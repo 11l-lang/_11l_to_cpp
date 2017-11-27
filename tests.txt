@@ -1,0 +1,278 @@
+// Based on [https://golang.org/doc/effective_go.html#named-results]
+fn read_full(Reader r, [Byte] buf) -> type {Int n = 0; Error? error}
+^                                                                    {
+    loop buf.len > 0 && error == null
+^                                     {
+        Int nr
+        nr, result.err = r.read(buf) // keyword result is inspired by Nim[http://nim-lang.org/docs/tut1.html] (also there is Result in Delphi[https://www.safaribooksonline.com/library/view/delphi-in-a/1565926595/re276.html])
+        result.n += nr
+        buf = buf[nr..]
+
+}}^
+
+
+replaced = line.replace('[', '<span class="sq"><span class="sq_brackets">[</span>')
+^                                                                                  …
+               .replace(']', '<span class="sq_brackets">]</span></span>')
+^                                                                        …
+               .replace('{', '<span class="cu_brackets"><span class="cu_brackets_b">{</span><span>…</span><span class="cu" style="display:none">')
+^                                                                                                                                                 …
+               .replace('}', '</span><span class="cu_brackets_b">}</span></span>')
+
+// [https://github.com/bbatsov/ruby-style-guide/pull/176#issuecomment-292355405 <- https://github.com/bbatsov/ruby-style-guide/issues/169 <- google:‘ruby multi line expressions’]:‘Ah wouldn't it be just so great if Ruby could read syntax like this one...’
+replaced = line.replace('[', '<span class="sq"><span class="sq_brackets">[</span>').
+^                                                                                    {
+               .replace(']', '<span class="sq_brackets">]</span></span>').
+^                                                                         …
+               .replace('{', '<span class="cu_brackets"><span class="cu_brackets_b">{</span><span>…</span><span class="cu" style="display:none">').
+^                                                                                                                                                  …
+               .replace('}', '</span><span class="cu_brackets_b">}</span></span>')
+
+}^
+
+// Не знаю, как быть в таком случае (возможно стоит ввести другой символ):
+outfile.write(line.replace('[', '<span class="sq"><span class="sq_brackets">[</span>')
+//^                                                                                   …
+                  .replace(']', '<span class="sq_brackets">]</span></span>')
+//^                                                                         …
+                  .replace('{', '<span class="cu_brackets"><span class="cu_brackets_b">{</span><span>…</span><span class="cu" style="display:none">')
+//^                                                                                                                                                  …
+                  .replace('}', '</span><span class="cu_brackets_b">}</span></span>'))
+
+
+loop
+    ^ {
+   switch instr[i]
+^                  {
+      "["
+^         {
+         nesting_level++
+      "]"
+^     }   {
+         if --nesting_level == 0
+^                                {
+            loop.break
+      "‘"
+^     }}  {
+         ending_tags.append("’") //‘‘
+      "’"
+^     }   {
+         assert(ending_tags.pop() == "’")
+   i++
+^  }
+   if i == instr.len
+^                    {
+      exit_with_error("Unended comment started", comment_start)
+
+}}}^
+
+
+loop
+^    {
+   switch instr[i]
+   {
+   "["
+^      {
+      nesting_level++
+   "]"
+^  }   {
+      if --nesting_level == 0
+^                             {
+         loop.break         
+   }
+^  }}
+   i++
+
+}^
+
+
+Array[type
+^          {
+          Int id
+          String value] arr
+^                     }
+
+
+arr.sort(fn (a, b)
+^                  {
+             return a.id < b.id
+         , reversed' true) // Notice: you can not put this in previous line!
+^        }
+
+arr.sort(fn (a, b)
+^                  {
+             return a.id < b.id) // But you can close bracket
+^                              }
+
+
+line.replace(switch
+^                   {
+                '[' {'<span class="sq"><span class="sq_brackets">[</span>'}
+                ']' {'<span class="sq_brackets">]</span></span>'}
+                '{' {'<span class="cu_brackets"><span class="cu_brackets_b">{</span><span>…</span><span class="cu" style="display:none">'}
+                '}' {'</span><span class="cu_brackets_b">}</span></span>'}
+            )
+^           }
+
+
+fn sign(x)
+^          {
+    return if x < 0
+^                  …
+             -1
+           else if x > 0
+^          Error: `if` scope is empty, after applied implied line joining: ```
+    return if x < 0 -1
+           else if x > 0
+```
+              1
+           else 0
+//}
+
+
+fn sign(x) 
+^          {
+    return if x < 0
+^                   {
+             (-1)
+           else if x > 0
+^          }    {        {
+               1
+           else 0
+^          }    {
+
+}}}^
+
+
+return if n < 0
+          {-n}
+       else
+^           {
+            n
+
+}^
+
+
+if whole_file // ...
+^             …
+        && (os.path.isdir(os.path.splitext(view().file_name())[0]) // ...
+         || os.path.basename(view().file_name()) == ".pq") // ...
+^                                                          {
+    html_fname = view().file_name()
+
+}^
+
+
+//{
+if next_char() == "\n" // чтобы переход на новую строку/перевод строки после `}` игнорировался
+^                      …
+        && !in_unordered_list // если находимся внутри списка, то пропуска новой строки делать не нужно
+^                             …
+        && ordered_list_current_number == null
+^                                              {
+    i += 1
+    writepos = i + 1
+
+}^
+
+
+res = aa
+^       …
+    + bb
+
+
+return
+       f()
+^      Error: unexpected indent
+
+
+loop 10
+
+Error: `loop` scope is empty^
+
+
+if a:
+	if b:
+		i = 0
+                j = 8
+^               Error: inconsistent indentations: ```
+TABTABi = 0
+SSSSSSSSSSSSSSSSj = 8
+```
+// Python для этого кода выдаёт ошибку `TabError: inconsistent use of tabs and spaces in indentation`.
+
+
+if a:
+	if b:
+		i = 0
+      j = 8
+^     Error: inconsistent indentations: ```
+TABTABi = 0
+SSSSSSj = 8
+```
+// Обратите внимание, что Python для этого кода выдаёт ошибку `IndentationError: unindent does not match any outer indentation level`
+// по той причине, что в Python'е [https://docs.python.org/3/reference/lexical_analysis.html]:‘Tabs are replaced (from left to right) by one to eight spaces’.
+// Я предлагаю отказаться от магических цифр вроде 8 пробелов на один символ табуляции, и если и разрешать вообще использовать табы, то по-честному: считая их
+// количество, а не преобразовывая их в пробелы.
+// Символ табуляции в сообщении об ошибке я обозначаю тремя символами `TAB`, потому что слово tab состоит из трёх букв.
+// И если между табуляциями вдруг окажется случайный пробел, которого не увидишь в редакторе, то при таком обозначении его сразу будет видно:
+//	 	.
+//TABSTAB.
+// Да, при таком подходе ширина не соответствует тому, как работают табы, но задача в данном случае — показать программисту то, как его код видит парсер, и чтобы
+// не хардкодить 8 пробелов на табуляцию, 4, или 2, или 3 (и уж тем более, не выносить это в настройки), символы табуляции рассматриваются просто как разделяющие
+// символы, и в строке-контексте ```...``` в сообщении об ошибке `inconsistent indentations` выводятся как `TAB`.
+
+
+if a:
+	if b:
+		i = 0
+                  j = 8
+^                 Error: inconsistent indentations: ```
+TABTABi = 0
+SSSSSSSSSSSSSSSSSSj = 8
+```
+// Python для этого кода выдаёт ошибку `IndentationError: unexpected indent`.
+// Хотя если установить значение табуляции в 9 пробелов, код получается выровненный и такое сообщение для программиста будет непонятно.
+
+
+if a:
+	if b:
+		i = 0
+        j = 8
+^       Error: inconsistent indentations: ```
+TABTABi = 0
+SSSSSSSSj = 8
+```
+// Python для этого кода выдаёт ошибку `TabError: inconsistent use of tabs and spaces in indentation`.
+// (Такую же ошибку, как в первом из этих четырёх примеров. Это указывает на то, что помимо 8 пробелов на табуляцию, в парсере Python
+// есть [недокументированная] обработка для 4-х пробелов на табуляцию [[[для 2-х пробелов на табуляцию такой обработки уже нет]]].)
+
+
+if b:
+    j = 8
+	i = 0
+^	Error: inconsistent indentations: ```
+SSSSj = 8
+TABi = 0
+```
+
+
+if 1:
+	        i = 0
+^	        Error: mixing tabs and spaces in indentation: ```
+TABSSSSSSSSi = 0
+```
+        	j = 1
+// Python этот код не считает ошибочным, не смотря на утверждение [http://legacy.python.org/dev/peps/pep-0008/#tabs-or-spaces
+//  <- https://stackoverflow.com/questions/2034517/pythons-interpretation-of-tabs-and-spaces-to-indent
+//  <- google:‘python mixed tabs and spaces’]:‘Python 3 disallows mixing the use of tabs and spaces for indentation.’
+// Я согласен, что можно такое выравнивание обрабатывать корректно (то есть, по-честному сравнивая последовательности символов пробелов и
+// табуляции [а не заменяя табуляции на 8 пробелов]) на случай копирования откуда-то куска кода с табами или с пробелами и с последующим
+// выравниваем его в IDE. Но я считаю это [оставлять после вставки кода смешанными пробелы и табуляцию] плохой практикой, и считаю, что в
+// этом случае следует просто выдавать ошибку, а не пытаться его [этот случай] корректно обрабатывать.
+
+
+if 1:
+    i = 0
+   j = 1
+^  Error: unindent does not match any outer indentation level
