@@ -1,4 +1,4 @@
-"""
+﻿"""
 После данной обработки отступы перестают играть роль — границу `scope` всегда определяют фигурные скобки.
 Также здесь выполняется склеивание строк, и таким образом границу statement\утверждения задаёт либо символ `;`,
 либо символ новой строки (при условии, что перед ним не стоит символ `…`!).
@@ -29,13 +29,13 @@ Error: `if/else/fn/loop/switch/type` scope is empty, after applied implied line 
 было произведено склеивание строк в месте данной ошибки).
 
 ---------------------------------------------------------------------------------------------------------------
-Error: mixing tabs and spaces in indentation: ```...```
+Error: mixing tabs and spaces in indentation: `...`
 ---------------------------------------------------------------------------------------------------------------
 В одной строке для отступа используется смесь пробелов и символов табуляции.
 Выберите что-либо одно (желательно сразу для всего файла): либо пробелы для отступа, либо табуляцию.
 Примечание: внутри строковых литералов, а также внутри строк кода можно смешивать пробелы и табуляцию. Эта
-ошибка генерируется только при проверке отступа (отступ — последовательность символов разделителей от самого
-начала строки до первого символа неразделителя).
+ошибка генерируется только при проверке отступа (отступ — последовательность символов пробелов или табуляции от
+самого начала строки до первого символа отличного от пробела и табуляции).
 
 ---------------------------------------------------------------------------------------------------------------
 Error: inconsistent indentations: ```...```
@@ -65,5 +65,247 @@ Error: unindent does not match any outer indentation level
 [-Добавить описание ошибки.-]
 ===============================================================================================================
 """
+from enum import Enum
 
-new_scope_keywords = ["else", "fn", "if", "loop", "switch", "type"]
+keywords = ['else', 'fn', 'if', 'in', 'loop', 'null', 'result', 'return', 'switch', 'type', 'typeof']
+new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
+binary_operators = [[], ['+'], ['+='], ['<<=']]
+
+
+class Exception(Exception):
+    def __init__(self, message, pos):
+        self.message = message
+        self.pos = pos
+
+class Lexem:
+#   = Token, but I prefer call it a Lexem (because I could not find a well-defined/precise distinction between token and lexem in computer science).
+# Also I prefer term lexical analyzer to ‘lexer, tokenizer, or scanner’[https://en.wikipedia.org/wiki/Lexical_analysis].
+# >[https://en.wikipedia.org/wiki/Analysis]:‘Analysis is the process of breaking a complex topic or substance into smaller parts in order to gain a better understanding of it.’
+# So, lexical analyzer has the task of breaking some source text/code into parts called lexems.
+    class Category(Enum):
+#       = Class [of lexem], or TokenName, or even just Token [https://stackoverflow.com/questions/14954721/what-is-the-difference-between-a-token-and-a-lexeme <- https://en.wikipedia.org/wiki/Lexical_analysis]
+        IDENTIFIER = 0
+        KEYWORD = 1
+        DELIMITER = 2 # SEPARATOR = 2
+        OPERATOR = 3
+        NUMERIC_LITERAL = 4
+        STRING_LITERAL = 5
+        SCOPE_BEGIN = 6 # similar to ‘INDENT token in Python’[https://docs.python.org/3/reference/lexical_analysis.html][-1]
+        SCOPE_END = 7   # similar to ‘DEDENT token in Python’[-1]
+        STATEMENT_SEPARATOR = 8
+
+    def __init__(self, start, end, category):
+        self.start = start
+        self.end = end
+        self.category = category
+
+def lex(source, implied_scopes = None, line_continuations = None, newline_chars = None, comments = None):
+    lexems = []
+    indentation_levels = []
+    nesting_elements = [] # логически этот стек можно объединить с indentation_levels, но так немного удобнее (например для обработки [./tests.txt]:‘// But you can close parenthesis/bracket’, конкретно: для проверок `nesting_elements[-1][0] != ...`)
+    i = 0
+    def end_scope(opt = 0):
+        pass
+
+    begin_of_line = True
+    while i < len(source):
+        if begin_of_line: # at the beginning of each line, the line's indentation level is compared to the last indentation_levels [:1]
+            begin_of_line = False
+            linestart = i
+            tabs = False
+            spaces = False
+            while i < len(source):
+                if source[i] == ' ':
+                    spaces = True
+                elif source[i] == "\t":
+                    tabs = True
+                else:
+                    break
+                i += 1
+            if i == len(source): # end of source
+                break
+
+            if source[i] in "\r\n" or source[i:i+2] == '//': # lines with only whitespace and/or comments do not affect the indentation
+                continue
+
+            if len(lexems) \
+               and lexems[-1].category == Lexem.Category.OPERATOR \
+               and source[lexems[-1].start:lexems[-1].end] in binary_operators[lexems[-1].end - lexems[-1].start]: # ‘Every line of code which ends with any binary operator should be joined with the following line of code.’:[https://github.com/JuliaLang/julia/issues/2097#issuecomment-339924750][-339924750]<
+                if line_continuations != None:
+                    line_continuations.append(lexems[-1].end)
+                continue
+
+            # if not (len(indentation_levels) and indentation_levels[-1][0] == None): # сразу после символа `{` это [:правило] не действует ...а хотя не могу подобрать пример, который бы показывал необходимость такой проверки, а потому оставлю этот if закомментированным # }
+            if source[i    ] in binary_operators[1]  \
+            or source[i:i+2] in binary_operators[2]  \
+            or source[i:i+3] in binary_operators[3]: # [правило:] ‘Every line of code which begins with any binary operator should be joined with the previous line of code.’:[-339924750]<
+                if len(lexems) == 0:
+                    raise Exception('source can not starts with a binary operator', i)
+                if line_continuations != None:
+                    line_continuations.append(lexems[-1].end)
+                continue
+
+            if tabs and spaces:
+                next_line_pos = source.find("\n", i)
+                raise Exception('mixing tabs and spaces in indentation: `' + source[linestart:next_line_pos if next_line_pos != -1 else len(source)].replace(' ', 'S').replace("\t", 'TAB') + '`', i)
+
+            indentation_level = i - linestart
+            if len(indentation_levels) and indentation_levels[-1][0] == None: # сразу после символа `{` идёт новый произвольный отступ (понижение уровня отступа может быть полезно, если вдруг отступ оказался слишком большой), который действует вплоть до парного символа `}`
+                indentation_levels[-1][0] = indentation_level
+            else:
+                if indentation_level > 0 and len(indentation_levels) and indentation_tabs != tabs:
+                    e = i + 1
+                    while e < len(source) and source[e] not in "\r\n":
+                        e += 1
+                    raise Exception("inconsistent indentations: ```\n" + prev_indentation_level*('TAB' if indentation_tabs else 'S') + source[prev_linestart:linestart]
+                        + (i-linestart)*('TAB' if tabs else 'S') + source[i:e] + "\n```", i)
+                prev_linestart = i
+
+                prev_indentation_level = indentation_levels[-1][0] if len(indentation_levels) else 0
+
+                if indentation_level == prev_indentation_level: # [1:] [-1]:‘If it is equal, nothing happens.’ :)(: [:2]
+                    if len(lexems):
+                        lexems.append(Lexem(linestart-1, linestart, Lexem.Category.STATEMENT_SEPARATOR))
+                elif indentation_level > prev_indentation_level: # [2:] [-1]:‘If it is larger, it is pushed on the stack, and one INDENT token is generated.’ [:3]
+                    if len(nesting_elements) == 0 or nesting_elements[-1][0] not in new_scope_keywords:
+                        raise Exception('unexpected indent', i)
+                    else:
+                        nesting_elements.pop() # remove new_scope_keyword                        
+                    if len(indentation_levels) == 0:
+                        indentation_tabs = tabs # первоначальная/новая установка символа для отступа (либо табуляция, либо пробелы) производится только от нулевого уровня отступа
+                    indentation_levels.append([indentation_level, False])
+                    lexems.append(Lexem(i, i, Lexem.Category.SCOPE_BEGIN))
+                    if implied_scopes != None:
+                        implied_scopes.append(('{', lexems[-2 if len(lexems) >= 2 else -1].end))
+                else: # [3:] [-1]:‘If it is smaller, it ~‘must’ be one of the numbers occurring on the stack; all numbers on the stack that are larger are popped off, and for each number popped off a DEDENT token is generated.’ [:4]
+                    while True:
+                        level, sub_scope = indentation_levels.pop() if len(indentation_levels) else (0, False)
+                        lexems.append(Lexem(i, i, Lexem.Category.SCOPE_END))
+                        if implied_scopes != None:
+                            implied_scopes.append(('}', i))
+                        if level == indentation_level:
+                            break
+                        if level < indentation_level:
+                            raise Exception('unindent does not match any outer indentation level', i)
+
+        ch = source[i]
+
+        if ch in " \t":
+            i += 1 # just skip whitespace characters
+        elif ch in "\r\n":
+            if newline_chars != None:
+                newline_chars.append(i)
+            i += 1
+            if ch == "\r" and source[i:i+1] == "\n":
+                i += 1
+            if len(nesting_elements) == 0 or nesting_elements[-1][0] not in '([': # если мы внутри скобок, то начинать новую строку не нужно # ])
+                begin_of_line = True
+        elif ch == '/' and source[i+1:i+2] == '/':
+            i += 2
+            comment_start = i
+            while i < len(source) and source[i] not in "\r\n":
+                i += 1
+            if comments != None:
+                comments.append((comment_start, i))
+        else:
+            operator = None
+            for op in ['+', '-', '*', '/', '%', '<<', '>>', '&', '|', '^', '~', '<', '>', '<=', '>=', '==', '!=', '=']:
+                if source[i:i+len(op)] == op:
+                    operator = op
+
+            lexem_start = i
+            i += 1
+
+            if operator:
+                i = lexem_start + len(operator)
+                category = Lexem.Category.OPERATOR
+            elif 'a' <= ch <= 'z' or 'A' <= ch <= 'Z' or ch == '_': # this is IDENTIFIER or KEYWORD
+                while i < len(source):
+                    ch = source[i]
+                    if not ('a' <= ch <= 'z' or 'A' <= ch <= 'Z' or ch == '_' or '0' <= ch <= '9' or ch == '?'):
+                        break
+                    i += 1
+                if source[lexem_start:i] in keywords:
+                    category = Lexem.Category.KEYWORD
+                    if source[lexem_start:i] in new_scope_keywords and (source[lexem_start:i] != 'loop' or source[i:i+1] != '.'):
+                        nesting_elements.append((source[lexem_start:i], lexem_start))
+                else:
+                    category = Lexem.Category.IDENTIFIER
+
+            elif '0' <= ch <= '9': # this is NUMERIC_LITERAL
+                if ch in '01' and source[i:i+1] == 'B':
+                    i += 1
+                else:
+                    while i < len(source) and '0' <= source[i] <= '9':
+                        i += 1
+                category = Lexem.Category.NUMERIC_LITERAL
+
+            elif ch == '"':
+                while i < len(source):
+                    ch = source[i]
+                    i += 1
+                    if ch == '"':
+                        break
+                category = Lexem.Category.STRING_LITERAL
+
+            elif ch == '{':
+                indentation_levels.append([None, True])
+                if len(nesting_elements):
+                    if nesting_elements[-1][0] in '([':
+                        raise Exception('naked braces (without new scope keyword) within parentheses/brackets is not allowed', lexem_start)
+                    if nesting_elements[-1][0] != '{': # }
+                        nesting_elements.pop() # remove new_scope_keyword
+                nesting_elements.append(('{', lexem_start)) # }
+                category = Lexem.Category.SCOPE_BEGIN
+            elif ch == '}':
+                if len(nesting_elements) == 0 or nesting_elements[-1][0] != '{':
+                    raise Exception('there is no corresponding opening brace for `}`', lexem_start)
+                #end_scope(lexem_start)
+                nesting_elements.pop()
+                while indentation_levels[-1][1] != True:
+                    lexems.append(Lexem(lexem_start, lexem_start, Lexem.Category.SCOPE_END))
+                    if implied_scopes != None: # {
+                        implied_scopes.append(('}', lexem_start))
+                    indentation_levels.pop()
+                assert(indentation_levels.pop() == (None, True))
+                category = Lexem.Category.SCOPE_END
+            elif ch == ';':
+                category = Lexem.Category.STATEMENT_SEPARATOR
+
+            elif ch in [',', '.']:
+                category = Lexem.Category.DELIMITER
+
+            elif ch in '([':
+                nesting_elements.append((ch, lexem_start))
+                category = Lexem.Category.DELIMITER
+            elif ch in '])':
+                if len(nesting_elements) == 0 or nesting_elements[-1][0] != {']':'[', ')':'('}[ch]: # ])
+                    raise Exception('there is no corresponding opening parenthesis/bracket for `' + ch + '`', lexem_start)
+                nesting_elements.pop()
+                #end_scope(lexem_start)
+                while len(indentation_levels) and indentation_levels[-1][1] != True:
+                    lexems.append(Lexem(lexem_start, lexem_start, Lexem.Category.SCOPE_END))
+                    if implied_scopes != None: # {
+                        implied_scopes.append(('}', lexem_start))
+                    indentation_levels.pop()
+                category = Lexem.Category.DELIMITER
+
+            else:
+                raise Exception('unexpected character ' + ch, lexem_start)
+
+            lexems.append(Lexem(lexem_start, i, category))
+
+    if len(nesting_elements):
+        if nesting_elements[-1][0] in '([{': # }])
+            raise Exception('there is no corresponding closing parenthesis/bracket/brace for `' + nesting_elements[-1][0] + '`', nesting_elements[-1][1])
+        else:
+            raise Exception('`' + nesting_elements[-1][0] + '` scope is empty.', nesting_elements[-1][1])
+
+    #end_scope() # [4:] [-1]:‘At the end of the file, a DEDENT token is generated for each number remaining on the stack that is larger than zero.’
+    while len(indentation_levels) and indentation_levels[-1][1] != True:
+        lexems.append(Lexem(i, i, Lexem.Category.SCOPE_END))
+        if implied_scopes != None: # {
+            implied_scopes.append(('}', i))
+        indentation_levels.pop()
+
+    return lexems
