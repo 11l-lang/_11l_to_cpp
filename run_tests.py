@@ -11,15 +11,15 @@ for n, test in enumerate(open("tests.txt", encoding="utf8").read().split("\n\n\n
     for line in test.splitlines():
         if line.startswith('^') or line.endswith("^"):
             if line.startswith('^'):
-                position = re.search(r'[^\t ]', line[1:]).start()
-                message = line[position + 1:]
+                position = re.search(r'[^\t ]', line[1:]).start() + 1
+                message = line[position:]
             else:
-                position = 1
+                position = 0
                 message = line[:-1]
-            position += len(test_source) - last_line_len
+            position += len(test_source) - last_line_len - 1
             if message.startswith('Error: '):
                 error = (message, position)
-            elif message[0] in "{}":
+            elif message[0] in '{}':
                 for ch in message:
                     scopes += [(ch, position)]
             elif message == '…':

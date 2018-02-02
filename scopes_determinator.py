@@ -68,7 +68,8 @@ Error: unindent does not match any outer indentation level
 from enum import Enum
 
 keywords = ['else', 'fn', 'if', 'in', 'loop', 'null', 'result', 'return', 'switch', 'type', 'typeof']
-new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
+# new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
+# Решил отказаться от учёта new_scope_keywords на уровне лексического анализатора из-за loop.break и case в switch
 binary_operators = [[], ['+'], ['+='], ['<<=']]
 
 
@@ -167,22 +168,19 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                     if len(lexems):
                         lexems.append(Lexem(linestart-1, linestart, Lexem.Category.STATEMENT_SEPARATOR))
                 elif indentation_level > prev_indentation_level: # [2:] [-1]:‘If it is larger, it is pushed on the stack, and one INDENT token is generated.’ [:3]
-                    if len(nesting_elements) == 0 or nesting_elements[-1][0] not in new_scope_keywords:
-                        raise Exception('unexpected indent', i)
-                    else:
-                        nesting_elements.pop() # remove new_scope_keyword                        
                     if len(indentation_levels) == 0:
                         indentation_tabs = tabs # первоначальная/новая установка символа для отступа (либо табуляция, либо пробелы) производится только от нулевого уровня отступа
                     indentation_levels.append([indentation_level, False])
                     lexems.append(Lexem(i, i, Lexem.Category.SCOPE_BEGIN))
                     if implied_scopes != None:
-                        implied_scopes.append(('{', lexems[-2 if len(lexems) >= 2 else -1].end))
+                        implied_scopes.append(('{', lexems[-2].end + (1 if source[lexems[-2].end] in " \n" else 0)))
                 else: # [3:] [-1]:‘If it is smaller, it ~‘must’ be one of the numbers occurring on the stack; all numbers on the stack that are larger are popped off, and for each number popped off a DEDENT token is generated.’ [:4]
                     while True:
-                        level, sub_scope = indentation_levels.pop() if len(indentation_levels) else (0, False)
+                        indentation_levels.pop()
                         lexems.append(Lexem(i, i, Lexem.Category.SCOPE_END))
                         if implied_scopes != None:
                             implied_scopes.append(('}', i))
+                        level, sub_scope = indentation_levels[-1] if len(indentation_levels) else [0, False]
                         if level == indentation_level:
                             break
                         if level < indentation_level:
@@ -227,8 +225,6 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                     i += 1
                 if source[lexem_start:i] in keywords:
                     category = Lexem.Category.KEYWORD
-                    if source[lexem_start:i] in new_scope_keywords and (source[lexem_start:i] != 'loop' or source[i:i+1] != '.'):
-                        nesting_elements.append((source[lexem_start:i], lexem_start))
                 else:
                     category = Lexem.Category.IDENTIFIER
 
@@ -250,11 +246,6 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
 
             elif ch == '{':
                 indentation_levels.append([None, True])
-                if len(nesting_elements):
-                    if nesting_elements[-1][0] in '([':
-                        raise Exception('naked braces (without new scope keyword) within parentheses/brackets is not allowed', lexem_start)
-                    if nesting_elements[-1][0] != '{': # }
-                        nesting_elements.pop() # remove new_scope_keyword
                 nesting_elements.append(('{', lexem_start)) # }
                 category = Lexem.Category.SCOPE_BEGIN
             elif ch == '}':
@@ -267,7 +258,7 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                     if implied_scopes != None: # {
                         implied_scopes.append(('}', lexem_start))
                     indentation_levels.pop()
-                assert(indentation_levels.pop() == (None, True))
+                assert(indentation_levels.pop() == [None, True])
                 category = Lexem.Category.SCOPE_END
             elif ch == ';':
                 category = Lexem.Category.STATEMENT_SEPARATOR
@@ -283,11 +274,11 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                     raise Exception('there is no corresponding opening parenthesis/bracket for `' + ch + '`', lexem_start)
                 nesting_elements.pop()
                 #end_scope(lexem_start)
-                while len(indentation_levels) and indentation_levels[-1][1] != True:
-                    lexems.append(Lexem(lexem_start, lexem_start, Lexem.Category.SCOPE_END))
-                    if implied_scopes != None: # {
-                        implied_scopes.append(('}', lexem_start))
-                    indentation_levels.pop()
+                # while len(indentation_levels) and indentation_levels[-1][1] != True:
+                #     lexems.append(Lexem(lexem_start, lexem_start, Lexem.Category.SCOPE_END))
+                #     if implied_scopes != None: # {
+                #         implied_scopes.append(('}', lexem_start))
+                #     indentation_levels.pop()
                 category = Lexem.Category.DELIMITER
 
             else:
@@ -296,10 +287,7 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
             lexems.append(Lexem(lexem_start, i, category))
 
     if len(nesting_elements):
-        if nesting_elements[-1][0] in '([{': # }])
-            raise Exception('there is no corresponding closing parenthesis/bracket/brace for `' + nesting_elements[-1][0] + '`', nesting_elements[-1][1])
-        else:
-            raise Exception('`' + nesting_elements[-1][0] + '` scope is empty.', nesting_elements[-1][1])
+        raise Exception('there is no corresponding closing parenthesis/bracket/brace for `' + nesting_elements[-1][0] + '`', nesting_elements[-1][1])
 
     #end_scope() # [4:] [-1]:‘At the end of the file, a DEDENT token is generated for each number remaining on the stack that is larger than zero.’
     while len(indentation_levels) and indentation_levels[-1][1] != True:

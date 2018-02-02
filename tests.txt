@@ -7,8 +7,21 @@ fn read_full(Reader r, [Byte] buf) -> type {Int n = 0; Error? error}
         nr, result.err = r.read(buf) // keyword result is inspired by Nim[http://nim-lang.org/docs/tut1.html] (also there is Result in Delphi[https://www.safaribooksonline.com/library/view/delphi-in-a/1565926595/re276.html])
         result.n += nr
         buf = buf[nr..]
+^                       }}
 
-}}^
+
+// Based on [https://golang.org/doc/effective_go.html#named-results]
+fn read_full(Reader r, [Byte] buf) -> type {Int n = 0; Error? error}
+^                                                                    {
+    loop buf.len > 0 && error == null
+^                                     {
+        Int nr
+        nr, result.err = r.read(buf) // keyword result is inspired by Nim[http://nim-lang.org/docs/tut1.html] (also there is Result in Delphi[https://www.safaribooksonline.com/library/view/delphi-in-a/1565926595/re276.html])
+        result.n += nr
+        buf = buf[nr..]
+    k
+^   }
+^     }
 
 
 fn read_full(Reader r, [Byte] buf) -> type {Int n = 0; Error? error} {
@@ -99,10 +112,11 @@ loop
 ^      {
       nesting_level++
    "]"
-^  }   {
+^  }
+^      {
       if --nesting_level == 0
 ^                             {
-         loop.break         
+         loop.break
    }
 ^  }}
    i++
