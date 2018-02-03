@@ -63,6 +63,7 @@ loop 1
 }^
 
 
+---
 replaced = line.replace('[', '<span class="sq"><span class="sq_brackets">[</span>')
 ^                                                                                  …
                .replace(']', '<span class="sq_brackets">]</span></span>')
@@ -71,6 +72,8 @@ replaced = line.replace('[', '<span class="sq"><span class="sq_brackets">[</span
 ^                                                                                                                                                 …
                .replace('}', '</span><span class="cu_brackets_b">}</span></span>')
 
+
+---
 // [https://github.com/bbatsov/ruby-style-guide/pull/176#issuecomment-292355405 <- https://github.com/bbatsov/ruby-style-guide/issues/169 <- google:‘ruby multi line expressions’]:‘Ah wouldn't it be just so great if Ruby could read syntax like this one...’
 // (Всё же решил отказаться от этого синтаксиса, пусть `.` в конце строки всегда означает оператор `with`.)
 //replaced = line.replace('[', '<span class="sq"><span class="sq_brackets">[</span>').
@@ -83,6 +86,7 @@ replaced = line.replace('[', '<span class="sq"><span class="sq_brackets">[</span
 //
 //}^
 
+
 main_window_pos.
 ^                {
     .x = 10
@@ -90,6 +94,8 @@ main_window_pos.
 
 }^
 
+
+---
 // Не знаю, как быть в таком случае (возможно стоит ввести другой символ):
 outfile.write(line.replace('[', '<span class="sq"><span class="sq_brackets">[</span>')
 //^                                                                                   …
@@ -394,7 +400,7 @@ a = ({1})
 ^    Error: naked braces (without new scope keyword) within parentheses/brackets is not allowed
 
 
-// {
+// {{
 fn f() {
 }}
  Error: there is no corresponding opening brace for `}`^      
@@ -412,7 +418,7 @@ r = [a + b)
 
 r = (a +
 ^   Error: there is no corresponding closing parenthesis/bracket/brace for `(`
-// )
+// ))
 
 
 setTimeout(fn () {

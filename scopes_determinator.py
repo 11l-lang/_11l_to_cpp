@@ -159,7 +159,7 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
 
             indentation_level = i - linestart
             if len(indentation_levels) and indentation_levels[-1][0] == None: # сразу после символа `{` идёт новый произвольный отступ (понижение уровня отступа может быть полезно, если вдруг отступ оказался слишком большой), который действует вплоть до парного символа `}`
-                indentation_levels[-1][0] = indentation_level # || maybe this is unnecessary
+                indentation_levels[-1][0] = indentation_level # || maybe this is unnecessary (actually it is necessary, see test "fn f()\n{\na = 1")
                 # // This is uncertain piece of code:
                 indentation_tabs = tabs
             else:
