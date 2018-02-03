@@ -130,6 +130,9 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
             if source[i] in "\r\n" or source[i:i+2] == '//': # lines with only whitespace and/or comments do not affect the indentation
                 continue
 
+            if source[i] in "{}": # Indentation level of lines starting with { or } is ignored
+                continue
+
             if len(lexems) \
                and lexems[-1].category == Lexem.Category.OPERATOR \
                and source[lexems[-1].start:lexems[-1].end] in binary_operators[lexems[-1].end - lexems[-1].start]: # ‘Every line of code which ends with any binary operator should be joined with the following line of code.’:[https://github.com/JuliaLang/julia/issues/2097#issuecomment-339924750][-339924750]<
@@ -156,7 +159,9 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
 
             indentation_level = i - linestart
             if len(indentation_levels) and indentation_levels[-1][0] == None: # сразу после символа `{` идёт новый произвольный отступ (понижение уровня отступа может быть полезно, если вдруг отступ оказался слишком большой), который действует вплоть до парного символа `}`
-                indentation_levels[-1][0] = indentation_level
+                indentation_levels[-1][0] = indentation_level # || maybe this is unnecessary
+                # // This is uncertain piece of code:
+                indentation_tabs = tabs
             else:
                 if indentation_level > 0 and len(indentation_levels) and indentation_tabs != tabs:
                     e = i + 1

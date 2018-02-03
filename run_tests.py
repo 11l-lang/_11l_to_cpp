@@ -27,8 +27,8 @@ for n, test in enumerate(open("tests.txt", encoding="utf8").read().split("\n\n\n
             continue
         test_source += line + "\n"
         last_line_len = len(line)
-    if n >= 1:
-        break
+#    if n >= 1:
+#        break
     # print(test_source)
     # print(error)
     implied_scopes = []
@@ -40,11 +40,12 @@ for n, test in enumerate(open("tests.txt", encoding="utf8").read().split("\n\n\n
         if implied_scopes == scopes and line_continuations == ellipsises:
             print('OK')
         else:
-            print("Mismatch for:\n" + test + "\n\n")
+            print("Mismatch at test:\n" + test + "\n\n")
             print(implied_scopes)
             print(scopes)
             print(line_continuations)
             print(ellipsises)
+            break
     except scopes_determinator.Exception as e:
         was_error = True
         if error and "Error: " + e.message == error[0] and e.pos == error[1]:
@@ -58,6 +59,8 @@ for n, test in enumerate(open("tests.txt", encoding="utf8").read().split("\n\n\n
             print('Error: ' + e.message + "\n" + test_source[prev_line_pos:next_line_pos] + "\n" + re.sub(r'[^\t]', ' ',
                                                                                                           test_source[
                                                                                                           prev_line_pos:e.pos]) + '^')
+            print("in test:\n" + test)
             break
     if error != None and not was_error:
-        print("There should be error in:\n" + test)
+        print("There should be error in test:\n" + test)
+        break

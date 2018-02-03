@@ -41,6 +41,18 @@ buf = buf[nr..]
 }
 
 
+fn read_full(Reader r, [Byte] buf)
+{
+    buf = buf[nr..]
+}
+
+
+fn read_full(Reader r, [Byte] buf)
+    {
+    buf = buf[nr..]
+    }
+
+
 replaced = line.replace('[', '<span class="sq"><span class="sq_brackets">[</span>')
 ^                                                                                  …
                .replace(']', '<span class="sq_brackets">]</span></span>')
