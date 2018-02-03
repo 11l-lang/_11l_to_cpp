@@ -53,6 +53,16 @@ fn read_full(Reader r, [Byte] buf)
     }
 
 
+fn f()
+{
+a = 1
+loop 1
+^      {
+	print(1)
+}
+}^
+
+
 replaced = line.replace('[', '<span class="sq"><span class="sq_brackets">[</span>')
 ^                                                                                  …
                .replace(']', '<span class="sq_brackets">]</span></span>')
