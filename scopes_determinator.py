@@ -163,7 +163,7 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                 # // This is uncertain piece of code:
                 indentation_tabs = tabs
             else:
-                if indentation_level > 0 and len(indentation_levels) and indentation_tabs != tabs:
+                if indentation_level > 0 and len(indentation_levels) and prev_indentation_level > 0 and indentation_tabs != tabs:
                     e = i + 1
                     while e < len(source) and source[e] not in "\r\n":
                         e += 1
@@ -177,7 +177,7 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                     if len(lexems):
                         lexems.append(Lexem(linestart-1, linestart, Lexem.Category.STATEMENT_SEPARATOR))
                 elif indentation_level > prev_indentation_level: # [2:] [-1]:‘If it is larger, it is pushed on the stack, and one INDENT token is generated.’ [:3]
-                    if len(indentation_levels) == 0:
+                    if prev_indentation_level == 0: # len(indentation_levels) == 0 or indentation_levels[-1][0] == 0:
                         indentation_tabs = tabs # первоначальная/новая установка символа для отступа (либо табуляция, либо пробелы) производится только от нулевого уровня отступа
                     indentation_levels.append([indentation_level, False])
                     lexems.append(Lexem(i, i, Lexem.Category.SCOPE_BEGIN))
