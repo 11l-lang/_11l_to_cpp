@@ -138,9 +138,12 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                 continue
 
             # if not (len(indentation_levels) and indentation_levels[-1][0] == None): # сразу после символа `{` это [:правило] не действует ...а хотя не могу подобрать пример, который бы показывал необходимость такой проверки, а потому оставлю этот if закомментированным # }
-            if source[i    ] in binary_operators[1]  \
-            or source[i:i+2] in binary_operators[2]  \
-            or source[i:i+3] in binary_operators[3]: # [правило:] ‘Every line of code which begins with any binary operator should be joined with the previous line of code.’:[-339924750]<
+            if ((source[i    ] in binary_operators[1]
+              or source[i:i+2] in binary_operators[2]
+              or source[i:i+3] in binary_operators[3]) # [правило:] ‘Every line of code which begins with any binary operator should be joined with the previous line of code.’:[-339924750]<
+              and not (source[i    ] in unary_operators[1]    # Rude fix for:
+                    or source[i:i+2] in unary_operators[2]    # a=b
+                    or source[i:i+3] in unary_operators[3])): # ++i // Plus symbol at the beginning here should not be treated as binary + operator, so there is no implied line joining
                 if len(lexems) == 0:
                     raise Exception('source can not starts with a binary operator', i)
                 if line_continuations != None:

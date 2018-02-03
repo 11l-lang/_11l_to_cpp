@@ -132,7 +132,8 @@ Array[type
 ^                     }
 
 
-$arr.sort(fn (a, b)
+---
+arr.sort(fn (a, b)
 ^                  {
              r = a.id < b.id // here is no line joining despite we are inside brackets in `sort(...)`
              return r
@@ -352,6 +353,11 @@ r = 1
 ^   Error: unexpected indent
 
 
+a=b
+++i // Plus symbol at the beginning here should not be treated as binary + operator, so there is no implied line joining
+
+
+---
 a = ({1})
 ^    Error: naked braces (without new scope keyword) within parentheses/brackets is not allowed
 

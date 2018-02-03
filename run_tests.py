@@ -1,7 +1,7 @@
 import scopes_determinator, re
 
 for n, test in enumerate(open("tests.txt", encoding="utf8").read().split("\n\n\n")):
-    if test[0] == '$':
+    if test.startswith('---'):
         continue
     test_source = ""
     error = None
@@ -23,7 +23,7 @@ for n, test in enumerate(open("tests.txt", encoding="utf8").read().split("\n\n\n
                 for ch in message:
                     scopes += [(ch, position)]
             elif message == '…':
-                ellipsises += [('…', position)]
+                ellipsises += [position]
             continue
         test_source += line + "\n"
         last_line_len = len(line)
@@ -34,13 +34,19 @@ for n, test in enumerate(open("tests.txt", encoding="utf8").read().split("\n\n\n
     implied_scopes = []
     line_continuations = []
     newline_chars = []
+    was_error = False
     try:
         scopes_determinator.lex(test_source, implied_scopes, line_continuations, newline_chars)
-        print(implied_scopes)
-        print(scopes)
-        print(line_continuations)
-        print(ellipsises)
+        if implied_scopes == scopes and line_continuations == ellipsises:
+            print('OK')
+        else:
+            print("Mismatch for:\n" + test + "\n\n")
+            print(implied_scopes)
+            print(scopes)
+            print(line_continuations)
+            print(ellipsises)
     except scopes_determinator.Exception as e:
+        was_error = True
         if error and "Error: " + e.message == error[0] and e.pos == error[1]:
             print('OK (Error)')
         else:
@@ -52,3 +58,6 @@ for n, test in enumerate(open("tests.txt", encoding="utf8").read().split("\n\n\n
             print('Error: ' + e.message + "\n" + test_source[prev_line_pos:next_line_pos] + "\n" + re.sub(r'[^\t]', ' ',
                                                                                                           test_source[
                                                                                                           prev_line_pos:e.pos]) + '^')
+            break
+    if error != None and not was_error:
+        print("There should be error in:\n" + test)
