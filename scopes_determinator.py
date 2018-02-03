@@ -70,7 +70,8 @@ from enum import Enum
 keywords = ['else', 'fn', 'if', 'in', 'loop', 'null', 'result', 'return', 'switch', 'type', 'typeof']
 # new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
 # Решил отказаться от учёта new_scope_keywords на уровне лексического анализатора из-за loop.break и case в switch
-binary_operators = [[], ['+'], ['+='], ['<<=']]
+binary_operators = [[], ['+', '-', '*', '/'], ['+=', '-=', '*=', '/='], ['<<=', '>>=']]
+unary_operators = [[], [], ['++', '--'], []]
 
 
 class Exception(Exception):
@@ -207,9 +208,10 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                 comments.append((comment_start, i))
         else:
             operator = None
-            for op in ['+', '-', '*', '/', '%', '<<', '>>', '&', '|', '^', '~', '<', '>', '<=', '>=', '==', '!=', '=']:
+            for op in ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '%', '&=', '|=', '^=', '++', '--', '+', '-', '*', '/', '%', '&', '|', '^', '~', '<', '>', '=']:
                 if source[i:i+len(op)] == op:
                     operator = op
+                    break
 
             lexem_start = i
             i += 1
@@ -258,7 +260,7 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                     if implied_scopes != None: # {
                         implied_scopes.append(('}', lexem_start))
                     indentation_levels.pop()
-                assert(indentation_levels.pop() == [None, True])
+                assert(indentation_levels.pop()[1] == True)
                 category = Lexem.Category.SCOPE_END
             elif ch == ';':
                 category = Lexem.Category.STATEMENT_SEPARATOR
@@ -274,11 +276,6 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                     raise Exception('there is no corresponding opening parenthesis/bracket for `' + ch + '`', lexem_start)
                 nesting_elements.pop()
                 #end_scope(lexem_start)
-                # while len(indentation_levels) and indentation_levels[-1][1] != True:
-                #     lexems.append(Lexem(lexem_start, lexem_start, Lexem.Category.SCOPE_END))
-                #     if implied_scopes != None: # {
-                #         implied_scopes.append(('}', lexem_start))
-                #     indentation_levels.pop()
                 category = Lexem.Category.DELIMITER
 
             else:
@@ -293,7 +290,7 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
     while len(indentation_levels) and indentation_levels[-1][1] != True:
         lexems.append(Lexem(i, i, Lexem.Category.SCOPE_END))
         if implied_scopes != None: # {
-            implied_scopes.append(('}', i))
+            implied_scopes.append(('}', i-1 if source[-1] == "\n" else i))
         indentation_levels.pop()
 
     return lexems
