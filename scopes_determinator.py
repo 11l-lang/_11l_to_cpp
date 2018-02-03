@@ -180,11 +180,13 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                         implied_scopes.append(('{', lexems[-2].end + (1 if source[lexems[-2].end] in " \n" else 0)))
                 else: # [3:] [-1]:‘If it is smaller, it ~‘must’ be one of the numbers occurring on the stack; all numbers on the stack that are larger are popped off, and for each number popped off a DEDENT token is generated.’ [:4]
                     while True:
+                        if indentation_levels[-1][1]:
+                            raise Exception('too much unindent, what is this unindent intended for?', i)
                         indentation_levels.pop()
                         lexems.append(Lexem(i, i, Lexem.Category.SCOPE_END))
                         if implied_scopes != None:
                             implied_scopes.append(('}', i))
-                        level, sub_scope = indentation_levels[-1] if len(indentation_levels) else [0, False]
+                        level, explicit_scope_via_curly_braces = indentation_levels[-1] if len(indentation_levels) else [0, False]
                         if level == indentation_level:
                             break
                         if level < indentation_level:
@@ -268,7 +270,7 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
             elif ch == ';':
                 category = Lexem.Category.STATEMENT_SEPARATOR
 
-            elif ch in [',', '.']:
+            elif ch in [',', '.', ':']:
                 category = Lexem.Category.DELIMITER
 
             elif ch in '([':
