@@ -192,6 +192,7 @@ line.replace(switch
 ^           }
 
 
+--- // [-fix-]
 fn sign(x)
 ^          {
     return if x < 0
