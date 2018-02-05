@@ -197,6 +197,8 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                         if level < indentation_level:
                             raise Exception('unindent does not match any outer indentation level', i)
 
+                prev_indentation_level = indentation_level
+
         ch = source[i]
 
         if ch in " \t":

@@ -8,7 +8,8 @@ for n, test in enumerate(open("tests.txt", encoding="utf8").read().split("\n\n\n
     scopes = []
     ellipsises = []
     last_line_len = 0
-    for line in test.splitlines():
+    def process_line(line):
+        global test_source, last_line_len, error,  scopes, ellipsises
         if line.startswith('^') or line.endswith("^"):
             if line.startswith('^'):
                 position = re.search(r'[^\t ]', line[1:]).start() + 1
@@ -24,9 +25,22 @@ for n, test in enumerate(open("tests.txt", encoding="utf8").read().split("\n\n\n
                     scopes += [(ch, position)]
             elif message == '…':
                 ellipsises += [position]
-            continue
+            return
         test_source += line + "\n"
         last_line_len = len(line)
+
+    line_start = 0
+    i = 0
+    while i < len(test):
+        if test[i] == "\n":
+            if test[i-3:i] == '```':
+                i = test.find('```', i)
+                assert(i != -1)
+                i += 3
+            process_line(test[line_start:i])
+            line_start = i+1
+        i += 1
+    process_line(test[line_start:i])
 #    if n >= 1:
 #        break
     # print(test_source)
