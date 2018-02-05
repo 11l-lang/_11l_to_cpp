@@ -155,7 +155,7 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
 
             if tabs and spaces:
                 next_line_pos = source.find("\n", i)
-                raise Exception('mixing tabs and spaces in indentation: `' + source[linestart:next_line_pos if next_line_pos != -1 else len(source)].replace(' ', 'S').replace("\t", 'TAB') + '`', i)
+                raise Exception('mixing tabs and spaces in indentation: `' + source[linestart:i].replace(' ', 'S').replace("\t", 'TAB') + source[i:next_line_pos if next_line_pos != -1 else len(source)] + '`', i)
 
             indentation_level = i - linestart
             if len(indentation_levels) and indentation_levels[-1][0] == None: # сразу после символа `{` идёт новый произвольный отступ (понижение уровня отступа может быть полезно, если вдруг отступ оказался слишком большой), который действует вплоть до парного символа `}`
