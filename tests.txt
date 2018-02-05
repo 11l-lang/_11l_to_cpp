@@ -404,6 +404,15 @@ a=b
 ++i // Plus symbol at the beginning here should not be treated as binary + operator, so there is no implied line joining
 
 
+a = 1
+^    …
+  - 2 // Символ + в конце этой строки находится под комментарием и не должен вызывать срабатывание автоматического склеивания строк +
+^     {
+    3
+b = 0
+}^
+
+
 ---
 a = ({1})
 ^    Error: naked braces (without new scope keyword) within parentheses/brackets is not allowed
