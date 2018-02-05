@@ -70,7 +70,7 @@ from enum import Enum
 keywords = ['else', 'fn', 'if', 'in', 'loop', 'null', 'result', 'return', 'switch', 'type', 'typeof']
 # new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
 # Решил отказаться от учёта new_scope_keywords на уровне лексического анализатора из-за loop.break и case в switch
-binary_operators = [[], ['+', '-', '*', '/'], ['+=', '-=', '*=', '/='], ['<<=', '>>=']]
+binary_operators = [[], ['+', '-', '*', '/'], ['+=', '-=', '*=', '/=', '&&', '||'], ['<<=', '>>=']]
 unary_operators = [[], [], ['++', '--'], []]
 
 
@@ -220,7 +220,7 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                 comments.append((comment_start, i))
         else:
             operator = None
-            for op in ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '%', '&=', '|=', '^=', '++', '--', '+', '-', '*', '/', '%', '&', '|', '^', '~', '<', '>', '=']:
+            for op in ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '%', '&=', '|=', '^=', '++', '--', '+', '-', '*', '/', '%', '!', '&', '|', '^', '~', '<', '>', '=']:
                 if source[i:i+len(op)] == op:
                     operator = op
                     break

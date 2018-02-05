@@ -208,24 +208,25 @@ fn sign(x)
 //}
 
 
-fn sign(x) 
+fn sign(x)
 ^          {
     return if x < 0
 ^                   {
-             (-1)
-           else if x > 0
-^          }    {        {
-               1
-           else 0
-^          }    {
+        (-1)
+    else if x > 0
+^   }
+^                 {
+          1
+    else 0
+^   }
 
-}}}^
+}^
 
 
 return if n < 0
           {-n}
-       else
-^           {
+else
+^    {
             n
 
 }^
@@ -237,11 +238,12 @@ fn min(a, b)
     return if a < b
 ^                   {
                a
-           else
-^          }    {
+    else
+^   }
+^        {
                b
 }
-^}
+}^
 // }
 
 
@@ -273,11 +275,13 @@ res = aa
     + bb
 
 
+--- // should be detected by syntax analyzer
 return
        f()
 ^      Error: unexpected indent
 
 
+--- // should be detected by syntax analyzer
 loop 10
 
 Error: `loop` scope is empty^
