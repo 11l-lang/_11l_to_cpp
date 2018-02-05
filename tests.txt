@@ -107,30 +107,33 @@ outfile.write(line.replace('[', '<span class="sq"><span class="sq_brackets">[</s
 
 
 loop
-    ^ {
+^    {
    switch instr[i]
 ^                  {
       "["
 ^         {
          nesting_level++
       "]"
-^     }   {
+^     }
+^         {
          if --nesting_level == 0
 ^                                {
             loop.break
       "‘"
-^     }}  {
+^     }}
+^         {
          ending_tags.append("’") //‘‘
       "’"
-^     }   {
+^     }
+^         {
          assert(ending_tags.pop() == "’")
    i++
-^  }
+^  }}
    if i == instr.len
 ^                    {
       exit_with_error("Unended comment started", comment_start)
 
-}}}^
+}}^
 
 
 loop
