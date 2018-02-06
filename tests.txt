@@ -63,14 +63,22 @@ loop 1
 }^
 
 
+str = "unclosed string
+^     Error: unclosed string literal
+
+
+str = ‘unclosed string
+^     Error: unpaired left single quotation mark
+
+
 ---
-replaced = line.replace('[', '<span class="sq"><span class="sq_brackets">[</span>')
+replaced = line.replace(‘[’, ‘<span class="sq"><span class="sq_brackets">[</span>’)
 ^                                                                                  …
-               .replace(']', '<span class="sq_brackets">]</span></span>')
+               .replace(‘]’, ‘<span class="sq_brackets">]</span></span>’)
 ^                                                                        …
-               .replace('{', '<span class="cu_brackets"><span class="cu_brackets_b">{</span><span>…</span><span class="cu" style="display:none">')
+               .replace(‘{’, ‘<span class="cu_brackets"><span class="cu_brackets_b">{</span><span>…</span><span class="cu" style="display:none">’)
 ^                                                                                                                                                 …
-               .replace('}', '</span><span class="cu_brackets_b">}</span></span>')
+               .replace(‘}’, ‘</span><span class="cu_brackets_b">}</span></span>’)
 
 
 ---

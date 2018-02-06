@@ -251,11 +251,30 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                 category = Lexem.Category.NUMERIC_LITERAL
 
             elif ch == '"':
-                while i < len(source):
+                startqpos = i - 1
+                while True:
+                    if i == len(source):
+                        raise Exception('unclosed string literal', startqpos)
                     ch = source[i]
                     i += 1
                     if ch == '"':
                         break
+                category = Lexem.Category.STRING_LITERAL
+
+            elif ch == '‘':
+                startqpos = i - 1
+                nesting_level = 1
+                while True:
+                    if i == len(source):
+                        raise Exception('unpaired left single quotation mark', startqpos)
+                    ch = source[i]
+                    i += 1
+                    if ch == "‘":
+                        nesting_level += 1
+                    elif ch == "’":
+                        nesting_level -= 1
+                        if nesting_level == 0:
+                            break
                 category = Lexem.Category.STRING_LITERAL
 
             elif ch == '{':
