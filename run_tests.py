@@ -55,10 +55,10 @@ for n, test in enumerate(open("tests.txt", encoding="utf8").read().split("\n\n\n
             print('OK')
         else:
             print("Mismatch at test:\n" + test + "\n\n")
-            print(implied_scopes)
-            print(scopes)
-            print(line_continuations)
-            print(ellipsises)
+            print("scopes_determinator scopes:", implied_scopes)
+            print("expected (in test) scopes: ", scopes)
+            print("scopes_determinator joined lines:", line_continuations)
+            print("expected (in test) joined lines: ", ellipsises)
             break
     except scopes_determinator.Exception as e:
         was_error = True

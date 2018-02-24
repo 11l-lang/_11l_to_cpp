@@ -70,7 +70,8 @@ from enum import Enum
 keywords = ['else', 'fn', 'if', 'in', 'loop', 'null', 'result', 'return', 'switch', 'type', 'typeof']
 # new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
 # Решил отказаться от учёта new_scope_keywords на уровне лексического анализатора из-за loop.break и case в switch
-binary_operators = [[], ['+', '-', '*', '/'], ['+=', '-=', '*=', '/=', '&&', '||'], ['<<=', '>>=']]
+binary_operators = [[], ['+', '-', '*', '/', '&', '|'], ['+=', '-=', '*=', '/=', '&&', '||'], ['<<=', '>>=']]
+binary_operators[1].remove('-') # Решил просто не считать `-` за бинарный оператор в контексте автоматического склеивания строк, так как `-` к тому же ещё и модификатор константности
 unary_operators = [[], [], ['++', '--'], []]
 
 
@@ -106,8 +107,8 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
     indentation_levels = []
     nesting_elements = [] # логически этот стек можно объединить с indentation_levels, но так немного удобнее (например для обработки [./tests.txt]:‘// But you can close parenthesis/bracket’, конкретно: для проверок `nesting_elements[-1][0] != ...`)
     i = 0
-    def end_scope(opt = 0):
-        pass
+    #def end_scope(opt = 0):
+    #    pass
 
     begin_of_line = True
     while i < len(source):
@@ -144,9 +145,10 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
             if ((source[i    ] in binary_operators[1]
               or source[i:i+2] in binary_operators[2]
               or source[i:i+3] in binary_operators[3]) # [правило:] ‘Every line of code which begins with any binary operator should be joined with the previous line of code.’:[-339924750]<
-              and not (source[i    ] in unary_operators[1]    # Rude fix for:
-                    or source[i:i+2] in unary_operators[2]    # a=b
-                    or source[i:i+3] in unary_operators[3])): # ++i // Plus symbol at the beginning here should not be treated as binary + operator, so there is no implied line joining
+              and not (source[i    ] in unary_operators[1]  # Rude fix for:
+                    or source[i:i+2] in unary_operators[2]  # a=b
+                    or source[i:i+3] in unary_operators[3]) # ++i // Plus symbol at the beginning here should not be treated as binary + operator, so there is no implied line joining
+              and (source[i] != '&' or source[i+1:i+2] == ' ')): # Символ `&` обрабатывается по-особенному — склеивание строк происходит только если после него стоит пробел
                 if len(lexems) == 0:
                     raise Exception('source can not starts with a binary operator', i)
                 if line_continuations != None:
@@ -296,7 +298,7 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
             elif ch == ';':
                 category = Lexem.Category.STATEMENT_SEPARATOR
 
-            elif ch in [',', '.', ':']:
+            elif ch in [',', '.', ':', '@']:
                 category = Lexem.Category.DELIMITER
 
             elif ch in '([':
