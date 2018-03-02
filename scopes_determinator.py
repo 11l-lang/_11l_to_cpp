@@ -80,13 +80,8 @@ class Exception(Exception):
         self.message = message
         self.pos = pos
 
-class Lexem:
-#   = Token, but I prefer call it a Lexem (because I could not find a well-defined/precise distinction between token and lexem in computer science).
-# Also I prefer term lexical analyzer to ‘lexer, tokenizer, or scanner’[https://en.wikipedia.org/wiki/Lexical_analysis].
-# >[https://en.wikipedia.org/wiki/Analysis]:‘Analysis is the process of breaking a complex topic or substance into smaller parts in order to gain a better understanding of it.’
-# So, lexical analyzer has the task of breaking some source text/code into parts called lexems.
+class Token:
     class Category(Enum):
-#       = Class [of lexem], or TokenName, or even just Token [https://stackoverflow.com/questions/14954721/what-is-the-difference-between-a-token-and-a-lexeme <- https://en.wikipedia.org/wiki/Lexical_analysis]
         IDENTIFIER = 0
         KEYWORD = 1
         DELIMITER = 2 # SEPARATOR = 2
@@ -103,7 +98,7 @@ class Lexem:
         self.category = category
 
 def lex(source, implied_scopes = None, line_continuations = None, newline_chars = None, comments = None):
-    lexems = []
+    tokens = []
     indentation_levels = []
     nesting_elements = [] # логически этот стек можно объединить с indentation_levels, но так немного удобнее (например для обработки [./tests.txt]:‘// But you can close parenthesis/bracket’, конкретно: для проверок `nesting_elements[-1][0] != ...`)
     i = 0
@@ -134,11 +129,11 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
             if source[i] in "{}": # Indentation level of lines starting with { or } is ignored
                 continue
 
-            if len(lexems) \
-               and lexems[-1].category == Lexem.Category.OPERATOR \
-               and source[lexems[-1].start:lexems[-1].end] in binary_operators[lexems[-1].end - lexems[-1].start]: # ‘Every line of code which ends with any binary operator should be joined with the following line of code.’:[https://github.com/JuliaLang/julia/issues/2097#issuecomment-339924750][-339924750]<
+            if len(tokens) \
+               and tokens[-1].category == Token.Category.OPERATOR \
+               and source[tokens[-1].start:tokens[-1].end] in binary_operators[tokens[-1].end - tokens[-1].start]: # ‘Every line of code which ends with any binary operator should be joined with the following line of code.’:[https://github.com/JuliaLang/julia/issues/2097#issuecomment-339924750][-339924750]<
                 if line_continuations != None:
-                    line_continuations.append(lexems[-1].end)
+                    line_continuations.append(tokens[-1].end)
                 continue
 
             # if not (len(indentation_levels) and indentation_levels[-1][0] == None): # сразу после символа `{` это [:правило] не действует ...а хотя не могу подобрать пример, который бы показывал необходимость такой проверки, а потому оставлю этот if закомментированным # }
@@ -149,10 +144,10 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                     or source[i:i+2] in unary_operators[2]  # a=b
                     or source[i:i+3] in unary_operators[3]) # ++i // Plus symbol at the beginning here should not be treated as binary + operator, so there is no implied line joining
               and (source[i] != '&' or source[i+1:i+2] == ' ')): # Символ `&` обрабатывается по-особенному — склеивание строк происходит только если после него стоит пробел
-                if len(lexems) == 0:
+                if len(tokens) == 0:
                     raise Exception('source can not starts with a binary operator', i)
                 if line_continuations != None:
-                    line_continuations.append(lexems[-1].end)
+                    line_continuations.append(tokens[-1].end)
                 continue
 
             if tabs and spaces:
@@ -176,21 +171,21 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                 prev_indentation_level = indentation_levels[-1][0] if len(indentation_levels) else 0
 
                 if indentation_level == prev_indentation_level: # [1:] [-1]:‘If it is equal, nothing happens.’ :)(: [:2]
-                    if len(lexems):
-                        lexems.append(Lexem(linestart-1, linestart, Lexem.Category.STATEMENT_SEPARATOR))
+                    if len(tokens):
+                        tokens.append(Token(linestart-1, linestart, Token.Category.STATEMENT_SEPARATOR))
                 elif indentation_level > prev_indentation_level: # [2:] [-1]:‘If it is larger, it is pushed on the stack, and one INDENT token is generated.’ [:3]
                     if prev_indentation_level == 0: # len(indentation_levels) == 0 or indentation_levels[-1][0] == 0:
                         indentation_tabs = tabs # первоначальная/новая установка символа для отступа (либо табуляция, либо пробелы) производится только от нулевого уровня отступа
                     indentation_levels.append([indentation_level, False])
-                    lexems.append(Lexem(i, i, Lexem.Category.SCOPE_BEGIN))
+                    tokens.append(Token(i, i, Token.Category.SCOPE_BEGIN))
                     if implied_scopes != None:
-                        implied_scopes.append(('{', lexems[-2].end + (1 if source[lexems[-2].end] in " \n" else 0)))
+                        implied_scopes.append(('{', tokens[-2].end + (1 if source[tokens[-2].end] in " \n" else 0)))
                 else: # [3:] [-1]:‘If it is smaller, it ~‘must’ be one of the numbers occurring on the stack; all numbers on the stack that are larger are popped off, and for each number popped off a DEDENT token is generated.’ [:4]
                     while True:
                         if indentation_levels[-1][1]:
                             raise Exception('too much unindent, what is this unindent intended for?', i)
                         indentation_levels.pop()
-                        lexems.append(Lexem(i, i, Lexem.Category.SCOPE_END))
+                        tokens.append(Token(i, i, Token.Category.SCOPE_END))
                         if implied_scopes != None:
                             implied_scopes.append(('}', i))
                         level, explicit_scope_via_curly_braces = indentation_levels[-1] if len(indentation_levels) else [0, False]
@@ -232,7 +227,7 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
 
             if operator:
                 i = lexem_start + len(operator)
-                category = Lexem.Category.OPERATOR
+                category = Token.Category.OPERATOR
             elif 'a' <= ch <= 'z' or 'A' <= ch <= 'Z' or ch == '_': # this is IDENTIFIER or KEYWORD
                 while i < len(source):
                     ch = source[i]
@@ -240,9 +235,9 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                         break
                     i += 1
                 if source[lexem_start:i] in keywords:
-                    category = Lexem.Category.KEYWORD
+                    category = Token.Category.KEYWORD
                 else:
-                    category = Lexem.Category.IDENTIFIER
+                    category = Token.Category.IDENTIFIER
 
             elif '0' <= ch <= '9': # this is NUMERIC_LITERAL
                 if ch in '01' and source[i:i+1] == 'B':
@@ -250,7 +245,7 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                 else:
                     while i < len(source) and '0' <= source[i] <= '9':
                         i += 1
-                category = Lexem.Category.NUMERIC_LITERAL
+                category = Token.Category.NUMERIC_LITERAL
 
             elif ch == '"':
                 startqpos = i - 1
@@ -261,7 +256,7 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                     i += 1
                     if ch == '"':
                         break
-                category = Lexem.Category.STRING_LITERAL
+                category = Token.Category.STRING_LITERAL
 
             elif ch == '‘':
                 startqpos = i - 1
@@ -277,53 +272,53 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                         nesting_level -= 1
                         if nesting_level == 0:
                             break
-                category = Lexem.Category.STRING_LITERAL
+                category = Token.Category.STRING_LITERAL
 
             elif ch == '{':
                 indentation_levels.append([None, True])
                 nesting_elements.append(('{', lexem_start)) # }
-                category = Lexem.Category.SCOPE_BEGIN
+                category = Token.Category.SCOPE_BEGIN
             elif ch == '}':
                 if len(nesting_elements) == 0 or nesting_elements[-1][0] != '{':
                     raise Exception('there is no corresponding opening brace for `}`', lexem_start)
                 #end_scope(lexem_start)
                 nesting_elements.pop()
                 while indentation_levels[-1][1] != True:
-                    lexems.append(Lexem(lexem_start, lexem_start, Lexem.Category.SCOPE_END))
+                    tokens.append(Token(lexem_start, lexem_start, Token.Category.SCOPE_END))
                     if implied_scopes != None: # {
                         implied_scopes.append(('}', lexem_start))
                     indentation_levels.pop()
                 assert(indentation_levels.pop()[1] == True)
-                category = Lexem.Category.SCOPE_END
+                category = Token.Category.SCOPE_END
             elif ch == ';':
-                category = Lexem.Category.STATEMENT_SEPARATOR
+                category = Token.Category.STATEMENT_SEPARATOR
 
             elif ch in [',', '.', ':', '@']:
-                category = Lexem.Category.DELIMITER
+                category = Token.Category.DELIMITER
 
             elif ch in '([':
                 nesting_elements.append((ch, lexem_start))
-                category = Lexem.Category.DELIMITER
+                category = Token.Category.DELIMITER
             elif ch in '])':
                 if len(nesting_elements) == 0 or nesting_elements[-1][0] != {']':'[', ')':'('}[ch]: # ])
                     raise Exception('there is no corresponding opening parenthesis/bracket for `' + ch + '`', lexem_start)
                 nesting_elements.pop()
                 #end_scope(lexem_start)
-                category = Lexem.Category.DELIMITER
+                category = Token.Category.DELIMITER
 
             else:
                 raise Exception('unexpected character ' + ch, lexem_start)
 
-            lexems.append(Lexem(lexem_start, i, category))
+            tokens.append(Token(lexem_start, i, category))
 
     if len(nesting_elements):
         raise Exception('there is no corresponding closing parenthesis/bracket/brace for `' + nesting_elements[-1][0] + '`', nesting_elements[-1][1])
 
     #end_scope() # [4:] [-1]:‘At the end of the file, a DEDENT token is generated for each number remaining on the stack that is larger than zero.’
     while len(indentation_levels) and indentation_levels[-1][1] != True:
-        lexems.append(Lexem(i, i, Lexem.Category.SCOPE_END))
+        tokens.append(Token(i, i, Token.Category.SCOPE_END))
         if implied_scopes != None: # {
             implied_scopes.append(('}', i-1 if source[-1] == "\n" else i))
         indentation_levels.pop()
 
-    return lexems
+    return tokens
