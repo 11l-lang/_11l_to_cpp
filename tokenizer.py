@@ -97,7 +97,7 @@ class Token:
         self.end = end
         self.category = category
 
-def lex(source, implied_scopes = None, line_continuations = None, newline_chars = None, comments = None):
+def tokenize(source, implied_scopes = None, line_continuations = None, newline_chars = None, comments = None):
     tokens = []
     indentation_levels = []
     nesting_elements = [] # логически этот стек можно объединить с indentation_levels, но так немного удобнее (например для обработки [./tests.txt]:‘// But you can close parenthesis/bracket’, конкретно: для проверок `nesting_elements[-1][0] != ...`)
@@ -234,7 +234,12 @@ def lex(source, implied_scopes = None, line_continuations = None, newline_chars 
                     if not ('a' <= ch <= 'z' or 'A' <= ch <= 'Z' or ch == '_' or '0' <= ch <= '9' or ch == '?'):
                         break
                     i += 1
-                if source[lexem_start:i] in keywords:
+                if source[i:i+1] == '/' and source[i-1:i] in 'IЦ':
+                    if source[i-2:i-1] == ' ':
+                        category = Token.Category.OPERATOR
+                    else:
+                        raise Exception('please clarify your intention by putting space character before or after `I`', i-1)
+                elif source[lexem_start:i] in keywords:
                     category = Token.Category.KEYWORD
                 else:
                     category = Token.Category.IDENTIFIER
