@@ -1,6 +1,11 @@
-import scopes_determinator, re
+import os, tokenizer, re
 
-for n, test in enumerate(open("tests.txt", encoding="utf8").read().split("\n\n\n")):
+tests = []
+for root, dirs, files in os.walk('tests'):
+    for name in files:
+        tests += open(os.path.join(root, name), encoding="utf8").read().split("\n\n\n")
+   
+for n, test in enumerate(tests):
     if test.startswith('---'):
         continue
     test_source = ""
@@ -50,17 +55,15 @@ for n, test in enumerate(open("tests.txt", encoding="utf8").read().split("\n\n\n
     newline_chars = []
     was_error = False
     try:
-        scopes_determinator.lex(test_source, implied_scopes, line_continuations, newline_chars)
-        if implied_scopes == scopes and line_continuations == ellipsises:
-            print('OK')
-        else:
+        tokenizer.tokenize(test_source, implied_scopes, line_continuations, newline_chars)
+        if not (implied_scopes == scopes and line_continuations == ellipsises):
             print("Mismatch at test:\n" + test + "\n\n")
             print("scopes_determinator scopes:", implied_scopes)
             print("expected (in test) scopes: ", scopes)
             print("scopes_determinator joined lines:", line_continuations)
             print("expected (in test) joined lines: ", ellipsises)
             break
-    except scopes_determinator.Exception as e:
+    except tokenizer.Exception as e:
         was_error = True
         if error and "Error: " + e.message == error[0] and e.pos == error[1]:
             print('OK (Error)')
@@ -78,3 +81,4 @@ for n, test in enumerate(open("tests.txt", encoding="utf8").read().split("\n\n\n
     if error != None and not was_error:
         print("There should be error in test:\n" + test)
         break
+    print('OK')

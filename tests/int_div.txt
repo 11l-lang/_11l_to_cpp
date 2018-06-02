@@ -1,0 +1,2 @@
+VarI/10
+^  Error: please clarify your intention by putting space character before or after `I`
