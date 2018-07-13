@@ -331,6 +331,6 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
 
     return tokens
 
-s = "1+2*3+4^2^2"
+s = "(0,1)+(2,)+f(1,2,3)+(3)"
 for tok in tokenize(s):
     print(tok.to_str(s), ",", end="")
