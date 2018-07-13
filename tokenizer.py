@@ -65,12 +65,12 @@ Error: unindent does not match any outer indentation level
 [-Добавить описание ошибки.-]
 ===============================================================================================================
 """
-from enum import Enum
+from enum import IntEnum
 
 keywords = ['else', 'fn', 'if', 'in', 'loop', 'null', 'result', 'return', 'switch', 'type', 'typeof']
 # new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
 # Решил отказаться от учёта new_scope_keywords на уровне лексического анализатора из-за loop.break и case в switch
-binary_operators = [[], ['+', '-', '*', '/', '&', '|'], ['+=', '-=', '*=', '/=', '&&', '||'], ['<<=', '>>=']]
+binary_operators = [[], ['+', '-', '*', '/', '^', '&', '|'], ['+=', '-=', '*=', '/=', '&&', '||'], ['<<=', '>>=']]
 binary_operators[1].remove('-') # Решил просто не считать `-` за бинарный оператор в контексте автоматического склеивания строк, так как `-` к тому же ещё и модификатор константности
 unary_operators = [[], [], ['++', '--'], []]
 
@@ -81,7 +81,7 @@ class Exception(Exception):
         self.pos = pos
 
 class Token:
-    class Category(Enum):
+    class Category(IntEnum):
         IDENTIFIER = 0
         KEYWORD = 1
         DELIMITER = 2 # SEPARATOR = 2
@@ -96,6 +96,9 @@ class Token:
         self.start = start
         self.end = end
         self.category = category
+
+    def to_str(self, source):
+        return "Token("+str(int(self.category))+", \""+source[self.start:self.end]+"\")"
 
 def tokenize(source, implied_scopes = None, line_continuations = None, newline_chars = None, comments = None):
     tokens = []
@@ -327,3 +330,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
         indentation_levels.pop()
 
     return tokens
+
+s = "1+2*3+4^2^2"
+for tok in tokenize(s):
+    print(tok.to_str(s), ",", end="")
