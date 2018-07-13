@@ -1,11 +1,11 @@
 import os, tokenizer, re
 
-tests = []
-for root, dirs, files in os.walk('tests'):
+tokenizer_tests = []
+for root, dirs, files in os.walk('tests/tokenizer'):
     for name in files:
-        tests += open(os.path.join(root, name), encoding="utf8").read().split("\n\n\n")
-   
-for n, test in enumerate(tests):
+        tokenizer_tests += open(os.path.join(root, name), encoding="utf8").read().split("\n\n\n")
+
+for n, test in enumerate(tokenizer_tests):
     if test.startswith('---'):
         continue
     test_source = ""
