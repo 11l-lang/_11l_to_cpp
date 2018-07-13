@@ -159,7 +159,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
 
             indentation_level = i - linestart
             if len(indentation_levels) and indentation_levels[-1][0] == None: # сразу после символа `{` идёт новый произвольный отступ (понижение уровня отступа может быть полезно, если вдруг отступ оказался слишком большой), который действует вплоть до парного символа `}`
-                indentation_levels[-1][0] = indentation_level # || maybe this is unnecessary (actually it is necessary, see test "fn f()\n{\na = 1")
+                indentation_levels[-1][0] = indentation_level # || maybe this is unnecessary (actually it is necessary, see test "fn f()\n{\na = 1") // }
                 # // This is uncertain piece of code:
                 indentation_tabs = tabs
             else:
@@ -266,7 +266,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
                         break
                 category = Token.Category.STRING_LITERAL
 
-            elif ch == '‘':
+            elif ch == '‘': # ’
                 startqpos = i - 1
                 nesting_level = 1
                 while True:
@@ -307,7 +307,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
             elif ch in '([':
                 nesting_elements.append((ch, lexem_start))
                 category = Token.Category.DELIMITER
-            elif ch in '])':
+            elif ch in '])': # ([
                 if len(nesting_elements) == 0 or nesting_elements[-1][0] != {']':'[', ')':'('}[ch]: # ])
                     raise Exception('there is no corresponding opening parenthesis/bracket for `' + ch + '`', lexem_start)
                 nesting_elements.pop()

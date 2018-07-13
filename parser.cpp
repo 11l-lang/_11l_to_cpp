@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
 
 	infix_r("^", 140);
 
-	symbol(".", 150); symbol("[", 150); symbol("(", 150);
+	symbol(".", 150); symbol("[", 150); symbol("(", 150); // ]
 
 	symbol("(name)").nud = [](std::shared_ptr<SymbolNode> self)->std::shared_ptr<SymbolNode>{return self;};
 	symbol("(literal)").nud = [](std::shared_ptr<SymbolNode> self)->std::shared_ptr<SymbolNode>{return self;};
@@ -237,7 +237,7 @@ int main(int argc, char* argv[])
 				if (token->value != ",")
 					break;
 				advance(",");
-			}
+			} // (
 		advance(")");
 		return self;
 	};
@@ -246,7 +246,7 @@ int main(int argc, char* argv[])
 		bool comma = false;
 		if (token->value != ")")
 			while (true)
-			{
+			{ // (
 				if (token->value == ")")
 					break;
 				self->children.push_back(expression());
@@ -254,7 +254,7 @@ int main(int argc, char* argv[])
 					break;
 				comma = true;
 				advance(",");
-			}
+			} // (
 		advance(")");
 		if (self->children.empty() || comma)
 			self->tuple = true;
