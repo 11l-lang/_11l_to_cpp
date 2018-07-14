@@ -58,8 +58,12 @@ public:
 	Token::Category category;
 	std::string value;
 	int lbp;
-	std::function<SymbolNode*(SymbolNode*)> nud;
-	std::function<SymbolNode*(SymbolNode*, SymbolNode*)> led;
+	int nud_bp;
+	int led_bp;
+	SymbolNode* (*nud)(SymbolNode*);
+	SymbolNode* (*led)(SymbolNode*, SymbolNode*);
+	void set_nud_bp(int nud_bp_, SymbolNode* (*nud_)(SymbolNode*             )) {nud_bp = nud_bp_; nud = nud_;}
+	void set_led_bp(int led_bp_, SymbolNode* (*led_)(SymbolNode*, SymbolNode*)) {led_bp = led_bp_; led = led_;}
 
 	SymbolBase():
 		nud([](SymbolNode*)->SymbolNode *{throw SyntaxError("Syntax error");}),
@@ -180,31 +184,31 @@ SymbolNode *expression(int rbp = 0)
 
 void infix(const char *value, int bp)
 {
-	symbol(value, bp).led = [bp](SymbolNode *self, SymbolNode *left)->SymbolNode*{
+	symbol(value, bp).set_led_bp(bp, [](SymbolNode *self, SymbolNode *left)->SymbolNode*{
 		//self->children.clear();
 		self->children.push_back(left);
-		self->children.push_back(expression(bp));
+		self->children.push_back(expression(self->symbol->led_bp));
 		return self;
-	};
+	});
 }
 
 void infix_r(const char *value, int bp)
 {
-	symbol(value, bp).led = [bp](SymbolNode *self, SymbolNode *left)->SymbolNode*{
+	symbol(value, bp).set_led_bp(bp, [](SymbolNode *self, SymbolNode *left)->SymbolNode*{
 		//self->children.clear();
 		self->children.push_back(left);
-		self->children.push_back(expression(bp-1));
+		self->children.push_back(expression(self->symbol->led_bp-1));
 		return self;
-	};
+	});
 }
 
 void prefix(const char *value, int bp)
 {
-	symbol(value).nud = [bp](SymbolNode *self)->SymbolNode*{
+	symbol(value).set_nud_bp(bp, [](SymbolNode *self)->SymbolNode*{
 		//self->children.clear();
-		self->children.push_back(expression(bp));
+		self->children.push_back(expression(self->symbol->nud_bp));
 		return self;
-	};
+	});
 }
 
 int main(int argc, char* argv[])
