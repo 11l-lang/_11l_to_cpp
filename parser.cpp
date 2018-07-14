@@ -40,7 +40,7 @@ public:
 	bool literal() { return category == STRING_LITERAL || category == NUMERIC_LITERAL; }
 };
 
-Token tokens[] = { Token(2, "("), Token(4, "0"), Token(2, ","), Token(4, "1"), Token(2, ")"), Token(3, "+"), Token(2, "("), Token(4, "2"), Token(2, ","), Token(2, ")"), Token(3, "+"), Token(0, "f"), Token(2, "("), Token(4, "1"), Token(2, ","), Token(4, "2"), Token(2, ","), Token(4, "3"), Token(2, ")"), Token(3, "+"), Token(2, "("), Token(4, "3"), Token(2, ")"), Token(2, "(end)") };
+Token tokens[] = { Token(2, "("), Token(4, "0"), Token(2, ","), Token(4, "1"), Token(2, ")"), Token(3, "+"), Token(2, "("), Token(4, "2"), Token(2, ","), Token(2, ")"), Token(3, "+"), Token(0, "f"), Token(2, "("), Token(4, "1"), Token(2, ","), Token(4, "2"), Token(2, ","), Token(4, "3"), Token(2, ")"), Token(3, "+"), Token(2, "("), Token(4, "3"), Token(2, ")"), Token(3, "+"), Token(2, "("), Token(2, ")"), Token(2, "(end)") };
 Token *tokenp = &tokens[0];
 
 
@@ -55,7 +55,6 @@ public:
 class SymbolBase
 {
 public:
-	Token::Category category;
 	std::string value;
 	int lbp;
 	int nud_bp;
@@ -74,16 +73,17 @@ public:
 class SymbolNode
 {
 public:
+	Token *token;
 	SymbolBase *symbol;
 	std::vector<SymbolNode*> children;
 	std::string value;
 	bool function_call, tuple;
 
-	SymbolNode() : function_call(false), tuple(false) {}
+	SymbolNode(Token *token) : token(token), function_call(false), tuple(false) {}
 
 	std::string to_str()
 	{
-		if (symbol->category == Token::STRING_LITERAL || symbol->category == Token::NUMERIC_LITERAL || symbol->category == Token::IDENTIFIER)
+		if (token->literal() || token->category == Token::IDENTIFIER)
 			return value;
 		if (symbol->value == "(") // )
 		{
@@ -132,12 +132,6 @@ SymbolBase &symbol(const char *value, int bp = 0)
 	if (it == symbol_table.end())
 	{
 		SymbolBase &sb = symbol_table[value];
-		if (strcmp(value, "(literal)") == 0)
-			sb.category = Token::NUMERIC_LITERAL;
-		else if (strcmp(value, "(name)") == 0)
-			sb.category = Token::IDENTIFIER;
-		else
-			sb.category = Token::OPERATOR;
 		sb.value = value;
 		sb.lbp = bp;
 		return sb;
@@ -156,7 +150,7 @@ void next_token()
 	tokenp++;
 	if (tokenp == &tokens[_countof(tokens)])
 		throw SyntaxError("No more tokens");
-	tokenp->node.reset(token = new SymbolNode);
+	tokenp->node.reset(token = new SymbolNode(tokenp));
 	token->symbol = &symbol_table[tokenp->literal() ? "(literal)" : tokenp->category == Token::IDENTIFIER ? "(name)" : tokenp->value];
 	token->value = tokenp->value;
 }
