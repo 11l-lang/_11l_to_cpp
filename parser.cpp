@@ -12,6 +12,8 @@
 #include <iostream>
 
 
+class SymbolNode;
+
 class Token
 {
 public:
@@ -28,6 +30,8 @@ public:
 		STATEMENT_SEPARATOR = 8
 	} category;
 	const char *value;
+
+	std::unique_ptr<SymbolNode> node;
 
 	Token(int category, const char *value) : category((Category)category), value(value)
 	{
@@ -47,7 +51,6 @@ public:
 	SyntaxError(const std::string &msg) : msg(msg) {}
 };
 
-class SymbolNode;
 
 class SymbolBase
 {
@@ -55,12 +58,12 @@ public:
 	Token::Category category;
 	std::string value;
 	int lbp;
-	std::function<std::shared_ptr<SymbolNode>(std::shared_ptr<SymbolNode>)> nud;
-	std::function<std::shared_ptr<SymbolNode>(std::shared_ptr<SymbolNode>, std::shared_ptr<SymbolNode>)> led;
+	std::function<SymbolNode*(SymbolNode*)> nud;
+	std::function<SymbolNode*(SymbolNode*, SymbolNode*)> led;
 
 	SymbolBase():
-		nud([](std::shared_ptr<SymbolNode>)->std::shared_ptr<SymbolNode> {throw SyntaxError("Syntax error");}),
-		led([](std::shared_ptr<SymbolNode>, std::shared_ptr<SymbolNode>)->std::shared_ptr<SymbolNode> {throw SyntaxError("Unknown operator");})
+		nud([](SymbolNode*)->SymbolNode *{throw SyntaxError("Syntax error");}),
+		led([](SymbolNode*, SymbolNode*)->SymbolNode *{throw SyntaxError("Unknown operator");})
 	{}
 };
 
@@ -68,7 +71,7 @@ class SymbolNode
 {
 public:
 	SymbolBase *symbol;
-	std::vector<std::shared_ptr<SymbolNode>> children;
+	std::vector<SymbolNode*> children;
 	std::string value;
 	bool function_call, tuple;
 
@@ -142,14 +145,14 @@ SymbolBase &symbol(const char *value, int bp = 0)
 	}
 }
 
-std::shared_ptr<SymbolNode> token;
+SymbolNode *token;
 
 void next_token()
 {
 	tokenp++;
 	if (tokenp == &tokens[_countof(tokens)])
 		throw SyntaxError("No more tokens");
-	token.reset(new SymbolNode);
+	tokenp->node.reset(token = new SymbolNode);
 	token->symbol = &symbol_table[tokenp->literal() ? "(literal)" : tokenp->category == Token::IDENTIFIER ? "(name)" : tokenp->value];
 	token->value = tokenp->value;
 }
@@ -161,11 +164,11 @@ void advance(const char *value)
 	next_token();
 }
 
-std::shared_ptr<SymbolNode> expression(int rbp = 0)
+SymbolNode *expression(int rbp = 0)
 {
-	std::shared_ptr<SymbolNode> t = token;
+	SymbolNode *t = token;
 	next_token();
-	std::shared_ptr<SymbolNode> left = t->symbol->nud(t);
+	SymbolNode *left = t->symbol->nud(t);
 	while (rbp < token->symbol->lbp)
 	{
 		t = token;
@@ -177,8 +180,8 @@ std::shared_ptr<SymbolNode> expression(int rbp = 0)
 
 void infix(const char *value, int bp)
 {
-	symbol(value, bp).led = [bp](std::shared_ptr<SymbolNode> self, std::shared_ptr<SymbolNode> left)->std::shared_ptr<SymbolNode>{
-		self->children.clear();
+	symbol(value, bp).led = [bp](SymbolNode *self, SymbolNode *left)->SymbolNode*{
+		//self->children.clear();
 		self->children.push_back(left);
 		self->children.push_back(expression(bp));
 		return self;
@@ -187,8 +190,8 @@ void infix(const char *value, int bp)
 
 void infix_r(const char *value, int bp)
 {
-	symbol(value, bp).led = [bp](std::shared_ptr<SymbolNode> self, std::shared_ptr<SymbolNode> left)->std::shared_ptr<SymbolNode>{
-		self->children.clear();
+	symbol(value, bp).led = [bp](SymbolNode *self, SymbolNode *left)->SymbolNode*{
+		//self->children.clear();
 		self->children.push_back(left);
 		self->children.push_back(expression(bp-1));
 		return self;
@@ -197,8 +200,8 @@ void infix_r(const char *value, int bp)
 
 void prefix(const char *value, int bp)
 {
-	symbol(value).nud = [bp](std::shared_ptr<SymbolNode> self)->std::shared_ptr<SymbolNode>{
-		self->children.clear();
+	symbol(value).nud = [bp](SymbolNode *self)->SymbolNode*{
+		//self->children.clear();
 		self->children.push_back(expression(bp));
 		return self;
 	};
@@ -219,16 +222,16 @@ int main(int argc, char* argv[])
 
 	symbol(".", 150); symbol("[", 150); symbol("(", 150); // ]
 
-	symbol("(name)").nud = [](std::shared_ptr<SymbolNode> self)->std::shared_ptr<SymbolNode>{return self;};
-	symbol("(literal)").nud = [](std::shared_ptr<SymbolNode> self)->std::shared_ptr<SymbolNode>{return self;};
+	symbol("(name)").nud = [](SymbolNode *self)->SymbolNode*{return self;};
+	symbol("(literal)").nud = [](SymbolNode *self)->SymbolNode*{return self;};
 
 	symbol("(end)");
 
 	symbol(")");
 
-	symbol("(").led = [](std::shared_ptr<SymbolNode> self, std::shared_ptr<SymbolNode> left)->std::shared_ptr<SymbolNode>{
+	symbol("(").led = [](SymbolNode *self, SymbolNode *left)->SymbolNode*{
 		self->function_call = true;
-		self->children.clear();
+		//self->children.clear();
 		self->children.push_back(left);
 		if (token->value != ")")
 			while (true)
@@ -241,8 +244,8 @@ int main(int argc, char* argv[])
 		advance(")");
 		return self;
 	};
-	symbol("(").nud = [](std::shared_ptr<SymbolNode> self)->std::shared_ptr<SymbolNode>{
-		self->children.clear();
+	symbol("(").nud = [](SymbolNode *self)->SymbolNode*{
+		//self->children.clear();
 		bool comma = false;
 		if (token->value != ")")
 			while (true)
