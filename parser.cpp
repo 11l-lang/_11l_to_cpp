@@ -19,7 +19,7 @@ class Token
 public:
 	enum Category
 	{
-		IDENTIFIER = 0,
+		NAME = 0, // or IDENTIFIER
 		KEYWORD = 1,
 		DELIMITER = 2,
 		OPERATOR = 3,
@@ -83,7 +83,7 @@ public:
 
 	std::string to_str()
 	{
-		if (token->literal() || token->category == Token::IDENTIFIER)
+		if (token->literal() || token->category == Token::NAME)
 			return value;
 		if (symbol->value == "(") // )
 		{
@@ -151,7 +151,7 @@ void next_token()
 	if (tokenp == &tokens[_countof(tokens)])
 		throw SyntaxError("No more tokens");
 	tokenp->node.reset(token = new SymbolNode(tokenp));
-	token->symbol = &symbol_table[tokenp->literal() ? "(literal)" : tokenp->category == Token::IDENTIFIER ? "(name)" : tokenp->value];
+	token->symbol = &symbol_table[tokenp->literal() ? "(literal)" : tokenp->category == Token::NAME ? "(name)" : tokenp->value];
 	token->value = tokenp->value;
 }
 

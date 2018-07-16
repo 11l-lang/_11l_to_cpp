@@ -83,7 +83,7 @@ class Error(Exception):
 
 class Token:
     class Category(IntEnum):
-        IDENTIFIER = 0
+        NAME = 0 # or IDENTIFIER
         KEYWORD = 1
         DELIMITER = 2 # SEPARATOR = 2
         OPERATOR = 3
@@ -232,7 +232,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
             if operator:
                 i = lexem_start + len(operator)
                 category = Token.Category.OPERATOR
-            elif 'a' <= ch <= 'z' or 'A' <= ch <= 'Z' or ch == '_': # this is IDENTIFIER or KEYWORD
+            elif 'a' <= ch <= 'z' or 'A' <= ch <= 'Z' or ch == '_': # this is NAME/IDENTIFIER or KEYWORD
                 while i < len(source):
                     ch = source[i]
                     if not ('a' <= ch <= 'z' or 'A' <= ch <= 'Z' or ch == '_' or '0' <= ch <= '9' or ch == '?'):
@@ -246,7 +246,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
                 elif source[lexem_start:i] in keywords:
                     category = Token.Category.KEYWORD
                 else:
-                    category = Token.Category.IDENTIFIER
+                    category = Token.Category.NAME
 
             elif '0' <= ch <= '9': # this is NUMERIC_LITERAL
                 if ch in '01' and source[i:i+1] == 'B':
