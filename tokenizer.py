@@ -323,14 +323,11 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
         raise Exception('there is no corresponding closing parenthesis/bracket/brace for `' + nesting_elements[-1][0] + '`', nesting_elements[-1][1])
 
     #end_scope() # [4:] [-1]:‘At the end of the file, a DEDENT token is generated for each number remaining on the stack that is larger than zero.’
-    while len(indentation_levels) and indentation_levels[-1][1] != True:
+    while len(indentation_levels):
+        assert(indentation_levels[-1][1] != True)
         tokens.append(Token(i, i, Token.Category.SCOPE_END))
         if implied_scopes != None: # {
             implied_scopes.append(('}', i-1 if source[-1] == "\n" else i))
         indentation_levels.pop()
 
     return tokens
-
-s = "(0,1)+(2,)+f(1,2,3)+(3)"
-for tok in tokenize(s):
-    print(tok.to_str(s), ",", end="")

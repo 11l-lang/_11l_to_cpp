@@ -1,4 +1,4 @@
-import os, tokenizer, re
+﻿import os, tokenizer, re
 
 tokenizer_tests = []
 for root, dirs, files in os.walk('tests/tokenizer'):
@@ -14,7 +14,7 @@ for n, test in enumerate(tokenizer_tests):
     ellipsises = []
     last_line_len = 0
     def process_line(line):
-        global test_source, last_line_len, error,  scopes, ellipsises
+        global test_source, last_line_len, error, scopes, ellipsises
         if line.startswith('^') or line.endswith("^"):
             if line.startswith('^'):
                 position = re.search(r'[^\t ]', line[1:]).start() + 1
@@ -67,6 +67,7 @@ for n, test in enumerate(tokenizer_tests):
         was_error = True
         if error and "Error: " + e.message == error[0] and e.pos == error[1]:
             print('OK (Error)')
+            continue
         else:
             next_line_pos = test_source.find("\n", e.pos)
             if next_line_pos == -1:
