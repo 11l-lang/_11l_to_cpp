@@ -63,7 +63,7 @@ for n, test in enumerate(tokenizer_tests):
             print("scopes_determinator joined lines:", line_continuations)
             print("expected (in test) joined lines: ", ellipsises)
             break
-    except tokenizer.Exception as e:
+    except tokenizer.Error as e:
         was_error = True
         if error and "Error: " + e.message == error[0] and e.pos == error[1]:
             print('OK (Error)')
