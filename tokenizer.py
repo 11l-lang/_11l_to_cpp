@@ -66,16 +66,17 @@ Error: unindent does not match any outer indentation level
 ===============================================================================================================
 """
 from enum import IntEnum
+from typing import List
 
 keywords = ['else', 'fn', 'if', 'in', 'loop', 'null', 'result', 'return', 'switch', 'type', 'typeof']
 # new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
 # Решил отказаться от учёта new_scope_keywords на уровне лексического анализатора из-за loop.break и case в switch
-binary_operators = [[], ['+', '-', '*', '/', '^', '&', '|'], ['+=', '-=', '*=', '/=', '&&', '||'], ['<<=', '>>=']]
+binary_operators : List[List[str]] = [[], ['+', '-', '*', '/', '^', '&', '|'], ['+=', '-=', '*=', '/=', '&&', '||'], ['<<=', '>>=']]
 binary_operators[1].remove('-') # Решил просто не считать `-` за бинарный оператор в контексте автоматического склеивания строк, так как `-` к тому же ещё и модификатор константности
 unary_operators = [[], [], ['++', '--'], []]
 
 
-class Exception(Exception):
+class Error(Exception):
     def __init__(self, message, pos):
         self.message = message
         self.pos = pos
@@ -148,14 +149,14 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
                     or source[i:i+3] in unary_operators[3]) # ++i // Plus symbol at the beginning here should not be treated as binary + operator, so there is no implied line joining
               and (source[i] != '&' or source[i+1:i+2] == ' ')): # Символ `&` обрабатывается по-особенному — склеивание строк происходит только если после него стоит пробел
                 if len(tokens) == 0:
-                    raise Exception('source can not starts with a binary operator', i)
+                    raise Error('source can not starts with a binary operator', i)
                 if line_continuations != None:
                     line_continuations.append(tokens[-1].end)
                 continue
 
             if tabs and spaces:
                 next_line_pos = source.find("\n", i)
-                raise Exception('mixing tabs and spaces in indentation: `' + source[linestart:i].replace(' ', 'S').replace("\t", 'TAB') + source[i:next_line_pos if next_line_pos != -1 else len(source)] + '`', i)
+                raise Error('mixing tabs and spaces in indentation: `' + source[linestart:i].replace(' ', 'S').replace("\t", 'TAB') + source[i:next_line_pos if next_line_pos != -1 else len(source)] + '`', i)
 
             indentation_level = i - linestart
             if len(indentation_levels) and indentation_levels[-1][0] == None: # сразу после символа `{` идёт новый произвольный отступ (понижение уровня отступа может быть полезно, если вдруг отступ оказался слишком большой), который действует вплоть до парного символа `}`
@@ -167,7 +168,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
                     e = i + 1
                     while e < len(source) and source[e] not in "\r\n":
                         e += 1
-                    raise Exception("inconsistent indentations: ```\n" + prev_indentation_level*('TAB' if indentation_tabs else 'S') + source[prev_linestart:linestart]
+                    raise Error("inconsistent indentations: ```\n" + prev_indentation_level*('TAB' if indentation_tabs else 'S') + source[prev_linestart:linestart]
                         + (i-linestart)*('TAB' if tabs else 'S') + source[i:e] + "\n```", i)
                 prev_linestart = i
 
@@ -186,7 +187,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
                 else: # [3:] [-1]:‘If it is smaller, it ~‘must’ be one of the numbers occurring on the stack; all numbers on the stack that are larger are popped off, and for each number popped off a DEDENT token is generated.’ [:4]
                     while True:
                         if indentation_levels[-1][1]:
-                            raise Exception('too much unindent, what is this unindent intended for?', i)
+                            raise Error('too much unindent, what is this unindent intended for?', i)
                         indentation_levels.pop()
                         tokens.append(Token(i, i, Token.Category.SCOPE_END))
                         if implied_scopes != None:
@@ -195,7 +196,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
                         if level == indentation_level:
                             break
                         if level < indentation_level:
-                            raise Exception('unindent does not match any outer indentation level', i)
+                            raise Error('unindent does not match any outer indentation level', i)
 
                 prev_indentation_level = indentation_level
 
@@ -241,7 +242,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
                     if source[i-2:i-1] == ' ':
                         category = Token.Category.OPERATOR
                     else:
-                        raise Exception('please clarify your intention by putting space character before or after `I`', i-1)
+                        raise Error('please clarify your intention by putting space character before or after `I`', i-1)
                 elif source[lexem_start:i] in keywords:
                     category = Token.Category.KEYWORD
                 else:
@@ -259,7 +260,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
                 startqpos = i - 1
                 while True:
                     if i == len(source):
-                        raise Exception('unclosed string literal', startqpos)
+                        raise Error('unclosed string literal', startqpos)
                     ch = source[i]
                     i += 1
                     if ch == '"':
@@ -271,7 +272,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
                 nesting_level = 1
                 while True:
                     if i == len(source):
-                        raise Exception('unpaired left single quotation mark', startqpos)
+                        raise Error('unpaired left single quotation mark', startqpos)
                     ch = source[i]
                     i += 1
                     if ch == "‘":
@@ -288,7 +289,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
                 category = Token.Category.SCOPE_BEGIN
             elif ch == '}':
                 if len(nesting_elements) == 0 or nesting_elements[-1][0] != '{':
-                    raise Exception('there is no corresponding opening brace for `}`', lexem_start)
+                    raise Error('there is no corresponding opening brace for `}`', lexem_start)
                 #end_scope(lexem_start)
                 nesting_elements.pop()
                 while indentation_levels[-1][1] != True:
@@ -309,18 +310,18 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
                 category = Token.Category.DELIMITER
             elif ch in '])': # ([
                 if len(nesting_elements) == 0 or nesting_elements[-1][0] != {']':'[', ')':'('}[ch]: # ])
-                    raise Exception('there is no corresponding opening parenthesis/bracket for `' + ch + '`', lexem_start)
+                    raise Error('there is no corresponding opening parenthesis/bracket for `' + ch + '`', lexem_start)
                 nesting_elements.pop()
                 #end_scope(lexem_start)
                 category = Token.Category.DELIMITER
 
             else:
-                raise Exception('unexpected character ' + ch, lexem_start)
+                raise Error('unexpected character ' + ch, lexem_start)
 
             tokens.append(Token(lexem_start, i, category))
 
     if len(nesting_elements):
-        raise Exception('there is no corresponding closing parenthesis/bracket/brace for `' + nesting_elements[-1][0] + '`', nesting_elements[-1][1])
+        raise Error('there is no corresponding closing parenthesis/bracket/brace for `' + nesting_elements[-1][0] + '`', nesting_elements[-1][1])
 
     #end_scope() # [4:] [-1]:‘At the end of the file, a DEDENT token is generated for each number remaining on the stack that is larger than zero.’
     while len(indentation_levels):
