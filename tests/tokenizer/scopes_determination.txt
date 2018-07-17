@@ -84,6 +84,14 @@ replaced = line.replace(‘[’, ‘<span class="sq"><span class="sq_brackets">[
               \.replace(‘}’, ‘</span><span class="cu_brackets_b">}</span></span>’)
 
 
+replaced = line.replace(‘[’, ‘<span class="sq"><span class="sq_brackets">[</span>’)\.replace(‘]’, ‘<span class="sq_brackets">]</span></span>’)
+^                                                                                  Error: unexpected character \
+
+
+\.replace(‘]’, ‘<span class="sq_brackets">]</span></span>’)
+Error: unexpected character \^
+
+
 ---
 // [https://github.com/bbatsov/ruby-style-guide/pull/176#issuecomment-292355405 <- https://github.com/bbatsov/ruby-style-guide/issues/169 <- google:‘ruby multi line expressions’]:‘Ah wouldn't it be just so great if Ruby could read syntax like this one...’
 // (Всё же решил отказаться от этого синтаксиса, пусть `.` в конце строки всегда означает оператор `with`.)
