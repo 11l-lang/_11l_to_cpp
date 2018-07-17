@@ -71,9 +71,10 @@ from typing import List
 keywords = ['else', 'fn', 'if', 'in', 'loop', 'null', 'result', 'return', 'switch', 'type', 'typeof']
 # new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
 # Решил отказаться от учёта new_scope_keywords на уровне лексического анализатора из-за loop.break и case в switch
-binary_operators : List[List[str]] = [[], ['+', '-', '*', '/', '^', '&', '|'], ['+=', '-=', '*=', '/=', '&&', '||'], ['<<=', '>>=']]
+binary_operators : List[List[str]] = [[], ['+', '-', '*', '/', '%', '^', '&', '|', '<', '>', '='], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '&&', '||', '&=', '|=', '^=', '\\.'], ['<<=', '>>=']]
+unary_operators = [[], ['!'], ['++', '--'], []]
+sorted_operators = sorted(binary_operators[1] + binary_operators[2] + binary_operators[3] + unary_operators[1] + unary_operators[2] + unary_operators[3], key = lambda x: len(x), reverse = True)
 binary_operators[1].remove('-') # Решил просто не считать `-` за бинарный оператор в контексте автоматического склеивания строк, так как `-` к тому же ещё и модификатор константности
-unary_operators = [[], [], ['++', '--'], []]
 
 
 class Error(Exception):
@@ -221,7 +222,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
                 comments.append((comment_start, i))
         else:
             operator = None
-            for op in ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '%', '&=', '|=', '^=', '++', '--', '+', '-', '*', '/', '%', '!', '&', '|', '^', '~', '<', '>', '=']:
+            for op in sorted_operators:
                 if source[i:i+len(op)] == op:
                     operator = op
                     break

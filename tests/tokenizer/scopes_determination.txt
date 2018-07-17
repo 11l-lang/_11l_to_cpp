@@ -75,14 +75,13 @@ str = ‘unclosed string
 // balancing ’
 
 
----
 replaced = line.replace(‘[’, ‘<span class="sq"><span class="sq_brackets">[</span>’)
 ^                                                                                  …
-               .replace(‘]’, ‘<span class="sq_brackets">]</span></span>’)
+              \.replace(‘]’, ‘<span class="sq_brackets">]</span></span>’)
 ^                                                                        …
-               .replace(‘{’, ‘<span class="cu_brackets"><span class="cu_brackets_b">{</span><span>…</span><span class="cu" style="display:none">’)
+              \.replace(‘{’, ‘<span class="cu_brackets"><span class="cu_brackets_b">{</span><span>…</span><span class="cu" style="display:none">’)
 ^                                                                                                                                                 …
-               .replace(‘}’, ‘</span><span class="cu_brackets_b">}</span></span>’)
+              \.replace(‘}’, ‘</span><span class="cu_brackets_b">}</span></span>’)
 
 
 ---
