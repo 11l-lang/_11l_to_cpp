@@ -71,7 +71,7 @@ from typing import List
 keywords = ['else', 'fn', 'if', 'in', 'loop', 'null', 'result', 'return', 'switch', 'type', 'typeof']
 # new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
 # Решил отказаться от учёта new_scope_keywords на уровне лексического анализатора из-за loop.break и case в switch
-binary_operators : List[List[str]] = [[], ['+', '-', '*', '/', '%', '^', '&', '|', '<', '>', '='], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '&&', '||', '&=', '|=', '^=', '\\.'], ['<<=', '>>=']]
+binary_operators : List[List[str]] = [[], ['+', '-', '*', '/', '%', '^', '&', '|', '<', '>', '='], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '&&', '||', '&=', '|=', '^='], ['<<=', '>>=']]
 unary_operators = [[], ['!'], ['++', '--'], []]
 sorted_operators = sorted(binary_operators[1] + binary_operators[2] + binary_operators[3] + unary_operators[1] + unary_operators[2] + unary_operators[3], key = lambda x: len(x), reverse = True)
 binary_operators[1].remove('-') # Решил просто не считать `-` за бинарный оператор в контексте автоматического склеивания строк, так как `-` к тому же ещё и модификатор константности
@@ -153,6 +153,15 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
                     raise Error('source can not starts with a binary operator', i)
                 if line_continuations != None:
                     line_continuations.append(tokens[-1].end)
+                continue
+
+            if source[i:i+2] == R'\.': # // Support for constructions like: ||| You need just to add `\` at the each line starting from dot:
+                if len(tokens):        # \\ result = abc.method1()          ||| result = abc.method1()
+                    i += 1             # \\     .method2()                  |||     \.method2()
+               #else: # with `if len(tokens): i += 1` there is no need for this else branch
+               #    raise Error('unexpected character \')
+                    if line_continuations != None:
+                        line_continuations.append(tokens[-1].end)
                 continue
 
             if tabs and spaces:
