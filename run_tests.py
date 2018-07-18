@@ -3,7 +3,19 @@
 tokenizer_tests = []
 for root, dirs, files in os.walk('tests/tokenizer'):
     for name in files:
-        tokenizer_tests += open(os.path.join(root, name), encoding="utf8").read().split("\n\n\n")
+        test = open(os.path.join(root, name), encoding="utf8").read()
+        if name == 'comments.txt':
+            source, expected_comments = test.split("===\n")
+            comments = []
+            tokenizer.tokenize(source, comments = comments)
+            comments_str = "\n".join(str(t) for t in comments)
+            if comments_str != expected_comments:
+                print("Comments mismatch for test:\n" + source + "Comments:\n" + comments_str + "\nExpected comments:\n" + expected_comments)
+                break
+            else:
+                print("OK (Comments)")
+        else:
+            tokenizer_tests += test.split("\n\n\n")
 
 for n, test in enumerate(tokenizer_tests):
     if test.startswith('---'):
@@ -52,10 +64,9 @@ for n, test in enumerate(tokenizer_tests):
     # print(error)
     implied_scopes = []
     line_continuations = []
-    newline_chars = []
     was_error = False
     try:
-        tokenizer.tokenize(test_source, implied_scopes, line_continuations, newline_chars)
+        tokenizer.tokenize(test_source, implied_scopes, line_continuations)
         if not (implied_scopes == scopes and line_continuations == ellipsises):
             print("Mismatch at test:\n" + test + "\n\n")
             print("scopes_determinator scopes:", implied_scopes)

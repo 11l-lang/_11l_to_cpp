@@ -102,7 +102,7 @@ class Token:
     def to_str(self, source):
         return "Token("+str(int(self.category))+", \""+source[self.start:self.end]+"\")"
 
-def tokenize(source, implied_scopes = None, line_continuations = None, newline_chars = None, comments = None):
+def tokenize(source, implied_scopes = None, line_continuations = None, comments = None):
     tokens = []
     indentation_levels = []
     nesting_elements = [] # логически этот стек можно объединить с indentation_levels, но так немного удобнее (например для обработки [./tests.txt]:‘// But you can close parenthesis/bracket’, конкретно: для проверок `nesting_elements[-1][0] != ...`)
@@ -215,20 +215,42 @@ def tokenize(source, implied_scopes = None, line_continuations = None, newline_c
         if ch in " \t":
             i += 1 # just skip whitespace characters
         elif ch in "\r\n":
-            if newline_chars != None:
-                newline_chars.append(i)
+            #if newline_chars != None: # rejected this code as it does not count newline characters inside comments and string literals — better to use pqmarkup.py approach — on demand (i.e. only when error occured) calculation of newline characters array
+            #    newline_chars.append(i)
             i += 1
             if ch == "\r" and source[i:i+1] == "\n":
                 i += 1
             if len(nesting_elements) == 0 or nesting_elements[-1][0] not in '([': # если мы внутри скобок, то начинать новую строку не нужно # ])
                 begin_of_line = True
-        elif ch == '/' and source[i+1:i+2] == '/':
+        elif (ch == '/'  and source[i+1:i+2] == '/' ) \
+          or (ch == '\\' and source[i+1:i+2] == '\\'): # single-line comment
             i += 2
             comment_start = i
             while i < len(source) and source[i] not in "\r\n":
                 i += 1
             if comments != None:
                 comments.append((comment_start, i))
+        elif ch == '\\' and source[i+1:i+2] in "‘({[": # multi-line comment # ]})’
+            lbr = source[i+1]
+            rbr = {"‘": "’", "(": ")", "{": "}", "[": "]"}[lbr]
+            i += 2
+            comment_start = i
+
+            nesting_level = 1
+            while True:
+                ch = source[i]
+                if ch == lbr:
+                    nesting_level += 1
+                elif ch == rbr:
+                    nesting_level -= 1
+                    if nesting_level == 0:
+                        break
+                i += 1
+                if i == len(source):
+                    raise Error('there is no corresponding opening parenthesis/bracket/brace/qoute for `' + lbr + '`', comment_start-1)
+            if comments != None:
+                comments.append((comment_start, i))
+            i += 1
         else:
             operator = None
             for op in sorted_operators:
