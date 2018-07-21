@@ -55,7 +55,7 @@ public:
 class SymbolBase
 {
 public:
-	std::string value;
+	std::string id;
 	int lbp;
 	int nud_bp;
 	int led_bp;
@@ -65,8 +65,8 @@ public:
 	void set_led_bp(int led_bp_, SymbolNode* (*led_)(SymbolNode*, SymbolNode*)) {led_bp = led_bp_; led = led_;}
 
 	SymbolBase():
-		nud([](SymbolNode*)->SymbolNode *{throw SyntaxError("Syntax error");}),
-		led([](SymbolNode*, SymbolNode*)->SymbolNode *{throw SyntaxError("Unknown operator");})
+		nud([](SymbolNode*)->SymbolNode *{throw SyntaxError("syntax error");}),
+		led([](SymbolNode*, SymbolNode*)->SymbolNode *{throw SyntaxError("unknown operator");})
 	{}
 };
 
@@ -85,7 +85,7 @@ public:
 	{
 		if (token->literal() || token->category == Token::NAME)
 			return value;
-		if (symbol->value == "(") // )
+		if (symbol->id == "(") // )
 		{
 			if (function_call)
 			{
@@ -93,7 +93,7 @@ public:
 				for (size_t i = 1; i < children.size(); i++) {
 					res += children[i]->to_str();
 					if (i < children.size() - 1)
-						res += ",";
+						res += ", ";
 				}
 				return res + ")";
 			}
@@ -103,7 +103,7 @@ public:
 				for (size_t i = 0; i < children.size(); i++) {
 					res += children[i]->to_str();
 					if (i < children.size() - 1)
-						res += ",";
+						res += ", ";
 				}
 				return res + ")";
 			}
@@ -116,9 +116,9 @@ public:
 		switch (children.size())
 		{
 		case 1:
-			return "(" + symbol->value + children[0]->to_str() + ")";
+			return "(" + symbol->id + children[0]->to_str() + ")";
 		case 2:
-			return "(" + children[0]->to_str() + symbol->value + children[1]->to_str() + ")";
+			return "(" + children[0]->to_str() + symbol->id + children[1]->to_str() + ")";
 		}
 		return "";
 	}
@@ -126,13 +126,13 @@ public:
 
 std::map<std::string, SymbolBase> symbol_table;
 
-SymbolBase &symbol(const char *value, int bp = 0)
+SymbolBase &symbol(const char *id, int bp = 0)
 {
-	auto it = symbol_table.find(value);
+	auto it = symbol_table.find(id);
 	if (it == symbol_table.end())
 	{
-		SymbolBase &sb = symbol_table[value];
-		sb.value = value;
+		SymbolBase &sb = symbol_table[id];
+		sb.id = id;
 		sb.lbp = bp;
 		return sb;
 	}
@@ -149,7 +149,7 @@ void next_token()
 {
 	tokenp++;
 	if (tokenp == &tokens[_countof(tokens)])
-		throw SyntaxError("No more tokens");
+		throw SyntaxError("no more tokens");
 	tokenp->node.reset(token = new SymbolNode(tokenp));
 	token->symbol = &symbol_table[tokenp->literal() ? "(literal)" : tokenp->category == Token::NAME ? "(name)" : tokenp->value];
 	token->value = tokenp->value;
@@ -157,8 +157,8 @@ void next_token()
 
 void advance(const char *value)
 {
-	if (value && strcmp(tokenp->value, value) != 0)
-		throw SyntaxError("Expected " + std::string(value));
+	if (strcmp(tokenp->value, value) != 0)
+		throw SyntaxError("expected " + std::string(value));
 	next_token();
 }
 
@@ -176,9 +176,9 @@ SymbolNode *expression(int rbp = 0)
 	return left;
 }
 
-void infix(const char *value, int bp)
+void infix(const char *id, int bp)
 {
-	symbol(value, bp).set_led_bp(bp, [](SymbolNode *self, SymbolNode *left)->SymbolNode*{
+	symbol(id, bp).set_led_bp(bp, [](SymbolNode *self, SymbolNode *left)->SymbolNode*{
 		//self->children.clear();
 		self->children.push_back(left);
 		self->children.push_back(expression(self->symbol->led_bp));
@@ -186,9 +186,9 @@ void infix(const char *value, int bp)
 	});
 }
 
-void infix_r(const char *value, int bp)
+void infix_r(const char *id, int bp)
 {
-	symbol(value, bp).set_led_bp(bp, [](SymbolNode *self, SymbolNode *left)->SymbolNode*{
+	symbol(id, bp).set_led_bp(bp, [](SymbolNode *self, SymbolNode *left)->SymbolNode*{
 		//self->children.clear();
 		self->children.push_back(left);
 		self->children.push_back(expression(self->symbol->led_bp-1));
@@ -196,9 +196,9 @@ void infix_r(const char *value, int bp)
 	});
 }
 
-void prefix(const char *value, int bp)
+void prefix(const char *id, int bp)
 {
-	symbol(value).set_nud_bp(bp, [](SymbolNode *self)->SymbolNode*{
+	symbol(id).set_nud_bp(bp, [](SymbolNode *self)->SymbolNode*{
 		//self->children.clear();
 		self->children.push_back(expression(self->symbol->nud_bp));
 		return self;
