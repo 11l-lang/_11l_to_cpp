@@ -159,7 +159,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                 if len(tokens):        # \\ result = abc.method1()          ||| result = abc.method1()
                     i += 1             # \\     .method2()                  |||     \.method2()
                #else: # with `if len(tokens): i += 1` there is no need for this else branch
-               #    raise Error('unexpected character \')
+               #    raise Error('unexpected character `\`')
                     if line_continuations != None:
                         line_continuations.append(tokens[-1].end)
                 continue
@@ -178,7 +178,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                     e = i + 1
                     while e < len(source) and source[e] not in "\r\n":
                         e += 1
-                    raise Error("inconsistent indentations: ```\n" + prev_indentation_level*('TAB' if indentation_tabs else 'S') + source[prev_linestart:linestart]
+                    raise Error("inconsistent indentations:\n```\n" + prev_indentation_level*('TAB' if indentation_tabs else 'S') + source[prev_linestart:linestart]
                         + (i-linestart)*('TAB' if tabs else 'S') + source[i:e] + "\n```", i)
                 prev_linestart = i
 
@@ -191,7 +191,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                     if prev_indentation_level == 0: # len(indentation_levels) == 0 or indentation_levels[-1][0] == 0:
                         indentation_tabs = tabs # первоначальная/новая установка символа для отступа (либо табуляция, либо пробелы) производится только от нулевого уровня отступа
                     indentation_levels.append([indentation_level, False])
-                    tokens.append(Token(i, i, Token.Category.SCOPE_BEGIN))
+                    tokens.append(Token(linestart, i, Token.Category.SCOPE_BEGIN))
                     if implied_scopes != None:
                         implied_scopes.append(('{', tokens[-2].end + (1 if source[tokens[-2].end] in " \n" else 0)))
                 else: # [3:] [-1]:‘If it is smaller, it ~‘must’ be one of the numbers occurring on the stack; all numbers on the stack that are larger are popped off, and for each number popped off a DEDENT token is generated.’ [:4]
@@ -348,7 +348,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                 category = Token.Category.DELIMITER
 
             else:
-                raise Error('unexpected character ' + ch, lexem_start)
+                raise Error('unexpected character `' + ch + '`', lexem_start)
 
             tokens.append(Token(lexem_start, i, category))
 
