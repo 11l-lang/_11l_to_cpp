@@ -105,7 +105,7 @@ class Token:
 def tokenize(source, implied_scopes = None, line_continuations = None, comments = None):
     tokens = []
     indentation_levels = []
-    nesting_elements = [] # логически этот стек можно объединить с indentation_levels, но так немного удобнее (например для обработки [./tests.txt]:‘// But you can close parenthesis/bracket’, конкретно: для проверок `nesting_elements[-1][0] != ...`)
+    nesting_elements = [] # логически этот стек можно объединить с indentation_levels, но так немного удобнее (конкретно: для проверок `nesting_elements[-1][0] != ...`)
     i = 0
     #def end_scope(opt = 0):
     #    pass
@@ -286,6 +286,24 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                 else:
                     while i < len(source) and '0' <= source[i] <= '9':
                         i += 1
+                    if i < len(source) and source[i] == "'" and i - lexem_start == 4: # this is a hexadecimal number
+                        pass
+                    else:
+                        while i < len(source) and ('0' <= source[i] <= '9' or source[i] in "'.eE"):
+                            if source[i] in 'eE':
+                                if source[i+1:i+2] in '-+':
+                                    i += 1
+                            i += 1
+                        if not source[i:i+1] in 'oоbд' and "'" in source[lexem_start:i] and not '.' in source[lexem_start:i]: # float numbers do not checked for a while
+                            number = source[lexem_start:i].replace("'", '')
+                            number_with_separators = ''
+                            j = len(number)
+                            while j > 3:
+                                number_with_separators = "'" + number[j-3:j] + number_with_separators
+                                j -= 3
+                            number_with_separators = number[0:j] + number_with_separators
+                            if source[lexem_start:i] != number_with_separators:
+                                raise Error('digit separator in this number is located in the wrong place (should be: '+ number_with_separators +')', lexem_start)
                 category = Token.Category.NUMERIC_LITERAL
 
             elif ch == '"':
