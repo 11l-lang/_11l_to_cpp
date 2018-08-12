@@ -1,0 +1,2 @@
+123'45
+^Error: digit separator in this number is located in the wrong place (should be: 12'345)
