@@ -1,0 +1,24 @@
+﻿---
+\‘res = '['
+for i in range(len(self.children)):
+    res += self.children[i].to_str()
+    if i < len(self.children)-1:
+        res += ', '
+return res + ']'’
+A res = ‘[’
+L(c) .children
+   res ‘’= c.to_str()
+   I L.next != N
+      res ‘’= ‘, ’
+R res‘]’
+
+
+String token
+F f()
+   R S :token {‘None’ {‘N’}; ‘False’ {‘0B’}; ‘True’ {‘1B’}}
+===
+String token;
+auto f()
+{
+    return [](const auto &a){return a == "None" ? "N" : a == "False" ? "0B" : a == "True" ? "1B" : throw KeyError(a);}(::token);
+}

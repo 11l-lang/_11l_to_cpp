@@ -86,21 +86,25 @@ class Token:
     class Category(IntEnum):
         NAME = 0 # or IDENTIFIER
         KEYWORD = 1
-        DELIMITER = 2 # SEPARATOR = 2
-        OPERATOR = 3
-        NUMERIC_LITERAL = 4
-        STRING_LITERAL = 5
-        SCOPE_BEGIN = 6 # similar to ‘INDENT token in Python’[https://docs.python.org/3/reference/lexical_analysis.html][-1]
-        SCOPE_END = 7   # similar to ‘DEDENT token in Python’[-1]
-        STATEMENT_SEPARATOR = 8
+        CONSTANT = 2
+        DELIMITER = 3 # SEPARATOR = 3
+        OPERATOR = 4
+        NUMERIC_LITERAL = 5
+        STRING_LITERAL = 6
+        SCOPE_BEGIN = 7 # similar to ‘INDENT token in Python’[https://docs.python.org/3/reference/lexical_analysis.html][-1]
+        SCOPE_END = 8   # similar to ‘DEDENT token in Python’[-1]
+        STATEMENT_SEPARATOR = 9
 
     def __init__(self, start, end, category):
         self.start = start
         self.end = end
         self.category = category
 
+    def value(self, source):
+        return source[self.start:self.end]
+
     def to_str(self, source):
-        return "Token("+str(int(self.category))+", \""+source[self.start:self.end]+"\")"
+        return 'Token('+str(self.category)+', "'+self.value(source)+'")'
 
 def tokenize(source, implied_scopes = None, line_continuations = None, comments = None):
     tokens = []
@@ -276,7 +280,10 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                     else:
                         raise Error('please clarify your intention by putting space character before or after `I`', i-1)
                 elif source[lexem_start:i] in keywords:
-                    category = Token.Category.KEYWORD
+                    if source[lexem_start:i] in ('N', 'Н'):
+                        category = Token.Category.CONSTANT
+                    else:
+                        category = Token.Category.KEYWORD
                 else:
                     category = Token.Category.NAME
 
@@ -352,7 +359,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
             elif ch == ';':
                 category = Token.Category.STATEMENT_SEPARATOR
 
-            elif ch in [',', '.', ':', '@']:
+            elif ch in (',', '.', ':', '@'):
                 category = Token.Category.DELIMITER
 
             elif ch in '([':
