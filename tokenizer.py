@@ -291,22 +291,46 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                 if ch in '01' and source[i:i+1] == 'B':
                     i += 1
                 else:
-                    while i < len(source) and ('0' <= source[i] <= '9' or 'A' <= source[i] <= 'F' or 'a' <= source[i] <= 'f' or source[i] in 'абсдефАБСДЕФ'):
+                    def is_hexadecimal_digit(ch):
+                        return '0' <= ch <= '9' or 'A' <= ch <= 'F' or 'a' <= ch <= 'f' or ch in 'абсдефАБСДЕФ'
+                    is_hex = False
+
+                    while i < len(source) and is_hexadecimal_digit(source[i]):
+                        if not ('0' <= source[i] <= '9'):
+                            is_hex = True
                         i += 1
-                    if i < len(source) and source[i] == "'" and i - lexem_start == 4: # this is a hexadecimal number
-                        i += 1
-                        while i < len(source) and ('0' <= source[i] <= '9' or 'A' <= source[i] <= 'F' or 'a' <= source[i] <= 'f' or source[i] in 'абсдефАБСДЕФ'):
+
+                    next_digit_separator = 0
+                    if i < len(source) and source[i] == "'" and i - lexem_start == 2: # special handling for 12'345 (чтобы это не считалось short hexadecimal number)
+                        j = i + 1
+                        while j < len(source) and is_hexadecimal_digit(source[j]):
+                            if not ('0' <= source[j] <= '9'):
+                                is_hex = True
+                            j += 1
+                        next_digit_separator = j - 1 - i
+
+                    if i < len(source) and source[i] == "'" and (i - lexem_start == 4 or (i - lexem_start == 2 and (next_digit_separator != 3 or is_hex))): # this is a hexadecimal number
+                        if i - lexem_start == 2: # this is a short hexadecimal number
                             i += 1
-                            if (i - lexem_start) % 5 == 4 and i < len(source):
-                                if source[i] != "'":
-                                    if not ('0' <= source[i] <= '9' or 'A' <= source[i] <= 'F' or 'a' <= source[i] <= 'f' or source[i] in 'абсдефАБСДЕФ'):
-                                        break
-                                    raise Error('here should be a digit separator in hexadecimal number', i)
+                            if i + 2 > len(source) or not is_hexadecimal_digit(source[i]) or not is_hexadecimal_digit(source[i+1]):
+                                raise Error('wrong short hexadecimal number', lexem_start)
+                            i += 2
+                            if i < len(source) and is_hexadecimal_digit(source[i]):
+                                raise Error('expected end of short hexadecimal number', i)
+                        else:
+                            i += 1
+                            while i < len(source) and is_hexadecimal_digit(source[i]):
                                 i += 1
-                        if i < len(source) and source[i] == "'":
-                            raise Error('digit separator in hexadecimal number is located in the wrong place', i)
-                        if (i - lexem_start) % 5 != 4:
-                            raise Error('after this digit separator there should be 4 digits in hexadecimal number', source.rfind("'", 0, i))
+                                if (i - lexem_start) % 5 == 4 and i < len(source):
+                                    if source[i] != "'":
+                                        if not is_hexadecimal_digit(source[i]):
+                                            break
+                                        raise Error('here should be a digit separator in hexadecimal number', i)
+                                    i += 1
+                            if i < len(source) and source[i] == "'":
+                                raise Error('digit separator in hexadecimal number is located in the wrong place', i)
+                            if (i - lexem_start) % 5 != 4:
+                                raise Error('after this digit separator there should be 4 digits in hexadecimal number', source.rfind("'", 0, i))
                     else:
                         while i < len(source) and ('0' <= source[i] <= '9' or source[i] in "'.eE"):
                             if source[i] in 'eE':
