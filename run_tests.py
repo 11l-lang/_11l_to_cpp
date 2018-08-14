@@ -1,4 +1,4 @@
-﻿import os, tokenizer, re, tempfile
+﻿import os, tokenizer, parse, re, tempfile, sys
 
 def kdiff3(str1, str2):
     for envvar in ['ProgramFiles', 'ProgramFiles(x86)', 'ProgramW6432']:
@@ -109,3 +109,22 @@ for n, test in enumerate(tokenizer_tests):
         print("There should be error in test:\n" + test)
         exit(1)
     print('OK')
+
+for fname in os.listdir('tests/parser'):
+    for test in open('tests/parser/' + fname, encoding="utf8").read().split("\n\n\n"):
+        if test.startswith('---'):
+            continue
+        try:
+            in_11l, expected_cpp = test.split("===\n")
+            expected_cpp += "\n"
+            in_cpp = parse.parse(tokenizer.tokenize(in_11l), in_11l).to_str()
+            if in_cpp != expected_cpp:
+                print("Mismatch for test:\n" + in_11l + "Output:\n" + in_cpp + "\nExpected output:\n" + expected_cpp)
+                kdiff3(in_cpp, expected_cpp)
+                exit(1)
+        except Exception as e:
+            print("Exception in test:\n" + test)
+            raise e
+        print('OK')
+
+print('All OK')
