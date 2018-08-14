@@ -229,8 +229,9 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         self.function_arguments = []
 
     def to_str(self, indent):
-        return self.children_to_str(indent, 'auto ' + self.function_name \
-            + '(' + ", ".join(map(lambda arg: arg[0] + ('' if arg[1] == None else ' = ' + arg[1].to_str()), self.function_arguments)) + ')')
+        return self.children_to_str(indent, 'auto ' + self.function_name + '()' if len(self.function_arguments) == 0 else
+            'template <' + ", ".join(map(lambda index_arg: 'typename T' + str(index_arg[0] + 1), enumerate(self.function_arguments))) + '> auto ' + self.function_name
+            + '(' + ", ".join(map(lambda index_arg: 'const T' + str(index_arg[0] + 1) + ' &' + index_arg[1][0] + ('' if index_arg[1][1] == None else ' = ' + index_arg[1][1].to_str()), enumerate(self.function_arguments))) + ')')
 
 class ASTReturn(ASTNodeWithExpression):
     def to_str(self, indent):

@@ -24,12 +24,13 @@ auto f()
 }
 
 
----
 F func(arg = 1)
    R arg + 1
 ===
-auto func(arg = 1)
+template <typename T1> auto func(const T1 &arg = 1)
+{
     return arg + 1;
+}
 
 
 ---
