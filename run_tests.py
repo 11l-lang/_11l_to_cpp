@@ -114,17 +114,33 @@ for fname in os.listdir('tests/parser'):
     for test in open('tests/parser/' + fname, encoding="utf8").read().split("\n\n\n"):
         if test.startswith('---'):
             continue
-        try:
-            in_11l, expected_cpp = test.split("===\n")
-            expected_cpp += "\n"
-            in_cpp = parse.parse(tokenizer.tokenize(in_11l), in_11l).to_str()
-            if in_cpp != expected_cpp:
-                print("Mismatch for test:\n" + in_11l + "Output:\n" + in_cpp + "\nExpected output:\n" + expected_cpp)
-                kdiff3(in_cpp, expected_cpp)
-                exit(1)
-        except Exception as e:
-            print("Exception in test:\n" + test)
-            raise e
-        print('OK')
+        if fname == 'errors.txt':
+            try:
+                source, error_message = test.split('^Error: ')
+                parse.parse(tokenizer.tokenize(source), source)
+            except parse.Error as e:
+                line_start = source.rfind("\n", 0, len(source))
+                if e.message == error_message.rstrip() and e.pos == source.rfind("\n", 0, line_start) + len(source) - line_start:
+                    print('OK (Error)')
+                    continue
+                else:
+                    kdiff3(e.message, error_message.rstrip())
+                    print('Error at position ' + str(e.pos) + " in test:\n" + test)
+                    exit(1)
+            print("There should be error in test:\n" + test)
+            exit(1)
+        else:
+            try:
+                in_11l, expected_cpp = test.split("===\n")
+                expected_cpp += "\n"
+                in_cpp = parse.parse(tokenizer.tokenize(in_11l), in_11l).to_str()
+                if in_cpp != expected_cpp:
+                    print("Mismatch for test:\n" + in_11l + "Output:\n" + in_cpp + "\nExpected output:\n" + expected_cpp)
+                    kdiff3(in_cpp, expected_cpp)
+                    exit(1)
+            except Exception as e:
+                print("Exception in test:\n" + test)
+                raise e
+            print('OK')
 
 print('All OK')

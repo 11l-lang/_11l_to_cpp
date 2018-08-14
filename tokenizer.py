@@ -68,7 +68,10 @@ Error: unindent does not match any outer indentation level
 from enum import IntEnum
 from typing import List
 
-keywords = ['else', 'fn', 'if', 'in', 'loop', 'null', 'result', 'return', 'switch', 'type', 'typeof']
+keywords = ['A',     'C',  'I',    'E',     'F',  'L',    'N',    'R',       'S',       'T',    'X',
+            'А',     'С',  'Е',    'И',     'Ф',  'Ц',    'Н',    'Р',       'В',       'Т',    'Х',
+            'var',   'in', 'if',   'else',  'fn', 'loop', 'null', 'return',  'switch',  'type', 'exception',
+            'перем', 'С',  'если', 'иначе', 'фн', 'цикл', 'нуль', 'вернуть', 'выбрать', 'тип',  'исключение']
 # new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
 # Решил отказаться от учёта new_scope_keywords на уровне лексического анализатора из-за loop.break и case в switch
 binary_operators : List[List[str]] = [[], ['+', '-', '*', '/', '%', '^', '&', '|', '<', '>', '='], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '&&', '||', '&=', '|=', '^='], ['<<=', '>>=']]
