@@ -12,3 +12,11 @@
 
 0000'FFFF'FF
          ^Error: after this digit separator there should be 4 digits in hexadecimal number
+
+
+00'F
+^Error: wrong short hexadecimal number
+
+
+00'7FF
+     ^Error: expected end of short hexadecimal number

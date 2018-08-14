@@ -86,7 +86,7 @@ class SymbolNode:
                 return '0' + n[:-1]
             if n[-1] in 'bд':
                 return '0b' + n[:-1]
-            if n[4:5] == "'":
+            if n[4:5] == "'" or n[-3:-2] == "'":
                 return '0x' + n
             return n
 
