@@ -1,4 +1,4 @@
-﻿---
+---
 \‘res = '['
 for i in range(len(self.children)):
     res += self.children[i].to_str()
@@ -13,6 +13,7 @@ L(c) .children
 R res‘]’
 
 
+---
 String token
 F f()
    R S :token {‘None’ {‘N’}; ‘False’ {‘0B’}; ‘True’ {‘1B’}}
@@ -22,3 +23,58 @@ auto f()
 {
     return [](const auto &a){return a == "None" ? "N" : a == "False" ? "0B" : a == "True" ? "1B" : throw KeyError(a);}(::token);
 }
+
+
+---
+F func(arg = 1)
+   R arg + 1
+===
+auto func(arg = 1)
+    return arg + 1;
+
+
+---
+T Person
+   String name
+   Int age
+
+   F ()
+      .age = 1
+
+   F (name, age)
+      .name = name
+      .age = age
+
+   F ()(name)
+      .name = name
+      R 1
+===
+class Person
+{
+public:
+    String name;
+    int age;
+
+    Person()
+    {
+        age = 1;
+    }
+
+    template <typename T1, typename T2> Person(const T1 &name, const T2 &age)
+    {
+        this->name = name;
+        this->age = age;
+    }
+
+    template <typename T1, typename T2> Person(const T1 &name, const T2 &age)
+    {
+        this->name = name;
+        this->age = age;
+    }
+
+    template <typename T1> auto operator()(const T1 &name)
+    {
+        this->name = name;
+        return 1;
+    }
+};

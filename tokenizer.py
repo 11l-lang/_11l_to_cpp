@@ -1,4 +1,4 @@
-﻿"""
+﻿R"""
 После данной обработки отступы перестают играть роль — границу `scope` всегда определяют фигурные скобки.
 Также здесь выполняется склеивание строк, и таким образом границу statement\утверждения задаёт либо символ `;`,
 либо символ новой строки (при условии, что перед ним не стоит символ `…`!).
@@ -291,17 +291,31 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                 if ch in '01' and source[i:i+1] == 'B':
                     i += 1
                 else:
-                    while i < len(source) and '0' <= source[i] <= '9':
+                    while i < len(source) and ('0' <= source[i] <= '9' or 'A' <= source[i] <= 'F' or 'a' <= source[i] <= 'f' or source[i] in 'абсдефАБСДЕФ'):
                         i += 1
                     if i < len(source) and source[i] == "'" and i - lexem_start == 4: # this is a hexadecimal number
-                        pass
+                        i += 1
+                        while i < len(source) and ('0' <= source[i] <= '9' or 'A' <= source[i] <= 'F' or 'a' <= source[i] <= 'f' or source[i] in 'абсдефАБСДЕФ'):
+                            i += 1
+                            if (i - lexem_start) % 5 == 4 and i < len(source):
+                                if source[i] != "'":
+                                    if not ('0' <= source[i] <= '9' or 'A' <= source[i] <= 'F' or 'a' <= source[i] <= 'f' or source[i] in 'абсдефАБСДЕФ'):
+                                        break
+                                    raise Error('here should be a digit separator in hexadecimal number', i)
+                                i += 1
+                        if i < len(source) and source[i] == "'":
+                            raise Error('digit separator in hexadecimal number is located in the wrong place', i)
+                        if (i - lexem_start) % 5 != 4:
+                            raise Error('after this digit separator there should be 4 digits in hexadecimal number', source.rfind("'", 0, i))
                     else:
                         while i < len(source) and ('0' <= source[i] <= '9' or source[i] in "'.eE"):
                             if source[i] in 'eE':
                                 if source[i+1:i+2] in '-+':
                                     i += 1
                             i += 1
-                        if not source[i:i+1] in 'oоbд' and "'" in source[lexem_start:i] and not '.' in source[lexem_start:i]: # float numbers do not checked for a while
+                        if source[i:i+1] in 'oоbд':
+                            i += 1
+                        elif "'" in source[lexem_start:i] and not '.' in source[lexem_start:i]: # float numbers do not checked for a while
                             number = source[lexem_start:i].replace("'", '')
                             number_with_separators = ''
                             j = len(number)
