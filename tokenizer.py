@@ -256,6 +256,9 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                 comments.append((comment_start, i))
             i += 1
         else:
+            def is_hexadecimal_digit(ch):
+                return '0' <= ch <= '9' or 'A' <= ch <= 'F' or 'a' <= ch <= 'f' or ch in 'абсдефАБСДЕФ'
+
             operator = None
             for op in sorted_operators:
                 if source[i:i+len(op)] == op:
@@ -279,6 +282,19 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                         category = Token.Category.OPERATOR
                     else:
                         raise Error('please clarify your intention by putting space character before or after `I`', i-1)
+                elif source[i:i+1] == "'": # this is a keyword argument, a raw string or a hexadecimal number
+                    i += 1
+                    if source[i:i+1] == ' ': # this is a keyword argument
+                        category = Token.Category.NAME
+                    elif source[i:i+1] in ('‘', "'"): # ’ # this is a raw string
+                        assert(False) # [--]
+                    else: # this is a hexadecimal number
+                        while i < len(source) and (is_hexadecimal_digit(source[i]) or source[i] == "'"):
+                            i += 1
+                        if not (source[lexem_start+4:lexem_start+5] == "'" or source[i-3:i-2] == "'"):
+                            raise Error('digit separator in this hexadecimal number is located in the wrong place', lexem_start)
+                        category = Token.Category.NUMERIC_LITERAL
+
                 elif source[lexem_start:i] in keywords:
                     if source[lexem_start:i] in ('N', 'Н'):
                         category = Token.Category.CONSTANT
@@ -288,9 +304,6 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                     category = Token.Category.NAME
 
             elif '0' <= ch <= '9': # this is NUMERIC_LITERAL or CONSTANT 0B or 1B
-                def is_hexadecimal_digit(ch):
-                    return '0' <= ch <= '9' or 'A' <= ch <= 'F' or 'a' <= ch <= 'f' or ch in 'абсдефАБСДЕФ'
-
                 if ch in '01' and source[i:i+1] in ('B', 'В') and not (is_hexadecimal_digit(source[i+1:i+2]) or source[i+1:i+2] == "'"):
                     i += 1
                     category = Token.Category.CONSTANT
