@@ -13,7 +13,6 @@ L(c) .children
 R res‘]’
 
 
----
 String token
 F f()
    R S :token {‘None’ {‘N’}; ‘False’ {‘0B’}; ‘True’ {‘1B’}}
