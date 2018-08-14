@@ -1,0 +1,2 @@
+F f() R 1
+      ^Error: expected a new scope (indented block or opening curly bracket)
