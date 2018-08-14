@@ -91,7 +91,7 @@ class SymbolNode:
             return n
 
         if self.token.category == Token.Category.STRING_LITERAL:
-            return '"' + repr(self.token.value(source))[1:-1].replace('"', R'\"').replace(R"\'", "'") + '"'
+            return '"' + repr(self.token.value(source)[1:-1])[1:-1].replace('"', R'\"').replace(R"\'", "'") + '"'
 
         if self.token.category == Token.Category.CONSTANT:
             return {'N': 'nullptr', 'Н': 'nullptr', '0B': 'false', '0В': 'false', '1B': 'true', '1В': 'true'}[self.token.value(source)]
@@ -118,10 +118,18 @@ class SymbolNode:
                 assert(len(self.children) == 1)
                 return '(' + self.children[0].to_str() + ')'
 
+        elif self.symbol.id in ('S', 'В', 'switch', 'выбрать'):
+            res = '[](const auto &a){return '
+            for i in range(1, len(self.children), 2):
+                res += 'a == ' + self.children[i].to_str() + ' ? ' + self.children[i+1].to_str() + ' : '
+            return res + 'throw KeyError(a);}(' + self.children[0].to_str() + ')'
+
         if len(self.children) == 1:
             #return '(' + self.symbol.id + self.children[0].to_str() + ')'
             if self.postfix:
                 return self.children[0].to_str() + self.symbol.id
+            elif self.symbol.id == ':':
+                return '::' + self.children[0].to_str()
             else:
                 return self.symbol.id + self.children[0].to_str()
         elif len(self.children) == 2:
@@ -172,10 +180,10 @@ class ASTNodeWithChildren(ASTNode):
             f(child)
 
     def children_to_str(self, indent, r):
-        r = ('' if self.tokeni == 0 else (source[tokens[self.tokeni-2].end:tokens[self.tokeni].start].count("\n")-1) * "\n") + ' ' * (indent*4) + r + "\n"
+        r = ('' if self.tokeni == 0 else (source[tokens[self.tokeni-2].end:tokens[self.tokeni].start].count("\n")-1) * "\n") + ' ' * (indent*4) + r + "\n" + ' ' * (indent*4) + "{\n"
         for c in self.children:
             r += c.to_str(indent+1)
-        return r
+        return r + ' ' * (indent*4) + "}\n"
 
 class ASTNodeWithExpression(ASTNode):
     expression : SymbolNode
@@ -198,6 +206,20 @@ class ASTExpression(ASTNodeWithExpression):
     def to_str(self, indent):
         return ' ' * (indent*4) + self.expression.to_str() + "\n"
 
+cpp_type_from_11l = {'Int':'int', 'String':'String', 'Bool':'bool', 'Array':'Array', 'Tuple':'Tuple'}
+
+class ASTVariableDeclaration(ASTNode):
+    var : str
+    type : str
+    type_args : List[str]
+
+    def to_str(self, indent):
+        return ' ' * (indent*3) + cpp_type_from_11l[self.type] + ('<' + ', '.join(cpp_type_from_11l[ty] for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + self.var + ";\n"
+
+class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
+    def to_str(self, indent):
+        return super().to_str(indent)[:-2] + ' = ' + self.expression.to_str() + ";\n"
+
 class ASTFunctionDefinition(ASTNodeWithChildren):
     function_name : str
     function_arguments : List[Tuple[str, SymbolNode]]# = []
@@ -210,6 +232,13 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         return self.children_to_str(indent, 'auto ' + self.function_name \
             + '(' + ", ".join(map(lambda arg: arg[0] + ('' if arg[1] == None else ' = ' + arg[1].to_str()), self.function_arguments)) + ')')
 
+class ASTReturn(ASTNodeWithExpression):
+    def to_str(self, indent):
+        return ' ' * (indent*4) + 'return' + (' ' + self.expression.to_str() if self.expression != None else '') + ";\n"
+
+    def walk_expressions(self, f):
+        if self.expression != None: f(self.expression)
+
 def next_token():
     global token, tokeni, tokensn
     if token == None and tokeni != -1:
@@ -221,20 +250,21 @@ def next_token():
     else:
         token = tokens[tokeni]
         tokensn = SymbolNode(token)
-        if token.category != Token.Category.SCOPE_BEGIN:
-            if token.category != Token.Category.KEYWORD or token.value(source) in allowed_keywords_in_expressions:
-                key : str
-                if token.category in (Token.Category.NUMERIC_LITERAL, Token.Category.STRING_LITERAL):
-                    key = '(literal)'
-                elif token.category == Token.Category.NAME:
-                    key = '(name)'
-                elif token.category == Token.Category.CONSTANT:
-                    key = '(constant)'
-                elif token.category in (Token.Category.STATEMENT_SEPARATOR, Token.Category.SCOPE_END):
-                    key = ';'
-                else:
-                    key = token.value(source)
-                tokensn.symbol = symbol_table[key]
+        if token.category != Token.Category.KEYWORD or token.value(source) in allowed_keywords_in_expressions:
+            key : str
+            if token.category in (Token.Category.NUMERIC_LITERAL, Token.Category.STRING_LITERAL):
+                key = '(literal)'
+            elif token.category == Token.Category.NAME:
+                key = '(name)'
+            elif token.category == Token.Category.CONSTANT:
+                key = '(constant)'
+            elif token.category == Token.Category.SCOPE_BEGIN:
+                key = '{' # }
+            elif token.category in (Token.Category.STATEMENT_SEPARATOR, Token.Category.SCOPE_END):
+                key = ';'
+            else:
+                key = token.value(source)
+            tokensn.symbol = symbol_table[key]
 
 def advance(value):
     if token.value(source) != value:
@@ -307,7 +337,7 @@ prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('--', 130); prefix(
 
 infix_r('^', 140)
 
-symbol('.', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('--', 150); postfix('++', 150)
+symbol('.', 150); prefix(':', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('--', 150); postfix('++', 150)
 
 infix_r('=', 10); infix_r('+=', 10); infix_r('-=', 10); infix_r('*=', 10); infix_r('/=', 10); infix_r('I/=', 10); infix_r('Ц/=', 10); infix_r('%=', 10); infix_r('>>=', 10); infix_r('<<=', 10); infix_r('**=', 10)
 
@@ -378,18 +408,42 @@ def nud(self):
     return self
 symbol('[').nud = nud # ]
 
+def advance_scope_begin():
+    if token.category != Token.Category.SCOPE_BEGIN:
+        raise Error('expected a new scope (indented block or opening curly bracket)', token.start)
+    next_token()
+
+def nud(self):
+    self.append_child(expression())
+    advance_scope_begin()
+    while token.category != Token.Category.SCOPE_END:
+        self.append_child(expression())
+        advance_scope_begin()
+        self.append_child(expression())
+        if token.category != Token.Category.SCOPE_END:
+            raise Error('expected end of scope (dedented block or closing curly bracket)', token.start)
+        next_token()
+        if token.category == Token.Category.STATEMENT_SEPARATOR:
+            next_token()
+    next_token()
+    return self
+symbol('S').nud = nud
+symbol('В').nud = nud
+symbol('switch').nud = nud
+symbol('выбрать').nud = nud
+
+symbol('{') # }
+
 def parse_internal(this_node):
     global token
 
     def new_scope(node, func_args = None):
-        if token.category != Token.Category.SCOPE_BEGIN:
-            raise Error('expected a new scope (indented block or opening curly bracket)', token.start)
-        next_token()
+        advance_scope_begin()
         parse_internal(node)
 
     while token != None:
         if token.category == Token.Category.KEYWORD:
-            if token.value(source) in ('F', 'fn'):
+            if token.value(source) in ('F', 'Ф', 'fn', 'фн'):
                 node = ASTFunctionDefinition()
                 next_token()
                 if token.category == Token.Category.NAME:
@@ -431,6 +485,16 @@ def parse_internal(this_node):
                 next_token()
                 new_scope(node)
 
+            elif token.value(source) in ('R', 'Р', 'return', 'вернуть'):
+                node = ASTReturn()
+                next_token()
+                if token.category in (Token.Category.SCOPE_END, Token.Category.STATEMENT_SEPARATOR):
+                    node.expression = None
+                else:
+                    node.set_expression(expression())
+                if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
+                    next_token()
+
             else:
                 raise Error('unrecognized statement started with keyword', token.start)
 
@@ -442,8 +506,24 @@ def parse_internal(this_node):
             return
 
         else:
-            node = ASTExpression()
-            node.set_expression(expression())
+            node_expression = expression()
+            if token.category == Token.Category.NAME:
+                var_name = token.value(source)
+                next_token()
+                if token.value(source) == '=':
+                    next_token()
+                    node = ASTVariableInitialization()
+                    node.set_expression(expression())
+                else:
+                    node = ASTVariableDeclaration()
+                node.var = var_name
+                node.type = node_expression.token.value(source)
+                node.type_args = []
+                assert(node.type[0].isupper()) # type name must begins with upper case letter
+                assert(node_expression.token.category == Token.Category.NAME) # [-add support of template types-]
+            else:
+                node = ASTExpression()
+                node.set_expression(node_expression)
             if not (token == None or token.category in (Token.Category.STATEMENT_SEPARATOR, Token.Category.SCOPE_END)):
                 raise Error('expected end of statement', token.start)
             if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
