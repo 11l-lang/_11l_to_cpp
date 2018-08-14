@@ -287,13 +287,14 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                 else:
                     category = Token.Category.NAME
 
-            elif '0' <= ch <= '9': # this is NUMERIC_LITERAL
-                if ch in '01' and source[i:i+1] == 'B':
-                    i += 1
-                else:
-                    def is_hexadecimal_digit(ch):
-                        return '0' <= ch <= '9' or 'A' <= ch <= 'F' or 'a' <= ch <= 'f' or ch in 'абсдефАБСДЕФ'
+            elif '0' <= ch <= '9': # this is NUMERIC_LITERAL or CONSTANT 0B or 1B
+                def is_hexadecimal_digit(ch):
+                    return '0' <= ch <= '9' or 'A' <= ch <= 'F' or 'a' <= ch <= 'f' or ch in 'абсдефАБСДЕФ'
 
+                if ch in '01' and source[i:i+1] in ('B', 'В') and not (is_hexadecimal_digit(source[i+1:i+2]) or source[i+1:i+2] == "'"):
+                    i += 1
+                    category = Token.Category.CONSTANT
+                else:
                     is_hex = False
                     while i < len(source) and is_hexadecimal_digit(source[i]):
                         if not ('0' <= source[i] <= '9'):
@@ -357,7 +358,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                             number_with_separators = number[0:j] + number_with_separators
                             if source[lexem_start:i] != number_with_separators:
                                 raise Error('digit separator in this number is located in the wrong place (should be: '+ number_with_separators +')', lexem_start)
-                category = Token.Category.NUMERIC_LITERAL
+                    category = Token.Category.NUMERIC_LITERAL
 
             elif ch == '"':
                 startqpos = i - 1

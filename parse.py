@@ -94,8 +94,7 @@ class SymbolNode:
             return '"' + repr(self.token.value(source))[1:-1].replace('"', R'\"').replace(R"\'", "'") + '"'
 
         if self.token.category == Token.Category.CONSTANT:
-            assert(self.token.value(source) in ('N', 'Н'))
-            return 'nullptr'
+            return {'N': 'nullptr', 'Н': 'nullptr', '0B': 'false', '0В': 'false', '1B': 'true', '1В': 'true'}[self.token.value(source)]
 
         if self.symbol.id == '(': # )
             if self.function_call:
@@ -397,7 +396,7 @@ def parse_internal(this_node):
                     node.function_name = token.value(source)
                     next_token()
                 elif token.symbol.id == '(': # this is constructor [`F ()...` or `F (...)...`] or operator() [`F ()(...)...`]
-                    if peek_token().symbol.id == ')' and peek_token(2).symbol.id == '(': # this is operator()
+                    if peek_token().symbol.id == ')' and peek_token(2).symbol.id == '(': # ) # this is operator()
                         next_token()
                         next_token()
                         node.function_name = '()'
