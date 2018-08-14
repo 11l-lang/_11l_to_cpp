@@ -293,23 +293,31 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                 else:
                     def is_hexadecimal_digit(ch):
                         return '0' <= ch <= '9' or 'A' <= ch <= 'F' or 'a' <= ch <= 'f' or ch in 'абсдефАБСДЕФ'
-                    is_hex = False
 
+                    is_hex = False
                     while i < len(source) and is_hexadecimal_digit(source[i]):
                         if not ('0' <= source[i] <= '9'):
                             is_hex = True
                         i += 1
 
                     next_digit_separator = 0
-                    if i < len(source) and source[i] == "'" and i - lexem_start == 2: # special handling for 12'345 (чтобы это не считалось short hexadecimal number)
-                        j = i + 1
-                        while j < len(source) and is_hexadecimal_digit(source[j]):
-                            if not ('0' <= source[j] <= '9'):
-                                is_hex = True
-                            j += 1
-                        next_digit_separator = j - 1 - i
+                    is_oct_or_bin = False
+                    if i < len(source) and source[i] == "'":
+                        if i - lexem_start == 2: # special handling for 12'345 (чтобы это не считалось short hexadecimal number)
+                            j = i + 1
+                            while j < len(source) and is_hexadecimal_digit(source[j]):
+                                if not ('0' <= source[j] <= '9'):
+                                    is_hex = True
+                                j += 1
+                            next_digit_separator = j - 1 - i
+                        elif i - lexem_start == 4: # special handling for 1010'1111b (чтобы это не считалось hexadecimal number)
+                            j = i + 1
+                            while j < len(source) and ((is_hexadecimal_digit(source[j]) and not source[j] in 'bд') or source[j] == "'"): # I know, checking for `in 'bд'` is hacky
+                                j += 1
+                            if j < len(source) and source[j] in 'oоbд':
+                                is_oct_or_bin = True
 
-                    if i < len(source) and source[i] == "'" and (i - lexem_start == 4 or (i - lexem_start == 2 and (next_digit_separator != 3 or is_hex))): # this is a hexadecimal number
+                    if i < len(source) and source[i] == "'" and ((i - lexem_start == 4 and not is_oct_or_bin) or (i - lexem_start == 2 and (next_digit_separator != 3 or is_hex))): # this is a hexadecimal number
                         if i - lexem_start == 2: # this is a short hexadecimal number
                             i += 1
                             if i + 2 > len(source) or not is_hexadecimal_digit(source[i]) or not is_hexadecimal_digit(source[i+1]):
