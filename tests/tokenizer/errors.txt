@@ -20,3 +20,7 @@
 
 00'7FF
      ^Error: expected end of short hexadecimal number
+
+
+FFF'000
+^Error: digit separator in this hexadecimal number is located in the wrong place
