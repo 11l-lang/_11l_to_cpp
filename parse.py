@@ -185,6 +185,12 @@ class ASTNodeWithChildren(ASTNode):
             r += c.to_str(indent+1)
         return r + ' ' * (indent*4) + "}\n"
 
+    def children_to_str_detect_single_stmt(self, indent, r):
+        if len(self.children) > 1:
+            return self.children_to_str(indent, r)
+        assert(len(self.children) == 1)
+        return ' ' * (indent*4) + r + "\n" + self.children[0].to_str(indent+1)
+
 class ASTNodeWithExpression(ASTNode):
     expression : SymbolNode
 
@@ -232,6 +238,22 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         return self.children_to_str(indent, 'auto ' + self.function_name + '()' if len(self.function_arguments) == 0 else
             'template <' + ", ".join(map(lambda index_arg: 'typename T' + str(index_arg[0] + 1), enumerate(self.function_arguments))) + '> auto ' + self.function_name
             + '(' + ", ".join(map(lambda index_arg: 'const T' + str(index_arg[0] + 1) + ' &' + index_arg[1][0] + ('' if index_arg[1][1] == None else ' = ' + index_arg[1][1].to_str()), enumerate(self.function_arguments))) + ')')
+
+class ASTIf(ASTNodeWithChildren, ASTNodeWithExpression):
+    else_or_elif : ASTNode = None
+
+    def to_str(self, indent):
+        return self.children_to_str_detect_single_stmt(indent, 'if (' + self.expression.to_str() + ')') + (self.else_or_elif.to_str(indent) if self.else_or_elif != None else '')
+
+class ASTElseIf(ASTNodeWithChildren, ASTNodeWithExpression):
+    else_or_elif : ASTNode = None
+
+    def to_str(self, indent):
+        return self.children_to_str_detect_single_stmt(indent, 'else if (' + self.expression.to_str() + ')') + (self.else_or_elif.to_str(indent) if self.else_or_elif != None else '')
+
+class ASTElse(ASTNodeWithChildren):
+    def to_str(self, indent):
+        return self.children_to_str_detect_single_stmt(indent, 'else')
 
 class ASTReturn(ASTNodeWithExpression):
     def to_str(self, indent):
@@ -485,6 +507,27 @@ def parse_internal(this_node):
 
                 next_token()
                 new_scope(node)
+
+            elif token.value(source) in ('I', 'Е', 'if', 'если'):
+                node = ASTIf()
+                next_token()
+                node.set_expression(expression())
+                new_scope(node)
+
+                n = node
+                while token != None and token.value(source) in ('E', 'И', 'else', 'иначе'):
+                    if peek_token().value(source) in ('I', 'Е', 'if', 'если'):
+                        n.else_or_elif = ASTElseIf()
+                        n = n.else_or_elif
+                        next_token()
+                        next_token()
+                        n.set_expression(expression())
+                        new_scope(n)
+                    if token != None and token.value(source) in ('E', 'И', 'else', 'иначе') and not peek_token().value(source) in ('I', 'Е', 'if', 'если'):
+                        n.else_or_elif = ASTElse()
+                        next_token()
+                        new_scope(n.else_or_elif)
+                        break
 
             elif token.value(source) in ('R', 'Р', 'return', 'вернуть'):
                 node = ASTReturn()
