@@ -59,10 +59,50 @@ F f()
 ===
 auto f()
 {
-    if (true)
-    {
+    if (true) {
     }
 }
+
+
+// Inspired by sample from ‘Nemerle Wiki’[https://github.com/rsdn/nemerle/wiki/The-basics-(tutorial)#Rewriting_Line_Counter_without_the_loop]
+if foo
+   if bar
+       m1()
+else
+    m2()
+===
+if (foo) {
+    if (bar)
+        m1()
+}
+else
+    m2()
+
+
+
+if foo
+   if bar
+       m1()
+   else if z
+       if e
+          m3()
+   else
+       m4()
+else
+    m2()
+===
+if (foo) {
+    if (bar)
+        m1()
+    else if (z) {
+        if (e)
+            m3()
+    }
+    else
+        m4()
+}
+else
+    m2()
 
 
 ---
