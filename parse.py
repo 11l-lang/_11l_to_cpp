@@ -211,7 +211,7 @@ class ASTProgram(ASTNodeWithChildren):
 
 class ASTExpression(ASTNodeWithExpression):
     def to_str(self, indent):
-        return ' ' * (indent*4) + self.expression.to_str() + "\n"
+        return ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
 cpp_type_from_11l = {'Int':'int', 'String':'String', 'Bool':'bool', 'Array':'Array', 'Tuple':'Tuple'}
 
