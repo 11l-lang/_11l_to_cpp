@@ -73,10 +73,10 @@ else
 ===
 if (foo) {
     if (bar)
-        m1()
+        m1();
 }
 else
-    m2()
+    m2();
 
 
 
@@ -93,16 +93,16 @@ else
 ===
 if (foo) {
     if (bar)
-        m1()
+        m1();
     else if (z) {
         if (e)
-            m3()
+            m3();
     }
     else
-        m4()
+        m4();
 }
 else
-    m2()
+    m2();
 
 
 ---
