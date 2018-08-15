@@ -179,15 +179,16 @@ class ASTNodeWithChildren(ASTNode):
         for child in self.children:
             f(child)
 
-    def children_to_str(self, indent, r):
-        r = ('' if self.tokeni == 0 else (source[tokens[self.tokeni-2].end:tokens[self.tokeni].start].count("\n")-1) * "\n") + ' ' * (indent*4) + r + "\n" + ' ' * (indent*4) + "{\n"
+    def children_to_str(self, indent, r, place_opening_curly_bracket_on_its_own_line = True):
+        r = ('' if self.tokeni == 0 else (source[tokens[self.tokeni-2].end:tokens[self.tokeni].start].count("\n")-1) * "\n") + ' ' * (indent*4) + r + ("\n" + ' ' * (indent*4) + "{\n" if place_opening_curly_bracket_on_its_own_line else " {\n")
         for c in self.children:
             r += c.to_str(indent+1)
         return r + ' ' * (indent*4) + "}\n"
 
-    def children_to_str_detect_single_stmt(self, indent, r):
-        if len(self.children) > 1 or len(self.children) == 0:
-            return self.children_to_str(indent, r)
+    def children_to_str_detect_single_stmt(self, indent, r, check_for_if = False):
+        if len(self.children) > 1 or len(self.children) == 0 \
+                or (check_for_if and type(self.children[0]) == ASTIf): # for correctly handling of dangling-else
+            return self.children_to_str(indent, r, False)
         assert(len(self.children) == 1)
         return ' ' * (indent*4) + r + "\n" + self.children[0].to_str(indent+1)
 
@@ -243,13 +244,13 @@ class ASTIf(ASTNodeWithChildren, ASTNodeWithExpression):
     else_or_elif : ASTNode = None
 
     def to_str(self, indent):
-        return self.children_to_str_detect_single_stmt(indent, 'if (' + self.expression.to_str() + ')') + (self.else_or_elif.to_str(indent) if self.else_or_elif != None else '')
+        return self.children_to_str_detect_single_stmt(indent, 'if (' + self.expression.to_str() + ')', check_for_if = True) + (self.else_or_elif.to_str(indent) if self.else_or_elif != None else '')
 
 class ASTElseIf(ASTNodeWithChildren, ASTNodeWithExpression):
     else_or_elif : ASTNode = None
 
     def to_str(self, indent):
-        return self.children_to_str_detect_single_stmt(indent, 'else if (' + self.expression.to_str() + ')') + (self.else_or_elif.to_str(indent) if self.else_or_elif != None else '')
+        return self.children_to_str_detect_single_stmt(indent, 'else if (' + self.expression.to_str() + ')', check_for_if = True) + (self.else_or_elif.to_str(indent) if self.else_or_elif != None else '')
 
 class ASTElse(ASTNodeWithChildren):
     def to_str(self, indent):
