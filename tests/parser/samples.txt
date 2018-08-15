@@ -52,6 +52,19 @@ template <typename T1> auto sign(const T1 &x)
 }
 
 
+F f()
+   I 1B
+   {
+   }
+===
+auto f()
+{
+    if (true)
+    {
+    }
+}
+
+
 ---
 T Person
    String name
