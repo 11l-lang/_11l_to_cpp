@@ -186,7 +186,7 @@ class ASTNodeWithChildren(ASTNode):
         return r + ' ' * (indent*4) + "}\n"
 
     def children_to_str_detect_single_stmt(self, indent, r):
-        if len(self.children) > 1:
+        if len(self.children) > 1 or len(self.children) == 0:
             return self.children_to_str(indent, r)
         assert(len(self.children) == 1)
         return ' ' * (indent*4) + r + "\n" + self.children[0].to_str(indent+1)
