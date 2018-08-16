@@ -6,6 +6,37 @@ class Error(Exception):
         self.message = message
         self.pos = pos
 
+class Scope:
+    parent : 'Scope'
+    class Var:
+        type : str
+        def __init__(self, type):
+            self.type = type
+    vars : Dict[str, Var]
+    is_function : bool
+
+    def __init__(self, func_args):
+        self.parent = None
+        if func_args != None:
+            self.is_function = True
+            self.vars = dict(map(lambda x: (x, Scope.Var(None)), func_args))
+        else:
+            self.is_function = False
+            self.vars = {}
+
+    def find_in_current_function(self, name):
+        s = self
+        while True:
+            if name in s.vars:
+                return True
+            if s.is_function:
+                return False
+            s = s.parent
+            if s == None:
+                return False
+
+scope : Scope
+
 class SymbolBase:
     id : str
     lbp : int
@@ -40,10 +71,12 @@ class SymbolNode:
     is_dict : bool = False
     is_type : bool = False
     postfix : bool = False
+    scope : Scope
 
     def __init__(self, token):
         self.token = token
         self.children = []
+        self.scope = scope
 
     def append_child(self, child):
         child.parent = self
@@ -149,6 +182,12 @@ class SymbolNode:
                 return self.children[0].to_str() + self.symbol.id
             elif self.symbol.id == ':':
                 return '::' + self.children[0].to_str()
+            elif self.symbol.id == '.':
+                c0 = self.children[0].to_str()
+                if self.scope.find_in_current_function(c0):
+                    return 'this->' + c0
+                else:
+                    return c0
             else:
                 return self.symbol.id + self.children[0].to_str()
         elif len(self.children) == 2:
@@ -259,8 +298,17 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         self.function_arguments = []
 
     def to_str(self, indent):
-        return self.children_to_str(indent, 'auto ' + self.function_name + '()' if len(self.function_arguments) == 0 else
-            'template <' + ", ".join(map(lambda index_arg: 'typename T' + str(index_arg[0] + 1), enumerate(self.function_arguments))) + '> auto ' + self.function_name
+        if type(self.parent) == ASTClassDefinition:
+            if self.function_name == '': # this is constructor
+                s = self.parent.class_name
+            elif self.function_name == '()': # this is `operator()`
+                s = 'auto operator()'
+            else:
+                s = 'auto ' + self.function_name
+        else:
+            s = 'auto ' + self.function_name
+        return self.children_to_str(indent, s + '()' if len(self.function_arguments) == 0 else
+            'template <' + ", ".join(map(lambda index_arg: 'typename T' + str(index_arg[0] + 1), enumerate(self.function_arguments))) + '> ' + s
             + '(' + ", ".join(map(lambda index_arg: 'const T' + str(index_arg[0] + 1) + ' &' + index_arg[1][0] + ('' if index_arg[1][1] == None else ' = ' + index_arg[1][1].to_str()), enumerate(self.function_arguments))) + ')')
 
 class ASTIf(ASTNodeWithChildren, ASTNodeWithExpression):
@@ -410,6 +458,7 @@ prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('--', 130); prefix(
 infix_r('^', 140)
 
 symbol('.', 150); prefix(':', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('--', 150); postfix('++', 150)
+prefix('.', 150)
 
 infix_r('=', 10); infix_r('+=', 10); infix_r('-=', 10); infix_r('*=', 10); infix_r('/=', 10); infix_r('I/=', 10); infix_r('Ц/=', 10); infix_r('%=', 10); infix_r('>>=', 10); infix_r('<<=', 10); infix_r('**=', 10)
 infix_r('[+]=', 10); infix_r('[&]=', 10); infix_r('[|]=', 10); infix_r('(+)=', 10)
@@ -529,7 +578,15 @@ def parse_internal(this_node):
 
     def new_scope(node, func_args = None):
         advance_scope_begin()
+        global scope
+        prev_scope = scope
+        scope = Scope(func_args)
+        scope.parent = prev_scope
+        tokensn.scope = scope # можно избавиться от этой строки, если не делать вызов next_token() в advance_scope_begin()
         parse_internal(node)
+        scope = prev_scope
+        if token != None:
+            tokensn.scope = scope
 
     def expected_name(what_name):
         next_token()
@@ -555,8 +612,8 @@ def parse_internal(this_node):
                 if token.category == Token.Category.NAME:
                     node.function_name = token.value(source)
                     next_token()
-                elif token.symbol.id == '(': # this is constructor [`F ()...` or `F (...)...`] or operator() [`F ()(...)...`]
-                    if peek_token().symbol.id == ')' and peek_token(2).symbol.id == '(': # ) # this is operator()
+                elif token.value(source) == '(': # this is constructor [`F ()...` or `F (...)...`] or operator() [`F ()(...)...`]
+                    if peek_token().value(source) == ')' and peek_token(2).value(source) == '(': # ) # this is operator()
                         next_token()
                         next_token()
                         node.function_name = '()'
@@ -589,7 +646,7 @@ def parse_internal(this_node):
                         next_token()
 
                 next_token()
-                new_scope(node)
+                new_scope(node, map(lambda arg: arg[0], node.function_arguments))
 
             elif token.value(source) in ('T', 'Т', 'type', 'тип'):
                 node = ASTClassDefinition()
@@ -695,6 +752,7 @@ def parse(tokens_, source_):
     source = source_
     tokeni = -1
     token = None
+    scope = Scope(None)
     next_token()
     p = ASTProgram()
     if len(tokens_) == 0: return p
