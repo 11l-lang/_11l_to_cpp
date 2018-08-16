@@ -75,7 +75,7 @@ keywords = ['A',     'C',  'I',    'E',     'F',  'L',    'N',    'R',       'S'
 keywords.remove('A'); keywords.remove('А'); keywords.remove('var'); keywords.remove('перем') # it is more convenient to consider A/var as [type] name, not a keyword
 # new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
 # Решил отказаться от учёта new_scope_keywords на уровне лексического анализатора из-за loop.break и case в switch
-binary_operators : List[List[str]] = [[], ['+', '-', '*', '/', '%', '^', '&', '|', '<', '>', '='], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '&&', '||', '&=', '|=', '^='], ['<<=', '>>=', '[+]', '[&]', '[|]', '(+)'], ['[+]=', '[&]=', '[|]=', '(+)=']]
+binary_operators : List[List[str]] = [[], ['+', '-', '*', '/', '%', '^', '&', '|', '<', '>', '='], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '&&', '||', '&=', '|=', '^=', '->'], ['<<=', '>>=', '[+]', '[&]', '[|]', '(+)'], ['[+]=', '[&]=', '[|]=', '(+)=']]
 unary_operators = [[], ['!'], ['++', '--'], []]
 sorted_operators = sorted(binary_operators[1] + binary_operators[2] + binary_operators[3] + binary_operators[4] + unary_operators[1] + unary_operators[2] + unary_operators[3], key = lambda x: len(x), reverse = True)
 binary_operators[1].remove('-') # Решил просто не считать `-` за бинарный оператор в контексте автоматического склеивания строк, так как `-` к тому же ещё и модификатор константности

@@ -195,10 +195,13 @@ class SymbolNode:
             if self.symbol.id == '.':
                 c1 = self.children[1].to_str()
                 return self.children[0].to_str() + '.' + ('len()' if c1 == 'len' else c1)
+            elif self.symbol.id == '->':
+                return '[](' + ', '.join(map(lambda c: 'const auto &' + c.to_str(), self.children[0].children if self.children[0].symbol.id == '(' else [self.children[0]])) + '){return ' + self.children[1].to_str() + ';}'
             else:
                 return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||'}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
         elif len(self.children) == 3:
-            assert(self.symbol.id == 'I')
+            assert(self.symbol.id in ('I', 'Е', 'if', 'если'))
+            return self.children[0].to_str() + ' ? ' + self.children[1].to_str() + ' : ' + self.children[2].to_str()
 
         return ''
 
@@ -435,9 +438,9 @@ def prefix(id, bp):
         return self
     symbol(id).set_nud_bp(bp, nud)
 
-infix('[+]', 20)
+infix('[+]', 20); infix('->', 20)
 
-infix('|', 30); infix('&', 40);
+infix('|', 30); infix('&', 40)
 
 infix('==', 50); infix('!=', 50)
 
@@ -570,6 +573,23 @@ symbol('S').nud = nud
 symbol('В').nud = nud
 symbol('switch').nud = nud
 symbol('выбрать').nud = nud
+
+def nud(self):
+    self.append_child(expression())
+    advance_scope_begin()
+    self.append_child(expression())
+    if token.category != Token.Category.SCOPE_END:
+        raise Error('expected end of scope (dedented block or closing curly bracket)', token.start)
+    next_token()
+    if not token.value(source) in ('E', 'И', 'else', 'иначе'):
+        raise Error('expected else block', token.start)
+    next_token()
+    self.append_child(expression())
+    return self
+symbol('I').nud = nud
+symbol('Е').nud = nud
+symbol('if').nud = nud
+symbol('если').nud = nud
 
 symbol('{') # }
 

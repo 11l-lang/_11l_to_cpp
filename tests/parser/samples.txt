@@ -164,9 +164,22 @@ public:
 };
 
 
----
 A l1 = () -> N
 A l2 = x -> x[0]
 A l3 = self -> self
 A l4 = (x, y, reverse = 0B) -> I reverse {y < x} E x < y
+A r = I reverse {y < x} E I eq {x == y} E x < y
+===
+auto l1 = [](){return nullptr;};
+auto l2 = [](const auto &x){return x[0];};
+auto l3 = [](const auto &self){return self;};
+auto l4 = [](const auto &x, const auto &y, const auto &reverse = false){return reverse ? y < x : x < y;};
+auto r = reverse ? y < x : eq ? x == y : x < y;
+
+
+---
+String ch
+I ch C ‘0’..‘9’
+{
+}
 ===
