@@ -72,11 +72,12 @@ keywords = ['A',     'C',  'I',    'E',     'F',  'L',    'N',    'R',       'S'
             'А',     'С',  'Е',    'И',     'Ф',  'Ц',    'Н',    'Р',       'В',       'Т',    'Х',
             'var',   'in', 'if',   'else',  'fn', 'loop', 'null', 'return',  'switch',  'type', 'exception',
             'перем', 'С',  'если', 'иначе', 'фн', 'цикл', 'нуль', 'вернуть', 'выбрать', 'тип',  'исключение']
+keywords.remove('A'); keywords.remove('А'); keywords.remove('var'); keywords.remove('перем') # it is more convenient to consider A/var as [type] name, not a keyword
 # new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
 # Решил отказаться от учёта new_scope_keywords на уровне лексического анализатора из-за loop.break и case в switch
-binary_operators : List[List[str]] = [[], ['+', '-', '*', '/', '%', '^', '&', '|', '<', '>', '='], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '&&', '||', '&=', '|=', '^='], ['<<=', '>>=']]
+binary_operators : List[List[str]] = [[], ['+', '-', '*', '/', '%', '^', '&', '|', '<', '>', '='], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '&&', '||', '&=', '|=', '^='], ['<<=', '>>=', '[+]', '[&]', '[|]', '(+)'], ['[+]=', '[&]=', '[|]=', '(+)=']]
 unary_operators = [[], ['!'], ['++', '--'], []]
-sorted_operators = sorted(binary_operators[1] + binary_operators[2] + binary_operators[3] + unary_operators[1] + unary_operators[2] + unary_operators[3], key = lambda x: len(x), reverse = True)
+sorted_operators = sorted(binary_operators[1] + binary_operators[2] + binary_operators[3] + binary_operators[4] + unary_operators[1] + unary_operators[2] + unary_operators[3], key = lambda x: len(x), reverse = True)
 binary_operators[1].remove('-') # Решил просто не считать `-` за бинарный оператор в контексте автоматического склеивания строк, так как `-` к тому же ещё и модификатор константности
 
 
@@ -151,7 +152,8 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
             # if not (len(indentation_levels) and indentation_levels[-1][0] == None): # сразу после символа `{` это [:правило] не действует ...а хотя не могу подобрать пример, который бы показывал необходимость такой проверки, а потому оставлю этот if закомментированным # }
             if ((source[i    ] in binary_operators[1]
               or source[i:i+2] in binary_operators[2]
-              or source[i:i+3] in binary_operators[3]) # [правило:] ‘Every line of code which begins with any binary operator should be joined with the previous line of code.’:[-339924750]<
+              or source[i:i+3] in binary_operators[3]
+              or source[i:i+4] in binary_operators[4]) # [правило:] ‘Every line of code which begins with any binary operator should be joined with the previous line of code.’:[-339924750]<
               and not (source[i    ] in unary_operators[1]  # Rude fix for:
                     or source[i:i+2] in unary_operators[2]  # a=b
                     or source[i:i+3] in unary_operators[3]) # ++i // Plus symbol at the beginning here should not be treated as binary + operator, so there is no implied line joining

@@ -1,4 +1,6 @@
 ﻿import os, tokenizer, parse, re, tempfile, sys
+sys.path.append('..')
+import python_to_11l.tokenizer as py_tokenizer, python_to_11l.parse as py_parser
 
 def kdiff3(str1, str2):
     for envvar in ['ProgramFiles', 'ProgramFiles(x86)', 'ProgramW6432']:
@@ -142,5 +144,27 @@ for fname in os.listdir('tests/parser'):
                 print("Exception in test:\n" + test)
                 raise e
             print('OK')
+
+for fname in os.listdir('tests/python_to_cpp'):
+    for test in open('tests/python_to_cpp/' + fname, encoding="utf8").read().split("\n\n\n"):
+        if test.startswith('---'):
+            continue
+        try:
+            in_python, expected_11l, expected_cpp = test.split("===\n")
+            expected_cpp += "\n"
+            in_11l = py_parser.parse(py_tokenizer.tokenize(in_python), in_python).to_str()
+            in_cpp = parse.parse(tokenizer.tokenize(expected_11l), expected_11l).to_str()
+            if in_11l != expected_11l:
+                print("Mismatch 11l for test:\n" + test)
+                kdiff3(in_11l, expected_11l)
+                exit(1)
+            if in_cpp != expected_cpp:
+                print("Mismatch cpp for test:\n" + test)
+                kdiff3(in_cpp, expected_cpp)
+                exit(1)
+        except Exception as e:
+            print("Exception in test:\n" + test)
+            raise e
+        print('OK')
 
 print('All OK')

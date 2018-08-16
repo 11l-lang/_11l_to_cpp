@@ -1,3 +1,16 @@
+empty_dict = {}
+dict = {'key': 1, 'key2': 2}
+arr = [1, 2]
+===
+A empty_dict = Dict()
+A dict = [‘key’ = 1, ‘key2’ = 2]
+A arr = [1, 2]
+===
+auto empty_dict = Dict();
+auto dict = create_dict(dict_of(u"key"_S, 1)(u"key2"_S, 2));
+auto arr = create_array({1, 2});
+
+
 def roman(n):
     rn = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}
     r = 0
@@ -23,23 +36,59 @@ if __name__ == '__main__':
     print("Earn cool rewards by using the 'Check' button!")
 ===
 F roman(n)
-   ...
-   return r
+   A rn = [‘I’ = 1, ‘V’ = 5, ‘X’ = 10, ‘L’ = 50, ‘C’ = 100, ‘D’ = 500, ‘M’ = 1000]
+   A r = 0
+   A i = 0
+   L i < n.len
+      I i < n.len - 1 & rn[n[i]] < rn[n[i + 1]]
+         r += rn[n[i + 1]] - rn[n[i]]
+         i += 2
+      E
+         r += rn[n[i]]
+         i++
+   R r
 
 :start:
 assert(roman(‘IV’) == 4, ‘4’)
+assert(roman(‘VI’) == 6, ‘6’)
+assert(roman(‘XL’) == 40, ‘40’)
+assert(roman(‘LXXVI’) == 76, ‘76’)
+assert(roman(‘CXLIX’) == 149, ‘149’)
+assert(roman(‘CDXCIX’) == 499, ‘499’)
+assert(roman(‘MMMDCCCLXXXVIII’) == 3888, ‘3888’)
+print(‘Earn cool rewards by using the 'Check' button!’)
 ===
 template <typename T1> auto roman(const T1 &n)
 {
-...
+    auto rn = create_dict(dict_of(u"I"_S, 1)(u"V"_S, 5)(u"X"_S, 10)(u"L"_S, 50)(u"C"_S, 100)(u"D"_S, 500)(u"M"_S, 1000));
+    auto r = 0;
+    auto i = 0;
+    while (i < n.len())
+        if (i < n.len() - 1 && rn[n[i]] < rn[n[i + 1]]) {
+            r += rn[n[i + 1]] - rn[n[i]];
+            i += 2;
+        }
+        else {
+            r += rn[n[i]];
+            i++;
+        }
+    return r;
 }
 
 int main()
 {
-    assert(roman("IV") == 4, "4");
+    assert(roman(u"IV"_S) == 4, u"4"_S);
+    assert(roman(u"VI"_S) == 6, u"6"_S);
+    assert(roman(u"XL"_S) == 40, u"40"_S);
+    assert(roman(u"LXXVI"_S) == 76, u"76"_S);
+    assert(roman(u"CXLIX"_S) == 149, u"149"_S);
+    assert(roman(u"CDXCIX"_S) == 499, u"499"_S);
+    assert(roman(u"MMMDCCCLXXXVIII"_S) == 3888, u"3888"_S);
+    print(u"Earn cool rewards by using the 'Check' button!"_S);
 }
 
 
+---
 def roman(n):
     r = ""
     while n >= 1000:
