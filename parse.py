@@ -38,6 +38,7 @@ class SymbolNode:
     tuple   : bool = False
     is_list : bool = False
     is_dict : bool = False
+    is_type : bool = False
     postfix : bool = False
 
     def __init__(self, token):
@@ -292,6 +293,18 @@ class ASTReturn(ASTNodeWithExpression):
     def walk_expressions(self, f):
         if self.expression != None: f(self.expression)
 
+class ASTClassDefinition(ASTNodeWithChildren):
+    base_classes : List[str]
+    class_name : str
+
+    def to_str(self, indent):
+        r = ('' if self.tokeni == 0 else (source[tokens[self.tokeni-2].end:tokens[self.tokeni].start].count("\n")-1) * "\n") + ' ' * (indent*4) \
+          + 'class ' + self.class_name + (' : ' + ', '.join(map(lambda c: 'public ' + c, self.base_classes)) if len(self.base_classes) else '') \
+          + "\n" + ' ' * (indent*4) + "{\n" + ' ' * (indent*4) + "public:\n"
+        for c in self.children:
+            r += c.to_str(indent+1)
+        return r + ' ' * (indent*4) + "};\n"
+
 class ASTMain(ASTNodeWithChildren):
     def to_str(self, indent):
         return self.children_to_str(indent, 'int main()')
@@ -449,7 +462,15 @@ symbol('(').nud = nud # )
 
 def led(self, left):
     self.append_child(left)
-    self.append_child(expression()) # [
+    if token.value(source)[0].isupper(): # type name must starts with an upper case letter
+        self.is_type = True
+        while True:
+            self.append_child(expression())
+            if token.value(source) != ',':
+                break
+            advance(',')
+    else:
+        self.append_child(expression()) # [
     advance(']')
     return self
 symbol('[').led = led
@@ -510,6 +531,14 @@ def parse_internal(this_node):
         advance_scope_begin()
         parse_internal(node)
 
+    def expected_name(what_name):
+        next_token()
+        if token.category != Token.Category.NAME:
+            raise Error('expected ' + what_name, token.start)
+        token_value = token.value(source)
+        next_token()
+        return token_value
+
     while token != None:
         if token.value(source) == ':' and peek_token().value(source) in ('start', 'старт'):
             node = ASTMain()
@@ -560,6 +589,22 @@ def parse_internal(this_node):
                         next_token()
 
                 next_token()
+                new_scope(node)
+
+            elif token.value(source) in ('T', 'Т', 'type', 'тип'):
+                node = ASTClassDefinition()
+                node.class_name = expected_name('class name')
+                node.base_classes = []
+
+                if token.value(source) == '(':
+                    while True:
+                        node.base_classes.append(expected_name('base class name'))
+                        if token.value(source) != ',':
+                            break
+                    if token.value(source) != ')': # (
+                        raise Error('expected `)`', token.start)
+                    next_token()
+
                 new_scope(node)
 
             elif token.value(source) in ('I', 'Е', 'if', 'если'):
@@ -626,8 +671,11 @@ def parse_internal(this_node):
                 node.var = var_name
                 node.type = node_expression.token.value(source)
                 node.type_args = []
-                assert(node.type[0].isupper() or node.type in ('var', 'перем')) # type name must begins with upper case letter
-                assert(node_expression.token.category == Token.Category.NAME) # [-add support of template types-]
+                if node.type == '[': # ]
+                    node.type = node_expression.children[0].token.value(source)
+                    for i in range(1, len(node_expression.children)):
+                        node.type_args.append(node_expression.children[i].to_str())
+                assert(node.type[0].isupper() or node.type in ('var', 'перем')) # type name must starts with an upper case letter
             else:
                 node = ASTExpression()
                 node.set_expression(node_expression)

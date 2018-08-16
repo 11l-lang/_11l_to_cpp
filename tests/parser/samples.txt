@@ -105,6 +105,25 @@ else
     m2();
 
 
+T Shape
+   Tuple[Int, Int] position
+
+T Circle(Shape, Object)
+   Int radious
+===
+class Shape
+{
+public:
+    Tuple<int, int> position;
+};
+
+class Circle : public Shape, public Object
+{
+public:
+    int radious;
+};
+
+
 ---
 T Person
    String name
@@ -150,3 +169,11 @@ public:
         return 1;
     }
 };
+
+
+---
+A l1 = () -> N
+A l2 = x -> x[0]
+A l3 = self -> self
+A l4 = (x, y, reverse = 0B) -> I reverse {y < x} E x < y
+===
