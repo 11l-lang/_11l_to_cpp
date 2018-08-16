@@ -23,3 +23,7 @@ inline void print(const String &s, const String &end = u"\n")
 {
 	std::wcout << std::wstring(s.begin(), s.end()) << std::wstring(end.begin(), end.end());
 }
+
+#include <tuple>
+template <typename...Types> using Tuple = std::tuple<Types...>;
+using std::make_tuple;
