@@ -37,6 +37,7 @@ class SymbolNode:
     function_call : bool = False
     tuple   : bool = False
     is_list : bool = False
+    is_dict : bool = False
     postfix : bool = False
 
     def __init__(self, token):
@@ -57,7 +58,7 @@ class SymbolNode:
             else:
                 return self.token.start
         elif self.symbol.id == '[': # ]
-            if self.is_list:
+            if self.is_list or self.is_dict:
                 return self.token.start
             else:
                 return self.children[0].token.start
@@ -91,7 +92,7 @@ class SymbolNode:
             return n
 
         if self.token.category == Token.Category.STRING_LITERAL:
-            return '"' + repr(self.token.value(source)[1:-1])[1:-1].replace('"', R'\"').replace(R"\'", "'") + '"'
+            return 'u"' + repr(self.token.value(source)[1:-1])[1:-1].replace('"', R'\"').replace(R"\'", "'") + '"_S'
 
         if self.token.category == Token.Category.CONSTANT:
             return {'N': 'nullptr', 'Н': 'nullptr', '0B': 'false', '0В': 'false', '1B': 'true', '1В': 'true'}[self.token.value(source)]
@@ -118,6 +119,23 @@ class SymbolNode:
                 assert(len(self.children) == 1)
                 return '(' + self.children[0].to_str() + ')'
 
+        elif self.symbol.id == '[': # ]
+            if self.is_list:
+                res = 'create_array({'
+                for i in range(len(self.children)):
+                    res += self.children[i].to_str()
+                    if i < len(self.children)-1:
+                        res += ', '
+                return res + '})'
+            elif self.is_dict:
+                res = 'create_dict(dict_of'
+                for child in self.children:
+                    assert(child.symbol.id == '=')
+                    res += '(' + child.children[0].to_str() + ', ' + child.children[1].to_str() + ')'
+                return res + ')'
+            else:
+                return self.children[0].to_str() + '[' + self.children[1].to_str() + ']'
+
         elif self.symbol.id in ('S', 'В', 'switch', 'выбрать'):
             res = '[](const auto &a){return '
             for i in range(1, len(self.children), 2):
@@ -134,7 +152,11 @@ class SymbolNode:
                 return self.symbol.id + self.children[0].to_str()
         elif len(self.children) == 2:
             #return '(' + self.children[0].to_str() + ' ' + self.symbol.id + ' ' + self.children[1].to_str() + ')'
-            return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||'}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
+            if self.symbol.id == '.':
+                c1 = self.children[1].to_str()
+                return self.children[0].to_str() + '.' + ('len()' if c1 == 'len' else c1)
+            else:
+                return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||'}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
         elif len(self.children) == 3:
             assert(self.symbol.id == 'I')
 
@@ -180,7 +202,7 @@ class ASTNodeWithChildren(ASTNode):
             f(child)
 
     def children_to_str(self, indent, r, place_opening_curly_bracket_on_its_own_line = True):
-        r = ('' if self.tokeni == 0 else (source[tokens[self.tokeni-2].end:tokens[self.tokeni].start].count("\n")-1) * "\n") + ' ' * (indent*4) + r + ("\n" + ' ' * (indent*4) + "{\n" if place_opening_curly_bracket_on_its_own_line else " {\n")
+        r = ('' if self.tokeni == 0 else (source[tokens[self.tokeni-2].end:tokens[self.tokeni].start].count("\n")-1) * "\n") + ' ' * (indent*4) + r + ("\n" + ' ' * (indent*4) + "{\n" if place_opening_curly_bracket_on_its_own_line else " {\n") # }
         for c in self.children:
             r += c.to_str(indent+1)
         return r + ' ' * (indent*4) + "}\n"
@@ -213,7 +235,7 @@ class ASTExpression(ASTNodeWithExpression):
     def to_str(self, indent):
         return ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
-cpp_type_from_11l = {'Int':'int', 'String':'String', 'Bool':'bool', 'Array':'Array', 'Tuple':'Tuple'}
+cpp_type_from_11l = {'A':'auto', 'А':'auto', 'var':'auto', 'перем':'auto', 'Int':'int', 'String':'String', 'Bool':'bool', 'Array':'Array', 'Tuple':'Tuple'}
 
 class ASTVariableDeclaration(ASTNode):
     var : str
@@ -221,7 +243,7 @@ class ASTVariableDeclaration(ASTNode):
     type_args : List[str]
 
     def to_str(self, indent):
-        return ' ' * (indent*3) + cpp_type_from_11l[self.type] + ('<' + ', '.join(cpp_type_from_11l[ty] for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + self.var + ";\n"
+        return ' ' * (indent*4) + cpp_type_from_11l[self.type] + ('<' + ', '.join(cpp_type_from_11l[ty] for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + self.var + ";\n"
 
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
     def to_str(self, indent):
@@ -256,12 +278,23 @@ class ASTElse(ASTNodeWithChildren):
     def to_str(self, indent):
         return self.children_to_str_detect_single_stmt(indent, 'else')
 
+class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
+    def to_str(self, indent):
+        return self.children_to_str_detect_single_stmt(indent, 'while (' + (self.expression.to_str() if self.expression != None else 'true') + ')')
+
+    def walk_expressions(self, f):
+        if self.expression != None: f(self.expression)
+
 class ASTReturn(ASTNodeWithExpression):
     def to_str(self, indent):
         return ' ' * (indent*4) + 'return' + (' ' + self.expression.to_str() if self.expression != None else '') + ";\n"
 
     def walk_expressions(self, f):
         if self.expression != None: f(self.expression)
+
+class ASTMain(ASTNodeWithChildren):
+    def to_str(self, indent):
+        return self.children_to_str(indent, 'int main()')
 
 def next_token():
     global token, tokeni, tokensn
@@ -341,6 +374,8 @@ def prefix(id, bp):
         return self
     symbol(id).set_nud_bp(bp, nud)
 
+infix('[+]', 20)
+
 infix('|', 30); infix('&', 40);
 
 infix('==', 50); infix('!=', 50)
@@ -364,6 +399,7 @@ infix_r('^', 140)
 symbol('.', 150); prefix(':', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('--', 150); postfix('++', 150)
 
 infix_r('=', 10); infix_r('+=', 10); infix_r('-=', 10); infix_r('*=', 10); infix_r('/=', 10); infix_r('I/=', 10); infix_r('Ц/=', 10); infix_r('%=', 10); infix_r('>>=', 10); infix_r('<<=', 10); infix_r('**=', 10)
+infix_r('[+]=', 10); infix_r('[&]=', 10); infix_r('[|]=', 10); infix_r('(+)=', 10)
 
 symbol('(name)').nud = lambda self: self
 symbol('(literal)').nud = lambda self: self
@@ -419,16 +455,25 @@ def led(self, left):
 symbol('[').led = led
 
 def nud(self):
-    self.is_list = True
-    if token.value(source) != ']':
-        while True: # [[
-            if token.value(source) == ']':
-                break
+    if peek_token().value(source) == '=':
+        self.is_dict = True
+        while True: # [
             self.append_child(expression())
             if token.value(source) != ',':
                 break
             advance(',')
-    advance(']')
+        advance(']')
+    else:
+        self.is_list = True
+        if token.value(source) != ']':
+            while True: # [[
+                # if token.value(source) == ']':
+                #     break
+                self.append_child(expression())
+                if token.value(source) != ',':
+                    break
+                advance(',')
+        advance(']')
     return self
 symbol('[').nud = nud # ]
 
@@ -466,7 +511,15 @@ def parse_internal(this_node):
         parse_internal(node)
 
     while token != None:
-        if token.category == Token.Category.KEYWORD:
+        if token.value(source) == ':' and peek_token().value(source) in ('start', 'старт'):
+            node = ASTMain()
+            next_token()
+            next_token()
+            advance(':')
+            assert(token.category == Token.Category.STATEMENT_SEPARATOR)
+            next_token()
+            parse_internal(node)
+        elif token.category == Token.Category.KEYWORD:
             if token.value(source) in ('F', 'Ф', 'fn', 'фн'):
                 node = ASTFunctionDefinition()
                 next_token()
@@ -530,6 +583,15 @@ def parse_internal(this_node):
                         new_scope(n.else_or_elif)
                         break
 
+            elif token.value(source) in ('L', 'Ц', 'loop', 'цикл'):
+                node = ASTLoop()
+                next_token()
+                if token.category == Token.Category.SCOPE_BEGIN:
+                    node.expression = None
+                else:
+                    node.set_expression(expression())
+                new_scope(node)
+
             elif token.value(source) in ('R', 'Р', 'return', 'вернуть'):
                 node = ASTReturn()
                 next_token()
@@ -564,7 +626,7 @@ def parse_internal(this_node):
                 node.var = var_name
                 node.type = node_expression.token.value(source)
                 node.type_args = []
-                assert(node.type[0].isupper()) # type name must begins with upper case letter
+                assert(node.type[0].isupper() or node.type in ('var', 'перем')) # type name must begins with upper case letter
                 assert(node_expression.token.category == Token.Category.NAME) # [-add support of template types-]
             else:
                 node = ASTExpression()

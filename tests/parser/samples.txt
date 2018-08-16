@@ -20,7 +20,7 @@ F f()
 String token;
 auto f()
 {
-    return [](const auto &a){return a == "None" ? "N" : a == "False" ? "0B" : a == "True" ? "1B" : throw KeyError(a);}(::token);
+    return [](const auto &a){return a == u"None"_S ? u"N"_S : a == u"False"_S ? u"0B"_S : a == u"True"_S ? u"1B"_S : throw KeyError(a);}(::token);
 }
 
 
