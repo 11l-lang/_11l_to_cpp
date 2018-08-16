@@ -124,7 +124,6 @@ public:
 };
 
 
----
 T Person
    String name
    Int age
@@ -149,12 +148,6 @@ public:
     Person()
     {
         age = 1;
-    }
-
-    template <typename T1, typename T2> Person(const T1 &name, const T2 &age)
-    {
-        this->name = name;
-        this->age = age;
     }
 
     template <typename T1, typename T2> Person(const T1 &name, const T2 &age)
