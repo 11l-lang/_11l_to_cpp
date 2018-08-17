@@ -6,3 +6,6 @@ syntax: glob
 *.vcxproj
 *.vcxproj.filters
 Debug
+.vs/
+.idea/
+__pycache__/

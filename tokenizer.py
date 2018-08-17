@@ -75,7 +75,7 @@ keywords = ['A',     'C',  'I',    'E',     'F',  'L',    'N',    'R',       'S'
 keywords.remove('A'); keywords.remove('А'); keywords.remove('var'); keywords.remove('перем') # it is more convenient to consider A/var as [type] name, not a keyword
 # new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
 # Решил отказаться от учёта new_scope_keywords на уровне лексического анализатора из-за loop.break и case в switch
-binary_operators : List[List[str]] = [[], ['+', '-', '*', '/', '%', '^', '&', '|', '<', '>', '='], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '&&', '||', '&=', '|=', '^=', '->'], ['<<=', '>>=', '[+]', '[&]', '[|]', '(+)'], ['[+]=', '[&]=', '[|]=', '(+)=']]
+binary_operators : List[List[str]] = [[], ['+', '-', '*', '/', '%', '^', '&', '|', '<', '>', '='], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '&&', '||', '&=', '|=', '^=', '->'], ['<<=', '>>=', '‘’=', '[+]', '[&]', '[|]', '(+)'], ['[+]=', '[&]=', '[|]=', '(+)=']]
 unary_operators = [[], ['!'], ['++', '--'], []]
 sorted_operators = sorted(binary_operators[1] + binary_operators[2] + binary_operators[3] + binary_operators[4] + unary_operators[1] + unary_operators[2] + unary_operators[3], key = lambda x: len(x), reverse = True)
 binary_operators[1].remove('-') # Решил просто не считать `-` за бинарный оператор в контексте автоматического склеивания строк, так как `-` к тому же ещё и модификатор константности
@@ -95,9 +95,10 @@ class Token:
         OPERATOR = 4
         NUMERIC_LITERAL = 5
         STRING_LITERAL = 6
-        SCOPE_BEGIN = 7 # similar to ‘INDENT token in Python’[https://docs.python.org/3/reference/lexical_analysis.html][-1]
-        SCOPE_END = 8   # similar to ‘DEDENT token in Python’[-1]
-        STATEMENT_SEPARATOR = 9
+        STRING_CONCATENATOR = 7 # special token inserted between adjacent string literal and some identifier
+        SCOPE_BEGIN = 8 # similar to ‘INDENT token in Python’[https://docs.python.org/3/reference/lexical_analysis.html][-1]
+        SCOPE_END   = 9 # similar to ‘DEDENT token in Python’[-1]
+        STATEMENT_SEPARATOR = 10
 
     def __init__(self, start, end, category):
         self.start = start
@@ -144,7 +145,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
 
             if len(tokens) \
                and tokens[-1].category == Token.Category.OPERATOR \
-               and source[tokens[-1].start:tokens[-1].end] in binary_operators[tokens[-1].end - tokens[-1].start]: # ‘Every line of code which ends with any binary operator should be joined with the following line of code.’:[https://github.com/JuliaLang/julia/issues/2097#issuecomment-339924750][-339924750]<
+               and tokens[-1].value(source) in binary_operators[tokens[-1].end - tokens[-1].start]: # ‘Every line of code which ends with any binary operator should be joined with the following line of code.’:[https://github.com/JuliaLang/julia/issues/2097#issuecomment-339924750][-339924750]<
                 if line_continuations != None:
                     line_continuations.append(tokens[-1].end)
                 continue
@@ -378,7 +379,9 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                                 raise Error('digit separator in this number is located in the wrong place (should be: '+ number_with_separators +')', lexem_start)
                     category = Token.Category.NUMERIC_LITERAL
 
-            elif ch == '"':
+            elif ch == '"': # (
+                if tokens[-1].category == Token.Category.NAME or tokens[-1].value(source) == ')':
+                    tokens.append(Token(lexem_start, lexem_start, Token.Category.STRING_CONCATENATOR))
                 startqpos = i - 1
                 while True:
                     if i == len(source):
@@ -387,9 +390,18 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                     i += 1
                     if ch == '"':
                         break
+                if source[i:i+1].isalpha() or source[i:i+1] in '‘(': # )’
+                    tokens.append(Token(lexem_start, i, Token.Category.STRING_LITERAL))
+                    tokens.append(Token(i, i, Token.Category.STRING_CONCATENATOR))
+                    continue
                 category = Token.Category.STRING_LITERAL
 
-            elif ch == '‘': # ’
+            elif ch == '‘': # (
+                if tokens[-1].category == Token.Category.NAME or tokens[-1].value(source) == ')':
+                    tokens.append(Token(lexem_start, lexem_start, Token.Category.STRING_CONCATENATOR))
+                    if source[i] == '’': # for cases like `a‘’b`
+                        i += 1
+                        continue
                 startqpos = i - 1
                 nesting_level = 1
                 while True:
@@ -403,6 +415,10 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                         nesting_level -= 1
                         if nesting_level == 0:
                             break
+                if source[i:i+1].isalpha() or source[i:i+1] in '"(': # )
+                    tokens.append(Token(lexem_start, i, Token.Category.STRING_LITERAL))
+                    tokens.append(Token(i, i, Token.Category.STRING_CONCATENATOR))
+                    continue
                 category = Token.Category.STRING_LITERAL
 
             elif ch == '{':
