@@ -126,6 +126,8 @@ class SymbolNode:
             return n
 
         if self.token.category == Token.Category.STRING_LITERAL:
+            if self.token.value(source)[0] == '"':
+                return 'u' + self.token.value(source) + '_S'
             return 'u"' + repr(self.token.value(source)[1:-1])[1:-1].replace('"', R'\"').replace(R"\'", "'") + '"_S'
 
         if self.token.category == Token.Category.CONSTANT:
@@ -196,9 +198,9 @@ class SymbolNode:
                 c1 = self.children[1].to_str()
                 return self.children[0].to_str() + '.' + ('len()' if c1 == 'len' else c1)
             elif self.symbol.id == '->':
-                return '[](' + ', '.join(map(lambda c: 'const auto &' + c.to_str(), self.children[0].children if self.children[0].symbol.id == '(' else [self.children[0]])) + '){return ' + self.children[1].to_str() + ';}'
+                return '[](' + ', '.join(map(lambda c: 'const auto &' + c.to_str(), self.children[0].children if self.children[0].symbol.id == '(' else [self.children[0]])) + '){return ' + self.children[1].to_str() + ';}' # )
             else:
-                return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||'}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
+                return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '(concat)':'+', '‘’=':'+='}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
         elif len(self.children) == 3:
             assert(self.symbol.id in ('I', 'Е', 'if', 'если'))
             return self.children[0].to_str() + ' ? ' + self.children[1].to_str() + ' : ' + self.children[2].to_str()
@@ -379,6 +381,8 @@ def next_token():
                 key = '(name)'
             elif token.category == Token.Category.CONSTANT:
                 key = '(constant)'
+            elif token.category == Token.Category.STRING_CONCATENATOR:
+                key = '(concat)'
             elif token.category == Token.Category.SCOPE_BEGIN:
                 key = '{' # }
             elif token.category in (Token.Category.STATEMENT_SEPARATOR, Token.Category.SCOPE_END):
@@ -438,7 +442,7 @@ def prefix(id, bp):
         return self
     symbol(id).set_nud_bp(bp, nud)
 
-infix('[+]', 20); infix('->', 20)
+infix('[+]', 20); infix('->', 20); infix('(concat)', 20)
 
 infix('|', 30); infix('&', 40)
 
@@ -464,7 +468,7 @@ symbol('.', 150); prefix(':', 150); symbol('[', 150); symbol('(', 150); symbol('
 prefix('.', 150)
 
 infix_r('=', 10); infix_r('+=', 10); infix_r('-=', 10); infix_r('*=', 10); infix_r('/=', 10); infix_r('I/=', 10); infix_r('Ц/=', 10); infix_r('%=', 10); infix_r('>>=', 10); infix_r('<<=', 10); infix_r('**=', 10)
-infix_r('[+]=', 10); infix_r('[&]=', 10); infix_r('[|]=', 10); infix_r('(+)=', 10)
+infix_r('[+]=', 10); infix_r('[&]=', 10); infix_r('[|]=', 10); infix_r('(+)=', 10); infix_r('‘’=', 10)
 
 symbol('(name)').nud = lambda self: self
 symbol('(literal)').nud = lambda self: self

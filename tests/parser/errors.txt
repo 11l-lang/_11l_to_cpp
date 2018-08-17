@@ -1,2 +1,39 @@
 F f() R 1
       ^Error: expected a new scope (indented block or opening curly bracket)
+
+
+r = ‘a’‘b’
+       ^Error: expected end of statement
+
+
+r = ‘a’ ‘b’
+        ^Error: expected end of statement
+
+
+f(‘id=’ id) // (
+        ^Error: expected )
+
+
+---
+r = .newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘’,
+  ‘(’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
+^Error: e
+
+
+---
+r = .newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)
+  ‘(’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
+^Error: e
+
+
+---
+r = .newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(’
+  (I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
+^Error: e
+
+
+---
+// This is wrong because there is probability of forgotten comma after `‘(some big ...’`, if you want line joining please specify it explicitly (via appending `""`) // )
+r = .newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(some big ...’
+  ‘... string’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
+^Error: e
