@@ -144,6 +144,24 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                 continue
 
             if len(tokens) \
+               and tokens[-1].category == Token.Category.STRING_CONCATENATOR \
+               and source[i] in '"‘': # ’ and not source[i+1:i+2] in ({'"':'"', '‘':'’'}[source[i]],):
+                if line_continuations != None:
+                    line_continuations.append(tokens[-1].end)
+                if source[i:i+2] in ('""', '‘’'):
+                    i += 2
+                continue
+
+            if len(tokens) \
+               and tokens[-1].category == Token.Category.STRING_LITERAL \
+               and source[i:i+2] in ('""', '‘’'):
+                if line_continuations != None:
+                    line_continuations.append(tokens[-1].end)
+                tokens.append(Token(i, i, Token.Category.STRING_CONCATENATOR))
+                i += 2
+                continue
+
+            if len(tokens) \
                and tokens[-1].category == Token.Category.OPERATOR \
                and tokens[-1].value(source) in binary_operators[tokens[-1].end - tokens[-1].start]: # ‘Every line of code which ends with any binary operator should be joined with the following line of code.’:[https://github.com/JuliaLang/julia/issues/2097#issuecomment-339924750][-339924750]<
                 if line_continuations != None:
@@ -379,7 +397,13 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                                 raise Error('digit separator in this number is located in the wrong place (should be: '+ number_with_separators +')', lexem_start)
                     category = Token.Category.NUMERIC_LITERAL
 
-            elif ch == '"': # (
+            elif ch == '"':
+                if source[i] == '"' \
+                        and tokens[-1].category == Token.Category.STRING_CONCATENATOR \
+                        and tokens[-2].category == Token.Category.STRING_LITERAL \
+                        and tokens[-2].value(source)[0] == '‘': # ’ // for cases like r = abc‘some big ...’""
+                    i += 1                                      #   \\                   ‘... string’
+                    continue # (
                 if tokens[-1].category == Token.Category.NAME or tokens[-1].value(source) == ')':
                     tokens.append(Token(lexem_start, lexem_start, Token.Category.STRING_CONCATENATOR))
                 startqpos = i - 1

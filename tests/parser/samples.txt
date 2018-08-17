@@ -208,16 +208,35 @@ String tag = u"<a href=\""_S + link + u"\""_S;
 tag += s;
 
 
----
+r = abc‘’
+  ‘1’
+r = abc‘1’
+  ‘’def
+r = abc‘’
+  ‘’def
+r = abc‘some big ...’""
+  ‘... string’
+===
+r = abc + u"1"_S;
+r = abc + u"1"_S + def;
+r = abc + def;
+r = abc + u"some big ..."_S + u"... string"_S;
+
+
 A indent = 0
 A r = .newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
 r = .newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(’
   ‘’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
 r = .newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘’
   ‘(’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
-r = .newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘’ // (
+r = .newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘’ // ((
   ‘’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
 r = .newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(some big ...’""
   ‘... string’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
 ===
-.
+auto indent = 0;
+auto r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + u"("_S + (function_arguments.empty || function_arguments[0] != u"self"_S ? function_arguments : function_arguments[1..]).join(u", "_S) + u")\n"_S;
+r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + u"("_S + (function_arguments.empty || function_arguments[0] != u"self"_S ? function_arguments : function_arguments[1..]).join(u", "_S) + u")\n"_S;
+r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + u"("_S + (function_arguments.empty || function_arguments[0] != u"self"_S ? function_arguments : function_arguments[1..]).join(u", "_S) + u")\n"_S;
+r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + (function_arguments.empty || function_arguments[0] != u"self"_S ? function_arguments : function_arguments[1..]).join(u", "_S) + u")\n"_S;
+r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + u"(some big ..."_S + u"... string"_S + (function_arguments.empty || function_arguments[0] != u"self"_S ? function_arguments : function_arguments[1..]).join(u", "_S) + u")\n"_S;

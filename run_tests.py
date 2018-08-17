@@ -119,14 +119,17 @@ for fname in os.listdir('tests/parser'):
         if fname == 'errors.txt':
             try:
                 source, error_message = test.split('^Error: ')
+                npos = error_message.find("\n")
+                if npos != -1:
+                    error_message = error_message[:npos]
                 parse.parse(tokenizer.tokenize(source), source)
             except parse.Error as e:
                 line_start = source.rfind("\n", 0, len(source))
-                if e.message == error_message.rstrip() and e.pos == source.rfind("\n", 0, line_start) + len(source) - line_start:
+                if e.message == error_message and e.pos == source.rfind("\n", 0, line_start) + len(source) - line_start:
                     print('OK (Error)')
                     continue
                 else:
-                    kdiff3(e.message, error_message.rstrip())
+                    kdiff3(e.message, error_message)
                     print('Error at position ' + str(e.pos) + " in test:\n" + test)
                     exit(1)
             print("There should be error in test:\n" + test)
