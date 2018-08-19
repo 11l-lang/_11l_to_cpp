@@ -1,9 +1,23 @@
 #include <string>
 
+class Char
+{
+public:
+	int code;
+
+	Char(int code) : code(code) {}
+
+	bool operator< (Char c) const {return code <  c.code;}
+	bool operator<=(Char c) const {return code <= c.code;}
+	bool operator> (Char c) const {return code >  c.code;}
+	bool operator>=(Char c) const {return code >= c.code;}
+};
+
 class String : public std::u16string
 {
 public:
 	String() {}
+	String(Char c) : basic_string(1, c.code) {}
 	String(char16_t c) : basic_string(1, c) {}
 	String(const char16_t *s) : basic_string(s) {}
 	String(const char16_t *s, size_t sz) : basic_string(s, sz) {}
@@ -26,9 +40,19 @@ public:
 	{
 		return std::move(s) * n;
 	}
+
+	Char operator[](int pos) const
+	{
+		return Char(at(pos));
+	}
 };
 
 String operator ""_S(const char16_t *s, size_t sz)
 {
 	return String(s, sz);
+}
+
+Char operator ""_C(char16_t c)
+{
+	return Char(c);
 }
