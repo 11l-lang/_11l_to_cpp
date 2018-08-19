@@ -45,3 +45,10 @@ L i < s.len & s[i] E ‘0’..‘9’
 
 .
  ^Error: unexpected end of source
+
+
+---
+A source = ‘code’
+A s = source.rtrim()
+      ^Error: please wrap `source` in `copy()`
+line_start = source.rfind("\n", source.len - 1)
