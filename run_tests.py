@@ -149,6 +149,8 @@ for fname in os.listdir('tests/parser'):
             print('OK')
 
 for fname in os.listdir('tests/python_to_cpp'):
+    if fname[0] == '-':
+        continue
     for test in open('tests/python_to_cpp/' + fname, encoding="utf8").read().split("\n\n\n"):
         if test.startswith('---'):
             continue
