@@ -122,7 +122,7 @@ for fname in os.listdir('tests/parser'):
                 npos = error_message.find("\n")
                 if npos != -1:
                     error_message = error_message[:npos]
-                parse.parse(tokenizer.tokenize(source), source)
+                parse.parse(tokenizer.tokenize(source.rstrip()), source.rstrip())
             except parse.Error as e:
                 line_start = source.rfind("\n", 0, len(source))
                 if e.message == error_message and e.pos == source.rfind("\n", 0, line_start) + len(source) - line_start:
@@ -158,13 +158,13 @@ for fname in os.listdir('tests/python_to_cpp'):
             in_python, expected_11l, expected_cpp = test.split("===\n")
             expected_cpp += "\n"
             in_11l = py_parser.parse(py_tokenizer.tokenize(in_python), in_python).to_str()
-            in_cpp = parse.parse(tokenizer.tokenize(expected_11l), expected_11l).to_str()
             if in_11l != expected_11l:
                 print("Mismatch 11l for test:\n" + test)
                 kdiff3(in_11l, expected_11l)
                 exit(1)
+            in_cpp = parse.parse(tokenizer.tokenize(expected_11l), expected_11l).to_str()
             if in_cpp != expected_cpp:
-                print("Mismatch cpp for test:\n" + test)
+                print("Mismatch C++ for test:\n" + test)
                 kdiff3(in_cpp, expected_cpp)
                 exit(1)
         except Exception as e:

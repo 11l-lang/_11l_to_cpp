@@ -194,11 +194,29 @@ class SymbolNode:
                 return self.symbol.id + self.children[0].to_str()
         elif len(self.children) == 2:
             #return '(' + self.children[0].to_str() + ' ' + self.symbol.id + ' ' + self.children[1].to_str() + ')'
+
+            def char_if_len_1(child):
+                if child.token.category == Token.Category.STRING_LITERAL and len(child.token.value(source)) == 3:
+                    return "u'" + child.token.value(source)[1:-1] + "'_C"
+                return child.to_str()
+
             if self.symbol.id == '.':
                 c1 = self.children[1].to_str()
-                return self.children[0].to_str() + '.' + ('len()' if c1 == 'len' else c1)
+                return char_if_len_1(self.children[0]) + '.' + ('len()' if c1 == 'len' else c1) # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
             elif self.symbol.id == '->':
                 return '[](' + ', '.join(map(lambda c: 'const auto &' + c.to_str(), self.children[0].children if self.children[0].symbol.id == '(' else [self.children[0]])) + '){return ' + self.children[1].to_str() + ';}' # )
+            elif self.symbol.id == '..':
+                return 'range_ee(' + char_if_len_1(self.children[0]) + ', ' + char_if_len_1(self.children[1]) + ')'
+            elif self.symbol.id == '.<':
+                return 'range_el(' + char_if_len_1(self.children[0]) + ', ' + char_if_len_1(self.children[1]) + ')'
+            elif self.symbol.id == '<.':
+                return 'range_le(' + char_if_len_1(self.children[0]) + ', ' + char_if_len_1(self.children[1]) + ')'
+            elif self.symbol.id == '<.<':
+                return 'range_ll(' + char_if_len_1(self.children[0]) + ', ' + char_if_len_1(self.children[1]) + ')'
+            elif self.symbol.id in ('C', 'С', 'in'):
+                return 'in(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
+            elif self.symbol.id in ('I/', 'Ц/'):
+                return 'int(' + self.children[0].to_str() + ')/int(' + self.children[1].to_str() + ')'
             else:
                 return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '(concat)':'+', '‘’=':'+='}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
         elif len(self.children) == 3:
@@ -402,6 +420,8 @@ def peek_token(how_much = 1):
 # This implementation is based on [http://svn.effbot.org/public/stuff/sandbox/topdown/tdop-4.py]
 def expression(rbp = 0):
     def check_tokensn():
+        if tokensn == None:
+            raise Error('unexpected end of source', len(source))
         if tokensn.symbol == None:
             raise Error('no symbol corresponding to token `' + token.value(source) + '` (belonging to ' + str(token.category) +') found while parsing expression', token.start)
     check_tokensn()
@@ -413,6 +433,7 @@ def expression(rbp = 0):
         t = tokensn
         next_token()
         left = t.symbol.led(t, left)
+        check_tokensn()
     return left
 
 def infix(id, bp):
@@ -446,7 +467,9 @@ infix('[+]', 20); infix('->', 20); infix('(concat)', 20)
 
 infix('|', 30); infix('&', 40)
 
-infix('==', 50); infix('!=', 50)
+infix('==', 50); infix('!=', 50); infix('C', 50); infix('С', 50); infix('in', 50)
+
+infix('..', 55); infix('.<', 55); infix('<.', 55); infix('<.<', 55) # ch C ‘0’..‘9’ = ch C (‘0’..‘9’)
 
 infix('<', 60); infix('<=', 60)
 infix('>', 60); infix('>=', 60)

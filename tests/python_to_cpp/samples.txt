@@ -1,0 +1,63 @@
+def parse_int(s):
+    i = 0
+    r = 0
+    while i < len(s) and '0' <= s[i] <= '9':
+        r = r*10 + ord(s[i]) - ord('0')
+        i += 1
+    return r
+===
+F parse_int(s)
+   A i = 0
+   A r = 0
+   L i < s.len & s[i] C ‘0’..‘9’
+      r = r * 10 + s[i].code - ‘0’.code
+      i++
+   R r
+===
+template <typename T1> auto parse_int(const T1 &s)
+{
+    auto i = 0;
+    auto r = 0;
+    while (i < s.len() && in(s[i], range_ee(u'0'_C, u'9'_C))) {
+        r = r * 10 + s[i].code - u'0'_C.code;
+        i++;
+    }
+    return r;
+}
+
+
+---
+def print_minutes_and_seconds(sec):
+    r60 = sec % 60
+    print(chr(ord('0') + r60 // 10)
+        + chr(ord('0') + r60 %  10))
+===
+F print_minutes_and_seconds(sec)
+   A r60 = sec % 60
+   print(Char(code' ‘0’.code + r60 I/ 10) + Char(code' ‘0’.code + r60 % 10))
+===
+.
+
+
+---
+print("Prepare files' list...", end = '')
+===
+print(‘Prepare files' list...’, end' ‘’)
+===
+print(u"Prepare files' list..."_S, u""_S)
+
+
+---
+def f(a = 1, b = 2):
+    return a + b
+print(f(b = 3))
+===
+F f(a = 1, b = 2)
+   R a + b
+print(f(b' 3))
+===
+template <typename T1, typename T2> auto f(const T1 &a = 1, const T2 &b = 2)
+{
+    return a + b;
+}
+print(f(1, 3))
