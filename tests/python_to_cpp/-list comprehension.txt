@@ -1,0 +1,49 @@
+selection_strings = [("selection", True)]
+'\n'.join([s[0] for s in selection_strings])
+===
+.
+===
+.
+
+
+dirs = ['tests', '.hg']
+dirs = [d for d in dirs if d[0] != '.']
+assert(dirs == ['tests'])
+===
+A dirs = [‘tests’, ‘.hg’]
+dirs = dirs.filter(d -> d[0] != ‘.’)
+assert(dirs == [‘tests’])
+===
+.
+
+
+dirs = [('tests', 1), ('.hg', 2)]
+ndirs = [d[1] for d in dirs if d[0] != '.']
+assert(ndirs == [1])
+===
+A dirs = [(‘tests’, 1), (‘.hg’, 2)]
+A ndirs = dirs.filter(d -> d[0] != ‘.’).map(d -> d[1])
+assert(ndirs == [‘tests’])
+===
+.
+
+
+python_types_to_11l = {'int':'Int', 'str':'String', 'bool':'Bool', 'List':'Array', 'Tuple':'Tuple'}
+
+class ASTTypeHint:
+    type_args : List[str]
+    def to_str(self):
+        return ', '.join(python_types_to_11l[ty] for ty in self.type_args)
+===
+python_types_to_11l = {'A':'auto', 'А':'auto', 'var':'auto', 'перем':'auto', 'Int':'int', 'String':'String', 'Bool':'bool', 'Array':'Array', 'Tuple':'Tuple'}
+.type_args.map(ty -> python_types_to_11l[ty]).join(‘, ’)
+===
+
+
+def split_len(seq, length):
+    return [seq[i:i+length] for i in range(0, len(seq), length)]
+assert(split_len('o─o o─x o─o', 4) == ['o─o ', 'o─x ', 'o─o'])
+===
+F split_len(seq, length)
+   R (0.<seq.len).step(length).map(i -> seq[i.+@length])
+===
