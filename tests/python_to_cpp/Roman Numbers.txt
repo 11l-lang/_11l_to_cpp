@@ -60,7 +60,7 @@ print(‘Earn cool rewards by using the 'Check' button!’)
 ===
 template <typename T1> auto roman(const T1 &n)
 {
-    auto rn = create_dict(dict_of(u"I"_S, 1)(u"V"_S, 5)(u"X"_S, 10)(u"L"_S, 50)(u"C"_S, 100)(u"D"_S, 500)(u"M"_S, 1000));
+    auto rn = create_dict(dict_of(u'I'_C, 1)(u'V'_C, 5)(u'X'_C, 10)(u'L'_C, 50)(u'C'_C, 100)(u'D'_C, 500)(u'M'_C, 1000));
     auto r = 0;
     auto i = 0;
     while (i < n.len())

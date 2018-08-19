@@ -133,6 +133,14 @@ class SymbolNode:
         if self.token.category == Token.Category.CONSTANT:
             return {'N': 'nullptr', 'Н': 'nullptr', '0B': 'false', '0В': 'false', '1B': 'true', '1В': 'true'}[self.token.value(source)]
 
+        def is_char(child):
+            return child.token.category == Token.Category.STRING_LITERAL and len(child.token.value(source)) == 3
+
+        def char_or_str(child, is_char):
+            if is_char:
+                return "u'" + child.token.value(source)[1:-1] + "'_C"
+            return child.to_str()
+
         if self.symbol.id == '(': # )
             if self.function_call:
                 func_name = self.children[0].to_str()
@@ -157,26 +165,53 @@ class SymbolNode:
 
         elif self.symbol.id == '[': # ]
             if self.is_list:
+                type_of_values_is_char = True
+                for child in self.children:
+                    if not is_char(child):
+                        type_of_values_is_char = False
+                        break
                 res = 'create_array({'
                 for i in range(len(self.children)):
-                    res += self.children[i].to_str()
+                    res += char_or_str(self.children[i], type_of_values_is_char)
                     if i < len(self.children)-1:
                         res += ', '
                 return res + '})'
             elif self.is_dict:
-                res = 'create_dict(dict_of'
+                char_key = True
+                char_val = True
                 for child in self.children:
                     assert(child.symbol.id == '=')
-                    res += '(' + child.children[0].to_str() + ', ' + child.children[1].to_str() + ')'
+                    if not is_char(child.children[0]):
+                        char_key = False
+                    if not is_char(child.children[1]):
+                        char_val = False
+                res = 'create_dict(dict_of'
+                for child in self.children:
+                    res += '(' + char_or_str(child.children[0], char_key) + ', ' + char_or_str(child.children[1], char_val) + ')'
                 return res + ')'
             else:
                 return self.children[0].to_str() + '[' + self.children[1].to_str() + ']'
 
         elif self.symbol.id in ('S', 'В', 'switch', 'выбрать'):
-            res = '[](const auto &a){return '
+            char_key = True
+            char_val = True
             for i in range(1, len(self.children), 2):
-                res += 'a == ' + self.children[i].to_str() + ' ? ' + self.children[i+1].to_str() + ' : '
-            return res + 'throw KeyError(a);}(' + self.children[0].to_str() + ')'
+                if not self.children[i].token.value(source) in ('E', 'И', 'else', 'иначе'):
+                    if not is_char(self.children[i]):
+                        char_key = False
+                if not is_char(self.children[i+1]):
+                    char_val = False
+            res = '[](const auto &a){return '
+            was_break = False
+            for i in range(1, len(self.children), 2):
+                if self.children[i].token.value(source) in ('E', 'И', 'else', 'иначе'):
+                    res += char_or_str(self.children[i+1], char_val)
+                    was_break = True
+                    break
+                res += 'a == ' + char_or_str(self.children[i], char_key) + ' ? ' + char_or_str(self.children[i+1], char_val) + ' : '
+                # I L.was_no_break
+                #    res ‘’= ‘throw KeyError(a)’
+            return res + ('throw KeyError(a)' if not was_break else '') + ';}(' + self.children[0].to_str() + ')'
 
         if len(self.children) == 1:
             #return '(' + self.symbol.id + self.children[0].to_str() + ')'
@@ -196,7 +231,7 @@ class SymbolNode:
             #return '(' + self.children[0].to_str() + ' ' + self.symbol.id + ' ' + self.children[1].to_str() + ')'
 
             def char_if_len_1(child):
-                if child.token.category == Token.Category.STRING_LITERAL and len(child.token.value(source)) == 3:
+                if is_char(child):
                     return "u'" + child.token.value(source)[1:-1] + "'_C"
                 return child.to_str()
 
@@ -586,14 +621,26 @@ def nud(self):
     self.append_child(expression())
     advance_scope_begin()
     while token.category != Token.Category.SCOPE_END:
-        self.append_child(expression())
-        advance_scope_begin()
-        self.append_child(expression())
-        if token.category != Token.Category.SCOPE_END:
-            raise Error('expected end of scope (dedented block or closing curly bracket)', token.start)
-        next_token()
-        if token.category == Token.Category.STATEMENT_SEPARATOR:
+        if token.value(source) in ('E', 'И', 'else', 'иначе'):
+            self.append_child(tokensn)
             next_token()
+            if token.category == Token.Category.SCOPE_BEGIN:
+                next_token()
+                self.append_child(expression())
+                if token.category != Token.Category.SCOPE_END:
+                    raise Error('expected end of scope (dedented block or closing curly bracket)', token.start)
+                next_token()
+            else:
+                self.append_child(expression())
+        else:
+            self.append_child(expression())
+            advance_scope_begin()
+            self.append_child(expression())
+            if token.category != Token.Category.SCOPE_END:
+                raise Error('expected end of scope (dedented block or closing curly bracket)', token.start)
+            next_token()
+            if token.category == Token.Category.STATEMENT_SEPARATOR:
+                next_token()
     next_token()
     return self
 symbol('S').nud = nud
