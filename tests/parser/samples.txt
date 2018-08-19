@@ -258,3 +258,9 @@ R .children[0].to_str()‘ ’(S .symbol.id {‘and’ {‘&’}; ‘or’ {‘|
 ===
 return children[0].to_str() + u" "_S + ([](const auto &a){return a == u"and"_S ? u"&"_S : a == u"or"_S ? u"|"_S : a == u"in"_S ? u"C"_S : u"symbol-"_S + (symbol.id);}(symbol.id)) + u" "_S + (children[1].to_str());
 return children[0].to_str() + u" "_S + ([](const auto &a){return a == u"and"_S ? u"&"_S : a == u"or"_S ? u"|"_S : a == u"in"_S ? u"C"_S : u"symbol-"_S + (symbol.id);}(symbol.id)) + u" "_S + (children[1].to_str());
+
+
+---
+A source = ‘code’
+A s = copy(source).rtrim()
+line_start = source.rfind("\n", source.len - 1)

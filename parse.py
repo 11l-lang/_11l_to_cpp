@@ -840,7 +840,7 @@ def parse_internal(this_node):
 
     return
 
-def parse(tokens_, source_):
+def parse(tokens_, source_, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
     global tokens, source, tokeni, token, scope
     tokens = tokens_ + [Token(len(source_), len(source_), Token.Category.STATEMENT_SEPARATOR)]
     source = source_
