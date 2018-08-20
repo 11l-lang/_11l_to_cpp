@@ -1,0 +1,104 @@
+selection_strings = [('selection', True), ('.hg', False)]
+c = '.'
+'\n'.join(s[0] + c for s in selection_strings)
+===
+A selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
+A c = ‘.’
+selection_strings.map(s -> s[0]‘’@c).join("\n")
+===
+auto selection_strings = create_array({make_tuple(u"selection"_S, true), make_tuple(u".hg"_S, false)});
+auto c = u"."_S;
+selection_strings.map([c](const auto &s){return _get<0>(s) + c;}).join(u"\n"_S);
+
+
+selection_strings = [('selection', True), ('.hg', False)]
+c = '.'
+'\n'.join([s[0] + c for s in selection_strings])
+===
+A selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
+A c = ‘.’
+(selection_strings.map(s -> s[0]‘’@c)).join("\n")
+===
+auto selection_strings = create_array({make_tuple(u"selection"_S, true), make_tuple(u".hg"_S, false)});
+auto c = u"."_S;
+(selection_strings.map([c](const auto &s){return _get<0>(s) + c;})).join(u"\n"_S);
+
+
+selection_strings = [('selection', True), ('.hg', False)]
+c = '.'
+'\n'.join(s[0] + c for s in selection_strings if s[0][0] != c)
+===
+A selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
+A c = ‘.’
+selection_strings.filter(s -> s[0][0] != @c).map(s -> s[0]‘’@c).join("\n")
+===
+auto selection_strings = create_array({make_tuple(u"selection"_S, true), make_tuple(u".hg"_S, false)});
+auto c = u"."_S;
+selection_strings.filter([c](const auto &s){return _get<0>(_get<0>(s)) != c;}).map([c](const auto &s){return _get<0>(s) + c;}).join(u"\n"_S);
+
+
+selection_strings = [('selection', True), ('.hg', False)]
+c = '.'
+'\n'.join(s for s in selection_strings if s[0][0] != c)
+===
+A selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
+A c = ‘.’
+selection_strings.filter(s -> s[0][0] != @c).join("\n")
+===
+auto selection_strings = create_array({make_tuple(u"selection"_S, true), make_tuple(u".hg"_S, false)});
+auto c = u"."_S;
+selection_strings.filter([c](const auto &s){return _get<0>(_get<0>(s)) != c;}).join(u"\n"_S);
+
+
+dirs = ['tests', '.hg']
+dirs = [d for d in dirs if d[0] != '.']
+assert(dirs == ['tests'])
+===
+A dirs = [‘tests’, ‘.hg’]
+dirs = dirs.filter(d -> d[0] != ‘.’)
+assert(dirs == [‘tests’])
+===
+auto dirs = create_array({u"tests"_S, u".hg"_S});
+dirs = dirs.filter([](const auto &d){return _get<0>(d) != u"."_S;});
+assert(dirs == create_array({u"tests"_S}));
+
+
+dirs = [('tests', 1), ('.hg', 2)]
+ndirs = [d[1] for d in dirs if d[0][0] != '.']
+assert(ndirs == [1])
+===
+A dirs = [(‘tests’, 1), (‘.hg’, 2)]
+A ndirs = dirs.filter(d -> d[0][0] != ‘.’).map(d -> d[1])
+assert(ndirs == [1])
+===
+auto dirs = create_array({make_tuple(u"tests"_S, 1), make_tuple(u".hg"_S, 2)});
+auto ndirs = dirs.filter([](const auto &d){return _get<0>(_get<0>(d)) != u"."_S;}).map([](const auto &d){return _get<1>(d);});
+assert(ndirs == create_array({1}));
+
+
+---
+python_types_to_11l = {'int':'Int', 'str':'String', 'bool':'Bool', 'List':'Array', 'Tuple':'Tuple'}
+
+class ASTTypeHint:
+    type_args : List[str]
+    def to_str(self):
+        return ', '.join(python_types_to_11l[ty] for ty in self.type_args)
+===
+A python_types_to_11l = [‘int’ = ‘Int’, ‘str’ = ‘String’, ‘bool’ = ‘Bool’, ‘List’ = ‘Array’, ‘Tuple’ = ‘Tuple’]
+
+T ASTTypeHint
+   Array[String] type_args
+   F to_str()
+      R .type_args.map(ty -> :python_types_to_11l[ty]).join(‘, ’)
+===
+.
+
+
+---
+def split_len(seq, length):
+    return [seq[i:i+length] for i in range(0, len(seq), length)]
+assert(split_len('o─o o─x o─o', 4) == ['o─o ', 'o─x ', 'o─o'])
+===
+F split_len(seq, length)
+   R (0.<seq.len).step(length).map(i -> seq[i.+@length])
+===

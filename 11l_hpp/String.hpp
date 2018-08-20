@@ -47,6 +47,11 @@ public:
 	{
 		return Char(at(pos));
 	}
+
+	bool operator==(Char ch) const {return   len() == 1 && at(0) == ch.code ;}
+	bool operator!=(Char ch) const {return !(len() == 1 && at(0) == ch.code);}
+	friend bool operator==(Char ch, const String &s) {return   s.len() == 1 && s.at(0) == ch.code ;}
+	friend bool operator!=(Char ch, const String &s) {return !(s.len() == 1 && s.at(0) == ch.code);}
 };
 
 String operator ""_S(const char16_t *s, size_t sz)

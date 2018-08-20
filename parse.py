@@ -113,7 +113,7 @@ class SymbolNode:
 
     def to_str(self):
         if self.token.category == Token.Category.NAME:
-            return self.token.value(source)
+            return self.token.value(source).lstrip('@')
 
         if self.token.category == Token.Category.NUMERIC_LITERAL:
             n = self.token.value(source)
@@ -151,7 +151,7 @@ class SymbolNode:
                         res += ', '
                 return res + ')'
             elif self.tuple:
-                res = 'Tuple('
+                res = 'make_tuple('
                 for i in range(len(self.children)):
                     res += self.children[i].to_str()
                     if i < len(self.children)-1:
@@ -189,6 +189,8 @@ class SymbolNode:
                 for child in self.children:
                     res += '(' + char_or_str(child.children[0], char_key) + ', ' + char_or_str(child.children[1], char_val) + ')'
                 return res + ')'
+            elif self.children[1].token.category == Token.Category.NUMERIC_LITERAL:
+                return '_get<' + self.children[1].to_str() + '>(' + self.children[0].to_str() + ')' # for support tuples (e.g. `(1, 2)[0]` -> `_get<0>(make_tuple(1, 2))`)
             else:
                 return self.children[0].to_str() + '[' + self.children[1].to_str() + ']'
 
@@ -225,6 +227,8 @@ class SymbolNode:
                     return 'this->' + c0
                 else:
                     return c0
+            elif self.symbol.id == '..':
+                return 'range_ei(' + self.children[0].to_str() + ')'
             else:
                 return self.symbol.id + self.children[0].to_str()
         elif len(self.children) == 2:
@@ -239,7 +243,17 @@ class SymbolNode:
                 c1 = self.children[1].to_str()
                 return char_if_len_1(self.children[0]) + '.' + ('len()' if c1 == 'len' else c1) # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
             elif self.symbol.id == '->':
-                return '[](' + ', '.join(map(lambda c: 'const auto &' + c.to_str(), self.children[0].children if self.children[0].symbol.id == '(' else [self.children[0]])) + '){return ' + self.children[1].to_str() + ';}' # )
+                captured_variables = set()
+                def gather_captured_variables(sn):
+                    if sn.token.category == Token.Category.NAME:
+                        if sn.token.value(source)[0] == '@':
+                            captured_variables.add(sn.token.value(source)[1:])
+                    else:
+                        for child in sn.children:
+                            if child != None:
+                                gather_captured_variables(child)
+                gather_captured_variables(self.children[1])
+                return '[' + ', '.join(captured_variables) + '](' + ', '.join(map(lambda c: 'const auto &' + c.to_str(), self.children[0].children if self.children[0].symbol.id == '(' else [self.children[0]])) + '){return ' + self.children[1].to_str() + ';}' # )
             elif self.symbol.id == '..':
                 return 'range_ee(' + char_if_len_1(self.children[0]) + ', ' + char_if_len_1(self.children[1]) + ')'
             elif self.symbol.id == '.<':
@@ -498,13 +512,14 @@ def prefix(id, bp):
         return self
     symbol(id).set_nud_bp(bp, nud)
 
-infix('[+]', 20); infix('->', 20); infix('(concat)', 20)
+infix('[+]', 20); infix('->', 20); infix('(concat)', 25) # s -> s[0]‘’@c = s -> (s[0]‘’@c)
 
 infix('|', 30); infix('&', 40)
 
 infix('==', 50); infix('!=', 50); infix('C', 50); infix('С', 50); infix('in', 50)
 
 infix('..', 55); infix('.<', 55); infix('<.', 55); infix('<.<', 55) # ch C ‘0’..‘9’ = ch C (‘0’..‘9’)
+#postfix('..', 55)
 
 infix('<', 60); infix('<=', 60)
 infix('>', 60); infix('>=', 60)
@@ -534,6 +549,13 @@ symbol('(constant)').nud = lambda self: self
 
 symbol(';')
 symbol(',')
+
+def led(self, left):
+    self.append_child(left) # [
+    if token.value(source) != ']':
+        self.append_child(expression(self.symbol.led_bp))
+    return self
+symbol('..', 55).set_led_bp(55, led)
 
 def led(self, left):
     if token.category != Token.Category.NAME:
