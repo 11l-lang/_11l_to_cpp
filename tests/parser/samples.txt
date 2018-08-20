@@ -171,7 +171,7 @@ A l4 = (x, y, reverse = 0B) -> I reverse {y < x} E x < y
 A r = I reverse {y < x} E I eq {x == y} E x < y
 ===
 auto l1 = [](){return nullptr;};
-auto l2 = [](const auto &x){return x[0];};
+auto l2 = [](const auto &x){return _get<0>(x);};
 auto l3 = [](const auto &self){return self;};
 auto l4 = [](const auto &x, const auto &y, const auto &reverse = false){return reverse ? y < x : x < y;};
 auto r = reverse ? y < x : eq ? x == y : x < y;
@@ -225,6 +225,21 @@ r = abc + def;
 r = abc + u"some big ..."_S + u"... string"_S;
 
 
+A arr = [1, 2, 3]
+print(arr[0..1])  // [1, 2]
+print(arr[0.<1])  // [1]
+print(arr[0<.1])  // [2]
+print(arr[0<.<2]) // [2]
+print(arr[1..])   // [2, 3]
+===
+auto arr = create_array({1, 2, 3});
+print(arr[range_ee(0, 1)]);
+print(arr[range_el(0, 1)]);
+print(arr[range_le(0, 1)]);
+print(arr[range_ll(0, 2)]);
+print(arr[range_ei(1)]);
+
+
 A indent = 0
 A r = .newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
 r = .newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(’
@@ -237,11 +252,11 @@ r = .newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__i
   ‘... string’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
 ===
 auto indent = 0;
-auto r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + u"("_S + (function_arguments.empty || function_arguments[0] != u"self"_S ? function_arguments : function_arguments[1..]).join(u", "_S) + u")\n"_S;
-r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + u"("_S + (function_arguments.empty || function_arguments[0] != u"self"_S ? function_arguments : function_arguments[1..]).join(u", "_S) + u")\n"_S;
-r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + u"("_S + (function_arguments.empty || function_arguments[0] != u"self"_S ? function_arguments : function_arguments[1..]).join(u", "_S) + u")\n"_S;
-r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + (function_arguments.empty || function_arguments[0] != u"self"_S ? function_arguments : function_arguments[1..]).join(u", "_S) + u")\n"_S;
-r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + u"(some big ..."_S + u"... string"_S + (function_arguments.empty || function_arguments[0] != u"self"_S ? function_arguments : function_arguments[1..]).join(u", "_S) + u")\n"_S;
+auto r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + u"("_S + (function_arguments.empty || _get<0>(function_arguments) != u"self"_S ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + u"("_S + (function_arguments.empty || _get<0>(function_arguments) != u"self"_S ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + u"("_S + (function_arguments.empty || _get<0>(function_arguments) != u"self"_S ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + (function_arguments.empty || _get<0>(function_arguments) != u"self"_S ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + u"(some big ..."_S + u"... string"_S + (function_arguments.empty || _get<0>(function_arguments) != u"self"_S ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
 
 
 F tag(ch)
@@ -256,8 +271,8 @@ template <typename T1> auto tag(const T1 &ch)
 R .children[0].to_str()‘ ’(S .symbol.id {‘and’ {‘&’}; ‘or’ {‘|’}; ‘in’ {‘C’} E {‘symbol-’(.symbol.id)}})‘ ’(.children[1].to_str())
 R .children[0].to_str()‘ ’(S .symbol.id {‘and’ {‘&’}; ‘or’ {‘|’}; ‘in’ {‘C’} E ‘symbol-’(.symbol.id)})‘ ’(.children[1].to_str())
 ===
-return children[0].to_str() + u" "_S + ([](const auto &a){return a == u"and"_S ? u"&"_S : a == u"or"_S ? u"|"_S : a == u"in"_S ? u"C"_S : u"symbol-"_S + (symbol.id);}(symbol.id)) + u" "_S + (children[1].to_str());
-return children[0].to_str() + u" "_S + ([](const auto &a){return a == u"and"_S ? u"&"_S : a == u"or"_S ? u"|"_S : a == u"in"_S ? u"C"_S : u"symbol-"_S + (symbol.id);}(symbol.id)) + u" "_S + (children[1].to_str());
+return _get<0>(children).to_str() + u" "_S + ([](const auto &a){return a == u"and"_S ? u"&"_S : a == u"or"_S ? u"|"_S : a == u"in"_S ? u"C"_S : u"symbol-"_S + (symbol.id);}(symbol.id)) + u" "_S + (_get<1>(children).to_str());
+return _get<0>(children).to_str() + u" "_S + ([](const auto &a){return a == u"and"_S ? u"&"_S : a == u"or"_S ? u"|"_S : a == u"in"_S ? u"C"_S : u"symbol-"_S + (symbol.id);}(symbol.id)) + u" "_S + (_get<1>(children).to_str());
 
 
 ---

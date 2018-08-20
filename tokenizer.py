@@ -299,7 +299,9 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
             if operator:
                 i = lexem_start + len(operator)
                 category = Token.Category.OPERATOR
-            elif 'a' <= ch <= 'z' or 'A' <= ch <= 'Z' or ch == '_': # this is NAME/IDENTIFIER or KEYWORD
+            elif 'a' <= ch <= 'z' or 'A' <= ch <= 'Z' or ch in ('_', '@'): # this is NAME/IDENTIFIER or KEYWORD
+                while i < len(source) and source[i] == '@':
+                    i += 1
                 while i < len(source):
                     ch = source[i]
                     if not ('a' <= ch <= 'z' or 'A' <= ch <= 'Z' or ch == '_' or '0' <= ch <= '9' or ch == '?'):
@@ -383,6 +385,8 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                                 raise Error('after this digit separator there should be 4 digits in hexadecimal number', source.rfind("'", 0, i))
                     else:
                         while i < len(source) and ('0' <= source[i] <= '9' or source[i] in "'.eE"):
+                            if source[i:i+2] in ('..', '.<'):
+                                break
                             if source[i] in 'eE':
                                 if source[i+1:i+2] in '-+':
                                     i += 1
@@ -407,8 +411,8 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                         and tokens[-2].category == Token.Category.STRING_LITERAL \
                         and tokens[-2].value(source)[0] == '‘': # ’ // for cases like r = abc‘some big ...’""
                     i += 1                                      #   \\                   ‘... string’
-                    continue # (
-                if tokens[-1].category == Token.Category.NAME or tokens[-1].value(source) == ')':
+                    continue # [(
+                if tokens[-1].category == Token.Category.NAME or tokens[-1].value(source) in (')', ']'):
                     tokens.append(Token(lexem_start, lexem_start, Token.Category.STRING_CONCATENATOR))
                 startqpos = i - 1
                 while True:
@@ -424,8 +428,8 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                     continue
                 category = Token.Category.STRING_LITERAL
 
-            elif ch == '‘': # (
-                if tokens[-1].category == Token.Category.NAME or tokens[-1].value(source) == ')':
+            elif ch == '‘': # [(
+                if tokens[-1].category == Token.Category.NAME or tokens[-1].value(source) in (')', ']'):
                     tokens.append(Token(lexem_start, lexem_start, Token.Category.STRING_CONCATENATOR))
                     if source[i] == '’': # for cases like `a‘’b`
                         i += 1
@@ -468,7 +472,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
             elif ch == ';':
                 category = Token.Category.STATEMENT_SEPARATOR
 
-            elif ch in (',', '.', ':', '@'):
+            elif ch in (',', '.', ':'):
                 category = Token.Category.DELIMITER
 
             elif ch in '([':

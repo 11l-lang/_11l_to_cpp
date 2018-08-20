@@ -1,3 +1,8 @@
+#include <algorithm>
+using std::min;
+using std::max;
+
+#include "11l_hpp/Range.hpp"
 #include "11l_hpp/String.hpp"
 
 class KeyError
@@ -10,7 +15,6 @@ public:
 
 #include "11l_hpp/Array.hpp"
 #include "11l_hpp/Dict.hpp"
-#include "11l_hpp/Range.hpp"
 
 #include <iostream>
 
@@ -34,6 +38,24 @@ inline void print(const String &s, const String &end = u"\n")
 	std::wcout << std::wstring(s.begin(), s.end()) << std::wstring(end.begin(), end.end());
 }
 
+inline void print(int i, const String &end = u"\n")
+{
+	std::wcout << i << std::wstring(end.begin(), end.end());
+}
+
+template <typename Ty> inline void print(const Array<Ty> &arr, const String &end = u"\n")
+{
+	std::wcout << L'[';
+	for (int i=0; i<arr.len(); i++) {
+		print(arr[i], u""_S);
+		if (i < arr.len()-1) std::wcout << L", ";
+	}
+	std::wcout << L']' << std::wstring(end.begin(), end.end());
+}
+
 #include <tuple>
 template <typename...Types> using Tuple = std::tuple<Types...>;
 using std::make_tuple;
+
+template <int n, typename Container> inline auto _get(const Container &c) {return c[n];}
+template <int n, typename...Types> inline auto _get(const Tuple<Types...> &t) {return std::get<n>(t);}
