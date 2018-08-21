@@ -1,3 +1,6 @@
+template <typename Ty> class Array;
+template <typename Type, bool include_beginning, bool include_ending> class RangeWithStep;
+
 template <typename Type, bool include_beginning, bool include_ending> class Range
 {
 public:
@@ -15,6 +18,35 @@ public:
 			return end - begin;
 		if (!include_beginning && !include_ending)
 			return end - begin - 1;
+	}
+
+	template <typename Func> auto map(Func &&func) -> Array<decltype(func(Type()))>
+	{
+		Array<decltype(func(Type()))> r;
+		for (Type i = begin + !include_beginning; i <= end - !include_ending; i++)
+			r.push_back(func(i));
+		return r;
+	}
+
+	RangeWithStep<Type, include_beginning, include_ending> step(Type step)
+	{
+		return RangeWithStep<Type, include_beginning, include_ending>(begin, end, step);
+	}
+};
+
+template <typename Type, bool include_beginning, bool include_ending> class RangeWithStep
+{
+public:
+	Type begin, end, step;
+
+	RangeWithStep(const Type &begin, const Type &end, const Type &step) : begin(begin), end(end), step(step) {}
+
+	template <typename Func> auto map(Func &&func) -> Array<decltype(func(Type()))>
+	{
+		Array<decltype(func(Type()))> r;
+		for (Type i = begin + !include_beginning; i <= end - !include_ending; i+=step)
+			r.push_back(func(i));
+		return r;
 	}
 };
 

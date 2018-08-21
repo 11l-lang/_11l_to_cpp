@@ -161,6 +161,8 @@ class SymbolNode:
                 return res + ')'
             else:
                 assert(len(self.children) == 1)
+                if self.children[0].symbol.id in ('..', '.<', '<.', '<.<'): # чтобы вместо `(range_el(0, seq.len()))` было `range_el(0, seq.len())`
+                    return self.children[0].to_str()
                 return '(' + self.children[0].to_str() + ')'
 
         elif self.symbol.id == '[': # ]
@@ -253,7 +255,7 @@ class SymbolNode:
                             if child != None:
                                 gather_captured_variables(child)
                 gather_captured_variables(self.children[1])
-                return '[' + ', '.join(captured_variables) + '](' + ', '.join(map(lambda c: 'const auto &' + c.to_str(), self.children[0].children if self.children[0].symbol.id == '(' else [self.children[0]])) + '){return ' + self.children[1].to_str() + ';}' # )
+                return '[' + ', '.join(sorted(captured_variables)) + '](' + ', '.join(map(lambda c: 'const auto &' + c.to_str(), self.children[0].children if self.children[0].symbol.id == '(' else [self.children[0]])) + '){return ' + self.children[1].to_str() + ';}' # )
             elif self.symbol.id == '..':
                 return 'range_ee(' + char_if_len_1(self.children[0]) + ', ' + char_if_len_1(self.children[1]) + ')'
             elif self.symbol.id == '.<':
