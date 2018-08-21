@@ -103,7 +103,7 @@ r3 = range(10, 1, -1)
 assert([i*2 for i in range(3)] == [0, 2, 4])
 ===
 F split_len(seq, length)
-   R (0.<seq.len).step(length).map(i -> @seq[i.<i + @length])
+   R (0 .< seq.len).step(length).map(i -> @seq[i .< i + @length])
 assert(split_len(‘o-o o-x o-o’, 4) == [‘o-o ’, ‘o-x ’, ‘o-o’])
 A r1 = (0.<10)
 A r2 = (1.<10)
