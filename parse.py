@@ -404,8 +404,13 @@ class ASTElse(ASTNodeWithChildren):
         return self.children_to_str_detect_single_stmt(indent, 'else')
 
 class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
+    loop_variable : str = None
+
     def to_str(self, indent):
-        return self.children_to_str_detect_single_stmt(indent, 'while (' + (self.expression.to_str() if self.expression != None else 'true') + ')')
+        if self.loop_variable != None:
+            return self.children_to_str_detect_single_stmt(indent, 'for (auto ' + self.loop_variable + ' : ' + self.expression.to_str() + ')')
+        else:
+            return self.children_to_str_detect_single_stmt(indent, 'while (' + (self.expression.to_str() if self.expression != None else 'true') + ')')
 
     def walk_expressions(self, f):
         if self.expression != None: f(self.expression)
@@ -811,6 +816,9 @@ def parse_internal(this_node):
                 if token.category == Token.Category.SCOPE_BEGIN:
                     node.expression = None
                 else:
+                    if token.value(source) == '(':
+                        node.loop_variable = expected_name('loop variable')
+                        advance(')')
                     node.set_expression(expression())
                 new_scope(node)
 
