@@ -94,11 +94,28 @@ T ASTTypeHint
 .
 
 
----
 def split_len(seq, length):
     return [seq[i:i+length] for i in range(0, len(seq), length)]
-assert(split_len('o─o o─x o─o', 4) == ['o─o ', 'o─x ', 'o─o'])
+assert(split_len('o-o o-x o-o', 4) == ['o-o ', 'o-x ', 'o-o'])
+r1 = range(10)
+r2 = range(1, 10)
+r3 = range(10, 1, -1)
+assert([i*2 for i in range(3)] == [0, 2, 4])
 ===
 F split_len(seq, length)
-   R (0.<seq.len).step(length).map(i -> seq[i.+@length])
+   R (0.<seq.len).step(length).map(i -> @seq[i.<i + @length])
+assert(split_len(‘o-o o-x o-o’, 4) == [‘o-o ’, ‘o-x ’, ‘o-o’])
+A r1 = (0.<10)
+A r2 = (1.<10)
+A r3 = (10.<1).step(-1)
+assert((0.<3).map(i -> i * 2) == [0, 2, 4])
 ===
+template <typename T1, typename T2> auto split_len(const T1 &seq, const T2 &length)
+{
+    return range_el(0, seq.len()).step(length).map([length, seq](const auto &i){return seq[range_el(i, i + length)];});
+}
+assert(split_len(u"o-o o-x o-o"_S, 4) == create_array({u"o-o "_S, u"o-x "_S, u"o-o"_S}));
+auto r1 = range_el(0, 10);
+auto r2 = range_el(1, 10);
+auto r3 = range_el(10, 1).step(-1);
+assert(range_el(0, 3).map([](const auto &i){return i * 2;}) == create_array({0, 2, 4}));
