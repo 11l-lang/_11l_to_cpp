@@ -266,6 +266,8 @@ class SymbolNode:
                 return 'in(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
             elif self.symbol.id in ('I/', 'Ц/'):
                 return 'int(' + self.children[0].to_str() + ')/int(' + self.children[1].to_str() + ')'
+            elif self.symbol.id in ('==', '!=') and self.children[1].token.category == Token.Category.STRING_LITERAL:
+                return self.children[0].to_str() + ' ' + self.symbol.id + ' ' + self.children[1].to_str()[:-2]
             else:
                 return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '(concat)':'+', '‘’=':'+='}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
         elif len(self.children) == 3:
