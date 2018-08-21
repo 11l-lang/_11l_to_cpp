@@ -59,7 +59,7 @@ dirs = dirs.filter(d -> d[0] != ‘.’)
 assert(dirs == [‘tests’])
 ===
 auto dirs = create_array({u"tests"_S, u".hg"_S});
-dirs = dirs.filter([](const auto &d){return _get<0>(d) != u"."_S;});
+dirs = dirs.filter([](const auto &d){return _get<0>(d) != u".";});
 assert(dirs == create_array({u"tests"_S}));
 
 
@@ -72,7 +72,7 @@ A ndirs = dirs.filter(d -> d[0][0] != ‘.’).map(d -> d[1])
 assert(ndirs == [1])
 ===
 auto dirs = create_array({make_tuple(u"tests"_S, 1), make_tuple(u".hg"_S, 2)});
-auto ndirs = dirs.filter([](const auto &d){return _get<0>(_get<0>(d)) != u"."_S;}).map([](const auto &d){return _get<1>(d);});
+auto ndirs = dirs.filter([](const auto &d){return _get<0>(_get<0>(d)) != u".";}).map([](const auto &d){return _get<1>(d);});
 assert(ndirs == create_array({1}));
 
 

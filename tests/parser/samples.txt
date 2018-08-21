@@ -252,11 +252,11 @@ r = .newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__i
   ‘... string’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
 ===
 auto indent = 0;
-auto r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + u"("_S + (function_arguments.empty || _get<0>(function_arguments) != u"self"_S ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
-r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + u"("_S + (function_arguments.empty || _get<0>(function_arguments) != u"self"_S ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
-r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + u"("_S + (function_arguments.empty || _get<0>(function_arguments) != u"self"_S ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
-r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + (function_arguments.empty || _get<0>(function_arguments) != u"self"_S ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
-r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__"_S ? function_name : u""_S) + u"(some big ..."_S + u"... string"_S + (function_arguments.empty || _get<0>(function_arguments) != u"self"_S ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+auto r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"("_S + (function_arguments.empty || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"("_S + (function_arguments.empty || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"("_S + (function_arguments.empty || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + (function_arguments.empty || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"(some big ..."_S + u"... string"_S + (function_arguments.empty || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
 
 
 F tag(ch)

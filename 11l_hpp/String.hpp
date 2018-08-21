@@ -21,8 +21,9 @@ public:
 	String() {}
 	String(Char c) : basic_string(1, c.code) {}
 	String(char16_t c) : basic_string(1, c) {}
-	String(const char16_t *s) : basic_string(s) {}
+	String(const char16_t *&s) : basic_string(s) {} // reference is needed here because otherwise String(const char16_t (&s)[N]) is never called (`String(u"str")` calls `String(const char16_t *s)`)
 	String(const char16_t *s, size_t sz) : basic_string(s, sz) {}
+	template <int N> String(const char16_t (&s)[N]): basic_string(s, N-1) {}
 
 	int len() const { return size(); } // return `int` (not `size_t`) to avoid warning C4018: '<': signed/unsigned mismatch
 
@@ -52,6 +53,9 @@ public:
 	bool operator!=(Char ch) const {return !(len() == 1 && at(0) == ch.code);}
 	friend bool operator==(Char ch, const String &s) {return   s.len() == 1 && s.at(0) == ch.code ;}
 	friend bool operator!=(Char ch, const String &s) {return !(s.len() == 1 && s.at(0) == ch.code);}
+
+	template <int N> bool operator==(const char16_t (&s)[N]) const {return   len() == N-1 && memcmp(c_str(), s, (N-1)*sizeof(char16_t)) == 0 ;}
+	template <int N> bool operator!=(const char16_t (&s)[N]) const {return !(len() == N-1 && memcmp(c_str(), s, (N-1)*sizeof(char16_t)) == 0);}
 };
 
 String operator ""_S(const char16_t *s, size_t sz)
