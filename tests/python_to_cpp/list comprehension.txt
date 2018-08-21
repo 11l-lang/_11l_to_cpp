@@ -1,53 +1,73 @@
-selection_strings = [('selection', True), ('.hg', False)]
-c = '.'
-'\n'.join(s[0] + c for s in selection_strings)
+def f():
+    selection_strings = [('selection', True), ('.hg', False)]
+    c = '.'
+    '\n'.join(s[0] + c for s in selection_strings)
 ===
-A selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
-A c = ‘.’
-selection_strings.map(s -> s[0]‘’@c).join("\n")
+F f()
+   A selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
+   A c = ‘.’
+   selection_strings.map(s -> s[0]‘’@c).join("\n")
 ===
-auto selection_strings = create_array({make_tuple(u"selection"_S, true), make_tuple(u".hg"_S, false)});
-auto c = u"."_S;
-selection_strings.map([c](const auto &s){return _get<0>(s) + c;}).join(u"\n"_S);
+auto f()
+{
+    auto selection_strings = create_array({make_tuple(u"selection"_S, true), make_tuple(u".hg"_S, false)});
+    auto c = u"."_S;
+    selection_strings.map([c](const auto &s){return _get<0>(s) + c;}).join(u"\n"_S);
+}
 
 
-selection_strings = [('selection', True), ('.hg', False)]
-c = '.'
-'\n'.join([s[0] + c for s in selection_strings])
+def f():
+    selection_strings = [('selection', True), ('.hg', False)]
+    c = '.'
+    '\n'.join([s[0] + c for s in selection_strings])
 ===
-A selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
-A c = ‘.’
-(selection_strings.map(s -> s[0]‘’@c)).join("\n")
+F f()
+   A selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
+   A c = ‘.’
+   (selection_strings.map(s -> s[0]‘’@c)).join("\n")
 ===
-auto selection_strings = create_array({make_tuple(u"selection"_S, true), make_tuple(u".hg"_S, false)});
-auto c = u"."_S;
-(selection_strings.map([c](const auto &s){return _get<0>(s) + c;})).join(u"\n"_S);
+auto f()
+{
+    auto selection_strings = create_array({make_tuple(u"selection"_S, true), make_tuple(u".hg"_S, false)});
+    auto c = u"."_S;
+    (selection_strings.map([c](const auto &s){return _get<0>(s) + c;})).join(u"\n"_S);
+}
 
 
-selection_strings = [('selection', True), ('.hg', False)]
-c = '.'
-'\n'.join(s[0] + c for s in selection_strings if s[0][0] != c)
+def f():
+    selection_strings = [('selection', True), ('.hg', False)]
+    c = '.'
+    '\n'.join(s[0] + c for s in selection_strings if s[0][0] != c)
 ===
-A selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
-A c = ‘.’
-selection_strings.filter(s -> s[0][0] != @c).map(s -> s[0]‘’@c).join("\n")
+F f()
+   A selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
+   A c = ‘.’
+   selection_strings.filter(s -> s[0][0] != @c).map(s -> s[0]‘’@c).join("\n")
 ===
-auto selection_strings = create_array({make_tuple(u"selection"_S, true), make_tuple(u".hg"_S, false)});
-auto c = u"."_S;
-selection_strings.filter([c](const auto &s){return _get<0>(_get<0>(s)) != c;}).map([c](const auto &s){return _get<0>(s) + c;}).join(u"\n"_S);
+auto f()
+{
+    auto selection_strings = create_array({make_tuple(u"selection"_S, true), make_tuple(u".hg"_S, false)});
+    auto c = u"."_S;
+    selection_strings.filter([c](const auto &s){return _get<0>(_get<0>(s)) != c;}).map([c](const auto &s){return _get<0>(s) + c;}).join(u"\n"_S);
+}
 
 
-selection_strings = [('selection', True), ('.hg', False)]
-c = '.'
-'\n'.join(s for s in selection_strings if s[0][0] != c)
+def f():
+    selection_strings = [('selection', True), ('.hg', False)]
+    c = '.'
+    '\n'.join(s for s in selection_strings if s[0][0] != c)
 ===
-A selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
-A c = ‘.’
-selection_strings.filter(s -> s[0][0] != @c).join("\n")
+F f()
+   A selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
+   A c = ‘.’
+   selection_strings.filter(s -> s[0][0] != @c).join("\n")
 ===
-auto selection_strings = create_array({make_tuple(u"selection"_S, true), make_tuple(u".hg"_S, false)});
-auto c = u"."_S;
-selection_strings.filter([c](const auto &s){return _get<0>(_get<0>(s)) != c;}).join(u"\n"_S);
+auto f()
+{
+    auto selection_strings = create_array({make_tuple(u"selection"_S, true), make_tuple(u".hg"_S, false)});
+    auto c = u"."_S;
+    selection_strings.filter([c](const auto &s){return _get<0>(_get<0>(s)) != c;}).join(u"\n"_S);
+}
 
 
 dirs = ['tests', '.hg']
@@ -76,7 +96,6 @@ auto ndirs = dirs.filter([](const auto &d){return _get<0>(_get<0>(d)) != u".";})
 assert(ndirs == create_array({1}));
 
 
----
 python_types_to_11l = {'int':'Int', 'str':'String', 'bool':'Bool', 'List':'Array', 'Tuple':'Tuple'}
 
 class ASTTypeHint:
@@ -91,7 +110,17 @@ T ASTTypeHint
    F to_str()
       R .type_args.map(ty -> :python_types_to_11l[ty]).join(‘, ’)
 ===
-.
+auto python_types_to_11l = create_dict(dict_of(u"int"_S, u"Int"_S)(u"str"_S, u"String"_S)(u"bool"_S, u"Bool"_S)(u"List"_S, u"Array"_S)(u"Tuple"_S, u"Tuple"_S));
+
+class ASTTypeHint
+{
+public:
+    Array<String> type_args;
+    auto to_str()
+    {
+        return type_args.map([](const auto &ty){return ::python_types_to_11l[ty];}).join(u", "_S);
+    }
+};
 
 
 def split_len(seq, length):
