@@ -61,3 +61,19 @@ template <typename T1, typename T2> auto f(const T1 &a = 1, const T2 &b = 2)
     return a + b;
 }
 print(f(1, 3))
+
+
+for i in range(0, 11, 2):
+    print(i)
+for i in range(11):
+    print(i)
+===
+L(i) (0.<11).step(2)
+   print(i)
+L(i) 0.<11
+   print(i)
+===
+for (auto i : range_el(0, 11).step(2))
+    print(i);
+for (auto i : range_el(0, 11))
+    print(i);

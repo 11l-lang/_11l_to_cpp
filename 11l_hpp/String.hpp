@@ -54,11 +54,11 @@ public:
 		return Char(at(pos));
 	}
 
-	String operator[](const Range<int, true,  true > &range) const {return slice(max(range.begin    , 0), min(range.end + 1, len()));}
-	String operator[](const Range<int, true,  false> &range) const {return slice(max(range.begin    , 0), min(range.end    , len()));}
-	String operator[](const Range<int, false, true > &range) const {return slice(max(range.begin + 1, 0), min(range.end + 1, len()));}
-	String operator[](const Range<int, false, false> &range) const {return slice(max(range.begin + 1, 0), min(range.end    , len()));}
-	String operator[](const RangeEI<int>             &range) const {return slice(max(range.begin    , 0),                    len() );}
+	String operator[](const Range<int, true,  true > &range) const {return slice(max(range.b    , 0), min(range.e + 1, len()));}
+	String operator[](const Range<int, true,  false> &range) const {return slice(max(range.b    , 0), min(range.e    , len()));}
+	String operator[](const Range<int, false, true > &range) const {return slice(max(range.b + 1, 0), min(range.e + 1, len()));}
+	String operator[](const Range<int, false, false> &range) const {return slice(max(range.b + 1, 0), min(range.e    , len()));}
+	String operator[](const RangeEI<int>             &range) const {return slice(max(range.b    , 0),                    len() );}
 
 	bool operator==(Char ch) const {return   len() == 1 && at(0) == ch.code ;}
 	bool operator!=(Char ch) const {return !(len() == 1 && at(0) == ch.code);}
