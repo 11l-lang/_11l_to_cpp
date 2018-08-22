@@ -77,3 +77,19 @@ for (auto i : range_el(0, 11).step(2))
     print(i);
 for (auto i : range_el(0, 11))
     print(i);
+
+
+dict : Dict[str, int]
+dict['key'] = 1
+arr : List[int]
+arr += [10]
+===
+Dict[String, Int] dict
+dict[‘key’] = 1
+Array[Int] arr
+arr [+]= 10
+===
+Dict<String, int> dict;
+dict.set(u"key"_S, 1);
+Array<int> arr;
+arr.append(10);

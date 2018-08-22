@@ -270,6 +270,10 @@ class SymbolNode:
                 return 'int(' + self.children[0].to_str() + ')/int(' + self.children[1].to_str() + ')'
             elif self.symbol.id in ('==', '!=') and self.children[1].token.category == Token.Category.STRING_LITERAL:
                 return self.children[0].to_str() + ' ' + self.symbol.id + ' ' + self.children[1].to_str()[:-2]
+            elif self.symbol.id == '=' and self.children[0].symbol.id == '[': # ] # replace `a[k] = v` with `a.set(k, v)`
+                return self.children[0].children[0].to_str() + '.set(' + self.children[0].children[1].to_str() + ', ' + self.children[1].to_str() + ')'
+            elif self.symbol.id == '[+]=': # replace `a [+]= v` with `a.append(v)`
+                return self.children[0].to_str() + '.append(' + self.children[1].to_str() + ')'
             else:
                 return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '(concat)':'+', '‘’=':'+='}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
         elif len(self.children) == 3:
@@ -351,7 +355,7 @@ class ASTExpression(ASTNodeWithExpression):
     def to_str(self, indent):
         return ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
-cpp_type_from_11l = {'A':'auto', 'А':'auto', 'var':'auto', 'перем':'auto', 'Int':'int', 'String':'String', 'Bool':'bool', 'Array':'Array', 'Tuple':'Tuple'}
+cpp_type_from_11l = {'A':'auto', 'А':'auto', 'var':'auto', 'перем':'auto', 'Int':'int', 'String':'String', 'Bool':'bool', 'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict'}
 
 class ASTVariableDeclaration(ASTNode):
     var : str
@@ -857,9 +861,19 @@ def parse_internal(this_node):
                 node.type = node_expression.token.value(source)
                 node.type_args = []
                 if node.type == '[': # ]
-                    node.type = node_expression.children[0].token.value(source)
-                    for i in range(1, len(node_expression.children)):
-                        node.type_args.append(node_expression.children[i].to_str())
+                    if node_expression.is_dict:
+                        assert(len(node_expression.children) == 1)
+                        node.type = 'Dict'
+                        node.type_args = [node_expression.children[0].children[0].to_str(), node_expression.children[0].children[1].to_str()]
+                    elif node_expression.is_list:
+                        assert(len(node_expression.children) == 1)
+                        node.type = 'Array'
+                        node.type_args = [node_expression.children[0].to_str()]
+                    else:
+                        assert(node_expression.is_type)
+                        node.type = node_expression.children[0].token.value(source)
+                        for i in range(1, len(node_expression.children)):
+                            node.type_args.append(node_expression.children[i].to_str())
                 assert(node.type[0].isupper() or node.type in ('var', 'перем')) # type name must starts with an upper case letter
             else:
                 node = ASTExpression()

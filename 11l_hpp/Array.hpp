@@ -1,7 +1,15 @@
 #include <initializer_list>
 #include <vector>
 
-template <typename Ty> class Array : public std::vector<Ty>
+class IndexError
+{
+public:
+	int index;
+
+	IndexError(int index) : index(index) {}
+};
+
+template <typename Type> class Array : public std::vector<Type>
 {
 	Array slice(int begin, int end) const
 	{
@@ -13,11 +21,11 @@ template <typename Ty> class Array : public std::vector<Ty>
 
 public:
 	Array() {}
-    Array(std::initializer_list<Ty> il) : vector(il) {}
+    Array(std::initializer_list<Type> il) : vector(il) {}
 
-	template <typename Func> auto map(Func &&func) -> Array<decltype(func(Ty()))>
+	template <typename Func> auto map(Func &&func) -> Array<decltype(func(Type()))>
 	{
-		Array<decltype(func(Ty()))> r;
+		Array<decltype(func(Type()))> r;
 		for (auto el : *this)
 			r.push_back(func(el));
 		return r;
@@ -54,10 +62,25 @@ public:
 	Array operator[](const Range<int, false, false> &range) const {return slice(max(range.b + 1, 0), min(range.e    , len()));}
 	Array operator[](const RangeEI<int>             &range) const {return slice(max(range.b    , 0),                  len() );}
 
-	const Ty &operator[](int i) const {return at(i);}
+	const Type &operator[](int i) const
+	{
+		if (in(i, range_el(0, len())))
+			return at(i);
+		throw IndexError(i);
+	}
+
+	void set(int i, const Type &v)
+	{
+		if (in(i, range_el(0, len())))
+			at(i) = v;
+		else
+			throw IndexError(i);
+	}
+
+	void append(const Type &v) {push_back(v);}
 };
 
-template <class Ty> Array<Ty> create_array(std::initializer_list<Ty> il)
+template <class Type> Array<Type> create_array(std::initializer_list<Type> il)
 {
-    return Array<Ty>(il);
+    return Array<Type>(il);
 }
