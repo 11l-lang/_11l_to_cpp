@@ -231,6 +231,13 @@ print(arr[0.<1])  // [1]
 print(arr[0<.1])  // [2]
 print(arr[0<.<2]) // [2]
 print(arr[1..])   // [2, 3]
+arr[1] = 4
+print(arr[1..])   // [4, 3]
+Dict[String, Int] dict
+[String = Int] dict2
+dict[‘key’] = 1
+[Int] arr2
+arr2 [+]= 10
 ===
 auto arr = create_array({1, 2, 3});
 print(arr[range_ee(0, 1)]);
@@ -238,6 +245,13 @@ print(arr[range_el(0, 1)]);
 print(arr[range_le(0, 1)]);
 print(arr[range_ll(0, 2)]);
 print(arr[range_ei(1)]);
+arr.set(1, 4);
+print(arr[range_ei(1)]);
+Dict<String, int> dict;
+Dict<String, int> dict2;
+dict.set(u"key"_S, 1);
+Array<int> arr2;
+arr2.append(10);
 
 
 A indent = 0

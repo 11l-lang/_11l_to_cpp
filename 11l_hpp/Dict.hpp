@@ -1,5 +1,13 @@
 #include <map>
 
+class KeyError
+{
+public:
+	String key;
+
+	KeyError(const String &key) : key(key) {}
+};
+
 // Mimic boost::assign::map_list_of behavior
 template <typename KeyType, typename ValueType> class DictInitializer
 {
@@ -42,6 +50,19 @@ template <typename KeyType, typename ValueType> class Dict : public std::map<Key
 public:
 	Dict() {}
 	Dict(DictInitializer<KeyType, ValueType> &&di) : map(std::forward<std::map<KeyType, ValueType>>(di.dict)) {}
+
+	ValueType &operator[](const KeyType &key)
+	{
+		auto r = insert(std::make_pair(key, ValueType()));
+		if (r.second) throw KeyError(String(key));
+		return r.first->second;
+	}
+
+	void set(const KeyType &key, const ValueType &value)
+	{
+		//insert(std::make_pair(key, value)); //`insert()` does not assign value if it already exists in the map
+		map::operator[](key) = value;
+	}
 };
 
 template <typename KeyType, typename ValueType> Dict<KeyType, ValueType> create_dict(DictInitializer<KeyType, ValueType> &di)

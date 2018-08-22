@@ -4,15 +4,6 @@ using std::max;
 
 #include "11l_hpp/Range.hpp"
 #include "11l_hpp/String.hpp"
-
-class KeyError
-{
-public:
-	String key;
-
-	KeyError(const String &key) : key(key) {}
-};
-
 #include "11l_hpp/Array.hpp"
 #include "11l_hpp/Dict.hpp"
 

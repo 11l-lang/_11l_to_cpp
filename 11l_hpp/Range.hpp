@@ -1,4 +1,4 @@
-template <typename Ty> class Array;
+template <typename Type> class Array;
 template <typename Type, bool include_beginning, bool include_ending> class RangeWithStep;
 
 template <typename Type, bool include_beginning, bool include_ending> class Range
