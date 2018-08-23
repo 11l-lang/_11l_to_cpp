@@ -138,7 +138,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
             if i == len(source): # end of source
                 break
 
-            if source[i] in "\r\n" or source[i:i+2] == '//': # lines with only whitespace and/or comments do not affect the indentation
+            if source[i] in "\r\n" or source[i:i+2] in ('//', '\\\\', R'\‘', R'\(', R'\{', R'\['): # ]})’ # lines with only whitespace and/or comments do not affect the indentation
                 continue
 
             if source[i] in "{}": # Indentation level of lines starting with { or } is ignored
@@ -253,18 +253,17 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                 begin_of_line = True
         elif (ch == '/'  and source[i+1:i+2] == '/' ) \
           or (ch == '\\' and source[i+1:i+2] == '\\'): # single-line comment
-            i += 2
             comment_start = i
+            i += 2
             while i < len(source) and source[i] not in "\r\n":
                 i += 1
             if comments != None:
                 comments.append((comment_start, i))
         elif ch == '\\' and source[i+1:i+2] in "‘({[": # multi-line comment # ]})’
+            comment_start = i
             lbr = source[i+1]
             rbr = {"‘": "’", "(": ")", "{": "}", "[": "]"}[lbr]
             i += 2
-            comment_start = i
-
             nesting_level = 1
             while True:
                 ch = source[i]
@@ -276,7 +275,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                         break
                 i += 1
                 if i == len(source):
-                    raise Error('there is no corresponding opening parenthesis/bracket/brace/qoute for `' + lbr + '`', comment_start-1)
+                    raise Error('there is no corresponding opening parenthesis/bracket/brace/qoute for `' + lbr + '`', comment_start+1)
             if comments != None:
                 comments.append((comment_start, i))
             i += 1
@@ -330,6 +329,10 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                         category = Token.Category.CONSTANT
                     else:
                         category = Token.Category.KEYWORD
+                        if source[i:i+1] == '.': # this is composite keyword like `L.break`
+                            i += 1
+                            while i < len(source) and (source[i].isalpha() or source[i] in '_.'):
+                                i += 1
                 else:
                     category = Token.Category.NAME
 
