@@ -298,12 +298,12 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
             if operator:
                 i = lexem_start + len(operator)
                 category = Token.Category.OPERATOR
-            elif 'a' <= ch <= 'z' or 'A' <= ch <= 'Z' or ch in ('_', '@'): # this is NAME/IDENTIFIER or KEYWORD
+            elif ch.isalpha() or ch in ('_', '@'): # this is NAME/IDENTIFIER or KEYWORD
                 while i < len(source) and source[i] == '@':
                     i += 1
                 while i < len(source):
                     ch = source[i]
-                    if not ('a' <= ch <= 'z' or 'A' <= ch <= 'Z' or ch == '_' or '0' <= ch <= '9' or ch == '?'):
+                    if not (ch.isalpha() or ch in '_?' or '0' <= ch <= '9'):
                         break
                     i += 1
                 if source[i:i+1] == '/' and source[i-1:i] in 'IЦ':
