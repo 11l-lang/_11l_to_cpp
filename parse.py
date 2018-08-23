@@ -122,7 +122,10 @@ class SymbolNode:
             if n[-1] in 'bд':
                 return '0b' + n[:-1]
             if n[4:5] == "'" or n[-3:-2] == "'":
-                return '0x' + n
+                nn = ''
+                for c in n:
+                    nn += {'А':'A','Б':'B','С':'C','Д':'D','Е':'E','Ф':'F'}.get(c, c)
+                return '0x' + nn
             return n
 
         if self.token.category == Token.Category.STRING_LITERAL:
@@ -213,7 +216,7 @@ class SymbolNode:
                     was_break = True
                     break
                 res += 'a == ' + char_or_str(self.children[i], char_key) + ' ? ' + char_or_str(self.children[i+1], char_val) + ' : '
-                # I L.was_no_break
+                # L.was_no_break
                 #    res ‘’= ‘throw KeyError(a)’
             return res + ('throw KeyError(a)' if not was_break else '') + ';}(' + self.children[0].to_str() + ')'
 
