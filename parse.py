@@ -129,9 +129,25 @@ class SymbolNode:
             return n
 
         if self.token.category == Token.Category.STRING_LITERAL:
-            if self.token.value(source)[0] == '"':
-                return 'u' + self.token.value(source) + '_S'
-            return 'u"' + repr(self.token.value(source)[1:-1])[1:-1].replace('"', R'\"').replace(R"\'", "'") + '"_S'
+            s = self.token.value(source)
+            if s[0] == '"':
+                return 'u' + s + '_S'
+
+            eat_left = 0
+            while s[eat_left] == "'":
+                eat_left += 1
+            eat_right = 0
+            while s[-1-eat_right] == "'":
+                eat_right += 1
+            s = s[1+eat_left*2:-1-eat_right*2]
+
+            if '\\' in s or "\n" in s:
+                delimiter = ''
+                while ')' + delimiter + '"' in s:
+                    delimiter += "'"
+                return 'uR"' + delimiter + '(' + s + ')' + delimiter + '"_S'
+
+            return 'u"' + repr(s)[1:-1].replace('"', R'\"').replace(R"\'", "'") + '"_S'
 
         if self.token.category == Token.Category.CONSTANT:
             return {'N': 'nullptr', 'Н': 'nullptr', '0B': 'false', '0В': 'false', '1B': 'true', '1В': 'true'}[self.token.value(source)]

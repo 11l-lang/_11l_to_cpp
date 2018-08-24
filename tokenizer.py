@@ -146,7 +146,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
 
             if len(tokens) \
                and tokens[-1].category == Token.Category.STRING_CONCATENATOR \
-               and source[i] in '"‘': # ’ and not source[i+1:i+2] in ({'"':'"', '‘':'’'}[source[i]],):
+               and source[i] in '"\'‘': # ’ and not source[i+1:i+2] in ({'"':'"', '‘':'’'}[source[i]],):
                 if line_continuations != None:
                     line_continuations.append(tokens[-1].end)
                 if source[i:i+2] in ('""', '‘’'):
@@ -316,7 +316,8 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                     if source[i:i+1] == ' ': # this is a keyword argument
                         category = Token.Category.NAME
                     elif source[i:i+1] in ('‘', "'"): # ’ # this is a raw string
-                        assert(False) # [--]
+                        i -= 1
+                        category = Token.Category.NAME
                     else: # this is a hexadecimal number
                         while i < len(source) and (is_hexadecimal_digit(source[i]) or source[i] == "'"):
                             i += 1
@@ -415,7 +416,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                         and tokens[-2].value(source)[0] == '‘': # ’ // for cases like r = abc‘some big ...’""
                     i += 1                                      #   \\                   ‘... string’
                     continue # [(
-                if tokens[-1].category == Token.Category.NAME or tokens[-1].value(source) in (')', ']'):
+                if len(tokens) and (tokens[-1].category == Token.Category.NAME or tokens[-1].value(source) in (')', ']')):
                     tokens.append(Token(lexem_start, lexem_start, Token.Category.STRING_CONCATENATOR))
                 startqpos = i - 1
                 while True:
@@ -423,7 +424,11 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                         raise Error('unclosed string literal', startqpos)
                     ch = source[i]
                     i += 1
-                    if ch == '"':
+                    if ch == '\\':
+                        if i == len(source):
+                            continue
+                        i += 1
+                    elif ch == '"':
                         break
                 if source[i:i+1].isalpha() or source[i:i+1] in '‘(': # )’
                     tokens.append(Token(lexem_start, i, Token.Category.STRING_LITERAL))
@@ -431,13 +436,19 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                     continue
                 category = Token.Category.STRING_LITERAL
 
-            elif ch == '‘': # [(
-                if tokens[-1].category == Token.Category.NAME or tokens[-1].value(source) in (')', ']'):
+            elif ch in "‘'": # [(
+                if len(tokens) and (tokens[-1].category == Token.Category.NAME or tokens[-1].value(source) in (')', ']')):
                     tokens.append(Token(lexem_start, lexem_start, Token.Category.STRING_CONCATENATOR))
                     if source[i] == '’': # for cases like `a‘’b`
                         i += 1
                         continue
-                startqpos = i - 1
+                i -= 1
+                while i < len(source) and source[i] == "'":
+                    i += 1
+                if source[i:i+1] != '‘': # ’
+                    raise Error('expected left single quotation mark', i)
+                startqpos = i
+                i += 1
                 nesting_level = 1
                 while True:
                     if i == len(source):
@@ -450,6 +461,8 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                         nesting_level -= 1
                         if nesting_level == 0:
                             break
+                while i < len(source) and source[i] == "'":
+                    i += 1
                 if source[i:i+1].isalpha() or source[i:i+1] in '"(': # )
                     tokens.append(Token(lexem_start, i, Token.Category.STRING_LITERAL))
                     tokens.append(Token(i, i, Token.Category.STRING_CONCATENATOR))
