@@ -220,6 +220,8 @@ r = abc‘’
   ‘’def
 r = abc‘some big ...’""
   ‘... string’
+r = abc"some big \n ..."‘’
+  "... string\n"
 r = abc‘’
   '‘‘it’s’
 r = abc'‘‘it’s’
@@ -230,6 +232,7 @@ r = abc + u"1"_S + def;
 r = abc + u"1"_S + def;
 r = abc + def;
 r = abc + u"some big ..."_S + u"... string"_S;
+r = abc + u"some big \n ..."_S + u"... string\n"_S;
 r = abc + u"it’s"_S;
 r = abc + u"it’s"_S + def;
 

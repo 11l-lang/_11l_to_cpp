@@ -436,7 +436,13 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                     continue
                 category = Token.Category.STRING_LITERAL
 
-            elif ch in "‘'": # [(
+            elif ch in "‘'":
+                if source[i] == '’' \
+                        and tokens[-1].category == Token.Category.STRING_CONCATENATOR \
+                        and tokens[-2].category == Token.Category.STRING_LITERAL \
+                        and tokens[-2].value(source)[0] == '"': # // for cases like r = abc"some big ..."‘’
+                    i += 1                                      # \\                   ‘... string’
+                    continue # ‘[(
                 if len(tokens) and (tokens[-1].category == Token.Category.NAME or tokens[-1].value(source) in (')', ']')):
                     tokens.append(Token(lexem_start, lexem_start, Token.Category.STRING_CONCATENATOR))
                     if source[i] == '’': # for cases like `a‘’b`
