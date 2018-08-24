@@ -142,7 +142,7 @@ class SymbolNode:
             s = s[1+eat_left*2:-1-eat_right*2]
 
             if '\\' in s or "\n" in s:
-                delimiter = ''
+                delimiter = '' # (
                 while ')' + delimiter + '"' in s:
                     delimiter += "'"
                 return 'uR"' + delimiter + '(' + s + ')' + delimiter + '"_S'
