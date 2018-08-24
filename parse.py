@@ -397,9 +397,9 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         self.function_arguments = []
 
     def to_str(self, indent):
-        if type(self.parent) == ASTClassDefinition:
+        if type(self.parent) == ASTTypeDefinition:
             if self.function_name == '': # this is constructor
-                s = self.parent.class_name
+                s = self.parent.type_name
             elif self.function_name == '()': # this is `operator()`
                 s = 'auto operator()'
             else:
@@ -445,13 +445,13 @@ class ASTReturn(ASTNodeWithExpression):
     def walk_expressions(self, f):
         if self.expression != None: f(self.expression)
 
-class ASTClassDefinition(ASTNodeWithChildren):
-    base_classes : List[str]
-    class_name : str
+class ASTTypeDefinition(ASTNodeWithChildren):
+    base_types : List[str]
+    type_name : str
 
     def to_str(self, indent):
         r = ('' if self.tokeni == 0 else (source[tokens[self.tokeni-2].end:tokens[self.tokeni].start].count("\n")-1) * "\n") + ' ' * (indent*4) \
-          + 'class ' + self.class_name + (' : ' + ', '.join(map(lambda c: 'public ' + c, self.base_classes)) if len(self.base_classes) else '') \
+          + 'class ' + self.type_name + (' : ' + ', '.join(map(lambda c: 'public ' + c, self.base_types)) if len(self.base_types) else '') \
           + "\n" + ' ' * (indent*4) + "{\n" + ' ' * (indent*4) + "public:\n"
         for c in self.children:
             r += c.to_str(indent+1)
@@ -797,13 +797,13 @@ def parse_internal(this_node):
                 new_scope(node, map(lambda arg: arg[0], node.function_arguments))
 
             elif token.value(source) in ('T', 'Т', 'type', 'тип'):
-                node = ASTClassDefinition()
-                node.class_name = expected_name('class name')
-                node.base_classes = []
+                node = ASTTypeDefinition()
+                node.type_name = expected_name('type name')
+                node.base_types = []
 
                 if token.value(source) == '(':
                     while True:
-                        node.base_classes.append(expected_name('base class name'))
+                        node.base_types.append(expected_name('base type name'))
                         if token.value(source) != ',':
                             break
                     if token.value(source) != ')': # (
