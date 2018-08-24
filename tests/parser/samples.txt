@@ -212,17 +212,26 @@ tag += s;
 
 r = abc‘’
   ‘1’
+r = abc‘’
+  ‘1’def
 r = abc‘1’
   ‘’def
 r = abc‘’
   ‘’def
 r = abc‘some big ...’""
   ‘... string’
+r = abc‘’
+  '‘‘it’s’
+r = abc'‘‘it’s’
+  ‘’def // ‘‘
 ===
 r = abc + u"1"_S;
 r = abc + u"1"_S + def;
+r = abc + u"1"_S + def;
 r = abc + def;
 r = abc + u"some big ..."_S + u"... string"_S;
+r = abc + u"it’s"_S;
+r = abc + u"it’s"_S + def;
 
 
 A arr = [1, 2, 3]

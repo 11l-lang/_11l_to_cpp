@@ -24,3 +24,19 @@
 
 FFF'000
 ^Error: digit separator in this hexadecimal number is located in the wrong place
+
+
+s = ‘str
+    ^Error: unpaired left single quotation mark
+
+
+s = '‘str
+     ^Error: unpaired left single quotation mark
+
+
+s = '’
+     ^Error: expected left single quotation mark
+
+
+---
+’
