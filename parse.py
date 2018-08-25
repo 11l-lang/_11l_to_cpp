@@ -453,7 +453,7 @@ class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
 
 class ASTFunctionDefinition(ASTNodeWithChildren):
     function_name : str
-    function_arguments : List[Tuple[str, SymbolNode]]# = []
+    function_arguments : List[Tuple[str, SymbolNode, str]]# = []
 
     def __init__(self, function_arguments = None):
         super().__init__()
@@ -471,7 +471,8 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
             s = 'auto ' + self.function_name
         return self.children_to_str(indent, s + '()' if len(self.function_arguments) == 0 else
             'template <' + ", ".join(map(lambda index_arg: 'typename T' + str(index_arg[0] + 1), enumerate(self.function_arguments))) + '> ' + s
-            + '(' + ", ".join(map(lambda index_arg: 'const T' + str(index_arg[0] + 1) + ' &' + index_arg[1][0] + ('' if index_arg[1][1] == None else ' = ' + index_arg[1][1].to_str()), enumerate(self.function_arguments))) + ')')
+            + '(' + ", ".join(map(lambda index_arg: ('T' + str(index_arg[0] + 1) + ' ' if '=' in index_arg[1][2] else 'const T' + str(index_arg[0] + 1) + ' &')
+            + index_arg[1][0] + ('' if index_arg[1][1] == None else ' = ' + index_arg[1][1].to_str()), enumerate(self.function_arguments))) + ')')
 
 class ASTIf(ASTNodeWithChildren, ASTNodeWithExpression):
     else_or_elif : ASTNode = None
@@ -854,6 +855,10 @@ def parse_internal(this_node):
 
                 next_token()
                 while token.value(source) != ')':
+                    modifiers = ''
+                    if token.value(source) == '=':
+                        modifiers += '='
+                        next_token()
                     if token.category != Token.Category.NAME:
                         raise Error('expected function\'s argument name', token)
                     func_arg_name = token.value(source)
@@ -863,7 +868,7 @@ def parse_internal(this_node):
                         default = expression()
                     else:
                         default = None
-                    node.function_arguments.append((func_arg_name, default)) # ((
+                    node.function_arguments.append((func_arg_name, default, modifiers)) # ((
                     if token.value(source) not in ',)':
                         raise Error('expected `,` or `)` in function\'s arguments list', token)
                     if token.value(source) == ',':
