@@ -1,12 +1,10 @@
-empty_dict = {}
+#empty_dict = {}
 dict = {'key': 1, 'key2': 2}
 arr = [1, 2]
 ===
-A empty_dict = Dict()
 A dict = [‘key’ = 1, ‘key2’ = 2]
 A arr = [1, 2]
 ===
-auto empty_dict = Dict();
 auto dict = create_dict(dict_of(u"key"_S, 1)(u"key2"_S, 2));
 auto arr = create_array({1, 2});
 

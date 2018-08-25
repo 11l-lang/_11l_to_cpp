@@ -52,3 +52,32 @@ A source = ‘code’
 A s = source.rtrim()
       ^Error: please wrap `source` in `copy()`
 line_start = source.rfind("\n", source.len - 1)
+
+
+T Ty
+{
+}
+T Ty
+  ^Error: redefinition of already defined identifier is not allowed
+{
+}
+
+
+f(1)
+^Error: call of undefined function `f`
+
+
+F f(a)
+{
+}
+F f(a, b)
+{
+}
+f(1)
+^Error: function overloading is not supported for now
+
+
+F f(a = 1, bb = 2)
+   R a + bb
+print(f(b' 3))
+        ^Error: argument `b` is not found in function `f`

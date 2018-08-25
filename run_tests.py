@@ -113,7 +113,8 @@ for n, test in enumerate(tokenizer_tests):
     print('OK')
 
 for fname in os.listdir('tests/parser'):
-    for test in open('tests/parser/' + fname, encoding="utf8").read().split("\n\n\n"):
+    full_fname = 'tests/parser/' + fname
+    for test in open(full_fname, encoding="utf8").read().split("\n\n\n"):
         if test.startswith('---'):
             continue
         if fname == 'errors.txt':
@@ -125,7 +126,7 @@ for fname in os.listdir('tests/parser'):
                     if error_message[npos:].rstrip() != '':
                         full_source += error_message[npos:]
                     error_message = error_message[:npos]
-                parse.parse(tokenizer.tokenize(full_source), full_source)
+                parse.parse(tokenizer.tokenize(full_source), full_source).to_str()
             except parse.Error as e:
                 line_start = source.rfind("\n", 0, len(source))
                 if e.message == error_message and e.pos == source.rfind("\n", 0, line_start) + len(source) - line_start:
@@ -135,6 +136,9 @@ for fname in os.listdir('tests/parser'):
                     kdiff3(e.message, error_message)
                     print('Error at position ' + str(e.pos) + " in test:\n" + test)
                     exit(1)
+            except Exception as e:
+                print("Exception in file '" + full_fname + "' in test:\n" + test)
+                raise e
             print("There should be error in test:\n" + test)
             exit(1)
         else:
@@ -147,14 +151,15 @@ for fname in os.listdir('tests/parser'):
                     kdiff3(in_cpp, expected_cpp)
                     exit(1)
             except Exception as e:
-                print("Exception in test:\n" + test)
+                print("Exception in file '" + full_fname + "' in test:\n" + test)
                 raise e
             print('OK')
 
 for fname in os.listdir('tests/python_to_cpp'):
+    full_fname = 'tests/python_to_cpp/' + fname
     if fname[0] == '-':
         continue
-    for test in open('tests/python_to_cpp/' + fname, encoding="utf8").read().split("\n\n\n"):
+    for test in open(full_fname, encoding="utf8").read().split("\n\n\n"):
         if test.startswith('---'):
             continue
         try:
@@ -171,7 +176,7 @@ for fname in os.listdir('tests/python_to_cpp'):
                 kdiff3(in_cpp, expected_cpp)
                 exit(1)
         except Exception as e:
-            print("Exception in test:\n" + test)
+            print("Exception in file '" + full_fname + "' in test:\n" + test)
             raise e
         print('OK')
 
