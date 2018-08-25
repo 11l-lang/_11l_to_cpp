@@ -314,7 +314,7 @@ class SymbolNode:
             elif self.symbol.id == '..':
                 return 'range_ei(' + self.children[0].to_str() + ')'
             else:
-                return self.symbol.id + self.children[0].to_str()
+                return {'(-)':'~'}.get(self.symbol.id, self.symbol.id) + self.children[0].to_str()
         elif len(self.children) == 2:
             #return '(' + self.children[0].to_str() + ' ' + self.symbol.id + ' ' + self.children[1].to_str() + ')'
 
@@ -357,7 +357,7 @@ class SymbolNode:
             elif self.symbol.id == '[+]=': # replace `a [+]= v` with `a.append(v)`
                 return self.children[0].to_str() + '.append(' + self.children[1].to_str() + ')'
             else:
-                return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '(concat)':'+', '‘’=':'+='}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
+                return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '(concat)':'+', '‘’=':'+=', '(+)':'^'}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
         elif len(self.children) == 3:
             assert(self.symbol.id in ('I', 'Е', 'if', 'если'))
             return self.children[0].to_str() + ' ? ' + self.children[1].to_str() + ' : ' + self.children[2].to_str()
@@ -633,7 +633,7 @@ infix('+', 110); infix('-', 110)
 infix('*', 120); infix('/', 120); infix('I/', 120); infix('Ц/', 120)
 infix('%', 120)
 
-prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('--', 130); prefix('++', 130)
+prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('(-)', 130); prefix('--', 130); prefix('++', 130)
 
 infix_r('^', 140)
 
