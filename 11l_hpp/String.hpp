@@ -67,7 +67,15 @@ public:
 
 	template <int N> bool operator==(const char16_t (&s)[N]) const {return   len() == N-1 && memcmp(c_str(), s, (N-1)*sizeof(char16_t)) == 0 ;}
 	template <int N> bool operator!=(const char16_t (&s)[N]) const {return !(len() == N-1 && memcmp(c_str(), s, (N-1)*sizeof(char16_t)) == 0);}
+
+	String operator+(const String &s) {String r(*this); r.append(s); return r;}
+	String operator+(Char ch) {String r(*this); r.append(1, ch.code); return r;}
 };
+
+String operator+(Char ch1, Char ch2)
+{
+	return String(ch1) + ch2;
+}
 
 String operator ""_S(const char16_t *s, size_t sz)
 {

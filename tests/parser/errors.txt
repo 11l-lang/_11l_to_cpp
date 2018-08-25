@@ -81,3 +81,12 @@ F f(a = 1, bb = 2)
    R a + bb
 print(f(b' 3))
         ^Error: argument `b` is not found in function `f`
+
+
+T Ty
+{
+   F () {}
+   F (a) {}
+}
+A t = Ty()
+      ^Error: constructors' overloading is not supported for now (see type `Ty`)
