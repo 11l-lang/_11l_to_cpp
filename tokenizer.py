@@ -416,7 +416,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                         and tokens[-2].value(source)[0] == '‘': # ’ // for cases like r = abc‘some big ...’""
                     i += 1                                      #   \\                   ‘... string’
                     continue # [(
-                if len(tokens) and (tokens[-1].category == Token.Category.NAME or tokens[-1].value(source) in (')', ']')):
+                if len(tokens) and ((tokens[-1].category == Token.Category.NAME and tokens[-1].value(source)[-1] != "'") or tokens[-1].value(source) in (')', ']')):
                     tokens.append(Token(lexem_start, lexem_start, Token.Category.STRING_CONCATENATOR))
                 startqpos = i - 1
                 while True:
@@ -443,7 +443,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                         and tokens[-2].value(source)[0] == '"': # // for cases like r = abc"some big ..."‘’
                     i += 1                                      # \\                   ‘... string’
                     continue # ‘[(
-                if len(tokens) and (tokens[-1].category == Token.Category.NAME or tokens[-1].value(source) in (')', ']')):
+                if len(tokens) and ((tokens[-1].category == Token.Category.NAME and tokens[-1].value(source)[-1] != "'") or tokens[-1].value(source) in (')', ']')):
                     tokens.append(Token(lexem_start, lexem_start, Token.Category.STRING_CONCATENATOR))
                     if source[i] == '’': # for cases like `a‘’b`
                         i += 1
