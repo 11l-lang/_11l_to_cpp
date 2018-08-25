@@ -2,6 +2,10 @@
 using std::min;
 using std::max;
 
+#include <tuple>
+template <typename...Types> using Tuple = std::tuple<Types...>;
+using std::make_tuple;
+
 #include "11l_hpp/Range.hpp"
 #include "11l_hpp/String.hpp"
 #include "11l_hpp/Array.hpp"
@@ -43,10 +47,6 @@ template <typename Ty> inline void print(const Array<Ty> &arr, const String &end
 	}
 	std::wcout << L']' << std::wstring(end.begin(), end.end());
 }
-
-#include <tuple>
-template <typename...Types> using Tuple = std::tuple<Types...>;
-using std::make_tuple;
 
 template <int n, typename Container> inline auto _get(const Container &c) {return c[n];}
 template <int n, typename...Types> inline auto _get(const Tuple<Types...> &t) {return std::get<n>(t);}

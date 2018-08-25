@@ -98,3 +98,41 @@ template <> bool in(const int &val, const Range<int, false, true > &range) {retu
 template <> bool in(const int &val, const Range<int, false, false> &range) {return unsigned(val - range.b - 1) < unsigned(range.size());}
 
 template <typename Ty> bool in(const Ty &val, const RangeEI<Ty> &range) {return val >= range.b;}
+
+// Based on [http://artlang.net/post/c++11-obkhod-elementov-kortezhe-std-tuple/ <- google:‘c++ tuple’]
+namespace _detail_
+{
+	template <typename Type, bool include_beginning, bool include_ending> bool in_or_equals(const Type &val, const Range<Type, include_beginning, include_ending> &range)
+	{
+		return in(val, range);
+	}
+//	template <typename Type> bool in_or_equals(const Type &val, const Type &val2)
+//	{
+//		return val == val2;
+//	}
+	template <typename Type, typename Type2> bool in_or_equals(const Type &val, const Type2 &val2) // for comparison between Char and String
+	{
+		return val == val2;
+	}
+
+	template <int index, typename ValueType, typename ... Types> struct iterate_tuple
+	{
+		static bool next(const ValueType &val, const Tuple<Types...> &t)
+		{
+			return in_or_equals(val, std::get<index>(t)) || iterate_tuple<index - 1, ValueType, Types...>::next(val, t);
+		}
+	};
+
+	template <typename ValueType, typename ... Types> struct iterate_tuple<0, ValueType, Types...>
+	{
+		static bool next(const ValueType &val, const Tuple<Types...> &t)
+		{
+			return in_or_equals(val, std::get<0>(t));
+		}
+	};
+}
+
+template <typename ValueType, typename ... Types> bool in(const ValueType &val, const Tuple<Types...> &ranges)
+{
+	return _detail_::iterate_tuple<std::tuple_size<Tuple<Types...>>::value - 1, ValueType, Types...>::next(val, ranges);
+}

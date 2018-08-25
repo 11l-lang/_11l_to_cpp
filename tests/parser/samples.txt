@@ -333,3 +333,16 @@ return _get<0>(children).to_str() + u" "_S + ([](const auto &a){return a == u"an
 A source = ‘code’
 A s = copy(source).rtrim()
 line_start = source.rfind("\n", source.len - 1)
+
+
+A i = 0
+A source = ‘abc_123 ’
+L i < source.len & source[i] C (‘0’..‘9’, ‘a’..‘z’, ‘A’..‘Z’, ‘_’)
+   i++
+assert(i == 7)
+===
+auto i = 0;
+auto source = u"abc_123 "_S;
+while (i < source.len() && in(source[i], make_tuple(range_ee(u'0'_C, u'9'_C), range_ee(u'a'_C, u'z'_C), range_ee(u'A'_C, u'Z'_C), u"_"_S)))
+    i++;
+assert(i == 7);
