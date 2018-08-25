@@ -8,32 +8,59 @@ class Error(Exception):
 
 class Scope:
     parent : 'Scope'
-    class Var:
+    class Id:
         type : str
-        def __init__(self, type):
+        ast_nodes : List['ASTNodeWithChildren']
+
+        def __init__(self, type, ast_node = None):
             self.type = type
-    vars : Dict[str, Var]
+            self.ast_nodes = []
+            if ast_node != None:
+                self.ast_nodes.append(ast_node)
+    ids : Dict[str, Id]
     is_function : bool
 
     def __init__(self, func_args):
         self.parent = None
         if func_args != None:
             self.is_function = True
-            self.vars = dict(map(lambda x: (x, Scope.Var(None)), func_args))
+            self.ids = dict(map(lambda x: (x, Scope.Id(None)), func_args))
         else:
             self.is_function = False
-            self.vars = {}
+            self.ids = {}
 
     def find_in_current_function(self, name):
         s = self
         while True:
-            if name in s.vars:
+            if name in s.ids:
                 return True
             if s.is_function:
                 return False
             s = s.parent
             if s == None:
                 return False
+
+    def find(self, name):
+        s = self
+        while True:
+            id = s.ids.get(name)
+            if id != None:
+                return id
+            s = s.parent
+            if s == None:
+                return None
+
+    def add_function(self, name, ast_node):
+        if name in self.ids:                                                   # A &id = .ids.set_if_not_present(name, Id(N)) // note that this is an error: `A id = .ids.set_if_not_present(...)`, but you can do this: `A id = copy(.ids.set_if_not_present(...))`
+            assert(type(self.ids[name].ast_nodes[0]) == ASTFunctionDefinition) # assert(id.ast_nodes.empty | T(id.ast_nodes[0]) == ASTFunctionDefinition)
+            self.ids[name].ast_nodes.append(ast_node)                          # id.ast_nodes [+]= ast_node
+        else:
+            self.ids[name] = Scope.Id(None, ast_node)
+
+    def add_name(self, name, ast_node):
+        if name in self.ids:                                                                                          # I !.ids.set(name, Id(N, ast_node))
+            raise Error('redefinition of already defined identifier is not allowed', tokens[ast_node.tokeni+1].start) #    X Error(‘redefinition ...’, ...)
+        self.ids[name] = Scope.Id(None, ast_node)
 
 scope : Scope
 
@@ -107,7 +134,7 @@ class SymbolNode:
             return self.token.end
 
         if self.symbol.id in '([': # ])
-            return self.children[-1].rightmost() + 1
+            return (self.children[-1] or self.children[-2]).rightmost() + 1
 
         return self.children[-1].rightmost()
 
@@ -163,10 +190,32 @@ class SymbolNode:
         if self.symbol.id == '(': # )
             if self.function_call:
                 func_name = self.children[0].to_str()
+                f_node = None
+                if self.children[0].symbol.id != '.':
+                    fid = self.scope.find(func_name)
+                    if fid == None:
+                        raise Error('call of undefined function `' + func_name + '`', self.children[0].token.start)
+                    if len(fid.ast_nodes) > 1:
+                        raise Error('function overloading is not supported for now', self.children[0].token.start)
+                    f_node = fid.ast_nodes[0]
+                    assert(type(f_node) == ASTFunctionDefinition)
+                last_function_arg = 0
                 res = func_name + '('
-                for i in range(1, len(self.children)):
-                    res += self.children[i].to_str()
-                    if i < len(self.children)-1:
+                for i in range(1, len(self.children), 2):
+                    if self.children[i] == None:
+                        res += self.children[i+1].to_str()
+                    else:
+                        argument_name = self.children[i].to_str()[:-1]
+                        while True:
+                            if last_function_arg == len(f_node.function_arguments):
+                                raise Error('argument `' + argument_name + '` is not found in function `' + func_name + '`', self.children[i].token.start)
+                            if f_node.function_arguments[last_function_arg][0] == argument_name:
+                                last_function_arg += 1
+                                break
+                            res += f_node.function_arguments[last_function_arg][1].to_str() + ', '
+                            last_function_arg += 1
+                        res += self.children[i+1].to_str()
+                    if i < len(self.children)-2:
                         res += ', '
                 return res + ')'
             elif self.tuple:
@@ -603,7 +652,13 @@ def led(self, left):
     self.append_child(left) # (
     if token.value(source) != ')':
         while True:
-            self.append_child(expression())
+            if token.value(source)[-1] == "'":
+                self.append_child(tokensn)
+                next_token()
+                self.append_child(expression())
+            else:
+                self.children.append(None)
+                self.append_child(expression())
             if token.value(source) != ',':
                 break
             advance(',') # (
@@ -793,12 +848,15 @@ def parse_internal(this_node):
                     if token.value(source) == ',':
                         next_token()
 
+                scope.add_function(node.function_name, node)
+
                 next_token()
                 new_scope(node, map(lambda arg: arg[0], node.function_arguments))
 
             elif token.value(source) in ('T', 'Т', 'type', 'тип'):
                 node = ASTTypeDefinition()
                 node.type_name = expected_name('type name')
+                scope.add_name(node.type_name, node)
                 node.base_types = []
 
                 if token.value(source) == '(':
@@ -914,6 +972,8 @@ def parse(tokens_, source_, suppress_error_please_wrap_in_copy = False): # optio
     tokeni = -1
     token = None
     scope = Scope(None)
+    scope.add_function('print', ASTFunctionDefinition())
+    scope.add_function('assert', ASTFunctionDefinition())
     next_token()
     p = ASTProgram()
     if len(tokens_) == 0: return p

@@ -65,12 +65,20 @@ auto f()
 
 
 // Inspired by sample from ‘Nemerle Wiki’[https://github.com/rsdn/nemerle/wiki/The-basics-(tutorial)#Rewriting_Line_Counter_without_the_loop]
+fn m1() {}
+fn m2() {}
 if foo
    if bar
        m1()
 else
     m2()
 ===
+auto m1()
+{
+}
+auto m2()
+{
+}
 if (foo) {
     if (bar)
         m1();
@@ -80,6 +88,10 @@ else
 
 
 
+fn m1() {}
+fn m2() {}
+fn m3() {}
+fn m4() {}
 if foo
    if bar
        m1()
@@ -91,6 +103,18 @@ if foo
 else
     m2()
 ===
+auto m1()
+{
+}
+auto m2()
+{
+}
+auto m3()
+{
+}
+auto m4()
+{
+}
 if (foo) {
     if (bar)
         m1();
@@ -188,6 +212,7 @@ if (in(ch, range_ee(u'0'_C, u'9'_C))) {
 
 
 A id = 0
+F f(str) {}
 f(‘id=’id)
 A s = ‘str’"\n"
 A s2 = a‘’b
@@ -198,6 +223,9 @@ String tag = ‘<a href="’link‘"’
 tag ‘’= s
 ===
 auto id = 0;
+template <typename T1> auto f(const T1 &str)
+{
+}
 f(u"id="_S + id);
 auto s = u"str"_S + u"\n"_S;
 auto s2 = a + b;
