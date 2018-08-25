@@ -99,11 +99,13 @@ class SymbolNode:
     is_type : bool = False
     postfix : bool = False
     scope : Scope
+    token_str_override : str
 
-    def __init__(self, token):
+    def __init__(self, token, token_str_override = None):
         self.token = token
         self.children = []
         self.scope = scope
+        self.token_str_override = token_str_override
 
     def append_child(self, child):
         child.parent = self
@@ -138,12 +140,15 @@ class SymbolNode:
 
         return self.children[-1].rightmost()
 
+    def token_str(self):
+        return self.token.value(source) if not self.token_str_override else self.token_str_override
+
     def to_str(self):
         if self.token.category == Token.Category.NAME:
-            return self.token.value(source).lstrip('@')
+            return self.token_str().lstrip('@')
 
         if self.token.category == Token.Category.NUMERIC_LITERAL:
-            n = self.token.value(source)
+            n = self.token_str()
             if n[-1] in 'oо':
                 return '0' + n[:-1]
             if n[-1] in 'bд':
@@ -156,7 +161,7 @@ class SymbolNode:
             return n
 
         if self.token.category == Token.Category.STRING_LITERAL:
-            s = self.token.value(source)
+            s = self.token_str()
             if s[0] == '"':
                 return 'u' + s + '_S'
 
@@ -177,14 +182,14 @@ class SymbolNode:
             return 'u"' + repr(s)[1:-1].replace('"', R'\"').replace(R"\'", "'") + '"_S'
 
         if self.token.category == Token.Category.CONSTANT:
-            return {'N': 'nullptr', 'Н': 'nullptr', '0B': 'false', '0В': 'false', '1B': 'true', '1В': 'true'}[self.token.value(source)]
+            return {'N': 'nullptr', 'Н': 'nullptr', '0B': 'false', '0В': 'false', '1B': 'true', '1В': 'true'}[self.token_str()]
 
         def is_char(child):
-            return child.token.category == Token.Category.STRING_LITERAL and len(child.token.value(source)) == 3
+            return child.token.category == Token.Category.STRING_LITERAL and len(child.token_str()) == 3
 
         def char_or_str(child, is_char):
             if is_char:
-                return "u'" + child.token.value(source)[1:-1] + "'_C"
+                return "u'" + child.token_str()[1:-1] + "'_C"
             return child.to_str()
 
         if self.symbol.id == '(': # )
@@ -204,6 +209,7 @@ class SymbolNode:
                 for i in range(1, len(self.children), 2):
                     if self.children[i] == None:
                         res += self.children[i+1].to_str()
+                        last_function_arg += 1
                     else:
                         argument_name = self.children[i].to_str()[:-1]
                         while True:
@@ -441,9 +447,9 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
     function_name : str
     function_arguments : List[Tuple[str, SymbolNode]]# = []
 
-    def __init__(self):
+    def __init__(self, function_arguments = None):
         super().__init__()
-        self.function_arguments = []
+        self.function_arguments = function_arguments or []
 
     def to_str(self, indent):
         if type(self.parent) == ASTTypeDefinition:
@@ -972,7 +978,7 @@ def parse(tokens_, source_, suppress_error_please_wrap_in_copy = False): # optio
     tokeni = -1
     token = None
     scope = Scope(None)
-    scope.add_function('print', ASTFunctionDefinition())
+    scope.add_function('print', ASTFunctionDefinition([('object', None), ('end', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), R'"\n"')), ('flush', SymbolNode(Token(0, 0, Token.Category.CONSTANT)))]))
     scope.add_function('assert', ASTFunctionDefinition())
     next_token()
     p = ASTProgram()

@@ -28,17 +28,21 @@ inline void assert_file_line(const char *file_name, int line, bool expression, c
 	}
 }
 
-inline void print(const String &s, const String &end = u"\n")
+inline void print(const String &s, const String &end = u"\n", bool flush = false)
 {
 	std::wcout << std::wstring(s.begin(), s.end()) << std::wstring(end.begin(), end.end());
+	if (flush)
+		std::wcout.flush();
 }
 
-inline void print(int i, const String &end = u"\n")
+inline void print(int i, const String &end = u"\n", bool flush = false)
 {
 	std::wcout << i << std::wstring(end.begin(), end.end());
+	if (flush)
+		std::wcout.flush();
 }
 
-template <typename Ty> inline void print(const Array<Ty> &arr, const String &end = u"\n")
+template <typename Ty> inline void print(const Array<Ty> &arr, const String &end = u"\n", bool flush = false)
 {
 	std::wcout << L'[';
 	for (int i=0; i<arr.len(); i++) {
@@ -46,6 +50,8 @@ template <typename Ty> inline void print(const Array<Ty> &arr, const String &end
 		if (i < arr.len()-1) std::wcout << L", ";
 	}
 	std::wcout << L']' << std::wstring(end.begin(), end.end());
+	if (flush)
+		std::wcout.flush();
 }
 
 template <int n, typename Container> inline auto _get(const Container &c) {return c[n];}
