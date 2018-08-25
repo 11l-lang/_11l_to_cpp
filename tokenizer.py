@@ -76,7 +76,7 @@ keywords.remove('A'); keywords.remove('А'); keywords.remove('var'); keywords.re
 #keywords.remove('C'); keywords.remove('С'); keywords.remove('in') # it is more convenient to consider C/in as an operator, not a keyword (however, this line is not necessary)
 # new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
 # Решил отказаться от учёта new_scope_keywords на уровне лексического анализатора из-за loop.break и case в switch
-binary_operators : List[List[str]] = [[], ['+', '-', '*', '/', '%', '^', '&', '|', '<', '>', '='], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '&&', '||', '&=', '|=', '^=', '->', '..', '.<', '<.', 'I/', 'Ц/'], ['<<=', '>>=', '‘’=', '[+]', '[&]', '[|]', '(+)', '<.<', 'I/=', 'Ц/='], ['[+]=', '[&]=', '[|]=', '(+)=']]
+binary_operators : List[List[str]] = [[], ['+', '-', '*', '/', '%', '^', '&', '|', '<', '>', '='], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '&&', '||', '&=', '|=', '^=', '->', '..', '.<', '<.', 'I/', 'Ц/', 'C ', 'С '], ['<<=', '>>=', '‘’=', '[+]', '[&]', '[|]', '(+)', '<.<', 'I/=', 'Ц/=', 'in ', '!C ', '!С '], ['[+]=', '[&]=', '[|]=', '(+)=', '!in ']]
 unary_operators = [[], ['!'], ['++', '--'], ['(-)']]
 sorted_operators = sorted(binary_operators[1] + binary_operators[2] + binary_operators[3] + binary_operators[4] + unary_operators[1] + unary_operators[2] + unary_operators[3], key = lambda x: len(x), reverse = True)
 binary_operators[1].remove('-') # Решил просто не считать `-` за бинарный оператор в контексте автоматического склеивания строк, так как `-` к тому же ещё и модификатор константности
@@ -287,13 +287,13 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                 return '0' <= ch <= '9' or 'A' <= ch <= 'F' or 'a' <= ch <= 'f' or ch in 'абсдефАБСДЕФ'
 
             operator = None
-            if ch in 'CС' and not (source[i+1:i+2].isalpha() or source[i+1:i+2].isdigit()): # without this check [and if 'C' is in binary_operators] when identifier starts with `C` (for example `Circle`), then this first letter of identifier is mistakenly considered as an operator
-                operator = ch
-            else:
-                for op in sorted_operators:
-                    if source[i:i+len(op)] == op:
-                        operator = op
-                        break
+            # if ch in 'CС' and not (source[i+1:i+2].isalpha() or source[i+1:i+2].isdigit()): # without this check [and if 'C' is in binary_operators] when identifier starts with `C` (for example `Circle`), then this first letter of identifier is mistakenly considered as an operator
+            #     operator = ch
+            # else:
+            for op in sorted_operators:
+                if source[i:i+len(op)] == op:
+                    operator = op
+                    break
 
             lexem_start = i
             i += 1

@@ -202,12 +202,26 @@ auto r = reverse ? y < x : eq ? x == y : x < y;
 
 
 String ch
-I ch C ‘0’..‘9’
-{
+I ch C ‘0’..‘9’ {
+}
+if ch in ‘0’..‘9’ {
+}
+I ch !C ‘0’..‘9’ {
+}
+if ch !in ‘0’..‘9’ {
 }
 ===
 String ch;
 if (in(ch, range_ee(u'0'_C, u'9'_C))) {
+}
+
+if (in(ch, range_ee(u'0'_C, u'9'_C))) {
+}
+
+if (!in(ch, range_ee(u'0'_C, u'9'_C))) {
+}
+
+if (!in(ch, range_ee(u'0'_C, u'9'_C))) {
 }
 
 

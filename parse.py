@@ -346,8 +346,10 @@ class SymbolNode:
                 return 'range_le(' + char_if_len_1(self.children[0]) + ', ' + char_if_len_1(self.children[1]) + ')'
             elif self.symbol.id == '<.<':
                 return 'range_ll(' + char_if_len_1(self.children[0]) + ', ' + char_if_len_1(self.children[1]) + ')'
-            elif self.symbol.id in ('C', 'С', 'in'):
+            elif self.symbol.id in ('C ', 'С ', 'in '):
                 return 'in(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
+            elif self.symbol.id in ('!C ', '!С ', '!in '):
+                return '!in(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
             elif self.symbol.id in ('I/', 'Ц/'):
                 return 'int(' + self.children[0].to_str() + ')/int(' + self.children[1].to_str() + ')'
             elif self.symbol.id in ('==', '!=') and self.children[1].token.category == Token.Category.STRING_LITERAL:
@@ -375,7 +377,7 @@ def symbol(id, bp = 0):
         s.id = id
         s.lbp = bp
         symbol_table[id] = s
-        if id[0].isalpha() and not id in ('I/', 'Ц/', 'I/=', 'Ц/='): # this is keyword-in-expression
+        if id[0].isalpha() and not id in ('I/', 'Ц/', 'I/=', 'Ц/=', 'C ', 'С ', 'in '): # this is keyword-in-expression
             assert(id.isalpha())
             allowed_keywords_in_expressions.append(id)
     else:
@@ -617,7 +619,7 @@ infix('[+]', 20); infix('->', 20); infix('(concat)', 25) # s -> s[0]‘’@c = s
 
 infix('|', 30); infix('&', 40)
 
-infix('==', 50); infix('!=', 50); infix('C', 50); infix('С', 50); infix('in', 50)
+infix('==', 50); infix('!=', 50); infix('C ', 50); infix('С ', 50); infix('in ', 50); infix('!C ', 50); infix('!С ', 50); infix('!in ', 50)
 
 infix('..', 55); infix('.<', 55); infix('<.', 55); infix('<.<', 55) # ch C ‘0’..‘9’ = ch C (‘0’..‘9’)
 #postfix('..', 55)
