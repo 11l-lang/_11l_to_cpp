@@ -106,6 +106,9 @@ class Token:
         self.end = end
         self.category = category
 
+    def __repr__(self):
+        return str(self.start)
+
     def value(self, source):
         return source[self.start:self.end]
 
