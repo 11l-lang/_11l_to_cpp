@@ -203,7 +203,14 @@ class SymbolNode:
                     if len(fid.ast_nodes) > 1:
                         raise Error('function overloading is not supported for now', self.children[0].token.start)
                     f_node = fid.ast_nodes[0]
-                    assert(type(f_node) == ASTFunctionDefinition)
+                    assert(type(f_node) in (ASTFunctionDefinition, ASTTypeDefinition))
+                    if type(f_node) == ASTTypeDefinition:
+                        if len(f_node.constructors) == 0:
+                            f_node = ASTFunctionDefinition()
+                        else:
+                            if len(f_node.constructors) > 1:
+                                raise Error('constructors\' overloading is not supported for now (see type `' + f_node.type_name + '`)', self.children[0].token.start)
+                            f_node = f_node.constructors[0]
                 last_function_arg = 0
                 res = func_name + '('
                 for i in range(1, len(self.children), 2):
@@ -503,6 +510,11 @@ class ASTReturn(ASTNodeWithExpression):
 class ASTTypeDefinition(ASTNodeWithChildren):
     base_types : List[str]
     type_name : str
+    constructors : List[ASTFunctionDefinition]
+
+    def __init__(self, constructors = None):
+        super().__init__()
+        self.constructors = constructors or []
 
     def to_str(self, indent):
         r = ('' if self.tokeni == 0 else (source[tokens[self.tokeni-2].end:tokens[self.tokeni].start].count("\n")-1) * "\n") + ' ' * (indent*4) \
@@ -821,13 +833,15 @@ def parse_internal(this_node):
                 if token.category == Token.Category.NAME:
                     node.function_name = token.value(source)
                     next_token()
-                elif token.value(source) == '(': # this is constructor [`F ()...` or `F (...)...`] or operator() [`F ()(...)...`]
+                elif token.value(source) == '(': # this is constructor [`F () {...}` or `F (...) {...}`] or operator() [`F ()(...) {...}`]
                     if peek_token().value(source) == ')' and peek_token(2).value(source) == '(': # ) # this is operator()
                         next_token()
                         next_token()
                         node.function_name = '()'
                     else:
                         node.function_name = ''
+                        if type(this_node) == ASTTypeDefinition:
+                            this_node.constructors.append(node)
                 elif token.category == Token.Category.OPERATOR:
                     node.function_name = token.value(source)
                     next_token()
@@ -980,6 +994,7 @@ def parse(tokens_, source_, suppress_error_please_wrap_in_copy = False): # optio
     scope = Scope(None)
     scope.add_function('print', ASTFunctionDefinition([('object', None), ('end', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), R'"\n"')), ('flush', SymbolNode(Token(0, 0, Token.Category.CONSTANT)))]))
     scope.add_function('assert', ASTFunctionDefinition())
+    scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', None)])]))
     next_token()
     p = ASTProgram()
     if len(tokens_) == 0: return p

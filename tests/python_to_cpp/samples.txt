@@ -26,17 +26,50 @@ template <typename T1> auto parse_int(const T1 &s)
 }
 
 
----
-def print_minutes_and_seconds(sec):
+class Object:
+    a : int
+    b : int
+    def __init__(self, a = 1, b = 2):
+        self.a = a
+        self.b = b
+object = Object(b = 3)
+===
+T Object
+   Int a
+   Int b
+   F (a = 1, b = 2)
+      .a = a
+      .b = b
+A object = Object(b' 3)
+===
+class Object
+{
+public:
+    int a;
+    int b;
+    template <typename T1, typename T2> Object(const T1 &a = 1, const T2 &b = 2)
+    {
+        this->a = a;
+        this->b = b;
+    }
+};
+auto object = Object(1, 3);
+
+
+def print_seconds(sec):
     r60 = sec % 60
-    print(chr(ord('0') + r60 // 10)
+    print(chr(ord('0') + r60 // 10) + ''
         + chr(ord('0') + r60 %  10))
 ===
-F print_minutes_and_seconds(sec)
+F print_seconds(sec)
    A r60 = sec % 60
-   print(Char(code' ‘0’.code + r60 I/ 10) + Char(code' ‘0’.code + r60 % 10))
+   print(Char(code' ‘0’.code + r60 I/ 10)‘’Char(code' ‘0’.code + r60 % 10))
 ===
-.
+template <typename T1> auto print_seconds(const T1 &sec)
+{
+    auto r60 = sec % 60;
+    print(Char(u'0'_C.code + int(r60)/int(10)) + Char(u'0'_C.code + r60 % 10));
+}
 
 
 print("Prepare files' list...", end = '')
