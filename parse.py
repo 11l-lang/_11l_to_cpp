@@ -2,9 +2,10 @@
 from typing import List, Tuple, Dict, Callable
 
 class Error(Exception):
-    def __init__(self, message, pos):
+    def __init__(self, message, token):
         self.message = message
-        self.pos = pos
+        self.pos = token.start
+        self.end = token.end
 
 class Scope:
     parent : 'Scope'
@@ -58,8 +59,8 @@ class Scope:
             self.ids[name] = Scope.Id(None, ast_node)
 
     def add_name(self, name, ast_node):
-        if name in self.ids:                                                                                          # I !.ids.set(name, Id(N, ast_node))
-            raise Error('redefinition of already defined identifier is not allowed', tokens[ast_node.tokeni+1].start) #    X Error(‘redefinition ...’, ...)
+        if name in self.ids:                                                                                    # I !.ids.set(name, Id(N, ast_node))
+            raise Error('redefinition of already defined identifier is not allowed', tokens[ast_node.tokeni+1]) #    X Error(‘redefinition ...’, ...)
         self.ids[name] = Scope.Id(None, ast_node)
 
 scope : Scope
@@ -81,9 +82,9 @@ class SymbolBase:
         self.led    = led
 
     def __init__(self):
-        def nud(s): raise Error('unknown unary operator', s.token.start)
+        def nud(s): raise Error('unknown unary operator', s.token)
         self.nud = nud
-        def led(s, l): raise Error('unknown binary operator', s.token.start)
+        def led(s, l): raise Error('unknown binary operator', s.token)
         self.led = led
 
 class SymbolNode:
@@ -199,9 +200,9 @@ class SymbolNode:
                 if self.children[0].symbol.id != '.':
                     fid = self.scope.find(func_name)
                     if fid == None:
-                        raise Error('call of undefined function `' + func_name + '`', self.children[0].token.start)
+                        raise Error('call of undefined function `' + func_name + '`', self.children[0].token)
                     if len(fid.ast_nodes) > 1:
-                        raise Error('function overloading is not supported for now', self.children[0].token.start)
+                        raise Error('function overloading is not supported for now', self.children[0].token)
                     f_node = fid.ast_nodes[0]
                     assert(type(f_node) in (ASTFunctionDefinition, ASTTypeDefinition))
                     if type(f_node) == ASTTypeDefinition:
@@ -209,7 +210,7 @@ class SymbolNode:
                             f_node = ASTFunctionDefinition()
                         else:
                             if len(f_node.constructors) > 1:
-                                raise Error('constructors\' overloading is not supported for now (see type `' + f_node.type_name + '`)', self.children[0].token.start)
+                                raise Error('constructors\' overloading is not supported for now (see type `' + f_node.type_name + '`)', self.children[0].token)
                             f_node = f_node.constructors[0]
                 last_function_arg = 0
                 res = func_name + '('
@@ -221,7 +222,7 @@ class SymbolNode:
                         argument_name = self.children[i].to_str()[:-1]
                         while True:
                             if last_function_arg == len(f_node.function_arguments):
-                                raise Error('argument `' + argument_name + '` is not found in function `' + func_name + '`', self.children[i].token.start)
+                                raise Error('argument `' + argument_name + '` is not found in function `' + func_name + '`', self.children[i].token)
                             if f_node.function_arguments[last_function_arg][0] == argument_name:
                                 last_function_arg += 1
                                 break
@@ -531,7 +532,7 @@ class ASTMain(ASTNodeWithChildren):
 def next_token():
     global token, tokeni, tokensn
     if token == None and tokeni != -1:
-        raise Error('no more tokens', len(source))
+        raise Error('no more tokens', Token(len(source), len(source), Token.Category.STATEMENT_SEPARATOR))
     tokeni += 1
     if tokeni == len(tokens):
         token = None
@@ -559,7 +560,7 @@ def next_token():
 
 def advance(value):
     if token.value(source) != value:
-        raise Error('expected ' + value, token.start)
+        raise Error('expected ' + value, token)
     next_token()
 
 def peek_token(how_much = 1):
@@ -569,9 +570,9 @@ def peek_token(how_much = 1):
 def expression(rbp = 0):
     def check_tokensn():
         if tokensn == None:
-            raise Error('unexpected end of source', len(source))
+            raise Error('unexpected end of source', Token(len(source), len(source), Token.Category.STATEMENT_SEPARATOR))
         if tokensn.symbol == None:
-            raise Error('no symbol corresponding to token `' + token.value(source) + '` (belonging to ' + str(token.category) +') found while parsing expression', token.start)
+            raise Error('no symbol corresponding to token `' + token.value(source) + '` (belonging to ' + str(token.category) +') found while parsing expression', token)
     check_tokensn()
     t = tokensn
     next_token()
@@ -658,7 +659,7 @@ symbol('..', 55).set_led_bp(55, led)
 
 def led(self, left):
     if token.category != Token.Category.NAME:
-        raise Error('expected an attribute name', token.start)
+        raise Error('expected an attribute name', token)
     self.append_child(left)
     self.append_child(tokensn)
     next_token()
@@ -741,7 +742,7 @@ symbol('[').nud = nud # ]
 
 def advance_scope_begin():
     if token.category != Token.Category.SCOPE_BEGIN:
-        raise Error('expected a new scope (indented block or opening curly bracket)', token.start)
+        raise Error('expected a new scope (indented block or opening curly bracket)', token)
     next_token()
 
 def nud(self):
@@ -755,7 +756,7 @@ def nud(self):
                 next_token()
                 self.append_child(expression())
                 if token.category != Token.Category.SCOPE_END:
-                    raise Error('expected end of scope (dedented block or closing curly bracket)', token.start)
+                    raise Error('expected end of scope (dedented block or closing curly bracket)', token)
                 next_token()
             else:
                 self.append_child(expression())
@@ -764,7 +765,7 @@ def nud(self):
             advance_scope_begin()
             self.append_child(expression())
             if token.category != Token.Category.SCOPE_END:
-                raise Error('expected end of scope (dedented block or closing curly bracket)', token.start)
+                raise Error('expected end of scope (dedented block or closing curly bracket)', token)
             next_token()
             if token.category == Token.Category.STATEMENT_SEPARATOR:
                 next_token()
@@ -780,10 +781,10 @@ def nud(self):
     advance_scope_begin()
     self.append_child(expression())
     if token.category != Token.Category.SCOPE_END:
-        raise Error('expected end of scope (dedented block or closing curly bracket)', token.start)
+        raise Error('expected end of scope (dedented block or closing curly bracket)', token)
     next_token()
     if not token.value(source) in ('E', 'И', 'else', 'иначе'):
-        raise Error('expected else block', token.start)
+        raise Error('expected else block', token)
     next_token()
     self.append_child(expression())
     return self
@@ -812,7 +813,7 @@ def parse_internal(this_node):
     def expected_name(what_name):
         next_token()
         if token.category != Token.Category.NAME:
-            raise Error('expected ' + what_name, token.start)
+            raise Error('expected ' + what_name, token)
         token_value = token.value(source)
         next_token()
         return token_value
@@ -846,15 +847,15 @@ def parse_internal(this_node):
                     node.function_name = token.value(source)
                     next_token()
                 else:
-                    raise Error('incorrect function name', token.start)
+                    raise Error('incorrect function name', token)
 
                 if token.value(source) != '(': # )
-                    raise Error('expected `(` after function name', token.start) # )(
+                    raise Error('expected `(` after function name', token) # )(
 
                 next_token()
                 while token.value(source) != ')':
                     if token.category != Token.Category.NAME:
-                        raise Error('expected function\'s argument name', token.start)
+                        raise Error('expected function\'s argument name', token)
                     func_arg_name = token.value(source)
                     next_token()
                     if token.value(source) == '=':
@@ -864,7 +865,7 @@ def parse_internal(this_node):
                         default = None
                     node.function_arguments.append((func_arg_name, default)) # ((
                     if token.value(source) not in ',)':
-                        raise Error('expected `,` or `)` in function\'s arguments list', token.start)
+                        raise Error('expected `,` or `)` in function\'s arguments list', token)
                     if token.value(source) == ',':
                         next_token()
 
@@ -885,7 +886,7 @@ def parse_internal(this_node):
                         if token.value(source) != ',':
                             break
                     if token.value(source) != ')': # (
-                        raise Error('expected `)`', token.start)
+                        raise Error('expected `)`', token)
                     next_token()
 
                 new_scope(node)
@@ -934,7 +935,7 @@ def parse_internal(this_node):
                     next_token()
 
             else:
-                raise Error('unrecognized statement started with keyword', token.start)
+                raise Error('unrecognized statement started with keyword', token)
 
         elif token.category == Token.Category.SCOPE_END:
             next_token()
@@ -976,7 +977,7 @@ def parse_internal(this_node):
                 node = ASTExpression()
                 node.set_expression(node_expression)
             if not (token == None or token.category in (Token.Category.STATEMENT_SEPARATOR, Token.Category.SCOPE_END)):
-                raise Error('expected end of statement', token.start)
+                raise Error('expected end of statement', token)
             if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
                 next_token()
 
