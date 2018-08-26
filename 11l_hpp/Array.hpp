@@ -56,6 +56,20 @@ public:
 
 	int len() const {return size();}
 
+	friend Array &&operator*(Array &&a, int n)
+	{
+		int len = a.len();
+		if (n < 1) // mimic Python's behavior in which [1] * 0 = [] and [1] * -1 = []
+			a.clear();
+		else {
+			a.reserve(len * n);
+			for (int i = 1; i < n; i++)
+				for (int j = 0; j < len; j++)
+					a.append(a[j]);
+		}
+		return std::move(a);
+	}
+
 	Array operator[](const Range<int, true,  true > &range) const {return slice(max(range.b    , 0), min(range.e + 1, len()));}
 	Array operator[](const Range<int, true,  false> &range) const {return slice(max(range.b    , 0), min(range.e    , len()));}
 	Array operator[](const Range<int, false, true > &range) const {return slice(max(range.b + 1, 0), min(range.e + 1, len()));}

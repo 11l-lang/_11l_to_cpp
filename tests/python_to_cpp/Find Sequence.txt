@@ -1,4 +1,3 @@
----
 def has_sequence(m):
     for y in range(len(m)):
         for x in range(len(m)-3):
@@ -6,44 +5,91 @@ def has_sequence(m):
                 return True
     for y in range(len(m)-3):
         for x in range(len(m)):
-            if m[y][x] == m[y+1][x] == m[y+2][x] == m[y+3][x]:
+            if m[y][x] == m[y+1][x] and m[y][x] == m[y+2][x] and m[y][x] == m[y+3][x]:
                 return True
     for y in range(len(m)-3):
         for x in range(len(m)-3):
-            if (m[y][x] == m[y+1][x+1] == m[y+2][x+2] == m[y+3][x+3]
-             or m[y][x+3] == m[y+1][x+2] == m[y+2][x+1] == m[y+3][x]):
+            if (m[y][x] == m[y+1][x+1] and m[y][x] == m[y+2][x+2] and m[y][x] == m[y+3][x+3]) \
+            or (m[y][x+3] == m[y+1][x+2] and m[y][x+3] == m[y+2][x+1] and m[y][x+3] == m[y+3][x]):
                 return True
     return False
 
 if __name__ == '__main__':
     # These "asserts" using only for self-checking and not necessary for auto-testing
-    assert(has_sequence([
+    assert has_sequence([
         [1, 2, 1, 1],
         [1, 1, 4, 1],
         [1, 3, 1, 6],
         [1, 7, 2, 5]
-    ]), "Vertical")
-    assert(not has_sequence([
+    ]), "Vertical"
+    assert not has_sequence([
         [7, 1, 4, 1],
         [1, 2, 5, 2],
         [3, 4, 1, 3],
         [1, 1, 8, 1]
-    ]), "Nothing here")
-    assert(has_sequence([
+    ]), "Nothing here"
+    assert has_sequence([
         [2, 1, 1, 6, 1],
         [1, 3, 2, 1, 1],
         [4, 1, 1, 3, 1],
         [5, 5, 5, 5, 5],
         [1, 1, 3, 1, 1]
-    ]), "Long Horizontal")
-    assert(has_sequence([
+    ]), "Long Horizontal"
+    assert has_sequence([
         [7, 1, 1, 8, 1, 1],
         [1, 1, 7, 3, 1, 5],
         [2, 3, 1, 2, 5, 1],
         [1, 1, 1, 5, 1, 4],
         [4, 6, 5, 1, 3, 1],
         [1, 1, 9, 1, 2, 1]
-    ]), "Diagonal")
+    ]), "Diagonal"
 
     print("All set? Click 'Check' to review your code and earn rewards!")
 ===
+F has_sequence(m)
+   L(y) 0 .< m.len
+      L(x) 0 .< m.len - 3
+         I m[y][x .< x + 4] == [m[y][x]] * 4
+            R 1B
+   L(y) 0 .< m.len - 3
+      L(x) 0 .< m.len
+         I m[y][x] == m[y + 1][x] & m[y][x] == m[y + 2][x] & m[y][x] == m[y + 3][x]
+            R 1B
+   L(y) 0 .< m.len - 3
+      L(x) 0 .< m.len - 3
+         I (m[y][x] == m[y + 1][x + 1] & m[y][x] == m[y + 2][x + 2] & m[y][x] == m[y + 3][x + 3]) | (m[y][x + 3] == m[y + 1][x + 2] & m[y][x + 3] == m[y + 2][x + 1] & m[y][x + 3] == m[y + 3][x])
+            R 1B
+   R 0B
+
+:start:
+assert(has_sequence([[1, 2, 1, 1], [1, 1, 4, 1], [1, 3, 1, 6], [1, 7, 2, 5]]), ‘Vertical’)
+assert(!has_sequence([[7, 1, 4, 1], [1, 2, 5, 2], [3, 4, 1, 3], [1, 1, 8, 1]]), ‘Nothing here’)
+assert(has_sequence([[2, 1, 1, 6, 1], [1, 3, 2, 1, 1], [4, 1, 1, 3, 1], [5, 5, 5, 5, 5], [1, 1, 3, 1, 1]]), ‘Long Horizontal’)
+assert(has_sequence([[7, 1, 1, 8, 1, 1], [1, 1, 7, 3, 1, 5], [2, 3, 1, 2, 5, 1], [1, 1, 1, 5, 1, 4], [4, 6, 5, 1, 3, 1], [1, 1, 9, 1, 2, 1]]), ‘Diagonal’)
+print(‘All set? Click 'Check' to review your code and earn rewards!’)
+===
+template <typename T1> auto has_sequence(const T1 &m)
+{
+    for (auto y : range_el(0, m.len()))
+        for (auto x : range_el(0, m.len() - 3))
+            if (m[y][range_el(x, x + 4)] == create_array({m[y][x]}) * 4)
+                return true;
+    for (auto y : range_el(0, m.len() - 3))
+        for (auto x : range_el(0, m.len()))
+            if (m[y][x] == m[y + 1][x] && m[y][x] == m[y + 2][x] && m[y][x] == m[y + 3][x])
+                return true;
+    for (auto y : range_el(0, m.len() - 3))
+        for (auto x : range_el(0, m.len() - 3))
+            if ((m[y][x] == m[y + 1][x + 1] && m[y][x] == m[y + 2][x + 2] && m[y][x] == m[y + 3][x + 3]) || (m[y][x + 3] == m[y + 1][x + 2] && m[y][x + 3] == m[y + 2][x + 1] && m[y][x + 3] == m[y + 3][x]))
+                return true;
+    return false;
+}
+
+int main()
+{
+    assert(has_sequence(create_array({create_array({1, 2, 1, 1}), create_array({1, 1, 4, 1}), create_array({1, 3, 1, 6}), create_array({1, 7, 2, 5})})), u"Vertical"_S);
+    assert(!has_sequence(create_array({create_array({7, 1, 4, 1}), create_array({1, 2, 5, 2}), create_array({3, 4, 1, 3}), create_array({1, 1, 8, 1})})), u"Nothing here"_S);
+    assert(has_sequence(create_array({create_array({2, 1, 1, 6, 1}), create_array({1, 3, 2, 1, 1}), create_array({4, 1, 1, 3, 1}), create_array({5, 5, 5, 5, 5}), create_array({1, 1, 3, 1, 1})})), u"Long Horizontal"_S);
+    assert(has_sequence(create_array({create_array({7, 1, 1, 8, 1, 1}), create_array({1, 1, 7, 3, 1, 5}), create_array({2, 3, 1, 2, 5, 1}), create_array({1, 1, 1, 5, 1, 4}), create_array({4, 6, 5, 1, 3, 1}), create_array({1, 1, 9, 1, 2, 1})})), u"Diagonal"_S);
+    print(u"All set? Click 'Check' to review your code and earn rewards!"_S);
+}
