@@ -48,6 +48,10 @@ public:
 	{
 		return std::move(s) * n;
 	}
+	String operator*(int n) const
+	{
+		return String(*this) * n;
+	}
 
 	Char operator[](int pos) const
 	{
