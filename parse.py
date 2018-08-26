@@ -1004,6 +1004,8 @@ def parse(tokens_, source_, suppress_error_please_wrap_in_copy = False): # optio
     scope.add_function('assert', ASTFunctionDefinition())
     scope.add_function('zip', ASTFunctionDefinition())
     scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', None)])]))
+    for type in cpp_type_from_11l:
+        scope.add_name(type, ASTTypeDefinition([ASTFunctionDefinition([])]))
     next_token()
     p = ASTProgram()
     if len(tokens_) == 0: return p
