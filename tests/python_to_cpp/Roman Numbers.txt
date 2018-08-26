@@ -359,11 +359,10 @@ int main()
 }
 
 
----
-//https://py.checkio.org/blog/roman-numerals/ <- google:‘checkio roman numbers’
-ELEMENTS = (("M", 1000), ("CM", 900), ("D", 500), ("CD", 400),
+#[https://py.checkio.org/blog/roman-numerals/ <- google:‘checkio roman numbers’]:
+ELEMENTS = [("M", 1000), ("CM", 900), ("D", 500), ("CD", 400),
             ("C", 100), ("XC", 90), ("L", 50), ("XL", 40),
-            ("X", 10), ("IX", 9), ("V", 5), ("IV", 4), ("I", 1))
+            ("X", 10), ("IX", 9), ("V", 5), ("IV", 4), ("I", 1)]
 
 def checkio(number):
     result = ""
@@ -372,6 +371,34 @@ def checkio(number):
             result += roman * (number // n)
             number %= n
     return result
+===
+A ELEMENTS = [(‘M’, 1000), (‘CM’, 900), (‘D’, 500), (‘CD’, 400), (‘C’, 100), (‘XC’, 90), (‘L’, 50), (‘XL’, 40), (‘X’, 10), (‘IX’, 9), (‘V’, 5), (‘IV’, 4), (‘I’, 1)]
+
+F checkio(=number)
+   A result = ‘’
+   L(romann) :ELEMENTS
+      A roman = romann[0]
+      A n = romann[1]
+      I n <= number
+         result ‘’= roman * (number I/ n)
+         number %= n
+   R result
+===
+auto ELEMENTS = create_array({make_tuple(u"M"_S, 1000), make_tuple(u"CM"_S, 900), make_tuple(u"D"_S, 500), make_tuple(u"CD"_S, 400), make_tuple(u"C"_S, 100), make_tuple(u"XC"_S, 90), make_tuple(u"L"_S, 50), make_tuple(u"XL"_S, 40), make_tuple(u"X"_S, 10), make_tuple(u"IX"_S, 9), make_tuple(u"V"_S, 5), make_tuple(u"IV"_S, 4), make_tuple(u"I"_S, 1)});
+
+template <typename T1> auto checkio(T1 number)
+{
+    auto result = u""_S;
+    for (auto romann : ::ELEMENTS) {
+        auto roman = _get<0>(romann);
+        auto n = _get<1>(romann);
+        if (n <= number) {
+            result += roman * (int(number)/int(n));
+            number %= n;
+        }
+    }
+    return result;
+}
 
 
 ---
