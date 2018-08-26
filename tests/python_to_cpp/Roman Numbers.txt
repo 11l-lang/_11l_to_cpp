@@ -1,10 +1,12 @@
-#empty_dict = {}
+empty_dict : Dict[str, int] = {}
 dict = {'key': 1, 'key2': 2}
 arr = [1, 2]
 ===
+Dict[String, Int] empty_dict
 A dict = [‘key’ = 1, ‘key2’ = 2]
 A arr = [1, 2]
 ===
+Dict<String, int> empty_dict;
 auto dict = create_dict(dict_of(u"key"_S, 1)(u"key2"_S, 2));
 auto arr = create_array({1, 2});
 
@@ -292,28 +294,69 @@ int main()
 }
 
 
----
-//https://github.com/therin/CheckiO/blob/master/roman%20numbers.py
+#[https://github.com/therin/CheckiO/blob/master/roman%20numbers.py]:
 def checkio(data):
 
     coding = zip(
     [1000,900,500,400,100,90,50,40,10,9,5,4,1],
     ["M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"])
     
-    result = []
+    result : List[str] = []
     for d, r in coding:
         while data >= d:
             result.append(r)
             data -= d
     return ''.join(result)
 
-#These "asserts" using only for self-checking and not necessary for auto-testing
 if __name__ == '__main__':
+    # These "asserts" using only for self-checking and not necessary for auto-testing
     assert checkio(6) == 'VI', '6'
     assert checkio(76) == 'LXXVI', '76'
     assert checkio(499) == 'CDXCIX', '499'
     assert checkio(3888) == 'MMMDCCCLXXXVIII', '3888'
     print('OK')
+===
+F checkio(=data)
+   A coding = zip([1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1], [‘M’, ‘CM’, ‘D’, ‘CD’, ‘C’, ‘XC’, ‘L’, ‘XL’, ‘X’, ‘IX’, ‘V’, ‘IV’, ‘I’])
+   Array[String] result
+   L(dr) coding
+      A d = dr[0]
+      A r = dr[1]
+      L data >= d
+         result.append(r)
+         data -= d
+   R result.join(‘’)
+
+:start:
+assert(checkio(6) == ‘VI’, ‘6’)
+assert(checkio(76) == ‘LXXVI’, ‘76’)
+assert(checkio(499) == ‘CDXCIX’, ‘499’)
+assert(checkio(3888) == ‘MMMDCCCLXXXVIII’, ‘3888’)
+print(‘OK’)
+===
+template <typename T1> auto checkio(T1 data)
+{
+    auto coding = zip(create_array({1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1}), create_array({u"M"_S, u"CM"_S, u"D"_S, u"CD"_S, u"C"_S, u"XC"_S, u"L"_S, u"XL"_S, u"X"_S, u"IX"_S, u"V"_S, u"IV"_S, u"I"_S}));
+    Array<String> result;
+    for (auto dr : coding) {
+        auto d = _get<0>(dr);
+        auto r = _get<1>(dr);
+        while (data >= d) {
+            result.append(r);
+            data -= d;
+        }
+    }
+    return result.join(u""_S);
+}
+
+int main()
+{
+    assert(checkio(6) == u"VI", u"6"_S);
+    assert(checkio(76) == u"LXXVI", u"76"_S);
+    assert(checkio(499) == u"CDXCIX", u"499"_S);
+    assert(checkio(3888) == u"MMMDCCCLXXXVIII", u"3888"_S);
+    print(u"OK"_S);
+}
 
 
 ---
