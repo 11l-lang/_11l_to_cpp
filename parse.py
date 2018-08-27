@@ -857,9 +857,9 @@ def parse_internal(this_node):
 
                 next_token()
                 while token.value(source) != ')':
-                    modifiers = ''
+                    qualifiers = ''
                     if token.value(source) == '=':
-                        modifiers += '='
+                        qualifiers += '='
                         next_token()
                     if token.category != Token.Category.NAME:
                         raise Error('expected function\'s argument name', token)
@@ -870,7 +870,7 @@ def parse_internal(this_node):
                         default = expression()
                     else:
                         default = None
-                    node.function_arguments.append((func_arg_name, default, modifiers)) # ((
+                    node.function_arguments.append((func_arg_name, default, qualifiers)) # ((
                     if token.value(source) not in ',)':
                         raise Error('expected `,` or `)` in function\'s arguments list', token)
                     if token.value(source) == ',':
