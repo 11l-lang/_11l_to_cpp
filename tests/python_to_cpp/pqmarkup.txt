@@ -1,0 +1,59 @@
+import sys
+
+class Exception(Exception):
+    message : str
+    line : int
+    column : int
+    pos : int
+    def __init__(self, message, line, column, pos):
+        self.message = message
+        self.line = line
+        self.column = column
+        self.pos = pos
+
+if __name__ == '__main__':
+    if '-h' in sys.argv or '--help' in sys.argv:
+        print(R'''A Python implementation of pq markup to HTML converter.''')
+===
+//import sys
+
+T Exception
+   String message
+   Int line
+   Int column
+   Int pos
+   F (message, line, column, pos)
+      .message = message
+      .line = line
+      .column = column
+      .pos = pos
+
+:start:
+I ‘-h’ C :argv | ‘--help’ C :argv
+   print(‘A Python implementation of pq markup to HTML converter.’)
+===
+Array<String> argv;
+
+class Exception
+{
+public:
+    String message;
+    int line;
+    int column;
+    int pos;
+    template <typename T1, typename T2, typename T3, typename T4> Exception(const T1 &message, const T2 &line, const T3 &column, const T4 &pos)
+    {
+        this->message = message;
+        this->line = line;
+        this->column = column;
+        this->pos = pos;
+    }
+};
+
+int MAIN_WITH_ARGV()
+{
+    INIT_ARGV();
+
+    if (in(u"-h"_S, ::argv) || in(u"--help"_S, ::argv))
+        print(u"A Python implementation of pq markup to HTML converter."_S);
+}
