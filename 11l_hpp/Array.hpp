@@ -94,7 +94,12 @@ public:
 	void append(const Type &v) {push_back(v);}
 };
 
-template <class Type> Array<Type> create_array(std::initializer_list<Type> il)
+template <typename Type> Array<Type> create_array(std::initializer_list<Type> il)
 {
     return Array<Type>(il);
+}
+
+template <typename Type> bool in(const Type &val, const Array<Type> &arr)
+{
+	return std::find(arr.begin(), arr.end(), val) != arr.end();
 }

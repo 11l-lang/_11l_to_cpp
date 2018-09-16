@@ -405,8 +405,15 @@ class ASTNodeWithChildren(ASTNode):
         for child in self.children:
             f(child)
 
-    def children_to_str(self, indent, r, place_opening_curly_bracket_on_its_own_line = True):
-        r = ('' if self.tokeni == 0 else (source[tokens[self.tokeni-2].end:tokens[self.tokeni].start].count("\n")-1) * "\n") + ' ' * (indent*4) + r + ("\n" + ' ' * (indent*4) + "{\n" if place_opening_curly_bracket_on_its_own_line else " {\n") # }
+    def children_to_str(self, indent, t, place_opening_curly_bracket_on_its_own_line = True, add_at_beginning = ''):
+        r = ''
+        if self.tokeni > 0:
+            ti = self.tokeni - 1
+            while ti > 0 and tokens[ti].category in (Token.Category.SCOPE_END, Token.Category.STATEMENT_SEPARATOR):
+                ti -= 1
+            r = (source[tokens[ti].end:tokens[self.tokeni].start].count("\n")-1) * "\n"
+        r += ' ' * (indent*4) + t + ("\n" + ' ' * (indent*4) + "{\n" if place_opening_curly_bracket_on_its_own_line else " {\n") # }
+        r += add_at_beginning
         for c in self.children:
             r += c.to_str(indent+1)
         return r + ' ' * (indent*4) + "}\n"
@@ -429,8 +436,10 @@ class ASTNodeWithExpression(ASTNode):
         f(self.expression)
 
 class ASTProgram(ASTNodeWithChildren):
+    beginning_extra = ''
+
     def to_str(self):
-        r = ''
+        r = self.beginning_extra
         for c in self.children:
             r += c.to_str(0)
         return r
@@ -529,8 +538,12 @@ class ASTTypeDefinition(ASTNodeWithChildren):
         return r + ' ' * (indent*4) + "};\n"
 
 class ASTMain(ASTNodeWithChildren):
+    found_reference_to_argv = False
+
     def to_str(self, indent):
-        return self.children_to_str(indent, 'int main()')
+        if not self.found_reference_to_argv:
+            return self.children_to_str(indent, 'int main()')
+        return self.children_to_str(indent, 'int MAIN_WITH_ARGV()', add_at_beginning = ' ' * ((indent+1)*4) + "INIT_ARGV();\n\n")
 
 def next_token():
     global token, tokeni, tokensn
@@ -1004,10 +1017,31 @@ def parse(tokens_, source_, suppress_error_please_wrap_in_copy = False): # optio
     scope.add_function('assert', ASTFunctionDefinition())
     scope.add_function('zip', ASTFunctionDefinition())
     scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', None)])]))
-    for type in cpp_type_from_11l:
-        scope.add_name(type, ASTTypeDefinition([ASTFunctionDefinition([])]))
+    for type_ in cpp_type_from_11l:
+        scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([])]))
     next_token()
     p = ASTProgram()
     if len(tokens_) == 0: return p
     parse_internal(p)
+
+    found_reference_to_argv = False
+    def find_reference_to_argv(node):
+        def f(e : SymbolNode):
+            if len(e.children) == 1 and e.symbol.id == ':' and e.children[0].token_str() == 'argv':
+                nonlocal found_reference_to_argv
+                found_reference_to_argv = True
+                return
+            for child in e.children:
+                if child != None:
+                    f(child)
+
+        node.walk_expressions(f)
+        node.walk_children(find_reference_to_argv)
+    find_reference_to_argv(p)
+
+    if found_reference_to_argv:
+        assert(type(p.children[-1]) == ASTMain)
+        p.children[-1].found_reference_to_argv = True
+        p.beginning_extra = "Array<String> argv;\n\n"
+
     return p

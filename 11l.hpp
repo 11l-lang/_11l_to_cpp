@@ -67,3 +67,6 @@ template <typename T1, typename T2> Array<Tuple<T1, T2>> zip(const Array<T1> &ar
 		r.push_back(make_tuple(*it1, *it2));
 	return r;
 }
+
+#define MAIN_WITH_ARGV() wmain(int argc, wchar_t *argv[])
+#define INIT_ARGV() for (int i=0; i<argc; i++) ::argv.append(String((char16_t*)argv[i], wcslen(argv[i])))
