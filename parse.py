@@ -869,6 +869,7 @@ def parse_internal(this_node):
                     raise Error('expected `(` after function name', token) # )(
 
                 next_token()
+                was_default_argument = False
                 while token.value(source) != ')':
                     qualifiers = ''
                     if token.value(source) == '=':
@@ -881,7 +882,10 @@ def parse_internal(this_node):
                     if token.value(source) == '=':
                         next_token()
                         default = expression()
+                        was_default_argument = True
                     else:
+                        if was_default_argument:
+                            raise Error('non-default argument follows default argument', tokens[tokeni-1])
                         default = None
                     node.function_arguments.append((func_arg_name, default, qualifiers)) # ((
                     if token.value(source) not in ',)':

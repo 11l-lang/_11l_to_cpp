@@ -90,3 +90,8 @@ T Ty
 }
 A t = Ty()
       ^Error: constructors' overloading is not supported for now (see type `Ty`)
+
+
+F f(a = 10, b)
+            ^Error: non-default argument follows default argument
+   R a + b
