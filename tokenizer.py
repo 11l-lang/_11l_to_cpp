@@ -314,9 +314,9 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                         category = Token.Category.OPERATOR
                     else:
                         raise Error('please clarify your intention by putting space character before or after `I`', i-1)
-                elif source[i:i+1] == "'": # this is a keyword argument, a raw string or a hexadecimal number
+                elif source[i:i+1] == "'": # this is a named argument, a raw string or a hexadecimal number
                     i += 1
-                    if source[i:i+1] == ' ': # this is a keyword argument
+                    if source[i:i+1] == ' ': # this is a named argument
                         category = Token.Category.NAME
                     elif source[i:i+1] in ('‘', "'"): # ’ # this is a raw string
                         i -= 1
@@ -411,6 +411,10 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                             if source[lexem_start:i] != number_with_separators:
                                 raise Error('digit separator in this number is located in the wrong place (should be: '+ number_with_separators +')', lexem_start)
                     category = Token.Category.NUMERIC_LITERAL
+
+            elif ch == "'" and source[i:i+1] == ',': # this is a named-only arguments mark
+                i += 1
+                category = Token.Category.DELIMITER
 
             elif ch == '"':
                 if source[i] == '"' \

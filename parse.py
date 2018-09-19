@@ -226,12 +226,23 @@ class SymbolNode:
                             if f_node.function_arguments[last_function_arg][0] == argument_name:
                                 last_function_arg += 1
                                 break
+                            if f_node.function_arguments[last_function_arg][1] == None:
+                                raise Error('argument `' + f_node.function_arguments[last_function_arg][0] + '` of function `' + func_name + '` has no default value, please specify its value here', self.children[i].token)
                             res += f_node.function_arguments[last_function_arg][1].to_str() + ', '
                             last_function_arg += 1
                         res += self.children[i+1].to_str()
                     if i < len(self.children)-2:
                         res += ', '
+
+                if f_node != None:
+                    while last_function_arg < len(f_node.function_arguments):
+                        if f_node.function_arguments[last_function_arg][1] == None:
+                            t = self.children[len(self.children)-1].token
+                            raise Error('missing required argument `'+ f_node.function_arguments[last_function_arg][0] + '`', Token(t.end, t.end, Token.Category.DELIMITER))
+                        last_function_arg += 1
+
                 return res + ')'
+
             elif self.tuple:
                 res = 'make_tuple('
                 for i in range(len(self.children)):
@@ -241,6 +252,7 @@ class SymbolNode:
                 if len(self.children) == 1:
                     res += ','
                 return res + ')'
+
             else:
                 assert(len(self.children) == 1)
                 if self.children[0].symbol.id in ('..', '.<', '<.', '<.<'): # чтобы вместо `(range_el(0, seq.len()))` было `range_el(0, seq.len())`
@@ -465,6 +477,8 @@ class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
 class ASTFunctionDefinition(ASTNodeWithChildren):
     function_name : str
     function_arguments : List[Tuple[str, SymbolNode, str]]# = []
+    first_named_only_argument = None
+    last_non_default_argument : int
 
     def __init__(self, function_arguments = None):
         super().__init__()
@@ -481,9 +495,10 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         else:
             s = 'auto ' + self.function_name
         return self.children_to_str(indent, s + '()' if len(self.function_arguments) == 0 else
-            'template <' + ", ".join(map(lambda index_arg: 'typename T' + str(index_arg[0] + 1), enumerate(self.function_arguments))) + '> ' + s
+            'template <' + ", ".join(map(lambda index_arg: 'typename T' + str(index_arg[0] + 1)
+                + ('' if index_arg[1][1] == None or index_arg[0] < self.last_non_default_argument else ' = decltype(' + index_arg[1][1].to_str() + ')'), enumerate(self.function_arguments))) + '> ' + s
             + '(' + ", ".join(map(lambda index_arg: ('T' + str(index_arg[0] + 1) + ' ' if '=' in index_arg[1][2] else 'const T' + str(index_arg[0] + 1) + ' &')
-            + index_arg[1][0] + ('' if index_arg[1][1] == None else ' = ' + index_arg[1][1].to_str()), enumerate(self.function_arguments))) + ')')
+            + index_arg[1][0] + ('' if index_arg[1][1] == None or index_arg[0] < self.last_non_default_argument else ' = ' + index_arg[1][1].to_str()), enumerate(self.function_arguments))) + ')')
 
 class ASTIf(ASTNodeWithChildren, ASTNodeWithExpression):
     else_or_elif : ASTNode = None
@@ -665,6 +680,7 @@ symbol('(constant)').nud = lambda self: self
 
 symbol(';')
 symbol(',')
+symbol("',")
 
 def led(self, left):
     self.append_child(left) # [
@@ -871,6 +887,11 @@ def parse_internal(this_node):
                 next_token()
                 was_default_argument = False
                 while token.value(source) != ')':
+                    if token.value(source) == "',":
+                        assert(node.first_named_only_argument == None)
+                        node.first_named_only_argument = len(node.function_arguments)
+                        next_token()
+                        continue
                     qualifiers = ''
                     if token.value(source) == '=':
                         qualifiers += '='
@@ -884,7 +905,7 @@ def parse_internal(this_node):
                         default = expression()
                         was_default_argument = True
                     else:
-                        if was_default_argument:
+                        if was_default_argument and node.first_named_only_argument == None:
                             raise Error('non-default argument follows default argument', tokens[tokeni-1])
                         default = None
                     node.function_arguments.append((func_arg_name, default, qualifiers)) # ((
@@ -892,6 +913,10 @@ def parse_internal(this_node):
                         raise Error('expected `,` or `)` in function\'s arguments list', token)
                     if token.value(source) == ',':
                         next_token()
+
+                node.last_non_default_argument = len(node.function_arguments) - 1
+                while node.last_non_default_argument >= 0 and node.function_arguments[node.last_non_default_argument][1] != None:
+                    node.last_non_default_argument -= 1
 
                 scope.add_function(node.function_name, node)
 

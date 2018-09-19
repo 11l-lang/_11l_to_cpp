@@ -95,3 +95,15 @@ A t = Ty()
 F f(a = 10, b)
             ^Error: non-default argument follows default argument
    R a + b
+
+
+F f(a = 10, ', b)
+   R a + b
+f(1)
+   ^Error: missing required argument `b`
+
+
+F f(a = 10, ', b, c)
+   R a + b + c
+f(c' 20)
+  ^Error: argument `b` of function `f` has no default value, please specify its value here
