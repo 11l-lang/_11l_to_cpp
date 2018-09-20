@@ -103,3 +103,11 @@ template <typename Type> bool in(const Type &val, const Array<Type> &arr)
 {
 	return std::find(arr.begin(), arr.end(), val) != arr.end();
 }
+
+template <typename Type> Type sum(const Array<Type> &arr)
+{
+	Type r = 0;
+	for (auto v : arr)
+		r += v;
+	return r;
+}

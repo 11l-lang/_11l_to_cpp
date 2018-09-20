@@ -186,7 +186,8 @@ class SymbolNode:
             return {'N': 'nullptr', 'Н': 'nullptr', '0B': 'false', '0В': 'false', '1B': 'true', '1В': 'true'}[self.token_str()]
 
         def is_char(child):
-            return child.token.category == Token.Category.STRING_LITERAL and len(child.token_str()) == 3
+            ts = child.token_str()
+            return child.token.category == Token.Category.STRING_LITERAL and (len(ts) == 3 or (ts[:2] == '"\\' and len(ts) == 4))
 
         def char_or_str(child, is_char):
             if is_char:
@@ -365,7 +366,7 @@ class SymbolNode:
             elif self.symbol.id in ('I/', 'Ц/'):
                 return 'int(' + self.children[0].to_str() + ')/int(' + self.children[1].to_str() + ')'
             elif self.symbol.id in ('==', '!=') and self.children[1].token.category == Token.Category.STRING_LITERAL:
-                return self.children[0].to_str() + ' ' + self.symbol.id + ' ' + self.children[1].to_str()[:-2]
+                return self.children[0].to_str() + ' ' + self.symbol.id + ' ' + char_if_len_1(self.children[1])[:-2]
             elif self.symbol.id == '=' and self.children[0].symbol.id == '[': # ] # replace `a[k] = v` with `a.set(k, v)`
                 return self.children[0].children[0].to_str() + '.set(' + self.children[0].children[1].to_str() + ', ' + self.children[1].to_str() + ')'
             elif self.symbol.id == '[+]=': # replace `a [+]= v` with `a.append(v)`
@@ -1051,6 +1052,7 @@ def parse(tokens_, source_, suppress_error_please_wrap_in_copy = False): # optio
     scope.add_function('print', ASTFunctionDefinition([('object', None), ('end', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), R'"\n"')), ('flush', SymbolNode(Token(0, 0, Token.Category.CONSTANT)))]))
     scope.add_function('assert', ASTFunctionDefinition())
     scope.add_function('zip', ASTFunctionDefinition())
+    scope.add_function('sum', ASTFunctionDefinition())
     scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', None)])]))
     for type_ in cpp_type_from_11l:
         scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([])]))
