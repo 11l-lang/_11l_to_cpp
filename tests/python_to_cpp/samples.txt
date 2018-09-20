@@ -142,9 +142,9 @@ for (auto i : range_el(0, 11))
     print(i);
 
 
-dict : Dict[str, int]
+dict : Dict[str, int] = {}
 dict['key'] = 1
-arr : List[int]
+arr : List[int] = []
 arr += [10]
 ===
 Dict[String, Int] dict

@@ -545,7 +545,13 @@ class ASTTypeDefinition(ASTNodeWithChildren):
         self.constructors = constructors or []
 
     def to_str(self, indent):
-        r = ('' if self.tokeni == 0 else (source[tokens[self.tokeni-2].end:tokens[self.tokeni].start].count("\n")-1) * "\n") + ' ' * (indent*4) \
+        r = ''
+        if self.tokeni > 0:
+            ti = self.tokeni - 1
+            while ti > 0 and tokens[ti].category in (Token.Category.SCOPE_END, Token.Category.STATEMENT_SEPARATOR):
+                ti -= 1
+            r = (source[tokens[ti].end:tokens[self.tokeni].start].count("\n")-1) * "\n"
+        r += ' ' * (indent*4) \
           + 'class ' + self.type_name + (' : ' + ', '.join(map(lambda c: 'public ' + c, self.base_types)) if len(self.base_types) else '') \
           + "\n" + ' ' * (indent*4) + "{\n" + ' ' * (indent*4) + "public:\n"
         for c in self.children:
