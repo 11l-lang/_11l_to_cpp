@@ -13,6 +13,7 @@ public:
 	bool operator>=(Char c) const {return code >= c.code;}
 
 	bool operator==(Char c) const {return code == c.code;}
+	bool operator!=(Char c) const {return code != c.code;}
 };
 
 class String : public std::u16string

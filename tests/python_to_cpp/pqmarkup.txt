@@ -23,6 +23,23 @@ class Converter:
         self.habrahabr_html = habrahabr_html
         self.ohd = ohd
 
+    def instr_pos_to_line_column(self, pos):
+        pos += sum(self.to_html_called_inside_to_html_outer_pos_list)
+        line = 1
+        line_start = -1
+        t = 0
+        while t < pos:
+            if self.instr[t] == "\r":
+                if t < pos-1 and self.instr[t+1] == "\n":
+                    t += 1
+                line += 1
+                line_start = t
+            elif self.instr[t] == "\n":
+                line += 1
+                line_start = t
+            t += 1
+        return (line, pos - line_start, pos)
+
 if __name__ == '__main__':
     if '-h' in sys.argv or '--help' in sys.argv:
         print(R'''A Python implementation of pq markup to HTML converter.''')
@@ -48,6 +65,23 @@ T Converter
    F (habrahabr_html, ohd)
       .habrahabr_html = habrahabr_html
       .ohd = ohd
+
+   F instr_pos_to_line_column(=pos)
+      pos += sum(.to_html_called_inside_to_html_outer_pos_list)
+      A line = 1
+      A line_start = -1
+      A t = 0
+      L t < pos
+         I .instr[t] == "\r"
+            I t < pos - 1 & .instr[t + 1] == "\n"
+               t++
+            line++
+            line_start = t
+         E I .instr[t] == "\n"
+            line++
+            line_start = t
+         t++
+      R (line, pos - line_start, pos)
 
 :start:
 I ‘-h’ C :argv | ‘--help’ C :argv
@@ -82,6 +116,28 @@ public:
     {
         this->habrahabr_html = habrahabr_html;
         this->ohd = ohd;
+    }
+
+    template <typename T1> auto instr_pos_to_line_column(T1 pos)
+    {
+        pos += sum(to_html_called_inside_to_html_outer_pos_list);
+        auto line = 1;
+        auto line_start = -1;
+        auto t = 0;
+        while (t < pos) {
+            if (instr[t] == u'\r') {
+                if (t < pos - 1 && instr[t + 1] == u'\n')
+                    t++;
+                line++;
+                line_start = t;
+            }
+            else if (instr[t] == u'\n') {
+                line++;
+                line_start = t;
+            }
+            t++;
+        }
+        return make_tuple(line, pos - line_start, pos);
     }
 };
 
