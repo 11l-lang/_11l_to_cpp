@@ -432,7 +432,7 @@ class ASTNodeWithChildren(ASTNode):
         return r + ' ' * (indent*4) + "}\n"
 
     def children_to_str_detect_single_stmt(self, indent, r, check_for_if = False):
-        if len(self.children) > 1 or len(self.children) == 0 \
+        if len(self.children) != 1 \
                 or (check_for_if and type(self.children[0]) == ASTIf): # for correctly handling of dangling-else
             return self.children_to_str(indent, r, False)
         assert(len(self.children) == 1)
@@ -535,6 +535,10 @@ class ASTReturn(ASTNodeWithExpression):
 
     def walk_expressions(self, f):
         if self.expression != None: f(self.expression)
+
+class ASTException(ASTNodeWithExpression):
+    def to_str(self, indent):
+        return ' ' * (indent*4) + 'throw ' + self.expression.to_str() + ";\n"
 
 class ASTTypeDefinition(ASTNodeWithChildren):
     base_types : List[str]
@@ -987,6 +991,13 @@ def parse_internal(this_node):
                     node.expression = None
                 else:
                     node.set_expression(expression())
+                if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
+                    next_token()
+
+            elif token.value(source) in ('X', 'Х', 'exception', 'исключение'):
+                node = ASTException()
+                next_token()
+                node.set_expression(expression())
                 if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
                     next_token()
 

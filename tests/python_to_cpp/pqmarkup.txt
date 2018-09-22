@@ -16,6 +16,7 @@ class Converter:
     to_html_called_inside_to_html_outer_pos_list : List[int]
     habrahabr_html : bool
     ohd : bool
+    instr : str
 
     def __init__(self, habrahabr_html, ohd):
         self.to_html_called_inside_to_html_outer_pos_list = []
@@ -40,6 +41,24 @@ class Converter:
             t += 1
         return (line, pos - line_start, pos)
 
+    def to_html(self, instr, outfile = None, *, outer_pos = 0):
+        self.to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
+        class FileToStringProxy:
+            result : List[str]
+            def __init__(self):
+                self.result = []
+            def write(self, s):
+                self.result.append(s)
+        if outfile == None:
+            outfile = FileToStringProxy()
+
+        if len(self.to_html_called_inside_to_html_outer_pos_list) == 1:
+            self.instr = instr
+
+        def exit_with_error(message, pos):
+            p = self.instr_pos_to_line_column(pos)
+            raise Exception(message, p[0], p[1], p[2])
+
 if __name__ == '__main__':
     if '-h' in sys.argv or '--help' in sys.argv:
         print(R'''A Python implementation of pq markup to HTML converter.''')
@@ -61,6 +80,7 @@ T Converter
    Array[Int] to_html_called_inside_to_html_outer_pos_list
    Bool habrahabr_html
    Bool ohd
+   String instr
 
    F (habrahabr_html, ohd)
       .habrahabr_html = habrahabr_html
@@ -82,6 +102,25 @@ T Converter
             line_start = t
          t++
       R (line, pos - line_start, pos)
+
+   F to_html(instr, outfile = N, ', outer_pos = 0)
+      .to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
+      T FileToStringProxy
+         Array[String] result
+         F ()
+         {
+         }
+         F write(s)
+            .result.append(s)
+      I outfile == N
+         outfile = FileToStringProxy()
+
+      I .to_html_called_inside_to_html_outer_pos_list.len == 1
+         .instr = instr
+
+      F exit_with_error(message, pos)
+         A p = .instr_pos_to_line_column(pos)
+         X Exception(message, p[0], p[1], p[2])
 
 :start:
 I ‘-h’ C :argv | ‘--help’ C :argv
@@ -111,6 +150,7 @@ public:
     Array<int> to_html_called_inside_to_html_outer_pos_list;
     bool habrahabr_html;
     bool ohd;
+    String instr;
 
     template <typename T1, typename T2> Converter(const T1 &habrahabr_html, const T2 &ohd)
     {
@@ -138,6 +178,34 @@ public:
             t++;
         }
         return make_tuple(line, pos - line_start, pos);
+    }
+
+    template <typename T1, typename T2 = decltype(nullptr), typename T3 = decltype(0)> auto to_html(const T1 &instr, const T2 &outfile = nullptr, const T3 &outer_pos = 0)
+    {
+        to_html_called_inside_to_html_outer_pos_list.append(outer_pos);
+        class FileToStringProxy
+        {
+        public:
+            Array<String> result;
+            FileToStringProxy()
+            {
+            }
+
+            template <typename T1> auto write(const T1 &s)
+            {
+                result.append(s);
+            }
+        };
+        if (outfile == nullptr)
+            outfile = FileToStringProxy();
+        if (to_html_called_inside_to_html_outer_pos_list.len() == 1)
+            this->instr = instr;
+
+        template <typename T1, typename T2> auto exit_with_error(const T1 &message, const T2 &pos)
+        {
+            auto p = instr_pos_to_line_column(pos);
+            throw Exception(message, _get<0>(p), _get<1>(p), _get<2>(p));
+        }
     }
 };
 
