@@ -109,7 +109,7 @@ T Converter
          .instr = instr
 
       F exit_with_error(message, pos)
-         A p = .instr_pos_to_line_column(pos)
+         A p = @.instr_pos_to_line_column(pos)
          X Exception(message, p[0], p[1], p[2])
 
 :start:
@@ -177,7 +177,7 @@ public:
         if (to_html_called_inside_to_html_outer_pos_list.len() == 1)
             this->instr = instr;
 
-        auto exit_with_error = [](const auto &message, const auto &pos)
+        auto exit_with_error = [this](const auto &message, const auto &pos)
         {
             auto p = instr_pos_to_line_column(pos);
             throw Exception(message, _get<0>(p), _get<1>(p), _get<2>(p));
