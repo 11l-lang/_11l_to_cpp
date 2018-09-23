@@ -39,7 +39,7 @@ class Converter:
                 line += 1
                 line_start = t
             t += 1
-        return (line, pos - line_start, pos)
+        return (line, pos - line_start)
 
     def to_html(self, instr, outfilef : IO[str] = None, *, outer_pos = 0):
         self.to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
@@ -55,7 +55,7 @@ class Converter:
 
         def exit_with_error(message, pos):
             p = self.instr_pos_to_line_column(pos)
-            raise Exception(message, p[0], p[1], p[2])
+            raise Exception(message, p[0], p[1], pos)
 
 if __name__ == '__main__':
     if '-h' in sys.argv or '--help' in sys.argv:
@@ -99,7 +99,7 @@ T Converter
             line++
             line_start = t
          t++
-      R (line, pos - line_start, pos)
+      R (line, pos - line_start)
 
    F to_html(instr, File? outfilef = N, ', outer_pos = 0)
       .to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
@@ -110,7 +110,7 @@ T Converter
 
       F exit_with_error(message, pos)
          A p = @.instr_pos_to_line_column(pos)
-         X Exception(message, p[0], p[1], p[2])
+         X Exception(message, p[0], p[1], pos)
 
 :start:
 I ‘-h’ C :argv | ‘--help’ C :argv
@@ -167,7 +167,7 @@ public:
             }
             t++;
         }
-        return make_tuple(line, pos - line_start, pos);
+        return make_tuple(line, pos - line_start);
     }
 
     template <typename T1, typename T3 = decltype(0)> auto to_html(const T1 &instr, File *outfilef = nullptr, const T3 &outer_pos = 0)
@@ -180,7 +180,7 @@ public:
         auto exit_with_error = [this](const auto &message, const auto &pos)
         {
             auto p = instr_pos_to_line_column(pos);
-            throw Exception(message, _get<0>(p), _get<1>(p), _get<2>(p));
+            throw Exception(message, _get<0>(p), _get<1>(p), pos);
         };
     }
 };
