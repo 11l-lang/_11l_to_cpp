@@ -495,11 +495,21 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 s = 'auto ' + self.function_name
         else:
             s = 'auto ' + self.function_name
-        return self.children_to_str(indent, s + '()' if len(self.function_arguments) == 0 else
-            'template <' + ", ".join(map(lambda index_arg: 'typename T' + str(index_arg[0] + 1)
-                + ('' if index_arg[1][1] == None or index_arg[0] < self.last_non_default_argument else ' = decltype(' + index_arg[1][1].to_str() + ')'), enumerate(self.function_arguments))) + '> ' + s
-            + '(' + ", ".join(map(lambda index_arg: ('T' + str(index_arg[0] + 1) + ' ' if '=' in index_arg[1][2] else 'const T' + str(index_arg[0] + 1) + ' &')
-            + index_arg[1][0] + ('' if index_arg[1][1] == None or index_arg[0] < self.last_non_default_argument else ' = ' + index_arg[1][1].to_str()), enumerate(self.function_arguments))) + ')')
+
+        if len(self.function_arguments) == 0:
+            return self.children_to_str(indent, s + '()')
+
+        templates = []
+        arguments = []
+        for index, arg in enumerate(self.function_arguments):
+            if arg[2] == '': # if there is no type specified
+                templates.append('typename T' + str(index + 1) + ('' if arg[1] == None or index < self.last_non_default_argument else ' = decltype(' + arg[1].to_str() + ')'))
+                arguments.append(('T' + str(index + 1) + ' ' if '=' in arg[3] else 'const T' + str(index + 1) + ' &')
+                    + arg[0] + ('' if arg[1] == None or index < self.last_non_default_argument else ' = ' + arg[1].to_str()))
+            else:
+                arguments.append(arg[2].rstrip('?') + ' *'
+                    + arg[0] + ('' if arg[1] == None or index < self.last_non_default_argument else ' = ' + arg[1].to_str()))
+        return self.children_to_str(indent, 'template <' + ', '.join(templates) + '> ' + s + '(' + ', '.join(arguments) + ')')
 
 class ASTIf(ASTNodeWithChildren, ASTNodeWithExpression):
     else_or_elif : ASTNode = None
@@ -903,6 +913,10 @@ def parse_internal(this_node):
                         node.first_named_only_argument = len(node.function_arguments)
                         next_token()
                         continue
+                    type_ = ''
+                    if token.value(source)[0].isupper(): # this is a type name
+                        type_ = token.value(source)
+                        next_token()
                     qualifiers = ''
                     if token.value(source) == '=':
                         qualifiers += '='
@@ -919,7 +933,7 @@ def parse_internal(this_node):
                         if was_default_argument and node.first_named_only_argument == None:
                             raise Error('non-default argument follows default argument', tokens[tokeni-1])
                         default = None
-                    node.function_arguments.append((func_arg_name, default, qualifiers)) # ((
+                    node.function_arguments.append((func_arg_name, default, type_, qualifiers)) # ((
                     if token.value(source) not in ',)':
                         raise Error('expected `,` or `)` in function\'s arguments list', token)
                     if token.value(source) == ',':
