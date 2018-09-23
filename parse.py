@@ -338,6 +338,11 @@ class SymbolNode:
 
             if self.symbol.id == '.':
                 c1 = self.children[1].to_str()
+                if self.children[0].token_str() == '@':
+                    if self.scope.find_in_current_function(c1):
+                        return 'this->' + c1
+                    else:
+                        return c1
                 return char_if_len_1(self.children[0]) + '.' + ('len()' if c1 == 'len' else c1) # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
             elif self.symbol.id == '->':
                 captured_variables = set()
@@ -501,7 +506,8 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                     if sn.token.category == Token.Category.NAME:
                         if sn.token.value(source)[0] == '@':
                             by_ref = sn.parent.children[0] is sn and sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!=')
-                            captured_variables.add(('&' if by_ref else '') + sn.token.value(source)[1:])
+                            t = sn.token.value(source)[1:]
+                            captured_variables.add(('&' if by_ref else '') + ('this' if t == '' else t))
                     else:
                         for child in sn.children:
                             if child != None:
