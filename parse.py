@@ -493,6 +493,26 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 s = 'auto operator()'
             else:
                 s = 'auto ' + self.function_name
+
+        elif type(self.parent) != ASTProgram: # local functions [i.e. functions inside functions] are represented as C++ lambdas
+            captured_variables = set()
+            def gather_captured_variables(node):
+                def f(sn : SymbolNode):
+                    if sn.token.category == Token.Category.NAME:
+                        if sn.token.value(source)[0] == '@':
+                            by_ref = sn.parent.children[0] is sn and sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!=')
+                            captured_variables.add(('&' if by_ref else '') + sn.token.value(source)[1:])
+                    else:
+                        for child in sn.children:
+                            if child != None:
+                                f(child)
+
+                node.walk_expressions(f)
+                node.walk_children(gather_captured_variables)
+            gather_captured_variables(self)
+
+            return self.children_to_str(indent, 'auto ' + self.function_name + ' = [' + ', '.join(sorted(captured_variables)) + '](' + ', '.join(map(lambda arg: 'const auto &' + arg[0], self.function_arguments)) + ')')[:-1] + ";\n"
+
         else:
             s = 'auto ' + self.function_name
 

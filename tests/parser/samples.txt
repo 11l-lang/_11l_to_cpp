@@ -364,3 +364,24 @@ auto source = u"abc_123 "_S;
 while (i < source.len() && in(source[i], make_tuple(range_ee(u'0'_C, u'9'_C), range_ee(u'a'_C, u'z'_C), range_ee(u'A'_C, u'Z'_C), u"_"_S)))
     i++;
 assert(i == 7);
+
+
+F to_html()
+   A i = 0
+   A writepos = 1
+   F write_to_pos(npos)
+      @writepos = @i + npos
+   write_to_pos(2)
+   R writepos
+===
+auto to_html()
+{
+    auto i = 0;
+    auto writepos = 1;
+    auto write_to_pos = [&writepos, i](const auto &npos)
+    {
+        writepos = i + npos;
+    };
+    write_to_pos(2);
+    return writepos;
+}

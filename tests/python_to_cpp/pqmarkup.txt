@@ -177,11 +177,11 @@ public:
         if (to_html_called_inside_to_html_outer_pos_list.len() == 1)
             this->instr = instr;
 
-        template <typename T1, typename T2> auto exit_with_error(const T1 &message, const T2 &pos)
+        auto exit_with_error = [](const auto &message, const auto &pos)
         {
             auto p = instr_pos_to_line_column(pos);
             throw Exception(message, _get<0>(p), _get<1>(p), _get<2>(p));
-        }
+        };
     }
 };
 
