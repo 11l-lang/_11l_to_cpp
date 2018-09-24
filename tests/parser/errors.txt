@@ -107,3 +107,12 @@ F f(a = 10, ', b, c)
    R a + b + c
 f(c' 20)
   ^Error: argument `b` of function `f` has no default value, please specify its value here
+
+
+:start:
+(String, Int -> String) f
+F ff(s, i)
+   R s * i
+f = ff
+assert(f(‘s’) == ‘ss’)
+        ^Error: wrong number of arguments passed to function pointer

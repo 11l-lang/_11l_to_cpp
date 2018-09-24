@@ -260,3 +260,29 @@ x = ~1 ^ 2
 A x = (-)1 (+) 2
 ===
 auto x = ~1 ^ 2;
+
+
+if __name__ == '__main__':
+    f : Callable[[str, int], str]
+    def ff(s, i):
+        return s * i
+    f = ff
+    assert(f('s', 2) == 'ss')
+===
+:start:
+(String, Int -> String) f
+F ff(s, i)
+   R s * i
+f = ff
+assert(f(‘s’, 2) == ‘ss’)
+===
+int main()
+{
+    std::function<String(String, int)> f;
+    auto ff = [](const auto &s, const auto &i)
+    {
+        return s * i;
+    };
+    f = ff;
+    assert(f(u"s"_S, 2) == u"ss");
+}

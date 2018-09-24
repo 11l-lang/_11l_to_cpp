@@ -11,6 +11,7 @@ using std::make_tuple;
 #include "11l_hpp/Array.hpp"
 #include "11l_hpp/Dict.hpp"
 
+#include <functional>
 #include <iostream>
 
 #define assert(...) assert_file_line(__FILE__, __LINE__, __VA_ARGS__)

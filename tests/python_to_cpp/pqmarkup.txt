@@ -45,9 +45,9 @@ class Converter:
         self.to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
 
         result : List[str] = [] # this should be faster than using regular string
-#       class Writer:
-#           write : Callable[[str], None]
-#       outfile = Writer()
+        class Writer:
+            write : Callable[[str], None]
+        outfile = Writer()
 #       outfile.write = (lambda s: result.append(s)) if outfilef == None else (lambda s: outfilef.write(s))
 
         if len(self.to_html_called_inside_to_html_outer_pos_list) == 1:
@@ -104,6 +104,9 @@ T Converter
    F to_html(instr, File? outfilef = N, ', outer_pos = 0)
       .to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
       Array[String] result
+      T Writer
+         (String -> N) write
+      A outfile = Writer()
 
       I .to_html_called_inside_to_html_outer_pos_list.len == 1
          .instr = instr
@@ -170,10 +173,16 @@ public:
         return make_tuple(line, pos - line_start);
     }
 
-    template <typename T1, typename T3 = decltype(0)> auto to_html(const T1 &instr, File *outfilef = nullptr, const T3 &outer_pos = 0)
+    template <typename T1, typename T3 = decltype(0)> auto to_html(const T1 &instr, File* const outfilef = nullptr, const T3 &outer_pos = 0)
     {
         to_html_called_inside_to_html_outer_pos_list.append(outer_pos);
         Array<String> result;
+        class Writer
+        {
+        public:
+            std::function<void(String)> write;
+        };
+        auto outfile = Writer();
         if (to_html_called_inside_to_html_outer_pos_list.len() == 1)
             this->instr = instr;
 
