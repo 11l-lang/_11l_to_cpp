@@ -63,6 +63,13 @@ class Converter:
 if __name__ == '__main__':
     if '-h' in sys.argv or '--help' in sys.argv:
         print(R'''A Python implementation of pq markup to HTML converter.''')
+        sys.exit(0)
+
+    args_habrahabr_html       = '--habrahabr-html'       in sys.argv
+    args_output_html_document = '--output-html-document' in sys.argv
+
+    if args_output_html_document and args_habrahabr_html:
+        sys.exit("Arguments --output-html-document and --habrahabr-html are mutually exclusive")
 ===
 //import sys
 
@@ -125,6 +132,12 @@ T Converter
 :start:
 I ‘-h’ C :argv | ‘--help’ C :argv
    print(‘A Python implementation of pq markup to HTML converter.’)
+   exit(0)
+A args_habrahabr_html = ‘--habrahabr-html’ C :argv
+A args_output_html_document = ‘--output-html-document’ C :argv
+
+I args_output_html_document & args_habrahabr_html
+   exit(‘Arguments --output-html-document and --habrahabr-html are mutually exclusive’)
 ===
 Array<String> argv;
 
@@ -209,6 +222,12 @@ int MAIN_WITH_ARGV()
 {
     INIT_ARGV();
 
-    if (in(u"-h"_S, ::argv) || in(u"--help"_S, ::argv))
+    if (in(u"-h"_S, ::argv) || in(u"--help"_S, ::argv)) {
         print(u"A Python implementation of pq markup to HTML converter."_S);
+        exit(0);
+    }
+    auto args_habrahabr_html = in(u"--habrahabr-html"_S, ::argv);
+    auto args_output_html_document = in(u"--output-html-document"_S, ::argv);
+    if (args_output_html_document && args_habrahabr_html)
+        exit(u"Arguments --output-html-document and --habrahabr-html are mutually exclusive"_S);
 }

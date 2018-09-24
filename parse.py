@@ -1132,6 +1132,7 @@ def parse(tokens_, source_, suppress_error_please_wrap_in_copy = False): # optio
     scope = Scope(None)
     scope.add_function('print', ASTFunctionDefinition([('object', None), ('end', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), R'"\n"')), ('flush', SymbolNode(Token(0, 0, Token.Category.CONSTANT)))]))
     scope.add_function('assert', ASTFunctionDefinition())
+    scope.add_function('exit', ASTFunctionDefinition())
     scope.add_function('zip', ASTFunctionDefinition())
     scope.add_function('sum', ASTFunctionDefinition())
     scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', None)])]))
