@@ -217,6 +217,8 @@ class SymbolNode:
                 res = func_name + '('
                 for i in range(1, len(self.children), 2):
                     if self.children[i] == None:
+                        if f_node != None and type(f_node) == ASTFunctionDefinition and f_node.function_arguments[last_function_arg][2].endswith('?'):
+                            res += '&'
                         res += self.children[i+1].to_str()
                         last_function_arg += 1
                     else:
@@ -321,7 +323,10 @@ class SymbolNode:
             if self.postfix:
                 return self.children[0].to_str() + self.symbol.id
             elif self.symbol.id == ':':
-                return '::' + self.children[0].to_str()
+                c0 = self.children[0].to_str()
+                if c0 in ('stdin', 'stdout', 'stderr'):
+                    return '_' + c0
+                return '::' + c0
             elif self.symbol.id == '.':
                 c0 = self.children[0].to_str()
                 if self.scope.find_in_current_function(c0):
@@ -1130,11 +1135,11 @@ def parse(tokens_, source_, suppress_error_please_wrap_in_copy = False): # optio
     tokeni = -1
     token = None
     scope = Scope(None)
-    scope.add_function('print', ASTFunctionDefinition([('object', None), ('end', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), R'"\n"')), ('flush', SymbolNode(Token(0, 0, Token.Category.CONSTANT)))]))
-    scope.add_function('assert', ASTFunctionDefinition())
-    scope.add_function('exit', ASTFunctionDefinition())
-    scope.add_function('zip', ASTFunctionDefinition())
-    scope.add_function('sum', ASTFunctionDefinition())
+    scope.add_function('print', ASTFunctionDefinition([('object', None, ''), ('end', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), R'"\n"'), 'String'), ('flush', SymbolNode(Token(0, 0, Token.Category.CONSTANT)))]))
+    scope.add_function('assert', ASTFunctionDefinition([('expression', None, 'Bool'), ('message', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), ''), 'String')]))
+    scope.add_function('exit', ASTFunctionDefinition([('arg', None, '')]))
+    scope.add_function('zip', ASTFunctionDefinition([('iterable1', None, ''), ('iterable2', None, '')]))
+    scope.add_function('sum', ASTFunctionDefinition([('iterable', None, '')]))
     scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', None)])]))
     for type_ in cpp_type_from_11l:
         scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([])]))
