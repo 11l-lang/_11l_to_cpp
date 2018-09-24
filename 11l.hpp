@@ -10,6 +10,7 @@ using std::make_tuple;
 #include "11l_hpp/String.hpp"
 #include "11l_hpp/Array.hpp"
 #include "11l_hpp/Dict.hpp"
+#include "11l_hpp/File.hpp"
 
 #include <functional>
 #include <iostream>
@@ -71,3 +72,9 @@ template <typename T1, typename T2> Array<Tuple<T1, T2>> zip(const Array<T1> &ar
 
 #define MAIN_WITH_ARGV() wmain(int argc, wchar_t *argv[])
 #define INIT_ARGV() for (int i=0; i<argc; i++) ::argv.append(String((char16_t*)argv[i], wcslen(argv[i])))
+
+inline void exit(const String &msg)
+{
+	_stderr.write(msg);
+	exit(1);
+}
