@@ -205,7 +205,7 @@ class SymbolNode:
                     if len(fid.ast_nodes) > 1:
                         raise Error('function overloading is not supported for now', self.children[0].token)
                     f_node = fid.ast_nodes[0]
-                    assert(type(f_node) in (ASTFunctionDefinition, ASTTypeDefinition))
+                    assert(type(f_node) in (ASTFunctionDefinition, ASTTypeDefinition) or (type(f_node) in (ASTVariableInitialization, ASTVariableDeclaration) and f_node.function_pointer))
                     if type(f_node) == ASTTypeDefinition:
                         if len(f_node.constructors) == 0:
                             f_node = ASTFunctionDefinition()
@@ -236,11 +236,15 @@ class SymbolNode:
                         res += ', '
 
                 if f_node != None:
-                    while last_function_arg < len(f_node.function_arguments):
-                        if f_node.function_arguments[last_function_arg][1] == None:
-                            t = self.children[len(self.children)-1].token
-                            raise Error('missing required argument `'+ f_node.function_arguments[last_function_arg][0] + '`', Token(t.end, t.end, Token.Category.DELIMITER))
-                        last_function_arg += 1
+                    if type(f_node) == ASTFunctionDefinition:
+                        while last_function_arg < len(f_node.function_arguments):
+                            if f_node.function_arguments[last_function_arg][1] == None:
+                                t = self.children[len(self.children)-1].token
+                                raise Error('missing required argument `'+ f_node.function_arguments[last_function_arg][0] + '`', Token(t.end, t.end, Token.Category.DELIMITER))
+                            last_function_arg += 1
+                    else:
+                        if last_function_arg != len(f_node.type_args):
+                            raise Error('wrong number of arguments passed to function pointer', Token(self.children[0].token.end, self.children[0].token.end, Token.Category.DELIMITER))
 
                 return res + ')'
 
@@ -466,14 +470,20 @@ class ASTExpression(ASTNodeWithExpression):
     def to_str(self, indent):
         return ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
-cpp_type_from_11l = {'A':'auto', 'А':'auto', 'var':'auto', 'перем':'auto', 'Int':'int', 'String':'String', 'Bool':'bool', 'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict'}
+cpp_type_from_11l = {'A':'auto', 'А':'auto', 'var':'auto', 'перем':'auto',
+                     'Int':'int', 'String':'String', 'Bool':'bool',
+                     'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
+                     'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict'}
 
 class ASTVariableDeclaration(ASTNode):
     var : str
     type : str
     type_args : List[str]
+    function_pointer : bool = False
 
     def to_str(self, indent):
+        if self.function_pointer:
+            return ' ' * (indent*4) + 'std::function<' + cpp_type_from_11l[self.type] + '(' + ', '.join(cpp_type_from_11l[ty] for ty in self.type_args) + ')> ' + self.var + ";\n"
         return ' ' * (indent*4) + cpp_type_from_11l[self.type] + ('<' + ', '.join(cpp_type_from_11l[ty] for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + self.var + ";\n"
 
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
@@ -533,7 +543,8 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 arguments.append(('T' + str(index + 1) + ' ' if '=' in arg[3] else 'const T' + str(index + 1) + ' &')
                     + arg[0] + ('' if arg[1] == None or index < self.last_non_default_argument else ' = ' + arg[1].to_str()))
             else:
-                arguments.append(arg[2].rstrip('?') + ' *'
+                arguments.append(arg[2].rstrip('?') + '* '
+                    + ('' if '=' in arg[3] else 'const ')
                     + arg[0] + ('' if arg[1] == None or index < self.last_non_default_argument else ' = ' + arg[1].to_str()))
         return self.children_to_str(indent, 'template <' + ', '.join(templates) + '> ' + s + '(' + ', '.join(arguments) + ')')
 
@@ -1079,7 +1090,20 @@ def parse_internal(this_node):
                         node.type = node_expression.children[0].token.value(source)
                         for i in range(1, len(node_expression.children)):
                             node.type_args.append(node_expression.children[i].to_str())
+                elif node.type == '(': # )
+                    node.function_pointer = True
+                    for i in range(len(node_expression.children)):
+                        child = node_expression.children[i]
+                        if child.token.category == Token.Category.NAME:
+                            node.type_args.append(child.token_str())
+                        else:
+                            assert(child.symbol.id == '->' and i == len(node_expression.children) - 1)
+                            assert(child.children[0].token.category == Token.Category.NAME)
+                            assert(child.children[1].token.category == Token.Category.NAME or child.children[1].token_str() in ('N', 'Н', 'null', 'нуль'))
+                            node.type_args.append(child.children[0].token_str())
+                            node.type = child.children[1].token_str() # return value is the last
                 assert(node.type[0].isupper() or node.type in ('var', 'перем')) # type name must starts with an upper case letter
+                scope.add_name(node.var, node)
             else:
                 node = ASTExpression()
                 node.set_expression(node_expression)
