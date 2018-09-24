@@ -48,7 +48,10 @@ class Converter:
         class Writer:
             write : Callable[[str], None]
         outfile = Writer()
-#       outfile.write = (lambda s: result.append(s)) if outfilef == None else (lambda s: outfilef.write(s))
+        if outfilef == None:
+            outfile.write = lambda s: result.append(s)
+        else:
+            outfile.write = lambda s: outfilef.write(s)
 
         if len(self.to_html_called_inside_to_html_outer_pos_list) == 1:
             self.instr = instr
@@ -107,6 +110,10 @@ T Converter
       T Writer
          (String -> N) write
       A outfile = Writer()
+      I outfilef == N
+         outfile.write = s -> @result.append(s)
+      E
+         outfile.write = s -> @outfilef.write(s)
 
       I .to_html_called_inside_to_html_outer_pos_list.len == 1
          .instr = instr
@@ -183,6 +190,10 @@ public:
             std::function<void(String)> write;
         };
         auto outfile = Writer();
+        if (outfilef == nullptr)
+            outfile.write = [&result](const auto &s){return result.append(s);};
+        else
+            outfile.write = [outfilef](const auto &s){return outfilef->write(s);};
         if (to_html_called_inside_to_html_outer_pos_list.len() == 1)
             this->instr = instr;
 

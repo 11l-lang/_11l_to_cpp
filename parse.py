@@ -25,7 +25,7 @@ class Scope:
         self.parent = None
         if func_args != None:
             self.is_function = True
-            self.ids = dict(map(lambda x: (x, Scope.Id(None)), func_args))
+            self.ids = dict(map(lambda x: (x[0], Scope.Id(x[1])), func_args))
         else:
             self.is_function = False
             self.ids = {}
@@ -341,19 +341,25 @@ class SymbolNode:
                 return child.to_str()
 
             if self.symbol.id == '.':
+                cts0 = self.children[0].token_str()
                 c1 = self.children[1].to_str()
-                if self.children[0].token_str() == '@':
+                if cts0 == '@':
                     if self.scope.find_in_current_function(c1):
                         return 'this->' + c1
                     else:
                         return c1
+                id = self.scope.find(cts0.lstrip('@'))
+                if id != None and id.type != None and id.type.endswith('?'):
+                    return cts0.lstrip('@') + '->' + c1
                 return char_if_len_1(self.children[0]) + '.' + ('len()' if c1 == 'len' else c1) # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
             elif self.symbol.id == '->':
                 captured_variables = set()
                 def gather_captured_variables(sn):
                     if sn.token.category == Token.Category.NAME:
                         if sn.token.value(source)[0] == '@':
-                            captured_variables.add(sn.token.value(source)[1:])
+                            by_ref = sn.parent.children[0] is sn and ((sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!='))
+                                                                   or (sn.parent.symbol.id == '.' and sn.parent.children[1].token_str() == 'append'))
+                            captured_variables.add(('&' if by_ref else '') + sn.token.value(source)[1:])
                     else:
                         for child in sn.children:
                             if child != None:
@@ -983,7 +989,7 @@ def parse_internal(this_node):
                 scope.add_function(node.function_name, node)
 
                 next_token()
-                new_scope(node, map(lambda arg: arg[0], node.function_arguments))
+                new_scope(node, map(lambda arg: (arg[0], arg[2]), node.function_arguments))
 
             elif token.value(source) in ('T', 'Т', 'type', 'тип'):
                 node = ASTTypeDefinition()
