@@ -598,6 +598,17 @@ class ASTException(ASTNodeWithExpression):
     def to_str(self, indent):
         return ' ' * (indent*4) + 'throw ' + self.expression.to_str() + ";\n"
 
+class ASTExceptionTry(ASTNodeWithChildren):
+    def to_str(self, indent):
+        return self.children_to_str(indent, 'try')
+
+class ASTExceptionCatch(ASTNodeWithChildren):
+    exception_object_type : str
+    exception_object_name : str
+
+    def to_str(self, indent):
+        return self.children_to_str(indent, 'catch (const ' + self.exception_object_type + '& ' + self.exception_object_name + ')')
+
 class ASTTypeDefinition(ASTNodeWithChildren):
     base_types : List[str]
     type_name : str
@@ -1063,6 +1074,20 @@ def parse_internal(this_node):
                 if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
                     next_token()
 
+            elif token.value(source) in ('X.try', 'Х.контроль', 'exception.try', 'исключение.контроль'):
+                node = ASTExceptionTry()
+                next_token()
+                new_scope(node)
+
+            elif token.value(source) in ('X.catch', 'Х.перехват', 'exception.catch', 'исключение.перехват'):
+                node = ASTExceptionCatch()
+                node.exception_object_type = expected_name('exception object type name')
+                if token.category != Token.Category.NAME:
+                    raise Error('expected exception object name', token)
+                node.exception_object_name = token.value(source)
+                next_token()
+                new_scope(node)
+
             else:
                 raise Error('unrecognized statement started with keyword', token)
 
@@ -1142,7 +1167,7 @@ def parse(tokens_, source_, suppress_error_please_wrap_in_copy = False): # optio
     scope.add_function('sum', ASTFunctionDefinition([('iterable', None, '')]))
     scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', None)])]))
     for type_ in cpp_type_from_11l:
-        scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([])]))
+        scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', None, '')])]))
     next_token()
     p = ASTProgram()
     if len(tokens_) == 0: return p
