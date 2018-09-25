@@ -76,7 +76,11 @@ if __name__ == '__main__':
     if args_output_html_document and args_habrahabr_html:
         sys.exit("Arguments --output-html-document and --habrahabr-html are mutually exclusive")
 
-    to_html(args_infile.read(), args_outfile, args_output_html_document, habrahabr_html = args_habrahabr_html)
+    try:
+        to_html(args_infile.read(), args_outfile, args_output_html_document, habrahabr_html = args_habrahabr_html)
+    except Exception as e:
+        sys.stderr.write(e.message + " at line " + str(e.line) + ", column " + str(e.column) + "\n")
+        sys.exit(-1)
 ===
 //import sys
 
@@ -150,7 +154,12 @@ A args_outfile = :stdout
 
 I args_output_html_document & args_habrahabr_html
    exit(‘Arguments --output-html-document and --habrahabr-html are mutually exclusive’)
-to_html(args_infile.read(), args_outfile, args_output_html_document, habrahabr_html' args_habrahabr_html)
+
+X.try
+   to_html(args_infile.read(), args_outfile, args_output_html_document, habrahabr_html' args_habrahabr_html)
+X.catch Exception e
+   :stderr.write(e.message‘ at line ’String(e.line)‘, column ’String(e.column)"\n")
+   exit(-1)
 ===
 Array<String> argv;
 
@@ -250,5 +259,14 @@ int MAIN_WITH_ARGV()
     auto args_outfile = _stdout;
     if (args_output_html_document && args_habrahabr_html)
         exit(u"Arguments --output-html-document and --habrahabr-html are mutually exclusive"_S);
-    to_html(args_infile.read(), &args_outfile, args_output_html_document, args_habrahabr_html);
+
+    try
+    {
+        to_html(args_infile.read(), &args_outfile, args_output_html_document, args_habrahabr_html);
+    }
+    catch (const Exception& e)
+    {
+        _stderr.write(e.message + u" at line "_S + String(e.line) + u", column "_S + String(e.column) + u"\n"_S);
+        exit(-1);
+    }
 }

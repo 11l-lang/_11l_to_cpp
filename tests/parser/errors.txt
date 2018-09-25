@@ -116,3 +116,19 @@ F ff(s, i)
 f = ff
 assert(f(‘s’) == ‘ss’)
         ^Error: wrong number of arguments passed to function pointer
+
+
+X.try
+{
+}
+X.catch
+        ^Error: expected exception object type name
+    exit(-1)
+
+
+X.try
+{
+}
+X.catch Exception
+                  ^Error: expected exception object name
+    exit(-1)
