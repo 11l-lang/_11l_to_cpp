@@ -71,7 +71,20 @@ if __name__ == '__main__':
     args_habrahabr_html       = '--habrahabr-html'       in sys.argv
     args_output_html_document = '--output-html-document' in sys.argv
     args_infile = sys.stdin
+    i = 1
+    while i < len(sys.argv):
+        if sys.argv[i] in ('-f', '--file'):
+            i += 2
+            continue
+        if not sys.argv[i].startswith('-'):
+            args_infile = open(sys.argv[i], 'r', encoding = 'utf-8')
+            break
+        i += 1
     args_outfile = sys.stdout
+    if '-f' in sys.argv:
+        args_outfile = open(sys.argv[sys.argv.index('-f')     + 1], 'w', encoding = 'utf-8')
+    elif '--file' in sys.argv:
+        args_outfile = open(sys.argv[sys.argv.index('--file') + 1], 'w', encoding = 'utf-8')
 
     if args_output_html_document and args_habrahabr_html:
         sys.exit("Arguments --output-html-document and --habrahabr-html are mutually exclusive")
@@ -150,7 +163,20 @@ I ‘-h’ C :argv | ‘--help’ C :argv
 A args_habrahabr_html = ‘--habrahabr-html’ C :argv
 A args_output_html_document = ‘--output-html-document’ C :argv
 A args_infile = :stdin
+A i = 1
+L i < :argv.len
+   I :argv[i] C (‘-f’, ‘--file’)
+      i += 2
+      L.continue
+   I !:argv[i].starts_with(‘-’)
+      args_infile = File(:argv[i], ‘r’, encoding' ‘utf-8’)
+      L.break
+   i++
 A args_outfile = :stdout
+I ‘-f’ C :argv
+   args_outfile = File(:argv[:argv.index(‘-f’) + 1], ‘w’, encoding' ‘utf-8’)
+E I ‘--file’ C :argv
+   args_outfile = File(:argv[:argv.index(‘--file’) + 1], ‘w’, encoding' ‘utf-8’)
 
 I args_output_html_document & args_habrahabr_html
    exit(‘Arguments --output-html-document and --habrahabr-html are mutually exclusive’)
@@ -256,7 +282,23 @@ int MAIN_WITH_ARGV()
     auto args_habrahabr_html = in(u"--habrahabr-html"_S, ::argv);
     auto args_output_html_document = in(u"--output-html-document"_S, ::argv);
     auto args_infile = _stdin;
+    auto i = 1;
+    while (i < ::argv.len()) {
+        if (in(::argv[i], make_tuple(u"-f"_S, u"--file"_S))) {
+            i += 2;
+            continue;
+        }
+        if (!::argv[i].starts_with(u"-"_S)) {
+            args_infile = File(::argv[i], u"r"_S, u"utf-8"_S);
+            break;
+        }
+        i++;
+    }
     auto args_outfile = _stdout;
+    if (in(u"-f"_S, ::argv))
+        args_outfile = File(::argv[::argv.index(u"-f"_S) + 1], u"w"_S, u"utf-8"_S);
+    else if (in(u"--file"_S, ::argv))
+        args_outfile = File(::argv[::argv.index(u"--file"_S) + 1], u"w"_S, u"utf-8"_S);
     if (args_output_html_document && args_habrahabr_html)
         exit(u"Arguments --output-html-document and --habrahabr-html are mutually exclusive"_S);
 

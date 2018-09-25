@@ -9,6 +9,25 @@ class File
 public:
 	File(FILE *file) : file(file) {}
 
+	File(const File &f)
+	{
+		assert(f.file == stdin || f.file == stdout || f.file == stderr);
+		file = f.file;
+	}
+
+	File(const String &name, const String &mode = u"r"_S, const String &encoding = u"utf-8"_S)
+	{
+		_wfopen_s(&file, (wchar_t*)name.c_str(), (wchar_t*)mode.c_str());
+	}
+
+	File &operator=(File &&f)
+	{
+		close();
+		file = f.file;
+		f.file = nullptr;
+		return *this;
+	}
+
 	void write(const String &s)
 	{
 		std::string utf8;
@@ -19,7 +38,25 @@ public:
 
 	String read()
 	{
-		return String();
+		fseek(file, 0, SEEK_END);
+		size_t file_size = ftell(file);
+		fseek(file, 0, SEEK_SET);
+
+		std::string file_str;
+		unsigned char utf8bom[3] = {0xEF, 0xBB, 0xBF}, first3bytes[3] = {0};
+		fread(first3bytes, 3, 1, file);
+		if (memcmp(first3bytes, utf8bom, 3) == 0)
+			file_size -= 3;
+		else
+			fseek(file, 0, SEEK_SET);
+		file_str.resize(file_size);
+		fread(file_str.data(), file_size, 1, file);
+
+		String r;
+		r.resize(file_size * 3 / 2);
+		r.resize(MultiByteToWideChar(CP_UTF8, 0, file_str.data(), file_str.size(), (LPWSTR)r.data(), r.size()));
+
+		return r;
 	}
 
 	void close()

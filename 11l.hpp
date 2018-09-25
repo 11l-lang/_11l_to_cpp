@@ -10,7 +10,6 @@ using std::make_tuple;
 #include "11l_hpp/String.hpp"
 #include "11l_hpp/Array.hpp"
 #include "11l_hpp/Dict.hpp"
-#include "11l_hpp/File.hpp"
 
 #include <functional>
 #include <iostream>
@@ -29,6 +28,8 @@ inline void assert_file_line(const char *file_name, int line, bool expression, c
 		throw AssertionError();
 	}
 }
+
+#include "11l_hpp/File.hpp"
 
 inline void print(const String &s, const String &end = u"\n", bool flush = false)
 {
