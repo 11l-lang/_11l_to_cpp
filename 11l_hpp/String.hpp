@@ -33,6 +33,22 @@ public:
 
 	int len() const { return size(); } // return `int` (not `size_t`) to avoid warning C4018: '<': signed/unsigned mismatch
 
+	bool starts_with(const char16_t *s, size_t sz) const
+	{
+		return len() >= (int)sz && memcmp(data(), s, sz*sizeof(char16_t)) == 0;
+	}
+	bool starts_with(const char16_t *&s_) const
+	{
+		for (const char16_t *t = data(), *s = s_; ;s++, t++)
+		{
+			if (*s == 0) return true;
+			if (*t == 0) return false;
+			if (*s != *t) return false;
+		}
+	}
+	template <int N> bool starts_with(const char16_t (&s)[N]) const {return starts_with(s, N-1);}
+	bool starts_with(const String &s) const {return starts_with(s.data(), s.len());}
+
 	friend String &&operator*(String &&s, int n)
 	{
 		int s_len = s.length();

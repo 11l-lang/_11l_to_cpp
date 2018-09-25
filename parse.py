@@ -587,6 +587,14 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
     def walk_expressions(self, f):
         if self.expression != None: f(self.expression)
 
+class ASTContinue(ASTNode):
+    def to_str(self, indent):
+        return ' ' * (indent*4) + "continue;\n"
+
+class ASTBreak(ASTNode):
+    def to_str(self, indent):
+        return ' ' * (indent*4) + "break;\n"
+
 class ASTReturn(ASTNodeWithExpression):
     def to_str(self, indent):
         return ' ' * (indent*4) + 'return' + (' ' + self.expression.to_str() if self.expression != None else '') + ";\n"
@@ -1057,6 +1065,18 @@ def parse_internal(this_node):
                     node.set_expression(expression())
                 new_scope(node)
 
+            elif token.value(source) in ('L.continue', 'Ц.продолжить', 'loop.continue', 'цикл.продолжить'):
+                node = ASTContinue()
+                next_token()
+                if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
+                    next_token()
+
+            elif token.value(source) in ('L.break', 'Ц.прервать', 'loop.break', 'цикл.прервать'):
+                node = ASTBreak()
+                next_token()
+                if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
+                    next_token()
+
             elif token.value(source) in ('R', 'Р', 'return', 'вернуть'):
                 node = ASTReturn()
                 next_token()
@@ -1161,11 +1181,12 @@ def parse(tokens_, source_, suppress_error_please_wrap_in_copy = False): # optio
     token = None
     scope = Scope(None)
     scope.add_function('print', ASTFunctionDefinition([('object', None, ''), ('end', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), R'"\n"'), 'String'), ('flush', SymbolNode(Token(0, 0, Token.Category.CONSTANT)))]))
-    scope.add_function('assert', ASTFunctionDefinition([('expression', None, 'Bool'), ('message', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), ''), 'String')]))
+    scope.add_function('assert', ASTFunctionDefinition([('expression', None, 'Bool'), ('message', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘’'), 'String')]))
     scope.add_function('exit', ASTFunctionDefinition([('arg', None, '')]))
     scope.add_function('zip', ASTFunctionDefinition([('iterable1', None, ''), ('iterable2', None, '')]))
     scope.add_function('sum', ASTFunctionDefinition([('iterable', None, '')]))
     scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', None)])]))
+    scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', None, 'String'), ('mode', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘r’'), 'String'), ('encoding', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘utf-8’'), 'String')])]))
     for type_ in cpp_type_from_11l:
         scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', None, '')])]))
     next_token()

@@ -9,6 +9,14 @@ public:
 	IndexError(int index) : index(index) {}
 };
 
+class ValueError
+{
+public:
+	String value;
+
+	template <typename ValueTy> ValueError(const ValueTy &value) : value(String(value)) {}
+};
+
 template <typename Type> class Array : public std::vector<Type>
 {
 	Array slice(int begin, int end) const
@@ -92,6 +100,13 @@ public:
 	}
 
 	void append(const Type &v) {push_back(v);}
+
+	int index(const Type &v) const
+	{
+		for (int i=0, l=len(); i<l; i++)
+			if (data()[i] == v) return i;
+		throw ValueError(v);
+	}
 };
 
 template <typename Type> Array<Type> create_array(std::initializer_list<Type> il)
