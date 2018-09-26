@@ -60,6 +60,51 @@ class Converter:
             p = self.instr_pos_to_line_column(pos)
             raise Exception(message, p[0], p[1], pos)
 
+        i = 0
+        def next_char(offset = 1):
+            return instr[i + offset] if i + offset < len(instr) else "\0"
+
+        def i_next_str(str): # i_ — if_/is_
+            #return i + len(str) <= len(instr) and instr[i:i+len(str)] == str
+            return instr[i+1:i+1+len(str)] == str # first check is not necessarily in Python
+
+        def prev_char(offset = 1):
+            return instr[i - offset] if i - offset >= 0 else "\0"
+
+        def html_escape(str):
+            str = str.replace('&', '&amp;').replace('<', '&lt;')
+            if self.habrahabr_html:
+                str = str.replace('"', '&quot;') # нужно для корректного отображения кавычек в <a href="http://address">, так как habrahabr автоматически конвертирует "" в «»
+            return str
+        def html_escapeq(str):
+            return str.replace('&', '&amp;').replace('"', '&quot;')
+
+        writepos = 0
+        def write_to_pos(pos, npos):
+            nonlocal writepos
+            outfile.write(html_escape(instr[writepos:pos]))
+            writepos = npos
+
+        def write_to_i(add_str, skip_chars = 1):
+            write_to_pos(i, i+skip_chars)
+            outfile.write(add_str)
+
+        def find_ending_pair_quote(i): # ищет окончание ‘строки’
+            assert(instr[i] == "‘") # ’
+            startqpos = i
+            nesting_level = 0
+            while True:
+                if i == len(instr):
+                    exit_with_error('Unpaired left single quotation mark', startqpos)
+                ch = instr[i]
+                if ch == "‘":
+                    nesting_level += 1
+                elif ch == "’":
+                    nesting_level -= 1
+                    if nesting_level == 0:
+                        return i
+                i += 1
+
 def to_html(instr, outfilef : IO[str] = None, ohd = False, *, habrahabr_html = False):
     return Converter(habrahabr_html, ohd).to_html(instr, outfilef)
 
@@ -152,6 +197,46 @@ T Converter
       F exit_with_error(message, pos)
          A p = @.instr_pos_to_line_column(pos)
          X Exception(message, p[0], p[1], pos)
+      A i = 0
+      F next_char(offset = 1)
+         R I @i + offset < @instr.len {@instr[@i + offset]} E "\0"
+
+      F i_next_str(str)
+         R @instr[@i + 1 .< @i + 1 + str.len] == str
+
+      F prev_char(offset = 1)
+         R I @i - offset >= 0 {@instr[@i - offset]} E "\0"
+
+      F html_escape(=str)
+         str = str.replace(‘&’, ‘&amp;’).replace(‘<’, ‘&lt;’)
+         I @.habrahabr_html
+            str = str.replace(‘"’, ‘&quot;’)
+         R str
+      F html_escapeq(str)
+         R str.replace(‘&’, ‘&amp;’).replace(‘"’, ‘&quot;’)
+      A writepos = 0
+      F write_to_pos(pos, npos)
+         @outfile.write(@html_escape(@instr[@writepos .< pos]))
+         @writepos = npos
+
+      F write_to_i(add_str, skip_chars = 1)
+         @write_to_pos(@i, @i + skip_chars)
+         @outfile.write(add_str)
+
+      F find_ending_pair_quote(=i)
+         assert(@instr[i] == "‘")
+         A startqpos = i
+         A nesting_level = 0
+         L
+            I i == @instr.len
+               @exit_with_error(‘Unpaired left single quotation mark’, startqpos)
+            S @instr[i]
+               "‘"
+                  nesting_level++
+               "’"
+                  I --nesting_level == 0
+                     R i
+            i++
 
 F to_html(instr, File? outfilef = N, ohd = 0B, ', habrahabr_html = 0B)
    R Converter(habrahabr_html, ohd).to_html(instr, outfilef)
@@ -262,6 +347,67 @@ public:
         {
             auto p = instr_pos_to_line_column(pos);
             throw Exception(message, _get<0>(p), _get<1>(p), pos);
+        };
+        auto i = 0;
+        auto next_char = [i, instr](const auto &offset)
+        {
+            return i + offset < instr.len() ? instr[i + offset] : u"\0"_S;
+        };
+
+        auto i_next_str = [i, instr](const auto &str)
+        {
+            return instr[range_el(i + 1, i + 1 + str.len())] == str;
+        };
+
+        auto prev_char = [i, instr](const auto &offset)
+        {
+            return i - offset >= 0 ? instr[i - offset] : u"\0"_S;
+        };
+
+        auto html_escape = [this](auto str)
+        {
+            str = str.replace(u"&"_S, u"&amp;"_S).replace(u"<"_S, u"&lt;"_S);
+            if (habrahabr_html)
+                str = str.replace(u"\""_S, u"&quot;"_S);
+            return str;
+        };
+        auto html_escapeq = [](const auto &str)
+        {
+            return str.replace(u"&"_S, u"&amp;"_S).replace(u"\""_S, u"&quot;"_S);
+        };
+        auto writepos = 0;
+        auto write_to_pos = [&writepos, html_escape, instr, outfile](const auto &pos, const auto &npos)
+        {
+            outfile.write(html_escape(instr[range_el(writepos, pos)]));
+            writepos = npos;
+        };
+
+        auto write_to_i = [i, outfile, write_to_pos](const auto &add_str, const auto &skip_chars)
+        {
+            write_to_pos(i, i + skip_chars);
+            outfile.write(add_str);
+        };
+
+        auto find_ending_pair_quote = [exit_with_error, instr](auto i)
+        {
+            assert(instr[i] == u'‘');
+            auto startqpos = i;
+            auto nesting_level = 0;
+            while (true) {
+                if (i == instr.len())
+                    exit_with_error(u"Unpaired left single quotation mark"_S, startqpos);
+                switch (instr[i])
+                {
+                case u"‘"_S:
+                    nesting_level++;
+                    break;
+                case u"’"_S:
+                    if (--nesting_level == 0)
+                        return i;
+                    break;
+                }
+                i++;
+            }
         };
     }
 };

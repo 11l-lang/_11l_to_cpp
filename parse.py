@@ -538,7 +538,8 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 node.walk_children(gather_captured_variables)
             gather_captured_variables(self)
 
-            return self.children_to_str(indent, 'auto ' + self.function_name + ' = [' + ', '.join(sorted(captured_variables)) + '](' + ', '.join(map(lambda arg: 'const auto &' + arg[0], self.function_arguments)) + ')')[:-1] + ";\n"
+            return self.children_to_str(indent, 'auto ' + self.function_name + ' = [' + ', '.join(sorted(filter(lambda v: not '&'+v in captured_variables, captured_variables))) + '](' \
+                + ', '.join(map(lambda arg: ('auto ' if '=' in arg[3] else 'const auto &') + arg[0], self.function_arguments)) + ')')[:-1] + ";\n"
 
         else:
             s = 'auto ' + self.function_name
@@ -574,6 +575,28 @@ class ASTElseIf(ASTNodeWithChildren, ASTNodeWithExpression):
 class ASTElse(ASTNodeWithChildren):
     def to_str(self, indent):
         return self.children_to_str_detect_single_stmt(indent, 'else')
+
+class ASTSwitch(ASTNodeWithExpression):
+    class Case(ASTNodeWithChildren, ASTNodeWithExpression):
+        pass
+    cases : List[Case]
+
+    def __init__(self):
+        self.cases = []
+
+    def walk_children(self, f):
+        for case in self.cases:
+            for child in case.children:
+                f(child)
+
+    def to_str(self, indent):
+        r = ' ' * (indent*4) + 'switch (' + self.expression.to_str() + ")\n" + ' ' * (indent*4) + "{\n"
+        for case in self.cases:
+            r += ' ' * (indent*4) + 'case ' + case.expression.to_str() + ":\n"
+            for c in case.children:
+                r += c.to_str(indent+1)
+            r += ' ' * ((indent+1)*4) + "break;\n"
+        return r + ' ' * (indent*4) + "}\n"
 
 class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
     loop_variable : str = None
@@ -1052,6 +1075,20 @@ def parse_internal(this_node):
                         next_token()
                         new_scope(n.else_or_elif)
                         break
+
+            elif token.value(source) in ('S', 'В', 'switch', 'выбрать'):
+                node = ASTSwitch()
+                next_token()
+                node.set_expression(expression())
+
+                advance_scope_begin()
+                while token.category != Token.Category.SCOPE_END:
+                    case = ASTSwitch.Case()
+                    case.parent = node
+                    case.set_expression(expression())
+                    new_scope(case)
+                    node.cases.append(case)
+                next_token()
 
             elif token.value(source) in ('L', 'Ц', 'loop', 'цикл'):
                 node = ASTLoop()
