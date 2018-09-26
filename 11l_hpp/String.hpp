@@ -49,6 +49,19 @@ public:
 	template <int N> bool starts_with(const char16_t (&s)[N]) const {return starts_with(s, N-1);}
 	bool starts_with(const String &s) const {return starts_with(s.data(), s.len());}
 
+	String replace(const String &old, const String &n) const
+	{
+		String str(*this);
+		size_t start_pos = 0;
+		while((start_pos = str.find(old, start_pos)) != String::npos) {
+			str.std::u16string::replace(start_pos, old.length(), n);
+			start_pos += n.length();
+		}
+		return str;
+	}
+
+	//String &operator=(const String &s) {assign(s); return *this;}
+
 	friend String &&operator*(String &&s, int n)
 	{
 		int s_len = s.length();
