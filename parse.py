@@ -592,7 +592,7 @@ class ASTSwitch(ASTNodeWithExpression):
     def to_str(self, indent):
         r = ' ' * (indent*4) + 'switch (' + self.expression.to_str() + ")\n" + ' ' * (indent*4) + "{\n"
         for case in self.cases:
-            r += ' ' * (indent*4) + 'case ' + case.expression.to_str() + ":\n"
+            r += ' ' * (indent*4) + ('default' if case.expression.token_str() in ('E', 'И', 'else', 'иначе') else 'case ' + case.expression.to_str()) + ":\n"
             for c in case.children:
                 r += c.to_str(indent+1)
             r += ' ' * ((indent+1)*4) + "break;\n"
@@ -1085,7 +1085,11 @@ def parse_internal(this_node):
                 while token.category != Token.Category.SCOPE_END:
                     case = ASTSwitch.Case()
                     case.parent = node
-                    case.set_expression(expression())
+                    if token.value(source) in ('E', 'И', 'else', 'иначе'):
+                        case.set_expression(tokensn)
+                        next_token()
+                    else:
+                        case.set_expression(expression())
                     new_scope(case)
                     node.cases.append(case)
                 next_token()

@@ -286,3 +286,52 @@ int main()
     f = ff;
     assert(f(u"s"_S, 2) == u"ss");
 }
+
+
+def find_ending_pair_quote(instr, i):
+    nesting_level = 0
+    while True:
+        ch = instr[i]
+        if ch == "‘":
+            nesting_level += 1
+        elif ch == "’":
+            nesting_level -= 1
+            if nesting_level == 0:
+                return i
+        else:
+            return -1
+        i += 1
+===
+F find_ending_pair_quote(instr, =i)
+   A nesting_level = 0
+   L
+      S instr[i]
+         "‘"
+            nesting_level++
+         "’"
+            I --nesting_level == 0
+               R i
+         E
+            R -1
+      i++
+===
+template <typename T1, typename T2> auto find_ending_pair_quote(const T1 &instr, T2 i)
+{
+    auto nesting_level = 0;
+    while (true) {
+        switch (instr[i])
+        {
+        case u"‘"_S:
+            nesting_level++;
+            break;
+        case u"’"_S:
+            if (--nesting_level == 0)
+                return i;
+            break;
+        default:
+            return -1;
+            break;
+        }
+        i++;
+    }
+}
