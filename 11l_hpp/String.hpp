@@ -7,6 +7,8 @@ public:
 
 	Char(int code) : code(code) {}
 
+	operator int() const {return code;} // for `switch (instr[i])` support
+
 	bool operator< (Char c) const {return code <  c.code;}
 	bool operator<=(Char c) const {return code <= c.code;}
 	bool operator> (Char c) const {return code >  c.code;}
@@ -14,6 +16,8 @@ public:
 
 	bool operator==(Char c) const {return code == c.code;}
 	bool operator!=(Char c) const {return code != c.code;}
+	bool operator==(char16_t c) const {return code == c;}
+	bool operator!=(char16_t c) const {return code != c;}
 };
 
 class String : public std::u16string

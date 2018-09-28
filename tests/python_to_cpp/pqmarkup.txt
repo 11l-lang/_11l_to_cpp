@@ -398,10 +398,10 @@ public:
                     exit_with_error(u"Unpaired left single quotation mark"_S, startqpos);
                 switch (instr[i])
                 {
-                case u"‘"_S:
+                case u'‘':
                     nesting_level++;
                     break;
-                case u"’"_S:
+                case u'’':
                     if (--nesting_level == 0)
                         return i;
                     break;
