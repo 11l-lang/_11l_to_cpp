@@ -590,9 +590,18 @@ class ASTSwitch(ASTNodeWithExpression):
                 f(child)
 
     def to_str(self, indent):
+        def is_char(child):
+            ts = child.token_str()
+            return child.token.category == Token.Category.STRING_LITERAL and (len(ts) == 3 or (ts[:2] == '"\\' and len(ts) == 4))
+
+        def char_if_len_1(child):
+            if is_char(child):
+                return "u'" + child.token.value(source)[1:-1] + "'"
+            return child.to_str()
+
         r = ' ' * (indent*4) + 'switch (' + self.expression.to_str() + ")\n" + ' ' * (indent*4) + "{\n"
         for case in self.cases:
-            r += ' ' * (indent*4) + ('default' if case.expression.token_str() in ('E', 'И', 'else', 'иначе') else 'case ' + case.expression.to_str()) + ":\n"
+            r += ' ' * (indent*4) + ('default' if case.expression.token_str() in ('E', 'И', 'else', 'иначе') else 'case ' + char_if_len_1(case.expression)) + ":\n"
             for c in case.children:
                 r += c.to_str(indent+1)
             r += ' ' * ((indent+1)*4) + "break;\n"
@@ -600,12 +609,16 @@ class ASTSwitch(ASTNodeWithExpression):
 
 class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
     loop_variable : str = None
+    there_is_loop_break_inside_switch = False
 
     def to_str(self, indent):
         if self.loop_variable != None:
-            return self.children_to_str_detect_single_stmt(indent, 'for (auto ' + self.loop_variable + ' : ' + self.expression.to_str() + ')')
+            r = self.children_to_str_detect_single_stmt(indent, 'for (auto ' + self.loop_variable + ' : ' + self.expression.to_str() + ')')
         else:
-            return self.children_to_str_detect_single_stmt(indent, 'while (' + (self.expression.to_str() if self.expression != None else 'true') + ')')
+            r = self.children_to_str_detect_single_stmt(indent, 'while (' + (self.expression.to_str() if self.expression != None else 'true') + ')')
+        if self.there_is_loop_break_inside_switch:
+            r += ' ' * (indent*4) + "break_:\n"
+        return r
 
     def walk_expressions(self, f):
         if self.expression != None: f(self.expression)
@@ -614,8 +627,20 @@ class ASTContinue(ASTNode):
     def to_str(self, indent):
         return ' ' * (indent*4) + "continue;\n"
 
-class ASTBreak(ASTNode):
+class ASTLoopBreak(ASTNode):
     def to_str(self, indent):
+        n = self.parent
+        while True:
+            if type(n) == ASTSwitch:
+                n = n.parent
+                while True:
+                    if type(n) == ASTLoop:
+                        n.there_is_loop_break_inside_switch = True
+                        break
+                return ' ' * (indent*4) + "goto break_;\n"
+            if type(n) == ASTLoop:
+                break
+            n = n.parent
         return ' ' * (indent*4) + "break;\n"
 
 class ASTReturn(ASTNodeWithExpression):
@@ -1113,7 +1138,7 @@ def parse_internal(this_node):
                     next_token()
 
             elif token.value(source) in ('L.break', 'Ц.прервать', 'loop.break', 'цикл.прервать'):
-                node = ASTBreak()
+                node = ASTLoopBreak()
                 next_token()
                 if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
                     next_token()

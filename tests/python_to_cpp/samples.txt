@@ -321,10 +321,10 @@ template <typename T1, typename T2> auto find_ending_pair_quote(const T1 &instr,
     while (true) {
         switch (instr[i])
         {
-        case u"‘"_S:
+        case u'‘':
             nesting_level++;
             break;
-        case u"’"_S:
+        case u'’':
             if (--nesting_level == 0)
                 return i;
             break;
@@ -334,4 +334,74 @@ template <typename T1, typename T2> auto find_ending_pair_quote(const T1 &instr,
         }
         i++;
     }
+}
+
+
+def exit_with_error(message, pos):
+    pass
+def write_http_link(instr, i, endpos, q_offset = 1):
+    nesting_level = 0
+    i += 2
+    while True:
+        if i == len(instr):
+            exit_with_error('Unended link', endpos+q_offset)
+        ch = instr[i]
+        if ch == "[":
+            nesting_level += 1
+        elif ch == "]":
+            if nesting_level == 0:
+                break
+            nesting_level -= 1
+        elif ch == " ":
+            break
+        i += 1
+===
+F exit_with_error(message, pos)
+{
+}
+F write_http_link(instr, =i, endpos, q_offset = 1)
+   A nesting_level = 0
+   i += 2
+   L
+      I i == instr.len
+         exit_with_error(‘Unended link’, endpos + q_offset)
+      S instr[i]
+         ‘[’
+            nesting_level++
+         ‘]’
+            I nesting_level == 0
+               L.break
+            --nesting_level
+         ‘ ’
+            L.break
+      i++
+===
+template <typename T1, typename T2> auto exit_with_error(const T1 &message, const T2 &pos)
+{
+}
+
+template <typename T1, typename T2, typename T3, typename T4 = decltype(1)> auto write_http_link(const T1 &instr, T2 i, const T3 &endpos, const T4 &q_offset = 1)
+{
+    auto nesting_level = 0;
+    i += 2;
+    while (true) {
+        if (i == instr.len())
+            exit_with_error(u"Unended link"_S, endpos + q_offset);
+        switch (instr[i])
+        {
+        case u'[':
+            nesting_level++;
+            break;
+        case u']':
+            if (nesting_level == 0)
+                goto break_;
+            --nesting_level;
+            break;
+        case u' ':
+            goto break_;
+            break;
+        }
+        i++;
+    }
+    break_:
 }
