@@ -526,7 +526,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 def f(sn : SymbolNode):
                     if sn.token.category == Token.Category.NAME:
                         if sn.token.value(source)[0] == '@':
-                            by_ref = sn.parent.children[0] is sn and sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!=')
+                            by_ref = sn.parent and sn.parent.children[0] is sn and sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!=')
                             t = sn.token.value(source)[1:]
                             captured_variables.add(('&' if by_ref else '') + ('this' if t == '' else t))
                     else:
@@ -563,11 +563,21 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
 class ASTIf(ASTNodeWithChildren, ASTNodeWithExpression):
     else_or_elif : ASTNode = None
 
+    def walk_children(self, f):
+        super().walk_children(f)
+        if self.else_or_elif != None:
+            self.else_or_elif.walk_children(f)
+
     def to_str(self, indent):
         return self.children_to_str_detect_single_stmt(indent, 'if (' + self.expression.to_str() + ')', check_for_if = True) + (self.else_or_elif.to_str(indent) if self.else_or_elif != None else '')
 
 class ASTElseIf(ASTNodeWithChildren, ASTNodeWithExpression):
     else_or_elif : ASTNode = None
+
+    def walk_children(self, f):
+        super().walk_children(f)
+        if self.else_or_elif != None:
+            self.else_or_elif.walk_children(f)
 
     def to_str(self, indent):
         return self.children_to_str_detect_single_stmt(indent, 'else if (' + self.expression.to_str() + ')', check_for_if = True) + (self.else_or_elif.to_str(indent) if self.else_or_elif != None else '')
@@ -660,10 +670,10 @@ class ASTExceptionTry(ASTNodeWithChildren):
 
 class ASTExceptionCatch(ASTNodeWithChildren):
     exception_object_type : str
-    exception_object_name : str
+    exception_object_name : str = ''
 
     def to_str(self, indent):
-        return self.children_to_str(indent, 'catch (const ' + self.exception_object_type + '& ' + self.exception_object_name + ')')
+        return self.children_to_str(indent, 'catch (const ' + self.exception_object_type + '&' + (' ' + self.exception_object_name if self.exception_object_name != '' else '') + ')')
 
 class ASTTypeDefinition(ASTNodeWithChildren):
     base_types : List[str]
@@ -1090,6 +1100,7 @@ def parse_internal(this_node):
                 while token != None and token.value(source) in ('E', 'И', 'else', 'иначе'):
                     if peek_token().value(source) in ('I', 'Е', 'if', 'если'):
                         n.else_or_elif = ASTElseIf()
+                        n.else_or_elif.parent = n
                         n = n.else_or_elif
                         next_token()
                         next_token()
@@ -1097,6 +1108,7 @@ def parse_internal(this_node):
                         new_scope(n)
                     if token != None and token.value(source) in ('E', 'И', 'else', 'иначе') and not peek_token().value(source) in ('I', 'Е', 'if', 'если'):
                         n.else_or_elif = ASTElse()
+                        n.else_or_elif.parent = n
                         next_token()
                         new_scope(n.else_or_elif)
                         break
@@ -1168,10 +1180,9 @@ def parse_internal(this_node):
             elif token.value(source) in ('X.catch', 'Х.перехват', 'exception.catch', 'исключение.перехват'):
                 node = ASTExceptionCatch()
                 node.exception_object_type = expected_name('exception object type name')
-                if token.category != Token.Category.NAME:
-                    raise Error('expected exception object name', token)
-                node.exception_object_name = token.value(source)
-                next_token()
+                if token.category == Token.Category.NAME:
+                    node.exception_object_name = token.value(source)
+                    next_token()
                 new_scope(node)
 
             else:

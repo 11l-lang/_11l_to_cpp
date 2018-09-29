@@ -105,6 +105,132 @@ class Converter:
                         return i
                 i += 1
 
+        def find_ending_sq_bracket(str, i, start = 0):
+            starti = i
+            assert(str[i] == "[") # ]
+            nesting_level = 0
+            while True:
+                ch = str[i]
+                if ch == "[":
+                    nesting_level += 1
+                elif ch == "]":
+                    nesting_level -= 1
+                    if nesting_level == 0:
+                        return i
+                i += 1
+                if i == len(str):
+                    exit_with_error('Unended comment started', start + starti)
+
+        def remove_comments(s, start, level = 3):
+            while True:
+                j = s.find("["*level) # ]
+                if j == -1:
+                    break
+                k = find_ending_sq_bracket(s, j, start) + 1
+                start += k - j
+                s = s[0:j] + s[k:]
+            return s
+
+        nonunique_links : Dict[int, str] = {}
+        link = ''
+
+        def write_http_link(startpos, endpos, q_offset = 1, text = ''):
+            nonlocal i, link
+            # Ищем окончание ссылки
+            nesting_level = 0
+            i += 2
+            while True:
+                if i == len(instr):
+                    exit_with_error('Unended link', endpos+q_offset)
+                ch = instr[i]
+                if ch == "[":
+                    nesting_level += 1
+                elif ch == "]":
+                    if nesting_level == 0:
+                        break
+                    nesting_level -= 1
+                elif ch == " ":
+                    break
+                i += 1
+
+            link = html_escapeq(instr[endpos+1+q_offset:i])
+            tag : str = '<a href="' + link + '"'
+            if link.startswith('./'):
+                tag += ' target="_self"'
+
+            # Ищем альтернативный текст при такой записи: ссылка[http://... ‘альтернативный текст’]
+            if instr[i] == " ":
+                tag += ' title="'
+                if next_char() == "‘": # ’[
+                    endqpos2 = find_ending_pair_quote(i+1)
+                    assert(instr[endqpos2+1] == ']')
+                    tag += html_escapeq(remove_comments(instr[i+2:endqpos2], i+2))
+                    i = endqpos2 + 1
+                else:
+                    endb = find_ending_sq_bracket(instr, endpos+q_offset)
+                    tag += html_escapeq(remove_comments(instr[i+1:endb], i+1))
+                    i = endb
+                tag += '"'
+            if next_char() == '[' and next_char(2) == '-':
+                j = i + 3
+                while j < len(instr):
+                    if instr[j] == ']':
+                        nonunique_links[int(instr[i+3:j])] = link
+                        i = j
+                        break
+                    if not instr[j].isdigit():
+                        break
+                    j += 1
+            if text == '':
+                write_to_pos(startpos, i+1)
+                text = html_escape(instr[startpos+q_offset:endpos])
+            outfile.write(tag + '>' + (text if text != '' else link) + '</a>')
+
+        def write_note(startpos, endpos, q_offset = 1):
+            nonlocal i
+            i += q_offset
+            endqpos2 = find_ending_pair_quote(i+1) # [[‘
+            if instr[endqpos2+1] != ']':
+                exit_with_error("Bracket ] should follow after ’", endqpos2+1)
+            write_to_pos(startpos, endqpos2+2)
+            outfile.write('<abbr title="'
+                + html_escapeq(remove_comments(instr[i+2:endqpos2], i+2)) + '">'
+                + html_escape(remove_comments(instr[startpos+q_offset:endpos], startpos+q_offset)) + '</abbr>')
+            i = endqpos2 + 1
+
+        endi = 0
+        def numbered_link(offset = 1):
+            if next_char(offset) == '-' and next_char(offset+1).isdigit():
+                j = i + offset + 1
+                while j < len(instr): # [
+                    if instr[j] == ']':
+                        nonlocal link
+                        try:
+                            link = nonunique_links[int(instr[i+offset+1:j])]
+                        except KeyError:
+                            exit_with_error("Link with such index was not declared previously", i+offset+1)
+                        nonlocal endi
+                        endi = j
+                        return True
+                    if not instr[j].isdigit():
+                        break
+                    j += 1
+            return False
+
+        ordered_list_current_number = -1
+        def close_ordered_list():
+            nonlocal ordered_list_current_number
+            if ordered_list_current_number != -1:
+                write_to_i("</li>\n</ol>\n", 0)
+                ordered_list_current_number = -1
+
+        in_unordered_list = False
+        def close_unordered_list():
+            nonlocal in_unordered_list
+            if in_unordered_list:
+                write_to_i("</li>\n</ul>\n", 0)
+                in_unordered_list = False
+
 def to_html(instr, outfilef : IO[str] = None, ohd = False, *, habrahabr_html = False):
     return Converter(habrahabr_html, ohd).to_html(instr, outfilef)
 
@@ -237,6 +363,116 @@ T Converter
                   I --nesting_level == 0
                      R i
             i++
+
+      F find_ending_sq_bracket(str, =i, start = 0)
+         A starti = i
+         assert(str[i] == ‘[’)
+         A nesting_level = 0
+         L
+            S str[i]
+               ‘[’
+                  nesting_level++
+               ‘]’
+                  I --nesting_level == 0
+                     R i
+            i++
+            I i == str.len
+               @exit_with_error(‘Unended comment started’, start + starti)
+
+      F remove_comments(=s, =start, level = 3)
+         L
+            S s.find(‘[’ * level)
+               -1
+                  L.break
+            A k = @find_ending_sq_bracket(s, j, start) + 1
+            start += k - j
+            s = s[0 .< j] + s[k ..]
+         R s
+      Dict[Int, String] nonunique_links
+      A link = ‘’
+
+      F write_http_link(startpos, endpos, q_offset = 1, =text = ‘’)
+         A nesting_level = 0
+         @i += 2
+         L
+            I @i == @instr.len
+               @exit_with_error(‘Unended link’, endpos + q_offset)
+            S @instr[@i]
+               ‘[’
+                  nesting_level++
+               ‘]’
+                  I nesting_level == 0
+                     L.break
+                  --nesting_level
+               ‘ ’
+                  L.break
+            @i++
+         @link = @html_escapeq(@instr[endpos + 1 + q_offset .< @i])
+         String tag = ‘<a href="’@link‘"’
+         I @link.starts_with(‘./’)
+            tag ‘’= ‘ target="_self"’
+
+         I @instr[@i] == ‘ ’
+            tag ‘’= ‘ title="’
+            I @next_char() == "‘"
+               A endqpos2 = @find_ending_pair_quote(@i + 1)
+               assert(@instr[endqpos2 + 1] == ‘]’)
+               tag ‘’= @html_escapeq(@remove_comments(@instr[@i + 2 .< endqpos2], @i + 2))
+               @i = endqpos2 + 1
+            E
+               A endb = @find_ending_sq_bracket(@instr, endpos + q_offset)
+               tag ‘’= @html_escapeq(@remove_comments(@instr[@i + 1 .< endb], @i + 1))
+               @i = endb
+            tag ‘’= ‘"’
+         I @next_char() == ‘[’ & @next_char(2) == ‘-’
+            A j = @i + 3
+            L j < @instr.len
+               I @instr[j] == ‘]’
+                  @nonunique_links[Int(@instr[@i + 3 .< j])] = @link
+                  @i = j
+                  L.break
+               I !@instr[j].isdigit()
+                  L.break
+               j++
+         I text == ‘’
+            @write_to_pos(startpos, @i + 1)
+            text = @html_escape(@instr[startpos + q_offset .< endpos])
+         @outfile.write(tag‘>’(I text != ‘’ {text} E @link)‘</a>’)
+
+      F write_note(startpos, endpos, q_offset = 1)
+         @i += q_offset
+         A endqpos2 = @find_ending_pair_quote(@i + 1)
+         I @instr[endqpos2 + 1] != ‘]’
+            @exit_with_error("Bracket ] should follow after ’", endqpos2 + 1)
+         @write_to_pos(startpos, endqpos2 + 2)
+         @outfile.write(‘<abbr title="’@html_escapeq(@remove_comments(@instr[@i + 2 .< endqpos2], @i + 2))‘">’@html_escape(@remove_comments(@instr[startpos + q_offset .< endpos], startpos + q_offset))‘</abbr>’)
+         @i = endqpos2 + 1
+      A endi = 0
+      F numbered_link(offset = 1)
+         I @next_char(offset) == ‘-’ & @next_char(offset + 1).isdigit()
+            A j = @i + offset + 1
+            L j < @instr.len
+               I @instr[j] == ‘]’
+                  X.try
+                     @link = @nonunique_links[Int(@instr[@i + offset + 1 .< j])]
+                  X.catch KeyError
+                     @exit_with_error(‘Link with such index was not declared previously’, @i + offset + 1)
+                  @endi = j
+                  R 1B
+               I !@instr[j].isdigit()
+                  L.break
+               j++
+         R 0B
+      A ordered_list_current_number = -1
+      F close_ordered_list()
+         I @ordered_list_current_number != -1
+            @write_to_i("</li>\n</ol>\n", 0)
+            @ordered_list_current_number = -1
+      A in_unordered_list = 0B
+      F close_unordered_list()
+         I @in_unordered_list
+            @write_to_i("</li>\n</ul>\n", 0)
+            @in_unordered_list = 0B
 
 F to_html(instr, File? outfilef = N, ohd = 0B, ', habrahabr_html = 0B)
    R Converter(habrahabr_html, ohd).to_html(instr, outfilef)
@@ -407,6 +643,163 @@ public:
                     break;
                 }
                 i++;
+            }
+        };
+
+        auto find_ending_sq_bracket = [exit_with_error](const auto &str, auto i, const auto &start)
+        {
+            auto starti = i;
+            assert(str[i] == u'[');
+            auto nesting_level = 0;
+            while (true) {
+                switch (str[i])
+                {
+                case u'[':
+                    nesting_level++;
+                    break;
+                case u']':
+                    if (--nesting_level == 0)
+                        return i;
+                    break;
+                }
+                i++;
+                if (i == str.len())
+                    exit_with_error(u"Unended comment started"_S, start + starti);
+            }
+        };
+
+        auto remove_comments = [find_ending_sq_bracket](auto s, auto start, const auto &level)
+        {
+            while (true) {
+                switch (s.find(u"["_S * level))
+                {
+                case -1:
+                    goto break_;
+                    break;
+                }
+                auto k = find_ending_sq_bracket(s, j, start) + 1;
+                start += k - j;
+                s = s[range_el(0, j)] + s[range_ei(k)];
+            }
+            break_:
+            return s;
+        };
+        Dict<int, String> nonunique_links;
+        auto link = u""_S;
+
+        auto write_http_link = [&i, &link, exit_with_error, find_ending_pair_quote, find_ending_sq_bracket, html_escape, html_escapeq, instr, next_char, nonunique_links, outfile, remove_comments, write_to_pos](const auto &startpos, const auto &endpos, const auto &q_offset, auto text)
+        {
+            auto nesting_level = 0;
+            i += 2;
+            while (true) {
+                if (i == instr.len())
+                    exit_with_error(u"Unended link"_S, endpos + q_offset);
+                switch (instr[i])
+                {
+                case u'[':
+                    nesting_level++;
+                    break;
+                case u']':
+                    if (nesting_level == 0)
+                        goto break_;
+                    --nesting_level;
+                    break;
+                case u' ':
+                    goto break_;
+                    break;
+                }
+                i++;
+            }
+            break_:
+            link = html_escapeq(instr[range_el(endpos + 1 + q_offset, i)]);
+            String tag = u"<a href=\""_S + link + u"\""_S;
+            if (link.starts_with(u"./"_S))
+                tag += u" target=\"_self\""_S;
+
+            if (instr[i] == u' ') {
+                tag += u" title=\""_S;
+                if (next_char() == u'‘') {
+                    auto endqpos2 = find_ending_pair_quote(i + 1);
+                    assert(instr[endqpos2 + 1] == u']');
+                    tag += html_escapeq(remove_comments(instr[range_el(i + 2, endqpos2)], i + 2));
+                    i = endqpos2 + 1;
+                }
+                else {
+                    auto endb = find_ending_sq_bracket(instr, endpos + q_offset);
+                    tag += html_escapeq(remove_comments(instr[range_el(i + 1, endb)], i + 1));
+                    i = endb;
+                }
+                tag += u"\""_S;
+            }
+            if (next_char() == u'[' && next_char(2) == u'-') {
+                auto j = i + 3;
+                while (j < instr.len()) {
+                    if (instr[j] == u']') {
+                        nonunique_links.set(Int(instr[range_el(i + 3, j)]), link);
+                        i = j;
+                        break;
+                    }
+                    if (!instr[j].isdigit())
+                        break;
+                    j++;
+                }
+            }
+            if (text == u"") {
+                write_to_pos(startpos, i + 1);
+                text = html_escape(instr[range_el(startpos + q_offset, endpos)]);
+            }
+            outfile.write(tag + u">"_S + (text != u"" ? text : link) + u"</a>"_S);
+        };
+
+        auto write_note = [&i, exit_with_error, find_ending_pair_quote, html_escape, html_escapeq, instr, outfile, remove_comments, write_to_pos](const auto &startpos, const auto &endpos, const auto &q_offset)
+        {
+            i += q_offset;
+            auto endqpos2 = find_ending_pair_quote(i + 1);
+            if (instr[endqpos2 + 1] != u']')
+                exit_with_error(u"Bracket ] should follow after ’"_S, endqpos2 + 1);
+            write_to_pos(startpos, endqpos2 + 2);
+            outfile.write(u"<abbr title=\""_S + html_escapeq(remove_comments(instr[range_el(i + 2, endqpos2)], i + 2)) + u"\">"_S + html_escape(remove_comments(instr[range_el(startpos + q_offset, endpos)], startpos + q_offset)) + u"</abbr>"_S);
+            i = endqpos2 + 1;
+        };
+        auto endi = 0;
+        auto numbered_link = [&endi, &link, exit_with_error, i, instr, next_char, nonunique_links](const auto &offset)
+        {
+            if (next_char(offset) == u'-' && next_char(offset + 1).isdigit()) {
+                auto j = i + offset + 1;
+                while (j < instr.len()) {
+                    if (instr[j] == u']') {
+                        try
+                        {
+                            link = nonunique_links[Int(instr[range_el(i + offset + 1, j)])];
+                        }
+                        catch (const KeyError&)
+                        {
+                            exit_with_error(u"Link with such index was not declared previously"_S, i + offset + 1);
+                        }
+                        endi = j;
+                        return true;
+                    }
+                    if (!instr[j].isdigit())
+                        break;
+                    j++;
+                }
+            }
+            return false;
+        };
+        auto ordered_list_current_number = -1;
+        auto close_ordered_list = [&ordered_list_current_number, write_to_i]()
+        {
+            if (ordered_list_current_number != -1) {
+                write_to_i(u"</li>\n</ol>\n"_S, 0);
+                ordered_list_current_number = -1;
+            }
+        };
+        auto in_unordered_list = false;
+        auto close_unordered_list = [&in_unordered_list, write_to_i]()
+        {
+            if (in_unordered_list) {
+                write_to_i(u"</li>\n</ul>\n"_S, 0);
+                in_unordered_list = false;
             }
         };
     }

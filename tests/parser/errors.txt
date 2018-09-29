@@ -126,6 +126,7 @@ X.catch
     exit(-1)
 
 
+---
 X.try
 {
 }
