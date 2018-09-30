@@ -58,6 +58,13 @@ public:
 		return r.first->second;
 	}
 
+	const ValueType &operator[](const KeyType &key) const
+	{
+		auto r = find(key);
+		if (r == end()) throw KeyError(String(key));
+		return r->second;
+	}
+
 	void set(const KeyType &key, const ValueType &value)
 	{
 		//insert(std::make_pair(key, value)); //`insert()` does not assign value if it already exists in the map

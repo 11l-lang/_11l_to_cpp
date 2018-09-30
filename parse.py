@@ -198,12 +198,31 @@ class SymbolNode:
             if self.function_call:
                 func_name = self.children[0].to_str()
                 f_node = None
-                if self.children[0].symbol.id != '.':
+                if self.children[0].symbol.id == '.':
+                    if len(self.children[0].children) == 1:
+                        s = self.scope
+                        while True:
+                            if s.is_function:
+                                for id in s.parent.ids.values():
+                                    if type(id.ast_nodes[0].parent) == ASTTypeDefinition:
+                                        fid = s.parent.ids.get(self.children[0].children[0].to_str())
+                                        if fid == None:
+                                            raise Error('call of undefined method `' + func_name + '`', self.children[0].children[0].token)
+                                        if len(fid.ast_nodes) > 1:
+                                            raise Error('methods\' overloading is not supported for now', self.children[0].children[0].token)
+                                        f_node = fid.ast_nodes[0]
+                                    break
+                                break
+                            s = s.parent
+                            assert(s)
+                elif func_name == 'Int':
+                    func_name = 'parse_int'
+                else:
                     fid = self.scope.find(func_name)
                     if fid == None:
                         raise Error('call of undefined function `' + func_name + '`', self.children[0].token)
                     if len(fid.ast_nodes) > 1:
-                        raise Error('function overloading is not supported for now', self.children[0].token)
+                        raise Error('functions\' overloading is not supported for now', self.children[0].token)
                     f_node = fid.ast_nodes[0]
                     assert(type(f_node) in (ASTFunctionDefinition, ASTTypeDefinition) or (type(f_node) in (ASTVariableInitialization, ASTVariableDeclaration) and f_node.function_pointer))
                     if type(f_node) == ASTTypeDefinition:
@@ -503,6 +522,7 @@ class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
 
 class ASTFunctionDefinition(ASTNodeWithChildren):
     function_name : str
+    function_return_type : str = ''
     function_arguments : List[Tuple[str, SymbolNode, str]]# = []
     first_named_only_argument = None
     last_non_default_argument : int
@@ -516,9 +536,9 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
             if self.function_name == '': # this is constructor
                 s = self.parent.type_name
             elif self.function_name == '()': # this is `operator()`
-                s = 'auto operator()'
+                s = ('auto' if self.function_return_type == '' else cpp_type_from_11l[self.function_return_type]) + ' operator()'
             else:
-                s = 'auto ' + self.function_name
+                s = ('auto' if self.function_return_type == '' else cpp_type_from_11l[self.function_return_type]) + ' ' + self.function_name
 
         elif type(self.parent) != ASTProgram: # local functions [i.e. functions inside functions] are represented as C++ lambdas
             captured_variables = set()
@@ -538,11 +558,13 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 node.walk_children(gather_captured_variables)
             gather_captured_variables(self)
 
-            return self.children_to_str(indent, 'auto ' + self.function_name + ' = [' + ', '.join(sorted(filter(lambda v: not '&'+v in captured_variables, captured_variables))) + '](' \
-                + ', '.join(map(lambda arg: ('auto ' if '=' in arg[3] else 'const auto &') + arg[0], self.function_arguments)) + ')')[:-1] + ";\n"
+            return self.children_to_str(indent, ('auto' if self.function_return_type == '' else cpp_type_from_11l[self.function_return_type]) + ' ' + self.function_name
+                + ' = [' + ', '.join(sorted(filter(lambda v: not '&'+v in captured_variables, captured_variables))) + '](' \
+                + ', '.join(map(lambda arg: ('auto ' if '=' in arg[3] else 'const auto &') + arg[0] if arg[1] == None else
+                                                 ('' if '=' in arg[3] else 'const ') + 'decltype(' + arg[1].to_str() + ') ' + arg[0] + ' = ' + arg[1].to_str(), self.function_arguments)) + ')')[:-1] + ";\n"
 
         else:
-            s = 'auto ' + self.function_name
+            s = ('auto' if self.function_return_type == '' else cpp_type_from_11l[self.function_return_type]) + ' ' + self.function_name
 
         if len(self.function_arguments) == 0:
             return self.children_to_str(indent, s + '()')
@@ -1071,6 +1093,11 @@ def parse_internal(this_node):
                 scope.add_function(node.function_name, node)
 
                 next_token()
+                if token.value(source) == '->':
+                    next_token()
+                    node.function_return_type = token.value(source)
+                    next_token()
+
                 new_scope(node, map(lambda arg: (arg[0], arg[2]), node.function_arguments))
 
             elif token.value(source) in ('T', 'Т', 'type', 'тип'):

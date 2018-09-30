@@ -74,7 +74,7 @@ F f(a, b)
 {
 }
 f(1)
-^Error: function overloading is not supported for now
+^Error: functions' overloading is not supported for now
 
 
 F f(a = 1, bb = 2)
