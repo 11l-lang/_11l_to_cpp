@@ -41,7 +41,7 @@ class Converter:
             t += 1
         return (line, pos - line_start)
 
-    def to_html(self, instr, outfilef : IO[str] = None, *, outer_pos = 0):
+    def to_html(self, instr, outfilef : IO[str] = None, *, outer_pos = 0) -> str:
         self.to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
 
         result : List[str] = [] # this should be faster than using regular string
@@ -62,14 +62,14 @@ class Converter:
 
         i = 0
         def next_char(offset = 1):
-            return instr[i + offset] if i + offset < len(instr) else "\0"
+            return instr[i + offset] if i + offset < len(instr) else "\0"[0]
 
         def i_next_str(str): # i_ — if_/is_
             #return i + len(str) <= len(instr) and instr[i:i+len(str)] == str
             return instr[i+1:i+1+len(str)] == str # first check is not necessarily in Python
 
         def prev_char(offset = 1):
-            return instr[i - offset] if i - offset >= 0 else "\0"
+            return instr[i - offset] if i - offset >= 0 else "\0"[0]
 
         def html_escape(str):
             str = str.replace('&', '&amp;').replace('<', '&lt;')
@@ -231,6 +231,136 @@ class Converter:
                 write_to_i("</li>\n</ul>\n", 0)
                 in_unordered_list = False
 
+        ending_tags : List[str] = []
+        new_line_tag = "\0"
+
+        while i < len(instr):
+            ch = instr[i]
+            if i == 0 or prev_char() == "\n": # if beginning of line
+                if ch == '.' and (next_char() in ' ‘'): # ’ this is unordered list
+                    close_ordered_list()
+                    s = ''
+                    if not in_unordered_list:
+                        s = "<ul>\n<li>"
+                        in_unordered_list = True
+                    else:
+                        s = "</li>\n<li>"
+                    write_to_i(s)
+                    new_line_tag = '' # используем тот факт, что разрыва строк в списках вида `. элемент списка` быть не может, и следующий символ \n будет либо закрывать список, либо обозначать начало следующего элемента списка
+                    if next_char() == ' ':
+                        i += 1
+                    else:
+                        endqpos = find_ending_pair_quote(i + 1)
+                        outfile.write(self.to_html(instr[i+2:endqpos], outer_pos = i+2))
+                        i = endqpos
+                    writepos = i + 1
+                else:
+                    close_unordered_list()
+                    if ch.isdigit():
+                        j = i + 1
+                        while j < len(instr):
+                            if not instr[j].isdigit():
+                                break
+                            j += 1
+                        if instr[j:j+1] == '.' and instr[j+1:j+2] in (' ', '‘'): # ’ this is ordered list
+                            value = int(instr[i:j])
+                            s = ''
+                            if ordered_list_current_number == -1:
+                                s = ('<ol>' if value == 1 else '<ol start="' + str(value) + '">') + "\n<li>"
+                                ordered_list_current_number = value
+                            else:
+                                s = "</li>\n" + ("<li>" if value == ordered_list_current_number + 1 else '<li value="' + str(value) + '">')
+                                ordered_list_current_number = value
+                            write_to_i(s)
+                            new_line_tag = '' # используем тот факт, что разрыва строк в списках вида `1. элемент списка` быть не может
+                            if instr[j+1] == ' ':
+                                i = j + 1
+                            else:
+                                endqpos = find_ending_pair_quote(j + 1)
+                                outfile.write(self.to_html(instr[j+2:endqpos], outer_pos = j+2))
+                                i = endqpos
+                            writepos = i + 1
+                        else:
+                            close_ordered_list()
+                    else:
+                        close_ordered_list()
+
+                if ch == ' ':
+                    write_to_i('&emsp;')
+                elif ch == '-': # horizontal rule
+                    if i_next_str('--'):
+                        j = i + 3
+                        while True:
+                            if j == len(instr) or instr[j] == "\n":
+                                write_to_i("<hr />\n")
+                                i = j
+                                writepos = j + 1
+                                break
+                            if instr[j] != '-':
+                                break
+                            j += 1
+                elif ch in ('>', '<') and (next_char() in ' ‘['): # this is blockquote # ]’
+                    write_to_pos(i, i + 2)
+                    outfile.write('<blockquote'+(ch=='<')*' class="re"'+'>')
+                    if next_char() == ' ': # > Quoted text.
+                        new_line_tag = '</blockquote>'
+                    else:
+                        if next_char() == '[': # ]
+                            if numbered_link(2): # >[-1]:‘Quoted text.’
+                                linkstr = link
+                                if len(linkstr) > 57:
+                                    linkstr = linkstr[:linkstr.rfind('/', 0, 47)+1] + '...'
+                                outfile.write('<a href="' + link + '">[' + instr[i+3:endi] + ']<i>' + linkstr + '</i></a>')
+                                i = endi + 1
+                            else: # >[http...]:‘Quoted text.’ or >[http...][-1]:‘Quoted text.’
+                                i += 1
+                                endb = find_ending_sq_bracket(instr, i)
+                                linkn = ''
+                                if instr[endb+1:endb+3] == '[-': # ]
+                                    linkn = '['+instr[endb+3:find_ending_sq_bracket(instr, endb+1)]+']'
+                                link = instr[i + 1:endb]
+                                spacepos = link.find(' ')
+                                if spacepos != -1:
+                                    link = link[:spacepos]
+                                if len(link) > 57:
+                                    link = link[:link.rfind('/', 0, 47)+1] + '...'
+                                write_http_link(i, i, 0, linkn+'<i>'+link+'</i>') # this function changes `link` :o, but I left[‘I mean didn't rename it to `link_`’] it as is [at least for a while] because it still works correctly
+                                i += 1
+                            if instr[i:i+2] != ':‘': # ’
+                                exit_with_error("Quotation with url should always has :‘...’ after ["+link[:link.find(':')]+"://url]", i)
+                            outfile.write(":<br />\n")
+                            writepos = i + 2
+                        else:
+                            endqpos = find_ending_pair_quote(i + 1)
+                            if instr[endqpos+1:endqpos+2] == "[": # >‘Author's name’[http...]:‘Quoted text.’ # ]
+                                startqpos = i + 1
+                                i = endqpos
+                                outfile.write('<i>')
+                                write_http_link(startqpos, endqpos)
+                                outfile.write('</i>')
+                                i += 1
+                                if instr[i:i+2] != ':‘': # ’
+                                    exit_with_error("Quotation with url should always has :‘...’ after ["+link[:link.find(':')]+"://url]", i)
+                                outfile.write(":<br />\n")
+                                writepos = i + 2
+                            elif instr[endqpos+1:endqpos+2] == ":": # >‘Author's name’:‘Quoted text.’
+                                outfile.write("<i>"+instr[i+2:endqpos]+"</i>:<br />\n")
+                                i = endqpos + 2
+                                if instr[i:i+1] != '‘': # ’
+                                    exit_with_error("Quotation with author's name should be in the form >‘Author's name’:‘Quoted text.’ (opening quotation mark not found after colon)", i)
+                                writepos = i + 1
+                            # else this is just >‘Quoted text.’
+                        ending_tags.append('</blockquote>')
+                    i += 1
+
+        if outfilef == None:
+            r = "".join(result)
+            if self.habrahabr_html:                               # // dirty hack
+                r = r.replace("</blockquote>\n", '</blockquote>') # \\ (just left it as is)
+            return r
+
+        return ''
+
 def to_html(instr, outfilef : IO[str] = None, ohd = False, *, habrahabr_html = False):
     return Converter(habrahabr_html, ohd).to_html(instr, outfilef)
 
@@ -306,7 +436,7 @@ T Converter
          t++
       R (line, pos - line_start)
 
-   F to_html(instr, File? outfilef = N, ', outer_pos = 0)
+   F to_html(instr, File? outfilef = N, ', outer_pos = 0) -> String
       .to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
       Array[String] result
       T Writer
@@ -325,13 +455,13 @@ T Converter
          X Exception(message, p[0], p[1], pos)
       A i = 0
       F next_char(offset = 1)
-         R I @i + offset < @instr.len {@instr[@i + offset]} E "\0"
+         R I @i + offset < @instr.len {@instr[@i + offset]} E "\0"[0]
 
       F i_next_str(str)
          R @instr[@i + 1 .< @i + 1 + str.len] == str
 
       F prev_char(offset = 1)
-         R I @i - offset >= 0 {@instr[@i - offset]} E "\0"
+         R I @i - offset >= 0 {@instr[@i - offset]} E "\0"[0]
 
       F html_escape(=str)
          str = str.replace(‘&’, ‘&amp;’).replace(‘<’, ‘&lt;’)
@@ -381,9 +511,9 @@ T Converter
 
       F remove_comments(=s, =start, level = 3)
          L
-            S s.find(‘[’ * level)
-               -1
-                  L.break
+            A j = s.findi(‘[’ * level)
+            I j == -1
+               L.break
             A k = @find_ending_sq_bracket(s, j, start) + 1
             start += k - j
             s = s[0 .< j] + s[k ..]
@@ -473,6 +603,133 @@ T Converter
          I @in_unordered_list
             @write_to_i("</li>\n</ul>\n", 0)
             @in_unordered_list = 0B
+      Array[String] ending_tags
+      A new_line_tag = "\0"
+
+      L i < instr.len
+         A ch = instr[i]
+         I i == 0 | prev_char() == "\n"
+            I ch == ‘.’ & (next_char() C " ‘")
+               close_ordered_list()
+               A s = ‘’
+               I !in_unordered_list
+                  s = "<ul>\n<li>"
+                  in_unordered_list = 1B
+               E
+                  s = "</li>\n<li>"
+               write_to_i(s)
+               new_line_tag = ‘’
+               I next_char() == ‘ ’
+                  i++
+               E
+                  A endqpos = find_ending_pair_quote(i + 1)
+                  outfile.write(.to_html(instr[i + 2 .< endqpos], outer_pos' i + 2))
+                  i = endqpos
+               writepos = i + 1
+            E
+               close_unordered_list()
+               I ch.isdigit()
+                  A j = i + 1
+                  L j < instr.len
+                     I !instr[j].isdigit()
+                        L.break
+                     j++
+                  I instr[j .< j + 1] == ‘.’ & instr[j + 1 .< j + 2] C (‘ ’, "‘")
+                     A value = Int(instr[i .< j])
+                     A s = ‘’
+                     I ordered_list_current_number == -1
+                        s = (I value == 1 {‘<ol>’} E ‘<ol start="’String(value)‘">’)"\n<li>"
+                        ordered_list_current_number = value
+                     E
+                        s = "</li>\n"(I value == ordered_list_current_number + 1 {‘<li>’} E ‘<li value="’String(value)‘">’)
+                        ordered_list_current_number = value
+                     write_to_i(s)
+                     new_line_tag = ‘’
+                     I instr[j + 1] == ‘ ’
+                        i = j + 1
+                     E
+                        A endqpos = find_ending_pair_quote(j + 1)
+                        outfile.write(.to_html(instr[j + 2 .< endqpos], outer_pos' j + 2))
+                        i = endqpos
+                     writepos = i + 1
+                  E
+                     close_ordered_list()
+               E
+                  close_ordered_list()
+
+            I ch == ‘ ’
+               write_to_i(‘&emsp;’)
+            E I ch == ‘-’
+               I i_next_str(‘--’)
+                  A j = i + 3
+                  L
+                     I j == instr.len | instr[j] == "\n"
+                        write_to_i("<hr />\n")
+                        i = j
+                        writepos = j + 1
+                        L.break
+                     I instr[j] != ‘-’
+                        L.break
+                     j++
+            E I ch C (‘>’, ‘<’) & (next_char() C " ‘[")
+               write_to_pos(i, i + 2)
+               outfile.write(‘<blockquote’((ch == ‘<’) * ‘ class="re"’)‘>’)
+               I next_char() == ‘ ’
+                  new_line_tag = ‘</blockquote>’
+               E
+                  I next_char() == ‘[’
+                     I numbered_link(2)
+                        A linkstr = link
+                        I linkstr.len > 57
+                           linkstr = linkstr[0 .< linkstr.rfindi(‘/’, 0, 47) + 1]‘...’
+                        outfile.write(‘<a href="’link‘">[’instr[i + 3 .< endi]‘]<i>’linkstr‘</i></a>’)
+                        i = endi + 1
+                     E
+                        i++
+                        A endb = find_ending_sq_bracket(instr, i)
+                        A linkn = ‘’
+                        I instr[endb + 1 .< endb + 3] == ‘[-’
+                           linkn = ‘[’instr[endb + 3 .< find_ending_sq_bracket(instr, endb + 1)]‘]’
+                        link = instr[i + 1 .< endb]
+                        A spacepos = link.findi(‘ ’)
+                        I spacepos != -1
+                           link = link[0 .< spacepos]
+                        I link.len > 57
+                           link = link[0 .< link.rfindi(‘/’, 0, 47) + 1]‘...’
+                        write_http_link(i, i, 0, linkn‘<i>’link‘</i>’)
+                        i++
+                     I instr[i .< i + 2] != ":‘"
+                        exit_with_error(‘Quotation with url should always has :‘...’ after [’link[0 .< link.findi(‘:’)]‘://url]’, i)
+                     outfile.write(":<br />\n")
+                     writepos = i + 2
+                  E
+                     A endqpos = find_ending_pair_quote(i + 1)
+                     I instr[endqpos + 1 .< endqpos + 2] == ‘[’
+                        A startqpos = i + 1
+                        i = endqpos
+                        outfile.write(‘<i>’)
+                        write_http_link(startqpos, endqpos)
+                        outfile.write(‘</i>’)
+                        i++
+                        I instr[i .< i + 2] != ":‘"
+                           exit_with_error(‘Quotation with url should always has :‘...’ after [’link[0 .< link.findi(‘:’)]‘://url]’, i)
+                        outfile.write(":<br />\n")
+                        writepos = i + 2
+                     E I instr[endqpos + 1 .< endqpos + 2] == ‘:’
+                        outfile.write(‘<i>’instr[i + 2 .< endqpos]"</i>:<br />\n")
+                        i = endqpos + 2
+                        I instr[i .< i + 1] != "‘"
+                           exit_with_error(‘Quotation with author's name should be in the form >‘Author's name’:‘Quoted text.’ (opening quotation mark not found after colon)’, i)
+                        writepos = i + 1
+                  ending_tags.append(‘</blockquote>’)
+               i++
+
+      I outfilef == N
+         A r = result.join(‘’)
+         I .habrahabr_html
+            r = r.replace("</blockquote>\n", ‘</blockquote>’)
+         R r
+      R ‘’
 
 F to_html(instr, File? outfilef = N, ohd = 0B, ', habrahabr_html = 0B)
    R Converter(habrahabr_html, ohd).to_html(instr, outfilef)
@@ -562,7 +819,7 @@ public:
         return make_tuple(line, pos - line_start);
     }
 
-    template <typename T1, typename T3 = decltype(0)> auto to_html(const T1 &instr, File* const outfilef = nullptr, const T3 &outer_pos = 0)
+    template <typename T1, typename T3 = decltype(0)> String to_html(const T1 &instr, File* const outfilef = nullptr, const T3 &outer_pos = 0)
     {
         to_html_called_inside_to_html_outer_pos_list.append(outer_pos);
         Array<String> result;
@@ -585,9 +842,9 @@ public:
             throw Exception(message, _get<0>(p), _get<1>(p), pos);
         };
         auto i = 0;
-        auto next_char = [i, instr](const auto &offset)
+        auto next_char = [i, instr](const decltype(1) offset = 1)
         {
-            return i + offset < instr.len() ? instr[i + offset] : u"\0"_S;
+            return i + offset < instr.len() ? instr[i + offset] : _get<0>(u"\0"_S);
         };
 
         auto i_next_str = [i, instr](const auto &str)
@@ -595,9 +852,9 @@ public:
             return instr[range_el(i + 1, i + 1 + str.len())] == str;
         };
 
-        auto prev_char = [i, instr](const auto &offset)
+        auto prev_char = [i, instr](const decltype(1) offset = 1)
         {
-            return i - offset >= 0 ? instr[i - offset] : u"\0"_S;
+            return i - offset >= 0 ? instr[i - offset] : _get<0>(u"\0"_S);
         };
 
         auto html_escape = [this](auto str)
@@ -618,7 +875,7 @@ public:
             writepos = npos;
         };
 
-        auto write_to_i = [i, outfile, write_to_pos](const auto &add_str, const auto &skip_chars)
+        auto write_to_i = [i, outfile, write_to_pos](const auto &add_str, const decltype(1) skip_chars = 1)
         {
             write_to_pos(i, i + skip_chars);
             outfile.write(add_str);
@@ -646,7 +903,7 @@ public:
             }
         };
 
-        auto find_ending_sq_bracket = [exit_with_error](const auto &str, auto i, const auto &start)
+        auto find_ending_sq_bracket = [exit_with_error](const auto &str, auto i, const decltype(0) start = 0)
         {
             auto starti = i;
             assert(str[i] == u'[');
@@ -668,26 +925,22 @@ public:
             }
         };
 
-        auto remove_comments = [find_ending_sq_bracket](auto s, auto start, const auto &level)
+        auto remove_comments = [find_ending_sq_bracket](auto s, auto start, const decltype(3) level = 3)
         {
             while (true) {
-                switch (s.find(u"["_S * level))
-                {
-                case -1:
-                    goto break_;
+                auto j = s.findi(u"["_S * level);
+                if (j == -1)
                     break;
-                }
                 auto k = find_ending_sq_bracket(s, j, start) + 1;
                 start += k - j;
                 s = s[range_el(0, j)] + s[range_ei(k)];
             }
-            break_:
             return s;
         };
         Dict<int, String> nonunique_links;
         auto link = u""_S;
 
-        auto write_http_link = [&i, &link, exit_with_error, find_ending_pair_quote, find_ending_sq_bracket, html_escape, html_escapeq, instr, next_char, nonunique_links, outfile, remove_comments, write_to_pos](const auto &startpos, const auto &endpos, const auto &q_offset, auto text)
+        auto write_http_link = [&i, &link, exit_with_error, find_ending_pair_quote, find_ending_sq_bracket, html_escape, html_escapeq, instr, next_char, nonunique_links, outfile, remove_comments, write_to_pos](const auto &startpos, const auto &endpos, const decltype(1) q_offset = 1, decltype(u""_S) text = u""_S)
         {
             auto nesting_level = 0;
             i += 2;
@@ -735,7 +988,7 @@ public:
                 auto j = i + 3;
                 while (j < instr.len()) {
                     if (instr[j] == u']') {
-                        nonunique_links.set(Int(instr[range_el(i + 3, j)]), link);
+                        nonunique_links.set(parse_int(instr[range_el(i + 3, j)]), link);
                         i = j;
                         break;
                     }
@@ -751,7 +1004,7 @@ public:
             outfile.write(tag + u">"_S + (text != u"" ? text : link) + u"</a>"_S);
         };
 
-        auto write_note = [&i, exit_with_error, find_ending_pair_quote, html_escape, html_escapeq, instr, outfile, remove_comments, write_to_pos](const auto &startpos, const auto &endpos, const auto &q_offset)
+        auto write_note = [&i, exit_with_error, find_ending_pair_quote, html_escape, html_escapeq, instr, outfile, remove_comments, write_to_pos](const auto &startpos, const auto &endpos, const decltype(1) q_offset = 1)
         {
             i += q_offset;
             auto endqpos2 = find_ending_pair_quote(i + 1);
@@ -762,7 +1015,7 @@ public:
             i = endqpos2 + 1;
         };
         auto endi = 0;
-        auto numbered_link = [&endi, &link, exit_with_error, i, instr, next_char, nonunique_links](const auto &offset)
+        auto numbered_link = [&endi, &link, exit_with_error, i, instr, next_char, nonunique_links](const decltype(1) offset = 1)
         {
             if (next_char(offset) == u'-' && next_char(offset + 1).isdigit()) {
                 auto j = i + offset + 1;
@@ -770,7 +1023,7 @@ public:
                     if (instr[j] == u']') {
                         try
                         {
-                            link = nonunique_links[Int(instr[range_el(i + offset + 1, j)])];
+                            link = nonunique_links[parse_int(instr[range_el(i + offset + 1, j)])];
                         }
                         catch (const KeyError&)
                         {
@@ -802,6 +1055,157 @@ public:
                 in_unordered_list = false;
             }
         };
+        Array<String> ending_tags;
+        auto new_line_tag = u"\0"_S;
+
+        while (i < instr.len()) {
+            auto ch = instr[i];
+            if (i == 0 || prev_char() == u'\n') {
+                if (ch == u'.' && (in(next_char(), u" ‘"_S))) {
+                    close_ordered_list();
+                    auto s = u""_S;
+                    if (!in_unordered_list) {
+                        s = u"<ul>\n<li>"_S;
+                        in_unordered_list = true;
+                    }
+                    else
+                        s = u"</li>\n<li>"_S;
+                    write_to_i(s);
+                    new_line_tag = u""_S;
+                    if (next_char() == u' ')
+                        i++;
+                    else {
+                        auto endqpos = find_ending_pair_quote(i + 1);
+                        outfile.write(to_html(instr[range_el(i + 2, endqpos)], nullptr, i + 2));
+                        i = endqpos;
+                    }
+                    writepos = i + 1;
+                }
+                else {
+                    close_unordered_list();
+                    if (ch.isdigit()) {
+                        auto j = i + 1;
+                        while (j < instr.len()) {
+                            if (!instr[j].isdigit())
+                                break;
+                            j++;
+                        }
+                        if (instr[range_el(j, j + 1)] == u'.' && in(instr[range_el(j + 1, j + 2)], make_tuple(u" "_S, u"‘"_S))) {
+                            auto value = parse_int(instr[range_el(i, j)]);
+                            auto s = u""_S;
+                            if (ordered_list_current_number == -1) {
+                                s = (value == 1 ? u"<ol>"_S : u"<ol start=\""_S + String(value) + u"\">"_S) + u"\n<li>"_S;
+                                ordered_list_current_number = value;
+                            }
+                            else {
+                                s = u"</li>\n"_S + (value == ordered_list_current_number + 1 ? u"<li>"_S : u"<li value=\""_S + String(value) + u"\">"_S);
+                                ordered_list_current_number = value;
+                            }
+                            write_to_i(s);
+                            new_line_tag = u""_S;
+                            if (instr[j + 1] == u' ')
+                                i = j + 1;
+                            else {
+                                auto endqpos = find_ending_pair_quote(j + 1);
+                                outfile.write(to_html(instr[range_el(j + 2, endqpos)], nullptr, j + 2));
+                                i = endqpos;
+                            }
+                            writepos = i + 1;
+                        }
+                        else
+                            close_ordered_list();
+                    }
+                    else
+                        close_ordered_list();
+                }
+                if (ch == u' ')
+                    write_to_i(u"&emsp;"_S);
+                else if (ch == u'-') {
+                    if (i_next_str(u"--"_S)) {
+                        auto j = i + 3;
+                        while (true) {
+                            if (j == instr.len() || instr[j] == u'\n') {
+                                write_to_i(u"<hr />\n"_S);
+                                i = j;
+                                writepos = j + 1;
+                                break;
+                            }
+                            if (instr[j] != u'-')
+                                break;
+                            j++;
+                        }
+                    }
+                }
+                else if (in(ch, make_tuple(u">"_S, u"<"_S)) && (in(next_char(), u" ‘["_S))) {
+                    write_to_pos(i, i + 2);
+                    outfile.write(u"<blockquote"_S + ((ch == u'<') * u" class=\"re\""_S) + u">"_S);
+                    if (next_char() == u' ')
+                        new_line_tag = u"</blockquote>"_S;
+                    else {
+                        if (next_char() == u'[') {
+                            if (numbered_link(2)) {
+                                auto linkstr = link;
+                                if (linkstr.len() > 57)
+                                    linkstr = linkstr[range_el(0, linkstr.rfindi(u"/"_S, 0, 47) + 1)] + u"..."_S;
+                                outfile.write(u"<a href=\""_S + link + u"\">["_S + instr[range_el(i + 3, endi)] + u"]<i>"_S + linkstr + u"</i></a>"_S);
+                                i = endi + 1;
+                            }
+                            else {
+                                i++;
+                                auto endb = find_ending_sq_bracket(instr, i);
+                                auto linkn = u""_S;
+                                if (instr[range_el(endb + 1, endb + 3)] == u"[-")
+                                    linkn = u"["_S + instr[range_el(endb + 3, find_ending_sq_bracket(instr, endb + 1))] + u"]"_S;
+                                link = instr[range_el(i + 1, endb)];
+                                auto spacepos = link.findi(u" "_S);
+                                if (spacepos != -1)
+                                    link = link[range_el(0, spacepos)];
+                                if (link.len() > 57)
+                                    link = link[range_el(0, link.rfindi(u"/"_S, 0, 47) + 1)] + u"..."_S;
+                                write_http_link(i, i, 0, linkn + u"<i>"_S + link + u"</i>"_S);
+                                i++;
+                            }
+                            if (instr[range_el(i, i + 2)] != u":‘")
+                                exit_with_error(u"Quotation with url should always has :‘...’ after ["_S + link[range_el(0, link.findi(u":"_S))] + u"://url]"_S, i);
+                            outfile.write(u":<br />\n"_S);
+                            writepos = i + 2;
+                        }
+                        else {
+                            auto endqpos = find_ending_pair_quote(i + 1);
+                            if (instr[range_el(endqpos + 1, endqpos + 2)] == u'[') {
+                                auto startqpos = i + 1;
+                                i = endqpos;
+                                outfile.write(u"<i>"_S);
+                                write_http_link(startqpos, endqpos);
+                                outfile.write(u"</i>"_S);
+                                i++;
+                                if (instr[range_el(i, i + 2)] != u":‘")
+                                    exit_with_error(u"Quotation with url should always has :‘...’ after ["_S + link[range_el(0, link.findi(u":"_S))] + u"://url]"_S, i);
+                                outfile.write(u":<br />\n"_S);
+                                writepos = i + 2;
+                            }
+                            else if (instr[range_el(endqpos + 1, endqpos + 2)] == u':') {
+                                outfile.write(u"<i>"_S + instr[range_el(i + 2, endqpos)] + u"</i>:<br />\n"_S);
+                                i = endqpos + 2;
+                                if (instr[range_el(i, i + 1)] != u'‘')
+                                    exit_with_error(u"Quotation with author's name should be in the form >‘Author's name’:‘Quoted text.’ (opening quotation mark not found after colon)"_S, i);
+                                writepos = i + 1;
+                            }
+                        }
+                        ending_tags.append(u"</blockquote>"_S);
+                    }
+                    i++;
+                }
+            }
+        }
+
+        if (outfilef == nullptr) {
+            auto r = result.join(u""_S);
+            if (habrahabr_html)
+                r = r.replace(u"</blockquote>\n"_S, u"</blockquote>"_S);
+            return r;
+        }
+        return u""_S;
     }
 };
 

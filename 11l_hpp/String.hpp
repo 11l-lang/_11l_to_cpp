@@ -3,11 +3,13 @@
 class Char
 {
 public:
-	int code;
+	char16_t code;
 
-	Char(int code) : code(code) {}
+	Char(char16_t code) : code(code) {}
 
-	operator int() const {return code;} // for `switch (instr[i])` support
+	operator char16_t() const {return code;} // for `switch (instr[i])` support
+
+	bool isdigit() const {return in((int)code, range_ee((int)'0', (int)'9'));}
 
 	bool operator< (Char c) const {return code <  c.code;}
 	bool operator<=(Char c) const {return code <= c.code;}
@@ -63,6 +65,36 @@ public:
 		}
 		return str;
 	}
+
+	int findi(Char c) const
+	{
+		const char16_t *s = data();
+		for (int i=0, n=len(); i<n; i++)
+			if (s[i] == c) return i;
+		return -1;
+	}
+	
+	int findi(const String &s) const
+	{
+		size_t r = find(s);
+		return r != String::npos ? r : -1;
+	}
+
+	int rfindi(const String &sub, int start, int end) const
+	{
+		size_t r = rfind(sub, end - 1);
+		if (r == String::npos || (int)r < start) return -1;
+		return r;
+	}
+
+	/*bool isdigit() const
+	{
+		if (empty()) return false;
+		const char16_t *s = data();
+		for (int i=0, n=len(); i<n; i++)
+			if (!Char(s[i]).isdigit()) return false;
+		return true;
+	}*/
 
 	//String &operator=(const String &s) {assign(s); return *this;}
 
@@ -124,3 +156,16 @@ Char operator ""_C(char16_t c)
 {
 	return Char(c);
 }
+
+inline int parse_int(const String &str)
+{
+	int res = 0, sign = 1;
+	const char16_t *s = str.c_str();
+	while (*s && (*s == u' ' || *s == u'\t')) s++;//skip whitespace
+	if (*s == u'-') sign=-1, s++; else if (*s == u'+') s++;
+	for (; Char(*s).isdigit(); s++)
+		res = res * 10 + (*s - u'0');
+	return res * sign;
+}
+
+inline bool in(Char c, const String &s) {return s.find(c.code) != String::npos;}
