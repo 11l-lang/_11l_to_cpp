@@ -20,7 +20,7 @@ F f()
 String token;
 auto f()
 {
-    return [](const auto &a){return a == u"None"_S ? u"N"_S : a == u"False"_S ? u"0B"_S : a == u"True"_S ? u"1B"_S : throw KeyError(a);}(::token);
+    return [&](const auto &a){return a == u"None"_S ? u"N"_S : a == u"False"_S ? u"0B"_S : a == u"True"_S ? u"1B"_S : throw KeyError(a);}(::token);
 }
 
 
@@ -330,11 +330,11 @@ auto newlines()
     return u""_S;
 }
 auto indent = 0;
-auto r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"("_S + (function_arguments.empty || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
-r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"("_S + (function_arguments.empty || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
-r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"("_S + (function_arguments.empty || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
-r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + (function_arguments.empty || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
-r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"(some big ..."_S + u"... string"_S + (function_arguments.empty || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+auto r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"("_S + (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"("_S + (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"("_S + (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"(some big ..."_S + u"... string"_S + (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
 
 
 F tag(ch)
@@ -342,15 +342,15 @@ F tag(ch)
 ===
 template <typename T1> auto tag(const T1 &ch)
 {
-    return [](const auto &a){return a == u'*'_C ? u'b'_C : a == u'_'_C ? u'u'_C : a == u'-'_C ? u's'_C : a == u'~'_C ? u'i'_C : throw KeyError(a);}(ch);
+    return [&](const auto &a){return a == u'*'_C ? u'b'_C : a == u'_'_C ? u'u'_C : a == u'-'_C ? u's'_C : a == u'~'_C ? u'i'_C : throw KeyError(a);}(ch);
 }
 
 
 R .children[0].to_str()‘ ’(S .symbol.id {‘and’ {‘&’}; ‘or’ {‘|’}; ‘in’ {‘C’} E {‘symbol-’(.symbol.id)}})‘ ’(.children[1].to_str())
 R .children[0].to_str()‘ ’(S .symbol.id {‘and’ {‘&’}; ‘or’ {‘|’}; ‘in’ {‘C’} E ‘symbol-’(.symbol.id)})‘ ’(.children[1].to_str())
 ===
-return _get<0>(children).to_str() + u" "_S + ([](const auto &a){return a == u"and"_S ? u"&"_S : a == u"or"_S ? u"|"_S : a == u"in"_S ? u"C"_S : u"symbol-"_S + (symbol.id);}(symbol.id)) + u" "_S + (_get<1>(children).to_str());
-return _get<0>(children).to_str() + u" "_S + ([](const auto &a){return a == u"and"_S ? u"&"_S : a == u"or"_S ? u"|"_S : a == u"in"_S ? u"C"_S : u"symbol-"_S + (symbol.id);}(symbol.id)) + u" "_S + (_get<1>(children).to_str());
+return _get<0>(children).to_str() + u" "_S + ([&](const auto &a){return a == u"and"_S ? u"&"_S : a == u"or"_S ? u"|"_S : a == u"in"_S ? u"C"_S : u"symbol-"_S + (symbol.id);}(symbol.id)) + u" "_S + (_get<1>(children).to_str());
+return _get<0>(children).to_str() + u" "_S + ([&](const auto &a){return a == u"and"_S ? u"&"_S : a == u"or"_S ? u"|"_S : a == u"in"_S ? u"C"_S : u"symbol-"_S + (symbol.id);}(symbol.id)) + u" "_S + (_get<1>(children).to_str());
 
 
 ---

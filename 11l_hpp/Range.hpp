@@ -57,7 +57,7 @@ public:
 	{
 		Type value, step;
 	public:
-		explicit Iterator(Type value, Type step) : value(value), step(step) {}
+		Iterator(Type value, Type step) : value(value), step(step) {}
 		bool operator!=(Iterator i) {return value < i.value;} // I know this is hack, but it is faster than precise computation of end()
 		void operator++() {value += step;}
 		Type operator*() {return value;}

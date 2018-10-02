@@ -191,7 +191,7 @@ class SymbolNode:
 
         def char_or_str(child, is_char):
             if is_char:
-                return "u'" + child.token_str()[1:-1] + "'_C"
+                return "u'" + child.token_str()[1:-1].replace("'", R"\'") + "'_C"
             return child.to_str()
 
         if self.symbol.id == '(': # )
@@ -325,7 +325,7 @@ class SymbolNode:
                         char_key = False
                 if not is_char(self.children[i+1]):
                     char_val = False
-            res = '[](const auto &a){return '
+            res = '[&](const auto &a){return ' # `[&]` is for `cc = {'а':'A','б':'B','с':'C','д':'D','е':'E','ф':'F'}.get(c.lower(), c)` -> `[&](const auto &a){return a == u'а'_C ? u"A"_S : ... : c;}(c.lower())`
             was_break = False
             for i in range(1, len(self.children), 2):
                 if self.children[i].token.value(source) in ('E', 'И', 'else', 'иначе'):
@@ -361,7 +361,7 @@ class SymbolNode:
 
             def char_if_len_1(child):
                 if is_char(child):
-                    return "u'" + child.token.value(source)[1:-1] + "'_C"
+                    return "u'" + child.token.value(source)[1:-1].replace("'", R"\'") + "'_C"
                 return child.to_str()
 
             if self.symbol.id == '.':
@@ -375,7 +375,7 @@ class SymbolNode:
                 id = self.scope.find(cts0.lstrip('@'))
                 if id != None and id.type != None and id.type.endswith('?'):
                     return cts0.lstrip('@') + '->' + c1
-                return char_if_len_1(self.children[0]) + '.' + ('len()' if c1 == 'len' else c1) # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
+                return char_if_len_1(self.children[0]) + '.' + c1 + ('()' if c1 in ('len', 'last', 'empty') else '') # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
             elif self.symbol.id == '->':
                 captured_variables = set()
                 def gather_captured_variables(sn):
@@ -399,9 +399,9 @@ class SymbolNode:
             elif self.symbol.id == '<.<':
                 return 'range_ll(' + char_if_len_1(self.children[0]) + ', ' + char_if_len_1(self.children[1]) + ')'
             elif self.symbol.id in ('C ', 'С ', 'in '):
-                return 'in(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
+                return 'in(' + char_if_len_1(self.children[0]) + ', ' + self.children[1].to_str() + ')'
             elif self.symbol.id in ('!C ', '!С ', '!in '):
-                return '!in(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
+                return '!in(' + char_if_len_1(self.children[0]) + ', ' + self.children[1].to_str() + ')'
             elif self.symbol.id in ('I/', 'Ц/'):
                 return 'int(' + self.children[0].to_str() + ')/int(' + self.children[1].to_str() + ')'
             elif self.symbol.id in ('==', '!=') and self.children[1].token.category == Token.Category.STRING_LITERAL:
@@ -503,7 +503,8 @@ class ASTExpression(ASTNodeWithExpression):
 cpp_type_from_11l = {'A':'auto', 'А':'auto', 'var':'auto', 'перем':'auto',
                      'Int':'int', 'String':'String', 'Bool':'bool',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
-                     'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict'}
+                     'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict',
+                     'Array[String]':'Array<String>', 'Array[Array[String]]':'Array<Array<String>>'}
 
 class ASTVariableDeclaration(ASTNode):
     var : str
@@ -628,7 +629,7 @@ class ASTSwitch(ASTNodeWithExpression):
 
         def char_if_len_1(child):
             if is_char(child):
-                return "u'" + child.token.value(source)[1:-1] + "'"
+                return "u'" + child.token.value(source)[1:-1].replace("'", R"\'") + "'"
             return child.to_str()
 
         r = ' ' * (indent*4) + 'switch (' + self.expression.to_str() + ")\n" + ' ' * (indent*4) + "{\n"
@@ -1217,10 +1218,15 @@ def parse_internal(this_node):
 
         elif token.category == Token.Category.SCOPE_END:
             next_token()
-            if token.category == Token.Category.STATEMENT_SEPARATOR: # Token.Category.EOF
+            if token.category == Token.Category.STATEMENT_SEPARATOR and token.end == len(source): # Token.Category.EOF
                 next_token()
                 assert(token == None)
             return
+
+        elif token.category == Token.Category.STATEMENT_SEPARATOR:
+            next_token()
+            assert(token.category != Token.Category.STATEMENT_SEPARATOR)
+            continue
 
         else:
             node_expression = expression()
@@ -1289,6 +1295,9 @@ def parse(tokens_, source_, suppress_error_please_wrap_in_copy = False): # optio
     scope.add_function('exit', ASTFunctionDefinition([('arg', None, '')]))
     scope.add_function('zip', ASTFunctionDefinition([('iterable1', None, ''), ('iterable2', None, '')]))
     scope.add_function('sum', ASTFunctionDefinition([('iterable', None, '')]))
+    scope.add_function('min', ASTFunctionDefinition([('object1', None, ''), ('object2', None, '')]))
+    scope.add_function('max', ASTFunctionDefinition([('object1', None, ''), ('object2', None, '')]))
+    scope.add_function('hex', ASTFunctionDefinition([('object', None, '')]))
     scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', None)])]))
     scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', None, 'String'), ('mode', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘r’'), 'String'), ('encoding', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘utf-8’'), 'String')])]))
     for type_ in cpp_type_from_11l:

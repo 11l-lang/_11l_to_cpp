@@ -23,7 +23,7 @@ inline void assert_file_line(const char *file_name, int line, bool expression, c
 	if (!expression) {
 		std::wcerr << "AssertionError";
 		if (!message.empty())
-			std::wcerr << " '" << std::wstring(message.begin(), message.end()) << "'";
+			std::wcerr << " '" << std::wstring(message.cbegin(), message.cend()) << "'";
 		std::wcerr << " at file '" << file_name << "', line " << line << "\n";
 		throw AssertionError();
 	}
@@ -33,14 +33,14 @@ inline void assert_file_line(const char *file_name, int line, bool expression, c
 
 inline void print(const String &s, const String &end = u"\n", bool flush = false)
 {
-	std::wcout << std::wstring(s.begin(), s.end()) << std::wstring(end.begin(), end.end());
+	std::wcout << std::wstring(s.cbegin(), s.cend()) << std::wstring(end.cbegin(), end.cend());
 	if (flush)
 		std::wcout.flush();
 }
 
 inline void print(int i, const String &end = u"\n", bool flush = false)
 {
-	std::wcout << i << std::wstring(end.begin(), end.end());
+	std::wcout << i << std::wstring(end.cbegin(), end.cend());
 	if (flush)
 		std::wcout.flush();
 }

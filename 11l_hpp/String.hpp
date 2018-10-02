@@ -1,4 +1,5 @@
 #include <string>
+#include <cwctype>
 
 class Char
 {
@@ -20,6 +21,9 @@ public:
 	bool operator!=(Char c) const {return code != c.code;}
 	bool operator==(char16_t c) const {return code == c;}
 	bool operator!=(char16_t c) const {return code != c;}
+
+	Char   lower() const {return towlower(code);}
+	bool islower() const {return iswlower(code);}
 };
 
 class String : public std::u16string
@@ -36,6 +40,20 @@ public:
 	String(const char16_t *&s) : basic_string(s) {} // reference is needed here because otherwise String(const char16_t (&s)[N]) is never called (`String(u"str")` calls `String(const char16_t *s)`)
 	String(const char16_t *s, size_t sz) : basic_string(s, sz) {}
 	template <int N> String(const char16_t (&s)[N]): basic_string(s, N-1) {}
+
+	class Iterator
+	{
+		char16_t *c;
+	public:
+		explicit Iterator(char16_t *c) : c(c) {}
+		bool operator!=(Iterator i) {return c != i.c;}
+		void operator++() {c++;}
+		Char operator*() {return Char(*c);}
+	};
+	Iterator begin() {return Iterator(data());}
+	Iterator end()   {return Iterator(data() + len());}
+	Iterator begin() const {return Iterator(const_cast<char16_t*>(data()));}
+	Iterator end()   const {return Iterator(const_cast<char16_t*>(data() + len()));}
 
 	int len() const { return size(); } // return `int` (not `size_t`) to avoid warning C4018: '<': signed/unsigned mismatch
 
@@ -66,17 +84,17 @@ public:
 		return str;
 	}
 
-	int findi(Char c) const
+	int findi(Char c, int start = 0) const
 	{
 		const char16_t *s = data();
-		for (int i=0, n=len(); i<n; i++)
+		for (int i=start, n=len(); i<n; i++)
 			if (s[i] == c) return i;
 		return -1;
 	}
 	
-	int findi(const String &s) const
+	int findi(const String &s, int start = 0) const
 	{
-		size_t r = find(s);
+		size_t r = find(s, start);
 		return r != String::npos ? r : -1;
 	}
 
@@ -87,14 +105,50 @@ public:
 		return r;
 	}
 
-	/*bool isdigit() const
+	int count(const char16_t *s, size_t sz) const
+	{
+		int c = 0;
+		for (int i=0; i<len();)
+			if (memcmp(s + i, data() + i, sz * sizeof(char16_t)) == 0) {
+				c++;
+				i += sz;
+			} else
+				i++;
+		return c;
+	}
+	template <int N> int count(const char16_t(&s)[N]) const
+	{
+		return count(s, N-1);
+	}
+	int count(const String &s) const
+	{
+		return count(s.data(), s.len());
+	}
+
+	Array<String> split(const String &delim);
+	
+	bool isdigit() const
 	{
 		if (empty()) return false;
 		const char16_t *s = data();
 		for (int i=0, n=len(); i<n; i++)
 			if (!Char(s[i]).isdigit()) return false;
 		return true;
-	}*/
+	}
+
+	String upper() const
+	{
+		String r;
+		r.resize(len());
+		for (int i=0; i<len(); i++)
+			r[i] = towupper(at(i));
+		return r;
+	}
+
+	String zfill(int width) const
+	{
+		return String(u"0") * max(width - len(), 0);
+	}
 
 	//String &operator=(const String &s) {assign(s); return *this;}
 
@@ -169,3 +223,19 @@ inline int parse_int(const String &str)
 }
 
 inline bool in(Char c, const String &s) {return s.find(c.code) != String::npos;}
+
+inline char hex_to_char(int c) {return (char)c + ((unsigned)c <= 9u ? '0' : 'A' - 10);}
+
+inline String hex(int n)
+{
+	char16_t rr[9], *h = rr;
+	for (const unsigned char *d = (unsigned char*)&n + sizeof(n)-1; d >= (unsigned char*)&n; d--)
+		*h++ = hex_to_char(*d >> 4),
+		*h++ = hex_to_char(*d & 0xF);
+	const char16_t *s = rr;
+	while (*s == '0')
+		s++;
+	String r = u"0x";
+	r.append(s, h-s);
+	return r;
+}
