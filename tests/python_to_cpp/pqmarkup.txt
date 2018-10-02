@@ -1,5 +1,5 @@
 import sys
-from typing import List
+from typing import List, IO, Callable, Dict
 
 class Exception(Exception):
     message : str
@@ -352,6 +352,368 @@ class Converter:
                             # else this is just >‘Quoted text.’
                         ending_tags.append('</blockquote>')
                     i += 1
+
+            if ch == "‘":
+                prevci = i - 1
+                prevc = instr[prevci] if prevci >= 0 else "\0"[0]
+                #assert(prevc == prev_char())
+                startqpos = i
+                i = find_ending_pair_quote(i)
+                endqpos = i
+                str_in_b = '' # (
+                if prevc == ')':
+                    openb = instr.rfind('(', 0, prevci - 1) # )
+                    if openb != -1 and openb > 0:
+                        str_in_b = instr[openb+1:startqpos-1]
+                        prevci = openb - 1
+                        prevc = instr[prevci]
+                if prevc in 'PР': # Рисунок обрабатывается по-особенному
+                    write_to_pos(prevci, endqpos + 1)
+                    title = ''
+                    endqpos2 : int
+                    if i_next_str('[‘'): # альтернативный текст’
+                        endqpos2 = find_ending_pair_quote(i+2)
+                        assert(instr[endqpos2+1] == ']')
+                        title = ' title="'+html_escapeq(remove_comments(instr[i+3:endqpos2], i+3))+'"'
+                    imgtag = '<img'
+                    if str_in_b != '':
+                        wh = str_in_b.replace(',', ' ').split(' ')
+                        assert(len(wh) in range(1, 3))
+                        imgtag += ' width="' + wh[0] + '" height="' + wh[-1] + '"'
+                    imgtag += ' src="'+instr[startqpos+1:endqpos]+'"'+title+' />'
+                    if i_next_str('[http') or i_next_str('[./'): # ]]
+                        write_http_link(startqpos, endqpos, 1, imgtag)
+                        writepos = i + 1
+                    elif i_next_str('[‘'): # ’]
+                        outfile.write(imgtag)
+                        writepos = endqpos2 + 2
+                        i = endqpos2 + 1
+                    else:
+                        outfile.write(imgtag)
+                        i = endqpos
+                elif i_next_str('[http') or i_next_str('[./'): # ]]
+                    write_http_link(startqpos, endqpos)
+                elif next_char() == '[' and numbered_link(2): # ]
+                    i = endi
+                    write_to_pos(startqpos, i+1)
+                    outfile.write('<a href="' + link + '">' + html_escape(instr[startqpos+1:endqpos]) + '</a>')
+                elif i_next_str('[‘'): # ’] сноска/альтернативный текст/текст всплывающей подсказки
+                    write_note(startqpos, endqpos)
+                elif next_char() == '{' and (self.habrahabr_html or self.ohd):
+                    # Ищем окончание спойлера }
+                    nesting_level = 0
+                    i += 2
+                    while True:
+                        if i == len(instr):
+                            exit_with_error('Unended spoiler', endqpos+1)
+                        ch = instr[i]
+                        if ch == "{":
+                            nesting_level += 1
+                        elif ch == "}":
+                            if nesting_level == 0:
+                                break
+                            nesting_level -= 1
+                        i += 1
+                    write_to_pos(prevci + 1, i + 1)
+                    outer_p = endqpos+(3 if instr[endqpos+2] == "\n" else 2) # проверка на == "\n" нужна, чтобы переход на новую строку/перевод строки после `{` игнорировался
+                    if self.habrahabr_html:
+                        outfile.write('<spoiler title="' + remove_comments(instr[startqpos+1:endqpos], startqpos+1).replace('"', "''") + '">' + self.to_html(instr[outer_p:i], outer_pos = outer_p) + '</spoiler>')
+                    else:
+                        outfile.write('<span class="spoiler_title" onclick="return spoiler2(this, event)">' + remove_comments(instr[startqpos+1:endqpos], startqpos+1) + '<br /></span>' # используется span, так как с div подчёркивание будет на весь экран
+                            + '<div class="spoiler_text" style="display: none">' + self.to_html(instr[outer_p:i], outer_pos = outer_p) + "</div>\n")
+                    if (next_char() == "\n" # чтобы переход на новую строку/перевод строки после `}` игнорировался
+                            and not in_unordered_list and ordered_list_current_number == -1): # если находимся внутри списка, то пропуска новой строки делать не нужно
+                        i += 1
+                        writepos = i + 1
+                elif prevc == "'": # raw [html] output
+                    t = startqpos - 1
+                    while t >= 0:
+                        if instr[t] != "'":
+                            break
+                        t -= 1
+                    eat_left = startqpos - 1 - t # количество кавычек, которые нужно съесть слева
+                    t = endqpos + 1
+                    while t < len(instr):
+                        if instr[t] != "'":
+                            break
+                        t += 1
+                    eat_right = t - (endqpos + 1) # количество кавычек, которые нужно съесть справа
+                    write_to_pos(startqpos - eat_left, t)
+                    outfile.write(instr[startqpos + eat_left:endqpos - eat_right + 1])
+                elif prevc in '0OО':
+                    write_to_pos(prevci, endqpos+1)
+                    outfile.write(html_escape(instr[startqpos+1:endqpos]).replace("\n", "<br />\n"))
+                elif prevc == "#":
+                    ins = instr[startqpos+1:endqpos]
+                    if self.habrahabr_html:
+                        write_to_pos(prevci, endqpos+1)
+                        contains_new_line = "\n" in ins
+                        outfile.write(('<source lang="' + str_in_b + '">' if str_in_b != '' else '<source>' if contains_new_line else '<code>') + ins + ("</source>" if str_in_b != '' or contains_new_line else "</code>")) # так как <source> в habrahabr — блочный элемент, а не встроенный\inline
+                    # elif self.ohd: # [-TODO syntax highlighting-]
+                    else:
+                        write_to_pos(prevci, endqpos+1)
+                        outfile.write('<pre style="display: inline">' + html_escape(instr[startqpos+1:endqpos]) + '</pre>') # в habrahabr_html тег pre не стоит задействовать, так как в habrahabr для тега pre используется шрифт monospace, в котором символы ‘ и ’ выглядят непонятно (не так как в Courier New)
+                    if ins[0] == "\n" and instr[i+1:i+2] == "\n":
+                        new_line_tag = ''
+                elif prevc in 'TТ':
+                    write_to_pos(prevci, endqpos+1)
+                    header_row = False
+                    hor_row_align = ''
+                    ver_row_align = ''
+
+                    # Fill/prepare 2d-array `table`
+                    table : List[List[List[str]]] = []
+                    j = startqpos + 1
+                    while j < endqpos:
+                        ch = instr[j]
+                        if ch == "‘": # ’
+                            empty_list : List[List[str]] = []
+                            table.append(empty_list)
+                            endrow = find_ending_pair_quote(j)
+                            hor_col_align = ''
+                            ver_col_align = ''
+
+                            # Read table row
+                            j += 1
+                            while j < endrow:
+                                ch = instr[j]
+                                if ch == "‘": # ’
+                                    end_of_column = find_ending_pair_quote(j)
+                                    style = ""
+                                    if hor_row_align != '' or hor_col_align != '':
+                                        style += "text-align: " + (hor_col_align if hor_col_align != '' else hor_row_align)
+                                    if ver_row_align != '' or ver_col_align != '':
+                                        if style != "":
+                                            style += "; "
+                                        style += "vertical-align: " + (ver_col_align if ver_col_align != '' else ver_row_align)
+                                    hor_col_align = ''
+                                    ver_col_align = ''
+                                    table[-1].append([self.to_html(instr[j+1:end_of_column], outer_pos = j+1), ("th" if header_row else "td") + (' style="'+style+'"' if style != '' else '')])
+                                    j = end_of_column
+                                elif ch in '<>' and instr[j+1:j+2] in ('<', '>'):
+                                    hor_col_align = {'<<':'left', '>>':'right', '><':'center', '<>':'justify'}[instr[j:j+2]]
+                                    j += 1
+                                elif instr[j:j+2] in ("/\\", "\\/"):
+                                    ver_col_align = "top" if instr[j:j+2] == "/\\" else "bottom"
+                                    j += 1
+                                elif ch == "-":
+                                    if len(table[-1]) == 0:
+                                        exit_with_error('Wrong table column span marker "-"', j)
+                                    table[-1].append(["", "-"])
+                                elif ch == "|":
+                                    if len(table) == 1:
+                                        exit_with_error('Wrong table row span marker "|"', j)
+                                    table[-1].append(["", "|"])
+                                elif instr[j:j+3] == "[[[": # ]]]
+                                    j = find_ending_sq_bracket(instr, j)
+                                elif ch not in "  \t\n":
+                                    exit_with_error('Unknown formatting character inside table row', j)
+                                j += 1
+
+                            header_row = False
+                            hor_row_align = ''
+                            ver_row_align = ''
+                        elif ch in 'HН':
+                            header_row = True
+                        elif ch in '<>' and instr[j+1:j+2] in ('<', '>'):
+                            hor_row_align = {'<<':'left', '>>':'right', '><':'center', '<>':'justify'}[instr[j:j+2]]
+                            j += 1
+                        elif instr[j:j+2] in ("/\\", "\\/"):
+                            ver_row_align = "top" if instr[j:j+2] == "/\\" else "bottom"
+                            j += 1
+                        elif instr[j:j+3] == "[[[": # ]]]
+                            j = find_ending_sq_bracket(instr, j)
+                        elif ch not in "  \t\n":
+                            exit_with_error('Unknown formatting character inside table', j)
+
+                        j += 1
+
+                    # Process column and row spans (walk in the reverse order — from bottom right corner of the table)
+                    for y in range(len(table)-1, -1, -1):
+                        for x in range(len(table[y])-1, -1, -1):
+                            if table[y][x][1] in ('-', '|'):
+                                xx = x
+                                yy = y
+                                while True:
+                                    if table[yy][xx][1] == "-":
+                                        xx -= 1
+                                    elif table[yy][xx][1] == "|":
+                                        yy -= 1
+                                    else:
+                                        break
+                                if xx < x:
+                                    table[yy][xx][1] += ' colspan="'+str(x-xx+1)+'"'
+                                if yy < y:
+                                    table[yy][xx][1] += ' rowspan="'+str(y-yy+1)+'"'
+                                for xxx in range(xx, x+1): # mark a whole rect of this merged cell as processed to avoid its further processing (in this loop) and to skip it at output table loop
+                                    for yyy in range(yy, y+1):
+                                        if not (xxx == xx and yyy == yy):
+                                            table[yyy][xxx][1] = ""
+
+                    # Output table
+                    outfile.write("<table"+' style="display: inline"'*(prevci != 0 and instr[prevci-1] != "\n")+">\n")
+                    for row in table:
+                        outfile.write("<tr>")
+                        for col, colattrs in row:
+                            if colattrs != "": # if this is merged cell (colattrs == "") — skip it
+                                outfile.write('<' + colattrs + '>' + col + '</' + colattrs[:2] + '>')
+                        outfile.write("</tr>\n")
+                    outfile.write("</table>\n")
+                    if not (prevci != 0 and instr[prevci-1] != "\n"):
+                        new_line_tag = ''
+                elif prevc in '<>' and instr[prevci-1] in '<>': # выравнивание текста \ text alignment
+                    write_to_pos(prevci-1, endqpos+1)
+                    outfile.write('<div align="' + {'<<':'left', '>>':'right', '><':'center', '<>':'justify'}[instr[prevci-1]+prevc] + '">'
+                                 + self.to_html(instr[startqpos+1:endqpos], outer_pos = startqpos+1) + "</div>\n")
+                    new_line_tag = ''
+                elif i_next_str(":‘") and instr[find_ending_pair_quote(i+2)+1:][:1] == '<': # this is reversed quote ‘Quoted text.’:‘Author's name’< # ’
+                    endrq = find_ending_pair_quote(i+2)
+                    i = endrq + 1
+                    write_to_pos(prevci + 1, i + 1)
+                    outfile.write('<blockquote>' + self.to_html(instr[startqpos+1:endqpos], outer_pos = startqpos+1) + "<br />\n<div align='right'><i>" + instr[endqpos+3:endrq] + "</i></div></blockquote>")
+                    new_line_tag = ''
+                else:
+                    i = startqpos # откатываем позицию обратно
+                    if prev_char() in '*_-~':
+                        write_to_pos(i - 1, i + 1)
+                        tag = {'*':'b', '_':'u', '-':'s', '~':'i'}[prev_char()]
+                        outfile.write('<' + tag + '>')
+                        ending_tags.append('</' + tag + '>')
+                    elif prevc in 'HН':
+                        write_to_pos(prevci, i + 1)
+                        tag = 'h' + str(min(max(3 - (0 if str_in_b == '' else int(str_in_b)), 1), 6))
+                        outfile.write('<' + tag + '>')
+                        ending_tags.append('</' + tag + '>')
+                    elif prevc in 'CС':
+                        write_to_pos(prevci, i + 1)
+                        which_color = 'color'
+                        if str_in_b[0:1] == '-':
+                            str_in_b = str_in_b[1:]
+                            which_color = 'background-color'
+                        if str_in_b[0:1] == '#':
+                            new_str_in_b = ''
+                            for c in str_in_b:
+                                cc = {'а':'A','б':'B','с':'C','д':'D','е':'E','ф':'F'}.get(c.lower(), c)[0]
+                                new_str_in_b += cc.lower() if c.islower() else cc
+                            str_in_b = new_str_in_b
+                        elif len(str_in_b) in (1, 3) and str_in_b.isdigit():
+                            new_str = "#"
+                            for ii in [0, 1, 2] if len(str_in_b) == 3 else [0, 0, 0]:
+                                new_str += hex((int(str_in_b[ii]) * 0xFF + 4) // 8)[2:].upper().zfill(2) # 8 - FF, 0 - 00, 4 - 80 (почему не 7F[‘когда `+ 3` вместо `+ 4`’] — две субъективные причины: 1.‘больше нравится как выглядит’ и 2.‘количество пикселей в строке `80` при `"font_face": "Courier New", "font_size": 10`’)
+                            str_in_b = new_str
+                        if self.habrahabr_html:
+                            outfile.write('<font color="' + str_in_b + '">')
+                            ending_tags.append('</font>')
+                        else: # The <font> tag is not supported in HTML5.
+                            outfile.write('<span style="'+which_color+': ' + str_in_b + '">')
+                            ending_tags.append('</span>')
+                    elif (instr[prevci-1]+prevc) in ("/\\", "\\/"):
+                        write_to_pos(prevci-1, i + 1)
+                        tag = 'sup' if (instr[prevci-1]+prevc) == "/\\" else "sub"
+                        outfile.write('<' + tag + '>')
+                        ending_tags.append('</' + tag + '>')
+                    elif prevc == '!':
+                        write_to_pos(prevci, i + 1)
+                        outfile.write('<blockquote>' if self.habrahabr_html else '<div class="note">')
+                        ending_tags.append('</blockquote>' if self.habrahabr_html else '</div>')
+                    else: # ‘
+                        ending_tags.append('’')
+            elif ch == "’":
+                write_to_pos(i, i + 1)
+                if len(ending_tags) == 0:
+                    exit_with_error('Unpaired right single quotation mark', i)
+                last = ending_tags.pop()
+                outfile.write(last)
+                if next_char() == "\n" and (last.startswith('</h') or last == "</blockquote>"): # так как <h.> - блоковый элемент, то он автоматически завершает строку, поэтому лишний тег <br> в этом случае добавлять не нужно (иначе получится лишняя пустая строка после заголовка)
+                    outfile.write("\n")
+                    i += 1
+                    writepos += 1
+            elif ch == '`':
+                # Сначала считаем количество символов ` — это определит границу, где находится окончание span of code
+                start = i
+                i += 1
+                while i < len(instr):
+                    if instr[i] != '`':
+                        break
+                    i += 1
+                end = instr.find((i - start)*'`', i)
+                if end == -1:
+                    exit_with_error('Unended ` started', start)
+                write_to_pos(start, end + i - start)
+                ins = instr[i:end]
+                delta = ins.count("‘") - ins.count("’") # в `backticks` могут быть ‘кавычки’ и в [[[комментариях]]] (выглядит это, например, так: [[[‘]]]`Don’t`), для этого и нужны
+                if delta > 0: # эти строки кода[:backticks]
+                    for ii in range(delta): # ‘‘
+                        ending_tags.append('’')
+                else:
+                    for ii in range(-delta):
+                        if ending_tags.pop() != '’':
+                            exit_with_error('Unpaired single quotation mark found inside code block/span beginning', start)
+                ins = html_escape(ins)
+                if not "\n" in ins: # this is a single-line code -‘block’span
+                    outfile.write('<code>' + ins + '</code>' if self.habrahabr_html else '<pre style="display: inline">' + ins + '</pre>')
+                else:
+                    ins = ins
+                    outfile.write('<pre>' + ins + '</pre>' + "\n"*(not self.habrahabr_html))
+                    new_line_tag = ''
+                i = end + i - start - 1
+            elif ch == '[': # ]
+                if i_next_str('http') or i_next_str('./') or i_next_str('‘') or numbered_link(): # ’
+                    s = i - 1
+                    while s >= writepos and instr[s] not in "\r\n\t [{(‘“": # ”’)}]
+                        s -= 1
+                    if i_next_str('‘'): # ’ сноска/альтернативный текст/текст всплывающей подсказки
+                        write_note(s + 1, i, 0)
+                    elif i_next_str('http') or i_next_str('./'):
+                        write_http_link(s + 1, i, 0)
+                    else:
+                        write_to_pos(s + 1, endi+1)
+                        outfile.write('<a href="' + link + '">' + html_escape(instr[s+1:i]) + '</a>')
+                        i = endi
+                elif i_next_str('[['): # ]] comment
+                    comment_start = i
+                    nesting_level = 0
+                    while True:
+                        ch = instr[i]
+                        if ch == "[":
+                            nesting_level += 1
+                        elif ch == "]":
+                            nesting_level -= 1
+                            if nesting_level == 0:
+                                break
+                        elif ch == "‘": # [backticks:]а также эти строки кода
+                            ending_tags.append('’') # ‘‘
+                        elif ch == "’":
+                            assert(ending_tags.pop() == '’')
+                        i += 1
+                        if i == len(instr):
+                            exit_with_error('Unended comment started', comment_start)
+                    write_to_pos(comment_start, i+1)
+                    if instr[comment_start+3:comment_start+4] != '[': # это [[[такой]]] комментарий, а не [[[[такой]]]] или [[[[[такой и [[[[[[так далее]]]]]]]]]]], а [[[такие]]] комментарии следует транслировать в HTML: <!--[[[комментарий]...]...]-->
+                        outfile.write('<!--')
+                        outfile.write(remove_comments(instr[comment_start:i+1], comment_start, 4)) # берётся вся строка вместе со [[[скобочками]]] для [[[таких] ситуаций]]
+                        outfile.write('-->')
+                else:
+                    write_to_i(('<span class="sq"><span class="sq_brackets">'*self.ohd) + '' + '<font color="#BFBFBF">'*self.habrahabr_html + '[' + '</font><font color="gray">'*self.habrahabr_html + '' + self.ohd*'</span>')
+            elif ch == "]":
+                write_to_i(('<span class="sq_brackets">'*self.ohd) + '' + '</font><font color="#BFBFBF">'*self.habrahabr_html + ']' + '</font>'*self.habrahabr_html + '' + self.ohd*'</span></span>')
+            elif ch == "{":
+                write_to_i('<span class="cu_brackets" onclick="return spoiler(this, event)"><span class="cu_brackets_b">'*self.ohd + '{' + self.ohd*'</span><span>…</span><span class="cu" style="display: none">')
+            elif ch == "}":
+                write_to_i('</span><span class="cu_brackets_b">'*self.ohd + '}' + self.ohd*'</span></span>')
+            elif ch == "\n":
+                write_to_i((new_line_tag if new_line_tag != "\0" else "<br />") + ("\n" if new_line_tag != '' else "")) # код `"\n" if new_line_tag != ''` нужен только для списков (unordered/ordered list)
+                new_line_tag = "\0"
+
+            i += 1
+
+        close_ordered_list()
+        close_unordered_list()
+
+        write_to_pos(len(instr), 0)
+        assert(len(ending_tags) == 0) # ‘слишком много открывающих одинарных кавычек’/‘где-то есть незакрытая открывающая кавычка’
+
+        assert(self.to_html_called_inside_to_html_outer_pos_list.pop() == outer_pos)
 
         if outfilef == None:
             r = "".join(result)
@@ -723,6 +1085,351 @@ T Converter
                         writepos = i + 1
                   ending_tags.append(‘</blockquote>’)
                i++
+
+         I ch == "‘"
+            A prevci = i - 1
+            A prevc = I prevci >= 0 {instr[prevci]} E "\0"[0]
+            A startqpos = i
+            i = find_ending_pair_quote(i)
+            A endqpos = i
+            A str_in_b = ‘’
+            I prevc == ‘)’
+               A openb = instr.rfindi(‘(’, 0, prevci - 1)
+               I openb != -1 & openb > 0
+                  str_in_b = instr[openb + 1 .< startqpos - 1]
+                  prevci = openb - 1
+                  prevc = instr[prevci]
+            I prevc C ‘PР’
+               write_to_pos(prevci, endqpos + 1)
+               A title = ‘’
+               Int endqpos2
+               I i_next_str("[‘")
+                  endqpos2 = find_ending_pair_quote(i + 2)
+                  assert(instr[endqpos2 + 1] == ‘]’)
+                  title = ‘ title="’html_escapeq(remove_comments(instr[i + 3 .< endqpos2], i + 3))‘"’
+               A imgtag = ‘<img’
+               I str_in_b != ‘’
+                  A wh = str_in_b.replace(‘,’, ‘ ’).split(‘ ’)
+                  assert(wh.len C (1.<3))
+                  imgtag ‘’= ‘ width="’wh[0]‘" height="’wh.last‘"’
+               imgtag ‘’= ‘ src="’instr[startqpos + 1 .< endqpos]‘"’title‘ />’
+               I i_next_str(‘[http’) | i_next_str(‘[./’)
+                  write_http_link(startqpos, endqpos, 1, imgtag)
+                  writepos = i + 1
+               E I i_next_str("[‘")
+                  outfile.write(imgtag)
+                  writepos = endqpos2 + 2
+                  i = endqpos2 + 1
+               E
+                  outfile.write(imgtag)
+                  i = endqpos
+            E I i_next_str(‘[http’) | i_next_str(‘[./’)
+               write_http_link(startqpos, endqpos)
+            E I next_char() == ‘[’ & numbered_link(2)
+               i = endi
+               write_to_pos(startqpos, i + 1)
+               outfile.write(‘<a href="’link‘">’html_escape(instr[startqpos + 1 .< endqpos])‘</a>’)
+            E I i_next_str("[‘")
+               write_note(startqpos, endqpos)
+            E I next_char() == ‘{’ & (.habrahabr_html | .ohd)
+               A nesting_level = 0
+               i += 2
+               L
+                  I i == instr.len
+                     exit_with_error(‘Unended spoiler’, endqpos + 1)
+                  ch = instr[i]
+                  I ch == ‘{’
+                     nesting_level++
+                  E I ch == ‘}’
+                     I nesting_level == 0
+                        L.break
+                     --nesting_level
+                  i++
+               write_to_pos(prevci + 1, i + 1)
+               A outer_p = endqpos + (I instr[endqpos + 2] == "\n" {3} E 2)
+               I .habrahabr_html
+                  outfile.write(‘<spoiler title="’remove_comments(instr[startqpos + 1 .< endqpos], startqpos + 1).replace(‘"’, ‘''’)‘">’(.to_html(instr[outer_p .< i], outer_pos' outer_p))‘</spoiler>’)
+               E
+                  outfile.write(‘<span class="spoiler_title" onclick="return spoiler2(this, event)">’remove_comments(instr[startqpos + 1 .< endqpos], startqpos + 1)‘<br /></span>’""‘<div class="spoiler_text" style="display: none">’(.to_html(instr[outer_p .< i], outer_pos' outer_p))"</div>\n")
+               I (next_char() == "\n" & !in_unordered_list & ordered_list_current_number == -1)
+                  i++
+                  writepos = i + 1
+            E I prevc == ‘'’
+               A t = startqpos - 1
+               L t >= 0
+                  I instr[t] != ‘'’
+                     L.break
+                  --t
+               A eat_left = startqpos - 1 - t
+               t = endqpos + 1
+               L t < instr.len
+                  I instr[t] != ‘'’
+                     L.break
+                  t++
+               A eat_right = t - (endqpos + 1)
+               write_to_pos(startqpos - eat_left, t)
+               outfile.write(instr[startqpos + eat_left .< endqpos - eat_right + 1])
+            E I prevc C ‘0OО’
+               write_to_pos(prevci, endqpos + 1)
+               outfile.write(html_escape(instr[startqpos + 1 .< endqpos]).replace("\n", "<br />\n"))
+            E I prevc == ‘#’
+               A ins = instr[startqpos + 1 .< endqpos]
+               I .habrahabr_html
+                  write_to_pos(prevci, endqpos + 1)
+                  A contains_new_line = "\n" C ins
+                  outfile.write((I str_in_b != ‘’ {‘<source lang="’str_in_b‘">’} E I contains_new_line {‘<source>’} E ‘<code>’) + ins + (I str_in_b != ‘’ | contains_new_line {‘</source>’} E ‘</code>’))
+
+               E
+                  write_to_pos(prevci, endqpos + 1)
+                  outfile.write(‘<pre style="display: inline">’html_escape(instr[startqpos + 1 .< endqpos])‘</pre>’)
+               I ins[0] == "\n" & instr[i + 1 .< i + 2] == "\n"
+                  new_line_tag = ‘’
+            E I prevc C ‘TТ’
+               write_to_pos(prevci, endqpos + 1)
+               A header_row = 0B
+               A hor_row_align = ‘’
+               A ver_row_align = ‘’
+               Array[Array[Array[String]]] table
+               A j = startqpos + 1
+               L j < endqpos
+                  ch = instr[j]
+                  I ch == "‘"
+                     Array[Array[String]] empty_list
+                     table.append(empty_list)
+                     A endrow = find_ending_pair_quote(j)
+                     A hor_col_align = ‘’
+                     A ver_col_align = ‘’
+                     j++
+                     L j < endrow
+                        ch = instr[j]
+                        I ch == "‘"
+                           A end_of_column = find_ending_pair_quote(j)
+                           A style = ‘’
+                           I hor_row_align != ‘’ | hor_col_align != ‘’
+                              style ‘’= ‘text-align: ’(I hor_col_align != ‘’ {hor_col_align} E hor_row_align)
+                           I ver_row_align != ‘’ | ver_col_align != ‘’
+                              I style != ‘’
+                                 style ‘’= ‘; ’
+                              style ‘’= ‘vertical-align: ’(I ver_col_align != ‘’ {ver_col_align} E ver_row_align)
+                           hor_col_align = ‘’
+                           ver_col_align = ‘’
+                           table.last.append([.to_html(instr[j + 1 .< end_of_column], outer_pos' j + 1), (I header_row {‘th’} E ‘td’) + (I style != ‘’ {‘ style="’style‘"’} E ‘’)])
+                           j = end_of_column
+                        E I ch C ‘<>’ & instr[j + 1 .< j + 2] C (‘<’, ‘>’)
+                           hor_col_align = S instr[j .< j + 2] {‘<<’ {‘left’}; ‘>>’ {‘right’}; ‘><’ {‘center’}; ‘<>’ {‘justify’}}
+                           j++
+                        E I instr[j .< j + 2] C ("/\\", "\\/")
+                           ver_col_align = I instr[j .< j + 2] == "/\\" {‘top’} E ‘bottom’
+                           j++
+                        E I ch == ‘-’
+                           I table.last.empty
+                              exit_with_error(‘Wrong table column span marker "-"’, j)
+                           table.last.append([‘’, ‘-’])
+                        E I ch == ‘|’
+                           I table.len == 1
+                              exit_with_error(‘Wrong table row span marker "|"’, j)
+                           table.last.append([‘’, ‘|’])
+                        E I instr[j .< j + 3] == ‘[[[’
+                           j = find_ending_sq_bracket(instr, j)
+                        E I ch !C "  \t\n"
+                           exit_with_error(‘Unknown formatting character inside table row’, j)
+                        j++
+                     header_row = 0B
+                     hor_row_align = ‘’
+                     ver_row_align = ‘’
+                  E I ch C ‘HН’
+                     header_row = 1B
+                  E I ch C ‘<>’ & instr[j + 1 .< j + 2] C (‘<’, ‘>’)
+                     hor_row_align = S instr[j .< j + 2] {‘<<’ {‘left’}; ‘>>’ {‘right’}; ‘><’ {‘center’}; ‘<>’ {‘justify’}}
+                     j++
+                  E I instr[j .< j + 2] C ("/\\", "\\/")
+                     ver_row_align = I instr[j .< j + 2] == "/\\" {‘top’} E ‘bottom’
+                     j++
+                  E I instr[j .< j + 3] == ‘[[[’
+                     j = find_ending_sq_bracket(instr, j)
+                  E I ch !C "  \t\n"
+                     exit_with_error(‘Unknown formatting character inside table’, j)
+                  j++
+
+               L(y) (table.len - 1 .< -1).step(-1)
+                  L(x) (table[y].len - 1 .< -1).step(-1)
+                     I table[y][x][1] C (‘-’, ‘|’)
+                        A xx = x
+                        A yy = y
+                        L
+                           I table[yy][xx][1] == ‘-’
+                              --xx
+                           E I table[yy][xx][1] == ‘|’
+                              --yy
+                           E
+                              L.break
+                        I xx < x
+                           table[yy][xx][1] += ‘ colspan="’String(x - xx + 1)‘"’
+                        I yy < y
+                           table[yy][xx][1] += ‘ rowspan="’String(y - yy + 1)‘"’
+                        L(xxx) xx .< x + 1
+                           L(yyy) yy .< y + 1
+                              I !(xxx == xx & yyy == yy)
+                                 table[yyy][xxx][1] = ‘’
+               outfile.write(‘<table’(‘ style="display: inline"’ * (prevci != 0 & instr[prevci - 1] != "\n"))">\n")
+               L(row) table
+                  outfile.write(‘<tr>’)
+                  L(colcolattrs) row
+                     A col = colcolattrs[0]
+                     A colattrs = colcolattrs[1]
+                     I colattrs != ‘’
+                        outfile.write(‘<’colattrs‘>’col‘</’colattrs[0.<2]‘>’)
+                  outfile.write("</tr>\n")
+               outfile.write("</table>\n")
+               I !(prevci != 0 & instr[prevci - 1] != "\n")
+                  new_line_tag = ‘’
+            E I prevc C ‘<>’ & instr[prevci - 1] C ‘<>’
+               write_to_pos(prevci - 1, endqpos + 1)
+               outfile.write(‘<div align="’(S instr[prevci - 1] + prevc {‘<<’ {‘left’}; ‘>>’ {‘right’}; ‘><’ {‘center’}; ‘<>’ {‘justify’}})‘">’(.to_html(instr[startqpos + 1 .< endqpos], outer_pos' startqpos + 1))"</div>\n")
+               new_line_tag = ‘’
+            E I i_next_str(":‘") & instr[find_ending_pair_quote(i + 2) + 1 ..][0.<1] == ‘<’
+               A endrq = find_ending_pair_quote(i + 2)
+               i = endrq + 1
+               write_to_pos(prevci + 1, i + 1)
+               outfile.write(‘<blockquote>’(.to_html(instr[startqpos + 1 .< endqpos], outer_pos' startqpos + 1))"<br />\n<div align='right'><i>"instr[endqpos + 3 .< endrq]‘</i></div></blockquote>’)
+               new_line_tag = ‘’
+            E
+               i = startqpos
+               I prev_char() C ‘*_-~’
+                  write_to_pos(i - 1, i + 1)
+                  A tag = S prev_char() {‘*’ {‘b’}; ‘_’ {‘u’}; ‘-’ {‘s’}; ‘~’ {‘i’}}
+                  outfile.write(‘<’tag‘>’)
+                  ending_tags.append(‘</’tag‘>’)
+               E I prevc C ‘HН’
+                  write_to_pos(prevci, i + 1)
+                  A tag = ‘h’String(min(max(3 - (I str_in_b == ‘’ {0} E Int(str_in_b)), 1), 6))
+                  outfile.write(‘<’tag‘>’)
+                  ending_tags.append(‘</’tag‘>’)
+               E I prevc C ‘CС’
+                  write_to_pos(prevci, i + 1)
+                  A which_color = ‘color’
+                  I str_in_b[0.<1] == ‘-’
+                     str_in_b = str_in_b[1..]
+                     which_color = ‘background-color’
+                  I str_in_b[0.<1] == ‘#’
+                     A new_str_in_b = ‘’
+                     L(c) str_in_b
+                        A cc = (S c.lower() {‘а’ {‘A’}; ‘б’ {‘B’}; ‘с’ {‘C’}; ‘д’ {‘D’}; ‘е’ {‘E’}; ‘ф’ {‘F’} E c})[0]
+                        new_str_in_b ‘’= I c.islower() {cc.lower()} E cc
+                     str_in_b = new_str_in_b
+                  E I str_in_b.len C (1, 3) & str_in_b.isdigit()
+                     A new_str = ‘#’
+                     L(ii) I str_in_b.len == 3 {[0, 1, 2]} E [0, 0, 0]
+                        new_str ‘’= hex((Int(str_in_b[ii]) * 00'FF + 4) I/ 8)[2..].upper().zfill(2)
+                     str_in_b = new_str
+                  I .habrahabr_html
+                     outfile.write(‘<font color="’str_in_b‘">’)
+                     ending_tags.append(‘</font>’)
+                  E
+                     outfile.write(‘<span style="’which_color‘: ’str_in_b‘">’)
+                     ending_tags.append(‘</span>’)
+               E I (instr[prevci - 1] + prevc) C ("/\\", "\\/")
+                  write_to_pos(prevci - 1, i + 1)
+                  A tag = I (instr[prevci - 1] + prevc) == "/\\" {‘sup’} E ‘sub’
+                  outfile.write(‘<’tag‘>’)
+                  ending_tags.append(‘</’tag‘>’)
+               E I prevc == ‘!’
+                  write_to_pos(prevci, i + 1)
+                  outfile.write(I .habrahabr_html {‘<blockquote>’} E ‘<div class="note">’)
+                  ending_tags.append(I .habrahabr_html {‘</blockquote>’} E ‘</div>’)
+               E
+                  ending_tags.append("’")
+         E I ch == "’"
+            write_to_pos(i, i + 1)
+            I ending_tags.empty
+               exit_with_error(‘Unpaired right single quotation mark’, i)
+            A last = ending_tags.pop()
+            outfile.write(last)
+            I next_char() == "\n" & (last.starts_with(‘</h’) | last == ‘</blockquote>’)
+               outfile.write("\n")
+               i++
+               writepos++
+         E I ch == ‘`’
+            A start = i
+            i++
+            L i < instr.len
+               I instr[i] != ‘`’
+                  L.break
+               i++
+            A end = instr.findi((i - start) * ‘`’, i)
+            I end == -1
+               exit_with_error(‘Unended ` started’, start)
+            write_to_pos(start, end + i - start)
+            A ins = instr[i .< end]
+            A delta = ins.count("‘") - ins.count("’")
+            I delta > 0
+               L(ii) 0 .< delta
+                  ending_tags.append("’")
+            E
+               L(ii) 0 .< -delta
+                  I ending_tags.pop() != "’"
+                     exit_with_error(‘Unpaired single quotation mark found inside code block/span beginning’, start)
+            ins = html_escape(ins)
+            I !("\n" C ins)
+               outfile.write(I .habrahabr_html {‘<code>’ins‘</code>’} E ‘<pre style="display: inline">’ins‘</pre>’)
+            E
+               ins = ins
+               outfile.write(‘<pre>’ins‘</pre>’("\n" * (!(.habrahabr_html))))
+               new_line_tag = ‘’
+            i = end + i - start - 1
+         E I ch == ‘[’
+            I i_next_str(‘http’) | i_next_str(‘./’) | i_next_str("‘") | numbered_link()
+               A s = i - 1
+               L s >= writepos & instr[s] !C "\r\n\t [{(‘“"
+                  --s
+               I i_next_str("‘")
+                  write_note(s + 1, i, 0)
+               E I i_next_str(‘http’) | i_next_str(‘./’)
+                  write_http_link(s + 1, i, 0)
+               E
+                  write_to_pos(s + 1, endi + 1)
+                  outfile.write(‘<a href="’link‘">’html_escape(instr[s + 1 .< i])‘</a>’)
+                  i = endi
+            E I i_next_str(‘[[’)
+               A comment_start = i
+               A nesting_level = 0
+               L
+                  ch = instr[i]
+                  I ch == ‘[’
+                     nesting_level++
+                  E I ch == ‘]’
+                     --nesting_level
+                     I nesting_level == 0
+                        L.break
+                  E I ch == "‘"
+                     ending_tags.append("’")
+                  E I ch == "’"
+                     assert(ending_tags.pop() == "’")
+                  i++
+                  I i == instr.len
+                     exit_with_error(‘Unended comment started’, comment_start)
+               write_to_pos(comment_start, i + 1)
+               I instr[comment_start + 3 .< comment_start + 4] != ‘[’
+                  outfile.write(‘<!--’)
+                  outfile.write(remove_comments(instr[comment_start .< i + 1], comment_start, 4))
+                  outfile.write(‘-->’)
+            E
+               write_to_i((‘<span class="sq"><span class="sq_brackets">’ * .ohd)‘’(‘<font color="#BFBFBF">’ * .habrahabr_html)‘[’(‘</font><font color="gray">’ * .habrahabr_html)‘’(.ohd * ‘</span>’))
+         E I ch == ‘]’
+            write_to_i((‘<span class="sq_brackets">’ * .ohd)‘’(‘</font><font color="#BFBFBF">’ * .habrahabr_html)‘]’(‘</font>’ * .habrahabr_html)‘’(.ohd * ‘</span></span>’))
+         E I ch == ‘{’
+            write_to_i(‘<span class="cu_brackets" onclick="return spoiler(this, event)"><span class="cu_brackets_b">’ * .ohd‘{’(.ohd * ‘</span><span>…</span><span class="cu" style="display: none">’))
+         E I ch == ‘}’
+            write_to_i(‘</span><span class="cu_brackets_b">’ * .ohd‘}’(.ohd * ‘</span></span>’))
+         E I ch == "\n"
+            write_to_i((I new_line_tag != "\0" {new_line_tag} E ‘<br />’) + (I new_line_tag != ‘’ {"\n"} E ‘’))
+            new_line_tag = "\0"
+         i++
+      close_ordered_list()
+      close_unordered_list()
+      write_to_pos(instr.len, 0)
+      assert(ending_tags.empty)
+      assert(.to_html_called_inside_to_html_outer_pos_list.pop() == outer_pos)
 
       I outfilef == N
          A r = result.join(‘’)
@@ -1197,7 +1904,414 @@ public:
                     i++;
                 }
             }
+
+            if (ch == u'‘') {
+                auto prevci = i - 1;
+                auto prevc = prevci >= 0 ? instr[prevci] : _get<0>(u"\0"_S);
+                auto startqpos = i;
+                i = find_ending_pair_quote(i);
+                auto endqpos = i;
+                auto str_in_b = u""_S;
+                if (prevc == u')') {
+                    auto openb = instr.rfindi(u"("_S, 0, prevci - 1);
+                    if (openb != -1 && openb > 0) {
+                        str_in_b = instr[range_el(openb + 1, startqpos - 1)];
+                        prevci = openb - 1;
+                        prevc = instr[prevci];
+                    }
+                }
+                if (in(prevc, u"PР"_S)) {
+                    write_to_pos(prevci, endqpos + 1);
+                    auto title = u""_S;
+                    int endqpos2;
+                    if (i_next_str(u"[‘"_S)) {
+                        endqpos2 = find_ending_pair_quote(i + 2);
+                        assert(instr[endqpos2 + 1] == u']');
+                        title = u" title=\""_S + html_escapeq(remove_comments(instr[range_el(i + 3, endqpos2)], i + 3)) + u"\""_S;
+                    }
+                    auto imgtag = u"<img"_S;
+                    if (str_in_b != u"") {
+                        auto wh = str_in_b.replace(u","_S, u" "_S).split(u" "_S);
+                        assert(in(wh.len(), range_el(1, 3)));
+                        imgtag += u" width=\""_S + _get<0>(wh) + u"\" height=\""_S + wh.last() + u"\""_S;
+                    }
+                    imgtag += u" src=\""_S + instr[range_el(startqpos + 1, endqpos)] + u"\""_S + title + u" />"_S;
+                    if (i_next_str(u"[http"_S) || i_next_str(u"[./"_S)) {
+                        write_http_link(startqpos, endqpos, 1, imgtag);
+                        writepos = i + 1;
+                    }
+                    else if (i_next_str(u"[‘"_S)) {
+                        outfile.write(imgtag);
+                        writepos = endqpos2 + 2;
+                        i = endqpos2 + 1;
+                    }
+                    else {
+                        outfile.write(imgtag);
+                        i = endqpos;
+                    }
+                }
+                else if (i_next_str(u"[http"_S) || i_next_str(u"[./"_S))
+                    write_http_link(startqpos, endqpos);
+                else if (next_char() == u'[' && numbered_link(2)) {
+                    i = endi;
+                    write_to_pos(startqpos, i + 1);
+                    outfile.write(u"<a href=\""_S + link + u"\">"_S + html_escape(instr[range_el(startqpos + 1, endqpos)]) + u"</a>"_S);
+                }
+                else if (i_next_str(u"[‘"_S))
+                    write_note(startqpos, endqpos);
+                else if (next_char() == u'{' && (habrahabr_html || ohd)) {
+                    auto nesting_level = 0;
+                    i += 2;
+                    while (true) {
+                        if (i == instr.len())
+                            exit_with_error(u"Unended spoiler"_S, endqpos + 1);
+                        ch = instr[i];
+                        if (ch == u'{')
+                            nesting_level++;
+                        else if (ch == u'}') {
+                            if (nesting_level == 0)
+                                break;
+                            --nesting_level;
+                        }
+                        i++;
+                    }
+                    write_to_pos(prevci + 1, i + 1);
+                    auto outer_p = endqpos + (instr[endqpos + 2] == u'\n' ? 3 : 2);
+                    if (habrahabr_html)
+                        outfile.write(u"<spoiler title=\""_S + remove_comments(instr[range_el(startqpos + 1, endqpos)], startqpos + 1).replace(u"\""_S, u"''"_S) + u"\">"_S + (to_html(instr[range_el(outer_p, i)], nullptr, outer_p)) + u"</spoiler>"_S);
+                    else
+                        outfile.write(u"<span class=\"spoiler_title\" onclick=\"return spoiler2(this, event)\">"_S + remove_comments(instr[range_el(startqpos + 1, endqpos)], startqpos + 1) + u"<br /></span>"_S + u"<div class=\"spoiler_text\" style=\"display: none\">"_S + (to_html(instr[range_el(outer_p, i)], nullptr, outer_p)) + u"</div>\n"_S);
+                    if ((next_char() == u'\n' && !in_unordered_list && ordered_list_current_number == -1)) {
+                        i++;
+                        writepos = i + 1;
+                    }
+                }
+                else if (prevc == u'\'') {
+                    auto t = startqpos - 1;
+                    while (t >= 0) {
+                        if (instr[t] != u'\'')
+                            break;
+                        --t;
+                    }
+                    auto eat_left = startqpos - 1 - t;
+                    t = endqpos + 1;
+                    while (t < instr.len()) {
+                        if (instr[t] != u'\'')
+                            break;
+                        t++;
+                    }
+                    auto eat_right = t - (endqpos + 1);
+                    write_to_pos(startqpos - eat_left, t);
+                    outfile.write(instr[range_el(startqpos + eat_left, endqpos - eat_right + 1)]);
+                }
+                else if (in(prevc, u"0OО"_S)) {
+                    write_to_pos(prevci, endqpos + 1);
+                    outfile.write(html_escape(instr[range_el(startqpos + 1, endqpos)]).replace(u"\n"_S, u"<br />\n"_S));
+                }
+                else if (prevc == u'#') {
+                    auto ins = instr[range_el(startqpos + 1, endqpos)];
+                    if (habrahabr_html) {
+                        write_to_pos(prevci, endqpos + 1);
+                        auto contains_new_line = in(u'\n'_C, ins);
+                        outfile.write((str_in_b != u"" ? u"<source lang=\""_S + str_in_b + u"\">"_S : contains_new_line ? u"<source>"_S : u"<code>"_S) + ins + (str_in_b != u"" || contains_new_line ? u"</source>"_S : u"</code>"_S));
+                    }
+
+                    else {
+                        write_to_pos(prevci, endqpos + 1);
+                        outfile.write(u"<pre style=\"display: inline\">"_S + html_escape(instr[range_el(startqpos + 1, endqpos)]) + u"</pre>"_S);
+                    }
+                    if (_get<0>(ins) == u'\n' && instr[range_el(i + 1, i + 2)] == u'\n')
+                        new_line_tag = u""_S;
+                }
+                else if (in(prevc, u"TТ"_S)) {
+                    write_to_pos(prevci, endqpos + 1);
+                    auto header_row = false;
+                    auto hor_row_align = u""_S;
+                    auto ver_row_align = u""_S;
+                    Array<Array<Array<String>>> table;
+                    auto j = startqpos + 1;
+                    while (j < endqpos) {
+                        ch = instr[j];
+                        if (ch == u'‘') {
+                            Array<Array<String>> empty_list;
+                            table.append(empty_list);
+                            auto endrow = find_ending_pair_quote(j);
+                            auto hor_col_align = u""_S;
+                            auto ver_col_align = u""_S;
+                            j++;
+                            while (j < endrow) {
+                                ch = instr[j];
+                                if (ch == u'‘') {
+                                    auto end_of_column = find_ending_pair_quote(j);
+                                    auto style = u""_S;
+                                    if (hor_row_align != u"" || hor_col_align != u"")
+                                        style += u"text-align: "_S + (hor_col_align != u"" ? hor_col_align : hor_row_align);
+                                    if (ver_row_align != u"" || ver_col_align != u"") {
+                                        if (style != u"")
+                                            style += u"; "_S;
+                                        style += u"vertical-align: "_S + (ver_col_align != u"" ? ver_col_align : ver_row_align);
+                                    }
+                                    hor_col_align = u""_S;
+                                    ver_col_align = u""_S;
+                                    table.last().append(create_array({to_html(instr[range_el(j + 1, end_of_column)], nullptr, j + 1), (header_row ? u"th"_S : u"td"_S) + (style != u"" ? u" style=\""_S + style + u"\""_S : u""_S)}));
+                                    j = end_of_column;
+                                }
+                                else if (in(ch, u"<>"_S) && in(instr[range_el(j + 1, j + 2)], make_tuple(u"<"_S, u">"_S))) {
+                                    hor_col_align = [&](const auto &a){return a == u"<<"_S ? u"left"_S : a == u">>"_S ? u"right"_S : a == u"><"_S ? u"center"_S : a == u"<>"_S ? u"justify"_S : throw KeyError(a);}(instr[range_el(j, j + 2)]);
+                                    j++;
+                                }
+                                else if (in(instr[range_el(j, j + 2)], make_tuple(u"/\\"_S, u"\\/"_S))) {
+                                    ver_col_align = instr[range_el(j, j + 2)] == u"/\\" ? u"top"_S : u"bottom"_S;
+                                    j++;
+                                }
+                                else if (ch == u'-') {
+                                    if (table.last().empty())
+                                        exit_with_error(u"Wrong table column span marker \"-\""_S, j);
+                                    table.last().append(create_array({u""_S, u"-"_S}));
+                                }
+                                else if (ch == u'|') {
+                                    if (table.len() == 1)
+                                        exit_with_error(u"Wrong table row span marker \"|\""_S, j);
+                                    table.last().append(create_array({u""_S, u"|"_S}));
+                                }
+                                else if (instr[range_el(j, j + 3)] == u"[[[")
+                                    j = find_ending_sq_bracket(instr, j);
+                                else if (!in(ch, u"  \t\n"_S))
+                                    exit_with_error(u"Unknown formatting character inside table row"_S, j);
+                                j++;
+                            }
+                            header_row = false;
+                            hor_row_align = u""_S;
+                            ver_row_align = u""_S;
+                        }
+                        else if (in(ch, u"HН"_S))
+                            header_row = true;
+                        else if (in(ch, u"<>"_S) && in(instr[range_el(j + 1, j + 2)], make_tuple(u"<"_S, u">"_S))) {
+                            hor_row_align = [&](const auto &a){return a == u"<<"_S ? u"left"_S : a == u">>"_S ? u"right"_S : a == u"><"_S ? u"center"_S : a == u"<>"_S ? u"justify"_S : throw KeyError(a);}(instr[range_el(j, j + 2)]);
+                            j++;
+                        }
+                        else if (in(instr[range_el(j, j + 2)], make_tuple(u"/\\"_S, u"\\/"_S))) {
+                            ver_row_align = instr[range_el(j, j + 2)] == u"/\\" ? u"top"_S : u"bottom"_S;
+                            j++;
+                        }
+                        else if (instr[range_el(j, j + 3)] == u"[[[")
+                            j = find_ending_sq_bracket(instr, j);
+                        else if (!in(ch, u"  \t\n"_S))
+                            exit_with_error(u"Unknown formatting character inside table"_S, j);
+                        j++;
+                    }
+                    for (auto y : range_el(table.len() - 1, -1).step(-1))
+                        for (auto x : range_el(table[y].len() - 1, -1).step(-1))
+                            if (in(_get<1>(table[y][x]), make_tuple(u"-"_S, u"|"_S))) {
+                                auto xx = x;
+                                auto yy = y;
+                                while (true)
+                                    if (_get<1>(table[yy][xx]) == u'-')
+                                        --xx;
+                                    else if (_get<1>(table[yy][xx]) == u'|')
+                                        --yy;
+                                    else
+                                        break;
+                                if (xx < x)
+                                    _get<1>(table[yy][xx]) += u" colspan=\""_S + String(x - xx + 1) + u"\""_S;
+                                if (yy < y)
+                                    _get<1>(table[yy][xx]) += u" rowspan=\""_S + String(y - yy + 1) + u"\""_S;
+                                for (auto xxx : range_el(xx, x + 1))
+                                    for (auto yyy : range_el(yy, y + 1))
+                                        if (!(xxx == xx && yyy == yy))
+                                            table[yyy][xxx].set(1, u""_S);
+                            }
+                    outfile.write(u"<table"_S + (u" style=\"display: inline\""_S * (prevci != 0 && instr[prevci - 1] != u'\n')) + u">\n"_S);
+                    for (auto row : table) {
+                        outfile.write(u"<tr>"_S);
+                        for (auto colcolattrs : row) {
+                            auto col = _get<0>(colcolattrs);
+                            auto colattrs = _get<1>(colcolattrs);
+                            if (colattrs != u"")
+                                outfile.write(u"<"_S + colattrs + u">"_S + col + u"</"_S + colattrs[range_el(0, 2)] + u">"_S);
+                        }
+                        outfile.write(u"</tr>\n"_S);
+                    }
+                    outfile.write(u"</table>\n"_S);
+                    if (!(prevci != 0 && instr[prevci - 1] != u'\n'))
+                        new_line_tag = u""_S;
+                }
+                else if (in(prevc, u"<>"_S) && in(instr[prevci - 1], u"<>"_S)) {
+                    write_to_pos(prevci - 1, endqpos + 1);
+                    outfile.write(u"<div align=\""_S + ([&](const auto &a){return a == u"<<"_S ? u"left"_S : a == u">>"_S ? u"right"_S : a == u"><"_S ? u"center"_S : a == u"<>"_S ? u"justify"_S : throw KeyError(a);}(instr[prevci - 1] + prevc)) + u"\">"_S + (to_html(instr[range_el(startqpos + 1, endqpos)], nullptr, startqpos + 1)) + u"</div>\n"_S);
+                    new_line_tag = u""_S;
+                }
+                else if (i_next_str(u":‘"_S) && instr[range_ei(find_ending_pair_quote(i + 2) + 1)][range_el(0, 1)] == u'<') {
+                    auto endrq = find_ending_pair_quote(i + 2);
+                    i = endrq + 1;
+                    write_to_pos(prevci + 1, i + 1);
+                    outfile.write(u"<blockquote>"_S + (to_html(instr[range_el(startqpos + 1, endqpos)], nullptr, startqpos + 1)) + u"<br />\n<div align='right'><i>"_S + instr[range_el(endqpos + 3, endrq)] + u"</i></div></blockquote>"_S);
+                    new_line_tag = u""_S;
+                }
+                else {
+                    i = startqpos;
+                    if (in(prev_char(), u"*_-~"_S)) {
+                        write_to_pos(i - 1, i + 1);
+                        auto tag = [&](const auto &a){return a == u'*'_C ? u'b'_C : a == u'_'_C ? u'u'_C : a == u'-'_C ? u's'_C : a == u'~'_C ? u'i'_C : throw KeyError(a);}(prev_char());
+                        outfile.write(u"<"_S + tag + u">"_S);
+                        ending_tags.append(u"</"_S + tag + u">"_S);
+                    }
+                    else if (in(prevc, u"HН"_S)) {
+                        write_to_pos(prevci, i + 1);
+                        auto tag = u"h"_S + String(min(max(3 - (str_in_b == u"" ? 0 : parse_int(str_in_b)), 1), 6));
+                        outfile.write(u"<"_S + tag + u">"_S);
+                        ending_tags.append(u"</"_S + tag + u">"_S);
+                    }
+                    else if (in(prevc, u"CС"_S)) {
+                        write_to_pos(prevci, i + 1);
+                        auto which_color = u"color"_S;
+                        if (str_in_b[range_el(0, 1)] == u'-') {
+                            str_in_b = str_in_b[range_ei(1)];
+                            which_color = u"background-color"_S;
+                        }
+                        if (str_in_b[range_el(0, 1)] == u'#') {
+                            auto new_str_in_b = u""_S;
+                            for (auto c : str_in_b) {
+                                auto cc = _get<0>(([&](const auto &a){return a == u'а'_C ? u"A"_S : a == u'б'_C ? u"B"_S : a == u'с'_C ? u"C"_S : a == u'д'_C ? u"D"_S : a == u'е'_C ? u"E"_S : a == u'ф'_C ? u"F"_S : c;}(c.lower())));
+                                new_str_in_b += c.islower() ? cc.lower() : cc;
+                            }
+                            str_in_b = new_str_in_b;
+                        }
+                        else if (in(str_in_b.len(), make_tuple(1, 3)) && str_in_b.isdigit()) {
+                            auto new_str = u"#"_S;
+                            for (auto ii : str_in_b.len() == 3 ? create_array({0, 1, 2}) : create_array({0, 0, 0}))
+                                new_str += hex(int((parse_int(str_in_b[ii]) * 0x00'FF + 4))/int(8))[range_ei(2)].upper().zfill(2);
+                            str_in_b = new_str;
+                        }
+                        if (habrahabr_html) {
+                            outfile.write(u"<font color=\""_S + str_in_b + u"\">"_S);
+                            ending_tags.append(u"</font>"_S);
+                        }
+                        else {
+                            outfile.write(u"<span style=\""_S + which_color + u": "_S + str_in_b + u"\">"_S);
+                            ending_tags.append(u"</span>"_S);
+                        }
+                    }
+                    else if (in((instr[prevci - 1] + prevc), make_tuple(u"/\\"_S, u"\\/"_S))) {
+                        write_to_pos(prevci - 1, i + 1);
+                        auto tag = (instr[prevci - 1] + prevc) == u"/\\" ? u"sup"_S : u"sub"_S;
+                        outfile.write(u"<"_S + tag + u">"_S);
+                        ending_tags.append(u"</"_S + tag + u">"_S);
+                    }
+                    else if (prevc == u'!') {
+                        write_to_pos(prevci, i + 1);
+                        outfile.write(habrahabr_html ? u"<blockquote>"_S : u"<div class=\"note\">"_S);
+                        ending_tags.append(habrahabr_html ? u"</blockquote>"_S : u"</div>"_S);
+                    }
+                    else
+                        ending_tags.append(u"’"_S);
+                }
+            }
+            else if (ch == u'’') {
+                write_to_pos(i, i + 1);
+                if (ending_tags.empty())
+                    exit_with_error(u"Unpaired right single quotation mark"_S, i);
+                auto last = ending_tags.pop();
+                outfile.write(last);
+                if (next_char() == u'\n' && (last.starts_with(u"</h"_S) || last == u"</blockquote>")) {
+                    outfile.write(u"\n"_S);
+                    i++;
+                    writepos++;
+                }
+            }
+            else if (ch == u'`') {
+                auto start = i;
+                i++;
+                while (i < instr.len()) {
+                    if (instr[i] != u'`')
+                        break;
+                    i++;
+                }
+                auto end = instr.findi((i - start) * u"`"_S, i);
+                if (end == -1)
+                    exit_with_error(u"Unended ` started"_S, start);
+                write_to_pos(start, end + i - start);
+                auto ins = instr[range_el(i, end)];
+                auto delta = ins.count(u"‘"_S) - ins.count(u"’"_S);
+                if (delta > 0)
+                    for (auto ii : range_el(0, delta))
+                        ending_tags.append(u"’"_S);
+                else
+                    for (auto ii : range_el(0, -delta))
+                        if (ending_tags.pop() != u'’')
+                            exit_with_error(u"Unpaired single quotation mark found inside code block/span beginning"_S, start);
+                ins = html_escape(ins);
+                if (!(in(u'\n'_C, ins)))
+                    outfile.write(habrahabr_html ? u"<code>"_S + ins + u"</code>"_S : u"<pre style=\"display: inline\">"_S + ins + u"</pre>"_S);
+                else {
+                    ins = ins;
+                    outfile.write(u"<pre>"_S + ins + u"</pre>"_S + (u"\n"_S * (!(habrahabr_html))));
+                    new_line_tag = u""_S;
+                }
+                i = end + i - start - 1;
+            }
+            else if (ch == u'[') {
+                if (i_next_str(u"http"_S) || i_next_str(u"./"_S) || i_next_str(u"‘"_S) || numbered_link()) {
+                    auto s = i - 1;
+                    while (s >= writepos && !in(instr[s], u"\r\n\t [{(‘“"_S))
+                        --s;
+                    if (i_next_str(u"‘"_S))
+                        write_note(s + 1, i, 0);
+                    else if (i_next_str(u"http"_S) || i_next_str(u"./"_S))
+                        write_http_link(s + 1, i, 0);
+                    else {
+                        write_to_pos(s + 1, endi + 1);
+                        outfile.write(u"<a href=\""_S + link + u"\">"_S + html_escape(instr[range_el(s + 1, i)]) + u"</a>"_S);
+                        i = endi;
+                    }
+                }
+                else if (i_next_str(u"[["_S)) {
+                    auto comment_start = i;
+                    auto nesting_level = 0;
+                    while (true) {
+                        ch = instr[i];
+                        if (ch == u'[')
+                            nesting_level++;
+                        else if (ch == u']') {
+                            --nesting_level;
+                            if (nesting_level == 0)
+                                break;
+                        }
+                        else if (ch == u'‘')
+                            ending_tags.append(u"’"_S);
+                        else if (ch == u'’')
+                            assert(ending_tags.pop() == u'’');
+                        i++;
+                        if (i == instr.len())
+                            exit_with_error(u"Unended comment started"_S, comment_start);
+                    }
+                    write_to_pos(comment_start, i + 1);
+                    if (instr[range_el(comment_start + 3, comment_start + 4)] != u'[') {
+                        outfile.write(u"<!--"_S);
+                        outfile.write(remove_comments(instr[range_el(comment_start, i + 1)], comment_start, 4));
+                        outfile.write(u"-->"_S);
+                    }
+                }
+                else
+                    write_to_i((u"<span class=\"sq\"><span class=\"sq_brackets\">"_S * ohd) + (u"<font color=\"#BFBFBF\">"_S * habrahabr_html) + u"["_S + (u"</font><font color=\"gray\">"_S * habrahabr_html) + (ohd * u"</span>"_S));
+            }
+            else if (ch == u']')
+                write_to_i((u"<span class=\"sq_brackets\">"_S * ohd) + (u"</font><font color=\"#BFBFBF\">"_S * habrahabr_html) + u"]"_S + (u"</font>"_S * habrahabr_html) + (ohd * u"</span></span>"_S));
+            else if (ch == u'{')
+                write_to_i(u"<span class=\"cu_brackets\" onclick=\"return spoiler(this, event)\"><span class=\"cu_brackets_b\">"_S * ohd + u"{"_S + (ohd * u"</span><span>…</span><span class=\"cu\" style=\"display: none\">"_S));
+            else if (ch == u'}')
+                write_to_i(u"</span><span class=\"cu_brackets_b\">"_S * ohd + u"}"_S + (ohd * u"</span></span>"_S));
+            else if (ch == u'\n') {
+                write_to_i((new_line_tag != u'\0' ? new_line_tag : u"<br />"_S) + (new_line_tag != u"" ? u"\n"_S : u""_S));
+                new_line_tag = u"\0"_S;
+            }
+            i++;
         }
+        close_ordered_list();
+        close_unordered_list();
+        write_to_pos(instr.len(), 0);
+        assert(ending_tags.empty());
+        assert(to_html_called_inside_to_html_outer_pos_list.pop() == outer_pos);
 
         if (outfilef == nullptr) {
             auto r = result.join(u""_S);

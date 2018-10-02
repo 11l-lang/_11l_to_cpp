@@ -91,6 +91,13 @@ public:
 		throw IndexError(i);
 	}
 
+	Type &operator[](int i)
+	{
+		if (in(i, range_el(0, len())))
+			return at(i);
+		throw IndexError(i);
+	}
+
 	void set(int i, const Type &v)
 	{
 		if (in(i, range_el(0, len())))
@@ -106,6 +113,22 @@ public:
 		for (int i=0, l=len(); i<l; i++)
 			if (data()[i] == v) return i;
 		throw ValueError(v);
+	}
+
+	Type &last()
+	{
+		if (empty())
+			throw IndexError(0);
+		return at(len()-1);
+	}
+
+	Type pop()
+	{
+		if (empty())
+			throw IndexError(0);
+		Type r(std::move(at(len()-1)));
+		resize(len()-1);
+		return r;
 	}
 };
 
@@ -125,4 +148,23 @@ template <typename Type> Type sum(const Array<Type> &arr)
 	for (auto v : arr)
 		r += v;
 	return r;
+}
+
+inline Array<String> String::split(const String &delim)
+{
+	Array<String> arr;
+	arr.reserve(count(delim) + 1);
+	const char16_t *str = data(), *begin = str, *end = data() + len() - delim.len() + 1;
+	while (str < end)
+		if (memcmp(str, delim.data(), delim.len()*sizeof(char16_t)) == 0)
+		{
+			arr.append(String(begin, str-begin));
+			str += delim.len();
+			begin = str;
+		}
+		else
+			str++;
+
+	arr.append(String(begin, str-begin));
+	return arr;
 }
