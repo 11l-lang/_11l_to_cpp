@@ -653,7 +653,6 @@ class Converter:
                 if not "\n" in ins: # this is a single-line code -‘block’span
                     outfile.write('<code>' + ins + '</code>' if self.habrahabr_html else '<pre style="display: inline">' + ins + '</pre>')
                 else:
-                    ins = ins
                     outfile.write('<pre>' + ins + '</pre>' + "\n"*(not self.habrahabr_html))
                     new_line_tag = ''
                 i = end + i - start - 1
@@ -694,9 +693,9 @@ class Converter:
                         outfile.write(remove_comments(instr[comment_start:i+1], comment_start, 4)) # берётся вся строка вместе со [[[скобочками]]] для [[[таких] ситуаций]]
                         outfile.write('-->')
                 else:
-                    write_to_i(('<span class="sq"><span class="sq_brackets">'*self.ohd) + '' + '<font color="#BFBFBF">'*self.habrahabr_html + '[' + '</font><font color="gray">'*self.habrahabr_html + '' + self.ohd*'</span>')
+                    write_to_i('<span class="sq"><span class="sq_brackets">'*self.ohd + '<font color="#BFBFBF">'*self.habrahabr_html + '[' + '</font><font color="gray">'*self.habrahabr_html + self.ohd*'</span>')
             elif ch == "]":
-                write_to_i(('<span class="sq_brackets">'*self.ohd) + '' + '</font><font color="#BFBFBF">'*self.habrahabr_html + ']' + '</font>'*self.habrahabr_html + '' + self.ohd*'</span></span>')
+                write_to_i('<span class="sq_brackets">'*self.ohd + '</font><font color="#BFBFBF">'*self.habrahabr_html + ']' + '</font>'*self.habrahabr_html + self.ohd*'</span></span>')
             elif ch == "{":
                 write_to_i('<span class="cu_brackets" onclick="return spoiler(this, event)"><span class="cu_brackets_b">'*self.ohd + '{' + self.ohd*'</span><span>…</span><span class="cu" style="display: none">')
             elif ch == "}":
@@ -1373,7 +1372,6 @@ T Converter
             I !("\n" C ins)
                outfile.write(I .habrahabr_html {‘<code>’ins‘</code>’} E ‘<pre style="display: inline">’ins‘</pre>’)
             E
-               ins = ins
                outfile.write(‘<pre>’ins‘</pre>’("\n" * (!(.habrahabr_html))))
                new_line_tag = ‘’
             i = end + i - start - 1
@@ -2244,7 +2242,6 @@ public:
                 if (!(in(u'\n'_C, ins)))
                     outfile.write(habrahabr_html ? u"<code>"_S + ins + u"</code>"_S : u"<pre style=\"display: inline\">"_S + ins + u"</pre>"_S);
                 else {
-                    ins = ins;
                     outfile.write(u"<pre>"_S + ins + u"</pre>"_S + (u"\n"_S * (!(habrahabr_html))));
                     new_line_tag = u""_S;
                 }
