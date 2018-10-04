@@ -17,7 +17,7 @@ public:
 
 	File(const String &name, const String &mode = u"r"_S, const String &encoding = u"utf-8"_S)
 	{
-		_wfopen_s(&file, (wchar_t*)name.c_str(), (wchar_t*)mode.c_str());
+		_wfopen_s(&file, (wchar_t*)name.c_str(), (wchar_t*)(mode + u'b').c_str());
 	}
 
 	File &operator=(File &&f)
