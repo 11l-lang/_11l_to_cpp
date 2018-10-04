@@ -31,7 +31,7 @@ public:
 	void write(const String &s)
 	{
 		std::string utf8;
-		utf8.resize(s.length() * 2);
+		utf8.resize(s.length() * 3);
 		utf8.resize(WideCharToMultiByte(CP_UTF8, 0, (LPCWCH)s.data(), s.length(), utf8.data(), utf8.size(), NULL, NULL));
 		fwrite(utf8.data(), utf8.size(), 1, file);
 	}

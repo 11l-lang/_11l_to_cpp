@@ -524,7 +524,7 @@ class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
 class ASTFunctionDefinition(ASTNodeWithChildren):
     function_name : str
     function_return_type : str = ''
-    function_arguments : List[Tuple[str, SymbolNode, str]]# = []
+    function_arguments : List[Tuple[str, SymbolNode, str, str]]# = []
     first_named_only_argument = None
     last_non_default_argument : int
 
@@ -559,10 +559,16 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 node.walk_children(gather_captured_variables)
             gather_captured_variables(self)
 
+            arguments = []
+            for arg in self.function_arguments:
+                if arg[2] == '': # if there is no type specified
+                    arguments.append(('auto ' if '=' in arg[3] else 'const auto &') + arg[0] if arg[1] == None else
+                                          ('' if '=' in arg[3] else 'const ') + 'decltype(' + arg[1].to_str() + ') ' + arg[0] + ' = ' + arg[1].to_str())
+                else:
+                    arguments.append(('' if '=' in arg[3] else 'const ') + cpp_type_from_11l[arg[2]] + ' ' + ('&'*(arg[2] not in ('Int',))) + arg[0] + ('' if arg[1] == None else ' = ' + arg[1].to_str()))
             return self.children_to_str(indent, ('auto' if self.function_return_type == '' else cpp_type_from_11l[self.function_return_type]) + ' ' + self.function_name
                 + ' = [' + ', '.join(sorted(filter(lambda v: not '&'+v in captured_variables, captured_variables))) + '](' \
-                + ', '.join(map(lambda arg: ('auto ' if '=' in arg[3] else 'const auto &') + arg[0] if arg[1] == None else
-                                                 ('' if '=' in arg[3] else 'const ') + 'decltype(' + arg[1].to_str() + ') ' + arg[0] + ' = ' + arg[1].to_str(), self.function_arguments)) + ')')[:-1] + ";\n"
+                + ', '.join(arguments) + ')')[:-1] + ";\n"
 
         else:
             s = ('auto' if self.function_return_type == '' else cpp_type_from_11l[self.function_return_type]) + ' ' + self.function_name
@@ -812,11 +818,13 @@ def prefix(id, bp):
         return self
     symbol(id).set_nud_bp(bp, nud)
 
-infix('[+]', 20); infix('->', 20); infix('(concat)', 25) # s -> s[0]‘’@c = s -> (s[0]‘’@c)
+infix('[+]', 20); infix('->', 20)
 
 infix('|', 30); infix('&', 40)
 
 infix('==', 50); infix('!=', 50); infix('C ', 50); infix('С ', 50); infix('in ', 50); infix('!C ', 50); infix('!С ', 50); infix('!in ', 50)
+
+infix('(concat)', 52) # `instr[prevci - 1 .< prevci]‘’prevc C ("/\\", "\\/")` = `(instr[prevci - 1 .< prevci]‘’prevc) C ("/\\", "\\/")`
 
 infix('..', 55); infix('.<', 55); infix('<.', 55); infix('<.<', 55) # ch C ‘0’..‘9’ = ch C (‘0’..‘9’)
 #postfix('..', 55)

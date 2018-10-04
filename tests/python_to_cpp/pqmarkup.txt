@@ -134,7 +134,7 @@ class Converter:
         nonunique_links : Dict[int, str] = {}
         link = ''
 
-        def write_http_link(startpos, endpos, q_offset = 1, text = ''):
+        def write_http_link(startpos, endpos : int, q_offset = 1, text = ''):
             nonlocal i, link
             # Ищем окончание ссылки
             nesting_level = 0
@@ -607,9 +607,9 @@ class Converter:
                         else: # The <font> tag is not supported in HTML5.
                             outfile.write('<span style="'+which_color+': ' + str_in_b + '">')
                             ending_tags.append('</span>')
-                    elif (instr[prevci-1]+prevc) in ("/\\", "\\/"):
+                    elif (instr[prevci-1:prevci]+''+prevc) in ("/\\", "\\/"):
                         write_to_pos(prevci-1, i + 1)
-                        tag = 'sup' if (instr[prevci-1]+prevc) == "/\\" else "sub"
+                        tag = 'sup' if (instr[prevci-1]+''+prevc) == "/\\" else "sub"
                         outfile.write('<' + tag + '>')
                         ending_tags.append('</' + tag + '>')
                     elif prevc == '!':
@@ -882,7 +882,7 @@ T Converter
       Dict[Int, String] nonunique_links
       A link = ‘’
 
-      F write_http_link(startpos, endpos, q_offset = 1, =text = ‘’)
+      F write_http_link(startpos, Int endpos, q_offset = 1, =text = ‘’)
          A nesting_level = 0
          @i += 2
          L
@@ -1327,9 +1327,9 @@ T Converter
                   E
                      outfile.write(‘<span style="’which_color‘: ’str_in_b‘">’)
                      ending_tags.append(‘</span>’)
-               E I (instr[prevci - 1] + prevc) C ("/\\", "\\/")
+               E I (instr[prevci - 1 .< prevci]‘’prevc) C ("/\\", "\\/")
                   write_to_pos(prevci - 1, i + 1)
-                  A tag = I (instr[prevci - 1] + prevc) == "/\\" {‘sup’} E ‘sub’
+                  A tag = I (instr[prevci - 1]‘’prevc) == "/\\" {‘sup’} E ‘sub’
                   outfile.write(‘<’tag‘>’)
                   ending_tags.append(‘</’tag‘>’)
                E I prevc == ‘!’
@@ -1645,7 +1645,7 @@ public:
         Dict<int, String> nonunique_links;
         auto link = u""_S;
 
-        auto write_http_link = [&i, &link, exit_with_error, find_ending_pair_quote, find_ending_sq_bracket, html_escape, html_escapeq, instr, next_char, nonunique_links, outfile, remove_comments, write_to_pos](const auto &startpos, const auto &endpos, const decltype(1) q_offset = 1, decltype(u""_S) text = u""_S)
+        auto write_http_link = [&i, &link, exit_with_error, find_ending_pair_quote, find_ending_sq_bracket, html_escape, html_escapeq, instr, next_char, nonunique_links, outfile, remove_comments, write_to_pos](const auto &startpos, const int endpos, const decltype(1) q_offset = 1, decltype(u""_S) text = u""_S)
         {
             auto nesting_level = 0;
             i += 2;
@@ -2190,7 +2190,7 @@ public:
                             ending_tags.append(u"</span>"_S);
                         }
                     }
-                    else if (in((instr[prevci - 1] + prevc), make_tuple(u"/\\"_S, u"\\/"_S))) {
+                    else if (in((instr[range_el(prevci - 1, prevci)] + prevc), make_tuple(u"/\\"_S, u"\\/"_S))) {
                         write_to_pos(prevci - 1, i + 1);
                         auto tag = (instr[prevci - 1] + prevc) == u"/\\" ? u"sup"_S : u"sub"_S;
                         outfile.write(u"<"_S + tag + u">"_S);

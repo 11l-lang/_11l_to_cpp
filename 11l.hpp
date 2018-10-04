@@ -57,8 +57,11 @@ template <typename Ty> inline void print(const Array<Ty> &arr, const String &end
 		std::wcout.flush();
 }
 
-template <int n, typename Container> inline auto _get(const Container &c) {return c[n];}
-template <int n, typename...Types> inline auto _get(const Tuple<Types...> &t) {return std::get<n>(t);}
+//template <int n, typename Container> inline auto  _get(const Container &c) {return c[n];}
+//template <int n, typename Type>      inline Type &_get(Array<Type> &arr) {return arr[n];}
+template <int n, typename Container> inline auto _get(const Container &c) -> decltype(c[n]) {return c[n];}
+template <int n, typename Container> inline auto _get(      Container &c) -> decltype(c[n]) {return c[n];}
+template <int n, typename...Types> inline const auto &_get(const Tuple<Types...> &t) {return std::get<n>(t);}
 
 // Note: solutions like this[https://gist.github.com/mortehu/373069390c75b02f98b655e3f7dbef9a <- google:‘zip vector c++’] can not handle temp arrays (array destructed after `zip(create_array(...)...)` call)
 template <typename T1, typename T2> Array<Tuple<T1, T2>> zip(const Array<T1> &arr1, const Array<T2> &arr2)
