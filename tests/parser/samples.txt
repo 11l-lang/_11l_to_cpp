@@ -384,7 +384,7 @@ auto to_html()
 {
     auto i = 0;
     auto writepos = 1;
-    auto write_to_pos = [&writepos, i](const auto &npos)
+    auto write_to_pos = [&i, &writepos](const auto &npos)
     {
         writepos = i + npos;
     };

@@ -1537,7 +1537,7 @@ public:
         if (outfilef == nullptr)
             outfile.write = [&result](const auto &s){return result.append(s);};
         else
-            outfile.write = [outfilef](const auto &s){return outfilef->write(s);};
+            outfile.write = [&outfilef](const auto &s){return outfilef->write(s);};
         if (to_html_called_inside_to_html_outer_pos_list.len() == 1)
             this->instr = instr;
 
@@ -1547,17 +1547,17 @@ public:
             throw Exception(message, _get<0>(p), _get<1>(p), pos);
         };
         auto i = 0;
-        auto next_char = [i, instr](const decltype(1) offset = 1)
+        auto next_char = [&i, &instr](const decltype(1) offset = 1)
         {
             return i + offset < instr.len() ? instr[i + offset] : _get<0>(u"\0"_S);
         };
 
-        auto i_next_str = [i, instr](const auto &str)
+        auto i_next_str = [&i, &instr](const auto &str)
         {
             return instr[range_el(i + 1, i + 1 + str.len())] == str;
         };
 
-        auto prev_char = [i, instr](const decltype(1) offset = 1)
+        auto prev_char = [&i, &instr](const decltype(1) offset = 1)
         {
             return i - offset >= 0 ? instr[i - offset] : _get<0>(u"\0"_S);
         };
@@ -1574,19 +1574,19 @@ public:
             return str.replace(u"&"_S, u"&amp;"_S).replace(u"\""_S, u"&quot;"_S);
         };
         auto writepos = 0;
-        auto write_to_pos = [&writepos, html_escape, instr, outfile](const auto &pos, const auto &npos)
+        auto write_to_pos = [&html_escape, &instr, &outfile, &writepos](const auto &pos, const auto &npos)
         {
             outfile.write(html_escape(instr[range_el(writepos, pos)]));
             writepos = npos;
         };
 
-        auto write_to_i = [i, outfile, write_to_pos](const auto &add_str, const decltype(1) skip_chars = 1)
+        auto write_to_i = [&i, &outfile, &write_to_pos](const auto &add_str, const decltype(1) skip_chars = 1)
         {
             write_to_pos(i, i + skip_chars);
             outfile.write(add_str);
         };
 
-        auto find_ending_pair_quote = [exit_with_error, instr](auto i)
+        auto find_ending_pair_quote = [&exit_with_error, &instr](auto i)
         {
             assert(instr[i] == u'‘');
             auto startqpos = i;
@@ -1608,7 +1608,7 @@ public:
             }
         };
 
-        auto find_ending_sq_bracket = [exit_with_error](const auto &str, auto i, const decltype(0) start = 0)
+        auto find_ending_sq_bracket = [&exit_with_error](const auto &str, auto i, const decltype(0) start = 0)
         {
             auto starti = i;
             assert(str[i] == u'[');
@@ -1630,7 +1630,7 @@ public:
             }
         };
 
-        auto remove_comments = [find_ending_sq_bracket](auto s, auto start, const decltype(3) level = 3)
+        auto remove_comments = [&find_ending_sq_bracket](auto s, auto start, const decltype(3) level = 3)
         {
             while (true) {
                 auto j = s.findi(u"["_S * level);
@@ -1645,7 +1645,7 @@ public:
         Dict<int, String> nonunique_links;
         auto link = u""_S;
 
-        auto write_http_link = [&i, &link, exit_with_error, find_ending_pair_quote, find_ending_sq_bracket, html_escape, html_escapeq, instr, next_char, nonunique_links, outfile, remove_comments, write_to_pos](const auto &startpos, const int endpos, const decltype(1) q_offset = 1, decltype(u""_S) text = u""_S)
+        auto write_http_link = [&exit_with_error, &find_ending_pair_quote, &find_ending_sq_bracket, &html_escape, &html_escapeq, &i, &instr, &link, &next_char, &nonunique_links, &outfile, &remove_comments, &write_to_pos](const auto &startpos, const int endpos, const decltype(1) q_offset = 1, decltype(u""_S) text = u""_S)
         {
             auto nesting_level = 0;
             i += 2;
@@ -1709,7 +1709,7 @@ public:
             outfile.write(tag + u">"_S + (text != u"" ? text : link) + u"</a>"_S);
         };
 
-        auto write_note = [&i, exit_with_error, find_ending_pair_quote, html_escape, html_escapeq, instr, outfile, remove_comments, write_to_pos](const auto &startpos, const auto &endpos, const decltype(1) q_offset = 1)
+        auto write_note = [&exit_with_error, &find_ending_pair_quote, &html_escape, &html_escapeq, &i, &instr, &outfile, &remove_comments, &write_to_pos](const auto &startpos, const auto &endpos, const decltype(1) q_offset = 1)
         {
             i += q_offset;
             auto endqpos2 = find_ending_pair_quote(i + 1);
@@ -1720,7 +1720,7 @@ public:
             i = endqpos2 + 1;
         };
         auto endi = 0;
-        auto numbered_link = [&endi, &link, exit_with_error, i, instr, next_char, nonunique_links](const decltype(1) offset = 1)
+        auto numbered_link = [&endi, &exit_with_error, &i, &instr, &link, &next_char, &nonunique_links](const decltype(1) offset = 1)
         {
             if (next_char(offset) == u'-' && next_char(offset + 1).isdigit()) {
                 auto j = i + offset + 1;
@@ -1745,7 +1745,7 @@ public:
             return false;
         };
         auto ordered_list_current_number = -1;
-        auto close_ordered_list = [&ordered_list_current_number, write_to_i]()
+        auto close_ordered_list = [&ordered_list_current_number, &write_to_i]()
         {
             if (ordered_list_current_number != -1) {
                 write_to_i(u"</li>\n</ol>\n"_S, 0);
@@ -1753,7 +1753,7 @@ public:
             }
         };
         auto in_unordered_list = false;
-        auto close_unordered_list = [&in_unordered_list, write_to_i]()
+        auto close_unordered_list = [&in_unordered_list, &write_to_i]()
         {
             if (in_unordered_list) {
                 write_to_i(u"</li>\n</ul>\n"_S, 0);

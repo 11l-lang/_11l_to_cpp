@@ -381,8 +381,8 @@ class SymbolNode:
                 def gather_captured_variables(sn):
                     if sn.token.category == Token.Category.NAME:
                         if sn.token.value(source)[0] == '@':
-                            by_ref = sn.parent.children[0] is sn and ((sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!='))
-                                                                   or (sn.parent.symbol.id == '.' and sn.parent.children[1].token_str() == 'append'))
+                            by_ref = True # sn.parent.children[0] is sn and ((sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!='))
+                                          #                               or (sn.parent.symbol.id == '.' and sn.parent.children[1].token_str() == 'append'))
                             captured_variables.add(('&' if by_ref else '') + sn.token.value(source)[1:])
                     else:
                         for child in sn.children:
@@ -547,9 +547,9 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 def f(sn : SymbolNode):
                     if sn.token.category == Token.Category.NAME:
                         if sn.token.value(source)[0] == '@':
-                            by_ref = sn.parent and sn.parent.children[0] is sn and sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!=')
+                            by_ref = True # sn.parent and sn.parent.children[0] is sn and sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!=')
                             t = sn.token.value(source)[1:]
-                            captured_variables.add(('&' if by_ref else '') + ('this' if t == '' else t))
+                            captured_variables.add('this' if t == '' else '&'*by_ref + t)
                     else:
                         for child in sn.children:
                             if child != None:
