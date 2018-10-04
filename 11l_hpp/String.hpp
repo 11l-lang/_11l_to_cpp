@@ -36,8 +36,29 @@ class String : public std::u16string
 public:
 	String() {}
 	String(Char c) : basic_string(1, c.code) {}
-	String(char16_t c) : basic_string(1, c) {}
-	String(const char16_t *&s) : basic_string(s) {} // reference is needed here because otherwise String(const char16_t (&s)[N]) is never called (`String(u"str")` calls `String(const char16_t *s)`)
+	explicit String(char16_t c) : basic_string(1, c) {}
+	explicit String(int num)
+	{
+		char16_t staticBuffer[30];
+		int len = 0;
+		if (num < 0)
+		{
+			staticBuffer[len++] = u'-';
+			do {
+				staticBuffer[len++] = u'0'-(num%10);
+			} while (num /= 10);
+		}
+		else
+		do
+		{
+			staticBuffer[len++] = u'0'+(num%10);
+			num /= 10;
+		} while (num);
+		for (char16_t *start=staticBuffer[0]==u'-' ? staticBuffer+1 : staticBuffer,
+			*end=staticBuffer+len-1; start<end; start++, end--) std::swap(*start, *end);
+		assign(staticBuffer, len);
+	}
+	explicit String(const char16_t *&s) : basic_string(s) {} // reference is needed here because otherwise String(const char16_t (&s)[N]) is never called (`String(u"str")` calls `String(const char16_t *s)`)
 	String(const char16_t *s, size_t sz) : basic_string(s, sz) {}
 	template <int N> String(const char16_t (&s)[N]): basic_string(s, N-1) {}
 
@@ -109,7 +130,7 @@ public:
 	{
 		int c = 0;
 		for (int i=0; i<len();)
-			if (memcmp(s + i, data() + i, sz * sizeof(char16_t)) == 0) {
+			if (memcmp(s, data() + i, sz * sizeof(char16_t)) == 0) {
 				c++;
 				i += sz;
 			} else
@@ -147,7 +168,7 @@ public:
 
 	String zfill(int width) const
 	{
-		return String(u"0") * max(width - len(), 0);
+		return String(u"0") * max(width - len(), 0) + *this;
 	}
 
 	//String &operator=(const String &s) {assign(s); return *this;}
@@ -173,16 +194,20 @@ public:
 		return String(*this) * n;
 	}
 
-	Char operator[](int pos) const
+	Char &operator[](int pos)
+	{
+		return (Char&)at(pos);
+	}
+	const Char operator[](int pos) const
 	{
 		return Char(at(pos));
 	}
 
-	String operator[](const Range<int, true,  true > &range) const {return slice(max(range.b    , 0), min(range.e + 1, len()));}
-	String operator[](const Range<int, true,  false> &range) const {return slice(max(range.b    , 0), min(range.e    , len()));}
-	String operator[](const Range<int, false, true > &range) const {return slice(max(range.b + 1, 0), min(range.e + 1, len()));}
-	String operator[](const Range<int, false, false> &range) const {return slice(max(range.b + 1, 0), min(range.e    , len()));}
-	String operator[](const RangeEI<int>             &range) const {return slice(max(range.b    , 0),                    len() );}
+	String operator[](const Range<int, true,  true > &range) const {return slice(max(range.b    , 0), min((unsigned)range.e + 1u, (unsigned)len()));} // `(unsigned)` is needed when `instr` starts with left single quotation mark
+	String operator[](const Range<int, true,  false> &range) const {return slice(max(range.b    , 0), min((unsigned)range.e     , (unsigned)len()));}
+	String operator[](const Range<int, false, true > &range) const {return slice(max(range.b + 1, 0), min((unsigned)range.e + 1u, (unsigned)len()));}
+	String operator[](const Range<int, false, false> &range) const {return slice(max(range.b + 1, 0), min((unsigned)range.e     , (unsigned)len()));}
+	String operator[](const RangeEI<int>             &range) const {return slice(max(range.b    , 0), len());}
 
 	bool operator==(Char ch) const {return   len() == 1 && at(0) == ch.code ;}
 	bool operator!=(Char ch) const {return !(len() == 1 && at(0) == ch.code);}
@@ -194,6 +219,8 @@ public:
 
 	String operator+(const String &s) const {String r(*this); r.append(s); return r;}
 	String operator+(Char ch) {String r(*this); r.append(1, ch.code); return r;}
+
+	String operator+(int i) {return *this + String(i);}
 };
 
 String operator+(Char ch1, Char ch2)
@@ -228,14 +255,17 @@ inline char hex_to_char(int c) {return (char)c + ((unsigned)c <= 9u ? '0' : 'A' 
 
 inline String hex(int n)
 {
-	char16_t rr[9], *h = rr;
+	char16_t rr[8], *h = rr;
 	for (const unsigned char *d = (unsigned char*)&n + sizeof(n)-1; d >= (unsigned char*)&n; d--)
 		*h++ = hex_to_char(*d >> 4),
 		*h++ = hex_to_char(*d & 0xF);
 	const char16_t *s = rr;
-	while (*s == '0')
+	while (*s == u'0')
 		s++;
 	String r = u"0x";
-	r.append(s, h-s);
+	if (h > s)
+		r.append(s, h-s);
+	else
+		r.append(1, u'0');
 	return r;
 }

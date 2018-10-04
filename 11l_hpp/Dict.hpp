@@ -5,6 +5,7 @@ class KeyError
 public:
 	String key;
 
+	KeyError(Char c) : key(c) {}
 	KeyError(const String &key) : key(key) {}
 };
 
