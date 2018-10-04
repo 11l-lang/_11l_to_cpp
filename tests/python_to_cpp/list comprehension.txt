@@ -12,7 +12,7 @@ auto f()
 {
     auto selection_strings = create_array({make_tuple(u"selection"_S, true), make_tuple(u".hg"_S, false)});
     auto c = u"."_S;
-    selection_strings.map([c](const auto &s){return _get<0>(s) + c;}).join(u"\n"_S);
+    selection_strings.map([&c](const auto &s){return _get<0>(s) + c;}).join(u"\n"_S);
 }
 
 
@@ -30,7 +30,7 @@ auto f()
 {
     auto selection_strings = create_array({make_tuple(u"selection"_S, true), make_tuple(u".hg"_S, false)});
     auto c = u"."_S;
-    (selection_strings.map([c](const auto &s){return _get<0>(s) + c;})).join(u"\n"_S);
+    (selection_strings.map([&c](const auto &s){return _get<0>(s) + c;})).join(u"\n"_S);
 }
 
 
@@ -48,7 +48,7 @@ auto f()
 {
     auto selection_strings = create_array({make_tuple(u"selection"_S, true), make_tuple(u".hg"_S, false)});
     auto c = u"."_S;
-    selection_strings.filter([c](const auto &s){return _get<0>(_get<0>(s)) != c;}).map([c](const auto &s){return _get<0>(s) + c;}).join(u"\n"_S);
+    selection_strings.filter([&c](const auto &s){return _get<0>(_get<0>(s)) != c;}).map([&c](const auto &s){return _get<0>(s) + c;}).join(u"\n"_S);
 }
 
 
@@ -66,7 +66,7 @@ auto f()
 {
     auto selection_strings = create_array({make_tuple(u"selection"_S, true), make_tuple(u".hg"_S, false)});
     auto c = u"."_S;
-    selection_strings.filter([c](const auto &s){return _get<0>(_get<0>(s)) != c;}).join(u"\n"_S);
+    selection_strings.filter([&c](const auto &s){return _get<0>(_get<0>(s)) != c;}).join(u"\n"_S);
 }
 
 
@@ -141,7 +141,7 @@ assert((0.<3).map(i -> i * 2) == [0, 2, 4])
 ===
 template <typename T1, typename T2> auto split_len(const T1 &seq, const T2 &length)
 {
-    return range_el(0, seq.len()).step(length).map([length, seq](const auto &i){return seq[range_el(i, i + length)];});
+    return range_el(0, seq.len()).step(length).map([&length, &seq](const auto &i){return seq[range_el(i, i + length)];});
 }
 assert(split_len(u"o-o o-x o-o"_S, 4) == create_array({u"o-o "_S, u"o-x "_S, u"o-o"_S}));
 auto r1 = range_el(0, 10);
