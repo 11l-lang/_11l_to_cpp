@@ -32,7 +32,7 @@ public:
 	{
 		std::string utf8;
 		utf8.resize(s.length() * 3);
-		utf8.resize(WideCharToMultiByte(CP_UTF8, 0, (LPCWCH)s.data(), s.length(), utf8.data(), utf8.size(), NULL, NULL));
+		utf8.resize(WideCharToMultiByte(CP_UTF8, 0, (LPCWCH)s.data(), s.length(), const_cast<char*>(utf8.data()), utf8.size(), NULL, NULL));
 		fwrite(utf8.data(), utf8.size(), 1, file);
 	}
 
@@ -50,7 +50,7 @@ public:
 		else
 			fseek(file, 0, SEEK_SET);
 		file_str.resize(file_size);
-		fread(file_str.data(), file_size, 1, file);
+		fread(const_cast<char*>(file_str.data()), file_size, 1, file);
 
 		String r;
 		r.resize(file_size * 3 / 2);

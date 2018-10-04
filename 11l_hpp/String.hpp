@@ -71,8 +71,8 @@ public:
 		void operator++() {c++;}
 		Char operator*() {return Char(*c);}
 	};
-	Iterator begin() {return Iterator(data());}
-	Iterator end()   {return Iterator(data() + len());}
+	Iterator begin() {return Iterator(const_cast<char16_t*>(data()));}
+	Iterator end()   {return Iterator(const_cast<char16_t*>(data()) + len());}
 	Iterator begin() const {return Iterator(const_cast<char16_t*>(data()));}
 	Iterator end()   const {return Iterator(const_cast<char16_t*>(data() + len()));}
 
