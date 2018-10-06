@@ -53,7 +53,7 @@ public:
 		fread(const_cast<char*>(file_str.data()), file_size, 1, file);
 
 		String r;
-		r.resize(file_size * 3 / 2);
+		r.resize(file_size);
 		r.resize(MultiByteToWideChar(CP_UTF8, 0, file_str.data(), file_str.size(), (LPWSTR)r.data(), r.size()));
 
 		return r;
