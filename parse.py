@@ -646,17 +646,19 @@ class ASTSwitch(ASTNodeWithExpression):
             r += ' ' * ((indent+1)*4) + "break;\n"
         return r + ' ' * (indent*4) + "}\n"
 
+break_label_index = -1
+
 class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
     loop_variable : str = None
-    there_is_loop_break_inside_switch = False
+    there_is_loop_break_inside_switch = -1
 
     def to_str(self, indent):
         if self.loop_variable != None:
             r = self.children_to_str_detect_single_stmt(indent, 'for (auto ' + self.loop_variable + ' : ' + self.expression.to_str() + ')')
         else:
             r = self.children_to_str_detect_single_stmt(indent, 'while (' + (self.expression.to_str() if self.expression != None else 'true') + ')')
-        if self.there_is_loop_break_inside_switch:
-            r += ' ' * (indent*4) + "break_:\n"
+        if self.there_is_loop_break_inside_switch != -1:
+            r += ' ' * (indent*4) + 'break_' + ('' if self.there_is_loop_break_inside_switch == 0 else str(self.there_is_loop_break_inside_switch)) + ":\n"
         return r
 
     def walk_expressions(self, f):
@@ -674,9 +676,12 @@ class ASTLoopBreak(ASTNode):
                 n = n.parent
                 while True:
                     if type(n) == ASTLoop:
-                        n.there_is_loop_break_inside_switch = True
-                        break
-                return ' ' * (indent*4) + "goto break_;\n"
+                        if n.there_is_loop_break_inside_switch == -1:
+                            global break_label_index
+                            break_label_index += 1
+                            n.there_is_loop_break_inside_switch = break_label_index
+                        return ' ' * (indent*4) + 'goto break_' + ('' if n.there_is_loop_break_inside_switch == 0 else str(n.there_is_loop_break_inside_switch)) + ";\n"
+                    n = n.parent
             if type(n) == ASTLoop:
                 break
             n = n.parent
@@ -1292,11 +1297,12 @@ def parse_internal(this_node):
     return
 
 def parse(tokens_, source_, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
-    global tokens, source, tokeni, token, scope
+    global tokens, source, tokeni, token, break_label_index, scope
     tokens = tokens_ + [Token(len(source_), len(source_), Token.Category.STATEMENT_SEPARATOR)]
     source = source_
     tokeni = -1
     token = None
+    break_label_index = -1
     scope = Scope(None)
     scope.add_function('print', ASTFunctionDefinition([('object', None, ''), ('end', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), R'"\n"'), 'String'), ('flush', SymbolNode(Token(0, 0, Token.Category.CONSTANT)))]))
     scope.add_function('assert', ASTFunctionDefinition([('expression', None, 'Bool'), ('message', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘’'), 'String')]))

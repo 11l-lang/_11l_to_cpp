@@ -1234,13 +1234,13 @@ T Converter
                L
                   I i == instr.len
                      exit_with_error(‘Unended spoiler’, endqpos + 1)
-                  ch = instr[i]
-                  I ch == ‘{’
-                     nesting_level++
-                  E I ch == ‘}’
-                     I nesting_level == 0
-                        L.break
-                     --nesting_level
+                  S instr[i]
+                     ‘{’
+                        nesting_level++
+                     ‘}’
+                        I nesting_level == 0
+                           L.break
+                        --nesting_level
                   i++
                write_to_pos(prevci + 1, i + 1)
                A outer_p = endqpos + (I instr[endqpos + 2] == "\n" {3} E 2)
@@ -1490,17 +1490,16 @@ T Converter
                A comment_start = i
                A nesting_level = 0
                L
-                  ch = instr[i]
-                  I ch == ‘[’
-                     nesting_level++
-                  E I ch == ‘]’
-                     --nesting_level
-                     I nesting_level == 0
-                        L.break
-                  E I ch == "‘"
-                     ending_tags.append("’")
-                  E I ch == "’"
-                     assert(ending_tags.pop() == "’")
+                  S instr[i]
+                     ‘[’
+                        nesting_level++
+                     ‘]’
+                        I --nesting_level == 0
+                           L.break
+                     "‘"
+                        ending_tags.append("’")
+                     "’"
+                        assert(ending_tags.pop() == "’")
                   i++
                   I i == instr.len
                      exit_with_error(‘Unended comment started’, comment_start)
@@ -2157,16 +2156,20 @@ public:
                     while (true) {
                         if (i == instr.len())
                             exit_with_error(u"Unended spoiler"_S, endqpos + 1);
-                        ch = instr[i];
-                        if (ch == u'{')
+                        switch (instr[i])
+                        {
+                        case u'{':
                             nesting_level++;
-                        else if (ch == u'}') {
+                            break;
+                        case u'}':
                             if (nesting_level == 0)
-                                break;
+                                goto break_1;
                             --nesting_level;
+                            break;
                         }
                         i++;
                     }
+                    break_1:
                     write_to_pos(prevci + 1, i + 1);
                     auto outer_p = endqpos + (instr[endqpos + 2] == u'\n' ? 3 : 2);
                     if (habrahabr_html)
@@ -2460,22 +2463,27 @@ public:
                     auto comment_start = i;
                     auto nesting_level = 0;
                     while (true) {
-                        ch = instr[i];
-                        if (ch == u'[')
+                        switch (instr[i])
+                        {
+                        case u'[':
                             nesting_level++;
-                        else if (ch == u']') {
-                            --nesting_level;
-                            if (nesting_level == 0)
-                                break;
-                        }
-                        else if (ch == u'‘')
+                            break;
+                        case u']':
+                            if (--nesting_level == 0)
+                                goto break_2;
+                            break;
+                        case u'‘':
                             ending_tags.append(u"’"_S);
-                        else if (ch == u'’')
+                            break;
+                        case u'’':
                             assert(ending_tags.pop() == u'’');
+                            break;
+                        }
                         i++;
                         if (i == instr.len())
                             exit_with_error(u"Unended comment started"_S, comment_start);
                     }
+                    break_2:
                     write_to_pos(comment_start, i + 1);
                     if (instr[range_el(comment_start + 3, comment_start + 4)] != u'[') {
                         outfile.write(u"<!--"_S);
