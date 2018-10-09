@@ -72,7 +72,6 @@ keywords = ['A',     'C',  'I',    'E',     'F',  'L',    'N',    'R',       'S'
             'А',     'С',  'Е',    'И',     'Ф',  'Ц',    'Н',    'Р',       'В',       'Т',    'Х',
             'var',   'in', 'if',   'else',  'fn', 'loop', 'null', 'return',  'switch',  'type', 'exception',
             'перем', 'С',  'если', 'иначе', 'фн', 'цикл', 'нуль', 'вернуть', 'выбрать', 'тип',  'исключение']
-keywords.remove('A'); keywords.remove('А'); keywords.remove('var'); keywords.remove('перем') # it is more convenient to consider A/var as [type] name, not a keyword
 #keywords.remove('C'); keywords.remove('С'); keywords.remove('in') # it is more convenient to consider C/in as an operator, not a keyword (however, this line is not necessary)
 # new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
 # Решил отказаться от учёта new_scope_keywords на уровне лексического анализатора из-за loop.break и case в switch
@@ -300,6 +299,8 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
 
             if operator:
                 i = lexem_start + len(operator)
+                if source[i-1] == ' ': # for correct handling of operator 'C '/'in ' in external tools (e.g. keyletters_to_keywords.py)
+                    i -= 1
                 category = Token.Category.OPERATOR
             elif ch.isalpha() or ch in ('_', '@'): # this is NAME/IDENTIFIER or KEYWORD
                 while i < len(source) and source[i] == '@':
@@ -309,11 +310,13 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                     if not (ch.isalpha() or ch in '_?' or '0' <= ch <= '9'):
                         break
                     i += 1
+
                 if source[i:i+1] == '/' and source[i-1:i] in 'IЦ':
                     if source[i-2:i-1] == ' ':
                         category = Token.Category.OPERATOR
                     else:
                         raise Error('please clarify your intention by putting space character before or after `I`', i-1)
+
                 elif source[i:i+1] == "'": # this is a named argument, a raw string or a hexadecimal number
                     i += 1
                     if source[i:i+1] == ' ': # this is a named argument
@@ -329,7 +332,9 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                         category = Token.Category.NUMERIC_LITERAL
 
                 elif source[lexem_start:i] in keywords:
-                    if source[lexem_start:i] in ('N', 'Н'):
+                    if source[lexem_start:i] in ('A', 'А', 'var', 'перем'): # it is more convenient to consider A/var as [type] name, not a keyword
+                        category = Token.Category.NAME
+                    elif source[lexem_start:i] in ('N', 'Н', 'null', 'нуль'):
                         category = Token.Category.CONSTANT
                     else:
                         category = Token.Category.KEYWORD
