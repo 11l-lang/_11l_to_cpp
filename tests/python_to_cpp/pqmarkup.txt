@@ -53,6 +53,7 @@ class Converter:
         else:
             outfile.write = lambda s: outfilef.write(s)
 
+        # Сохраняем instr для определения номера строки по номеру символа
         if len(self.to_html_called_inside_to_html_outer_pos_list) == 1:
             self.instr = instr
 
@@ -161,9 +162,10 @@ class Converter:
             # Ищем альтернативный текст при такой записи: ссылка[http://... ‘альтернативный текст’]
             if instr[i] == " ":
                 tag += ' title="'
-                if next_char() == "‘": # ’[
+                if next_char() == "‘": # [
                     endqpos2 = find_ending_pair_quote(i+1)
-                    assert(instr[endqpos2+1] == ']')
+                    if instr[endqpos2+1] != ']': # [
+                        exit_with_error('Expected `]` after `’`', endqpos2+1)
                     tag += html_escapeq(remove_comments(instr[i+2:endqpos2], i+2))
                     i = endqpos2 + 1
                 else:
@@ -371,14 +373,15 @@ class Converter:
                     write_to_pos(prevci, endqpos + 1)
                     title = ''
                     endqpos2 : int
-                    if i_next_str('[‘'): # альтернативный текст’
+                    if i_next_str('[‘'): # альтернативный текст
                         endqpos2 = find_ending_pair_quote(i+2)
-                        assert(instr[endqpos2+1] == ']')
+                        if instr[endqpos2+1] != ']': # [
+                            exit_with_error('Expected `]` after `’`', endqpos2+1)
                         title = ' title="'+html_escapeq(remove_comments(instr[i+3:endqpos2], i+3))+'"'
                     imgtag = '<img'
                     if str_in_b != '':
                         wh = str_in_b.replace(',', ' ').split(' ')
-                        assert(len(wh) in range(1, 3))
+                        assert(len(wh) in (1, 2))
                         imgtag += ' width="' + wh[0] + '" height="' + wh[-1] + '"'
                     imgtag += ' src="'+instr[startqpos+1:endqpos]+'"'+title+' />'
                     if i_next_str('[http') or i_next_str('[./'): # ]]
@@ -607,9 +610,9 @@ class Converter:
                         else: # The <font> tag is not supported in HTML5.
                             outfile.write('<span style="'+which_color+': ' + str_in_b + '">')
                             ending_tags.append('</span>')
-                    elif (instr[prevci-1:prevci]+''+prevc) in ("/\\", "\\/"):
+                    elif (instr[prevci-1:prevci], prevc) in (('/', "\\"), ("\\", '/')):
                         write_to_pos(prevci-1, i + 1)
-                        tag = 'sup' if (instr[prevci-1]+''+prevc) == "/\\" else "sub"
+                        tag = 'sup' if (instr[prevci-1], prevc) == ('/', "\\") else 'sub'
                         outfile.write('<' + tag + '>')
                         ending_tags.append('</' + tag + '>')
                     elif prevc == '!':
@@ -726,8 +729,24 @@ def to_html(instr, outfilef : IO[str] = None, ohd = False, *, habrahabr_html = F
     return Converter(habrahabr_html, ohd).to_html(instr, outfilef)
 
 if __name__ == '__main__':
+    # Support running module as a command line command.
     if '-h' in sys.argv or '--help' in sys.argv:
-        print(R'''A Python implementation of pq markup to HTML converter.''')
+        print(R'''A Python implementation of pq markup to HTML converter.
+
+Usage: pqmarkup [options] [INPUTFILE]
+
+Positional arguments:
+  INPUT_FILE            input file (STDIN is assumed if no INPUT_FILE is
+                        given)
+
+Options:
+  -h, --help            show this help message and exit
+  --habrahabr-html      for publishing posts on habr.com
+  --output-html-document
+                        add some html header for rough testing preview of your
+                        converted documents
+  -f [OUTPUT_FILE], --file [OUTPUT_FILE]
+                        write output to OUTPUT_FILE (defaults to STDOUT)''')
         sys.exit(0)
 
     args_habrahabr_html       = '--habrahabr-html'       in sys.argv
@@ -739,14 +758,14 @@ if __name__ == '__main__':
             i += 2
             continue
         if not sys.argv[i].startswith('-'):
-            args_infile = open(sys.argv[i], 'r', encoding = 'utf-8')
+            args_infile = open(sys.argv[i], 'r', encoding = 'utf-8-sig')
             break
         i += 1
     args_outfile = sys.stdout
     if '-f' in sys.argv:
-        args_outfile = open(sys.argv[sys.argv.index('-f')     + 1], 'w', encoding = 'utf-8')
+        args_outfile = open(sys.argv[sys.argv.index('-f')     + 1], 'w', encoding = 'utf-8', newline = "\n")
     elif '--file' in sys.argv:
-        args_outfile = open(sys.argv[sys.argv.index('--file') + 1], 'w', encoding = 'utf-8')
+        args_outfile = open(sys.argv[sys.argv.index('--file') + 1], 'w', encoding = 'utf-8', newline = "\n")
 
     if args_output_html_document and args_habrahabr_html:
         sys.exit("Options --output-html-document and --habrahabr-html are mutually exclusive")
@@ -1005,7 +1024,8 @@ T Converter
             tag ‘’= ‘ title="’
             I @next_char() == "‘"
                A endqpos2 = @find_ending_pair_quote(@i + 1)
-               assert(@instr[endqpos2 + 1] == ‘]’)
+               I @instr[endqpos2 + 1] != ‘]’
+                  @exit_with_error("Expected `]` after `’`", endqpos2 + 1)
                tag ‘’= @html_escapeq(@remove_comments(@instr[@i + 2 .< endqpos2], @i + 2))
                @i = endqpos2 + 1
             E
@@ -1202,12 +1222,13 @@ T Converter
                Int endqpos2
                I i_next_str("[‘")
                   endqpos2 = find_ending_pair_quote(i + 2)
-                  assert(instr[endqpos2 + 1] == ‘]’)
+                  I instr[endqpos2 + 1] != ‘]’
+                     exit_with_error("Expected `]` after `’`", endqpos2 + 1)
                   title = ‘ title="’html_escapeq(remove_comments(instr[i + 3 .< endqpos2], i + 3))‘"’
                A imgtag = ‘<img’
                I str_in_b != ‘’
                   A wh = str_in_b.replace(‘,’, ‘ ’).split(‘ ’)
-                  assert(wh.len C (1.<3))
+                  assert(wh.len C (1, 2))
                   imgtag ‘’= ‘ width="’wh[0]‘" height="’wh.last‘"’
                imgtag ‘’= ‘ src="’instr[startqpos + 1 .< endqpos]‘"’title‘ />’
                I i_next_str(‘[http’) | i_next_str(‘[./’)
@@ -1425,9 +1446,9 @@ T Converter
                   E
                      outfile.write(‘<span style="’which_color‘: ’str_in_b‘">’)
                      ending_tags.append(‘</span>’)
-               E I (instr[prevci - 1 .< prevci]‘’prevc) C ("/\\", "\\/")
+               E I (instr[prevci - 1 .< prevci], prevc) C ((‘/’, "\\"), ("\\", ‘/’))
                   write_to_pos(prevci - 1, i + 1)
-                  A tag = I (instr[prevci - 1]‘’prevc) == "/\\" {‘sup’} E ‘sub’
+                  A tag = I (instr[prevci - 1], prevc) == (‘/’, "\\") {‘sup’} E ‘sub’
                   outfile.write(‘<’tag‘>’)
                   ending_tags.append(‘</’tag‘>’)
                E I prevc == ‘!’
@@ -1538,7 +1559,22 @@ F to_html(instr, File? outfilef = N, ohd = 0B, ', habrahabr_html = 0B)
 
 :start:
 I ‘-h’ C :argv | ‘--help’ C :argv
-   print(‘A Python implementation of pq markup to HTML converter.’)
+   print(‘A Python implementation of pq markup to HTML converter.
+
+Usage: pqmarkup [options] [INPUTFILE]
+
+Positional arguments:
+  INPUT_FILE            input file (STDIN is assumed if no INPUT_FILE is
+                        given)
+
+Options:
+  -h, --help            show this help message and exit
+  --habrahabr-html      for publishing posts on habr.com
+  --output-html-document
+                        add some html header for rough testing preview of your
+                        converted documents
+  -f [OUTPUT_FILE], --file [OUTPUT_FILE]
+                        write output to OUTPUT_FILE (defaults to STDOUT)’)
    exit(0)
 A args_habrahabr_html = ‘--habrahabr-html’ C :argv
 A args_output_html_document = ‘--output-html-document’ C :argv
@@ -1549,14 +1585,14 @@ L i < :argv.len
       i += 2
       L.continue
    I !:argv[i].starts_with(‘-’)
-      args_infile = File(:argv[i], ‘r’, encoding' ‘utf-8’)
+      args_infile = File(:argv[i], ‘r’, encoding' ‘utf-8-sig’)
       L.break
    i++
 A args_outfile = :stdout
 I ‘-f’ C :argv
-   args_outfile = File(:argv[:argv.index(‘-f’) + 1], ‘w’, encoding' ‘utf-8’)
+   args_outfile = File(:argv[:argv.index(‘-f’) + 1], ‘w’, encoding' ‘utf-8’, newline' "\n")
 E I ‘--file’ C :argv
-   args_outfile = File(:argv[:argv.index(‘--file’) + 1], ‘w’, encoding' ‘utf-8’)
+   args_outfile = File(:argv[:argv.index(‘--file’) + 1], ‘w’, encoding' ‘utf-8’, newline' "\n")
 
 I args_output_html_document & args_habrahabr_html
    exit(‘Options --output-html-document and --habrahabr-html are mutually exclusive’)
@@ -1871,7 +1907,8 @@ public:
                 tag += u" title=\""_S;
                 if (next_char() == u'‘') {
                     auto endqpos2 = find_ending_pair_quote(i + 1);
-                    assert(instr[endqpos2 + 1] == u']');
+                    if (instr[endqpos2 + 1] != u']')
+                        exit_with_error(u"Expected `]` after `’`"_S, endqpos2 + 1);
                     tag += html_escapeq(remove_comments(instr[range_el(i + 2, endqpos2)], i + 2));
                     i = endqpos2 + 1;
                 }
@@ -2117,13 +2154,14 @@ public:
                     int endqpos2;
                     if (i_next_str(u"[‘"_S)) {
                         endqpos2 = find_ending_pair_quote(i + 2);
-                        assert(instr[endqpos2 + 1] == u']');
+                        if (instr[endqpos2 + 1] != u']')
+                            exit_with_error(u"Expected `]` after `’`"_S, endqpos2 + 1);
                         title = u" title=\""_S + html_escapeq(remove_comments(instr[range_el(i + 3, endqpos2)], i + 3)) + u"\""_S;
                     }
                     auto imgtag = u"<img"_S;
                     if (str_in_b != u"") {
                         auto wh = str_in_b.replace(u","_S, u" "_S).split(u" "_S);
-                        assert(in(wh.len(), range_el(1, 3)));
+                        assert(in(wh.len(), make_tuple(1, 2)));
                         imgtag += u" width=\""_S + _get<0>(wh) + u"\" height=\""_S + wh.last() + u"\""_S;
                     }
                     imgtag += u" src=\""_S + instr[range_el(startqpos + 1, endqpos)] + u"\""_S + title + u" />"_S;
@@ -2387,9 +2425,9 @@ public:
                             ending_tags.append(u"</span>"_S);
                         }
                     }
-                    else if (in((instr[range_el(prevci - 1, prevci)] + prevc), make_tuple(u"/\\"_S, u"\\/"_S))) {
+                    else if (in(make_tuple(instr[range_el(prevci - 1, prevci)], prevc), make_tuple(make_tuple(u"/"_S, u"\\"_S), make_tuple(u"\\"_S, u"/"_S)))) {
                         write_to_pos(prevci - 1, i + 1);
-                        auto tag = (instr[prevci - 1] + prevc) == u"/\\" ? u"sup"_S : u"sub"_S;
+                        auto tag = make_tuple(instr[prevci - 1], prevc) == make_tuple(u"/"_S, u"\\"_S) ? u"sup"_S : u"sub"_S;
                         outfile.write(u"<"_S + tag + u">"_S);
                         ending_tags.append(u"</"_S + tag + u">"_S);
                     }
@@ -2532,7 +2570,22 @@ int MAIN_WITH_ARGV()
     INIT_ARGV();
 
     if (in(u"-h"_S, ::argv) || in(u"--help"_S, ::argv)) {
-        print(u"A Python implementation of pq markup to HTML converter."_S);
+        print(uR"(A Python implementation of pq markup to HTML converter.
+
+Usage: pqmarkup [options] [INPUTFILE]
+
+Positional arguments:
+  INPUT_FILE            input file (STDIN is assumed if no INPUT_FILE is
+                        given)
+
+Options:
+  -h, --help            show this help message and exit
+  --habrahabr-html      for publishing posts on habr.com
+  --output-html-document
+                        add some html header for rough testing preview of your
+                        converted documents
+  -f [OUTPUT_FILE], --file [OUTPUT_FILE]
+                        write output to OUTPUT_FILE (defaults to STDOUT))"_S);
         exit(0);
     }
     auto args_habrahabr_html = in(u"--habrahabr-html"_S, ::argv);
@@ -2545,16 +2598,16 @@ int MAIN_WITH_ARGV()
             continue;
         }
         if (!::argv[i].starts_with(u"-"_S)) {
-            args_infile = File(::argv[i], u"r"_S, u"utf-8"_S);
+            args_infile = File(::argv[i], u"r"_S, u"utf-8-sig"_S);
             break;
         }
         i++;
     }
     auto args_outfile = _stdout;
     if (in(u"-f"_S, ::argv))
-        args_outfile = File(::argv[::argv.index(u"-f"_S) + 1], u"w"_S, u"utf-8"_S);
+        args_outfile = File(::argv[::argv.index(u"-f"_S) + 1], u"w"_S, u"utf-8"_S, u"\n"_S);
     else if (in(u"--file"_S, ::argv))
-        args_outfile = File(::argv[::argv.index(u"--file"_S) + 1], u"w"_S, u"utf-8"_S);
+        args_outfile = File(::argv[::argv.index(u"--file"_S) + 1], u"w"_S, u"utf-8"_S, u"\n"_S);
     if (args_output_html_document && args_habrahabr_html)
         exit(u"Options --output-html-document and --habrahabr-html are mutually exclusive"_S);
     if (args_output_html_document)
