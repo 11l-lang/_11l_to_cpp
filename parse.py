@@ -1313,7 +1313,7 @@ def parse(tokens_, source_, suppress_error_please_wrap_in_copy = False): # optio
     scope.add_function('max', ASTFunctionDefinition([('object1', None, ''), ('object2', None, '')]))
     scope.add_function('hex', ASTFunctionDefinition([('object', None, '')]))
     scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', None)])]))
-    scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', None, 'String'), ('mode', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘r’'), 'String'), ('encoding', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘utf-8’'), 'String')])]))
+    scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', None, 'String'), ('mode', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘r’'), 'String'), ('encoding', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘utf-8’'), 'String'), ('newline', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘’'), 'String')])]))
     for type_ in cpp_type_from_11l:
         scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', None, '')])]))
     next_token()

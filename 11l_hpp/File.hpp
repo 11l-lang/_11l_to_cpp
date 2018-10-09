@@ -15,7 +15,7 @@ public:
 		file = f.file;
 	}
 
-	File(const String &name, const String &mode = u"r"_S, const String &encoding = u"utf-8"_S)
+	File(const String &name, const String &mode = u"r"_S, const String &encoding = u"utf-8"_S, const String &newline = u""_S)
 	{
 		_wfopen_s(&file, (wchar_t*)name.c_str(), (wchar_t*)(mode + u'b').c_str());
 	}
