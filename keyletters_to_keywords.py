@@ -10,10 +10,13 @@ writepos = 0
 
 try:
     for token in tokenizer.tokenize(source):
-        #if token.category == tokenizer.Token.Category.KEYWORD:
-        if token.value(source) in tokenizer.keywords:
+        if token.value(source) in tokenizer.keywords \
+                or token.category == tokenizer.Token.Category.KEYWORD: # for composite keywords (e.g. `L.break`)
+            dot_pos = token.value(source).find('.') # \
+            if dot_pos == -1:                       # A dot_pos = token.value(source). {.find(‘.’) ? .len}
+                dot_pos = len(token.value(source))  # /
             outf.write(source[writepos:token.start])
-            outf.write(tokenizer.keywords[tokenizer.keywords.index(token.value(source)) % 11 + 11*2])
+            outf.write(tokenizer.keywords[tokenizer.keywords.index(token.value(source)[:dot_pos]) % 11 + 11*2] + token.value(source)[dot_pos:])
         else:
             outf.write(source[writepos:token.end])
         writepos = token.end
