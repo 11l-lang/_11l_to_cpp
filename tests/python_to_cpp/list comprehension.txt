@@ -148,3 +148,29 @@ auto r1 = range_el(0, 10);
 auto r2 = range_el(1, 10);
 auto r3 = range_el(10, 1).step(-1);
 assert(range_el(0, 3).map([](const auto &i){return i * 2;}) == create_array({0, 2, 4}));
+
+
+# Nested list comprehension:
+def f():
+    matrix = [
+        [1, 2, 3, 4],
+        [5, 6, 7, 8],
+        [9, 10, 11, 12],
+    ]
+    r1 = map(lambda i: map(lambda row: row[i], matrix), range(4))
+    r2 = [[row[i] for row in matrix] for i in range(4)]
+    assert(r1 == r2 and r2 == [[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]])
+===
+F f()
+   A matrix = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]
+   A r1 = (0.<4).map(i -> @matrix.map(row -> row[@i]))
+   A r2 = (0.<4).map(i -> @matrix.map(row -> row[@i]))
+   assert(r1 == r2 & r2 == [[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]])
+===
+auto f()
+{
+    auto matrix = create_array({create_array({1, 2, 3, 4}), create_array({5, 6, 7, 8}), create_array({9, 10, 11, 12})});
+    auto r1 = range_el(0, 4).map([&matrix](const auto &i){return matrix.map([&i](const auto &row){return row[i];});});
+    auto r2 = range_el(0, 4).map([&matrix](const auto &i){return matrix.map([&i](const auto &row){return row[i];});});
+    assert(r1 == r2 && r2 == create_array({create_array({1, 5, 9}), create_array({2, 6, 10}), create_array({3, 7, 11}), create_array({4, 8, 12})}));
+}
