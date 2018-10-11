@@ -386,7 +386,7 @@ class SymbolNode:
                             captured_variables.add(('&' if by_ref else '') + sn.token.value(source)[1:])
                     else:
                         for child in sn.children:
-                            if child != None:
+                            if child != None and child.symbol.id != '->':
                                 gather_captured_variables(child)
                 gather_captured_variables(self.children[1])
                 return '[' + ', '.join(sorted(captured_variables)) + '](' + ', '.join(map(lambda c: 'const auto &' + c.to_str(), self.children[0].children if self.children[0].symbol.id == '(' else [self.children[0]])) + '){return ' + self.children[1].to_str() + ';}' # )
@@ -1236,7 +1236,7 @@ def parse_internal(this_node):
                 assert(token == None)
             return
 
-        elif token.category == Token.Category.STATEMENT_SEPARATOR:
+        elif token.category == Token.Category.STATEMENT_SEPARATOR: # this `if` was added in revision 105 in order to support `hor_col_align = S instr[j .< j + 2] {‘<<’ {‘left’}; ‘>>’ {‘right’}; ‘><’ {‘center’}; ‘<>’ {‘justify’}}` [there was no STATEMENT_SEPARATOR after this line of code]
             next_token()
             assert(token.category != Token.Category.STATEMENT_SEPARATOR)
             continue
