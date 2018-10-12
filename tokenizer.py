@@ -307,9 +307,16 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                     i += 1
                 while i < len(source):
                     ch = source[i]
-                    if not (ch.isalpha() or ch in '_?' or '0' <= ch <= '9'):
+                    if not (ch.isalpha() or ch in '_?:' or '0' <= ch <= '9'):
                         break
                     i += 1
+                # Tokenize `fs:path:dirname` to ['fs:path', ':', 'dirname']
+                j = i - 1
+                while j > lexem_start:
+                    if source[j] == ':':
+                        i = j
+                        break
+                    j -= 1
 
                 if source[i:i+1] == '/' and source[i-1:i] in 'IЦ':
                     if source[i-2:i-1] == ' ':

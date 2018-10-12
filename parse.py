@@ -1,5 +1,7 @@
 ﻿from tokenizer import Token
+import tokenizer
 from typing import List, Tuple, Dict, Callable
+import os
 
 class Error(Exception):
     def __init__(self, message, token):
@@ -218,7 +220,10 @@ class SymbolNode:
                 elif func_name == 'Int':
                     func_name = 'parse_int'
                 else:
-                    fid = self.scope.find(func_name)
+                    if self.children[0].symbol.id == ':':
+                        fid = modules[self.children[0].children[0].token_str()].scope.find(self.children[0].children[1].token_str())
+                    else:
+                        fid = self.scope.find(func_name)
                     if fid == None:
                         raise Error('call of undefined function `' + func_name + '`', self.children[0].token)
                     if len(fid.ast_nodes) > 1:
@@ -243,14 +248,16 @@ class SymbolNode:
                     else:
                         argument_name = self.children[i].to_str()[:-1]
                         while True:
+                            if f_node == None:
+                                raise Error('function `' + func_name + '` is not found', Token(self.children[0].leftmost(), self.children[0].rightmost(), Token.Category.NAME))
                             if last_function_arg == len(f_node.function_arguments):
                                 raise Error('argument `' + argument_name + '` is not found in function `' + func_name + '`', self.children[i].token)
                             if f_node.function_arguments[last_function_arg][0] == argument_name:
                                 last_function_arg += 1
                                 break
-                            if f_node.function_arguments[last_function_arg][1] == None:
+                            if f_node.function_arguments[last_function_arg][1] == '':
                                 raise Error('argument `' + f_node.function_arguments[last_function_arg][0] + '` of function `' + func_name + '` has no default value, please specify its value here', self.children[i].token)
-                            res += f_node.function_arguments[last_function_arg][1].to_str() + ', '
+                            res += f_node.function_arguments[last_function_arg][1] + ', '
                             last_function_arg += 1
                         res += self.children[i+1].to_str()
                     if i < len(self.children)-2:
@@ -259,7 +266,7 @@ class SymbolNode:
                 if f_node != None:
                     if type(f_node) == ASTFunctionDefinition:
                         while last_function_arg < len(f_node.function_arguments):
-                            if f_node.function_arguments[last_function_arg][1] == None:
+                            if f_node.function_arguments[last_function_arg][1] == '':
                                 t = self.children[len(self.children)-1].token
                                 raise Error('missing required argument `'+ f_node.function_arguments[last_function_arg][0] + '`', Token(t.end, t.end, Token.Category.DELIMITER))
                             last_function_arg += 1
@@ -376,6 +383,8 @@ class SymbolNode:
                 if id != None and id.type != None and id.type.endswith('?'):
                     return cts0.lstrip('@') + '->' + c1
                 return char_if_len_1(self.children[0]) + '.' + c1 + ('()' if c1 in ('len', 'last', 'empty') else '') # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
+            elif self.symbol.id == ':':
+                return self.children[0].to_str() + '::' + self.children[1].to_str()
             elif self.symbol.id == '->':
                 captured_variables = set()
                 def gather_captured_variables(sn):
@@ -524,7 +533,7 @@ class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
 class ASTFunctionDefinition(ASTNodeWithChildren):
     function_name : str
     function_return_type : str = ''
-    function_arguments : List[Tuple[str, SymbolNode, str, str]]# = []
+    function_arguments : List[Tuple[str, str, str, str]]# = [] # (arg_name, default_value, type_, qualifiers)
     first_named_only_argument = None
     last_non_default_argument : int
 
@@ -562,10 +571,10 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
             arguments = []
             for arg in self.function_arguments:
                 if arg[2] == '': # if there is no type specified
-                    arguments.append(('auto ' if '=' in arg[3] else 'const auto &') + arg[0] if arg[1] == None else
-                                          ('' if '=' in arg[3] else 'const ') + 'decltype(' + arg[1].to_str() + ') ' + arg[0] + ' = ' + arg[1].to_str())
+                    arguments.append(('auto ' if '=' in arg[3] else 'const auto &') + arg[0] if arg[1] == '' else
+                                          ('' if '=' in arg[3] else 'const ') + 'decltype(' + arg[1] + ') ' + arg[0] + ' = ' + arg[1])
                 else:
-                    arguments.append(('' if '=' in arg[3] else 'const ') + cpp_type_from_11l[arg[2]] + ' ' + ('&'*(arg[2] not in ('Int',))) + arg[0] + ('' if arg[1] == None else ' = ' + arg[1].to_str()))
+                    arguments.append(('' if '=' in arg[3] else 'const ') + cpp_type_from_11l[arg[2]] + ' ' + ('&'*(arg[2] not in ('Int',))) + arg[0] + ('' if arg[1] == '' else ' = ' + arg[1]))
             return self.children_to_str(indent, ('auto' if self.function_return_type == '' else cpp_type_from_11l[self.function_return_type]) + ' ' + self.function_name
                 + ' = [' + ', '.join(sorted(filter(lambda v: not '&'+v in captured_variables, captured_variables))) + '](' \
                 + ', '.join(arguments) + ')')[:-1] + ";\n"
@@ -580,13 +589,13 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         arguments = []
         for index, arg in enumerate(self.function_arguments):
             if arg[2] == '': # if there is no type specified
-                templates.append('typename T' + str(index + 1) + ('' if arg[1] == None or index < self.last_non_default_argument else ' = decltype(' + arg[1].to_str() + ')'))
+                templates.append('typename T' + str(index + 1) + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = decltype(' + arg[1] + ')'))
                 arguments.append(('T' + str(index + 1) + ' ' if '=' in arg[3] else 'const T' + str(index + 1) + ' &')
-                    + arg[0] + ('' if arg[1] == None or index < self.last_non_default_argument else ' = ' + arg[1].to_str()))
+                    + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
             else:
                 arguments.append(arg[2].rstrip('?') + '* '
                     + ('' if '=' in arg[3] else 'const ')
-                    + arg[0] + ('' if arg[1] == None or index < self.last_non_default_argument else ' = ' + arg[1].to_str()))
+                    + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
         return self.children_to_str(indent, 'template <' + ', '.join(templates) + '> ' + s + '(' + ', '.join(arguments) + ')')
 
 class ASTIf(ASTNodeWithChildren, ASTNodeWithExpression):
@@ -736,6 +745,8 @@ class ASTMain(ASTNodeWithChildren):
     found_reference_to_argv = False
 
     def to_str(self, indent):
+        if importing_module:
+            return ''
         if not self.found_reference_to_argv:
             return self.children_to_str(indent, 'int main()')
         return self.children_to_str(indent, 'int MAIN_WITH_ARGV()', add_at_beginning = ' ' * ((indent+1)*4) + "INIT_ARGV();\n\n")
@@ -850,8 +861,8 @@ prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('(-)', 130); prefix
 
 infix_r('^', 140)
 
-symbol('.', 150); prefix(':', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('--', 150); postfix('++', 150)
-prefix('.', 150)
+symbol('.', 150); symbol(':', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('--', 150); postfix('++', 150)
+prefix('.', 150); prefix(':', 150)
 
 infix_r('=', 10); infix_r('+=', 10); infix_r('-=', 10); infix_r('*=', 10); infix_r('/=', 10); infix_r('I/=', 10); infix_r('Ц/=', 10); infix_r('%=', 10); infix_r('>>=', 10); infix_r('<<=', 10); infix_r('**=', 10)
 infix_r('[+]=', 10); infix_r('[&]=', 10); infix_r('[|]=', 10); infix_r('(+)=', 10); infix_r('‘’=', 10)
@@ -879,6 +890,46 @@ def led(self, left):
     next_token()
     return self
 symbol('.').led = led
+
+class Module:
+    scope : Scope
+modules : Dict[str, Module] = {}
+
+def led(self, left):
+    if token.category != Token.Category.NAME:
+        raise Error('expected an identifier name', token)
+
+    # Process module [transpile it if necessary and load it]
+    global scope
+    module_name = left.to_str()
+    if module_name not in modules:
+        module_file_name = os.path.dirname(file_name) + '/' + module_name
+        try:
+            modulefstat = os.stat(module_file_name + '.11l')
+        except FileNotFoundError:
+            raise Error('can not import module `' + module_name + '`: file `' + module_file_name + '.11l` is not found', left.token)
+
+        hpp_file_mtime = 0
+        if os.path.isfile(module_file_name + '.hpp'):
+            hpp_file_mtime = os.stat(module_file_name + '.hpp').st_mtime
+        if hpp_file_mtime == 0 \
+                or modulefstat.st_mtime       > hpp_file_mtime \
+                or os.stat(__file__).st_mtime > hpp_file_mtime \
+                or os.stat(os.path.dirname(__file__) + '/tokenizer.py').st_mtime > hpp_file_mtime \
+                or True: # always parse module for a while
+            module_source = open(module_file_name + '.11l', encoding = 'utf-8-sig').read()
+            prev_scope = scope
+            open(module_file_name + '.hpp', 'w', encoding = 'utf-8-sig', newline = "\n").write('namespace ' + module_name + "\n{\n" # utf-8-sig is for MSVC (fix of error C2015: too many characters in constant [`u'‘'`])
+                + parse_and_to_str(tokenizer.tokenize(module_source), module_source, module_file_name + '.11l', True) + "}\n")
+            modules[module_name] = Module()
+            modules[module_name].scope = scope
+            scope = prev_scope
+
+    self.append_child(left)
+    self.append_child(tokensn)
+    next_token()
+    return self
+symbol(':').led = led
 
 def led(self, left):
     self.function_call = True
@@ -1088,12 +1139,12 @@ def parse_internal(this_node):
                     next_token()
                     if token.value(source) == '=':
                         next_token()
-                        default = expression()
+                        default = expression().to_str()
                         was_default_argument = True
                     else:
                         if was_default_argument and node.first_named_only_argument == None:
                             raise Error('non-default argument follows default argument', tokens[tokeni-1])
-                        default = None
+                        default = ''
                     node.function_arguments.append((func_arg_name, default, type_, qualifiers)) # ((
                     if token.value(source) not in ',)':
                         raise Error('expected `,` or `)` in function\'s arguments list', token)
@@ -1101,7 +1152,7 @@ def parse_internal(this_node):
                         next_token()
 
                 node.last_non_default_argument = len(node.function_arguments) - 1
-                while node.last_non_default_argument >= 0 and node.function_arguments[node.last_non_default_argument][1] != None:
+                while node.last_non_default_argument >= 0 and node.function_arguments[node.last_non_default_argument][1] != '':
                     node.last_non_default_argument -= 1
 
                 scope.add_function(node.function_name, node)
@@ -1296,16 +1347,35 @@ def parse_internal(this_node):
 
     return
 
-def parse(tokens_, source_, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
-    global tokens, source, tokeni, token, break_label_index, scope
+tokens    = []
+source    = ''
+tokeni    = -1
+token     = Token(0, 0, Token.Category.STATEMENT_SEPARATOR)
+scope     = Scope(None)
+tokensn   = SymbolNode(token)
+file_name = ''
+importing_module = False
+
+def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
+    if len(tokens_) == 0: return ASTProgram()
+    global tokens, source, tokeni, token, break_label_index, scope, tokensn, file_name, importing_module, modules
+    prev_tokens    = tokens
+    prev_source    = source
+    prev_tokeni    = tokeni
+    prev_token     = token
+#   prev_scope     = scope
+    prev_tokensn   = tokensn
+    prev_file_name = file_name
+    prev_importing_module = importing_module
+    prev_break_label_index = break_label_index
     tokens = tokens_ + [Token(len(source_), len(source_), Token.Category.STATEMENT_SEPARATOR)]
     source = source_
     tokeni = -1
     token = None
     break_label_index = -1
     scope = Scope(None)
-    scope.add_function('print', ASTFunctionDefinition([('object', None, ''), ('end', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), R'"\n"'), 'String'), ('flush', SymbolNode(Token(0, 0, Token.Category.CONSTANT)))]))
-    scope.add_function('assert', ASTFunctionDefinition([('expression', None, 'Bool'), ('message', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘’'), 'String')]))
+    scope.add_function('print', ASTFunctionDefinition([('object', None, ''), ('end', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), R'"\n"').to_str(), 'String'), ('flush', SymbolNode(Token(0, 0, Token.Category.CONSTANT), '0B').to_str())]))
+    scope.add_function('assert', ASTFunctionDefinition([('expression', None, 'Bool'), ('message', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘’').to_str(), 'String')]))
     scope.add_function('exit', ASTFunctionDefinition([('arg', None, '')]))
     scope.add_function('zip', ASTFunctionDefinition([('iterable1', None, ''), ('iterable2', None, '')]))
     scope.add_function('sum', ASTFunctionDefinition([('iterable', None, '')]))
@@ -1313,13 +1383,19 @@ def parse(tokens_, source_, suppress_error_please_wrap_in_copy = False): # optio
     scope.add_function('max', ASTFunctionDefinition([('object1', None, ''), ('object2', None, '')]))
     scope.add_function('hex', ASTFunctionDefinition([('object', None, '')]))
     scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', None)])]))
-    scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', None, 'String'), ('mode', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘r’'), 'String'), ('encoding', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘utf-8’'), 'String'), ('newline', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘’'), 'String')])]))
+    scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', None, 'String'), ('mode', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘r’').to_str(), 'String'), ('encoding', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘utf-8’').to_str(), 'String'), ('newline', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘’').to_str(), 'String')])]))
     for type_ in cpp_type_from_11l:
         scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', None, '')])]))
+    file_name = file_name_
+    importing_module = importing_module_
+    if not importing_module:
+        modules = {}
     next_token()
     p = ASTProgram()
-    if len(tokens_) == 0: return p
     parse_internal(p)
+
+    if len(modules):
+        p.beginning_extra = "\n".join(map(lambda m: '#include "' + m + '.hpp"', modules)) + "\n\n"
 
     found_reference_to_argv = False
     def find_reference_to_argv(node):
@@ -1339,6 +1415,18 @@ def parse(tokens_, source_, suppress_error_please_wrap_in_copy = False): # optio
     if found_reference_to_argv:
         assert(type(p.children[-1]) == ASTMain)
         p.children[-1].found_reference_to_argv = True
-        p.beginning_extra = "Array<String> argv;\n\n"
+        p.beginning_extra += "Array<String> argv;\n\n"
 
-    return p
+    s = p.to_str() # call `to_str()` moved here [from outside] because it accesses global variables `source` (via `token.value(source)`) and `tokens` (via `tokens[ti]`)
+
+    tokens    = prev_tokens
+    source    = prev_source
+    tokeni    = prev_tokeni
+    token     = prev_token
+#   scope     = prev_scope
+    tokensn   = prev_tokensn
+    file_name = prev_file_name
+    importing_module = prev_importing_module
+    break_label_index = prev_break_label_index
+
+    return s
