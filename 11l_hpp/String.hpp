@@ -1,6 +1,12 @@
 #include <string>
 #include <cwctype>
 
+static class LocaleInitializer
+{
+public:
+	LocaleInitializer() {setlocale(LC_CTYPE, "");} // for correct work of `Char::towlower()` and `Char::iswlower()`
+} locale_initializer;
+
 class Char
 {
 public:

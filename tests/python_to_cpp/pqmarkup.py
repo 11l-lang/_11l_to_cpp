@@ -295,6 +295,8 @@ class Converter:
                         while True:
                             if j == len(instr) or instr[j] == "\n":
                                 write_to_i("<hr />\n")
+                                if j == len(instr):
+                                    j -= 1
                                 i = j
                                 writepos = j + 1
                                 break

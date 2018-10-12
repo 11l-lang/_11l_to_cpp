@@ -268,6 +268,8 @@ T Converter
                   L
                      I j == instr.len | instr[j] == "\n"
                         write_to_i("<hr />\n")
+                        I j == instr.len
+                           --j
                         i = j
                         writepos = j + 1
                         L.break
