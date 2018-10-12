@@ -362,6 +362,8 @@ public:
                         while (true) {
                             if (j == instr.len() || instr[j] == u'\n') {
                                 write_to_i(u"<hr />\n"_S);
+                                if (j == instr.len())
+                                    --j;
                                 i = j;
                                 writepos = j + 1;
                                 break;
