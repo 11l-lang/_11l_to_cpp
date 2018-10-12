@@ -414,6 +414,8 @@ public:
                                 auto startqpos = i + 1;
                                 i = endqpos;
                                 outfile.write(u"<i>"_S);
+                                assert(writepos == startqpos + 1);
+                                writepos = startqpos;
                                 write_http_link(startqpos, endqpos);
                                 outfile.write(u"</i>"_S);
                                 i++;

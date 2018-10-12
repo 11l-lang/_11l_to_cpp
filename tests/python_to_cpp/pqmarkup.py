@@ -340,6 +340,8 @@ class Converter:
                                 startqpos = i + 1
                                 i = endqpos
                                 outfile.write('<i>')
+                                assert(writepos == startqpos + 1)
+                                writepos = startqpos
                                 write_http_link(startqpos, endqpos)
                                 outfile.write('</i>')
                                 i += 1
