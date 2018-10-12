@@ -126,7 +126,7 @@ for fname in os.listdir('tests/parser'):
                     if error_message[npos:].rstrip() != '':
                         full_source += error_message[npos:]
                     error_message = error_message[:npos]
-                parse.parse(tokenizer.tokenize(full_source), full_source).to_str()
+                parse.parse_and_to_str(tokenizer.tokenize(full_source), full_source, full_fname)
             except parse.Error as e:
                 line_start = source.rfind("\n", 0, len(source))
                 if e.message == error_message and e.pos == source.rfind("\n", 0, line_start) + len(source) - line_start:
@@ -145,7 +145,7 @@ for fname in os.listdir('tests/parser'):
             try:
                 in_11l, expected_cpp = test.split("===\n")
                 expected_cpp += "\n"
-                in_cpp = parse.parse(tokenizer.tokenize(in_11l), in_11l).to_str()
+                in_cpp = parse.parse_and_to_str(tokenizer.tokenize(in_11l), in_11l, full_fname)
                 if in_cpp != expected_cpp:
                     print("Mismatch for test:\n" + in_11l + "Output:\n" + in_cpp + "\nExpected output:\n" + expected_cpp)
                     kdiff3(in_cpp, expected_cpp)
@@ -159,18 +159,20 @@ for fname in os.listdir('tests/python_to_cpp'):
     full_fname = 'tests/python_to_cpp/' + fname
     if fname[0] == '-':
         continue
+    if not fname.endswith('.txt'): # skip .py, .11l and .hpp files
+        continue
     for test in open(full_fname, encoding="utf8").read().split("\n\n\n"):
         if test.startswith('---'):
             continue
         try:
             in_python, expected_11l, expected_cpp = test.split("===\n")
             expected_cpp += "\n"
-            in_11l = py_parser.parse(py_tokenizer.tokenize(in_python), in_python).to_str()
+            in_11l = py_parser.parse_and_to_str(py_tokenizer.tokenize(in_python), in_python, full_fname)
             if in_11l != expected_11l:
                 print("Mismatch 11l for test:\n" + test)
                 kdiff3(in_11l, expected_11l)
                 exit(1)
-            in_cpp = parse.parse(tokenizer.tokenize(expected_11l), expected_11l).to_str()
+            in_cpp = parse.parse_and_to_str(tokenizer.tokenize(expected_11l), expected_11l, full_fname)
             if in_cpp != expected_cpp:
                 print("Mismatch C++ for test:\n" + test)
                 kdiff3(in_cpp, expected_cpp)

@@ -45,6 +45,13 @@ inline void print(int i, const String &end = u"\n", bool flush = false)
 		std::wcout.flush();
 }
 
+inline void print(double i, const String &end = u"\n", bool flush = false)
+{
+	std::wcout << i << std::wstring(end.cbegin(), end.cend());
+	if (flush)
+		std::wcout.flush();
+}
+
 template <typename Ty> inline void print(const Array<Ty> &arr, const String &end = u"\n", bool flush = false)
 {
 	std::wcout << L'[';
