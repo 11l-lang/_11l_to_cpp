@@ -258,7 +258,7 @@ H‘‘1’ ‘2’’
 </table>
 """)
     TEST(
-"""T‘
+R"""T‘
 /\>>‘‘top
 right’ ‘top right’ \/‘bottom right’ ‘top right’’
 ‘‘default alignment’ ‘default
@@ -511,15 +511,15 @@ TEST(‘T‘‘
 <tr><td>5</td><td>6</td><td>7</td></tr>
 </table>
 ’)
-TEST("T‘\n\
-/\>>‘‘top\n\
-right’ ‘top right’ \/‘bottom right’ ‘top right’’\n\
-‘‘default alignment’ ‘default\n\
-alignment’ ‘default alignment’ ‘default alignment’’\n\
-\/><‘‘bottom center’ ‘bottom\n\
-center’ >>‘bottom\n\
-right’ ‘bottom center’’\n\
-’", ‘<table>
+TEST(‘T‘
+/\>>‘‘top
+right’ ‘top right’ \/‘bottom right’ ‘top right’’
+‘‘default alignment’ ‘default
+alignment’ ‘default alignment’ ‘default alignment’’
+\/><‘‘bottom center’ ‘bottom
+center’ >>‘bottom
+right’ ‘bottom center’’
+’’, ‘<table>
 <tr><td style="text-align: right; vertical-align: top">top<br />
 right</td><td style="text-align: right; vertical-align: top">top right</td><td style="text-align: right; vertical-align: bottom">bottom right</td><td style="text-align: right; vertical-align: top">top right</td></tr>
 <tr><td>default alignment</td><td>default<br />
@@ -767,15 +767,15 @@ H‘‘1’ ‘2’’
 <tr><td>5</td><td>6</td><td>7</td></tr>
 </table>
 )"_S);
-    TEST(u"T‘\n\
-/\>>‘‘top\n\
-right’ ‘top right’ \/‘bottom right’ ‘top right’’\n\
-‘‘default alignment’ ‘default\n\
-alignment’ ‘default alignment’ ‘default alignment’’\n\
-\/><‘‘bottom center’ ‘bottom\n\
-center’ >>‘bottom\n\
-right’ ‘bottom center’’\n\
-’"_S, uR"(<table>
+    TEST(uR"(T‘
+/\>>‘‘top
+right’ ‘top right’ \/‘bottom right’ ‘top right’’
+‘‘default alignment’ ‘default
+alignment’ ‘default alignment’ ‘default alignment’’
+\/><‘‘bottom center’ ‘bottom
+center’ >>‘bottom
+right’ ‘bottom center’’
+’)"_S, uR"(<table>
 <tr><td style="text-align: right; vertical-align: top">top<br />
 right</td><td style="text-align: right; vertical-align: top">top right</td><td style="text-align: right; vertical-align: bottom">bottom right</td><td style="text-align: right; vertical-align: top">top right</td></tr>
 <tr><td>default alignment</td><td>default<br />
