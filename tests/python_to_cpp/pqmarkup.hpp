@@ -595,7 +595,7 @@ public:
                                     j = end_of_column;
                                 }
                                 else if (in(ch, u"<>"_S) && in(instr[range_el(j + 1, j + 2)], make_tuple(u"<"_S, u">"_S))) {
-                                    hor_col_align = [&](const auto &a){return a == u"<<"_S ? u"left"_S : a == u">>"_S ? u"right"_S : a == u"><"_S ? u"center"_S : a == u"<>"_S ? u"justify"_S : throw KeyError(a);}(instr[range_el(j, j + 2)]);
+                                    hor_col_align = [&](const auto &a){return a == u"<<" ? u"left"_S : a == u">>" ? u"right"_S : a == u"><" ? u"center"_S : a == u"<>" ? u"justify"_S : throw KeyError(a);}(instr[range_el(j, j + 2)]);
                                     j++;
                                 }
                                 else if (in(instr[range_el(j, j + 2)], make_tuple(u"/\\"_S, u"\\/"_S))) {
@@ -625,7 +625,7 @@ public:
                         else if (in(ch, u"HН"_S))
                             header_row = true;
                         else if (in(ch, u"<>"_S) && in(instr[range_el(j + 1, j + 2)], make_tuple(u"<"_S, u">"_S))) {
-                            hor_row_align = [&](const auto &a){return a == u"<<"_S ? u"left"_S : a == u">>"_S ? u"right"_S : a == u"><"_S ? u"center"_S : a == u"<>"_S ? u"justify"_S : throw KeyError(a);}(instr[range_el(j, j + 2)]);
+                            hor_row_align = [&](const auto &a){return a == u"<<" ? u"left"_S : a == u">>" ? u"right"_S : a == u"><" ? u"center"_S : a == u"<>" ? u"justify"_S : throw KeyError(a);}(instr[range_el(j, j + 2)]);
                             j++;
                         }
                         else if (in(instr[range_el(j, j + 2)], make_tuple(u"/\\"_S, u"\\/"_S))) {
@@ -676,7 +676,7 @@ public:
                 }
                 else if (in(prevc, u"<>"_S) && in(instr[prevci - 1], u"<>"_S)) {
                     write_to_pos(prevci - 1, endqpos + 1);
-                    outfile.write(u"<div align=\""_S + ([&](const auto &a){return a == u"<<"_S ? u"left"_S : a == u">>"_S ? u"right"_S : a == u"><"_S ? u"center"_S : a == u"<>"_S ? u"justify"_S : throw KeyError(a);}(instr[prevci - 1] + prevc)) + u"\">"_S + (to_html(instr[range_el(startqpos + 1, endqpos)], nullptr, startqpos + 1)) + u"</div>\n"_S);
+                    outfile.write(u"<div align=\""_S + ([&](const auto &a){return a == u"<<" ? u"left"_S : a == u">>" ? u"right"_S : a == u"><" ? u"center"_S : a == u"<>" ? u"justify"_S : throw KeyError(a);}(instr[prevci - 1] + prevc)) + u"\">"_S + (to_html(instr[range_el(startqpos + 1, endqpos)], nullptr, startqpos + 1)) + u"</div>\n"_S);
                     new_line_tag = u""_S;
                 }
                 else if (i_next_str(u":‘"_S) && instr[range_ei(find_ending_pair_quote(i + 2) + 1)][range_el(0, 1)] == u'<') {
@@ -690,7 +690,7 @@ public:
                     i = startqpos;
                     if (in(prev_char(), u"*_-~"_S)) {
                         write_to_pos(i - 1, i + 1);
-                        auto tag = [&](const auto &a){return a == u'*'_C ? u'b'_C : a == u'_'_C ? u'u'_C : a == u'-'_C ? u's'_C : a == u'~'_C ? u'i'_C : throw KeyError(a);}(prev_char());
+                        auto tag = [&](const auto &a){return a == u'*' ? u'b'_C : a == u'_' ? u'u'_C : a == u'-' ? u's'_C : a == u'~' ? u'i'_C : throw KeyError(a);}(prev_char());
                         outfile.write(u"<"_S + tag + u">"_S);
                         ending_tags.append(u"</"_S + tag + u">"_S);
                     }
@@ -710,7 +710,7 @@ public:
                         if (str_in_b[range_el(0, 1)] == u'#') {
                             auto new_str_in_b = u""_S;
                             for (auto c : str_in_b) {
-                                auto cc = _get<0>(([&](const auto &a){return a == u'а'_C ? u"A"_S : a == u'б'_C ? u"B"_S : a == u'с'_C ? u"C"_S : a == u'д'_C ? u"D"_S : a == u'е'_C ? u"E"_S : a == u'ф'_C ? u"F"_S : c;}(c.lower())));
+                                auto cc = _get<0>(([&](const auto &a){return a == u'а' ? u"A"_S : a == u'б' ? u"B"_S : a == u'с' ? u"C"_S : a == u'д' ? u"D"_S : a == u'е' ? u"E"_S : a == u'ф' ? u"F"_S : c;}(c.lower())));
                                 new_str_in_b += c.islower() ? cc.lower() : cc;
                             }
                             str_in_b = new_str_in_b;

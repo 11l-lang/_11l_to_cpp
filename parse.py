@@ -339,7 +339,7 @@ class SymbolNode:
                     res += char_or_str(self.children[i+1], char_val)
                     was_break = True
                     break
-                res += 'a == ' + char_or_str(self.children[i], char_key) + ' ? ' + char_or_str(self.children[i+1], char_val) + ' : '
+                res += 'a == ' + char_or_str(self.children[i], char_key)[:-2] + ' ? ' + char_or_str(self.children[i+1], char_val) + ' : '
                 # L.was_no_break
                 #    res ‘’= ‘throw KeyError(a)’
             return res + ('throw KeyError(a)' if not was_break else '') + ';}(' + self.children[0].to_str() + ')'

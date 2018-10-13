@@ -147,7 +147,7 @@ for fname in os.listdir('tests/parser'):
                 expected_cpp += "\n"
                 in_cpp = parse.parse_and_to_str(tokenizer.tokenize(in_11l), in_11l, full_fname)
                 if in_cpp != expected_cpp:
-                    print("Mismatch for test:\n" + in_11l + "Output:\n" + in_cpp + "\nExpected output:\n" + expected_cpp)
+                    print("Mismatch for test:\n" + in_11l + "Output:\n" + in_cpp + "\nExpected output:\n" + expected_cpp + "[in file '" + full_fname + "']")
                     kdiff3(in_cpp, expected_cpp)
                     exit(1)
             except Exception as e:
