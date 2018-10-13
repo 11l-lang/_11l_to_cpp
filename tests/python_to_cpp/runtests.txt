@@ -3,7 +3,7 @@ import sys, pqmarkup
 test_id = 0
 failed_tests = 0
 def TEST(str1, str2, ohd = False, habrahabr_html = False):
-#    global test_id, failed_tests
+    global test_id, failed_tests
     test_id += 1
     print("Test " + str(test_id) + " ...", end = '')
     str1 = pqmarkup.to_html(str1, ohd = ohd, habrahabr_html = habrahabr_html)
