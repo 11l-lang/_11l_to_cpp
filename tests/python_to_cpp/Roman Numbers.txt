@@ -203,7 +203,7 @@ F roman(=n)
       r ‘’= ‘IV’
 
    L n >= 1
-      --n
+      n--
       r ‘’= ‘I’
    R r
 
@@ -278,7 +278,7 @@ template <typename T1> auto roman(T1 n)
     }
 
     while (n >= 1) {
-        --n;
+        n--;
         r += u"I"_S;
     }
     return r;

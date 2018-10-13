@@ -190,7 +190,7 @@ public:
                 case u']':
                     if (nesting_level == 0)
                         goto break_;
-                    --nesting_level;
+                    nesting_level--;
                     break;
                 case u' ':
                     goto break_;
@@ -363,7 +363,7 @@ public:
                             if (j == instr.len() || instr[j] == u'\n') {
                                 write_to_i(u"<hr />\n"_S);
                                 if (j == instr.len())
-                                    --j;
+                                    j--;
                                 i = j;
                                 writepos = j + 1;
                                 break;
@@ -507,7 +507,7 @@ public:
                         case u'}':
                             if (nesting_level == 0)
                                 goto break_1;
-                            --nesting_level;
+                            nesting_level--;
                             break;
                         }
                         i++;
@@ -529,7 +529,7 @@ public:
                     while (t >= 0) {
                         if (instr[t] != u'\'')
                             break;
-                        --t;
+                        t--;
                     }
                     auto eat_left = startqpos - 1 - t;
                     t = endqpos + 1;
@@ -645,9 +645,9 @@ public:
                                 auto yy = y;
                                 while (true)
                                     if (_get<1>(table[yy][xx]) == u'-')
-                                        --xx;
+                                        xx--;
                                     else if (_get<1>(table[yy][xx]) == u'|')
-                                        --yy;
+                                        yy--;
                                     else
                                         break;
                                 if (xx < x)
@@ -791,7 +791,7 @@ public:
                 if (i_next_str(u"http"_S) || i_next_str(u"./"_S) || i_next_str(u"‘"_S) || numbered_link()) {
                     auto s = i - 1;
                     while (s >= writepos && !in(instr[s], u"\r\n\t [{(‘“"_S))
-                        --s;
+                        s--;
                     if (i_next_str(u"‘"_S))
                         write_note(s + 1, i, 0);
                     else if (i_next_str(u"http"_S) || i_next_str(u"./"_S))

@@ -371,7 +371,7 @@ F write_http_link(instr, =i, endpos, q_offset = 1)
          ‘]’
             I nesting_level == 0
                L.break
-            --nesting_level
+            nesting_level--
          ‘ ’
             L.break
       i++
@@ -395,7 +395,7 @@ template <typename T1, typename T2, typename T3, typename T4 = decltype(1)> auto
         case u']':
             if (nesting_level == 0)
                 goto break_;
-            --nesting_level;
+            nesting_level--;
             break;
         case u' ':
             goto break_;
