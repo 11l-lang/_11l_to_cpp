@@ -267,10 +267,11 @@ r = abc"some big \n ..."‘’
 r = abc‘’
   '‘‘it’s’
 r = abc'‘‘it’s’
-  ‘’def // ‘‘
+  ‘’def
 // This is a preferred way for including \r in string literals:
 r = ‘Host: api.dropboxapi.com’"\r\n"‘’
     ‘Connection: close’"\r\n"
+// ‘‘
 ===
 r = abc + u"1"_S;
 r = abc + u"1"_S + def;

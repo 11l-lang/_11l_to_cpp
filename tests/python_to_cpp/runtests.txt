@@ -95,7 +95,7 @@ Some text.""", habrahabr_html = True)
     TEST("[[[‘]]]`Don’t`", "<!--[[[‘]]]--><code>Don’t</code>", habrahabr_html = True)
     TEST("'‘<Don‘t! Don‘t! Don‘t!>’’’’''''", "<Don‘t! Don‘t! Don‘t!>")
     TEST("`'‘<div>&lt;</div>’'`", "<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>", habrahabr_html = True)
-#    TEST("''‘‘’‘’’''", "’‘")
+    TEST("''‘‘’‘’’''", "’‘")
     TEST("''''‘‘‘‘Don’t! Don’t! Don’t!’'", "Don’t! Don’t! Don’t!")
 #    TEST(open("tests/test1.pq", encoding="utf-8").read(), open("tests/test1.pq.to_habrahabr_html", encoding="utf-8").read(), habrahabr_html = True) # для проверки безопасности рефакторинга нужен был какой-либо обширный тестовый текст на пк-разметке [-TODO подобрать такой текст, который не стыдно закоммитить :)(:-]
     TEST("""<<‘выравнивание по левому краю’
@@ -390,6 +390,7 @@ TEST(‘[[[‘]]]test```’```test’, ‘<!--[[[‘]]]-->test<code>’</code>te
 TEST(‘[[[‘]]]`Don’t`’, ‘<!--[[[‘]]]--><code>Don’t</code>’, habrahabr_html' 1B)
 TEST(‘'‘<Don‘t! Don‘t! Don‘t!>’’’’''''’, "<Don‘t! Don‘t! Don‘t!>")
 TEST(‘`'‘<div>&lt;</div>’'`’, ‘<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>’, habrahabr_html' 1B)
+TEST(‘''‘‘’‘’’''’, '‘‘’‘’’')
 TEST(‘''''‘‘‘‘Don’t! Don’t! Don’t!’'’, "Don’t! Don’t! Don’t!")
 TEST(‘<<‘выравнивание по левому краю’
 >>‘выравнивание по правому краю’
@@ -655,6 +656,7 @@ Some text.)"_S, false, true);
     TEST(u"[[[‘]]]`Don’t`"_S, u"<!--[[[‘]]]--><code>Don’t</code>"_S, false, true);
     TEST(u"'‘<Don‘t! Don‘t! Don‘t!>’’’’''''"_S, u"<Don‘t! Don‘t! Don‘t!>"_S);
     TEST(u"`'‘<div>&lt;</div>’'`"_S, u"<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>"_S, false, true);
+    TEST(u"''‘‘’‘’’''"_S, u"’‘"_S);
     TEST(u"''''‘‘‘‘Don’t! Don’t! Don’t!’'"_S, u"Don’t! Don’t! Don’t!"_S);
     TEST(uR"(<<‘выравнивание по левому краю’
 >>‘выравнивание по правому краю’
