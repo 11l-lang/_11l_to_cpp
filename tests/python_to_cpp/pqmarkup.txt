@@ -39,7 +39,7 @@ class Converter:
                 line += 1
                 line_start = t
             t += 1
-        return (line, pos - line_start)
+        return (line, pos - line_start, pos) # returning last `pos` is necessary because `pos` was modified above [in line `pos += sum(self.to_html_called_inside_to_html_outer_pos_list)`]
 
     def to_html(self, instr, outfilef : IO[str] = None, *, outer_pos = 0) -> str:
         self.to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
@@ -59,7 +59,7 @@ class Converter:
 
         def exit_with_error(message, pos):
             p = self.instr_pos_to_line_column(pos)
-            raise Exception(message, p[0], p[1], pos)
+            raise Exception(message, p[0], p[1], p[2])
 
         i = 0
         def next_char(offset = 1):
@@ -295,6 +295,8 @@ class Converter:
                         while True:
                             if j == len(instr) or instr[j] == "\n":
                                 write_to_i("<hr />\n")
+                                if j == len(instr):
+                                    j -= 1
                                 i = j
                                 writepos = j + 1
                                 break
@@ -338,6 +340,8 @@ class Converter:
                                 startqpos = i + 1
                                 i = endqpos
                                 outfile.write('<i>')
+                                assert(writepos == startqpos + 1)
+                                writepos = startqpos
                                 write_http_link(startqpos, endqpos)
                                 outfile.write('</i>')
                                 i += 1
@@ -912,7 +916,7 @@ T Converter
             line++
             line_start = t
          t++
-      R (line, pos - line_start)
+      R (line, pos - line_start, pos)
 
    F to_html(instr, File? outfilef = N, ', outer_pos = 0) -> String
       .to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
@@ -930,7 +934,7 @@ T Converter
 
       F exit_with_error(message, pos)
          A p = @.instr_pos_to_line_column(pos)
-         X Exception(message, p[0], p[1], pos)
+         X Exception(message, p[0], p[1], p[2])
       A i = 0
       F next_char(offset = 1)
          R I @i + offset < @instr.len {@instr[@i + offset]} E "\0"[0]
@@ -1144,6 +1148,8 @@ T Converter
                   L
                      I j == instr.len | instr[j] == "\n"
                         write_to_i("<hr />\n")
+                        I j == instr.len
+                           --j
                         i = j
                         writepos = j + 1
                         L.break
@@ -1187,6 +1193,8 @@ T Converter
                         A startqpos = i + 1
                         i = endqpos
                         outfile.write(‘<i>’)
+                        assert(writepos == startqpos + 1)
+                        writepos = startqpos
                         write_http_link(startqpos, endqpos)
                         outfile.write(‘</i>’)
                         i++
@@ -1750,7 +1758,7 @@ public:
             }
             t++;
         }
-        return make_tuple(line, pos - line_start);
+        return make_tuple(line, pos - line_start, pos);
     }
 
     template <typename T1, typename T3 = decltype(0)> String to_html(const T1 &instr, File* const outfilef = nullptr, const T3 &outer_pos = 0)
@@ -1773,7 +1781,7 @@ public:
         auto exit_with_error = [this](const auto &message, const auto &pos)
         {
             auto p = instr_pos_to_line_column(pos);
-            throw Exception(message, _get<0>(p), _get<1>(p), pos);
+            throw Exception(message, _get<0>(p), _get<1>(p), _get<2>(p));
         };
         auto i = 0;
         auto next_char = [&i, &instr](const decltype(1) offset = 1)
@@ -2061,6 +2069,8 @@ public:
                         while (true) {
                             if (j == instr.len() || instr[j] == u'\n') {
                                 write_to_i(u"<hr />\n"_S);
+                                if (j == instr.len())
+                                    --j;
                                 i = j;
                                 writepos = j + 1;
                                 break;
@@ -2111,6 +2121,8 @@ public:
                                 auto startqpos = i + 1;
                                 i = endqpos;
                                 outfile.write(u"<i>"_S);
+                                assert(writepos == startqpos + 1);
+                                writepos = startqpos;
                                 write_http_link(startqpos, endqpos);
                                 outfile.write(u"</i>"_S);
                                 i++;
