@@ -74,12 +74,25 @@ public:
 	}
 };
 
+template <typename Type> class RangeEIWithStep
+{
+public:
+	Type b, step;
+
+	RangeEIWithStep(const Type &begin, const Type &step) : b(begin), step(step) {}
+};
+
 template <typename Type> class RangeEI
 {
 public:
 	Type b;
 
 	explicit RangeEI(const Type &begin) : b(begin) {}
+
+	RangeEIWithStep<Type> step(Type step)
+	{
+		return RangeEIWithStep<Type>(b, step);
+	}
 };
 
 template <typename Ty> auto range_ee(const Ty &begin, const Ty &end) {return Range<Ty, true,  true >(begin, end);} // equal-equal range (`a..b`)

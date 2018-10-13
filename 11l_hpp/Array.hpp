@@ -19,10 +19,10 @@ public:
 
 template <typename Type> class Array : public std::vector<Type>
 {
-	Array slice(int begin, int end) const
+	Array slice(int begin, int end, int step = 1) const
 	{
 		Array r;
-		for (int i = begin; i < end; i++)
+		for (int i = begin; i < end; i += step)
 			r.push_back(at(i));
 		return r;
 	}
@@ -83,6 +83,11 @@ public:
 	Array operator[](const Range<int, false, true > &range) const {return slice(max(range.b + 1, 0), min(range.e + 1, len()));}
 	Array operator[](const Range<int, false, false> &range) const {return slice(max(range.b + 1, 0), min(range.e    , len()));}
 	Array operator[](const RangeEI<int>             &range) const {return slice(max(range.b    , 0),                  len() );}
+	Array operator[](const RangeWithStep<int, true,  true > &range) const {return slice(max(range.b    , 0), min(range.e + 1, len()), range.step);}
+	Array operator[](const RangeWithStep<int, true,  false> &range) const {return slice(max(range.b    , 0), min(range.e    , len()), range.step);}
+	Array operator[](const RangeWithStep<int, false, true > &range) const {return slice(max(range.b + 1, 0), min(range.e + 1, len()), range.step);}
+	Array operator[](const RangeWithStep<int, false, false> &range) const {return slice(max(range.b + 1, 0), min(range.e    , len()), range.step);}
+	Array operator[](const RangeEIWithStep<int>             &range) const {return slice(max(range.b    , 0),                  len() , range.step);}
 
 	const Type &operator[](int i) const
 	{
@@ -107,6 +112,13 @@ public:
 	}
 
 	void append(const Type &v) {push_back(v);}
+
+	void append(const Array<Type> &arr)
+	{
+		reserve(size() + arr.size());
+		for (auto el : arr)
+			push_back(el);
+	}
 
 	int index(const Type &v) const
 	{

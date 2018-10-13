@@ -876,8 +876,8 @@ symbol(',')
 symbol("',")
 
 def led(self, left):
-    self.append_child(left) # [
-    if token.value(source) != ']':
+    self.append_child(left) # [(
+    if token.value(source) not in (']', ')'):
         self.append_child(expression(self.symbol.led_bp))
     return self
 symbol('..', 55).set_led_bp(55, led)
@@ -919,7 +919,7 @@ def led(self, left):
                 or True: # always parse module for a while
             module_source = open(module_file_name + '.11l', encoding = 'utf-8-sig').read()
             prev_scope = scope
-            open(module_file_name + '.hpp', 'w', encoding = 'utf-8-sig', newline = "\n").write('namespace ' + module_name + "\n{\n" # utf-8-sig is for MSVC (fix of error C2015: too many characters in constant [`u'‘'`])
+            open(module_file_name + '.hpp', 'w', encoding = 'utf-8-sig', newline = "\n").write('namespace ' + module_name + "\n{\n" # utf-8-sig is for MSVC (fix of error C2015: too many characters in constant [`u'‘'`]) # ’
                 + parse_and_to_str(tokenizer.tokenize(module_source), module_source, module_file_name + '.11l', True) + "}\n")
             modules[module_name] = Module()
             modules[module_name].scope = scope

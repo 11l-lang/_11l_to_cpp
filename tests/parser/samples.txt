@@ -291,6 +291,9 @@ print(arr[0<.<2]) // [2]
 print(arr[1..])   // [2, 3]
 arr[1] = 4
 print(arr[1..])   // [4, 3]
+arr [+]= [5, 6]
+assert(arr[(0..4).step(2)] == [1, 3, 6])
+assert(arr[(1..).step(2)] == [4, 5])
 Dict[String, Int] dict
 [String = Int] dict2
 dict[‘key’] = 1
@@ -305,6 +308,9 @@ print(arr[range_ll(0, 2)]);
 print(arr[range_ei(1)]);
 arr.set(1, 4);
 print(arr[range_ei(1)]);
+arr.append(create_array({5, 6}));
+assert(arr[range_ee(0, 4).step(2)] == create_array({1, 3, 6}));
+assert(arr[range_ei(1).step(2)] == create_array({4, 5}));
 Dict<String, int> dict;
 Dict<String, int> dict2;
 dict.set(u"key"_S, 1);
