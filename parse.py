@@ -324,12 +324,8 @@ class SymbolNode:
                 return self.children[0].to_str() + '[' + self.children[1].to_str() + ']'
 
         elif self.symbol.id in ('S', 'В', 'switch', 'выбрать'):
-            char_key = True
             char_val = True
             for i in range(1, len(self.children), 2):
-                if not self.children[i].token.value(source) in ('E', 'И', 'else', 'иначе'):
-                    if not is_char(self.children[i]):
-                        char_key = False
                 if not is_char(self.children[i+1]):
                     char_val = False
             res = '[&](const auto &a){return ' # `[&]` is for `cc = {'а':'A','б':'B','с':'C','д':'D','е':'E','ф':'F'}.get(c.lower(), c)` -> `[&](const auto &a){return a == u'а'_C ? u"A"_S : ... : c;}(c.lower())`
@@ -339,7 +335,7 @@ class SymbolNode:
                     res += char_or_str(self.children[i+1], char_val)
                     was_break = True
                     break
-                res += 'a == ' + char_or_str(self.children[i], char_key)[:-2] + ' ? ' + char_or_str(self.children[i+1], char_val) + ' : '
+                res += 'a == ' + char_or_str(self.children[i], is_char(self.children[i]))[:-2] + ' ? ' + char_or_str(self.children[i+1], char_val) + ' : '
                 # L.was_no_break
                 #    res ‘’= ‘throw KeyError(a)’
             return res + ('throw KeyError(a)' if not was_break else '') + ';}(' + self.children[0].to_str() + ')'

@@ -345,10 +345,16 @@ r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init_
 
 F tag(ch)
    R S ch {‘*’ {‘b’}; ‘_’ {‘u’}; ‘-’ {‘s’}; ‘~’ {‘i’}}
+F tag2(ch)
+   R S ch {‘*’ {‘b’}; ‘**’ {‘bb’}}
 ===
 template <typename T1> auto tag(const T1 &ch)
 {
     return [&](const auto &a){return a == u'*' ? u'b'_C : a == u'_' ? u'u'_C : a == u'-' ? u's'_C : a == u'~' ? u'i'_C : throw KeyError(a);}(ch);
+}
+template <typename T1> auto tag2(const T1 &ch)
+{
+    return [&](const auto &a){return a == u'*' ? u"b"_S : a == u"**" ? u"bb"_S : throw KeyError(a);}(ch);
 }
 
 
