@@ -932,7 +932,7 @@ def led(self, left):
     self.append_child(left) # (
     if token.value(source) != ')':
         while True:
-            if token.value(source)[-1] == "'":
+            if token.category != Token.Category.STRING_LITERAL and token.value(source)[-1] == "'":
                 self.append_child(tokensn)
                 next_token()
                 self.append_child(expression())
