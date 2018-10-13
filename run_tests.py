@@ -169,12 +169,12 @@ for fname in os.listdir('tests/python_to_cpp'):
             expected_cpp += "\n"
             in_11l = py_parser.parse_and_to_str(py_tokenizer.tokenize(in_python), in_python, full_fname)
             if in_11l != expected_11l:
-                print("Mismatch 11l for test:\n" + test)
+                print("Mismatch 11l for test:\n" + test + "\n[in file '" + full_fname + "']")
                 kdiff3(in_11l, expected_11l)
                 exit(1)
             in_cpp = parse.parse_and_to_str(tokenizer.tokenize(expected_11l), expected_11l, full_fname)
             if in_cpp != expected_cpp:
-                print("Mismatch C++ for test:\n" + test)
+                print("Mismatch C++ for test:\n" + test + "\n[in file '" + full_fname + "']")
                 kdiff3(in_cpp, expected_cpp)
                 exit(1)
         except Exception as e:

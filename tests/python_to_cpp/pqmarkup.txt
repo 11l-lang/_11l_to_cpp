@@ -1015,7 +1015,7 @@ T Converter
                ‘]’
                   I nesting_level == 0
                      L.break
-                  --nesting_level
+                  nesting_level--
                ‘ ’
                   L.break
             @i++
@@ -1149,7 +1149,7 @@ T Converter
                      I j == instr.len | instr[j] == "\n"
                         write_to_i("<hr />\n")
                         I j == instr.len
-                           --j
+                           j--
                         i = j
                         writepos = j + 1
                         L.break
@@ -1269,7 +1269,7 @@ T Converter
                      ‘}’
                         I nesting_level == 0
                            L.break
-                        --nesting_level
+                        nesting_level--
                   i++
                write_to_pos(prevci + 1, i + 1)
                A outer_p = endqpos + (I instr[endqpos + 2] == "\n" {3} E 2)
@@ -1285,7 +1285,7 @@ T Converter
                L t >= 0
                   I instr[t] != ‘'’
                      L.break
-                  --t
+                  t--
                A eat_left = startqpos - 1 - t
                t = endqpos + 1
                L t < instr.len
@@ -1384,9 +1384,9 @@ T Converter
                         A yy = y
                         L
                            I table[yy][xx][1] == ‘-’
-                              --xx
+                              xx--
                            E I table[yy][xx][1] == ‘|’
-                              --yy
+                              yy--
                            E
                               L.break
                         I xx < x
@@ -1506,7 +1506,7 @@ T Converter
             I i_next_str(‘http’) | i_next_str(‘./’) | i_next_str("‘") | numbered_link()
                A s = i - 1
                L s >= writepos & instr[s] !C "\r\n\t [{(‘“"
-                  --s
+                  s--
                I i_next_str("‘")
                   write_note(s + 1, i, 0)
                E I i_next_str(‘http’) | i_next_str(‘./’)
@@ -1897,7 +1897,7 @@ public:
                 case u']':
                     if (nesting_level == 0)
                         goto break_;
-                    --nesting_level;
+                    nesting_level--;
                     break;
                 case u' ':
                     goto break_;
@@ -2070,7 +2070,7 @@ public:
                             if (j == instr.len() || instr[j] == u'\n') {
                                 write_to_i(u"<hr />\n"_S);
                                 if (j == instr.len())
-                                    --j;
+                                    j--;
                                 i = j;
                                 writepos = j + 1;
                                 break;
@@ -2214,7 +2214,7 @@ public:
                         case u'}':
                             if (nesting_level == 0)
                                 goto break_1;
-                            --nesting_level;
+                            nesting_level--;
                             break;
                         }
                         i++;
@@ -2236,7 +2236,7 @@ public:
                     while (t >= 0) {
                         if (instr[t] != u'\'')
                             break;
-                        --t;
+                        t--;
                     }
                     auto eat_left = startqpos - 1 - t;
                     t = endqpos + 1;
@@ -2352,9 +2352,9 @@ public:
                                 auto yy = y;
                                 while (true)
                                     if (_get<1>(table[yy][xx]) == u'-')
-                                        --xx;
+                                        xx--;
                                     else if (_get<1>(table[yy][xx]) == u'|')
-                                        --yy;
+                                        yy--;
                                     else
                                         break;
                                 if (xx < x)
@@ -2498,7 +2498,7 @@ public:
                 if (i_next_str(u"http"_S) || i_next_str(u"./"_S) || i_next_str(u"‘"_S) || numbered_link()) {
                     auto s = i - 1;
                     while (s >= writepos && !in(instr[s], u"\r\n\t [{(‘“"_S))
-                        --s;
+                        s--;
                     if (i_next_str(u"‘"_S))
                         write_note(s + 1, i, 0);
                     else if (i_next_str(u"http"_S) || i_next_str(u"./"_S))
