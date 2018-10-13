@@ -59,7 +59,7 @@ template <typename Ty> inline void print(const Array<Ty> &arr, const String &end
 		print(arr[i], u""_S);
 		if (i < arr.len()-1) std::wcout << L", ";
 	}
-	std::wcout << L']' << std::wstring(end.begin(), end.end());
+	std::wcout << L']' << std::wstring(end.cbegin(), end.cend());
 	if (flush)
 		std::wcout.flush();
 }

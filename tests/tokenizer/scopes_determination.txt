@@ -72,7 +72,7 @@ str = ‘unclosed string
 
 
 ---
-// balancing ’
+// balancing ’[[
 
 
 replaced = line.replace(‘[’, ‘<span class="sq"><span class="sq_brackets">[</span>’)
