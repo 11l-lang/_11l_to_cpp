@@ -209,11 +209,16 @@ public:
 		return Char(at(pos));
 	}
 
-	String operator[](const Range<int, true,  true > &range) const {return slice(max(range.b    , 0), min((unsigned)range.e + 1u, (unsigned)len()));} // `(unsigned)` is needed when `instr` starts with left single quotation mark
-	String operator[](const Range<int, true,  false> &range) const {return slice(max(range.b    , 0), min((unsigned)range.e     , (unsigned)len()));}
-	String operator[](const Range<int, false, true > &range) const {return slice(max(range.b + 1, 0), min((unsigned)range.e + 1u, (unsigned)len()));}
-	String operator[](const Range<int, false, false> &range) const {return slice(max(range.b + 1, 0), min((unsigned)range.e     , (unsigned)len()));}
-	String operator[](const RangeEI<int>             &range) const {return slice(max(range.b    , 0), len());}
+	String operator[](const Range<int, true,  true > range) const {return slice(max(range.b    , 0), min((unsigned)range.e + 1u, (unsigned)len()));} // `(unsigned)` is needed when `instr` starts with left single quotation mark
+	String operator[](const Range<int, true,  false> range) const {return slice(max(range.b    , 0), min((unsigned)range.e     , (unsigned)len()));}
+	String operator[](const Range<int, false, true > range) const {return slice(max(range.b + 1, 0), min((unsigned)range.e + 1u, (unsigned)len()));}
+	String operator[](const Range<int, false, false> range) const {return slice(max(range.b + 1, 0), min((unsigned)range.e     , (unsigned)len()));}
+	String operator[](const RangeEI<int>             range) const {return slice(max(range.b    , 0), len());}
+
+	String operator[](const range_e_llen    range) const {return (*this)[range_el(        range.b, len() + range.e)];}
+	String operator[](const range_elen_elen range) const {return (*this)[range_ee(len() + range.b, len() + range.e)];}
+	String operator[](const range_elen_llen range) const {return (*this)[range_el(len() + range.b, len() + range.e)];}
+	String operator[](const range_elen_i    range) const {return (*this)[range_ei(len() + range.b)];}
 
 	char16_t at_plus_len(int i) const
 	{

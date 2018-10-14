@@ -95,6 +95,27 @@ public:
 	}
 };
 
+struct range_e_llen // `a.<(len)-b`
+{
+	int b, e;
+	range_e_llen(int b, int e) : b(b), e(e) {}
+};
+struct range_elen_elen // `(len)-a..(len)-b`
+{
+	int b, e;
+	range_elen_elen(int b, int e) : b(b), e(e) {}
+};
+struct range_elen_llen // `(len)-a.<(len)-b`
+{
+	int b, e;
+	range_elen_llen(int b, int e) : b(b), e(e) {}
+};
+struct range_elen_i // `(len)-a..`
+{
+	int b;
+	range_elen_i(int b) : b(b) {}
+};
+
 template <typename Ty> auto range_ee(const Ty &begin, const Ty &end) {return Range<Ty, true,  true >(begin, end);} // equal-equal range (`a..b`)
 template <typename Ty> auto range_el(const Ty &begin, const Ty &end) {return Range<Ty, true,  false>(begin, end);} // equal-less  range (`a.<b`)
 template <typename Ty> auto range_le(const Ty &begin, const Ty &end) {return Range<Ty, false, true >(begin, end);} // less-equal  range (`a<.b`)

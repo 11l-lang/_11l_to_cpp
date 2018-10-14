@@ -359,7 +359,11 @@ class SymbolNode:
                 else:
                     return c0
             elif self.symbol.id == '..':
-                return 'range_ei(' + self.children[0].to_str() + ')'
+                c0 = self.children[0].to_str()
+                if c0.startswith('(len)'):
+                    return 'range_elen_i(' + c0[len('(len)'):] + ')'
+                else:
+                    return 'range_ei(' + c0 + ')'
             else:
                 return {'(-)':'~'}.get(self.symbol.id, self.symbol.id) + self.children[0].to_str()
         elif len(self.children) == 2:
@@ -398,14 +402,19 @@ class SymbolNode:
                                 gather_captured_variables(child)
                 gather_captured_variables(self.children[1])
                 return '[' + ', '.join(sorted(captured_variables)) + '](' + ', '.join(map(lambda c: 'const auto &' + c.to_str(), self.children[0].children if self.children[0].symbol.id == '(' else [self.children[0]])) + '){return ' + self.children[1].to_str() + ';}' # )
-            elif self.symbol.id == '..':
-                return 'range_ee(' + char_if_len_1(self.children[0]) + ', ' + char_if_len_1(self.children[1]) + ')'
-            elif self.symbol.id == '.<':
-                return 'range_el(' + char_if_len_1(self.children[0]) + ', ' + char_if_len_1(self.children[1]) + ')'
-            elif self.symbol.id == '<.':
-                return 'range_le(' + char_if_len_1(self.children[0]) + ', ' + char_if_len_1(self.children[1]) + ')'
-            elif self.symbol.id == '<.<':
-                return 'range_ll(' + char_if_len_1(self.children[0]) + ', ' + char_if_len_1(self.children[1]) + ')'
+            elif self.symbol.id in ('..', '.<', '<.', '<.<'):
+                s = {'..':'ee', '.<':'el', '<.':'le', '<.<':'ll'}[self.symbol.id]
+                c0 = char_if_len_1(self.children[0])
+                c1 = char_if_len_1(self.children[1])
+                b = s[0]
+                if c0.startswith('(len)'):
+                    b += 'len'
+                    c0 = c0[len('(len)'):]
+                e = s[1]
+                if c1.startswith('(len)'):
+                    e += 'len'
+                    c1 = c1[len('(len)'):]
+                return 'range_' + b + '_'*(len(b) > 1 or len(e) > 1) + e + '(' + c0 + ', ' + c1 + ')'
             elif self.symbol.id in ('C', 'С', 'in'):
                 return 'in(' + char_if_len_1(self.children[0]) + ', ' + self.children[1].to_str() + ')'
             elif self.symbol.id in ('!C', '!С', '!in'):
