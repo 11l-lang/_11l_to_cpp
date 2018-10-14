@@ -320,22 +320,38 @@ arr2.append(10);
 
 
 A s = ‘154’
-A arr = [1, 5, 4]
+A a = [1, 5, 4]
 s[2] = ‘3’
-arr[2] = 3
+a[2] = 3
 assert(s[(len)-2] == ‘5’)
-assert(arr[(len)-2] == 5)
+assert(a[(len)-2] == 5)
 s[(len)-2] = ‘2’
-arr[(len)-2] = 2
+a[(len)-2] = 2
+assert(s[0.<(len)-1] == ‘12’)
+assert(a[0.<(len)-1] == [1, 2])
+assert(s[(len)-2..] == ‘23’)
+assert(a[(len)-2..] == [2, 3])
+assert(s[(len)-3..(len)-1] == ‘123’)
+assert(a[(len)-3..(len)-1] == [1, 2, 3])
+assert(s[(len)-3.<(len)-1] == ‘12’)
+assert(a[(len)-3.<(len)-1] == [1, 2])
 ===
 auto s = u"154"_S;
-auto arr = create_array({1, 5, 4});
+auto a = create_array({1, 5, 4});
 s.set(2, u'3'_C);
-arr.set(2, 3);
+a.set(2, 3);
 assert(s.at_plus_len( - 2) == u'5');
-assert(arr.at_plus_len( - 2) == 5);
+assert(a.at_plus_len( - 2) == 5);
 s.set_plus_len( - 2, u'2'_C);
-arr.set_plus_len( - 2, 2);
+a.set_plus_len( - 2, 2);
+assert(s[range_e_llen(0,  - 1)] == u"12");
+assert(a[range_e_llen(0,  - 1)] == create_array({1, 2}));
+assert(s[range_elen_i( - 2)] == u"23");
+assert(a[range_elen_i( - 2)] == create_array({2, 3}));
+assert(s[range_elen_elen( - 3,  - 1)] == u"123");
+assert(a[range_elen_elen( - 3,  - 1)] == create_array({1, 2, 3}));
+assert(s[range_elen_llen( - 3,  - 1)] == u"12");
+assert(a[range_elen_llen( - 3,  - 1)] == create_array({1, 2}));
 
 
 F newlines()

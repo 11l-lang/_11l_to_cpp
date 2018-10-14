@@ -70,16 +70,21 @@ public:
 		return std::move(a);
 	}
 
-	Array operator[](const Range<int, true,  true > &range) const {return slice(max(range.b    , 0), min(range.e + 1, len()));}
-	Array operator[](const Range<int, true,  false> &range) const {return slice(max(range.b    , 0), min(range.e    , len()));}
-	Array operator[](const Range<int, false, true > &range) const {return slice(max(range.b + 1, 0), min(range.e + 1, len()));}
-	Array operator[](const Range<int, false, false> &range) const {return slice(max(range.b + 1, 0), min(range.e    , len()));}
-	Array operator[](const RangeEI<int>             &range) const {return slice(max(range.b    , 0),                  len() );}
-	Array operator[](const RangeWithStep<int, true,  true > &range) const {return slice(max(range.b    , 0), min(range.e + 1, len()), range.step);}
-	Array operator[](const RangeWithStep<int, true,  false> &range) const {return slice(max(range.b    , 0), min(range.e    , len()), range.step);}
-	Array operator[](const RangeWithStep<int, false, true > &range) const {return slice(max(range.b + 1, 0), min(range.e + 1, len()), range.step);}
-	Array operator[](const RangeWithStep<int, false, false> &range) const {return slice(max(range.b + 1, 0), min(range.e    , len()), range.step);}
-	Array operator[](const RangeEIWithStep<int>             &range) const {return slice(max(range.b    , 0),                  len() , range.step);}
+	Array operator[](const Range<int, true,  true > range) const {return slice(max(range.b    , 0), min(range.e + 1, len()));}
+	Array operator[](const Range<int, true,  false> range) const {return slice(max(range.b    , 0), min(range.e    , len()));}
+	Array operator[](const Range<int, false, true > range) const {return slice(max(range.b + 1, 0), min(range.e + 1, len()));}
+	Array operator[](const Range<int, false, false> range) const {return slice(max(range.b + 1, 0), min(range.e    , len()));}
+	Array operator[](const RangeEI<int>             range) const {return slice(max(range.b    , 0),                  len() );}
+	Array operator[](const RangeWithStep<int, true,  true > range) const {return slice(max(range.b    , 0), min(range.e + 1, len()), range.step);}
+	Array operator[](const RangeWithStep<int, true,  false> range) const {return slice(max(range.b    , 0), min(range.e    , len()), range.step);}
+	Array operator[](const RangeWithStep<int, false, true > range) const {return slice(max(range.b + 1, 0), min(range.e + 1, len()), range.step);}
+	Array operator[](const RangeWithStep<int, false, false> range) const {return slice(max(range.b + 1, 0), min(range.e    , len()), range.step);}
+	Array operator[](const RangeEIWithStep<int>             range) const {return slice(max(range.b    , 0),                  len() , range.step);}
+
+	Array operator[](const range_e_llen    range) const {return (*this)[range_el(        range.b, len() + range.e)];}
+	Array operator[](const range_elen_elen range) const {return (*this)[range_ee(len() + range.b, len() + range.e)];}
+	Array operator[](const range_elen_llen range) const {return (*this)[range_el(len() + range.b, len() + range.e)];}
+	Array operator[](const range_elen_i    range) const {return (*this)[range_ei(len() + range.b)];}
 
 	const Type &operator[](int i) const
 	{
