@@ -36,7 +36,7 @@ T Converter
             line++
             line_start = t
          t++
-      R (line, pos - line_start)
+      R (line, pos - line_start, pos)
 
    F to_html(instr, File? outfilef = N, ', outer_pos = 0) -> String
       .to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
@@ -54,7 +54,7 @@ T Converter
 
       F exit_with_error(message, pos)
          A p = @.instr_pos_to_line_column(pos)
-         X Exception(message, p[0], p[1], pos)
+         X Exception(message, p[0], p[1], p[2])
       A i = 0
       F next_char(offset = 1)
          R I @i + offset < @instr.len {@instr[@i + offset]} E "\0"[0]

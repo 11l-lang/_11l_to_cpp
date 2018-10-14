@@ -39,7 +39,7 @@ class Converter:
                 line += 1
                 line_start = t
             t += 1
-        return (line, pos - line_start)
+        return (line, pos - line_start, pos) # returning last `pos` is necessary because `pos` was modified above [in line `pos += sum(self.to_html_called_inside_to_html_outer_pos_list)`]
 
     def to_html(self, instr, outfilef : IO[str] = None, *, outer_pos = 0) -> str:
         self.to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
@@ -59,7 +59,7 @@ class Converter:
 
         def exit_with_error(message, pos):
             p = self.instr_pos_to_line_column(pos)
-            raise Exception(message, p[0], p[1], pos)
+            raise Exception(message, p[0], p[1], p[2])
 
         i = 0
         def next_char(offset = 1):

@@ -1,7 +1,7 @@
 ﻿from tokenizer import Token
 import tokenizer
 from typing import List, Tuple, Dict, Callable
-import os
+import os, thindf
 
 class Error(Exception):
     def __init__(self, message, token):
@@ -20,6 +20,21 @@ class Scope:
             self.ast_nodes = []
             if ast_node != None:
                 self.ast_nodes.append(ast_node)
+
+        def serialize_to_dict(self):
+            ast_nodes = []
+            for ast_node in self.ast_nodes:
+                if type(ast_node) == ASTFunctionDefinition:
+                    ast_nodes.append(ast_node.serialize_to_dict())
+            return {'type': self.type, 'ast_nodes': ast_nodes}
+
+        def deserialize_from_dict(self, d):
+            self.type = d['type']
+            for ast_node_dict in d['ast_nodes']:
+                ast_node = ASTFunctionDefinition()
+                ast_node.deserialize_from_dict(ast_node_dict)
+                self.ast_nodes.append(ast_node)
+
     ids : Dict[str, Id]
     is_function : bool
 
@@ -31,6 +46,18 @@ class Scope:
         else:
             self.is_function = False
             self.ids = {}
+
+    def serialize_to_dict(self):
+        ids_dict = {}
+        for name, id in self.ids.items():
+            ids_dict[name] = id.serialize_to_dict()
+        return ids_dict
+
+    def deserialize_from_dict(self, d):
+        for name, id_dict in d.items():
+            id = Scope.Id(id_dict['type'])
+            id.deserialize_from_dict(id_dict)
+            self.ids[name] = id
 
     def find_in_current_function(self, name):
         s = self
@@ -553,6 +580,12 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         super().__init__()
         self.function_arguments = function_arguments or []
 
+    def serialize_to_dict(self):
+        return {'function_arguments': [', '.join(arg) for arg in self.function_arguments]}
+
+    def deserialize_from_dict(self, d):
+        self.function_arguments = [arg.split(', ') for arg in d['function_arguments']]
+
     def to_str(self, indent):
         if type(self.parent) == ASTTypeDefinition:
             if self.function_name == '': # this is constructor
@@ -928,14 +961,21 @@ def led(self, left):
                 or modulefstat.st_mtime       > hpp_file_mtime \
                 or os.stat(__file__).st_mtime > hpp_file_mtime \
                 or os.stat(os.path.dirname(__file__) + '/tokenizer.py').st_mtime > hpp_file_mtime \
-                or True: # always parse module for a while
+                or not os.path.isfile(module_file_name + '.11l_global_scope'):
             module_source = open(module_file_name + '.11l', encoding = 'utf-8-sig').read()
             prev_scope = scope
             open(module_file_name + '.hpp', 'w', encoding = 'utf-8-sig', newline = "\n").write('namespace ' + module_name + "\n{\n" # utf-8-sig is for MSVC (fix of error C2015: too many characters in constant [`u'‘'`]) # ’
                 + parse_and_to_str(tokenizer.tokenize(module_source), module_source, module_file_name + '.11l', True) + "}\n")
             modules[module_name] = Module()
             modules[module_name].scope = scope
+            assert(scope.is_function == False) # serializing `is_function` member variable is not necessary because it is always equal to `False`
+            open(module_file_name + '.11l_global_scope', 'w', encoding = 'utf-8', newline = "\n").write(thindf.to_thindf(scope.serialize_to_dict()))
             scope = prev_scope
+        else:
+            module_scope = Scope(None)
+            module_scope.deserialize_from_dict(thindf.parse(open(module_file_name + '.11l_global_scope', encoding = 'utf-8-sig').read()))
+            modules[module_name] = Module()
+            modules[module_name].scope = module_scope
 
     self.append_child(left)
     self.append_child(tokensn)
@@ -1075,8 +1115,9 @@ symbol('{') # }
 def parse_internal(this_node):
     global token
 
-    def new_scope(node, func_args = None):
-        advance_scope_begin()
+    def new_scope(node, func_args = None, call_advance_scope_begin = True):
+        if call_advance_scope_begin:
+            advance_scope_begin()
         global scope
         prev_scope = scope
         scope = Scope(func_args)
@@ -1103,7 +1144,7 @@ def parse_internal(this_node):
             advance(':')
             assert(token.category == Token.Category.STATEMENT_SEPARATOR)
             next_token()
-            parse_internal(node)
+            new_scope(node, [], False)
         elif token.category == Token.Category.KEYWORD:
             if token.value(source) in ('F', 'Ф', 'fn', 'фн'):
                 node = ASTFunctionDefinition()
@@ -1368,6 +1409,20 @@ tokensn   = SymbolNode(token)
 file_name = ''
 importing_module = False
 
+builtins_scope = Scope(None)
+builtins_scope.add_function('print', ASTFunctionDefinition([('object', '', ''), ('end', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), R'"\n"').to_str(), 'String'), ('flush', SymbolNode(Token(0, 0, Token.Category.CONSTANT), '0B').to_str())]))
+builtins_scope.add_function('assert', ASTFunctionDefinition([('expression', '', 'Bool'), ('message', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘’').to_str(), 'String')]))
+builtins_scope.add_function('exit', ASTFunctionDefinition([('arg', '', '')]))
+builtins_scope.add_function('zip', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', '')]))
+builtins_scope.add_function('sum', ASTFunctionDefinition([('iterable', '', '')]))
+builtins_scope.add_function('min', ASTFunctionDefinition([('object1', '', ''), ('object2', '', '')]))
+builtins_scope.add_function('max', ASTFunctionDefinition([('object1', '', ''), ('object2', '', '')]))
+builtins_scope.add_function('hex', ASTFunctionDefinition([('object', '', '')]))
+builtins_scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', '')])]))
+builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('mode', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘r’').to_str(), 'String'), ('encoding', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘utf-8’').to_str(), 'String'), ('newline', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘’').to_str(), 'String')])]))
+for type_ in cpp_type_from_11l:
+    builtins_scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', '', '')])]))
+
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
     if len(tokens_) == 0: return ASTProgram()
     global tokens, source, tokeni, token, break_label_index, scope, tokensn, file_name, importing_module, modules
@@ -1386,18 +1441,7 @@ def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, su
     token = None
     break_label_index = -1
     scope = Scope(None)
-    scope.add_function('print', ASTFunctionDefinition([('object', None, ''), ('end', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), R'"\n"').to_str(), 'String'), ('flush', SymbolNode(Token(0, 0, Token.Category.CONSTANT), '0B').to_str())]))
-    scope.add_function('assert', ASTFunctionDefinition([('expression', None, 'Bool'), ('message', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘’').to_str(), 'String')]))
-    scope.add_function('exit', ASTFunctionDefinition([('arg', None, '')]))
-    scope.add_function('zip', ASTFunctionDefinition([('iterable1', None, ''), ('iterable2', None, '')]))
-    scope.add_function('sum', ASTFunctionDefinition([('iterable', None, '')]))
-    scope.add_function('min', ASTFunctionDefinition([('object1', None, ''), ('object2', None, '')]))
-    scope.add_function('max', ASTFunctionDefinition([('object1', None, ''), ('object2', None, '')]))
-    scope.add_function('hex', ASTFunctionDefinition([('object', None, '')]))
-    scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', None)])]))
-    scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', None, 'String'), ('mode', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘r’').to_str(), 'String'), ('encoding', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘utf-8’').to_str(), 'String'), ('newline', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘’').to_str(), 'String')])]))
-    for type_ in cpp_type_from_11l:
-        scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', None, '')])]))
+    scope.parent = builtins_scope
     file_name = file_name_
     importing_module = importing_module_
     if not importing_module:
