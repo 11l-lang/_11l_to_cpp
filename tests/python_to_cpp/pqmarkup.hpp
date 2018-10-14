@@ -51,7 +51,7 @@ public:
             }
             t++;
         }
-        return make_tuple(line, pos - line_start);
+        return make_tuple(line, pos - line_start, pos);
     }
 
     template <typename T1, typename T3 = decltype(0)> String to_html(const T1 &instr, File* const outfilef = nullptr, const T3 &outer_pos = 0)
@@ -74,7 +74,7 @@ public:
         auto exit_with_error = [this](const auto &message, const auto &pos)
         {
             auto p = instr_pos_to_line_column(pos);
-            throw Exception(message, _get<0>(p), _get<1>(p), pos);
+            throw Exception(message, _get<0>(p), _get<1>(p), _get<2>(p));
         };
         auto i = 0;
         auto next_char = [&i, &instr](const decltype(1) offset = 1)

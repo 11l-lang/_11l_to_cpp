@@ -1,0 +1,16 @@
+Exception
+    type = N
+    ast_nodes = []
+Converter
+    type = N
+    ast_nodes = []
+to_html
+    type = N
+    ast_nodes = [
+    .   function_arguments = [
+            ‘instr, , , ’
+            ‘outfilef, nullptr, File?, ’
+            ‘ohd, false, , ’
+            ‘habrahabr_html, false, , ’
+        ]
+    ]
