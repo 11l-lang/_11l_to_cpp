@@ -215,6 +215,24 @@ public:
 	String operator[](const Range<int, false, false> &range) const {return slice(max(range.b + 1, 0), min((unsigned)range.e     , (unsigned)len()));}
 	String operator[](const RangeEI<int>             &range) const {return slice(max(range.b    , 0), len());}
 
+	char16_t at_plus_len(int i) const
+	{
+		return (*this)[len() + i];
+	}
+
+	void set(int i, char16_t c)
+	{
+		if (in(i, range_el(0, len())))
+			at(i) = c;
+		else
+			throw IndexError(i);
+	}
+
+	void set_plus_len(int i, char16_t c)
+	{
+		set(len() + i, c);
+	}
+
 	bool operator==(Char ch) const {return   len() == 1 && at(0) == ch.code ;}
 	bool operator!=(Char ch) const {return !(len() == 1 && at(0) == ch.code);}
 	friend bool operator==(Char ch, const String &s) {return   s.len() == 1 && s.at(0) == ch.code ;}

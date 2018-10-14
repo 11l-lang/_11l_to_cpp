@@ -6,6 +6,14 @@ using std::max;
 template <typename...Types> using Tuple = std::tuple<Types...>;
 using std::make_tuple;
 
+class IndexError
+{
+public:
+	int index;
+
+	IndexError(int index) : index(index) {}
+};
+
 #include "11l_hpp/Range.hpp"
 #include "11l_hpp/String.hpp"
 #include "11l_hpp/Array.hpp"

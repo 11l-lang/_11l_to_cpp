@@ -1,14 +1,6 @@
 #include <initializer_list>
 #include <vector>
 
-class IndexError
-{
-public:
-	int index;
-
-	IndexError(int index) : index(index) {}
-};
-
 class ValueError
 {
 public:
@@ -103,12 +95,22 @@ public:
 		throw IndexError(i);
 	}
 
+	const Type &at_plus_len(int i) const
+	{
+		return (*this)[len() + i];
+	}
+
 	void set(int i, const Type &v)
 	{
 		if (in(i, range_el(0, len())))
 			at(i) = v;
 		else
 			throw IndexError(i);
+	}
+
+	void set_plus_len(int i, const Type &v)
+	{
+		set(len() + i, v);
 	}
 
 	void append(const Type &v) {push_back(v);}
