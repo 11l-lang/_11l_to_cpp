@@ -321,7 +321,10 @@ class SymbolNode:
             elif self.children[1].token.category == Token.Category.NUMERIC_LITERAL:
                 return '_get<' + self.children[1].to_str() + '>(' + self.children[0].to_str() + ')' # for support tuples (e.g. `(1, 2)[0]` -> `_get<0>(make_tuple(1, 2))`)
             else:
-                return self.children[0].to_str() + '[' + self.children[1].to_str() + ']'
+                c1 = self.children[1].to_str()
+                if c1.startswith('(len)'):
+                    return self.children[0].to_str() + '.at_plus_len(' + c1[len('(len)'):] + ')'
+                return self.children[0].to_str() + '[' + c1 + ']'
 
         elif self.symbol.id in ('S', 'В', 'switch', 'выбрать'):
             char_val = True
@@ -412,7 +415,11 @@ class SymbolNode:
             elif self.symbol.id in ('==', '!=') and self.children[1].token.category == Token.Category.STRING_LITERAL:
                 return self.children[0].to_str() + ' ' + self.symbol.id + ' ' + char_if_len_1(self.children[1])[:-2]
             elif self.symbol.id == '=' and self.children[0].symbol.id == '[': # ] # replace `a[k] = v` with `a.set(k, v)`
-                return self.children[0].children[0].to_str() + '.set(' + self.children[0].children[1].to_str() + ', ' + self.children[1].to_str() + ')'
+                c01 = self.children[0].children[1].to_str()
+                if c01.startswith('(len)'):
+                    return self.children[0].children[0].to_str() + '.set_plus_len(' + c01[len('(len)'):] + ', ' + char_if_len_1(self.children[1]) + ')'
+                else:
+                    return self.children[0].children[0].to_str() + '.set(' + c01 + ', ' + char_if_len_1(self.children[1]) + ')'
             elif self.symbol.id == '[+]=': # replace `a [+]= v` with `a.append(v)`
                 return self.children[0].to_str() + '.append(' + self.children[1].to_str() + ')'
             else:

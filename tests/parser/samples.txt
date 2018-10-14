@@ -319,6 +319,25 @@ Array<int> arr2;
 arr2.append(10);
 
 
+A s = ‘154’
+A arr = [1, 5, 4]
+s[2] = ‘3’
+arr[2] = 3
+assert(s[(len)-2] == ‘5’)
+assert(arr[(len)-2] == 5)
+s[(len)-2] = ‘2’
+arr[(len)-2] = 2
+===
+auto s = u"154"_S;
+auto arr = create_array({1, 5, 4});
+s.set(2, u'3'_C);
+arr.set(2, 3);
+assert(s.at_plus_len( - 2) == u'5');
+assert(arr.at_plus_len( - 2) == 5);
+s.set_plus_len( - 2, u'2'_C);
+arr.set_plus_len( - 2, 2);
+
+
 F newlines()
    R ‘’
 A indent = 0
