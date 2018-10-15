@@ -380,6 +380,11 @@ class SymbolNode:
                     return '_' + c0
                 return '::' + c0
             elif self.symbol.id == '.':
+                sn = self.parent
+                while sn != None:
+                    if sn.symbol.id == '.' and len(sn.children) == 3:
+                        return 'T.' + self.children[0].to_str() # T means *‘t’emporary [variable], and it can be safely used because `T` is a keyletter
+                    sn = sn.parent
                 c0 = self.children[0].to_str()
                 if self.scope.find_in_current_function(c0):
                     return 'this->' + c0
@@ -461,6 +466,8 @@ class SymbolNode:
             else:
                 return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '(concat)':'+', '‘’=':'+=', '(+)':'^'}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
         elif len(self.children) == 3:
+            if self.children[1].token.category == Token.Category.SCOPE_BEGIN:
+                return '[&](auto &&T){return ' + self.children[2].to_str() + ';}(' + self.children[0].to_str() + ')'
             assert(self.symbol.id in ('I', 'Е', 'if', 'если'))
             return self.children[0].to_str() + ' ? ' + self.children[1].to_str() + ' : ' + self.children[2].to_str()
 
@@ -928,6 +935,14 @@ def led(self, left):
 symbol('..', 55).set_led_bp(55, led)
 
 def led(self, left):
+    if token.category == Token.Category.SCOPE_BEGIN:
+        self.append_child(left)
+        self.append_child(tokensn)
+        if token.end != token.start: # if current token is a `{` then it is "with"-expression, but not "with"-statement
+            next_token()
+            self.append_child(expression())
+            advance('}')
+        return self
     if token.category != Token.Category.NAME:
         raise Error('expected an attribute name', token)
     self.append_child(left)

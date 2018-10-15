@@ -439,3 +439,12 @@ auto to_html()
     write_to_pos(2);
     return writepos;
 }
+
+
+F f(active_window)
+   A width = active_window.rect. {.right - .left}
+===
+template <typename T1> auto f(const T1 &active_window)
+{
+    auto width = [&](auto &&T){return T.right - T.left;}(active_window.rect);
+}
