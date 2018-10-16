@@ -381,10 +381,17 @@ class SymbolNode:
                 return '::' + c0
             elif self.symbol.id == '.':
                 c0 = self.children[0].to_str()
-                sn = self.parent
-                while sn != None:
+                sn = self
+                while True:
                     if sn.symbol.id == '.' and len(sn.children) == 3:
                         return 'T.' + c0 + '()'*(c0 in ('len', 'last', 'empty')) # T means *‘t’emporary [variable], and it can be safely used because `T` is a keyletter
+                    if sn.parent == None:
+                        n = sn.ast_parent
+                        while n != None:
+                            if type(n) == ASTWith:
+                                return 'T.' + c0
+                            n = n.parent
+                        break
                     sn = sn.parent
                 if self.scope.find_in_current_function(c0):
                     return 'this->' + c0
@@ -497,7 +504,7 @@ def symbol(id, bp = 0):
     return s
 
 class ASTNode:
-    parent : 'ASTNode'
+    parent : 'ASTNode' = None
 
     def walk_expressions(self, f):
         pass
@@ -524,7 +531,7 @@ class ASTNodeWithChildren(ASTNode):
             while ti > 0 and tokens[ti].category in (Token.Category.SCOPE_END, Token.Category.STATEMENT_SEPARATOR):
                 ti -= 1
             r = (source[tokens[ti].end:tokens[self.tokeni].start].count("\n")-1) * "\n"
-        r += ' ' * (indent*4) + t + ("\n" + ' ' * (indent*4) + "{\n" if place_opening_curly_bracket_on_its_own_line else " {\n") # }
+        r += ' ' * (indent*4) + t + (("\n" + ' ' * (indent*4) + "{\n") if place_opening_curly_bracket_on_its_own_line else " {\n") # }
         r += add_at_beginning
         for c in self.children:
             r += c.to_str(indent+1)
@@ -580,6 +587,10 @@ class ASTVariableDeclaration(ASTNode):
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
     def to_str(self, indent):
         return super().to_str(indent)[:-2] + ' = ' + self.expression.to_str() + ";\n"
+
+class ASTWith(ASTNodeWithChildren, ASTNodeWithExpression):
+    def to_str(self, indent):
+        return self.children_to_str(indent, '[&](auto &&T)', False)[:-1] + '(' + self.expression.to_str() + ");\n"
 
 class ASTFunctionDefinition(ASTNodeWithChildren):
     function_name : str
@@ -945,7 +956,7 @@ def led(self, left):
     if token.category == Token.Category.SCOPE_BEGIN:
         self.append_child(left)
         self.append_child(tokensn)
-        if token.end != token.start: # if current token is a `{` then it is "with"-expression, but not "with"-statement
+        if token.value(source) == '{': # } # if current token is a `{` then it is "with"-expression, but not "with"-statement
             next_token()
             self.append_child(expression())
             advance('}')
@@ -1369,53 +1380,58 @@ def parse_internal(this_node):
 
         else:
             node_expression = expression()
-            if token.category == Token.Category.NAME:
-                var_name = token.value(source)
-                next_token()
-                if token.value(source) == '=':
-                    next_token()
-                    node = ASTVariableInitialization()
-                    node.set_expression(expression())
-                else:
-                    node = ASTVariableDeclaration()
-                node.var = var_name
-                node.type = node_expression.token.value(source)
-                node.type_args = []
-                if node.type == '[': # ]
-                    if node_expression.is_dict:
-                        assert(len(node_expression.children) == 1)
-                        node.type = 'Dict'
-                        node.type_args = [node_expression.children[0].children[0].to_str(), node_expression.children[0].children[1].to_str()]
-                    elif node_expression.is_list:
-                        assert(len(node_expression.children) == 1)
-                        node.type = 'Array'
-                        node.type_args = [node_expression.children[0].to_str()]
-                    else:
-                        assert(node_expression.is_type)
-                        node.type = node_expression.children[0].token.value(source)
-                        for i in range(1, len(node_expression.children)):
-                            node.type_args.append(node_expression.children[i].to_str())
-                elif node.type == '(': # )
-                    node.function_pointer = True
-                    for i in range(len(node_expression.children)):
-                        child = node_expression.children[i]
-                        if child.token.category == Token.Category.NAME:
-                            node.type_args.append(child.token_str())
-                        else:
-                            assert(child.symbol.id == '->' and i == len(node_expression.children) - 1)
-                            assert(child.children[0].token.category == Token.Category.NAME)
-                            assert(child.children[1].token.category == Token.Category.NAME or child.children[1].token_str() in ('N', 'Н', 'null', 'нуль'))
-                            node.type_args.append(child.children[0].token_str())
-                            node.type = child.children[1].token_str() # return value is the last
-                assert(node.type[0].isupper() or node.type in ('var', 'перем')) # type name must starts with an upper case letter
-                scope.add_name(node.var, node)
+            if node_expression.symbol.id == '.' and node_expression.children[1].token.category == Token.Category.SCOPE_BEGIN: # this is a "with"-statement
+                node = ASTWith()
+                node.set_expression(node_expression.children[0])
+                new_scope(node)
             else:
-                node = ASTExpression()
-                node.set_expression(node_expression)
-            if not (token == None or token.category in (Token.Category.STATEMENT_SEPARATOR, Token.Category.SCOPE_END)):
-                raise Error('expected end of statement', token)
-            if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
-                next_token()
+                if token.category == Token.Category.NAME:
+                    var_name = token.value(source)
+                    next_token()
+                    if token.value(source) == '=':
+                        next_token()
+                        node = ASTVariableInitialization()
+                        node.set_expression(expression())
+                    else:
+                        node = ASTVariableDeclaration()
+                    node.var = var_name
+                    node.type = node_expression.token.value(source)
+                    node.type_args = []
+                    if node.type == '[': # ]
+                        if node_expression.is_dict:
+                            assert(len(node_expression.children) == 1)
+                            node.type = 'Dict'
+                            node.type_args = [node_expression.children[0].children[0].to_str(), node_expression.children[0].children[1].to_str()]
+                        elif node_expression.is_list:
+                            assert(len(node_expression.children) == 1)
+                            node.type = 'Array'
+                            node.type_args = [node_expression.children[0].to_str()]
+                        else:
+                            assert(node_expression.is_type)
+                            node.type = node_expression.children[0].token.value(source)
+                            for i in range(1, len(node_expression.children)):
+                                node.type_args.append(node_expression.children[i].to_str())
+                    elif node.type == '(': # )
+                        node.function_pointer = True
+                        for i in range(len(node_expression.children)):
+                            child = node_expression.children[i]
+                            if child.token.category == Token.Category.NAME:
+                                node.type_args.append(child.token_str())
+                            else:
+                                assert(child.symbol.id == '->' and i == len(node_expression.children) - 1)
+                                assert(child.children[0].token.category == Token.Category.NAME)
+                                assert(child.children[1].token.category == Token.Category.NAME or child.children[1].token_str() in ('N', 'Н', 'null', 'нуль'))
+                                node.type_args.append(child.children[0].token_str())
+                                node.type = child.children[1].token_str() # return value is the last
+                    assert(node.type[0].isupper() or node.type in ('var', 'перем')) # type name must starts with an upper case letter
+                    scope.add_name(node.var, node)
+                else:
+                    node = ASTExpression()
+                    node.set_expression(node_expression)
+                if not (token == None or token.category in (Token.Category.STATEMENT_SEPARATOR, Token.Category.SCOPE_END)):
+                    raise Error('expected end of statement', token)
+                if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
+                    next_token()
 
         node.parent = this_node
         this_node.children.append(node)
