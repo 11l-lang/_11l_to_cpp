@@ -104,11 +104,25 @@ public:
 	{
 		String str(*this);
 		size_t start_pos = 0;
-		while((start_pos = str.find(old, start_pos)) != String::npos) {
+		while((start_pos = str.findi(old, start_pos)) != -1) {
 			str.std::u16string::replace(start_pos, old.length(), n);
 			start_pos += n.length();
 		}
 		return str;
+	}
+
+	Nullable<int> find(Char c, int start = 0) const
+	{
+		const char16_t *s = data();
+		for (int i=start, n=len(); i<n; i++)
+			if (s[i] == c) return Nullable<int>(i);
+		return Nullable<int>();
+	}
+	
+	Nullable<int> find(const String &s) const
+	{
+		size_t r = basic_string::find(s);
+		return r == npos ? Nullable<int>() : Nullable<int>(r);
 	}
 
 	int findi(Char c, int start = 0) const
@@ -121,7 +135,7 @@ public:
 	
 	int findi(const String &s, int start = 0) const
 	{
-		size_t r = find(s, start);
+		size_t r = basic_string::find(s, start);
 		return r != String::npos ? r : -1;
 	}
 
@@ -278,7 +292,7 @@ inline int parse_int(const String &str)
 	return res * sign;
 }
 
-inline bool in(Char c, const String &s) {return s.find(c.code) != String::npos;}
+inline bool in(Char c, const String &s) {return s.find(c) != nullptr;}
 
 inline char hex_to_char(int c) {return (char)c + ((unsigned)c <= 9u ? '0' : 'A' - 10);}
 

@@ -441,10 +441,12 @@ auto to_html()
 }
 
 
-F f(active_window)
+F f(active_window, s)
    A width = active_window.rect. {.right - .left}
+   R s.find(‘.’) ? s.len
 ===
-template <typename T1> auto f(const T1 &active_window)
+template <typename T1, typename T2> auto f(const T1 &active_window, const T2 &s)
 {
     auto width = [&](auto &&T){return T.right - T.left;}(active_window.rect);
+    return [&]{auto R = s.find(u"."_S); return R != nullptr ? *R : s.len();}();
 }
