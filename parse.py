@@ -380,12 +380,12 @@ class SymbolNode:
                     return '_' + c0
                 return '::' + c0
             elif self.symbol.id == '.':
+                c0 = self.children[0].to_str()
                 sn = self.parent
                 while sn != None:
                     if sn.symbol.id == '.' and len(sn.children) == 3:
-                        return 'T.' + self.children[0].to_str() # T means *‘t’emporary [variable], and it can be safely used because `T` is a keyletter
+                        return 'T.' + c0 + '()'*(c0 in ('len', 'last', 'empty')) # T means *‘t’emporary [variable], and it can be safely used because `T` is a keyletter
                     sn = sn.parent
-                c0 = self.children[0].to_str()
                 if self.scope.find_in_current_function(c0):
                     return 'this->' + c0
                 else:
@@ -417,7 +417,7 @@ class SymbolNode:
                 id = self.scope.find(cts0.lstrip('@'))
                 if id != None and id.type != None and id.type.endswith('?'):
                     return cts0.lstrip('@') + '->' + c1
-                return char_if_len_1(self.children[0]) + '.' + c1 + ('()' if c1 in ('len', 'last', 'empty') else '') # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
+                return char_if_len_1(self.children[0]) + '.' + c1 + '()'*(c1 in ('len', 'last', 'empty')) # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
             elif self.symbol.id == ':':
                 return self.children[0].to_str() + '::' + self.children[1].to_str()
             elif self.symbol.id == '->':
@@ -469,6 +469,9 @@ class SymbolNode:
                 return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '(concat)':'+', '‘’=':'+=', '(+)':'^'}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
         elif len(self.children) == 3:
             if self.children[1].token.category == Token.Category.SCOPE_BEGIN:
+                assert(self.symbol.id == '.')
+                if self.children[2].symbol.id == '?': # not necessary, just to beautify generated C++
+                    return '[&](auto &&T){auto X = ' + self.children[2].children[0].to_str() + '; return X != nullptr ? *X : ' + self.children[2].children[1].to_str() + ';}(' + self.children[0].to_str() + ')'
                 return '[&](auto &&T){return ' + self.children[2].to_str() + ';}(' + self.children[0].to_str() + ')'
             assert(self.symbol.id in ('I', 'Е', 'if', 'если'))
             return self.children[0].to_str() + ' ? ' + self.children[1].to_str() + ' : ' + self.children[2].to_str()
