@@ -443,6 +443,9 @@ auto to_html()
 
 F f(active_window, s)
    A width = active_window.rect. {.right - .left}
+   active_window.pos.
+      .x = 10
+      .y = 20
    assert(‘string’. {.find(‘.’) ? .len} == 6)
    assert(‘str.ng’. {.find(‘.’) ? .len} == 3)
    R s.find(‘.’) ? s.len
@@ -450,6 +453,10 @@ F f(active_window, s)
 template <typename T1, typename T2> auto f(const T1 &active_window, const T2 &s)
 {
     auto width = [&](auto &&T){return T.right - T.left;}(active_window.rect);
+    [&](auto &&T) {
+        T.x = 10;
+        T.y = 20;
+    }(active_window.pos);
     assert([&](auto &&T){auto X = T.find(u"."_S); return X != nullptr ? *X : T.len();}(u"string"_S) == 6);
     assert([&](auto &&T){auto X = T.find(u"."_S); return X != nullptr ? *X : T.len();}(u"str.ng"_S) == 3);
     return [&]{auto R = s.find(u"."_S); return R != nullptr ? *R : s.len();}();
