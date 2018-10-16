@@ -461,3 +461,24 @@ template <typename T1, typename T2> auto f(const T1 &active_window, const T2 &s)
     assert([&](auto &&T){auto X = T.find(u"."_S); return X != nullptr ? *X : T.len();}(u"str.ng"_S) == 3);
     return [&]{auto R = s.find(u"."_S); return R != nullptr ? *R : s.len();}();
 }
+
+
+L(n) [1, 2, 3, 4]
+   I n == 30
+      L.break
+   print(n)
+
+   L.was_no_break
+      print(‘no break’)
+===
+{bool was_break = false;
+for (auto n : create_array({1, 2, 3, 4})) {
+    if (n == 30) {
+        was_break = true;
+        break;
+    }
+    print(n);
+}
+if (!was_break)
+    print(u"no break"_S);
+}

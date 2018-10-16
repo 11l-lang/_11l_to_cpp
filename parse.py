@@ -542,7 +542,10 @@ class ASTNodeWithChildren(ASTNode):
                 or (check_for_if and type(self.children[0]) == ASTIf): # for correctly handling of dangling-else
             return self.children_to_str(indent, r, False)
         assert(len(self.children) == 1)
-        return ' ' * (indent*4) + r + "\n" + self.children[0].to_str(indent+1)
+        c0str = self.children[0].to_str(indent+1)
+        if c0str.startswith(' ' * ((indent+1)*4) + "was_break = true;\n"):
+            return self.children_to_str(indent, r, False)
+        return ' ' * (indent*4) + r + "\n" + c0str
 
 class ASTNodeWithExpression(ASTNode):
     expression : SymbolNode
@@ -723,17 +726,30 @@ class ASTSwitch(ASTNodeWithExpression):
             r += ' ' * ((indent+1)*4) + "break;\n"
         return r + ' ' * (indent*4) + "}\n"
 
-break_label_index = -1
+class ASTLoopWasNoBreak(ASTNodeWithChildren):
+    def to_str(self, indent):
+        return ''
 
 class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
     loop_variable : str = None
     there_is_loop_break_inside_switch = -1
 
+    def has_L_was_no_break(self):
+        return type(self.children[-1]) == ASTLoopWasNoBreak
+
     def to_str(self, indent):
+        r = ''
+        if self.has_L_was_no_break():
+            r = ' ' * (indent*4) + "{bool was_break = false;\n"
+
         if self.loop_variable != None:
-            r = self.children_to_str_detect_single_stmt(indent, 'for (auto ' + self.loop_variable + ' : ' + self.expression.to_str() + ')')
+            r += self.children_to_str_detect_single_stmt(indent, 'for (auto ' + self.loop_variable + ' : ' + self.expression.to_str() + ')')
         else:
-            r = self.children_to_str_detect_single_stmt(indent, 'while (' + (self.expression.to_str() if self.expression != None else 'true') + ')')
+            r += self.children_to_str_detect_single_stmt(indent, 'while (' + (self.expression.to_str() if self.expression != None else 'true') + ')')
+
+        if self.has_L_was_no_break():
+            r += self.children[-1].children_to_str_detect_single_stmt(indent, 'if (!was_break)') + ' ' * (indent*4) + "}\n"
+
         if self.there_is_loop_break_inside_switch != -1:
             r += ' ' * (indent*4) + 'break_' + ('' if self.there_is_loop_break_inside_switch == 0 else str(self.there_is_loop_break_inside_switch)) + ":\n"
         return r
@@ -745,8 +761,19 @@ class ASTContinue(ASTNode):
     def to_str(self, indent):
         return ' ' * (indent*4) + "continue;\n"
 
+break_label_index = -1
+
 class ASTLoopBreak(ASTNode):
     def to_str(self, indent):
+        r = ''
+        n = self.parent
+        while True:
+            if type(n) == ASTLoop:
+                if n.has_L_was_no_break():
+                    r = ' ' * (indent*4) + "was_break = true;\n"
+                break
+            n = n.parent
+
         n = self.parent
         while True:
             if type(n) == ASTSwitch:
@@ -757,12 +784,13 @@ class ASTLoopBreak(ASTNode):
                             global break_label_index
                             break_label_index += 1
                             n.there_is_loop_break_inside_switch = break_label_index
-                        return ' ' * (indent*4) + 'goto break_' + ('' if n.there_is_loop_break_inside_switch == 0 else str(n.there_is_loop_break_inside_switch)) + ";\n"
+                        return r + ' ' * (indent*4) + 'goto break_' + ('' if n.there_is_loop_break_inside_switch == 0 else str(n.there_is_loop_break_inside_switch)) + ";\n"
                     n = n.parent
             if type(n) == ASTLoop:
                 break
             n = n.parent
-        return ' ' * (indent*4) + "break;\n"
+
+        return r + ' ' * (indent*4) + "break;\n"
 
 class ASTReturn(ASTNodeWithExpression):
     def to_str(self, indent):
@@ -1332,6 +1360,11 @@ def parse_internal(this_node):
                 next_token()
                 if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
                     next_token()
+
+            elif token.value(source) in ('L.was_no_break', 'Ц.не_был_прерван', 'loop.was_no_break', 'цикл.не_был_прерван'):
+                node = ASTLoopWasNoBreak()
+                next_token()
+                new_scope(node)
 
             elif token.value(source) in ('R', 'Р', 'return', 'вернуть'):
                 node = ASTReturn()
