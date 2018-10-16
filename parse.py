@@ -463,6 +463,8 @@ class SymbolNode:
                     return self.children[0].children[0].to_str() + '.set(' + c01 + ', ' + char_if_len_1(self.children[1]) + ')'
             elif self.symbol.id == '[+]=': # replace `a [+]= v` with `a.append(v)`
                 return self.children[0].to_str() + '.append(' + self.children[1].to_str() + ')'
+            elif self.symbol.id == '?':
+                return '[&]{auto R = ' + self.children[0].to_str() + '; return R != nullptr ? *R : ' + self.children[1].to_str() + ';}()'
             else:
                 return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '(concat)':'+', '‘’=':'+=', '(+)':'^'}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
         elif len(self.children) == 3:
@@ -887,6 +889,8 @@ def prefix(id, bp):
     symbol(id).set_nud_bp(bp, nud)
 
 infix('[+]', 20); infix('->', 20)
+
+infix('?', 25) # based on C# operator precedence ([http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-334.pdf])
 
 infix('|', 30); infix('&', 40)
 

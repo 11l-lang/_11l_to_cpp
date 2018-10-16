@@ -6,6 +6,24 @@ using std::max;
 template <typename...Types> using Tuple = std::tuple<Types...>;
 using std::make_tuple;
 
+class NullPointerException
+{};
+
+template <typename Ty> class Nullable
+{
+	bool has_value;
+	Ty value;
+public:
+	Nullable() : has_value(false) {}
+	Nullable(const Ty &value) : has_value(true), value(value) {}
+
+	bool operator==(nullptr_t) const {return !has_value;}
+	bool operator!=(nullptr_t) const {return  has_value;}
+
+	const Ty &operator*() const {if (!has_value) throw NullPointerException(); return value;}
+	      Ty &operator*()       {if (!has_value) throw NullPointerException(); return value;}
+};
+
 class IndexError
 {
 public:
