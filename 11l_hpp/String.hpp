@@ -264,6 +264,7 @@ public:
 	String operator+(Char ch) {String r(*this); r.append(1, ch.code); return r;}
 
 	String operator+(int i) {return *this + String(i);}
+	friend String operator+(int i, const String &s) {return String(i) + s;}
 };
 
 String operator+(Char ch1, Char ch2)
