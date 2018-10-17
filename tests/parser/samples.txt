@@ -499,11 +499,39 @@ print(0);
 
 L(v) [10, 20, 30]
    print(L.index‘: ’v)
-   \(I L.next
-      print(‘, ’, end' ‘’))
 ===
 {int Lindex = 0;
 for (auto v : create_array({10, 20, 30})) {
     print(Lindex + u": "_S + v);
     Lindex++;
+}}
+
+
+L(v) [10, 20, 30]
+   print(L.index‘: ’v, end' ‘’)
+   I L.next
+      print(‘, ’, end' ‘’)
+===
+{int Lindex = 0;
+{auto &&__range = create_array({10, 20, 30});
+for (auto __begin = __range.begin(), __end = __range.end(); __begin != __end;) {
+    auto &&v = *__begin; ++__begin;
+    print(Lindex + u": "_S + v, u""_S);
+    if (__begin != __end)
+        print(u", "_S, u""_S);
+    Lindex++;
+}}}
+
+
+L(ch) [‘a’, ‘b’, ‘c’]
+   print(ch, end' ‘’)
+   I L.next
+      print(‘, ’, end' ‘’)
+===
+{auto &&__range = create_array({u'a'_C, u'b'_C, u'c'_C});
+for (auto __begin = __range.begin(), __end = __range.end(); __begin != __end;) {
+    auto &&ch = *__begin; ++__begin;
+    print(ch, u""_S);
+    if (__begin != __end)
+        print(u", "_S, u""_S);
 }}

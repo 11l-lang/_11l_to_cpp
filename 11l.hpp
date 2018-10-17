@@ -64,6 +64,11 @@ inline void print(const String &s, const String &end = u"\n", bool flush = false
 		std::wcout.flush();
 }
 
+inline void print(Char c, const String &end = u"\n", bool flush = false)
+{
+	print(String(c), end, flush);
+}
+
 inline void print(int i, const String &end = u"\n", bool flush = false)
 {
 	std::wcout << i << std::wstring(end.cbegin(), end.cend());
