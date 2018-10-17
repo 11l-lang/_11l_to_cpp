@@ -15,8 +15,9 @@ writepos = 0
 
 try:
     for token in tokenizer.tokenize(source):
-        if token.value(source) in tokenizer.keywords \
-                or token.category == tokenizer.Token.Category.KEYWORD: # for composite keywords (e.g. `L.break`)
+        if (token.value(source) in tokenizer.keywords
+                or token.category == tokenizer.Token.Category.KEYWORD # for composite keywords (e.g. `L.break`)
+                or token.value(source).split('.')[0] in tokenizer.keywords): # for `L.index`
             dot_pos = token.value(source).find('.') # \
             if dot_pos == -1:                       # A dot_pos = token.value(source). {.find(‘.’) ? .len}
                 dot_pos = len(token.value(source))  # /
