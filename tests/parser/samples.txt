@@ -482,3 +482,16 @@ for (auto n : create_array({1, 2, 3, 4})) {
 if (!was_break)
     print(u"no break"_S);
 }
+
+
+L(i) 4 {L(j) 4 {I i + j == 5 {L(i).break}; print(i + j)}}
+print(0)
+===
+for (int i = 0; i < 4; i++)
+    for (int j = 0; j < 4; j++) {
+        if (i + j == 5)
+            goto break_;
+        print(i + j);
+    }
+break_:
+print(0);

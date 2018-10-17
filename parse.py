@@ -732,7 +732,7 @@ class ASTLoopWasNoBreak(ASTNodeWithChildren):
 
 class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
     loop_variable : str = None
-    there_is_loop_break_inside_switch = -1
+    break_label_needed = -1
 
     def has_L_was_no_break(self):
         return type(self.children[-1]) == ASTLoopWasNoBreak
@@ -742,16 +742,20 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
         if self.has_L_was_no_break():
             r = ' ' * (indent*4) + "{bool was_break = false;\n"
 
-        if self.loop_variable != None:
-            r += self.children_to_str_detect_single_stmt(indent, 'for (auto ' + self.loop_variable + ' : ' + self.expression.to_str() + ')')
+        if self.expression != None and self.expression.token.category == Token.Category.NUMERIC_LITERAL:
+            lv = self.loop_variable if self.loop_variable != None else 'Lindex'
+            r += self.children_to_str_detect_single_stmt(indent, 'for (int ' + lv + ' = 0; ' + lv + ' < ' + self.expression.to_str() + '; ' + lv + '++)')
         else:
-            r += self.children_to_str_detect_single_stmt(indent, 'while (' + (self.expression.to_str() if self.expression != None else 'true') + ')')
+            if self.loop_variable != None:
+                r += self.children_to_str_detect_single_stmt(indent, 'for (auto ' + self.loop_variable + ' : ' + self.expression.to_str() + ')')
+            else:
+                r += self.children_to_str_detect_single_stmt(indent, 'while (' + (self.expression.to_str() if self.expression != None else 'true') + ')')
 
         if self.has_L_was_no_break():
             r += self.children[-1].children_to_str_detect_single_stmt(indent, 'if (!was_break)') + ' ' * (indent*4) + "}\n"
 
-        if self.there_is_loop_break_inside_switch != -1:
-            r += ' ' * (indent*4) + 'break_' + ('' if self.there_is_loop_break_inside_switch == 0 else str(self.there_is_loop_break_inside_switch)) + ":\n"
+        if self.break_label_needed != -1:
+            r += ' ' * (indent*4) + 'break_' + ('' if self.break_label_needed == 0 else str(self.break_label_needed)) + ":\n"
         return r
 
     def walk_expressions(self, f):
@@ -764,15 +768,29 @@ class ASTContinue(ASTNode):
 break_label_index = -1
 
 class ASTLoopBreak(ASTNode):
+    loop_variable : str = ''
+    token : Token
+
     def to_str(self, indent):
         r = ''
         n = self.parent
+        loop_level = 0
         while True:
             if type(n) == ASTLoop:
-                if n.has_L_was_no_break():
-                    r = ' ' * (indent*4) + "was_break = true;\n"
-                break
+                if self.loop_variable == '' or self.loop_variable == n.loop_variable:
+                    if n.has_L_was_no_break():
+                        r = ' ' * (indent*4) + "was_break = true;\n"
+                    if loop_level > 0:
+                        if n.break_label_needed == -1:
+                            global break_label_index
+                            break_label_index += 1
+                            n.break_label_needed = break_label_index
+                        return r + ' ' * (indent*4) + 'goto break_' + ('' if n.break_label_needed == 0 else str(n.break_label_needed)) + ";\n"
+                    break
+                loop_level += 1
             n = n.parent
+            if n == None:
+                raise Error('loop corresponding to this `L' + ('(' + self.loop_variable + ')')*(self.loop_variable != '') + '.break` statement is not found', self.token)
 
         n = self.parent
         while True:
@@ -780,11 +798,10 @@ class ASTLoopBreak(ASTNode):
                 n = n.parent
                 while True:
                     if type(n) == ASTLoop:
-                        if n.there_is_loop_break_inside_switch == -1:
-                            global break_label_index
+                        if n.break_label_needed == -1:
                             break_label_index += 1
-                            n.there_is_loop_break_inside_switch = break_label_index
-                        return r + ' ' * (indent*4) + 'goto break_' + ('' if n.there_is_loop_break_inside_switch == 0 else str(n.there_is_loop_break_inside_switch)) + ";\n"
+                            n.break_label_needed = break_label_index
+                        return r + ' ' * (indent*4) + 'goto break_' + ('' if n.break_label_needed == 0 else str(n.break_label_needed)) + ";\n"
                     n = n.parent
             if type(n) == ASTLoop:
                 break
@@ -1338,16 +1355,28 @@ def parse_internal(this_node):
                 next_token()
 
             elif token.value(source) in ('L', 'Ц', 'loop', 'цикл'):
-                node = ASTLoop()
-                next_token()
-                if token.category == Token.Category.SCOPE_BEGIN:
-                    node.expression = None
+                if peek_token().value(source) == '(' and peek_token(4).value(source) == '.':
+                    assert(peek_token(5).value(source) in ('break', 'прервать'))
+                    node = ASTLoopBreak()
+                    node.token = token
+                    next_token()
+                    node.loop_variable = expected_name('loop variable')
+                    advance(')')
+                    advance('.')
+                    next_token()
+                    if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
+                        next_token()
                 else:
-                    if token.value(source) == '(':
-                        node.loop_variable = expected_name('loop variable')
-                        advance(')')
-                    node.set_expression(expression())
-                new_scope(node)
+                    node = ASTLoop()
+                    next_token()
+                    if token.category == Token.Category.SCOPE_BEGIN:
+                        node.expression = None
+                    else:
+                        if token.value(source) == '(':
+                            node.loop_variable = expected_name('loop variable')
+                            advance(')')
+                        node.set_expression(expression())
+                    new_scope(node)
 
             elif token.value(source) in ('L.continue', 'Ц.продолжить', 'loop.continue', 'цикл.продолжить'):
                 node = ASTContinue()
@@ -1357,6 +1386,7 @@ def parse_internal(this_node):
 
             elif token.value(source) in ('L.break', 'Ц.прервать', 'loop.break', 'цикл.прервать'):
                 node = ASTLoopBreak()
+                node.token = token
                 next_token()
                 if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
                     next_token()
