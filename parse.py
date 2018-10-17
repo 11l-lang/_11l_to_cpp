@@ -188,6 +188,18 @@ class SymbolNode:
                 return 'Lindex'
             return self.token_str().lstrip('@')
 
+        if self.token.category == Token.Category.KEYWORD and self.token_str() in ('L.next', 'Ц.след', 'loop.next', 'цикл.след'):
+            parent = self
+            while parent.parent:
+                parent = parent.parent
+            ast_parent = parent.ast_parent
+            while True:
+                if type(ast_parent) == ASTLoop:
+                    ast_parent.has_L_next = True
+                    break
+                ast_parent = ast_parent.parent
+            return '__begin != __end'
+
         if self.token.category == Token.Category.NUMERIC_LITERAL:
             n = self.token_str()
             if n[-1] in 'oо':
@@ -508,7 +520,7 @@ def symbol(id, bp = 0):
         s.lbp = bp
         symbol_table[id] = s
         if id[0].isalpha() and not id in ('I/', 'Ц/', 'I/=', 'Ц/=', 'C', 'С', 'in'): # this is keyword-in-expression
-            assert(id.isalpha())
+            assert(id.isalpha() or id in ('L.next', 'Ц.след', 'loop.next', 'цикл.след'))
             allowed_keywords_in_expressions.append(id)
     else:
         s.lbp = max(bp, s.lbp)
@@ -745,6 +757,7 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
     loop_variable : str = None
     break_label_needed = -1
     has_L_index = False
+    has_L_next  = False
 
     def has_L_was_no_break(self):
         return type(self.children[-1]) == ASTLoopWasNoBreak
@@ -754,21 +767,34 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
         if self.has_L_was_no_break():
             r = ' ' * (indent*4) + "{bool was_break = false;\n"
 
+        loop_auto = False
         if self.expression != None and self.expression.token.category == Token.Category.NUMERIC_LITERAL:
             lv = self.loop_variable if self.loop_variable != None else 'Lindex'
             tr = 'for (int ' + lv + ' = 0; ' + lv + ' < ' + self.expression.to_str() + '; ' + lv + '++)'
         else:
             if self.loop_variable != None:
+                loop_auto = True
                 tr = 'for (auto ' + self.loop_variable + ' : ' + self.expression.to_str() + ')'
             else:
                 tr = 'while (' + (self.expression.to_str() if self.expression != None else 'true') + ')'
         rr = self.children_to_str_detect_single_stmt(indent, tr)
 
-        if self.has_L_index:
+        if self.has_L_next:
+            if not loop_auto:
+                raise Error('this kind of loop does not support `L.next`', tokens[self.tokeni])
+            rr = ' ' * (indent*4) + '{auto &&__range = ' + self.expression.to_str() \
+                + ";\n" + self.children_to_str(indent, 'for (auto __begin = __range.begin(), __end = __range.end(); __begin != __end;)', False,
+                    add_at_beginning = ' ' * ((indent+1)*4) + 'auto &&'+ self.loop_variable + " = *__begin; ++__begin;\n")
+        elif self.has_L_index:
             rr = self.children_to_str(indent, tr, False)
+
+        if self.has_L_index:
             r += ' ' * (indent*4) + "{int Lindex = 0;\n" + rr[:-indent*4-2] + ' ' * ((indent+1)*4) + "Lindex++;\n" + ' ' * (indent*4) + "}}\n"
         else:
             r += rr
+
+        if self.has_L_next:
+            r = r[:-1] + "}\n"
 
         if self.has_L_was_no_break(): # {
             r += self.children[-1].children_to_str_detect_single_stmt(indent, 'if (!was_break)') + ' ' * (indent*4) + "}\n"
@@ -1004,6 +1030,11 @@ infix_r('[+]=', 10); infix_r('[&]=', 10); infix_r('[|]=', 10); infix_r('(+)=', 1
 symbol('(name)').nud = lambda self: self
 symbol('(literal)').nud = lambda self: self
 symbol('(constant)').nud = lambda self: self
+
+symbol('L.next').nud = lambda self: self
+symbol('Ц.след').nud = lambda self: self
+symbol('loop.next').nud = lambda self: self
+symbol('цикл.след').nud = lambda self: self
 
 symbol(';')
 symbol(',')

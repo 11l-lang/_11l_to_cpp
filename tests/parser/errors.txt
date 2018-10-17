@@ -143,3 +143,9 @@ L(i) 10
    L(j) 20
       L(k).break
       ^Error: loop corresponding to this `L(k).break` statement is not found
+
+
+L 10
+^Error: this kind of loop does not support `L.next`
+   I L.next
+      print(1)
