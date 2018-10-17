@@ -495,3 +495,15 @@ for (int i = 0; i < 4; i++)
     }
 break_:
 print(0);
+
+
+L(v) [10, 20, 30]
+   print(L.index‘: ’v)
+   \(I L.next
+      print(‘, ’, end' ‘’))
+===
+{int Lindex = 0;
+for (auto v : create_array({10, 20, 30})) {
+    print(Lindex + u": "_S + v);
+    Lindex++;
+}}

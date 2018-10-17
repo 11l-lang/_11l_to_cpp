@@ -134,7 +134,7 @@ for fname in os.listdir('tests/parser'):
                     continue
                 else:
                     kdiff3(e.message, error_message)
-                    print('Error at position ' + str(e.pos) + " in test:\n" + test)
+                    print('Error at position ' + str(e.pos) + " in test:\n" + test + "\n[in file '" + full_fname + "']")
                     exit(1)
             except Exception as e:
                 print("Exception in file '" + full_fname + "' in test:\n" + test)

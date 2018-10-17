@@ -349,6 +349,8 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                             i += 1
                             while i < len(source) and (source[i].isalpha() or source[i] in '_.'):
                                 i += 1
+                            if source[lexem_start:i] in ('L.index', 'Ц.индекс', 'loop.index', 'цикл.индекс'): # for correct STRING_CONCATENATOR insertion
+                                category = Token.Category.NAME
                 else:
                     category = Token.Category.NAME
 

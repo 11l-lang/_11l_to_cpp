@@ -175,6 +175,17 @@ class SymbolNode:
 
     def to_str(self):
         if self.token.category == Token.Category.NAME:
+            if self.token_str() in ('L.index', 'Ц.индекс', 'loop.index', 'цикл.индекс'):
+                parent = self
+                while parent.parent:
+                    parent = parent.parent
+                ast_parent = parent.ast_parent
+                while True:
+                    if type(ast_parent) == ASTLoop:
+                        ast_parent.has_L_index = True
+                        break
+                    ast_parent = ast_parent.parent
+                return 'Lindex'
             return self.token_str().lstrip('@')
 
         if self.token.category == Token.Category.NUMERIC_LITERAL:
@@ -733,6 +744,7 @@ class ASTLoopWasNoBreak(ASTNodeWithChildren):
 class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
     loop_variable : str = None
     break_label_needed = -1
+    has_L_index = False
 
     def has_L_was_no_break(self):
         return type(self.children[-1]) == ASTLoopWasNoBreak
@@ -744,14 +756,21 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
 
         if self.expression != None and self.expression.token.category == Token.Category.NUMERIC_LITERAL:
             lv = self.loop_variable if self.loop_variable != None else 'Lindex'
-            r += self.children_to_str_detect_single_stmt(indent, 'for (int ' + lv + ' = 0; ' + lv + ' < ' + self.expression.to_str() + '; ' + lv + '++)')
+            tr = 'for (int ' + lv + ' = 0; ' + lv + ' < ' + self.expression.to_str() + '; ' + lv + '++)'
         else:
             if self.loop_variable != None:
-                r += self.children_to_str_detect_single_stmt(indent, 'for (auto ' + self.loop_variable + ' : ' + self.expression.to_str() + ')')
+                tr = 'for (auto ' + self.loop_variable + ' : ' + self.expression.to_str() + ')'
             else:
-                r += self.children_to_str_detect_single_stmt(indent, 'while (' + (self.expression.to_str() if self.expression != None else 'true') + ')')
+                tr = 'while (' + (self.expression.to_str() if self.expression != None else 'true') + ')'
+        rr = self.children_to_str_detect_single_stmt(indent, tr)
 
-        if self.has_L_was_no_break():
+        if self.has_L_index:
+            rr = self.children_to_str(indent, tr, False)
+            r += ' ' * (indent*4) + "{int Lindex = 0;\n" + rr[:-indent*4-2] + ' ' * ((indent+1)*4) + "Lindex++;\n" + ' ' * (indent*4) + "}}\n"
+        else:
+            r += rr
+
+        if self.has_L_was_no_break(): # {
             r += self.children[-1].children_to_str_detect_single_stmt(indent, 'if (!was_break)') + ' ' * (indent*4) + "}\n"
 
         if self.break_label_needed != -1:
