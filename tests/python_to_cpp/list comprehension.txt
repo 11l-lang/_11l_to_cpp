@@ -70,30 +70,40 @@ auto f()
 }
 
 
-dirs = ['tests', '.hg']
-dirs = [d for d in dirs if d[0] != '.']
-assert(dirs == ['tests'])
+def f():
+    dirs = ['tests', '.hg']
+    dirs = [d for d in dirs if d[0] != '.']
+    assert(dirs == ['tests'])
 ===
-A dirs = [‘tests’, ‘.hg’]
-dirs = dirs.filter(d -> d[0] != ‘.’)
-assert(dirs == [‘tests’])
+F f()
+   A dirs = [‘tests’, ‘.hg’]
+   dirs = dirs.filter(d -> d[0] != ‘.’)
+   assert(dirs == [‘tests’])
 ===
-auto dirs = create_array({u"tests"_S, u".hg"_S});
-dirs = dirs.filter([](const auto &d){return _get<0>(d) != u'.';});
-assert(dirs == create_array({u"tests"_S}));
+auto f()
+{
+    auto dirs = create_array({u"tests"_S, u".hg"_S});
+    dirs = dirs.filter([](const auto &d){return _get<0>(d) != u'.';});
+    assert(dirs == create_array({u"tests"_S}));
+}
 
 
-dirs = [('tests', 1), ('.hg', 2)]
-ndirs = [d[1] for d in dirs if d[0][0] != '.']
-assert(ndirs == [1])
+def f():
+    dirs = [('tests', 1), ('.hg', 2)]
+    ndirs = [d[1] for d in dirs if d[0][0] != '.']
+    assert(ndirs == [1])
 ===
-A dirs = [(‘tests’, 1), (‘.hg’, 2)]
-A ndirs = dirs.filter(d -> d[0][0] != ‘.’).map(d -> d[1])
-assert(ndirs == [1])
+F f()
+   A dirs = [(‘tests’, 1), (‘.hg’, 2)]
+   A ndirs = dirs.filter(d -> d[0][0] != ‘.’).map(d -> d[1])
+   assert(ndirs == [1])
 ===
-auto dirs = create_array({make_tuple(u"tests"_S, 1), make_tuple(u".hg"_S, 2)});
-auto ndirs = dirs.filter([](const auto &d){return _get<0>(_get<0>(d)) != u'.';}).map([](const auto &d){return _get<1>(d);});
-assert(ndirs == create_array({1}));
+auto f()
+{
+    auto dirs = create_array({make_tuple(u"tests"_S, 1), make_tuple(u".hg"_S, 2)});
+    auto ndirs = dirs.filter([](const auto &d){return _get<0>(_get<0>(d)) != u'.';}).map([](const auto &d){return _get<1>(d);});
+    assert(ndirs == create_array({1}));
+}
 
 
 python_types_to_11l = {'int':'Int', 'str':'String', 'bool':'Bool', 'List':'Array', 'Tuple':'Tuple'}
@@ -125,29 +135,34 @@ public:
 
 def split_len(seq, length):
     return [seq[i:i+length] for i in range(0, len(seq), length)]
-assert(split_len('o-o o-x o-o', 4) == ['o-o ', 'o-x ', 'o-o'])
-r1 = range(10)
-r2 = range(1, 10)
-r3 = range(10, 1, -1)
-assert([i*2 for i in range(3)] == [0, 2, 4])
+def f():
+    assert(split_len('o-o o-x o-o', 4) == ['o-o ', 'o-x ', 'o-o'])
+    r1 = range(10)
+    r2 = range(1, 10)
+    r3 = range(10, 1, -1)
+    assert([i*2 for i in range(3)] == [0, 2, 4])
 ===
 F split_len(seq, length)
    R (0 .< seq.len).step(length).map(i -> @seq[i .< i + @length])
-assert(split_len(‘o-o o-x o-o’, 4) == [‘o-o ’, ‘o-x ’, ‘o-o’])
-A r1 = 0.<10
-A r2 = 1.<10
-A r3 = (10.<1).step(-1)
-assert((0.<3).map(i -> i * 2) == [0, 2, 4])
+F f()
+   assert(split_len(‘o-o o-x o-o’, 4) == [‘o-o ’, ‘o-x ’, ‘o-o’])
+   A r1 = 0.<10
+   A r2 = 1.<10
+   A r3 = (10.<1).step(-1)
+   assert((0.<3).map(i -> i * 2) == [0, 2, 4])
 ===
 template <typename T1, typename T2> auto split_len(const T1 &seq, const T2 &length)
 {
     return range_el(0, seq.len()).step(length).map([&length, &seq](const auto &i){return seq[range_el(i, i + length)];});
 }
-assert(split_len(u"o-o o-x o-o"_S, 4) == create_array({u"o-o "_S, u"o-x "_S, u"o-o"_S}));
-auto r1 = range_el(0, 10);
-auto r2 = range_el(1, 10);
-auto r3 = range_el(10, 1).step(-1);
-assert(range_el(0, 3).map([](const auto &i){return i * 2;}) == create_array({0, 2, 4}));
+auto f()
+{
+    assert(split_len(u"o-o o-x o-o"_S, 4) == create_array({u"o-o "_S, u"o-x "_S, u"o-o"_S}));
+    auto r1 = range_el(0, 10);
+    auto r2 = range_el(1, 10);
+    auto r3 = range_el(10, 1).step(-1);
+    assert(range_el(0, 3).map([](const auto &i){return i * 2;}) == create_array({0, 2, 4}));
+}
 
 
 # Nested list comprehension:

@@ -67,11 +67,12 @@ auto f()
 // Inspired by sample from ‘Nemerle Wiki’[https://github.com/rsdn/nemerle/wiki/The-basics-(tutorial)#Rewriting_Line_Counter_without_the_loop]
 fn m1() {}
 fn m2() {}
-if foo
-   if bar
-       m1()
-else
-    m2()
+fn f()
+   if foo
+      if bar
+          m1()
+   else
+       m2()
 ===
 auto m1()
 {
@@ -79,29 +80,34 @@ auto m1()
 auto m2()
 {
 }
-if (foo) {
-    if (bar)
-        m1();
+auto f()
+{
+    if (foo) {
+        if (bar)
+            m1();
+    }
+    else
+        m2();
 }
-else
-    m2();
-
 
 
 fn m1() {}
 fn m2() {}
 fn m3() {}
 fn m4() {}
-if foo
-   if bar
-       m1()
-   else if z
-       if e
-          m3()
+fn f()
+{
+   if foo
+      if bar
+          m1()
+      else if z
+          if e
+             m3()
+      else
+          m4()
    else
-       m4()
-else
-    m2()
+       m2()
+}
 ===
 auto m1()
 {
@@ -115,18 +121,21 @@ auto m3()
 auto m4()
 {
 }
-if (foo) {
-    if (bar)
-        m1();
-    else if (z) {
-        if (e)
-            m3();
+auto f()
+{
+    if (foo) {
+        if (bar)
+            m1();
+        else if (z) {
+            if (e)
+                m3();
+        }
+        else
+            m4();
     }
     else
-        m4();
+        m2();
 }
-else
-    m2();
 
 
 T Shape
@@ -201,27 +210,31 @@ auto l4 = [](const auto &x, const auto &y, const auto &reverse = false){return r
 auto r = reverse ? y < x : eq ? x == y : x < y;
 
 
-String ch
-I ch C ‘0’..‘9’ {
-}
-if ch in ‘0’..‘9’ {
-}
-I ch !C ‘0’..‘9’ {
-}
-if ch !in ‘0’..‘9’ {
-}
+F f()
+   String ch
+   I ch C ‘0’..‘9’ {
+   }
+   if ch in ‘0’..‘9’ {
+   }
+   I ch !C ‘0’..‘9’ {
+   }
+   if ch !in ‘0’..‘9’ {
+   }
 ===
-String ch;
-if (in(ch, range_ee(u'0'_C, u'9'_C))) {
-}
+auto f()
+{
+    String ch;
+    if (in(ch, range_ee(u'0'_C, u'9'_C))) {
+    }
 
-if (in(ch, range_ee(u'0'_C, u'9'_C))) {
-}
+    if (in(ch, range_ee(u'0'_C, u'9'_C))) {
+    }
 
-if (!in(ch, range_ee(u'0'_C, u'9'_C))) {
-}
+    if (!in(ch, range_ee(u'0'_C, u'9'_C))) {
+    }
 
-if (!in(ch, range_ee(u'0'_C, u'9'_C))) {
+    if (!in(ch, range_ee(u'0'_C, u'9'_C))) {
+    }
 }
 
 
@@ -240,7 +253,14 @@ auto id = 0;
 template <typename T1> auto f(const T1 &str)
 {
 }
-f(u"id="_S + id);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        f(u"id="_S + id);
+    }
+} code_block_1;
 auto s = u"str"_S + u"\n"_S;
 auto s2 = a + b;
 template <typename T1> auto to_str(const T1 &indent)
@@ -249,134 +269,157 @@ template <typename T1> auto to_str(const T1 &indent)
     return (u" "_S * (indent * 3)) + (expression.to_str()) + u"\n"_S;
 }
 String tag = u"<a href=\""_S + link + u"\""_S;
-tag += s;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        tag += s;
+    }
+} code_block_2;
 
 
-r = abc‘’
-  ‘1’
-r = abc‘’
-  ‘1’def
-r = abc‘1’
-  ‘’def
-r = abc‘’
-  ‘’def
-r = abc‘some big ...’""
-  ‘... string’
-r = abc"some big \n ..."‘’
-  "... string\n"
-r = abc‘’
-  '‘‘it’s’
-r = abc'‘‘it’s’
-  ‘’def
-// This is a preferred way for including \r in string literals:
-r = ‘Host: api.dropboxapi.com’"\r\n"‘’
-    ‘Connection: close’"\r\n"
-// ‘‘
+F f()
+   r = abc‘’
+     ‘1’
+   r = abc‘’
+     ‘1’def
+   r = abc‘1’
+     ‘’def
+   r = abc‘’
+     ‘’def
+   r = abc‘some big ...’""
+     ‘... string’
+   r = abc"some big \n ..."‘’
+     "... string\n"
+   r = abc‘’
+     '‘‘it’s’
+   r = abc'‘‘it’s’
+     ‘’def
+   // This is a preferred way for including \r in string literals:
+   r = ‘Host: api.dropboxapi.com’"\r\n"‘’
+       ‘Connection: close’"\r\n"
+   // ‘‘
 ===
-r = abc + u"1"_S;
-r = abc + u"1"_S + def;
-r = abc + u"1"_S + def;
-r = abc + def;
-r = abc + u"some big ..."_S + u"... string"_S;
-r = abc + u"some big \n ..."_S + u"... string\n"_S;
-r = abc + u"it’s"_S;
-r = abc + u"it’s"_S + def;
-r = u"Host: api.dropboxapi.com"_S + u"\r\n"_S + u"Connection: close"_S + u"\r\n"_S;
+auto f()
+{
+    r = abc + u"1"_S;
+    r = abc + u"1"_S + def;
+    r = abc + u"1"_S + def;
+    r = abc + def;
+    r = abc + u"some big ..."_S + u"... string"_S;
+    r = abc + u"some big \n ..."_S + u"... string\n"_S;
+    r = abc + u"it’s"_S;
+    r = abc + u"it’s"_S + def;
+    r = u"Host: api.dropboxapi.com"_S + u"\r\n"_S + u"Connection: close"_S + u"\r\n"_S;
+}
 
 
-A arr = [1, 2, 3]
-print(arr[0..1])  // [1, 2]
-print(arr[0.<1])  // [1]
-print(arr[0<.1])  // [2]
-print(arr[0<.<2]) // [2]
-print(arr[1..])   // [2, 3]
-arr[1] = 4
-print(arr[1..])   // [4, 3]
-arr [+]= [5, 6]
-assert(arr[(0..4).step(2)] == [1, 3, 6])
-assert(arr[(1..).step(2)] == [4, 5])
-Dict[String, Int] dict
-[String = Int] dict2
-dict[‘key’] = 1
-[Int] arr2
-arr2 [+]= 10
+F f()
+   A arr = [1, 2, 3]
+   print(arr[0..1])  // [1, 2]
+   print(arr[0.<1])  // [1]
+   print(arr[0<.1])  // [2]
+   print(arr[0<.<2]) // [2]
+   print(arr[1..])   // [2, 3]
+   arr[1] = 4
+   print(arr[1..])   // [4, 3]
+   arr [+]= [5, 6]
+   assert(arr[(0..4).step(2)] == [1, 3, 6])
+   assert(arr[(1..).step(2)] == [4, 5])
+   Dict[String, Int] dict
+   [String = Int] dict2
+   dict[‘key’] = 1
+   [Int] arr2
+   arr2 [+]= 10
 ===
-auto arr = create_array({1, 2, 3});
-print(arr[range_ee(0, 1)]);
-print(arr[range_el(0, 1)]);
-print(arr[range_le(0, 1)]);
-print(arr[range_ll(0, 2)]);
-print(arr[range_ei(1)]);
-arr.set(1, 4);
-print(arr[range_ei(1)]);
-arr.append(create_array({5, 6}));
-assert(arr[range_ee(0, 4).step(2)] == create_array({1, 3, 6}));
-assert(arr[range_ei(1).step(2)] == create_array({4, 5}));
-Dict<String, int> dict;
-Dict<String, int> dict2;
-dict.set(u"key"_S, 1);
-Array<int> arr2;
-arr2.append(10);
+auto f()
+{
+    auto arr = create_array({1, 2, 3});
+    print(arr[range_ee(0, 1)]);
+    print(arr[range_el(0, 1)]);
+    print(arr[range_le(0, 1)]);
+    print(arr[range_ll(0, 2)]);
+    print(arr[range_ei(1)]);
+    arr.set(1, 4);
+    print(arr[range_ei(1)]);
+    arr.append(create_array({5, 6}));
+    assert(arr[range_ee(0, 4).step(2)] == create_array({1, 3, 6}));
+    assert(arr[range_ei(1).step(2)] == create_array({4, 5}));
+    Dict<String, int> dict;
+    Dict<String, int> dict2;
+    dict.set(u"key"_S, 1);
+    Array<int> arr2;
+    arr2.append(10);
+}
 
 
-A s = ‘154’
-A a = [1, 5, 4]
-s[2] = ‘3’
-a[2] = 3
-assert(s[(len)-2] == ‘5’)
-assert(a[(len)-2] == 5)
-s[(len)-2] = ‘2’
-a[(len)-2] = 2
-assert(s[0.<(len)-1] == ‘12’)
-assert(a[0.<(len)-1] == [1, 2])
-assert(s[(len)-2..] == ‘23’)
-assert(a[(len)-2..] == [2, 3])
-assert(s[(len)-3..(len)-1] == ‘123’)
-assert(a[(len)-3..(len)-1] == [1, 2, 3])
-assert(s[(len)-3.<(len)-1] == ‘12’)
-assert(a[(len)-3.<(len)-1] == [1, 2])
+F f()
+   A s = ‘154’
+   A a = [1, 5, 4]
+   s[2] = ‘3’
+   a[2] = 3
+   assert(s[(len)-2] == ‘5’)
+   assert(a[(len)-2] == 5)
+   s[(len)-2] = ‘2’
+   a[(len)-2] = 2
+   assert(s[0.<(len)-1] == ‘12’)
+   assert(a[0.<(len)-1] == [1, 2])
+   assert(s[(len)-2..] == ‘23’)
+   assert(a[(len)-2..] == [2, 3])
+   assert(s[(len)-3..(len)-1] == ‘123’)
+   assert(a[(len)-3..(len)-1] == [1, 2, 3])
+   assert(s[(len)-3.<(len)-1] == ‘12’)
+   assert(a[(len)-3.<(len)-1] == [1, 2])
 ===
-auto s = u"154"_S;
-auto a = create_array({1, 5, 4});
-s.set(2, u'3'_C);
-a.set(2, 3);
-assert(s.at_plus_len( - 2) == u'5');
-assert(a.at_plus_len( - 2) == 5);
-s.set_plus_len( - 2, u'2'_C);
-a.set_plus_len( - 2, 2);
-assert(s[range_e_llen(0,  - 1)] == u"12");
-assert(a[range_e_llen(0,  - 1)] == create_array({1, 2}));
-assert(s[range_elen_i( - 2)] == u"23");
-assert(a[range_elen_i( - 2)] == create_array({2, 3}));
-assert(s[range_elen_elen( - 3,  - 1)] == u"123");
-assert(a[range_elen_elen( - 3,  - 1)] == create_array({1, 2, 3}));
-assert(s[range_elen_llen( - 3,  - 1)] == u"12");
-assert(a[range_elen_llen( - 3,  - 1)] == create_array({1, 2}));
+auto f()
+{
+    auto s = u"154"_S;
+    auto a = create_array({1, 5, 4});
+    s.set(2, u'3'_C);
+    a.set(2, 3);
+    assert(s.at_plus_len( - 2) == u'5');
+    assert(a.at_plus_len( - 2) == 5);
+    s.set_plus_len( - 2, u'2'_C);
+    a.set_plus_len( - 2, 2);
+    assert(s[range_e_llen(0,  - 1)] == u"12");
+    assert(a[range_e_llen(0,  - 1)] == create_array({1, 2}));
+    assert(s[range_elen_i( - 2)] == u"23");
+    assert(a[range_elen_i( - 2)] == create_array({2, 3}));
+    assert(s[range_elen_elen( - 3,  - 1)] == u"123");
+    assert(a[range_elen_elen( - 3,  - 1)] == create_array({1, 2, 3}));
+    assert(s[range_elen_llen( - 3,  - 1)] == u"12");
+    assert(a[range_elen_llen( - 3,  - 1)] == create_array({1, 2}));
+}
 
 
 F newlines()
    R ‘’
-A indent = 0
-A r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
-r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(’
-  ‘’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
-r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘’
-  ‘(’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
-r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘’ // ((
-  ‘’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
-r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(some big ...’""
-  ‘... string’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
+F f()
+   A indent = 0
+   A r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
+   r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(’
+     ‘’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
+   r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘’
+     ‘(’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
+   r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘’ // ((
+     ‘’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
+   r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(some big ...’""
+     ‘... string’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
 ===
 auto newlines()
 {
     return u""_S;
 }
-auto indent = 0;
-auto r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"("_S + (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
-r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"("_S + (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
-r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"("_S + (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
-r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
-r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"(some big ..."_S + u"... string"_S + (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+auto f()
+{
+    auto indent = 0;
+    auto r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"("_S + (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+    r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"("_S + (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+    r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"("_S + (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+    r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+    r = newlines() + (u" "_S * (indent * 3)) + u"F "_S + (function_name != u"__init__" ? function_name : u""_S) + u"(some big ..."_S + u"... string"_S + (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) + u")\n"_S;
+}
 
 
 F tag(ch)
@@ -394,11 +437,15 @@ template <typename T1> auto tag2(const T1 &ch)
 }
 
 
-R .children[0].to_str()‘ ’(S .symbol.id {‘and’ {‘&’}; ‘or’ {‘|’}; ‘in’ {‘C’} E {‘symbol-’(.symbol.id)}})‘ ’(.children[1].to_str())
-R .children[0].to_str()‘ ’(S .symbol.id {‘and’ {‘&’}; ‘or’ {‘|’}; ‘in’ {‘C’} E ‘symbol-’(.symbol.id)})‘ ’(.children[1].to_str())
+F f()
+   R .children[0].to_str()‘ ’(S .symbol.id {‘and’ {‘&’}; ‘or’ {‘|’}; ‘in’ {‘C’} E {‘symbol-’(.symbol.id)}})‘ ’(.children[1].to_str())
+   R .children[0].to_str()‘ ’(S .symbol.id {‘and’ {‘&’}; ‘or’ {‘|’}; ‘in’ {‘C’} E  ‘symbol-’(.symbol.id) })‘ ’(.children[1].to_str())
 ===
-return _get<0>(children).to_str() + u" "_S + ([&](const auto &a){return a == u"and" ? u"&"_S : a == u"or" ? u"|"_S : a == u"in" ? u"C"_S : u"symbol-"_S + (symbol.id);}(symbol.id)) + u" "_S + (_get<1>(children).to_str());
-return _get<0>(children).to_str() + u" "_S + ([&](const auto &a){return a == u"and" ? u"&"_S : a == u"or" ? u"|"_S : a == u"in" ? u"C"_S : u"symbol-"_S + (symbol.id);}(symbol.id)) + u" "_S + (_get<1>(children).to_str());
+auto f()
+{
+    return _get<0>(children).to_str() + u" "_S + ([&](const auto &a){return a == u"and" ? u"&"_S : a == u"or" ? u"|"_S : a == u"in" ? u"C"_S : u"symbol-"_S + (symbol.id);}(symbol.id)) + u" "_S + (_get<1>(children).to_str());
+    return _get<0>(children).to_str() + u" "_S + ([&](const auto &a){return a == u"and" ? u"&"_S : a == u"or" ? u"|"_S : a == u"in" ? u"C"_S : u"symbol-"_S + (symbol.id);}(symbol.id)) + u" "_S + (_get<1>(children).to_str());
+}
 
 
 ---
@@ -407,17 +454,21 @@ A s = copy(source).rtrim()
 line_start = source.rfind("\n", source.len - 1)
 
 
-A i = 0
-A source = ‘abc_123 ’
-L i < source.len & source[i] C (‘0’..‘9’, ‘a’..‘z’, ‘A’..‘Z’, ‘_’)
-   i++
-assert(i == 7)
+F f()
+   A i = 0
+   A source = ‘abc_123 ’
+   L i < source.len & source[i] C (‘0’..‘9’, ‘a’..‘z’, ‘A’..‘Z’, ‘_’)
+      i++
+   assert(i == 7)
 ===
-auto i = 0;
-auto source = u"abc_123 "_S;
-while (i < source.len() && in(source[i], make_tuple(range_ee(u'0'_C, u'9'_C), range_ee(u'a'_C, u'z'_C), range_ee(u'A'_C, u'Z'_C), u"_"_S)))
-    i++;
-assert(i == 7);
+auto f()
+{
+    auto i = 0;
+    auto source = u"abc_123 "_S;
+    while (i < source.len() && in(source[i], make_tuple(range_ee(u'0'_C, u'9'_C), range_ee(u'a'_C, u'z'_C), range_ee(u'A'_C, u'Z'_C), u"_"_S)))
+        i++;
+    assert(i == 7);
+}
 
 
 F to_html()
@@ -463,75 +514,95 @@ template <typename T1, typename T2> auto f(const T1 &active_window, const T2 &s)
 }
 
 
-L(n) [1, 2, 3, 4]
-   I n == 30
-      L.break
-   print(n)
-
-   L.was_no_break
-      print(‘no break’)
+F f()
+   L(n) [1, 2, 3, 4]
+      I n == 30
+         L.break
+      print(n)
+   
+      L.was_no_break
+         print(‘no break’)
 ===
-{bool was_break = false;
-for (auto n : create_array({1, 2, 3, 4})) {
-    if (n == 30) {
-        was_break = true;
-        break;
+auto f()
+{
+    {bool was_break = false;
+    for (auto n : create_array({1, 2, 3, 4})) {
+        if (n == 30) {
+            was_break = true;
+            break;
+        }
+        print(n);
     }
-    print(n);
-}
-if (!was_break)
-    print(u"no break"_S);
-}
-
-
-L(i) 4 {L(j) 4 {I i + j == 5 {L(i).break}; print(i + j)}}
-print(0)
-===
-for (int i = 0; i < 4; i++)
-    for (int j = 0; j < 4; j++) {
-        if (i + j == 5)
-            goto break_;
-        print(i + j);
+    if (!was_break)
+        print(u"no break"_S);
     }
-break_:
-print(0);
+}
 
 
-L(v) [10, 20, 30]
-   print(L.index‘: ’v)
+F f()
+   L(i) 4 {L(j) 4 {I i + j == 5 {L(i).break}; print(i + j)}}
+   print(0)
 ===
-{int Lindex = 0;
-for (auto v : create_array({10, 20, 30})) {
-    print(Lindex + u": "_S + v);
-    Lindex++;
-}}
+auto f()
+{
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++) {
+            if (i + j == 5)
+                goto break_;
+            print(i + j);
+        }
+    break_:
+    print(0);
+}
 
 
-L(v) [10, 20, 30]
-   print(L.index‘: ’v, end' ‘’)
-   I L.next
-      print(‘, ’, end' ‘’)
+F f()
+   L(v) [10, 20, 30]
+      print(L.index‘: ’v)
 ===
-{int Lindex = 0;
-{auto &&__range = create_array({10, 20, 30});
-for (auto __begin = __range.begin(), __end = __range.end(); __begin != __end;) {
-    auto &&v = *__begin; ++__begin;
-    print(Lindex + u": "_S + v, u""_S);
-    if (__begin != __end)
-        print(u", "_S, u""_S);
-    Lindex++;
-}}}
+auto f()
+{
+    {int Lindex = 0;
+    for (auto v : create_array({10, 20, 30})) {
+        print(Lindex + u": "_S + v);
+        Lindex++;
+    }}
+}
 
 
-L(ch) [‘a’, ‘b’, ‘c’]
-   print(ch, end' ‘’)
-   I L.next
-      print(‘, ’, end' ‘’)
+F f()
+   L(v) [10, 20, 30]
+      print(L.index‘: ’v, end' ‘’)
+      I L.next
+         print(‘, ’, end' ‘’)
 ===
-{auto &&__range = create_array({u'a'_C, u'b'_C, u'c'_C});
-for (auto __begin = __range.begin(), __end = __range.end(); __begin != __end;) {
-    auto &&ch = *__begin; ++__begin;
-    print(ch, u""_S);
-    if (__begin != __end)
-        print(u", "_S, u""_S);
-}}
+auto f()
+{
+    {int Lindex = 0;
+    {auto &&__range = create_array({10, 20, 30});
+    for (auto __begin = __range.begin(), __end = __range.end(); __begin != __end;) {
+        auto &&v = *__begin; ++__begin;
+        print(Lindex + u": "_S + v, u""_S);
+        if (__begin != __end)
+            print(u", "_S, u""_S);
+        Lindex++;
+    }}}
+}
+
+
+F f()
+   L(ch) [‘a’, ‘b’, ‘c’]
+      print(ch, end' ‘’)
+      I L.next
+         print(‘, ’, end' ‘’)
+===
+auto f()
+{
+    {auto &&__range = create_array({u'a'_C, u'b'_C, u'c'_C});
+    for (auto __begin = __range.begin(), __end = __range.end(); __begin != __end;) {
+        auto &&ch = *__begin; ++__begin;
+        print(ch, u""_S);
+        if (__begin != __end)
+            print(u", "_S, u""_S);
+    }}
+}
