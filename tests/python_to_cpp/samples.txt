@@ -78,8 +78,14 @@ print("Prepare files' list...", flush = True)
 print(‘Prepare files' list...’, end' ‘’)
 print(‘Prepare files' list...’, flush' 1B)
 ===
-print(u"Prepare files' list..."_S, u""_S);
-print(u"Prepare files' list..."_S, u"\n"_S, true);
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Prepare files' list..."_S, u""_S);
+        print(u"Prepare files' list..."_S, u"\n"_S, true);
+    }
+} code_block_1;
 
 
 def f(a = 1, b = 2):
@@ -102,13 +108,27 @@ template <typename T1 = decltype(1), typename T2 = decltype(2)> auto f(const T1 
 {
     return a + b;
 }
-print(f(1, 3));
-print(f(0, 3));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(f(1, 3));
+        print(f(0, 3));
+    }
+} code_block_1;
 template <typename T1 = decltype(1), typename T2 = decltype(2), typename T3 = decltype(3)> auto f2(const T1 &a = 1, const T2 &b = 2, const T3 &c = 3)
 {
     return a + b + c;
 }
-print(f2(1, 3, 4));
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(f2(1, 3, 4));
+    }
+} code_block_2;
 
 
 def f(a = 10, *, b, c = 20):
@@ -123,39 +143,56 @@ template <typename T1, typename T2, typename T3 = decltype(20)> auto f(const T1 
 {
     return a + b + c;
 }
-f(10, 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        f(10, 1);
+    }
+} code_block_1;
 
 
-for i in range(0, 11, 2):
-    print(i)
-for i in range(11):
-    print(i)
+def f():
+    for i in range(0, 11, 2):
+        print(i)
+    for i in range(11):
+        print(i)
 ===
-L(i) (0.<11).step(2)
-   print(i)
-L(i) 0.<11
-   print(i)
+F f()
+   L(i) (0.<11).step(2)
+      print(i)
+   L(i) 0.<11
+      print(i)
 ===
-for (auto i : range_el(0, 11).step(2))
-    print(i);
-for (auto i : range_el(0, 11))
-    print(i);
+auto f()
+{
+    for (auto i : range_el(0, 11).step(2))
+        print(i);
+    for (auto i : range_el(0, 11))
+        print(i);
+}
 
 
-dict : Dict[str, int] = {}
-dict['key'] = 1
-arr : List[int] = []
-arr += [10]
+def f():
+    dict : Dict[str, int] = {}
+    dict['key'] = 1
+    arr : List[int] = []
+    arr += [10]
 ===
-Dict[String, Int] dict
-dict[‘key’] = 1
-Array[Int] arr
-arr [+]= 10
+F f()
+   Dict[String, Int] dict
+   dict[‘key’] = 1
+   Array[Int] arr
+   arr [+]= 10
 ===
-Dict<String, int> dict;
-dict.set(u"key"_S, 1);
-Array<int> arr;
-arr.append(10);
+auto f()
+{
+    Dict<String, int> dict;
+    dict.set(u"key"_S, 1);
+    Array<int> arr;
+    arr.append(10);
+}
 
 
 R"\""
@@ -222,37 +259,43 @@ b’
 "'"
 "\""
 ===
-uR"(\")"_S;
-uR"(\")"_S;
-uR"(a\\)"_S;
-uR"(a\\)"_S;
-uR"(\')"_S;
-uR"(a
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        uR"(\")"_S;
+        uR"(\")"_S;
+        uR"(a\\)"_S;
+        uR"(a\\)"_S;
+        uR"(\')"_S;
+        uR"(a
 b)"_S;
-u"ab"_S;
-uR"(a\b)"_S;
-uR"'(a\)"b)'"_S;
-uR"''(a\)"b)'"c)''"_S;
-u"\
+        u"ab"_S;
+        uR"(a\b)"_S;
+        uR"'(a\)"b)'"_S;
+        uR"''(a\)"b)'"c)''"_S;
+        u"\
 <html>\""_S;
-u"\
+        u"\
 <html>'"_S;
-u"\
+        u"\
 <html>\n\
 <head>"_S;
-u"a"_S;
-u"\n"_S;
-u"'"_S;
-u"\""_S;
-u"‘"_S;
-u"’"_S;
-u"don‘t"_S;
-u"don‘t"_S;
-u"don’‘t"_S;
-u"don’t"_S;
-u"don’t"_S;
-u"'"_S;
-u"\""_S;
+        u"a"_S;
+        u"\n"_S;
+        u"'"_S;
+        u"\""_S;
+        u"‘"_S;
+        u"’"_S;
+        u"don‘t"_S;
+        u"don‘t"_S;
+        u"don’‘t"_S;
+        u"don’t"_S;
+        u"don’t"_S;
+        u"'"_S;
+        u"\""_S;
+    }
+} code_block_1;
 
 
 x = ~1 ^ 2

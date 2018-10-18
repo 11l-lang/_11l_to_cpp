@@ -15,59 +15,58 @@ def TEST(str1, str2, ohd = False, habrahabr_html = False):
     else:
         print("passed")
 
-if __name__ == '__main__':
-    TEST("*‘bold’",          "<b>bold</b>")
-    TEST("_‘underlined’",    "<u>underlined</u>")
-    TEST("-‘strikethrough’", "<s>strikethrough</s>")
-    TEST("~‘italics’",       "<i>italics</i>")
-    TEST("H‘header’\n" +
+TEST("*‘bold’",          "<b>bold</b>")
+TEST("_‘underlined’",    "<u>underlined</u>")
+TEST("-‘strikethrough’", "<s>strikethrough</s>")
+TEST("~‘italics’",       "<i>italics</i>")
+TEST("H‘header’\n" +
      "H(1)‘header’",     "<h3>header</h3>\n"
                        + "<h2>header</h2>")
-    TEST("H(+1)‘header’",    "<h2>header</h2>")
-    TEST("H(-1)‘header’",    "<h4>header</h4>")
-    TEST("[http://address]", '<a href="http://address">http://address</a>')
-    TEST("link[http://address]", '<a href="http://address">link</a>')
-    TEST("link[https://address]", '<a href="https://address">link</a>')
-    TEST("‘multiword link’[http://address]", '<a href="http://address">multiword link</a>')
-    TEST("link[https://address ‘title &text[[[comment]]]’]", '<a href="https://address" title="title &amp;text">link</a>')
-    TEST("link[https://address title [.&.] text[[[comment]]]]", '<a href="https://address" title="title [.&amp;.] text">link</a>')
-    TEST("text[‘title text’]", '<abbr title="title text">text</abbr>')
-    TEST("[text][‘title text’]", '[text]<abbr title="title text"></abbr>') # чтобы получить '<abbr title="title text">[text]</abbr>' пишите так: ‘[text]’[‘title text’]
-#    TEST("‘`‘` и `’`’[‘`‘` и `’`’]", '<abbr title="`‘` и `’`"><code>‘</code> и <code>’</code></abbr>') # Почему оставил закомментированным (а также почему в ‘...[[[комментарий]]]’[‘...’] удаляются комментарии, а в ‘...[[[комментарий]]]’[http...] — не удаляются): согласно правилу прецедента {должна возникнуть необходимость использовать такое в реальном тексте прежде чем добавлять какой-либо функционал в код ‘на всякий случай’/‘на будущее’}.
-    TEST("P‘http://image-url’", '<img src="http://image-url" />')
-    TEST("P‘http://image-url’[http://address]", '<a href="http://address"><img src="http://image-url" /></a>')
-    TEST("P‘http://image-url’[‘title text[[[comment]]]’]", '<img src="http://image-url" title="title text" />')
-    TEST("P‘http://image-url’[http://address ‘title text’]", '<a href="http://address" title="title text"><img src="http://image-url" /></a>')
-    TEST("P‘http://image-url’[http://address title text]", '<a href="http://address" title="title text"><img src="http://image-url" /></a>')
-    TEST("С(000)‘black text’", '<span style="color: #000000">black text</span>')
-    TEST("С(800)‘red text’", '<span style="color: #FF0000">red text</span>')
-    TEST("С(4)‘gray text’", '<span style="color: #808080">gray text</span>')
-    TEST('С(#фФ0000)‘red text’', '<span style="color: #fF0000">red text</span>')
-    TEST('C(#fF0000)‘red text’', '<span style="color: #fF0000">red text</span>')
-    TEST('C(-800)‘text on a red background’', '<span style="background-color: #FF0000">text on a red background</span>')
-    TEST("link[http://address][1] ‘the same link’[1]", '<a href="http://address">link</a>[1] ‘the same link’[1]')
-    TEST("link[http://address][-1] ‘the same link’[-1]", '<a href="http://address">link</a> <a href="http://address">the same link</a>')
-    TEST("[[[comment[[[[sensitive information]]]]]]]", "<!--[[[comment]]]-->")
-    TEST("[[[com]ment]]", "<!--[[[com]ment]]-->")
-    TEST("[[[[comment]]]]", "")
-    TEST("[[[[[com]m]e]n]t]", "")
-    TEST("\n A", "<br />\n&emsp;A")
-    TEST(" A", "&emsp;A")
-    TEST("---", "<hr />\n")
-    TEST("---\n", "<hr />\n")
-    TEST("a\n---\n", "a<br />\n<hr />\n")
-    TEST("a\n---\n\n", "a<br />\n<hr />\n<br />\n") # check for wrong code: `writepos = i = j + 1` (should be `i = j`)
-    TEST("a\n---=\n", "a<br />\n---=<br />\n")
-    TEST("a\n----\n", "a<br />\n<hr />\n")
-    TEST("a0‘*‘<non-bold>’’", "a*‘&lt;non-bold>’")
-    TEST("""a
+TEST("H(+1)‘header’",    "<h2>header</h2>")
+TEST("H(-1)‘header’",    "<h4>header</h4>")
+TEST("[http://address]", '<a href="http://address">http://address</a>')
+TEST("link[http://address]", '<a href="http://address">link</a>')
+TEST("link[https://address]", '<a href="https://address">link</a>')
+TEST("‘multiword link’[http://address]", '<a href="http://address">multiword link</a>')
+TEST("link[https://address ‘title &text[[[comment]]]’]", '<a href="https://address" title="title &amp;text">link</a>')
+TEST("link[https://address title [.&.] text[[[comment]]]]", '<a href="https://address" title="title [.&amp;.] text">link</a>')
+TEST("text[‘title text’]", '<abbr title="title text">text</abbr>')
+TEST("[text][‘title text’]", '[text]<abbr title="title text"></abbr>') # чтобы получить '<abbr title="title text">[text]</abbr>' пишите так: ‘[text]’[‘title text’]
+#TEST("‘`‘` и `’`’[‘`‘` и `’`’]", '<abbr title="`‘` и `’`"><code>‘</code> и <code>’</code></abbr>') # Почему оставил закомментированным (а также почему в ‘...[[[комментарий]]]’[‘...’] удаляются комментарии, а в ‘...[[[комментарий]]]’[http...] — не удаляются): согласно правилу прецедента {должна возникнуть необходимость использовать такое в реальном тексте прежде чем добавлять какой-либо функционал в код ‘на всякий случай’/‘на будущее’}.
+TEST("P‘http://image-url’", '<img src="http://image-url" />')
+TEST("P‘http://image-url’[http://address]", '<a href="http://address"><img src="http://image-url" /></a>')
+TEST("P‘http://image-url’[‘title text[[[comment]]]’]", '<img src="http://image-url" title="title text" />')
+TEST("P‘http://image-url’[http://address ‘title text’]", '<a href="http://address" title="title text"><img src="http://image-url" /></a>')
+TEST("P‘http://image-url’[http://address title text]", '<a href="http://address" title="title text"><img src="http://image-url" /></a>')
+TEST("С(000)‘black text’", '<span style="color: #000000">black text</span>')
+TEST("С(800)‘red text’", '<span style="color: #FF0000">red text</span>')
+TEST("С(4)‘gray text’", '<span style="color: #808080">gray text</span>')
+TEST('С(#фФ0000)‘red text’', '<span style="color: #fF0000">red text</span>')
+TEST('C(#fF0000)‘red text’', '<span style="color: #fF0000">red text</span>')
+TEST('C(-800)‘text on a red background’', '<span style="background-color: #FF0000">text on a red background</span>')
+TEST("link[http://address][1] ‘the same link’[1]", '<a href="http://address">link</a>[1] ‘the same link’[1]')
+TEST("link[http://address][-1] ‘the same link’[-1]", '<a href="http://address">link</a> <a href="http://address">the same link</a>')
+TEST("[[[comment[[[[sensitive information]]]]]]]", "<!--[[[comment]]]-->")
+TEST("[[[com]ment]]", "<!--[[[com]ment]]-->")
+TEST("[[[[comment]]]]", "")
+TEST("[[[[[com]m]e]n]t]", "")
+TEST("\n A", "<br />\n&emsp;A")
+TEST(" A", "&emsp;A")
+TEST("---", "<hr />\n")
+TEST("---\n", "<hr />\n")
+TEST("a\n---\n", "a<br />\n<hr />\n")
+TEST("a\n---\n\n", "a<br />\n<hr />\n<br />\n") # check for wrong code: `writepos = i = j + 1` (should be `i = j`)
+TEST("a\n---=\n", "a<br />\n---=<br />\n")
+TEST("a\n----\n", "a<br />\n<hr />\n")
+TEST("a0‘*‘<non-bold>’’", "a*‘&lt;non-bold>’")
+TEST("""a
 ‘b[[[comment]]]’{
 c
 ‘d’{e}
 }""", """a<br />
 <spoiler title="b">c<br />
 <spoiler title="d">e</spoiler></spoiler>""", habrahabr_html = True)
-    TEST("""‘title’{
+TEST("""‘title’{
 te
 }
 xt""", """<span class="spoiler_title" onclick="return spoiler2(this, event)">title<br /></span><div class="spoiler_text" style="display: none">te<br />
@@ -75,12 +74,12 @@ xt""", """<span class="spoiler_title" onclick="return spoiler2(this, event)">tit
 xt""", ohd = True) # пока что фиксирую такой некрасивый HTML-код, так как например этот HTML-код работает некорректно: '<span class="spoiler_title" onclick="return spoiler2(this, event)">title</span><div class="spoiler_text" style="display:none">te<br />\n</div><br />\nxt'
                    #                                                                                      и этот тоже: '<span class="spoiler_title" onclick="return spoiler2(this, event)">title</span><div class="spoiler_text" style="display:none">te</div><br />\nxt'
                    #                                                                                           и этот: '<span class="spoiler_title" onclick="return spoiler2(this, event)">title</span><div class="spoiler_text" style="display:none">te</div>xt'
-    TEST("""#(Javascript)‘
+TEST("""#(Javascript)‘
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
 ’""", """<source lang="Javascript">
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
 </source>""", habrahabr_html = True)
-    TEST("""‘Code’{
+TEST("""‘Code’{
 #(Python)‘
 import hashlib
 ’
@@ -91,14 +90,14 @@ Some text.""",
 import hashlib
 </source></spoiler><br />
 Some text.""", habrahabr_html = True)
-    TEST("[[[‘]]]test```’```test", "<!--[[[‘]]]-->test<code>’</code>test", habrahabr_html = True)
-    TEST("[[[‘]]]`Don’t`", "<!--[[[‘]]]--><code>Don’t</code>", habrahabr_html = True)
-    TEST("'‘<Don‘t! Don‘t! Don‘t!>’’’’''''", "<Don‘t! Don‘t! Don‘t!>")
-    TEST("`'‘<div>&lt;</div>’'`", "<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>", habrahabr_html = True)
-    TEST("''‘‘’‘’’''", "’‘")
-    TEST("''''‘‘‘‘Don’t! Don’t! Don’t!’'", "Don’t! Don’t! Don’t!")
-#    TEST(open("tests/test1.pq", encoding="utf-8").read(), open("tests/test1.pq.to_habrahabr_html", encoding="utf-8").read(), habrahabr_html = True) # для проверки безопасности рефакторинга нужен был какой-либо обширный тестовый текст на пк-разметке [-TODO подобрать такой текст, который не стыдно закоммитить :)(:-]
-    TEST("""<<‘выравнивание по левому краю’
+TEST("[[[‘]]]test```’```test", "<!--[[[‘]]]-->test<code>’</code>test", habrahabr_html = True)
+TEST("[[[‘]]]`Don’t`", "<!--[[[‘]]]--><code>Don’t</code>", habrahabr_html = True)
+TEST("'‘<Don‘t! Don‘t! Don‘t!>’’’’''''", "<Don‘t! Don‘t! Don‘t!>")
+TEST("`'‘<div>&lt;</div>’'`", "<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>", habrahabr_html = True)
+TEST("''‘‘’‘’’''", "’‘")
+TEST("''''‘‘‘‘Don’t! Don’t! Don’t!’'", "Don’t! Don’t! Don’t!")
+#TEST(open("tests/test1.pq", encoding="utf-8").read(), open("tests/test1.pq.to_habrahabr_html", encoding="utf-8").read(), habrahabr_html = True) # для проверки безопасности рефакторинга нужен был какой-либо обширный тестовый текст на пк-разметке [-TODO подобрать такой текст, который не стыдно закоммитить :)(:-]
+TEST("""<<‘выравнивание по левому краю’
 >>‘выравнивание по правому краю’
 ><‘выравнивание по центру’
 <>‘выравнивание по ширине’""", """\
@@ -107,20 +106,20 @@ Some text.""", habrahabr_html = True)
 <div align="center">выравнивание по центру</div>
 <div align="justify">выравнивание по ширине</div>
 """)
-    TEST("‘’<<", "‘’&lt;&lt;") # was [before this commit]: ‘’<div align="left"></div>&lt;&lt;
-    TEST(R"/\‘надстрочный\superscript’\/‘подстрочный\subscript’", R"<sup>надстрочный\superscript</sup><sub>подстрочный\subscript</sub>")
-    TEST("> Quote\n" +
+TEST("‘’<<", "‘’&lt;&lt;") # was [before this commit]: ‘’<div align="left"></div>&lt;&lt;
+TEST(R"/\‘надстрочный\superscript’\/‘подстрочный\subscript’", R"<sup>надстрочный\superscript</sup><sub>подстрочный\subscript</sub>")
+TEST("> Quote\n" +
      ">‘Quote2’\n", "<blockquote>Quote</blockquote>\n"
                   + "<blockquote>Quote2</blockquote>\n")
-    TEST(">[http://address]:‘Quoted text.’",                '<blockquote><a href="http://address"><i>http://address</i></a>:<br />\nQuoted text.</blockquote>')
-    TEST(">[http://another-address][-1]:‘Quoted text.’\n" +
+TEST(">[http://address]:‘Quoted text.’",                '<blockquote><a href="http://address"><i>http://address</i></a>:<br />\nQuoted text.</blockquote>')
+TEST(">[http://another-address][-1]:‘Quoted text.’\n" +
      ">[-1]:‘Another quoted text.’",                    '<blockquote><a href="http://another-address">[1]<i>http://another-address</i></a>:<br />\nQuoted text.</blockquote>\n'
                                                       + '<blockquote><a href="http://another-address">[1]<i>http://another-address</i></a>:<br />\nAnother quoted text.</blockquote>')
-    TEST(">‘Author's name’[http://address]:‘Quoted text.’", '<blockquote><i><a href="http://address">Author\'s name</a></i>:<br />\nQuoted text.</blockquote>')
-    TEST(">‘Author's name’:‘Quoted text.’",                 '<blockquote><i>Author\'s name</i>:<br />\nQuoted text.</blockquote>')
-    TEST("‘Quoted text.’:‘Author's name’<",                 "<blockquote>Quoted text.<br />\n<div align='right'><i>Author's name</i></div></blockquote>")
-    TEST("‘понимание [[[процесса]]] разбора [[[разметки]]] человеком’[‘говоря проще: приходится [[[гораздо]]] меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё’]", '<abbr title="говоря проще: приходится  меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё">понимание  разбора  человеком</abbr>')
-    TEST(
+TEST(">‘Author's name’[http://address]:‘Quoted text.’", '<blockquote><i><a href="http://address">Author\'s name</a></i>:<br />\nQuoted text.</blockquote>')
+TEST(">‘Author's name’:‘Quoted text.’",                 '<blockquote><i>Author\'s name</i>:<br />\nQuoted text.</blockquote>')
+TEST("‘Quoted text.’:‘Author's name’<",                 "<blockquote>Quoted text.<br />\n<div align='right'><i>Author's name</i></div></blockquote>")
+TEST("‘понимание [[[процесса]]] разбора [[[разметки]]] человеком’[‘говоря проще: приходится [[[гораздо]]] меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё’]", '<abbr title="говоря проще: приходится  меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё">понимание  разбора  человеком</abbr>')
+TEST(
 """. unordered
 . list""",
 """<ul>
@@ -128,7 +127,7 @@ Some text.""", habrahabr_html = True)
 <li>list</li>
 </ul>
 """)
-    TEST(
+TEST(
 """1. ordered
 2. list""",
 """<ol>
@@ -136,7 +135,7 @@ Some text.""", habrahabr_html = True)
 <li>list</li>
 </ol>
 """)
-    TEST(
+TEST(
 """13. disordered
 2. list""",
 """<ol start="13">
@@ -144,7 +143,7 @@ Some text.""", habrahabr_html = True)
 <li value="2">list</li>
 </ol>
 """)
-    TEST(
+TEST(
 """1. interrupted
 . ol
 2. list""",
@@ -158,7 +157,7 @@ Some text.""", habrahabr_html = True)
 <li>list</li>
 </ol>
 """)
-    TEST(
+TEST(
 """. interrupted
 1. ul
 . list""",
@@ -172,7 +171,7 @@ Some text.""", habrahabr_html = True)
 <li>list</li>
 </ul>
 """)
-    TEST(
+TEST(
 """1.‘multiline
 list element’
 2. second""",
@@ -182,7 +181,7 @@ list element</li>
 <li>second</li>
 </ol>
 """)
-    TEST(
+TEST(
 """.‘multiline
 list element’
 . second""",
@@ -192,7 +191,7 @@ list element</li>
 <li>second</li>
 </ul>
 """)
-    TEST(
+TEST(
 """4.‘А ещё мне коды[/годы] этих символов нравятся...’
 
 Один существенный минус ...""",
@@ -201,7 +200,7 @@ list element</li>
 </ol>
 <br />
 Один существенный минус ...""", ohd = True)
-    TEST(
+TEST(
 """4. ‘А ещё мне коды[/годы] этих символов нравятся...’{...}
 
 Один существенный минус ...""",
@@ -211,7 +210,7 @@ list element</li>
 </ol>
 <br />
 Один существенный минус ...""", ohd = True)
-    TEST(
+TEST(
 """T‘
 H‘‘1’ ‘2’’
  ‘‘3’ ‘4’[[[comment]]]’
@@ -222,7 +221,7 @@ H‘‘1’ ‘2’’
 <tr><td>3</td><td>4</td></tr>
 </table>
 5""")
-    TEST(
+TEST(
 """T‘‘
 ‘ ’ ‘ ’ ‘1’ ’‘
 ‘ ’ ‘ ’  |  ’‘
@@ -233,7 +232,7 @@ H‘‘1’ ‘2’’
 <tr><td colspan="2">2</td></tr>
 </table>
 """)
-    TEST(
+TEST(
 """T‘‘
 ‘ ’ ‘ ’ ‘1’ ’‘
 ‘ ’ ‘ ’  |  ’‘
@@ -244,7 +243,7 @@ H‘‘1’ ‘2’’
 <tr><td colspan="3">2</td></tr>
 </table>
 """)
-    TEST(
+TEST(
 """T‘‘
 ‘1’  -   -  ‘2’ ’‘
  |   -   -  ‘3’ ’‘
@@ -257,7 +256,7 @@ H‘‘1’ ‘2’’
 <tr><td>5</td><td>6</td><td>7</td></tr>
 </table>
 """)
-    TEST(
+TEST(
 R"""T‘
 /\>>‘‘top
 right’ ‘top right’ \/‘bottom right’ ‘top right’’
@@ -277,7 +276,7 @@ center</td><td style="text-align: right; vertical-align: bottom">bottom<br />
 right</td><td style="text-align: center; vertical-align: bottom">bottom center</td></tr>
 </table>
 """)
-    TEST("""A
+TEST("""A
 ```
 let s2 = str
         .lowercaseString
@@ -335,8 +334,6 @@ F TEST(=str1, =str2, ohd = 0B, habrahabr_html = 0B)
       :failed_tests++
    E
       print(‘passed’)
-
-:start:
 TEST(‘*‘bold’’, ‘<b>bold</b>’)
 TEST(‘_‘underlined’’, ‘<u>underlined</u>’)
 TEST(‘-‘strikethrough’’, ‘<s>strikethrough</s>’)
@@ -610,68 +607,70 @@ template <typename T1, typename T2, typename T3 = decltype(false), typename T4 =
         print(u"passed"_S);
 }
 
-int main()
+struct CodeBlock1
 {
-    TEST(u"*‘bold’"_S, u"<b>bold</b>"_S);
-    TEST(u"_‘underlined’"_S, u"<u>underlined</u>"_S);
-    TEST(u"-‘strikethrough’"_S, u"<s>strikethrough</s>"_S);
-    TEST(u"~‘italics’"_S, u"<i>italics</i>"_S);
-    TEST(u"H‘header’\n"_S + u"H(1)‘header’"_S, u"<h3>header</h3>\n"_S + u"<h2>header</h2>"_S);
-    TEST(u"H(+1)‘header’"_S, u"<h2>header</h2>"_S);
-    TEST(u"H(-1)‘header’"_S, u"<h4>header</h4>"_S);
-    TEST(u"[http://address]"_S, u"<a href=\"http://address\">http://address</a>"_S);
-    TEST(u"link[http://address]"_S, u"<a href=\"http://address\">link</a>"_S);
-    TEST(u"link[https://address]"_S, u"<a href=\"https://address\">link</a>"_S);
-    TEST(u"‘multiword link’[http://address]"_S, u"<a href=\"http://address\">multiword link</a>"_S);
-    TEST(u"link[https://address ‘title &text[[[comment]]]’]"_S, u"<a href=\"https://address\" title=\"title &amp;text\">link</a>"_S);
-    TEST(u"link[https://address title [.&.] text[[[comment]]]]"_S, u"<a href=\"https://address\" title=\"title [.&amp;.] text\">link</a>"_S);
-    TEST(u"text[‘title text’]"_S, u"<abbr title=\"title text\">text</abbr>"_S);
-    TEST(u"[text][‘title text’]"_S, u"[text]<abbr title=\"title text\"></abbr>"_S);
-    TEST(u"P‘http://image-url’"_S, u"<img src=\"http://image-url\" />"_S);
-    TEST(u"P‘http://image-url’[http://address]"_S, u"<a href=\"http://address\"><img src=\"http://image-url\" /></a>"_S);
-    TEST(u"P‘http://image-url’[‘title text[[[comment]]]’]"_S, u"<img src=\"http://image-url\" title=\"title text\" />"_S);
-    TEST(u"P‘http://image-url’[http://address ‘title text’]"_S, u"<a href=\"http://address\" title=\"title text\"><img src=\"http://image-url\" /></a>"_S);
-    TEST(u"P‘http://image-url’[http://address title text]"_S, u"<a href=\"http://address\" title=\"title text\"><img src=\"http://image-url\" /></a>"_S);
-    TEST(u"С(000)‘black text’"_S, u"<span style=\"color: #000000\">black text</span>"_S);
-    TEST(u"С(800)‘red text’"_S, u"<span style=\"color: #FF0000\">red text</span>"_S);
-    TEST(u"С(4)‘gray text’"_S, u"<span style=\"color: #808080\">gray text</span>"_S);
-    TEST(u"С(#фФ0000)‘red text’"_S, u"<span style=\"color: #fF0000\">red text</span>"_S);
-    TEST(u"C(#fF0000)‘red text’"_S, u"<span style=\"color: #fF0000\">red text</span>"_S);
-    TEST(u"C(-800)‘text on a red background’"_S, u"<span style=\"background-color: #FF0000\">text on a red background</span>"_S);
-    TEST(u"link[http://address][1] ‘the same link’[1]"_S, u"<a href=\"http://address\">link</a>[1] ‘the same link’[1]"_S);
-    TEST(u"link[http://address][-1] ‘the same link’[-1]"_S, u"<a href=\"http://address\">link</a> <a href=\"http://address\">the same link</a>"_S);
-    TEST(u"[[[comment[[[[sensitive information]]]]]]]"_S, u"<!--[[[comment]]]-->"_S);
-    TEST(u"[[[com]ment]]"_S, u"<!--[[[com]ment]]-->"_S);
-    TEST(u"[[[[comment]]]]"_S, u""_S);
-    TEST(u"[[[[[com]m]e]n]t]"_S, u""_S);
-    TEST(u"\n A"_S, u"<br />\n&emsp;A"_S);
-    TEST(u" A"_S, u"&emsp;A"_S);
-    TEST(u"---"_S, u"<hr />\n"_S);
-    TEST(u"---\n"_S, u"<hr />\n"_S);
-    TEST(u"a\n---\n"_S, u"a<br />\n<hr />\n"_S);
-    TEST(u"a\n---\n\n"_S, u"a<br />\n<hr />\n<br />\n"_S);
-    TEST(u"a\n---=\n"_S, u"a<br />\n---=<br />\n"_S);
-    TEST(u"a\n----\n"_S, u"a<br />\n<hr />\n"_S);
-    TEST(u"a0‘*‘<non-bold>’’"_S, u"a*‘&lt;non-bold>’"_S);
-    TEST(uR"(a
+    CodeBlock1()
+    {
+        TEST(u"*‘bold’"_S, u"<b>bold</b>"_S);
+        TEST(u"_‘underlined’"_S, u"<u>underlined</u>"_S);
+        TEST(u"-‘strikethrough’"_S, u"<s>strikethrough</s>"_S);
+        TEST(u"~‘italics’"_S, u"<i>italics</i>"_S);
+        TEST(u"H‘header’\n"_S + u"H(1)‘header’"_S, u"<h3>header</h3>\n"_S + u"<h2>header</h2>"_S);
+        TEST(u"H(+1)‘header’"_S, u"<h2>header</h2>"_S);
+        TEST(u"H(-1)‘header’"_S, u"<h4>header</h4>"_S);
+        TEST(u"[http://address]"_S, u"<a href=\"http://address\">http://address</a>"_S);
+        TEST(u"link[http://address]"_S, u"<a href=\"http://address\">link</a>"_S);
+        TEST(u"link[https://address]"_S, u"<a href=\"https://address\">link</a>"_S);
+        TEST(u"‘multiword link’[http://address]"_S, u"<a href=\"http://address\">multiword link</a>"_S);
+        TEST(u"link[https://address ‘title &text[[[comment]]]’]"_S, u"<a href=\"https://address\" title=\"title &amp;text\">link</a>"_S);
+        TEST(u"link[https://address title [.&.] text[[[comment]]]]"_S, u"<a href=\"https://address\" title=\"title [.&amp;.] text\">link</a>"_S);
+        TEST(u"text[‘title text’]"_S, u"<abbr title=\"title text\">text</abbr>"_S);
+        TEST(u"[text][‘title text’]"_S, u"[text]<abbr title=\"title text\"></abbr>"_S);
+        TEST(u"P‘http://image-url’"_S, u"<img src=\"http://image-url\" />"_S);
+        TEST(u"P‘http://image-url’[http://address]"_S, u"<a href=\"http://address\"><img src=\"http://image-url\" /></a>"_S);
+        TEST(u"P‘http://image-url’[‘title text[[[comment]]]’]"_S, u"<img src=\"http://image-url\" title=\"title text\" />"_S);
+        TEST(u"P‘http://image-url’[http://address ‘title text’]"_S, u"<a href=\"http://address\" title=\"title text\"><img src=\"http://image-url\" /></a>"_S);
+        TEST(u"P‘http://image-url’[http://address title text]"_S, u"<a href=\"http://address\" title=\"title text\"><img src=\"http://image-url\" /></a>"_S);
+        TEST(u"С(000)‘black text’"_S, u"<span style=\"color: #000000\">black text</span>"_S);
+        TEST(u"С(800)‘red text’"_S, u"<span style=\"color: #FF0000\">red text</span>"_S);
+        TEST(u"С(4)‘gray text’"_S, u"<span style=\"color: #808080\">gray text</span>"_S);
+        TEST(u"С(#фФ0000)‘red text’"_S, u"<span style=\"color: #fF0000\">red text</span>"_S);
+        TEST(u"C(#fF0000)‘red text’"_S, u"<span style=\"color: #fF0000\">red text</span>"_S);
+        TEST(u"C(-800)‘text on a red background’"_S, u"<span style=\"background-color: #FF0000\">text on a red background</span>"_S);
+        TEST(u"link[http://address][1] ‘the same link’[1]"_S, u"<a href=\"http://address\">link</a>[1] ‘the same link’[1]"_S);
+        TEST(u"link[http://address][-1] ‘the same link’[-1]"_S, u"<a href=\"http://address\">link</a> <a href=\"http://address\">the same link</a>"_S);
+        TEST(u"[[[comment[[[[sensitive information]]]]]]]"_S, u"<!--[[[comment]]]-->"_S);
+        TEST(u"[[[com]ment]]"_S, u"<!--[[[com]ment]]-->"_S);
+        TEST(u"[[[[comment]]]]"_S, u""_S);
+        TEST(u"[[[[[com]m]e]n]t]"_S, u""_S);
+        TEST(u"\n A"_S, u"<br />\n&emsp;A"_S);
+        TEST(u" A"_S, u"&emsp;A"_S);
+        TEST(u"---"_S, u"<hr />\n"_S);
+        TEST(u"---\n"_S, u"<hr />\n"_S);
+        TEST(u"a\n---\n"_S, u"a<br />\n<hr />\n"_S);
+        TEST(u"a\n---\n\n"_S, u"a<br />\n<hr />\n<br />\n"_S);
+        TEST(u"a\n---=\n"_S, u"a<br />\n---=<br />\n"_S);
+        TEST(u"a\n----\n"_S, u"a<br />\n<hr />\n"_S);
+        TEST(u"a0‘*‘<non-bold>’’"_S, u"a*‘&lt;non-bold>’"_S);
+        TEST(uR"(a
 ‘b[[[comment]]]’{
 c
 ‘d’{e}
 })"_S, uR"(a<br />
 <spoiler title="b">c<br />
 <spoiler title="d">e</spoiler></spoiler>)"_S, false, true);
-    TEST(uR"(‘title’{
+        TEST(uR"(‘title’{
 te
 }
 xt)"_S, uR"'(<span class="spoiler_title" onclick="return spoiler2(this, event)">title<br /></span><div class="spoiler_text" style="display: none">te<br />
 </div>
 xt)'"_S, true);
-    TEST(uR"(#(Javascript)‘
+        TEST(uR"(#(Javascript)‘
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
 ’)"_S, uR"(<source lang="Javascript">
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
 </source>)"_S, false, true);
-    TEST(uR"(‘Code’{
+        TEST(uR"(‘Code’{
 #(Python)‘
 import hashlib
 ’
@@ -681,13 +680,13 @@ Some text.)"_S, uR"(<spoiler title="Code"><source lang="Python">
 import hashlib
 </source></spoiler><br />
 Some text.)"_S, false, true);
-    TEST(u"[[[‘]]]test```’```test"_S, u"<!--[[[‘]]]-->test<code>’</code>test"_S, false, true);
-    TEST(u"[[[‘]]]`Don’t`"_S, u"<!--[[[‘]]]--><code>Don’t</code>"_S, false, true);
-    TEST(u"'‘<Don‘t! Don‘t! Don‘t!>’’’’''''"_S, u"<Don‘t! Don‘t! Don‘t!>"_S);
-    TEST(u"`'‘<div>&lt;</div>’'`"_S, u"<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>"_S, false, true);
-    TEST(u"''‘‘’‘’’''"_S, u"’‘"_S);
-    TEST(u"''''‘‘‘‘Don’t! Don’t! Don’t!’'"_S, u"Don’t! Don’t! Don’t!"_S);
-    TEST(uR"(<<‘выравнивание по левому краю’
+        TEST(u"[[[‘]]]test```’```test"_S, u"<!--[[[‘]]]-->test<code>’</code>test"_S, false, true);
+        TEST(u"[[[‘]]]`Don’t`"_S, u"<!--[[[‘]]]--><code>Don’t</code>"_S, false, true);
+        TEST(u"'‘<Don‘t! Don‘t! Don‘t!>’’’’''''"_S, u"<Don‘t! Don‘t! Don‘t!>"_S);
+        TEST(u"`'‘<div>&lt;</div>’'`"_S, u"<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>"_S, false, true);
+        TEST(u"''‘‘’‘’’''"_S, u"’‘"_S);
+        TEST(u"''''‘‘‘‘Don’t! Don’t! Don’t!’'"_S, u"Don’t! Don’t! Don’t!"_S);
+        TEST(uR"(<<‘выравнивание по левому краю’
 >>‘выравнивание по правому краю’
 ><‘выравнивание по центру’
 <>‘выравнивание по ширине’)"_S, u"\
@@ -696,34 +695,34 @@ Some text.)"_S, false, true);
 <div align=\"center\">выравнивание по центру</div>\n\
 <div align=\"justify\">выравнивание по ширине</div>\n\
 "_S);
-    TEST(u"‘’<<"_S, u"‘’&lt;&lt;"_S);
-    TEST(uR"(/\‘надстрочный\superscript’\/‘подстрочный\subscript’)"_S, uR"(<sup>надстрочный\superscript</sup><sub>подстрочный\subscript</sub>)"_S);
-    TEST(u"> Quote\n"_S + u">‘Quote2’\n"_S, u"<blockquote>Quote</blockquote>\n"_S + u"<blockquote>Quote2</blockquote>\n"_S);
-    TEST(u">[http://address]:‘Quoted text.’"_S, u"<blockquote><a href=\"http://address\"><i>http://address</i></a>:<br />\nQuoted text.</blockquote>"_S);
-    TEST(u">[http://another-address][-1]:‘Quoted text.’\n"_S + u">[-1]:‘Another quoted text.’"_S, u"<blockquote><a href=\"http://another-address\">[1]<i>http://another-address</i></a>:<br />\nQuoted text.</blockquote>\n"_S + u"<blockquote><a href=\"http://another-address\">[1]<i>http://another-address</i></a>:<br />\nAnother quoted text.</blockquote>"_S);
-    TEST(u">‘Author's name’[http://address]:‘Quoted text.’"_S, u"<blockquote><i><a href=\"http://address\">Author's name</a></i>:<br />\nQuoted text.</blockquote>"_S);
-    TEST(u">‘Author's name’:‘Quoted text.’"_S, u"<blockquote><i>Author's name</i>:<br />\nQuoted text.</blockquote>"_S);
-    TEST(u"‘Quoted text.’:‘Author's name’<"_S, u"<blockquote>Quoted text.<br />\n<div align='right'><i>Author's name</i></div></blockquote>"_S);
-    TEST(u"‘понимание [[[процесса]]] разбора [[[разметки]]] человеком’[‘говоря проще: приходится [[[гораздо]]] меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё’]"_S, u"<abbr title=\"говоря проще: приходится  меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё\">понимание  разбора  человеком</abbr>"_S);
-    TEST(uR"(. unordered
+        TEST(u"‘’<<"_S, u"‘’&lt;&lt;"_S);
+        TEST(uR"(/\‘надстрочный\superscript’\/‘подстрочный\subscript’)"_S, uR"(<sup>надстрочный\superscript</sup><sub>подстрочный\subscript</sub>)"_S);
+        TEST(u"> Quote\n"_S + u">‘Quote2’\n"_S, u"<blockquote>Quote</blockquote>\n"_S + u"<blockquote>Quote2</blockquote>\n"_S);
+        TEST(u">[http://address]:‘Quoted text.’"_S, u"<blockquote><a href=\"http://address\"><i>http://address</i></a>:<br />\nQuoted text.</blockquote>"_S);
+        TEST(u">[http://another-address][-1]:‘Quoted text.’\n"_S + u">[-1]:‘Another quoted text.’"_S, u"<blockquote><a href=\"http://another-address\">[1]<i>http://another-address</i></a>:<br />\nQuoted text.</blockquote>\n"_S + u"<blockquote><a href=\"http://another-address\">[1]<i>http://another-address</i></a>:<br />\nAnother quoted text.</blockquote>"_S);
+        TEST(u">‘Author's name’[http://address]:‘Quoted text.’"_S, u"<blockquote><i><a href=\"http://address\">Author's name</a></i>:<br />\nQuoted text.</blockquote>"_S);
+        TEST(u">‘Author's name’:‘Quoted text.’"_S, u"<blockquote><i>Author's name</i>:<br />\nQuoted text.</blockquote>"_S);
+        TEST(u"‘Quoted text.’:‘Author's name’<"_S, u"<blockquote>Quoted text.<br />\n<div align='right'><i>Author's name</i></div></blockquote>"_S);
+        TEST(u"‘понимание [[[процесса]]] разбора [[[разметки]]] человеком’[‘говоря проще: приходится [[[гораздо]]] меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё’]"_S, u"<abbr title=\"говоря проще: приходится  меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё\">понимание  разбора  человеком</abbr>"_S);
+        TEST(uR"(. unordered
 . list)"_S, uR"(<ul>
 <li>unordered</li>
 <li>list</li>
 </ul>
 )"_S);
-    TEST(uR"(1. ordered
+        TEST(uR"(1. ordered
 2. list)"_S, uR"(<ol>
 <li>ordered</li>
 <li>list</li>
 </ol>
 )"_S);
-    TEST(uR"(13. disordered
+        TEST(uR"(13. disordered
 2. list)"_S, uR"(<ol start="13">
 <li>disordered</li>
 <li value="2">list</li>
 </ol>
 )"_S);
-    TEST(uR"(1. interrupted
+        TEST(uR"(1. interrupted
 . ol
 2. list)"_S, uR"(<ol>
 <li>interrupted</li>
@@ -735,7 +734,7 @@ Some text.)"_S, false, true);
 <li>list</li>
 </ol>
 )"_S);
-    TEST(uR"(. interrupted
+        TEST(uR"(. interrupted
 1. ul
 . list)"_S, uR"(<ul>
 <li>interrupted</li>
@@ -747,7 +746,7 @@ Some text.)"_S, false, true);
 <li>list</li>
 </ul>
 )"_S);
-    TEST(uR"(1.‘multiline
+        TEST(uR"(1.‘multiline
 list element’
 2. second)"_S, uR"(<ol>
 <li>multiline<br />
@@ -755,7 +754,7 @@ list element</li>
 <li>second</li>
 </ol>
 )"_S);
-    TEST(uR"(.‘multiline
+        TEST(uR"(.‘multiline
 list element’
 . second)"_S, uR"(<ul>
 <li>multiline<br />
@@ -763,14 +762,14 @@ list element</li>
 <li>second</li>
 </ul>
 )"_S);
-    TEST(uR"(4.‘А ещё мне коды[/годы] этих символов нравятся...’
+        TEST(uR"(4.‘А ещё мне коды[/годы] этих символов нравятся...’
 
 Один существенный минус ...)"_S, uR"(<ol start="4">
 <li>А ещё мне коды<span class="sq"><span class="sq_brackets">[</span>/годы<span class="sq_brackets">]</span></span> этих символов нравятся...</li>
 </ol>
 <br />
 Один существенный минус ...)"_S, true);
-    TEST(uR"(4. ‘А ещё мне коды[/годы] этих символов нравятся...’{...}
+        TEST(uR"(4. ‘А ещё мне коды[/годы] этих символов нравятся...’{...}
 
 Один существенный минус ...)"_S, uR"'(<ol start="4">
 <li><span class="spoiler_title" onclick="return spoiler2(this, event)">А ещё мне коды[/годы] этих символов нравятся...<br /></span><div class="spoiler_text" style="display: none">...</div>
@@ -778,7 +777,7 @@ list element</li>
 </ol>
 <br />
 Один существенный минус ...)'"_S, true);
-    TEST(uR"(T‘
+        TEST(uR"(T‘
 H‘‘1’ ‘2’’
  ‘‘3’ ‘4’[[[comment]]]’
 [[[comment]]]’
@@ -787,7 +786,7 @@ H‘‘1’ ‘2’’
 <tr><td>3</td><td>4</td></tr>
 </table>
 5)"_S);
-    TEST(uR"(T‘‘
+        TEST(uR"(T‘‘
 ‘ ’ ‘ ’ ‘1’ ’‘
 ‘ ’ ‘ ’  |  ’‘
 ‘2’  -   |  ’’)"_S, uR"(<table>
@@ -796,7 +795,7 @@ H‘‘1’ ‘2’’
 <tr><td colspan="2">2</td></tr>
 </table>
 )"_S);
-    TEST(uR"(T‘‘
+        TEST(uR"(T‘‘
 ‘ ’ ‘ ’ ‘1’ ’‘
 ‘ ’ ‘ ’  |  ’‘
 ‘2’  -   -  ’’)"_S, uR"(<table>
@@ -805,7 +804,7 @@ H‘‘1’ ‘2’’
 <tr><td colspan="3">2</td></tr>
 </table>
 )"_S);
-    TEST(uR"(T‘‘
+        TEST(uR"(T‘‘
 ‘1’  -   -  ‘2’ ’‘
  |   -   -  ‘3’ ’‘
  |   -   -  ‘4’ ’‘
@@ -816,7 +815,7 @@ H‘‘1’ ‘2’’
 <tr><td>5</td><td>6</td><td>7</td></tr>
 </table>
 )"_S);
-    TEST(uR"(T‘
+        TEST(uR"(T‘
 /\>>‘‘top
 right’ ‘top right’ \/‘bottom right’ ‘top right’’
 ‘‘default alignment’ ‘default
@@ -834,7 +833,7 @@ center</td><td style="text-align: right; vertical-align: bottom">bottom<br />
 right</td><td style="text-align: center; vertical-align: bottom">bottom center</td></tr>
 </table>
 )"_S);
-    TEST(uR"(A
+        TEST(uR"(A
 ```
 let s2 = str
         .lowercaseString
@@ -849,28 +848,36 @@ let s2 = str
 </pre>
 B<br />
 C)"_S);
-
-    auto check_file = [](const auto &fname)
-    {
-        try
-        {
-            pqmarkup::to_html(File(fname, u"r"_S, u"utf8"_S).read(), nullptr, true);
-        }
-        catch (const pqmarkup::Exception& e)
-        {
-            print(e.message + u" at file '"_S + fname + u"', line "_S + String(e.line) + u", column "_S + String(e.column));
-            exit(1);
-        }
-    };
-    check_file(u"docs/en/syntax.pq.txt"_S);
-    check_file(u"docs/ru/syntax.pq.txt"_S);
-
-    if (failed_tests == 0) {
-        print(u"OK (all "_S + String(test_id) + u" tests passed)"_S);
-        exit(0);
     }
-    else {
-        print(String(test_id - failed_tests) + u" tests passed and "_S + String(failed_tests) + u" failed."_S);
+} code_block_1;
+
+template <typename T1> auto check_file(const T1 &fname)
+{
+    try
+    {
+        pqmarkup::to_html(File(fname, u"r"_S, u"utf8"_S).read(), nullptr, true);
+    }
+    catch (const pqmarkup::Exception& e)
+    {
+        print(e.message + u" at file '"_S + fname + u"', line "_S + String(e.line) + u", column "_S + String(e.column));
         exit(1);
     }
 }
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        check_file(u"docs/en/syntax.pq.txt"_S);
+        check_file(u"docs/ru/syntax.pq.txt"_S);
+
+        if (failed_tests == 0) {
+            print(u"OK (all "_S + String(test_id) + u" tests passed)"_S);
+            exit(0);
+        }
+        else {
+            print(String(test_id - failed_tests) + u" tests passed and "_S + String(failed_tests) + u" failed."_S);
+            exit(1);
+        }
+    }
+} code_block_2;

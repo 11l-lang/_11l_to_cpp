@@ -585,8 +585,24 @@ class ASTProgram(ASTNodeWithChildren):
 
     def to_str(self):
         r = self.beginning_extra
+        prev_global_statement = True
+        code_block_id = 1
+
         for c in self.children:
-            r += c.to_str(0)
+            global_statement = type(c) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition, ASTTypeDefinition, ASTMain)
+            if global_statement != prev_global_statement:
+                prev_global_statement = global_statement
+                if not global_statement:
+                    sname = 'CodeBlock' + str(code_block_id)
+                    r += "\n"*(c is not self.children[0]) + 'struct ' + sname + "\n{\n    " + sname + "()\n    {\n"
+                else:
+                    r += "    }\n} code_block_" + str(code_block_id) + ";\n"
+                    code_block_id += 1
+            r += c.to_str(2*(not global_statement))
+
+        if prev_global_statement != True: # {{
+            r += "    }\n} code_block_" + str(code_block_id) + ";\n"
+
         return r
 
 class ASTExpression(ASTNodeWithExpression):
