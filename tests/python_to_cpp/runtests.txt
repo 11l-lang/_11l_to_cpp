@@ -293,6 +293,21 @@ let s2 = str
 B<br />
 C""") # с тегом <code> пробелы ‘корректно не отображаются’/коллапсируются
 
+# Check for error handling
+test_id += 1
+was_error = False
+print("Test " + str(test_id) + " (error handling) ...", end = '')
+try:
+    pqmarkup.to_html("\nT‘‘‘`’’’")
+except pqmarkup.Exception as e:
+    was_error = True
+    if e.line == 2 and e.column == 5 and e.pos == 5:
+        print("passed")
+    else:
+        print("FAILED!")
+        failed_tests += 1
+assert(was_error)
+
 # Unfortunately addition of this line:
 # precommit.check_docs.en = python pqmarkup.py docs/en/syntax.pq.txt > nul
 # to [hooks] section in hgrc is not working, so perform this check here.
@@ -571,6 +586,19 @@ let s2 = str
 </pre>
 B<br />
 C’)
+test_id++
+A was_error = 0B
+print(‘Test ’String(test_id)‘ (error handling) ...’, end' ‘’)
+X.try
+   pqmarkup:to_html("\nT‘‘‘`’’’")
+X.catch pqmarkup:Exception e
+   was_error = 1B
+   I e.line == 2 & e.column == 5 & e.pos == 5
+      print(‘passed’)
+   E
+      print(‘FAILED!’)
+      failed_tests++
+assert(was_error)
 
 F check_file(fname)
    X.try
@@ -848,8 +876,33 @@ let s2 = str
 </pre>
 B<br />
 C)"_S);
+        test_id++;
     }
 } code_block_1;
+auto was_error = false;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"Test "_S + String(test_id) + u" (error handling) ..."_S, u""_S);
+        try
+        {
+            pqmarkup::to_html(u"\nT‘‘‘`’’’"_S);
+        }
+        catch (const pqmarkup::Exception& e)
+        {
+            was_error = true;
+            if (e.line == 2 && e.column == 5 && e.pos == 5)
+                print(u"passed"_S);
+            else {
+                print(u"FAILED!"_S);
+                failed_tests++;
+            }
+        }
+        assert(was_error);
+    }
+} code_block_2;
 
 template <typename T1> auto check_file(const T1 &fname)
 {
@@ -864,9 +917,9 @@ template <typename T1> auto check_file(const T1 &fname)
     }
 }
 
-struct CodeBlock2
+struct CodeBlock3
 {
-    CodeBlock2()
+    CodeBlock3()
     {
         check_file(u"docs/en/syntax.pq.txt"_S);
         check_file(u"docs/ru/syntax.pq.txt"_S);
@@ -880,4 +933,4 @@ struct CodeBlock2
             exit(1);
         }
     }
-} code_block_2;
+} code_block_3;
