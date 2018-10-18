@@ -294,6 +294,26 @@ let s2 = str
 B<br />
 C""") # с тегом <code> пробелы ‘корректно не отображаются’/коллапсируются
 
+# Unfortunately addition of this line:
+# precommit.check_docs.en = python pqmarkup.py docs/en/syntax.pq.txt > nul
+# to [hooks] section in hgrc is not working, so perform this check here.
+# Почему unfortunately: потому, что было бы лучше, если бы возник прецедент необходимости в этом исключении во внешнем коде,
+# так как тогда бы я передавал в этом исключении информацию, необходимую для этого [внешнего] кода, а так получается, что я
+# уже не смогу узнать, какая информация необходима внешнему коду, так как при наличии данного/этого исключения внешний код
+# будет просто подстраиваться под ту информацию, что я уже передаю в исключении. В данном случае, возможно это и не играет
+# большой роли, но сам принцип должен быть такой: выдавать следует информацию тогда, когда появляется реальная/насущная
+# необходимость в ней, так как именно в этот момент возможно наиболее точно установить требования к тому, в какой форме, в
+# каком формате необходимо передавать информацию. Заранее сделать это ‘на будущее’/‘на всякий случай’ получится всегда хуже
+# [кроме того случая, когда человек, которому поручили это, уже имеет соответствующий опыт].
+def check_file(fname):
+    try:
+        pqmarkup.to_html(open(fname, encoding='utf8').read(), ohd = True)
+    except pqmarkup.Exception as e:
+        print(e.message + " at file '" + fname + "', line " + str(e.line) + ", column " + str(e.column))
+        sys.exit(1)
+check_file("docs/en/syntax.pq.txt")
+check_file("docs/ru/syntax.pq.txt")
+
 if failed_tests == 0:
     print("OK (all " + str(test_id) + " tests passed)")
     sys.exit(0)
@@ -554,6 +574,15 @@ let s2 = str
 </pre>
 B<br />
 C’)
+
+F check_file(fname)
+   X.try
+      pqmarkup:to_html(File(fname, encoding' ‘utf8’).read(), ohd' 1B)
+   X.catch pqmarkup:Exception e
+      print(e.message‘ at file '’fname‘', line ’String(e.line)‘, column ’String(e.column))
+      exit(1)
+check_file(‘docs/en/syntax.pq.txt’)
+check_file(‘docs/ru/syntax.pq.txt’)
 
 I failed_tests == 0
    print(‘OK (all ’String(test_id)‘ tests passed)’)
@@ -820,6 +849,21 @@ let s2 = str
 </pre>
 B<br />
 C)"_S);
+
+    auto check_file = [](const auto &fname)
+    {
+        try
+        {
+            pqmarkup::to_html(File(fname, u"r"_S, u"utf8"_S).read(), nullptr, true);
+        }
+        catch (const pqmarkup::Exception& e)
+        {
+            print(e.message + u" at file '"_S + fname + u"', line "_S + String(e.line) + u", column "_S + String(e.column));
+            exit(1);
+        }
+    };
+    check_file(u"docs/en/syntax.pq.txt"_S);
+    check_file(u"docs/ru/syntax.pq.txt"_S);
 
     if (failed_tests == 0) {
         print(u"OK (all "_S + String(test_id) + u" tests passed)"_S);
