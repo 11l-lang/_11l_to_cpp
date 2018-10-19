@@ -271,7 +271,7 @@ class SymbolNode:
                     func_name = 'parse_int'
                 else:
                     if self.children[0].symbol.id == ':':
-                        fid = modules[self.children[0].children[0].token_str()].scope.find(self.children[0].children[1].token_str())
+                        fid = find_module(self.children[0].children[0].token_str()).scope.find(self.children[0].children[1].token_str())
                     else:
                         fid = self.scope.find(func_name)
                     if fid == None:
@@ -502,7 +502,7 @@ class SymbolNode:
                 assert(self.symbol.id == '.')
                 if self.children[2].symbol.id == '?': # not necessary, just to beautify generated C++
                     return '[&](auto &&T){auto X = ' + self.children[2].children[0].to_str() + '; return X != nullptr ? *X : ' + self.children[2].children[1].to_str() + ';}(' + self.children[0].to_str() + ')'
-                return '[&](auto &&T){return ' + self.children[2].to_str() + ';}(' + self.children[0].to_str() + ')'
+                return '[&](auto &&T){return ' + self.children[2].to_str() + ';}(' + self.children[0].to_str() + ')' # why I prefer `auto &&T` to `auto&& T`: ampersand is related to the variable, but not to the type, for example in `int &i, j` `j` is not a reference, but just an integer
             assert(self.symbol.id in ('I', 'Е', 'if', 'если'))
             return self.children[0].to_str() + ' ? ' + self.children[1].to_str() + ' : ' + self.children[2].to_str()
 
@@ -1082,7 +1082,17 @@ symbol('.').led = led
 
 class Module:
     scope : Scope
+
+    def __init__(self, scope):
+        self.scope = scope
+
 modules : Dict[str, Module] = {}
+builtin_modules : Dict[str, Module] = {}
+
+def find_module(name):
+    if name in modules:
+        return modules[name]
+    return builtin_modules[name]
 
 def led(self, left):
     if token.category != Token.Category.NAME:
@@ -1091,7 +1101,7 @@ def led(self, left):
     # Process module [transpile it if necessary and load it]
     global scope
     module_name = left.to_str()
-    if module_name not in modules:
+    if module_name not in modules and module_name not in builtin_modules:
         module_file_name = os.path.dirname(file_name) + '/' + module_name
         try:
             modulefstat = os.stat(module_file_name + '.11l')
@@ -1110,16 +1120,14 @@ def led(self, left):
             prev_scope = scope
             open(module_file_name + '.hpp', 'w', encoding = 'utf-8-sig', newline = "\n").write('namespace ' + module_name + "\n{\n" # utf-8-sig is for MSVC (fix of error C2015: too many characters in constant [`u'‘'`]) # ’
                 + parse_and_to_str(tokenizer.tokenize(module_source), module_source, module_file_name + '.11l', True) + "}\n")
-            modules[module_name] = Module()
-            modules[module_name].scope = scope
+            modules[module_name] = Module(scope)
             assert(scope.is_function == False) # serializing `is_function` member variable is not necessary because it is always equal to `False`
             open(module_file_name + '.11l_global_scope', 'w', encoding = 'utf-8', newline = "\n").write(thindf.to_thindf(scope.serialize_to_dict()))
             scope = prev_scope
         else:
             module_scope = Scope(None)
             module_scope.deserialize_from_dict(thindf.parse(open(module_file_name + '.11l_global_scope', encoding = 'utf-8-sig').read()))
-            modules[module_name] = Module()
-            modules[module_name].scope = module_scope
+            modules[module_name] = Module(module_scope)
 
     self.append_child(left)
     self.append_child(tokensn)
@@ -1593,6 +1601,10 @@ builtins_scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code
 builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('mode', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘r’').to_str(), 'String'), ('encoding', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘utf-8’').to_str(), 'String'), ('newline', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘’').to_str(), 'String')])]))
 for type_ in cpp_type_from_11l:
     builtins_scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', '', '')])]))
+
+module_scope = Scope(None)
+module_scope.add_function('get_temp_dir', ASTFunctionDefinition([]))
+builtin_modules['fs'] = Module(module_scope)
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
     if len(tokens_) == 0: return ASTProgram()
