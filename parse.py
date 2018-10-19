@@ -186,7 +186,7 @@ class SymbolNode:
                         break
                     ast_parent = ast_parent.parent
                 return 'Lindex'
-            return self.token_str().lstrip('@')
+            return self.token_str().lstrip('@').replace(':', '::')
 
         if self.token.category == Token.Category.KEYWORD and self.token_str() in ('L.next', 'Ц.след', 'loop.next', 'цикл.след'):
             parent = self
@@ -271,7 +271,7 @@ class SymbolNode:
                     func_name = 'parse_int'
                 else:
                     if self.children[0].symbol.id == ':':
-                        fid = find_module(self.children[0].children[0].token_str()).scope.find(self.children[0].children[1].token_str())
+                        fid = find_module(self.children[0].children[0].to_str()).scope.find(self.children[0].children[1].token_str())
                     else:
                         fid = self.scope.find(func_name)
                     if fid == None:
@@ -1605,6 +1605,9 @@ for type_ in cpp_type_from_11l:
 module_scope = Scope(None)
 module_scope.add_function('get_temp_dir', ASTFunctionDefinition([]))
 builtin_modules['fs'] = Module(module_scope)
+module_scope = Scope(None)
+module_scope.add_function('join', ASTFunctionDefinition([('path1', '', 'String'), ('path2', '', 'String')]))
+builtin_modules['fs::path'] = Module(module_scope)
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
     if len(tokens_) == 0: return ASTProgram()

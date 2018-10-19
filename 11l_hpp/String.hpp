@@ -100,6 +100,13 @@ public:
 	template <int N> bool starts_with(const char16_t (&s)[N]) const {return starts_with(s, N-1);}
 	bool starts_with(const String &s) const {return starts_with(s.data(), s.len());}
 
+	bool ends_with(const char16_t *s, size_t sz) const
+	{
+		return len() >= (int)sz && memcmp(data() + len() - sz, s, sz*sizeof(char16_t)) == 0;
+	}
+	template <int N> bool ends_with(const char16_t (&s)[N]) const {return ends_with(s, N-1);}
+	bool ends_with(const String &s) const {return ends_with(s.data(), s.len());}
+
 	String replace(const String &old, const String &n) const
 	{
 		String str(*this);
