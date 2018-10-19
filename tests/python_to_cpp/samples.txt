@@ -448,3 +448,19 @@ template <typename T1, typename T2, typename T3, typename T4 = decltype(1)> auto
     }
     break_:
 }
+
+
+import tempfile
+
+print(tempfile.gettempdir())
+===
+//import tempfile
+print(fs:get_temp_dir())
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(fs::get_temp_dir());
+    }
+} code_block_1;
