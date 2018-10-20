@@ -46,4 +46,9 @@ public:
 	}
 #undef environ
 } environ;
+
+int _(const String &s)
+{
+	return _wsystem((wchar_t*)s.c_str());
+}
 }

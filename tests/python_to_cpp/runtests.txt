@@ -1,9 +1,10 @@
-import sys, pqmarkup
+import os, tempfile, sys, pqmarkup
 
 test_id = 0
 failed_tests = 0
+kdiff_showed = False
 def TEST(str1, str2, ohd = False, habrahabr_html = False):
-    global test_id, failed_tests
+    global test_id, failed_tests, kdiff_showed
     test_id += 1
     print("Test " + str(test_id) + " ...", end = '')
     str1 = pqmarkup.to_html(str1, ohd = ohd, habrahabr_html = habrahabr_html)
@@ -11,6 +12,16 @@ def TEST(str1, str2, ohd = False, habrahabr_html = False):
         str1 = str(str1)
         str2 = str(str2)
         print("FAILED!")
+        if not kdiff_showed:
+            for envvar in ['ProgramFiles', 'ProgramFiles(x86)', 'ProgramW6432']:
+                os.environ["PATH"] += os.pathsep + os.getenv(envvar, '') + r'\KDiff3'
+            command = 'kdiff3'
+            for file in [('wrong', str1), ('right', str2)]: # можно наоборот — [('right', str2), ('wrong', str1)], только цвет нужно оставить как при [('wrong', str1), ('right', str2)]
+                full_fname = os.path.join(tempfile.gettempdir(), file[0])
+                command += ' "' + full_fname + '"'
+                open(full_fname, 'w', encoding = 'utf-8-sig', newline = "\n").write(file[1])
+            os.system(command)
+            kdiff_showed = True
         failed_tests += 1
     else:
         print("passed")
@@ -335,9 +346,10 @@ else:
     print(str(test_id-failed_tests) + " tests passed and " + str(failed_tests) + " failed.")
     sys.exit(1)
 ===
-//import sys, pqmarkup
+//import os, tempfile, sys, pqmarkup
 A test_id = 0
 A failed_tests = 0
+A kdiff_showed = 0B
 F TEST(=str1, =str2, ohd = 0B, habrahabr_html = 0B)
    :test_id++
    print(‘Test ’String(test_id)‘ ...’, end' ‘’)
@@ -346,6 +358,16 @@ F TEST(=str1, =str2, ohd = 0B, habrahabr_html = 0B)
       str1 = String(str1)
       str2 = String(str2)
       print(‘FAILED!’)
+      I !:kdiff_showed
+         L(envvar) [‘ProgramFiles’, ‘ProgramFiles(x86)’, ‘ProgramW6432’]
+            os:environ[‘PATH’] += os:env_path_sep‘’os:getenv(envvar, ‘’)‘\KDiff3’
+         A command = ‘kdiff3’
+         L(file) [(‘wrong’, str1), (‘right’, str2)]
+            A full_fname = fs:path:join(fs:get_temp_dir(), file[0])
+            command ‘’= ‘ "’full_fname‘"’
+            File(full_fname, ‘w’, encoding' ‘utf-8-sig’, newline' "\n").write(file[1])
+         os:(command)
+         :kdiff_showed = 1B
       :failed_tests++
    E
       print(‘passed’)
@@ -620,6 +642,7 @@ E
 
 auto test_id = 0;
 auto failed_tests = 0;
+auto kdiff_showed = false;
 template <typename T1, typename T2, typename T3 = decltype(false), typename T4 = decltype(false)> auto TEST(T1 str1, T2 str2, const T3 &ohd = false, const T4 &habrahabr_html = false)
 {
     ::test_id++;
@@ -629,6 +652,18 @@ template <typename T1, typename T2, typename T3 = decltype(false), typename T4 =
         str1 = String(str1);
         str2 = String(str2);
         print(u"FAILED!"_S);
+        if (!::kdiff_showed) {
+            for (auto envvar : create_array({u"ProgramFiles"_S, u"ProgramFiles(x86)"_S, u"ProgramW6432"_S}))
+                os::environ[u"PATH"_S] += os::env_path_sep + os::getenv(envvar, u""_S) + uR"(\KDiff3)"_S;
+            auto command = u"kdiff3"_S;
+            for (auto file : create_array({make_tuple(u"wrong"_S, str1), make_tuple(u"right"_S, str2)})) {
+                auto full_fname = fs::path::join(fs::get_temp_dir(), _get<0>(file));
+                command += u" \""_S + full_fname + u"\""_S;
+                File(full_fname, u"w"_S, u"utf-8-sig"_S, u"\n"_S).write(_get<1>(file));
+            }
+            os::_(command);
+            ::kdiff_showed = true;
+        }
         ::failed_tests++;
     }
     else
