@@ -1588,9 +1588,12 @@ tokensn   = SymbolNode(token)
 file_name = ''
 importing_module = False
 
+def token_to_str(token_str_override, token_category = Token.Category.STRING_LITERAL):
+    return SymbolNode(Token(0, 0, token_category), token_str_override).to_str()
+
 builtins_scope = Scope(None)
-builtins_scope.add_function('print', ASTFunctionDefinition([('object', '', ''), ('end', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), R'"\n"').to_str(), 'String'), ('flush', SymbolNode(Token(0, 0, Token.Category.CONSTANT), '0B').to_str())]))
-builtins_scope.add_function('assert', ASTFunctionDefinition([('expression', '', 'Bool'), ('message', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘’').to_str(), 'String')]))
+builtins_scope.add_function('print', ASTFunctionDefinition([('object', '', ''), ('end', token_to_str(R'"\n"'), 'String'), ('flush', token_to_str('0B', Token.Category.CONSTANT))]))
+builtins_scope.add_function('assert', ASTFunctionDefinition([('expression', '', 'Bool'), ('message', token_to_str('‘’'), 'String')]))
 builtins_scope.add_function('exit', ASTFunctionDefinition([('arg', '', '')]))
 builtins_scope.add_function('zip', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', '')]))
 builtins_scope.add_function('sum', ASTFunctionDefinition([('iterable', '', '')]))
@@ -1598,7 +1601,7 @@ builtins_scope.add_function('min', ASTFunctionDefinition([('object1', '', ''), (
 builtins_scope.add_function('max', ASTFunctionDefinition([('object1', '', ''), ('object2', '', '')]))
 builtins_scope.add_function('hex', ASTFunctionDefinition([('object', '', '')]))
 builtins_scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', '')])]))
-builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('mode', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘r’').to_str(), 'String'), ('encoding', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘utf-8’').to_str(), 'String'), ('newline', SymbolNode(Token(0, 0, Token.Category.STRING_LITERAL), '‘’').to_str(), 'String')])]))
+builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('mode', token_to_str('‘r’'), 'String'), ('encoding', token_to_str('‘utf-8’'), 'String'), ('newline', token_to_str('‘’'), 'String')])]))
 for type_ in cpp_type_from_11l:
     builtins_scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', '', '')])]))
 
@@ -1609,6 +1612,7 @@ module_scope = Scope(None)
 module_scope.add_function('join', ASTFunctionDefinition([('path1', '', 'String'), ('path2', '', 'String')]))
 builtin_modules['fs::path'] = Module(module_scope)
 module_scope = Scope(None)
+module_scope.add_function('getenv', ASTFunctionDefinition([('name', '', 'String'), ('default', token_to_str('‘’'), 'String')]))
 builtin_modules['os'] = Module(module_scope)
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
