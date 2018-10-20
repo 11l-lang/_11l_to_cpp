@@ -449,7 +449,8 @@ class SymbolNode:
                     return cts0.lstrip('@') + '->' + c1
                 return char_if_len_1(self.children[0]) + '.' + c1 + '()'*(c1 in ('len', 'last', 'empty')) # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
             elif self.symbol.id == ':':
-                return self.children[0].to_str() + '::' + self.children[1].to_str()
+                c1 = self.children[1].to_str()
+                return self.children[0].to_str() + '::' + (c1 if c1 != '' else '_')
             elif self.symbol.id == '->':
                 captured_variables = set()
                 def gather_captured_variables(sn):
@@ -1095,7 +1096,7 @@ def find_module(name):
     return builtin_modules[name]
 
 def led(self, left):
-    if token.category != Token.Category.NAME:
+    if token.category != Token.Category.NAME and token.value(source) != '(': # )
         raise Error('expected an identifier name', token)
 
     # Process module [transpile it if necessary and load it]
@@ -1130,8 +1131,11 @@ def led(self, left):
             modules[module_name] = Module(module_scope)
 
     self.append_child(left)
-    self.append_child(tokensn)
-    next_token()
+    if token.value(source) != '(': # )
+        self.append_child(tokensn)
+        next_token()
+    else:
+        self.append_child(SymbolNode(Token(token.start, token.start, Token.Category.NAME)))
     return self
 symbol(':').led = led
 
@@ -1612,6 +1616,7 @@ module_scope = Scope(None)
 module_scope.add_function('join', ASTFunctionDefinition([('path1', '', 'String'), ('path2', '', 'String')]))
 builtin_modules['fs::path'] = Module(module_scope)
 module_scope = Scope(None)
+module_scope.add_function('', ASTFunctionDefinition([('command', '', 'String')]))
 module_scope.add_function('getenv', ASTFunctionDefinition([('name', '', 'String'), ('default', token_to_str('‘’'), 'String')]))
 builtin_modules['os'] = Module(module_scope)
 
