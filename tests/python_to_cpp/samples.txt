@@ -452,15 +452,15 @@ template <typename T1, typename T2, typename T3, typename T4 = decltype(1)> auto
 
 import os, tempfile
 
-print(os.path.join(tempfile.gettempdir(), 'right'))
+print(os.pathsep + os.path.join(tempfile.gettempdir(), 'right'))
 ===
 //import os, tempfile
-print(fs:path:join(fs:get_temp_dir(), ‘right’))
+print(os:env_path_sep‘’fs:path:join(fs:get_temp_dir(), ‘right’))
 ===
 struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(fs::path::join(fs::get_temp_dir(), u"right"_S));
+        print(os::env_path_sep + fs::path::join(fs::get_temp_dir(), u"right"_S));
     }
 } code_block_1;

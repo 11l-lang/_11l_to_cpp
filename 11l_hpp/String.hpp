@@ -272,6 +272,7 @@ public:
 
 	String operator+(int i) {return *this + String(i);}
 	friend String operator+(int i, const String &s) {return String(i) + s;}
+	friend String operator+(Char c, const String &s) {return String(c) + s;}
 };
 
 String operator+(Char ch1, Char ch2)
