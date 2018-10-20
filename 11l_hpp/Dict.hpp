@@ -77,3 +77,8 @@ template <typename KeyType, typename ValueType> Dict<KeyType, ValueType> create_
 {
 	return Dict<KeyType, ValueType>(std::move(di));
 }
+
+template <typename KeyType, typename ValueType> inline bool in(const KeyType &key, const Dict<KeyType, ValueType> &dict)
+{
+	return dict.find(key) != dict.end();
+}

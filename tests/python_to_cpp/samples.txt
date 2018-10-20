@@ -177,12 +177,14 @@ auto f()
 def f():
     dict : Dict[str, int] = {}
     dict['key'] = 1
+    assert('key' in dict)
     arr : List[int] = []
     arr += [10]
 ===
 F f()
    Dict[String, Int] dict
    dict[‘key’] = 1
+   assert(‘key’ C dict)
    Array[Int] arr
    arr [+]= 10
 ===
@@ -190,6 +192,7 @@ auto f()
 {
     Dict<String, int> dict;
     dict.set(u"key"_S, 1);
+    assert(in(u"key"_S, dict));
     Array<int> arr;
     arr.append(10);
 }
