@@ -1608,6 +1608,8 @@ builtin_modules['fs'] = Module(module_scope)
 module_scope = Scope(None)
 module_scope.add_function('join', ASTFunctionDefinition([('path1', '', 'String'), ('path2', '', 'String')]))
 builtin_modules['fs::path'] = Module(module_scope)
+module_scope = Scope(None)
+builtin_modules['os'] = Module(module_scope)
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
     if len(tokens_) == 0: return ASTProgram()

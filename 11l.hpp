@@ -57,6 +57,7 @@ inline void assert_file_line(const char *file_name, int line, bool expression, c
 
 #include "11l_hpp/File.hpp"
 #include "11l_hpp/fs.hpp"
+#include "11l_hpp/os.hpp"
 
 inline void print(const String &s, const String &end = u"\n", bool flush = false)
 {
