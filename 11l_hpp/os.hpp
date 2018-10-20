@@ -20,4 +20,30 @@ String getenv(const String &name, const String &def = String())
 	r.resize(return_value - 1);
 	return r;
 }
+
+void setenv(const String &name, const String &value)
+{
+	_wputenv_s((wchar_t*)name.c_str(), (wchar_t*)value.c_str());
+}
+
+class Environ
+{
+public:
+	class Var
+	{
+		String name;
+	public:
+		Var(const String &name) : name(name) {}
+		void operator+=(const String &s)
+		{
+			setenv(name, getenv(name) + s);
+		}
+	};
+
+	Var operator[](const String &name) const
+	{
+		return Var(name);
+	}
+#undef environ
+} environ;
 }
