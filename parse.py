@@ -1611,6 +1611,7 @@ for type_ in cpp_type_from_11l:
 
 module_scope = Scope(None)
 module_scope.add_function('get_temp_dir', ASTFunctionDefinition([]))
+module_scope.add_function('list_dir', ASTFunctionDefinition([('path', token_to_str('‘.’'), 'String')]))
 builtin_modules['fs'] = Module(module_scope)
 module_scope = Scope(None)
 module_scope.add_function('join', ASTFunctionDefinition([('path1', '', 'String'), ('path2', '', 'String')]))

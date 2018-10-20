@@ -42,6 +42,7 @@ class String : public std::u16string
 public:
 	String() {}
 	String(Char c) : basic_string(1, c.code) {}
+	String(std::u16string &&s) : std::u16string(s) {}
 	explicit String(char16_t c) : basic_string(1, c) {}
 	explicit String(int num)
 	{
