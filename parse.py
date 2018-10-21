@@ -617,15 +617,15 @@ cpp_type_from_11l = {'A':'auto', 'А':'auto', 'var':'auto', 'перем':'auto',
                      'Array[String]':'Array<String>', 'Array[Array[String]]':'Array<Array<String>>'}
 
 class ASTVariableDeclaration(ASTNode):
-    var : str
+    vars : List[str]
     type : str
     type_args : List[str]
     function_pointer : bool = False
 
     def to_str(self, indent):
         if self.function_pointer:
-            return ' ' * (indent*4) + 'std::function<' + cpp_type_from_11l[self.type] + '(' + ', '.join(cpp_type_from_11l[ty] for ty in self.type_args) + ')> ' + self.var + ";\n"
-        return ' ' * (indent*4) + cpp_type_from_11l[self.type] + ('<' + ', '.join(cpp_type_from_11l[ty] for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + self.var + ";\n"
+            return ' ' * (indent*4) + 'std::function<' + cpp_type_from_11l[self.type] + '(' + ', '.join(cpp_type_from_11l[ty] for ty in self.type_args) + ')> ' + ', '.join(self.vars) + ";\n"
+        return ' ' * (indent*4) + cpp_type_from_11l[self.type] + ('<' + ', '.join(cpp_type_from_11l[ty] for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + ', '.join(self.vars) + ";\n"
 
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
     def to_str(self, indent):
@@ -1537,9 +1537,12 @@ def parse_internal(this_node):
                         next_token()
                         node = ASTVariableInitialization()
                         node.set_expression(expression())
+                        node.vars = [var_name]
                     else:
                         node = ASTVariableDeclaration()
-                    node.var = var_name
+                        node.vars = [var_name]
+                        while token.value(source) == ',':
+                            node.vars.append(expected_name('variable name'))
                     node.type = node_expression.token.value(source)
                     node.type_args = []
                     if node.type == '[': # ]
@@ -1569,7 +1572,8 @@ def parse_internal(this_node):
                                 node.type_args.append(child.children[0].token_str())
                                 node.type = child.children[1].token_str() # return value is the last
                     assert(node.type[0].isupper() or node.type in ('var', 'перем')) # type name must starts with an upper case letter
-                    scope.add_name(node.var, node)
+                    for var in node.vars:
+                        scope.add_name(var, node)
                 else:
                     node = ASTExpression()
                     node.set_expression(node_expression)
