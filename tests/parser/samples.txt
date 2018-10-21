@@ -606,3 +606,8 @@ auto f()
             print(u", "_S, u""_S);
     }}
 }
+
+
+[String] dirs, files
+===
+Array<String> dirs, files;
