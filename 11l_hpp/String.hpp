@@ -28,8 +28,10 @@ public:
 	bool operator==(char16_t c) const {return code == c;}
 	bool operator!=(char16_t c) const {return code != c;}
 
-	Char   lower() const {return towlower(code);}
-	bool islower() const {return iswlower(code);}
+	Char    lowercase() const {return towlower(code);}
+	bool is_lowercase() const {return iswlower(code);}
+	Char    uppercase() const {return towupper(code);}
+	bool is_uppercase() const {return iswupper(code);}
 };
 
 class String : public std::u16string
@@ -185,7 +187,16 @@ public:
 		return true;
 	}
 
-	String upper() const
+	String lowercase() const
+	{
+		String r;
+		r.resize(len());
+		for (int i=0; i<len(); i++)
+			r[i] = towlower(at(i));
+		return r;
+	}
+
+	String uppercase() const
 	{
 		String r;
 		r.resize(len());
