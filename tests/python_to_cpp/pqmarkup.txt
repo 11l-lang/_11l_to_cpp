@@ -1440,13 +1440,13 @@ T Converter
                   I str_in_b[0.<1] == ‘#’
                      A new_str_in_b = ‘’
                      L(c) str_in_b
-                        A cc = (S c.lower() {‘а’ {‘A’}; ‘б’ {‘B’}; ‘с’ {‘C’}; ‘д’ {‘D’}; ‘е’ {‘E’}; ‘ф’ {‘F’} E c})[0]
-                        new_str_in_b ‘’= I c.islower() {cc.lower()} E cc
+                        A cc = (S c.lowercase() {‘а’ {‘A’}; ‘б’ {‘B’}; ‘с’ {‘C’}; ‘д’ {‘D’}; ‘е’ {‘E’}; ‘ф’ {‘F’} E c})[0]
+                        new_str_in_b ‘’= I c.is_lowercase() {cc.lowercase()} E cc
                      str_in_b = new_str_in_b
                   E I str_in_b.len C (1, 3) & str_in_b.isdigit()
                      A new_str = ‘#’
                      L(ii) I str_in_b.len == 3 {[0, 1, 2]} E [0, 0, 0]
-                        new_str ‘’= hex((Int(str_in_b[ii]) * 00'FF + 4) I/ 8)[2..].upper().zfill(2)
+                        new_str ‘’= hex((Int(str_in_b[ii]) * 00'FF + 4) I/ 8)[2..].uppercase().zfill(2)
                      str_in_b = new_str
                   I .habrahabr_html
                      outfile.write(‘<font color="’str_in_b‘">’)
@@ -2417,15 +2417,15 @@ public:
                         if (str_in_b[range_el(0, 1)] == u'#') {
                             auto new_str_in_b = u""_S;
                             for (auto c : str_in_b) {
-                                auto cc = _get<0>(([&](const auto &a){return a == u'а' ? u"A"_S : a == u'б' ? u"B"_S : a == u'с' ? u"C"_S : a == u'д' ? u"D"_S : a == u'е' ? u"E"_S : a == u'ф' ? u"F"_S : c;}(c.lower())));
-                                new_str_in_b += c.islower() ? cc.lower() : cc;
+                                auto cc = _get<0>(([&](const auto &a){return a == u'а' ? u"A"_S : a == u'б' ? u"B"_S : a == u'с' ? u"C"_S : a == u'д' ? u"D"_S : a == u'е' ? u"E"_S : a == u'ф' ? u"F"_S : c;}(c.lowercase())));
+                                new_str_in_b += c.is_lowercase() ? cc.lowercase() : cc;
                             }
                             str_in_b = new_str_in_b;
                         }
                         else if (in(str_in_b.len(), make_tuple(1, 3)) && str_in_b.isdigit()) {
                             auto new_str = u"#"_S;
                             for (auto ii : str_in_b.len() == 3 ? create_array({0, 1, 2}) : create_array({0, 0, 0}))
-                                new_str += hex(int((parse_int(str_in_b[ii]) * 0x00'FF + 4))/int(8))[range_ei(2)].upper().zfill(2);
+                                new_str += hex(int((parse_int(str_in_b[ii]) * 0x00'FF + 4))/int(8))[range_ei(2)].uppercase().zfill(2);
                             str_in_b = new_str;
                         }
                         if (habrahabr_html) {
