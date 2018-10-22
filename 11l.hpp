@@ -15,7 +15,10 @@ template <typename Ty> class Nullable
 	Ty value;
 public:
 	Nullable() : has_value(false) {}
+	Nullable(nullptr_t) : has_value(false) {}
 	Nullable(const Ty &value) : has_value(true), value(value) {}
+//	Nullable(const Nullable &n) : has_value(n.has_value), value(n.value) {}
+//	template <typename Type> Nullable(Type &&value) : has_value(true), value(value) {} // for `Nullable<std::function<...>>`
 
 	bool operator==(nullptr_t) const {return !has_value;}
 	bool operator!=(nullptr_t) const {return  has_value;}
@@ -120,5 +123,6 @@ template <typename T1, typename T2> Array<Tuple<T1, T2>> zip(const Array<T1> &ar
 inline void exit(const String &msg)
 {
 	_stderr.write(msg);
+	_stderr.write(u"\n");
 	exit(1);
 }

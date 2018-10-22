@@ -61,7 +61,7 @@ public:
         class Writer
         {
         public:
-            std::function<void(String)> write;
+            std::function<void(const String&)> write;
         };
         auto outfile = Writer();
         if (outfilef == nullptr)

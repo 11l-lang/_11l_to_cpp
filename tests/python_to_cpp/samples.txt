@@ -324,7 +324,7 @@ assert(f(‘s’, 2) == ‘ss’)
 ===
 int main()
 {
-    std::function<String(String, int)> f;
+    std::function<String(const String&, const int)> f;
     auto ff = [](const auto &s, const auto &i)
     {
         return s * i;
@@ -482,3 +482,63 @@ struct CodeBlock1
         os::_(u"pause"_S);
     }
 } code_block_1;
+
+
+import os
+
+def process_files(exclude_dir):
+    for root, dirs, files in os.walk('.'):
+        dirs[:] = [d for d in dirs if d[0] != '.' and d != exclude_dir] # exclude hidden folders (e.g. `.hg`)
+        for name in files:
+            print(os.path.join(root, name))
+
+def process_files2():
+    for root, dirs, files in os.walk('.'):
+        for name in files:
+            print(os.path.join(root, name))
+===
+//import os
+
+F process_files(exclude_dir)
+   L(_fname) fs:walk(‘.’, dir_filter' d -> d[0] != ‘.’ & d != @exclude_dir, files_only' 0B)
+      A root = fs:path:dir_name(_fname)
+      [String] dirs, files
+      I fs:is_directory(_fname) {dirs [+]= fs:path:base_name(_fname)} E files [+]= fs:path:base_name(_fname)
+      L(name) files
+         print(fs:path:join(root, name))
+
+F process_files2()
+   L(_fname) fs:walk(‘.’, files_only' 0B)
+      A root = fs:path:dir_name(_fname)
+      [String] dirs, files
+      I fs:is_directory(_fname) {dirs [+]= fs:path:base_name(_fname)} E files [+]= fs:path:base_name(_fname)
+      L(name) files
+         print(fs:path:join(root, name))
+===
+template <typename T1> auto process_files(const T1 &exclude_dir)
+{
+    for (auto _fname : fs::walk(u"."_S, [&exclude_dir](const auto &d){return _get<0>(d) != u'.' && d != exclude_dir;}, false)) {
+        auto root = fs::path::dir_name(_fname);
+        Array<String> dirs, files;
+        if (fs::is_directory(_fname))
+            dirs.append(fs::path::base_name(_fname));
+        else
+            files.append(fs::path::base_name(_fname));
+        for (auto name : files)
+            print(fs::path::join(root, name));
+    }
+}
+
+auto process_files2()
+{
+    for (auto _fname : fs::walk(u"."_S, nullptr, false)) {
+        auto root = fs::path::dir_name(_fname);
+        Array<String> dirs, files;
+        if (fs::is_directory(_fname))
+            dirs.append(fs::path::base_name(_fname));
+        else
+            files.append(fs::path::base_name(_fname));
+        for (auto name : files)
+            print(fs::path::join(root, name));
+    }
+}
