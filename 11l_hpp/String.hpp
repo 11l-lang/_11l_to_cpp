@@ -102,6 +102,18 @@ public:
 	}
 	template <int N> bool starts_with(const char16_t (&s)[N]) const {return starts_with(s, N-1);}
 	bool starts_with(const String &s) const {return starts_with(s.data(), s.len());}
+	template <typename Type> bool starts_with(const Tuple<Type, Type> &tuple)
+	{
+		return starts_with(_get<0>(tuple)) || starts_with(_get<1>(tuple));
+	}
+	template <typename Type> bool starts_with(const Tuple<Type, Type, Type> &tuple)
+	{
+		return starts_with(_get<0>(tuple)) || starts_with(_get<1>(tuple)) || starts_with(_get<2>(tuple));
+	}
+	template <typename Type> bool starts_with(const Tuple<Type, Type, Type, Type> &tuple)
+	{
+		return starts_with(_get<0>(tuple)) || starts_with(_get<1>(tuple)) || starts_with(_get<2>(tuple)) || starts_with(_get<3>(tuple));
+	}
 
 	bool ends_with(const char16_t *s, size_t sz) const
 	{
@@ -109,6 +121,18 @@ public:
 	}
 	template <int N> bool ends_with(const char16_t (&s)[N]) const {return ends_with(s, N-1);}
 	bool ends_with(const String &s) const {return ends_with(s.data(), s.len());}
+	template <typename Type> bool ends_with(const Tuple<Type, Type> &tuple)
+	{
+		return ends_with(_get<0>(tuple)) || ends_with(_get<1>(tuple));
+	}
+	template <typename Type> bool ends_with(const Tuple<Type, Type, Type> &tuple)
+	{
+		return ends_with(_get<0>(tuple)) || ends_with(_get<1>(tuple)) || ends_with(_get<2>(tuple));
+	}
+	template <typename Type> bool ends_with(const Tuple<Type, Type, Type, Type> &tuple)
+	{
+		return ends_with(_get<0>(tuple)) || ends_with(_get<1>(tuple)) || ends_with(_get<2>(tuple)) || ends_with(_get<3>(tuple));
+	}
 
 	String replace(const String &old, const String &n) const
 	{
@@ -129,9 +153,9 @@ public:
 		return Nullable<int>();
 	}
 	
-	Nullable<int> find(const String &s) const
+	Nullable<int> find(const String &s, int start = 0) const
 	{
-		size_t r = basic_string::find(s);
+		size_t r = basic_string::find(s, start);
 		return r == npos ? Nullable<int>() : Nullable<int>(r);
 	}
 

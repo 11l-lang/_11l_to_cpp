@@ -319,6 +319,18 @@ except pqmarkup.Exception as e:
         failed_tests += 1
 assert(was_error)
 
+# Check for presence of TAB and CR characters in source files and forbid them
+test_id += 1
+print("Test " + str(test_id) + ". Checking source files for unallowed characters...")
+for root, dirs, files in os.walk('.'):
+    dirs[:] = [d for d in dirs if d[0] != '.'] # exclude hidden folders (e.g. `.hg`)
+    for name in files:
+        if name.endswith(".py") or name.endswith(".txt"):
+            filestr = open(os.path.join(root, name), encoding = 'utf8', newline = '').read()
+            if "\r" in filestr or "\t" in filestr:
+                print(R"Unallowed character (\r or \t) found in file " + os.path.join(root, name)[2:])
+                failed_tests += 1
+
 # Unfortunately addition of this line:
 # precommit.check_docs.en = python pqmarkup.py docs/en/syntax.pq.txt > nul
 # to [hooks] section in hgrc is not working, so perform this check here.
@@ -621,6 +633,18 @@ X.catch pqmarkup:Exception e
       print(‘FAILED!’)
       failed_tests++
 assert(was_error)
+test_id++
+print(‘Test ’String(test_id)‘. Checking source files for unallowed characters...’)
+L(_fname) fs:walk(‘.’, dir_filter' d -> d[0] != ‘.’, files_only' 0B)
+   A root = fs:path:dir_name(_fname)
+   [String] dirs, files
+   I fs:is_directory(_fname) {dirs [+]= fs:path:base_name(_fname)} E files [+]= fs:path:base_name(_fname)
+   L(name) files
+      I name.ends_with(‘.py’) | name.ends_with(‘.txt’)
+         A filestr = File(fs:path:join(root, name), encoding' ‘utf8’, newline' ‘’).read()
+         I "\r" C filestr | "\t" C filestr
+            print(‘Unallowed character (\r or \t) found in file ’fs:path:join(root, name)[2..])
+            failed_tests++
 
 F check_file(fname)
    X.try
@@ -936,6 +960,24 @@ struct CodeBlock2
             }
         }
         assert(was_error);
+        test_id++;
+        print(u"Test "_S + String(test_id) + u". Checking source files for unallowed characters..."_S);
+        for (auto _fname : fs::walk(u"."_S, [](const auto &d){return _get<0>(d) != u'.';}, false)) {
+            auto root = fs::path::dir_name(_fname);
+            Array<String> dirs, files;
+            if (fs::is_directory(_fname))
+                dirs.append(fs::path::base_name(_fname));
+            else
+                files.append(fs::path::base_name(_fname));
+            for (auto name : files)
+                if (name.ends_with(u".py"_S) || name.ends_with(u".txt"_S)) {
+                    auto filestr = File(fs::path::join(root, name), u"r"_S, u"utf8"_S, u""_S).read();
+                    if (in(u'\r'_C, filestr) || in(u'\t'_C, filestr)) {
+                        print(uR"(Unallowed character (\r or \t) found in file )"_S + fs::path::join(root, name)[range_ei(2)]);
+                        failed_tests++;
+                    }
+                }
+        }
     }
 } code_block_2;
 
