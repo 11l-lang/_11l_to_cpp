@@ -235,7 +235,7 @@ class SymbolNode:
             return 'u"' + repr(s)[1:-1].replace('"', R'\"').replace(R"\'", "'") + '"_S'
 
         if self.token.category == Token.Category.CONSTANT:
-            return {'N': 'nullptr', 'Н': 'nullptr', '0B': 'false', '0В': 'false', '1B': 'true', '1В': 'true'}[self.token_str()]
+            return {'N': 'nullptr', 'Н': 'nullptr', 'null': 'nullptr', 'нуль': 'nullptr', '0B': 'false', '0В': 'false', '1B': 'true', '1В': 'true'}[self.token_str()]
 
         def is_char(child):
             ts = child.token_str()
@@ -624,7 +624,7 @@ class ASTVariableDeclaration(ASTNode):
 
     def to_str(self, indent):
         if self.function_pointer:
-            return ' ' * (indent*4) + 'std::function<' + cpp_type_from_11l[self.type] + '(' + ', '.join(cpp_type_from_11l[ty] for ty in self.type_args) + ')> ' + ', '.join(self.vars) + ";\n"
+            return ' ' * (indent*4) + 'std::function<' + cpp_type_from_11l[self.type] + '(' + ', '.join('const ' + cpp_type_from_11l[ty] + ('&'*(ty not in ('Int',))) for ty in self.type_args) + ')> ' + ', '.join(self.vars) + ";\n"
         return ' ' * (indent*4) + cpp_type_from_11l[self.type] + ('<' + ', '.join(cpp_type_from_11l[ty] for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + ', '.join(self.vars) + ";\n"
 
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
@@ -1411,7 +1411,17 @@ def parse_internal(this_node):
                         n.else_or_elif = ASTElse()
                         n.else_or_elif.parent = n
                         next_token()
-                        new_scope(n.else_or_elif)
+                        if token.category == Token.Category.SCOPE_BEGIN:
+                            new_scope(n.else_or_elif)
+                        else: # for support `I fs:is_directory(_fname) {...} E ...` (without this `else` only `I fs:is_directory(_fname) {...} E {...}` is allowed)
+                            expr_node = ASTExpression()
+                            expr_node.set_expression(expression())
+                            expr_node.parent = n.else_or_elif
+                            n.else_or_elif.children.append(expr_node)
+                            if not (token == None or token.category in (Token.Category.STATEMENT_SEPARATOR, Token.Category.SCOPE_END)):
+                                raise Error('expected end of statement', token)
+                            if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
+                                next_token()
                         break
 
             elif token.value(source) in ('S', 'В', 'switch', 'выбрать'):
@@ -1616,9 +1626,13 @@ for type_ in cpp_type_from_11l:
 module_scope = Scope(None)
 module_scope.add_function('get_temp_dir', ASTFunctionDefinition([]))
 module_scope.add_function('list_dir', ASTFunctionDefinition([('path', token_to_str('‘.’'), 'String')]))
+module_scope.add_function('walk', ASTFunctionDefinition([('path', token_to_str('‘.’'), 'String'), ('dir_filter', token_to_str('N', Token.Category.CONSTANT), '(String -> Bool)?'), ('files_only', token_to_str('1B', Token.Category.CONSTANT), 'Bool')]))
+module_scope.add_function('is_directory', ASTFunctionDefinition([('path', '', 'String')]))
 builtin_modules['fs'] = Module(module_scope)
 module_scope = Scope(None)
 module_scope.add_function('join', ASTFunctionDefinition([('path1', '', 'String'), ('path2', '', 'String')]))
+module_scope.add_function('base_name', ASTFunctionDefinition([('path', '', 'String')]))
+module_scope.add_function('dir_name', ASTFunctionDefinition([('path', '', 'String')]))
 builtin_modules['fs::path'] = Module(module_scope)
 module_scope = Scope(None)
 module_scope.add_function('', ASTFunctionDefinition([('command', '', 'String')]))
