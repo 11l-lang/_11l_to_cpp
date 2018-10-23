@@ -35,6 +35,7 @@ public:
 	IndexError(int index) : index(index) {}
 };
 
+#include "11l_hpp/funcs.hpp"
 #include "11l_hpp/Range.hpp"
 #include "11l_hpp/String.hpp"
 #include "11l_hpp/Array.hpp"
