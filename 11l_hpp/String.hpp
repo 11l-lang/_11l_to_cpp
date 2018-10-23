@@ -67,6 +67,8 @@ public:
 			*end=staticBuffer+len-1; start<end; start++, end--) std::swap(*start, *end);
 		assign(staticBuffer, len);
 	}
+	explicit String(float  num) : basic_string((char16_t*)std::to_wstring(num).c_str()) {}
+	explicit String(double num) : basic_string((char16_t*)std::to_wstring(num).c_str()) {}
 	explicit String(const char16_t *&s) : basic_string(s) {} // reference is needed here because otherwise String(const char16_t (&s)[N]) is never called (`String(u"str")` calls `String(const char16_t *s)`)
 	String(const char16_t *s, size_t sz) : basic_string(s, sz) {}
 	template <int N> String(const char16_t (&s)[N]): basic_string(s, N-1) {}
@@ -330,12 +332,29 @@ inline int parse_int(const String &str)
 {
 	int res = 0, sign = 1;
 	const char16_t *s = str.c_str();
-	while (*s && (*s == u' ' || *s == u'\t')) s++;//skip whitespace
+	while (*s && (*s == u' ' || *s == u'\t')) s++; // skip whitespace
 	if (*s == u'-') sign=-1, s++; else if (*s == u'+') s++;
 	for (; Char(*s).isdigit(); s++)
 		res = res * 10 + (*s - u'0');
 	return res * sign;
 }
+
+inline double parse_float(const char16_t *s)
+{
+	double res = 0, f = 1, sign = 1;
+	while (*s && (*s == u' ' || *s == u'\t')) s++; // skip whitespace
+	// Sign
+	if (*s == u'-') sign=-1, s++; else if (*s == u'+') s++;
+	// Integer part
+	for (; Char(*s).isdigit(); s++) // check for '\0' is not needed because it is included in `isdigit()`
+		res = res * 10 + (*s - u'0');
+	// Fractional part
+	if (*s == '.')
+		for (s++; Char(*s).isdigit(); s++)
+			res += (f *= 0.1) * (*s - u'0');
+	return res * sign;
+}
+inline double parse_float(const String &s) {return parse_float(s.c_str());}
 
 inline bool in(Char c, const String &s) {return s.find(c) != nullptr;}
 
