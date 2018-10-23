@@ -44,7 +44,7 @@ class String : public std::u16string
 public:
 	String() {}
 	String(Char c) : basic_string(1, c.code) {}
-	String(std::u16string &&s) : std::u16string(s) {}
+	String(std::u16string &&s) : std::u16string(std::forward<std::u16string>(s)) {}
 	explicit String(char16_t c) : basic_string(1, c) {}
 	explicit String(int num)
 	{
@@ -159,6 +159,15 @@ public:
 	{
 		size_t r = basic_string::find(s, start);
 		return r == npos ? Nullable<int>() : Nullable<int>(r);
+	}
+
+	Nullable<int> find(const Tuple<String, String> &t, int start = 0) const
+	{
+		for (int i = start, l = len() - min(std::get<0>(t).len(), std::get<1>(t).len()); i <= l; i++) {
+			if (i <= len() - std::get<0>(t).len() && memcmp(c_str() + i, std::get<0>(t).c_str(), std::get<0>(t).len() * sizeof(char16_t)) == 0) return i;
+			if (i <= len() - std::get<1>(t).len() && memcmp(c_str() + i, std::get<1>(t).c_str(), std::get<1>(t).len() * sizeof(char16_t)) == 0) return i;
+		}
+		return nullptr;
 	}
 
 	int findi(Char c, int start = 0) const
