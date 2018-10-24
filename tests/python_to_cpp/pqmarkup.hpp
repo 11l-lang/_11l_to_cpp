@@ -228,7 +228,7 @@ public:
                         i = j;
                         break;
                     }
-                    if (!instr[j].isdigit())
+                    if (!instr[j].is_digit())
                         break;
                     j++;
                 }
@@ -253,7 +253,7 @@ public:
         auto endi = 0;
         auto numbered_link = [&endi, &exit_with_error, &i, &instr, &link, &next_char, &nonunique_links](const decltype(1) offset = 1)
         {
-            if (next_char(offset) == u'-' && next_char(offset + 1).isdigit()) {
+            if (next_char(offset) == u'-' && next_char(offset + 1).is_digit()) {
                 auto j = i + offset + 1;
                 while (j < instr.len()) {
                     if (instr[j] == u']') {
@@ -268,7 +268,7 @@ public:
                         endi = j;
                         return true;
                     }
-                    if (!instr[j].isdigit())
+                    if (!instr[j].is_digit())
                         break;
                     j++;
                 }
@@ -319,10 +319,10 @@ public:
                 }
                 else {
                     close_unordered_list();
-                    if (ch.isdigit()) {
+                    if (ch.is_digit()) {
                         auto j = i + 1;
                         while (j < instr.len()) {
-                            if (!instr[j].isdigit())
+                            if (!instr[j].is_digit())
                                 break;
                             j++;
                         }
@@ -715,7 +715,7 @@ public:
                             }
                             str_in_b = new_str_in_b;
                         }
-                        else if (in(str_in_b.len(), make_tuple(1, 3)) && str_in_b.isdigit()) {
+                        else if (in(str_in_b.len(), make_tuple(1, 3)) && str_in_b.is_digit()) {
                             auto new_str = u"#"_S;
                             for (auto ii : str_in_b.len() == 3 ? create_array({0, 1, 2}) : create_array({0, 0, 0}))
                                 new_str += hex(int((parse_int(str_in_b[ii]) * 0x00'FF + 4))/int(8))[range_ei(2)].uppercase().zfill(2);

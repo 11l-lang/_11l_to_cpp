@@ -16,7 +16,7 @@ public:
 
 	operator char16_t() const {return code;} // for `switch (instr[i])` support
 
-	bool isdigit() const {return in((int)code, range_ee((int)'0', (int)'9'));}
+	bool is_digit() const {return in((int)code, range_ee((int)'0', (int)'9'));}
 
 	bool operator< (Char c) const {return code <  c.code;}
 	bool operator<=(Char c) const {return code <= c.code;}
@@ -213,12 +213,12 @@ public:
 
 	Array<String> split(const String &delim);
 	
-	bool isdigit() const
+	bool is_digit() const
 	{
 		if (empty()) return false;
 		const char16_t *s = data();
 		for (int i=0, n=len(); i<n; i++)
-			if (!Char(s[i]).isdigit()) return false;
+			if (!Char(s[i]).is_digit()) return false;
 		return true;
 	}
 
@@ -343,7 +343,7 @@ inline int parse_int(const String &str)
 	const char16_t *s = str.c_str();
 	while (*s && (*s == u' ' || *s == u'\t')) s++; // skip whitespace
 	if (*s == u'-') sign=-1, s++; else if (*s == u'+') s++;
-	for (; Char(*s).isdigit(); s++)
+	for (; Char(*s).is_digit(); s++)
 		res = res * 10 + (*s - u'0');
 	return res * sign;
 }
@@ -355,11 +355,11 @@ inline double parse_float(const char16_t *s)
 	// Sign
 	if (*s == u'-') sign=-1, s++; else if (*s == u'+') s++;
 	// Integer part
-	for (; Char(*s).isdigit(); s++) // check for '\0' is not needed because it is included in `isdigit()`
+	for (; Char(*s).is_digit(); s++) // check for '\0' is not needed because it is included in `is_digit()`
 		res = res * 10 + (*s - u'0');
 	// Fractional part
 	if (*s == '.')
-		for (s++; Char(*s).isdigit(); s++)
+		for (s++; Char(*s).is_digit(); s++)
 			res += (f *= 0.1) * (*s - u'0');
 	return res * sign;
 }
