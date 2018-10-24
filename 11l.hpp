@@ -6,6 +6,12 @@ using std::max;
 template <typename...Types> using Tuple = std::tuple<Types...>;
 using std::make_tuple;
 
+//template <int n, typename Container> inline auto  _get(const Container &c) {return c[n];}
+//template <int n, typename Type>      inline Type &_get(Array<Type> &arr) {return arr[n];}
+template <int n, typename Container> inline auto _get(const Container &c) -> decltype(c[n]) {return c[n];}
+template <int n, typename Container> inline auto _get(      Container &c) -> decltype(c[n]) {return c[n];}
+template <int n, typename...Types> inline const auto &_get(const Tuple<Types...> &t) {return std::get<n>(t);}
+
 class NullPointerException
 {};
 
@@ -60,8 +66,8 @@ inline void assert_file_line(const char *file_name, int line, bool expression, c
 }
 
 #include "11l_hpp/File.hpp"
-#include "11l_hpp/fs.hpp"
 #include "11l_hpp/os.hpp"
+#include "11l_hpp/fs.hpp"
 
 inline void print(const String &s, const String &end = u"\n", bool flush = false)
 {
@@ -101,12 +107,6 @@ template <typename Ty> inline void print(const Array<Ty> &arr, const String &end
 		std::wcout.flush();
 }
 
-//template <int n, typename Container> inline auto  _get(const Container &c) {return c[n];}
-//template <int n, typename Type>      inline Type &_get(Array<Type> &arr) {return arr[n];}
-template <int n, typename Container> inline auto _get(const Container &c) -> decltype(c[n]) {return c[n];}
-template <int n, typename Container> inline auto _get(      Container &c) -> decltype(c[n]) {return c[n];}
-template <int n, typename...Types> inline const auto &_get(const Tuple<Types...> &t) {return std::get<n>(t);}
-
 // Note: solutions like this[https://gist.github.com/mortehu/373069390c75b02f98b655e3f7dbef9a <- google:‘zip vector c++’] can not handle temp arrays (array destructed after `zip(create_array(...)...)` call)
 template <typename T1, typename T2> Array<Tuple<T1, T2>> zip(const Array<T1> &arr1, const Array<T2> &arr2)
 {
@@ -118,8 +118,13 @@ template <typename T1, typename T2> Array<Tuple<T1, T2>> zip(const Array<T1> &ar
 	return r;
 }
 
+#ifdef _WIN32
 #define MAIN_WITH_ARGV() wmain(int argc, wchar_t *argv[])
 #define INIT_ARGV() for (int i=0; i<argc; i++) ::argv.append(String((char16_t*)argv[i], wcslen(argv[i])))
+#else
+#define MAIN_WITH_ARGV() main(int argc, char *argv[])
+#define INIT_ARGV() for (int i=0; i<argc; i++) ::argv.append(String(convert_utf8_to_utf16(argv[i])))
+#endif
 
 inline void exit(const String &msg)
 {

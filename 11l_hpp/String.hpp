@@ -1,4 +1,5 @@
-#include <string>
+﻿#include <string>
+#include <cstring> // for memcmp in GCC
 #include <cwctype>
 
 static class LocaleInitializer

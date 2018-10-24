@@ -1,6 +1,21 @@
 #include <cstdio>
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#else
+#include <codecvt>
+#include <locale>
+
+std::string convert_utf16_to_utf8(const std::u16string &u16)
+{
+    return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(u16);
+}
+
+std::u16string convert_utf8_to_utf16(const std::string &u8)
+{
+	return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes(u8);
+}
+#endif
 
 class File
 {
@@ -17,7 +32,11 @@ public:
 
 	File(const String &name, const String &mode = u"r"_S, const String &encoding = u"utf-8"_S, const String &newline = u""_S)
 	{
+#ifdef _WIN32
 		_wfopen_s(&file, (wchar_t*)name.c_str(), (wchar_t*)(mode + u'b').c_str());
+#else
+		file = fopen(convert_utf16_to_utf8(name).c_str(), convert_utf16_to_utf8(mode + u'b').c_str());
+#endif
 	}
 
 	File &operator=(File &&f)
@@ -31,8 +50,12 @@ public:
 	void write(const String &s)
 	{
 		std::string utf8;
+#ifdef _WIN32
 		utf8.resize(s.length() * 3);
 		utf8.resize(WideCharToMultiByte(CP_UTF8, 0, (LPCWCH)s.data(), s.length(), const_cast<char*>(utf8.data()), utf8.size(), NULL, NULL));
+#else
+		utf8 = convert_utf16_to_utf8(s);
+#endif
 		fwrite(utf8.data(), utf8.size(), 1, file);
 	}
 
@@ -52,11 +75,14 @@ public:
 		file_str.resize(file_size);
 		fread(const_cast<char*>(file_str.data()), file_size, 1, file);
 
+#ifdef _WIN32
 		String r;
 		r.resize(file_size);
 		r.resize(MultiByteToWideChar(CP_UTF8, 0, file_str.data(), file_str.size(), (LPWSTR)r.data(), r.size()));
-
 		return r;
+#else
+		return String(convert_utf8_to_utf16(file_str));
+#endif
 	}
 
 	void close()
