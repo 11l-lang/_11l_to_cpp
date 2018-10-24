@@ -15,13 +15,13 @@ template <typename Type> class Array : public std::vector<Type>
 	{
 		Array r;
 		for (int i = begin; i < end; i += step)
-			r.push_back(at(i));
+			r.push_back(std::vector<Type>::at(i));
 		return r;
 	}
 
 public:
 	Array() {}
-    Array(std::initializer_list<Type> il) : vector(il) {}
+    Array(std::initializer_list<Type> il) : std::vector<Type>(il) {}
 
 	template <typename Func> auto map(Func &&func) -> Array<decltype(func(Type()))>
 	{
@@ -34,10 +34,10 @@ public:
 	String join(const String &str)
 	{
 		String r;
-		auto it = begin();
-		if (it != end()) {
+		auto it = std::vector<Type>::begin();
+		if (it != std::vector<Type>::end()) {
 			r += *it;
-			for (++it; it != end(); ++it) {
+			for (++it; it != std::vector<Type>::end(); ++it) {
 				r += str;
 				r += *it;
 			}
@@ -54,7 +54,7 @@ public:
 		return r;
 	}
 
-	int len() const {return size();}
+	int len() const {return std::vector<Type>::size();}
 
 	friend Array &&operator*(Array &&a, int n)
 	{
@@ -89,14 +89,14 @@ public:
 	const Type &operator[](int i) const
 	{
 		if (in(i, range_el(0, len())))
-			return at(i);
+			return std::vector<Type>::at(i);
 		throw IndexError(i);
 	}
 
 	Type &operator[](int i)
 	{
 		if (in(i, range_el(0, len())))
-			return at(i);
+			return std::vector<Type>::at(i);
 		throw IndexError(i);
 	}
 
@@ -108,7 +108,7 @@ public:
 	void set(int i, const Type &v)
 	{
 		if (in(i, range_el(0, len())))
-			at(i) = v;
+			std::vector<Type>::at(i) = v;
 		else
 			throw IndexError(i);
 	}
@@ -118,11 +118,11 @@ public:
 		set(len() + i, v);
 	}
 
-	void append(const Type &v) {push_back(v);}
+	void append(const Type &v) {std::vector<Type>::push_back(v);}
 
 	void append(const Array<Type> &arr)
 	{
-		reserve(size() + arr.size());
+		reserve(std::vector<Type>::size() + arr.size());
 		for (auto el : arr)
 			push_back(el);
 	}
@@ -130,23 +130,23 @@ public:
 	int index(const Type &v) const
 	{
 		for (int i=0, l=len(); i<l; i++)
-			if (data()[i] == v) return i;
+			if (std::vector<Type>::data()[i] == v) return i;
 		throw ValueError(v);
 	}
 
 	Type &last()
 	{
-		if (empty())
+		if (std::vector<Type>::empty())
 			throw IndexError(0);
-		return at(len()-1);
+		return std::vector<Type>::at(len()-1);
 	}
 
 	Type pop()
 	{
-		if (empty())
+		if (std::vector<Type>::empty())
 			throw IndexError(0);
-		Type r(std::move(at(len()-1)));
-		resize(len()-1);
+		Type r(std::move(std::vector<Type>::at(len()-1)));
+		std::vector<Type>::resize(len()-1);
 		return r;
 	}
 };

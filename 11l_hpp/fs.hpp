@@ -4,21 +4,13 @@ namespace fs
 {
 inline String get_temp_dir()
 {
-	size_t return_value;
-	wchar_t buf[MAX_PATH];
-	_wgetenv_s(&return_value, buf, L"TMPDIR");
-	if (buf[0]) return String((char16_t*)buf, return_value - 1);
-	_wgetenv_s(&return_value, buf, L"TEMP");
-	if (buf[0]) return String((char16_t*)buf, return_value - 1);
-	_wgetenv_s(&return_value, buf, L"TMP");
-	if (buf[0]) return String((char16_t*)buf, return_value - 1);
-	return String(u".");
+	return os::getenv(u"TMPDIR", os::getenv(u"TEMP", os::getenv(u"TMP", u".")));
 }
 
 Array<String> list_dir(const String &path = u".")
 {
 	Array<String> r;
-    for (auto &&p: std::filesystem::directory_iterator((wchar_t*)path.c_str()))
+    for (auto &&p: std::filesystem::directory_iterator((std::u16string&)path))
 		r.append(p.path().filename().u16string());
 	return r;
 }
@@ -77,7 +69,7 @@ class Walker
 	bool files_only;
 
 public:
-	Walker(const String &path, Nullable<std::function<bool(const String&)>> dir_filter, bool files_only) : rdi(path), dir_filter(dir_filter), files_only(files_only) {}
+	Walker(const String &path, Nullable<std::function<bool(const String&)>> dir_filter, bool files_only) : rdi((const std::u16string&)path), dir_filter(dir_filter), files_only(files_only) {}
 
 	Iterator begin() const
 	{
@@ -104,7 +96,7 @@ Walker walk(const String &path, const std::function<bool(const String&)> &dir_fi
 
 bool is_directory(const String &path)
 {
-	return std::filesystem::is_directory((wchar_t*)path.c_str());
+	return std::filesystem::is_directory((std::u16string&)path);
 }
 
 namespace path

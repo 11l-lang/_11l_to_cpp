@@ -1,4 +1,4 @@
-#include <map>
+﻿#include <map>
 
 class KeyError
 {
@@ -13,7 +13,7 @@ public:
 template <typename KeyType, typename ValueType> class DictInitializer
 {
 	std::map<KeyType, ValueType> dict;
-	template <typename KeyType, typename ValueType> friend class Dict;
+	template <typename /*KeyType*/, typename /*ValueType*/> friend class Dict; // fix of error in GCC: declaration of template parameter ‘KeyType’ shadows template parameter
 
 public:
 	DictInitializer(const KeyType &key, const ValueType &value)
@@ -50,11 +50,11 @@ template <typename KeyType, typename ValueType> class Dict : public std::map<Key
 {
 public:
 	Dict() {}
-	Dict(DictInitializer<KeyType, ValueType> &&di) : map(std::forward<std::map<KeyType, ValueType>>(di.dict)) {}
+	Dict(DictInitializer<KeyType, ValueType> &&di) : std::map<KeyType, ValueType>(std::forward<std::map<KeyType, ValueType>>(di.dict)) {}
 
 	ValueType &operator[](const KeyType &key)
 	{
-		auto r = insert(std::make_pair(key, ValueType()));
+		auto r = std::map<KeyType, ValueType>::insert(std::make_pair(key, ValueType()));
 		if (r.second) throw KeyError(String(key));
 		return r.first->second;
 	}
@@ -62,14 +62,14 @@ public:
 	const ValueType &operator[](const KeyType &key) const
 	{
 		auto r = find(key);
-		if (r == end()) throw KeyError(String(key));
+		if (r == std::map<KeyType, ValueType>::end()) throw KeyError(String(key));
 		return r->second;
 	}
 
 	void set(const KeyType &key, const ValueType &value)
 	{
 		//insert(std::make_pair(key, value)); //`insert()` does not assign value if it already exists in the map
-		map::operator[](key) = value;
+		std::map<KeyType, ValueType>::operator[](key) = value;
 	}
 };
 
