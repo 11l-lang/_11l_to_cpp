@@ -13,12 +13,12 @@ T Exception
 
 T Converter
    Array[Int] to_html_called_inside_to_html_outer_pos_list
-   Bool habrahabr_html
+   Bool habr_html
    Bool ohd
    String instr
 
-   F (habrahabr_html, ohd)
-      .habrahabr_html = habrahabr_html
+   F (habr_html, ohd)
+      .habr_html = habr_html
       .ohd = ohd
 
    F instr_pos_to_line_column(=pos)
@@ -67,7 +67,7 @@ T Converter
 
       F html_escape(=str)
          str = str.replace(‘&’, ‘&amp;’).replace(‘<’, ‘&lt;’)
-         I @.habrahabr_html
+         I @.habr_html
             str = str.replace(‘"’, ‘&quot;’)
          R str
       F html_escapeq(str)
@@ -377,7 +377,7 @@ T Converter
                outfile.write(‘<a href="’link‘">’html_escape(instr[startqpos + 1 .< endqpos])‘</a>’)
             E I i_next_str("[‘")
                write_note(startqpos, endqpos)
-            E I next_char() == ‘{’ & (.habrahabr_html | .ohd)
+            E I next_char() == ‘{’ & (.habr_html | .ohd)
                A nesting_level = 0
                i += 2
                L
@@ -393,7 +393,7 @@ T Converter
                   i++
                write_to_pos(prevci + 1, i + 1)
                A outer_p = endqpos + (I instr[endqpos + 2] == "\n" {3} E 2)
-               I .habrahabr_html
+               I .habr_html
                   outfile.write(‘<spoiler title="’remove_comments(instr[startqpos + 1 .< endqpos], startqpos + 1).replace(‘"’, ‘''’)‘">’(.to_html(instr[outer_p .< i], outer_pos' outer_p))‘</spoiler>’)
                E
                   outfile.write(‘<span class="spoiler_title" onclick="return spoiler2(this, event)">’remove_comments(instr[startqpos + 1 .< endqpos], startqpos + 1)‘<br /></span>’""‘<div class="spoiler_text" style="display: none">’(.to_html(instr[outer_p .< i], outer_pos' outer_p))"</div>\n")
@@ -420,7 +420,7 @@ T Converter
                outfile.write(html_escape(instr[startqpos + 1 .< endqpos]).replace("\n", "<br />\n"))
             E I prevc == ‘#’
                A ins = instr[startqpos + 1 .< endqpos]
-               I .habrahabr_html
+               I .habr_html
                   write_to_pos(prevci, endqpos + 1)
                   A contains_new_line = "\n" C ins
                   outfile.write((I str_in_b != ‘’ {‘<source lang="’str_in_b‘">’} E I contains_new_line {‘<source>’} E ‘<code>’) + ins + (I str_in_b != ‘’ | contains_new_line {‘</source>’} E ‘</code>’))
@@ -568,7 +568,7 @@ T Converter
                      L(ii) I str_in_b.len == 3 {[0, 1, 2]} E [0, 0, 0]
                         new_str ‘’= hex((Int(str_in_b[ii]) * 00'FF + 4) I/ 8)[2..].uppercase().zfill(2)
                      str_in_b = new_str
-                  I .habrahabr_html
+                  I .habr_html
                      outfile.write(‘<font color="’str_in_b‘">’)
                      ending_tags.append(‘</font>’)
                   E
@@ -581,8 +581,8 @@ T Converter
                   ending_tags.append(‘</’tag‘>’)
                E I prevc == ‘!’
                   write_to_pos(prevci, i + 1)
-                  outfile.write(I .habrahabr_html {‘<blockquote>’} E ‘<div class="note">’)
-                  ending_tags.append(I .habrahabr_html {‘</blockquote>’} E ‘</div>’)
+                  outfile.write(I .habr_html {‘<blockquote>’} E ‘<div class="note">’)
+                  ending_tags.append(I .habr_html {‘</blockquote>’} E ‘</div>’)
                E
                   ending_tags.append("’")
          E I ch == "’"
@@ -617,9 +617,9 @@ T Converter
                      exit_with_error(‘Unpaired single quotation mark found inside code block/span beginning’, start)
             ins = html_escape(ins)
             I !("\n" C ins)
-               outfile.write(I .habrahabr_html {‘<code>’ins‘</code>’} E ‘<pre style="display: inline">’ins‘</pre>’)
+               outfile.write(I .habr_html {‘<code>’ins‘</code>’} E ‘<pre style="display: inline">’ins‘</pre>’)
             E
-               outfile.write(‘<pre>’ins‘</pre>’("\n" * (!(.habrahabr_html))))
+               outfile.write(‘<pre>’ins‘</pre>’("\n" * (!(.habr_html))))
                new_line_tag = ‘’
             i = end + i - start - 1
          E I ch == ‘[’
@@ -658,9 +658,9 @@ T Converter
                   outfile.write(remove_comments(instr[comment_start .< i + 1], comment_start, 4))
                   outfile.write(‘-->’)
             E
-               write_to_i((‘<span class="sq"><span class="sq_brackets">’ * .ohd)‘’(‘<font color="#BFBFBF">’ * .habrahabr_html)‘[’(‘</font><font color="gray">’ * .habrahabr_html)‘’(.ohd * ‘</span>’))
+               write_to_i((‘<span class="sq"><span class="sq_brackets">’ * .ohd)‘’(‘<font color="#BFBFBF">’ * .habr_html)‘[’(‘</font><font color="gray">’ * .habr_html)‘’(.ohd * ‘</span>’))
          E I ch == ‘]’
-            write_to_i((‘<span class="sq_brackets">’ * .ohd)‘’(‘</font><font color="#BFBFBF">’ * .habrahabr_html)‘]’(‘</font>’ * .habrahabr_html)‘’(.ohd * ‘</span></span>’))
+            write_to_i((‘<span class="sq_brackets">’ * .ohd)‘’(‘</font><font color="#BFBFBF">’ * .habr_html)‘]’(‘</font>’ * .habr_html)‘’(.ohd * ‘</span></span>’))
          E I ch == ‘{’
             write_to_i(‘<span class="cu_brackets" onclick="return spoiler(this, event)"><span class="cu_brackets_b">’ * .ohd‘{’(.ohd * ‘</span><span>…</span><span class="cu" style="display: none">’))
          E I ch == ‘}’
@@ -677,13 +677,13 @@ T Converter
 
       I outfilef == N
          A r = result.join(‘’)
-         I .habrahabr_html
+         I .habr_html
             r = r.replace("</blockquote>\n", ‘</blockquote>’)
          R r
       R ‘’
 
-F to_html(instr, File? outfilef = N, ohd = 0B, ', habrahabr_html = 0B)
-   R Converter(habrahabr_html, ohd).to_html(instr, outfilef)
+F to_html(instr, File? outfilef = N, ohd = 0B, ', habr_html = 0B)
+   R Converter(habr_html, ohd).to_html(instr, outfilef)
 
 :start:
 I ‘-h’ C :argv | ‘--help’ C :argv
@@ -697,14 +697,14 @@ Positional arguments:
 
 Options:
   -h, --help            show this help message and exit
-  --habrahabr-html      for publishing posts on habr.com
+  --habr-html           for publishing posts on habr.com
   --output-html-document
                         add some html header for rough testing preview of your
                         converted documents
   -f [OUTPUT_FILE], --file [OUTPUT_FILE]
                         write output to OUTPUT_FILE (defaults to STDOUT)’)
    exit(0)
-A args_habrahabr_html = ‘--habrahabr-html’ C :argv
+A args_habr_html = ‘--habr-html’ C :argv
 A args_output_html_document = ‘--output-html-document’ C :argv
 A args_infile = :stdin
 A i = 1
@@ -722,8 +722,8 @@ I ‘-f’ C :argv
 E I ‘--file’ C :argv
    args_outfile = File(:argv[:argv.index(‘--file’) + 1], ‘w’, encoding' ‘utf-8’, newline' "\n")
 
-I args_output_html_document & args_habrahabr_html
-   exit(‘Options --output-html-document and --habrahabr-html are mutually exclusive’)
+I args_output_html_document & args_habr_html
+   exit(‘Options --output-html-document and --habr-html are mutually exclusive’)
 
 I args_output_html_document
    args_outfile.write(‘<html>
@@ -817,7 +817,7 @@ div.note {
 <table width="55%" align="center"><tr><td>
 ’)
 X.try
-   to_html(args_infile.read(), args_outfile, args_output_html_document, habrahabr_html' args_habrahabr_html)
+   to_html(args_infile.read(), args_outfile, args_output_html_document, habr_html' args_habr_html)
 X.catch Exception e
    :stderr.write(e.message‘ at line ’String(e.line)‘, column ’String(e.column)"\n")
    exit(-1)

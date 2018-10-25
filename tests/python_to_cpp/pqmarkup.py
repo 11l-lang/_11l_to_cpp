@@ -14,14 +14,14 @@ class Exception(Exception):
 
 class Converter:
     to_html_called_inside_to_html_outer_pos_list : List[int]
-    habrahabr_html : bool
+    habr_html : bool
     ohd : bool
     instr : str
 
-    def __init__(self, habrahabr_html, ohd):
+    def __init__(self, habr_html, ohd):
         self.to_html_called_inside_to_html_outer_pos_list = []
         #self.newline_chars = []
-        self.habrahabr_html = habrahabr_html
+        self.habr_html = habr_html
         self.ohd = ohd
 
     def instr_pos_to_line_column(self, pos):
@@ -74,8 +74,8 @@ class Converter:
 
         def html_escape(str):
             str = str.replace('&', '&amp;').replace('<', '&lt;')
-            if self.habrahabr_html:
-                str = str.replace('"', '&quot;') # нужно для корректного отображения кавычек в <a href="http://address">, так как habrahabr автоматически конвертирует "" в «»
+            if self.habr_html:
+                str = str.replace('"', '&quot;') # нужно для корректного отображения кавычек в <a href="http://address">, так как Habr автоматически конвертирует "" в «»
             return str
         def html_escapeq(str):
             return str.replace('&', '&amp;').replace('"', '&quot;')
@@ -406,7 +406,7 @@ class Converter:
                     outfile.write('<a href="' + link + '">' + html_escape(instr[startqpos+1:endqpos]) + '</a>')
                 elif i_next_str('[‘'): # ’] сноска/альтернативный текст/текст всплывающей подсказки
                     write_note(startqpos, endqpos)
-                elif next_char() == '{' and (self.habrahabr_html or self.ohd):
+                elif next_char() == '{' and (self.habr_html or self.ohd):
                     # Ищем окончание спойлера }
                     nesting_level = 0
                     i += 2
@@ -423,7 +423,7 @@ class Converter:
                         i += 1
                     write_to_pos(prevci + 1, i + 1)
                     outer_p = endqpos+(3 if instr[endqpos+2] == "\n" else 2) # проверка на == "\n" нужна, чтобы переход на новую строку/перевод строки после `{` игнорировался
-                    if self.habrahabr_html:
+                    if self.habr_html:
                         outfile.write('<spoiler title="' + remove_comments(instr[startqpos+1:endqpos], startqpos+1).replace('"', "''") + '">' + self.to_html(instr[outer_p:i], outer_pos = outer_p) + '</spoiler>')
                     else:
                         outfile.write('<span class="spoiler_title" onclick="return spoiler2(this, event)">' + remove_comments(instr[startqpos+1:endqpos], startqpos+1) + '<br /></span>' # используется span, так как с div подчёркивание будет на весь экран
@@ -452,14 +452,14 @@ class Converter:
                     outfile.write(html_escape(instr[startqpos+1:endqpos]).replace("\n", "<br />\n"))
                 elif prevc == "#":
                     ins = instr[startqpos+1:endqpos]
-                    if self.habrahabr_html:
+                    if self.habr_html:
                         write_to_pos(prevci, endqpos+1)
                         contains_new_line = "\n" in ins
-                        outfile.write(('<source lang="' + str_in_b + '">' if str_in_b != '' else '<source>' if contains_new_line else '<code>') + ins + ("</source>" if str_in_b != '' or contains_new_line else "</code>")) # так как <source> в habrahabr — блочный элемент, а не встроенный\inline
+                        outfile.write(('<source lang="' + str_in_b + '">' if str_in_b != '' else '<source>' if contains_new_line else '<code>') + ins + ("</source>" if str_in_b != '' or contains_new_line else "</code>")) # так как <source> в Habr — блочный элемент, а не встроенный\inline
                     # elif self.ohd: # [-TODO syntax highlighting-]
                     else:
                         write_to_pos(prevci, endqpos+1)
-                        outfile.write('<pre style="display: inline">' + html_escape(instr[startqpos+1:endqpos]) + '</pre>') # в habrahabr_html тег pre не стоит задействовать, так как в habrahabr для тега pre используется шрифт monospace, в котором символы ‘ и ’ выглядят непонятно (не так как в Courier New)
+                        outfile.write('<pre style="display: inline">' + html_escape(instr[startqpos+1:endqpos]) + '</pre>') # в habr_html тег pre не стоит задействовать, так как в Habr для тега pre используется шрифт monospace, в котором символы ‘ и ’ выглядят непонятно (не так как в Courier New)
                     if ins[0] == "\n" and instr[i+1:i+2] == "\n":
                         new_line_tag = ''
                 elif prevc in 'TТ':
@@ -608,7 +608,7 @@ class Converter:
                             for ii in [0, 1, 2] if len(str_in_b) == 3 else [0, 0, 0]:
                                 new_str += hex((int(str_in_b[ii]) * 0xFF + 4) // 8)[2:].upper().zfill(2) # 8 - FF, 0 - 00, 4 - 80 (почему не 7F[‘когда `+ 3` вместо `+ 4`’] — две субъективные причины: 1.‘больше нравится как выглядит’ и 2.‘количество пикселей в строке `80` при `"font_face": "Courier New", "font_size": 10`’)
                             str_in_b = new_str
-                        if self.habrahabr_html:
+                        if self.habr_html:
                             outfile.write('<font color="' + str_in_b + '">')
                             ending_tags.append('</font>')
                         else: # The <font> tag is not supported in HTML5.
@@ -621,8 +621,8 @@ class Converter:
                         ending_tags.append('</' + tag + '>')
                     elif prevc == '!':
                         write_to_pos(prevci, i + 1)
-                        outfile.write('<blockquote>' if self.habrahabr_html else '<div class="note">')
-                        ending_tags.append('</blockquote>' if self.habrahabr_html else '</div>')
+                        outfile.write('<blockquote>' if self.habr_html else '<div class="note">')
+                        ending_tags.append('</blockquote>' if self.habr_html else '</div>')
                     else: # ‘
                         ending_tags.append('’')
             elif ch == "’":
@@ -658,9 +658,9 @@ class Converter:
                             exit_with_error('Unpaired single quotation mark found inside code block/span beginning', start)
                 ins = html_escape(ins)
                 if not "\n" in ins: # this is a single-line code -‘block’span
-                    outfile.write('<code>' + ins + '</code>' if self.habrahabr_html else '<pre style="display: inline">' + ins + '</pre>')
+                    outfile.write('<code>' + ins + '</code>' if self.habr_html else '<pre style="display: inline">' + ins + '</pre>')
                 else:
-                    outfile.write('<pre>' + ins + '</pre>' + "\n"*(not self.habrahabr_html))
+                    outfile.write('<pre>' + ins + '</pre>' + "\n"*(not self.habr_html))
                     new_line_tag = ''
                 i = end + i - start - 1
             elif ch == '[': # ]
@@ -700,9 +700,9 @@ class Converter:
                         outfile.write(remove_comments(instr[comment_start:i+1], comment_start, 4)) # берётся вся строка вместе со [[[скобочками]]] для [[[таких] ситуаций]]
                         outfile.write('-->')
                 else:
-                    write_to_i('<span class="sq"><span class="sq_brackets">'*self.ohd + '<font color="#BFBFBF">'*self.habrahabr_html + '[' + '</font><font color="gray">'*self.habrahabr_html + self.ohd*'</span>')
+                    write_to_i('<span class="sq"><span class="sq_brackets">'*self.ohd + '<font color="#BFBFBF">'*self.habr_html + '[' + '</font><font color="gray">'*self.habr_html + self.ohd*'</span>')
             elif ch == "]":
-                write_to_i('<span class="sq_brackets">'*self.ohd + '</font><font color="#BFBFBF">'*self.habrahabr_html + ']' + '</font>'*self.habrahabr_html + self.ohd*'</span></span>')
+                write_to_i('<span class="sq_brackets">'*self.ohd + '</font><font color="#BFBFBF">'*self.habr_html + ']' + '</font>'*self.habr_html + self.ohd*'</span></span>')
             elif ch == "{":
                 write_to_i('<span class="cu_brackets" onclick="return spoiler(this, event)"><span class="cu_brackets_b">'*self.ohd + '{' + self.ohd*'</span><span>…</span><span class="cu" style="display: none">')
             elif ch == "}":
@@ -723,14 +723,14 @@ class Converter:
 
         if outfilef == None:
             r = "".join(result)
-            if self.habrahabr_html:                               # // dirty hack
+            if self.habr_html:                               # // dirty hack
                 r = r.replace("</blockquote>\n", '</blockquote>') # \\ (just left it as is)
             return r
 
         return ''
 
-def to_html(instr, outfilef : IO[str] = None, ohd = False, *, habrahabr_html = False):
-    return Converter(habrahabr_html, ohd).to_html(instr, outfilef)
+def to_html(instr, outfilef : IO[str] = None, ohd = False, *, habr_html = False):
+    return Converter(habr_html, ohd).to_html(instr, outfilef)
 
 
 if __name__ == '__main__':
@@ -746,7 +746,7 @@ Positional arguments:
 
 Options:
   -h, --help            show this help message and exit
-  --habrahabr-html      for publishing posts on habr.com
+  --habr-html           for publishing posts on habr.com
   --output-html-document
                         add some html header for rough testing preview of your
                         converted documents
@@ -754,7 +754,7 @@ Options:
                         write output to OUTPUT_FILE (defaults to STDOUT)''')
         sys.exit(0)
 
-    args_habrahabr_html       = '--habrahabr-html'       in sys.argv
+    args_habr_html       = '--habr-html'            in sys.argv
     args_output_html_document = '--output-html-document' in sys.argv
     args_infile = sys.stdin
     i = 1
@@ -772,8 +772,8 @@ Options:
     elif '--file' in sys.argv:
         args_outfile = open(sys.argv[sys.argv.index('--file') + 1], 'w', encoding = 'utf-8', newline = "\n")
 
-    if args_output_html_document and args_habrahabr_html:
-        sys.exit("Options --output-html-document and --habrahabr-html are mutually exclusive")
+    if args_output_html_document and args_habr_html:
+        sys.exit("Options --output-html-document and --habr-html are mutually exclusive")
 
     if args_output_html_document:
         args_outfile.write(
@@ -834,7 +834,7 @@ span.sq_brackets {color: #BFBFBF;}
 span.cu_brackets {cursor: pointer;}
 span.cu {background-color: #F7F7FF;}
 abbr {text-decoration: none; border-bottom: 1px dotted;}
-pre {margin: 0;}''' + # когда везде использовался <pre style="display: inline">, то margin в таких блоках не учитывался, поэтому и без этой строки с `pre {margin: 0}` код выглядел также как с этой строкой выглядят `<pre>` без `style="display: inline"`; но, вообще говоря, я добавил эту строку для соответствия форматированию habrahabr.ru
+pre {margin: 0;}''' + # когда везде использовался <pre style="display: inline">, то margin в таких блоках не учитывался, поэтому и без этой строки с `pre {margin: 0}` код выглядел также как с этой строкой выглядят `<pre>` без `style="display: inline"`; но, вообще говоря, я добавил эту строку для соответствия форматированию Habr
 '''
 pre, code {font-family: 'Courier New'; line-height: normal}
 ul, ol {margin: 11px 0 7px 0;}
@@ -869,7 +869,7 @@ div.note {
 <table width="55%" align="center"><tr><td>
 ''')
     try:
-        to_html(args_infile.read(), args_outfile, args_output_html_document, habrahabr_html = args_habrahabr_html)
+        to_html(args_infile.read(), args_outfile, args_output_html_document, habr_html = args_habr_html)
     except Exception as e:
         sys.stderr.write(e.message + " at line " + str(e.line) + ", column " + str(e.column) + "\n")
         sys.exit(-1)

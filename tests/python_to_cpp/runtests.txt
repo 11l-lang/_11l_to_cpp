@@ -3,11 +3,11 @@ import os, tempfile, sys, pqmarkup
 test_id = 0
 failed_tests = 0
 kdiff_showed = False
-def TEST(str1, str2, ohd = False, habrahabr_html = False):
+def TEST(str1, str2, ohd = False, habr_html = False):
     global test_id, failed_tests, kdiff_showed
     test_id += 1
     print("Test " + str(test_id) + " ...", end = '')
-    str1 = pqmarkup.to_html(str1, ohd = ohd, habrahabr_html = habrahabr_html)
+    str1 = pqmarkup.to_html(str1, ohd = ohd, habr_html = habr_html)
     if str1 != str2:
         str1 = str(str1)
         str2 = str(str2)
@@ -76,7 +76,7 @@ c
 ‘d’{e}
 }""", """a<br />
 <spoiler title="b">c<br />
-<spoiler title="d">e</spoiler></spoiler>""", habrahabr_html = True)
+<spoiler title="d">e</spoiler></spoiler>""", habr_html = True)
 TEST("""‘title’{
 te
 }
@@ -89,7 +89,7 @@ TEST("""#(Javascript)‘
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
 ’""", """<source lang="Javascript">
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
-</source>""", habrahabr_html = True)
+</source>""", habr_html = True)
 TEST("""‘Code’{
 #(Python)‘
 import hashlib
@@ -100,14 +100,14 @@ Some text.""",
 """<spoiler title="Code"><source lang="Python">
 import hashlib
 </source></spoiler><br />
-Some text.""", habrahabr_html = True)
-TEST("[[[‘]]]test```’```test", "<!--[[[‘]]]-->test<code>’</code>test", habrahabr_html = True)
-TEST("[[[‘]]]`Don’t`", "<!--[[[‘]]]--><code>Don’t</code>", habrahabr_html = True)
+Some text.""", habr_html = True)
+TEST("[[[‘]]]test```’```test", "<!--[[[‘]]]-->test<code>’</code>test", habr_html = True)
+TEST("[[[‘]]]`Don’t`", "<!--[[[‘]]]--><code>Don’t</code>", habr_html = True)
 TEST("'‘<Don‘t! Don‘t! Don‘t!>’’’’''''", "<Don‘t! Don‘t! Don‘t!>")
-TEST("`'‘<div>&lt;</div>’'`", "<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>", habrahabr_html = True)
+TEST("`'‘<div>&lt;</div>’'`", "<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>", habr_html = True)
 TEST("''‘‘’‘’’''", "’‘")
 TEST("''''‘‘‘‘Don’t! Don’t! Don’t!’'", "Don’t! Don’t! Don’t!")
-#TEST(open("tests/test1.pq", encoding="utf-8").read(), open("tests/test1.pq.to_habrahabr_html", encoding="utf-8").read(), habrahabr_html = True) # для проверки безопасности рефакторинга нужен был какой-либо обширный тестовый текст на пк-разметке [-TODO подобрать такой текст, который не стыдно закоммитить :)(:-]
+#TEST(open("tests/test1.pq", encoding="utf-8").read(), open("tests/test1.pq.to_habr_html", encoding="utf-8").read(), habr_html = True) # для проверки безопасности рефакторинга нужен был какой-либо обширный тестовый текст на пк-разметке [-TODO подобрать такой текст, который не стыдно закоммитить :)(:-]
 TEST("""<<‘выравнивание по левому краю’
 >>‘выравнивание по правому краю’
 ><‘выравнивание по центру’
@@ -362,10 +362,10 @@ else:
 A test_id = 0
 A failed_tests = 0
 A kdiff_showed = 0B
-F TEST(=str1, =str2, ohd = 0B, habrahabr_html = 0B)
+F TEST(=str1, =str2, ohd = 0B, habr_html = 0B)
    :test_id++
    print(‘Test ’String(test_id)‘ ...’, end' ‘’)
-   str1 = pqmarkup:to_html(str1, ohd' ohd, habrahabr_html' habrahabr_html)
+   str1 = pqmarkup:to_html(str1, ohd' ohd, habr_html' habr_html)
    I str1 != str2
       str1 = String(str1)
       str2 = String(str2)
@@ -430,7 +430,7 @@ c
 ‘d’{e}
 }’, ‘a<br />
 <spoiler title="b">c<br />
-<spoiler title="d">e</spoiler></spoiler>’, habrahabr_html' 1B)
+<spoiler title="d">e</spoiler></spoiler>’, habr_html' 1B)
 TEST(‘‘title’{
 te
 }
@@ -441,7 +441,7 @@ TEST(‘#(Javascript)‘
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
 ’’, ‘<source lang="Javascript">
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
-</source>’, habrahabr_html' 1B)
+</source>’, habr_html' 1B)
 TEST(‘‘Code’{
 #(Python)‘
 import hashlib
@@ -451,11 +451,11 @@ import hashlib
 Some text.’, ‘<spoiler title="Code"><source lang="Python">
 import hashlib
 </source></spoiler><br />
-Some text.’, habrahabr_html' 1B)
-TEST(‘[[[‘]]]test```’```test’, ‘<!--[[[‘]]]-->test<code>’</code>test’, habrahabr_html' 1B)
-TEST(‘[[[‘]]]`Don’t`’, ‘<!--[[[‘]]]--><code>Don’t</code>’, habrahabr_html' 1B)
+Some text.’, habr_html' 1B)
+TEST(‘[[[‘]]]test```’```test’, ‘<!--[[[‘]]]-->test<code>’</code>test’, habr_html' 1B)
+TEST(‘[[[‘]]]`Don’t`’, ‘<!--[[[‘]]]--><code>Don’t</code>’, habr_html' 1B)
 TEST(‘'‘<Don‘t! Don‘t! Don‘t!>’’’’''''’, "<Don‘t! Don‘t! Don‘t!>")
-TEST(‘`'‘<div>&lt;</div>’'`’, ‘<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>’, habrahabr_html' 1B)
+TEST(‘`'‘<div>&lt;</div>’'`’, ‘<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>’, habr_html' 1B)
 TEST(‘''‘‘’‘’’''’, '‘‘’‘’’')
 TEST(‘''''‘‘‘‘Don’t! Don’t! Don’t!’'’, "Don’t! Don’t! Don’t!")
 TEST(‘<<‘выравнивание по левому краю’
@@ -667,11 +667,11 @@ E
 auto test_id = 0;
 auto failed_tests = 0;
 auto kdiff_showed = false;
-template <typename T1, typename T2, typename T3 = decltype(false), typename T4 = decltype(false)> auto TEST(T1 str1, T2 str2, const T3 &ohd = false, const T4 &habrahabr_html = false)
+template <typename T1, typename T2, typename T3 = decltype(false), typename T4 = decltype(false)> auto TEST(T1 str1, T2 str2, const T3 &ohd = false, const T4 &habr_html = false)
 {
     ::test_id++;
     print(u"Test "_S + String(test_id) + u" ..."_S, u""_S);
-    str1 = pqmarkup::to_html(str1, nullptr, ohd, habrahabr_html);
+    str1 = pqmarkup::to_html(str1, nullptr, ohd, habr_html);
     if (str1 != str2) {
         str1 = String(str1);
         str2 = String(str2);

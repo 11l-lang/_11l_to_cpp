@@ -3,7 +3,7 @@ fn f()
     \(( some commented code
     ... // :)(:
     ))
-    if .habrahabr_html                                    // dirty hack
+    if .habr_html                                         // dirty hack
         r = r.replace("</blockquote>\n", ‘</blockquote>’) \\ (just left it as is)
 ===
 (11, 39)
