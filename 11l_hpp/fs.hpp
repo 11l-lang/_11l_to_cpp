@@ -7,7 +7,7 @@ inline String get_temp_dir()
 	return os::getenv(u"TMPDIR", os::getenv(u"TEMP", os::getenv(u"TMP", u".")));
 }
 
-Array<String> list_dir(const String &path = u".")
+inline Array<String> list_dir(const String &path = u".")
 {
 	Array<String> r;
     for (auto &&p: std::filesystem::directory_iterator((std::u16string&)path))
@@ -84,17 +84,17 @@ public:
 	}
 };
 
-Walker walk(const String &path = u".", Nullable<std::function<bool(const String&)>> dir_filter = nullptr, bool files_only = true)
+inline Walker walk(const String &path = u".", Nullable<std::function<bool(const String&)>> dir_filter = nullptr, bool files_only = true)
 {
 	return Walker(path, dir_filter, files_only);
 }
 
-Walker walk(const String &path, const std::function<bool(const String&)> &dir_filter, bool files_only)
+inline Walker walk(const String &path, const std::function<bool(const String&)> &dir_filter, bool files_only)
 {
 	return Walker(path, dir_filter, files_only);
 }
 
-bool is_directory(const String &path)
+inline bool is_directory(const String &path)
 {
 	return std::filesystem::is_directory((std::u16string&)path);
 }
@@ -108,7 +108,7 @@ u'\\'
 u'/'
 #endif
 ;
-String join(const String &path1, const String &path2)
+inline String join(const String &path1, const String &path2)
 {
 	String r(path1);
 	if (!(r.ends_with(u"\\") || r.ends_with(u"/")))
@@ -116,7 +116,7 @@ String join(const String &path1, const String &path2)
 	return r + path2;
 }
 
-String dir_name(const String &path)
+inline String dir_name(const String &path)
 {
 	size_t sep_pos = path.find_last_of(u"/\\");
 	if (sep_pos == String::npos)
@@ -124,7 +124,7 @@ String dir_name(const String &path)
 	return String(path.c_str(), sep_pos);
 }
 
-String base_name(const String &path)
+inline String base_name(const String &path)
 {
 	size_t sep_pos = path.find_last_of(u"/\\");
 	if (sep_pos == String::npos)

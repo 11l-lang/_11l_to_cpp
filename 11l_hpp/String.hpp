@@ -323,17 +323,17 @@ public:
 	friend String operator+(Char c, const String &s) {return String(c) + s;}
 };
 
-String operator+(Char ch1, Char ch2)
+inline String operator+(Char ch1, Char ch2)
 {
 	return String(ch1) + ch2;
 }
 
-String operator ""_S(const char16_t *s, size_t sz)
+inline String operator ""_S(const char16_t *s, size_t sz)
 {
 	return String(s, sz);
 }
 
-Char operator ""_C(char16_t c)
+inline Char operator ""_C(char16_t c)
 {
 	return Char(c);
 }
