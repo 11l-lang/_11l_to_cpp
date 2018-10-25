@@ -116,22 +116,22 @@ struct range_elen_i // `(len)-a..`
 	range_elen_i(int b) : b(b) {}
 };
 
-template <typename Ty> auto range_ee(const Ty &begin, const Ty &end) {return Range<Ty, true,  true >(begin, end);} // equal-equal range (`a..b`)
-template <typename Ty> auto range_el(const Ty &begin, const Ty &end) {return Range<Ty, true,  false>(begin, end);} // equal-less  range (`a.<b`)
-template <typename Ty> auto range_le(const Ty &begin, const Ty &end) {return Range<Ty, false, true >(begin, end);} // less-equal  range (`a<.b`)
-template <typename Ty> auto range_ll(const Ty &begin, const Ty &end) {return Range<Ty, false, false>(begin, end);} // less-less   range (`a<.<b`)
-template <typename Ty> auto range_ei(const Ty &begin               ) {return RangeEI<Ty>            (begin     );} // equal-infinity range (`a..`)
+template <typename Ty> inline auto range_ee(const Ty &begin, const Ty &end) {return Range<Ty, true,  true >(begin, end);} // equal-equal range (`a..b`)
+template <typename Ty> inline auto range_el(const Ty &begin, const Ty &end) {return Range<Ty, true,  false>(begin, end);} // equal-less  range (`a.<b`)
+template <typename Ty> inline auto range_le(const Ty &begin, const Ty &end) {return Range<Ty, false, true >(begin, end);} // less-equal  range (`a<.b`)
+template <typename Ty> inline auto range_ll(const Ty &begin, const Ty &end) {return Range<Ty, false, false>(begin, end);} // less-less   range (`a<.<b`)
+template <typename Ty> inline auto range_ei(const Ty &begin               ) {return RangeEI<Ty>            (begin     );} // equal-infinity range (`a..`)
 
-template <typename Ty> bool in(const Ty &val, const Range<Ty, true,  true > &range) {return val >= range.b && val <= range.e;}
-template <typename Ty> bool in(const Ty &val, const Range<Ty, true,  false> &range) {return val >= range.b && val <  range.e;}
-template <typename Ty> bool in(const Ty &val, const Range<Ty, false, true > &range) {return val >  range.b && val <= range.e;}
-template <typename Ty> bool in(const Ty &val, const Range<Ty, false, false> &range) {return val >  range.b && val <  range.e;}
-template <> bool in(const int &val, const Range<int, true,  true > &range) {return unsigned(val - range.b) <= unsigned(range.e - range.b);}
-template <> bool in(const int &val, const Range<int, true,  false> &range) {return unsigned(val - range.b) <  unsigned(range.size());}
-template <> bool in(const int &val, const Range<int, false, true > &range) {return unsigned(val - range.b - 1) < unsigned(range.e - range.b);}
-template <> bool in(const int &val, const Range<int, false, false> &range) {return unsigned(val - range.b - 1) < unsigned(range.size());}
+template <typename Ty> inline bool in(const Ty &val, const Range<Ty, true,  true > &range) {return val >= range.b && val <= range.e;}
+template <typename Ty> inline bool in(const Ty &val, const Range<Ty, true,  false> &range) {return val >= range.b && val <  range.e;}
+template <typename Ty> inline bool in(const Ty &val, const Range<Ty, false, true > &range) {return val >  range.b && val <= range.e;}
+template <typename Ty> inline bool in(const Ty &val, const Range<Ty, false, false> &range) {return val >  range.b && val <  range.e;}
+template <> inline bool in(const int &val, const Range<int, true,  true > &range) {return unsigned(val - range.b) <= unsigned(range.e - range.b);}
+template <> inline bool in(const int &val, const Range<int, true,  false> &range) {return unsigned(val - range.b) <  unsigned(range.size());}
+template <> inline bool in(const int &val, const Range<int, false, true > &range) {return unsigned(val - range.b - 1) < unsigned(range.e - range.b);}
+template <> inline bool in(const int &val, const Range<int, false, false> &range) {return unsigned(val - range.b - 1) < unsigned(range.size());}
 
-template <typename Ty> bool in(const Ty &val, const RangeEI<Ty> &range) {return val >= range.b;}
+template <typename Ty> inline bool in(const Ty &val, const RangeEI<Ty> &range) {return val >= range.b;}
 
 // Based on [http://artlang.net/post/c++11-obkhod-elementov-kortezhe-std-tuple/ <- google:‘c++ tuple’]
 namespace _detail_
@@ -166,7 +166,7 @@ namespace _detail_
 	};
 }
 
-template <typename ValueType, typename ... Types> bool in(const ValueType &val, const Tuple<Types...> &ranges)
+template <typename ValueType, typename ... Types> inline bool in(const ValueType &val, const Tuple<Types...> &ranges)
 {
 	return _detail_::iterate_tuple<std::tuple_size<Tuple<Types...>>::value - 1, ValueType, Types...>::next(val, ranges);
 }

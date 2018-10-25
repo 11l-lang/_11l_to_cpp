@@ -8,7 +8,7 @@ u':'
 #endif
 ;
 
-String getenv(const String &name, const String &def = String())
+inline String getenv(const String &name, const String &def = String())
 {
 #ifdef _WIN32
 	size_t return_value;
@@ -26,7 +26,7 @@ String getenv(const String &name, const String &def = String())
 #endif
 }
 
-void setenv(const String &name, const String &value)
+inline void setenv(const String &name, const String &value)
 {
 #ifdef _WIN32
 	_wputenv_s((wchar_t*)name.c_str(), (wchar_t*)value.c_str());
@@ -35,7 +35,7 @@ void setenv(const String &name, const String &value)
 #endif
 }
 
-class Environ
+static class Environ
 {
 public:
 	class Var
@@ -56,7 +56,7 @@ public:
 #undef environ
 } environ;
 
-int _(const String &s)
+inline int _(const String &s)
 {
 #ifdef _WIN32
 	return _wsystem((wchar_t*)s.c_str());
