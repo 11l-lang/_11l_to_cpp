@@ -22,13 +22,13 @@ class Converter
 {
 public:
     Array<int> to_html_called_inside_to_html_outer_pos_list;
-    bool habrahabr_html;
+    bool habr_html;
     bool ohd;
     String instr;
 
-    template <typename T1, typename T2> Converter(const T1 &habrahabr_html, const T2 &ohd)
+    template <typename T1, typename T2> Converter(const T1 &habr_html, const T2 &ohd)
     {
-        this->habrahabr_html = habrahabr_html;
+        this->habr_html = habr_html;
         this->ohd = ohd;
     }
 
@@ -95,7 +95,7 @@ public:
         auto html_escape = [this](auto str)
         {
             str = str.replace(u"&"_S, u"&amp;"_S).replace(u"<"_S, u"&lt;"_S);
-            if (habrahabr_html)
+            if (habr_html)
                 str = str.replace(u"\""_S, u"&quot;"_S);
             return str;
         };
@@ -493,7 +493,7 @@ public:
                 }
                 else if (i_next_str(u"[‘"_S))
                     write_note(startqpos, endqpos);
-                else if (next_char() == u'{' && (habrahabr_html || ohd)) {
+                else if (next_char() == u'{' && (habr_html || ohd)) {
                     auto nesting_level = 0;
                     i += 2;
                     while (true) {
@@ -515,7 +515,7 @@ public:
                     break_1:
                     write_to_pos(prevci + 1, i + 1);
                     auto outer_p = endqpos + (instr[endqpos + 2] == u'\n' ? 3 : 2);
-                    if (habrahabr_html)
+                    if (habr_html)
                         outfile.write(u"<spoiler title=\""_S + remove_comments(instr[range_el(startqpos + 1, endqpos)], startqpos + 1).replace(u"\""_S, u"''"_S) + u"\">"_S + (to_html(instr[range_el(outer_p, i)], nullptr, outer_p)) + u"</spoiler>"_S);
                     else
                         outfile.write(u"<span class=\"spoiler_title\" onclick=\"return spoiler2(this, event)\">"_S + remove_comments(instr[range_el(startqpos + 1, endqpos)], startqpos + 1) + u"<br /></span>"_S + u"<div class=\"spoiler_text\" style=\"display: none\">"_S + (to_html(instr[range_el(outer_p, i)], nullptr, outer_p)) + u"</div>\n"_S);
@@ -548,7 +548,7 @@ public:
                 }
                 else if (prevc == u'#') {
                     auto ins = instr[range_el(startqpos + 1, endqpos)];
-                    if (habrahabr_html) {
+                    if (habr_html) {
                         write_to_pos(prevci, endqpos + 1);
                         auto contains_new_line = in(u'\n'_C, ins);
                         outfile.write((str_in_b != u"" ? u"<source lang=\""_S + str_in_b + u"\">"_S : contains_new_line ? u"<source>"_S : u"<code>"_S) + ins + (str_in_b != u"" || contains_new_line ? u"</source>"_S : u"</code>"_S));
@@ -721,7 +721,7 @@ public:
                                 new_str += hex(int((parse_int(str_in_b[ii]) * 0x00'FF + 4))/int(8))[range_ei(2)].uppercase().zfill(2);
                             str_in_b = new_str;
                         }
-                        if (habrahabr_html) {
+                        if (habr_html) {
                             outfile.write(u"<font color=\""_S + str_in_b + u"\">"_S);
                             ending_tags.append(u"</font>"_S);
                         }
@@ -738,8 +738,8 @@ public:
                     }
                     else if (prevc == u'!') {
                         write_to_pos(prevci, i + 1);
-                        outfile.write(habrahabr_html ? u"<blockquote>"_S : u"<div class=\"note\">"_S);
-                        ending_tags.append(habrahabr_html ? u"</blockquote>"_S : u"</div>"_S);
+                        outfile.write(habr_html ? u"<blockquote>"_S : u"<div class=\"note\">"_S);
+                        ending_tags.append(habr_html ? u"</blockquote>"_S : u"</div>"_S);
                     }
                     else
                         ending_tags.append(u"’"_S);
@@ -780,9 +780,9 @@ public:
                             exit_with_error(u"Unpaired single quotation mark found inside code block/span beginning"_S, start);
                 ins = html_escape(ins);
                 if (!(in(u'\n'_C, ins)))
-                    outfile.write(habrahabr_html ? u"<code>"_S + ins + u"</code>"_S : u"<pre style=\"display: inline\">"_S + ins + u"</pre>"_S);
+                    outfile.write(habr_html ? u"<code>"_S + ins + u"</code>"_S : u"<pre style=\"display: inline\">"_S + ins + u"</pre>"_S);
                 else {
-                    outfile.write(u"<pre>"_S + ins + u"</pre>"_S + (u"\n"_S * (!(habrahabr_html))));
+                    outfile.write(u"<pre>"_S + ins + u"</pre>"_S + (u"\n"_S * (!(habr_html))));
                     new_line_tag = u""_S;
                 }
                 i = end + i - start - 1;
@@ -835,10 +835,10 @@ public:
                     }
                 }
                 else
-                    write_to_i((u"<span class=\"sq\"><span class=\"sq_brackets\">"_S * ohd) + (u"<font color=\"#BFBFBF\">"_S * habrahabr_html) + u"["_S + (u"</font><font color=\"gray\">"_S * habrahabr_html) + (ohd * u"</span>"_S));
+                    write_to_i((u"<span class=\"sq\"><span class=\"sq_brackets\">"_S * ohd) + (u"<font color=\"#BFBFBF\">"_S * habr_html) + u"["_S + (u"</font><font color=\"gray\">"_S * habr_html) + (ohd * u"</span>"_S));
             }
             else if (ch == u']')
-                write_to_i((u"<span class=\"sq_brackets\">"_S * ohd) + (u"</font><font color=\"#BFBFBF\">"_S * habrahabr_html) + u"]"_S + (u"</font>"_S * habrahabr_html) + (ohd * u"</span></span>"_S));
+                write_to_i((u"<span class=\"sq_brackets\">"_S * ohd) + (u"</font><font color=\"#BFBFBF\">"_S * habr_html) + u"]"_S + (u"</font>"_S * habr_html) + (ohd * u"</span></span>"_S));
             else if (ch == u'{')
                 write_to_i(u"<span class=\"cu_brackets\" onclick=\"return spoiler(this, event)\"><span class=\"cu_brackets_b\">"_S * ohd + u"{"_S + (ohd * u"</span><span>…</span><span class=\"cu\" style=\"display: none\">"_S));
             else if (ch == u'}')
@@ -857,7 +857,7 @@ public:
 
         if (outfilef == nullptr) {
             auto r = result.join(u""_S);
-            if (habrahabr_html)
+            if (habr_html)
                 r = r.replace(u"</blockquote>\n"_S, u"</blockquote>"_S);
             return r;
         }
@@ -865,8 +865,8 @@ public:
     }
 };
 
-template <typename T1, typename T3 = decltype(false), typename T4 = decltype(false)> auto to_html(const T1 &instr, File* const outfilef = nullptr, const T3 &ohd = false, const T4 &habrahabr_html = false)
+template <typename T1, typename T3 = decltype(false), typename T4 = decltype(false)> auto to_html(const T1 &instr, File* const outfilef = nullptr, const T3 &ohd = false, const T4 &habr_html = false)
 {
-    return Converter(habrahabr_html, ohd).to_html(instr, outfilef);
+    return Converter(habr_html, ohd).to_html(instr, outfilef);
 }
 }
