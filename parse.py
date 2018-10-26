@@ -1,5 +1,9 @@
-﻿from tokenizer import Token
-import tokenizer
+﻿try:
+    from tokenizer import Token
+    import tokenizer
+except ImportError:
+    from .tokenizer import Token
+    from . import tokenizer
 from typing import List, Tuple, Dict, Callable
 import os, thindf
 
