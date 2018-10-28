@@ -136,7 +136,7 @@ X.catch Exception
 
 
 non_existing_module:func()
-^Error: can not import module `non_existing_module`: file `tests/parser/non_existing_module.11l` is not found
+^Error: can not import module `non_existing_module`: file 'tests/parser/non_existing_module.11l' is not found
 
 
 L(i) 10
