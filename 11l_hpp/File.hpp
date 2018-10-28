@@ -67,13 +67,13 @@ public:
 
 		std::string file_str;
 		unsigned char utf8bom[3] = {0xEF, 0xBB, 0xBF}, first3bytes[3] = {0};
-		fread(first3bytes, 3, 1, file);
+		size_t _ = fread(first3bytes, 3, 1, file); // `size_t _` to suppress GCC warning ‘ignoring return value of ‘size_t fread(void*, size_t, size_t, FILE*)’, declared with attribute warn_unused_result [-Wunused-result]’
 		if (memcmp(first3bytes, utf8bom, 3) == 0)
 			file_size -= 3;
 		else
 			fseek(file, 0, SEEK_SET);
 		file_str.resize(file_size);
-		fread(const_cast<char*>(file_str.data()), file_size, 1, file);
+		_ = fread(const_cast<char*>(file_str.data()), file_size, 1, file);
 
 #ifdef _WIN32
 		String r;
