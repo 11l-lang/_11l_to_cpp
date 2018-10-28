@@ -1107,11 +1107,11 @@ def led(self, left):
     global scope
     module_name = left.to_str()
     if module_name not in modules and module_name not in builtin_modules:
-        module_file_name = os.path.dirname(file_name) + '/' + module_name
+        module_file_name = os.path.join(os.path.dirname(file_name), module_name).replace('\\', '/') # `os.path.join()` is needed for case when `os.path.dirname(file_name)` is empty string, `replace('\\', '/')` is needed for passing 'tests/parser/errors.txt'
         try:
             modulefstat = os.stat(module_file_name + '.11l')
         except FileNotFoundError:
-            raise Error('can not import module `' + module_name + '`: file `' + module_file_name + '.11l` is not found', left.token)
+            raise Error('can not import module `' + module_name + "`: file '" + module_file_name + ".11l' is not found", left.token)
 
         hpp_file_mtime = 0
         if os.path.isfile(module_file_name + '.hpp'):
@@ -1644,7 +1644,7 @@ module_scope.add_function('', ASTFunctionDefinition([('command', '', 'String')])
 module_scope.add_function('getenv', ASTFunctionDefinition([('name', '', 'String'), ('default', token_to_str('‘’'), 'String')]))
 builtin_modules['os'] = Module(module_scope)
 
-def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
+def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
     if len(tokens_) == 0: return ASTProgram()
     global tokens, source, tokeni, token, break_label_index, scope, tokensn, file_name, importing_module, modules
     prev_tokens    = tokens
@@ -1695,6 +1695,9 @@ def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, su
         p.beginning_extra += "Array<String> argv;\n\n"
 
     s = p.to_str() # call `to_str()` moved here [from outside] because it accesses global variables `source` (via `token.value(source)`) and `tokens` (via `tokens[ti]`)
+
+    if append_main and type(p.children[-1]) != ASTMain:
+        s += "\nint main()\n{\n}\n"
 
     tokens    = prev_tokens
     source    = prev_source

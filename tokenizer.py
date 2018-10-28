@@ -85,6 +85,7 @@ class Error(Exception):
     def __init__(self, message, pos):
         self.message = message
         self.pos = pos
+        self.end = pos
 
 class Token:
     class Category(IntEnum):
