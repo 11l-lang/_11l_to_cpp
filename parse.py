@@ -1624,7 +1624,7 @@ builtins_scope.add_function('max', ASTFunctionDefinition([('object1', '', ''), (
 builtins_scope.add_function('hex', ASTFunctionDefinition([('object', '', '')]))
 builtins_scope.add_function('round', ASTFunctionDefinition([('number', '', 'Float'), ('ndigits', '0', '')]))
 builtins_scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', '')])]))
-builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('mode', token_to_str('‘r’'), 'String'), ('encoding', token_to_str('‘utf-8’'), 'String'), ('newline', token_to_str('‘’'), 'String')])]))
+builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('mode', token_to_str('‘r’'), 'String'), ('encoding', token_to_str('‘utf-8’'), 'String')])]))
 for type_ in cpp_type_from_11l:
     builtins_scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', '', '')])]))
 

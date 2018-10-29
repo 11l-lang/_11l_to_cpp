@@ -137,7 +137,7 @@ for fname in os.listdir('tests/parser'):
                     print('Error at position ' + str(e.pos) + " in test:\n" + test + "\n[in file '" + full_fname + "']")
                     exit(1)
             except Exception as e:
-                print("Exception in file '" + full_fname + "' in test:\n" + test)
+                print("Exception in test:\n" + test + "\n[in file '" + full_fname + "']")
                 raise e
             print("There should be error in test:\n" + test)
             exit(1)
@@ -151,7 +151,7 @@ for fname in os.listdir('tests/parser'):
                     kdiff3(in_cpp, expected_cpp)
                     exit(1)
             except Exception as e:
-                print("Exception in file '" + full_fname + "' in test:\n" + test)
+                print("Exception in test:\n" + test + "\n[in file '" + full_fname + "']")
                 raise e
             print('OK')
 
@@ -178,7 +178,7 @@ for fname in os.listdir('tests/python_to_cpp'):
                 kdiff3(in_cpp, expected_cpp)
                 exit(1)
         except Exception as e:
-            print("Exception in file '" + full_fname + "' in test:\n" + test)
+            print("Exception in test:\n" + test + "\n[in file '" + full_fname + "']")
             raise e
         print('OK')
 
