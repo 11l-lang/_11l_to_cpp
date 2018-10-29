@@ -500,7 +500,7 @@ def process_files2():
 //import os
 
 F process_files(exclude_dir)
-   L(_fname) fs:walk(‘.’, dir_filter' d -> d[0] != ‘.’ & d != @exclude_dir, files_only' 0B)
+   L(_fname) fs:walk_dir(‘.’, dir_filter' d -> d[0] != ‘.’ & d != @exclude_dir, files_only' 0B)
       A root = fs:path:dir_name(_fname)
       [String] dirs, files
       I fs:is_directory(_fname) {dirs [+]= fs:path:base_name(_fname)} E files [+]= fs:path:base_name(_fname)
@@ -508,7 +508,7 @@ F process_files(exclude_dir)
          print(fs:path:join(root, name))
 
 F process_files2()
-   L(_fname) fs:walk(‘.’, files_only' 0B)
+   L(_fname) fs:walk_dir(‘.’, files_only' 0B)
       A root = fs:path:dir_name(_fname)
       [String] dirs, files
       I fs:is_directory(_fname) {dirs [+]= fs:path:base_name(_fname)} E files [+]= fs:path:base_name(_fname)
@@ -517,7 +517,7 @@ F process_files2()
 ===
 template <typename T1> auto process_files(const T1 &exclude_dir)
 {
-    for (auto _fname : fs::walk(u"."_S, [&exclude_dir](const auto &d){return _get<0>(d) != u'.' && d != exclude_dir;}, false)) {
+    for (auto _fname : fs::walk_dir(u"."_S, [&exclude_dir](const auto &d){return _get<0>(d) != u'.' && d != exclude_dir;}, false)) {
         auto root = fs::path::dir_name(_fname);
         Array<String> dirs, files;
         if (fs::is_directory(_fname))
@@ -531,7 +531,7 @@ template <typename T1> auto process_files(const T1 &exclude_dir)
 
 auto process_files2()
 {
-    for (auto _fname : fs::walk(u"."_S, nullptr, false)) {
+    for (auto _fname : fs::walk_dir(u"."_S, nullptr, false)) {
         auto root = fs::path::dir_name(_fname);
         Array<String> dirs, files;
         if (fs::is_directory(_fname))

@@ -1631,7 +1631,7 @@ for type_ in cpp_type_from_11l:
 module_scope = Scope(None)
 module_scope.add_function('get_temp_dir', ASTFunctionDefinition([]))
 module_scope.add_function('list_dir', ASTFunctionDefinition([('path', token_to_str('‘.’'), 'String')]))
-module_scope.add_function('walk', ASTFunctionDefinition([('path', token_to_str('‘.’'), 'String'), ('dir_filter', token_to_str('N', Token.Category.CONSTANT), '(String -> Bool)?'), ('files_only', token_to_str('1B', Token.Category.CONSTANT), 'Bool')]))
+module_scope.add_function('walk_dir', ASTFunctionDefinition([('path', token_to_str('‘.’'), 'String'), ('dir_filter', token_to_str('N', Token.Category.CONSTANT), '(String -> Bool)?'), ('files_only', token_to_str('1B', Token.Category.CONSTANT), 'Bool')]))
 module_scope.add_function('is_directory', ASTFunctionDefinition([('path', '', 'String')]))
 builtin_modules['fs'] = Module(module_scope)
 module_scope = Scope(None)
