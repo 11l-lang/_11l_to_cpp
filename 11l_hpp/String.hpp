@@ -88,7 +88,7 @@ public:
 	Iterator begin() const {return Iterator(const_cast<char16_t*>(data()));}
 	Iterator end()   const {return Iterator(const_cast<char16_t*>(data() + len()));}
 
-	int len() const { return size(); } // return `int` (not `size_t`) to avoid warning C4018: '<': signed/unsigned mismatch
+	int len() const { return (int)size(); } // return `int` (not `size_t`) to avoid warning C4018: '<': signed/unsigned mismatch
 
 	bool starts_with(const char16_t *s, size_t sz) const
 	{
@@ -141,7 +141,7 @@ public:
 	{
 		String str(*this);
 		size_t start_pos = 0;
-		while((start_pos = str.findi(old, start_pos)) != -1) {
+		while((start_pos = str.findi(old, (int)start_pos)) != -1) {
 			str.std::u16string::replace(start_pos, old.length(), n);
 			start_pos += n.length();
 		}
@@ -159,7 +159,7 @@ public:
 	Nullable<int> find(const String &s, int start = 0) const
 	{
 		size_t r = basic_string::find(s, start);
-		return r == npos ? Nullable<int>() : Nullable<int>(r);
+		return r == npos ? Nullable<int>() : Nullable<int>((int)r);
 	}
 
 	Nullable<int> find(const Tuple<String, String> &t, int start = 0) const
@@ -182,14 +182,14 @@ public:
 	int findi(const String &s, int start = 0) const
 	{
 		size_t r = basic_string::find(s, start);
-		return r != String::npos ? r : -1;
+		return r != String::npos ? (int)r : -1;
 	}
 
 	int rfindi(const String &sub, int start, int end) const
 	{
 		size_t r = rfind(sub, end - 1);
 		if (r == String::npos || (int)r < start) return -1;
-		return r;
+		return (int)r;
 	}
 
 	int count(const char16_t *s, size_t sz) const
@@ -198,7 +198,7 @@ public:
 		for (int i=0; i<len();)
 			if (memcmp(s, data() + i, sz * sizeof(char16_t)) == 0) {
 				c++;
-				i += sz;
+				i += (int)sz;
 			} else
 				i++;
 		return c;
@@ -250,7 +250,7 @@ public:
 
 	friend String &&operator*(String &&s, int n)
 	{
-		int s_len = s.length();
+		size_t s_len = s.length();
 		if (n < 1) // mimic Python's behavior in which 's' * 0 = '' and 's' * -1 = ''
 			s.clear();
 		else {
