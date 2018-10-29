@@ -718,9 +718,9 @@ L i < :argv.len
    i++
 A args_outfile = :stdout
 I ‘-f’ C :argv
-   args_outfile = File(:argv[:argv.index(‘-f’) + 1], ‘w’, encoding' ‘utf-8’, newline' "\n")
+   args_outfile = File(:argv[:argv.index(‘-f’) + 1], ‘w’, encoding' ‘utf-8’)
 E I ‘--file’ C :argv
-   args_outfile = File(:argv[:argv.index(‘--file’) + 1], ‘w’, encoding' ‘utf-8’, newline' "\n")
+   args_outfile = File(:argv[:argv.index(‘--file’) + 1], ‘w’, encoding' ‘utf-8’)
 
 I args_output_html_document & args_habr_html
    exit(‘Options --output-html-document and --habr-html are mutually exclusive’)

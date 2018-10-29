@@ -23,6 +23,8 @@ public:
 	Array() {}
     Array(std::initializer_list<Type> il) : std::vector<Type>(il) {}
 
+	using std::vector<Type>::begin, std::vector<Type>::end;
+
 	template <typename Func> auto map(Func &&func) -> Array<decltype(func(Type()))>
 	{
 		Array<decltype(func(Type()))> r;
@@ -34,10 +36,10 @@ public:
 	String join(const String &str)
 	{
 		String r;
-		auto it = std::vector<Type>::begin();
-		if (it != std::vector<Type>::end()) {
+		auto it = begin();
+		if (it != end()) {
 			r += *it;
-			for (++it; it != std::vector<Type>::end(); ++it) {
+			for (++it; it != end(); ++it) {
 				r += str;
 				r += *it;
 			}
@@ -134,6 +136,23 @@ public:
 		throw ValueError(v);
 	}
 
+	Nullable<int> find(const Type &val, int start = 0) const
+	{
+		auto it = std::find(begin() + start, end());
+		if (it != end())
+			return it - begin();
+		return nullptr;
+	}
+
+	Nullable<int> find(const Tuple<Type, Type> &t, int start = 0) const
+	{
+		for (auto it = begin() + start; it != end(); ++it) {
+			if (*it == std::get<0>(t)) return it - begin();
+			if (*it == std::get<1>(t)) return it - begin();
+		}
+		return nullptr;
+	}
+
 	Type &last()
 	{
 		if (std::vector<Type>::empty())
@@ -156,7 +175,7 @@ template <typename Type> Array<Type> create_array(std::initializer_list<Type> il
     return Array<Type>(il);
 }
 
-template <typename Type> bool in(const Type &val, const Array<Type> &arr)
+template <typename Ty, typename Type> bool in(const Ty &val, const Array<Type> &arr)
 {
 	return std::find(arr.begin(), arr.end(), val) != arr.end();
 }

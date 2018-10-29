@@ -73,7 +73,23 @@ public:
 		else
 			fseek(file, 0, SEEK_SET);
 		file_str.resize(file_size);
-		_ = fread(const_cast<char*>(file_str.data()), file_size, 1, file);
+		_ = fread(file_str.data(), file_size, 1, file);
+
+		size_t cr_pos = file_str.find('\r');
+		if (cr_pos != std::string::npos) {
+			char *dest = file_str.data() + cr_pos;
+			const char *src = dest + 1, *end = file_str.data() + file_str.size();
+			while (src < end) {
+				if (*src == '\r') {
+					src++;
+					continue;
+				}
+				*dest = *src;
+				dest++;
+				src++;
+			}
+			file_str.resize(dest - file_str.data());
+		}
 
 #ifdef _WIN32
 		String r;
@@ -83,6 +99,18 @@ public:
 #else
 		return String(convert_utf8_to_utf16(file_str));
 #endif
+	}
+
+	Array<unsigned char> read_bytes()
+	{
+		fseek(file, 0, SEEK_END);
+		size_t file_size = ftell(file);
+		fseek(file, 0, SEEK_SET);
+
+		Array<unsigned char> file_bytes;
+		file_bytes.resize(file_size);
+		size_t _ = fread(file_bytes.data(), file_size, 1, file);
+		return file_bytes;
 	}
 
 	void close()

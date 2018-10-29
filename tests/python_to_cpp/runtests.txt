@@ -326,9 +326,9 @@ for root, dirs, files in os.walk('.'):
     dirs[:] = [d for d in dirs if d[0] != '.'] # exclude hidden folders (e.g. `.hg`)
     for name in files:
         if name.endswith(".py") or name.endswith(".txt"):
-            filestr = open(os.path.join(root, name), encoding = 'utf8', newline = '').read()
-            if "\r" in filestr or "\t" in filestr:
-                print(R"Unallowed character (\r or \t) found in file " + os.path.join(root, name)[2:])
+            file_bytes = open(os.path.join(root, name), 'rb').read()
+            if b"\r" in file_bytes or b"\t" in file_bytes:
+                print(R"Unallowed character (\r or \t) found in file '" + os.path.join(root, name)[2:] + "'")
                 failed_tests += 1
 
 # Unfortunately addition of this line:
@@ -377,7 +377,7 @@ F TEST(=str1, =str2, ohd = 0B, habr_html = 0B)
          L(file) [(‘wrong’, str1), (‘right’, str2)]
             A full_fname = fs:path:join(fs:get_temp_dir(), file[0])
             command ‘’= ‘ "’full_fname‘"’
-            File(full_fname, ‘w’, encoding' ‘utf-8-sig’, newline' "\n").write(file[1])
+            File(full_fname, ‘w’, encoding' ‘utf-8-sig’).write(file[1])
          os:(command)
          :kdiff_showed = 1B
       :failed_tests++
@@ -641,9 +641,9 @@ L(_fname) fs:walk(‘.’, dir_filter' d -> d[0] != ‘.’, files_only' 0B)
    I fs:is_directory(_fname) {dirs [+]= fs:path:base_name(_fname)} E files [+]= fs:path:base_name(_fname)
    L(name) files
       I name.ends_with(‘.py’) | name.ends_with(‘.txt’)
-         A filestr = File(fs:path:join(root, name), encoding' ‘utf8’, newline' ‘’).read()
-         I "\r" C filestr | "\t" C filestr
-            print(‘Unallowed character (\r or \t) found in file ’fs:path:join(root, name)[2..])
+         A file_bytes = File(fs:path:join(root, name)).read_bytes()
+         I "\r".code C file_bytes | "\t".code C file_bytes
+            print(‘Unallowed character (\r or \t) found in file '’fs:path:join(root, name)[2..]‘'’)
             failed_tests++
 
 F check_file(fname)
@@ -683,7 +683,7 @@ template <typename T1, typename T2, typename T3 = decltype(false), typename T4 =
             for (auto file : create_array({make_tuple(u"wrong"_S, str1), make_tuple(u"right"_S, str2)})) {
                 auto full_fname = fs::path::join(fs::get_temp_dir(), _get<0>(file));
                 command += u" \""_S + full_fname + u"\""_S;
-                File(full_fname, u"w"_S, u"utf-8-sig"_S, u"\n"_S).write(_get<1>(file));
+                File(full_fname, u"w"_S, u"utf-8-sig"_S).write(_get<1>(file));
             }
             os::_(command);
             ::kdiff_showed = true;
@@ -971,9 +971,9 @@ struct CodeBlock2
                 files.append(fs::path::base_name(_fname));
             for (auto name : files)
                 if (name.ends_with(u".py"_S) || name.ends_with(u".txt"_S)) {
-                    auto filestr = File(fs::path::join(root, name), u"r"_S, u"utf8"_S, u""_S).read();
-                    if (in(u'\r'_C, filestr) || in(u'\t'_C, filestr)) {
-                        print(uR"(Unallowed character (\r or \t) found in file )"_S + fs::path::join(root, name)[range_ei(2)]);
+                    auto file_bytes = File(fs::path::join(root, name)).read_bytes();
+                    if (in(u'\r'_C.code, file_bytes) || in(u'\t'_C.code, file_bytes)) {
+                        print(uR"(Unallowed character (\r or \t) found in file ')"_S + fs::path::join(root, name)[range_ei(2)] + u"'"_S);
                         failed_tests++;
                     }
                 }
