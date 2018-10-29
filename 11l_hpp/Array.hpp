@@ -56,7 +56,7 @@ public:
 		return r;
 	}
 
-	int len() const {return std::vector<Type>::size();}
+	int len() const {return (int)std::vector<Type>::size();}
 
 	friend Array &&operator*(Array &&a, int n)
 	{
@@ -147,10 +147,15 @@ public:
 	Nullable<int> find(const Tuple<Type, Type> &t, int start = 0) const
 	{
 		for (auto it = begin() + start; it != end(); ++it) {
-			if (*it == std::get<0>(t)) return it - begin();
-			if (*it == std::get<1>(t)) return it - begin();
+			if (*it == std::get<0>(t)) return int(it - begin());
+			if (*it == std::get<1>(t)) return int(it - begin());
 		}
 		return nullptr;
+	}
+
+	template <typename Ty> Nullable<int> find(const Tuple<Ty, Ty> &t, int start = 0) const
+	{
+		return find(make_tuple((Type)std::get<0>(t), (Type)std::get<1>(t)), start);
 	}
 
 	Type &last()

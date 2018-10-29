@@ -52,7 +52,7 @@ public:
 		std::string utf8;
 #ifdef _WIN32
 		utf8.resize(s.length() * 3);
-		utf8.resize(WideCharToMultiByte(CP_UTF8, 0, (LPCWCH)s.data(), s.length(), const_cast<char*>(utf8.data()), utf8.size(), NULL, NULL));
+		utf8.resize(WideCharToMultiByte(CP_UTF8, 0, (LPCWCH)s.data(), s.len(), const_cast<char*>(utf8.data()), (int)utf8.size(), NULL, NULL));
 #else
 		utf8 = convert_utf16_to_utf8(s);
 #endif
@@ -94,7 +94,7 @@ public:
 #ifdef _WIN32
 		String r;
 		r.resize(file_size);
-		r.resize(MultiByteToWideChar(CP_UTF8, 0, file_str.data(), file_str.size(), (LPWSTR)r.data(), r.size()));
+		r.resize(MultiByteToWideChar(CP_UTF8, 0, file_str.data(), (int)file_str.size(), (LPWSTR)r.data(), (int)r.size()));
 		return r;
 #else
 		return String(convert_utf8_to_utf16(file_str));
