@@ -635,7 +635,7 @@ X.catch pqmarkup:Exception e
 assert(was_error)
 test_id++
 print(‘Test ’String(test_id)‘. Checking source files for unallowed characters...’)
-L(_fname) fs:walk(‘.’, dir_filter' d -> d[0] != ‘.’, files_only' 0B)
+L(_fname) fs:walk_dir(‘.’, dir_filter' d -> d[0] != ‘.’, files_only' 0B)
    A root = fs:path:dir_name(_fname)
    [String] dirs, files
    I fs:is_directory(_fname) {dirs [+]= fs:path:base_name(_fname)} E files [+]= fs:path:base_name(_fname)
@@ -962,7 +962,7 @@ struct CodeBlock2
         assert(was_error);
         test_id++;
         print(u"Test "_S + String(test_id) + u". Checking source files for unallowed characters..."_S);
-        for (auto _fname : fs::walk(u"."_S, [](const auto &d){return _get<0>(d) != u'.';}, false)) {
+        for (auto _fname : fs::walk_dir(u"."_S, [](const auto &d){return _get<0>(d) != u'.';}, false)) {
             auto root = fs::path::dir_name(_fname);
             Array<String> dirs, files;
             if (fs::is_directory(_fname))
