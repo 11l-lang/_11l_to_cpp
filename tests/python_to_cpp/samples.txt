@@ -555,3 +555,25 @@ struct CodeBlock1
         print(round(1.12345, 3));
     }
 } code_block_1;
+
+
+import time
+start = time.perf_counter()
+time.sleep(0.1)
+print(time.perf_counter() - start)
+===
+//import time
+A start = time:perf_counter()
+sleep(0.1)
+print(time:perf_counter() - start)
+===
+auto start = timens::perf_counter();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        sleep(0.1);
+        print(timens::perf_counter() - start);
+    }
+} code_block_1;
