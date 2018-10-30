@@ -68,6 +68,14 @@ inline void assert_file_line(const char *file_name, int line, bool expression, c
 #include "11l_hpp/File.hpp"
 #include "11l_hpp/os.hpp"
 #include "11l_hpp/fs.hpp"
+#include "11l_hpp/time.hpp"
+
+#include <thread>
+
+void sleep(double secs) // I could not pick up an appropriate namespace for this function, so left it in a global namespace (like in Ruby, Julia and Groovy)
+{
+	std::this_thread::sleep_for(std::chrono::duration<double>(secs));
+}
 
 inline void print(const String &s, const String &end = u"\n", bool flush = false)
 {

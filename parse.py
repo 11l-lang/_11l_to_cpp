@@ -453,8 +453,10 @@ class SymbolNode:
                     return cts0.lstrip('@') + '->' + c1
                 return char_if_len_1(self.children[0]) + '.' + c1 + '()'*(c1 in ('len', 'last', 'empty')) # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
             elif self.symbol.id == ':':
+                c0 = self.children[0].to_str()
+                c0 = {'time':'timens'}.get(c0, c0) # 'time': a symbol with this name already exists and therefore this name cannot be used as a namespace name
                 c1 = self.children[1].to_str()
-                return self.children[0].to_str() + '::' + (c1 if c1 != '' else '_')
+                return c0 + '::' + (c1 if c1 != '' else '_')
             elif self.symbol.id == '->':
                 captured_variables = set()
                 def gather_captured_variables(sn):
@@ -1623,6 +1625,7 @@ builtins_scope.add_function('min', ASTFunctionDefinition([('object1', '', ''), (
 builtins_scope.add_function('max', ASTFunctionDefinition([('object1', '', ''), ('object2', '', '')]))
 builtins_scope.add_function('hex', ASTFunctionDefinition([('object', '', '')]))
 builtins_scope.add_function('round', ASTFunctionDefinition([('number', '', 'Float'), ('ndigits', '0', '')]))
+builtins_scope.add_function('sleep', ASTFunctionDefinition([('secs', '', 'Float')]))
 builtins_scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', '')])]))
 builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('mode', token_to_str('‘r’'), 'String'), ('encoding', token_to_str('‘utf-8’'), 'String')])]))
 for type_ in cpp_type_from_11l:
@@ -1643,6 +1646,9 @@ module_scope = Scope(None)
 module_scope.add_function('', ASTFunctionDefinition([('command', '', 'String')]))
 module_scope.add_function('getenv', ASTFunctionDefinition([('name', '', 'String'), ('default', token_to_str('‘’'), 'String')]))
 builtin_modules['os'] = Module(module_scope)
+module_scope = Scope(None)
+module_scope.add_function('perf_counter', ASTFunctionDefinition([]))
+builtin_modules['time'] = Module(module_scope)
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
     if len(tokens_) == 0: return ASTProgram()
