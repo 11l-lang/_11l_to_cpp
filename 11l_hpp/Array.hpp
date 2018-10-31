@@ -21,7 +21,7 @@ template <typename Type> class Array : public std::vector<Type>
 
 public:
 	Array() {}
-    Array(std::initializer_list<Type> il) : std::vector<Type>(il) {}
+	Array(std::initializer_list<Type> il) : std::vector<Type>(il) {}
 
 	using std::vector<Type>::begin, std::vector<Type>::end;
 
@@ -177,7 +177,7 @@ public:
 
 template <typename Type> Array<Type> create_array(std::initializer_list<Type> il)
 {
-    return Array<Type>(il);
+	return Array<Type>(il);
 }
 
 template <typename Ty, typename Type> bool in(const Ty &val, const Array<Type> &arr)

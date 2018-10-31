@@ -73,6 +73,7 @@ public:
 	explicit String(const char16_t *&s) : basic_string(s) {} // reference is needed here because otherwise String(const char16_t (&s)[N]) is never called (`String(u"str")` calls `String(const char16_t *s)`)
 	String(const char16_t *s, size_t sz) : basic_string(s, sz) {}
 	template <int N> String(const char16_t (&s)[N]): basic_string(s, N-1) {}
+	explicit String(const char *s, const char *e) : basic_string(s, e) {}
 
 	using std::u16string::assign;
 	void assign(double num)

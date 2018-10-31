@@ -1654,6 +1654,8 @@ module_scope.add_function('', ASTFunctionDefinition([('year', '0', 'Int'), ('mon
 module_scope.add_function('perf_counter', ASTFunctionDefinition([]))
 module_scope.add_function('delta', ASTFunctionDefinition([('days', '0', 'Float'), ('hours', '0', 'Float'), ('minutes', '0', 'Float'), ('seconds', '0', 'Float'), ('milliseconds', '0', 'Float'), ('microseconds', '0', 'Float'), ('weeks', '0', 'Float')]))
 module_scope.add_function('today', ASTFunctionDefinition([]))
+module_scope.add_function('from_unix_time', ASTFunctionDefinition([('unix_time', '', 'Float')]))
+module_scope.add_function('strptime', ASTFunctionDefinition([('datetime_string', '', 'String'), ('format', '', 'String')]))
 builtin_modules['time'] = Module(module_scope)
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
