@@ -577,3 +577,30 @@ struct CodeBlock1
         print(timens::perf_counter() - start);
     }
 } code_block_1;
+
+
+import datetime
+assert(datetime.datetime(2018, 8, 2) - datetime.datetime(2018, 7, 1) == datetime.timedelta(days = 32))
+assert(datetime.date    (2018, 8, 2) - datetime.date    (2018, 7, 1) == datetime.timedelta(days = 32))
+print(datetime.timedelta(days = 1, hours = 2, minutes = 3, seconds = 4.5))
+print(datetime.date.today())
+print(datetime.datetime.now() - datetime.date.today())
+===
+//import datetime
+assert(time:(2018, 8, 2) - time:(2018, 7, 1) == time:delta(days' 32))
+assert(time:(2018, 8, 2) - time:(2018, 7, 1) == time:delta(days' 32))
+print(time:delta(days' 1, hours' 2, minutes' 3, seconds' 4.5))
+print(time:today())
+print(time:() - time:today())
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        assert(timens::_(2018, 8, 2) - timens::_(2018, 7, 1) == timens::delta(32));
+        assert(timens::_(2018, 8, 2) - timens::_(2018, 7, 1) == timens::delta(32));
+        print(timens::delta(1, 2, 3, 4.5));
+        print(timens::today());
+        print(timens::_() - timens::today());
+    }
+} code_block_1;
