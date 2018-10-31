@@ -8,7 +8,7 @@
 
 std::string convert_utf16_to_utf8(const std::u16string &u16)
 {
-    return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(u16);
+	return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(u16);
 }
 
 std::u16string convert_utf8_to_utf16(const std::string &u8)
