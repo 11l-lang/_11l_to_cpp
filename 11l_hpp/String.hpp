@@ -68,11 +68,21 @@ public:
 			*end=staticBuffer+len-1; start<end; start++, end--) std::swap(*start, *end);
 		assign(staticBuffer, len);
 	}
-	explicit String(float  num) : basic_string((char16_t*)std::to_wstring(num).c_str()) {}
-	explicit String(double num) : basic_string((char16_t*)std::to_wstring(num).c_str()) {}
+	explicit String(float  num) {assign(num);}
+	explicit String(double num) {assign(num);}
 	explicit String(const char16_t *&s) : basic_string(s) {} // reference is needed here because otherwise String(const char16_t (&s)[N]) is never called (`String(u"str")` calls `String(const char16_t *s)`)
 	String(const char16_t *s, size_t sz) : basic_string(s, sz) {}
 	template <int N> String(const char16_t (&s)[N]): basic_string(s, N-1) {}
+
+	using std::u16string::assign;
+	void assign(double num)
+	{
+		std::wstring ws = std::to_wstring(num);
+		size_t l = ws.length() - 1;
+		while (ws[l] == '0') l--;
+		if (ws[l] == '.') l--;
+		assign(ws.begin(), ws.begin() + l + 1);
+	}
 
 	class Iterator
 	{
@@ -317,10 +327,12 @@ public:
 
 	String operator+(const String &s) const {String r(*this); r.append(s); return r;}
 	String operator+(Char ch) {String r(*this); r.append(1, ch.code); return r;}
+	String operator+(char16_t ch) {String r(*this); r.append(1, ch); return r;}
 
 	String operator+(int i) {return *this + String(i);}
 	friend String operator+(int i, const String &s) {return String(i) + s;}
-	friend String operator+(Char c, const String &s) {return String(c) + s;}
+	friend String operator+(Char ch, const String &s) {return String(ch) + s;}
+	friend String operator+(char16_t ch, const String &s) {return String(ch) + s;}
 };
 
 inline String operator+(Char ch1, Char ch2)
