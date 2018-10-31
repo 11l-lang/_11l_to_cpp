@@ -580,26 +580,33 @@ struct CodeBlock1
 
 
 import datetime
+d = datetime.timedelta(days = 1, hours = 2, minutes = 3, seconds = 4.5)
 assert(datetime.datetime(2018, 8, 2) - datetime.datetime(2018, 7, 1) == datetime.timedelta(days = 32))
 assert(datetime.date    (2018, 8, 2) - datetime.date    (2018, 7, 1) == datetime.timedelta(days = 32))
-print(datetime.timedelta(days = 1, hours = 2, minutes = 3, seconds = 4.5))
+print(d)
+print(str(d.days) + ', ' + str(d.seconds))
 print(datetime.date.today())
 print(datetime.datetime.now() - datetime.date.today())
 ===
 //import datetime
+A d = time:delta(days' 1, hours' 2, minutes' 3, seconds' 4.5)
 assert(time:(2018, 8, 2) - time:(2018, 7, 1) == time:delta(days' 32))
 assert(time:(2018, 8, 2) - time:(2018, 7, 1) == time:delta(days' 32))
-print(time:delta(days' 1, hours' 2, minutes' 3, seconds' 4.5))
+print(d)
+print(String(d.days())‘, ’String(d.seconds))
 print(time:today())
 print(time:() - time:today())
 ===
+auto d = timens::delta(1, 2, 3, 4.5);
+
 struct CodeBlock1
 {
     CodeBlock1()
     {
         assert(timens::_(2018, 8, 2) - timens::_(2018, 7, 1) == timens::delta(32));
         assert(timens::_(2018, 8, 2) - timens::_(2018, 7, 1) == timens::delta(32));
-        print(timens::delta(1, 2, 3, 4.5));
+        print(d);
+        print(String(d.days()) + u", "_S + String(d.seconds));
         print(timens::today());
         print(timens::_() - timens::today());
     }
