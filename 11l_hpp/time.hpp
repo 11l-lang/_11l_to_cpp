@@ -22,9 +22,9 @@ HRCTimePoint perf_counter()
 
 class Delta
 {
-    friend class Time;
-    double seconds;
 public:
+    double seconds;
+
     explicit Delta(double seconds) : seconds(seconds) {}
 
     operator String() const
@@ -55,6 +55,8 @@ public:
 
 	bool operator==(Delta d) const {return seconds == d.seconds;}
 	bool operator!=(Delta d) const {return seconds != d.seconds;}
+
+	double days() const {return seconds / (24.0 * 3600);}
 };
 
 inline Delta delta(double days = 0, double hours = 0, double minutes = 0, double seconds = 0, double milliseconds = 0, double microseconds = 0, double weeks = 0)

@@ -295,8 +295,11 @@ class SymbolNode:
                 res = func_name + '('
                 for i in range(1, len(self.children), 2):
                     if self.children[i] == None:
-                        if f_node != None and type(f_node) == ASTFunctionDefinition and f_node.function_arguments[last_function_arg][2].endswith('?'):
-                            res += '&'
+                        if f_node != None and type(f_node) == ASTFunctionDefinition:
+                            if last_function_arg >= len(f_node.function_arguments):
+                                raise Error('Too many arguments for function `' + func_name + '`', Token(self.children[0].leftmost(), self.children[0].rightmost(), Token.Category.NAME))
+                            if f_node.function_arguments[last_function_arg][2].endswith('?'):
+                                res += '&'
                         res += self.children[i+1].to_str()
                         last_function_arg += 1
                     else:
@@ -1616,7 +1619,7 @@ def token_to_str(token_str_override, token_category = Token.Category.STRING_LITE
     return SymbolNode(Token(0, 0, token_category), token_str_override).to_str()
 
 builtins_scope = Scope(None)
-builtins_scope.add_function('print', ASTFunctionDefinition([('object', '', ''), ('end', token_to_str(R'"\n"'), 'String'), ('flush', token_to_str('0B', Token.Category.CONSTANT))]))
+builtins_scope.add_function('print', ASTFunctionDefinition([('object', '', ''), ('end', token_to_str(R'"\n"'), 'String'), ('flush', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
 builtins_scope.add_function('assert', ASTFunctionDefinition([('expression', '', 'Bool'), ('message', token_to_str('‘’'), 'String')]))
 builtins_scope.add_function('exit', ASTFunctionDefinition([('arg', '', '')]))
 builtins_scope.add_function('zip', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', '')]))
