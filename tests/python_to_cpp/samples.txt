@@ -642,3 +642,55 @@ struct CodeBlock1
         print(timens::from_unix_time(timens::_(1970, 1, 2).unix_time()));
     }
 } code_block_1;
+
+
+for line in open('1.py').readlines():
+    print(line)
+===
+L(line) File(‘1.py’).read_lines(1B)
+   print(line)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto line : File(u"1.py"_S).read_lines(true))
+            print(line);
+    }
+} code_block_1;
+
+
+items = ['A', 'B', 'C']
+for index, item in enumerate(items):
+    print(str(index) + '. ' + item)
+for index, item in enumerate(items, 1):
+    print(str(index) + '. ' + item)
+===
+A items = [‘A’, ‘B’, ‘C’]
+L(item) items
+   A index = L.index
+   print(String(index)‘. ’item)
+L(item) items
+   A index = L.index + 1
+   print(String(index)‘. ’item)
+===
+auto items = create_array({u'A'_C, u'B'_C, u'C'_C});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {int Lindex = 0;
+        for (auto item : items) {
+            auto index = Lindex;
+            print(String(index) + u". "_S + item);
+            Lindex++;
+        }}
+        {int Lindex = 0;
+        for (auto item : items) {
+            auto index = Lindex + 1;
+            print(String(index) + u". "_S + item);
+            Lindex++;
+        }}
+    }
+} code_block_1;
