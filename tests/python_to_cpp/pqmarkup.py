@@ -631,7 +631,7 @@ class Converter:
                     exit_with_error('Unpaired right single quotation mark', i)
                 last = ending_tags.pop()
                 outfile.write(last)
-                if next_char() == "\n" and (last.startswith('</h') or last == "</blockquote>"): # так как <h.> - блоковый элемент, то он автоматически завершает строку, поэтому лишний тег <br> в этом случае добавлять не нужно (иначе получится лишняя пустая строка после заголовка)
+                if next_char() == "\n" and (last.startswith('</h') or last in ('</blockquote>', '</div>')): # так как <h.> - блоковый элемент, то он автоматически завершает строку, поэтому лишний тег <br> в этом случае добавлять не нужно (иначе получится лишняя пустая строка после заголовка)
                     outfile.write("\n")
                     i += 1
                     writepos += 1
@@ -723,7 +723,7 @@ class Converter:
 
         if outfilef == None:
             r = "".join(result)
-            if self.habr_html:                               # // dirty hack
+            if self.habr_html:                                    # // dirty hack
                 r = r.replace("</blockquote>\n", '</blockquote>') # \\ (just left it as is)
             return r
 
@@ -754,7 +754,7 @@ Options:
                         write output to OUTPUT_FILE (defaults to STDOUT)''')
         sys.exit(0)
 
-    args_habr_html       = '--habr-html'            in sys.argv
+    args_habr_html            = '--habr-html'            in sys.argv
     args_output_html_document = '--output-html-document' in sys.argv
     args_infile = sys.stdin
     i = 1

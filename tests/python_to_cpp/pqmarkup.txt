@@ -459,7 +459,7 @@ class Converter:
                     # elif self.ohd: # [-TODO syntax highlighting-]
                     else:
                         write_to_pos(prevci, endqpos+1)
-                        outfile.write('<pre style="display: inline">' + html_escape(instr[startqpos+1:endqpos]) + '</pre>') # в habr_html тег pre не стоит задействовать, так как в habr для тега pre используется шрифт monospace, в котором символы ‘ и ’ выглядят непонятно (не так как в Courier New)
+                        outfile.write('<pre style="display: inline">' + html_escape(instr[startqpos+1:endqpos]) + '</pre>') # в habr_html тег pre не стоит задействовать, так как в Habr для тега pre используется шрифт monospace, в котором символы ‘ и ’ выглядят непонятно (не так как в Courier New)
                     if ins[0] == "\n" and instr[i+1:i+2] == "\n":
                         new_line_tag = ''
                 elif prevc in 'TТ':
@@ -631,7 +631,7 @@ class Converter:
                     exit_with_error('Unpaired right single quotation mark', i)
                 last = ending_tags.pop()
                 outfile.write(last)
-                if next_char() == "\n" and (last.startswith('</h') or last == "</blockquote>"): # так как <h.> - блоковый элемент, то он автоматически завершает строку, поэтому лишний тег <br> в этом случае добавлять не нужно (иначе получится лишняя пустая строка после заголовка)
+                if next_char() == "\n" and (last.startswith('</h') or last in ('</blockquote>', '</div>')): # так как <h.> - блоковый элемент, то он автоматически завершает строку, поэтому лишний тег <br> в этом случае добавлять не нужно (иначе получится лишняя пустая строка после заголовка)
                     outfile.write("\n")
                     i += 1
                     writepos += 1
@@ -1471,7 +1471,7 @@ T Converter
                exit_with_error(‘Unpaired right single quotation mark’, i)
             A last = ending_tags.pop()
             outfile.write(last)
-            I next_char() == "\n" & (last.starts_with(‘</h’) | last == ‘</blockquote>’)
+            I next_char() == "\n" & (last.starts_with(‘</h’) | last C (‘</blockquote>’, ‘</div>’))
                outfile.write("\n")
                i++
                writepos++
@@ -2458,7 +2458,7 @@ public:
                     exit_with_error(u"Unpaired right single quotation mark"_S, i);
                 auto last = ending_tags.pop();
                 outfile.write(last);
-                if (next_char() == u'\n' && (last.starts_with(u"</h"_S) || last == u"</blockquote>")) {
+                if (next_char() == u'\n' && (last.starts_with(u"</h"_S) || in(last, make_tuple(u"</blockquote>"_S, u"</div>"_S)))) {
                     outfile.write(u"\n"_S);
                     i++;
                     writepos++;

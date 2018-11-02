@@ -751,7 +751,7 @@ public:
                     exit_with_error(u"Unpaired right single quotation mark"_S, i);
                 auto last = ending_tags.pop();
                 outfile.write(last);
-                if (next_char() == u'\n' && (last.starts_with(u"</h"_S) || last == u"</blockquote>")) {
+                if (next_char() == u'\n' && (last.starts_with(u"</h"_S) || in(last, make_tuple(u"</blockquote>"_S, u"</div>"_S)))) {
                     outfile.write(u"\n"_S);
                     i++;
                     writepos++;
