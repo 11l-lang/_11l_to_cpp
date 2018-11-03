@@ -625,3 +625,20 @@ public:
         print(u"TypeName object destructed"_S);
     }
 };
+
+
+I.likely 1+1 == 2
+   print(‘+’)
+I.unlikely 1-1 == 2
+   print(‘-’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        if (likely(1 + 1 == 2))
+            print(u"+"_S);
+        if (unlikely(1 - 1 == 2))
+            print(u"-"_S);
+    }
+} code_block_1;
