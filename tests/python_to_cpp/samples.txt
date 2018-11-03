@@ -773,7 +773,7 @@ int main()
     animals.append(std::make_unique<Cat>());
     auto animal = std::make_unique<Sheep>();
     animal->say();
-    animals.append(animal);
+    animals.append(std::move(animal));
     for (auto &&animal : animals)
         animal->say();
 }

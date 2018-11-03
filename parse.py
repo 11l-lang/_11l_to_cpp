@@ -19,6 +19,7 @@ class Scope:
     class Id:
         type : str
         ast_nodes : List['ASTNodeWithChildren']
+        last_occurrence : 'SymbolNode' = None
 
         def __init__(self, type, ast_node = None):
             self.type = type
@@ -191,6 +192,33 @@ class SymbolNode:
                         break
                     ast_parent = ast_parent.parent
                 return 'Lindex'
+
+            tid = self.scope.find(self.token_str())
+            if tid != None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTVariableInitialization and tid.ast_nodes[0].is_ptr: # `animals [+]= animal` -> `animals.append(std::move(animal));`
+                if tid.last_occurrence == None:
+                    last_reference = None
+                    var_name = self.token_str()
+                    def find_last_reference_to_identifier(node):
+                        def f(e : SymbolNode):
+                            if e.token.category == Token.Category.NAME and e.token_str() == var_name and id(e.scope.find(var_name)) == id(tid):
+                                nonlocal last_reference
+                                last_reference = e
+                            for child in e.children:
+                                if child != None:
+                                    f(child)
+                        node.walk_expressions(f)
+                        node.walk_children(find_last_reference_to_identifier)
+
+                    for index in range(len(tid.ast_nodes[0].parent.children)):
+                        if id(tid.ast_nodes[0].parent.children[index]) == id(tid.ast_nodes[0]):
+                            for index in range(index + 1, len(tid.ast_nodes[0].parent.children)):
+                                find_last_reference_to_identifier(tid.ast_nodes[0].parent.children[index])
+                            tid.last_occurrence = last_reference
+                            break
+
+                if id(tid.last_occurrence) == id(self):
+                    return 'std::move(' + self.token_str() + ')'
+
             return self.token_str().lstrip('@').replace(':', '::')
 
         if self.token.category == Token.Category.KEYWORD and self.token_str() in ('L.next', 'Ц.след', 'loop.next', 'цикл.след'):
@@ -260,8 +288,8 @@ class SymbolNode:
                         s = self.scope
                         while True:
                             if s.is_function:
-                                for id in s.parent.ids.values():
-                                    if type(id.ast_nodes[0].parent) == ASTTypeDefinition:
+                                for id_ in s.parent.ids.values():
+                                    if type(id_.ast_nodes[0].parent) == ASTTypeDefinition:
                                         fid = s.parent.ids.get(self.children[0].children[0].to_str())
                                         if fid == None:
                                             raise Error('call of undefined method `' + func_name + '`', self.children[0].children[0].token)
@@ -454,14 +482,14 @@ class SymbolNode:
                         return 'this->' + c1
                     else:
                         return c1
-                id = self.scope.find(cts0.lstrip('@'))
-                if id != None:
-                    if id.type != None and id.type.endswith('?'):
+                id_ = self.scope.find(cts0.lstrip('@'))
+                if id_ != None:
+                    if id_.type != None and id_.type.endswith('?'):
                         return cts0.lstrip('@') + '->' + c1
-                    if len(id.ast_nodes) and type(id.ast_nodes[0]) == ASTLoop and id.ast_nodes[0].is_loop_variable_a_ptr and cts0 == id.ast_nodes[0].loop_variable:
+                    if len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTLoop and id_.ast_nodes[0].is_loop_variable_a_ptr and cts0 == id_.ast_nodes[0].loop_variable:
                         return cts0 + '->' + c1
-                    if len(id.ast_nodes) and type(id.ast_nodes[0]) == ASTVariableInitialization and id.ast_nodes[0].is_ptr:
-                        return cts0 + '->' + c1
+                    if len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTVariableInitialization and id_.ast_nodes[0].is_ptr:
+                        return self.children[0].to_str() + '->' + c1 # `to_str()` is needed for such case: `animal.say(); animals [+]= animal; animal.say()` -> `animal->say(); animals.append(animal); std::move(animal)->say();`
                 return char_if_len_1(self.children[0]) + '.' + c1 + '()'*(c1 in ('len', 'last', 'empty')) # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
             elif self.symbol.id == ':':
                 c0 = self.children[0].to_str()
