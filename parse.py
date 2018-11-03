@@ -460,6 +460,8 @@ class SymbolNode:
                         return cts0.lstrip('@') + '->' + c1
                     if len(id.ast_nodes) and type(id.ast_nodes[0]) == ASTLoop and id.ast_nodes[0].is_loop_variable_a_ptr and cts0 == id.ast_nodes[0].loop_variable:
                         return cts0 + '->' + c1
+                    if len(id.ast_nodes) and type(id.ast_nodes[0]) == ASTVariableInitialization and id.ast_nodes[0].is_ptr:
+                        return cts0 + '->' + c1
                 return char_if_len_1(self.children[0]) + '.' + c1 + '()'*(c1 in ('len', 'last', 'empty')) # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
             elif self.symbol.id == ':':
                 c0 = self.children[0].to_str()
@@ -662,6 +664,8 @@ class ASTVariableDeclaration(ASTNode):
         return ' ' * (indent*4) + self.trans_type(self.type) + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + ', '.join(self.vars) + ";\n"
 
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
+    is_ptr = False
+
     def to_str(self, indent):
         return super().to_str(indent)[:-2] + ' = ' + self.expression.to_str() + ";\n"
 
@@ -1660,6 +1664,11 @@ def parse_internal(this_node):
                         next_token()
                         node = ASTVariableInitialization()
                         node.set_expression(expression())
+                        if node.expression.symbol.id == '(' and node.expression.children[0].token.category == Token.Category.NAME and node.expression.children[0].token_str()[0].isupper(): # ) # for `A animal = Sheep(); animal.say()` -> `...; animal->say();`
+                            id = scope.find(node.expression.children[0].token_str())
+                            assert(id != None and len(id.ast_nodes) and type(id.ast_nodes[0]) == ASTTypeDefinition)
+                            if id.ast_nodes[0].have_virtual_functions:
+                                node.is_ptr = True
                         node.vars = [var_name]
                     else:
                         node = ASTVariableDeclaration()

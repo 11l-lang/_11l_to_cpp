@@ -710,11 +710,15 @@ class Cat(Animal):
     def say(self):
         print('meow')
 
-animals : List[Animal] = []
-animals += [Sheep()]
-animals += [Cat()]
-for animal in animals:
+if __name__ == '__main__':
+    animals : List[Animal] = []
+    animals += [Sheep()]
+    animals += [Cat()]
+    animal = Sheep()
     animal.say()
+    animals += [animal]
+    for animal in animals:
+        animal.say()
 ===
 
 T Animal
@@ -727,9 +731,14 @@ T Sheep(Animal)
 T Cat(Animal)
    F.virtual.override say() -> N
       print(‘meow’)
+
+:start:
 Array[Animal] animals
 animals [+]= Sheep()
 animals [+]= Cat()
+A animal = Sheep()
+animal.say()
+animals [+]= animal
 L(animal) animals
    animal.say()
 ===
@@ -756,15 +765,15 @@ public:
         print(u"meow"_S);
     }
 };
-Array<std::unique_ptr<Animal>> animals;
 
-struct CodeBlock1
+int main()
 {
-    CodeBlock1()
-    {
-        animals.append(std::make_unique<Sheep>());
-        animals.append(std::make_unique<Cat>());
-        for (auto &&animal : animals)
-            animal->say();
-    }
-} code_block_1;
+    Array<std::unique_ptr<Animal>> animals;
+    animals.append(std::make_unique<Sheep>());
+    animals.append(std::make_unique<Cat>());
+    auto animal = std::make_unique<Sheep>();
+    animal->say();
+    animals.append(animal);
+    for (auto &&animal : animals)
+        animal->say();
+}
