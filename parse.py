@@ -766,6 +766,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
 
 class ASTIf(ASTNodeWithChildren, ASTNodeWithExpression):
     else_or_elif : ASTNode = None
+    likely = 0
 
     def walk_children(self, f):
         super().walk_children(f)
@@ -773,7 +774,14 @@ class ASTIf(ASTNodeWithChildren, ASTNodeWithExpression):
             self.else_or_elif.walk_children(f)
 
     def to_str(self, indent):
-        return self.children_to_str_detect_single_stmt(indent, 'if (' + self.expression.to_str() + ')', check_for_if = True) + (self.else_or_elif.to_str(indent) if self.else_or_elif != None else '')
+        if self.likely == 0:
+            s = 'if (' + self.expression.to_str() + ')'
+        elif self.likely == 1:
+            s = 'if (likely(' + self.expression.to_str() + '))'
+        else:
+            assert(self.likely == -1)
+            s = 'if (unlikely(' + self.expression.to_str() + '))'
+        return self.children_to_str_detect_single_stmt(indent, s, check_for_if = True) + (self.else_or_elif.to_str(indent) if self.else_or_elif != None else '')
 
 class ASTElseIf(ASTNodeWithChildren, ASTNodeWithExpression):
     else_or_elif : ASTNode = None
@@ -1472,8 +1480,18 @@ def parse_internal(this_node):
                         node.have_virtual_functions = True
                         break
 
-            elif token.value(source) in ('I', 'Е', 'if', 'если'):
+            elif token.value(source).startswith('I') or \
+                 token.value(source).startswith('Е') or \
+                 token.value(source).startswith('if') or \
+                 token.value(source).startswith('если'):
                 node = ASTIf()
+                if '.' in token.value(source):
+                    subkw = token.value(source)[token.value(source).find('.')+1:]
+                    if subkw in ('likely', 'часто'):
+                        node.likely = 1
+                    else:
+                        assert(subkw in ('unlikely', 'редко'))
+                        node.likely = -1
                 next_token()
                 node.set_expression(expression())
                 new_scope(node)

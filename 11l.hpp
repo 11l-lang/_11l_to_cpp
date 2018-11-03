@@ -12,6 +12,14 @@ template <int n, typename Container> inline auto _get(const Container &c) -> dec
 template <int n, typename Container> inline auto _get(      Container &c) -> decltype(c[n]) {return c[n];}
 template <int n, typename...Types> inline const auto &_get(const Tuple<Types...> &t) {return std::get<n>(t);}
 
+#if __GNUC__ || __INTEL_COMPILER // || __clang__ // Clang already defines __GNUC__
+#define likely(x) __builtin_expect(!!(x), 1)
+#define unlikely(x) __builtin_expect(!!(x), 0)
+#else
+#define likely(x) (x)
+#define unlikely(x) (x)
+#endif
+
 class NullPointerException
 {};
 
