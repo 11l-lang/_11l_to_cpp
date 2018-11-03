@@ -670,7 +670,7 @@ class ASTWith(ASTNodeWithChildren, ASTNodeWithExpression):
         return self.children_to_str(indent, '[&](auto &&T)', False)[:-1] + '(' + self.expression.to_str() + ");\n"
 
 class ASTFunctionDefinition(ASTNodeWithChildren):
-    function_name : str
+    function_name : str = ''
     function_return_type : str = ''
     function_arguments : List[Tuple[str, str, str, str]]# = [] # (arg_name, default_value, type_, qualifiers)
     first_named_only_argument = None
@@ -697,6 +697,8 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         if type(self.parent) == ASTTypeDefinition:
             if self.function_name == '': # this is constructor
                 s = self.parent.type_name
+            elif self.function_name == '(destructor)':
+                s = '~' + self.parent.type_name
             elif self.function_name == '()': # this is `operator()`
                 s = ('auto' if self.function_return_type == '' else cpp_type_from_11l[self.function_return_type]) + ' operator()'
             else:
@@ -1369,73 +1371,78 @@ def parse_internal(this_node):
                     elif subkw in ('override', 'переопр' ): node.virtual_category = node.VirtualCategory.OVERRIDE
                     elif subkw in ('abstract', 'абстракт'): node.virtual_category = node.VirtualCategory.ABSTRACT
                     elif subkw in ('final',    'финал'   ): node.virtual_category = node.VirtualCategory.FINAL
+                elif token.value(source) in ('F.destructor', 'Ф.деструктор', 'fn.destructor', 'фн.деструктор'):
+                    if type(this_node) != ASTTypeDefinition:
+                        raise Error('destructor declaration allowed only inside types', token)
+                    node.function_name = '(destructor)' # can not use `~` here because `~` can be an operator overload
                 next_token()
-                if token.category == Token.Category.NAME:
-                    node.function_name = token.value(source)
-                    next_token()
-                elif token.value(source) == '(': # this is constructor [`F () {...}` or `F (...) {...}`] or operator() [`F ()(...) {...}`]
-                    if peek_token().value(source) == ')' and peek_token(2).value(source) == '(': # ) # this is operator()
+                if node.function_name != '(destructor)':
+                    if token.category == Token.Category.NAME:
+                        node.function_name = token.value(source)
                         next_token()
+                    elif token.value(source) == '(': # this is constructor [`F () {...}` or `F (...) {...}`] or operator() [`F ()(...) {...}`]
+                        if peek_token().value(source) == ')' and peek_token(2).value(source) == '(': # ) # this is operator()
+                            next_token()
+                            next_token()
+                            node.function_name = '()'
+                        else:
+                            node.function_name = ''
+                            if type(this_node) == ASTTypeDefinition:
+                                this_node.constructors.append(node)
+                    elif token.category == Token.Category.OPERATOR:
+                        node.function_name = token.value(source)
                         next_token()
-                        node.function_name = '()'
                     else:
-                        node.function_name = ''
-                        if type(this_node) == ASTTypeDefinition:
-                            this_node.constructors.append(node)
-                elif token.category == Token.Category.OPERATOR:
-                    node.function_name = token.value(source)
+                        raise Error('incorrect function name', token)
+
+                    if token.value(source) != '(': # )
+                        raise Error('expected `(` after function name', token) # )(
+
                     next_token()
-                else:
-                    raise Error('incorrect function name', token)
+                    was_default_argument = False
+                    while token.value(source) != ')':
+                        if token.value(source) == "',":
+                            assert(node.first_named_only_argument == None)
+                            node.first_named_only_argument = len(node.function_arguments)
+                            next_token()
+                            continue
+                        type_ = ''
+                        if token.value(source)[0].isupper(): # this is a type name
+                            type_ = token.value(source)
+                            next_token()
+                        qualifiers = ''
+                        if token.value(source) == '=':
+                            qualifiers += '='
+                            next_token()
+                        if token.category != Token.Category.NAME:
+                            raise Error('expected function\'s argument name', token)
+                        func_arg_name = token.value(source)
+                        next_token()
+                        if token.value(source) == '=':
+                            next_token()
+                            default = expression().to_str()
+                            was_default_argument = True
+                        else:
+                            if was_default_argument and node.first_named_only_argument == None:
+                                raise Error('non-default argument follows default argument', tokens[tokeni-1])
+                            default = ''
+                        node.function_arguments.append((func_arg_name, default, type_, qualifiers)) # ((
+                        if token.value(source) not in ',)':
+                            raise Error('expected `,` or `)` in function\'s arguments list', token)
+                        if token.value(source) == ',':
+                            next_token()
 
-                if token.value(source) != '(': # )
-                    raise Error('expected `(` after function name', token) # )(
+                    node.last_non_default_argument = len(node.function_arguments) - 1
+                    while node.last_non_default_argument >= 0 and node.function_arguments[node.last_non_default_argument][1] != '':
+                        node.last_non_default_argument -= 1
 
-                next_token()
-                was_default_argument = False
-                while token.value(source) != ')':
-                    if token.value(source) == "',":
-                        assert(node.first_named_only_argument == None)
-                        node.first_named_only_argument = len(node.function_arguments)
-                        next_token()
-                        continue
-                    type_ = ''
-                    if token.value(source)[0].isupper(): # this is a type name
-                        type_ = token.value(source)
-                        next_token()
-                    qualifiers = ''
-                    if token.value(source) == '=':
-                        qualifiers += '='
-                        next_token()
-                    if token.category != Token.Category.NAME:
-                        raise Error('expected function\'s argument name', token)
-                    func_arg_name = token.value(source)
+                    scope.add_function(node.function_name, node)
+
                     next_token()
-                    if token.value(source) == '=':
+                    if token.value(source) == '->':
                         next_token()
-                        default = expression().to_str()
-                        was_default_argument = True
-                    else:
-                        if was_default_argument and node.first_named_only_argument == None:
-                            raise Error('non-default argument follows default argument', tokens[tokeni-1])
-                        default = ''
-                    node.function_arguments.append((func_arg_name, default, type_, qualifiers)) # ((
-                    if token.value(source) not in ',)':
-                        raise Error('expected `,` or `)` in function\'s arguments list', token)
-                    if token.value(source) == ',':
+                        node.function_return_type = token.value(source)
                         next_token()
-
-                node.last_non_default_argument = len(node.function_arguments) - 1
-                while node.last_non_default_argument >= 0 and node.function_arguments[node.last_non_default_argument][1] != '':
-                    node.last_non_default_argument -= 1
-
-                scope.add_function(node.function_name, node)
-
-                next_token()
-                if token.value(source) == '->':
-                    next_token()
-                    node.function_return_type = token.value(source)
-                    next_token()
 
                 if node.virtual_category != node.VirtualCategory.ABSTRACT:
                     new_scope(node, map(lambda arg: (arg[0], arg[2]), node.function_arguments))

@@ -163,3 +163,8 @@ Array[Animal] animals
 T Animal
    F.virtual.abstract say(arg) -> N
    ^Error: type should be specified for argument `arg` [for virtual functions all arguments should have types]
+
+
+F.destructor
+^Error: destructor declaration allowed only inside types
+   print(‘destructor called’)
