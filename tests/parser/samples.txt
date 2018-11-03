@@ -611,3 +611,17 @@ auto f()
 [String] dirs, files
 ===
 Array<String> dirs, files;
+
+
+T TypeName
+   F.destructor
+      print(‘TypeName object destructed’)
+===
+class TypeName
+{
+public:
+    ~TypeName()
+    {
+        print(u"TypeName object destructed"_S);
+    }
+};
