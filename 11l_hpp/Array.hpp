@@ -120,6 +120,7 @@ public:
 		set(len() + i, v);
 	}
 
+	void append(Type &&v) {std::vector<Type>::push_back(std::move(v));}
 	void append(const Type &v) {std::vector<Type>::push_back(v);}
 
 	void append(const Array<Type> &arr)
