@@ -694,3 +694,77 @@ struct CodeBlock1
         }}
     }
 } code_block_1;
+
+
+from typing import List
+
+class Animal:
+    def say(self) -> None:
+        raise NotImplementedError()
+
+class Sheep(Animal):
+    def say(self):
+        print('baa')
+
+class Cat(Animal):
+    def say(self):
+        print('meow')
+
+animals : List[Animal] = []
+animals += [Sheep()]
+animals += [Cat()]
+for animal in animals:
+    animal.say()
+===
+
+T Animal
+   F.virtual.abstract say() -> N
+
+T Sheep(Animal)
+   F.virtual.override say() -> N
+      print(‘baa’)
+
+T Cat(Animal)
+   F.virtual.override say() -> N
+      print(‘meow’)
+Array[Animal] animals
+animals [+]= Sheep()
+animals [+]= Cat()
+L(animal) animals
+   animal.say()
+===
+class Animal
+{
+public:
+    virtual void say() = 0;
+};
+
+class Sheep : public Animal
+{
+public:
+    virtual void say() override
+    {
+        print(u"baa"_S);
+    }
+};
+
+class Cat : public Animal
+{
+public:
+    virtual void say() override
+    {
+        print(u"meow"_S);
+    }
+};
+Array<std::unique_ptr<Animal>> animals;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        animals.append(std::make_unique<Sheep>());
+        animals.append(std::make_unique<Cat>());
+        for (auto &&animal : animals)
+            animal->say();
+    }
+} code_block_1;

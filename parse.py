@@ -5,6 +5,7 @@ except ImportError:
     from .tokenizer import Token
     from . import tokenizer
 from typing import List, Tuple, Dict, Callable
+from enum import IntEnum
 import os, thindf
 
 class Error(Exception):
@@ -285,6 +286,8 @@ class SymbolNode:
                     f_node = fid.ast_nodes[0]
                     assert(type(f_node) in (ASTFunctionDefinition, ASTTypeDefinition) or (type(f_node) in (ASTVariableInitialization, ASTVariableDeclaration) and f_node.function_pointer))
                     if type(f_node) == ASTTypeDefinition:
+                        if f_node.have_virtual_functions:
+                            func_name = 'std::make_unique<' + func_name + '>'
                         if len(f_node.constructors) == 0:
                             f_node = ASTFunctionDefinition()
                         else:
@@ -452,8 +455,11 @@ class SymbolNode:
                     else:
                         return c1
                 id = self.scope.find(cts0.lstrip('@'))
-                if id != None and id.type != None and id.type.endswith('?'):
-                    return cts0.lstrip('@') + '->' + c1
+                if id != None:
+                    if id.type != None and id.type.endswith('?'):
+                        return cts0.lstrip('@') + '->' + c1
+                    if len(id.ast_nodes) and type(id.ast_nodes[0]) == ASTLoop and id.ast_nodes[0].is_loop_variable_a_ptr and cts0 == id.ast_nodes[0].loop_variable:
+                        return cts0 + '->' + c1
                 return char_if_len_1(self.children[0]) + '.' + c1 + '()'*(c1 in ('len', 'last', 'empty')) # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
             elif self.symbol.id == ':':
                 c0 = self.children[0].to_str()
@@ -630,11 +636,30 @@ class ASTVariableDeclaration(ASTNode):
     type : str
     type_args : List[str]
     function_pointer : bool = False
+    scope : Scope
+    type_token : Token
+
+    def __init__(self):
+        self.scope = scope
+
+    def trans_type(self, ty):
+        t = cpp_type_from_11l.get(ty)
+        if t != None:
+            return t
+        else:
+            id = self.scope.find(ty)
+            if id == None:
+                raise Error('type `' + ty + '` is not defined', self.type_token)
+            if len(id.ast_nodes) == 0 or type(id.ast_nodes[0]) != ASTTypeDefinition:
+                raise Error('`' + ty + '`: expected a type name', self.type_token)
+            if id.ast_nodes[0].have_virtual_functions:
+                return 'std::unique_ptr<' + ty + '>'
+            return ty
 
     def to_str(self, indent):
         if self.function_pointer:
-            return ' ' * (indent*4) + 'std::function<' + cpp_type_from_11l[self.type] + '(' + ', '.join('const ' + cpp_type_from_11l[ty] + ('&'*(ty not in ('Int',))) for ty in self.type_args) + ')> ' + ', '.join(self.vars) + ";\n"
-        return ' ' * (indent*4) + cpp_type_from_11l[self.type] + ('<' + ', '.join(cpp_type_from_11l[ty] for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + ', '.join(self.vars) + ";\n"
+            return ' ' * (indent*4) + 'std::function<' + self.trans_type(self.type) + '(' + ', '.join('const ' + self.trans_type(ty) + ('&'*(ty not in ('Int',))) for ty in self.type_args) + ')> ' + ', '.join(self.vars) + ";\n"
+        return ' ' * (indent*4) + self.trans_type(self.type) + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + ', '.join(self.vars) + ";\n"
 
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
     def to_str(self, indent):
@@ -650,6 +675,13 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
     function_arguments : List[Tuple[str, str, str, str]]# = [] # (arg_name, default_value, type_, qualifiers)
     first_named_only_argument = None
     last_non_default_argument : int
+    class VirtualCategory(IntEnum):
+        NO = 0
+        NEW = 1
+        OVERRIDE = 2
+        ABSTRACT = 3
+        FINAL = 4
+    virtual_category = VirtualCategory.NO
 
     def __init__(self, function_arguments = None):
         super().__init__()
@@ -669,6 +701,18 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 s = ('auto' if self.function_return_type == '' else cpp_type_from_11l[self.function_return_type]) + ' operator()'
             else:
                 s = ('auto' if self.function_return_type == '' else cpp_type_from_11l[self.function_return_type]) + ' ' + self.function_name
+
+            if self.virtual_category != self.VirtualCategory.NO:
+                arguments = []
+                for index, arg in enumerate(self.function_arguments):
+                    if arg[2] == '': # if there is no type specified
+                        raise Error('type should be specified for argument `' + arg[0] + '` [for virtual functions all arguments should have types]', tokens[self.tokeni])
+                    else:
+                        arguments.append(arg[2].rstrip('?') + '* '
+                            + ('' if '=' in arg[3] else 'const ')
+                            + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
+                s = 'virtual ' + s + '(' + ', '.join(arguments) + ')' + ('', ' override', ' = 0', ' final')[self.virtual_category - 1]
+                return ' ' * (indent*4) + s + ";\n" if self.virtual_category == self.VirtualCategory.ABSTRACT else self.children_to_str(indent, s)
 
         elif type(self.parent) != ASTProgram: # local functions [i.e. functions inside functions] are represented as C++ lambdas
             captured_variables = set()
@@ -784,6 +828,7 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
     break_label_needed = -1
     has_L_index = False
     has_L_next  = False
+    is_loop_variable_a_ptr = False
 
     def has_L_was_no_break(self):
         return type(self.children[-1]) == ASTLoopWasNoBreak
@@ -800,7 +845,7 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
         else:
             if self.loop_variable != None:
                 loop_auto = True
-                tr = 'for (auto ' + self.loop_variable + ' : ' + self.expression.to_str() + ')'
+                tr = 'for (auto ' + '&&'*self.is_loop_variable_a_ptr + self.loop_variable + ' : ' + self.expression.to_str() + ')'
             else:
                 tr = 'while (' + (self.expression.to_str() if self.expression != None else 'true') + ')'
         rr = self.children_to_str_detect_single_stmt(indent, tr)
@@ -906,6 +951,7 @@ class ASTTypeDefinition(ASTNodeWithChildren):
     base_types : List[str]
     type_name : str
     constructors : List[ASTFunctionDefinition]
+    have_virtual_functions = False
 
     def __init__(self, constructors = None):
         super().__init__()
@@ -1278,7 +1324,7 @@ symbol('если').nud = nud
 symbol('{') # }
 
 def parse_internal(this_node):
-    global token
+    global token, scope
 
     def new_scope(node, func_args = None, call_advance_scope_begin = True):
         if call_advance_scope_begin:
@@ -1311,8 +1357,18 @@ def parse_internal(this_node):
             next_token()
             new_scope(node, [], False)
         elif token.category == Token.Category.KEYWORD:
-            if token.value(source) in ('F', 'Ф', 'fn', 'фн'):
+            if token.value(source).startswith('F') or \
+               token.value(source).startswith('Ф') or \
+               token.value(source).startswith('fn') or \
+               token.value(source).startswith('фн'):
                 node = ASTFunctionDefinition()
+                if '.virtual.' in token.value(source) or \
+                   '.виртуал.' in token.value(source):
+                    subkw = token.value(source)[token.value(source).rfind('.')+1:]
+                    if   subkw in ('new',      'новая'   ): node.virtual_category = node.VirtualCategory.NEW
+                    elif subkw in ('override', 'переопр' ): node.virtual_category = node.VirtualCategory.OVERRIDE
+                    elif subkw in ('abstract', 'абстракт'): node.virtual_category = node.VirtualCategory.ABSTRACT
+                    elif subkw in ('final',    'финал'   ): node.virtual_category = node.VirtualCategory.FINAL
                 next_token()
                 if token.category == Token.Category.NAME:
                     node.function_name = token.value(source)
@@ -1381,7 +1437,11 @@ def parse_internal(this_node):
                     node.function_return_type = token.value(source)
                     next_token()
 
-                new_scope(node, map(lambda arg: (arg[0], arg[2]), node.function_arguments))
+                if node.virtual_category != node.VirtualCategory.ABSTRACT:
+                    new_scope(node, map(lambda arg: (arg[0], arg[2]), node.function_arguments))
+                else:
+                    if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
+                        next_token()
 
             elif token.value(source) in ('T', 'Т', 'type', 'тип'):
                 node = ASTTypeDefinition()
@@ -1399,6 +1459,11 @@ def parse_internal(this_node):
                     next_token()
 
                 new_scope(node)
+
+                for child in node.children:
+                    if type(child) == ASTFunctionDefinition and child.virtual_category != child.VirtualCategory.NO:
+                        node.have_virtual_functions = True
+                        break
 
             elif token.value(source) in ('I', 'Е', 'if', 'если'):
                 node = ASTIf()
@@ -1466,6 +1531,10 @@ def parse_internal(this_node):
                 else:
                     node = ASTLoop()
                     next_token()
+                    prev_scope = scope
+                    scope = Scope(None)
+                    scope.parent = prev_scope
+
                     if token.category == Token.Category.SCOPE_BEGIN:
                         node.expression = None
                     else:
@@ -1473,7 +1542,17 @@ def parse_internal(this_node):
                             node.loop_variable = expected_name('loop variable')
                             advance(')')
                         node.set_expression(expression())
+
+                        if node.loop_variable != None and node.expression.token.category == Token.Category.NAME: # check if loop variable is a [smart] pointer
+                            id = scope.find(node.expression.token.value(source))
+                            if id != None and len(id.ast_nodes) == 1 and type(id.ast_nodes[0]) == ASTVariableDeclaration and id.ast_nodes[0].type == 'Array':
+                                tid = scope.find(id.ast_nodes[0].type_args[0])
+                                if tid != None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].have_virtual_functions:
+                                    node.is_loop_variable_a_ptr = True
+                                    scope.add_name(node.loop_variable, node)
+
                     new_scope(node)
+                    scope = prev_scope
 
             elif token.value(source) in ('L.continue', 'Ц.продолжить', 'loop.continue', 'цикл.продолжить'):
                 node = ASTContinue()
@@ -1563,6 +1642,7 @@ def parse_internal(this_node):
                         while token.value(source) == ',':
                             node.vars.append(expected_name('variable name'))
                     node.type = node_expression.token.value(source)
+                    node.type_token = node_expression.token
                     node.type_args = []
                     if node.type == '[': # ]
                         if node_expression.is_dict:
