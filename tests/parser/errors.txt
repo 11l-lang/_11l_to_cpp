@@ -15,7 +15,7 @@ r = ‘a’ ‘b’
 
 
 f(‘id=’ id) // (
-        ^Error: expected )
+        ^Error: expected `)`
 
 
 r = .newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘’,

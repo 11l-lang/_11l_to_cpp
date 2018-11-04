@@ -1055,7 +1055,7 @@ def next_token():
 
 def advance(value):
     if token.value(source) != value:
-        raise Error('expected ' + value, token)
+        raise Error('expected `' + value + '`', token)
     next_token()
 
 def peek_token(how_much = 1):
