@@ -927,6 +927,7 @@ break_label_index = -1
 
 class ASTLoopBreak(ASTNode):
     loop_variable : str = ''
+    loop_level = 0
     token : Token
 
     def to_str(self, indent):
@@ -935,7 +936,7 @@ class ASTLoopBreak(ASTNode):
         loop_level = 0
         while True:
             if type(n) == ASTLoop:
-                if self.loop_variable == '' or self.loop_variable == n.loop_variable:
+                if loop_level == self.loop_level if self.loop_variable == '' else self.loop_variable == n.loop_variable:
                     if n.has_L_was_no_break():
                         r = ' ' * (indent*4) + "was_break = true;\n"
                     if loop_level > 0:
@@ -948,7 +949,7 @@ class ASTLoopBreak(ASTNode):
                 loop_level += 1
             n = n.parent
             if n == None:
-                raise Error('loop corresponding to this `L' + ('(' + self.loop_variable + ')')*(self.loop_variable != '') + '.break` statement is not found', self.token)
+                raise Error('loop corresponding to this `' + '^'*self.loop_level + 'L' + ('(' + self.loop_variable + ')')*(self.loop_variable != '') + '.break` statement is not found', self.token)
 
         n = self.parent
         while True:
@@ -1665,6 +1666,22 @@ def parse_internal(this_node):
 
             else:
                 raise Error('unrecognized statement started with keyword', token)
+
+        elif token.value(source) == '^':
+            node = ASTLoopBreak()
+            node.token = token
+            node.loop_level = 1
+            next_token()
+            while token.value(source) == '^':
+                node.loop_level += 1
+                next_token()
+
+            if token.value(source) not in ('L.break', 'Ц.прервать', 'loop.break', 'цикл.прервать'):
+                raise Error('expected `L.break`', token)
+
+            next_token()
+            if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
+                next_token()
 
         elif token.category == Token.Category.SCOPE_END:
             next_token()
