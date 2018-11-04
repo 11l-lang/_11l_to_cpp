@@ -79,6 +79,7 @@ binary_operators : List[List[str]] = [[], ['+', '-', '*', '/', '%', '^', '&', '|
 unary_operators = [[], ['!'], ['++', '--'], ['(-)']]
 sorted_operators = sorted(binary_operators[1] + binary_operators[2] + binary_operators[3] + binary_operators[4] + unary_operators[1] + unary_operators[2] + unary_operators[3], key = lambda x: len(x), reverse = True)
 binary_operators[1].remove('-') # Решил просто не считать `-` за бинарный оператор в контексте автоматического склеивания строк, так как `-` к тому же ещё и квалификатор константности
+binary_operators[1].remove('^') # for `^L.break` support
 
 
 class Error(Exception):

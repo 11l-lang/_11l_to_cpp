@@ -146,6 +146,17 @@ L(i) 10
 
 
 L 10
+   L 20
+      ^^L.break
+      ^Error: loop corresponding to this `^^L.break` statement is not found
+
+
+L 10
+   ^^1
+     ^Error: expected `L.break`
+
+
+L 10
 ^Error: this kind of loop does not support `L.next`
    I L.next
       print(1)
