@@ -805,3 +805,79 @@ struct CodeBlock1
         print(u"\t word \t"_S.trim(Array<Char>(u"\t "_S)) == u"word");
     }
 } code_block_1;
+
+
+import math
+
+print(math.ceil(3.6) == 4)
+print(math.floor(3.6) == 3)
+print(math.trunc(-3.6) == -3)
+print(math.fabs(-3.5) == 3.5)
+print(math.exp(2) - 7.38905609893065 + 1)
+print(math.log(math.exp(1)) == 1)
+print(math.log(25, 5) == 2)
+print(math.log2(8) == 3)
+print(math.log10(100) == 2)
+print(math.pow(2, 3) == 2 ** 3)
+print(math.sqrt(4) == 2)
+print(math.acos(0.5) - 0.0471975511965979)
+print(math.asin(1) - 0.5707963267948966)
+print(math.atan(1) - 0.7853981633974483 + 1)
+print(math.atan2(1, 2) - 0.4636476090008061 + 1)
+print(math.cos(1) - 0.5403023058681398 + 1)
+print(math.sin(1) - 0.8414709848078965 + 1)
+print(math.tan(1) - 1.5574077246549023 + 1)
+print(math.degrees(1) - 57.29577951308232 + 1)
+print(math.radians(1) - 0.017453292519943295 + 1)
+print(math.pi - 2.141592653589793)
+===
+//import math
+print(ceil(3.6) == 4)
+print(floor(3.6) == 3)
+print(trunc(-3.6) == -3)
+print(fabs(-3.5) == 3.5)
+print(exp(2) - 7.38905609893065 + 1)
+print(log(exp(1)) == 1)
+print(log(25, 5) == 2)
+print(log2(8) == 3)
+print(log10(100) == 2)
+print(pow(2, 3) == 2 ^ 3)
+print(sqrt(4) == 2)
+print(acos(0.5) - 0.0471975511965979)
+print(asin(1) - 0.5707963267948966)
+print(atan(1) - 0.7853981633974483 + 1)
+print(atan2(1, 2) - 0.4636476090008061 + 1)
+print(cos(1) - 0.5403023058681398 + 1)
+print(sin(1) - 0.8414709848078965 + 1)
+print(tan(1) - 1.5574077246549023 + 1)
+print(degrees(1) - 57.29577951308232 + 1)
+print(radians(1) - 0.017453292519943295 + 1)
+print(pi - 2.141592653589793)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(ceil(3.6) == 4);
+        print(floor(3.6) == 3);
+        print(trunc(-3.6) == -3);
+        print(fabs(-3.5) == 3.5);
+        print(exp(2) - 7.38905609893065 + 1);
+        print(log(exp(1)) == 1);
+        print(log(25, 5) == 2);
+        print(log2(8) == 3);
+        print(log10(100) == 2);
+        print(pow(2, 3) == pow(2, 3));
+        print(sqrt(4) == 2);
+        print(acos(0.5) - 0.0471975511965979);
+        print(asin(1) - 0.5707963267948966);
+        print(atan(1) - 0.7853981633974483 + 1);
+        print(atan2(1, 2) - 0.4636476090008061 + 1);
+        print(cos(1) - 0.5403023058681398 + 1);
+        print(sin(1) - 0.8414709848078965 + 1);
+        print(tan(1) - 1.5574077246549023 + 1);
+        print(degrees(1) - 57.29577951308232 + 1);
+        print(radians(1) - 0.017453292519943295 + 1);
+        print(pi - 2.141592653589793);
+    }
+} code_block_1;

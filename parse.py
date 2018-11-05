@@ -543,6 +543,8 @@ class SymbolNode:
                 return self.children[0].to_str() + '.append(' + self.children[1].to_str() + ')'
             elif self.symbol.id == '?':
                 return '[&]{auto R = ' + self.children[0].to_str() + '; return R != nullptr ? *R : ' + self.children[1].to_str() + ';}()'
+            elif self.symbol.id == '^':
+                return 'pow(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
             else:
                 return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '(concat)':'+', '‘’=':'+=', '(+)':'^'}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
         elif len(self.children) == 3:
@@ -1791,6 +1793,25 @@ builtins_scope.add_function('max', ASTFunctionDefinition([('object1', '', ''), (
 builtins_scope.add_function('hex', ASTFunctionDefinition([('object', '', '')]))
 builtins_scope.add_function('round', ASTFunctionDefinition([('number', '', 'Float'), ('ndigits', '0', '')]))
 builtins_scope.add_function('sleep', ASTFunctionDefinition([('secs', '', 'Float')]))
+builtins_scope.add_function('ceil',  ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('floor', ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('trunc', ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('fabs',  ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('exp',   ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('log',   ASTFunctionDefinition([('x', '', 'Float'), ('base', '0', 'Float')]))
+builtins_scope.add_function('log2',  ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('log10', ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('pow',   ASTFunctionDefinition([('x', '', 'Float'), ('y', '', 'Float')]))
+builtins_scope.add_function('sqrt',  ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('acos',  ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('asin',  ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('atan',  ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('atan2', ASTFunctionDefinition([('x', '', 'Float'), ('y', '', 'Float')]))
+builtins_scope.add_function('cos',   ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('sin',   ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('tan',   ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('degrees', ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('radians', ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', '')])]))
 builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('mode', token_to_str('‘r’'), 'String'), ('encoding', token_to_str('‘utf-8’'), 'String')])]))
 for type_ in cpp_type_from_11l:
