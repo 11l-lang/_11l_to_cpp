@@ -777,3 +777,31 @@ int main()
     for (auto &&animal : animals)
         animal->say();
 }
+
+
+print("\t word \t".rstrip("\t") == "\t word ")
+print("\t word \t".lstrip("\t") ==   " word \t")
+print("\t word \t". strip("\t") ==   " word ")
+print("\t word \t".rstrip("\t ") == "\t word")
+print("\t word \t".lstrip("\t ") ==    "word \t")
+print("\t word \t". strip("\t ") ==    "word")
+===
+print("\t word \t".rtrim("\t") == "\t word ")
+print("\t word \t".ltrim("\t") == " word \t")
+print("\t word \t".trim("\t") == ‘ word ’)
+print("\t word \t".rtrim(Array[Char]("\t ")) == "\t word")
+print("\t word \t".ltrim(Array[Char]("\t ")) == "word \t")
+print("\t word \t".trim(Array[Char]("\t ")) == ‘word’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"\t word \t"_S.rtrim(u"\t"_S) == u"\t word ");
+        print(u"\t word \t"_S.ltrim(u"\t"_S) == u" word \t");
+        print(u"\t word \t"_S.trim(u"\t"_S) == u" word ");
+        print(u"\t word \t"_S.rtrim(Array<Char>(u"\t "_S)) == u"\t word");
+        print(u"\t word \t"_S.ltrim(Array<Char>(u"\t "_S)) == u"word \t");
+        print(u"\t word \t"_S.trim(Array<Char>(u"\t "_S)) == u"word");
+    }
+} code_block_1;
