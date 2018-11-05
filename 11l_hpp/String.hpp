@@ -223,7 +223,7 @@ public:
 		return count(s.data(), s.len());
 	}
 
-	Array<String> split(const String &delim);
+	Array<String> split(const String &delim) const;
 	
 	bool is_digit() const
 	{
@@ -255,6 +255,69 @@ public:
 	String zfill(int width) const
 	{
 		return String(u"0") * max(width - len(), 0) + *this;
+	}
+
+	String ltrim(Char c, Nullable<int> limit = nullptr) const
+	{
+		const char16_t *s = data();
+		int i = 0;
+		for (int l=limit == nullptr ? len() : min(len(), *limit); i<l; i++)
+			if (s[i] != c) break;
+		return String(s + i, len() - i);
+	}
+
+	String ltrim(const String &str, Nullable<int> limit = nullptr) const
+	{
+		const char16_t *s = data();
+		int i = 0, l = len()-str.len();
+		for (int lim = limit == nullptr ? -1 : *limit; i<=l; i+=str.len())
+			if (memcmp(str.c_str(), s+i, str.len()*sizeof(char16_t)) || lim-- == 0) break;
+		return String(s + i, len() - i);
+	}
+
+	template <typename ... Types> String ltrim(const Tuple<Types...> &tuple, Nullable<int> limit = nullptr) const
+	{
+		const char16_t *s = data();
+		int i = 0;
+		for (int l=limit == nullptr ? len() : min(len(), *limit); i<l; i++)
+			if (!in(s[i], tuple)) break;
+		return String(s + i, len() - i);
+	}
+
+	String ltrim(const Array<Char> &arr, Nullable<int> limit = nullptr) const;
+
+	String rtrim(Char c, Nullable<int> limit = nullptr) const
+	{
+		const char16_t *s = data();
+		int l = len()-1;
+		for (int ll=limit == nullptr ? 0 : max(0, len()-*limit); l>=ll; l--)
+			if (s[l] != c) break;
+		return String(s, l+1);
+	}
+
+	String rtrim(const String &str, Nullable<int> limit = nullptr) const
+	{
+		const char16_t *s = data();
+		int l = len()-str.len();
+		for (int lim = limit == nullptr ? -1 : *limit; l>=0; l-=str.len())
+			if (memcmp(str.c_str(), s+l, str.len()*sizeof(char16_t)) || lim-- == 0) break;
+		return String(s, l+str.len());
+	}
+
+	template <typename ... Types> String rtrim(const Tuple<Types...> &tuple, Nullable<int> limit = nullptr) const
+	{
+		const char16_t *s = data();
+		int l = len()-1;
+		for (int ll=limit == nullptr ? 0 : max(0, len()-*limit); l>=ll; l--)
+			if (!in(s[l], tuple)) break;
+		return String(s, l+1);
+	}
+
+	String rtrim(const Array<Char> &arr, Nullable<int> limit = nullptr) const;
+
+	template <typename Ty> String trim(const Ty &s) const
+	{
+		return ltrim(s).rtrim(s);
 	}
 
 	//String &operator=(const String &s) {assign(s); return *this;}

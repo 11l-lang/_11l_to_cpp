@@ -650,3 +650,36 @@ struct CodeBlock1
             print(u"-"_S);
     }
 } code_block_1;
+
+
+print(‘12.0.0’.rtrim(‘.0’) == ‘12’)
+print(‘12.0.0’.rtrim(‘.0’, 1) == ‘12.0’)
+print(‘/a///’.rtrim(‘/’, 2) == ‘/a/’)
+print(‘/a///’.ltrim(‘/’) == ‘a///’)
+print(‘/a///’.trim(‘/’) == ‘a’)
+print(‘//a//’.ltrim(‘/’, 1) == ‘/a//’)
+print("\t word \t".rtrim(("\t", " ")) == "\t word")
+print("\t word \t".ltrim(("\t", " ")) ==    "word \t")
+print("\t word \t". trim(("\t", " ")) ==    "word")
+print("\t word \t".rtrim(("\t", " "), 1) == "\t word ")
+print("\t word \t".ltrim(("\t", " "), 1) ==   " word \t")
+print("\t word \t". trim(("\t", " ")   ) ==    "word")
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"12.0.0"_S.rtrim(u".0"_S) == u"12");
+        print(u"12.0.0"_S.rtrim(u".0"_S, 1) == u"12.0");
+        print(u"/a///"_S.rtrim(u"/"_S, 2) == u"/a/");
+        print(u"/a///"_S.ltrim(u"/"_S) == u"a///");
+        print(u"/a///"_S.trim(u"/"_S) == u'a');
+        print(u"//a//"_S.ltrim(u"/"_S, 1) == u"/a//");
+        print(u"\t word \t"_S.rtrim(make_tuple(u"\t"_S, u" "_S)) == u"\t word");
+        print(u"\t word \t"_S.ltrim(make_tuple(u"\t"_S, u" "_S)) == u"word \t");
+        print(u"\t word \t"_S.trim(make_tuple(u"\t"_S, u" "_S)) == u"word");
+        print(u"\t word \t"_S.rtrim(make_tuple(u"\t"_S, u" "_S), 1) == u"\t word ");
+        print(u"\t word \t"_S.ltrim(make_tuple(u"\t"_S, u" "_S), 1) == u" word \t");
+        print(u"\t word \t"_S.trim(make_tuple(u"\t"_S, u" "_S)) == u"word");
+    }
+} code_block_1;

@@ -302,6 +302,8 @@ class SymbolNode:
                             assert(s)
                 elif func_name == 'Int':
                     func_name = 'parse_int'
+                elif func_name == 'Array[Char]':
+                    func_name = 'Array<Char>'
                 else:
                     if self.children[0].symbol.id == ':':
                         fid = find_module(self.children[0].children[0].to_str()).scope.find(self.children[0].children[1].token_str())
@@ -659,7 +661,8 @@ cpp_type_from_11l = {'A':'auto', 'А':'auto', 'var':'auto', 'перем':'auto',
                      'Int':'int', 'String':'String', 'Bool':'bool',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
                      'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict',
-                     'Array[String]':'Array<String>', 'Array[Array[String]]':'Array<Array<String>>'}
+                     'Array[String]':'Array<String>', 'Array[Array[String]]':'Array<Array<String>>',
+                     'Array[Char]':'Array<Char>'}
 
 class ASTVariableDeclaration(ASTNode):
     vars : List[str]

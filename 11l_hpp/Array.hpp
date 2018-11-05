@@ -22,6 +22,12 @@ template <typename Type> class Array : public std::vector<Type>
 public:
 	Array() {}
 	Array(std::initializer_list<Type> il) : std::vector<Type>(il) {}
+	Array(const String &s)
+	{
+		reserve(s.len());
+		for (auto c : s)
+			append(c);
+	}
 
 	using std::vector<Type>::begin, std::vector<Type>::end;
 
@@ -139,9 +145,9 @@ public:
 
 	Nullable<int> find(const Type &val, int start = 0) const
 	{
-		auto it = std::find(begin() + start, end());
+		auto it = std::find(begin() + start, end(), val);
 		if (it != end())
-			return it - begin();
+			return int(it - begin());
 		return nullptr;
 	}
 
@@ -194,7 +200,7 @@ template <typename Type> Type sum(const Array<Type> &arr)
 	return r;
 }
 
-inline Array<String> String::split(const String &delim)
+inline Array<String> String::split(const String &delim) const
 {
 	Array<String> arr;
 	arr.reserve(count(delim) + 1);
@@ -211,4 +217,22 @@ inline Array<String> String::split(const String &delim)
 
 	arr.append(String(begin, str-begin));
 	return arr;
+}
+
+inline String String::ltrim(const Array<Char> &arr, Nullable<int> limit) const
+{
+	const char16_t *s = data();
+	int i = 0;
+	for (int l=limit == nullptr ? len() : min(len(), *limit); i<l; i++)
+		if (!in(s[i], arr)) break;
+	return String(s + i, len() - i);
+}
+
+inline String String::rtrim(const Array<Char> &arr, Nullable<int> limit) const
+{
+	const char16_t *s = data();
+	int l = len()-1;
+	for (int ll=limit == nullptr ? 0 : max(0, len()-*limit); l>=ll; l--)
+		if (!in(s[l], arr)) break;
+	return String(s, l+1);
 }
