@@ -24,7 +24,7 @@ public:
 	Array(std::initializer_list<Type> il) : std::vector<Type>(il) {}
 	Array(const String &s)
 	{
-		reserve(s.len());
+		std::vector<Type>::reserve(s.len());
 		for (auto c : s)
 			append(c);
 	}
