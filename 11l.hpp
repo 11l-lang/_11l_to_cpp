@@ -77,6 +77,7 @@ inline void assert_file_line(const char *file_name, int line, bool expression, c
 #include "11l_hpp/os.hpp"
 #include "11l_hpp/fs.hpp"
 #include "11l_hpp/time.hpp"
+#include "11l_hpp/re.hpp"
 
 #include <thread>
 
