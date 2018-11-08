@@ -1199,8 +1199,8 @@ def find_module(name):
     return builtin_modules[name]
 
 def led(self, left):
-    if token.category != Token.Category.NAME and token.value(source) != '(': # )
-        raise Error('expected an identifier name', token)
+    if token.category != Token.Category.NAME and token.value(source) != '(' and token.category != Token.Category.STRING_LITERAL: # )
+        raise Error('expected an identifier name or string literal', token)
 
     # Process module [transpile it if necessary and load it]
     global scope
@@ -1234,7 +1234,17 @@ def led(self, left):
             modules[module_name] = Module(module_scope)
 
     self.append_child(left)
-    if token.value(source) != '(': # )
+    if token.category == Token.Category.STRING_LITERAL: # for `re:‘pattern’`
+        self.append_child(SymbolNode(Token(token.start, token.start, Token.Category.NAME)))
+        sn = SymbolNode(Token(token.start, token.start, Token.Category.DELIMITER))
+        sn.symbol = symbol_table['('] # )
+        sn.function_call = True
+        sn.append_child(self)
+        sn.children.append(None)
+        sn.append_child(tokensn)
+        next_token()
+        return sn
+    elif token.value(source) != '(': # )
         self.append_child(tokensn)
         next_token()
     else: # for `os:(...)` and `time:(...)`
@@ -1840,6 +1850,10 @@ module_scope.add_function('today', ASTFunctionDefinition([]))
 module_scope.add_function('from_unix_time', ASTFunctionDefinition([('unix_time', '', 'Float')]))
 module_scope.add_function('strptime', ASTFunctionDefinition([('datetime_string', '', 'String'), ('format', '', 'String')]))
 builtin_modules['time'] = Module(module_scope)
+module_scope = Scope(None)
+module_scope.add_function('', ASTFunctionDefinition([('pattern', '', 'String')]))
+module_scope.add_function('search', ASTFunctionDefinition([('string', '', 'String')]))
+builtin_modules['re'] = Module(module_scope)
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
     if len(tokens_) == 0: return ASTProgram()

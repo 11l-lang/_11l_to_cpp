@@ -881,3 +881,22 @@ struct CodeBlock1
         print(pi - 2.141592653589793);
     }
 } code_block_1;
+
+
+import re
+
+print(re.search('[a-z]', '_12b').start(0) == 3)
+print(re.compile('[a-z]').search('_12b').start(0) == 3)
+===
+//import re
+print(re:‘[a-z]’.search(‘_12b’).start(0) == 3)
+print(re:(‘[a-z]’).search(‘_12b’).start(0) == 3)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(re::_(u"[a-z]"_S).search(u"_12b"_S).start(0) == 3);
+        print(re::_(u"[a-z]"_S).search(u"_12b"_S).start(0) == 3);
+    }
+} code_block_1;
