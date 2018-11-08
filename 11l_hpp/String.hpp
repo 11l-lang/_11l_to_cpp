@@ -35,6 +35,8 @@ public:
 	bool is_uppercase() const {return iswupper(code);}
 };
 
+namespace re {class RegEx;}
+
 class String : public std::u16string
 {
 	String slice(int begin, int end) const
@@ -224,6 +226,7 @@ public:
 	}
 
 	Array<String> split(const String &delim) const;
+	Array<String> split(const re::RegEx &regex) const;
 	
 	bool is_digit() const
 	{
