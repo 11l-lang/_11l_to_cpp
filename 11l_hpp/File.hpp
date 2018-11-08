@@ -132,6 +132,11 @@ public:
 		return file_bytes;
 	}
 
+	void flush()
+	{
+		fflush(file);
+	}
+
 	void close()
 	{
 		if (file && file != stdin && file != stdout && file != stderr)

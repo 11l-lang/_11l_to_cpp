@@ -12,3 +12,8 @@ static const double pi = 3.1415926535897932384626433832795;
 
 inline double radians(double deg) {return deg*0.017453292519943295769236907684886;}
 inline double degrees(double rad) {return rad*57.295779513082320876798154814105;}
+
+inline const short    mod(short    x, short    y) {return x%y;}
+inline const int      mod(int      x, int      y) {return x%y;}
+inline const unsigned mod(unsigned x, unsigned y) {return x%y;}
+template <class T, class Ta> inline T mod(const T &x, const Ta &y) {return x - y*floor(x/y);}

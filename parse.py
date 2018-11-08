@@ -301,7 +301,7 @@ class SymbolNode:
                             s = s.parent
                             assert(s)
                 elif func_name == 'Int':
-                    func_name = 'parse_int'
+                    func_name = 'to_int'
                 elif func_name == 'Array[Char]':
                     func_name = 'Array<Char>'
                 else:
@@ -531,6 +531,8 @@ class SymbolNode:
                 return '!in(' + char_if_len_1(self.children[0]) + ', ' + self.children[1].to_str() + ')'
             elif self.symbol.id in ('I/', 'Ц/'):
                 return 'int(' + self.children[0].to_str() + ')/int(' + self.children[1].to_str() + ')'
+            elif self.symbol.id in ('I/=', 'Ц/='):
+                return self.children[0].to_str() + ' = int(' + self.children[0].to_str() + ')/int(' + self.children[1].to_str() + ')'
             elif self.symbol.id in ('==', '!=') and self.children[1].token.category == Token.Category.STRING_LITERAL:
                 return self.children[0].to_str() + ' ' + self.symbol.id + ' ' + char_if_len_1(self.children[1])[:-2]
             elif self.symbol.id == '=' and self.children[0].symbol.id == '[': # ] # replace `a[k] = v` with `a.set(k, v)`
@@ -545,6 +547,8 @@ class SymbolNode:
                 return '[&]{auto R = ' + self.children[0].to_str() + '; return R != nullptr ? *R : ' + self.children[1].to_str() + ';}()'
             elif self.symbol.id == '^':
                 return 'pow(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
+            elif self.symbol.id == '%':
+                return 'mod(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
             else:
                 return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '(concat)':'+', '‘’=':'+=', '(+)':'^'}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
         elif len(self.children) == 3:
@@ -660,7 +664,7 @@ class ASTExpression(ASTNodeWithExpression):
         return ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
 cpp_type_from_11l = {'A':'auto', 'А':'auto', 'var':'auto', 'перем':'auto',
-                     'Int':'int', 'String':'String', 'Bool':'bool',
+                     'Int':'int', 'Float':'double', 'String':'String', 'Bool':'bool',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
                      'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict',
                      'Array[String]':'Array<String>', 'Array[Array[String]]':'Array<Array<String>>',
@@ -1794,6 +1798,7 @@ def token_to_str(token_str_override, token_category = Token.Category.STRING_LITE
 
 builtins_scope = Scope(None)
 builtins_scope.add_function('print', ASTFunctionDefinition([('object', '', ''), ('end', token_to_str(R'"\n"'), 'String'), ('flush', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
+builtins_scope.add_function('input', ASTFunctionDefinition())
 builtins_scope.add_function('assert', ASTFunctionDefinition([('expression', '', 'Bool'), ('message', token_to_str('‘’'), 'String')]))
 builtins_scope.add_function('exit', ASTFunctionDefinition([('arg', '', '')]))
 builtins_scope.add_function('zip', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', '')]))
