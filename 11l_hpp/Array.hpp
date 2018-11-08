@@ -200,16 +200,54 @@ template <typename Type> Type sum(const Array<Type> &arr)
 	return r;
 }
 
-inline Array<String> String::split(const String &delim) const
+inline Array<String> String::split(const String &delim, Nullable<int> limit) const
 {
+	int lim = limit == nullptr ? -1 : *limit - 1;
 	Array<String> arr;
-	arr.reserve(count(delim) + 1);
+	if (lim == 0) {
+		arr.append(*this);
+		return arr;
+	}
+	arr.reserve(limit == nullptr ? count(delim) + 1 : *limit);
 	const char16_t *str = data(), *begin = str, *end = data() + len() - delim.len() + 1;
 	while (str < end)
 		if (memcmp(str, delim.data(), delim.len()*sizeof(char16_t)) == 0)
 		{
 			arr.append(String(begin, str-begin));
 			str += delim.len();
+			if (--lim == 0) {
+				arr.append(String(str, end-str));
+				return arr;
+			}
+			begin = str;
+		}
+		else
+			str++;
+
+	arr.append(String(begin, str-begin));
+	return arr;
+}
+
+template <typename ... Types> inline Array<String> String::split(const Tuple<Types...> &delim_tuple, Nullable<int> limit) const
+{
+	int lim = limit == nullptr ? -1 : *limit - 1;
+	Array<String> arr;
+	if (lim == 0) {
+		arr.append(*this);
+		return arr;
+	}
+	if (limit != nullptr)
+		arr.reserve(*limit);
+	const char16_t *str = data(), *begin = str, *end = data() + len();
+	while (str < end)
+		if (in(*str, delim_tuple))
+		{
+			arr.append(String(begin, str-begin));
+			str++;
+			if (--lim == 0) {
+				arr.append(String(str, end-str));
+				return arr;
+			}
 			begin = str;
 		}
 		else
