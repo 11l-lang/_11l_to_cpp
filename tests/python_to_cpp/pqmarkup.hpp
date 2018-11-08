@@ -224,7 +224,7 @@ public:
                 auto j = i + 3;
                 while (j < instr.len()) {
                     if (instr[j] == u']') {
-                        nonunique_links.set(parse_int(instr[range_el(i + 3, j)]), link);
+                        nonunique_links.set(to_int(instr[range_el(i + 3, j)]), link);
                         i = j;
                         break;
                     }
@@ -259,7 +259,7 @@ public:
                     if (instr[j] == u']') {
                         try
                         {
-                            link = nonunique_links[parse_int(instr[range_el(i + offset + 1, j)])];
+                            link = nonunique_links[to_int(instr[range_el(i + offset + 1, j)])];
                         }
                         catch (const KeyError&)
                         {
@@ -327,7 +327,7 @@ public:
                             j++;
                         }
                         if (instr[range_el(j, j + 1)] == u'.' && in(instr[range_el(j + 1, j + 2)], make_tuple(u" "_S, u"‘"_S))) {
-                            auto value = parse_int(instr[range_el(i, j)]);
+                            auto value = to_int(instr[range_el(i, j)]);
                             auto s = u""_S;
                             if (ordered_list_current_number == -1) {
                                 s = (value == 1 ? u"<ol>"_S : u"<ol start=\""_S + String(value) + u"\">"_S) + u"\n<li>"_S;
@@ -696,7 +696,7 @@ public:
                     }
                     else if (in(prevc, u"HН"_S)) {
                         write_to_pos(prevci, i + 1);
-                        auto tag = u"h"_S + String(min(max(3 - (str_in_b == u"" ? 0 : parse_int(str_in_b)), 1), 6));
+                        auto tag = u"h"_S + String(min(max(3 - (str_in_b == u"" ? 0 : to_int(str_in_b)), 1), 6));
                         outfile.write(u"<"_S + tag + u">"_S);
                         ending_tags.append(u"</"_S + tag + u">"_S);
                     }
@@ -718,7 +718,7 @@ public:
                         else if (in(str_in_b.len(), make_tuple(1, 3)) && str_in_b.is_digit()) {
                             auto new_str = u"#"_S;
                             for (auto ii : str_in_b.len() == 3 ? create_array({0, 1, 2}) : create_array({0, 0, 0}))
-                                new_str += hex(int((parse_int(str_in_b[ii]) * 0x00'FF + 4))/int(8))[range_ei(2)].uppercase().zfill(2);
+                                new_str += hex(int((to_int(str_in_b[ii]) * 0x00'FF + 4))/int(8))[range_ei(2)].uppercase().zfill(2);
                             str_in_b = new_str;
                         }
                         if (habr_html) {

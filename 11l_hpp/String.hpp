@@ -75,7 +75,7 @@ public:
 	explicit String(const char16_t *&s) : basic_string(s) {} // reference is needed here because otherwise String(const char16_t (&s)[N]) is never called (`String(u"str")` calls `String(const char16_t *s)`)
 	String(const char16_t *s, size_t sz) : basic_string(s, sz) {}
 	template <int N> String(const char16_t (&s)[N]): basic_string(s, N-1) {}
-	explicit String(const char *s, const char *e) : basic_string(s, e) {}
+	template <class T> explicit String(const T s, const T e) : basic_string(s, e) {}
 
 	using std::u16string::assign;
 	void assign(double num)
@@ -418,7 +418,7 @@ inline Char operator ""_C(char16_t c)
 	return Char(c);
 }
 
-inline int parse_int(const String &str)
+inline int to_int(const String &str)
 {
 	int res = 0, sign = 1;
 	const char16_t *s = str.c_str();
@@ -427,6 +427,11 @@ inline int parse_int(const String &str)
 	for (; Char(*s).is_digit(); s++)
 		res = res * 10 + (*s - u'0');
 	return res * sign;
+}
+
+inline int to_int(double d)
+{
+	return (int)d;
 }
 
 inline double parse_float(const char16_t *s)

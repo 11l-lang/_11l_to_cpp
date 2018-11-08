@@ -124,6 +124,13 @@ template <typename Ty> inline void print(const Array<Ty> &arr, const String &end
 		std::wcout.flush();
 }
 
+inline String input()
+{
+	std::wstring s;
+	std::getline(std::wcin, s);
+	return String(s.cbegin(), s.cend());
+}
+
 // Note: solutions like this[https://gist.github.com/mortehu/373069390c75b02f98b655e3f7dbef9a <- google:‘zip vector c++’] can not handle temp arrays (array destructed after `zip(create_array(...)...)` call)
 template <typename T1, typename T2> Array<Tuple<T1, T2>> zip(const Array<T1> &arr1, const Array<T2> &arr2)
 {

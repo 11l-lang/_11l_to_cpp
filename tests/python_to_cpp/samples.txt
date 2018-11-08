@@ -67,8 +67,8 @@ F print_seconds(sec)
 ===
 template <typename T1> auto print_seconds(const T1 &sec)
 {
-    auto r60 = sec % 60;
-    print(Char(u'0'_C.code + int(r60)/int(10)) + Char(u'0'_C.code + r60 % 10));
+    auto r60 = mod(sec, 60);
+    print(Char(u'0'_C.code + int(r60)/int(10)) + Char(u'0'_C.code + mod(r60, 10)));
 }
 
 

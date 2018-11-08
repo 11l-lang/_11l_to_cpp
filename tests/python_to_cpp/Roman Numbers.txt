@@ -405,7 +405,7 @@ checkio=lambda data: ['','M','MM','MMM'][data//1000]+['','C','CC','CCC','CD','D'
 ===
 A checkio = data -> [‘’, ‘M’, ‘MM’, ‘MMM’][data I/ 1000] + [‘’, ‘C’, ‘CC’, ‘CCC’, ‘CD’, ‘D’, ‘DC’, ‘DCC’, ‘DCCC’, ‘CM’][data I/ 100 % 10] + [‘’, ‘X’, ‘XX’, ‘XXX’, ‘XL’, ‘L’, ‘LX’, ‘LXX’, ‘LXXX’, ‘XC’][data I/ 10 % 10] + [‘’, ‘I’, ‘II’, ‘III’, ‘IV’, ‘V’, ‘VI’, ‘VII’, ‘VIII’, ‘IX’][data % 10]
 ===
-auto checkio = [](const auto &data){return create_array({u""_S, u"M"_S, u"MM"_S, u"MMM"_S})[int(data)/int(1000)] + create_array({u""_S, u"C"_S, u"CC"_S, u"CCC"_S, u"CD"_S, u"D"_S, u"DC"_S, u"DCC"_S, u"DCCC"_S, u"CM"_S})[int(data)/int(100) % 10] + create_array({u""_S, u"X"_S, u"XX"_S, u"XXX"_S, u"XL"_S, u"L"_S, u"LX"_S, u"LXX"_S, u"LXXX"_S, u"XC"_S})[int(data)/int(10) % 10] + create_array({u""_S, u"I"_S, u"II"_S, u"III"_S, u"IV"_S, u"V"_S, u"VI"_S, u"VII"_S, u"VIII"_S, u"IX"_S})[data % 10];};
+auto checkio = [](const auto &data){return create_array({u""_S, u"M"_S, u"MM"_S, u"MMM"_S})[int(data)/int(1000)] + create_array({u""_S, u"C"_S, u"CC"_S, u"CCC"_S, u"CD"_S, u"D"_S, u"DC"_S, u"DCC"_S, u"DCCC"_S, u"CM"_S})[mod(int(data)/int(100), 10)] + create_array({u""_S, u"X"_S, u"XX"_S, u"XXX"_S, u"XL"_S, u"L"_S, u"LX"_S, u"LXX"_S, u"LXXX"_S, u"XC"_S})[mod(int(data)/int(10), 10)] + create_array({u""_S, u"I"_S, u"II"_S, u"III"_S, u"IV"_S, u"V"_S, u"VI"_S, u"VII"_S, u"VIII"_S, u"IX"_S})[mod(data, 10)];};
 
 
 ---
