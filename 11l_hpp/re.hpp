@@ -37,7 +37,11 @@ inline RegEx _(const String &pattern)
 inline Array<String> String::split(const re::RegEx &regex) const
 {
 	Array<String> r;
-	for (std::wsregex_token_iterator it(((std::wstring*)this)->begin(), ((std::wstring*)this)->end(), regex.regex, -1), end; it != end; ++it)
-		r.append((std::u16string&&)it->str());
+	int begin = 0;
+	for (std::wsregex_iterator it(((std::wstring*)this)->begin(), ((std::wstring*)this)->end(), regex.regex), end; it != end; ++it) {
+		r.append(slice(begin, (int)it->position()));
+		begin = int(it->position() + it->length());
+	}
+	r.append(slice(begin, len()));
 	return r;
 }
