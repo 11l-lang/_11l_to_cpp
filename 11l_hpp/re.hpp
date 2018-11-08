@@ -45,3 +45,8 @@ inline Array<String> String::split(const re::RegEx &regex) const
 	r.append(slice(begin, len()));
 	return r;
 }
+
+String String::replace(const re::RegEx &regex, const String &repl) const
+{
+	return String((std::u16string&&)std::regex_replace((const std::wstring&)*this, regex.regex, (const std::wstring&)repl));
+}

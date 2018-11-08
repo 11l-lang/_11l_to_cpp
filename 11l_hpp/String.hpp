@@ -160,6 +160,7 @@ public:
 		}
 		return str;
 	}
+	String replace(const re::RegEx &regex, const String &repl) const;
 
 	Nullable<int> find(Char c, int start = 0) const
 	{

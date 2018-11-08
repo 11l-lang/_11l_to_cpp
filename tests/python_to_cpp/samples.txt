@@ -891,6 +891,7 @@ print(re.compile('[a-z]').search('_12b').start(0) == 3)
 print(re.search('([a-z])a', '1a2ba').group(1) == 'b')
 print(re.split(' |:', ' 1 2:3') == ['', '1', '2', '3'])
 print(re.split(' |:', ' 1 2:3 ') == ['', '1', '2', '3', ''])
+print(re.sub(R' \[[^\]]+\]', '', 'Additionally [multi-] select THIS2 [also (e.g. with Ctrl+mouse)].') == 'Additionally select THIS2.')
 ===
 //import re
 print(re:‘[a-z]’.search(‘_12b’).start(0) == 3)
@@ -899,6 +900,7 @@ print(re:(‘[a-z]’).search(‘_12b’).start(0) == 3)
 print(re:‘([a-z])a’.search(‘1a2ba’).group(1) == ‘b’)
 print(‘ 1 2:3’.split(re:‘ |:’) == [‘’, ‘1’, ‘2’, ‘3’])
 print(‘ 1 2:3 ’.split(re:‘ |:’) == [‘’, ‘1’, ‘2’, ‘3’, ‘’])
+print(‘Additionally [multi-] select THIS2 [also (e.g. with Ctrl+mouse)].’.replace(re:‘ \[[^\]]+\]’, ‘’) == ‘Additionally select THIS2.’)
 ===
 struct CodeBlock1
 {
@@ -910,5 +912,6 @@ struct CodeBlock1
         print(re::_(u"([a-z])a"_S).search(u"1a2ba"_S).group(1) == u'b');
         print(u" 1 2:3"_S.split(re::_(u" |:"_S)) == create_array({u""_S, u"1"_S, u"2"_S, u"3"_S}));
         print(u" 1 2:3 "_S.split(re::_(u" |:"_S)) == create_array({u""_S, u"1"_S, u"2"_S, u"3"_S, u""_S}));
+        print(u"Additionally [multi-] select THIS2 [also (e.g. with Ctrl+mouse)]."_S.replace(re::_(uR"( \[[^\]]+\])"_S), u""_S) == u"Additionally select THIS2.");
     }
 } code_block_1;
