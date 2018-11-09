@@ -43,6 +43,43 @@ public:
 		}
 		return r;
 	}
+
+	class Matches
+	{
+		String s;
+		std::wregex regex;
+		std::wsregex_iterator b;
+		class Iterator
+		{
+			std::wsregex_iterator rit;
+		public:
+			Iterator() {}
+			Iterator(const std::wsregex_iterator &rit) : rit(rit) {}
+
+			bool operator!=(const Iterator &it) const {return rit != it.rit;}
+			void operator++() {++rit;}
+			const decltype(*rit) &operator*() const {return *rit;}
+		} e;
+	public:
+		Matches(String &&s_, std::wregex &&regex_) : s(std::move(s_)), regex(std::move(regex_)), b(((std::wstring&)s).begin(), ((std::wstring&)s).end(), regex) {}
+
+		Iterator begin() const {return Iterator(b);}
+		Iterator  &end()       {return e;}
+		const Iterator &end() const {return e;}
+
+		template <typename Func> auto map(Func &&func) -> Array<decltype(func(Match()))>
+		{
+			Array<decltype(func(Match()))> r;
+			for (auto el : *this)
+				r.push_back(func((Match&)el));
+			return r;
+		}
+	};
+
+	Matches find_matches(String &&s) &&
+	{
+		return Matches(std::move(s), std::move(regex));
+	}
 };
 
 inline RegEx _(const String &pattern)
