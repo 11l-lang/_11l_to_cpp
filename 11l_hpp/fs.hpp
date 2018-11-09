@@ -99,6 +99,31 @@ inline bool is_directory(const String &path)
 	return std::filesystem::is_directory((std::u16string&)path);
 }
 
+inline bool create_directory(const String &path)
+{
+	return std::filesystem::create_directory((std::u16string&)path);
+}
+
+inline bool create_directories(const String &path)
+{
+	return std::filesystem::create_directories((std::u16string&)path);
+}
+
+inline bool remove(const String &path)
+{
+	return std::filesystem::remove((std::u16string&)path);
+}
+
+inline bool remove_all(const String &path)
+{
+	return std::filesystem::remove_all((std::u16string&)path);
+}
+
+inline void rename(const String &old_path, const String &new_path)
+{
+	std::filesystem::rename((std::u16string&)old_path, (std::u16string&)new_path);
+}
+
 namespace path
 {
 static const char16_t sep =
