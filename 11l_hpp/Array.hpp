@@ -180,6 +180,19 @@ public:
 		std::vector<Type>::resize(len()-1);
 		return r;
 	}
+
+	template <typename Ty> bool operator==(const Array<Ty> &arr) const
+	{
+		if (len() != arr.len()) return false;
+		for (int i=0, n=len(); i<n; i++)
+			if (std::vector<Type>::at(i) != arr.at(i))
+				return false;
+		return true;
+	}
+	template <typename Ty> bool operator!=(const Array<Ty> &arr) const
+	{
+		return !(*this == arr);
+	}
 };
 
 template <typename Type> Array<Type> create_array(std::initializer_list<Type> il)
