@@ -26,6 +26,13 @@ public:
 		std::regex_search((std::wstring&)s, r.m, regex);
 		return r;
 	}
+
+	Match match(const String &s) const
+	{
+		Match r;
+		std::regex_match((std::wstring&)s, r.m, regex);
+		return r;
+	}
 };
 
 inline RegEx _(const String &pattern)
