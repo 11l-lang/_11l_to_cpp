@@ -936,3 +936,24 @@ struct CodeBlock1
         print(re::_(u"[A-Z]([1-9])"_S).find_matches(u"B1, C2, D3"_S).map([](const auto &m){return m.start(0);}) == create_array({0, 4, 8}));
     }
 } code_block_1;
+
+
+import os
+os.mkdir('temp_dir')
+os.makedirs('temp_dir/dir1/dir2')
+os.rename('temp_dir', 'temp_dir_')
+===
+//import os
+fs:create_directory(‘temp_dir’)
+fs:create_directories(‘temp_dir/dir1/dir2’)
+fs:rename(‘temp_dir’, ‘temp_dir_’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        fs::create_directory(u"temp_dir"_S);
+        fs::create_directories(u"temp_dir/dir1/dir2"_S);
+        fs::rename(u"temp_dir"_S, u"temp_dir_"_S);
+    }
+} code_block_1;
