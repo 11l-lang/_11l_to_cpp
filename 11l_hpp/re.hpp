@@ -33,6 +33,16 @@ public:
 		std::regex_match((std::wstring&)s, r.m, regex);
 		return r;
 	}
+
+	Array<String> find_strings(const String &s) const
+	{
+		Array<String> r;
+		for (std::wsregex_iterator it(((std::wstring&)s).begin(), ((std::wstring&)s).end(), regex), end; it != end; ++it) {
+			int group = it->size() == 2 ? 1 : 0;
+			r.append(s[range_el((int)it->position(group), int(it->position(group) + it->length(group)))]);
+		}
+		return r;
+	}
 };
 
 inline RegEx _(const String &pattern)

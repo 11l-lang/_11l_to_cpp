@@ -896,6 +896,8 @@ print(re.sub(R'(\d)', R'\1\1', '1, 2, 3') == '11, 22, 33')
 print(re.match(R"Additionally select (THIS\d*)$", 'Additionally select THIS2').group(1) == 'THIS2')
 print(re.match('[a-z]([a-z]*)[a-z]', 'abcd').group(1) == 'bc')
 print(re.fullmatch('[a-z]([a-z]*)[a-z]', 'abcd').group(1) == 'bc')
+print(re.findall("[A-Z][1-9]", "B1, C2, D3") == ['B1', 'C2', 'D3'])
+print(re.findall("[A-Z]([1-9])", "B1, C2, D3") == ['1', '2', '3'])
 ===
 //import re
 print(re:‘[a-z]’.search(‘_12b’).start(0) == 3)
@@ -909,6 +911,8 @@ print(‘1, 2, 3’.replace(re:‘(\d)’, ‘$1$1’) == ‘11, 22, 33’)
 print(re:‘Additionally select (THIS\d*)’.match(‘Additionally select THIS2’).group(1) == ‘THIS2’)
 print(re:‘^[a-z]([a-z]*)[a-z]’.search(‘abcd’).group(1) == ‘bc’)
 print(re:‘[a-z]([a-z]*)[a-z]’.match(‘abcd’).group(1) == ‘bc’)
+print(re:‘[A-Z][1-9]’.find_strings(‘B1, C2, D3’) == [‘B1’, ‘C2’, ‘D3’])
+print(re:‘[A-Z]([1-9])’.find_strings(‘B1, C2, D3’) == [‘1’, ‘2’, ‘3’])
 ===
 struct CodeBlock1
 {
@@ -925,5 +929,7 @@ struct CodeBlock1
         print(re::_(uR"(Additionally select (THIS\d*))"_S).match(u"Additionally select THIS2"_S).group(1) == u"THIS2");
         print(re::_(u"^[a-z]([a-z]*)[a-z]"_S).search(u"abcd"_S).group(1) == u"bc");
         print(re::_(u"[a-z]([a-z]*)[a-z]"_S).match(u"abcd"_S).group(1) == u"bc");
+        print(re::_(u"[A-Z][1-9]"_S).find_strings(u"B1, C2, D3"_S) == create_array({u"B1"_S, u"C2"_S, u"D3"_S}));
+        print(re::_(u"[A-Z]([1-9])"_S).find_strings(u"B1, C2, D3"_S) == create_array({u'1'_C, u'2'_C, u'3'_C}));
     }
 } code_block_1;
