@@ -894,9 +894,9 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
             lv = self.loop_variable if self.loop_variable != None else 'Lindex'
             tr = 'for (int ' + lv + ' = 0; ' + lv + ' < ' + self.expression.to_str() + '; ' + lv + '++)'
         else:
-            if self.loop_variable != None:
+            if self.loop_variable != None or (self.expression != None and self.expression.symbol.id in ('..', '.<')):
                 loop_auto = True
-                tr = 'for (auto ' + '&&'*self.is_loop_variable_a_ptr + self.loop_variable + ' : ' + self.expression.to_str() + ')'
+                tr = 'for (auto ' + '&&'*self.is_loop_variable_a_ptr + (self.loop_variable if self.loop_variable != None else '__unused') + ' : ' + self.expression.to_str() + ')'
             else:
                 tr = 'while (' + (self.expression.to_str() if self.expression != None else 'true') + ')'
         rr = self.children_to_str_detect_single_stmt(indent, tr)
