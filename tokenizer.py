@@ -271,18 +271,17 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
             nesting_level = 1
             while True:
                 ch = source[i]
+                i += 1
                 if ch == lbr:
                     nesting_level += 1
                 elif ch == rbr:
                     nesting_level -= 1
                     if nesting_level == 0:
                         break
-                i += 1
                 if i == len(source):
                     raise Error('there is no corresponding opening parenthesis/bracket/brace/qoute for `' + lbr + '`', comment_start+1)
             if comments != None:
                 comments.append((comment_start, i))
-            i += 1
         else:
             def is_hexadecimal_digit(ch):
                 return '0' <= ch <= '9' or 'A' <= ch <= 'F' or 'a' <= ch <= 'f' or ch in 'абсдефАБСДЕФ'

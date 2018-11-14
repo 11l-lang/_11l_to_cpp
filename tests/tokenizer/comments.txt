@@ -6,7 +6,7 @@ fn f()
     if .habr_html                                         // dirty hack
         r = r.replace("</blockquote>\n", ‘</blockquote>’) \\ (just left it as is)
 ===
-(11, 39)
-(45, 90)
+(11, 40)
+(45, 91)
 (150, 163)
 (222, 245)
