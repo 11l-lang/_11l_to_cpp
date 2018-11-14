@@ -800,10 +800,15 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 arguments.append(('T' + str(index + 1) + ' ' if '=' in arg[3] else 'const T' + str(index + 1) + ' &')
                     + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
             else:
-                arguments.append(arg[2].rstrip('?') + '* '
-                    + ('' if '=' in arg[3] else 'const ')
-                    + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
-        return self.children_to_str(indent, 'template <' + ', '.join(templates) + '> ' + s + '(' + ', '.join(arguments) + ')')
+                if arg[2].endswith('?'):
+                    arguments.append(arg[2].rstrip('?') + '* '
+                            + ('' if '=' in arg[3] else 'const ')
+                            + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
+                else:
+                    arguments.append(('' if '=' in arg[3] else 'const ')
+                        + cpp_type_from_11l.get(arg[2], arg[2]) + ' '
+                        + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
+        return self.children_to_str(indent, ('template <' + ', '.join(templates) + '> ')*(len(templates) != 0) + s + '(' + ', '.join(arguments) + ')')
 
 class ASTIf(ASTNodeWithChildren, ASTNodeWithExpression):
     else_or_elif : ASTNode = None
