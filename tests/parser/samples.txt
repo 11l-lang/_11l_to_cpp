@@ -683,3 +683,24 @@ struct CodeBlock1
         print(u"\t word \t"_S.trim(make_tuple(u"\t"_S, u" "_S)) == u"word");
     }
 } code_block_1;
+
+
+F func(Int n) -> N
+    print(n)
+
+(Int -> N) fptr = func
+fptr(1)
+===
+void func(const int n)
+{
+    print(n);
+}
+std::function<void(const int)> fptr = func;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        fptr(1);
+    }
+} code_block_1;
