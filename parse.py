@@ -330,7 +330,9 @@ class SymbolNode:
                     if self.children[i] == None:
                         if f_node != None and type(f_node) == ASTFunctionDefinition:
                             if last_function_arg >= len(f_node.function_arguments):
-                                raise Error('Too many arguments for function `' + func_name + '`', Token(self.children[0].leftmost(), self.children[0].rightmost(), Token.Category.NAME))
+                                raise Error('too many arguments for function `' + func_name + '`', Token(self.children[0].leftmost(), self.children[0].rightmost(), Token.Category.NAME))
+                            if f_node.first_named_only_argument != None and last_function_arg >= f_node.first_named_only_argument:
+                                raise Error('argument `' + f_node.function_arguments[last_function_arg][0] + '` of function `' + func_name + '` is named-only', self.children[i+1].token)
                             if f_node.function_arguments[last_function_arg][2].endswith('?'):
                                 res += '&'
                         res += self.children[i+1].to_str()
