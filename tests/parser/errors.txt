@@ -179,3 +179,12 @@ T Animal
 F.destructor
 ^Error: destructor declaration allowed only inside types
    print(‘destructor called’)
+
+
+F to_html(instr, ohd = 0B, ', habr_html = 0B)
+   print(instr)
+
+to_html(s, 0B, habr_html' 1B) // this is correct
+to_html(s, habr_html' 1B) // and this is correct
+to_html(s, 0B, 1B) // this is wrong
+               ^Error: argument `habr_html` of function `to_html` is named-only
