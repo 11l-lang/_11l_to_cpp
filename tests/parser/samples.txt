@@ -704,3 +704,37 @@ struct CodeBlock1
         fptr(1);
     }
 } code_block_1;
+
+
+A tag = S ‘_’
+           ‘*’
+              ‘b’
+           ‘_’
+              ‘u’
+           ‘-’
+              ‘s’
+           ‘~’
+              ‘i’
+print(tag)
+tag = S ‘-’
+         ‘*’
+            ‘b’
+         ‘_’
+            ‘u’
+         ‘-’
+            ‘s’
+         ‘~’
+            ‘i’
+print(tag)
+===
+auto tag = [&](const auto &a){return a == u'*' ? u'b'_C : a == u'_' ? u'u'_C : a == u'-' ? u's'_C : a == u'~' ? u'i'_C : throw KeyError(a);}(u"_"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(tag);
+        tag = [&](const auto &a){return a == u'*' ? u'b'_C : a == u'_' ? u'u'_C : a == u'-' ? u's'_C : a == u'~' ? u'i'_C : throw KeyError(a);}(u"-"_S);
+        print(tag);
+    }
+} code_block_1;

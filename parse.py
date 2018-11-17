@@ -1728,7 +1728,7 @@ def parse_internal(this_node):
                 node.set_expression(node_expression.children[0])
                 new_scope(node)
             else:
-                if token.category == Token.Category.NAME:
+                if token.category == Token.Category.NAME and tokens[tokeni-1].category != Token.Category.SCOPE_END:
                     var_name = token.value(source)
                     next_token()
                     if token.value(source) == '=':
@@ -1775,13 +1775,14 @@ def parse_internal(this_node):
                                 assert(child.children[1].token.category == Token.Category.NAME or child.children[1].token_str() in ('N', 'Н', 'null', 'нуль'))
                                 node.type_args.append(child.children[0].token_str())
                                 node.type = child.children[1].token_str() # return value is the last
-                    assert(node.type[0].isupper() or node.type in ('var', 'перем')) # type name must starts with an upper case letter
+                    if not (node.type[0].isupper() or node.type in ('var', 'перем')):
+                        raise Error('type name must starts with an upper case letter', node.type_token)
                     for var in node.vars:
                         scope.add_name(var, node)
                 else:
                     node = ASTExpression()
                     node.set_expression(node_expression)
-                if not (token == None or token.category in (Token.Category.STATEMENT_SEPARATOR, Token.Category.SCOPE_END)):
+                if not (token == None or token.category in (Token.Category.STATEMENT_SEPARATOR, Token.Category.SCOPE_END) or tokens[tokeni-1].category == Token.Category.SCOPE_END):
                     raise Error('expected end of statement', token)
                 if token != None and token.category == Token.Category.STATEMENT_SEPARATOR:
                     next_token()
