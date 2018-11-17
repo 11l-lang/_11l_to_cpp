@@ -218,7 +218,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                 prev_indentation_level = indentation_levels[-1][0] if len(indentation_levels) else 0
 
                 if indentation_level == prev_indentation_level: # [1:] [-1]:‘If it is equal, nothing happens.’ :)(: [:2]
-                    if len(tokens):# and tokens[-1].category != Token.Category.SCOPE_END:
+                    if len(tokens) and tokens[-1].category != Token.Category.SCOPE_END:
                         tokens.append(Token(linestart-1, linestart, Token.Category.STATEMENT_SEPARATOR))
                 elif indentation_level > prev_indentation_level: # [2:] [-1]:‘If it is larger, it is pushed on the stack, and one INDENT token is generated.’ [:3]
                     if prev_indentation_level == 0: # len(indentation_levels) == 0 or indentation_levels[-1][0] == 0:
