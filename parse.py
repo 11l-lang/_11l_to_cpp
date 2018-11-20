@@ -316,7 +316,7 @@ class SymbolNode:
                     f_node = fid.ast_nodes[0]
                     assert(type(f_node) in (ASTFunctionDefinition, ASTTypeDefinition) or (type(f_node) in (ASTVariableInitialization, ASTVariableDeclaration) and f_node.function_pointer))
                     if type(f_node) == ASTTypeDefinition:
-                        if f_node.have_virtual_functions:
+                        if f_node.has_virtual_functions:
                             func_name = 'std::make_unique<' + func_name + '>'
                         if len(f_node.constructors) == 0:
                             f_node = ASTFunctionDefinition()
@@ -693,7 +693,7 @@ class ASTVariableDeclaration(ASTNode):
                 raise Error('type `' + ty + '` is not defined', self.type_token)
             if len(id.ast_nodes) == 0 or type(id.ast_nodes[0]) != ASTTypeDefinition:
                 raise Error('`' + ty + '`: expected a type name', self.type_token)
-            if id.ast_nodes[0].have_virtual_functions:
+            if id.ast_nodes[0].has_virtual_functions:
                 return 'std::unique_ptr<' + ty + '>'
             return ty
 
@@ -1010,7 +1010,7 @@ class ASTTypeDefinition(ASTNodeWithChildren):
     base_types : List[str]
     type_name : str
     constructors : List[ASTFunctionDefinition]
-    have_virtual_functions = False
+    has_virtual_functions = False
 
     def __init__(self, constructors = None):
         super().__init__()
@@ -1536,7 +1536,7 @@ def parse_internal(this_node):
 
                 for child in node.children:
                     if type(child) == ASTFunctionDefinition and child.virtual_category != child.VirtualCategory.NO:
-                        node.have_virtual_functions = True
+                        node.has_virtual_functions = True
                         break
 
             elif token.value(source).startswith('I') or \
@@ -1631,7 +1631,7 @@ def parse_internal(this_node):
                             id = scope.find(node.expression.token.value(source))
                             if id != None and len(id.ast_nodes) == 1 and type(id.ast_nodes[0]) == ASTVariableDeclaration and id.ast_nodes[0].type == 'Array':
                                 tid = scope.find(id.ast_nodes[0].type_args[0])
-                                if tid != None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].have_virtual_functions:
+                                if tid != None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_virtual_functions:
                                     node.is_loop_variable_a_ptr = True
                                     scope.add_name(node.loop_variable, node)
 
@@ -1738,7 +1738,7 @@ def parse_internal(this_node):
                         if node.expression.symbol.id == '(' and node.expression.children[0].token.category == Token.Category.NAME and node.expression.children[0].token_str()[0].isupper(): # ) # for `A animal = Sheep(); animal.say()` -> `...; animal->say();`
                             id = scope.find(node.expression.children[0].token_str())
                             assert(id != None and len(id.ast_nodes) and type(id.ast_nodes[0]) == ASTTypeDefinition)
-                            if id.ast_nodes[0].have_virtual_functions:
+                            if id.ast_nodes[0].has_virtual_functions:
                                 node.is_ptr = True
                         node.vars = [var_name]
                     else:
@@ -1819,7 +1819,7 @@ builtins_scope.add_function('sleep', ASTFunctionDefinition([('secs', '', 'Float'
 builtins_scope.add_function('ceil',  ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_function('floor', ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_function('trunc', ASTFunctionDefinition([('x', '', 'Float')]))
-builtins_scope.add_function('fabs',  ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('abs',   ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_function('exp',   ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_function('log',   ASTFunctionDefinition([('x', '', 'Float'), ('base', '0', 'Float')]))
 builtins_scope.add_function('log2',  ASTFunctionDefinition([('x', '', 'Float')]))
