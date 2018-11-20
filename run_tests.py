@@ -1,5 +1,5 @@
 ﻿import os, tokenizer, parse, re, tempfile, sys
-sys.path.append('..')
+sys.path.insert(0, '..') # `append(..)` here works incorrectly if 11l package is installed
 import python_to_11l.tokenizer as py_tokenizer, python_to_11l.parse as py_parser
 
 def kdiff3(str1, str2):
