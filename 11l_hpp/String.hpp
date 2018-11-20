@@ -458,14 +458,15 @@ inline char hex_to_char(int c) {return (char)c + ((unsigned)c <= 9u ? '0' : 'A' 
 
 inline String hex(int n)
 {
-	char16_t rr[8], *h = rr;
+	char16_t rr[9], *h = rr;
+	rr[8] = 0;
 	for (const unsigned char *d = (unsigned char*)&n + sizeof(n)-1; d >= (unsigned char*)&n; d--)
 		*h++ = hex_to_char(*d >> 4),
 		*h++ = hex_to_char(*d & 0xF);
 	const char16_t *s = rr;
 	while (*s == u'0')
 		s++;
-	String r = u"0x";
+	String r;
 	if (h > s)
 		r.append(s, h-s);
 	else
