@@ -318,6 +318,8 @@ class SymbolNode:
                     if type(f_node) == ASTTypeDefinition:
                         if f_node.has_virtual_functions:
                             func_name = 'std::make_unique<' + func_name + '>'
+                        elif f_node.has_pointers_to_the_same_type:
+                            func_name = 'make_SharedPtr<' + func_name + '>'
                         if len(f_node.constructors) == 0:
                             f_node = ASTFunctionDefinition()
                         else:
@@ -333,7 +335,7 @@ class SymbolNode:
                                 raise Error('too many arguments for function `' + func_name + '`', Token(self.children[0].leftmost(), self.children[0].rightmost(), Token.Category.NAME))
                             if f_node.first_named_only_argument != None and last_function_arg >= f_node.first_named_only_argument:
                                 raise Error('argument `' + f_node.function_arguments[last_function_arg][0] + '` of function `' + func_name + '` is named-only', self.children[i+1].token)
-                            if f_node.function_arguments[last_function_arg][2].endswith('?'):
+                            if f_node.function_arguments[last_function_arg][2] == 'File?':
                                 res += '&'
                         res += self.children[i+1].to_str()
                         last_function_arg += 1
@@ -486,6 +488,12 @@ class SymbolNode:
                         return 'this->' + c1
                     else:
                         return c1
+                if cts0 == '.' and len(self.children[0].children) == 1: # `.left.tree_indent()` -> `left->tree_indent()`
+                    id_ = self.scope.find(self.children[0].children[0].token_str())
+                    if id_ != None and len(id_.ast_nodes) and type(id_.ast_nodes[0]) in (ASTVariableInitialization, ASTVariableDeclaration):
+                        tid = self.scope.find(id_.ast_nodes[0].type.rstrip('?'))
+                        if tid != None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
+                            return self.children[0].children[0].token_str() + '->' + c1
                 id_ = self.scope.find(cts0.lstrip('@'))
                 if id_ != None:
                     if id_.type != None and id_.type.endswith('?'):
@@ -494,6 +502,10 @@ class SymbolNode:
                         return cts0 + '->' + c1
                     if len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTVariableInitialization and id_.ast_nodes[0].is_ptr:
                         return self.children[0].to_str() + '->' + c1 # `to_str()` is needed for such case: `animal.say(); animals [+]= animal; animal.say()` -> `animal->say(); animals.append(animal); std::move(animal)->say();`
+                    if len(id_.ast_nodes) and type(id_.ast_nodes[0]) in (ASTVariableInitialization, ASTVariableDeclaration): # `Node tree = ...; tree.tree_indent()` -> `... tree->tree_indent()` # (
+                        tid = self.scope.find(id_.ast_nodes[0].type)#.rstrip('?'))
+                        if tid != None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
+                            return cts0 + '->' + c1
                 return char_if_len_1(self.children[0]) + '.' + c1 + '()'*(c1 in ('len', 'last', 'empty')) # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
             elif self.symbol.id == ':':
                 c0 = self.children[0].to_str()
@@ -684,6 +696,8 @@ class ASTVariableDeclaration(ASTNode):
         self.scope = scope
 
     def trans_type(self, ty):
+        if ty[-1] == '?':
+            ty = ty[:-1]
         t = cpp_type_from_11l.get(ty)
         if t != None:
             return t
@@ -695,6 +709,8 @@ class ASTVariableDeclaration(ASTNode):
                 raise Error('`' + ty + '`: expected a type name', self.type_token)
             if id.ast_nodes[0].has_virtual_functions:
                 return 'std::unique_ptr<' + ty + '>'
+            elif id.ast_nodes[0].has_pointers_to_the_same_type:
+                return 'SharedPtr<' + ty + '>'
             return ty
 
     def to_str(self, indent):
@@ -725,10 +741,12 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         ABSTRACT = 3
         FINAL = 4
     virtual_category = VirtualCategory.NO
+    scope : Scope
 
     def __init__(self, function_arguments = None):
         super().__init__()
         self.function_arguments = function_arguments or []
+        self.scope = scope
 
     def serialize_to_dict(self):
         return {'function_arguments': [', '.join(arg) for arg in self.function_arguments]}
@@ -802,7 +820,12 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 arguments.append(('T' + str(index + 1) + ' ' if '=' in arg[3] else 'const T' + str(index + 1) + ' &')
                     + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
             else:
-                if arg[2].endswith('?'):
+                tid = self.scope.find(arg[2].rstrip('?'))
+                if tid != None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
+                    arguments.append('SharedPtr<' + arg[2].rstrip('?') + '> '
+                        #+ ('' if '=' in arg[3] else 'const ')
+                        + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
+                elif arg[2].endswith('?'):
                     arguments.append(arg[2].rstrip('?') + '* '
                             + ('' if '=' in arg[3] else 'const ')
                             + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
@@ -1011,6 +1034,7 @@ class ASTTypeDefinition(ASTNodeWithChildren):
     type_name : str
     constructors : List[ASTFunctionDefinition]
     has_virtual_functions = False
+    has_pointers_to_the_same_type = False
 
     def __init__(self, constructors = None):
         super().__init__()
@@ -1023,8 +1047,12 @@ class ASTTypeDefinition(ASTNodeWithChildren):
             while ti > 0 and tokens[ti].category in (Token.Category.SCOPE_END, Token.Category.STATEMENT_SEPARATOR):
                 ti -= 1
             r = (source[tokens[ti].end:tokens[self.tokeni].start].count("\n")-1) * "\n"
+        base_types = []
+        if self.has_pointers_to_the_same_type:
+            base_types += ['SharedObject']
+        base_types += self.base_types
         r += ' ' * (indent*4) \
-          + 'class ' + self.type_name + (' : ' + ', '.join(map(lambda c: 'public ' + c, self.base_types)) if len(self.base_types) else '') \
+          + 'class ' + self.type_name + (' : ' + ', '.join(map(lambda c: 'public ' + c, base_types)) if len(base_types) else '') \
           + "\n" + ' ' * (indent*4) + "{\n" + ' ' * (indent*4) + "public:\n"
         for c in self.children:
             r += c.to_str(indent+1)
@@ -1779,6 +1807,8 @@ def parse_internal(this_node):
                         raise Error('type name must starts with an upper case letter', node.type_token)
                     for var in node.vars:
                         scope.add_name(var, node)
+                    if type(this_node) == ASTTypeDefinition and this_node.type_name == node.type.rstrip('?'):
+                        this_node.has_pointers_to_the_same_type = True
                 else:
                     node = ASTExpression()
                     node.set_expression(node_expression)
