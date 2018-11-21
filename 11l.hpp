@@ -54,6 +54,7 @@ public:
 #include "11l_hpp/String.hpp"
 #include "11l_hpp/Array.hpp"
 #include "11l_hpp/Dict.hpp"
+#include "11l_hpp/pointers.hpp"
 
 #include <functional>
 #include <iostream>

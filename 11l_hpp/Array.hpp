@@ -193,6 +193,13 @@ public:
 	{
 		return !(*this == arr);
 	}
+
+	Array operator+(const Array &a) const
+	{
+		Array r(*this);
+		r.append(a);
+		return r;
+	}
 };
 
 template <typename Type> Array<Type> create_array(std::initializer_list<Type> il)
