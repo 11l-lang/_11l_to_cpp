@@ -1536,8 +1536,11 @@ def parse_internal(this_node):
                     next_token()
                     if token.value(source) == '->':
                         next_token()
-                        node.function_return_type = token.value(source)
-                        next_token()
+                        if token.value(source) in ('N', 'Н', 'null', 'нуль'):
+                            node.function_return_type = token.value(source)
+                            next_token()
+                        else:
+                            node.function_return_type = expression().to_str()
 
                 if node.virtual_category != node.VirtualCategory.ABSTRACT:
                     new_scope(node, map(lambda arg: (arg[0], arg[2]), node.function_arguments))

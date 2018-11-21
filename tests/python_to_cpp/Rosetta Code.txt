@@ -1,4 +1,6 @@
 # https://www.rosettacode.org/wiki/Visualize_a_tree#D
+from typing import List
+
 class Node:
     value : str
     left : 'Node' = None
@@ -9,13 +11,14 @@ class Node:
         self.left = left
         self.right = right
 
-    def tree_indent(self):
+    def tree_indent(self) -> List[str]:
         tr = self.right.tree_indent() if self.right != None else ['-- (null)']
         return ['--' + self.value] + list(map(lambda a: '  |' + a, self.left.tree_indent() if self.left != None else ['-- (null)'])) + ['  `' + tr[0]] + list(map(lambda a: "   " + a, tr[1:]))
 
 tree : Node = Node(1, Node(2, Node(4, Node(7)), Node(5)), Node(3, Node(6, Node(8), Node(9))))
 print("\n".join(tree.tree_indent()))
 ===
+
 T Node
    String value
    Node? left
@@ -26,7 +29,7 @@ T Node
       .left = left
       .right = right
 
-   F tree_indent()
+   F tree_indent() -> Array[String]
       A tr = I .right != N {.right.tree_indent()} E [‘-- (null)’]
       R [‘--’(.value)] + (I .left != N {.left.tree_indent()} E [‘-- (null)’]).map(a -> ‘  |’a) + [‘  `’tr[0]] + tr[1..].map(a -> ‘   ’a)
 Node tree = Node(1, Node(2, Node(4, Node(7)), Node(5)), Node(3, Node(6, Node(8), Node(9))))
@@ -46,7 +49,7 @@ public:
         this->right = right;
     }
 
-    auto tree_indent()
+    Array<String> tree_indent()
     {
         auto tr = right != nullptr ? right->tree_indent() : create_array({u"-- (null)"_S});
         return create_array({u"--"_S + (value)}) + (left != nullptr ? left->tree_indent() : create_array({u"-- (null)"_S})).map([](const auto &a){return u"  |"_S + a;}) + create_array({u"  `"_S + _get<0>(tr)}) + tr[range_ei(1)].map([](const auto &a){return u"   "_S + a;});
