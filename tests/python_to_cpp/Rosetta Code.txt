@@ -64,3 +64,49 @@ struct CodeBlock1
         print((tree->tree_indent()).join(u"\n"_S));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Range_expansion#Python
+def rangeexpand(txt):
+    lst : List[int] = []
+    for r in txt.split(','):
+        if '-' in r[1:]:
+            rr = r[1:].split('-', 1)
+            lst += range(int(r[0] + rr[0]), int(rr[1]) + 1)
+        else:
+            lst.append(int(r))
+    return lst
+ 
+print(rangeexpand('-6,-3--1,3-5,7-11,14,15,17-20'))
+===
+F rangeexpand(txt)
+   Array[Int] lst
+   L(r) txt.split(‘,’)
+      I ‘-’ C r[1..]
+         A rr = r[1..].split(‘-’, 1 + 1)
+         lst [+]= (Int(r[0] + rr[0]) .< Int(rr[1]) + 1)
+      E
+         lst.append(Int(r))
+   R lst
+print(rangeexpand(‘-6,-3--1,3-5,7-11,14,15,17-20’))
+===
+template <typename T1> auto rangeexpand(const T1 &txt)
+{
+    Array<int> lst;
+    for (auto r : txt.split(u","_S))
+        if (in(u'-'_C, r[range_ei(1)])) {
+            auto rr = r[range_ei(1)].split(u"-"_S, 1 + 1);
+            lst.append(range_el(to_int(_get<0>(r) + _get<0>(rr)), to_int(_get<1>(rr)) + 1));
+        }
+        else
+            lst.append(to_int(r));
+    return lst;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(rangeexpand(u"-6,-3--1,3-5,7-11,14,15,17-20"_S));
+    }
+} code_block_1;
