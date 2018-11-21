@@ -500,7 +500,7 @@ class SymbolNode:
                         return cts0.lstrip('@') + '->' + c1
                     if len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTLoop and id_.ast_nodes[0].is_loop_variable_a_ptr and cts0 == id_.ast_nodes[0].loop_variable:
                         return cts0 + '->' + c1
-                    if len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTVariableInitialization and id_.ast_nodes[0].is_ptr:
+                    if len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTVariableInitialization and (id_.ast_nodes[0].is_ptr or id_.ast_nodes[0].is_shared_ptr):
                         return self.children[0].to_str() + '->' + c1 # `to_str()` is needed for such case: `animal.say(); animals [+]= animal; animal.say()` -> `animal->say(); animals.append(animal); std::move(animal)->say();`
                     if len(id_.ast_nodes) and type(id_.ast_nodes[0]) in (ASTVariableInitialization, ASTVariableDeclaration): # `Node tree = ...; tree.tree_indent()` -> `... tree->tree_indent()` # (
                         tid = self.scope.find(id_.ast_nodes[0].type)#.rstrip('?'))
@@ -720,6 +720,7 @@ class ASTVariableDeclaration(ASTNode):
 
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
     is_ptr = False
+    is_shared_ptr = False
 
     def to_str(self, indent):
         return super().to_str(indent)[:-2] + ' = ' + self.expression.to_str() + ";\n"
@@ -1771,6 +1772,8 @@ def parse_internal(this_node):
                             assert(id != None and len(id.ast_nodes) and type(id.ast_nodes[0]) == ASTTypeDefinition)
                             if id.ast_nodes[0].has_virtual_functions:
                                 node.is_ptr = True
+                            elif id.ast_nodes[0].has_pointers_to_the_same_type:
+                                node.is_shared_ptr = True
                         node.vars = [var_name]
                     else:
                         node = ASTVariableDeclaration()
