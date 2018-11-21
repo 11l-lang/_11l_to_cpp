@@ -564,7 +564,7 @@ class SymbolNode:
             elif self.symbol.id == '%':
                 return 'mod(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
             else:
-                return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '(concat)':'+', '‘’=':'+=', '(+)':'^'}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
+                return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '(concat)':'+', '[+]':'+', '‘’=':'+=', '(+)':'^'}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
         elif len(self.children) == 3:
             if self.children[1].token.category == Token.Category.SCOPE_BEGIN:
                 assert(self.symbol.id == '.')
