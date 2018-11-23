@@ -47,11 +47,23 @@ public:
 		{
 			setenv(name, getenv(name) + s);
 		}
+		operator String() const
+		{
+			String r = getenv(name, u"\0"_S);
+			if (r == u'\0')
+				throw KeyError(name);
+			return r;
+		}
 	};
 
 	Var operator[](const String &name) const
 	{
 		return Var(name);
+	}
+
+	void set(const String &name, const String &value)
+	{
+		setenv(name, value);
 	}
 #undef environ
 } environ;

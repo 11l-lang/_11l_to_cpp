@@ -176,6 +176,9 @@ class SymbolNode:
 
         return self.children[-1].rightmost()
 
+    def left_to_right_token(self):
+        return Token(self.leftmost(), self.rightmost(), Token.Category.NAME)
+
     def token_str(self):
         return self.token.value(source) if not self.token_str_override else self.token_str_override
 
@@ -310,9 +313,9 @@ class SymbolNode:
                     else:
                         fid = self.scope.find(func_name)
                     if fid == None:
-                        raise Error('call of undefined function `' + func_name + '`', self.children[0].token)
+                        raise Error('call of undefined function `' + func_name + '`', self.children[0].left_to_right_token())
                     if len(fid.ast_nodes) > 1:
-                        raise Error('functions\' overloading is not supported for now', self.children[0].token)
+                        raise Error('functions\' overloading is not supported for now', self.children[0].left_to_right_token())
                     f_node = fid.ast_nodes[0]
                     assert(type(f_node) in (ASTFunctionDefinition, ASTTypeDefinition) or (type(f_node) in (ASTVariableInitialization, ASTVariableDeclaration) and f_node.function_pointer))
                     if type(f_node) == ASTTypeDefinition:
@@ -324,7 +327,7 @@ class SymbolNode:
                             f_node = ASTFunctionDefinition()
                         else:
                             if len(f_node.constructors) > 1:
-                                raise Error('constructors\' overloading is not supported for now (see type `' + f_node.type_name + '`)', self.children[0].token)
+                                raise Error('constructors\' overloading is not supported for now (see type `' + f_node.type_name + '`)', self.children[0].left_to_right_token())
                             f_node = f_node.constructors[0]
                 last_function_arg = 0
                 res = func_name + '('
@@ -332,7 +335,7 @@ class SymbolNode:
                     if self.children[i] == None:
                         if f_node != None and type(f_node) == ASTFunctionDefinition:
                             if last_function_arg >= len(f_node.function_arguments):
-                                raise Error('too many arguments for function `' + func_name + '`', Token(self.children[0].leftmost(), self.children[0].rightmost(), Token.Category.NAME))
+                                raise Error('too many arguments for function `' + func_name + '`', self.children[0].left_to_right_token())
                             if f_node.first_named_only_argument != None and last_function_arg >= f_node.first_named_only_argument:
                                 raise Error('argument `' + f_node.function_arguments[last_function_arg][0] + '` of function `' + func_name + '` is named-only', self.children[i+1].token)
                             if f_node.function_arguments[last_function_arg][2] == 'File?':
@@ -343,7 +346,7 @@ class SymbolNode:
                         argument_name = self.children[i].to_str()[:-1]
                         while True:
                             if f_node == None:
-                                raise Error('function `' + func_name + '` is not found', Token(self.children[0].leftmost(), self.children[0].rightmost(), Token.Category.NAME))
+                                raise Error('function `' + func_name + '` is not found', self.children[0].left_to_right_token())
                             if last_function_arg == len(f_node.function_arguments):
                                 raise Error('argument `' + argument_name + '` is not found in function `' + func_name + '`', self.children[i].token)
                             if f_node.function_arguments[last_function_arg][0] == argument_name:
@@ -1895,6 +1898,7 @@ builtin_modules['fs::path'] = Module(module_scope)
 module_scope = Scope(None)
 module_scope.add_function('', ASTFunctionDefinition([('command', '', 'String')]))
 module_scope.add_function('getenv', ASTFunctionDefinition([('name', '', 'String'), ('default', token_to_str('‘’'), 'String')]))
+module_scope.add_function('setenv', ASTFunctionDefinition([('name', '', 'String'), ('value', '', 'String')]))
 builtin_modules['os'] = Module(module_scope)
 module_scope = Scope(None)
 module_scope.add_function('', ASTFunctionDefinition([('year', '0', 'Int'), ('month', '1', 'Int'), ('day', '1', 'Int'), ('hour', '0', 'Int'), ('minute', '0', 'Int'), ('second', '0', 'Float')]))
