@@ -199,9 +199,15 @@ public:
 		return r != String::npos ? (int)r : -1;
 	}
 
+	Nullable<int> rfind(const String &s, int start = (int)npos) const
+	{
+		size_t r = basic_string::rfind(s, start);
+		return r == npos ? Nullable<int>() : Nullable<int>((int)r);
+	}
+
 	int rfindi(const String &sub, int start, int end) const
 	{
-		size_t r = rfind(sub, end - 1);
+		size_t r = basic_string::rfind(sub, end - 1);
 		if (r == String::npos || (int)r < start) return -1;
 		return (int)r;
 	}
@@ -368,7 +374,14 @@ public:
 	String operator[](const range_elen_llen range) const {return (*this)[range_el(len() + range.b, len() + range.e)];}
 	String operator[](const range_elen_i    range) const {return (*this)[range_ei(len() + range.b)];}
 
-	char16_t at_plus_len(int i) const
+	Char last() const
+	{
+		if (empty())
+			throw IndexError(0);
+		return (*this)[len() - 1];
+	}
+
+	Char at_plus_len(int i) const
 	{
 		return (*this)[len() + i];
 	}
@@ -428,6 +441,11 @@ inline int to_int(const String &str)
 	for (; Char(*s).is_digit(); s++)
 		res = res * 10 + (*s - u'0');
 	return res * sign;
+}
+
+inline int to_int(Char ch)
+{
+	return ch.is_digit() ? ch.code - '0' : 0;
 }
 
 inline int to_int(double d)

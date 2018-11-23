@@ -84,12 +84,12 @@ public:
 	}
 };
 
-inline Walker walk(const String &path = u".", Nullable<std::function<bool(const String&)>> dir_filter = nullptr, bool files_only = true)
+inline Walker walk_dir(const String &path = u".", Nullable<std::function<bool(const String&)>> dir_filter = nullptr, bool files_only = true)
 {
 	return Walker(path, dir_filter, files_only);
 }
 
-inline Walker walk(const String &path, const std::function<bool(const String&)> &dir_filter, bool files_only = true)
+inline Walker walk_dir(const String &path, const std::function<bool(const String&)> &dir_filter, bool files_only = true)
 {
 	return Walker(path, dir_filter, files_only);
 }
