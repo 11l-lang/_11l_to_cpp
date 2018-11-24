@@ -552,14 +552,14 @@ auto f()
                 goto break_;
             print(i + j);
         }
-    break_:
+    break_:;
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++) {
             if (i + j == 5)
                 goto break_1;
             print(i + j);
         }
-    break_1:
+    break_1:;
     print(0);
 }
 

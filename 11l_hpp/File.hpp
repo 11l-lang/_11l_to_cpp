@@ -132,6 +132,13 @@ public:
 		return file_bytes;
 	}
 
+	Char read(int n)
+	{
+		char c;
+		size_t _ = fread(&c, 1, 1, file);
+		return c;
+	}
+
 	void flush()
 	{
 		fflush(file);

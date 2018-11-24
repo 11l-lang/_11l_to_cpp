@@ -260,3 +260,169 @@ struct CodeBlock1
         bf(u"++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."_S);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Execute_Brain****
+import sys, collections
+
+def bf(source):
+    tape = collections.defaultdict(int) # int
+    cell = 0
+    ptr = 0
+    while ptr < len(source):
+        opcode = source[ptr]
+        if   opcode == '>': cell += 1
+        elif opcode == '<': cell -= 1
+        elif opcode == '+': tape[cell] += 1
+        elif opcode == '-': tape[cell] -= 1
+        elif opcode == '.': sys.stdout.write(chr(tape[cell]))
+        elif opcode == ',': tape[cell] = ord(sys.stdin.read(1))
+        elif opcode == '[':
+            if tape[cell] == 0:
+                nesting_level = 0
+                while True:
+                    ch = source[ptr]
+                    if ch == '[':
+                        nesting_level += 1
+                    elif ch == ']':
+                        nesting_level -= 1
+                        if nesting_level == 0:
+                            break
+                    ptr += 1
+        elif opcode == ']':
+            if tape[cell] != 0:
+                nesting_level = 0
+                while True:
+                    ch = source[ptr]
+                    if ch == '[':
+                        nesting_level -= 1
+                        if nesting_level == 0:
+                            break
+                    elif ch == ']':
+                        nesting_level += 1
+                    ptr -= 1
+        ptr += 1
+
+bf('++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.')
+===
+//import sys, collections
+
+F bf(source)
+   A tape = DefaultDict[Int, Int]()
+   A cell = 0
+   A ptr = 0
+   L ptr < source.len
+      S source[ptr]
+         ‘>’
+            cell++
+         ‘<’
+            cell--
+         ‘+’
+            tape[cell]++
+         ‘-’
+            tape[cell]--
+         ‘.’
+            :stdout.write(Char(code' tape[cell]))
+         ‘,’
+            tape[cell] = :stdin.read(1).code
+         ‘[’
+            I tape[cell] == 0
+               A nesting_level = 0
+               L
+                  S source[ptr]
+                     ‘[’
+                        nesting_level++
+                     ‘]’
+                        I --nesting_level == 0
+                           L.break
+                  ptr++
+         ‘]’
+            I tape[cell] != 0
+               A nesting_level = 0
+               L
+                  S source[ptr]
+                     ‘[’
+                        I --nesting_level == 0
+                           L.break
+                     ‘]’
+                        nesting_level++
+                  ptr--
+      ptr++
+bf(‘++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.’)
+===
+template <typename T1> auto bf(const T1 &source)
+{
+    auto tape = DefaultDict<int, int>();
+    auto cell = 0;
+    auto ptr = 0;
+    while (ptr < source.len()) {
+        switch (source[ptr])
+        {
+        case u'>':
+            cell++;
+            break;
+        case u'<':
+            cell--;
+            break;
+        case u'+':
+            tape[cell]++;
+            break;
+        case u'-':
+            tape[cell]--;
+            break;
+        case u'.':
+            _stdout.write(Char(tape[cell]));
+            break;
+        case u',':
+            tape.set(cell, _stdin.read(1).code);
+            break;
+        case u'[':
+            if (tape[cell] == 0) {
+                auto nesting_level = 0;
+                while (true) {
+                    switch (source[ptr])
+                    {
+                    case u'[':
+                        nesting_level++;
+                        break;
+                    case u']':
+                        if (--nesting_level == 0)
+                            goto break_;
+                        break;
+                    }
+                    ptr++;
+                }
+                break_:;
+            }
+            break;
+        case u']':
+            if (tape[cell] != 0) {
+                auto nesting_level = 0;
+                while (true) {
+                    switch (source[ptr])
+                    {
+                    case u'[':
+                        if (--nesting_level == 0)
+                            goto break_1;
+                        break;
+                    case u']':
+                        nesting_level++;
+                        break;
+                    }
+                    ptr--;
+                }
+                break_1:;
+            }
+            break;
+        }
+        ptr++;
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        bf(u"++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."_S);
+    }
+} code_block_1;
