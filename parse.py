@@ -958,7 +958,7 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
             r += self.children[-1].children_to_str_detect_single_stmt(indent, 'if (!was_break)') + ' ' * (indent*4) + "}\n"
 
         if self.break_label_needed != -1:
-            r += ' ' * (indent*4) + 'break_' + ('' if self.break_label_needed == 0 else str(self.break_label_needed)) + ":\n"
+            r += ' ' * (indent*4) + 'break_' + ('' if self.break_label_needed == 0 else str(self.break_label_needed)) + ":;\n"
         return r
 
     def walk_expressions(self, f):

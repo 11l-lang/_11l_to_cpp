@@ -198,7 +198,7 @@ public:
                 }
                 i++;
             }
-            break_:
+            break_:;
             link = html_escapeq(instr[range_el(endpos + 1 + q_offset, i)]);
             String tag = u"<a href=\""_S + link + u"\""_S;
             if (link.starts_with(u"./"_S))
@@ -512,7 +512,7 @@ public:
                         }
                         i++;
                     }
-                    break_1:
+                    break_1:;
                     write_to_pos(prevci + 1, i + 1);
                     auto outer_p = endqpos + (instr[endqpos + 2] == u'\n' ? 3 : 2);
                     if (habr_html)
@@ -826,7 +826,7 @@ public:
                         if (i == instr.len())
                             exit_with_error(u"Unended comment started"_S, comment_start);
                     }
-                    break_2:
+                    break_2:;
                     write_to_pos(comment_start, i + 1);
                     if (instr[range_el(comment_start + 3, comment_start + 4)] != u'[') {
                         outfile.write(u"<!--"_S);
