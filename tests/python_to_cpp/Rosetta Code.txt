@@ -147,3 +147,116 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Execute_Brain****/Python
+import sys, collections
+
+def bf(source):
+    loop_ptrs : Dict[int, int] = {}
+    loop_stack : List[int] = []
+    for ptr, opcode in enumerate(source):
+        if opcode == '[': loop_stack.append(ptr)
+        if opcode == ']':
+            sptr = loop_stack.pop()
+            loop_ptrs[ptr] = sptr
+            loop_ptrs[sptr] = ptr
+
+    tape = collections.defaultdict(int) # int
+    cell = 0
+    ptr = 0
+    while ptr < len(source):
+        opcode = source[ptr]
+        if   opcode == '>': cell += 1
+        elif opcode == '<': cell -= 1
+        elif opcode == '+': tape[cell] += 1
+        elif opcode == '-': tape[cell] -= 1
+        elif opcode == '.': sys.stdout.write(chr(tape[cell]))
+        elif opcode == ',': tape[cell] = ord(sys.stdin.read(1))
+        elif (opcode == '[' and not tape[cell]) or \
+             (opcode == ']' and tape[cell]): ptr = loop_ptrs[ptr]
+        ptr += 1
+
+bf('++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.')
+===
+//import sys, collections
+
+F bf(source)
+   Dict[Int, Int] loop_ptrs
+   Array[Int] loop_stack
+   L(opcode) source
+      A ptr = L.index
+      I opcode == ‘[’
+         loop_stack.append(ptr)
+      I opcode == ‘]’
+         A sptr = loop_stack.pop()
+         loop_ptrs[ptr] = sptr
+         loop_ptrs[sptr] = ptr
+   A tape = DefaultDict[Int, Int]()
+   A cell = 0
+   A ptr = 0
+   L ptr < source.len
+      A opcode = source[ptr]
+      I opcode == ‘>’
+         cell++
+      E I opcode == ‘<’
+         cell--
+      E I opcode == ‘+’
+         tape[cell]++
+      E I opcode == ‘-’
+         tape[cell]--
+      E I opcode == ‘.’
+         :stdout.write(Char(code' tape[cell]))
+      E I opcode == ‘,’
+         tape[cell] = :stdin.read(1).code
+      E I (opcode == ‘[’ & !(tape[cell])) | (opcode == ‘]’ & tape[cell])
+         ptr = loop_ptrs[ptr]
+      ptr++
+bf(‘++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.’)
+===
+template <typename T1> auto bf(const T1 &source)
+{
+    Dict<int, int> loop_ptrs;
+    Array<int> loop_stack;
+    {int Lindex = 0;
+    for (auto opcode : source) {
+        auto ptr = Lindex;
+        if (opcode == u'[')
+            loop_stack.append(ptr);
+        if (opcode == u']') {
+            auto sptr = loop_stack.pop();
+            loop_ptrs.set(ptr, sptr);
+            loop_ptrs.set(sptr, ptr);
+        }
+        Lindex++;
+    }}
+    auto tape = DefaultDict<int, int>();
+    auto cell = 0;
+    auto ptr = 0;
+    while (ptr < source.len()) {
+        auto opcode = source[ptr];
+        if (opcode == u'>')
+            cell++;
+        else if (opcode == u'<')
+            cell--;
+        else if (opcode == u'+')
+            tape[cell]++;
+        else if (opcode == u'-')
+            tape[cell]--;
+        else if (opcode == u'.')
+            _stdout.write(Char(tape[cell]));
+        else if (opcode == u',')
+            tape.set(cell, _stdin.read(1).code);
+        else if ((opcode == u'[' && !(tape[cell])) || (opcode == u']' && tape[cell]))
+            ptr = loop_ptrs[ptr];
+        ptr++;
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        bf(u"++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."_S);
+    }
+} code_block_1;
