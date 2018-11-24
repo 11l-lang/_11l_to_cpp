@@ -82,3 +82,19 @@ template <typename KeyType, typename ValueType> inline bool in(const KeyType &ke
 {
 	return dict.find(key) != dict.end();
 }
+
+template <typename KeyType, typename ValueType> class DefaultDict : public std::map<KeyType, ValueType>
+{
+public:
+	DefaultDict() {}
+
+	void set(const KeyType &key, const ValueType &value)
+	{
+		std::map<KeyType, ValueType>::operator[](key) = value;
+	}
+};
+
+template <typename KeyType, typename ValueType> inline bool in(const KeyType &key, const DefaultDict<KeyType, ValueType> &dict)
+{
+	return dict.find(key) != dict.end();
+}

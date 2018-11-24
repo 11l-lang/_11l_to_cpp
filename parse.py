@@ -307,6 +307,8 @@ class SymbolNode:
                     func_name = 'to_int'
                 elif func_name == 'Array[Char]':
                     func_name = 'Array<Char>'
+                elif func_name.startswith('DefaultDict['): # ]
+                    func_name = 'DefaultDict<' + ', '.join(cpp_type_from_11l[c.to_str()] for c in self.children[0].children[1:]) + '>'
                 else:
                     if self.children[0].symbol.id == ':':
                         fid = find_module(self.children[0].children[0].to_str()).scope.find(self.children[0].children[1].token_str())
