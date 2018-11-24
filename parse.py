@@ -685,7 +685,7 @@ class ASTExpression(ASTNodeWithExpression):
 cpp_type_from_11l = {'A':'auto', 'А':'auto', 'var':'auto', 'перем':'auto',
                      'Int':'int', 'Float':'double', 'String':'String', 'Bool':'bool',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
-                     'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict',
+                     'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict',
                      'Array[String]':'Array<String>', 'Array[Array[String]]':'Array<Array<String>>',
                      'Array[Char]':'Array<Char>'}
 
