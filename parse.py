@@ -514,7 +514,8 @@ class SymbolNode:
                 return char_if_len_1(self.children[0]) + '.' + c1 + '()'*(c1 in ('len', 'last', 'empty')) # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
             elif self.symbol.id == ':':
                 c0 = self.children[0].to_str()
-                c0 = {'time':'timens'}.get(c0, c0) # 'time': a symbol with this name already exists and therefore this name cannot be used as a namespace name
+                c0 = {'time':'timens', # 'time': a symbol with this name already exists and therefore this name cannot be used as a namespace name
+                      'random':'randomns'}.get(c0, c0) # GCC: .../11l-lang/_11l_to_cpp/11l_hpp/random.hpp:1:11: error: ‘namespace random { }’ redeclared as different kind of symbol
                 c1 = self.children[1].to_str()
                 return c0 + '::' + (c1 if c1 != '' else '_')
             elif self.symbol.id == '->':

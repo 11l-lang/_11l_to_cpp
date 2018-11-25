@@ -138,11 +138,11 @@ struct CodeBlock1
     CodeBlock1()
     {
         while (true) {
-            auto a = random::_(20);
+            auto a = randomns::_(20);
             print(a);
             if (a == 10)
                 break;
-            auto b = random::_(20);
+            auto b = randomns::_(20);
             print(b);
         }
     }

@@ -1,4 +1,4 @@
-namespace random
+﻿namespace randomns // GCC: .../11l-lang/_11l_to_cpp/11l_hpp/random.hpp:1:11: error: ‘namespace random { }’ redeclared as different kind of symbol
 {
 static unsigned int seed = 0;
 
