@@ -136,12 +136,12 @@ public:
 			push_back(el);
 	}
 
-	template <typename Type, bool include_beginning, bool include_ending> void append(const Range<Type, include_beginning, include_ending> &range)
+	template <typename Ty, bool include_beginning, bool include_ending> void append(const Range<Ty, include_beginning, include_ending> &range)
 	{
 		for (auto i : range)
 			append(i);
 	}
-	template <typename Type, bool include_beginning, bool include_ending> void operator+=(const Range<Type, include_beginning, include_ending> &range)
+	template <typename Ty, bool include_beginning, bool include_ending> void operator+=(const Range<Ty, include_beginning, include_ending> &range)
 	{
 		append(range);
 	}
