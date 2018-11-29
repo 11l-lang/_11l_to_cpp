@@ -224,6 +224,14 @@ template <typename Type> Array<Type> create_array(std::initializer_list<Type> il
 	return Array<Type>(il);
 }
 
+Array<char> create_array(std::initializer_list<bool> il) // avoid using std::vector<bool>
+{
+	Array<char> r;
+	for (bool b : il)
+		r.push_back(b);
+	return r;
+}
+
 template <typename Ty, typename Type> bool in(const Ty &val, const Array<Type> &arr)
 {
 	return std::find(arr.begin(), arr.end(), val) != arr.end();

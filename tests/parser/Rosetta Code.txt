@@ -1,0 +1,20 @@
+// https://www.rosettacode.org/wiki/100_doors
+A doors = [0B] * 100
+L(i) 100
+   L(j) (i .< 100).step(i + 1)
+      doors[j] = !doors[j]
+   print(‘Door ’(i + 1)‘: ’(I doors[i] {‘open’} E ‘close’))
+===
+auto doors = create_array({false}) * 100;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int i = 0; i < 100; i++) {
+            for (auto j : range_el(i, 100).step(i + 1))
+                doors.set(j, !doors[j]);
+            print(u"Door "_S + (i + 1) + u": "_S + (doors[i] ? u"open"_S : u"close"_S));
+        }
+    }
+} code_block_1;

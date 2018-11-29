@@ -579,3 +579,32 @@ struct CodeBlock1
         print(decompress(compressed));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/100_doors#Python
+# Please take solution from '../parser/Rosetta Code.txt'
+doors = [False] * 100
+for i in range(100):
+   for j in range(i, 100, i+1):
+       doors[j] = not doors[j]
+   print('Door ' + str(i+1) + ': '+ ('open' if doors[i] else 'close'))
+===
+A doors = [0B] * 100
+L(i) 0.<100
+   L(j) (i .< 100).step(i + 1)
+      doors[j] = !(doors[j])
+   print(‘Door ’String(i + 1)‘: ’(I doors[i] {‘open’} E ‘close’))
+===
+auto doors = create_array({false}) * 100;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(0, 100)) {
+            for (auto j : range_el(i, 100).step(i + 1))
+                doors.set(j, !(doors[j]));
+            print(u"Door "_S + String(i + 1) + u": "_S + (doors[i] ? u"open"_S : u"close"_S));
+        }
+    }
+} code_block_1;
