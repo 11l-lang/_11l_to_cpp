@@ -307,6 +307,8 @@ class SymbolNode:
                     func_name = 'to_int'
                 elif func_name == 'Array[Char]':
                     func_name = 'Array<Char>'
+                elif func_name == 'Dict':
+                    func_name = 'create_dict'
                 elif func_name.startswith('DefaultDict['): # ]
                     func_name = 'DefaultDict<' + ', '.join(cpp_type_from_11l[c.to_str()] for c in self.children[0].children[1:]) + '>'
                 else:
@@ -690,6 +692,28 @@ cpp_type_from_11l = {'A':'auto', 'А':'auto', 'var':'auto', 'перем':'auto',
                      'Array[String]':'Array<String>', 'Array[Array[String]]':'Array<Array<String>>',
                      'Array[Char]':'Array<Char>'}
 
+def trans_type(ty, scope, type_token):
+    if ty[-1] == '?':
+        ty = ty[:-1]
+    t = cpp_type_from_11l.get(ty)
+    if t != None:
+        return t
+    else:
+        p = ty.find('[') # ]
+        if p != -1:
+            return trans_type(ty[:p], scope, type_token) + '<' + trans_type(ty[p+1:-1], scope, type_token) + '>'
+
+        id = scope.find(ty)
+        if id == None:
+            raise Error('type `' + ty + '` is not defined', type_token)
+        if len(id.ast_nodes) == 0 or type(id.ast_nodes[0]) != ASTTypeDefinition:
+            raise Error('`' + ty + '`: expected a type name', type_token)
+        if id.ast_nodes[0].has_virtual_functions:
+            return 'std::unique_ptr<' + ty + '>'
+        elif id.ast_nodes[0].has_pointers_to_the_same_type:
+            return 'SharedPtr<' + ty + '>'
+        return ty
+
 class ASTVariableDeclaration(ASTNode):
     vars : List[str]
     type : str
@@ -702,22 +726,7 @@ class ASTVariableDeclaration(ASTNode):
         self.scope = scope
 
     def trans_type(self, ty):
-        if ty[-1] == '?':
-            ty = ty[:-1]
-        t = cpp_type_from_11l.get(ty)
-        if t != None:
-            return t
-        else:
-            id = self.scope.find(ty)
-            if id == None:
-                raise Error('type `' + ty + '` is not defined', self.type_token)
-            if len(id.ast_nodes) == 0 or type(id.ast_nodes[0]) != ASTTypeDefinition:
-                raise Error('`' + ty + '`: expected a type name', self.type_token)
-            if id.ast_nodes[0].has_virtual_functions:
-                return 'std::unique_ptr<' + ty + '>'
-            elif id.ast_nodes[0].has_pointers_to_the_same_type:
-                return 'SharedPtr<' + ty + '>'
-            return ty
+        return trans_type(ty, self.scope, self.type_token)
 
     def to_str(self, indent):
         if self.function_pointer:
@@ -738,7 +747,7 @@ class ASTWith(ASTNodeWithChildren, ASTNodeWithExpression):
 class ASTFunctionDefinition(ASTNodeWithChildren):
     function_name : str = ''
     function_return_type : str = ''
-    function_arguments : List[Tuple[str, str, str, str]]# = [] # (arg_name, default_value, type_, qualifiers)
+    function_arguments : List[Tuple[str, str, str, str]]# = [] # (arg_name, default_value, type_, qualifier)
     first_named_only_argument = None
     last_non_default_argument : int
     class VirtualCategory(IntEnum):
@@ -837,8 +846,8 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                             + ('' if '=' in arg[3] else 'const ')
                             + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
                 else:
-                    arguments.append(('' if '=' in arg[3] else 'const ')
-                        + cpp_type_from_11l.get(arg[2], arg[2]) + ' '
+                    arguments.append(
+                        (('' if arg[3] == '=' else 'const ') + cpp_type_from_11l.get(arg[2], arg[2]) + ' ' if arg[3] != '&' else trans_type(arg[2], self.scope, tokens[self.tokeni]) + ' &')
                         + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
         return self.children_to_str(indent, ('template <' + ', '.join(templates) + '> ')*(len(templates) != 0) + s + '(' + ', '.join(arguments) + ')')
 
@@ -1512,9 +1521,19 @@ def parse_internal(this_node):
                         if token.value(source)[0].isupper(): # this is a type name
                             type_ = token.value(source)
                             next_token()
-                        qualifiers = ''
+                        if token.value(source) == '[':
+                            next_token()
+                            if token.category != Token.Category.NAME:
+                                raise Error('expected function\'s argument subname', token)
+                            type_ += '[' + token.value(source) + ']'
+                            next_token()
+                            advance(']')
+                        qualifier = ''
                         if token.value(source) == '=':
-                            qualifiers += '='
+                            qualifier = '='
+                            next_token()
+                        elif token.value(source) == '&':
+                            qualifier = '&'
                             next_token()
                         if token.category != Token.Category.NAME:
                             raise Error('expected function\'s argument name', token)
@@ -1528,7 +1547,7 @@ def parse_internal(this_node):
                             if was_default_argument and node.first_named_only_argument == None:
                                 raise Error('non-default argument follows default argument', tokens[tokeni-1])
                             default = ''
-                        node.function_arguments.append((func_arg_name, default, type_, qualifiers)) # ((
+                        node.function_arguments.append((func_arg_name, default, type_, qualifier)) # ((
                         if token.value(source) not in ',)':
                             raise Error('expected `,` or `)` in function\'s arguments list', token)
                         if token.value(source) == ',':
@@ -1913,7 +1932,6 @@ module_scope.add_function('strptime', ASTFunctionDefinition([('datetime_string',
 builtin_modules['time'] = Module(module_scope)
 module_scope = Scope(None)
 module_scope.add_function('', ASTFunctionDefinition([('pattern', '', 'String')]))
-module_scope.add_function('search', ASTFunctionDefinition([('string', '', 'String')]))
 builtin_modules['re'] = Module(module_scope)
 module_scope = Scope(None)
 module_scope.add_function('', ASTFunctionDefinition([('min', '', 'Float'), ('max', '0', 'Float')]))

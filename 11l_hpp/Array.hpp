@@ -191,6 +191,13 @@ public:
 		return r;
 	}
 
+	Type pop(int i)
+	{
+		Type r(std::move((*this)[i]));
+		std::vector<Type>::erase(begin() + i);
+		return r;
+	}
+
 	template <typename Ty> bool operator==(const Array<Ty> &arr) const
 	{
 		if (len() != arr.len()) return false;
