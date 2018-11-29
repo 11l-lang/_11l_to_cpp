@@ -426,3 +426,156 @@ struct CodeBlock1
         bf(u"++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."_S);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/LZW_compression#Python
+import sys
+from typing import List
+
+def compress(uncompressed):
+    dict_size = 256
+    dictionary = dict((str(chr(i)), i) for i in range(dict_size))
+ 
+    w = ""
+    result : List[int] = []
+    for c in uncompressed:
+        wc = w + c
+        if wc in dictionary:
+            w = wc
+        else:
+            result.append(dictionary[w])
+            # Add wc to the dictionary.
+            dictionary[wc] = dict_size
+            dict_size += 1
+            w = c
+ 
+    # Output the code for w.
+    if len(w):
+        result.append(dictionary[w])
+    return result
+
+def decompress(compressed : List[int]):
+    dict_size = 256
+    dictionary = dict((i, str(chr(i))) for i in range(dict_size))
+ 
+    result = ''
+    w = str(chr(compressed.pop(0)))
+    result += w
+    for k in compressed:
+        entry = ''
+        if k in dictionary:
+            entry = dictionary[k]
+        elif k == dict_size:
+            entry = w + w[0]
+        else:
+            sys.exit('Bad compressed k: '+str(k))
+        result += entry
+ 
+        dictionary[dict_size] = w + entry[0]
+        dict_size += 1
+ 
+        w = entry
+    return result
+
+compressed = compress('TOBEORNOTTOBEORTOBEORNOT')
+print(compressed)
+print(decompress(compressed))
+===
+//import sys
+
+F compress(uncompressed)
+   A dict_size = 256
+   A dictionary = Dict((0 .< dict_size).map(i -> (String(Char(code' i)), i)))
+   A w = ‘’
+   Array[Int] result
+   L(c) uncompressed
+      A wc = w‘’c
+      I wc C dictionary
+         w = wc
+      E
+         result.append(dictionary[w])
+         dictionary[wc] = dict_size
+         dict_size++
+         w = c
+
+   I !w.empty
+      result.append(dictionary[w])
+   R result
+
+F decompress(Array[Int] &compressed)
+   A dict_size = 256
+   A dictionary = Dict((0 .< dict_size).map(i -> (i, String(Char(code' i)))))
+   A result = ‘’
+   A w = String(Char(code' compressed.pop(0)))
+   result ‘’= w
+   L(k) compressed
+      A entry = ‘’
+      I k C dictionary
+         entry = dictionary[k]
+      E I k == dict_size
+         entry = w + w[0]
+      E
+         exit(‘Bad compressed k: ’String(k))
+      result ‘’= entry
+      dictionary[dict_size] = w + entry[0]
+      dict_size++
+      w = entry
+   R result
+A compressed = compress(‘TOBEORNOTTOBEORTOBEORNOT’)
+print(compressed)
+print(decompress(compressed))
+===
+template <typename T1> auto compress(const T1 &uncompressed)
+{
+    auto dict_size = 256;
+    auto dictionary = create_dict(range_el(0, dict_size).map([](const auto &i){return make_tuple(String(Char(i)), i);}));
+    auto w = u""_S;
+    Array<int> result;
+    for (auto c : uncompressed) {
+        auto wc = w + c;
+        if (in(wc, dictionary))
+            w = wc;
+        else {
+            result.append(dictionary[w]);
+            dictionary.set(wc, dict_size);
+            dict_size++;
+            w = c;
+        }
+    }
+    if (!w.empty())
+        result.append(dictionary[w]);
+    return result;
+}
+
+auto decompress(Array<int> &compressed)
+{
+    auto dict_size = 256;
+    auto dictionary = create_dict(range_el(0, dict_size).map([](const auto &i){return make_tuple(i, String(Char(i)));}));
+    auto result = u""_S;
+    auto w = String(Char(compressed.pop(0)));
+    result += w;
+    for (auto k : compressed) {
+        auto entry = u""_S;
+        if (in(k, dictionary))
+            entry = dictionary[k];
+        else if (k == dict_size)
+            entry = w + _get<0>(w);
+        else
+            exit(u"Bad compressed k: "_S + String(k));
+        result += entry;
+        dictionary.set(dict_size, w + _get<0>(entry));
+        dict_size++;
+        w = entry;
+    }
+    return result;
+}
+auto compressed = compress(u"TOBEORNOTTOBEORTOBEORNOT"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compressed);
+        print(decompress(compressed));
+    }
+} code_block_1;

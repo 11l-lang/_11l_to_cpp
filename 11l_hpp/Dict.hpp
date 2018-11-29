@@ -78,6 +78,14 @@ template <typename KeyType, typename ValueType> Dict<KeyType, ValueType> create_
 	return Dict<KeyType, ValueType>(std::move(di));
 }
 
+template <typename KeyType, typename ValueType> Dict<KeyType, ValueType> create_dict(const Array<Tuple<KeyType, ValueType>> &arr)
+{
+	Dict<KeyType, ValueType> r;
+	for (auto &&el : arr)
+		r.set(_get<0>(el), _get<1>(el));
+	return r;
+}
+
 template <typename KeyType, typename ValueType> inline bool in(const KeyType &key, const Dict<KeyType, ValueType> &dict)
 {
 	return dict.find(key) != dict.end();

@@ -134,6 +134,7 @@ public:
 
 	Char read(int n)
 	{
+		assert(n == 1);
 		char c;
 		size_t _ = fread(&c, 1, 1, file);
 		return c;
