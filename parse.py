@@ -1126,9 +1126,9 @@ def type_of(sn):
     else:
         if sn.children[0].token.category == Token.Category.STRING_LITERAL:
             tid = builtins_scope.ids.get('String')
-            return None
             tid = tid.ast_nodes[0].scope.ids.get(sn.children[1].token_str())
-            assert(tid != None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTFunctionDefinition)
+            if not (tid != None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTFunctionDefinition):
+                raise Error('method `' + sn.children[1].token_str() + '` is not found in type `String`', sn.left_to_right_token())
             return tid.ast_nodes[0]
         else:
             tid = sn.scope.find(sn.children[0].token_str())
@@ -1992,6 +1992,10 @@ for type_ in cpp_type_from_11l:
     builtins_scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', '', '')])]))
 string_scope = Scope(None)
 string_scope.add_name('split', ASTFunctionDefinition([('delim', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?'), ('group_delimiters', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
+string_scope.add_name('rtrim', ASTFunctionDefinition([('s', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
+string_scope.add_name('ltrim', ASTFunctionDefinition([('s', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
+string_scope.add_name('trim', ASTFunctionDefinition([('s', '', 'String')]))
+string_scope.add_name('replace', ASTFunctionDefinition([('old', '', 'String'), ('new', '', 'String')]))
 builtins_scope.ids['String'].ast_nodes[0].scope = string_scope
 
 module_scope = Scope(None)
