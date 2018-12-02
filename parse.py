@@ -345,7 +345,9 @@ class SymbolNode:
                             if f_node.first_named_only_argument != None and last_function_arg >= f_node.first_named_only_argument:
                                 raise Error('argument `' + f_node.function_arguments[last_function_arg][0] + '` of function `' + func_name + '` is named-only', self.children[i+1].token)
                             if f_node.function_arguments[last_function_arg][2] == 'File?':
-                                res += '&'
+                                tid = self.scope.find(self.children[i+1].token_str())
+                                if tid == None or tid.type != 'File?':
+                                    res += '&'
                         res += self.children[i+1].to_str()
                         last_function_arg += 1
                     else:
@@ -762,9 +764,10 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
     virtual_category = VirtualCategory.NO
     scope : Scope
 
-    def __init__(self, function_arguments = None):
+    def __init__(self, function_arguments = None, function_return_type = ''):
         super().__init__()
         self.function_arguments = function_arguments or []
+        self.function_return_type = function_return_type
         self.scope = scope
 
     def serialize_to_dict(self):
@@ -1058,6 +1061,7 @@ class ASTTypeDefinition(ASTNodeWithChildren):
     def __init__(self, constructors = None):
         super().__init__()
         self.constructors = constructors or []
+        self.scope = scope # needed for built-in types, e.g. `File(full_fname, ‘w’, encoding' ‘utf-8-sig’).write(...)`
 
     def to_str(self, indent):
         r = ''
@@ -1100,7 +1104,23 @@ def type_of(sn):
     elif sn.children[0].symbol.id == '(': # )
         if not sn.children[0].function_call:
             return None
-        return None # [-TODO-]
+        if sn.children[0].children[0].symbol.id == '.':
+            return None
+        tid = sn.scope.find(sn.children[0].children[0].token_str())
+        if tid == None:
+            return None
+        if type(tid.ast_nodes[0]) == ASTFunctionDefinition: # `input().split(...)`
+            if tid.ast_nodes[0].function_return_type == '':
+                return None
+            type_name = tid.ast_nodes[0].function_return_type
+            tid = tid.ast_nodes[0].scope.find(type_name)
+        else: # `Converter(habr_html, ohd).to_html(instr, outfilef)`
+            type_name = sn.children[0].children[0].token_str()
+        assert(tid != None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
+        tid = tid.ast_nodes[0].scope.ids.get(sn.children[1].token_str())
+        if not (tid != None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition)):
+            raise Error('method `' + sn.children[1].token_str() + '` is not found in type `' + type_name + '`', sn.left_to_right_token())
+        return tid.ast_nodes[0]
     elif sn.children[0].token_str().startswith(('@', ':')):
         return None # [-TODO-]
     else:
@@ -1918,8 +1938,8 @@ tokens    = []
 source    = ''
 tokeni    = -1
 token     = Token(0, 0, Token.Category.STATEMENT_SEPARATOR)
-scope     = Scope(None)
-tokensn   = SymbolNode(token)
+#scope     = Scope(None)
+#tokensn   = SymbolNode(token)
 file_name = ''
 importing_module = False
 
@@ -1927,8 +1947,10 @@ def token_to_str(token_str_override, token_category = Token.Category.STRING_LITE
     return SymbolNode(Token(0, 0, token_category), token_str_override).to_str()
 
 builtins_scope = Scope(None)
+scope = builtins_scope
+tokensn   = SymbolNode(token)
 builtins_scope.add_function('print', ASTFunctionDefinition([('object', '', ''), ('end', token_to_str(R'"\n"'), 'String'), ('flush', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
-builtins_scope.add_function('input', ASTFunctionDefinition())
+builtins_scope.add_function('input', ASTFunctionDefinition(None, 'String'))
 builtins_scope.add_function('assert', ASTFunctionDefinition([('expression', '', 'Bool'), ('message', token_to_str('‘’'), 'String')]))
 builtins_scope.add_function('exit', ASTFunctionDefinition([('arg', '', '')]))
 builtins_scope.add_function('zip', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', '')]))
@@ -1959,6 +1981,13 @@ builtins_scope.add_function('degrees', ASTFunctionDefinition([('x', '', 'Float')
 builtins_scope.add_function('radians', ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', '')])]))
 builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('mode', token_to_str('‘r’'), 'String'), ('encoding', token_to_str('‘utf-8’'), 'String')])]))
+file_scope = Scope(None)
+file_scope.add_name('read_bytes', ASTFunctionDefinition([]))
+file_scope.add_name('read', ASTFunctionDefinition([]))
+file_scope.add_name('write', ASTFunctionDefinition([('s', '', 'String')]))
+file_scope.add_name('read_lines', ASTFunctionDefinition([('keep_newline', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
+builtins_scope.ids['File'].ast_nodes[0].scope = file_scope
+
 for type_ in cpp_type_from_11l:
     builtins_scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', '', '')])]))
 string_scope = Scope(None)

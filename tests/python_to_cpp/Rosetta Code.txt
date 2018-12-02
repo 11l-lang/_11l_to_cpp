@@ -608,3 +608,17 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/A%2BB#Python
+print(sum(map(lambda i: int(i), input().split())))
+===
+print(sum(input().split((‘ ’, "\t", "\r", "\n"), group_delimiters' 1B).map(i -> Int(i))))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum(input().split(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S), nullptr, true).map([](const auto &i){return to_int(i);})));
+    }
+} code_block_1;
