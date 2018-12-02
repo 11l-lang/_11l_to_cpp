@@ -232,8 +232,8 @@ public:
 		return count(s.data(), s.len());
 	}
 
-	Array<String> split(const String &delim, Nullable<int> limit = nullptr) const;
-	template <typename ... Types> Array<String> split(const Tuple<Types...> &delim_tuple, Nullable<int> limit = nullptr) const;
+	Array<String> split(const String &delim, Nullable<int> limit = nullptr, bool group_delimiters = false) const;
+	template <typename ... Types> Array<String> split(const Tuple<Types...> &delim_tuple, Nullable<int> limit = nullptr, bool group_delimiters = false) const;
 	Array<String> split(const re::RegEx &regex) const;
 	
 	bool is_digit() const
