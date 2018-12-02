@@ -198,6 +198,14 @@ public:
 		return r;
 	}
 
+	void remove(const Type &val)
+	{
+		auto it = std::find(begin(), end(), val);
+		if (it == end())
+			throw ValueError(val);
+		std::vector<Type>::erase(it);
+	}
+
 	template <typename Ty> bool operator==(const Array<Ty> &arr) const
 	{
 		if (len() != arr.len()) return false;

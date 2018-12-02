@@ -622,3 +622,65 @@ struct CodeBlock1
         print(sum(input().split(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S), nullptr, true).map([](const auto &i){return to_int(i);})));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/ABC_Problem#Python:_Iterative.2C_with_tests
+def can_make_word(word):
+    if word == '':
+        return False
+ 
+    blocks_remaining = 'BO XK DQ CP NA GT RE TG QD FS JW HU VI AN OB ER FS LY PC ZM'.split(' ')
+
+    for ch in word.upper():
+        for block in blocks_remaining:
+            if ch in block:
+                blocks_remaining.remove(block)
+                break
+        else:
+            return False
+    return True
+ 
+print(', '.join("'" + w + "': " + str(can_make_word(w)) for w in ['', 'a', 'baRk', 'booK', 'treat', 'COMMON', 'squad', 'Confused']))
+===
+F can_make_word(word)
+   I word == ‘’
+      R 0B
+   A blocks_remaining = ‘BO XK DQ CP NA GT RE TG QD FS JW HU VI AN OB ER FS LY PC ZM’.split(‘ ’)
+
+   L(ch) word.uppercase()
+      L(block) blocks_remaining
+         I ch C block
+            blocks_remaining.remove(block)
+            L.break
+         L.was_no_break
+            R 0B
+   R 1B
+print([‘’, ‘a’, ‘baRk’, ‘booK’, ‘treat’, ‘COMMON’, ‘squad’, ‘Confused’].map(w -> ‘'’w‘': ’String(can_make_word(w))).join(‘, ’))
+===
+template <typename T1> auto can_make_word(const T1 &word)
+{
+    if (word == u"")
+        return false;
+    auto blocks_remaining = u"BO XK DQ CP NA GT RE TG QD FS JW HU VI AN OB ER FS LY PC ZM"_S.split(u" "_S);
+    for (auto ch : word.uppercase())
+        {bool was_break = false;
+        for (auto block : blocks_remaining) {
+            if (in(ch, block)) {
+                blocks_remaining.remove(block);
+                was_break = true;
+                break;
+            }
+        }
+        if (!was_break)
+            return false;
+        }
+    return true;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(create_array({u""_S, u"a"_S, u"baRk"_S, u"booK"_S, u"treat"_S, u"COMMON"_S, u"squad"_S, u"Confused"_S}).map([](const auto &w){return u"'"_S + w + u"': "_S + String(can_make_word(w));}).join(u", "_S));
+    }
+} code_block_1;

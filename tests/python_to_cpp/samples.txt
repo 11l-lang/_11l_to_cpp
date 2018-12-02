@@ -957,3 +957,41 @@ struct CodeBlock1
         fs::rename(u"temp_dir"_S, u"temp_dir_"_S);
     }
 } code_block_1;
+
+
+# [http://book.pythontips.com/en/latest/for_-_else.html <- google:‘python else for’ <- https://www.rosettacode.org/wiki/ABC_Problem#Python:_Iterative.2C_with_tests]
+for n in range(2, 10):
+    for x in range(2, n):
+        if n % x == 0:
+            print(str(n) + ' equals ' + str(x) + ' * ' + str(n/x))
+            break
+    else:
+        # loop fell through without finding a factor
+        print(str(n) + ' is a prime number')
+===
+L(n) 2.<10
+   L(x) 2 .< n
+      I n % x == 0
+         print(String(n)‘ equals ’String(x)‘ * ’String(n / x))
+         L.break
+      L.was_no_break
+         print(String(n)‘ is a prime number’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_el(2, 10))
+            {bool was_break = false;
+            for (auto x : range_el(2, n)) {
+                if (mod(n, x) == 0) {
+                    print(String(n) + u" equals "_S + String(x) + u" * "_S + String(n / x));
+                    was_break = true;
+                    break;
+                }
+            }
+            if (!was_break)
+                print(String(n) + u" is a prime number"_S);
+            }
+    }
+} code_block_1;
