@@ -303,6 +303,8 @@ class SymbolNode:
                                 break
                             s = s.parent
                             assert(s)
+                    else:
+                        f_node = type_of(self.children[0])
                 elif func_name == 'Int':
                     func_name = 'to_int'
                 elif func_name == 'Array[Char]':
@@ -614,6 +616,7 @@ class ASTNodeWithChildren(ASTNode):
     # children : List['ASTNode'] = [] # OMFG! This actually means static (common for all objects of type ASTNode) variable, not default value of member variable, that was unexpected to me as it contradicts C++11 behavior
     children : List['ASTNode']
     tokeni : int
+    scope : Scope
 
     def __init__(self):
         self.children = []
@@ -1084,6 +1087,49 @@ class ASTMain(ASTNodeWithChildren):
             return self.children_to_str(indent, 'int main()')
         return self.children_to_str(indent, 'int MAIN_WITH_ARGV()', add_at_beginning = ' ' * ((indent+1)*4) + "INIT_ARGV();\n\n")
 
+def type_of(sn):
+    assert(sn.symbol.id == '.')
+    if sn.children[0].symbol.id == '.':
+        if len(sn.children[0].children) == 1:
+            return None
+        left = type_of(sn.children[0])
+        if left == None: # `Array[Array[Array[String]]] table... table.last.append([...])`
+            return None
+    elif sn.children[0].symbol.id == '[': # ]
+        return None
+    elif sn.children[0].symbol.id == '(': # )
+        if not sn.children[0].function_call:
+            return None
+        return None # [-TODO-]
+    elif sn.children[0].token_str().startswith(('@', ':')):
+        return None # [-TODO-]
+    else:
+        if sn.children[0].token.category == Token.Category.STRING_LITERAL:
+            tid = builtins_scope.ids.get('String')
+            return None
+            tid = tid.ast_nodes[0].scope.ids.get(sn.children[1].token_str())
+            assert(tid != None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTFunctionDefinition)
+            return tid.ast_nodes[0]
+        else:
+            tid = sn.scope.find(sn.children[0].token_str())
+        assert(tid != None)
+        if len(tid.ast_nodes) != 1: # for `F f(active_window, s)... R s.find(‘.’) ? s.len`
+            return None
+        left = tid.ast_nodes[0]
+        if type(left) == ASTLoop:
+            return None
+
+    assert(type(left) in (ASTVariableDeclaration, ASTVariableInitialization))
+    if left.type in ('A', 'А', 'var', 'перем'): # for `A selection_strings = ... selection_strings.map(...)`
+        return None
+    if len(left.type_args): # `Array[String] ending_tags... ending_tags.append(‘</blockquote>’)`
+        return None # [-TODO-]
+    tid = left.scope.find(left.type)
+    assert(tid != None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
+    tid = tid.ast_nodes[0].scope.ids.get(sn.children[1].token_str())
+    assert(tid != None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition))
+    return tid.ast_nodes[0]
+
 def next_token():
     global token, tokeni, tokensn
     if token == None and tokeni != -1:
@@ -1167,7 +1213,7 @@ def prefix(id, bp):
         return self
     symbol(id).set_nud_bp(bp, nud)
 
-infix('[+]', 15); infix('->', 20)
+infix('[+]', 15); #infix('->', 20)
 
 infix('?', 25) # based on C# operator precedence ([http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-334.pdf])
 
@@ -1214,6 +1260,20 @@ symbol('цикл.след').nud = lambda self: self
 symbol(';')
 symbol(',')
 symbol("',")
+
+def led(self, left):
+    self.append_child(left)
+    global scope
+    prev_scope = scope
+    scope = Scope([])
+    scope.parent = prev_scope
+    tokensn.scope = scope
+    for c in left.children if left.symbol.id == '(' else [left]: # )
+        scope.add_name(c.token_str(), None)
+    self.append_child(expression(self.symbol.led_bp))
+    scope = prev_scope
+    return self
+symbol('->', 20).set_led_bp(20, led)
 
 def led(self, left):
     self.append_child(left) # [(
@@ -1447,6 +1507,7 @@ def parse_internal(this_node):
         scope = Scope(func_args)
         scope.parent = prev_scope
         tokensn.scope = scope # можно избавиться от этой строки, если не делать вызов next_token() в advance_scope_begin()
+        node.scope = scope
         parse_internal(node)
         scope = prev_scope
         if token != None:
@@ -1690,7 +1751,7 @@ def parse_internal(this_node):
                                 tid = scope.find(id.ast_nodes[0].type_args[0])
                                 if tid != None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_virtual_functions:
                                     node.is_loop_variable_a_ptr = True
-                                    scope.add_name(node.loop_variable, node)
+                        scope.add_name(node.loop_variable, node)
 
                     new_scope(node)
                     scope = prev_scope
@@ -1900,6 +1961,9 @@ builtins_scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code
 builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('mode', token_to_str('‘r’'), 'String'), ('encoding', token_to_str('‘utf-8’'), 'String')])]))
 for type_ in cpp_type_from_11l:
     builtins_scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', '', '')])]))
+string_scope = Scope(None)
+string_scope.add_name('split', ASTFunctionDefinition([('delim', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?'), ('group_delimiters', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
+builtins_scope.ids['String'].ast_nodes[0].scope = string_scope
 
 module_scope = Scope(None)
 module_scope.add_function('get_temp_dir', ASTFunctionDefinition([]))

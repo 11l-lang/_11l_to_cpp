@@ -245,7 +245,7 @@ template <typename Type> Type sum(const Array<Type> &arr)
 	return r;
 }
 
-inline Array<String> String::split(const String &delim, Nullable<int> limit) const
+inline Array<String> String::split(const String &delim, Nullable<int> limit, bool group_delimiters) const
 {
 	int lim = limit == nullptr ? -1 : *limit - 1;
 	Array<String> arr;
@@ -258,7 +258,8 @@ inline Array<String> String::split(const String &delim, Nullable<int> limit) con
 	while (str < end)
 		if (memcmp(str, delim.data(), delim.len()*sizeof(char16_t)) == 0)
 		{
-			arr.append(String(begin, str-begin));
+			if (!group_delimiters || str != begin)
+				arr.append(String(begin, str-begin));
 			str += delim.len();
 			if (--lim == 0) {
 				arr.append(String(str, end-str));
@@ -269,11 +270,12 @@ inline Array<String> String::split(const String &delim, Nullable<int> limit) con
 		else
 			str++;
 
-	arr.append(String(begin, str-begin));
+	if (!group_delimiters || str != begin)
+		arr.append(String(begin, str-begin));
 	return arr;
 }
 
-template <typename ... Types> inline Array<String> String::split(const Tuple<Types...> &delim_tuple, Nullable<int> limit) const
+template <typename ... Types> inline Array<String> String::split(const Tuple<Types...> &delim_tuple, Nullable<int> limit, bool group_delimiters) const
 {
 	int lim = limit == nullptr ? -1 : *limit - 1;
 	Array<String> arr;
@@ -287,7 +289,8 @@ template <typename ... Types> inline Array<String> String::split(const Tuple<Typ
 	while (str < end)
 		if (in(*str, delim_tuple))
 		{
-			arr.append(String(begin, str-begin));
+			if (!group_delimiters || str != begin)
+				arr.append(String(begin, str-begin));
 			str++;
 			if (--lim == 0) {
 				arr.append(String(str, end-str));
@@ -298,7 +301,8 @@ template <typename ... Types> inline Array<String> String::split(const Tuple<Typ
 		else
 			str++;
 
-	arr.append(String(begin, str-begin));
+	if (!group_delimiters || str != begin)
+		arr.append(String(begin, str-begin));
 	return arr;
 }
 
