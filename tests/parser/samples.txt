@@ -777,6 +777,7 @@ T Person
    String name = ‘  F.  H. ’
 Person person
 print(person.name.split(‘ ’, group_delimiters' 1B))
+print(‘ 1 2  3  ’.split(‘ ’, group_delimiters' 1B))
 ===
 class Person
 {
@@ -790,5 +791,6 @@ struct CodeBlock1
     CodeBlock1()
     {
         print(person.name.split(u" "_S, nullptr, true));
+        print(u" 1 2  3  "_S.split(u" "_S, nullptr, true));
     }
 } code_block_1;
