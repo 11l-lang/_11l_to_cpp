@@ -1,4 +1,4 @@
-// https://www.rosettacode.org/wiki/100_doors
+// https://www.rosettacode.org/wiki/100_doors#Python
 A doors = [0B] * 100
 L(i) 100
    L(j) (i .< 100).step(i + 1)
@@ -16,5 +16,55 @@ struct CodeBlock1
                 doors.set(j, !doors[j]);
             print(u"Door "_S + (i + 1) + u": "_S + (doors[i] ? u"open"_S : u"close"_S));
         }
+    }
+} code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Abundant,_deficient_and_perfect_number_classifications#Kotlin
+F sum_proper_divisors(n)
+   R I n < 2 {0} E sum((1 .. n I/ 2).filter(it -> (@n % it) == 0))
+
+A deficient = 0
+A perfect = 0
+A abundant = 0
+
+L(n) 1..20000
+   A sp = sum_proper_divisors(n)
+   I sp < n
+      deficient++
+   E I sp == n
+      perfect++
+   E I sp > n
+      abundant++
+
+print(‘Deficient = ’deficient)
+print(‘Perfect   = ’perfect)
+print(‘Abundant  = ’abundant)
+===
+template <typename T1> auto sum_proper_divisors(const T1 &n)
+{
+    return n < 2 ? 0 : sum(range_ee(1, int(n)/int(2)).filter([&n](const auto &it){return (mod(n, it)) == 0;}));
+}
+auto deficient = 0;
+auto perfect = 0;
+auto abundant = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto n : range_ee(1, 20000)) {
+            auto sp = sum_proper_divisors(n);
+            if (sp < n)
+                deficient++;
+            else if (sp == n)
+                perfect++;
+            else if (sp > n)
+                abundant++;
+        }
+        print(u"Deficient = "_S + deficient);
+        print(u"Perfect   = "_S + perfect);
+        print(u"Abundant  = "_S + abundant);
     }
 } code_block_1;
