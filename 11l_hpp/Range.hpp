@@ -32,11 +32,20 @@ public:
 			return e - b - 1;
 	}
 
-	template <typename Func> auto map(Func &&func) -> Array<decltype(func(Type()))>
+	template <typename Func> auto map(Func &&func) const -> Array<decltype(func(Type()))>
 	{
 		Array<decltype(func(Type()))> r;
 		for (Type i = b + !include_beginning; i <= e - !include_ending; i++)
 			r.push_back(func(i));
+		return r;
+	}
+
+	template <typename Func> Array<Type> filter(Func &&func) const
+	{
+		Array<Type> r;
+		for (auto el : *this)
+			if (func(el))
+				r.push_back(el);
 		return r;
 	}
 
