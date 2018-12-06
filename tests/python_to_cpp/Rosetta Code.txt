@@ -72,7 +72,7 @@ def rangeexpand(txt):
     for r in txt.split(','):
         if '-' in r[1:]:
             rr = r[1:].split('-', 1)
-            lst += range(int(r[0] + rr[0]), int(rr[1]) + 1)
+            lst += range(int(r[0] + '' + rr[0]), int(rr[1]) + 1)
         else:
             lst.append(int(r))
     return lst
@@ -84,7 +84,7 @@ F rangeexpand(txt)
    L(r) txt.split(‘,’)
       I ‘-’ C r[1..]
          A rr = r[1..].split(‘-’, 1 + 1)
-         lst [+]= (Int(r[0] + rr[0]) .< Int(rr[1]) + 1)
+         lst [+]= (Int(r[0]‘’rr[0]) .< Int(rr[1]) + 1)
       E
          lst.append(Int(r))
    R lst
@@ -513,11 +513,11 @@ F decompress(Array[Int] &compressed)
       I k C dictionary
          entry = dictionary[k]
       E I k == dict_size
-         entry = w + w[0]
+         entry = w‘’w[0]
       E
          exit(‘Bad compressed k: ’String(k))
       result ‘’= entry
-      dictionary[dict_size] = w + entry[0]
+      dictionary[dict_size] = w‘’entry[0]
       dict_size++
       w = entry
    R result
