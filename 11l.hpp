@@ -88,7 +88,7 @@ void sleep(double secs) // I could not pick up an appropriate namespace for this
 	std::this_thread::sleep_for(std::chrono::duration<double>(secs));
 }
 
-inline void print(const String &s, const String &end = u"\n", bool flush = false)
+inline void print(const String &s = u"", const String &end = u"\n", bool flush = false)
 {
 	std::wcout << std::wstring(s.cbegin(), s.cend()) << std::wstring(end.cbegin(), end.cend());
 	if (flush)
