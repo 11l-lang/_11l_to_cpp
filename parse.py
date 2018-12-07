@@ -323,18 +323,21 @@ class SymbolNode:
                     if len(fid.ast_nodes) > 1:
                         raise Error('functions\' overloading is not supported for now', self.children[0].left_to_right_token())
                     f_node = fid.ast_nodes[0]
-                    assert(type(f_node) in (ASTFunctionDefinition, ASTTypeDefinition) or (type(f_node) in (ASTVariableInitialization, ASTVariableDeclaration) and f_node.function_pointer))
-                    if type(f_node) == ASTTypeDefinition:
-                        if f_node.has_virtual_functions:
-                            func_name = 'std::make_unique<' + func_name + '>'
-                        elif f_node.has_pointers_to_the_same_type:
-                            func_name = 'make_SharedPtr<' + func_name + '>'
-                        if len(f_node.constructors) == 0:
-                            f_node = ASTFunctionDefinition()
-                        else:
-                            if len(f_node.constructors) > 1:
-                                raise Error('constructors\' overloading is not supported for now (see type `' + f_node.type_name + '`)', self.children[0].left_to_right_token())
-                            f_node = f_node.constructors[0]
+                    if type(f_node) == ASTLoop: # for `L(justify) [(s, w) -> ...]...justify(...)`
+                        f_node = None
+                    else:
+                        assert(type(f_node) in (ASTFunctionDefinition, ASTTypeDefinition) or (type(f_node) in (ASTVariableInitialization, ASTVariableDeclaration) and f_node.function_pointer))
+                        if type(f_node) == ASTTypeDefinition:
+                            if f_node.has_virtual_functions:
+                                func_name = 'std::make_unique<' + func_name + '>'
+                            elif f_node.has_pointers_to_the_same_type:
+                                func_name = 'make_SharedPtr<' + func_name + '>'
+                            if len(f_node.constructors) == 0:
+                                f_node = ASTFunctionDefinition()
+                            else:
+                                if len(f_node.constructors) > 1:
+                                    raise Error('constructors\' overloading is not supported for now (see type `' + f_node.type_name + '`)', self.children[0].left_to_right_token())
+                                f_node = f_node.constructors[0]
                 last_function_arg = 0
                 res = func_name + '('
                 for i in range(1, len(self.children), 2):
@@ -1949,7 +1952,7 @@ def token_to_str(token_str_override, token_category = Token.Category.STRING_LITE
 builtins_scope = Scope(None)
 scope = builtins_scope
 tokensn   = SymbolNode(token)
-builtins_scope.add_function('print', ASTFunctionDefinition([('object', '', ''), ('end', token_to_str(R'"\n"'), 'String'), ('flush', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
+builtins_scope.add_function('print', ASTFunctionDefinition([('object', token_to_str('‘’'), ''), ('end', token_to_str(R'"\n"'), 'String'), ('flush', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
 builtins_scope.add_function('input', ASTFunctionDefinition(None, 'String'))
 builtins_scope.add_function('assert', ASTFunctionDefinition([('expression', '', 'Bool'), ('message', token_to_str('‘’'), 'String')]))
 builtins_scope.add_function('exit', ASTFunctionDefinition([('arg', '', '')]))

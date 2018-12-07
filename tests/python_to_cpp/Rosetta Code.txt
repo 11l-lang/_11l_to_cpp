@@ -750,3 +750,106 @@ struct CodeBlock1
         print(u"Abundant  = "_S + String(abundant));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Align_columns#Python
+from typing import Callable
+
+txt = R"""Given$a$txt$file$of$many$lines,$where$fields$within$a$line$
+are$delineated$by$a$single$'dollar'$character,$write$a$program
+that$aligns$each$column$of$fields$by$ensuring$that$words$in$each$
+column$are$separated$by$at$least$one$space.
+Further,$allow$for$each$word$in$a$column$to$be$either$left$
+justified,$right$justified,$or$center$justified$within$its$column."""
+
+parts = [line.rstrip("$").split("$") for line in txt.split("\n")]
+
+max_widths = [0] * len(parts[0])
+for line in parts:
+    for i, word in enumerate(line):
+        max_widths[i] = max(max_widths[i], len(word))
+
+ljust : Callable[[str, int], str] = lambda s, w: s + ' '*(w-len(s))
+centr : Callable[[str, int], str] = lambda s, w: ' '*(w-len(s) - (w//2 - len(s)//2)) + s + ' '*(w//2 - len(s)//2)
+rjust : Callable[[str, int], str] = lambda s, w: ' '*(w-len(s)) + s
+for i, justify in enumerate([ljust, centr, rjust]):
+    print(["Left", "Center", "Right"][i] + " column-aligned output:")
+    for line in parts:
+        for j, word in enumerate(line):
+            print(justify(word, max_widths[j]), end = ' ')
+        print()
+    print("- " * 52)
+===
+A txt = ‘Given$a$txt$file$of$many$lines,$where$fields$within$a$line$
+are$delineated$by$a$single$'dollar'$character,$write$a$program
+that$aligns$each$column$of$fields$by$ensuring$that$words$in$each$
+column$are$separated$by$at$least$one$space.
+Further,$allow$for$each$word$in$a$column$to$be$either$left$
+justified,$right$justified,$or$center$justified$within$its$column.’
+A parts = txt.split("\n").map(line -> line.rtrim(‘$’).split(‘$’))
+A max_widths = [0] * parts[0].len
+L(line) parts
+   L(word) line
+      A i = L.index
+      max_widths[i] = max(max_widths[i], word.len)
+(String, Int -> String) ljust = (s, w) -> s‘’(‘ ’ * (w - s.len))
+(String, Int -> String) centr = (s, w) -> (‘ ’ * (w - s.len - (w I/ 2 - s.len I/ 2)))‘’s‘’(‘ ’ * (w I/ 2 - s.len I/ 2))
+(String, Int -> String) rjust = (s, w) -> (‘ ’ * (w - s.len))‘’s
+L(justify) [ljust, centr, rjust]
+   A i = L.index
+   print([‘Left’, ‘Center’, ‘Right’][i]‘ column-aligned output:’)
+   L(line) parts
+      L(word) line
+         A j = L.index
+         print(justify(word, max_widths[j]), end' ‘ ’)
+      print()
+   print(‘- ’ * 52)
+===
+auto txt = uR"(Given$a$txt$file$of$many$lines,$where$fields$within$a$line$
+are$delineated$by$a$single$'dollar'$character,$write$a$program
+that$aligns$each$column$of$fields$by$ensuring$that$words$in$each$
+column$are$separated$by$at$least$one$space.
+Further,$allow$for$each$word$in$a$column$to$be$either$left$
+justified,$right$justified,$or$center$justified$within$its$column.)"_S;
+auto parts = txt.split(u"\n"_S).map([](const auto &line){return line.rtrim(u"$"_S).split(u"$"_S);});
+auto max_widths = create_array({0}) * _get<0>(parts).len();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto line : parts)
+            {int Lindex = 0;
+            for (auto word : line) {
+                auto i = Lindex;
+                max_widths.set(i, max(max_widths[i], word.len()));
+                Lindex++;
+            }}
+    }
+} code_block_1;
+std::function<String(const String&, const int)> ljust = [](const auto &s, const auto &w){return s + (u" "_S * (w - s.len()));};
+std::function<String(const String&, const int)> centr = [](const auto &s, const auto &w){return (u" "_S * (w - s.len() - (int(w)/int(2) - int(s.len())/int(2)))) + s + (u" "_S * (int(w)/int(2) - int(s.len())/int(2)));};
+std::function<String(const String&, const int)> rjust = [](const auto &s, const auto &w){return (u" "_S * (w - s.len())) + s;};
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        {int Lindex = 0;
+        for (auto justify : create_array({ljust, centr, rjust})) {
+            auto i = Lindex;
+            print(create_array({u"Left"_S, u"Center"_S, u"Right"_S})[i] + u" column-aligned output:"_S);
+            for (auto line : parts) {
+                {int Lindex = 0;
+                for (auto word : line) {
+                    auto j = Lindex;
+                    print(justify(word, max_widths[j]), u" "_S);
+                    Lindex++;
+                }}
+                print();
+            }
+            print(u"- "_S * 52);
+            Lindex++;
+        }}
+    }
+} code_block_2;
