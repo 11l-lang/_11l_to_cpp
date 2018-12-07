@@ -853,3 +853,89 @@ struct CodeBlock2
         }}
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Almost_prime#Kotlin
+def k_prime(k, n):
+    f = 0
+    p = 2
+    while f < k and p * p <= n:
+        while n % p == 0:
+            n /= p
+            f += 1
+        p += 1
+    return f + (1 if n > 1 else 0) == k
+ 
+def primes(k, n):
+    i = 2
+    list : List[int] = []
+    while len(list) < n:
+        if k_prime(k, i):
+            list.append(i)
+        i += 1
+    return list
+ 
+for k in range(1, 6):
+    print('k = '+str(k)+': ', end = '')
+    print(primes(k, 10))
+===
+F k_prime(k, =n)
+   A f = 0
+   A p = 2
+   L f < k & p * p <= n
+      L n % p == 0
+         n /= p
+         f++
+      p++
+   R f + (I n > 1 {1} E 0) == k
+
+F primes(k, n)
+   A i = 2
+   Array[Int] list
+   L list.len < n
+      I k_prime(k, i)
+         list.append(i)
+      i++
+   R list
+
+L(k) 1.<6
+   print(‘k = ’String(k)‘: ’, end' ‘’)
+   print(primes(k, 10))
+===
+template <typename T1, typename T2> auto k_prime(const T1 &k, T2 n)
+{
+    auto f = 0;
+    auto p = 2;
+    while (f < k && p * p <= n) {
+        while (mod(n, p) == 0) {
+            n /= p;
+            f++;
+        }
+        p++;
+    }
+    return f + (n > 1 ? 1 : 0) == k;
+}
+
+template <typename T1, typename T2> auto primes(const T1 &k, const T2 &n)
+{
+    auto i = 2;
+    Array<int> list;
+    while (list.len() < n) {
+        if (k_prime(k, i))
+            list.append(i);
+        i++;
+    }
+    return list;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto k : range_el(1, 6)) {
+            print(u"k = "_S + String(k) + u": "_S, u""_S);
+            print(primes(k, 10));
+        }
+    }
+} code_block_1;
