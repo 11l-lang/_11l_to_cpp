@@ -182,6 +182,8 @@ class SymbolNode:
             return self.token.end
 
         if self.symbol.id in '([': # ])
+            if len(self.children) == 0:
+                return self.token.end + 1
             return (self.children[-1] or self.children[-2]).rightmost() + 1
 
         return self.children[-1].rightmost()
@@ -1050,7 +1052,20 @@ class ASTLoopBreak(ASTNode):
 
 class ASTReturn(ASTNodeWithExpression):
     def to_str(self, indent):
-        return ' ' * (indent*4) + 'return' + (' ' + self.expression.to_str() if self.expression != None else '') + ";\n"
+        expr_str = ''
+        if self.expression != None:
+            if self.expression.is_list and len(self.expression.children) == 0:
+                n = self.parent
+                while type(n) != ASTFunctionDefinition:
+                    n = n.parent
+                if n.function_return_type == '':
+                    raise Error('Function returning an empty array should have return type specified', self.expression.left_to_right_token())
+                if not n.function_return_type.startswith('Array['): # ]
+                    raise Error('Function returning an empty array should have an Array based return type', self.expression.left_to_right_token())
+                expr_str = trans_type(n.function_return_type, self.expression.scope, self.expression.token) + '()'
+            else:
+                expr_str = self.expression.to_str()
+        return ' ' * (indent*4) + 'return' + (' ' + expr_str if expr_str != '' else '') + ";\n"
 
     def walk_expressions(self, f):
         if self.expression != None: f(self.expression)
