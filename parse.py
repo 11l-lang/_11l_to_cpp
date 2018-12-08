@@ -86,6 +86,16 @@ class Scope:
             if s == None:
                 return None
 
+    def find_and_return_scope(self, name):
+        s = self
+        while True:
+            id = s.ids.get(name)
+            if id != None:
+                return id, s
+            s = s.parent
+            if s == None:
+                return None, None
+
     def add_function(self, name, ast_node):
         if name in self.ids:                                                   # A &id = .ids.set_if_not_present(name, Id(N)) // note that this is an error: `A id = .ids.set_if_not_present(...)`, but you can do this: `A id = copy(.ids.set_if_not_present(...))`
             assert(type(self.ids[name].ast_nodes[0]) == ASTFunctionDefinition) # assert(id.ast_nodes.empty | T(id.ast_nodes[0]) == ASTFunctionDefinition)
@@ -307,37 +317,43 @@ class SymbolNode:
                         f_node = type_of(self.children[0])
                 elif func_name == 'Int':
                     func_name = 'to_int'
-                elif func_name == 'Array[Char]':
-                    func_name = 'Array<Char>'
+                elif func_name.startswith('Array['): # ]
+                    func_name = 'Array<' + func_name[6:-1] + '>'
                 elif func_name == 'Dict':
                     func_name = 'create_dict'
                 elif func_name.startswith('DefaultDict['): # ]
                     func_name = 'DefaultDict<' + ', '.join(cpp_type_from_11l[c.to_str()] for c in self.children[0].children[1:]) + '>'
                 else:
                     if self.children[0].symbol.id == ':':
-                        fid = find_module(self.children[0].children[0].to_str()).scope.find(self.children[0].children[1].token_str())
+                        fid, sc = find_module(self.children[0].children[0].to_str()).scope.find_and_return_scope(self.children[0].children[1].token_str())
                     else:
-                        fid = self.scope.find(func_name)
+                        fid, sc = self.scope.find_and_return_scope(func_name)
                     if fid == None:
                         raise Error('call of undefined function `' + func_name + '`', self.children[0].left_to_right_token())
                     if len(fid.ast_nodes) > 1:
                         raise Error('functions\' overloading is not supported for now', self.children[0].left_to_right_token())
-                    f_node = fid.ast_nodes[0]
-                    if type(f_node) == ASTLoop: # for `L(justify) [(s, w) -> ...]...justify(...)`
-                        f_node = None
+                    if len(fid.ast_nodes) == 0:
+                        if sc.is_function: # for calling of function arguments, e.g. `F amb(comp, ...)...comp(prev, opt)`
+                            f_node = None
+                        else:
+                            raise Error('node of function `' + func_name + '` is not found', self.children[0].left_to_right_token())
                     else:
-                        assert(type(f_node) in (ASTFunctionDefinition, ASTTypeDefinition) or (type(f_node) in (ASTVariableInitialization, ASTVariableDeclaration) and f_node.function_pointer))
-                        if type(f_node) == ASTTypeDefinition:
-                            if f_node.has_virtual_functions:
-                                func_name = 'std::make_unique<' + func_name + '>'
-                            elif f_node.has_pointers_to_the_same_type:
-                                func_name = 'make_SharedPtr<' + func_name + '>'
-                            if len(f_node.constructors) == 0:
-                                f_node = ASTFunctionDefinition()
-                            else:
-                                if len(f_node.constructors) > 1:
-                                    raise Error('constructors\' overloading is not supported for now (see type `' + f_node.type_name + '`)', self.children[0].left_to_right_token())
-                                f_node = f_node.constructors[0]
+                        f_node = fid.ast_nodes[0]
+                        if type(f_node) == ASTLoop: # for `L(justify) [(s, w) -> ...]...justify(...)`
+                            f_node = None
+                        else:
+                            assert(type(f_node) in (ASTFunctionDefinition, ASTTypeDefinition) or (type(f_node) in (ASTVariableInitialization, ASTVariableDeclaration) and f_node.function_pointer))
+                            if type(f_node) == ASTTypeDefinition:
+                                if f_node.has_virtual_functions:
+                                    func_name = 'std::make_unique<' + func_name + '>'
+                                elif f_node.has_pointers_to_the_same_type:
+                                    func_name = 'make_SharedPtr<' + func_name + '>'
+                                if len(f_node.constructors) == 0:
+                                    f_node = ASTFunctionDefinition()
+                                else:
+                                    if len(f_node.constructors) > 1:
+                                        raise Error('constructors\' overloading is not supported for now (see type `' + f_node.type_name + '`)', self.children[0].left_to_right_token())
+                                    f_node = f_node.constructors[0]
                 last_function_arg = 0
                 res = func_name + '('
                 for i in range(1, len(self.children), 2):
@@ -1992,7 +2008,7 @@ file_scope.add_name('read_lines', ASTFunctionDefinition([('keep_newline', token_
 builtins_scope.ids['File'].ast_nodes[0].scope = file_scope
 
 for type_ in cpp_type_from_11l:
-    builtins_scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', '', '')])]))
+    builtins_scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', token_to_str('‘’'), '')])]))
 string_scope = Scope(None)
 string_scope.add_name('split', ASTFunctionDefinition([('delim', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?'), ('group_delimiters', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
 string_scope.add_name('rtrim', ASTFunctionDefinition([('s', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
