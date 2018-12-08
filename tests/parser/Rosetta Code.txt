@@ -71,9 +71,9 @@ struct CodeBlock1
 
 
 // https://www.rosettacode.org/wiki/Amb#Nim
-F amb(comp, options, prev = ‘’)
+F amb(comp, options, prev = ‘’) -> Array[String]
    I options.empty
-      R Array[String]()
+      R []
 
    L(opt) options[0]
       // If this is the base call, prev is empty and we need to continue.
@@ -91,7 +91,7 @@ F amb(comp, options, prev = ‘’)
       if !res.empty
          R opt [+] res // We have a match
 
-   R Array[String]()
+   R []
 
 A sets = [[‘the’, ‘that’, ‘a’],
           [‘frog’, ‘elephant’, ‘thing’],
@@ -101,7 +101,7 @@ A sets = [[‘the’, ‘that’, ‘a’],
 A result = amb((s, t) -> s.last == t[0], sets)
 print(result.join(‘ ’))
 ===
-template <typename T1, typename T2, typename T3 = decltype(u""_S)> auto amb(const T1 &comp, const T2 &options, const T3 &prev = u""_S)
+template <typename T1, typename T2, typename T3 = decltype(u""_S)> Array<String> amb(const T1 &comp, const T2 &options, const T3 &prev = u""_S)
 {
     if (options.empty())
         return Array<String>();
