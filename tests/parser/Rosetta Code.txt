@@ -68,3 +68,62 @@ struct CodeBlock1
         print(u"Abundant  = "_S + abundant);
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Amb#Nim
+F amb(comp, options, prev = ‘’)
+   I options.empty
+      R Array[String]()
+
+   L(opt) options[0]
+      // If this is the base call, prev is empty and we need to continue.
+      I prev != ‘’ & !comp(prev, opt)
+         L.continue
+
+      // Take care of the case where we have no options left.
+      I options.len == 1
+         R [opt]
+
+      // Traverse into the tree.
+      A res = amb(comp, options[1..], opt)
+
+      // If it was a failure, try the next one.
+      if !res.empty
+         R opt [+] res // We have a match
+
+   R Array[String]()
+
+A sets = [[‘the’, ‘that’, ‘a’],
+          [‘frog’, ‘elephant’, ‘thing’],
+          [‘walked’, ‘treaded’, ‘grows’],
+          [‘slowly’, ‘quickly’]]
+
+A result = amb((s, t) -> s.last == t[0], sets)
+print(result.join(‘ ’))
+===
+template <typename T1, typename T2, typename T3 = decltype(u""_S)> auto amb(const T1 &comp, const T2 &options, const T3 &prev = u""_S)
+{
+    if (options.empty())
+        return Array<String>();
+
+    for (auto opt : _get<0>(options)) {
+        if (prev != u"" && !comp(prev, opt))
+            continue;
+        if (options.len() == 1)
+            return create_array({opt});
+        auto res = amb(comp, options[range_ei(1)], opt);
+        if (!res.empty())
+            return opt + res;
+    }
+    return Array<String>();
+}
+auto sets = create_array({create_array({u"the"_S, u"that"_S, u"a"_S}), create_array({u"frog"_S, u"elephant"_S, u"thing"_S}), create_array({u"walked"_S, u"treaded"_S, u"grows"_S}), create_array({u"slowly"_S, u"quickly"_S})});
+auto result = amb([](const auto &s, const auto &t){return s.last() == _get<0>(t);}, sets);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(result.join(u" "_S));
+    }
+} code_block_1;

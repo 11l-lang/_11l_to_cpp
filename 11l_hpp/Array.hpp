@@ -225,6 +225,21 @@ public:
 		r.append(a);
 		return r;
 	}
+
+	Array operator+(const Type &t) const
+	{
+		Array r(*this);
+		r.append(t);
+		return r;
+	}
+
+	friend Array operator+(const Type &t, const Array &a)
+	{
+		Array r;
+		r.append(t);
+		r.append(a);
+		return r;
+	}
 };
 
 template <typename Type> Array<Type> create_array(std::initializer_list<Type> il)
