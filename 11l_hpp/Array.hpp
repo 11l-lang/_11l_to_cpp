@@ -346,3 +346,27 @@ inline String String::rtrim(const Array<Char> &arr, Nullable<int> limit) const
 		if (!in(s[l], arr)) break;
 	return String(s, l+1);
 }
+
+Array<Char> sorted(const String &s)
+{
+	Array<Char> arr;
+	arr.assign(s.cbegin(), s.cend());
+	std::sort(arr.begin(), arr.end());
+	return arr;
+}
+
+template <typename Type> Type max(const Array<Type> &arr)
+{
+	Type r = arr[0];
+	for (auto i : arr)
+		if (i > r) r = i;
+	return r;
+}
+
+template <typename Type> Type min(const Array<Type> &arr)
+{
+	Type r = arr[0];
+	for (auto i : arr)
+		if (i < r) r = i;
+	return r;
+}

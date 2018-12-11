@@ -100,6 +100,14 @@ public:
 	{
 		std::map<KeyType, ValueType>::operator[](key) = value;
 	}
+
+	Array<ValueType> values() const
+	{
+		Array<ValueType> r;
+		for (auto &&kv : *this)
+			r.push_back(kv.second);
+		return r;
+	}
 };
 
 template <typename KeyType, typename ValueType> inline bool in(const KeyType &key, const DefaultDict<KeyType, ValueType> &dict)
