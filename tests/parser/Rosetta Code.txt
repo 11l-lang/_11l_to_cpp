@@ -127,3 +127,31 @@ struct CodeBlock1
         print(result.join(u" "_S));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Amicable_pairs
+F sum_proper_divisors(n)
+   R I n < 2 {0} E sum((1 .. n I/ 2).filter(it -> (@n % it) == 0))
+
+L(n) 1..20000
+   A m = sum_proper_divisors(n)
+   I m > n & sum_proper_divisors(m) == n
+      print(n"\t"m)
+===
+template <typename T1> auto sum_proper_divisors(const T1 &n)
+{
+    return n < 2 ? 0 : sum(range_ee(1, int(n)/int(2)).filter([&n](const auto &it){return (mod(n, it)) == 0;}));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto n : range_ee(1, 20000)) {
+            auto m = sum_proper_divisors(n);
+            if (m > n && sum_proper_divisors(m) == n)
+                print(n + u"\t"_S + m);
+        }
+    }
+} code_block_1;
