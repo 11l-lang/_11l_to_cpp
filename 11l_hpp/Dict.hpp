@@ -71,6 +71,14 @@ public:
 		//insert(std::make_pair(key, value)); //`insert()` does not assign value if it already exists in the map
 		std::map<KeyType, ValueType>::operator[](key) = value;
 	}
+
+	Array<ValueType> values() const
+	{
+		Array<ValueType> r;
+		for (auto &&kv : *this)
+			r.push_back(kv.second);
+		return r;
+	}
 };
 
 template <typename KeyType, typename ValueType> Dict<KeyType, ValueType> create_dict(DictInitializer<KeyType, ValueType> &di)
