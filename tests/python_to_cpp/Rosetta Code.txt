@@ -939,3 +939,50 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Anagrams#Python
+import collections
+from typing import List, DefaultDict
+
+anagram : DefaultDict[str, List[str]] = collections.defaultdict(list)
+for word in open('unixdict.txt').read().split("\n"):
+    anagram[''.join(sorted(word))].append(word)
+
+count = max(len(ana) for ana in anagram.values())
+
+for ana in anagram.values():
+    if len(ana) == count:
+        print(ana)
+===
+//import collections
+DefaultDict[String, Array[String]] anagram
+L(word) File(‘unixdict.txt’).read().split("\n")
+   anagram[(sorted(word)).join(‘’)].append(word)
+A count = max(anagram.values().map(ana -> ana.len))
+
+L(ana) anagram.values()
+   I ana.len == count
+      print(ana)
+===
+DefaultDict<String, Array<String>> anagram;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto word : File(u"unixdict.txt"_S).read().split(u"\n"_S))
+            anagram[(sorted(word)).join(u""_S)].append(word);
+    }
+} code_block_1;
+auto count = max(anagram.values().map([](const auto &ana){return ana.len();}));
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto ana : anagram.values())
+            if (ana.len() == count)
+                print(ana);
+    }
+} code_block_2;
