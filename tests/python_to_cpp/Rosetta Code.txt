@@ -986,3 +986,93 @@ struct CodeBlock2
                 print(ana);
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Anagrams/Deranged_anagrams#Kotlin
+from typing import Dict, List
+
+def is_not_deranged(s1, s2):
+    for i in range(len(s1)):
+        if s1[i] == s2[i]:
+            return True
+    return False
+
+anagram : Dict[str, List[str]] = {}
+count = 0
+for word in open('unixdict.txt').read().split("\n"):
+    a = ''.join(sorted(word))
+    if a not in anagram:
+        anagram[a] = [word]
+    else:
+        for ana in anagram[a]:
+            if is_not_deranged(ana, word):
+                break
+        else:
+            anagram[a].append(word)
+            count = max(count, len(word))
+
+for ana in anagram.values():
+    if len(ana) > 1 and len(ana[0]) == count:
+        print(ana)
+===
+
+F is_not_deranged(s1, s2)
+   L(i) 0 .< s1.len
+      I s1[i] == s2[i]
+         R 1B
+   R 0B
+Dict[String, Array[String]] anagram
+A count = 0
+L(word) File(‘unixdict.txt’).read().split("\n")
+   A a = sorted(word).join(‘’)
+   I a !C anagram
+      anagram[a] = [word]
+   E
+      L(ana) anagram[a]
+         I is_not_deranged(ana, word)
+            L.break
+         L.was_no_break
+            anagram[a].append(word)
+            count = max(count, word.len)
+
+L(ana) anagram.values()
+   I ana.len > 1 & ana[0].len == count
+      print(ana)
+===
+template <typename T1, typename T2> auto is_not_deranged(const T1 &s1, const T2 &s2)
+{
+    for (auto i : range_el(0, s1.len()))
+        if (s1[i] == s2[i])
+            return true;
+    return false;
+}
+Dict<String, Array<String>> anagram;
+auto count = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto word : File(u"unixdict.txt"_S).read().split(u"\n"_S)) {
+            auto a = sorted(word).join(u""_S);
+            if (!in(a, anagram))
+                anagram.set(a, create_array({word}));
+            else
+                {bool was_break = false;
+                for (auto ana : anagram[a]) {
+                    if (is_not_deranged(ana, word)) {
+                        was_break = true;
+                        break;
+                    }
+                }
+                if (!was_break) {
+                    anagram[a].append(word);
+                    count = max(count, word.len());
+                }
+                }
+        }
+        for (auto ana : anagram.values())
+            if (ana.len() > 1 && _get<0>(ana).len() == count)
+                print(ana);
+    }
+} code_block_1;
