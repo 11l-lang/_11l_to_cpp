@@ -363,6 +363,8 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                     is_hex = False
                     while i < len(source) and is_hexadecimal_digit(source[i]):
                         if not ('0' <= source[i] <= '9'):
+                            if source[i] in 'eE' and source[i+1:i+2] in ('-', '+'): # fix `1e-10`
+                                break
                             is_hex = True
                         i += 1
 
@@ -413,7 +415,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                                 if source[i+1:i+2] in '-+':
                                     i += 1
                             i += 1
-                        if source[i:i+1] in 'oоbд':
+                        if source[i:i+1] in ('o', 'о', 'b', 'д'):
                             i += 1
                         elif "'" in source[lexem_start:i] and not '.' in source[lexem_start:i]: # float numbers do not checked for a while
                             number = source[lexem_start:i].replace("'", '')
