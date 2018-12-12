@@ -845,8 +845,8 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                                           ('' if '=' in arg[3] else 'const ') + 'decltype(' + arg[1] + ') ' + arg[0] + ' = ' + arg[1])
                 else:
                     arguments.append(('' if '=' in arg[3] else 'const ') + cpp_type_from_11l[arg[2]] + ' ' + ('&'*(arg[2] not in ('Int',))) + arg[0] + ('' if arg[1] == '' else ' = ' + arg[1]))
-            return self.children_to_str(indent, ('auto' if self.function_return_type == '' else cpp_type_from_11l[self.function_return_type]) + ' ' + self.function_name
-                + ' = [' + ', '.join(sorted(filter(lambda v: not '&'+v in captured_variables, captured_variables))) + '](' \
+            return self.children_to_str(indent, ('auto' if self.function_return_type == '' else 'std::function<' + cpp_type_from_11l[self.function_return_type] + '(' + ', '.join(cpp_type_from_11l[arg[2]] for arg in self.function_arguments) + ')>') + ' ' + self.function_name
+                + ' = [' + ', '.join(sorted(filter(lambda v: not '&'+v in captured_variables, captured_variables))) + ']('
                 + ', '.join(arguments) + ')')[:-1] + ";\n"
 
         else:

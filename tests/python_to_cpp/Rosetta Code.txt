@@ -1076,3 +1076,45 @@ struct CodeBlock1
                 print(ana);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Anonymous_recursion#C.2B.2B
+def fib(n):
+    def f(n : int) -> int:
+        if n < 2:
+            return n
+        return f(n-1) + f(n-2)
+    return f(n)
+
+for i in range(21):
+    print(fib(i), end = ' ')
+===
+F fib(n)
+   F f(Int n) -> Int
+      I n < 2
+         R n
+      R @f(n - 1) + @f(n - 2)
+   R f(n)
+
+L(i) 0.<21
+   print(fib(i), end' ‘ ’)
+===
+template <typename T1> auto fib(const T1 &n)
+{
+    std::function<int(int)> f = [&f](const int n)
+    {
+        if (n < 2)
+            return n;
+        return f(n - 1) + f(n - 2);
+    };
+    return f(n);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(0, 21))
+            print(fib(i), u" "_S);
+    }
+} code_block_1;
