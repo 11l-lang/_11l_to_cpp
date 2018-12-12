@@ -1211,9 +1211,7 @@ def agm(a0, g0, tolerance = 1e-10):
     an = (a0 + g0) / 2.0
     gn = math.sqrt(a0 * g0)
     while abs(an - gn) > tolerance:
-        angn = ((an + gn) / 2.0, math.sqrt(an * gn))
-        an = angn[0]
-        gn = angn[1]
+        (an, gn) = ((an + gn) / 2.0, math.sqrt(an * gn))
     return an
  
 print(agm(1, 1 / math.sqrt(2)))
@@ -1224,9 +1222,7 @@ F agm(a0, g0, tolerance = 1e-10)
    A an = (a0 + g0) / 2.0
    A gn = sqrt(a0 * g0)
    L abs(an - gn) > tolerance
-      A angn = ((an + gn) / 2.0, sqrt(an * gn))
-      an = angn[0]
-      gn = angn[1]
+      (an, gn) = ((an + gn) / 2.0, sqrt(an * gn))
    R an
 print(agm(1, 1 / sqrt(2)))
 ===
@@ -1234,11 +1230,8 @@ template <typename T1, typename T2, typename T3 = decltype(1e-10)> auto agm(cons
 {
     auto an = (a0 + g0) / 2.0;
     auto gn = sqrt(a0 * g0);
-    while (abs(an - gn) > tolerance) {
-        auto angn = make_tuple((an + gn) / 2.0, sqrt(an * gn));
-        an = _get<0>(angn);
-        gn = _get<1>(angn);
-    }
+    while (abs(an - gn) > tolerance)
+        std::tie(an, gn) = make_tuple((an + gn) / 2.0, sqrt(an * gn));
     return an;
 }
 

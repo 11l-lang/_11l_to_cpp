@@ -590,6 +590,8 @@ class SymbolNode:
                     return self.children[0].children[0].to_str() + '.set(' + c01 + ', ' + char_if_len_1(self.children[1]) + ')'
             elif self.symbol.id == '[+]=': # replace `a [+]= v` with `a.append(v)`
                 return self.children[0].to_str() + '.append(' + self.children[1].to_str() + ')'
+            elif self.symbol.id == '=' and self.children[0].tuple:
+                return 'std::tie(' + ', '.join(c.to_str() for c in self.children[0].children) + ') = ' + self.children[1].to_str()
             elif self.symbol.id == '?':
                 return '[&]{auto R = ' + self.children[0].to_str() + '; return R != nullptr ? *R : ' + self.children[1].to_str() + ';}()'
             elif self.symbol.id == '^':
