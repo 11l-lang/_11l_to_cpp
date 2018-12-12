@@ -1118,3 +1118,134 @@ struct CodeBlock1
             print(fib(i), u" "_S);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Anti-primes
+max_divisors = 0
+c = 0
+n = 1
+while True:
+    divisors = 1
+    for i in range(1, n // 2 + 1):
+        if n % i == 0:
+            divisors += 1
+
+    if divisors > max_divisors:
+        max_divisors = divisors
+        print(n, end = ' ')
+        c += 1
+        if c == 20:
+            break
+
+    n += 1
+===
+A max_divisors = 0
+A c = 0
+A n = 1
+L
+   A divisors = 1
+   L(i) 1 .< n I/ 2 + 1
+      I n % i == 0
+         divisors++
+
+   I divisors > max_divisors
+      max_divisors = divisors
+      print(n, end' ‘ ’)
+      c++
+      I c == 20
+         L.break
+   n++
+===
+auto max_divisors = 0;
+auto c = 0;
+auto n = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            auto divisors = 1;
+            for (auto i : range_el(1, int(n)/int(2) + 1))
+                if (mod(n, i) == 0)
+                    divisors++;
+
+            if (divisors > max_divisors) {
+                max_divisors = divisors;
+                print(n, u" "_S);
+                c++;
+                if (c == 20)
+                    break;
+            }
+            n++;
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Apply_a_callback_to_an_array#Kotlin
+array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+arrsq = list(map(lambda i: i*i, array))
+print(arrsq)
+===
+A array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+A arrsq = array.map(i -> i * i)
+print(arrsq)
+===
+auto array = create_array({1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+auto arrsq = array.map([](const auto &i){return i * i;});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(arrsq);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Arithmetic-geometric_mean#Python
+import math
+ 
+def agm(a0, g0, tolerance = 1e-10):
+    an = (a0 + g0) / 2.0
+    gn = math.sqrt(a0 * g0)
+    while abs(an - gn) > tolerance:
+        angn = ((an + gn) / 2.0, math.sqrt(an * gn))
+        an = angn[0]
+        gn = angn[1]
+    return an
+ 
+print(agm(1, 1 / math.sqrt(2)))
+===
+//import math
+
+F agm(a0, g0, tolerance = 1e-10)
+   A an = (a0 + g0) / 2.0
+   A gn = sqrt(a0 * g0)
+   L abs(an - gn) > tolerance
+      A angn = ((an + gn) / 2.0, sqrt(an * gn))
+      an = angn[0]
+      gn = angn[1]
+   R an
+print(agm(1, 1 / sqrt(2)))
+===
+template <typename T1, typename T2, typename T3 = decltype(1e-10)> auto agm(const T1 &a0, const T2 &g0, const T3 &tolerance = 1e-10)
+{
+    auto an = (a0 + g0) / 2.0;
+    auto gn = sqrt(a0 * g0);
+    while (abs(an - gn) > tolerance) {
+        auto angn = make_tuple((an + gn) / 2.0, sqrt(an * gn));
+        an = _get<0>(angn);
+        gn = _get<1>(angn);
+    }
+    return an;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(agm(1, 1 / sqrt(2)));
+    }
+} code_block_1;
