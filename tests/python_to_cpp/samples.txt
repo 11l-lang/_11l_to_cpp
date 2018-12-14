@@ -998,27 +998,127 @@ struct CodeBlock1
 
 
 class Symbol:
-    node : 'ASTNode'
+    id : str
+    lbp : int
+    led_bp : int
+    led : Callable[['ASTNode', 'ASTNode'], 'ASTNode']
+
+    def set_led_bp(self, led_bp, led):
+        self.led_bp = led_bp
+        self.led    = led
 
 class ASTNode:
-    child : 'ASTNode'
+    first_child : Optional['ASTNode'] = None
+    second_child : Optional['ASTNode'] = None
+
+symbol_table : Dict[str, Symbol] = {}
+
+def symbol(id, bp = 0):
+    if not id in symbol_table:
+        s = Symbol()
+        s.id = id
+        s.lbp = bp
+        symbol_table[id] = s
+    return symbol_table[id]
+
+def infix(id, bp):
+    def led(self : ASTNode, left):
+        self.first_child = left
+        #self.second_child = expression(self.symbol.led_bp)
+        return self
+    symbol(id, bp).set_led_bp(bp, led)
+
+infix('+', 1)
+infix('-', 1)
+infix('*', 2)
+infix('/', 2)
 ===
 T Symbol
-   ASTNode node
+   String id
+   Int lbp
+   Int led_bp
+   (ASTNode, ASTNode -> ASTNode) led
+
+   F set_led_bp(led_bp, led)
+      .led_bp = led_bp
+      .led = led
 
 T ASTNode
-   ASTNode child
+   ASTNode? first_child
+   ASTNode? second_child
+Dict[String, Symbol] symbol_table
+
+F symbol(id, bp = 0)
+   I !(id C :symbol_table)
+      A s = Symbol()
+      s.id = id
+      s.lbp = bp
+      :symbol_table[id] = s
+   R :symbol_table[id]
+
+F infix(id, bp)
+   F led(ASTNode self, left)
+      self.first_child = left
+      R self
+   symbol(id, bp).set_led_bp(bp, led)
+infix(‘+’, 1)
+infix(‘-’, 1)
+infix(‘*’, 2)
+infix(‘/’, 2)
 ===
 class ASTNode;
 
 class Symbol
 {
 public:
-    SharedPtr<ASTNode> node;
+    String id;
+    int lbp;
+    int led_bp;
+    std::function<SharedPtr<ASTNode>(const SharedPtr<ASTNode>&, const SharedPtr<ASTNode>&)> led;
+
+    template <typename T1, typename T2> auto set_led_bp(const T1 &led_bp, const T2 &led)
+    {
+        this->led_bp = led_bp;
+        this->led = led;
+    }
 };
 
 class ASTNode : public SharedObject
 {
 public:
-    SharedPtr<ASTNode> child;
+    SharedPtr<ASTNode> first_child;
+    SharedPtr<ASTNode> second_child;
 };
+Dict<String, Symbol> symbol_table;
+
+template <typename T1, typename T2 = decltype(0)> auto symbol(const T1 &id, const T2 &bp = 0)
+{
+    if (!(in(id, ::symbol_table))) {
+        auto s = Symbol();
+        s.id = id;
+        s.lbp = bp;
+        ::symbol_table.set(id, s);
+    }
+    return ::symbol_table[id];
+}
+
+template <typename T1, typename T2> auto infix(const T1 &id, const T2 &bp)
+{
+    auto led = [](const SharedPtr<ASTNode> &self, const auto &left)
+    {
+        self->first_child = left;
+        return self;
+    };
+    symbol(id, bp).set_led_bp(bp, led);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        infix(u"+"_S, 1);
+        infix(u"-"_S, 1);
+        infix(u"*"_S, 2);
+        infix(u"/"_S, 2);
+    }
+} code_block_1;

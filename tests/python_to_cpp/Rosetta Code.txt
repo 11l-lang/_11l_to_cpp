@@ -1334,14 +1334,14 @@ def symbol(id, bp = 0):
     return symbol_table[id]
 
 def infix(id, bp):
-    def led(self, left):
+    def led(self : ASTNode, left):
         self.first_child = left
         self.second_child = expression(self.symbol.led_bp)
         return self
     symbol(id, bp).set_led_bp(bp, led)
 
 def prefix(id, bp):
-    def nud(self):
+    def nud(self : ASTNode):
         self.first_child = expression(self.symbol.nud_bp)
         return self
     symbol(id).set_nud_bp(bp, nud)
