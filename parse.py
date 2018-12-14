@@ -720,7 +720,7 @@ cpp_type_from_11l = {'A':'auto', 'А':'auto', 'var':'auto', 'перем':'auto',
                      'Array[String]':'Array<String>', 'Array[Array[String]]':'Array<Array<String>>',
                      'Array[Char]':'Array<Char>'}
 
-def trans_type(ty, scope, type_token):
+def trans_type(ty, scope, type_token, ast_type_node = None):
     if ty[-1] == '?':
         ty = ty[:-1]
     t = cpp_type_from_11l.get(ty)
@@ -729,7 +729,7 @@ def trans_type(ty, scope, type_token):
     else:
         p = ty.find('[') # ]
         if p != -1:
-            return trans_type(ty[:p], scope, type_token) + '<' + trans_type(ty[p+1:-1], scope, type_token) + '>'
+            return trans_type(ty[:p], scope, type_token, ast_type_node) + '<' + trans_type(ty[p+1:-1], scope, type_token, ast_type_node) + '>'
 
         id = scope.find(ty)
         if id == None:
@@ -739,6 +739,8 @@ def trans_type(ty, scope, type_token):
         if id.ast_nodes[0].has_virtual_functions:
             return 'std::unique_ptr<' + ty + '>'
         elif id.ast_nodes[0].has_pointers_to_the_same_type:
+            if ast_type_node != None and id.ast_nodes[0].tokeni > ast_type_node.tokeni: # if type `ty` was declared after this variable, insert a forward declaration of type `ty`
+                ast_type_node.forward_declared_types.append(ty)
             return 'SharedPtr<' + ty + '>'
         return ty
 
@@ -754,7 +756,7 @@ class ASTVariableDeclaration(ASTNode):
         self.scope = scope
 
     def trans_type(self, ty):
-        return trans_type(ty, self.scope, self.type_token)
+        return trans_type(ty, self.scope, self.type_token, self.parent if type(self.parent) == ASTTypeDefinition else None)
 
     def to_str(self, indent):
         if self.function_pointer:
@@ -1093,11 +1095,13 @@ class ASTTypeDefinition(ASTNodeWithChildren):
     constructors : List[ASTFunctionDefinition]
     has_virtual_functions = False
     has_pointers_to_the_same_type = False
+    forward_declared_types : List[str]
 
     def __init__(self, constructors = None):
         super().__init__()
         self.constructors = constructors or []
         self.scope = scope # needed for built-in types, e.g. `File(full_fname, ‘w’, encoding' ‘utf-8-sig’).write(...)`
+        self.forward_declared_types = []
 
     def to_str(self, indent):
         r = ''
@@ -1115,6 +1119,8 @@ class ASTTypeDefinition(ASTNodeWithChildren):
           + "\n" + ' ' * (indent*4) + "{\n" + ' ' * (indent*4) + "public:\n"
         for c in self.children:
             r += c.to_str(indent+1)
+        if len(self.forward_declared_types):
+            r = "\n".join(' ' * (indent*4) + 'class ' + t + ';' for t in self.forward_declared_types) + "\n\n" + r
         return r + ' ' * (indent*4) + "};\n"
 
 class ASTMain(ASTNodeWithChildren):

@@ -995,3 +995,30 @@ struct CodeBlock1
             }
     }
 } code_block_1;
+
+
+class Symbol:
+    node : 'ASTNode'
+
+class ASTNode:
+    child : 'ASTNode'
+===
+T Symbol
+   ASTNode node
+
+T ASTNode
+   ASTNode child
+===
+class ASTNode;
+
+class Symbol
+{
+public:
+    SharedPtr<ASTNode> node;
+};
+
+class ASTNode : public SharedObject
+{
+public:
+    SharedPtr<ASTNode> child;
+};
