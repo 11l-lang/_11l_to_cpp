@@ -1242,3 +1242,126 @@ struct CodeBlock1
         print(agm(1, 1 / sqrt(2)));
     }
 } code_block_1;
+
+
+---
+import re
+from typing import Callable, Dict, List, Optional
+
+# class T_shared_ASTNode:
+#     pass
+
+class Symbol:
+    id : str
+    lbp : int
+    nud_bp : int
+    led_bp : int
+    nud : Callable[['ASTNode'], 'ASTNode']
+    led : Callable[['ASTNode', 'ASTNode'], 'ASTNode']
+
+    def set_nud_bp(self, nud_bp, nud):
+        self.nud_bp = nud_bp
+        self.nud    = nud
+
+    def set_led_bp(self, led_bp, led):
+        self.led_bp = led_bp
+        self.led    = led
+
+class ASTNode:
+    symbol : Symbol # &
+    value : int
+    first_child : Optional['ASTNode'] = None
+    second_child : Optional['ASTNode'] = None
+
+    def eval(self):
+        sid = self.symbol.id
+        if sid == '(number)':
+            return self.value
+        elif sid == '+':
+            return self.first_child.eval() + self.second_child.eval()
+        elif sid == '-':
+            return -self.first_child.eval() if self.second_child == None else self.first_child.eval() - self.second_child.eval()
+        elif sid == '*':
+            return self.first_child.eval() * self.second_child.eval()
+        elif sid == '/':
+            return self.first_child.eval() / self.second_child.eval()
+        else:
+            assert(sid == '(') # )
+            return self.first_child.eval()
+
+symbol_table : Dict[str, Symbol] = {}
+tokens : List[str]
+tokeni = -1
+token_node : ASTNode
+
+def advance(sid = ''):
+    global token_node, tokeni
+    if sid != '':
+        assert(token_node.symbol.id == sid)
+    tokeni += 1
+    token_node = ASTNode()
+    if tokeni == len(tokens):
+        token_node.symbol = symbol_table['(end)']
+        return
+    token = tokens[tokeni]
+    token_node.symbol = symbol_table['(number)' if token.isdigit() else token]
+    if token.isdigit():
+        token_node.value = int(token)
+
+def expression(rbp = 0):
+    t = token_node
+    advance()
+    left = t.symbol.nud(t)
+    while rbp < token_node.symbol.lbp:
+        t = token_node
+        advance()
+        left = t.symbol.led(t, left)
+    return left
+
+def parse(expr_str):
+    global tokens, tokeni
+    tokens = re.findall(R'\s*(\d+|.)', expr_str)
+    tokeni = -1
+    advance()
+    return expression()
+
+def symbol(id, bp = 0):
+    if not id in symbol_table:
+        s = Symbol()
+        s.id = id
+        s.lbp = bp
+        symbol_table[id] = s
+    return symbol_table[id]
+
+def infix(id, bp):
+    def led(self, left):
+        self.first_child = left
+        self.second_child = expression(self.symbol.led_bp)
+        return self
+    symbol(id, bp).set_led_bp(bp, led)
+
+def prefix(id, bp):
+    def nud(self):
+        self.first_child = expression(self.symbol.nud_bp)
+        return self
+    symbol(id).set_nud_bp(bp, nud)
+
+infix('+', 1)
+infix('-', 1)
+infix('*', 2)
+infix('/', 2)
+prefix('-', 3)
+
+symbol('(number)').nud = lambda self: self
+symbol('(end)')
+
+def nud_parens(self):
+    expr = expression() # (
+    advance(')')
+    return expr
+symbol('(').nud = nud_parens
+symbol(')')
+
+for expr_str in ['-2 / 2 + 4 + 3 * 2',
+                 '2 * (3 + (4 * 5 + (6 * 7) * 8) - 9) * 10']:
+    print(expr_str + ' = ' + str(parse(expr_str).eval()))
