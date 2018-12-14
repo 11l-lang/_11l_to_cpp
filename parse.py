@@ -4,7 +4,7 @@
 except ImportError:
     from .tokenizer import Token
     from . import tokenizer
-from typing import List, Tuple, Dict, Callable
+from typing import List, Tuple, Dict, Callable, Set
 from enum import IntEnum
 import os, thindf
 
@@ -740,7 +740,7 @@ def trans_type(ty, scope, type_token, ast_type_node = None):
             return 'std::unique_ptr<' + ty + '>'
         elif id.ast_nodes[0].has_pointers_to_the_same_type:
             if ast_type_node != None and id.ast_nodes[0].tokeni > ast_type_node.tokeni: # if type `ty` was declared after this variable, insert a forward declaration of type `ty`
-                ast_type_node.forward_declared_types.append(ty)
+                ast_type_node.forward_declared_types.add(ty)
             return 'SharedPtr<' + ty + '>'
         return ty
 
@@ -1095,13 +1095,13 @@ class ASTTypeDefinition(ASTNodeWithChildren):
     constructors : List[ASTFunctionDefinition]
     has_virtual_functions = False
     has_pointers_to_the_same_type = False
-    forward_declared_types : List[str]
+    forward_declared_types : Set[str]
 
     def __init__(self, constructors = None):
         super().__init__()
         self.constructors = constructors or []
         self.scope = scope # needed for built-in types, e.g. `File(full_fname, ‘w’, encoding' ‘utf-8-sig’).write(...)`
-        self.forward_declared_types = []
+        self.forward_declared_types = set()
 
     def to_str(self, indent):
         r = ''
