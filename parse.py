@@ -526,7 +526,7 @@ class SymbolNode:
                         tid = self.scope.find(id_.ast_nodes[0].type.rstrip('?'))
                         if tid != None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
                             return self.children[0].children[0].token_str() + '->' + c1
-                id_ = self.scope.find(cts0.lstrip('@'))
+                id_, s = self.scope.find_and_return_scope(cts0.lstrip('@'))
                 if id_ != None:
                     if id_.type != None and id_.type.endswith('?'):
                         return cts0.lstrip('@') + '->' + c1
@@ -536,6 +536,10 @@ class SymbolNode:
                         return self.children[0].to_str() + '->' + c1 # `to_str()` is needed for such case: `animal.say(); animals [+]= animal; animal.say()` -> `animal->say(); animals.append(animal); std::move(animal)->say();`
                     if len(id_.ast_nodes) and type(id_.ast_nodes[0]) in (ASTVariableInitialization, ASTVariableDeclaration): # `Node tree = ...; tree.tree_indent()` -> `... tree->tree_indent()` # (
                         tid = self.scope.find(id_.ast_nodes[0].type)#.rstrip('?'))
+                        if tid != None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
+                            return cts0 + '->' + c1
+                    if id_.type != None and s.is_function:
+                        tid = s.find(id_.type)
                         if tid != None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
                             return cts0 + '->' + c1
                 return char_if_len_1(self.children[0]) + '.' + c1 + '()'*(c1 in ('len', 'last', 'empty')) # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
@@ -848,7 +852,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                     arguments.append(('auto ' if '=' in arg[3] else 'const auto &') + arg[0] if arg[1] == '' else
                                           ('' if '=' in arg[3] else 'const ') + 'decltype(' + arg[1] + ') ' + arg[0] + ' = ' + arg[1])
                 else:
-                    arguments.append(('' if '=' in arg[3] else 'const ') + cpp_type_from_11l[arg[2]] + ' ' + ('&'*(arg[2] not in ('Int',))) + arg[0] + ('' if arg[1] == '' else ' = ' + arg[1]))
+                    arguments.append(('' if '=' in arg[3] else 'const ') + trans_type(arg[2], self.scope, tokens[self.tokeni]) + ' ' + ('&'*(arg[2] not in ('Int',))) + arg[0] + ('' if arg[1] == '' else ' = ' + arg[1]))
             return self.children_to_str(indent, ('auto' if self.function_return_type == '' else 'std::function<' + cpp_type_from_11l[self.function_return_type] + '(' + ', '.join(cpp_type_from_11l[arg[2]] for arg in self.function_arguments) + ')>') + ' ' + self.function_name
                 + ' = [' + ', '.join(sorted(filter(lambda v: not '&'+v in captured_variables, captured_variables))) + ']('
                 + ', '.join(arguments) + ')')[:-1] + ";\n"
