@@ -717,7 +717,7 @@ class ASTExpression(ASTNodeWithExpression):
     def to_str(self, indent):
         return ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
-cpp_type_from_11l = {'A':'auto', 'А':'auto', 'var':'auto', 'перем':'auto',
+cpp_type_from_11l = {'auto&':'auto&', 'A':'auto', 'А':'auto', 'var':'auto', 'перем':'auto',
                      'Int':'int', 'Float':'double', 'String':'String', 'Bool':'bool',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
                      'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict',
@@ -1165,6 +1165,8 @@ def type_of(sn):
         assert(tid != None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
         tid = tid.ast_nodes[0].scope.ids.get(sn.children[1].token_str())
         if not (tid != None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition)):
+            if type_name == 'auto&':
+                return None
             raise Error('method `' + sn.children[1].token_str() + '` is not found in type `' + type_name + '`', sn.left_to_right_token())
         return tid.ast_nodes[0]
     elif sn.children[0].token_str().startswith(('@', ':')):
@@ -1691,6 +1693,9 @@ def parse_internal(this_node):
                         next_token()
                         if token.value(source) in ('N', 'Н', 'null', 'нуль'):
                             node.function_return_type = token.value(source)
+                            next_token()
+                        elif token.value(source) == '&':
+                            node.function_return_type = 'auto&'
                             next_token()
                         else:
                             node.function_return_type = expression().to_str()

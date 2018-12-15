@@ -1013,7 +1013,7 @@ class ASTNode:
 
 symbol_table : Dict[str, Symbol] = {}
 
-def symbol(id, bp = 0):
+def symbol(id, bp = 0): # -> &
     if not id in symbol_table:
         s = Symbol()
         s.id = id
@@ -1048,7 +1048,7 @@ T ASTNode
    ASTNode? second_child
 Dict[String, Symbol] symbol_table
 
-F symbol(id, bp = 0)
+F symbol(id, bp = 0) -> &
    I !(id C :symbol_table)
       A s = Symbol()
       s.id = id
@@ -1091,7 +1091,7 @@ public:
 };
 Dict<String, Symbol> symbol_table;
 
-template <typename T1, typename T2 = decltype(0)> auto symbol(const T1 &id, const T2 &bp = 0)
+template <typename T1, typename T2 = decltype(0)> auto& symbol(const T1 &id, const T2 &bp = 0)
 {
     if (!(in(id, ::symbol_table))) {
         auto s = Symbol();
