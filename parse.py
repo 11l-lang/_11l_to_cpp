@@ -526,6 +526,19 @@ class SymbolNode:
                         tid = self.scope.find(id_.ast_nodes[0].type.rstrip('?'))
                         if tid != None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
                             return self.children[0].children[0].token_str() + '->' + c1
+
+                if cts0 == ':' and len(self.children[0].children) == 1: # `:token_node.symbol` -> `::token_node->symbol`
+                    id_ = global_scope.find(self.children[0].children[0].token_str())
+                    if id_ != None and len(id_.ast_nodes) and type(id_.ast_nodes[0]) in (ASTVariableInitialization, ASTVariableDeclaration):
+                        tid = self.scope.find(id_.ast_nodes[0].type)#.rstrip('?')
+                        if tid != None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
+                            return '::' + self.children[0].children[0].token_str() + '->' + c1
+
+                if cts0 == '.' and len(self.children[0].children) == 2: # // for `ASTNode token_node; token_node.symbol.id = sid` -> `... token_node->symbol->id = sid`
+                    t_node = type_of(self.children[0])                  # \\ and `ASTNode token_node; ... :token_node.symbol.id = sid` -> `... ::token_node->symbol->id = sid`
+                    if t_node != None and type(t_node) in (ASTVariableDeclaration, ASTVariableInitialization) and t_node.is_reference:
+                        return self.children[0].to_str() + '->' + c1
+
                 id_, s = self.scope.find_and_return_scope(cts0.lstrip('@'))
                 if id_ != None:
                     if id_.type != None and id_.type.endswith('?'):
@@ -752,7 +765,8 @@ class ASTVariableDeclaration(ASTNode):
     vars : List[str]
     type : str
     type_args : List[str]
-    function_pointer : bool = False
+    function_pointer = False
+    is_reference = False
     scope : Scope
     type_token : Token
 
@@ -765,7 +779,7 @@ class ASTVariableDeclaration(ASTNode):
     def to_str(self, indent):
         if self.function_pointer:
             return ' ' * (indent*4) + 'std::function<' + self.trans_type(self.type) + '(' + ', '.join('const ' + self.trans_type(ty) + ('&'*(ty not in ('Int',))) for ty in self.type_args) + ')> ' + ', '.join(self.vars) + ";\n"
-        return ' ' * (indent*4) + self.trans_type(self.type) + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + ', '.join(self.vars) + ";\n"
+        return ' ' * (indent*4) + self.trans_type(self.type) + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + '*'*self.is_reference + ', '.join(self.vars) + ";\n"
 
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
     is_ptr = False
@@ -1169,7 +1183,12 @@ def type_of(sn):
                 return None
             raise Error('method `' + sn.children[1].token_str() + '` is not found in type `' + type_name + '`', sn.left_to_right_token())
         return tid.ast_nodes[0]
-    elif sn.children[0].token_str().startswith(('@', ':')):
+    elif sn.children[0].symbol.id == ':':
+        assert(len(sn.children[0].children) == 1)
+        tid = global_scope.find(sn.children[0].children[0].token_str())
+        assert(tid != None and len(tid.ast_nodes) == 1)
+        left = tid.ast_nodes[0]
+    elif sn.children[0].token_str().startswith('@'):
         return None # [-TODO-]
     else:
         if sn.children[0].token.category == Token.Category.STRING_LITERAL:
@@ -1917,7 +1936,15 @@ def parse_internal(this_node):
                 node.set_expression(node_expression.children[0])
                 new_scope(node)
             else:
-                if token.category == Token.Category.NAME and tokens[tokeni-1].category != Token.Category.SCOPE_END:
+                if node_expression.symbol.id == '&' and node_expression.children[0].token.category == Token.Category.NAME and node_expression.children[1].token.category == Token.Category.NAME: # this is a reference declaration (e.g. `Symbol& symbol`)
+                    node = ASTVariableDeclaration()
+                    node.is_reference = True
+                    node.vars = [node_expression.children[1].token_str()]
+                    node.type = node_expression.children[0].token_str()
+                    node.type_token = node_expression.token
+                    node.type_args = []
+                    scope.add_name(node.vars[0], node)
+                elif token.category == Token.Category.NAME and tokens[tokeni-1].category != Token.Category.SCOPE_END:
                     var_name = token.value(source)
                     next_token()
                     if token.value(source) == '=':
@@ -1999,6 +2026,7 @@ def token_to_str(token_str_override, token_category = Token.Category.STRING_LITE
 
 builtins_scope = Scope(None)
 scope = builtins_scope
+global_scope : Scope
 tokensn   = SymbolNode(token)
 builtins_scope.add_function('print', ASTFunctionDefinition([('object', token_to_str('‘’'), ''), ('end', token_to_str(R'"\n"'), 'String'), ('flush', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
 builtins_scope.add_function('input', ASTFunctionDefinition(None, 'String'))
@@ -2031,11 +2059,23 @@ builtins_scope.add_function('sin',   ASTFunctionDefinition([('x', '', 'Float')])
 builtins_scope.add_function('tan',   ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_function('degrees', ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_function('radians', ASTFunctionDefinition([('x', '', 'Float')]))
+
+def add_builtin_global_var(var_name, var_type, var_type_args = []):
+    var = ASTVariableDeclaration()
+    var.vars = [var_name]
+    var.type = var_type
+    var.type_args = var_type_args
+    builtins_scope.add_name(var_name, var)
+add_builtin_global_var('argv', 'Array', ['String'])
+add_builtin_global_var('stdin', 'File')
+add_builtin_global_var('stdout', 'File')
+add_builtin_global_var('stderr', 'File')
+
 builtins_scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', '')])]))
 builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('mode', token_to_str('‘r’'), 'String'), ('encoding', token_to_str('‘utf-8’'), 'String')])]))
 file_scope = Scope(None)
 file_scope.add_name('read_bytes', ASTFunctionDefinition([]))
-file_scope.add_name('read', ASTFunctionDefinition([]))
+file_scope.add_name('read', ASTFunctionDefinition([('size', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
 file_scope.add_name('write', ASTFunctionDefinition([('s', '', 'String')]))
 file_scope.add_name('read_lines', ASTFunctionDefinition([('keep_newline', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
 builtins_scope.ids['File'].ast_nodes[0].scope = file_scope
@@ -2088,7 +2128,7 @@ builtin_modules['random'] = Module(module_scope)
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
     if len(tokens_) == 0: return ASTProgram()
-    global tokens, source, tokeni, token, break_label_index, scope, tokensn, file_name, importing_module, modules
+    global tokens, source, tokeni, token, break_label_index, scope, global_scope, tokensn, file_name, importing_module, modules
     prev_tokens    = tokens
     prev_source    = source
     prev_tokeni    = tokeni
@@ -2104,6 +2144,8 @@ def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, ap
     token = None
     break_label_index = -1
     scope = Scope(None)
+    if not importing_module_:
+        global_scope = scope
     scope.parent = builtins_scope
     file_name = file_name_
     importing_module = importing_module_

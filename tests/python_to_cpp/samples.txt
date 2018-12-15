@@ -1008,10 +1008,28 @@ class Symbol:
         self.led    = led
 
 class ASTNode:
+    symbol : Symbol # &
     first_child : Optional['ASTNode'] = None
     second_child : Optional['ASTNode'] = None
 
 symbol_table : Dict[str, Symbol] = {}
+tokens : List[str]
+tokeni = -1
+token_node : ASTNode
+
+def advance(sid = ''):
+    global token_node, tokeni
+    if sid != '':
+        assert(token_node.symbol.id == sid)
+    tokeni += 1
+    token_node = ASTNode()
+    if tokeni == len(tokens):
+        token_node.symbol = symbol_table['(end)']
+        return
+    token = tokens[tokeni]
+    token_node.symbol = symbol_table['(number)' if token.isdigit() else token]
+    if token.isdigit():
+        token_node.value = int(token)
 
 def symbol(id, bp = 0): # -> &
     if not id in symbol_table:
@@ -1044,9 +1062,26 @@ T Symbol
       .led = led
 
 T ASTNode
+   Symbol& symbol
    ASTNode? first_child
    ASTNode? second_child
 Dict[String, Symbol] symbol_table
+Array[String] tokens
+A tokeni = -1
+ASTNode token_node
+
+F advance(sid = ‘’)
+   I sid != ‘’
+      assert(:token_node.symbol.id == sid)
+   :tokeni++
+   :token_node = ASTNode()
+   I :tokeni == tokens.len
+      :token_node.symbol = :symbol_table[‘(end)’]
+      R
+   A token = :tokens[:tokeni]
+   :token_node.symbol = :symbol_table[I token.is_digit() {‘(number)’} E token]
+   I token.is_digit()
+      :token_node.value = Int(token)
 
 F symbol(id, bp = 0) -> &
    I !(id C :symbol_table)
@@ -1086,10 +1121,30 @@ public:
 class ASTNode : public SharedObject
 {
 public:
+    Symbol *symbol;
     SharedPtr<ASTNode> first_child;
     SharedPtr<ASTNode> second_child;
 };
 Dict<String, Symbol> symbol_table;
+Array<String> tokens;
+auto tokeni = -1;
+SharedPtr<ASTNode> token_node;
+
+template <typename T1 = decltype(u""_S)> auto advance(const T1 &sid = u""_S)
+{
+    if (sid != u"")
+        assert(::token_node->symbol->id == sid);
+    ::tokeni++;
+    ::token_node = make_SharedPtr<ASTNode>();
+    if (::tokeni == tokens.len()) {
+        ::token_node->symbol = ::symbol_table[u"(end)"_S];
+        return;
+    }
+    auto token = ::tokens[::tokeni];
+    ::token_node->symbol = ::symbol_table[token.is_digit() ? u"(number)"_S : token];
+    if (token.is_digit())
+        ::token_node->value = to_int(token);
+}
 
 template <typename T1, typename T2 = decltype(0)> auto& symbol(const T1 &id, const T2 &bp = 0)
 {
