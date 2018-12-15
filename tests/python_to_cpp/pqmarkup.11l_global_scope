@@ -1,11 +1,11 @@
 Exception
-    type = N
+    type = ‘’
     ast_nodes = []
 Converter
-    type = N
+    type = ‘’
     ast_nodes = []
 to_html
-    type = N
+    type = ‘’
     ast_nodes = [
     .   function_arguments = [
             ‘instr, , , ’

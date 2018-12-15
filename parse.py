@@ -22,6 +22,7 @@ class Scope:
         last_occurrence : 'SymbolNode' = None
 
         def __init__(self, type, ast_node = None):
+            assert(type != None)
             self.type = type
             self.ast_nodes = []
             if ast_node != None:
@@ -101,12 +102,12 @@ class Scope:
             assert(type(self.ids[name].ast_nodes[0]) == ASTFunctionDefinition) # assert(id.ast_nodes.empty | T(id.ast_nodes[0]) == ASTFunctionDefinition)
             self.ids[name].ast_nodes.append(ast_node)                          # id.ast_nodes [+]= ast_node
         else:
-            self.ids[name] = Scope.Id(None, ast_node)
+            self.ids[name] = Scope.Id('', ast_node)
 
     def add_name(self, name, ast_node):
         if name in self.ids:                                                                                    # I !.ids.set(name, Id(N, ast_node))
             raise Error('redefinition of already defined identifier is not allowed', tokens[ast_node.tokeni+1]) #    X Error(‘redefinition ...’, ...)
-        self.ids[name] = Scope.Id(None, ast_node)
+        self.ids[name] = Scope.Id('', ast_node)
 
 scope : Scope
 
@@ -541,7 +542,7 @@ class SymbolNode:
 
                 id_, s = self.scope.find_and_return_scope(cts0.lstrip('@'))
                 if id_ != None:
-                    if id_.type != None and id_.type.endswith('?'):
+                    if id_.type != '' and id_.type.endswith('?'):
                         return cts0.lstrip('@') + '->' + c1
                     if len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTLoop and id_.ast_nodes[0].is_loop_variable_a_ptr and cts0 == id_.ast_nodes[0].loop_variable:
                         return cts0 + '->' + c1
@@ -551,7 +552,7 @@ class SymbolNode:
                         tid = self.scope.find(id_.ast_nodes[0].type)#.rstrip('?'))
                         if tid != None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
                             return cts0 + '->' + c1
-                    if id_.type != None and s.is_function:
+                    if id_.type != '' and s.is_function:
                         tid = s.find(id_.type)
                         if tid != None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
                             return cts0 + '->' + c1
@@ -1197,10 +1198,18 @@ def type_of(sn):
             if not (tid != None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTFunctionDefinition):
                 raise Error('method `' + sn.children[1].token_str() + '` is not found in type `String`', sn.left_to_right_token())
             return tid.ast_nodes[0]
-        else:
-            tid = sn.scope.find(sn.children[0].token_str())
+
+        tid, s = sn.scope.find_and_return_scope(sn.children[0].token_str())
         assert(tid != None)
         if len(tid.ast_nodes) != 1: # for `F f(active_window, s)... R s.find(‘.’) ? s.len`
+            if tid.type != '' and s.is_function: # for `F nud(ASTNode self)... self.symbol.nud_bp`
+                if '[' in tid.type: # ] # for `F decompress(Array[Int] &compressed)`
+                    return None
+                tid = s.find(tid.type)
+                assert(tid != None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
+                tid = tid.ast_nodes[0].scope.ids.get(sn.children[1].token_str())
+                assert(tid != None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition))
+                return tid.ast_nodes[0]
             return None
         left = tid.ast_nodes[0]
         if type(left) == ASTLoop:
