@@ -166,9 +166,10 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                 i += 2
                 continue
 
-            if len(tokens) \
-               and tokens[-1].category == Token.Category.OPERATOR \
-               and tokens[-1].value(source) in binary_operators[tokens[-1].end - tokens[-1].start]: # ‘Every line of code which ends with any binary operator should be joined with the following line of code.’:[https://github.com/JuliaLang/julia/issues/2097#issuecomment-339924750][-339924750]<
+            if (len(tokens)
+                and tokens[-1].category == Token.Category.OPERATOR
+                and tokens[-1].value(source) in binary_operators[tokens[-1].end - tokens[-1].start] # ‘Every line of code which ends with any binary operator should be joined with the following line of code.’:[https://github.com/JuliaLang/julia/issues/2097#issuecomment-339924750][-339924750]<
+                and source[tokens[-1].end-4:tokens[-1].end] != '-> &'): # for `F symbol(id, bp = 0) -> &`
                 if line_continuations != None:
                     line_continuations.append(tokens[-1].end)
                 continue

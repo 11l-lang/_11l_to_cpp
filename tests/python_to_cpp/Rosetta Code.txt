@@ -1325,7 +1325,7 @@ def parse(expr_str):
     advance()
     return expression()
 
-def symbol(id, bp = 0):
+def symbol(id, bp = 0): # -> &
     if not id in symbol_table:
         s = Symbol()
         s.id = id
