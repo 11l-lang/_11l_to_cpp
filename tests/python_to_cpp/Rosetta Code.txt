@@ -1285,9 +1285,11 @@ class ASTNode:
             return self.first_child.eval() * self.second_child.eval()
         elif sid == '/':
             return self.first_child.eval() / self.second_child.eval()
-        else:
-            assert(sid == '(') # )
+        elif sid == '(': # )
             return self.first_child.eval()
+        else:
+            assert(False)
+            return 0
 
 symbol_table : Dict[str, Symbol] = {}
 tokens : List[str]
