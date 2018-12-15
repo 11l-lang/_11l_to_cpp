@@ -941,6 +941,7 @@ class ASTSwitch(ASTNodeWithExpression):
     class Case(ASTNodeWithChildren, ASTNodeWithExpression):
         pass
     cases : List[Case]
+    has_string_case = False
 
     def __init__(self):
         self.cases = []
@@ -959,6 +960,16 @@ class ASTSwitch(ASTNodeWithExpression):
             if is_char(child):
                 return "u'" + child.token.value(source)[1:-1].replace("'", R"\'") + "'"
             return child.to_str()
+
+        if self.has_string_case: # C++ does not support strings in case labels so insert if-elif-else chain in this case
+            r = ''
+            for case in self.cases:
+                if case.expression.token_str() in ('E', 'И', 'else', 'иначе'):
+                    assert(id(case) == id(self.cases[-1]))
+                    r += case.children_to_str_detect_single_stmt(indent, 'else')
+                else:
+                    r += case.children_to_str_detect_single_stmt(indent, ('if' if id(case) == id(self.cases[0]) else 'else if') + ' (' + self.expression.to_str() + ' == ' + char_if_len_1(case.expression) + ')', check_for_if = True)
+            return r
 
         r = ' ' * (indent*4) + 'switch (' + self.expression.to_str() + ")\n" + ' ' * (indent*4) + "{\n"
         for case in self.cases:
@@ -1815,6 +1826,9 @@ def parse_internal(this_node):
                         next_token()
                     else:
                         case.set_expression(expression())
+                        ts = case.expression.token_str()
+                        if case.expression.token.category == Token.Category.STRING_LITERAL and not (len(ts) == 3 or (ts[:2] == '"\\' and len(ts) == 4)):
+                            node.has_string_case = True
                     new_scope(case)
                     node.cases.append(case)
                 next_token()

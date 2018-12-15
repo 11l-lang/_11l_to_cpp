@@ -1037,9 +1037,11 @@ class ASTNode:
             return self.first_child.eval() * self.second_child.eval()
         elif sid == '/':
             return self.first_child.eval() / self.second_child.eval()
-        else:
-            assert(sid == '(') # )
+        elif sid == '(': # )
             return self.first_child.eval()
+        else:
+            assert(False)
+            return 0
 
 symbol_table : Dict[str, Symbol] = {}
 tokens : List[str]
@@ -1154,9 +1156,11 @@ T ASTNode
             R .first_child.eval() * .second_child.eval()
          ‘/’
             R .first_child.eval() / .second_child.eval()
-         E
-            assert(sid == ‘(’)
+         ‘(’
             R .first_child.eval()
+         E
+            assert(0B)
+            R 0
 Dict[String, Symbol] symbol_table
 Array[String] tokens
 A tokeni = -1
@@ -1264,27 +1268,21 @@ public:
 
     auto eval()
     {
-        switch (symbol->id)
-        {
-        case u"(number)"_S:
+        if (symbol->id == u"(number)"_S)
             return value;
-            break;
-        case u'+':
+        else if (symbol->id == u'+')
             return first_child->eval() + second_child->eval();
-            break;
-        case u'-':
+        else if (symbol->id == u'-')
             return second_child == nullptr ? -first_child->eval() : first_child->eval() - second_child->eval();
-            break;
-        case u'*':
+        else if (symbol->id == u'*')
             return first_child->eval() * second_child->eval();
-            break;
-        case u'/':
+        else if (symbol->id == u'/')
             return first_child->eval() / second_child->eval();
-            break;
-        default:
-            assert(sid == u'(');
+        else if (symbol->id == u'(')
             return first_child->eval();
-            break;
+        else {
+            assert(false);
+            return 0;
         }
     }
 };
