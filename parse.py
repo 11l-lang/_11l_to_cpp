@@ -524,6 +524,8 @@ class SymbolNode:
                 if cts0 == '.' and len(self.children[0].children) == 1: # `.left.tree_indent()` -> `left->tree_indent()`
                     id_ = self.scope.find(self.children[0].children[0].token_str())
                     if id_ != None and len(id_.ast_nodes) and type(id_.ast_nodes[0]) in (ASTVariableInitialization, ASTVariableDeclaration):
+                        if id_.ast_nodes[0].is_reference:
+                            return self.children[0].children[0].token_str() + '->' + c1
                         tid = self.scope.find(id_.ast_nodes[0].type.rstrip('?'))
                         if tid != None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
                             return self.children[0].children[0].token_str() + '->' + c1
