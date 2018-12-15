@@ -1264,7 +1264,7 @@ public:
 
     auto eval()
     {
-        switch (symbol.id)
+        switch (symbol->id)
         {
         case u"(number)"_S:
             return value;
