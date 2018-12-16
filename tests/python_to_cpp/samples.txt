@@ -1063,7 +1063,7 @@ def advance(sid = ''):
         token_node.value = int(token)
 
 def expression(rbp = 0):
-    t = token_node
+    t : ASTNode = token_node
     advance()
     left = t.symbol.nud(t)
     while rbp < token_node.symbol.lbp:
@@ -1180,7 +1180,7 @@ F advance(sid = ‘’)
       :token_node.value = Int(token)
 
 F expression(rbp = 0)
-   A t = :token_node
+   ASTNode t = :token_node
    advance()
    A left = t.symbol.nud(t)
    L rbp < :token_node.symbol.lbp
@@ -1309,13 +1309,13 @@ template <typename T1 = decltype(u""_S)> auto advance(const T1 &sid = u""_S)
 
 template <typename T1 = decltype(0)> auto expression(const T1 &rbp = 0)
 {
-    auto t = ::token_node;
+    SharedPtr<ASTNode> t = ::token_node;
     advance();
-    auto left = t.symbol.nud(t);
+    auto left = t->symbol->nud(t);
     while (rbp < ::token_node->symbol->lbp) {
         t = ::token_node;
         advance();
-        left = t.symbol.led(t, left);
+        left = t->symbol->led(t, left);
     }
     return left;
 }
