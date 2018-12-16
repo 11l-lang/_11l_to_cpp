@@ -1357,7 +1357,7 @@ prefix('-', 3)
 symbol('(number)').nud = lambda self: self
 symbol('(end)')
 
-def nud_parens(self):
+def nud_parens(self : ASTNode):
     expr = expression() # (
     advance(')')
     return expr

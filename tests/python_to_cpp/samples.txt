@@ -1109,7 +1109,7 @@ prefix('-', 3)
 symbol('(number)').nud = lambda self: self
 symbol('(end)')
 
-def nud_parens(self):
+def nud_parens(self : ASTNode):
     expr = expression() # (
     advance(')')
     return expr
@@ -1223,7 +1223,7 @@ prefix(‘-’, 3)
 symbol(‘(number)’).nud = self -> self
 symbol(‘(end)’)
 
-F nud_parens(self)
+F nud_parens(ASTNode self)
    A expr = expression()
    advance(‘)’)
    R expr
@@ -1374,7 +1374,7 @@ struct CodeBlock1
     }
 } code_block_1;
 
-template <typename T1> auto nud_parens(const T1 &self)
+auto nud_parens(SharedPtr<ASTNode> self)
 {
     auto expr = expression();
     advance(u")"_S);
