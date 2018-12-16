@@ -542,6 +542,15 @@ class SymbolNode:
                     if t_node != None and type(t_node) in (ASTVariableDeclaration, ASTVariableInitialization) and t_node.is_reference:
                         return self.children[0].to_str() + '->' + c1
 
+                if cts0 == '(': # ) # `parse(expr_str).eval()` -> `parse(expr_str)->eval()`
+                    fid, sc = self.scope.find_and_return_scope(self.children[0].children[0].token_str())
+                    if fid != None and len(fid.ast_nodes) == 1:
+                        f_node = fid.ast_nodes[0]
+                        if type(f_node) == ASTFunctionDefinition and f_node.function_return_type != '':
+                            frtid = sc.find(f_node.function_return_type)
+                            if frtid != None and len(frtid.ast_nodes) == 1 and type(frtid.ast_nodes[0]) == ASTTypeDefinition and frtid.ast_nodes[0].has_pointers_to_the_same_type:
+                                return self.children[0].to_str() + '->' + c1
+
                 id_, s = self.scope.find_and_return_scope(cts0.lstrip('@'))
                 if id_ != None:
                     if id_.type != '' and id_.type.endswith('?'):
@@ -879,7 +888,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 + ', '.join(arguments) + ')')[:-1] + ";\n"
 
         else:
-            s = ('auto' if self.function_return_type == '' else cpp_type_from_11l[self.function_return_type]) + ' ' + self.function_name
+            s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + self.function_name
 
         if len(self.function_arguments) == 0:
             return self.children_to_str(indent, s + '()')

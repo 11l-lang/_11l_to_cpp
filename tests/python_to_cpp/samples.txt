@@ -1072,7 +1072,7 @@ def expression(rbp = 0):
         left = t.symbol.led(t, left)
     return left
 
-def parse(expr_str):
+def parse(expr_str) -> ASTNode:
     global tokens, tokeni
     tokens = re.findall(R'\s*(\d+|.)', expr_str)
     tokeni = -1
@@ -1189,7 +1189,7 @@ F expression(rbp = 0)
       left = t.symbol.led(t, left)
    R left
 
-F parse(expr_str)
+F parse(expr_str) -> ASTNode
    :tokens = re:‘\s*(\d+|.)’.find_strings(expr_str)
    :tokeni = -1
    advance()
@@ -1320,7 +1320,7 @@ template <typename T1 = decltype(0)> auto expression(const T1 &rbp = 0)
     return left;
 }
 
-template <typename T1> auto parse(const T1 &expr_str)
+template <typename T1> SharedPtr<ASTNode> parse(const T1 &expr_str)
 {
     ::tokens = re::_(uR"(\s*(\d+|.))"_S).find_strings(expr_str);
     ::tokeni = -1;
@@ -1388,6 +1388,6 @@ struct CodeBlock2
         symbol(u"("_S).nud = nud_parens;
         symbol(u")"_S);
         for (auto expr_str : create_array({u"-2 / 2 + 4 + 3 * 2"_S, u"2 * (3 + (4 * 5 + (6 * 7) * 8) - 9) * 10"_S}))
-            print(expr_str + u" = "_S + String(parse(expr_str).eval()));
+            print(expr_str + u" = "_S + String(parse(expr_str)->eval()));
     }
 } code_block_2;
