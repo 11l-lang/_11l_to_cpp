@@ -619,6 +619,10 @@ class SymbolNode:
             elif self.symbol.id == '%':
                 return 'mod(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
             else:
+                if self.symbol.id == '=' and self.children[0].symbol.id == '.' and len(self.children[0].children) == 2: # `::token_node->symbol = &::symbol_table[...]`
+                    t_node = type_of(self.children[0])
+                    if t_node != None and type(t_node) in (ASTVariableDeclaration, ASTVariableInitialization) and t_node.is_reference:
+                        return self.children[0].to_str() + ' = &' + self.children[1].to_str()
                 return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '(concat)':'+', '[+]':'+', '‘’=':'+=', '(+)':'^'}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
         elif len(self.children) == 3:
             if self.children[1].token.category == Token.Category.SCOPE_BEGIN:

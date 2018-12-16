@@ -1298,11 +1298,11 @@ template <typename T1 = decltype(u""_S)> auto advance(const T1 &sid = u""_S)
     ::tokeni++;
     ::token_node = make_SharedPtr<ASTNode>();
     if (::tokeni == tokens.len()) {
-        ::token_node->symbol = ::symbol_table[u"(end)"_S];
+        ::token_node->symbol = &::symbol_table[u"(end)"_S];
         return;
     }
     auto token = ::tokens[::tokeni];
-    ::token_node->symbol = ::symbol_table[token.is_digit() ? u"(number)"_S : token];
+    ::token_node->symbol = &::symbol_table[token.is_digit() ? u"(number)"_S : token];
     if (token.is_digit())
         ::token_node->value = to_int(token);
 }
