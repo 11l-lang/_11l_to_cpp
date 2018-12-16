@@ -1311,7 +1311,7 @@ def advance(sid = ''):
         token_node.value = int(token)
 
 def expression(rbp = 0):
-    t = token_node
+    t : ASTNode = token_node
     advance()
     left = t.symbol.nud(t)
     while rbp < token_node.symbol.lbp:
