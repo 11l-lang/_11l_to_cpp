@@ -1320,7 +1320,7 @@ def expression(rbp = 0):
         left = t.symbol.led(t, left)
     return left
 
-def parse(expr_str):
+def parse(expr_str) -> ASTNode:
     global tokens, tokeni
     tokens = re.findall(R'\s*(\d+|.)', expr_str)
     tokeni = -1
