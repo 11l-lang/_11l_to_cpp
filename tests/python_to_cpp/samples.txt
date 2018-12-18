@@ -995,3 +995,70 @@ struct CodeBlock1
             }
     }
 } code_block_1;
+
+
+import os
+
+print(os.path.abspath('.'))
+print(os.path.relpath('a/b', 'a/c').replace('\\', '/') == '../b')
+print(os.path.dirname('a/b/c') == 'a/b')
+print(os.path.basename('a/b/c') == 'c')
+open('temp', 'w').write('123')
+print(os.path.getsize('temp') == 3)
+print(os.path.isfile('temp'))
+print(not os.path.isdir('temp'))
+print(not os.path.islink('temp'))
+os.remove('temp')
+print(os.path.join('a/b', 'c').replace('\\', '/') == 'a/b/c')
+print(os.path.pathsep == os.pathsep)
+print(os.path.pathsep in (':', ';'))
+print(os.path.sep == os.sep)
+print(os.path.sep in ('/', '\\'))
+print(os.path.splitext('a/b/c.txt') == ('a/b/c', '.txt'))
+print(os.path.splitext('c.txt') == ('c', '.txt'))
+print(os.path.splitext('a/b.c/d') == ('a/b.c/d', ''))
+===
+//import os
+print(fs:path:absolute(‘.’))
+print(fs:path:relative(‘a/b’, ‘a/c’).replace("\\", ‘/’) == ‘../b’)
+print(fs:path:dir_name(‘a/b/c’) == ‘a/b’)
+print(fs:path:base_name(‘a/b/c’) == ‘c’)
+File(‘temp’, ‘w’).write(‘123’)
+print(fs:file_size(‘temp’) == 3)
+print(fs:is_file(‘temp’))
+print(!fs:is_directory(‘temp’))
+print(!fs:is_symlink(‘temp’))
+fs:remove(‘temp’)
+print(fs:path:join(‘a/b’, ‘c’).replace("\\", ‘/’) == ‘a/b/c’)
+print(os:env_path_sep == os:env_path_sep)
+print(os:env_path_sep C (‘:’, ‘;’))
+print(fs:path:sep == fs:path:sep)
+print(fs:path:sep C (‘/’, "\\"))
+print(fs:path:split_ext(‘a/b/c.txt’) == (‘a/b/c’, ‘.txt’))
+print(fs:path:split_ext(‘c.txt’) == (‘c’, ‘.txt’))
+print(fs:path:split_ext(‘a/b.c/d’) == (‘a/b.c/d’, ‘’))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(fs::path::absolute(u"."_S));
+        print(fs::path::relative(u"a/b"_S, u"a/c"_S).replace(u"\\"_S, u"/"_S) == u"../b");
+        print(fs::path::dir_name(u"a/b/c"_S) == u"a/b");
+        print(fs::path::base_name(u"a/b/c"_S) == u'c');
+        File(u"temp"_S, u"w"_S).write(u"123"_S);
+        print(fs::file_size(u"temp"_S) == 3);
+        print(fs::is_file(u"temp"_S));
+        print(!fs::is_directory(u"temp"_S));
+        print(!fs::is_symlink(u"temp"_S));
+        fs::remove(u"temp"_S);
+        print(fs::path::join(u"a/b"_S, u"c"_S).replace(u"\\"_S, u"/"_S) == u"a/b/c");
+        print(os::env_path_sep == os::env_path_sep);
+        print(in(os::env_path_sep, make_tuple(u":"_S, u";"_S)));
+        print(fs::path::sep == fs::path::sep);
+        print(in(fs::path::sep, make_tuple(u"/"_S, u"\\"_S)));
+        print(fs::path::split_ext(u"a/b/c.txt"_S) == make_tuple(u"a/b/c"_S, u".txt"_S));
+        print(fs::path::split_ext(u"c.txt"_S) == make_tuple(u"c"_S, u".txt"_S));
+        print(fs::path::split_ext(u"a/b.c/d"_S) == make_tuple(u"a/b.c/d"_S, u""_S));
+    }
+} code_block_1;

@@ -99,6 +99,21 @@ inline bool is_directory(const String &path)
 	return std::filesystem::is_directory((std::u16string&)path);
 }
 
+inline bool is_file(const String &path)
+{
+	return std::filesystem::is_regular_file((std::u16string&)path);
+}
+
+inline bool is_symlink(const String &path)
+{
+	return std::filesystem::is_symlink((std::u16string&)path);
+}
+
+inline uintmax_t file_size(const String &path)
+{
+	return std::filesystem::file_size((std::u16string&)path);
+}
+
 inline bool create_directory(const String &path)
 {
 	return std::filesystem::create_directory((std::u16string&)path);
@@ -155,6 +170,29 @@ inline String base_name(const String &path)
 	if (sep_pos == String::npos)
 		return path;
 	return String(path.c_str() + sep_pos + 1);
+}
+
+inline String absolute(const String &path)
+{
+	return std::filesystem::absolute((std::u16string&)path).u16string();
+}
+
+inline String relative(const String &path, const String &base)
+{
+	return std::filesystem::relative((std::u16string&)path, (std::u16string&)base).u16string();
+}
+
+inline Tuple<String, String> split_ext(const String &path)
+{
+	size_t sep_pos = path.find_last_of(u"/\\");
+	if (sep_pos == String::npos)
+		sep_pos = 0;
+	size_t dot_pos = path.find_last_of(u".");
+
+	if (dot_pos == String::npos || dot_pos < sep_pos)
+		return make_tuple(path, String());
+
+	return make_tuple(path[range_el(0, (int)dot_pos)], path[range_ei((int)dot_pos)]);
 }
 }
 }
