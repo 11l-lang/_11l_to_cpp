@@ -412,7 +412,9 @@ public:
 	String operator+(char16_t ch) {String r(*this); r.append(1, ch); return r;}
 
 	String operator+(int i) {return *this + String(i);}
+	String operator+(double n) {return *this + String(n);}
 	friend String operator+(int i, const String &s) {return String(i) + s;}
+	friend String operator+(double n, const String &s) {return String(n) + s;}
 	friend String operator+(Char ch, const String &s) {return String(ch) + s;}
 	friend String operator+(char16_t ch, const String &s) {return String(ch) + s;}
 };
