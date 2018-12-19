@@ -155,3 +155,31 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Arithmetic/Integer#C
+A a = Int(input())
+A b = Int(input())
+
+print(‘a + b = ’(a + b))
+print(‘a - b = ’(a - b))
+print(‘a * b = ’(a * b))
+print(‘a / b = ’(a I/ b))
+print(‘a % b = ’(a % b))
+print(‘a ^ b = ’(a ^ b))
+===
+auto a = to_int(input());
+auto b = to_int(input());
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"a + b = "_S + (a + b));
+        print(u"a - b = "_S + (a - b));
+        print(u"a * b = "_S + (a * b));
+        print(u"a / b = "_S + (int(a)/int(b)));
+        print(u"a % b = "_S + (mod(a, b)));
+        print(u"a ^ b = "_S + (pow(a, b)));
+    }
+} code_block_1;
