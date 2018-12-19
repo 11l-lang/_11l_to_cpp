@@ -1639,3 +1639,42 @@ struct CodeBlock2
             print(expr_str + u" = "_S + String(parse(expr_str)->eval()));
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Associative_array/Iteration#Python
+d = {'key1': 'value1', 'key2': 'value2'}
+
+for key, value in d.items():
+    print(key + ' = ' + value)
+
+for key in d.keys():
+    print(key)
+
+for value in d.values():
+    print(value)
+===
+A d = [‘key1’ = ‘value1’, ‘key2’ = ‘value2’]
+
+L(key, value) d
+   print(key‘ = ’value)
+
+L(key) d.keys()
+   print(key)
+
+L(value) d.values()
+   print(value)
+===
+auto d = create_dict(dict_of(u"key1"_S, u"value1"_S)(u"key2"_S, u"value2"_S));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[key, value] : d)
+            print(key + u" = "_S + value);
+        for (auto key : d.keys())
+            print(key);
+        for (auto value : d.values())
+            print(value);
+    }
+} code_block_1;

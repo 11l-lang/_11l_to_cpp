@@ -794,3 +794,19 @@ struct CodeBlock1
         print(u" 1 2  3  "_S.split(u" "_S, nullptr, true));
     }
 } code_block_1;
+
+
+A number = 3
+L 1..number
+   print(‘.’)
+===
+auto number = 3;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto __unused : range_ee(1, number))
+            print(u"."_S);
+    }
+} code_block_1;

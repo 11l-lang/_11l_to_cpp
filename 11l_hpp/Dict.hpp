@@ -72,6 +72,14 @@ public:
 		std::map<KeyType, ValueType>::operator[](key) = value;
 	}
 
+	Array<KeyType> keys() const
+	{
+		Array<KeyType> r;
+		for (auto &&kv : *this)
+			r.push_back(kv.first);
+		return r;
+	}
+
 	Array<ValueType> values() const
 	{
 		Array<ValueType> r;

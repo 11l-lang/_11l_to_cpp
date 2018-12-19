@@ -1017,8 +1017,11 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
             tr = 'for (int ' + lv + ' = 0; ' + lv + ' < ' + self.expression.to_str() + '; ' + lv + '++)'
         else:
             if self.loop_variable != None or (self.expression != None and self.expression.symbol.id in ('..', '.<')):
-                loop_auto = True
-                tr = 'for (auto ' + '&&'*self.is_loop_variable_a_ptr + (self.loop_variable if self.loop_variable != None else '__unused') + ' : ' + self.expression.to_str() + ')'
+                if self.loop_variable != None and ',' in self.loop_variable:
+                    tr = 'for (auto &&[' + self.loop_variable + '] : ' + self.expression.to_str() + ')'
+                else:
+                    loop_auto = True
+                    tr = 'for (auto ' + '&&'*self.is_loop_variable_a_ptr + (self.loop_variable if self.loop_variable != None else '__unused') + ' : ' + self.expression.to_str() + ')'
             else:
                 tr = 'while (' + (self.expression.to_str() if self.expression != None else 'true') + ')'
         rr = self.children_to_str_detect_single_stmt(indent, tr)
@@ -1870,6 +1873,8 @@ def parse_internal(this_node):
                     else:
                         if token.value(source) == '(':
                             node.loop_variable = expected_name('loop variable')
+                            if token.value(source) == ',':
+                                node.loop_variable += ', ' + expected_name('loop variable2')
                             advance(')')
                         node.set_expression(expression())
 
