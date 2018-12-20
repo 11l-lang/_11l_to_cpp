@@ -34,6 +34,7 @@ public:
 	template <typename Func> auto map(Func &&func) const -> Array<decltype(func(Type()))>
 	{
 		Array<decltype(func(Type()))> r;
+		r.reserve(len());
 		for (auto el : *this)
 			r.push_back(func(el));
 		return r;
@@ -345,6 +346,13 @@ inline String String::rtrim(const Array<Char> &arr, Nullable<int> limit) const
 	for (int ll=limit == nullptr ? 0 : max(0, len()-*limit); l>=ll; l--)
 		if (!in(s[l], arr)) break;
 	return String(s, l+1);
+}
+
+template <typename Type> Array<Type> sorted(const Array<Type> &arr)
+{
+	Array<Type> r(arr);
+	std::sort(r.begin(), r.end());
+	return r;
 }
 
 Array<Char> sorted(const String &s)
