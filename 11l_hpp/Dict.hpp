@@ -46,25 +46,10 @@ template <typename KeyType, typename ValueType> DictInitializer<KeyType, ValueTy
 	return DictInitializer<KeyType, ValueType>(std::forward<KeyType>(key), std::forward<ValueType>(value));
 }
 
-template <typename KeyType, typename ValueType> class Dict : public std::map<KeyType, ValueType>
+template <typename KeyType, typename ValueType> class DefaultDict : public std::map<KeyType, ValueType>
 {
 public:
-	Dict() {}
-	Dict(DictInitializer<KeyType, ValueType> &&di) : std::map<KeyType, ValueType>(std::forward<std::map<KeyType, ValueType>>(di.dict)) {}
-
-	ValueType &operator[](const KeyType &key)
-	{
-		auto r = std::map<KeyType, ValueType>::insert(std::make_pair(key, ValueType()));
-		if (r.second) throw KeyError(String(key));
-		return r.first->second;
-	}
-
-	const ValueType &operator[](const KeyType &key) const
-	{
-		auto r = find(key);
-		if (r == std::map<KeyType, ValueType>::end()) throw KeyError(String(key));
-		return r->second;
-	}
+	DefaultDict() {}
 
 	void set(const KeyType &key, const ValueType &value)
 	{
@@ -87,6 +72,36 @@ public:
 			r.push_back(kv.second);
 		return r;
 	}
+
+	template <typename Func> Array<Tuple<KeyType, ValueType>> filter(Func &&func) const
+	{
+		Array<Tuple<KeyType, ValueType>> r;
+		for (auto &&el : *this)
+			if (func(make_tuple(el.first, el.second)))
+				r.push_back(make_tuple(el.first, el.second));
+		return r;
+	}
+};
+
+template <typename KeyType, typename ValueType> class Dict : public DefaultDict<KeyType, ValueType>
+{
+public:
+	Dict() {}
+	Dict(DictInitializer<KeyType, ValueType> &&di) : std::map<KeyType, ValueType>(std::forward<std::map<KeyType, ValueType>>(di.dict)) {}
+
+	ValueType &operator[](const KeyType &key)
+	{
+		auto r = std::map<KeyType, ValueType>::insert(std::make_pair(key, ValueType()));
+		if (r.second) throw KeyError(String(key));
+		return r.first->second;
+	}
+
+	const ValueType &operator[](const KeyType &key) const
+	{
+		auto r = find(key);
+		if (r == std::map<KeyType, ValueType>::end()) throw KeyError(String(key));
+		return r->second;
+	}
 };
 
 template <typename KeyType, typename ValueType> Dict<KeyType, ValueType> create_dict(DictInitializer<KeyType, ValueType> &di)
@@ -101,30 +116,6 @@ template <typename KeyType, typename ValueType> Dict<KeyType, ValueType> create_
 		r.set(_get<0>(el), _get<1>(el));
 	return r;
 }
-
-template <typename KeyType, typename ValueType> inline bool in(const KeyType &key, const Dict<KeyType, ValueType> &dict)
-{
-	return dict.find(key) != dict.end();
-}
-
-template <typename KeyType, typename ValueType> class DefaultDict : public std::map<KeyType, ValueType>
-{
-public:
-	DefaultDict() {}
-
-	void set(const KeyType &key, const ValueType &value)
-	{
-		std::map<KeyType, ValueType>::operator[](key) = value;
-	}
-
-	Array<ValueType> values() const
-	{
-		Array<ValueType> r;
-		for (auto &&kv : *this)
-			r.push_back(kv.second);
-		return r;
-	}
-};
 
 template <typename KeyType, typename ValueType> inline bool in(const KeyType &key, const DefaultDict<KeyType, ValueType> &dict)
 {
