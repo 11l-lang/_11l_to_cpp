@@ -2079,6 +2079,7 @@ builtins_scope.add_function('assert', ASTFunctionDefinition([('expression', '', 
 builtins_scope.add_function('exit', ASTFunctionDefinition([('arg', '', '')]))
 builtins_scope.add_function('zip', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', '')]))
 builtins_scope.add_function('sum', ASTFunctionDefinition([('iterable', '', '')]))
+builtins_scope.add_function('product', ASTFunctionDefinition([('iterable', '', '')]))
 builtins_scope.add_function('sorted', ASTFunctionDefinition([('iterable', '', '')]))
 builtins_scope.add_function('min', ASTFunctionDefinition([('object1', '', ''), ('object2', token_to_str('N', Token.Category.CONSTANT), '')]))
 builtins_scope.add_function('max', ASTFunctionDefinition([('object1', '', ''), ('object2', token_to_str('N', Token.Category.CONSTANT), '')]))
