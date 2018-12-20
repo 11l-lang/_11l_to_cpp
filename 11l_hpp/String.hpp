@@ -455,6 +455,21 @@ inline int to_int(double d)
 	return (int)d;
 }
 
+inline double to_float(const String &str)
+{
+	return atof(std::string(str.cbegin(), str.cend()).c_str());
+}
+
+inline double to_float(Char ch)
+{
+	return ch.is_digit() ? ch.code - '0' : 0;
+}
+
+inline double to_float(int i)
+{
+	return i;
+}
+
 inline double parse_float(const char16_t *s)
 {
 	double res = 0, f = 1, sign = 1;
