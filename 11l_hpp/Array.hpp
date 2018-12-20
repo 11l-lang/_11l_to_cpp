@@ -31,7 +31,7 @@ public:
 
 	using std::vector<Type>::begin, std::vector<Type>::end;
 
-	template <typename Func> auto map(Func &&func) -> Array<decltype(func(Type()))>
+	template <typename Func> auto map(Func &&func) const -> Array<decltype(func(Type()))>
 	{
 		Array<decltype(func(Type()))> r;
 		for (auto el : *this)
@@ -53,7 +53,7 @@ public:
 		return r;
 	}
 
-	template <typename Func> Array filter(Func &&func)
+	template <typename Func> Array filter(Func &&func) const
 	{
 		Array r;
 		for (auto el : *this)
