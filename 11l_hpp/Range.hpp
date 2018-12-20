@@ -32,6 +32,11 @@ public:
 			return e - b - 1;
 	}
 
+	Type len() const
+	{
+		return size();
+	}
+
 	template <typename Func> auto map(Func &&func) const -> Array<decltype(func(Type()))>
 	{
 		Array<decltype(func(Type()))> r;
