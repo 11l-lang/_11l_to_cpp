@@ -1899,3 +1899,31 @@ struct CodeBlock1
         print(modes(create_array({1, 1, 2, 4, 4})));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Averages/Root_mean_square#Python
+import math
+
+def qmean(num):
+    return math.sqrt(sum(n*n for n in num)/float(len(num)))
+ 
+print(qmean(range(1,11)))
+===
+//import math
+
+F qmean(num)
+   R sqrt(sum(num.map(n -> n * n)) / Float(num.len))
+print(qmean((1.<11)))
+===
+template <typename T1> auto qmean(const T1 &num)
+{
+    return sqrt(sum(num.map([](const auto &n){return n * n;})) / to_float(num.len()));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(qmean(range_el(1, 11)));
+    }
+} code_block_1;
