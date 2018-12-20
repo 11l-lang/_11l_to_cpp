@@ -1701,3 +1701,43 @@ struct CodeBlock1
         print(average(create_array({0, 0, 3, 1, 4, 1, 5, 9, 0, 0})));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Averages/Mean_angle#C.23
+import math
+
+def mean_angle(angles):
+    x = sum(math.cos(math.radians(a)) for a in angles) / len(angles)
+    y = sum(math.sin(math.radians(a)) for a in angles) / len(angles)
+    return math.degrees(math.atan2(y, x))
+
+print(mean_angle([350, 10]))
+print(mean_angle([90, 180, 270, 360]))
+print(mean_angle([10, 20, 30]))
+===
+//import math
+
+F mean_angle(angles)
+   A x = sum(angles.map(a -> cos(radians(a)))) / angles.len
+   A y = sum(angles.map(a -> sin(radians(a)))) / angles.len
+   R degrees(atan2(y, x))
+print(mean_angle([350, 10]))
+print(mean_angle([90, 180, 270, 360]))
+print(mean_angle([10, 20, 30]))
+===
+template <typename T1> auto mean_angle(const T1 &angles)
+{
+    auto x = sum(angles.map([](const auto &a){return cos(radians(a));})) / angles.len();
+    auto y = sum(angles.map([](const auto &a){return sin(radians(a));})) / angles.len();
+    return degrees(atan2(y, x));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(mean_angle(create_array({350, 10})));
+        print(mean_angle(create_array({90, 180, 270, 360})));
+        print(mean_angle(create_array({10, 20, 30})));
+    }
+} code_block_1;
