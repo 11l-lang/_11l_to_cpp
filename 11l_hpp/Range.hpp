@@ -35,6 +35,7 @@ public:
 	template <typename Func> auto map(Func &&func) const -> Array<decltype(func(Type()))>
 	{
 		Array<decltype(func(Type()))> r;
+		r.reserve(e - !include_ending - (b + !include_beginning) + 1);
 		for (Type i = b + !include_beginning; i <= e - !include_ending; i++)
 			r.push_back(func(i));
 		return r;
