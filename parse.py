@@ -320,6 +320,8 @@ class SymbolNode:
                         f_node = type_of(self.children[0])
                 elif func_name == 'Int':
                     func_name = 'to_int'
+                elif func_name == 'Float':
+                    func_name = 'to_float'
                 elif func_name.startswith('Array['): # ]
                     func_name = 'Array<' + func_name[6:-1] + '>'
                 elif func_name == 'Dict':

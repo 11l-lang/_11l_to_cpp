@@ -1678,3 +1678,26 @@ struct CodeBlock1
             print(value);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Averages/Arithmetic_mean#Python
+def average(x):
+    return sum(x)/float(len(x))# if x else 0
+print (average([0,0,3,1,4,1,5,9,0,0]))
+===
+F average(x)
+   R sum(x) / Float(x.len)
+print(average([0, 0, 3, 1, 4, 1, 5, 9, 0, 0]))
+===
+template <typename T1> auto average(const T1 &x)
+{
+    return sum(x) / to_float(x.len());
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(average(create_array({0, 0, 3, 1, 4, 1, 5, 9, 0, 0})));
+    }
+} code_block_1;
