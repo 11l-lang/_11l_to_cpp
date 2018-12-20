@@ -269,6 +269,14 @@ template <typename Type> Type sum(const Array<Type> &arr)
 	return r;
 }
 
+template <typename Type> Type product(const Array<Type> &arr)
+{
+	Type r = 1;
+	for (auto v : arr)
+		r *= v;
+	return r;
+}
+
 inline Array<String> String::split(const String &delim, Nullable<int> limit, bool group_delimiters) const
 {
 	int lim = limit == nullptr ? -1 : *limit - 1;

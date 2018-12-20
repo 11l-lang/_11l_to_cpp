@@ -183,3 +183,45 @@ struct CodeBlock1
         print(u"a ^ b = "_S + (pow(a, b)));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Averages/Pythagorean_means#Python
+F amean(num)
+   R sum(num)/Float(num.len)
+ 
+F gmean(num)
+   R product(num) ^ (1.0/num.len)
+ 
+F hmean(num)
+   return num.len / sum(num.map(n -> 1.0/n))
+ 
+A numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+print(amean(numbers))
+print(gmean(numbers))
+print(hmean(numbers))
+===
+template <typename T1> auto amean(const T1 &num)
+{
+    return sum(num) / to_float(num.len());
+}
+
+template <typename T1> auto gmean(const T1 &num)
+{
+    return pow(product(num), (1.0 / num.len()));
+}
+
+template <typename T1> auto hmean(const T1 &num)
+{
+    return num.len() / sum(num.map([](const auto &n){return 1.0 / n;}));
+}
+auto numbers = create_array({1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(amean(numbers));
+        print(gmean(numbers));
+        print(hmean(numbers));
+    }
+} code_block_1;
