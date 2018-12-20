@@ -2133,6 +2133,7 @@ string_scope.add_name('rtrim', ASTFunctionDefinition([('s', '', 'String'), ('lim
 string_scope.add_name('ltrim', ASTFunctionDefinition([('s', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
 string_scope.add_name('trim', ASTFunctionDefinition([('s', '', 'String')]))
 string_scope.add_name('replace', ASTFunctionDefinition([('old', '', 'String'), ('new', '', 'String')]))
+string_scope.add_name('zfill', ASTFunctionDefinition([('width', '', 'Int')]))
 builtins_scope.ids['String'].ast_nodes[0].scope = string_scope
 
 module_scope = Scope(None)
