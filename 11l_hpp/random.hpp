@@ -36,4 +36,10 @@ inline float _(float min, float max)
 {
 	return _(max - min) + min;
 }
+
+template <typename Type> inline void shuffle(Array<Type> &arr)
+{
+	for (int i=0,l=arr.len(); i<l; i++)
+		std::swap(arr[_(l)], arr[_(l)]);
+}
 }
