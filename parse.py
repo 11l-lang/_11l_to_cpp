@@ -2179,6 +2179,7 @@ module_scope.add_function('', ASTFunctionDefinition([('pattern', '', 'String')])
 builtin_modules['re'] = Module(module_scope)
 module_scope = Scope(None)
 module_scope.add_function('', ASTFunctionDefinition([('min', '', 'Float'), ('max', '0', 'Float')]))
+module_scope.add_function('shuffle', ASTFunctionDefinition([('container', '', '')]))
 builtin_modules['random'] = Module(module_scope)
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++

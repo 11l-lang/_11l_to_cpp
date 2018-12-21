@@ -2015,3 +2015,86 @@ struct CodeBlock1
             print(u"Added "_S + String(e) + u", sma(3) = "_S + String(sma3.add(e)) + u", sma(5) = "_S + String(sma5.add(e)));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Balanced_brackets#Python
+import random
+
+def gen(n):
+    txt = ['[', ']'] * n
+    random.shuffle(txt)
+    return ''.join(txt)
+
+def is_balanced(s):
+    nesting_level = 0
+    for c in s:
+        c = c
+        if c == '[':
+            nesting_level += 1
+        elif c == ']':
+            nesting_level -= 1
+            if nesting_level < 0:
+                return False
+    return True
+
+for n in range(10):
+    s = gen(n)
+    print(s + ' '*(20-len(s)) + 'is ' + ('balanced' if is_balanced(s) else 'not balanced'))
+===
+//import random
+
+F gen(n)
+   A txt = [‘[’, ‘]’] * n
+   random:shuffle(txt)
+   R txt.join(‘’)
+
+F is_balanced(s)
+   A nesting_level = 0
+   L(c) s
+      S c
+         ‘[’
+            nesting_level++
+         ‘]’
+            I --nesting_level < 0
+               R 0B
+   R 1B
+
+L(n) 0.<10
+   A s = gen(n)
+   print(s‘’(‘ ’ * (20 - s.len))‘is ’(I is_balanced(s) {‘balanced’} E ‘not balanced’))
+===
+template <typename T1> auto gen(const T1 &n)
+{
+    auto txt = create_array({u'['_C, u']'_C}) * n;
+    randomns::shuffle(txt);
+    return txt.join(u""_S);
+}
+
+template <typename T1> auto is_balanced(const T1 &s)
+{
+    auto nesting_level = 0;
+    for (auto c : s)
+        switch (c)
+        {
+        case u'[':
+            nesting_level++;
+            break;
+        case u']':
+            if (--nesting_level < 0)
+                return false;
+            break;
+        }
+    return true;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto n : range_el(0, 10)) {
+            auto s = gen(n);
+            print(s + (u" "_S * (20 - s.len())) + u"is "_S + (is_balanced(s) ? u"balanced"_S : u"not balanced"_S));
+        }
+    }
+} code_block_1;

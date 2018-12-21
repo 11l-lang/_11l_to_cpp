@@ -13,7 +13,7 @@ public:
 template <typename KeyType, typename ValueType> class DictInitializer
 {
 	std::map<KeyType, ValueType> dict;
-	template <typename /*KeyType*/, typename /*ValueType*/> friend class Dict; // fix of error in GCC: declaration of template parameter ‘KeyType’ shadows template parameter
+	template <typename /*KeyType*/, typename /*ValueType*/> friend class DefaultDict; // fix of error in GCC: declaration of template parameter ‘KeyType’ shadows template parameter
 
 public:
 	DictInitializer(const KeyType &key, const ValueType &value)
@@ -50,6 +50,7 @@ template <typename KeyType, typename ValueType> class DefaultDict : public std::
 {
 public:
 	DefaultDict() {}
+	DefaultDict(DictInitializer<KeyType, ValueType> &&di) : std::map<KeyType, ValueType>(std::forward<std::map<KeyType, ValueType>>(di.dict)) {}
 
 	void set(const KeyType &key, const ValueType &value)
 	{
@@ -87,7 +88,7 @@ template <typename KeyType, typename ValueType> class Dict : public DefaultDict<
 {
 public:
 	Dict() {}
-	Dict(DictInitializer<KeyType, ValueType> &&di) : std::map<KeyType, ValueType>(std::forward<std::map<KeyType, ValueType>>(di.dict)) {}
+	Dict(DictInitializer<KeyType, ValueType> &&di) : DefaultDict<KeyType, ValueType>(std::forward<DictInitializer<KeyType, ValueType>>(di)) {}
 
 	ValueType &operator[](const KeyType &key)
 	{
