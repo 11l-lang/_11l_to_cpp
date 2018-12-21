@@ -746,6 +746,8 @@ class ASTProgram(ASTNodeWithChildren):
 
 class ASTExpression(ASTNodeWithExpression):
     def to_str(self, indent):
+        if self.expression.symbol.id == '=' and type(self.parent) == ASTTypeDefinition:
+            return ' ' * (indent*4) + 'decltype(' + self.expression.children[1].to_str() + ') ' + self.expression.to_str() + ";\n"
         return ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
 cpp_type_from_11l = {'auto&':'auto&', 'A':'auto', 'А':'auto', 'var':'auto', 'перем':'auto',

@@ -1927,3 +1927,91 @@ struct CodeBlock1
         print(qmean(range_el(1, 11)));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Averages/Simple_moving_average#D
+from typing import List
+
+class SMA:
+    data : List[float]
+    sum = 0.0
+    index = 0
+    n_filled = 0
+    period : int
+
+    def __init__(self, period):
+        self.period = period
+        self.data = [0.0] * period
+
+    def add(self, v):
+        self.sum += v - self.data[self.index]
+        self.data[self.index] = v
+        self.index = (self.index + 1) % self.period
+        self.n_filled = min(self.period, self.n_filled + 1)
+        return self.sum / self.n_filled
+
+sma3 = SMA(3)
+sma5 = SMA(5)
+
+for e in [1, 2, 3, 4, 5, 5, 4, 3, 2, 1]:
+    print('Added ' + str(e) + ', sma(3) = ' + str(sma3.add(e)) + ', sma(5) = ' + str(sma5.add(e)))
+===
+
+T SMA
+   Array[Float] data
+   sum = 0.0
+   index = 0
+   n_filled = 0
+   Int period
+
+   F (period)
+      .period = period
+      .data = [0.0] * period
+
+   F add(v)
+      .sum += v - .data[.index]
+      .data[.index] = v
+      .index = (.index + 1) % .period
+      .n_filled = min(.period, .n_filled + 1)
+      R .sum / .n_filled
+A sma3 = SMA(3)
+A sma5 = SMA(5)
+
+L(e) [1, 2, 3, 4, 5, 5, 4, 3, 2, 1]
+   print(‘Added ’String(e)‘, sma(3) = ’String(sma3.add(e))‘, sma(5) = ’String(sma5.add(e)))
+===
+class SMA
+{
+public:
+    Array<double> data;
+    decltype(0.0) sum = 0.0;
+    decltype(0) index = 0;
+    decltype(0) n_filled = 0;
+    int period;
+
+    template <typename T1> SMA(const T1 &period)
+    {
+        this->period = period;
+        data = create_array({0.0}) * period;
+    }
+
+    template <typename T1> auto add(const T1 &v)
+    {
+        sum += v - data[index];
+        data.set(index, v);
+        index = mod((index + 1), period);
+        n_filled = min(period, n_filled + 1);
+        return sum / n_filled;
+    }
+};
+auto sma3 = SMA(3);
+auto sma5 = SMA(5);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto e : create_array({1, 2, 3, 4, 5, 5, 4, 3, 2, 1}))
+            print(u"Added "_S + String(e) + u", sma(3) = "_S + String(sma3.add(e)) + u", sma(5) = "_S + String(sma5.add(e)));
+    }
+} code_block_1;
