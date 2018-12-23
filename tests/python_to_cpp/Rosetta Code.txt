@@ -1641,6 +1641,167 @@ struct CodeBlock2
 } code_block_2;
 
 
+---
+class ASTNode;
+
+class Symbol
+{
+public:
+    String id;
+    int lbp;
+    int nud_bp;
+    int led_bp;
+    std::function<std::unique_ptr<ASTNode>(std::unique_ptr<ASTNode>)> nud;
+    std::function<std::unique_ptr<ASTNode>(std::unique_ptr<ASTNode>, std::unique_ptr<ASTNode>)> led;
+
+    template <typename T1, typename T2> auto set_nud_bp(const T1 &nud_bp, const T2 &nud)
+    {
+        this->nud_bp = nud_bp;
+        this->nud = nud;
+    }
+
+    template <typename T1, typename T2> auto set_led_bp(const T1 &led_bp, const T2 &led)
+    {
+        this->led_bp = led_bp;
+        this->led = led;
+    }
+};
+
+class ASTNode
+{
+public:
+    Symbol *symbol;
+    int value;
+    std::unique_ptr<ASTNode> first_child;
+    std::unique_ptr<ASTNode> second_child;
+
+    auto eval()
+    {
+        if (symbol->id == u"(number)"_S)
+            return value;
+        else if (symbol->id == u'+')
+            return first_child->eval() + second_child->eval();
+        else if (symbol->id == u'-')
+            return second_child == nullptr ? -first_child->eval() : first_child->eval() - second_child->eval();
+        else if (symbol->id == u'*')
+            return first_child->eval() * second_child->eval();
+        else if (symbol->id == u'/')
+            return first_child->eval() / second_child->eval();
+        else if (symbol->id == u'(')
+            return first_child->eval();
+        else {
+            assert(false);
+            return 0;
+        }
+    }
+};
+Dict<String, Symbol> symbol_table;
+Array<String> tokens;
+auto tokeni = -1;
+std::unique_ptr<ASTNode> token_node;
+
+template <typename T1 = decltype(u""_S)> auto advance(const T1 &sid = u""_S)
+{
+    if (sid != u"")
+        assert(::token_node->symbol->id == sid);
+    ::tokeni++;
+    ::token_node = std::make_unique<ASTNode>();
+    if (::tokeni == tokens.len()) {
+        ::token_node->symbol = &::symbol_table[u"(end)"_S];
+        return;
+    }
+    auto token = ::tokens[::tokeni];
+    ::token_node->symbol = &::symbol_table[token.is_digit() ? u"(number)"_S : token];
+    if (token.is_digit())
+        ::token_node->value = to_int(token);
+}
+
+template <typename T1 = decltype(0)> auto expression(const T1 &rbp = 0)
+{
+    std::unique_ptr<ASTNode> t = std::move(::token_node);
+    advance();
+    auto left = t->symbol->nud(std::move(t));
+    while (rbp < ::token_node->symbol->lbp) {
+        t = std::move(::token_node);
+        advance();
+        left = t->symbol->led(std::move(t), std::move(left));
+    }
+    return left;
+}
+
+template <typename T1> std::unique_ptr<ASTNode> parse(const T1 &expr_str)
+{
+    ::tokens = re::_(uR"(\s*(\d+|.))"_S).find_strings(expr_str);
+    ::tokeni = -1;
+    advance();
+    return expression();
+}
+
+template <typename T1, typename T2 = decltype(0)> auto& symbol(const T1 &id, const T2 &bp = 0)
+{
+    if (!(in(id, ::symbol_table))) {
+        auto s = Symbol();
+        s.id = id;
+        s.lbp = bp;
+        ::symbol_table.set(id, s);
+    }
+    return ::symbol_table[id];
+}
+
+template <typename T1, typename T2> auto infix(const T1 &id, const T2 &bp)
+{
+    auto led = [](std::unique_ptr<ASTNode> self, std::unique_ptr<ASTNode> left)
+    {
+        self->first_child = std::move(left);
+        self->second_child = expression(self->symbol->led_bp);
+        return self;
+    };
+    symbol(id, bp).set_led_bp(bp, led);
+}
+
+template <typename T1, typename T2> auto prefix(const T1 &id, const T2 &bp)
+{
+    auto nud = [](std::unique_ptr<ASTNode> self)
+    {
+        self->first_child = expression(self->symbol->nud_bp);
+        return self;
+    };
+    symbol(id).set_nud_bp(bp, nud);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        infix(u"+"_S, 1);
+        infix(u"-"_S, 1);
+        infix(u"*"_S, 2);
+        infix(u"/"_S, 2);
+        prefix(u"-"_S, 3);
+        symbol(u"(number)"_S).nud = [](std::unique_ptr<ASTNode>self){return self;};
+        symbol(u"(end)"_S);
+    }
+} code_block_1;
+
+auto nud_parens(std::unique_ptr<ASTNode> self)
+{
+    auto expr = expression();
+    advance(u")"_S);
+    return expr;
+}
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        symbol(u"("_S).nud = nud_parens;
+        symbol(u")"_S);
+        for (auto expr_str : create_array({u"-2 / 2 + 4 + 3 * 2"_S, u"2 * (3 + (4 * 5 + (6 * 7) * 8) - 9) * 10"_S}))
+            print(expr_str + u" = "_S + String(parse(expr_str)->eval()));
+    }
+} code_block_2;
+
+
 # https://www.rosettacode.org/wiki/Associative_array/Iteration#Python
 d = {'key1': 'value1', 'key2': 'value2'}
 
