@@ -505,6 +505,9 @@ class SymbolNode:
                     return 'range_elen_i(' + c0[len('(len)'):] + ')'
                 else:
                     return 'range_ei(' + c0 + ')'
+            elif self.symbol.id == '&':
+                assert(self.parent.symbol.id == '(') # )
+                return self.children[0].to_str()
             else:
                 return {'(-)':'~'}.get(self.symbol.id, self.symbol.id) + self.children[0].to_str()
         elif len(self.children) == 2:
@@ -1367,7 +1370,7 @@ infix('+', 110); infix('-', 110)
 infix('*', 120); infix('/', 120); infix('I/', 120); infix('Ц/', 120)
 infix('%', 120)
 
-prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('(-)', 130); prefix('--', 130); prefix('++', 130)
+prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('(-)', 130); prefix('--', 130); prefix('++', 130); prefix('&', 130)
 
 infix_r('^', 140)
 
