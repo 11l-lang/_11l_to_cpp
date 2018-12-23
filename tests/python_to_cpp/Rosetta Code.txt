@@ -2045,7 +2045,7 @@ for n in range(10):
 
 F gen(n)
    A txt = [‘[’, ‘]’] * n
-   random:shuffle(txt)
+   random:shuffle(&txt)
    R txt.join(‘’)
 
 F is_balanced(s)
