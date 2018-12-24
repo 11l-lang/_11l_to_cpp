@@ -2115,7 +2115,7 @@ sma3 = SMA(3)
 sma5 = SMA(5)
 
 for e in [1, 2, 3, 4, 5, 5, 4, 3, 2, 1]:
-    print('Added ' + str(e) + ', sma(3) = ' + str(sma3.add(e)) + ', sma(5) = ' + str(sma5.add(e)))
+    print('Added %d, sma(3) = %f, sma(5) = %f' % (e, sma3.add(e), sma5.add(e)))
 ===
 
 T SMA
@@ -2139,7 +2139,7 @@ A sma3 = SMA(3)
 A sma5 = SMA(5)
 
 L(e) [1, 2, 3, 4, 5, 5, 4, 3, 2, 1]
-   print(‘Added ’String(e)‘, sma(3) = ’String(sma3.add(e))‘, sma(5) = ’String(sma5.add(e)))
+   print(‘Added #.0, sma(3) = #.6, sma(5) = #.6’.format(e, sma3.add(e), sma5.add(e)))
 ===
 class SMA
 {
@@ -2173,7 +2173,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto e : create_array({1, 2, 3, 4, 5, 5, 4, 3, 2, 1}))
-            print(u"Added "_S + String(e) + u", sma(3) = "_S + String(sma3.add(e)) + u", sma(5) = "_S + String(sma5.add(e)));
+            print(u"Added #.0, sma(3) = #.6, sma(5) = #.6"_S.format(e, sma3.add(e), sma5.add(e)));
     }
 } code_block_1;
 
@@ -2257,5 +2257,105 @@ struct CodeBlock1
             auto s = gen(n);
             print(s + (u" "_S * (20 - s.len())) + u"is "_S + (is_balanced(s) ? u"balanced"_S : u"not balanced"_S));
         }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Benford%27s_law#D
+import math
+
+def get_fibs():
+    a = 1.0
+    b = 1.0
+    r : List[float] = []
+    for i in range(1000):
+        r.append(a)
+        (a, b) = (b, a + b)
+    return r
+
+def benford(seq):
+    freqs = [(0.0, 0.0)] * 9
+    seq_len = 0
+    for d in seq:
+        if d != 0:
+            i = ord(str(d)[0]) - ord('1')
+            freqs[i] = (freqs[i][0], freqs[i][1] + 1)
+            seq_len += 1
+
+    for i in range(len(freqs)):
+        freqs[i] = (math.log10(1.0 + 1.0 / (i + 1)), freqs[i][1] / seq_len)
+
+    return freqs
+
+print('%9s %9s %9s' % ('Actual', 'Expected', 'Deviation'))
+for i, p in enumerate(benford(get_fibs())):
+    print('%d: %5.2f%% | %5.2f%% | %5.4f%%' % (i+1, p[1] * 100, p[0] * 100, abs(p[1] - p[0]) * 100))
+===
+//import math
+
+F get_fibs()
+   A a = 1.0
+   A b = 1.0
+   Array[Float] r
+   L(i) 0.<1000
+      r.append(a)
+      (a, b) = (b, a + b)
+   R r
+
+F benford(seq)
+   A freqs = [(0.0, 0.0)] * 9
+   A seq_len = 0
+   L(d) seq
+      I d != 0
+         A i = String(d)[0].code - ‘1’.code
+         freqs[i] = (freqs[i][0], freqs[i][1] + 1)
+         seq_len++
+
+   L(i) 0 .< freqs.len
+      freqs[i] = (log10(1.0 + 1.0 / (i + 1)), freqs[i][1] / seq_len)
+   R freqs
+print(‘#9 #9 #9’.format(‘Actual’, ‘Expected’, ‘Deviation’))
+L(p) benford(get_fibs())
+   A i = L.index
+   print(‘#.0: #2.2% | #2.2% | #0.4%’.format(i + 1, p[1] * 100, p[0] * 100, abs(p[1] - p[0]) * 100))
+===
+auto get_fibs()
+{
+    auto a = 1.0;
+    auto b = 1.0;
+    Array<double> r;
+    for (auto i : range_el(0, 1000)) {
+        r.append(a);
+        std::tie(a, b) = make_tuple(b, a + b);
+    }
+    return r;
+}
+
+template <typename T1> auto benford(const T1 &seq)
+{
+    auto freqs = create_array({make_tuple(0.0, 0.0)}) * 9;
+    auto seq_len = 0;
+    for (auto d : seq)
+        if (d != 0) {
+            auto i = _get<0>(String(d)).code - u'1'_C.code;
+            freqs.set(i, make_tuple(_get<0>(freqs[i]), _get<1>(freqs[i]) + 1));
+            seq_len++;
+        }
+    for (auto i : range_el(0, freqs.len()))
+        freqs.set(i, make_tuple(log10(1.0 + 1.0 / (i + 1)), _get<1>(freqs[i]) / seq_len));
+    return freqs;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"#9 #9 #9"_S.format(u"Actual"_S, u"Expected"_S, u"Deviation"_S));
+        {int Lindex = 0;
+        for (auto p : benford(get_fibs())) {
+            auto i = Lindex;
+            print(u"#.0: #2.2% | #2.2% | #0.4%"_S.format(i + 1, _get<1>(p) * 100, _get<0>(p) * 100, abs(_get<1>(p) - _get<0>(p)) * 100));
+            Lindex++;
+        }}
     }
 } code_block_1;

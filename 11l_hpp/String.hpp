@@ -1,6 +1,7 @@
 ﻿#include <string>
 #include <cstring> // for memcmp in GCC
 #include <cwctype>
+#include <array>
 
 static class LocaleInitializer
 {
@@ -49,7 +50,8 @@ public:
 	String(Char c) : basic_string(1, c.code) {}
 	String(std::u16string &&s) : std::u16string(std::forward<std::u16string>(s)) {}
 	explicit String(char16_t c) : basic_string(1, c) {}
-	explicit String(int num)
+	explicit String(int num) {assign(num);}
+	void assign(int num)
 	{
 		char16_t staticBuffer[30];
 		int len = 0;
@@ -70,21 +72,56 @@ public:
 			*end=staticBuffer+len-1; start<end; start++, end--) std::swap(*start, *end);
 		assign(staticBuffer, len);
 	}
-	explicit String(float  num) {assign(num);}
-	explicit String(double num) {assign(num);}
+	explicit String(float  num, int digits = 6, bool remove_trailing_zeroes = true) {assign(num, digits, remove_trailing_zeroes);}
+	explicit String(double num, int digits = 9, bool remove_trailing_zeroes = true) {assign(num, digits, remove_trailing_zeroes);}
 	explicit String(const char16_t *&s) : basic_string(s) {} // reference is needed here because otherwise String(const char16_t (&s)[N]) is never called (`String(u"str")` calls `String(const char16_t *s)`)
 	String(const char16_t *s, size_t sz) : basic_string(s, sz) {}
 	template <int N> String(const char16_t (&s)[N]): basic_string(s, N-1) {}
 	template <class T> explicit String(const T s, const T e) : basic_string(s, e) {}
 
 	using std::u16string::assign;
-	void assign(double num)
+	void assign(double num, int digits = 9, bool remove_trailing_zeroes = true)
 	{
-		std::wstring ws = std::to_wstring(num);
-		size_t l = ws.length() - 1;
-		while (ws[l] == '0') l--;
-		if (ws[l] == '.') l--;
-		assign(ws.begin(), ws.begin() + l + 1);
+		if (!_finite(num)) {clear(); return;}
+
+		if (fabs(num) > 1e9)
+		{
+			double exponent = floor(log10(fabs(num)));
+			num *= pow(.1, exponent);
+			if (fabs(num) > 1e9) return; // infinite recursion elimination
+			assign(num, digits);
+			append(1, u'e');
+			append(String(exponent));
+			return;
+		}
+
+		num += sign(num) * pow(.1, digits) * .5; // adjust number (0.199999 -> 0.2)
+		if ((int)num)
+			assign((int)num);
+		else // for numbers in range (-1; 0), as `(int)num` for them equals to 0
+		{
+			clear();
+			if (num < 0) append(1, u'-');
+			append(1, u'0');
+		}
+		num = fabs(num - (double)(int)num);
+		if (digits > 0)
+		{
+			append(1, u'.');
+			for (int i=0; i<digits; i++)
+			{
+				num *= 10.;
+				append(1, u'0'+int(num));
+				num -= (double)(int)num;
+			}
+			// Remove trailing zeroes ...
+			if (remove_trailing_zeroes) {
+				size_t l = length() - 1;
+				while (at(l) == u'0') l--;
+				if (at(l) == u'.') l--; // ... and dot/period.
+				resize(l + 1);
+			}
+		}
 	}
 
 	class Iterator
@@ -417,6 +454,101 @@ public:
 	friend String operator+(double n, const String &s) {return String(n) + s;}
 	friend String operator+(Char ch, const String &s) {return String(ch) + s;}
 	friend String operator+(char16_t ch, const String &s) {return String(ch) + s;}
+
+private:
+	struct FormatArgument//Field
+	{
+		enum class Type {STRING, NUMBER} type;
+		union {
+			const String *string;
+			double number;
+		};
+
+		void set(int n)
+		{
+			type = Type::NUMBER;
+			number = n;
+		}
+		void set(double n)
+		{
+			type = Type::NUMBER;
+			number = n;
+		}
+		void set(const String &s)
+		{
+			type = Type::STRING;
+			string = &s;
+		}
+	};
+
+	template <size_t size> static void fill_in_format_arguments(std::array<FormatArgument, size> &arr_args, int index)
+	{
+		if (index != size)
+			throw AssertionError();
+	}
+
+	template <size_t size, typename Type, typename ... Types> static void fill_in_format_arguments(std::array<FormatArgument, size> &arr_args, int index, const Type &arg, const Types&... args)
+	{
+		arr_args[index].set(arg);
+		fill_in_format_arguments(arr_args, index + 1, args...);
+	}
+public:
+	template <typename ... Types> String format(const Types&... args) const
+	{
+		std::array<FormatArgument, sizeof...(args)> format_arguments;
+		fill_in_format_arguments(format_arguments, 0, args...);
+
+		int argument_index = 0;
+		String r;
+		const char16_t *s = data();
+		for (int i=0; i<len();)
+			if (s[i] == '#' && (s[i+1] == '.' || Char(s[i+1]).is_digit())) {
+				int before_period = 0,
+					 after_period = 0;
+				bool has_period = false;
+				i++;
+				if (s[i] == '.' && !Char(s[i+1]).is_digit()) // #.
+					i++;
+				else {
+					//if (Char(s[i]).is_digit())
+						for (; Char(s[i]).is_digit(); i++)
+							before_period = before_period*10 + (s[i] - '0');
+					if (s[i] == '.' && Char(s[i+1]).is_digit()) { // the second condition is needed for a such case: `x, y: #6, #6.`
+						has_period = true;
+						for (i++; Char(s[i]).is_digit(); i++)
+							after_period = after_period*10 + (s[i] - '0');
+					}
+				}
+
+				FormatArgument fa = format_arguments[argument_index++];
+				if (fa.type == FormatArgument::Type::STRING) {
+					if (has_period)
+						throw AssertionError();
+					r.resize(r.size() + max(before_period - fa.string->len(), 0), ' ');
+					r += *fa.string;
+				}
+				else {
+					if (before_period == 0 && after_period == 0) // #.
+						r += String(fa.number);
+					else {
+						if (!has_period && fract(fa.number) != 0) {
+							std::wcerr << L"If you want to truncate floating point number, then append ‘.0’ to format specifier (or use integer number instead of floating point number)\n";
+							throw AssertionError();
+						}
+						String s(fa.number, after_period, false);
+						r.resize(r.size() + max(after_period + bool(after_period) + before_period - s.len(), 0), ' ');
+						r += s;
+					}
+				}
+			}
+			else
+				r += s[i++];
+
+		if (argument_index != sizeof...(args))
+			throw AssertionError();
+
+		return r;
+	}
 };
 
 inline String operator+(Char ch1, Char ch2)

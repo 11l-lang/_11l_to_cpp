@@ -11,6 +11,7 @@ using std::make_tuple;
 template <int n, typename Container> inline auto _get(const Container &c) -> decltype(c[n]) {return c[n];}
 template <int n, typename Container> inline auto _get(      Container &c) -> decltype(c[n]) {return c[n];}
 template <int n, typename...Types> inline const auto &_get(const Tuple<Types...> &t) {return std::get<n>(t);}
+template <int n, typename...Types> inline       auto &_get(      Tuple<Types...> &t) {return std::get<n>(t);}
 
 #if __GNUC__ || __INTEL_COMPILER // || __clang__ // Clang already defines __GNUC__
 #define likely(x) __builtin_expect(!!(x), 1)
@@ -49,6 +50,8 @@ public:
 	IndexError(int index) : index(index) {}
 };
 
+class AssertionError {};
+
 #include "11l_hpp/funcs.hpp"
 #include "11l_hpp/Range.hpp"
 #include "11l_hpp/String.hpp"
@@ -60,8 +63,6 @@ public:
 #include <iostream>
 
 #define assert(...) assert_file_line(__FILE__, __LINE__, __VA_ARGS__)
-
-class AssertionError {};
 
 inline void assert_file_line(const char *file_name, int line, bool expression, const String &message = String())
 {
