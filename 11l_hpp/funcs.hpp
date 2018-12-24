@@ -17,3 +17,5 @@ inline const short    mod(short    x, short    y) {return x%y;}
 inline const int      mod(int      x, int      y) {return x%y;}
 inline const unsigned mod(unsigned x, unsigned y) {return x%y;}
 template <class T, class Ta> inline T mod(const T &x, const Ta &y) {return x - y*floor(x/y);}
+
+template <class T> inline T sign(const T x) {return x>0 ? T(1) : (x<0 ? T(-1) : 0);}

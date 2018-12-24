@@ -1062,3 +1062,16 @@ struct CodeBlock1
         print(fs::path::split_ext(u"a/b.c/d"_S) == make_tuple(u"a/b.c/d"_S, u""_S));
     }
 } code_block_1;
+
+
+print('Number: %g.' % (1.1))
+===
+print(‘Number: #..’.format(1.1))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Number: #.."_S.format(1.1));
+    }
+} code_block_1;
