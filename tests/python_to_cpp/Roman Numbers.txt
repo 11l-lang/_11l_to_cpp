@@ -318,7 +318,7 @@ if __name__ == '__main__':
 ===
 F checkio(=data)
    A coding = zip([1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1], [‘M’, ‘CM’, ‘D’, ‘CD’, ‘C’, ‘XC’, ‘L’, ‘XL’, ‘X’, ‘IX’, ‘V’, ‘IV’, ‘I’])
-   Array[String] result
+   [String] result
    L(dr) coding
       A d = dr[0]
       A r = dr[1]

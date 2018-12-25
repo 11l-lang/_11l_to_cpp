@@ -71,7 +71,7 @@ struct CodeBlock1
 
 
 // https://www.rosettacode.org/wiki/Amb#Nim
-F amb(comp, options, prev = ‘’) -> Array[String]
+F amb(comp, options, prev = ‘’) -> [String]
    I options.empty
       R []
 

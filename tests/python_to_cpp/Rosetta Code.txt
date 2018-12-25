@@ -29,7 +29,7 @@ T Node
       .left = left
       .right = right
 
-   F tree_indent() -> Array[String]
+   F tree_indent() -> [String]
       A tr = I .right != N {.right.tree_indent()} E [‘-- (null)’]
       R [‘--’(.value)] [+] (I .left != N {.left.tree_indent()} E [‘-- (null)’]).map(a -> ‘  |’a) [+] [‘  `’tr[0]] + tr[1..].map(a -> ‘   ’a)
 A tree = Node(1, Node(2, Node(4, Node(7)), Node(5)), Node(3, Node(6, Node(8), Node(9))))
@@ -80,7 +80,7 @@ def rangeexpand(txt):
 print(rangeexpand('-6,-3--1,3-5,7-11,14,15,17-20'))
 ===
 F rangeexpand(txt)
-   Array[Int] lst
+   [Int] lst
    L(r) txt.split(‘,’)
       I ‘-’ C r[1..]
          A rr = r[1..].split(‘-’, 1 + 1)
@@ -183,7 +183,7 @@ bf('++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.
 
 F bf(source)
    Dict[Int, Int] loop_ptrs
-   Array[Int] loop_stack
+   [Int] loop_stack
    L(opcode) source
       A ptr = L.index
       I opcode == ‘[’
@@ -487,7 +487,7 @@ F compress(uncompressed)
    A dict_size = 256
    A dictionary = Dict((0 .< dict_size).map(i -> (String(Char(code' i)), i)))
    A w = ‘’
-   Array[Int] result
+   [Int] result
    L(c) uncompressed
       A wc = w‘’c
       I wc C dictionary
@@ -502,7 +502,7 @@ F compress(uncompressed)
       result.append(dictionary[w])
    R result
 
-F decompress(Array[Int] &compressed)
+F decompress([Int] &compressed)
    A dict_size = 256
    A dictionary = Dict((0 .< dict_size).map(i -> (i, String(Char(code' i)))))
    A result = ‘’
@@ -891,7 +891,7 @@ F k_prime(k, =n)
 
 F primes(k, n)
    A i = 2
-   Array[Int] list
+   [Int] list
    L list.len < n
       I k_prime(k, i)
          list.append(i)
@@ -956,7 +956,7 @@ for ana in anagram.values():
         print(ana)
 ===
 //import collections
-DefaultDict[String, Array[String]] anagram
+DefaultDict[String, [String]] anagram
 L(word) File(‘unixdict.txt’).read().split("\n")
    anagram[sorted(word).join(‘’)].append(word)
 A count = max(anagram.values().map(ana -> ana.len))
@@ -1021,7 +1021,7 @@ F is_not_deranged(s1, s2)
       I s1[i] == s2[i]
          R 1B
    R 0B
-Dict[String, Array[String]] anagram
+Dict[String, [String]] anagram
 A count = 0
 L(word) File(‘unixdict.txt’).read().split("\n")
    A a = sorted(word).join(‘’)
@@ -1410,7 +1410,7 @@ T ASTNode
             assert(0B)
             R 0
 Dict[String, Symbol] symbol_table
-Array[String] tokens
+[String] tokens
 A tokeni = -1
 ASTNode token_node
 
@@ -2119,7 +2119,7 @@ for e in [1, 2, 3, 4, 5, 5, 4, 3, 2, 1]:
 ===
 
 T SMA
-   Array[Float] data
+   [Float] data
    sum = 0.0
    index = 0
    n_filled = 0
@@ -2296,7 +2296,7 @@ for i, p in enumerate(benford(get_fibs())):
 F get_fibs()
    A a = 1.0
    A b = 1.0
-   Array[Float] r
+   [Float] r
    L(i) 0.<1000
       r.append(a)
       (a, b) = (b, a + b)

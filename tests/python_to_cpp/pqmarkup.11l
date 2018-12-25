@@ -12,7 +12,7 @@ T Exception
       .pos = pos
 
 T Converter
-   Array[Int] to_html_called_inside_to_html_outer_pos_list
+   [Int] to_html_called_inside_to_html_outer_pos_list
    Bool habr_html
    Bool ohd
    String instr
@@ -40,7 +40,7 @@ T Converter
 
    F to_html(instr, File? outfilef = N, ', outer_pos = 0) -> String
       .to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
-      Array[String] result
+      [String] result
       T Writer
          (String -> N) write
       A outfile = Writer()
@@ -206,7 +206,7 @@ T Converter
          I @in_unordered_list
             @write_to_i("</li>\n</ul>\n", 0)
             @in_unordered_list = 0B
-      Array[String] ending_tags
+      [String] ending_tags
       A new_line_tag = "\0"
 
       L i < instr.len
@@ -435,12 +435,12 @@ T Converter
                A header_row = 0B
                A hor_row_align = ‘’
                A ver_row_align = ‘’
-               Array[Array[Array[String]]] table
+               [Array[Array[String]]] table
                A j = startqpos + 1
                L j < endqpos
                   ch = instr[j]
                   I ch == "‘"
-                     Array[Array[String]] empty_list
+                     [[String]] empty_list
                      table.append(empty_list)
                      A endrow = find_ending_pair_quote(j)
                      A hor_col_align = ‘’

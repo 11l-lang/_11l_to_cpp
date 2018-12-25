@@ -116,7 +116,7 @@ class ASTTypeHint:
 A python_types_to_11l = [‘int’ = ‘Int’, ‘str’ = ‘String’, ‘bool’ = ‘Bool’, ‘List’ = ‘Array’, ‘Tuple’ = ‘Tuple’]
 
 T ASTTypeHint
-   Array[String] type_args
+   [String] type_args
    F to_str()
       R .type_args.map(ty -> :python_types_to_11l[ty]).join(‘, ’)
 ===
