@@ -1005,6 +1005,7 @@ class ASTLoopWasNoBreak(ASTNodeWithChildren):
 
 class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
     loop_variable : str = None
+    is_loop_variable_a_reference = False
     break_label_needed = -1
     has_L_index = False
     has_L_next  = False
@@ -1028,7 +1029,7 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
                     tr = 'for (auto &&[' + self.loop_variable + '] : ' + self.expression.to_str() + ')'
                 else:
                     loop_auto = True
-                    tr = 'for (auto ' + '&&'*self.is_loop_variable_a_ptr + (self.loop_variable if self.loop_variable != None else '__unused') + ' : ' + self.expression.to_str() + ')'
+                    tr = 'for (auto ' + '&&'*self.is_loop_variable_a_ptr + '&'*self.is_loop_variable_a_reference + (self.loop_variable if self.loop_variable != None else '__unused') + ' : ' + self.expression.to_str() + ')'
             else:
                 tr = 'while (' + (self.expression.to_str() if self.expression != None else 'true') + ')'
         rr = self.children_to_str_detect_single_stmt(indent, tr)
@@ -1879,6 +1880,9 @@ def parse_internal(this_node):
                         node.expression = None
                     else:
                         if token.value(source) == '(':
+                            if peek_token().value(source) == '&':
+                                node.is_loop_variable_a_reference = True
+                                next_token()
                             node.loop_variable = expected_name('loop variable')
                             if token.value(source) == ',':
                                 node.loop_variable += ', ' + expected_name('loop variable2')

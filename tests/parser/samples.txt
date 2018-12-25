@@ -854,3 +854,21 @@ struct CodeBlock1
  1%)");
     }
 } code_block_1;
+
+
+A freqs = [1, 2]
+L(&f) freqs
+   f *= 2
+print(freqs)
+===
+auto freqs = create_array({1, 2});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &f : freqs)
+            f *= 2;
+        print(freqs);
+    }
+} code_block_1;
