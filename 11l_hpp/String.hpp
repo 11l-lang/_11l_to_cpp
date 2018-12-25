@@ -82,7 +82,7 @@ public:
 	using std::u16string::assign;
 	void assign(double num, int digits = 9, bool remove_trailing_zeroes = true)
 	{
-		if (!_finite(num)) {clear(); return;}
+		if (!isfinite(num)) {clear(); return;}
 
 		if (fabs(num) > 1e9)
 		{

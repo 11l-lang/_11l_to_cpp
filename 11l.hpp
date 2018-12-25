@@ -54,13 +54,13 @@ class AssertionError {};
 
 #include "11l_hpp/funcs.hpp"
 #include "11l_hpp/Range.hpp"
+#include <iostream> // for std::wcerr in String.hpp
 #include "11l_hpp/String.hpp"
 #include "11l_hpp/Array.hpp"
 #include "11l_hpp/Dict.hpp"
 #include "11l_hpp/pointers.hpp"
 
 #include <functional>
-#include <iostream>
 
 #define assert(...) assert_file_line(__FILE__, __LINE__, __VA_ARGS__)
 
