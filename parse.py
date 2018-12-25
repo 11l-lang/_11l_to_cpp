@@ -195,6 +195,23 @@ class SymbolNode:
     def token_str(self):
         return self.token.value(source) if not self.token_str_override else self.token_str_override
 
+    def to_type_str(self):
+        if self.symbol.id == '[': # ]
+            if self.is_list:
+                assert(len(self.children) == 1)
+                return 'Array[' + self.children[0].to_type_str() + ']'
+            else:
+                assert(self.is_type)
+                r = self.children[0].token.value(source) + '['
+                for i in range(1, len(self.children)):
+                    r += self.children[i].to_type_str()
+                    if i < len(self.children) - 1:
+                        r += ', '
+                return r + ']'
+    
+        assert(self.token.category == Token.Category.NAME)
+        return self.token_str()
+
     def to_str(self):
         if self.token.category == Token.Category.NAME:
             if self.token_str() in ('L.index', 'Ц.индекс', 'loop.index', 'цикл.индекс'):
@@ -769,7 +786,7 @@ def trans_type(ty, scope, type_token, ast_type_node = None):
     else:
         p = ty.find('[') # ]
         if p != -1:
-            return trans_type(ty[:p], scope, type_token, ast_type_node) + '<' + trans_type(ty[p+1:-1], scope, type_token, ast_type_node) + '>'
+            return (trans_type(ty[:p], scope, type_token, ast_type_node) if p != 0 else 'Array') + '<' + trans_type(ty[p+1:-1], scope, type_token, ast_type_node) + '>'
 
         id = scope.find(ty)
         if id == None:
@@ -849,9 +866,9 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
             elif self.function_name == '(destructor)':
                 s = '~' + self.parent.type_name
             elif self.function_name == '()': # this is `operator()`
-                s = ('auto' if self.function_return_type == '' else cpp_type_from_11l[self.function_return_type]) + ' operator()'
+                s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' operator()'
             else:
-                s = ('auto' if self.function_return_type == '' else cpp_type_from_11l[self.function_return_type]) + ' ' + self.function_name
+                s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + self.function_name
 
             if self.virtual_category != self.VirtualCategory.NO:
                 arguments = []
@@ -1763,7 +1780,7 @@ def parse_internal(this_node):
                             node.function_return_type = 'auto&'
                             next_token()
                         else:
-                            node.function_return_type = expression().to_str()
+                            node.function_return_type = expression().to_type_str()
 
                 if node.virtual_category != node.VirtualCategory.ABSTRACT:
                     new_scope(node, map(lambda arg: (arg[0], arg[2]), node.function_arguments))
@@ -2025,16 +2042,16 @@ def parse_internal(this_node):
                         if node_expression.is_dict:
                             assert(len(node_expression.children) == 1)
                             node.type = 'Dict'
-                            node.type_args = [node_expression.children[0].children[0].to_str(), node_expression.children[0].children[1].to_str()]
+                            node.type_args = [node_expression.children[0].children[0].to_type_str(), node_expression.children[0].children[1].to_type_str()]
                         elif node_expression.is_list:
                             assert(len(node_expression.children) == 1)
                             node.type = 'Array'
-                            node.type_args = [node_expression.children[0].to_str()]
+                            node.type_args = [node_expression.children[0].to_type_str()]
                         else:
                             assert(node_expression.is_type)
                             node.type = node_expression.children[0].token.value(source)
                             for i in range(1, len(node_expression.children)):
-                                node.type_args.append(node_expression.children[i].to_str())
+                                node.type_args.append(node_expression.children[i].to_type_str())
                     elif node.type == '(': # )
                         node.function_pointer = True
                         for i in range(len(node_expression.children)):

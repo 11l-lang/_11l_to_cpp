@@ -185,7 +185,7 @@ F f()
    Dict[String, Int] dict
    dict[‘key’] = 1
    assert(‘key’ C dict)
-   Array[Int] arr
+   [Int] arr
    arr [+]= 10
 ===
 auto f()
@@ -733,7 +733,7 @@ T Cat(Animal)
       print(‘meow’)
 
 :start:
-Array[Animal] animals
+[Animal] animals
 animals [+]= Sheep()
 animals [+]= Cat()
 A animal = Sheep()
