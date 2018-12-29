@@ -2098,7 +2098,7 @@ class SMA:
     sum = 0.0
     index = 0
     n_filled = 0
-    period : int
+    period : int # Why not `period = 0`? Because `Int period` means that `period` must be initialized in constructor.
 
     def __init__(self, period):
         self.period = period

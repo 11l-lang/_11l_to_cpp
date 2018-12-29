@@ -640,3 +640,16 @@ inline String hex(int n)
 		r.append(1, u'0');
 	return r;
 }
+
+inline String bin(int n)
+{
+	char16_t r[32], *p = r;
+	for (int i=0; i<32; i++, n <<= 1)
+		if (n & 0x8000'0000) {
+			*p++ = u'1';
+			for (i++, n <<= 1; i<32; i++, n <<= 1)
+				*p++ = u'0' + (unsigned(n) >> 31);
+			return String(r, p - r);
+		}
+	return String(u'0');
+}
