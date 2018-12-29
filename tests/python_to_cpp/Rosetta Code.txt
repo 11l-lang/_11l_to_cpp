@@ -30,9 +30,9 @@ T Node
       .right = right
 
    F tree_indent() -> [String]
-      A tr = I .right != N {.right.tree_indent()} E [‘-- (null)’]
+      V tr = I .right != N {.right.tree_indent()} E [‘-- (null)’]
       R [‘--’(.value)] [+] (I .left != N {.left.tree_indent()} E [‘-- (null)’]).map(a -> ‘  |’a) [+] [‘  `’tr[0]] + tr[1..].map(a -> ‘   ’a)
-A tree = Node(1, Node(2, Node(4, Node(7)), Node(5)), Node(3, Node(6, Node(8), Node(9))))
+V tree = Node(1, Node(2, Node(4, Node(7)), Node(5)), Node(3, Node(6, Node(8), Node(9))))
 print(tree.tree_indent().join("\n"))
 ===
 class Node : public SharedObject
@@ -83,7 +83,7 @@ F rangeexpand(txt)
    [Int] lst
    L(r) txt.split(‘,’)
       I ‘-’ C r[1..]
-         A rr = r[1..].split(‘-’, 1 + 1)
+         V rr = r[1..].split(‘-’, 1 + 1)
          lst [+]= (Int(r[0]‘’rr[0]) .< Int(rr[1]) + 1)
       E
          lst.append(Int(r))
@@ -126,11 +126,11 @@ while True:
 //import random
 
 L
-   A a = random:(20)
+   V a = random:(20)
    print(a)
    I a == 10
       L.break
-   A b = random:(20)
+   V b = random:(20)
    print(b)
 ===
 struct CodeBlock1
@@ -185,18 +185,18 @@ F bf(source)
    Dict[Int, Int] loop_ptrs
    [Int] loop_stack
    L(opcode) source
-      A ptr = L.index
+      V ptr = L.index
       I opcode == ‘[’
          loop_stack.append(ptr)
       I opcode == ‘]’
-         A sptr = loop_stack.pop()
+         V sptr = loop_stack.pop()
          loop_ptrs[ptr] = sptr
          loop_ptrs[sptr] = ptr
-   A tape = DefaultDict[Int, Int]()
-   A cell = 0
-   A ptr = 0
+   V tape = DefaultDict[Int, Int]()
+   V cell = 0
+   V ptr = 0
    L ptr < source.len
-      A opcode = source[ptr]
+      V opcode = source[ptr]
       I opcode == ‘>’
          cell++
       E I opcode == ‘<’
@@ -308,9 +308,9 @@ bf('++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.
 //import sys, collections
 
 F bf(source)
-   A tape = DefaultDict[Int, Int]()
-   A cell = 0
-   A ptr = 0
+   V tape = DefaultDict[Int, Int]()
+   V cell = 0
+   V ptr = 0
    L ptr < source.len
       S source[ptr]
          ‘>’
@@ -327,7 +327,7 @@ F bf(source)
             tape[cell] = :stdin.read(1).code
          ‘[’
             I tape[cell] == 0
-               A nesting_level = 0
+               V nesting_level = 0
                L
                   S source[ptr]
                      ‘[’
@@ -338,7 +338,7 @@ F bf(source)
                   ptr++
          ‘]’
             I tape[cell] != 0
-               A nesting_level = 0
+               V nesting_level = 0
                L
                   S source[ptr]
                      ‘[’
@@ -484,12 +484,12 @@ print(decompress(compressed))
 //import sys
 
 F compress(uncompressed)
-   A dict_size = 256
-   A dictionary = Dict((0 .< dict_size).map(i -> (String(Char(code' i)), i)))
-   A w = ‘’
+   V dict_size = 256
+   V dictionary = Dict((0 .< dict_size).map(i -> (String(Char(code' i)), i)))
+   V w = ‘’
    [Int] result
    L(c) uncompressed
-      A wc = w‘’c
+      V wc = w‘’c
       I wc C dictionary
          w = wc
       E
@@ -503,13 +503,13 @@ F compress(uncompressed)
    R result
 
 F decompress([Int] &compressed)
-   A dict_size = 256
-   A dictionary = Dict((0 .< dict_size).map(i -> (i, String(Char(code' i)))))
-   A result = ‘’
-   A w = String(Char(code' compressed.pop(0)))
+   V dict_size = 256
+   V dictionary = Dict((0 .< dict_size).map(i -> (i, String(Char(code' i)))))
+   V result = ‘’
+   V w = String(Char(code' compressed.pop(0)))
    result ‘’= w
    L(k) compressed
-      A entry = ‘’
+      V entry = ‘’
       I k C dictionary
          entry = dictionary[k]
       E I k == dict_size
@@ -521,7 +521,7 @@ F decompress([Int] &compressed)
       dict_size++
       w = entry
    R result
-A compressed = compress(‘TOBEORNOTTOBEORTOBEORNOT’)
+V compressed = compress(‘TOBEORNOTTOBEORTOBEORNOT’)
 print(compressed)
 print(decompress(compressed))
 ===
@@ -589,7 +589,7 @@ for i in range(100):
        doors[j] = not doors[j]
    print('Door ' + str(i+1) + ': '+ ('open' if doors[i] else 'close'))
 ===
-A doors = [0B] * 100
+V doors = [0B] * 100
 L(i) 0.<100
    L(j) (i .< 100).step(i + 1)
       doors[j] = !(doors[j])
@@ -645,7 +645,7 @@ print(', '.join("'" + w + "': " + str(can_make_word(w)) for w in ['', 'a', 'baRk
 F can_make_word(word)
    I word == ‘’
       R 0B
-   A blocks_remaining = ‘BO XK DQ CP NA GT RE TG QD FS JW HU VI AN OB ER FS LY PC ZM’.split(‘ ’)
+   V blocks_remaining = ‘BO XK DQ CP NA GT RE TG QD FS JW HU VI AN OB ER FS LY PC ZM’.split(‘ ’)
 
    L(ch) word.uppercase()
       L(block) blocks_remaining
@@ -707,12 +707,12 @@ print("Abundant  = " + str(abundant))
 ===
 F sum_proper_divisors(n)
    R I n < 2 {0} E sum((1 .< n I/ 2 + 1).filter(it -> (@n % it) == 0))
-A deficient = 0
-A perfect = 0
-A abundant = 0
+V deficient = 0
+V perfect = 0
+V abundant = 0
 
 L(n) 1 .< 20000 + 1
-   A sp = sum_proper_divisors(n)
+   V sp = sum_proper_divisors(n)
    I sp < n
       deficient++
    E I sp == n
@@ -780,27 +780,27 @@ for i, justify in enumerate([ljust, centr, rjust]):
         print()
     print("- " * 52)
 ===
-A txt = ‘Given$a$txt$file$of$many$lines,$where$fields$within$a$line$
+V txt = ‘Given$a$txt$file$of$many$lines,$where$fields$within$a$line$
 are$delineated$by$a$single$'dollar'$character,$write$a$program
 that$aligns$each$column$of$fields$by$ensuring$that$words$in$each$
 column$are$separated$by$at$least$one$space.
 Further,$allow$for$each$word$in$a$column$to$be$either$left$
 justified,$right$justified,$or$center$justified$within$its$column.’
-A parts = txt.split("\n").map(line -> line.rtrim(‘$’).split(‘$’))
-A max_widths = [0] * parts[0].len
+V parts = txt.split("\n").map(line -> line.rtrim(‘$’).split(‘$’))
+V max_widths = [0] * parts[0].len
 L(line) parts
    L(word) line
-      A i = L.index
+      V i = L.index
       max_widths[i] = max(max_widths[i], word.len)
 (String, Int -> String) ljust = (s, w) -> s‘’(‘ ’ * (w - s.len))
 (String, Int -> String) centr = (s, w) -> (‘ ’ * (w - s.len - (w I/ 2 - s.len I/ 2)))‘’s‘’(‘ ’ * (w I/ 2 - s.len I/ 2))
 (String, Int -> String) rjust = (s, w) -> (‘ ’ * (w - s.len))‘’s
 L(justify) [ljust, centr, rjust]
-   A i = L.index
+   V i = L.index
    print([‘Left’, ‘Center’, ‘Right’][i]‘ column-aligned output:’)
    L(line) parts
       L(word) line
-         A j = L.index
+         V j = L.index
          print(justify(word, max_widths[j]), end' ‘ ’)
       print()
    print(‘- ’ * 52)
@@ -880,8 +880,8 @@ for k in range(1, 6):
     print(primes(k, 10))
 ===
 F k_prime(k, =n)
-   A f = 0
-   A p = 2
+   V f = 0
+   V p = 2
    L f < k & p * p <= n
       L n % p == 0
          n /= p
@@ -890,7 +890,7 @@ F k_prime(k, =n)
    R f + (I n > 1 {1} E 0) == k
 
 F primes(k, n)
-   A i = 2
+   V i = 2
    [Int] list
    L list.len < n
       I k_prime(k, i)
@@ -959,7 +959,7 @@ for ana in anagram.values():
 DefaultDict[String, [String]] anagram
 L(word) File(‘unixdict.txt’).read().split("\n")
    anagram[sorted(word).join(‘’)].append(word)
-A count = max(anagram.values().map(ana -> ana.len))
+V count = max(anagram.values().map(ana -> ana.len))
 
 L(ana) anagram.values()
    I ana.len == count
@@ -1022,9 +1022,9 @@ F is_not_deranged(s1, s2)
          R 1B
    R 0B
 Dict[String, [String]] anagram
-A count = 0
+V count = 0
 L(word) File(‘unixdict.txt’).read().split("\n")
-   A a = sorted(word).join(‘’)
+   V a = sorted(word).join(‘’)
    I a !C anagram
       anagram[a] = [word]
    E
@@ -1139,11 +1139,11 @@ while True:
 
     n += 1
 ===
-A max_divisors = 0
-A c = 0
-A n = 1
+V max_divisors = 0
+V c = 0
+V n = 1
 L
-   A divisors = 1
+   V divisors = 1
    L(i) 1 .< n I/ 2 + 1
       I n % i == 0
          divisors++
@@ -1188,8 +1188,8 @@ array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 arrsq = list(map(lambda i: i*i, array))
 print(arrsq)
 ===
-A array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-A arrsq = array.map(i -> i * i)
+V array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+V arrsq = array.map(i -> i * i)
 print(arrsq)
 ===
 auto array = create_array({1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
@@ -1219,8 +1219,8 @@ print(agm(1, 1 / math.sqrt(2)))
 //import math
 
 F agm(a0, g0, tolerance = 1e-10)
-   A an = (a0 + g0) / 2.0
-   A gn = sqrt(a0 * g0)
+   V an = (a0 + g0) / 2.0
+   V gn = sqrt(a0 * g0)
    L abs(an - gn) > tolerance
       (an, gn) = ((an + gn) / 2.0, sqrt(an * gn))
    R an
@@ -1411,7 +1411,7 @@ T ASTNode
             R 0
 Dict[String, Symbol] symbol_table
 [String] tokens
-A tokeni = -1
+V tokeni = -1
 ASTNode token_node
 
 F advance(sid = ‘’)
@@ -1422,7 +1422,7 @@ F advance(sid = ‘’)
    I :tokeni == tokens.len
       :token_node.symbol = :symbol_table[‘(end)’]
       R
-   A token = :tokens[:tokeni]
+   V token = :tokens[:tokeni]
    :token_node.symbol = :symbol_table[I token.is_digit() {‘(number)’} E token]
    I token.is_digit()
       :token_node.value = Int(token)
@@ -1430,7 +1430,7 @@ F advance(sid = ‘’)
 F expression(rbp = 0)
    ASTNode t = :token_node
    advance()
-   A left = t.symbol.nud(t)
+   V left = t.symbol.nud(t)
    L rbp < :token_node.symbol.lbp
       t = :token_node
       advance()
@@ -1445,7 +1445,7 @@ F parse(expr_str) -> ASTNode
 
 F symbol(id, bp = 0) -> &
    I !(id C :symbol_table)
-      A s = Symbol()
+      V s = Symbol()
       s.id = id
       s.lbp = bp
       :symbol_table[id] = s
@@ -1472,7 +1472,7 @@ symbol(‘(number)’).nud = self -> self
 symbol(‘(end)’)
 
 F nud_parens(ASTNode self)
-   A expr = expression()
+   V expr = expression()
    advance(‘)’)
    R expr
 symbol(‘(’).nud = nud_parens
@@ -1814,7 +1814,7 @@ for key in d.keys():
 for value in d.values():
     print(value)
 ===
-A d = [‘key1’ = ‘value1’, ‘key2’ = ‘value2’]
+V d = [‘key1’ = ‘value1’, ‘key2’ = ‘value2’]
 
 L(key, value) d
    print(key‘ = ’value)
@@ -1879,8 +1879,8 @@ print(mean_angle([10, 20, 30]))
 //import math
 
 F mean_angle(angles)
-   A x = sum(angles.map(a -> cos(radians(a)))) / angles.len
-   A y = sum(angles.map(a -> sin(radians(a)))) / angles.len
+   V x = sum(angles.map(a -> cos(radians(a)))) / angles.len
+   V y = sum(angles.map(a -> sin(radians(a)))) / angles.len
    R degrees(atan2(y, x))
 print(mean_angle([350, 10]))
 print(mean_angle([90, 180, 270, 360]))
@@ -1933,22 +1933,22 @@ print(mean_time(['23:00:17', '23:40:20', '00:12:45', '00:17:19']))
 //import math
 
 F mean_angle(angles)
-   A x = sum(angles.map(a -> cos(radians(a)))) / angles.len
-   A y = sum(angles.map(a -> sin(radians(a)))) / angles.len
+   V x = sum(angles.map(a -> cos(radians(a)))) / angles.len
+   V y = sum(angles.map(a -> sin(radians(a)))) / angles.len
    R degrees(atan2(y, x))
 
 F mean_time(times)
-   A t = (times.map(time -> time.split(‘:’)))
-   A seconds = (t.map(hms -> (Float(hms[2]) + Int(hms[1]) * 60 + Int(hms[0]) * 3600)))
-   A day = 24 * 60 * 60
-   A to_angles = seconds.map(s -> s * 360.0 / @day)
-   A mean_as_angle = mean_angle(to_angles)
-   A mean_seconds = round(mean_as_angle * day / 360.0)
+   V t = (times.map(time -> time.split(‘:’)))
+   V seconds = (t.map(hms -> (Float(hms[2]) + Int(hms[1]) * 60 + Int(hms[0]) * 3600)))
+   V day = 24 * 60 * 60
+   V to_angles = seconds.map(s -> s * 360.0 / @day)
+   V mean_as_angle = mean_angle(to_angles)
+   V mean_seconds = round(mean_as_angle * day / 360.0)
    I mean_seconds < 0
       mean_seconds += day
-   A h = mean_seconds I/ 3600
-   A m = mean_seconds % 3600
-   A s = m % 60
+   V h = mean_seconds I/ 3600
+   V m = mean_seconds % 3600
+   V s = m % 60
    m = m I/ 60
    R String(h).zfill(2)‘:’String(m).zfill(2)‘:’String(s).zfill(2)
 print(mean_time([‘23:00:17’, ‘23:40:20’, ‘00:12:45’, ‘00:17:19’]))
@@ -1996,8 +1996,8 @@ print(median([4.1, 5.6, 7.2, 1.7, 9.3, 4.4, 3.2]))
 print(median([4.1, 7.2, 1.7, 9.3, 4.4, 3.2]))
 ===
 F median(aray)
-   A srtd = sorted(aray)
-   A alen = srtd.len
+   V srtd = sorted(aray)
+   V alen = srtd.len
    R 0.5 * (srtd[(alen - 1) I/ 2] + srtd[alen I/ 2])
 print(median([4.1, 5.6, 7.2, 1.7, 9.3, 4.4, 3.2]))
 print(median([4.1, 7.2, 1.7, 9.3, 4.4, 3.2]))
@@ -2035,10 +2035,10 @@ print(modes([1,1,2,4,4]))
 //import collections
 
 F modes(values)
-   A count = DefaultDict[Int, Int]()
+   V count = DefaultDict[Int, Int]()
    L(v) values
       count[v]++
-   A best = max(count.values())
+   V best = max(count.values())
    R count.filter(kv -> kv[1] == @best).map(kv -> kv[0])
 print(modes([1, 3, 6, 6, 6, 6, 7, 7, 12, 12, 17]))
 print(modes([1, 1, 2, 4, 4]))
@@ -2135,8 +2135,8 @@ T SMA
       .index = (.index + 1) % .period
       .n_filled = min(.period, .n_filled + 1)
       R .sum / .n_filled
-A sma3 = SMA(3)
-A sma5 = SMA(5)
+V sma3 = SMA(3)
+V sma5 = SMA(5)
 
 L(e) [1, 2, 3, 4, 5, 5, 4, 3, 2, 1]
    print(‘Added #.0, sma(3) = #.6, sma(5) = #.6’.format(e, sma3.add(e), sma5.add(e)))
@@ -2205,12 +2205,12 @@ for n in range(10):
 //import random
 
 F gen(n)
-   A txt = [‘[’, ‘]’] * n
+   V txt = [‘[’, ‘]’] * n
    random:shuffle(&txt)
    R txt.join(‘’)
 
 F is_balanced(s)
-   A nesting_level = 0
+   V nesting_level = 0
    L(c) s
       S c
          ‘[’
@@ -2221,7 +2221,7 @@ F is_balanced(s)
    R 1B
 
 L(n) 0.<10
-   A s = gen(n)
+   V s = gen(n)
    print(s‘’(‘ ’ * (20 - s.len))‘is ’(I is_balanced(s) {‘balanced’} E ‘not balanced’))
 ===
 template <typename T1> auto gen(const T1 &n)
@@ -2294,8 +2294,8 @@ for i, p in enumerate(benford(get_fibs())):
 //import math
 
 F get_fibs()
-   A a = 1.0
-   A b = 1.0
+   V a = 1.0
+   V b = 1.0
    [Float] r
    L(i) 0.<1000
       r.append(a)
@@ -2303,11 +2303,11 @@ F get_fibs()
    R r
 
 F benford(seq)
-   A freqs = [(0.0, 0.0)] * 9
-   A seq_len = 0
+   V freqs = [(0.0, 0.0)] * 9
+   V seq_len = 0
    L(d) seq
       I d != 0
-         A i = String(d)[0].code - ‘1’.code
+         V i = String(d)[0].code - ‘1’.code
          freqs[i] = (freqs[i][0], freqs[i][1] + 1)
          seq_len++
 
@@ -2316,7 +2316,7 @@ F benford(seq)
    R freqs
 print(‘#9 #9 #9’.format(‘Actual’, ‘Expected’, ‘Deviation’))
 L(p) benford(get_fibs())
-   A i = L.index
+   V i = L.index
    print(‘#.0: #2.2% | #2.2% | #0.4%’.format(i + 1, p[1] * 100, p[0] * 100, abs(p[1] - p[0]) * 100))
 ===
 auto get_fibs()

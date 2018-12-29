@@ -98,7 +98,7 @@ class Scope:
                 return None, None
 
     def add_function(self, name, ast_node):
-        if name in self.ids:                                                   # A &id = .ids.set_if_not_present(name, Id(N)) // note that this is an error: `A id = .ids.set_if_not_present(...)`, but you can do this: `A id = copy(.ids.set_if_not_present(...))`
+        if name in self.ids:                                                   # V &id = .ids.set_if_not_present(name, Id(N)) // note that this is an error: `V id = .ids.set_if_not_present(...)`, but you can do this: `V id = copy(.ids.set_if_not_present(...))`
             assert(type(self.ids[name].ast_nodes[0]) == ASTFunctionDefinition) # assert(id.ast_nodes.empty | T(id.ast_nodes[0]) == ASTFunctionDefinition)
             self.ids[name].ast_nodes.append(ast_node)                          # id.ast_nodes [+]= ast_node
         else:
@@ -770,7 +770,7 @@ class ASTExpression(ASTNodeWithExpression):
             return ' ' * (indent*4) + 'decltype(' + self.expression.children[1].to_str() + ') ' + self.expression.to_str() + ";\n"
         return ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
-cpp_type_from_11l = {'auto&':'auto&', 'A':'auto', 'А':'auto', 'var':'auto', 'перем':'auto',
+cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'перем':'auto',
                      'Int':'int', 'Float':'double', 'String':'String', 'Bool':'bool',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
                      'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict',
@@ -1270,7 +1270,7 @@ def type_of(sn):
             return None
 
     assert(type(left) in (ASTVariableDeclaration, ASTVariableInitialization))
-    if left.type in ('A', 'А', 'var', 'перем'): # for `A selection_strings = ... selection_strings.map(...)`
+    if left.type in ('V', 'П', 'var', 'перем'): # for `V selection_strings = ... selection_strings.map(...)`
         return None
     if len(left.type_args): # `Array[String] ending_tags... ending_tags.append(‘</blockquote>’)`
         return None # [-TODO-]
@@ -2022,7 +2022,7 @@ def parse_internal(this_node):
                         next_token()
                         node = ASTVariableInitialization()
                         node.set_expression(expression())
-                        if node.expression.symbol.id == '(' and node.expression.children[0].token.category == Token.Category.NAME and node.expression.children[0].token_str()[0].isupper(): # ) # for `A animal = Sheep(); animal.say()` -> `...; animal->say();`
+                        if node.expression.symbol.id == '(' and node.expression.children[0].token.category == Token.Category.NAME and node.expression.children[0].token_str()[0].isupper(): # ) # for `V animal = Sheep(); animal.say()` -> `...; animal->say();`
                             id = scope.find(node.expression.children[0].token_str())
                             assert(id != None and len(id.ast_nodes) and type(id.ast_nodes[0]) == ASTTypeDefinition)
                             if id.ast_nodes[0].has_virtual_functions:

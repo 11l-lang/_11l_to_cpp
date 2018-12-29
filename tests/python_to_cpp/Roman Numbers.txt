@@ -3,8 +3,8 @@ dict = {'key': 1, 'key2': 2}
 arr = [1, 2]
 ===
 Dict[String, Int] empty_dict
-A dict = [‘key’ = 1, ‘key2’ = 2]
-A arr = [1, 2]
+V dict = [‘key’ = 1, ‘key2’ = 2]
+V arr = [1, 2]
 ===
 Dict<String, int> empty_dict;
 auto dict = create_dict(dict_of(u"key"_S, 1)(u"key2"_S, 2));
@@ -36,9 +36,9 @@ if __name__ == '__main__':
     print("Earn cool rewards by using the 'Check' button!")
 ===
 F roman(n)
-   A rn = [‘I’ = 1, ‘V’ = 5, ‘X’ = 10, ‘L’ = 50, ‘C’ = 100, ‘D’ = 500, ‘M’ = 1000]
-   A r = 0
-   A i = 0
+   V rn = [‘I’ = 1, ‘V’ = 5, ‘X’ = 10, ‘L’ = 50, ‘C’ = 100, ‘D’ = 500, ‘M’ = 1000]
+   V r = 0
+   V i = 0
    L i < n.len
       I i < n.len - 1 & rn[n[i]] < rn[n[i + 1]]
          r += rn[n[i + 1]] - rn[n[i]]
@@ -153,7 +153,7 @@ if __name__ == '__main__':
     print("Earn cool rewards by using the 'Check' button!")
 ===
 F roman(=n)
-   A r = ‘’
+   V r = ‘’
    L n >= 1000
       n -= 1000
       r ‘’= ‘M’
@@ -317,11 +317,11 @@ if __name__ == '__main__':
     print('OK')
 ===
 F checkio(=data)
-   A coding = zip([1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1], [‘M’, ‘CM’, ‘D’, ‘CD’, ‘C’, ‘XC’, ‘L’, ‘XL’, ‘X’, ‘IX’, ‘V’, ‘IV’, ‘I’])
+   V coding = zip([1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1], [‘M’, ‘CM’, ‘D’, ‘CD’, ‘C’, ‘XC’, ‘L’, ‘XL’, ‘X’, ‘IX’, ‘V’, ‘IV’, ‘I’])
    [String] result
    L(dr) coding
-      A d = dr[0]
-      A r = dr[1]
+      V d = dr[0]
+      V r = dr[1]
       L data >= d
          result.append(r)
          data -= d
@@ -372,13 +372,13 @@ def checkio(number):
             number %= n
     return result
 ===
-A ELEMENTS = [(‘M’, 1000), (‘CM’, 900), (‘D’, 500), (‘CD’, 400), (‘C’, 100), (‘XC’, 90), (‘L’, 50), (‘XL’, 40), (‘X’, 10), (‘IX’, 9), (‘V’, 5), (‘IV’, 4), (‘I’, 1)]
+V ELEMENTS = [(‘M’, 1000), (‘CM’, 900), (‘D’, 500), (‘CD’, 400), (‘C’, 100), (‘XC’, 90), (‘L’, 50), (‘XL’, 40), (‘X’, 10), (‘IX’, 9), (‘V’, 5), (‘IV’, 4), (‘I’, 1)]
 
 F checkio(=number)
-   A result = ‘’
+   V result = ‘’
    L(romann) :ELEMENTS
-      A roman = romann[0]
-      A n = romann[1]
+      V roman = romann[0]
+      V n = romann[1]
       I n <= number
          result ‘’= roman * (number I/ n)
          number %= n
@@ -403,7 +403,7 @@ template <typename T1> auto checkio(T1 number)
 
 checkio=lambda data: ['','M','MM','MMM'][data//1000]+['','C','CC','CCC','CD','D','DC','DCC','DCCC','CM'][data//100%10]+['','X','XX','XXX','XL','L','LX','LXX','LXXX','XC'][data//10%10]+['','I','II','III','IV','V','VI','VII','VIII','IX'][data%10]
 ===
-A checkio = data -> [‘’, ‘M’, ‘MM’, ‘MMM’][data I/ 1000] + [‘’, ‘C’, ‘CC’, ‘CCC’, ‘CD’, ‘D’, ‘DC’, ‘DCC’, ‘DCCC’, ‘CM’][data I/ 100 % 10] + [‘’, ‘X’, ‘XX’, ‘XXX’, ‘XL’, ‘L’, ‘LX’, ‘LXX’, ‘LXXX’, ‘XC’][data I/ 10 % 10] + [‘’, ‘I’, ‘II’, ‘III’, ‘IV’, ‘V’, ‘VI’, ‘VII’, ‘VIII’, ‘IX’][data % 10]
+V checkio = data -> [‘’, ‘M’, ‘MM’, ‘MMM’][data I/ 1000] + [‘’, ‘C’, ‘CC’, ‘CCC’, ‘CD’, ‘D’, ‘DC’, ‘DCC’, ‘DCCC’, ‘CM’][data I/ 100 % 10] + [‘’, ‘X’, ‘XX’, ‘XXX’, ‘XL’, ‘L’, ‘LX’, ‘LXX’, ‘LXXX’, ‘XC’][data I/ 10 % 10] + [‘’, ‘I’, ‘II’, ‘III’, ‘IV’, ‘V’, ‘VI’, ‘VII’, ‘VIII’, ‘IX’][data % 10]
 ===
 auto checkio = [](const auto &data){return create_array({u""_S, u"M"_S, u"MM"_S, u"MMM"_S})[int(data)/int(1000)] + create_array({u""_S, u"C"_S, u"CC"_S, u"CCC"_S, u"CD"_S, u"D"_S, u"DC"_S, u"DCC"_S, u"DCCC"_S, u"CM"_S})[mod(int(data)/int(100), 10)] + create_array({u""_S, u"X"_S, u"XX"_S, u"XXX"_S, u"XL"_S, u"L"_S, u"LX"_S, u"LXX"_S, u"LXXX"_S, u"XC"_S})[mod(int(data)/int(10), 10)] + create_array({u""_S, u"I"_S, u"II"_S, u"III"_S, u"IV"_S, u"V"_S, u"VI"_S, u"VII"_S, u"VIII"_S, u"IX"_S})[mod(data, 10)];};
 

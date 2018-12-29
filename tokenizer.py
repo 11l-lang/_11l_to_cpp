@@ -68,8 +68,8 @@ Error: unindent does not match any outer indentation level
 from enum import IntEnum
 from typing import List
 
-keywords = ['A',     'C',  'I',    'E',     'F',  'L',    'N',    'R',       'S',       'T',    'X',
-            'А',     'С',  'Е',    'И',     'Ф',  'Ц',    'Н',    'Р',       'В',       'Т',    'Х',
+keywords = ['V',     'C',  'I',    'E',     'F',  'L',    'N',    'R',       'S',       'T',    'X',
+            'П',     'С',  'Е',    'И',     'Ф',  'Ц',    'Н',    'Р',       'В',       'Т',    'Х',
             'var',   'in', 'if',   'else',  'fn', 'loop', 'null', 'return',  'switch',  'type', 'exception',
             'перем', 'С',  'если', 'иначе', 'фн', 'цикл', 'нуль', 'вернуть', 'выбрать', 'тип',  'исключение']
 #keywords.remove('C'); keywords.remove('С'); keywords.remove('in') # it is more convenient to consider C/in as an operator, not a keyword (however, this line is not necessary)
@@ -341,7 +341,7 @@ def tokenize(source, implied_scopes = None, line_continuations = None, comments 
                         category = Token.Category.NUMERIC_LITERAL
 
                 elif source[lexem_start:i] in keywords:
-                    if source[lexem_start:i] in ('A', 'А', 'var', 'перем'): # it is more convenient to consider A/var as [type] name, not a keyword
+                    if source[lexem_start:i] in ('V', 'П', 'var', 'перем'): # it is more convenient to consider V/var as [type] name, not a keyword
                         category = Token.Category.NAME
                     elif source[lexem_start:i] in ('N', 'Н', 'null', 'нуль'):
                         category = Token.Category.CONSTANT

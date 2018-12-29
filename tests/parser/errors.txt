@@ -48,8 +48,8 @@ L i < s.len & s[i] E ‘0’..‘9’
 
 
 ---
-A source = ‘code’
-A s = source.rtrim()
+V source = ‘code’
+V s = source.rtrim()
       ^Error: please wrap `source` in `copy()`
 line_start = source.rfind("\n", source.len - 1)
 
@@ -88,7 +88,7 @@ T Ty
    F () {}
    F (a) {}
 }
-A t = Ty()
+V t = Ty()
       ^Error: constructors' overloading is not supported for now (see type `Ty`)
 
 

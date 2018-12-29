@@ -23,9 +23,9 @@ T Converter
 
    F instr_pos_to_line_column(=pos)
       pos += sum(.to_html_called_inside_to_html_outer_pos_list)
-      A line = 1
-      A line_start = -1
-      A t = 0
+      V line = 1
+      V line_start = -1
+      V t = 0
       L t < pos
          I .instr[t] == "\r"
             I t < pos - 1 & .instr[t + 1] == "\n"
@@ -43,7 +43,7 @@ T Converter
       [String] result
       T Writer
          (String -> N) write
-      A outfile = Writer()
+      V outfile = Writer()
       I outfilef == N
          outfile.write = s -> @result.append(s)
       E
@@ -53,9 +53,9 @@ T Converter
          .instr = instr
 
       F exit_with_error(message, pos)
-         A p = @.instr_pos_to_line_column(pos)
+         V p = @.instr_pos_to_line_column(pos)
          X Exception(message, p[0], p[1], p[2])
-      A i = 0
+      V i = 0
       F next_char(offset = 1)
          R I @i + offset < @instr.len {@instr[@i + offset]} E "\0"[0]
 
@@ -72,7 +72,7 @@ T Converter
          R str
       F html_escapeq(str)
          R str.replace(‘&’, ‘&amp;’).replace(‘"’, ‘&quot;’)
-      A writepos = 0
+      V writepos = 0
       F write_to_pos(pos, npos)
          @outfile.write(@html_escape(@instr[@writepos .< pos]))
          @writepos = npos
@@ -83,8 +83,8 @@ T Converter
 
       F find_ending_pair_quote(=i)
          assert(@instr[i] == "‘")
-         A startqpos = i
-         A nesting_level = 0
+         V startqpos = i
+         V nesting_level = 0
          L
             I i == @instr.len
                @exit_with_error(‘Unpaired left single quotation mark’, startqpos)
@@ -97,9 +97,9 @@ T Converter
             i++
 
       F find_ending_sq_bracket(str, =i, start = 0)
-         A starti = i
+         V starti = i
          assert(str[i] == ‘[’)
-         A nesting_level = 0
+         V nesting_level = 0
          L
             S str[i]
                ‘[’
@@ -113,18 +113,18 @@ T Converter
 
       F remove_comments(=s, =start, level = 3)
          L
-            A j = s.findi(‘[’ * level)
+            V j = s.findi(‘[’ * level)
             I j == -1
                L.break
-            A k = @find_ending_sq_bracket(s, j, start) + 1
+            V k = @find_ending_sq_bracket(s, j, start) + 1
             start += k - j
             s = s[0 .< j] + s[k ..]
          R s
       Dict[Int, String] nonunique_links
-      A link = ‘’
+      V link = ‘’
 
       F write_http_link(startpos, Int endpos, q_offset = 1, =text = ‘’)
-         A nesting_level = 0
+         V nesting_level = 0
          @i += 2
          L
             I @i == @instr.len
@@ -147,18 +147,18 @@ T Converter
          I @instr[@i] == ‘ ’
             tag ‘’= ‘ title="’
             I @next_char() == "‘"
-               A endqpos2 = @find_ending_pair_quote(@i + 1)
+               V endqpos2 = @find_ending_pair_quote(@i + 1)
                I @instr[endqpos2 + 1] != ‘]’
                   @exit_with_error("Expected `]` after `’`", endqpos2 + 1)
                tag ‘’= @html_escapeq(@remove_comments(@instr[@i + 2 .< endqpos2], @i + 2))
                @i = endqpos2 + 1
             E
-               A endb = @find_ending_sq_bracket(@instr, endpos + q_offset)
+               V endb = @find_ending_sq_bracket(@instr, endpos + q_offset)
                tag ‘’= @html_escapeq(@remove_comments(@instr[@i + 1 .< endb], @i + 1))
                @i = endb
             tag ‘’= ‘"’
          I @next_char() == ‘[’ & @next_char(2) == ‘-’
-            A j = @i + 3
+            V j = @i + 3
             L j < @instr.len
                I @instr[j] == ‘]’
                   @nonunique_links[Int(@instr[@i + 3 .< j])] = @link
@@ -174,16 +174,16 @@ T Converter
 
       F write_note(startpos, endpos, q_offset = 1)
          @i += q_offset
-         A endqpos2 = @find_ending_pair_quote(@i + 1)
+         V endqpos2 = @find_ending_pair_quote(@i + 1)
          I @instr[endqpos2 + 1] != ‘]’
             @exit_with_error("Bracket ] should follow after ’", endqpos2 + 1)
          @write_to_pos(startpos, endqpos2 + 2)
          @outfile.write(‘<abbr title="’@html_escapeq(@remove_comments(@instr[@i + 2 .< endqpos2], @i + 2))‘">’@html_escape(@remove_comments(@instr[startpos + q_offset .< endpos], startpos + q_offset))‘</abbr>’)
          @i = endqpos2 + 1
-      A endi = 0
+      V endi = 0
       F numbered_link(offset = 1)
          I @next_char(offset) == ‘-’ & @next_char(offset + 1).is_digit()
-            A j = @i + offset + 1
+            V j = @i + offset + 1
             L j < @instr.len
                I @instr[j] == ‘]’
                   X.try
@@ -196,25 +196,25 @@ T Converter
                   L.break
                j++
          R 0B
-      A ordered_list_current_number = -1
+      V ordered_list_current_number = -1
       F close_ordered_list()
          I @ordered_list_current_number != -1
             @write_to_i("</li>\n</ol>\n", 0)
             @ordered_list_current_number = -1
-      A in_unordered_list = 0B
+      V in_unordered_list = 0B
       F close_unordered_list()
          I @in_unordered_list
             @write_to_i("</li>\n</ul>\n", 0)
             @in_unordered_list = 0B
       [String] ending_tags
-      A new_line_tag = "\0"
+      V new_line_tag = "\0"
 
       L i < instr.len
-         A ch = instr[i]
+         V ch = instr[i]
          I i == 0 | prev_char() == "\n"
             I ch == ‘.’ & (next_char() C " ‘")
                close_ordered_list()
-               A s = ‘’
+               V s = ‘’
                I !in_unordered_list
                   s = "<ul>\n<li>"
                   in_unordered_list = 1B
@@ -225,21 +225,21 @@ T Converter
                I next_char() == ‘ ’
                   i++
                E
-                  A endqpos = find_ending_pair_quote(i + 1)
+                  V endqpos = find_ending_pair_quote(i + 1)
                   outfile.write(.to_html(instr[i + 2 .< endqpos], outer_pos' i + 2))
                   i = endqpos
                writepos = i + 1
             E
                close_unordered_list()
                I ch.is_digit()
-                  A j = i + 1
+                  V j = i + 1
                   L j < instr.len
                      I !instr[j].is_digit()
                         L.break
                      j++
                   I instr[j .< j + 1] == ‘.’ & instr[j + 1 .< j + 2] C (‘ ’, "‘")
-                     A value = Int(instr[i .< j])
-                     A s = ‘’
+                     V value = Int(instr[i .< j])
+                     V s = ‘’
                      I ordered_list_current_number == -1
                         s = (I value == 1 {‘<ol>’} E ‘<ol start="’String(value)‘">’)"\n<li>"
                         ordered_list_current_number = value
@@ -251,7 +251,7 @@ T Converter
                      I instr[j + 1] == ‘ ’
                         i = j + 1
                      E
-                        A endqpos = find_ending_pair_quote(j + 1)
+                        V endqpos = find_ending_pair_quote(j + 1)
                         outfile.write(.to_html(instr[j + 2 .< endqpos], outer_pos' j + 2))
                         i = endqpos
                      writepos = i + 1
@@ -264,7 +264,7 @@ T Converter
                write_to_i(‘&emsp;’)
             E I ch == ‘-’
                I i_next_str(‘--’)
-                  A j = i + 3
+                  V j = i + 3
                   L
                      I j == instr.len | instr[j] == "\n"
                         write_to_i("<hr />\n")
@@ -284,19 +284,19 @@ T Converter
                E
                   I next_char() == ‘[’
                      I numbered_link(2)
-                        A linkstr = link
+                        V linkstr = link
                         I linkstr.len > 57
                            linkstr = linkstr[0 .< linkstr.rfindi(‘/’, 0, 47) + 1]‘...’
                         outfile.write(‘<a href="’link‘">[’instr[i + 3 .< endi]‘]<i>’linkstr‘</i></a>’)
                         i = endi + 1
                      E
                         i++
-                        A endb = find_ending_sq_bracket(instr, i)
-                        A linkn = ‘’
+                        V endb = find_ending_sq_bracket(instr, i)
+                        V linkn = ‘’
                         I instr[endb + 1 .< endb + 3] == ‘[-’
                            linkn = ‘[’instr[endb + 3 .< find_ending_sq_bracket(instr, endb + 1)]‘]’
                         link = instr[i + 1 .< endb]
-                        A spacepos = link.findi(‘ ’)
+                        V spacepos = link.findi(‘ ’)
                         I spacepos != -1
                            link = link[0 .< spacepos]
                         I link.len > 57
@@ -308,9 +308,9 @@ T Converter
                      outfile.write(":<br />\n")
                      writepos = i + 2
                   E
-                     A endqpos = find_ending_pair_quote(i + 1)
+                     V endqpos = find_ending_pair_quote(i + 1)
                      I instr[endqpos + 1 .< endqpos + 2] == ‘[’
-                        A startqpos = i + 1
+                        V startqpos = i + 1
                         i = endqpos
                         outfile.write(‘<i>’)
                         assert(writepos == startqpos + 1)
@@ -332,30 +332,30 @@ T Converter
                i++
 
          I ch == "‘"
-            A prevci = i - 1
-            A prevc = I prevci >= 0 {instr[prevci]} E "\0"[0]
-            A startqpos = i
+            V prevci = i - 1
+            V prevc = I prevci >= 0 {instr[prevci]} E "\0"[0]
+            V startqpos = i
             i = find_ending_pair_quote(i)
-            A endqpos = i
-            A str_in_b = ‘’
+            V endqpos = i
+            V str_in_b = ‘’
             I prevc == ‘)’
-               A openb = instr.rfindi(‘(’, 0, prevci - 1)
+               V openb = instr.rfindi(‘(’, 0, prevci - 1)
                I openb != -1 & openb > 0
                   str_in_b = instr[openb + 1 .< startqpos - 1]
                   prevci = openb - 1
                   prevc = instr[prevci]
             I prevc C ‘PР’
                write_to_pos(prevci, endqpos + 1)
-               A title = ‘’
+               V title = ‘’
                Int endqpos2
                I i_next_str("[‘")
                   endqpos2 = find_ending_pair_quote(i + 2)
                   I instr[endqpos2 + 1] != ‘]’
                      exit_with_error("Expected `]` after `’`", endqpos2 + 1)
                   title = ‘ title="’html_escapeq(remove_comments(instr[i + 3 .< endqpos2], i + 3))‘"’
-               A imgtag = ‘<img’
+               V imgtag = ‘<img’
                I str_in_b != ‘’
-                  A wh = str_in_b.replace(‘,’, ‘ ’).split(‘ ’)
+                  V wh = str_in_b.replace(‘,’, ‘ ’).split(‘ ’)
                   assert(wh.len C (1, 2))
                   imgtag ‘’= ‘ width="’wh[0]‘" height="’wh.last‘"’
                imgtag ‘’= ‘ src="’instr[startqpos + 1 .< endqpos]‘"’title‘ />’
@@ -378,7 +378,7 @@ T Converter
             E I i_next_str("[‘")
                write_note(startqpos, endqpos)
             E I next_char() == ‘{’ & (.habr_html | .ohd)
-               A nesting_level = 0
+               V nesting_level = 0
                i += 2
                L
                   I i == instr.len
@@ -392,7 +392,7 @@ T Converter
                         nesting_level--
                   i++
                write_to_pos(prevci + 1, i + 1)
-               A outer_p = endqpos + (I instr[endqpos + 2] == "\n" {3} E 2)
+               V outer_p = endqpos + (I instr[endqpos + 2] == "\n" {3} E 2)
                I .habr_html
                   outfile.write(‘<spoiler title="’remove_comments(instr[startqpos + 1 .< endqpos], startqpos + 1).replace(‘"’, ‘''’)‘">’(.to_html(instr[outer_p .< i], outer_pos' outer_p))‘</spoiler>’)
                E
@@ -401,28 +401,28 @@ T Converter
                   i++
                   writepos = i + 1
             E I prevc == ‘'’
-               A t = startqpos - 1
+               V t = startqpos - 1
                L t >= 0
                   I instr[t] != ‘'’
                      L.break
                   t--
-               A eat_left = startqpos - 1 - t
+               V eat_left = startqpos - 1 - t
                t = endqpos + 1
                L t < instr.len
                   I instr[t] != ‘'’
                      L.break
                   t++
-               A eat_right = t - (endqpos + 1)
+               V eat_right = t - (endqpos + 1)
                write_to_pos(startqpos - eat_left, t)
                outfile.write(instr[startqpos + eat_left .< endqpos - eat_right + 1])
             E I prevc C ‘0OО’
                write_to_pos(prevci, endqpos + 1)
                outfile.write(html_escape(instr[startqpos + 1 .< endqpos]).replace("\n", "<br />\n"))
             E I prevc == ‘#’
-               A ins = instr[startqpos + 1 .< endqpos]
+               V ins = instr[startqpos + 1 .< endqpos]
                I .habr_html
                   write_to_pos(prevci, endqpos + 1)
-                  A contains_new_line = "\n" C ins
+                  V contains_new_line = "\n" C ins
                   outfile.write((I str_in_b != ‘’ {‘<source lang="’str_in_b‘">’} E I contains_new_line {‘<source>’} E ‘<code>’) + ins + (I str_in_b != ‘’ | contains_new_line {‘</source>’} E ‘</code>’))
 
                E
@@ -432,25 +432,25 @@ T Converter
                   new_line_tag = ‘’
             E I prevc C ‘TТ’
                write_to_pos(prevci, endqpos + 1)
-               A header_row = 0B
-               A hor_row_align = ‘’
-               A ver_row_align = ‘’
+               V header_row = 0B
+               V hor_row_align = ‘’
+               V ver_row_align = ‘’
                [Array[Array[String]]] table
-               A j = startqpos + 1
+               V j = startqpos + 1
                L j < endqpos
                   ch = instr[j]
                   I ch == "‘"
                      [[String]] empty_list
                      table.append(empty_list)
-                     A endrow = find_ending_pair_quote(j)
-                     A hor_col_align = ‘’
-                     A ver_col_align = ‘’
+                     V endrow = find_ending_pair_quote(j)
+                     V hor_col_align = ‘’
+                     V ver_col_align = ‘’
                      j++
                      L j < endrow
                         ch = instr[j]
                         I ch == "‘"
-                           A end_of_column = find_ending_pair_quote(j)
-                           A style = ‘’
+                           V end_of_column = find_ending_pair_quote(j)
+                           V style = ‘’
                            I hor_row_align != ‘’ | hor_col_align != ‘’
                               style ‘’= ‘text-align: ’(I hor_col_align != ‘’ {hor_col_align} E hor_row_align)
                            I ver_row_align != ‘’ | ver_col_align != ‘’
@@ -500,8 +500,8 @@ T Converter
                L(y) (table.len - 1 .< -1).step(-1)
                   L(x) (table[y].len - 1 .< -1).step(-1)
                      I table[y][x][1] C (‘-’, ‘|’)
-                        A xx = x
-                        A yy = y
+                        V xx = x
+                        V yy = y
                         L
                            I table[yy][xx][1] == ‘-’
                               xx--
@@ -521,8 +521,8 @@ T Converter
                L(row) table
                   outfile.write(‘<tr>’)
                   L(colcolattrs) row
-                     A col = colcolattrs[0]
-                     A colattrs = colcolattrs[1]
+                     V col = colcolattrs[0]
+                     V colattrs = colcolattrs[1]
                      I colattrs != ‘’
                         outfile.write(‘<’colattrs‘>’col‘</’colattrs[0.<2]‘>’)
                   outfile.write("</tr>\n")
@@ -534,7 +534,7 @@ T Converter
                outfile.write(‘<div align="’(S instr[prevci - 1] + prevc {‘<<’ {‘left’}; ‘>>’ {‘right’}; ‘><’ {‘center’}; ‘<>’ {‘justify’}})‘">’(.to_html(instr[startqpos + 1 .< endqpos], outer_pos' startqpos + 1))"</div>\n")
                new_line_tag = ‘’
             E I i_next_str(":‘") & instr[find_ending_pair_quote(i + 2) + 1 ..][0.<1] == ‘<’
-               A endrq = find_ending_pair_quote(i + 2)
+               V endrq = find_ending_pair_quote(i + 2)
                i = endrq + 1
                write_to_pos(prevci + 1, i + 1)
                outfile.write(‘<blockquote>’(.to_html(instr[startqpos + 1 .< endqpos], outer_pos' startqpos + 1))"<br />\n<div align='right'><i>"instr[endqpos + 3 .< endrq]‘</i></div></blockquote>’)
@@ -543,28 +543,28 @@ T Converter
                i = startqpos
                I prev_char() C ‘*_-~’
                   write_to_pos(i - 1, i + 1)
-                  A tag = S prev_char() {‘*’ {‘b’}; ‘_’ {‘u’}; ‘-’ {‘s’}; ‘~’ {‘i’}}
+                  V tag = S prev_char() {‘*’ {‘b’}; ‘_’ {‘u’}; ‘-’ {‘s’}; ‘~’ {‘i’}}
                   outfile.write(‘<’tag‘>’)
                   ending_tags.append(‘</’tag‘>’)
                E I prevc C ‘HН’
                   write_to_pos(prevci, i + 1)
-                  A tag = ‘h’String(min(max(3 - (I str_in_b == ‘’ {0} E Int(str_in_b)), 1), 6))
+                  V tag = ‘h’String(min(max(3 - (I str_in_b == ‘’ {0} E Int(str_in_b)), 1), 6))
                   outfile.write(‘<’tag‘>’)
                   ending_tags.append(‘</’tag‘>’)
                E I prevc C ‘CС’
                   write_to_pos(prevci, i + 1)
-                  A which_color = ‘color’
+                  V which_color = ‘color’
                   I str_in_b[0.<1] == ‘-’
                      str_in_b = str_in_b[1..]
                      which_color = ‘background-color’
                   I str_in_b[0.<1] == ‘#’
-                     A new_str_in_b = ‘’
+                     V new_str_in_b = ‘’
                      L(c) str_in_b
-                        A cc = (S c.lowercase() {‘а’ {‘A’}; ‘б’ {‘B’}; ‘с’ {‘C’}; ‘д’ {‘D’}; ‘е’ {‘E’}; ‘ф’ {‘F’} E c})[0]
+                        V cc = (S c.lowercase() {‘а’ {‘A’}; ‘б’ {‘B’}; ‘с’ {‘C’}; ‘д’ {‘D’}; ‘е’ {‘E’}; ‘ф’ {‘F’} E c})[0]
                         new_str_in_b ‘’= I c.is_lowercase() {cc.lowercase()} E cc
                      str_in_b = new_str_in_b
                   E I str_in_b.len C (1, 3) & str_in_b.is_digit()
-                     A new_str = ‘#’
+                     V new_str = ‘#’
                      L(ii) I str_in_b.len == 3 {[0, 1, 2]} E [0, 0, 0]
                         new_str ‘’= hex((Int(str_in_b[ii]) * 00'FF + 4) I/ 8).zfill(2)
                      str_in_b = new_str
@@ -576,7 +576,7 @@ T Converter
                      ending_tags.append(‘</span>’)
                E I (instr[prevci - 1 .< prevci], prevc) C ((‘/’, "\\"), ("\\", ‘/’))
                   write_to_pos(prevci - 1, i + 1)
-                  A tag = I (instr[prevci - 1], prevc) == (‘/’, "\\") {‘sup’} E ‘sub’
+                  V tag = I (instr[prevci - 1], prevc) == (‘/’, "\\") {‘sup’} E ‘sub’
                   outfile.write(‘<’tag‘>’)
                   ending_tags.append(‘</’tag‘>’)
                E I prevc == ‘!’
@@ -589,25 +589,25 @@ T Converter
             write_to_pos(i, i + 1)
             I ending_tags.empty
                exit_with_error(‘Unpaired right single quotation mark’, i)
-            A last = ending_tags.pop()
+            V last = ending_tags.pop()
             outfile.write(last)
             I next_char() == "\n" & (last.starts_with(‘</h’) | last C (‘</blockquote>’, ‘</div>’))
                outfile.write("\n")
                i++
                writepos++
          E I ch == ‘`’
-            A start = i
+            V start = i
             i++
             L i < instr.len
                I instr[i] != ‘`’
                   L.break
                i++
-            A end = instr.findi((i - start) * ‘`’, i)
+            V end = instr.findi((i - start) * ‘`’, i)
             I end == -1
                exit_with_error(‘Unended ` started’, start)
             write_to_pos(start, end + i - start)
-            A ins = instr[i .< end]
-            A delta = ins.count("‘") - ins.count("’")
+            V ins = instr[i .< end]
+            V delta = ins.count("‘") - ins.count("’")
             I delta > 0
                L(ii) 0 .< delta
                   ending_tags.append("’")
@@ -624,7 +624,7 @@ T Converter
             i = end + i - start - 1
          E I ch == ‘[’
             I i_next_str(‘http’) | i_next_str(‘./’) | i_next_str("‘") | numbered_link()
-               A s = i - 1
+               V s = i - 1
                L s >= writepos & instr[s] !C "\r\n\t [{(‘“"
                   s--
                I i_next_str("‘")
@@ -636,8 +636,8 @@ T Converter
                   outfile.write(‘<a href="’link‘">’html_escape(instr[s + 1 .< i])‘</a>’)
                   i = endi
             E I i_next_str(‘[[’)
-               A comment_start = i
-               A nesting_level = 0
+               V comment_start = i
+               V nesting_level = 0
                L
                   S instr[i]
                      ‘[’
@@ -676,7 +676,7 @@ T Converter
       assert(.to_html_called_inside_to_html_outer_pos_list.pop() == outer_pos)
 
       I outfilef == N
-         A r = result.join(‘’)
+         V r = result.join(‘’)
          I .habr_html
             r = r.replace("</blockquote>\n", ‘</blockquote>’)
          R r
@@ -704,10 +704,10 @@ Options:
   -f [OUTPUT_FILE], --file [OUTPUT_FILE]
                         write output to OUTPUT_FILE (defaults to STDOUT)’)
    exit(0)
-A args_habr_html = ‘--habr-html’ C :argv
-A args_output_html_document = ‘--output-html-document’ C :argv
-A args_infile = :stdin
-A i = 1
+V args_habr_html = ‘--habr-html’ C :argv
+V args_output_html_document = ‘--output-html-document’ C :argv
+V args_infile = :stdin
+V i = 1
 L i < :argv.len
    I :argv[i] C (‘-f’, ‘--file’)
       i += 2
@@ -716,7 +716,7 @@ L i < :argv.len
       args_infile = File(:argv[i], ‘r’, encoding' ‘utf-8-sig’)
       L.break
    i++
-A args_outfile = :stdout
+V args_outfile = :stdout
 I ‘-f’ C :argv
    args_outfile = File(:argv[:argv.index(‘-f’) + 1], ‘w’, encoding' ‘utf-8’)
 E I ‘--file’ C :argv
