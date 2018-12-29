@@ -1,5 +1,5 @@
 // https://www.rosettacode.org/wiki/100_doors#Python
-A doors = [0B] * 100
+V doors = [0B] * 100
 L(i) 100
    L(j) (i .< 100).step(i + 1)
       doors[j] = !doors[j]
@@ -24,12 +24,12 @@ struct CodeBlock1
 F sum_proper_divisors(n)
    R I n < 2 {0} E sum((1 .. n I/ 2).filter(it -> (@n % it) == 0))
 
-A deficient = 0
-A perfect = 0
-A abundant = 0
+V deficient = 0
+V perfect = 0
+V abundant = 0
 
 L(n) 1..20000
-   A sp = sum_proper_divisors(n)
+   V sp = sum_proper_divisors(n)
    I sp < n
       deficient++
    E I sp == n
@@ -85,7 +85,7 @@ F amb(comp, options, prev = ‘’) -> [String]
          R [opt]
 
       // Traverse into the tree.
-      A res = amb(comp, options[1..], opt)
+      V res = amb(comp, options[1..], opt)
 
       // If it was a failure, try the next one.
       if !res.empty
@@ -93,12 +93,12 @@ F amb(comp, options, prev = ‘’) -> [String]
 
    R []
 
-A sets = [[‘the’, ‘that’, ‘a’],
+V sets = [[‘the’, ‘that’, ‘a’],
           [‘frog’, ‘elephant’, ‘thing’],
           [‘walked’, ‘treaded’, ‘grows’],
           [‘slowly’, ‘quickly’]]
 
-A result = amb((s, t) -> s.last == t[0], sets)
+V result = amb((s, t) -> s.last == t[0], sets)
 print(result.join(‘ ’))
 ===
 template <typename T1, typename T2, typename T3 = decltype(u""_S)> Array<String> amb(const T1 &comp, const T2 &options, const T3 &prev = u""_S)
@@ -134,7 +134,7 @@ F sum_proper_divisors(n)
    R I n < 2 {0} E sum((1 .. n I/ 2).filter(it -> (@n % it) == 0))
 
 L(n) 1..20000
-   A m = sum_proper_divisors(n)
+   V m = sum_proper_divisors(n)
    I m > n & sum_proper_divisors(m) == n
       print(n"\t"m)
 ===
@@ -158,8 +158,8 @@ struct CodeBlock1
 
 
 // https://www.rosettacode.org/wiki/Arithmetic/Integer#C
-A a = Int(input())
-A b = Int(input())
+V a = Int(input())
+V b = Int(input())
 
 print(‘a + b = ’(a + b))
 print(‘a - b = ’(a - b))
@@ -195,7 +195,7 @@ F gmean(num)
 F hmean(num)
    return num.len / sum(num.map(n -> 1.0/n))
  
-A numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+V numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 print(amean(numbers))
 print(gmean(numbers))
 print(hmean(numbers))

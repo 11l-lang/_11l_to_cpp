@@ -7,8 +7,8 @@ def parse_int(s):
     return r
 ===
 F parse_int(s)
-   A i = 0
-   A r = 0
+   V i = 0
+   V r = 0
    L i < s.len & s[i] C ‘0’..‘9’
       r = r * 10 + s[i].code - ‘0’.code
       i++
@@ -40,7 +40,7 @@ T Object
    F (a = 1, b = 2)
       .a = a
       .b = b
-A object = Object(b' 3)
+V object = Object(b' 3)
 ===
 class Object
 {
@@ -62,7 +62,7 @@ def print_seconds(sec):
         + chr(ord('0') + r60 %  10))
 ===
 F print_seconds(sec)
-   A r60 = sec % 60
+   V r60 = sec % 60
    print(Char(code' ‘0’.code + r60 I/ 10)‘’Char(code' ‘0’.code + r60 % 10))
 ===
 template <typename T1> auto print_seconds(const T1 &sec)
@@ -303,7 +303,7 @@ b)"_S;
 
 x = ~1 ^ 2
 ===
-A x = (-)1 (+) 2
+V x = (-)1 (+) 2
 ===
 auto x = ~1 ^ 2;
 
@@ -349,7 +349,7 @@ def find_ending_pair_quote(instr, i):
         i += 1
 ===
 F find_ending_pair_quote(instr, =i)
-   A nesting_level = 0
+   V nesting_level = 0
    L
       S instr[i]
          "‘"
@@ -406,7 +406,7 @@ F exit_with_error(message, pos)
 {
 }
 F write_http_link(instr, =i, endpos, q_offset = 1)
-   A nesting_level = 0
+   V nesting_level = 0
    i += 2
    L
       I i == instr.len
@@ -501,7 +501,7 @@ def process_files2():
 
 F process_files(exclude_dir)
    L(_fname) fs:walk_dir(‘.’, dir_filter' d -> d[0] != ‘.’ & d != @exclude_dir, files_only' 0B)
-      A root = fs:path:dir_name(_fname)
+      V root = fs:path:dir_name(_fname)
       [String] dirs, files
       I fs:is_directory(_fname) {dirs [+]= fs:path:base_name(_fname)} E files [+]= fs:path:base_name(_fname)
       L(name) files
@@ -509,7 +509,7 @@ F process_files(exclude_dir)
 
 F process_files2()
    L(_fname) fs:walk_dir(‘.’, files_only' 0B)
-      A root = fs:path:dir_name(_fname)
+      V root = fs:path:dir_name(_fname)
       [String] dirs, files
       I fs:is_directory(_fname) {dirs [+]= fs:path:base_name(_fname)} E files [+]= fs:path:base_name(_fname)
       L(name) files
@@ -563,7 +563,7 @@ time.sleep(0.1)
 print(time.perf_counter() - start)
 ===
 //import time
-A start = time:perf_counter()
+V start = time:perf_counter()
 sleep(0.1)
 print(time:perf_counter() - start)
 ===
@@ -589,7 +589,7 @@ print(datetime.date.today())
 print(datetime.datetime.now() - datetime.date.today())
 ===
 //import datetime
-A d = time:delta(days' 1, hours' 2, minutes' 3, seconds' 4.5)
+V d = time:delta(days' 1, hours' 2, minutes' 3, seconds' 4.5)
 assert(time:(2018, 8, 2) - time:(2018, 7, 1) == time:delta(days' 32))
 assert(time:(2018, 8, 2) - time:(2018, 7, 1) == time:delta(days' 32))
 print(d)
@@ -666,12 +666,12 @@ for index, item in enumerate(items):
 for index, item in enumerate(items, 1):
     print(str(index) + '. ' + item)
 ===
-A items = [‘A’, ‘B’, ‘C’]
+V items = [‘A’, ‘B’, ‘C’]
 L(item) items
-   A index = L.index
+   V index = L.index
    print(String(index)‘. ’item)
 L(item) items
-   A index = L.index + 1
+   V index = L.index + 1
    print(String(index)‘. ’item)
 ===
 auto items = create_array({u'A'_C, u'B'_C, u'C'_C});
@@ -736,7 +736,7 @@ T Cat(Animal)
 [Animal] animals
 animals [+]= Sheep()
 animals [+]= Cat()
-A animal = Sheep()
+V animal = Sheep()
 animal.say()
 animals [+]= animal
 L(animal) animals

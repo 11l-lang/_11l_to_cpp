@@ -4,8 +4,8 @@ def f():
     '\n'.join(s[0] + c for s in selection_strings)
 ===
 F f()
-   A selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
-   A c = ‘.’
+   V selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
+   V c = ‘.’
    selection_strings.map(s -> s[0]‘’@c).join("\n")
 ===
 auto f()
@@ -22,8 +22,8 @@ def f():
     '\n'.join([s[0] + c for s in selection_strings])
 ===
 F f()
-   A selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
-   A c = ‘.’
+   V selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
+   V c = ‘.’
    (selection_strings.map(s -> s[0]‘’@c)).join("\n")
 ===
 auto f()
@@ -40,8 +40,8 @@ def f():
     '\n'.join(s[0] + c for s in selection_strings if s[0][0] != c)
 ===
 F f()
-   A selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
-   A c = ‘.’
+   V selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
+   V c = ‘.’
    selection_strings.filter(s -> s[0][0] != @c).map(s -> s[0]‘’@c).join("\n")
 ===
 auto f()
@@ -58,8 +58,8 @@ def f():
     '\n'.join(s for s in selection_strings if s[0][0] != c)
 ===
 F f()
-   A selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
-   A c = ‘.’
+   V selection_strings = [(‘selection’, 1B), (‘.hg’, 0B)]
+   V c = ‘.’
    selection_strings.filter(s -> s[0][0] != @c).join("\n")
 ===
 auto f()
@@ -76,7 +76,7 @@ def f():
     assert(dirs == ['tests'])
 ===
 F f()
-   A dirs = [‘tests’, ‘.hg’]
+   V dirs = [‘tests’, ‘.hg’]
    dirs = dirs.filter(d -> d[0] != ‘.’)
    assert(dirs == [‘tests’])
 ===
@@ -94,8 +94,8 @@ def f():
     assert(ndirs == [1])
 ===
 F f()
-   A dirs = [(‘tests’, 1), (‘.hg’, 2)]
-   A ndirs = dirs.filter(d -> d[0][0] != ‘.’).map(d -> d[1])
+   V dirs = [(‘tests’, 1), (‘.hg’, 2)]
+   V ndirs = dirs.filter(d -> d[0][0] != ‘.’).map(d -> d[1])
    assert(ndirs == [1])
 ===
 auto f()
@@ -113,7 +113,7 @@ class ASTTypeHint:
     def to_str(self):
         return ', '.join(python_types_to_11l[ty] for ty in self.type_args)
 ===
-A python_types_to_11l = [‘int’ = ‘Int’, ‘str’ = ‘String’, ‘bool’ = ‘Bool’, ‘List’ = ‘Array’, ‘Tuple’ = ‘Tuple’]
+V python_types_to_11l = [‘int’ = ‘Int’, ‘str’ = ‘String’, ‘bool’ = ‘Bool’, ‘List’ = ‘Array’, ‘Tuple’ = ‘Tuple’]
 
 T ASTTypeHint
    [String] type_args
@@ -146,9 +146,9 @@ F split_len(seq, length)
    R (0 .< seq.len).step(length).map(i -> @seq[i .< i + @length])
 F f()
    assert(split_len(‘o-o o-x o-o’, 4) == [‘o-o ’, ‘o-x ’, ‘o-o’])
-   A r1 = 0.<10
-   A r2 = 1.<10
-   A r3 = (10.<1).step(-1)
+   V r1 = 0.<10
+   V r2 = 1.<10
+   V r3 = (10.<1).step(-1)
    assert((0.<3).map(i -> i * 2) == [0, 2, 4])
 ===
 template <typename T1, typename T2> auto split_len(const T1 &seq, const T2 &length)
@@ -177,9 +177,9 @@ def f():
     assert(r1 == r2 and r2 == [[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]])
 ===
 F f()
-   A matrix = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]
-   A r1 = (0.<4).map(i -> @matrix.map(row -> row[@i]))
-   A r2 = (0.<4).map(i -> @matrix.map(row -> row[@i]))
+   V matrix = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]
+   V r1 = (0.<4).map(i -> @matrix.map(row -> row[@i]))
+   V r2 = (0.<4).map(i -> @matrix.map(row -> row[@i]))
    assert(r1 == r2 & r2 == [[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]])
 ===
 auto f()

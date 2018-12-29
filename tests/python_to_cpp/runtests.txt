@@ -359,9 +359,9 @@ else:
     sys.exit(1)
 ===
 //import os, tempfile, sys, pqmarkup
-A test_id = 0
-A failed_tests = 0
-A kdiff_showed = 0B
+V test_id = 0
+V failed_tests = 0
+V kdiff_showed = 0B
 F TEST(=str1, =str2, ohd = 0B, habr_html = 0B)
    :test_id++
    print(‘Test ’String(test_id)‘ ...’, end' ‘’)
@@ -373,9 +373,9 @@ F TEST(=str1, =str2, ohd = 0B, habr_html = 0B)
       I !:kdiff_showed
          L(envvar) [‘ProgramFiles’, ‘ProgramFiles(x86)’, ‘ProgramW6432’]
             os:environ[‘PATH’] += os:env_path_sep‘’os:getenv(envvar, ‘’)‘\KDiff3’
-         A command = ‘kdiff3’
+         V command = ‘kdiff3’
          L(file) [(‘wrong’, str1), (‘right’, str2)]
-            A full_fname = fs:path:join(fs:get_temp_dir(), file[0])
+            V full_fname = fs:path:join(fs:get_temp_dir(), file[0])
             command ‘’= ‘ "’full_fname‘"’
             File(full_fname, ‘w’, encoding' ‘utf-8-sig’).write(file[1])
          os:(command)
@@ -621,7 +621,7 @@ let s2 = str
 B<br />
 C’)
 test_id++
-A was_error = 0B
+V was_error = 0B
 print(‘Test ’String(test_id)‘ (error handling) ...’, end' ‘’)
 X.try
    pqmarkup:to_html("\nT‘‘‘`’’’")
@@ -636,12 +636,12 @@ assert(was_error)
 test_id++
 print(‘Test ’String(test_id)‘. Checking source files for unallowed characters...’)
 L(_fname) fs:walk_dir(‘.’, dir_filter' d -> d[0] != ‘.’, files_only' 0B)
-   A root = fs:path:dir_name(_fname)
+   V root = fs:path:dir_name(_fname)
    [String] dirs, files
    I fs:is_directory(_fname) {dirs [+]= fs:path:base_name(_fname)} E files [+]= fs:path:base_name(_fname)
    L(name) files
       I name.ends_with(‘.py’) | name.ends_with(‘.txt’)
-         A file_bytes = File(fs:path:join(root, name)).read_bytes()
+         V file_bytes = File(fs:path:join(root, name)).read_bytes()
          I "\r".code C file_bytes | "\t".code C file_bytes
             print(‘Unallowed character (\r or \t) found in file '’fs:path:join(root, name)[2..]‘'’)
             failed_tests++

@@ -5,7 +5,7 @@ for i in range(len(self.children)):
     if i < len(self.children)-1:
         res += ', '
 return res + ']'’
-A res = ‘[’
+V res = ‘[’
 L(c) .children
    res ‘’= c.to_str()
    I L.next != N
@@ -197,11 +197,11 @@ public:
 };
 
 
-A l1 = () -> N
-A l2 = x -> x[0]
-A l3 = self -> self
-A l4 = (x, y, reverse = 0B) -> I reverse {y < x} E x < y
-A r = I reverse {y < x} E I eq {x == y} E x < y
+V l1 = () -> N
+V l2 = x -> x[0]
+V l3 = self -> self
+V l4 = (x, y, reverse = 0B) -> I reverse {y < x} E x < y
+V r = I reverse {y < x} E I eq {x == y} E x < y
 ===
 auto l1 = [](){return nullptr;};
 auto l2 = [](const auto &x){return _get<0>(x);};
@@ -238,13 +238,13 @@ auto f()
 }
 
 
-A id = 0
+V id = 0
 F f(str) {}
 f(‘id=’id)
-A s = ‘str’"\n"
-A s2 = a‘’b
+V s = ‘str’"\n"
+V s2 = a‘’b
 F to_str(indent)
-   A t = ‘str’(.expression.to_str())
+   V t = ‘str’(.expression.to_str())
    R (‘ ’ * (indent * 3))‘’(.expression.to_str())"\n"
 String tag = ‘<a href="’link‘"’
 tag ‘’= s
@@ -316,7 +316,7 @@ auto f()
 
 
 F f()
-   A arr = [1, 2, 3]
+   V arr = [1, 2, 3]
    print(arr[0..1])  // [1, 2]
    print(arr[0.<1])  // [1]
    print(arr[0<.1])  // [2]
@@ -355,8 +355,8 @@ auto f()
 
 
 F f()
-   A s = ‘154’
-   A a = [1, 5, 4]
+   V s = ‘154’
+   V a = [1, 5, 4]
    s[2] = ‘3’
    a[2] = 3
    assert(s[(len)-2] == ‘5’)
@@ -396,8 +396,8 @@ auto f()
 F newlines()
    R ‘’
 F f()
-   A indent = 0
-   A r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
+   V indent = 0
+   V r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
    r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(’
      ‘’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
    r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘’
@@ -449,14 +449,14 @@ auto f()
 
 
 ---
-A source = ‘code’
-A s = copy(source).rtrim()
+V source = ‘code’
+V s = copy(source).rtrim()
 line_start = source.rfind("\n", source.len - 1)
 
 
 F f()
-   A i = 0
-   A source = ‘abc_123 ’
+   V i = 0
+   V source = ‘abc_123 ’
    L i < source.len & source[i] C (‘0’..‘9’, ‘a’..‘z’, ‘A’..‘Z’, ‘_’)
       i++
    assert(i == 7)
@@ -472,8 +472,8 @@ auto f()
 
 
 F to_html()
-   A i = 0
-   A writepos = 1
+   V i = 0
+   V writepos = 1
    F write_to_pos(npos)
       @writepos = @i + npos
    write_to_pos(2)
@@ -493,7 +493,7 @@ auto to_html()
 
 
 F f(active_window, s)
-   A width = active_window.rect. {.right - .left}
+   V width = active_window.rect. {.right - .left}
    active_window.pos.
       .x = 10
       .y = 20
@@ -706,7 +706,7 @@ struct CodeBlock1
 } code_block_1;
 
 
-A tag = S ‘_’
+V tag = S ‘_’
            ‘*’
               ‘b’
            ‘_’
@@ -796,7 +796,7 @@ struct CodeBlock1
 } code_block_1;
 
 
-A number = 3
+V number = 3
 L 1..number
    print(‘.’)
 ===
@@ -856,7 +856,7 @@ struct CodeBlock1
 } code_block_1;
 
 
-A freqs = [1, 2]
+V freqs = [1, 2]
 L(&f) freqs
    f *= 2
 print(freqs)

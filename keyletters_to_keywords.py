@@ -19,7 +19,7 @@ try:
                 or token.category == tokenizer.Token.Category.KEYWORD # for composite keywords (e.g. `L.break`)
                 or token.value(source).split('.')[0] in tokenizer.keywords): # for `L.index`
             dot_pos = token.value(source).find('.') # \
-            if dot_pos == -1:                       # A dot_pos = token.value(source). {.find(‘.’) ? .len}
+            if dot_pos == -1:                       # V dot_pos = token.value(source). {.find(‘.’) ? .len}
                 dot_pos = len(token.value(source))  # /
             outf.write(source[writepos:token.start])
             outf.write(tokenizer.keywords[tokenizer.keywords.index(token.value(source)[:dot_pos]) % 11 + 11*2*(not reverse)] + token.value(source)[dot_pos:])
