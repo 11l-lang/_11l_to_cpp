@@ -225,3 +225,17 @@ struct CodeBlock1
         print(hmean(numbers));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Binary_digits
+L(n) [0, 5, 50, 9000]
+   print(‘#4 = #.’.format(n, bin(n)))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : create_array({0, 5, 50, 9000}))
+            print(u"#4 = #."_S.format(n, bin(n)));
+    }
+} code_block_1;
