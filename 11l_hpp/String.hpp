@@ -300,6 +300,13 @@ public:
 		return r;
 	}
 
+	String capitalize() const
+	{
+		String r(*this);
+		r[0] = towupper(at(0));
+		return r;
+	}
+
 	String zfill(int width) const
 	{
 		return String(u"0") * max(width - len(), 0) + *this;
@@ -502,11 +509,16 @@ public:
 		String r;
 		const char16_t *s = data();
 		for (int i=0; i<len();)
-			if (s[i] == '#' && (s[i+1] == '.' || Char(s[i+1]).is_digit())) {
+			if (s[i] == '#' && (s[i+1] == '.' || s[i+1] == '<' || Char(s[i+1]).is_digit())) {
 				int before_period = 0,
-					 after_period = 0;
-				bool has_period = false;
+				     after_period = 0;
+				bool left_align = false,
+				     has_period = false;
 				i++;
+				if (s[i] == '<') {
+					left_align = true;
+					i++;
+				}
 				if (s[i] == '.' && !Char(s[i+1]).is_digit()) // #.
 					i++;
 				else {
@@ -524,8 +536,11 @@ public:
 				if (fa.type == FormatArgument::Type::STRING) {
 					if (has_period)
 						throw AssertionError();
+					if (left_align)
+						r += *fa.string;
 					r.resize(r.size() + max(before_period - fa.string->len(), 0), ' ');
-					r += *fa.string;
+					if (!left_align)
+						r += *fa.string;
 				}
 				else {
 					if (before_period == 0 && after_period == 0) // #.
@@ -536,8 +551,11 @@ public:
 							throw AssertionError();
 						}
 						String s(fa.number, after_period, false);
+						if (left_align)
+							r += s;
 						r.resize(r.size() + max(after_period + bool(after_period) + before_period - s.len(), 0), ' ');
-						r += s;
+						if (!left_align)
+							r += s;
 					}
 				}
 			}

@@ -1239,7 +1239,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(agm(1, 1 / sqrt(2)));
+        print(agm(1, 1.0 / sqrt(2)));
     }
 } code_block_1;
 
@@ -2359,3 +2359,106 @@ struct CodeBlock1
         }}
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Box_the_compass#Python
+majors   = 'north east south west'.split()
+majors   *= 2 # no need for modulo later
+quarter1 = 'N,N by E,N-NE,NE by N,NE,NE by E,E-NE,E by N'.split(',')
+quarter2 = [p.replace('NE','EN') for p in quarter1]
+ 
+def degrees2compasspoint(d):
+    d = (d % 360) + 360/64
+    majorindex = int(d / 90)
+    minorindex  = int( (d % 90 *4) // 45 )
+    p1 = majors[majorindex]
+    p2 = majors[majorindex+1]
+    q : List[str]
+    if p1 in ('north', 'south'):
+        q = quarter1
+    else:
+        q = quarter2
+    return q[minorindex].replace('N', p1).replace('E', p2).capitalize()
+ 
+if __name__ == '__main__':
+    for i in range(33):
+        d = i * 11.25
+        m = i % 3
+        if   m == 1: d += 5.62
+        elif m == 2: d -= 5.62
+        n = i % 32 + 1
+        print( '%2i %-18s %7.2f°' % (n, degrees2compasspoint(d), d) )
+===
+V majors = ‘north east south west’.split((‘ ’, "\t", "\r", "\n"), group_delimiters' 1B)
+majors *= 2
+V quarter1 = ‘N,N by E,N-NE,NE by N,NE,NE by E,E-NE,E by N’.split(‘,’)
+V quarter2 = quarter1.map(p -> p.replace(‘NE’, ‘EN’))
+
+F degrees2compasspoint(=d)
+   d = (d % 360) + 360 / 64
+   V majorindex = Int(d / 90)
+   V minorindex = Int((d % 90 * 4) I/ 45)
+   V p1 = :majors[majorindex]
+   V p2 = :majors[majorindex + 1]
+   [String] q
+   I p1 C (‘north’, ‘south’)
+      q = :quarter1
+   E
+      q = :quarter2
+   R q[minorindex].replace(‘N’, p1).replace(‘E’, p2).capitalize()
+
+:start:
+L(i) 0.<33
+   V d = i * 11.25
+   S i % 3
+      1
+         d += 5.62
+      2
+         d -= 5.62
+   V n = i % 32 + 1
+   print(‘#2.0 #<18 #4.2°’.format(n, degrees2compasspoint(d), d))
+===
+auto majors = u"north east south west"_S.split(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S), nullptr, true);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        majors *= 2;
+    }
+} code_block_1;
+auto quarter1 = u"N,N by E,N-NE,NE by N,NE,NE by E,E-NE,E by N"_S.split(u","_S);
+auto quarter2 = quarter1.map([](const auto &p){return p.replace(u"NE"_S, u"EN"_S);});
+
+template <typename T1> auto degrees2compasspoint(T1 d)
+{
+    d = (mod(d, 360)) + 360.0 / 64;
+    auto majorindex = to_int(d / 90.0);
+    auto minorindex = to_int(int((mod(d, 90) * 4))/int(45));
+    auto p1 = ::majors[majorindex];
+    auto p2 = ::majors[majorindex + 1];
+    Array<String> q;
+    if (in(p1, make_tuple(u"north"_S, u"south"_S)))
+        q = ::quarter1;
+    else
+        q = ::quarter2;
+    return q[minorindex].replace(u"N"_S, p1).replace(u"E"_S, p2).capitalize();
+}
+
+int main()
+{
+    for (auto i : range_el(0, 33)) {
+        auto d = i * 11.25;
+        switch (mod(i, 3))
+        {
+        case 1:
+            d += 5.62;
+            break;
+        case 2:
+            d -= 5.62;
+            break;
+        }
+        auto n = mod(i, 32) + 1;
+        print(u"#2.0 #<18 #4.2°"_S.format(n, degrees2compasspoint(d), d));
+    }
+}
