@@ -239,3 +239,38 @@ struct CodeBlock1
             print(u"#4 = #."_S.format(n, bin(n)));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Bitwise_operations#Kotlin
+V x = 10
+V y = 2
+print(‘x       = ’x)
+print(‘y       = ’y)
+print(‘NOT x   = ’(-)x)
+print(‘x AND y = ’(x [&] y))
+print(‘x OR  y = ’(x [|] y))
+print(‘x XOR y = ’(x (+) y))
+print(‘x SHL y = ’(x << y))
+print(‘x SHR y = ’(x >> y))
+print(‘x ROL y = ’rotl(x, y))
+print(‘x ROR y = ’rotr(x, y))
+===
+auto x = 10;
+auto y = 2;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"x       = "_S + x);
+        print(u"y       = "_S + y);
+        print(u"NOT x   = "_S + ~x);
+        print(u"x AND y = "_S + (x & y));
+        print(u"x OR  y = "_S + (x | y));
+        print(u"x XOR y = "_S + (x ^ y));
+        print(u"x SHL y = "_S + (x << y));
+        print(u"x SHR y = "_S + (x >> y));
+        print(u"x ROL y = "_S + rotl(x, y));
+        print(u"x ROR y = "_S + rotr(x, y));
+    }
+} code_block_1;
