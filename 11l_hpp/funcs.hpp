@@ -19,3 +19,16 @@ inline const unsigned mod(unsigned x, unsigned y) {return x%y;}
 template <class T, class Ta> inline T mod(const T &x, const Ta &y) {return x - y*floor(x/y);}
 
 template <class T> inline T sign(const T x) {return x>0 ? T(1) : (x<0 ? T(-1) : 0);}
+
+// https://stackoverflow.com/a/776523
+#ifdef _MSC_VER
+#include <intrin.h>
+inline unsigned long long rotl(unsigned long long value, int shift) {return _rotl64(value, shift);}
+inline unsigned long long rotr(unsigned long long value, int shift) {return _rotr64(value, shift);}
+#else
+#include <x86intrin.h>
+inline unsigned long long rotl(unsigned long long value, int shift) {return (value << shift) | (value >> (64 - shift));} // https://stackoverflow.com/a/24370769
+inline unsigned long long rotr(unsigned long long value, int shift) {return (value >> shift) | (value << (64 - shift));}
+#endif
+inline int rotl(int value, int shift) {return _rotl(value, shift);}
+inline int rotr(int value, int shift) {return _rotr(value, shift);}

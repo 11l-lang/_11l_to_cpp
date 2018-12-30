@@ -654,7 +654,7 @@ class SymbolNode:
                     t_node = type_of(self.children[0])
                     if t_node != None and type(t_node) in (ASTVariableDeclaration, ASTVariableInitialization) and t_node.is_reference:
                         return self.children[0].to_str() + ' = &' + self.children[1].to_str()
-                return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '(concat)':'+', '[+]':'+', '‘’=':'+=', '(+)':'^'}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
+                return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '[&]':'&', '[|]':'|', '(concat)':'+', '[+]':'+', '‘’=':'+=', '(+)':'^'}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
         elif len(self.children) == 3:
             if self.children[1].token.category == Token.Category.SCOPE_BEGIN:
                 assert(self.symbol.id == '.')
@@ -2111,6 +2111,8 @@ builtins_scope.add_function('min', ASTFunctionDefinition([('arg1', '', ''), ('ar
 builtins_scope.add_function('max', ASTFunctionDefinition([('arg1', '', ''), ('arg2', token_to_str('N', Token.Category.CONSTANT), '')]))
 builtins_scope.add_function('hex', ASTFunctionDefinition([('x', '', '')]))
 builtins_scope.add_function('bin', ASTFunctionDefinition([('x', '', '')]))
+builtins_scope.add_function('rotl', ASTFunctionDefinition([('value', '', 'Int'), ('shift', '', 'Int')]))
+builtins_scope.add_function('rotr', ASTFunctionDefinition([('value', '', 'Int'), ('shift', '', 'Int')]))
 builtins_scope.add_function('round', ASTFunctionDefinition([('number', '', 'Float'), ('ndigits', '0', '')]))
 builtins_scope.add_function('sleep', ASTFunctionDefinition([('secs', '', 'Float')]))
 builtins_scope.add_function('ceil',  ASTFunctionDefinition([('x', '', 'Float')]))
