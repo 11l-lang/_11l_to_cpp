@@ -2462,3 +2462,163 @@ int main()
         print(u"#2.0 #<18 #4.2°"_S.format(n, degrees2compasspoint(d), d));
     }
 }
+
+
+# https://www.rosettacode.org/wiki/Brace_expansion#Python
+def getitem(s, depth = 0):
+    out = ['']
+    while s != '':
+        c = str(s[0])
+        if depth and (c == ',' or c == '}'):
+            return (out, s)
+        if c == '{':
+            global getgroup # to suppress error 'undefined identifier' in `x = getgroup(s[1:], depth+1)`
+            x = getgroup(s[1:], depth+1) #                                     ^^^^^^^^
+            if len(x[0]):
+                nout : List[str] = []
+                for a in out:
+                    for b in x[0]:
+                        nout.append(a + '' + b)
+                out = nout
+                s = x[1]
+                continue
+        if c == '\\' and len(s) > 1:
+            (s, c) = (s[1:], c + s[1])
+ 
+        out = [a+c for a in out]
+        s = s[1:]
+ 
+    return (out, s)
+ 
+def getgroup(s, depth):
+    out : List[str] = []
+    comma = False
+    while s != '':
+        gs = getitem(s, depth)
+        s = gs[1]
+        if s == '': break
+        out += gs[0]
+ 
+        if s[0] == '}':
+            if comma: return (out, s[1:])
+            return (['{' + a + '}' for a in out], s[1:])
+ 
+        if s[0] == ',':
+            (comma, s) = (True, s[1:])
+ 
+    return (['']*0, '')
+
+# stolen cowbells from perl6 example
+for s in R'''~/{Downloads,Pictures}/*.{jpg,gif,png}
+It{{em,alic}iz,erat}e{d,}, please.
+{,{,gotta have{ ,\, again\, }}more }cowbell!
+{}} some }{,{\\{ edge, edge} \,}{ cases, {here} \\\\\}'''.split('\n'):
+    print("\n\t".join([s] + getitem(s)[0]) + "\n")
+===
+F getitem(=s, depth = 0)
+   V out = [‘’]
+   L s != ‘’
+      V c = String(s[0])
+      I depth & (c == ‘,’ | c == ‘}’)
+         R (out, s)
+      I c == ‘{’
+         V x = getgroup(s[1..], depth + 1)
+         I !x[0].empty
+            [String] nout
+            L(a) out
+               L(b) x[0]
+                  nout.append(a‘’b)
+            out = nout
+            s = x[1]
+            L.continue
+      I c == "\\" & s.len > 1
+         (s, c) = (s[1..], c‘’s[1])
+      out = out.map(a -> a‘’@c)
+      s = s[1..]
+   R (out, s)
+
+F getgroup(=s, depth)
+   [String] out
+   V comma = 0B
+   L s != ‘’
+      V gs = getitem(s, depth)
+      s = gs[1]
+      I s == ‘’
+         L.break
+      out [+]= gs[0]
+
+      I s[0] == ‘}’
+         I comma
+            R (out, s[1..])
+         R (out.map(a -> ‘{’a‘}’), s[1..])
+
+      I s[0] == ‘,’
+         (comma, s) = (1B, s[1..])
+   R ([‘’] * 0, ‘’)
+
+L(s) ‘~/{Downloads,Pictures}/*.{jpg,gif,png}
+It{{em,alic}iz,erat}e{d,}, please.
+{,{,gotta have{ ,\, again\, }}more }cowbell!
+{}} some }{,{\\{ edge, edge} \,}{ cases, {here} \\\\\}’.split("\n")
+   print(([s] [+] getitem(s)[0]).join("\n\t")"\n")
+===
+template <typename T1, typename T2 = decltype(0)> auto getitem(T1 s, const T2 &depth = 0)
+{
+    auto out = create_array({u""_S});
+    while (s != u"") {
+        auto c = String(_get<0>(s));
+        if (depth && (c == u',' || c == u'}'))
+            return make_tuple(out, s);
+        if (c == u'{') {
+            auto x = getgroup(s[range_ei(1)], depth + 1);
+            if (!_get<0>(x).empty()) {
+                Array<String> nout;
+                for (auto a : out)
+                    for (auto b : _get<0>(x))
+                        nout.append(a + b);
+                out = nout;
+                s = _get<1>(x);
+                continue;
+            }
+        }
+        if (c == u'\\' && s.len() > 1)
+            std::tie(s, c) = make_tuple(s[range_ei(1)], c + _get<1>(s));
+        out = out.map([&c](const auto &a){return a + c;});
+        s = s[range_ei(1)];
+    }
+    return make_tuple(out, s);
+}
+
+template <typename T1, typename T2> auto getgroup(T1 s, const T2 &depth)
+{
+    Array<String> out;
+    auto comma = false;
+    while (s != u"") {
+        auto gs = getitem(s, depth);
+        s = _get<1>(gs);
+        if (s == u"")
+            break;
+        out.append(_get<0>(gs));
+
+        if (_get<0>(s) == u'}') {
+            if (comma)
+                return make_tuple(out, s[range_ei(1)]);
+            return make_tuple(out.map([](const auto &a){return u"{"_S + a + u"}"_S;}), s[range_ei(1)]);
+        }
+        if (_get<0>(s) == u',')
+            std::tie(comma, s) = make_tuple(true, s[range_ei(1)]);
+    }
+    return make_tuple(create_array({u""_S}) * 0, u""_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto s : uR"(~/{Downloads,Pictures}/*.{jpg,gif,png}
+It{{em,alic}iz,erat}e{d,}, please.
+{,{,gotta have{ ,\, again\, }}more }cowbell!
+{}} some }{,{\\{ edge, edge} \,}{ cases, {here} \\\\\})"_S.split(u"\n"_S))
+            print((create_array({s}) + _get<0>(getitem(s))).join(u"\n\t"_S) + u"\n"_S);
+    }
+} code_block_1;
