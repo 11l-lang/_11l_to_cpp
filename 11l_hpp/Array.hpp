@@ -29,7 +29,10 @@ public:
 			append(c);
 	}
 
-	using std::vector<Type>::begin, std::vector<Type>::end;
+	using std::vector<Type>::begin,
+	      std::vector<Type>::end,
+	      std::vector<Type>::clear,
+	      std::vector<Type>::reserve;
 
 	template <typename Func> auto map(Func &&func) const -> Array<decltype(func(Type()))>
 	{
@@ -88,7 +91,7 @@ public:
 			reserve(l * n);
 			for (int i = 1; i < n; i++)
 				for (int j = 0; j < l; j++)
-					append(data()[j]);
+					append(std::vector<Type>::data()[j]);
 		}
 	}
 
@@ -147,7 +150,7 @@ public:
 	{
 		reserve(std::vector<Type>::size() + arr.size());
 		for (auto el : arr)
-			push_back(el);
+			append(el);
 	}
 
 	template <typename Ty, bool include_beginning, bool include_ending> void append(const Range<Ty, include_beginning, include_ending> &range)
