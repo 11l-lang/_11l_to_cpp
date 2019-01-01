@@ -546,11 +546,11 @@ public:
 					if (before_period == 0 && after_period == 0) // #.
 						r += String(fa.number);
 					else {
-						if (!has_period && fract(fa.number) != 0) {
-							std::wcerr << L"If you want to truncate floating point number, then append ‘.0’ to format specifier (or use integer number instead of floating point number)\n";
-							throw AssertionError();
-						}
-						String s(fa.number, after_period, false);
+						String s; // (
+						if (!has_period) // && fract(fa.number) != 0)
+							s.assign(fa.number);
+						else
+							s.assign(fa.number, after_period, false);
 						if (left_align)
 							r += s;
 						r.resize(r.size() + max(after_period + bool(after_period) + before_period - s.len(), 0), ' ');
