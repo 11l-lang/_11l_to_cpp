@@ -1064,14 +1064,14 @@ struct CodeBlock1
 } code_block_1;
 
 
-print('Number: %g.' % (1.1))
+print('Number: %4g, %g.' % (1.1, 1.1))
 ===
-print(‘Number: #..’.format(1.1))
+print(‘Number: #4, #..’.format(1.1, 1.1))
 ===
 struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(u"Number: #.."_S.format(1.1));
+        print(u"Number: #4, #.."_S.format(1.1, 1.1));
     }
 } code_block_1;
