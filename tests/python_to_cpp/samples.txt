@@ -852,7 +852,7 @@ print(sin(1) - 0.8414709848078965 + 1)
 print(tan(1) - 1.5574077246549023 + 1)
 print(degrees(1) - 57.29577951308232 + 1)
 print(radians(1) - 0.017453292519943295 + 1)
-print(pi - 2.141592653589793)
+print(math:pi - 2.141592653589793)
 ===
 struct CodeBlock1
 {
@@ -878,7 +878,7 @@ struct CodeBlock1
         print(tan(1) - 1.5574077246549023 + 1);
         print(degrees(1) - 57.29577951308232 + 1);
         print(radians(1) - 0.017453292519943295 + 1);
-        print(pi - 2.141592653589793);
+        print(math::pi - 2.141592653589793);
     }
 } code_block_1;
 
