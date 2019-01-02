@@ -274,3 +274,58 @@ struct CodeBlock1
         print(u"x ROR y = "_S + rotr(x, y));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Caesar_cipher
+F caesar(string, =key, decode = 0B)
+   I decode
+      key = 26 - key
+
+   V r = ‘ ’ * string.len
+   L(c) string
+      r[L.index] = S c
+                      ‘a’..‘z’
+                         Char(code' (c.code - ‘a’.code + key) % 26 + ‘a’.code)
+                      ‘A’..‘Z’
+                         Char(code' (c.code - ‘A’.code + key) % 26 + ‘A’.code)
+                      E
+                         c
+   R r
+
+V msg = ‘The quick brown fox jumped over the lazy dogs’
+print(msg)
+V enc = caesar(msg, 11)
+print(enc)
+print(caesar(enc, 11, decode' 1B))
+===
+template <typename T1, typename T2, typename T3 = decltype(false)> auto caesar(const T1 &string, T2 key, const T3 &decode = false)
+{
+    if (decode)
+        key = 26 - key;
+    auto r = u" "_S * string.len();
+    {int Lindex = 0;
+    for (auto c : string) {
+        r.set(Lindex, [&](const auto &a){return in(a, range_ee(u'a'_C, u'z'_C)) ? Char(mod((c.code - u'a'_C.code + key), 26) + u'a'_C.code) : in(a, range_ee(u'A'_C, u'Z'_C)) ? Char(mod((c.code - u'A'_C.code + key), 26) + u'A'_C.code) : c;}(c));
+        Lindex++;
+    }}
+    return r;
+}
+auto msg = u"The quick brown fox jumped over the lazy dogs"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(msg);
+    }
+} code_block_1;
+auto enc = caesar(msg, 11);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(enc);
+        print(caesar(enc, 11, true));
+    }
+} code_block_2;
