@@ -2622,3 +2622,59 @@ It{{em,alic}iz,erat}e{d,}, please.
             print((create_array({s}) + _get<0>(getitem(s))).join(u"\n\t"_S) + u"\n"_S);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Calculating_the_value_of_e#Python
+import math
+#Implementation of Brother's formula
+e0 = 0.0
+e = 2.0
+n = 0
+fact = 1
+while(e-e0 > 1e-15):
+    e0 = e
+    n += 1
+    fact *= 2*n*(2*n+1)
+    e += (2.0*n+2)/fact
+ 
+print("Computed e = "+str(e))
+print("Real e = "+str(math.e))
+print("Error = "+str(math.e-e))
+print("Number of iterations = "+str(n))
+===
+//import math
+V e0 = 0.0
+V e = 2.0
+V n = 0
+V fact = 1
+L (e - e0 > 1e-15)
+   e0 = e
+   n++
+   fact *= 2 * n * (2 * n + 1)
+   e += (2.0 * n + 2) / fact
+print(‘Computed e = ’String(e))
+print(‘Real e = ’String(math:e))
+print(‘Error = ’String(math:e - e))
+print(‘Number of iterations = ’String(n))
+===
+auto e0 = 0.0;
+auto e = 2.0;
+auto n = 0;
+auto fact = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while ((e - e0 > 1e-15)) {
+            e0 = e;
+            n++;
+            fact *= 2 * n * (2 * n + 1);
+            e += (2.0 * n + 2) / fact;
+        }
+        print(u"Computed e = "_S + String(e));
+        print(u"Real e = "_S + String(math::e));
+        print(u"Error = "_S + String(math::e - e));
+        print(u"Number of iterations = "_S + String(n));
+    }
+} code_block_1;

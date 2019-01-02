@@ -1,4 +1,11 @@
+#define _USE_MATH_DEFINES
 #include <math.h>
+
+namespace math
+{
+	static const double pi = M_PI;
+	static const double e  = M_E;
+}
 
 template <class T, class Ta> inline T snap(const T x, const Ta grid_size) {return floor(x/grid_size + T(0.5)) * grid_size;}
 
@@ -7,8 +14,6 @@ template <class T, class Ta> inline T round(const T number, const Ta ndigits) {r
 template <class T> inline T fract(const T x) {return x - floor(x);}
 
 inline double log(const double x, const double base) {return log(x) / log(base);}
-
-static const double pi = 3.1415926535897932384626433832795;
 
 inline double radians(double deg) {return deg*0.017453292519943295769236907684886;}
 inline double degrees(double rad) {return rad*57.295779513082320876798154814105;}

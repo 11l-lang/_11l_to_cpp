@@ -1906,7 +1906,7 @@ def parse_internal(this_node):
                     if token.category == Token.Category.SCOPE_BEGIN:
                         node.expression = None
                     else:
-                        if token.value(source) == '(':
+                        if token.value(source) == '(' and token.start == tokens[tokeni-1].end:
                             if peek_token().value(source) == '&':
                                 node.is_loop_variable_a_reference = True
                                 next_token()
@@ -2177,6 +2177,8 @@ string_scope.add_name('zfill', ASTFunctionDefinition([('width', '', 'Int')]))
 string_scope.add_name('format', ASTFunctionDefinition([('arg', token_to_str('N', Token.Category.CONSTANT), '')] * 32))
 builtins_scope.ids['String'].ast_nodes[0].scope = string_scope
 
+module_scope = Scope(None)
+builtin_modules['math'] = Module(module_scope)
 module_scope = Scope(None)
 module_scope.add_function('get_temp_dir', ASTFunctionDefinition([]))
 module_scope.add_function('list_dir', ASTFunctionDefinition([('path', token_to_str('‘.’'), 'String')]))
