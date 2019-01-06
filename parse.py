@@ -797,6 +797,9 @@ def trans_type(ty, scope, type_token, ast_type_node = None):
         p = ty.find('[') # ]
         if p != -1:
             return (trans_type(ty[:p], scope, type_token, ast_type_node) if p != 0 else 'Array') + '<' + trans_type(ty[p+1:-1], scope, type_token, ast_type_node) + '>'
+        p = ty.find(',')
+        if p != -1:
+            return trans_type(ty[:p], scope, type_token, ast_type_node) + ', ' + trans_type(ty[p+1:].lstrip(), scope, type_token, ast_type_node)
 
         id = scope.find(ty)
         if id == None:
