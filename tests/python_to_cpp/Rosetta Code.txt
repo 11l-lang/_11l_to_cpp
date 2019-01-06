@@ -2812,3 +2812,27 @@ struct CodeBlock1
         print(cart_prod(create_array({}), create_array({1, 2})));
     }
 } code_block_1;
+
+
+def cart_prod(a, b):
+    p : List[Tuple[int, int]] = []
+    for i in a:
+        for j in b:
+            p += [(i, j)]
+    return p
+===
+F cart_prod(a, b)
+   [Tuple[Int, Int]] p
+   L(i) a
+      L(j) b
+         p [+]= (i, j)
+   R p
+===
+template <typename T1, typename T2> auto cart_prod(const T1 &a, const T2 &b)
+{
+    Array<Tuple<int, int>> p;
+    for (auto i : a)
+        for (auto j : b)
+            p.append(make_tuple(i, j));
+    return p;
+}
