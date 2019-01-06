@@ -2678,3 +2678,137 @@ struct CodeBlock1
         print(u"Number of iterations = "_S + String(n));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Cantor_set#Python
+WIDTH = 81
+HEIGHT = 5
+
+def cantor(start, len, index):
+    global lines
+    seg = len // 3
+    if seg == 0:
+        return
+    for it in range(HEIGHT-index):
+        i = index + it
+        for jt in range(seg):
+            j = start + seg + jt
+            pos = i * WIDTH + j
+            lines[pos] = ' '
+    cantor(start,           seg, index + 1)
+    cantor(start + seg * 2, seg, index + 1)
+
+lines = ['*'] * (WIDTH*HEIGHT)
+cantor(0, WIDTH, 1)
+
+for i in range(HEIGHT):
+    beg = WIDTH * i
+    print(''.join(lines[beg : beg+WIDTH]))
+===
+V WIDTH = 81
+V HEIGHT = 5
+
+F cantor(start, len, index)
+   V seg = len I/ 3
+   I seg == 0
+      R
+   L(it) 0 .< :HEIGHT - index
+      V i = index + it
+      L(jt) 0 .< seg
+         V j = start + seg + jt
+         V pos = i * :WIDTH + j
+         :lines[pos] = ‘ ’
+   cantor(start, seg, index + 1)
+   cantor(start + seg * 2, seg, index + 1)
+V lines = [‘*’] * (WIDTH * HEIGHT)
+cantor(0, WIDTH, 1)
+
+L(i) 0 .< HEIGHT
+   V beg = WIDTH * i
+   print((lines[beg .< beg + WIDTH]).join(‘’))
+===
+auto WIDTH = 81;
+auto HEIGHT = 5;
+
+template <typename T1, typename T2, typename T3> auto cantor(const T1 &start, const T2 &len, const T3 &index)
+{
+    auto seg = int(len)/int(3);
+    if (seg == 0)
+        return;
+    for (auto it : range_el(0, ::HEIGHT - index)) {
+        auto i = index + it;
+        for (auto jt : range_el(0, seg)) {
+            auto j = start + seg + jt;
+            auto pos = i * ::WIDTH + j;
+            ::lines.set(pos, u' '_C);
+        }
+    }
+    cantor(start, seg, index + 1);
+    cantor(start + seg * 2, seg, index + 1);
+}
+auto lines = create_array({u'*'_C}) * (WIDTH * HEIGHT);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        cantor(0, WIDTH, 1);
+
+        for (auto i : range_el(0, HEIGHT)) {
+            auto beg = WIDTH * i;
+            print((lines[range_el(beg, beg + WIDTH)]).join(u""_S));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Cartesian_product_of_two_or_more_lists#Go
+def cart_prod(a, b):
+    p = [(0, 0)] * (len(a) * len(b))
+    i = 0
+    for aa in a:
+        for bb in b:
+            p[i] = (aa, bb)
+            i += 1
+    return p
+
+print(cart_prod([1, 2], [3, 4]))
+print(cart_prod([3, 4], [1, 2]))
+print(cart_prod([1, 2], []))
+print(cart_prod([], [1, 2]))
+===
+F cart_prod(a, b)
+   V p = [(0, 0)] * (a.len * b.len)
+   V i = 0
+   L(aa) a
+      L(bb) b
+         p[i] = (aa, bb)
+         i++
+   R p
+print(cart_prod([1, 2], [3, 4]))
+print(cart_prod([3, 4], [1, 2]))
+print(cart_prod([1, 2], []))
+print(cart_prod([], [1, 2]))
+===
+template <typename T1, typename T2> auto cart_prod(const T1 &a, const T2 &b)
+{
+    auto p = create_array({make_tuple(0, 0)}) * (a.len() * b.len());
+    auto i = 0;
+    for (auto aa : a)
+        for (auto bb : b) {
+            p.set(i, make_tuple(aa, bb));
+            i++;
+        }
+    return p;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(cart_prod(create_array({1, 2}), create_array({3, 4})));
+        print(cart_prod(create_array({3, 4}), create_array({1, 2})));
+        print(cart_prod(create_array({1, 2}), create_array({})));
+        print(cart_prod(create_array({}), create_array({1, 2})));
+    }
+} code_block_1;
