@@ -329,3 +329,86 @@ struct CodeBlock2
         print(caesar(enc, 11, true));
     }
 } code_block_2;
+
+
+// https://www.rosettacode.org/wiki/Carmichael_3_strong_pseudoprimes#D
+F mod_(n, m)
+   R ((n % m) + m) % m
+ 
+F is_prime(n)
+   I n C (2, 3)
+      R 1B
+   E I n < 2 | n % 2 == 0 | n % 3 == 0
+      R 0B
+   V div = 5
+   V inc = 2
+   L div ^ 2 <= n
+      I n % div == 0
+         R 0B
+      div += inc
+      inc = 6 - inc
+   R 1B
+ 
+L(p) 2 .< 62
+   I !is_prime(p)
+      L.continue
+   L(h3) 2 .< p
+      V g = h3 + p
+      L(d) 1 .< g
+         I (g * (p - 1)) % d != 0 | mod_(-p * p, h3) != d % h3
+            L.continue;
+         V q = 1 + (p - 1) * g I/ d;
+         I !is_prime(q)
+            L.continue
+         V r = 1 + (p * q I/ h3)
+         I !is_prime(r) | (q * r) % (p - 1) != 1
+            L.continue
+         print(p‘ x ’q‘ x ’r)
+===
+template <typename T1, typename T2> auto mod_(const T1 &n, const T2 &m)
+{
+    return mod(((mod(n, m)) + m), m);
+}
+
+template <typename T1> auto is_prime(const T1 &n)
+{
+    if (in(n, make_tuple(2, 3)))
+        return true;
+    else if (n < 2 || mod(n, 2) == 0 || mod(n, 3) == 0)
+        return false;
+    auto div = 5;
+    auto inc = 2;
+    while (pow(div, 2) <= n) {
+        if (mod(n, div) == 0)
+            return false;
+        div += inc;
+        inc = 6 - inc;
+    }
+    return true;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto p : range_el(2, 62)) {
+            if (!is_prime(p))
+                continue;
+            for (auto h3 : range_el(2, p)) {
+                auto g = h3 + p;
+                for (auto d : range_el(1, g)) {
+                    if (mod((g * (p - 1)), d) != 0 || mod_(-p * p, h3) != mod(d, h3))
+                        continue;
+                    auto q = 1 + int((p - 1) * g)/int(d);
+                    if (!is_prime(q))
+                        continue;
+                    auto r = 1 + (int(p * q)/int(h3));
+                    if (!is_prime(r) || mod((q * r), (p - 1)) != 1)
+                        continue;
+                    print(p + u" x "_S + q + u" x "_S + r);
+                }
+            }
+        }
+    }
+} code_block_1;

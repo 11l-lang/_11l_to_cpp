@@ -127,6 +127,17 @@ template <typename Ty> inline void print(const Array<Ty> &arr, const String &end
 		std::wcout.flush();
 }
 
+template <typename Ty1, typename Ty2> inline void print(const Tuple<Ty1, Ty2> &t, const String &end = u"\n", bool flush = false)
+{
+	std::wcout << L'(';
+	print(_get<0>(t), u""_S);
+	std::wcout << L", ";
+	print(_get<1>(t), u""_S);
+	std::wcout << L')' << std::wstring(end.cbegin(), end.cend());
+	if (flush)
+		std::wcout.flush();
+}
+
 inline String input()
 {
 	std::wstring s;
