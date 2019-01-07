@@ -1075,3 +1075,103 @@ struct CodeBlock1
         print(u"Number: #4, #.."_S.format(1.1, 1.1));
     }
 } code_block_1;
+
+
+i = 0
+s = 'Array[Int]'
+while i < len(s):
+    c = s[i]
+    if c == '[':
+        print('<')
+    elif c == ']':
+        print('>')
+    else:
+        print(c, end = '')
+    i += 1
+===
+V i = 0
+V s = ‘Array[Int]’
+L i < s.len
+   V c = s[i]
+   S c
+      ‘[’
+         print(‘<’)
+      ‘]’
+         print(‘>’)
+      E
+         print(c, end' ‘’)
+   i++
+===
+auto i = 0;
+auto s = u"Array[Int]"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (i < s.len()) {
+            auto c = s[i];
+            switch (c)
+            {
+            case u'[':
+                print(u"<"_S);
+                break;
+            case u']':
+                print(u">"_S);
+                break;
+            default:
+                print(c, u""_S);
+                break;
+            }
+            i++;
+        }
+    }
+} code_block_1;
+
+
+i = 0
+s = 'Array[Int]'
+while i < len(s):
+    c = s[i]
+    if c == '[':
+        print('<')
+    elif c == ']':
+        print('>')
+    print(c, end = '')
+    i += 1
+===
+V i = 0
+V s = ‘Array[Int]’
+L i < s.len
+   V c = s[i]
+   S c
+      ‘[’
+         print(‘<’)
+      ‘]’
+         print(‘>’)
+   print(c, end' ‘’)
+   i++
+===
+auto i = 0;
+auto s = u"Array[Int]"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (i < s.len()) {
+            auto c = s[i];
+            switch (c)
+            {
+            case u'[':
+                print(u"<"_S);
+                break;
+            case u']':
+                print(u">"_S);
+                break;
+            }
+            print(c, u""_S);
+            i++;
+        }
+    }
+} code_block_1;
