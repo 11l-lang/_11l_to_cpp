@@ -364,7 +364,8 @@ class SymbolNode:
                         if type(f_node) == ASTLoop: # for `L(justify) [(s, w) -> ...]...justify(...)`
                             f_node = None
                         else:
-                            assert(type(f_node) in (ASTFunctionDefinition, ASTTypeDefinition) or (type(f_node) in (ASTVariableInitialization, ASTVariableDeclaration) and f_node.function_pointer))
+                            assert(type(f_node) in (ASTFunctionDefinition, ASTTypeDefinition) or (type(f_node) in (ASTVariableInitialization, ASTVariableDeclaration) and f_node.function_pointer)
+                                                                                              or (type(f_node) ==  ASTVariableInitialization and f_node.expression.symbol.id == '->'))
                             if type(f_node) == ASTTypeDefinition:
                                 if f_node.has_virtual_functions:
                                     func_name = 'std::make_unique<' + func_name + '>'
@@ -416,7 +417,7 @@ class SymbolNode:
                                 t = self.children[len(self.children)-1].token
                                 raise Error('missing required argument `'+ f_node.function_arguments[last_function_arg][0] + '`', Token(t.end, t.end, Token.Category.DELIMITER))
                             last_function_arg += 1
-                    else:
+                    elif f_node.function_pointer:
                         if last_function_arg != len(f_node.type_args):
                             raise Error('wrong number of arguments passed to function pointer', Token(self.children[0].token.end, self.children[0].token.end, Token.Category.DELIMITER))
 
@@ -610,7 +611,8 @@ class SymbolNode:
                             if child != None and child.symbol.id != '->':
                                 gather_captured_variables(child)
                 gather_captured_variables(self.children[1])
-                return '[' + ', '.join(sorted(captured_variables)) + '](' + ', '.join(map(lambda c: 'const auto &' + c.to_str(), self.children[0].children if self.children[0].symbol.id == '(' else [self.children[0]])) + '){return ' + self.children[1].to_str() + ';}' # )
+                return '[' + ', '.join(sorted(captured_variables)) + '](' + ', '.join(map(lambda c: 'const ' + ('auto &' if c.symbol.id != '=' else 'decltype(' + c.children[1].to_str() + ') &') + c.to_str(),
+                    self.children[0].children if self.children[0].symbol.id == '(' else [self.children[0]])) + '){return ' + self.children[1].to_str() + ';}' # )
             elif self.symbol.id in ('..', '.<', '<.', '<.<'):
                 s = {'..':'ee', '.<':'el', '<.':'le', '<.<':'ll'}[self.symbol.id]
                 c0 = char_if_len_1(self.children[0])

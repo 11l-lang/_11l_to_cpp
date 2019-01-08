@@ -206,7 +206,7 @@ V r = I reverse {y < x} E I eq {x == y} E x < y
 auto l1 = [](){return nullptr;};
 auto l2 = [](const auto &x){return _get<0>(x);};
 auto l3 = [](const auto &self){return self;};
-auto l4 = [](const auto &x, const auto &y, const auto &reverse = false){return reverse ? y < x : x < y;};
+auto l4 = [](const auto &x, const auto &y, const decltype(false) &reverse = false){return reverse ? y < x : x < y;};
 auto r = reverse ? y < x : eq ? x == y : x < y;
 
 

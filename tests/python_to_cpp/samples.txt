@@ -1175,3 +1175,32 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+l1 = lambda: None
+l2 = lambda x: x[0]
+l3 = lambda self: self
+l4 = lambda x, y, reverse = False: y < x if reverse else x < y
+print(l4(1, 2))
+print(l4(1, 2, True))
+===
+V l1 = () -> N
+V l2 = x -> x[0]
+V l3 = self -> self
+V l4 = (x, y, reverse = 0B) -> I reverse {y < x} E x < y
+print(l4(1, 2))
+print(l4(1, 2, 1B))
+===
+auto l1 = [](){return nullptr;};
+auto l2 = [](const auto &x){return _get<0>(x);};
+auto l3 = [](const auto &self){return self;};
+auto l4 = [](const auto &x, const auto &y, const decltype(false) &reverse = false){return reverse ? y < x : x < y;};
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(l4(1, 2));
+        print(l4(1, 2, true));
+    }
+} code_block_1;
