@@ -38,7 +38,7 @@ public:
 	{
 		Array<decltype(func(Type()))> r;
 		r.reserve(len());
-		for (auto el : *this)
+		for (auto &&el : *this)
 			r.push_back(func(el));
 		return r;
 	}
@@ -60,9 +60,25 @@ public:
 	template <typename Func> Array filter(Func &&func) const
 	{
 		Array r;
-		for (auto el : *this)
+		for (auto &&el : *this)
 			if (func(el))
 				r.push_back(el);
+		return r;
+	}
+
+	template <typename Func> Type reduce(Func &&func) const
+	{
+		Type r = (*this)[0];
+		for (auto it = begin() + 1; it != end(); ++it)
+			r = func(r, *it);
+		return r;
+	}
+
+	template <typename Func> Type reduce(const Type &initial, Func &&func) const
+	{
+		Type r = initial;
+		for (auto &&el : *this)
+			r = func(r, el);
 		return r;
 	}
 
