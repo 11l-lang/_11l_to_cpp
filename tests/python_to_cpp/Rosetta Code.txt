@@ -2836,3 +2836,69 @@ template <typename T1, typename T2> auto cart_prod(const T1 &a, const T2 &b)
             p.append(make_tuple(i, j));
     return p;
 }
+
+
+# https://www.rosettacode.org/wiki/Catalan_numbers
+c = 1
+for n in range(1, 16):
+    print(c)
+    c = 2*(2*n - 1) * c // (n + 1)
+===
+V c = 1
+L(n) 1.<16
+   print(c)
+   c = 2 * (2 * n - 1) * c I/ (n + 1)
+===
+auto c = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_el(1, 16)) {
+            print(c);
+            c = int(2 * (2 * n - 1) * c)/int((n + 1));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Catalan_numbers/Pascal%27s_triangle#Python
+n = 15
+t = [0] * (n + 2)
+t[1] = 1
+for i in range(1, n + 1):
+    for j in range(i, 1, -1): t[j] += t[j - 1]
+    t[i + 1] = t[i]
+    for j in range(i + 1, 1, -1): t[j] += t[j - 1]
+    print(t[i+1] - t[i], end=' ')
+===
+V n = 15
+V t = [0] * (n + 2)
+t[1] = 1
+L(i) 1 .< n + 1
+   L(j) (i .< 1).step(-1)
+      t[j] += t[j - 1]
+   t[i + 1] = t[i]
+   L(j) (i + 1 .< 1).step(-1)
+      t[j] += t[j - 1]
+   print(t[i + 1] - t[i], end' ‘ ’)
+===
+auto n = 15;
+auto t = create_array({0}) * (n + 2);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        t.set(1, 1);
+        for (auto i : range_el(1, n + 1)) {
+            for (auto j : range_el(i, 1).step(-1))
+                t[j] += t[j - 1];
+            t.set(i + 1, t[i]);
+            for (auto j : range_el(i + 1, 1).step(-1))
+                t[j] += t[j - 1];
+            print(t[i + 1] - t[i], u" "_S);
+        }
+    }
+} code_block_1;
