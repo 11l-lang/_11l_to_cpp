@@ -13,6 +13,7 @@ public:
 		Type value;
 	public:
 		explicit Iterator(Type value) : value(value) {}
+		bool operator==(Iterator i) {return value == i.value;}
 		bool operator!=(Iterator i) {return value != i.value;}
 		void operator++() {value++;}
 		Type operator*() {return value;}
@@ -49,9 +50,28 @@ public:
 	template <typename Func> Array<Type> filter(Func &&func) const
 	{
 		Array<Type> r;
-		for (auto el : *this)
+		for (auto &&el : *this)
 			if (func(el))
 				r.push_back(el);
+		return r;
+	}
+
+	template <typename Func> Type reduce(Func &&func) const
+	{
+		auto it = begin();
+		if (it == end())
+			throw AssertionError();
+		Type r = *it;
+		for (++it; it != end(); ++it)
+			r = func(r, *it);
+		return r;
+	}
+
+	template <typename Func> Type reduce(const Type &initial, Func &&func) const
+	{
+		Type r = initial;
+		for (auto &&el : *this)
+			r = func(r, el);
 		return r;
 	}
 
