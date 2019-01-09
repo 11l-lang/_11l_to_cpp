@@ -2120,7 +2120,7 @@ builtins_scope.add_function('assert', ASTFunctionDefinition([('expression', '', 
 builtins_scope.add_function('exit', ASTFunctionDefinition([('arg', '', '')]))
 builtins_scope.add_function('zip', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', '')]))
 builtins_scope.add_function('multiloop', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', ''), ('function', '', ''), ('optional', token_to_str('N', Token.Category.CONSTANT), '')]))
-builtins_scope.add_function('multiloop_filtered', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', ''), ('filter_function', '', ''), ('function', '', '')]))
+builtins_scope.add_function('multiloop_filtered', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', ''), ('filter_function', '', ''), ('function', '', ''), ('optional', token_to_str('N', Token.Category.CONSTANT), '')]))
 builtins_scope.add_function('sum', ASTFunctionDefinition([('iterable', '', '')]))
 builtins_scope.add_function('product', ASTFunctionDefinition([('iterable', '', '')]))
 builtins_scope.add_function('sorted', ASTFunctionDefinition([('iterable', '', '')]))
