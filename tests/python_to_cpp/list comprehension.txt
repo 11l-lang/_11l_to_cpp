@@ -189,3 +189,48 @@ auto f()
     auto r2 = range_el(0, 4).map([&matrix](const auto &i){return matrix.map([&i](const auto &row){return row[i];});});
     assert(r1 == r2 && r2 == create_array({create_array({1, 5, 9}), create_array({2, 6, 10}), create_array({3, 7, 11}), create_array({4, 8, 12})}));
 }
+
+
+from typing import List
+
+aa = ['1', '2']
+bb = ['x', 'y']
+cc = ['A', 'B']
+nout : List[str] = []
+for a in aa:
+    for b in bb:
+        for c in cc:
+            nout.append(a + '' + b + '' + c)
+print([a + '' + b for a in aa for b in bb] == ['1x', '1y', '2x', '2y'])
+print([a + '' + b for a in aa for b in bb if a + '' + b != '1x'] == ['1y', '2x', '2y'])
+#print(nout)
+#print([a + b + c for a in aa for b in bb for c in cc])
+===
+V aa = [‘1’, ‘2’]
+V bb = [‘x’, ‘y’]
+V cc = [‘A’, ‘B’]
+[String] nout
+L(a) aa
+   L(b) bb
+      L(c) cc
+         nout.append(a‘’b‘’c)
+print(multiloop(aa, bb, (a, b) -> a‘’b) == [‘1x’, ‘1y’, ‘2x’, ‘2y’])
+print(multiloop_filtered(aa, bb, (a, b) -> a‘’b != ‘1x’, (a, b) -> a‘’b) == [‘1y’, ‘2x’, ‘2y’])
+===
+auto aa = create_array({u'1'_C, u'2'_C});
+auto bb = create_array({u'x'_C, u'y'_C});
+auto cc = create_array({u'A'_C, u'B'_C});
+Array<String> nout;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto a : aa)
+            for (auto b : bb)
+                for (auto c : cc)
+                    nout.append(a + b + c);
+        print(multiloop(aa, bb, [](const auto &a, const auto &b){return a + b;}) == create_array({u"1x"_S, u"1y"_S, u"2x"_S, u"2y"_S}));
+        print(multiloop_filtered(aa, bb, [](const auto &a, const auto &b){return a + b != u"1x";}, [](const auto &a, const auto &b){return a + b;}) == create_array({u"1y"_S, u"2x"_S, u"2y"_S}));
+    }
+} code_block_1;

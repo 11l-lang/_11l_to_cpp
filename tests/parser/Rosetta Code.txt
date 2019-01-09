@@ -356,8 +356,8 @@ L(p) 2 .< 62
       V g = h3 + p
       L(d) 1 .< g
          I (g * (p - 1)) % d != 0 | mod_(-p * p, h3) != d % h3
-            L.continue;
-         V q = 1 + (p - 1) * g I/ d;
+            L.continue
+         V q = 1 + (p - 1) * g I/ d
          I !is_prime(q)
             L.continue
          V r = 1 + (p * q I/ h3)

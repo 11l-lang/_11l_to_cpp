@@ -14,7 +14,7 @@ class Char
 public:
 	char16_t code;
 
-	Char(char16_t code) : code(code) {}
+	Char(char16_t code = 0) : code(code) {}
 
 	operator char16_t() const {return code;} // for `switch (instr[i])` support
 
