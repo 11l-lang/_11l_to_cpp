@@ -2475,11 +2475,12 @@ def getitem(s, depth = 0):
             global getgroup # to suppress error 'undefined identifier' in `x = getgroup(s[1:], depth+1)`
             x = getgroup(s[1:], depth+1) #                                     ^^^^^^^^
             if len(x[0]):
-                nout : List[str] = []
-                for a in out:
-                    for b in x[0]:
-                        nout.append(a + '' + b)
-                out = nout
+                #nout : List[str] = []
+                #for a in out:
+                #    for b in x[0]:
+                #        nout.append(a + '' + b)
+                #out = nout
+                out = [a + '' + b for a in out for b in x[0]]
                 s = x[1]
                 continue
         if c == '\\' and len(s) > 1:
@@ -2524,11 +2525,7 @@ F getitem(=s, depth = 0)
       I c == ‘{’
          V x = getgroup(s[1..], depth + 1)
          I !x[0].empty
-            [String] nout
-            L(a) out
-               L(b) x[0]
-                  nout.append(a‘’b)
-            out = nout
+            out = multiloop(out, x[0], (a, b) -> a‘’b)
             s = x[1]
             L.continue
       I c == "\\" & s.len > 1
@@ -2572,11 +2569,7 @@ template <typename T1, typename T2 = decltype(0)> auto getitem(T1 s, const T2 &d
         if (c == u'{') {
             auto x = getgroup(s[range_ei(1)], depth + 1);
             if (!_get<0>(x).empty()) {
-                Array<String> nout;
-                for (auto a : out)
-                    for (auto b : _get<0>(x))
-                        nout.append(a + b);
-                out = nout;
+                out = multiloop(out, _get<0>(x), [](const auto &a, const auto &b){return a + b;});
                 s = _get<1>(x);
                 continue;
             }
@@ -2835,6 +2828,18 @@ template <typename T1, typename T2> auto cart_prod(const T1 &a, const T2 &b)
         for (auto j : b)
             p.append(make_tuple(i, j));
     return p;
+}
+
+
+def cart_prod(a, b):
+    return [(aa, bb) for aa in a for bb in b]
+===
+F cart_prod(a, b)
+   R multiloop(a, b, (aa, bb) -> (aa, bb))
+===
+template <typename T1, typename T2> auto cart_prod(const T1 &a, const T2 &b)
+{
+    return multiloop(a, b, [](const auto &aa, const auto &bb){return make_tuple(aa, bb);});
 }
 
 

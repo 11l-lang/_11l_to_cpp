@@ -149,10 +149,55 @@ inline String input()
 template <typename T1, typename T2> Array<Tuple<T1, T2>> zip(const Array<T1> &arr1, const Array<T2> &arr2)
 {
 	Array<Tuple<T1, T2>> r;
+	r.reserve(min(arr1.len(), arr2.len()));
 	auto it1 = arr1.begin();
 	auto it2 = arr2.begin();
 	for (; it1 != arr1.end() && it2 != arr2.end(); ++it1, ++it2)
 		r.push_back(make_tuple(*it1, *it2));
+	return r;
+}
+
+template <typename Type1, typename Type2, typename Func> auto multiloop(const Array<Type1> &arr1, const Array<Type2> &arr2, Func &&func) -> Array<decltype(func(Type1(), Type2()))>
+{
+	Array<decltype(func(Type1(), Type2()))> r;
+	r.reserve(arr1.len() * arr2.len());
+	for (auto &&el1 : arr1)
+		for (auto &&el2 : arr2)
+			r.push_back(func(el1, el2));
+	return r;
+}
+
+template <typename Type1, typename Type2, typename FilterFunc, typename Func> auto multiloop_filtered(const Array<Type1> &arr1, const Array<Type2> &arr2, FilterFunc &&filter_func, Func &&func) -> Array<decltype(func(Type1(), Type2()))>
+{
+	Array<decltype(func(Type1(), Type2()))> r;
+//	r.reserve(arr1.len() * arr2.len());
+	for (auto &&el1 : arr1)
+		for (auto &&el2 : arr2)
+			if (filter_func(el1, el2))
+				r.push_back(func(el1, el2));
+	return r;
+}
+
+template <typename Type1, typename Type2, typename Type3, typename Func> auto multiloop(const Array<Type1> &arr1, const Array<Type2> &arr2, const Array<Type3> &arr3, Func &&func) -> Array<decltype(func(Type1(), Type2(), Type3()))>
+{
+	Array<decltype(func(Type1(), Type2(), Type3()))> r;
+	r.reserve(arr1.len() * arr2.len() * arr3.len());
+	for (auto &&el1 : arr1)
+		for (auto &&el2 : arr2)
+			for (auto &&el3 : arr3)
+				r.push_back(func(el1, el2, el3));
+	return r;
+}
+
+template <typename Type1, typename Type2, typename Type3, typename FilterFunc, typename Func> auto multiloop_filtered(const Array<Type1> &arr1, const Array<Type2> &arr2, const Array<Type3> &arr3, FilterFunc &&filter_func, Func &&func) -> Array<decltype(func(Type1(), Type2(), Type3()))>
+{
+	Array<decltype(func(Type1(), Type2(), Type3()))> r;
+//	r.reserve(arr1.len() * arr2.len() * arr3.len());
+	for (auto &&el1 : arr1)
+		for (auto &&el2 : arr2)
+			for (auto &&el3 : arr3)
+				if (filter_func(el1, el2, el3))
+					r.push_back(func(el1, el2, el3));
 	return r;
 }
 
