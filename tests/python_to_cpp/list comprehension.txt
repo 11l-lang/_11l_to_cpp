@@ -205,7 +205,7 @@ print([a + '' + b for a in aa for b in bb] == ['1x', '1y', '2x', '2y'])
 print([a + '' + b for a in aa for b in bb if a + '' + b != '1x'] == ['1y', '2x', '2y'])
 print(nout)
 print([a + '' + b + '' + c for a in aa for b in bb for c in cc])
-#print([a + '' + b + '' + c for a in aa for b in bb for c in cc if a + '' + b + '' + c != '2yB'])
+print([a + '' + b + '' + c for a in aa for b in bb for c in cc if a + '' + b + '' + c != '2yB'])
 ===
 V aa = [‘1’, ‘2’]
 V bb = [‘x’, ‘y’]
@@ -219,6 +219,7 @@ print(multiloop(aa, bb, (a, b) -> a‘’b) == [‘1x’, ‘1y’, ‘2x’, �
 print(multiloop_filtered(aa, bb, (a, b) -> a‘’b != ‘1x’, (a, b) -> a‘’b) == [‘1y’, ‘2x’, ‘2y’])
 print(nout)
 print(multiloop(aa, bb, cc, (a, b, c) -> a‘’b‘’c))
+print(multiloop_filtered(aa, bb, cc, (a, b, c) -> a‘’b‘’c != ‘2yB’, (a, b, c) -> a‘’b‘’c))
 ===
 auto aa = create_array({u'1'_C, u'2'_C});
 auto bb = create_array({u'x'_C, u'y'_C});
@@ -237,6 +238,7 @@ struct CodeBlock1
         print(multiloop_filtered(aa, bb, [](const auto &a, const auto &b){return a + b != u"1x";}, [](const auto &a, const auto &b){return a + b;}) == create_array({u"1y"_S, u"2x"_S, u"2y"_S}));
         print(nout);
         print(multiloop(aa, bb, cc, [](const auto &a, const auto &b, const auto &c){return a + b + c;}));
+        print(multiloop_filtered(aa, bb, cc, [](const auto &a, const auto &b, const auto &c){return a + b + c != u"2yB";}, [](const auto &a, const auto &b, const auto &c){return a + b + c;}));
     }
 } code_block_1;
 
