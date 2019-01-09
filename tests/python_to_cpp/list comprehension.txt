@@ -234,3 +234,26 @@ struct CodeBlock1
         print(multiloop_filtered(aa, bb, [](const auto &a, const auto &b){return a + b != u"1x";}, [](const auto &a, const auto &b){return a + b;}) == create_array({u"1y"_S, u"2x"_S, u"2y"_S}));
     }
 } code_block_1;
+
+
+aa = [1, 2]
+bb = [3, 4]
+print([a for a in aa if [3, 4] == [b for b in bb]])
+print([a for a in aa if [4, 5] == [b + 1 for b in bb]])
+===
+V aa = [1, 2]
+V bb = [3, 4]
+print(aa.filter(a -> [3, 4] == :bb))
+print(aa.filter(a -> [4, 5] == :bb.map(b -> b + 1)))
+===
+auto aa = create_array({1, 2});
+auto bb = create_array({3, 4});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(aa.filter([](const auto &a){return create_array({3, 4}) == ::bb;}));
+        print(aa.filter([](const auto &a){return create_array({4, 5}) == ::bb.map([](const auto &b){return b + 1;});}));
+    }
+} code_block_1;
