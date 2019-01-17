@@ -77,7 +77,8 @@ public:
 	explicit String(const char16_t *&s) : basic_string(s) {} // reference is needed here because otherwise String(const char16_t (&s)[N]) is never called (`String(u"str")` calls `String(const char16_t *s)`)
 	String(const char16_t *s, size_t sz) : basic_string(s, sz) {}
 	template <int N> String(const char16_t (&s)[N]): basic_string(s, N-1) {}
-	template <class T> explicit String(const T s, const T e) : basic_string(s, e) {}
+	template <typename Ty> explicit String(const Ty s, const Ty e) : basic_string(s, e) {}
+	template <typename Ty, typename = std::enable_if_t<std::is_enum<Ty>::value>> explicit String(const Ty e) : String(int(e)) {}
 
 	using std::u16string::assign;
 	void assign(double num, int digits = 9, bool remove_trailing_zeroes = true)
