@@ -34,9 +34,9 @@ public:
 	      std::vector<Type>::clear,
 	      std::vector<Type>::reserve;
 
-	template <typename Func> auto map(Func &&func) const -> Array<decltype(func(Type()))>
+	template <typename Func> auto map(Func &&func) const -> Array<decltype(func(std::declval<Type>()))>
 	{
-		Array<decltype(func(Type()))> r;
+		Array<decltype(func(std::declval<Type>()))> r;
 		r.reserve(len());
 		for (auto &&el : *this)
 			r.push_back(func(el));

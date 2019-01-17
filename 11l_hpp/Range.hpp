@@ -38,9 +38,9 @@ public:
 		return size();
 	}
 
-	template <typename Func> auto map(Func &&func) const -> Array<decltype(func(Type()))>
+	template <typename Func> auto map(Func &&func) const -> Array<decltype(func(std::declval<Type>()))>
 	{
-		Array<decltype(func(Type()))> r;
+		Array<decltype(func(std::declval<Type>()))> r;
 		r.reserve(e - !include_ending - (b + !include_beginning) + 1);
 		for (Type i = b + !include_beginning; i <= e - !include_ending; i++)
 			r.push_back(func(i));
@@ -100,9 +100,9 @@ public:
 	Iterator begin() const {return Iterator(b + !include_beginning,  step);}
 	Iterator end()   const {return Iterator(e - !include_ending + 1, step);}
 
-	template <typename Func> auto map(Func &&func) -> Array<decltype(func(Type()))>
+	template <typename Func> auto map(Func &&func) -> Array<decltype(func(std::declval<Type>()))>
 	{
-		Array<decltype(func(Type()))> r;
+		Array<decltype(func(std::declval<Type>()))> r;
 		for (Type i = b + !include_beginning; i <= e - !include_ending; i+=step)
 			r.push_back(func(i));
 		return r;
