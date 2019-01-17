@@ -174,10 +174,10 @@ public:
 		for (auto i : range)
 			append(i);
 	}
-	template <typename Ty, bool include_beginning, bool include_ending> void operator+=(const Range<Ty, include_beginning, include_ending> &range)
-	{
-		append(range);
-	}
+//	template <typename Ty, bool include_beginning, bool include_ending> void operator+=(const Range<Ty, include_beginning, include_ending> &range)
+//	{
+//		append(range);
+//	}
 
 	int index(const Type &v) const
 	{
