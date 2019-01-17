@@ -157,9 +157,9 @@ template <typename T1, typename T2> Array<Tuple<T1, T2>> zip(const Array<T1> &ar
 	return r;
 }
 
-template <typename Type1, typename Type2, typename Func> auto multiloop(const Array<Type1> &arr1, const Array<Type2> &arr2, Func &&func) -> Array<decltype(func(Type1(), Type2()))>
+template <typename Type1, typename Type2, typename Func> auto multiloop(const Array<Type1> &arr1, const Array<Type2> &arr2, Func &&func) -> Array<decltype(func(std::declval<Type1>(), std::declval<Type2>()))>
 {
-	Array<decltype(func(Type1(), Type2()))> r;
+	Array<decltype(func(std::declval<Type1>(), std::declval<Type2>()))> r;
 	r.reserve(arr1.len() * arr2.len());
 	for (auto &&el1 : arr1)
 		for (auto &&el2 : arr2)
@@ -167,9 +167,9 @@ template <typename Type1, typename Type2, typename Func> auto multiloop(const Ar
 	return r;
 }
 
-template <typename Type1, typename Type2, typename FilterFunc, typename Func> auto multiloop_filtered(const Array<Type1> &arr1, const Array<Type2> &arr2, FilterFunc &&filter_func, Func &&func) -> Array<decltype(func(Type1(), Type2()))>
+template <typename Type1, typename Type2, typename FilterFunc, typename Func> auto multiloop_filtered(const Array<Type1> &arr1, const Array<Type2> &arr2, FilterFunc &&filter_func, Func &&func) -> Array<decltype(func(std::declval<Type1>(), std::declval<Type2>()))>
 {
-	Array<decltype(func(Type1(), Type2()))> r;
+	Array<decltype(func(std::declval<Type1>(), std::declval<Type2>()))> r;
 //	r.reserve(arr1.len() * arr2.len());
 	for (auto &&el1 : arr1)
 		for (auto &&el2 : arr2)
@@ -178,9 +178,9 @@ template <typename Type1, typename Type2, typename FilterFunc, typename Func> au
 	return r;
 }
 
-template <typename Type1, typename Type2, typename Type3, typename Func> auto multiloop(const Array<Type1> &arr1, const Array<Type2> &arr2, const Array<Type3> &arr3, Func &&func) -> Array<decltype(func(Type1(), Type2(), Type3()))>
+template <typename Type1, typename Type2, typename Type3, typename Func> auto multiloop(const Array<Type1> &arr1, const Array<Type2> &arr2, const Array<Type3> &arr3, Func &&func) -> Array<decltype(func(std::declval<Type1>(), std::declval<Type2>(), std::declval<Type3>()))>
 {
-	Array<decltype(func(Type1(), Type2(), Type3()))> r;
+	Array<decltype(func(std::declval<Type1>(), std::declval<Type2>(), std::declval<Type3>()))> r;
 	r.reserve(arr1.len() * arr2.len() * arr3.len());
 	for (auto &&el1 : arr1)
 		for (auto &&el2 : arr2)
@@ -189,9 +189,9 @@ template <typename Type1, typename Type2, typename Type3, typename Func> auto mu
 	return r;
 }
 
-template <typename Type1, typename Type2, typename Type3, typename FilterFunc, typename Func> auto multiloop_filtered(const Array<Type1> &arr1, const Array<Type2> &arr2, const Array<Type3> &arr3, FilterFunc &&filter_func, Func &&func) -> Array<decltype(func(Type1(), Type2(), Type3()))>
+template <typename Type1, typename Type2, typename Type3, typename FilterFunc, typename Func> auto multiloop_filtered(const Array<Type1> &arr1, const Array<Type2> &arr2, const Array<Type3> &arr3, FilterFunc &&filter_func, Func &&func) -> Array<decltype(func(std::declval<Type1>(), std::declval<Type2>(), std::declval<Type3>()))>
 {
-	Array<decltype(func(Type1(), Type2(), Type3()))> r;
+	Array<decltype(func(std::declval<Type1>(), std::declval<Type2>(), std::declval<Type3>()))> r;
 //	r.reserve(arr1.len() * arr2.len() * arr3.len());
 	for (auto &&el1 : arr1)
 		for (auto &&el2 : arr2)
