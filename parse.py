@@ -708,7 +708,7 @@ class ASTNodeWithChildren(ASTNode):
     # children : List['ASTNode'] = [] # OMFG! This actually means static (common for all objects of type ASTNode) variable, not default value of member variable, that was unexpected to me as it contradicts C++11 behavior
     children : List['ASTNode']
     tokeni : int
-    scope : Scope
+    #scope : Scope
 
     def __init__(self):
         self.children = []
@@ -760,7 +760,7 @@ class ASTProgram(ASTNodeWithChildren):
         code_block_id = 1
 
         for c in self.children:
-            global_statement = type(c) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition, ASTTypeDefinition, ASTMain)
+            global_statement = type(c) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition, ASTTypeDefinition, ASTTypeEnum, ASTMain)
             if global_statement != prev_global_statement:
                 prev_global_statement = global_statement
                 if not global_statement:
@@ -1209,6 +1209,23 @@ class ASTTypeDefinition(ASTNodeWithChildren):
             r += c.to_str(indent+1)
         if len(self.forward_declared_types):
             r = "\n".join(' ' * (indent*4) + 'class ' + t + ';' for t in self.forward_declared_types) + "\n\n" + r
+        return r + ' ' * (indent*4) + "};\n"
+
+class ASTTypeEnum(ASTNode):
+    enum_name : str
+    enumerators : List[str]
+
+    def __init__(self):
+        super().__init__()
+        self.enumerators = []
+
+    def to_str(self, indent):
+        r = ' ' * (indent*4) + 'enum class ' + self.enum_name + " {\n"
+        for i in range(len(self.enumerators)):
+            r += ' ' * ((indent+1)*4) + self.enumerators[i]
+            if i < len(self.enumerators) - 1:
+                r += ', '
+            r += "\n"
         return r + ' ' * (indent*4) + "};\n"
 
 class ASTMain(ASTNodeWithChildren):
@@ -1825,6 +1842,26 @@ def parse_internal(this_node):
                         node.has_virtual_functions = True
                         break
 
+            elif token.value(source) in ('T.enum', 'Т.перечисл', 'type.enum', 'тип.перечисл'):
+                node = ASTTypeEnum()
+                node.enum_name = expected_name('enum name')
+                advance_scope_begin()
+
+                while True:
+                    if token.category != Token.Category.NAME:
+                        raise Error('expected an enumerator name', token)
+                    enumerator = token.value(source)
+                    next_token()
+                    if token.value(source) == '=':
+                        next_token()
+                        enumerator += ' = ' + expression().to_str()
+                    node.enumerators.append(enumerator)
+                    if token.category == Token.Category.SCOPE_END:
+                        next_token()
+                        break
+                    assert(token.category == Token.Category.STATEMENT_SEPARATOR)
+                    next_token()
+
             elif token.value(source).startswith('I') or \
                  token.value(source).startswith('Е') or \
                  token.value(source).startswith('if') or \
@@ -2012,7 +2049,8 @@ def parse_internal(this_node):
 
         elif token.category == Token.Category.STATEMENT_SEPARATOR: # this `if` was added in revision 105 in order to support `hor_col_align = S instr[j .< j + 2] {‘<<’ {‘left’}; ‘>>’ {‘right’}; ‘><’ {‘center’}; ‘<>’ {‘justify’}}` [there was no STATEMENT_SEPARATOR after this line of code]
             next_token()
-            assert(token.category != Token.Category.STATEMENT_SEPARATOR)
+            if token != None:
+                assert(token.category != Token.Category.STATEMENT_SEPARATOR)
             continue
 
         else:
