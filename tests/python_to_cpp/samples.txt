@@ -1204,3 +1204,77 @@ struct CodeBlock1
         print(l4(1, 2, true));
     }
 } code_block_1;
+
+
+from enum import IntEnum
+
+class Category(IntEnum):
+    NAME = 0 # or IDENTIFIER
+    KEYWORD = 1
+    CONSTANT = 2
+    TEST_CATEGORY = 10
+    TEST_CATEGORY2 = 11
+    TEST_CATEGORY3 = 11
+===
+T.enum Category
+   NAME
+   KEYWORD
+   CONSTANT
+   TEST_CATEGORY = 10
+   TEST_CATEGORY2
+   TEST_CATEGORY3 = 11
+===
+enum class Category {
+    NAME, 
+    KEYWORD, 
+    CONSTANT, 
+    TEST_CATEGORY = 10, 
+    TEST_CATEGORY2, 
+    TEST_CATEGORY3 = 11
+};
+
+
+# This test is also[‘as previous’] failed without `if token != None:` under ‘this `if` was added in revision 105’
+c = 1
+if c == 1:
+    print(1)
+elif c == 2:
+    print(2)
+===
+S 1
+   1
+      print(1)
+   2
+      print(2)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        switch (1)
+        {
+        case 1:
+            print(1);
+            break;
+        case 2:
+            print(2);
+            break;
+        }
+    }
+} code_block_1;
+
+
+---
+import syntax_highlighter_for_pqmarkup
+try:
+    print(syntax_highlighter_for_pqmarkup.highlight('11l', 'V a = 0'))
+except syntax_highlighter_for_pqmarkup.Error as e:
+    print('Syntax highlighter error: ' + e.message + ' at ' + str(e.pos))
+===
+//import syntax_highlighter_for_pqmarkup
+X.try
+   print(syntax_highlighter_for_pqmarkup:highlight(‘11l’, ‘V a = 0’))
+X.catch syntax_highlighter_for_pqmarkup:Error e
+   print(‘Syntax highlighter error: ’e.message‘ at ’String(e.pos))
+===
+.
