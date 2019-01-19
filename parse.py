@@ -463,7 +463,12 @@ class SymbolNode:
                         char_val = False
                 res = 'create_dict(dict_of'
                 for child in self.children:
-                    res += '(' + char_or_str(child.children[0], char_key) + ', ' + char_or_str(child.children[1], char_val) + ')'
+                    c0 = child.children[0]
+                    if c0.symbol.id == '.' and len(c0.children) == 2 and c0.children[1].token_str().isupper():
+                        c0str = c0.to_str().replace('.', '::') # replace `python_to_11l:tokenizer:Token.Category.NAME` with `python_to_11l::tokenizer::Token::Category::NAME`
+                    else:
+                        c0str = char_or_str(c0, char_key)
+                    res += '(' + c0str + ', ' + char_or_str(child.children[1], char_val) + ')'
                 return res + ')'
             elif self.children[1].token.category == Token.Category.NUMERIC_LITERAL:
                 return '_get<' + self.children[1].to_str() + '>(' + self.children[0].to_str() + ')' # for support tuples (e.g. `(1, 2)[0]` -> `_get<0>(make_tuple(1, 2))`)
@@ -1271,6 +1276,8 @@ def type_of(sn):
             raise Error('method `' + sn.children[1].token_str() + '` is not found in type `' + type_name + '`', sn.left_to_right_token())
         return tid.ast_nodes[0]
     elif sn.children[0].symbol.id == ':':
+        if len(sn.children[0].children) == 2:
+            return None # [-TODO-]
         assert(len(sn.children[0].children) == 1)
         tid = global_scope.find(sn.children[0].children[0].token_str())
         assert(tid != None and len(tid.ast_nodes) == 1)
@@ -1503,7 +1510,7 @@ def led(self, left):
     global scope
     module_name = left.to_str()
     if module_name not in modules and module_name not in builtin_modules:
-        module_file_name = os.path.join(os.path.dirname(file_name), module_name).replace('\\', '/') # `os.path.join()` is needed for case when `os.path.dirname(file_name)` is empty string, `replace('\\', '/')` is needed for passing 'tests/parser/errors.txt'
+        module_file_name = os.path.join(os.path.dirname(file_name), module_name.replace('::', '/')).replace('\\', '/') # `os.path.join()` is needed for case when `os.path.dirname(file_name)` is empty string, `replace('\\', '/')` is needed for passing 'tests/parser/errors.txt'
         try:
             modulefstat = os.stat(module_file_name + '.11l')
         except FileNotFoundError:
@@ -1519,8 +1526,8 @@ def led(self, left):
                 or not os.path.isfile(module_file_name + '.11l_global_scope'):
             module_source = open(module_file_name + '.11l', encoding = 'utf-8-sig').read()
             prev_scope = scope
-            open(module_file_name + '.hpp', 'w', encoding = 'utf-8-sig', newline = "\n").write('namespace ' + module_name + "\n{\n" # utf-8-sig is for MSVC (fix of error C2015: too many characters in constant [`u'‘'`]) # ’
-                + parse_and_to_str(tokenizer.tokenize(module_source), module_source, module_file_name + '.11l', True) + "}\n")
+            open(module_file_name + '.hpp', 'w', encoding = 'utf-8-sig', newline = "\n").write( # utf-8-sig is for MSVC (fix of error C2015: too many characters in constant [`u'‘'`]) # ’
+                parse_and_to_str(tokenizer.tokenize(module_source), module_source, module_file_name + '.11l', True))
             modules[module_name] = Module(scope)
             assert(scope.is_function == False) # serializing `is_function` member variable is not necessary because it is always equal to `False`
             open(module_file_name + '.11l_global_scope', 'w', encoding = 'utf-8', newline = "\n").write(thindf.to_thindf(scope.serialize_to_dict()))
@@ -1601,7 +1608,11 @@ def led(self, left):
 symbol('[').led = led
 
 def nud(self):
-    if peek_token().value(source) == '=':
+    i = 1 # [[
+    if token.value(source) != ']': # for `R []`
+        while peek_token(i).value(source) not in ('=', ',', ']'): # for `V cat_to_class_python = [python_to_11l:tokenizer:Token.Category.NAME = ‘identifier’, ...]`
+            i += 1
+    if peek_token(i).value(source) == '=':
         self.is_dict = True
         while True: # [
             self.append_child(expression())
@@ -1851,6 +1862,8 @@ def parse_internal(this_node):
                     if token.category != Token.Category.NAME:
                         raise Error('expected an enumerator name', token)
                     enumerator = token.value(source)
+                    if not enumerator.isupper():
+                        raise Error('enumerators must be uppercase', token)
                     next_token()
                     if token.value(source) == '=':
                         next_token()
@@ -2290,14 +2303,14 @@ def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, ap
     scope.parent = builtins_scope
     file_name = file_name_
     importing_module = importing_module_
-    if not importing_module:
-        modules = {}
+    prev_modules = modules
+    modules = {}
     next_token()
     p = ASTProgram()
     parse_internal(p)
 
     if len(modules):
-        p.beginning_extra = "\n".join(map(lambda m: '#include "' + m + '.hpp"', modules)) + "\n\n"
+        p.beginning_extra = "\n".join(map(lambda m: 'namespace ' + m.replace('::', ' { namespace ') + " {\n#include \"" + m.replace('::', '/') + ".hpp\"\n}" + '}'*m.count('::'), modules)) + "\n\n"
 
     found_reference_to_argv = False
     def find_reference_to_argv(node):
@@ -2333,5 +2346,6 @@ def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, ap
     file_name = prev_file_name
     importing_module = prev_importing_module
     break_label_index = prev_break_label_index
+    modules = prev_modules
 
     return s

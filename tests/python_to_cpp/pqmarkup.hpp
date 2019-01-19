@@ -1,6 +1,4 @@
-﻿namespace pqmarkup
-{
-Array<String> argv;
+﻿Array<String> argv;
 
 class Exception
 {
@@ -868,5 +866,4 @@ public:
 template <typename T1, typename T3 = decltype(false), typename T4 = decltype(false)> auto to_html(const T1 &instr, File* const outfilef = nullptr, const T3 &ohd = false, const T4 &habr_html = false)
 {
     return Converter(habr_html, ohd).to_html(instr, outfilef);
-}
 }
