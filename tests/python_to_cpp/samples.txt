@@ -1294,3 +1294,18 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+import test_deep_imports
+print()
+===
+//import test_deep_imports
+print()
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print();
+    }
+} code_block_1;

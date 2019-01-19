@@ -2281,7 +2281,7 @@ module_scope.add_function('shuffle', ASTFunctionDefinition([('container', '', ''
 builtin_modules['random'] = Module(module_scope)
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
-    if len(tokens_) == 0: return ASTProgram()
+    if len(tokens_) == 0: return ASTProgram().to_str()
     global tokens, source, tokeni, token, break_label_index, scope, global_scope, tokensn, file_name, importing_module, modules
     prev_tokens    = tokens
     prev_source    = source
