@@ -1264,7 +1264,6 @@ struct CodeBlock1
 } code_block_1;
 
 
----
 import syntax_highlighter_for_pqmarkup
 try:
     print(syntax_highlighter_for_pqmarkup.highlight('11l', 'V a = 0'))
@@ -1277,4 +1276,21 @@ X.try
 X.catch syntax_highlighter_for_pqmarkup:Error e
    print(‘Syntax highlighter error: ’e.message‘ at ’String(e.pos))
 ===
-.
+namespace syntax_highlighter_for_pqmarkup {
+#include "syntax_highlighter_for_pqmarkup.hpp"
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        try
+        {
+            print(syntax_highlighter_for_pqmarkup::highlight(u"11l"_S, u"V a = 0"_S));
+        }
+        catch (const syntax_highlighter_for_pqmarkup::Error& e)
+        {
+            print(u"Syntax highlighter error: "_S + e.message + u" at "_S + String(e.pos));
+        }
+    }
+} code_block_1;

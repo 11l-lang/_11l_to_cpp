@@ -662,7 +662,9 @@ E
    print(String(test_id - failed_tests)‘ tests passed and ’String(failed_tests)‘ failed.’)
    exit(1)
 ===
+namespace pqmarkup {
 #include "pqmarkup.hpp"
+}
 
 auto test_id = 0;
 auto failed_tests = 0;

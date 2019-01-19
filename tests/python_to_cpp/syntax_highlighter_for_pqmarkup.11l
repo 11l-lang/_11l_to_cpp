@@ -1,0 +1,12 @@
+//import python_to_11l.tokenizer
+V cat_to_class_python = [python_to_11l:tokenizer:Token.Category.NAME = ‘identifier’, python_to_11l:tokenizer:Token.Category.KEYWORD = ‘keyword’, python_to_11l:tokenizer:Token.Category.CONSTANT = ‘constant’, python_to_11l:tokenizer:Token.Category.OPERATOR_OR_DELIMITER = ‘’, python_to_11l:tokenizer:Token.Category.NUMERIC_LITERAL = ‘numeric-literal’, python_to_11l:tokenizer:Token.Category.STRING_LITERAL = ‘string-literal’, python_to_11l:tokenizer:Token.Category.INDENT = ‘’, python_to_11l:tokenizer:Token.Category.DEDENT = ‘’, python_to_11l:tokenizer:Token.Category.STATEMENT_SEPARATOR = ‘’]
+
+T Error
+   String message
+   Int pos
+   F (message, pos)
+      .message = message
+      .pos = pos
+
+F highlight(lang, source)
+   R source

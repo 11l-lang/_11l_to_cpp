@@ -188,3 +188,9 @@ to_html(s, 0B, habr_html' 1B) // this is correct
 to_html(s, habr_html' 1B) // and this is correct
 to_html(s, 0B, 1B) // this is wrong
                ^Error: argument `habr_html` of function `to_html` is named-only
+
+
+T.enum Category
+   NAME
+   Keyword
+   ^Error: enumerators must be uppercase
