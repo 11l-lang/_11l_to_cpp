@@ -523,7 +523,7 @@ F decompress([Int] &compressed)
    R result
 V compressed = compress(‘TOBEORNOTTOBEORTOBEORNOT’)
 print(compressed)
-print(decompress(compressed))
+print(decompress(&compressed))
 ===
 template <typename T1> auto compress(const T1 &uncompressed)
 {
