@@ -1,0 +1,10 @@
+Imported modules = []
+to_html
+    type = ‘’
+    node
+        function_arguments = [
+            ‘instr; ; ’
+            outfilef; N; IO[str]
+            ‘ohd; 0B; ’
+            ‘habr_html; 0B; ’
+        ]

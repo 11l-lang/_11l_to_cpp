@@ -36,7 +36,7 @@ class Scope:
             return {'type': self.type, 'ast_nodes': ast_nodes}
 
         def deserialize_from_dict(self, d):
-            self.type = d['type']
+            #self.type = d['type']
             for ast_node_dict in d['ast_nodes']:
                 ast_node = ASTFunctionDefinition()
                 ast_node.deserialize_from_dict(ast_node_dict)
@@ -888,10 +888,10 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         self.scope = scope
 
     def serialize_to_dict(self):
-        return {'function_arguments': [', '.join(arg) for arg in self.function_arguments]}
+        return {'function_arguments': ['; '.join(arg) for arg in self.function_arguments]}
 
     def deserialize_from_dict(self, d):
-        self.function_arguments = [arg.split(', ') for arg in d['function_arguments']]
+        self.function_arguments = [arg.split('; ') for arg in d['function_arguments']]
 
     def to_str(self, indent):
         if type(self.parent) == ASTTypeDefinition:

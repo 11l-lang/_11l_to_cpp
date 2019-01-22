@@ -1,0 +1,13 @@
+Imported modules = [
+    python_to_11l.tokenizer
+]
+cat_to_class_python
+    type = ‘’
+    node = N
+highlight
+    type = ‘’
+    node
+        function_arguments = [
+            ‘lang; ; ’
+            ‘source; ; ’
+        ]

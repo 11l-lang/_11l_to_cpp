@@ -8,9 +8,9 @@ to_html
     type = ‘’
     ast_nodes = [
     .   function_arguments = [
-            ‘instr, , , ’
-            ‘outfilef, nullptr, File?, ’
-            ‘ohd, false, , ’
-            ‘habr_html, false, , ’
+            ‘instr; ; ; ’
+            ‘outfilef; nullptr; File?; ’
+            ‘ohd; false; ; ’
+            ‘habr_html; false; ; ’
         ]
     ]
