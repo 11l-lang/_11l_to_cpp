@@ -18,5 +18,14 @@ public:
 
 template <typename T1, typename T2> auto highlight(const T1 &lang, const T2 &source)
 {
+    Array<Tuple<int, int>> comments;
+
+    if (lang == u"Python") {
+        for (auto token : python_to_11l::tokenizer::tokenize(source, nullptr, &comments))
+            print(token.to_str(source));
+        print(comments);
+    }
+    else
+        assert(lang == u"11l");
     return source;
 }

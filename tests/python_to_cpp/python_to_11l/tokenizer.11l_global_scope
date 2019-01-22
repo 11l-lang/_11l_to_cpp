@@ -1,3 +1,12 @@
 Token
     type = ‘’
     ast_nodes = []
+tokenize
+    type = ‘’
+    ast_nodes = [
+    .   function_arguments = [
+            ‘source, , , ’
+            newline_chars, nullptr, [Int]?, &
+            comments, nullptr, [Tuple[Int, Int]]?, &
+        ]
+    ]

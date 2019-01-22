@@ -10,3 +10,28 @@ T Token
       INDENT
       DEDENT
       STATEMENT_SEPARATOR
+   Int start
+   Int end
+   Category category
+
+   F (start, end, category)
+      .start = start
+      .end = end
+      .category = category
+
+   F __repr__()
+      R String(.start)
+
+   F value(source)
+      R source[.start .< .end]
+
+   F to_str(source)
+      R ‘Token(’String(.category)‘, "’(.value(source))‘")’
+
+F tokenize(source, [Int]? &newline_chars = N, [Tuple[Int, Int]]? &comments = N)
+   [Token] tokens
+
+   I comments != N
+      comments.append((10, 20))
+   tokens.append(Token(0, source.len, Token.Category.STATEMENT_SEPARATOR))
+   R tokens

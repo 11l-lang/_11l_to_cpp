@@ -20,4 +20,13 @@ class Error(Exception):
         self.pos = pos
 
 def highlight(lang, source):
+    comments : List[Tuple[int, int]] = []
+
+    if lang == 'Python':
+        for token in python_to_11l.tokenizer.tokenize(source, comments = comments):
+            print(token.to_str(source))
+        print(comments)
+    else:
+        assert(lang == '11l')
+
     return source

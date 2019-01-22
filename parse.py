@@ -381,6 +381,7 @@ class SymbolNode:
                 res = func_name + '('
                 for i in range(1, len(self.children), 2):
                     if self.children[i] == None:
+                        cstr = self.children[i+1].to_str()
                         if f_node != None and type(f_node) == ASTFunctionDefinition:
                             if last_function_arg >= len(f_node.function_arguments):
                                 raise Error('too many arguments for function `' + func_name + '`', self.children[0].left_to_right_token())
@@ -390,7 +391,9 @@ class SymbolNode:
                                 tid = self.scope.find(self.children[i+1].token_str())
                                 if tid == None or tid.type != 'File?':
                                     res += '&'
-                        res += self.children[i+1].to_str()
+                            elif f_node.function_arguments[last_function_arg][2].endswith('?') and f_node.function_arguments[last_function_arg][2] != 'Int?' and not cstr.startswith('make_SharedPtr<'):
+                                res += '&'
+                        res += cstr
                         last_function_arg += 1
                     else:
                         argument_name = self.children[i].to_str()[:-1]
@@ -406,6 +409,8 @@ class SymbolNode:
                                 raise Error('argument `' + f_node.function_arguments[last_function_arg][0] + '` of function `' + func_name + '` has no default value, please specify its value here', self.children[i].token)
                             res += f_node.function_arguments[last_function_arg][1] + ', '
                             last_function_arg += 1
+                        if f_node.function_arguments[last_function_arg-1][2].endswith('?') and not '->' in f_node.function_arguments[last_function_arg-1][2]:
+                            res += '&'
                         res += self.children[i+1].to_str()
                     if i < len(self.children)-2:
                         res += ', '
@@ -530,7 +535,7 @@ class SymbolNode:
                 else:
                     return 'range_ei(' + c0 + ')'
             elif self.symbol.id == '&':
-                assert(self.parent.symbol.id == '(') # )
+                assert(self.parent.function_call)
                 return self.children[0].to_str()
             else:
                 return {'(-)':'~'}.get(self.symbol.id, self.symbol.id) + self.children[0].to_str()
@@ -596,7 +601,14 @@ class SymbolNode:
                         tid = s.find(id_.type)
                         if tid != None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
                             return cts0 + '->' + c1
+
+                if c1.isupper():
+                    c0 = self.children[0].to_str()
+                    #assert(c0[0].isupper())
+                    return c0.replace('.', '::') + '::' + c1 # replace `Token.Category.STATEMENT_SEPARATOR` with `Token::Category::STATEMENT_SEPARATOR`
+
                 return char_if_len_1(self.children[0]) + '.' + c1 + '()'*(c1 in ('len', 'last', 'empty')) # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
+
             elif self.symbol.id == ':':
                 c0 = self.children[0].to_str()
                 c0 = {'time':'timens', # 'time': a symbol with this name already exists and therefore this name cannot be used as a namespace name
@@ -809,9 +821,11 @@ def trans_type(ty, scope, type_token, ast_type_node = None):
             return trans_type(ty[:p], scope, type_token, ast_type_node) + ', ' + trans_type(ty[p+1:].lstrip(), scope, type_token, ast_type_node)
 
         id = scope.find(ty)
-        if id == None:
+        if id == None or len(id.ast_nodes) == 0:
             raise Error('type `' + ty + '` is not defined', type_token)
-        if len(id.ast_nodes) == 0 or type(id.ast_nodes[0]) != ASTTypeDefinition:
+        if type(id.ast_nodes[0]) == ASTTypeEnum:
+            return ty
+        if type(id.ast_nodes[0]) != ASTTypeDefinition:
             raise Error('`' + ty + '`: expected a type name', type_token)
         if id.ast_nodes[0].has_virtual_functions:
             return 'std::unique_ptr<' + ty + '>'
@@ -951,7 +965,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                         #+ ('' if '=' in arg[3] else 'const ')
                         + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
                 elif arg[2].endswith('?'):
-                    arguments.append(arg[2].rstrip('?') + '* '
+                    arguments.append(trans_type(arg[2].rstrip('?'), self.scope, tokens[self.tokeni]) + '* '
                             + ('' if '=' in arg[3] else 'const ')
                             + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
                 else:
@@ -1280,7 +1294,8 @@ def type_of(sn):
             return None # [-TODO-]
         assert(len(sn.children[0].children) == 1)
         tid = global_scope.find(sn.children[0].children[0].token_str())
-        assert(tid != None and len(tid.ast_nodes) == 1)
+        if tid == None or len(tid.ast_nodes) != 1:
+            raise Error('`' + sn.children[0].children[0].token_str() + '` is not found in global scope', sn.left_to_right_token()) # this error occurs without this code: ` or (self.token_str()[0].isupper() and self.token_str() != self.token_str().upper())`
         left = tid.ast_nodes[0]
     elif sn.children[0].token_str().startswith('@'):
         return None # [-TODO-]
@@ -1308,7 +1323,10 @@ def type_of(sn):
         if type(left) == ASTLoop:
             return None
 
-    assert(type(left) in (ASTVariableDeclaration, ASTVariableInitialization))
+    if type(left) == ASTTypeDefinition:
+        return None # [-TODO-]
+    if type(left) not in (ASTVariableDeclaration, ASTVariableInitialization):
+        raise Error('left type is `' + str(type(left)) + '`', sn.left_to_right_token())
     if left.type in ('V', 'П', 'var', 'перем'): # for `V selection_strings = ... selection_strings.map(...)`
         return None
     if len(left.type_args): # `Array[String] ending_tags... ending_tags.append(‘</blockquote>’)`
@@ -1526,8 +1544,8 @@ def led(self, left):
                 or not os.path.isfile(module_file_name + '.11l_global_scope'):
             module_source = open(module_file_name + '.11l', encoding = 'utf-8-sig').read()
             prev_scope = scope
-            open(module_file_name + '.hpp', 'w', encoding = 'utf-8-sig', newline = "\n").write( # utf-8-sig is for MSVC (fix of error C2015: too many characters in constant [`u'‘'`]) # ’
-                parse_and_to_str(tokenizer.tokenize(module_source), module_source, module_file_name + '.11l', True))
+            s = parse_and_to_str(tokenizer.tokenize(module_source), module_source, module_file_name + '.11l', True)
+            open(module_file_name + '.hpp', 'w', encoding = 'utf-8-sig', newline = "\n").write(s) # utf-8-sig is for MSVC (fix of error C2015: too many characters in constant [`u'‘'`]) # ’
             modules[module_name] = Module(scope)
             assert(scope.is_function == False) # serializing `is_function` member variable is not necessary because it is always equal to `False`
             open(module_file_name + '.11l_global_scope', 'w', encoding = 'utf-8', newline = "\n").write(thindf.to_thindf(scope.serialize_to_dict()))
@@ -1775,13 +1793,28 @@ def parse_internal(this_node):
                         if token.value(source)[0].isupper(): # this is a type name
                             type_ = token.value(source)
                             next_token()
-                        if token.value(source) == '[':
-                            next_token()
-                            if token.category != Token.Category.NAME:
-                                raise Error('expected function\'s argument subname', token)
-                            type_ += '[' + token.value(source) + ']'
-                            next_token()
-                            advance(']')
+                        if token.value(source) == '[': # ]
+                            nesting_level = 0
+                            while True:
+                                type_ += token.value(source)
+                                if token.value(source) == '[':
+                                    next_token()
+                                    nesting_level += 1
+                                elif token.value(source) == ']':
+                                    next_token()
+                                    nesting_level -= 1
+                                    if nesting_level == 0:
+                                        break
+                                elif token.value(source) == ',':
+                                    type_ += ' '
+                                    next_token()
+                                else:
+                                    if token.category != Token.Category.NAME:
+                                        raise Error('expected subtype name', token)
+                                    next_token()
+                            if token.value(source) == '?':
+                                type_ += '?'
+                                next_token()
                         qualifier = ''
                         if token.value(source) == '=':
                             qualifier = '='
@@ -1856,6 +1889,7 @@ def parse_internal(this_node):
             elif token.value(source) in ('T.enum', 'Т.перечисл', 'type.enum', 'тип.перечисл'):
                 node = ASTTypeEnum()
                 node.enum_name = expected_name('enum name')
+                scope.add_name(node.enum_name, node)
                 advance_scope_begin()
 
                 while True:
@@ -2214,7 +2248,7 @@ add_builtin_global_var('stdin', 'File')
 add_builtin_global_var('stdout', 'File')
 add_builtin_global_var('stderr', 'File')
 
-builtins_scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', '')])]))
+builtins_scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', '', 'Int')])]))
 builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('mode', token_to_str('‘r’'), 'String'), ('encoding', token_to_str('‘utf-8’'), 'String')])]))
 file_scope = Scope(None)
 file_scope.add_name('read_bytes', ASTFunctionDefinition([]))
