@@ -11,3 +11,30 @@ class Token:
         INDENT = 6 # [https://docs.python.org/3/reference/lexical_analysis.html#indentation][-1]
         DEDENT = 7
         STATEMENT_SEPARATOR = 8
+
+    start : int
+    end : int
+    category : Category
+
+    def __init__(self, start, end, category):
+        self.start = start
+        self.end = end
+        self.category = category
+
+    def __repr__(self):
+        return str(self.start)
+
+    def value(self, source):
+        return source[self.start:self.end]
+
+    def to_str(self, source):
+        return 'Token('+str(self.category)+', "'+self.value(source)+'")'
+
+def tokenize(source, newline_chars : List[int] = None, comments : List[Tuple[int, int]] = None):
+    tokens : List[Token] = []
+
+    if comments != None:
+        comments.append((10, 20))
+    tokens.append(Token(0, len(source), Token.Category.STATEMENT_SEPARATOR))
+
+    return tokens

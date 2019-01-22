@@ -179,6 +179,7 @@ for fname in os.listdir('tests/python_to_cpp'):
                 exit(1)
         except Exception as e:
             print("Exception in test:\n" + test + "\n[in file '" + full_fname + "']")
+            print("[in file '" + (py_parser.file_name if type(e) == py_parser.Error else parse.file_name) + "']")
             raise e
         print('OK')
 
