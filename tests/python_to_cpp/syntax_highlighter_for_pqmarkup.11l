@@ -12,7 +12,7 @@ F highlight(lang, source)
    [Tuple[Int, Int]] comments
 
    I lang == ‘Python’
-      L(token) python_to_11l:tokenizer:tokenize(source, comments' comments)
+      L(token) python_to_11l:tokenizer:tokenize(source, comments' &comments)
          print(token.to_str(source))
       print(comments)
    E
