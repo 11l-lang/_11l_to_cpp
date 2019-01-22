@@ -8,7 +8,7 @@ highlight
     type = ‘’
     ast_nodes = [
     .   function_arguments = [
-            ‘lang, , , ’
-            ‘source, , , ’
+            ‘lang; ; ; ’
+            ‘source; ; ; ’
         ]
     ]
