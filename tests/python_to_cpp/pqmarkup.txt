@@ -1,5 +1,6 @@
 import sys
 from typing import List, IO, Callable, Dict
+Char = str
 
 class Exception(Exception):
     message : str
@@ -63,14 +64,14 @@ class Converter:
 
         i = 0
         def next_char(offset = 1):
-            return instr[i + offset] if i + offset < len(instr) else "\0"[0]
+            return instr[i + offset] if i + offset < len(instr) else Char("\0")
 
         def i_next_str(str): # i_ — if_/is_
             #return i + len(str) <= len(instr) and instr[i:i+len(str)] == str
             return instr[i+1:i+1+len(str)] == str # first check is not necessarily in Python
 
         def prev_char(offset = 1):
-            return instr[i - offset] if i - offset >= 0 else "\0"[0]
+            return instr[i - offset] if i - offset >= 0 else Char("\0")
 
         def html_escape(str):
             str = str.replace('&', '&amp;').replace('<', '&lt;')
@@ -361,7 +362,7 @@ class Converter:
 
             if ch == "‘":
                 prevci = i - 1
-                prevc = instr[prevci] if prevci >= 0 else "\0"[0]
+                prevc = instr[prevci] if prevci >= 0 else Char("\0")
                 #assert(prevc == prev_char())
                 startqpos = i
                 i = find_ending_pair_quote(i)
@@ -937,13 +938,13 @@ T Converter
          X Exception(message, p[0], p[1], p[2])
       V i = 0
       F next_char(offset = 1)
-         R I @i + offset < @instr.len {@instr[@i + offset]} E "\0"[0]
+         R I @i + offset < @instr.len {@instr[@i + offset]} E Char("\0")
 
       F i_next_str(str)
          R @instr[@i + 1 .< @i + 1 + str.len] == str
 
       F prev_char(offset = 1)
-         R I @i - offset >= 0 {@instr[@i - offset]} E "\0"[0]
+         R I @i - offset >= 0 {@instr[@i - offset]} E Char("\0")
 
       F html_escape(=str)
          str = str.replace(‘&’, ‘&amp;’).replace(‘<’, ‘&lt;’)
@@ -1213,7 +1214,7 @@ T Converter
 
          I ch == "‘"
             V prevci = i - 1
-            V prevc = I prevci >= 0 {instr[prevci]} E "\0"[0]
+            V prevc = I prevci >= 0 {instr[prevci]} E Char("\0")
             V startqpos = i
             i = find_ending_pair_quote(i)
             V endqpos = i
@@ -1786,7 +1787,7 @@ public:
         auto i = 0;
         auto next_char = [&i, &instr](const decltype(1) offset = 1)
         {
-            return i + offset < instr.len() ? instr[i + offset] : _get<0>(u"\0"_S);
+            return i + offset < instr.len() ? instr[i + offset] : u'\0'_C;
         };
 
         auto i_next_str = [&i, &instr](const auto &str)
@@ -1796,7 +1797,7 @@ public:
 
         auto prev_char = [&i, &instr](const decltype(1) offset = 1)
         {
-            return i - offset >= 0 ? instr[i - offset] : _get<0>(u"\0"_S);
+            return i - offset >= 0 ? instr[i - offset] : u'\0'_C;
         };
 
         auto html_escape = [this](auto str)
@@ -2147,7 +2148,7 @@ public:
 
             if (ch == u'‘') {
                 auto prevci = i - 1;
-                auto prevc = prevci >= 0 ? instr[prevci] : _get<0>(u"\0"_S);
+                auto prevc = prevci >= 0 ? instr[prevci] : u'\0'_C;
                 auto startqpos = i;
                 i = find_ending_pair_quote(i);
                 auto endqpos = i;

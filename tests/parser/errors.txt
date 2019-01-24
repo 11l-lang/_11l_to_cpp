@@ -194,3 +194,7 @@ T.enum Category
    NAME
    Keyword
    ^Error: enumerators must be uppercase
+
+
+V c = Char(‘’)
+           ^Error: Char can be constructed only from single character string literals

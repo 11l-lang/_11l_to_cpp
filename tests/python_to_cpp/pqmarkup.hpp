@@ -77,7 +77,7 @@ public:
         auto i = 0;
         auto next_char = [&i, &instr](const decltype(1) offset = 1)
         {
-            return i + offset < instr.len() ? instr[i + offset] : _get<0>(u"\0"_S);
+            return i + offset < instr.len() ? instr[i + offset] : u'\0'_C;
         };
 
         auto i_next_str = [&i, &instr](const auto &str)
@@ -87,7 +87,7 @@ public:
 
         auto prev_char = [&i, &instr](const decltype(1) offset = 1)
         {
-            return i - offset >= 0 ? instr[i - offset] : _get<0>(u"\0"_S);
+            return i - offset >= 0 ? instr[i - offset] : u'\0'_C;
         };
 
         auto html_escape = [this](auto str)
@@ -438,7 +438,7 @@ public:
 
             if (ch == u'‘') {
                 auto prevci = i - 1;
-                auto prevc = prevci >= 0 ? instr[prevci] : _get<0>(u"\0"_S);
+                auto prevc = prevci >= 0 ? instr[prevci] : u'\0'_C;
                 auto startqpos = i;
                 i = find_ending_pair_quote(i);
                 auto endqpos = i;

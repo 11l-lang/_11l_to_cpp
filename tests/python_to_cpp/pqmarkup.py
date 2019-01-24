@@ -1,5 +1,6 @@
 import sys
 from typing import List, IO, Callable, Dict
+Char = str
 
 class Exception(Exception):
     message : str
@@ -63,14 +64,14 @@ class Converter:
 
         i = 0
         def next_char(offset = 1):
-            return instr[i + offset] if i + offset < len(instr) else "\0"[0]
+            return instr[i + offset] if i + offset < len(instr) else Char("\0")
 
         def i_next_str(str): # i_ — if_/is_
             #return i + len(str) <= len(instr) and instr[i:i+len(str)] == str
             return instr[i+1:i+1+len(str)] == str # first check is not necessarily in Python
 
         def prev_char(offset = 1):
-            return instr[i - offset] if i - offset >= 0 else "\0"[0]
+            return instr[i - offset] if i - offset >= 0 else Char("\0")
 
         def html_escape(str):
             str = str.replace('&', '&amp;').replace('<', '&lt;')
@@ -361,7 +362,7 @@ class Converter:
 
             if ch == "‘":
                 prevci = i - 1
-                prevc = instr[prevci] if prevci >= 0 else "\0"[0]
+                prevc = instr[prevci] if prevci >= 0 else Char("\0")
                 #assert(prevc == prev_char())
                 startqpos = i
                 i = find_ending_pair_quote(i)
