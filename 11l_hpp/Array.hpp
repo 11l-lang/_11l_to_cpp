@@ -395,6 +395,16 @@ template <typename Type> Array<Type> sorted(const Array<Type> &arr)
 	return r;
 }
 
+template <typename Type, typename Key> Array<Type> sorted(const Array<Type> &arr, Key key, bool reverse = false)
+{
+	Array<Type> r(arr);
+	if (!reverse)
+		std::sort(r.begin(), r.end(), [key](const Type &a, const Type &b) {return key(a) < key(b);});
+	else
+		std::sort(r.begin(), r.end(), [key](const Type &a, const Type &b) {return key(b) < key(a);});
+	return r;
+}
+
 Array<Char> sorted(const String &s)
 {
 	Array<Char> arr;
