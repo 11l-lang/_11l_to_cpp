@@ -208,6 +208,14 @@ class SymbolNode:
                     if i < len(self.children) - 1:
                         r += ', '
                 return r + ']'
+        elif self.symbol.id == '(': # )
+            assert(self.tuple)
+            r = 'Tuple['
+            for i in range(len(self.children)):
+                r += self.children[i].to_type_str()
+                if i < len(self.children) - 1:
+                    r += ', '
+            return r + ']'
     
         assert(self.token.category == Token.Category.NAME)
         return self.token_str()
@@ -821,12 +829,15 @@ def trans_type(ty, scope, type_token, ast_type_node = None):
         if '.' in ty: # for `Token.Category category`
             return ty.replace('.', '::') # [-TODO: generalize-]
 
+        if ty.startswith('('): # )
+            return 'Tuple<' + trans_type(ty[1:-1], scope, type_token, ast_type_node) + '>'
+
         p = ty.find('[') # ]
         if p != -1:
             return (trans_type(ty[:p], scope, type_token, ast_type_node) if p != 0 else 'Array') + '<' + trans_type(ty[p+1:-1], scope, type_token, ast_type_node) + '>'
         p = ty.find(',')
         if p != -1:
-            return trans_type(ty[:p], scope, type_token, ast_type_node) + ', ' + trans_type(ty[p+1:].lstrip(), scope, type_token, ast_type_node)
+            return trans_type(ty[:p], scope, type_token, ast_type_node) + ', ' + trans_type(ty[p+1:].lstrip(' '), scope, type_token, ast_type_node)
 
         id = scope.find(ty)
         if id == None or len(id.ast_nodes) == 0:
@@ -1820,6 +1831,16 @@ def parse_internal(this_node):
                                     if token.category != Token.Category.NAME:
                                         raise Error('expected subtype name', token)
                                     next_token()
+                                if token.value(source) == '(':
+                                    type_ += '('
+                                    next_token()
+                                    while token.value(source) != ')':
+                                        type_ += token.value(source)
+                                        if token.value(source) == ',':
+                                            type_ += ' '
+                                        next_token()
+                                    next_token()
+                                    type_ += ')'
                             if token.value(source) == '?':
                                 type_ += '?'
                                 next_token()
