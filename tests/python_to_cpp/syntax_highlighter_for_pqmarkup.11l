@@ -10,7 +10,7 @@ T Error
 
 F highlight(lang, source)
    V writepos = 0
-   [Tuple[Int, Int]] comments
+   [(Int, Int)] comments
    V res = ‘’
 
    F html_escape(s)
