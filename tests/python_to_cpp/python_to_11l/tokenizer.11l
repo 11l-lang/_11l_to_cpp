@@ -1,6 +1,17 @@
+V keywords = [‘False’, ‘await’, ‘else’, ‘import’, ‘pass’, ‘None’, ‘break’, ‘except’, ‘in’, ‘raise’, ‘True’, ‘class’, ‘finally’, ‘is’, ‘return’, ‘and’, ‘continue’, ‘for’, ‘lambda’, ‘try’, ‘as’, ‘def’, ‘from’, ‘nonlocal’, ‘while’, ‘assert’, ‘del’, ‘global’, ‘not’, ‘with’, ‘async’, ‘elif’, ‘if’, ‘or’, ‘yield’]
 V operators = [‘+’, ‘-’, ‘*’, ‘**’, ‘/’, ‘//’, ‘%’, ‘@’, ‘<<’, ‘>>’, ‘&’, ‘|’, ‘^’, ‘~’, ‘<’, ‘>’, ‘<=’, ‘>=’, ‘==’, ‘!=’]
 V delimiters = [‘(’, ‘)’, ‘[’, ‘]’, ‘{’, ‘}’, ‘,’, ‘:’, ‘.’, ‘;’, ‘@’, ‘=’, ‘->’, ‘+=’, ‘-=’, ‘*=’, ‘/=’, ‘//=’, ‘%=’, ‘@=’, ‘&=’, ‘|=’, ‘^=’, ‘>>=’, ‘<<=’, ‘**=’]
 V operators_and_delimiters = sorted(operators [+] delimiters, key' x -> x.len, reverse' 1B)
+
+T Error
+   String message
+   Int pos
+   Int end
+
+   F (message, pos)
+      .message = message
+      .pos = pos
+      .end = pos
 
 T Token
    T.enum Category
@@ -33,8 +44,191 @@ T Token
 
 F tokenize(source, [Int]? &newline_chars = N, [Tuple[Int, Int]]? &comments = N)
    [Token] tokens
+   [Int] indentation_levels
+   [Tuple[String, Int]] nesting_elements
+   V begin_of_line = 1B
+   V expected_an_indented_block = 0B
+   V i = 0
 
-   I comments != N
-      comments.append((10, 20))
-   tokens.append(Token(0, source.len, Token.Category.STATEMENT_SEPARATOR))
+   L i < source.len
+      I begin_of_line
+         begin_of_line = 0B
+         V linestart = i
+         V indentation_level = 0
+         L i < source.len
+            I source[i] == ‘ ’
+               indentation_level++
+            E I source[i] == "\t"
+               indentation_level += 8
+            E
+               L.break
+            i++
+         I i == source.len
+            L.break
+
+         I source[i] C "\r\n#"
+            L.continue
+         V prev_indentation_level = I !indentation_levels.empty {indentation_levels.last} E 0
+
+         I expected_an_indented_block
+            I !(indentation_level > prev_indentation_level)
+               X Error(‘expected an indented block’, i)
+
+         I indentation_level == prev_indentation_level
+            I !tokens.empty
+               tokens.append(Token(linestart - 1, linestart, Token.Category.STATEMENT_SEPARATOR))
+         E I indentation_level > prev_indentation_level
+            I !expected_an_indented_block
+               X Error(‘unexpected indent’, i)
+            expected_an_indented_block = 0B
+            indentation_levels.append(indentation_level)
+            tokens.append(Token(linestart, i, Token.Category.INDENT))
+         E
+            L
+               indentation_levels.pop()
+               tokens.append(Token(i, i, Token.Category.DEDENT))
+               V level = I !indentation_levels.empty {indentation_levels.last} E 0
+               I level == indentation_level
+                  L.break
+               I level < indentation_level
+                  X Error(‘unindent does not match any outer indentation level’, i)
+      V ch = source[i]
+
+      I ch C " \t"
+         i++
+      E I ch C "\r\n"
+         I newline_chars != N
+            newline_chars.append(i)
+         i++
+         I ch == "\r" & source[i .< i + 1] == "\n"
+            i++
+         I nesting_elements.empty
+            begin_of_line = 1B
+      E I ch == ‘#’
+         V comment_start = i
+         i++
+         L i < source.len & source[i] !C "\r\n"
+            i++
+         I comments != N
+            comments.append((comment_start, i))
+      E
+         expected_an_indented_block = ch == ‘:’
+         V operator_or_delimiter = ‘’
+         L(op) :operators_and_delimiters
+            I source[i .< i + op.len] == op
+               operator_or_delimiter = op
+               L.break
+         V lexem_start = i
+         i++
+         Token.Category category
+
+         I operator_or_delimiter != ‘’
+            i = lexem_start + operator_or_delimiter.len
+            category = Token.Category.OPERATOR_OR_DELIMITER
+            I ch C ‘([{’
+               nesting_elements.append((ch, lexem_start))
+            E I ch C ‘)]}’
+               I nesting_elements.empty | nesting_elements.last[0] != (S ch {‘)’ {‘(’}; ‘]’ {‘[’}; ‘}’ {‘{’}})
+                  X Error(‘there is no corresponding opening parenthesis/bracket/brace for `’ch‘`’, lexem_start)
+               nesting_elements.pop()
+            E I ch == ‘;’
+               category = Token.Category.STATEMENT_SEPARATOR
+
+         E I ch C (‘"’, ‘'’) | (ch C ‘rRbB’ & source[i .< i + 1] C (‘"’, ‘'’))
+            String ends
+            I ch C ‘rRbB’
+               ends = I source[i .< i + 3] C (‘"""’, ‘'''’) {source[i .< i + 3]} E source[i]
+            E
+               i--
+               ends = I source[i .< i + 3] C (‘"""’, ‘'''’) {source[i .< i + 3]} E ch
+            i += ends.len
+            L
+               I i == source.len
+                  X Error(‘unclosed string literal’, lexem_start)
+               I source[i] == "\\"
+                  i++
+                  I i == source.len
+                     L.continue
+               E I source[i .< i + ends.len] == ends
+                  i += ends.len
+                  L.break
+               i++
+            category = Token.Category.STRING_LITERAL
+
+         E I ch C ‘a’..‘z’ | ch C ‘A’..‘Z’ | ch == ‘_’
+            L i < source.len
+               ch = source[i]
+               I !(ch C ‘a’..‘z’ | ch C ‘A’..‘Z’ | ch == ‘_’ | ch C ‘0’..‘9’ | ch == ‘?’)
+                  L.break
+               i++
+            I source[lexem_start .< i] C :keywords
+               I source[lexem_start .< i] C (‘None’, ‘False’, ‘True’)
+                  category = Token.Category.CONSTANT
+               E
+                  category = Token.Category.KEYWORD
+            E
+               category = Token.Category.NAME
+
+         E I (ch C ‘-+’ & source[i .< i + 1] C ‘0’..‘9’) | ch C ‘0’..‘9’
+            I ch C ‘-+’
+               assert(0B)
+               ch = source[i + 1]
+            E
+               i--
+            V is_hex = ch == ‘0’ & source[i + 1 .< i + 2] C (‘x’, ‘X’)
+            V is_oct = ch == ‘0’ & source[i + 1 .< i + 2] C (‘o’, ‘O’)
+            V is_bin = ch == ‘0’ & source[i + 1 .< i + 2] C (‘b’, ‘B’)
+            I is_hex | is_oct | is_bin
+               i += 2
+            V start = i
+            i++
+            I is_hex
+               L i < source.len & (source[i] C ‘0’..‘9’ | source[i] C ‘a’..‘z’ | source[i] C ‘A’..‘Z’ | source[i] == ‘_’)
+                  i++
+            E I is_oct
+               L i < source.len & (source[i] C ‘0’..‘7’ | source[i] == ‘_’)
+                  i++
+            E I is_bin
+               L i < source.len & (source[i] C ‘01’ | source[i] == ‘_’)
+                  i++
+            E
+               L i < source.len & (source[i] C ‘0’..‘9’ | source[i] C ‘_.eE’)
+                  I source[i] C ‘eE’
+                     I source[i + 1 .< i + 2] C ‘-+’
+                        i++
+                  i++
+               I ‘_’ C source[start .< i] & !(‘.’ C source[start .< i])
+                  V number = source[start .< i].replace(‘_’, ‘’)
+                  V number_with_separators = ‘’
+                  V j = number.len
+                  L j > 3
+                     number_with_separators = ‘_’number[j - 3 .< j]‘’number_with_separators
+                     j -= 3
+                  number_with_separators = number[0 .< j]‘’number_with_separators
+                  I source[start .< i] != number_with_separators
+                     X Error(‘digit separator in this number is located in the wrong place (should be: ’number_with_separators‘)’, start)
+            category = Token.Category.NUMERIC_LITERAL
+
+         E I ch == "\\"
+            I source[i] !C "\r\n"
+               X Error(‘only new line character allowed after backslash’, i)
+            I source[i] == "\r"
+               i++
+            I source[i] == "\n"
+               i++
+            L.continue
+
+         E
+            X Error(‘unexpected character ’ch, lexem_start)
+         tokens.append(Token(lexem_start, i, category))
+
+   I !nesting_elements.empty
+      X Error(‘there is no corresponding closing parenthesis/bracket/brace for `’nesting_elements.last[0]‘`’, nesting_elements.last[1])
+
+   I expected_an_indented_block
+      X Error(‘expected an indented block’, i)
+
+   L indentation_levels.len
+      tokens.append(Token(i, i, Token.Category.DEDENT))
+      indentation_levels.pop()
    R tokens
