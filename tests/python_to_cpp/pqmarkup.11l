@@ -57,13 +57,13 @@ T Converter
          X Exception(message, p[0], p[1], p[2])
       V i = 0
       F next_char(offset = 1)
-         R I @i + offset < @instr.len {@instr[@i + offset]} E "\0"[0]
+         R I @i + offset < @instr.len {@instr[@i + offset]} E Char("\0")
 
       F i_next_str(str)
          R @instr[@i + 1 .< @i + 1 + str.len] == str
 
       F prev_char(offset = 1)
-         R I @i - offset >= 0 {@instr[@i - offset]} E "\0"[0]
+         R I @i - offset >= 0 {@instr[@i - offset]} E Char("\0")
 
       F html_escape(=str)
          str = str.replace(‘&’, ‘&amp;’).replace(‘<’, ‘&lt;’)
@@ -333,7 +333,7 @@ T Converter
 
          I ch == "‘"
             V prevci = i - 1
-            V prevc = I prevci >= 0 {instr[prevci]} E "\0"[0]
+            V prevc = I prevci >= 0 {instr[prevci]} E Char("\0")
             V startqpos = i
             i = find_ending_pair_quote(i)
             V endqpos = i

@@ -339,6 +339,11 @@ class SymbolNode:
                     func_name = 'to_int'
                 elif func_name == 'Float':
                     func_name = 'to_float'
+                elif func_name == 'Char' and self.children[2].token.category == Token.Category.STRING_LITERAL:
+                    assert(self.children[1] == None) # [-TODO: write a good error message-]
+                    if not is_char(self.children[2]):
+                        raise Error('Char can be constructed only from single character string literals', self.children[2].token)
+                    return char_or_str(self.children[2], True)
                 elif func_name.startswith('Array['): # ]
                     func_name = 'Array<' + func_name[6:-1] + '>'
                 elif func_name == 'Dict':
@@ -545,9 +550,7 @@ class SymbolNode:
             #return '(' + self.children[0].to_str() + ' ' + self.symbol.id + ' ' + self.children[1].to_str() + ')'
 
             def char_if_len_1(child):
-                if is_char(child):
-                    return "u'" + child.token.value(source)[1:-1].replace("'", R"\'") + "'_C"
-                return child.to_str()
+                return char_or_str(child, is_char(child))
 
             if self.symbol.id == '.':
                 cts0 = self.children[0].token_str()
