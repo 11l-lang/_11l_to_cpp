@@ -220,7 +220,7 @@ public:
 		if (std::vector<Type>::empty())
 			throw IndexError(0);
 		Type r(std::move(std::vector<Type>::at(len()-1)));
-		std::vector<Type>::resize(len()-1);
+		std::vector<Type>::pop_back();
 		return r;
 	}
 

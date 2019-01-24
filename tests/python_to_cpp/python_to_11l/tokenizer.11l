@@ -45,7 +45,7 @@ T Token
 F tokenize(source, [Int]? &newline_chars = N, [Tuple[Int, Int]]? &comments = N)
    [Token] tokens
    [Int] indentation_levels
-   [Tuple[String, Int]] nesting_elements
+   [Tuple[Char, Int]] nesting_elements
    V begin_of_line = 1B
    V expected_an_indented_block = 0B
    V i = 0
