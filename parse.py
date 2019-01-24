@@ -509,6 +509,8 @@ class SymbolNode:
                 c0 = self.children[0].to_str()
                 if c0 in ('stdin', 'stdout', 'stderr'):
                     return '_' + c0
+                if importing_module:
+                    return os.path.basename(file_name)[:-4] + '::' + c0
                 return '::' + c0
             elif self.symbol.id == '.':
                 c0 = self.children[0].to_str()
@@ -813,6 +815,9 @@ def trans_type(ty, scope, type_token, ast_type_node = None):
     if t != None:
         return t
     else:
+        if '.' in ty: # for `Token.Category category`
+            return ty.replace('.', '::') # [-TODO: generalize-]
+
         p = ty.find('[') # ]
         if p != -1:
             return (trans_type(ty[:p], scope, type_token, ast_type_node) if p != 0 else 'Array') + '<' + trans_type(ty[p+1:-1], scope, type_token, ast_type_node) + '>'
@@ -2164,6 +2169,8 @@ def parse_internal(this_node):
                                 assert(child.children[1].token.category == Token.Category.NAME or child.children[1].token_str() in ('N', 'Н', 'null', 'нуль'))
                                 node.type_args.append(child.children[0].token_str())
                                 node.type = child.children[1].token_str() # return value is the last
+                    elif node.type == '.':
+                        node.type = node_expression.to_str()
                     if not (node.type[0].isupper() or node.type in ('var', 'перем')):
                         raise Error('type name must starts with an upper case letter', node.type_token)
                     for var in node.vars:

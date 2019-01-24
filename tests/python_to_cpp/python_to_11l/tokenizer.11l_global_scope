@@ -1,3 +1,6 @@
+keywords
+    type = ‘’
+    ast_nodes = []
 operators
     type = ‘’
     ast_nodes = []
@@ -5,6 +8,9 @@ delimiters
     type = ‘’
     ast_nodes = []
 operators_and_delimiters
+    type = ‘’
+    ast_nodes = []
+Error
     type = ‘’
     ast_nodes = []
 Token

@@ -639,6 +639,14 @@ inline double parse_float(const char16_t *s)
 inline double parse_float(const String &s) {return parse_float(s.c_str());}
 
 inline bool in(Char c, const String &s) {return s.find(c) != nullptr;}
+inline bool in(const String &c, const String &s) {return s.find(c) != nullptr;}
+
+template <bool include_beginning, bool include_ending> inline bool in(const String &s, const Range<Char, include_beginning, include_ending> &range)
+{
+	if (s.len() == 0) return false;
+	if (s.len() != 1) throw AssertionError();
+	return in(s[0], range);
+}
 
 inline char hex_to_char(int c) {return (char)c + ((unsigned)c <= 9u ? '0' : 'A' - 10);}
 

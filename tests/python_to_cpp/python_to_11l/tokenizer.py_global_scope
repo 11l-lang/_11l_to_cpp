@@ -1,4 +1,7 @@
 Imported modules = []
+keywords
+    type = List
+    node = N
 operators
     type = List
     node = N
