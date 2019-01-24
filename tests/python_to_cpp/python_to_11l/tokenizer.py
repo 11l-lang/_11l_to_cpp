@@ -1,4 +1,19 @@
-﻿from enum import IntEnum
+﻿from typing import List, Tuple
+from enum import IntEnum
+
+operators = [ # https://docs.python.org/3/reference/lexical_analysis.html#operators
+             '+',       '-',       '*',       '**',      '/',       '//',      '%',      '@',
+             '<<',      '>>',      '&',       '|',       '^',       '~',
+             '<',       '>',       '<=',      '>=',      '==',      '!=',]
+#operators.sort(key = lambda x: len(x), reverse = True)
+
+delimiters = [ # https://docs.python.org/3/reference/lexical_analysis.html#delimiters        
+              '(',       ')',       '[',       ']',       '{',       '}',
+              ',',       ':',       '.',       ';',       '@',       '=',       '->',
+              '+=',      '-=',      '*=',      '/=',      '//=',     '%=',      '@=',
+              '&=',      '|=',      '^=',      '>>=',     '<<=',     '**=',]
+#delimiters.sort(key = lambda x: len(x), reverse = True)
+operators_and_delimiters = sorted(operators + delimiters, key = lambda x: len(x), reverse = True)
 
 class Token:
     class Category(IntEnum):

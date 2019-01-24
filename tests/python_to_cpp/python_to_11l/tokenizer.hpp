@@ -1,4 +1,8 @@
-﻿class Token
+﻿auto operators = create_array({u"+"_S, u"-"_S, u"*"_S, u"**"_S, u"/"_S, u"//"_S, u"%"_S, u"@"_S, u"<<"_S, u">>"_S, u"&"_S, u"|"_S, u"^"_S, u"~"_S, u"<"_S, u">"_S, u"<="_S, u">="_S, u"=="_S, u"!="_S});
+auto delimiters = create_array({u"("_S, u")"_S, u"["_S, u"]"_S, u"{"_S, u"}"_S, u","_S, u":"_S, u"."_S, u";"_S, u"@"_S, u"="_S, u"->"_S, u"+="_S, u"-="_S, u"*="_S, u"/="_S, u"//="_S, u"%="_S, u"@="_S, u"&="_S, u"|="_S, u"^="_S, u">>="_S, u"<<="_S, u"**="_S});
+auto operators_and_delimiters = sorted(operators + delimiters, [](const auto &x){return x.len();}, true);
+
+class Token
 {
 public:
     enum class Category {

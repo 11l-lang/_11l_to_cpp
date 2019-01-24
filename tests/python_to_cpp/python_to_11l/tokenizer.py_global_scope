@@ -1,4 +1,13 @@
 Imported modules = []
+operators
+    type = List
+    node = N
+delimiters
+    type = List
+    node = N
+operators_and_delimiters
+    type = ‘’
+    node = N
 tokenize
     type = ‘’
     node

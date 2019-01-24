@@ -1,3 +1,12 @@
+operators
+    type = ‘’
+    ast_nodes = []
+delimiters
+    type = ‘’
+    ast_nodes = []
+operators_and_delimiters
+    type = ‘’
+    ast_nodes = []
 Token
     type = ‘’
     ast_nodes = []
