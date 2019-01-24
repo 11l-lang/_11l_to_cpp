@@ -9,12 +9,31 @@ T Error
       .pos = pos
 
 F highlight(lang, source)
+   V writepos = 0
    [Tuple[Int, Int]] comments
+   V res = ‘’
+
+   F html_escape(s)
+      R s.replace(‘&’, ‘&amp;’).replace(‘<’, ‘&lt;’)
 
    I lang == ‘Python’
-      L(token) python_to_11l:tokenizer:tokenize(source, comments' &comments)
-         print(token.to_str(source))
-      print(comments)
+      X.try
+         L(token) python_to_11l:tokenizer:tokenize(source, comments' &comments) [+] [python_to_11l:tokenizer:Token(source.len, source.len, python_to_11l:tokenizer:Token.Category.STATEMENT_SEPARATOR)]
+            L comments.len & comments[0][0] < token.start
+               res ‘’= html_escape(source[writepos .< comments[0][0]])
+               writepos = comments[0][1]
+               res ‘’= ‘<span class="comment">’html_escape(source[comments[0][0] .< comments[0][1]])‘</span>’
+               comments.pop(0)
+            res ‘’= html_escape(source[writepos .< token.start])
+            writepos = token.end
+            V css_class = :cat_to_class_python[token.category]
+            I css_class != ‘’
+               res ‘’= ‘<span class="’css_class‘">’html_escape(token.value(source))‘</span>’
+            E
+               res ‘’= html_escape(token.value(source))
+
+      X.catch python_to_11l:tokenizer:Error e
+         X Error(e.message, e.pos)
    E
       assert(lang == ‘11l’)
-   R source
+   R res

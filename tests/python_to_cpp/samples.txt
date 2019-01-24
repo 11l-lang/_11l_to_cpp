@@ -1266,15 +1266,15 @@ struct CodeBlock1
 
 import syntax_highlighter_for_pqmarkup
 try:
-    print(syntax_highlighter_for_pqmarkup.highlight('Python', 'a = 0'))
-    print(syntax_highlighter_for_pqmarkup.highlight('11l', 'V a = 0'))
+    print(syntax_highlighter_for_pqmarkup.highlight('Python', 'a = 0 # c'))
+    print(syntax_highlighter_for_pqmarkup.highlight('11l', 'V a = 0 // c'))
 except syntax_highlighter_for_pqmarkup.Error as e:
     print('Syntax highlighter error: ' + e.message + ' at ' + str(e.pos))
 ===
 //import syntax_highlighter_for_pqmarkup
 X.try
-   print(syntax_highlighter_for_pqmarkup:highlight(‘Python’, ‘a = 0’))
-   print(syntax_highlighter_for_pqmarkup:highlight(‘11l’, ‘V a = 0’))
+   print(syntax_highlighter_for_pqmarkup:highlight(‘Python’, ‘a = 0 # c’))
+   print(syntax_highlighter_for_pqmarkup:highlight(‘11l’, ‘V a = 0 // c’))
 X.catch syntax_highlighter_for_pqmarkup:Error e
    print(‘Syntax highlighter error: ’e.message‘ at ’String(e.pos))
 ===
@@ -1288,8 +1288,8 @@ struct CodeBlock1
     {
         try
         {
-            print(syntax_highlighter_for_pqmarkup::highlight(u"Python"_S, u"a = 0"_S));
-            print(syntax_highlighter_for_pqmarkup::highlight(u"11l"_S, u"V a = 0"_S));
+            print(syntax_highlighter_for_pqmarkup::highlight(u"Python"_S, u"a = 0 # c"_S));
+            print(syntax_highlighter_for_pqmarkup::highlight(u"11l"_S, u"V a = 0 // c"_S));
         }
         catch (const syntax_highlighter_for_pqmarkup::Error& e)
         {
