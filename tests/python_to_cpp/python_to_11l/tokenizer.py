@@ -1,4 +1,5 @@
 ﻿from typing import List, Tuple
+Char = str
 from enum import IntEnum
 
 keywords = [ # https://docs.python.org/3/reference/lexical_analysis.html#keywords
@@ -67,7 +68,7 @@ class Token:
 def tokenize(source, newline_chars : List[int] = None, comments : List[Tuple[int, int]] = None):
     tokens : List[Token] = []
     indentation_levels : List[int] = []
-    nesting_elements : List[Tuple[str, int]] = [] # parentheses, square brackets or curly braces
+    nesting_elements : List[Tuple[Char, int]] = [] # parentheses, square brackets or curly braces
 
     begin_of_line = True
     expected_an_indented_block = False

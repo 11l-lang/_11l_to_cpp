@@ -63,7 +63,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
 {
     Array<Token> tokens;
     Array<int> indentation_levels;
-    Array<Tuple<String, int>> nesting_elements;
+    Array<Tuple<Char, int>> nesting_elements;
     auto begin_of_line = true;
     auto expected_an_indented_block = false;
     auto i = 0;
