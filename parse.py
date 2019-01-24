@@ -2063,7 +2063,7 @@ def parse_internal(this_node):
 
             elif token.value(source) in ('X.catch', 'Х.перехват', 'exception.catch', 'исключение.перехват'):
                 node = ASTExceptionCatch()
-                node.exception_object_type = expected_name('exception object type name')
+                node.exception_object_type = expected_name('exception object type name').replace(':', '::')
                 if token.value(source) == ':':
                     next_token()
                     node.exception_object_type += '::' + token.value(source)

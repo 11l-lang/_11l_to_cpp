@@ -18,14 +18,41 @@ public:
 
 template <typename T1, typename T2> auto highlight(const T1 &lang, const T2 &source)
 {
+    auto writepos = 0;
     Array<Tuple<int, int>> comments;
+    auto res = u""_S;
+
+    auto html_escape = [](const auto &s)
+    {
+        return s.replace(u"&"_S, u"&amp;"_S).replace(u"<"_S, u"&lt;"_S);
+    };
 
     if (lang == u"Python") {
-        for (auto token : python_to_11l::tokenizer::tokenize(source, nullptr, &comments))
-            print(token.to_str(source));
-        print(comments);
+        try
+        {
+            for (auto token : python_to_11l::tokenizer::tokenize(source, nullptr, &comments) + create_array({python_to_11l::tokenizer::Token(source.len(), source.len(), python_to_11l::tokenizer::Token::Category::STATEMENT_SEPARATOR)})) {
+                while (comments.len() && _get<0>(_get<0>(comments)) < token.start) {
+                    res += html_escape(source[range_el(writepos, _get<0>(_get<0>(comments)))]);
+                    writepos = _get<1>(_get<0>(comments));
+                    res += u"<span class=\"comment\">"_S + html_escape(source[range_el(_get<0>(_get<0>(comments)), _get<1>(_get<0>(comments)))]) + u"</span>"_S;
+                    comments.pop(0);
+                }
+                res += html_escape(source[range_el(writepos, token.start)]);
+                writepos = token.end;
+                auto css_class = syntax_highlighter_for_pqmarkup::cat_to_class_python[token.category];
+                if (css_class != u"")
+                    res += u"<span class=\""_S + css_class + u"\">"_S + html_escape(token.value(source)) + u"</span>"_S;
+                else
+                    res += html_escape(token.value(source));
+            }
+        }
+
+        catch (const python_to_11l::tokenizer::Error& e)
+        {
+            throw Error(e.message, e.pos);
+        }
     }
     else
         assert(lang == u"11l");
-    return source;
+    return res;
 }
