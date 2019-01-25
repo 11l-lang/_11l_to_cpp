@@ -655,7 +655,7 @@ public:
                                 for (auto xxx : range_el(xx, x + 1))
                                     for (auto yyy : range_el(yy, y + 1))
                                         if (!(xxx == xx && yyy == yy))
-                                            table[yyy][xxx].set(1, u""_S);
+                                            _set<1>(table[yyy][xxx], u""_S);
                             }
                     outfile.write(u"<table"_S + (u" style=\"display: inline\""_S * (prevci != 0 && instr[prevci - 1] != u'\n')) + u">\n"_S);
                     for (auto row : table) {
