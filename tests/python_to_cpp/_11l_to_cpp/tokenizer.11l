@@ -1,0 +1,509 @@
+‘
+После данной обработки отступы перестают играть роль — границу `scope` всегда определяют фигурные скобки.
+Также здесь выполняется склеивание строк, и таким образом границу statement\утверждения задаёт либо символ `;`,
+либо символ новой строки (при условии, что перед ним не стоит символ `…`!).
+
+===============================================================================================================
+Ошибки:
+---------------------------------------------------------------------------------------------------------------
+Error: `if/else/fn/loop/switch/type` scope is empty.
+---------------------------------------------------------------------------------------------------------------
+Существуют операторы, которые всегда требуют нового scope\блока, который можно обозначить двумя способами:
+1. Начать следующую строку с отступом относительно предыдущей, например:
+if condition\условие
+    scope\блок
+2. Заключить блок\scope в фигурные скобки:
+if condition\условие {scope\блок}
+
+Примечание. При использовании второго способа блок\scope может иметь произвольный уровень отступа:
+if condition\условие
+{
+scope\блок
+}
+
+---------------------------------------------------------------------------------------------------------------
+Error: `if/else/fn/loop/switch/type` scope is empty, after applied implied line joining: ```...```
+---------------------------------------------------------------------------------------------------------------
+Сообщение об ошибке аналогично предыдущему, но выделено в отдельное сообщение об ошибке, так как может
+возникать по вине ошибочного срабатывания автоматического склеивания строк (и показывается оно тогда, когда
+было произведено склеивание строк в месте данной ошибки).
+
+---------------------------------------------------------------------------------------------------------------
+Error: mixing tabs and spaces in indentation: `...`
+---------------------------------------------------------------------------------------------------------------
+В одной строке для отступа используется смесь пробелов и символов табуляции.
+Выберите что-либо одно (желательно сразу для всего файла): либо пробелы для отступа, либо табуляцию.
+Примечание: внутри строковых литералов, а также внутри строк кода можно смешивать пробелы и табуляцию. Эта
+ошибка генерируется только при проверке отступа (отступ — последовательность символов пробелов или табуляции от
+самого начала строки до первого символа отличного от пробела и табуляции).
+
+---------------------------------------------------------------------------------------------------------------
+Error: inconsistent indentations: ```...```
+---------------------------------------------------------------------------------------------------------------
+В текущей строке кода для отступа используются пробелы, а в предыдущей строке — табуляция (либо наоборот).
+[[[
+Сообщение было предназначено для несколько другой ошибки: для любых двух соседних строк, если взять отступ
+одной из них, то другой отступ должен начинаться с него же {если отступ текущей строки отличается от отступа
+предыдущей, то:
+1. Когда отступ текущей строки начинается на отступ предыдущей строки, это INDENT.
+2. Когда отступ предыдущей строки начинается на отступ текущей строки, это DEDENT.
+}. Например:
+if a:
+SSTABif b:
+SSTABTABi = 0
+SSTABSi = 0
+Последняя пара строк не удовлетворяет этому требованию, так как ни строка ‘SSTABTAB’ не начинается на строку
+‘SSTABS’, ни ‘SSTABS’ не начинается на ‘SSTABTAB’.
+Эта проверка имела бы смысл в случае разрешения смешения пробелов и табуляции для отступа в пределах одной
+строки (а это разрешено в Python). Но я решил отказаться от этой идеи, а лучшего текста сообщения для этой
+ошибки не придумал.
+]]]
+
+---------------------------------------------------------------------------------------------------------------
+Error: unindent does not match any outer indentation level
+---------------------------------------------------------------------------------------------------------------
+[-Добавить описание ошибки.-]
+===============================================================================================================
+’
+V keywords = [‘V’, ‘C’, ‘I’, ‘E’, ‘F’, ‘L’, ‘N’, ‘R’, ‘S’, ‘T’, ‘X’, ‘П’, ‘С’, ‘Е’, ‘И’, ‘Ф’, ‘Ц’, ‘Н’, ‘Р’, ‘В’, ‘Т’, ‘Х’, ‘var’, ‘in’, ‘if’, ‘else’, ‘fn’, ‘loop’, ‘null’, ‘return’, ‘switch’, ‘type’, ‘exception’, ‘перем’, ‘С’, ‘если’, ‘иначе’, ‘фн’, ‘цикл’, ‘нуль’, ‘вернуть’, ‘выбрать’, ‘тип’, ‘исключение’]
+[String] empty_list_of_str
+[[String]] binary_operators = [empty_list_of_str, [String(‘+’), ‘-’, ‘*’, ‘/’, ‘%’, ‘^’, ‘&’, ‘|’, ‘<’, ‘>’, ‘=’, ‘?’], [‘<<’, ‘>>’, ‘<=’, ‘>=’, ‘==’, ‘!=’, ‘+=’, ‘-=’, ‘*=’, ‘/=’, ‘%=’, ‘&=’, ‘|=’, ‘^=’, ‘->’, ‘..’, ‘.<’, ‘<.’, ‘I/’, ‘Ц/’, ‘C ’, ‘С ’], [‘<<=’, ‘>>=’, ‘‘’=’, ‘[+]’, ‘[&]’, ‘[|]’, ‘(+)’, ‘<.<’, ‘I/=’, ‘Ц/=’, ‘in ’, ‘!C ’, ‘!С ’], [‘[+]=’, ‘[&]=’, ‘[|]=’, ‘(+)=’, ‘!in ’]]
+[[String]] unary_operators = [empty_list_of_str, [String(‘!’)], [‘++’, ‘--’], [‘(-)’]]
+V sorted_operators = sorted(binary_operators[1] + binary_operators[2] + binary_operators[3] + binary_operators[4] + unary_operators[1] + unary_operators[2] + unary_operators[3], key' x -> x.len, reverse' 1B)
+binary_operators[1].remove(‘-’)
+binary_operators[1].remove(‘^’)
+
+T Error
+   String message
+   Int pos
+   Int end
+
+   F (message, pos)
+      .message = message
+      .pos = pos
+      .end = pos
+
+T Token
+   T.enum Category
+      NAME
+      KEYWORD
+      CONSTANT
+      DELIMITER
+      OPERATOR
+      NUMERIC_LITERAL
+      STRING_LITERAL
+      STRING_CONCATENATOR
+      SCOPE_BEGIN
+      SCOPE_END
+      STATEMENT_SEPARATOR
+   Int start
+   Int end
+   Category category
+
+   F (start, end, category)
+      .start = start
+      .end = end
+      .category = category
+
+   F __repr__()
+      R String(.start)
+
+   F value(source)
+      R source[.start .< .end]
+
+   F to_str(source)
+      R ‘Token(’String(.category)‘, "’(.value(source))‘")’
+
+F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuations = N, [(Int, Int)]? &comments = N)
+   [Token] tokens
+   [(Int, Bool)] indentation_levels
+   [(Char, Int)] nesting_elements
+   V i = 0
+   V begin_of_line = 1B
+   Bool indentation_tabs
+   Int prev_indentation_level
+   Int prev_linestart
+
+   L i < source.len
+      I begin_of_line
+         begin_of_line = 0B
+         V linestart = i
+         V tabs = 0B
+         V spaces = 0B
+         L i < source.len
+            I source[i] == ‘ ’
+               spaces = 1B
+            E I source[i] == "\t"
+               tabs = 1B
+            E
+               L.break
+            i++
+         I i == source.len
+            L.break
+
+         I source[i] C "\r\n" | source[i .< i + 2] C (‘//’, "\\\\", ‘\‘’’', ‘\(’, ‘\{’, ‘\[’)
+            L.continue
+
+         I source[i] C ‘{}’
+            L.continue
+
+         I tokens.len & tokens.last.category == Token.Category.STRING_CONCATENATOR & source[i] C "\"'‘"
+            I line_continuations != N
+               line_continuations.append(tokens.last.end)
+            I source[i .< i + 2] C (‘""’, ‘‘’’)
+               i += 2
+            L.continue
+
+         I tokens.len & tokens.last.category == Token.Category.STRING_LITERAL & source[i .< i + 2] C (‘""’, ‘‘’’)
+            I line_continuations != N
+               line_continuations.append(tokens.last.end)
+            tokens.append(Token(i, i, Token.Category.STRING_CONCATENATOR))
+            i += 2
+            L.continue
+
+         I (tokens.len & tokens.last.category == Token.Category.OPERATOR & tokens.last.value(source) C :binary_operators[tokens.last.end - tokens.last.start] & source[tokens.last.end - 4 .< tokens.last.end] != ‘-> &’)
+            I line_continuations != N
+               line_continuations.append(tokens.last.end)
+            L.continue
+
+         I ((source[i] C :binary_operators[1] | source[i .< i + 2] C :binary_operators[2] | source[i .< i + 3] C :binary_operators[3] | source[i .< i + 4] C :binary_operators[4]) & !(source[i] C :unary_operators[1] | source[i .< i + 2] C :unary_operators[2] | source[i .< i + 3] C :unary_operators[3]) & (source[i] != ‘&’ | source[i + 1 .< i + 2] == ‘ ’))
+            I tokens.empty
+               X Error(‘source can not starts with a binary operator’, i)
+            I line_continuations != N
+               line_continuations.append(tokens.last.end)
+            L.continue
+
+         I source[i .< i + 2] == ‘\.’
+            I !tokens.empty
+               i++
+
+               I line_continuations != N
+                  line_continuations.append(tokens.last.end)
+            L.continue
+
+         I tabs & spaces
+            V next_line_pos = source.findi("\n", i)
+            X Error(‘mixing tabs and spaces in indentation: `’source[linestart .< i].replace(‘ ’, ‘S’).replace("\t", ‘TAB’) + source[i .< I next_line_pos != -1 {next_line_pos} E !source.empty]‘`’, i)
+         V indentation_level = i - linestart
+         I indentation_levels.len & indentation_levels.last[0] == -1
+            indentation_levels.last = (indentation_level, indentation_levels.last[1])
+            indentation_tabs = tabs
+         E
+            I indentation_level > 0 & indentation_levels.len & prev_indentation_level > 0 & indentation_tabs != tabs
+               V e = i + 1
+               L e < source.len & source[e] !C "\r\n"
+                  e++
+               X Error("inconsistent indentations:\n```\n"prev_indentation_level * (I indentation_tabs {‘TAB’} E ‘S’) + source[prev_linestart .< linestart] + (i - linestart) * (I tabs {‘TAB’} E ‘S’) + source[i .< e]"\n```", i)
+            prev_linestart = i
+            prev_indentation_level = I !indentation_levels.empty {indentation_levels.last[0]} E 0
+
+            I indentation_level == prev_indentation_level
+               I tokens.len & tokens.last.category != Token.Category.SCOPE_END
+                  tokens.append(Token(linestart - 1, linestart, Token.Category.STATEMENT_SEPARATOR))
+            E I indentation_level > prev_indentation_level
+               I prev_indentation_level == 0
+                  indentation_tabs = tabs
+               indentation_levels.append((indentation_level, 0B))
+               tokens.append(Token(linestart, i, Token.Category.SCOPE_BEGIN))
+               I implied_scopes != N
+                  implied_scopes.append((Char(‘{’), tokens[(len)-2].end + (I source[tokens[(len)-2].end] C " \n" {1} E 0)))
+            E
+               L
+                  I indentation_levels.last[1]
+                     X Error(‘too much unindent, what is this unindent intended for?’, i)
+                  indentation_levels.pop()
+                  tokens.append(Token(i, i, Token.Category.SCOPE_END))
+                  I implied_scopes != N
+                     implied_scopes.append((Char(‘}’), i))
+                  V level = I !indentation_levels.empty {indentation_levels.last[0]} E 0
+                  I level == indentation_level
+                     L.break
+                  I level < indentation_level
+                     X Error(‘unindent does not match any outer indentation level’, i)
+            prev_indentation_level = indentation_level
+      V ch = source[i]
+
+      I ch C " \t"
+         i++
+      E I ch C "\r\n"
+         i++
+         I ch == "\r" & source[i .< i + 1] == "\n"
+            i++
+         I nesting_elements.empty | nesting_elements.last[0] !C ‘([’
+            begin_of_line = 1B
+      E I (ch == ‘/’ & source[i + 1 .< i + 2] == ‘/’) | (ch == "\\" & source[i + 1 .< i + 2] == "\\")
+         V comment_start = i
+         i += 2
+         L i < source.len & source[i] !C "\r\n"
+            i++
+         I comments != N
+            comments.append((comment_start, i))
+      E I ch == "\\" & source[i + 1 .< i + 2] C "‘({["
+         V comment_start = i
+         V lbr = source[i + 1]
+         V rbr = S lbr {"‘" {"’"}; ‘(’ {‘)’}; ‘{’ {‘}’}; ‘[’ {‘]’}}
+         i += 2
+         V nesting_level = 1
+         L
+            ch = source[i]
+            i++
+            I ch == lbr
+               nesting_level++
+            E I ch == rbr
+               nesting_level--
+               I nesting_level == 0
+                  L.break
+            I i == source.len
+               X Error(‘there is no corresponding opening parenthesis/bracket/brace/qoute for `’lbr‘`’, comment_start + 1)
+         I comments != N
+            comments.append((comment_start, i))
+      E
+         F is_hexadecimal_digit(ch)
+            R ch C ‘0’..‘9’ | ch C ‘A’..‘F’ | ch C ‘a’..‘f’ | ch C ‘абсдефАБСДЕФ’
+         V operator_s = ‘’
+
+         L(op) :sorted_operators
+            I source[i .< i + op.len] == op
+               operator_s = op
+               L.break
+         V lexem_start = i
+         i++
+         Token.Category category
+
+         I operator_s != ‘’
+            i = lexem_start + operator_s.len
+            I source[i - 1] == ‘ ’
+               i--
+            category = Token.Category.OPERATOR
+         E I ch.is_alpha() | ch C (‘_’, ‘@’)
+            L i < source.len & source[i] == ‘@’
+               i++
+            L i < source.len
+               ch = source[i]
+               I !(ch.is_alpha() | ch C ‘_?:’ | ch C ‘0’..‘9’)
+                  L.break
+               i++
+            V j = i - 1
+            L j > lexem_start
+               I source[j] == ‘:’
+                  i = j
+                  L.break
+               j--
+
+            I source[i .< i + 1] == ‘/’ & source[i - 1 .< i] C ‘IЦ’
+               I source[i - 2 .< i - 1] == ‘ ’
+                  category = Token.Category.OPERATOR
+               E
+                  X Error(‘please clarify your intention by putting space character before or after `I`’, i - 1)
+
+            E I source[i .< i + 1] == ‘'’
+               i++
+               I source[i .< i + 1] == ‘ ’
+                  category = Token.Category.NAME
+               E I source[i .< i + 1] C ("‘", ‘'’)
+                  i--
+                  category = Token.Category.NAME
+               E
+                  L i < source.len & (is_hexadecimal_digit(source[i]) | source[i] == ‘'’)
+                     i++
+                  I !(source[lexem_start + 4 .< lexem_start + 5] == ‘'’ | source[i - 3 .< i - 2] == ‘'’)
+                     X Error(‘digit separator in this hexadecimal number is located in the wrong place’, lexem_start)
+                  category = Token.Category.NUMERIC_LITERAL
+
+            E I source[lexem_start .< i] C keywords
+               I source[lexem_start .< i] C (‘V’, ‘П’, ‘var’, ‘перем’)
+                  category = Token.Category.NAME
+               E I source[lexem_start .< i] C (‘N’, ‘Н’, ‘null’, ‘нуль’)
+                  category = Token.Category.CONSTANT
+               E
+                  category = Token.Category.KEYWORD
+                  I source[i .< i + 1] == ‘.’
+                     i++
+                     L i < source.len & (source[i].is_alpha() | source[i] C ‘_.’)
+                        i++
+                     I source[lexem_start .< i] C (‘L.index’, ‘Ц.индекс’, ‘loop.index’, ‘цикл.индекс’)
+                        category = Token.Category.NAME
+            E
+               category = Token.Category.NAME
+
+         E I ch C ‘0’..‘9’
+            I ch C ‘01’ & source[i .< i + 1] C (‘B’, ‘В’) & !(is_hexadecimal_digit(source[i + 1 .< i + 2]) | source[i + 1 .< i + 2] == ‘'’)
+               i++
+               category = Token.Category.CONSTANT
+            E
+               V is_hex = 0B
+               L i < source.len & is_hexadecimal_digit(source[i])
+                  I !(source[i] C ‘0’..‘9’)
+                     I source[i] C ‘eE’ & source[i + 1 .< i + 2] C (‘-’, ‘+’)
+                        L.break
+                     is_hex = 1B
+                  i++
+               V next_digit_separator = 0
+               V is_oct_or_bin = 0B
+               I i < source.len & source[i] == ‘'’
+                  I i - lexem_start == 2
+                     V j = i + 1
+                     L j < source.len & is_hexadecimal_digit(source[j])
+                        I !(source[j] C ‘0’..‘9’)
+                           is_hex = 1B
+                        j++
+                     next_digit_separator = j - 1 - i
+                  E I i - lexem_start == 4
+                     V j = i + 1
+                     L j < source.len & ((is_hexadecimal_digit(source[j]) & !(source[j] C ‘bд’)) | source[j] == ‘'’)
+                        j++
+                     I j < source.len & source[j] C ‘oоbд’
+                        is_oct_or_bin = 1B
+
+               I i < source.len & source[i] == ‘'’ & ((i - lexem_start == 4 & !is_oct_or_bin) | (i - lexem_start == 2 & (next_digit_separator != 3 | is_hex)))
+                  I i - lexem_start == 2
+                     i++
+                     I i + 2 > source.len | !is_hexadecimal_digit(source[i]) | !is_hexadecimal_digit(source[i + 1])
+                        X Error(‘wrong short hexadecimal number’, lexem_start)
+                     i += 2
+                     I i < source.len & is_hexadecimal_digit(source[i])
+                        X Error(‘expected end of short hexadecimal number’, i)
+                  E
+                     i++
+                     L i < source.len & is_hexadecimal_digit(source[i])
+                        i++
+                        I (i - lexem_start) % 5 == 4 & i < source.len
+                           I source[i] != ‘'’
+                              I !is_hexadecimal_digit(source[i])
+                                 L.break
+                              X Error(‘here should be a digit separator in hexadecimal number’, i)
+                           i++
+                     I i < source.len & source[i] == ‘'’
+                        X Error(‘digit separator in hexadecimal number is located in the wrong place’, i)
+                     I (i - lexem_start) % 5 != 4
+                        X Error(‘after this digit separator there should be 4 digits in hexadecimal number’, source.rfindi(‘'’, 0, i))
+               E
+                  L i < source.len & (source[i] C ‘0’..‘9’ | source[i] C ‘'.eE’)
+                     I source[i .< i + 2] C (‘..’, ‘.<’)
+                        L.break
+                     I source[i] C ‘eE’
+                        I source[i + 1 .< i + 2] C ‘-+’
+                           i++
+                     i++
+                  I source[i .< i + 1] C (‘o’, ‘о’, ‘b’, ‘д’)
+                     i++
+                  E I ‘'’ C source[lexem_start .< i] & !(‘.’ C source[lexem_start .< i])
+                     V number = source[lexem_start .< i].replace(‘'’, ‘’)
+                     V number_with_separators = ‘’
+                     V j = number.len
+                     L j > 3
+                        number_with_separators = ‘'’number[j - 3 .< j]‘’number_with_separators
+                        j -= 3
+                     number_with_separators = number[0 .< j]‘’number_with_separators
+                     I source[lexem_start .< i] != number_with_separators
+                        X Error(‘digit separator in this number is located in the wrong place (should be: ’number_with_separators‘)’, lexem_start)
+               category = Token.Category.NUMERIC_LITERAL
+
+         E I ch == ‘'’ & source[i .< i + 1] == ‘,’
+            i++
+            category = Token.Category.DELIMITER
+
+         E I ch == ‘"’
+            I source[i] == ‘"’ & tokens.last.category == Token.Category.STRING_CONCATENATOR & tokens[(len)-2].category == Token.Category.STRING_LITERAL & tokens[(len)-2].value(source)[0] == "‘"
+               i++
+               L.continue
+            V startqpos = i - 1
+            I tokens.len & tokens.last.end == startqpos & ((tokens.last.category == Token.Category.NAME & tokens.last.value(source).last != ‘'’) | tokens.last.value(source) C (‘)’, ‘]’))
+               tokens.append(Token(lexem_start, lexem_start, Token.Category.STRING_CONCATENATOR))
+            L
+               I i == source.len
+                  X Error(‘unclosed string literal’, startqpos)
+               ch = source[i]
+               i++
+               I ch == "\\"
+                  I i == source.len
+                     L.continue
+                  i++
+               E I ch == ‘"’
+                  L.break
+            I source[i .< i + 1].is_alpha() | source[i .< i + 1] C (‘@’, "‘", ‘(’)
+               tokens.append(Token(lexem_start, i, Token.Category.STRING_LITERAL))
+               tokens.append(Token(i, i, Token.Category.STRING_CONCATENATOR))
+               L.continue
+            category = Token.Category.STRING_LITERAL
+
+         E I ch C "‘'"
+            I source[i] == "’" & tokens.last.category == Token.Category.STRING_CONCATENATOR & tokens[(len)-2].category == Token.Category.STRING_LITERAL & tokens[(len)-2].value(source)[0] == ‘"’
+               i++
+               L.continue
+            I tokens.len & tokens.last.end == i - 1 & ((tokens.last.category == Token.Category.NAME & tokens.last.value(source).last != ‘'’) | tokens.last.value(source) C (‘)’, ‘]’))
+               tokens.append(Token(lexem_start, lexem_start, Token.Category.STRING_CONCATENATOR))
+               I source[i] == "’"
+                  i++
+                  L.continue
+            i--
+            L i < source.len & source[i] == ‘'’
+               i++
+            I source[i .< i + 1] != "‘"
+               X Error(‘expected left single quotation mark’, i)
+            V startqpos = i
+            i++
+            V nesting_level = 1
+            L
+               I i == source.len
+                  X Error(‘unpaired left single quotation mark’, startqpos)
+               ch = source[i]
+               i++
+               I ch == "‘"
+                  nesting_level++
+               E I ch == "’"
+                  nesting_level--
+                  I nesting_level == 0
+                     L.break
+            L i < source.len & source[i] == ‘'’
+               i++
+            I source[i .< i + 1].is_alpha() | source[i .< i + 1] C (‘@’, ‘"’, ‘(’)
+               tokens.append(Token(lexem_start, i, Token.Category.STRING_LITERAL))
+               tokens.append(Token(i, i, Token.Category.STRING_CONCATENATOR))
+               L.continue
+            category = Token.Category.STRING_LITERAL
+
+         E I ch == ‘{’
+            indentation_levels.append((-1, 1B))
+            nesting_elements.append((Char(‘{’), lexem_start))
+            category = Token.Category.SCOPE_BEGIN
+         E I ch == ‘}’
+            I nesting_elements.empty | nesting_elements.last[0] != ‘{’
+               X Error(‘there is no corresponding opening brace for `}`’, lexem_start)
+            nesting_elements.pop()
+            L indentation_levels.last[1] != 1B
+               tokens.append(Token(lexem_start, lexem_start, Token.Category.SCOPE_END))
+               I implied_scopes != N
+                  implied_scopes.append((Char(‘}’), lexem_start))
+               indentation_levels.pop()
+            assert(indentation_levels.pop()[1] == 1B)
+            category = Token.Category.SCOPE_END
+         E I ch == ‘;’
+            category = Token.Category.STATEMENT_SEPARATOR
+
+         E I ch C (‘,’, ‘.’, ‘:’)
+            category = Token.Category.DELIMITER
+
+         E I ch C ‘([’
+            nesting_elements.append((ch, lexem_start))
+            category = Token.Category.DELIMITER
+         E I ch C ‘])’
+            I nesting_elements.empty | nesting_elements.last[0] != (S ch {‘]’ {‘[’}; ‘)’ {‘(’}})
+               X Error(‘there is no corresponding opening parenthesis/bracket for `’ch‘`’, lexem_start)
+            nesting_elements.pop()
+            category = Token.Category.DELIMITER
+
+         E
+            X Error(‘unexpected character `’ch‘`’, lexem_start)
+         tokens.append(Token(lexem_start, i, category))
+
+   I !nesting_elements.empty
+      X Error(‘there is no corresponding closing parenthesis/bracket/brace for `’nesting_elements.last[0]‘`’, nesting_elements.last[1])
+
+   L indentation_levels.len
+      assert(indentation_levels.last[1] != 1B)
+      tokens.append(Token(i, i, Token.Category.SCOPE_END))
+      I implied_scopes != N
+         implied_scopes.append((Char(‘}’), I source.last == "\n" {i - 1} E i))
+      indentation_levels.pop()
+   R tokens

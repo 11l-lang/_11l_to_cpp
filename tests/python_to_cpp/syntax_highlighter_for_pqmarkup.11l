@@ -1,5 +1,7 @@
 //import python_to_11l.tokenizer
+//import _11l_to_cpp.tokenizer
 V cat_to_class_python = [python_to_11l:tokenizer:Token.Category.NAME = ‘identifier’, python_to_11l:tokenizer:Token.Category.KEYWORD = ‘keyword’, python_to_11l:tokenizer:Token.Category.CONSTANT = ‘constant’, python_to_11l:tokenizer:Token.Category.OPERATOR_OR_DELIMITER = ‘’, python_to_11l:tokenizer:Token.Category.NUMERIC_LITERAL = ‘numeric-literal’, python_to_11l:tokenizer:Token.Category.STRING_LITERAL = ‘string-literal’, python_to_11l:tokenizer:Token.Category.INDENT = ‘’, python_to_11l:tokenizer:Token.Category.DEDENT = ‘’, python_to_11l:tokenizer:Token.Category.STATEMENT_SEPARATOR = ‘’]
+V cat_to_class_11l = [_11l_to_cpp:tokenizer:Token.Category.NAME = ‘identifier’, _11l_to_cpp:tokenizer:Token.Category.KEYWORD = ‘keyword’, _11l_to_cpp:tokenizer:Token.Category.CONSTANT = ‘constant’, _11l_to_cpp:tokenizer:Token.Category.DELIMITER = ‘’, _11l_to_cpp:tokenizer:Token.Category.OPERATOR = ‘’, _11l_to_cpp:tokenizer:Token.Category.NUMERIC_LITERAL = ‘numeric-literal’, _11l_to_cpp:tokenizer:Token.Category.STRING_LITERAL = ‘string-literal’, _11l_to_cpp:tokenizer:Token.Category.STRING_CONCATENATOR = ‘’, _11l_to_cpp:tokenizer:Token.Category.SCOPE_BEGIN = ‘’, _11l_to_cpp:tokenizer:Token.Category.SCOPE_END = ‘’, _11l_to_cpp:tokenizer:Token.Category.STATEMENT_SEPARATOR = ‘’]
 
 T Error
    String message
@@ -36,4 +38,27 @@ F highlight(lang, source)
          X Error(e.message, e.pos)
    E
       assert(lang == ‘11l’)
+      X.try
+         L(token) _11l_to_cpp:tokenizer:tokenize(source, comments' &comments) [+] [_11l_to_cpp:tokenizer:Token(source.len, source.len, _11l_to_cpp:tokenizer:Token.Category.STATEMENT_SEPARATOR)]
+            L comments.len & comments[0][0] < token.start
+               res ‘’= html_escape(source[writepos .< comments[0][0]])
+               writepos = comments[0][1]
+               res ‘’= ‘<span class="comment">’html_escape(source[comments[0][0] .< comments[0][1]])‘</span>’
+               comments.pop(0)
+            res ‘’= html_escape(source[writepos .< token.start])
+            writepos = token.end
+            V tokstr = html_escape(token.value(source))
+            String css_class
+            I (token.category == _11l_to_cpp:tokenizer:Token.Category.NAME & tokstr C (‘V’, ‘П’, ‘var’, ‘перем’)) | (token.category == _11l_to_cpp:tokenizer:Token.Category.OPERATOR & tokstr C (‘C’, ‘С’, ‘in’, ‘!C’, ‘!С’, ‘!in’)) | tokstr.split(‘.’)[0] C _11l_to_cpp:tokenizer:keywords
+               css_class = ‘keyword’
+            E
+               css_class = :cat_to_class_11l[token.category]
+
+            I css_class != ‘’
+               res ‘’= ‘<span class="’css_class‘">’tokstr‘</span>’
+            E
+               res ‘’= tokstr
+
+      X.catch _11l_to_cpp:tokenizer:Error e
+         X Error(e.message, e.pos)
    R res

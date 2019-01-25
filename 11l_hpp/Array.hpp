@@ -146,6 +146,11 @@ public:
 		return (*this)[len() + i];
 	}
 
+	Type &at_plus_len(int i)
+	{
+		return (*this)[len() + i];
+	}
+
 	void set(int i, const Type &v)
 	{
 		if (in(i, range_el(0, len())))
