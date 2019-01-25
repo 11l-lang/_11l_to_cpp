@@ -31,14 +31,14 @@ class Scope:
         def serialize_to_dict(self):
             ast_nodes = []
             for ast_node in self.ast_nodes:
-                if type(ast_node) == ASTFunctionDefinition:
+                if type(ast_node) in (ASTFunctionDefinition, ASTTypeDefinition):
                     ast_nodes.append(ast_node.serialize_to_dict())
             return {'type': self.type, 'ast_nodes': ast_nodes}
 
         def deserialize_from_dict(self, d):
             #self.type = d['type']
             for ast_node_dict in d['ast_nodes']:
-                ast_node = ASTFunctionDefinition()
+                ast_node = ASTFunctionDefinition() if ast_node_dict['node_type'] == 'function' else ASTTypeDefinition()
                 ast_node.deserialize_from_dict(ast_node_dict)
                 self.ast_nodes.append(ast_node)
 
@@ -906,8 +906,12 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         self.function_return_type = function_return_type
         self.scope = scope
 
-    def serialize_to_dict(self):
-        return {'function_arguments': ['; '.join(arg) for arg in self.function_arguments]}
+    def serialize_to_dict(self, node_type = True):
+        r = {}
+        if node_type: # 'node_type' is inserted in dict before 'function_arguments' as this looks more logical in .11l_global_scope
+            r['node_type'] = 'function'
+        r['function_arguments'] = ['; '.join(arg) for arg in self.function_arguments]
+        return r
 
     def deserialize_from_dict(self, d):
         self.function_arguments = [arg.split('; ') for arg in d['function_arguments']]
@@ -1228,6 +1232,15 @@ class ASTTypeDefinition(ASTNodeWithChildren):
         self.constructors = constructors or []
         self.scope = scope # needed for built-in types, e.g. `File(full_fname, ‘w’, encoding' ‘utf-8-sig’).write(...)`
         self.forward_declared_types = set()
+
+    def serialize_to_dict(self):
+        return {'node_type': 'type', 'constructors': [c.serialize_to_dict(False) for c in self.constructors]}
+
+    def deserialize_from_dict(self, d):
+        for c_dict in d['constructors']:
+            c = ASTFunctionDefinition()
+            c.deserialize_from_dict(c_dict)
+            self.constructors.append(c)
 
     def to_str(self, indent):
         r = ''
