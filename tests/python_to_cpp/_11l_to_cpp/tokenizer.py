@@ -165,7 +165,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
             if len(tokens) \
                and tokens[-1].category == Token.Category.STRING_CONCATENATOR \
                and source[i] in '"\'‘': # ’ and not source[i+1:i+2] in ({'"':'"', '‘':'’'}[source[i]],):
-                if line_continuations != None:
+                if line_continuations is not None:
                     line_continuations.append(tokens[-1].end)
                 if source[i:i+2] in ('""', '‘’'):
                     i += 2
@@ -174,7 +174,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
             if len(tokens) \
                and tokens[-1].category == Token.Category.STRING_LITERAL \
                and source[i:i+2] in ('""', '‘’'):
-                if line_continuations != None:
+                if line_continuations is not None:
                     line_continuations.append(tokens[-1].end)
                 tokens.append(Token(i, i, Token.Category.STRING_CONCATENATOR))
                 i += 2
@@ -184,7 +184,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                 and tokens[-1].category == Token.Category.OPERATOR
                 and tokens[-1].value(source) in binary_operators[tokens[-1].end - tokens[-1].start] # ‘Every line of code which ends with any binary operator should be joined with the following line of code.’:[https://github.com/JuliaLang/julia/issues/2097#issuecomment-339924750][-339924750]<
                 and source[tokens[-1].end-4:tokens[-1].end] != '-> &'): # for `F symbol(id, bp = 0) -> &`
-                if line_continuations != None:
+                if line_continuations is not None:
                     line_continuations.append(tokens[-1].end)
                 continue
 
@@ -199,7 +199,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
               and (source[i] != '&' or source[i+1:i+2] == ' ')): # Символ `&` обрабатывается по-особенному — склеивание строк происходит только если после него стоит пробел
                 if len(tokens) == 0:
                     raise Error('source can not starts with a binary operator', i)
-                if line_continuations != None:
+                if line_continuations is not None:
                     line_continuations.append(tokens[-1].end)
                 continue
 
@@ -208,7 +208,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                     i += 1             # \\     .method2()                  |||     \.method2()
                #else: # with `if len(tokens): i += 1` there is no need for this else branch
                #    raise Error('unexpected character `\`')
-                    if line_continuations != None:
+                    if line_continuations is not None:
                         line_continuations.append(tokens[-1].end)
                 continue
 
@@ -240,7 +240,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                         indentation_tabs = tabs # первоначальная/новая установка символа для отступа (либо табуляция, либо пробелы) производится только от нулевого уровня отступа
                     indentation_levels.append((indentation_level, False))
                     tokens.append(Token(linestart, i, Token.Category.SCOPE_BEGIN))
-                    if implied_scopes != None:
+                    if implied_scopes is not None:
                         implied_scopes.append((Char('{'), tokens[-2].end + (1 if source[tokens[-2].end] in " \n" else 0)))
                 else: # [3:] [-1]:‘If it is smaller, it ~‘must’ be one of the numbers occurring on the stack; all numbers on the stack that are larger are popped off, and for each number popped off a DEDENT token is generated.’ [:4]
                     while True:
@@ -248,7 +248,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                             raise Error('too much unindent, what is this unindent intended for?', i)
                         indentation_levels.pop()
                         tokens.append(Token(i, i, Token.Category.SCOPE_END))
-                        if implied_scopes != None:
+                        if implied_scopes is not None:
                             implied_scopes.append((Char('}'), i))
                         level = indentation_levels[-1][0] if len(indentation_levels) else 0 #level, explicit_scope_via_curly_braces = indentation_levels[-1] if len(indentation_levels) else [0, False]
                         if level == indentation_level:
@@ -263,7 +263,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
         if ch in " \t":
             i += 1 # just skip whitespace characters
         elif ch in "\r\n":
-            #if newline_chars != None: # rejected this code as it does not count newline characters inside comments and string literals — better to use pqmarkup.py approach — on demand (i.e. only when error occured) calculation of newline characters array
+            #if newline_chars is not None: # rejected this code as it does not count newline characters inside comments and string literals — better to use pqmarkup.py approach — on demand (i.e. only when error occured) calculation of newline characters array
             #    newline_chars.append(i)
             i += 1
             if ch == "\r" and source[i:i+1] == "\n":
@@ -276,7 +276,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
             i += 2
             while i < len(source) and source[i] not in "\r\n":
                 i += 1
-            if comments != None:
+            if comments is not None:
                 comments.append((comment_start, i))
         elif ch == '\\' and source[i+1:i+2] in "‘({[": # multi-line comment # ]})’
             comment_start = i
@@ -295,7 +295,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                         break
                 if i == len(source):
                     raise Error('there is no corresponding opening parenthesis/bracket/brace/qoute for `' + lbr + '`', comment_start+1)
-            if comments != None:
+            if comments is not None:
                 comments.append((comment_start, i))
         else:
             def is_hexadecimal_digit(ch):
@@ -526,7 +526,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                 nesting_elements.pop()
                 while indentation_levels[-1][1] != True:
                     tokens.append(Token(lexem_start, lexem_start, Token.Category.SCOPE_END))
-                    if implied_scopes != None: # {
+                    if implied_scopes is not None: # {
                         implied_scopes.append((Char('}'), lexem_start))
                     indentation_levels.pop()
                 assert(indentation_levels.pop()[1] == True)
@@ -559,7 +559,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
     while len(indentation_levels):
         assert(indentation_levels[-1][1] != True)
         tokens.append(Token(i, i, Token.Category.SCOPE_END))
-        if implied_scopes != None: # {
+        if implied_scopes is not None: # {
             implied_scopes.append((Char('}'), i-1 if source[-1] == "\n" else i))
         indentation_levels.pop()
 

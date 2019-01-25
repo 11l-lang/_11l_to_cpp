@@ -123,7 +123,7 @@ def tokenize(source, newline_chars : List[int] = None, comments : List[Tuple[int
         if ch in " \t":
             i += 1 # just skip whitespace characters
         elif ch in "\r\n":
-            if newline_chars != None:
+            if newline_chars is not None:
                 newline_chars.append(i)
             i += 1
             if ch == "\r" and source[i:i+1] == "\n":
@@ -135,7 +135,7 @@ def tokenize(source, newline_chars : List[int] = None, comments : List[Tuple[int
             i += 1
             while i < len(source) and source[i] not in "\r\n":
                 i += 1
-            if comments != None:
+            if comments is not None:
                 comments.append((comment_start, i))
         else:
             expected_an_indented_block = ch == ':'
