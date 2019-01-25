@@ -667,11 +667,14 @@ class SymbolNode:
             elif self.symbol.id in ('==', '!=') and self.children[1].token.category == Token.Category.STRING_LITERAL:
                 return self.children[0].to_str() + ' ' + self.symbol.id + ' ' + char_if_len_1(self.children[1])[:-2]
             elif self.symbol.id == '=' and self.children[0].symbol.id == '[': # ] # replace `a[k] = v` with `a.set(k, v)`
-                c01 = self.children[0].children[1].to_str()
-                if c01.startswith('(len)'):
-                    return self.children[0].children[0].to_str() + '.set_plus_len(' + c01[len('(len)'):] + ', ' + char_if_len_1(self.children[1]) + ')'
+                if self.children[0].children[1].token.category == Token.Category.NUMERIC_LITERAL: # replace `a[0] = v` with `_set<0>(a, v)` to support tuples
+                    return '_set<' + self.children[0].children[1].token_str() + '>(' + self.children[0].children[0].to_str() + ', ' + char_if_len_1(self.children[1]) + ')'
                 else:
-                    return self.children[0].children[0].to_str() + '.set(' + c01 + ', ' + char_if_len_1(self.children[1]) + ')'
+                    c01 = self.children[0].children[1].to_str()
+                    if c01.startswith('(len)'):
+                        return self.children[0].children[0].to_str() + '.set_plus_len(' + c01[len('(len)'):] + ', ' + char_if_len_1(self.children[1]) + ')'
+                    else:
+                        return self.children[0].children[0].to_str() + '.set(' + c01 + ', ' + char_if_len_1(self.children[1]) + ')'
             elif self.symbol.id == '[+]=': # replace `a [+]= v` with `a.append(v)`
                 return self.children[0].to_str() + '.append(' + self.children[1].to_str() + ')'
             elif self.symbol.id == '=' and self.children[0].tuple:

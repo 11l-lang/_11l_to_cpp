@@ -2896,7 +2896,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        t.set(1, 1);
+        _set<1>(t, 1);
         for (auto i : range_el(1, n + 1)) {
             for (auto j : range_el(i, 1).step(-1))
                 t[j] += t[j - 1];

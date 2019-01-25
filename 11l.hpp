@@ -12,6 +12,8 @@ template <int n, typename Container> inline auto _get(const Container &c) -> dec
 template <int n, typename Container> inline auto _get(      Container &c) -> decltype(c[n]) {return c[n];}
 template <int n, typename...Types> inline const auto &_get(const Tuple<Types...> &t) {return std::get<n>(t);}
 template <int n, typename...Types> inline       auto &_get(      Tuple<Types...> &t) {return std::get<n>(t);}
+template <int n, typename Container, typename Value> inline void _set(Container       &c, const Value &v) {c.set(n, v);}
+template <int n, typename  ...Types, typename Value> inline void _set(Tuple<Types...> &t, const Value &v) {std::get<n>(t) = v;}
 
 #if __GNUC__ || __INTEL_COMPILER // || __clang__ // Clang already defines __GNUC__
 #define likely(x) __builtin_expect(!!(x), 1)
