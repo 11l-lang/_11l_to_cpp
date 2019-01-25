@@ -1,0 +1,31 @@
+keywords
+    type = ‘’
+    ast_nodes = []
+empty_list_of_str
+    type = ‘’
+    ast_nodes = []
+binary_operators
+    type = ‘’
+    ast_nodes = []
+unary_operators
+    type = ‘’
+    ast_nodes = []
+sorted_operators
+    type = ‘’
+    ast_nodes = []
+Error
+    type = ‘’
+    ast_nodes = []
+Token
+    type = ‘’
+    ast_nodes = []
+tokenize
+    type = ‘’
+    ast_nodes = [
+    .   function_arguments = [
+            ‘source; ; ; ’
+            implied_scopes; nullptr; [(Char, Int)]?; &
+            line_continuations; nullptr; [Int]?; &
+            comments; nullptr; [(Int, Int)]?; &
+        ]
+    ]

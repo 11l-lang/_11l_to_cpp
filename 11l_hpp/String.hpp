@@ -34,6 +34,7 @@ public:
 	bool is_lowercase() const {return iswlower(code);}
 	Char    uppercase() const {return towupper(code);}
 	bool is_uppercase() const {return iswupper(code);}
+	bool is_alpha    () const {return iswalpha(code);}
 };
 
 namespace re {class RegEx;}
@@ -280,6 +281,15 @@ public:
 		const char16_t *s = data();
 		for (int i=0, n=len(); i<n; i++)
 			if (!Char(s[i]).is_digit()) return false;
+		return true;
+	}
+
+	bool is_alpha() const
+	{
+		if (empty()) return false;
+		const char16_t *s = data();
+		for (int i=0, n=len(); i<n; i++)
+			if (!Char(s[i]).is_alpha()) return false;
 		return true;
 	}
 

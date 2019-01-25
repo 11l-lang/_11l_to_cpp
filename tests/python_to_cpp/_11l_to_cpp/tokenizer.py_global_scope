@@ -1,0 +1,25 @@
+Imported modules = []
+keywords
+    type = List
+    node = N
+empty_list_of_str
+    type = List
+    node = N
+binary_operators
+    type = List
+    node = N
+unary_operators
+    type = List
+    node = N
+sorted_operators
+    type = ‘’
+    node = N
+tokenize
+    type = ‘’
+    node
+        function_arguments = [
+            ‘source; ; ’
+            implied_scopes; N; List[Tuple[Char, int]]
+            line_continuations; N; List[int]
+            comments; N; List[Tuple[int, int]]
+        ]
