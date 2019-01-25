@@ -15,14 +15,32 @@ sorted_operators
     ast_nodes = []
 Error
     type = ‘’
-    ast_nodes = []
+    ast_nodes = [
+    .   node_type = type
+        constructors = [
+        .   function_arguments = [
+                ‘message; ; ; ’
+                ‘pos; ; ; ’
+            ]
+        ]
+    ]
 Token
     type = ‘’
-    ast_nodes = []
+    ast_nodes = [
+    .   node_type = type
+        constructors = [
+        .   function_arguments = [
+                ‘start; ; ; ’
+                ‘end; ; ; ’
+                ‘category; ; ; ’
+            ]
+        ]
+    ]
 tokenize
     type = ‘’
     ast_nodes = [
-    .   function_arguments = [
+    .   node_type = function
+        function_arguments = [
             ‘source; ; ; ’
             implied_scopes; nullptr; [(Char, Int)]?; &
             line_continuations; nullptr; [Int]?; &
