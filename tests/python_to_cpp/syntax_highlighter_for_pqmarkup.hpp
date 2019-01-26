@@ -5,8 +5,21 @@ namespace _11l_to_cpp { namespace tokenizer {
 #include "_11l_to_cpp/tokenizer.hpp"
 }}
 
+auto css = uR"(<style>
+span.keyword {color: #0000FF; font-weight: bold;}
+span.identifier {color: #00009F;}
+span.string-literal {color: #800000;}
+span.numeric-literal {color: #008000;}
+span.constant {color: #008000;}
+span.comment {color: #808080;}
+</style>)"_S;
 auto cat_to_class_python = create_dict(dict_of(python_to_11l::tokenizer::Token::Category::NAME, u"identifier"_S)(python_to_11l::tokenizer::Token::Category::KEYWORD, u"keyword"_S)(python_to_11l::tokenizer::Token::Category::CONSTANT, u"constant"_S)(python_to_11l::tokenizer::Token::Category::OPERATOR_OR_DELIMITER, u""_S)(python_to_11l::tokenizer::Token::Category::NUMERIC_LITERAL, u"numeric-literal"_S)(python_to_11l::tokenizer::Token::Category::STRING_LITERAL, u"string-literal"_S)(python_to_11l::tokenizer::Token::Category::INDENT, u""_S)(python_to_11l::tokenizer::Token::Category::DEDENT, u""_S)(python_to_11l::tokenizer::Token::Category::STATEMENT_SEPARATOR, u""_S));
 auto cat_to_class_11l = create_dict(dict_of(_11l_to_cpp::tokenizer::Token::Category::NAME, u"identifier"_S)(_11l_to_cpp::tokenizer::Token::Category::KEYWORD, u"keyword"_S)(_11l_to_cpp::tokenizer::Token::Category::CONSTANT, u"constant"_S)(_11l_to_cpp::tokenizer::Token::Category::DELIMITER, u""_S)(_11l_to_cpp::tokenizer::Token::Category::OPERATOR, u""_S)(_11l_to_cpp::tokenizer::Token::Category::NUMERIC_LITERAL, u"numeric-literal"_S)(_11l_to_cpp::tokenizer::Token::Category::STRING_LITERAL, u"string-literal"_S)(_11l_to_cpp::tokenizer::Token::Category::STRING_CONCATENATOR, u""_S)(_11l_to_cpp::tokenizer::Token::Category::SCOPE_BEGIN, u""_S)(_11l_to_cpp::tokenizer::Token::Category::SCOPE_END, u""_S)(_11l_to_cpp::tokenizer::Token::Category::STATEMENT_SEPARATOR, u""_S));
+
+template <typename T1> auto is_lang_supported(const T1 &lang)
+{
+    return in(lang, make_tuple(u"11l"_S, u"Python"_S));
+}
 
 class Error
 {

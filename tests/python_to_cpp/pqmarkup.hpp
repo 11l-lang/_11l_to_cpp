@@ -1,4 +1,8 @@
-﻿Array<String> argv;
+﻿namespace syntax_highlighter_for_pqmarkup {
+#include "syntax_highlighter_for_pqmarkup.hpp"
+}
+
+Array<String> argv;
 
 class Exception
 {
@@ -22,6 +26,7 @@ public:
     Array<int> to_html_called_inside_to_html_outer_pos_list;
     bool habr_html;
     bool ohd;
+    decltype(false) highlight_style_was_added = false;
     String instr;
 
     template <typename T1, typename T2> Converter(const T1 &habr_html, const T2 &ohd)
@@ -233,7 +238,7 @@ public:
             }
             if (text == u"") {
                 write_to_pos(startpos, i + 1);
-                text = html_escape(instr[range_el(startpos + q_offset, endpos)]);
+                text = html_escape(remove_comments(instr[range_el(startpos + q_offset, endpos)], startpos + q_offset));
             }
             outfile.write(tag + u">"_S + (text != u"" ? text : link) + u"</a>"_S);
         };
@@ -424,10 +429,10 @@ public:
                             }
                             else if (instr[range_el(endqpos + 1, endqpos + 2)] == u':') {
                                 outfile.write(u"<i>"_S + instr[range_el(i + 2, endqpos)] + u"</i>:<br />\n"_S);
-                                i = endqpos + 2;
-                                if (instr[range_el(i, i + 1)] != u'‘')
-                                    exit_with_error(u"Quotation with author's name should be in the form >‘Author's name’:‘Quoted text.’ (opening quotation mark not found after colon)"_S, i);
-                                writepos = i + 1;
+                                i = endqpos + 1;
+                                if (instr[range_el(i, i + 2)] != u":‘")
+                                    exit_with_error(u"Quotation with author's name should be in the form >‘Author's name’:‘Quoted text.’"_S, i);
+                                writepos = i + 2;
                             }
                         }
                         ending_tags.append(u"</blockquote>"_S);
@@ -546,18 +551,34 @@ public:
                 }
                 else if (prevc == u'#') {
                     auto ins = instr[range_el(startqpos + 1, endqpos)];
+                    write_to_pos(prevci, endqpos + 1);
                     if (habr_html) {
-                        write_to_pos(prevci, endqpos + 1);
                         auto contains_new_line = in(u'\n'_C, ins);
                         outfile.write((str_in_b != u"" ? u"<source lang=\""_S + str_in_b + u"\">"_S : contains_new_line ? u"<source>"_S : u"<code>"_S) + ins + (str_in_b != u"" || contains_new_line ? u"</source>"_S : u"</code>"_S));
                     }
-
                     else {
-                        write_to_pos(prevci, endqpos + 1);
-                        outfile.write(u"<pre style=\"display: inline\">"_S + html_escape(instr[range_el(startqpos + 1, endqpos)]) + u"</pre>"_S);
+                        auto pre = u"<pre "_S + (_get<0>(ins) == u'\n' ? u"class=\"code_block\""_S : u"style=\"display: inline\""_S) + u">"_S;
+                        if (ohd && syntax_highlighter_for_pqmarkup::is_lang_supported(str_in_b)) {
+                            if (!(highlight_style_was_added)) {
+                                outfile.write(syntax_highlighter_for_pqmarkup::css);
+                                highlight_style_was_added = true;
+                            }
+                            try
+                            {
+                                outfile.write(pre + syntax_highlighter_for_pqmarkup::highlight(str_in_b, ins) + u"</pre>"_S);
+                            }
+                            catch (const syntax_highlighter_for_pqmarkup::Error& e)
+                            {
+                                exit_with_error(u"Syntax highlighter: "_S + e.message, startqpos + 1 + e.pos);
+                            }
+                        }
+                        else
+                            outfile.write(pre + html_escape(ins) + u"</pre>"_S);
                     }
-                    if (_get<0>(ins) == u'\n' && instr[range_el(i + 1, i + 2)] == u'\n')
+                    if (_get<0>(ins) == u'\n' && instr[range_el(i + 1, i + 2)] == u'\n') {
+                        outfile.write(u"\n"_S);
                         new_line_tag = u""_S;
+                    }
                 }
                 else if (in(prevc, u"TТ"_S)) {
                     write_to_pos(prevci, endqpos + 1);
@@ -657,7 +678,10 @@ public:
                                         if (!(xxx == xx && yyy == yy))
                                             _set<1>(table[yyy][xxx], u""_S);
                             }
-                    outfile.write(u"<table"_S + (u" style=\"display: inline\""_S * (prevci != 0 && instr[prevci - 1] != u'\n')) + u">\n"_S);
+                    auto is_inline = true;
+                    if ((prevci == 0 || instr[prevci - 1] == u'\n' || (prevci - 3 >= 0 && instr[range_el(prevci - 3, prevci)] == u"]]]" && instr[range_el(0, 3)] == u"[[[" && find_ending_sq_bracket(instr, 0) == prevci - 1)))
+                        is_inline = false;
+                    outfile.write(u"<table"_S + (u" style=\"display: inline\""_S * is_inline) + u">\n"_S);
                     for (auto row : table) {
                         outfile.write(u"<tr>"_S);
                         for (auto colcolattrs : row) {
@@ -669,7 +693,7 @@ public:
                         outfile.write(u"</tr>\n"_S);
                     }
                     outfile.write(u"</table>\n"_S);
-                    if (!(prevci != 0 && instr[prevci - 1] != u'\n'))
+                    if (!is_inline)
                         new_line_tag = u""_S;
                 }
                 else if (in(prevc, u"<>"_S) && in(instr[prevci - 1], u"<>"_S)) {
@@ -778,7 +802,7 @@ public:
                             exit_with_error(u"Unpaired single quotation mark found inside code block/span beginning"_S, start);
                 ins = html_escape(ins);
                 if (!(in(u'\n'_C, ins)))
-                    outfile.write(habr_html ? u"<code>"_S + ins + u"</code>"_S : u"<pre style=\"display: inline\">"_S + ins + u"</pre>"_S);
+                    outfile.write(habr_html ? u"<code>"_S + ins + u"</code>"_S : u"<pre class=\"inline_code\">"_S + ins + u"</pre>"_S);
                 else {
                     outfile.write(u"<pre>"_S + ins + u"</pre>"_S + (u"\n"_S * (!(habr_html))));
                     new_line_tag = u""_S;
@@ -786,7 +810,7 @@ public:
                 i = end + i - start - 1;
             }
             else if (ch == u'[') {
-                if (i_next_str(u"http"_S) || i_next_str(u"./"_S) || i_next_str(u"‘"_S) || numbered_link()) {
+                if (i_next_str(u"http"_S) || i_next_str(u"./"_S) || (i_next_str(u"‘"_S) && !in(prev_char(), u"\r\n\t \0"_S)) || numbered_link()) {
                     auto s = i - 1;
                     while (s >= writepos && !in(instr[s], u"\r\n\t [{(‘“"_S))
                         s--;

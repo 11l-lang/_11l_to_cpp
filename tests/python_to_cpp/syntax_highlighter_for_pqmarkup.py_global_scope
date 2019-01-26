@@ -2,12 +2,21 @@ Imported modules = [
     python_to_11l.tokenizer
     _11l_to_cpp.tokenizer
 ]
+css
+    type = str
+    node = N
 cat_to_class_python
     type = ‘’
     node = N
 cat_to_class_11l
     type = ‘’
     node = N
+is_lang_supported
+    type = ‘’
+    node
+        function_arguments = [
+            ‘lang; ; ’
+        ]
 highlight
     type = ‘’
     node

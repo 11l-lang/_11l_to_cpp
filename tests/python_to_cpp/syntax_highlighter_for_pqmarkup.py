@@ -1,6 +1,15 @@
 import python_to_11l.tokenizer
 import _11l_to_cpp.tokenizer
 
+css = R'''<style>
+span.keyword {color: #0000FF; font-weight: bold;}
+span.identifier {color: #00009F;}
+span.string-literal {color: #800000;}
+span.numeric-literal {color: #008000;}
+span.constant {color: #008000;}
+span.comment {color: #808080;}
+</style>'''
+
 cat_to_class_python = {
     python_to_11l.tokenizer.Token.Category.NAME                  : 'identifier',
     python_to_11l.tokenizer.Token.Category.KEYWORD               : 'keyword',
@@ -26,6 +35,9 @@ cat_to_class_11l = {
     _11l_to_cpp.tokenizer.Token.Category.SCOPE_END           : '',
     _11l_to_cpp.tokenizer.Token.Category.STATEMENT_SEPARATOR : '',
 }
+
+def is_lang_supported(lang):
+    return lang in ('11l', 'Python')
 
 class Error(Exception):
     message : str
