@@ -147,21 +147,21 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
          I source[i] C ‘{}’
             L.continue
 
-         I tokens.len & tokens.last.category == Token.Category.STRING_CONCATENATOR & source[i] C "\"'‘"
+         I tokens.len & tokens.last.category == STRING_CONCATENATOR & source[i] C "\"'‘"
             I line_continuations != N
                line_continuations.append(tokens.last.end)
             I source[i .< i + 2] C (‘""’, ‘‘’’)
                i += 2
             L.continue
 
-         I tokens.len & tokens.last.category == Token.Category.STRING_LITERAL & source[i .< i + 2] C (‘""’, ‘‘’’)
+         I tokens.len & tokens.last.category == STRING_LITERAL & source[i .< i + 2] C (‘""’, ‘‘’’)
             I line_continuations != N
                line_continuations.append(tokens.last.end)
             tokens.append(Token(i, i, Token.Category.STRING_CONCATENATOR))
             i += 2
             L.continue
 
-         I (tokens.len & tokens.last.category == Token.Category.OPERATOR & tokens.last.value(source) C :binary_operators[tokens.last.end - tokens.last.start] & source[tokens.last.end - 4 .< tokens.last.end] != ‘-> &’)
+         I (tokens.len & tokens.last.category == OPERATOR & tokens.last.value(source) C :binary_operators[tokens.last.end - tokens.last.start] & source[tokens.last.end - 4 .< tokens.last.end] != ‘-> &’)
             I line_continuations != N
                line_continuations.append(tokens.last.end)
             L.continue
@@ -198,7 +198,7 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
             prev_indentation_level = I !indentation_levels.empty {indentation_levels.last[0]} E 0
 
             I indentation_level == prev_indentation_level
-               I tokens.len & tokens.last.category != Token.Category.SCOPE_END
+               I tokens.len & tokens.last.category != SCOPE_END
                   tokens.append(Token(linestart - 1, linestart, Token.Category.STATEMENT_SEPARATOR))
             E I indentation_level > prev_indentation_level
                I prev_indentation_level == 0
@@ -274,7 +274,7 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
             i = lexem_start + operator_s.len
             I source[i - 1] == ‘ ’
                i--
-            category = Token.Category.OPERATOR
+            category = OPERATOR
          E I ch.is_alpha() | ch C (‘_’, ‘@’)
             L i < source.len & source[i] == ‘@’
                i++
@@ -292,44 +292,44 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
 
             I source[i .< i + 1] == ‘/’ & source[i - 1 .< i] C ‘IЦ’
                I source[i - 2 .< i - 1] == ‘ ’
-                  category = Token.Category.OPERATOR
+                  category = OPERATOR
                E
                   X Error(‘please clarify your intention by putting space character before or after `I`’, i - 1)
 
             E I source[i .< i + 1] == ‘'’
                i++
                I source[i .< i + 1] == ‘ ’
-                  category = Token.Category.NAME
+                  category = NAME
                E I source[i .< i + 1] C ("‘", ‘'’)
                   i--
-                  category = Token.Category.NAME
+                  category = NAME
                E
                   L i < source.len & (is_hexadecimal_digit(source[i]) | source[i] == ‘'’)
                      i++
                   I !(source[lexem_start + 4 .< lexem_start + 5] == ‘'’ | source[i - 3 .< i - 2] == ‘'’)
                      X Error(‘digit separator in this hexadecimal number is located in the wrong place’, lexem_start)
-                  category = Token.Category.NUMERIC_LITERAL
+                  category = NUMERIC_LITERAL
 
             E I source[lexem_start .< i] C keywords
                I source[lexem_start .< i] C (‘V’, ‘П’, ‘var’, ‘перем’)
-                  category = Token.Category.NAME
+                  category = NAME
                E I source[lexem_start .< i] C (‘N’, ‘Н’, ‘null’, ‘нуль’)
-                  category = Token.Category.CONSTANT
+                  category = CONSTANT
                E
-                  category = Token.Category.KEYWORD
+                  category = KEYWORD
                   I source[i .< i + 1] == ‘.’
                      i++
                      L i < source.len & (source[i].is_alpha() | source[i] C ‘_.’)
                         i++
                      I source[lexem_start .< i] C (‘L.index’, ‘Ц.индекс’, ‘loop.index’, ‘цикл.индекс’)
-                        category = Token.Category.NAME
+                        category = NAME
             E
-               category = Token.Category.NAME
+               category = NAME
 
          E I ch C ‘0’..‘9’
             I ch C ‘01’ & source[i .< i + 1] C (‘B’, ‘В’) & !(is_hexadecimal_digit(source[i + 1 .< i + 2]) | source[i + 1 .< i + 2] == ‘'’)
                i++
-               category = Token.Category.CONSTANT
+               category = CONSTANT
             E
                V is_hex = 0B
                L i < source.len & is_hexadecimal_digit(source[i])
@@ -397,18 +397,18 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
                      number_with_separators = number[0 .< j]‘’number_with_separators
                      I source[lexem_start .< i] != number_with_separators
                         X Error(‘digit separator in this number is located in the wrong place (should be: ’number_with_separators‘)’, lexem_start)
-               category = Token.Category.NUMERIC_LITERAL
+               category = NUMERIC_LITERAL
 
          E I ch == ‘'’ & source[i .< i + 1] == ‘,’
             i++
-            category = Token.Category.DELIMITER
+            category = DELIMITER
 
          E I ch == ‘"’
-            I source[i] == ‘"’ & tokens.last.category == Token.Category.STRING_CONCATENATOR & tokens[(len)-2].category == Token.Category.STRING_LITERAL & tokens[(len)-2].value(source)[0] == "‘"
+            I source[i] == ‘"’ & tokens.last.category == STRING_CONCATENATOR & tokens[(len)-2].category == STRING_LITERAL & tokens[(len)-2].value(source)[0] == "‘"
                i++
                L.continue
             V startqpos = i - 1
-            I tokens.len & tokens.last.end == startqpos & ((tokens.last.category == Token.Category.NAME & tokens.last.value(source).last != ‘'’) | tokens.last.value(source) C (‘)’, ‘]’))
+            I tokens.len & tokens.last.end == startqpos & ((tokens.last.category == NAME & tokens.last.value(source).last != ‘'’) | tokens.last.value(source) C (‘)’, ‘]’))
                tokens.append(Token(lexem_start, lexem_start, Token.Category.STRING_CONCATENATOR))
             L
                I i == source.len
@@ -425,13 +425,13 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
                tokens.append(Token(lexem_start, i, Token.Category.STRING_LITERAL))
                tokens.append(Token(i, i, Token.Category.STRING_CONCATENATOR))
                L.continue
-            category = Token.Category.STRING_LITERAL
+            category = STRING_LITERAL
 
          E I ch C "‘'"
-            I source[i] == "’" & tokens.last.category == Token.Category.STRING_CONCATENATOR & tokens[(len)-2].category == Token.Category.STRING_LITERAL & tokens[(len)-2].value(source)[0] == ‘"’
+            I source[i] == "’" & tokens.last.category == STRING_CONCATENATOR & tokens[(len)-2].category == STRING_LITERAL & tokens[(len)-2].value(source)[0] == ‘"’
                i++
                L.continue
-            I tokens.len & tokens.last.end == i - 1 & ((tokens.last.category == Token.Category.NAME & tokens.last.value(source).last != ‘'’) | tokens.last.value(source) C (‘)’, ‘]’))
+            I tokens.len & tokens.last.end == i - 1 & ((tokens.last.category == NAME & tokens.last.value(source).last != ‘'’) | tokens.last.value(source) C (‘)’, ‘]’))
                tokens.append(Token(lexem_start, lexem_start, Token.Category.STRING_CONCATENATOR))
                I source[i] == "’"
                   i++
@@ -461,12 +461,12 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
                tokens.append(Token(lexem_start, i, Token.Category.STRING_LITERAL))
                tokens.append(Token(i, i, Token.Category.STRING_CONCATENATOR))
                L.continue
-            category = Token.Category.STRING_LITERAL
+            category = STRING_LITERAL
 
          E I ch == ‘{’
             indentation_levels.append((-1, 1B))
             nesting_elements.append((Char(‘{’), lexem_start))
-            category = Token.Category.SCOPE_BEGIN
+            category = SCOPE_BEGIN
          E I ch == ‘}’
             I nesting_elements.empty | nesting_elements.last[0] != ‘{’
                X Error(‘there is no corresponding opening brace for `}`’, lexem_start)
@@ -477,21 +477,21 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
                   implied_scopes.append((Char(‘}’), lexem_start))
                indentation_levels.pop()
             assert(indentation_levels.pop()[1] == 1B)
-            category = Token.Category.SCOPE_END
+            category = SCOPE_END
          E I ch == ‘;’
-            category = Token.Category.STATEMENT_SEPARATOR
+            category = STATEMENT_SEPARATOR
 
          E I ch C (‘,’, ‘.’, ‘:’)
-            category = Token.Category.DELIMITER
+            category = DELIMITER
 
          E I ch C ‘([’
             nesting_elements.append((ch, lexem_start))
-            category = Token.Category.DELIMITER
+            category = DELIMITER
          E I ch C ‘])’
             I nesting_elements.empty | nesting_elements.last[0] != (S ch {‘]’ {‘[’}; ‘)’ {‘(’}})
                X Error(‘there is no corresponding opening parenthesis/bracket for `’ch‘`’, lexem_start)
             nesting_elements.pop()
-            category = Token.Category.DELIMITER
+            category = DELIMITER
 
          E
             X Error(‘unexpected character `’ch‘`’, lexem_start)

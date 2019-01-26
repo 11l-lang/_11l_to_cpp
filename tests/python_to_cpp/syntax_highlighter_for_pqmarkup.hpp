@@ -71,7 +71,7 @@ template <typename T1, typename T2> auto highlight(const T1 &lang, const T2 &sou
                 writepos = token.end;
                 auto tokstr = html_escape(token.value(source));
                 String css_class;
-                if ((token.category == _11l_to_cpp::tokenizer::Token::Category::NAME && in(tokstr, make_tuple(u"V"_S, u"П"_S, u"var"_S, u"перем"_S))) || (token.category == _11l_to_cpp::tokenizer::Token::Category::OPERATOR && in(tokstr, make_tuple(u"C"_S, u"С"_S, u"in"_S, u"!C"_S, u"!С"_S, u"!in"_S))) || in(_get<0>(tokstr.split(u"."_S)), _11l_to_cpp::tokenizer::keywords))
+                if ((token.category == decltype(token.category)::NAME && in(tokstr, make_tuple(u"V"_S, u"П"_S, u"var"_S, u"перем"_S))) || (token.category == decltype(token.category)::OPERATOR && in(tokstr, make_tuple(u"C"_S, u"С"_S, u"in"_S, u"!C"_S, u"!С"_S, u"!in"_S))) || in(_get<0>(tokstr.split(u"."_S)), _11l_to_cpp::tokenizer::keywords))
                     css_class = u"keyword"_S;
                 else
                     css_class = syntax_highlighter_for_pqmarkup::cat_to_class_11l[token.category];

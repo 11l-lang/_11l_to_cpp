@@ -124,7 +124,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
 
          I operator_or_delimiter != ‘’
             i = lexem_start + operator_or_delimiter.len
-            category = Token.Category.OPERATOR_OR_DELIMITER
+            category = OPERATOR_OR_DELIMITER
             I ch C ‘([{’
                nesting_elements.append((ch, lexem_start))
             E I ch C ‘)]}’
@@ -132,7 +132,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
                   X Error(‘there is no corresponding opening parenthesis/bracket/brace for `’ch‘`’, lexem_start)
                nesting_elements.pop()
             E I ch == ‘;’
-               category = Token.Category.STATEMENT_SEPARATOR
+               category = STATEMENT_SEPARATOR
 
          E I ch C (‘"’, ‘'’) | (ch C ‘rRbB’ & source[i .< i + 1] C (‘"’, ‘'’))
             String ends
@@ -153,7 +153,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
                   i += ends.len
                   L.break
                i++
-            category = Token.Category.STRING_LITERAL
+            category = STRING_LITERAL
 
          E I ch C ‘a’..‘z’ | ch C ‘A’..‘Z’ | ch == ‘_’
             L i < source.len
@@ -163,11 +163,11 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
                i++
             I source[lexem_start .< i] C :keywords
                I source[lexem_start .< i] C (‘None’, ‘False’, ‘True’)
-                  category = Token.Category.CONSTANT
+                  category = CONSTANT
                E
-                  category = Token.Category.KEYWORD
+                  category = KEYWORD
             E
-               category = Token.Category.NAME
+               category = NAME
 
          E I (ch C ‘-+’ & source[i .< i + 1] C ‘0’..‘9’) | ch C ‘0’..‘9’
             I ch C ‘-+’
@@ -207,7 +207,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
                   number_with_separators = number[0 .< j]‘’number_with_separators
                   I source[start .< i] != number_with_separators
                      X Error(‘digit separator in this number is located in the wrong place (should be: ’number_with_separators‘)’, start)
-            category = Token.Category.NUMERIC_LITERAL
+            category = NUMERIC_LITERAL
 
          E I ch == "\\"
             I source[i] !C "\r\n"
