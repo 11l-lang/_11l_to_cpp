@@ -666,6 +666,8 @@ class SymbolNode:
                 return self.children[0].to_str() + ' = int(' + self.children[0].to_str() + ')/int(' + self.children[1].to_str() + ')'
             elif self.symbol.id in ('==', '!=') and self.children[1].token.category == Token.Category.STRING_LITERAL:
                 return self.children[0].to_str() + ' ' + self.symbol.id + ' ' + char_if_len_1(self.children[1])[:-2]
+            elif self.symbol.id in ('==', '!=', '=') and self.children[1].token.category == Token.Category.NAME and self.children[1].token_str().isupper(): # `token.category == NAME` -> `token.category == decltype(token.category)::NAME` and `category = NAME` -> `category = decltype(category)::NAME`
+                return self.children[0].to_str() + ' ' + self.symbol.id + ' decltype(' + self.children[0].to_str() + ')::' + self.children[1].token_str()
             elif self.symbol.id == '=' and self.children[0].symbol.id == '[': # ] # replace `a[k] = v` with `a.set(k, v)`
                 if self.children[0].children[1].token.category == Token.Category.NUMERIC_LITERAL: # replace `a[0] = v` with `_set<0>(a, v)` to support tuples
                     return '_set<' + self.children[0].children[1].token_str() + '>(' + self.children[0].children[0].to_str() + ', ' + char_if_len_1(self.children[1]) + ')'
