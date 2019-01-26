@@ -1,9 +1,20 @@
+css
+    type = ‘’
+    ast_nodes = []
 cat_to_class_python
     type = ‘’
     ast_nodes = []
 cat_to_class_11l
     type = ‘’
     ast_nodes = []
+is_lang_supported
+    type = ‘’
+    ast_nodes = [
+    .   node_type = function
+        function_arguments = [
+            ‘lang; ; ; ’
+        ]
+    ]
 Error
     type = ‘’
     ast_nodes = [

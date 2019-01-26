@@ -41,9 +41,14 @@ TEST("link[https://address]", '<a href="https://address">link</a>')
 TEST("‘multiword link’[http://address]", '<a href="http://address">multiword link</a>')
 TEST("link[https://address ‘title &text[[[comment]]]’]", '<a href="https://address" title="title &amp;text">link</a>')
 TEST("link[https://address title [.&.] text[[[comment]]]]", '<a href="https://address" title="title [.&amp;.] text">link</a>')
+TEST('‘[[[Scoping rules/]]]Code blocks’[./code-blocks]', '<a href="./code-blocks" target="_self">Code blocks</a>')
 TEST("text[‘title text’]", '<abbr title="title text">text</abbr>')
 TEST("[text][‘title text’]", '[text]<abbr title="title text"></abbr>') # чтобы получить '<abbr title="title text">[text]</abbr>' пишите так: ‘[text]’[‘title text’]
-#TEST("‘`‘` и `’`’[‘`‘` и `’`’]", '<abbr title="`‘` и `’`"><code>‘</code> и <code>’</code></abbr>') # Почему оставил закомментированным (а также почему в ‘...[[[комментарий]]]’[‘...’] удаляются комментарии, а в ‘...[[[комментарий]]]’[http...] — не удаляются): согласно правилу прецедента {должна возникнуть необходимость использовать такое в реальном тексте прежде чем добавлять какой-либо функционал в код ‘на всякий случай’/‘на будущее’}.
+TEST('Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [‘мои мысли на тему режимов открытия файлов’[./File]]', 'Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [<a href="./File" target="_self">мои мысли на тему режимов открытия файлов</a>]')
+TEST('Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [[‘’]‘мои мысли на тему режимов открытия файлов’[./File]]', 'Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [<abbr title=""></abbr><a href="./File" target="_self">мои мысли на тему режимов открытия файлов</a>]') # maybe this test is unnecessary
+TEST('[[‘’][[[Справка/]]]Документация по методам доступна на данный момент только ‘на английском’[./../../built-in-types].]', '[<abbr title=""></abbr><!--[[[Справка/]]]-->Документация по методам доступна на данный момент только <a href="./../../built-in-types" target="_self">на английском</a>.]')
+TEST('[‘мои мысли на тему режимов открытия файлов’[./File]]', '[<a href="./File" target="_self">мои мысли на тему режимов открытия файлов</a>]')
+#TEST("‘`‘` и `’`’[‘`‘` и `’`’]", '<abbr title="`‘` и `’`"><code>‘</code> и <code>’</code></abbr>') # Почему оставил закомментированным: должна возникнуть необходимость использовать такое в реальном тексте прежде чем добавлять какой-либо функционал в код ‘на всякий случай’/‘на будущее’.
 TEST("P‘http://image-url’", '<img src="http://image-url" />')
 TEST("P‘http://image-url’[http://address]", '<a href="http://address"><img src="http://image-url" /></a>')
 TEST("P‘http://image-url’[‘title text[[[comment]]]’]", '<img src="http://image-url" title="title text" />')
@@ -85,9 +90,9 @@ xt""", """<span class="spoiler_title" onclick="return spoiler2(this, event)">tit
 xt""", ohd = True) # пока что фиксирую такой некрасивый HTML-код, так как например этот HTML-код работает некорректно: '<span class="spoiler_title" onclick="return spoiler2(this, event)">title</span><div class="spoiler_text" style="display:none">te<br />\n</div><br />\nxt'
                    #                                                                                      и этот тоже: '<span class="spoiler_title" onclick="return spoiler2(this, event)">title</span><div class="spoiler_text" style="display:none">te</div><br />\nxt'
                    #                                                                                           и этот: '<span class="spoiler_title" onclick="return spoiler2(this, event)">title</span><div class="spoiler_text" style="display:none">te</div>xt'
-TEST("""#(Javascript)‘
+TEST("""#(JavaScript)‘
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
-’""", """<source lang="Javascript">
+’""", """<source lang="JavaScript">
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
 </source>""", habr_html = True)
 TEST("""‘Code’{
@@ -99,7 +104,8 @@ import hashlib
 Some text.""",
 """<spoiler title="Code"><source lang="Python">
 import hashlib
-</source></spoiler><br />
+</source>
+</spoiler><br />
 Some text.""", habr_html = True)
 TEST("[[[‘]]]test```’```test", "<!--[[[‘]]]-->test<code>’</code>test", habr_html = True)
 TEST("[[[‘]]]`Don’t`", "<!--[[[‘]]]--><code>Don’t</code>", habr_html = True)
@@ -129,6 +135,7 @@ TEST(">[http://another-address][-1]:‘Quoted text.’\n" +
 TEST(">‘Author's name’[http://address]:‘Quoted text.’", '<blockquote><i><a href="http://address">Author\'s name</a></i>:<br />\nQuoted text.</blockquote>')
 TEST(">‘Author's name’:‘Quoted text.’",                 '<blockquote><i>Author\'s name</i>:<br />\nQuoted text.</blockquote>')
 TEST("‘Quoted text.’:‘Author's name’<",                 "<blockquote>Quoted text.<br />\n<div align='right'><i>Author's name</i></div></blockquote>")
+TEST('>‘Как люди думают. Дмитрий Чернышев. 2015. 304с.’:‘[[[стр.89:]]]...’', "<blockquote><i>Как люди думают. Дмитрий Чернышев. 2015. 304с.</i>:<br />\n<!--[[[стр.89:]]]-->...</blockquote>")
 TEST("‘понимание [[[процесса]]] разбора [[[разметки]]] человеком’[‘говоря проще: приходится [[[гораздо]]] меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё’]", '<abbr title="говоря проще: приходится  меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё">понимание  разбора  человеком</abbr>')
 TEST(
 """. unordered
@@ -325,7 +332,7 @@ print("Test " + str(test_id) + ". Checking source files for unallowed characters
 for root, dirs, files in os.walk('.'):
     dirs[:] = [d for d in dirs if d[0] != '.'] # exclude hidden folders (e.g. `.hg`)
     for name in files:
-        if name.endswith(".py") or name.endswith(".txt"):
+        if name.endswith(('.py', '.txt')):
             file_bytes = open(os.path.join(root, name), 'rb').read()
             if b"\r" in file_bytes or b"\t" in file_bytes:
                 print(R"Unallowed character (\r or \t) found in file '" + os.path.join(root, name)[2:] + "'")
@@ -396,8 +403,13 @@ TEST(‘link[https://address]’, ‘<a href="https://address">link</a>’)
 TEST(‘‘multiword link’[http://address]’, ‘<a href="http://address">multiword link</a>’)
 TEST(‘link[https://address ‘title &text[[[comment]]]’]’, ‘<a href="https://address" title="title &amp;text">link</a>’)
 TEST(‘link[https://address title [.&.] text[[[comment]]]]’, ‘<a href="https://address" title="title [.&amp;.] text">link</a>’)
+TEST(‘‘[[[Scoping rules/]]]Code blocks’[./code-blocks]’, ‘<a href="./code-blocks" target="_self">Code blocks</a>’)
 TEST(‘text[‘title text’]’, ‘<abbr title="title text">text</abbr>’)
 TEST(‘[text][‘title text’]’, ‘[text]<abbr title="title text"></abbr>’)
+TEST(‘Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [‘мои мысли на тему режимов открытия файлов’[./File]]’, ‘Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [<a href="./File" target="_self">мои мысли на тему режимов открытия файлов</a>]’)
+TEST(‘Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [[‘’]‘мои мысли на тему режимов открытия файлов’[./File]]’, ‘Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [<abbr title=""></abbr><a href="./File" target="_self">мои мысли на тему режимов открытия файлов</a>]’)
+TEST(‘[[‘’][[[Справка/]]]Документация по методам доступна на данный момент только ‘на английском’[./../../built-in-types].]’, ‘[<abbr title=""></abbr><!--[[[Справка/]]]-->Документация по методам доступна на данный момент только <a href="./../../built-in-types" target="_self">на английском</a>.]’)
+TEST(‘[‘мои мысли на тему режимов открытия файлов’[./File]]’, ‘[<a href="./File" target="_self">мои мысли на тему режимов открытия файлов</a>]’)
 TEST(‘P‘http://image-url’’, ‘<img src="http://image-url" />’)
 TEST(‘P‘http://image-url’[http://address]’, ‘<a href="http://address"><img src="http://image-url" /></a>’)
 TEST(‘P‘http://image-url’[‘title text[[[comment]]]’]’, ‘<img src="http://image-url" title="title text" />’)
@@ -437,9 +449,9 @@ te
 xt’, ‘<span class="spoiler_title" onclick="return spoiler2(this, event)">title<br /></span><div class="spoiler_text" style="display: none">te<br />
 </div>
 xt’, ohd' 1B)
-TEST(‘#(Javascript)‘
+TEST(‘#(JavaScript)‘
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
-’’, ‘<source lang="Javascript">
+’’, ‘<source lang="JavaScript">
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
 </source>’, habr_html' 1B)
 TEST(‘‘Code’{
@@ -450,7 +462,8 @@ import hashlib
 
 Some text.’, ‘<spoiler title="Code"><source lang="Python">
 import hashlib
-</source></spoiler><br />
+</source>
+</spoiler><br />
 Some text.’, habr_html' 1B)
 TEST(‘[[[‘]]]test```’```test’, ‘<!--[[[‘]]]-->test<code>’</code>test’, habr_html' 1B)
 TEST(‘[[[‘]]]`Don’t`’, ‘<!--[[[‘]]]--><code>Don’t</code>’, habr_html' 1B)
@@ -475,6 +488,7 @@ TEST(">[http://another-address][-1]:‘Quoted text.’\n"‘>[-1]:‘Another quo
 TEST(‘>‘Author's name’[http://address]:‘Quoted text.’’, "<blockquote><i><a href=\"http://address\">Author's name</a></i>:<br />\nQuoted text.</blockquote>")
 TEST(‘>‘Author's name’:‘Quoted text.’’, "<blockquote><i>Author's name</i>:<br />\nQuoted text.</blockquote>")
 TEST(‘‘Quoted text.’:‘Author's name’<’, "<blockquote>Quoted text.<br />\n<div align='right'><i>Author's name</i></div></blockquote>")
+TEST(‘>‘Как люди думают. Дмитрий Чернышев. 2015. 304с.’:‘[[[стр.89:]]]...’’, "<blockquote><i>Как люди думают. Дмитрий Чернышев. 2015. 304с.</i>:<br />\n<!--[[[стр.89:]]]-->...</blockquote>")
 TEST(‘‘понимание [[[процесса]]] разбора [[[разметки]]] человеком’[‘говоря проще: приходится [[[гораздо]]] меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё’]’, ‘<abbr title="говоря проще: приходится  меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё">понимание  разбора  человеком</abbr>’)
 TEST(‘. unordered
 . list’, ‘<ul>
@@ -640,7 +654,7 @@ L(_fname) fs:walk_dir(‘.’, dir_filter' d -> d[0] != ‘.’, files_only' 0B)
    [String] dirs, files
    I fs:is_directory(_fname) {dirs [+]= fs:path:base_name(_fname)} E files [+]= fs:path:base_name(_fname)
    L(name) files
-      I name.ends_with(‘.py’) | name.ends_with(‘.txt’)
+      I name.ends_with((‘.py’, ‘.txt’))
          V file_bytes = File(fs:path:join(root, name)).read_bytes()
          I "\r".code C file_bytes | "\t".code C file_bytes
             print(‘Unallowed character (\r or \t) found in file '’fs:path:join(root, name)[2..]‘'’)
@@ -713,8 +727,13 @@ struct CodeBlock1
         TEST(u"‘multiword link’[http://address]"_S, u"<a href=\"http://address\">multiword link</a>"_S);
         TEST(u"link[https://address ‘title &text[[[comment]]]’]"_S, u"<a href=\"https://address\" title=\"title &amp;text\">link</a>"_S);
         TEST(u"link[https://address title [.&.] text[[[comment]]]]"_S, u"<a href=\"https://address\" title=\"title [.&amp;.] text\">link</a>"_S);
+        TEST(u"‘[[[Scoping rules/]]]Code blocks’[./code-blocks]"_S, u"<a href=\"./code-blocks\" target=\"_self\">Code blocks</a>"_S);
         TEST(u"text[‘title text’]"_S, u"<abbr title=\"title text\">text</abbr>"_S);
         TEST(u"[text][‘title text’]"_S, u"[text]<abbr title=\"title text\"></abbr>"_S);
+        TEST(u"Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [‘мои мысли на тему режимов открытия файлов’[./File]]"_S, u"Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [<a href=\"./File\" target=\"_self\">мои мысли на тему режимов открытия файлов</a>]"_S);
+        TEST(u"Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [[‘’]‘мои мысли на тему режимов открытия файлов’[./File]]"_S, u"Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [<abbr title=\"\"></abbr><a href=\"./File\" target=\"_self\">мои мысли на тему режимов открытия файлов</a>]"_S);
+        TEST(u"[[‘’][[[Справка/]]]Документация по методам доступна на данный момент только ‘на английском’[./../../built-in-types].]"_S, u"[<abbr title=\"\"></abbr><!--[[[Справка/]]]-->Документация по методам доступна на данный момент только <a href=\"./../../built-in-types\" target=\"_self\">на английском</a>.]"_S);
+        TEST(u"[‘мои мысли на тему режимов открытия файлов’[./File]]"_S, u"[<a href=\"./File\" target=\"_self\">мои мысли на тему режимов открытия файлов</a>]"_S);
         TEST(u"P‘http://image-url’"_S, u"<img src=\"http://image-url\" />"_S);
         TEST(u"P‘http://image-url’[http://address]"_S, u"<a href=\"http://address\"><img src=\"http://image-url\" /></a>"_S);
         TEST(u"P‘http://image-url’[‘title text[[[comment]]]’]"_S, u"<img src=\"http://image-url\" title=\"title text\" />"_S);
@@ -754,9 +773,9 @@ te
 xt)"_S, uR"'(<span class="spoiler_title" onclick="return spoiler2(this, event)">title<br /></span><div class="spoiler_text" style="display: none">te<br />
 </div>
 xt)'"_S, true);
-        TEST(uR"(#(Javascript)‘
+        TEST(uR"(#(JavaScript)‘
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
-’)"_S, uR"(<source lang="Javascript">
+’)"_S, uR"(<source lang="JavaScript">
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
 </source>)"_S, false, true);
         TEST(uR"(‘Code’{
@@ -767,7 +786,8 @@ import hashlib
 
 Some text.)"_S, uR"(<spoiler title="Code"><source lang="Python">
 import hashlib
-</source></spoiler><br />
+</source>
+</spoiler><br />
 Some text.)"_S, false, true);
         TEST(u"[[[‘]]]test```’```test"_S, u"<!--[[[‘]]]-->test<code>’</code>test"_S, false, true);
         TEST(u"[[[‘]]]`Don’t`"_S, u"<!--[[[‘]]]--><code>Don’t</code>"_S, false, true);
@@ -792,6 +812,7 @@ Some text.)"_S, false, true);
         TEST(u">‘Author's name’[http://address]:‘Quoted text.’"_S, u"<blockquote><i><a href=\"http://address\">Author's name</a></i>:<br />\nQuoted text.</blockquote>"_S);
         TEST(u">‘Author's name’:‘Quoted text.’"_S, u"<blockquote><i>Author's name</i>:<br />\nQuoted text.</blockquote>"_S);
         TEST(u"‘Quoted text.’:‘Author's name’<"_S, u"<blockquote>Quoted text.<br />\n<div align='right'><i>Author's name</i></div></blockquote>"_S);
+        TEST(u">‘Как люди думают. Дмитрий Чернышев. 2015. 304с.’:‘[[[стр.89:]]]...’"_S, u"<blockquote><i>Как люди думают. Дмитрий Чернышев. 2015. 304с.</i>:<br />\n<!--[[[стр.89:]]]-->...</blockquote>"_S);
         TEST(u"‘понимание [[[процесса]]] разбора [[[разметки]]] человеком’[‘говоря проще: приходится [[[гораздо]]] меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё’]"_S, u"<abbr title=\"говоря проще: приходится  меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё\">понимание  разбора  человеком</abbr>"_S);
         TEST(uR"(. unordered
 . list)"_S, uR"(<ul>
@@ -972,7 +993,7 @@ struct CodeBlock2
             else
                 files.append(fs::path::base_name(_fname));
             for (auto name : files)
-                if (name.ends_with(u".py"_S) || name.ends_with(u".txt"_S)) {
+                if (name.ends_with(make_tuple(u".py"_S, u".txt"_S))) {
                     auto file_bytes = File(fs::path::join(root, name)).read_bytes();
                     if (in(u'\r'_C.code, file_bytes) || in(u'\t'_C.code, file_bytes)) {
                         print(uR"(Unallowed character (\r or \t) found in file ')"_S + fs::path::join(root, name)[range_ei(2)] + u"'"_S);

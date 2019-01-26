@@ -1,6 +1,7 @@
 import sys
 from typing import List, IO, Callable, Dict
 Char = str
+import syntax_highlighter_for_pqmarkup
 
 class Exception(Exception):
     message : str
@@ -17,6 +18,7 @@ class Converter:
     to_html_called_inside_to_html_outer_pos_list : List[int]
     habr_html : bool
     ohd : bool
+    highlight_style_was_added = False
     instr : str
 
     def __init__(self, habr_html, ohd):
@@ -186,7 +188,7 @@ class Converter:
                     j += 1
             if text == '':
                 write_to_pos(startpos, i+1)
-                text = html_escape(instr[startpos+q_offset:endpos])
+                text = html_escape(remove_comments(instr[startpos+q_offset:endpos], startpos+q_offset))
             outfile.write(tag + '>' + (text if text != '' else link) + '</a>')
 
         def write_note(startpos, endpos, q_offset = 1):
@@ -352,10 +354,10 @@ class Converter:
                                 writepos = i + 2
                             elif instr[endqpos+1:endqpos+2] == ":": # >‘Author's name’:‘Quoted text.’
                                 outfile.write("<i>"+instr[i+2:endqpos]+"</i>:<br />\n")
-                                i = endqpos + 2
-                                if instr[i:i+1] != '‘': # ’
-                                    exit_with_error("Quotation with author's name should be in the form >‘Author's name’:‘Quoted text.’ (opening quotation mark not found after colon)", i)
-                                writepos = i + 1
+                                i = endqpos + 1
+                                if instr[i:i+2] != ':‘': # ’
+                                    exit_with_error("Quotation with author's name should be in the form >‘Author's name’:‘Quoted text.’", i)
+                                writepos = i + 2
                             # else this is just >‘Quoted text.’
                         ending_tags.append('</blockquote>')
                     i += 1
@@ -453,15 +455,24 @@ class Converter:
                     outfile.write(html_escape(instr[startqpos+1:endqpos]).replace("\n", "<br />\n"))
                 elif prevc == "#":
                     ins = instr[startqpos+1:endqpos]
+                    write_to_pos(prevci, endqpos+1)
                     if self.habr_html:
-                        write_to_pos(prevci, endqpos+1)
                         contains_new_line = "\n" in ins
                         outfile.write(('<source lang="' + str_in_b + '">' if str_in_b != '' else '<source>' if contains_new_line else '<code>') + ins + ("</source>" if str_in_b != '' or contains_new_line else "</code>")) # так как <source> в Habr — блочный элемент, а не встроенный\inline
-                    # elif self.ohd: # [-TODO syntax highlighting-]
                     else:
-                        write_to_pos(prevci, endqpos+1)
-                        outfile.write('<pre style="display: inline">' + html_escape(instr[startqpos+1:endqpos]) + '</pre>') # в habr_html тег pre не стоит задействовать, так как в Habr для тега pre используется шрифт monospace, в котором символы ‘ и ’ выглядят непонятно (не так как в Courier New)
+                        pre = '<pre ' + ('class="code_block"' if ins[0] == "\n" else 'style="display: inline"') + '>' # can not do `outfile.write('<pre ' + ...)` here because `outfile.write(syntax_highlighter_for_pqmarkup.css)` should be outside of <pre> block
+                        if self.ohd and syntax_highlighter_for_pqmarkup.is_lang_supported(str_in_b):
+                            if not self.highlight_style_was_added:
+                                outfile.write(syntax_highlighter_for_pqmarkup.css)
+                                self.highlight_style_was_added = True
+                            try:
+                                outfile.write(pre + syntax_highlighter_for_pqmarkup.highlight(str_in_b, ins) + '</pre>')
+                            except syntax_highlighter_for_pqmarkup.Error as e:
+                                exit_with_error('Syntax highlighter: ' + e.message, startqpos+1+e.pos)
+                        else:
+                            outfile.write(pre + html_escape(ins) + '</pre>') # в habr_html тег pre не стоит задействовать, так как в Habr для тега pre используется шрифт monospace, в котором символы ‘ и ’ выглядят непонятно (не так как в Courier New)
                     if ins[0] == "\n" and instr[i+1:i+2] == "\n":
+                        outfile.write("\n")
                         new_line_tag = ''
                 elif prevc in 'TТ':
                     write_to_pos(prevci, endqpos+1)
@@ -559,7 +570,12 @@ class Converter:
                                             table[yyy][xxx][1] = ""
 
                     # Output table
-                    outfile.write("<table"+' style="display: inline"'*(prevci != 0 and instr[prevci-1] != "\n")+">\n")
+                    is_inline = True
+                    if (prevci == 0 or
+                        instr[prevci-1] == "\n" or # [[[
+                       (prevci-3 >= 0 and instr[prevci-3:prevci] == ']]]' and instr[0:3] == '[[[' and find_ending_sq_bracket(instr, 0) == prevci-1)): # ]]]
+                        is_inline = False
+                    outfile.write("<table"+' style="display: inline"'*is_inline+">\n")
                     for row in table:
                         outfile.write("<tr>")
                         for col, colattrs in row:
@@ -567,7 +583,7 @@ class Converter:
                                 outfile.write('<' + colattrs + '>' + col + '</' + colattrs[:2] + '>')
                         outfile.write("</tr>\n")
                     outfile.write("</table>\n")
-                    if not (prevci != 0 and instr[prevci-1] != "\n"):
+                    if not is_inline:
                         new_line_tag = ''
                 elif prevc in '<>' and instr[prevci-1] in '<>': # выравнивание текста \ text alignment
                     write_to_pos(prevci-1, endqpos+1)
@@ -659,13 +675,13 @@ class Converter:
                             exit_with_error('Unpaired single quotation mark found inside code block/span beginning', start)
                 ins = html_escape(ins)
                 if not "\n" in ins: # this is a single-line code -‘block’span
-                    outfile.write('<code>' + ins + '</code>' if self.habr_html else '<pre style="display: inline">' + ins + '</pre>')
+                    outfile.write('<code>' + ins + '</code>' if self.habr_html else '<pre class="inline_code">' + ins + '</pre>')
                 else:
                     outfile.write('<pre>' + ins + '</pre>' + "\n"*(not self.habr_html))
                     new_line_tag = ''
                 i = end + i - start - 1
             elif ch == '[': # ]
-                if i_next_str('http') or i_next_str('./') or i_next_str('‘') or numbered_link(): # ’
+                if i_next_str('http') or i_next_str('./') or (i_next_str('‘') and prev_char() not in "\r\n\t \0") or numbered_link(): # ’
                     s = i - 1
                     while s >= writepos and instr[s] not in "\r\n\t [{(‘“": # ”’)}]
                         s -= 1
@@ -776,12 +792,29 @@ Options:
     if args_output_html_document and args_habr_html:
         sys.exit("Options --output-html-document and --habr-html are mutually exclusive")
 
+    infile_str = args_infile.read()
+    title = ''
+    if infile_str.startswith('[[[H‘') or \
+       infile_str.startswith('[[[Н‘'): # ’]]]’]]]
+        i = 5
+        nesting_level = 1
+        while i < len(infile_str):
+            ch = infile_str[i]
+            if ch == "‘":
+                nesting_level += 1
+            elif ch == "’":
+                nesting_level -= 1
+                if nesting_level == 0:
+                    break
+            i += 1
+        title = infile_str[5:i]
+
     if args_output_html_document:
         args_outfile.write(
 R'''<html>
 <head>
 <meta charset="utf-8" />
-<base target="_blank">
+''' + ('<title>' + title + "</title>\n" if title != '' else '') + R'''<base target="_blank">
 <script type="text/javascript">
 function spoiler(element, event)
 {
@@ -864,13 +897,22 @@ div.note {
     padding: 18px 20px;
     background: #ffffd7;
 }
+pre.code_block {padding: 6px 0;}
+pre.inline_code {
+    display: inline;
+    padding: 0px 3px;
+    border: 1px solid #E5E5E5;
+    background-color: #FAFAFA;
+    border-radius: 3px;
+}
+img {vertical-align: middle;}
 </style>
 </head>
 <body>
 <table width="55%" align="center"><tr><td>
 ''')
     try:
-        to_html(args_infile.read(), args_outfile, args_output_html_document, habr_html = args_habr_html)
+        to_html(infile_str, args_outfile, args_output_html_document, habr_html = args_habr_html)
     except Exception as e:
         sys.stderr.write(e.message + " at line " + str(e.line) + ", column " + str(e.column) + "\n")
         sys.exit(-1)
