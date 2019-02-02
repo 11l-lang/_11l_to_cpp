@@ -2932,3 +2932,46 @@ struct CodeBlock1
         print(create_array({1, 1, 3}).reduce(2, [](const auto &x, const auto &y){return x + y;}));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Character_codes#Python
+print(ord('a')) # prints "97"
+print(chr(97))  # prints "a"
+===
+print(‘a’.code)
+print(Char(code' 97))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u'a'_C.code);
+        print(Char(97));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Check_that_file_exists#Python
+import os
+ 
+os.path.isfile("input.txt")
+os.path.isfile("/input.txt")
+os.path.isdir("docs")
+os.path.isdir("/docs")
+===
+//import os
+fs:is_file(‘input.txt’)
+fs:is_file(‘/input.txt’)
+fs:is_directory(‘docs’)
+fs:is_directory(‘/docs’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        fs::is_file(u"input.txt"_S);
+        fs::is_file(u"/input.txt"_S);
+        fs::is_directory(u"docs"_S);
+        fs::is_directory(u"/docs"_S);
+    }
+} code_block_1;
