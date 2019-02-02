@@ -481,12 +481,18 @@ class Converter:
                     ver_row_align = ''
 
                     # Fill/prepare 2d-array `table`
-                    table : List[List[List[str]]] = []
+                    class TableCell:
+                        text  : str
+                        attrs : str
+                        def __init__(self, text : str, attrs : str): # types are needed to avoid this error in MSVC 2017: ‘error C2892: local class shall not have member templates’
+                            self.text  = text
+                            self.attrs = attrs
+                    table : List[List[TableCell]] = []
                     j = startqpos + 1
                     while j < endqpos:
                         ch = instr[j]
                         if ch == "‘": # ’
-                            empty_list : List[List[str]] = []
+                            empty_list : List[TableCell] = []
                             table.append(empty_list)
                             endrow = find_ending_pair_quote(j)
                             hor_col_align = ''
@@ -507,7 +513,7 @@ class Converter:
                                         style += "vertical-align: " + (ver_col_align if ver_col_align != '' else ver_row_align)
                                     hor_col_align = ''
                                     ver_col_align = ''
-                                    table[-1].append([self.to_html(instr[j+1:end_of_column], outer_pos = j+1), ("th" if header_row else "td") + (' style="'+style+'"' if style != '' else '')])
+                                    table[-1].append(TableCell(self.to_html(instr[j+1:end_of_column], outer_pos = j+1), ("th" if header_row else "td") + (' style="'+style+'"' if style != '' else '')))
                                     j = end_of_column
                                 elif ch in '<>' and instr[j+1:j+2] in ('<', '>'):
                                     hor_col_align = {'<<':'left', '>>':'right', '><':'center', '<>':'justify'}[instr[j:j+2]]
@@ -518,11 +524,11 @@ class Converter:
                                 elif ch == "-":
                                     if len(table[-1]) == 0:
                                         exit_with_error('Wrong table column span marker "-"', j)
-                                    table[-1].append(["", "-"])
+                                    table[-1].append(TableCell('', '-'))
                                 elif ch == "|":
                                     if len(table) == 1:
                                         exit_with_error('Wrong table row span marker "|"', j)
-                                    table[-1].append(["", "|"])
+                                    table[-1].append(TableCell('', '|'))
                                 elif instr[j:j+3] == "[[[": # ]]]
                                     j = find_ending_sq_bracket(instr, j)
                                 elif ch not in "  \t\n":
@@ -550,24 +556,24 @@ class Converter:
                     # Process column and row spans (walk in the reverse order — from bottom right corner of the table)
                     for y in range(len(table)-1, -1, -1):
                         for x in range(len(table[y])-1, -1, -1):
-                            if table[y][x][1] in ('-', '|'):
+                            if table[y][x].attrs in ('-', '|'):
                                 xx = x
                                 yy = y
                                 while True:
-                                    if table[yy][xx][1] == "-":
+                                    if table[yy][xx].attrs == '-':
                                         xx -= 1
-                                    elif table[yy][xx][1] == "|":
+                                    elif table[yy][xx].attrs == '|':
                                         yy -= 1
                                     else:
                                         break
                                 if xx < x:
-                                    table[yy][xx][1] += ' colspan="'+str(x-xx+1)+'"'
+                                    table[yy][xx].attrs += ' colspan="'+str(x-xx+1)+'"'
                                 if yy < y:
-                                    table[yy][xx][1] += ' rowspan="'+str(y-yy+1)+'"'
+                                    table[yy][xx].attrs += ' rowspan="'+str(y-yy+1)+'"'
                                 for xxx in range(xx, x+1): # mark a whole rect of this merged cell as processed to avoid its further processing (in this loop) and to skip it at output table loop
                                     for yyy in range(yy, y+1):
-                                        if not (xxx == xx and yyy == yy):
-                                            table[yyy][xxx][1] = ""
+                                        if (xxx, yyy) != (xx, yy):
+                                            table[yyy][xxx].attrs = ''
 
                     # Output table
                     is_inline = True
@@ -578,9 +584,9 @@ class Converter:
                     outfile.write("<table"+' style="display: inline"'*is_inline+">\n")
                     for row in table:
                         outfile.write("<tr>")
-                        for col, colattrs in row:
-                            if colattrs != "": # if this is merged cell (colattrs == "") — skip it
-                                outfile.write('<' + colattrs + '>' + col + '</' + colattrs[:2] + '>')
+                        for cell in row:
+                            if cell.attrs != '': # if this is a merged cell (cell.attrs == '') — skip it
+                                outfile.write('<' + cell.attrs + '>' + cell.text + '</' + cell.attrs[:2] + '>')
                         outfile.write("</tr>\n")
                     outfile.write("</table>\n")
                     if not is_inline:

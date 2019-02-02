@@ -585,12 +585,24 @@ public:
                     auto header_row = false;
                     auto hor_row_align = u""_S;
                     auto ver_row_align = u""_S;
-                    Array<Array<Array<String>>> table;
+
+                    class TableCell
+                    {
+                    public:
+                        String text;
+                        String attrs;
+                        TableCell(const String &text, const String &attrs)
+                        {
+                            this->text = text;
+                            this->attrs = attrs;
+                        }
+                    };
+                    Array<Array<TableCell>> table;
                     auto j = startqpos + 1;
                     while (j < endqpos) {
                         ch = instr[j];
                         if (ch == u'‘') {
-                            Array<Array<String>> empty_list;
+                            Array<TableCell> empty_list;
                             table.append(empty_list);
                             auto endrow = find_ending_pair_quote(j);
                             auto hor_col_align = u""_S;
@@ -610,7 +622,7 @@ public:
                                     }
                                     hor_col_align = u""_S;
                                     ver_col_align = u""_S;
-                                    table.last().append(create_array({to_html(instr[range_el(j + 1, end_of_column)], nullptr, j + 1), (header_row ? u"th"_S : u"td"_S) + (style != u"" ? u" style=\""_S + style + u"\""_S : u""_S)}));
+                                    table.last().append(TableCell(to_html(instr[range_el(j + 1, end_of_column)], nullptr, j + 1), (header_row ? u"th"_S : u"td"_S) + (style != u"" ? u" style=\""_S + style + u"\""_S : u""_S)));
                                     j = end_of_column;
                                 }
                                 else if (in(ch, u"<>"_S) && in(instr[range_el(j + 1, j + 2)], make_tuple(u"<"_S, u">"_S))) {
@@ -624,12 +636,12 @@ public:
                                 else if (ch == u'-') {
                                     if (table.last().empty())
                                         exit_with_error(u"Wrong table column span marker \"-\""_S, j);
-                                    table.last().append(create_array({u""_S, u"-"_S}));
+                                    table.last().append(TableCell(u""_S, u"-"_S));
                                 }
                                 else if (ch == u'|') {
                                     if (table.len() == 1)
                                         exit_with_error(u"Wrong table row span marker \"|\""_S, j);
-                                    table.last().append(create_array({u""_S, u"|"_S}));
+                                    table.last().append(TableCell(u""_S, u"|"_S));
                                 }
                                 else if (instr[range_el(j, j + 3)] == u"[[[")
                                     j = find_ending_sq_bracket(instr, j);
@@ -659,24 +671,24 @@ public:
                     }
                     for (auto y : range_el(table.len() - 1, -1).step(-1))
                         for (auto x : range_el(table[y].len() - 1, -1).step(-1))
-                            if (in(_get<1>(table[y][x]), make_tuple(u"-"_S, u"|"_S))) {
+                            if (in(table[y][x].attrs, make_tuple(u"-"_S, u"|"_S))) {
                                 auto xx = x;
                                 auto yy = y;
                                 while (true)
-                                    if (_get<1>(table[yy][xx]) == u'-')
+                                    if (table[yy][xx].attrs == u'-')
                                         xx--;
-                                    else if (_get<1>(table[yy][xx]) == u'|')
+                                    else if (table[yy][xx].attrs == u'|')
                                         yy--;
                                     else
                                         break;
                                 if (xx < x)
-                                    _get<1>(table[yy][xx]) += u" colspan=\""_S + String(x - xx + 1) + u"\""_S;
+                                    table[yy][xx].attrs += u" colspan=\""_S + String(x - xx + 1) + u"\""_S;
                                 if (yy < y)
-                                    _get<1>(table[yy][xx]) += u" rowspan=\""_S + String(y - yy + 1) + u"\""_S;
+                                    table[yy][xx].attrs += u" rowspan=\""_S + String(y - yy + 1) + u"\""_S;
                                 for (auto xxx : range_el(xx, x + 1))
                                     for (auto yyy : range_el(yy, y + 1))
-                                        if (!(xxx == xx && yyy == yy))
-                                            _set<1>(table[yyy][xxx], u""_S);
+                                        if (make_tuple(xxx, yyy) != make_tuple(xx, yy))
+                                            table[yyy][xxx].attrs = u""_S;
                             }
                     auto is_inline = true;
                     if ((prevci == 0 || instr[prevci - 1] == u'\n' || (prevci - 3 >= 0 && instr[range_el(prevci - 3, prevci)] == u"]]]" && instr[range_el(0, 3)] == u"[[[" && find_ending_sq_bracket(instr, 0) == prevci - 1)))
@@ -684,12 +696,9 @@ public:
                     outfile.write(u"<table"_S + (u" style=\"display: inline\""_S * is_inline) + u">\n"_S);
                     for (auto row : table) {
                         outfile.write(u"<tr>"_S);
-                        for (auto colcolattrs : row) {
-                            auto col = _get<0>(colcolattrs);
-                            auto colattrs = _get<1>(colcolattrs);
-                            if (colattrs != u"")
-                                outfile.write(u"<"_S + colattrs + u">"_S + col + u"</"_S + colattrs[range_el(0, 2)] + u">"_S);
-                        }
+                        for (auto cell : row)
+                            if (cell.attrs != u"")
+                                outfile.write(u"<"_S + cell.attrs + u">"_S + cell.text + u"</"_S + cell.attrs[range_el(0, 2)] + u">"_S);
                         outfile.write(u"</tr>\n"_S);
                     }
                     outfile.write(u"</table>\n"_S);

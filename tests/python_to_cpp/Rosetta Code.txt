@@ -2975,3 +2975,95 @@ struct CodeBlock1
         fs::is_directory(u"/docs"_S);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Chinese_remainder_theorem#Python
+from functools import reduce
+
+def mul_inv(a, b):
+    b0 = b
+    x0 = 0
+    x1 = 1
+    if b == 1: return 1
+    while a > 1:
+        q = a // b
+        (a, b) = (b, a%b)
+        (x0, x1) = (x1 - q * x0, x0)
+    if x1 < 0: x1 += b0
+    return x1
+
+def chinese_remainder(n, a):
+    sum = 0
+    prod = reduce(lambda a, b: a*b, n)
+    for n_i, a_i in zip(n, a):
+        p = prod // n_i
+        sum += a_i * mul_inv(p, n_i) * p
+    return sum % prod
+
+n = [3, 5, 7]
+a = [2, 3, 2]
+print(chinese_remainder(n, a))
+===
+
+F mul_inv(=a, =b)
+   V b0 = b
+   V x0 = 0
+   V x1 = 1
+   I b == 1
+      R 1
+   L a > 1
+      V q = a I/ b
+      (a, b) = (b, a % b)
+      (x0, x1) = (x1 - q * x0, x0)
+   I x1 < 0
+      x1 += b0
+   R x1
+
+F chinese_remainder(n, a)
+   V sum = 0
+   V prod = n.reduce((a, b) -> a * b)
+   L(n_i, a_i) zip(n, a)
+      V p = prod I/ n_i
+      sum += a_i * mul_inv(p, n_i) * p
+   R sum % prod
+V n = [3, 5, 7]
+V a = [2, 3, 2]
+print(chinese_remainder(n, a))
+===
+template <typename T1, typename T2> auto mul_inv(T1 a, T2 b)
+{
+    auto b0 = b;
+    auto x0 = 0;
+    auto x1 = 1;
+    if (b == 1)
+        return 1;
+    while (a > 1) {
+        auto q = int(a)/int(b);
+        std::tie(a, b) = make_tuple(b, mod(a, b));
+        std::tie(x0, x1) = make_tuple(x1 - q * x0, x0);
+    }
+    if (x1 < 0)
+        x1 += b0;
+    return x1;
+}
+
+template <typename T1, typename T2> auto chinese_remainder(const T1 &n, const T2 &a)
+{
+    auto sum = 0;
+    auto prod = n.reduce([](const auto &a, const auto &b){return a * b;});
+    for (auto &&[n_i, a_i] : zip(n, a)) {
+        auto p = int(prod)/int(n_i);
+        sum += a_i * mul_inv(p, n_i) * p;
+    }
+    return mod(sum, prod);
+}
+auto n = create_array({3, 5, 7});
+auto a = create_array({2, 3, 2});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(chinese_remainder(n, a));
+    }
+} code_block_1;

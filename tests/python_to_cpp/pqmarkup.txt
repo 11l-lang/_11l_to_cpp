@@ -481,12 +481,18 @@ class Converter:
                     ver_row_align = ''
 
                     # Fill/prepare 2d-array `table`
-                    table : List[List[List[str]]] = []
+                    class TableCell:
+                        text  : str
+                        attrs : str
+                        def __init__(self, text : str, attrs : str): # types are needed to avoid this error in MSVC 2017: ‘error C2892: local class shall not have member templates’
+                            self.text  = text
+                            self.attrs = attrs
+                    table : List[List[TableCell]] = []
                     j = startqpos + 1
                     while j < endqpos:
                         ch = instr[j]
                         if ch == "‘": # ’
-                            empty_list : List[List[str]] = []
+                            empty_list : List[TableCell] = []
                             table.append(empty_list)
                             endrow = find_ending_pair_quote(j)
                             hor_col_align = ''
@@ -507,7 +513,7 @@ class Converter:
                                         style += "vertical-align: " + (ver_col_align if ver_col_align != '' else ver_row_align)
                                     hor_col_align = ''
                                     ver_col_align = ''
-                                    table[-1].append([self.to_html(instr[j+1:end_of_column], outer_pos = j+1), ("th" if header_row else "td") + (' style="'+style+'"' if style != '' else '')])
+                                    table[-1].append(TableCell(self.to_html(instr[j+1:end_of_column], outer_pos = j+1), ("th" if header_row else "td") + (' style="'+style+'"' if style != '' else '')))
                                     j = end_of_column
                                 elif ch in '<>' and instr[j+1:j+2] in ('<', '>'):
                                     hor_col_align = {'<<':'left', '>>':'right', '><':'center', '<>':'justify'}[instr[j:j+2]]
@@ -518,11 +524,11 @@ class Converter:
                                 elif ch == "-":
                                     if len(table[-1]) == 0:
                                         exit_with_error('Wrong table column span marker "-"', j)
-                                    table[-1].append(["", "-"])
+                                    table[-1].append(TableCell('', '-'))
                                 elif ch == "|":
                                     if len(table) == 1:
                                         exit_with_error('Wrong table row span marker "|"', j)
-                                    table[-1].append(["", "|"])
+                                    table[-1].append(TableCell('', '|'))
                                 elif instr[j:j+3] == "[[[": # ]]]
                                     j = find_ending_sq_bracket(instr, j)
                                 elif ch not in "  \t\n":
@@ -550,24 +556,24 @@ class Converter:
                     # Process column and row spans (walk in the reverse order — from bottom right corner of the table)
                     for y in range(len(table)-1, -1, -1):
                         for x in range(len(table[y])-1, -1, -1):
-                            if table[y][x][1] in ('-', '|'):
+                            if table[y][x].attrs in ('-', '|'):
                                 xx = x
                                 yy = y
                                 while True:
-                                    if table[yy][xx][1] == "-":
+                                    if table[yy][xx].attrs == '-':
                                         xx -= 1
-                                    elif table[yy][xx][1] == "|":
+                                    elif table[yy][xx].attrs == '|':
                                         yy -= 1
                                     else:
                                         break
                                 if xx < x:
-                                    table[yy][xx][1] += ' colspan="'+str(x-xx+1)+'"'
+                                    table[yy][xx].attrs += ' colspan="'+str(x-xx+1)+'"'
                                 if yy < y:
-                                    table[yy][xx][1] += ' rowspan="'+str(y-yy+1)+'"'
+                                    table[yy][xx].attrs += ' rowspan="'+str(y-yy+1)+'"'
                                 for xxx in range(xx, x+1): # mark a whole rect of this merged cell as processed to avoid its further processing (in this loop) and to skip it at output table loop
                                     for yyy in range(yy, y+1):
-                                        if not (xxx == xx and yyy == yy):
-                                            table[yyy][xxx][1] = ""
+                                        if (xxx, yyy) != (xx, yy):
+                                            table[yyy][xxx].attrs = ''
 
                     # Output table
                     is_inline = True
@@ -578,9 +584,9 @@ class Converter:
                     outfile.write("<table"+' style="display: inline"'*is_inline+">\n")
                     for row in table:
                         outfile.write("<tr>")
-                        for col, colattrs in row:
-                            if colattrs != "": # if this is merged cell (colattrs == "") — skip it
-                                outfile.write('<' + colattrs + '>' + col + '</' + colattrs[:2] + '>')
+                        for cell in row:
+                            if cell.attrs != '': # if this is a merged cell (cell.attrs == '') — skip it
+                                outfile.write('<' + cell.attrs + '>' + cell.text + '</' + cell.attrs[:2] + '>')
                         outfile.write("</tr>\n")
                     outfile.write("</table>\n")
                     if not is_inline:
@@ -1369,12 +1375,19 @@ T Converter
                V header_row = 0B
                V hor_row_align = ‘’
                V ver_row_align = ‘’
-               [Array[Array[String]]] table
+
+               T TableCell
+                  String text
+                  String attrs
+                  F (String text, String attrs)
+                     .text = text
+                     .attrs = attrs
+               [[TableCell]] table
                V j = startqpos + 1
                L j < endqpos
                   ch = instr[j]
                   I ch == "‘"
-                     [[String]] empty_list
+                     [TableCell] empty_list
                      table.append(empty_list)
                      V endrow = find_ending_pair_quote(j)
                      V hor_col_align = ‘’
@@ -1393,7 +1406,7 @@ T Converter
                               style ‘’= ‘vertical-align: ’(I ver_col_align != ‘’ {ver_col_align} E ver_row_align)
                            hor_col_align = ‘’
                            ver_col_align = ‘’
-                           table.last.append([.to_html(instr[j + 1 .< end_of_column], outer_pos' j + 1), (I header_row {‘th’} E ‘td’) + (I style != ‘’ {‘ style="’style‘"’} E ‘’)])
+                           table.last.append(TableCell(.to_html(instr[j + 1 .< end_of_column], outer_pos' j + 1), (I header_row {‘th’} E ‘td’) + (I style != ‘’ {‘ style="’style‘"’} E ‘’)))
                            j = end_of_column
                         E I ch C ‘<>’ & instr[j + 1 .< j + 2] C (‘<’, ‘>’)
                            hor_col_align = S instr[j .< j + 2] {‘<<’ {‘left’}; ‘>>’ {‘right’}; ‘><’ {‘center’}; ‘<>’ {‘justify’}}
@@ -1404,11 +1417,11 @@ T Converter
                         E I ch == ‘-’
                            I table.last.empty
                               exit_with_error(‘Wrong table column span marker "-"’, j)
-                           table.last.append([‘’, ‘-’])
+                           table.last.append(TableCell(‘’, ‘-’))
                         E I ch == ‘|’
                            I table.len == 1
                               exit_with_error(‘Wrong table row span marker "|"’, j)
-                           table.last.append([‘’, ‘|’])
+                           table.last.append(TableCell(‘’, ‘|’))
                         E I instr[j .< j + 3] == ‘[[[’
                            j = find_ending_sq_bracket(instr, j)
                         E I ch !C "  \t\n"
@@ -1433,35 +1446,33 @@ T Converter
 
                L(y) (table.len - 1 .< -1).step(-1)
                   L(x) (table[y].len - 1 .< -1).step(-1)
-                     I table[y][x][1] C (‘-’, ‘|’)
+                     I table[y][x].attrs C (‘-’, ‘|’)
                         V xx = x
                         V yy = y
                         L
-                           I table[yy][xx][1] == ‘-’
+                           I table[yy][xx].attrs == ‘-’
                               xx--
-                           E I table[yy][xx][1] == ‘|’
+                           E I table[yy][xx].attrs == ‘|’
                               yy--
                            E
                               L.break
                         I xx < x
-                           table[yy][xx][1] += ‘ colspan="’String(x - xx + 1)‘"’
+                           table[yy][xx].attrs += ‘ colspan="’String(x - xx + 1)‘"’
                         I yy < y
-                           table[yy][xx][1] += ‘ rowspan="’String(y - yy + 1)‘"’
+                           table[yy][xx].attrs += ‘ rowspan="’String(y - yy + 1)‘"’
                         L(xxx) xx .< x + 1
                            L(yyy) yy .< y + 1
-                              I !(xxx == xx & yyy == yy)
-                                 table[yyy][xxx][1] = ‘’
+                              I (xxx, yyy) != (xx, yy)
+                                 table[yyy][xxx].attrs = ‘’
                V is_inline = 1B
                I (prevci == 0 | instr[prevci - 1] == "\n" | (prevci - 3 >= 0 & instr[prevci - 3 .< prevci] == ‘]]]’ & instr[0.<3] == ‘[[[’ & find_ending_sq_bracket(instr, 0) == prevci - 1))
                   is_inline = 0B
                outfile.write(‘<table’(‘ style="display: inline"’ * is_inline)">\n")
                L(row) table
                   outfile.write(‘<tr>’)
-                  L(colcolattrs) row
-                     V col = colcolattrs[0]
-                     V colattrs = colcolattrs[1]
-                     I colattrs != ‘’
-                        outfile.write(‘<’colattrs‘>’col‘</’colattrs[0.<2]‘>’)
+                  L(cell) row
+                     I cell.attrs != ‘’
+                        outfile.write(‘<’cell.attrs‘>’cell.text‘</’cell.attrs[0.<2]‘>’)
                   outfile.write("</tr>\n")
                outfile.write("</table>\n")
                I !is_inline
@@ -2374,12 +2385,24 @@ public:
                     auto header_row = false;
                     auto hor_row_align = u""_S;
                     auto ver_row_align = u""_S;
-                    Array<Array<Array<String>>> table;
+
+                    class TableCell
+                    {
+                    public:
+                        String text;
+                        String attrs;
+                        TableCell(const String &text, const String &attrs)
+                        {
+                            this->text = text;
+                            this->attrs = attrs;
+                        }
+                    };
+                    Array<Array<TableCell>> table;
                     auto j = startqpos + 1;
                     while (j < endqpos) {
                         ch = instr[j];
                         if (ch == u'‘') {
-                            Array<Array<String>> empty_list;
+                            Array<TableCell> empty_list;
                             table.append(empty_list);
                             auto endrow = find_ending_pair_quote(j);
                             auto hor_col_align = u""_S;
@@ -2399,7 +2422,7 @@ public:
                                     }
                                     hor_col_align = u""_S;
                                     ver_col_align = u""_S;
-                                    table.last().append(create_array({to_html(instr[range_el(j + 1, end_of_column)], nullptr, j + 1), (header_row ? u"th"_S : u"td"_S) + (style != u"" ? u" style=\""_S + style + u"\""_S : u""_S)}));
+                                    table.last().append(TableCell(to_html(instr[range_el(j + 1, end_of_column)], nullptr, j + 1), (header_row ? u"th"_S : u"td"_S) + (style != u"" ? u" style=\""_S + style + u"\""_S : u""_S)));
                                     j = end_of_column;
                                 }
                                 else if (in(ch, u"<>"_S) && in(instr[range_el(j + 1, j + 2)], make_tuple(u"<"_S, u">"_S))) {
@@ -2413,12 +2436,12 @@ public:
                                 else if (ch == u'-') {
                                     if (table.last().empty())
                                         exit_with_error(u"Wrong table column span marker \"-\""_S, j);
-                                    table.last().append(create_array({u""_S, u"-"_S}));
+                                    table.last().append(TableCell(u""_S, u"-"_S));
                                 }
                                 else if (ch == u'|') {
                                     if (table.len() == 1)
                                         exit_with_error(u"Wrong table row span marker \"|\""_S, j);
-                                    table.last().append(create_array({u""_S, u"|"_S}));
+                                    table.last().append(TableCell(u""_S, u"|"_S));
                                 }
                                 else if (instr[range_el(j, j + 3)] == u"[[[")
                                     j = find_ending_sq_bracket(instr, j);
@@ -2448,24 +2471,24 @@ public:
                     }
                     for (auto y : range_el(table.len() - 1, -1).step(-1))
                         for (auto x : range_el(table[y].len() - 1, -1).step(-1))
-                            if (in(_get<1>(table[y][x]), make_tuple(u"-"_S, u"|"_S))) {
+                            if (in(table[y][x].attrs, make_tuple(u"-"_S, u"|"_S))) {
                                 auto xx = x;
                                 auto yy = y;
                                 while (true)
-                                    if (_get<1>(table[yy][xx]) == u'-')
+                                    if (table[yy][xx].attrs == u'-')
                                         xx--;
-                                    else if (_get<1>(table[yy][xx]) == u'|')
+                                    else if (table[yy][xx].attrs == u'|')
                                         yy--;
                                     else
                                         break;
                                 if (xx < x)
-                                    _get<1>(table[yy][xx]) += u" colspan=\""_S + String(x - xx + 1) + u"\""_S;
+                                    table[yy][xx].attrs += u" colspan=\""_S + String(x - xx + 1) + u"\""_S;
                                 if (yy < y)
-                                    _get<1>(table[yy][xx]) += u" rowspan=\""_S + String(y - yy + 1) + u"\""_S;
+                                    table[yy][xx].attrs += u" rowspan=\""_S + String(y - yy + 1) + u"\""_S;
                                 for (auto xxx : range_el(xx, x + 1))
                                     for (auto yyy : range_el(yy, y + 1))
-                                        if (!(xxx == xx && yyy == yy))
-                                            _set<1>(table[yyy][xxx], u""_S);
+                                        if (make_tuple(xxx, yyy) != make_tuple(xx, yy))
+                                            table[yyy][xxx].attrs = u""_S;
                             }
                     auto is_inline = true;
                     if ((prevci == 0 || instr[prevci - 1] == u'\n' || (prevci - 3 >= 0 && instr[range_el(prevci - 3, prevci)] == u"]]]" && instr[range_el(0, 3)] == u"[[[" && find_ending_sq_bracket(instr, 0) == prevci - 1)))
@@ -2473,12 +2496,9 @@ public:
                     outfile.write(u"<table"_S + (u" style=\"display: inline\""_S * is_inline) + u">\n"_S);
                     for (auto row : table) {
                         outfile.write(u"<tr>"_S);
-                        for (auto colcolattrs : row) {
-                            auto col = _get<0>(colcolattrs);
-                            auto colattrs = _get<1>(colcolattrs);
-                            if (colattrs != u"")
-                                outfile.write(u"<"_S + colattrs + u">"_S + col + u"</"_S + colattrs[range_el(0, 2)] + u">"_S);
-                        }
+                        for (auto cell : row)
+                            if (cell.attrs != u"")
+                                outfile.write(u"<"_S + cell.attrs + u">"_S + cell.text + u"</"_S + cell.attrs[range_el(0, 2)] + u">"_S);
                         outfile.write(u"</tr>\n"_S);
                     }
                     outfile.write(u"</table>\n"_S);

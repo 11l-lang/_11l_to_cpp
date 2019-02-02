@@ -446,12 +446,19 @@ T Converter
                V header_row = 0B
                V hor_row_align = ‘’
                V ver_row_align = ‘’
-               [Array[Array[String]]] table
+
+               T TableCell
+                  String text
+                  String attrs
+                  F (String text, String attrs)
+                     .text = text
+                     .attrs = attrs
+               [[TableCell]] table
                V j = startqpos + 1
                L j < endqpos
                   ch = instr[j]
                   I ch == "‘"
-                     [[String]] empty_list
+                     [TableCell] empty_list
                      table.append(empty_list)
                      V endrow = find_ending_pair_quote(j)
                      V hor_col_align = ‘’
@@ -470,7 +477,7 @@ T Converter
                               style ‘’= ‘vertical-align: ’(I ver_col_align != ‘’ {ver_col_align} E ver_row_align)
                            hor_col_align = ‘’
                            ver_col_align = ‘’
-                           table.last.append([.to_html(instr[j + 1 .< end_of_column], outer_pos' j + 1), (I header_row {‘th’} E ‘td’) + (I style != ‘’ {‘ style="’style‘"’} E ‘’)])
+                           table.last.append(TableCell(.to_html(instr[j + 1 .< end_of_column], outer_pos' j + 1), (I header_row {‘th’} E ‘td’) + (I style != ‘’ {‘ style="’style‘"’} E ‘’)))
                            j = end_of_column
                         E I ch C ‘<>’ & instr[j + 1 .< j + 2] C (‘<’, ‘>’)
                            hor_col_align = S instr[j .< j + 2] {‘<<’ {‘left’}; ‘>>’ {‘right’}; ‘><’ {‘center’}; ‘<>’ {‘justify’}}
@@ -481,11 +488,11 @@ T Converter
                         E I ch == ‘-’
                            I table.last.empty
                               exit_with_error(‘Wrong table column span marker "-"’, j)
-                           table.last.append([‘’, ‘-’])
+                           table.last.append(TableCell(‘’, ‘-’))
                         E I ch == ‘|’
                            I table.len == 1
                               exit_with_error(‘Wrong table row span marker "|"’, j)
-                           table.last.append([‘’, ‘|’])
+                           table.last.append(TableCell(‘’, ‘|’))
                         E I instr[j .< j + 3] == ‘[[[’
                            j = find_ending_sq_bracket(instr, j)
                         E I ch !C "  \t\n"
@@ -510,35 +517,33 @@ T Converter
 
                L(y) (table.len - 1 .< -1).step(-1)
                   L(x) (table[y].len - 1 .< -1).step(-1)
-                     I table[y][x][1] C (‘-’, ‘|’)
+                     I table[y][x].attrs C (‘-’, ‘|’)
                         V xx = x
                         V yy = y
                         L
-                           I table[yy][xx][1] == ‘-’
+                           I table[yy][xx].attrs == ‘-’
                               xx--
-                           E I table[yy][xx][1] == ‘|’
+                           E I table[yy][xx].attrs == ‘|’
                               yy--
                            E
                               L.break
                         I xx < x
-                           table[yy][xx][1] += ‘ colspan="’String(x - xx + 1)‘"’
+                           table[yy][xx].attrs += ‘ colspan="’String(x - xx + 1)‘"’
                         I yy < y
-                           table[yy][xx][1] += ‘ rowspan="’String(y - yy + 1)‘"’
+                           table[yy][xx].attrs += ‘ rowspan="’String(y - yy + 1)‘"’
                         L(xxx) xx .< x + 1
                            L(yyy) yy .< y + 1
-                              I !(xxx == xx & yyy == yy)
-                                 table[yyy][xxx][1] = ‘’
+                              I (xxx, yyy) != (xx, yy)
+                                 table[yyy][xxx].attrs = ‘’
                V is_inline = 1B
                I (prevci == 0 | instr[prevci - 1] == "\n" | (prevci - 3 >= 0 & instr[prevci - 3 .< prevci] == ‘]]]’ & instr[0.<3] == ‘[[[’ & find_ending_sq_bracket(instr, 0) == prevci - 1))
                   is_inline = 0B
                outfile.write(‘<table’(‘ style="display: inline"’ * is_inline)">\n")
                L(row) table
                   outfile.write(‘<tr>’)
-                  L(colcolattrs) row
-                     V col = colcolattrs[0]
-                     V colattrs = colcolattrs[1]
-                     I colattrs != ‘’
-                        outfile.write(‘<’colattrs‘>’col‘</’colattrs[0.<2]‘>’)
+                  L(cell) row
+                     I cell.attrs != ‘’
+                        outfile.write(‘<’cell.attrs‘>’cell.text‘</’cell.attrs[0.<2]‘>’)
                   outfile.write("</tr>\n")
                outfile.write("</table>\n")
                I !is_inline

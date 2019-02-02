@@ -319,9 +319,7 @@ if __name__ == '__main__':
 F checkio(=data)
    V coding = zip([1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1], [‘M’, ‘CM’, ‘D’, ‘CD’, ‘C’, ‘XC’, ‘L’, ‘XL’, ‘X’, ‘IX’, ‘V’, ‘IV’, ‘I’])
    [String] result
-   L(dr) coding
-      V d = dr[0]
-      V r = dr[1]
+   L(d, r) coding
       L data >= d
          result.append(r)
          data -= d
@@ -338,14 +336,11 @@ template <typename T1> auto checkio(T1 data)
 {
     auto coding = zip(create_array({1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1}), create_array({u"M"_S, u"CM"_S, u"D"_S, u"CD"_S, u"C"_S, u"XC"_S, u"L"_S, u"XL"_S, u"X"_S, u"IX"_S, u"V"_S, u"IV"_S, u"I"_S}));
     Array<String> result;
-    for (auto dr : coding) {
-        auto d = _get<0>(dr);
-        auto r = _get<1>(dr);
+    for (auto &&[d, r] : coding)
         while (data >= d) {
             result.append(r);
             data -= d;
         }
-    }
     return result.join(u""_S);
 }
 
@@ -376,9 +371,7 @@ V ELEMENTS = [(‘M’, 1000), (‘CM’, 900), (‘D’, 500), (‘CD’, 400),
 
 F checkio(=number)
    V result = ‘’
-   L(romann) :ELEMENTS
-      V roman = romann[0]
-      V n = romann[1]
+   L(roman, n) :ELEMENTS
       I n <= number
          result ‘’= roman * (number I/ n)
          number %= n
@@ -389,14 +382,11 @@ auto ELEMENTS = create_array({make_tuple(u"M"_S, 1000), make_tuple(u"CM"_S, 900)
 template <typename T1> auto checkio(T1 number)
 {
     auto result = u""_S;
-    for (auto romann : ::ELEMENTS) {
-        auto roman = _get<0>(romann);
-        auto n = _get<1>(romann);
+    for (auto &&[roman, n] : ::ELEMENTS)
         if (n <= number) {
             result += roman * (int(number)/int(n));
             number %= n;
         }
-    }
     return result;
 }
 
