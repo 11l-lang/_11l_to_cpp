@@ -3067,3 +3067,33 @@ struct CodeBlock1
         print(chinese_remainder(n, a));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Compare_a_list_of_strings#D
+for strings_s in ['AA AA AA AA', 'AA ACB BB CC']:
+    strings = strings_s.split(' ')
+    print(strings)
+    print(all(a[0] == a[1] for a in zip(strings, strings[1:]))) # All equal
+    print(all(a[0]  < a[1] for a in zip(strings, strings[1:]))) # Strictly ascending
+    print()
+===
+L(strings_s) [‘AA AA AA AA’, ‘AA ACB BB CC’]
+   V strings = strings_s.split(‘ ’)
+   print(strings)
+   print(all(zip(strings, strings[1..]).map(a -> a[0] == a[1])))
+   print(all(zip(strings, strings[1..]).map(a -> a[0] < a[1])))
+   print()
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto strings_s : create_array({u"AA AA AA AA"_S, u"AA ACB BB CC"_S})) {
+            auto strings = strings_s.split(u" "_S);
+            print(strings);
+            print(all(zip(strings, strings[range_ei(1)]).map([](const auto &a){return _get<0>(a) == _get<1>(a);})));
+            print(all(zip(strings, strings[range_ei(1)]).map([](const auto &a){return _get<0>(a) < _get<1>(a);})));
+            print();
+        }
+    }
+} code_block_1;
