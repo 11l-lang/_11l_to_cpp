@@ -412,3 +412,80 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Combinations#D
+F comb(arr, k)
+   [[Int]] result
+   I k == 0
+      [Int] empty_array
+      result [+]= empty_array
+      R result
+
+   L(x) arr
+      V i = L.index
+      L(suffix) comb(arr[i+1..], k-1)
+         result [+]= x [+] suffix
+
+   R result
+
+print(comb([0, 1, 2, 3, 4], 3))
+===
+template <typename T1, typename T2> auto comb(const T1 &arr, const T2 &k)
+{
+    Array<Array<int>> result;
+    if (k == 0) {
+        Array<int> empty_array;
+        result.append(empty_array);
+        return result;
+    }
+    {int Lindex = 0;
+
+    for (auto x : arr) {
+        auto i = Lindex;
+        for (auto suffix : comb(arr[range_ei(i + 1)], k - 1))
+            result.append(x + suffix);
+        Lindex++;
+    }}
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(comb(create_array({0, 1, 2, 3, 4}), 3));
+    }
+} code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Comma_quibbling
+F quibble(words)
+   R S words.len
+      0
+         ‘{}’
+      1
+         ‘{’words[0]‘}’
+      E
+         ‘{’words[0.<(len)-1].join(‘, ’)‘ and ’words.last‘}’
+
+print(quibble([‘’] * 0))
+print(quibble([‘ABC’]))
+print(quibble([‘ABC’, ‘DEF’]))
+print(quibble([‘ABC’, ‘DEF’, ‘G’, ‘H’]))
+===
+template <typename T1> auto quibble(const T1 &words)
+{
+    return [&](const auto &a){return a == 0 ? u"{}"_S : a == 1 ? u"{"_S + _get<0>(words) + u"}"_S : u"{"_S + words[range_e_llen(0,  - 1)].join(u", "_S) + u" and "_S + words.last() + u"}"_S;}(words.len());
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(quibble(create_array({u""_S}) * 0));
+        print(quibble(create_array({u"ABC"_S})));
+        print(quibble(create_array({u"ABC"_S, u"DEF"_S})));
+        print(quibble(create_array({u"ABC"_S, u"DEF"_S, u"G"_S, u"H"_S})));
+    }
+} code_block_1;

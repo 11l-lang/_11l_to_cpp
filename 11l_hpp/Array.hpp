@@ -213,6 +213,13 @@ public:
 		return find(make_tuple((Type)std::get<0>(t), (Type)std::get<1>(t)), start);
 	}
 
+	const Type &last() const
+	{
+		if (std::vector<Type>::empty())
+			throw IndexError(0);
+		return std::vector<Type>::at(len()-1);
+	}
+
 	Type &last()
 	{
 		if (std::vector<Type>::empty())

@@ -508,7 +508,7 @@ class SymbolNode:
                     res += char_or_str(self.children[i+1], char_val)
                     was_break = True
                     break
-                res += ('a == ' + char_or_str(self.children[i], is_char(self.children[i]))[:-2] if self.children[i].symbol.id not in ('..', '.<', '<.', '<.<')
+                res += ('a == ' + (char_or_str(self.children[i], is_char(self.children[i]))[:-2] if self.children[i].token.category == Token.Category.STRING_LITERAL else self.children[i].to_str()) if self.children[i].symbol.id not in ('..', '.<', '<.', '<.<')
                    else 'in(a, ' + self.children[i].to_str() + ')') + ' ? ' + char_or_str(self.children[i+1], char_val) + ' : '
                 # L.was_no_break
                 #    res ‘’= ‘throw KeyError(a)’
