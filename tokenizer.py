@@ -470,7 +470,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                         i += 1
                     elif ch == '"':
                         break
-                if source[i:i+1].isalpha() or source[i:i+1] in ('@', '‘', '('): # )’
+                if source[i:i+1].isalpha() or source[i:i+1] in ('@', ':', '‘', '('): # )’
                     tokens.append(Token(lexem_start, i, Token.Category.STRING_LITERAL))
                     tokens.append(Token(i, i, Token.Category.STRING_CONCATENATOR))
                     continue
@@ -509,7 +509,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                             break
                 while i < len(source) and source[i] == "'":
                     i += 1
-                if source[i:i+1].isalpha() or source[i:i+1] in ('@', '"', '('): # )
+                if source[i:i+1].isalpha() or source[i:i+1] in ('@', ':', '"', '('): # )
                     tokens.append(Token(lexem_start, i, Token.Category.STRING_LITERAL))
                     tokens.append(Token(i, i, Token.Category.STRING_CONCATENATOR))
                     continue

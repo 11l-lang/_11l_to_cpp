@@ -489,3 +489,19 @@ struct CodeBlock1
         print(quibble(create_array({u"ABC"_S, u"DEF"_S, u"G"_S, u"H"_S})));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Command-line_arguments
+:start:
+print(‘Program name: ’:argv[0])
+print("Arguments:\n":argv[1..].join("\n"))
+===
+Array<String> argv;
+
+int MAIN_WITH_ARGV()
+{
+    INIT_ARGV();
+
+    print(u"Program name: "_S + _get<0>(::argv));
+    print(u"Arguments:\n"_S + ::argv[range_ei(1)].join(u"\n"_S));
+}
