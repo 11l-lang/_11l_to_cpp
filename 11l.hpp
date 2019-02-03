@@ -203,6 +203,22 @@ template <typename Type1, typename Type2, typename Type3, typename FilterFunc, t
 	return r;
 }
 
+template <typename Iterable> bool all(const Iterable &i)
+{
+	for (auto &&el : i)
+		if (!el)
+			return false;
+	return true;
+}
+
+template <typename Iterable> bool any(const Iterable &i)
+{
+	for (auto &&el : i)
+		if (el)
+			return true;
+	return false;
+}
+
 #ifdef _WIN32
 #define MAIN_WITH_ARGV() wmain(int argc, wchar_t *argv[])
 #define INIT_ARGV() for (int i=0; i<argc; i++) ::argv.append(String((char16_t*)argv[i], wcslen(argv[i])))
