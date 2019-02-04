@@ -505,3 +505,44 @@ int MAIN_WITH_ARGV()
     print(u"Program name: "_S + _get<0>(::argv));
     print(u"Arguments:\n"_S + ::argv[range_ei(1)].join(u"\n"_S));
 }
+
+
+// https://www.rosettacode.org/wiki/Constrained_random_points_on_a_circle#Julia
+F print_circle(lo, hi, ndots)
+   V canvas = [[0B] * (2*hi+1)] * (2*hi+1)
+   V i = 0
+   L i < ndots
+      V x = random:(-hi..hi)
+      V y = random:(-hi..hi)
+      I x^2 + y^2 C lo^2 .. hi^2
+         canvas[x + hi][y + hi] = 1B
+         i++
+
+   L(i) 0 .. 2*hi
+      print(canvas[i].map(j -> I j {‘♦ ’} E ‘  ’).join(‘’))
+ 
+print_circle(10, 15, 100)
+===
+template <typename T1, typename T2, typename T3> auto print_circle(const T1 &lo, const T2 &hi, const T3 &ndots)
+{
+    auto canvas = create_array({create_array({false}) * (2 * hi + 1)}) * (2 * hi + 1);
+    auto i = 0;
+    while (i < ndots) {
+        auto x = randomns::_(range_ee(-hi, hi));
+        auto y = randomns::_(range_ee(-hi, hi));
+        if (in(pow(x, 2) + pow(y, 2), range_ee(pow(lo, 2), pow(hi, 2)))) {
+            canvas[x + hi].set(y + hi, true);
+            i++;
+        }
+    }
+    for (auto i : range_ee(0, 2 * hi))
+        print(canvas[i].map([](const auto &j){return j ? u"♦ "_S : u"  "_S;}).join(u""_S));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print_circle(10, 15, 100);
+    }
+} code_block_1;
