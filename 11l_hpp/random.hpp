@@ -37,6 +37,9 @@ inline float _(float min, float max)
 	return _(max - min) + min;
 }
 
+inline int _(const Range<int, true, false> range) {return _(range.b, range.e);}
+inline int _(const Range<int, true, true > range) {return _(range.b, range.e + 1);}
+
 template <typename Type> inline void shuffle(Array<Type> &arr)
 {
 	for (int i=0,l=arr.len(); i<l; i++)
