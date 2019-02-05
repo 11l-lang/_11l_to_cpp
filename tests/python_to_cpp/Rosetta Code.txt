@@ -3097,3 +3097,95 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Continued_fraction#C
+def calc(f_a, f_b, n = 1000):
+    r = 0.0
+    while n > 0:
+        r = f_b(n) / (f_a(n) + r)
+        n -= 1
+    return f_a(0) + r
+
+print(calc(lambda n: 2 if n > 0 else 1, lambda n: 1))
+print(calc(lambda n: n if n > 0 else 2, lambda n: n - 1 if n > 1 else 1))
+print(calc(lambda n: 6 if n > 0 else 3, lambda n: (2 * n - 1) ** 2))
+===
+F calc(f_a, f_b, =n = 1000)
+   V r = 0.0
+   L n > 0
+      r = f_b(n) / (f_a(n) + r)
+      n--
+   R f_a(0) + r
+print(calc(n -> I n > 0 {2} E 1, n -> 1))
+print(calc(n -> I n > 0 {n} E 2, n -> I n > 1 {n - 1} E 1))
+print(calc(n -> I n > 0 {6} E 3, n -> (2 * n - 1) ^ 2))
+===
+template <typename T1, typename T2, typename T3 = decltype(1000)> auto calc(const T1 &f_a, const T2 &f_b, T3 n = 1000)
+{
+    auto r = 0.0;
+    while (n > 0) {
+        r = f_b(n) / (f_a(n) + r);
+        n--;
+    }
+    return f_a(0) + r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(calc([](const auto &n){return n > 0 ? 2 : 1;}, [](const auto &n){return 1;}));
+        print(calc([](const auto &n){return n > 0 ? n : 2;}, [](const auto &n){return n > 1 ? n - 1 : 1;}));
+        print(calc([](const auto &n){return n > 0 ? 6 : 3;}, [](const auto &n){return pow((2 * n - 1), 2);}));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Convert_seconds_to_compound_duration#Julia
+def duration(sec):
+    t : List[int] = []
+    for dm in [60, 60, 24, 7]:
+        m : int
+        (sec, m) = (sec // dm, sec % dm)
+        t.insert(0, m)
+    t.insert(0, sec)
+    return ', '.join(str(num_unit[0]) + ' ' + str(num_unit[1]) for num_unit in zip(t, ['wk', 'd', 'hr', 'min', 'sec']) if num_unit[0] > 0)
+ 
+print(duration(7259))
+print(duration(86400))
+print(duration(6000000))
+===
+F duration(=sec)
+   [Int] t
+   L(dm) [60, 60, 24, 7]
+      Int m
+      (sec, m) = (sec I/ dm, sec % dm)
+      t.insert(0, m)
+   t.insert(0, sec)
+   R zip(t, [‘wk’, ‘d’, ‘hr’, ‘min’, ‘sec’]).filter(num_unit -> num_unit[0] > 0).map(num_unit -> String(num_unit[0])‘ ’String(num_unit[1])).join(‘, ’)
+print(duration(7259))
+print(duration(86400))
+print(duration(6000000))
+===
+template <typename T1> auto duration(T1 sec)
+{
+    Array<int> t;
+    for (auto dm : create_array({60, 60, 24, 7})) {
+        int m;
+        std::tie(sec, m) = make_tuple(int(sec)/int(dm), mod(sec, dm));
+        t.insert(0, m);
+    }
+    t.insert(0, sec);
+    return zip(t, create_array({u"wk"_S, u"d"_S, u"hr"_S, u"min"_S, u"sec"_S})).filter([](const auto &num_unit){return _get<0>(num_unit) > 0;}).map([](const auto &num_unit){return String(_get<0>(num_unit)) + u" "_S + String(_get<1>(num_unit));}).join(u", "_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(duration(7259));
+        print(duration(86400));
+        print(duration(6000000));
+    }
+} code_block_1;

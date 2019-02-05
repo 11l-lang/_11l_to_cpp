@@ -184,6 +184,11 @@ public:
 //		append(range);
 //	}
 
+	void insert(int index, const Type &v)
+	{
+		std::vector<Type>::insert(begin() + index, v);
+	}
+
 	int index(const Type &v) const
 	{
 		for (int i=0, l=len(); i<l; i++)
