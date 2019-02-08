@@ -51,7 +51,7 @@ class Converter:
         class Writer:
             write : Callable[[str], None]
         outfile = Writer()
-        if outfilef == None:
+        if outfilef is None:
             outfile.write = lambda s: result.append(s)
         else:
             outfile.write = lambda s: outfilef.write(s)
@@ -744,7 +744,7 @@ class Converter:
 
         assert(self.to_html_called_inside_to_html_outer_pos_list.pop() == outer_pos)
 
-        if outfilef == None:
+        if outfilef is None:
             r = "".join(result)
             if self.habr_html:                                    # // dirty hack
                 r = r.replace("</blockquote>\n", '</blockquote>') # \\ (just left it as is)
