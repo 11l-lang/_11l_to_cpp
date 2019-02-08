@@ -96,7 +96,7 @@ for n, test in enumerate(tokenizer_tests):
             print('OK (Error)')
             continue
         else:
-            kdiff3('Error: ' + e.message, error[0] if error != None else '')
+            kdiff3('Error: ' + e.message, error[0] if error is not None else '')
             next_line_pos = test_source.find("\n", e.pos)
             if next_line_pos == -1:
                 next_line_pos = len(test_source)
@@ -107,7 +107,7 @@ for n, test in enumerate(tokenizer_tests):
                                                                                                           prev_line_pos:e.pos]) + '^')
             print("in test:\n" + test)
             exit(1)
-    if error != None and not was_error:
+    if error is not None and not was_error:
         print("There should be error in test:\n" + test)
         exit(1)
     print('OK')

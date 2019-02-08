@@ -12,8 +12,8 @@ class Node:
         self.right = right
 
     def tree_indent(self) -> List[str]:
-        tr = self.right.tree_indent() if self.right != None else ['-- (null)']
-        return ['--' + self.value] + list(map(lambda a: '  |' + a, self.left.tree_indent() if self.left != None else ['-- (null)'])) + ['  `' + tr[0]] + list(map(lambda a: "   " + a, tr[1:]))
+        tr = self.right.tree_indent() if self.right is not None else ['-- (null)']
+        return ['--' + self.value] + list(map(lambda a: '  |' + a, self.left.tree_indent() if self.left is not None else ['-- (null)'])) + ['  `' + tr[0]] + list(map(lambda a: "   " + a, tr[1:]))
 
 tree = Node(1, Node(2, Node(4, Node(7)), Node(5)), Node(3, Node(6, Node(8), Node(9))))
 print("\n".join(tree.tree_indent()))
@@ -1280,7 +1280,7 @@ class ASTNode:
         elif sid == '+':
             return self.first_child.eval() + self.second_child.eval()
         elif sid == '-':
-            return -self.first_child.eval() if self.second_child == None else self.first_child.eval() - self.second_child.eval()
+            return -self.first_child.eval() if self.second_child is None else self.first_child.eval() - self.second_child.eval()
         elif sid == '*':
             return self.first_child.eval() * self.second_child.eval()
         elif sid == '/':
