@@ -795,7 +795,7 @@ class ASTProgram(ASTNodeWithChildren):
         code_block_id = 1
 
         for c in self.children:
-            global_statement = type(c) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition, ASTTypeDefinition, ASTTypeEnum, ASTMain)
+            global_statement = type(c) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition, ASTTypeDefinition, ASTTypeAlias, ASTTypeEnum, ASTMain)
             if global_statement != prev_global_statement:
                 prev_global_statement = global_statement
                 if not global_statement:
@@ -845,7 +845,7 @@ def trans_type(ty, scope, type_token, ast_type_node = None):
         id = scope.find(ty)
         if id is None or len(id.ast_nodes) == 0:
             raise Error('type `' + ty + '` is not defined', type_token)
-        if type(id.ast_nodes[0]) == ASTTypeEnum:
+        if type(id.ast_nodes[0]) in (ASTTypeAlias, ASTTypeEnum):
             return ty
         if type(id.ast_nodes[0]) != ASTTypeDefinition:
             raise Error('`' + ty + '`: expected a type name', type_token)
@@ -1264,6 +1264,20 @@ class ASTTypeDefinition(ASTNodeWithChildren):
         if len(self.forward_declared_types):
             r = "\n".join(' ' * (indent*4) + 'class ' + t + ';' for t in self.forward_declared_types) + "\n\n" + r
         return r + ' ' * (indent*4) + "};\n"
+
+class ASTTypeAlias(ASTNode):
+    name : str
+    defining_type : str # this term is taken from C++ Standard (‘using identifier attribute-specifier-seqopt = defining-type-id ;’)
+    template_params : List[str]
+
+    def __init__(self):
+        self.template_params = []
+
+    def to_str(self, indent):
+        r = ' ' * (indent*4)
+        if len(self.template_params):
+            r += 'template <' + ', '.join(self.template_params) + '> '
+        return r + 'using ' + self.name + ' = ' + self.defining_type + ";\n"
 
 class ASTTypeEnum(ASTNode):
     enum_name : str
@@ -1912,24 +1926,62 @@ def parse_internal(this_node):
             elif token.value(source) in ('T', 'Т', 'type', 'тип'):
                 node = ASTTypeDefinition()
                 node.type_name = expected_name('type name')
-                scope.add_name(node.type_name, node)
-                node.base_types = []
 
-                if token.value(source) == '(':
-                    while True:
-                        node.base_types.append(expected_name('base type name'))
-                        if token.value(source) != ',':
+                if token.value(source) in ('[', '='): # ] # this is a type alias
+                    n = ASTTypeAlias()
+                    n.name = node.type_name
+                    node = n
+                    scope.add_name(node.name, node)
+
+                    prev_scope = scope
+                    scope = Scope(None)
+                    scope.parent = prev_scope
+
+                    if token.value(source) == '[':
+                        next_token()
+                        while True:
+                            if token.category == Token.Category.KEYWORD and token.value(source) in ('T', 'Т', 'type', 'тип'):
+                                next_token()
+                                assert(token.category == Token.Category.NAME)
+                                scope.add_name(token.value(source), ASTTypeDefinition())
+                                node.template_params.append('typename ' + token.value(source))
+                            else:
+                                expr = expression()
+                                type_name = trans_type(expr.to_type_str(), scope, expr.left_to_right_token())
+                                assert(token.category == Token.Category.NAME)
+                                scope.add_name(token.value(source), ASTTypeDefinition()) # :(hack):
+                                node.template_params.append(type_name + ' ' + token.value(source))
+                            next_token()
+                            if token.value(source) == ']':
+                                next_token()
+                                break
+                            advance(',')
+                    advance('=')
+
+                    expr = expression()
+                    node.defining_type = trans_type(expr.to_type_str(), scope, expr.left_to_right_token())
+                    scope = prev_scope
+                    if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
+                        next_token()
+                else:
+                    scope.add_name(node.type_name, node)
+                    node.base_types = []
+
+                    if token.value(source) == '(':
+                        while True:
+                            node.base_types.append(expected_name('base type name'))
+                            if token.value(source) != ',':
+                                break
+                        if token.value(source) != ')': # (
+                            raise Error('expected `)`', token)
+                        next_token()
+
+                    new_scope(node)
+
+                    for child in node.children:
+                        if type(child) == ASTFunctionDefinition and child.virtual_category != child.VirtualCategory.NO:
+                            node.has_virtual_functions = True
                             break
-                    if token.value(source) != ')': # (
-                        raise Error('expected `)`', token)
-                    next_token()
-
-                new_scope(node)
-
-                for child in node.children:
-                    if type(child) == ASTFunctionDefinition and child.virtual_category != child.VirtualCategory.NO:
-                        node.has_virtual_functions = True
-                        break
 
             elif token.value(source) in ('T.enum', 'Т.перечисл', 'type.enum', 'тип.перечисл'):
                 node = ASTTypeEnum()
