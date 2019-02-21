@@ -902,3 +902,16 @@ struct CodeBlock1
         _set<0>(t, 3);
     }
 } code_block_1;
+
+
+T Tuple2[T Ty] = Tuple[Ty, Ty]
+T Tuple23[T Ty1, T Ty2] = Tuple[Ty1, Ty1, Ty2]
+T Tuple2Int = Tuple[Int, Int]
+T StaticArray = Array
+T StaticIntArray[Int n] = StaticArray[Int, n]
+===
+template <typename Ty> using Tuple2 = Tuple<Ty, Ty>;
+template <typename Ty1, typename Ty2> using Tuple23 = Tuple<Ty1, Ty1, Ty2>;
+using Tuple2Int = Tuple<int, int>;
+using StaticArray = Array;
+template <int n> using StaticIntArray = StaticArray<int, n>;
