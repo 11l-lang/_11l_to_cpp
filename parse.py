@@ -733,6 +733,7 @@ def symbol(id, bp = 0):
 
 class ASTNode:
     parent : 'ASTNode' = None
+    access_specifier_public = 1
 
     def walk_expressions(self, f):
         pass
@@ -1258,8 +1259,12 @@ class ASTTypeDefinition(ASTNodeWithChildren):
         base_types += self.base_types
         r += ' ' * (indent*4) \
           + 'class ' + self.type_name + (' : ' + ', '.join(map(lambda c: 'public ' + c, base_types)) if len(base_types) else '') \
-          + "\n" + ' ' * (indent*4) + "{\n" + ' ' * (indent*4) + "public:\n"
+          + "\n" + ' ' * (indent*4) + "{\n"
+        access_specifier_public = -1
         for c in self.children:
+            if c.access_specifier_public != access_specifier_public:
+                r += ' ' * (indent*4) + ['private', 'public'][c.access_specifier_public] + ":\n"
+                access_specifier_public = c.access_specifier_public
             r += c.to_str(indent+1)
         if len(self.forward_declared_types):
             r = "\n".join(' ' * (indent*4) + 'class ' + t + ';' for t in self.forward_declared_types) + "\n\n" + r
@@ -1781,6 +1786,8 @@ def parse_internal(this_node):
         next_token()
         return token_value
 
+    access_specifier_private = False
+
     while token is not None:
         if token.value(source) == ':' and peek_token().value(source) in ('start', 'старт'):
             node = ASTMain()
@@ -1790,6 +1797,12 @@ def parse_internal(this_node):
             assert(token.category == Token.Category.STATEMENT_SEPARATOR)
             next_token()
             new_scope(node, [], False)
+
+        elif token.value(source) == '.' and type(this_node) == ASTTypeDefinition:
+            access_specifier_private = True
+            next_token()
+            continue
+
         elif token.category == Token.Category.KEYWORD:
             if token.value(source).startswith('F') or \
                token.value(source).startswith('Ф') or \
@@ -2277,6 +2290,9 @@ def parse_internal(this_node):
                 if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
                     next_token()
 
+        if access_specifier_private:
+            node.access_specifier_public = 0
+            access_specifier_private = False
         node.parent = this_node
         this_node.children.append(node)
 

@@ -915,3 +915,28 @@ template <typename Ty1, typename Ty2> using Tuple23 = Tuple<Ty1, Ty1, Ty2>;
 using Tuple2Int = Tuple<int, int>;
 using StaticArray = Array;
 template <int n> using StaticIntArray = StaticArray<int, n>;
+
+
+T MyType
+   Int public_variable
+   . Int private_variable
+
+T MyType2
+   . Int private_variable
+   Int public_variable
+===
+class MyType
+{
+public:
+    int public_variable;
+private:
+    int private_variable;
+};
+
+class MyType2
+{
+private:
+    int private_variable;
+public:
+    int public_variable;
+};
