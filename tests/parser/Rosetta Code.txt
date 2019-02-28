@@ -566,6 +566,7 @@ L(i) 4
    print("\nGeneration "i‘:’)
    L(row) 0 .< cellcounty
       print(‘  ’(0 .< cellcountx).map(col -> [‘. ’, ‘O ’][:universe[(@row, col)]]).join(‘’))
+
    DefaultDict[(Int, Int), Int] nextgeneration
    L(row) 0 .< cellcounty
       L(col) 0 .< cellcountx
@@ -604,3 +605,105 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Conway%27s_Game_of_Life#More_optimal_solution
+V cellcountx = 6
+V cellcounty = 5
+V universe = [[0B] * cellcountx] * cellcounty
+universe[1][1] = 1B
+universe[2][1] = 1B
+universe[3][1] = 1B
+universe[1][4] = 1B
+universe[2][4] = 1B
+universe[3][4] = 1B
+V nextgeneration = [[0B] * cellcountx] * cellcounty
+
+L(i) 4
+   print("\nGeneration "i‘:’)
+   L(row) 0 .< cellcounty
+      print(‘  ’, end' ‘’)
+      L(col) 0 .< cellcountx
+         print(I universe[row][col] {‘O ’} E ‘. ’, end' ‘’)
+      print()
+
+   L(row) 0 .< cellcounty
+      L(col) 0 .< cellcountx
+         V s = 0
+         I row > 0
+            s = universe[row-1][col]
+            I col > 0
+               s += universe[row-1][col-1]
+            I col < cellcountx-1
+               s += universe[row-1][col+1]
+         I col > 0
+            s += universe[row][col-1]
+         I col < cellcountx-1
+            s += universe[row][col+1]
+         I row < cellcounty-1
+            s += universe[row+1][col]
+            I col > 0
+               s += universe[row+1][col-1]
+            I col < cellcountx-1
+               s += universe[row+1][col+1]
+         nextgeneration[row][col] = I universe[row][col] {s C 2..3} E s == 3
+   universe = nextgeneration
+===
+auto cellcountx = 6;
+auto cellcounty = 5;
+auto universe = create_array({create_array({false}) * cellcountx}) * cellcounty;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _set<1>(_get<1>(universe), true);
+        _set<1>(_get<2>(universe), true);
+        _set<1>(_get<3>(universe), true);
+        _set<4>(_get<1>(universe), true);
+        _set<4>(_get<2>(universe), true);
+        _set<4>(_get<3>(universe), true);
+    }
+} code_block_1;
+auto nextgeneration = create_array({create_array({false}) * cellcountx}) * cellcounty;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+
+        for (int i = 0; i < 4; i++) {
+            print(u"\nGeneration "_S + i + u":"_S);
+            for (auto row : range_el(0, cellcounty)) {
+                print(u"  "_S, u""_S);
+                for (auto col : range_el(0, cellcountx))
+                    print(universe[row][col] ? u"O "_S : u". "_S, u""_S);
+                print();
+            }
+            for (auto row : range_el(0, cellcounty))
+                for (auto col : range_el(0, cellcountx)) {
+                    auto s = 0;
+                    if (row > 0) {
+                        s = universe[row - 1][col];
+                        if (col > 0)
+                            s += universe[row - 1][col - 1];
+                        if (col < cellcountx - 1)
+                            s += universe[row - 1][col + 1];
+                    }
+                    if (col > 0)
+                        s += universe[row][col - 1];
+                    if (col < cellcountx - 1)
+                        s += universe[row][col + 1];
+                    if (row < cellcounty - 1) {
+                        s += universe[row + 1][col];
+                        if (col > 0)
+                            s += universe[row + 1][col - 1];
+                        if (col < cellcountx - 1)
+                            s += universe[row + 1][col + 1];
+                    }
+                    nextgeneration[row].set(col, universe[row][col] ? in(s, range_ee(2, 3)) : s == 3);
+                }
+            universe = nextgeneration;
+        }
+    }
+} code_block_2;

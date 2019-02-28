@@ -121,13 +121,13 @@ public:
 		return r;
 	}
 
-	Array<unsigned char> read_bytes()
+	Array<Byte> read_bytes()
 	{
 		fseek(file, 0, SEEK_END);
 		size_t file_size = ftell(file);
 		fseek(file, 0, SEEK_SET);
 
-		Array<unsigned char> file_bytes;
+		Array<Byte> file_bytes;
 		file_bytes.resize(file_size);
 		size_t _ = fread(file_bytes.data(), file_size, 1, file);
 		return file_bytes;
