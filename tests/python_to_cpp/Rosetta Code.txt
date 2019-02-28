@@ -1328,12 +1328,12 @@ def parse(expr_str) -> ASTNode:
     return expression()
 
 def symbol(id, bp = 0): # -> &
-    if not id in symbol_table:
-        s = Symbol()
-        s.id = id
-        s.lbp = bp
-        symbol_table[id] = s
-    return symbol_table[id]
+    if not id in symbol_table: # Bool was_added
+        s = Symbol()           # V &s = :symbol_table.add(id, &was_added)
+        s.id = id              # I was_added
+        s.lbp = bp             #    s.id = id
+        symbol_table[id] = s   #    s.lbp = bp
+    return symbol_table[id]    # R s
 
 def infix(id, bp):
     def led(self : ASTNode, left):
@@ -3187,5 +3187,91 @@ struct CodeBlock1
         print(duration(7259));
         print(duration(86400));
         print(duration(6000000));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Conway%27s_Game_of_Life#Python
+import collections
+ 
+cellcountx = 6
+cellcounty = 5
+celltable = {
+ (1, 2): 1,
+ (1, 3): 1,
+ (0, 3): 1,
+}
+ 
+universe = collections.defaultdict(int) # Tuple[int, int]
+universe[(1, 1)] = 1
+universe[(2, 1)] = 1
+universe[(3, 1)] = 1
+universe[(1, 4)] = 1
+universe[(2, 4)] = 1
+universe[(3, 4)] = 1
+ 
+for i in range(4):
+    print("\nGeneration " + str(i) + ':')
+    for row in range(cellcounty):
+        print('  ' + ''.join(['. ', 'O '][universe[(row, col)]] for col in range(cellcountx)))
+    nextgeneration = collections.defaultdict(int) # Tuple[int, int]
+    for row in range(cellcounty):
+        for col in range(cellcountx):
+            nextgeneration[(row, col)] = celltable.get(
+                ( universe[(row, col)],
+                 -universe[(row, col)] + sum(universe[(r, c)]
+                                             for r in range(row-1, row+2)
+                                             for c in range(col-1, col+2))
+                ), 0)
+    universe = nextgeneration
+===
+//import collections
+V cellcountx = 6
+V cellcounty = 5
+V celltable = [(1, 2) = 1, (1, 3) = 1, (0, 3) = 1]
+V universe = DefaultDict[(Int, Int), Int]()
+universe[(1, 1)] = 1
+universe[(2, 1)] = 1
+universe[(3, 1)] = 1
+universe[(1, 4)] = 1
+universe[(2, 4)] = 1
+universe[(3, 4)] = 1
+
+L(i) 0.<4
+   print("\nGeneration "String(i)‘:’)
+   L(row) 0 .< cellcounty
+      print(‘  ’(0 .< cellcountx).map(col -> [‘. ’, ‘O ’][:universe[(@row, col)]]).join(‘’))
+   V nextgeneration = DefaultDict[(Int, Int), Int]()
+   L(row) 0 .< cellcounty
+      L(col) 0 .< cellcountx
+         nextgeneration[(row, col)] = celltable.get((universe[(row, col)], -universe[(row, col)] + sum(multiloop((row - 1 .< row + 2), (col - 1 .< col + 2), (r, c) -> :universe[(r, c)]))), 0)
+   universe = nextgeneration
+===
+auto cellcountx = 6;
+auto cellcounty = 5;
+auto celltable = create_dict(dict_of(make_tuple(1, 2), 1)(make_tuple(1, 3), 1)(make_tuple(0, 3), 1));
+auto universe = DefaultDict<Tuple<int, int>, int>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        universe.set(make_tuple(1, 1), 1);
+        universe.set(make_tuple(2, 1), 1);
+        universe.set(make_tuple(3, 1), 1);
+        universe.set(make_tuple(1, 4), 1);
+        universe.set(make_tuple(2, 4), 1);
+        universe.set(make_tuple(3, 4), 1);
+
+        for (auto i : range_el(0, 4)) {
+            print(u"\nGeneration "_S + String(i) + u":"_S);
+            for (auto row : range_el(0, cellcounty))
+                print(u"  "_S + range_el(0, cellcountx).map([&row](const auto &col){return create_array({u". "_S, u"O "_S})[::universe[make_tuple(row, col)]];}).join(u""_S));
+            auto nextgeneration = DefaultDict<Tuple<int, int>, int>();
+            for (auto row : range_el(0, cellcounty))
+                for (auto col : range_el(0, cellcountx))
+                    nextgeneration.set(make_tuple(row, col), celltable.get(make_tuple(universe[make_tuple(row, col)], -universe[make_tuple(row, col)] + sum(multiloop(range_el(row - 1, row + 2), range_el(col - 1, col + 2), [](const auto &r, const auto &c){return ::universe[make_tuple(r, c)];}))), 0));
+            universe = nextgeneration;
+        }
     }
 } code_block_1;

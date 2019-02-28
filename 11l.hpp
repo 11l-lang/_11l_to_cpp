@@ -169,6 +169,16 @@ template <typename Type1, typename Type2, typename Func> auto multiloop(const Ar
 	return r;
 }
 
+template <typename Type1, bool include_beginning1, bool include_ending1, typename Type2, bool include_beginning2, bool include_ending2, typename Func> auto multiloop(const Range<Type1, include_beginning1, include_ending1> &range1, const Range<Type2, include_beginning2, include_ending2> &range2, Func &&func) -> Array<decltype(func(std::declval<Type1>(), std::declval<Type2>()))>
+{
+	Array<decltype(func(std::declval<Type1>(), std::declval<Type2>()))> r;
+	r.reserve(range1.len() * range2.len());
+	for (auto v1 : range1)
+		for (auto v2 : range2)
+			r.push_back(func(v1, v2));
+	return r;
+}
+
 template <typename Type1, typename Type2, typename FilterFunc, typename Func> auto multiloop_filtered(const Array<Type1> &arr1, const Array<Type2> &arr2, FilterFunc &&filter_func, Func &&func) -> Array<decltype(func(std::declval<Type1>(), std::declval<Type2>()))>
 {
 	Array<decltype(func(std::declval<Type1>(), std::declval<Type2>()))> r;
