@@ -54,6 +54,8 @@ public:
 
 class AssertionError {};
 
+typedef unsigned char Byte;
+
 #include "11l_hpp/funcs.hpp"
 #include "11l_hpp/Range.hpp"
 #include <iostream> // for std::wcerr in String.hpp
