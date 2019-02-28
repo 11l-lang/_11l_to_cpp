@@ -357,7 +357,7 @@ class SymbolNode:
                 elif func_name == 'Dict':
                     func_name = 'create_dict'
                 elif func_name.startswith('DefaultDict['): # ]
-                    func_name = 'DefaultDict<' + ', '.join(cpp_type_from_11l[c.to_str()] for c in self.children[0].children[1:]) + '>'
+                    func_name = 'DefaultDict<' + ', '.join(trans_type(c.to_type_str(), c.scope, c.token) for c in self.children[0].children[1:]) + '>'
                 else:
                     if self.children[0].symbol.id == ':':
                         fid, sc = find_module(self.children[0].children[0].to_str()).scope.find_and_return_scope(self.children[0].children[1].token_str())
@@ -1666,7 +1666,7 @@ symbol('(').nud = nud # )
 
 def led(self, left):
     self.append_child(left)
-    if token.value(source)[0].isupper(): # type name must starts with an upper case letter
+    if token.value(source)[0].isupper() or (token.value(source) == '(' and source[token.start+1].isupper()): # ) # type name must starts with an upper case letter
         self.is_type = True
         while True:
             self.append_child(expression())
@@ -1682,6 +1682,9 @@ symbol('[').led = led
 def nud(self):
     i = 1 # [[
     if token.value(source) != ']': # for `R []`
+        if token.value(source) == '(': # for `V celltable = [(1, 2) = 1, (1, 3) = 1, (0, 3) = 1]`
+            while peek_token(i).value(source) != ')':
+                i += 1
         while peek_token(i).value(source) not in ('=', ',', ']'): # for `V cat_to_class_python = [python_to_11l:tokenizer:Token.Category.NAME = ‘identifier’, ...]`
             i += 1
     if peek_token(i).value(source) == '=':

@@ -58,6 +58,13 @@ public:
 		std::map<KeyType, ValueType>::operator[](key) = value;
 	}
 
+	const ValueType &get(const KeyType &key, const ValueType &default_value) const
+	{
+		auto r = find(key);
+		if (r == std::map<KeyType, ValueType>::end()) return default_value;
+		return r->second;
+	}
+
 	Array<KeyType> keys() const
 	{
 		Array<KeyType> r;
