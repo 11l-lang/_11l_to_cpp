@@ -707,3 +707,57 @@ struct CodeBlock2
         }
     }
 } code_block_2;
+
+
+// https://www.rosettacode.org/wiki/Count_in_factors#C.2B.2B
+F get_prime_factors(=li)
+   I li == 1
+      R ‘1’
+   E
+      V res = ‘’
+      V f = 2
+      L
+         I li % f == 0
+            res ‘’= f
+            li /= f
+            I li == 1
+               L.break
+            res ‘’= ‘ x ’
+         E
+            f++
+      R res
+
+L(x) 1..17
+   print(‘#4: #.’.format(x, get_prime_factors(x)))
+print(‘2144: ’get_prime_factors(2144))
+===
+template <typename T1> auto get_prime_factors(T1 li)
+{
+    if (li == 1)
+        return u"1"_S;
+    else {
+        auto res = u""_S;
+        auto f = 2;
+        while (true)
+            if (mod(li, f) == 0) {
+                res += f;
+                li /= f;
+                if (li == 1)
+                    break;
+                res += u" x "_S;
+            }
+            else
+                f++;
+        return res;
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto x : range_ee(1, 17))
+            print(u"#4: #."_S.format(x, get_prime_factors(x)));
+        print(u"2144: "_S + get_prime_factors(2144));
+    }
+} code_block_1;

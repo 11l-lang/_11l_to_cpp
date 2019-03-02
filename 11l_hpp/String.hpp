@@ -462,12 +462,19 @@ public:
 	template <int N> bool operator==(const char16_t (&s)[N]) const {return   len() == N-1 && memcmp(c_str(), s, (N-1)*sizeof(char16_t)) == 0 ;}
 	template <int N> bool operator!=(const char16_t (&s)[N]) const {return !(len() == N-1 && memcmp(c_str(), s, (N-1)*sizeof(char16_t)) == 0);}
 
-	String operator+(const String &s) const {String r(*this); r.append(s); return r;}
-	String operator+(Char ch) {String r(*this); r.append(1, ch.code); return r;}
-	String operator+(char16_t ch) {String r(*this); r.append(1, ch); return r;}
+	void operator+=(const char16_t *s) {append(s);}
+	void operator+=(const String &s) {append(s);}
+	void operator+=(Char ch) {append(1, ch.code);}
+	void operator+=(char16_t ch) {append(1, ch);}
+	void operator+=(int i)    {*this += String(i);}
+	void operator+=(double n) {*this += String(n);}
 
-	String operator+(int i) {return *this + String(i);}
-	String operator+(double n) {return *this + String(n);}
+	String operator+(const String &s) const {String r(*this); r.append(s); return r;}
+	String operator+(Char ch)         const {String r(*this); r.append(1, ch.code); return r;}
+	String operator+(char16_t ch)     const {String r(*this); r.append(1, ch); return r;}
+
+	String operator+(int i)    const {return *this + String(i);}
+	String operator+(double n) const {return *this + String(n);}
 	friend String operator+(int i, const String &s) {return String(i) + s;}
 	friend String operator+(double n, const String &s) {return String(n) + s;}
 	friend String operator+(Char ch, const String &s) {return String(ch) + s;}
