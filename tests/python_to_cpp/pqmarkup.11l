@@ -396,9 +396,9 @@ T Converter
                write_to_pos(prevci + 1, i + 1)
                V outer_p = endqpos + (I instr[endqpos + 2] == "\n" {3} E 2)
                I .habr_html
-                  outfile.write(‘<spoiler title="’remove_comments(instr[startqpos + 1 .< endqpos], startqpos + 1).replace(‘"’, ‘''’)‘">’(.to_html(instr[outer_p .< i], outer_pos' outer_p))‘</spoiler>’)
+                  outfile.write(‘<spoiler title="’remove_comments(instr[startqpos + 1 .< endqpos], startqpos + 1).replace(‘"’, ‘''’)"\">\n"(.to_html(instr[outer_p .< i], outer_pos' outer_p))"</spoiler>\n")
                E
-                  outfile.write(‘<span class="spoiler_title" onclick="return spoiler2(this, event)">’remove_comments(instr[startqpos + 1 .< endqpos], startqpos + 1)‘<br /></span>’""‘<div class="spoiler_text" style="display: none">’(.to_html(instr[outer_p .< i], outer_pos' outer_p))"</div>\n")
+                  outfile.write(‘<span class="spoiler_title" onclick="return spoiler2(this, event)">’remove_comments(instr[startqpos + 1 .< endqpos], startqpos + 1)‘<br /></span>’"<div class=\"spoiler_text\" style=\"display: none\">\n"(.to_html(instr[outer_p .< i], outer_pos' outer_p))"</div>\n")
                I (next_char() == "\n" & !in_unordered_list & ordered_list_current_number == -1)
                   i++
                   writepos = i + 1
