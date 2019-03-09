@@ -519,9 +519,9 @@ public:
                     write_to_pos(prevci + 1, i + 1);
                     auto outer_p = endqpos + (instr[endqpos + 2] == u'\n' ? 3 : 2);
                     if (habr_html)
-                        outfile.write(u"<spoiler title=\""_S + remove_comments(instr[range_el(startqpos + 1, endqpos)], startqpos + 1).replace(u"\""_S, u"''"_S) + u"\">"_S + (to_html(instr[range_el(outer_p, i)], nullptr, outer_p)) + u"</spoiler>"_S);
+                        outfile.write(u"<spoiler title=\""_S + remove_comments(instr[range_el(startqpos + 1, endqpos)], startqpos + 1).replace(u"\""_S, u"''"_S) + u"\">\n"_S + (to_html(instr[range_el(outer_p, i)], nullptr, outer_p)) + u"</spoiler>\n"_S);
                     else
-                        outfile.write(u"<span class=\"spoiler_title\" onclick=\"return spoiler2(this, event)\">"_S + remove_comments(instr[range_el(startqpos + 1, endqpos)], startqpos + 1) + u"<br /></span>"_S + u"<div class=\"spoiler_text\" style=\"display: none\">"_S + (to_html(instr[range_el(outer_p, i)], nullptr, outer_p)) + u"</div>\n"_S);
+                        outfile.write(u"<span class=\"spoiler_title\" onclick=\"return spoiler2(this, event)\">"_S + remove_comments(instr[range_el(startqpos + 1, endqpos)], startqpos + 1) + u"<br /></span>"_S + u"<div class=\"spoiler_text\" style=\"display: none\">\n"_S + (to_html(instr[range_el(outer_p, i)], nullptr, outer_p)) + u"</div>\n"_S);
                     if ((next_char() == u'\n' && !in_unordered_list && ordered_list_current_number == -1)) {
                         i++;
                         writepos = i + 1;

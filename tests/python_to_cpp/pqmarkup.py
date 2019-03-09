@@ -427,10 +427,10 @@ class Converter:
                     write_to_pos(prevci + 1, i + 1)
                     outer_p = endqpos+(3 if instr[endqpos+2] == "\n" else 2) # проверка на == "\n" нужна, чтобы переход на новую строку/перевод строки после `{` игнорировался
                     if self.habr_html:
-                        outfile.write('<spoiler title="' + remove_comments(instr[startqpos+1:endqpos], startqpos+1).replace('"', "''") + '">' + self.to_html(instr[outer_p:i], outer_pos = outer_p) + '</spoiler>')
+                        outfile.write('<spoiler title="' + remove_comments(instr[startqpos+1:endqpos], startqpos+1).replace('"', "''") + '">\n' + self.to_html(instr[outer_p:i], outer_pos = outer_p) + "</spoiler>\n")
                     else:
                         outfile.write('<span class="spoiler_title" onclick="return spoiler2(this, event)">' + remove_comments(instr[startqpos+1:endqpos], startqpos+1) + '<br /></span>' # используется span, так как с div подчёркивание будет на весь экран
-                            + '<div class="spoiler_text" style="display: none">' + self.to_html(instr[outer_p:i], outer_pos = outer_p) + "</div>\n")
+                            + '<div class="spoiler_text" style="display: none">\n' + self.to_html(instr[outer_p:i], outer_pos = outer_p) + "</div>\n")
                     if (next_char() == "\n" # чтобы переход на новую строку/перевод строки после `}` игнорировался
                             and not in_unordered_list and ordered_list_current_number == -1): # если находимся внутри списка, то пропуска новой строки делать не нужно
                         i += 1
