@@ -345,6 +345,8 @@ class SymbolNode:
                         f_node = type_of(self.children[0])
                 elif func_name == 'Int':
                     func_name = 'to_int'
+                elif func_name == 'Int64':
+                    func_name = 'to_int64'
                 elif func_name == 'Float':
                     func_name = 'to_float'
                 elif func_name == 'Char' and self.children[2].token.category == Token.Category.STRING_LITERAL:
@@ -819,7 +821,7 @@ class ASTExpression(ASTNodeWithExpression):
         return ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
 cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'перем':'auto',
-                     'Int':'int', 'Float':'double', 'String':'String', 'Bool':'bool', 'Byte':'Byte',
+                     'Int':'int', 'Int64':'int64_t', 'Float':'double', 'String':'String', 'Bool':'bool', 'Byte':'Byte',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
                      'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict'}
 

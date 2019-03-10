@@ -602,15 +602,25 @@ inline Char operator ""_C(char16_t c)
 	return Char(c);
 }
 
-inline int to_int(const String &str)
+template <typename TInt> inline TInt to_int_t(const String &str)
 {
-	int res = 0, sign = 1;
+	TInt res = 0, sign = 1;
 	const char16_t *s = str.c_str();
 	while (*s && (*s == u' ' || *s == u'\t')) s++; // skip whitespace
 	if (*s == u'-') sign=-1, s++; else if (*s == u'+') s++;
 	for (; Char(*s).is_digit(); s++)
 		res = res * 10 + (*s - u'0');
 	return res * sign;
+}
+
+inline int to_int(const String &str)
+{
+	return to_int_t<int>(str);
+}
+
+inline int64_t to_int64(const String &str)
+{
+	return to_int_t<int64_t>(str);
 }
 
 inline int to_int(Char ch)
@@ -621,6 +631,16 @@ inline int to_int(Char ch)
 inline int to_int(double d)
 {
 	return (int)d;
+}
+
+inline int64_t to_int64(double d)
+{
+	return (int64_t)d;
+}
+
+inline int64_t to_int64(int i)
+{
+	return i;
 }
 
 inline double to_float(const String &str)
