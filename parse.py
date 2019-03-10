@@ -2384,6 +2384,7 @@ string_scope.add_name('split', ASTFunctionDefinition([('delim', '', 'String'), (
 string_scope.add_name('rtrim', ASTFunctionDefinition([('s', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
 string_scope.add_name('ltrim', ASTFunctionDefinition([('s', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
 string_scope.add_name('trim', ASTFunctionDefinition([('s', '', 'String')]))
+string_scope.add_name('count', ASTFunctionDefinition([('s', '', 'String')]))
 string_scope.add_name('replace', ASTFunctionDefinition([('old', '', 'String'), ('new', '', 'String')]))
 string_scope.add_name('zfill', ASTFunctionDefinition([('width', '', 'Int')]))
 string_scope.add_name('format', ASTFunctionDefinition([('arg', token_to_str('N', Token.Category.CONSTANT), '')] * 32))

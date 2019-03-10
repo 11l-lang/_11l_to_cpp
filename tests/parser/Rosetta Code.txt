@@ -761,3 +761,17 @@ struct CodeBlock1
         print(u"2144: "_S + get_prime_factors(2144));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Count_occurrences_of_a_substring
+print(‘the three truths’.count(‘th’))
+print(‘ababababab’.count(‘abab’))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"the three truths"_S.count(u"th"_S));
+        print(u"ababababab"_S.count(u"abab"_S));
+    }
+} code_block_1;
