@@ -643,6 +643,11 @@ inline int64_t to_int64(int i)
 	return i;
 }
 
+inline uint32_t to_uint32(int i)
+{
+	return i;
+}
+
 inline double to_float(const String &str)
 {
 	return atof(std::string(str.cbegin(), str.cend()).c_str());

@@ -3320,3 +3320,80 @@ struct CodeBlock1
         print(changes(100000, create_array({1, 5, 10, 25, 50, 100})));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/CRC-32#C
+UInt32 = int
+
+crc_table = [0] * 256
+for i in range(256):
+    rem : UInt32 = i
+    for j in range(8):
+        if rem & 1:
+            rem >>= 1
+            rem ^= 0xEDB88320
+        else:
+            rem >>= 1
+    crc_table[i] = rem
+ 
+def crc32(buf, crc = UInt32(0)):
+    crc ^= 0xFFFFFFFF
+    for k in buf:
+        crc = (crc >> 8) ^ crc_table[(crc & 0xFF) ^ ord(k)]
+    return crc ^ 0xFFFFFFFF
+ 
+print(hex(crc32('The quick brown fox jumps over the lazy dog'))[2:].upper())
+===
+V crc_table = [0] * 256
+L(i) 0.<256
+   UInt32 rem = i
+   L(j) 0.<8
+      I rem [&] 1
+         rem >>= 1
+         rem (+)= EDB8'8320
+      E
+         rem >>= 1
+   crc_table[i] = rem
+
+F crc32(buf, =crc = UInt32(0))
+   crc (+)= FFFF'FFFF
+   L(k) buf
+      crc = (crc >> 8) (+) :crc_table[(crc [&] 00'FF) (+) k.code]
+   R crc (+) FFFF'FFFF
+print(hex(crc32(‘The quick brown fox jumps over the lazy dog’)))
+===
+auto crc_table = create_array({0}) * 256;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(0, 256)) {
+            uint32_t rem = i;
+            for (auto j : range_el(0, 8))
+                if (rem & 1) {
+                    rem >>= 1;
+                    rem ^= 0xEDB8'8320;
+                }
+                else
+                    rem >>= 1;
+            crc_table.set(i, rem);
+        }
+    }
+} code_block_1;
+
+template <typename T1, typename T2 = decltype(to_uint32(0))> auto crc32(const T1 &buf, T2 crc = to_uint32(0))
+{
+    crc ^= 0xFFFF'FFFF;
+    for (auto k : buf)
+        crc = (crc >> 8) ^ ::crc_table[(crc & 0x00'FF) ^ k.code];
+    return crc ^ 0xFFFF'FFFF;
+}
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(hex(crc32(u"The quick brown fox jumps over the lazy dog"_S)));
+    }
+} code_block_2;
