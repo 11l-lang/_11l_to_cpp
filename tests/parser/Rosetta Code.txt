@@ -775,3 +775,22 @@ struct CodeBlock1
         print(u"ababababab"_S.count(u"abab"_S));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Create_a_two-dimensional_array_at_runtime#Python
+V width = 3
+V height = 5
+V myarray = [[0] * width] * height
+print(myarray[height-1][width-1])
+===
+auto width = 3;
+auto height = 5;
+auto myarray = create_array({create_array({0}) * width}) * height;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(myarray[height - 1][width - 1]);
+    }
+} code_block_1;
