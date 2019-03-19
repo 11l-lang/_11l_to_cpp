@@ -230,9 +230,9 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto a : aa)
-            for (auto b : bb)
-                for (auto c : cc)
+        for (auto &&a : aa)
+            for (auto &&b : bb)
+                for (auto &&c : cc)
                     nout.append(a + b + c);
         print(multiloop(aa, bb, [](const auto &a, const auto &b){return a + b;}) == create_array({u"1x"_S, u"1y"_S, u"2x"_S, u"2y"_S}));
         print(multiloop_filtered(aa, bb, [](const auto &a, const auto &b){return a + b != u"1x";}, [](const auto &a, const auto &b){return a + b;}) == create_array({u"1y"_S, u"2x"_S, u"2y"_S}));

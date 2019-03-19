@@ -47,7 +47,7 @@ template <typename T1, typename T2> auto highlight(const T1 &lang, const T2 &sou
     if (lang == u"Python") {
         try
         {
-            for (auto token : python_to_11l::tokenizer::tokenize(source, nullptr, &comments) + create_array({python_to_11l::tokenizer::Token(source.len(), source.len(), python_to_11l::tokenizer::Token::Category::STATEMENT_SEPARATOR)})) {
+            for (auto &&token : python_to_11l::tokenizer::tokenize(source, nullptr, &comments) + create_array({python_to_11l::tokenizer::Token(source.len(), source.len(), python_to_11l::tokenizer::Token::Category::STATEMENT_SEPARATOR)})) {
                 while (comments.len() && _get<0>(_get<0>(comments)) < token.start) {
                     res += html_escape(source[range_el(writepos, _get<0>(_get<0>(comments)))]);
                     writepos = _get<1>(_get<0>(comments));
@@ -73,7 +73,7 @@ template <typename T1, typename T2> auto highlight(const T1 &lang, const T2 &sou
         assert(lang == u"11l");
         try
         {
-            for (auto token : _11l_to_cpp::tokenizer::tokenize(source, nullptr, nullptr, &comments) + create_array({_11l_to_cpp::tokenizer::Token(source.len(), source.len(), _11l_to_cpp::tokenizer::Token::Category::STATEMENT_SEPARATOR)})) {
+            for (auto &&token : _11l_to_cpp::tokenizer::tokenize(source, nullptr, nullptr, &comments) + create_array({_11l_to_cpp::tokenizer::Token(source.len(), source.len(), _11l_to_cpp::tokenizer::Token::Category::STATEMENT_SEPARATOR)})) {
                 while (comments.len() && _get<0>(_get<0>(comments)) < token.start) {
                     res += html_escape(source[range_el(writepos, _get<0>(_get<0>(comments)))]);
                     writepos = _get<1>(_get<0>(comments));

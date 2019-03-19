@@ -138,7 +138,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
         else {
             expected_an_indented_block = ch == u':';
             auto operator_or_delimiter = u""_S;
-            for (auto op : tokenizer::operators_and_delimiters)
+            for (auto &&op : tokenizer::operators_and_delimiters)
                 if (source[range_el(i, i + op.len())] == op) {
                     operator_or_delimiter = op;
                     break;

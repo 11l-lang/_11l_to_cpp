@@ -517,28 +517,28 @@ F process_files2()
 ===
 template <typename T1> auto process_files(const T1 &exclude_dir)
 {
-    for (auto _fname : fs::walk_dir(u"."_S, [&exclude_dir](const auto &d){return _get<0>(d) != u'.' && d != exclude_dir;}, false)) {
+    for (auto &&_fname : fs::walk_dir(u"."_S, [&exclude_dir](const auto &d){return _get<0>(d) != u'.' && d != exclude_dir;}, false)) {
         auto root = fs::path::dir_name(_fname);
         Array<String> dirs, files;
         if (fs::is_directory(_fname))
             dirs.append(fs::path::base_name(_fname));
         else
             files.append(fs::path::base_name(_fname));
-        for (auto name : files)
+        for (auto &&name : files)
             print(fs::path::join(root, name));
     }
 }
 
 auto process_files2()
 {
-    for (auto _fname : fs::walk_dir(u"."_S, nullptr, false)) {
+    for (auto &&_fname : fs::walk_dir(u"."_S, nullptr, false)) {
         auto root = fs::path::dir_name(_fname);
         Array<String> dirs, files;
         if (fs::is_directory(_fname))
             dirs.append(fs::path::base_name(_fname));
         else
             files.append(fs::path::base_name(_fname));
-        for (auto name : files)
+        for (auto &&name : files)
             print(fs::path::join(root, name));
     }
 }
@@ -654,7 +654,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto line : File(u"1.py"_S).read_lines(true))
+        for (auto &&line : File(u"1.py"_S).read_lines(true))
             print(line);
     }
 } code_block_1;
@@ -681,13 +681,13 @@ struct CodeBlock1
     CodeBlock1()
     {
         {int Lindex = 0;
-        for (auto item : items) {
+        for (auto &&item : items) {
             auto index = Lindex;
             print(String(index) + u". "_S + item);
             Lindex++;
         }}
         {int Lindex = 0;
-        for (auto item : items) {
+        for (auto &&item : items) {
             auto index = Lindex + 1;
             print(String(index) + u". "_S + item);
             Lindex++;

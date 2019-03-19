@@ -93,7 +93,7 @@ print(rangeexpand(‘-6,-3--1,3-5,7-11,14,15,17-20’))
 template <typename T1> auto rangeexpand(const T1 &txt)
 {
     Array<int> lst;
-    for (auto r : txt.split(u","_S))
+    for (auto &&r : txt.split(u","_S))
         if (in(u'-'_C, r[range_ei(1)])) {
             auto rr = r[range_ei(1)].split(u"-"_S, 1 + 1);
             lst.append(range_el(to_int(_get<0>(r) + _get<0>(rr)), to_int(_get<1>(rr)) + 1));
@@ -219,7 +219,7 @@ template <typename T1> auto bf(const T1 &source)
     Dict<int, int> loop_ptrs;
     Array<int> loop_stack;
     {int Lindex = 0;
-    for (auto opcode : source) {
+    for (auto &&opcode : source) {
         auto ptr = Lindex;
         if (opcode == u'[')
             loop_stack.append(ptr);
@@ -531,7 +531,7 @@ template <typename T1> auto compress(const T1 &uncompressed)
     auto dictionary = create_dict(range_el(0, dict_size).map([](const auto &i){return make_tuple(String(Char(i)), i);}));
     auto w = u""_S;
     Array<int> result;
-    for (auto c : uncompressed) {
+    for (auto &&c : uncompressed) {
         auto wc = w + c;
         if (in(wc, dictionary))
             w = wc;
@@ -554,7 +554,7 @@ auto decompress(Array<int> &compressed)
     auto result = u""_S;
     auto w = String(Char(compressed.pop(0)));
     result += w;
-    for (auto k : compressed) {
+    for (auto &&k : compressed) {
         auto entry = u""_S;
         if (in(k, dictionary))
             entry = dictionary[k];
@@ -662,9 +662,9 @@ template <typename T1> auto can_make_word(const T1 &word)
     if (word == u"")
         return false;
     auto blocks_remaining = u"BO XK DQ CP NA GT RE TG QD FS JW HU VI AN OB ER FS LY PC ZM"_S.split(u" "_S);
-    for (auto ch : word.uppercase())
+    for (auto &&ch : word.uppercase())
         {bool was_break = false;
-        for (auto block : blocks_remaining) {
+        for (auto &&block : blocks_remaining) {
             if (in(ch, block)) {
                 blocks_remaining.remove(block);
                 was_break = true;
@@ -818,9 +818,9 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto line : parts)
+        for (auto &&line : parts)
             {int Lindex = 0;
-            for (auto word : line) {
+            for (auto &&word : line) {
                 auto i = Lindex;
                 max_widths.set(i, max(max_widths[i], word.len()));
                 Lindex++;
@@ -836,12 +836,12 @@ struct CodeBlock2
     CodeBlock2()
     {
         {int Lindex = 0;
-        for (auto justify : create_array({ljust, centr, rjust})) {
+        for (auto &&justify : create_array({ljust, centr, rjust})) {
             auto i = Lindex;
             print(create_array({u"Left"_S, u"Center"_S, u"Right"_S})[i] + u" column-aligned output:"_S);
-            for (auto line : parts) {
+            for (auto &&line : parts) {
                 {int Lindex = 0;
-                for (auto word : line) {
+                for (auto &&word : line) {
                     auto j = Lindex;
                     print(justify(word, max_widths[j]), u" "_S);
                     Lindex++;
@@ -971,7 +971,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto word : File(u"unixdict.txt"_S).read().split(u"\n"_S))
+        for (auto &&word : File(u"unixdict.txt"_S).read().split(u"\n"_S))
             anagram[sorted(word).join(u""_S)].append(word);
     }
 } code_block_1;
@@ -981,7 +981,7 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        for (auto ana : anagram.values())
+        for (auto &&ana : anagram.values())
             if (ana.len() == count)
                 print(ana);
     }
@@ -1053,13 +1053,13 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto word : File(u"unixdict.txt"_S).read().split(u"\n"_S)) {
+        for (auto &&word : File(u"unixdict.txt"_S).read().split(u"\n"_S)) {
             auto a = sorted(word).join(u""_S);
             if (!in(a, anagram))
                 anagram.set(a, create_array({word}));
             else
                 {bool was_break = false;
-                for (auto ana : anagram[a]) {
+                for (auto &&ana : anagram[a]) {
                     if (is_not_deranged(ana, word)) {
                         was_break = true;
                         break;
@@ -1071,7 +1071,7 @@ struct CodeBlock1
                 }
                 }
         }
-        for (auto ana : anagram.values())
+        for (auto &&ana : anagram.values())
             if (ana.len() > 1 && _get<0>(ana).len() == count)
                 print(ana);
     }
@@ -1635,7 +1635,7 @@ struct CodeBlock2
     {
         symbol(u"("_S).nud = nud_parens;
         symbol(u")"_S);
-        for (auto expr_str : create_array({u"-2 / 2 + 4 + 3 * 2"_S, u"2 * (3 + (4 * 5 + (6 * 7) * 8) - 9) * 10"_S}))
+        for (auto &&expr_str : create_array({u"-2 / 2 + 4 + 3 * 2"_S, u"2 * (3 + (4 * 5 + (6 * 7) * 8) - 9) * 10"_S}))
             print(expr_str + u" = "_S + String(parse(expr_str)->eval()));
     }
 } code_block_2;
@@ -1833,9 +1833,9 @@ struct CodeBlock1
     {
         for (auto &&[key, value] : d)
             print(key + u" = "_S + value);
-        for (auto key : d.keys())
+        for (auto &&key : d.keys())
             print(key);
-        for (auto value : d.values())
+        for (auto &&value : d.values())
             print(value);
     }
 } code_block_1;
@@ -2046,7 +2046,7 @@ print(modes([1, 1, 2, 4, 4]))
 template <typename T1> auto modes(const T1 &values)
 {
     auto count = DefaultDict<int, int>();
-    for (auto v : values)
+    for (auto &&v : values)
         count[v]++;
     auto best = max(count.values());
     return count.filter([&best](const auto &kv){return _get<1>(kv) == best;}).map([](const auto &kv){return _get<0>(kv);});
@@ -2172,7 +2172,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto e : create_array({1, 2, 3, 4, 5, 5, 4, 3, 2, 1}))
+        for (auto &&e : create_array({1, 2, 3, 4, 5, 5, 4, 3, 2, 1}))
             print(u"Added #.0, sma(3) = #.6, sma(5) = #.6"_S.format(e, sma3.add(e), sma5.add(e)));
     }
 } code_block_1;
@@ -2234,7 +2234,7 @@ template <typename T1> auto gen(const T1 &n)
 template <typename T1> auto is_balanced(const T1 &s)
 {
     auto nesting_level = 0;
-    for (auto c : s)
+    for (auto &&c : s)
         switch (c)
         {
         case u'[':
@@ -2335,7 +2335,7 @@ template <typename T1> auto benford(const T1 &seq)
 {
     auto freqs = create_array({make_tuple(0.0, 0.0)}) * 9;
     auto seq_len = 0;
-    for (auto d : seq)
+    for (auto &&d : seq)
         if (d != 0) {
             auto i = _get<0>(String(d)).code - u'1'_C.code;
             freqs.set(i, make_tuple(_get<0>(freqs[i]), _get<1>(freqs[i]) + 1));
@@ -2352,7 +2352,7 @@ struct CodeBlock1
     {
         print(u"#9 #9 #9"_S.format(u"Actual"_S, u"Expected"_S, u"Deviation"_S));
         {int Lindex = 0;
-        for (auto p : benford(get_fibs())) {
+        for (auto &&p : benford(get_fibs())) {
             auto i = Lindex;
             print(u"#.0: #2.2% | #2.2% | #0.4%"_S.format(i + 1, _get<1>(p) * 100, _get<0>(p) * 100, abs(_get<1>(p) - _get<0>(p)) * 100));
             Lindex++;
@@ -2608,7 +2608,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto s : uR"(~/{Downloads,Pictures}/*.{jpg,gif,png}
+        for (auto &&s : uR"(~/{Downloads,Pictures}/*.{jpg,gif,png}
 It{{em,alic}iz,erat}e{d,}, please.
 {,{,gotta have{ ,\, again\, }}more }cowbell!
 {}} some }{,{\\{ edge, edge} \,}{ cases, {here} \\\\\})"_S.split(u"\n"_S))
@@ -2787,8 +2787,8 @@ template <typename T1, typename T2> auto cart_prod(const T1 &a, const T2 &b)
 {
     auto p = create_array({make_tuple(0, 0)}) * (a.len() * b.len());
     auto i = 0;
-    for (auto aa : a)
-        for (auto bb : b) {
+    for (auto &&aa : a)
+        for (auto &&bb : b) {
             p.set(i, make_tuple(aa, bb));
             i++;
         }
@@ -2824,8 +2824,8 @@ F cart_prod(a, b)
 template <typename T1, typename T2> auto cart_prod(const T1 &a, const T2 &b)
 {
     Array<Tuple<int, int>> p;
-    for (auto i : a)
-        for (auto j : b)
+    for (auto &&i : a)
+        for (auto &&j : b)
             p.append(make_tuple(i, j));
     return p;
 }
@@ -3088,7 +3088,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto strings_s : create_array({u"AA AA AA AA"_S, u"AA ACB BB CC"_S})) {
+        for (auto &&strings_s : create_array({u"AA AA AA AA"_S, u"AA ACB BB CC"_S})) {
             auto strings = strings_s.split(u" "_S);
             print(strings);
             print(all(zip(strings, strings[range_ei(1)]).map([](const auto &a){return _get<0>(a) == _get<1>(a);})));
@@ -3171,7 +3171,7 @@ print(duration(6000000))
 template <typename T1> auto duration(T1 sec)
 {
     Array<int> t;
-    for (auto dm : create_array({60, 60, 24, 7})) {
+    for (auto &&dm : create_array({60, 60, 24, 7})) {
         int m;
         std::tie(sec, m) = make_tuple(int(sec)/int(dm), mod(sec, dm));
         t.insert(0, m);
@@ -3306,7 +3306,7 @@ template <typename T1, typename T2> auto changes(const T1 &amount, const T2 &coi
 {
     auto ways = create_array({to_int64(0)}) * (amount + 1);
     _set<0>(ways, 1);
-    for (auto coin : coins)
+    for (auto &&coin : coins)
         for (auto j : range_el(coin, amount + 1))
             ways[j] += ways[j - coin];
     return ways[amount];
@@ -3385,7 +3385,7 @@ struct CodeBlock1
 template <typename T1, typename T2 = decltype(to_uint32(0))> auto crc32(const T1 &buf, T2 crc = to_uint32(0))
 {
     crc ^= 0xFFFF'FFFF;
-    for (auto k : buf)
+    for (auto &&k : buf)
         crc = (crc >> 8) ^ ::crc_table[(crc & 0x00'FF) ^ k.code];
     return crc ^ 0xFFFF'FFFF;
 }

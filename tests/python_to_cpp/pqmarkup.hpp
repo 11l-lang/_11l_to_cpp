@@ -694,9 +694,9 @@ public:
                     if ((prevci == 0 || instr[prevci - 1] == u'\n' || (prevci - 3 >= 0 && instr[range_el(prevci - 3, prevci)] == u"]]]" && instr[range_el(0, 3)] == u"[[[" && find_ending_sq_bracket(instr, 0) == prevci - 1)))
                         is_inline = false;
                     outfile.write(u"<table"_S + (u" style=\"display: inline\""_S * is_inline) + u">\n"_S);
-                    for (auto row : table) {
+                    for (auto &&row : table) {
                         outfile.write(u"<tr>"_S);
-                        for (auto cell : row)
+                        for (auto &&cell : row)
                             if (cell.attrs != u"")
                                 outfile.write(u"<"_S + cell.attrs + u">"_S + cell.text + u"</"_S + cell.attrs[range_el(0, 2)] + u">"_S);
                         outfile.write(u"</tr>\n"_S);
@@ -740,7 +740,7 @@ public:
                         }
                         if (str_in_b[range_el(0, 1)] == u'#') {
                             auto new_str_in_b = u""_S;
-                            for (auto c : str_in_b) {
+                            for (auto &&c : str_in_b) {
                                 auto cc = _get<0>(([&](const auto &a){return a == u'а' ? u"A"_S : a == u'б' ? u"B"_S : a == u'с' ? u"C"_S : a == u'д' ? u"D"_S : a == u'е' ? u"E"_S : a == u'ф' ? u"F"_S : c;}(c.lowercase())));
                                 new_str_in_b += c.is_lowercase() ? cc.lowercase() : cc;
                             }
@@ -748,7 +748,7 @@ public:
                         }
                         else if (in(str_in_b.len(), make_tuple(1, 3)) && str_in_b.is_digit()) {
                             auto new_str = u"#"_S;
-                            for (auto ii : str_in_b.len() == 3 ? create_array({0, 1, 2}) : create_array({0, 0, 0}))
+                            for (auto &&ii : str_in_b.len() == 3 ? create_array({0, 1, 2}) : create_array({0, 0, 0}))
                                 new_str += hex(int((to_int(str_in_b[ii]) * 0x00'FF + 4))/int(8)).zfill(2);
                             str_in_b = new_str;
                         }
