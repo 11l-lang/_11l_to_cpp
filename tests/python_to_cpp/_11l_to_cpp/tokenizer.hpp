@@ -310,7 +310,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                 return in(ch, range_ee(u'0'_C, u'9'_C)) || in(ch, range_ee(u'A'_C, u'F'_C)) || in(ch, range_ee(u'a'_C, u'f'_C)) || in(ch, u"абсдефАБСДЕФ"_S);
             };
             auto operator_s = u""_S;
-            for (auto op : tokenizer::sorted_operators)
+            for (auto &&op : tokenizer::sorted_operators)
                 if (source[range_el(i, i + op.len())] == op) {
                     operator_s = op;
                     break;

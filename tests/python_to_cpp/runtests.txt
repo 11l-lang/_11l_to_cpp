@@ -693,10 +693,10 @@ template <typename T1, typename T2, typename T3 = decltype(false), typename T4 =
         str2 = String(str2);
         print(u"FAILED!"_S);
         if (!::kdiff_showed) {
-            for (auto envvar : create_array({u"ProgramFiles"_S, u"ProgramFiles(x86)"_S, u"ProgramW6432"_S}))
+            for (auto &&envvar : create_array({u"ProgramFiles"_S, u"ProgramFiles(x86)"_S, u"ProgramW6432"_S}))
                 os::environ[u"PATH"_S] += os::env_path_sep + os::getenv(envvar, u""_S) + uR"(\KDiff3)"_S;
             auto command = u"kdiff3"_S;
-            for (auto file : create_array({make_tuple(u"wrong"_S, str1), make_tuple(u"right"_S, str2)})) {
+            for (auto &&file : create_array({make_tuple(u"wrong"_S, str1), make_tuple(u"right"_S, str2)})) {
                 auto full_fname = fs::path::join(fs::get_temp_dir(), _get<0>(file));
                 command += u" \""_S + full_fname + u"\""_S;
                 File(full_fname, u"w"_S, u"utf-8-sig"_S).write(_get<1>(file));
@@ -985,14 +985,14 @@ struct CodeBlock2
         assert(was_error);
         test_id++;
         print(u"Test "_S + String(test_id) + u". Checking source files for unallowed characters..."_S);
-        for (auto _fname : fs::walk_dir(u"."_S, [](const auto &d){return _get<0>(d) != u'.';}, false)) {
+        for (auto &&_fname : fs::walk_dir(u"."_S, [](const auto &d){return _get<0>(d) != u'.';}, false)) {
             auto root = fs::path::dir_name(_fname);
             Array<String> dirs, files;
             if (fs::is_directory(_fname))
                 dirs.append(fs::path::base_name(_fname));
             else
                 files.append(fs::path::base_name(_fname));
-            for (auto name : files)
+            for (auto &&name : files)
                 if (name.ends_with(make_tuple(u".py"_S, u".txt"_S))) {
                     auto file_bytes = File(fs::path::join(root, name)).read_bytes();
                     if (in(u'\r'_C.code, file_bytes) || in(u'\t'_C.code, file_bytes)) {

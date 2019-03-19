@@ -526,7 +526,7 @@ F f()
 auto f()
 {
     {bool was_break = false;
-    for (auto n : create_array({1, 2, 3, 4})) {
+    for (auto &&n : create_array({1, 2, 3, 4})) {
         if (n == 30) {
             was_break = true;
             break;
@@ -571,7 +571,7 @@ F f()
 auto f()
 {
     {int Lindex = 0;
-    for (auto v : create_array({10, 20, 30})) {
+    for (auto &&v : create_array({10, 20, 30})) {
         print(Lindex + u": "_S + v);
         Lindex++;
     }}

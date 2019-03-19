@@ -106,7 +106,7 @@ template <typename T1, typename T2, typename T3 = decltype(u""_S)> Array<String>
     if (options.empty())
         return Array<String>();
 
-    for (auto opt : _get<0>(options)) {
+    for (auto &&opt : _get<0>(options)) {
         if (prev != u"" && !comp(prev, opt))
             continue;
         if (options.len() == 1)
@@ -235,7 +235,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto n : create_array({0, 5, 50, 9000}))
+        for (auto &&n : create_array({0, 5, 50, 9000}))
             print(u"#4 = #."_S.format(n, bin(n)));
     }
 } code_block_1;
@@ -304,7 +304,7 @@ template <typename T1, typename T2, typename T3 = decltype(false)> auto caesar(c
         key = 26 - key;
     auto r = u" "_S * string.len();
     {int Lindex = 0;
-    for (auto c : string) {
+    for (auto &&c : string) {
         r.set(Lindex, [&](const auto &a){return in(a, range_ee(u'a'_C, u'z'_C)) ? Char(mod((c.code - u'a'_C.code + key), 26) + u'a'_C.code) : in(a, range_ee(u'A'_C, u'Z'_C)) ? Char(mod((c.code - u'A'_C.code + key), 26) + u'A'_C.code) : c;}(c));
         Lindex++;
     }}
@@ -441,9 +441,9 @@ template <typename T1, typename T2> auto comb(const T1 &arr, const T2 &k)
     }
     {int Lindex = 0;
 
-    for (auto x : arr) {
+    for (auto &&x : arr) {
         auto i = Lindex;
-        for (auto suffix : comb(arr[range_ei(i + 1)], k - 1))
+        for (auto &&suffix : comb(arr[range_ei(i + 1)], k - 1))
             result.append(x + suffix);
         Lindex++;
     }}
@@ -792,5 +792,102 @@ struct CodeBlock1
     CodeBlock1()
     {
         print(myarray[height - 1][width - 1]);
+    }
+} code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Benford%27s_law#D
+F get_fibs()
+   V a = 1.0
+   V b = 1.0
+   [Float] r
+   L 1000
+      r [+]= a
+      (a, b) = (b, a + b)
+   R r
+
+F benford(seq)
+   V freqs = [(0.0, 0.0)] * 9
+   V seq_len = 0
+   L(d) seq
+      I d != 0
+         freqs[String(d)[0].code - ‘1’.code][1]++
+         seq_len++
+
+   L(&f) freqs
+      f = (log10(1.0 + 1.0 / (L.index + 1)), f[1] / seq_len)
+   R freqs
+
+print(‘#9 #9 #9’.format(‘Actual’, ‘Expected’, ‘Deviation’))
+
+L(p) benford(get_fibs())
+   print(‘#.: #2.2% | #2.2% | #0.4%’.format(L.index + 1, p[1] * 100, p[0] * 100, abs(p[1] - p[0]) * 100))
+===
+auto get_fibs()
+{
+    auto a = 1.0;
+    auto b = 1.0;
+    Array<double> r;
+    for (int Lindex = 0; Lindex < 1000; Lindex++) {
+        r.append(a);
+        std::tie(a, b) = make_tuple(b, a + b);
+    }
+    return r;
+}
+
+template <typename T1> auto benford(const T1 &seq)
+{
+    auto freqs = create_array({make_tuple(0.0, 0.0)}) * 9;
+    auto seq_len = 0;
+    for (auto &&d : seq)
+        if (d != 0) {
+            _get<1>(freqs[_get<0>(String(d)).code - u'1'_C.code])++;
+            seq_len++;
+        }
+    {int Lindex = 0;
+
+    for (auto &f : freqs) {
+        f = make_tuple(log10(1.0 + 1.0 / (Lindex + 1)), _get<1>(f) / seq_len);
+        Lindex++;
+    }}
+    return freqs;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"#9 #9 #9"_S.format(u"Actual"_S, u"Expected"_S, u"Deviation"_S));
+        {int Lindex = 0;
+
+        for (auto &&p : benford(get_fibs())) {
+            print(u"#.: #2.2% | #2.2% | #0.4%"_S.format(Lindex + 1, _get<1>(p) * 100, _get<0>(p) * 100, abs(_get<1>(p) - _get<0>(p)) * 100));
+            Lindex++;
+        }}
+    }
+} code_block_1;
+
+
+// https://www.rosettacode.org/wiki/CSV_data_manipulation#Nim
+L(=line) File(‘data.csv’).read_lines()
+   I L.index == 0
+      line ‘’= ‘,SUM’
+   E
+      line ‘’= ‘,’sum(line.split(‘,’).map(i -> Int(i)))
+   print(line)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {int Lindex = 0;
+        for (auto line : File(u"data.csv"_S).read_lines()) {
+            if (Lindex == 0)
+                line += u",SUM"_S;
+            else
+                line += u","_S + sum(line.split(u","_S).map([](const auto &i){return to_int(i);}));
+            print(line);
+            Lindex++;
+        }}
     }
 } code_block_1;
