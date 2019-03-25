@@ -381,8 +381,8 @@ class SymbolNode:
                         if type(f_node) == ASTLoop: # for `L(justify) [(s, w) -> ...]...justify(...)`
                             f_node = None
                         else:
-                            assert(type(f_node) in (ASTFunctionDefinition, ASTTypeDefinition) or (type(f_node) in (ASTVariableInitialization, ASTVariableDeclaration) and f_node.function_pointer)
-                                                                                              or (type(f_node) ==  ASTVariableInitialization and f_node.expression.symbol.id == '->'))
+                            #assert(type(f_node) in (ASTFunctionDefinition, ASTTypeDefinition) or (type(f_node) in (ASTVariableInitialization, ASTVariableDeclaration) and f_node.function_pointer)
+                            #                                                                  or (type(f_node) ==  ASTVariableInitialization and f_node.expression.symbol.id == '->'))
                             if type(f_node) == ASTTypeDefinition:
                                 if f_node.has_virtual_functions:
                                     func_name = 'std::make_unique<' + func_name + '>'
