@@ -891,3 +891,44 @@ struct CodeBlock1
         }}
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/CSV_to_HTML_translation#C
+V input_csv = ‘Character,Speech
+The multitude,The messiah! Show us the messiah!
+Brians mother,<angry>Now you listen here! He's not the messiah; he's a very naughty boy! Now go away!</angry>
+The multitude,Who are you?
+Brians mother,I'm his mother; that's who!
+The multitude,Behold his mother! Behold his mother!’
+
+print("<table>\n<tr><td>", end' ‘’)
+
+L(c) input_csv
+   print(S c {
+            "\n"{"</td></tr>\n<tr><td>"}
+            ‘,’ {‘</td><td>’}
+            ‘<’ {‘&lt;’}
+            ‘>’ {‘&gt;’}
+            ‘&’ {‘&amp;’}
+            E   {c}
+   }, end' ‘’)
+
+print("</td></tr>\n</table>")
+===
+auto input_csv = uR"(Character,Speech
+The multitude,The messiah! Show us the messiah!
+Brians mother,<angry>Now you listen here! He's not the messiah; he's a very naughty boy! Now go away!</angry>
+The multitude,Who are you?
+Brians mother,I'm his mother; that's who!
+The multitude,Behold his mother! Behold his mother!)"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"<table>\n<tr><td>"_S, u""_S);
+        for (auto &&c : input_csv)
+            print([&](const auto &a){return a == u'\n' ? u"</td></tr>\n<tr><td>"_S : a == u',' ? u"</td><td>"_S : a == u'<' ? u"&lt;"_S : a == u'>' ? u"&gt;"_S : a == u'&' ? u"&amp;"_S : c;}(c), u""_S);
+        print(u"</td></tr>\n</table>"_S);
+    }
+} code_block_1;

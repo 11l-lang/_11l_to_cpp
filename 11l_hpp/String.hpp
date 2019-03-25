@@ -86,7 +86,7 @@ public:
 	{
 		if (!isfinite(num)) {clear(); return;}
 
-		if (fabs(num) > 1e9 || fabs(num) < 1e-6)
+		if (fabs(num) > 1e9 || (fabs(num) < 1e-6 && num != 0))
 		{
 			double exponent = floor(log10(fabs(num)));
 			num *= pow(.1, exponent);

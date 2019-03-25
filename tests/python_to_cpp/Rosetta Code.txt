@@ -3397,3 +3397,64 @@ struct CodeBlock2
         print(hex(crc32(u"The quick brown fox jumps over the lazy dog"_S)));
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Cumulative_standard_deviation#Python:_Using_a_class_instance
+import math
+
+class SD:
+    sum = 0.0
+    sum2 = 0.0
+    n = 0.0
+
+    def sd(self, x):
+        self.sum  += x
+        self.sum2 += x*x
+        self.n    += 1.0
+        return math.sqrt(self.sum2/self.n - self.sum**2 / self.n**2)
+
+sd_inst = SD()
+for value in [2,4,4,4,5,5,7,9]:
+    print(str(value) + ' ' + str(sd_inst.sd(value)))
+===
+//import math
+
+T SD
+   sum = 0.0
+   sum2 = 0.0
+   n = 0.0
+
+   F sd(x)
+      .sum += x
+      .sum2 += x * x
+      .n += 1.0
+      R sqrt(.sum2 / .n - .sum ^ 2 / .n ^ 2)
+V sd_inst = SD()
+L(value) [2, 4, 4, 4, 5, 5, 7, 9]
+   print(String(value)‘ ’String(sd_inst.sd(value)))
+===
+class SD
+{
+public:
+    decltype(0.0) sum = 0.0;
+    decltype(0.0) sum2 = 0.0;
+    decltype(0.0) n = 0.0;
+
+    template <typename T1> auto sd(const T1 &x)
+    {
+        sum += x;
+        sum2 += x * x;
+        n += 1.0;
+        return sqrt(sum2 / n - pow(sum, 2) / pow(n, 2));
+    }
+};
+auto sd_inst = SD();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&value : create_array({2, 4, 4, 4, 5, 5, 7, 9}))
+            print(String(value) + u" "_S + String(sd_inst.sd(value)));
+    }
+} code_block_1;
