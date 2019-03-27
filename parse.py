@@ -16,6 +16,8 @@ class Error(Exception):
 
 class Scope:
     parent : 'Scope'
+    node : 'ASTNode' = None
+
     class Id:
         type : str
         ast_nodes : List['ASTNodeWithChildren']
@@ -72,6 +74,17 @@ class Scope:
             if name in s.ids:
                 return True
             if s.is_function:
+                return False
+            s = s.parent
+            if s is None:
+                return False
+
+    def find_in_current_type_function(self, name):
+        s = self
+        while True:
+            if name in s.ids:
+                return True
+            if s.is_function and type(s.node) == ASTFunctionDefinition and type(s.node.parent) == ASTTypeDefinition:
                 return False
             s = s.parent
             if s is None:
@@ -568,7 +581,7 @@ class SymbolNode:
                 cts0 = self.children[0].token_str()
                 c1 = self.children[1].to_str()
                 if cts0 == '@':
-                    if self.scope.find_in_current_function(c1):
+                    if self.scope.find_in_current_type_function(c1):
                         return 'this->' + c1
                     else:
                         return c1
@@ -1781,6 +1794,7 @@ def parse_internal(this_node):
         prev_scope = scope
         scope = Scope(func_args)
         scope.parent = prev_scope
+        scope.node = node
         tokensn.scope = scope # можно избавиться от этой строки, если не делать вызов next_token() в advance_scope_begin()
         node.scope = scope
         parse_internal(node)

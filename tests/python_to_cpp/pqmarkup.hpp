@@ -35,28 +35,6 @@ public:
         this->ohd = ohd;
     }
 
-    template <typename T1> auto instr_pos_to_line_column(T1 pos)
-    {
-        pos += sum(to_html_called_inside_to_html_outer_pos_list);
-        auto line = 1;
-        auto line_start = -1;
-        auto t = 0;
-        while (t < pos) {
-            if (instr[t] == u'\r') {
-                if (t < pos - 1 && instr[t + 1] == u'\n')
-                    t++;
-                line++;
-                line_start = t;
-            }
-            else if (instr[t] == u'\n') {
-                line++;
-                line_start = t;
-            }
-            t++;
-        }
-        return make_tuple(line, pos - line_start, pos);
-    }
-
     template <typename T1, typename T3 = decltype(0)> String to_html(const T1 &instr, File* const outfilef = nullptr, const T3 &outer_pos = 0)
     {
         to_html_called_inside_to_html_outer_pos_list.append(outer_pos);
@@ -74,10 +52,20 @@ public:
         if (to_html_called_inside_to_html_outer_pos_list.len() == 1)
             this->instr = instr;
 
-        auto exit_with_error = [this](const auto &message, const auto &pos)
+        auto exit_with_error = [this](const auto &message, auto pos)
         {
-            auto p = instr_pos_to_line_column(pos);
-            throw Exception(message, _get<0>(p), _get<1>(p), _get<2>(p));
+            pos += sum(to_html_called_inside_to_html_outer_pos_list);
+            auto line = 1;
+            auto line_start = -1;
+            auto t = 0;
+            while (t < pos) {
+                if (this->instr[t] == u'\n') {
+                    line++;
+                    line_start = t;
+                }
+                t++;
+            }
+            throw Exception(message, line, pos - line_start, pos);
         };
         auto i = 0;
         auto next_char = [&i, &instr](const decltype(1) offset = 1)
