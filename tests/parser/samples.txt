@@ -940,3 +940,22 @@ private:
 public:
     int public_variable;
 };
+
+
+// Test that shows why `and type(s.node) == ASTFunctionDefinition` is needed
+T Converter
+   String instr
+
+   F to_html()
+      V f = () -> @.instr
+===
+class Converter
+{
+public:
+    String instr;
+
+    auto to_html()
+    {
+        auto f = [&](){return instr;};
+    }
+};
