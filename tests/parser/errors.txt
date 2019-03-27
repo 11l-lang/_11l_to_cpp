@@ -198,3 +198,12 @@ T.enum Category
 
 V c = Char(‘’)
            ^Error: Char can be constructed only from single character string literals
+
+
+T Converter
+   F f()
+      R 0
+
+   F to_html()
+      V f = () -> .f()
+                  ^Error: probably `@` is missing (before this dot)
