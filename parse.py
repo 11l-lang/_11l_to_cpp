@@ -342,15 +342,14 @@ class SymbolNode:
                         s = self.scope
                         while True:
                             if s.is_function:
-                                for id_ in s.parent.ids.values():
-                                    if type(id_.ast_nodes[0].parent) == ASTTypeDefinition:
-                                        fid = s.parent.ids.get(self.children[0].children[0].to_str())
-                                        if fid is None:
-                                            raise Error('call of undefined method `' + func_name + '`', self.children[0].children[0].token)
-                                        if len(fid.ast_nodes) > 1:
-                                            raise Error('methods\' overloading is not supported for now', self.children[0].children[0].token)
-                                        f_node = fid.ast_nodes[0]
-                                    break
+                                assert(type(s.node) == ASTFunctionDefinition)
+                                if type(s.node.parent) == ASTTypeDefinition:
+                                    fid = s.parent.ids.get(self.children[0].children[0].to_str())
+                                    if fid is None:
+                                        raise Error('call of undefined method `' + func_name + '`', self.children[0].children[0].token)
+                                    if len(fid.ast_nodes) > 1:
+                                        raise Error('methods\' overloading is not supported for now', self.children[0].children[0].token)
+                                    f_node = fid.ast_nodes[0]
                                 break
                             s = s.parent
                             assert(s)
