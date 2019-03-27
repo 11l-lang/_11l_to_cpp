@@ -23,23 +23,6 @@ T Converter
       .habr_html = habr_html
       .ohd = ohd
 
-   F instr_pos_to_line_column(=pos)
-      pos += sum(.to_html_called_inside_to_html_outer_pos_list)
-      V line = 1
-      V line_start = -1
-      V t = 0
-      L t < pos
-         I .instr[t] == "\r"
-            I t < pos - 1 & .instr[t + 1] == "\n"
-               t++
-            line++
-            line_start = t
-         E I .instr[t] == "\n"
-            line++
-            line_start = t
-         t++
-      R (line, pos - line_start, pos)
-
    F to_html(instr, File? outfilef = N, ', outer_pos = 0) -> String
       .to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
       [String] result
@@ -54,9 +37,17 @@ T Converter
       I .to_html_called_inside_to_html_outer_pos_list.len == 1
          .instr = instr
 
-      F exit_with_error(message, pos)
-         V p = @.instr_pos_to_line_column(pos)
-         X Exception(message, p[0], p[1], p[2])
+      F exit_with_error(message, =pos)
+         pos += sum(@.to_html_called_inside_to_html_outer_pos_list)
+         V line = 1
+         V line_start = -1
+         V t = 0
+         L t < pos
+            I @.instr[t] == "\n"
+               line++
+               line_start = t
+            t++
+         X Exception(message, line, pos - line_start, pos)
       V i = 0
       F next_char(offset = 1)
          R I @i + offset < @instr.len {@instr[@i + offset]} E Char("\0")

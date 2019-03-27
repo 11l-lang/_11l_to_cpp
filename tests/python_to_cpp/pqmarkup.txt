@@ -27,23 +27,6 @@ class Converter:
         self.habr_html = habr_html
         self.ohd = ohd
 
-    def instr_pos_to_line_column(self, pos):
-        pos += sum(self.to_html_called_inside_to_html_outer_pos_list)
-        line = 1
-        line_start = -1
-        t = 0
-        while t < pos:
-            if self.instr[t] == "\r":
-                if t < pos-1 and self.instr[t+1] == "\n":
-                    t += 1
-                line += 1
-                line_start = t
-            elif self.instr[t] == "\n":
-                line += 1
-                line_start = t
-            t += 1
-        return (line, pos - line_start, pos) # returning last `pos` is necessary because `pos` was modified above [in line `pos += sum(self.to_html_called_inside_to_html_outer_pos_list)`]
-
     def to_html(self, instr, outfilef : IO[str] = None, *, outer_pos = 0) -> str:
         self.to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
 
@@ -61,8 +44,16 @@ class Converter:
             self.instr = instr
 
         def exit_with_error(message, pos):
-            p = self.instr_pos_to_line_column(pos)
-            raise Exception(message, p[0], p[1], p[2])
+            pos += sum(self.to_html_called_inside_to_html_outer_pos_list)
+            line = 1
+            line_start = -1
+            t = 0
+            while t < pos:
+                if self.instr[t] == "\n":
+                    line += 1
+                    line_start = t
+                t += 1
+            raise Exception(message, line, pos - line_start, pos)
 
         i = 0
         def next_char(offset = 1):
@@ -952,23 +943,6 @@ T Converter
       .habr_html = habr_html
       .ohd = ohd
 
-   F instr_pos_to_line_column(=pos)
-      pos += sum(.to_html_called_inside_to_html_outer_pos_list)
-      V line = 1
-      V line_start = -1
-      V t = 0
-      L t < pos
-         I .instr[t] == "\r"
-            I t < pos - 1 & .instr[t + 1] == "\n"
-               t++
-            line++
-            line_start = t
-         E I .instr[t] == "\n"
-            line++
-            line_start = t
-         t++
-      R (line, pos - line_start, pos)
-
    F to_html(instr, File? outfilef = N, ', outer_pos = 0) -> String
       .to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
       [String] result
@@ -983,9 +957,17 @@ T Converter
       I .to_html_called_inside_to_html_outer_pos_list.len == 1
          .instr = instr
 
-      F exit_with_error(message, pos)
-         V p = @.instr_pos_to_line_column(pos)
-         X Exception(message, p[0], p[1], p[2])
+      F exit_with_error(message, =pos)
+         pos += sum(@.to_html_called_inside_to_html_outer_pos_list)
+         V line = 1
+         V line_start = -1
+         V t = 0
+         L t < pos
+            I @.instr[t] == "\n"
+               line++
+               line_start = t
+            t++
+         X Exception(message, line, pos - line_start, pos)
       V i = 0
       F next_char(offset = 1)
          R I @i + offset < @instr.len {@instr[@i + offset]} E Char("\0")
@@ -1835,28 +1817,6 @@ public:
         this->ohd = ohd;
     }
 
-    template <typename T1> auto instr_pos_to_line_column(T1 pos)
-    {
-        pos += sum(to_html_called_inside_to_html_outer_pos_list);
-        auto line = 1;
-        auto line_start = -1;
-        auto t = 0;
-        while (t < pos) {
-            if (instr[t] == u'\r') {
-                if (t < pos - 1 && instr[t + 1] == u'\n')
-                    t++;
-                line++;
-                line_start = t;
-            }
-            else if (instr[t] == u'\n') {
-                line++;
-                line_start = t;
-            }
-            t++;
-        }
-        return make_tuple(line, pos - line_start, pos);
-    }
-
     template <typename T1, typename T3 = decltype(0)> String to_html(const T1 &instr, File* const outfilef = nullptr, const T3 &outer_pos = 0)
     {
         to_html_called_inside_to_html_outer_pos_list.append(outer_pos);
@@ -1874,10 +1834,20 @@ public:
         if (to_html_called_inside_to_html_outer_pos_list.len() == 1)
             this->instr = instr;
 
-        auto exit_with_error = [this](const auto &message, const auto &pos)
+        auto exit_with_error = [this](const auto &message, auto pos)
         {
-            auto p = instr_pos_to_line_column(pos);
-            throw Exception(message, _get<0>(p), _get<1>(p), _get<2>(p));
+            pos += sum(to_html_called_inside_to_html_outer_pos_list);
+            auto line = 1;
+            auto line_start = -1;
+            auto t = 0;
+            while (t < pos) {
+                if (this->instr[t] == u'\n') {
+                    line++;
+                    line_start = t;
+                }
+                t++;
+            }
+            throw Exception(message, line, pos - line_start, pos);
         };
         auto i = 0;
         auto next_char = [&i, &instr](const decltype(1) offset = 1)
