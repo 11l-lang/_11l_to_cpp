@@ -46,6 +46,7 @@ class Scope:
 
     ids : Dict[str, Id]
     is_function : bool
+    is_lambda = False
 
     def __init__(self, func_args):
         self.parent = None
@@ -342,7 +343,9 @@ class SymbolNode:
                         s = self.scope
                         while True:
                             if s.is_function:
-                                assert(type(s.node) == ASTFunctionDefinition)
+                                if type(s.node) != ASTFunctionDefinition:
+                                    assert(s.is_lambda)
+                                    raise Error('probably `@` is missing (before this dot)', self.children[0].token)
                                 if type(s.node.parent) == ASTTypeDefinition:
                                     fid = s.parent.ids.get(self.children[0].children[0].to_str())
                                     if fid is None:
@@ -1547,6 +1550,7 @@ def led(self, left):
     prev_scope = scope
     scope = Scope([])
     scope.parent = prev_scope
+    scope.is_lambda = True
     tokensn.scope = scope
     for c in left.children if left.symbol.id == '(' else [left]: # )
         scope.add_name(c.token_str(), None)
