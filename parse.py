@@ -112,7 +112,7 @@ class Scope:
                 return None, None
 
     def add_function(self, name, ast_node):
-        if name in self.ids:                                                   # V &id = .ids.set_if_not_present(name, Id(N)) // note that this is an error: `V id = .ids.set_if_not_present(...)`, but you can do this: `V id = copy(.ids.set_if_not_present(...))`
+        if name in self.ids:                                                   # V &id = .ids.set_if_not_present(name, Id(N)) // [[[or `put_if_absent` as in Java, or `add_if_absent`]]] note that this is an error: `V id = .ids.set_if_not_present(...)`, but you can do this: `V id = copy(.ids.set_if_not_present(...))`
             assert(type(self.ids[name].ast_nodes[0]) == ASTFunctionDefinition) # assert(id.ast_nodes.empty | T(id.ast_nodes[0]) == ASTFunctionDefinition)
             self.ids[name].ast_nodes.append(ast_node)                          # id.ast_nodes [+]= ast_node
         else:
