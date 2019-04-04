@@ -654,7 +654,8 @@ class SymbolNode:
                         if sn.token.value(source)[0] == '@':
                             by_ref = True # sn.parent.children[0] is sn and ((sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!='))
                                           #                               or (sn.parent.symbol.id == '.' and sn.parent.children[1].token_str() == 'append'))
-                            captured_variables.add(('&' if by_ref else '') + sn.token.value(source)[1:])
+                            t = sn.token.value(source)[1:]
+                            captured_variables.add('this' if t == '' else '&'*by_ref + t)
                     else:
                         for child in sn.children:
                             if child is not None and child.symbol.id != '->':

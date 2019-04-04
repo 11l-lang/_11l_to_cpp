@@ -1312,3 +1312,49 @@ struct CodeBlock1
         print();
     }
 } code_block_1;
+
+
+class Converter:
+    instr : str
+
+    def to_html():
+        f = lambda: self.instr
+        def ff():
+            return self.instr
+        i = 0
+        g = lambda: self.instr[i]
+        def gg():
+            return self.instr[i]
+===
+T Converter
+   String instr
+
+   F to_html()
+      V f = () -> .instr
+      F ff()
+         R @.instr
+      V i = 0
+      V g = () -> .instr[@i]
+      F gg()
+         R @.instr[@i]
+===
+class Converter
+{
+public:
+    String instr;
+
+    auto to_html()
+    {
+        auto f = [](){return instr;};
+        auto ff = [this]()
+        {
+            return instr;
+        };
+        auto i = 0;
+        auto g = [&i](){return instr[i];};
+        auto gg = [&i, this]()
+        {
+            return instr[i];
+        };
+    }
+};
