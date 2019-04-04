@@ -932,3 +932,102 @@ struct CodeBlock1
         print(u"</td></tr>\n</table>"_S);
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Cycle_detection#D
+F brent(f, x0)
+   Int cycle_length
+   V hare = x0
+   V power = 1
+   L
+      V tortoise = hare
+      L(i) 1..power
+         hare = f(hare)
+         I tortoise == hare
+            cycle_length = i
+            ^L.break
+      power *= 2
+
+   hare = x0
+   L 1..cycle_length
+      hare = f(hare)
+
+   V cycle_start = 0
+   V tortoise = x0
+   L tortoise != hare
+      tortoise = f(tortoise)
+      hare = f(hare)
+      cycle_start++
+
+   print_result(x0, f, cycle_length, cycle_start)
+
+F print_result(x0, f, len, start)
+   print(‘Cycle length = ’len)
+   print(‘Start index = ’start)
+   V i = x0
+   L 1..start
+      i = f(i)
+   V cycle = [0] * len
+   L 0.<len
+      cycle[L.index] = i
+      i = f(i)
+   print(‘Cycle: ’, end' ‘’)
+   print(cycle)
+
+brent(i -> (i * i + 1) % 255, 3)
+===
+template <typename T1, typename T2> auto brent(const T1 &f, const T2 &x0)
+{
+    int cycle_length;
+    auto hare = x0;
+    auto power = 1;
+    while (true) {
+        auto tortoise = hare;
+        for (auto i : range_ee(1, power)) {
+            hare = f(hare);
+            if (tortoise == hare) {
+                cycle_length = i;
+                goto break_;
+            }
+        }
+        power *= 2;
+    }
+    break_:;
+    hare = x0;
+    for (auto __unused : range_ee(1, cycle_length))
+        hare = f(hare);
+    auto cycle_start = 0;
+    auto tortoise = x0;
+    while (tortoise != hare) {
+        tortoise = f(tortoise);
+        hare = f(hare);
+        cycle_start++;
+    }
+    print_result(x0, f, cycle_length, cycle_start);
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto print_result(const T1 &x0, const T2 &f, const T3 &len, const T4 &start)
+{
+    print(u"Cycle length = "_S + len);
+    print(u"Start index = "_S + start);
+    auto i = x0;
+    for (auto __unused : range_ee(1, start))
+        i = f(i);
+    auto cycle = create_array({0}) * len;
+    {int Lindex = 0;
+    for (auto __unused : range_el(0, len)) {
+        cycle.set(Lindex, i);
+        i = f(i);
+        Lindex++;
+    }}
+    print(u"Cycle: "_S, u""_S);
+    print(cycle);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        brent([](const auto &i){return mod((i * i + 1), 255);}, 3);
+    }
+} code_block_1;
