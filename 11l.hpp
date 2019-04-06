@@ -15,6 +15,21 @@ template <int n, typename...Types> inline       auto &_get(      Tuple<Types...>
 template <int n, typename Container, typename Value> inline void _set(Container       &c, const Value &v) {c.set(n, v);}
 template <int n, typename  ...Types, typename Value> inline void _set(Tuple<Types...> &t, const Value &v) {std::get<n>(t) = v;}
 
+namespace std { // `namespace std` is necessary to avoid error C3312 in MSVC {>[https://stackoverflow.com/questions/32681697/range-based-for-loop-and-adl <- google:‘error C3312’]:‘`begin` and `end` from global namespace are not considered’}
+template <typename...Types> class TupleIterator
+{
+	using Type = typename tuple_element<0, tuple<Types...>>::type;
+	Type *ptr;
+public:
+	TupleIterator(Type *ptr) : ptr(ptr) {}
+	void operator++() {tuple<Types...> t; ptr += &get<1>(t) - &get<0>(t);}
+	Type &operator*() {return *ptr;}
+	bool operator!=(TupleIterator i) {return ptr != i.ptr;}
+};
+template <typename...Types> inline TupleIterator<Types...> begin(tuple<Types...> &t) {return TupleIterator<Types...>(&get<0>(t));}
+template <typename...Types> inline TupleIterator<Types...> end  (tuple<Types...> &t) {return TupleIterator<Types...>(&get<tuple_size<tuple<Types...>>::value-1>(t) + (&get<1>(t) - &get<0>(t)));}
+}
+
 #if __GNUC__ || __INTEL_COMPILER // || __clang__ // Clang already defines __GNUC__
 #define likely(x) __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)

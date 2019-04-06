@@ -1361,3 +1361,19 @@ public:
         };
     }
 };
+
+
+for ii in (0, 1, 2):
+    print(ii)
+===
+L(ii) (0, 1, 2)
+   print(ii)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&ii : make_tuple(0, 1, 2))
+            print(ii);
+    }
+} code_block_1;
