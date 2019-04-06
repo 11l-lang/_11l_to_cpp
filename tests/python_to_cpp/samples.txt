@@ -1365,9 +1365,13 @@ public:
 
 for ii in (0, 1, 2):
     print(ii)
+for i in (10,):
+    print(i)
 ===
 L(ii) (0, 1, 2)
    print(ii)
+L(i) (10,)
+   print(i)
 ===
 struct CodeBlock1
 {
@@ -1375,5 +1379,7 @@ struct CodeBlock1
     {
         for (auto &&ii : make_tuple(0, 1, 2))
             print(ii);
+        for (auto &&i : make_tuple(10))
+            print(i);
     }
 } code_block_1;

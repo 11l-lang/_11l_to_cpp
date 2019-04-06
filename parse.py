@@ -466,8 +466,6 @@ class SymbolNode:
                     res += self.children[i].to_str()
                     if i < len(self.children)-1:
                         res += ', '
-                if len(self.children) == 1:
-                    res += ','
                 return res + ')'
 
             else:
