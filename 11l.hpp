@@ -16,8 +16,25 @@ template <int n, typename Container, typename Value> inline void _set(Container 
 template <int n, typename  ...Types, typename Value> inline void _set(Tuple<Types...> &t, const Value &v) {std::get<n>(t) = v;}
 
 namespace std { // `namespace std` is necessary to avoid error C3312 in MSVC {>[https://stackoverflow.com/questions/32681697/range-based-for-loop-and-adl <- google:‘error C3312’]:‘`begin` and `end` from global namespace are not considered’}
+// From [https://stackoverflow.com/questions/14261183/how-to-make-generic-computations-over-heterogeneous-argument-packs-of-a-variadic <- google:‘c++ homogeneous tuple range based for site:stackoverflow.com’]:
+struct null_type {};
+template<typename... Ts> struct homogeneous_type;
+template<typename T>     struct homogeneous_type<T> {using type = T; static const bool is_homogeneous = true;};
+template<typename T, typename... Ts>
+struct homogeneous_type<T, Ts...>
+{
+	using type_of_remaining_parameters = typename homogeneous_type<Ts...>::type;
+	static const bool is_homogeneous = std::is_same<T, type_of_remaining_parameters>::value;
+	using type = typename std::conditional<is_homogeneous, T, null_type>::type;
+};
+template<typename... Ts> struct is_homogeneous_pack
+{
+	static const bool value = homogeneous_type<Ts...>::is_homogeneous;
+};
+
 template <typename...Types> class TupleIterator
 {
+	static_assert(is_homogeneous_pack<Types...>::value, "Tuple is not homogeneous!");
 	using Type = typename tuple_element<0, tuple<Types...>>::type;
 	Type *ptr;
 public:
