@@ -319,6 +319,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                 if source[i-1] == ' ': # for correct handling of operator 'C '/'in ' in external tools (e.g. keyletters_to_keywords.py)
                     i -= 1
                 category = Token.Category.OPERATOR
+
             elif ch.isalpha() or ch in ('_', '@'): # this is NAME/IDENTIFIER or KEYWORD
                 while i < len(source) and source[i] == '@':
                     i += 1
@@ -403,12 +404,15 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
 
                     if i < len(source) and source[i] == "'" and ((i - lexem_start == 4 and not is_oct_or_bin) or (i - lexem_start == 2 and (next_digit_separator != 3 or is_hex))): # this is a hexadecimal number
                         if i - lexem_start == 2: # this is a short hexadecimal number
-                            i += 1
-                            if i + 2 > len(source) or not is_hexadecimal_digit(source[i]) or not is_hexadecimal_digit(source[i+1]):
-                                raise Error('wrong short hexadecimal number', lexem_start)
-                            i += 2
-                            if i < len(source) and is_hexadecimal_digit(source[i]):
-                                raise Error('expected end of short hexadecimal number', i)
+                            while True:
+                                i += 1
+                                if i + 2 > len(source) or not is_hexadecimal_digit(source[i]) or not is_hexadecimal_digit(source[i+1]):
+                                    raise Error('wrong short hexadecimal number', lexem_start)
+                                i += 2
+                                if i < len(source) and is_hexadecimal_digit(source[i]):
+                                    raise Error('expected end of short hexadecimal number', i)
+                                if source[i:i+1] != "'":
+                                    break
                         else:
                             i += 1
                             while i < len(source) and is_hexadecimal_digit(source[i]):
