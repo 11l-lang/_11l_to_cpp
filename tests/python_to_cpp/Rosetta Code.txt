@@ -2962,8 +2962,8 @@ os.path.isdir("/docs")
 //import os
 fs:is_file(‘input.txt’)
 fs:is_file(‘/input.txt’)
-fs:is_directory(‘docs’)
-fs:is_directory(‘/docs’)
+fs:is_dir(‘docs’)
+fs:is_dir(‘/docs’)
 ===
 struct CodeBlock1
 {
@@ -2971,8 +2971,8 @@ struct CodeBlock1
     {
         fs::is_file(u"input.txt"_S);
         fs::is_file(u"/input.txt"_S);
-        fs::is_directory(u"docs"_S);
-        fs::is_directory(u"/docs"_S);
+        fs::is_dir(u"docs"_S);
+        fs::is_dir(u"/docs"_S);
     }
 } code_block_1;
 
