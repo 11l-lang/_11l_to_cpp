@@ -1009,6 +1009,7 @@ print(os.path.isfile('temp'))
 print(not os.path.isdir('temp'))
 print(not os.path.islink('temp'))
 os.remove('temp')
+os.rmdir('temp')
 print(os.path.join('a/b', 'c').replace('\\', '/') == 'a/b/c')
 print(os.path.pathsep == os.pathsep)
 print(os.path.pathsep in (':', ';'))
@@ -1028,7 +1029,8 @@ print(fs:file_size(‘temp’) == 3)
 print(fs:is_file(‘temp’))
 print(!fs:is_dir(‘temp’))
 print(!fs:is_symlink(‘temp’))
-fs:remove(‘temp’)
+fs:remove_file(‘temp’)
+fs:remove_dir(‘temp’)
 print(fs:path:join(‘a/b’, ‘c’).replace("\\", ‘/’) == ‘a/b/c’)
 print(os:env_path_sep == os:env_path_sep)
 print(os:env_path_sep C (‘:’, ‘;’))
@@ -1051,7 +1053,8 @@ struct CodeBlock1
         print(fs::is_file(u"temp"_S));
         print(!fs::is_dir(u"temp"_S));
         print(!fs::is_symlink(u"temp"_S));
-        fs::remove(u"temp"_S);
+        fs::remove_file(u"temp"_S);
+        fs::remove_dir(u"temp"_S);
         print(fs::path::join(u"a/b"_S, u"c"_S).replace(u"\\"_S, u"/"_S) == u"a/b/c");
         print(os::env_path_sep == os::env_path_sep);
         print(in(os::env_path_sep, make_tuple(u":"_S, u";"_S)));

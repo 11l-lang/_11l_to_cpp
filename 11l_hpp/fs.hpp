@@ -1,4 +1,7 @@
 ﻿#include <filesystem>
+#ifndef _WIN32
+#include <unistd.h>
+#endif
 
 namespace fs
 {
@@ -124,12 +127,25 @@ inline bool create_dirs(const String &path)
 	return std::filesystem::create_directories((std::u16string&)path);
 }
 
-inline bool remove(const String &path)
+inline bool remove_file(const String &path)
 {
-	return std::filesystem::remove((std::u16string&)path);
+#ifdef _WIN32
+	return DeleteFileW((wchar_t*)path.c_str()) != 0;
+#else
+	return unlink(convert_utf16_to_utf8(path).c_str()) == 0;
+#endif
 }
 
-inline bool remove_all(const String &path)
+inline bool remove_dir(const String &path)
+{
+#ifdef _WIN32
+	return RemoveDirectoryW((wchar_t*)path.c_str()) != 0;
+#else
+	return rmdir(convert_utf16_to_utf8(path).c_str()) == 0;
+#endif
+}
+
+inline uintmax_t remove_all(const String &path)
 {
 	return std::filesystem::remove_all((std::u16string&)path);
 }
