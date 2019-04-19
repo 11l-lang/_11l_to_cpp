@@ -503,7 +503,7 @@ F process_files(exclude_dir)
    L(_fname) fs:walk_dir(‘.’, dir_filter' d -> d[0] != ‘.’ & d != @exclude_dir, files_only' 0B)
       V root = fs:path:dir_name(_fname)
       [String] dirs, files
-      I fs:is_directory(_fname) {dirs [+]= fs:path:base_name(_fname)} E files [+]= fs:path:base_name(_fname)
+      I fs:is_dir(_fname) {dirs [+]= fs:path:base_name(_fname)} E files [+]= fs:path:base_name(_fname)
       L(name) files
          print(fs:path:join(root, name))
 
@@ -511,7 +511,7 @@ F process_files2()
    L(_fname) fs:walk_dir(‘.’, files_only' 0B)
       V root = fs:path:dir_name(_fname)
       [String] dirs, files
-      I fs:is_directory(_fname) {dirs [+]= fs:path:base_name(_fname)} E files [+]= fs:path:base_name(_fname)
+      I fs:is_dir(_fname) {dirs [+]= fs:path:base_name(_fname)} E files [+]= fs:path:base_name(_fname)
       L(name) files
          print(fs:path:join(root, name))
 ===
@@ -520,7 +520,7 @@ template <typename T1> auto process_files(const T1 &exclude_dir)
     for (auto &&_fname : fs::walk_dir(u"."_S, [&exclude_dir](const auto &d){return _get<0>(d) != u'.' && d != exclude_dir;}, false)) {
         auto root = fs::path::dir_name(_fname);
         Array<String> dirs, files;
-        if (fs::is_directory(_fname))
+        if (fs::is_dir(_fname))
             dirs.append(fs::path::base_name(_fname));
         else
             files.append(fs::path::base_name(_fname));
@@ -534,7 +534,7 @@ auto process_files2()
     for (auto &&_fname : fs::walk_dir(u"."_S, nullptr, false)) {
         auto root = fs::path::dir_name(_fname);
         Array<String> dirs, files;
-        if (fs::is_directory(_fname))
+        if (fs::is_dir(_fname))
             dirs.append(fs::path::base_name(_fname));
         else
             files.append(fs::path::base_name(_fname));
@@ -944,16 +944,16 @@ os.makedirs('temp_dir/dir1/dir2')
 os.rename('temp_dir', 'temp_dir_')
 ===
 //import os
-fs:create_directory(‘temp_dir’)
-fs:create_directories(‘temp_dir/dir1/dir2’)
+fs:create_dir(‘temp_dir’)
+fs:create_dirs(‘temp_dir/dir1/dir2’)
 fs:rename(‘temp_dir’, ‘temp_dir_’)
 ===
 struct CodeBlock1
 {
     CodeBlock1()
     {
-        fs::create_directory(u"temp_dir"_S);
-        fs::create_directories(u"temp_dir/dir1/dir2"_S);
+        fs::create_dir(u"temp_dir"_S);
+        fs::create_dirs(u"temp_dir/dir1/dir2"_S);
         fs::rename(u"temp_dir"_S, u"temp_dir_"_S);
     }
 } code_block_1;
@@ -1026,7 +1026,7 @@ print(fs:path:base_name(‘a/b/c’) == ‘c’)
 File(‘temp’, ‘w’).write(‘123’)
 print(fs:file_size(‘temp’) == 3)
 print(fs:is_file(‘temp’))
-print(!fs:is_directory(‘temp’))
+print(!fs:is_dir(‘temp’))
 print(!fs:is_symlink(‘temp’))
 fs:remove(‘temp’)
 print(fs:path:join(‘a/b’, ‘c’).replace("\\", ‘/’) == ‘a/b/c’)
@@ -1049,7 +1049,7 @@ struct CodeBlock1
         File(u"temp"_S, u"w"_S).write(u"123"_S);
         print(fs::file_size(u"temp"_S) == 3);
         print(fs::is_file(u"temp"_S));
-        print(!fs::is_directory(u"temp"_S));
+        print(!fs::is_dir(u"temp"_S));
         print(!fs::is_symlink(u"temp"_S));
         fs::remove(u"temp"_S);
         print(fs::path::join(u"a/b"_S, u"c"_S).replace(u"\\"_S, u"/"_S) == u"a/b/c");

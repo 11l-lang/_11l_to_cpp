@@ -652,7 +652,7 @@ print(‘Test ’String(test_id)‘. Checking source files for unallowed charact
 L(_fname) fs:walk_dir(‘.’, dir_filter' d -> d[0] != ‘.’, files_only' 0B)
    V root = fs:path:dir_name(_fname)
    [String] dirs, files
-   I fs:is_directory(_fname) {dirs [+]= fs:path:base_name(_fname)} E files [+]= fs:path:base_name(_fname)
+   I fs:is_dir(_fname) {dirs [+]= fs:path:base_name(_fname)} E files [+]= fs:path:base_name(_fname)
    L(name) files
       I name.ends_with((‘.py’, ‘.txt’))
          V file_bytes = File(fs:path:join(root, name)).read_bytes()
@@ -988,7 +988,7 @@ struct CodeBlock2
         for (auto &&_fname : fs::walk_dir(u"."_S, [](const auto &d){return _get<0>(d) != u'.';}, false)) {
             auto root = fs::path::dir_name(_fname);
             Array<String> dirs, files;
-            if (fs::is_directory(_fname))
+            if (fs::is_dir(_fname))
                 dirs.append(fs::path::base_name(_fname));
             else
                 files.append(fs::path::base_name(_fname));

@@ -94,7 +94,7 @@ inline Walker walk_dir(const String &path, const std::function<bool(const String
 	return Walker(path, dir_filter, files_only);
 }
 
-inline bool is_directory(const String &path)
+inline bool is_dir(const String &path)
 {
 	return std::filesystem::is_directory((std::u16string&)path);
 }
@@ -114,12 +114,12 @@ inline uintmax_t file_size(const String &path)
 	return std::filesystem::file_size((std::u16string&)path);
 }
 
-inline bool create_directory(const String &path)
+inline bool create_dir(const String &path)
 {
 	return std::filesystem::create_directory((std::u16string&)path);
 }
 
-inline bool create_directories(const String &path)
+inline bool create_dirs(const String &path)
 {
 	return std::filesystem::create_directories((std::u16string&)path);
 }
