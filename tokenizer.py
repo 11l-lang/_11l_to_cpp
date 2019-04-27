@@ -156,7 +156,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
             if i == len(source): # end of source
                 break
 
-            if source[i] in "\r\n" or source[i:i+2] in ('//', '\\\\', R'\‘', R'\(', R'\{', R'\['): # ]})’ # lines with only whitespace and/or comments do not affect the indentation
+            if source[i] in "\r\n" or source[i:i+2] in ('//', R'\\', R'\‘', R'\(', R'\{', R'\['): # ]})’ # lines with only whitespace and/or comments do not affect the indentation
                 continue
 
             if source[i] in "{}": # Indentation level of lines starting with { or } is ignored

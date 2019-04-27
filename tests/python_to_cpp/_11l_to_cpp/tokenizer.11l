@@ -141,7 +141,7 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
          I i == source.len
             L.break
 
-         I source[i] C "\r\n" | source[i .< i + 2] C (‘//’, "\\\\", ‘\‘’’', ‘\(’, ‘\{’, ‘\[’)
+         I source[i] C "\r\n" | source[i .< i + 2] C (‘//’, ‘\\’, ‘\‘’’', ‘\(’, ‘\{’, ‘\[’)
             L.continue
 
          I source[i] C ‘{}’
@@ -231,14 +231,14 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
             i++
          I nesting_elements.empty | nesting_elements.last[0] !C ‘([’
             begin_of_line = 1B
-      E I (ch == ‘/’ & source[i + 1 .< i + 2] == ‘/’) | (ch == "\\" & source[i + 1 .< i + 2] == "\\")
+      E I (ch == ‘/’ & source[i + 1 .< i + 2] == ‘/’) | (ch == ‘\’ & source[i + 1 .< i + 2] == ‘\’)
          V comment_start = i
          i += 2
          L i < source.len & source[i] !C "\r\n"
             i++
          I comments != N
             comments.append((comment_start, i))
-      E I ch == "\\" & source[i + 1 .< i + 2] C "‘({["
+      E I ch == ‘\’ & source[i + 1 .< i + 2] C "‘({["
          V comment_start = i
          V lbr = source[i + 1]
          V rbr = S lbr {"‘" {"’"}; ‘(’ {‘)’}; ‘{’ {‘}’}; ‘[’ {‘]’}}
@@ -415,7 +415,7 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
                   X Error(‘unclosed string literal’, startqpos)
                ch = source[i]
                i++
-               I ch == "\\"
+               I ch == ‘\’
                   I i == source.len
                      L.continue
                   i++

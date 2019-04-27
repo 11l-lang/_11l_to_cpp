@@ -172,7 +172,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
             }
             if (i == source.len())
                 break;
-            if (in(source[i], u"\r\n"_S) || in(source[range_el(i, i + 2)], make_tuple(u"//"_S, u"\\\\"_S, uR"(\‘)"_S, uR"(\()"_S, uR"(\{)"_S, uR"(\[)"_S)))
+            if (in(source[i], u"\r\n"_S) || in(source[range_el(i, i + 2)], make_tuple(u"//"_S, uR"(\\)"_S, uR"(\‘)"_S, uR"(\()"_S, uR"(\{)"_S, uR"(\[)"_S)))
                 continue;
             if (in(source[i], u"{}"_S))
                 continue;

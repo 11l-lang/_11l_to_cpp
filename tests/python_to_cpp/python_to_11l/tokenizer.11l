@@ -145,7 +145,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
             L
                I i == source.len
                   X Error(‘unclosed string literal’, lexem_start)
-               I source[i] == "\\"
+               I source[i] == ‘\’
                   i++
                   I i == source.len
                      L.continue
@@ -209,7 +209,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
                      X Error(‘digit separator in this number is located in the wrong place (should be: ’number_with_separators‘)’, start)
             category = NUMERIC_LITERAL
 
-         E I ch == "\\"
+         E I ch == ‘\’
             I source[i] !C "\r\n"
                X Error(‘only new line character allowed after backslash’, i)
             I source[i] == "\r"

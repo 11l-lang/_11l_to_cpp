@@ -584,9 +584,9 @@ T Converter
                   E
                      outfile.write(‘<span style="’which_color‘: ’str_in_b‘">’)
                      ending_tags.append(‘</span>’)
-               E I (instr[prevci - 1 .< prevci], prevc) C ((‘/’, "\\"), ("\\", ‘/’))
+               E I (instr[prevci - 1 .< prevci], prevc) C ((‘/’, ‘\’), (‘\’, ‘/’))
                   write_to_pos(prevci - 1, i + 1)
-                  V tag = I (instr[prevci - 1], prevc) == (‘/’, "\\") {‘sup’} E ‘sub’
+                  V tag = I (instr[prevci - 1], prevc) == (‘/’, ‘\’) {‘sup’} E ‘sub’
                   outfile.write(‘<’tag‘>’)
                   ending_tags.append(‘</’tag‘>’)
                E I prevc == ‘!’

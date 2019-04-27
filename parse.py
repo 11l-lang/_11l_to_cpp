@@ -331,6 +331,8 @@ class SymbolNode:
 
         def char_or_str(child, is_char):
             if is_char:
+                if child.token_str()[1:-1] == "\\":
+                    return R"u'\\'_C"
                 return "u'" + child.token_str()[1:-1].replace("'", R"\'") + "'_C"
             return child.to_str()
 
