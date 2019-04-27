@@ -228,7 +228,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
    I expected_an_indented_block
       X Error(‘expected an indented block’, i)
 
-   L indentation_levels.len
+   L !indentation_levels.empty
       tokens.append(Token(i, i, Token.Category.DEDENT))
       indentation_levels.pop()
    R tokens

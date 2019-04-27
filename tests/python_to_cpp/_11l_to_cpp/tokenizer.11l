@@ -500,7 +500,7 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
    I !nesting_elements.empty
       X Error(‘there is no corresponding closing parenthesis/bracket/brace for `’nesting_elements.last[0]‘`’, nesting_elements.last[1])
 
-   L indentation_levels.len
+   L !indentation_levels.empty
       assert(indentation_levels.last[1] != 1B)
       tokens.append(Token(i, i, Token.Category.SCOPE_END))
       I implied_scopes != N
