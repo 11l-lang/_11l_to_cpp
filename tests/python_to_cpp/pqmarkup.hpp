@@ -749,9 +749,9 @@ public:
                             ending_tags.append(u"</span>"_S);
                         }
                     }
-                    else if (in(make_tuple(instr[range_el(prevci - 1, prevci)], prevc), make_tuple(make_tuple(u"/"_S, u"\\"_S), make_tuple(u"\\"_S, u"/"_S)))) {
+                    else if (in(make_tuple(instr[range_el(prevci - 1, prevci)], prevc), make_tuple(make_tuple(u"/"_S, uR"(\)"_S), make_tuple(uR"(\)"_S, u"/"_S)))) {
                         write_to_pos(prevci - 1, i + 1);
-                        auto tag = make_tuple(instr[prevci - 1], prevc) == make_tuple(u"/"_S, u"\\"_S) ? u"sup"_S : u"sub"_S;
+                        auto tag = make_tuple(instr[prevci - 1], prevc) == make_tuple(u"/"_S, uR"(\)"_S) ? u"sup"_S : u"sub"_S;
                         outfile.write(u"<"_S + tag + u">"_S);
                         ending_tags.append(u"</"_S + tag + u">"_S);
                     }

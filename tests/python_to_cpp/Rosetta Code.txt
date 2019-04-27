@@ -2528,7 +2528,7 @@ F getitem(=s, depth = 0)
             out = multiloop(out, x[0], (a, b) -> a‘’b)
             s = x[1]
             L.continue
-      I c == "\\" & s.len > 1
+      I c == ‘\’ & s.len > 1
          (s, c) = (s[1..], c‘’s[1])
       out = out.map(a -> a‘’@c)
       s = s[1..]

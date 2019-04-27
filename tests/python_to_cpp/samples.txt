@@ -1021,7 +1021,7 @@ print(os.path.splitext('a/b.c/d') == ('a/b.c/d', ''))
 ===
 //import os
 print(fs:path:absolute(‘.’))
-print(fs:path:relative(‘a/b’, ‘a/c’).replace("\\", ‘/’) == ‘../b’)
+print(fs:path:relative(‘a/b’, ‘a/c’).replace(‘\’, ‘/’) == ‘../b’)
 print(fs:path:dir_name(‘a/b/c’) == ‘a/b’)
 print(fs:path:base_name(‘a/b/c’) == ‘c’)
 File(‘temp’, ‘w’).write(‘123’)
@@ -1031,11 +1031,11 @@ print(!fs:is_dir(‘temp’))
 print(!fs:is_symlink(‘temp’))
 fs:remove_file(‘temp’)
 fs:remove_dir(‘temp’)
-print(fs:path:join(‘a/b’, ‘c’).replace("\\", ‘/’) == ‘a/b/c’)
+print(fs:path:join(‘a/b’, ‘c’).replace(‘\’, ‘/’) == ‘a/b/c’)
 print(os:env_path_sep == os:env_path_sep)
 print(os:env_path_sep C (‘:’, ‘;’))
 print(fs:path:sep == fs:path:sep)
-print(fs:path:sep C (‘/’, "\\"))
+print(fs:path:sep C (‘/’, ‘\’))
 print(fs:path:split_ext(‘a/b/c.txt’) == (‘a/b/c’, ‘.txt’))
 print(fs:path:split_ext(‘c.txt’) == (‘c’, ‘.txt’))
 print(fs:path:split_ext(‘a/b.c/d’) == (‘a/b.c/d’, ‘’))
@@ -1045,7 +1045,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         print(fs::path::absolute(u"."_S));
-        print(fs::path::relative(u"a/b"_S, u"a/c"_S).replace(u"\\"_S, u"/"_S) == u"../b");
+        print(fs::path::relative(u"a/b"_S, u"a/c"_S).replace(uR"(\)"_S, u"/"_S) == u"../b");
         print(fs::path::dir_name(u"a/b/c"_S) == u"a/b");
         print(fs::path::base_name(u"a/b/c"_S) == u'c');
         File(u"temp"_S, u"w"_S).write(u"123"_S);
@@ -1055,11 +1055,11 @@ struct CodeBlock1
         print(!fs::is_symlink(u"temp"_S));
         fs::remove_file(u"temp"_S);
         fs::remove_dir(u"temp"_S);
-        print(fs::path::join(u"a/b"_S, u"c"_S).replace(u"\\"_S, u"/"_S) == u"a/b/c");
+        print(fs::path::join(u"a/b"_S, u"c"_S).replace(uR"(\)"_S, u"/"_S) == u"a/b/c");
         print(os::env_path_sep == os::env_path_sep);
         print(in(os::env_path_sep, make_tuple(u":"_S, u";"_S)));
         print(fs::path::sep == fs::path::sep);
-        print(in(fs::path::sep, make_tuple(u"/"_S, u"\\"_S)));
+        print(in(fs::path::sep, make_tuple(u"/"_S, uR"(\)"_S)));
         print(fs::path::split_ext(u"a/b/c.txt"_S) == make_tuple(u"a/b/c"_S, u".txt"_S));
         print(fs::path::split_ext(u"c.txt"_S) == make_tuple(u"c"_S, u".txt"_S));
         print(fs::path::split_ext(u"a/b.c/d"_S) == make_tuple(u"a/b.c/d"_S, u""_S));
