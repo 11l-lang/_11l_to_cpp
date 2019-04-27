@@ -270,7 +270,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
     if (expected_an_indented_block)
         throw Error(u"expected an indented block"_S, i);
 
-    while (indentation_levels.len()) {
+    while (!indentation_levels.empty()) {
         tokens.append(Token(i, i, Token::Category::DEDENT));
         indentation_levels.pop();
     }

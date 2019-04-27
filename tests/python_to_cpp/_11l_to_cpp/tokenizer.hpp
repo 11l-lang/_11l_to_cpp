@@ -598,7 +598,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
     if (!nesting_elements.empty())
         throw Error(u"there is no corresponding closing parenthesis/bracket/brace for `"_S + _get<0>(nesting_elements.last()) + u"`"_S, _get<1>(nesting_elements.last()));
 
-    while (indentation_levels.len()) {
+    while (!indentation_levels.empty()) {
         assert(_get<1>(indentation_levels.last()) != true);
         tokens.append(Token(i, i, Token::Category::SCOPE_END));
         if (implied_scopes != nullptr)
