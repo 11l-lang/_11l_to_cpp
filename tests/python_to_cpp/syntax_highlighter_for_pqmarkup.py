@@ -94,6 +94,19 @@ def highlight(lang, source):
                     css_class = cat_to_class_11l[token.category]
 
                 if css_class != '':
+                    if token.category == _11l_to_cpp.tokenizer.Token.Category.STRING_LITERAL:
+                        if tokstr[0] == "'":
+                            apos = 1
+                            while tokstr[apos] == "'":
+                                apos += 1
+                            assert(tokstr[:apos*2+1] == "'"*apos + '‘'*apos + '‘')
+                            tokstr = '<span style="opacity: 0.25">' + tokstr[:apos*2] + '</span>' + tokstr[apos*2:]
+                        if tokstr[-1] == "'":
+                            apos = 1
+                            while tokstr[-(apos+1)] == "'":
+                                apos += 1
+                            assert(tokstr[-(apos*2+1):] == '’' + '’'*apos + "'"*apos)
+                            tokstr = tokstr[:-(apos*2)] + '<span style="opacity: 0.25">' + tokstr[-(apos*2):] + '</span>'
                     res += '<span class="' + css_class + '">' + tokstr + '</span>'
                 else:
                     res += tokstr

@@ -475,7 +475,7 @@ class Converter:
                     class TableCell:
                         text  : str
                         attrs : str
-                        def __init__(self, text : str, attrs : str): # types are needed to avoid this error in MSVC 2017: ‘error C2892: local class shall not have member templates’
+                        def __init__(self, text : str, attrs : str): # type hints are needed to avoid this error in MSVC 2017: ‘error C2892: local class shall not have member templates’
                             self.text  = text
                             self.attrs = attrs
                     table : List[List[TableCell]] = []

@@ -80,12 +80,17 @@ TEST("""a
 c
 ‘d’{e}
 }""", """a<br />
-<spoiler title="b">c<br />
-<spoiler title="d">e</spoiler></spoiler>""", habr_html = True)
+<spoiler title="b">
+c<br />
+<spoiler title="d">
+e</spoiler>
+</spoiler>
+""", habr_html = True)
 TEST("""‘title’{
 te
 }
-xt""", """<span class="spoiler_title" onclick="return spoiler2(this, event)">title<br /></span><div class="spoiler_text" style="display: none">te<br />
+xt""", """<span class="spoiler_title" onclick="return spoiler2(this, event)">title<br /></span><div class="spoiler_text" style="display: none">
+te<br />
 </div>
 xt""", ohd = True) # пока что фиксирую такой некрасивый HTML-код, так как например этот HTML-код работает некорректно: '<span class="spoiler_title" onclick="return spoiler2(this, event)">title</span><div class="spoiler_text" style="display:none">te<br />\n</div><br />\nxt'
                    #                                                                                      и этот тоже: '<span class="spoiler_title" onclick="return spoiler2(this, event)">title</span><div class="spoiler_text" style="display:none">te</div><br />\nxt'
@@ -102,10 +107,12 @@ import hashlib
 }
 
 Some text.""",
-"""<spoiler title="Code"><source lang="Python">
+"""<spoiler title="Code">
+<source lang="Python">
 import hashlib
 </source>
-</spoiler><br />
+</spoiler>
+<br />
 Some text.""", habr_html = True)
 TEST("[[[‘]]]test```’```test", "<!--[[[‘]]]-->test<code>’</code>test", habr_html = True)
 TEST("[[[‘]]]`Don’t`", "<!--[[[‘]]]--><code>Don’t</code>", habr_html = True)
@@ -223,7 +230,8 @@ TEST(
 
 Один существенный минус ...""",
 """<ol start="4">
-<li><span class="spoiler_title" onclick="return spoiler2(this, event)">А ещё мне коды[/годы] этих символов нравятся...<br /></span><div class="spoiler_text" style="display: none">...</div>
+<li><span class="spoiler_title" onclick="return spoiler2(this, event)">А ещё мне коды[/годы] этих символов нравятся...<br /></span><div class="spoiler_text" style="display: none">
+...</div>
 </li>
 </ol>
 <br />
@@ -310,6 +318,22 @@ let s2 = str
 </pre>
 B<br />
 C""") # с тегом <code> пробелы ‘корректно не отображаются’/коллапсируются
+TEST(R"""#(11l)‘(‘\‘’’')
+('‘‘Don’t!’)
+('''‘‘‘‘Don’t! Don’t! Don’t!’)
+(‘Don‘t! Don‘t! Don‘t!’’’’''')
+('‘‘’‘’’')’""", R"""<style>
+span.keyword {color: #0000FF; font-weight: bold;}
+span.identifier {color: #00009F;}
+span.string-literal {color: #800000;}
+span.numeric-literal {color: #008000;}
+span.constant {color: #008000;}
+span.comment {color: #808080;}
+</style><pre style="display: inline">(<span class="string-literal">‘\‘’<span style="opacity: 0.25">’'</span></span>)
+(<span class="string-literal"><span style="opacity: 0.25">'‘</span>‘Don’t!’</span>)
+(<span class="string-literal"><span style="opacity: 0.25">'''‘‘‘</span>‘Don’t! Don’t! Don’t!’</span>)
+(<span class="string-literal">‘Don‘t! Don‘t! Don‘t!’<span style="opacity: 0.25">’’’'''</span></span>)
+(<span class="string-literal"><span style="opacity: 0.25">'‘</span>‘’‘’<span style="opacity: 0.25">’'</span></span>)</pre>""", ohd = True)
 
 # Check for error handling
 test_id += 1
@@ -441,12 +465,17 @@ TEST(‘a
 c
 ‘d’{e}
 }’, ‘a<br />
-<spoiler title="b">c<br />
-<spoiler title="d">e</spoiler></spoiler>’, habr_html' 1B)
+<spoiler title="b">
+c<br />
+<spoiler title="d">
+e</spoiler>
+</spoiler>
+’, habr_html' 1B)
 TEST(‘‘title’{
 te
 }
-xt’, ‘<span class="spoiler_title" onclick="return spoiler2(this, event)">title<br /></span><div class="spoiler_text" style="display: none">te<br />
+xt’, ‘<span class="spoiler_title" onclick="return spoiler2(this, event)">title<br /></span><div class="spoiler_text" style="display: none">
+te<br />
 </div>
 xt’, ohd' 1B)
 TEST(‘#(JavaScript)‘
@@ -460,10 +489,12 @@ import hashlib
 ’
 }
 
-Some text.’, ‘<spoiler title="Code"><source lang="Python">
+Some text.’, ‘<spoiler title="Code">
+<source lang="Python">
 import hashlib
 </source>
-</spoiler><br />
+</spoiler>
+<br />
 Some text.’, habr_html' 1B)
 TEST(‘[[[‘]]]test```’```test’, ‘<!--[[[‘]]]-->test<code>’</code>test’, habr_html' 1B)
 TEST(‘[[[‘]]]`Don’t`’, ‘<!--[[[‘]]]--><code>Don’t</code>’, habr_html' 1B)
@@ -558,7 +589,8 @@ TEST(‘4.‘А ещё мне коды[/годы] этих символов нр
 TEST(‘4. ‘А ещё мне коды[/годы] этих символов нравятся...’{...}
 
 Один существенный минус ...’, ‘<ol start="4">
-<li><span class="spoiler_title" onclick="return spoiler2(this, event)">А ещё мне коды[/годы] этих символов нравятся...<br /></span><div class="spoiler_text" style="display: none">...</div>
+<li><span class="spoiler_title" onclick="return spoiler2(this, event)">А ещё мне коды[/годы] этих символов нравятся...<br /></span><div class="spoiler_text" style="display: none">
+...</div>
 </li>
 </ol>
 <br />
@@ -634,6 +666,22 @@ let s2 = str
 </pre>
 B<br />
 C’)
+TEST(‘#(11l)‘(‘\‘’’')
+('‘‘Don’t!’)
+('''‘‘‘‘Don’t! Don’t! Don’t!’)
+(‘Don‘t! Don‘t! Don‘t!’’’’''')
+('‘‘’‘’’')’’, ‘<style>
+span.keyword {color: #0000FF; font-weight: bold;}
+span.identifier {color: #00009F;}
+span.string-literal {color: #800000;}
+span.numeric-literal {color: #008000;}
+span.constant {color: #008000;}
+span.comment {color: #808080;}
+</style><pre style="display: inline">(<span class="string-literal">‘\‘’<span style="opacity: 0.25">’'</span></span>)
+(<span class="string-literal"><span style="opacity: 0.25">'‘</span>‘Don’t!’</span>)
+(<span class="string-literal"><span style="opacity: 0.25">'''‘‘‘</span>‘Don’t! Don’t! Don’t!’</span>)
+(<span class="string-literal">‘Don‘t! Don‘t! Don‘t!’<span style="opacity: 0.25">’’’'''</span></span>)
+(<span class="string-literal"><span style="opacity: 0.25">'‘</span>‘’‘’<span style="opacity: 0.25">’'</span></span>)</pre>’, ohd' 1B)
 test_id++
 V was_error = 0B
 print(‘Test ’String(test_id)‘ (error handling) ...’, end' ‘’)
@@ -765,12 +813,17 @@ struct CodeBlock1
 c
 ‘d’{e}
 })"_S, uR"(a<br />
-<spoiler title="b">c<br />
-<spoiler title="d">e</spoiler></spoiler>)"_S, false, true);
+<spoiler title="b">
+c<br />
+<spoiler title="d">
+e</spoiler>
+</spoiler>
+)"_S, false, true);
         TEST(uR"(‘title’{
 te
 }
-xt)"_S, uR"'(<span class="spoiler_title" onclick="return spoiler2(this, event)">title<br /></span><div class="spoiler_text" style="display: none">te<br />
+xt)"_S, uR"'(<span class="spoiler_title" onclick="return spoiler2(this, event)">title<br /></span><div class="spoiler_text" style="display: none">
+te<br />
 </div>
 xt)'"_S, true);
         TEST(uR"(#(JavaScript)‘
@@ -784,10 +837,12 @@ import hashlib
 ’
 }
 
-Some text.)"_S, uR"(<spoiler title="Code"><source lang="Python">
+Some text.)"_S, uR"(<spoiler title="Code">
+<source lang="Python">
 import hashlib
 </source>
-</spoiler><br />
+</spoiler>
+<br />
 Some text.)"_S, false, true);
         TEST(u"[[[‘]]]test```’```test"_S, u"<!--[[[‘]]]-->test<code>’</code>test"_S, false, true);
         TEST(u"[[[‘]]]`Don’t`"_S, u"<!--[[[‘]]]--><code>Don’t</code>"_S, false, true);
@@ -882,7 +937,8 @@ list element</li>
         TEST(uR"(4. ‘А ещё мне коды[/годы] этих символов нравятся...’{...}
 
 Один существенный минус ...)"_S, uR"'(<ol start="4">
-<li><span class="spoiler_title" onclick="return spoiler2(this, event)">А ещё мне коды[/годы] этих символов нравятся...<br /></span><div class="spoiler_text" style="display: none">...</div>
+<li><span class="spoiler_title" onclick="return spoiler2(this, event)">А ещё мне коды[/годы] этих символов нравятся...<br /></span><div class="spoiler_text" style="display: none">
+...</div>
 </li>
 </ol>
 <br />
@@ -958,6 +1014,22 @@ let s2 = str
 </pre>
 B<br />
 C)"_S);
+        TEST(uR"(#(11l)‘(‘\‘’’')
+('‘‘Don’t!’)
+('''‘‘‘‘Don’t! Don’t! Don’t!’)
+(‘Don‘t! Don‘t! Don‘t!’’’’''')
+('‘‘’‘’’')’)"_S, uR"(<style>
+span.keyword {color: #0000FF; font-weight: bold;}
+span.identifier {color: #00009F;}
+span.string-literal {color: #800000;}
+span.numeric-literal {color: #008000;}
+span.constant {color: #008000;}
+span.comment {color: #808080;}
+</style><pre style="display: inline">(<span class="string-literal">‘\‘’<span style="opacity: 0.25">’'</span></span>)
+(<span class="string-literal"><span style="opacity: 0.25">'‘</span>‘Don’t!’</span>)
+(<span class="string-literal"><span style="opacity: 0.25">'''‘‘‘</span>‘Don’t! Don’t! Don’t!’</span>)
+(<span class="string-literal">‘Don‘t! Don‘t! Don‘t!’<span style="opacity: 0.25">’’’'''</span></span>)
+(<span class="string-literal"><span style="opacity: 0.25">'‘</span>‘’‘’<span style="opacity: 0.25">’'</span></span>)</pre>)"_S, true);
         test_id++;
     }
 } code_block_1;

@@ -66,6 +66,19 @@ F highlight(lang, source)
                css_class = :cat_to_class_11l[token.category]
 
             I css_class != ‘’
+               I token.category == STRING_LITERAL
+                  I tokstr[0] == ‘'’
+                     V apos = 1
+                     L tokstr[apos] == ‘'’
+                        apos++
+                     assert(tokstr[0 .< apos * 2 + 1] == (‘'’ * apos)‘’("‘" * apos)"‘")
+                     tokstr = ‘<span style="opacity: 0.25">’tokstr[0 .< apos * 2]‘</span>’tokstr[apos * 2 ..]
+                  I tokstr.last == ‘'’
+                     V apos = 1
+                     L tokstr[(len)-(apos + 1)] == ‘'’
+                        apos++
+                     assert(tokstr[(len)-(apos * 2 + 1) ..] == "’"("’" * apos)‘’(‘'’ * apos))
+                     tokstr = tokstr[0 .< (len)-(apos * 2)]‘<span style="opacity: 0.25">’tokstr[(len)-(apos * 2) ..]‘</span>’
                res ‘’= ‘<span class="’css_class‘">’tokstr‘</span>’
             E
                res ‘’= tokstr
