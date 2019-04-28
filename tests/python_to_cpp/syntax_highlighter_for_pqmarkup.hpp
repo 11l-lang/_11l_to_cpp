@@ -88,8 +88,26 @@ template <typename T1, typename T2> auto highlight(const T1 &lang, const T2 &sou
                     css_class = u"keyword"_S;
                 else
                     css_class = syntax_highlighter_for_pqmarkup::cat_to_class_11l[token.category];
-                if (css_class != u"")
+
+                if (css_class != u"") {
+                    if (token.category == decltype(token.category)::STRING_LITERAL) {
+                        if (_get<0>(tokstr) == u'\'') {
+                            auto apos = 1;
+                            while (tokstr[apos] == u'\'')
+                                apos++;
+                            assert(tokstr[range_el(0, apos * 2 + 1)] == (u"'"_S * apos) + (u"‘"_S * apos) + u"‘"_S);
+                            tokstr = u"<span style=\"opacity: 0.25\">"_S + tokstr[range_el(0, apos * 2)] + u"</span>"_S + tokstr[range_ei(apos * 2)];
+                        }
+                        if (tokstr.last() == u'\'') {
+                            auto apos = 1;
+                            while (tokstr.at_plus_len( - (apos + 1)) == u'\'')
+                                apos++;
+                            assert(tokstr[range_elen_i( - (apos * 2 + 1))] == u"’"_S + (u"’"_S * apos) + (u"'"_S * apos));
+                            tokstr = tokstr[range_e_llen(0,  - (apos * 2))] + u"<span style=\"opacity: 0.25\">"_S + tokstr[range_elen_i( - (apos * 2))] + u"</span>"_S;
+                        }
+                    }
                     res += u"<span class=\""_S + css_class + u"\">"_S + tokstr + u"</span>"_S;
+                }
                 else
                     res += tokstr;
             }
