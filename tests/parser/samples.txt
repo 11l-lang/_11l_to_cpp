@@ -616,6 +616,35 @@ auto f()
 }
 
 
+F f()
+   V array = [1, 2, 3, 4]
+   L(i) array
+      I i % 2 == 0
+         L.remove_current_element_and_continue
+   print(array)
+===
+auto f()
+{
+    auto array = create_array({1, 2, 3, 4});
+    {auto &&__range = array;
+    auto __end = __range.end();
+    auto __dst = __range.begin();
+    for (auto __src = __range.begin(); __src != __end;) {
+        auto &&i = *__src;
+        if (mod(i, 2) == 0) {
+            ++__src;
+            continue;
+        }
+        if (__dst != __src)
+            *__dst = std::move(*__src);
+        ++__dst;
+        ++__src;
+    }
+    __range.erase(__dst, __end);}
+    print(array);
+}
+
+
 [String] dirs, files
 ===
 Array<String> dirs, files;

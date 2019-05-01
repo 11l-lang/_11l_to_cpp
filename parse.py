@@ -788,8 +788,9 @@ class ASTNodeWithChildren(ASTNode):
         return r + ' ' * (indent*4) + "}\n"
 
     def children_to_str_detect_single_stmt(self, indent, r, check_for_if = False):
-        if len(self.children) != 1 \
-                or (check_for_if and type(self.children[0]) == ASTIf): # for correctly handling of dangling-else
+        if (len(self.children) != 1 
+                or (check_for_if and type(self.children[0]) == ASTIf) # for correctly handling of dangling-else
+                or type(self.children[0]) == ASTLoopRemoveCurrentElementAndContinue): # `L.remove_current_element_and_continue` ‘раскрывается в 2 строки кода’\‘is translated into 2 statements’
             return self.children_to_str(indent, r, False)
         assert(len(self.children) == 1)
         c0str = self.children[0].to_str(indent+1)
@@ -1108,6 +1109,7 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
     break_label_needed = -1
     has_L_index = False
     has_L_next  = False
+    has_L_remove_current_element_and_continue = False
     is_loop_variable_a_ptr = False
 
     def has_L_was_no_break(self):
@@ -1134,6 +1136,25 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
             else:
                 tr = 'while (' + (self.expression.to_str() if self.expression is not None else 'true') + ')'
         rr = self.children_to_str_detect_single_stmt(indent, tr)
+
+        if self.has_L_remove_current_element_and_continue:
+            if not loop_auto:
+                raise Error('this kind of loop does not support `L.remove_current_element_and_continue`', tokens[self.tokeni])
+            if self.has_L_next:
+                raise Error('`L.next` can not be used with `L.remove_current_element_and_continue`', tokens[self.tokeni])
+            if self.has_L_index:
+                raise Error('`L.index` can not be used with `L.remove_current_element_and_continue`', tokens[self.tokeni]) # {
+            rr = ' ' * (indent*4) + '{auto &&__range = ' + self.expression.to_str() + ";\n" \
+               + ' ' * (indent*4) + "auto __end = __range.end();\n" \
+               + ' ' * (indent*4) + "auto __dst = __range.begin();\n" \
+               + self.children_to_str(indent, 'for (auto __src = __range.begin(); __src != __end;)', False,
+                    add_at_beginning = ' ' * ((indent+1)*4) + 'auto &&'+ self.loop_variable + " = *__src;\n")[:-indent*4-2] \
+               + ' ' * ((indent+1)*4) + "if (__dst != __src)\n" \
+               + ' ' * ((indent+1)*4) + "    *__dst = std::move(*__src);\n" \
+               + ' ' * ((indent+1)*4) + "++__dst;\n" \
+               + ' ' * ((indent+1)*4) + "++__src;\n" \
+               + ' ' * (indent*4) + "}\n" \
+               + ' ' * (indent*4) + "__range.erase(__dst, __end);}\n"
 
         if self.has_L_next:
             if not loop_auto:
@@ -1210,6 +1231,17 @@ class ASTLoopBreak(ASTNode):
             n = n.parent
 
         return r + ' ' * (indent*4) + "break;\n"
+
+class ASTLoopRemoveCurrentElementAndContinue(ASTNode):
+    def to_str(self, indent):
+        n = self.parent
+        while True:
+            if type(n) == ASTLoop:
+                n.has_L_remove_current_element_and_continue = True
+                break
+            n = n.parent
+        return ' ' * (indent*4) + "++__src;\n" \
+             + ' ' * (indent*4) + "continue;\n"
 
 class ASTReturn(ASTNodeWithExpression):
     def to_str(self, indent):
@@ -2166,6 +2198,12 @@ def parse_internal(this_node):
             elif token.value(source) in ('L.break', 'Ц.прервать', 'loop.break', 'цикл.прервать'):
                 node = ASTLoopBreak()
                 node.token = token
+                next_token()
+                if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
+                    next_token()
+
+            elif token.value(source) in ('L.remove_current_element_and_continue', 'Ц.удалить_текущий_элемент_и_продолжить', 'loop.remove_current_element_and_continue', 'цикл.удалить_текущий_элемент_и_продолжить'):
+                node = ASTLoopRemoveCurrentElementAndContinue()
                 next_token()
                 if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
                     next_token()
