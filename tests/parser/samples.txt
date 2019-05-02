@@ -988,3 +988,30 @@ public:
         auto f = [this](){return instr;};
     }
 };
+
+
+F f(Int x, y, z)
+   R x + y + z
+F f2(x, Int y, z)
+   R x + y + z
+F f3(Int x, Float y)
+   R x + y
+F f4(Int x; y)
+   R x + y
+===
+auto f(const int x, const int y, const int z)
+{
+    return x + y + z;
+}
+template <typename T1> auto f2(const T1 &x, const int y, const int z)
+{
+    return x + y + z;
+}
+auto f3(const int x, const double y)
+{
+    return x + y;
+}
+template <typename T2> auto f4(const int x, const T2 &y)
+{
+    return x + y;
+}

@@ -1905,6 +1905,7 @@ def parse_internal(this_node):
 
                     next_token()
                     was_default_argument = False
+                    prev_type_name = ''
                     while token.value(source) != ')':
                         if token.value(source) == "',":
                             assert(node.first_named_only_argument is None)
@@ -1947,6 +1948,8 @@ def parse_internal(this_node):
                             if token.value(source) == '?':
                                 type_ += '?'
                                 next_token()
+                        if type_ == '':
+                            type_ = prev_type_name
                         qualifier = ''
                         if token.value(source) == '=':
                             qualifier = '='
@@ -1967,10 +1970,14 @@ def parse_internal(this_node):
                                 raise Error('non-default argument follows default argument', tokens[tokeni-1])
                             default = ''
                         node.function_arguments.append((func_arg_name, default, type_, qualifier)) # ((
-                        if token.value(source) not in ',)':
-                            raise Error('expected `,` or `)` in function\'s arguments list', token)
+                        if token.value(source) not in ',;)':
+                            raise Error('expected `)`, `;` or `,` in function\'s arguments list', token)
                         if token.value(source) == ',':
                             next_token()
+                            prev_type_name = type_
+                        elif token.value(source) == ';':
+                            next_token()
+                            prev_type_name = ''
 
                     node.last_non_default_argument = len(node.function_arguments) - 1
                     while node.last_non_default_argument >= 0 and node.function_arguments[node.last_non_default_argument][1] != '':

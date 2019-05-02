@@ -1452,7 +1452,7 @@ F symbol(id, bp = 0) -> &
    R :symbol_table[id]
 
 F infix(id, bp)
-   F led(ASTNode self, left)
+   F led(ASTNode self; left)
       self.first_child = left
       self.second_child = expression(self.symbol.led_bp)
       R self
