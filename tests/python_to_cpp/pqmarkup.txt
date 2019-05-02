@@ -943,7 +943,7 @@ T Converter
       .habr_html = habr_html
       .ohd = ohd
 
-   F to_html(instr, File? outfilef = N, ', outer_pos = 0) -> String
+   F to_html(instr, File? outfilef = N; ', outer_pos = 0) -> String
       .to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
       [String] result
       T Writer
@@ -1036,7 +1036,7 @@ T Converter
       Dict[Int, String] nonunique_links
       V link = ‘’
 
-      F write_http_link(startpos, Int endpos, q_offset = 1, =text = ‘’)
+      F write_http_link(startpos, Int endpos; q_offset = 1, =text = ‘’)
          V nesting_level = 0
          @i += 2
          L
@@ -1612,7 +1612,7 @@ T Converter
          R r
       R ‘’
 
-F to_html(instr, File? outfilef = N, ohd = 0B, ', habr_html = 0B)
+F to_html(instr, File? outfilef = N; ohd = 0B, ', habr_html = 0B)
    R Converter(habr_html, ohd).to_html(instr, outfilef)
 
 :start:
