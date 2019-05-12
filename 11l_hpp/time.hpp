@@ -165,12 +165,12 @@ inline Time strptime(const String &datetime_string, const String &format)
 // [https://stackoverflow.com/a/33542189/2692494 <- google:‘c++ strptime’]
 	std::basic_istringstream<char16_t, std::char_traits<char16_t>, std::allocator<char16_t>> input(datetime_string);
 	input.imbue(std::locale(setlocale(LC_ALL, nullptr)));
-	tm tm;
+	tm tm = {0};
 	input >> std::get_time(&tm, format.c_str());
 	if (input.fail())
 		return Time(0);
 #else // code above does not work in GCC for some unknown reason, so use `::strptime()` instead
-	tm tm;
+	tm tm = {0};
 	::strptime(convert_utf16_to_utf8(datetime_string).c_str(), convert_utf16_to_utf8(format).c_str(), &tm);
 #endif
 	return Time((double)mktime(&tm));
