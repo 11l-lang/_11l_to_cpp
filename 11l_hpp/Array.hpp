@@ -300,6 +300,7 @@ template <typename Type> Array<Type> create_array(std::initializer_list<Type> il
 Array<char> create_array(std::initializer_list<bool> il) // avoid using std::vector<bool>
 {
 	Array<char> r;
+	r.reserve(il.size());
 	for (bool b : il)
 		r.push_back(b);
 	return r;
