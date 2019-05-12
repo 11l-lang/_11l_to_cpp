@@ -1061,3 +1061,15 @@ struct CodeBlock1
         print((timens::strptime(u"March 7 2009 7:30pm"_S, format_str) + timens::delta(0, 12)).strftime(format_str));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Day_of_the_week
+print((2008..2121).filter(y -> time:(y, 12, 25).strftime(‘%w’) == ‘0’)) // Warning: this code does not work in MSVC 2017! But this works: `V fmt = ‘%w’; print((2008..2121).filter(y -> time:(y, 12, 25).strftime(:fmt) == ‘0’))`
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(range_ee(2008, 2121).filter([](const auto &y){return timens::_(y, 12, 25).strftime(u"%w"_S) == u'0';}));
+    }
+} code_block_1;

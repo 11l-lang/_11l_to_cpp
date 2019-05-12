@@ -162,11 +162,12 @@ class SymbolNode:
     scope : Scope
     token_str_override : str
 
-    def __init__(self, token, token_str_override = None):
+    def __init__(self, token, token_str_override = None, symbol = None):
         self.token = token
         self.children = []
         self.scope = scope
         self.token_str_override = token_str_override
+        self.symbol = symbol
 
     def append_child(self, child):
         child.parent = self
@@ -651,7 +652,7 @@ class SymbolNode:
                 captured_variables = set()
                 def gather_captured_variables(sn):
                     if sn.token.category == Token.Category.NAME:
-                        if sn.token.value(source)[0] == '@':
+                        if sn.token.value(source).startswith('@'):
                             by_ref = True # sn.parent.children[0] is sn and ((sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!='))
                                           #                               or (sn.parent.symbol.id == '.' and sn.parent.children[1].token_str() == 'append'))
                             t = sn.token.value(source)[1:]
@@ -1667,7 +1668,7 @@ def led(self, left):
 
     self.append_child(left)
     if token.category == Token.Category.STRING_LITERAL: # for `re:‘pattern’`
-        self.append_child(SymbolNode(Token(token.start, token.start, Token.Category.NAME)))
+        self.append_child(SymbolNode(Token(token.start, token.start, Token.Category.NAME), symbol = symbol_table['(name)']))
         sn = SymbolNode(Token(token.start, token.start, Token.Category.DELIMITER))
         sn.symbol = symbol_table['('] # )
         sn.function_call = True
@@ -1680,7 +1681,7 @@ def led(self, left):
         self.append_child(tokensn)
         next_token()
     else: # for `os:(...)` and `time:(...)`
-        self.append_child(SymbolNode(Token(token.start, token.start, Token.Category.NAME)))
+        self.append_child(SymbolNode(Token(token.start, token.start, Token.Category.NAME), symbol = symbol_table['(name)']))
     return self
 symbol(':').led = led
 
