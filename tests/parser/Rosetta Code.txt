@@ -1064,7 +1064,7 @@ struct CodeBlock1
 
 
 // https://www.rosettacode.org/wiki/Day_of_the_week
-print((2008..2121).filter(y -> time:(y, 12, 25).strftime(‘%w’) == ‘0’)) // Warning: this code does not work in MSVC 2017! But this works: `V fmt = ‘%w’; print((2008..2121).filter(y -> time:(y, 12, 25).strftime(:fmt) == ‘0’))`
+print((2008..2121).filter(y -> time:(y, 12, 25).strftime(‘%w’) == ‘0’)) // Warning: this code does not work in MSVC 2017 and MSVC 2019! But this works: `V fmt = ‘%w’; print((2008..2121).filter(y -> time:(y, 12, 25).strftime(:fmt) == ‘0’))`
 ===
 struct CodeBlock1
 {
