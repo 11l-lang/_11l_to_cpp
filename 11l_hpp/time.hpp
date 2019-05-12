@@ -88,9 +88,8 @@ public:
 		tm *tm = localtime(&t);
 #endif
 		GET_LOCALTIME_TM
-		std::string f(f16.cbegin(), f16.cend());
 		char s[100];
-		return String(s, s + ::strftime(s, sizeof(s), f.c_str(), tm));
+		return String(s, s + ::strftime(s, sizeof(s), f16.to_string().c_str(), tm));
 	}
 
 	String format(const String &f) const

@@ -484,6 +484,15 @@ public:
 	friend String operator+(Char ch, const String &s) {return String(ch) + s;}
 	friend String operator+(char16_t ch, const String &s) {return String(ch) + s;}
 
+	std::string to_string() const
+	{
+		std::string s;
+		s.reserve(length());
+		for (char16_t c : *this)
+			s.append(1, (char)c);
+		return s;
+	}
+
 private:
 	struct FormatArgument//Field
 	{
@@ -654,7 +663,7 @@ inline uint32_t to_uint32(int i)
 
 inline double to_float(const String &str)
 {
-	return atof(std::string(str.cbegin(), str.cend()).c_str());
+	return atof(str.to_string().c_str());
 }
 
 inline double to_float(Char ch)
