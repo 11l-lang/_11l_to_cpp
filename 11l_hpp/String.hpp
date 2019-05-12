@@ -51,6 +51,7 @@ public:
 	String(Char c) : basic_string(1, c.code) {}
 	String(std::u16string &&s) : std::u16string(std::forward<std::u16string>(s)) {}
 	explicit String(char16_t c) : basic_string(1, c) {}
+	explicit String(bool b) : basic_string(b ? u"1B" : u"0B", 2) {}
 	explicit String(int num) {assign(num);}
 	void assign(int num)
 	{
@@ -77,7 +78,7 @@ public:
 	explicit String(double num, int digits = 9, bool remove_trailing_zeroes = true) {assign(num, digits, remove_trailing_zeroes);}
 	explicit String(const char16_t *&s) : basic_string(s) {} // reference is needed here because otherwise String(const char16_t (&s)[N]) is never called (`String(u"str")` calls `String(const char16_t *s)`)
 	String(const char16_t *s, size_t sz) : basic_string(s, sz) {}
-	template <int N> String(const char16_t (&s)[N]): basic_string(s, N-1) {}
+	template <int N> String(const char16_t (&s)[N]) : basic_string(s, N-1) {}
 	template <typename Ty> explicit String(const Ty s, const Ty e) : basic_string(s, e) {}
 	template <typename Ty, typename = std::enable_if_t<std::is_enum<Ty>::value>> explicit String(const Ty e) : String(int(e)) {}
 
@@ -469,13 +470,16 @@ public:
 	void operator+=(int i)    {*this += String(i);}
 	void operator+=(double n) {*this += String(n);}
 
+	String operator+(const char16_t *s) const {String r(*this); r.append(s); return r;}
 	String operator+(const String &s) const {String r(*this); r.append(s); return r;}
 	String operator+(Char ch)         const {String r(*this); r.append(1, ch.code); return r;}
 	String operator+(char16_t ch)     const {String r(*this); r.append(1, ch); return r;}
 
 	String operator+(int i)    const {return *this + String(i);}
+	String operator+(bool b)   const {return *this + String(b);}
 	String operator+(double n) const {return *this + String(n);}
 	friend String operator+(int i, const String &s) {return String(i) + s;}
+	friend String operator+(bool b, const String &s) {return String(b) + s;}
 	friend String operator+(double n, const String &s) {return String(n) + s;}
 	friend String operator+(Char ch, const String &s) {return String(ch) + s;}
 	friend String operator+(char16_t ch, const String &s) {return String(ch) + s;}

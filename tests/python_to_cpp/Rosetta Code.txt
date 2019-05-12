@@ -3458,3 +3458,57 @@ struct CodeBlock1
             print(String(value) + u" "_S + String(sd_inst(value)));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Damm_algorithm#Python
+matrix = [
+    [0, 3, 1, 7, 5, 9, 8, 6, 4, 2],
+    [7, 0, 9, 2, 1, 5, 4, 8, 6, 3],
+    [4, 2, 0, 6, 8, 7, 1, 3, 5, 9],
+    [1, 7, 5, 0, 9, 8, 3, 4, 2, 6],
+    [6, 1, 2, 3, 0, 4, 5, 9, 7, 8],
+    [3, 6, 7, 4, 2, 0, 9, 5, 8, 1],
+    [5, 8, 6, 9, 7, 2, 0, 1, 3, 4],
+    [8, 9, 4, 5, 3, 6, 2, 0, 1, 7],
+    [9, 4, 3, 8, 6, 1, 7, 2, 0, 5],
+    [2, 5, 8, 1, 4, 3, 6, 7, 9, 0]
+]
+
+def damm(num: int) -> bool:
+    row = 0
+    for digit in str(num):
+        row = matrix[row][int(digit)] 
+    return row == 0
+
+for test in [5724, 5727, 112946]:
+    print(test + "\t Validates as: " + damm(test))
+===
+V matrix = [[0, 3, 1, 7, 5, 9, 8, 6, 4, 2], [7, 0, 9, 2, 1, 5, 4, 8, 6, 3], [4, 2, 0, 6, 8, 7, 1, 3, 5, 9], [1, 7, 5, 0, 9, 8, 3, 4, 2, 6], [6, 1, 2, 3, 0, 4, 5, 9, 7, 8], [3, 6, 7, 4, 2, 0, 9, 5, 8, 1], [5, 8, 6, 9, 7, 2, 0, 1, 3, 4], [8, 9, 4, 5, 3, 6, 2, 0, 1, 7], [9, 4, 3, 8, 6, 1, 7, 2, 0, 5], [2, 5, 8, 1, 4, 3, 6, 7, 9, 0]]
+
+F damm(Int num) -> Bool
+   V row = 0
+   L(digit) String(num)
+      row = :matrix[row][Int(digit)]
+   R row == 0
+
+L(test) [5724, 5727, 112946]
+   print(test"\t Validates as: "damm(test))
+===
+auto matrix = create_array({create_array({0, 3, 1, 7, 5, 9, 8, 6, 4, 2}), create_array({7, 0, 9, 2, 1, 5, 4, 8, 6, 3}), create_array({4, 2, 0, 6, 8, 7, 1, 3, 5, 9}), create_array({1, 7, 5, 0, 9, 8, 3, 4, 2, 6}), create_array({6, 1, 2, 3, 0, 4, 5, 9, 7, 8}), create_array({3, 6, 7, 4, 2, 0, 9, 5, 8, 1}), create_array({5, 8, 6, 9, 7, 2, 0, 1, 3, 4}), create_array({8, 9, 4, 5, 3, 6, 2, 0, 1, 7}), create_array({9, 4, 3, 8, 6, 1, 7, 2, 0, 5}), create_array({2, 5, 8, 1, 4, 3, 6, 7, 9, 0})});
+
+bool damm(const int num)
+{
+    auto row = 0;
+    for (auto &&digit : String(num))
+        row = ::matrix[row][to_int(digit)];
+    return row == 0;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&test : create_array({5724, 5727, 112946}))
+            print(test + u"\t Validates as: "_S + damm(test));
+    }
+} code_block_1;
