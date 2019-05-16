@@ -23,13 +23,20 @@ HRCTimePoint perf_counter()
 {
 	return std::chrono::high_resolution_clock::now();
 }
+}
 
-class Delta
+class TimeDelta
 {
+	struct Uninitialized {};
+	explicit TimeDelta(Uninitialized) {}
+	friend class Time;
+
 public:
 	double seconds;
 
-	explicit Delta(double seconds) : seconds(seconds) {}
+	explicit TimeDelta(double days = 0, double hours = 0, double minutes = 0, double seconds = 0, double milliseconds = 0, double microseconds = 0, double weeks = 0) :
+		seconds(weeks * (7.0 * 24 * 3600) + days * (24.0 * 3600) + hours * 3600.0 + minutes * 60.0 + seconds + milliseconds * 0.001 + microseconds * 1e-6)
+	{}
 
 	operator String() const
 	{
@@ -57,22 +64,40 @@ public:
 		return r;
 	}
 
-	bool operator==(Delta d) const {return seconds == d.seconds;}
-	bool operator!=(Delta d) const {return seconds != d.seconds;}
+	bool operator==(TimeDelta d) const {return seconds == d.seconds;}
+	bool operator!=(TimeDelta d) const {return seconds != d.seconds;}
 
 	double days() const {return seconds / (24.0 * 3600);}
 };
 
-inline Delta delta(double days = 0, double hours = 0, double minutes = 0, double seconds = 0, double milliseconds = 0, double microseconds = 0, double weeks = 0)
-{
-	return Delta(weeks * (7.0 * 24 * 3600) + days * (24.0 * 3600) + hours * 3600.0 + minutes * 60.0 + seconds + milliseconds * 0.001 + microseconds * 1e-6);
-}
-
 class Time
 {
 	double seconds_since_epoch;
+	struct Uninitialized {};
+	explicit Time(Uninitialized) {}
+
 public:
-	explicit Time(double seconds_since_epoch) : seconds_since_epoch(seconds_since_epoch) {}
+	Time() : seconds_since_epoch(std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::system_clock::now().time_since_epoch()).count()) {}
+
+	explicit Time(int year, int month = 1, int day = 1, int hour = 0, int minute = 0, double second = 0)
+	{
+		tm tm;
+		tm.tm_year = year - 1900;
+		tm.tm_mon = month - 1;
+		tm.tm_mday = day;
+		tm.tm_hour = hour;
+		tm.tm_min = minute;
+		tm.tm_sec = (int)second;
+		tm.tm_isdst = -1;
+		seconds_since_epoch = mktime(&tm) + fract(second);
+	}
+
+	static Time from_unix_time(double s)
+	{
+		Time t((Uninitialized())); // `Time t(Uninitialized());` does not work in MSVC
+		t.seconds_since_epoch = s;
+		return t;
+	}
 
 	double unix_time() const {return seconds_since_epoch;}
 
@@ -104,7 +129,7 @@ public:
 	{
 		time_t t = (time_t)seconds_since_epoch;
 		GET_LOCALTIME_TM
-		String r = String(tm->tm_year + 1900) + u'-' + (tm->tm_mon + 1) + u'-' + tm->tm_mday + u' '
+		String r = String(tm->tm_year + 1900) + u'-' + String(tm->tm_mon + 1).zfill(2) + u'-' + String(tm->tm_mday).zfill(2) + u' '
 		         + String(tm->tm_hour).zfill(2) + u':'
 		         + String(tm->tm_min ).zfill(2) + u':'
 		         + String(tm->tm_sec ).zfill(2);
@@ -114,30 +139,19 @@ public:
 		return r;
 	}
 
-	Time operator+(Delta d) const {return Time(seconds_since_epoch + d.seconds);}
-	Time operator-(Delta d) const {return Time(seconds_since_epoch - d.seconds);}
-	Delta operator-(Time t) const {return Delta(seconds_since_epoch - t.seconds_since_epoch);}
+	Time operator+(TimeDelta d) const {return from_unix_time(seconds_since_epoch + d.seconds);}
+	Time operator-(TimeDelta d) const {return from_unix_time(seconds_since_epoch - d.seconds);}
+	TimeDelta operator-(Time t) const {TimeDelta r((TimeDelta::Uninitialized())); r.seconds = seconds_since_epoch - t.seconds_since_epoch; return r;}
 
 	bool operator==(Time t) const {return seconds_since_epoch == t.seconds_since_epoch;}
 	bool operator!=(Time t) const {return seconds_since_epoch != t.seconds_since_epoch;}
 };
 
-inline Time _()
+namespace timens
 {
-	return Time(std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::system_clock::now().time_since_epoch()).count());
-}
-
-inline Time _(int year, int month = 1, int day = 1, int hour = 0, int minute = 0, double second = 0)
+inline Time from_unix_time(double s)
 {
-	tm tm;
-	tm.tm_year = year - 1900;
-	tm.tm_mon = month - 1;
-	tm.tm_mday = day;
-	tm.tm_hour = hour;
-	tm.tm_min = minute;
-	tm.tm_sec = (int)second;
-	tm.tm_isdst = -1;
-	return Time(mktime(&tm) + fract(second));
+	return Time::from_unix_time(s);
 }
 
 inline Time today()
@@ -150,12 +164,7 @@ inline Time today()
 	ttm.tm_mon  = tm->tm_mon;
 	ttm.tm_mday = tm->tm_mday;
 	ttm.tm_isdst = tm->tm_isdst;
-	return Time((double)mktime(&ttm));
-}
-
-inline Time from_unix_time(double s)
-{
-	return Time(s);
+	return from_unix_time((double)mktime(&ttm));
 }
 
 inline Time strptime(const String &datetime_string, const String &format)
@@ -172,6 +181,6 @@ inline Time strptime(const String &datetime_string, const String &format)
 	tm tm = {0};
 	::strptime(convert_utf16_to_utf8(datetime_string).c_str(), convert_utf16_to_utf8(format).c_str(), &tm);
 #endif
-	return Time((double)mktime(&tm));
+	return from_unix_time((double)mktime(&tm));
 }
 }

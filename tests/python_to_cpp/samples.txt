@@ -589,26 +589,26 @@ print(datetime.date.today())
 print(datetime.datetime.now() - datetime.date.today())
 ===
 //import datetime
-V d = time:delta(days' 1, hours' 2, minutes' 3, seconds' 4.5)
-assert(time:(2018, 8, 2) - time:(2018, 7, 1) == time:delta(days' 32))
-assert(time:(2018, 8, 2) - time:(2018, 7, 1) == time:delta(days' 32))
+V d = TimeDelta(days' 1, hours' 2, minutes' 3, seconds' 4.5)
+assert(Time(2018, 8, 2) - Time(2018, 7, 1) == TimeDelta(days' 32))
+assert(Time(2018, 8, 2) - Time(2018, 7, 1) == TimeDelta(days' 32))
 print(d)
 print(String(d.days())‘, ’String(d.seconds))
 print(time:today())
-print(time:() - time:today())
+print(Time() - time:today())
 ===
-auto d = timens::delta(1, 2, 3, 4.5);
+auto d = TimeDelta(1, 2, 3, 4.5);
 
 struct CodeBlock1
 {
     CodeBlock1()
     {
-        assert(timens::_(2018, 8, 2) - timens::_(2018, 7, 1) == timens::delta(32));
-        assert(timens::_(2018, 8, 2) - timens::_(2018, 7, 1) == timens::delta(32));
+        assert(Time(2018, 8, 2) - Time(2018, 7, 1) == TimeDelta(32));
+        assert(Time(2018, 8, 2) - Time(2018, 7, 1) == TimeDelta(32));
         print(d);
         print(String(d.days()) + u", "_S + String(d.seconds));
         print(timens::today());
-        print(timens::_() - timens::today());
+        print(Time() - timens::today());
     }
 } code_block_1;
 
@@ -623,23 +623,23 @@ print(datetime.datetime.fromtimestamp(datetime.datetime(1970, 1, 2).timestamp())
 # [-TODO: Add `time:gmtime()` and `time:timegm()` [<- `calendar.timegm()`] (need good (practical) test cases!)-]
 ===
 //import datetime
-print(time:(2001, 2, 3, 4, 5, 6).strftime(‘%Y.%m.%d %H:%M:%S’) == ‘2001.02.03 04:05:06’)
-print(time:(2001, 2, 3, 4, 5, 6).format(‘YYYY.MM.DD hh:mm:ss’) == ‘2001.02.03 04:05:06’)
-print(time:(2001, 2, 3, 4, 5, 6).format(‘ГГГГ.ММ.ДД чч:мм:сс’) == ‘2001.02.03 04:05:06’)
-print(time:strptime(‘2001.02.03 04:05:06’, ‘%Y.%m.%d %H:%M:%S’) == time:(2001, 2, 3, 4, 5, 6))
-print(time:(1970, 1, 2).unix_time())
-print(time:from_unix_time(time:(1970, 1, 2).unix_time()))
+print(Time(2001, 2, 3, 4, 5, 6).strftime(‘%Y.%m.%d %H:%M:%S’) == ‘2001.02.03 04:05:06’)
+print(Time(2001, 2, 3, 4, 5, 6).format(‘YYYY.MM.DD hh:mm:ss’) == ‘2001.02.03 04:05:06’)
+print(Time(2001, 2, 3, 4, 5, 6).format(‘ГГГГ.ММ.ДД чч:мм:сс’) == ‘2001.02.03 04:05:06’)
+print(time:strptime(‘2001.02.03 04:05:06’, ‘%Y.%m.%d %H:%M:%S’) == Time(2001, 2, 3, 4, 5, 6))
+print(Time(1970, 1, 2).unix_time())
+print(time:from_unix_time(Time(1970, 1, 2).unix_time()))
 ===
 struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(timens::_(2001, 2, 3, 4, 5, 6).strftime(u"%Y.%m.%d %H:%M:%S"_S) == u"2001.02.03 04:05:06");
-        print(timens::_(2001, 2, 3, 4, 5, 6).format(u"YYYY.MM.DD hh:mm:ss"_S) == u"2001.02.03 04:05:06");
-        print(timens::_(2001, 2, 3, 4, 5, 6).format(u"ГГГГ.ММ.ДД чч:мм:сс"_S) == u"2001.02.03 04:05:06");
-        print(timens::strptime(u"2001.02.03 04:05:06"_S, u"%Y.%m.%d %H:%M:%S"_S) == timens::_(2001, 2, 3, 4, 5, 6));
-        print(timens::_(1970, 1, 2).unix_time());
-        print(timens::from_unix_time(timens::_(1970, 1, 2).unix_time()));
+        print(Time(2001, 2, 3, 4, 5, 6).strftime(u"%Y.%m.%d %H:%M:%S"_S) == u"2001.02.03 04:05:06");
+        print(Time(2001, 2, 3, 4, 5, 6).format(u"YYYY.MM.DD hh:mm:ss"_S) == u"2001.02.03 04:05:06");
+        print(Time(2001, 2, 3, 4, 5, 6).format(u"ГГГГ.ММ.ДД чч:мм:сс"_S) == u"2001.02.03 04:05:06");
+        print(timens::strptime(u"2001.02.03 04:05:06"_S, u"%Y.%m.%d %H:%M:%S"_S) == Time(2001, 2, 3, 4, 5, 6));
+        print(Time(1970, 1, 2).unix_time());
+        print(timens::from_unix_time(Time(1970, 1, 2).unix_time()));
     }
 } code_block_1;
 
