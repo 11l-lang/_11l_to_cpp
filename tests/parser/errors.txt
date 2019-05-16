@@ -207,3 +207,7 @@ T Converter
    F to_html()
       V f = () -> .f()
                   ^Error: probably `@` is missing (before this dot)
+
+
+V d = TimeDelta(10)
+                ^Error: argument `days` of function `TimeDelta` is named-only
