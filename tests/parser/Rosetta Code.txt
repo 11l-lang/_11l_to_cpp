@@ -1073,3 +1073,140 @@ struct CodeBlock1
         print(range_ee(2008, 2121).filter([](const auto &y){return Time(y, 12, 25).strftime(u"%w"_S) == u'0';}));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Deconvolution/1D#D
+F deconv(g, f)
+   V result = [0]*(g.len - f.len + 1)
+   L(&e) result
+      V n = L.index
+      e = g[n]
+      V lower_bound = I n >= f.len {n - f.len + 1} E 0
+      L(i) lower_bound .< n
+         e -= result[i] * f[n - i]
+      e /= f[0]
+   R result
+
+V h = [-8,-9,-3,-1,-6,7]
+V f = [-3,-6,-1,8,-6,3,-1,-9,-9,3,-2,5,2,-2,-7,-1]
+V g = [24,75,71,-34,3,22,-45,23,245,25,52,25,-67,-96,96,31,55,36,29,-43,-7]
+print(deconv(g, f))
+print(deconv(g, h))
+===
+template <typename T1, typename T2> auto deconv(const T1 &g, const T2 &f)
+{
+    auto result = create_array({0}) * (g.len() - f.len() + 1);
+    {int Lindex = 0;
+    for (auto &e : result) {
+        auto n = Lindex;
+        e = g[n];
+        auto lower_bound = n >= f.len() ? n - f.len() + 1 : 0;
+        for (auto i : range_el(lower_bound, n))
+            e -= result[i] * f[n - i];
+        e /= _get<0>(f);
+        Lindex++;
+    }}
+    return result;
+}
+auto h = create_array({-8, -9, -3, -1, -6, 7});
+auto f = create_array({-3, -6, -1, 8, -6, 3, -1, -9, -9, 3, -2, 5, 2, -2, -7, -1});
+auto g = create_array({24, 75, 71, -34, 3, 22, -45, 23, 245, 25, 52, 25, -67, -96, 96, 31, 55, 36, 29, -43, -7});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(deconv(g, f));
+        print(deconv(g, h));
+    }
+} code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Department_Numbers#C
+print(‘Police     Sanitation         Fire’)
+print(‘----------------------------------’)
+
+L(police) (2..6).step(2)
+   L(sanitation) 1..7
+      L(fire) 1..7
+         I police!=sanitation & sanitation!=fire & fire!=police & police+fire+sanitation==12
+            print(police"\t\t"sanitation"\t\t"fire)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Police     Sanitation         Fire"_S);
+        print(u"----------------------------------"_S);
+        for (auto police : range_ee(2, 6).step(2))
+            for (auto sanitation : range_ee(1, 7))
+                for (auto fire : range_ee(1, 7))
+                    if (police != sanitation && sanitation != fire && fire != police && police + fire + sanitation == 12)
+                        print(police + u"\t\t"_S + sanitation + u"\t\t"_S + fire);
+    }
+} code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Dice_game_probabilities#C
+F throw_die(n_sides, n_dice, s, [Int] &counts)
+   I n_dice == 0
+      counts[s]++
+      R
+   L(i) 1..n_sides
+      throw_die(n_sides, n_dice - 1, s + i, counts)
+
+F beating_probability(n_sides1, n_dice1,
+                      n_sides2, n_dice2)
+   V len1 = (n_sides1 + 1) * n_dice1
+   V C1 = [0] * len1
+   throw_die(n_sides1, n_dice1, 0, &C1)
+
+   V len2 = (n_sides2 + 1) * n_dice2
+   V C2 = [0] * len2
+   throw_die(n_sides2, n_dice2, 0, &C2)
+
+   Float p12 = (n_sides1 ^ n_dice1) * (n_sides2 ^ n_dice2)
+
+   V tot = 0.0
+   L(i) 0 .< len1
+      L(j) 0 .< min(i, len2)
+         tot += Float(C1[i]) * C2[j] / p12
+   R tot
+
+print(‘#.16’.format(beating_probability(4, 9, 6, 6)))
+print(‘#.16’.format(beating_probability(10, 5, 7, 6)))
+===
+template <typename T1, typename T2, typename T3> auto throw_die(const T1 &n_sides, const T2 &n_dice, const T3 &s, Array<int> &counts)
+{
+    if (n_dice == 0) {
+        counts[s]++;
+        return;
+    }
+    for (auto i : range_ee(1, n_sides))
+        throw_die(n_sides, n_dice - 1, s + i, counts);
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto beating_probability(const T1 &n_sides1, const T2 &n_dice1, const T3 &n_sides2, const T4 &n_dice2)
+{
+    auto len1 = (n_sides1 + 1) * n_dice1;
+    auto C1 = create_array({0}) * len1;
+    throw_die(n_sides1, n_dice1, 0, C1);
+    auto len2 = (n_sides2 + 1) * n_dice2;
+    auto C2 = create_array({0}) * len2;
+    throw_die(n_sides2, n_dice2, 0, C2);
+    double p12 = (pow(n_sides1, n_dice1)) * (pow(n_sides2, n_dice2));
+    auto tot = 0.0;
+    for (auto i : range_el(0, len1))
+        for (auto j : range_el(0, min(i, len2)))
+            tot += to_float(C1[i]) * C2[j] / p12;
+    return tot;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"#.16"_S.format(beating_probability(4, 9, 6, 6)));
+        print(u"#.16"_S.format(beating_probability(10, 5, 7, 6)));
+    }
+} code_block_1;

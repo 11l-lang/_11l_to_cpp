@@ -3512,3 +3512,30 @@ struct CodeBlock1
             print(test + u"\t Validates as: "_S + damm(test));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Delete_a_file#Python
+import os
+# current directory
+os.remove("output.txt")
+os.rmdir("docs")
+# root directory
+os.remove("/output.txt")
+os.rmdir("/docs")
+===
+//import os
+fs:remove_file(‘output.txt’)
+fs:remove_dir(‘docs’)
+fs:remove_file(‘/output.txt’)
+fs:remove_dir(‘/docs’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        fs::remove_file(u"output.txt"_S);
+        fs::remove_dir(u"docs"_S);
+        fs::remove_file(u"/output.txt"_S);
+        fs::remove_dir(u"/docs"_S);
+    }
+} code_block_1;
