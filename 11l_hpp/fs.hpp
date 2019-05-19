@@ -97,6 +97,11 @@ inline Walker walk_dir(const String &path, const std::function<bool(const String
 	return Walker(path, dir_filter, files_only);
 }
 
+inline Walker walk_dir(const String &path, nullptr_t, bool files_only)
+{
+	return Walker(path, nullptr, files_only);
+}
+
 inline bool is_dir(const String &path)
 {
 	return std::filesystem::is_directory((std::u16string&)path);
