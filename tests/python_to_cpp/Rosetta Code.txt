@@ -2756,6 +2756,8 @@ struct CodeBlock1
 
 
 # https://www.rosettacode.org/wiki/Cartesian_product_of_two_or_more_lists#Go
+from typing import List
+
 def cart_prod(a, b):
     p = [(0, 0)] * (len(a) * len(b))
     i = 0
@@ -2767,9 +2769,11 @@ def cart_prod(a, b):
 
 print(cart_prod([1, 2], [3, 4]))
 print(cart_prod([3, 4], [1, 2]))
-print(cart_prod([1, 2], []))
-print(cart_prod([], [1, 2]))
+empty_array : List[int]
+print(cart_prod([1, 2], empty_array))
+print(cart_prod(empty_array, [1, 2]))
 ===
+
 F cart_prod(a, b)
    V p = [(0, 0)] * (a.len * b.len)
    V i = 0
@@ -2780,8 +2784,9 @@ F cart_prod(a, b)
    R p
 print(cart_prod([1, 2], [3, 4]))
 print(cart_prod([3, 4], [1, 2]))
-print(cart_prod([1, 2], []))
-print(cart_prod([], [1, 2]))
+[Int] empty_array
+print(cart_prod([1, 2], empty_array))
+print(cart_prod(empty_array, [1, 2]))
 ===
 template <typename T1, typename T2> auto cart_prod(const T1 &a, const T2 &b)
 {
@@ -2801,10 +2806,18 @@ struct CodeBlock1
     {
         print(cart_prod(create_array({1, 2}), create_array({3, 4})));
         print(cart_prod(create_array({3, 4}), create_array({1, 2})));
-        print(cart_prod(create_array({1, 2}), create_array({})));
-        print(cart_prod(create_array({}), create_array({1, 2})));
     }
 } code_block_1;
+Array<int> empty_array;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(cart_prod(create_array({1, 2}), empty_array));
+        print(cart_prod(empty_array, create_array({1, 2})));
+    }
+} code_block_2;
 
 
 def cart_prod(a, b):
@@ -3537,5 +3550,61 @@ struct CodeBlock1
         fs::remove_dir(u"docs"_S);
         fs::remove_file(u"/output.txt"_S);
         fs::remove_dir(u"/docs"_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Digital_root#Python
+Int64 = int
+
+def digital_root (n):
+    ap = 0
+    while n >= 10:
+        n = sum(int(digit) for digit in str(n))
+        ap += 1
+    return (ap, n)
+
+for n in [Int64(627615), 39390, 588225, 393900588225, 55]:
+    persistance : Int64
+    root : Int64
+    (persistance, root) = digital_root(n)
+    print("%12i has additive persistance %2i and digital root %i." 
+          % (n, persistance, root))
+===
+
+F digital_root(=n)
+   V ap = 0
+   L n >= 10
+      n = sum(String(n).map(digit -> Int(digit)))
+      ap++
+   R (ap, n)
+
+L(n) [Int64(627615), 39390, 588225, 393900588225, 55]
+   Int64 persistance
+   Int64 root
+   (persistance, root) = digital_root(n)
+   print(‘#12.0 has additive persistance #2.0 and digital root #.0.’.format(n, persistance, root))
+===
+template <typename T1> auto digital_root(T1 n)
+{
+    auto ap = 0;
+    while (n >= 10) {
+        n = sum(String(n).map([](const auto &digit){return to_int(digit);}));
+        ap++;
+    }
+    return make_tuple(ap, n);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&n : create_array<int64_t>({to_int64(627615), 39390, 588225, 393900588225, 55})) {
+            int64_t persistance;
+            int64_t root;
+            std::tie(persistance, root) = digital_root(n);
+            print(u"#12.0 has additive persistance #2.0 and digital root #.0."_S.format(n, persistance, root));
+        }
     }
 } code_block_1;

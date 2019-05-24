@@ -479,12 +479,14 @@ class SymbolNode:
 
         elif self.symbol.id == '[': # ]
             if self.is_list:
+                assert(len(self.children) > 0)
                 type_of_values_is_char = True
                 for child in self.children:
                     if not is_char(child):
                         type_of_values_is_char = False
                         break
-                res = 'create_array({'
+                res = 'create_array' + ('<' + trans_type(self.children[0].children[0].token_str(), self.scope, self.children[0].children[0].token)
+                                      + '>' if len(self.children) > 1 and self.children[0].function_call and self.children[0].children[0].token_str()[0].isupper() else '') + '({'
                 for i in range(len(self.children)):
                     res += char_or_str(self.children[i], type_of_values_is_char)
                     if i < len(self.children)-1:
@@ -2462,6 +2464,7 @@ string_scope.add_name('count', ASTFunctionDefinition([('s', '', 'String')]))
 string_scope.add_name('replace', ASTFunctionDefinition([('old', '', 'String'), ('new', '', 'String')]))
 string_scope.add_name('zfill', ASTFunctionDefinition([('width', '', 'Int')]))
 string_scope.add_name('format', ASTFunctionDefinition([('arg', token_to_str('N', Token.Category.CONSTANT), '')] * 32))
+string_scope.add_name('map', ASTFunctionDefinition([('function', '', '(Char -> T)')]))
 builtins_scope.ids['String'].ast_nodes[0].scope = string_scope
 
 module_scope = Scope(None)
