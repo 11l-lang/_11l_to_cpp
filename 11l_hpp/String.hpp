@@ -53,7 +53,8 @@ public:
 	explicit String(char16_t c) : basic_string(1, c) {}
 	explicit String(bool b) : basic_string(b ? u"1B" : u"0B", 2) {}
 	explicit String(int num) {assign(num);}
-	void assign(int num)
+	explicit String(int64_t num) {assign(num);}
+	template <typename IntType> void assign_int(IntType num)
 	{
 		char16_t staticBuffer[30];
 		int len = 0;
@@ -74,6 +75,8 @@ public:
 			*end=staticBuffer+len-1; start<end; start++, end--) std::swap(*start, *end);
 		assign(staticBuffer, len);
 	}
+	void assign(int     num) { assign_int(num); }
+	void assign(int64_t num) { assign_int(num); }
 	explicit String(float  num, int digits = 6, bool remove_trailing_zeroes = true) {assign(num, digits, remove_trailing_zeroes);}
 	explicit String(double num, int digits = 9, bool remove_trailing_zeroes = true) {assign(num, digits, remove_trailing_zeroes);}
 	explicit String(const char16_t *&s) : basic_string(s) {} // reference is needed here because otherwise String(const char16_t (&s)[N]) is never called (`String(u"str")` calls `String(const char16_t *s)`)
@@ -388,6 +391,15 @@ public:
 		return ltrim(s).rtrim(s);
 	}
 
+	template <typename Func> auto map(Func &&func) const -> Array<decltype(func(std::declval<Char>()))>
+	{
+		Array<decltype(func(std::declval<Char>()))> r;
+		r.reserve(len());
+		for (auto &&el : *this)
+			r.push_back(func(el));
+		return r;
+	}
+
 	//String &operator=(const String &s) {assign(s); return *this;}
 
 	friend String &&operator*(String &&s, int n)
@@ -497,21 +509,27 @@ public:
 private:
 	struct FormatArgument//Field
 	{
-		enum class Type {STRING, NUMBER} type;
+		enum class Type {STRING, INTEGER, FLOAT} type;
 		union {
 			const String *string;
-			double number;
+			double f;
+			int64_t i;
 		};
 
 		void set(int n)
 		{
-			type = Type::NUMBER;
-			number = n;
+			type = Type::INTEGER;
+			i = n;
+		}
+		void set(int64_t n)
+		{
+			type = Type::INTEGER;
+			i = n;
 		}
 		void set(double n)
 		{
-			type = Type::NUMBER;
-			number = n;
+			type = Type::FLOAT;
+			f = n;
 		}
 		void set(const String &s)
 		{
@@ -576,13 +594,18 @@ public:
 				}
 				else {
 					if (before_period == 0 && after_period == 0) // #.
-						r += String(fa.number);
+						r += fa.type == FormatArgument::Type::INTEGER ? String(fa.i) : String(fa.f);
 					else {
 						String s; // (
 						if (!has_period) // && fract(fa.number) != 0)
-							s.assign(fa.number);
+							fa.type == FormatArgument::Type::INTEGER ? s.assign(fa.i) : s.assign(fa.f);
+						else if (fa.type == FormatArgument::Type::INTEGER) {
+							if (after_period != 0)
+								throw AssertionError();
+							s.assign(fa.i);
+						}
 						else
-							s.assign(fa.number, after_period, false);
+							s.assign(fa.f, after_period, false);
 						if (left_align)
 							r += s;
 						r.resize(r.size() + max(after_period + bool(after_period) + before_period - s.len(), 0), ' ');
