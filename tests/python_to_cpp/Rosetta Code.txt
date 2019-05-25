@@ -3736,7 +3736,7 @@ for x in [[1, 2, 3], [0, 1, 2, 3], [1, 0, 3, 4], [1, 2, 0], [0, 0, 0], [0], [1, 
     print(linear(x))
 ===
 F linear(x)
-   V a = enumerate(x).filter2((i, v) -> v != 0).map((i, v) -> ‘#.e(#.0)’.format(I v == -1 {‘-’} E I v == 1 {‘’} E String(v)‘*’, i + 1))
+   V a = enumerate(x).filter2((i, v) -> v != 0).map2((i, v) -> ‘#.e(#.0)’.format(I v == -1 {‘-’} E I v == 1 {‘’} E String(v)‘*’, i + 1))
    R (I !a.empty {a} E [String(‘0’)]).join(‘ + ’).replace(‘ + -’, ‘ - ’)
 
 L(x) [[1, 2, 3], [0, 1, 2, 3], [1, 0, 3, 4], [1, 2, 0], [0, 0, 0], [0], [1, 1, 1], [-1, -1, -1], [-1, -2, 0, 3], [-1]]
@@ -3744,7 +3744,7 @@ L(x) [[1, 2, 3], [0, 1, 2, 3], [1, 0, 3, 4], [1, 2, 0], [0, 0, 0], [0], [1, 1, 1
 ===
 template <typename T1> auto linear(const T1 &x)
 {
-    auto a = enumerate(x).filter2([](const auto &i, const auto &v){return v != 0;}).map([](const auto &i, const auto &v){return u"#.e(#.0)"_S.format(v == -1 ? u"-"_S : v == 1 ? u""_S : String(v) + u"*"_S, i + 1);});
+    auto a = enumerate(x).filter2([](const auto &i, const auto &v){return v != 0;}).map2([](const auto &i, const auto &v){return u"#.e(#.0)"_S.format(v == -1 ? u"-"_S : v == 1 ? u""_S : String(v) + u"*"_S, i + 1);});
     return (!a.empty() ? a : create_array({String(u"0"_S)})).join(u" + "_S).replace(u" + -"_S, u" - "_S);
 }
 

@@ -43,7 +43,7 @@ public:
 		return r;
 	}
 
-	template <typename Func> auto map(Func &&func) const -> Array<decltype(func(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>()))>
+	template <typename Func> auto map2(Func &&func) const
 	{
 		Array<decltype(func(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>()))> r;
 		r.reserve(len());
