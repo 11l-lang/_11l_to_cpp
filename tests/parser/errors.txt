@@ -211,3 +211,8 @@ T Converter
 
 V d = TimeDelta(10)
                 ^Error: argument `days` of function `TimeDelta` is named-only
+
+
+L m
+^Error: please write `L m != 0` instead of `L m`
+   m = m I/ 10

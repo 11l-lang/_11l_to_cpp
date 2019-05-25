@@ -3608,3 +3608,120 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Digital_root/Multiplicative_digital_root#Python
+def mdroot(n):
+    count = 0
+    mdr = n 
+    while mdr > 9:
+        m = mdr
+        digits_mul = 1
+        while m != 0:
+            digits_mul *= m % 10
+            m = m // 10
+        mdr = digits_mul
+        count += 1
+    return (count, mdr)
+
+print('Number: (MP, MDR)')
+print('======  =========')
+for n in (123321, 7739, 893, 899998):
+    print('%6i: ' % (n), end = '')
+    print(mdroot(n))
+
+table = [[0]*0 for i in range(10)]
+n = 0
+while min(len(row) for row in table) < 5:
+    table[mdroot(n)[1]].append(n)
+    n += 1
+
+print('')
+print('MP: [n0..n4]')
+print('==  ========')
+for mp, val in enumerate(table):
+    print('%2i: ' % (mp), end = '')
+    print(val[:5])
+===
+F mdroot(n)
+   V count = 0
+   V mdr = n
+   L mdr > 9
+      V m = mdr
+      V digits_mul = 1
+      L m != 0
+         digits_mul *= m % 10
+         m = m I/ 10
+      mdr = digits_mul
+      count++
+   R (count, mdr)
+print(‘Number: (MP, MDR)’)
+print(‘======  =========’)
+L(n) (123321, 7739, 893, 899998)
+   print(‘#6.0: ’.format(n), end' ‘’)
+   print(mdroot(n))
+V table = (0.<10).map(i -> [0] * 0)
+V n = 0
+L min(table.map(row -> row.len)) < 5
+   table[mdroot(n)[1]].append(n)
+   n++
+print(‘’)
+print(‘MP: [n0..n4]’)
+print(‘==  ========’)
+L(val) table
+   V mp = L.index
+   print(‘#2.0: ’.format(mp), end' ‘’)
+   print(val[0.<5])
+===
+template <typename T1> auto mdroot(const T1 &n)
+{
+    auto count = 0;
+    auto mdr = n;
+    while (mdr > 9) {
+        auto m = mdr;
+        auto digits_mul = 1;
+        while (m != 0) {
+            digits_mul *= mod(m, 10);
+            m = int(m)/int(10);
+        }
+        mdr = digits_mul;
+        count++;
+    }
+    return make_tuple(count, mdr);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Number: (MP, MDR)"_S);
+        print(u"======  ========="_S);
+        for (auto &&n : make_tuple(123321, 7739, 893, 899998)) {
+            print(u"#6.0: "_S.format(n), u""_S);
+            print(mdroot(n));
+        }
+    }
+} code_block_1;
+auto table = range_el(0, 10).map([](const auto &i){return create_array({0}) * 0;});
+auto n = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (min(table.map([](const auto &row){return row.len();})) < 5) {
+            table[_get<1>(mdroot(n))].append(n);
+            n++;
+        }
+        print(u""_S);
+        print(u"MP: [n0..n4]"_S);
+        print(u"==  ========"_S);
+        {int Lindex = 0;
+        for (auto &&val : table) {
+            auto mp = Lindex;
+            print(u"#2.0: "_S.format(mp), u""_S);
+            print(val[range_el(0, 5)]);
+            Lindex++;
+        }}
+    }
+} code_block_2;

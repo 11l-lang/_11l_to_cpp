@@ -1137,6 +1137,8 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
                         self.expression.symbol.id in ('..', '.<') or (self.expression.symbol.id == '(' and self.expression.children[0].symbol.id == '.' and self.expression.children[0].children[0].symbol.id == '(' and self.expression.children[0].children[0].children[0].symbol.id in ('..', '.<'))))) # ))
                                         ) + (self.loop_variable if self.loop_variable is not None else '__unused') + ' : ' + self.expression.to_str() + ')'
             else:
+                if self.expression is not None and self.expression.token.category == Token.Category.NAME:
+                    raise Error('please write `L ' + self.expression.token_str() + ' != 0` instead of `L ' + self.expression.token_str() + '`', tokens[self.tokeni])
                 tr = 'while (' + (self.expression.to_str() if self.expression is not None else 'true') + ')'
         rr = self.children_to_str_detect_single_stmt(indent, tr)
 
