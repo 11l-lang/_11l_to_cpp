@@ -43,6 +43,15 @@ public:
 		return r;
 	}
 
+	template <typename Func> auto map(Func &&func) const -> Array<decltype(func(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>()))>
+	{
+		Array<decltype(func(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>()))> r;
+		r.reserve(len());
+		for (auto &&el : *this)
+			r.push_back(func(std::get<0>(el), std::get<1>(el)));
+		return r;
+	}
+
 	String join(const String &str)
 	{
 		String r;
@@ -62,6 +71,15 @@ public:
 		Array r;
 		for (auto &&el : *this)
 			if (func(el))
+				r.push_back(el);
+		return r;
+	}
+
+	template <typename Func> Array filter2(Func &&func) const
+	{
+		Array r;
+		for (auto &&el : *this)
+			if (func(std::get<0>(el), std::get<1>(el)))
 				r.push_back(el);
 		return r;
 	}
@@ -324,6 +342,15 @@ template <typename Type> Type product(const Array<Type> &arr)
 	Type r = 1;
 	for (auto v : arr)
 		r *= v;
+	return r;
+}
+
+template <typename Type> auto enumerate(const Array<Type> &arr)
+{
+	Array<Tuple<int, Type>> r;
+	int i = 0;
+	for (auto &&v : arr)
+		r.append(make_tuple(i++, v));
 	return r;
 }
 
