@@ -619,7 +619,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(sum(input().split(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S), nullptr, true).map([](const auto &i){return to_int(i);})));
+        print(sum_map(input().split(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S), nullptr, true), [](const auto &i){return to_int(i);}));
     }
 } code_block_1;
 
@@ -1888,8 +1888,8 @@ print(mean_angle([10, 20, 30]))
 ===
 template <typename T1> auto mean_angle(const T1 &angles)
 {
-    auto x = sum(angles.map([](const auto &a){return cos(radians(a));})) / angles.len();
-    auto y = sum(angles.map([](const auto &a){return sin(radians(a));})) / angles.len();
+    auto x = sum_map(angles, [](const auto &a){return cos(radians(a));}) / angles.len();
+    auto y = sum_map(angles, [](const auto &a){return sin(radians(a));}) / angles.len();
     return degrees(atan2(y, x));
 }
 
@@ -1955,8 +1955,8 @@ print(mean_time([‘23:00:17’, ‘23:40:20’, ‘00:12:45’, ‘00:17:19’]
 ===
 template <typename T1> auto mean_angle(const T1 &angles)
 {
-    auto x = sum(angles.map([](const auto &a){return cos(radians(a));})) / angles.len();
-    auto y = sum(angles.map([](const auto &a){return sin(radians(a));})) / angles.len();
+    auto x = sum_map(angles, [](const auto &a){return cos(radians(a));}) / angles.len();
+    auto y = sum_map(angles, [](const auto &a){return sin(radians(a));}) / angles.len();
     return degrees(atan2(y, x));
 }
 
@@ -2078,7 +2078,7 @@ print(qmean((1.<11)))
 ===
 template <typename T1> auto qmean(const T1 &num)
 {
-    return sqrt(sum(num.map([](const auto &n){return n * n;})) / to_float(num.len()));
+    return sqrt(sum_map(num, [](const auto &n){return n * n;}) / to_float(num.len()));
 }
 
 struct CodeBlock1
@@ -3589,7 +3589,7 @@ template <typename T1> auto digital_root(T1 n)
 {
     auto ap = 0;
     while (n >= 10) {
-        n = sum(String(n).map([](const auto &digit){return to_int(digit);}));
+        n = sum_map(String(n), [](const auto &digit){return to_int(digit);});
         ap++;
     }
     return make_tuple(ap, n);

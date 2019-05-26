@@ -380,6 +380,9 @@ class SymbolNode:
                     func_name = 'create_dict'
                 elif func_name.startswith('DefaultDict['): # ]
                     func_name = 'DefaultDict<' + ', '.join(trans_type(c.to_type_str(), c.scope, c.token) for c in self.children[0].children[1:]) + '>'
+                elif func_name == 'sum' and self.children[2].symbol.id == '(' and self.children[2].children[0].symbol.id == '.' and self.children[2].children[0].children[1].token_str() == 'map': # )
+                    assert(len(self.children) == 3)
+                    return 'sum_map(' + self.children[2].children[0].children[0].to_str() + ', ' + self.children[2].children[2].to_str() + ')'
                 else:
                     if self.children[0].symbol.id == ':':
                         fid, sc = find_module(self.children[0].children[0].to_str()).scope.find_and_return_scope(self.children[0].children[1].token_str())

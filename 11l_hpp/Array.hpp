@@ -1,4 +1,4 @@
-#include <initializer_list>
+﻿#include <initializer_list>
 #include <vector>
 
 class ValueError
@@ -329,11 +329,20 @@ template <typename Ty, typename Type> bool in(const Ty &val, const Array<Type> &
 	return std::find(arr.begin(), arr.end(), val) != arr.end();
 }
 
-template <typename Type> Type sum(const Array<Type> &arr)
+template <typename Iterable> auto sum(const Iterable &iterable)
 {
-	Type r = 0;
-	for (auto v : arr)
+	std::remove_const_t<std::remove_reference_t<decltype(*std::begin(iterable))>> r = 0; // >[https://stackoverflow.com/questions/15887144/stdremove-const-with-const-references <- google:‘c++ remove_const’]:‘In order to strip `const` away, you first have to apply `std::remove_reference`, ~‘then’ apply `std::remove_const`’
+	//auto r = decltype(*std::begin(iterable))(0); // this also works
+	for (auto v : iterable)
 		r += v;
+	return r;
+}
+
+template <typename Iterable, typename Func> auto sum_map(const Iterable &iterable, Func &&func)
+{
+	decltype(func(std::declval<decltype(*std::begin(iterable))>())) r = 0;
+	for (auto &&el : iterable)
+		r += func(el);
 	return r;
 }
 
