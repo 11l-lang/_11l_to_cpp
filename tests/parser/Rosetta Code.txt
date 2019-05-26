@@ -212,7 +212,7 @@ template <typename T1> auto gmean(const T1 &num)
 
 template <typename T1> auto hmean(const T1 &num)
 {
-    return num.len() / sum(num.map([](const auto &n){return 1.0 / n;}));
+    return num.len() / sum_map(num, [](const auto &n){return 1.0 / n;});
 }
 auto numbers = create_array({1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
 
@@ -885,7 +885,7 @@ struct CodeBlock1
             if (Lindex == 0)
                 line += u",SUM"_S;
             else
-                line += u","_S + sum(line.split(u","_S).map([](const auto &i){return to_int(i);}));
+                line += u","_S + sum_map(line.split(u","_S), [](const auto &i){return to_int(i);});
             print(line);
             Lindex++;
         }}
@@ -1208,5 +1208,39 @@ struct CodeBlock1
     {
         print(u"#.16"_S.format(beating_probability(4, 9, 6, 6)));
         print(u"#.16"_S.format(beating_probability(10, 5, 7, 6)));
+    }
+} code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Diversity_prediction_theorem#C.2B.2B
+F average_square_diff(a, predictions)
+   R sum(predictions.map(x -> (x - @a) ^ 2)) / predictions.len
+
+F diversity_theorem(truth, predictions)
+   V average = sum(predictions) / predictions.len
+   print(‘average-error: ’average_square_diff(truth, predictions)"\n"‘’
+         ‘crowd-error:   ’((truth - average) ^ 2)"\n"‘’
+         ‘diversity:     ’average_square_diff(average, predictions))
+
+diversity_theorem(49.0, [Float(48), 47, 51])
+diversity_theorem(49.0, [Float(48), 47, 51, 42])
+===
+template <typename T1, typename T2> auto average_square_diff(const T1 &a, const T2 &predictions)
+{
+    return sum_map(predictions, [&a](const auto &x){return pow((x - a), 2);}) / predictions.len();
+}
+
+template <typename T1, typename T2> auto diversity_theorem(const T1 &truth, const T2 &predictions)
+{
+    auto average = sum(predictions) / predictions.len();
+    print(u"average-error: "_S + average_square_diff(truth, predictions) + u"\n"_S + u"crowd-error:   "_S + (pow((truth - average), 2)) + u"\n"_S + u"diversity:     "_S + average_square_diff(average, predictions));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        diversity_theorem(49.0, create_array<double>({to_float(48), 47, 51}));
+        diversity_theorem(49.0, create_array<double>({to_float(48), 47, 51, 42}));
     }
 } code_block_1;
