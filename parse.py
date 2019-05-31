@@ -1444,10 +1444,16 @@ def type_of(sn):
     if type(left) not in (ASTVariableDeclaration, ASTVariableInitialization):
         raise Error('left type is `' + str(type(left)) + '`', sn.left_to_right_token())
     if left.type in ('V', 'П', 'var', 'перем'): # for `V selection_strings = ... selection_strings.map(...)`
+        if left.expression.symbol.id == '(' and left.expression.children[0].token.category == Token.Category.NAME and left.expression.children[0].token_str()[0].isupper(): # ) # for `V n = Node()`
+            tid = sn.scope.find(left.expression.children[0].token_str())
+            assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
+            tid = tid.ast_nodes[0].scope.ids.get(sn.children[1].token_str())
+            assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition))
+            return tid.ast_nodes[0]
         return None
     if len(left.type_args): # `Array[String] ending_tags... ending_tags.append(‘</blockquote>’)`
         return None # [-TODO-]
-    tid = left.scope.find(left.type)
+    tid = left.scope.find(left.type.rstrip('?'))
     assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
     tid = tid.ast_nodes[0].scope.ids.get(sn.children[1].token_str())
     assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition))
@@ -2325,7 +2331,7 @@ def parse_internal(this_node):
                         node.vars = [var_name]
                     else:
                         node = ASTVariableDeclaration()
-                        id = scope.find(node_expression.token.value(source))
+                        id = scope.find(node_expression.token.value(source).rstrip('?'))
                         if id is not None:
                             assert(len(id.ast_nodes) and type(id.ast_nodes[0]) in (ASTTypeDefinition, ASTTypeEnum))
                             if type(id.ast_nodes[0]) == ASTTypeDefinition:
@@ -2373,6 +2379,7 @@ def parse_internal(this_node):
                         scope.add_name(var, node)
                     if type(this_node) == ASTTypeDefinition and this_node.type_name == node.type.rstrip('?'):
                         this_node.has_pointers_to_the_same_type = True
+                        node.is_shared_ptr = True
                 else:
                     node = ASTExpression()
                     node.set_expression(node_expression)
@@ -2519,6 +2526,9 @@ builtins_scope.ids['Time'].ast_nodes[0].scope = time_scope
 f = ASTFunctionDefinition([('days', '0', 'Float'), ('hours', '0', 'Float'), ('minutes', '0', 'Float'), ('seconds', '0', 'Float'), ('milliseconds', '0', 'Float'), ('microseconds', '0', 'Float'), ('weeks', '0', 'Float')])
 f.first_named_only_argument = 0
 builtins_scope.add_name('TimeDelta', ASTTypeDefinition([f]))
+time_delta_scope = Scope(None)
+time_delta_scope.add_name('days', ASTFunctionDefinition([]))
+builtins_scope.ids['TimeDelta'].ast_nodes[0].scope = time_delta_scope
 module_scope = Scope(None)
 module_scope.add_function('perf_counter', ASTFunctionDefinition([]))
 module_scope.add_function('today', ASTFunctionDefinition([]))

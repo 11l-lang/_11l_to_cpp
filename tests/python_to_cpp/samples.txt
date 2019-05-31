@@ -1503,12 +1503,16 @@ struct CodeBlock1
 class Node:
     first_child : 'Node' = None
 n = Node()
+m : Node
 print(n.first_child.first_child.first_child)
+print(m.first_child.first_child.first_child)
 ===
 T Node
    Node? first_child
 V n = Node()
+Node m
 print(n.first_child.first_child.first_child)
+print(m.first_child.first_child.first_child)
 ===
 class Node : public SharedObject
 {
@@ -1516,11 +1520,13 @@ public:
     SharedPtr<Node> first_child;
 };
 auto n = make_SharedPtr<Node>();
+SharedPtr<Node> m;
 
 struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(n->first_child.first_child.first_child);
+        print(n->first_child->first_child->first_child);
+        print(m->first_child->first_child->first_child);
     }
 } code_block_1;
