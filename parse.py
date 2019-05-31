@@ -611,7 +611,7 @@ class SymbolNode:
 
                 if cts0 == '.' and len(self.children[0].children) == 2: # // for `ASTNode token_node; token_node.symbol.id = sid` -> `... token_node->symbol->id = sid`
                     t_node = type_of(self.children[0])                  # \\ and `ASTNode token_node; ... :token_node.symbol.id = sid` -> `... ::token_node->symbol->id = sid`
-                    if t_node is not None and type(t_node) in (ASTVariableDeclaration, ASTVariableInitialization) and t_node.is_reference:
+                    if t_node is not None and type(t_node) in (ASTVariableDeclaration, ASTVariableInitialization) and (t_node.is_reference or t_node.is_shared_ptr):
                         return self.children[0].to_str() + '->' + c1
 
                 if cts0 == '(': # ) # `parse(expr_str).eval()` -> `parse(expr_str)->eval()`
@@ -880,7 +880,7 @@ def trans_type(ty, scope, type_token, ast_type_node = None):
         if id.ast_nodes[0].has_virtual_functions:
             return 'std::unique_ptr<' + ty + '>'
         elif id.ast_nodes[0].has_pointers_to_the_same_type:
-            if ast_type_node is not None and id.ast_nodes[0].tokeni > ast_type_node.tokeni: # if type `ty` was declared after this variable, insert a forward declaration of type `ty`
+            if ast_type_node is not None and tokens[id.ast_nodes[0].tokeni].start > type_token.start: # if type `ty` was declared after this variable, insert a forward declaration of type `ty`
                 ast_type_node.forward_declared_types.add(ty)
             return 'SharedPtr<' + ty + '>'
         return ty
@@ -893,6 +893,8 @@ class ASTVariableDeclaration(ASTNode):
     is_reference = False
     scope : Scope
     type_token : Token
+    is_ptr = False
+    is_shared_ptr = False
 
     def __init__(self):
         self.scope = scope
@@ -906,9 +908,6 @@ class ASTVariableDeclaration(ASTNode):
         return ' ' * (indent*4) + self.trans_type(self.type) + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + '*'*self.is_reference + ', '.join(self.vars) + ";\n"
 
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
-    is_ptr = False
-    is_shared_ptr = False
-
     def to_str(self, indent):
         return super().to_str(indent)[:-2] + ' = ' + self.expression.to_str() + ";\n"
 
@@ -2326,6 +2325,14 @@ def parse_internal(this_node):
                         node.vars = [var_name]
                     else:
                         node = ASTVariableDeclaration()
+                        id = scope.find(node_expression.token.value(source))
+                        if id is not None:
+                            assert(len(id.ast_nodes) and type(id.ast_nodes[0]) in (ASTTypeDefinition, ASTTypeEnum))
+                            if type(id.ast_nodes[0]) == ASTTypeDefinition:
+                                if id.ast_nodes[0].has_virtual_functions:
+                                    node.is_ptr = True
+                                elif id.ast_nodes[0].has_pointers_to_the_same_type:
+                                    node.is_shared_ptr = True
                         node.vars = [var_name]
                         while token.value(source) == ',':
                             node.vars.append(expected_name('variable name'))

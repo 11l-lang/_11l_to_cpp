@@ -1386,3 +1386,141 @@ struct CodeBlock1
             print(i);
     }
 } code_block_1;
+
+
+class Aa:
+    _a : 'Aa' = None
+    class Bb:
+        _b : 'Bb' = None
+        d = 1
+    b : Bb = Bb()
+
+def f(a : Aa):
+    print(a.b.d)
+
+f(Aa())
+===
+T Aa
+   Aa? _a
+   T Bb
+      Bb? _b
+      d = 1
+   Bb b = Bb()
+
+F f(Aa a)
+   print(a.b.d)
+f(Aa())
+===
+class Aa : public SharedObject
+{
+public:
+    SharedPtr<Aa> _a;
+    class Bb : public SharedObject
+    {
+    public:
+        SharedPtr<Bb> _b;
+        decltype(1) d = 1;
+    };
+    SharedPtr<Bb> b = make_SharedPtr<Bb>();
+};
+
+auto f(SharedPtr<Aa> a)
+{
+    print(a->b->d);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        f(make_SharedPtr<Aa>());
+    }
+} code_block_1;
+
+
+class Aa:
+    _a : 'Aa' = None
+    class Bb:
+        _b : 'Bb' = None
+        class Cc:
+            _c : 'Cc' = None
+            d = 1
+        c : Cc = Cc()
+    b : Bb = Bb()
+
+def f(a : Aa):
+    print(a.b.c.d)
+
+f(Aa())
+===
+T Aa
+   Aa? _a
+   T Bb
+      Bb? _b
+      T Cc
+         Cc? _c
+         d = 1
+      Cc c = Cc()
+   Bb b = Bb()
+
+F f(Aa a)
+   print(a.b.c.d)
+f(Aa())
+===
+class Aa : public SharedObject
+{
+public:
+    SharedPtr<Aa> _a;
+    class Bb : public SharedObject
+    {
+    public:
+        SharedPtr<Bb> _b;
+        class Cc : public SharedObject
+        {
+        public:
+            SharedPtr<Cc> _c;
+            decltype(1) d = 1;
+        };
+        SharedPtr<Cc> c = make_SharedPtr<Cc>();
+    };
+    SharedPtr<Bb> b = make_SharedPtr<Bb>();
+};
+
+auto f(SharedPtr<Aa> a)
+{
+    print(a->b->c->d);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        f(make_SharedPtr<Aa>());
+    }
+} code_block_1;
+
+
+class Node:
+    first_child : 'Node' = None
+n = Node()
+print(n.first_child.first_child.first_child)
+===
+T Node
+   Node? first_child
+V n = Node()
+print(n.first_child.first_child.first_child)
+===
+class Node : public SharedObject
+{
+public:
+    SharedPtr<Node> first_child;
+};
+auto n = make_SharedPtr<Node>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(n->first_child.first_child.first_child);
+    }
+} code_block_1;
