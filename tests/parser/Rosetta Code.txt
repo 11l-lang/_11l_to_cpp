@@ -1244,3 +1244,15 @@ struct CodeBlock1
         diversity_theorem(49.0, create_array<double>({to_float(48), 47, 51, 42}));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Dot_product
+print(dot((1,  3, -5), (4, -2, -1)))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(dot(make_tuple(1, 3, -5), make_tuple(4, -2, -1)));
+    }
+} code_block_1;

@@ -2452,6 +2452,7 @@ builtins_scope.add_function('sin',   ASTFunctionDefinition([('x', '', 'Float')])
 builtins_scope.add_function('tan',   ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_function('degrees', ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_function('radians', ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('dot',   ASTFunctionDefinition([('v1', '', ''), ('v2', '', '')]))
 
 def add_builtin_global_var(var_name, var_type, var_type_args = []):
     var = ASTVariableDeclaration()

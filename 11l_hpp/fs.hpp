@@ -211,9 +211,9 @@ inline Tuple<String, String> split_ext(const String &path)
 	size_t dot_pos = path.find_last_of(u".");
 
 	if (dot_pos == String::npos || dot_pos < sep_pos)
-		return make_tuple(path, String());
+		return Tuple<String, String>(path, String());
 
-	return make_tuple(path[range_el(0, (int)dot_pos)], path[range_ei((int)dot_pos)]);
+	return Tuple<String, String>(path[range_el(0, (int)dot_pos)], path[range_ei((int)dot_pos)]);
 }
 }
 }
