@@ -1015,3 +1015,18 @@ template <typename T2> auto f4(const int x, const T2 &y)
 {
     return x + y;
 }
+
+
+print((2, 1) * 1.5)
+print(1.5 * (2, 1))
+print((2, 1) * (1.5, 2.0))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(make_tuple(2, 1) * 1.5);
+        print(1.5 * make_tuple(2, 1));
+        print(make_tuple(2, 1) * make_tuple(1.5, 2.0));
+    }
+} code_block_1;
