@@ -1,6 +1,6 @@
 #include <algorithm>
-using std::min;
-using std::max;
+//using std::min;
+//using std::max;
 
 #include <tuple>
 template <typename...Types> using Tuple = std::tuple<Types...>;
@@ -180,6 +180,19 @@ template <typename Ty1, typename Ty2> inline void print(const Tuple<Ty1, Ty2> &t
 	print(_get<0>(t), u""_S);
 	std::wcout << L", ";
 	print(_get<1>(t), u""_S);
+	std::wcout << L')' << std::wstring(end.cbegin(), end.cend());
+	if (flush)
+		std::wcout.flush();
+}
+
+template <typename Type, int dimension> inline void print(const Tvec<Type, dimension> &v, const String &end = u"\n", bool flush = false)
+{
+	std::wcout << L'(';
+	for (int i = 0; i < dimension; i++) {
+		print(v[i], u""_S);
+		if (i < dimension - 1)
+			std::wcout << L", ";
+	}
 	std::wcout << L')' << std::wstring(end.cbegin(), end.cend());
 	if (flush)
 		std::wcout.flush();

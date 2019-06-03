@@ -1323,7 +1323,7 @@ struct CodeBlock1
 class Converter:
     instr : str
 
-    def to_html():
+    def to_html(self):
         f = lambda: self.instr
         def ff():
             return self.instr
