@@ -88,7 +88,7 @@ template <class T, int N> INLINE const Tvec<T,N> sqrt(const Tvec<T,N> &v)
 template <class T> INLINE const T inversesqrt(const T &x) {return T(1)/sqrt(x);}
 
 //Pseudorandom Number Generating Functions
-static HMuint HMRandomSeed=0;
+/*static HMuint HMRandomSeed=0;
 
 INLINE void rseed(const HMuint newSeed)
 {HMRandomSeed=newSeed;}
@@ -119,7 +119,7 @@ INLINE const HMfloat random(const HMfloat randMax) {return (HMfloat)random((HMlo
 INLINE const HMfloat random(const HMfloat randMin,const HMfloat randMax) {return (HMfloat)random((HMlong_double)randMin,(HMlong_double)randMax);}
 INLINE const HMdouble random(const HMdouble randMax) {return (HMdouble)random((HMlong_double)randMax);}
 INLINE const HMdouble random(const HMdouble randMin,const HMdouble randMax) {return (HMdouble)random((HMlong_double)randMin,(HMlong_double)randMax);}
-
+*/
 //Common Functions
 #if defined(_MSC_VER) && _MSC_VER<=1200 //for MSVC++ 6.0 and earlier
 #define T_TYPE T::TYPE
@@ -245,7 +245,7 @@ template <class T> INLINE const T dot(const Tvec<T,4> &v0,const Tvec<T,4> &v1) {
 template <class T> INLINE const T sqlen(const Tvec<T,3> &v) {return dot(v,v);}
 template <class T> INLINE const T sqlen(const Tvec<T,4> &v) {return dot(v,v);}*/
 template <class T> INLINE const T_TYPE sqlen(const T &v) {return dot(v,v);}
-template <int N> INLINE const short sqlen(const Tvec<short, N> &v) {typedef char please_use_ivec_instead[-1];}
+template <class T, int N> INLINE const T sqlen(const Tvec<T, N> &v) {static_assert(sizeof(T) >= 4, "Please use ivec instead"); return dot(v,v);}
 
 //template <class T> INLINE const typename T::TYPE length(const T &v) {return sqrt(sqlen(v));}
 template <class T> INLINE const T length(const Tvec<T,2> &v) {return sqrt(sqlen(v));}

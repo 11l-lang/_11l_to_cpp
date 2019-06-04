@@ -9,6 +9,7 @@
 #else
 #include <xmmintrin.h>
 #endif
+#include <string.h> // for memcmp [in GCC]
 
 
 template <int size> INLINE bool objEqual(const void *obj1, const void *obj2) {return memcmp(obj1, obj2, size) == 0;}
