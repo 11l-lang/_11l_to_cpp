@@ -91,6 +91,8 @@ template <class T> struct Tbasevec<T,2>
 template <class T> struct Tbasevec<T,3> : Tbasevec<T,2>
 {
 	union {T z,b,p;};
+	using Tbasevec<T,2>::x,
+	      Tbasevec<T,2>::y;
 	Tvec<T,2> &xy() {return (Tvec<T,2>&)x;}
 	Tvec<T,2> &rg() {return (Tvec<T,2>&)x;}
 	Tvec<T,2> &st() {return (Tvec<T,2>&)x;}
@@ -107,6 +109,9 @@ template <class T> struct Tbasevec<T,3> : Tbasevec<T,2>
 template <class T> struct Tbasevec<T,4> : Tbasevec<T,3>
 {
 	union {T w,a,q;};
+	using Tbasevec<T,3>::x,
+	      Tbasevec<T,3>::y,
+	      Tbasevec<T,3>::z;
 	Tvec<T,2> &zw() {return (Tvec<T,2>&)z;}
 	Tvec<T,2> &ba() {return (Tvec<T,2>&)z;}
 	Tvec<T,2> &pq() {return (Tvec<T,2>&)z;}
@@ -131,6 +136,8 @@ template <class T> struct Tbasevec<T,4> : Tbasevec<T,3>
 
 template <class T, int N> struct Tvec : Tbasevec<T,N>
 {
+	using Tbasevec<T,N>::x,
+	      Tbasevec<T,N>::y;
 	INLINE Tvec() {}
 	//cast constructor
 	template <class TT> INLINE explicit Tvec(const Tvec<TT,N> &v) {for (int i=0;i<N;i++) (&x)[i]=(T)v[i];}
@@ -146,20 +153,20 @@ template <class T, int N> struct Tvec : Tbasevec<T,N>
 	//vec2
 	INLINE Tvec(const T x_,const T y_) {x=x_; y=y_; typedef char staticCheck[N==2 ? 1 : 0];}
 	//vec3
-	INLINE Tvec(const Tvec<T,2> &xy,const T z_)   {x=xy.x; y=xy.y; z=z_;   typedef char staticCheck[N==3 ? 1 : 0];}
-	INLINE Tvec(const T x_,const Tvec<T,2> &yz)   {x=x_;   y=yz.x; z=yz.y; typedef char staticCheck[N==3 ? 1 : 0];}
-	INLINE Tvec(const T x_,const T y_,const T z_) {x=x_;   y=y_;   z=z_;   typedef char staticCheck[N==3 ? 1 : 0];}
+	INLINE Tvec(const Tvec<T,2> &xy,const T z_)   {x=xy.x; y=xy.y; Tbasevec<T,N>::z=z_;   typedef char staticCheck[N==3 ? 1 : 0];}
+	INLINE Tvec(const T x_,const Tvec<T,2> &yz)   {x=x_;   y=yz.x; Tbasevec<T,N>::z=yz.y; typedef char staticCheck[N==3 ? 1 : 0];}
+	INLINE Tvec(const T x_,const T y_,const T z_) {x=x_;   y=y_;   Tbasevec<T,N>::z=z_;   typedef char staticCheck[N==3 ? 1 : 0];}
 	//vec4
 	//2 arg
-	INLINE Tvec(const Tvec<T,3> &xyz,const T w_)         {x=xyz.x; y=xyz.y; z=xyz.z; w=w_;}
-	INLINE Tvec(const T x_,const Tvec<T,3> &yzw)         {x=x_;    y=yzw.x; z=yzw.y; w=yzw.z;}
-	INLINE Tvec(const Tvec<T,2> &xy,const Tvec<T,2> &zw) {x=xy.x;  y=xy.y;  z=zw.x;  w=zw.y;}
+	INLINE Tvec(const Tvec<T,3> &xyz,const T w_)         {x=xyz.x; y=xyz.y; Tbasevec<T,N>::z=xyz.z; Tbasevec<T,N>::w=w_;}
+	INLINE Tvec(const T x_,const Tvec<T,3> &yzw)         {x=x_;    y=yzw.x; Tbasevec<T,N>::z=yzw.y; Tbasevec<T,N>::w=yzw.z;}
+	INLINE Tvec(const Tvec<T,2> &xy,const Tvec<T,2> &zw) {x=xy.x;  y=xy.y;  Tbasevec<T,N>::z=zw.x;  Tbasevec<T,N>::w=zw.y;}
 	//3 arg
-	INLINE Tvec(const Tvec<T,2> &xy,const T z_,const T w_) {x=xy.x; y=xy.y; z=z_;   w=w_;}
-	INLINE Tvec(const T x_,const Tvec<T,2> &yz,const T w_) {x=x_;   y=yz.x; z=yz.y; w=w_;}
-	INLINE Tvec(const T x_,const T y_,const Tvec<T,2> &zw) {x=x_;   y=y_;   z=zw.x; w=zw.y;}
+	INLINE Tvec(const Tvec<T,2> &xy,const T z_,const T w_) {x=xy.x; y=xy.y; Tbasevec<T,N>::z=z_;   Tbasevec<T,N>::w=w_;}
+	INLINE Tvec(const T x_,const Tvec<T,2> &yz,const T w_) {x=x_;   y=yz.x; Tbasevec<T,N>::z=yz.y; Tbasevec<T,N>::w=w_;}
+	INLINE Tvec(const T x_,const T y_,const Tvec<T,2> &zw) {x=x_;   y=y_;   Tbasevec<T,N>::z=zw.x; Tbasevec<T,N>::w=zw.y;}
 	//4 arg
-	INLINE Tvec(const T x_,const T y_,const T z_,const T w_) {x=x_; y=y_; z=z_; w=w_;}
+	INLINE Tvec(const T x_,const T y_,const T z_,const T w_) {x=x_; y=y_; Tbasevec<T,N>::z=z_; Tbasevec<T,N>::w=w_;}
 
 	//operators
 	INLINE T &operator [] (const int i) {return (&x)[i];}
