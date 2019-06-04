@@ -223,7 +223,7 @@ template <class T, int N> INLINE const Tvec<T,N> clamp(const Tvec<T,N> &x,const 
 
 template <class T,class Ta> INLINE const T  mix(const T &x,const T &y,const Ta &a) {return x + (y-x)*a;}
 template <class T,class Ta> INLINE const T lerp(const T &x,const T &y,const Ta &a) {return mix(x,y,a);}
-template <class T,class Ta> INLINE const T cerp(const T &x,const T &y,const Ta &a) {return mix(x,y,(Ta(1)-cos(a*PI))/Ta(2));}
+template <class T,class Ta> INLINE const T cerp(const T &x,const T &y,const Ta &a) {return mix(x,y,(Ta(1)-cos(a*(Ta)PI))/Ta(2));}
 template <class T,class Ta> INLINE const T herp3(const T &x,const T &y,const Ta &a) {return mix(x,y,a*a*(Ta(3)-Ta(2)*a));}
 template <class T,class Ta> INLINE const T herp5(const T &x,const T &y,const Ta &a) {return mix(x,y,a*a*a*(Ta(10)+a*(Ta(6)*a-Ta(15))));}
 template <class T> INLINE const T unlerp(const T &x, const T &y, const T &a) {return (a - x)/(y - x);}//returns t, such as lerp(x,y,t) = a
