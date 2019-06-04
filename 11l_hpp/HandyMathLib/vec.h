@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include "typedef.h"
+#include <type_traits> // for std::enable_if_t [in GCC]
 
 
 
@@ -91,8 +92,8 @@ template <class T> struct Tbasevec<T,2>
 template <class T> struct Tbasevec<T,3> : Tbasevec<T,2>
 {
 	union {T z,b,p;};
-	using Tbasevec<T,2>::x,
-	      Tbasevec<T,2>::y;
+	using Tbasevec<T,2>::x;
+	using Tbasevec<T,2>::y;
 	Tvec<T,2> &xy() {return (Tvec<T,2>&)x;}
 	Tvec<T,2> &rg() {return (Tvec<T,2>&)x;}
 	Tvec<T,2> &st() {return (Tvec<T,2>&)x;}
@@ -109,9 +110,9 @@ template <class T> struct Tbasevec<T,3> : Tbasevec<T,2>
 template <class T> struct Tbasevec<T,4> : Tbasevec<T,3>
 {
 	union {T w,a,q;};
-	using Tbasevec<T,3>::x,
-	      Tbasevec<T,3>::y,
-	      Tbasevec<T,3>::z;
+	using Tbasevec<T,3>::x;
+	using Tbasevec<T,3>::y;
+	using Tbasevec<T,3>::z;
 	Tvec<T,2> &zw() {return (Tvec<T,2>&)z;}
 	Tvec<T,2> &ba() {return (Tvec<T,2>&)z;}
 	Tvec<T,2> &pq() {return (Tvec<T,2>&)z;}
@@ -136,8 +137,8 @@ template <class T> struct Tbasevec<T,4> : Tbasevec<T,3>
 
 template <class T, int N> struct Tvec : Tbasevec<T,N>
 {
-	using Tbasevec<T,N>::x,
-	      Tbasevec<T,N>::y;
+	using Tbasevec<T,N>::x;
+	using Tbasevec<T,N>::y;
 	INLINE Tvec() {}
 	//cast constructor
 	template <class TT> INLINE explicit Tvec(const Tvec<TT,N> &v) {for (int i=0;i<N;i++) (&x)[i]=(T)v[i];}

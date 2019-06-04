@@ -4,7 +4,7 @@
 #include "vec.h"
 #include "mat.h"
 #include "quat.h"
-#include "aabb.h"
+//#include "aabb.h"
 
 
 
@@ -50,12 +50,14 @@ template <class dstT,class srcT> INLINE const dstT mat_cast(const srcT &m) {retu
 template <class dstT,class srcT> INLINE const dstT quat_cast(const Tquat<srcT> &q)
 {return dstT((dst)q.x, (dst)q.y, (dst)q.z, (dst)q.w);}
 
+template <class Tvec> class Taabb;
 template <class dstT,class srcT> INLINE const dstT aabb_cast(const Taabb<srcT> &b)
 {return dstT(vec_cast<dst>(b.min), vec_cast<dst>(b.max));}
 
 template <class dstT,class srcT> INLINE const dstT rect_cast(const Taabb<srcT> &r)
 {return dstT(vec_cast<dst>(r.min), vec_cast<dst>(r.max));}
 
+template <class T> class Trange;
 template <class dstT,class srcT> INLINE const dstT range_cast(const Trange<srcT> &r)
 {return dstT(dst(r.min), dst(r.max));}
 

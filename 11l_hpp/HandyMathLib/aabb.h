@@ -2,6 +2,7 @@
 #define HM_AABB_H
 
 #include "func.h"
+#include <string.h> // for memcmp [in GCC]
 
 template <class T> T minimum(const T &t1, const T &t2) {return min(t1, t2);}
 template <class T> T maximum(const T &t1, const T &t2) {return max(t1, t2);}
@@ -91,8 +92,8 @@ template <class Tvec> class Taabb : public Trange<Tvec>
 {
 	typedef typename Tvec::TYPE T;
 public:
-	using Trange<Tvec>::min,
-	      Trange<Tvec>::max;
+	using Trange<Tvec>::min;
+	using Trange<Tvec>::max;
 
 	INLINE Taabb() {}
 	template <class TT> INLINE explicit Taabb(const Taabb<TT> &b) {min=(Tvec)b.min; max=(Tvec)b.max;}
