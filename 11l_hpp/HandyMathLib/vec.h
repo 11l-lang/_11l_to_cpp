@@ -175,16 +175,16 @@ template <class T, int N> struct Tvec : Tbasevec<T,N>
 	INLINE operator const T* () const {return &x;}
 
 	//vector ~ a
-	template <typename Ty> INLINE const Tvec<decltype(T()+Ty()), N> operator+(const Ty a) const {Tvec<decltype(T()+Ty()), N> r; for (int i=0;i<N;i++) r[i]=(&x)[i] + a; return r;}
-	template <typename Ty> INLINE const Tvec<decltype(T()-Ty()), N> operator-(const Ty a) const {Tvec<decltype(T()-Ty()), N> r; for (int i=0;i<N;i++) r[i]=(&x)[i] - a; return r;}
-	template <typename Ty> INLINE const Tvec<decltype(T()*Ty()), N> operator*(const Ty a) const {Tvec<decltype(T()*Ty()), N> r; for (int i=0;i<N;i++) r[i]=(&x)[i] * a; return r;}
-	template <typename Ty> INLINE const Tvec<decltype(T()/Ty()), N> operator/(const Ty a) const {Tvec<decltype(T()/Ty()), N> r; for (int i=0;i<N;i++) r[i]=(&x)[i] / a; return r;}
+	template <typename Ty, typename = std::enable_if_t<std::is_arithmetic<Ty>::value>> INLINE const Tvec<decltype(T()+Ty()), N> operator+(const Ty a) const {Tvec<decltype(T()+Ty()), N> r; for (int i=0;i<N;i++) r[i]=(&x)[i] + a; return r;}
+	template <typename Ty, typename = std::enable_if_t<std::is_arithmetic<Ty>::value>> INLINE const Tvec<decltype(T()-Ty()), N> operator-(const Ty a) const {Tvec<decltype(T()-Ty()), N> r; for (int i=0;i<N;i++) r[i]=(&x)[i] - a; return r;}
+	template <typename Ty, typename = std::enable_if_t<std::is_arithmetic<Ty>::value>> INLINE const Tvec<decltype(T()*Ty()), N> operator*(const Ty a) const {Tvec<decltype(T()*Ty()), N> r; for (int i=0;i<N;i++) r[i]=(&x)[i] * a; return r;}
+	template <typename Ty, typename = std::enable_if_t<std::is_arithmetic<Ty>::value>> INLINE const Tvec<decltype(T()/Ty()), N> operator/(const Ty a) const {Tvec<decltype(T()/Ty()), N> r; for (int i=0;i<N;i++) r[i]=(&x)[i] / a; return r;}
 
 	//a ~ vector
-	template <typename Ty> INLINE friend const Tvec<decltype(Ty()+T()), N> operator+(const Ty a, const Tvec &v) {Tvec<decltype(Ty()+T()), N> r; for (int i=0;i<N;i++) r[i]=a + v[i]; return r;}
-	template <typename Ty> INLINE friend const Tvec<decltype(Ty()-T()), N> operator-(const Ty a, const Tvec &v) {Tvec<decltype(Ty()-T()), N> r; for (int i=0;i<N;i++) r[i]=a - v[i]; return r;}
-	template <typename Ty> INLINE friend const Tvec<decltype(Ty()*T()), N> operator*(const Ty a, const Tvec &v) {Tvec<decltype(Ty()*T()), N> r; for (int i=0;i<N;i++) r[i]=a * v[i]; return r;}
-	template <typename Ty> INLINE friend const Tvec<decltype(Ty()/T()), N> operator/(const Ty a, const Tvec &v) {Tvec<decltype(Ty()/T()), N> r; for (int i=0;i<N;i++) r[i]=a / v[i]; return r;}
+	template <typename Ty, typename = std::enable_if_t<std::is_arithmetic<Ty>::value>> INLINE friend const Tvec<decltype(Ty()+T()), N> operator+(const Ty a, const Tvec &v) {Tvec<decltype(Ty()+T()), N> r; for (int i=0;i<N;i++) r[i]=a + v[i]; return r;}
+	template <typename Ty, typename = std::enable_if_t<std::is_arithmetic<Ty>::value>> INLINE friend const Tvec<decltype(Ty()-T()), N> operator-(const Ty a, const Tvec &v) {Tvec<decltype(Ty()-T()), N> r; for (int i=0;i<N;i++) r[i]=a - v[i]; return r;}
+	template <typename Ty, typename = std::enable_if_t<std::is_arithmetic<Ty>::value>> INLINE friend const Tvec<decltype(Ty()*T()), N> operator*(const Ty a, const Tvec &v) {Tvec<decltype(Ty()*T()), N> r; for (int i=0;i<N;i++) r[i]=a * v[i]; return r;}
+	template <typename Ty, typename = std::enable_if_t<std::is_arithmetic<Ty>::value>> INLINE friend const Tvec<decltype(Ty()/T()), N> operator/(const Ty a, const Tvec &v) {Tvec<decltype(Ty()/T()), N> r; for (int i=0;i<N;i++) r[i]=a / v[i]; return r;}
 
 	//vector ~ vector
 	template <typename Ty> INLINE const Tvec<decltype(T()+Ty()), N> operator+(const Tvec<Ty, N> &v) const {Tvec<decltype(T()+Ty()), N> r; for (int i=0;i<N;i++) r[i]=(&x)[i] + v[i]; return r;}
