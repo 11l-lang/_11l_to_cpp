@@ -139,6 +139,27 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
     prev_indentation_level : int
     prev_linestart : int
 
+    def skip_multiline_comment():
+        nonlocal i, source, comments
+        comment_start = i
+        lbr = source[i+1]
+        rbr = {"‘": "’", "(": ")", "{": "}", "[": "]"}[lbr]
+        i += 2
+        nesting_level = 1
+        while True:
+            ch = source[i]
+            i += 1
+            if ch == lbr:
+                nesting_level += 1
+            elif ch == rbr:
+                nesting_level -= 1
+                if nesting_level == 0:
+                    break
+            if i == len(source):
+                raise Error('there is no corresponding opening parenthesis/bracket/brace/qoute for `' + lbr + '`', comment_start+1)
+        if comments is not None:
+            comments.append((comment_start, i))
+
     while i < len(source):
         if begin_of_line: # at the beginning of each line, the line's indentation level is compared to the last indentation_levels [:1]
             begin_of_line = False
@@ -156,7 +177,15 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
             if i == len(source): # end of source
                 break
 
-            if source[i] in "\r\n" or source[i:i+2] in ('//', R'\\', R'\‘', R'\(', R'\{', R'\['): # ]})’ # lines with only whitespace and/or comments do not affect the indentation
+            ii = i
+            if source[i:i+2] in (R'\‘', R'\(', R'\{', R'\['): # ]})’ 
+                skip_multiline_comment()
+                while i < len(source) and source[i] in " \t": # skip whitespace characters
+                    i += 1
+                if i == len(source): # end of source
+                    break
+
+            if source[i] in "\r\n" or source[i:i+2] in ('//', R'\\'): # lines with only whitespace and/or comments do not affect the indentation
                 continue
 
             if source[i] in "{}": # Indentation level of lines starting with { or } is ignored
@@ -216,7 +245,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                 next_line_pos = source.find("\n", i)
                 raise Error('mixing tabs and spaces in indentation: `' + source[linestart:i].replace(' ', 'S').replace("\t", 'TAB') + source[i:next_line_pos if next_line_pos != -1 else len(source)] + '`', i)
 
-            indentation_level = i - linestart
+            indentation_level = ii - linestart
             if len(indentation_levels) and indentation_levels[-1][0] == -1: # сразу после символа `{` идёт новый произвольный отступ (понижение уровня отступа может быть полезно, если вдруг отступ оказался слишком большой), который действует вплоть до парного символа `}`
                 indentation_levels[-1] = (indentation_level, indentation_levels[-1][1]) #indentation_levels[-1][0] = indentation_level # || maybe this is unnecessary (actually it is necessary, see test "fn f()\n{\na = 1") // }
                 # // This is uncertain piece of code:
@@ -227,8 +256,8 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                     while e < len(source) and source[e] not in "\r\n":
                         e += 1
                     raise Error("inconsistent indentations:\n```\n" + prev_indentation_level*('TAB' if indentation_tabs else 'S') + source[prev_linestart:linestart]
-                        + (i-linestart)*('TAB' if tabs else 'S') + source[i:e] + "\n```", i)
-                prev_linestart = i
+                        + (ii-linestart)*('TAB' if tabs else 'S') + source[ii:e] + "\n```", ii)
+                prev_linestart = ii
 
                 prev_indentation_level = indentation_levels[-1][0] if len(indentation_levels) else 0
 
@@ -239,22 +268,22 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                     if prev_indentation_level == 0: # len(indentation_levels) == 0 or indentation_levels[-1][0] == 0:
                         indentation_tabs = tabs # первоначальная/новая установка символа для отступа (либо табуляция, либо пробелы) производится только от нулевого уровня отступа
                     indentation_levels.append((indentation_level, False))
-                    tokens.append(Token(linestart, i, Token.Category.SCOPE_BEGIN))
+                    tokens.append(Token(linestart, ii, Token.Category.SCOPE_BEGIN))
                     if implied_scopes is not None:
                         implied_scopes.append((Char('{'), tokens[-2].end + (1 if source[tokens[-2].end] in " \n" else 0)))
                 else: # [3:] [-1]:‘If it is smaller, it ~‘must’ be one of the numbers occurring on the stack; all numbers on the stack that are larger are popped off, and for each number popped off a DEDENT token is generated.’ [:4]
                     while True:
                         if indentation_levels[-1][1]:
-                            raise Error('too much unindent, what is this unindent intended for?', i)
+                            raise Error('too much unindent, what is this unindent intended for?', ii)
                         indentation_levels.pop()
-                        tokens.append(Token(i, i, Token.Category.SCOPE_END))
+                        tokens.append(Token(ii, ii, Token.Category.SCOPE_END))
                         if implied_scopes is not None:
-                            implied_scopes.append((Char('}'), i))
+                            implied_scopes.append((Char('}'), ii))
                         level = indentation_levels[-1][0] if len(indentation_levels) else 0 #level, explicit_scope_via_curly_braces = indentation_levels[-1] if len(indentation_levels) else [0, False]
                         if level == indentation_level:
                             break
                         if level < indentation_level:
-                            raise Error('unindent does not match any outer indentation level', i)
+                            raise Error('unindent does not match any outer indentation level', ii)
 
                 prev_indentation_level = indentation_level
 
@@ -279,24 +308,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
             if comments is not None:
                 comments.append((comment_start, i))
         elif ch == '\\' and source[i+1:i+2] in "‘({[": # multi-line comment # ]})’
-            comment_start = i
-            lbr = source[i+1]
-            rbr = {"‘": "’", "(": ")", "{": "}", "[": "]"}[lbr]
-            i += 2
-            nesting_level = 1
-            while True:
-                ch = source[i]
-                i += 1
-                if ch == lbr:
-                    nesting_level += 1
-                elif ch == rbr:
-                    nesting_level -= 1
-                    if nesting_level == 0:
-                        break
-                if i == len(source):
-                    raise Error('there is no corresponding opening parenthesis/bracket/brace/qoute for `' + lbr + '`', comment_start+1)
-            if comments is not None:
-                comments.append((comment_start, i))
+            skip_multiline_comment()
         else:
             def is_hexadecimal_digit(ch):
                 return '0' <= ch <= '9' or 'A' <= ch <= 'F' or 'a' <= ch <= 'f' or ch in 'абсдефАБСДЕФ'
