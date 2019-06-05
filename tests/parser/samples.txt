@@ -1030,3 +1030,12 @@ struct CodeBlock1
         print(make_tuple(2, 1) * make_tuple(1.5, 2.0));
     }
 } code_block_1;
+
+
+V tag = S ‘_’
+           \(case) ‘*’
+              ‘b’
+           \(case) ‘_’
+              ‘u’
+===
+auto tag = [&](const auto &a){return a == u'*' ? u'b'_C : a == u'_' ? u'u'_C : throw KeyError(a);}(u"_"_S);
