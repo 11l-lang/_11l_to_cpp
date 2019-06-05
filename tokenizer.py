@@ -131,9 +131,6 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
     indentation_levels : List[Tuple[int, bool]] = []
     nesting_elements : List[Tuple[Char, int]] = [] # логически этот стек можно объединить с indentation_levels, но так немного удобнее (конкретно: для проверок `nesting_elements[-1][0] != ...`)
     i = 0
-    #def end_scope(opt = 0):
-    #    pass
-
     begin_of_line = True
     indentation_tabs : bool
     prev_indentation_level : int
@@ -292,7 +289,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
         if ch in " \t":
             i += 1 # just skip whitespace characters
         elif ch in "\r\n":
-            #if newline_chars is not None: # rejected this code as it does not count newline characters inside comments and string literals — better to use pqmarkup.py approach — on demand (i.e. only when error occured) calculation of newline characters array
+            #if newline_chars is not None: # rejected this code as it does not count newline characters inside comments and string literals
             #    newline_chars.append(i)
             i += 1
             if ch == "\r" and source[i:i+1] == "\n":
@@ -538,7 +535,6 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
             elif ch == '}':
                 if len(nesting_elements) == 0 or nesting_elements[-1][0] != '{':
                     raise Error('there is no corresponding opening brace for `}`', lexem_start)
-                #end_scope(lexem_start)
                 nesting_elements.pop()
                 while indentation_levels[-1][1] != True:
                     tokens.append(Token(lexem_start, lexem_start, Token.Category.SCOPE_END))
@@ -560,7 +556,6 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                 if len(nesting_elements) == 0 or nesting_elements[-1][0] != {']':'[', ')':'('}[ch]: # ])
                     raise Error('there is no corresponding opening parenthesis/bracket for `' + ch + '`', lexem_start)
                 nesting_elements.pop()
-                #end_scope(lexem_start)
                 category = Token.Category.DELIMITER
 
             else:
@@ -571,7 +566,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
     if len(nesting_elements):
         raise Error('there is no corresponding closing parenthesis/bracket/brace for `' + nesting_elements[-1][0] + '`', nesting_elements[-1][1])
 
-    #end_scope() # [4:] [-1]:‘At the end of the file, a DEDENT token is generated for each number remaining on the stack that is larger than zero.’
+    # [4:] [-1]:‘At the end of the file, a DEDENT token is generated for each number remaining on the stack that is larger than zero.’
     while len(indentation_levels):
         assert(indentation_levels[-1][1] != True)
         tokens.append(Token(i, i, Token.Category.SCOPE_END))
