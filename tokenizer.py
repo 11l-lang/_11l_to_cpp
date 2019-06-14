@@ -361,7 +361,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                     else: # this is a hexadecimal number
                         while i < len(source) and (is_hexadecimal_digit(source[i]) or source[i] == "'"):
                             i += 1
-                        if not (source[lexem_start+4:lexem_start+5] == "'" or source[i-3:i-2] == "'"):
+                        if not (source[lexem_start+4:lexem_start+5] == "'" or source[i-3:i-2] == "'" or source[i-2:i-1] == "'"):
                             raise Error('digit separator in this hexadecimal number is located in the wrong place', lexem_start)
                         category = Token.Category.NUMERIC_LITERAL
 
@@ -397,7 +397,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                     next_digit_separator = 0
                     is_oct_or_bin = False
                     if i < len(source) and source[i] == "'":
-                        if i - lexem_start == 2: # special handling for 12'345 (чтобы это не считалось short hexadecimal number)
+                        if i - lexem_start in (2, 1): # special handling for 12'345/1'234 (чтобы это не считалось short/ultrashort hexadecimal number)
                             j = i + 1
                             while j < len(source) and is_hexadecimal_digit(source[j]):
                                 if not ('0' <= source[j] <= '9'):
@@ -411,7 +411,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                             if j < len(source) and source[j] in 'oоbд':
                                 is_oct_or_bin = True
 
-                    if i < len(source) and source[i] == "'" and ((i - lexem_start == 4 and not is_oct_or_bin) or (i - lexem_start == 2 and (next_digit_separator != 3 or is_hex))): # this is a hexadecimal number
+                    if i < len(source) and source[i] == "'" and ((i - lexem_start == 4 and not is_oct_or_bin) or (i - lexem_start in (2, 1) and (next_digit_separator != 3 or is_hex))): # this is a hexadecimal number
                         if i - lexem_start == 2: # this is a short hexadecimal number
                             while True:
                                 i += 1
@@ -422,6 +422,13 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                                     raise Error('expected end of short hexadecimal number', i)
                                 if source[i:i+1] != "'":
                                     break
+                        elif i - lexem_start == 1: # this is an ultrashort hexadecimal number
+                            i += 1
+                            if i + 1 > len(source) or not is_hexadecimal_digit(source[i]):
+                                raise Error('wrong ultrashort hexadecimal number', lexem_start)
+                            i += 1
+                            if i < len(source) and is_hexadecimal_digit(source[i]):
+                                raise Error('expected end of ultrashort hexadecimal number', i)
                         else:
                             i += 1
                             while i < len(source) and is_hexadecimal_digit(source[i]):

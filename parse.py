@@ -295,10 +295,12 @@ class SymbolNode:
                 return '0' + n[:-1]
             if n[-1] in 'bд':
                 return '0b' + n[:-1]
-            if n[4:5] == "'" or n[-3:-2] == "'":
+            if n[4:5] == "'" or n[-3:-2] == "'" or n[-2:-1] == "'":
                 nn = ''
                 for c in n:
                     nn += {'А':'A','Б':'B','С':'C','Д':'D','Е':'E','Ф':'F'}.get(c, c)
+                if n[-2:-1] == "'":
+                    nn = nn.replace("'", '')
                 return '0x' + nn
             return n
 
