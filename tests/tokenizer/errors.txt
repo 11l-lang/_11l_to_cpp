@@ -18,8 +18,16 @@
 ^Error: wrong short hexadecimal number
 
 
+0'G
+^Error: wrong ultrashort hexadecimal number
+
+
 00'7FF
      ^Error: expected end of short hexadecimal number
+
+
+0'7F
+   ^Error: expected end of ultrashort hexadecimal number
 
 
 FFF'000
