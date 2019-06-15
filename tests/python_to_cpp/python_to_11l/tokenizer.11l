@@ -189,7 +189,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
                L i < source.len & (source[i] C ‘0’..‘7’ | source[i] == ‘_’)
                   i++
             E I is_bin
-               L i < source.len & (source[i] C ‘01’ | source[i] == ‘_’)
+               L i < source.len & source[i] C ‘01_’
                   i++
             E
                L i < source.len & (source[i] C ‘0’..‘9’ | source[i] C ‘_.eE’)

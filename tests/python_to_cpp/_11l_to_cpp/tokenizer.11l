@@ -33,9 +33,9 @@ Error: mixing tabs and spaces in indentation: `...`
 ---------------------------------------------------------------------------------------------------------------
 В одной строке для отступа используется смесь пробелов и символов табуляции.
 Выберите что-либо одно (желательно сразу для всего файла): либо пробелы для отступа, либо табуляцию.
-Примечание: внутри строковых литералов, а также внутри строк кода можно смешивать пробелы и табуляцию. Эта
-ошибка генерируется только при проверке отступа (отступ — последовательность символов пробелов или табуляции от
-самого начала строки до первого символа отличного от пробела и табуляции).
+Примечание: внутри строковых литералов, в комментариях, а также внутри строк кода можно смешивать пробелы и
+табуляцию. Эта ошибка генерируется только при проверке отступов (отступ — последовательность символов пробелов
+или табуляции от самого начала строки до первого символа отличного от пробела и табуляции).
 
 ---------------------------------------------------------------------------------------------------------------
 Error: inconsistent indentations: ```...```
@@ -124,6 +124,26 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
    Int prev_indentation_level
    Int prev_linestart
 
+   F skip_multiline_comment()
+      V comment_start = @i
+      V lbr = @source[@i + 1]
+      V rbr = S lbr {"‘" {"’"}; ‘(’ {‘)’}; ‘{’ {‘}’}; ‘[’ {‘]’}}
+      @i += 2
+      V nesting_level = 1
+      L
+         V ch = @source[@i]
+         @i++
+         I ch == lbr
+            nesting_level++
+         E I ch == rbr
+            nesting_level--
+            I nesting_level == 0
+               L.break
+         I @i == @source.len
+            X Error(‘there is no corresponding opening parenthesis/bracket/brace/qoute for `’lbr‘`’, comment_start + 1)
+      I @comments != N
+         @comments.append((comment_start, @i))
+
    L i < source.len
       I begin_of_line
          begin_of_line = 0B
@@ -140,8 +160,15 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
             i++
          I i == source.len
             L.break
+         V ii = i
+         I source[i .< i + 2] C (‘\‘’’', ‘\(’, ‘\{’, ‘\[’)
+            skip_multiline_comment()
+            L i < source.len & source[i] C " \t"
+               i++
+            I i == source.len
+               L.break
 
-         I source[i] C "\r\n" | source[i .< i + 2] C (‘//’, ‘\\’, ‘\‘’’', ‘\(’, ‘\{’, ‘\[’)
+         I source[i] C "\r\n" | source[i .< i + 2] C (‘//’, ‘\\’)
             L.continue
 
          I source[i] C ‘{}’
@@ -184,7 +211,7 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
          I tabs & spaces
             V next_line_pos = source.findi("\n", i)
             X Error(‘mixing tabs and spaces in indentation: `’source[linestart .< i].replace(‘ ’, ‘S’).replace("\t", ‘TAB’) + source[i .< I next_line_pos != -1 {next_line_pos} E !source.empty]‘`’, i)
-         V indentation_level = i - linestart
+         V indentation_level = ii - linestart
          I indentation_levels.len & indentation_levels.last[0] == -1
             indentation_levels.last = (indentation_level, indentation_levels.last[1])
             indentation_tabs = tabs
@@ -193,8 +220,8 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
                V e = i + 1
                L e < source.len & source[e] !C "\r\n"
                   e++
-               X Error("inconsistent indentations:\n```\n"prev_indentation_level * (I indentation_tabs {‘TAB’} E ‘S’) + source[prev_linestart .< linestart] + (i - linestart) * (I tabs {‘TAB’} E ‘S’) + source[i .< e]"\n```", i)
-            prev_linestart = i
+               X Error("inconsistent indentations:\n```\n"prev_indentation_level * (I indentation_tabs {‘TAB’} E ‘S’) + source[prev_linestart .< linestart] + (ii - linestart) * (I tabs {‘TAB’} E ‘S’) + source[ii .< e]"\n```", ii)
+            prev_linestart = ii
             prev_indentation_level = I !indentation_levels.empty {indentation_levels.last[0]} E 0
 
             I indentation_level == prev_indentation_level
@@ -204,22 +231,22 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
                I prev_indentation_level == 0
                   indentation_tabs = tabs
                indentation_levels.append((indentation_level, 0B))
-               tokens.append(Token(linestart, i, Token.Category.SCOPE_BEGIN))
+               tokens.append(Token(linestart, ii, Token.Category.SCOPE_BEGIN))
                I implied_scopes != N
                   implied_scopes.append((Char(‘{’), tokens[(len)-2].end + (I source[tokens[(len)-2].end] C " \n" {1} E 0)))
             E
                L
                   I indentation_levels.last[1]
-                     X Error(‘too much unindent, what is this unindent intended for?’, i)
+                     X Error(‘too much unindent, what is this unindent intended for?’, ii)
                   indentation_levels.pop()
-                  tokens.append(Token(i, i, Token.Category.SCOPE_END))
+                  tokens.append(Token(ii, ii, Token.Category.SCOPE_END))
                   I implied_scopes != N
-                     implied_scopes.append((Char(‘}’), i))
+                     implied_scopes.append((Char(‘}’), ii))
                   V level = I !indentation_levels.empty {indentation_levels.last[0]} E 0
                   I level == indentation_level
                      L.break
                   I level < indentation_level
-                     X Error(‘unindent does not match any outer indentation level’, i)
+                     X Error(‘unindent does not match any outer indentation level’, ii)
             prev_indentation_level = indentation_level
       V ch = source[i]
 
@@ -239,24 +266,7 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
          I comments != N
             comments.append((comment_start, i))
       E I ch == ‘\’ & source[i + 1 .< i + 2] C "‘({["
-         V comment_start = i
-         V lbr = source[i + 1]
-         V rbr = S lbr {"‘" {"’"}; ‘(’ {‘)’}; ‘{’ {‘}’}; ‘[’ {‘]’}}
-         i += 2
-         V nesting_level = 1
-         L
-            ch = source[i]
-            i++
-            I ch == lbr
-               nesting_level++
-            E I ch == rbr
-               nesting_level--
-               I nesting_level == 0
-                  L.break
-            I i == source.len
-               X Error(‘there is no corresponding opening parenthesis/bracket/brace/qoute for `’lbr‘`’, comment_start + 1)
-         I comments != N
-            comments.append((comment_start, i))
+         skip_multiline_comment()
       E
          F is_hexadecimal_digit(ch)
             R ch C ‘0’..‘9’ | ch C ‘A’..‘F’ | ch C ‘a’..‘f’ | ch C ‘абсдефАБСДЕФ’
@@ -275,6 +285,7 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
             I source[i - 1] == ‘ ’
                i--
             category = OPERATOR
+
          E I ch.is_alpha() | ch C (‘_’, ‘@’)
             L i < source.len & source[i] == ‘@’
                i++
@@ -306,7 +317,7 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
                E
                   L i < source.len & (is_hexadecimal_digit(source[i]) | source[i] == ‘'’)
                      i++
-                  I !(source[lexem_start + 4 .< lexem_start + 5] == ‘'’ | source[i - 3 .< i - 2] == ‘'’)
+                  I !(source[lexem_start + 4 .< lexem_start + 5] == ‘'’ | source[i - 3 .< i - 2] == ‘'’ | source[i - 2 .< i - 1] == ‘'’)
                      X Error(‘digit separator in this hexadecimal number is located in the wrong place’, lexem_start)
                   category = NUMERIC_LITERAL
 
@@ -341,7 +352,7 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
                V next_digit_separator = 0
                V is_oct_or_bin = 0B
                I i < source.len & source[i] == ‘'’
-                  I i - lexem_start == 2
+                  I i - lexem_start C (2, 1)
                      V j = i + 1
                      L j < source.len & is_hexadecimal_digit(source[j])
                         I !(source[j] C ‘0’..‘9’)
@@ -355,14 +366,24 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
                      I j < source.len & source[j] C ‘oоbд’
                         is_oct_or_bin = 1B
 
-               I i < source.len & source[i] == ‘'’ & ((i - lexem_start == 4 & !is_oct_or_bin) | (i - lexem_start == 2 & (next_digit_separator != 3 | is_hex)))
+               I i < source.len & source[i] == ‘'’ & ((i - lexem_start == 4 & !is_oct_or_bin) | (i - lexem_start C (2, 1) & (next_digit_separator != 3 | is_hex)))
                   I i - lexem_start == 2
+                     L
+                        i++
+                        I i + 2 > source.len | !is_hexadecimal_digit(source[i]) | !is_hexadecimal_digit(source[i + 1])
+                           X Error(‘wrong short hexadecimal number’, lexem_start)
+                        i += 2
+                        I i < source.len & is_hexadecimal_digit(source[i])
+                           X Error(‘expected end of short hexadecimal number’, i)
+                        I source[i .< i + 1] != ‘'’
+                           L.break
+                  E I i - lexem_start == 1
                      i++
-                     I i + 2 > source.len | !is_hexadecimal_digit(source[i]) | !is_hexadecimal_digit(source[i + 1])
-                        X Error(‘wrong short hexadecimal number’, lexem_start)
-                     i += 2
+                     I i + 1 > source.len | !is_hexadecimal_digit(source[i])
+                        X Error(‘wrong ultrashort hexadecimal number’, lexem_start)
+                     i++
                      I i < source.len & is_hexadecimal_digit(source[i])
-                        X Error(‘expected end of short hexadecimal number’, i)
+                        X Error(‘expected end of ultrashort hexadecimal number’, i)
                   E
                      i++
                      L i < source.len & is_hexadecimal_digit(source[i])
