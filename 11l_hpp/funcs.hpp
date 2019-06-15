@@ -5,9 +5,9 @@
 #undef assert
 //namespace std
 //{
-	template <typename Type> Tvec<Type, 2> make_tuple(const Type x, const Type y) { return Tvec<Type, 2>(x, y); }
-	template <typename Type> Tvec<Type, 3> make_tuple(const Type x, const Type y, const Type z) { return Tvec<Type, 3>(x, y, z); }
-	template <typename Type> Tvec<Type, 4> make_tuple(const Type x, const Type y, const Type z, const Type w) { return Tvec<Type, 4>(x, y, z, w); }
+	template <typename Type, typename = std::enable_if_t<std::is_arithmetic<Type>::value>> Tvec<Type, 2> make_tuple(const Type x, const Type y) { return Tvec<Type, 2>(x, y); }
+	template <typename Type, typename = std::enable_if_t<std::is_arithmetic<Type>::value>> Tvec<Type, 3> make_tuple(const Type x, const Type y, const Type z) { return Tvec<Type, 3>(x, y, z); }
+	template <typename Type, typename = std::enable_if_t<std::is_arithmetic<Type>::value>> Tvec<Type, 4> make_tuple(const Type x, const Type y, const Type z, const Type w) { return Tvec<Type, 4>(x, y, z, w); }
 #define DEFINE_make_tuple(Type) \
 	Tvec<Type, 2> make_tuple(const Type x, const Type y) { return Tvec<Type, 2>(x, y); } \
 	Tvec<Type, 3> make_tuple(const Type x, const Type y, const Type z) { return Tvec<Type, 3>(x, y, z); } \

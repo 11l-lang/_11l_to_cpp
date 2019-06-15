@@ -580,7 +580,7 @@ L(i) 4
 auto cellcountx = 6;
 auto cellcounty = 5;
 auto celltable = create_dict(dict_of(make_tuple(1, 2), 1)(make_tuple(1, 3), 1)(make_tuple(0, 3), 1));
-DefaultDict<Tuple<int, int>, int> universe;
+DefaultDict<ivec2, int> universe;
 
 struct CodeBlock1
 {
@@ -597,7 +597,7 @@ struct CodeBlock1
             print(u"\nGeneration "_S + i + u":"_S);
             for (auto row : range_el(0, cellcounty))
                 print(u"  "_S + range_el(0, cellcountx).map([&row](const auto &col){return create_array({u". "_S, u"O "_S})[::universe[make_tuple(row, col)]];}).join(u""_S));
-            DefaultDict<Tuple<int, int>, int> nextgeneration;
+            DefaultDict<ivec2, int> nextgeneration;
             for (auto row : range_el(0, cellcounty))
                 for (auto col : range_el(0, cellcountx))
                     nextgeneration.set(make_tuple(row, col), celltable.get(make_tuple(universe[make_tuple(row, col)], -universe[make_tuple(row, col)] + sum(multiloop(range_ee(row - 1, row + 1), range_ee(col - 1, col + 1), [](const auto &r, const auto &c){return ::universe[make_tuple(r, c)];}))), 0));

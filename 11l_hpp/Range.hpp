@@ -168,6 +168,13 @@ template <> inline bool in(const int &val, const Range<int, false, false> &range
 
 template <typename Ty> inline bool in(const Ty &val, const RangeEI<Ty> &range) {return val >= range.b;}
 
+template <typename Type, int n> bool in(const Type &val, const Tvec<Type, n> &v)
+{
+	for (int i=0; i<n; i++)
+		if (v[i] == val) return true;
+	return false;
+}
+
 // Based on [http://artlang.net/post/c++11-obkhod-elementov-kortezhe-std-tuple/ <- google:‘c++ tuple’]
 namespace _detail_
 {
