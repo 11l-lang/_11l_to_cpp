@@ -36,7 +36,7 @@ public:
 template <typename T1, typename T2> auto highlight(const T1 &lang, const T2 &source)
 {
     auto writepos = 0;
-    Array<Tuple<int, int>> comments;
+    Array<ivec2> comments;
     auto res = u""_S;
 
     auto html_escape = [](const auto &s)

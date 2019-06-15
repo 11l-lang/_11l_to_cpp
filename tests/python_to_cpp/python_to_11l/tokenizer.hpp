@@ -59,7 +59,7 @@ public:
     }
 };
 
-template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline_chars = nullptr, Array<Tuple<int, int>>* const comments = nullptr)
+template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline_chars = nullptr, Array<ivec2>* const comments = nullptr)
 {
     Array<Token> tokens;
     Array<int> indentation_levels;

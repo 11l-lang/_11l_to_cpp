@@ -225,12 +225,12 @@ class SymbolNode:
                 return r + ']'
         elif self.symbol.id == '(': # )
             assert(self.tuple)
-            r = 'Tuple['
+            r = '('
             for i in range(len(self.children)):
                 r += self.children[i].to_type_str()
                 if i < len(self.children) - 1:
                     r += ', '
-            return r + ']'
+            return r + ')'
     
         assert(self.token.category == Token.Category.NAME)
         return self.token_str()
@@ -863,7 +863,11 @@ def trans_type(ty, scope, type_token, ast_type_node = None):
             return ty.replace('.', '::') # [-TODO: generalize-]
 
         if ty.startswith('('): # )
-            return 'Tuple<' + trans_type(ty[1:-1], scope, type_token, ast_type_node) + '>'
+            tuple_types_str = trans_type(ty[1:-1], scope, type_token, ast_type_node)
+            tuple_types = tuple_types_str.split(', ')
+            if tuple_types[0] in ('int', 'float', 'double') and tuple_types.count(tuple_types[0]) == len(tuple_types):
+                return {'int':'i', 'float':'', 'double':'d'}[tuple_types[0]] + 'vec' + str(len(tuple_types))
+            return 'Tuple<' + tuple_types_str + '>'
 
         p = ty.find('[') # ]
         if p != -1:
