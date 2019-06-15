@@ -37,9 +37,9 @@ Error: mixing tabs and spaces in indentation: `...`
 ---------------------------------------------------------------------------------------------------------------
 В одной строке для отступа используется смесь пробелов и символов табуляции.
 Выберите что-либо одно (желательно сразу для всего файла): либо пробелы для отступа, либо табуляцию.
-Примечание: внутри строковых литералов, а также внутри строк кода можно смешивать пробелы и табуляцию. Эта
-ошибка генерируется только при проверке отступа (отступ — последовательность символов пробелов или табуляции от
-самого начала строки до первого символа отличного от пробела и табуляции).
+Примечание: внутри строковых литералов, в комментариях, а также внутри строк кода можно смешивать пробелы и
+табуляцию. Эта ошибка генерируется только при проверке отступов (отступ — последовательность символов пробелов
+или табуляции от самого начала строки до первого символа отличного от пробела и табуляции).
 
 ---------------------------------------------------------------------------------------------------------------
 Error: inconsistent indentations: ```...```
@@ -155,6 +155,30 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
     int prev_indentation_level;
     int prev_linestart;
 
+    auto skip_multiline_comment = [&comments, &i, &source]()
+    {
+        auto comment_start = i;
+        auto lbr = source[i + 1];
+        auto rbr = [&](const auto &a){return a == u'‘' ? u'’'_C : a == u'(' ? u')'_C : a == u'{' ? u'}'_C : a == u'[' ? u']'_C : throw KeyError(a);}(lbr);
+        i += 2;
+        auto nesting_level = 1;
+        while (true) {
+            auto ch = source[i];
+            i++;
+            if (ch == lbr)
+                nesting_level++;
+            else if (ch == rbr) {
+                nesting_level--;
+                if (nesting_level == 0)
+                    break;
+            }
+            if (i == source.len())
+                throw Error(u"there is no corresponding opening parenthesis/bracket/brace/qoute for `"_S + lbr + u"`"_S, comment_start + 1);
+        }
+        if (comments != nullptr)
+            comments->append(make_tuple(comment_start, i));
+    };
+
     while (i < source.len()) {
         if (begin_of_line) {
             begin_of_line = false;
@@ -172,7 +196,15 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
             }
             if (i == source.len())
                 break;
-            if (in(source[i], u"\r\n"_S) || in(source[range_el(i, i + 2)], make_tuple(u"//"_S, uR"(\\)"_S, uR"(\‘)"_S, uR"(\()"_S, uR"(\{)"_S, uR"(\[)"_S)))
+            auto ii = i;
+            if (in(source[range_el(i, i + 2)], make_tuple(uR"(\‘)"_S, uR"(\()"_S, uR"(\{)"_S, uR"(\[)"_S))) {
+                skip_multiline_comment();
+                while (i < source.len() && in(source[i], u" \t"_S))
+                    i++;
+                if (i == source.len())
+                    break;
+            }
+            if (in(source[i], u"\r\n"_S) || in(source[range_el(i, i + 2)], make_tuple(u"//"_S, uR"(\\)"_S)))
                 continue;
             if (in(source[i], u"{}"_S))
                 continue;
@@ -220,7 +252,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                 auto next_line_pos = source.findi(u"\n"_S, i);
                 throw Error(u"mixing tabs and spaces in indentation: `"_S + source[range_el(linestart, i)].replace(u" "_S, u"S"_S).replace(u"\t"_S, u"TAB"_S) + source[range_el(i, next_line_pos != -1 ? next_line_pos : !source.empty())] + u"`"_S, i);
             }
-            auto indentation_level = i - linestart;
+            auto indentation_level = ii - linestart;
             if (indentation_levels.len() && _get<0>(indentation_levels.last()) == -1) {
                 indentation_levels.last() = make_tuple(indentation_level, _get<1>(indentation_levels.last()));
                 indentation_tabs = tabs;
@@ -230,9 +262,9 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                     auto e = i + 1;
                     while (e < source.len() && !in(source[e], u"\r\n"_S))
                         e++;
-                    throw Error(u"inconsistent indentations:\n```\n"_S + prev_indentation_level * (indentation_tabs ? u"TAB"_S : u"S"_S) + source[range_el(prev_linestart, linestart)] + (i - linestart) * (tabs ? u"TAB"_S : u"S"_S) + source[range_el(i, e)] + u"\n```"_S, i);
+                    throw Error(u"inconsistent indentations:\n```\n"_S + prev_indentation_level * (indentation_tabs ? u"TAB"_S : u"S"_S) + source[range_el(prev_linestart, linestart)] + (ii - linestart) * (tabs ? u"TAB"_S : u"S"_S) + source[range_el(ii, e)] + u"\n```"_S, ii);
                 }
-                prev_linestart = i;
+                prev_linestart = ii;
                 prev_indentation_level = !indentation_levels.empty() ? _get<0>(indentation_levels.last()) : 0;
 
                 if (indentation_level == prev_indentation_level) {
@@ -243,23 +275,23 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                     if (prev_indentation_level == 0)
                         indentation_tabs = tabs;
                     indentation_levels.append(make_tuple(indentation_level, false));
-                    tokens.append(Token(linestart, i, Token::Category::SCOPE_BEGIN));
+                    tokens.append(Token(linestart, ii, Token::Category::SCOPE_BEGIN));
                     if (implied_scopes != nullptr)
                         implied_scopes->append(make_tuple(u'{'_C, tokens.at_plus_len( - 2).end + (in(source[tokens.at_plus_len( - 2).end], u" \n"_S) ? 1 : 0)));
                 }
                 else
                     while (true) {
                         if (_get<1>(indentation_levels.last()))
-                            throw Error(u"too much unindent, what is this unindent intended for?"_S, i);
+                            throw Error(u"too much unindent, what is this unindent intended for?"_S, ii);
                         indentation_levels.pop();
-                        tokens.append(Token(i, i, Token::Category::SCOPE_END));
+                        tokens.append(Token(ii, ii, Token::Category::SCOPE_END));
                         if (implied_scopes != nullptr)
-                            implied_scopes->append(make_tuple(u'}'_C, i));
+                            implied_scopes->append(make_tuple(u'}'_C, ii));
                         auto level = !indentation_levels.empty() ? _get<0>(indentation_levels.last()) : 0;
                         if (level == indentation_level)
                             break;
                         if (level < indentation_level)
-                            throw Error(u"unindent does not match any outer indentation level"_S, i);
+                            throw Error(u"unindent does not match any outer indentation level"_S, ii);
                     }
                 prev_indentation_level = indentation_level;
             }
@@ -282,28 +314,8 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
             if (comments != nullptr)
                 comments->append(make_tuple(comment_start, i));
         }
-        else if (ch == u'\\' && in(source[range_el(i + 1, i + 2)], u"‘({["_S)) {
-            auto comment_start = i;
-            auto lbr = source[i + 1];
-            auto rbr = [&](const auto &a){return a == u'‘' ? u'’'_C : a == u'(' ? u')'_C : a == u'{' ? u'}'_C : a == u'[' ? u']'_C : throw KeyError(a);}(lbr);
-            i += 2;
-            auto nesting_level = 1;
-            while (true) {
-                ch = source[i];
-                i++;
-                if (ch == lbr)
-                    nesting_level++;
-                else if (ch == rbr) {
-                    nesting_level--;
-                    if (nesting_level == 0)
-                        break;
-                }
-                if (i == source.len())
-                    throw Error(u"there is no corresponding opening parenthesis/bracket/brace/qoute for `"_S + lbr + u"`"_S, comment_start + 1);
-            }
-            if (comments != nullptr)
-                comments->append(make_tuple(comment_start, i));
-        }
+        else if (ch == u'\\' && in(source[range_el(i + 1, i + 2)], u"‘({["_S))
+            skip_multiline_comment();
         else {
             auto is_hexadecimal_digit = [](const auto &ch)
             {
@@ -325,6 +337,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                     i--;
                 category = decltype(category)::OPERATOR;
             }
+
             else if (ch.is_alpha() || in(ch, make_tuple(u"_"_S, u"@"_S))) {
                 while (i < source.len() && source[i] == u'@')
                     i++;
@@ -361,7 +374,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                     else {
                         while (i < source.len() && (is_hexadecimal_digit(source[i]) || source[i] == u'\''))
                             i++;
-                        if (!(source[range_el(lexem_start + 4, lexem_start + 5)] == u'\'' || source[range_el(i - 3, i - 2)] == u'\''))
+                        if (!(source[range_el(lexem_start + 4, lexem_start + 5)] == u'\'' || source[range_el(i - 3, i - 2)] == u'\'' || source[range_el(i - 2, i - 1)] == u'\''))
                             throw Error(u"digit separator in this hexadecimal number is located in the wrong place"_S, lexem_start);
                         category = decltype(category)::NUMERIC_LITERAL;
                     }
@@ -405,7 +418,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                     auto next_digit_separator = 0;
                     auto is_oct_or_bin = false;
                     if (i < source.len() && source[i] == u'\'') {
-                        if (i - lexem_start == 2) {
+                        if (in(i - lexem_start, make_tuple(2, 1))) {
                             auto j = i + 1;
                             while (j < source.len() && is_hexadecimal_digit(source[j])) {
                                 if (!(in(source[j], range_ee(u'0'_C, u'9'_C))))
@@ -423,14 +436,25 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                         }
                     }
 
-                    if (i < source.len() && source[i] == u'\'' && ((i - lexem_start == 4 && !is_oct_or_bin) || (i - lexem_start == 2 && (next_digit_separator != 3 || is_hex)))) {
-                        if (i - lexem_start == 2) {
+                    if (i < source.len() && source[i] == u'\'' && ((i - lexem_start == 4 && !is_oct_or_bin) || (in(i - lexem_start, make_tuple(2, 1)) && (next_digit_separator != 3 || is_hex)))) {
+                        if (i - lexem_start == 2)
+                            while (true) {
+                                i++;
+                                if (i + 2 > source.len() || !is_hexadecimal_digit(source[i]) || !is_hexadecimal_digit(source[i + 1]))
+                                    throw Error(u"wrong short hexadecimal number"_S, lexem_start);
+                                i += 2;
+                                if (i < source.len() && is_hexadecimal_digit(source[i]))
+                                    throw Error(u"expected end of short hexadecimal number"_S, i);
+                                if (source[range_el(i, i + 1)] != u'\'')
+                                    break;
+                            }
+                        else if (i - lexem_start == 1) {
                             i++;
-                            if (i + 2 > source.len() || !is_hexadecimal_digit(source[i]) || !is_hexadecimal_digit(source[i + 1]))
-                                throw Error(u"wrong short hexadecimal number"_S, lexem_start);
-                            i += 2;
+                            if (i + 1 > source.len() || !is_hexadecimal_digit(source[i]))
+                                throw Error(u"wrong ultrashort hexadecimal number"_S, lexem_start);
+                            i++;
                             if (i < source.len() && is_hexadecimal_digit(source[i]))
-                                throw Error(u"expected end of short hexadecimal number"_S, i);
+                                throw Error(u"expected end of ultrashort hexadecimal number"_S, i);
                         }
                         else {
                             i++;

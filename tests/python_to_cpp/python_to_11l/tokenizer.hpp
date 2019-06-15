@@ -225,7 +225,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                     while (i < source.len() && (in(source[i], range_ee(u'0'_C, u'7'_C)) || source[i] == u'_'))
                         i++;
                 else if (is_bin)
-                    while (i < source.len() && (in(source[i], u"01"_S) || source[i] == u'_'))
+                    while (i < source.len() && in(source[i], u"01_"_S))
                         i++;
                 else {
                     while (i < source.len() && (in(source[i], range_ee(u'0'_C, u'9'_C)) || in(source[i], u"_.eE"_S))) {

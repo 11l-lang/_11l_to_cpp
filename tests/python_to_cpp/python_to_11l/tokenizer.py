@@ -220,7 +220,7 @@ def tokenize(source, newline_chars : List[int] = None, comments : List[Tuple[int
                     while i < len(source) and ('0' <= source[i] <= '7' or source[i] == '_'):
                         i += 1
                 elif is_bin:
-                    while i < len(source) and (source[i] in '01' or source[i] == '_'):
+                    while i < len(source) and source[i] in '01_':
                         i += 1
                 else:
                     while i < len(source) and ('0' <= source[i] <= '9' or source[i] in '_.eE'):
