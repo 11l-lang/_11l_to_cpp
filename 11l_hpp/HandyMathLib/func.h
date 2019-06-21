@@ -79,7 +79,7 @@ template <class T> INLINE const T degrees(const T &rad) {return rad*T(57.2957795
 
 //Exponential Functions
 template <class T> INLINE const T exp2(const T &x) {return exp(x*T(0.69314718055994530941723212145818L));}
-template <class T> INLINE const T log2(const T &x) {return log(x)*T(1.4426950408889634073599246810019L);}
+//template <class T> INLINE const T log2(const T &x) {return log(x)*T(1.4426950408889634073599246810019L);}
 template <class T, int N> INLINE const Tvec<T,N> sqrt(const Tvec<T,N> &v)
 {
 	Tvec<T,N> r;

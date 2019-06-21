@@ -3756,3 +3756,53 @@ struct CodeBlock1
             print(linear(x));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Entropy
+import collections, math
+
+def entropy(source):
+    hist = collections.defaultdict(int) # Char
+    for c in source:
+        hist[c] += 1
+    r = 0.0
+    for v in hist.values():
+        c = float(v) / len(source)
+        r -= c * math.log2(c)
+    return r
+
+print(entropy('1223334444'))
+===
+//import collections, math
+
+F entropy(source)
+   V hist = DefaultDict[Char, Int]()
+   L(c) source
+      hist[c]++
+   V r = 0.0
+   L(v) hist.values()
+      V c = Float(v) / source.len
+      r -= c * log2(c)
+   R r
+print(entropy(‘1223334444’))
+===
+template <typename T1> auto entropy(const T1 &source)
+{
+    auto hist = DefaultDict<Char, int>();
+    for (auto &&c : source)
+        hist[c]++;
+    auto r = 0.0;
+    for (auto &&v : hist.values()) {
+        auto c = to_float(v) / source.len();
+        r -= c * log2(c);
+    }
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(entropy(u"1223334444"_S));
+    }
+} code_block_1;
