@@ -3806,3 +3806,151 @@ struct CodeBlock1
         print(entropy(u"1223334444"_S));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Equilibrium_index#Multi_Pass
+def eqindex(arr):
+    return [i for i in range(len(arr)) if sum(arr[:i]) == sum(arr[i+1:])]
+
+print(eqindex([-7, 1, 5, 2, -4, 3, 0]))
+===
+F eqindex(arr)
+   R (0 .< arr.len).filter(i -> sum(@arr[0 .< i]) == sum(@arr[i + 1 ..]))
+print(eqindex([-7, 1, 5, 2, -4, 3, 0]))
+===
+template <typename T1> auto eqindex(const T1 &arr)
+{
+    return range_el(0, arr.len()).filter([&arr](const auto &i){return sum(arr[range_el(0, i)]) == sum(arr[range_ei(i + 1)]);});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(eqindex(create_array({-7, 1, 5, 2, -4, 3, 0})));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Ethiopian_multiplication#Python
+def halve(x):
+    return x // 2
+
+def double_(x):
+    return x * 2
+
+def even(x):
+    return not x % 2
+
+def ethiopian(multiplier, multiplicand):
+    result = 0
+
+    while multiplier >= 1:
+        if not even(multiplier):
+            result += multiplicand
+        multiplier   = halve(multiplier)
+        multiplicand = double_(multiplicand)
+
+    return result
+
+print(ethiopian(17, 34))
+===
+F halve(x)
+   R x I/ 2
+
+F double_(x)
+   R x * 2
+
+F even(x)
+   R !(x % 2)
+
+F ethiopian(=multiplier, =multiplicand)
+   V result = 0
+
+   L multiplier >= 1
+      I !even(multiplier)
+         result += multiplicand
+      multiplier = halve(multiplier)
+      multiplicand = double_(multiplicand)
+   R result
+print(ethiopian(17, 34))
+===
+template <typename T1> auto halve(const T1 &x)
+{
+    return int(x)/int(2);
+}
+
+template <typename T1> auto double_(const T1 &x)
+{
+    return x * 2;
+}
+
+template <typename T1> auto even(const T1 &x)
+{
+    return !(mod(x, 2));
+}
+
+template <typename T1, typename T2> auto ethiopian(T1 multiplier, T2 multiplicand)
+{
+    auto result = 0;
+
+    while (multiplier >= 1) {
+        if (!even(multiplier))
+            result += multiplicand;
+        multiplier = halve(multiplier);
+        multiplicand = double_(multiplicand);
+    }
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(ethiopian(17, 34));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Euler_method#Python
+def euler(f, y0, a, b, h):
+    t = a
+    y = y0
+    while t <= b:
+        print("%6.3f %6.3f" % (t, y))
+        t += h
+        y += h * f(t, y)
+
+newtoncooling = lambda time, temp: -0.07 * (temp - 20)
+
+euler(newtoncooling, 100.0, 0.0, 100.0, 10.0)
+===
+F euler(f, y0, a, b, h)
+   V t = a
+   V y = y0
+   L t <= b
+      print(‘#2.3 #2.3’.format(t, y))
+      t += h
+      y += h * f(t, y)
+V newtoncooling = (time, temp) -> -0.07 * (temp - 20)
+euler(newtoncooling, 100.0, 0.0, 100.0, 10.0)
+===
+template <typename T1, typename T2, typename T3, typename T4, typename T5> auto euler(const T1 &f, const T2 &y0, const T3 &a, const T4 &b, const T5 &h)
+{
+    auto t = a;
+    auto y = y0;
+    while (t <= b) {
+        print(u"#2.3 #2.3"_S.format(t, y));
+        t += h;
+        y += h * f(t, y);
+    }
+}
+auto newtoncooling = [](const auto &time, const auto &temp){return -0.07 * (temp - 20);};
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        euler(newtoncooling, 100.0, 0.0, 100.0, 10.0);
+    }
+} code_block_1;
