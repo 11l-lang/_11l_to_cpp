@@ -4,7 +4,7 @@
 ===================================================================================================
 
 Handy Math Library
-Copyright (C) 2005-2009  Alexander Tretyak
+Copyright (C) 2005-2019  Alexander Tretyak
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
