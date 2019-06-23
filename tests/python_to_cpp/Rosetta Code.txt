@@ -4039,3 +4039,174 @@ struct CodeBlock1
         print(u"#.0^5 + #.0^5 + #.0^5 + #.0^5 = #.0^5"_S.format(_get<0>(r), _get<1>(r), _get<2>(r), _get<3>(r), _get<4>(r)));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Evaluate_binomial_coefficients#Python
+def binomial_coeff(n, k):
+    result = 1
+    for i in range(1, k+1):
+        result = result * (n-i+1) / i
+    return result
+
+print(binomial_coeff(5, 3))
+===
+F binomial_coeff(n, k)
+   V result = 1
+   L(i) 1 .< k + 1
+      result = result * (n - i + 1) / i
+   R result
+print(binomial_coeff(5, 3))
+===
+template <typename T1, typename T2> auto binomial_coeff(const T1 &n, const T2 &k)
+{
+    auto result = 1;
+    for (auto i : range_el(1, k + 1))
+        result = result * (n - i + 1) / i;
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(binomial_coeff(5, 3));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Exceptions#Python
+class SillyError(Exception):
+    message : str
+    def __init__(self, message):
+         self.message = message
+
+try:
+   raise SillyError('egg')
+except SillyError as se:
+   print(se.message)
+===
+T SillyError
+   String message
+   F (message)
+      .message = message
+
+X.try
+   X SillyError(‘egg’)
+X.catch SillyError se
+   print(se.message)
+===
+class SillyError
+{
+public:
+    String message;
+    template <typename T1> SillyError(const T1 &message)
+    {
+        this->message = message;
+    }
+};
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        try
+        {
+            throw SillyError(u"egg"_S);
+        }
+        catch (const SillyError& se)
+        {
+            print(se.message);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Exceptions/Catch_an_exception_thrown_in_a_nested_call#Python
+class U0(Exception): pass
+class U1(Exception): pass
+ 
+def baz(i):
+    if i == 0:
+        raise U0()
+    else:
+        raise U1()
+ 
+def bar(i):
+    baz(i) # Nest those calls
+ 
+def foo():
+    for i in range(2):
+        try:
+            bar(i)
+        except U0:
+            print("Function foo caught exception U0")
+ 
+foo()
+===
+T U0
+{
+}
+T U1
+{
+}
+
+F baz(i)
+   I i == 0
+      X U0()
+   E
+      X U1()
+
+F bar(i)
+   baz(i)
+
+F foo()
+   L(i) 0.<2
+      X.try
+         bar(i)
+      X.catch U0
+         print(‘Function foo caught exception U0’)
+foo()
+===
+class U0
+{
+};
+
+class U1
+{
+};
+
+template <typename T1> auto baz(const T1 &i)
+{
+    if (i == 0)
+        throw U0();
+    else
+        throw U1();
+}
+
+template <typename T1> auto bar(const T1 &i)
+{
+    baz(i);
+}
+
+auto foo()
+{
+    for (auto i : range_el(0, 2)) {
+        try
+        {
+            bar(i);
+        }
+        catch (const U0&)
+        {
+            print(u"Function foo caught exception U0"_S);
+        }
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        foo();
+    }
+} code_block_1;

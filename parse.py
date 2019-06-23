@@ -788,7 +788,7 @@ class ASTNodeWithChildren(ASTNode):
             ti = self.tokeni - 1
             while ti > 0 and tokens[ti].category in (Token.Category.SCOPE_END, Token.Category.STATEMENT_SEPARATOR):
                 ti -= 1
-            r = (source[tokens[ti].end:tokens[self.tokeni].start].count("\n")-1) * "\n"
+            r = (min(source[tokens[ti].end:tokens[self.tokeni].start].count("\n"), 2) - 1) * "\n"
         r += ' ' * (indent*4) + t + (("\n" + ' ' * (indent*4) + "{\n") if place_opening_curly_bracket_on_its_own_line else " {\n") # }
         r += add_at_beginning
         for c in self.children:
