@@ -141,6 +141,13 @@ inline void print(Char c, const String &end = u"\n", bool flush = false)
 	print(String(c), end, flush);
 }
 
+inline void print(bool b, const String &end = u"\n", bool flush = false)
+{
+	std::wcout << (int)b << L'B' << std::wstring(end.cbegin(), end.cend());
+	if (flush)
+		std::wcout.flush();
+}
+
 inline void print(int i, const String &end = u"\n", bool flush = false)
 {
 	std::wcout << i << std::wstring(end.cbegin(), end.cend());
@@ -168,6 +175,20 @@ template <typename Ty> inline void print(const Array<Ty> &arr, const String &end
 	for (int i=0; i<arr.len(); i++) {
 		print(arr[i], u""_S);
 		if (i < arr.len()-1) std::wcout << L", ";
+	}
+	std::wcout << L']' << std::wstring(end.cbegin(), end.cend());
+	if (flush)
+		std::wcout.flush();
+}
+
+template <typename Key, typename Value> inline void print(const Dict<Key, Value> &dict, const String &end = u"\n", bool flush = false)
+{
+	std::wcout << L'[';
+	bool first = true;
+	for (auto &&[key, value] : dict) {
+		if (!first) std::wcout << L", "; else first = false;
+		print(key, u" = "_S);
+		print(value, u""_S);
 	}
 	std::wcout << L']' << std::wstring(end.cbegin(), end.cend());
 	if (flush)

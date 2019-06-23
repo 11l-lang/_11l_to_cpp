@@ -1530,3 +1530,21 @@ struct CodeBlock1
         print(m->first_child->first_child->first_child);
     }
 } code_block_1;
+
+
+def f():
+    nn = 2
+    nn_to_n = {n*nn: n for n in range(10)}
+    print(nn_to_n)
+===
+F f()
+   V nn = 2
+   V nn_to_n = Dict(0.<10, n -> (n * @nn, n))
+   print(nn_to_n)
+===
+auto f()
+{
+    auto nn = 2;
+    auto nn_to_n = create_dict(range_el(0, 10), [&nn](const auto &n){return make_tuple(n * nn, n);});
+    print(nn_to_n);
+}
