@@ -1256,3 +1256,51 @@ struct CodeBlock1
         print(dot(make_tuple(1, 3, -5), make_tuple(4, -2, -1)));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Angle_difference_between_two_bearings#Python
+F get_difference(b1, b2)
+   R wrap(b2 - b1, -180.0, 180.0)
+
+print(get_difference( 20.0, 45.0))
+print(get_difference(-45.0, 45.0))
+print(get_difference(-85.0, 90.0))
+print(get_difference(-95.0, 90.0))
+print(get_difference(-45.0, 125.0))
+print(get_difference(-45.0, 145.0))
+print(get_difference(-45.0, 125.0))
+print(get_difference(-45.0, 145.0))
+print(get_difference(29.4803, -88.6381))
+print(get_difference(-78.3251, -159.036))
+print(‘’)
+print(get_difference(-70099.74233810938, 29840.67437876723))
+print(get_difference(-165313.6666297357, 33693.9894517456))
+print(get_difference(1174.8380510598456, -154146.66490124757))
+print(get_difference(60175.77306795546, 42213.07192354373))
+===
+template <typename T1, typename T2> auto get_difference(const T1 &b1, const T2 &b2)
+{
+    return wrap(b2 - b1, -180.0, 180.0);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(get_difference(20.0, 45.0));
+        print(get_difference(-45.0, 45.0));
+        print(get_difference(-85.0, 90.0));
+        print(get_difference(-95.0, 90.0));
+        print(get_difference(-45.0, 125.0));
+        print(get_difference(-45.0, 145.0));
+        print(get_difference(-45.0, 125.0));
+        print(get_difference(-45.0, 145.0));
+        print(get_difference(29.4803, -88.6381));
+        print(get_difference(-78.3251, -159.036));
+        print(u""_S);
+        print(get_difference(-70099.74233810938, 29840.67437876723));
+        print(get_difference(-165313.6666297357, 33693.9894517456));
+        print(get_difference(1174.8380510598456, -154146.66490124757));
+        print(get_difference(60175.77306795546, 42213.07192354373));
+    }
+} code_block_1;
