@@ -68,7 +68,7 @@ F print_seconds(sec)
 template <typename T1> auto print_seconds(const T1 &sec)
 {
     auto r60 = mod(sec, 60);
-    print(Char(u'0'_C.code + int(r60)/int(10)) + Char(u'0'_C.code + mod(r60, 10)));
+    print(Char(u'0'_C.code + idiv(r60, 10)) + Char(u'0'_C.code + mod(r60, 10)));
 }
 
 
@@ -1548,3 +1548,32 @@ auto f()
     auto nn_to_n = create_dict(range_el(0, 10), [&nn](const auto &n){return make_tuple(n * nn, n);});
     print(nn_to_n);
 }
+
+
+print(0x1000_0000_0000 // 0x1000)
+a = 6
+a //= 2
+print(a)
+===
+print(1000'0000'0000 I/ 10'00)
+V a = 6
+a I/= 2
+print(a)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(idiv(0x1000'0000'0000, 0x10'00));
+    }
+} code_block_1;
+auto a = 6;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        a = idiv(a, 2);
+        print(a);
+    }
+} code_block_2;
