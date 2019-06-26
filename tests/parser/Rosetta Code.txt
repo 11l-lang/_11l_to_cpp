@@ -43,7 +43,7 @@ print(‘Abundant  = ’abundant)
 ===
 template <typename T1> auto sum_proper_divisors(const T1 &n)
 {
-    return n < 2 ? 0 : sum(range_ee(1, int(n)/int(2)).filter([&n](const auto &it){return (mod(n, it)) == 0;}));
+    return n < 2 ? 0 : sum(range_ee(1, idiv(n, 2)).filter([&n](const auto &it){return (mod(n, it)) == 0;}));
 }
 auto deficient = 0;
 auto perfect = 0;
@@ -140,7 +140,7 @@ L(n) 1..20000
 ===
 template <typename T1> auto sum_proper_divisors(const T1 &n)
 {
-    return n < 2 ? 0 : sum(range_ee(1, int(n)/int(2)).filter([&n](const auto &it){return (mod(n, it)) == 0;}));
+    return n < 2 ? 0 : sum(range_ee(1, idiv(n, 2)).filter([&n](const auto &it){return (mod(n, it)) == 0;}));
 }
 
 struct CodeBlock1
@@ -178,7 +178,7 @@ struct CodeBlock1
         print(u"a + b = "_S + (a + b));
         print(u"a - b = "_S + (a - b));
         print(u"a * b = "_S + (a * b));
-        print(u"a / b = "_S + (int(a)/int(b)));
+        print(u"a / b = "_S + (idiv(a, b)));
         print(u"a % b = "_S + (mod(a, b)));
         print(u"a ^ b = "_S + (pow(a, b)));
     }
@@ -400,10 +400,10 @@ struct CodeBlock1
                 for (auto d : range_el(1, g)) {
                     if (mod((g * (p - 1)), d) != 0 || mod_(-p * p, h3) != mod(d, h3))
                         continue;
-                    auto q = 1 + int((p - 1) * g)/int(d);
+                    auto q = 1 + idiv((p - 1) * g, d);
                     if (!is_prime(q))
                         continue;
-                    auto r = 1 + (int(p * q)/int(h3));
+                    auto r = 1 + (idiv(p * q, h3));
                     if (!is_prime(r) || mod((q * r), (p - 1)) != 1)
                         continue;
                     print(p + u" x "_S + q + u" x "_S + r);

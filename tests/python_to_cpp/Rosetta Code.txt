@@ -725,7 +725,7 @@ print(‘Abundant  = ’String(abundant))
 ===
 template <typename T1> auto sum_proper_divisors(const T1 &n)
 {
-    return n < 2 ? 0 : sum(range_el(1, int(n)/int(2) + 1).filter([&n](const auto &it){return (mod(n, it)) == 0;}));
+    return n < 2 ? 0 : sum(range_el(1, idiv(n, 2) + 1).filter([&n](const auto &it){return (mod(n, it)) == 0;}));
 }
 auto deficient = 0;
 auto perfect = 0;
@@ -828,7 +828,7 @@ struct CodeBlock1
     }
 } code_block_1;
 std::function<String(const String&, const int)> ljust = [](const auto &s, const auto &w){return s + (u" "_S * (w - s.len()));};
-std::function<String(const String&, const int)> centr = [](const auto &s, const auto &w){return (u" "_S * (w - s.len() - (int(w)/int(2) - int(s.len())/int(2)))) + s + (u" "_S * (int(w)/int(2) - int(s.len())/int(2)));};
+std::function<String(const String&, const int)> centr = [](const auto &s, const auto &w){return (u" "_S * (w - s.len() - (idiv(w, 2) - idiv(s.len(), 2)))) + s + (u" "_S * (idiv(w, 2) - idiv(s.len(), 2)));};
 std::function<String(const String&, const int)> rjust = [](const auto &s, const auto &w){return (u" "_S * (w - s.len())) + s;};
 
 struct CodeBlock2
@@ -1166,7 +1166,7 @@ struct CodeBlock1
     {
         while (true) {
             auto divisors = 1;
-            for (auto i : range_el(1, int(n)/int(2) + 1))
+            for (auto i : range_el(1, idiv(n, 2) + 1))
                 if (mod(n, i) == 0)
                     divisors++;
 
@@ -1970,10 +1970,10 @@ template <typename T1> auto mean_time(const T1 &times)
     auto mean_seconds = round(mean_as_angle * day / 360.0);
     if (mean_seconds < 0)
         mean_seconds += day;
-    auto h = int(mean_seconds)/int(3600);
+    auto h = idiv(mean_seconds, 3600);
     auto m = mod(mean_seconds, 3600);
     auto s = mod(m, 60);
-    m = int(m)/int(60);
+    m = idiv(m, 60);
     return String(h).zfill(2) + u":"_S + String(m).zfill(2) + u":"_S + String(s).zfill(2);
 }
 
@@ -2006,7 +2006,7 @@ template <typename T1> auto median(const T1 &aray)
 {
     auto srtd = sorted(aray);
     auto alen = srtd.len();
-    return 0.5 * (srtd[int((alen - 1))/int(2)] + srtd[int(alen)/int(2)]);
+    return 0.5 * (srtd[idiv((alen - 1), 2)] + srtd[idiv(alen, 2)]);
 }
 
 struct CodeBlock1
@@ -2434,7 +2434,7 @@ template <typename T1> auto degrees2compasspoint(T1 d)
 {
     d = (mod(d, 360)) + 360.0 / 64;
     auto majorindex = to_int(d / 90.0);
-    auto minorindex = to_int(int((mod(d, 90) * 4))/int(45));
+    auto minorindex = to_int(idiv((mod(d, 90) * 4), 45));
     auto p1 = ::majors[majorindex];
     auto p2 = ::majors[majorindex + 1];
     Array<String> q;
@@ -2725,7 +2725,7 @@ auto HEIGHT = 5;
 
 template <typename T1, typename T2, typename T3> auto cantor(const T1 &start, const T2 &len, const T3 &index)
 {
-    auto seg = int(len)/int(3);
+    auto seg = idiv(len, 3);
     if (seg == 0)
         return;
     for (auto it : range_el(0, ::HEIGHT - index)) {
@@ -2875,7 +2875,7 @@ struct CodeBlock1
     {
         for (auto n : range_el(1, 16)) {
             print(c);
-            c = int(2 * (2 * n - 1) * c)/int((n + 1));
+            c = idiv(2 * (2 * n - 1) * c, (n + 1));
         }
     }
 } code_block_1;
@@ -3051,7 +3051,7 @@ template <typename T1, typename T2> auto mul_inv(T1 a, T2 b)
     if (b == 1)
         return 1;
     while (a > 1) {
-        auto q = int(a)/int(b);
+        auto q = idiv(a, b);
         std::tie(a, b) = make_tuple(b, mod(a, b));
         std::tie(x0, x1) = make_tuple(x1 - q * x0, x0);
     }
@@ -3065,7 +3065,7 @@ template <typename T1, typename T2> auto chinese_remainder(const T1 &n, const T2
     auto sum = 0;
     auto prod = n.reduce([](const auto &a, const auto &b){return a * b;});
     for (auto &&[n_i, a_i] : zip(n, a)) {
-        auto p = int(prod)/int(n_i);
+        auto p = idiv(prod, n_i);
         sum += a_i * mul_inv(p, n_i) * p;
     }
     return mod(sum, prod);
@@ -3186,7 +3186,7 @@ template <typename T1> auto duration(T1 sec)
     Array<int> t;
     for (auto &&dm : create_array({60, 60, 24, 7})) {
         int m;
-        std::tie(sec, m) = make_tuple(int(sec)/int(dm), mod(sec, dm));
+        std::tie(sec, m) = make_tuple(idiv(sec, dm), mod(sec, dm));
         t.insert(0, m);
     }
     t.insert(0, sec);
@@ -3682,7 +3682,7 @@ template <typename T1> auto mdroot(const T1 &n)
         auto digits_mul = 1;
         while (m != 0) {
             digits_mul *= mod(m, 10);
-            m = int(m)/int(10);
+            m = idiv(m, 10);
         }
         mdr = digits_mul;
         count++;
@@ -3877,7 +3877,7 @@ print(ethiopian(17, 34))
 ===
 template <typename T1> auto halve(const T1 &x)
 {
-    return int(x)/int(2);
+    return idiv(x, 2);
 }
 
 template <typename T1> auto double_(const T1 &x)

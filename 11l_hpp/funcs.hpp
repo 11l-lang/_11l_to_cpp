@@ -51,3 +51,13 @@ inline unsigned long long rotr(unsigned long long value, int shift) {return (val
 #endif
 inline int rotl(int value, int shift) {return _rotl(value, shift);}
 inline int rotr(int value, int shift) {return _rotr(value, shift);}
+
+inline int     ext_int(int     n) {return n;}
+inline int64_t ext_int(int64_t n) {return n;}
+inline int     ext_int(float   n) {return (int)n;}
+inline int64_t ext_int(double  n) {return (int64_t)n;}
+
+template <typename Type1, typename Type2> inline auto idiv(Type1 a, Type2 b)
+{
+	return ext_int(a / b);
+}

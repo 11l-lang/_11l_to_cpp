@@ -737,7 +737,7 @@ public:
                         else if (in(str_in_b.len(), make_tuple(1, 3)) && str_in_b.is_digit()) {
                             auto new_str = u"#"_S;
                             for (auto &&ii : str_in_b.len() == 3 ? create_array({0, 1, 2}) : create_array({0, 0, 0}))
-                                new_str += hex(int((to_int(str_in_b[ii]) * 0x00'FF + 4))/int(8)).zfill(2);
+                                new_str += hex(idiv((to_int(str_in_b[ii]) * 0x00'FF + 4), 8)).zfill(2);
                             str_in_b = new_str;
                         }
                         if (habr_html) {
