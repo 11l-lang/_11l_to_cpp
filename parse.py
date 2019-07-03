@@ -1088,7 +1088,9 @@ class ASTSwitch(ASTNodeWithExpression):
 
         def char_if_len_1(child):
             if is_char(child):
-                return "u'" + child.token.value(source)[1:-1].replace("'", R"\'") + "'"
+                if child.token_str()[1:-1] == "\\":
+                    return R"u'\\'"
+                return "u'" + child.token_str()[1:-1].replace("'", R"\'") + "'"
             return child.to_str()
 
         if self.has_string_case: # C++ does not support strings in case labels so insert if-elif-else chain in this case

@@ -4210,3 +4210,188 @@ struct CodeBlock1
         foo();
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Execute_SNUSP#Python
+import sys
+Byte = int
+ 
+HW = r'''
+/++++!/===========?\>++.>+.+++++++..+++\
+\+++\ | /+>+++++++>/ /++++++++++<<.++>./
+$+++/ | \+++++++++>\ \+++++.>.+++.-----\
+      \==-<<<<+>+++/ /=.>.+>.--------.-/'''
+ 
+def snusp(store, code):
+    ds = [Byte(0)] * store # data store
+    dp = 0                 # data pointer
+    cs = code.split("\n")  # 2 dimensional code store
+    ipr = 0                # instruction pointers in row ...
+    ipc = 0                # ... and column
+    for r, row in enumerate(cs):
+        ipc = row.find('$')
+        if ipc != -1:
+            ipr = r
+            break
+    id = 0  # instruction direction.  starting direction is always rt
+    def step():
+        nonlocal ipr, ipc
+        if id&1:
+            ipr += 1 - (id&2)
+        else:
+            ipc += 1 - (id&2)
+    while ipr >= 0 and ipr < len(cs) and ipc >= 0 and ipc < len(cs[ipr]):
+        op = cs[ipr][ipc]
+        if op == '>':
+            dp += 1
+        elif op == '<':
+            dp -= 1
+        elif op == '+':
+            ds[dp] += 1
+        elif op == '-':
+            ds[dp] -= 1
+        elif op == '.':
+            sys.stdout.write(chr(ds[dp]))
+        elif op == ',':
+            ds[dp] = Byte(ord(sys.stdin.read(1)))
+        elif op == '/':
+            id = ~id
+        elif op == '\\':
+            id ^= 1
+        elif op == '!':
+            step()
+        elif op == '?':
+            if not ds[dp]:
+                step()
+        step()
+ 
+snusp(5, HW)
+===
+//import sys
+V HW = ‘
+/++++!/===========?\>++.>+.+++++++..+++\
+\+++\ | /+>+++++++>/ /++++++++++<<.++>./
+$+++/ | \+++++++++>\ \+++++.>.+++.-----\
+      \==-<<<<+>+++/ /=.>.+>.--------.-/’
+
+F snusp(store, code)
+   V ds = [Byte(0)] * store
+   V dp = 0
+   V cs = code.split("\n")
+   V ipr = 0
+   V ipc = 0
+   L(row) cs
+      V r = L.index
+      ipc = row.findi(‘$’)
+      I ipc != -1
+         ipr = r
+         L.break
+   V id = 0
+   F step()
+      I @id [&] 1
+         @ipr += 1 - (@id [&] 2)
+      E
+         @ipc += 1 - (@id [&] 2)
+   L ipr >= 0 & ipr < cs.len & ipc >= 0 & ipc < cs[ipr].len
+      S cs[ipr][ipc]
+         ‘>’
+            dp++
+         ‘<’
+            dp--
+         ‘+’
+            ds[dp]++
+         ‘-’
+            ds[dp]--
+         ‘.’
+            :stdout.write(Char(code' ds[dp]))
+         ‘,’
+            ds[dp] = Byte(:stdin.read(1).code)
+         ‘/’
+            id = (-)id
+         ‘\’
+            id (+)= 1
+         ‘!’
+            step()
+         ‘?’
+            I !(ds[dp])
+               step()
+      step()
+snusp(5, HW)
+===
+auto HW = uR"(
+/++++!/===========?\>++.>+.+++++++..+++\
+\+++\ | /+>+++++++>/ /++++++++++<<.++>./
+$+++/ | \+++++++++>\ \+++++.>.+++.-----\
+      \==-<<<<+>+++/ /=.>.+>.--------.-/)"_S;
+
+template <typename T1, typename T2> auto snusp(const T1 &store, const T2 &code)
+{
+    auto ds = create_array({Byte(0)}) * store;
+    auto dp = 0;
+    auto cs = code.split(u"\n"_S);
+    auto ipr = 0;
+    auto ipc = 0;
+    {int Lindex = 0;
+    for (auto &&row : cs) {
+        auto r = Lindex;
+        ipc = row.findi(u"$"_S);
+        if (ipc != -1) {
+            ipr = r;
+            break;
+        }
+        Lindex++;
+    }}
+    auto id = 0;
+    auto step = [&id, &ipc, &ipr]()
+    {
+        if (id & 1)
+            ipr += 1 - (id & 2);
+        else
+            ipc += 1 - (id & 2);
+    };
+    while (ipr >= 0 && ipr < cs.len() && ipc >= 0 && ipc < cs[ipr].len()) {
+        switch (cs[ipr][ipc])
+        {
+        case u'>':
+            dp++;
+            break;
+        case u'<':
+            dp--;
+            break;
+        case u'+':
+            ds[dp]++;
+            break;
+        case u'-':
+            ds[dp]--;
+            break;
+        case u'.':
+            _stdout.write(Char(ds[dp]));
+            break;
+        case u',':
+            ds.set(dp, Byte(_stdin.read(1).code));
+            break;
+        case u'/':
+            id = ~id;
+            break;
+        case u'\\':
+            id ^= 1;
+            break;
+        case u'!':
+            step();
+            break;
+        case u'?':
+            if (!(ds[dp]))
+                step();
+            break;
+        }
+        step();
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        snusp(5, HW);
+    }
+} code_block_1;
