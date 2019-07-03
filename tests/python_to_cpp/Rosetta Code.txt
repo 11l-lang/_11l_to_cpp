@@ -3150,7 +3150,7 @@ struct CodeBlock1
     {
         print(calc([](const auto &n){return n > 0 ? 2 : 1;}, [](const auto &n){return 1;}));
         print(calc([](const auto &n){return n > 0 ? n : 2;}, [](const auto &n){return n > 1 ? n - 1 : 1;}));
-        print(calc([](const auto &n){return n > 0 ? 6 : 3;}, [](const auto &n){return pow((2 * n - 1), 2);}));
+        print(calc([](const auto &n){return n > 0 ? 6 : 3;}, [](const auto &n){return square((2 * n - 1));}));
     }
 } code_block_1;
 
@@ -3456,9 +3456,9 @@ public:
     template <typename T1> auto operator()(const T1 &x)
     {
         sum += x;
-        sum2 += pow(x, 2);
+        sum2 += square(x);
         n += 1.0;
-        return sqrt(sum2 / n - pow((sum / n), 2));
+        return sqrt(sum2 / n - square((sum / n)));
     }
 };
 auto sd_inst = SD();
@@ -4393,5 +4393,25 @@ struct CodeBlock1
     CodeBlock1()
     {
         snusp(5, HW);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Exponentiation_order
+print(5**3**2)
+print((5**3)**2)
+print(5**(3**2))
+===
+print(5 ^ 3 ^ 2)
+print((5 ^ 3) ^ 2)
+print(5 ^ (3 ^ 2))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(pow(5, square(3)));
+        print(square((cube(5))));
+        print(pow(5, (square(3))));
     }
 } code_block_1;

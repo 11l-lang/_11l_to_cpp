@@ -378,7 +378,7 @@ template <typename T1> auto is_prime(const T1 &n)
         return false;
     auto div = 5;
     auto inc = 2;
-    while (pow(div, 2) <= n) {
+    while (square(div) <= n) {
         if (mod(n, div) == 0)
             return false;
         div += inc;
@@ -530,7 +530,7 @@ template <typename T1, typename T2, typename T3> auto print_circle(const T1 &lo,
     while (i < ndots) {
         auto x = randomns::_(range_ee(-hi, hi));
         auto y = randomns::_(range_ee(-hi, hi));
-        if (in(pow(x, 2) + pow(y, 2), range_ee(pow(lo, 2), pow(hi, 2)))) {
+        if (in(square(x) + square(y), range_ee(square(lo), square(hi)))) {
             canvas[x + hi].set(y + hi, true);
             i++;
         }
@@ -1227,13 +1227,13 @@ diversity_theorem(49.0, [Float(48), 47, 51, 42])
 ===
 template <typename T1, typename T2> auto average_square_diff(const T1 &a, const T2 &predictions)
 {
-    return sum_map(predictions, [&a](const auto &x){return pow((x - a), 2);}) / predictions.len();
+    return sum_map(predictions, [&a](const auto &x){return square((x - a));}) / predictions.len();
 }
 
 template <typename T1, typename T2> auto diversity_theorem(const T1 &truth, const T2 &predictions)
 {
     auto average = sum(predictions) / predictions.len();
-    print(u"average-error: "_S + average_square_diff(truth, predictions) + u"\n"_S + u"crowd-error:   "_S + (pow((truth - average), 2)) + u"\n"_S + u"diversity:     "_S + average_square_diff(average, predictions));
+    print(u"average-error: "_S + average_square_diff(truth, predictions) + u"\n"_S + u"crowd-error:   "_S + (square((truth - average))) + u"\n"_S + u"diversity:     "_S + average_square_diff(average, predictions));
 }
 
 struct CodeBlock1
