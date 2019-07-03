@@ -712,7 +712,12 @@ class SymbolNode:
             elif self.symbol.id == '?':
                 return '[&]{auto R = ' + self.children[0].to_str() + '; return R != nullptr ? *R : ' + self.children[1].to_str() + ';}()'
             elif self.symbol.id == '^':
-                return 'pow(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
+                c1 = self.children[1].to_str()
+                if c1 == '2':
+                    return 'square(' + self.children[0].to_str() + ')'
+                if c1 == '3':
+                    return 'cube(' + self.children[0].to_str() + ')'
+                return 'pow(' + self.children[0].to_str() + ', ' + c1 + ')'
             elif self.symbol.id == '%':
                 return 'mod(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
             else:
