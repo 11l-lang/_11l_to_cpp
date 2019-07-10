@@ -157,8 +157,8 @@ L 10
 
 
 L 10
-^Error: this kind of loop does not support `L.next`
-   I L.next
+^Error: this kind of loop does not support `L.last_iteration`
+   I !L.last_iteration
       print(1)
 
 

@@ -277,17 +277,17 @@ class SymbolNode:
 
             return self.token_str().lstrip('@').replace(':', '::')
 
-        if self.token.category == Token.Category.KEYWORD and self.token_str() in ('L.next', 'Ц.след', 'loop.next', 'цикл.след'):
+        if self.token.category == Token.Category.KEYWORD and self.token_str() in ('L.last_iteration', 'Ц.последняя_итерация', 'loop.last_iteration', 'цикл.последняя_итерация'):
             parent = self
             while parent.parent:
                 parent = parent.parent
             ast_parent = parent.ast_parent
             while True:
                 if type(ast_parent) == ASTLoop:
-                    ast_parent.has_L_next = True
+                    ast_parent.has_L_last_iteration = True
                     break
                 ast_parent = ast_parent.parent
-            return '__begin != __end'
+            return '(__begin == __end)'
 
         if self.token.category == Token.Category.NUMERIC_LITERAL:
             n = self.token_str()
@@ -758,7 +758,7 @@ def symbol(id, bp = 0):
         s.lbp = bp
         symbol_table[id] = s
         if id[0].isalpha() and not id in ('I/', 'Ц/', 'I/=', 'Ц/=', 'C', 'С', 'in'): # this is keyword-in-expression
-            assert(id.isalpha() or id in ('L.next', 'Ц.след', 'loop.next', 'цикл.след'))
+            assert(id.isalpha() or id in ('L.last_iteration', 'Ц.последняя_итерация', 'loop.last_iteration', 'цикл.последняя_итерация'))
             allowed_keywords_in_expressions.append(id)
     else:
         s.lbp = max(bp, s.lbp)
@@ -1126,7 +1126,7 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
     copy_loop_variable = False
     break_label_needed = -1
     has_L_index = False
-    has_L_next  = False
+    has_L_last_iteration = False
     has_L_remove_current_element_and_continue = False
     is_loop_variable_a_ptr = False
 
@@ -1160,8 +1160,8 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
         if self.has_L_remove_current_element_and_continue:
             if not loop_auto:
                 raise Error('this kind of loop does not support `L.remove_current_element_and_continue`', tokens[self.tokeni])
-            if self.has_L_next:
-                raise Error('`L.next` can not be used with `L.remove_current_element_and_continue`', tokens[self.tokeni])
+            if self.has_L_last_iteration:
+                raise Error('`L.last_iteration` can not be used with `L.remove_current_element_and_continue`', tokens[self.tokeni])
             if self.has_L_index:
                 raise Error('`L.index` can not be used with `L.remove_current_element_and_continue`', tokens[self.tokeni]) # {
             rr = ' ' * (indent*4) + '{auto &&__range = ' + self.expression.to_str() + ";\n" \
@@ -1176,9 +1176,9 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
                + ' ' * (indent*4) + "}\n" \
                + ' ' * (indent*4) + "__range.erase(__dst, __end);}\n"
 
-        if self.has_L_next:
+        if self.has_L_last_iteration:
             if not loop_auto:
-                raise Error('this kind of loop does not support `L.next`', tokens[self.tokeni])
+                raise Error('this kind of loop does not support `L.last_iteration`', tokens[self.tokeni])
             rr = ' ' * (indent*4) + '{auto &&__range = ' + self.expression.to_str() \
                 + ";\n" + self.children_to_str(indent, 'for (auto __begin = __range.begin(), __end = __range.end(); __begin != __end;)', False,
                     add_at_beginning = ' ' * ((indent+1)*4) + 'auto &&'+ self.loop_variable + " = *__begin; ++__begin;\n")
@@ -1190,7 +1190,7 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
         else:
             r += rr
 
-        if self.has_L_next:
+        if self.has_L_last_iteration:
             r = r[:-1] + "}\n"
 
         if self.has_L_was_no_break(): # {
@@ -1594,10 +1594,10 @@ symbol('(name)').nud = lambda self: self
 symbol('(literal)').nud = lambda self: self
 symbol('(constant)').nud = lambda self: self
 
-symbol('L.next').nud = lambda self: self
-symbol('Ц.след').nud = lambda self: self
-symbol('loop.next').nud = lambda self: self
-symbol('цикл.след').nud = lambda self: self
+symbol('L.last_iteration').nud = lambda self: self
+symbol('Ц.последняя_итерация').nud = lambda self: self
+symbol('loop.last_iteration').nud = lambda self: self
+symbol('цикл.последняя_итерация').nud = lambda self: self
 
 symbol(';')
 symbol(',')
