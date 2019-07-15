@@ -1039,3 +1039,16 @@ V tag = S ‘_’
               ‘u’
 ===
 auto tag = [&](const auto &a){return a == u'*' ? u'b'_C : a == u'_' ? u'u'_C : throw KeyError(a);}(u"_"_S);
+
+
+L 2
+   print(L.index)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int Lindex = 0; Lindex < 2; Lindex++)
+            print(Lindex);
+    }
+} code_block_1;

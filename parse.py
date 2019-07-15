@@ -1182,10 +1182,10 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
             rr = ' ' * (indent*4) + '{auto &&__range = ' + self.expression.to_str() \
                 + ";\n" + self.children_to_str(indent, 'for (auto __begin = __range.begin(), __end = __range.end(); __begin != __end;)', False,
                     add_at_beginning = ' ' * ((indent+1)*4) + 'auto &&'+ self.loop_variable + " = *__begin; ++__begin;\n")
-        elif self.has_L_index:
+        elif self.has_L_index and not (self.loop_variable is None and self.expression is not None and self.expression.token.category == Token.Category.NUMERIC_LITERAL):
             rr = self.children_to_str(indent, tr, False)
 
-        if self.has_L_index:
+        if self.has_L_index and not (self.loop_variable is None and self.expression is not None and self.expression.token.category == Token.Category.NUMERIC_LITERAL):
             r += ' ' * (indent*4) + "{int Lindex = 0;\n" + rr[:-indent*4-2] + ' ' * ((indent+1)*4) + "Lindex++;\n" + ' ' * (indent*4) + "}}\n"
         else:
             r += rr
