@@ -378,6 +378,8 @@ class SymbolNode:
                     return char_or_str(self.children[2], True)
                 elif func_name.startswith('Array['): # ]
                     func_name = 'Array<' + func_name[6:-1] + '>'
+                elif func_name == 'Array':
+                    func_name = 'create_array'
                 elif func_name == 'Dict':
                     func_name = 'create_dict'
                 elif func_name.startswith('DefaultDict['): # ]
@@ -708,7 +710,7 @@ class SymbolNode:
             elif self.symbol.id == '[+]=': # replace `a [+]= v` with `a.append(v)`
                 return self.children[0].to_str() + '.append(' + self.children[1].to_str() + ')'
             elif self.symbol.id == '=' and self.children[0].tuple:
-                return 'std::tie(' + ', '.join(c.to_str() for c in self.children[0].children) + ') = ' + self.children[1].to_str()
+                return 'assign_from_tuple(' + ', '.join(c.to_str() for c in self.children[0].children) + ', ' + self.children[1].to_str() + ')'
             elif self.symbol.id == '?':
                 return '[&]{auto R = ' + self.children[0].to_str() + '; return R != nullptr ? *R : ' + self.children[1].to_str() + ';}()'
             elif self.symbol.id == '^':
@@ -1461,7 +1463,8 @@ def type_of(sn):
             tid = sn.scope.find(left.expression.children[0].token_str())
             assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
             tid = tid.ast_nodes[0].scope.ids.get(sn.children[1].token_str())
-            assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition))
+            if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition)):
+                raise Error('method `' + sn.children[1].token_str() + '` is not found in type `' + left.expression.children[0].token_str() + '`', sn.left_to_right_token()) # error message example: method `remove` is not found in type `Array`
             return tid.ast_nodes[0]
         return None
     if len(left.type_args): # `Array[String] ending_tags... ending_tags.append(‘</blockquote>’)`
@@ -2501,6 +2504,9 @@ string_scope.add_name('zfill', ASTFunctionDefinition([('width', '', 'Int')]))
 string_scope.add_name('format', ASTFunctionDefinition([('arg', token_to_str('N', Token.Category.CONSTANT), '')] * 32))
 string_scope.add_name('map', ASTFunctionDefinition([('function', '', '(Char -> T)')]))
 builtins_scope.ids['String'].ast_nodes[0].scope = string_scope
+array_scope = Scope(None)
+array_scope.add_name('remove', ASTFunctionDefinition([('x', '', '')]))
+builtins_scope.ids['Array'].ast_nodes[0].scope = array_scope
 
 module_scope = Scope(None)
 builtin_modules['math'] = Module(module_scope)

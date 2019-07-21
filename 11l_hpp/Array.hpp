@@ -194,6 +194,7 @@ public:
 
 	template <typename Ty, bool include_beginning, bool include_ending> void append(const Range<Ty, include_beginning, include_ending> &range)
 	{
+		reserve(size() + range.size());
 		for (auto i : range)
 			append(i);
 	}
@@ -321,6 +322,15 @@ Array<char> create_array(std::initializer_list<bool> il) // avoid using std::vec
 	r.reserve(il.size());
 	for (bool b : il)
 		r.push_back(b);
+	return r;
+}
+
+template <typename Type, bool include_beginning, bool include_ending> Array<Type> create_array(const Range<Type, include_beginning, include_ending> &range)
+{
+	Array<Type> r;
+	r.reserve(range.size());
+	for (auto i : range)
+		r.push_back(i);
 	return r;
 }
 
