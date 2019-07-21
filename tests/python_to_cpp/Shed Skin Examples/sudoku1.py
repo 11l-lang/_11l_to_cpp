@@ -2,6 +2,7 @@
 # --- jack.ha@gmail.com
 #
 # sudoku solver
+from typing import List, Tuple, Dict
 
 def validMove(puzzle, x, y, number):
         #see if the number is in any row, column or his own 3x3 square
@@ -26,13 +27,13 @@ def validMove(puzzle, x, y, number):
         return blnOK
 
 def findallMoves(puzzle,x,y):
-        returnList = []
+        returnList : List[int] = []
         for n in range(1,10):
                 if validMove(puzzle, x, y, n):
                         returnList.append(n)
         return returnList
 
-def solvePuzzleStep(puzzle):
+def solvePuzzleStep(puzzle : List[List[int]]):
         isChanged = False
         for y in range(9):
                 for x in range(9):
@@ -44,49 +45,61 @@ def solvePuzzleStep(puzzle):
         return isChanged
 
 #try to solve as much as possible without lookahead
-def solvePuzzleSimple(puzzle):
+def solvePuzzleSimple(puzzle : List[List[int]]):
         iterationCount = 0
         while solvePuzzleStep(puzzle) == True:
                 iterationCount += 1
 
-hashtable = {}
+hashtable : Dict[int, bool] = {}
+
+def calc_hash_of_list(l): # uses FNV-1a algorithm
+        hash = 2166136261
+        for e in l:
+                hash = (16777619 * (hash ^ e)) & 0xFFFFFFFF;
+        return hash
 
 def calc_hash(puzzle):
         hashcode = 0
         for c in range(9):
-                hashcode = hashcode * 17 + hash(tuple(puzzle[c]))
+                hashcode = hashcode * 17 + calc_hash_of_list(puzzle[c])
         return hashcode
 
 def hash_add(puzzle):
-        hashtable[calc_hash(puzzle)] = 1
+        hashtable[calc_hash(puzzle)] = True
 
 def hash_lookup(puzzle):
         return calc_hash(puzzle) in hashtable
 
+iterations = 0
+
 #solve with lookahead
 #unit is 3x3, (i,j) is coords of unit. l is the list of all todo's
-def perm(puzzle, i, j, l, u):
+def perm(puzzle : List[List[int]], i, j, l, u : List[Tuple[int, int]]):
         global iterations
         iterations += 1
-        if (u == []) and (l == []):
+        if len(u) == 0 and len(l) == 0:
                 print("Solved!")
+                global printpuzzle
                 printpuzzle(puzzle)
                 print("iterations: " + str(iterations))
                 return True
         else:
-                if l == []:
+                if len(l) == 0:
                         #here we have all permutations for one unit
 
                         #some simple moves
-                        puzzlebackup = []
+                        puzzlebackup : List[List[int]] = []
                         for c in range(9):
-                                puzzlebackup.append(tuple(puzzle[c]))
+                                puzzlebackup.append(puzzle[c][0:])
                         solvePuzzleSimple(puzzle)
 
                         #next unit to fill
                         for c in range(len(u)):
                                 if not hash_lookup(puzzle):
-                                        inew, jnew = u.pop(c)
+                                        inew : int
+                                        jnew : int
+                                        (inew, jnew) = u.pop(c)
+                                        global genMoveList
                                         l = genMoveList(puzzle, inew, jnew)
                                         #printpuzzle(puzzle)
                                         #print "iterations: ", iterations
@@ -143,7 +156,7 @@ def printpuzzle(puzzle):
                         s += ' '
                 print(s)
 
-def main():
+def solve():
         puzzle = [[0, 9, 3, 0, 8, 0, 4, 0, 0],
                           [0, 4, 0, 0, 3, 0, 0, 0, 0],
                           [6, 0, 0, 0, 0, 9, 2, 0, 5],
@@ -155,8 +168,8 @@ def main():
                           [0, 0, 4, 0, 1, 0, 8, 5, 0]]
 
         #create todo unit(each 3x3) list (this is also the order that they will be tried!)
-        u = []
-        lcount = []
+        u : List[Tuple[int, int]] = []
+        lcount : List[int] = []
         for y in range(3):
                 for x in range(3):
                         u.append((x,y))
@@ -167,12 +180,11 @@ def main():
                 for i in range(j,9):
                         if i != j:
                                 if lcount[i] < lcount[j]:
-                                        u[i], u[j] = u[j], u[i]
-                                        lcount[i], lcount[j] = lcount[j], lcount[i]
+                                        (u[i], u[j]) = (u[j], u[i])
+                                        (lcount[i], lcount[j]) = (lcount[j], lcount[i])
 
         l = genMoveList(puzzle, 0, 0)
         perm (puzzle, 0, 0, l, u)
 
-iterations = 0
 for x in range(30):
-    main()
+    solve()

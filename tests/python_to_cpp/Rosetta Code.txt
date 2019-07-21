@@ -1231,7 +1231,7 @@ template <typename T1, typename T2, typename T3 = decltype(1e-10)> auto agm(cons
     auto an = (a0 + g0) / 2.0;
     auto gn = sqrt(a0 * g0);
     while (abs(an - gn) > tolerance)
-        std::tie(an, gn) = make_tuple((an + gn) / 2.0, sqrt(an * gn));
+        assign_from_tuple(an, gn, make_tuple((an + gn) / 2.0, sqrt(an * gn)));
     return an;
 }
 
@@ -2326,7 +2326,7 @@ auto get_fibs()
     Array<double> r;
     for (auto i : range_el(0, 1000)) {
         r.append(a);
-        std::tie(a, b) = make_tuple(b, a + b);
+        assign_from_tuple(a, b, make_tuple(b, a + b));
     }
     return r;
 }
@@ -2575,7 +2575,7 @@ template <typename T1, typename T2 = decltype(0)> auto getitem(T1 s, const T2 &d
             }
         }
         if (c == u'\\' && s.len() > 1)
-            std::tie(s, c) = make_tuple(s[range_ei(1)], c + _get<1>(s));
+            assign_from_tuple(s, c, make_tuple(s[range_ei(1)], c + _get<1>(s)));
         out = out.map([&c](const auto &a){return a + c;});
         s = s[range_ei(1)];
     }
@@ -2599,7 +2599,7 @@ template <typename T1, typename T2> auto getgroup(T1 s, const T2 &depth)
             return make_tuple(out.map([](const auto &a){return u"{"_S + a + u"}"_S;}), s[range_ei(1)]);
         }
         if (_get<0>(s) == u',')
-            std::tie(comma, s) = make_tuple(true, s[range_ei(1)]);
+            assign_from_tuple(comma, s, make_tuple(true, s[range_ei(1)]));
     }
     return make_tuple(create_array({u""_S}) * 0, u""_S);
 }
@@ -3052,8 +3052,8 @@ template <typename T1, typename T2> auto mul_inv(T1 a, T2 b)
         return 1;
     while (a > 1) {
         auto q = idiv(a, b);
-        std::tie(a, b) = make_tuple(b, mod(a, b));
-        std::tie(x0, x1) = make_tuple(x1 - q * x0, x0);
+        assign_from_tuple(a, b, make_tuple(b, mod(a, b)));
+        assign_from_tuple(x0, x1, make_tuple(x1 - q * x0, x0));
     }
     if (x1 < 0)
         x1 += b0;
@@ -3186,7 +3186,7 @@ template <typename T1> auto duration(T1 sec)
     Array<int> t;
     for (auto &&dm : create_array({60, 60, 24, 7})) {
         int m;
-        std::tie(sec, m) = make_tuple(idiv(sec, dm), mod(sec, dm));
+        assign_from_tuple(sec, m, make_tuple(idiv(sec, dm), mod(sec, dm)));
         t.insert(0, m);
     }
     t.insert(0, sec);
@@ -3603,7 +3603,7 @@ struct CodeBlock1
         for (auto &&n : create_array<int64_t>({to_int64(627615), 39390, 588225, 393900588225, 55})) {
             int64_t persistance;
             int64_t root;
-            std::tie(persistance, root) = digital_root(n);
+            assign_from_tuple(persistance, root, digital_root(n));
             print(u"#12.0 has additive persistance #2.0 and digital root #.0."_S.format(n, persistance, root));
         }
     }

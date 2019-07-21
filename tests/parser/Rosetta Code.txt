@@ -830,7 +830,7 @@ auto get_fibs()
     Array<double> r;
     for (int Lindex = 0; Lindex < 1000; Lindex++) {
         r.append(a);
-        std::tie(a, b) = make_tuple(b, a + b);
+        assign_from_tuple(a, b, make_tuple(b, a + b));
     }
     return r;
 }

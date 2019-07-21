@@ -51,6 +51,18 @@ template <typename...Types> inline TupleIterator<Types...> end  (tuple<Types...>
 }
 }
 
+template <typename Type0, typename Type1, typename Type> void assign_from_tuple(Type0 &v0, Type1 &v1, const Type &t)
+{
+	v0 = _get<0>(t);
+	v1 = _get<1>(t);
+}
+template <typename Type0, typename Type1, typename Type2, typename Type> void assign_from_tuple(Type0 &v0, Type1 &v1, Type2 &v2, const Type &t)
+{
+	v0 = _get<0>(t);
+	v1 = _get<1>(t);
+	v2 = _get<2>(t);
+}
+
 #if __GNUC__ || __INTEL_COMPILER // || __clang__ // Clang already defines __GNUC__
 #define likely(x) __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
