@@ -1577,3 +1577,26 @@ struct CodeBlock2
         print(a);
     }
 } code_block_2;
+
+
+s = set() # int
+s.add(1)
+print(1 in s)
+print(2 in s)
+===
+V s = Set[Int]()
+s.add(1)
+print(1 C s)
+print(2 C s)
+===
+auto s = Set<int>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        s.add(1);
+        print(in(1, s));
+        print(in(2, s));
+    }
+} code_block_1;
