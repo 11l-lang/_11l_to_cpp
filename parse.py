@@ -860,7 +860,7 @@ class ASTExpression(ASTNodeWithExpression):
 cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'перем':'auto',
                      'Int':'int', 'Int64':'int64_t', 'UInt32':'uint32_t', 'Float':'double', 'String':'String', 'Bool':'bool', 'Byte':'Byte',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
-                     'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict'}
+                     'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set'}
 
 def trans_type(ty, scope, type_token, ast_type_node = None):
     if ty[-1] == '?':
