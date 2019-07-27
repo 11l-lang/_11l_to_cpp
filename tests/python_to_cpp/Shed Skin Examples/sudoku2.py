@@ -74,9 +74,9 @@ class board:
                 self.cels = [3 * [bmp()] for i in range(3)]
 
                 #a set of all solved boards discovered so far
-                self.solutions = set() # BoardRep
+                self.solutions = set()
                 #a set of all boards examined--should help reduce the amount of search duplication
-                self.examined = set() # BoardRep
+                self.examined = set()
 
         def fread(self,filename=''):
                 #self.__init__()

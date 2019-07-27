@@ -76,8 +76,6 @@ public:
         rows = 9 * create_array({bmp()});
         cols = 9 * create_array({bmp()});
         cels = range_el(0, 3).map([](const auto &i){return 3 * create_array({bmp()});});
-        solutions = Set<BoardRep>();
-        examined = Set<BoardRep>();
     }
 
     template <typename T1 = decltype(u""_S)> auto fread(T1 filename = u""_S)
