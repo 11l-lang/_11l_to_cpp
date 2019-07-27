@@ -173,7 +173,7 @@ template <class T, int N> struct Tvec : Tbasevec<T,N>
 	INLINE T &operator [] (const int i) {return (&x)[i];}
 	INLINE const T &operator [] (const int i) const {return (&x)[i];}
 	//INLINE operator T* () {return &x;}
-	INLINE operator const T* () const {return &x;}
+//	INLINE operator const T* () const {return &x;}
 
 	//vector ~ a
 	template <typename Ty, typename = std::enable_if_t<std::is_arithmetic<Ty>::value>> INLINE const Tvec<decltype(T()+Ty()), N> operator+(const Ty a) const {Tvec<decltype(T()+Ty()), N> r; for (int i=0;i<N;i++) r[i]=(&x)[i] + a; return r;}
