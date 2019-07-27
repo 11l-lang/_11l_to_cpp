@@ -249,6 +249,9 @@ class SymbolNode:
                     ast_parent = ast_parent.parent
                 return 'Lindex'
 
+            if self.token_str() == '(.)':
+                return '*this'
+
             tid = self.scope.find(self.token_str())
             if tid is not None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTVariableInitialization and tid.ast_nodes[0].is_ptr: # `animals [+]= animal` -> `animals.append(std::move(animal));`
                 if tid.last_occurrence is None:
@@ -934,6 +937,7 @@ class ASTWith(ASTNodeWithChildren, ASTNodeWithExpression):
 class ASTFunctionDefinition(ASTNodeWithChildren):
     function_name : str = ''
     function_return_type : str = ''
+    is_const = False
     function_arguments : List[Tuple[str, str, str, str]]# = [] # (arg_name, default_value, type_, qualifier)
     first_named_only_argument = None
     last_non_default_argument : int
@@ -971,7 +975,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
             elif self.function_name == '()': # this is `operator()`
                 s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' operator()'
             else:
-                s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + self.function_name
+                s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + {'[&]':'operator&', '<':'operator<'}.get(self.function_name, self.function_name)
 
             if self.virtual_category != self.VirtualCategory.NO:
                 arguments = []
@@ -1018,7 +1022,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
             s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + self.function_name
 
         if len(self.function_arguments) == 0:
-            return self.children_to_str(indent, s + '()')
+            return self.children_to_str(indent, s + '()' + ' const'*self.is_const)
 
         templates = []
         arguments = []
@@ -1041,7 +1045,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                     arguments.append(
                         (('' if arg[3] == '=' else 'const ') + cpp_type_from_11l.get(arg[2], arg[2]) + ' ' + '&'*(arg[2] == 'String') if arg[3] != '&' else trans_type(arg[2], self.scope, tokens[self.tokeni]) + ' &')
                         + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
-        return self.children_to_str(indent, ('template <' + ', '.join(templates) + '> ')*(len(templates) != 0) + s + '(' + ', '.join(arguments) + ')')
+        return self.children_to_str(indent, ('template <' + ', '.join(templates) + '> ')*(len(templates) != 0) + s + '(' + ', '.join(arguments) + ')' + ' const'*self.is_const)
 
 class ASTIf(ASTNodeWithChildren, ASTNodeWithExpression):
     else_or_elif : ASTNode = None
@@ -1600,6 +1604,8 @@ symbol('(name)').nud = lambda self: self
 symbol('(literal)').nud = lambda self: self
 symbol('(constant)').nud = lambda self: self
 
+symbol('(.)').nud = lambda self: self
+
 symbol('L.last_iteration').nud = lambda self: self
 symbol('Ц.последняя_итерация').nud = lambda self: self
 symbol('loop.last_iteration').nud = lambda self: self
@@ -1912,6 +1918,10 @@ def parse_internal(this_node):
                     if type(this_node) != ASTTypeDefinition:
                         raise Error('destructor declaration allowed only inside types', token)
                     node.function_name = '(destructor)' # can not use `~` here because `~` can be an operator overload
+                if '.const' in token.value(source) or \
+                   '.конст' in token.value(source):
+                    node.is_const = True
+
                 next_token()
                 if node.function_name != '(destructor)':
                     if token.category == Token.Category.NAME:

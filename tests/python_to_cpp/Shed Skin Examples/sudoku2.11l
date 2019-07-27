@@ -1,0 +1,185 @@
+//import math
+//import time
+//import sys
+
+T bmp
+   [Byte] v
+   F (vals = 9 * [Byte(1)], n = -1)
+      .v = vals[0.<9]
+      I n >= 0
+         .v[n] = !(.v[n])
+   F.const [&](other)
+      R bmp((0.<9).map(i -> Byte(@.v[i] & @other.v[i])))
+   F cnt()
+      R .v.filter(i -> i).len
+
+F calc_hash_of_str(s)
+   V hash = 2166136261
+   L(c) s
+      hash = (16777619 * (hash (+) c.code)) [&] FFFF'FFFF
+   R hash
+
+T BoardRep
+   [[Int]] __fields
+   F (board)
+      .__fields = board.final
+
+   F __hash__()
+      V rep = ‘’
+      L(i) 0.<9
+         L(j) 0.<9
+            rep ‘’= String(.__fields[i][j])
+      R calc_hash_of_str(rep)
+   F.const <(other)
+      R .__fields < other.__fields
+V board_notifyOnCompletion = 1B
+V board_completeSearch = 0B
+
+T board
+   [[Int]] final
+   [bmp] rows
+   [bmp] cols
+   [[bmp]] cels
+   __turns = 0
+   __backtracks = 0
+   __starttime = 0.0
+   __endtime = 0.0
+   __status = 0
+   __maxdepth = 0
+   __openspaces = 81
+   Set[BoardRep] solutions
+   Set[BoardRep] examined
+
+   F ()
+      .final = (0.<9).map(i -> 9 * [0])
+      .rows = 9 * [bmp()]
+      .cols = 9 * [bmp()]
+      .cels = (0.<3).map(i -> 3 * [bmp()])
+      .solutions = Set[BoardRep]()
+      .examined = Set[BoardRep]()
+
+   F fread(=filename = ‘’)
+      I filename == ‘’
+         print(‘filename: ’)
+         filename = input()
+      V f = File(filename, ‘r’)
+      V lines = f.read_lines(1B)
+      L(row) 0.<9
+         L(digit) 1.<10
+            X.try
+               .setval(row, lines[row].index(String(digit)), digit)
+            X.catch ValueError
+            {
+            }
+
+   F setval(row, col, val)
+      .final[row][col] = val
+      .__openspaces--
+      V mask = bmp(n' val - 1)
+      .rows[row] = .rows[row] [&] mask
+      .cols[col] = .cols[col] [&] mask
+      V cr = .cell(row)
+      V cc = .cell(col)
+      .cels[cr][cc] = .cels[cr][cc] [&] mask
+
+   F.const cell(num)
+      R Int(ceil((num + 1) / 3.0)) - 1
+
+   F.const to_str()
+      V ret = ‘’
+      L(row) 0.<9
+         I row == 3 | row == 6
+            ret ‘’= (((3 * ‘---’)‘+’) * 3)[0 .< (len)-1]"\n"
+         L(col) 0.<9
+            I col == 3 | col == 6
+               ret ‘’= ‘|’
+            ret ‘’= ‘ ’(I .final[row][col] != 0 {String(.final[row][col])} E ‘ ’)‘ ’
+         ret ‘’= "\n"
+      R ret
+
+   F solve(notify = 1B, completeSearch = 0B)
+      I .__status == 0
+         .__status = 1
+         .__starttime = Time().unix_time()
+         V board_notifyOnCompletion = notify
+         V board_completeSearch = completeSearch
+         .__solve((.), 0)
+
+   F.const openspaces()
+      R .__openspaces
+
+   F __solve(_board, depth) -> N
+      I BoardRep(_board) !C .examined
+         .examined.add(BoardRep(_board))
+
+         I _board.openspaces() <= 0
+            .solutions.add(BoardRep(_board))
+            print(‘solution:’)
+            print(_board.to_str())
+            I depth == 0
+               .onexit()
+            I !:board_completeSearch
+               .onexit()
+
+         E
+            .__turns++
+            I depth > .__maxdepth
+               .__maxdepth = depth
+            Int mincnt
+            [(Int, Int)] coords
+            (mincnt, coords) = _board.findmincounts()
+            I mincnt <= 0
+               .__backtracks++
+               I depth == 0
+                  .onexit()
+            E
+               L(row, col) coords
+                  V broken = 0B
+                  L(val) (0.<9).filter(i -> @_board.mergemask(@row, @col).v[i] == Byte(1))
+                     I !:board_completeSearch & .__status == 2
+                        broken = 1B
+                        L.break
+                     val++
+                     V t = _board.clone()
+                     t.setval(row, col, val)
+                     .__solve(t, depth + 1)
+
+                  I broken
+                     L.break
+
+   F.const clone()
+      V ret = board()
+      L(row) 0.<9
+         L(col) 0.<9
+            I .final[row][col]
+               ret.setval(row, col, .final[row][col])
+      R ret
+
+   F.const mergemask(row, col)
+      R .rows[row] [&] .cols[col] [&] .cels[.cell(row)][.cell(col)]
+
+   F.const findmincounts()
+      [(Int, Int, Int)] masks
+      L(row) 0.<9
+         L(col) 0.<9
+            I .final[row][col] == 0
+               V numallowed = .mergemask(row, col).cnt()
+               masks.append((numallowed, row, col))
+      R (min(masks)[0], masks.filter(i -> i[0] == min(@masks)[0]).map(i -> (i[1], i[2])))
+
+   F stats()
+      V t = I .__status == 1 {Time().unix_time() - .__starttime} E .__endtime - .__starttime
+      R [‘max depth’ = .__maxdepth, ‘turns’ = .__turns, ‘backtracks’ = .__backtracks, ‘elapsed time’ = Int(t), ‘boards examined’ = .examined.len, ‘number of solutions’ = .solutions.len]
+
+   F onexit()
+      .__endtime = Time().unix_time()
+      .__status = 2
+
+      I :board_notifyOnCompletion
+         print(.stats()[‘turns’])
+
+:start:
+V puzzle = board()
+puzzle.fread(‘testdata/b6.pz’)
+print(puzzle.to_str())
+puzzle.solve()

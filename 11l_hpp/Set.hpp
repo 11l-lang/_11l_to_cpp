@@ -5,6 +5,8 @@ template <typename KeyType> class Set : public std::set<KeyType>
 public:
 	Set() {}
 
+	int len() const {return (int)size();}
+
 	bool add(const KeyType &k)
 	{
 		auto r = insert(k);
