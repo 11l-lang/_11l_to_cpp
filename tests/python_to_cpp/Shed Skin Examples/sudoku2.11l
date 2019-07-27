@@ -8,7 +8,7 @@ T bmp
       .v = vals[0.<9]
       I n >= 0
          .v[n] = !(.v[n])
-   F.const [&](other)
+   F [&](other)
       R bmp((0.<9).map(i -> Byte(@.v[i] & @other.v[i])))
    F cnt()
       R .v.filter(i -> i).len
@@ -30,7 +30,7 @@ T BoardRep
          L(j) 0.<9
             rep ‘’= String(.__fields[i][j])
       R calc_hash_of_str(rep)
-   F.const <(other)
+   F <(other)
       R .__fields < other.__fields
 V board_notifyOnCompletion = 1B
 V board_completeSearch = 0B
