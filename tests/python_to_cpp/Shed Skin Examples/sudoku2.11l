@@ -55,8 +55,6 @@ T board
       .rows = 9 * [bmp()]
       .cols = 9 * [bmp()]
       .cels = (0.<3).map(i -> 3 * [bmp()])
-      .solutions = Set[BoardRep]()
-      .examined = Set[BoardRep]()
 
    F fread(=filename = ‘’)
       I filename == ‘’
