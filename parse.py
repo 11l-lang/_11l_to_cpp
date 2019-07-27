@@ -1045,7 +1045,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                     arguments.append(
                         (('' if arg[3] == '=' else 'const ') + cpp_type_from_11l.get(arg[2], arg[2]) + ' ' + '&'*(arg[2] == 'String') if arg[3] != '&' else trans_type(arg[2], self.scope, tokens[self.tokeni]) + ' &')
                         + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
-        return self.children_to_str(indent, ('template <' + ', '.join(templates) + '> ')*(len(templates) != 0) + s + '(' + ', '.join(arguments) + ')' + ' const'*self.is_const)
+        return self.children_to_str(indent, ('template <' + ', '.join(templates) + '> ')*(len(templates) != 0) + s + '(' + ', '.join(arguments) + ')' + ' const'*(self.is_const or self.function_name in tokenizer.sorted_operators))
 
 class ASTIf(ASTNodeWithChildren, ASTNodeWithExpression):
     else_or_elif : ASTNode = None

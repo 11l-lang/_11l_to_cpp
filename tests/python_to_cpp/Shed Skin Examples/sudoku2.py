@@ -15,7 +15,7 @@ class bmp:
         def __init__(self, vals=9*[Byte(1)], n=-1):
                 self.v = vals[0:9]
                 if n>=0: self.v[n] = not self.v[n]
-        def __and__(self, other): # const
+        def __and__(self, other):
                 return bmp([Byte(self.v[i] and other.v[i]) for i in range(9)])
         def cnt(self):
                 return len([i for i in self.v if i])
@@ -42,7 +42,7 @@ class BoardRep:
                         for j in range(9):
                                 rep += str(self.__fields[i][j])
                 return calc_hash_of_str(rep)
-        def __lt__(self, other): # const
+        def __lt__(self, other):
             return self.__fields < other.__fields
 
 board_notifyOnCompletion = True               #let the user know when you're done computing a game
