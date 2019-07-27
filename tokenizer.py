@@ -557,8 +557,12 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                 category = Token.Category.DELIMITER
 
             elif ch in '([':
-                nesting_elements.append((ch, lexem_start))
-                category = Token.Category.DELIMITER
+                if source[lexem_start:lexem_start+3] == '(.)':
+                    i += 2
+                    category = Token.Category.NAME
+                else:
+                    nesting_elements.append((ch, lexem_start))
+                    category = Token.Category.DELIMITER
             elif ch in '])': # ([
                 if len(nesting_elements) == 0 or nesting_elements[-1][0] != {']':'[', ')':'('}[ch]: # ])
                     raise Error('there is no corresponding opening parenthesis/bracket for `' + ch + '`', lexem_start)

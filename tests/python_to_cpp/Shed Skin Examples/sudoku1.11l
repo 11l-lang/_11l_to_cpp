@@ -1,0 +1,155 @@
+
+F validMove(puzzle, x, y, number)
+   V blnOK = 1B
+   V px = x I/ 3
+   V py = y I/ 3
+   I puzzle[x][y] != 0
+      blnOK = 0B
+   I blnOK
+      L(i) 0.<9
+         I puzzle[i][y] == number
+            blnOK = 0B
+   I blnOK
+      L(j) 0.<9
+         I puzzle[x][j] == number
+            blnOK = 0B
+   I blnOK
+      L(i) 0.<3
+         L(j) 0.<3
+            I puzzle[px * 3 + i][py * 3 + j] == number
+               blnOK = 0B
+   R blnOK
+
+F findallMoves(puzzle, x, y)
+   [Int] returnList
+   L(n) 1.<10
+      I validMove(puzzle, x, y, n)
+         returnList.append(n)
+   R returnList
+
+F solvePuzzleStep([[Int]] &puzzle)
+   V isChanged = 0B
+   L(y) 0.<9
+      L(x) 0.<9
+         I puzzle[x][y] == 0
+            V allMoves = findallMoves(puzzle, x, y)
+            I allMoves.len == 1
+               puzzle[x][y] = allMoves[0]
+               isChanged = 1B
+   R isChanged
+
+F solvePuzzleSimple([[Int]] &puzzle)
+   V iterationCount = 0
+   L solvePuzzleStep(&puzzle) == 1B
+      iterationCount++
+Dict[Int, Bool] hashtable
+
+F calc_hash_of_list(l)
+   V hash = 2166136261
+   L(e) l
+      hash = (16777619 * (hash (+) e)) [&] FFFF'FFFF
+   R hash
+
+F calc_hash(puzzle)
+   V hashcode = 0
+   L(c) 0.<9
+      hashcode = hashcode * 17 + calc_hash_of_list(puzzle[c])
+   R hashcode
+
+F hash_add(puzzle)
+   :hashtable[calc_hash(puzzle)] = 1B
+
+F hash_lookup(puzzle)
+   R calc_hash(puzzle) C :hashtable
+V iterations = 0
+
+F perm([[Int]] &puzzle; i, j, =l, [(Int, Int)] &u)
+   :iterations++
+   I u.empty & l.empty
+      print(‘Solved!’)
+      printpuzzle(puzzle)
+      print(‘iterations: ’String(iterations))
+      R 1B
+   E
+      I l.empty
+         [[Int]] puzzlebackup
+         L(c) 0.<9
+            puzzlebackup.append(puzzle[c][0..])
+         solvePuzzleSimple(&puzzle)
+
+         L(c) 0 .< u.len
+            I !hash_lookup(puzzle)
+               Int inew
+               Int jnew
+               (inew, jnew) = u.pop(c)
+               l = genMoveList(puzzle, inew, jnew)
+
+               I perm(&puzzle, inew, jnew, l, &u)
+                  R 1B
+               E
+                  hash_add(puzzle)
+               u.insert(c, (inew, jnew))
+
+         L(y) 0.<9
+            L(x) 0.<9
+               puzzle[x][y] = puzzlebackup[x][y]
+         hash_add(puzzle)
+         R 0B
+      E
+         V ii = i * 3
+         V jj = j * 3
+         L(m) 0 .< l.len
+            L(y) 0.<3
+               L(x) 0.<3
+                  I validMove(puzzle, x + ii, y + jj, l[m])
+                     puzzle[x + ii][y + jj] = l[m]
+                     V backup = l.pop(m)
+                     I (perm(&puzzle, i, j, l, &u))
+                        R 1B
+                     E
+                        hash_add(puzzle)
+                     l.insert(m, backup)
+                     puzzle[x + ii][y + jj] = 0
+         R 0B
+
+F genMoveList(puzzle, i, j)
+   V l = Array(1.<10)
+   L(y) 0.<3
+      L(x) 0.<3
+         V p = puzzle[i * 3 + x][j * 3 + y]
+         I p != 0
+            l.remove(p)
+   R l
+
+F printpuzzle(puzzle)
+   L(x) 0.<9
+      V s = ‘ ’
+      L(y) 0.<9
+         S puzzle[x][y]
+            0
+               s ‘’= ‘.’
+            E
+               s ‘’= String(puzzle[x][y])
+         s ‘’= ‘ ’
+      print(s)
+
+F solve()
+   V puzzle = [[0, 9, 3, 0, 8, 0, 4, 0, 0], [0, 4, 0, 0, 3, 0, 0, 0, 0], [6, 0, 0, 0, 0, 9, 2, 0, 5], [3, 0, 0, 0, 0, 0, 0, 9, 0], [0, 2, 7, 0, 0, 0, 5, 1, 0], [0, 8, 0, 0, 0, 0, 0, 0, 4], [7, 0, 1, 6, 0, 0, 0, 0, 2], [0, 0, 0, 0, 7, 0, 0, 6, 0], [0, 0, 4, 0, 1, 0, 8, 5, 0]]
+   [(Int, Int)] u
+   [Int] lcount
+   L(y) 0.<3
+      L(x) 0.<3
+         u.append((x, y))
+         lcount.append(genMoveList(puzzle, x, y).len)
+
+   L(j) 0.<9
+      L(i) j .< 9
+         I i != j
+            I lcount[i] < lcount[j]
+               (u[i], u[j]) = (u[j], u[i])
+               (lcount[i], lcount[j]) = (lcount[j], lcount[i])
+   V l = genMoveList(puzzle, 0, 0)
+   perm(&puzzle, 0, 0, l, &u)
+
+L(x) 0.<30
+   solve()

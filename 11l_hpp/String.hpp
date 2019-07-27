@@ -243,6 +243,13 @@ public:
 		return r != String::npos ? (int)r : -1;
 	}
 
+	template <typename ValType> int index(const ValType &v) const
+	{
+		int r = findi(v);
+		if (r == -1) throw ValueError(v);
+		return r;
+	}
+
 	Nullable<int> rfind(const String &s, int start = (int)npos) const
 	{
 		size_t r = basic_string::rfind(s, start);

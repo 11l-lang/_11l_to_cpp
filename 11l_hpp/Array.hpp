@@ -115,6 +115,10 @@ public:
 		}
 		return std::move(a);
 	}
+	friend Array &&operator*(int n, Array &&a)
+	{
+		return std::move(a) * n;
+	}
 
 	void operator*=(int n)
 	{

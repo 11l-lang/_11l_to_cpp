@@ -41,9 +41,9 @@ template <typename KeyType, typename ValueType> DictInitializer<KeyType, ValueTy
 {
 	return DictInitializer<KeyType, ValueType>(key, value);
 }
-template <typename KeyType, typename ValueType> DictInitializer<KeyType, ValueType> dict_of(KeyType &&key, ValueType &&value)
+template <typename KeyType, typename ValueType> auto dict_of(KeyType &&key, ValueType &&value)
 {
-	return DictInitializer<KeyType, ValueType>(std::forward<KeyType>(key), std::forward<ValueType>(value));
+	return DictInitializer<std::remove_reference_t<KeyType>, std::remove_reference_t<ValueType>>(std::forward<KeyType>(key), std::forward<ValueType>(value));
 }
 
 template <typename KeyType, typename ValueType> class DefaultDict : public std::map<KeyType, ValueType>
