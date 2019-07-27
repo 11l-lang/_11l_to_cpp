@@ -1331,6 +1331,7 @@ class Converter:
         g = lambda: self.instr[i]
         def gg():
             return self.instr[i]
+        a = [self.instr[i] for i in range(9)]
 ===
 T Converter
    String instr
@@ -1343,6 +1344,7 @@ T Converter
       V g = () -> @.instr[@i]
       F gg()
          R @.instr[@i]
+      V a = (0.<9).map(i -> @.instr[i])
 ===
 class Converter
 {
@@ -1362,6 +1364,7 @@ public:
         {
             return instr[i];
         };
+        auto a = range_el(0, 9).map([this](const auto &i){return instr[i];});
     }
 };
 
