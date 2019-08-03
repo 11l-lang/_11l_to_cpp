@@ -381,8 +381,10 @@ class SymbolNode:
                     return char_or_str(self.children[2], True)
                 elif func_name.startswith('Array['): # ]
                     func_name = 'Array<' + func_name[6:-1] + '>'
-                elif func_name == 'Array':
+                elif func_name == 'Array': # `list(range(1,10))` -> `Array(1.<10)` -> `create_array(range_el(1, 10))`
                     func_name = 'create_array'
+                elif self.children[0].symbol.id == '[' and self.children[0].is_list: # ] # `[Type]()` -> `Array<Type>()`
+                    func_name = trans_type(self.children[0].to_type_str(), self.children[0].scope, self.children[0].token)
                 elif func_name == 'Dict':
                     func_name = 'create_dict'
                 elif func_name.startswith('DefaultDict['): # ]
