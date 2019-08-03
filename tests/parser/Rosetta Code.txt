@@ -416,12 +416,10 @@ struct CodeBlock1
 
 // https://www.rosettacode.org/wiki/Combinations#D
 F comb(arr, k)
-   [[Int]] result
    I k == 0
-      [Int] empty_array
-      result [+]= empty_array
-      R result
+      R [[Int]()]
 
+   [[Int]] result
    L(x) arr
       V i = L.index
       L(suffix) comb(arr[i+1..], k-1)
@@ -433,14 +431,10 @@ print(comb([0, 1, 2, 3, 4], 3))
 ===
 template <typename T1, typename T2> auto comb(const T1 &arr, const T2 &k)
 {
+    if (k == 0)
+        return create_array({Array<int>()});
     Array<Array<int>> result;
-    if (k == 0) {
-        Array<int> empty_array;
-        result.append(empty_array);
-        return result;
-    }
     {int Lindex = 0;
-
     for (auto &&x : arr) {
         auto i = Lindex;
         for (auto &&suffix : comb(arr[range_ei(i + 1)], k - 1))

@@ -1052,3 +1052,21 @@ struct CodeBlock1
             print(Lindex);
     }
 } code_block_1;
+
+
+V a = [[Int]]()
+a [+]= [Int]()
+print(a)
+print([[Int]()])
+===
+auto a = Array<Array<int>>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        a.append(Array<int>());
+        print(a);
+        print(create_array({Array<int>()}));
+    }
+} code_block_1;
