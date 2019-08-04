@@ -232,8 +232,9 @@ template <typename Type, int dimension> inline void print(const Tvec<Type, dimen
 		std::wcout.flush();
 }
 
-inline String input()
+inline String input(const String &prompt = String())
 {
+	std::wcout << std::wstring(prompt.cbegin(), prompt.cend());
 	std::wstring s;
 	std::getline(std::wcin, s);
 	return String(s.cbegin(), s.cend());

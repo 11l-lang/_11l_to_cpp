@@ -80,10 +80,8 @@ public:
 
     template <typename T1 = decltype(u""_S)> auto fread(T1 filename = u""_S)
     {
-        if (filename == u"") {
-            print(u"filename: "_S, u""_S);
-            filename = input();
-        }
+        if (filename == u"")
+            filename = input(u"filename: "_S);
         auto f = File(filename, u"r"_S);
         auto lines = f.read_lines(true);
         for (auto row : range_el(0, 9))
