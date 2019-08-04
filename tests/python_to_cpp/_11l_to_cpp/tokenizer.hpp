@@ -105,16 +105,16 @@ class Token
 {
 public:
     enum class Category {
-        NAME, 
-        KEYWORD, 
-        CONSTANT, 
-        DELIMITER, 
-        OPERATOR, 
-        NUMERIC_LITERAL, 
-        STRING_LITERAL, 
-        STRING_CONCATENATOR, 
-        SCOPE_BEGIN, 
-        SCOPE_END, 
+        NAME,
+        KEYWORD,
+        CONSTANT,
+        DELIMITER,
+        OPERATOR,
+        NUMERIC_LITERAL,
+        STRING_LITERAL,
+        STRING_CONCATENATOR,
+        SCOPE_BEGIN,
+        SCOPE_END,
         STATEMENT_SEPARATOR
     };
     int start;

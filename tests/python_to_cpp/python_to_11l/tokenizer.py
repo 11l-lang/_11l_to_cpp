@@ -17,7 +17,7 @@ operators = [ # https://docs.python.org/3/reference/lexical_analysis.html#operat
              '<',       '>',       '<=',      '>=',      '==',      '!=',]
 #operators.sort(key = lambda x: len(x), reverse = True)
 
-delimiters = [ # https://docs.python.org/3/reference/lexical_analysis.html#delimiters        
+delimiters = [ # https://docs.python.org/3/reference/lexical_analysis.html#delimiters
               '(',       ')',       '[',       ']',       '{',       '}',
               ',',       ':',       '.',       ';',       '@',       '=',       '->',
               '+=',      '-=',      '*=',      '/=',      '//=',     '%=',      '@=',

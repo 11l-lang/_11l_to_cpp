@@ -101,11 +101,11 @@ def roman(n):
     if n >= 500:
         n -= 500
         r += "D"
-        
+
     if n >= 400:
         n -= 400
         r += "CD"
-        
+
     while n >= 100:
         n -= 100
         r += "C"
@@ -117,11 +117,11 @@ def roman(n):
     if n >= 50:
         n -= 50
         r += "L"
-        
+
     if n >= 40:
         n -= 40
         r += "XL"
-        
+
     while n >= 10:
         n -= 10
         r += "X"
@@ -133,11 +133,11 @@ def roman(n):
     if n >= 5:
         n -= 5
         r += "V"
-        
+
     if n >= 4:
         n -= 4
         r += "IV"
-        
+
     while n >= 1:
         n -= 1
         r += "I"
@@ -300,7 +300,7 @@ def checkio(data):
     coding = zip(
     [1000,900,500,400,100,90,50,40,10,9,5,4,1],
     ["M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"])
-    
+
     result : List[str] = []
     for d, r in coding:
         while data >= d:
@@ -400,5 +400,5 @@ auto checkio = [](const auto &data){return create_array({u""_S, u"M"_S, u"MM"_S,
 
 ---
 def checkio(data):
-    s = lambda b,z: '' if not z else str(s(b%z[0][0], z[1:])) + (b//z[0][0])*z[0][1]    
+    s = lambda b,z: '' if not z else str(s(b%z[0][0], z[1:])) + (b//z[0][0])*z[0][1]
     return s(data, [(1000, 'M'), (900, 'MC'), (500, 'D'), (400, 'DC'), (100, 'C'), (90, 'CX'), (50, 'L'), (40, 'LX'), (10, 'X'), (9, 'XI'), (5, 'V'), (4, 'VI'), (1, 'I')])[::-1]

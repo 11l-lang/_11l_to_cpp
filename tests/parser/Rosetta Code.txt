@@ -188,13 +188,13 @@ struct CodeBlock1
 // https://www.rosettacode.org/wiki/Averages/Pythagorean_means#Python
 F amean(num)
    R sum(num)/Float(num.len)
- 
+
 F gmean(num)
    R product(num) ^ (1.0/num.len)
- 
+
 F hmean(num)
    return num.len / sum(num.map(n -> 1.0/n))
- 
+
 V numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 print(amean(numbers))
 print(gmean(numbers))
@@ -334,7 +334,7 @@ struct CodeBlock2
 // https://www.rosettacode.org/wiki/Carmichael_3_strong_pseudoprimes#D
 F mod_(n, m)
    R ((n % m) + m) % m
- 
+
 F is_prime(n)
    I n C (2, 3)
       R 1B
@@ -348,7 +348,7 @@ F is_prime(n)
       div += inc
       inc = 6 - inc
    R 1B
- 
+
 L(p) 2 .< 62
    I !is_prime(p)
       L.continue
@@ -514,7 +514,7 @@ F print_circle(lo, hi, ndots)
 
    L(i) 0 .. 2*hi
       print(canvas[i].map(j -> I j {‘♦ ’} E ‘  ’).join(‘’))
- 
+
 print_circle(10, 15, 100)
 ===
 template <typename T1, typename T2, typename T3> auto print_circle(const T1 &lo, const T2 &hi, const T3 &ndots)

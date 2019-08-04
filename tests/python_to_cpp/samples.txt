@@ -1231,11 +1231,11 @@ T.enum Category
    TEST_CATEGORY3 = 11
 ===
 enum class Category {
-    NAME, 
-    KEYWORD, 
-    CONSTANT, 
-    TEST_CATEGORY = 10, 
-    TEST_CATEGORY2, 
+    NAME,
+    KEYWORD,
+    CONSTANT,
+    TEST_CATEGORY = 10,
+    TEST_CATEGORY2,
     TEST_CATEGORY3 = 11
 };
 

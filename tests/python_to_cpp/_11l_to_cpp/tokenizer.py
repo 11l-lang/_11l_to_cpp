@@ -175,7 +175,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                 break
 
             ii = i
-            if source[i:i+2] in (R'\‘', R'\(', R'\{', R'\['): # ]})’ 
+            if source[i:i+2] in (R'\‘', R'\(', R'\{', R'\['): # ]})’
                 skip_multiline_comment()
                 while i < len(source) and source[i] in " \t": # skip whitespace characters
                     i += 1

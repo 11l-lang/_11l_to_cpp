@@ -99,7 +99,7 @@ public:
 			z = M[2][0] + M[0][2];
 			w = M[1][2] - M[2][1];
 			if (quatIsUnit) (*this)*=0.5f/(T)sqrt(x);
-		} else 
+		} else
 		if ( M[1][1] > M[2][2] )
 		{
 			x = M[1][0] + M[0][1];
