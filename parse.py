@@ -2444,7 +2444,7 @@ scope = builtins_scope
 global_scope : Scope
 tokensn   = SymbolNode(token)
 builtins_scope.add_function('print', ASTFunctionDefinition([('object', token_to_str('‘’'), ''), ('end', token_to_str(R'"\n"'), 'String'), ('flush', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
-builtins_scope.add_function('input', ASTFunctionDefinition(None, 'String'))
+builtins_scope.add_function('input', ASTFunctionDefinition([('prompt', token_to_str('‘’'), 'String')], 'String'))
 builtins_scope.add_function('assert', ASTFunctionDefinition([('expression', '', 'Bool'), ('message', token_to_str('‘’'), 'String')]))
 builtins_scope.add_function('exit', ASTFunctionDefinition([('arg', '', '')]))
 builtins_scope.add_function('zip', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', '')]))

@@ -58,8 +58,7 @@ T board
 
    F fread(=filename = ‘’)
       I filename == ‘’
-         print(‘filename: ’, end' ‘’)
-         filename = input()
+         filename = input(‘filename: ’)
       V f = File(filename, ‘r’)
       V lines = f.read_lines(1B)
       L(row) 0.<9
