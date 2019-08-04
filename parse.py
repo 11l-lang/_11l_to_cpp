@@ -231,7 +231,7 @@ class SymbolNode:
                 if i < len(self.children) - 1:
                     r += ', '
             return r + ')'
-    
+
         assert(self.token.category == Token.Category.NAME)
         return self.token_str()
 
@@ -811,7 +811,7 @@ class ASTNodeWithChildren(ASTNode):
         return r + ' ' * (indent*4) + "}\n"
 
     def children_to_str_detect_single_stmt(self, indent, r, check_for_if = False):
-        if (len(self.children) != 1 
+        if (len(self.children) != 1
                 or (check_for_if and type(self.children[0]) == ASTIf) # for correctly handling of dangling-else
                 or type(self.children[0]) == ASTLoopRemoveCurrentElementAndContinue): # `L.remove_current_element_and_continue` ‘раскрывается в 2 строки кода’\‘is translated into 2 statements’
             return self.children_to_str(indent, r, False)
@@ -1383,7 +1383,7 @@ class ASTTypeEnum(ASTNode):
         for i in range(len(self.enumerators)):
             r += ' ' * ((indent+1)*4) + self.enumerators[i]
             if i < len(self.enumerators) - 1:
-                r += ', '
+                r += ','
             r += "\n"
         return r + ' ' * (indent*4) + "};\n"
 
@@ -2292,7 +2292,7 @@ def parse_internal(this_node):
                 if token.value(source) == ':':
                     next_token()
                     node.exception_object_type += '::' + token.value(source)
-                    next_token()                    
+                    next_token()
                 if token.category == Token.Category.NAME:
                     node.exception_object_name = token.value(source)
                     next_token()

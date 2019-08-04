@@ -164,7 +164,7 @@ class board:
                                                 #now we iterate through possible values to put in there
                                                 broken = False
                                                 for val in [i for i in range(9) if _board.mergemask(row, col).v[i] == Byte(1)]:
-                                                        if not board_completeSearch and self.__status == 2: 
+                                                        if not board_completeSearch and self.__status == 2:
                                                             broken = True
                                                             break
                                                         val += 1

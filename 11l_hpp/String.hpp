@@ -213,7 +213,7 @@ public:
 			if (s[i] == c) return Nullable<int>(i);
 		return Nullable<int>();
 	}
-	
+
 	Nullable<int> find(const String &s, int start = 0) const
 	{
 		size_t r = basic_string::find(s, start);
@@ -236,7 +236,7 @@ public:
 			if (s[i] == c) return i;
 		return -1;
 	}
-	
+
 	int findi(const String &s, int start = 0) const
 	{
 		size_t r = basic_string::find(s, start);
@@ -286,7 +286,7 @@ public:
 	Array<String> split(const String &delim, Nullable<int> limit = nullptr, bool group_delimiters = false) const;
 	template <typename ... Types> Array<String> split(const Tuple<Types...> &delim_tuple, Nullable<int> limit = nullptr, bool group_delimiters = false) const;
 	Array<String> split(const re::RegEx &regex) const;
-	
+
 	bool is_digit() const
 	{
 		if (empty()) return false;

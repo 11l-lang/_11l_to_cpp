@@ -888,7 +888,7 @@ INLINE HMbool rayPlaneIntn(T &t,const Tvec<T,3> &rayStart,const Tvec<T,3> &rayDi
 template <class T>
 INLINE HMbool rayPlaneIntn(Tvec<T,3> &intn,const Tvec<T,3> &rayStart,const Tvec<T,3> &rayDirn,const Tvec<T,4> &Plane,const T min=0)
 {
-	T t;	
+	T t;
 	if (rayPlaneIntn(t,rayStart,rayDirn,Plane))
 		if (t>=min)
 		{
@@ -902,7 +902,7 @@ INLINE HMbool rayPlaneIntn(Tvec<T,3> &intn,const Tvec<T,3> &rayStart,const Tvec<
 template <class T>
 INLINE HMbool rayPlaneIntn(Tvec<T,3> &intn,const Tvec<T,3> &rayStart,const Tvec<T,3> &rayDirn,const Tvec<T,4> &Plane,const T min,const T max)
 {
-	T t;	
+	T t;
 	if (rayPlaneIntn(t,rayStart,rayDirn,Plane))
 		if (t>=min && t<=max)
 		{

@@ -519,7 +519,7 @@ F f()
       I n == 30
          L.break
       print(n)
-   
+
       L.was_no_break
          print(‘no break’)
 ===
