@@ -81,7 +81,7 @@ class board:
         def fread(self,filename=''):
                 #self.__init__()
                 if filename=='':
-                        print("filename: ")
+                        print("filename: ", end = '')
                         filename = input()
                 f = open(filename, 'r')
                 lines = f.readlines()

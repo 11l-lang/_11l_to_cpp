@@ -81,7 +81,7 @@ public:
     template <typename T1 = decltype(u""_S)> auto fread(T1 filename = u""_S)
     {
         if (filename == u"") {
-            print(u"filename: "_S);
+            print(u"filename: "_S, u""_S);
             filename = input();
         }
         auto f = File(filename, u"r"_S);
