@@ -1308,6 +1308,8 @@ class ASTExceptionCatch(ASTNodeWithChildren):
     exception_object_name : str = ''
 
     def to_str(self, indent):
+        if self.exception_object_type == '':
+            return self.children_to_str(indent, 'catch (...)')
         return self.children_to_str(indent, 'catch (const ' + self.exception_object_type + '&' + (' ' + self.exception_object_name if self.exception_object_name != '' else '') + ')')
 
 class ASTTypeDefinition(ASTNodeWithChildren):
@@ -1482,7 +1484,8 @@ def type_of(sn):
     tid = left.scope.find(left.type.rstrip('?'))
     assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
     tid = tid.ast_nodes[0].scope.ids.get(sn.children[1].token_str())
-    assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition))
+    if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition)):
+        raise Error('method `' + sn.children[1].token_str() + '` is not found in type `' + left.type.rstrip('?') + '`', sn.left_to_right_token())
     return tid.ast_nodes[0]
 
 def next_token():
@@ -2284,14 +2287,18 @@ def parse_internal(this_node):
 
             elif token.value(source) in ('X.catch', 'Х.перехват', 'exception.catch', 'исключение.перехват'):
                 node = ASTExceptionCatch()
-                node.exception_object_type = expected_name('exception object type name').replace(':', '::')
-                if token.value(source) == ':':
+                if peek_token().category != Token.Category.SCOPE_BEGIN:
+                    node.exception_object_type = expected_name('exception object type name').replace(':', '::')
+                    if token.value(source) == ':':
+                        next_token()
+                        node.exception_object_type += '::' + token.value(source)
+                        next_token()
+                    if token.category == Token.Category.NAME:
+                        node.exception_object_name = token.value(source)
+                        next_token()
+                else:
                     next_token()
-                    node.exception_object_type += '::' + token.value(source)
-                    next_token()
-                if token.category == Token.Category.NAME:
-                    node.exception_object_name = token.value(source)
-                    next_token()
+                    node.exception_object_type = ''
                 new_scope(node)
 
             else:
@@ -2500,11 +2507,14 @@ file_scope.add_name('read_bytes', ASTFunctionDefinition([]))
 file_scope.add_name('read', ASTFunctionDefinition([('size', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
 file_scope.add_name('write', ASTFunctionDefinition([('s', '', 'String')]))
 file_scope.add_name('read_lines', ASTFunctionDefinition([('keep_newline', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
+file_scope.add_name('flush', ASTFunctionDefinition([]))
 builtins_scope.ids['File'].ast_nodes[0].scope = file_scope
 
 for type_ in cpp_type_from_11l:
     builtins_scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', token_to_str('‘’'), '')])]))
 string_scope = Scope(None)
+string_scope.add_name('starts_with', ASTFunctionDefinition([('prefix', '', 'String')]))
+string_scope.add_name('ends_with', ASTFunctionDefinition([('suffix', '', 'String')]))
 string_scope.add_name('split', ASTFunctionDefinition([('delim', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?'), ('group_delimiters', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
 string_scope.add_name('rtrim', ASTFunctionDefinition([('s', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
 string_scope.add_name('ltrim', ASTFunctionDefinition([('s', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
@@ -2623,7 +2633,8 @@ def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, ap
     find_reference_to_argv(p)
 
     if found_reference_to_argv:
-        assert(type(p.children[-1]) == ASTMain)
+        if type(p.children[-1]) != ASTMain:
+            raise Error("`sys.argv`->`:argv` can be used only after `if __name__ == '__main__':`->`:start:`", tokens[-1])
         p.children[-1].found_reference_to_argv = True
         p.beginning_extra += "Array<String> argv;\n\n"
 
