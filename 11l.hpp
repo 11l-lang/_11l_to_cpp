@@ -332,7 +332,6 @@ template <typename Iterable> bool any(const Iterable &i)
 
 inline void exit(const String &msg)
 {
-	_stderr.write(msg);
-	_stderr.write(u"\n");
+	std::wcerr << std::wstring(msg.cbegin(), msg.cend()) << "\n";
 	exit(1);
 }

@@ -18,6 +18,8 @@ std::u16string convert_utf8_to_utf16(const std::string &u8)
 }
 #endif
 
+class UnicodeDecodeError {};
+
 class File
 {
 	FILE *file;
@@ -95,7 +97,11 @@ public:
 #ifdef _WIN32
 		String r;
 		r.resize(file_size);
-		r.resize(MultiByteToWideChar(CP_UTF8, 0, file_str.data(), (int)file_str.size(), (LPWSTR)r.data(), (int)r.size()));
+		r.resize(MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, file_str.data(), (int)file_str.size(), (LPWSTR)r.data(), (int)r.size()));
+		if (GetLastError() != ERROR_SUCCESS) {
+			assert(GetLastError() == ERROR_NO_UNICODE_TRANSLATION);
+			throw UnicodeDecodeError();
+		}
 		return r;
 #else
 		return String(convert_utf8_to_utf16(file_str));

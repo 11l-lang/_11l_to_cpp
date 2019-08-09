@@ -121,7 +121,7 @@ assert(f(‘s’) == ‘ss’)
 X.try
 {
 }
-X.catch
+X.catch 1
         ^Error: expected exception object type name
     exit(-1)
 
@@ -216,3 +216,8 @@ V d = TimeDelta(10)
 L m
 ^Error: please write `L m != 0` instead of `L m`
    m = m I/ 10
+
+
+String filestr
+print(filestr.ends_with2((‘ ’, "\t")))
+      ^Error: method `ends_with2` is not found in type `String`
