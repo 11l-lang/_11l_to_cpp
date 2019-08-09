@@ -725,11 +725,11 @@ T Animal
    F.virtual.abstract say() -> N
 
 T Sheep(Animal)
-   F.virtual.override say() -> N
+   F.virtual.assign say() -> N
       print(‘baa’)
 
 T Cat(Animal)
-   F.virtual.override say() -> N
+   F.virtual.assign say() -> N
       print(‘meow’)
 
 :start:
@@ -777,6 +777,58 @@ int main()
     for (auto &&animal : animals)
         animal->say();
 }
+
+
+class Animal:
+    def say(self) -> None:
+        print('')
+
+class Sheep(Animal):
+    def say(self):
+        print('baa')
+
+class Cat(Animal):
+    def say(self):
+        print('meow')
+===
+T Animal
+   F.virtual.new say() -> N
+      print(‘’)
+
+T Sheep(Animal)
+   F.virtual.override say() -> N
+      print(‘baa’)
+
+T Cat(Animal)
+   F.virtual.override say() -> N
+      print(‘meow’)
+===
+class Animal
+{
+public:
+    virtual void say()
+    {
+        print(u""_S);
+    }
+};
+
+class Sheep : public Animal
+{
+public:
+    virtual void say() override
+    {
+        print(u"baa"_S);
+    }
+};
+
+class Cat : public Animal
+{
+public:
+    virtual void say() override
+    {
+        print(u"meow"_S);
+    }
+};
 
 
 print("\t word \t".rstrip("\t") == "\t word ")

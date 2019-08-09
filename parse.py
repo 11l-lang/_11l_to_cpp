@@ -948,7 +948,8 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         NEW = 1
         OVERRIDE = 2
         ABSTRACT = 3
-        FINAL = 4
+        ASSIGN = 4
+        FINAL = 5
     virtual_category = VirtualCategory.NO
     scope : Scope
 
@@ -988,7 +989,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                         arguments.append(arg[2].rstrip('?') + '* '
                             + ('' if '=' in arg[3] else 'const ')
                             + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
-                s = 'virtual ' + s + '(' + ', '.join(arguments) + ')' + ('', ' override', ' = 0', ' final')[self.virtual_category - 1]
+                s = 'virtual ' + s + '(' + ', '.join(arguments) + ')' + ('', ' override', ' = 0', ' override', ' final')[self.virtual_category - 1]
                 return ' ' * (indent*4) + s + ";\n" if self.virtual_category == self.VirtualCategory.ABSTRACT else self.children_to_str(indent, s)
 
         elif type(self.parent) != ASTProgram: # local functions [i.e. functions inside functions] are represented as C++ lambdas
@@ -1904,10 +1905,7 @@ def parse_internal(this_node):
             continue
 
         elif token.category == Token.Category.KEYWORD:
-            if token.value(source).startswith('F') or \
-               token.value(source).startswith('Ф') or \
-               token.value(source).startswith('fn') or \
-               token.value(source).startswith('фн'):
+            if token.value(source).startswith(('F', 'Ф', 'fn', 'фн')):
                 node = ASTFunctionDefinition()
                 if '.virtual.' in token.value(source) or \
                    '.виртуал.' in token.value(source):
@@ -1915,6 +1913,7 @@ def parse_internal(this_node):
                     if   subkw in ('new',      'новая'   ): node.virtual_category = node.VirtualCategory.NEW
                     elif subkw in ('override', 'переопр' ): node.virtual_category = node.VirtualCategory.OVERRIDE
                     elif subkw in ('abstract', 'абстракт'): node.virtual_category = node.VirtualCategory.ABSTRACT
+                    elif subkw in ('assign',   'опред'   ): node.virtual_category = node.VirtualCategory.ASSIGN
                     elif subkw in ('final',    'финал'   ): node.virtual_category = node.VirtualCategory.FINAL
                 elif token.value(source) in ('F.destructor', 'Ф.деструктор', 'fn.destructor', 'фн.деструктор'):
                     if type(this_node) != ASTTypeDefinition:
@@ -2130,10 +2129,7 @@ def parse_internal(this_node):
                     assert(token.category == Token.Category.STATEMENT_SEPARATOR)
                     next_token()
 
-            elif token.value(source).startswith('I') or \
-                 token.value(source).startswith('Е') or \
-                 token.value(source).startswith('if') or \
-                 token.value(source).startswith('если'):
+            elif token.value(source).startswith(('I', 'Е', 'if', 'если')):
                 node = ASTIf()
                 if '.' in token.value(source):
                     subkw = token.value(source)[token.value(source).find('.')+1:]
