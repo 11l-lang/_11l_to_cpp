@@ -9,3 +9,4 @@ Debug
 .vs/
 .idea/
 __pycache__/
+.git/
