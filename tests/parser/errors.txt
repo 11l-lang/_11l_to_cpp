@@ -221,3 +221,12 @@ L m
 String filestr
 print(filestr.ends_with2((‘ ’, "\t")))
       ^Error: method `ends_with2` is not found in type `String`
+
+
+F tokenize(source, [(Int, Int)]? &comments = N)
+   [String] tokens
+   R tokens
+
+[(Int, Int)] comments
+tokenize(‘’, comments)
+             ^Error: argument `comments` of function `tokenize` is in-out, but there is no `&` prefix

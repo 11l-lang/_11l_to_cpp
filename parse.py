@@ -437,6 +437,8 @@ class SymbolNode:
                                 raise Error('too many arguments for function `' + func_name + '`', self.children[0].left_to_right_token())
                             if f_node.first_named_only_argument is not None and last_function_arg >= f_node.first_named_only_argument:
                                 raise Error('argument `' + f_node.function_arguments[last_function_arg][0] + '` of function `' + func_name + '` is named-only', self.children[i+1].token)
+                            if len(f_node.function_arguments[last_function_arg]) > 3 and '&' in f_node.function_arguments[last_function_arg][3] and not (self.children[i+1].symbol.id == '&' and len(self.children[i+1].children) == 1):
+                                raise Error('argument `' + f_node.function_arguments[last_function_arg][0] + '` of function `' + func_name + '` is in-out, but there is no `&` prefix', self.children[i+1].token)
                             if f_node.function_arguments[last_function_arg][2] == 'File?':
                                 tid = self.scope.find(self.children[i+1].token_str())
                                 if tid is None or tid.type != 'File?':
@@ -446,10 +448,10 @@ class SymbolNode:
                         res += cstr
                         last_function_arg += 1
                     else:
+                        if f_node is None or type(f_node) != ASTFunctionDefinition:
+                            raise Error('function `' + func_name + '` is not found', self.children[0].left_to_right_token())
                         argument_name = self.children[i].to_str()[:-1]
                         while True:
-                            if f_node is None:
-                                raise Error('function `' + func_name + '` is not found', self.children[0].left_to_right_token())
                             if last_function_arg == len(f_node.function_arguments):
                                 raise Error('argument `' + argument_name + '` is not found in function `' + func_name + '`', self.children[i].token)
                             if f_node.function_arguments[last_function_arg][0] == argument_name:
@@ -2582,7 +2584,7 @@ module_scope.add_function('', ASTFunctionDefinition([('pattern', '', 'String')])
 builtin_modules['re'] = Module(module_scope)
 module_scope = Scope(None)
 module_scope.add_function('', ASTFunctionDefinition([('min', '', 'Float'), ('max', '0', 'Float')]))
-module_scope.add_function('shuffle', ASTFunctionDefinition([('container', '', '')]))
+module_scope.add_function('shuffle', ASTFunctionDefinition([('container', '', '', '&')]))
 builtin_modules['random'] = Module(module_scope)
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++

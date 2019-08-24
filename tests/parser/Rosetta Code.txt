@@ -1147,7 +1147,7 @@ F throw_die(n_sides, n_dice, s, [Int] &counts)
       counts[s]++
       R
    L(i) 1..n_sides
-      throw_die(n_sides, n_dice - 1, s + i, counts)
+      throw_die(n_sides, n_dice - 1, s + i, &counts)
 
 F beating_probability(n_sides1, n_dice1,
                       n_sides2, n_dice2)
