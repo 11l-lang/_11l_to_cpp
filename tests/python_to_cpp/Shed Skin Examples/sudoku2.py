@@ -49,34 +49,26 @@ board_notifyOnCompletion = True               #let the user know when you're don
 board_completeSearch = False                  #search past the first solution
 
 class board:
-        final : List[List[int]]
-        rows : List[bmp]
-        cols : List[bmp]
-        cels : List[List[bmp]]
-
-        #statistics
-        __turns = 0
-        __backtracks = 0
-        __starttime = 0.0
-        __endtime = 0.0
-        __status = 0
-        __maxdepth = 0
-        __openspaces = 81
-
-        solutions : Set[BoardRep] # this is needed for 11l and to fix mypy error: Need type annotation for 'solutions' (comment this line and uncomment ` -> None:` to see this error)
-        examined  : Set[BoardRep] # this is needed for 11l and to fix mypy error: Need type annotation for 'examined'  (comment this line and uncomment ` -> None:` to see this error)
-
-        def __init__(self):# -> None:
+        def __init__(self):
                 #final numbers: a 9 by 9 grid
-                self.final = [9 * [0] for i in range(9)]
-                self.rows = 9 * [bmp()]
-                self.cols = 9 * [bmp()]
-                self.cels = [3 * [bmp()] for i in range(3)]
+                self.final : List[List[int]] = [9 * [0] for i in range(9)]
+                self.rows : List[bmp] = 9 * [bmp()]
+                self.cols : List[bmp] = 9 * [bmp()]
+                self.cels : List[List[bmp]] = [3 * [bmp()] for i in range(3)]
+
+                #statistics
+                self.__turns = 0
+                self.__backtracks = 0
+                self.__starttime = 0.0
+                self.__endtime = 0.0
+                self.__status = 0
+                self.__maxdepth = 0
+                self.__openspaces = 81
 
                 #a set of all solved boards discovered so far
-                self.solutions = set()
+                self.solutions = set() # BoardRep
                 #a set of all boards examined--should help reduce the amount of search duplication
-                self.examined = set()
+                self.examined = set() # BoardRep
 
         def fread(self,filename=''):
                 #self.__init__()

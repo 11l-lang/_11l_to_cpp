@@ -1655,3 +1655,36 @@ struct CodeBlock1
         print(in(2, s));
     }
 } code_block_1;
+
+
+class Class:
+    a : int
+
+    def __init__(a):
+        self.a = a
+        self.b = 0
+        self.s = set() # str
+        self.final : List[List[int]] = [9 * [0] for i in range(9)]
+===
+T Class
+   Int a
+   b = 0
+   s = Set[String]()
+   [[Int]] final = (0.<9).map(i -> 9 * [0])
+
+   F (a)
+      .a = a
+===
+class Class
+{
+public:
+    int a;
+    decltype(0) b = 0;
+    decltype(Set<String>()) s = Set<String>();
+    Array<Array<int>> final = range_el(0, 9).map([](const auto &i){return 9 * create_array({0});});
+
+    template <typename T1> Class(const T1 &a)
+    {
+        this->a = a;
+    }
+};

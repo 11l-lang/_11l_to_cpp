@@ -56,10 +56,10 @@ auto board_completeSearch = false;
 class board
 {
 public:
-    Array<Array<int>> final;
-    Array<bmp> rows;
-    Array<bmp> cols;
-    Array<Array<bmp>> cels;
+    Array<Array<int>> final = range_el(0, 9).map([](const auto &i){return 9 * create_array({0});});
+    Array<bmp> rows = 9 * create_array({bmp()});
+    Array<bmp> cols = 9 * create_array({bmp()});
+    Array<Array<bmp>> cels = range_el(0, 3).map([](const auto &i){return 3 * create_array({bmp()});});
     decltype(0) __turns = 0;
     decltype(0) __backtracks = 0;
     decltype(0.0) __starttime = 0.0;
@@ -67,15 +67,10 @@ public:
     decltype(0) __status = 0;
     decltype(0) __maxdepth = 0;
     decltype(81) __openspaces = 81;
-    Set<BoardRep> solutions;
-    Set<BoardRep> examined;
-
+    decltype(Set<BoardRep>()) solutions = Set<BoardRep>();
+    decltype(Set<BoardRep>()) examined = Set<BoardRep>();
     board()
     {
-        final = range_el(0, 9).map([](const auto &i){return 9 * create_array({0});});
-        rows = 9 * create_array({bmp()});
-        cols = 9 * create_array({bmp()});
-        cels = range_el(0, 3).map([](const auto &i){return 3 * create_array({bmp()});});
     }
 
     template <typename T1 = decltype(u""_S)> auto fread(T1 filename = u""_S)

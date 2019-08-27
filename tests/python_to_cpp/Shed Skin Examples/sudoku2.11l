@@ -36,10 +36,10 @@ V board_notifyOnCompletion = 1B
 V board_completeSearch = 0B
 
 T board
-   [[Int]] final
-   [bmp] rows
-   [bmp] cols
-   [[bmp]] cels
+   [[Int]] final = (0.<9).map(i -> 9 * [0])
+   [bmp] rows = 9 * [bmp()]
+   [bmp] cols = 9 * [bmp()]
+   [[bmp]] cels = (0.<3).map(i -> 3 * [bmp()])
    __turns = 0
    __backtracks = 0
    __starttime = 0.0
@@ -47,14 +47,11 @@ T board
    __status = 0
    __maxdepth = 0
    __openspaces = 81
-   Set[BoardRep] solutions
-   Set[BoardRep] examined
-
+   solutions = Set[BoardRep]()
+   examined = Set[BoardRep]()
    F ()
-      .final = (0.<9).map(i -> 9 * [0])
-      .rows = 9 * [bmp()]
-      .cols = 9 * [bmp()]
-      .cels = (0.<3).map(i -> 3 * [bmp()])
+   {
+   }
 
    F fread(=filename = ‘’)
       I filename == ‘’
