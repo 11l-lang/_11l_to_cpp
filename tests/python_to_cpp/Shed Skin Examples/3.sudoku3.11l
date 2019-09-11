@@ -1,0 +1,177 @@
+V TRIPLETS = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+V ROW_ITER = (0.<9).map(row -> (0.<9).map(col -> (@row, col)))
+V COL_ITER = (0.<9).map(col -> (0.<9).map(row -> (row, @col)))
+V TxT_ITER = multiloop(TRIPLETS, TRIPLETS, (rows, cols) -> multiloop(rows, cols, (row, col) -> (row, col)))
+
+T soduko
+   [[[Int]]] squares = (0.<9).map(row -> (0.<9).map(col -> Array(1.<10)))
+   _changed = 0B
+   F (start_grid)
+
+      I start_grid.len != 0
+         assert(start_grid.len == 9, ‘Bad input!’)
+         L(row) 0.<9
+            .set_row(row, start_grid[row])
+
+   F copy()
+      [String] e
+      V soduko_copy = soduko(e)
+      L(row) 0.<9
+         L(col) 0.<9
+            soduko_copy.squares[row][col] = copy(.squares[row][col])
+      soduko_copy._changed = 0B
+      R soduko_copy
+
+   F set_row(row, x_list)
+      assert(x_list.len == 9, ‘not 9’)
+      L(col) 0.<9
+         Int x
+         X.try
+            x = Int(x_list[col])
+         X.catch
+            x = 0
+         .set_cell(row, col, x)
+
+   F set_cell(row, col, x)
+      I .squares[row][col] == [x]
+      {
+      }
+      E I x !C (1 .< 9 + 1)
+      {
+      }
+      E
+         assert(x C .squares[row][col], ‘bugger2’)
+         .squares[row][col] = [x]
+         .update_neighbours(row, col, x)
+         ._changed = 1B
+
+   T Error
+   {
+   }
+
+   F cell_exclude(row, col, x)
+      assert(x C (1 .< 9 + 1), ‘inra’)
+      I x C .squares[row][col]
+         .squares[row][col].remove(x)
+         I .squares[row][col].empty
+            X .Error()
+         I .squares[row][col].len == 1
+            ._changed = 1B
+            .update_neighbours(row, col, .squares[row][col][0])
+      E
+      {
+      }
+      R
+
+   F update_neighbours(set_row, set_col, x) -> N
+      L(row) 0.<9
+         I row != set_row
+            .cell_exclude(row, set_col, x)
+      L(col) 0.<9
+         I col != set_col
+            .cell_exclude(set_row, col, x)
+      [Int] rows
+      [Int] cols
+      L(triplet) :TRIPLETS
+         I set_row C triplet
+            rows = copy(triplet)
+         I set_col C triplet
+            cols = copy(triplet)
+      rows.remove(set_row)
+      cols.remove(set_col)
+      L(row) rows
+         L(col) cols
+            assert(row != set_row | col != set_col, ‘meuh’)
+            .cell_exclude(row, col, x)
+
+   F get_cell_digit_str(row, col)
+      I .squares[row][col].len == 1
+         R String(.squares[row][col][0])
+      E
+         R ‘0’
+
+   F to_str()
+      V answer = "   123   456   789\n"
+      L(row) 0.<9
+         answer = answer‘’String(row + 1)‘ [’((0.<3).map(col -> @.get_cell_digit_str(@row, col).replace(‘0’, ‘?’))).join(‘’)‘] [’((3.<6).map(col -> @.get_cell_digit_str(@row, col).replace(‘0’, ‘?’))).join(‘’)‘] [’((6.<9).map(col -> @.get_cell_digit_str(@row, col).replace(‘0’, ‘?’))).join(‘’)"]\n"
+         I row + 1 C [3, 6]
+            answer = answer"   ---   ---   ---\n"
+      R answer
+
+   F check_for_single_occurances()
+      L(check_type) [:ROW_ITER, :COL_ITER, TxT_ITER]
+         L(check_list) check_type
+            L(x) 1 .< 9 + 1
+               [(Int, Int)] x_in_list
+               L(row, col) check_list
+                  I x C .squares[row][col]
+                     x_in_list.append((row, col))
+               I x_in_list.len == 1
+                  V row = x_in_list[0][0]
+                  V col = x_in_list[0][1]
+                  I .squares[row][col].len > 1
+                     .set_cell(row, col, x)
+
+   F check_for_last_in_row_col_3x3()
+      L(type_name, check_type) [(‘Row’, :ROW_ITER), (‘Col’, :COL_ITER), (‘3x3’, TxT_ITER)]
+         L(check_list) check_type
+            [(Int, Int)] unknown_entries
+            V unassigned_values = Array(1 .< 9 + 1)
+            [Int] known_values
+            L(row, col) check_list
+               I .squares[row][col].len == 1
+                  assert(.squares[row][col][0] !C known_values, ‘bugger3’)
+                  known_values.append(.squares[row][col][0])
+                  assert(.squares[row][col][0] C unassigned_values, ‘bugger4’)
+                  unassigned_values.remove(.squares[row][col][0])
+               E
+                  unknown_entries.append((row, col))
+            assert(unknown_entries.len + known_values.len == 9, ‘bugger5’)
+            assert(unknown_entries.len == unassigned_values.len, ‘bugger6’)
+            I unknown_entries.len == 1
+               V x = unassigned_values[0]
+               .set_cell(unknown_entries[0][0], unknown_entries[0][1], x)
+      R
+
+   F check()
+      ._changed = 1B
+      L ._changed
+         ._changed = 0B
+         .check_for_single_occurances()
+         .check_for_last_in_row_col_3x3()
+      R
+
+   F one_level_supposition()
+      V progress = 1B
+      L progress == 1B
+         progress = 0B
+         L(row) 0.<9
+            L(col) 0.<9
+               I .squares[row][col].len > 1
+                  [Int] bad_x
+                  L(x) .squares[row][col]
+                     V soduko_copy = .copy()
+                     X.try
+                        soduko_copy.set_cell(row, col, x)
+                        soduko_copy.check()
+                     X.catch .Error e
+                        bad_x.append(x)
+
+                  I bad_x.empty
+                  {
+                  }
+                  E I bad_x.len < .squares[row][col].len
+                     L(x) bad_x
+                        .cell_exclude(row, col, x)
+                        .check()
+                     progress = 1B
+                  E
+                     assert(0B, ‘bugger7’)
+
+:start:
+L(x) 0.<50
+   V t = soduko([‘800000600’, ‘040500100’, ‘070090000’, ‘030020007’, ‘600008004’, ‘500000090’, ‘000030020’, ‘001006050’, ‘004000003’])
+   t.check()
+   t.one_level_supposition()
+   t.check()
+   print(t.to_str())

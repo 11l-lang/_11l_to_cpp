@@ -10,10 +10,10 @@ COL_ITER = [[(row,col) for row in range(0,9)] for col in range(0,9)]
 TxT_ITER = [[(row,col) for row in rows for col in cols] for rows in TRIPLETS for cols in TRIPLETS]
 
 class soduko:
-    def __init__(self, start_grid=None) :
-        self.squares =[ [list(range(1,10))  for col in range(0,9)] for row in range(0,9)]
+    def __init__(self, start_grid) :
+        self.squares : List[List[List[int]]] =[ [list(range(1,10))  for col in range(0,9)] for row in range(0,9)]
 
-        if start_grid is not None:
+        if len(start_grid) != 0:
             assert len(start_grid)==9, "Bad input!"
             for row in range(0,9) :
                 self.set_row(row, start_grid[row])
@@ -21,7 +21,8 @@ class soduko:
         self._changed=False
 
     def copy(self) :
-        soduko_copy = soduko(None)
+        e : List[str] = []
+        soduko_copy = soduko(e) # [-TODO something-]
         for row in range(0,9) :
             for col in range(0,9) :
                 soduko_copy.squares[row][col] = self.squares[row][col][:]
@@ -31,6 +32,7 @@ class soduko:
     def set_row(self,row, x_list) :
         assert len(x_list)==9, 'not 9'
         for col in range(0,9) :
+            x : int
             try :
                 x = int(x_list[col])
             except :
@@ -49,11 +51,15 @@ class soduko:
             self.update_neighbours(row,col,x)
             self._changed=True
 
+    class Error(Exception):
+        pass
+
     def cell_exclude(self, row,col,x) :
         assert x in range(1,9+1), 'inra'
         if x in self.squares[row][col] :
             self.squares[row][col].remove(x)
-            assert len(self.squares[row][col]) > 0, "bugger"
+            if len(self.squares[row][col]) == 0:
+                raise self.Error()
             if len(self.squares[row][col]) == 1 :
                 self._changed=True
                 self.update_neighbours(row,col,self.squares[row][col][0])
@@ -61,13 +67,15 @@ class soduko:
             pass
         return
 
-    def update_neighbours(self,set_row,set_col,x) :
+    def update_neighbours(self,set_row,set_col,x) -> None:
         for row in range(0,9) :
             if row != set_row :
                 self.cell_exclude(row,set_col,x)
         for col in range(0,9) :
             if col != set_col :
                 self.cell_exclude(set_row,col,x)
+        rows : List[int]
+        cols : List[int]
         for triplet in TRIPLETS :
             if set_row in triplet : rows = triplet[:]
             if set_col in triplet : cols = triplet[:]
@@ -84,7 +92,7 @@ class soduko:
         else :
             return "0"
 
-    def __str__(self):
+    def to_str(self):
         answer = "   123   456   789\n"
         for row in range(0,9) :
             answer = answer + str(row+1)                         +   " [" + "".join([self.get_cell_digit_str(row,col).replace("0","?") for col in range(0,3)])                         + "] [" + "".join([self.get_cell_digit_str(row,col).replace("0","?") for col in range(3,6)])                         + "] [" + "".join([self.get_cell_digit_str(row,col).replace("0","?") for col in range(6,9)])                         + "]\n"
@@ -92,34 +100,27 @@ class soduko:
               answer = answer + "   ---   ---   ---\n"
         return answer
 
-    def check(self) :
-        self._changed=True
-        while self._changed:
-            self._changed=False
-            self.check_for_single_occurances()
-            self.check_for_last_in_row_col_3x3()
-        return
-
     def check_for_single_occurances(self):
         for check_type in [ROW_ITER, COL_ITER, TxT_ITER]:
             for check_list in check_type :
                 for x in range(1,9+1) : #1 to 9 inclusive
-                    x_in_list = []
-                    for (row,col) in check_list :
+                    x_in_list : List[Tuple[int, int]] = []
+                    for row,col in check_list :
                         if x in self.squares[row][col] :
                             x_in_list.append((row,col))
                     if len(x_in_list)==1 :
-                        (row,col) = x_in_list[0]
+                        row = x_in_list[0][0] # [-TODO: (row,col) = x_in_list[0]-]
+                        col = x_in_list[0][1]
                         if len(self.squares[row][col]) > 1 :
                             self.set_cell(row,col,x)
 
     def check_for_last_in_row_col_3x3(self):
-        for (type_name, check_type) in [("Row",ROW_ITER),("Col",COL_ITER),("3x3",TxT_ITER)]:
+        for type_name, check_type in [("Row",ROW_ITER),("Col",COL_ITER),("3x3",TxT_ITER)]:
             for check_list in check_type :
-                unknown_entries = []
+                unknown_entries : List[Tuple[int, int]] = []
                 unassigned_values = list(range(1,9+1)) #1-9 inclusive
-                known_values = []
-                for (row,col) in check_list :
+                known_values : List[int] = []
+                for row,col in check_list :
                     if len(self.squares[row][col]) == 1 :
                         assert self.squares[row][col][0] not in known_values, "bugger3"
 
@@ -134,26 +135,34 @@ class soduko:
                 assert len(unknown_entries) == len(unassigned_values), 'bugger6'
                 if len(unknown_entries) == 1 :
                     x = unassigned_values[0]
-                    (row,col) = unknown_entries[0]
-                    self.set_cell(row,col,x)
+                    # [-TODO: (row,col) = unknown_entries[0]-]
+                    self.set_cell(unknown_entries[0][0],unknown_entries[0][1],x)
+        return
+
+    def check(self) :
+        self._changed=True
+        while self._changed:
+            self._changed=False
+            self.check_for_single_occurances()
+            self.check_for_last_in_row_col_3x3()
         return
 
     def one_level_supposition(self):
         progress=True
-        while progress :
+        while progress == True:
             progress=False
             for row in range(0,9) :
                 for col in range(0,9):
                     if len(self.squares[row][col]) > 1 :
-                        bad_x = []
+                        bad_x : List[int] = []
                         for x in self.squares[row][col] :
                             soduko_copy = self.copy()
                             try:
                                 soduko_copy.set_cell(row,col,x)
                                 soduko_copy.check()
-                            except AssertionError as e :
+                            except self.Error as e :
                                 bad_x.append(x)
-                            del soduko_copy
+                            #del soduko_copy
                         if len(bad_x) == 0 :
                             pass
                         elif len(bad_x) < len(self.squares[row][col]) :
@@ -164,7 +173,7 @@ class soduko:
                         else :
                             assert False, "bugger7"
 
-def main():
+if __name__ == '__main__':
     for x in range(50):
         t = soduko(["800000600",
                        "040500100",
@@ -179,7 +188,4 @@ def main():
         t.check()
         t.one_level_supposition()
         t.check()
-        print(t)
-
-if __name__ == '__main__':
-    main()
+        print(t.to_str())

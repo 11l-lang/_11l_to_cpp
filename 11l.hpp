@@ -322,6 +322,11 @@ template <typename Iterable> bool any(const Iterable &i)
 	return false;
 }
 
+template <typename Ty> Ty copy(const Ty &obj)
+{
+	return obj;
+}
+
 #ifdef _WIN32
 #define MAIN_WITH_ARGV() wmain(int argc, wchar_t *argv[])
 #define INIT_ARGV() for (int i=0; i<argc; i++) ::argv.append(String((char16_t*)argv[i], wcslen(argv[i])))

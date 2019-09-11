@@ -103,10 +103,15 @@ class Scope:
 
     def find_and_return_scope(self, name):
         s = self
-        while True:
+        if type(s.node) == ASTTypeDefinition:
             id = s.ids.get(name)
             if id is not None:
                 return id, s
+        while True:
+            if type(s.node) != ASTTypeDefinition:
+                id = s.ids.get(name)
+                if id is not None:
+                    return id, s
             s = s.parent
             if s is None:
                 return None, None
@@ -361,6 +366,13 @@ class SymbolNode:
                                     if len(fid.ast_nodes) > 1:
                                         raise Error('methods\' overloading is not supported for now', self.children[0].children[0].token)
                                     f_node = fid.ast_nodes[0]
+                                    if type(f_node) == ASTTypeDefinition:
+                                        if len(f_node.constructors) == 0:
+                                            f_node = ASTFunctionDefinition()
+                                        else:
+                                            if len(f_node.constructors) > 1:
+                                                raise Error('constructors\' overloading is not supported for now (see type `' + f_node.type_name + '`)', self.children[0].left_to_right_token())
+                                            f_node = f_node.constructors[0]
                                 break
                             s = s.parent
                             assert(s)
@@ -395,6 +407,17 @@ class SymbolNode:
                 elif func_name == 'sum' and self.children[2].symbol.id == '(' and self.children[2].children[0].symbol.id == '.' and self.children[2].children[0].children[1].token_str() == 'map': # )
                     assert(len(self.children) == 3)
                     return 'sum_map(' + self.children[2].children[0].children[0].to_str() + ', ' + self.children[2].children[2].to_str() + ')'
+                elif func_name == 'copy':
+                    s = self.scope
+                    while True:
+                        if s.is_function:
+                            if type(s.node.parent) == ASTTypeDefinition:
+                                fid = s.parent.ids.get('copy')
+                                if fid is not None:
+                                    func_name = '::copy'
+                            break
+                        s = s.parent
+                        assert(s)
                 else:
                     if self.children[0].symbol.id == ':':
                         fid, sc = find_module(self.children[0].children[0].to_str()).scope.find_and_return_scope(self.children[0].children[1].token_str())
@@ -2196,7 +2219,7 @@ def parse_internal(this_node):
                 next_token()
 
             elif token.value(source) in ('L', 'Ц', 'loop', 'цикл'):
-                if peek_token().value(source) == '(' and peek_token(4).value(source) == '.':
+                if peek_token().value(source) == '(' and peek_token(4).value(source) == '.' and peek_token(4).start == peek_token(3).end:
                     assert(peek_token(5).value(source) in ('break', 'прервать'))
                     node = ASTLoopBreak()
                     node.token = token
@@ -2290,6 +2313,8 @@ def parse_internal(this_node):
             elif token.value(source) in ('X.catch', 'Х.перехват', 'exception.catch', 'исключение.перехват'):
                 node = ASTExceptionCatch()
                 if peek_token().category != Token.Category.SCOPE_BEGIN:
+                    if peek_token().value(source) == '.':
+                        next_token()
                     node.exception_object_type = expected_name('exception object type name').replace(':', '::')
                     if token.value(source) == ':':
                         next_token()
@@ -2465,6 +2490,7 @@ builtins_scope.add_function('min', ASTFunctionDefinition([('arg1', '', ''), ('ar
 builtins_scope.add_function('max', ASTFunctionDefinition([('arg1', '', ''), ('arg2', token_to_str('N', Token.Category.CONSTANT), '')]))
 builtins_scope.add_function('hex', ASTFunctionDefinition([('x', '', '')]))
 builtins_scope.add_function('bin', ASTFunctionDefinition([('x', '', '')]))
+builtins_scope.add_function('copy', ASTFunctionDefinition([('object', '', '')]))
 builtins_scope.add_function('rotl', ASTFunctionDefinition([('value', '', 'Int'), ('shift', '', 'Int')]))
 builtins_scope.add_function('rotr', ASTFunctionDefinition([('value', '', 'Int'), ('shift', '', 'Int')]))
 builtins_scope.add_function('round', ASTFunctionDefinition([('number', '', 'Float'), ('ndigits', '0', '')]))
