@@ -92,7 +92,7 @@ class soduko:
         else :
             return "0"
 
-    def to_str(self):
+    def __str__(self):
         answer = "   123   456   789\n"
         for row in range(0,9) :
             answer = answer + str(row+1)                         +   " [" + "".join([self.get_cell_digit_str(row,col).replace("0","?") for col in range(0,3)])                         + "] [" + "".join([self.get_cell_digit_str(row,col).replace("0","?") for col in range(3,6)])                         + "] [" + "".join([self.get_cell_digit_str(row,col).replace("0","?") for col in range(6,9)])                         + "]\n"
@@ -188,4 +188,4 @@ if __name__ == '__main__':
         t.check()
         t.one_level_supposition()
         t.check()
-        print(t.to_str())
+        print(t)

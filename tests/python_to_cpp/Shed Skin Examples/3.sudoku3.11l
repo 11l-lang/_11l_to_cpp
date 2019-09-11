@@ -90,7 +90,7 @@ T soduko
       E
          R ‘0’
 
-   F to_str()
+   F String()
       V answer = "   123   456   789\n"
       L(row) 0.<9
          answer = answer‘’String(row + 1)‘ [’((0.<3).map(col -> @.get_cell_digit_str(@row, col).replace(‘0’, ‘?’))).join(‘’)‘] [’((3.<6).map(col -> @.get_cell_digit_str(@row, col).replace(‘0’, ‘?’))).join(‘’)‘] [’((6.<9).map(col -> @.get_cell_digit_str(@row, col).replace(‘0’, ‘?’))).join(‘’)"]\n"
@@ -174,4 +174,4 @@ L(x) 0.<50
    t.check()
    t.one_level_supposition()
    t.check()
-   print(t.to_str())
+   print(t)

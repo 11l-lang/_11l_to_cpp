@@ -117,7 +117,7 @@ public:
             return u"0"_S;
     }
 
-    auto to_str()
+    operator String()
     {
         auto answer = u"   123   456   789\n"_S;
         for (auto row : range_el(0, 9)) {
@@ -229,6 +229,6 @@ int main()
         t.check();
         t.one_level_supposition();
         t.check();
-        print(t.to_str());
+        print(t);
     }
 }

@@ -1000,10 +1000,10 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 s = self.parent.type_name
             elif self.function_name == '(destructor)':
                 s = '~' + self.parent.type_name
-            elif self.function_name == '()': # this is `operator()`
-                s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' operator()'
+            elif self.function_name == 'String':
+                s = 'operator String'
             else:
-                s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + {'[&]':'operator&', '<':'operator<'}.get(self.function_name, self.function_name)
+                s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + {'()':'operator()', '[&]':'operator&', '<':'operator<'}.get(self.function_name, self.function_name)
 
             if self.virtual_category != self.VirtualCategory.NO:
                 arguments = []

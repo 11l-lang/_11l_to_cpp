@@ -1,6 +1,5 @@
 /.hg
 /.vs
-/__pycache__
 /.idea
 /*.vcxproj
 /*.vcxproj.filters
