@@ -2354,7 +2354,7 @@ def parse_internal(this_node):
                 assert(token is None)
             return
 
-        elif token.category == Token.Category.STATEMENT_SEPARATOR: # this `if` was added in revision 105 in order to support `hor_col_align = S instr[j .< j + 2] {‘<<’ {‘left’}; ‘>>’ {‘right’}; ‘><’ {‘center’}; ‘<>’ {‘justify’}}` [there was no STATEMENT_SEPARATOR after this line of code]
+        elif token.category == Token.Category.STATEMENT_SEPARATOR: # this `if` was added in revision 105[‘Almost complete work on tests/python_to_cpp/pqmarkup.txt’] in order to support `hor_col_align = S instr[j .< j + 2] {‘<<’ {‘left’}; ‘>>’ {‘right’}; ‘><’ {‘center’}; ‘<>’ {‘justify’}}` [there was no STATEMENT_SEPARATOR after this line of code]
             next_token()
             if token is not None:
                 assert(token.category != Token.Category.STATEMENT_SEPARATOR)

@@ -1292,7 +1292,7 @@ enum class Category {
 };
 
 
-# This test is also[‘as previous’] failed without `if token != None:` under ‘this `if` was added in revision 105’
+# This test is also[‘as previous’] failed without `if token is not None:` under ‘this `if` was added in revision 105[‘Almost complete work on tests/python_to_cpp/pqmarkup.txt’]’
 c = 1
 if c == 1:
     print(1)
