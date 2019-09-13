@@ -4,3 +4,4 @@
 /*.vcxproj
 /*.vcxproj.filters
 __pycache__
+.mypy_cache

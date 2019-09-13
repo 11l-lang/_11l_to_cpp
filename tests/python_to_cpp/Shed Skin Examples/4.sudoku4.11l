@@ -1,0 +1,85 @@
+
+F cross(aa, bb)
+   R multiloop(aa, bb, (a, b) -> a‘’b)
+V rows = ‘ABCDEFGHI’
+V cols = ‘123456789’
+V digits = ‘123456789’
+V squares = cross(rows, cols)
+V unitlist = (cols.map(c -> cross(rows, String(c))) [+] rows.map(r -> cross(String(r), cols)) [+] multiloop([‘ABC’, ‘DEF’, ‘GHI’], [‘123’, ‘456’, ‘789’], (rs, cs) -> cross(rs, cs)))
+V units = Dict(squares.map(s -> (s, :unitlist.filter(u -> @s C u))))
+Dict[String, Set[String]] peers
+L(s) squares
+   V se = Set[String]()
+   L(u) units[s]
+      L(s2) u
+         I s2 != s
+            se.add(s2)
+   peers[s] = se
+
+F search(values) -> Dict[String, String]
+   ‘Using depth-first search and propagation, try all possible values.’
+   I values.empty
+      R Dict()
+   I all(:squares.map(s -> @values[s].len == 1))
+      R values
+   V s = min(:squares.filter(s -> @values[s].len > 1).map(s -> (@values[s].len, s)))[1]
+   L(d) values[s]
+      V r = search(assign(&values.copy(), s, d))
+      I !r.empty
+         R r
+   R Dict()
+
+F assign(Dict[String, String] &values; s, d) -> Dict[String, String]
+   ‘Eliminate all the other values (except d) from values[s] and propagate.’
+   I all(values[s].filter(d2 -> d2 != @d).map(d2 -> !eliminate(&@values, @s, d2).empty))
+      R values
+   E
+      R Dict()
+
+F eliminate(Dict[String, String] &values; s, d) -> Dict[String, String]
+   ‘Eliminate d from values[s]; propagate when values or places <= 2.’
+   I d !C values[s]
+      R values
+   values[s] = values[s].replace(d, ‘’)
+   I values[s].empty
+      R Dict()
+   E I values[s].len == 1
+      V d2 = values[s][0]
+      I !all(:peers[s].map(s2 -> !eliminate(&@values, s2, @d2).empty))
+         R Dict()
+
+   L(u) :units[s]
+      V dplaces = u.filter(s -> @d C @values[s])
+      I dplaces.empty
+         R Dict()
+      E I dplaces.len == 1
+         I assign(&values, dplaces[0], d).empty
+            R Dict()
+   R values
+
+F parse_grid(=grid) -> Dict[String, String]
+   ‘Given a string of 81 digits (or .0-), return a dict of {cell:values}’
+   grid = grid.filter(c -> c C ‘0.-123456789’)
+   V values = Dict(:squares.map(s -> (s, :digits)))
+   L(s, d) zip(squares, grid)
+      I d C :digits & assign(&values, s, d).empty
+         R Dict()
+   R values
+
+F solve_file(filename, sep, action)
+   ‘Parse a file into a sequence of 81-char descriptions and solve them.’
+   V results = File(filename).read().trim((‘ ’, "\t", "\r", "\n")).split(sep).map(grid -> @action(search(parse_grid(grid))))
+   print(‘## Got #.0 out of #.0’.format(sum(results.map(r -> (I !r.empty {1} E 0))), results.len))
+   R results
+
+F printboard(values)
+   ‘Used for debugging.’
+   V width = 1 + max(:squares.map(s -> @values[s].len))
+   V line = "\n"([‘-’ * (width * 3)] * 3).join(‘+’)
+   L(r) :rows
+      print((:cols.map(c -> @values[@r + c].center(@width) + (I c C ‘36’ {‘|’} E ‘’))).join(‘’) + (I r C ‘CF’ {line} E ‘’))
+   print()
+   R values
+
+:start:
+solve_file(‘testdata/top95.txt’, "\n", v -> printboard(v))

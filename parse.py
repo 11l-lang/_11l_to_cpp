@@ -1304,7 +1304,7 @@ class ASTReturn(ASTNodeWithExpression):
     def to_str(self, indent):
         expr_str = ''
         if self.expression is not None:
-            if self.expression.is_list and len(self.expression.children) == 0:
+            if self.expression.is_list and len(self.expression.children) == 0: # `R []`
                 n = self.parent
                 while type(n) != ASTFunctionDefinition:
                     n = n.parent
@@ -1312,6 +1312,15 @@ class ASTReturn(ASTNodeWithExpression):
                     raise Error('Function returning an empty array should have return type specified', self.expression.left_to_right_token())
                 if not n.function_return_type.startswith('Array['): # ]
                     raise Error('Function returning an empty array should have an Array based return type', self.expression.left_to_right_token())
+                expr_str = trans_type(n.function_return_type, self.expression.scope, self.expression.token) + '()'
+            elif self.expression.symbol.id == '(' and self.expression.function_call and self.expression.children[0].token_str() == 'Dict' and len(self.expression.children) == 1: # ) # `R Dict()`
+                n = self.parent
+                while type(n) != ASTFunctionDefinition:
+                    n = n.parent
+                if n.function_return_type == '':
+                    raise Error('Function returning an empty dict should have return type specified', self.expression.left_to_right_token())
+                if not n.function_return_type.startswith('Dict['): # ]
+                    raise Error('Function returning an empty dict should have a Dict based return type', self.expression.left_to_right_token())
                 expr_str = trans_type(n.function_return_type, self.expression.scope, self.expression.token) + '()'
             else:
                 expr_str = self.expression.to_str()
@@ -2550,6 +2559,7 @@ string_scope.add_name('trim', ASTFunctionDefinition([('s', '', 'String')]))
 string_scope.add_name('count', ASTFunctionDefinition([('s', '', 'String')]))
 string_scope.add_name('replace', ASTFunctionDefinition([('old', '', 'String'), ('new', '', 'String')]))
 string_scope.add_name('zfill', ASTFunctionDefinition([('width', '', 'Int')]))
+string_scope.add_name('center', ASTFunctionDefinition([('width', '', 'Int'), ('fillchar', token_to_str('‘ ’'), 'Char')]))
 string_scope.add_name('format', ASTFunctionDefinition([('arg', token_to_str('N', Token.Category.CONSTANT), '')] * 32))
 string_scope.add_name('map', ASTFunctionDefinition([('function', '', '(Char -> T)')]))
 builtins_scope.ids['String'].ast_nodes[0].scope = string_scope

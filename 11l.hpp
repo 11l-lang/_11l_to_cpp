@@ -241,9 +241,9 @@ inline String input(const String &prompt = String())
 }
 
 // Note: solutions like this[https://gist.github.com/mortehu/373069390c75b02f98b655e3f7dbef9a <- google:‘zip vector c++’] can not handle temp arrays (array destructed after `zip(create_array(...)...)` call)
-template <typename T1, typename T2> Array<Tuple<T1, T2>> zip(const Array<T1> &arr1, const Array<T2> &arr2)
+template <typename T1, typename T2> auto zip(const T1 &arr1, const T2 &arr2)
 {
-	Array<Tuple<T1, T2>> r;
+	Array<Tuple<std::remove_reference_t<decltype(*std::begin(T1()))>, std::remove_reference_t<decltype(*std::begin(T2()))>>> r;
 	r.reserve(min(arr1.len(), arr2.len()));
 	auto it1 = arr1.begin();
 	auto it2 = arr2.begin();
@@ -259,6 +259,16 @@ template <typename Type1, typename Type2, typename Func> auto multiloop(const Ar
 	for (auto &&el1 : arr1)
 		for (auto &&el2 : arr2)
 			r.push_back(func(el1, el2));
+	return r;
+}
+
+template <typename Func> auto multiloop(const String &str1, const String &str2, Func &&func) -> Array<decltype(func(std::declval<Char>(), std::declval<Char>()))>
+{
+	Array<decltype(func(std::declval<Char>(), std::declval<Char>()))> r;
+	r.reserve(str1.len() * str2.len());
+	for (Char c1 : str1)
+		for (Char c2 : str2)
+			r.push_back(func(c1, c2));
 	return r;
 }
 

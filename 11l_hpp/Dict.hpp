@@ -52,6 +52,8 @@ public:
 	DefaultDict() {}
 	DefaultDict(DictInitializer<KeyType, ValueType> &&di) : std::map<KeyType, ValueType>(std::forward<std::map<KeyType, ValueType>>(di.dict)) {}
 
+	int len() const {return (int)size();}
+
 	void set(const KeyType &key, const ValueType &value)
 	{
 		//insert(std::make_pair(key, value)); //`insert()` does not assign value if it already exists in the map
@@ -109,6 +111,12 @@ public:
 		auto r = find(key);
 		if (r == std::map<KeyType, ValueType>::end()) throw KeyError(String(key));
 		return r->second;
+	}
+
+	Dict copy() const
+	{
+		Dict d = *this;
+		return d;
 	}
 };
 

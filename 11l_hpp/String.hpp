@@ -335,6 +335,14 @@ public:
 		return String(u"0") * max(width - len(), 0) + *this;
 	}
 
+	String center(int width, String fillchar = String(u' ')) const
+	{
+		if (fillchar.len() != 1)
+			throw AssertionError();
+		int w = width / 2 - len() / 2;
+		return fillchar * (width - len() - w) + *this + fillchar * w;
+	}
+
 	String ltrim(Char c, Nullable<int> limit = nullptr) const
 	{
 		const char16_t *s = data();
@@ -404,6 +412,15 @@ public:
 		r.reserve(len());
 		for (auto &&el : *this)
 			r.push_back(func(el));
+		return r;
+	}
+
+	template <typename Func> String filter(Func &&func) const
+	{
+		String r;
+		for (Char c : *this)
+			if (func(c))
+				r += c;
 		return r;
 	}
 

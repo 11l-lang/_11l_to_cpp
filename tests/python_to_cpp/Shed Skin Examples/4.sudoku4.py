@@ -11,70 +11,82 @@
 ##   g is a grid,   e.g. 81 non-blank chars, e.g. starting with '.18...7...
 ##   values is a dict of possible values, e.g. {'A1':'123489', 'A2':'8', ...}
 
-def cross(A, B):
-    return [a+b for a in A for b in B]
+from typing import Dict, Set
+
+def cross(aa, bb):
+    return [a+''+b for a in aa for b in bb]
 
 rows = 'ABCDEFGHI'
 cols = '123456789'
 digits   = '123456789'
 squares  = cross(rows, cols)
-unitlist = ([cross(rows, c) for c in cols] +
-            [cross(r, cols) for r in rows] +
-            [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')])
+unitlist = ([cross(rows, str(c)) for c in cols] +
+            [cross(str(r), cols) for r in rows] +
+            [cross(rs, cs) for rs in ['ABC','DEF','GHI'] for cs in ['123','456','789']])
 units = dict([(s, [u for u in unitlist if s in u])
              for s in squares])
-peers = dict([(s, set([s2 for u in units[s] for s2 in u if s2 != s]))
-             for s in squares])
+peers : Dict[str, Set[str]] = {}
+for s in squares:
+    se = set() # str
+    for u in units[s]:
+        for s2 in u:
+            if s2 != s:
+                se.add(s2)
+    peers[s] = se
 
-def search(values):
+def search(values) -> Dict[str, str]: # [-TODO: Optional[Dict[str, str]] support (for `return {}` -> `return None`)-]
     "Using depth-first search and propagation, try all possible values."
-    if values is None:
-        return None ## Failed earlier
+    if len(values) == 0:
+        return {} ## Failed earlier
     if all([len(values[s]) == 1 for s in squares]):
         return values ## Solved!
     ## Chose the unfilled square s with the fewest possibilities
-    _,s = min([(len(values[s]), s) for s in squares if len(values[s]) > 1])
+    s = min([(len(values[s]), s) for s in squares if len(values[s]) > 1])[1]
     for d in values[s]:
-        r = search(assign(values.copy(), s, d))
-        if r: return r
+        global assign
+        values_copy = values.copy()
+        r = search(assign(values_copy, s, d))
+        if len(r) != 0: return r
+    return {}
 
-def assign(values, s, d):
+def assign(values : Dict[str, str], s, d) -> Dict[str, str]:
     "Eliminate all the other values (except d) from values[s] and propagate."
-    if all([eliminate(values, s, d2) for d2 in values[s] if d2 != d]):
+    global eliminate
+    if all([len(eliminate(values, s, d2)) != 0 for d2 in values[s] if d2 != d]):
         return values
     else:
-        return None
+        return {}
 
-def eliminate(values, s, d):
+def eliminate(values : Dict[str, str], s, d) -> Dict[str, str]:
     "Eliminate d from values[s]; propagate when values or places <= 2."
     if d not in values[s]:
         return values ## Already eliminated
     values[s] = values[s].replace(d,'')
     if len(values[s]) == 0:
-        return None ## Contradiction: removed last value
+        return {} ## Contradiction: removed last value
     elif len(values[s]) == 1:
         ## If there is only one value (d2) left in square, remove it from peers
-        d2, = values[s]
-        if not all([eliminate(values, s2, d2) for s2 in peers[s]]):
-            return None
+        d2 = values[s][0]
+        if not all([len(eliminate(values, s2, d2)) != 0 for s2 in peers[s]]):
+            return {}
     ## Now check the places where d appears in the units of s
     for u in units[s]:
         dplaces = [s for s in u if d in values[s]]
         if len(dplaces) == 0:
-            return None
+            return {}
         elif len(dplaces) == 1:
             # d can only be in one place in unit; assign it there
-            if not assign(values, dplaces[0], d):
-                return None
+            if len(assign(values, dplaces[0], d)) == 0:
+                return {}
     return values
 
-def parse_grid(grid):
+def parse_grid(grid) -> Dict[str, str]:
     "Given a string of 81 digits (or .0-), return a dict of {cell:values}"
     grid = [c for c in grid if c in '0.-123456789']
     values = dict([(s, digits) for s in squares]) ## Each square can be any digit
     for s,d in zip(squares, grid):
-        if d in digits and not assign(values, s, d):
-            return None
+        if d in digits and len(assign(values, s, d)) == 0:
+            return {}
     return values
 
 def solve_file(filename, sep, action):
@@ -82,7 +94,7 @@ def solve_file(filename, sep, action):
     results = [action(search(parse_grid(grid)))
                for grid in open(filename).read().strip().split(sep)]
     print("## Got %d out of %d" % (
-          sum([(r is not None) for r in results]), len(results)))
+          sum([(1 if len(r) else 0) for r in results]), len(results))) # [-TODO: `[1 if len(r) else 0 for r in results]` support-]
     return results
 
 def printboard(values):
@@ -96,7 +108,7 @@ def printboard(values):
     return values
 
 if __name__ == '__main__':
-    solve_file("testdata/top95.txt", '\n', printboard)
+    solve_file("testdata/top95.txt", '\n', lambda v: printboard(v)) # [-TODO: `lambda v: printboard(v)` -> `printboard`-]
 
 ## References used:
 ## http://www.scanraid.com/BasicStrategies.htm

@@ -1688,3 +1688,27 @@ public:
         this->a = a;
     }
 };
+
+
+def f() -> List[str]:
+   return []
+===
+F f() -> [String]
+   R []
+===
+Array<String> f()
+{
+    return Array<String>();
+}
+
+
+def f() -> Dict[str, str]:
+   return {}
+===
+F f() -> Dict[String, String]
+   R Dict()
+===
+Dict<String, String> f()
+{
+    return Dict<String, String>();
+}
