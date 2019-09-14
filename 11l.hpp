@@ -243,12 +243,22 @@ inline String input(const String &prompt = String())
 // Note: solutions like this[https://gist.github.com/mortehu/373069390c75b02f98b655e3f7dbef9a <- google:‘zip vector c++’] can not handle temp arrays (array destructed after `zip(create_array(...)...)` call)
 template <typename T1, typename T2> auto zip(const T1 &arr1, const T2 &arr2)
 {
-	Array<Tuple<std::remove_reference_t<decltype(*std::begin(T1()))>, std::remove_reference_t<decltype(*std::begin(T2()))>>> r;
+	Array<decltype(make_tuple(*std::begin(std::declval<T1>()), *std::begin(std::declval<T2>())))> r; // do not forget that `make_tuple(1, 2)` returns `Tvec<int, 2>(1, 2)` rather than `Tuple<int, int>(1, 2)`
 	r.reserve(min(arr1.len(), arr2.len()));
 	auto it1 = arr1.begin();
 	auto it2 = arr2.begin();
 	for (; it1 != arr1.end() && it2 != arr2.end(); ++it1, ++it2)
 		r.push_back(make_tuple(*it1, *it2));
+	return r;
+}
+
+template <typename T1, typename T2> auto cart_product(const T1 &arr1, const T2 &arr2)
+{
+	Array<decltype(make_tuple(*std::begin(std::declval<T1>()), *std::begin(std::declval<T2>())))> r;
+	r.reserve(arr1.len() * arr2.len());
+	for (auto &&el1 : arr1)
+		for (auto &&el2 : arr2)
+			r.push_back(make_tuple(el1, el2));
 	return r;
 }
 

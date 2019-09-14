@@ -1712,3 +1712,31 @@ Dict<String, String> f()
 {
     return Dict<String, String>();
 }
+
+
+from itertools import product
+
+print(list(product([1, 2], [3, 4])))     # Array<Tvec<int,2> >
+print(list(product([1.0, 2.0], [3, 4]))) # Array<std::tuple<double,int> >
+print(list(product(range(3), range(1,4))))
+
+print(list(zip([1, 2], [10, 20])))
+print(list(zip([1.0, 2.0], [10, 20])))
+===
+print(cart_product([1, 2], [3, 4]))
+print(cart_product([1.0, 2.0], [3, 4]))
+print(cart_product((0.<3), (1.<4)))
+print(zip([1, 2], [10, 20]))
+print(zip([1.0, 2.0], [10, 20]))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(cart_product(create_array({1, 2}), create_array({3, 4})));
+        print(cart_product(create_array({1.0, 2.0}), create_array({3, 4})));
+        print(cart_product(range_el(0, 3), range_el(1, 4)));
+        print(zip(create_array({1, 2}), create_array({10, 20})));
+        print(zip(create_array({1.0, 2.0}), create_array({10, 20})));
+    }
+} code_block_1;
