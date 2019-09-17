@@ -241,6 +241,21 @@ public:
 		return find(make_tuple((Type)std::get<0>(t), (Type)std::get<1>(t)), start);
 	}
 
+	int count(const Type &val) const
+	{
+		return (int)std::count(begin(), end(), val);
+	}
+
+	void sort()
+	{
+		std::sort(begin(), end());
+	}
+
+	void reverse()
+	{
+		std::reverse(begin(), end());
+	}
+
 	const Type &last() const
 	{
 		if (std::vector<Type>::empty())

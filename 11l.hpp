@@ -208,6 +208,19 @@ template <typename Key, typename Value> inline void print(const Dict<Key, Value>
 		std::wcout.flush();
 }
 
+template <typename Ty> inline void print(const Set<Ty> &set, const String &end = u"\n", bool flush = false)
+{
+	std::wcout << L"Set([";
+	bool first = true;
+	for (auto &&el : set) {
+		if (!first) std::wcout << L", "; else first = false;
+		print(el, u""_S);
+	}
+	std::wcout << L"])" << std::wstring(end.cbegin(), end.cend());
+	if (flush)
+		std::wcout.flush();
+}
+
 template <typename Ty1, typename Ty2> inline void print(const Tuple<Ty1, Ty2> &t, const String &end = u"\n", bool flush = false)
 {
 	std::wcout << L'(';

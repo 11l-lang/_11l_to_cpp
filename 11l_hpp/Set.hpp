@@ -13,6 +13,15 @@ public:
 		return r.second;
 	}
 
+	Set difference(const Set &other) const
+	{
+		Set r;
+		for (auto &&el : *this)
+			if (!in(el, other))
+				r.add(el);
+		return r;
+	}
+
 	template <typename Func> auto map(Func &&func) const
 	{
 		Array<decltype(func(std::declval<KeyType>()))> r;
@@ -22,6 +31,22 @@ public:
 		return r;
 	}
 };
+
+template <typename Type> Set<Type> create_set(const Array<Type> &arr)
+{
+	Set<Type> r;
+	for (auto &&el : arr)
+		r.add(el);
+	return r;
+}
+
+template <typename Type> Array<Type> create_array(const Set<Type> &set)
+{
+	Array<Type> r;
+	for (auto &&el : set)
+		r.append(el);
+	return r;
+}
 
 template <typename KeyType> inline bool in(const KeyType &key, const Set<KeyType> &set)
 {

@@ -1,11 +1,12 @@
 # (c) Peter Goodspeed
 # --- coriolinus@gmail.com
 
-from math import exp
+import math
+from typing import List, Set
 
 #functions
 def sigmoid(x):
-        return float(1)/(1 + exp(-x))
+        return float(1)/(1 + math.exp(-x))
 
 def sig(x, xshift=0, xcompress=1):
         return 0 + (1 * sigmoid(xcompress * (x - xshift)))
@@ -15,11 +16,16 @@ class SpaceNotEmpty(Exception):
         pass
 
 class MultiVictory(Exception):
+        victors : Set[int]
         def __init__(self, victorslist):
                 self.victors = victorslist
 
 #classes
-class rectBoard(object):
+class rectBoard:
+        edge : int
+        __board : List[List[int]]
+        __empty : int
+
         def __init__(self, edge=3):
                 self.edge = edge
                 self.__board = [edge * [0] for i in range(edge)]
@@ -39,7 +45,7 @@ class rectBoard(object):
         #        return self.__board[row][col]
 
         def isvictory(self):
-                victors = []
+                victors : List[int] = []
                 #examine rows
                 for row in self.__board:
                         if len(set(row)) == 1:
@@ -53,13 +59,13 @@ class rectBoard(object):
 
                 #examine diagonals
                 #left diagonal
-                ld = []
+                ld : List[int] = []
                 for i in range(self.edge): ld.append(self.__board[i][i])
                 if len(set(ld)) == 1:
                         if ld[0] != 0: victors.append(ld[0])
 
                 #right diagonal
-                rd = []
+                rd : List[int] = []
                 for i in range(self.edge): rd.append(self.__board[i][self.edge-(1+i)])
                 if len(set(rd)) == 1:
                         if rd[0] != 0: victors.append(rd[0])
@@ -87,19 +93,19 @@ class rectBoard(object):
                                 else: ret += str(self.__board[row][col])
                 return ret
 
-        def doRow(self, fields, indices, player, scores):
+        def doRow(self, fields, indices, player, scores : List[List[float]]):
                 players = set(fields).difference(set([0]))
 
                 if(len(players) == 1):
                         if list(players)[0] == player:
                                 for rown, coln in indices:
-                                        scores[rown][coln] += 15 * sig(fields.count(player) / float(self.edge), .5, 10)
+                                        scores[rown][coln] += 15 * sig(fields.count(player) / float(self.edge), 0.5, 10)
                         else:
                                 for rown, coln in indices:
                                         scores[rown][coln] += 15 * fields.count(list(players)[0]) / float(self.edge)
 
         def makeAImove(self, player):
-                scores = [self.edge * [0] for i in range(self.edge)]
+                scores = [self.edge * [0.0] for i in range(self.edge)]
 
                 for rown in range(self.edge):
                         row = self.__board[rown]
@@ -124,7 +130,7 @@ class rectBoard(object):
                 for rown, coln in indices:
                         scores[rown][coln] += 1
 
-                scorelist = []
+                scorelist : List[Tuple[float, Tuple[int, int]]] = []
                 for rown in range(self.edge):
                         for coln in range(self.edge):
                                 if(self.__board[rown][coln] == 0):
@@ -146,16 +152,18 @@ def aigame(size=10, turn=1, players=2):
         b = rectBoard(size)
 
         while((not b.isfull()) and (b.isvictory() == 0)):
+                r : int
+                c : int
                 if(turn==1):
                         #player turn
                         #print
                         #print b
-                        r, c = b.makeAImove(turn)
+                        (r, c) = b.makeAImove(turn) # [-TODO: `(r, c) = b.makeAImove(turn)` -> `V (r, c) = b.makeAImove(turn)`-]
                         b.assign(r,c,1)
                         turn = 2
                 else:
                         #computer turn
-                        r, c = b.makeAImove(turn)
+                        (r, c) = b.makeAImove(turn)
                         b.assign(r,c,turn)
                         if(turn == players): turn = 1
                         else: turn += 1

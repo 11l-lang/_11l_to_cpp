@@ -401,6 +401,8 @@ class SymbolNode:
                     func_name = 'create_dict'
                 elif func_name.startswith('DefaultDict['): # ]
                     func_name = 'DefaultDict<' + ', '.join(trans_type(c.to_type_str(), c.scope, c.token) for c in self.children[0].children[1:]) + '>'
+                elif func_name == 'Set':
+                    func_name = 'create_set'
                 elif func_name.startswith('Set['): # ]
                     c = self.children[0].children[1]
                     func_name = 'Set<' + trans_type(c.to_type_str(), c.scope, c.token) + '>'
@@ -2567,6 +2569,9 @@ builtins_scope.ids['String'].ast_nodes[0].scope = string_scope
 array_scope = Scope(None)
 array_scope.add_name('remove', ASTFunctionDefinition([('x', '', '')]))
 builtins_scope.ids['Array'].ast_nodes[0].scope = array_scope
+set_scope = Scope(None)
+set_scope.add_name('difference', ASTFunctionDefinition([('other', '', 'Set')]))
+builtins_scope.ids['Set'].ast_nodes[0].scope = set_scope
 
 module_scope = Scope(None)
 builtin_modules['math'] = Module(module_scope)

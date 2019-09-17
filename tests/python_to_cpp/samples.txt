@@ -1740,3 +1740,19 @@ struct CodeBlock1
         print(zip(create_array({1.0, 2.0}), create_array({10, 20})));
     }
 } code_block_1;
+
+
+print(set([1, 2, 3]).difference(set([2, 4])))
+print(set([2, 4]).difference(set([1, 2, 3])))
+===
+print(Set([1, 2, 3]).difference(Set([2, 4])))
+print(Set([2, 4]).difference(Set([1, 2, 3])))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(create_set(create_array({1, 2, 3})).difference(create_set(create_array({2, 4}))));
+        print(create_set(create_array({2, 4})).difference(create_set(create_array({1, 2, 3}))));
+    }
+} code_block_1;
