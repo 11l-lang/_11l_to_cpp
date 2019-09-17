@@ -745,7 +745,8 @@ class SymbolNode:
             elif self.symbol.id == '[+]=': # replace `a [+]= v` with `a.append(v)`
                 return self.children[0].to_str() + '.append(' + self.children[1].to_str() + ')'
             elif self.symbol.id == '=' and self.children[0].tuple:
-                return 'assign_from_tuple(' + ', '.join(c.to_str() for c in self.children[0].children) + ', ' + self.children[1].to_str() + ')'
+                assert(False)
+                #return 'assign_from_tuple(' + ', '.join(c.to_str() for c in self.children[0].children) + ', ' + self.children[1].to_str() + ')'
             elif self.symbol.id == '?':
                 return '[&]{auto R = ' + self.children[0].to_str() + '; return R != nullptr ? *R : ' + self.children[1].to_str() + ';}()'
             elif self.symbol.id == '^':
@@ -958,6 +959,28 @@ class ASTVariableDeclaration(ASTNode):
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
     def to_str(self, indent):
         return super().to_str(indent)[:-2] + ' = ' + self.expression.to_str() + ";\n"
+
+class ASTTupleInitialization(ASTNodeWithExpression):
+    dest_vars : List[str]
+
+    def __init__(self):
+        self.dest_vars = []
+
+    def to_str(self, indent):
+        return ' ' * (indent*4) + 'auto [' + ', '.join(self.dest_vars) + '] = ' + self.expression.to_str() + ";\n"
+
+class ASTTupleAssignment(ASTNodeWithExpression):
+    dest_vars : List[Tuple[str, bool]]
+
+    def __init__(self):
+        self.dest_vars = []
+
+    def to_str(self, indent):
+        r = ''
+        for i, dv in enumerate(self.dest_vars):
+            if dv[1]:
+                r += ' ' * (indent*4) + 'TUPLE_ELEMENT_T(' + str(i) + ', ' + self.expression.to_str() + ') ' + dv[0] + ";\n"
+        return r + ' ' * (indent*4) + 'assign_from_tuple(' + ', '.join(dv[0] for dv in self.dest_vars) + ', ' + self.expression.to_str() + ')' + ";\n"
 
 class ASTWith(ASTNodeWithChildren, ASTNodeWithExpression):
     def to_str(self, indent):
@@ -1926,6 +1949,14 @@ def parse_internal(this_node):
         next_token()
         return token_value
 
+    def is_tuple_assignment():
+        if token.value(source) == '(':
+            ti = 1
+            while peek_token(ti).value(source) != ')':
+                ti += 1
+            return peek_token(ti + 1).value(source) == '='
+        return False
+
     access_specifier_private = False
 
     while token is not None:
@@ -2370,6 +2401,53 @@ def parse_internal(this_node):
             if token is not None:
                 assert(token.category != Token.Category.STATEMENT_SEPARATOR)
             continue
+
+        elif token.value(source) in ('V', 'П', 'var', 'перем') and peek_token().value(source) == '(': # this is `V (a, b) = ...`
+            node = ASTTupleInitialization()
+            next_token()
+            next_token()
+
+            while True:
+                assert(token.category == Token.Category.NAME)
+                node.dest_vars.append(token.value(source))
+                next_token()
+                if token.value(source) == ')':
+                    break
+                advance(',')
+
+            next_token()
+            advance('=')
+            node.set_expression(expression())
+
+            if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
+                next_token()
+
+        elif is_tuple_assignment(): # this is `(a, b) = ...` or `(a, V b) = ...` or `(V a, b) = ...`
+            node = ASTTupleAssignment()
+            next_token()
+
+            while True:
+                assert(token.category == Token.Category.NAME)
+
+                add_var = False
+                if token.value(source) in ('V', 'П', 'var', 'перем'):
+                    add_var = True
+                    next_token()
+                    assert(token.category == Token.Category.NAME)
+
+                node.dest_vars.append((token.value(source), add_var))
+                next_token() # (
+
+                if token.value(source) == ')':
+                    break
+                advance(',')
+
+            next_token()
+            advance('=')
+            node.set_expression(expression())
+
+            if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
+                next_token()
 
         else:
             node_expression = expression()

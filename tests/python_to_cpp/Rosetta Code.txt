@@ -3159,7 +3159,6 @@ struct CodeBlock1
 def duration(sec):
     t : List[int] = []
     for dm in [60, 60, 24, 7]:
-        m : int
         (sec, m) = (sec // dm, sec % dm)
         t.insert(0, m)
     t.insert(0, sec)
@@ -3172,8 +3171,7 @@ print(duration(6000000))
 F duration(=sec)
    [Int] t
    L(dm) [60, 60, 24, 7]
-      Int m
-      (sec, m) = (sec I/ dm, sec % dm)
+      (sec, V m) = (sec I/ dm, sec % dm)
       t.insert(0, m)
    t.insert(0, sec)
    R zip(t, [‘wk’, ‘d’, ‘hr’, ‘min’, ‘sec’]).filter(num_unit -> num_unit[0] > 0).map(num_unit -> String(num_unit[0])‘ ’String(num_unit[1])).join(‘, ’)
@@ -3185,7 +3183,7 @@ template <typename T1> auto duration(T1 sec)
 {
     Array<int> t;
     for (auto &&dm : create_array({60, 60, 24, 7})) {
-        int m;
+        TUPLE_ELEMENT_T(1, make_tuple(idiv(sec, dm), mod(sec, dm))) m;
         assign_from_tuple(sec, m, make_tuple(idiv(sec, dm), mod(sec, dm)));
         t.insert(0, m);
     }

@@ -152,13 +152,11 @@ def aigame(size=10, turn=1, players=2):
         b = rectBoard(size)
 
         while((not b.isfull()) and (b.isvictory() == 0)):
-                r : int
-                c : int
                 if(turn==1):
                         #player turn
                         #print
                         #print b
-                        (r, c) = b.makeAImove(turn) # [-TODO: `(r, c) = b.makeAImove(turn)` -> `V (r, c) = b.makeAImove(turn)`-]
+                        (r, c) = b.makeAImove(turn) # [+TODO: `(r, c) = b.makeAImove(turn)` -> `V (r, c) = b.makeAImove(turn)`+]
                         b.assign(r,c,1)
                         turn = 2
                 else:

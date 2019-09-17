@@ -169,24 +169,20 @@ public:
 template <typename T1 = decltype(10), typename T2 = decltype(1), typename T3 = decltype(2)> auto aigame(const T1 &size = 10, T2 turn = 1, const T3 &players = 2)
 {
     auto b = rectBoard(size);
-
-    while (((!b.isfull()) && (b.isvictory() == 0))) {
-        int r;
-        int c;
+    while (((!b.isfull()) && (b.isvictory() == 0)))
         if ((turn == 1)) {
-            assign_from_tuple(r, c, b.makeAImove(turn));
+            auto [r, c] = b.makeAImove(turn);
             b.assign(r, c, 1);
             turn = 2;
         }
         else {
-            assign_from_tuple(r, c, b.makeAImove(turn));
+            auto [r, c] = b.makeAImove(turn);
             b.assign(r, c, turn);
             if ((turn == players))
                 turn = 1;
             else
                 turn++;
         }
-    }
     print();
     print(b);
     print();

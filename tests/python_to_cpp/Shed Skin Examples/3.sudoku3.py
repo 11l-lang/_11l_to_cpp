@@ -109,8 +109,7 @@ class soduko:
                         if x in self.squares[row][col] :
                             x_in_list.append((row,col))
                     if len(x_in_list)==1 :
-                        row = x_in_list[0][0] # [-TODO: (row,col) = x_in_list[0]-]
-                        col = x_in_list[0][1]
+                        (row,col) = x_in_list[0] # [+TODO: (row,col) = x_in_list[0]+]
                         if len(self.squares[row][col]) > 1 :
                             self.set_cell(row,col,x)
 
@@ -135,8 +134,8 @@ class soduko:
                 assert len(unknown_entries) == len(unassigned_values), 'bugger6'
                 if len(unknown_entries) == 1 :
                     x = unassigned_values[0]
-                    # [-TODO: (row,col) = unknown_entries[0]-]
-                    self.set_cell(unknown_entries[0][0],unknown_entries[0][1],x)
+                    (row,col) = unknown_entries[0] # [+TODO: (row,col) = unknown_entries[0]+]
+                    self.set_cell(row,col,x)
         return
 
     def check(self) :

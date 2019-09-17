@@ -51,6 +51,8 @@ template <typename...Types> inline TupleIterator<Types...> end  (tuple<Types...>
 }
 }
 
+#define TUPLE_ELEMENT_T(n, tuple) std::remove_const_t<std::remove_reference_t<decltype(_get<n>(tuple))>>
+
 template <typename Type0, typename Type1, typename Type> void assign_from_tuple(Type0 &v0, Type1 &v1, const Type &t)
 {
 	v0 = _get<0>(t);

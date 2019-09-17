@@ -134,14 +134,12 @@ F aigame(size = 10, =turn = 1, players = 2)
    V b = rectBoard(size)
 
    L ((!b.isfull()) & (b.isvictory() == 0))
-      Int r
-      Int c
       I (turn == 1)
-         (r, c) = b.makeAImove(turn)
+         V (r, c) = b.makeAImove(turn)
          b.assign(r, c, 1)
          turn = 2
       E
-         (r, c) = b.makeAImove(turn)
+         V (r, c) = b.makeAImove(turn)
          b.assign(r, c, turn)
          I (turn == players)
             turn = 1

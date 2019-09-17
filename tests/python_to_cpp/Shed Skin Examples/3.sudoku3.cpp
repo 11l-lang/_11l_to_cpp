@@ -12,7 +12,7 @@ public:
     decltype(false) _changed = false;
     template <typename T1> soduko(const T1 &start_grid)
     {
-        if (start_grid.len() != 0) {
+        if (!start_grid.empty()) {
             assert(start_grid.len() == 9, u"Bad input!"_S);
             for (auto row : range_el(0, 9))
                 set_row(row, start_grid[row]);
@@ -138,8 +138,7 @@ public:
                         if (in(x, squares[row][col]))
                             x_in_list.append(make_tuple(row, col));
                     if (x_in_list.len() == 1) {
-                        auto row = _get<0>(_get<0>(x_in_list));
-                        auto col = _get<1>(_get<0>(x_in_list));
+                        auto [row, col] = _get<0>(x_in_list);
                         if (squares[row][col].len() > 1)
                             set_cell(row, col, x);
                     }
@@ -166,7 +165,8 @@ public:
                 assert(unknown_entries.len() == unassigned_values.len(), u"bugger6"_S);
                 if (unknown_entries.len() == 1) {
                     auto x = _get<0>(unassigned_values);
-                    set_cell(_get<0>(_get<0>(unknown_entries)), _get<1>(_get<0>(unknown_entries)), x);
+                    auto [row, col] = _get<0>(unknown_entries);
+                    set_cell(row, col, x);
                 }
             }
         return;

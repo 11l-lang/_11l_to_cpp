@@ -8,7 +8,7 @@ T soduko
    _changed = 0B
    F (start_grid)
 
-      I start_grid.len != 0
+      I !start_grid.empty
          assert(start_grid.len == 9, ‘Bad input!’)
          L(row) 0.<9
             .set_row(row, start_grid[row])
@@ -107,8 +107,7 @@ T soduko
                   I x C .squares[row][col]
                      x_in_list.append((row, col))
                I x_in_list.len == 1
-                  V row = x_in_list[0][0]
-                  V col = x_in_list[0][1]
+                  V (row, col) = x_in_list[0]
                   I .squares[row][col].len > 1
                      .set_cell(row, col, x)
 
@@ -130,7 +129,8 @@ T soduko
             assert(unknown_entries.len == unassigned_values.len, ‘bugger6’)
             I unknown_entries.len == 1
                V x = unassigned_values[0]
-               .set_cell(unknown_entries[0][0], unknown_entries[0][1], x)
+               V (row, col) = unknown_entries[0]
+               .set_cell(row, col, x)
       R
 
    F check()

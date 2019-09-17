@@ -1756,3 +1756,27 @@ struct CodeBlock1
         print(create_set(create_array({2, 4})).difference(create_set(create_array({1, 2, 3}))));
     }
 } code_block_1;
+
+
+(a, b) = (1, 2)
+(a, b) = (3, 4)
+(b, c) = (5, 6)
+(d, c) = (7, 8)
+===
+V (a, b) = (1, 2)
+(a, b) = (3, 4)
+(b, V c) = (5, 6)
+(V d, c) = (7, 8)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        auto [a, b] = make_tuple(1, 2);
+        assign_from_tuple(a, b, make_tuple(3, 4));
+        TUPLE_ELEMENT_T(1, make_tuple(5, 6)) c;
+        assign_from_tuple(b, c, make_tuple(5, 6));
+        TUPLE_ELEMENT_T(0, make_tuple(7, 8)) d;
+        assign_from_tuple(d, c, make_tuple(7, 8));
+    }
+} code_block_1;
