@@ -36,7 +36,8 @@ template <typename T1> Dict<String, String> search(const T1 &values)
         return values;
     auto s = _get<1>(min(::squares.filter([&values](const auto &s){return values[s].len() > 1;}).map([&values](const auto &s){return make_tuple(values[s].len(), s);})));
     for (auto &&d : values[s]) {
-        auto r = search(assign(values.copy(), s, d));
+        auto values_copy = values.copy();
+        auto r = search(assign(values_copy, s, d));
         if (!r.empty())
             return r;
     }

@@ -745,8 +745,8 @@ class SymbolNode:
             elif self.symbol.id == '[+]=': # replace `a [+]= v` with `a.append(v)`
                 return self.children[0].to_str() + '.append(' + self.children[1].to_str() + ')'
             elif self.symbol.id == '=' and self.children[0].tuple:
-                assert(False)
-                #return 'assign_from_tuple(' + ', '.join(c.to_str() for c in self.children[0].children) + ', ' + self.children[1].to_str() + ')'
+                #assert(False)
+                return 'assign_from_tuple(' + ', '.join(c.to_str() for c in self.children[0].children) + ', ' + self.children[1].to_str() + ')'
             elif self.symbol.id == '?':
                 return '[&]{auto R = ' + self.children[0].to_str() + '; return R != nullptr ? *R : ' + self.children[1].to_str() + ';}()'
             elif self.symbol.id == '^':
@@ -1953,6 +1953,8 @@ def parse_internal(this_node):
         if token.value(source) == '(':
             ti = 1
             while peek_token(ti).value(source) != ')':
+                if peek_token(ti).value(source) == '[': # ]
+                    return False
                 ti += 1
             return peek_token(ti + 1).value(source) == '='
         return False

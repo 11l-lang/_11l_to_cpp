@@ -24,7 +24,8 @@ F search(values) -> Dict[String, String]
       R values
    V s = min(:squares.filter(s -> @values[s].len > 1).map(s -> (@values[s].len, s)))[1]
    L(d) values[s]
-      V r = search(assign(&values.copy(), s, d))
+      V values_copy = values.copy()
+      V r = search(assign(&values_copy, s, d))
       I !r.empty
          R r
    R Dict()

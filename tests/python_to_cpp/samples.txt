@@ -1762,11 +1762,17 @@ struct CodeBlock1
 (a, b) = (3, 4)
 (b, c) = (5, 6)
 (d, c) = (7, 8)
+u = [1, 2]
+(i, j) = (0, 1)
+(u[i], u[j]) = (u[j], u[i])
 ===
 V (a, b) = (1, 2)
 (a, b) = (3, 4)
 (b, V c) = (5, 6)
 (V d, c) = (7, 8)
+V u = [1, 2]
+V (i, j) = (0, 1)
+(u[i], u[j]) = (u[j], u[i])
 ===
 struct CodeBlock1
 {
@@ -1780,3 +1786,13 @@ struct CodeBlock1
         assign_from_tuple(d, c, make_tuple(7, 8));
     }
 } code_block_1;
+auto u = create_array({1, 2});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        auto [i, j] = make_tuple(0, 1);
+        assign_from_tuple(u[i], u[j], make_tuple(u[j], u[i]));
+    }
+} code_block_2;
