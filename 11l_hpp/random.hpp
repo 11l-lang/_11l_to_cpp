@@ -1,10 +1,15 @@
 ﻿namespace randomns // GCC: .../11l-lang/_11l_to_cpp/11l_hpp/random.hpp:1:11: error: ‘namespace random { }’ redeclared as different kind of symbol
 {
-static unsigned int seed = 0;
+static unsigned int seed_ = 0;
+
+inline void seed(unsigned int s)
+{
+	seed_ = s;
+}
 
 inline unsigned int _random()
 {
-	return seed = 1664525 * seed + 1013904223;
+	return seed_ = 1664525 * seed_ + 1013904223;
 }
 
 inline double _(double max = 1.0)

@@ -733,6 +733,8 @@ class SymbolNode:
                 return self.children[0].to_str() + ' ' + self.symbol.id + ' ' + char_if_len_1(self.children[1])[:-2]
             elif self.symbol.id in ('==', '!=', '=') and self.children[1].token.category == Token.Category.NAME and self.children[1].token_str().isupper(): # `token.category == NAME` -> `token.category == decltype(token.category)::NAME` and `category = NAME` -> `category = decltype(category)::NAME`
                 return self.children[0].to_str() + ' ' + self.symbol.id + ' decltype(' + self.children[0].to_str() + ')::' + self.children[1].token_str()
+            elif self.symbol.id in ('==', '!=') and self.children[0].symbol.id == '&' and len(self.children[0].children) == 1 and self.children[1].symbol.id == '&' and len(self.children[1].children) == 1: # `&a == &b` -> `&a == &b`
+                return '&' + self.children[0].children[0].token_str() + ' ' + self.symbol.id + ' &' + self.children[1].children[0].token_str()
             elif self.symbol.id == '=' and self.children[0].symbol.id == '[': # ] # replace `a[k] = v` with `a.set(k, v)`
                 if self.children[0].children[1].token.category == Token.Category.NUMERIC_LITERAL: # replace `a[0] = v` with `_set<0>(a, v)` to support tuples
                     return '_set<' + self.children[0].children[1].token_str() + '>(' + self.children[0].children[0].to_str() + ', ' + char_if_len_1(self.children[1]) + ')'
@@ -772,7 +774,7 @@ class SymbolNode:
                     if t_node is not None and type(t_node) in (ASTVariableDeclaration, ASTVariableInitialization) and t_node.is_reference:
                         return self.children[0].to_str() + ' = &' + self.children[1].to_str()
 
-                return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '[&]':'&', '[|]':'|', '(concat)':'+', '[+]':'+', '‘’=':'+=', '(+)':'^', '(+)=':'^='}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
+                return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '[&]':'&', '[&]=':'&=', '[|]':'|', '[|]=':'|=', '(concat)':'+', '[+]':'+', '‘’=':'+=', '(+)':'^', '(+)=':'^='}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
         elif len(self.children) == 3:
             if self.children[1].token.category == Token.Category.SCOPE_BEGIN:
                 assert(self.symbol.id == '.')
@@ -2608,6 +2610,8 @@ builtins_scope.add_function('tan',   ASTFunctionDefinition([('x', '', 'Float')])
 builtins_scope.add_function('degrees', ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_function('radians', ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_function('dot',   ASTFunctionDefinition([('v1', '', ''), ('v2', '', '')]))
+builtins_scope.add_function('ValueError', ASTFunctionDefinition([('s', '', 'String')]))
+builtins_scope.add_function('IndexError', ASTFunctionDefinition([('index', '', 'Int')]))
 
 def add_builtin_global_var(var_name, var_type, var_type_args = []):
     var = ASTVariableDeclaration()
@@ -2706,6 +2710,7 @@ module_scope.add_function('', ASTFunctionDefinition([('pattern', '', 'String')])
 builtin_modules['re'] = Module(module_scope)
 module_scope = Scope(None)
 module_scope.add_function('', ASTFunctionDefinition([('min', '', 'Float'), ('max', '0', 'Float')]))
+module_scope.add_function('seed', ASTFunctionDefinition([('s', '', 'Int')]))
 module_scope.add_function('shuffle', ASTFunctionDefinition([('container', '', '', '&')]))
 builtin_modules['random'] = Module(module_scope)
 

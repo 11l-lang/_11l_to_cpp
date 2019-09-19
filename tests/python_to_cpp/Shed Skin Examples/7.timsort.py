@@ -6,18 +6,14 @@ converted from java version by dan stromberg
 modified by mark.dufour@gmail.com to work with shedskin
 
 '''
+from typing import List, Callable
+
 import random
 random.seed(1)
 
 cmp = lambda a, b: a - b
 
-def timsort(list_, comparefn=cmp):
-	'''Sort function for timsort'''
-	timsort_object = Timsort(list_, comparefn=comparefn)
-	timsort_object.sort(low = 0, high = len(list_))
-	assert timsort_object.list_ == sorted(timsort_object.list_)
-
-def array_copy(list1, base1, list2, base2, length):
+def array_copy(list1, base1, list2 : List[int], base2, length):
 	'''
 	Copy from list1 to list2 at offsets base1 and base2, for length elements.
 	Like Java's System.arraycopy.
@@ -29,6 +25,7 @@ def array_copy(list1, base1, list2, base2, length):
 
 	#print 'in array_copy copying from', list1, list1[base1:base1+length]
 	#print 'in array_copy copying to  ', list2, list2[base2:base2+length]
+	copy_forward : bool
 	if id(list1) == id(list2):
 		#print 'in array_copy lists are the same'
 		if base1 < base2:
@@ -204,7 +201,7 @@ def gallop_left(key, list_, base, length, hint, comparefn):
 	assert last_offset == offset
 	return offset
 
-def binary_sort(list_, low, high, start, comparefn):
+def binary_sort(list_ : List[int], low, high, start, comparefn):
 	'''
 	Sorts the specified portion of the specified array using a binary
 	insertion sort.  This is the best method for sorting small numbers
@@ -272,7 +269,7 @@ def binary_sort(list_, low, high, start, comparefn):
 		#print 'at end of binary_sort main loop list_ is', list_
 	#print 'at end of binary_sort list_ is', list_
 
-def reverse_range(list_, low, high):
+def reverse_range(list_ : List[int], low, high):
 	'''
 	Reverse the specified range of the specified array.
 
@@ -288,13 +285,13 @@ def reverse_range(list_, low, high):
 		#low += 1
 		#list_[high] = temp
 		#high -= 1
-		list_[low], list_[high] = list_[high], list_[low]
+		(list_[low], list_[high]) = (list_[high], list_[low])
 		low += 1
 		high -= 1
 	#print 'at end of reverse_range list_ is  ', list_, 'low is', low, 'high is', high
 	#raise AssertionError
 
-def count_run_and_make_ascending(list_, low, high, comparefn):
+def count_run_and_make_ascending(list_ : List[int], low, high, comparefn):
 	'''
 	Returns the length of the run beginning at the specified position in
 	the specified array and reverses the run if it is descending (ensuring
@@ -342,7 +339,7 @@ def count_run_and_make_ascending(list_, low, high, comparefn):
 	return run_high - low
 
 class Timsort:
-	'''Class for timsort'ing'''
+	#'''Class for timsort'ing'''
 
 	# This is the minimum sized sequence that will be merged.  Shorter
 	# sequences will be lengthened by calling binary_sort.  If the entire
@@ -424,6 +421,10 @@ class Timsort:
 	# @param list_ the array to be sorted
 	# @param comparefn the comparator to determine the order of the sort
 	#
+	list_ : List[int]
+	tmp   : List[int]
+	comparefn : Callable[[int, int], int]
+
 	def __init__(self, list_, comparefn=cmp):
 		self.min_merge = 32
 		self.initial_min_gallop = 7
@@ -431,8 +432,8 @@ class Timsort:
 
 		self.initial_tmp_storage_length = 256
 
-		self.run_base = []
-		self.run_len = []
+		self.run_base : List[int] = []
+		self.run_len  : List[int] = []
 
 		self.min_gallop = self.initial_min_gallop
 
@@ -442,8 +443,9 @@ class Timsort:
 		# Allocate temp storage (which may be increased later if necessary)
 		length = len(list_)
 		#T[] newArray = (T[]) new Object[length < 2 * self.initial_tmp_storage_length ? length / 2 : self.initial_tmp_storage_length]
+		ternary : int
 		if length < self.initial_tmp_storage_length * 2:
-			ternary = length / 2
+			ternary = length // 2
 		else:
 			ternary = self.initial_tmp_storage_length
 		self.tmp = list(range(ternary))
@@ -459,6 +461,7 @@ class Timsort:
 		# the min_merge declaration above for more information.
 		#
 		#self.stack_len = (length <	120  ?  5 : length <   1542  ? 10 : length < 119151  ? 19 : 40)
+		self.stack_len : int
 		if length < 120:
 			self.stack_len = 5
 		elif length < 1542:
@@ -472,8 +475,8 @@ class Timsort:
 
 	def sort(self, low, high, comparefn = cmp):
 		'''sort method - perform a sort :)'''
-		list_ = self.list_
-		range_check(len(list_), low, high)
+		global range_check
+		range_check(len(self.list_), low, high)
 		num_remaining = high - low
 		if num_remaining < 2:
 			# Arrays of size 0 and 1 are always sorted
@@ -481,7 +484,7 @@ class Timsort:
 
 		# If array is small, do a "mini-Timsort" with no merges
 		if num_remaining < self.min_merge:
-			initial_run_len = count_run_and_make_ascending(list_, low, high, comparefn)
+			initial_run_len = count_run_and_make_ascending(self.list_, low, high, comparefn)
 			#print 'in sort initial_run_len is', initial_run_len
 			binary_sort(self.list_, low, high, low + initial_run_len, comparefn)
 			return
@@ -491,17 +494,18 @@ class Timsort:
 		# extending short natural runs to min_run elements, and merging runs
 		# to maintain stack invariant.
 		#
-		#timothy_sort = Timsort(list_, comparefn)
+		#timothy_sort = Timsort(self.list_, comparefn)
 		min_run = self.min_run_length(num_remaining)
 		while True:
 			# Identify next run
-			#print 'list_ is', list_, 'low is', low, 'high is', high, 'comparefn is', comparefn
-			run_len = count_run_and_make_ascending(list_, low, high, comparefn)
+			#print 'list_ is', self.list_, 'low is', low, 'high is', high, 'comparefn is', comparefn
+			run_len = count_run_and_make_ascending(self.list_, low, high, comparefn)
 			#print 'after'
 
 			# If run is short, extend to min(min_run, num_remaining)
 			if run_len < min_run:
 				#force = num_remaining <= min_run ? num_remaining : min_run
+				ternary : int
 				if num_remaining <= min_run:
 					ternary = num_remaining
 				else:
@@ -679,9 +683,8 @@ class Timsort:
 
 		# Copy first run into temp array
 		# For performance
-		list_ = self.list_
 		tmp = self.ensure_capacity(len1)
-		array_copy(list_, base1, tmp, 0, len1)
+		array_copy(self.list_, base1, tmp, 0, len1)
 
 		# Indexes into tmp array
 		cursor1 = 0
@@ -691,17 +694,17 @@ class Timsort:
 		dest = base1
 
 		# Move first element of second run and deal with degenerate cases
-		list_[dest] = list_[cursor2]
+		self.list_[dest] = self.list_[cursor2]
 		dest += 1
 		cursor2 += 1
 		len2 -= 1
 		if len2 == 0:
-			array_copy(tmp, cursor1, list_, dest, len1)
+			array_copy(tmp, cursor1, self.list_, dest, len1)
 			return
 		if len1 == 1:
-			array_copy(list_, cursor2, list_, dest, len2)
+			array_copy(self.list_, cursor2, self.list_, dest, len2)
 			# Last elt of run 1 to end of merge
-			list_[dest + len2] = tmp[cursor1]
+			self.list_[dest + len2] = tmp[cursor1]
 			return
 
 		# Use local variable for performance
@@ -722,8 +725,8 @@ class Timsort:
 			#
 			while True:
 				assert len1 > 1 and len2 > 0
-				if comparefn(list_[cursor2], tmp[cursor1]) < 0:
-					list_[dest] = list_[cursor2]
+				if comparefn(self.list_[cursor2], tmp[cursor1]) < 0:
+					self.list_[dest] = self.list_[cursor2]
 					dest += 1
 					cursor2 += 1
 					count2 += 1
@@ -733,7 +736,7 @@ class Timsort:
 						loops_done = True
 						break
 				else:
-					list_[dest] = tmp[cursor1]
+					self.list_[dest] = tmp[cursor1]
 					dest += 1
 					cursor1 += 1
 					count1 += 1
@@ -754,9 +757,9 @@ class Timsort:
 			#
 			while True:
 				assert len1 > 1 and len2 > 0
-				count1 = gallop_right(list_[cursor2], tmp, cursor1, len1, 0, comparefn)
+				count1 = gallop_right(self.list_[cursor2], tmp, cursor1, len1, 0, comparefn)
 				if count1 != 0:
-					array_copy(tmp, cursor1, list_, dest, count1)
+					array_copy(tmp, cursor1, self.list_, dest, count1)
 					dest += count1
 					cursor1 += count1
 					len1 -= count1
@@ -764,7 +767,7 @@ class Timsort:
 						# len1 == 1 or len1 == 0
 						loops_done = True
 						break
-				list_[dest] = list_[cursor2]
+				self.list_[dest] = self.list_[cursor2]
 				dest += 1
 				cursor2 += 1
 				len2 -= 1
@@ -772,16 +775,16 @@ class Timsort:
 					loops_done = True
 					break
 
-				count2 = gallop_left(tmp[cursor1], list_, cursor2, len2, 0, comparefn)
+				count2 = gallop_left(tmp[cursor1], self.list_, cursor2, len2, 0, comparefn)
 				if count2 != 0:
-					array_copy(list_, cursor2, list_, dest, count2)
+					array_copy(self.list_, cursor2, self.list_, dest, count2)
 					dest += count2
 					cursor2 += count2
 					len2 -= count2
 					if len2 == 0:
 						loops_done = True
 						break
-				list_[dest] = tmp[cursor1]
+				self.list_[dest] = tmp[cursor1]
 				dest += 1
 				cursor1 += 1
 				len1 -= 1
@@ -790,7 +793,7 @@ class Timsort:
 					break
 				min_gallop -= 1
 
-				if not (count1 >= self.initial_min_gallop | count2 >= self.initial_min_gallop):
+				if not (count1 >= self.initial_min_gallop or count2 >= self.initial_min_gallop):
 					break
 
 			if loops_done:
@@ -804,6 +807,7 @@ class Timsort:
 
 		# Write back to field
 		#self.min_gallop = min_gallop < 1 ? 1 : min_gallop
+		ternary : int
 		if min_gallop < 1:
 			ternary = 1
 		else:
@@ -812,15 +816,15 @@ class Timsort:
 
 		if len1 == 1:
 			assert len2 > 0
-			array_copy(list_, cursor2, list_, dest, len2)
+			array_copy(self.list_, cursor2, self.list_, dest, len2)
 			#  Last elt of run 1 to end of merge
-			list_[dest + len2] = tmp[cursor1]
+			self.list_[dest + len2] = tmp[cursor1]
 		elif len1 == 0:
 			raise ValueError("Comparison function violates its general contract!")
 		else:
 			assert len2 == 0
 			assert len1 > 1
-			array_copy(tmp, cursor1, list_, dest, len1)
+			array_copy(tmp, cursor1, self.list_, dest, len1)
 
 	def merge_high(self, base1, len1, base2, len2):
 		# pylint: disable=R0914,R0912,R0915
@@ -843,9 +847,8 @@ class Timsort:
 
 		# Copy second run into temp array
 		# For performance
-		list_ = self.list_
 		tmp = self.ensure_capacity(len2)
-		array_copy(list_, base2, tmp, 0, len2)
+		array_copy(self.list_, base2, tmp, 0, len2)
 
 		# Indexes into list_
 		cursor1 = base1 + len1 - 1
@@ -855,18 +858,18 @@ class Timsort:
 		dest = base2 + len2 - 1
 
 		# Move last element of first run and deal with degenerate cases
-		list_[dest] = list_[cursor1]
+		self.list_[dest] = self.list_[cursor1]
 		dest -= 1
 		cursor1 -= 1
 		len1 -= 1
 		if len1 == 0:
-			array_copy(tmp, 0, list_, dest - (len2 - 1), len2)
+			array_copy(tmp, 0, self.list_, dest - (len2 - 1), len2)
 			return
 		if len2 == 1:
 			dest -= len1
 			cursor1 -= len1
-			array_copy(list_, cursor1 + 1, list_, dest + 1, len1)
-			list_[dest] = tmp[cursor2]
+			array_copy(self.list_, cursor1 + 1, self.list_, dest + 1, len1)
+			self.list_[dest] = tmp[cursor2]
 			return
 
 		# Use local variable for performance
@@ -887,8 +890,8 @@ class Timsort:
 			#
 			while True:
 				assert len1 > 0 and len2 > 1
-				if comparefn(tmp[cursor2], list_[cursor1]) < 0:
-					list_[dest] = list_[cursor1]
+				if comparefn(tmp[cursor2], self.list_[cursor1]) < 0:
+					self.list_[dest] = self.list_[cursor1]
 					dest -= 1
 					cursor1 -= 1
 					count1 += 1
@@ -898,7 +901,7 @@ class Timsort:
 						loops_done = True
 						break
 				else:
-					list_[dest] = tmp[cursor2]
+					self.list_[dest] = tmp[cursor2]
 					dest -= 1
 					cursor2 -= 1
 					count2 += 1
@@ -920,16 +923,16 @@ class Timsort:
 			#
 			while True:
 				assert len1 > 0 and len2 > 1
-				count1 = len1 - gallop_right(tmp[cursor2], list_, base1, len1, len1 - 1, comparefn)
+				count1 = len1 - gallop_right(tmp[cursor2], self.list_, base1, len1, len1 - 1, comparefn)
 				if count1 != 0:
 					dest -= count1
 					cursor1 -= count1
 					len1 -= count1
-					array_copy(list_, cursor1 + 1, list_, dest + 1, count1)
+					array_copy(self.list_, cursor1 + 1, self.list_, dest + 1, count1)
 					if len1 == 0:
 						loops_done = True
 						break
-				list_[dest] = tmp[cursor2]
+				self.list_[dest] = tmp[cursor2]
 				dest -= 1
 				cursor2 -= 1
 				len2 -= 1
@@ -937,17 +940,17 @@ class Timsort:
 					loops_done = True
 					break
 
-				count2 = len2 - gallop_left(list_[cursor1], tmp, 0, len2, len2 - 1, comparefn)
+				count2 = len2 - gallop_left(self.list_[cursor1], tmp, 0, len2, len2 - 1, comparefn)
 				if count2 != 0:
 					dest -= count2
 					cursor2 -= count2
 					len2 -= count2
-					array_copy(tmp, cursor2 + 1, list_, dest + 1, count2)
+					array_copy(tmp, cursor2 + 1, self.list_, dest + 1, count2)
 					if len2 <= 1:
 						# len2 == 1 or len2 == 0
 						loops_done = True
 						break
-				list_[dest] = list_[cursor1]
+				self.list_[dest] = self.list_[cursor1]
 				dest -= 1
 				cursor1 -= 1
 				len1 -= 1
@@ -955,7 +958,7 @@ class Timsort:
 					loops_done = True
 					break
 				min_gallop -= 1
-				if not (count1 >= self.initial_min_gallop | count2 >= self.initial_min_gallop):
+				if not (count1 >= self.initial_min_gallop or count2 >= self.initial_min_gallop):
 					break
 
 			if loops_done:
@@ -969,6 +972,7 @@ class Timsort:
 
 		# Write back to field
 		#self.min_gallop = min_gallop < 1 ? 1 : min_gallop
+		ternary : int
 		if min_gallop < 1:
 			ternary = 1
 		else:
@@ -979,15 +983,15 @@ class Timsort:
 			assert len1 > 0
 			dest -= len1
 			cursor1 -= len1
-			array_copy(list_, cursor1 + 1, list_, dest + 1, len1)
+			array_copy(self.list_, cursor1 + 1, self.list_, dest + 1, len1)
 			# Move first elt of run2 to front of merge
-			list_[dest] = tmp[cursor2]
+			self.list_[dest] = tmp[cursor2]
 		elif len2 == 0:
 			raise ValueError("Comparison function violates its general contract!")
 		else:
 			assert len1 == 0
 			assert len2 > 0
-			array_copy(tmp, 0, list_, dest - (len2 - 1), len2)
+			array_copy(tmp, 0, self.list_, dest - (len2 - 1), len2)
 
 	def ensure_capacity(self, min_capacity):
 		'''
@@ -1017,6 +1021,13 @@ class Timsort:
 			self.tmp = list(range(new_size))
 		return self.tmp
 
+def timsort(list_, comparefn=cmp):
+	'''Sort function for timsort'''
+	timsort_object = Timsort(list_, comparefn=comparefn)
+	timsort_object.sort(low = 0, high = len(list_))
+	assert timsort_object.list_ == sorted(timsort_object.list_)
+	return timsort_object.list_
+
 def range_check(array_len, from_index, to_index):
 	'''
 	Checks that from_index and to_index are in range, and throws an
@@ -1032,16 +1043,13 @@ def range_check(array_len, from_index, to_index):
 	if from_index > to_index:
 		raise ValueError("from_index(" + str(from_index) + ") > to_index(" + str(to_index)+")")
 	if from_index < 0:
-		raise IndexError(str(from_index))
+		raise IndexError(from_index)
 	if to_index > array_len:
-		raise IndexError(str(to_index))
+		raise IndexError(to_index)
 
-def main():
+if __name__ == '__main__':
     l = list(range(1000))
     random.shuffle(l)
     print(l)
-    timsort(l)
+    l = timsort(l)
     print(l)
-
-if __name__ == '__main__':
-    main()
