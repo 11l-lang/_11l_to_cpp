@@ -2302,8 +2302,8 @@ def parse_internal(this_node):
                                 node.copy_loop_variable = True
                                 next_token()
                             node.loop_variable = expected_name('loop variable')
-                            if token.value(source) == ',':
-                                node.loop_variable += ', ' + expected_name('loop variable2')
+                            while token.value(source) == ',':
+                                node.loop_variable += ', ' + expected_name('loop variable')
                             advance(')')
                         node.set_expression(expression())
 

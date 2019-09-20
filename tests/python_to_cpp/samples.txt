@@ -1806,3 +1806,27 @@ struct CodeBlock2
         assign_from_tuple(u[i], u[j], make_tuple(u[j], u[i]));
     }
 } code_block_2;
+
+
+for x, y in [(1, 2), (3, 4)]:
+    print(str(x) + ', ' + str(y))
+
+for x, y, z in [(1, 2, 3), (4, 5, 6)]:
+    print(str(x) + ', ' + str(y) + ', ' + str(z))
+===
+L(x, y) [(1, 2), (3, 4)]
+   print(String(x)‘, ’String(y))
+
+L(x, y, z) [(1, 2, 3), (4, 5, 6)]
+   print(String(x)‘, ’String(y)‘, ’String(z))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[x, y] : create_array({make_tuple(1, 2), make_tuple(3, 4)}))
+            print(String(x) + u", "_S + String(y));
+        for (auto &&[x, y, z] : create_array({make_tuple(1, 2, 3), make_tuple(4, 5, 6)}))
+            print(String(x) + u", "_S + String(y) + u", "_S + String(z));
+    }
+} code_block_1;
