@@ -1,0 +1,46 @@
+//import random
+//import math
+
+F generateRandomPoints(npoints = 6)
+   ‘Generate a few random points v1...vn’
+   print(String(npoints)‘ points x,y:’)
+   [(Float, Float)] points
+   L(i) 0 .< npoints
+      V (xrand, yrand) = (random:(), random:())
+      print(String(xrand)‘ ’String(yrand))
+      L(xoff) -1 .< 2
+         L(yoff) -1 .< 2
+            points.append((xrand + xoff, yrand + yoff))
+   R points
+
+F closest(x, y, points)
+   ‘Function to find the closest of the vi.’
+   V (best, good) = (99.0 * 99.0, 99.0 * 99.0)
+   L(px, py) points
+      V dist = (x - px) * (x - px) + (y - py) * (y - py)
+      I dist < best
+         (best, good) = (dist, best)
+      E I dist < good
+         good = dist
+   R sqrt(best) / sqrt(good)
+
+F generateScreen(points, rows = 40, cols = 80)
+   V yfact = 1.0 / cols
+   V xfact = 1.0 / rows
+   [String] screen
+   V chars = ‘ -.,+*$&#~~’
+   L(i) 0 .< rows
+      V x = i * xfact
+      V line = (0 .< cols).map(j -> @chars[Int(10 * closest(@x, j * @yfact, @points))])
+      screen.extend(line)
+      screen.append("\n")
+   R screen.join(‘’)
+//import time
+
+:start:
+V points = generateRandomPoints(10)
+print()
+V t1 = time:perf_counter()
+print(generateScreen(points, 40, 80))
+V t2 = time:perf_counter()
+print(round(t2 - t1, 3))

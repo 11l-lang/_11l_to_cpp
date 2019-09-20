@@ -1,0 +1,724 @@
+‘
+timsort
+
+converted from java version by dan stromberg
+
+modified by mark.dufour@gmail.com to work with shedskin
+
+’
+//import random
+random:seed(1)
+V cmp = (a, b) -> a - b
+
+F array_copy(list1, base1, [Int] &list2; base2, length)
+   ‘
+	Copy from list1 to list2 at offsets base1 and base2, for length elements.
+	Like Java's System.arraycopy.
+	’
+   Bool copy_forward
+   I &list1 == &list2
+      I base1 < base2
+         copy_forward = 0B
+      E
+         copy_forward = 1B
+   E
+      copy_forward = 1B
+
+   I copy_forward
+      L(offset) 0 .< length
+         list2[base2 + offset] = list1[base1 + offset]
+   E
+      L(offset) (length - 1 .< -1).step(-1)
+         list2[base2 + offset] = list1[base1 + offset]
+
+F gallop_right(key, list_, base, length, hint, comparefn)
+   ‘
+	Like gallop_left, except that if the range contains an element equal to
+	key, gallop_right returns the index after the rightmost equal element.
+
+	@param key the key whose insertion point to search for
+	@param list_ the array in which to search
+	@param base the index of the first element in the range
+	@param length the length of the range; must be > 0
+	@param hint the index at which to begin the search, 0 <= hint < number.
+	 The closer hint is to the result, the faster this method will run.
+	@param comparefn the comparator used to order the range, and to search
+	@return the int k,  0 <= k <= number such that list_[b + k - 1] <= key < list_[b + k]
+	’
+   assert(length > 0 & hint >= 0 & hint < length)
+   V offset = 1
+   V last_offset = 0
+   I comparefn(key, list_[base + hint]) < 0
+      V max_offset = hint + 1
+      L offset < max_offset & comparefn(key, list_[base + hint - offset]) < 0
+         last_offset = offset
+         offset = (offset << 1) + 1
+         I offset <= 0
+            offset = max_offset
+      I offset > max_offset
+         offset = max_offset
+      V tmp = last_offset
+      last_offset = hint - offset
+      offset = hint - tmp
+   E
+      V max_offset = length - hint
+      L offset < max_offset & comparefn(key, list_[base + hint + offset]) >= 0
+         last_offset = offset
+         offset = (offset << 1) + 1
+         I offset <= 0
+            offset = max_offset
+      I offset > max_offset
+         offset = max_offset
+      last_offset += hint
+      offset += hint
+   assert(-1 <= last_offset & last_offset < offset & offset <= length)
+   last_offset++
+   L last_offset < offset
+      V midpoint = last_offset + ((offset - last_offset) I/ 2)
+
+      I comparefn(key, list_[base + midpoint]) < 0
+         offset = midpoint
+      E
+         last_offset = midpoint + 1
+   assert(last_offset == offset)
+   R offset
+
+F gallop_left(key, list_, base, length, hint, comparefn)
+   ‘
+	Locates the position at which to insert the specified key into the
+	specified sorted range; if the range contains an element equal to key,
+	returns the index of the leftmost equal element.
+
+	@param key the key whose insertion point to search for
+	@param list_ the array in which to search
+	@param base the index of the first element in the range
+	@param length the length of the range; must be > 0
+	@param hint the index at which to begin the search, 0 <= hint < number.
+	 The closer hint is to the result, the faster this method will run.
+	@param c the comparator used to order the range, and to search
+	@return the int k,  0 <= k <= number such that list_[b + k - 1] < key <= list_[b + k],
+	pretending that list_[b - 1] is minus infinity and list_[b + number] is infinity.
+	In other words, key belongs at index b + k; or in other words,
+	the first k elements of list_ should precede key, and the last number - k
+	should follow it.
+	’
+   assert(length > 0 & hint >= 0 & hint < length)
+   V last_offset = 0
+   V offset = 1
+   I comparefn(key, list_[base + hint]) > 0
+      V max_offset = length - hint
+      L offset < max_offset & comparefn(key, list_[base + hint + offset]) > 0
+         last_offset = offset
+         offset = (offset << 1) + 1
+         I offset <= 0
+            offset = max_offset
+      I offset > max_offset
+         offset = max_offset
+      last_offset += hint
+      offset += hint
+   E
+      V max_offset = hint + 1
+      L offset < max_offset & comparefn(key, list_[base + hint - offset]) <= 0
+         last_offset = offset
+         offset = (offset << 1) + 1
+         I offset <= 0
+            offset = max_offset
+      I offset > max_offset
+         offset = max_offset
+      V tmp = last_offset
+      last_offset = hint - offset
+      offset = hint - tmp
+   assert(-1 <= last_offset & last_offset < offset & offset <= length)
+   last_offset++
+   L last_offset < offset
+      V midpoint = last_offset + ((offset - last_offset) I/ 2)
+
+      I comparefn(key, list_[base + midpoint]) > 0
+         last_offset = midpoint + 1
+      E
+         offset = midpoint
+   assert(last_offset == offset)
+   R offset
+
+F binary_sort([Int] &list_; low, high, =start, comparefn)
+   ‘
+	Sorts the specified portion of the specified array using a binary
+	insertion sort.  This is the best method for sorting small numbers
+	of elements.  It requires O(n log n) compares, but O(n^2) data
+	movement (worst case).
+
+	If the initial part of the specified range is already sorted,
+	this method can take advantage of it: the method assumes that the
+	elements from index {@code low}, inclusive, to {@code start},
+	exclusive are already sorted.
+
+	@param list_ the array in which a range is to be sorted
+	@param low the index of the first element in the range to be sorted
+	@param high the index after the last element in the range to be sorted
+	@param start the index of the first element in the range that is
+		not already known to be sorted (@code low <= start <= high)
+	@param comparefn comparator to used for the sort
+	’
+   assert(low <= start & start <= high)
+   I start == low
+      start++
+   L(start) start .< high
+      V pivot = list_[start]
+      V left = low
+      V right = start
+      assert(left <= right)
+
+      L left < right
+         V mid = (left + right) I/ 2
+         I comparefn(pivot, list_[mid]) < 0
+            right = mid
+         E
+            left = mid + 1
+      assert(left == right)
+      V number = start - left
+      array_copy(list_, left, &list_, left + 1, number)
+      list_[left] = pivot
+
+F reverse_range([Int] &list_; =low, =high)
+   ‘
+	Reverse the specified range of the specified array.
+
+	@param list_ the array in which a range is to be reversed
+	@param low the index of the first element in the range to be reversed
+	@param high the index after the last element in the range to be reversed
+	’
+   high--
+   L low < high
+      (list_[low], list_[high]) = (list_[high], list_[low])
+      low++
+      high--
+
+F count_run_and_make_ascending([Int] &list_; low, high, comparefn)
+   ‘
+	Returns the length of the run beginning at the specified position in
+	the specified array and reverses the run if it is descending (ensuring
+	that the run will always be ascending when the method returns).
+
+	A run is the longest ascending sequence with:
+
+		list_[low] <= list_[low + 1] <= list_[low + 2] <= ...
+
+	or the longest descending sequence with:
+
+		list_[low] >  list_[low + 1] >  list_[low + 2] >  ...
+
+	For its intended use in a stable mergesort, the strictness of the
+	definition of "descending" is needed so that the call can safely
+	reverse a descending sequence without violating stability.
+
+	@param list_ the array in which a run is to be counted and possibly reversed
+	@param low index of the first element in the run
+	@param high index after the last element that may be contained in the run.
+	 It is required that @code{low < high}.
+	@param comparefn the comparator to used for the sort
+	@return  the length of the run beginning at the specified position in
+			  the specified array
+	’
+   assert(low < high)
+   V run_high = low + 1
+   I run_high == high
+      R 1
+
+   I comparefn(list_[run_high], list_[low]) < 0
+      run_high++
+      L run_high < high & comparefn(list_[run_high], list_[run_high - 1]) < 0
+         run_high++
+      reverse_range(&list_, low, run_high)
+   E
+      run_high++
+      L run_high < high & comparefn(list_[run_high], list_[run_high - 1]) >= 0
+         run_high++
+   R run_high - low
+
+T Timsort
+   [Int] list_
+   [Int] tmp
+   (Int, Int -> Int) comparefn
+   min_merge = 32
+   initial_min_gallop = 7
+   stack_size = 0
+   initial_tmp_storage_length = 256
+   [Int] run_base
+   [Int] run_len
+   min_gallop = .initial_min_gallop
+   Int stack_len
+
+   F (list_, comparefn = cmp)
+      .list_ = list_
+      .comparefn = comparefn
+      V length = list_.len
+      Int ternary
+      I length < .initial_tmp_storage_length * 2
+         ternary = length I/ 2
+      E
+         ternary = .initial_tmp_storage_length
+      .tmp = Array(0 .< ternary)
+      I length < 120
+         .stack_len = 5
+      E I length < 1542
+         .stack_len = 10
+      E I length < 119151
+         .stack_len = 19
+      E
+         .stack_len = 40
+      .run_base = Array(0 .< .stack_len)
+      .run_len = Array(0 .< .stack_len)
+
+   F sort(=low, high, comparefn = cmp)
+      ‘sort method - perform a sort :)’
+      range_check(.list_.len, low, high)
+      V num_remaining = high - low
+      I num_remaining < 2
+         R
+
+      I num_remaining < .min_merge
+         V initial_run_len = count_run_and_make_ascending(&.list_, low, high, comparefn)
+         binary_sort(&.list_, low, high, low + initial_run_len, comparefn)
+         R
+      V min_run = .min_run_length(num_remaining)
+      L
+         V run_len = count_run_and_make_ascending(&.list_, low, high, comparefn)
+
+         I run_len < min_run
+            Int ternary
+            I num_remaining <= min_run
+               ternary = num_remaining
+            E
+               ternary = min_run
+            V force = ternary
+            binary_sort(&.list_, low, low + force, low + run_len, comparefn)
+            run_len = force
+         .push_run(low, run_len)
+         .merge_collapse()
+         low += run_len
+         num_remaining -= run_len
+         I num_remaining == 0
+            L.break
+      assert(low == high)
+      .merge_force_collapse()
+      assert(.stack_size == 1)
+
+   F min_run_length(=number)
+      ‘
+		Returns the minimum acceptable run length for an array of the specified
+		length. Natural runs shorter than this will be extended with
+		{@link #binary_sort}.
+
+		Roughly speaking, the computation is:
+
+		 If number < self.min_merge, return number (it's too small to bother with fancy stuff).
+		 Else if number is an exact power of 2, return self.min_merge/2.
+		 Else return an int k, self.min_merge/2 <= k <= self.min_merge, such that number/k
+		  is close to, but strictly less than, an exact power of 2.
+
+		For the rationale, see listsort.txt.
+
+		@param number the length of the array to be sorted
+		@return the length of the minimum run to be merged
+		’
+      assert(number >= 0)
+      V low_bit = 0
+
+      L number >= .min_merge
+         low_bit [|]= (number [&] 1)
+         number >>= 1
+      R number + low_bit
+
+   F push_run(run_base, run_len)
+      ‘
+		Pushes the specified run onto the pending-run stack.
+
+		@param self.run_base index of the first element in the run
+		@param self.run_len  the number of elements in the run
+		’
+      .run_base[.stack_size] = run_base
+      .run_len[.stack_size] = run_len
+      .stack_size++
+
+   F merge_collapse()
+      ‘
+		Examines the stack of runs waiting to be merged and merges adjacent runs
+		until the stack invariants are reestablished:
+
+		 1. self.run_len[i - 3] > self.run_len[i - 2] + self.run_len[i - 1]
+		 2. self.run_len[i - 2] > self.run_len[i - 1]
+
+		This method is called each time a new run is pushed onto the stack,
+		so the invariants are guaranteed to hold for i < self.stack_size upon
+		entry to the method.
+		’
+      L .stack_size > 1
+         V number = .stack_size - 2
+         I number > 0 & .run_len[number - 1] <= .run_len[number] + .run_len[number + 1]
+            I .run_len[number - 1] < .run_len[number + 1]
+               number--
+            .merge_at(number)
+         E I .run_len[number] <= .run_len[number + 1]
+            .merge_at(number)
+         E
+            L.break
+
+   F merge_force_collapse()
+      ‘
+		Merges all runs on the stack until only one remains.  This method is
+		called once, to complete the sort.
+		’
+      L .stack_size > 1
+         V number = .stack_size - 2
+         I number > 0 & .run_len[number - 1] < .run_len[number + 1]
+            number--
+         .merge_at(number)
+
+   F merge_at(i)
+      ‘
+		Merges the two runs at stack indices i and i+1.  Run i must be
+		the penultimate or antepenultimate run on the stack.  In other words,
+		i must be equal to self.stack_size-2 or self.stack_size-3.
+
+		@param i stack index of the first of the two runs to merge
+		’
+      assert(.stack_size >= 2)
+      assert(i >= 0)
+      assert(i == .stack_size - 2 | i == .stack_size - 3)
+      V base1 = .run_base[i]
+      V len1 = .run_len[i]
+      V base2 = .run_base[i + 1]
+      V len2 = .run_len[i + 1]
+      assert(len1 > 0 & len2 > 0)
+      assert(base1 + len1 == base2)
+      .run_len[i] = len1 + len2
+      I i == .stack_size - 3
+         .run_base[i + 1] = .run_base[i + 2]
+         .run_len[i + 1] = .run_len[i + 2]
+      .stack_size--
+      V k = gallop_right(.list_[base2], .list_, base1, len1, 0, .comparefn)
+      assert(k >= 0)
+      base1 += k
+      len1 -= k
+      I len1 == 0
+         R
+      len2 = gallop_left(.list_[base1 + len1 - 1], .list_, base2, len2, len2 - 1, .comparefn)
+      assert(len2 >= 0)
+      I len2 == 0
+         R
+
+      I len1 <= len2
+         .merge_low(base1, len1, base2, len2)
+      E
+         .merge_high(base1, len1, base2, len2)
+
+   F merge_low(base1, =len1, base2, =len2)
+      ‘
+		Merges two adjacent runs in place, in a stable fashion.  The first
+		element of the first run must be greater than the first element of the
+		second run (list_[base1] > list_[base2]), and the last element of the first run
+		(list_[base1 + len1-1]) must be greater than all elements of the second run.
+
+		For performance, this method should be called only when len1 <= len2
+		its twin, merge_high should be called if len1 >= len2.  (Either method
+		may be called if len1 == len2.)
+
+		@param base1 index of first element in first run to be merged
+		@param len1  length of first run to be merged (must be > 0)
+		@param base2 index of first element in second run to be merged
+			(must be aBase + aLen)
+		@param len2  length of second run to be merged (must be > 0)
+		’
+      assert(len1 > 0 & len2 > 0 & base1 + len1 == base2)
+      V tmp = .ensure_capacity(len1)
+      array_copy(.list_, base1, &tmp, 0, len1)
+      V cursor1 = 0
+      V cursor2 = base2
+      V dest = base1
+      .list_[dest] = .list_[cursor2]
+      dest++
+      cursor2++
+      I --len2 == 0
+         array_copy(tmp, cursor1, &.list_, dest, len1)
+         R
+      I len1 == 1
+         array_copy(.list_, cursor2, &.list_, dest, len2)
+         .list_[dest + len2] = tmp[cursor1]
+         R
+      V comparefn = .comparefn
+      V min_gallop = .min_gallop
+      V loops_done = 0B
+      L
+         V count1 = 0
+         V count2 = 0
+
+         L
+            assert(len1 > 1 & len2 > 0)
+            I comparefn(.list_[cursor2], tmp[cursor1]) < 0
+               .list_[dest] = .list_[cursor2]
+               dest++
+               cursor2++
+               count2++
+               count1 = 0
+               I --len2 == 0
+                  loops_done = 1B
+                  L.break
+            E
+               .list_[dest] = tmp[cursor1]
+               dest++
+               cursor1++
+               count1++
+               count2 = 0
+               len1--
+               I len1 == 1
+                  loops_done = 1B
+                  L.break
+            I (count1 [|] count2) >= min_gallop
+               L.break
+         I loops_done
+            L.break
+
+         L
+            assert(len1 > 1 & len2 > 0)
+            count1 = gallop_right(.list_[cursor2], tmp, cursor1, len1, 0, comparefn)
+            I count1 != 0
+               array_copy(tmp, cursor1, &.list_, dest, count1)
+               dest += count1
+               cursor1 += count1
+               len1 -= count1
+               I len1 <= 1
+                  loops_done = 1B
+                  L.break
+            .list_[dest] = .list_[cursor2]
+            dest++
+            cursor2++
+            I --len2 == 0
+               loops_done = 1B
+               L.break
+            count2 = gallop_left(tmp[cursor1], .list_, cursor2, len2, 0, comparefn)
+            I count2 != 0
+               array_copy(.list_, cursor2, &.list_, dest, count2)
+               dest += count2
+               cursor2 += count2
+               len2 -= count2
+               I len2 == 0
+                  loops_done = 1B
+                  L.break
+            .list_[dest] = tmp[cursor1]
+            dest++
+            cursor1++
+            I --len1 == 1
+               loops_done = 1B
+               L.break
+            min_gallop--
+
+            I !(count1 >= .initial_min_gallop | count2 >= .initial_min_gallop)
+               L.break
+
+         I loops_done
+            L.break
+
+         I min_gallop < 0
+            min_gallop = 0
+         min_gallop += 2
+      Int ternary
+      I min_gallop < 1
+         ternary = 1
+      E
+         ternary = min_gallop
+      .min_gallop = ternary
+
+      I len1 == 1
+         assert(len2 > 0)
+         array_copy(.list_, cursor2, &.list_, dest, len2)
+         .list_[dest + len2] = tmp[cursor1]
+      E I len1 == 0
+         X ValueError(‘Comparison function violates its general contract!’)
+      E
+         assert(len2 == 0)
+         assert(len1 > 1)
+         array_copy(tmp, cursor1, &.list_, dest, len1)
+
+   F merge_high(base1, =len1, base2, =len2)
+      ‘
+		Like merge_low, except that this method should be called only if
+		len1 >= len2; merge_low should be called if len1 <= len2.  (Either method
+		may be called if len1 == len2.)
+
+		@param base1 index of first element in first run to be merged
+		@param len1  length of first run to be merged (must be > 0)
+		@param base2 index of first element in second run to be merged
+			(must be aBase + aLen)
+		@param len2  length of second run to be merged (must be > 0)
+		’
+      assert(len1 > 0 & len2 > 0 & base1 + len1 == base2)
+      V tmp = .ensure_capacity(len2)
+      array_copy(.list_, base2, &tmp, 0, len2)
+      V cursor1 = base1 + len1 - 1
+      V cursor2 = len2 - 1
+      V dest = base2 + len2 - 1
+      .list_[dest] = .list_[cursor1]
+      dest--
+      cursor1--
+      I --len1 == 0
+         array_copy(tmp, 0, &.list_, dest - (len2 - 1), len2)
+         R
+      I len2 == 1
+         dest -= len1
+         cursor1 -= len1
+         array_copy(.list_, cursor1 + 1, &.list_, dest + 1, len1)
+         .list_[dest] = tmp[cursor2]
+         R
+      V comparefn = .comparefn
+      V min_gallop = .min_gallop
+      V loops_done = 0B
+      L
+         V count1 = 0
+         V count2 = 0
+
+         L
+            assert(len1 > 0 & len2 > 1)
+            I comparefn(tmp[cursor2], .list_[cursor1]) < 0
+               .list_[dest] = .list_[cursor1]
+               dest--
+               cursor1--
+               count1++
+               count2 = 0
+               I --len1 == 0
+                  loops_done = 1B
+                  L.break
+            E
+               .list_[dest] = tmp[cursor2]
+               dest--
+               cursor2--
+               count2++
+               count1 = 0
+               len2--
+               I len2 == 1
+                  loops_done = 1B
+                  L.break
+            I !((count1 [|] count2) < min_gallop)
+               L.break
+
+         I loops_done
+            L.break
+
+         L
+            assert(len1 > 0 & len2 > 1)
+            count1 = len1 - gallop_right(tmp[cursor2], .list_, base1, len1, len1 - 1, comparefn)
+            I count1 != 0
+               dest -= count1
+               cursor1 -= count1
+               len1 -= count1
+               array_copy(.list_, cursor1 + 1, &.list_, dest + 1, count1)
+               I len1 == 0
+                  loops_done = 1B
+                  L.break
+            .list_[dest] = tmp[cursor2]
+            dest--
+            cursor2--
+            I --len2 == 1
+               loops_done = 1B
+               L.break
+            count2 = len2 - gallop_left(.list_[cursor1], tmp, 0, len2, len2 - 1, comparefn)
+            I count2 != 0
+               dest -= count2
+               cursor2 -= count2
+               len2 -= count2
+               array_copy(tmp, cursor2 + 1, &.list_, dest + 1, count2)
+               I len2 <= 1
+                  loops_done = 1B
+                  L.break
+            .list_[dest] = .list_[cursor1]
+            dest--
+            cursor1--
+            I --len1 == 0
+               loops_done = 1B
+               L.break
+            min_gallop--
+            I !(count1 >= .initial_min_gallop | count2 >= .initial_min_gallop)
+               L.break
+
+         I loops_done
+            L.break
+
+         I min_gallop < 0
+            min_gallop = 0
+         min_gallop += 2
+      Int ternary
+      I min_gallop < 1
+         ternary = 1
+      E
+         ternary = min_gallop
+      .min_gallop = ternary
+
+      I len2 == 1
+         assert(len1 > 0)
+         dest -= len1
+         cursor1 -= len1
+         array_copy(.list_, cursor1 + 1, &.list_, dest + 1, len1)
+         .list_[dest] = tmp[cursor2]
+      E I len2 == 0
+         X ValueError(‘Comparison function violates its general contract!’)
+      E
+         assert(len1 == 0)
+         assert(len2 > 0)
+         array_copy(tmp, 0, &.list_, dest - (len2 - 1), len2)
+
+   F ensure_capacity(min_capacity)
+      ‘
+		Ensures that the external array tmp has at least the specified
+		number of elements, increasing its size if necessary.  The size
+		increases exponentially to ensure amortized linear time complexity.
+
+		@param min_capacity the minimum required capacity of the tmp array
+		@return tmp, whether or not it grew
+		’
+      I .tmp.len < min_capacity
+         V new_size = min_capacity
+         new_size [|]= new_size >> 1
+         new_size [|]= new_size >> 2
+         new_size [|]= new_size >> 4
+         new_size [|]= new_size >> 8
+         new_size [|]= new_size >> 16
+         new_size++
+
+         I new_size < 0
+            new_size = min_capacity
+         E
+            new_size = min(new_size, .list_.len I/ 2)
+         .tmp = Array(0 .< new_size)
+      R .tmp
+
+F timsort(list_, comparefn = cmp)
+   ‘Sort function for timsort’
+   V timsort_object = Timsort(list_, comparefn' comparefn)
+   timsort_object.sort(low' 0, high' list_.len)
+   assert(timsort_object.list_ == sorted(timsort_object.list_))
+   R timsort_object.list_
+
+F range_check(array_len, from_index, to_index)
+   ‘
+	Checks that from_index and to_index are in range, and throws an
+	appropriate exception if they aren't.
+
+	@param array_len the length of the array
+	@param from_index the index of the first element of the range
+	@param to_index the index after the last element of the range
+	@throws IllegalArgumentException if from_index > to_index
+	@throws ArrayIndexOutOfBoundsException if from_index < 0
+		 or to_index > array_len
+	’
+   I from_index > to_index
+      X ValueError(‘from_index(’String(from_index)‘) > to_index(’String(to_index)‘)’)
+   I from_index < 0
+      X IndexError(from_index)
+   I to_index > array_len
+      X IndexError(to_index)
+
+:start:
+V l = Array(0.<1000)
+random:shuffle(&l)
+print(l)
+l = timsort(l)
+print(l)

@@ -5,3 +5,5 @@
 /*.vcxproj.filters
 __pycache__
 .mypy_cache
+*.exe
+*.obj

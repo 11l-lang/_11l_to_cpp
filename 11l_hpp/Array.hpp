@@ -207,6 +207,13 @@ public:
 //		append(range);
 //	}
 
+	template <typename Ty> void extend(const Ty &iterable)
+	{
+		reserve(std::vector<Type>::size() + iterable.len());
+		for (auto el : iterable)
+			append(el);
+	}
+
 	void insert(int index, const Type &v)
 	{
 		std::vector<Type>::insert(begin() + index, v);
