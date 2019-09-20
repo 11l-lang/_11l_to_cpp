@@ -4,6 +4,12 @@ template <typename KeyType> class Set : public std::set<KeyType>
 {
 public:
 	Set() {}
+	Set(std::initializer_list<KeyType> il)
+	{
+//		reserve(il.size());
+		for (auto &&el : il)
+			add(el);
+	}
 
 	int len() const {return (int)size();}
 
@@ -31,6 +37,11 @@ public:
 		return r;
 	}
 };
+
+template <typename Type> Set<Type> create_set(std::initializer_list<Type> il)
+{
+	return Set<Type>(il);
+}
 
 template <typename Type> Set<Type> create_set(const Array<Type> &arr)
 {

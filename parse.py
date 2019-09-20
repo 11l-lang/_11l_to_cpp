@@ -402,6 +402,14 @@ class SymbolNode:
                 elif func_name.startswith('DefaultDict['): # ]
                     func_name = 'DefaultDict<' + ', '.join(trans_type(c.to_type_str(), c.scope, c.token) for c in self.children[0].children[1:]) + '>'
                 elif func_name == 'Set':
+                    if self.children[2].is_list:
+                        res = 'create_set({'
+                        c = self.children[2].children
+                        for i in range(len(c)):
+                            res += c[i].to_str()
+                            if i < len(c)-1:
+                                res += ', '
+                        return res + '})'
                     func_name = 'create_set'
                 elif func_name.startswith('Set['): # ]
                     c = self.children[0].children[1]
