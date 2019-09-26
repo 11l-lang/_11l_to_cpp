@@ -460,6 +460,11 @@ template <typename ... Types> inline Array<String> String::split(const Tuple<Typ
 	return arr;
 }
 
+inline Array<String> String::split_py() const
+{
+	return split(make_tuple(u' '_C, u'\t'_C, u'\r'_C, u'\n'_C), nullptr, true);
+}
+
 inline String String::ltrim(const Array<Char> &arr, Nullable<int> limit) const
 {
 	const char16_t *s = data();

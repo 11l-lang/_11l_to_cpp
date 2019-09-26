@@ -230,3 +230,7 @@ F tokenize(source, [(Int, Int)]? &comments = N)
 [(Int, Int)] comments
 tokenize(‘’, comments)
              ^Error: argument `comments` of function `tokenize` is in-out, but there is no `&` prefix
+
+
+V direc = Vector()
+          ^Error: identifier `Vector` is not found

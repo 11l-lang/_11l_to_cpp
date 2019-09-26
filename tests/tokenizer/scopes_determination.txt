@@ -359,12 +359,12 @@ SSSSSSj = 8\
 
 if a:
 	if b:
-		\(.) i = 0
-      \(.) j = 8
+		\(...) i = 0
+      \(...) j = 8
       ^Error: inconsistent indentations:\
 ```\
-TABTAB\(.) i = 0\
-SSSSSS\(.) j = 8\
+TABTAB\(...) i = 0\
+SSSSSS\(...) j = 8\
 ```
 
 

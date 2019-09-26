@@ -286,6 +286,7 @@ public:
 	Array<String> split(const String &delim, Nullable<int> limit = nullptr, bool group_delimiters = false) const;
 	template <typename ... Types> Array<String> split(const Tuple<Types...> &delim_tuple, Nullable<int> limit = nullptr, bool group_delimiters = false) const;
 	Array<String> split(const re::RegEx &regex) const;
+	Array<String> split_py() const;
 
 	bool is_digit() const
 	{
@@ -587,7 +588,7 @@ public:
 				int before_period = 0,
 				     after_period = 0;
 				bool left_align = false,
-				     has_period = false;
+				     there_are_digits_after_period = false;
 				i++;
 				if (s[i] == '<') {
 					left_align = true;
@@ -600,7 +601,7 @@ public:
 						for (; Char(s[i]).is_digit(); i++)
 							before_period = before_period*10 + (s[i] - '0');
 					if (s[i] == '.' && Char(s[i+1]).is_digit()) { // the second condition is needed for a such case: `x, y: #6, #6.`
-						has_period = true;
+						there_are_digits_after_period = true;
 						for (i++; Char(s[i]).is_digit(); i++)
 							after_period = after_period*10 + (s[i] - '0');
 					}
@@ -608,7 +609,7 @@ public:
 
 				FormatArgument fa = format_arguments[argument_index++];
 				if (fa.type == FormatArgument::Type::STRING) {
-					if (has_period)
+					if (there_are_digits_after_period)
 						throw AssertionError();
 					if (left_align)
 						r += *fa.string;
@@ -617,11 +618,11 @@ public:
 						r += *fa.string;
 				}
 				else {
-					if (before_period == 0 && after_period == 0) // #.
+					if (before_period == 0 && after_period == 0 && !there_are_digits_after_period) // #.
 						r += fa.type == FormatArgument::Type::INTEGER ? String(fa.i) : String(fa.f);
 					else {
 						String s; // (
-						if (!has_period) // && fract(fa.number) != 0)
+						if (!there_are_digits_after_period) // && fract(fa.number) != 0)
 							fa.type == FormatArgument::Type::INTEGER ? s.assign(fa.i) : s.assign(fa.f);
 						else if (fa.type == FormatArgument::Type::INTEGER) {
 							if (after_period != 0)

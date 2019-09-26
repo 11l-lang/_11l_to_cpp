@@ -255,6 +255,8 @@ class SymbolNode:
                 return 'Lindex'
 
             if self.token_str() == '(.)':
+                # if self.parent is not None and self.parent.symbol.id == '=' and self is self.parent.children[1]: # `... = (.)` -> `... = this;`
+                #     return 'this'
                 return '*this'
 
             tid = self.scope.find(self.token_str())
@@ -361,6 +363,14 @@ class SymbolNode:
                                     raise Error('probably `@` is missing (before this dot)', self.children[0].token)
                                 if type(s.node.parent) == ASTTypeDefinition:
                                     fid = s.parent.ids.get(self.children[0].children[0].to_str())
+                                    if fid is None:
+                                        for base_type_name in s.node.parent.base_types:
+                                            tid = s.node.parent.scope.parent.find(base_type_name)
+                                            if tid is not None:
+                                                assert(isinstance(tid.ast_nodes[0], ASTTypeDefinition))
+                                                fid = tid.ast_nodes[0].scope.ids.get(self.children[0].children[0].to_str())
+                                                if fid is not None:
+                                                    break
                                     if fid is None:
                                         raise Error('call of undefined method `' + func_name + '`', self.children[0].children[0].token)
                                     if len(fid.ast_nodes) > 1:
@@ -482,7 +492,7 @@ class SymbolNode:
                         last_function_arg += 1
                     else:
                         if f_node is None or type(f_node) != ASTFunctionDefinition:
-                            raise Error('function `' + func_name + '` is not found', self.children[0].left_to_right_token())
+                            raise Error('function `' + func_name + '` is not found (you can remove named arguments in function call to suppress this error)', self.children[0].left_to_right_token())
                         argument_name = self.children[i].to_str()[:-1]
                         while True:
                             if last_function_arg == len(f_node.function_arguments):
@@ -742,6 +752,9 @@ class SymbolNode:
             elif self.symbol.id in ('==', '!=', '=') and self.children[1].token.category == Token.Category.NAME and self.children[1].token_str().isupper(): # `token.category == NAME` -> `token.category == decltype(token.category)::NAME` and `category = NAME` -> `category = decltype(category)::NAME`
                 return self.children[0].to_str() + ' ' + self.symbol.id + ' decltype(' + self.children[0].to_str() + ')::' + self.children[1].token_str()
             elif self.symbol.id in ('==', '!=') and self.children[0].symbol.id == '&' and len(self.children[0].children) == 1 and self.children[1].symbol.id == '&' and len(self.children[1].children) == 1: # `&a == &b` -> `&a == &b`
+                id_, s = self.scope.find_and_return_scope(self.children[0].children[0].token_str())
+                if id_ is not None and len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTLoop and id_.ast_nodes[0].is_loop_variable_a_ptr and self.children[0].children[0].token_str() == id_.ast_nodes[0].loop_variable: # `L(obj)...&obj != &objChoque` -> `...&*obj != objChoque`
+                    return '&*' + self.children[0].children[0].token_str() + ' ' + self.symbol.id + ' ' + self.children[1].children[0].token_str()
                 return '&' + self.children[0].children[0].token_str() + ' ' + self.symbol.id + ' &' + self.children[1].children[0].token_str()
             elif self.symbol.id == '=' and self.children[0].symbol.id == '[': # ] # replace `a[k] = v` with `a.set(k, v)`
                 if self.children[0].children[1].token.category == Token.Category.NUMERIC_LITERAL: # replace `a[0] = v` with `_set<0>(a, v)` to support tuples
@@ -777,10 +790,11 @@ class SymbolNode:
                     else:
                         return self.children[0].to_str() + ' / ' + self.children[1].token_str() + '.0'
 
-                if self.symbol.id == '=' and self.children[0].symbol.id == '.' and len(self.children[0].children) == 2: # `::token_node->symbol = &::symbol_table[...]`
+                if self.symbol.id == '=' and self.children[0].symbol.id == '.' and len(self.children[0].children) == 2: # `:token_node.symbol = :symbol_table[...]` -> `::token_node->symbol = &::symbol_table[...]`
                     t_node = type_of(self.children[0])
                     if t_node is not None and type(t_node) in (ASTVariableDeclaration, ASTVariableInitialization) and t_node.is_reference:
-                        return self.children[0].to_str() + ' = &' + self.children[1].to_str()
+                        c1s = self.children[1].to_str()
+                        return self.children[0].to_str() + ' = ' + '&'*(c1s != 'nullptr') + c1s
 
                 return self.children[0].to_str() + ' ' + {'&':'&&', '|':'||', '[&]':'&', '[&]=':'&=', '[|]':'|', '[|]=':'|=', '(concat)':'+', '[+]':'+', '‘’=':'+=', '(+)':'^', '(+)=':'^='}.get(self.symbol.id, self.symbol.id) + ' ' + self.children[1].to_str()
         elif len(self.children) == 3:
@@ -905,7 +919,7 @@ cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'п
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
                      'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set'}
 
-def trans_type(ty, scope, type_token, ast_type_node = None):
+def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False):
     if ty[-1] == '?':
         ty = ty[:-1]
     t = cpp_type_from_11l.get(ty)
@@ -936,12 +950,10 @@ def trans_type(ty, scope, type_token, ast_type_node = None):
             return ty
         if type(id.ast_nodes[0]) != ASTTypeDefinition:
             raise Error('`' + ty + '`: expected a type name', type_token)
-        if id.ast_nodes[0].has_virtual_functions:
-            return 'std::unique_ptr<' + ty + '>'
-        elif id.ast_nodes[0].has_pointers_to_the_same_type:
+        if id.ast_nodes[0].has_virtual_functions or id.ast_nodes[0].has_pointers_to_the_same_type:
             if ast_type_node is not None and tokens[id.ast_nodes[0].tokeni].start > type_token.start: # if type `ty` was declared after this variable, insert a forward declaration of type `ty`
                 ast_type_node.forward_declared_types.add(ty)
-            return 'SharedPtr<' + ty + '>'
+            return ty if is_reference else 'std::unique_ptr<' + ty + '>' if id.ast_nodes[0].has_virtual_functions else 'SharedPtr<' + ty + '>'
         return ty
 
 class ASTVariableDeclaration(ASTNode):
@@ -958,13 +970,13 @@ class ASTVariableDeclaration(ASTNode):
     def __init__(self):
         self.scope = scope
 
-    def trans_type(self, ty):
-        return trans_type(ty, self.scope, self.type_token, self.parent if type(self.parent) == ASTTypeDefinition else None)
+    def trans_type(self, ty, is_reference = False):
+        return trans_type(ty, self.scope, self.type_token, self.parent if type(self.parent) == ASTTypeDefinition else None, is_reference)
 
     def to_str(self, indent):
         if self.function_pointer:
             return ' ' * (indent*4) + 'std::function<' + self.trans_type(self.type) + '(' + ', '.join('const ' + self.trans_type(ty) + ('&'*(ty not in ('Int',))) for ty in self.type_args) + ')> ' + ', '.join(self.vars) + ";\n"
-        return ' ' * (indent*4) + self.trans_type(self.type) + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + '*'*self.is_reference + ', '.join(self.vars) + ";\n"
+        return ' ' * (indent*4) + self.trans_type(self.type, self.is_reference) + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + '*'*self.is_reference + ', '.join(self.vars) + ";\n"
 
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
     def to_str(self, indent):
@@ -1038,7 +1050,8 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
             elif self.function_name == 'String':
                 s = 'operator String'
             else:
-                s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + {'()':'operator()', '[&]':'operator&', '<':'operator<'}.get(self.function_name, self.function_name)
+                s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + \
+                    {'()':'operator()', '[&]':'operator&', '<':'operator<', '+':'operator+', '-':'operator-', '*':'operator*'}.get(self.function_name, self.function_name)
 
             if self.virtual_category != self.VirtualCategory.NO:
                 arguments = []
@@ -1046,8 +1059,10 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                     if arg[2] == '': # if there is no type specified
                         raise Error('type should be specified for argument `' + arg[0] + '` [for virtual functions all arguments should have types]', tokens[self.tokeni])
                     else:
-                        arguments.append(arg[2].rstrip('?') + '* '
-                            + ('' if '=' in arg[3] else 'const ')
+                        arguments.append(
+                              ('' if '=' in arg[3] or '&' in arg[3] else 'const ')
+                            + arg[2].rstrip('?') + '* '*0 + ' '
+                            + ('&' if '&' in arg[3] or '=' not in arg[3] else '')
                             + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
                 s = 'virtual ' + s + '(' + ', '.join(arguments) + ')' + ('', ' override', ' = 0', ' override', ' final')[self.virtual_category - 1]
                 return ' ' * (indent*4) + s + ";\n" if self.virtual_category == self.VirtualCategory.ABSTRACT else self.children_to_str(indent, s)
@@ -1108,7 +1123,16 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                     arguments.append(
                         (('' if arg[3] == '=' else 'const ') + cpp_type_from_11l.get(arg[2], arg[2]) + ' ' + '&'*(arg[2] == 'String') if arg[3] != '&' else trans_type(arg[2], self.scope, tokens[self.tokeni]) + ' &')
                         + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
-        return self.children_to_str(indent, ('template <' + ', '.join(templates) + '> ')*(len(templates) != 0) + s + '(' + ', '.join(arguments) + ')' + ' const'*(self.is_const or self.function_name in tokenizer.sorted_operators))
+        r = self.children_to_str(indent, ('template <' + ', '.join(templates) + '> ')*(len(templates) != 0) + s + '(' + ', '.join(arguments) + ')' + ' const'*(self.is_const or self.function_name in tokenizer.sorted_operators))
+
+        if isinstance(self.parent, ASTTypeDefinition) and self.function_name in ('+', '-', '*', '/') and self.function_name + '=' not in self.parent.scope.ids:
+            r += ' ' * (indent*4) + 'template <typename Ty> auto &operator' + self.function_name + "=(const Ty &t)\n"
+            r += ' ' * (indent*4) + "{\n"
+            r += ' ' * ((indent+1)*4) + '*this = *this ' + self.function_name + " t;\n"
+            r += ' ' * ((indent+1)*4) + "return *this;\n"
+            r += ' ' * (indent*4) + "}\n"
+
+        return r
 
 class ASTIf(ASTNodeWithChildren, ASTNodeWithExpression):
     else_or_elif : ASTNode = None
@@ -1528,7 +1552,10 @@ def type_of(sn):
                 tid = s.find(tid.type)
                 assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
                 tid = tid.ast_nodes[0].scope.ids.get(sn.children[1].token_str())
-                assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition))
+                if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition, ASTExpression)): # `ASTExpression` is needed to fix an error ‘identifier `disInter` is not found in `r`’ in '9.yopyra.py' (when there is no `disInter : float`)
+                    raise Error('identifier `' + sn.children[1].token_str() + '` is not found in `' + sn.children[0].token_str() + '`', sn.children[1].token)
+                if isinstance(tid.ast_nodes[0], ASTExpression):
+                    return None
                 return tid.ast_nodes[0]
             return None
         left = tid.ast_nodes[0]
@@ -1544,8 +1571,10 @@ def type_of(sn):
             tid = sn.scope.find(left.expression.children[0].token_str())
             assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
             tid = tid.ast_nodes[0].scope.ids.get(sn.children[1].token_str())
-            if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition)):
-                raise Error('method `' + sn.children[1].token_str() + '` is not found in type `' + left.expression.children[0].token_str() + '`', sn.left_to_right_token()) # error message example: method `remove` is not found in type `Array`
+            if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition, ASTExpression)): # `ASTExpression` is needed to fix an error ‘identifier `Vhor` is not found in type `Scene`’ in '9.yopyra.py' (when `Vhor = .look.pVectorial(.upCamara)`, i.e. when there is no `Vhor : Vector`)
+                raise Error('identifier `' + sn.children[1].token_str() + '` is not found in type `' + left.expression.children[0].token_str() + '`', sn.left_to_right_token()) # error message example: method `remove` is not found in type `Array`
+            if isinstance(tid.ast_nodes[0], ASTExpression):
+                return None
             return tid.ast_nodes[0]
         return None
     if len(left.type_args): # `Array[String] ending_tags... ending_tags.append(‘</blockquote>’)`
@@ -1963,7 +1992,7 @@ def parse_internal(this_node):
         if token.value(source) == '(':
             ti = 1
             while peek_token(ti).value(source) != ')':
-                if peek_token(ti).value(source) == '[': # ]
+                if peek_token(ti).value(source) in ('[', '.'): # ] # `(u[i], u[j]) = (u[j], u[i])`, `(.x, .y, .z) = (vx, vy, vz)`
                     return False
                 ti += 1
             return peek_token(ti + 1).value(source) == '='
@@ -2307,10 +2336,16 @@ def parse_internal(this_node):
                             advance(')')
                         node.set_expression(expression())
 
-                        if node.loop_variable is not None and node.expression.token.category == Token.Category.NAME: # check if loop variable is a [smart] pointer
-                            id = scope.find(node.expression.token.value(source))
-                            if id is not None and len(id.ast_nodes) == 1 and type(id.ast_nodes[0]) == ASTVariableDeclaration and id.ast_nodes[0].type == 'Array':
-                                tid = scope.find(id.ast_nodes[0].type_args[0])
+                        if node.loop_variable is not None: # check if loop variable is a [smart] pointer
+                            lv_node = None
+                            if node.expression.token.category == Token.Category.NAME:
+                                id = scope.find(node.expression.token.value(source))
+                                if id is not None and len(id.ast_nodes) == 1:
+                                    lv_node = id.ast_nodes[0]
+                            elif node.expression.symbol.id == '.':
+                                lv_node = type_of(node.expression)
+                            if lv_node is not None and isinstance(lv_node, ASTVariableDeclaration) and lv_node.type == 'Array':
+                                tid = scope.find(lv_node.type_args[0])
                                 if tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_virtual_functions:
                                     node.is_loop_variable_a_ptr = True
                         scope.add_name(node.loop_variable, node)
@@ -2439,7 +2474,8 @@ def parse_internal(this_node):
             next_token()
 
             while True:
-                assert(token.category == Token.Category.NAME)
+                if token.category != Token.Category.NAME:
+                    raise Error('expected variable name', token)
 
                 add_var = False
                 if token.value(source) in ('V', 'П', 'var', 'перем'):
@@ -2485,7 +2521,8 @@ def parse_internal(this_node):
                         node.set_expression(expression())
                         if node.expression.symbol.id == '(' and node.expression.children[0].token.category == Token.Category.NAME and node.expression.children[0].token_str()[0].isupper(): # ) # for `V animal = Sheep(); animal.say()` -> `...; animal->say();`
                             id = scope.find(node.expression.children[0].token_str())
-                            assert(id is not None and len(id.ast_nodes) and type(id.ast_nodes[0]) == ASTTypeDefinition)
+                            if not (id is not None and len(id.ast_nodes) and type(id.ast_nodes[0]) == ASTTypeDefinition):
+                                raise Error('identifier `' + node.expression.children[0].token_str() + '` is not found', node.expression.children[0].token)
                             if id.ast_nodes[0].has_virtual_functions:
                                 node.is_ptr = True
                             elif id.ast_nodes[0].has_pointers_to_the_same_type:
@@ -2545,6 +2582,9 @@ def parse_internal(this_node):
                 else:
                     node = ASTExpression()
                     node.set_expression(node_expression)
+                    if isinstance(this_node, ASTTypeDefinition) and node_expression.symbol.id == '=': # fix error ‘identifier `disInter` is not found in `r`’ in '9.yopyra.py'
+                        scope.add_name(node_expression.children[0].token_str(), node)
+
                 if not (token is None or token.category in (Token.Category.STATEMENT_SEPARATOR, Token.Category.SCOPE_END) or tokens[tokeni-1].category == Token.Category.SCOPE_END):
                     raise Error('expected end of statement', token)
                 if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
@@ -2650,6 +2690,7 @@ string_scope = Scope(None)
 string_scope.add_name('starts_with', ASTFunctionDefinition([('prefix', '', 'String')]))
 string_scope.add_name('ends_with', ASTFunctionDefinition([('suffix', '', 'String')]))
 string_scope.add_name('split', ASTFunctionDefinition([('delim', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?'), ('group_delimiters', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
+string_scope.add_name('split_py', ASTFunctionDefinition([]))
 string_scope.add_name('rtrim', ASTFunctionDefinition([('s', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
 string_scope.add_name('ltrim', ASTFunctionDefinition([('s', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
 string_scope.add_name('trim', ASTFunctionDefinition([('s', '', 'String')]))

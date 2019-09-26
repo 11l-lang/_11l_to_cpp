@@ -1830,3 +1830,266 @@ struct CodeBlock1
             print(String(x) + u", "_S + String(y) + u", "_S + String(z));
     }
 } code_block_1;
+
+
+class Rayo: # &
+    pass
+class Vector:
+    pass
+class Base:
+    def intersecta(self, r : Rayo, v : Vector) -> None:
+        raise NotImplementedError()
+class Derived(Base):
+    def intersecta(self, r : Rayo, v : Vector):
+        pass
+===
+T Rayo
+{
+}
+T Vector
+{
+}
+T Base
+   F.virtual.abstract intersecta(Rayo& r, Vector v) -> N
+T Derived(Base)
+   F.virtual.assign intersecta(Rayo& r, Vector v) -> N
+   {
+   }
+===
+class Rayo
+{
+};
+
+class Vector
+{
+};
+
+class Base
+{
+public:
+    virtual void intersecta(Rayo &r, const Vector &v) = 0;
+};
+class Derived : public Base
+{
+public:
+    virtual void intersecta(Rayo &r, const Vector &v) override
+    {
+    }
+};
+
+
+from typing import Optional
+
+class Rayo: # &
+    objInter : Optional['Cuerpo'] # &
+
+    def __init__(self):
+        self.objInter = None
+
+class Cuerpo:
+    tipo : str
+    material : int
+
+    def init(self, tipo, material):
+        self.tipo = tipo
+        self.material = material
+
+    def intersecta(self, r : Rayo) -> None:
+        raise NotImplementedError()
+
+class Esfera(Cuerpo):
+    def __init__(self, material):
+        self.init('esfera', material)
+
+    def intersecta(self, r : Rayo):
+        r.objInter = self
+
+class Plano(Cuerpo):
+    def __init__(self, material):
+        self.init('plano', material)
+
+    def intersecta(self, r : Rayo):
+        r.objInter = self
+
+class Scene:
+    def __init__(self):
+        self.lObjetos : List[Cuerpo] = []
+        sph = Esfera(1)
+        self.lObjetos.append(sph)
+        pl = Plano(2)
+        self.lObjetos.append(pl)
+
+scene = Scene()
+
+def calculaSombra(r : Rayo, objChoque):
+    for obj in scene.lObjetos:
+        r.objInter = None
+        obj.intersecta(r)
+        print(obj is not objChoque)
+
+def trazar(r : Rayo):
+    for obj in scene.lObjetos:    # Probamos con todos los objetos
+        obj.intersecta(r)
+
+    if r.objInter is not None:
+        matIndex = r.objInter.material
+        rayoLuz = Rayo()
+        calculaSombra(rayoLuz, r.objInter)
+
+r = Rayo()
+trazar(r)
+===
+
+T Rayo
+   Cuerpo& objInter
+
+   F ()
+      .objInter = N
+
+T Cuerpo
+   String tipo
+   Int material
+
+   F init(tipo, material)
+      .tipo = tipo
+      .material = material
+   F.virtual.abstract intersecta(Rayo& r) -> N
+
+T Esfera(Cuerpo)
+   F (material)
+      .init(‘esfera’, material)
+
+   F.virtual.assign intersecta(Rayo& r) -> N
+      r.objInter = (.)
+
+T Plano(Cuerpo)
+   F (material)
+      .init(‘plano’, material)
+
+   F.virtual.assign intersecta(Rayo& r) -> N
+      r.objInter = (.)
+
+T Scene
+   [Cuerpo] lObjetos
+   F ()
+      V sph = Esfera(1)
+      .lObjetos.append(sph)
+      V pl = Plano(2)
+      .lObjetos.append(pl)
+V scene = Scene()
+
+F calculaSombra(Rayo& r; objChoque)
+   L(obj) :scene.lObjetos
+      r.objInter = N
+      obj.intersecta(r)
+      print(&obj != &objChoque)
+
+F trazar(Rayo& r)
+   L(obj) :scene.lObjetos
+      obj.intersecta(r)
+
+   I r.objInter != N
+      V matIndex = r.objInter.material
+      V rayoLuz = Rayo()
+      calculaSombra(&rayoLuz, r.objInter)
+V r = Rayo()
+trazar(&r)
+===
+class Cuerpo;
+
+class Rayo
+{
+public:
+    Cuerpo *objInter;
+
+    Rayo()
+    {
+        objInter = nullptr;
+    }
+};
+
+class Cuerpo
+{
+public:
+    String tipo;
+    int material;
+
+    template <typename T1, typename T2> auto init(const T1 &tipo, const T2 &material)
+    {
+        this->tipo = tipo;
+        this->material = material;
+    }
+    virtual void intersecta(Rayo &r) = 0;
+};
+
+class Esfera : public Cuerpo
+{
+public:
+    template <typename T1> Esfera(const T1 &material)
+    {
+        init(u"esfera"_S, material);
+    }
+
+    virtual void intersecta(Rayo &r) override
+    {
+        r.objInter = &*this;
+    }
+};
+
+class Plano : public Cuerpo
+{
+public:
+    template <typename T1> Plano(const T1 &material)
+    {
+        init(u"plano"_S, material);
+    }
+
+    virtual void intersecta(Rayo &r) override
+    {
+        r.objInter = &*this;
+    }
+};
+
+class Scene
+{
+public:
+    Array<std::unique_ptr<Cuerpo>> lObjetos;
+    Scene()
+    {
+        auto sph = std::make_unique<Esfera>(1);
+        lObjetos.append(std::move(sph));
+        auto pl = std::make_unique<Plano>(2);
+        lObjetos.append(std::move(pl));
+    }
+};
+auto scene = Scene();
+
+template <typename T2> auto calculaSombra(Rayo &r, const T2 &objChoque)
+{
+    for (auto &&obj : ::scene.lObjetos) {
+        r.objInter = nullptr;
+        obj->intersecta(r);
+        print(&*obj != objChoque);
+    }
+}
+
+auto trazar(Rayo &r)
+{
+    for (auto &&obj : ::scene.lObjetos)
+        obj->intersecta(r);
+
+    if (r.objInter != nullptr) {
+        auto matIndex = r.objInter->material;
+        auto rayoLuz = Rayo();
+        calculaSombra(rayoLuz, r.objInter);
+    }
+}
+auto r = Rayo();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        trazar(r);
+    }
+} code_block_1;

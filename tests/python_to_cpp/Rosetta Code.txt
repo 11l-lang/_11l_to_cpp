@@ -613,13 +613,13 @@ struct CodeBlock1
 # https://www.rosettacode.org/wiki/A%2BB#Python
 print(sum(map(lambda i: int(i), input().split())))
 ===
-print(sum(input().split((‘ ’, "\t", "\r", "\n"), group_delimiters' 1B).map(i -> Int(i))))
+print(sum(input().split_py().map(i -> Int(i))))
 ===
 struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(sum_map(input().split(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S), nullptr, true), [](const auto &i){return to_int(i);}));
+        print(sum_map(input().split_py(), [](const auto &i){return to_int(i);}));
     }
 } code_block_1;
 
@@ -2362,7 +2362,7 @@ struct CodeBlock1
 
 
 # https://www.rosettacode.org/wiki/Box_the_compass#Python
-majors   = 'north east south west'.split()
+majors   = 'north east south west'.split(' ')
 majors   *= 2 # no need for modulo later
 quarter1 = 'N,N by E,N-NE,NE by N,NE,NE by E,E-NE,E by N'.split(',')
 quarter2 = [p.replace('NE','EN') for p in quarter1]
@@ -2389,7 +2389,7 @@ if __name__ == '__main__':
         n = i % 32 + 1
         print( '%2i %-18s %7.2f°' % (n, degrees2compasspoint(d), d) )
 ===
-V majors = ‘north east south west’.split((‘ ’, "\t", "\r", "\n"), group_delimiters' 1B)
+V majors = ‘north east south west’.split(‘ ’)
 majors *= 2
 V quarter1 = ‘N,N by E,N-NE,NE by N,NE,NE by E,E-NE,E by N’.split(‘,’)
 V quarter2 = quarter1.map(p -> p.replace(‘NE’, ‘EN’))
@@ -2418,7 +2418,7 @@ L(i) 0.<33
    V n = i % 32 + 1
    print(‘#2.0 #<18 #4.2°’.format(n, degrees2compasspoint(d), d))
 ===
-auto majors = u"north east south west"_S.split(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S), nullptr, true);
+auto majors = u"north east south west"_S.split(u" "_S);
 
 struct CodeBlock1
 {
