@@ -85,9 +85,9 @@ class Color:
 #     def __imul__(self, other):
 #         return Color(self.r*other, self.y*other, self.z*other)
     def __str__(self):
-        return "%d %d %d" % (max(0.0, min(self.r*255.0, 255.0)),
-                             max(0.0, min(self.g*255.0, 255.0)),
-                             max(0.0, min(self.b*255.0, 255.0)))
+        return "%d %d %d" % (int(max(0.0, min(self.r*255.0, 255.0))),
+                             int(max(0.0, min(self.g*255.0, 255.0))),
+                             int(max(0.0, min(self.b*255.0, 255.0))))
 #     def __repr__(self):
 #         return "<C: %.2f %.2f %.2f>" % (self.r, self.g, self.b) # for debugging
 
@@ -425,7 +425,7 @@ def renderPixel(x, y):
 if __name__ == '__main__':
     print("Rendering: " + scene_namefile)
 
-    fileout = open(scene_namefile+".ppm", "w")
+    fileout = open(scene_namefile+".ppm", "w", newline = "\n")
     fileout.write("P3\n")
     fileout.write(str(scene.imgAncho) + ' ' + str(scene.endline - scene.startline + 1) + "\n")
     fileout.write("255\n")

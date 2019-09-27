@@ -106,7 +106,7 @@ public:
 
     operator String()
     {
-        return u"#.0 #.0 #.0"_S.format(max(0.0, min(r * 255.0, 255.0)), max(0.0, min(g * 255.0, 255.0)), max(0.0, min(b * 255.0, 255.0)));
+        return u"#.0 #.0 #.0"_S.format(to_int(max(0.0, min(r * 255.0, 255.0))), to_int(max(0.0, min(g * 255.0, 255.0))), to_int(max(0.0, min(b * 255.0, 255.0))));
     }
 };
 

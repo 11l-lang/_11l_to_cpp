@@ -52,7 +52,7 @@ T Color
       R Color(.r * other, .g * other, .b * other)
 
    F String()
-      R ‘#.0 #.0 #.0’.format(max(0.0, min(.r * 255.0, 255.0)), max(0.0, min(.g * 255.0, 255.0)), max(0.0, min(.b * 255.0, 255.0)))
+      R ‘#.0 #.0 #.0’.format(Int(max(0.0, min(.r * 255.0, 255.0))), Int(max(0.0, min(.g * 255.0, 255.0))), Int(max(0.0, min(.b * 255.0, 255.0))))
 
 T Luz
    Vector posicion
