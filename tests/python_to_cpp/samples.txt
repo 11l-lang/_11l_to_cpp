@@ -1746,6 +1746,9 @@ print(set([1, 2, 3]).difference(set([2, 4]))); print({1, 2, 3}.difference({2, 4}
 print(set([2, 4]).difference(set([1, 2, 3]))); print({2, 4}.difference({1, 2, 3}))
 print({1})
 print({1,})
+Byte = int
+print([Byte(1), 2])
+print({Byte(1), 2})
 ===
 print(Set([1, 2, 3]).difference(Set([2, 4])))
 print(Set([1, 2, 3]).difference(Set([2, 4])))
@@ -1753,6 +1756,8 @@ print(Set([2, 4]).difference(Set([1, 2, 3])))
 print(Set([2, 4]).difference(Set([1, 2, 3])))
 print(Set([1]))
 print(Set([1]))
+print([Byte(1), 2])
+print(Set([Byte(1), 2]))
 ===
 struct CodeBlock1
 {
@@ -1764,6 +1769,8 @@ struct CodeBlock1
         print(create_set({2, 4}).difference(create_set({1, 2, 3})));
         print(create_set({1}));
         print(create_set({1}));
+        print(create_array<Byte>({Byte(1), 2}));
+        print(create_set<Byte>({Byte(1), 2}));
     }
 } code_block_1;
 

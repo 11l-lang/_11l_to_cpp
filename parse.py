@@ -413,8 +413,9 @@ class SymbolNode:
                     func_name = 'DefaultDict<' + ', '.join(trans_type(c.to_type_str(), c.scope, c.token) for c in self.children[0].children[1:]) + '>'
                 elif func_name == 'Set':
                     if self.children[2].is_list:
-                        res = 'create_set({'
                         c = self.children[2].children
+                        res = 'create_set' + ('<' + trans_type(c[0].children[0].token_str(), self.scope, c[0].children[0].token)
+                                            + '>' if len(c) > 1 and c[0].function_call and c[0].children[0].token_str()[0].isupper() else '') + '({'
                         for i in range(len(c)):
                             res += c[i].to_str()
                             if i < len(c)-1:
