@@ -1,0 +1,211 @@
+//import os
+V BETA0 = 1
+V BETA1 = 1
+V M = 30
+V ONE = (1 << M)
+V HALF = (1 << (M - 1))
+V QUARTER = (1 << (M - 2))
+V THREEQU = HALF + QUARTER
+F clear(c, [Int] &charstack)
+   V a = String(c) + String(1 - c) * charstack[0]
+   charstack[0] = 0
+   R a
+
+F encode(string, =c0 = BETA0, =c1 = BETA1, adaptive = 1, verbose = 0)
+   V b = :ONE
+   V a = 0
+   V tot0 = 0
+   V tot1 = 0
+   assert(c0 > 0)
+   assert(c1 > 0)
+   Float p0
+   I adaptive == 0
+      p0 = c0 * 1.0 / (c0 + c1)
+   V ans = ‘’
+   V charstack = [0]
+   L(c) string
+      V w = b - a
+      I adaptive
+         V cT = c0 + c1
+         p0 = c0 * 1.0 / cT
+      V boundary = a + Int(p0 * w)
+      I (boundary == a)
+         boundary++
+         print(‘warningA’)
+      I (boundary == b)
+         boundary--
+         print(‘warningB’)
+
+      I (c == ‘1’)
+         a = boundary
+         tot1++
+         I adaptive
+            c1++
+      E I (c == ‘0’)
+         b = boundary
+         tot0++
+         I adaptive
+            c0++
+
+      L ((a >= :HALF) | (b <= :HALF))
+         I (a >= :HALF)
+            ans = ans‘’clear(1, &charstack)
+            a = a - :HALF
+            b = b - :HALF
+         E
+            ans = ans‘’clear(0, &charstack)
+         a *= 2
+         b *= 2
+      assert(a <= :HALF)
+      assert(b >= :HALF)
+      assert(a >= 0)
+      assert(b <= :ONE)
+
+      L ((a > :QUARTER) & (b < :THREEQU))
+         charstack[0]++
+         a = 2 * a - :HALF
+         b = 2 * b - :HALF
+      assert(a <= :HALF)
+      assert(b >= :HALF)
+      assert(a >= 0)
+      assert(b <= :ONE)
+
+   I ((:HALF - a) > (b - :HALF))
+      V w = (:HALF - a)
+      ans = ans‘’clear(0, &charstack)
+      L (w < :HALF)
+         ans = ans‘’clear(1, &charstack)
+         w *= 2
+   E
+      V w = (b - :HALF)
+      ans = ans‘’clear(1, &charstack)
+      L (w < :HALF)
+         ans = ans‘’clear(0, &charstack)
+         w *= 2
+   R ans
+
+F decode(string, =n = 10000, =c0 = BETA0, =c1 = BETA1, adaptive = 1, verbose = 0)
+   V b = :ONE
+   V a = 0
+   V tot0 = 0
+   V tot1 = 0
+   assert(c0 > 0)
+   assert(c1 > 0)
+   V model_needs_updating = 1
+   Float p0
+   I adaptive == 0
+      p0 = c0 * 1.0 / (c0 + c1)
+   V ans = ‘’
+   V u = 0.0
+   V v = Float(ONE)
+   Int boundary
+   L(c) string
+      I n <= 0
+         L.break
+      assert(n > 0)
+      assert(u >= 0)
+      assert(v <= :ONE)
+      V halfway = u + (v - u) / 2
+      I (c == ‘1’)
+         u = halfway
+      E I (c == ‘0’)
+         v = halfway
+
+      L (1)
+         V firsttime = 0
+         I (model_needs_updating)
+            V w = b - a
+            I adaptive
+               V cT = c0 + c1
+               p0 = c0 * 1.0 / cT
+            boundary = a + Int(p0 * w)
+            I (boundary == a)
+               boundary++
+               print(‘warningA’)
+            I (boundary == b)
+               boundary--
+               print(‘warningB’)
+            model_needs_updating = 0
+         I (boundary <= u)
+            ans = ans‘1’
+            tot1++
+            I adaptive
+               c1++
+            a = boundary
+            model_needs_updating = 1
+            n--
+         E I (boundary >= v)
+            ans = ans‘0’
+            tot0++
+            I adaptive
+               c0++
+            b = boundary
+            model_needs_updating = 1
+            n--
+
+         L ((a >= :HALF) | (b <= :HALF))
+            I (a >= :HALF)
+               a = a - :HALF
+               b = b - :HALF
+               u = u - :HALF
+               v = v - :HALF
+            a *= 2
+            b *= 2
+            u *= 2
+            v *= 2
+            model_needs_updating = 1
+         assert(a <= :HALF)
+         assert(b >= :HALF)
+         assert(a >= 0)
+         assert(b <= :ONE)
+
+         L ((a > :QUARTER) & (b < :THREEQU))
+            a = 2 * a - :HALF
+            b = 2 * b - :HALF
+            u = 2 * u - :HALF
+            v = 2 * v - :HALF
+         I !(n > 0 & model_needs_updating)
+            L.break
+   R ans
+
+F hardertest()
+   print(‘Reading the BentCoinFile’)
+   V inputfile = File(‘testdata/BentCoinFile’, ‘r’)
+   V outputfile = File(‘tmp.zip’, ‘w’)
+   print(‘Compressing to tmp.zip’)
+   V s = inputfile.read()
+   V n = s.len
+   V zip = encode(s, 10, 1)
+   outputfile.write(zip)
+   outputfile.close()
+   inputfile.close()
+   print(‘DONE compressing’)
+   inputfile = File(‘tmp.zip’, ‘r’)
+   outputfile = File(‘tmp2’, ‘w’)
+   print(‘Uncompressing to tmp2’)
+   V unc = decode(Array(inputfile.read()), n, 10, 1)
+   outputfile.write(unc)
+   outputfile.close()
+   inputfile.close()
+   print(‘DONE uncompressing’)
+   print(‘Checking for differences...’)
+   print(s == unc)
+
+F test()
+   V sl = [‘1010’, ‘111’, ‘00001000000000000000’, ‘1’, ‘10’, ‘01’, ‘0’, ‘0000000’, ‘000000000000000100000000000000000000000000000000100000000000000000011000000’]
+   L(s) sl
+      print(‘encoding ’s)
+      V n = s.len
+      V e = encode(s, 10, 1)
+      print(‘decoding ’e)
+      V ds = decode(e, n, 10, 1)
+      print(ds)
+      I (ds != s)
+         print(s)
+         print(‘ERR@’)
+      E
+         print(‘ok ---------- ’)
+
+:start:
+test()
+hardertest()

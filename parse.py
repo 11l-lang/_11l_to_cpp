@@ -2683,6 +2683,7 @@ file_scope.add_name('read', ASTFunctionDefinition([('size', token_to_str('N', To
 file_scope.add_name('write', ASTFunctionDefinition([('s', '', 'String')]))
 file_scope.add_name('read_lines', ASTFunctionDefinition([('keep_newline', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
 file_scope.add_name('flush', ASTFunctionDefinition([]))
+file_scope.add_name('close', ASTFunctionDefinition([]))
 builtins_scope.ids['File'].ast_nodes[0].scope = file_scope
 
 for type_ in cpp_type_from_11l:

@@ -360,6 +360,15 @@ template <typename Type, bool include_beginning, bool include_ending> Array<Type
 	return r;
 }
 
+Array<Char> create_array(const String &s)
+{
+	Array<Char> r;
+	r.reserve(s.len());
+	for (auto c : s)
+		r.push_back(c);
+	return r;
+}
+
 template <typename Ty, typename Type> bool in(const Ty &val, const Array<Type> &arr)
 {
 	return std::find(arr.begin(), arr.end(), val) != arr.end();

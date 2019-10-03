@@ -97,6 +97,7 @@ public:
 #ifdef _WIN32
 		String r;
 		r.resize(file_size);
+		SetLastError(ERROR_SUCCESS);
 		r.resize(MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, file_str.data(), (int)file_str.size(), (LPWSTR)r.data(), (int)r.size()));
 		if (GetLastError() != ERROR_SUCCESS) {
 			assert(GetLastError() == ERROR_NO_UNICODE_TRANSLATION);
