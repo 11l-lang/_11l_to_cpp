@@ -1495,7 +1495,7 @@ class ASTMain(ASTNodeWithChildren):
         return self.children_to_str(indent, 'int MAIN_WITH_ARGV()', add_at_beginning = ' ' * ((indent+1)*4) + "INIT_ARGV();\n\n")
 
 def type_of(sn):
-    assert(sn.symbol.id == '.')
+    assert(sn.symbol.id == '.' and len(sn.children) == 2)
     if sn.children[0].symbol.id == '.':
         if len(sn.children[0].children) == 1:
             return None
@@ -1545,7 +1545,8 @@ def type_of(sn):
             return tid.ast_nodes[0]
 
         tid, s = sn.scope.find_and_return_scope(sn.children[0].token_str())
-        assert(tid is not None)
+        if tid is None:
+            raise Error('identifier is not found', sn.children[0].token)
         if len(tid.ast_nodes) != 1: # for `F f(active_window, s)... R s.find(‘.’) ? s.len`
             if tid.type != '' and s.is_function: # for `F nud(ASTNode self)... self.symbol.nud_bp`
                 if '[' in tid.type: # ] # for `F decompress(Array[Int] &compressed)`
@@ -2343,7 +2344,7 @@ def parse_internal(this_node):
                                 id = scope.find(node.expression.token.value(source))
                                 if id is not None and len(id.ast_nodes) == 1:
                                     lv_node = id.ast_nodes[0]
-                            elif node.expression.symbol.id == '.':
+                            elif node.expression.symbol.id == '.' and len(node.expression.children) == 2:
                                 lv_node = type_of(node.expression)
                             if lv_node is not None and isinstance(lv_node, ASTVariableDeclaration) and lv_node.type == 'Array':
                                 tid = scope.find(lv_node.type_args[0])
@@ -2466,6 +2467,15 @@ def parse_internal(this_node):
             next_token()
             advance('=')
             node.set_expression(expression())
+
+            if node.expression.symbol.id == '(' and node.expression.children[0].symbol.id == '.' \
+                                            and len(node.expression.children[0].children) == 2   \
+                                                and node.expression.children[0].children[1].token_str() == 'split': # ) # `V (name, ...) = ....split(...)` ~> `(V name, V ...) = ....split(...)` -> `...assign_from_tuple(name, ...);` (because `auto [name, ...] = ....split(...);` does not working)
+                n = node
+                node = ASTTupleAssignment()
+                for dv in n.dest_vars:
+                    node.dest_vars.append((dv, True))
+                node.set_expression(n.expression)
 
             if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
                 next_token()

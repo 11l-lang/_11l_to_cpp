@@ -1,0 +1,151 @@
+//import sys
+//import math
+V CYTOSOLIC = 0
+V EXTRACELLULAR = 1
+V NUCLEAR = 2
+V MITOCHONDRIAL = 3
+V BLIND = 4
+V D = 5.0
+V LENGTH = 50
+V AMINOACIDS = ‘ACDEFGHIKLMNPQRSTVWY’
+
+T Protein
+   String name
+   String mass
+   String isoelectric_point
+   String size
+   String sequence
+   Int type_id
+   Dict[Char, Float] local_composition
+   Dict[Char, Float] global_composition
+
+   F (name, mass, isoelectric_point, size, sequence, type_id)
+      .name = name
+      .mass = mass
+      .isoelectric_point = isoelectric_point
+      .size = size
+      .sequence = sequence
+      .type_id = type_id
+      .extract_composition()
+
+   F extract_composition()
+      .local_composition = Dict((:AMINOACIDS.map(x -> (x, 0.0))))
+      L(counter) 0 .< LENGTH
+         .local_composition[.sequence[counter]] += 1.0 / :LENGTH
+      .global_composition = Dict((:AMINOACIDS.map(x -> (x, 0.0))))
+      L(aminoacid) .sequence
+         .global_composition[aminoacid] += 1.0 / .sequence.len
+
+   F create_vector()
+      [Float] vector
+      V last_value = 0.0
+      L(key, value) sorted(.local_composition.items())
+         vector.append(value)
+         last_value = value
+      L(key) sorted(.global_composition.keys())
+         vector.append(last_value)
+      R vector
+[Protein] PROTEINS
+
+F load_file(filename, type_id)
+   V protfile = File(filename)
+   L(line) protfile.read_lines(1B)
+      I line.starts_with(‘name’)
+         L.continue
+      V (name, mass, isoelectric_point, size, sequence) = line.trim((‘ ’, "\t", "\r", "\n")).split("\t")
+      V protein = Protein(name, mass, isoelectric_point, size, sequence, type_id)
+      :PROTEINS.append(protein)
+   protfile.close()
+
+F create_tables()
+   ‘Create the feature and label tables.’
+   [[Float]] feature_table
+   [[Int]] label_table
+
+   L(protein) :PROTEINS
+      feature_table.append(protein.create_vector())
+
+   L(protein) :PROTEINS
+      I protein.type_id == :BLIND
+         L.continue
+      V labels = [-1] * 4
+      labels[protein.type_id] *= -1
+      label_table.append(labels)
+   R (feature_table, label_table)
+
+F create_kernel_table(feature_table)
+   [[Float]] kernel_table
+   L(row) feature_table
+      [Float] kernel_row
+      L(candidate) feature_table
+         V difference = 0.0
+         L(counter) 0 .< row.len
+            difference += (row[counter] - candidate[counter]) ^ 2
+         kernel_row.append(exp(-:D * difference))
+      kernel_table.append(kernel_row)
+   R kernel_table
+
+F train_adatron(kernel_table, label_table, h, c)
+   V tolerance = 0.5
+   V alphas = (0 .< label_table[0].len).map(_ -> ([0.0] * @kernel_table.len))
+   V betas = (0 .< label_table[0].len).map(_ -> ([0.0] * @kernel_table.len))
+   V bias = [0.0] * label_table[0].len
+   V labelalphas = [0.0] * kernel_table.len
+   V max_differences = [(0.0, 0)] * label_table[0].len
+   L(iteration) 0 .< 10 * kernel_table.len
+      print(‘Starting iteration #....’.format(iteration))
+      I iteration == 20
+         R (alphas, bias)
+      L(klass) 0 .< label_table[0].len
+         max_differences[klass] = (0.0, 0)
+         L(elem) 0 .< kernel_table.len
+            labelalphas[elem] = label_table[elem][klass] * alphas[klass][elem]
+         L(col_counter) 0 .< kernel_table.len
+            V prediction = 0.0
+            L(row_counter) 0 .< kernel_table.len
+               prediction += kernel_table[col_counter][row_counter] * labelalphas[row_counter]
+            V g = 1.0 - ((prediction + bias[klass]) * label_table[col_counter][klass])
+            betas[klass][col_counter] = min(max((alphas[klass][col_counter] + h * g), 0.0), c)
+            V difference = abs(alphas[klass][col_counter] - betas[klass][col_counter])
+            I difference > max_differences[klass][0]
+               max_differences[klass] = (difference, col_counter)
+
+         I all(max_differences.map(max_difference -> max_difference[0] < @tolerance))
+            R (alphas, bias)
+         E
+            alphas[klass][max_differences[klass][1]] = betas[klass][max_differences[klass][1]]
+            V element_sum = 0.0
+            L(element_counter) 0 .< kernel_table.len
+               element_sum += label_table[element_counter][klass] * alphas[klass][element_counter] / 4
+            bias[klass] = bias[klass] + element_sum
+
+F calculate_error(alphas, bias, kernel_table, label_table)
+   V prediction = 0.0
+   V predictions = (0 .< label_table[0].len).map(_ -> ([0.0] * @kernel_table.len))
+   L(klass) 0 .< label_table[0].len
+      L(col_counter) 0 .< kernel_table.len
+         L(row_counter) 0 .< kernel_table.len
+            prediction += kernel_table[col_counter][row_counter] * label_table[row_counter][klass] * alphas[klass][row_counter]
+         predictions[klass][col_counter] = prediction + bias[klass]
+
+   L(col_counter) 0 .< kernel_table.len
+      [Float] current_predictions
+      V error = 0
+      L(row_counter) 0 .< label_table[0].len
+         current_predictions.append(predictions[row_counter][col_counter])
+      V predicted_class = current_predictions.index(max(current_predictions))
+
+      I label_table[col_counter][predicted_class] < 0
+         error++
+      R 1.0 * error / kernel_table.len
+
+:start:
+L(filename, type_id) [(‘testdata/c.txt’, CYTOSOLIC), (‘testdata/e.txt’, EXTRACELLULAR), (‘testdata/n.txt’, NUCLEAR), (‘testdata/m.txt’, MITOCHONDRIAL)]
+   load_file(filename, type_id)
+print(‘Creating feature tables...’)
+V (feature_table, label_table) = create_tables()
+print(‘Creating kernel table...’)
+V kernel_table = create_kernel_table(feature_table)
+print(‘Training SVM...’)
+V (alphas, bias) = train_adatron(kernel_table, label_table, 1.0, 3.0)
+print(calculate_error(alphas, bias, kernel_table, label_table))

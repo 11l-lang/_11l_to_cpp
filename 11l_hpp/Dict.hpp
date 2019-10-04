@@ -70,6 +70,7 @@ public:
 	Array<KeyType> keys() const
 	{
 		Array<KeyType> r;
+		r.reserve(size());
 		for (auto &&kv : *this)
 			r.push_back(kv.first);
 		return r;
@@ -78,8 +79,18 @@ public:
 	Array<ValueType> values() const
 	{
 		Array<ValueType> r;
+		r.reserve(size());
 		for (auto &&kv : *this)
 			r.push_back(kv.second);
+		return r;
+	}
+
+	Array<Tuple<KeyType, ValueType>> items() const
+	{
+		Array<Tuple<KeyType, ValueType>> r;
+		r.reserve(size());
+		for (auto &&el : *this)
+			r.push_back(make_tuple(el.first, el.second));
 		return r;
 	}
 

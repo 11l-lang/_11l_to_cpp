@@ -4,7 +4,9 @@
 # placed in the public domain by Stavros Korokithakis
 
 import sys
-from math import exp
+import math
+from typing import List, Dict
+Char = str
 
 CYTOSOLIC = 0
 EXTRACELLULAR = 1
@@ -16,18 +18,25 @@ D = 5.0
 
 LENGTH = 50
 
-PROTEINS = []
-
 AMINOACIDS = "ACDEFGHIKLMNPQRSTVWY"
 
 class Protein:
-    def __init__(self, name, mass, isoelectric_point, size, sequence, type):
+    name : str
+    mass : str
+    isoelectric_point : str
+    size : str
+    sequence : str
+    type_id : int
+    local_composition : Dict[Char, float]
+    global_composition : Dict[Char, float]
+
+    def __init__(self, name, mass, isoelectric_point, size, sequence, type_id):
         self.name = name
         self.mass = mass
         self.isoelectric_point = isoelectric_point
         self.size = size
         self.sequence = sequence
-        self.type = type
+        self.type_id = type_id
         self.extract_composition()
 
     def extract_composition(self):
@@ -39,54 +48,58 @@ class Protein:
             self.global_composition[aminoacid] += 1.0 / len(self.sequence)
 
     def create_vector(self):
-        vector = []
+        vector : List[float] = []
+        last_value = 0.0
         for key, value in sorted(self.local_composition.items()):
             vector.append(value)
+            last_value = value
         for key in sorted(self.global_composition.keys()):
-            vector.append(value)
+            vector.append(last_value)
         return vector
 
+PROTEINS : List[Protein] = []
 
-def load_file(filename, type):
+
+def load_file(filename, type_id):
     global PROTEINS
     protfile = open(filename)
-    for line in protfile:
+    for line in protfile.readlines():
         if line.startswith("name"):
             continue
-        name, mass, isoelectric_point, size, sequence = line.strip().split("\t")
-        protein = Protein(name, mass, isoelectric_point, size, sequence, type)
+        (name, mass, isoelectric_point, size, sequence) = line.strip().split("\t")
+        protein = Protein(name, mass, isoelectric_point, size, sequence, type_id)
         PROTEINS.append(protein)
     protfile.close()
 
 
 def create_tables():
     """Create the feature and label tables."""
-    feature_table = []
-    label_table = []
+    feature_table : List[List[float]] = []
+    label_table : List[List[int]] = []
 
     for protein in PROTEINS:
         feature_table.append(protein.create_vector())
 
     for protein in PROTEINS:
-        if protein.type == BLIND:
+        if protein.type_id == BLIND:
             continue
         labels = [-1] * 4
         # Invert the sign of the label our protein belongs to.
-        labels[protein.type] *= -1
+        labels[protein.type_id] *= -1
         label_table.append(labels)
 
-    return feature_table, label_table
+    return (feature_table, label_table)
 
 
 def create_kernel_table(feature_table):
-    kernel_table = []
+    kernel_table : List[List[float]] = []
     for row in feature_table:
-        kernel_row = []
+        kernel_row : List[float] = []
         for candidate in feature_table:
             difference = 0.0
             for counter in range(len(row)):
                 difference += (row[counter] - candidate[counter]) ** 2
-            kernel_row.append(exp(-D*difference))
+            kernel_row.append(math.exp(-D*difference))
         kernel_table.append(kernel_row)
     return kernel_table
 
@@ -99,9 +112,9 @@ def train_adatron(kernel_table, label_table, h, c):
     labelalphas = [0.0] * len(kernel_table)
     max_differences = [(0.0, 0)] * len(label_table[0])
     for iteration in range(10*len(kernel_table)):
-        print("Starting iteration %s..." % iteration)
+        print("Starting iteration %s..." % (iteration))
         if iteration == 20: # XXX shedskin test
-            return alphas, bias
+            return (alphas, bias)
         for klass in range(len(label_table[0])):
             max_differences[klass] = (0.0, 0)
             for elem in range(len(kernel_table)):
@@ -118,7 +131,7 @@ def train_adatron(kernel_table, label_table, h, c):
                     max_differences[klass] = (difference, col_counter)
 
             if all([max_difference[0] < tolerance for max_difference in max_differences]):
-                return alphas, bias
+                return (alphas, bias)
             else:
                 alphas[klass][max_differences[klass][1]] = betas[klass][max_differences[klass][1]]
                 element_sum = 0.0
@@ -137,7 +150,7 @@ def calculate_error(alphas, bias, kernel_table, label_table):
             predictions[klass][col_counter] = prediction + bias[klass]
 
     for col_counter in range(len(kernel_table)):
-        current_predictions = []
+        current_predictions : List[float] = []
         error = 0
         for row_counter in range(len(label_table[0])):
             current_predictions.append(predictions[row_counter][col_counter])
@@ -150,11 +163,11 @@ def calculate_error(alphas, bias, kernel_table, label_table):
         return 1.0 * error / len(kernel_table)
 
 
-def main():
-    for filename, type in [("testdata/c.txt", CYTOSOLIC), ("testdata/e.txt", EXTRACELLULAR), ("testdata/n.txt", NUCLEAR), ("testdata/m.txt", MITOCHONDRIAL)]:#, ("b.txt", BLIND)
-        load_file(filename, type)
+if __name__ == "__main__":
+    for filename, type_id in [("testdata/c.txt", CYTOSOLIC), ("testdata/e.txt", EXTRACELLULAR), ("testdata/n.txt", NUCLEAR), ("testdata/m.txt", MITOCHONDRIAL)]:#, ("b.txt", BLIND)
+        load_file(filename, type_id)
     print("Creating feature tables...")
-    feature_table, label_table = create_tables()
+    (feature_table, label_table) = create_tables()
     #import pickle
     #print "Loading kernel table..."
     #kernel_file = file("kernel_table.txt")
@@ -163,10 +176,5 @@ def main():
     print("Creating kernel table...")
     kernel_table = create_kernel_table(feature_table)
     print("Training SVM...")
-    alphas, bias = train_adatron(kernel_table, label_table, 1.0, 3.0)
+    (alphas, bias) = train_adatron(kernel_table, label_table, 1.0, 3.0)
     print(calculate_error(alphas, bias, kernel_table, label_table))
-
-
-if __name__ == "__main__":
-    main()
-

@@ -64,6 +64,21 @@ template <typename Type0, typename Type1, typename Type2, typename Type> void as
 	v1 = _get<1>(t);
 	v2 = _get<2>(t);
 }
+template <typename Type0, typename Type1, typename Type2, typename Type3, typename Type> void assign_from_tuple(Type0 &v0, Type1 &v1, Type2 &v2, Type3 &v3, const Type &t)
+{
+	v0 = _get<0>(t);
+	v1 = _get<1>(t);
+	v2 = _get<2>(t);
+	v3 = _get<3>(t);
+}
+template <typename Type0, typename Type1, typename Type2, typename Type3, typename Type4, typename Type> void assign_from_tuple(Type0 &v0, Type1 &v1, Type2 &v2, Type3 &v3, Type4 &v4, const Type &t)
+{
+	v0 = _get<0>(t);
+	v1 = _get<1>(t);
+	v2 = _get<2>(t);
+	v3 = _get<3>(t);
+	v4 = _get<4>(t);
+}
 
 #if __GNUC__ || __INTEL_COMPILER // || __clang__ // Clang already defines __GNUC__
 #define likely(x) __builtin_expect(!!(x), 1)
