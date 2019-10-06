@@ -8,7 +8,7 @@ auto rows = u"ABCDEFGHI"_S;
 auto cols = u"123456789"_S;
 auto digits = u"123456789"_S;
 auto squares = cross(rows, cols);
-auto unitlist = (cols.map([](const auto &c){return cross(rows, String(c));}) + rows.map([](const auto &r){return cross(String(r), cols);}) + multiloop(create_array({u"ABC"_S, u"DEF"_S, u"GHI"_S}), create_array({u"123"_S, u"456"_S, u"789"_S}), [](const auto &rs, const auto &cs){return cross(rs, cs);}));
+auto unitlist = (cols.map([](const auto &c){return cross(::rows, String(c));}) + rows.map([](const auto &r){return cross(String(r), ::cols);}) + multiloop(create_array({u"ABC"_S, u"DEF"_S, u"GHI"_S}), create_array({u"123"_S, u"456"_S, u"789"_S}), [](const auto &rs, const auto &cs){return cross(rs, cs);}));
 auto units = create_dict(squares.map([](const auto &s){return make_tuple(s, ::unitlist.filter([&s](const auto &u){return in(s, u);}));}));
 Dict<String, Set<String>> peers;
 
@@ -84,7 +84,7 @@ template <typename T1> Dict<String, String> parse_grid(T1 grid)
     u"Given a string of 81 digits (or .0-), return a dict of {cell:values}"_S;
     grid = grid.filter([](const auto &c){return in(c, u"0.-123456789"_S);});
     auto values = create_dict(::squares.map([](const auto &s){return make_tuple(s, ::digits);}));
-    for (auto &&[s, d] : zip(squares, grid))
+    for (auto &&[s, d] : zip(::squares, grid))
         if (in(d, ::digits) && assign(values, s, d).empty())
             return Dict<String, String>();
     return values;

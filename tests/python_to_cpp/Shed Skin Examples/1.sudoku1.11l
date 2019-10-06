@@ -68,7 +68,7 @@ F perm([[Int]] &puzzle; i, j, =l, [(Int, Int)] &u)
    I u.empty & l.empty
       print(‘Solved!’)
       printpuzzle(puzzle)
-      print(‘iterations: ’String(iterations))
+      print(‘iterations: ’String(:iterations))
       R 1B
    E
       I l.empty

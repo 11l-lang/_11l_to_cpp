@@ -42,11 +42,11 @@ public:
     SharedPtr<Node> left;
     SharedPtr<Node> right;
 
-    template <typename T1> Node(const T1 &value, SharedPtr<Node> left = nullptr, SharedPtr<Node> right = nullptr)
+    template <typename T1> Node(const T1 &value, SharedPtr<Node> left = nullptr, SharedPtr<Node> right = nullptr) :
+        left(left),
+        right(right)
     {
         this->value = String(value);
-        this->left = left;
-        this->right = right;
     }
 
     Array<String> tree_indent()
@@ -1419,7 +1419,7 @@ F advance(sid = ‘’)
       assert(:token_node.symbol.id == sid)
    :tokeni++
    :token_node = ASTNode()
-   I :tokeni == tokens.len
+   I :tokeni == :tokens.len
       :token_node.symbol = :symbol_table[‘(end)’]
       R
    V token = :tokens[:tokeni]
@@ -1545,7 +1545,7 @@ template <typename T1 = decltype(u""_S)> auto advance(const T1 &sid = u""_S)
         assert(::token_node->symbol->id == sid);
     ::tokeni++;
     ::token_node = make_SharedPtr<ASTNode>();
-    if (::tokeni == tokens.len()) {
+    if (::tokeni == ::tokens.len()) {
         ::token_node->symbol = &::symbol_table[u"(end)"_S];
         return;
     }
@@ -1706,7 +1706,7 @@ template <typename T1 = decltype(u""_S)> auto advance(const T1 &sid = u""_S)
         assert(::token_node->symbol->id == sid);
     ::tokeni++;
     ::token_node = std::make_unique<ASTNode>();
-    if (::tokeni == tokens.len()) {
+    if (::tokeni == ::tokens.len()) {
         ::token_node->symbol = &::symbol_table[u"(end)"_S];
         return;
     }
@@ -2150,9 +2150,9 @@ public:
     decltype(0) n_filled = 0;
     int period;
 
-    template <typename T1> SMA(const T1 &period)
+    template <typename T1> SMA(const T1 &period) :
+        period(period)
     {
-        this->period = period;
         data = create_array({0.0}) * period;
     }
 
@@ -4097,9 +4097,9 @@ class SillyError
 {
 public:
     String message;
-    template <typename T1> SillyError(const T1 &message)
+    template <typename T1> SillyError(const T1 &message) :
+        message(message)
     {
-        this->message = message;
     }
 };
 

@@ -273,19 +273,20 @@ public:
     Array<int> list_;
     Array<int> tmp;
     std::function<int(const int, const int)> comparefn;
+    int min_gallop;
     decltype(32) min_merge = 32;
     decltype(7) initial_min_gallop = 7;
     decltype(0) stack_size = 0;
     decltype(256) initial_tmp_storage_length = 256;
     Array<int> run_base;
     Array<int> run_len;
-    decltype(initial_min_gallop) min_gallop = initial_min_gallop;
     int stack_len;
 
-    template <typename T1, typename T2 = decltype(cmp)> Timsort(const T1 &list_, const T2 &comparefn = cmp)
+    template <typename T1, typename T2 = decltype(cmp)> Timsort(const T1 &list_, const T2 &comparefn = cmp) :
+        list_(list_),
+        comparefn(comparefn)
     {
-        this->list_ = list_;
-        this->comparefn = comparefn;
+        min_gallop = initial_min_gallop;
         auto length = list_.len();
         int ternary;
         if (length < initial_tmp_storage_length * 2)

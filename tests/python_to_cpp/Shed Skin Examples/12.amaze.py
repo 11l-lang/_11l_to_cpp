@@ -17,9 +17,11 @@ http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/496884
 """
 import sys
 import random
+from typing import List
 
 class MazeReaderException(Exception):
-    pass
+    def __init__(self, message):
+        pass
 
 STDIN = 0
 FILE_ = 1
@@ -29,11 +31,12 @@ PATH = -1
 START = -2
 EXIT = -3
 
-class MazeReader(object):
+null_point = (1 << 30, 1 << 30)
+
+class MazeReader:
 
     def __init__(self):
-        self.maze_rows = []
-        pass
+        self.maze_rows : List[List[int]] = []
 
     def readStdin(self):
         print('Enter a maze')
@@ -41,12 +44,12 @@ class MazeReader(object):
         print()
 
         data = input('Enter the dimension of the maze as Width X Height: ')
-        w1, h1 = data.split() # XXX SS
-        w, h  = int(w1), int(h1)
+        (w1, h1) = data.split() # XXX SS
+        (w, h) = (int(w1), int(h1))
 
         for x in range(h):
             row = ''
-            while not row:
+            while row == '':
                 row = input('Enter row number %d: ' % (x+1))
             rowsplit = [int(y) for y in row.split()] # XXX SS
             if len(rowsplit) != w:
@@ -59,7 +62,9 @@ class MazeReader(object):
             f = open(fname)
             lines = f.readlines()
             f.close()
-            lines = [ line for line in lines if line.strip() ]
+            def workaround_for_MSVC_2017(line : str): # [https://developercommunity.visualstudio.com/content/problem/565417/bug-with-operator-in-c.html]
+                return line.strip() != ''
+            lines = [ line for line in lines if workaround_for_MSVC_2017(line) ]
             w = len(lines[0].split())
             for line in lines:
                 row = [int(y) for y in line.split()]
@@ -67,8 +72,8 @@ class MazeReader(object):
                     raise MazeReaderException('Invalid maze file - error in maze dimensions')
                 else:
                     self.maze_rows.append(row)
-        except (IOError, OSError) as e:
-            raise MazeReaderException(str(e))
+        except:
+            raise MazeReaderException('read error')
 
     def getData(self):
         return self.maze_rows
@@ -81,16 +86,16 @@ class MazeReader(object):
 
         return self.getData()
 
-class MazeFactory(object):
-    def makeMaze(self, source=STDIN):
-        reader = MazeReader()
-        return Maze(reader.readMaze(source))
-
 class MazeError(Exception):
-    pass
+    def __init__(self, message):
+        pass
 
-class Maze(object):
-    def __init__(self, rows=[[]]):
+class Maze:
+    _rows : List[List[int]]
+    _height : int
+    _width  : int
+
+    def __init__(self, rows):
         self._rows = rows
         self.__validate()
         self.__normalize()
@@ -99,13 +104,14 @@ class Maze(object):
         s = '\n'
         for row in self._rows:
             for item in row:
+                sitem : str
                 if item == PATH: sitem = '*'
                 elif item == START: sitem = 'S'
                 elif item == EXIT: sitem = 'E'
                 else: sitem = str(item)
 
-                s = ''.join((s,'  ',sitem,'   '))
-            s = ''.join((s,'\n\n'))
+                s = s + '  ' + sitem + '   '
+            s = s + '\n\n'
 
         return s
 
@@ -124,8 +130,8 @@ class Maze(object):
             row = [min(int(y), 1) for y in row] #map(lambda x: min(int(x), 1), row) # SS
             self._rows[x] = row
 
-    def validatePoint(self, pt):
-        x,y = pt
+    def validatePoint(self, pt): # const
+        (x,y) = pt
         w = self._width
         h = self._height
 
@@ -135,8 +141,6 @@ class Maze(object):
 
         if y > h - 1 or y<0:
             raise MazeError('y co-ordinate out of range!')
-
-        pass # SS
 
     def getItem(self, x, y):
         self.validatePoint((x,y))
@@ -157,14 +161,14 @@ class Maze(object):
     def getNeighBours(self, pt):
         self.validatePoint(pt)
 
-        x,y = pt
+        (x,y) = pt
 
         h = self._height
         w = self._width
 
-        poss_nbors = (x-1,y),(x-1,y+1),(x,y+1),(x+1,y+1),(x+1,y),(x+1,y-1),(x,y-1),(x-1,y-1)
+        poss_nbors = ((x-1,y),(x-1,y+1),(x,y+1),(x+1,y+1),(x+1,y),(x+1,y-1),(x,y-1),(x-1,y-1))
 
-        nbors = []
+        nbors : List[Tuple[int, int]] = []
         for xx,yy in poss_nbors:
             if (xx>=0 and xx<=w-1) and (yy>=0 and yy<=h-1):
                 nbors.append((xx,yy))
@@ -172,7 +176,7 @@ class Maze(object):
         return nbors
 
     def getExitPoints(self, pt):
-        exits = []
+        exits : List[Tuple[int, int]] = []
         for xx,yy in self.getNeighBours(pt):
             if self.getItem(xx,yy)==0: # SS
                 exits.append((xx,yy))
@@ -183,19 +187,26 @@ class Maze(object):
         self.validatePoint(pt1)
         self.validatePoint(pt2)
 
-        x1,y1 = pt1
-        x2,y2 = pt2
+        (x1,y1) = pt1
+        (x2,y2) = pt2
 
         return pow( (pow((x1-x2), 2) + pow((y1-y2),2)), 0.5)
 
-class MazeSolver(object):
+class MazeFactory:
+    def makeMaze(self, source=STDIN):
+        reader = MazeReader()
+        return Maze(reader.readMaze(source))
+
+class MazeSolver:
+    maze : Maze
+
     def __init__(self, maze):
         self.maze = maze
         self._start = (0,0)
         self._end = (0,0)
         self._current = (0,0)
         self._steps = 0
-        self._path = []
+        self._path : List[Tuple[int, int]] = []
         self._tryalternate = False
         self._trynextbest = False
         self._disputed = (0,0)
@@ -227,32 +238,6 @@ class MazeSolver(object):
     def isSolved(self):
         return (self._current == self._end)
 
-    def getNextPoint(self):
-        points = self.maze.getExitPoints(self._current)
-
-        point = self.getBestPoint(points)
-
-        while self.checkClosedLoop(point):
-
-            if self.endlessLoop():
-                print(self._loops)
-                point = None
-                break
-
-            point2 = point
-            if point==self._start and len(self._path)>2:
-                self._tryalternate = True
-                break
-            else:
-                point = self.getNextClosestPointNotInPath(points, point2)
-                if not point:
-                    self.retracePath()
-                    self._tryalternate = True
-                    point = self._start
-                    break
-
-        return point
-
     def retracePath(self):
         print('Retracing...')
         self._retrace = True
@@ -261,7 +246,7 @@ class MazeSolver(object):
         path2.reverse()
 
         idx = path2.index(self._start)
-        self._path += self._path[-2:idx:-1]
+        self._path.extend(self._path[len(self._path)-2:idx:-1]) # [-TODO: `self._path[-2:idx:-1]`-]
         self._numretraces += 1
 
     def endlessLoop(self):
@@ -273,6 +258,32 @@ class MazeSolver(object):
             return True
 
         return False
+
+    def getNextPoint(self):
+        points = self.maze.getExitPoints(self._current)
+
+        point = self.getBestPoint(points)
+
+        while self.checkClosedLoop(point):
+
+            if self.endlessLoop():
+                print(self._loops)
+                point = null_point
+                break
+
+            point2 = point
+            if point==self._start and len(self._path)>2:
+                self._tryalternate = True
+                break
+            else:
+                point = self.getNextClosestPointNotInPath(points, point2)
+                if point == null_point:
+                    self.retracePath()
+                    self._tryalternate = True
+                    point = self._start
+                    break
+
+        return point
 
     def checkClosedLoop(self, point):
         l = list(range(0, len(self._path)-1, 2))
@@ -292,12 +303,14 @@ class MazeSolver(object):
 
         if point2 in self._path:
             point = self.getNextClosestPointNotInPath(points, point2)
-            if not point:
+            if point == null_point:
                 point = point2
 
         if self._tryalternate:
             point = self.getAlternatePoint(points, altpoint)
-            print('Trying alternate...',self._current, point)
+            print('Trying alternate... ', end = '')
+            print(self._current, end = ' ')
+            print(point)
 
         self._trynextbest = False
         self._tryalternate = False
@@ -311,7 +324,7 @@ class MazeSolver(object):
 
         distances.sort()
 
-        points2 = [()]*len(points) # SS
+        points2 = [(0, 0)]*len(points) # SS
         count = 0
 
         for dist in distances:
@@ -335,13 +348,14 @@ class MazeSolver(object):
 
     def getAlternatePoint(self, points, point):
         points2 = points[:]
-        print(points2, point)
+        print(points2, end = ' ')
+        print(point)
 
         points2.remove(point)
-        if points2:
+        if len(points2):
             return random.choice(points2)
 
-        return None
+        return null_point
 
     def getNextClosestPoint(self, points, point):
         points2 = self.sortPoints(points)
@@ -350,7 +364,7 @@ class MazeSolver(object):
         try:
             return points2[idx+1]
         except:
-            return None
+            return null_point
 
     def getNextClosestPointNotInPath(self, points, point):
 
@@ -360,47 +374,6 @@ class MazeSolver(object):
             point2 = self.getNextClosestPoint(points, point2)
 
         return point2
-
-    def solve(self):
-        #print 'Starting point is', self._start
-        #print 'Ending point is', self._end
-
-        # First check if both start and end are same
-        if self._start == self._end:
-            print('Start/end points are the same. Trivial maze.')
-            print([self._start, self._end])
-            return None
-
-        # Check boundary conditions
-        if not self.boundaryCheck():
-            print('Either start/end point are unreachable. Maze cannot be solved.')
-            return None
-
-        # Proper maze
-        #print 'Maze is a proper maze.'
-
-        # Initialize solver
-        self.setCurrentPoint(self._start)
-
-        unsolvable = False
-
-        while not self.isSolved():
-            self._steps += 1
-            pt = self.getNextPoint()
-
-            if pt:
-                self.setCurrentPoint(pt)
-            else:
-                print('Dead-lock - maze unsolvable')
-                unsolvable = True
-                break
-
-        if not unsolvable:
-            pass #print 'Solution path is',self._path
-        else:
-            print('Path till deadlock is',self._path)
-
-        self.printResult()
 
     def printResult(self):
         """ Print the maze showing the path """
@@ -414,22 +387,64 @@ class MazeSolver(object):
         #print 'Maze with solution path'
         #print self.maze
 
+    def solve(self):
+        #print 'Starting point is', self._start
+        #print 'Ending point is', self._end
 
-class MazeGame(object):
+        # First check if both start and end are same
+        if self._start == self._end:
+            print('Start/end points are the same. Trivial maze.')
+            print([self._start, self._end])
+            return
+
+        # Check boundary conditions
+        if not self.boundaryCheck():
+            print('Either start/end point are unreachable. Maze cannot be solved.')
+            return
+
+        # Proper maze
+        #print 'Maze is a proper maze.'
+
+        # Initialize solver
+        self.setCurrentPoint(self._start)
+
+        unsolvable = False
+
+        while not self.isSolved():
+            self._steps += 1
+            pt = self.getNextPoint()
+
+            if pt != null_point:
+                self.setCurrentPoint(pt)
+            else:
+                print('Dead-lock - maze unsolvable')
+                unsolvable = True
+                break
+
+        if not unsolvable:
+            pass #print 'Solution path is',self._path
+        else:
+            print('Path till deadlock is ', end = '')
+            print(self._path)
+
+        self.printResult()
+
+
+class MazeGame:
     def __init__(self):
         self._start = (0,0)
         self._end = (0,0)
 
-    #def createMaze(self):
-    #    return None
-#
-#    def getStartEndPoints(self, maze):
-#        return None
+    def createMaze(self) -> Maze:
+        raise NotImplementedError()
+
+    def getStartEndPoints(self, maze : Maze) -> None:
+        raise NotImplementedError()
 
     def runGame(self):
         maze = self.createMaze()
-        if not maze:
-            return None
+        # if not maze:
+        #     return None
 
         #print maze
         self.getStartEndPoints(maze)
@@ -451,13 +466,13 @@ class FilebasedMazeGame(MazeGame):
         print(m)
         return m
 
-    def getStartEndPoints(self, maze):
+    def getStartEndPoints(self, maze : Maze):
 
         while True:
             try:
                 #pt1 = raw_input('Enter starting point: ')
                 pt1 = '0 4'
-                x,y = pt1.split()
+                (x,y) = pt1.split()
                 self._start = (int(x), int(y))
                 maze.validatePoint(self._start)
                 break
@@ -467,7 +482,7 @@ class FilebasedMazeGame(MazeGame):
         while True:
             try:
                 pt2 = '5 4' #pt2 = raw_input('Enter ending point: ')
-                x,y = pt2.split()
+                (x,y) = pt2.split()
                 self._end = (int(x), int(y))
                 maze.validatePoint(self._end)
                 break

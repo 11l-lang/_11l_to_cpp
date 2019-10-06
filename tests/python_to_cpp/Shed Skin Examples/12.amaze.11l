@@ -1,0 +1,432 @@
+‘
+Amaze - A completely object-oriented Pythonic maze generator/solver.
+This can generate random mazes and solve them. It should be
+able to solve any kind of maze and inform you in case a maze is
+unsolveable.
+
+This uses a very simple representation of a mze. A maze is
+represented as an mxn matrix with each point value being either
+0 or 1. Points with value 0 represent paths and those with
+value 1 represent blocks. The problem is to find a path from
+point A to point B in the matrix.
+
+The matrix is represented internally as a list of lists.
+
+Have fun ☺
+http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/496884
+’
+//import sys
+//import random
+
+T MazeReaderException
+   F (message)
+   {
+   }
+V STDIN = 0
+V FILE_ = 1
+V SOCKET = 2
+V PATH = -1
+V START = -2
+V EXIT = -3
+V null_point = (1 << 30, 1 << 30)
+
+T MazeReader
+   [[Int]] maze_rows
+   F ()
+   {
+   }
+
+   F readStdin()
+      print(‘Enter a maze’)
+      print(‘You can enter a maze row by row’)
+      print()
+      V data = input(‘Enter the dimension of the maze as Width X Height: ’)
+      V (w1, h1) = data.split_py()
+      V (w, h) = (Int(w1), Int(h1))
+
+      L(x) 0 .< h
+         V row = ‘’
+         L row == ‘’
+            row = input(‘Enter row number #.0: ’.format(x + 1))
+         V rowsplit = row.split_py().map(y -> Int(y))
+         I rowsplit.len != w
+            X MazeReaderException(‘invalid size of maze row’)
+         .maze_rows.append(rowsplit)
+
+   F readFile()
+      V fname = ‘testdata/maze.txt’
+      X.try
+         V f = File(fname)
+         V lines = f.read_lines(1B)
+         f.close()
+         F workaround_for_MSVC_2017(String line)
+            R line.trim((‘ ’, "\t", "\r", "\n")) != ‘’
+         lines = lines.filter(line -> @workaround_for_MSVC_2017(line))
+         V w = lines[0].split_py().len
+         L(line) lines
+            V row = line.split_py().map(y -> Int(y))
+            I row.len != w
+               X MazeReaderException(‘Invalid maze file - error in maze dimensions’)
+            E
+               .maze_rows.append(row)
+      X.catch
+         X MazeReaderException(‘read error’)
+
+   F getData()
+      R .maze_rows
+
+   F readMaze(source = STDIN)
+      I source == :STDIN
+         .readStdin()
+      E I source == :FILE_
+         .readFile()
+      R .getData()
+
+T MazeError
+   F (message)
+   {
+   }
+
+T Maze
+   [[Int]] _rows
+   Int _height
+   Int _width
+
+   F (rows)
+      ._rows = rows
+      .__validate()
+      .__normalize()
+
+   F String()
+      V s = "\n"
+      L(row) ._rows
+         L(item) row
+            String sitem
+            I item == :PATH
+               sitem = ‘*’
+            E I item == :START
+               sitem = ‘S’
+            E I item == :EXIT
+               sitem = ‘E’
+            E
+               sitem = String(item)
+            s = s‘  ’sitem‘   ’
+         s = s"\n\n"
+      R s
+
+   F __validate()
+      V width = ._rows[0].len
+      V widths = ._rows.map(row -> row.len)
+      I widths.count(width) != widths.len
+         X MazeError(‘Invalid maze!’)
+      ._height = ._rows.len
+      ._width = width
+
+   F __normalize()
+      L(x) 0 .< ._rows.len
+         V row = ._rows[x]
+         row = row.map(y -> min(Int(y), 1))
+         ._rows[x] = row
+
+   F.const validatePoint(pt)
+      V (x, y) = pt
+      V w = ._width
+      V h = ._height
+
+      I x > w - 1 | x < 0
+         X MazeError(‘x co-ordinate out of range!’)
+
+      I y > h - 1 | y < 0
+         X MazeError(‘y co-ordinate out of range!’)
+
+   F getItem(x, y)
+      .validatePoint((x, y))
+      V w = ._width
+      V h = ._height
+      V row = ._rows[h - y - 1]
+      R row[x]
+
+   F setItem(x, y, value)
+      V h = ._height
+      .validatePoint((x, y))
+      V row = ._rows[h - y - 1]
+      row[x] = value
+
+   F getNeighBours(pt)
+      .validatePoint(pt)
+      V (x, y) = pt
+      V h = ._height
+      V w = ._width
+      V poss_nbors = ((x - 1, y), (x - 1, y + 1), (x, y + 1), (x + 1, y + 1), (x + 1, y), (x + 1, y - 1), (x, y - 1), (x - 1, y - 1))
+      [(Int, Int)] nbors
+      L(xx, yy) poss_nbors
+         I (xx >= 0 & xx <= w - 1) & (yy >= 0 & yy <= h - 1)
+            nbors.append((xx, yy))
+      R nbors
+
+   F getExitPoints(pt)
+      [(Int, Int)] exits
+      L(xx, yy) .getNeighBours(pt)
+         I .getItem(xx, yy) == 0
+            exits.append((xx, yy))
+      R exits
+
+   F calcDistance(pt1, pt2)
+      .validatePoint(pt1)
+      .validatePoint(pt2)
+      V (x1, y1) = pt1
+      V (x2, y2) = pt2
+      R pow((pow((x1 - x2), 2) + pow((y1 - y2), 2)), 0.5)
+
+T MazeFactory
+   F makeMaze(source = STDIN)
+      V reader = MazeReader()
+      R Maze(reader.readMaze(source))
+
+T MazeSolver
+   Maze maze
+   _start = (0, 0)
+   _end = (0, 0)
+   _current = (0, 0)
+   _steps = 0
+   [(Int, Int)] _path
+   _tryalternate = 0B
+   _trynextbest = 0B
+   _disputed = (0, 0)
+   _loops = 0
+   _retrace = 0B
+   _numretraces = 0
+
+   F (maze)
+      .maze = maze
+
+   F setStartPoint(pt)
+      .maze.validatePoint(pt)
+      ._start = pt
+
+   F setEndPoint(pt)
+      .maze.validatePoint(pt)
+      ._end = pt
+
+   F boundaryCheck()
+      V exits1 = .maze.getExitPoints(._start)
+      V exits2 = .maze.getExitPoints(._end)
+
+      I exits1.empty | exits2.empty
+         R 0B
+      R 1B
+
+   F setCurrentPoint(point)
+      ._current = point
+      ._path.append(point)
+
+   F isSolved()
+      R (._current == ._end)
+
+   F retracePath()
+      print(‘Retracing...’)
+      ._retrace = 1B
+      V path2 = copy(._path)
+      path2.reverse()
+      V idx = path2.index(._start)
+      ._path.extend(._path[(._path.len - 2 .< idx).step(-1)])
+      ._numretraces++
+
+   F endlessLoop()
+      I ._loops > 100
+         print(‘Seems to be hitting an endless loop.’)
+         R 1B
+      E I ._numretraces > 8
+         print(‘Seem to be retracing loop.’)
+         R 1B
+      R 0B
+
+   F getNextPoint()
+      V points = .maze.getExitPoints(._current)
+      V point = .getBestPoint(points)
+
+      L .checkClosedLoop(point)
+         I .endlessLoop()
+            print(._loops)
+            point = :null_point
+            L.break
+         V point2 = point
+         I point == ._start & ._path.len > 2
+            ._tryalternate = 1B
+            L.break
+         E
+            point = .getNextClosestPointNotInPath(points, point2)
+            I point == :null_point
+               .retracePath()
+               ._tryalternate = 1B
+               point = ._start
+               L.break
+      R point
+
+   F checkClosedLoop(point)
+      V l = Array((0 .< ._path.len - 1).step(2))
+      l.reverse()
+
+      L(x) l
+         I ._path[x] == point
+            ._loops++
+            R 1B
+      R 0B
+
+   F getBestPoint(points)
+      V point = .getClosestPoint(points)
+      V point2 = point
+      V altpoint = point
+
+      I point2 C ._path
+         point = .getNextClosestPointNotInPath(points, point2)
+         I point == :null_point
+            point = point2
+
+      I ._tryalternate
+         point = .getAlternatePoint(points, altpoint)
+         print(‘Trying alternate... ’, end' ‘’)
+         print(._current, end' ‘ ’)
+         print(point)
+      ._trynextbest = 0B
+      ._tryalternate = 0B
+      ._retrace = 0B
+      R point
+
+   F sortPoints(points)
+      V distances = points.map(point -> @.maze.calcDistance(point, @._end))
+      V distances2 = copy(distances)
+      distances.sort()
+      V points2 = [(0, 0)] * points.len
+      V count = 0
+
+      L(dist) distances
+         V idx = distances2.index(dist)
+         V point = points[idx]
+
+         L point C points2
+            idx = distances2.index(dist, idx + 1)
+            point = points[idx]
+         points2[count] = point
+         count++
+      R points2
+
+   F getClosestPoint(points)
+      V points2 = .sortPoints(points)
+      V closest = points2[0]
+      R closest
+
+   F getAlternatePoint(points, point)
+      V points2 = copy(points)
+      print(points2, end' ‘ ’)
+      print(point)
+      points2.remove(point)
+      I !points2.empty
+         R random:choice(points2)
+      R :null_point
+
+   F getNextClosestPoint(points, point)
+      V points2 = .sortPoints(points)
+      V idx = points2.index(point)
+
+      X.try
+         R points2[idx + 1]
+      X.catch
+         R :null_point
+
+   F getNextClosestPointNotInPath(points, point)
+      V point2 = .getNextClosestPoint(points, point)
+      L point2 C ._path
+         point2 = .getNextClosestPoint(points, point2)
+      R point2
+
+   F printResult()
+      ‘ Print the maze showing the path ’
+
+      L(x, y) ._path
+         .maze.setItem(x, y, :PATH)
+      .maze.setItem(._start[0], ._start[1], :START)
+      .maze.setItem(._end[0], ._end[1], :EXIT)
+
+   F solve()
+      I ._start == ._end
+         print(‘Start/end points are the same. Trivial maze.’)
+         print([._start, ._end])
+         R
+
+      I !.boundaryCheck()
+         print(‘Either start/end point are unreachable. Maze cannot be solved.’)
+         R
+      .setCurrentPoint(._start)
+      V unsolvable = 0B
+
+      L !.isSolved()
+         ._steps++
+         V pt = .getNextPoint()
+
+         I pt != :null_point
+            .setCurrentPoint(pt)
+         E
+            print(‘Dead-lock - maze unsolvable’)
+            unsolvable = 1B
+            L.break
+
+      I !unsolvable
+      {
+      }
+      E
+         print(‘Path till deadlock is ’, end' ‘’)
+         print(._path)
+      .printResult()
+
+T MazeGame
+   _start = (0, 0)
+   _end = (0, 0)
+   F ()
+   {
+   }
+   F.virtual.abstract createMaze() -> Maze
+   F.virtual.abstract getStartEndPoints(Maze maze) -> N
+
+   F runGame()
+      V maze = .createMaze()
+      .getStartEndPoints(maze)
+      V solver = MazeSolver(maze)
+      solver.setStartPoint(._start)
+      solver.setEndPoint(._end)
+      solver.solve()
+
+T FilebasedMazeGame(MazeGame)
+   F.virtual.assign createMaze() -> Maze
+      V f = MazeFactory()
+      V m = f.makeMaze(:FILE_)
+      print(m)
+      R m
+
+   F.virtual.assign getStartEndPoints(Maze maze) -> N
+      L
+         X.try
+            V pt1 = ‘0 4’
+            V (x, y) = pt1.split_py()
+            ._start = (Int(x), Int(y))
+            maze.validatePoint(._start)
+            L.break
+         X.catch
+         {
+         }
+
+      L
+         X.try
+            V pt2 = ‘5 4’
+            V (x, y) = pt2.split_py()
+            ._end = (Int(x), Int(y))
+            maze.validatePoint(._end)
+            L.break
+         X.catch
+         {
+         }
+
+:start:
+V game = FilebasedMazeGame()
+L(x) 0.<1
+   game.runGame()

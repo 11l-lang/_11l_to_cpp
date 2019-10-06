@@ -239,16 +239,17 @@ T Timsort
    [Int] list_
    [Int] tmp
    (Int, Int -> Int) comparefn
+   Int min_gallop
    min_merge = 32
    initial_min_gallop = 7
    stack_size = 0
    initial_tmp_storage_length = 256
    [Int] run_base
    [Int] run_len
-   min_gallop = .initial_min_gallop
    Int stack_len
 
    F (list_, comparefn = cmp)
+      .min_gallop = .initial_min_gallop
       .list_ = list_
       .comparefn = comparefn
       V length = list_.len

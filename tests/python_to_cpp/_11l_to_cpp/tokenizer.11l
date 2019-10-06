@@ -321,7 +321,7 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
                      X Error(‘digit separator in this hexadecimal number is located in the wrong place’, lexem_start)
                   category = NUMERIC_LITERAL
 
-            E I source[lexem_start .< i] C keywords
+            E I source[lexem_start .< i] C :keywords
                I source[lexem_start .< i] C (‘V’, ‘П’, ‘var’, ‘перем’)
                   category = NAME
                E I source[lexem_start .< i] C (‘N’, ‘Н’, ‘null’, ‘нуль’)

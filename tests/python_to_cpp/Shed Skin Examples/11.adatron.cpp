@@ -21,21 +21,21 @@ public:
     Dict<Char, double> local_composition;
     Dict<Char, double> global_composition;
 
-    template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6> Protein(const T1 &name, const T2 &mass, const T3 &isoelectric_point, const T4 &size, const T5 &sequence, const T6 &type_id)
+    template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6> Protein(const T1 &name, const T2 &mass, const T3 &isoelectric_point, const T4 &size, const T5 &sequence, const T6 &type_id) :
+        name(name),
+        mass(mass),
+        isoelectric_point(isoelectric_point),
+        size(size),
+        sequence(sequence),
+        type_id(type_id)
     {
-        this->name = name;
-        this->mass = mass;
-        this->isoelectric_point = isoelectric_point;
-        this->size = size;
-        this->sequence = sequence;
-        this->type_id = type_id;
         extract_composition();
     }
 
     auto extract_composition()
     {
         local_composition = create_dict((::AMINOACIDS.map([](const auto &x){return make_tuple(x, 0.0);})));
-        for (auto counter : range_el(0, LENGTH))
+        for (auto counter : range_el(0, ::LENGTH))
             local_composition[sequence[counter]] += 1.0 / ::LENGTH;
         global_composition = create_dict((::AMINOACIDS.map([](const auto &x){return make_tuple(x, 0.0);})));
         for (auto &&aminoacid : sequence)

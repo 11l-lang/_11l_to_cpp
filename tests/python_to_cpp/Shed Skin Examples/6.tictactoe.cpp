@@ -19,9 +19,9 @@ class MultiVictory
 {
 public:
     Set<int> victors;
-    template <typename T1> MultiVictory(const T1 &victorslist)
+    template <typename T1> MultiVictory(const T1 &victorslist) :
+        victors(victorslist)
     {
-        victors = victorslist;
     }
 };
 
@@ -32,9 +32,9 @@ public:
     Array<Array<int>> __board;
     int __empty;
 
-    template <typename T1 = decltype(3)> rectBoard(const T1 &edge = 3)
+    template <typename T1 = decltype(3)> rectBoard(const T1 &edge = 3) :
+        edge(edge)
     {
-        this->edge = edge;
         __board = range_el(0, edge).map([&edge](const auto &i){return edge * create_array({0});});
         __empty = square(edge);
     }
@@ -119,7 +119,7 @@ public:
 
     template <typename T1, typename T2, typename T3> auto doRow(const T1 &fields, const T2 &indices, const T3 &player, Array<Array<double>> &scores)
     {
-        auto players = create_set(fields).difference(create_set(create_array({0})));
+        auto players = create_set(fields).difference(create_set({0}));
 
         if ((players.len() == 1)) {
             if (_get<0>(create_array(players)) == player)

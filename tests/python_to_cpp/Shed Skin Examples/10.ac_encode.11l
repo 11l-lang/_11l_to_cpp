@@ -97,7 +97,7 @@ F decode(string, =n = 10000, =c0 = BETA0, =c1 = BETA1, adaptive = 1, verbose = 0
       p0 = c0 * 1.0 / (c0 + c1)
    V ans = ‘’
    V u = 0.0
-   V v = Float(ONE)
+   V v = Float(:ONE)
    Int boundary
    L(c) string
       I n <= 0

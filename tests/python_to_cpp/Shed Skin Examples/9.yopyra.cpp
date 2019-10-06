@@ -117,11 +117,11 @@ public:
     Color color;
     String tipo;
 
-    template <typename T1, typename T2, typename T3> Luz(const T1 &posicion, const T2 &color, const T3 &tipo)
+    template <typename T1, typename T2, typename T3> Luz(const T1 &posicion, const T2 &color, const T3 &tipo) :
+        posicion(posicion),
+        color(color),
+        tipo(tipo)
     {
-        this->posicion = posicion;
-        this->color = color;
-        this->tipo = tipo;
     }
 };
 
@@ -136,15 +136,15 @@ public:
     double cTransmitividad;
     double iRefraccion;
 
-    template <typename T1, typename T2 = decltype(0.0), typename T3 = decltype(0.0), typename T4 = decltype(0.0), typename T5 = decltype(0.0), typename T6 = decltype(0.0), typename T7 = decltype(0.0)> Material(const T1 &color, const T2 &cDifuso = 0.0, const T3 &cEspecular = 0.0, const T4 &dEspecular = 0.0, const T5 &cReflexion = 0.0, const T6 &cTransmitividad = 0.0, const T7 &iRefraccion = 0.0)
+    template <typename T1, typename T2 = decltype(0.0), typename T3 = decltype(0.0), typename T4 = decltype(0.0), typename T5 = decltype(0.0), typename T6 = decltype(0.0), typename T7 = decltype(0.0)> Material(const T1 &color, const T2 &cDifuso = 0.0, const T3 &cEspecular = 0.0, const T4 &dEspecular = 0.0, const T5 &cReflexion = 0.0, const T6 &cTransmitividad = 0.0, const T7 &iRefraccion = 0.0) :
+        color(color),
+        cDifuso(cDifuso),
+        cEspecular(cEspecular),
+        dEspecular(dEspecular),
+        cReflexion(cReflexion),
+        cTransmitividad(cTransmitividad),
+        iRefraccion(iRefraccion)
     {
-        this->color = color;
-        this->cDifuso = cDifuso;
-        this->cEspecular = cEspecular;
-        this->dEspecular = dEspecular;
-        this->cReflexion = cReflexion;
-        this->cTransmitividad = cTransmitividad;
-        this->iRefraccion = iRefraccion;
     }
 };
 class Cuerpo;
@@ -158,10 +158,10 @@ public:
     double disInter;
     Cuerpo *objInter;
 
-    template <typename T1, typename T2> Rayo(const T1 &origen, const T2 &direccion)
+    template <typename T1, typename T2> Rayo(const T1 &origen, const T2 &direccion) :
+        origen(origen),
+        direccion(direccion)
     {
-        this->origen = origen;
-        this->direccion = direccion;
         disInter = ::MAX_DIST;
         objInter = nullptr;
     }
@@ -188,11 +188,11 @@ public:
     Vector posicion;
     double radio;
 
-    template <typename T1, typename T2, typename T3> Esfera(const T1 &material, const T2 &posicion, const T3 &radio)
+    template <typename T1, typename T2, typename T3> Esfera(const T1 &material, const T2 &posicion, const T3 &radio) :
+        posicion(posicion),
+        radio(radio)
     {
         init(u"esfera"_S, material);
-        this->posicion = posicion;
-        this->radio = radio;
     }
 
     virtual bool intersecta(Rayo &r) override
@@ -225,12 +225,12 @@ public:
     Vector normal;
     double distancia;
 
-    template <typename T1, typename T2, typename T3> Plano(const T1 &material, const T2 &normal, const T3 &distancia)
+    template <typename T1, typename T2, typename T3> Plano(const T1 &material, const T2 &normal, const T3 &distancia) :
+        normal(normal),
+        distancia(distancia)
     {
         init(u"plano"_S, material);
-        this->normal = normal;
         this->normal.normalizar();
-        this->distancia = distancia;
     }
 
     virtual bool intersecta(Rayo &r) override

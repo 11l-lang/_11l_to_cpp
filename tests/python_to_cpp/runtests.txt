@@ -395,7 +395,7 @@ V failed_tests = 0
 V kdiff_showed = 0B
 F TEST(=str1, =str2, ohd = 0B, habr_html = 0B)
    :test_id++
-   print(‘Test ’String(test_id)‘ ...’, end' ‘’)
+   print(‘Test ’String(:test_id)‘ ...’, end' ‘’)
    str1 = pqmarkup:to_html(str1, ohd' ohd, habr_html' habr_html)
    I str1 != str2
       str1 = String(str1)
@@ -734,7 +734,7 @@ auto kdiff_showed = false;
 template <typename T1, typename T2, typename T3 = decltype(false), typename T4 = decltype(false)> auto TEST(T1 str1, T2 str2, const T3 &ohd = false, const T4 &habr_html = false)
 {
     ::test_id++;
-    print(u"Test "_S + String(test_id) + u" ..."_S, u""_S);
+    print(u"Test "_S + String(::test_id) + u" ..."_S, u""_S);
     str1 = pqmarkup::to_html(str1, nullptr, ohd, habr_html);
     if (str1 != str2) {
         str1 = String(str1);

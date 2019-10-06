@@ -362,15 +362,8 @@ class SymbolNode:
                                     assert(s.is_lambda)
                                     raise Error('probably `@` is missing (before this dot)', self.children[0].token)
                                 if type(s.node.parent) == ASTTypeDefinition:
-                                    fid = s.parent.ids.get(self.children[0].children[0].to_str())
-                                    if fid is None:
-                                        for base_type_name in s.node.parent.base_types:
-                                            tid = s.node.parent.scope.parent.find(base_type_name)
-                                            if tid is not None:
-                                                assert(isinstance(tid.ast_nodes[0], ASTTypeDefinition))
-                                                fid = tid.ast_nodes[0].scope.ids.get(self.children[0].children[0].to_str())
-                                                if fid is not None:
-                                                    break
+                                    assert(s.node.parent.scope == s.parent)
+                                    fid = s.node.parent.find_id_including_base_types(self.children[0].children[0].to_str())
                                     if fid is None:
                                         raise Error('call of undefined method `' + func_name + '`', self.children[0].children[0].token)
                                     if len(fid.ast_nodes) > 1:
@@ -1025,6 +1018,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         FINAL = 5
     virtual_category = VirtualCategory.NO
     scope : Scope
+    member_initializer_list = ''
 
     def __init__(self, function_arguments = None, function_return_type = ''):
         super().__init__()
@@ -1124,7 +1118,27 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                     arguments.append(
                         (('' if arg[3] == '=' else 'const ') + cpp_type_from_11l.get(arg[2], arg[2]) + ' ' + '&'*(arg[2] == 'String') if arg[3] != '&' else trans_type(arg[2], self.scope, tokens[self.tokeni]) + ' &')
                         + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
-        r = self.children_to_str(indent, ('template <' + ', '.join(templates) + '> ')*(len(templates) != 0) + s + '(' + ', '.join(arguments) + ')' + ' const'*(self.is_const or self.function_name in tokenizer.sorted_operators))
+
+        if self.member_initializer_list == '' and self.function_name == '' and type(self.parent) == ASTTypeDefinition:
+            i = 0
+            while i < len(self.children):
+                c = self.children[i]
+                if isinstance(c, ASTExpression) and c.expression.symbol.id == '=' \
+                        and c.expression.children[0].symbol.id == '.' \
+                    and len(c.expression.children[0].children) == 1 \
+                        and c.expression.children[0].children[0].token.category == Token.Category.NAME \
+                        and c.expression.children[1].token.category == Token.Category.NAME \
+                        and c.expression.children[1].token_str() in (arg[0] for arg in self.function_arguments):
+                    if self.member_initializer_list == '':
+                        self.member_initializer_list = " :\n"
+                    else:
+                        self.member_initializer_list += ",\n"
+                    self.member_initializer_list += ' ' * ((indent+1)*4) + c.expression.children[0].children[0].token_str() + '(' + c.expression.children[1].token_str() + ')'
+                    self.children.pop(i)
+                    continue
+                i += 1
+
+        r = self.children_to_str(indent, ('template <' + ', '.join(templates) + '> ')*(len(templates) != 0) + s + '(' + ', '.join(arguments) + ')' + ' const'*(self.is_const or self.function_name in tokenizer.sorted_operators) + self.member_initializer_list)
 
         if isinstance(self.parent, ASTTypeDefinition) and self.function_name in ('+', '-', '*', '/') and self.function_name + '=' not in self.parent.scope.ids:
             r += ' ' * (indent*4) + 'template <typename Ty> auto &operator' + self.function_name + "=(const Ty &t)\n"
@@ -1429,6 +1443,18 @@ class ASTTypeDefinition(ASTNodeWithChildren):
             c.deserialize_from_dict(c_dict)
             self.constructors.append(c)
 
+    def find_id_including_base_types(self, id):
+        tid = self.scope.ids.get(id)
+        if tid is None:
+            for base_type_name in self.base_types:
+                tid = self.scope.parent.find(base_type_name)
+                assert(tid is not None and len(tid.ast_nodes) == 1)
+                assert(isinstance(tid.ast_nodes[0], ASTTypeDefinition))
+                tid = tid.ast_nodes[0].find_id_including_base_types(id)
+                if tid is not None:
+                    break
+        return tid
+
     def to_str(self, indent):
         r = ''
         if self.tokeni > 0:
@@ -1572,7 +1598,7 @@ def type_of(sn):
         if left.expression.symbol.id == '(' and left.expression.children[0].token.category == Token.Category.NAME and left.expression.children[0].token_str()[0].isupper(): # ) # for `V n = Node()`
             tid = sn.scope.find(left.expression.children[0].token_str())
             assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
-            tid = tid.ast_nodes[0].scope.ids.get(sn.children[1].token_str())
+            tid = tid.ast_nodes[0].find_id_including_base_types(sn.children[1].token_str())
             if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition, ASTExpression)): # `ASTExpression` is needed to fix an error ‘identifier `Vhor` is not found in type `Scene`’ in '9.yopyra.py' (when `Vhor = .look.pVectorial(.upCamara)`, i.e. when there is no `Vhor : Vector`)
                 raise Error('identifier `' + sn.children[1].token_str() + '` is not found in type `' + left.expression.children[0].token_str() + '`', sn.left_to_right_token()) # error message example: method `remove` is not found in type `Array`
             if isinstance(tid.ast_nodes[0], ASTExpression):
@@ -2139,7 +2165,8 @@ def parse_internal(this_node):
                     while node.last_non_default_argument >= 0 and node.function_arguments[node.last_non_default_argument][1] != '':
                         node.last_non_default_argument -= 1
 
-                    scope.add_function(node.function_name, node)
+                    if node.function_name not in cpp_type_from_11l: # there was an error in line `String sitem` because of `F String()`
+                        scope.add_function(node.function_name, node)
 
                     next_token()
                     if token.value(source) == '->':
@@ -2470,7 +2497,7 @@ def parse_internal(this_node):
 
             if node.expression.symbol.id == '(' and node.expression.children[0].symbol.id == '.' \
                                             and len(node.expression.children[0].children) == 2   \
-                                                and node.expression.children[0].children[1].token_str() == 'split': # ) # `V (name, ...) = ....split(...)` ~> `(V name, V ...) = ....split(...)` -> `...assign_from_tuple(name, ...);` (because `auto [name, ...] = ....split(...);` does not working)
+                                                and node.expression.children[0].children[1].token_str() in ('split', 'split_py'): # ) # `V (name, ...) = ....split(...)` ~> `(V name, V ...) = ....split(...)` -> `...assign_from_tuple(name, ...);` (because `auto [name, ...] = ....split(...);` does not working)
                 n = node
                 node = ASTTupleAssignment()
                 for dv in n.dest_vars:
@@ -2543,7 +2570,9 @@ def parse_internal(this_node):
                         node = ASTVariableDeclaration()
                         id = scope.find(node_expression.token.value(source).rstrip('?'))
                         if id is not None:
-                            assert(len(id.ast_nodes) and type(id.ast_nodes[0]) in (ASTTypeDefinition, ASTTypeEnum))
+                            assert(len(id.ast_nodes) == 1)
+                            if type(id.ast_nodes[0]) not in (ASTTypeDefinition, ASTTypeEnum):
+                                raise Error('identifier is of type `' + type(id.ast_nodes[0]).__name__ + '` (should be ASTTypeDefinition or ASTTypeEnum)', node_expression.token) # this error was in line `String sitem` because of `F String()`
                             if type(id.ast_nodes[0]) == ASTTypeDefinition:
                                 if id.ast_nodes[0].has_virtual_functions:
                                     node.is_ptr = True
@@ -2715,6 +2744,7 @@ string_scope.add_name('map', ASTFunctionDefinition([('function', '', '(Char -> T
 builtins_scope.ids['String'].ast_nodes[0].scope = string_scope
 array_scope = Scope(None)
 array_scope.add_name('remove', ASTFunctionDefinition([('x', '', '')]))
+array_scope.add_name('reverse', ASTFunctionDefinition([]))
 builtins_scope.ids['Array'].ast_nodes[0].scope = array_scope
 set_scope = Scope(None)
 set_scope.add_name('difference', ASTFunctionDefinition([('other', '', 'Set')]))
@@ -2775,6 +2805,7 @@ module_scope = Scope(None)
 module_scope.add_function('', ASTFunctionDefinition([('startstop', '0', 'Float'), ('stop', '0', 'Float')]))
 module_scope.add_function('seed', ASTFunctionDefinition([('s', '', 'Int')]))
 module_scope.add_function('shuffle', ASTFunctionDefinition([('container', '', '', '&')]))
+module_scope.add_function('choice', ASTFunctionDefinition([('container', '', '')]))
 builtin_modules['random'] = Module(module_scope)
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++

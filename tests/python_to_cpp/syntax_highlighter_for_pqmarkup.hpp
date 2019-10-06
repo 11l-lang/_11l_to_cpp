@@ -26,10 +26,10 @@ class Error
 public:
     String message;
     int pos;
-    template <typename T1, typename T2> Error(const T1 &message, const T2 &pos)
+    template <typename T1, typename T2> Error(const T1 &message, const T2 &pos) :
+        message(message),
+        pos(pos)
     {
-        this->message = message;
-        this->pos = pos;
     }
 };
 

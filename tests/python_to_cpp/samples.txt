@@ -47,10 +47,10 @@ class Object
 public:
     int a;
     int b;
-    template <typename T1 = decltype(1), typename T2 = decltype(2)> Object(const T1 &a = 1, const T2 &b = 2)
+    template <typename T1 = decltype(1), typename T2 = decltype(2)> Object(const T1 &a = 1, const T2 &b = 2) :
+        a(a),
+        b(b)
     {
-        this->a = a;
-        this->b = b;
     }
 };
 auto object = Object(1, 3);
@@ -1683,9 +1683,9 @@ public:
     decltype(Set<String>()) s = Set<String>();
     Array<Array<int>> final = range_el(0, 9).map([](const auto &i){return 9 * create_array({0});});
 
-    template <typename T1> Class(const T1 &a)
+    template <typename T1> Class(const T1 &a) :
+        a(a)
     {
-        this->a = a;
     }
 };
 

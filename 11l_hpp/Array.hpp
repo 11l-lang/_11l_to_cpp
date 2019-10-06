@@ -1,12 +1,27 @@
 ﻿#include <initializer_list>
 #include <vector>
 
+template <typename Type> String to_string(const Type &v)
+{
+	return String(v);
+};
+template <typename Type, int N> String to_string(const Tvec<Type, N> &v)
+{
+	String r;
+	for (int i = 0; i < N; i++) {
+		r += String(v[i]);
+		if (i < N-1)
+			r += u", ";
+	}
+	return r;
+}
+
 class ValueError
 {
 public:
 	String value;
 
-	template <typename ValueTy> ValueError(const ValueTy &value) : value(String(value)) {}
+	template <typename ValueTy> ValueError(const ValueTy &value) : value(to_string(value)) {}
 };
 
 template <typename Type> class Array : public std::vector<Type>
@@ -219,9 +234,9 @@ public:
 		std::vector<Type>::insert(begin() + index, v);
 	}
 
-	int index(const Type &v) const
+	int index(const Type &v, int start = 0) const
 	{
-		for (int i=0, l=len(); i<l; i++)
+		for (int i=start, l=len(); i<l; i++)
 			if (std::vector<Type>::data()[i] == v) return i;
 		throw ValueError(v);
 	}
@@ -352,6 +367,15 @@ Array<char> create_array(std::initializer_list<bool> il) // avoid using std::vec
 }
 
 template <typename Type, bool include_beginning, bool include_ending> Array<Type> create_array(const Range<Type, include_beginning, include_ending> &range)
+{
+	Array<Type> r;
+	r.reserve(range.size());
+	for (auto i : range)
+		r.push_back(i);
+	return r;
+}
+
+template <typename Type, bool include_beginning, bool include_ending> Array<Type> create_array(const RangeWithStep<Type, include_beginning, include_ending> &range)
 {
 	Array<Type> r;
 	r.reserve(range.size());

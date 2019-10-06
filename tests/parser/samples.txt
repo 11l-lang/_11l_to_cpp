@@ -183,10 +183,10 @@ public:
         age = 1;
     }
 
-    template <typename T1, typename T2> Person(const T1 &name, const T2 &age)
+    template <typename T1, typename T2> Person(const T1 &name, const T2 &age) :
+        name(name),
+        age(age)
     {
-        this->name = name;
-        this->age = age;
     }
 
     template <typename T1> auto operator()(const T1 &name)

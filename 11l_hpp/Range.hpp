@@ -100,6 +100,15 @@ public:
 	Iterator begin() const {return Iterator(b + !include_beginning,  step);}
 	Iterator end()   const {return Iterator(e - !include_ending + 1, step);}
 
+	Type size() const
+	{
+		return (Range<Type, include_beginning, include_ending>(b, e).size() + step - 1) / step;
+	}
+	Type len() const
+	{
+		return size();
+	}
+
 	template <typename Func> auto map(Func &&func) -> Array<decltype(func(std::declval<Type>()))>
 	{
 		Array<decltype(func(std::declval<Type>()))> r;

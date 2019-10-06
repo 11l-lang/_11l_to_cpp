@@ -93,11 +93,11 @@ public:
     int pos;
     int end;
 
-    template <typename T1, typename T2> Error(const T1 &message, const T2 &pos)
+    template <typename T1, typename T2> Error(const T1 &message, const T2 &pos) :
+        message(message),
+        pos(pos),
+        end(pos)
     {
-        this->message = message;
-        this->pos = pos;
-        end = pos;
     }
 };
 
@@ -121,11 +121,11 @@ public:
     int end;
     Category category;
 
-    template <typename T1, typename T2, typename T3> Token(const T1 &start, const T2 &end, const T3 &category)
+    template <typename T1, typename T2, typename T3> Token(const T1 &start, const T2 &end, const T3 &category) :
+        start(start),
+        end(end),
+        category(category)
     {
-        this->start = start;
-        this->end = end;
-        this->category = category;
     }
 
     auto __repr__()
@@ -380,7 +380,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                     }
                 }
 
-                else if (in(source[range_el(lexem_start, i)], keywords)) {
+                else if (in(source[range_el(lexem_start, i)], tokenizer::keywords)) {
                     if (in(source[range_el(lexem_start, i)], make_tuple(u"V"_S, u"П"_S, u"var"_S, u"перем"_S)))
                         category = decltype(category)::NAME;
                     else if (in(source[range_el(lexem_start, i)], make_tuple(u"N"_S, u"Н"_S, u"null"_S, u"нуль"_S)))

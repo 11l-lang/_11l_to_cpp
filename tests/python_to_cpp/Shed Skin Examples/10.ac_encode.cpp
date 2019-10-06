@@ -116,7 +116,7 @@ template <typename T1, typename T2 = decltype(10000), typename T3 = decltype(BET
         p0 = c0 * 1.0 / (c0 + c1);
     auto ans = u""_S;
     auto u = 0.0;
-    auto v = to_float(ONE);
+    auto v = to_float(::ONE);
     int boundary;
     for (auto &&c : string) {
         if (n <= 0)

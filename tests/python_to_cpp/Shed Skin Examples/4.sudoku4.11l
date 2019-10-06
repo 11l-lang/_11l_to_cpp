@@ -5,7 +5,7 @@ V rows = ‘ABCDEFGHI’
 V cols = ‘123456789’
 V digits = ‘123456789’
 V squares = cross(rows, cols)
-V unitlist = (cols.map(c -> cross(rows, String(c))) [+] rows.map(r -> cross(String(r), cols)) [+] multiloop([‘ABC’, ‘DEF’, ‘GHI’], [‘123’, ‘456’, ‘789’], (rs, cs) -> cross(rs, cs)))
+V unitlist = (cols.map(c -> cross(:rows, String(c))) [+] rows.map(r -> cross(String(r), :cols)) [+] multiloop([‘ABC’, ‘DEF’, ‘GHI’], [‘123’, ‘456’, ‘789’], (rs, cs) -> cross(rs, cs)))
 V units = Dict(squares.map(s -> (s, :unitlist.filter(u -> @s C u))))
 Dict[String, Set[String]] peers
 L(s) squares
@@ -62,7 +62,7 @@ F parse_grid(=grid) -> Dict[String, String]
    ‘Given a string of 81 digits (or .0-), return a dict of {cell:values}’
    grid = grid.filter(c -> c C ‘0.-123456789’)
    V values = Dict(:squares.map(s -> (s, :digits)))
-   L(s, d) zip(squares, grid)
+   L(s, d) zip(:squares, grid)
       I d C :digits & assign(&values, s, d).empty
          R Dict()
    R values

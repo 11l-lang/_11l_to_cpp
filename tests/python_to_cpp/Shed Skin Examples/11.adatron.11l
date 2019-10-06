@@ -30,7 +30,7 @@ T Protein
 
    F extract_composition()
       .local_composition = Dict((:AMINOACIDS.map(x -> (x, 0.0))))
-      L(counter) 0 .< LENGTH
+      L(counter) 0 .< :LENGTH
          .local_composition[.sequence[counter]] += 1.0 / :LENGTH
       .global_composition = Dict((:AMINOACIDS.map(x -> (x, 0.0))))
       L(aminoacid) .sequence

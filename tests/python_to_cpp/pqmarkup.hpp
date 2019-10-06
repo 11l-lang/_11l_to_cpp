@@ -11,12 +11,12 @@ public:
     int line;
     int column;
     int pos;
-    template <typename T1, typename T2, typename T3, typename T4> Exception(const T1 &message, const T2 &line, const T3 &column, const T4 &pos)
+    template <typename T1, typename T2, typename T3, typename T4> Exception(const T1 &message, const T2 &line, const T3 &column, const T4 &pos) :
+        message(message),
+        line(line),
+        column(column),
+        pos(pos)
     {
-        this->message = message;
-        this->line = line;
-        this->column = column;
-        this->pos = pos;
     }
 };
 
@@ -29,10 +29,10 @@ public:
     decltype(false) highlight_style_was_added = false;
     String instr;
 
-    template <typename T1, typename T2> Converter(const T1 &habr_html, const T2 &ohd)
+    template <typename T1, typename T2> Converter(const T1 &habr_html, const T2 &ohd) :
+        habr_html(habr_html),
+        ohd(ohd)
     {
-        this->habr_html = habr_html;
-        this->ohd = ohd;
     }
 
     template <typename T1, typename T3 = decltype(0)> String to_html(const T1 &instr, File* const outfilef = nullptr, const T3 &outer_pos = 0)
@@ -579,10 +579,10 @@ public:
                     public:
                         String text;
                         String attrs;
-                        TableCell(const String &text, const String &attrs)
+                        TableCell(const String &text, const String &attrs) :
+                            text(text),
+                            attrs(attrs)
                         {
-                            this->text = text;
-                            this->attrs = attrs;
                         }
                     };
                     Array<Array<TableCell>> table;

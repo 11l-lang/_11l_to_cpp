@@ -88,7 +88,7 @@ template <typename T2, typename T3, typename T4> auto perm(Array<Array<int>> &pu
     if (u.empty() && l.empty()) {
         print(u"Solved!"_S);
         printpuzzle(puzzle);
-        print(u"iterations: "_S + String(iterations));
+        print(u"iterations: "_S + String(::iterations));
         return true;
     }
     else

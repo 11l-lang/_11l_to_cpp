@@ -424,6 +424,7 @@ class Timsort:
 	list_ : List[int]
 	tmp   : List[int]
 	comparefn : Callable[[int, int], int]
+	min_gallop : int
 
 	def __init__(self, list_, comparefn=cmp):
 		self.min_merge = 32
