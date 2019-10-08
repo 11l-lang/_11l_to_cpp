@@ -1,0 +1,90 @@
+//import random
+
+F randomMatrix(n, upperBound, seed)
+   random:seed(seed)
+   [[Float]] m
+   L(r) 0 .< n
+      [Float] sm
+      L(c) 0 .< n
+         sm.append(upperBound * random:())
+      m.append(sm)
+   R m
+
+F wrappedPath(path)
+   R path[1..] [+] [path[0]]
+
+F pathLength(cities, path)
+   V pairs = zip(path, wrappedPath(path))
+   R sum(pairs.map2((r, c) -> @cities[r][c]))
+
+F updatePher([[Float]] &pher; path, boost)
+   V pairs = zip(path, wrappedPath(path))
+   L(r, c) pairs
+      pher[r][c] = pher[r][c] + boost
+
+F evaporatePher([[Float]] &pher; maxIter, boost)
+   V decr = boost / Float(maxIter)
+   L(r) 0 .< pher.len
+      L(c) 0 .< pher[r].len
+         I pher[r][c] > decr
+            pher[r][c] = pher[r][c] - decr
+         E
+            pher[r][c] = 0.0
+
+F doSumWeight(cities, pher, used, current)
+   V runningTotal = 0.0
+   L(city) 0 .< cities.len
+      I city !C used
+         runningTotal = (runningTotal + cities[current][city] * (1.0 + pher[current][city]))
+   R runningTotal
+
+F findSumWeight(cities, pher, used, current, soughtTotal)
+   V runningTotal = 0.0
+   V next = 0
+   L(city) 0 .< cities.len
+      I runningTotal >= soughtTotal
+         L.break
+      I city !C used
+         runningTotal = (runningTotal + cities[current][city] * (1.0 + pher[current][city]))
+         next = city
+   R next
+
+F genPath(cities, pher)
+   V current = random:(0, cities.len - 1 + 1)
+   V path = [current]
+   V used = [current = 1]
+   L used.len < cities.len
+      V sumWeight = doSumWeight(cities, pher, used, current)
+      V rndValue = random:() * sumWeight
+      current = findSumWeight(cities, pher, used, current, rndValue)
+      path.append(current)
+      used[current] = 1
+   R path
+
+F bestPath(cities, seed, maxIter, boost)
+   V pher = randomMatrix(cities.len, 0, 0)
+   random:seed(seed)
+   V bestLen = 0.0
+   [Int] bestPath
+   L(iter) 0 .< maxIter
+      V path = genPath(cities, pher)
+      V pathLen = pathLength(cities, path)
+      I pathLen > bestLen
+         updatePher(&pher, path, boost)
+         bestLen = pathLen
+         bestPath = path
+      evaporatePher(&pher, maxIter, boost)
+   R bestPath
+
+:start:
+V seed = 1
+V boost = 5
+V iter = 1000
+V numCities = 200
+V maxDistance = 100
+V cityDistanceSeed = 1
+print(‘starting’)
+V cities = randomMatrix(numCities, maxDistance, cityDistanceSeed)
+V path = bestPath(cities, seed, iter, boost)
+print(path)
+print(‘len = ’String(pathLength(cities, path)))

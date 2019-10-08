@@ -63,7 +63,7 @@ public:
 		Array<decltype(func(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>()))> r;
 		r.reserve(len());
 		for (auto &&el : *this)
-			r.push_back(func(std::get<0>(el), std::get<1>(el)));
+			r.push_back(func(_get<0>(el), _get<1>(el)));
 		return r;
 	}
 
