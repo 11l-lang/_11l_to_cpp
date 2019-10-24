@@ -416,12 +416,12 @@ public:
 		return r;
 	}
 
-	template <typename Func> String filter(Func &&func) const
+	template <typename Func> Array<Char> filter(Func &&func) const
 	{
-		String r;
+		Array<Char> r;
 		for (Char c : *this)
 			if (func(c))
-				r += c;
+				r.append(c);
 		return r;
 	}
 

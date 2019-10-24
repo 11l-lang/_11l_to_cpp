@@ -1,0 +1,59 @@
+//import sys
+
+F BF_interpreter(=prog)
+   V CELL = 255
+   prog = (prog.filter(c -> c C ‘><+-.,[]’)).join(‘’)
+   V len_prog = prog.len
+   V tape = [0]
+   V ip = 0
+   V p = 0
+   V level = 0
+
+   L ip < len_prog
+      V x = prog[ip]
+      ip++
+
+      I x == ‘+’
+         tape[p] = (tape[p] + 1) [&] CELL
+      E I x == ‘-’
+         tape[p] = (tape[p] - 1) [&] CELL
+      E I x == ‘>’
+         p++
+         I tape.len <= p
+            tape.append(0)
+      E I x == ‘<’
+         I p
+            p--
+         E
+            tape.insert(0, 0)
+      E I x == ‘.’
+         :stdout.write(Char(code' tape[p]))
+      E I x == ‘,’
+         tape[p] = :stdin.read(1).code
+      E I x == ‘[’
+         I !(tape[p])
+            L
+               I prog[ip] == ‘[’
+                  level++
+               I prog[ip] == ‘]’
+                  I level
+                     level--
+                  E
+                     L.break
+               ip++
+            ip++
+      E I x == ‘]’
+         ip -= 2
+         L
+            I prog[ip] == ‘[’
+               I level
+                  level--
+               E
+                  L.break
+            I prog[ip] == ‘]’
+               level++
+            ip--
+
+:start:
+V program = File(‘testdata/99bottles.bf’).read()
+BF_interpreter(program)
