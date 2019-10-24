@@ -50,7 +50,21 @@ The package contains the following functions:
 
 import sys, os
 
+class InternalNode:
+    name : str
+    def __init__(self):
+        self.leaf = 0
+        self.child : List[InternalNode] = []
+    def children(self,child0,child1):
+        self.leaf = 0
+        self.child.append(child0)
+        self.child.append(child1)
+
 class node:
+    count : float
+    index : int
+    name  : str
+    internalnode : InternalNode
     def __init__(self, count, index , name=""):
         self.count = float(count)
         self.index = index
@@ -65,24 +79,11 @@ class node:
     def report(self):
         if (self.index == 1 ) :
             print('#Symbol\tCount\tCodeword')
-        print('%s\t(%2.2g)\t%s' % (self.name,self.count,self.word))
-        pass
+        print('%s\t(%f)\t%s' % (self.name,self.count,self.word))
     def associate(self,internalnode):
         self.internalnode = internalnode
-        internalnode.leaf = 1
-        internalnode.name = self.name
-        pass
-
-class internalnode:
-    def __init__(self):
-        self.leaf = 0
-        self.child = []
-        pass
-    def children(self,child0,child1):
-        self.leaf = 0
-        self.child.append(child0)
-        self.child.append(child1)
-        pass
+        self.internalnode.leaf = 1
+        self.internalnode.name = self.name
 
 def find_idx(seq, index):
     for item in seq:
@@ -93,8 +94,9 @@ def find_name(seq, name):
     for item in seq:
         if item.name == name:
             return item
+    return node(0, -1)
 
-def iterate (c) :
+def iterate (c : List[node]) -> InternalNode:
     """
     Run the Huffman algorithm on the list of "nodes" c.
     The list of nodes c is destroyed as we go, then recreated.
@@ -117,13 +119,14 @@ def iterate (c) :
     c         (0.12)	000
     d         (0.12)	001
     """
+    root : InternalNode
     if ( len(c) > 1 ) :
         c.sort() ## sort the nodes by count, using the __cmp__ function defined in the node class
         deletednode = c[0] ## keep copy of smallest node so that we can put it back in later
         second = c[1].index ## index of second smallest node
         # MERGE THE BOTTOM TWO
         c[1].count += c[0].count  ##  this merged node retains the name of the bigger leaf.
-        del c[0]
+        c.pop(0)
 
         root = iterate ( c )
 
@@ -137,18 +140,16 @@ def iterate (c) :
         co.count -= deletednode.count   ## restore correct count
 
         ## make the new branches in the DECODING tree
-        newnode0 = internalnode()
-        newnode1 = internalnode()
+        newnode0 = InternalNode()
+        newnode1 = InternalNode()
         treenode = co.internalnode # find the node that got two children
         treenode.children(newnode0,newnode1)
         deletednode.associate(newnode0)
         co.associate(newnode1)
-        pass
     else :
         c[0].word = ""
-        root = internalnode()
+        root = InternalNode()
         c[0].associate(root)
-        pass
     return root
 
 def encode(sourcelist,code):
@@ -159,12 +160,10 @@ def encode(sourcelist,code):
     for s in sourcelist:
         co = find_name(code, s)
 #        co = find(lambda p: p.name == s, code)
-        if ( not co  ):
-            print("Warning: symbol",repr(s),"has no encoding!", file=sys.stderr)
-            pass
+        if co.index == -1:
+            print("Warning: symbol " + s + " has no encoding!")
         else:
             answer = answer + co.word
-            pass
     return answer
 
 def decode(string,root):
@@ -173,7 +172,7 @@ def decode(string,root):
     """
     ## split the string into a list
     ## then copy the elements of the list one by one.
-    answer = []
+    answer : List[str] = []
     clist = list( string )
     ## start from root
     currentnode = root
@@ -184,8 +183,7 @@ def decode(string,root):
         if currentnode.leaf != 0:
             answer.append( str(currentnode.name) )
             currentnode = root
-        pass
-    assert (currentnode == root) ## if this is not true then we have run out of characters and are half-way through a codeword
+    #assert (currentnode == root) ## if this is not true then we have run out of characters and are half-way through a codeword
     return answer
 
 ## alternate way of calling huffman with a list of counts ## for use as package by other programs ######
@@ -215,11 +213,10 @@ def makenodes(probs):
     See also the file Example.py for a python program that uses this package.
     """
     m=0
-    c=[]
+    c : List[node]=[]
     for p in probs:
-        m += 1 ;
+        m += 1
         c.append( node( p[1], m, p[0] ) )
-        pass
     return c
 
 def dec_to_bin( n , digits ):
@@ -256,69 +253,60 @@ def weight(string):
     for c in list(string):
         if(c=='0'):
             w0+=1
-            pass
         elif(c=='1'):
             w1+=1
-            pass
-        pass
     return (w0,w1)
 
 
-def findprobs(f=0.01,N=6):
+def findprobs(f=0.01,nn=6):
     """ Find probabilities of all the events
     000000
     000001
      ...
     111111
-    <-N ->
+    <-nn ->
     >>> print findprobs(0.1,3)              # doctest:+ELLIPSIS
     [('000', 0.7...),..., ('111', 0.001...)]
     """
-    answer = []
-    for n in range(2**N):
-        s = dec_to_bin(n,N)
+    answer : List[Tuple[str, float]] = []
+    for n in range(int(2**nn)):
+        s = dec_to_bin(n,nn)
         (w0,w1) = weight(s)
         if verbose and 0 :
-            print(s,w0,w1)
+            print(s + ' ' + w0 + ' ' + w1)
         answer.append( (s, f**w1 * (1-f)**w0 ) )
-        pass
-    assert ( len(answer) == 2**N )
+    assert ( len(answer) == 2**nn )
     return answer
 
-def Bencode(string,symbols,N):
+def Bencode(string,symbols,n):
     """
     Reads in a string of 0s and 1s.
-    Creates a list of blocks of size N.
+    Creates a list of blocks of size n.
     Sends this list to the general-purpose Huffman encoder
     defined by the nodes in the list "symbols".
     """
-    blocks = []
+    blocks : List[str] = []
     chars = list(string)
 
     s=""
     for c in chars:
         s = s+c
-        if (len(s)>=N):
+        if (len(s)>=n):
             blocks.append( s )
             s = ""
-            pass
-        pass
     if (len(s)>0):
-        print("warning, padding last block with 0s", file=sys.stderr)
-        while (len(s)<N):
+        print("warning, padding last block with 0s")
+        while (len(s)<n):
             s = s+'0'
-            pass
         blocks.append( s )
-        pass
 
     if verbose:
         print("blocks to be encoded:")
         print(blocks)
-        pass
     zipped = encode( blocks , symbols )
     return zipped
 
-def Bdecode(string,root,N):
+def Bdecode(string,root,n):
     """
     Decode a binary string into blocks.
     """
@@ -326,7 +314,6 @@ def Bdecode(string,root,N):
     if verbose:
         print("blocks from decoder:")
         print(answer)
-        pass
     output = "".join( answer )
     ## this assumes that the source file was an exact multiple of the blocklength
     return output
@@ -348,32 +335,59 @@ def easytest():
     decoded = ['000', '001', '010', '011', '100', '100', '000']
     OK!
     """
-    N=3
+    n=3
     f=0.01
-    probs = findprobs(f,N)
+    probs = findprobs(f,n)
 #    if len(probs) > 999 :
 #        sys.setrecursionlimit( len(probs)+100 )
     symbols = makenodes(probs) # makenodes is defined at the bottom of Huffman3 package
     root = iterate(symbols) # make huffman code and put it into the symbols' nodes, and return the root of the decoding tree
 
-    symbols.sort(key = lambda x: x.index) # sort by index
-    for co in symbols :                   # and write the answer
+    symbols = sorted(symbols, key = lambda x: x.index) # sort by index
+    for co in symbols :                                # and write the answer
         co.report()
 
     source = ['000','001','010','011','100','100','000']
     zipped = encode(source, symbols)
-    print("zipped  =",zipped)
+    print("zipped  = " + zipped)
     answer = decode( zipped, root )
-    print("decoded =",answer)
+    print("decoded = ", end = ''); print(answer)
     if ( source != answer ):
         print("ERROR")
     else:
         print("OK!")
-    pass
 
-def test():
-    easytest()
-    hardertest()
+f=0.01; n=12   #  1244 bits if n==12
+f=0.01; n=5   #  2266  bits if n==5
+f=0.01; n=10   #  1379 bits if n==10
+
+def compress_it( inputfile, outputfile ):
+    """
+    Make Huffman code for blocks, and
+    Compress from file (possibly stdin).
+    """
+    probs = findprobs(f,n)
+    symbols = makenodes(probs)
+#    if len(probs) > 999 :
+#        sys.setrecursionlimit( len(probs)+100 )
+    root = iterate(symbols) # make huffman code and put it into the symbols' nodes, and return the root of the decoding tree
+
+    string = inputfile.read()
+    outputfile.write( Bencode(string, symbols, n) )
+
+def uncompress_it( inputfile, outputfile ):
+    """
+    Make Huffman code for blocks, and
+    UNCompress from file (possibly stdin).
+    """
+    probs = findprobs(f,n)
+#    if len(probs) > 999 :
+#        sys.setrecursionlimit( len(probs)+100 )
+    symbols = makenodes(probs)
+    root = iterate(symbols) # make huffman code and put it into the symbols' nodes, and return the root of the decoding tree
+
+    string = inputfile.read()
+    outputfile.write( Bdecode(string, root, n) )
 
 def hardertest():
     print("Reading the BentCoinFile")
@@ -394,44 +408,12 @@ def hardertest():
     print("Checking for differences...")
     print((open('testdata/BentCoinFile').read() == open('tmp2').read()))#os.system( "diff testdata/BentCoinFile tmp2" )
     #os.system( "wc tmp.zip testdata/BentCoinFile tmp2" )
-    pass
 
-f=0.01; N=12   #  1244 bits if N==12
-f=0.01; N=5   #  2266  bits if N==5
-f=0.01; N=10   #  1379 bits if N==10
-
-def compress_it( inputfile, outputfile ):
-    """
-    Make Huffman code for blocks, and
-    Compress from file (possibly stdin).
-    """
-    probs = findprobs(f,N)
-    symbols = makenodes(probs)
-#    if len(probs) > 999 :
-#        sys.setrecursionlimit( len(probs)+100 )
-    root = iterate(symbols) # make huffman code and put it into the symbols' nodes, and return the root of the decoding tree
-
-    string = inputfile.read()
-    outputfile.write( Bencode(string, symbols, N) )
-    pass
-
-def uncompress_it( inputfile, outputfile ):
-    """
-    Make Huffman code for blocks, and
-    UNCompress from file (possibly stdin).
-    """
-    probs = findprobs(f,N)
-#    if len(probs) > 999 :
-#        sys.setrecursionlimit( len(probs)+100 )
-    symbols = makenodes(probs)
-    root = iterate(symbols) # make huffman code and put it into the symbols' nodes, and return the root of the decoding tree
-
-    string = inputfile.read()
-    outputfile.write( Bdecode(string, root, N) )
-    pass
+def test():
+    easytest()
+    hardertest()
 
 if __name__ == '__main__':
-    sys.setrecursionlimit( 10000 )
+    #sys.setrecursionlimit( 10000 )
     test()
-    pass
 

@@ -50,7 +50,7 @@ public:
 		return *this;
 	}
 
-	void write(const String &s)
+	void write(const String &s) const
 	{
 		std::string utf8;
 #ifdef _WIN32
@@ -62,7 +62,7 @@ public:
 		fwrite(utf8.data(), utf8.size(), 1, file);
 	}
 
-	String read()
+	String read() const
 	{
 		fseek(file, 0, SEEK_END);
 		size_t file_size = ftell(file);
