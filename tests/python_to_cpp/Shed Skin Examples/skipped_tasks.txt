@@ -2,3 +2,5 @@
 . TarsaLZP.py — import com.github.tarsa.tarsalzp.Main
 . TonyJpegDecoder.py — is not compatible with Python 3
 . voronoi2.py — unclear how to use it (what input file is needed)
+. astar.py and astar_main.py — require pygame module
+. bh.py — unclear how to use it (what input file is needed)
