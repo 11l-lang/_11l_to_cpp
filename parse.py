@@ -540,7 +540,7 @@ class SymbolNode:
                         type_of_values_is_char = False
                         break
                 res = 'create_array' + ('<' + trans_type(self.children[0].children[0].token_str(), self.scope, self.children[0].children[0].token)
-                                      + '>' if len(self.children) > 1 and self.children[0].function_call and self.children[0].children[0].token_str()[0].isupper() else '') + '({'
+                                      + '>' if len(self.children) > 1 and self.children[0].function_call and self.children[0].children[0].token_str()[0].isupper() and self.children[0].children[0].token_str() != 'Array' else '') + '({'
                 for i in range(len(self.children)):
                     res += char_or_str(self.children[i], type_of_values_is_char)
                     if i < len(self.children)-1:
@@ -857,8 +857,15 @@ class ASTNodeWithChildren(ASTNode):
         return r + ' ' * (indent*4) + "}\n"
 
     def children_to_str_detect_single_stmt(self, indent, r, check_for_if = False):
+        def has_if(node):
+            while True:
+                if not isinstance(node, ASTNodeWithChildren) or len(node.children) != 1:
+                    return False
+                if type(node) == ASTIf:
+                    return True
+                node = node.children[0]
         if (len(self.children) != 1
-                or (check_for_if and type(self.children[0]) == ASTIf) # for correctly handling of dangling-else
+                or (check_for_if and (type(self.children[0]) == ASTIf or has_if(self.children[0]))) # for correctly handling of dangling-else
                 or type(self.children[0]) == ASTLoopRemoveCurrentElementAndContinue): # `L.remove_current_element_and_continue` ‘раскрывается в 2 строки кода’\‘is translated into 2 statements’
             return self.children_to_str(indent, r, False)
         assert(len(self.children) == 1)
