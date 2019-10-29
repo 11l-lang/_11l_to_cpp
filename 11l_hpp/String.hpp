@@ -695,6 +695,11 @@ inline int to_int(double d)
 	return (int)d;
 }
 
+inline int to_int(int i)
+{
+	return i;
+}
+
 inline int64_t to_int64(double d)
 {
 	return (int64_t)d;
@@ -723,6 +728,16 @@ inline double to_float(Char ch)
 inline double to_float(int i)
 {
 	return i;
+}
+
+inline double to_float(float f)
+{
+	return f;
+}
+
+inline double to_float(double d)
+{
+	return d;
 }
 
 inline double parse_float(const char16_t *s)

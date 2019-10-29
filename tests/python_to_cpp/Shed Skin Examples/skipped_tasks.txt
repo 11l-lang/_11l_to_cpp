@@ -4,6 +4,6 @@
 . voronoi2.py — unclear how to use it (what input file is needed)
 . astar.py and astar_main.py — require pygame module
 . bh.py — unclear how to use it (what input file is needed)
-. block.py — ?
+. block.py — problem with InternalNode.children and node.associate(self,internalnode) — `iterate(symbols)` does not work
 . c64_main.py — require pygtk, gtk, optparse modules
 . chaos.py — is not compatible with Python 3 (‘TypeError: a bytes-like object is required, not 'str'’ in line ‘f.write(magic)’)

@@ -49,6 +49,7 @@ The package contains the following functions:
 ## This supplies the huffman algorithm, complete with encoders and decoders:
 
 import sys, os
+from typing import List
 
 class InternalNode:
     name : str
