@@ -159,6 +159,18 @@ void sleep(double secs) // I could not pick up an appropriate namespace for this
 	std::this_thread::sleep_for(std::chrono::duration<double>(secs));
 }
 
+namespace std {
+template <> class hash<String>
+{
+public:
+	size_t operator()(const String &s) const { return hash<u16string>()(s); }
+};
+}
+template <typename Ty> auto hash(const Ty &obj)
+{
+	return std::hash<Ty>()(obj);
+}
+
 inline void print(const String &s = u"", const String &end = u"\n", bool flush = false)
 {
 	std::wcout << std::wstring(s.cbegin(), s.cend()) << std::wstring(end.cbegin(), end.cend());

@@ -7,3 +7,6 @@
 . block.py — problem with InternalNode.children and node.associate(self,internalnode) — `iterate(symbols)` does not work
 . c64_main.py — require pygtk, gtk, optparse modules
 . chaos.py — is not compatible with Python 3 (‘TypeError: a bytes-like object is required, not 'str'’ in line ‘f.write(magic)’)
+. chull.py — is not interesting
+. circle.py and circle_main.py — require pygame module
+. colorsys.py — prints nothing

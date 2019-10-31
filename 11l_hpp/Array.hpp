@@ -44,6 +44,17 @@ public:
 			append(c);
 	}
 
+	operator String() const
+	{
+		String r = u'[';
+		for (int i=0; i<len(); i++) {
+			r += String(at(i));
+			if (i < len()-1) r += u", ";
+		}
+		r += u']';
+		return r;
+	}
+
 	using std::vector<Type>::begin,
 	      std::vector<Type>::end,
 	      std::vector<Type>::clear,
@@ -320,7 +331,7 @@ public:
 	{
 		if (len() != arr.len()) return false;
 		for (int i=0, n=len(); i<n; i++)
-			if (std::vector<Type>::at(i) != arr.at(i))
+			if (!(std::vector<Type>::at(i) == arr.at(i)))
 				return false;
 		return true;
 	}

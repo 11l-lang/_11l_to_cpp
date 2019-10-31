@@ -86,7 +86,7 @@ class soduko:
                 assert row != set_row or col != set_col , 'meuh'
                 self.cell_exclude(row,col,x)
 
-    def get_cell_digit_str(self,row,col) :
+    def get_cell_digit_str(self,row,col) : # const
         if len(self.squares[row][col])==1 :
             return str(self.squares[row][col][0])
         else :

@@ -84,7 +84,7 @@ T soduko
             assert(row != set_row | col != set_col, ‘meuh’)
             .cell_exclude(row, col, x)
 
-   F get_cell_digit_str(row, col)
+   F.const get_cell_digit_str(row, col)
       I .squares[row][col].len == 1
          R String(.squares[row][col][0])
       E

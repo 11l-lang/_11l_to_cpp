@@ -137,7 +137,7 @@ public:
         __normalize();
     }
 
-    operator String()
+    operator String() const
     {
         auto s = u"\n"_S;
         for (auto &&row : _rows) {

@@ -1,0 +1,143 @@
+UInt32 random_seed = 0
+F rnd()
+   :random_seed = (1664525 * :random_seed + 1013904223) [&] FFFF'FFFF
+   R :random_seed
+
+F randint(max) -> UInt32
+   R (UInt64(rnd()) * max) >> 32
+F randfloat(max)
+   R rnd() * (max / Float(0001'0000'0000))
+F random_uniform(min, max)
+   R randfloat(max - min) + min
+
+T Vertex
+   String name
+   F (name = ‘’)
+      .name = name
+
+   F <(v)
+      R .name < v.name
+
+   F ==(v)
+      R .name == v.name
+
+   F __hash__()
+      R hash(.name)
+
+   F String()
+      R .name
+
+   F __repr__()
+      R .name
+
+T Edge
+   Vertex u
+   Vertex v
+   Float d
+   F (u, v, d)
+      .u = u
+      .v = v
+      .d = d
+   F String()
+      R ‘[#. --#0.2--> #.]’.format(.u.name, .d, .v.name)
+
+T Graph
+   [Vertex] v
+   [Edge] e
+   F ()
+      [Vertex] v
+
+      L(n) 0.<100
+         v.append(Vertex(String(n + 1)))
+      [Edge] e
+      L(n) 0 .< 10 * v.len
+         V ui = randint(v.len)
+         V u = v[ui]
+         V tv = Vertex(‘’)
+         L
+            V tvi = randint(v.len)
+            tv = v[tvi]
+            I tvi != ui
+               L.break
+         e.append(Edge(u, tv, random_uniform(10, 100)))
+      .v = v
+      .e = e
+
+   F distance(s, ss)
+      Float d
+      L(edge) :G.e.filter(e -> e.u == @s & e.v == @ss[0])
+         d = edge.d
+         L.break
+         L.was_no_break
+            assert(0B)
+
+      L(u, v) zip(ss[0 .< (len)-1], ss[1..])
+         L(edge) :G.e.filter(e -> e.u == @u & e.v == @v)
+            d += edge.d
+            L.break
+            L.was_no_break
+               assert(0B)
+      R d
+V G = Graph()
+
+F Extract_Min([Vertex] &q; d)
+   V m_is_none = 1B
+   V m = Vertex(‘’)
+   V md = 1e50
+   L(u) q
+      I m_is_none
+         m = u
+         m_is_none = 0B
+         md = d[u]
+      E
+         I d[u] < md
+            md = d[u]
+            m = u
+   q.remove(m)
+   R m
+
+F dijkstra(g, t, s)
+   Dict[Vertex, Float] d
+   Dict[Vertex, Vertex] previous
+   L(v) g.v
+      d[v] = 1e50
+      previous[v] = Vertex(‘’)
+   d[s] = 0
+   [Vertex] ss
+   V Q = copy(g.v)
+
+   L !Q.empty
+      V u = Extract_Min(&Q, d)
+      I u == t
+         L.break
+      ss.append(u)
+      L(edge) g.e.filter(e -> e.u == @u)
+         I d[u] + edge.d < d[edge.v]
+            d[edge.v] = d[u] + edge.d
+            previous[edge.v] = u
+   ss.clear()
+   V u = t
+   L previous[u].name != ‘’
+      ss.insert(0, u)
+      u = previous[u]
+   R ss
+
+:start:
+L(n) 0.<100
+   G = Graph()
+   V si = randint(G.v.len)
+   V s = G.v[si]
+   V t = Vertex(‘’)
+   L
+      V ti = randint(G.v.len)
+      t = G.v[ti]
+      I ti != si
+         L.break
+   V ss = dijkstra(G, t, s)
+   I !ss.empty
+      print(‘dijkstra #. ---> #.: #. #.9’.format(String(s), String(t), String(ss), G.distance(s, ss)))
+      L(inter) ss[0 .< (len)-1]
+         V S1 = dijkstra(G, t, inter)
+         print("\t => dijkstra #. ---> #.: #. #.9".format(String(inter), String(t), String(S1), G.distance(inter, S1)))
+         I S1 != ss[(ss.len - S1.len) ..]
+            print(‘************ ALARM! **************’)

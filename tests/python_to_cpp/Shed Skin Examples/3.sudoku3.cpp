@@ -109,7 +109,7 @@ public:
             }
     }
 
-    template <typename T1, typename T2> auto get_cell_digit_str(const T1 &row, const T2 &col)
+    template <typename T1, typename T2> auto get_cell_digit_str(const T1 &row, const T2 &col) const
     {
         if (squares[row][col].len() == 1)
             return String(_get<0>(squares[row][col]));
@@ -117,7 +117,7 @@ public:
             return u"0"_S;
     }
 
-    operator String()
+    operator String() const
     {
         auto answer = u"   123   456   789\n"_S;
         for (auto row : range_el(0, 9)) {

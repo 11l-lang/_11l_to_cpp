@@ -385,6 +385,8 @@ class SymbolNode:
                     func_name = 'to_int'
                 elif func_name == 'Int64':
                     func_name = 'to_int64'
+                elif func_name == 'UInt64':
+                    func_name = 'to_uint64'
                 elif func_name == 'UInt32':
                     func_name = 'to_uint32'
                 elif func_name == 'Float':
@@ -1044,6 +1046,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         self.function_arguments = [arg.split('; ') for arg in d['function_arguments']]
 
     def to_str(self, indent):
+        is_const = False
         if type(self.parent) == ASTTypeDefinition:
             if self.function_name == '': # this is constructor
                 s = self.parent.type_name
@@ -1051,9 +1054,10 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 s = '~' + self.parent.type_name
             elif self.function_name == 'String':
                 s = 'operator String'
+                is_const = True
             else:
                 s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + \
-                    {'()':'operator()', '[&]':'operator&', '<':'operator<', '+':'operator+', '-':'operator-', '*':'operator*'}.get(self.function_name, self.function_name)
+                    {'()':'operator()', '[&]':'operator&', '<':'operator<', '==':'operator==', '+':'operator+', '-':'operator-', '*':'operator*'}.get(self.function_name, self.function_name)
 
             if self.virtual_category != self.VirtualCategory.NO:
                 arguments = []
@@ -1102,7 +1106,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
             s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + self.function_name
 
         if len(self.function_arguments) == 0:
-            return self.children_to_str(indent, s + '()' + ' const'*self.is_const)
+            return self.children_to_str(indent, s + '()' + ' const'*(self.is_const or is_const))
 
         templates = []
         arguments = []
@@ -2572,12 +2576,13 @@ def parse_internal(this_node):
                         node.set_expression(expression())
                         if node.expression.symbol.id == '(' and node.expression.children[0].token.category == Token.Category.NAME and node.expression.children[0].token_str()[0].isupper(): # ) # for `V animal = Sheep(); animal.say()` -> `...; animal->say();`
                             id = scope.find(node.expression.children[0].token_str())
-                            if not (id is not None and len(id.ast_nodes) and type(id.ast_nodes[0]) == ASTTypeDefinition):
+                            if not (id is not None and len(id.ast_nodes) != 0):
                                 raise Error('identifier `' + node.expression.children[0].token_str() + '` is not found', node.expression.children[0].token)
-                            if id.ast_nodes[0].has_virtual_functions:
-                                node.is_ptr = True
-                            elif id.ast_nodes[0].has_pointers_to_the_same_type:
-                                node.is_shared_ptr = True
+                            if type(id.ast_nodes[0]) == ASTTypeDefinition: # support for functions beginning with an uppercase letter (e.g. Extract_Min)
+                                if id.ast_nodes[0].has_virtual_functions:
+                                    node.is_ptr = True
+                                elif id.ast_nodes[0].has_pointers_to_the_same_type:
+                                    node.is_shared_ptr = True
                         node.vars = [var_name]
                     else:
                         node = ASTVariableDeclaration()
@@ -2691,6 +2696,7 @@ builtins_scope.add_function('max', ASTFunctionDefinition([('arg1', '', ''), ('ar
 builtins_scope.add_function('hex', ASTFunctionDefinition([('x', '', '')]))
 builtins_scope.add_function('bin', ASTFunctionDefinition([('x', '', '')]))
 builtins_scope.add_function('copy', ASTFunctionDefinition([('object', '', '')]))
+builtins_scope.add_function('hash', ASTFunctionDefinition([('object', '', '')]))
 builtins_scope.add_function('rotl', ASTFunctionDefinition([('value', '', 'Int'), ('shift', '', 'Int')]))
 builtins_scope.add_function('rotr', ASTFunctionDefinition([('value', '', 'Int'), ('shift', '', 'Int')]))
 builtins_scope.add_function('round', ASTFunctionDefinition([('number', '', 'Float'), ('ndigits', '0', '')]))

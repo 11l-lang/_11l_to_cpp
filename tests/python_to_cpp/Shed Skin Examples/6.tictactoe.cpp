@@ -91,7 +91,7 @@ public:
         return _get<0>(victors);
     }
 
-    operator String()
+    operator String() const
     {
         auto ret = u""_S;
         for (auto row : range_el(0, edge)) {
