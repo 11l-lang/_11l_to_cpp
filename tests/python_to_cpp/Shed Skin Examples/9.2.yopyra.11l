@@ -1,0 +1,309 @@
+//import math
+//import sys
+V MAX_DIST = 1999999999.0
+V PI_SOBRE_180 = 0.017453292
+V PEQUENO = 0.000000001
+
+F colorToString(c)
+   R ‘#. #. #.’.format(Int(max(0.0, min(c.r * 255.0, 255.0))),
+                       Int(max(0.0, min(c.g * 255.0, 255.0))),
+                       Int(max(0.0, min(c.b * 255.0, 255.0))))
+
+T Luz
+   (Float, Float, Float) posicion
+   (Float, Float, Float) color
+   String tipo
+
+   F (posicion, color, tipo)
+      .posicion = posicion
+      .color = color
+      .tipo = tipo
+
+T Material
+   (Float, Float, Float) color
+   Float cDifuso
+   Float cEspecular
+   Float dEspecular
+   Float cReflexion
+   Float cTransmitividad
+   Float iRefraccion
+
+   F (color, cDifuso = 0.0, cEspecular = 0.0, dEspecular = 0.0, cReflexion = 0.0, cTransmitividad = 0.0, iRefraccion = 0.0)
+      .color = color
+      .cDifuso = cDifuso
+      .cEspecular = cEspecular
+      .dEspecular = dEspecular
+      .cReflexion = cReflexion
+      .cTransmitividad = cTransmitividad
+      .iRefraccion = iRefraccion
+
+T Rayo
+   (Float, Float, Float) origen
+   (Float, Float, Float) direccion
+   Float disInter
+   Cuerpo& objInter
+
+   F (origen, direccion)
+      .origen = origen
+      .direccion = direccion
+      .disInter = :MAX_DIST
+      .objInter = N
+
+T Cuerpo
+   String tipo
+   Int material
+
+   F init(tipo, material)
+      .tipo = tipo
+      .material = material
+   F.virtual.abstract intersecta(Rayo& r) -> Bool
+   F.virtual.abstract getNormal((Float, Float, Float) punto) -> (Float, Float, Float)
+
+T Esfera(Cuerpo)
+   (Float, Float, Float) posicion
+   Float radio
+
+   F (material, posicion, radio)
+      .init(‘esfera’, material)
+      .posicion = posicion
+      .radio = radio
+
+   F.virtual.assign intersecta(Rayo& r) -> Bool
+      V esfera_rayo = .posicion - r.origen
+      V v = dot(esfera_rayo, r.direccion)
+
+      I v - .radio > r.disInter
+         R 0B
+      V distChoque = .radio * .radio + v * v - esfera_rayo.x * esfera_rayo.x - esfera_rayo.y * esfera_rayo.y - esfera_rayo.z * esfera_rayo.z
+      I distChoque < 0.0
+         R 0B
+      distChoque = v - sqrt(distChoque)
+      I distChoque > r.disInter | distChoque < 0.0
+         R 0B
+      r.disInter = distChoque
+      r.objInter = (.)
+      R 1B
+
+   F.virtual.assign getNormal((Float, Float, Float) punto) -> (Float, Float, Float)
+      V normal = punto - .posicion
+      R normalize(normal)
+
+T Plano(Cuerpo)
+   (Float, Float, Float) normal
+   Float distancia
+
+   F (material, normal, distancia)
+      .init(‘plano’, material)
+      .normal = normalize(normal)
+      .distancia = distancia
+
+   F.virtual.assign intersecta(Rayo& r) -> Bool
+      V v = dot(.normal, r.direccion)
+      I v == 0.0
+         R 0B
+      V distChoque = -(dot(.normal, r.origen) + .distancia) / v
+      I distChoque < 0.0
+         R 0B
+      I distChoque > r.disInter
+         R 0B
+      r.disInter = distChoque
+      r.objInter = (.)
+      R 1B
+
+   F.virtual.assign getNormal((Float, Float, Float) punto) -> (Float, Float, Float)
+      R .normal
+
+T Scene
+   Int endline
+   (Float, Float, Float) posCamara
+   (Float, Float, Float) lookCamara
+   (Float, Float, Float) upCamara
+   Int anchoGrid
+   Int altoGrid
+   (Float, Float, Float) look
+   (Float, Float, Float) Vhor
+   (Float, Float, Float) Vver
+   (Float, Float, Float) Vp
+   [Cuerpo] lObjetos
+   [Luz] lLuces
+   [Material] lMateriales
+   imgAncho = 320
+   imgAlto = 200
+   profTrazado = 3
+   oversampling = 1
+   campoVision = 60.0
+   startline = 0
+
+   F (scene_filename)
+      V lines = File(scene_filename).read_lines(1B).filter(l -> l.trim((‘ ’, "\t", "\r", "\n")) != ‘’ & l.trim((‘ ’, "\t", "\r", "\n"))[0] != ‘#’).map(l -> l.split_py())
+      .endline = .imgAlto - 1
+
+      L(line) lines
+         V word = line[0]
+         line = line[1..]
+
+         I word == ‘size’
+            .imgAncho = Int(line[0])
+            .imgAlto = Int(line[1])
+            .endline = .imgAlto - 1
+         E I word == ‘nbounces’
+            .profTrazado = Int(line[0])
+         E I word == ‘oversampling’
+            .oversampling = Int(line[0])
+         E I word == ‘vision’
+            .campoVision = Float(line[0])
+         E I word == ‘renderslice’
+            .startline = max(0, Int(line[0]))
+            .endline = min(.imgAlto - 1, Int(line[1]))
+
+         E I word == ‘posCamara’
+            .posCamara = .parse_vector(line)
+         E I word == ‘lookCamara’
+            .lookCamara = .parse_vector(line)
+         E I word == ‘upCamara’
+            .upCamara = .parse_vector(line)
+
+         E I word == ‘sphere’
+            V sph = Esfera(Int(line[0]), .parse_vector(line[1.<4]), Float(line.last))
+            .lObjetos.append(sph)
+
+         E I word == ‘plano’
+            V pl = Plano(Int(line[0]), .parse_vector(line[1.<4]), Float(line.last))
+            .lObjetos.append(pl)
+
+         E I word == ‘light’
+            V light = Luz(.parse_vector(line[0.<3]), .parse_color(line[3.<6]), line.last)
+            .lLuces.append(light)
+
+         E I word == ‘material’
+            V mat = .parse_material(line)
+            .lMateriales.append(mat)
+      .anchoGrid = .imgAncho * .oversampling
+      .altoGrid = .imgAlto * .oversampling
+      .look = .lookCamara - .posCamara
+      .Vhor = normalize(cross(.upCamara, .look))
+      .Vver = normalize(cross(.Vhor, .look))
+      V fl = .anchoGrid / (2 * tan((0.5 * .campoVision) * :PI_SOBRE_180))
+      V Vp = normalize(.look)
+      Vp.x = Vp.x * fl - 0.5 * (.anchoGrid * .Vhor.x + .altoGrid * .Vver.x)
+      Vp.y = Vp.y * fl - 0.5 * (.anchoGrid * .Vhor.y + .altoGrid * .Vver.y)
+      Vp.z = Vp.z * fl - 0.5 * (.anchoGrid * .Vhor.z + .altoGrid * .Vver.z)
+      .Vp = Vp
+
+   F parse_vector(line)
+      R (Float(line[0]), Float(line[1]), Float(line[2]))
+   F parse_color(line)
+      R (Float(line[0]), Float(line[1]), Float(line[2]))
+   F parse_material(line)
+      V f = line[3..].map(x -> Float(x))
+      R Material(.parse_color(line[0.<3]), f[0], f[1], f[2], f[3], f[4], f[5])
+V scene_namefile = ‘testdata/scene.txt’
+V scene = Scene(scene_namefile)
+
+F calculaSombra(Rayo& r; objChoque)
+   V sombra = 1.0
+   L(obj) :scene.lObjetos
+      r.objInter = N
+      r.disInter = :MAX_DIST
+
+      I obj.intersecta(r) & &obj != &objChoque
+         sombra *= :scene.lMateriales[obj.material].cTransmitividad
+   R sombra
+
+F trazar(Rayo& r; prof) -> (Float, Float, Float)
+   V c = (0.0, 0.0, 0.0)
+
+   L(obj) :scene.lObjetos
+      obj.intersecta(r)
+
+   I r.objInter != N
+      V matIndex = r.objInter.material
+      V pInterseccion = r.origen + r.direccion * r.disInter
+      V vIncidente = pInterseccion - r.origen
+      V vVueltaOrigen = normalize(r.direccion * -1.0)
+      V vNormal = r.objInter.getNormal(pInterseccion)
+      L(luz) :scene.lLuces
+         I luz.tipo == ‘ambiental’
+            c += luz.color
+         E I luz.tipo == ‘puntual’
+            V dirLuz = normalize(luz.posicion - pInterseccion)
+            V rayoLuz = Rayo(pInterseccion, dirLuz)
+            V sombra = calculaSombra(&rayoLuz, r.objInter)
+            V NL = dot(vNormal, dirLuz)
+            I NL > 0.0
+               I :scene.lMateriales[matIndex].cDifuso > 0.0
+                  V colorDifuso = luz.color * :scene.lMateriales[matIndex].cDifuso * NL
+                  colorDifuso.r *= :scene.lMateriales[matIndex].color.r * sombra
+                  colorDifuso.g *= :scene.lMateriales[matIndex].color.g * sombra
+                  colorDifuso.b *= :scene.lMateriales[matIndex].color.b * sombra
+                  c += colorDifuso
+               I :scene.lMateriales[matIndex].cEspecular > 0.0
+                  V rr = (vNormal * 2 * NL) - dirLuz
+                  V espec = dot(vVueltaOrigen, rr)
+                  I espec > 0.0
+                     espec = :scene.lMateriales[matIndex].cEspecular * pow(espec, :scene.lMateriales[matIndex].dEspecular)
+                     V colorEspecular = luz.color * espec * sombra
+                     c += colorEspecular
+      I prof < :scene.profTrazado
+         I :scene.lMateriales[matIndex].cReflexion > 0.0
+            V t = dot(vVueltaOrigen, vNormal)
+            I t > 0.0
+               V vDirRef = (vNormal * 2 * t) - vVueltaOrigen
+               V vOffsetInter = pInterseccion + vDirRef * :PEQUENO
+               V rayoRef = Rayo(vOffsetInter, vDirRef)
+               c += trazar(&rayoRef, prof + 1.0) * :scene.lMateriales[matIndex].cReflexion
+         I :scene.lMateriales[matIndex].cTransmitividad > 0.0
+            V RN = dot(vNormal, vIncidente * -1.0)
+            Float n1
+            Float n2
+            vIncidente = normalize(vIncidente)
+            I dot(vNormal, vIncidente) > 0.0
+               vNormal = vNormal * -1.0
+               RN = -RN
+               n1 = :scene.lMateriales[matIndex].iRefraccion
+               n2 = 1.0
+            E
+               n2 = :scene.lMateriales[matIndex].iRefraccion
+               n1 = 1.0
+            I n1 != 0.0 & n2 != 0.0
+               V par_sqrt = sqrt(1 - (n1 * n1 / n2 * n2) * (1 - RN * RN))
+               V vDirRefrac = vIncidente + (vNormal * RN) * (n1 / n2) - (vNormal * par_sqrt)
+               V vOffsetInter = pInterseccion + vDirRefrac * :PEQUENO
+               V rayoRefrac = Rayo(vOffsetInter, vDirRefrac)
+               c += trazar(&rayoRefrac, prof + 1.0) * :scene.lMateriales[matIndex].cTransmitividad
+   R c
+
+F renderPixel(=x, =y)
+   V c = (0.0, 0.0, 0.0)
+   x *= :scene.oversampling
+   y *= :scene.oversampling
+
+   L(i) 0 .< :scene.oversampling
+      L(j) 0 .< :scene.oversampling
+         (Float, Float, Float) direc
+         direc.x = x * :scene.Vhor.x + y * :scene.Vver.x + :scene.Vp.x
+         direc.y = x * :scene.Vhor.y + y * :scene.Vver.y + :scene.Vp.y
+         direc.z = x * :scene.Vhor.z + y * :scene.Vver.z + :scene.Vp.z
+         V r = Rayo(:scene.posCamara, normalize(direc))
+         c += trazar(&r, 1.0)
+         y++
+      x++
+   V srq_oversampling = :scene.oversampling * :scene.oversampling
+   c.r /= srq_oversampling
+   c.g /= srq_oversampling
+   c.b /= srq_oversampling
+   R c
+
+:start:
+print(‘Rendering: ’scene_namefile)
+V fileout = File(scene_namefile‘.ppm’, ‘w’)
+fileout.write("P3\n")
+fileout.write(String(scene.imgAncho)‘ ’String(scene.endline - scene.startline + 1)"\n")
+fileout.write("255\n")
+print(‘Line (from #.0 to #.0):’.format(scene.startline, scene.endline), end' ‘ ’)
+L(y) scene.startline .< scene.endline + 1
+   L(x) 0 .< scene.imgAncho
+      fileout.write(colorToString(renderPixel(x, y))‘ ’)
+   fileout.write("\n")
+   print(y, end' ‘ ’)
+   :stdout.flush()

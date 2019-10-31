@@ -933,7 +933,7 @@ def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False
         if ty.startswith('('): # )
             tuple_types_str = trans_type(ty[1:-1], scope, type_token, ast_type_node)
             tuple_types = tuple_types_str.split(', ')
-            if tuple_types[0] in ('int', 'float', 'double') and tuple_types.count(tuple_types[0]) == len(tuple_types):
+            if tuple_types[0] in ('int', 'float', 'double') and tuple_types.count(tuple_types[0]) == len(tuple_types) and len(tuple_types) in range(2, 5):
                 return {'int':'i', 'float':'', 'double':'d'}[tuple_types[0]] + 'vec' + str(len(tuple_types))
             return 'Tuple<' + tuple_types_str + '>'
 
@@ -1063,7 +1063,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                     else:
                         arguments.append(
                               ('' if '=' in arg[3] or '&' in arg[3] else 'const ')
-                            + arg[2].rstrip('?') + '* '*0 + ' '
+                            + trans_type(arg[2].rstrip('?'), self.scope, tokens[self.tokeni]) + '* '*0 + ' '
                             + ('&' if '&' in arg[3] or '=' not in arg[3] else '')
                             + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
                 s = 'virtual ' + s + '(' + ', '.join(arguments) + ')' + ('', ' override', ' = 0', ' override', ' final')[self.virtual_category - 1]
@@ -1093,7 +1093,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                     arguments.append(('auto ' if '=' in arg[3] else 'const auto &') + arg[0] if arg[1] == '' else
                                           ('' if '=' in arg[3] else 'const ') + 'decltype(' + arg[1] + ') ' + arg[0] + ' = ' + arg[1])
                 else:
-                    arguments.append(('' if '=' in arg[3] else 'const ') + trans_type(arg[2], self.scope, tokens[self.tokeni]) + ' ' + ('&'*(arg[2] not in ('Int',))) + arg[0] + ('' if arg[1] == '' else ' = ' + arg[1]))
+                    arguments.append(('' if '=' in arg[3] else 'const ') + trans_type(arg[2], self.scope, tokens[self.tokeni]) + ' ' + ('&'*(arg[2] not in ('Int', 'Float'))) + arg[0] + ('' if arg[1] == '' else ' = ' + arg[1]))
             return self.children_to_str(indent, ('auto' if self.function_return_type == '' else 'std::function<' + cpp_type_from_11l[self.function_return_type] + '(' + ', '.join(cpp_type_from_11l[arg[2]] for arg in self.function_arguments) + ')>') + ' ' + self.function_name
                 + ' = [' + ', '.join(sorted(filter(lambda v: not '&'+v in captured_variables, captured_variables))) + ']('
                 + ', '.join(arguments) + ')')[:-1] + ";\n"
@@ -1122,8 +1122,9 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                             + ('' if '=' in arg[3] else 'const ')
                             + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
                 else:
+                    ty = trans_type(arg[2], self.scope, tokens[self.tokeni])
                     arguments.append(
-                        (('' if arg[3] == '=' else 'const ') + cpp_type_from_11l.get(arg[2], arg[2]) + ' ' + '&'*(arg[2] == 'String') if arg[3] != '&' else trans_type(arg[2], self.scope, tokens[self.tokeni]) + ' &')
+                        (('' if arg[3] == '=' else 'const ') + ty + ' ' + '&'*(arg[2] not in ('Int', 'Float')) if arg[3] != '&' else ty + ' &')
                         + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
 
         if self.member_initializer_list == '' and self.function_name == '' and type(self.parent) == ASTTypeDefinition:
@@ -1615,7 +1616,10 @@ def type_of(sn):
     if len(left.type_args): # `Array[String] ending_tags... ending_tags.append(‘</blockquote>’)`
         return None # [-TODO-]
     tid = left.scope.find(left.type.rstrip('?'))
-    assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
+    if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition):
+        if left.type.startswith('('): # )
+            return None
+        raise Error('type `' + left.type + '` is not found', sn.left_to_right_token())
     tid = tid.ast_nodes[0].scope.ids.get(sn.children[1].token_str())
     if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition)):
         raise Error('method `' + sn.children[1].token_str() + '` is not found in type `' + left.type.rstrip('?') + '`', sn.left_to_right_token())
@@ -2137,6 +2141,8 @@ def parse_internal(this_node):
                             if token.value(source) == '?':
                                 type_ += '?'
                                 next_token()
+                        if token.value(source) == '(': # )
+                            type_ = expression().to_type_str()
                         if type_ == '':
                             type_ = prev_type_name
                         qualifier = ''
@@ -2606,20 +2612,23 @@ def parse_internal(this_node):
                             for i in range(1, len(node_expression.children)):
                                 node.type_args.append(node_expression.children[i].to_type_str())
                     elif node.type == '(': # )
-                        node.function_pointer = True
                         for i in range(len(node_expression.children)):
                             child = node_expression.children[i]
                             if child.token.category == Token.Category.NAME:
                                 node.type_args.append(child.token_str())
                             else:
+                                node.function_pointer = True
                                 assert(child.symbol.id == '->' and i == len(node_expression.children) - 1)
                                 assert(child.children[0].token.category == Token.Category.NAME)
                                 assert(child.children[1].token.category == Token.Category.NAME or child.children[1].token_str() in ('N', 'Н', 'null', 'нуль'))
                                 node.type_args.append(child.children[0].token_str())
                                 node.type = child.children[1].token_str() # return value is the last
+                        if not node.function_pointer: # this is a tuple
+                            node.type = '(' + ', '.join(node.type_args) + ')'
+                            node.type_args.clear()
                     elif node.type == '.':
                         node.type = node_expression.to_str()
-                    if not (node.type[0].isupper() or node.type in ('var', 'перем')):
+                    if not (node.type[0].isupper() or node.type[0] == '(' or node.type in ('var', 'перем')): # )
                         raise Error('type name must starts with an upper case letter', node.type_token)
                     for var in node.vars:
                         scope.add_name(var, node)
@@ -2707,6 +2716,8 @@ builtins_scope.add_function('tan',   ASTFunctionDefinition([('x', '', 'Float')])
 builtins_scope.add_function('degrees', ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_function('radians', ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_function('dot',   ASTFunctionDefinition([('v1', '', ''), ('v2', '', '')]))
+builtins_scope.add_function('cross', ASTFunctionDefinition([('v1', '', ''), ('v2', '', '')]))
+builtins_scope.add_function('normalize', ASTFunctionDefinition([('v', '', '')]))
 builtins_scope.add_function('ValueError', ASTFunctionDefinition([('s', '', 'String')]))
 builtins_scope.add_function('IndexError', ASTFunctionDefinition([('index', '', 'Int')]))
 

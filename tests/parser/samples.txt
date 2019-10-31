@@ -1070,3 +1070,12 @@ struct CodeBlock1
         print(create_array({Array<int>()}));
     }
 } code_block_1;
+
+
+F getNormal((Float, Float, Float) punto) -> (Float, Float, Float)
+   R punto
+===
+dvec3 getNormal(const dvec3 &punto)
+{
+    return punto;
+}
