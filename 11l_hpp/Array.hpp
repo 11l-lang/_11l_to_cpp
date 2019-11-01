@@ -175,14 +175,14 @@ public:
 	Array operator[](const range_elen_llen range) const {return (*this)[range_el(len() + range.b, len() + range.e)];}
 	Array operator[](const range_elen_i    range) const {return (*this)[range_ei(len() + range.b)];}
 
-	const Type &operator[](int i) const
+	decltype(std::declval<const std::vector<Type>>().at(0)) operator[](int i) const // decltype is needed for Array<bool> support
 	{
 		if (in(i, range_el(0, len())))
 			return std::vector<Type>::at(i);
 		throw IndexError(i);
 	}
 
-	Type &operator[](int i)
+	decltype(std::declval<std::vector<Type>>().at(0)) operator[](int i) // decltype is needed for Array<bool> support
 	{
 		if (in(i, range_el(0, len())))
 			return std::vector<Type>::at(i);

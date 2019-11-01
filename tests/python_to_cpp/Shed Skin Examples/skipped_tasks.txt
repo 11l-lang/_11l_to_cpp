@@ -10,3 +10,7 @@
 . chull.py — is not interesting
 . circle.py and circle_main.py — require pygame module
 . colorsys.py — prints nothing
+. dijkstra2.py — is not interesting, require heapq module
+. disco.py, gtp.py and go.py — unclear how to use it
+. fysphun.py and fysphun_main.py — require pygame module
+. genetic2.py — too heavily rely on random, also running too long

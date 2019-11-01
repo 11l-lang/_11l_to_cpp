@@ -1,0 +1,113 @@
+//import random
+//import math
+V infiniteNeg = -1e302
+
+T Individual
+   Int ngenes
+   [Bool] genome
+   fitness = :infiniteNeg
+   F (ngenes = 0)
+      .ngenes = ngenes
+      .genome = (0 .< ngenes).map(i -> random:() < 0.5)
+   F bin2dec(inf = 0, =sup = 0)
+      I sup == 0
+         sup = .ngenes - 1
+      V result = 0
+      L(i) inf .< sup + 1
+         I .genome[i]
+            result += 1 << (i - inf)
+      R result
+   F computeFitness()
+      .fitness = .fitnessFun(.computeValuesGenome())
+   F __repr__()
+      R (.genome.map(gene -> String(Int(gene)))).join(‘’)
+
+   F fitnessFun(x)
+      R x + abs(sin(32 * x))
+   F computeValuesGenome(xMin = 0, xMax = math:pi)
+      V scaleFactor = (xMax - xMin) / (1 << .ngenes)
+      R .bin2dec() * scaleFactor
+
+T SGA
+   [Individual] population
+   Individual bestIndividual
+   popSize = 200
+   genomeSize = 16
+   generationsMax = 16
+   crossingOverProb = 0.75
+   selectivePressure = 0.75
+   geneMutationProb = 0.005
+
+   F ()
+   {
+   }
+
+   F generateRandomPop()
+      .population = (0 .< .popSize).map(i -> Individual(@.genomeSize))
+
+   F computeFitnessPop()
+      L(individual) .population
+         individual.computeFitness()
+
+   F mutatePop()
+      V nmutations = Int(round(.popSize * .genomeSize * .geneMutationProb))
+      L(i) 0 .< nmutations
+         V individual = random:choice(.population)
+         V gene = random:(0, .genomeSize - 1 + 1)
+         individual.genome[gene] = !(individual.genome[gene])
+
+   F tounamentSelectionPop()
+      [Individual] pop2
+      L(i) 0 .< .popSize
+         V individual1 = random:choice(.population)
+         V individual2 = random:choice(.population)
+         I random:() < .selectivePressure
+            I individual1.fitness > individual2.fitness
+               pop2.append(individual1)
+            E
+               pop2.append(individual2)
+         E
+            I individual1.fitness > individual2.fitness
+               pop2.append(individual2)
+            E
+               pop2.append(individual1)
+      R pop2
+
+   F crossingOverPop()
+      V nCrossingOver = Int(round(.popSize * .crossingOverProb))
+      L(i) 0 .< nCrossingOver
+         V ind1 = random:choice(.population)
+         V ind2 = random:choice(.population)
+         V crossPosition = random:(0, .genomeSize - 1 + 1)
+         L(j) 0 .< crossPosition + 1
+            (ind1.genome[j], ind2.genome[j]) = (ind2.genome[j], ind1.genome[j])
+
+   F showGeneration_bestIndFind()
+      V fitnessTot = 0.0
+      V bestIndividualGeneration = .population[0]
+      L(individual) .population
+         fitnessTot += individual.fitness
+         I individual.fitness > bestIndividualGeneration.fitness
+            bestIndividualGeneration = individual
+      I .bestIndividual.fitness < bestIndividualGeneration.fitness
+         .bestIndividual = copy(bestIndividualGeneration)
+
+   F run()
+      .generateRandomPop()
+      .bestIndividual = Individual(.genomeSize)
+      L(generation) 1 .< .generationsMax + 1
+         I generation % 300 == 0
+            print(‘generation ’String(generation))
+         .computeFitnessPop()
+         .showGeneration_bestIndFind()
+         .population = .tounamentSelectionPop()
+         .mutatePop()
+         .crossingOverPop()
+
+:start:
+V sga = SGA()
+sga.generationsMax = 3000
+sga.genomeSize = 20
+sga.popSize = 30
+sga.geneMutationProb = 0.01
+sga.run()
