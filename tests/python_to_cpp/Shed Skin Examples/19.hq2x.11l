@@ -1,0 +1,1608 @@
+V LUT16to32 = 65536 * [0]
+V RGBtoYUV = 65536 * [0]
+V Ymask = 00FF'0000
+V Umask = 0000'FF00
+V Vmask = 0000'00FF
+V trY = 0030'0000
+V trU = 0000'0700
+V trV = 0000'0006
+
+T PPM
+   Int w
+   Int h
+   [Int] rgb
+
+   F (w, h, rgb)
+      (.w, .h) = (w, h)
+      .rgb = rgb
+
+   F save(filename)
+      V f = File(filename, ‘w’)
+      f.write("P3\n")
+      f.write(String(.w)‘ ’String(.h)"\n")
+      f.write("255\n")
+      L(rgb) .rgb
+         V r = ((rgb >> 16) [&] 00'ff)
+         V g = ((rgb >> 8) [&] 00'ff)
+         V b = (rgb [&] 00'ff)
+         f.write(String(r)‘ ’String(g)‘ ’String(b)"\n")
+      f.close()
+
+F loadPPM(filename)
+   V lines = File(filename).read_lines(1B).map(l -> l.trim((‘ ’, "\t", "\r", "\n")))
+   assert(lines[0] == ‘P3’)
+   V wh = lines[1].split_py().map(i -> Int(i))
+   V w = wh[0]
+   V h = wh[1]
+   assert(Int(lines[2]) == 255)
+   [Int] values
+   L(line) lines[3..]
+      values.extend(line.split_py().map(i -> Int(i)))
+   [Int] rgb
+   L(i) (0 .< values.len).step(3)
+      V r = values[i] >> 3
+      V g = values[i + 1] >> 2
+      V b = values[i + 2] >> 3
+      rgb.append(r << 11 [|] g << 5 [|] b)
+   R PPM(w, h, rgb)
+
+F diff(w1, w2)
+   V YUV1 = RGBtoYUV[w1]
+   V YUV2 = RGBtoYUV[w2]
+   R (abs((YUV1 [&] Ymask) - (YUV2 [&] Ymask)) > :trY) | (abs((YUV1 [&] Umask) - (YUV2 [&] Umask)) > :trU) | (abs((YUV1 [&] Vmask) - (YUV2 [&] Vmask)) > :trV)
+
+F Interp1(c1, c2)
+   R (c1 * 3 + c2) >> 2
+
+F Interp2(c1, c2, c3)
+   R (c1 * 2 + c2 + c3) >> 2
+
+F Interp6(c1, c2, c3)
+   R ((((c1 [&] 0000'FF00) * 5 + (c2 [&] 0000'FF00) * 2 + (c3 [&] 0000'FF00)) [&] 0007'F800) + (((c1 [&] 00FF'00FF) * 5 + (c2 [&] 00FF'00FF) * 2 + (c3 [&] 00FF'00FF)) [&] 07F8'07F8)) >> 3
+
+F Interp7(c1, c2, c3)
+   R ((((c1 [&] 0000'FF00) * 6 + (c2 [&] 0000'FF00) + (c3 [&] 0000'FF00)) [&] 0007'F800) + (((c1 [&] 00FF'00FF) * 6 + (c2 [&] 00FF'00FF) + (c3 [&] 00FF'00FF)) [&] 07F8'07F8)) >> 3
+
+F Interp9(c1, c2, c3)
+   R ((((c1 [&] 0000'FF00) * 2 + ((c2 [&] 0000'FF00) + (c3 [&] 0000'FF00)) * 3) [&] 0007'F800) + (((c1 [&] 00FF'00FF) * 2 + ((c2 [&] 00FF'00FF) + (c3 [&] 00FF'00FF)) * 3) [&] 07F8'07F8)) >> 3
+
+F Interp10(c1, c2, c3)
+   R ((((c1 [&] 0000'FF00) * 14 + (c2 [&] 0000'FF00) + (c3 [&] 0000'FF00)) [&] 000F'F000) + (((c1 [&] 00FF'00FF) * 14 + (c2 [&] 00FF'00FF) + (c3 [&] 00FF'00FF)) [&] 0FF0'0FF0)) >> 4
+
+F PIXEL00_0([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut] = c[5]
+F PIXEL00_10([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut] = Interp1(c[5], c[1])
+F PIXEL00_11([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut] = Interp1(c[5], c[4])
+F PIXEL00_12([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut] = Interp1(c[5], c[2])
+F PIXEL00_20([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut] = Interp2(c[5], c[4], c[2])
+F PIXEL00_21([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut] = Interp2(c[5], c[1], c[2])
+F PIXEL00_22([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut] = Interp2(c[5], c[1], c[4])
+F PIXEL00_60([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut] = Interp6(c[5], c[2], c[4])
+F PIXEL00_61([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut] = Interp6(c[5], c[4], c[2])
+F PIXEL00_70([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut] = Interp7(c[5], c[4], c[2])
+F PIXEL00_90([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut] = Interp9(c[5], c[4], c[2])
+F PIXEL00_100([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut] = Interp10(c[5], c[4], c[2])
+F PIXEL01_0([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + 1] = c[5]
+F PIXEL01_10([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + 1] = Interp1(c[5], c[3])
+F PIXEL01_11([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + 1] = Interp1(c[5], c[2])
+F PIXEL01_12([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + 1] = Interp1(c[5], c[6])
+F PIXEL01_20([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + 1] = Interp2(c[5], c[2], c[6])
+F PIXEL01_21([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + 1] = Interp2(c[5], c[3], c[6])
+F PIXEL01_22([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + 1] = Interp2(c[5], c[3], c[2])
+F PIXEL01_60([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + 1] = Interp6(c[5], c[6], c[2])
+F PIXEL01_61([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + 1] = Interp6(c[5], c[2], c[6])
+F PIXEL01_70([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + 1] = Interp7(c[5], c[2], c[6])
+F PIXEL01_90([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + 1] = Interp9(c[5], c[2], c[6])
+F PIXEL01_100([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + 1] = Interp10(c[5], c[2], c[6])
+F PIXEL10_0([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL] = c[5]
+F PIXEL10_10([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL] = Interp1(c[5], c[7])
+F PIXEL10_11([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL] = Interp1(c[5], c[8])
+F PIXEL10_12([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL] = Interp1(c[5], c[4])
+F PIXEL10_20([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL] = Interp2(c[5], c[8], c[4])
+F PIXEL10_21([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL] = Interp2(c[5], c[7], c[4])
+F PIXEL10_22([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL] = Interp2(c[5], c[7], c[8])
+F PIXEL10_60([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL] = Interp6(c[5], c[4], c[8])
+F PIXEL10_61([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL] = Interp6(c[5], c[8], c[4])
+F PIXEL10_70([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL] = Interp7(c[5], c[8], c[4])
+F PIXEL10_90([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL] = Interp9(c[5], c[8], c[4])
+F PIXEL10_100([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL] = Interp10(c[5], c[8], c[4])
+F PIXEL11_0([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL + 1] = c[5]
+F PIXEL11_10([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL + 1] = Interp1(c[5], c[9])
+F PIXEL11_11([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL + 1] = Interp1(c[5], c[6])
+F PIXEL11_12([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL + 1] = Interp1(c[5], c[8])
+F PIXEL11_20([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL + 1] = Interp2(c[5], c[6], c[8])
+F PIXEL11_21([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL + 1] = Interp2(c[5], c[9], c[8])
+F PIXEL11_22([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL + 1] = Interp2(c[5], c[9], c[6])
+F PIXEL11_60([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL + 1] = Interp6(c[5], c[8], c[6])
+F PIXEL11_61([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL + 1] = Interp6(c[5], c[6], c[8])
+F PIXEL11_70([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL + 1] = Interp7(c[5], c[6], c[8])
+F PIXEL11_90([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL + 1] = Interp9(c[5], c[6], c[8])
+F PIXEL11_100([Int] &rgb_out; pOut, BpL, c)
+   rgb_out[pOut + BpL + 1] = Interp10(c[5], c[6], c[8])
+
+F hq2x(xres, yres, rgb)
+   ‘
+    +--+--+--+
+    |w1|w2|w3|
+    +--+--+--+
+    |w4|w5|w6|
+    +--+--+--+
+    |w7|w8|w9|
+    +--+--+--+
+    ’
+   V c = 10 * [0]
+   V w = 10 * [0]
+   V rgb_out = 4 * rgb.len * [0]
+   V BpL = 2 * xres
+
+   L(j) 0 .< yres
+      V prevline = I j > 0 {-xres} E 0
+      V nextline = I j < yres - 1 {xres} E 0
+
+      L(i) 0 .< xres
+         V pos = j * xres + i
+         V pOut = j * xres * 4 + 2 * i
+         w[3] = rgb[pos + prevline]
+         w[2] = w[3]
+         w[1] = w[3]
+         w[6] = rgb[pos]
+         w[5] = w[6]
+         w[4] = w[6]
+         w[9] = rgb[pos + nextline]
+         w[8] = w[9]
+         w[7] = w[9]
+
+         I i > 0
+            w[1] = rgb[pos + prevline - 1]
+            w[4] = rgb[pos - 1]
+            w[7] = rgb[pos + nextline - 1]
+
+         I i < xres - 1
+            w[3] = rgb[pos + prevline + 1]
+            w[6] = rgb[pos + 1]
+            w[9] = rgb[pos + nextline + 1]
+         V pattern = 0
+         V flag = 1
+         V YUV1 = RGBtoYUV[w[5]]
+         L(k) 1.<10
+            I k == 5
+               L.continue
+            I w[k] != w[5]
+               V YUV2 = RGBtoYUV[w[k]]
+               I (abs((YUV1 [&] Ymask) - (YUV2 [&] Ymask)) > :trY) | (abs((YUV1 [&] Umask) - (YUV2 [&] Umask)) > :trU) | (abs((YUV1 [&] Vmask) - (YUV2 [&] Vmask)) > :trV)
+                  pattern [|]= flag
+            flag <<= 1
+
+         L(k) 1.<10
+            c[k] = LUT16to32[w[k]]
+
+         I pattern == 0 | pattern == 1 | pattern == 4 | pattern == 32 | pattern == 128 | pattern == 5 | pattern == 132 | pattern == 160 | pattern == 33 | pattern == 129 | pattern == 36 | pattern == 133 | pattern == 164 | pattern == 161 | pattern == 37 | pattern == 165
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 2 | pattern == 34 | pattern == 130 | pattern == 162
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 16 | pattern == 17 | pattern == 48 | pattern == 49
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 64 | pattern == 65 | pattern == 68 | pattern == 69
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 8 | pattern == 12 | pattern == 136 | pattern == 140
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 3 | pattern == 35 | pattern == 131 | pattern == 163
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 6 | pattern == 38 | pattern == 134 | pattern == 166
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 20 | pattern == 21 | pattern == 52 | pattern == 53
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 144 | pattern == 145 | pattern == 176 | pattern == 177
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 192 | pattern == 193 | pattern == 196 | pattern == 197
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 96 | pattern == 97 | pattern == 100 | pattern == 101
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 40 | pattern == 44 | pattern == 168 | pattern == 172
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 9 | pattern == 13 | pattern == 137 | pattern == 141
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 18 | pattern == 50
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 80 | pattern == 81
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 72 | pattern == 76
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 10 | pattern == 138
+            I (diff(w[4], w[2]))
+               PIXEL00_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 66
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 24
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 7 | pattern == 39 | pattern == 135
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 148 | pattern == 149 | pattern == 180
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 224 | pattern == 228 | pattern == 225
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 41 | pattern == 169 | pattern == 45
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 22 | pattern == 54
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 208 | pattern == 209
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 104 | pattern == 108
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 11 | pattern == 139
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 19 | pattern == 51
+            I (diff(w[2], w[6]))
+               PIXEL00_11(&rgb_out, pOut, BpL, c)
+               PIXEL01_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_60(&rgb_out, pOut, BpL, c)
+               PIXEL01_90(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 146 | pattern == 178
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_10(&rgb_out, pOut, BpL, c)
+               PIXEL11_12(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_90(&rgb_out, pOut, BpL, c)
+               PIXEL11_61(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 84 | pattern == 85
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL01_11(&rgb_out, pOut, BpL, c)
+               PIXEL11_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_60(&rgb_out, pOut, BpL, c)
+               PIXEL11_90(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 112 | pattern == 113
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL10_12(&rgb_out, pOut, BpL, c)
+               PIXEL11_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_61(&rgb_out, pOut, BpL, c)
+               PIXEL11_90(&rgb_out, pOut, BpL, c)
+         E I pattern == 200 | pattern == 204
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_10(&rgb_out, pOut, BpL, c)
+               PIXEL11_11(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_90(&rgb_out, pOut, BpL, c)
+               PIXEL11_60(&rgb_out, pOut, BpL, c)
+         E I pattern == 73 | pattern == 77
+            I (diff(w[8], w[4]))
+               PIXEL00_12(&rgb_out, pOut, BpL, c)
+               PIXEL10_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_61(&rgb_out, pOut, BpL, c)
+               PIXEL10_90(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 42 | pattern == 170
+            I (diff(w[4], w[2]))
+               PIXEL00_10(&rgb_out, pOut, BpL, c)
+               PIXEL10_11(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_90(&rgb_out, pOut, BpL, c)
+               PIXEL10_60(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 14 | pattern == 142
+            I (diff(w[4], w[2]))
+               PIXEL00_10(&rgb_out, pOut, BpL, c)
+               PIXEL01_12(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_90(&rgb_out, pOut, BpL, c)
+               PIXEL01_61(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 67
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 70
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 28
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 152
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 194
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 98
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 56
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 25
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 26 | pattern == 31
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 82 | pattern == 214
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 88 | pattern == 248
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 74 | pattern == 107
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 27
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_10(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 86
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            PIXEL11_10(&rgb_out, pOut, BpL, c)
+         E I pattern == 216
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            PIXEL10_10(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 106
+            PIXEL00_10(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 30
+            PIXEL00_10(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 210
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            PIXEL01_10(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 120
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_10(&rgb_out, pOut, BpL, c)
+         E I pattern == 75
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            PIXEL10_10(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 29
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 198
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 184
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 99
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 57
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 71
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 156
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 226
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 60
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 195
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 102
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 153
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 58
+            I (diff(w[4], w[2]))
+               PIXEL00_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_70(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 83
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_70(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_70(&rgb_out, pOut, BpL, c)
+         E I pattern == 92
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_70(&rgb_out, pOut, BpL, c)
+         E I pattern == 202
+            I (diff(w[4], w[2]))
+               PIXEL00_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_70(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_70(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 78
+            I (diff(w[4], w[2]))
+               PIXEL00_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_70(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_70(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 154
+            I (diff(w[4], w[2]))
+               PIXEL00_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_70(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 114
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_70(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_70(&rgb_out, pOut, BpL, c)
+         E I pattern == 89
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_70(&rgb_out, pOut, BpL, c)
+         E I pattern == 90
+            I (diff(w[4], w[2]))
+               PIXEL00_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_70(&rgb_out, pOut, BpL, c)
+         E I pattern == 55 | pattern == 23
+            I (diff(w[2], w[6]))
+               PIXEL00_11(&rgb_out, pOut, BpL, c)
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_60(&rgb_out, pOut, BpL, c)
+               PIXEL01_90(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 182 | pattern == 150
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+               PIXEL11_12(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_90(&rgb_out, pOut, BpL, c)
+               PIXEL11_61(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 213 | pattern == 212
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL01_11(&rgb_out, pOut, BpL, c)
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_60(&rgb_out, pOut, BpL, c)
+               PIXEL11_90(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 241 | pattern == 240
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL10_12(&rgb_out, pOut, BpL, c)
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_61(&rgb_out, pOut, BpL, c)
+               PIXEL11_90(&rgb_out, pOut, BpL, c)
+         E I pattern == 236 | pattern == 232
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+               PIXEL11_11(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_90(&rgb_out, pOut, BpL, c)
+               PIXEL11_60(&rgb_out, pOut, BpL, c)
+         E I pattern == 109 | pattern == 105
+            I (diff(w[8], w[4]))
+               PIXEL00_12(&rgb_out, pOut, BpL, c)
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_61(&rgb_out, pOut, BpL, c)
+               PIXEL10_90(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 171 | pattern == 43
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+               PIXEL10_11(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_90(&rgb_out, pOut, BpL, c)
+               PIXEL10_60(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 143 | pattern == 15
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+               PIXEL01_12(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_90(&rgb_out, pOut, BpL, c)
+               PIXEL01_61(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 124
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_10(&rgb_out, pOut, BpL, c)
+         E I pattern == 203
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            PIXEL10_10(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 62
+            PIXEL00_10(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 211
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            PIXEL01_10(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 118
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            PIXEL11_10(&rgb_out, pOut, BpL, c)
+         E I pattern == 217
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            PIXEL10_10(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 110
+            PIXEL00_10(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 155
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_10(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 188
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 185
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 61
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 157
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 103
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 227
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 230
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 199
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 220
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 158
+            I (diff(w[4], w[2]))
+               PIXEL00_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 234
+            I (diff(w[4], w[2]))
+               PIXEL00_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_70(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 242
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_70(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 59
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_70(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 121
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_70(&rgb_out, pOut, BpL, c)
+         E I pattern == 87
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_70(&rgb_out, pOut, BpL, c)
+         E I pattern == 79
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_70(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 122
+            I (diff(w[4], w[2]))
+               PIXEL00_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_70(&rgb_out, pOut, BpL, c)
+         E I pattern == 94
+            I (diff(w[4], w[2]))
+               PIXEL00_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_70(&rgb_out, pOut, BpL, c)
+         E I pattern == 218
+            I (diff(w[4], w[2]))
+               PIXEL00_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 91
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_70(&rgb_out, pOut, BpL, c)
+         E I pattern == 229
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 167
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 173
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 181
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 186
+            I (diff(w[4], w[2]))
+               PIXEL00_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_70(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+
+         I pattern == 115
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_70(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_70(&rgb_out, pOut, BpL, c)
+         E I pattern == 93
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_70(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_70(&rgb_out, pOut, BpL, c)
+         E I pattern == 206
+            I (diff(w[4], w[2]))
+               PIXEL00_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_70(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_70(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 205 | pattern == 201
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_70(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 174 | pattern == 46
+            I (diff(w[4], w[2]))
+               PIXEL00_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_70(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 179 | pattern == 147
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_70(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 117 | pattern == 116
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_10(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_70(&rgb_out, pOut, BpL, c)
+         E I pattern == 189
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 231
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 126
+            PIXEL00_10(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_10(&rgb_out, pOut, BpL, c)
+         E I pattern == 219
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_10(&rgb_out, pOut, BpL, c)
+            PIXEL10_10(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 125
+            I (diff(w[8], w[4]))
+               PIXEL00_12(&rgb_out, pOut, BpL, c)
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_61(&rgb_out, pOut, BpL, c)
+               PIXEL10_90(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_10(&rgb_out, pOut, BpL, c)
+         E I pattern == 221
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL01_11(&rgb_out, pOut, BpL, c)
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_60(&rgb_out, pOut, BpL, c)
+               PIXEL11_90(&rgb_out, pOut, BpL, c)
+            PIXEL10_10(&rgb_out, pOut, BpL, c)
+         E I pattern == 207
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+               PIXEL01_12(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_90(&rgb_out, pOut, BpL, c)
+               PIXEL01_61(&rgb_out, pOut, BpL, c)
+            PIXEL10_10(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 238
+            PIXEL00_10(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+               PIXEL11_11(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_90(&rgb_out, pOut, BpL, c)
+               PIXEL11_60(&rgb_out, pOut, BpL, c)
+         E I pattern == 190
+            PIXEL00_10(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+               PIXEL11_12(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_90(&rgb_out, pOut, BpL, c)
+               PIXEL11_61(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 187
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+               PIXEL10_11(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_90(&rgb_out, pOut, BpL, c)
+               PIXEL10_60(&rgb_out, pOut, BpL, c)
+            PIXEL01_10(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 243
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            PIXEL01_10(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL10_12(&rgb_out, pOut, BpL, c)
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_61(&rgb_out, pOut, BpL, c)
+               PIXEL11_90(&rgb_out, pOut, BpL, c)
+         E I pattern == 119
+            I (diff(w[2], w[6]))
+               PIXEL00_11(&rgb_out, pOut, BpL, c)
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_60(&rgb_out, pOut, BpL, c)
+               PIXEL01_90(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            PIXEL11_10(&rgb_out, pOut, BpL, c)
+         E I pattern == 237 | pattern == 233
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_100(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 175 | pattern == 47
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_100(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 183 | pattern == 151
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_100(&rgb_out, pOut, BpL, c)
+            PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 245 | pattern == 244
+            PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_100(&rgb_out, pOut, BpL, c)
+         E I pattern == 250
+            PIXEL00_10(&rgb_out, pOut, BpL, c)
+            PIXEL01_10(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 123
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_10(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_10(&rgb_out, pOut, BpL, c)
+         E I pattern == 95
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_10(&rgb_out, pOut, BpL, c)
+            PIXEL11_10(&rgb_out, pOut, BpL, c)
+         E I pattern == 222
+            PIXEL00_10(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_10(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 252
+            PIXEL00_21(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_100(&rgb_out, pOut, BpL, c)
+         E I pattern == 249
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_22(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_100(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 235
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_21(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_100(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 111
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_100(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_22(&rgb_out, pOut, BpL, c)
+         E I pattern == 63
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_100(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_21(&rgb_out, pOut, BpL, c)
+         E I pattern == 159
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_100(&rgb_out, pOut, BpL, c)
+            PIXEL10_22(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 215
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_100(&rgb_out, pOut, BpL, c)
+            PIXEL10_21(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 246
+            PIXEL00_22(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_100(&rgb_out, pOut, BpL, c)
+         E I pattern == 254
+            PIXEL00_10(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_100(&rgb_out, pOut, BpL, c)
+         E I pattern == 253
+            PIXEL00_12(&rgb_out, pOut, BpL, c)
+            PIXEL01_11(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_100(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_100(&rgb_out, pOut, BpL, c)
+         E I pattern == 251
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            PIXEL01_10(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_100(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 239
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_100(&rgb_out, pOut, BpL, c)
+            PIXEL01_12(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_100(&rgb_out, pOut, BpL, c)
+            PIXEL11_11(&rgb_out, pOut, BpL, c)
+         E I pattern == 127
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_100(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_20(&rgb_out, pOut, BpL, c)
+            PIXEL11_10(&rgb_out, pOut, BpL, c)
+         E I pattern == 191
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_100(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_100(&rgb_out, pOut, BpL, c)
+            PIXEL10_11(&rgb_out, pOut, BpL, c)
+            PIXEL11_12(&rgb_out, pOut, BpL, c)
+         E I pattern == 223
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_20(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_100(&rgb_out, pOut, BpL, c)
+            PIXEL10_10(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_20(&rgb_out, pOut, BpL, c)
+         E I pattern == 247
+            PIXEL00_11(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_100(&rgb_out, pOut, BpL, c)
+            PIXEL10_12(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_100(&rgb_out, pOut, BpL, c)
+         E I pattern == 255
+            I (diff(w[4], w[2]))
+               PIXEL00_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL00_100(&rgb_out, pOut, BpL, c)
+            I (diff(w[2], w[6]))
+               PIXEL01_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL01_100(&rgb_out, pOut, BpL, c)
+            I (diff(w[8], w[4]))
+               PIXEL10_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL10_100(&rgb_out, pOut, BpL, c)
+            I (diff(w[6], w[8]))
+               PIXEL11_0(&rgb_out, pOut, BpL, c)
+            E
+               PIXEL11_100(&rgb_out, pOut, BpL, c)
+   R rgb_out
+
+F init_LUTs()
+
+   L(i) 0.<65536
+      LUT16to32[i] = ((i [&] F8'00) << 8) [|] ((i [&] 07'E0) << 5) [|] ((i [&] 00'1F) << 3)
+
+   L(i) 0.<32
+      L(j) 0.<64
+         L(k) 0.<32
+            V r = i << 3
+            V g = j << 2
+            V b = k << 3
+            V Y = (r + g + b) >> 2
+            V u = 128 + ((r - b) >> 2)
+            V v = 128 + ((-r + 2 * g - b) >> 3)
+            RGBtoYUV[(i << 11) [|] (j << 5) [|] k] = (Y << 16) [|] (u << 8) [|] v
+
+:start:
+init_LUTs()
+print(‘scaling randam.ppm to randam2.ppm (100 times)..’)
+V ppm = loadPPM(‘testdata/randam.ppm’)
+[Int] rgb
+L(i) 0.<100
+   rgb = hq2x(ppm.w, ppm.h, ppm.rgb)
+PPM(2 * ppm.w, 2 * ppm.h, rgb).save(‘testdata/randam2.ppm’)

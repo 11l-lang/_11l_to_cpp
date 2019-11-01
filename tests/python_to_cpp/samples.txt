@@ -2100,3 +2100,14 @@ struct CodeBlock1
         trazar(r);
     }
 } code_block_1;
+
+
+def PIXEL00_0(rgb_out, pOut, BpL, c): rgb_out[pOut] = c[5]
+===
+F PIXEL00_0(rgb_out, pOut, BpL, c)
+   rgb_out[pOut] = c[5]
+===
+template <typename T1, typename T2, typename T3, typename T4> auto PIXEL00_0(const T1 &rgb_out, const T2 &pOut, const T3 &BpL, const T4 &c)
+{
+    rgb_out.set(pOut, _get<5>(c));
+}

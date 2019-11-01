@@ -14,3 +14,4 @@
 . disco.py, gtp.py and go.py — unclear how to use it
 . fysphun.py and fysphun_main.py — require pygame module
 . genetic2.py — too heavily rely on random, also running too long
+. gs_main.py — require pygtk module

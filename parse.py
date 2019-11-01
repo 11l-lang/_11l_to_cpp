@@ -2109,8 +2109,8 @@ def parse_internal(this_node):
                             node.first_named_only_argument = len(node.function_arguments)
                             next_token()
                             continue
-                        type_ = ''
-                        if token.value(source)[0].isupper(): # this is a type name
+                        type_ = '' # (
+                        if token.value(source)[0].isupper() and peek_token().value(source) not in (',', ')'): # this is a type name
                             type_ = token.value(source)
                             next_token()
                         if token.value(source) == '[': # ]
@@ -2514,7 +2514,12 @@ def parse_internal(this_node):
 
             if node.expression.symbol.id == '(' and node.expression.children[0].symbol.id == '.' \
                                             and len(node.expression.children[0].children) == 2   \
-                                                and node.expression.children[0].children[1].token_str() in ('split', 'split_py'): # ) # `V (name, ...) = ....split(...)` ~> `(V name, V ...) = ....split(...)` -> `...assign_from_tuple(name, ...);` (because `auto [name, ...] = ....split(...);` does not working)
+                                               and (node.expression.children[0].children[1].token_str() in ('split', 'split_py') # ) # `V (name, ...) = ....split(...)` ~> `(V name, V ...) = ....split(...)` -> `...assign_from_tuple(name, ...);` (because `auto [name, ...] = ....split(...);` does not working)
+                                                or (node.expression.children[0].children[1].token_str() == 'map' # for `V (w, h) = lines[1].split_py().map(i -> Int(i))`
+                                                and node.expression.children[0].children[0].function_call)
+                                                and node.expression.children[0].children[0].children[0].symbol.id == '.'
+                                            and len(node.expression.children[0].children[0].children[0].children) == 2
+                                                and node.expression.children[0].children[0].children[0].children[1].token_str() in ('split', 'split_py')):
                 n = node
                 node = ASTTupleAssignment()
                 for dv in n.dest_vars:
