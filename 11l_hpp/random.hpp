@@ -27,23 +27,23 @@ inline int _(int max)
 	return ((unsigned long long)_random() * max) >> 32u;
 }
 
-inline int _(int min, int max)
+inline int __(int min, int max)
 {
 	return _(max - min) + min;
 }
 
-inline double _(double min, double max)
+inline double __(double min, double max)
 {
 	return _(max - min) + min;
 }
 
-inline float _(float min, float max)
+inline float __(float min, float max)
 {
 	return _(max - min) + min;
 }
 
-inline int _(const Range<int, true, false> range) {return _(range.b, range.e);}
-inline int _(const Range<int, true, true > range) {return _(range.b, range.e + 1);}
+inline int _(const Range<int, true, false> range) {return __(range.b, range.e);}
+inline int _(const Range<int, true, true > range) {return __(range.b, range.e + 1);}
 
 template <typename Type> inline void shuffle(Array<Type> &arr)
 {

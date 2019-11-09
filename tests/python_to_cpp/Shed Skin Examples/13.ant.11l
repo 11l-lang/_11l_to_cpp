@@ -50,7 +50,7 @@ F findSumWeight(cities, pher, used, current, soughtTotal)
    R next
 
 F genPath(cities, pher)
-   V current = random:(0, cities.len - 1 + 1)
+   V current = random:(0 .. cities.len - 1)
    V path = [current]
    V used = [current = 1]
    L used.len < cities.len

@@ -53,7 +53,7 @@ T SGA
       V nmutations = Int(round(.popSize * .genomeSize * .geneMutationProb))
       L(i) 0 .< nmutations
          V individual = random:choice(.population)
-         V gene = random:(0, .genomeSize - 1 + 1)
+         V gene = random:(0 .. .genomeSize - 1)
          individual.genome[gene] = !(individual.genome[gene])
 
    F tounamentSelectionPop()
@@ -78,7 +78,7 @@ T SGA
       L(i) 0 .< nCrossingOver
          V ind1 = random:choice(.population)
          V ind2 = random:choice(.population)
-         V crossPosition = random:(0, .genomeSize - 1 + 1)
+         V crossPosition = random:(0 .. .genomeSize - 1)
          L(j) 0 .< crossPosition + 1
             (ind1.genome[j], ind2.genome[j]) = (ind2.genome[j], ind1.genome[j])
 

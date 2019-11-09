@@ -75,7 +75,7 @@ public:
         auto nmutations = to_int(round(popSize * genomeSize * geneMutationProb));
         for (auto i : range_el(0, nmutations)) {
             auto individual = randomns::choice(population);
-            auto gene = randomns::_(0, genomeSize - 1 + 1);
+            auto gene = randomns::_(range_ee(0, genomeSize - 1));
             individual.genome.set(gene, !(individual.genome[gene]));
         }
     }
@@ -107,7 +107,7 @@ public:
         for (auto i : range_el(0, nCrossingOver)) {
             auto ind1 = randomns::choice(population);
             auto ind2 = randomns::choice(population);
-            auto crossPosition = randomns::_(0, genomeSize - 1 + 1);
+            auto crossPosition = randomns::_(range_ee(0, genomeSize - 1));
             for (auto j : range_el(0, crossPosition + 1))
                 assign_from_tuple(ind1.genome[j], ind2.genome[j], make_tuple(ind2.genome[j], ind1.genome[j]));
         }

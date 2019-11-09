@@ -68,7 +68,7 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5> auto 
 
 template <typename T1, typename T2> auto genPath(const T1 &cities, const T2 &pher)
 {
-    auto current = randomns::_(0, cities.len() - 1 + 1);
+    auto current = randomns::_(range_ee(0, cities.len() - 1));
     auto path = create_array({current});
     auto used = create_dict(dict_of(current, 1));
     while (used.len() < cities.len()) {
