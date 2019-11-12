@@ -19,7 +19,7 @@ public:
 		Type operator*() {return value;}
 	};
 	Iterator begin() const {return Iterator(b + !include_beginning);}
-	Iterator end()   const {return Iterator(e - !include_ending + 1);}
+	Iterator end()   const {return Iterator(max(e - !include_ending + 1, b + !include_beginning));}
 
 	Type size() const
 	{

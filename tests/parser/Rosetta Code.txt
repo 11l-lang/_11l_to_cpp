@@ -1298,3 +1298,31 @@ struct CodeBlock1
         print(get_difference(60175.77306795546, 42213.07192354373));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Factorial#Python
+F factorial(n)
+   V result = 1
+   L(i) 2..n
+      result *= i
+   R result
+
+L(n) 0..5
+   print(n‘ ’factorial(n))
+===
+template <typename T1> auto factorial(const T1 &n)
+{
+    auto result = 1;
+    for (auto i : range_ee(2, n))
+        result *= i;
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(0, 5))
+            print(n + u" "_S + factorial(n));
+    }
+} code_block_1;
