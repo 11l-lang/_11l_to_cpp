@@ -4413,3 +4413,47 @@ struct CodeBlock1
         print(pow(5, (square(3))));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Extract_file_extension#Python
+import re
+
+def extract_ext(path):
+    m = re.search(r'\.[A-Za-z0-9]+$', path)
+    return m.group(0) if m else ""
+
+paths = ['http://example.com/download.tar.gz',
+         'CharacterModel.3DS',
+         '.desktop',
+         'document',
+         'document.txt_backup',
+         '/etc/pam.d/login']
+
+for path in paths:
+    print(path.rjust(max(map(lambda p: len(p), paths))) + ' -> ' + extract_ext(path))
+===
+//import re
+
+F extract_ext(path)
+   V m = re:‘\.[A-Za-z0-9]+$’.search(path)
+   R I m {m.group(0)} E ‘’
+V paths = [‘http://example.com/download.tar.gz’, ‘CharacterModel.3DS’, ‘.desktop’, ‘document’, ‘document.txt_backup’, ‘/etc/pam.d/login’]
+
+L(path) paths
+   print(path.rjust(max(paths.map(p -> p.len)))‘ -> ’extract_ext(path))
+===
+template <typename T1> auto extract_ext(const T1 &path)
+{
+    auto m = re::_(uR"(\.[A-Za-z0-9]+$)"_S).search(path);
+    return m ? m.group(0) : u""_S;
+}
+auto paths = create_array({u"http://example.com/download.tar.gz"_S, u"CharacterModel.3DS"_S, u".desktop"_S, u"document"_S, u"document.txt_backup"_S, u"/etc/pam.d/login"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&path : paths)
+            print(path.rjust(max(paths.map([](const auto &p){return p.len();}))) + u" -> "_S + extract_ext(path));
+    }
+} code_block_1;

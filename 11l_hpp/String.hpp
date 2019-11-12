@@ -344,6 +344,20 @@ public:
 		return fillchar * (width - len() - w) + *this + fillchar * w;
 	}
 
+	String ljust(int width, String fillchar = String(u' ')) const
+	{
+		if (fillchar.len() != 1)
+			throw AssertionError();
+		return *this + fillchar * (width - len());
+	}
+
+	String rjust(int width, String fillchar = String(u' ')) const
+	{
+		if (fillchar.len() != 1)
+			throw AssertionError();
+		return fillchar * (width - len()) + *this;
+	}
+
 	String ltrim(Char c, Nullable<int> limit = nullptr) const
 	{
 		const char16_t *s = data();

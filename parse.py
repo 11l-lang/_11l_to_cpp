@@ -2768,6 +2768,8 @@ string_scope.add_name('count', ASTFunctionDefinition([('s', '', 'String')]))
 string_scope.add_name('replace', ASTFunctionDefinition([('old', '', 'String'), ('new', '', 'String')]))
 string_scope.add_name('zfill', ASTFunctionDefinition([('width', '', 'Int')]))
 string_scope.add_name('center', ASTFunctionDefinition([('width', '', 'Int'), ('fillchar', token_to_str('‘ ’'), 'Char')]))
+string_scope.add_name('ljust',  ASTFunctionDefinition([('width', '', 'Int'), ('fillchar', token_to_str('‘ ’'), 'Char')]))
+string_scope.add_name('rjust',  ASTFunctionDefinition([('width', '', 'Int'), ('fillchar', token_to_str('‘ ’'), 'Char')]))
 string_scope.add_name('format', ASTFunctionDefinition([('arg', token_to_str('N', Token.Category.CONSTANT), '')] * 32))
 string_scope.add_name('map', ASTFunctionDefinition([('function', '', '(Char -> T)')]))
 builtins_scope.ids['String'].ast_nodes[0].scope = string_scope
