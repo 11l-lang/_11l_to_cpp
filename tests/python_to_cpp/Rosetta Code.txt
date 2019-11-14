@@ -4457,3 +4457,51 @@ struct CodeBlock1
             print(path.rjust(max(paths.map([](const auto &p){return p.len();}))) + u" -> "_S + extract_ext(path));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Factors_of_an_integer#Python
+import math
+
+def factor(n):
+  factors = set() # int
+  for x in range(1, int(math.sqrt(n)) + 1):
+    if n % x == 0:
+      factors.add(x)
+      factors.add(n//x)
+  return sorted(list(factors))
+
+for i in (45, 53, 64):
+  print(str(i) + ": factors: " + str(factor(i)))
+===
+//import math
+
+F factor(n)
+   V factors = Set[Int]()
+   L(x) 1 .< Int(sqrt(n)) + 1
+      I n % x == 0
+         factors.add(x)
+         factors.add(n I/ x)
+   R sorted(Array(factors))
+
+L(i) (45, 53, 64)
+   print(String(i)‘: factors: ’String(factor(i)))
+===
+template <typename T1> auto factor(const T1 &n)
+{
+    auto factors = Set<int>();
+    for (auto x : range_el(1, to_int(sqrt(n)) + 1))
+        if (mod(n, x) == 0) {
+            factors.add(x);
+            factors.add(idiv(n, x));
+        }
+    return sorted(create_array(factors));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&i : make_tuple(45, 53, 64))
+            print(String(i) + u": factors: "_S + String(factor(i)));
+    }
+} code_block_1;

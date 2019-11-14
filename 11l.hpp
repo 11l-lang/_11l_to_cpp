@@ -122,6 +122,10 @@ class AssertionError {};
 typedef unsigned char Byte;
 
 #include "11l_hpp/funcs.hpp"
+namespace std {
+template <typename Type, int dimension> inline const Type *begin(const Tvec<Type, dimension> &v) {return &v[0];}
+template <typename Type, int dimension> inline const Type *end  (const Tvec<Type, dimension> &v) {return &v[0] + dimension;}
+}
 #include "11l_hpp/Range.hpp"
 #include <iostream> // for std::wcerr in String.hpp
 #include "11l_hpp/String.hpp"
