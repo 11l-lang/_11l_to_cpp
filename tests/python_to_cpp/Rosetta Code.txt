@@ -4575,3 +4575,169 @@ struct CodeBlock1
             print(String(i) + u": "_S + String(_get<1>(farey(i))) + u" items"_S);
     }
 } code_block_1;
+
+
+---
+[-https://www.rosettacode.org/wiki/Fast_Fourier_transform-]
+
+
+# https://www.rosettacode.org/wiki/FASTA_format#Python [-Note that a high-quality implementation will not hold the entire file in memory at once; real FASTA files can be multiple gigabytes in size.-]
+instr = \
+'''>Rosetta_Example_1
+THERECANBENOSPACE
+>Rosetta_Example_2
+THERECANBESEVERAL
+LINESBUTTHEYALLMUST
+BECONCATENATED'''
+
+def fasta_parse(instr):
+    r : List[Tuple[str, str]] = []
+    key = ''
+    val = ''
+    for line in instr.split("\n"):
+        if line.startswith('>'):
+            if key != '':
+                r.append((key, val))
+            (key, val) = (line[1:].split()[0], '')
+        elif key != '':
+            val += line
+    if key != '':
+        r.append((key, val))
+    return r
+
+print("\n".join(key + ': ' + val for key, val in fasta_parse(instr)))
+===
+V instr = ‘>Rosetta_Example_1
+THERECANBENOSPACE
+>Rosetta_Example_2
+THERECANBESEVERAL
+LINESBUTTHEYALLMUST
+BECONCATENATED’
+
+F fasta_parse(instr)
+   [(String, String)] r
+   V key = ‘’
+   V val = ‘’
+   L(line) instr.split("\n")
+      I line.starts_with(‘>’)
+         I key != ‘’
+            r.append((key, val))
+         (key, val) = (line[1..].split_py()[0], ‘’)
+      E I key != ‘’
+         val ‘’= line
+   I key != ‘’
+      r.append((key, val))
+   R r
+print(fasta_parse(instr).map2((key, val) -> key‘: ’val).join("\n"))
+===
+auto instr = uR"(>Rosetta_Example_1
+THERECANBENOSPACE
+>Rosetta_Example_2
+THERECANBESEVERAL
+LINESBUTTHEYALLMUST
+BECONCATENATED)"_S;
+
+template <typename T1> auto fasta_parse(const T1 &instr)
+{
+    Array<Tuple<String, String>> r;
+    auto key = u""_S;
+    auto val = u""_S;
+    for (auto &&line : instr.split(u"\n"_S))
+        if (line.starts_with(u">"_S)) {
+            if (key != u"")
+                r.append(make_tuple(key, val));
+            assign_from_tuple(key, val, make_tuple(_get<0>(line[range_ei(1)].split_py()), u""_S));
+        }
+        else if (key != u"")
+            val += line;
+    if (key != u"")
+        r.append(make_tuple(key, val));
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(fasta_parse(instr).map2([](const auto &key, const auto &val){return key + u": "_S + val;}).join(u"\n"_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Feigenbaum_constant_calculation#Python
+max_it = 13
+max_it_j = 10
+a1 = 1.0
+a2 = 0.0
+d1 = 3.2
+a = 0.0
+
+print(" i       d")
+for i in range(2, max_it + 1):
+    a = a1 + (a1 - a2) / d1
+    for j in range(1, max_it_j + 1):
+        x = 0.0
+        y = 0.0
+        for k in range(1, (1 << i) + 1):
+            y = 1.0 - 2.0 * y * x
+            x = a - x * x
+        a = a - x / y
+    d = (a1 - a2) / (a - a1)
+    print("%2d    %.8f" % (i, d))
+    d1 = d
+    a2 = a1
+    a1 = a
+===
+V max_it = 13
+V max_it_j = 10
+V a1 = 1.0
+V a2 = 0.0
+V d1 = 3.2
+V a = 0.0
+print(‘ i       d’)
+L(i) 2 .< max_it + 1
+   a = a1 + (a1 - a2) / d1
+   L(j) 1 .< max_it_j + 1
+      V x = 0.0
+      V y = 0.0
+      L(k) 1 .< (1 << i) + 1
+         y = 1.0 - 2.0 * y * x
+         x = a - x * x
+      a = a - x / y
+   V d = (a1 - a2) / (a - a1)
+   print(‘#2.0    #.8’.format(i, d))
+   d1 = d
+   a2 = a1
+   a1 = a
+===
+auto max_it = 13;
+auto max_it_j = 10;
+auto a1 = 1.0;
+auto a2 = 0.0;
+auto d1 = 3.2;
+auto a = 0.0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u" i       d"_S);
+        for (auto i : range_el(2, max_it + 1)) {
+            a = a1 + (a1 - a2) / d1;
+            for (auto j : range_el(1, max_it_j + 1)) {
+                auto x = 0.0;
+                auto y = 0.0;
+                for (auto k : range_el(1, (1 << i) + 1)) {
+                    y = 1.0 - 2.0 * y * x;
+                    x = a - x * x;
+                }
+                a = a - x / y;
+            }
+            auto d = (a1 - a2) / (a - a1);
+            print(u"#2.0    #.8"_S.format(i, d));
+            d1 = d;
+            a2 = a1;
+            a1 = a;
+        }
+    }
+} code_block_1;
