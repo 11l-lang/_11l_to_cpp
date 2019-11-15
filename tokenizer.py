@@ -451,7 +451,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                                 if source[i+1:i+2] in '-+':
                                     i += 1
                             i += 1
-                        if source[i:i+1] in ('o', 'о', 'b', 'д'):
+                        if source[i:i+1] in ('o', 'о', 'b', 'д', 'i'):
                             i += 1
                         elif "'" in source[lexem_start:i] and not '.' in source[lexem_start:i]: # float numbers do not checked for a while
                             number = source[lexem_start:i].replace("'", '')
