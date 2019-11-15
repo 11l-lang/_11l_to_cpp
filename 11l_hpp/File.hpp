@@ -3,6 +3,8 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
+#undef far
+#undef near
 #else
 #include <codecvt>
 #include <locale>

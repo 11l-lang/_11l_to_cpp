@@ -4505,3 +4505,73 @@ struct CodeBlock1
             print(String(i) + u": factors: "_S + String(factor(i)));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Farey_sequence#Lua
+def farey(n):
+    a = 0
+    b = 1
+    c = 1
+    d = n
+    far = '0/1 '
+    farn = 1
+    while c <= n:
+        k = (n + b) // d
+        (a, b, c, d) = (c, d, k * c - a, k * d - b)
+        far += str(a) + '/' + str(b) + ' '
+        farn += 1
+    return (far, farn)
+
+for i in range(1, 11+1):
+    print(str(i) + ": " + farey(i)[0])
+
+for i in range(100, 1000+100, 100):
+    print(str(i) + ": " + str(farey(i)[1]) + " items")
+===
+F farey(n)
+   V a = 0
+   V b = 1
+   V c = 1
+   V d = n
+   V far = ‘0/1 ’
+   V farn = 1
+   L c <= n
+      V k = (n + b) I/ d
+      (a, b, c, d) = (c, d, k * c - a, k * d - b)
+      far ‘’= String(a)‘/’String(b)‘ ’
+      farn++
+   R (far, farn)
+
+L(i) 1 .< 11 + 1
+   print(String(i)‘: ’farey(i)[0])
+
+L(i) (100 .< 1000 + 100).step(100)
+   print(String(i)‘: ’String(farey(i)[1])‘ items’)
+===
+template <typename T1> auto farey(const T1 &n)
+{
+    auto a = 0;
+    auto b = 1;
+    auto c = 1;
+    auto d = n;
+    auto far = u"0/1 "_S;
+    auto farn = 1;
+    while (c <= n) {
+        auto k = idiv((n + b), d);
+        assign_from_tuple(a, b, c, d, make_tuple(c, d, k * c - a, k * d - b));
+        far += String(a) + u"/"_S + String(b) + u" "_S;
+        farn++;
+    }
+    return make_tuple(far, farn);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(1, 11 + 1))
+            print(String(i) + u": "_S + _get<0>(farey(i)));
+        for (auto i : range_el(100, 1000 + 100).step(100))
+            print(String(i) + u": "_S + String(_get<1>(farey(i))) + u" items"_S);
+    }
+} code_block_1;
