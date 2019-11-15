@@ -4786,3 +4786,19 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://rosettacode.org/wiki/Euler%27s_identity#Python
+import math
+print(math.e ** (math.pi * 1j) + 1)
+===
+//import math
+print(math:e ^ (math:pi * 1i) + 1)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(pow(math::e, (math::pi * 1i)) + 1);
+    }
+} code_block_1;

@@ -138,6 +138,10 @@ template <typename Type, int dimension> inline const Type *end  (const Tvec<Type
 #include <complex>
 typedef std::complex<double> Complex;
 using namespace std::complex_literals;
+template <typename Ty, typename Ty2> inline std::complex<Ty> operator+(const std::complex<Ty> &c, const Ty2 &n) {return std::complex<Ty>(c.real() + n, c.imag());}
+template <typename Ty, typename Ty2> inline std::complex<Ty> operator+(const Ty2 &n, const std::complex<Ty> &c) {return std::complex<Ty>(c.real() + n, c.imag());}
+template <typename Ty, typename Ty2> inline std::complex<Ty> operator-(const std::complex<Ty> &c, const Ty2 &n) {return std::complex<Ty>(c.real() - n, c.imag());}
+template <typename Ty, typename Ty2> inline std::complex<Ty> operator-(const Ty2 &n, const std::complex<Ty> &c) {return std::complex<Ty>(n - c.real(), -c.imag());}
 template <typename Ty, typename Ty2> inline std::complex<Ty> operator*(const std::complex<Ty> &c, const Ty2 &n) {return std::complex<Ty>(c.real() * n, c.imag() * n);}
 template <typename Ty, typename Ty2> inline std::complex<Ty> operator*(const Ty2 &n, const std::complex<Ty> &c) {return std::complex<Ty>(c.real() * n, c.imag() * n);}
 template <typename Ty, typename Ty2> inline std::complex<Ty> operator/(const std::complex<Ty> &c, const Ty2 &n) {return std::complex<Ty>(c.real() / n, c.imag() / n);}
@@ -218,6 +222,17 @@ inline void print(int64_t i, const String &end = u"\n", bool flush = false)
 inline void print(double i, const String &end = u"\n", bool flush = false)
 {
 	std::wcout << i << std::wstring(end.cbegin(), end.cend());
+	if (flush)
+		std::wcout.flush();
+}
+
+inline void print(Complex c, const String &end = u"\n", bool flush = false)
+{
+	if (c.real() != 0.0)
+		std::wcout << c.real() << std::showpos << c.imag() << std::noshowpos;
+	else
+		std::wcout << c.imag();
+	std::wcout << L'i' << std::wstring(end.cbegin(), end.cend());
 	if (flush)
 		std::wcout.flush();
 }
