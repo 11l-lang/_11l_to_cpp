@@ -146,6 +146,7 @@ template <typename Ty, typename Ty2> inline std::complex<Ty> operator*(const std
 template <typename Ty, typename Ty2> inline std::complex<Ty> operator*(const Ty2 &n, const std::complex<Ty> &c) {return std::complex<Ty>(c.real() * n, c.imag() * n);}
 template <typename Ty, typename Ty2> inline std::complex<Ty> operator/(const std::complex<Ty> &c, const Ty2 &n) {return std::complex<Ty>(c.real() / n, c.imag() / n);}
 template <typename Ty, typename Ty2> inline std::complex<Ty> operator/(const Ty2 &n, const std::complex<Ty> &c) {return Ty(n) / c;}
+template <typename Ty> inline std::complex<Ty> conjugate(const std::complex<Ty> &c) {return std::conj(c);}
 
 #define assert(...) assert_file_line(__FILE__, __LINE__, __VA_ARGS__)
 

@@ -4802,3 +4802,51 @@ struct CodeBlock1
         print(pow(math::e, (math::pi * 1i)) + 1);
     }
 } code_block_1;
+
+
+# https://rosettacode.org/wiki/Arithmetic/Complex#Python
+z1 = 1.5 + 3j
+z2 = 1.5 + 1.5j
+print(z1 + z2)        # (3+4.5j)
+print(z1 - z2)        # 1.5j
+print(z1 * z2)        # (-2.25+6.75j)
+print(z1 / z2)        # (1.5+0.5j)
+print(- z1)           # (-1.5-3j)
+print(z1.conjugate()) # (1.5-3j)
+print(abs(z1))        # 3.3541019662496847
+print(z1 ** z2)       # (-1.1024829553277784-0.38306415117199333j)
+print(z1.real)        # 1.5
+print(z1.imag)        # 3.0
+===
+V z1 = 1.5 + 3i
+V z2 = 1.5 + 1.5i
+print(z1 + z2)
+print(z1 - z2)
+print(z1 * z2)
+print(z1 / z2)
+print(-z1)
+print(conjugate(z1))
+print(abs(z1))
+print(z1 ^ z2)
+print(z1.real)
+print(z1.imag)
+===
+auto z1 = 1.5 + 3i;
+auto z2 = 1.5 + 1.5i;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(z1 + z2);
+        print(z1 - z2);
+        print(z1 * z2);
+        print(z1 / z2);
+        print(-z1);
+        print(conjugate(z1));
+        print(abs(z1));
+        print(pow(z1, z2));
+        print(z1.real());
+        print(z1.imag());
+    }
+} code_block_1;
