@@ -4951,3 +4951,114 @@ struct CodeBlock2
         }
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Fibonacci_sequence#Iterative_63 [Python]
+def fib_iter(n):
+    if n < 2:
+        return n
+    fib_prev = 1
+    fib = 1
+    for num in range(2, n):
+        (fib_prev, fib) = (fib, fib + fib_prev)
+    return fib
+
+for i in range(1, 21):
+    print(fib_iter(i), end = ' ')
+print()
+===
+F fib_iter(n)
+   I n < 2
+      R n
+   V fib_prev = 1
+   V fib = 1
+   L(num) 2 .< n
+      (fib_prev, fib) = (fib, fib + fib_prev)
+   R fib
+
+L(i) 1.<21
+   print(fib_iter(i), end' ‘ ’)
+print()
+===
+template <typename T1> auto fib_iter(const T1 &n)
+{
+    if (n < 2)
+        return n;
+    auto fib_prev = 1;
+    auto fib = 1;
+    for (auto num : range_el(2, n))
+        assign_from_tuple(fib_prev, fib, make_tuple(fib, fib + fib_prev));
+    return fib;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(1, 21))
+            print(fib_iter(i), u" "_S);
+        print();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Fibonacci_word#Python
+import math
+
+def entropy(s):
+    if len(s) <= 1:
+        return 0.0
+    lns = float(len(s))
+    count0 = s.count('0')
+    return -sum(count/lns * math.log(count/lns, 2) for count in (count0, len(s) - count0))
+
+nmax = 37
+fwords = [str('1'), '0']
+print('%-3s %10s %-10s %s' % ('N', 'Length', 'Entropy', 'Fibword'))
+for n in range(1, nmax+1):
+    while len(fwords) < n:
+        fwords += [''.join(fwords[-2:][::-1])]
+    v = fwords[n-1]
+    print('%3i %10i %10.7f %s' % (n, len(v), entropy(v), v if len(v) < 56 else '<too long>'))
+===
+//import math
+
+F entropy(s)
+   I s.len <= 1
+      R 0.0
+   V lns = Float(s.len)
+   V count0 = s.count(‘0’)
+   R -sum((count0, s.len - count0).map(count -> count / @lns * log(count / @lns, 2)))
+V nmax = 37
+V fwords = [String(‘1’), ‘0’]
+print(‘#<3 #10 #<10 #.’.format(‘N’, ‘Length’, ‘Entropy’, ‘Fibword’))
+L(n) 1 .< nmax + 1
+   L fwords.len < n
+      fwords [+]= (fwords[(len)-2 ..][(0..).step(-1)]).join(‘’)
+   V v = fwords[n - 1]
+   print(‘#3.0 #10.0 #2.7 #.’.format(n, v.len, entropy(v), I v.len < 56 {v} E ‘<too long>’))
+===
+template <typename T1> auto entropy(const T1 &s)
+{
+    if (s.len() <= 1)
+        return 0.0;
+    auto lns = to_float(s.len());
+    auto count0 = s.count(u"0"_S);
+    return -sum_map(make_tuple(count0, s.len() - count0), [&lns](const auto &count){return count / lns * log(count / lns, 2);});
+}
+auto nmax = 37;
+auto fwords = create_array<String>({String(u"1"_S), u"0"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"#<3 #10 #<10 #."_S.format(u"N"_S, u"Length"_S, u"Entropy"_S, u"Fibword"_S));
+        for (auto n : range_el(1, nmax + 1)) {
+            while (fwords.len() < n)
+                fwords.append((fwords[range_elen_i( - 2)][range_ei(0).step(-1)]).join(u""_S));
+            auto v = fwords[n - 1];
+            print(u"#3.0 #10.0 #2.7 #."_S.format(n, v.len(), entropy(v), v.len() < 56 ? v : u"<too long>"_S));
+        }
+    }
+} code_block_1;

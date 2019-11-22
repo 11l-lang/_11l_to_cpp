@@ -29,8 +29,12 @@ template <typename Type> class Array : public std::vector<Type>
 	Array slice(int begin, int end, int step = 1) const
 	{
 		Array r;
-		for (int i = begin; i < end; i += step)
-			r.push_back(std::vector<Type>::at(i));
+		if (step > 0)
+			for (int i = begin; i < end; i += step)
+				r.push_back(std::vector<Type>::at(i));
+		else // for `[::-1]` [-TODO: fix `[0::-1]` and `[r:l:-1]`-]
+			for (int i = end - 1; i >= begin; i += step)
+				r.push_back(std::vector<Type>::at(i));
 		return r;
 	}
 
