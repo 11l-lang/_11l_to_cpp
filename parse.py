@@ -434,6 +434,8 @@ class SymbolNode:
                             break
                         s = s.parent
                         assert(s)
+                elif func_name == '*this':
+                    func_name = '(*this)' # function call has higher precedence than dereference in C++, so `*this(...)` is equivalent to `*(this(...))`
                 else:
                     if self.children[0].symbol.id == ':':
                         fid, sc = find_module(self.children[0].children[0].to_str()).scope.find_and_return_scope(self.children[0].children[1].token_str())
@@ -715,6 +717,8 @@ class SymbolNode:
                                           #                               or (sn.parent.symbol.id == '.' and sn.parent.children[1].token_str() == 'append'))
                             t = sn.token.value(source)[1:]
                             captured_variables.add('this' if t == '' else '&'*by_ref + t)
+                        elif sn.token.value(source) == '(.)':
+                            captured_variables.add('this')
                     else:
                         for child in sn.children:
                             if child is not None and child.symbol.id != '->':
@@ -1082,6 +1086,8 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                             by_ref = True # sn.parent and sn.parent.children[0] is sn and sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!=')
                             t = sn.token.value(source)[1:]
                             captured_variables.add('this' if t == '' else '&'*by_ref + t)
+                        elif sn.token.value(source) == '(.)':
+                            captured_variables.add('this')
                     else:
                         for child in sn.children:
                             if child is not None:

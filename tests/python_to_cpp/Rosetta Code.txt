@@ -4850,3 +4850,104 @@ struct CodeBlock1
         print(z1.imag());
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Fibonacci_n-step_number_sequences#Python:_Callable_class
+from typing import List
+
+class Fiblike:
+    addnum : int
+    memo : List[int]
+
+    def __init__(self, start):
+        self.addnum = len(start)
+        self.memo = start[:]
+
+    def __call__(self, n):
+        try:
+            return self.memo[n]
+        except IndexError:
+            ans = sum(self(i) for i in range(n-self.addnum, n))
+            self.memo.append(ans)
+            return ans
+
+fibo = Fiblike([1,1])
+print([fibo(i) for i in range(10)]) # [1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+lucas = Fiblike([2,1])
+print([lucas(i) for i in range(10)]) # [2, 1, 3, 4, 7, 11, 18, 29, 47, 76]
+for n, name in zip(range(2,11), 'fibo tribo tetra penta hexa hepta octo nona deca'.split()) :
+    fibber = Fiblike([1] + [int(2**i) for i in range(n-1)])
+    print('n=%2i, %5snacci -> %s ...' % (n, name, ' '.join(str(fibber(i)) for i in range(15))))
+===
+
+T Fiblike
+   Int addnum
+   [Int] memo
+
+   F (start)
+      .addnum = start.len
+      .memo = copy(start)
+
+   F ()(n)
+      X.try
+         R .memo[n]
+      X.catch IndexError
+         V ans = sum((n - .addnum .< n).map(i -> (.)(i)))
+         .memo.append(ans)
+         R ans
+V fibo = Fiblike([1, 1])
+print((0.<10).map(i -> fibo(i)))
+V lucas = Fiblike([2, 1])
+print((0.<10).map(i -> lucas(i)))
+L(n, name) zip((2.<11), ‘fibo tribo tetra penta hexa hepta octo nona deca’.split_py())
+   V fibber = Fiblike([1] [+] (0 .< n - 1).map(i -> Int(2 ^ i)))
+   print(‘n=#2.0, #5nacci -> #. ...’.format(n, name, (0.<15).map(i -> String(@fibber(i))).join(‘ ’)))
+===
+class Fiblike
+{
+public:
+    int addnum;
+    Array<int> memo;
+
+    template <typename T1> Fiblike(const T1 &start)
+    {
+        addnum = start.len();
+        memo = copy(start);
+    }
+
+    template <typename T1> auto operator()(const T1 &n)
+    {
+        try
+        {
+            return memo[n];
+        }
+        catch (const IndexError&)
+        {
+            auto ans = sum_map(range_el(n - addnum, n), [this](const auto &i){return (*this)(i);});
+            memo.append(ans);
+            return ans;
+        }
+    }
+};
+auto fibo = Fiblike(create_array({1, 1}));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(range_el(0, 10).map([](const auto &i){return fibo(i);}));
+    }
+} code_block_1;
+auto lucas = Fiblike(create_array({2, 1}));
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(range_el(0, 10).map([](const auto &i){return lucas(i);}));
+        for (auto &&[n, name] : zip(range_el(2, 11), u"fibo tribo tetra penta hexa hepta octo nona deca"_S.split_py())) {
+            auto fibber = Fiblike(create_array({1}) + range_el(0, n - 1).map([](const auto &i){return to_int(pow(2, i));}));
+            print(u"n=#2.0, #5nacci -> #. ..."_S.format(n, name, range_el(0, 15).map([&fibber](const auto &i){return String(fibber(i));}).join(u" "_S)));
+        }
+    }
+} code_block_2;
