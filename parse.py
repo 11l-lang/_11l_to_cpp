@@ -1448,6 +1448,7 @@ class ASTTypeDefinition(ASTNodeWithChildren):
 
     def __init__(self, constructors = None):
         super().__init__()
+        self.base_types = []
         self.constructors = constructors or []
         self.scope = scope # needed for built-in types, e.g. `File(full_fname, ‘w’, encoding' ‘utf-8-sig’).write(...)`
         self.forward_declared_types = set()
@@ -2251,7 +2252,6 @@ def parse_internal(this_node):
                         next_token()
                 else:
                     scope.add_name(node.type_name, node)
-                    node.base_types = []
 
                     if token.value(source) == '(':
                         while True:
@@ -2783,6 +2783,7 @@ builtins_scope.ids['String'].ast_nodes[0].scope = string_scope
 array_scope = Scope(None)
 array_scope.add_name('remove', ASTFunctionDefinition([('x', '', '')]))
 array_scope.add_name('reverse', ASTFunctionDefinition([]))
+array_scope.add_name('filter', ASTFunctionDefinition([('f', '', '')]))
 builtins_scope.ids['Array'].ast_nodes[0].scope = array_scope
 set_scope = Scope(None)
 set_scope.add_name('difference', ASTFunctionDefinition([('other', '', 'Set')]))

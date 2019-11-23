@@ -5062,3 +5062,76 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/File_extension_is_in_extensions_list#Python
+def is_ext(file_name, extensions):
+    return any(map(lambda e: file_name.lower().endswith("." + e.lower()), extensions))
+
+def test(file_names, extensions):
+    for file_name in file_names:
+        print(file_name.ljust(max(len(f_n) for f_n in file_names)) + ' ' + str(is_ext(file_name, extensions)))
+
+test([
+    'MyData.a##',
+    'MyData.tar.Gz',
+    'MyData.gzip',
+    'MyData.7z.backup',
+    'MyData...',
+    'MyData'
+], ['zip', 'rar', '7z', 'gz', 'archive', 'A##', 'tar.bz2'])
+
+test([
+    'MyData_v1.0.tar.bz2',
+    'MyData_v1.0.bz2'
+], ['tar.bz2'])
+===
+F is_ext(file_name, extensions)
+   R any(extensions.map(e -> @file_name.lowercase().ends_with(‘.’e.lowercase())))
+
+F test(file_names, extensions)
+   L(file_name) file_names
+      print(file_name.ljust(max(file_names.map(f_n -> f_n.len)))‘ ’String(is_ext(file_name, extensions)))
+test([‘MyData.a##’, ‘MyData.tar.Gz’, ‘MyData.gzip’, ‘MyData.7z.backup’, ‘MyData...’, ‘MyData’], [‘zip’, ‘rar’, ‘7z’, ‘gz’, ‘archive’, ‘A##’, ‘tar.bz2’])
+test([‘MyData_v1.0.tar.bz2’, ‘MyData_v1.0.bz2’], [‘tar.bz2’])
+===
+template <typename T1, typename T2> auto is_ext(const T1 &file_name, const T2 &extensions)
+{
+    return any(extensions.map([&file_name](const auto &e){return file_name.lowercase().ends_with(u"."_S + e.lowercase());}));
+}
+
+template <typename T1, typename T2> auto test(const T1 &file_names, const T2 &extensions)
+{
+    for (auto &&file_name : file_names)
+        print(file_name.ljust(max(file_names.map([](const auto &f_n){return f_n.len();}))) + u" "_S + String(is_ext(file_name, extensions)));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        test(create_array({u"MyData.a##"_S, u"MyData.tar.Gz"_S, u"MyData.gzip"_S, u"MyData.7z.backup"_S, u"MyData..."_S, u"MyData"_S}), create_array({u"zip"_S, u"rar"_S, u"7z"_S, u"gz"_S, u"archive"_S, u"A##"_S, u"tar.bz2"_S}));
+        test(create_array({u"MyData_v1.0.tar.bz2"_S, u"MyData_v1.0.bz2"_S}), create_array({u"tar.bz2"_S}));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Filter
+array = list(range(1, 11))
+even = filter(lambda n: n % 2 == 0, array)
+print(even)
+===
+V array = Array(1.<11)
+V even = array.filter(n -> n % 2 == 0)
+print(even)
+===
+auto array = create_array(range_el(1, 11));
+auto even = array.filter([](const auto &n){return mod(n, 2) == 0;});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(even);
+    }
+} code_block_1;
