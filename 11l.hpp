@@ -39,15 +39,15 @@ template <typename...Types> class TupleIterator
 	Type *ptr;
 public:
 	TupleIterator(Type *ptr) : ptr(ptr) {}
-	void operator++() {tuple<Type, Type> t; ptr += &get<1>(t) - &get<0>(t);}
+	void operator++() {tuple<Type, Type> *t = nullptr; ptr += &get<1>(*t) - &get<0>(*t);} // pointer is used to support types without a default constructor (e.g. Char)
 	Type &operator*() {return *ptr;}
 	bool operator!=(TupleIterator i) {return ptr != i.ptr;}
 };
 template <typename...Types> inline TupleIterator<Types...> begin(tuple<Types...> &t) {return TupleIterator<Types...>(&get<0>(t));}
 template <typename...Types> inline TupleIterator<Types...> end  (tuple<Types...> &t) {
 	tuple<typename tuple_element<0, tuple<Types...>>::type,
-	      typename tuple_element<0, tuple<Types...>>::type> tt; // if `t` is a single element tuple, then `&get<1>(t) - &get<0>(t)` will not work
-	return TupleIterator<Types...>(&get<tuple_size<tuple<Types...>>::value-1>(t) + (&get<1>(tt) - &get<0>(tt)));
+	      typename tuple_element<0, tuple<Types...>>::type> *tt = nullptr; // if `t` is a single element tuple, then `&get<1>(t) - &get<0>(t)` will not work
+	return TupleIterator<Types...>(&get<tuple_size<tuple<Types...>>::value-1>(t) + (&get<1>(*tt) - &get<0>(*tt)));
 }
 }
 
