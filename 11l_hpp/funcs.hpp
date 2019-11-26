@@ -68,3 +68,17 @@ template <typename Type1, typename Type2> inline auto idiv(Type1 a, Type2 b)
 {
 	return ext_int(a / b);
 }
+
+#ifdef __GNUC__
+inline int bsr(int     x) {return __builtin_clz  (x) ^ 31;}
+inline int bsr(int64_t x) {return __builtin_clzll(x) ^ 63;}
+inline int bsf(int     x) {return __builtin_ctz  (x);}
+inline int bsf(int64_t x) {return __builtin_ctzll(x);}
+#elif _MSC_VER
+inline int bsr(int x)     {unsigned long r; _BitScanReverse  (&r, x); return r;}
+inline int bsr(int64_t x) {unsigned long r; _BitScanReverse64(&r, x); return r;}
+inline int bsf(int x)     {unsigned long r; _BitScanForward  (&r, x); return r;}
+inline int bsf(int64_t x) {unsigned long r; _BitScanForward64(&r, x); return r;}
+#else
+#error Unsupported compiler
+#endif

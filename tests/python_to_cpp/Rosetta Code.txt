@@ -5135,3 +5135,66 @@ struct CodeBlock1
         print(even);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Find_common_directory_path#C
+def find_common_directory_path(paths, sep = '/'):
+    pos = 0
+    while True:
+        for path in paths:
+            if pos < len(path) and path[pos] == paths[0][pos]:
+                continue
+
+            while pos > 0:
+                pos -= 1
+                if paths[0][pos] == sep:
+                    break
+            return paths[0][:pos]
+        pos += 1
+
+print(find_common_directory_path([
+    "/home/user1/tmp/coverage/test",
+    "/home/user1/tmp/covert/operator",
+    "/home/user1/tmp/coven/members"]))
+===
+F find_common_directory_path(paths, sep = ‘/’)
+   V pos = 0
+   L
+      L(path) paths
+         I pos < path.len & path[pos] == paths[0][pos]
+            L.continue
+
+         L pos > 0
+            pos--
+            I paths[0][pos] == sep
+               L.break
+         R paths[0][0 .< pos]
+      pos++
+print(find_common_directory_path([‘/home/user1/tmp/coverage/test’, ‘/home/user1/tmp/covert/operator’, ‘/home/user1/tmp/coven/members’]))
+===
+template <typename T1, typename T2 = decltype(u"/"_S)> auto find_common_directory_path(const T1 &paths, const T2 &sep = u"/"_S)
+{
+    auto pos = 0;
+    while (true) {
+        for (auto &&path : paths) {
+            if (pos < path.len() && path[pos] == _get<0>(paths)[pos])
+                continue;
+
+            while (pos > 0) {
+                pos--;
+                if (_get<0>(paths)[pos] == sep)
+                    break;
+            }
+            return _get<0>(paths)[range_el(0, pos)];
+        }
+        pos++;
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(find_common_directory_path(create_array({u"/home/user1/tmp/coverage/test"_S, u"/home/user1/tmp/covert/operator"_S, u"/home/user1/tmp/coven/members"_S})));
+    }
+} code_block_1;
