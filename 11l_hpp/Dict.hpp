@@ -146,14 +146,6 @@ template <typename KeyType, typename ValueType> Dict<KeyType, ValueType> create_
 	return r;
 }
 
-namespace std
-{
-template <class Type, int N, size_t i> struct tuple_element<i, Tvec<Type, N>>
-{
-	using type = Type;
-};
-}
-
 template <typename Iterable, typename Func> auto create_dict(const Iterable &iterable, Func &&func)
 {
 	using Type = decltype(func(std::declval<decltype(*std::begin(iterable))>()));
