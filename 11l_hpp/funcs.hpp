@@ -17,7 +17,7 @@
 // [https://stackoverflow.com/questions/45898828/structured-bindings-for-your-own-type-that-isn-t-a-struct-or-a-tuplevia-public] and [https://stackoverflow.com/a/46003908/2692494]
 namespace std {
 	template <typename Ty, int N> struct tuple_size<Tvec<Ty, N>> : std::integral_constant<size_t, N> { };
-	template <typename Ty, int N> struct tuple_element<N, Tvec<Ty, N>> { using type = Ty; };
+//	template <typename Ty, int N> struct tuple_element<N, Tvec<Ty, N>> { using type = Ty; };
 }
 template <size_t i, typename Ty, int N> Ty& get(Tvec<Ty, N> &v) { return v[i]; }
 template <size_t i, typename Ty, int N> const Ty get(const Tvec<Ty, N> &v) { return v[i]; }

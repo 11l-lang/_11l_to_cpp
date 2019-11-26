@@ -24,6 +24,13 @@ public:
 	template <typename ValueTy> ValueError(const ValueTy &value) : value(to_string(value)) {}
 };
 
+template <typename ValType> int String::index(const ValType &v) const
+{
+	int r = findi(v);
+	if (r == -1) throw ValueError(v);
+	return r;
+}
+
 template <typename Type> class Array : public std::vector<Type>
 {
 	Array slice(int begin, int end, int step = 1) const
@@ -52,7 +59,7 @@ public:
 	{
 		String r = u'[';
 		for (int i=0; i<len(); i++) {
-			r += String(at(i));
+			r += String(std::vector<Type>::at(i));
 			if (i < len()-1) r += u", ";
 		}
 		r += u']';
@@ -149,6 +156,22 @@ public:
 	{
 		return std::move(a) * n;
 	}
+/*	friend Array operator*(const Array &a, int n)
+	{
+		Array r;
+		if (n >= 1) { // mimic Python's behavior in which [1] * 0 = [] and [1] * -1 = []
+			int len = a.len();
+			r.reserve(len * n);
+			for (int i = 0; i < n; i++)
+				for (int j = 0; j < len; j++)
+					r.append(a[j]);
+		}
+		return r;
+	}
+	friend Array operator*(int n, const Array &a)
+	{
+		return a * n;
+	}*/
 
 	void operator*=(int n)
 	{
@@ -228,7 +251,7 @@ public:
 
 	template <typename Ty, bool include_beginning, bool include_ending> void append(const Range<Ty, include_beginning, include_ending> &range)
 	{
-		reserve(size() + range.size());
+		reserve(std::vector<Type>::size() + range.size());
 		for (auto i : range)
 			append(i);
 	}
@@ -444,6 +467,15 @@ template <typename Type> auto enumerate(const Array<Type> &arr)
 	int i = 0;
 	for (auto &&v : arr)
 		r.append(make_tuple(i++, v));
+	return r;
+}
+
+template <typename Func> Array<Char> String::filter(Func &&func) const
+{
+	Array<Char> r;
+	for (Char c : *this)
+		if (func(c))
+			r.append(c);
 	return r;
 }
 

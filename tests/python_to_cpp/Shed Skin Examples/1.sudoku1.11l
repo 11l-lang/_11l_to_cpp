@@ -63,6 +63,27 @@ F hash_lookup(puzzle)
    R calc_hash(puzzle) C :hashtable
 V iterations = 0
 
+F printpuzzle(puzzle)
+   L(x) 0.<9
+      V s = ‘ ’
+      L(y) 0.<9
+         S puzzle[x][y]
+            0
+               s ‘’= ‘.’
+            E
+               s ‘’= String(puzzle[x][y])
+         s ‘’= ‘ ’
+      print(s)
+
+F genMoveList(puzzle, i, j)
+   V l = Array(1.<10)
+   L(y) 0.<3
+      L(x) 0.<3
+         V p = puzzle[i * 3 + x][j * 3 + y]
+         I p != 0
+            l.remove(p)
+   R l
+
 F perm([[Int]] &puzzle; i, j, =l, [(Int, Int)] &u)
    :iterations++
    I u.empty & l.empty
@@ -111,27 +132,6 @@ F perm([[Int]] &puzzle; i, j, =l, [(Int, Int)] &u)
                      l.insert(m, backup)
                      puzzle[x + ii][y + jj] = 0
          R 0B
-
-F genMoveList(puzzle, i, j)
-   V l = Array(1.<10)
-   L(y) 0.<3
-      L(x) 0.<3
-         V p = puzzle[i * 3 + x][j * 3 + y]
-         I p != 0
-            l.remove(p)
-   R l
-
-F printpuzzle(puzzle)
-   L(x) 0.<9
-      V s = ‘ ’
-      L(y) 0.<9
-         S puzzle[x][y]
-            0
-               s ‘’= ‘.’
-            E
-               s ‘’= String(puzzle[x][y])
-         s ‘’= ‘ ’
-      print(s)
 
 F solve()
    V puzzle = [[0, 9, 3, 0, 8, 0, 4, 0, 0], [0, 4, 0, 0, 3, 0, 0, 0, 0], [6, 0, 0, 0, 0, 9, 2, 0, 5], [3, 0, 0, 0, 0, 0, 0, 9, 0], [0, 2, 7, 0, 0, 0, 5, 1, 0], [0, 8, 0, 0, 0, 0, 0, 0, 4], [7, 0, 1, 6, 0, 0, 0, 0, 2], [0, 0, 0, 0, 7, 0, 0, 6, 0], [0, 0, 4, 0, 1, 0, 8, 5, 0]]

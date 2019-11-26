@@ -85,6 +85,38 @@ template <typename T1> auto hash_lookup(const T1 &puzzle)
 }
 auto iterations = 0;
 
+template <typename T1> auto printpuzzle(const T1 &puzzle)
+{
+    for (auto x : range_el(0, 9)) {
+        auto s = u" "_S;
+        for (auto y : range_el(0, 9)) {
+            switch (puzzle[x][y])
+            {
+            case 0:
+                s += u"."_S;
+                break;
+            default:
+                s += String(puzzle[x][y]);
+                break;
+            }
+            s += u" "_S;
+        }
+        print(s);
+    }
+}
+
+template <typename T1, typename T2, typename T3> auto genMoveList(const T1 &puzzle, const T2 &i, const T3 &j)
+{
+    auto l = create_array(range_el(1, 10));
+    for (auto y : range_el(0, 3))
+        for (auto x : range_el(0, 3)) {
+            auto p = puzzle[i * 3 + x][j * 3 + y];
+            if (p != 0)
+                l.remove(p);
+        }
+    return l;
+}
+
 template <typename T2, typename T3, typename T4> auto perm(Array<Array<int>> &puzzle, const T2 &i, const T3 &j, T4 l, Array<ivec2> &u)
 {
     ::iterations++;
@@ -136,38 +168,6 @@ template <typename T2, typename T3, typename T4> auto perm(Array<Array<int>> &pu
                         }
             return false;
         }
-}
-
-template <typename T1, typename T2, typename T3> auto genMoveList(const T1 &puzzle, const T2 &i, const T3 &j)
-{
-    auto l = create_array(range_el(1, 10));
-    for (auto y : range_el(0, 3))
-        for (auto x : range_el(0, 3)) {
-            auto p = puzzle[i * 3 + x][j * 3 + y];
-            if (p != 0)
-                l.remove(p);
-        }
-    return l;
-}
-
-template <typename T1> auto printpuzzle(const T1 &puzzle)
-{
-    for (auto x : range_el(0, 9)) {
-        auto s = u" "_S;
-        for (auto y : range_el(0, 9)) {
-            switch (puzzle[x][y])
-            {
-            case 0:
-                s += u"."_S;
-                break;
-            default:
-                s += String(puzzle[x][y]);
-                break;
-            }
-            s += u" "_S;
-        }
-        print(s);
-    }
 }
 
 auto solve()

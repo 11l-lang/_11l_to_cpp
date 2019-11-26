@@ -1,10 +1,12 @@
 ﻿#include "C:\!!BITBUCKET\11l-lang\_11l_to_cpp\11l.hpp"
 
+auto _9_bytes = 9 * create_array({Byte(1)});
+
 class bmp
 {
 public:
     Array<Byte> v;
-    template <typename T1 = decltype(9 * create_array({Byte(1)})), typename T2 = decltype(-1)> bmp(const T1 &vals = 9 * create_array({Byte(1)}), const T2 &n = -1)
+    template <typename T1 = decltype(_9_bytes), typename T2 = decltype(-1)> bmp(const T1 &vals = _9_bytes, const T2 &n = -1)
     {
         v = vals[range_el(0, 9)];
         if (n >= 0)
@@ -95,7 +97,7 @@ public:
     {
         final[row].set(col, val);
         __openspaces--;
-        auto mask = bmp(9 * create_array({Byte(1)}), val - 1);
+        auto mask = bmp(_9_bytes, val - 1);
         rows.set(row, rows[row] & mask);
         cols.set(col, cols[col] & mask);
         auto cr = cell(row);

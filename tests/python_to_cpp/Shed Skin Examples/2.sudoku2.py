@@ -9,10 +9,11 @@ import sys
 
 from typing import List, Set, Tuple
 Byte = int
+_9_bytes = 9*[Byte(1)] # workaround for GCC
 
 class bmp:
         v : List[Byte]
-        def __init__(self, vals=9*[Byte(1)], n=-1):
+        def __init__(self, vals=_9_bytes, n=-1):
                 self.v = vals[0:9]
                 if n>=0: self.v[n] = not self.v[n]
         def __and__(self, other):

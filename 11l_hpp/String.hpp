@@ -243,12 +243,7 @@ public:
 		return r != String::npos ? (int)r : -1;
 	}
 
-	template <typename ValType> int index(const ValType &v) const
-	{
-		int r = findi(v);
-		if (r == -1) throw ValueError(v);
-		return r;
-	}
+	template <typename ValType> int index(const ValType &v) const;
 
 	Nullable<int> rfind(const String &s, int start = (int)npos) const
 	{
@@ -430,14 +425,7 @@ public:
 		return r;
 	}
 
-	template <typename Func> Array<Char> filter(Func &&func) const
-	{
-		Array<Char> r;
-		for (Char c : *this)
-			if (func(c))
-				r.append(c);
-		return r;
-	}
+	template <typename Func> Array<Char> filter(Func &&func) const;
 
 	//String &operator=(const String &s) {assign(s); return *this;}
 

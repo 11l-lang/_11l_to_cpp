@@ -72,6 +72,28 @@ def hash_lookup(puzzle):
 
 iterations = 0
 
+def printpuzzle(puzzle):
+        for x in range(9):
+                s = ' '
+                for y in range(9):
+                        p = puzzle[x][y]
+                        if p == 0:
+                                s += '.'
+                        else:
+                                s += str(puzzle[x][y])
+                        s += ' '
+                print(s)
+
+#gen move list for unit (i,j)
+def genMoveList(puzzle, i, j):
+        l = list(range(1,10))
+        for y in range(3):
+                for x in range(3):
+                        p = puzzle[i*3+x][j*3+y]
+                        if p != 0:
+                                l.remove(p)
+        return l
+
 #solve with lookahead
 #unit is 3x3, (i,j) is coords of unit. l is the list of all todo's
 def perm(puzzle : List[List[int]], i, j, l, u : List[Tuple[int, int]]):
@@ -133,28 +155,6 @@ def perm(puzzle : List[List[int]], i, j, l, u : List[Tuple[int, int]]):
                                                         l.insert(m, backup)
                                                         puzzle[x+ii][y+jj] = 0
                         return False
-
-#gen move list for unit (i,j)
-def genMoveList(puzzle, i, j):
-        l = list(range(1,10))
-        for y in range(3):
-                for x in range(3):
-                        p = puzzle[i*3+x][j*3+y]
-                        if p != 0:
-                                l.remove(p)
-        return l
-
-def printpuzzle(puzzle):
-        for x in range(9):
-                s = ' '
-                for y in range(9):
-                        p = puzzle[x][y]
-                        if p == 0:
-                                s += '.'
-                        else:
-                                s += str(puzzle[x][y])
-                        s += ' '
-                print(s)
 
 def solve():
         puzzle = [[0, 9, 3, 0, 8, 0, 4, 0, 0],

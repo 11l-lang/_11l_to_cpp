@@ -1,10 +1,11 @@
 //import math
 //import time
 //import sys
+V _9_bytes = 9 * [Byte(1)]
 
 T bmp
    [Byte] v
-   F (vals = 9 * [Byte(1)], n = -1)
+   F (vals = _9_bytes, n = -1)
       .v = vals[0.<9]
       I n >= 0
          .v[n] = !(.v[n])

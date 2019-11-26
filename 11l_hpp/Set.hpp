@@ -11,11 +11,11 @@ public:
 			add(el);
 	}
 
-	int len() const {return (int)size();}
+	int len() const {return (int)std::set<KeyType>::size();}
 
 	bool add(const KeyType &k)
 	{
-		auto r = insert(k);
+		auto r = std::set<KeyType>::insert(k);
 		return r.second;
 	}
 

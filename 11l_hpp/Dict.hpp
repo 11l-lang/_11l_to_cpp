@@ -48,6 +48,8 @@ template <typename KeyType, typename ValueType> auto dict_of(KeyType &&key, Valu
 
 template <typename KeyType, typename ValueType> class DefaultDict : public std::map<KeyType, ValueType>
 {
+	using std::map<KeyType, ValueType>::size;
+
 public:
 	DefaultDict() {}
 	DefaultDict(DictInitializer<KeyType, ValueType> &&di) : std::map<KeyType, ValueType>(std::forward<std::map<KeyType, ValueType>>(di.dict)) {}
