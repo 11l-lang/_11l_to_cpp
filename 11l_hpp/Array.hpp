@@ -580,6 +580,13 @@ Array<Char> sorted(const String &s)
 	return arr;
 }
 
+template <typename Type> inline Array<Type> reversed(const Array<Type> &arr)
+{
+	Array<Type> r(arr);
+	std::reverse(r.begin(), r.end());
+	return r;
+}
+
 template <typename Ty> bool operator>(const Tvec<Ty, 2> &v1, const Tvec<Ty, 2> &v2) {return std::make_tuple(v1[0], v1[1]) > std::make_tuple(v2[0], v2[1]);}
 template <typename Ty> bool operator>(const Tvec<Ty, 3> &v1, const Tvec<Ty, 3> &v2) {return std::make_tuple(v1[0], v1[1], v1[2]) > std::make_tuple(v2[0], v2[1], v2[2]);}
 template <typename Ty> bool operator>(const Tvec<Ty, 4> &v1, const Tvec<Ty, 4> &v2) {return std::make_tuple(v1[0], v1[1], v1[2], v1[3]) > std::make_tuple(v2[0], v2[1], v2[2], v2[3]);}

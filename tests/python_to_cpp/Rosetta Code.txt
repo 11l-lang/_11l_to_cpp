@@ -5034,7 +5034,7 @@ V fwords = [String(‘1’), ‘0’]
 print(‘#<3 #10 #<10 #.’.format(‘N’, ‘Length’, ‘Entropy’, ‘Fibword’))
 L(n) 1 .< nmax + 1
    L fwords.len < n
-      fwords [+]= (fwords[(len)-2 ..][(0..).step(-1)]).join(‘’)
+      fwords [+]= (reversed(fwords[(len)-2 ..])).join(‘’)
    V v = fwords[n - 1]
    print(‘#3.0 #10.0 #2.7 #.’.format(n, v.len, entropy(v), I v.len < 56 {v} E ‘<too long>’))
 ===
@@ -5056,7 +5056,7 @@ struct CodeBlock1
         print(u"#<3 #10 #<10 #."_S.format(u"N"_S, u"Length"_S, u"Entropy"_S, u"Fibword"_S));
         for (auto n : range_el(1, nmax + 1)) {
             while (fwords.len() < n)
-                fwords.append((fwords[range_elen_i( - 2)][range_ei(0).step(-1)]).join(u""_S));
+                fwords.append((reversed(fwords[range_elen_i( - 2)])).join(u""_S));
             auto v = fwords[n - 1];
             print(u"#3.0 #10.0 #2.7 #."_S.format(n, v.len(), entropy(v), v.len() < 56 ? v : u"<too long>"_S));
         }
@@ -5211,7 +5211,7 @@ def baseN(num, b):
     while num != 0:
         (num, d) = divmod(num, b)
         result += digits[int(d)]
-    return result[::-1] # reverse [-TODO: replace `result[::-1]` with `result[((len)-1..0).step(-1)]` or `reversed(result)`-]
+    return result[::-1] # reverse [+TODO: replace `result[::-1]` with `result[((len)-1..0).step(-1)]` or `reversed(result)`+]
 
 def pal2(num):
     if num == 0 or num == 1: return True
@@ -5246,13 +5246,13 @@ F baseN(=num, b)
    L num != 0
       (num, V d) = divmod(num, b)
       result ‘’= :digits[Int(d)]
-   R result[(0..).step(-1)]
+   R reversed(result)
 
 F pal2(num)
    I num == 0 | num == 1
       R 1B
    V based = bin(num)
-   R based == based[(0..).step(-1)]
+   R based == reversed(based)
 
 F pal_23(limit)
    V r = [Int64(0), 1]
@@ -5260,7 +5260,7 @@ F pal_23(limit)
    L
       n++
       V b = baseN(n, 3)
-      V revb = b[(0..).step(-1)]
+      V revb = reversed(b)
 
       L(trial) (b‘’revb, b‘0’revb, b‘1’revb, b‘2’revb)
          V t = Int64(trial, 3)
@@ -5284,7 +5284,7 @@ template <typename T1, typename T2> auto baseN(T1 num, const T2 &b)
         assign_from_tuple(num, d, divmod(num, b));
         result += ::digits[to_int(d)];
     }
-    return result[range_ei(0).step(-1)];
+    return reversed(result);
 }
 
 template <typename T1> auto pal2(const T1 &num)
@@ -5292,7 +5292,7 @@ template <typename T1> auto pal2(const T1 &num)
     if (num == 0 || num == 1)
         return true;
     auto based = bin(num);
-    return based == based[range_ei(0).step(-1)];
+    return based == reversed(based);
 }
 
 template <typename T1> auto pal_23(const T1 &limit)
@@ -5302,7 +5302,7 @@ template <typename T1> auto pal_23(const T1 &limit)
     while (true) {
         n++;
         auto b = baseN(n, 3);
-        auto revb = b[range_ei(0).step(-1)];
+        auto revb = reversed(b);
 
         for (auto &&trial : make_tuple(b + revb, b + u"0"_S + revb, b + u"1"_S + revb, b + u"2"_S + revb)) {
             auto t = to_int64(trial, 3);

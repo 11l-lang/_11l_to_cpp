@@ -149,7 +149,9 @@ public:
 		explicit Iterator(char16_t *c) : c(c) {}
 		bool operator!=(Iterator i) {return c != i.c;}
 		void operator++() {c++;}
-		Char operator*() {return Char(*c);}
+//		Iterator operator--()    {return Iterator(--c);}         // prefix
+//		Iterator operator--(int) {Iterator r(c); c--; return r;} // postfix
+		Char &operator*() {return (Char&)*c;}
 	};
 	Iterator begin() {return Iterator(const_cast<char16_t*>(data()));}
 	Iterator end()   {return Iterator(const_cast<char16_t*>(data()) + len());}
@@ -876,4 +878,11 @@ inline String bin(int64_t n)
 			return String(r, p - r);
 		}
 	return String(u'0');
+}
+
+inline String reversed(const String &s)
+{
+	String r(s);
+	std::reverse(r.std::u16string::begin(), r.std::u16string::end()); // can not use `std::reverse(r.begin(), r.end());` because of MSVC error C2794 in debug build
+	return r;
 }
