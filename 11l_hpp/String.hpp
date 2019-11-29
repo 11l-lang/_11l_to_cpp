@@ -96,6 +96,16 @@ public:
 	template <int N> String(const char16_t (&s)[N]) : basic_string(s, N-1) {}
 	template <typename Ty> explicit String(const Ty s, const Ty e) : basic_string(s, e) {}
 	template <typename Ty, typename = std::enable_if_t<std::is_enum<Ty>::value>> explicit String(const Ty e) : String(int(e)) {}
+	template <typename Type, int dimension> explicit String(const Tvec<Type, dimension> &v)
+	{
+		assign(1, u'(');
+		for (int i = 0; i < dimension; i++) {
+			*this += String(v[i]);
+			if (i < dimension - 1)
+				*this += u", ";
+		}
+		append(1, u')');
+	}
 
 	using std::u16string::assign;
 	void assign(double num, int digits = 9, bool remove_trailing_zeroes = true)
@@ -532,11 +542,16 @@ public:
 	String operator+(int i)    const {return *this + String(i);}
 	String operator+(bool b)   const {return *this + String(b);}
 	String operator+(double n) const {return *this + String(n);}
+
+	template <typename Ty> String operator+(const Ty &obj) const {return *this + String(obj);}
+
 	friend String operator+(int i, const String &s) {return String(i) + s;}
 	friend String operator+(bool b, const String &s) {return String(b) + s;}
 	friend String operator+(double n, const String &s) {return String(n) + s;}
 	friend String operator+(Char ch, const String &s) {return String(ch) + s;}
 	friend String operator+(char16_t ch, const String &s) {return String(ch) + s;}
+
+	template <typename Ty> friend String operator+(const Ty &obj, const String &s) {return String(obj) + s;}
 
 	std::string to_string() const
 	{

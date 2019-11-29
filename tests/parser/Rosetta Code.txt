@@ -1352,3 +1352,23 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Find_the_intersection_of_a_line_with_a_plane#C.2B.2B
+F intersection_point(ray_direction, ray_point, plane_normal, plane_point)
+    return ray_point - ray_direction * dot(ray_point - plane_point, plane_normal) / dot(ray_direction, plane_normal)
+
+print(‘The ray intersects the plane at ’intersection_point((0.0, -1.0, -1.0), (0.0, 0.0, 10.0), (0.0, 0.0, 1.0), (0.0, 0.0, 5.0)))
+===
+template <typename T1, typename T2, typename T3, typename T4> auto intersection_point(const T1 &ray_direction, const T2 &ray_point, const T3 &plane_normal, const T4 &plane_point)
+{
+    return ray_point - ray_direction * dot(ray_point - plane_point, plane_normal) / dot(ray_direction, plane_normal);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"The ray intersects the plane at "_S + intersection_point(make_tuple(0.0, -1.0, -1.0), make_tuple(0.0, 0.0, 10.0), make_tuple(0.0, 0.0, 1.0), make_tuple(0.0, 0.0, 5.0)));
+    }
+} code_block_1;
