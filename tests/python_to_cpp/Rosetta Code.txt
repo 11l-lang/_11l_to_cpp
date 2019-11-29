@@ -5198,3 +5198,128 @@ struct CodeBlock1
         print(find_common_directory_path(create_array({u"/home/user1/tmp/coverage/test"_S, u"/home/user1/tmp/covert/operator"_S, u"/home/user1/tmp/coven/members"_S})));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Find_palindromic_numbers_in_both_binary_and_ternary_bases#Python
+Int64 = int
+
+digits = "0123456789abcdefghijklmnopqrstuvwxyz"
+
+def baseN(num, b):
+    if num == 0: return "0"
+    result = ""
+    while num != 0:
+        (num, d) = divmod(num, b)
+        result += digits[int(d)]
+    return result[::-1] # reverse [-TODO: replace `result[::-1]` with `result[((len)-1..0).step(-1)]` or `reversed(result)`-]
+
+def pal2(num):
+    if num == 0 or num == 1: return True
+    based = bin(num)[2:]
+    return based == based[::-1]
+
+def pal_23(limit):
+    r = [Int64(0), 1]
+    n = 1
+    while True:
+        n += 1
+        b = baseN(n, 3)
+        revb = b[::-1]
+        #if len(b) > 12: break
+        for trial in (b + ''  + revb, b + '0' + revb,
+                      b + '1' + revb, b + '2' + revb):
+            t = Int64(trial, 3)
+            if pal2(t):
+                r.append(t)
+                if len(r) == limit:
+                    return r
+
+for pal23 in pal_23(6):
+    print(str(pal23) + ' ' + baseN(pal23, 3) + ' ' + baseN(pal23, 2))
+===
+V digits = ‘0123456789abcdefghijklmnopqrstuvwxyz’
+
+F baseN(=num, b)
+   I num == 0
+      R ‘0’
+   V result = ‘’
+   L num != 0
+      (num, V d) = divmod(num, b)
+      result ‘’= :digits[Int(d)]
+   R result[(0..).step(-1)]
+
+F pal2(num)
+   I num == 0 | num == 1
+      R 1B
+   V based = bin(num)
+   R based == based[(0..).step(-1)]
+
+F pal_23(limit)
+   V r = [Int64(0), 1]
+   V n = 1
+   L
+      n++
+      V b = baseN(n, 3)
+      V revb = b[(0..).step(-1)]
+
+      L(trial) (b‘’revb, b‘0’revb, b‘1’revb, b‘2’revb)
+         V t = Int64(trial, 3)
+         I pal2(t)
+            r.append(t)
+            I r.len == limit
+               R r
+
+L(pal23) pal_23(6)
+   print(String(pal23)‘ ’baseN(pal23, 3)‘ ’baseN(pal23, 2))
+===
+auto digits = u"0123456789abcdefghijklmnopqrstuvwxyz"_S;
+
+template <typename T1, typename T2> auto baseN(T1 num, const T2 &b)
+{
+    if (num == 0)
+        return u"0"_S;
+    auto result = u""_S;
+    while (num != 0) {
+        TUPLE_ELEMENT_T(1, divmod(num, b)) d;
+        assign_from_tuple(num, d, divmod(num, b));
+        result += ::digits[to_int(d)];
+    }
+    return result[range_ei(0).step(-1)];
+}
+
+template <typename T1> auto pal2(const T1 &num)
+{
+    if (num == 0 || num == 1)
+        return true;
+    auto based = bin(num);
+    return based == based[range_ei(0).step(-1)];
+}
+
+template <typename T1> auto pal_23(const T1 &limit)
+{
+    auto r = create_array<int64_t>({to_int64(0), 1});
+    auto n = 1;
+    while (true) {
+        n++;
+        auto b = baseN(n, 3);
+        auto revb = b[range_ei(0).step(-1)];
+
+        for (auto &&trial : make_tuple(b + revb, b + u"0"_S + revb, b + u"1"_S + revb, b + u"2"_S + revb)) {
+            auto t = to_int64(trial, 3);
+            if (pal2(t)) {
+                r.append(t);
+                if (r.len() == limit)
+                    return r;
+            }
+        }
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&pal23 : pal_23(6))
+            print(String(pal23) + u" "_S + baseN(pal23, 3) + u" "_S + baseN(pal23, 2));
+    }
+} code_block_1;

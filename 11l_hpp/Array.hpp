@@ -16,14 +16,6 @@ template <typename Type, int N> String to_string(const Tvec<Type, N> &v)
 	return r;
 }
 
-class ValueError
-{
-public:
-	String value;
-
-	template <typename ValueTy> ValueError(const ValueTy &value) : value(to_string(value)) {}
-};
-
 template <typename ValType> int String::index(const ValType &v) const
 {
 	int r = findi(v);

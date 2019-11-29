@@ -45,6 +45,17 @@ class String : public std::u16string
 	{
 		return String(c_str() + begin, end - begin);
 	}
+	String slice(int begin, int end, int step) const
+	{
+		String r;
+		if (step > 0)
+			for (int i = begin; i < end; i += step)
+				r.append(1, at(i));
+		else // for `[::-1]` [-TODO: fix `[0::-1]` and `[r:l:-1]`-]
+			for (int i = end - 1; i >= begin; i += step)
+				r.append(1, at(i));
+		return r;
+	}
 
 public:
 	String() {}
@@ -464,6 +475,7 @@ public:
 	String operator[](const Range<int, false, true > range) const {return slice(max(range.b + 1, 0), min((unsigned)range.e + 1u, (unsigned)len()));}
 	String operator[](const Range<int, false, false> range) const {return slice(max(range.b + 1, 0), min((unsigned)range.e     , (unsigned)len()));}
 	String operator[](const RangeEI<int>             range) const {return slice(max(range.b    , 0), len());}
+	String operator[](const RangeEIWithStep<int>     range) const {return slice(max(range.b    , 0), len(), range.step);}
 
 	String operator[](const range_e_llen    range) const {return (*this)[range_el(        range.b, len() + range.e)];}
 	String operator[](const range_elen_elen range) const {return (*this)[range_ee(len() + range.b, len() + range.e)];}
@@ -666,14 +678,25 @@ inline Char operator ""_C(char16_t c)
 	return Char(c);
 }
 
+class ValueError
+{
+public:
+	String value;
+
+	template <typename ValueTy> ValueError(const ValueTy &value) : value(to_string(value)) {}
+};
+
 template <typename TInt> inline TInt to_int_t(const String &str)
 {
 	TInt res = 0, sign = 1;
 	const char16_t *s = str.c_str();
 	while (*s && (*s == u' ' || *s == u'\t')) s++; // skip whitespace
 	if (*s == u'-') sign=-1, s++; else if (*s == u'+') s++;
-	for (; Char(*s).is_digit(); s++)
+	for (; *s; s++) {
+		if (!Char(*s).is_digit())
+			throw ValueError(str);
 		res = res * 10 + (*s - u'0');
+	}
 	return res * sign;
 }
 
@@ -685,6 +708,46 @@ inline int to_int(const String &str)
 inline int64_t to_int64(const String &str)
 {
 	return to_int_t<int64_t>(str);
+}
+
+template <typename TInt> inline TInt to_int_t(const String &str, int base)
+{
+	if (base > 36)
+		throw ValueError(str);
+
+	TInt res = 0, sign = 1;
+	const char16_t *s = str.c_str();
+	while (*s && (*s == u' ' || *s == u'\t')) s++; // skip whitespace
+	if (*s == u'-') sign=-1, s++; else if (*s == u'+') s++;
+	for (; *s; s++) {
+		res *= base;
+		if (Char(*s).is_digit()) {
+			if (*s - u'0' >= base)
+				throw ValueError(str);
+			res += (*s - u'0');
+		}
+		else if (base > 10) {
+			if (in(*s, range_el(u'A', char16_t(u'A' + base - 10))))
+				res += (*s - u'A' + 10);
+			else if (in(*s, range_el(u'a', char16_t(u'a' + base - 10))))
+				res += (*s - u'a' + 10);
+			else
+				throw ValueError(str);
+		}
+		else
+			throw ValueError(str);
+	}
+	return res * sign;
+}
+
+inline int to_int(const String &str, int base)
+{
+	return to_int_t<int>(str, base);
+}
+
+inline int64_t to_int64(const String &str, int base)
+{
+	return to_int_t<int64_t>(str, base);
 }
 
 inline int to_int(Char ch)
@@ -700,6 +763,11 @@ inline int to_int(double d)
 inline int to_int(int i)
 {
 	return i;
+}
+
+inline int to_int(int64_t i)
+{
+	return (int)i;
 }
 
 inline int64_t to_int64(double d)
@@ -792,6 +860,19 @@ inline String bin(int n)
 			*p++ = u'1';
 			for (i++, n <<= 1; i<32; i++, n <<= 1)
 				*p++ = u'0' + (unsigned(n) >> 31);
+			return String(r, p - r);
+		}
+	return String(u'0');
+}
+
+inline String bin(int64_t n)
+{
+	char16_t r[64], *p = r;
+	for (int i=0; i<64; i++, n <<= 1)
+		if (n & 0x8000'0000'0000'0000) {
+			*p++ = u'1';
+			for (i++, n <<= 1; i<64; i++, n <<= 1)
+				*p++ = u'0' + (uint64_t(n) >> 63);
 			return String(r, p - r);
 		}
 	return String(u'0');
