@@ -1372,3 +1372,42 @@ struct CodeBlock1
         print(u"The ray intersects the plane at "_S + intersection_point(make_tuple(0.0, -1.0, -1.0), make_tuple(0.0, 0.0, 10.0), make_tuple(0.0, 0.0, 1.0), make_tuple(0.0, 0.0, 5.0)));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Find_the_last_Sunday_of_each_month
+F last_sundays(year)
+   [String] sundays
+   L(month) 1..12
+      V last_day_of_month = I month < 12 {Time(year, month + 1)} E Time(year + 1)
+      L
+         last_day_of_month -= TimeDelta(days' 1)
+         I last_day_of_month.strftime(‘%w’) == ‘0’
+            sundays [+]= year‘-’String(month).zfill(2)‘-’last_day_of_month.strftime(‘%d’)
+            L.break
+   R sundays
+
+print(last_sundays(2013).join("\n"))
+===
+template <typename T1> auto last_sundays(const T1 &year)
+{
+    Array<String> sundays;
+    for (auto month : range_ee(1, 12)) {
+        auto last_day_of_month = month < 12 ? Time(year, month + 1) : Time(year + 1);
+        while (true) {
+            last_day_of_month -= TimeDelta(1);
+            if (last_day_of_month.strftime(u"%w"_S) == u'0') {
+                sundays.append(year + u"-"_S + String(month).zfill(2) + u"-"_S + last_day_of_month.strftime(u"%d"_S));
+                break;
+            }
+        }
+    }
+    return sundays;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(last_sundays(2013).join(u"\n"_S));
+    }
+} code_block_1;

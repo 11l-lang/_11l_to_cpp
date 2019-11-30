@@ -139,6 +139,9 @@ public:
 		return r;
 	}
 
+	Time &operator+=(TimeDelta d) {seconds_since_epoch += d.seconds; return *this;}
+	Time &operator-=(TimeDelta d) {seconds_since_epoch -= d.seconds; return *this;}
+
 	Time operator+(TimeDelta d) const {return from_unix_time(seconds_since_epoch + d.seconds);}
 	Time operator-(TimeDelta d) const {return from_unix_time(seconds_since_epoch - d.seconds);}
 	TimeDelta operator-(Time t) const {TimeDelta r((TimeDelta::Uninitialized())); r.seconds = seconds_since_epoch - t.seconds_since_epoch; return r;}
