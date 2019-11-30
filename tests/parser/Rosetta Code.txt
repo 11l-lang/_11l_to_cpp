@@ -1382,7 +1382,8 @@ F last_sundays(year)
       L
          last_day_of_month -= TimeDelta(days' 1)
          I last_day_of_month.strftime(‘%w’) == ‘0’
-            sundays [+]= year‘-’String(month).zfill(2)‘-’last_day_of_month.strftime(‘%d’)
+            //sundays [+]= year‘-’String(month).zfill(2)‘-’last_day_of_month.strftime(‘%d’)
+            sundays [+]= year‘-’(‘#02’.format(month))‘-’last_day_of_month.strftime(‘%d’)
             L.break
    R sundays
 
@@ -1396,7 +1397,7 @@ template <typename T1> auto last_sundays(const T1 &year)
         while (true) {
             last_day_of_month -= TimeDelta(1);
             if (last_day_of_month.strftime(u"%w"_S) == u'0') {
-                sundays.append(year + u"-"_S + String(month).zfill(2) + u"-"_S + last_day_of_month.strftime(u"%d"_S));
+                sundays.append(year + u"-"_S + (u"#02"_S.format(month)) + u"-"_S + last_day_of_month.strftime(u"%d"_S));
                 break;
             }
         }

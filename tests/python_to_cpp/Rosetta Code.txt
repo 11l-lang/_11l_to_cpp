@@ -1926,7 +1926,8 @@ def mean_time(times):
     m = mean_seconds % 3600
     s = m % 60
     m = m // 60
-    return str(h).zfill(2)+':'+str(m).zfill(2)+':'+str(s).zfill(2)
+    #return str(h).zfill(2)+':'+str(m).zfill(2)+':'+str(s).zfill(2)
+    return '%02d:%02d:%02d' % (h, m, s)
 
 print(mean_time(['23:00:17', '23:40:20', '00:12:45', '00:17:19']))
 ===
@@ -1950,7 +1951,7 @@ F mean_time(times)
    V m = mean_seconds % 3600
    V s = m % 60
    m = m I/ 60
-   R String(h).zfill(2)‘:’String(m).zfill(2)‘:’String(s).zfill(2)
+   R ‘#02.0:#02.0:#02.0’.format(h, m, s)
 print(mean_time([‘23:00:17’, ‘23:40:20’, ‘00:12:45’, ‘00:17:19’]))
 ===
 template <typename T1> auto mean_angle(const T1 &angles)
@@ -1974,7 +1975,7 @@ template <typename T1> auto mean_time(const T1 &times)
     auto m = mod(mean_seconds, 3600);
     auto s = mod(m, 60);
     m = idiv(m, 60);
-    return String(h).zfill(2) + u":"_S + String(m).zfill(2) + u":"_S + String(s).zfill(2);
+    return u"#02.0:#02.0:#02.0"_S.format(h, m, s);
 }
 
 struct CodeBlock1

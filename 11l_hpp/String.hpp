@@ -619,12 +619,15 @@ public:
 				int before_period = 0,
 				     after_period = 0;
 				bool left_align = false,
-				     there_are_digits_after_period = false;
+				     there_are_digits_after_period = false,
+					 zero_padding = false;
 				i++;
 				if (s[i] == '<') {
 					left_align = true;
 					i++;
 				}
+				if (s[i] == '0')
+					zero_padding = true;
 				if (s[i] == '.' && !Char(s[i+1]).is_digit()) // #.
 					i++;
 				else {
@@ -664,7 +667,7 @@ public:
 							s.assign(fa.f, after_period, false);
 						if (left_align)
 							r += s;
-						r.resize(r.size() + max(after_period + bool(after_period) + before_period - s.len(), 0), ' ');
+						r.resize(r.size() + max(after_period + bool(after_period) + before_period - s.len(), 0), zero_padding ? '0' : ' ');
 						if (!left_align)
 							r += s;
 					}
