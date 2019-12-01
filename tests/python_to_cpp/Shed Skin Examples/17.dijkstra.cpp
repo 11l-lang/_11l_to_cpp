@@ -69,7 +69,7 @@ public:
     }
     operator String() const
     {
-        return u"[#. --#0.2--> #.]"_S.format(u.name, d, v.name);
+        return u"[#. --#.2--> #.]"_S.format(u.name, d, v.name);
     }
 };
 

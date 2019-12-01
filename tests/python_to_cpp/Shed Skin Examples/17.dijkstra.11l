@@ -39,7 +39,7 @@ T Edge
       .v = v
       .d = d
    F String()
-      R ‘[#. --#0.2--> #.]’.format(.u.name, .d, .v.name)
+      R ‘[#. --#.2--> #.]’.format(.u.name, .d, .v.name)
 
 T Graph
    [Vertex] v
