@@ -531,7 +531,7 @@ class SymbolNode:
 
             else:
                 assert(len(self.children) == 1)
-                if self.children[0].symbol.id in ('..', '.<', '<.', '<.<'): # чтобы вместо `(range_el(0, seq.len()))` было `range_el(0, seq.len())`
+                if self.children[0].symbol.id in ('..', '.<', '.+', '<.', '<.<'): # чтобы вместо `(range_el(0, seq.len()))` было `range_el(0, seq.len())`
                     return self.children[0].to_str()
                 return '(' + self.children[0].to_str() + ')'
 
@@ -588,7 +588,7 @@ class SymbolNode:
                     res += char_or_str(self.children[i+1], char_val)
                     was_break = True
                     break
-                res += ('a == ' + (char_or_str(self.children[i], is_char(self.children[i]))[:-2] if self.children[i].token.category == Token.Category.STRING_LITERAL else self.children[i].to_str()) if self.children[i].symbol.id not in ('..', '.<', '<.', '<.<')
+                res += ('a == ' + (char_or_str(self.children[i], is_char(self.children[i]))[:-2] if self.children[i].token.category == Token.Category.STRING_LITERAL else self.children[i].to_str()) if self.children[i].symbol.id not in ('..', '.<', '.+', '<.', '<.<')
                    else 'in(a, ' + self.children[i].to_str() + ')') + ' ? ' + char_or_str(self.children[i+1], char_val) + ' : '
                 # L.was_no_break
                 #    res ‘’= ‘throw KeyError(a)’
@@ -726,8 +726,8 @@ class SymbolNode:
                 gather_captured_variables(self.children[1])
                 return '[' + ', '.join(sorted(captured_variables)) + '](' + ', '.join(map(lambda c: 'const ' + ('auto &' if c.symbol.id != '=' else 'decltype(' + c.children[1].to_str() + ') &') + c.to_str(),
                     self.children[0].children if self.children[0].symbol.id == '(' else [self.children[0]])) + '){return ' + self.children[1].to_str() + ';}' # )
-            elif self.symbol.id in ('..', '.<', '<.', '<.<'):
-                s = {'..':'ee', '.<':'el', '<.':'le', '<.<':'ll'}[self.symbol.id]
+            elif self.symbol.id in ('..', '.<', '.+', '<.', '<.<'):
+                s = {'..':'ee', '.<':'el', '.+':'ep', '<.':'le', '<.<':'ll'}[self.symbol.id]
                 c0 = char_if_len_1(self.children[0])
                 c1 = char_if_len_1(self.children[1])
                 b = s[0]
@@ -1729,7 +1729,7 @@ infix('==', 50); infix('!=', 50); infix('C', 50); infix('С', 50); infix('in', 5
 
 infix('(concat)', 52) # `instr[prevci - 1 .< prevci]‘’prevc C ("/\\", "\\/")` = `(instr[prevci - 1 .< prevci]‘’prevc) C ("/\\", "\\/")`
 
-infix('..', 55); infix('.<', 55); infix('<.', 55); infix('<.<', 55) # ch C ‘0’..‘9’ = ch C (‘0’..‘9’)
+infix('..', 55); infix('.<', 55); infix('.+', 55); infix('<.', 55); infix('<.<', 55) # ch C ‘0’..‘9’ = ch C (‘0’..‘9’)
 #postfix('..', 55)
 
 infix('<', 60); infix('<=', 60)

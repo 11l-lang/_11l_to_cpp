@@ -1083,3 +1083,14 @@ dvec3 getNormal(const dvec3 &punto)
 {
     return punto;
 }
+
+
+print(‘1234’[1.+2])
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"1234"_S[range_ep(1, 2)]);
+    }
+} code_block_1;

@@ -77,7 +77,7 @@ keywords = ['V',     'C',  'I',    'E',     'F',  'L',    'N',    'R',       'S'
 # new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
 # Решил отказаться от учёта new_scope_keywords на уровне лексического анализатора из-за loop.break и case в switch
 empty_list_of_str : List[str] = []
-binary_operators : List[List[str]] = [empty_list_of_str, [str('+'), '-', '*', '/', '%', '^', '&', '|', '<', '>', '=', '?'], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '->', '..', '.<', '<.', 'I/', 'Ц/', 'C ', 'С '], ['<<=', '>>=', '‘’=', '[+]', '[&]', '[|]', '(+)', '<.<', 'I/=', 'Ц/=', 'in ', '!C ', '!С '], ['[+]=', '[&]=', '[|]=', '(+)=', '!in ']]
+binary_operators : List[List[str]] = [empty_list_of_str, [str('+'), '-', '*', '/', '%', '^', '&', '|', '<', '>', '=', '?'], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '->', '..', '.<', '.+', '<.', 'I/', 'Ц/', 'C ', 'С '], ['<<=', '>>=', '‘’=', '[+]', '[&]', '[|]', '(+)', '<.<', 'I/=', 'Ц/=', 'in ', '!C ', '!С '], ['[+]=', '[&]=', '[|]=', '(+)=', '!in ']]
 unary_operators  : List[List[str]] = [empty_list_of_str, [str('!')], ['++', '--'], ['(-)']]
 sorted_operators = sorted(binary_operators[1] + binary_operators[2] + binary_operators[3] + binary_operators[4] + unary_operators[1] + unary_operators[2] + unary_operators[3], key = lambda x: len(x), reverse = True)
 binary_operators[1].remove('-') # Решил просто не считать `-` за бинарный оператор в контексте автоматического склеивания строк, так как `-` к тому же ещё и квалификатор константности
@@ -445,7 +445,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                                 raise Error('after this digit separator there should be 4 digits in hexadecimal number', source.rfind("'", 0, i))
                     else:
                         while i < len(source) and ('0' <= source[i] <= '9' or source[i] in "'.eE"):
-                            if source[i:i+2] in ('..', '.<'):
+                            if source[i:i+2] in ('..', '.<', '.+'):
                                 break
                             if source[i] in 'eE':
                                 if source[i+1:i+2] in '-+':

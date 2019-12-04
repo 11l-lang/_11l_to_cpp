@@ -162,6 +162,7 @@ struct range_elen_i // `(len)-a..`
 
 template <typename Ty> inline auto range_ee(const Ty &begin, const Ty &end) {return Range<Ty, true,  true >(begin, end);} // equal-equal range (`a..b`)
 template <typename Ty> inline auto range_el(const Ty &begin, const Ty &end) {return Range<Ty, true,  false>(begin, end);} // equal-less  range (`a.<b`)
+template <typename Ty> inline auto range_ep(const Ty &begin, const Ty &len) {return range_el(begin, begin + len);}        // equal-plus  range (`a.+b`)
 template <typename Ty> inline auto range_le(const Ty &begin, const Ty &end) {return Range<Ty, false, true >(begin, end);} // less-equal  range (`a<.b`)
 template <typename Ty> inline auto range_ll(const Ty &begin, const Ty &end) {return Range<Ty, false, false>(begin, end);} // less-less   range (`a<.<b`)
 template <typename Ty> inline auto range_ei(const Ty &begin               ) {return RangeEI<Ty>            (begin     );} // equal-infinity range (`a..`)
