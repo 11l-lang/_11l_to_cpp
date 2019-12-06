@@ -119,8 +119,8 @@ public:
 
 	String format(const String &f) const
 	{
-		return strftime(f.replace(u"YYYY", u"%Y").replace(u"YY", u"%y").replace(u"MM", u"%m").replace(u"DD", u"%d")
-		                 .replace(u"ГГГГ", u"%Y").replace(u"ГГ", u"%y").replace(u"ММ", u"%m").replace(u"ДД", u"%d")
+		return strftime(f.replace(u"YYYY", u"%Y").replace(u"YY", u"%y").replace(u"MMM", u"%b").replace(u"MM", u"%m").replace(u"DD", u"%d")
+		                 .replace(u"ГГГГ", u"%Y").replace(u"ГГ", u"%y").replace(u"МММ", u"%b").replace(u"ММ", u"%m").replace(u"ДД", u"%d")
 		                 .replace(u"hh", u"%H").replace(u"mm", u"%M").replace(u"ss", u"%S")
 		                 .replace(u"чч", u"%H").replace(u"мм", u"%M").replace(u"сс", u"%S"));
 	}
@@ -134,7 +134,7 @@ public:
 		         + String(tm->tm_min ).zfill(2) + u':'
 		         + String(tm->tm_sec ).zfill(2);
 		double f = fract(seconds_since_epoch);
-		if (f)
+		if (f != 0)
 			r += String(f).c_str() + 1;
 		return r;
 	}
