@@ -87,3 +87,13 @@ auto divmod(int     x, int     y) {  div_t r =   div(x, y); return make_tuple(r.
 auto divmod(int64_t x, int64_t y) {lldiv_t r = lldiv(x, y); return make_tuple(r.quot, r.rem);}
 auto divmod(int     x, int64_t y) {return divmod(int64_t(x), y);}
 auto divmod(int64_t x, int     y) {return divmod(x, int64_t(y));}
+
+template <typename Ty> Ty factorial(Ty n)
+{
+	if (n <= 1)
+		return 1;
+	Ty r = 2;
+	for (Ty i = 3; i <= n; i++)
+		r *= i;
+	return r;
+}

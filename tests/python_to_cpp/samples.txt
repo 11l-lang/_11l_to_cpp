@@ -882,6 +882,7 @@ print(math.tan(1) - 1.5574077246549023 + 1)
 print(math.degrees(1) - 57.29577951308232 + 1)
 print(math.radians(1) - 0.017453292519943295 + 1)
 print(math.pi - 2.141592653589793)
+print(math.factorial(3))
 ===
 //import math
 print(ceil(3.6) == 4)
@@ -905,6 +906,7 @@ print(tan(1) - 1.5574077246549023 + 1)
 print(degrees(1) - 57.29577951308232 + 1)
 print(radians(1) - 0.017453292519943295 + 1)
 print(math:pi - 2.141592653589793)
+print(factorial(3))
 ===
 struct CodeBlock1
 {
@@ -931,6 +933,7 @@ struct CodeBlock1
         print(degrees(1) - 57.29577951308232 + 1);
         print(radians(1) - 0.017453292519943295 + 1);
         print(math::pi - 2.141592653589793);
+        print(factorial(3));
     }
 } code_block_1;
 

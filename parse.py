@@ -2706,6 +2706,7 @@ builtins_scope.add_function('reversed', ASTFunctionDefinition([('iterable', '', 
 builtins_scope.add_function('min', ASTFunctionDefinition([('arg1', '', ''), ('arg2', token_to_str('N', Token.Category.CONSTANT), '')]))
 builtins_scope.add_function('max', ASTFunctionDefinition([('arg1', '', ''), ('arg2', token_to_str('N', Token.Category.CONSTANT), '')]))
 builtins_scope.add_function('divmod', ASTFunctionDefinition([('x', '', ''), ('y', '', '')]))
+builtins_scope.add_function('factorial', ASTFunctionDefinition([('x', '', '')]))
 builtins_scope.add_function('hex', ASTFunctionDefinition([('x', '', '')]))
 builtins_scope.add_function('bin', ASTFunctionDefinition([('x', '', '')]))
 builtins_scope.add_function('copy', ASTFunctionDefinition([('object', '', '')]))

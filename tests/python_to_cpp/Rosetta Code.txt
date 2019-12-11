@@ -5324,3 +5324,59 @@ struct CodeBlock1
             print(String(pal23) + u" "_S + baseN(pal23, 3) + u" "_S + baseN(pal23, 2));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Find_the_missing_permutation#C
+import math
+
+perms = [
+    'ABCD', 'CABD', 'ACDB', 'DACB', 'BCDA', 'ACBD', 'ADCB', 'CDAB',
+    'DABC', 'BCAD', 'CADB', 'CDBA', 'CBAD', 'ABDC', 'ADBC', 'BDCA',
+    'DCBA', 'BACD', 'BADC', 'BDAC', 'CBDA', 'DBCA', 'DCAB',
+]
+
+missing = ''
+for i in range(4):
+    cnt = [0] * 4
+    for j in range(len(perms)):
+        cnt[ord(perms[j][i]) - ord('A')] += 1
+    for j in range(4):
+        if cnt[j] != math.factorial(4-1):
+            missing += chr(ord('A') + j)
+            break
+
+print(missing)
+===
+//import math
+V perms = [‘ABCD’, ‘CABD’, ‘ACDB’, ‘DACB’, ‘BCDA’, ‘ACBD’, ‘ADCB’, ‘CDAB’, ‘DABC’, ‘BCAD’, ‘CADB’, ‘CDBA’, ‘CBAD’, ‘ABDC’, ‘ADBC’, ‘BDCA’, ‘DCBA’, ‘BACD’, ‘BADC’, ‘BDAC’, ‘CBDA’, ‘DBCA’, ‘DCAB’]
+V missing = ‘’
+L(i) 0.<4
+   V cnt = [0] * 4
+   L(j) 0 .< perms.len
+      cnt[perms[j][i].code - ‘A’.code]++
+   L(j) 0.<4
+      I cnt[j] != factorial(4 - 1)
+         missing ‘’= Char(code' ‘A’.code + j)
+         L.break
+print(missing)
+===
+auto perms = create_array({u"ABCD"_S, u"CABD"_S, u"ACDB"_S, u"DACB"_S, u"BCDA"_S, u"ACBD"_S, u"ADCB"_S, u"CDAB"_S, u"DABC"_S, u"BCAD"_S, u"CADB"_S, u"CDBA"_S, u"CBAD"_S, u"ABDC"_S, u"ADBC"_S, u"BDCA"_S, u"DCBA"_S, u"BACD"_S, u"BADC"_S, u"BDAC"_S, u"CBDA"_S, u"DBCA"_S, u"DCAB"_S});
+auto missing = u""_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(0, 4)) {
+            auto cnt = create_array({0}) * 4;
+            for (auto j : range_el(0, perms.len()))
+                cnt[perms[j][i].code - u'A'_C.code]++;
+            for (auto j : range_el(0, 4))
+                if (cnt[j] != factorial(4 - 1)) {
+                    missing += Char(u'A'_C.code + j);
+                    break;
+                }
+        }
+        print(missing);
+    }
+} code_block_1;
