@@ -5380,3 +5380,97 @@ struct CodeBlock1
         print(missing);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Five_weekends
+import datetime
+
+def five_weekends_per_month(years):
+    dates : List[datetime.date] = []
+    for year in years:
+        for month in range(1, 13):
+            sd = datetime.date(year, month, 1)
+            d = sd
+            c = [0] * 7
+            while int(d.strftime('%m')) == month:
+                c[int(d.strftime('%w'))] += 1
+                d += datetime.timedelta(days = 1)
+            if c[0] == 5 and c[5] == 5 and c[6] == 5:
+                dates += [sd]
+    return dates
+
+dates = five_weekends_per_month(range(2000, 2101))
+
+print('There are %s months of which the first and last five are:' % (len(dates)))
+indent = '  '
+fmt = '%Y %m(%B)'
+print(indent +('\n'+indent).join(d.strftime(fmt) for d in dates[:5]))
+print(indent +'...')
+print(indent +('\n'+indent).join(d.strftime(fmt) for d in dates[-5:]))
+
+print('\nThere are %i years in the range that do not have months with five weekends'
+      % (len(set(range(2000, 2101)) - {int(d.strftime('%Y')) for d in dates})))
+===
+//import datetime
+
+F five_weekends_per_month(years)
+   [Time] dates
+   L(year) years
+      L(month) 1.<13
+         V sd = Time(year, month, 1)
+         V d = sd
+         V c = [0] * 7
+         L Int(d.strftime(‘%m’)) == month
+            c[Int(d.strftime(‘%w’))]++
+            d += TimeDelta(days' 1)
+         I c[0] == 5 & c[5] == 5 & c[6] == 5
+            dates [+]= sd
+   R dates
+V dates = five_weekends_per_month((2000.<2101))
+print(‘There are #. months of which the first and last five are:’.format(dates.len))
+V indent = ‘  ’
+V fmt = ‘%Y %m(%B)’
+print(indent‘’dates[0.<5].map(d -> d.strftime(:fmt)).join("\n"indent))
+print(indent‘...’)
+print(indent‘’dates[(len)-5 ..].map(d -> d.strftime(:fmt)).join("\n"indent))
+print("\nThere are #.0 years in the range that do not have months with five weekends".format((Set((2000.<2101)) - Set(dates.map(d -> Int(d.strftime(‘%Y’))))).len))
+===
+template <typename T1> auto five_weekends_per_month(const T1 &years)
+{
+    Array<Time> dates;
+    for (auto &&year : years)
+        for (auto month : range_el(1, 13)) {
+            auto sd = Time(year, month, 1);
+            auto d = sd;
+            auto c = create_array({0}) * 7;
+            while (to_int(d.strftime(u"%m"_S)) == month) {
+                c[to_int(d.strftime(u"%w"_S))]++;
+                d += TimeDelta(1);
+            }
+            if (_get<0>(c) == 5 && _get<5>(c) == 5 && _get<6>(c) == 5)
+                dates.append(sd);
+        }
+    return dates;
+}
+auto dates = five_weekends_per_month(range_el(2000, 2101));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"There are #. months of which the first and last five are:"_S.format(dates.len()));
+    }
+} code_block_1;
+auto indent = u"  "_S;
+auto fmt = u"%Y %m(%B)"_S;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(indent + dates[range_el(0, 5)].map([](const auto &d){return d.strftime(::fmt);}).join(u"\n"_S + indent));
+        print(indent + u"..."_S);
+        print(indent + dates[range_elen_i( - 5)].map([](const auto &d){return d.strftime(::fmt);}).join(u"\n"_S + indent));
+        print(u"\nThere are #.0 years in the range that do not have months with five weekends"_S.format((create_set(range_el(2000, 2101)) - create_set(dates.map([](const auto &d){return to_int(d.strftime(u"%Y"_S));}))).len()));
+    }
+} code_block_2;

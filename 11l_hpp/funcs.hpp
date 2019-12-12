@@ -90,10 +90,8 @@ auto divmod(int64_t x, int     y) {return divmod(x, int64_t(y));}
 
 template <typename Ty> Ty factorial(Ty n)
 {
-	if (n <= 1)
-		return 1;
-	Ty r = 2;
-	for (Ty i = 3; i <= n; i++)
+	Ty r = 1;
+	for (Ty i = 2; i <= n; i++)
 		r *= i;
 	return r;
 }
