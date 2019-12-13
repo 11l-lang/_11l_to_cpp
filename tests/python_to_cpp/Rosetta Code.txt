@@ -590,7 +590,7 @@ for i in range(100):
    print('Door ' + str(i+1) + ': '+ ('open' if doors[i] else 'close'))
 ===
 V doors = [0B] * 100
-L(i) 0.<100
+L(i) 100
    L(j) (i .< 100).step(i + 1)
       doors[j] = !(doors[j])
    print(‘Door ’String(i + 1)‘: ’(I doors[i] {‘open’} E ‘close’))
@@ -601,7 +601,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto i : range_el(0, 100)) {
+        for (int i = 0; i < 100; i++) {
             for (auto j : range_el(i, 100).step(i + 1))
                 doors.set(j, !(doors[j]));
             print(u"Door "_S + String(i + 1) + u": "_S + (doors[i] ? u"open"_S : u"close"_S));
@@ -898,7 +898,7 @@ F primes(k, n)
       i++
    R list
 
-L(k) 1.<6
+L(k) 1..5
    print(‘k = ’String(k)‘: ’, end' ‘’)
    print(primes(k, 10))
 ===
@@ -933,7 +933,7 @@ struct CodeBlock1
     CodeBlock1()
     {
 
-        for (auto k : range_el(1, 6)) {
+        for (auto k : range_ee(1, 5)) {
             print(u"k = "_S + String(k) + u": "_S, u""_S);
             print(primes(k, 10));
         }
@@ -1096,7 +1096,7 @@ F fib(n)
       R @f(n - 1) + @f(n - 2)
    R f(n)
 
-L(i) 0.<21
+L(i) 21
    print(fib(i), end' ‘ ’)
 ===
 template <typename T1> auto fib(const T1 &n)
@@ -1114,7 +1114,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto i : range_el(0, 21))
+        for (int i = 0; i < 21; i++)
             print(fib(i), u" "_S);
     }
 } code_block_1;
@@ -2075,7 +2075,7 @@ print(qmean(range(1,11)))
 
 F qmean(num)
    R sqrt(sum(num.map(n -> n * n)) / Float(num.len))
-print(qmean(1.<11))
+print(qmean(1..10))
 ===
 template <typename T1> auto qmean(const T1 &num)
 {
@@ -2086,7 +2086,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(qmean(range_el(1, 11)));
+        print(qmean(range_ee(1, 10)));
     }
 } code_block_1;
 
@@ -2221,7 +2221,7 @@ F is_balanced(s)
                R 0B
    R 1B
 
-L(n) 0.<10
+L(n) 10
    V s = gen(n)
    print(s‘’(‘ ’ * (20 - s.len))‘is ’(I is_balanced(s) {‘balanced’} E ‘not balanced’))
 ===
@@ -2254,7 +2254,7 @@ struct CodeBlock1
     CodeBlock1()
     {
 
-        for (auto n : range_el(0, 10)) {
+        for (int n = 0; n < 10; n++) {
             auto s = gen(n);
             print(s + (u" "_S * (20 - s.len())) + u"is "_S + (is_balanced(s) ? u"balanced"_S : u"not balanced"_S));
         }
@@ -2298,7 +2298,7 @@ F get_fibs()
    V a = 1.0
    V b = 1.0
    [Float] r
-   L(i) 0.<1000
+   L(i) 1000
       r.append(a)
       (a, b) = (b, a + b)
    R r
@@ -2325,7 +2325,7 @@ auto get_fibs()
     auto a = 1.0;
     auto b = 1.0;
     Array<double> r;
-    for (auto i : range_el(0, 1000)) {
+    for (int i = 0; i < 1000; i++) {
         r.append(a);
         assign_from_tuple(a, b, make_tuple(b, a + b));
     }
@@ -2409,7 +2409,7 @@ F degrees2compasspoint(=d)
    R q[minorindex].replace(‘N’, p1).replace(‘E’, p2).capitalize()
 
 :start:
-L(i) 0.<33
+L(i) 33
    V d = i * 11.25
    S i % 3
       1
@@ -2448,7 +2448,7 @@ template <typename T1> auto degrees2compasspoint(T1 d)
 
 int main()
 {
-    for (auto i : range_el(0, 33)) {
+    for (int i = 0; i < 33; i++) {
         auto d = i * 11.25;
         switch (mod(i, 3))
         {
@@ -2864,7 +2864,7 @@ for n in range(1, 16):
     c = 2*(2*n - 1) * c // (n + 1)
 ===
 V c = 1
-L(n) 1.<16
+L(n) 1..15
    print(c)
    c = 2 * (2 * n - 1) * c I/ (n + 1)
 ===
@@ -2874,7 +2874,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto n : range_el(1, 16)) {
+        for (auto n : range_ee(1, 15)) {
             print(c);
             c = idiv(2 * (2 * n - 1) * c, (n + 1));
         }
@@ -2931,8 +2931,8 @@ print(reduce(lambda x, y: x + y, range(1, 4), 3))
 print(reduce(lambda x, y: x + y, [1, 1, 3]))
 print(reduce(lambda x, y: x + y, [1, 1, 3], 2))
 ===
-print((1.<4).reduce((x, y) -> x + y))
-print((1.<4).reduce(3, (x, y) -> x + y))
+print((1..3).reduce((x, y) -> x + y))
+print((1..3).reduce(3, (x, y) -> x + y))
 print([1, 1, 3].reduce((x, y) -> x + y))
 print([1, 1, 3].reduce(2, (x, y) -> x + y))
 ===
@@ -2940,8 +2940,8 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(range_el(1, 4).reduce([](const auto &x, const auto &y){return x + y;}));
-        print(range_el(1, 4).reduce(3, [](const auto &x, const auto &y){return x + y;}));
+        print(range_ee(1, 3).reduce([](const auto &x, const auto &y){return x + y;}));
+        print(range_ee(1, 3).reduce(3, [](const auto &x, const auto &y){return x + y;}));
         print(create_array({1, 1, 3}).reduce([](const auto &x, const auto &y){return x + y;}));
         print(create_array({1, 1, 3}).reduce(2, [](const auto &x, const auto &y){return x + y;}));
     }
@@ -3249,7 +3249,7 @@ universe[(1, 4)] = 1
 universe[(2, 4)] = 1
 universe[(3, 4)] = 1
 
-L(i) 0.<4
+L(i) 4
    print("\nGeneration "String(i)‘:’)
    L(row) 0 .< cellcounty
       print(‘  ’(0 .< cellcountx).map(col -> [‘. ’, ‘O ’][:universe[(@row, col)]]).join(‘’))
@@ -3275,7 +3275,7 @@ struct CodeBlock1
         universe.set(make_tuple(2, 4), 1);
         universe.set(make_tuple(3, 4), 1);
 
-        for (auto i : range_el(0, 4)) {
+        for (int i = 0; i < 4; i++) {
             print(u"\nGeneration "_S + String(i) + u":"_S);
             for (auto row : range_el(0, cellcounty))
                 print(u"  "_S + range_el(0, cellcountx).map([&row](const auto &col){return create_array({u". "_S, u"O "_S})[::universe[make_tuple(row, col)]];}).join(u""_S));
@@ -3357,9 +3357,9 @@ def crc32(buf, crc = UInt32(0)):
 print(hex(crc32('The quick brown fox jumps over the lazy dog'))[2:].upper())
 ===
 V crc_table = [0] * 256
-L(i) 0.<256
+L(i) 256
    UInt32 rem = i
-   L(j) 0.<8
+   L(j) 8
       I rem [&] 1
          rem >>= 1
          rem (+)= EDB8'8320
@@ -3380,9 +3380,9 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto i : range_el(0, 256)) {
+        for (int i = 0; i < 256; i++) {
             uint32_t rem = i;
-            for (auto j : range_el(0, 8))
+            for (int j = 0; j < 8; j++)
                 if (rem & 1) {
                     rem >>= 1;
                     rem ^= 0xEDB8'8320;
@@ -4160,7 +4160,7 @@ F bar(i)
    baz(i)
 
 F foo()
-   L(i) 0.<2
+   L(i) 2
       X.try
          bar(i)
       X.catch U0
@@ -4190,7 +4190,7 @@ template <typename T1> auto bar(const T1 &i)
 
 auto foo()
 {
-    for (auto i : range_el(0, 2)) {
+    for (int i = 0; i < 2; i++) {
         try
         {
             bar(i);
@@ -4900,7 +4900,7 @@ V fibo = Fiblike([1, 1])
 print((0.<10).map(i -> fibo(i)))
 V lucas = Fiblike([2, 1])
 print((0.<10).map(i -> lucas(i)))
-L(n, name) zip(2.<11, ‘fibo tribo tetra penta hexa hepta octo nona deca’.split_py())
+L(n, name) zip(2..10, ‘fibo tribo tetra penta hexa hepta octo nona deca’.split_py())
    V fibber = Fiblike([1] [+] (0 .< n - 1).map(i -> Int(2 ^ i)))
    print(‘n=#2.0, #5nacci -> #. ...’.format(n, name, (0.<15).map(i -> String(@fibber(i))).join(‘ ’)))
 ===
@@ -4946,7 +4946,7 @@ struct CodeBlock2
     CodeBlock2()
     {
         print(range_el(0, 10).map([](const auto &i){return lucas(i);}));
-        for (auto &&[n, name] : zip(range_el(2, 11), u"fibo tribo tetra penta hexa hepta octo nona deca"_S.split_py())) {
+        for (auto &&[n, name] : zip(range_ee(2, 10), u"fibo tribo tetra penta hexa hepta octo nona deca"_S.split_py())) {
             auto fibber = Fiblike(create_array({1}) + range_el(0, n - 1).map([](const auto &i){return to_int(pow(2, i));}));
             print(u"n=#2.0, #5nacci -> #. ..."_S.format(n, name, range_el(0, 15).map([&fibber](const auto &i){return String(fibber(i));}).join(u" "_S)));
         }
@@ -4977,7 +4977,7 @@ F fib_iter(n)
       (fib_prev, fib) = (fib, fib + fib_prev)
    R fib
 
-L(i) 1.<21
+L(i) 1..20
    print(fib_iter(i), end' ‘ ’)
 print()
 ===
@@ -4996,7 +4996,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto i : range_el(1, 21))
+        for (auto i : range_ee(1, 20))
             print(fib_iter(i), u" "_S);
         print();
     }
@@ -5122,11 +5122,11 @@ array = list(range(1, 11))
 even = filter(lambda n: n % 2 == 0, array)
 print(even)
 ===
-V array = Array(1.<11)
+V array = Array(1..10)
 V even = array.filter(n -> n % 2 == 0)
 print(even)
 ===
-auto array = create_array(range_el(1, 11));
+auto array = create_array(range_ee(1, 10));
 auto even = array.filter([](const auto &n){return mod(n, 2) == 0;});
 
 struct CodeBlock1
@@ -5350,11 +5350,11 @@ print(missing)
 //import math
 V perms = [‘ABCD’, ‘CABD’, ‘ACDB’, ‘DACB’, ‘BCDA’, ‘ACBD’, ‘ADCB’, ‘CDAB’, ‘DABC’, ‘BCAD’, ‘CADB’, ‘CDBA’, ‘CBAD’, ‘ABDC’, ‘ADBC’, ‘BDCA’, ‘DCBA’, ‘BACD’, ‘BADC’, ‘BDAC’, ‘CBDA’, ‘DBCA’, ‘DCAB’]
 V missing = ‘’
-L(i) 0.<4
+L(i) 4
    V cnt = [0] * 4
    L(j) 0 .< perms.len
       cnt[perms[j][i].code - ‘A’.code]++
-   L(j) 0.<4
+   L(j) 4
       I cnt[j] != factorial(4 - 1)
          missing ‘’= Char(code' ‘A’.code + j)
          L.break
@@ -5367,11 +5367,11 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto i : range_el(0, 4)) {
+        for (int i = 0; i < 4; i++) {
             auto cnt = create_array({0}) * 4;
             for (auto j : range_el(0, perms.len()))
                 cnt[perms[j][i].code - u'A'_C.code]++;
-            for (auto j : range_el(0, 4))
+            for (int j = 0; j < 4; j++)
                 if (cnt[j] != factorial(4 - 1)) {
                     missing += Char(u'A'_C.code + j);
                     break;
@@ -5416,7 +5416,7 @@ print('\nThere are %i years in the range that do not have months with five weeke
 F five_weekends_per_month(years)
    [Time] dates
    L(year) years
-      L(month) 1.<13
+      L(month) 1..12
          V sd = Time(year, month, 1)
          V d = sd
          V c = [0] * 7
@@ -5426,20 +5426,20 @@ F five_weekends_per_month(years)
          I c[0] == 5 & c[5] == 5 & c[6] == 5
             dates [+]= sd
    R dates
-V dates = five_weekends_per_month(2000.<2101)
+V dates = five_weekends_per_month(2000..2100)
 print(‘There are #. months of which the first and last five are:’.format(dates.len))
 V indent = ‘  ’
 V fmt = ‘%Y %m(%B)’
 print(indent‘’dates[0.<5].map(d -> d.strftime(:fmt)).join("\n"indent))
 print(indent‘...’)
 print(indent‘’dates[(len)-5 ..].map(d -> d.strftime(:fmt)).join("\n"indent))
-print("\nThere are #.0 years in the range that do not have months with five weekends".format((Set(2000.<2101) - Set(dates.map(d -> Int(d.strftime(‘%Y’))))).len))
+print("\nThere are #.0 years in the range that do not have months with five weekends".format((Set(2000..2100) - Set(dates.map(d -> Int(d.strftime(‘%Y’))))).len))
 ===
 template <typename T1> auto five_weekends_per_month(const T1 &years)
 {
     Array<Time> dates;
     for (auto &&year : years)
-        for (auto month : range_el(1, 13)) {
+        for (auto month : range_ee(1, 12)) {
             auto sd = Time(year, month, 1);
             auto d = sd;
             auto c = create_array({0}) * 7;
@@ -5452,7 +5452,7 @@ template <typename T1> auto five_weekends_per_month(const T1 &years)
         }
     return dates;
 }
-auto dates = five_weekends_per_month(range_el(2000, 2101));
+auto dates = five_weekends_per_month(range_ee(2000, 2100));
 
 struct CodeBlock1
 {
@@ -5471,6 +5471,6 @@ struct CodeBlock2
         print(indent + dates[range_el(0, 5)].map([](const auto &d){return d.strftime(::fmt);}).join(u"\n"_S + indent));
         print(indent + u"..."_S);
         print(indent + dates[range_elen_i( - 5)].map([](const auto &d){return d.strftime(::fmt);}).join(u"\n"_S + indent));
-        print(u"\nThere are #.0 years in the range that do not have months with five weekends"_S.format((create_set(range_el(2000, 2101)) - create_set(dates.map([](const auto &d){return to_int(d.strftime(u"%Y"_S));}))).len()));
+        print(u"\nThere are #.0 years in the range that do not have months with five weekends"_S.format((create_set(range_ee(2000, 2100)) - create_set(dates.map([](const auto &d){return to_int(d.strftime(u"%Y"_S));}))).len()));
     }
 } code_block_2;

@@ -162,14 +162,14 @@ def f():
 F f()
    L(i) (0.<11).step(2)
       print(i)
-   L(i) 0.<11
+   L(i) 11
       print(i)
 ===
 auto f()
 {
     for (auto i : range_el(0, 11).step(2))
         print(i);
-    for (auto i : range_el(0, 11))
+    for (int i = 0; i < 11; i++)
         print(i);
 }
 
@@ -1024,7 +1024,7 @@ for n in range(2, 10):
         # loop fell through without finding a factor
         print(str(n) + ' is a prime number')
 ===
-L(n) 2.<10
+L(n) 2..9
    L(x) 2 .< n
       I n % x == 0
          print(String(n)‘ equals ’String(x)‘ * ’String(n / x))
@@ -1036,7 +1036,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto n : range_el(2, 10))
+        for (auto n : range_ee(2, 9))
             {bool was_break = false;
             for (auto x : range_el(2, n)) {
                 if (mod(n, x) == 0) {
@@ -1721,14 +1721,14 @@ from itertools import product
 
 print(list(product([1, 2], [3, 4])))     # Array<Tvec<int,2> >
 print(list(product([1.0, 2.0], [3, 4]))) # Array<std::tuple<double,int> >
-print(list(product(range(3), range(1,4))))
+print(list(product(range(3), range(1, 4))))
 
 print(list(zip([1, 2], [10, 20])))
 print(list(zip([1.0, 2.0], [10, 20])))
 ===
 print(cart_product([1, 2], [3, 4]))
 print(cart_product([1.0, 2.0], [3, 4]))
-print(cart_product(0.<3, 1.<4))
+print(cart_product(0.<3, 1..3))
 print(zip([1, 2], [10, 20]))
 print(zip([1.0, 2.0], [10, 20]))
 ===
@@ -1738,7 +1738,7 @@ struct CodeBlock1
     {
         print(cart_product(create_array({1, 2}), create_array({3, 4})));
         print(cart_product(create_array({1.0, 2.0}), create_array({3, 4})));
-        print(cart_product(range_el(0, 3), range_el(1, 4)));
+        print(cart_product(range_el(0, 3), range_ee(1, 3)));
         print(zip(create_array({1, 2}), create_array({10, 20})));
         print(zip(create_array({1.0, 2.0}), create_array({10, 20})));
     }
