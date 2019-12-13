@@ -84,7 +84,7 @@ F rangeexpand(txt)
    L(r) txt.split(‘,’)
       I ‘-’ C r[1..]
          V rr = r[1..].split(‘-’, 1 + 1)
-         lst [+]= (Int(r[0]‘’rr[0]) .< Int(rr[1]) + 1)
+         lst [+]= Int(r[0]‘’rr[0]) .< Int(rr[1]) + 1
       E
          lst.append(Int(r))
    R lst
@@ -2075,7 +2075,7 @@ print(qmean(range(1,11)))
 
 F qmean(num)
    R sqrt(sum(num.map(n -> n * n)) / Float(num.len))
-print(qmean((1.<11)))
+print(qmean(1.<11))
 ===
 template <typename T1> auto qmean(const T1 &num)
 {
@@ -4900,7 +4900,7 @@ V fibo = Fiblike([1, 1])
 print((0.<10).map(i -> fibo(i)))
 V lucas = Fiblike([2, 1])
 print((0.<10).map(i -> lucas(i)))
-L(n, name) zip((2.<11), ‘fibo tribo tetra penta hexa hepta octo nona deca’.split_py())
+L(n, name) zip(2.<11, ‘fibo tribo tetra penta hexa hepta octo nona deca’.split_py())
    V fibber = Fiblike([1] [+] (0 .< n - 1).map(i -> Int(2 ^ i)))
    print(‘n=#2.0, #5nacci -> #. ...’.format(n, name, (0.<15).map(i -> String(@fibber(i))).join(‘ ’)))
 ===
@@ -5426,14 +5426,14 @@ F five_weekends_per_month(years)
          I c[0] == 5 & c[5] == 5 & c[6] == 5
             dates [+]= sd
    R dates
-V dates = five_weekends_per_month((2000.<2101))
+V dates = five_weekends_per_month(2000.<2101)
 print(‘There are #. months of which the first and last five are:’.format(dates.len))
 V indent = ‘  ’
 V fmt = ‘%Y %m(%B)’
 print(indent‘’dates[0.<5].map(d -> d.strftime(:fmt)).join("\n"indent))
 print(indent‘...’)
 print(indent‘’dates[(len)-5 ..].map(d -> d.strftime(:fmt)).join("\n"indent))
-print("\nThere are #.0 years in the range that do not have months with five weekends".format((Set((2000.<2101)) - Set(dates.map(d -> Int(d.strftime(‘%Y’))))).len))
+print("\nThere are #.0 years in the range that do not have months with five weekends".format((Set(2000.<2101) - Set(dates.map(d -> Int(d.strftime(‘%Y’))))).len))
 ===
 template <typename T1> auto five_weekends_per_month(const T1 &years)
 {
