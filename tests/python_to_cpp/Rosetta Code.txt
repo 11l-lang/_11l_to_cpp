@@ -876,8 +876,7 @@ def primes(k, n):
     return list
 
 for k in range(1, 6):
-    print('k = '+str(k)+': ', end = '')
-    print(primes(k, 10))
+    print('k = '+str(k)+': '+str(primes(k, 10)))
 ===
 F k_prime(k, =n)
    V f = 0
@@ -899,8 +898,7 @@ F primes(k, n)
    R list
 
 L(k) 1..5
-   print(‘k = ’String(k)‘: ’, end' ‘’)
-   print(primes(k, 10))
+   print(‘k = ’String(k)‘: ’String(primes(k, 10)))
 ===
 template <typename T1, typename T2> auto k_prime(const T1 &k, T2 n)
 {
@@ -932,11 +930,8 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
-        for (auto k : range_ee(1, 5)) {
-            print(u"k = "_S + String(k) + u": "_S, u""_S);
-            print(primes(k, 10));
-        }
+        for (auto k : range_ee(1, 5))
+            print(u"k = "_S + String(k) + u": "_S + String(primes(k, 10)));
     }
 } code_block_1;
 
@@ -5474,3 +5469,127 @@ struct CodeBlock2
         print(u"\nThere are #.0 years in the range that do not have months with five weekends"_S.format((create_set(range_ee(2000, 2100)) - create_set(dates.map([](const auto &d){return to_int(d.strftime(u"%Y"_S));}))).len()));
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Fivenum#Python
+import math
+
+def fivenum(array):
+    n = len(array)
+    x = sorted(array)
+
+    n4 = math.floor((n+3.0)/2.0)/2.0
+    d = [1.0, n4, (n+1)/2, n+1-n4, float(n)]
+    sum_array : List[float] = []
+
+    for e in range(5):
+        fl = int(math.floor(d[e] - 1))
+        ce = int(math.ceil(d[e] - 1))
+        sum_array.append(0.5 * (x[fl] + x[ce]))
+
+    return sum_array
+
+x = [0.14082834, 0.09748790, 1.73131507, 0.87636009, -1.95059594, 0.73438555, -0.03035726, 1.46675970,
+-0.74621349, -0.72588772, 0.63905160, 0.61501527, -0.98983780, -1.00447874, -0.62759469, 0.66206163,
+1.04312009, -0.10305385, 0.75775634, 0.32566578]
+
+print(fivenum(x))
+===
+//import math
+
+F fivenum(array)
+   V n = array.len
+   V x = sorted(array)
+   V n4 = floor((n + 3.0) / 2.0) / 2.0
+   V d = [1.0, n4, (n + 1) / 2, n + 1 - n4, Float(n)]
+   [Float] sum_array
+
+   L(e) 5
+      V fl = Int(floor(d[e] - 1))
+      V ce = Int(ceil(d[e] - 1))
+      sum_array.append(0.5 * (x[fl] + x[ce]))
+   R sum_array
+V x = [0.14082834, 0.09748790, 1.73131507, 0.87636009, -1.95059594, 0.73438555, -0.03035726, 1.46675970, -0.74621349, -0.72588772, 0.63905160, 0.61501527, -0.98983780, -1.00447874, -0.62759469, 0.66206163, 1.04312009, -0.10305385, 0.75775634, 0.32566578]
+print(fivenum(x))
+===
+template <typename T1> auto fivenum(const T1 &array)
+{
+    auto n = array.len();
+    auto x = sorted(array);
+    auto n4 = floor((n + 3.0) / 2.0) / 2.0;
+    auto d = create_array({1.0, n4, (n + 1) / 2.0, n + 1 - n4, to_float(n)});
+    Array<double> sum_array;
+
+    for (int e = 0; e < 5; e++) {
+        auto fl = to_int(floor(d[e] - 1));
+        auto ce = to_int(ceil(d[e] - 1));
+        sum_array.append(0.5 * (x[fl] + x[ce]));
+    }
+    return sum_array;
+}
+auto x = create_array({0.14082834, 0.09748790, 1.73131507, 0.87636009, -1.95059594, 0.73438555, -0.03035726, 1.46675970, -0.74621349, -0.72588772, 0.63905160, 0.61501527, -0.98983780, -1.00447874, -0.62759469, 0.66206163, 1.04312009, -0.10305385, 0.75775634, 0.32566578});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(fivenum(x));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Floyd%27s_triangle#Python
+def floyd(rowcount):
+    rows = [[1]]
+    while len(rows) < rowcount:
+        n = rows[-1][-1] + 1
+        rows.append(list(range(n, n + len(rows[-1]) + 1)))
+    return rows
+
+def pfloyd(rows):
+    colspace = [len(str(n)) for n in rows[-1]]
+    for row in rows:
+        print(' '.join(str(n).rjust(spaces) for spaces, n in zip(colspace, row)))
+
+pfloyd(floyd(5))
+pfloyd(floyd(14))
+===
+F floyd(rowcount)
+   V rows = [[1]]
+   L rows.len < rowcount
+      V n = rows.last.last + 1
+      rows.append(Array(n .< n + rows.last.len + 1))
+   R rows
+
+F pfloyd(rows)
+   V colspace = rows.last.map(n -> String(n).len)
+   L(row) rows
+      print(zip(colspace, row).map2((spaces, n) -> String(n).rjust(spaces)).join(‘ ’))
+pfloyd(floyd(5))
+pfloyd(floyd(14))
+===
+template <typename T1> auto floyd(const T1 &rowcount)
+{
+    auto rows = create_array({create_array({1})});
+    while (rows.len() < rowcount) {
+        auto n = rows.last().last() + 1;
+        rows.append(create_array(range_el(n, n + rows.last().len() + 1)));
+    }
+    return rows;
+}
+
+template <typename T1> auto pfloyd(const T1 &rows)
+{
+    auto colspace = rows.last().map([](const auto &n){return String(n).len();});
+    for (auto &&row : rows)
+        print(zip(colspace, row).map2([](const auto &spaces, const auto &n){return String(n).rjust(spaces);}).join(u" "_S));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        pfloyd(floyd(5));
+        pfloyd(floyd(14));
+    }
+} code_block_1;
