@@ -331,6 +331,17 @@ template <typename T1, typename T2> auto cart_product(const T1 &arr1, const T2 &
 	return r;
 }
 
+template <typename T1, typename T2, typename T3> auto cart_product(const T1 &arr1, const T2 &arr2, const T3 &arr3)
+{
+	Array<decltype(make_tuple(*std::begin(std::declval<T1>()), *std::begin(std::declval<T2>()), *std::begin(std::declval<T3>())))> r;
+	r.reserve(arr1.len() * arr2.len() * arr3.len());
+	for (auto &&el1 : arr1)
+		for (auto &&el2 : arr2)
+			for (auto &&el3 : arr3)
+				r.push_back(make_tuple(el1, el2, el3));
+	return r;
+}
+
 template <typename Type1, typename Type2, typename Func> auto multiloop(const Array<Type1> &arr1, const Array<Type2> &arr2, Func &&func) -> Array<decltype(func(std::declval<Type1>(), std::declval<Type2>()))>
 {
 	Array<decltype(func(std::declval<Type1>(), std::declval<Type2>()))> r;
