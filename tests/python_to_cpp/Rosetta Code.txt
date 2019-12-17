@@ -5683,3 +5683,52 @@ struct CodeBlock1
         floyd_warshall(4, create_array({make_tuple(1, 3, -2), make_tuple(2, 1, 4), make_tuple(2, 3, 3), make_tuple(3, 4, 2), make_tuple(4, 2, -1)}));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Formatted_numeric_output
+print('%09.3f' % (7.125))
+===
+print(‘#05.3’.format(7.125))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"#05.3"_S.format(7.125));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Forward_difference#Python
+from typing import List
+
+dif = lambda s: [x-s[i] for i,x in enumerate(s[1:])]
+def difn(s, n) -> List[int]:
+    return difn(dif(s), n-1) if n != 0 else s
+
+s = [90, 47, 58, 29, 22, 32, 55, 5, 55, 73]
+for i in range(10):
+    print(difn(s, i))
+===
+V dif = s -> enumerate(s[1..]).map2((i, x) -> x - @s[i])
+F difn(s, n) -> [Int]
+   R I n != 0 {difn(dif(s), n - 1)} E s
+V s = [90, 47, 58, 29, 22, 32, 55, 5, 55, 73]
+L(i) 10
+   print(difn(s, i))
+===
+auto dif = [](const auto &s){return enumerate(s[range_ei(1)]).map2([&s](const auto &i, const auto &x){return x - s[i];});};
+template <typename T1, typename T2> Array<int> difn(const T1 &s, const T2 &n)
+{
+    return n != 0 ? difn(dif(s), n - 1) : s;
+}
+auto s = create_array({90, 47, 58, 29, 22, 32, 55, 5, 55, 73});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int i = 0; i < 10; i++)
+            print(difn(s, i));
+    }
+} code_block_1;

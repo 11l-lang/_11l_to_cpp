@@ -457,7 +457,7 @@ template <typename Type> Type product(const Array<Type> &arr)
 
 template <typename Type> auto enumerate(const Array<Type> &arr)
 {
-	Array<Tuple<int, Type>> r;
+	Array<decltype(make_tuple(int(), std::declval<Type>()))> r;
 	int i = 0;
 	for (auto &&v : arr)
 		r.append(make_tuple(i++, v));
