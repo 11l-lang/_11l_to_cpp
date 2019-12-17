@@ -95,3 +95,8 @@ template <typename Ty> Ty factorial(Ty n)
 		r *= i;
 	return r;
 }
+
+int pow(int x, int y)
+{
+	return (int)pow(double(x), double(y));
+}

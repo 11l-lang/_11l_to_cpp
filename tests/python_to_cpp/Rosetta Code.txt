@@ -5732,3 +5732,131 @@ struct CodeBlock1
             print(difn(s, i));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Four_bit_adder#Python
+def xor(a, b): return (a and not b) or (b and not a)
+
+def ha(a, b): return (xor(a, b), a and b)     # sum, carry
+
+def fa(a, b, ci):
+    (s0, c0) = ha(ci, a)
+    (s1, c1) = ha(s0, b)
+    return (s1, c0 or c1)     # sum, carry
+
+def fa4(a, b):
+    width = 4
+    ci = [False] * width
+    co = [False] * width
+    s  = [False] * width
+    for i in range(width):
+        (s[i], co[i]) = fa(a[i], b[i], co[i-1] if i != 0 else 0)
+    return (s, co[-1])
+
+def int2bus(n, width=4):
+    return [int(c) for c in bin(n)[2:].zfill(width)[::-1]]
+
+def bus2int(b):
+    return sum(1 << i for i, bit in enumerate(b) if bit)
+
+width = 4
+tot = [False] * (width + 1)
+for a in range(2**width):
+    for b in range(2**width):
+        (ta, tlast) = fa4(int2bus(a), int2bus(b))
+     #[-(ta, tot[width]) = fa4(int2bus(a), int2bus(b))-]
+        for i in range(width):
+            tot[i] = ta[i]
+        tot[width] = tlast
+        assert a + b == bus2int(tot), "totals don't match: %i + %i != %s" % (a, b, str(tot))
+===
+F xor(a, b)
+   R (a & !b) | (b & !a)
+
+F ha(a, b)
+   R (xor(a, b), a & b)
+
+F fa(a, b, ci)
+   V (s0, c0) = ha(ci, a)
+   V (s1, c1) = ha(s0, b)
+   R (s1, c0 | c1)
+
+F fa4(a, b)
+   V width = 4
+   V ci = [0B] * width
+   V co = [0B] * width
+   V s = [0B] * width
+   L(i) 0 .< width
+      (s[i], co[i]) = fa(a[i], b[i], I i != 0 {co[i - 1]} E 0)
+   R (s, co.last)
+
+F int2bus(n, width = 4)
+   R reversed(bin(n).zfill(width)).map(c -> Int(c))
+
+F bus2int(b)
+   R sum(enumerate(b).filter2((i, bit) -> bit).map2((i, bit) -> 1 << i))
+V width = 4
+V tot = [0B] * (width + 1)
+L(a) 0 .< 2 ^ width
+   L(b) 0 .< 2 ^ width
+      V (ta, tlast) = fa4(int2bus(a), int2bus(b))
+
+      L(i) 0 .< width
+         tot[i] = ta[i]
+      tot[width] = tlast
+      assert(a + b == bus2int(tot), ‘totals don't match: #.0 + #.0 != #.’.format(a, b, String(tot)))
+===
+template <typename T1, typename T2> auto xor(const T1 &a, const T2 &b)
+{
+    return (a && !b) || (b && !a);
+}
+
+template <typename T1, typename T2> auto ha(const T1 &a, const T2 &b)
+{
+    return make_tuple(xor(a, b), a && b);
+}
+
+template <typename T1, typename T2, typename T3> auto fa(const T1 &a, const T2 &b, const T3 &ci)
+{
+    auto [s0, c0] = ha(ci, a);
+    auto [s1, c1] = ha(s0, b);
+    return make_tuple(s1, c0 || c1);
+}
+
+template <typename T1, typename T2> auto fa4(const T1 &a, const T2 &b)
+{
+    auto width = 4;
+    auto ci = create_array({false}) * width;
+    auto co = create_array({false}) * width;
+    auto s = create_array({false}) * width;
+    for (auto i : range_el(0, width))
+        assign_from_tuple(s[i], co[i], fa(a[i], b[i], i != 0 ? co[i - 1] : 0));
+    return make_tuple(s, co.last());
+}
+
+template <typename T1, typename T2 = decltype(4)> auto int2bus(const T1 &n, const T2 &width = 4)
+{
+    return reversed(bin(n).zfill(width)).map([](const auto &c){return to_int(c);});
+}
+
+template <typename T1> auto bus2int(const T1 &b)
+{
+    return sum(enumerate(b).filter2([](const auto &i, const auto &bit){return bit;}).map2([](const auto &i, const auto &bit){return 1 << i;}));
+}
+auto width = 4;
+auto tot = create_array({false}) * (width + 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto a : range_el(0, pow(2, width)))
+            for (auto b : range_el(0, pow(2, width))) {
+                auto [ta, tlast] = fa4(int2bus(a), int2bus(b));
+                for (auto i : range_el(0, width))
+                    tot.set(i, ta[i]);
+                tot.set(width, tlast);
+                assert(a + b == bus2int(tot), u"totals don't match: #.0 + #.0 != #."_S.format(a, b, String(tot)));
+            }
+    }
+} code_block_1;
