@@ -64,6 +64,11 @@ public:
 		fwrite(utf8.data(), utf8.size(), 1, file);
 	}
 
+	void write_bytes(const Array<Byte> &bytes)
+	{
+		fwrite(bytes.data(), bytes.size(), 1, file);
+	}
+
 	String read() const
 	{
 		fseek(file, 0, SEEK_END);
