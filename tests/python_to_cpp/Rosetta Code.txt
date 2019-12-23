@@ -5860,3 +5860,150 @@ struct CodeBlock1
             }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Fractran#D
+def fractran(prog, val, limit):
+    fracts = [[int(i) for i in p.split('/')] for p in prog.split(' ')]
+    r : List[float] = []
+    for n in range(limit):
+        r += [val]
+        for p in fracts:
+            if val % p[1] == 0:
+                val = p[0] * val / p[1]
+                break
+    return r
+
+print(fractran("17/91 78/85 19/51 23/38 29/33 77/29 95/23 77/19 1/17 11/13 13/11 15/14 15/2 55/1", 2, 15))
+===
+F fractran(prog, =val, limit)
+   V fracts = prog.split(‘ ’).map(p -> p.split(‘/’).map(i -> Int(i)))
+   [Float] r
+   L(n) 0 .< limit
+      r [+]= val
+      L(p) fracts
+         I val % p[1] == 0
+            val = p[0] * val / p[1]
+            L.break
+   R r
+print(fractran(‘17/91 78/85 19/51 23/38 29/33 77/29 95/23 77/19 1/17 11/13 13/11 15/14 15/2 55/1’, 2, 15))
+===
+template <typename T1, typename T2, typename T3> auto fractran(const T1 &prog, T2 val, const T3 &limit)
+{
+    auto fracts = prog.split(u" "_S).map([](const auto &p){return p.split(u"/"_S).map([](const auto &i){return to_int(i);});});
+    Array<double> r;
+    for (auto n : range_el(0, limit)) {
+        r.append(val);
+        for (auto &&p : fracts)
+            if (mod(val, _get<1>(p)) == 0) {
+                val = _get<0>(p) * val / _get<1>(p);
+                break;
+            }
+    }
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(fractran(u"17/91 78/85 19/51 23/38 29/33 77/29 95/23 77/19 1/17 11/13 13/11 15/14 15/2 55/1"_S, 2, 15));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Function_composition#Python
+import math
+
+compose = lambda f, g: (lambda x: f( g(x) ))
+sin_asin = compose(lambda x: math.sin(x), lambda x: math.asin(x))
+print(sin_asin(0.5))
+===
+//import math
+V compose = (f, g) -> (x -> @f(@g(x)))
+V sin_asin = compose(x -> sin(x), x -> asin(x))
+print(sin_asin(0.5))
+===
+auto compose = [](const auto &f, const auto &g){return ([&f, &g](const auto &x){return f(g(x));});};
+auto sin_asin = compose([](const auto &x){return sin(x);}, [](const auto &x){return asin(x);});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sin_asin(0.5));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Fusc_sequence#C
+def fusc(n):
+    if n <= 1:
+        return n
+    if n % 2 == 0:
+        return fusc(n // 2)
+    return fusc((n-1) // 2) + fusc((n+1) // 2)
+
+print('First 61 terms:')
+print([fusc(n) for n in range(61)])
+
+print()
+print('Points in the sequence where an item has more digits than any previous items:')
+max_len = 0
+for i in range(700_000):
+    f = fusc(i)
+    if len(str(f)) > max_len:
+        max_len = len(str(f))
+        print((i, f))
+===
+F fusc(n)
+   I n <= 1
+      R n
+   I n % 2 == 0
+      R fusc(n I/ 2)
+   R fusc((n - 1) I/ 2) + fusc((n + 1) I/ 2)
+print(‘First 61 terms:’)
+print((0.<61).map(n -> fusc(n)))
+print()
+print(‘Points in the sequence where an item has more digits than any previous items:’)
+V max_len = 0
+L(i) 700'000
+   V f = fusc(i)
+   I String(f).len > max_len
+      max_len = String(f).len
+      print((i, f))
+===
+template <typename T1> auto fusc(const T1 &n)
+{
+    if (n <= 1)
+        return n;
+    if (mod(n, 2) == 0)
+        return fusc(idiv(n, 2));
+    return fusc(idiv((n - 1), 2)) + fusc(idiv((n + 1), 2));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"First 61 terms:"_S);
+        print(range_el(0, 61).map([](const auto &n){return fusc(n);}));
+        print();
+        print(u"Points in the sequence where an item has more digits than any previous items:"_S);
+    }
+} code_block_1;
+auto max_len = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (int i = 0; i < 700'000; i++) {
+            auto f = fusc(i);
+            if (String(f).len() > max_len) {
+                max_len = String(f).len();
+                print(make_tuple(i, f));
+            }
+        }
+    }
+} code_block_2;
