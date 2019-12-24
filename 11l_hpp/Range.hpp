@@ -93,12 +93,13 @@ public:
 		Type value, step;
 	public:
 		Iterator(Type value, Type step) : value(value), step(step) {}
-		bool operator!=(Iterator i) {return step < 0 ? value > i.value : value < i.value;} // I know this is hack, but it is faster than precise computation of end()
+		bool operator!=(Iterator i) {return !include_ending ? (step < 0 ? value >  i.value : value <  i.value) // I know this is hack, but it is faster than precise computation of end() {for step > 0: `end = include_ending ? e + step - (e - b) %  step : e-1 + step - (e-1 - b) %  step`,
+			                                                : (step < 0 ? value >= i.value : value <= i.value);} //                                                                        for step < 0: `end = include_ending ? e + step + (b - e) % -step : e+1 + step + (b - e-1) % -step`}
 		void operator++() {value += step;}
 		Type operator*() {return value;}
 	};
-	Iterator begin() const {return Iterator(b + !include_beginning,  step);}
-	Iterator end()   const {return Iterator(e - !include_ending + 1, step);}
+	Iterator begin() const {return Iterator(b + !include_beginning, step);}
+	Iterator end()   const {return Iterator(e                     , step);}
 
 	Type size() const
 	{
