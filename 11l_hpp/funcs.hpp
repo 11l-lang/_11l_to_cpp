@@ -100,3 +100,5 @@ int pow(int x, int y)
 {
 	return (int)pow(double(x), double(y));
 }
+
+using std::swap;

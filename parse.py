@@ -1119,7 +1119,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         for index, arg in enumerate(self.function_arguments):
             if arg[2] == '': # if there is no type specified
                 templates.append('typename T' + str(index + 1) + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = decltype(' + arg[1] + ')'))
-                arguments.append(('T' + str(index + 1) + ' ' if '=' in arg[3] else 'const T' + str(index + 1) + ' &')
+                arguments.append(('T' + str(index + 1) + ' ' if '=' in arg[3] else 'const '*(arg[3] != '&') + 'T' + str(index + 1) + ' &')
                     + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
             else:
                 tid = self.scope.find(arg[2].rstrip('?'))
@@ -2692,6 +2692,7 @@ builtins_scope.add_function('print', f)
 builtins_scope.add_function('input', ASTFunctionDefinition([('prompt', token_to_str('‘’'), 'String')], 'String'))
 builtins_scope.add_function('assert', ASTFunctionDefinition([('expression', '', 'Bool'), ('message', token_to_str('‘’'), 'String')]))
 builtins_scope.add_function('exit', ASTFunctionDefinition([('arg', '', '')]))
+builtins_scope.add_function('swap', ASTFunctionDefinition([('a', '', '', '&'), ('b', '', '', '&')]))
 builtins_scope.add_function('zip', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', '')]))
 builtins_scope.add_function('all', ASTFunctionDefinition([('iterable', '', '')]))
 builtins_scope.add_function('any', ASTFunctionDefinition([('iterable', '', '')]))
