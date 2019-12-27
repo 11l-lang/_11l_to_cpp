@@ -76,9 +76,11 @@ inline int bsf(int     x) {return __builtin_ctz  (x);}
 inline int bsf(int64_t x) {return __builtin_ctzll(x);}
 #elif _MSC_VER
 inline int bsr(int x)     {unsigned long r; _BitScanReverse  (&r, x); return r;}
-inline int bsr(int64_t x) {unsigned long r; _BitScanReverse64(&r, x); return r;}
 inline int bsf(int x)     {unsigned long r; _BitScanForward  (&r, x); return r;}
+#ifdef _AMD64_
+inline int bsr(int64_t x) {unsigned long r; _BitScanReverse64(&r, x); return r;}
 inline int bsf(int64_t x) {unsigned long r; _BitScanForward64(&r, x); return r;}
+#endif
 #else
 #error Unsupported compiler
 #endif
