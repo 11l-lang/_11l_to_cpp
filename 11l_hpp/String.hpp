@@ -30,6 +30,11 @@ public:
 	bool operator==(char16_t c) const {return code == c;}
 	bool operator!=(char16_t c) const {return code != c;}
 
+	void operator++() {++code;}
+	Char operator+(int i) const {return Char(code + i);}
+	Char operator-(int i) const {return Char(code - i);}
+	int operator-(Char c) const {return Char(code - c.code);}
+
 	Char    lowercase() const {return towlower(code);}
 	bool is_lowercase() const {return iswlower(code);}
 	Char    uppercase() const {return towupper(code);}

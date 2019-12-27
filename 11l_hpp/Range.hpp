@@ -15,11 +15,11 @@ public:
 		explicit Iterator(Type value) : value(value) {}
 		bool operator==(Iterator i) {return value == i.value;}
 		bool operator!=(Iterator i) {return value != i.value;}
-		void operator++() {value++;}
+		void operator++() {++value;}
 		Type operator*() {return value;}
 	};
-	Iterator begin() const {return Iterator(b + !include_beginning);}
-	Iterator end()   const {return Iterator(max(e - !include_ending + 1, b + !include_beginning));}
+	Iterator begin() const {return Iterator(b + (int)!include_beginning);}
+	Iterator end()   const {return Iterator(max(e - (int)!include_ending + 1, b + (int)!include_beginning));}
 
 	Type size() const
 	{

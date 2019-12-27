@@ -1543,3 +1543,15 @@ struct CodeBlock1
         print(gauss_eliminate(a, b));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Generate_lower_case_ASCII_alphabet
+print(Array(‘a’..‘z’))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(create_array(range_ee(u'a'_C, u'z'_C)));
+    }
+} code_block_1;
