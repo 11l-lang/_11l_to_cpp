@@ -6099,3 +6099,291 @@ struct CodeBlock1
         print(genfizzbuzz(create_array({make_tuple(5, u"Buzz"_S), make_tuple(3, u"Fizz"_S), make_tuple(7, u"Baxx"_S)}), range_ee(1, 20)));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Greatest_common_divisor#Python
+def gcd(u, v):
+    while v != 0:
+        (u, v) = (v, u % v)
+    return abs(u)
+
+print(gcd(0,0))
+print(gcd(0, 10))
+print(gcd(0, -10))
+print(gcd(9, 6))
+print(gcd(6, 9))
+print(gcd(-6, 9))
+print(gcd(8, 45))
+print(gcd(40902, 24140))
+===
+F gcd(=u, =v)
+   L v != 0
+      (u, v) = (v, u % v)
+   R abs(u)
+print(gcd(0, 0))
+print(gcd(0, 10))
+print(gcd(0, -10))
+print(gcd(9, 6))
+print(gcd(6, 9))
+print(gcd(-6, 9))
+print(gcd(8, 45))
+print(gcd(40902, 24140))
+===
+template <typename T1, typename T2> auto gcd(T1 u, T2 v)
+{
+    while (v != 0)
+        assign_from_tuple(u, v, make_tuple(v, mod(u, v)));
+    return abs(u);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(gcd(0, 0));
+        print(gcd(0, 10));
+        print(gcd(0, -10));
+        print(gcd(9, 6));
+        print(gcd(6, 9));
+        print(gcd(-6, 9));
+        print(gcd(8, 45));
+        print(gcd(40902, 24140));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Greatest_subsequential_sum#Python
+def maxsumseq(sequence):
+    (start, end, sum_start) = (-1, -1, -1)
+    (maxsum_, sum_) = (0, 0)
+    for i, x in enumerate(sequence):
+        sum_ += x
+        if maxsum_ < sum_: # found maximal subsequence so far
+            maxsum_ = sum_
+            (start, end) = (sum_start, i)
+        elif sum_ < 0: # start new sequence
+            sum_ = 0
+            sum_start = i
+    assert maxsum_ == sum(sequence[start + 1:end + 1])
+    return sequence[start + 1:end + 1]
+
+print(maxsumseq([-1, 2, -1]))
+print(maxsumseq([-1, 2, -1, 3, -1]))
+print(maxsumseq([-1, 1, 2, -5, -6]))
+print(maxsumseq([-1, -2, 3, 5, 6, -2, -1, 4, -4, 2, -1]))
+===
+F maxsumseq(sequence)
+   V (start, end, sum_start) = (-1, -1, -1)
+   V (maxsum_, sum_) = (0, 0)
+   L(x) sequence
+      V i = L.index
+      sum_ += x
+      I maxsum_ < sum_
+         maxsum_ = sum_
+         (start, end) = (sum_start, i)
+      E I sum_ < 0
+         sum_ = 0
+         sum_start = i
+   assert(maxsum_ == sum(sequence[start + 1 .< end + 1]))
+   R sequence[start + 1 .< end + 1]
+print(maxsumseq([-1, 2, -1]))
+print(maxsumseq([-1, 2, -1, 3, -1]))
+print(maxsumseq([-1, 1, 2, -5, -6]))
+print(maxsumseq([-1, -2, 3, 5, 6, -2, -1, 4, -4, 2, -1]))
+===
+template <typename T1> auto maxsumseq(const T1 &sequence)
+{
+    auto [start, end, sum_start] = make_tuple(-1, -1, -1);
+    auto [maxsum_, sum_] = make_tuple(0, 0);
+    {int Lindex = 0;
+    for (auto &&x : sequence) {
+        auto i = Lindex;
+        sum_ += x;
+        if (maxsum_ < sum_) {
+            maxsum_ = sum_;
+            assign_from_tuple(start, end, make_tuple(sum_start, i));
+        }
+        else if (sum_ < 0) {
+            sum_ = 0;
+            sum_start = i;
+        }
+        Lindex++;
+    }}
+    assert(maxsum_ == sum(sequence[range_el(start + 1, end + 1)]));
+    return sequence[range_el(start + 1, end + 1)];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(maxsumseq(create_array({-1, 2, -1})));
+        print(maxsumseq(create_array({-1, 2, -1, 3, -1})));
+        print(maxsumseq(create_array({-1, 1, 2, -5, -6})));
+        print(maxsumseq(create_array({-1, -2, 3, 5, 6, -2, -1, 4, -4, 2, -1})));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Guess_the_number#Python
+import random
+t=random.randint(1,10)
+g=int(input("Guess a number that's between 1 and 10: "))
+while t!=g:g=int(input("Guess again! "))
+print("That's right!")
+===
+//import random
+V t = random:(1 .. 10)
+V g = Int(input(‘Guess a number that's between 1 and 10: ’))
+L t != g
+   g = Int(input(‘Guess again! ’))
+print(‘That's right!’)
+===
+auto t = randomns::_(range_ee(1, 10));
+auto g = to_int(input(u"Guess a number that's between 1 and 10: "_S));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (t != g)
+            g = to_int(input(u"Guess again! "_S));
+        print(u"That's right!"_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Hailstone_sequence#Python
+def hailstone(n):
+    seq = [n]
+    while n>1:
+        n = 3*n + 1 if n % 2 != 0 else n//2
+        seq.append(n)
+    return seq
+
+h = hailstone(27)
+assert len(h)==112 and h[:4]==[27, 82, 41, 124] and h[-4:]==[8, 4, 2, 1]
+m = max((len(hailstone(i)), i) for i in range(1,100000))
+print("Maximum length %i was found for hailstone(%i) for numbers <100,000" % (m[0], m[1]))
+===
+F hailstone(=n)
+   V seq = [n]
+   L n > 1
+      n = I n % 2 != 0 {3 * n + 1} E n I/ 2
+      seq.append(n)
+   R seq
+V h = hailstone(27)
+assert(h.len == 112 & h[0.<4] == [27, 82, 41, 124] & h[(len)-4 ..] == [8, 4, 2, 1])
+V m = max((1..99999).map(i -> (hailstone(i).len, i)))
+print(‘Maximum length #.0 was found for hailstone(#.0) for numbers <100,000’.format(m[0], m[1]))
+===
+template <typename T1> auto hailstone(T1 n)
+{
+    auto seq = create_array({n});
+    while (n > 1) {
+        n = mod(n, 2) != 0 ? 3 * n + 1 : idiv(n, 2);
+        seq.append(n);
+    }
+    return seq;
+}
+auto h = hailstone(27);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        assert(h.len() == 112 && h[range_el(0, 4)] == create_array({27, 82, 41, 124}) && h[range_elen_i( - 4)] == create_array({8, 4, 2, 1}));
+    }
+} code_block_1;
+auto m = max(range_ee(1, 99999).map([](const auto &i){return make_tuple(hailstone(i).len(), i);}));
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"Maximum length #.0 was found for hailstone(#.0) for numbers <100,000"_S.format(_get<0>(m), _get<1>(m)));
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Hamming_numbers#Python
+def hamming(limit):
+    h = [1] * limit
+    (x2, x3, x5) = (2, 3, 5)
+    i = 0
+    j = 0
+    k = 0
+
+    for n in range(1, limit):
+        h[n] = min(x2, x3, x5)
+        if x2 == h[n]:
+            i += 1
+            x2 = 2 * h[i]
+        if x3 == h[n]:
+            j += 1
+            x3 = 3 * h[j]
+        if x5 == h[n]:
+            k += 1
+            x5 = 5 * h[k]
+
+    return h[-1]
+
+print([hamming(i) for i in range(1, 21)])
+print(hamming(1691))
+===
+F hamming(limit)
+   V h = [1] * limit
+   V (x2, x3, x5) = (2, 3, 5)
+   V i = 0
+   V j = 0
+   V k = 0
+
+   L(n) 1 .< limit
+      h[n] = min(x2, x3, x5)
+      I x2 == h[n]
+         i++
+         x2 = 2 * h[i]
+      I x3 == h[n]
+         j++
+         x3 = 3 * h[j]
+      I x5 == h[n]
+         k++
+         x5 = 5 * h[k]
+   R h.last
+print((1..20).map(i -> hamming(i)))
+print(hamming(1691))
+===
+template <typename T1> auto hamming(const T1 &limit)
+{
+    auto h = create_array({1}) * limit;
+    auto [x2, x3, x5] = make_tuple(2, 3, 5);
+    auto i = 0;
+    auto j = 0;
+    auto k = 0;
+
+    for (auto n : range_el(1, limit)) {
+        h.set(n, min(x2, x3, x5));
+        if (x2 == h[n]) {
+            i++;
+            x2 = 2 * h[i];
+        }
+        if (x3 == h[n]) {
+            j++;
+            x3 = 3 * h[j];
+        }
+        if (x5 == h[n]) {
+            k++;
+            x5 = 5 * h[k];
+        }
+    }
+    return h.last();
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(range_ee(1, 20).map([](const auto &i){return hamming(i);}));
+        print(hamming(1691));
+    }
+} code_block_1;
