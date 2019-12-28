@@ -6500,3 +6500,98 @@ struct CodeBlock1
             }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Hash_from_two_arrays#Python
+keys = ['a', 'b', 'c']
+values = [1, 2, 3]
+hash_ = dict(zip(keys, values))
+print(hash_)
+===
+V keys = [‘a’, ‘b’, ‘c’]
+V values = [1, 2, 3]
+V hash_ = Dict(zip(keys, values))
+print(hash_)
+===
+auto keys = create_array({u'a'_C, u'b'_C, u'c'_C});
+auto values = create_array({1, 2, 3});
+auto hash_ = create_dict(zip(keys, values));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(hash_);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Hash_join#Python
+import collections
+
+def hash_join(table1, table2):
+    h : DefaultDict[str, List[Tuple[int, str]]] = collections.defaultdict(list)
+    # hash phase
+    for s in table1:
+        h[s[1]].append(s)
+    # join phase
+    res : List[Tuple[Tuple[int, str], Tuple[str, str]]] = []
+    for r in table2:
+        for s in h[r[0]]:
+            res += [(s, r)]
+    return res
+
+table1 = [(27, "Jonah"),
+          (18, "Alan"),
+          (28, "Glory"),
+          (18, "Popeye"),
+          (28, "Alan")]
+table2 = [("Jonah", "Whales"),
+          ("Jonah", "Spiders"),
+          ("Alan", "Ghosts"),
+          ("Alan", "Zombies"),
+          ("Glory", "Buffy")]
+
+for row in hash_join(table1, table2):
+    print(row)
+===
+//import collections
+
+F hash_join(table1, table2)
+   DefaultDict[String, [(Int, String)]] h
+
+   L(s) table1
+      h[s[1]].append(s)
+   [((Int, String), (String, String))] res
+   L(r) table2
+      L(s) h[r[0]]
+         res [+]= (s, r)
+   R res
+V table1 = [(27, ‘Jonah’), (18, ‘Alan’), (28, ‘Glory’), (18, ‘Popeye’), (28, ‘Alan’)]
+V table2 = [(‘Jonah’, ‘Whales’), (‘Jonah’, ‘Spiders’), (‘Alan’, ‘Ghosts’), (‘Alan’, ‘Zombies’), (‘Glory’, ‘Buffy’)]
+
+L(row) hash_join(table1, table2)
+   print(row)
+===
+template <typename T1, typename T2> auto hash_join(const T1 &table1, const T2 &table2)
+{
+    DefaultDict<String, Array<Tuple<int, String>>> h;
+    for (auto &&s : table1)
+        h[_get<1>(s)].append(s);
+    Array<Tuple<Tuple<int, String>, Tuple<String, String>>> res;
+    for (auto &&r : table2)
+        for (auto &&s : h[_get<0>(r)])
+            res.append(make_tuple(s, r));
+    return res;
+}
+auto table1 = create_array({make_tuple(27, u"Jonah"_S), make_tuple(18, u"Alan"_S), make_tuple(28, u"Glory"_S), make_tuple(18, u"Popeye"_S), make_tuple(28, u"Alan"_S)});
+auto table2 = create_array({make_tuple(u"Jonah"_S, u"Whales"_S), make_tuple(u"Jonah"_S, u"Spiders"_S), make_tuple(u"Alan"_S, u"Ghosts"_S), make_tuple(u"Alan"_S, u"Zombies"_S), make_tuple(u"Glory"_S, u"Buffy"_S)});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&row : hash_join(table1, table2))
+            print(row);
+    }
+} code_block_1;

@@ -936,12 +936,34 @@ def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False
         if '.' in ty: # for `Token.Category category`
             return ty.replace('.', '::') # [-TODO: generalize-]
 
-        if ty.startswith('('): # )
-            tuple_types_str = trans_type(ty[1:-1], scope, type_token, ast_type_node)
-            tuple_types = tuple_types_str.split(', ')
+        if ty.startswith('('):
+            assert(ty[-1] == ')')
+            i = 1
+            s = i
+            nesting_level = 0
+            types = ''
+            while True:
+                if ty[i] == '(':
+                    nesting_level += 1
+                elif ty[i] == ')':
+                    if nesting_level == 0:
+                        assert(i == len(ty)-1)
+                        types += trans_type(ty[s:i], scope, type_token, ast_type_node)
+                        break
+                    nesting_level -= 1
+                elif ty[i] == ',':
+                    if nesting_level == 0: # ignore inner commas
+                        types += trans_type(ty[s:i], scope, type_token, ast_type_node) + ', '
+                        i += 1
+                        while ty[i] == ' ':
+                            i += 1
+                        s = i
+                        continue
+                i += 1
+            tuple_types = types.split(', ')
             if tuple_types[0] in ('int', 'float', 'double') and tuple_types.count(tuple_types[0]) == len(tuple_types) and len(tuple_types) in range(2, 5):
                 return {'int':'i', 'float':'', 'double':'d'}[tuple_types[0]] + 'vec' + str(len(tuple_types))
-            return 'Tuple<' + tuple_types_str + '>'
+            return 'Tuple<' + types + '>'
 
         p = ty.find('[') # ]
         if p != -1:
