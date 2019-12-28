@@ -134,6 +134,19 @@ public:
 
 	explicit RangeEI(const Type &begin) : b(begin) {}
 
+	class Iterator
+	{
+		Type value;
+	public:
+		explicit Iterator(Type value) : value(value) {}
+		bool operator==(Iterator i) {return value == i.value;}
+		bool operator!=(Iterator i) {return value != i.value;}
+		void operator++() {++value;}
+		Type operator*() {return value;}
+	};
+	Iterator begin() const {return Iterator(b);}
+	Iterator end  () const {return Iterator(std::numeric_limits<Type>::max());}
+
 	RangeEIWithStep<Type> step(Type step)
 	{
 		return RangeEIWithStep<Type>(b, step);

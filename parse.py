@@ -1786,7 +1786,7 @@ symbol('->', 20).set_led_bp(20, led)
 
 def led(self, left):
     self.append_child(left) # [(
-    if token.value(source) not in (']', ')'):
+    if token.value(source) not in (']', ')') and token.category != Token.Category.SCOPE_BEGIN:
         self.append_child(expression(self.symbol.led_bp))
     return self
 symbol('..', 55).set_led_bp(55, led)

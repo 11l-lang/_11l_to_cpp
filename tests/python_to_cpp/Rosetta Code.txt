@@ -6387,3 +6387,116 @@ struct CodeBlock1
         print(hamming(1691));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Happy_numbers#Python
+def happy(n):
+    past = set() # int
+    while n != 1:
+        n = sum(int(c)**2 for c in str(n))
+        if n in past:
+            return False
+        past.add(n)
+    return True
+
+print([x for x in range(500) if happy(x)][:8])
+===
+F happy(=n)
+   V past = Set[Int]()
+   L n != 1
+      n = sum(String(n).map(c -> Int(c) ^ 2))
+      I n C past
+         R 0B
+      past.add(n)
+   R 1B
+print((0.<500).filter(x -> happy(x))[0.<8])
+===
+template <typename T1> auto happy(T1 n)
+{
+    auto past = Set<int>();
+    while (n != 1) {
+        n = sum_map(String(n), [](const auto &c){return square(to_int(c));});
+        if (in(n, past))
+            return false;
+        past.add(n);
+    }
+    return true;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(range_el(0, 500).filter([](const auto &x){return happy(x);})[range_el(0, 8)]);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Harshad_or_Niven_series#Python
+import itertools
+
+def is_harshad(n):
+    return n % sum(int(ch) for ch in str(n)) == 0
+
+def harshad(num):
+    r : List[int] = []
+    for n in itertools.count(1):
+        if is_harshad(n):
+            r += [n]
+            if len(r) == num:
+                return r
+
+print(harshad(20))
+
+for n in itertools.count(1001):
+    if is_harshad(n):
+        print(n)
+        break
+===
+//import itertools
+
+F is_harshad(n)
+   R n % sum(String(n).map(ch -> Int(ch))) == 0
+
+F harshad(num)
+   [Int] r
+   L(n) 1..
+      I is_harshad(n)
+         r [+]= n
+         I r.len == num
+            R r
+print(harshad(20))
+
+L(n) 1001..
+   I is_harshad(n)
+      print(n)
+      L.break
+===
+template <typename T1> auto is_harshad(const T1 &n)
+{
+    return mod(n, sum_map(String(n), [](const auto &ch){return to_int(ch);})) == 0;
+}
+
+template <typename T1> auto harshad(const T1 &num)
+{
+    Array<int> r;
+    for (auto n : range_ei(1))
+        if (is_harshad(n)) {
+            r.append(n);
+            if (r.len() == num)
+                return r;
+        }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(harshad(20));
+        for (auto n : range_ei(1001))
+            if (is_harshad(n)) {
+                print(n);
+                break;
+            }
+    }
+} code_block_1;
