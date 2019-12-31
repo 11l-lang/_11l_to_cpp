@@ -299,7 +299,7 @@ public:
 		return nullptr;
 	}
 
-	Nullable<int> find(const Tuple<Type, Type> &t, int start = 0) const
+	Nullable<int> find(const decltype(make_tuple(std::declval<Type>(), std::declval<Type>())) &t, int start = 0) const
 	{
 		for (auto it = begin() + start; it != end(); ++it) {
 			if (*it == _get<0>(t)) return int(it - begin());
@@ -309,6 +309,10 @@ public:
 	}
 
 	template <typename Ty> Nullable<int> find(const Tuple<Ty, Ty> &t, int start = 0) const
+	{
+		return find(make_tuple((Type)_get<0>(t), (Type)_get<1>(t)), start);
+	}
+	template <typename Ty> Nullable<int> find(const Tvec<Ty, 2> &t, int start = 0) const
 	{
 		return find(make_tuple((Type)_get<0>(t), (Type)_get<1>(t)), start);
 	}
