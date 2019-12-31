@@ -6595,3 +6595,125 @@ struct CodeBlock1
             print(row);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Heronian_triangles#Python
+from typing import List, Tuple
+import math
+
+def gcd(u, v):
+    while v != 0:
+        (u, v) = (v, u % v)
+    return abs(u)
+
+def hero(a, b, c):
+    s = (a + b + c) / 2
+    a2 = s * (s - a) * (s - b) * (s - c)
+    return math.sqrt(a2) if a2 > 0 else 0
+
+def is_heronian(a, b, c):
+    x = hero(a, b, c)
+    return x > 0 and x.is_integer()
+
+def gcd3(x, y, z):
+    return gcd(gcd(x, y), z)
+
+MAXSIDE = 200
+
+h : List[Tuple[int, int, int]] = []
+for x in range(1, MAXSIDE + 1):
+    for y in range(x, MAXSIDE + 1):
+        for z in range(y, MAXSIDE + 1):
+            if (x + y > z) and gcd3(x, y, z) == 1 and is_heronian(x, y, z):
+                h += [(x, y, z)]
+
+# By increasing area, perimeter, then sides
+h = sorted(h, key=lambda x: (hero(x[0], x[1], x[2]), sum(x), (x[2], x[1], x[0])))
+
+print(
+    'Primitive Heronian triangles with sides up to %i: %i' % (MAXSIDE, len(h))
+)
+print('\nFirst ten when ordered by increasing area, then perimeter, then maximum sides:')
+print('\n'.join('  %14s perim: %3i area: %i'
+                % (str((x, y, z)), x + y + z, hero(x, y, z)) for x, y, z in h[:10]))
+print('\nAll with area 210 subject to the previous ordering:')
+print('\n'.join('  %14s perim: %3i area: %i'
+                % (str((x, y, z)), x + y + z, hero(x, y, z)) for x, y, z in h
+                if hero(x, y, z) == 210))
+===
+//import math
+
+F gcd(=u, =v)
+   L v != 0
+      (u, v) = (v, u % v)
+   R abs(u)
+
+F hero(a, b, c)
+   V s = (a + b + c) / 2
+   V a2 = s * (s - a) * (s - b) * (s - c)
+   R I a2 > 0 {sqrt(a2)} E 0
+
+F is_heronian(a, b, c)
+   V x = hero(a, b, c)
+   R x > 0 & fract(x) == 0
+
+F gcd3(x, y, z)
+   R gcd(gcd(x, y), z)
+V MAXSIDE = 200
+[(Int, Int, Int)] h
+L(x) 1 .< MAXSIDE + 1
+   L(y) x .< MAXSIDE + 1
+      L(z) y .< MAXSIDE + 1
+         I (x + y > z) & gcd3(x, y, z) == 1 & is_heronian(x, y, z)
+            h [+]= (x, y, z)
+h = sorted(h, key' x -> (hero(x[0], x[1], x[2]), sum(x), (x[2], x[1], x[0])))
+print(‘Primitive Heronian triangles with sides up to #.: #.’.format(MAXSIDE, h.len))
+print("\nFirst ten when ordered by increasing area, then perimeter, then maximum sides:")
+print(h[0.<10].map3((x, y, z) -> ‘  #14 perim: #3 area: #.’.format(String((x, y, z)), x + y + z, hero(x, y, z))).join("\n"))
+print("\nAll with area 210 subject to the previous ordering:")
+print(h.filter3((x, y, z) -> hero(x, y, z) == 210).map3((x, y, z) -> ‘  #14 perim: #3 area: #.’.format(String((x, y, z)), x + y + z, hero(x, y, z))).join("\n"))
+===
+template <typename T1, typename T2> auto gcd(T1 u, T2 v)
+{
+    while (v != 0)
+        assign_from_tuple(u, v, make_tuple(v, mod(u, v)));
+    return abs(u);
+}
+
+template <typename T1, typename T2, typename T3> auto hero(const T1 &a, const T2 &b, const T3 &c)
+{
+    auto s = (a + b + c) / 2.0;
+    auto a2 = s * (s - a) * (s - b) * (s - c);
+    return a2 > 0 ? sqrt(a2) : 0;
+}
+
+template <typename T1, typename T2, typename T3> auto is_heronian(const T1 &a, const T2 &b, const T3 &c)
+{
+    auto x = hero(a, b, c);
+    return x > 0 && fract(x) == 0;
+}
+
+template <typename T1, typename T2, typename T3> auto gcd3(const T1 &x, const T2 &y, const T3 &z)
+{
+    return gcd(gcd(x, y), z);
+}
+auto MAXSIDE = 200;
+Array<ivec3> h;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto x : range_el(1, MAXSIDE + 1))
+            for (auto y : range_el(x, MAXSIDE + 1))
+                for (auto z : range_el(y, MAXSIDE + 1))
+                    if ((x + y > z) && gcd3(x, y, z) == 1 && is_heronian(x, y, z))
+                        h.append(make_tuple(x, y, z));
+        h = sorted(h, [](const auto &x){return make_tuple(hero(_get<0>(x), _get<1>(x), _get<2>(x)), sum(x), make_tuple(_get<2>(x), _get<1>(x), _get<0>(x)));});
+        print(u"Primitive Heronian triangles with sides up to #.: #."_S.format(MAXSIDE, h.len()));
+        print(u"\nFirst ten when ordered by increasing area, then perimeter, then maximum sides:"_S);
+        print(h[range_el(0, 10)].map3([](const auto &x, const auto &y, const auto &z){return u"  #14 perim: #3 area: #."_S.format(String(make_tuple(x, y, z)), x + y + z, hero(x, y, z));}).join(u"\n"_S));
+        print(u"\nAll with area 210 subject to the previous ordering:"_S);
+        print(h.filter3([](const auto &x, const auto &y, const auto &z){return hero(x, y, z) == 210;}).map3([](const auto &x, const auto &y, const auto &z){return u"  #14 perim: #3 area: #."_S.format(String(make_tuple(x, y, z)), x + y + z, hero(x, y, z));}).join(u"\n"_S));
+    }
+} code_block_1;

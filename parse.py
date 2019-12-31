@@ -2743,6 +2743,7 @@ builtins_scope.add_function('sleep', ASTFunctionDefinition([('secs', '', 'Float'
 builtins_scope.add_function('ceil',  ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_function('floor', ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_function('trunc', ASTFunctionDefinition([('x', '', 'Float')]))
+builtins_scope.add_function('fract', ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_function('wrap',  ASTFunctionDefinition([('x', '', 'Float'), ('min_value', '', 'Float'), ('max_value', '', 'Float')]))
 builtins_scope.add_function('abs',   ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_function('exp',   ASTFunctionDefinition([('x', '', 'Float')]))

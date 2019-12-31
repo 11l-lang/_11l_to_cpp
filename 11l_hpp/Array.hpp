@@ -83,6 +83,15 @@ public:
 		return r;
 	}
 
+	template <typename Func> auto map3(Func &&func) const
+	{
+		Array<decltype(func(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>(), std::declval<std::tuple_element_t<2, Type>>()))> r;
+		r.reserve(len());
+		for (auto &&el : *this)
+			r.push_back(func(_get<0>(el), _get<1>(el), _get<2>(el)));
+		return r;
+	}
+
 	String join(const String &str)
 	{
 		String r;
@@ -110,7 +119,16 @@ public:
 	{
 		Array r;
 		for (auto &&el : *this)
-			if (func(std::get<0>(el), std::get<1>(el)))
+			if (func(_get<0>(el), _get<1>(el)))
+				r.push_back(el);
+		return r;
+	}
+
+	template <typename Func> Array filter3(Func &&func) const
+	{
+		Array r;
+		for (auto &&el : *this)
+			if (func(_get<0>(el), _get<1>(el), _get<2>(el)))
 				r.push_back(el);
 		return r;
 	}
@@ -284,15 +302,15 @@ public:
 	Nullable<int> find(const Tuple<Type, Type> &t, int start = 0) const
 	{
 		for (auto it = begin() + start; it != end(); ++it) {
-			if (*it == std::get<0>(t)) return int(it - begin());
-			if (*it == std::get<1>(t)) return int(it - begin());
+			if (*it == _get<0>(t)) return int(it - begin());
+			if (*it == _get<1>(t)) return int(it - begin());
 		}
 		return nullptr;
 	}
 
 	template <typename Ty> Nullable<int> find(const Tuple<Ty, Ty> &t, int start = 0) const
 	{
-		return find(make_tuple((Type)std::get<0>(t), (Type)std::get<1>(t)), start);
+		return find(make_tuple((Type)_get<0>(t), (Type)_get<1>(t)), start);
 	}
 
 	int count(const Type &val) const
