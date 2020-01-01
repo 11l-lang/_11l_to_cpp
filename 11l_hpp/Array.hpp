@@ -74,6 +74,7 @@ public:
 		return r;
 	}
 
+	//template <typename Func, typename = decltype(std::declval<Func>()(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>()))> auto map(Func &&func) const
 	template <typename Func> auto map2(Func &&func) const
 	{
 		Array<decltype(func(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>()))> r;
@@ -83,6 +84,7 @@ public:
 		return r;
 	}
 
+	//template <typename Func, typename Dummy = int, typename = decltype(std::declval<Func>()(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>(), std::declval<std::tuple_element_t<2, Type>>()))> auto map(Func &&func) const
 	template <typename Func> auto map3(Func &&func) const
 	{
 		Array<decltype(func(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>(), std::declval<std::tuple_element_t<2, Type>>()))> r;
@@ -106,7 +108,7 @@ public:
 		return r;
 	}
 
-	template <typename Func> Array filter(Func &&func) const
+	template <typename Func, typename = decltype(std::declval<Func>()(std::declval<Type>()))> Array filter(Func &&func) const
 	{
 		Array r;
 		for (auto &&el : *this)
@@ -115,6 +117,7 @@ public:
 		return r;
 	}
 
+	//template <typename Func, typename Dummy = int, typename = decltype(std::declval<Func>()(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>()))> Array filter(Func &&func) const
 	template <typename Func> Array filter2(Func &&func) const
 	{
 		Array r;
@@ -124,6 +127,7 @@ public:
 		return r;
 	}
 
+	//template <typename Func, typename Dummy = int, typename Dummy2 = int, typename = decltype(std::declval<Func>()(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>(), std::declval<std::tuple_element_t<2, Type>>()))> Array filter(Func &&func) const
 	template <typename Func> Array filter3(Func &&func) const
 	{
 		Array r;
