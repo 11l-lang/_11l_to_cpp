@@ -6717,3 +6717,329 @@ struct CodeBlock1
         print(h.filter3([](const auto &x, const auto &y, const auto &z){return hero(x, y, z) == 210;}).map3([](const auto &x, const auto &y, const auto &z){return u"  #14 perim: #3 area: #."_S.format(String(make_tuple(x, y, z)), x + y + z, hero(x, y, z));}).join(u"\n"_S));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Higher-order_functions#Python
+def first(function):
+    return function()
+
+def second():
+    return "second"
+
+result = first(second)
+print(result)
+===
+F first(function)
+   R function()
+
+F second()
+   R ‘second’
+V result = first(second)
+print(result)
+===
+template <typename T1> auto first(const T1 &function)
+{
+    return function();
+}
+
+auto second()
+{
+    return u"second"_S;
+}
+auto result = first(second);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(result);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Hofstadter_Figure-Figure_sequences#Python
+cR = [1]
+cS = [2]
+
+def extend_RS():
+    global cS
+    x = cR[len(cR) - 1] + cS[len(cR) - 1]
+    cR.append(x)
+    cS += range(cS[-1] + 1, x)
+    cS.append(x + 1)
+
+def ff_R(n):
+    assert(n > 0)
+    while n > len(cR): extend_RS()
+    return cR[n - 1]
+
+def ff_S(n):
+    assert(n > 0)
+    while n > len(cS): extend_RS()
+    return cS[n - 1]
+
+# tests
+print([ ff_R(i) for i in range(1, 11) ])
+
+arr = [0]*1001
+for i in range(40, 0, -1):
+    arr[ff_R(i)] += 1
+for i in range(960, 0, -1):
+    arr[ff_S(i)] += 1
+if all(a == 1 for a in arr[1:1001]):
+    print("All Integers 1..1000 found OK")
+else:
+    print("All Integers 1..1000 NOT found only once: ERROR")
+===
+V cR = [1]
+V cS = [2]
+
+F extend_RS()
+   V x = :cR[:cR.len - 1] + :cS[:cR.len - 1]
+   :cR.append(x)
+   :cS [+]= :cS.last + 1 .< x
+   :cS.append(x + 1)
+
+F ff_R(n)
+   assert(n > 0)
+   L n > :cR.len
+      extend_RS()
+   R :cR[n - 1]
+
+F ff_S(n)
+   assert(n > 0)
+   L n > :cS.len
+      extend_RS()
+   R :cS[n - 1]
+print((1..10).map(i -> ff_R(i)))
+V arr = [0] * 1001
+L(i) (40.<0).step(-1)
+   arr[ff_R(i)]++
+L(i) (960.<0).step(-1)
+   arr[ff_S(i)]++
+I all(arr[1.<1001].map(a -> a == 1))
+   print(‘All Integers 1..1000 found OK’)
+E
+   print(‘All Integers 1..1000 NOT found only once: ERROR’)
+===
+auto cR = create_array({1});
+auto cS = create_array({2});
+
+auto extend_RS()
+{
+    auto x = ::cR[::cR.len() - 1] + ::cS[::cR.len() - 1];
+    ::cR.append(x);
+    ::cS.append(range_el(::cS.last() + 1, x));
+    ::cS.append(x + 1);
+}
+
+template <typename T1> auto ff_R(const T1 &n)
+{
+    assert(n > 0);
+    while (n > ::cR.len())
+        extend_RS();
+    return ::cR[n - 1];
+}
+
+template <typename T1> auto ff_S(const T1 &n)
+{
+    assert(n > 0);
+    while (n > ::cS.len())
+        extend_RS();
+    return ::cS[n - 1];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(range_ee(1, 10).map([](const auto &i){return ff_R(i);}));
+    }
+} code_block_1;
+auto arr = create_array({0}) * 1001;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto i : range_el(40, 0).step(-1))
+            arr[ff_R(i)]++;
+        for (auto i : range_el(960, 0).step(-1))
+            arr[ff_S(i)]++;
+        if (all(arr[range_el(1, 1001)].map([](const auto &a){return a == 1;})))
+            print(u"All Integers 1..1000 found OK"_S);
+        else
+            print(u"All Integers 1..1000 NOT found only once: ERROR"_S);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Hofstadter_Q_sequence#C
+qseq = [0] * 100001
+qseq[1] = 1
+qseq[2] = 1
+
+for i in range(3, len(qseq)):
+    qseq[i] = qseq[i - qseq[i - 1]] + qseq[i - qseq[i - 2]]
+
+print('The first 10 terms are: ' + ', '.join(str(q) for q in qseq[1:11]))
+print("The 1000'th term is " + str(qseq[1000]))
+
+less_than_preceding = 0
+for i in range(2, len(qseq)):
+    if qseq[i] < qseq[i-1]:
+        less_than_preceding += 1
+print('Times a member of the sequence is less than its preceding term: ' + str(less_than_preceding))
+===
+V qseq = [0] * 100001
+qseq[1] = 1
+qseq[2] = 1
+
+L(i) 3 .< qseq.len
+   qseq[i] = qseq[i - qseq[i - 1]] + qseq[i - qseq[i - 2]]
+print(‘The first 10 terms are: ’qseq[1.<11].map(q -> String(q)).join(‘, ’))
+print(‘The 1000'th term is ’String(qseq[1000]))
+V less_than_preceding = 0
+L(i) 2 .< qseq.len
+   I qseq[i] < qseq[i - 1]
+      less_than_preceding++
+print(‘Times a member of the sequence is less than its preceding term: ’String(less_than_preceding))
+===
+auto qseq = create_array({0}) * 100001;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _set<1>(qseq, 1);
+        _set<2>(qseq, 1);
+        for (auto i : range_el(3, qseq.len()))
+            qseq.set(i, qseq[i - qseq[i - 1]] + qseq[i - qseq[i - 2]]);
+        print(u"The first 10 terms are: "_S + qseq[range_el(1, 11)].map([](const auto &q){return String(q);}).join(u", "_S));
+        print(u"The 1000'th term is "_S + String(_get<1000>(qseq)));
+    }
+} code_block_1;
+auto less_than_preceding = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto i : range_el(2, qseq.len()))
+            if (qseq[i] < qseq[i - 1])
+                less_than_preceding++;
+        print(u"Times a member of the sequence is less than its preceding term: "_S + String(less_than_preceding));
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Hofstadter-Conway_$10,000_sequence#Nim
+last = 1 << 20
+a_list = [0] * (last+1)
+a_list[0] = -50_000
+a_list[1] = 1
+a_list[2] = 1
+
+v    = a_list[2]
+k1   = 2
+lg2  = 1
+amax = 0.0
+
+for n in range(3, last+1):
+    v = a_list[v] + a_list[n-v]
+    a_list[n] = v
+    amax = max(amax, float(v) / n)
+    if (k1 & n) == 0:
+        print("Maximum between 2^%i and 2^%i was %f" % (lg2, lg2+1, amax))
+        amax = 0
+        lg2 += 1
+    k1 = n
+===
+V last = 1 << 20
+V a_list = [0] * (last + 1)
+a_list[0] = -50'000
+a_list[1] = 1
+a_list[2] = 1
+V v = a_list[2]
+V k1 = 2
+V lg2 = 1
+V amax = 0.0
+
+L(n) 3 .< last + 1
+   v = a_list[v] + a_list[n - v]
+   a_list[n] = v
+   amax = max(amax, Float(v) / n)
+   I (k1 [&] n) == 0
+      print(‘Maximum between 2^#. and 2^#. was #.6’.format(lg2, lg2 + 1, amax))
+      amax = 0
+      lg2++
+   k1 = n
+===
+auto last = 1 << 20;
+auto a_list = create_array({0}) * (last + 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _set<0>(a_list, -50'000);
+        _set<1>(a_list, 1);
+        _set<2>(a_list, 1);
+    }
+} code_block_1;
+auto v = _get<2>(a_list);
+auto k1 = 2;
+auto lg2 = 1;
+auto amax = 0.0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+
+        for (auto n : range_el(3, last + 1)) {
+            v = a_list[v] + a_list[n - v];
+            a_list.set(n, v);
+            amax = max(amax, to_float(v) / n);
+            if ((k1 & n) == 0) {
+                print(u"Maximum between 2^#. and 2^#. was #.6"_S.format(lg2, lg2 + 1, amax));
+                amax = 0;
+                lg2++;
+            }
+            k1 = n;
+        }
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Horner%27s_rule_for_polynomial_evaluation#Python
+def horner(coeffs, x):
+    acc = 0
+    for c in reversed(coeffs):
+        acc = acc * x + c
+    return acc
+
+print(horner([-19, 7, -4, 6], 3))
+===
+F horner(coeffs, x)
+   V acc = 0
+   L(c) reversed(coeffs)
+      acc = acc * x + c
+   R acc
+print(horner([-19, 7, -4, 6], 3))
+===
+template <typename T1, typename T2> auto horner(const T1 &coeffs, const T2 &x)
+{
+    auto acc = 0;
+    for (auto &&c : reversed(coeffs))
+        acc = acc * x + c;
+    return acc;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(horner(create_array({-19, 7, -4, 6}), 3));
+    }
+} code_block_1;
