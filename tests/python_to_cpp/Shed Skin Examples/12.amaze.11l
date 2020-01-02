@@ -47,7 +47,7 @@ T MazeReader
       L(x) 0 .< h
          V row = ‘’
          L row == ‘’
-            row = input(‘Enter row number #.0: ’.format(x + 1))
+            row = input(‘Enter row number #.: ’.format(x + 1))
          V rowsplit = row.split_py().map(y -> Int(y))
          I rowsplit.len != w
             X MazeReaderException(‘invalid size of maze row’)
@@ -428,5 +428,5 @@ T FilebasedMazeGame(MazeGame)
 
 :start:
 V game = FilebasedMazeGame()
-L(x) 0.<1
+L(x) 1
    game.runGame()

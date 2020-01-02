@@ -21,7 +21,7 @@ template <typename T1> auto wrappedPath(const T1 &path)
 template <typename T1, typename T2> auto pathLength(const T1 &cities, const T2 &path)
 {
     auto pairs = zip(path, wrappedPath(path));
-    return sum(pairs.map2([&cities](const auto &r, const auto &c){return cities[r][c];}));
+    return sum_map(pairs, [&cities](const auto &r, const auto &c){return cities[r][c];});
 }
 
 template <typename T2, typename T3> auto updatePher(Array<Array<double>> &pher, const T2 &path, const T3 &boost)

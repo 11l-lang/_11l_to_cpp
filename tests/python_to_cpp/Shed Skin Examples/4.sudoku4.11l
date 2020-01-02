@@ -70,7 +70,7 @@ F parse_grid(=grid) -> Dict[String, String]
 F solve_file(filename, sep, action)
    ‘Parse a file into a sequence of 81-char descriptions and solve them.’
    V results = File(filename).read().trim((‘ ’, "\t", "\r", "\n")).split(sep).map(grid -> @action(search(parse_grid(grid))))
-   print(‘## Got #.0 out of #.0’.format(sum(results.map(r -> (I !r.empty {1} E 0))), results.len))
+   print(‘## Got #. out of #.’.format(sum(results.map(r -> (I !r.empty {1} E 0))), results.len))
    R results
 
 F printboard(values)

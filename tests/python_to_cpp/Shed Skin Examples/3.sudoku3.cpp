@@ -1,20 +1,20 @@
 ﻿#include "C:\!!BITBUCKET\11l-lang\_11l_to_cpp\11l.hpp"
 
 auto TRIPLETS = create_array({create_array({0, 1, 2}), create_array({3, 4, 5}), create_array({6, 7, 8})});
-auto ROW_ITER = range_el(0, 9).map([](const auto &row){return range_el(0, 9).map([&row](const auto &col){return make_tuple(row, col);});});
-auto COL_ITER = range_el(0, 9).map([](const auto &col){return range_el(0, 9).map([&col](const auto &row){return make_tuple(row, col);});});
+auto ROW_ITER = range_ee(0, 8).map([](const auto &row){return range_ee(0, 8).map([&row](const auto &col){return make_tuple(row, col);});});
+auto COL_ITER = range_ee(0, 8).map([](const auto &col){return range_ee(0, 8).map([&col](const auto &row){return make_tuple(row, col);});});
 auto TxT_ITER = multiloop(TRIPLETS, TRIPLETS, [](const auto &rows, const auto &cols){return multiloop(rows, cols, [](const auto &row, const auto &col){return make_tuple(row, col);});});
 
 class soduko
 {
 public:
-    Array<Array<Array<int>>> squares = range_el(0, 9).map([](const auto &row){return range_el(0, 9).map([](const auto &col){return create_array(range_el(1, 10));});});
+    Array<Array<Array<int>>> squares = range_ee(0, 8).map([](const auto &row){return range_ee(0, 8).map([](const auto &col){return create_array(range_ee(1, 9));});});
     decltype(false) _changed = false;
     template <typename T1> soduko(const T1 &start_grid)
     {
         if (!start_grid.empty()) {
             assert(start_grid.len() == 9, u"Bad input!"_S);
-            for (auto row : range_el(0, 9))
+            for (auto row : range_ee(0, 8))
                 set_row(row, start_grid[row]);
         }
     }
@@ -23,8 +23,8 @@ public:
     {
         Array<String> e;
         auto soduko_copy = soduko(e);
-        for (auto row : range_el(0, 9))
-            for (auto col : range_el(0, 9))
+        for (auto row : range_ee(0, 8))
+            for (auto col : range_ee(0, 8))
                 soduko_copy.squares[row].set(col, ::copy(squares[row][col]));
         soduko_copy._changed = false;
         return soduko_copy;
@@ -33,7 +33,7 @@ public:
     template <typename T1, typename T2> auto set_row(const T1 &row, const T2 &x_list)
     {
         assert(x_list.len() == 9, u"not 9"_S);
-        for (auto col : range_el(0, 9)) {
+        for (auto col : range_ee(0, 8)) {
             int x;
             try
             {
@@ -86,10 +86,10 @@ public:
 
     template <typename T1, typename T2, typename T3> void update_neighbours(const T1 &set_row, const T2 &set_col, const T3 &x)
     {
-        for (auto row : range_el(0, 9))
+        for (auto row : range_ee(0, 8))
             if (row != set_row)
                 cell_exclude(row, set_col, x);
-        for (auto col : range_el(0, 9))
+        for (auto col : range_ee(0, 8))
             if (col != set_col)
                 cell_exclude(set_row, col, x);
         Array<int> rows;
@@ -120,8 +120,8 @@ public:
     operator String() const
     {
         auto answer = u"   123   456   789\n"_S;
-        for (auto row : range_el(0, 9)) {
-            answer = answer + String(row + 1) + u" ["_S + (range_el(0, 3).map([&row, this](const auto &col){return get_cell_digit_str(row, col).replace(u"0"_S, u"?"_S);})).join(u""_S) + u"] ["_S + (range_el(3, 6).map([&row, this](const auto &col){return get_cell_digit_str(row, col).replace(u"0"_S, u"?"_S);})).join(u""_S) + u"] ["_S + (range_el(6, 9).map([&row, this](const auto &col){return get_cell_digit_str(row, col).replace(u"0"_S, u"?"_S);})).join(u""_S) + u"]\n"_S;
+        for (auto row : range_ee(0, 8)) {
+            answer = answer + String(row + 1) + u" ["_S + (range_ee(0, 2).map([&row, this](const auto &col){return get_cell_digit_str(row, col).replace(u"0"_S, u"?"_S);})).join(u""_S) + u"] ["_S + (range_ee(3, 5).map([&row, this](const auto &col){return get_cell_digit_str(row, col).replace(u"0"_S, u"?"_S);})).join(u""_S) + u"] ["_S + (range_ee(6, 8).map([&row, this](const auto &col){return get_cell_digit_str(row, col).replace(u"0"_S, u"?"_S);})).join(u""_S) + u"]\n"_S;
             if (in(row + 1, create_array({3, 6})))
                 answer = answer + u"   ---   ---   ---\n"_S;
         }
@@ -188,8 +188,8 @@ public:
         auto progress = true;
         while (progress == true) {
             progress = false;
-            for (auto row : range_el(0, 9))
-                for (auto col : range_el(0, 9))
+            for (auto row : range_ee(0, 8))
+                for (auto col : range_ee(0, 8))
                     if (squares[row][col].len() > 1) {
                         Array<int> bad_x;
                         for (auto &&x : squares[row][col]) {
@@ -224,7 +224,7 @@ public:
 
 int main()
 {
-    for (auto x : range_el(0, 50)) {
+    for (int x = 0; x < 50; x++) {
         auto t = soduko(create_array({u"800000600"_S, u"040500100"_S, u"070090000"_S, u"030020007"_S, u"600008004"_S, u"500000090"_S, u"000030020"_S, u"001006050"_S, u"004000003"_S}));
         t.check();
         t.one_level_supposition();

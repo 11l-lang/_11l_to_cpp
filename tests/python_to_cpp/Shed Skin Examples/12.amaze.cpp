@@ -63,7 +63,7 @@ public:
         for (auto x : range_el(0, h)) {
             auto row = u""_S;
             while (row == u"")
-                row = input(u"Enter row number #.0: "_S.format(x + 1));
+                row = input(u"Enter row number #.: "_S.format(x + 1));
             auto rowsplit = row.split_py().map([](const auto &y){return to_int(y);});
             if (rowsplit.len() != w)
                 throw MazeReaderException(u"invalid size of maze row"_S);
@@ -572,6 +572,6 @@ public:
 int main()
 {
     auto game = std::make_unique<FilebasedMazeGame>();
-    for (auto x : range_el(0, 1))
+    for (int x = 0; x < 1; x++)
         std::move(game)->runGame();
 }

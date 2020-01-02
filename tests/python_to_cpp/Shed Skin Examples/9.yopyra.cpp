@@ -106,7 +106,7 @@ public:
 
     operator String() const
     {
-        return u"#.0 #.0 #.0"_S.format(to_int(max(0.0, min(r * 255.0, 255.0))), to_int(max(0.0, min(g * 255.0, 255.0))), to_int(max(0.0, min(b * 255.0, 255.0))));
+        return u"#. #. #."_S.format(to_int(max(0.0, min(r * 255.0, 255.0))), to_int(max(0.0, min(g * 255.0, 255.0))), to_int(max(0.0, min(b * 255.0, 255.0))));
     }
 };
 
@@ -485,7 +485,7 @@ int main()
     fileout.write(u"P3\n"_S);
     fileout.write(String(scene.imgAncho) + u" "_S + String(scene.endline - scene.startline + 1) + u"\n"_S);
     fileout.write(u"255\n"_S);
-    print(u"Line (from #.0 to #.0):"_S.format(scene.startline, scene.endline), u" "_S);
+    print(u"Line (from #. to #.):"_S.format(scene.startline, scene.endline), u" "_S);
     for (auto y : range_el(scene.startline, scene.endline + 1)) {
         for (auto x : range_el(0, scene.imgAncho))
             fileout.write(String(renderPixel(x, y)) + u" "_S);

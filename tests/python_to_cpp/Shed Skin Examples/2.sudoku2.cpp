@@ -42,8 +42,8 @@ public:
     auto __hash__()
     {
         auto rep = u""_S;
-        for (auto i : range_el(0, 9))
-            for (auto j : range_el(0, 9))
+        for (int i = 0; i < 9; i++)
+            for (int j = 0; j < 9; j++)
                 rep += String(__fields[i][j]);
         return calc_hash_of_str(rep);
     }
@@ -81,8 +81,8 @@ public:
             filename = input(u"filename: "_S);
         auto f = File(filename, u"r"_S);
         auto lines = f.read_lines(true);
-        for (auto row : range_el(0, 9))
-            for (auto digit : range_el(1, 10)) {
+        for (int row = 0; row < 9; row++)
+            for (auto digit : range_ee(1, 9)) {
                 try
                 {
                     setval(row, lines[row].index(String(digit)), digit);
@@ -113,10 +113,10 @@ public:
     auto to_str() const
     {
         auto ret = u""_S;
-        for (auto row : range_el(0, 9)) {
+        for (int row = 0; row < 9; row++) {
             if (row == 3 || row == 6)
                 ret += (((3 * u"---"_S) + u"+"_S) * 3)[range_e_llen(0,  - 1)] + u"\n"_S;
-            for (auto col : range_el(0, 9)) {
+            for (int col = 0; col < 9; col++) {
                 if (col == 3 || col == 6)
                     ret += u"|"_S;
                 ret += u" "_S + (final[row][col] != 0 ? String(final[row][col]) : u" "_S) + u" "_S;
@@ -192,8 +192,8 @@ public:
     auto clone() const
     {
         auto ret = board();
-        for (auto row : range_el(0, 9))
-            for (auto col : range_el(0, 9))
+        for (int row = 0; row < 9; row++)
+            for (int col = 0; col < 9; col++)
                 if (final[row][col])
                     ret.setval(row, col, final[row][col]);
         return ret;
@@ -207,8 +207,8 @@ public:
     auto findmincounts() const
     {
         Array<ivec3> masks;
-        for (auto row : range_el(0, 9))
-            for (auto col : range_el(0, 9))
+        for (int row = 0; row < 9; row++)
+            for (int col = 0; col < 9; col++)
                 if (final[row][col] == 0) {
                     auto numallowed = mergemask(row, col).cnt();
                     masks.append(make_tuple(numallowed, row, col));

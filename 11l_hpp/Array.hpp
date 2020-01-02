@@ -28,7 +28,7 @@ template <typename> struct is_tuple_or_vec : std::false_type {};
 template <typename ...T> struct is_tuple_or_vec<std::tuple<T...>> : std::true_type {};
 template <typename Ty, int N> struct is_tuple_or_vec<Tvec<Ty, N>> : std::true_type {};
 template <typename Type, size_t i, typename = std::enable_if_t< is_tuple_or_vec<Type>::value>> std::tuple_element_t<(i < std::tuple_size<Type>::value ? i : 0), Type> tuple_element_f();
-template <typename Type, size_t i, typename = std::enable_if_t<!is_tuple_or_vec<Type>::value>> Type tuple_element_f();
+template <typename Type, size_t i, typename = std::enable_if_t<!is_tuple_or_vec<Type>::value>> void tuple_element_f();
 
 template <typename Type> class Array : public std::vector<Type>
 {

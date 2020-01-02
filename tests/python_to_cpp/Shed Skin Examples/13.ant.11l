@@ -15,7 +15,7 @@ F wrappedPath(path)
 
 F pathLength(cities, path)
    V pairs = zip(path, wrappedPath(path))
-   R sum(pairs.map2((r, c) -> @cities[r][c]))
+   R sum(pairs.map((r, c) -> @cities[r][c]))
 
 F updatePher([[Float]] &pher; path, boost)
    V pairs = zip(path, wrappedPath(path))

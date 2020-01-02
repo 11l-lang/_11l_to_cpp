@@ -27,8 +27,8 @@ T BoardRep
 
    F __hash__()
       V rep = ‘’
-      L(i) 0.<9
-         L(j) 0.<9
+      L(i) 9
+         L(j) 9
             rep ‘’= String(.__fields[i][j])
       R calc_hash_of_str(rep)
    F <(other)
@@ -59,8 +59,8 @@ T board
          filename = input(‘filename: ’)
       V f = File(filename, ‘r’)
       V lines = f.read_lines(1B)
-      L(row) 0.<9
-         L(digit) 1.<10
+      L(row) 9
+         L(digit) 1..9
             X.try
                .setval(row, lines[row].index(String(digit)), digit)
             X.catch ValueError
@@ -82,10 +82,10 @@ T board
 
    F.const to_str()
       V ret = ‘’
-      L(row) 0.<9
+      L(row) 9
          I row == 3 | row == 6
             ret ‘’= (((3 * ‘---’)‘+’) * 3)[0 .< (len)-1]"\n"
-         L(col) 0.<9
+         L(col) 9
             I col == 3 | col == 6
                ret ‘’= ‘|’
             ret ‘’= ‘ ’(I .final[row][col] != 0 {String(.final[row][col])} E ‘ ’)‘ ’
@@ -144,8 +144,8 @@ T board
 
    F.const clone()
       V ret = board()
-      L(row) 0.<9
-         L(col) 0.<9
+      L(row) 9
+         L(col) 9
             I .final[row][col]
                ret.setval(row, col, .final[row][col])
       R ret
@@ -155,8 +155,8 @@ T board
 
    F.const findmincounts()
       [(Int, Int, Int)] masks
-      L(row) 0.<9
-         L(col) 0.<9
+      L(row) 9
+         L(col) 9
             I .final[row][col] == 0
                V numallowed = .mergemask(row, col).cnt()
                masks.append((numallowed, row, col))

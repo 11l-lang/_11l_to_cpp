@@ -52,7 +52,7 @@ T Color
       R Color(.r * other, .g * other, .b * other)
 
    F String()
-      R ‘#.0 #.0 #.0’.format(Int(max(0.0, min(.r * 255.0, 255.0))), Int(max(0.0, min(.g * 255.0, 255.0))), Int(max(0.0, min(.b * 255.0, 255.0))))
+      R ‘#. #. #.’.format(Int(max(0.0, min(.r * 255.0, 255.0))), Int(max(0.0, min(.g * 255.0, 255.0))), Int(max(0.0, min(.b * 255.0, 255.0))))
 
 T Luz
    Vector posicion
@@ -352,7 +352,7 @@ V fileout = File(scene_namefile‘.ppm’, ‘w’)
 fileout.write("P3\n")
 fileout.write(String(scene.imgAncho)‘ ’String(scene.endline - scene.startline + 1)"\n")
 fileout.write("255\n")
-print(‘Line (from #.0 to #.0):’.format(scene.startline, scene.endline), end' ‘ ’)
+print(‘Line (from #. to #.):’.format(scene.startline, scene.endline), end' ‘ ’)
 L(y) scene.startline .< scene.endline + 1
    L(x) 0 .< scene.imgAncho
       fileout.write(String(renderPixel(x, y))‘ ’)

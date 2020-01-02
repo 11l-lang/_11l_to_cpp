@@ -81,7 +81,7 @@ public:
     Graph()
     {
         Array<Vertex> v;
-        for (auto n : range_el(0, 100))
+        for (int n = 0; n < 100; n++)
             v.append(Vertex(String(n + 1)));
         Array<Edge> e;
         for (auto n : range_el(0, 10 * v.len())) {
@@ -181,7 +181,7 @@ template <typename T1, typename T2, typename T3> auto dijkstra(const T1 &g, cons
 
 int main()
 {
-    for (auto n : range_el(0, 100)) {
+    for (int n = 0; n < 100; n++) {
         G = Graph();
         auto si = randint(G.v.len());
         auto s = G.v[si];

@@ -5,7 +5,7 @@ V setup = [4, 2, 3, 5, 6, 3, 2, 4, iNone, iNone] [+] [iTrue] * 4 [+] [iNone, iNo
 V squares = (0.<128).filter(i -> !(i [&] 8))
 V knightMoves = [-33, -31, -18, -14, 14, 18, 31, 33]
 V bishopLines = [Array((17.<120).step(17)), Array((-17 .< -120).step(-17)), Array((15.<106).step(15)), Array((-15 .< -106).step(-15))]
-V rookLines = [Array(1.<8), Array((-1 .< -8).step(-1)), Array((16.<128).step(16)), Array((-16 .< -128).step(-16))]
+V rookLines = [Array(1..7), Array((-1 .< -8).step(-1)), Array((16.<128).step(16)), Array((-16 .< -128).step(-16))]
 V queenLines = bishopLines [+] rookLines
 V kingMoves = (-17, -16, -15, -1, 1, 15, 16, 17)
 [Int] empty_list
@@ -24,7 +24,7 @@ F evaluate(board)
 
 F printBoard(board)
    L(i) (7 .< -1).step(-1)
-      L(j) 0.<8
+      L(j) 8
          V ix = i * 16 + j
          print(:pieces[board[ix]], end' ‘ ’)
       print()

@@ -210,7 +210,7 @@ F hq2x(xres, yres, rgb)
          V pattern = 0
          V flag = 1
          V YUV1 = RGBtoYUV[w[5]]
-         L(k) 1.<10
+         L(k) 1..9
             I k == 5
                L.continue
             I w[k] != w[5]
@@ -219,7 +219,7 @@ F hq2x(xres, yres, rgb)
                   pattern [|]= flag
             flag <<= 1
 
-         L(k) 1.<10
+         L(k) 1..9
             c[k] = LUT16to32[w[k]]
 
          I pattern == 0 | pattern == 1 | pattern == 4 | pattern == 32 | pattern == 128 | pattern == 5 | pattern == 132 | pattern == 160 | pattern == 33 | pattern == 129 | pattern == 36 | pattern == 133 | pattern == 164 | pattern == 161 | pattern == 37 | pattern == 165
@@ -1584,12 +1584,12 @@ F hq2x(xres, yres, rgb)
 
 F init_LUTs()
 
-   L(i) 0.<65536
+   L(i) 65536
       LUT16to32[i] = ((i [&] F8'00) << 8) [|] ((i [&] 07'E0) << 5) [|] ((i [&] 00'1F) << 3)
 
-   L(i) 0.<32
-      L(j) 0.<64
-         L(k) 0.<32
+   L(i) 32
+      L(j) 64
+         L(k) 32
             V r = i << 3
             V g = j << 2
             V b = k << 3
@@ -1603,6 +1603,6 @@ init_LUTs()
 print(‘scaling randam.ppm to randam2.ppm (100 times)..’)
 V ppm = loadPPM(‘testdata/randam.ppm’)
 [Int] rgb
-L(i) 0.<100
+L(i) 100
    rgb = hq2x(ppm.w, ppm.h, ppm.rgb)
 PPM(2 * ppm.w, 2 * ppm.h, rgb).save(‘testdata/randam2.ppm’)

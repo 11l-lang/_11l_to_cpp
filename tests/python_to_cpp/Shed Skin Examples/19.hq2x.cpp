@@ -336,7 +336,7 @@ template <typename T1, typename T2, typename T3> auto hq2x(const T1 &xres, const
             auto pattern = 0;
             auto flag = 1;
             auto YUV1 = RGBtoYUV[_get<5>(w)];
-            for (auto k : range_el(1, 10)) {
+            for (auto k : range_ee(1, 9)) {
                 if (k == 5)
                     continue;
                 if (w[k] != _get<5>(w)) {
@@ -346,7 +346,7 @@ template <typename T1, typename T2, typename T3> auto hq2x(const T1 &xres, const
                 }
                 flag <<= 1;
             }
-            for (auto k : range_el(1, 10))
+            for (auto k : range_ee(1, 9))
                 c.set(k, LUT16to32[w[k]]);
 
             if (pattern == 0 || pattern == 1 || pattern == 4 || pattern == 32 || pattern == 128 || pattern == 5 || pattern == 132 || pattern == 160 || pattern == 33 || pattern == 129 || pattern == 36 || pattern == 133 || pattern == 164 || pattern == 161 || pattern == 37 || pattern == 165) {
@@ -1923,11 +1923,11 @@ template <typename T1, typename T2, typename T3> auto hq2x(const T1 &xres, const
 
 auto init_LUTs()
 {
-    for (auto i : range_el(0, 65536))
+    for (int i = 0; i < 65536; i++)
         LUT16to32.set(i, ((i & 0xF8'00) << 8) | ((i & 0x07'E0) << 5) | ((i & 0x00'1F) << 3));
-    for (auto i : range_el(0, 32))
-        for (auto j : range_el(0, 64))
-            for (auto k : range_el(0, 32)) {
+    for (int i = 0; i < 32; i++)
+        for (int j = 0; j < 64; j++)
+            for (int k = 0; k < 32; k++) {
                 auto r = i << 3;
                 auto g = j << 2;
                 auto b = k << 3;
@@ -1944,7 +1944,7 @@ int main()
     print(u"scaling randam.ppm to randam2.ppm (100 times).."_S);
     auto ppm = loadPPM(u"testdata/randam.ppm"_S);
     Array<int> rgb;
-    for (auto i : range_el(0, 100))
+    for (int i = 0; i < 100; i++)
         rgb = hq2x(ppm.w, ppm.h, ppm.rgb);
     PPM(2 * ppm.w, 2 * ppm.h, rgb).save(u"testdata/randam2.ppm"_S);
 }

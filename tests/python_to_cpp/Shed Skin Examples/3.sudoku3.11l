@@ -1,30 +1,30 @@
 V TRIPLETS = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
-V ROW_ITER = (0.<9).map(row -> (0.<9).map(col -> (@row, col)))
-V COL_ITER = (0.<9).map(col -> (0.<9).map(row -> (row, @col)))
+V ROW_ITER = (0..8).map(row -> (0..8).map(col -> (@row, col)))
+V COL_ITER = (0..8).map(col -> (0..8).map(row -> (row, @col)))
 V TxT_ITER = multiloop(TRIPLETS, TRIPLETS, (rows, cols) -> multiloop(rows, cols, (row, col) -> (row, col)))
 
 T soduko
-   [[[Int]]] squares = (0.<9).map(row -> (0.<9).map(col -> Array(1.<10)))
+   [[[Int]]] squares = (0..8).map(row -> (0..8).map(col -> Array(1..9)))
    _changed = 0B
    F (start_grid)
 
       I !start_grid.empty
          assert(start_grid.len == 9, ‘Bad input!’)
-         L(row) 0.<9
+         L(row) 0..8
             .set_row(row, start_grid[row])
 
    F copy()
       [String] e
       V soduko_copy = soduko(e)
-      L(row) 0.<9
-         L(col) 0.<9
+      L(row) 0..8
+         L(col) 0..8
             soduko_copy.squares[row][col] = copy(.squares[row][col])
       soduko_copy._changed = 0B
       R soduko_copy
 
    F set_row(row, x_list)
       assert(x_list.len == 9, ‘not 9’)
-      L(col) 0.<9
+      L(col) 0..8
          Int x
          X.try
             x = Int(x_list[col])
@@ -36,7 +36,7 @@ T soduko
       I .squares[row][col] == [x]
       {
       }
-      E I x !C (1 .< 9 + 1)
+      E I x !C 1 .< 9 + 1
       {
       }
       E
@@ -50,7 +50,7 @@ T soduko
    }
 
    F cell_exclude(row, col, x)
-      assert(x C (1 .< 9 + 1), ‘inra’)
+      assert(x C 1 .< 9 + 1, ‘inra’)
       I x C .squares[row][col]
          .squares[row][col].remove(x)
          I .squares[row][col].empty
@@ -64,10 +64,10 @@ T soduko
       R
 
    F update_neighbours(set_row, set_col, x) -> N
-      L(row) 0.<9
+      L(row) 0..8
          I row != set_row
             .cell_exclude(row, set_col, x)
-      L(col) 0.<9
+      L(col) 0..8
          I col != set_col
             .cell_exclude(set_row, col, x)
       [Int] rows
@@ -92,8 +92,8 @@ T soduko
 
    F String()
       V answer = "   123   456   789\n"
-      L(row) 0.<9
-         answer = answer‘’String(row + 1)‘ [’((0.<3).map(col -> @.get_cell_digit_str(@row, col).replace(‘0’, ‘?’))).join(‘’)‘] [’((3.<6).map(col -> @.get_cell_digit_str(@row, col).replace(‘0’, ‘?’))).join(‘’)‘] [’((6.<9).map(col -> @.get_cell_digit_str(@row, col).replace(‘0’, ‘?’))).join(‘’)"]\n"
+      L(row) 0..8
+         answer = answer‘’String(row + 1)‘ [’((0..2).map(col -> @.get_cell_digit_str(@row, col).replace(‘0’, ‘?’))).join(‘’)‘] [’((3..5).map(col -> @.get_cell_digit_str(@row, col).replace(‘0’, ‘?’))).join(‘’)‘] [’((6..8).map(col -> @.get_cell_digit_str(@row, col).replace(‘0’, ‘?’))).join(‘’)"]\n"
          I row + 1 C [3, 6]
             answer = answer"   ---   ---   ---\n"
       R answer
@@ -145,8 +145,8 @@ T soduko
       V progress = 1B
       L progress == 1B
          progress = 0B
-         L(row) 0.<9
-            L(col) 0.<9
+         L(row) 0..8
+            L(col) 0..8
                I .squares[row][col].len > 1
                   [Int] bad_x
                   L(x) .squares[row][col]
@@ -169,7 +169,7 @@ T soduko
                      assert(0B, ‘bugger7’)
 
 :start:
-L(x) 0.<50
+L(x) 50
    V t = soduko([‘800000600’, ‘040500100’, ‘070090000’, ‘030020007’, ‘600008004’, ‘500000090’, ‘000030020’, ‘001006050’, ‘004000003’])
    t.check()
    t.one_level_supposition()

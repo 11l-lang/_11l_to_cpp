@@ -8,18 +8,18 @@ template <typename T1, typename T2, typename T3, typename T4> auto validMove(con
     if (puzzle[x][y] != 0)
         blnOK = false;
     if (blnOK) {
-        for (auto i : range_el(0, 9))
+        for (int i = 0; i < 9; i++)
             if (puzzle[i][y] == number)
                 blnOK = false;
     }
     if (blnOK) {
-        for (auto j : range_el(0, 9))
+        for (int j = 0; j < 9; j++)
             if (puzzle[x][j] == number)
                 blnOK = false;
     }
     if (blnOK) {
-        for (auto i : range_el(0, 3))
-            for (auto j : range_el(0, 3))
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
                 if (puzzle[px * 3 + i][py * 3 + j] == number)
                     blnOK = false;
     }
@@ -29,7 +29,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto validMove(con
 template <typename T1, typename T2, typename T3> auto findallMoves(const T1 &puzzle, const T2 &x, const T3 &y)
 {
     Array<int> returnList;
-    for (auto n : range_el(1, 10))
+    for (auto n : range_ee(1, 9))
         if (validMove(puzzle, x, y, n))
             returnList.append(n);
     return returnList;
@@ -38,8 +38,8 @@ template <typename T1, typename T2, typename T3> auto findallMoves(const T1 &puz
 auto solvePuzzleStep(Array<Array<int>> &puzzle)
 {
     auto isChanged = false;
-    for (auto y : range_el(0, 9))
-        for (auto x : range_el(0, 9))
+    for (int y = 0; y < 9; y++)
+        for (int x = 0; x < 9; x++)
             if (puzzle[x][y] == 0) {
                 auto allMoves = findallMoves(puzzle, x, y);
                 if (allMoves.len() == 1) {
@@ -69,7 +69,7 @@ template <typename T1> auto calc_hash_of_list(const T1 &l)
 template <typename T1> auto calc_hash(const T1 &puzzle)
 {
     auto hashcode = 0;
-    for (auto c : range_el(0, 9))
+    for (int c = 0; c < 9; c++)
         hashcode = hashcode * 17 + calc_hash_of_list(puzzle[c]);
     return hashcode;
 }
@@ -87,9 +87,9 @@ auto iterations = 0;
 
 template <typename T1> auto printpuzzle(const T1 &puzzle)
 {
-    for (auto x : range_el(0, 9)) {
+    for (int x = 0; x < 9; x++) {
         auto s = u" "_S;
-        for (auto y : range_el(0, 9)) {
+        for (int y = 0; y < 9; y++) {
             switch (puzzle[x][y])
             {
             case 0:
@@ -107,9 +107,9 @@ template <typename T1> auto printpuzzle(const T1 &puzzle)
 
 template <typename T1, typename T2, typename T3> auto genMoveList(const T1 &puzzle, const T2 &i, const T3 &j)
 {
-    auto l = create_array(range_el(1, 10));
-    for (auto y : range_el(0, 3))
-        for (auto x : range_el(0, 3)) {
+    auto l = create_array(range_ee(1, 9));
+    for (int y = 0; y < 3; y++)
+        for (int x = 0; x < 3; x++) {
             auto p = puzzle[i * 3 + x][j * 3 + y];
             if (p != 0)
                 l.remove(p);
@@ -129,7 +129,7 @@ template <typename T2, typename T3, typename T4> auto perm(Array<Array<int>> &pu
     else
         if (l.empty()) {
             Array<Array<int>> puzzlebackup;
-            for (auto c : range_el(0, 9))
+            for (int c = 0; c < 9; c++)
                 puzzlebackup.append(puzzle[c][range_ei(0)]);
             solvePuzzleSimple(puzzle);
             for (auto c : range_el(0, u.len()))
@@ -144,8 +144,8 @@ template <typename T2, typename T3, typename T4> auto perm(Array<Array<int>> &pu
                         hash_add(puzzle);
                     u.insert(c, make_tuple(inew, jnew));
                 }
-            for (auto y : range_el(0, 9))
-                for (auto x : range_el(0, 9))
+            for (int y = 0; y < 9; y++)
+                for (int x = 0; x < 9; x++)
                     puzzle[x].set(y, puzzlebackup[x][y]);
             hash_add(puzzle);
             return false;
@@ -154,8 +154,8 @@ template <typename T2, typename T3, typename T4> auto perm(Array<Array<int>> &pu
             auto ii = i * 3;
             auto jj = j * 3;
             for (auto m : range_el(0, l.len()))
-                for (auto y : range_el(0, 3))
-                    for (auto x : range_el(0, 3))
+                for (int y = 0; y < 3; y++)
+                    for (int x = 0; x < 3; x++)
                         if (validMove(puzzle, x + ii, y + jj, l[m])) {
                             puzzle[x + ii].set(y + jj, l[m]);
                             auto backup = l.pop(m);
@@ -175,12 +175,12 @@ auto solve()
     auto puzzle = create_array({create_array({0, 9, 3, 0, 8, 0, 4, 0, 0}), create_array({0, 4, 0, 0, 3, 0, 0, 0, 0}), create_array({6, 0, 0, 0, 0, 9, 2, 0, 5}), create_array({3, 0, 0, 0, 0, 0, 0, 9, 0}), create_array({0, 2, 7, 0, 0, 0, 5, 1, 0}), create_array({0, 8, 0, 0, 0, 0, 0, 0, 4}), create_array({7, 0, 1, 6, 0, 0, 0, 0, 2}), create_array({0, 0, 0, 0, 7, 0, 0, 6, 0}), create_array({0, 0, 4, 0, 1, 0, 8, 5, 0})});
     Array<ivec2> u;
     Array<int> lcount;
-    for (auto y : range_el(0, 3))
-        for (auto x : range_el(0, 3)) {
+    for (int y = 0; y < 3; y++)
+        for (int x = 0; x < 3; x++) {
             u.append(make_tuple(x, y));
             lcount.append(genMoveList(puzzle, x, y).len());
         }
-    for (auto j : range_el(0, 9))
+    for (auto j : range_ee(0, 8))
         for (auto i : range_el(j, 9))
             if (i != j) {
                 if (lcount[i] < lcount[j]) {
@@ -196,7 +196,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto x : range_el(0, 30))
+        for (int x = 0; x < 30; x++)
             solve();
     }
 } code_block_1;

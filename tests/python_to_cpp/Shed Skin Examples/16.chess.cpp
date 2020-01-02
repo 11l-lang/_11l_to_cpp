@@ -7,7 +7,7 @@ auto setup = create_array({4, 2, 3, 5, 6, 3, 2, 4, iNone, iNone}) + create_array
 auto squares = range_el(0, 128).filter([](const auto &i){return !(i & 8);});
 auto knightMoves = create_array({-33, -31, -18, -14, 14, 18, 31, 33});
 auto bishopLines = create_array({create_array(range_el(17, 120).step(17)), create_array(range_el(-17, -120).step(-17)), create_array(range_el(15, 106).step(15)), create_array(range_el(-15, -106).step(-15))});
-auto rookLines = create_array({create_array(range_el(1, 8)), create_array(range_el(-1, -8).step(-1)), create_array(range_el(16, 128).step(16)), create_array(range_el(-16, -128).step(-16))});
+auto rookLines = create_array({create_array(range_ee(1, 7)), create_array(range_el(-1, -8).step(-1)), create_array(range_el(16, 128).step(16)), create_array(range_el(-16, -128).step(-16))});
 auto queenLines = bishopLines + rookLines;
 auto kingMoves = make_tuple(-17, -16, -15, -1, 1, 15, 16, 17);
 Array<int> empty_list;
@@ -38,7 +38,7 @@ template <typename T1> auto evaluate(const T1 &board)
 template <typename T1> auto printBoard(const T1 &board)
 {
     for (auto i : range_el(7, -1).step(-1)) {
-        for (auto j : range_el(0, 8)) {
+        for (int j = 0; j < 8; j++) {
             auto ix = i * 16 + j;
             print(::pieces[board[ix]], u" "_S);
         }
