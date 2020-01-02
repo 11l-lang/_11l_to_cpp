@@ -3730,7 +3730,7 @@ for x in [[1, 2, 3], [0, 1, 2, 3], [1, 0, 3, 4], [1, 2, 0], [0, 0, 0], [0], [1, 
     print(linear(x))
 ===
 F linear(x)
-   V a = enumerate(x).filter2((i, v) -> v != 0).map2((i, v) -> ‘#.e(#.)’.format(I v == -1 {‘-’} E I v == 1 {‘’} E String(v)‘*’, i + 1))
+   V a = enumerate(x).filter((i, v) -> v != 0).map((i, v) -> ‘#.e(#.)’.format(I v == -1 {‘-’} E I v == 1 {‘’} E String(v)‘*’, i + 1))
    R (I !a.empty {a} E [String(‘0’)]).join(‘ + ’).replace(‘ + -’, ‘ - ’)
 
 L(x) [[1, 2, 3], [0, 1, 2, 3], [1, 0, 3, 4], [1, 2, 0], [0, 0, 0], [0], [1, 1, 1], [-1, -1, -1], [-1, -2, 0, 3], [-1]]
@@ -3738,7 +3738,7 @@ L(x) [[1, 2, 3], [0, 1, 2, 3], [1, 0, 3, 4], [1, 2, 0], [0, 0, 0], [0], [1, 1, 1
 ===
 template <typename T1> auto linear(const T1 &x)
 {
-    auto a = enumerate(x).filter2([](const auto &i, const auto &v){return v != 0;}).map2([](const auto &i, const auto &v){return u"#.e(#.)"_S.format(v == -1 ? u"-"_S : v == 1 ? u""_S : String(v) + u"*"_S, i + 1);});
+    auto a = enumerate(x).filter([](const auto &i, const auto &v){return v != 0;}).map([](const auto &i, const auto &v){return u"#.e(#.)"_S.format(v == -1 ? u"-"_S : v == 1 ? u""_S : String(v) + u"*"_S, i + 1);});
     return (!a.empty() ? a : create_array({String(u"0"_S)})).join(u" + "_S).replace(u" + -"_S, u" - "_S);
 }
 
@@ -4669,7 +4669,7 @@ F fasta_parse(instr)
    I key != ‘’
       r.append((key, val))
    R r
-print(fasta_parse(instr).map2((key, val) -> key‘: ’val).join("\n"))
+print(fasta_parse(instr).map((key, val) -> key‘: ’val).join("\n"))
 ===
 auto instr = uR"(>Rosetta_Example_1
 THERECANBENOSPACE
@@ -4700,7 +4700,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(fasta_parse(instr).map2([](const auto &key, const auto &val){return key + u": "_S + val;}).join(u"\n"_S));
+        print(fasta_parse(instr).map([](const auto &key, const auto &val){return key + u": "_S + val;}).join(u"\n"_S));
     }
 } code_block_1;
 
@@ -5564,7 +5564,7 @@ F floyd(rowcount)
 F pfloyd(rows)
    V colspace = rows.last.map(n -> String(n).len)
    L(row) rows
-      print(zip(colspace, row).map2((space, n) -> String(n).rjust(space)).join(‘ ’))
+      print(zip(colspace, row).map((space, n) -> String(n).rjust(space)).join(‘ ’))
 pfloyd(floyd(5))
 pfloyd(floyd(14))
 ===
@@ -5582,7 +5582,7 @@ template <typename T1> auto pfloyd(const T1 &rows)
 {
     auto colspace = rows.last().map([](const auto &n){return String(n).len();});
     for (auto &&row : rows)
-        print(zip(colspace, row).map2([](const auto &space, const auto &n){return String(n).rjust(space);}).join(u" "_S));
+        print(zip(colspace, row).map([](const auto &space, const auto &n){return String(n).rjust(space);}).join(u" "_S));
 }
 
 struct CodeBlock1
@@ -5710,14 +5710,14 @@ s = [90, 47, 58, 29, 22, 32, 55, 5, 55, 73]
 for i in range(10):
     print(difn(s, i))
 ===
-V dif = s -> enumerate(s[1..]).map2((i, x) -> x - @s[i])
+V dif = s -> enumerate(s[1..]).map((i, x) -> x - @s[i])
 F difn(s, n) -> [Int]
    R I n != 0 {difn(dif(s), n - 1)} E s
 V s = [90, 47, 58, 29, 22, 32, 55, 5, 55, 73]
 L(i) 10
    print(difn(s, i))
 ===
-auto dif = [](const auto &s){return enumerate(s[range_ei(1)]).map2([&s](const auto &i, const auto &x){return x - s[i];});};
+auto dif = [](const auto &s){return enumerate(s[range_ei(1)]).map([&s](const auto &i, const auto &x){return x - s[i];});};
 template <typename T1, typename T2> Array<int> difn(const T1 &s, const T2 &n)
 {
     return n != 0 ? difn(dif(s), n - 1) : s;
@@ -5735,9 +5735,9 @@ struct CodeBlock1
 
 
 # https://www.rosettacode.org/wiki/Four_bit_adder#Python
-def xor(a, b): return (a and not b) or (b and not a)
+def xor_(a, b): return (a and not b) or (b and not a)
 
-def ha(a, b): return (xor(a, b), a and b)     # sum, carry
+def ha(a, b): return (xor_(a, b), a and b)     # sum, carry
 
 def fa(a, b, ci):
     (s0, c0) = ha(ci, a)
@@ -5770,11 +5770,11 @@ for a in range(2**width):
         tot[width] = tlast
         assert a + b == bus2int(tot), "totals don't match: %i + %i != %s" % (a, b, str(tot))
 ===
-F xor(a, b)
+F xor_(a, b)
    R (a & !b) | (b & !a)
 
 F ha(a, b)
-   R (xor(a, b), a & b)
+   R (xor_(a, b), a & b)
 
 F fa(a, b, ci)
    V (s0, c0) = ha(ci, a)
@@ -5794,7 +5794,7 @@ F int2bus(n, width = 4)
    R reversed(bin(n).zfill(width)).map(c -> Int(c))
 
 F bus2int(b)
-   R sum(enumerate(b).filter2((i, bit) -> bit).map2((i, bit) -> 1 << i))
+   R sum(enumerate(b).filter((i, bit) -> bit).map((i, bit) -> 1 << i))
 V width = 4
 V tot = [0B] * (width + 1)
 L(a) 0 .< 2 ^ width
@@ -5806,14 +5806,14 @@ L(a) 0 .< 2 ^ width
       tot[width] = tlast
       assert(a + b == bus2int(tot), ‘totals don't match: #. + #. != #.’.format(a, b, String(tot)))
 ===
-template <typename T1, typename T2> auto xor(const T1 &a, const T2 &b)
+template <typename T1, typename T2> auto xor_(const T1 &a, const T2 &b)
 {
     return (a && !b) || (b && !a);
 }
 
 template <typename T1, typename T2> auto ha(const T1 &a, const T2 &b)
 {
-    return make_tuple(xor(a, b), a && b);
+    return make_tuple(xor_(a, b), a && b);
 }
 
 template <typename T1, typename T2, typename T3> auto fa(const T1 &a, const T2 &b, const T3 &ci)
@@ -5841,7 +5841,7 @@ template <typename T1, typename T2 = decltype(4)> auto int2bus(const T1 &n, cons
 
 template <typename T1> auto bus2int(const T1 &b)
 {
-    return sum(enumerate(b).filter2([](const auto &i, const auto &bit){return bit;}).map2([](const auto &i, const auto &bit){return 1 << i;}));
+    return sum_map(enumerate(b).filter([](const auto &i, const auto &bit){return bit;}), [](const auto &i, const auto &bit){return 1 << i;});
 }
 auto width = 4;
 auto tot = create_array({false}) * (width + 1);
@@ -6076,7 +6076,7 @@ F genfizzbuzz(factorwords, numbers)
    V sfactorwords = sorted(factorwords, key' p -> p[0])
    [String] lines
    L(num) numbers
-      V words = sfactorwords.filter2((fact, wrd) -> (@num % fact) == 0).map2((fact, wrd) -> wrd).join(‘’)
+      V words = sfactorwords.filter((fact, wrd) -> (@num % fact) == 0).map((fact, wrd) -> wrd).join(‘’)
       lines.append(I words != ‘’ {words} E String(num))
    R lines.join("\n")
 print(genfizzbuzz([(5, ‘Buzz’), (3, ‘Fizz’), (7, ‘Baxx’)], 1..20))
@@ -6086,7 +6086,7 @@ template <typename T1, typename T2> auto genfizzbuzz(const T1 &factorwords, cons
     auto sfactorwords = sorted(factorwords, [](const auto &p){return _get<0>(p);});
     Array<String> lines;
     for (auto &&num : numbers) {
-        auto words = sfactorwords.filter2([&num](const auto &fact, const auto &wrd){return (mod(num, fact)) == 0;}).map2([](const auto &fact, const auto &wrd){return wrd;}).join(u""_S);
+        auto words = sfactorwords.filter([&num](const auto &fact, const auto &wrd){return (mod(num, fact)) == 0;}).map([](const auto &fact, const auto &wrd){return wrd;}).join(u""_S);
         lines.append(words != u"" ? words : String(num));
     }
     return lines.join(u"\n"_S);
@@ -6669,9 +6669,9 @@ L(x) 1 .< MAXSIDE + 1
 h = sorted(h, key' x -> (hero(x[0], x[1], x[2]), sum(x), (x[2], x[1], x[0])))
 print(‘Primitive Heronian triangles with sides up to #.: #.’.format(MAXSIDE, h.len))
 print("\nFirst ten when ordered by increasing area, then perimeter, then maximum sides:")
-print(h[0.<10].map3((x, y, z) -> ‘  #14 perim: #3 area: #.’.format(String((x, y, z)), x + y + z, hero(x, y, z))).join("\n"))
+print(h[0.<10].map((x, y, z) -> ‘  #14 perim: #3 area: #.’.format(String((x, y, z)), x + y + z, hero(x, y, z))).join("\n"))
 print("\nAll with area 210 subject to the previous ordering:")
-print(h.filter3((x, y, z) -> hero(x, y, z) == 210).map3((x, y, z) -> ‘  #14 perim: #3 area: #.’.format(String((x, y, z)), x + y + z, hero(x, y, z))).join("\n"))
+print(h.filter((x, y, z) -> hero(x, y, z) == 210).map((x, y, z) -> ‘  #14 perim: #3 area: #.’.format(String((x, y, z)), x + y + z, hero(x, y, z))).join("\n"))
 ===
 template <typename T1, typename T2> auto gcd(T1 u, T2 v)
 {
@@ -6712,9 +6712,9 @@ struct CodeBlock1
         h = sorted(h, [](const auto &x){return make_tuple(hero(_get<0>(x), _get<1>(x), _get<2>(x)), sum(x), make_tuple(_get<2>(x), _get<1>(x), _get<0>(x)));});
         print(u"Primitive Heronian triangles with sides up to #.: #."_S.format(MAXSIDE, h.len()));
         print(u"\nFirst ten when ordered by increasing area, then perimeter, then maximum sides:"_S);
-        print(h[range_el(0, 10)].map3([](const auto &x, const auto &y, const auto &z){return u"  #14 perim: #3 area: #."_S.format(String(make_tuple(x, y, z)), x + y + z, hero(x, y, z));}).join(u"\n"_S));
+        print(h[range_el(0, 10)].map([](const auto &x, const auto &y, const auto &z){return u"  #14 perim: #3 area: #."_S.format(String(make_tuple(x, y, z)), x + y + z, hero(x, y, z));}).join(u"\n"_S));
         print(u"\nAll with area 210 subject to the previous ordering:"_S);
-        print(h.filter3([](const auto &x, const auto &y, const auto &z){return hero(x, y, z) == 210;}).map3([](const auto &x, const auto &y, const auto &z){return u"  #14 perim: #3 area: #."_S.format(String(make_tuple(x, y, z)), x + y + z, hero(x, y, z));}).join(u"\n"_S));
+        print(h.filter([](const auto &x, const auto &y, const auto &z){return hero(x, y, z) == 210;}).map([](const auto &x, const auto &y, const auto &z){return u"  #14 perim: #3 area: #."_S.format(String(make_tuple(x, y, z)), x + y + z, hero(x, y, z));}).join(u"\n"_S));
     }
 } code_block_1;
 

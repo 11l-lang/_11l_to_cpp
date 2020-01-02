@@ -2139,19 +2139,43 @@ struct CodeBlock1
 
 
 print([i*i for i in [1, 2, 3] if i != 2])
-print([a+b for a, b in [(1, 2), (2, 3), (3, 4)] if a != 2])
-print([a+b+c for a, b, c in [(1, 2, 3), (2, 3, 4), (3, 4, 5)] if a != 2])
+print([a+b for a, b in [(1, 2  ), (2, 3  ), (3, 4  )] if a != 2])
+print([a+b for a, b in [(1, 2.0), (2, 3.0), (3, 4.0)] if a != 2])
+print([a+b+c for a, b, c in [(1, 2  , 3), (2, 3  , 4), (3, 4  , 5)] if a != 2])
+print([a+b+c for a, b, c in [(1, 2.0, 3), (2, 3.0, 4), (3, 4.0, 5)] if a != 2])
+print(sum(i*i for i in [1, 2, 3]))
+print(sum(i*i for i in [1, 2, 3] if i != 2))
+print(sum(a*b for a, b in [(1, 2  ), (2, 3  ), (3, 4  )]))
+print(sum(a*b for a, b in [(1, 2.0), (2, 3.0), (3, 4.0)]))
+print(sum(a*b*c for a, b, c in [(1, 2  , 3), (2, 3  , 4), (3, 4  , 5)]))
+print(sum(a*b*c for a, b, c in [(1, 2.0, 3), (2, 3.0, 4), (3, 4.0, 5)]))
 ===
 print([1, 2, 3].filter(i -> i != 2).map(i -> i * i))
-print([(1, 2), (2, 3), (3, 4)].filter2((a, b) -> a != 2).map2((a, b) -> a + b))
-print([(1, 2, 3), (2, 3, 4), (3, 4, 5)].filter3((a, b, c) -> a != 2).map3((a, b, c) -> a + b + c))
+print([(1, 2), (2, 3), (3, 4)].filter((a, b) -> a != 2).map((a, b) -> a + b))
+print([(1, 2.0), (2, 3.0), (3, 4.0)].filter((a, b) -> a != 2).map((a, b) -> a + b))
+print([(1, 2, 3), (2, 3, 4), (3, 4, 5)].filter((a, b, c) -> a != 2).map((a, b, c) -> a + b + c))
+print([(1, 2.0, 3), (2, 3.0, 4), (3, 4.0, 5)].filter((a, b, c) -> a != 2).map((a, b, c) -> a + b + c))
+print(sum([1, 2, 3].map(i -> i * i)))
+print(sum([1, 2, 3].filter(i -> i != 2).map(i -> i * i)))
+print(sum([(1, 2), (2, 3), (3, 4)].map((a, b) -> a * b)))
+print(sum([(1, 2.0), (2, 3.0), (3, 4.0)].map((a, b) -> a * b)))
+print(sum([(1, 2, 3), (2, 3, 4), (3, 4, 5)].map((a, b, c) -> a * b * c)))
+print(sum([(1, 2.0, 3), (2, 3.0, 4), (3, 4.0, 5)].map((a, b, c) -> a * b * c)))
 ===
 struct CodeBlock1
 {
     CodeBlock1()
     {
         print(create_array({1, 2, 3}).filter([](const auto &i){return i != 2;}).map([](const auto &i){return i * i;}));
-        print(create_array({make_tuple(1, 2), make_tuple(2, 3), make_tuple(3, 4)}).filter2([](const auto &a, const auto &b){return a != 2;}).map2([](const auto &a, const auto &b){return a + b;}));
-        print(create_array({make_tuple(1, 2, 3), make_tuple(2, 3, 4), make_tuple(3, 4, 5)}).filter3([](const auto &a, const auto &b, const auto &c){return a != 2;}).map3([](const auto &a, const auto &b, const auto &c){return a + b + c;}));
+        print(create_array({make_tuple(1, 2), make_tuple(2, 3), make_tuple(3, 4)}).filter([](const auto &a, const auto &b){return a != 2;}).map([](const auto &a, const auto &b){return a + b;}));
+        print(create_array({make_tuple(1, 2.0), make_tuple(2, 3.0), make_tuple(3, 4.0)}).filter([](const auto &a, const auto &b){return a != 2;}).map([](const auto &a, const auto &b){return a + b;}));
+        print(create_array({make_tuple(1, 2, 3), make_tuple(2, 3, 4), make_tuple(3, 4, 5)}).filter([](const auto &a, const auto &b, const auto &c){return a != 2;}).map([](const auto &a, const auto &b, const auto &c){return a + b + c;}));
+        print(create_array({make_tuple(1, 2.0, 3), make_tuple(2, 3.0, 4), make_tuple(3, 4.0, 5)}).filter([](const auto &a, const auto &b, const auto &c){return a != 2;}).map([](const auto &a, const auto &b, const auto &c){return a + b + c;}));
+        print(sum_map(create_array({1, 2, 3}), [](const auto &i){return i * i;}));
+        print(sum_map(create_array({1, 2, 3}).filter([](const auto &i){return i != 2;}), [](const auto &i){return i * i;}));
+        print(sum_map(create_array({make_tuple(1, 2), make_tuple(2, 3), make_tuple(3, 4)}), [](const auto &a, const auto &b){return a * b;}));
+        print(sum_map(create_array({make_tuple(1, 2.0), make_tuple(2, 3.0), make_tuple(3, 4.0)}), [](const auto &a, const auto &b){return a * b;}));
+        print(sum_map(create_array({make_tuple(1, 2, 3), make_tuple(2, 3, 4), make_tuple(3, 4, 5)}), [](const auto &a, const auto &b, const auto &c){return a * b * c;}));
+        print(sum_map(create_array({make_tuple(1, 2.0, 3), make_tuple(2, 3.0, 4), make_tuple(3, 4.0, 5)}), [](const auto &a, const auto &b, const auto &c){return a * b * c;}));
     }
 } code_block_1;

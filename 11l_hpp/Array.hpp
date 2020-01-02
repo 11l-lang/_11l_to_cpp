@@ -23,6 +23,13 @@ template <typename ValType> int String::index(const ValType &v) const
 	return r;
 }
 
+// [https://stackoverflow.com/a/48458312 <- google:‘c++ is tuple’]
+template <typename> struct is_tuple_or_vec : std::false_type {};
+template <typename ...T> struct is_tuple_or_vec<std::tuple<T...>> : std::true_type {};
+template <typename Ty, int N> struct is_tuple_or_vec<Tvec<Ty, N>> : std::true_type {};
+template <typename Type, size_t i, typename = std::enable_if_t< is_tuple_or_vec<Type>::value>> std::tuple_element_t<(i < std::tuple_size<Type>::value ? i : 0), Type> tuple_element_f();
+template <typename Type, size_t i, typename = std::enable_if_t<!is_tuple_or_vec<Type>::value>> Type tuple_element_f();
+
 template <typename Type> class Array : public std::vector<Type>
 {
 	Array slice(int begin, int end, int step = 1) const
@@ -51,7 +58,7 @@ public:
 
 	operator String() const
 	{
-		String r = u'[';
+		String r(u'[');
 		for (int i=0; i<len(); i++) {
 			r += String(std::vector<Type>::at(i));
 			if (i < len()-1) r += u", ";
@@ -74,8 +81,8 @@ public:
 		return r;
 	}
 
-	//template <typename Func, typename = decltype(std::declval<Func>()(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>()))> auto map(Func &&func) const
-	template <typename Func> auto map2(Func &&func) const
+	template <typename Func, typename = decltype(std::declval<Func>()(std::declval<decltype(tuple_element_f<Type, 0>())>(),
+	                                                                  std::declval<decltype(tuple_element_f<Type, 1>())>()))> auto map(Func &&func) const
 	{
 		Array<decltype(func(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>()))> r;
 		r.reserve(len());
@@ -84,8 +91,9 @@ public:
 		return r;
 	}
 
-	//template <typename Func, typename Dummy = int, typename = decltype(std::declval<Func>()(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>(), std::declval<std::tuple_element_t<2, Type>>()))> auto map(Func &&func) const
-	template <typename Func> auto map3(Func &&func) const
+	template <typename Func, typename Dummy = int, typename = decltype(std::declval<Func>()(std::declval<decltype(tuple_element_f<Type, 0>())>(),
+	                                                                                        std::declval<decltype(tuple_element_f<Type, 1>())>(),
+	                                                                                        std::declval<decltype(tuple_element_f<Type, 2>())>()))> auto map(Func &&func) const
 	{
 		Array<decltype(func(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>(), std::declval<std::tuple_element_t<2, Type>>()))> r;
 		r.reserve(len());
@@ -117,8 +125,8 @@ public:
 		return r;
 	}
 
-	//template <typename Func, typename Dummy = int, typename = decltype(std::declval<Func>()(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>()))> Array filter(Func &&func) const
-	template <typename Func> Array filter2(Func &&func) const
+	template <typename Func, typename Dummy = int, typename = decltype(std::declval<Func>()(std::declval<decltype(tuple_element_f<Type, 0>())>(),
+	                                                                                        std::declval<decltype(tuple_element_f<Type, 1>())>()))> Array filter(Func &&func) const
 	{
 		Array r;
 		for (auto &&el : *this)
@@ -127,8 +135,9 @@ public:
 		return r;
 	}
 
-	//template <typename Func, typename Dummy = int, typename Dummy2 = int, typename = decltype(std::declval<Func>()(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>(), std::declval<std::tuple_element_t<2, Type>>()))> Array filter(Func &&func) const
-	template <typename Func> Array filter3(Func &&func) const
+	template <typename Func, typename Dummy = int, typename Dummy2 = int, typename = decltype(std::declval<Func>()(std::declval<decltype(tuple_element_f<Type, 0>())>(),
+	                                                                                                               std::declval<decltype(tuple_element_f<Type, 1>())>(),
+	                                                                                                               std::declval<decltype(tuple_element_f<Type, 2>())>()))> Array filter(Func &&func) const
 	{
 		Array r;
 		for (auto &&el : *this)
@@ -465,11 +474,30 @@ template <typename Iterable> auto sum(const Iterable &iterable)
 	return r;
 }
 
-template <typename Iterable, typename Func> auto sum_map(const Iterable &iterable, Func &&func)
+template <typename Iterable, typename Func> auto sum_map(const Iterable &iterable, Func &&func)// -> decltype(func(std::declval<decltype(*std::begin(iterable))>()))
 {
 	decltype(func(std::declval<decltype(*std::begin(iterable))>())) r = 0;
 	for (auto &&el : iterable)
 		r += func(el);
+	return r;
+}
+
+template <typename Type, typename Func, typename = decltype(std::declval<Func>()(std::declval<decltype(tuple_element_f<Type, 0>())>(),
+                                                                                 std::declval<decltype(tuple_element_f<Type, 1>())>()))> auto sum_map(const Array<Type> &arr, Func &&func)
+{
+	decltype(func(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>())) r = 0;
+	for (auto &&el : arr)
+		r += func(_get<0>(el), _get<1>(el));
+	return r;
+}
+
+template <typename Type, typename Func, typename Dummy = int, typename = decltype(std::declval<Func>()(std::declval<decltype(tuple_element_f<Type, 0>())>(),
+                                                                                                       std::declval<decltype(tuple_element_f<Type, 1>())>(),
+                                                                                                       std::declval<decltype(tuple_element_f<Type, 2>())>()))> auto sum_map(const Array<Type> &arr, Func &&func)
+{
+	decltype(func(std::declval<std::tuple_element_t<0, Type>>(), std::declval<std::tuple_element_t<1, Type>>(), std::declval<std::tuple_element_t<2, Type>>())) r = 0;
+	for (auto &&el : arr)
+		r += func(_get<0>(el), _get<1>(el), _get<2>(el));
 	return r;
 }
 
