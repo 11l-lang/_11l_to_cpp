@@ -568,36 +568,7 @@ public:
 	}
 
 private:
-	struct FormatArgument//Field
-	{
-		enum class Type {STRING, INTEGER, FLOAT} type;
-		union {
-			const String *string;
-			double f;
-			int64_t i;
-		};
-
-		void set(int n)
-		{
-			type = Type::INTEGER;
-			i = n;
-		}
-		void set(int64_t n)
-		{
-			type = Type::INTEGER;
-			i = n;
-		}
-		void set(double n)
-		{
-			type = Type::FLOAT;
-			f = n;
-		}
-		void set(const String &s)
-		{
-			type = Type::STRING;
-			string = &s;
-		}
-	};
+	struct FormatArgument;//Field
 
 	template <size_t size> static void fill_in_format_arguments(std::array<FormatArgument, size> &arr_args, int index)
 	{
@@ -611,82 +582,127 @@ private:
 		fill_in_format_arguments(arr_args, index + 1, args...);
 	}
 public:
-	template <typename ... Types> String format(const Types&... args) const
+	template <typename ... Types> String format(const Types&... args) const;
+};
+
+struct String::FormatArgument//Field
+{
+	enum class Type {STRING, INTEGER, FLOAT} type;
+	union {
+		const String *string;
+		double f;
+		int64_t i;
+	};
+	String s;
+
+	void set(int n)
 	{
-		std::array<FormatArgument, sizeof...(args)> format_arguments;
-		fill_in_format_arguments(format_arguments, 0, args...);
-
-		int argument_index = 0;
-		String r;
-		const char16_t *s = data();
-		for (int i=0; i<len();)
-			if (s[i] == '#' && (s[i+1] == '.' || s[i+1] == '<' || Char(s[i+1]).is_digit())) {
-				int before_period = 0,
-				     after_period = 0;
-				bool left_align = false,
-				     there_are_digits_after_period = false,
-					 zero_padding = false;
-				i++;
-				if (s[i] == '<') {
-					left_align = true;
-					i++;
-				}
-				if (s[i] == '0')
-					zero_padding = true;
-				if (s[i] == '.' && !Char(s[i+1]).is_digit()) // #.
-					i++;
-				else {
-					//if (Char(s[i]).is_digit())
-						for (; Char(s[i]).is_digit(); i++)
-							before_period = before_period*10 + (s[i] - '0');
-					if (s[i] == '.' && Char(s[i+1]).is_digit()) { // the second condition is needed for a such case: `x, y: #6, #6.`
-						there_are_digits_after_period = true;
-						for (i++; Char(s[i]).is_digit(); i++)
-							after_period = after_period*10 + (s[i] - '0');
-					}
-				}
-
-				FormatArgument fa = format_arguments[argument_index++];
-				if (fa.type == FormatArgument::Type::STRING) {
-					if (there_are_digits_after_period)
-						throw AssertionError();
-					if (left_align)
-						r += *fa.string;
-					r.resize(r.size() + max(before_period - fa.string->len(), 0), ' ');
-					if (!left_align)
-						r += *fa.string;
-				}
-				else {
-					if (before_period == 0 && after_period == 0 && !there_are_digits_after_period) // #.
-						r += fa.type == FormatArgument::Type::INTEGER ? String(fa.i) : String(fa.f);
-					else {
-						String s; // (
-						if (!there_are_digits_after_period) // && fract(fa.number) != 0)
-							fa.type == FormatArgument::Type::INTEGER ? s.assign(fa.i) : s.assign(fa.f);
-						else if (fa.type == FormatArgument::Type::INTEGER) {
-							if (after_period != 0)
-								throw AssertionError();
-							s.assign(fa.i);
-						}
-						else
-							s.assign(fa.f, after_period, false);
-						if (left_align)
-							r += s;
-						r.resize(r.size() + max(after_period + bool(after_period) + before_period - s.len(), 0), zero_padding ? '0' : ' ');
-						if (!left_align)
-							r += s;
-					}
-				}
-			}
-			else
-				r += s[i++];
-
-		if (argument_index != sizeof...(args))
-			throw AssertionError();
-
-		return r;
+		type = Type::INTEGER;
+		i = n;
+	}
+	void set(int64_t n)
+	{
+		type = Type::INTEGER;
+		i = n;
+	}
+	void set(float n)
+	{
+		type = Type::FLOAT;
+		f = n;
+	}
+	void set(double n)
+	{
+		type = Type::FLOAT;
+		f = n;
+	}
+	void set(const String &s)
+	{
+		type = Type::STRING;
+		string = &s;
+	}
+	template <typename Ty> void set(const Ty &v)
+	{
+		type = Type::STRING;
+		s = String(v);
+		string = &s;
 	}
 };
+
+template <typename ... Types> String String::format(const Types&... args) const
+{
+	std::array<FormatArgument, sizeof...(args)> format_arguments;
+	fill_in_format_arguments(format_arguments, 0, args...);
+
+	int argument_index = 0;
+	String r;
+	const char16_t *s = data();
+	for (int i=0; i<len();)
+		if (s[i] == '#' && (s[i+1] == '.' || s[i+1] == '<' || Char(s[i+1]).is_digit())) {
+			int before_period = 0,
+			     after_period = 0;
+			bool left_align = false,
+			     there_are_digits_after_period = false,
+			     zero_padding = false;
+			i++;
+			if (s[i] == '<') {
+				left_align = true;
+				i++;
+			}
+			if (s[i] == '0')
+				zero_padding = true;
+			if (s[i] == '.' && !Char(s[i+1]).is_digit()) // #.
+				i++;
+			else {
+				//if (Char(s[i]).is_digit())
+					for (; Char(s[i]).is_digit(); i++)
+						before_period = before_period*10 + (s[i] - '0');
+				if (s[i] == '.' && Char(s[i+1]).is_digit()) { // the second condition is needed for a such case: `x, y: #6, #6.`
+					there_are_digits_after_period = true;
+					for (i++; Char(s[i]).is_digit(); i++)
+						after_period = after_period*10 + (s[i] - '0');
+				}
+			}
+
+			FormatArgument fa = format_arguments[argument_index++];
+			if (fa.type == FormatArgument::Type::STRING) {
+				if (there_are_digits_after_period)
+					throw AssertionError();
+				if (left_align)
+					r += *fa.string;
+				r.resize(r.size() + max(before_period - fa.string->len(), 0), ' ');
+				if (!left_align)
+					r += *fa.string;
+			}
+			else {
+				if (before_period == 0 && after_period == 0 && !there_are_digits_after_period) // #.
+					r += fa.type == FormatArgument::Type::INTEGER ? String(fa.i) : String(fa.f);
+				else {
+					String s; // (
+					if (!there_are_digits_after_period) // && fract(fa.number) != 0)
+						fa.type == FormatArgument::Type::INTEGER ? s.assign(fa.i) : s.assign(fa.f);
+					else if (fa.type == FormatArgument::Type::INTEGER) {
+						if (after_period != 0)
+							throw AssertionError();
+						s.assign(fa.i);
+					}
+					else
+						s.assign(fa.f, after_period, false);
+					if (left_align)
+						r += s;
+					r.resize(r.size() + max(after_period + bool(after_period) + before_period - s.len(), 0), zero_padding ? '0' : ' ');
+					if (!left_align)
+						r += s;
+				}
+			}
+		}
+		else
+			r += s[i++];
+
+	if (argument_index != sizeof...(args))
+		throw AssertionError();
+
+	return r;
+}
 
 inline String operator+(Char ch1, Char ch2)
 {

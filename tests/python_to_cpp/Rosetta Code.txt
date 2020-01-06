@@ -5768,7 +5768,7 @@ for a in range(2**width):
         for i in range(width):
             tot[i] = ta[i]
         tot[width] = tlast
-        assert a + b == bus2int(tot), "totals don't match: %i + %i != %s" % (a, b, str(tot))
+        assert a + b == bus2int(tot), "totals don't match: %i + %i != %s" % (a, b, tot)
 ===
 F xor_(a, b)
    R (a & !b) | (b & !a)
@@ -5804,7 +5804,7 @@ L(a) 0 .< 2 ^ width
       L(i) 0 .< width
          tot[i] = ta[i]
       tot[width] = tlast
-      assert(a + b == bus2int(tot), ‘totals don't match: #. + #. != #.’.format(a, b, String(tot)))
+      assert(a + b == bus2int(tot), ‘totals don't match: #. + #. != #.’.format(a, b, tot))
 ===
 template <typename T1, typename T2> auto xor_(const T1 &a, const T2 &b)
 {
@@ -5856,7 +5856,7 @@ struct CodeBlock1
                 for (auto i : range_el(0, width))
                     tot.set(i, ta[i]);
                 tot.set(width, tlast);
-                assert(a + b == bus2int(tot), u"totals don't match: #. + #. != #."_S.format(a, b, String(tot)));
+                assert(a + b == bus2int(tot), u"totals don't match: #. + #. != #."_S.format(a, b, tot));
             }
     }
 } code_block_1;
@@ -6635,10 +6635,10 @@ print(
 )
 print('\nFirst ten when ordered by increasing area, then perimeter, then maximum sides:')
 print('\n'.join('  %14s perim: %3i area: %i'
-                % (str((x, y, z)), x + y + z, hero(x, y, z)) for x, y, z in h[:10]))
+                % ((x, y, z), x + y + z, hero(x, y, z)) for x, y, z in h[:10]))
 print('\nAll with area 210 subject to the previous ordering:')
 print('\n'.join('  %14s perim: %3i area: %i'
-                % (str((x, y, z)), x + y + z, hero(x, y, z)) for x, y, z in h
+                % ((x, y, z), x + y + z, hero(x, y, z)) for x, y, z in h
                 if hero(x, y, z) == 210))
 ===
 //import math
@@ -6669,9 +6669,9 @@ L(x) 1 .< MAXSIDE + 1
 h = sorted(h, key' x -> (hero(x[0], x[1], x[2]), sum(x), (x[2], x[1], x[0])))
 print(‘Primitive Heronian triangles with sides up to #.: #.’.format(MAXSIDE, h.len))
 print("\nFirst ten when ordered by increasing area, then perimeter, then maximum sides:")
-print(h[0.<10].map((x, y, z) -> ‘  #14 perim: #3 area: #.’.format(String((x, y, z)), x + y + z, hero(x, y, z))).join("\n"))
+print(h[0.<10].map((x, y, z) -> ‘  #14 perim: #3 area: #.’.format((x, y, z), x + y + z, hero(x, y, z))).join("\n"))
 print("\nAll with area 210 subject to the previous ordering:")
-print(h.filter((x, y, z) -> hero(x, y, z) == 210).map((x, y, z) -> ‘  #14 perim: #3 area: #.’.format(String((x, y, z)), x + y + z, hero(x, y, z))).join("\n"))
+print(h.filter((x, y, z) -> hero(x, y, z) == 210).map((x, y, z) -> ‘  #14 perim: #3 area: #.’.format((x, y, z), x + y + z, hero(x, y, z))).join("\n"))
 ===
 template <typename T1, typename T2> auto gcd(T1 u, T2 v)
 {
@@ -6712,9 +6712,9 @@ struct CodeBlock1
         h = sorted(h, [](const auto &x){return make_tuple(hero(_get<0>(x), _get<1>(x), _get<2>(x)), sum(x), make_tuple(_get<2>(x), _get<1>(x), _get<0>(x)));});
         print(u"Primitive Heronian triangles with sides up to #.: #."_S.format(MAXSIDE, h.len()));
         print(u"\nFirst ten when ordered by increasing area, then perimeter, then maximum sides:"_S);
-        print(h[range_el(0, 10)].map([](const auto &x, const auto &y, const auto &z){return u"  #14 perim: #3 area: #."_S.format(String(make_tuple(x, y, z)), x + y + z, hero(x, y, z));}).join(u"\n"_S));
+        print(h[range_el(0, 10)].map([](const auto &x, const auto &y, const auto &z){return u"  #14 perim: #3 area: #."_S.format(make_tuple(x, y, z), x + y + z, hero(x, y, z));}).join(u"\n"_S));
         print(u"\nAll with area 210 subject to the previous ordering:"_S);
-        print(h.filter([](const auto &x, const auto &y, const auto &z){return hero(x, y, z) == 210;}).map([](const auto &x, const auto &y, const auto &z){return u"  #14 perim: #3 area: #."_S.format(String(make_tuple(x, y, z)), x + y + z, hero(x, y, z));}).join(u"\n"_S));
+        print(h.filter([](const auto &x, const auto &y, const auto &z){return hero(x, y, z) == 210;}).map([](const auto &x, const auto &y, const auto &z){return u"  #14 perim: #3 area: #."_S.format(make_tuple(x, y, z), x + y + z, hero(x, y, z));}).join(u"\n"_S));
     }
 } code_block_1;
 
@@ -7041,5 +7041,277 @@ struct CodeBlock1
     CodeBlock1()
     {
         print(horner(create_array({-19, 7, -4, 6}), 3));
+    }
+} code_block_1;
+
+
+# SKIPPY (takes too much time)
+# https://www.rosettacode.org/wiki/Humble_numbers#C.2B.2B
+import collections
+
+def is_humble(i):
+    if i <= 1: return True
+    if i % 2 == 0: return is_humble(i // 2)
+    if i % 3 == 0: return is_humble(i // 3)
+    if i % 5 == 0: return is_humble(i // 5)
+    if i % 7 == 0: return is_humble(i // 7)
+    return False
+
+humble = collections.defaultdict(int) # int
+limit = 0x7FFF
+count = 0
+num = 1
+
+while count < limit:
+    if is_humble(num):
+        humble[len(str(num))] += 1
+        if count < 50:
+            print(num, end = ' ')
+        count += 1
+    num += 1
+
+print()
+print()
+print('Of the first ' + str(count) + ' humble numbers:')
+
+for num in range(1, len(humble) - 1):
+    if num not in humble:
+        break
+    print("%5d have %d digits" % (humble[num], num))
+===
+//import collections
+
+F is_humble(i)
+   I i <= 1
+      R 1B
+   I i % 2 == 0
+      R is_humble(i I/ 2)
+   I i % 3 == 0
+      R is_humble(i I/ 3)
+   I i % 5 == 0
+      R is_humble(i I/ 5)
+   I i % 7 == 0
+      R is_humble(i I/ 7)
+   R 0B
+V humble = DefaultDict[Int, Int]()
+V limit = 7F'FF
+V count = 0
+V num = 1
+
+L count < limit
+   I is_humble(num)
+      humble[String(num).len]++
+      I count < 50
+         print(num, end' ‘ ’)
+      count++
+   num++
+print()
+print()
+print(‘Of the first ’String(count)‘ humble numbers:’)
+
+L(num) 1 .< humble.len - 1
+   I num !C humble
+      L.break
+   print(‘#5 have #. digits’.format(humble[num], num))
+===
+template <typename T1> auto is_humble(const T1 &i)
+{
+    if (i <= 1)
+        return true;
+    if (mod(i, 2) == 0)
+        return is_humble(idiv(i, 2));
+    if (mod(i, 3) == 0)
+        return is_humble(idiv(i, 3));
+    if (mod(i, 5) == 0)
+        return is_humble(idiv(i, 5));
+    if (mod(i, 7) == 0)
+        return is_humble(idiv(i, 7));
+    return false;
+}
+auto humble = DefaultDict<int, int>();
+auto limit = 0x7F'FF;
+auto count = 0;
+auto num = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        while (count < limit) {
+            if (is_humble(num)) {
+                humble[String(num).len()]++;
+                if (count < 50)
+                    print(num, u" "_S);
+                count++;
+            }
+            num++;
+        }
+        print();
+        print();
+        print(u"Of the first "_S + String(count) + u" humble numbers:"_S);
+
+        for (auto num : range_el(1, humble.len() - 1)) {
+            if (!in(num, humble))
+                break;
+            print(u"#5 have #. digits"_S.format(humble[num], num));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Identity_matrix#Python
+def identity_matrix(size):
+    matrix = [[0]*size for i in range(size)]
+    #matrix = [[0] * size] * size    #Has a flaw. See http://stackoverflow.com/questions/240178/unexpected-feature-in-a-python-list-of-lists
+
+    for i in range(size):
+        matrix[i][i] = 1
+
+    return matrix
+
+for row in identity_matrix(3):
+    print(row)
+===
+F identity_matrix(size)
+   V matrix = (0 .< size).map(i -> [0] * @size)
+
+   L(i) 0 .< size
+      matrix[i][i] = 1
+   R matrix
+
+L(row) identity_matrix(3)
+   print(row)
+===
+template <typename T1> auto identity_matrix(const T1 &size)
+{
+    auto matrix = range_el(0, size).map([&size](const auto &i){return create_array({0}) * size;});
+    for (auto i : range_el(0, size))
+        matrix[i].set(i, 1);
+    return matrix;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&row : identity_matrix(3))
+            print(row);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/IBAN#Python
+import re
+
+def mod97(numberstring):
+    segstart = 0
+    step = 9
+    prepended = ''
+    number = 0
+    while segstart < len(numberstring) - step:
+        number = int(prepended + numberstring[segstart:segstart+step])
+        remainder = number % 97
+        prepended =  str(remainder)
+        if remainder < 10:
+            prepended = "0" + prepended
+        segstart += step
+        step = 7
+    number = int(prepended + numberstring[segstart:])
+    return number % 97
+
+country2length = {'IS': 26, 'IT': 27, 'MT': 31, 'MU': 30, 'MR': 27, 'MK': 19, 'IE': 22, 'MD': 24,
+                  'ME': 22, 'MC': 27, 'IL': 23, 'DE': 22, 'DO': 28, 'DK': 18, 'PK': 24, 'HR': 21,
+                  'HU': 28, 'FI': 18, 'LU': 20, 'LT': 20, 'LV': 21, 'KW': 30, 'LI': 21, 'PS': 29,
+                  'PT': 25, 'LB': 28, 'GB': 22, 'GE': 22, 'CR': 21, 'TR': 26, 'GI': 23, 'GL': 18,
+                  'CY': 28, 'CZ': 24, 'GR': 27, 'GT': 28, 'KZ': 20, 'TN': 24, 'CH': 21, 'SE': 24,
+                  'SA': 24, 'SM': 27, 'SI': 19, 'SK': 24, 'PL': 28, 'BR': 29, 'FR': 27, 'FO': 18,
+                  'BA': 20, 'BG': 22, 'BE': 16, 'BH': 22, 'VG': 24, 'RO': 24, 'RS': 22, 'NO': 15,
+                  'NL': 18, 'AZ': 28, 'EE': 20, 'AT': 20, 'ES': 24, 'AL': 28, 'AD': 24, 'AE': 23}
+
+def valid_iban(iban_):
+    # Ensure upper alphanumeric input.
+    iban = iban_.replace(' ','').replace('\t','')
+    if not re.match(r'[\dA-Z]+$', iban):
+        return False
+    # Validate country code against expected length.
+    if len(iban) != country2length[iban[:2]]:
+        return False
+    # Shift and convert.
+    iban = iban[4:] + '' + iban[:4]
+    return mod97(''.join(str(int(ch, 36)) for ch in iban)) == 1 #BASE 36: 0..9,A..Z -> 0..35
+
+for account in ["GB82 WEST 1234 5698 7654 32", "GB82 TEST 1234 5698 7654 32"]:
+    print('%s validation is: %s' % (account, valid_iban(account)))
+===
+//import re
+
+F mod97(numberstring)
+   V segstart = 0
+   V step = 9
+   V prepended = ‘’
+   V number = 0
+   L segstart < numberstring.len - step
+      number = Int(prepended‘’numberstring[segstart .< segstart + step])
+      V remainder = number % 97
+      prepended = String(remainder)
+      I remainder < 10
+         prepended = ‘0’prepended
+      segstart += step
+      step = 7
+   number = Int(prepended‘’numberstring[segstart ..])
+   R number % 97
+V country2length = [‘IS’ = 26, ‘IT’ = 27, ‘MT’ = 31, ‘MU’ = 30, ‘MR’ = 27, ‘MK’ = 19, ‘IE’ = 22, ‘MD’ = 24, ‘ME’ = 22, ‘MC’ = 27, ‘IL’ = 23, ‘DE’ = 22, ‘DO’ = 28, ‘DK’ = 18, ‘PK’ = 24, ‘HR’ = 21, ‘HU’ = 28, ‘FI’ = 18, ‘LU’ = 20, ‘LT’ = 20, ‘LV’ = 21, ‘KW’ = 30, ‘LI’ = 21, ‘PS’ = 29, ‘PT’ = 25, ‘LB’ = 28, ‘GB’ = 22, ‘GE’ = 22, ‘CR’ = 21, ‘TR’ = 26, ‘GI’ = 23, ‘GL’ = 18, ‘CY’ = 28, ‘CZ’ = 24, ‘GR’ = 27, ‘GT’ = 28, ‘KZ’ = 20, ‘TN’ = 24, ‘CH’ = 21, ‘SE’ = 24, ‘SA’ = 24, ‘SM’ = 27, ‘SI’ = 19, ‘SK’ = 24, ‘PL’ = 28, ‘BR’ = 29, ‘FR’ = 27, ‘FO’ = 18, ‘BA’ = 20, ‘BG’ = 22, ‘BE’ = 16, ‘BH’ = 22, ‘VG’ = 24, ‘RO’ = 24, ‘RS’ = 22, ‘NO’ = 15, ‘NL’ = 18, ‘AZ’ = 28, ‘EE’ = 20, ‘AT’ = 20, ‘ES’ = 24, ‘AL’ = 28, ‘AD’ = 24, ‘AE’ = 23]
+
+F valid_iban(iban_)
+   V iban = iban_.replace(‘ ’, ‘’).replace("\t", ‘’)
+   I !re:‘[\dA-Z]+’.match(iban)
+      R 0B
+
+   I iban.len != :country2length[iban[0.<2]]
+      R 0B
+   iban = iban[4..]‘’iban[0.<4]
+   R mod97(iban.map(ch -> String(Int(ch, 36))).join(‘’)) == 1
+
+L(account) [‘GB82 WEST 1234 5698 7654 32’, ‘GB82 TEST 1234 5698 7654 32’]
+   print(‘#. validation is: #.’.format(account, valid_iban(account)))
+===
+template <typename T1> auto mod97(const T1 &numberstring)
+{
+    auto segstart = 0;
+    auto step = 9;
+    auto prepended = u""_S;
+    auto number = 0;
+    while (segstart < numberstring.len() - step) {
+        number = to_int(prepended + numberstring[range_el(segstart, segstart + step)]);
+        auto remainder = mod(number, 97);
+        prepended = String(remainder);
+        if (remainder < 10)
+            prepended = u"0"_S + prepended;
+        segstart += step;
+        step = 7;
+    }
+    number = to_int(prepended + numberstring[range_ei(segstart)]);
+    return mod(number, 97);
+}
+auto country2length = create_dict(dict_of(u"IS"_S, 26)(u"IT"_S, 27)(u"MT"_S, 31)(u"MU"_S, 30)(u"MR"_S, 27)(u"MK"_S, 19)(u"IE"_S, 22)(u"MD"_S, 24)(u"ME"_S, 22)(u"MC"_S, 27)(u"IL"_S, 23)(u"DE"_S, 22)(u"DO"_S, 28)(u"DK"_S, 18)(u"PK"_S, 24)(u"HR"_S, 21)(u"HU"_S, 28)(u"FI"_S, 18)(u"LU"_S, 20)(u"LT"_S, 20)(u"LV"_S, 21)(u"KW"_S, 30)(u"LI"_S, 21)(u"PS"_S, 29)(u"PT"_S, 25)(u"LB"_S, 28)(u"GB"_S, 22)(u"GE"_S, 22)(u"CR"_S, 21)(u"TR"_S, 26)(u"GI"_S, 23)(u"GL"_S, 18)(u"CY"_S, 28)(u"CZ"_S, 24)(u"GR"_S, 27)(u"GT"_S, 28)(u"KZ"_S, 20)(u"TN"_S, 24)(u"CH"_S, 21)(u"SE"_S, 24)(u"SA"_S, 24)(u"SM"_S, 27)(u"SI"_S, 19)(u"SK"_S, 24)(u"PL"_S, 28)(u"BR"_S, 29)(u"FR"_S, 27)(u"FO"_S, 18)(u"BA"_S, 20)(u"BG"_S, 22)(u"BE"_S, 16)(u"BH"_S, 22)(u"VG"_S, 24)(u"RO"_S, 24)(u"RS"_S, 22)(u"NO"_S, 15)(u"NL"_S, 18)(u"AZ"_S, 28)(u"EE"_S, 20)(u"AT"_S, 20)(u"ES"_S, 24)(u"AL"_S, 28)(u"AD"_S, 24)(u"AE"_S, 23));
+
+template <typename T1> auto valid_iban(const T1 &iban_)
+{
+    auto iban = iban_.replace(u" "_S, u""_S).replace(u"\t"_S, u""_S);
+    if (!re::_(uR"([\dA-Z]+)"_S).match(iban))
+        return false;
+    if (iban.len() != ::country2length[iban[range_el(0, 2)]])
+        return false;
+    iban = iban[range_ei(4)] + iban[range_el(0, 4)];
+    return mod97(iban.map([](const auto &ch){return String(to_int(ch, 36));}).join(u""_S)) == 1;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&account : create_array({u"GB82 WEST 1234 5698 7654 32"_S, u"GB82 TEST 1234 5698 7654 32"_S}))
+            print(u"#. validation is: #."_S.format(account, valid_iban(account)));
     }
 } code_block_1;
