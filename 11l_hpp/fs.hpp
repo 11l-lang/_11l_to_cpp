@@ -18,7 +18,7 @@ inline Array<String> list_dir(const String &path = u".")
 	return r;
 }
 
-#if _MSC_VER // `disable_recursion_pending()` is broken[‘after its call `recursion_pending()` is always false’] in MSVC 2017 under std::filesystem, but works correctly under std::experimental::filesystem
+#if defined(_MSC_VER) && _MSC_VER < 1920 // `disable_recursion_pending()` is broken[‘after its call `recursion_pending()` is always false’] in MSVC 2017 under std::filesystem, but works correctly under std::experimental::filesystem
 namespace std_filesystem = std::experimental::filesystem;
 #else
 namespace std_filesystem = std::filesystem;
