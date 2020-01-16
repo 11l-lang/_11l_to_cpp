@@ -1315,7 +1315,7 @@ def expression(rbp = 0):
     while rbp < token_node.symbol.lbp:
         t = move(token_node)
         advance()
-        left = t.symbol.led(move(t), move(left))
+        left = t.symbol.led(t, move(left))
     return left
 
 def parse(expr_str) -> ASTNode:
@@ -1434,7 +1434,7 @@ F expression(rbp = 0)
    L rbp < :token_node.symbol.lbp
       t = move(:token_node)
       advance()
-      left = t.symbol.led(move(t), move(left))
+      left = t.symbol.led(t, move(left))
    R left
 
 F parse(expr_str) -> ASTNode

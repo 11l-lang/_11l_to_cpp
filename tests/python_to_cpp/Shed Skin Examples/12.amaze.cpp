@@ -573,5 +573,5 @@ int main()
 {
     auto game = std::make_unique<FilebasedMazeGame>();
     for (int x = 0; x < 1; x++)
-        std::move(game)->runGame();
+        game->runGame();
 }
