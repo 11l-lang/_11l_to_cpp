@@ -35,16 +35,16 @@ T Node
 V tree = Node(1, Node(2, Node(4, Node(7)), Node(5)), Node(3, Node(6, Node(8), Node(9))))
 print(tree.tree_indent().join("\n"))
 ===
-class Node : public SharedObject
+class Node
 {
 public:
     String value;
-    SharedPtr<Node> left;
-    SharedPtr<Node> right;
+    std::unique_ptr<Node> left;
+    std::unique_ptr<Node> right;
 
-    template <typename T1> Node(const T1 &value, SharedPtr<Node> left = nullptr, SharedPtr<Node> right = nullptr) :
-        left(left),
-        right(right)
+    template <typename T1> Node(const T1 &value, std::unique_ptr<Node> left = nullptr, std::unique_ptr<Node> right = nullptr) :
+        left(std::move(left)),
+        right(std::move(right))
     {
         this->value = String(value);
     }
@@ -55,7 +55,7 @@ public:
         return create_array({u"--"_S + (value)}) + (left != nullptr ? left->tree_indent() : create_array({u"-- (null)"_S})).map([](const auto &a){return u"  |"_S + a;}) + create_array({u"  `"_S + _get<0>(tr)}) + tr[range_ei(1)].map([](const auto &a){return u"   "_S + a;});
     }
 };
-auto tree = make_SharedPtr<Node>(1, make_SharedPtr<Node>(2, make_SharedPtr<Node>(4, make_SharedPtr<Node>(7)), make_SharedPtr<Node>(5)), make_SharedPtr<Node>(3, make_SharedPtr<Node>(6, make_SharedPtr<Node>(8), make_SharedPtr<Node>(9))));
+auto tree = std::make_unique<Node>(1, std::make_unique<Node>(2, std::make_unique<Node>(4, std::make_unique<Node>(7)), std::make_unique<Node>(5)), std::make_unique<Node>(3, std::make_unique<Node>(6, std::make_unique<Node>(8), std::make_unique<Node>(9))));
 
 struct CodeBlock1
 {
@@ -1243,6 +1243,9 @@ struct CodeBlock1
 import re
 from typing import Callable, Dict, List, Optional
 
+def move(obj):
+    return obj
+
 # class T_shared_ASTNode:
 #     pass
 
@@ -1306,13 +1309,13 @@ def advance(sid = ''):
         token_node.value = int(token)
 
 def expression(rbp = 0):
-    t : ASTNode = token_node
+    t : ASTNode = move(token_node)
     advance()
-    left = t.symbol.nud(t)
+    left = t.symbol.nud(move(t))
     while rbp < token_node.symbol.lbp:
-        t = token_node
+        t = move(token_node)
         advance()
-        left = t.symbol.led(t, left)
+        left = t.symbol.led(move(t), move(left))
     return left
 
 def parse(expr_str) -> ASTNode:
@@ -1331,7 +1334,7 @@ def symbol(id, bp = 0): # -> &
     return symbol_table[id]    # R s
 
 def infix(id, bp):
-    def led(self : ASTNode, left):
+    def led(self : ASTNode, left : ASTNode):
         self.first_child = left
         self.second_child = expression(self.symbol.led_bp)
         return self
@@ -1349,7 +1352,9 @@ infix('*', 2)
 infix('/', 2)
 prefix('-', 3)
 
-symbol('(number)').nud = lambda self: self
+def nud(self : ASTNode):
+    return self
+symbol('(number)').nud = nud
 symbol('(end)')
 
 def nud_parens(self : ASTNode):
@@ -1423,13 +1428,13 @@ F advance(sid = ‘’)
       :token_node.value = Int(token)
 
 F expression(rbp = 0)
-   ASTNode t = :token_node
+   ASTNode t = move(:token_node)
    advance()
-   V left = t.symbol.nud(t)
+   V left = t.symbol.nud(move(t))
    L rbp < :token_node.symbol.lbp
-      t = :token_node
+      t = move(:token_node)
       advance()
-      left = t.symbol.led(t, left)
+      left = t.symbol.led(move(t), move(left))
    R left
 
 F parse(expr_str) -> ASTNode
@@ -1447,7 +1452,7 @@ F symbol(id, bp = 0) -> &
    R :symbol_table[id]
 
 F infix(id, bp)
-   F led(ASTNode self; left)
+   F led(ASTNode self, ASTNode left)
       self.first_child = left
       self.second_child = expression(self.symbol.led_bp)
       R self
@@ -1463,7 +1468,10 @@ infix(‘-’, 1)
 infix(‘*’, 2)
 infix(‘/’, 2)
 prefix(‘-’, 3)
-symbol(‘(number)’).nud = self -> self
+
+F nud(ASTNode self)
+   R self
+symbol(‘(number)’).nud = nud
 symbol(‘(end)’)
 
 F nud_parens(ASTNode self)
@@ -1476,167 +1484,6 @@ symbol(‘)’)
 L(expr_str) [‘-2 / 2 + 4 + 3 * 2’, ‘2 * (3 + (4 * 5 + (6 * 7) * 8) - 9) * 10’]
    print(expr_str‘ = ’String(parse(expr_str).eval()))
 ===
-class ASTNode;
-
-class Symbol
-{
-public:
-    String id;
-    int lbp;
-    int nud_bp;
-    int led_bp;
-    std::function<SharedPtr<ASTNode>(const SharedPtr<ASTNode>&)> nud;
-    std::function<SharedPtr<ASTNode>(const SharedPtr<ASTNode>&, const SharedPtr<ASTNode>&)> led;
-
-    template <typename T1, typename T2> auto set_nud_bp(const T1 &nud_bp, const T2 &nud)
-    {
-        this->nud_bp = nud_bp;
-        this->nud = nud;
-    }
-
-    template <typename T1, typename T2> auto set_led_bp(const T1 &led_bp, const T2 &led)
-    {
-        this->led_bp = led_bp;
-        this->led = led;
-    }
-};
-
-class ASTNode : public SharedObject
-{
-public:
-    Symbol *symbol;
-    int value;
-    SharedPtr<ASTNode> first_child;
-    SharedPtr<ASTNode> second_child;
-
-    auto eval()
-    {
-        if (symbol->id == u"(number)"_S)
-            return value;
-        else if (symbol->id == u'+')
-            return first_child->eval() + second_child->eval();
-        else if (symbol->id == u'-')
-            return second_child == nullptr ? -first_child->eval() : first_child->eval() - second_child->eval();
-        else if (symbol->id == u'*')
-            return first_child->eval() * second_child->eval();
-        else if (symbol->id == u'/')
-            return first_child->eval() / second_child->eval();
-        else if (symbol->id == u'(')
-            return first_child->eval();
-        else {
-            assert(false);
-            return 0;
-        }
-    }
-};
-Dict<String, Symbol> symbol_table;
-Array<String> tokens;
-auto tokeni = -1;
-SharedPtr<ASTNode> token_node;
-
-template <typename T1 = decltype(u""_S)> auto advance(const T1 &sid = u""_S)
-{
-    if (sid != u"")
-        assert(::token_node->symbol->id == sid);
-    ::tokeni++;
-    ::token_node = make_SharedPtr<ASTNode>();
-    if (::tokeni == ::tokens.len()) {
-        ::token_node->symbol = &::symbol_table[u"(end)"_S];
-        return;
-    }
-    auto token = ::tokens[::tokeni];
-    ::token_node->symbol = &::symbol_table[token.is_digit() ? u"(number)"_S : token];
-    if (token.is_digit())
-        ::token_node->value = to_int(token);
-}
-
-template <typename T1 = decltype(0)> auto expression(const T1 &rbp = 0)
-{
-    SharedPtr<ASTNode> t = ::token_node;
-    advance();
-    auto left = t->symbol->nud(t);
-    while (rbp < ::token_node->symbol->lbp) {
-        t = ::token_node;
-        advance();
-        left = t->symbol->led(t, left);
-    }
-    return left;
-}
-
-template <typename T1> SharedPtr<ASTNode> parse(const T1 &expr_str)
-{
-    ::tokens = re::_(uR"(\s*(\d+|.))"_S).find_strings(expr_str);
-    ::tokeni = -1;
-    advance();
-    return expression();
-}
-
-template <typename T1, typename T2 = decltype(0)> auto& symbol(const T1 &id, const T2 &bp = 0)
-{
-    if (!(in(id, ::symbol_table))) {
-        auto s = Symbol();
-        s.id = id;
-        s.lbp = bp;
-        ::symbol_table.set(id, s);
-    }
-    return ::symbol_table[id];
-}
-
-template <typename T1, typename T2> auto infix(const T1 &id, const T2 &bp)
-{
-    auto led = [](const SharedPtr<ASTNode> &self, const auto &left)
-    {
-        self->first_child = left;
-        self->second_child = expression(self->symbol->led_bp);
-        return self;
-    };
-    symbol(id, bp).set_led_bp(bp, led);
-}
-
-template <typename T1, typename T2> auto prefix(const T1 &id, const T2 &bp)
-{
-    auto nud = [](const SharedPtr<ASTNode> &self)
-    {
-        self->first_child = expression(self->symbol->nud_bp);
-        return self;
-    };
-    symbol(id).set_nud_bp(bp, nud);
-}
-
-struct CodeBlock1
-{
-    CodeBlock1()
-    {
-        infix(u"+"_S, 1);
-        infix(u"-"_S, 1);
-        infix(u"*"_S, 2);
-        infix(u"/"_S, 2);
-        prefix(u"-"_S, 3);
-        symbol(u"(number)"_S).nud = [](const auto &self){return self;};
-        symbol(u"(end)"_S);
-    }
-} code_block_1;
-
-auto nud_parens(SharedPtr<ASTNode> self)
-{
-    auto expr = expression();
-    advance(u")"_S);
-    return expr;
-}
-
-struct CodeBlock2
-{
-    CodeBlock2()
-    {
-        symbol(u"("_S).nud = nud_parens;
-        symbol(u")"_S);
-        for (auto &&expr_str : create_array({u"-2 / 2 + 4 + 3 * 2"_S, u"2 * (3 + (4 * 5 + (6 * 7) * 8) - 9) * 10"_S}))
-            print(expr_str + u" = "_S + String(parse(expr_str)->eval()));
-    }
-} code_block_2;
-
-
----
 class ASTNode;
 
 class Symbol
@@ -1749,7 +1596,7 @@ template <typename T1, typename T2> auto infix(const T1 &id, const T2 &bp)
     {
         self->first_child = std::move(left);
         self->second_child = expression(self->symbol->led_bp);
-        return self;
+        return std::move(self);
     };
     symbol(id, bp).set_led_bp(bp, led);
 }
@@ -1759,7 +1606,7 @@ template <typename T1, typename T2> auto prefix(const T1 &id, const T2 &bp)
     auto nud = [](std::unique_ptr<ASTNode> self)
     {
         self->first_child = expression(self->symbol->nud_bp);
-        return self;
+        return std::move(self);
     };
     symbol(id).set_nud_bp(bp, nud);
 }
@@ -1773,10 +1620,22 @@ struct CodeBlock1
         infix(u"*"_S, 2);
         infix(u"/"_S, 2);
         prefix(u"-"_S, 3);
-        symbol(u"(number)"_S).nud = [](std::unique_ptr<ASTNode>self){return self;};
-        symbol(u"(end)"_S);
     }
 } code_block_1;
+
+auto nud(std::unique_ptr<ASTNode> self)
+{
+    return std::move(self);
+}
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        symbol(u"(number)"_S).nud = nud;
+        symbol(u"(end)"_S);
+    }
+} code_block_2;
 
 auto nud_parens(std::unique_ptr<ASTNode> self)
 {
@@ -1785,16 +1644,16 @@ auto nud_parens(std::unique_ptr<ASTNode> self)
     return expr;
 }
 
-struct CodeBlock2
+struct CodeBlock3
 {
-    CodeBlock2()
+    CodeBlock3()
     {
         symbol(u"("_S).nud = nud_parens;
         symbol(u")"_S);
-        for (auto expr_str : create_array({u"-2 / 2 + 4 + 3 * 2"_S, u"2 * (3 + (4 * 5 + (6 * 7) * 8) - 9) * 10"_S}))
+        for (auto &&expr_str : create_array({u"-2 / 2 + 4 + 3 * 2"_S, u"2 * (3 + (4 * 5 + (6 * 7) * 8) - 9) * 10"_S}))
             print(expr_str + u" = "_S + String(parse(expr_str)->eval()));
     }
-} code_block_2;
+} code_block_3;
 
 
 # https://www.rosettacode.org/wiki/Associative_array/Iteration#Python

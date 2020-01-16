@@ -20,6 +20,7 @@ class Scope:
 
     class Id:
         type : str
+        type_node : 'ASTTypeDefinition' = None
         ast_nodes : List['ASTNodeWithChildren']
         last_occurrence : 'SymbolNode' = None
 
@@ -29,6 +30,12 @@ class Scope:
             self.ast_nodes = []
             if ast_node is not None:
                 self.ast_nodes.append(ast_node)
+
+        def init_type_node(self, scope):
+            if self.type != '':
+                tid = scope.find(self.type)
+                if tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition:
+                    self.type_node = tid.ast_nodes[0]
 
         def serialize_to_dict(self):
             ast_nodes = []
@@ -56,6 +63,10 @@ class Scope:
         else:
             self.is_function = False
             self.ids = {}
+
+    def init_ids_type_node(self):
+        for id in self.ids.values():
+            id.init_type_node(self.parent)
 
     def serialize_to_dict(self):
         ids_dict = {}
@@ -260,7 +271,8 @@ class SymbolNode:
                 return '*this'
 
             tid = self.scope.find(self.token_str())
-            if tid is not None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTVariableInitialization and tid.ast_nodes[0].is_ptr: # `animals [+]= animal` -> `animals.append(std::move(animal));`
+            if tid is not None and ((len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTVariableInitialization and tid.ast_nodes[0].is_ptr) # `animals [+]= animal` -> `animals.append(std::move(animal));`
+                                 or (tid.type_node is not None and (tid.type_node.has_virtual_functions or tid.type_node.has_pointers_to_the_same_type))):
                 if tid.last_occurrence is None:
                     last_reference = None
                     var_name = self.token_str()
@@ -275,12 +287,16 @@ class SymbolNode:
                         node.walk_expressions(f)
                         node.walk_children(find_last_reference_to_identifier)
 
-                    for index in range(len(tid.ast_nodes[0].parent.children)):
-                        if id(tid.ast_nodes[0].parent.children[index]) == id(tid.ast_nodes[0]):
-                            for index in range(index + 1, len(tid.ast_nodes[0].parent.children)):
-                                find_last_reference_to_identifier(tid.ast_nodes[0].parent.children[index])
-                            tid.last_occurrence = last_reference
-                            break
+                    if tid.type_node is not None:
+                        find_last_reference_to_identifier(self.scope.node)
+                        tid.last_occurrence = last_reference
+                    else:
+                        for index in range(len(tid.ast_nodes[0].parent.children)):
+                            if id(tid.ast_nodes[0].parent.children[index]) == id(tid.ast_nodes[0]):
+                                for index in range(index + 1, len(tid.ast_nodes[0].parent.children)):
+                                    find_last_reference_to_identifier(tid.ast_nodes[0].parent.children[index])
+                                tid.last_occurrence = last_reference
+                                break
 
                 if id(tid.last_occurrence) == id(self):
                     return 'std::move(' + self.token_str() + ')'
@@ -434,6 +450,8 @@ class SymbolNode:
                             break
                         s = s.parent
                         assert(s)
+                elif func_name == 'move':
+                    func_name = 'std::move'
                 elif func_name == '*this':
                     func_name = '(*this)' # function call has higher precedence than dereference in C++, so `*this(...)` is equivalent to `*(this(...))`
                 else:
@@ -458,10 +476,10 @@ class SymbolNode:
                             #assert(type(f_node) in (ASTFunctionDefinition, ASTTypeDefinition) or (type(f_node) in (ASTVariableInitialization, ASTVariableDeclaration) and f_node.function_pointer)
                             #                                                                  or (type(f_node) ==  ASTVariableInitialization and f_node.expression.symbol.id == '->'))
                             if type(f_node) == ASTTypeDefinition:
-                                if f_node.has_virtual_functions:
+                                if f_node.has_virtual_functions or f_node.has_pointers_to_the_same_type:
                                     func_name = 'std::make_unique<' + func_name + '>'
-                                elif f_node.has_pointers_to_the_same_type:
-                                    func_name = 'make_SharedPtr<' + func_name + '>'
+                                # elif f_node.has_pointers_to_the_same_type:
+                                #     func_name = 'make_SharedPtr<' + func_name + '>'
                                 if len(f_node.constructors) == 0:
                                     f_node = ASTFunctionDefinition()
                                 else:
@@ -484,7 +502,7 @@ class SymbolNode:
                                 tid = self.scope.find(self.children[i+1].token_str())
                                 if tid is None or tid.type != 'File?':
                                     res += '&'
-                            elif f_node.function_arguments[last_function_arg][2].endswith('?') and f_node.function_arguments[last_function_arg][2] != 'Int?' and not cstr.startswith('make_SharedPtr<'):
+                            elif f_node.function_arguments[last_function_arg][2].endswith('?') and f_node.function_arguments[last_function_arg][2] != 'Int?' and not cstr.startswith(('std::make_unique<', 'make_SharedPtr<')):
                                 res += '&'
                         res += cstr
                         last_function_arg += 1
@@ -982,7 +1000,7 @@ def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False
         if id.ast_nodes[0].has_virtual_functions or id.ast_nodes[0].has_pointers_to_the_same_type:
             if ast_type_node is not None and tokens[id.ast_nodes[0].tokeni].start > type_token.start: # if type `ty` was declared after this variable, insert a forward declaration of type `ty`
                 ast_type_node.forward_declared_types.add(ty)
-            return ty if is_reference else 'std::unique_ptr<' + ty + '>' if id.ast_nodes[0].has_virtual_functions else 'SharedPtr<' + ty + '>'
+            return ty if is_reference else 'std::unique_ptr<' + ty + '>'# if id.ast_nodes[0].has_virtual_functions else 'SharedPtr<' + ty + '>'
         return ty
 
 class ASTVariableDeclaration(ASTNode):
@@ -1004,7 +1022,10 @@ class ASTVariableDeclaration(ASTNode):
 
     def to_str(self, indent):
         if self.function_pointer:
-            return ' ' * (indent*4) + 'std::function<' + self.trans_type(self.type) + '(' + ', '.join('const ' + self.trans_type(ty) + ('&'*(ty not in ('Int',))) for ty in self.type_args) + ')> ' + ', '.join(self.vars) + ";\n"
+            def trans_type(ty):
+                tt = self.trans_type(ty)
+                return tt if tt.startswith('std::unique_ptr<') else 'const ' + tt + ('&'*(ty not in ('Int',)))
+            return ' ' * (indent*4) + 'std::function<' + self.trans_type(self.type) + '(' + ', '.join(trans_type(ty) for ty in self.type_args) + ')> ' + ', '.join(self.vars) + ";\n"
         return ' ' * (indent*4) + self.trans_type(self.type, self.is_reference) + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + '*'*self.is_reference + ', '.join(self.vars) + ";\n"
 
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
@@ -1125,7 +1146,11 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                     arguments.append(('auto ' if '=' in arg[3] else 'const auto &') + arg[0] if arg[1] == '' else
                                           ('' if '=' in arg[3] else 'const ') + 'decltype(' + arg[1] + ') ' + arg[0] + ' = ' + arg[1])
                 else:
-                    arguments.append(('' if '=' in arg[3] else 'const ') + trans_type(arg[2], self.scope, tokens[self.tokeni]) + ' ' + ('&'*(arg[2] not in ('Int', 'Float'))) + arg[0] + ('' if arg[1] == '' else ' = ' + arg[1]))
+                    tid = self.scope.parent.find(arg[2].rstrip('?'))
+                    if tid is not None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and (tid.ast_nodes[0].has_virtual_functions or tid.ast_nodes[0].has_pointers_to_the_same_type):
+                        arguments.append('std::unique_ptr<' + arg[2].rstrip('?') + '> ' + arg[0] + ('' if arg[1] == '' else ' = ' + arg[1]))
+                    else:
+                        arguments.append(('' if '=' in arg[3] else 'const ') + trans_type(arg[2], self.scope, tokens[self.tokeni]) + ' ' + ('&'*(arg[2] not in ('Int', 'Float'))) + arg[0] + ('' if arg[1] == '' else ' = ' + arg[1]))
             return self.children_to_str(indent, ('auto' if self.function_return_type == '' else 'std::function<' + cpp_type_from_11l[self.function_return_type] + '(' + ', '.join(cpp_type_from_11l[arg[2]] for arg in self.function_arguments) + ')>') + ' ' + self.function_name
                 + ' = [' + ', '.join(sorted(filter(lambda v: not '&'+v in captured_variables, captured_variables))) + ']('
                 + ', '.join(arguments) + ')')[:-1] + ";\n"
@@ -1144,9 +1169,9 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 arguments.append(('T' + str(index + 1) + ' ' if '=' in arg[3] else 'const '*(arg[3] != '&') + 'T' + str(index + 1) + ' &')
                     + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
             else:
-                tid = self.scope.find(arg[2].rstrip('?'))
-                if tid is not None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
-                    arguments.append('SharedPtr<' + arg[2].rstrip('?') + '> '
+                tid = self.scope.parent.find(arg[2].rstrip('?'))
+                if tid is not None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and (tid.ast_nodes[0].has_virtual_functions or tid.ast_nodes[0].has_pointers_to_the_same_type):
+                    arguments.append('std::unique_ptr<' + arg[2].rstrip('?') + '> '
                         #+ ('' if '=' in arg[3] else 'const ')
                         + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
                 elif arg[2].endswith('?'):
@@ -1173,7 +1198,13 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                         self.member_initializer_list = " :\n"
                     else:
                         self.member_initializer_list += ",\n"
-                    self.member_initializer_list += ' ' * ((indent+1)*4) + c.expression.children[0].children[0].token_str() + '(' + c.expression.children[1].token_str() + ')'
+                    ec1 = c.expression.children[1].token_str()
+                    for index, arg in enumerate(self.function_arguments):
+                        if arg[0] == ec1:
+                            if arguments[index].startswith('std::unique_ptr<'):
+                                ec1 = 'std::move(' + ec1 + ')'
+                            break
+                    self.member_initializer_list += ' ' * ((indent+1)*4) + c.expression.children[0].children[0].token_str() + '(' + ec1 + ')'
                     self.children.pop(i)
                     continue
                 i += 1
@@ -1504,8 +1535,8 @@ class ASTTypeDefinition(ASTNodeWithChildren):
                 ti -= 1
             r = (source[tokens[ti].end:tokens[self.tokeni].start].count("\n")-1) * "\n"
         base_types = []
-        if self.has_pointers_to_the_same_type:
-            base_types += ['SharedObject']
+        # if self.has_pointers_to_the_same_type:
+        #     base_types += ['SharedObject']
         base_types += self.base_types
         r += ' ' * (indent*4) \
           + 'class ' + self.type_name + (' : ' + ', '.join(map(lambda c: 'public ' + c, base_types)) if len(base_types) else '') \
@@ -2044,6 +2075,7 @@ def parse_internal(this_node):
         prev_scope = scope
         scope = Scope(func_args)
         scope.parent = prev_scope
+        scope.init_ids_type_node()
         scope.node = node
         tokensn.scope = scope # можно избавиться от этой строки, если не делать вызов next_token() в advance_scope_begin()
         node.scope = scope
@@ -2733,6 +2765,7 @@ builtins_scope.add_function('factorial', ASTFunctionDefinition([('x', '', '')]))
 builtins_scope.add_function('hex', ASTFunctionDefinition([('x', '', '')]))
 builtins_scope.add_function('bin', ASTFunctionDefinition([('x', '', '')]))
 builtins_scope.add_function('copy', ASTFunctionDefinition([('object', '', '')]))
+builtins_scope.add_function('move', ASTFunctionDefinition([('object', '', '')]))
 builtins_scope.add_function('hash', ASTFunctionDefinition([('object', '', '')]))
 builtins_scope.add_function('rotl', ASTFunctionDefinition([('value', '', 'Int'), ('shift', '', 'Int')]))
 builtins_scope.add_function('rotr', ASTFunctionDefinition([('value', '', 'Int'), ('shift', '', 'Int')]))

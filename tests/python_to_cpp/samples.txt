@@ -710,8 +710,18 @@ class Cat(Animal):
     def say(self):
         print('meow')
 
+animals : List[Animal] = []
+
+def add_animal(animal : Animal):
+    class Animal: # this local class checks for `tid = self.scope+'‘.parent’'.find(arg[2].rstrip('?'))`
+        name : str
+    animals += [animal]
+
+def global_func():
+    def local_func(animal : Animal):
+        animals += [animal]
+
 if __name__ == '__main__':
-    animals : List[Animal] = []
     animals += [Sheep()]
     animals += [Cat()]
     animal = Sheep()
@@ -731,9 +741,18 @@ T Sheep(Animal)
 T Cat(Animal)
    F.virtual.assign say() -> N
       print(‘meow’)
+[Animal] animals
+
+F add_animal(Animal animal)
+   T Animal
+      String name
+   :animals [+]= animal
+
+F global_func()
+   F local_func(Animal animal)
+      :animals [+]= animal
 
 :start:
-[Animal] animals
 animals [+]= Sheep()
 animals [+]= Cat()
 V animal = Sheep()
@@ -765,10 +784,28 @@ public:
         print(u"meow"_S);
     }
 };
+Array<std::unique_ptr<Animal>> animals;
+
+auto add_animal(std::unique_ptr<Animal> animal)
+{
+    class Animal
+    {
+    public:
+        String name;
+    };
+    ::animals.append(std::move(animal));
+}
+
+auto global_func()
+{
+    auto local_func = [](std::unique_ptr<Animal> animal)
+    {
+        ::animals.append(std::move(animal));
+    };
+}
 
 int main()
 {
-    Array<std::unique_ptr<Animal>> animals;
     animals.append(std::make_unique<Sheep>());
     animals.append(std::make_unique<Cat>());
     auto animal = std::make_unique<Sheep>();
@@ -1469,20 +1506,20 @@ F f(Aa a)
    print(a.b.d)
 f(Aa())
 ===
-class Aa : public SharedObject
+class Aa
 {
 public:
-    SharedPtr<Aa> _a;
-    class Bb : public SharedObject
+    std::unique_ptr<Aa> _a;
+    class Bb
     {
     public:
-        SharedPtr<Bb> _b;
+        std::unique_ptr<Bb> _b;
         decltype(1) d = 1;
     };
-    SharedPtr<Bb> b = make_SharedPtr<Bb>();
+    std::unique_ptr<Bb> b = std::make_unique<Bb>();
 };
 
-auto f(SharedPtr<Aa> a)
+auto f(std::unique_ptr<Aa> a)
 {
     print(a->b->d);
 }
@@ -1491,7 +1528,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        f(make_SharedPtr<Aa>());
+        f(std::make_unique<Aa>());
     }
 } code_block_1;
 
@@ -1525,26 +1562,26 @@ F f(Aa a)
    print(a.b.c.d)
 f(Aa())
 ===
-class Aa : public SharedObject
+class Aa
 {
 public:
-    SharedPtr<Aa> _a;
-    class Bb : public SharedObject
+    std::unique_ptr<Aa> _a;
+    class Bb
     {
     public:
-        SharedPtr<Bb> _b;
-        class Cc : public SharedObject
+        std::unique_ptr<Bb> _b;
+        class Cc
         {
         public:
-            SharedPtr<Cc> _c;
+            std::unique_ptr<Cc> _c;
             decltype(1) d = 1;
         };
-        SharedPtr<Cc> c = make_SharedPtr<Cc>();
+        std::unique_ptr<Cc> c = std::make_unique<Cc>();
     };
-    SharedPtr<Bb> b = make_SharedPtr<Bb>();
+    std::unique_ptr<Bb> b = std::make_unique<Bb>();
 };
 
-auto f(SharedPtr<Aa> a)
+auto f(std::unique_ptr<Aa> a)
 {
     print(a->b->c->d);
 }
@@ -1553,39 +1590,46 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        f(make_SharedPtr<Aa>());
+        f(std::make_unique<Aa>());
     }
 } code_block_1;
 
 
 class Node:
     first_child : 'Node' = None
+    value : int
 n = Node()
 m : Node
-print(n.first_child.first_child.first_child)
-print(m.first_child.first_child.first_child)
+if False:
+    print(n.first_child.first_child.first_child.value)
+    print(m.first_child.first_child.first_child.value)
 ===
 T Node
    Node? first_child
+   Int value
 V n = Node()
 Node m
-print(n.first_child.first_child.first_child)
-print(m.first_child.first_child.first_child)
+I 0B
+   print(n.first_child.first_child.first_child.value)
+   print(m.first_child.first_child.first_child.value)
 ===
-class Node : public SharedObject
+class Node
 {
 public:
-    SharedPtr<Node> first_child;
+    std::unique_ptr<Node> first_child;
+    int value;
 };
-auto n = make_SharedPtr<Node>();
-SharedPtr<Node> m;
+auto n = std::make_unique<Node>();
+std::unique_ptr<Node> m;
 
 struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(n->first_child->first_child->first_child);
-        print(m->first_child->first_child->first_child);
+        if (false) {
+            print(n->first_child->first_child->first_child->value);
+            print(m->first_child->first_child->first_child->value);
+        }
     }
 } code_block_1;
 

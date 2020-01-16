@@ -46,7 +46,7 @@ template <typename T1> auto printBoard(const T1 &board)
     }
 }
 
-template <typename T2> auto move(Array<int> &board, const T2 &mv)
+template <typename T2> auto mov(Array<int> &board, const T2 &mv)
 {
     auto ix = (mv >> 8) & 0x00'ff;
     board.set(mv & 0x00'ff, board[ix]);
@@ -121,7 +121,7 @@ template <typename T2> auto moveStr(Array<int> &board, const T2 &strMove)
     auto moves = pseudoLegalMoves(board);
     for (auto &&m : moves)
         if (strMove == toString(m)) {
-            move(board, m);
+            mov(board, m);
             return;
         }
     for (auto &&m : moves)
@@ -358,7 +358,7 @@ template <typename T1> auto legalMoves(const T1 &board)
         kingVal = -kingVal;
     for (auto &&mv : allMoves) {
         auto board2 = copy(board);
-        move(board2, mv);
+        mov(board2, mv);
         if (pseudoLegalCaptures(board2).filter([&board2, &kingVal](const auto &i){return board2[i & 0x00'ff] == kingVal;}).empty())
             retval.append(mv);
     }
@@ -378,7 +378,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto alphaBetaQui(
     if (n >= -4)
         for (auto &&mv : pseudoLegalCaptures(board)) {
             auto newboard = copy(board);
-            move(newboard, mv);
+            mov(newboard, mv);
             auto value = alphaBetaQui(newboard, -beta, -alpha, n - 1);
             value = make_tuple(-_get<0>(value), _get<1>(value));
             if (_get<0>(value) >= beta)
@@ -399,7 +399,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto alphaBeta(con
 
     for (auto &&mv : legalMoves(board)) {
         auto newboard = copy(board);
-        move(newboard, mv);
+        mov(newboard, mv);
         auto value = alphaBeta(newboard, -beta, -alpha, n - 1);
         value = make_tuple(-_get<0>(value), _get<1>(value));
         if (_get<0>(value) >= beta)

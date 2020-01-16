@@ -52,7 +52,7 @@ def printBoard(board):
       print(pieces[board[ix]], end=' ')
     print()
 
-def move(board : List[int], mv):
+def mov(board : List[int], mv):
   ix = (mv >> 8) & 0xff
   board[mv & 0xff] = board[ix]
   board[ix] = 0
@@ -115,7 +115,7 @@ def moveStr(board : List[int], strMove):
   moves = pseudoLegalMoves(board)
   for m in moves:
     if strMove == toString(m):
-      move(board, m)
+      mov(board, m)
       return
   for m in moves:
     print(toString(m))
@@ -315,7 +315,7 @@ def legalMoves(board):
     kingVal = -kingVal
   for mv in allMoves:
     board2 = board[:]
-    move(board2, mv)
+    mov(board2, mv)
     #print "trying to reduce move", toString(mv)
     if len([i for i in pseudoLegalCaptures(board2) if board2[i & 0xff] == kingVal]) == 0:
       retval.append(mv)
@@ -334,7 +334,7 @@ def alphaBetaQui(board, alpha, beta, n):
     #from copy import copy
     for mv in pseudoLegalCaptures(board):
       newboard = board[:]
-      move(newboard, mv)
+      mov(newboard, mv)
       value = alphaBetaQui(newboard, -beta, -alpha, n - 1)
       value = (-value[0], value[1])
       if value[0] >= beta:
@@ -352,7 +352,7 @@ def alphaBeta(board, alpha, beta, n):
 
   for mv in legalMoves(board):
     newboard = board[:]
-    move(newboard, mv)
+    mov(newboard, mv)
     value = alphaBeta(newboard, -beta, -alpha, n - 1)
     value = (-value[0], value[1])
     if value[0] >= beta:

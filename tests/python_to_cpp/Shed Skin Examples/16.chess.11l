@@ -29,7 +29,7 @@ F printBoard(board)
          print(:pieces[board[ix]], end' ‘ ’)
       print()
 
-F move([Int] &board; mv)
+F mov([Int] &board; mv)
    V ix = (mv >> 8) [&] 00'ff
    board[mv [&] 00'ff] = board[ix]
    board[ix] = 0
@@ -90,7 +90,7 @@ F moveStr([Int] &board; strMove)
    V moves = pseudoLegalMoves(board)
    L(m) moves
       I strMove == toString(m)
-         move(&board, m)
+         mov(&board, m)
          R
    L(m) moves
       print(toString(m))
@@ -276,7 +276,7 @@ F legalMoves(board)
       kingVal = -kingVal
    L(mv) allMoves
       V board2 = copy(board)
-      move(&board2, mv)
+      mov(&board2, mv)
 
       I pseudoLegalCaptures(board2).filter(i -> @board2[i [&] 00'ff] == @kingVal).empty
          retval.append(mv)
@@ -294,7 +294,7 @@ F alphaBetaQui(board, =alpha, beta, n)
    I n >= -4
       L(mv) pseudoLegalCaptures(board)
          V newboard = copy(board)
-         move(&newboard, mv)
+         mov(&newboard, mv)
          V value = alphaBetaQui(newboard, -beta, -alpha, n - 1)
          value = (-value[0], value[1])
          I value[0] >= beta
@@ -311,7 +311,7 @@ F alphaBeta(board, =alpha, beta, n)
 
    L(mv) legalMoves(board)
       V newboard = copy(board)
-      move(&newboard, mv)
+      mov(&newboard, mv)
       V value = alphaBeta(newboard, -beta, -alpha, n - 1)
       value = (-value[0], value[1])
       I value[0] >= beta
