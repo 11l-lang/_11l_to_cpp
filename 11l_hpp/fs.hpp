@@ -35,10 +35,8 @@ class Walker
 		{
 			if (walker->dir_filter == nullptr) {
 				if (walker->files_only)
-					if (std_filesystem::is_directory(it->status()))
-						do
-							++it;
-						while (it != std_filesystem::recursive_directory_iterator() && std_filesystem::is_directory(it->status()));
+					while (it != std_filesystem::recursive_directory_iterator() && std_filesystem::is_directory(it->status()))
+						++it;
 			}
 			else
 				if (walker->files_only)
