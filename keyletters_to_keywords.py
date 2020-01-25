@@ -17,12 +17,14 @@ try:
     for token in tokenizer.tokenize(source):
         if (token.value(source) in tokenizer.keywords
                 or token.category == tokenizer.Token.Category.KEYWORD # for composite keywords (e.g. `L.break`)
-                or token.value(source).split('.')[0] in tokenizer.keywords): # for `L.index`
+                or token.value(source).split('.')[0] in tokenizer.keywords # for `L.index`
+                or (token.value(source).startswith('!') and token.value(source)[1:] in tokenizer.keywords)): # for `!C`/`!in`
             dot_pos = token.value(source).find('.') # \
             if dot_pos == -1:                       # V dot_pos = token.value(source). {.find(‘.’) ? .len}
                 dot_pos = len(token.value(source))  # /
+            em = int(token.value(source)[0] == '!')
             outf.write(source[writepos:token.start])
-            outf.write(tokenizer.keywords[tokenizer.keywords.index(token.value(source)[:dot_pos]) % 11 + 11*2*(not reverse)] + token.value(source)[dot_pos:])
+            outf.write('!'*em + tokenizer.keywords[tokenizer.keywords.index(token.value(source)[em:dot_pos]) % 11 + 11*2*(not reverse)] + token.value(source)[dot_pos:])
         else:
             outf.write(source[writepos:token.end])
         writepos = token.end
