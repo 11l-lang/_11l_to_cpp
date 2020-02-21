@@ -232,7 +232,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
 
             if source[i:i+2] == R'\.': # // Support for constructions like: ||| You need just to add `\` at the each line starting from dot:
                 if len(tokens):        # \\ result = abc.method1()          ||| result = abc.method1()
-                    i += 1             # \\     .method2()                  |||     \.method2()
+                    i += 1             # \\             .method2()          |||            \.method2()
                #else: # with `if len(tokens): i += 1` there is no need for this else branch
                #    raise Error('unexpected character `\`')
                     if line_continuations is not None:
