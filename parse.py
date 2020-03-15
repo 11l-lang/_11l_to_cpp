@@ -322,6 +322,8 @@ class SymbolNode:
                 return '0' + n[:-1]
             if n[-1] in 'bд':
                 return '0b' + n[:-1]
+            if n[-1] == 's':
+                return n[:-1] + 'f'
             if n[4:5] == "'" or n[-3:-2] == "'" or n[-2:-1] == "'":
                 nn = ''
                 for c in n:
