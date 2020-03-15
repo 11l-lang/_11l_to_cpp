@@ -166,7 +166,7 @@ public:
         Dict<int, String> nonunique_links;
         auto link = u""_S;
 
-        auto write_http_link = [&exit_with_error, &find_ending_pair_quote, &find_ending_sq_bracket, &html_escape, &html_escapeq, &i, &instr, &link, &next_char, &nonunique_links, &outfile, &remove_comments, &write_to_pos](const auto &startpos, const int endpos, const decltype(1) q_offset = 1, decltype(u""_S) text = u""_S)
+        auto write_http_link = [&exit_with_error, &find_ending_pair_quote, &find_ending_sq_bracket, &html_escapeq, &i, &instr, &link, &next_char, &nonunique_links, &outfile, &remove_comments, &write_to_pos, this](const auto &startpos, const int endpos, const decltype(1) q_offset = 1, decltype(u""_S) text = u""_S)
         {
             auto nesting_level = 0;
             i += 2;
@@ -226,7 +226,7 @@ public:
             }
             if (text == u"") {
                 write_to_pos(startpos, i + 1);
-                text = html_escape(remove_comments(instr[range_el(startpos + q_offset, endpos)], startpos + q_offset));
+                text = to_html(instr[range_el(startpos + q_offset, endpos)], nullptr, startpos + q_offset);
             }
             outfile.write(tag + u">"_S + (text != u"" ? text : link) + u"</a>"_S);
         };

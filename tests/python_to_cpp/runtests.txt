@@ -41,7 +41,9 @@ TEST("link[https://address]", '<a href="https://address">link</a>')
 TEST("‘multiword link’[http://address]", '<a href="http://address">multiword link</a>')
 TEST("link[https://address ‘title &text[[[comment]]]’]", '<a href="https://address" title="title &amp;text">link</a>')
 TEST("link[https://address title [.&.] text[[[comment]]]]", '<a href="https://address" title="title [.&amp;.] text">link</a>')
-TEST('‘[[[Scoping rules/]]]Code blocks’[./code-blocks]', '<a href="./code-blocks" target="_self">Code blocks</a>')
+TEST('‘[[[Scoping rules/]]]Code blocks’[./code-blocks]', '<a href="./code-blocks" target="_self"><!--[[[Scoping rules/]]]-->Code blocks</a>')
+TEST(R'‘Versioning with 100%/versions_threshold/\‘2’ overhead’[./versioning.pq]', '<a href="./versioning.pq" target="_self">Versioning with 100%/versions_threshold<sup>2</sup> overhead</a>')
+TEST('‘compares files based on which ~‘lines’ have changed’[http://www.devuxer.com/2014/02/15/why-the-mercurial-zipdoc-extension-fails-for-excel-files/]', '<a href="http://www.devuxer.com/2014/02/15/why-the-mercurial-zipdoc-extension-fails-for-excel-files/">compares files based on which <i>lines</i> have changed</a>')
 TEST("text[‘title text’]", '<abbr title="title text">text</abbr>')
 TEST("[text][‘title text’]", '[text]<abbr title="title text"></abbr>') # чтобы получить '<abbr title="title text">[text]</abbr>' пишите так: ‘[text]’[‘title text’]
 TEST('Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [‘мои мысли на тему режимов открытия файлов’[./File]]', 'Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [<a href="./File" target="_self">мои мысли на тему режимов открытия файлов</a>]')
@@ -427,7 +429,9 @@ TEST(‘link[https://address]’, ‘<a href="https://address">link</a>’)
 TEST(‘‘multiword link’[http://address]’, ‘<a href="http://address">multiword link</a>’)
 TEST(‘link[https://address ‘title &text[[[comment]]]’]’, ‘<a href="https://address" title="title &amp;text">link</a>’)
 TEST(‘link[https://address title [.&.] text[[[comment]]]]’, ‘<a href="https://address" title="title [.&amp;.] text">link</a>’)
-TEST(‘‘[[[Scoping rules/]]]Code blocks’[./code-blocks]’, ‘<a href="./code-blocks" target="_self">Code blocks</a>’)
+TEST(‘‘[[[Scoping rules/]]]Code blocks’[./code-blocks]’, ‘<a href="./code-blocks" target="_self"><!--[[[Scoping rules/]]]-->Code blocks</a>’)
+TEST(‘‘Versioning with 100%/versions_threshold/\‘2’ overhead’[./versioning.pq]’, ‘<a href="./versioning.pq" target="_self">Versioning with 100%/versions_threshold<sup>2</sup> overhead</a>’)
+TEST(‘‘compares files based on which ~‘lines’ have changed’[http://www.devuxer.com/2014/02/15/why-the-mercurial-zipdoc-extension-fails-for-excel-files/]’, ‘<a href="http://www.devuxer.com/2014/02/15/why-the-mercurial-zipdoc-extension-fails-for-excel-files/">compares files based on which <i>lines</i> have changed</a>’)
 TEST(‘text[‘title text’]’, ‘<abbr title="title text">text</abbr>’)
 TEST(‘[text][‘title text’]’, ‘[text]<abbr title="title text"></abbr>’)
 TEST(‘Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [‘мои мысли на тему режимов открытия файлов’[./File]]’, ‘Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [<a href="./File" target="_self">мои мысли на тему режимов открытия файлов</a>]’)
@@ -775,7 +779,9 @@ struct CodeBlock1
         TEST(u"‘multiword link’[http://address]"_S, u"<a href=\"http://address\">multiword link</a>"_S);
         TEST(u"link[https://address ‘title &text[[[comment]]]’]"_S, u"<a href=\"https://address\" title=\"title &amp;text\">link</a>"_S);
         TEST(u"link[https://address title [.&.] text[[[comment]]]]"_S, u"<a href=\"https://address\" title=\"title [.&amp;.] text\">link</a>"_S);
-        TEST(u"‘[[[Scoping rules/]]]Code blocks’[./code-blocks]"_S, u"<a href=\"./code-blocks\" target=\"_self\">Code blocks</a>"_S);
+        TEST(u"‘[[[Scoping rules/]]]Code blocks’[./code-blocks]"_S, u"<a href=\"./code-blocks\" target=\"_self\"><!--[[[Scoping rules/]]]-->Code blocks</a>"_S);
+        TEST(uR"(‘Versioning with 100%/versions_threshold/\‘2’ overhead’[./versioning.pq])"_S, u"<a href=\"./versioning.pq\" target=\"_self\">Versioning with 100%/versions_threshold<sup>2</sup> overhead</a>"_S);
+        TEST(u"‘compares files based on which ~‘lines’ have changed’[http://www.devuxer.com/2014/02/15/why-the-mercurial-zipdoc-extension-fails-for-excel-files/]"_S, u"<a href=\"http://www.devuxer.com/2014/02/15/why-the-mercurial-zipdoc-extension-fails-for-excel-files/\">compares files based on which <i>lines</i> have changed</a>"_S);
         TEST(u"text[‘title text’]"_S, u"<abbr title=\"title text\">text</abbr>"_S);
         TEST(u"[text][‘title text’]"_S, u"[text]<abbr title=\"title text\"></abbr>"_S);
         TEST(u"Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [‘мои мысли на тему режимов открытия файлов’[./File]]"_S, u"Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [<a href=\"./File\" target=\"_self\">мои мысли на тему режимов открытия файлов</a>]"_S);

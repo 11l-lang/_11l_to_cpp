@@ -179,7 +179,7 @@ class Converter:
                     j += 1
             if text == '':
                 write_to_pos(startpos, i+1)
-                text = html_escape(remove_comments(instr[startpos+q_offset:endpos], startpos+q_offset))
+                text = self.to_html(instr[startpos+q_offset:endpos], outer_pos = startpos+q_offset)
             outfile.write(tag + '>' + (text if text != '' else link) + '</a>')
 
         def write_note(startpos, endpos, q_offset = 1):
@@ -831,10 +831,11 @@ function spoiler2(element, event)
 }
 </script>
 <style type="text/css">
-body td {
+div#main, td {
     font-size: 14px;
     font-family: Verdana, sans-serif;
     line-height: 160%;
+    text-align: justify;
 }
 span.cu_brackets_b {
     font-size: initial;
@@ -859,7 +860,6 @@ h3 {font-size: 137.5%;}
 h4 {font-size: 120%;}
 h5 {font-size: 110%;}
 h6 {font-size: 100%;}
-td {text-align: justify; /*font-family: Tahoma, sans-serif;*/}
 span.sq {color: gray; font-size: 0.8rem; font-weight: normal; /*pointer-events: none;*/}
 span.sq_brackets {color: #BFBFBF;}
 span.cu_brackets {cursor: pointer;}
@@ -872,8 +872,8 @@ ul, ol {margin: 11px 0 7px 0;}
 ul li, ol li {padding: 7px 0;}
 ul li:first-child, ol li:first-child {padding-top   : 0;}
 ul  li:last-child, ol  li:last-child {padding-bottom: 0;}
-table table {margin: 9px 0; border-collapse: collapse;}
-table table th, table table td {padding: 6px 13px; border: 1px solid #BFBFBF;}
+table {margin: 9px 0; border-collapse: collapse;}
+table th, table td {padding: 6px 13px; border: 1px solid #BFBFBF;}
 span.spoiler_title {
     color: #548eaa;
     cursor: pointer;
@@ -903,10 +903,15 @@ pre.inline_code {
     border-radius: 3px;
 }
 img {vertical-align: middle;}
+
+div#main {width: 100%;}
+@media screen and (min-width: 1050px) {
+    div#main {width: 1024px;}
+}
 </style>
 </head>
 <body>
-<table width="55%" align="center"><tr><td>
+<div id="main" style="margin: 0 auto">
 ''')
     try:
         to_html(infile_str, args_outfile, args_output_html_document, habr_html = args_habr_html)
@@ -914,7 +919,7 @@ img {vertical-align: middle;}
         sys.stderr.write(e.message + " at line " + str(e.line) + ", column " + str(e.column) + "\n")
         sys.exit(-1)
     if args_output_html_document:
-        args_outfile.write('''
-</td></tr></table>
+        args_outfile.write(
+'''</div>
 </body>
 </html>''')

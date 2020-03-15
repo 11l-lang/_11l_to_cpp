@@ -1635,6 +1635,24 @@ def type_of(sn):
         if tid is None or len(tid.ast_nodes) != 1:
             raise Error('`' + sn.children[0].children[0].token_str() + '` is not found in global scope', sn.left_to_right_token()) # this error occurs without this code: ` or (self.token_str()[0].isupper() and self.token_str() != self.token_str().upper())`
         left = tid.ast_nodes[0]
+    elif sn.children[0].token_str() == '@':
+        s = sn.scope
+        while True:
+            if s.is_function:
+                if type(s.node.parent) == ASTFunctionDefinition:
+                    if type(s.node.parent.parent) == ASTTypeDefinition:
+                        fid = s.node.parent.parent.find_id_including_base_types(sn.children[1].token_str())
+                        if fid is None:
+                            raise Error('call of undefined method `' + sn.children[1].token_str() + '`', sn.left_to_right_token())
+                        if len(fid.ast_nodes) > 1:
+                            raise Error('methods\' overloading is not supported for now', sn.left_to_right_token())
+                        f_node = fid.ast_nodes[0]
+                        if type(f_node) == ASTFunctionDefinition:
+                            return f_node
+                break
+            s = s.parent
+            assert(s)
+        return None
     elif sn.children[0].token_str().startswith('@'):
         return None # [-TODO-]
     else:

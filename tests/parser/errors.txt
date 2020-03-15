@@ -234,3 +234,21 @@ tokenize(‘’, comments)
 
 V direc = Vector()
           ^Error: identifier `Vector` is not found
+
+
+T Converter
+   F to_html(', a = 1)
+      F write_http_link()
+         I 1B
+            R @.to_html_(a' 2)
+              ^Error: call of undefined method `to_html_`
+
+
+T Converter
+   F to_html()
+      R ‘’
+   F to_html(', a = 1)
+      F write_http_link()
+         I 1B
+            R @.to_html(a' 2)
+              ^Error: methods' overloading is not supported for now
