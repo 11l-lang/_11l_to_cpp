@@ -789,7 +789,11 @@ Options:
     if args_output_html_document and args_habr_html:
         sys.exit("Options --output-html-document and --habr-html are mutually exclusive")
 
-    infile_str = args_infile.read()
+    infile_str : str
+    try:
+        infile_str = args_infile.read()
+    except UnicodeDecodeError:
+        sys.exit('Input is not a valid UTF-8!')
     title = ''
     if infile_str.startswith('[[[H‘') or \
        infile_str.startswith('[[[Н‘'): # ’]]]’]]]

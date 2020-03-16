@@ -734,7 +734,11 @@ E I ‘--file’ C :argv
 
 I args_output_html_document & args_habr_html
    exit(‘Options --output-html-document and --habr-html are mutually exclusive’)
-V infile_str = args_infile.read()
+String infile_str
+X.try
+   infile_str = args_infile.read()
+X.catch UnicodeDecodeError
+   exit(‘Input is not a valid UTF-8!’)
 V title = ‘’
 I infile_str.starts_with("[[[H‘") | infile_str.starts_with("[[[Н‘")
    i = 5
