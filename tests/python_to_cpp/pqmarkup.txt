@@ -776,14 +776,23 @@ Options:
             i += 2
             continue
         if not sys.argv[i].startswith('-'):
-            args_infile = open(sys.argv[i], 'r', encoding = 'utf-8-sig')
+            try:
+                args_infile = open(sys.argv[i], 'r', encoding = 'utf-8-sig')
+            except:
+                sys.exit("Can't open file '" + sys.argv[i] + "'")
             break
         i += 1
     args_outfile = sys.stdout
-    if '-f' in sys.argv:
-        args_outfile = open(sys.argv[sys.argv.index('-f')     + 1], 'w', encoding = 'utf-8', newline = "\n")
-    elif '--file' in sys.argv:
-        args_outfile = open(sys.argv[sys.argv.index('--file') + 1], 'w', encoding = 'utf-8', newline = "\n")
+    outfile_name : str
+    try:
+        if '-f' in sys.argv:
+            outfile_name = sys.argv[sys.argv.index('-f')     + 1]
+            args_outfile = open(outfile_name, 'w', encoding = 'utf-8', newline = "\n")
+        elif '--file' in sys.argv:
+            outfile_name = sys.argv[sys.argv.index('--file') + 1]
+            args_outfile = open(outfile_name, 'w', encoding = 'utf-8', newline = "\n")
+    except:
+        sys.exit("Can't open file '" + outfile_name + "' for writing")
 
     if args_output_html_document and args_habr_html:
         sys.exit("Options --output-html-document and --habr-html are mutually exclusive")
@@ -1652,14 +1661,23 @@ L i < :argv.len
       i += 2
       L.continue
    I !:argv[i].starts_with(‘-’)
-      args_infile = File(:argv[i], ‘r’, encoding' ‘utf-8-sig’)
+      X.try
+         args_infile = File(:argv[i], ‘r’, encoding' ‘utf-8-sig’)
+      X.catch
+         exit(‘Can't open file '’:argv[i]‘'’)
       L.break
    i++
 V args_outfile = :stdout
-I ‘-f’ C :argv
-   args_outfile = File(:argv[:argv.index(‘-f’) + 1], ‘w’, encoding' ‘utf-8’)
-E I ‘--file’ C :argv
-   args_outfile = File(:argv[:argv.index(‘--file’) + 1], ‘w’, encoding' ‘utf-8’)
+String outfile_name
+X.try
+   I ‘-f’ C :argv
+      outfile_name = :argv[:argv.index(‘-f’) + 1]
+      args_outfile = File(outfile_name, ‘w’, encoding' ‘utf-8’)
+   E I ‘--file’ C :argv
+      outfile_name = :argv[:argv.index(‘--file’) + 1]
+      args_outfile = File(outfile_name, ‘w’, encoding' ‘utf-8’)
+X.catch
+   exit(‘Can't open file '’outfile_name‘' for writing’)
 
 I args_output_html_document & args_habr_html
    exit(‘Options --output-html-document and --habr-html are mutually exclusive’)
@@ -2721,16 +2739,35 @@ Options:
             continue;
         }
         if (!::argv[i].starts_with(u"-"_S)) {
-            args_infile = File(::argv[i], u"r"_S, u"utf-8-sig"_S);
+            try
+            {
+                args_infile = File(::argv[i], u"r"_S, u"utf-8-sig"_S);
+            }
+            catch (...)
+            {
+                exit(u"Can't open file '"_S + ::argv[i] + u"'"_S);
+            }
             break;
         }
         i++;
     }
     auto args_outfile = _stdout;
-    if (in(u"-f"_S, ::argv))
-        args_outfile = File(::argv[::argv.index(u"-f"_S) + 1], u"w"_S, u"utf-8"_S);
-    else if (in(u"--file"_S, ::argv))
-        args_outfile = File(::argv[::argv.index(u"--file"_S) + 1], u"w"_S, u"utf-8"_S);
+    String outfile_name;
+    try
+    {
+        if (in(u"-f"_S, ::argv)) {
+            outfile_name = ::argv[::argv.index(u"-f"_S) + 1];
+            args_outfile = File(outfile_name, u"w"_S, u"utf-8"_S);
+        }
+        else if (in(u"--file"_S, ::argv)) {
+            outfile_name = ::argv[::argv.index(u"--file"_S) + 1];
+            args_outfile = File(outfile_name, u"w"_S, u"utf-8"_S);
+        }
+    }
+    catch (...)
+    {
+        exit(u"Can't open file '"_S + outfile_name + u"' for writing"_S);
+    }
     if (args_output_html_document && args_habr_html)
         exit(u"Options --output-html-document and --habr-html are mutually exclusive"_S);
     String infile_str;

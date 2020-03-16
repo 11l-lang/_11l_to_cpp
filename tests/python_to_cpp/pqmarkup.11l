@@ -723,14 +723,23 @@ L i < :argv.len
       i += 2
       L.continue
    I !:argv[i].starts_with(‘-’)
-      args_infile = File(:argv[i], ‘r’, encoding' ‘utf-8-sig’)
+      X.try
+         args_infile = File(:argv[i], ‘r’, encoding' ‘utf-8-sig’)
+      X.catch
+         exit(‘Can't open file '’:argv[i]‘'’)
       L.break
    i++
 V args_outfile = :stdout
-I ‘-f’ C :argv
-   args_outfile = File(:argv[:argv.index(‘-f’) + 1], ‘w’, encoding' ‘utf-8’)
-E I ‘--file’ C :argv
-   args_outfile = File(:argv[:argv.index(‘--file’) + 1], ‘w’, encoding' ‘utf-8’)
+String outfile_name
+X.try
+   I ‘-f’ C :argv
+      outfile_name = :argv[:argv.index(‘-f’) + 1]
+      args_outfile = File(outfile_name, ‘w’, encoding' ‘utf-8’)
+   E I ‘--file’ C :argv
+      outfile_name = :argv[:argv.index(‘--file’) + 1]
+      args_outfile = File(outfile_name, ‘w’, encoding' ‘utf-8’)
+X.catch
+   exit(‘Can't open file '’outfile_name‘' for writing’)
 
 I args_output_html_document & args_habr_html
    exit(‘Options --output-html-document and --habr-html are mutually exclusive’)

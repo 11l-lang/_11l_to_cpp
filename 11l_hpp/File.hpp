@@ -20,6 +20,7 @@ std::u16string convert_utf8_to_utf16(const std::string &u8)
 }
 #endif
 
+class FileNotFoundError {};
 class UnicodeDecodeError {};
 
 class File
@@ -38,10 +39,13 @@ public:
 	File(const String &name, const String &mode = u"r"_S, const String &encoding = u"utf-8"_S, const String &newline = u""_S)
 	{
 #ifdef _WIN32
+		file = NULL;
 		_wfopen_s(&file, (wchar_t*)name.c_str(), (wchar_t*)(mode + u'b').c_str());
 #else
 		file = fopen(convert_utf16_to_utf8(name).c_str(), convert_utf16_to_utf8(mode + u'b').c_str());
 #endif
+		if (file == NULL)
+			throw FileNotFoundError();
 	}
 
 	File &operator=(File &&f)

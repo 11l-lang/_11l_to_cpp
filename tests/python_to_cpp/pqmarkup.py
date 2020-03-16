@@ -777,14 +777,23 @@ Options:
             i += 2
             continue
         if not sys.argv[i].startswith('-'):
-            args_infile = open(sys.argv[i], 'r', encoding = 'utf-8-sig')
+            try:
+                args_infile = open(sys.argv[i], 'r', encoding = 'utf-8-sig')
+            except:
+                sys.exit("Can't open file '" + sys.argv[i] + "'")
             break
         i += 1
     args_outfile = sys.stdout
-    if '-f' in sys.argv:
-        args_outfile = open(sys.argv[sys.argv.index('-f')     + 1], 'w', encoding = 'utf-8', newline = "\n")
-    elif '--file' in sys.argv:
-        args_outfile = open(sys.argv[sys.argv.index('--file') + 1], 'w', encoding = 'utf-8', newline = "\n")
+    outfile_name : str
+    try:
+        if '-f' in sys.argv:
+            outfile_name = sys.argv[sys.argv.index('-f')     + 1]
+            args_outfile = open(outfile_name, 'w', encoding = 'utf-8', newline = "\n")
+        elif '--file' in sys.argv:
+            outfile_name = sys.argv[sys.argv.index('--file') + 1]
+            args_outfile = open(outfile_name, 'w', encoding = 'utf-8', newline = "\n")
+    except:
+        sys.exit("Can't open file '" + outfile_name + "' for writing")
 
     if args_output_html_document and args_habr_html:
         sys.exit("Options --output-html-document and --habr-html are mutually exclusive")
