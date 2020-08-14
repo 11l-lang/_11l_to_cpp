@@ -75,6 +75,20 @@ public:
 
 	String read() const
 	{
+		if (file == stdin) {
+			String s;
+			while (!feof(stdin)) {
+				char buf[64*1024];
+				size_t n = fread(buf, 1, sizeof(buf), stdin);
+				assert(n > 0);
+				size_t oldsz = s.size();
+				s.resize(oldsz + n);
+				for (size_t i = 0; i < n; i++)
+					s[oldsz + i] = buf[i];
+			}
+			return s;
+		}
+
 		fseek(file, 0, SEEK_END);
 		size_t file_size = ftell(file);
 		fseek(file, 0, SEEK_SET);
