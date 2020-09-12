@@ -3224,7 +3224,7 @@ L(i) 256
 F crc32(buf, =crc = UInt32(0))
    crc (+)= FFFF'FFFF
    L(k) buf
-      crc = (crc >> 8) (+) :crc_table[(crc [&] 00'FF) (+) k.code]
+      crc = (crc >> 8) (+) :crc_table[(crc [&] F'F) (+) k.code]
    R crc (+) FFFF'FFFF
 print(hex(crc32(‘The quick brown fox jumps over the lazy dog’)))
 ===
@@ -3252,7 +3252,7 @@ template <typename T1, typename T2 = decltype(to_uint32(0))> auto crc32(const T1
 {
     crc ^= 0xFFFF'FFFF;
     for (auto &&k : buf)
-        crc = (crc >> 8) ^ ::crc_table[(crc & 0x00'FF) ^ k.code];
+        crc = (crc >> 8) ^ ::crc_table[(crc & 0xFF) ^ k.code];
     return crc ^ 0xFFFF'FFFF;
 }
 
