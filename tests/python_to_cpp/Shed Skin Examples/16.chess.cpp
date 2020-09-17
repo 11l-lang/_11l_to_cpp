@@ -12,13 +12,13 @@ auto queenLines = bishopLines + rookLines;
 auto kingMoves = make_tuple(-17, -16, -15, -1, 1, 15, 16, 17);
 Array<int> empty_list;
 auto linePieces = create_array({create_array({empty_list}), create_array({empty_list}), create_array({empty_list}), bishopLines, rookLines, queenLines, create_array({empty_list}), create_array({empty_list}), queenLines, rookLines, bishopLines, create_array({empty_list}), create_array({empty_list})});
-auto clearCastlingOpportunities = create_array({empty_list}) * 0x00'80;
+auto clearCastlingOpportunities = create_array({empty_list}) * 0x80;
 
 struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto &&[i, v] : make_tuple(make_tuple(0x00'00, create_array({10})), make_tuple(0x00'04, create_array({10, 11})), make_tuple(0x00'07, create_array({11})), make_tuple(0x00'70, create_array({12})), make_tuple(0x00'74, create_array({12, 13})), make_tuple(0x00'77, create_array({13}))))
+        for (auto &&[i, v] : make_tuple(make_tuple(0x00, create_array({10})), make_tuple(0x04, create_array({10, 11})), make_tuple(0x07, create_array({11})), make_tuple(0x70, create_array({12})), make_tuple(0x74, create_array({12, 13})), make_tuple(0x77, create_array({13}))))
             clearCastlingOpportunities.set(i, v);
     }
 } code_block_1;
@@ -48,8 +48,8 @@ template <typename T1> auto printBoard(const T1 &board)
 
 template <typename T2> auto mov(Array<int> &board, const T2 &mv)
 {
-    auto ix = (mv >> 8) & 0x00'ff;
-    board.set(mv & 0x00'ff, board[ix]);
+    auto ix = (mv >> 8) & 0xff;
+    board.set(mv & 0xff, board[ix]);
     board.set(ix, 0);
     for (auto &&i : ::clearCastlingOpportunities[ix])
         board.set(i, ::iFalse);
@@ -61,23 +61,23 @@ template <typename T2> auto mov(Array<int> &board, const T2 &mv)
     else
         _set<27>(board, ::iNone);
     if ((mv & 0x0400'0000))
-        switch (mv & 0x00'ff)
+        switch (mv & 0xff)
         {
-        case 0x00'02:
-            _set<00'00>(board, 0);
-            _set<00'03>(board, 4);
+        case 0x02:
+            _set<0'0>(board, 0);
+            _set<0'3>(board, 4);
             break;
-        case 0x00'06:
-            _set<00'07>(board, 0);
-            _set<00'05>(board, 4);
+        case 0x06:
+            _set<0'7>(board, 0);
+            _set<0'5>(board, 4);
             break;
-        case 0x00'72:
-            _set<00'70>(board, 0);
-            _set<00'73>(board, -4);
+        case 0x72:
+            _set<7'0>(board, 0);
+            _set<7'3>(board, -4);
             break;
-        case 0x00'76:
-            _set<00'77>(board, 0);
-            _set<00'75>(board, -4);
+        case 0x76:
+            _set<7'7>(board, 0);
+            _set<7'5>(board, -4);
             break;
         default:
             throw u"faulty castling"_S;
@@ -85,27 +85,27 @@ template <typename T2> auto mov(Array<int> &board, const T2 &mv)
         }
     if (mv & 0x0800'0000) {
         if (_get<26>(board))
-            board.set(mv & 0x00'07 + 64, 0);
+            board.set(mv & 0x07 + 64, 0);
         else
-            board.set(mv & 0x00'07 + 48, 0);
+            board.set(mv & 0x07 + 48, 0);
     }
     if (mv & 0x1000'0000) {
         auto a = (mv & 0x00ff'0000) >> 16;
-        if ((a >= 0x00'80))
+        if ((a >= 0x80))
             a = a - 0x01'00;
-        board.set(mv & 0x00'ff, a);
+        board.set(mv & 0xff, a);
     }
 }
 
 template <typename T1> auto toString(const T1 &move)
 {
-    auto fr = (move >> 8) & 0x00'ff;
-    auto to = move & 0x00'ff;
+    auto fr = (move >> 8) & 0xff;
+    auto to = move & 0xff;
     auto letters = u"abcdefgh"_S;
     auto numbers = u"12345678"_S;
     auto mid = u"-"_S;
     if ((move & 0x0400'0000)) {
-        if ((move & 0x00'07) == 0x00'02)
+        if ((move & 0x07) == 0x02)
             return u"O-O-O"_S;
         else
             return u"O-O"_S;
@@ -133,7 +133,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto rowAttack(con
 {
     auto own = _get<0>(attackers);
     for (auto &&k : dir.map([&ix](const auto &i){return i + ix;})) {
-        if (k & 0x00'88)
+        if (k & 0x88)
             return false;
         if (board[k])
             return (board[k] * own < 0) && in(board[k], attackers);
@@ -153,7 +153,7 @@ template <typename T1> auto pseudoLegalMovesWhite(const T1 &board)
     for (auto &&sq : ::squares) {
         auto b = board[sq];
         if (b >= 1) {
-            if (b == 1 && !(sq + 16 & 0x00'88) && board[sq + 16] == 0) {
+            if (b == 1 && !(sq + 16 & 0x88) && board[sq + 16] == 0) {
                 if (sq >= 16 && sq < 32 && board[sq + 32] == 0)
                     retval.append(sq * 0x01'01 + 32);
                 retval.append(sq * 0x01'01 + 16);
@@ -166,20 +166,20 @@ template <typename T1> auto pseudoLegalMovesWhite(const T1 &board)
             else if (b == 3 || b == 5)
                 for (auto &&line : ::bishopLines)
                     for (auto &&k : line) {
-                        if ((k + sq & 0x00'88) || board[k + sq] != 0)
+                        if ((k + sq & 0x88) || board[k + sq] != 0)
                             break;
                         retval.append(sq * 0x01'01 + k);
                     }
             if (b == 4 || b == 5)
                 for (auto &&line : ::rookLines)
                     for (auto &&k : line) {
-                        if ((k + sq & 0x00'88) || board[k + sq] != 0)
+                        if ((k + sq & 0x88) || board[k + sq] != 0)
                             break;
                         retval.append(sq * 0x01'01 + k);
                     }
             else if (b == 6) {
                 for (auto &&k : ::kingMoves)
-                    if (!(k + sq & 0x00'88) && board[k + sq] == 0)
+                    if (!(k + sq & 0x88) && board[k + sq] == 0)
                         retval.append(sq * 0x01'01 + k);
             }
         }
@@ -197,7 +197,7 @@ template <typename T1> auto pseudoLegalMovesBlack(const T1 &board)
     for (auto &&sq : ::squares) {
         auto b = board[sq];
         if (b < 0) {
-            if (b == -1 && !(sq + 16 & 0x00'88) && board[sq - 16] == 0) {
+            if (b == -1 && !(sq + 16 & 0x88) && board[sq - 16] == 0) {
                 if (sq >= 96 && sq < 112 && board[sq - 32] == 0)
                     retval.append(sq * 0x01'01 - 32);
                 retval.append(sq * 0x01'01 - 16);
@@ -210,28 +210,28 @@ template <typename T1> auto pseudoLegalMovesBlack(const T1 &board)
             else if (b == -3 || b == -5)
                 for (auto &&line : ::bishopLines)
                     for (auto &&k : line) {
-                        if ((k + sq & 0x00'88) || board[k + sq] != 0)
+                        if ((k + sq & 0x88) || board[k + sq] != 0)
                             break;
                         retval.append(sq * 0x01'01 + k);
                     }
             if (b == -4 || b == -5)
                 for (auto &&line : ::rookLines)
                     for (auto &&k : line) {
-                        if ((k + sq & 0x00'88) || board[k + sq] != 0)
+                        if ((k + sq & 0x88) || board[k + sq] != 0)
                             break;
                         retval.append(sq * 0x01'01 + k);
                     }
             else if (b == -6) {
                 for (auto &&k : ::kingMoves)
-                    if (!(k + sq & 0x00'88) && board[k + sq] == 0)
+                    if (!(k + sq & 0x88) && board[k + sq] == 0)
                         retval.append(sq * 0x01'01 + k);
             }
         }
     }
-    if ((_get<12>(board) && _get<0x00'71>(board) == 0 && _get<0x00'72>(board) == 0 && _get<0x00'73>(board) == 0 && !(in(1, board[range_el(0x00'61, 0x00'65)])) && !nonpawnWhiteAttacks(board, 0x00'72) && !nonpawnWhiteAttacks(board, 0x00'73) && !nonpawnWhiteAttacks(board, 0x00'74)))
-        retval.append(0x0400'0000 + 0x00'74 * 0x01'01 - 2);
-    if ((_get<11>(board) && _get<0x00'75>(board) == 0 && _get<0x00'76>(board) == 0 && !(in(-1, board[range_el(0x00'63, 0x00'68)])) && !nonpawnWhiteAttacks(board, 0x00'74) && !nonpawnWhiteAttacks(board, 0x00'75) && !nonpawnWhiteAttacks(board, 0x00'76)))
-        retval.append(0x0400'0000 + 0x00'74 * 0x01'01 + 2);
+    if ((_get<12>(board) && _get<0x71>(board) == 0 && _get<0x72>(board) == 0 && _get<0x73>(board) == 0 && !(in(1, board[range_el(0x61, 0x65)])) && !nonpawnWhiteAttacks(board, 0x72) && !nonpawnWhiteAttacks(board, 0x73) && !nonpawnWhiteAttacks(board, 0x74)))
+        retval.append(0x0400'0000 + 0x74 * 0x01'01 - 2);
+    if ((_get<11>(board) && _get<0x75>(board) == 0 && _get<0x76>(board) == 0 && !(in(-1, board[range_el(0x63, 0x68)])) && !nonpawnWhiteAttacks(board, 0x74) && !nonpawnWhiteAttacks(board, 0x75) && !nonpawnWhiteAttacks(board, 0x76)))
+        retval.append(0x0400'0000 + 0x74 * 0x01'01 + 2);
     return retval;
 }
 
@@ -250,27 +250,27 @@ template <typename T1> auto pseudoLegalCapturesWhite(const T1 &board)
         auto b = board[sq];
         if (b >= 1) {
             if (b == 1) {
-                if (!(sq + 17 & 0x00'88) && board[sq + 17] < 0)
+                if (!(sq + 17 & 0x88) && board[sq + 17] < 0)
                     retval.append(0x0200'0000 + sq * 0x01'01 + 17);
-                if (!(sq + 15 & 0x00'88) && board[sq + 15] < 0)
+                if (!(sq + 15 & 0x88) && board[sq + 15] < 0)
                     retval.append(0x0200'0000 + sq * 0x01'01 + 15);
                 if (sq >= 64 && sq < 72 && abs((sq & 7) - _get<27>(board)) == 1)
-                    retval.append(0x0200'0000 + sq * 0x01'00 + (sq & 0x00'70) + 16 + _get<27>(board));
+                    retval.append(0x0200'0000 + sq * 0x01'00 + (sq & 0x70) + 16 + _get<27>(board));
             }
             else if (b == 2) {
                 for (auto &&k : ::knightMoves)
-                    if (!(sq + k & 0x00'88) && board[k + sq] < 0)
+                    if (!(sq + k & 0x88) && board[k + sq] < 0)
                         retval.append(0x0200'0000 + sq * 0x01'01 + k);
             }
             else if (b == 6) {
                 for (auto &&k : ::kingMoves)
-                    if (!(k + sq & 0x00'88) && board[k + sq] < 0)
+                    if (!(k + sq & 0x88) && board[k + sq] < 0)
                         retval.append(0x0200'0000 + sq * 0x01'01 + k);
             }
             else
                 for (auto &&line : ::linePieces[b])
                     for (auto &&k : line) {
-                        if ((sq + k & 0x00'88) || board[k + sq] >= 1)
+                        if ((sq + k & 0x88) || board[k + sq] >= 1)
                             break;
                         if (board[k + sq] < 0) {
                             retval.append(0x0200'0000 + sq * 0x01'01 + k);
@@ -294,11 +294,11 @@ template <typename T1> auto pseudoLegalCapturesBlack(const T1 &board)
                 if (listGet(board, sq - 15) >= 1)
                     retval.append(0x0200'0000 + sq * 0x01'01 - 15);
                 if (sq >= 48 && sq < 56 && abs((sq & 7) - _get<27>(board)) == 1)
-                    retval.append(0x0a00'0000 + sq * 0x01'00 + (sq & 0x00'70) - 16 + _get<27>(board));
+                    retval.append(0x0a00'0000 + sq * 0x01'00 + (sq & 0x70) - 16 + _get<27>(board));
             }
             else if (b == -2) {
                 for (auto &&k : ::knightMoves)
-                    if (!(sq + k & 0x00'88) && board[k + sq] >= 1)
+                    if (!(sq + k & 0x88) && board[k + sq] >= 1)
                         retval.append(0x0200'0000 + sq * 0x01'01 + k);
             }
             else if (b == -3)
@@ -359,7 +359,7 @@ template <typename T1> auto legalMoves(const T1 &board)
     for (auto &&mv : allMoves) {
         auto board2 = copy(board);
         mov(board2, mv);
-        if (pseudoLegalCaptures(board2).filter([&board2, &kingVal](const auto &i){return board2[i & 0x00'ff] == kingVal;}).empty())
+        if (pseudoLegalCaptures(board2).filter([&board2, &kingVal](const auto &i){return board2[i & 0xff] == kingVal;}).empty())
             retval.append(mv);
     }
     return retval;

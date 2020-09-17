@@ -10,8 +10,8 @@ V queenLines = bishopLines [+] rookLines
 V kingMoves = (-17, -16, -15, -1, 1, 15, 16, 17)
 [Int] empty_list
 V linePieces = [[empty_list], [empty_list], [empty_list], bishopLines, rookLines, queenLines, [empty_list], [empty_list], queenLines, rookLines, bishopLines, [empty_list], [empty_list]]
-V clearCastlingOpportunities = [empty_list] * 00'80
-L(i, v) ((00'00, [10]), (00'04, [10, 11]), (00'07, [11]), (00'70, [12]), (00'74, [12, 13]), (00'77, [13]))
+V clearCastlingOpportunities = [empty_list] * 8'0
+L(i, v) ((0'0, [10]), (0'4, [10, 11]), (0'7, [11]), (7'0, [12]), (7'4, [12, 13]), (7'7, [13]))
    clearCastlingOpportunities[i] = v
 V pieces = ‘.pnbrqkKQRBNP’
 
@@ -30,8 +30,8 @@ F printBoard(board)
       print()
 
 F mov([Int] &board; mv)
-   V ix = (mv >> 8) [&] 00'ff
-   board[mv [&] 00'ff] = board[ix]
+   V ix = (mv >> 8) [&] f'f
+   board[mv [&] f'f] = board[ix]
    board[ix] = 0
 
    L(i) :clearCastlingOpportunities[ix]
@@ -44,40 +44,40 @@ F mov([Int] &board; mv)
    E
       board[27] = :iNone
    I (mv [&] 0400'0000)
-      S mv [&] 00'ff
-         00'02
-            board[00'00] = 0
-            board[00'03] = 4
-         00'06
-            board[00'07] = 0
-            board[00'05] = 4
-         00'72
-            board[00'70] = 0
-            board[00'73] = -4
-         00'76
-            board[00'77] = 0
-            board[00'75] = -4
+      S mv [&] f'f
+         0'2
+            board[0'0] = 0
+            board[0'3] = 4
+         0'6
+            board[0'7] = 0
+            board[0'5] = 4
+         7'2
+            board[7'0] = 0
+            board[7'3] = -4
+         7'6
+            board[7'7] = 0
+            board[7'5] = -4
          E
             X ‘faulty castling’
    I mv [&] 0800'0000
       I board[26]
-         board[mv [&] 00'07 + 64] = 0
+         board[mv [&] 0'7 + 64] = 0
       E
-         board[mv [&] 00'07 + 48] = 0
+         board[mv [&] 0'7 + 48] = 0
    I mv [&] 1000'0000
       V a = (mv [&] 00ff'0000) >> 16
-      I (a >= 00'80)
+      I (a >= 8'0)
          a = a - 01'00
-      board[mv [&] 00'ff] = a
+      board[mv [&] f'f] = a
 
 F toString(move)
-   V fr = (move >> 8) [&] 00'ff
-   V to = move [&] 00'ff
+   V fr = (move >> 8) [&] f'f
+   V to = move [&] f'f
    V letters = ‘abcdefgh’
    V numbers = ‘12345678’
    V mid = ‘-’
    I (move [&] 0400'0000)
-      I (move [&] 00'07) == 00'02
+      I (move [&] 0'7) == 0'2
          R ‘O-O-O’
       E
          R ‘O-O’
@@ -99,7 +99,7 @@ F moveStr([Int] &board; strMove)
 F rowAttack(board, attackers, ix, dir)
    V own = attackers[0]
    L(k) dir.map(i -> i + @ix)
-      I k [&] 00'88
+      I k [&] 8'8
          R 0B
       I board[k]
          R (board[k] * own < 0) & board[k] C attackers
@@ -114,7 +114,7 @@ F pseudoLegalMovesWhite(board)
    L(sq) :squares
       V b = board[sq]
       I b >= 1
-         I b == 1 & !(sq + 16 [&] 00'88) & board[sq + 16] == 0
+         I b == 1 & !(sq + 16 [&] 8'8) & board[sq + 16] == 0
             I sq >= 16 & sq < 32 & board[sq + 32] == 0
                retval.append(sq * 01'01 + 32)
             retval.append(sq * 01'01 + 16)
@@ -125,18 +125,18 @@ F pseudoLegalMovesWhite(board)
          E I b == 3 | b == 5
             L(line) :bishopLines
                L(k) line
-                  I (k + sq [&] 00'88) | board[k + sq] != 0
+                  I (k + sq [&] 8'8) | board[k + sq] != 0
                      L.break
                   retval.append(sq * 01'01 + k)
          I b == 4 | b == 5
             L(line) :rookLines
                L(k) line
-                  I (k + sq [&] 00'88) | board[k + sq] != 0
+                  I (k + sq [&] 8'8) | board[k + sq] != 0
                      L.break
                   retval.append(sq * 01'01 + k)
          E I b == 6
             L(k) :kingMoves
-               I !(k + sq [&] 00'88) & board[k + sq] == 0
+               I !(k + sq [&] 8'8) & board[k + sq] == 0
                   retval.append(sq * 01'01 + k)
    I (board[10] & board[1] == 0 & board[2] == 0 & board[3] == 0 & !(-1 C board[17.<22]) & !nonpawnBlackAttacks(board, 2) & !nonpawnBlackAttacks(board, 3) & !nonpawnBlackAttacks(board, 4))
       retval.append(0400'0000 + 4 * 01'01 - 2)
@@ -149,7 +149,7 @@ F pseudoLegalMovesBlack(board)
    L(sq) :squares
       V b = board[sq]
       I b < 0
-         I b == -1 & !(sq + 16 [&] 00'88) & board[sq - 16] == 0
+         I b == -1 & !(sq + 16 [&] 8'8) & board[sq - 16] == 0
             I sq >= 96 & sq < 112 & board[sq - 32] == 0
                retval.append(sq * 01'01 - 32)
             retval.append(sq * 01'01 - 16)
@@ -160,24 +160,24 @@ F pseudoLegalMovesBlack(board)
          E I b == -3 | b == -5
             L(line) :bishopLines
                L(k) line
-                  I (k + sq [&] 00'88) | board[k + sq] != 0
+                  I (k + sq [&] 8'8) | board[k + sq] != 0
                      L.break
                   retval.append(sq * 01'01 + k)
 
          I b == -4 | b == -5
             L(line) :rookLines
                L(k) line
-                  I (k + sq [&] 00'88) | board[k + sq] != 0
+                  I (k + sq [&] 8'8) | board[k + sq] != 0
                      L.break
                   retval.append(sq * 01'01 + k)
          E I b == -6
             L(k) :kingMoves
-               I !(k + sq [&] 00'88) & board[k + sq] == 0
+               I !(k + sq [&] 8'8) & board[k + sq] == 0
                   retval.append(sq * 01'01 + k)
-   I (board[12] & board[00'71] == 0 & board[00'72] == 0 & board[00'73] == 0 & !(1 C board[00'61.<00'65]) & !nonpawnWhiteAttacks(board, 00'72) & !nonpawnWhiteAttacks(board, 00'73) & !nonpawnWhiteAttacks(board, 00'74))
-      retval.append(0400'0000 + 00'74 * 01'01 - 2)
-   I (board[11] & board[00'75] == 0 & board[00'76] == 0 & !(-1 C board[00'63.<00'68]) & !nonpawnWhiteAttacks(board, 00'74) & !nonpawnWhiteAttacks(board, 00'75) & !nonpawnWhiteAttacks(board, 00'76))
-      retval.append(0400'0000 + 00'74 * 01'01 + 2)
+   I (board[12] & board[7'1] == 0 & board[7'2] == 0 & board[7'3] == 0 & !(1 C board[6'1.<6'5]) & !nonpawnWhiteAttacks(board, 7'2) & !nonpawnWhiteAttacks(board, 7'3) & !nonpawnWhiteAttacks(board, 7'4))
+      retval.append(0400'0000 + 7'4 * 01'01 - 2)
+   I (board[11] & board[7'5] == 0 & board[7'6] == 0 & !(-1 C board[6'3.<6'8]) & !nonpawnWhiteAttacks(board, 7'4) & !nonpawnWhiteAttacks(board, 7'5) & !nonpawnWhiteAttacks(board, 7'6))
+      retval.append(0400'0000 + 7'4 * 01'01 + 2)
    R retval
 
 F pseudoLegalMoves(board)
@@ -192,24 +192,24 @@ F pseudoLegalCapturesWhite(board)
       V b = board[sq]
       I b >= 1
          I b == 1
-            I !(sq + 17 [&] 00'88) & board[sq + 17] < 0
+            I !(sq + 17 [&] 8'8) & board[sq + 17] < 0
                retval.append(0200'0000 + sq * 01'01 + 17)
-            I !(sq + 15 [&] 00'88) & board[sq + 15] < 0
+            I !(sq + 15 [&] 8'8) & board[sq + 15] < 0
                retval.append(0200'0000 + sq * 01'01 + 15)
             I sq >= 64 & sq < 72 & abs((sq [&] 7) - board[27]) == 1
-               retval.append(0200'0000 + sq * 01'00 + (sq [&] 00'70) + 16 + board[27])
+               retval.append(0200'0000 + sq * 01'00 + (sq [&] 7'0) + 16 + board[27])
          E I b == 2
             L(k) :knightMoves
-               I !(sq + k [&] 00'88) & board[k + sq] < 0
+               I !(sq + k [&] 8'8) & board[k + sq] < 0
                   retval.append(0200'0000 + sq * 01'01 + k)
          E I b == 6
             L(k) :kingMoves
-               I !(k + sq [&] 00'88) & board[k + sq] < 0
+               I !(k + sq [&] 8'8) & board[k + sq] < 0
                   retval.append(0200'0000 + sq * 01'01 + k)
          E
             L(line) :linePieces[b]
                L(k) line
-                  I (sq + k [&] 00'88) | board[k + sq] >= 1
+                  I (sq + k [&] 8'8) | board[k + sq] >= 1
                      L.break
                   I board[k + sq] < 0
                      retval.append(0200'0000 + sq * 01'01 + k)
@@ -227,10 +227,10 @@ F pseudoLegalCapturesBlack(board)
             I listGet(board, sq - 15) >= 1
                retval.append(0200'0000 + sq * 01'01 - 15)
             I sq >= 48 & sq < 56 & abs((sq [&] 7) - board[27]) == 1
-               retval.append(0a00'0000 + sq * 01'00 + (sq [&] 00'70) - 16 + board[27])
+               retval.append(0a00'0000 + sq * 01'00 + (sq [&] 7'0) - 16 + board[27])
          E I b == -2
             L(k) :knightMoves
-               I !(sq + k [&] 00'88) & board[k + sq] >= 1
+               I !(sq + k [&] 8'8) & board[k + sq] >= 1
                   retval.append(0200'0000 + sq * 01'01 + k)
          E I b == -3
             L(line) :bishopLines
@@ -278,7 +278,7 @@ F legalMoves(board)
       V board2 = copy(board)
       mov(&board2, mv)
 
-      I pseudoLegalCaptures(board2).filter(i -> @board2[i [&] 00'ff] == @kingVal).empty
+      I pseudoLegalCaptures(board2).filter(i -> @board2[i [&] f'f] == @kingVal).empty
          retval.append(mv)
    R retval
 

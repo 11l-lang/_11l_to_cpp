@@ -1639,9 +1639,14 @@ def type_of(sn):
         s = sn.scope
         while True:
             if s.is_function:
-                if type(s.node.parent) == ASTFunctionDefinition:
-                    if type(s.node.parent.parent) == ASTTypeDefinition:
-                        fid = s.node.parent.parent.find_id_including_base_types(sn.children[1].token_str())
+                if s.is_lambda:
+                    assert(s.node is None)
+                    snp = s.parent.node
+                else:
+                    snp = s.node.parent
+                if type(snp) == ASTFunctionDefinition:
+                    if type(snp.parent) == ASTTypeDefinition:
+                        fid = snp.parent.find_id_including_base_types(sn.children[1].token_str())
                         if fid is None:
                             raise Error('call of undefined method `' + sn.children[1].token_str() + '`', sn.left_to_right_token())
                         if len(fid.ast_nodes) > 1:

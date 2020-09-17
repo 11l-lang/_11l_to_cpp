@@ -1094,3 +1094,34 @@ struct CodeBlock1
         print(u"1234"_S[range_ep(1, 2)]);
     }
 } code_block_1;
+
+
+T Maze
+   Int _height
+   F calcDistance(pt1)
+      R 0
+
+T MazeSolver
+   Maze maze
+   F sortPoints(points)
+      V distances = points.map(point -> @.maze.calcDistance(point))
+===
+class Maze
+{
+public:
+    int _height;
+    template <typename T1> auto calcDistance(const T1 &pt1)
+    {
+        return 0;
+    }
+};
+
+class MazeSolver
+{
+public:
+    Maze maze;
+    template <typename T1> auto sortPoints(const T1 &points)
+    {
+        auto distances = points.map([this](const auto &point){return maze.calcDistance(point);});
+    }
+};
