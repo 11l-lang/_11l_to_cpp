@@ -64,20 +64,20 @@ template <typename T2> auto mov(Array<int> &board, const T2 &mv)
         switch (mv & 0xff)
         {
         case 0x02:
-            _set<0'0>(board, 0);
-            _set<0'3>(board, 4);
+            _set<0x00>(board, 0);
+            _set<0x03>(board, 4);
             break;
         case 0x06:
-            _set<0'7>(board, 0);
-            _set<0'5>(board, 4);
+            _set<0x07>(board, 0);
+            _set<0x05>(board, 4);
             break;
         case 0x72:
-            _set<7'0>(board, 0);
-            _set<7'3>(board, -4);
+            _set<0x70>(board, 0);
+            _set<0x73>(board, -4);
             break;
         case 0x76:
-            _set<7'7>(board, 0);
-            _set<7'5>(board, -4);
+            _set<0x77>(board, 0);
+            _set<0x75>(board, -4);
             break;
         default:
             throw u"faulty castling"_S;

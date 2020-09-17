@@ -779,7 +779,7 @@ class SymbolNode:
                 return '&' + self.children[0].children[0].token_str() + ' ' + self.symbol.id + ' &' + self.children[1].children[0].token_str()
             elif self.symbol.id == '=' and self.children[0].symbol.id == '[': # ] # replace `a[k] = v` with `a.set(k, v)`
                 if self.children[0].children[1].token.category == Token.Category.NUMERIC_LITERAL: # replace `a[0] = v` with `_set<0>(a, v)` to support tuples
-                    return '_set<' + self.children[0].children[1].token_str() + '>(' + self.children[0].children[0].to_str() + ', ' + char_if_len_1(self.children[1]) + ')'
+                    return '_set<' + self.children[0].children[1].to_str() + '>(' + self.children[0].children[0].to_str() + ', ' + char_if_len_1(self.children[1]) + ')'
                 else:
                     c01 = self.children[0].children[1].to_str()
                     if c01.startswith('(len)'):
