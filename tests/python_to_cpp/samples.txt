@@ -2223,3 +2223,28 @@ struct CodeBlock1
         print(sum_map(create_array({make_tuple(1, 2.0, 3), make_tuple(2, 3.0, 4), make_tuple(3, 4.0, 5)}), [](const auto &a, const auto &b, const auto &c){return a * b * c;}));
     }
 } code_block_1;
+
+
+print((0).bit_length())
+print((1).bit_length())
+print((2).bit_length())
+print((3).bit_length())
+print((4).bit_length())
+===
+print(bit_length((0)))
+print(bit_length((1)))
+print(bit_length((2)))
+print(bit_length((3)))
+print(bit_length((4)))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(bit_length((0)));
+        print(bit_length((1)));
+        print(bit_length((2)));
+        print(bit_length((3)));
+        print(bit_length((4)));
+    }
+} code_block_1;

@@ -77,13 +77,14 @@ inline int bsf(int64_t x) {return __builtin_ctzll(x);}
 #elif _MSC_VER
 inline int bsr(int x)     {unsigned long r; _BitScanReverse  (&r, x); return r;}
 inline int bsf(int x)     {unsigned long r; _BitScanForward  (&r, x); return r;}
-#ifdef _AMD64_
+#ifdef _M_AMD64
 inline int bsr(int64_t x) {unsigned long r; _BitScanReverse64(&r, x); return r;}
 inline int bsf(int64_t x) {unsigned long r; _BitScanForward64(&r, x); return r;}
 #endif
 #else
 #error Unsupported compiler
 #endif
+template <typename Ty> int bit_length(Ty x) {return x != 0 ? bsr(x) + 1 : 0;}
 
 auto divmod(int     x, int     y) {  div_t r =   div(x, y); return make_tuple(r.quot, r.rem);}
 auto divmod(int64_t x, int64_t y) {lldiv_t r = lldiv(x, y); return make_tuple(r.quot, r.rem);}

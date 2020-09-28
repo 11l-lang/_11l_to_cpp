@@ -478,11 +478,11 @@ public:
 		return String(*this) * n;
 	}
 
-	Char &operator[](int pos)
+	Char &operator[](size_t pos)
 	{
 		return (Char&)at(pos);
 	}
-	const Char operator[](int pos) const
+	const Char operator[](size_t pos) const
 	{
 		return Char(at(pos));
 	}
