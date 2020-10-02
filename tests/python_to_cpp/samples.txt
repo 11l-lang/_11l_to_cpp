@@ -1838,11 +1838,12 @@ V u = [1, 2]
 V (i, j) = (0, 1)
 (u[i], u[j]) = (u[j], u[i])
 ===
+auto [a, b] = make_tuple(1, 2);
+
 struct CodeBlock1
 {
     CodeBlock1()
     {
-        auto [a, b] = make_tuple(1, 2);
         assign_from_tuple(a, b, make_tuple(3, 4));
         TUPLE_ELEMENT_T(1, make_tuple(5, 6)) c;
         assign_from_tuple(b, c, make_tuple(5, 6));
@@ -1851,12 +1852,12 @@ struct CodeBlock1
     }
 } code_block_1;
 auto u = create_array({1, 2});
+auto [i, j] = make_tuple(0, 1);
 
 struct CodeBlock2
 {
     CodeBlock2()
     {
-        auto [i, j] = make_tuple(0, 1);
         assign_from_tuple(u[i], u[j], make_tuple(u[j], u[i]));
     }
 } code_block_2;

@@ -920,7 +920,7 @@ class ASTProgram(ASTNodeWithChildren):
         code_block_id = 1
 
         for c in self.children:
-            global_statement = type(c) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition, ASTTypeDefinition, ASTTypeAlias, ASTTypeEnum, ASTMain)
+            global_statement = type(c) in (ASTVariableDeclaration, ASTVariableInitialization, ASTTupleInitialization, ASTFunctionDefinition, ASTTypeDefinition, ASTTypeAlias, ASTTypeEnum, ASTMain)
             if global_statement != prev_global_statement:
                 prev_global_statement = global_statement
                 if not global_statement:
@@ -1715,6 +1715,16 @@ def type_of(sn):
         raise Error('method `' + sn.children[1].token_str() + '` is not found in type `' + left.type.rstrip('?') + '`', sn.left_to_right_token())
     return tid.ast_nodes[0]
 
+# List of C++ keywords is taken from here[https://en.cppreference.com/w/cpp/keyword]
+cpp_keywords = {'alignas', 'alignof', 'and', 'and_eq', 'asm', 'auto', 'bitand', 'bitor', 'bool', 'break', 'case', 'catch', 'char', 'char8_t', 'char16_t', 'char32_t', 'class', 'compl', 'concept', 'const',
+    'consteval', 'constexpr', 'constinit', 'const_cast', 'continue', 'co_await', 'co_return', 'co_yield', 'decltype', 'default', 'delete', 'do', 'double', 'dynamic_cast', 'else', 'enum', 'explicit',
+    'export', 'extern', 'false', 'float', 'for', 'friend', 'goto', 'if', 'inline', 'int', 'long', 'mutable', 'namespace', 'new', 'noexcept', 'not', 'not_eq', 'nullptr', 'operator', 'or', 'or_eq',
+    'private', 'protected', 'public', 'reflexpr', 'register', 'reinterpret_cast', 'requires', 'return', 'short', 'signed', 'sizeof', 'static', 'static_assert', 'static_cast', 'struct', 'switch',
+    'template', 'this', 'thread_local', 'throw', 'true', 'try', 'typedef', 'typeid', 'typename', 'union', 'unsigned', 'using', 'virtual', 'void', 'volatile', 'wchar_t', 'while', 'xor', 'xor_eq'}
+
+def fix_cpp_keyword(token_str):
+    return '_' + token_str + '_' if token_str in cpp_keywords else token_str
+
 def next_token():
     global token, tokeni, tokensn
     if token is None and tokeni != -1:
@@ -1732,6 +1742,8 @@ def next_token():
                 key = '(literal)'
             elif token.category == Token.Category.NAME:
                 key = '(name)'
+                if token.value(source) in cpp_keywords:
+                    tokensn.token_str_override = '_' + token.value(source) + '_'
             elif token.category == Token.Category.CONSTANT:
                 key = '(constant)'
             elif token.category == Token.Category.STRING_CONCATENATOR:
@@ -2471,7 +2483,7 @@ def parse_internal(this_node):
                         if node.loop_variable is not None: # check if loop variable is a [smart] pointer
                             lv_node = None
                             if node.expression.token.category == Token.Category.NAME:
-                                id = scope.find(node.expression.token.value(source))
+                                id = scope.find(node.expression.token_str())
                                 if id is not None and len(id.ast_nodes) == 1:
                                     lv_node = id.ast_nodes[0]
                             elif node.expression.symbol.id == '.' and len(node.expression.children) == 2:
@@ -2588,7 +2600,7 @@ def parse_internal(this_node):
 
             while True:
                 assert(token.category == Token.Category.NAME)
-                node.dest_vars.append(token.value(source))
+                node.dest_vars.append(fix_cpp_keyword(token.value(source)))
                 next_token()
                 if token.value(source) == ')':
                     break
@@ -2659,14 +2671,14 @@ def parse_internal(this_node):
                     node.type_args = []
                     scope.add_name(node.vars[0], node)
                 elif token.category == Token.Category.NAME and tokens[tokeni-1].category != Token.Category.SCOPE_END:
-                    var_name = token.value(source)
+                    var_name = fix_cpp_keyword(token.value(source))
                     next_token()
                     if token.value(source) == '=':
                         next_token()
                         node = ASTVariableInitialization()
                         node.set_expression(expression())
                         if node_expression.token.value(source) not in ('V', 'П', 'var', 'перем'):
-                            id = scope.find(node_expression.token.value(source))
+                            id = scope.find(node_expression.token_str())
                             if id is not None and len(id.ast_nodes) != 0:
                                 if type(id.ast_nodes[0]) == ASTTypeDefinition and (id.ast_nodes[0].has_virtual_functions or id.ast_nodes[0].has_pointers_to_the_same_type):
                                     node.is_ptr = True
@@ -2682,7 +2694,7 @@ def parse_internal(this_node):
                         node.vars = [var_name]
                     else:
                         node = ASTVariableDeclaration()
-                        id = scope.find(node_expression.token.value(source).rstrip('?'))
+                        id = scope.find(node_expression.token_str().rstrip('?'))
                         if id is not None:
                             assert(len(id.ast_nodes) == 1)
                             if type(id.ast_nodes[0]) not in (ASTTypeDefinition, ASTTypeEnum):

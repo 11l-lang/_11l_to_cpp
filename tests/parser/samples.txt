@@ -1125,3 +1125,19 @@ public:
         auto distances = points.map([this](const auto &point){return maze.calcDistance(point);});
     }
 };
+
+
+V (private, a) = (1B, 0)
+V new = 0B
+print(new)
+===
+auto [_private_, a] = make_tuple(true, 0);
+auto _new_ = false;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(_new_);
+    }
+} code_block_1;
