@@ -719,6 +719,11 @@ inline Char operator ""_C(char16_t c)
 	return Char(c);
 }
 
+template <typename Type> String to_string(const Type &v)
+{
+	return String(v);
+}
+
 class ValueError
 {
 public:

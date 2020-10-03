@@ -63,12 +63,7 @@ template <typename T1, typename T2> auto load_file(const T1 &filename, const T2 
     for (auto &&line : protfile.read_lines(true)) {
         if (line.starts_with(u"name"_S))
             continue;
-        TUPLE_ELEMENT_T(0, line.trim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S)).split(u"\t"_S)) name;
-        TUPLE_ELEMENT_T(1, line.trim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S)).split(u"\t"_S)) mass;
-        TUPLE_ELEMENT_T(2, line.trim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S)).split(u"\t"_S)) isoelectric_point;
-        TUPLE_ELEMENT_T(3, line.trim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S)).split(u"\t"_S)) size;
-        TUPLE_ELEMENT_T(4, line.trim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S)).split(u"\t"_S)) sequence;
-        assign_from_tuple(name, mass, isoelectric_point, size, sequence, line.trim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S)).split(u"\t"_S));
+        auto [name, mass, isoelectric_point, size, sequence] = bind_array<5>(line.trim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S)).split(u"\t"_S));
         auto protein = Protein(name, mass, isoelectric_point, size, sequence, type_id);
         ::PROTEINS.append(protein);
     }

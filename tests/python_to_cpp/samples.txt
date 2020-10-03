@@ -2249,3 +2249,10 @@ struct CodeBlock1
         print(bit_length((4)));
     }
 } code_block_1;
+
+
+(a, b) = input().split()
+===
+V (a, b) = input().split_py()
+===
+auto [a, b] = bind_array<2>(input().split_py());

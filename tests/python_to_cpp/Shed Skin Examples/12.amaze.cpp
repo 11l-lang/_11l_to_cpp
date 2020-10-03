@@ -55,9 +55,7 @@ public:
         print(u"You can enter a maze row by row"_S);
         print();
         auto data = input(u"Enter the dimension of the maze as Width X Height: "_S);
-        TUPLE_ELEMENT_T(0, data.split_py()) w1;
-        TUPLE_ELEMENT_T(1, data.split_py()) h1;
-        assign_from_tuple(w1, h1, data.split_py());
+        auto [w1, h1] = bind_array<2>(data.split_py());
         auto [w, h] = make_tuple(to_int(w1), to_int(h1));
 
         for (auto x : range_el(0, h)) {
@@ -539,9 +537,7 @@ public:
             try
             {
                 auto pt1 = u"0 4"_S;
-                TUPLE_ELEMENT_T(0, pt1.split_py()) x;
-                TUPLE_ELEMENT_T(1, pt1.split_py()) y;
-                assign_from_tuple(x, y, pt1.split_py());
+                auto [x, y] = bind_array<2>(pt1.split_py());
                 _start = make_tuple(to_int(x), to_int(y));
                 maze.validatePoint(_start);
                 break;
@@ -555,9 +551,7 @@ public:
             try
             {
                 auto pt2 = u"5 4"_S;
-                TUPLE_ELEMENT_T(0, pt2.split_py()) x;
-                TUPLE_ELEMENT_T(1, pt2.split_py()) y;
-                assign_from_tuple(x, y, pt2.split_py());
+                auto [x, y] = bind_array<2>(pt2.split_py());
                 _end = make_tuple(to_int(x), to_int(y));
                 maze.validatePoint(_end);
                 break;

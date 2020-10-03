@@ -1037,12 +1037,16 @@ class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
 
 class ASTTupleInitialization(ASTNodeWithExpression):
     dest_vars : List[str]
+    bind_array = False
 
     def __init__(self):
         self.dest_vars = []
 
     def to_str(self, indent):
-        return ' ' * (indent*4) + 'auto [' + ', '.join(self.dest_vars) + '] = ' + self.expression.to_str() + ";\n"
+        e = self.expression.to_str()
+        if self.bind_array:
+            e = 'bind_array<' + str(len(self.dest_vars)) + '>(' + e + ')'
+        return ' ' * (indent*4) + 'auto [' + ', '.join(self.dest_vars) + '] = ' + e + ";\n"
 
 class ASTTupleAssignment(ASTNodeWithExpression):
     dest_vars : List[Tuple[str, bool]]
@@ -2618,11 +2622,12 @@ def parse_internal(this_node):
                                                 and node.expression.children[0].children[0].children[0].symbol.id == '.'
                                             and len(node.expression.children[0].children[0].children[0].children) == 2
                                                 and node.expression.children[0].children[0].children[0].children[1].token_str() in ('split', 'split_py')):
-                n = node
-                node = ASTTupleAssignment()
-                for dv in n.dest_vars:
-                    node.dest_vars.append((dv, True))
-                node.set_expression(n.expression)
+                # n = node
+                # node = ASTTupleAssignment()
+                # for dv in n.dest_vars:
+                #     node.dest_vars.append((dv, True))
+                # node.set_expression(n.expression)
+                node.bind_array = True
 
             if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
                 next_token()

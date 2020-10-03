@@ -1,10 +1,6 @@
 ﻿#include <initializer_list>
 #include <vector>
 
-template <typename Type> String to_string(const Type &v)
-{
-	return String(v);
-};
 template <typename Type, int N> String to_string(const Tvec<Type, N> &v)
 {
 	String r;
@@ -665,4 +661,21 @@ template <typename Type> Type min(const Array<Type> &arr)
 	for (auto i : arr)
 		if (i < r) r = i;
 	return r;
+}
+
+// [https://stackoverflow.com/a/51077813/2692494 <- google:‘structured binding vector’]
+template <class T, size_t N> struct array_binder {
+	//const Array<T> &arr; // this does not work with `auto [a, b] = bind_array<2>(create_array({1, 2}));` because destructor of Array is called before `get()`
+	T a[N];
+	array_binder(const Array<T> &arr) { for (size_t i=0; i<N; i++) a[i] = arr[i]; }
+	template <size_t I> T get() { return a[I]; }
+};
+
+namespace std {
+	template <class T, size_t N> struct tuple_size<array_binder<T, N>> : std::integral_constant<size_t, N> { };
+	template <size_t I, size_t N, class T> struct tuple_element<I, array_binder<T, N>> { using type = T; };
+}
+
+template <size_t N, class T> auto bind_array(const Array<T> &vec) {
+	return array_binder<T, N>(vec);
 }
