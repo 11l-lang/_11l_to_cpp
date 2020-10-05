@@ -56,8 +56,8 @@ class String : public std::u16string
 		if (step > 0)
 			for (int i = begin; i < end; i += step)
 				r.append(1, at(i));
-		else // for `[::-1]` [-TODO: fix `[0::-1]` and `[r:l:-1]`-]
-			for (int i = end - 1; i >= begin; i += step)
+		else
+			for (int i = begin; i > end; i += step)
 				r.append(1, at(i));
 		return r;
 	}
@@ -493,12 +493,13 @@ public:
 	String operator[](const Range<int, false, true > range) const {return slice(max(range.b + 1, 0), min((unsigned)range.e + 1u, (unsigned)len()));}
 	String operator[](const Range<int, false, false> range) const {return slice(max(range.b + 1, 0), min((unsigned)range.e     , (unsigned)len()));}
 	String operator[](const RangeEI<int>             range) const {return slice(max(range.b    , 0), len());}
-	String operator[](const RangeEIWithStep<int>     range) const {return slice(max(range.b    , 0), len(), range.step);}
+	String operator[](const RangeEIWithStep<int>     range) const {return slice(max(range.b    , 0), range.step > 0 ? len() : -1, range.step);}
 
 	String operator[](const range_e_llen    range) const {return (*this)[range_el(        range.b, len() + range.e)];}
 	String operator[](const range_elen_elen range) const {return (*this)[range_ee(len() + range.b, len() + range.e)];}
 	String operator[](const range_elen_llen range) const {return (*this)[range_el(len() + range.b, len() + range.e)];}
 	String operator[](const range_elen_i    range) const {return (*this)[range_ei(len() + range.b)];}
+	String operator[](const range_elen_i_wstep range) const {return (*this)[range_ei(len() + range.b).step(range.s)];}
 
 	Char last() const
 	{

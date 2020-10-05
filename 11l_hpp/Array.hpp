@@ -36,8 +36,8 @@ template <typename Type> class Array : public std::vector<Type>
 			for (int i = begin; i < end; i += step)
 				r.push_back(std::vector<Type>::at(i));
 		}
-		else // for `[::-1]` [-TODO: fix `[0::-1]` and `[r:l:-1]`-]
-			for (int i = end - 1; i >= begin; i += step)
+		else
+			for (int i = begin; i > end; i += step)
 				r.push_back(std::vector<Type>::at(i));
 		return r;
 	}
@@ -216,12 +216,13 @@ public:
 	Array operator[](const RangeWithStep<int, true,  false> range) const {return slice(max(range.b    , 0), min(range.e    , len()), range.step);}
 	Array operator[](const RangeWithStep<int, false, true > range) const {return slice(max(range.b + 1, 0), min(range.e + 1, len()), range.step);}
 	Array operator[](const RangeWithStep<int, false, false> range) const {return slice(max(range.b + 1, 0), min(range.e    , len()), range.step);}
-	Array operator[](const RangeEIWithStep<int>             range) const {return slice(max(range.b    , 0),                  len() , range.step);}
+	Array operator[](const RangeEIWithStep<int>             range) const {return slice(max(range.b    , 0), range.step > 0 ? len() : -1, range.step);}
 
 	Array operator[](const range_e_llen    range) const {return (*this)[range_el(        range.b, len() + range.e)];}
 	Array operator[](const range_elen_elen range) const {return (*this)[range_ee(len() + range.b, len() + range.e)];}
 	Array operator[](const range_elen_llen range) const {return (*this)[range_el(len() + range.b, len() + range.e)];}
 	Array operator[](const range_elen_i    range) const {return (*this)[range_ei(len() + range.b)];}
+	Array operator[](const range_elen_i_wstep range) const {return (*this)[range_ei(len() + range.b).step(range.s)];}
 
 	decltype(std::declval<const std::vector<Type>>().at(0)) operator[](int i) const // decltype is needed for Array<bool> support
 	{
