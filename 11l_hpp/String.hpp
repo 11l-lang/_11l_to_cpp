@@ -739,8 +739,13 @@ template <typename TInt> inline TInt to_int_t(const String &str)
 	while (*s && (*s == u' ' || *s == u'\t')) s++; // skip whitespace
 	if (*s == u'-') sign=-1, s++; else if (*s == u'+') s++;
 	for (; *s; s++) {
-		if (!Char(*s).is_digit())
+		if (!Char(*s).is_digit()) {
+			while (*s == u' ' || *s == u'\t' || *s == u'\n')
+				s++;
+			if (*s == 0)
+				break;
 			throw ValueError(str);
+		}
 		res = res * 10 + (*s - u'0');
 	}
 	return res * sign;

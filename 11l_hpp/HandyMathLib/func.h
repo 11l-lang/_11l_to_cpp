@@ -165,6 +165,10 @@ INLINE const HMint mod(const HMint x,const HMint y) {return x%y;}
 INLINE const HMubyte mod(const HMubyte x,const HMubyte y) {return x%y;}
 INLINE const HMushort mod(const HMushort x,const HMushort y) {return x%y;}
 INLINE const HMuint mod(const HMuint x,const HMuint y) {return x%y;}
+INLINE const int64_t mod(const int64_t x,const int64_t y) {return x%y;}
+INLINE const uint64_t mod(const uint64_t x,const uint64_t y) {return x%y;}
+INLINE const int64_t mod(const int x,const int64_t y) {return x%y;}
+INLINE const int64_t mod(const int64_t x,const int y) {return x%y;}
 template <class T,class Ta> INLINE const T mod(const T &x,const Ta &y) {return x - y*floor(x/y);}
 template <class T,class Ta> INLINE const T wrap(const T &x,const Ta &maxVal) {return mod(x,maxVal);}
 template <class T,class Ta> INLINE const T wrap(const T &x,const Ta &minVal,const Ta &maxVal)
