@@ -2256,3 +2256,10 @@ struct CodeBlock1
 V (a, b) = input().split_py()
 ===
 auto [a, b] = bind_array<2>(input().split_py());
+
+
+(a, b) = map(int, input().split())
+===
+V (a, b) = input().split_py().map(Int)
+===
+auto [a, b] = bind_array<2>(input().split_py().map([](const auto &x){return to_int(x);}));

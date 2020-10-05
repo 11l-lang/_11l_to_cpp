@@ -398,6 +398,9 @@ class SymbolNode:
                                 break
                             s = s.parent
                             assert(s)
+                    elif func_name.endswith('.map') and self.children[2].token.category == Token.Category.NAME and self.children[2].token_str()[0].isupper():
+                        c2 = self.children[2].to_str()
+                        return func_name + '([](const auto &x){return ' + {'Int':'to_int', 'Int64':'to_int64', 'UInt64':'to_uint64', 'UInt32':'to_uint32', 'Float':'to_float'}.get(c2, c2) + '(x);})'
                     else:
                         f_node = type_of(self.children[0])
                 elif func_name == 'Int':
