@@ -160,7 +160,7 @@ public:
 
 	int len() const {return (int)std::vector<Type>::size();}
 
-	friend Array &&operator*(Array &&a, int n)
+	friend Array operator*(Array a, int n)
 	{
 		if (n < 1) // mimic Python's behavior in which [1] * 0 = [] and [1] * -1 = []
 			a.clear();
@@ -173,7 +173,7 @@ public:
 		}
 		return std::move(a);
 	}
-	friend Array &&operator*(int n, Array &&a)
+	friend Array operator*(int n, Array a)
 	{
 		return std::move(a) * n;
 	}
