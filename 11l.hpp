@@ -301,6 +301,19 @@ template <typename Type, int dimension> inline void print(const Tvec<Type, dimen
 		std::wcout.flush();
 }
 
+template <typename Ty> inline void print_elements(const Ty &container, const String &end = u"\n", bool flush = false)
+{
+	bool first_element = true;
+	for (auto &&el : container) {
+		if (!first_element) std::wcout << L' ';
+		else first_element = false;
+		print(el, u""_S);
+	}
+	std::wcout << std::wstring(end.cbegin(), end.cend());
+	if (flush)
+		std::wcout.flush();
+}
+
 inline String input(const String &prompt = String())
 {
 	std::wcout << std::wstring(prompt.cbegin(), prompt.cend());
