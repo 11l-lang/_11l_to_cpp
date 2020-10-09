@@ -506,10 +506,11 @@ template <typename Type> Type product(const Array<Type> &arr)
 	return r;
 }
 
-template <typename Type> auto enumerate(const Array<Type> &arr)
+template <typename Type> auto enumerate(const Array<Type> &arr, int start = 0)
 {
 	Array<decltype(make_tuple(int(), std::declval<Type>()))> r;
-	int i = 0;
+	r.reserve(arr.size());
+	int i = start;
 	for (auto &&v : arr)
 		r.append(make_tuple(i++, v));
 	return r;

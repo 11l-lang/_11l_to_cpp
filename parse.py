@@ -2807,7 +2807,7 @@ builtins_scope.add_function('multiloop', ASTFunctionDefinition([('iterable1', ''
 builtins_scope.add_function('multiloop_filtered', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', ''), ('filter_function', '', ''), ('function', '', ''), ('optional', token_to_str('N', Token.Category.CONSTANT), '')]))
 builtins_scope.add_function('sum', ASTFunctionDefinition([('iterable', '', '')]))
 builtins_scope.add_function('product', ASTFunctionDefinition([('iterable', '', '')]))
-builtins_scope.add_function('enumerate', ASTFunctionDefinition([('iterable', '', '')]))
+builtins_scope.add_function('enumerate', ASTFunctionDefinition([('iterable', '', ''), ('start', '0', 'Int')]))
 builtins_scope.add_function('sorted', ASTFunctionDefinition([('iterable', '', ''), ('key', token_to_str('N', Token.Category.CONSTANT), ''), ('reverse', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
 builtins_scope.add_function('reversed', ASTFunctionDefinition([('iterable', '', '')]))
 builtins_scope.add_function('min', ASTFunctionDefinition([('arg1', '', ''), ('arg2', token_to_str('N', Token.Category.CONSTANT), ''), ('arg3', token_to_str('N', Token.Category.CONSTANT), '')]))
