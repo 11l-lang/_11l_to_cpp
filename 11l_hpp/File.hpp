@@ -20,12 +20,33 @@ std::u16string convert_utf8_to_utf16(const std::string &u8)
 }
 #endif
 
-class FileNotFoundError {};
 class UnicodeDecodeError {};
+
+String convert_utf8_string_to_String(const std::string &s)
+{
+#ifdef _WIN32
+	String r;
+	if (!s.empty()) {
+		r.resize(s.size());
+		SetLastError(ERROR_SUCCESS);
+		r.resize(MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s.data(), (int)s.size(), (LPWSTR)r.data(), (int)r.size()));
+		if (GetLastError() != ERROR_SUCCESS) {
+			assert(GetLastError() == ERROR_NO_UNICODE_TRANSLATION);
+			throw UnicodeDecodeError();
+		}
+	}
+	return r;
+#else
+	return String(convert_utf8_to_utf16(s));
+#endif
+}
+
+class FileNotFoundError {};
 
 class File
 {
 	FILE *file;
+	bool check_bom = true;
 
 public:
 	File(FILE *file) : file(file) {}
@@ -119,21 +140,7 @@ public:
 			file_str.resize(dest - file_str.data());
 		}
 
-#ifdef _WIN32
-		String r;
-		if (!file_str.empty()) {
-			r.resize(file_str.size());
-			SetLastError(ERROR_SUCCESS);
-			r.resize(MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, file_str.data(), (int)file_str.size(), (LPWSTR)r.data(), (int)r.size()));
-			if (GetLastError() != ERROR_SUCCESS) {
-				assert(GetLastError() == ERROR_NO_UNICODE_TRANSLATION);
-				throw UnicodeDecodeError();
-			}
-		}
-		return r;
-#else
-		return String(convert_utf8_to_utf16(file_str));
-#endif
+		return convert_utf8_string_to_String(file_str);
 	}
 
 	Array<String> read_lines(bool keep_newline = false)
@@ -153,6 +160,44 @@ public:
 			if (r[r.len()-1].empty())
 				r.resize(r.len()-1);
 		return r;
+	}
+
+	String read_line(bool keep_newline = false)
+	{
+		std::string line;
+
+		while (true) {
+			char buf[64*1024];
+			buf[0] = '\0';
+			char *s = fgets(buf, sizeof(buf), file);
+			if (buf[0] == '\0')
+				break;
+			assert(buf == s);
+			int len = (int)strlen(s);
+			int orig_len = len;
+			if (buf[len-1] == '\r')
+				len--;
+			else if (buf[len-1] == '\n' && len >= 2 && buf[len-2] == '\r') {
+				buf[len-2] = '\n';
+				len--;
+			}
+			if (!keep_newline && buf[len-1] == '\n')
+				len--;
+
+			if (check_bom) {
+				check_bom = false;
+				unsigned char utf8bom[3] = {0xEF, 0xBB, 0xBF};
+				if (memcmp(buf, utf8bom, 3) == 0)
+					s += 3, len -= 3;
+			}
+
+			line.append(s, len);
+
+			if (orig_len < sizeof(buf)-1)
+				break;
+		}
+
+		return convert_utf8_string_to_String(line);
 	}
 
 	Array<Byte> read_bytes()
