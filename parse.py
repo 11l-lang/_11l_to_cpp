@@ -163,6 +163,8 @@ class SymbolBase:
         def led(s, l): raise Error('unknown binary operator', s.token)
         self.led = led
 
+int_is_int64 = False
+
 class SymbolNode:
     token : Token
     symbol : SymbolBase = None
@@ -319,9 +321,9 @@ class SymbolNode:
         if self.token.category == Token.Category.NUMERIC_LITERAL:
             n = self.token_str()
             if n[-1] in 'oо':
-                return '0' + n[:-1]
+                return '0' + n[:-1] + 'LL'*int_is_int64
             if n[-1] in 'bд':
-                return '0b' + n[:-1]
+                return '0b' + n[:-1] + 'LL'*int_is_int64
             if n[-1] == 's':
                 return n[:-1] + 'f'
             if n[4:5] == "'" or n[-3:-2] == "'" or n[-2:-1] == "'":
@@ -331,7 +333,9 @@ class SymbolNode:
                 if n[-2:-1] == "'":
                     nn = nn.replace("'", '')
                 return '0x' + nn
-            return n
+            if '.' in n or 'e' in n:
+                return n
+            return n + 'LL'*int_is_int64
 
         if self.token.category == Token.Category.STRING_LITERAL:
             s = self.token_str()

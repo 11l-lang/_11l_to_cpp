@@ -753,9 +753,15 @@ template <typename TInt> inline TInt to_int_t(const String &str)
 	return res * sign;
 }
 
-inline int to_int(const String &str)
+#ifdef INT_IS_INT64
+typedef int64_t Int;
+#else
+typedef int32_t Int;
+#endif
+
+inline Int to_int(const String &str)
 {
-	return to_int_t<int>(str);
+	return to_int_t<Int>(str);
 }
 
 inline int64_t to_int64(const String &str)
@@ -802,9 +808,9 @@ template <typename TInt> inline TInt to_int_t(const String &str, int base)
 	return res * sign;
 }
 
-inline int to_int(const String &str, int base)
+inline Int to_int(const String &str, int base)
 {
-	return to_int_t<int>(str, base);
+	return to_int_t<Int>(str, base);
 }
 
 inline int64_t to_int64(const String &str, int base)
@@ -812,24 +818,24 @@ inline int64_t to_int64(const String &str, int base)
 	return to_int_t<int64_t>(str, base);
 }
 
-inline int to_int(Char ch)
+inline Int to_int(Char ch)
 {
 	return ch.is_digit() ? ch.code - '0' : 0;
 }
 
-inline int to_int(double d)
+inline Int to_int(double d)
 {
-	return (int)d;
+	return (Int)d;
 }
 
-inline int to_int(int i)
+inline Int to_int(int i)
 {
 	return i;
 }
 
-inline int to_int(int64_t i)
+inline Int to_int(int64_t i)
 {
-	return (int)i;
+	return (Int)i;
 }
 
 inline int64_t to_int64(double d)
