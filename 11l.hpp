@@ -12,8 +12,8 @@ template <int n, typename Container> inline auto _get(const Container &c) -> dec
 template <int n, typename Container> inline auto _get(      Container &c) -> decltype(c[n]) {return c[n];}
 template <int n, typename...Types> inline const auto &_get(const Tuple<Types...> &t) {return std::get<n>(t);}
 template <int n, typename...Types> inline       auto &_get(      Tuple<Types...> &t) {return std::get<n>(t);}
-template <int n, typename Container, typename Value> inline void _set(Container       &c, const Value &v) {c.set(n, v);}
-template <int n, typename  ...Types, typename Value> inline void _set(Tuple<Types...> &t, const Value &v) {std::get<n>(t) = v;}
+template <int n, typename Container, typename Value> inline const Value &_set(Container       &c, const Value &v) {c.set(n, v); return v;}
+template <int n, typename  ...Types, typename Value> inline const Value &_set(Tuple<Types...> &t, const Value &v) {return std::get<n>(t) = v;}
 
 namespace std { // `namespace std` is necessary to avoid error C3312 in MSVC {>[https://stackoverflow.com/questions/32681697/range-based-for-loop-and-adl <- google:‘error C3312’]:‘`begin` and `end` from global namespace are not considered’}
 // From [https://stackoverflow.com/questions/14261183/how-to-make-generic-computations-over-heterogeneous-argument-packs-of-a-variadic <- google:‘c++ homogeneous tuple range based for site:stackoverflow.com’]:
