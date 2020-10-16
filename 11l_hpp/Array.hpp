@@ -98,7 +98,7 @@ public:
 		return r;
 	}
 
-	String join(const String &str)
+	String join(const String &str) const
 	{
 		String r;
 		auto it = begin();
