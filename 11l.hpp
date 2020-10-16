@@ -132,6 +132,7 @@ template <typename Type, int dimension> inline const Type *end  (const Tvec<Type
 #include "11l_hpp/Array.hpp"
 #include "11l_hpp/Dict.hpp"
 #include "11l_hpp/Set.hpp"
+#include "11l_hpp/Deque.hpp"
 #include "11l_hpp/pointers.hpp"
 
 #include <functional>
@@ -271,6 +272,18 @@ template <typename Ty> inline void print(const Set<Ty> &set, const String &end =
 	for (auto &&el : set) {
 		if (!first) std::wcout << L", "; else first = false;
 		print(el, u""_S);
+	}
+	std::wcout << L"])" << std::wstring(end.cbegin(), end.cend());
+	if (flush)
+		std::wcout.flush();
+}
+
+template <typename Ty> inline void print(const Deque<Ty> &d, const String &end = u"\n", bool flush = false)
+{
+	std::wcout << L"Deque([";
+	for (int i=0; i<d.len(); i++) {
+		print(d[i], u""_S);
+		if (i < d.len()-1) std::wcout << L", ";
 	}
 	std::wcout << L"])" << std::wstring(end.cbegin(), end.cend());
 	if (flush)

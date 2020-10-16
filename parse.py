@@ -443,9 +443,9 @@ class SymbolNode:
                                 res += ', '
                         return res + '})'
                     func_name = 'create_set'
-                elif func_name.startswith('Set['): # ]
+                elif func_name.startswith(('Set[', 'Deque[')): # ]]
                     c = self.children[0].children[1]
-                    func_name = 'Set<' + trans_type(c.to_type_str(), c.scope, c.token) + '>'
+                    func_name = func_name[:func_name.find('[')] + '<' + trans_type(c.to_type_str(), c.scope, c.token) + '>' # ]
                 elif func_name == 'sum' and self.children[2].symbol.id == '(' and self.children[2].children[0].symbol.id == '.' and self.children[2].children[0].children[1].token_str() == 'map': # )
                     assert(len(self.children) == 3)
                     return 'sum_map(' + self.children[2].children[0].children[0].to_str() + ', ' + self.children[2].children[2].to_str() + ')'
@@ -952,7 +952,7 @@ class ASTExpression(ASTNodeWithExpression):
 cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'перем':'auto',
                      'Int':'int', 'Int64':'int64_t', 'UInt32':'uint32_t', 'Float':'double', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
-                     'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set'}
+                     'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque'}
 
 def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False):
     if ty[-1] == '?':

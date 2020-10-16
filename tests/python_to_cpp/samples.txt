@@ -2266,3 +2266,56 @@ auto [a, b] = bind_array<2>(input().split_py());
 V (a, b) = input().split_py().map(Int)
 ===
 auto [a, b] = bind_array<2>(input().split_py().map([](const auto &x){return to_int(x);}));
+
+
+import collections
+
+d = collections.deque() # int
+d.append(1)
+d.append(2)
+d.appendleft(3)
+d.extend([10, 20])
+d.extendleft([-10, -20])
+print(d.index(3))
+d.insert(3, 5)
+print(d)
+print(d.pop())
+print(d.popleft())
+d.remove(5)
+print(d)
+===
+//import collections
+V d = Deque[Int]()
+d.append(1)
+d.append(2)
+d.append_left(3)
+d.extend([10, 20])
+d.extend_left([-10, -20])
+print(d.index(3))
+d.insert(3, 5)
+print(d)
+print(d.pop())
+print(d.pop_left())
+d.remove(5)
+print(d)
+===
+auto d = Deque<int>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        d.append(1);
+        d.append(2);
+        d.append_left(3);
+        d.extend(create_array({10, 20}));
+        d.extend_left(create_array({-10, -20}));
+        print(d.index(3));
+        d.insert(3, 5);
+        print(d);
+        print(d.pop());
+        print(d.pop_left());
+        d.remove(5);
+        print(d);
+    }
+} code_block_1;
