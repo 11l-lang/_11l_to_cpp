@@ -638,7 +638,12 @@ template <typename ... Types> String String::format(const Types&... args) const
 	int argument_index = 0;
 	String r;
 	const char16_t *s = data();
-	for (int i=0; i<len();)
+	for (int i=0; i<len();) {
+		if (s[i] == '#' && s[i+1] == '#') {
+			r += u'#';
+			i += 2;
+			continue;
+		}
 		if (s[i] == '#' && (s[i+1] == '.' || s[i+1] == '<' || Char(s[i+1]).is_digit())) {
 			int before_period = 0,
 			     after_period = 0;
@@ -699,6 +704,7 @@ template <typename ... Types> String String::format(const Types&... args) const
 		}
 		else
 			r += s[i++];
+	}
 
 	if (argument_index != sizeof...(args))
 		throw AssertionError();

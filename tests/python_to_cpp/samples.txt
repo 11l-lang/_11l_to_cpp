@@ -1160,14 +1160,17 @@ struct CodeBlock1
 
 
 print('Number: %4g, %g.' % (1.1, 1.1))
+print("That's like rule #%i." % (1))
 ===
 print(‘Number: #4, #..’.format(1.1, 1.1))
+print(‘That's like rule ###..’.format(1))
 ===
 struct CodeBlock1
 {
     CodeBlock1()
     {
         print(u"Number: #4, #.."_S.format(1.1, 1.1));
+        print(u"That's like rule ###.."_S.format(1));
     }
 } code_block_1;
 
