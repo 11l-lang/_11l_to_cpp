@@ -565,7 +565,8 @@ class SymbolNode:
 
         elif self.symbol.id == '[': # ]
             if self.is_list:
-                assert(len(self.children) > 0)
+                if len(self.children) == 0:
+                    raise Error('empty array is not supported', self.left_to_right_token())
                 type_of_values_is_char = True
                 for child in self.children:
                     if not is_char(child):
