@@ -960,6 +960,8 @@ def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False
         ty = ty[:-1]
     t = cpp_type_from_11l.get(ty)
     if t is not None:
+        if t == 'int' and int_is_int64:
+            return 'int64_t'
         return t
     else:
         if '.' in ty: # for `Token.Category category`
@@ -1166,7 +1168,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                         arguments.append('std::unique_ptr<' + arg[2].rstrip('?') + '> ' + arg[0] + ('' if arg[1] == '' else ' = ' + arg[1]))
                     else:
                         arguments.append(('' if '=' in arg[3] else 'const ') + trans_type(arg[2], self.scope, tokens[self.tokeni]) + ' ' + ('&'*(arg[2] not in ('Int', 'Float'))) + arg[0] + ('' if arg[1] == '' else ' = ' + arg[1]))
-            return self.children_to_str(indent, ('auto' if self.function_return_type == '' else 'std::function<' + cpp_type_from_11l[self.function_return_type] + '(' + ', '.join(cpp_type_from_11l[arg[2]] for arg in self.function_arguments) + ')>') + ' ' + self.function_name
+            return self.children_to_str(indent, ('auto' if self.function_return_type == '' else 'std::function<' + trans_type(self.function_return_type, self.scope, tokens[self.tokeni]) + '(' + ', '.join(trans_type(arg[2], self.scope, tokens[self.tokeni]) for arg in self.function_arguments) + ')>') + ' ' + self.function_name
                 + ' = [' + ', '.join(sorted(filter(lambda v: not '&'+v in captured_variables, captured_variables))) + ']('
                 + ', '.join(arguments) + ')')[:-1] + ";\n"
 
