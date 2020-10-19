@@ -28,6 +28,18 @@ public:
 		return r;
 	}
 
+	Nullable<KeyType> lower_bound(const KeyType &key) const
+	{
+		auto it = std::set<KeyType>::lower_bound(key);
+		return it != std::set<KeyType>::end() ? Nullable<KeyType>(*it) : Nullable<KeyType>(nullptr);
+	}
+
+	Nullable<KeyType> upper_bound(const KeyType &key) const
+	{
+		auto it = std::set<KeyType>::upper_bound(key);
+		return it != std::set<KeyType>::end() ? Nullable<KeyType>(*it) : Nullable<KeyType>(nullptr);
+	}
+
 	template <typename Func> auto map(Func &&func) const
 	{
 		Array<decltype(func(std::declval<KeyType>()))> r;
