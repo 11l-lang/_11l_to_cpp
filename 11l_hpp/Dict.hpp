@@ -50,6 +50,37 @@ template <typename KeyType, typename ValueType> class DefaultDict : public std::
 {
 	using std::map<KeyType, ValueType>::size;
 
+	class ConstValuePtr
+	{
+		const ValueType *value;
+
+	public:
+		ConstValuePtr(const ValueType *value) : value(value) {}
+
+		bool operator==(nullptr_t) const {return value == nullptr;}
+		bool operator!=(nullptr_t) const {return value != nullptr;}
+
+		const ValueType &operator*() const {if (value == nullptr) throw NullPointerException(); return *value;}
+		const ValueType &operator*()       {if (value == nullptr) throw NullPointerException(); return *value;}
+		const ValueType *operator->() const {if (value == nullptr) throw NullPointerException(); return value;}
+		const ValueType *operator->()       {if (value == nullptr) throw NullPointerException(); return value;}
+	};
+	class ValuePtr
+	{
+		ValueType *value;
+
+	public:
+		ValuePtr(ValueType *value) : value(value) {}
+
+		bool operator==(nullptr_t) const {return value == nullptr;}
+		bool operator!=(nullptr_t) const {return value != nullptr;}
+
+		const ValueType &operator*() const {if (value == nullptr) throw NullPointerException(); return *value;}
+		      ValueType &operator*()       {if (value == nullptr) throw NullPointerException(); return *value;}
+		const ValueType *operator->() const {if (value == nullptr) throw NullPointerException(); return value;}
+		      ValueType *operator->()       {if (value == nullptr) throw NullPointerException(); return value;}
+	};
+
 public:
 	DefaultDict() {}
 	DefaultDict(DictInitializer<KeyType, ValueType> &&di) : std::map<KeyType, ValueType>(std::forward<std::map<KeyType, ValueType>>(di.dict)) {}
@@ -62,9 +93,23 @@ public:
 		std::map<KeyType, ValueType>::operator[](key) = value;
 	}
 
+	ConstValuePtr find(const KeyType &key) const
+	{
+		auto r = std::map<KeyType, ValueType>::find(key);
+		if (r == std::map<KeyType, ValueType>::end()) return ConstValuePtr(nullptr);
+		return ConstValuePtr(&r->second);
+	}
+
+	ValuePtr find(const KeyType &key)
+	{
+		auto r = std::map<KeyType, ValueType>::find(key);
+		if (r == std::map<KeyType, ValueType>::end()) return ValuePtr(nullptr);
+		return ValuePtr(&r->second);
+	}
+
 	const ValueType &get(const KeyType &key, const ValueType &default_value) const
 	{
-		auto r = find(key);
+		auto r = std::map<KeyType, ValueType>::find(key);
 		if (r == std::map<KeyType, ValueType>::end()) return default_value;
 		return r->second;
 	}
@@ -159,5 +204,5 @@ template <typename Iterable, typename Func> auto create_dict(const Iterable &ite
 
 template <typename KeyType, typename ValueType> inline bool in(const KeyType &key, const DefaultDict<KeyType, ValueType> &dict)
 {
-	return dict.find(key) != dict.end();
+	return dict.std::map<KeyType, ValueType>::find(key) != dict.end();
 }

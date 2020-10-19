@@ -1141,3 +1141,63 @@ struct CodeBlock1
         print(_new_);
     }
 } code_block_1;
+
+
+F print_set(map, key)
+   V? it = map.find(key) // test const
+   print(it ? Set([1]))
+   I it == N | it.empty
+      print(-1)
+      R
+   I it == Set([1])
+      print(-2)
+      R
+   L(value) it
+      print(value, end' ‘ ’)
+   print()
+
+V set_values = [1 = Set([2, 3]), 2 = Set[Int]()]
+print_set(set_values, 1)
+print_set(set_values, 2)
+print_set(set_values, 3)
+V? it = set_values.find(1) // test non-const
+it.add(4)
+print_set(set_values, 1)
+===
+template <typename T1, typename T2> auto print_set(const T1 &map, const T2 &key)
+{
+    auto it = map.find(key);
+    print([&]{auto R = it; return R != nullptr ? *R : create_set({1});}());
+    if (it == nullptr || it->empty()) {
+        print(-1);
+        return;
+    }
+    if (*it == create_set({1})) {
+        print(-2);
+        return;
+    }
+    for (auto &&value : *it)
+        print(value, u" "_S);
+    print();
+}
+auto set_values = create_dict(dict_of(1, create_set({2, 3}))(2, Set<int>()));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print_set(set_values, 1);
+        print_set(set_values, 2);
+        print_set(set_values, 3);
+    }
+} code_block_1;
+auto it = set_values.find(1);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        it->add(4);
+        print_set(set_values, 1);
+    }
+} code_block_2;

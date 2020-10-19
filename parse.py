@@ -273,7 +273,7 @@ class SymbolNode:
                 return '*this'
 
             tid = self.scope.find(self.token_str())
-            if tid is not None and ((len(tid.ast_nodes) and isinstance(tid.ast_nodes[0], ASTVariableDeclaration) and tid.ast_nodes[0].is_ptr) # `animals [+]= animal` -> `animals.append(std::move(animal));`
+            if tid is not None and ((len(tid.ast_nodes) and isinstance(tid.ast_nodes[0], ASTVariableDeclaration) and tid.ast_nodes[0].is_ptr and not tid.ast_nodes[0].nullable) # `animals [+]= animal` -> `animals.append(std::move(animal));`
                                  or (tid.type_node is not None and (tid.type_node.has_virtual_functions or tid.type_node.has_pointers_to_the_same_type))) \
                                 and (self.parent is None or self.parent.symbol.id not in ('.', ':')):
                 if tid.last_occurrence is None:
@@ -303,6 +303,12 @@ class SymbolNode:
 
                 if id(tid.last_occurrence) == id(self):
                     return 'std::move(' + self.token_str() + ')'
+
+            if tid is not None and len(tid.ast_nodes) and isinstance(tid.ast_nodes[0], ASTVariableDeclaration) and tid.ast_nodes[0].is_ptr and tid.ast_nodes[0].nullable:
+                if self.parent is None or (not (self.parent.symbol.id in ('==', '!=') and self.parent.children[1].token_str() in ('N', 'Н', 'null', 'нуль'))
+                                       and not (self.parent.symbol.id == '.')
+                                       and not (self.parent.symbol.id == '?')):
+                    return '*' + self.token_str()
 
             return self.token_str().lstrip('@').replace(':', '::')
 
@@ -714,7 +720,7 @@ class SymbolNode:
                     if len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTLoop and id_.ast_nodes[0].is_loop_variable_a_ptr and cts0 == id_.ast_nodes[0].loop_variable:
                         return cts0 + '->' + c1
                     if len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTVariableInitialization and (id_.ast_nodes[0].is_ptr): # ( # or id_.ast_nodes[0].is_shared_ptr):
-                        return self.children[0].to_str() + '->' + c1 # `to_str()` is needed for such case: `animal.say(); animals [+]= animal; animal.say()` -> `animal->say(); animals.append(animal); std::move(animal)->say();`
+                        return self.children[0].to_str() + '->' + c1 + '()'*(c1 in ('len', 'last', 'empty')) # `to_str()` is needed for such case: `animal.say(); animals [+]= animal; animal.say()` -> `animal->say(); animals.append(animal); std::move(animal)->say();`
                     if len(id_.ast_nodes) and type(id_.ast_nodes[0]) in (ASTVariableInitialization, ASTVariableDeclaration): # `Node tree = ...; tree.tree_indent()` -> `... tree->tree_indent()` # (
                         tid = self.scope.find(id_.ast_nodes[0].type)#.rstrip('?'))
                         if tid is not None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
@@ -1025,6 +1031,7 @@ class ASTVariableDeclaration(ASTNode):
     scope : Scope
     type_token : Token
     is_ptr = False
+    nullable = False
     #is_shared_ptr = False
 
     def __init__(self):
@@ -1706,7 +1713,7 @@ def type_of(sn):
         return None # [-TODO-]
     if type(left) not in (ASTVariableDeclaration, ASTVariableInitialization):
         raise Error('left type is `' + str(type(left)) + '`', sn.left_to_right_token())
-    if left.type in ('V', 'П', 'var', 'перем'): # for `V selection_strings = ... selection_strings.map(...)`
+    if left.type in ('V', 'П', 'var', 'перем', 'V?', 'П?', 'var?', 'перем?'): # for `V selection_strings = ... selection_strings.map(...)`
         if left.expression.symbol.id == '(' and left.expression.children[0].token.category == Token.Category.NAME and left.expression.children[0].token_str()[0].isupper(): # ) # for `V n = Node()`
             tid = sn.scope.find(left.expression.children[0].token_str())
             assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
@@ -2693,10 +2700,14 @@ def parse_internal(this_node):
                         node = ASTVariableInitialization()
                         node.set_expression(expression())
                         if node_expression.token.value(source) not in ('V', 'П', 'var', 'перем'):
-                            id = scope.find(node_expression.token_str())
-                            if id is not None and len(id.ast_nodes) != 0:
-                                if type(id.ast_nodes[0]) == ASTTypeDefinition and (id.ast_nodes[0].has_virtual_functions or id.ast_nodes[0].has_pointers_to_the_same_type):
-                                    node.is_ptr = True
+                            if node_expression.token.value(source) in ('V?', 'П?', 'var?', 'перем?'):
+                                node.is_ptr = True
+                                node.nullable = True
+                            else:
+                                id = scope.find(node_expression.token_str())
+                                if id is not None and len(id.ast_nodes) != 0:
+                                    if type(id.ast_nodes[0]) == ASTTypeDefinition and (id.ast_nodes[0].has_virtual_functions or id.ast_nodes[0].has_pointers_to_the_same_type):
+                                        node.is_ptr = True
                         elif node.expression.symbol.id == '(' and node.expression.children[0].token.category == Token.Category.NAME and node.expression.children[0].token_str()[0].isupper(): # ) # for `V animal = Sheep(); animal.say()` -> `...; animal->say();`
                             id = scope.find(node.expression.children[0].token_str())
                             if not (id is not None and len(id.ast_nodes) != 0):
