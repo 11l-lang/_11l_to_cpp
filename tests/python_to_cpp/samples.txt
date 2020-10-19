@@ -2319,3 +2319,63 @@ struct CodeBlock1
         print(d);
     }
 } code_block_1;
+
+
+def ref(obj):
+    return obj
+
+def print_set(map : DefaultDict[int, Set[int]], key):
+    s = ref(map[key])
+    if len(s) == 0:
+        print(-1)
+        return
+    for value in s:
+        print(value, end = ' ')
+    print()
+
+import collections
+set_values : DefaultDict[int, Set[int]] = collections.defaultdict(set)
+set_values[1].add(2)
+print_set(set_values, 1)
+print_set(set_values, 2)
+s = {1}
+===
+
+F print_set(DefaultDict[Int, Set[Int]] &map; key)
+   V& s = map[key]
+   I s.empty
+      print(-1)
+      R
+   L(value) s
+      print(value, end' ‘ ’)
+   print()
+//import collections
+DefaultDict[Int, Set[Int]] set_values
+set_values[1].add(2)
+print_set(&set_values, 1)
+print_set(&set_values, 2)
+V s = Set([1])
+===
+template <typename T2> auto print_set(DefaultDict<int, Set<int>> &map, const T2 &key)
+{
+    auto& s = map[key];
+    if (s.empty()) {
+        print(-1);
+        return;
+    }
+    for (auto &&value : s)
+        print(value, u" "_S);
+    print();
+}
+DefaultDict<int, Set<int>> set_values;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _get<1>(set_values).add(2);
+        print_set(set_values, 1);
+        print_set(set_values, 2);
+    }
+} code_block_1;
+auto s = create_set({1});

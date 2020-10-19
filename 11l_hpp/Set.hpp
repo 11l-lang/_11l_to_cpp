@@ -2,8 +2,13 @@
 
 template <typename KeyType> class Set : public std::set<KeyType>
 {
+	Set(const Set &s) : std::set<KeyType>(s) {}
+
 public:
+	friend Set<KeyType> copy(const Set<KeyType> &s) {return s;}
+
 	Set() {}
+	Set(Set &&s) : std::set<KeyType>(std::forward<std::set<KeyType>>(s)) {}
 	Set(std::initializer_list<KeyType> il)
 	{
 //		reserve(il.size());

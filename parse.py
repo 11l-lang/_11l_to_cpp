@@ -1038,6 +1038,9 @@ class ASTVariableDeclaration(ASTNode):
         self.scope = scope
 
     def trans_type(self, ty, is_reference = False):
+        if ty.endswith('&'):
+            assert(trans_type(ty[:-1], self.scope, self.type_token, self.parent if type(self.parent) == ASTTypeDefinition else None, is_reference) == 'auto')
+            return 'auto&'
         return trans_type(ty, self.scope, self.type_token, self.parent if type(self.parent) == ASTTypeDefinition else None, is_reference)
 
     def to_str(self, indent):

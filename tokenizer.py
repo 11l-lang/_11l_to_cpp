@@ -369,6 +369,8 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                 elif source[lexem_start:i] in keywords:
                     if source[lexem_start:i] in ('V', 'П', 'var', 'перем'): # it is more convenient to consider V/var as [type] name, not a keyword
                         category = Token.Category.NAME
+                        if source[i:i+1] == '&':
+                            i += 1
                     elif source[lexem_start:i] in ('N', 'Н', 'null', 'нуль'):
                         category = Token.Category.CONSTANT
                     else:
