@@ -183,6 +183,11 @@ template <typename KeyType, typename ValueType> Dict<KeyType, ValueType> create_
 	return Dict<KeyType, ValueType>(std::move(di));
 }
 
+template <typename KeyType, typename ValueType> Dict<KeyType, ValueType> create_dict(DictInitializer<KeyType, ValueType> &&di)
+{
+	return Dict<KeyType, ValueType>(std::move(di));
+}
+
 template <typename KeyType, typename ValueType> Dict<KeyType, ValueType> create_dict(const Array<Tuple<KeyType, ValueType>> &arr)
 {
 	Dict<KeyType, ValueType> r;
