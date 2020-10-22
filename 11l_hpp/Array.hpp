@@ -380,6 +380,11 @@ public:
 		std::vector<Type>::erase(it);
 	}
 
+	void del(int start, int stop)
+	{
+		std::vector<Type>::erase(begin() + start, begin() + stop);
+	}
+
 	template <typename Ty> bool operator==(const Array<Ty> &arr) const
 	{
 		if (len() != arr.len()) return false;
