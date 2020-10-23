@@ -105,3 +105,7 @@ int pow(int x, int y)
 }
 
 using std::swap;
+
+template <typename Ty> bool equal(const Ty &a, const Ty &b, const Ty &c)                           {return a == b && a == c;}
+template <typename Ty> bool equal(const Ty &a, const Ty &b, const Ty &c, const Ty &d)              {return a == b && a == c && a == d;}
+template <typename Ty> bool equal(const Ty &a, const Ty &b, const Ty &c, const Ty &d, const Ty &e) {return a == b && a == c && a == d && a == e;}

@@ -791,6 +791,12 @@ class SymbolNode:
                 if id_ is not None and len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTLoop and id_.ast_nodes[0].is_loop_variable_a_ptr and self.children[0].children[0].token_str() == id_.ast_nodes[0].loop_variable: # `L(obj)...&obj != &objChoque` -> `...&*obj != objChoque`
                     return '&*' + self.children[0].children[0].token_str() + ' ' + self.symbol.id + ' ' + self.children[1].children[0].token_str()
                 return '&' + self.children[0].children[0].token_str() + ' ' + self.symbol.id + ' &' + self.children[1].children[0].token_str()
+            elif self.symbol.id == '==' and self.children[0].symbol.id == '==': # replace `a == b == c` with `equal(a, b, c)`
+                def f(child):
+                    if child.symbol.id == '==':
+                        return f(child.children[0]) + ', ' + child.children[1].to_str()
+                    return child.to_str()
+                return 'equal(' + f(self) + ')'
             elif self.symbol.id == '=' and self.children[0].symbol.id == '[': # ] # replace `a[k] = v` with `a.set(k, v)`
                 if self.children[0].children[1].token.category == Token.Category.NUMERIC_LITERAL: # replace `a[0] = v` with `_set<0>(a, v)` to support tuples
                     return '_set<' + self.children[0].children[1].to_str() + '>(' + self.children[0].children[0].to_str() + ', ' + char_if_len_1(self.children[1]) + ')'
