@@ -337,6 +337,9 @@ public:
 		std::sort(begin(), end());
 	}
 
+	void sort_range(const Range<int, true,  true> range) {std::sort(begin() + range.b, begin() + range.e + 1);}
+	void sort_range(const Range<int, true, false> range) {std::sort(begin() + range.b, begin() + range.e);}
+
 	void reverse()
 	{
 		std::reverse(begin(), end());
