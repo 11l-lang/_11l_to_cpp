@@ -520,8 +520,8 @@ F f()
          L.break
       print(n)
 
-      L.was_no_break
-         print(‘no break’)
+   L.was_no_break
+      print(‘no break’)
 ===
 auto f()
 {

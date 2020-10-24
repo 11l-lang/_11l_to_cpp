@@ -652,8 +652,8 @@ F can_make_word(word)
          I ch C block
             blocks_remaining.remove(block)
             L.break
-         L.was_no_break
-            R 0B
+      L.was_no_break
+         R 0B
    R 1B
 print([‘’, ‘a’, ‘baRk’, ‘booK’, ‘treat’, ‘COMMON’, ‘squad’, ‘Confused’].map(w -> ‘'’w‘': ’String(can_make_word(w))).join(‘, ’))
 ===
@@ -664,13 +664,12 @@ template <typename T1> auto can_make_word(const T1 &word)
     auto blocks_remaining = u"BO XK DQ CP NA GT RE TG QD FS JW HU VI AN OB ER FS LY PC ZM"_S.split(u" "_S);
     for (auto &&ch : word.uppercase())
         {bool was_break = false;
-        for (auto &&block : blocks_remaining) {
+        for (auto &&block : blocks_remaining)
             if (in(ch, block)) {
                 blocks_remaining.remove(block);
                 was_break = true;
                 break;
             }
-        }
         if (!was_break)
             return false;
         }
@@ -1026,9 +1025,9 @@ L(word) File(‘unixdict.txt’).read().split("\n")
       L(ana) anagram[a]
          I is_not_deranged(ana, word)
             L.break
-         L.was_no_break
-            anagram[a].append(word)
-            count = max(count, word.len)
+      L.was_no_break
+         anagram[a].append(word)
+         count = max(count, word.len)
 
 L(ana) anagram.values()
    I ana.len > 1 & ana[0].len == count
@@ -1054,12 +1053,11 @@ struct CodeBlock1
                 anagram.set(a, create_array({word}));
             else
                 {bool was_break = false;
-                for (auto &&ana : anagram[a]) {
+                for (auto &&ana : anagram[a])
                     if (is_not_deranged(ana, word)) {
                         was_break = true;
                         break;
                     }
-                }
                 if (!was_break) {
                     anagram[a].append(word);
                     count = max(count, word.len());

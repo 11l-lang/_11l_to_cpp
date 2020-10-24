@@ -1344,9 +1344,10 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
     has_L_last_iteration = False
     has_L_remove_current_element_and_continue = False
     is_loop_variable_a_ptr = False
+    was_no_break_node : ASTLoopWasNoBreak = None
 
     def has_L_was_no_break(self):
-        return type(self.children[-1]) == ASTLoopWasNoBreak
+        return self.was_no_break_node is not None
 
     def to_str(self, indent):
         r = ''
@@ -1409,7 +1410,7 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
             r = r[:-1] + "}\n"
 
         if self.has_L_was_no_break(): # {
-            r += self.children[-1].children_to_str_detect_single_stmt(indent, 'if (!was_break)') + ' ' * (indent*4) + "}\n"
+            r += self.was_no_break_node.children_to_str_detect_single_stmt(indent, 'if (!was_break)') + ' ' * (indent*4) + "}\n"
 
         if self.break_label_needed != -1:
             r += ' ' * (indent*4) + 'break_' + ('' if self.break_label_needed == 0 else str(self.break_label_needed)) + ":;\n"
@@ -2527,6 +2528,12 @@ def parse_internal(this_node):
                     new_scope(node)
                     scope = prev_scope
 
+                    if token is not None and token.value(source) in ('L.was_no_break', 'Ц.не_был_прерван', 'loop.was_no_break', 'цикл.не_был_прерван'):
+                        node.was_no_break_node = ASTLoopWasNoBreak()
+                        node.was_no_break_node.parent = node
+                        next_token()
+                        new_scope(node.was_no_break_node)
+
             elif token.value(source) in ('L.continue', 'Ц.продолжить', 'loop.continue', 'цикл.продолжить'):
                 node = ASTContinue()
                 next_token()
@@ -2545,11 +2552,6 @@ def parse_internal(this_node):
                 next_token()
                 if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
                     next_token()
-
-            elif token.value(source) in ('L.was_no_break', 'Ц.не_был_прерван', 'loop.was_no_break', 'цикл.не_был_прерван'):
-                node = ASTLoopWasNoBreak()
-                next_token()
-                new_scope(node)
 
             elif token.value(source) in ('R', 'Р', 'return', 'вернуть'):
                 node = ASTReturn()

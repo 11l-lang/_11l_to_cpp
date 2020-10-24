@@ -68,15 +68,15 @@ T Graph
       L(edge) :G.e.filter(e -> e.u == @s & e.v == @ss[0])
          d = edge.d
          L.break
-         L.was_no_break
-            assert(0B)
+      L.was_no_break
+         assert(0B)
 
       L(u, v) zip(ss[0 .< (len)-1], ss[1..])
          L(edge) :G.e.filter(e -> e.u == @u & e.v == @v)
             d += edge.d
             L.break
-            L.was_no_break
-               assert(0B)
+         L.was_no_break
+            assert(0B)
       R d
 V G = Graph()
 

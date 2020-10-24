@@ -94,7 +94,7 @@ template <typename T1, typename T2, typename T3> auto solve_file(const T1 &filen
 {
     u"Parse a file into a sequence of 81-char descriptions and solve them."_S;
     auto results = File(filename).read().trim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S)).split(sep).map([&action](const auto &grid){return action(search(parse_grid(grid)));});
-    print(u"## Got #. out of #."_S.format(sum_map(results, [](const auto &r){return (!r.empty() ? 1 : 0);}), results.len()));
+    print(u"#### Got #. out of #."_S.format(sum_map(results, [](const auto &r){return (!r.empty() ? 1 : 0);}), results.len()));
     return results;
 }
 
