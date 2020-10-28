@@ -2,7 +2,7 @@ empty_dict : Dict[str, int] = {}
 dict = {'key': 1, 'key2': 2}
 arr = [1, 2]
 ===
-Dict[String, Int] empty_dict
+[String = Int] empty_dict
 V dict = [‘key’ = 1, ‘key2’ = 2]
 V arr = [1, 2]
 ===

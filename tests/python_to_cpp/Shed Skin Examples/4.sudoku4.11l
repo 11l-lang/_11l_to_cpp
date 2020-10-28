@@ -7,7 +7,7 @@ V digits = ‘123456789’
 V squares = cross(rows, cols)
 V unitlist = (cols.map(c -> cross(:rows, String(c))) [+] rows.map(r -> cross(String(r), :cols)) [+] multiloop([‘ABC’, ‘DEF’, ‘GHI’], [‘123’, ‘456’, ‘789’], (rs, cs) -> cross(rs, cs)))
 V units = Dict(squares.map(s -> (s, :unitlist.filter(u -> @s C u))))
-Dict[String, Set[String]] peers
+[String = Set[String]] peers
 L(s) squares
    V se = Set[String]()
    L(u) units[s]
@@ -16,7 +16,7 @@ L(s) squares
             se.add(s2)
    peers[s] = se
 
-F search(values) -> Dict[String, String]
+F search(values) -> [String = String]
    ‘Using depth-first search and propagation, try all possible values.’
    I values.empty
       R Dict()
@@ -30,14 +30,14 @@ F search(values) -> Dict[String, String]
          R r
    R Dict()
 
-F assign(Dict[String, String] &values; s, d) -> Dict[String, String]
+F assign([String = String] &values; s, d) -> [String = String]
    ‘Eliminate all the other values (except d) from values[s] and propagate.’
    I all(values[s].filter(d2 -> d2 != @d).map(d2 -> !eliminate(&@values, @s, d2).empty))
       R values
    E
       R Dict()
 
-F eliminate(Dict[String, String] &values; s, d) -> Dict[String, String]
+F eliminate([String = String] &values; s, d) -> [String = String]
    ‘Eliminate d from values[s]; propagate when values or places <= 2.’
    I d !C values[s]
       R values
@@ -58,7 +58,7 @@ F eliminate(Dict[String, String] &values; s, d) -> Dict[String, String]
             R Dict()
    R values
 
-F parse_grid(=grid) -> Dict[String, String]
+F parse_grid(=grid) -> [String = String]
    ‘Given a string of 81 digits (or .0-), return a dict of {cell:values}’
    grid = grid.filter(c -> c C ‘0.-123456789’)
    V values = Dict(:squares.map(s -> (s, :digits)))

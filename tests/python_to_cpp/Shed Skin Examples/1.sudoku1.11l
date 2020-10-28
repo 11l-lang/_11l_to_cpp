@@ -42,7 +42,7 @@ F solvePuzzleSimple([[Int]] &puzzle)
    V iterationCount = 0
    L solvePuzzleStep(&puzzle) == 1B
       iterationCount++
-Dict[Int, Bool] hashtable
+[Int = Bool] hashtable
 
 F calc_hash_of_list(l)
    V hash = 2166136261

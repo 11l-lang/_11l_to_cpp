@@ -16,8 +16,8 @@ T Protein
    String size
    String sequence
    Int type_id
-   Dict[Char, Float] local_composition
-   Dict[Char, Float] global_composition
+   [Char = Float] local_composition
+   [Char = Float] global_composition
 
    F (name, mass, isoelectric_point, size, sequence, type_id)
       .name = name

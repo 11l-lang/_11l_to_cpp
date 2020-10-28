@@ -182,7 +182,7 @@ def f():
     arr += [10]
 ===
 F f()
-   Dict[String, Int] dict
+   [String = Int] dict
    dict[‘key’] = 1
    assert(‘key’ C dict)
    [Int] arr
@@ -1751,15 +1751,15 @@ Array<String> f()
 }
 
 
-def f() -> Dict[str, str]:
+def f() -> Dict[str, int]:
    return {}
 ===
-F f() -> Dict[String, String]
+F f() -> [String = Int]
    R Dict()
 ===
-Dict<String, String> f()
+Dict<String, int> f()
 {
-    return Dict<String, String>();
+    return Dict<String, int>();
 }
 
 

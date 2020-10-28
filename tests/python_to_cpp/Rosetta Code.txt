@@ -182,7 +182,7 @@ bf('++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.
 //import sys, collections
 
 F bf(source)
-   Dict[Int, Int] loop_ptrs
+   [Int = Int] loop_ptrs
    [Int] loop_stack
    L(opcode) source
       V ptr = L.index
@@ -1015,7 +1015,7 @@ F is_not_deranged(s1, s2)
       I s1[i] == s2[i]
          R 1B
    R 0B
-Dict[String, [String]] anagram
+[String = [String]] anagram
 V count = 0
 L(word) File(‘unixdict.txt’).read().split("\n")
    V a = sorted(word).join(‘’)
@@ -1407,7 +1407,7 @@ T ASTNode
          E
             assert(0B)
             R 0
-Dict[String, Symbol] symbol_table
+[String = Symbol] symbol_table
 [String] tokens
 V tokeni = -1
 ASTNode token_node

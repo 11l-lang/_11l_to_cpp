@@ -233,6 +233,10 @@ class SymbolNode:
             if self.is_list:
                 assert(len(self.children) == 1)
                 return 'Array[' + self.children[0].to_type_str() + ']'
+            elif self.is_dict:
+                assert(len(self.children) == 1 and self.children[0].symbol.id == '=')
+                return 'Dict[' + self.children[0].children[0].to_type_str() + ', ' \
+                               + self.children[0].children[1].to_type_str() + ']'
             else:
                 assert(self.is_type)
                 r = self.children[0].token.value(source) + '['
@@ -1010,6 +1014,12 @@ def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False
 
         p = ty.find('[') # ]
         if p != -1:
+            if '=' in ty:
+                assert(p == 0 and ty[0] == '[' and ty[-1] == ']')
+                tylist = ty[1:-1].split('=')
+                assert(len(tylist) == 2)
+                return 'Dict<' + trans_type(tylist[0], scope, type_token, ast_type_node) + ', ' \
+                               + trans_type(tylist[1], scope, type_token, ast_type_node) + '>'
             return (trans_type(ty[:p], scope, type_token, ast_type_node) if p != 0 else 'Array') + '<' + trans_type(ty[p+1:-1], scope, type_token, ast_type_node) + '>'
         p = ty.find(',')
         if p != -1:
@@ -2257,6 +2267,8 @@ def parse_internal(this_node):
                                         break
                                 elif token.value(source) == ',':
                                     type_ += ' '
+                                    next_token()
+                                elif token.value(source) == '=':
                                     next_token()
                                 else:
                                     if token.category != Token.Category.NAME:

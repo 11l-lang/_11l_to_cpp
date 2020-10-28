@@ -113,7 +113,7 @@ T Converter
             start += k - j
             s = s[0 .< j] + s[k ..]
          R s
-      Dict[Int, String] nonunique_links
+      [Int = String] nonunique_links
       V link = ‘’
 
       F write_http_link(startpos, Int endpos; q_offset = 1, =text = ‘’)

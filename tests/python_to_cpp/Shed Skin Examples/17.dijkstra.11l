@@ -97,8 +97,8 @@ F Extract_Min([Vertex] &q; d)
    R m
 
 F dijkstra(g, t, s)
-   Dict[Vertex, Float] d
-   Dict[Vertex, Vertex] previous
+   [Vertex = Float] d
+   [Vertex = Vertex] previous
    L(v) g.v
       d[v] = 1e50
       previous[v] = Vertex(‘’)
