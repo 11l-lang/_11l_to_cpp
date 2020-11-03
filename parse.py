@@ -1753,7 +1753,7 @@ def type_of(sn):
         raise Error('type `' + left.type + '` is not found', sn.left_to_right_token())
     tid = tid.ast_nodes[0].scope.ids.get(sn.children[1].token_str())
     if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition)):
-        raise Error('method `' + sn.children[1].token_str() + '` is not found in type `' + left.type.rstrip('?') + '`', sn.left_to_right_token())
+        raise Error('member `' + sn.children[1].token_str() + '` is not found in type `' + left.type.rstrip('?') + '`', sn.left_to_right_token())
     return tid.ast_nodes[0]
 
 # List of C++ keywords is taken from here[https://en.cppreference.com/w/cpp/keyword]
@@ -2922,6 +2922,7 @@ builtins_scope.ids['File'].ast_nodes[0].scope = file_scope
 for type_ in cpp_type_from_11l:
     builtins_scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', token_to_str('‘’'), '')])]))
 string_scope = Scope(None)
+string_scope.add_name('last', ASTVariableDeclaration())
 string_scope.add_name('starts_with', ASTFunctionDefinition([('prefix', '', 'String')]))
 string_scope.add_name('ends_with', ASTFunctionDefinition([('suffix', '', 'String')]))
 string_scope.add_name('split', ASTFunctionDefinition([('delim', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?'), ('group_delimiters', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))

@@ -1216,3 +1216,17 @@ struct CodeBlock1
         print(equal(1, 2, 3, 4, 5));
     }
 } code_block_1;
+
+
+String s
+print(s.last.code)
+===
+String s;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(s.last().code);
+    }
+} code_block_1;
