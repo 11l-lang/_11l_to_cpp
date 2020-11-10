@@ -3786,10 +3786,10 @@ F euler(f, y0, a, b, h)
 V newtoncooling = (time, temp) -> -0.07 * (temp - 20)
 euler(newtoncooling, 100.0, 0.0, 100.0, 10.0)
 ===
-template <typename T1, typename T2, typename T3, typename T4, typename T5> auto euler(const T1 &f, const T2 &y0, const T3 &a, const T4 &b, const T5 &h)
+template <typename T1, typename T2, typename T3, typename T4, typename T5> auto euler(const T1 &f, const T2 &_y0_, const T3 &a, const T4 &b, const T5 &h)
 {
     auto t = a;
-    auto y = y0;
+    auto y = _y0_;
     while (t <= b) {
         print(u"#2.3 #2.3"_S.format(t, y));
         t += h;

@@ -230,9 +230,9 @@ public:
     {
         validatePoint(pt1);
         validatePoint(pt2);
-        auto [x1, y1] = pt1;
+        auto [x1, _y1_] = pt1;
         auto [x2, y2] = pt2;
-        return pow((pow((x1 - x2), 2) + pow((y1 - y2), 2)), 0.5);
+        return pow((pow((x1 - x2), 2) + pow((_y1_ - y2), 2)), 0.5);
     }
 };
 

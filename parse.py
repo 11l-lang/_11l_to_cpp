@@ -1761,7 +1761,8 @@ cpp_keywords = {'alignas', 'alignof', 'and', 'and_eq', 'asm', 'auto', 'bitand', 
     'consteval', 'constexpr', 'constinit', 'const_cast', 'continue', 'co_await', 'co_return', 'co_yield', 'decltype', 'default', 'delete', 'do', 'double', 'dynamic_cast', 'else', 'enum', 'explicit',
     'export', 'extern', 'false', 'float', 'for', 'friend', 'goto', 'if', 'inline', 'int', 'long', 'mutable', 'namespace', 'new', 'noexcept', 'not', 'not_eq', 'nullptr', 'operator', 'or', 'or_eq',
     'private', 'protected', 'public', 'reflexpr', 'register', 'reinterpret_cast', 'requires', 'return', 'short', 'signed', 'sizeof', 'static', 'static_assert', 'static_cast', 'struct', 'switch',
-    'template', 'this', 'thread_local', 'throw', 'true', 'try', 'typedef', 'typeid', 'typename', 'union', 'unsigned', 'using', 'virtual', 'void', 'volatile', 'wchar_t', 'while', 'xor', 'xor_eq'}
+    'template', 'this', 'thread_local', 'throw', 'true', 'try', 'typedef', 'typeid', 'typename', 'union', 'unsigned', 'using', 'virtual', 'void', 'volatile', 'wchar_t', 'while', 'xor', 'xor_eq',
+    'j0', 'j1', 'jn', 'y0', 'y1', 'yn'}
 
 def fix_cpp_keyword(token_str):
     return '_' + token_str + '_' if token_str in cpp_keywords else token_str
@@ -2300,7 +2301,7 @@ def parse_internal(this_node):
                             next_token()
                         if token.category != Token.Category.NAME:
                             raise Error('expected function\'s argument name', token)
-                        func_arg_name = token.value(source)
+                        func_arg_name = fix_cpp_keyword(token.value(source))
                         next_token()
                         if token.value(source) == '=':
                             next_token()
@@ -2890,6 +2891,7 @@ builtins_scope.add_function('degrees', ASTFunctionDefinition([('x', '', 'Float')
 builtins_scope.add_function('radians', ASTFunctionDefinition([('x', '', 'Float')]))
 builtins_scope.add_function('dot',   ASTFunctionDefinition([('v1', '', ''), ('v2', '', '')]))
 builtins_scope.add_function('cross', ASTFunctionDefinition([('v1', '', ''), ('v2', '', '')]))
+builtins_scope.add_function('sqlen',     ASTFunctionDefinition([('v', '', '')]))
 builtins_scope.add_function('normalize', ASTFunctionDefinition([('v', '', '')]))
 builtins_scope.add_function('conjugate', ASTFunctionDefinition([('c', '', '')]))
 builtins_scope.add_function('ValueError', ASTFunctionDefinition([('s', '', 'String')]))
