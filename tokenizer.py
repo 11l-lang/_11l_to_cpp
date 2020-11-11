@@ -80,7 +80,6 @@ empty_list_of_str : List[str] = []
 binary_operators : List[List[str]] = [empty_list_of_str, [str('+'), '-', '*', '/', '%', '^', '&', '|', '<', '>', '=', '?'], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '->', '..', '.<', '.+', '<.', 'I/', 'Ц/', 'C ', 'С '], ['<<=', '>>=', '‘’=', '[+]', '[&]', '[|]', '(+)', '<.<', 'I/=', 'Ц/=', 'in ', '!C ', '!С '], ['[+]=', '[&]=', '[|]=', '(+)=', '!in ']]
 unary_operators  : List[List[str]] = [empty_list_of_str, [str('!')], ['++', '--'], ['(-)']]
 sorted_operators = sorted(binary_operators[1] + binary_operators[2] + binary_operators[3] + binary_operators[4] + unary_operators[1] + unary_operators[2] + unary_operators[3], key = lambda x: len(x), reverse = True)
-binary_operators[1].remove('-') # Решил просто не считать `-` за бинарный оператор в контексте автоматического склеивания строк, так как `-` к тому же ещё и квалификатор константности
 binary_operators[1].remove('^') # for `^L.break` support
 binary_operators[2].remove('..') # for `L(n) 1..`
 
@@ -223,7 +222,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
               and not (source[i    ] in unary_operators[1]  # Rude fix for:
                     or source[i:i+2] in unary_operators[2]  # a=b
                     or source[i:i+3] in unary_operators[3]) # ++i // Plus symbol at the beginning here should not be treated as binary + operator, so there is no implied line joining
-              and (source[i] != '&' or source[i+1:i+2] == ' ')): # Символ `&` обрабатывается по-особенному — склеивание строк происходит только если после него стоит пробел
+              and (source[i] not in ('&', '-') or source[i+1:i+2] == ' ')): # Символы `&` и `-` обрабатываются по-особенному — склеивание строк происходит только если после одного из этих символов стоит пробел
                 if len(tokens) == 0:
                     raise Error('source can not starts with a binary operator', i)
                 if line_continuations is not None:

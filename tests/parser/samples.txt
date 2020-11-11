@@ -1230,3 +1230,9 @@ struct CodeBlock1
         print(s.last().code);
     }
 } code_block_1;
+
+
+V some_variable = 2
+                - 3
+===
+auto some_variable = 2 - 3;
