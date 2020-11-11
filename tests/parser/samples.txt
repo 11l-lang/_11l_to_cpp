@@ -1236,3 +1236,10 @@ V some_variable = 2
                 - 3
 ===
 auto some_variable = 2 - 3;
+
+
+-V one = 1
+-V (x, y) = input().split(‘ ’).map(Int)
+===
+const auto one = 1;
+const auto [x, y] = bind_array<2>(input().split(u" "_S).map([](const auto &x){return to_int(x);}));

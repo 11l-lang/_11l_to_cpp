@@ -1042,6 +1042,7 @@ class ASTVariableDeclaration(ASTNode):
     vars : List[str]
     type : str
     type_args : List[str]
+    is_const = False
     function_pointer = False
     is_reference = False
     scope : Scope
@@ -1065,7 +1066,7 @@ class ASTVariableDeclaration(ASTNode):
                 tt = self.trans_type(ty)
                 return tt if tt.startswith('std::unique_ptr<') else 'const ' + tt + ('&'*(ty not in ('Int',)))
             return ' ' * (indent*4) + 'std::function<' + self.trans_type(self.type) + '(' + ', '.join(trans_type(ty) for ty in self.type_args) + ')> ' + ', '.join(self.vars) + ";\n"
-        return ' ' * (indent*4) + self.trans_type(self.type, self.is_reference) + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + '*'*self.is_reference + ', '.join(self.vars) + ";\n"
+        return ' ' * (indent*4) + 'const '*self.is_const + self.trans_type(self.type, self.is_reference) + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + '*'*self.is_reference + ', '.join(self.vars) + ";\n"
 
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
     def to_str(self, indent):
@@ -1073,6 +1074,7 @@ class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
 
 class ASTTupleInitialization(ASTNodeWithExpression):
     dest_vars : List[str]
+    is_const = False
     bind_array = False
 
     def __init__(self):
@@ -1082,7 +1084,7 @@ class ASTTupleInitialization(ASTNodeWithExpression):
         e = self.expression.to_str()
         if self.bind_array:
             e = 'bind_array<' + str(len(self.dest_vars)) + '>(' + e + ')'
-        return ' ' * (indent*4) + 'auto [' + ', '.join(self.dest_vars) + '] = ' + e + ";\n"
+        return ' ' * (indent*4) + 'const '*self.is_const + 'auto [' + ', '.join(self.dest_vars) + '] = ' + e + ";\n"
 
 class ASTTupleAssignment(ASTNodeWithExpression):
     dest_vars : List[Tuple[str, bool]]
@@ -2638,8 +2640,13 @@ def parse_internal(this_node):
                 assert(token.category != Token.Category.STATEMENT_SEPARATOR)
             continue
 
-        elif token.value(source) in ('V', 'П', 'var', 'перем') and peek_token().value(source) == '(': # this is `V (a, b) = ...`
+        elif ((token.value(source) in ('V', 'П', 'var', 'перем') and peek_token().value(source) == '(') # ) # this is `V (a, b) = ...`
+           or (token.value(source) == '-' and
+        peek_token().value(source) in ('V', 'П', 'var', 'перем') and peek_token(2).value(source) == '(')): # this is `-V (a, b) = ...`
             node = ASTTupleInitialization()
+            if token.value(source) == '-':
+                node.is_const = True
+                next_token()
             next_token()
             next_token()
 
@@ -2758,6 +2765,10 @@ def parse_internal(this_node):
                         while token.value(source) == ',':
                             node.vars.append(expected_name('variable name'))
                     node.type = node_expression.token.value(source)
+                    if node.type == '-' and len(node_expression.children) == 1:
+                        node.is_const = True
+                        node_expression = node_expression.children[0]
+                        node.type = node_expression.token.value(source)
                     node.type_token = node_expression.token
                     node.type_args = []
                     if node.type == '[': # ]
