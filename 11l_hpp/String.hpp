@@ -717,6 +717,11 @@ inline String operator+(Char ch1, Char ch2)
 	return String(ch1) + ch2;
 }
 
+inline String operator*(Char c, int n)
+{
+	return String(c) * n;
+}
+
 inline String operator ""_S(const char16_t *s, size_t sz)
 {
 	return String(s, sz);
