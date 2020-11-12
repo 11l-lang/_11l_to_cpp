@@ -688,7 +688,7 @@ template <class T, size_t N> struct array_binder {
 	//const Array<T> &arr; // this does not work with `auto [a, b] = bind_array<2>(create_array({1, 2}));` because destructor of Array is called before `get()`
 	T a[N];
 	array_binder(const Array<T> &arr) { for (size_t i=0; i<N; i++) a[i] = arr[(int)i]; }
-	template <size_t I> T get() const { return a[I]; }
+	template <size_t I> const T &get() const { return a[I]; }
 };
 
 namespace std {
