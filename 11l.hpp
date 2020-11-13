@@ -314,11 +314,12 @@ template <typename Type, int dimension> inline void print(const Tvec<Type, dimen
 		std::wcout.flush();
 }
 
-template <typename Ty> inline void print_elements(const Ty &container, const String &end = u"\n", bool flush = false)
+template <typename Ty> inline void print_elements(const Ty &container, const String &sep = u" ", const String &end = u"\n", bool flush = false)
 {
 	bool first_element = true;
+	std::wstring sepws(sep.cbegin(), sep.cend());
 	for (auto &&el : container) {
-		if (!first_element) std::wcout << L' ';
+		if (!first_element) std::wcout << sepws;
 		else first_element = false;
 		print(el, u""_S);
 	}
