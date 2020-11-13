@@ -112,6 +112,15 @@ public:
 		}
 		append(1, u')');
 	}
+	template <typename Type> explicit String(const Array<Type> &arr)
+	{
+		assign(1, u'[');
+		for (int i=0; i<arr.len(); i++) {
+			*this += String(arr[i]);
+			if (i < arr.len()-1) *this += u", ";
+		}
+		append(1, u']');
+	}
 
 	using std::u16string::assign;
 	void assign(double num, int digits = 9, bool remove_trailing_zeroes = true)

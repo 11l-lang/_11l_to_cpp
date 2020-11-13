@@ -52,17 +52,6 @@ public:
 			append(c);
 	}
 
-	operator String() const
-	{
-		String r(u'[');
-		for (int i=0; i<len(); i++) {
-			r += String(std::vector<Type>::at(i));
-			if (i < len()-1) r += u", ";
-		}
-		r += u']';
-		return r;
-	}
-
 	using std::vector<Type>::begin,
 	      std::vector<Type>::end,
 	      std::vector<Type>::clear,

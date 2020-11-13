@@ -166,7 +166,7 @@ public:
 
 	const ValueType &operator[](const KeyType &key) const
 	{
-		auto r = find(key);
+		auto r = std::map<KeyType, ValueType>::find(key);
 		if (r == std::map<KeyType, ValueType>::end()) throw KeyError(String(key));
 		return r->second;
 	}
