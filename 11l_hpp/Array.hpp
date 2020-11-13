@@ -689,6 +689,7 @@ template <class T, size_t N> struct array_binder {
 	T a[N];
 	array_binder(const Array<T> &arr) { for (size_t i=0; i<N; i++) a[i] = arr[(int)i]; }
 	template <size_t I> const T &get() const { return a[I]; }
+	template <size_t I>       T &get()       { return a[I]; }
 };
 
 namespace std {
