@@ -2378,3 +2378,33 @@ struct CodeBlock1
     }
 } code_block_1;
 auto s = create_set({1});
+
+
+d = {1: 2}
+try:
+    print(d[3])
+except KeyError:
+    print(d)
+===
+V d = [1 = 2]
+X.try
+   print(d[3])
+X.catch KeyError
+   print(d)
+===
+auto d = create_dict(dict_of(1, 2));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        try
+        {
+            print(_get<3>(d));
+        }
+        catch (const KeyError&)
+        {
+            print(d);
+        }
+    }
+} code_block_1;

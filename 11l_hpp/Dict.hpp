@@ -159,9 +159,9 @@ public:
 
 	ValueType &operator[](const KeyType &key)
 	{
-		auto r = std::map<KeyType, ValueType>::insert(std::make_pair(key, ValueType()));
-		if (r.second) throw KeyError(String(key));
-		return r.first->second;
+		auto r = std::map<KeyType, ValueType>::find(key);
+		if (r == std::map<KeyType, ValueType>::end()) throw KeyError(String(key));
+		return r->second;
 	}
 
 	const ValueType &operator[](const KeyType &key) const
