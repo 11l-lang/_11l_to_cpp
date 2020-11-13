@@ -840,7 +840,7 @@ inline int64_t to_int64(const String &str, int base)
 
 inline Int to_int(Char ch)
 {
-	return ch.is_digit() ? ch.code - '0' : 0;
+	return ch.is_digit() ? ch.code - '0' : throw ValueError(ch);
 }
 
 inline Int to_int(double d)
