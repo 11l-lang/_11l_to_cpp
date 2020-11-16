@@ -214,7 +214,7 @@ V d = TimeDelta(10)
 
 
 L m
-^Error: please write `L m != 0` instead of `L m`
+^Error: please write `L m != 0` or `L 1..m` instead of `L m`
    m = m I/ 10
 
 
