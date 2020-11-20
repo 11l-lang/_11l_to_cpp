@@ -3027,6 +3027,12 @@ module_scope.add_function('seed', ASTFunctionDefinition([('s', '', 'Int')]))
 module_scope.add_function('shuffle', ASTFunctionDefinition([('container', '', '', '&')]))
 module_scope.add_function('choice', ASTFunctionDefinition([('container', '', '')]))
 builtin_modules['random'] = Module(module_scope)
+module_scope = Scope(None)
+module_scope.add_function('push',    ASTFunctionDefinition([('array', '', '', '&'), ('item', '', '')]))
+module_scope.add_function('pop',     ASTFunctionDefinition([('array', '', '', '&')]))
+module_scope.add_function('heapify', ASTFunctionDefinition([('array', '', '', '&')]))
+builtin_modules['minheap'] = Module(module_scope)
+builtin_modules['maxheap'] = Module(module_scope)
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
     if len(tokens_) == 0: return ASTProgram().to_str()

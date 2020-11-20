@@ -168,6 +168,7 @@ inline void assert_file_line(const char *file_name, int line, bool expression, c
 #include "11l_hpp/time.hpp"
 #include "11l_hpp/re.hpp"
 #include "11l_hpp/random.hpp"
+#include "11l_hpp/minmaxheap.hpp"
 
 #include <thread>
 

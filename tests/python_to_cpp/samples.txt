@@ -2408,3 +2408,34 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+import heapq
+a = [3, 1, 2]
+heapq.heapify(a)
+heapq.heappush(a, 5)
+heapq.heappush(a, 0)
+while len(a):
+    print(heapq.heappop(a))
+===
+//import heapq
+V a = [3, 1, 2]
+minheap:heapify(&a)
+minheap:push(&a, 5)
+minheap:push(&a, 0)
+L !a.empty
+   print(minheap:pop(&a))
+===
+auto a = create_array({3, 1, 2});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        minheap::heapify(a);
+        minheap::push(a, 5);
+        minheap::push(a, 0);
+        while (!a.empty())
+            print(minheap::pop(a));
+    }
+} code_block_1;
