@@ -1775,9 +1775,6 @@ cpp_keywords = {'alignas', 'alignof', 'and', 'and_eq', 'asm', 'auto', 'bitand', 
     'template', 'this', 'thread_local', 'throw', 'true', 'try', 'typedef', 'typeid', 'typename', 'union', 'unsigned', 'using', 'virtual', 'void', 'volatile', 'wchar_t', 'while', 'xor', 'xor_eq',
     'j0', 'j1', 'jn', 'y0', 'y1', 'yn'}
 
-def fix_cpp_keyword(token_str):
-    return '_' + token_str + '_' if token_str in cpp_keywords else token_str
-
 def next_token():
     global token, tokeni, tokensn
     if token is None and tokeni != -1:
@@ -2312,7 +2309,7 @@ def parse_internal(this_node):
                             next_token()
                         if token.category != Token.Category.NAME:
                             raise Error('expected function\'s argument name', token)
-                        func_arg_name = fix_cpp_keyword(token.value(source))
+                        func_arg_name = tokensn.token_str()
                         next_token()
                         if token.value(source) == '=':
                             next_token()
@@ -2661,7 +2658,7 @@ def parse_internal(this_node):
 
             while True:
                 assert(token.category == Token.Category.NAME)
-                name = fix_cpp_keyword(token.value(source))
+                name = tokensn.token_str()
                 node.dest_vars.append(name)
                 scope.add_name(name, node)
                 next_token()
@@ -2705,7 +2702,7 @@ def parse_internal(this_node):
                     next_token()
                     assert(token.category == Token.Category.NAME)
 
-                name = fix_cpp_keyword(token.value(source))
+                name = tokensn.token_str()
                 node.dest_vars.append((name, add_var))
                 if add_var:
                     scope.add_name(name, node)
@@ -2738,7 +2735,7 @@ def parse_internal(this_node):
                     node.type_args = []
                     scope.add_name(node.vars[0], node)
                 elif token.category == Token.Category.NAME and tokens[tokeni-1].category != Token.Category.SCOPE_END:
-                    var_name = fix_cpp_keyword(token.value(source))
+                    var_name = tokensn.token_str()
                     next_token()
                     if token.value(source) == '=':
                         next_token()
