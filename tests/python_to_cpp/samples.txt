@@ -2456,3 +2456,24 @@ struct CodeBlock1
         sought.findi(u"a"_S);
     }
 } code_block_1;
+
+
+search = ''
+(sought, search) = ('a', 'b')
+sought.find('a')
+===
+V search = ‘’
+(V sought, search) = (‘a’, ‘b’)
+sought.findi(‘a’)
+===
+auto search = u""_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        TUPLE_ELEMENT_T(0, make_tuple(u"a"_S, u"b"_S)) sought;
+        assign_from_tuple(sought, search, make_tuple(u"a"_S, u"b"_S));
+        sought.findi(u"a"_S);
+    }
+} code_block_1;
