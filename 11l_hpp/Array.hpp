@@ -641,6 +641,17 @@ Array<Char> sorted(const String &s)
 	return arr;
 }
 
+Array<Char> sorted(const String &s, nullptr_t, bool reverse)
+{
+	Array<Char> arr;
+	arr.assign(s.cbegin(), s.cend());
+	if (!reverse)
+		std::sort(arr.begin(), arr.end());
+	else
+		std::sort(arr.begin(), arr.end(), std::greater<>());
+	return arr;
+}
+
 template <typename Type> inline Array<Type> reversed(const Array<Type> &arr)
 {
 	Array<Type> r(arr);

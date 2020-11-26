@@ -2439,3 +2439,20 @@ struct CodeBlock1
             print(minheap::pop(a));
     }
 } code_block_1;
+
+
+(sought, search) = ('a', 'b')
+sought.find('a')
+===
+V (sought, search) = (‘a’, ‘b’)
+sought.findi(‘a’)
+===
+auto [sought, search] = make_tuple(u"a"_S, u"b"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        sought.findi(u"a"_S);
+    }
+} code_block_1;

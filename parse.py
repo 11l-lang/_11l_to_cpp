@@ -1734,7 +1734,7 @@ def type_of(sn):
         if type(left) == ASTLoop:
             return None
 
-    if type(left) == ASTTypeDefinition:
+    if type(left) in (ASTTypeDefinition, ASTTupleInitialization):
         return None # [-TODO-]
     if type(left) not in (ASTVariableDeclaration, ASTVariableInitialization):
         raise Error('left type is `' + str(type(left)) + '`', sn.left_to_right_token())
@@ -2655,7 +2655,9 @@ def parse_internal(this_node):
 
             while True:
                 assert(token.category == Token.Category.NAME)
-                node.dest_vars.append(fix_cpp_keyword(token.value(source)))
+                name = fix_cpp_keyword(token.value(source))
+                node.dest_vars.append(name)
+                scope.add_name(name, node)
                 next_token()
                 if token.value(source) == ')':
                     break
