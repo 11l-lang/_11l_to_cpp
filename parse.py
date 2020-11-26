@@ -135,8 +135,14 @@ class Scope:
             self.ids[name] = Scope.Id('', ast_node)
 
     def add_name(self, name, ast_node):
-        if name in self.ids:                                                                                    # I !.ids.set(name, Id(N, ast_node))
-            raise Error('redefinition of already defined identifier is not allowed', tokens[ast_node.tokeni+1]) #    X Error(‘redefinition ...’, ...)
+        if name in self.ids:                                                            # I !.ids.set(name, Id(N, ast_node))
+            if isinstance(ast_node, ASTVariableDeclaration):
+                t = ast_node.type_token
+            elif isinstance(ast_node, ASTNodeWithChildren):
+                t = tokens[ast_node.tokeni + 1]
+            else:
+                t = token
+            raise Error('redefinition of already defined identifier is not allowed', t) #    X Error(‘redefinition ...’, ...)
         self.ids[name] = Scope.Id('', ast_node)
 
 scope : Scope
