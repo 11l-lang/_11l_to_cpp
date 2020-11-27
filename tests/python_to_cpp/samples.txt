@@ -2477,3 +2477,23 @@ struct CodeBlock1
         sought.findi(u"a"_S);
     }
 } code_block_1;
+
+
+n = 0
+if n&1 != 0:
+    print(1)
+===
+V n = 0
+I n [&] 1 != 0
+   print(1)
+===
+auto n = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        if ((n & 1) != 0)
+            print(1);
+    }
+} code_block_1;

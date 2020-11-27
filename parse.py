@@ -832,6 +832,8 @@ class SymbolNode:
                 return 'pow(' + self.children[0].to_str() + ', ' + c1 + ')'
             elif self.symbol.id == '%':
                 return 'mod(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
+            elif self.symbol.id == '[&]' and self.parent is not None and self.parent.symbol.id in ('==', '!='): # there is a difference in precedence of operators `&` and `==`/`!=` in Python/11l and C++
+                return '(' + self.children[0].to_str() + ' & ' + self.children[1].to_str() + ')'
             else:
                 def is_integer(t):
                     return t.category == Token.Category.NUMERIC_LITERAL and ('.' not in t.value(source)) and ('e' not in t.value(source))
