@@ -2497,3 +2497,25 @@ struct CodeBlock1
             print(1);
     }
 } code_block_1;
+
+
+a = [1]
+def ref(obj):
+    return obj
+r = ref(a)
+print(r.index(1))
+===
+V a = [1]
+V& r = a
+print(r.index(1))
+===
+auto a = create_array({1});
+auto& r = a;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(r.index(1));
+    }
+} code_block_1;

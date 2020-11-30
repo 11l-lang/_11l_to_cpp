@@ -1746,7 +1746,7 @@ def type_of(sn):
         return None # [-TODO-]
     if type(left) not in (ASTVariableDeclaration, ASTVariableInitialization):
         raise Error('left type is `' + str(type(left)) + '`', sn.left_to_right_token())
-    if left.type in ('V', 'П', 'var', 'перем', 'V?', 'П?', 'var?', 'перем?'): # for `V selection_strings = ... selection_strings.map(...)`
+    if left.type in ('V', 'П', 'var', 'перем', 'V?', 'П?', 'var?', 'перем?', 'V&', 'П&', 'var&', 'перем&'): # for `V selection_strings = ... selection_strings.map(...)`
         if left.expression.symbol.id == '(' and left.expression.children[0].token.category == Token.Category.NAME and left.expression.children[0].token_str()[0].isupper(): # ) # for `V n = Node()`
             tid = sn.scope.find(left.expression.children[0].token_str())
             assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
