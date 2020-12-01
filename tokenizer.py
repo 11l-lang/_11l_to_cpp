@@ -95,7 +95,7 @@ class Error(Exception):
         self.end = pos
 
 class Token:
-    class Category(IntEnum):
+    class Category(IntEnum): # why ‘Category’: >[https://docs.python.org/3/reference/lexical_analysis.html#other-tokens]:‘the following categories of tokens exist’
         NAME = 0 # or IDENTIFIER
         KEYWORD = 1
         CONSTANT = 2

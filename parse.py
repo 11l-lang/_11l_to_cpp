@@ -1777,7 +1777,7 @@ cpp_keywords = {'alignas', 'alignof', 'and', 'and_eq', 'asm', 'auto', 'bitand', 
     'template', 'this', 'thread_local', 'throw', 'true', 'try', 'typedef', 'typeid', 'typename', 'union', 'unsigned', 'using', 'virtual', 'void', 'volatile', 'wchar_t', 'while', 'xor', 'xor_eq',
     'j0', 'j1', 'jn', 'y0', 'y1', 'yn'}
 
-def next_token():
+def next_token(): # why ‘next_token’: >[https://youtu.be/Nlqv6NtBXcA?t=1203]:‘we'll have an advance method which will fetch the next token’
     global token, tokeni, tokensn
     if token is None and tokeni != -1:
         raise Error('no more tokens', Token(len(source), len(source), Token.Category.STATEMENT_SEPARATOR))
