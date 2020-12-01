@@ -2975,6 +2975,7 @@ array_scope = Scope(None)
 array_scope.add_name('remove', ASTFunctionDefinition([('x', '', '')]))
 array_scope.add_name('reverse', ASTFunctionDefinition([]))
 array_scope.add_name('filter', ASTFunctionDefinition([('f', '', '')]))
+array_scope.add_name('join', ASTFunctionDefinition([('sep', '', 'String')]))
 builtins_scope.ids['Array'].ast_nodes[0].scope = array_scope
 set_scope = Scope(None)
 set_scope.add_name('difference', ASTFunctionDefinition([('other', '', 'Set')]))
