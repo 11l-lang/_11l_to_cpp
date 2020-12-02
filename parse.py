@@ -2868,7 +2868,7 @@ builtins_scope.add_function('input', ASTFunctionDefinition([('prompt', token_to_
 builtins_scope.add_function('assert', ASTFunctionDefinition([('expression', '', 'Bool'), ('message', token_to_str('‘’'), 'String')]))
 builtins_scope.add_function('exit', ASTFunctionDefinition([('arg', '', '')]))
 builtins_scope.add_function('swap', ASTFunctionDefinition([('a', '', '', '&'), ('b', '', '', '&')]))
-builtins_scope.add_function('zip', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', '')]))
+builtins_scope.add_function('zip', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', ''), ('iterable3', token_to_str('N', Token.Category.CONSTANT), '')]))
 builtins_scope.add_function('all', ASTFunctionDefinition([('iterable', '', '')]))
 builtins_scope.add_function('any', ASTFunctionDefinition([('iterable', '', '')]))
 builtins_scope.add_function('cart_product', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', ''), ('iterable3', token_to_str('N', Token.Category.CONSTANT), '')]))

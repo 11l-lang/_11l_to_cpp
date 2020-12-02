@@ -349,6 +349,18 @@ template <typename T1, typename T2> auto zip(const T1 &arr1, const T2 &arr2)
 	return r;
 }
 
+template <typename T1, typename T2, typename T3> auto zip(const T1 &arr1, const T2 &arr2, const T3 &arr3)
+{
+	Array<decltype(make_tuple(*std::begin(arr1), *std::begin(arr2), *std::begin(arr3)))> r; // do not forget that `make_tuple(1, 2, 3)` returns `Tvec<int, 3>(1, 2, 3)` rather than `Tuple<int, int, int>(1, 2, 3)`
+	r.reserve(min(arr1.len(), arr2.len(), arr3.len()));
+	auto it1 = arr1.begin();
+	auto it2 = arr2.begin();
+	auto it3 = arr3.begin();
+	for (; it1 != arr1.end() && it2 != arr2.end() && it3 != arr3.end(); ++it1, ++it2, ++it3)
+		r.push_back(make_tuple(*it1, *it2, *it3));
+	return r;
+}
+
 template <typename T1, typename T2> auto cart_product(const T1 &arr1, const T2 &arr2)
 {
 	Array<decltype(make_tuple(*std::begin(arr1), *std::begin(arr2)))> r;
