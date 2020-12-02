@@ -334,6 +334,10 @@ public:
 		std::reverse(begin(), end());
 	}
 
+	void reverse_range(const Range<int, true,  true> range) {std::reverse(begin() + range.b, begin() + range.e + 1);}
+	void reverse_range(const Range<int, true, false> range) {std::reverse(begin() + range.b, begin() + range.e);}
+	void reverse_range(const RangeEI<int>            range) {std::reverse(begin() + range.b, end());}
+
 	const Type &last() const
 	{
 		if (std::vector<Type>::empty())
