@@ -7172,3 +7172,17 @@ struct CodeBlock1
             print(u"#. validation is: #."_S.format(account, valid_iban(account)));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Infinity#Python
+print(float('infinity'))
+===
+print(Float.infinity)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(std::numeric_limits<double>::infinity());
+    }
+} code_block_1;

@@ -135,6 +135,8 @@ template <typename Type, int dimension> inline const Type *end  (const Tvec<Type
 #include "11l_hpp/Deque.hpp"
 #include "11l_hpp/pointers.hpp"
 
+#include <limits>
+
 #include <functional>
 #include <complex>
 typedef std::complex<double> Complex;

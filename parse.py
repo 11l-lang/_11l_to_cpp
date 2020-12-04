@@ -723,6 +723,9 @@ class SymbolNode:
                             if frtid is not None and len(frtid.ast_nodes) == 1 and type(frtid.ast_nodes[0]) == ASTTypeDefinition and frtid.ast_nodes[0].has_pointers_to_the_same_type:
                                 return self.children[0].to_str() + '->' + c1
 
+                if cts0 in ('Float', 'Float32') and c1 == 'infinity':
+                    return 'std::numeric_limits<' + cpp_type_from_11l[cts0] + '>::infinity()'
+
                 id_, s = self.scope.find_and_return_scope(cts0.lstrip('@'))
                 if id_ is not None:
                     if id_.type != '' and id_.type.endswith('?'):
@@ -975,7 +978,7 @@ class ASTExpression(ASTNodeWithExpression):
         return ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
 cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'перем':'auto',
-                     'Int':'int', 'Int64':'int64_t', 'UInt32':'uint32_t', 'Float':'double', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte',
+                     'Int':'int', 'Int64':'int64_t', 'UInt32':'uint32_t', 'Float':'double', 'Float32':'float', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
                      'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque'}
 
