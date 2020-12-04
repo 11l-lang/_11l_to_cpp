@@ -1555,3 +1555,29 @@ struct CodeBlock1
         print(create_array(range_ee(u'a'_C, u'z'_C)));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Idiomatically_determine_all_the_lowercase_and_uppercase_letters#Kotlin
+print(‘Lower case: ’, end' ‘’)
+L(ch) ‘a’..‘z’
+   print(ch, end' ‘’)
+print()
+print(‘Upper case: ’, end' ‘’)
+L(ch) ‘A’..‘Z’
+   print(ch, end' ‘’)
+print()
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Lower case: "_S, u""_S);
+        for (auto ch : range_ee(u'a'_C, u'z'_C))
+            print(ch, u""_S);
+        print();
+        print(u"Upper case: "_S, u""_S);
+        for (auto ch : range_ee(u'A'_C, u'Z'_C))
+            print(ch, u""_S);
+        print();
+    }
+} code_block_1;

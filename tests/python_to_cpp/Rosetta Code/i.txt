@@ -1,0 +1,318 @@
+# https://www.rosettacode.org/wiki/Inheritance/Single#Python
+class Animal:
+  pass #functions go here...
+class Dog(Animal):
+  pass #functions go here...
+class Cat(Animal):
+  pass #functions go here...
+class Lab(Dog):
+  pass #functions go here...
+class Collie(Dog):
+  pass #functions go here...
+===
+T Animal
+{
+}
+T Dog(Animal)
+{
+}
+T Cat(Animal)
+{
+}
+T Lab(Dog)
+{
+}
+T Collie(Dog)
+{
+}
+===
+class Animal
+{
+};
+
+class Dog : public Animal
+{
+};
+
+class Cat : public Animal
+{
+};
+
+class Lab : public Dog
+{
+};
+
+class Collie : public Dog
+{
+};
+
+
+# https://www.rosettacode.org/wiki/Input/Output_for_lines_of_text#Python
+def do_stuff(words):
+    print(words)
+
+linecount = int(input())
+for x in range(linecount):
+    line = input()
+    do_stuff(line)
+===
+F do_stuff(words)
+   print(words)
+V linecount = Int(input())
+L(x) 0 .< linecount
+   V line = input()
+   do_stuff(line)
+===
+template <typename T1> auto do_stuff(const T1 &words)
+{
+    print(words);
+}
+auto linecount = to_int(input());
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto x : range_el(0, linecount)) {
+            auto line = input();
+            do_stuff(line);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Input/Output_for_pairs_of_numbers#Python
+def do_stuff(a, b):
+    return a + b
+
+t = int(input())
+for x in range(0, t):
+    (a, b) = map(int, input().split(' '))
+    print(do_stuff(a, b))
+===
+F do_stuff(a, b)
+   R a + b
+V t = Int(input())
+L(x) 0 .< t
+   V (a, b) = input().split(‘ ’).map(Int)
+   print(do_stuff(a, b))
+===
+template <typename T1, typename T2> auto do_stuff(const T1 &a, const T2 &b)
+{
+    return a + b;
+}
+auto t = to_int(input());
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto x : range_el(0, t)) {
+            auto [a, b] = bind_array<2>(input().split(u" "_S).map([](const auto &x){return to_int(x);}));
+            print(do_stuff(a, b));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Integer_comparison#Python
+a = int(input('Enter value of a: '))
+b = int(input('Enter value of b: '))
+
+if a < b:
+    print('a is less than b')
+if a > b:
+    print('a is greater than b')
+if a == b:
+    print('a is equal to b')
+===
+V a = Int(input(‘Enter value of a: ’))
+V b = Int(input(‘Enter value of b: ’))
+
+I a < b
+   print(‘a is less than b’)
+I a > b
+   print(‘a is greater than b’)
+I a == b
+   print(‘a is equal to b’)
+===
+auto a = to_int(input(u"Enter value of a: "_S));
+auto b = to_int(input(u"Enter value of b: "_S));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        if (a < b)
+            print(u"a is less than b"_S);
+        if (a > b)
+            print(u"a is greater than b"_S);
+        if (a == b)
+            print(u"a is equal to b"_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Integer_sequence#Python
+import itertools
+
+for i in itertools.count(1):
+    print(i)
+===
+//import itertools
+
+L(i) 1..
+   print(i)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ei(1))
+            print(i);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Intersecting_number_wheels#Python:_Simplified_procedural
+from typing import Dict, List
+
+def nextfrom(w : Dict[str, List[str]], name):
+    while True:
+        nxt = w[name][0]
+        w[name] = w[name][1:] + w[name][:1]
+        if '0' <= nxt[0] <= '9':
+            return nxt
+        name = nxt
+
+for group in '''
+A: 1 2 3
+A: 1 B 2; B: 3 4
+A: 1 D D; D: 6 7 8
+A: 1 B C; B: 3 4; C: 5 B'''.strip("\n").split('\n'):
+    print("Intersecting Number Wheel group:\n  " + group)
+    wheel : Dict[str, List[str]] = {}
+    first = ''
+    for w in group.split(';'):
+        s = w.strip(' ').split(' ')
+        name = s[0]
+        wheel[name[:-1]] = s[1:]
+        first = name[:-1] if first == '' else first
+    gen = ' '.join(nextfrom(wheel, first) for i in range(20))
+    print("  Generates:\n    " + gen + " ...\n")
+===
+
+F nextfrom([String = [String]] &w; =name)
+   L
+      V nxt = w[name][0]
+      w[name] = w[name][1..] + w[name][0.<1]
+      I nxt[0] C ‘0’..‘9’
+         R nxt
+      name = nxt
+
+L(group) ‘
+A: 1 2 3
+A: 1 B 2; B: 3 4
+A: 1 D D; D: 6 7 8
+A: 1 B C; B: 3 4; C: 5 B’.trim("\n").split("\n")
+   print("Intersecting Number Wheel group:\n  "group)
+   [String = [String]] wheel
+   V first = ‘’
+   L(w) group.split(‘;’)
+      V s = w.trim(‘ ’).split(‘ ’)
+      V name = s[0]
+      wheel[name[0 .< (len)-1]] = s[1..]
+      first = I first == ‘’ {name[0 .< (len)-1]} E first
+   V gen = (0.<20).map(i -> nextfrom(&@wheel, @first)).join(‘ ’)
+   print("  Generates:\n    "gen" ...\n")
+===
+template <typename T2> auto nextfrom(Dict<String, Array<String>> &w, T2 name)
+{
+    while (true) {
+        auto nxt = _get<0>(w[name]);
+        w.set(name, w[name][range_ei(1)] + w[name][range_el(0, 1)]);
+        if (in(_get<0>(nxt), range_ee(u'0'_C, u'9'_C)))
+            return nxt;
+        name = nxt;
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&group : uR"(
+A: 1 2 3
+A: 1 B 2; B: 3 4
+A: 1 D D; D: 6 7 8
+A: 1 B C; B: 3 4; C: 5 B)"_S.trim(u"\n"_S).split(u"\n"_S)) {
+            print(u"Intersecting Number Wheel group:\n  "_S + group);
+            Dict<String, Array<String>> wheel;
+            auto first = u""_S;
+            for (auto &&w : group.split(u";"_S)) {
+                auto s = w.trim(u" "_S).split(u" "_S);
+                auto name = _get<0>(s);
+                wheel.set(name[range_e_llen(0,  - 1)], s[range_ei(1)]);
+                first = first == u"" ? name[range_e_llen(0,  - 1)] : first;
+            }
+            auto gen = range_el(0, 20).map([&first, &wheel](const auto &i){return nextfrom(wheel, first);}).join(u" "_S);
+            print(u"  Generates:\n    "_S + gen + u" ...\n"_S);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/ISBN13_check_digit#Python
+def is_isbn13(n):
+    n = n.replace('-','').replace(' ', '')
+    if len(n) != 13:
+        return False
+    product = (sum(int(ch) for ch in n[::2])
+               + sum(int(ch) * 3 for ch in n[1::2]))
+    return product % 10 == 0
+
+tests = '''
+978-1734314502
+978-1734314509
+978-1788399081
+978-1788399083'''.strip("\n").split("\n")
+for t in tests:
+    print("ISBN13 "+t+" validates "+is_isbn13(t))
+===
+F is_isbn13(=n)
+   n = n.replace(‘-’, ‘’).replace(‘ ’, ‘’)
+   I n.len != 13
+      R 0B
+   V product = (sum(n[(0..).step(2)].map(ch -> Int(ch))) + sum(n[(1..).step(2)].map(ch -> Int(ch) * 3)))
+   R product % 10 == 0
+V tests = ‘
+978-1734314502
+978-1734314509
+978-1788399081
+978-1788399083’.trim("\n").split("\n")
+L(t) tests
+   print(‘ISBN13 ’t‘ validates ’is_isbn13(t))
+===
+template <typename T1> auto is_isbn13(T1 n)
+{
+    n = n.replace(u"-"_S, u""_S).replace(u" "_S, u""_S);
+    if (n.len() != 13)
+        return false;
+    auto product = (sum_map(n[range_ei(0).step(2)], [](const auto &ch){return to_int(ch);}) + sum_map(n[range_ei(1).step(2)], [](const auto &ch){return to_int(ch) * 3;}));
+    return mod(product, 10) == 0;
+}
+auto tests = uR"(
+978-1734314502
+978-1734314509
+978-1788399081
+978-1788399083)"_S.trim(u"\n"_S).split(u"\n"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&t : tests)
+            print(u"ISBN13 "_S + t + u" validates "_S + is_isbn13(t));
+    }
+} code_block_1;
