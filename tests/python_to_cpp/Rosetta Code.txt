@@ -7186,3 +7186,67 @@ struct CodeBlock1
         print(std::numeric_limits<double>::infinity());
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Index_finite_lists_of_positive_integers#Python
+def rank(x): return int('a'.join(map(str, [1] + x)), 11)
+
+def unrank(n):
+    s = ''
+    while n != 0: (s,n) = ("0123456789a"[n%11] + s, n//11)
+    return list(map(int, s.split('a')))[1:]
+
+l = [1, 2, 3, 10, 100, 987654321]
+print(l)
+n = rank(l)
+print(n)
+l = unrank(n)
+print(l)
+===
+F rank(x)
+   R Int(([1] [+] x).map(String).join(‘a’), 11)
+
+F unrank(=n)
+   V s = ‘’
+   L n != 0
+      (s, n) = (‘0123456789a’[n % 11]‘’s, n I/ 11)
+   R s.split(‘a’).map(Int)[1..]
+V l = [1, 2, 3, 10, 100, 987654321]
+print(l)
+V n = rank(l)
+print(n)
+l = unrank(n)
+print(l)
+===
+template <typename T1> auto rank(const T1 &x)
+{
+    return to_int((create_array({1}) + x).map([](const auto &x){return String(x);}).join(u"a"_S), 11);
+}
+
+template <typename T1> auto unrank(T1 n)
+{
+    auto s = u""_S;
+    while (n != 0)
+        assign_from_tuple(s, n, make_tuple(u"0123456789a"_S[mod(n, 11)] + s, idiv(n, 11)));
+    return s.split(u"a"_S).map([](const auto &x){return to_int(x);})[range_ei(1)];
+}
+auto l = create_array({1, 2, 3, 10, 100, 987654321});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(l);
+    }
+} code_block_1;
+auto n = rank(l);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(n);
+        l = unrank(n);
+        print(l);
+    }
+} code_block_2;
