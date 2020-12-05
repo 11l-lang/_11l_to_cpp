@@ -2519,3 +2519,37 @@ struct CodeBlock1
         print(r.index(1));
     }
 } code_block_1;
+
+
+a : List[int] = []
+a.sort(reverse = True)
+===
+[Int] a
+a.sort(reverse' 1B)
+===
+Array<int> a;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        a.sort(nullptr, true);
+    }
+} code_block_1;
+
+
+a = list(map(int, input().split()))
+a.sort(reverse = True)
+===
+V a = input().split_py().map(Int)
+a.sort(reverse' 1B)
+===
+auto a = input().split_py().map([](const auto &x){return to_int(x);});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        a.sort(nullptr, true);
+    }
+} code_block_1;

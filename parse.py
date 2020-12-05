@@ -1750,6 +1750,7 @@ def type_of(sn):
     if type(left) not in (ASTVariableDeclaration, ASTVariableInitialization):
         raise Error('left type is `' + str(type(left)) + '`', sn.left_to_right_token())
     if left.type in ('V', 'П', 'var', 'перем', 'V?', 'П?', 'var?', 'перем?', 'V&', 'П&', 'var&', 'перем&'): # for `V selection_strings = ... selection_strings.map(...)`
+        assert(type(left) == ASTVariableInitialization)
         if left.expression.symbol.id == '(' and left.expression.children[0].token.category == Token.Category.NAME and left.expression.children[0].token_str()[0].isupper(): # ) # for `V n = Node()`
             tid = sn.scope.find(left.expression.children[0].token_str())
             assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
@@ -1759,9 +1760,16 @@ def type_of(sn):
             if isinstance(tid.ast_nodes[0], ASTExpression):
                 return None
             return tid.ast_nodes[0]
+        if left.expression.symbol.id == '(' and left.expression.children[0].symbol.id == '.' and len(left.expression.children[0].children) == 2 and left.expression.children[0].children[1].token_str() == 'map': # ) # for `V a = ....map(Int); a.sort(reverse' 1B)`
+            tid = builtins_scope.find('Array').ast_nodes[0].scope.ids.get(sn.children[1].token_str())
+            if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition)):
+                raise Error('member `' + sn.children[1].token_str() + '` is not found in type `Array`', sn.left_to_right_token())
+            return tid.ast_nodes[0]
         return None
-    if len(left.type_args): # `Array[String] ending_tags... ending_tags.append(‘</blockquote>’)`
-        return None # [-TODO-]
+    # if len(left.type_args): # `Array[String] ending_tags... ending_tags.append(‘</blockquote>’)`
+    #     return None # [-TODO-]
+    if left.type == 'T':
+        return None
     tid = left.scope.find(left.type.rstrip('?'))
     if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition):
         if left.type.startswith('('): # )
@@ -2975,11 +2983,27 @@ string_scope.add_name('format', ASTFunctionDefinition([('arg', token_to_str('N',
 string_scope.add_name('map', ASTFunctionDefinition([('function', '', '(Char -> T)')]))
 builtins_scope.ids['String'].ast_nodes[0].scope = string_scope
 array_scope = Scope(None)
+last_member_var_decl = ASTVariableDeclaration()
+last_member_var_decl.type = 'T'
+array_scope.add_name('last', last_member_var_decl)
+array_scope.add_name('append', ASTFunctionDefinition([('x', '', '')]))
+array_scope.add_name('extend', ASTFunctionDefinition([('t', '', '')]))
 array_scope.add_name('remove', ASTFunctionDefinition([('x', '', '')]))
+array_scope.add_name('count', ASTFunctionDefinition([('x', '', '')]))
+array_scope.add_name('index', ASTFunctionDefinition([('x', '', ''), ('i', '0', 'Int')]))
+array_scope.add_name('pop', ASTFunctionDefinition([('i', '-1', 'Int')]))
+array_scope.add_name('insert', ASTFunctionDefinition([('i', '', 'Int'), ('x', '', '')]))
 array_scope.add_name('reverse', ASTFunctionDefinition([]))
+array_scope.add_name('clear', ASTFunctionDefinition([]))
+array_scope.add_name('map', ASTFunctionDefinition([('f', '', '')]))
 array_scope.add_name('filter', ASTFunctionDefinition([('f', '', '')]))
 array_scope.add_name('join', ASTFunctionDefinition([('sep', '', 'String')]))
+array_scope.add_name('sort', ASTFunctionDefinition([('key', token_to_str('N', Token.Category.CONSTANT), ''), ('reverse', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
 builtins_scope.ids['Array'].ast_nodes[0].scope = array_scope
+dict_scope = Scope(None)
+dict_scope.add_name('values', ASTFunctionDefinition([]))
+builtins_scope.ids['Dict'].ast_nodes[0].scope = dict_scope
+builtins_scope.ids['DefaultDict'].ast_nodes[0].scope = dict_scope
 set_scope = Scope(None)
 set_scope.add_name('difference', ASTFunctionDefinition([('other', '', 'Set')]))
 builtins_scope.ids['Set'].ast_nodes[0].scope = set_scope

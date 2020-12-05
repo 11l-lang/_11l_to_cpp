@@ -326,6 +326,22 @@ public:
 		std::sort(begin(), end());
 	}
 
+	template <typename Key> void sort(Key &&key, bool reverse = false)
+	{
+		if (!reverse)
+			std::sort(begin(), end(), [key](const Type &a, const Type &b) {return key(a) < key(b);});
+		else
+			std::sort(begin(), end(), [key](const Type &a, const Type &b) {return key(b) < key(a);});
+	}
+
+	void sort(nullptr_t, bool reverse)
+	{
+		if (!reverse)
+			std::sort(begin(), end());
+		else
+			std::sort(begin(), end(), std::greater<>()); // [https://stackoverflow.com/a/37757410/2692494 <- google:‘std sort reverse’]
+	}
+
 	void sort_range(const Range<int, true,  true> range) {std::sort(begin() + range.b, begin() + range.e + 1);}
 	void sort_range(const Range<int, true, false> range) {std::sort(begin() + range.b, begin() + range.e);}
 
@@ -617,7 +633,7 @@ template <typename Type> Array<Type> sorted(const Array<Type> &arr)
 	return r;
 }
 
-template <typename Type, typename Key> Array<Type> sorted(const Array<Type> &arr, Key key, bool reverse = false)
+template <typename Type, typename Key> Array<Type> sorted(const Array<Type> &arr, Key &&key, bool reverse = false)
 {
 	Array<Type> r(arr);
 	if (!reverse)
