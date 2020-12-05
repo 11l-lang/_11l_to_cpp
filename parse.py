@@ -2949,6 +2949,10 @@ add_builtin_global_var('stdout', 'File')
 add_builtin_global_var('stderr', 'File')
 
 builtins_scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', '', 'Int')])]))
+char_scope = Scope(None)
+char_scope.add_name('is_digit', ASTFunctionDefinition([]))
+builtins_scope.ids['Char'].ast_nodes[0].scope = char_scope
+
 builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('mode', token_to_str('‘r’'), 'String'), ('encoding', token_to_str('‘utf-8’'), 'String')])]))
 file_scope = Scope(None)
 file_scope.add_name('read_bytes', ASTFunctionDefinition([]))
@@ -2964,7 +2968,9 @@ builtins_scope.ids['File'].ast_nodes[0].scope = file_scope
 for type_ in cpp_type_from_11l:
     builtins_scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', token_to_str('‘’'), '')])]))
 string_scope = Scope(None)
-string_scope.add_name('last', ASTVariableDeclaration())
+str_last_member_var_decl = ASTVariableDeclaration()
+str_last_member_var_decl.type = 'Char'
+string_scope.add_name('last', str_last_member_var_decl)
 string_scope.add_name('starts_with', ASTFunctionDefinition([('prefix', '', 'String')]))
 string_scope.add_name('ends_with', ASTFunctionDefinition([('suffix', '', 'String')]))
 string_scope.add_name('split', ASTFunctionDefinition([('delim', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?'), ('group_delimiters', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
@@ -2983,9 +2989,9 @@ string_scope.add_name('format', ASTFunctionDefinition([('arg', token_to_str('N',
 string_scope.add_name('map', ASTFunctionDefinition([('function', '', '(Char -> T)')]))
 builtins_scope.ids['String'].ast_nodes[0].scope = string_scope
 array_scope = Scope(None)
-last_member_var_decl = ASTVariableDeclaration()
-last_member_var_decl.type = 'T'
-array_scope.add_name('last', last_member_var_decl)
+arr_last_member_var_decl = ASTVariableDeclaration()
+arr_last_member_var_decl.type = 'T'
+array_scope.add_name('last', arr_last_member_var_decl)
 array_scope.add_name('append', ASTFunctionDefinition([('x', '', '')]))
 array_scope.add_name('extend', ASTFunctionDefinition([('t', '', '')]))
 array_scope.add_name('remove', ASTFunctionDefinition([('x', '', '')]))

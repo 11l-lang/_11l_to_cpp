@@ -2553,3 +2553,20 @@ struct CodeBlock1
         a.sort(nullptr, true);
     }
 } code_block_1;
+
+
+s : str
+print(s[-1].isdigit())
+===
+String s
+print(s.last.is_digit())
+===
+String s;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(s.last().is_digit());
+    }
+} code_block_1;
