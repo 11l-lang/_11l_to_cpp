@@ -1581,3 +1581,44 @@ struct CodeBlock1
         print();
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Jensen%27s_Device#C.23
+F sum(&i, lo, hi, term)
+   V temp = 0.0
+   i = lo
+   L i <= hi
+      temp += term()
+      i++
+   R temp
+
+F main()
+   Int i
+   print(sum(&i, 1, 100, () -> 1 / @i))
+
+main()
+===
+template <typename T1, typename T2, typename T3, typename T4> auto sum(T1 &i, const T2 &lo, const T3 &hi, const T4 &term)
+{
+    auto temp = 0.0;
+    i = lo;
+    while (i <= hi) {
+        temp += term();
+        i++;
+    }
+    return temp;
+}
+
+auto _main_()
+{
+    int i;
+    print(sum(i, 1, 100, [&i](){return 1.0 / i;}));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _main_();
+    }
+} code_block_1;
