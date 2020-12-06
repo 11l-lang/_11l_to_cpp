@@ -1622,3 +1622,19 @@ struct CodeBlock1
         _main_();
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Kernighans_large_earthquake_problem#Python
+L(ln) File(‘data.txt’).read_lines()
+   I Float(ln.split(‘ ’, group_delimiters' 1B)[2]) > 6
+      print(ln)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&ln : File(u"data.txt"_S).read_lines())
+            if (to_float(_get<2>(ln.split(u" "_S, nullptr, true))) > 6)
+                print(ln);
+    }
+} code_block_1;
