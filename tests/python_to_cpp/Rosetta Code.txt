@@ -7378,3 +7378,174 @@ struct CodeBlock2
         }
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Jaro-Winkler_distance#Python
+WORDS = open("linuxwords.txt").read().split("\n")
+MISSPELLINGS = [
+    "accomodate",
+    "definately",
+    "goverment"
+]
+
+def jaro_winkler_distance(st1, st2):
+    if len(st1) < len(st2):
+        (st1, st2) = (st2, st1)
+    len1 = len(st1)
+    len2 = len(st2)
+    if len2 == 0:
+        return 0.0
+    delta = max(0, len2 // 2 - 1)
+    flag = [False for _ in range(len2)]  # flags for possible transpositions
+    ch1_match : List[Char] = []
+    for idx1, ch1 in enumerate(st1):
+        for idx2, ch2 in enumerate(st2):
+            if idx2 <= idx1 + delta and idx2 >= idx1 - delta and ch1 == ch2 and not flag[idx2]:
+                flag[idx2] = True
+                ch1_match.append(ch1)
+                break
+
+    matches = len(ch1_match)
+    if matches == 0:
+        return 1.0
+    transpositions = 0
+    idx1 = 0
+    for idx2, ch2 in enumerate(st2):
+        if flag[idx2]:
+            transpositions += (ch2 != ch1_match[idx1])
+            idx1 += 1
+
+    jaro = (float(matches) / len1 + float(matches) / len2 + (matches - transpositions/2) / matches) / 3.0
+    commonprefix = 0
+    for i in range(min(4, len2)):
+        commonprefix += (st1[i] == st2[i])
+
+    return 1.0 - (jaro + commonprefix * 0.1 * (1 - jaro))
+
+def within_distance(maxdistance, stri, maxtoreturn):
+    arr = [w for w in WORDS if jaro_winkler_distance(stri, w) <= maxdistance]
+    arr.sort(key=lambda x: jaro_winkler_distance(stri, x))
+    return arr if len(arr) <= maxtoreturn else arr[:maxtoreturn]
+
+for STR in MISSPELLINGS:
+    print('\nClose dictionary words ( distance < 0.15 using Jaro-Winkler distance) to "',
+          STR, '" are:\n        Word   | Distance')
+    for w in within_distance(0.15, STR, 5):
+        print('%14s | %6.4f' % (w, jaro_winkler_distance(STR, w)))
+===
+V WORDS = File(‘linuxwords.txt’).read().split("\n")
+V MISSPELLINGS = [‘accomodate’, ‘definately’, ‘goverment’]
+
+F jaro_winkler_distance(=st1, =st2)
+   I st1.len < st2.len
+      (st1, st2) = (st2, st1)
+   V len1 = st1.len
+   V len2 = st2.len
+   I len2 == 0
+      R 0.0
+   V delta = max(0, len2 I/ 2 - 1)
+   V flag = (0 .< len2).map(_ -> 0B)
+   [Char] ch1_match
+   L(ch1) st1
+      V idx1 = L.index
+      L(ch2) st2
+         V idx2 = L.index
+         I idx2 <= idx1 + delta & idx2 >= idx1 - delta & ch1 == ch2 & !(flag[idx2])
+            flag[idx2] = 1B
+            ch1_match.append(ch1)
+            L.break
+   V matches = ch1_match.len
+   I matches == 0
+      R 1.0
+   V transpositions = 0
+   V idx1 = 0
+   L(ch2) st2
+      V idx2 = L.index
+      I flag[idx2]
+         transpositions += (ch2 != ch1_match[idx1])
+         idx1++
+   V jaro = (Float(matches) / len1 + Float(matches) / len2 + (matches - transpositions / 2) / matches) / 3.0
+   V commonprefix = 0
+   L(i) 0 .< min(4, len2)
+      commonprefix += (st1[i] == st2[i])
+   R 1.0 - (jaro + commonprefix * 0.1 * (1 - jaro))
+
+F within_distance(maxdistance, stri, maxtoreturn)
+   V arr = :WORDS.filter(w -> jaro_winkler_distance(@stri, w) <= @maxdistance)
+   arr.sort(key' x -> jaro_winkler_distance(@stri, x))
+   R I arr.len <= maxtoreturn {arr} E arr[0 .< maxtoreturn]
+
+L(STR) MISSPELLINGS
+   print("\nClose dictionary words ( distance < 0.15 using Jaro-Winkler distance) to \" "STR" \" are:\n        Word   | Distance")
+   L(w) within_distance(0.15, STR, 5)
+      print(‘#14 | #.4’.format(w, jaro_winkler_distance(STR, w)))
+===
+auto WORDS = File(u"linuxwords.txt"_S).read().split(u"\n"_S);
+auto MISSPELLINGS = create_array({u"accomodate"_S, u"definately"_S, u"goverment"_S});
+
+template <typename T1, typename T2> auto jaro_winkler_distance(T1 st1, T2 st2)
+{
+    if (st1.len() < st2.len())
+        assign_from_tuple(st1, st2, make_tuple(st2, st1));
+    auto len1 = st1.len();
+    auto len2 = st2.len();
+    if (len2 == 0)
+        return 0.0;
+    auto delta = max(0, idiv(len2, 2) - 1);
+    auto flag = range_el(0, len2).map([](const auto &_){return false;});
+    Array<Char> ch1_match;
+    {int Lindex = 0;
+    for (auto &&ch1 : st1) {
+        auto idx1 = Lindex;
+        {int Lindex = 0;
+        for (auto &&ch2 : st2) {
+            auto idx2 = Lindex;
+            if (idx2 <= idx1 + delta && idx2 >= idx1 - delta && ch1 == ch2 && !(flag[idx2])) {
+                flag.set(idx2, true);
+                ch1_match.append(ch1);
+                break;
+            }
+            Lindex++;
+        }}
+        Lindex++;
+    }}
+    auto matches = ch1_match.len();
+    if (matches == 0)
+        return 1.0;
+    auto transpositions = 0;
+    auto idx1 = 0;
+    {int Lindex = 0;
+    for (auto &&ch2 : st2) {
+        auto idx2 = Lindex;
+        if (flag[idx2]) {
+            transpositions += (ch2 != ch1_match[idx1]);
+            idx1++;
+        }
+        Lindex++;
+    }}
+    auto jaro = (to_float(matches) / len1 + to_float(matches) / len2 + (matches - transpositions / 2.0) / matches) / 3.0;
+    auto commonprefix = 0;
+    for (auto i : range_el(0, min(4, len2)))
+        commonprefix += (st1[i] == st2[i]);
+    return 1.0 - (jaro + commonprefix * 0.1 * (1 - jaro));
+}
+
+template <typename T1, typename T2, typename T3> auto within_distance(const T1 &maxdistance, const T2 &stri, const T3 &maxtoreturn)
+{
+    auto arr = ::WORDS.filter([&maxdistance, &stri](const auto &w){return jaro_winkler_distance(stri, w) <= maxdistance;});
+    arr.sort([&stri](const auto &x){return jaro_winkler_distance(stri, x);});
+    return arr.len() <= maxtoreturn ? arr : arr[range_el(0, maxtoreturn)];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&STR : MISSPELLINGS) {
+            print(u"\nClose dictionary words ( distance < 0.15 using Jaro-Winkler distance) to \" "_S + STR + u" \" are:\n        Word   | Distance"_S);
+            for (auto &&w : within_distance(0.15, STR, 5))
+                print(u"#14 | #.4"_S.format(w, jaro_winkler_distance(STR, w)));
+        }
+    }
+} code_block_1;
