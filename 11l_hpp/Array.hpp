@@ -474,6 +474,11 @@ Array<Char> create_array(const String &s)
 	return r;
 }
 
+template <typename Type> Array<Type> create_array(const Array<Type> &arr)
+{
+	return arr;
+}
+
 template <typename Ty, typename Type> bool in(const Ty &val, const Array<Type> &arr)
 {
 	return std::find(arr.begin(), arr.end(), val) != arr.end();

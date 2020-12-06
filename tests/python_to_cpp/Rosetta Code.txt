@@ -7549,3 +7549,50 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/JortSort#Python
+def jortsort(sequence):
+    return list(sequence) == sorted(sequence)
+
+def print_for_seq(seq):
+    print('jortsort(%s) is %s' % (seq, jortsort(seq)))
+
+print_for_seq([1, 2, 4, 3])
+print_for_seq([14, 6, 8])
+print_for_seq(['a', 'c'])
+print_for_seq('CVGH')
+print_for_seq('PQRST')
+===
+F jortsort(sequence)
+   R Array(sequence) == sorted(sequence)
+
+F print_for_seq(seq)
+   print(‘jortsort(#.) is #.’.format(seq, jortsort(seq)))
+print_for_seq([1, 2, 4, 3])
+print_for_seq([14, 6, 8])
+print_for_seq([‘a’, ‘c’])
+print_for_seq(‘CVGH’)
+print_for_seq(‘PQRST’)
+===
+template <typename T1> auto jortsort(const T1 &sequence)
+{
+    return create_array(sequence) == sorted(sequence);
+}
+
+template <typename T1> auto print_for_seq(const T1 &seq)
+{
+    print(u"jortsort(#.) is #."_S.format(seq, jortsort(seq)));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print_for_seq(create_array({1, 2, 4, 3}));
+        print_for_seq(create_array({14, 6, 8}));
+        print_for_seq(create_array({u'a'_C, u'c'_C}));
+        print_for_seq(u"CVGH"_S);
+        print_for_seq(u"PQRST"_S);
+    }
+} code_block_1;
