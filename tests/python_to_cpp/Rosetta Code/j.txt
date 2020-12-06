@@ -1,0 +1,217 @@
+# https://www.rosettacode.org/wiki/Jaro_distance#Python
+def jaro(s, t):
+    s_len = len(s)
+    t_len = len(t)
+
+    if s_len == 0 and t_len == 0:
+        return 1.0
+
+    match_distance = (max(s_len, t_len) // 2) - 1
+
+    s_matches = [False] * s_len
+    t_matches = [False] * t_len
+
+    matches = 0
+    transpositions = 0
+
+    for i in range(s_len):
+        start = max(0, i - match_distance)
+        end = min(i + match_distance + 1, t_len)
+
+        for j in range(start, end):
+            if t_matches[j]:
+                continue
+            if s[i] != t[j]:
+                continue
+            s_matches[i] = True
+            t_matches[j] = True
+            matches += 1
+            break
+
+    if matches == 0:
+        return 0.0
+
+    k = 0
+    for i in range(s_len):
+        if not s_matches[i]:
+            continue
+        while not t_matches[k]:
+            k += 1
+        if s[i] != t[k]:
+            transpositions += 1
+        k += 1
+
+    return ((float(matches) / s_len) +
+            (float(matches) / t_len) +
+            ((matches - transpositions / 2) / matches)) / 3
+
+for s, t in [('MARTHA', 'MARHTA'),
+             ('DIXON', 'DICKSONX'),
+             ('JELLYFISH', 'SMELLYFISH')]:
+    print("jaro('%s', '%s') = %.10f" % (s, t, jaro(s, t)))
+===
+F jaro(s, t)
+   V s_len = s.len
+   V t_len = t.len
+
+   I s_len == 0 & t_len == 0
+      R 1.0
+   V match_distance = (max(s_len, t_len) I/ 2) - 1
+   V s_matches = [0B] * s_len
+   V t_matches = [0B] * t_len
+   V matches = 0
+   V transpositions = 0
+
+   L(i) 0 .< s_len
+      V start = max(0, i - match_distance)
+      V end = min(i + match_distance + 1, t_len)
+
+      L(j) start .< end
+         I t_matches[j]
+            L.continue
+         I s[i] != t[j]
+            L.continue
+         s_matches[i] = 1B
+         t_matches[j] = 1B
+         matches++
+         L.break
+
+   I matches == 0
+      R 0.0
+   V k = 0
+   L(i) 0 .< s_len
+      I !(s_matches[i])
+         L.continue
+      L !(t_matches[k])
+         k++
+      I s[i] != t[k]
+         transpositions++
+      k++
+   R ((Float(matches) / s_len) + (Float(matches) / t_len) + ((matches - transpositions / 2) / matches)) / 3
+
+L(s, t) [(‘MARTHA’, ‘MARHTA’), (‘DIXON’, ‘DICKSONX’), (‘JELLYFISH’, ‘SMELLYFISH’)]
+   print(‘jaro('#.', '#.') = #.10’.format(s, t, jaro(s, t)))
+===
+template <typename T1, typename T2> auto jaro(const T1 &s, const T2 &t)
+{
+    auto s_len = s.len();
+    auto t_len = t.len();
+    if (s_len == 0 && t_len == 0)
+        return 1.0;
+    auto match_distance = (idiv(max(s_len, t_len), 2)) - 1;
+    auto s_matches = create_array({false}) * s_len;
+    auto t_matches = create_array({false}) * t_len;
+    auto matches = 0;
+    auto transpositions = 0;
+
+    for (auto i : range_el(0, s_len)) {
+        auto start = max(0, i - match_distance);
+        auto end = min(i + match_distance + 1, t_len);
+
+        for (auto j : range_el(start, end)) {
+            if (t_matches[j])
+                continue;
+            if (s[i] != t[j])
+                continue;
+            s_matches.set(i, true);
+            t_matches.set(j, true);
+            matches++;
+            break;
+        }
+    }
+    if (matches == 0)
+        return 0.0;
+    auto k = 0;
+    for (auto i : range_el(0, s_len)) {
+        if (!(s_matches[i]))
+            continue;
+        while (!(t_matches[k]))
+            k++;
+        if (s[i] != t[k])
+            transpositions++;
+        k++;
+    }
+    return ((to_float(matches) / s_len) + (to_float(matches) / t_len) + ((matches - transpositions / 2.0) / matches)) / 3.0;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[s, t] : create_array({make_tuple(u"MARTHA"_S, u"MARHTA"_S), make_tuple(u"DIXON"_S, u"DICKSONX"_S), make_tuple(u"JELLYFISH"_S, u"SMELLYFISH"_S)}))
+            print(u"jaro('#.', '#.') = #.10"_S.format(s, t, jaro(s, t)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Jewels_and_stones#Python
+def count_jewels(s, j):
+    return sum(int(x in j) for x in s)
+
+print(count_jewels("aAAbbbb", "aA"))
+print(count_jewels("ZZ", "z"))
+===
+F count_jewels(s, j)
+   R sum(s.map(x -> Int(x C @j)))
+print(count_jewels(‘aAAbbbb’, ‘aA’))
+print(count_jewels(‘ZZ’, ‘z’))
+===
+template <typename T1, typename T2> auto count_jewels(const T1 &s, const T2 &j)
+{
+    return sum_map(s, [&j](const auto &x){return to_int(in(x, j));});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(count_jewels(u"aAAbbbb"_S, u"aA"_S));
+        print(count_jewels(u"ZZ"_S, u"z"_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Josephus_problem#Python
+def j(n, k):
+    p = list(range(n))
+    i = 0
+    seq : List[int] = []
+    while len(p):
+        i = (i+k-1) % len(p)
+        seq.append(p.pop(i))
+    return 'Prisoner killing order: %s.\nSurvivor: %i' % (', '.join(str(i) for i in seq[:-1]), seq[-1])
+
+print(j(5, 2))
+print(j(41, 3))
+===
+F j(n, k)
+   V p = Array(0 .< n)
+   V i = 0
+   [Int] seq
+   L !p.empty
+      i = (i + k - 1) % p.len
+      seq.append(p.pop(i))
+   R "Prisoner killing order: #..\nSurvivor: #.".format(seq[0 .< (len)-1].map(i -> String(i)).join(‘, ’), seq.last)
+print(j(5, 2))
+print(j(41, 3))
+===
+template <typename T1, typename T2> auto j(const T1 &n, const T2 &k)
+{
+    auto p = create_array(range_el(0, n));
+    auto i = 0;
+    Array<int> seq;
+    while (!p.empty()) {
+        i = mod((i + k - 1), p.len());
+        seq.append(p.pop(i));
+    }
+    return u"Prisoner killing order: #..\nSurvivor: #."_S.format(seq[range_e_llen(0,  - 1)].map([](const auto &i){return String(i);}).join(u", "_S), seq.last());
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(j(5, 2));
+        print(j(41, 3));
+    }
+} code_block_1;
