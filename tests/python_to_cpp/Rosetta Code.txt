@@ -7596,3 +7596,146 @@ struct CodeBlock1
         print_for_seq(u"PQRST"_S);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Knapsack_problem/Bounded#Python
+from typing import Dict, Tuple, List
+
+items = {
+        "sandwich":     (50,    60,     2),
+        "map":          (9,     150,    1),
+        "compass":      (13,    35,     1),
+        "water":        (153,   200,    3),
+        "glucose":      (15,    60,     2),
+        "tin":          (68,    45,     3),
+        "banana":       (27,    60,     3),
+        "apple":        (39,    40,     3),
+        "cheese":       (23,    30,     1),
+        "beer":         (52,    10,     3),
+        "suntan cream": (11,    70,     1),
+        "camera":       (32,    30,     1),
+        "t-shirt":      (24,    15,     2),
+        "trousers":     (48,    10,     2),
+        "umbrella":     (73,    40,     1),
+        "w-trousers":   (42,    70,     1),
+        "w-overcoat":   (43,    75,     1),
+        "note-case":    (22,    80,     1),
+        "sunglasses":   (7,     20,     1),
+        "towel":        (18,    12,     2),
+        "socks":        (4,     50,     1),
+        "book":         (30,    10,     2),
+}
+
+item_keys = list(items.keys())
+
+cache : Dict[Tuple[int, int], Tuple[int, List[Tuple[int, str]]]] = {}
+def choose_item(weight, idx):
+    best_list : List[Tuple[int, str]] = []
+    if idx < 0: return (0, best_list)
+
+    k = (weight, idx)
+    if k in cache: return cache[k]
+
+    name = item_keys[idx]
+    (w, v, qty) = items[name]
+    best_v = 0
+
+    for i in range(0, qty + 1):
+        wlim = weight - i * w
+        if wlim < 0: break
+
+        (val, taken) = choose_item(wlim, idx - 1)
+        if val + i * v > best_v:
+            best_v = val + i * v
+            best_list = taken[:]
+            best_list.append((i, name))
+
+    cache[k] = (best_v, best_list)
+    return (best_v, best_list)
+
+(v, lst) = choose_item(400, len(items) - 1)
+w = 0
+for cnt, name in lst:
+    if cnt > 0:
+        print(cnt, name)
+        w = w + items[name][0] * cnt
+
+print("Total weight:", w, "Value:", v)
+===
+V items = [‘sandwich’ = (50, 60, 2), ‘map’ = (9, 150, 1), ‘compass’ = (13, 35, 1), ‘water’ = (153, 200, 3), ‘glucose’ = (15, 60, 2), ‘tin’ = (68, 45, 3), ‘banana’ = (27, 60, 3), ‘apple’ = (39, 40, 3), ‘cheese’ = (23, 30, 1), ‘beer’ = (52, 10, 3), ‘suntan cream’ = (11, 70, 1), ‘camera’ = (32, 30, 1), ‘t-shirt’ = (24, 15, 2), ‘trousers’ = (48, 10, 2), ‘umbrella’ = (73, 40, 1), ‘w-trousers’ = (42, 70, 1), ‘w-overcoat’ = (43, 75, 1), ‘note-case’ = (22, 80, 1), ‘sunglasses’ = (7, 20, 1), ‘towel’ = (18, 12, 2), ‘socks’ = (4, 50, 1), ‘book’ = (30, 10, 2)]
+V item_keys = Array(items.keys())
+[(Int, Int) = (Int, [(Int, String)])] cache
+F choose_item(weight, idx)
+   [(Int, String)] best_list
+   I idx < 0
+      R (0, best_list)
+   V k = (weight, idx)
+   I k C :cache
+      R :cache[k]
+   V name = :item_keys[idx]
+   V (w, v, qty) = :items[name]
+   V best_v = 0
+
+   L(i) 0 .< qty + 1
+      V wlim = weight - i * w
+      I wlim < 0
+         L.break
+      V (val, taken) = choose_item(wlim, idx - 1)
+      I val + i * v > best_v
+         best_v = val + i * v
+         best_list = copy(taken)
+         best_list.append((i, name))
+   :cache[k] = (best_v, best_list)
+   R (best_v, best_list)
+V (v, lst) = choose_item(400, items.len - 1)
+V w = 0
+L(cnt, name) lst
+   I cnt > 0
+      print(cnt‘ ’name)
+      w = w + items[name][0] * cnt
+print(‘Total weight: ’w‘ Value: ’v)
+===
+auto items = create_dict(dict_of(u"sandwich"_S, make_tuple(50, 60, 2))(u"map"_S, make_tuple(9, 150, 1))(u"compass"_S, make_tuple(13, 35, 1))(u"water"_S, make_tuple(153, 200, 3))(u"glucose"_S, make_tuple(15, 60, 2))(u"tin"_S, make_tuple(68, 45, 3))(u"banana"_S, make_tuple(27, 60, 3))(u"apple"_S, make_tuple(39, 40, 3))(u"cheese"_S, make_tuple(23, 30, 1))(u"beer"_S, make_tuple(52, 10, 3))(u"suntan cream"_S, make_tuple(11, 70, 1))(u"camera"_S, make_tuple(32, 30, 1))(u"t-shirt"_S, make_tuple(24, 15, 2))(u"trousers"_S, make_tuple(48, 10, 2))(u"umbrella"_S, make_tuple(73, 40, 1))(u"w-trousers"_S, make_tuple(42, 70, 1))(u"w-overcoat"_S, make_tuple(43, 75, 1))(u"note-case"_S, make_tuple(22, 80, 1))(u"sunglasses"_S, make_tuple(7, 20, 1))(u"towel"_S, make_tuple(18, 12, 2))(u"socks"_S, make_tuple(4, 50, 1))(u"book"_S, make_tuple(30, 10, 2)));
+auto item_keys = create_array(items.keys());
+Dict<ivec2, Tuple<int, Array<Tuple<int, String>>>> cache;
+template <typename T1, typename T2> auto choose_item(const T1 &weight, const T2 &idx)
+{
+    Array<Tuple<int, String>> best_list;
+    if (idx < 0)
+        return make_tuple(0, best_list);
+    auto k = make_tuple(weight, idx);
+    if (in(k, ::cache))
+        return ::cache[k];
+    auto name = ::item_keys[idx];
+    auto [w, v, qty] = ::items[name];
+    auto best_v = 0;
+
+    for (auto i : range_el(0, qty + 1)) {
+        auto wlim = weight - i * w;
+        if (wlim < 0)
+            break;
+        auto [val, taken] = choose_item(wlim, idx - 1);
+        if (val + i * v > best_v) {
+            best_v = val + i * v;
+            best_list = copy(taken);
+            best_list.append(make_tuple(i, name));
+        }
+    }
+    ::cache.set(k, make_tuple(best_v, best_list));
+    return make_tuple(best_v, best_list);
+}
+auto [v, lst] = choose_item(400, items.len() - 1);
+auto w = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[cnt, name] : lst)
+            if (cnt > 0) {
+                print(cnt + u" "_S + name);
+                w = w + _get<0>(items[name]) * cnt;
+            }
+        print(u"Total weight: "_S + w + u" Value: "_S + v);
+    }
+} code_block_1;
