@@ -1233,6 +1233,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 if tid is not None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and (tid.ast_nodes[0].has_virtual_functions or tid.ast_nodes[0].has_pointers_to_the_same_type):
                     arguments.append('std::unique_ptr<' + arg[2].rstrip('?') + '> '
                         #+ ('' if '=' in arg[3] else 'const ')
+                        + arg[3] # add `&` if needed
                         + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
                 elif arg[2].endswith('?'):
                     arguments.append(trans_type(arg[2].rstrip('?'), self.scope, tokens[self.tokeni]) + '* '

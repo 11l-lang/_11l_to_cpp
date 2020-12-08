@@ -18,8 +18,8 @@ tokenize
     type = ‘’
     node
         function_arguments = [
-            ‘source; ; ’
-            implied_scopes; N; List[Tuple[Char, int]]
-            line_continuations; N; List[int]
-            comments; N; List[Tuple[int, int]]
+            ‘source; ; ; ’
+            ‘implied_scopes; N; List[Tuple[Char, int]]; ’
+            ‘line_continuations; N; List[int]; ’
+            ‘comments; N; List[Tuple[int, int]]; ’
         ]

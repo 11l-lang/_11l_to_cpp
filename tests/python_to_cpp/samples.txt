@@ -2570,3 +2570,127 @@ struct CodeBlock1
         print(s.last().is_digit());
     }
 } code_block_1;
+
+
+# [algoprog.ru/.../757+.py]
+from typing import Optional
+
+class Node:
+    value : int
+    left  : Optional['Node'] = None
+    right : Optional['Node'] = None
+    def __init__(self, value):
+        self.value = value
+
+def insert(i, n : "Node"):
+    if i == n.value:
+        return
+    if i < n.value:
+        if n.left is None:
+            n.left = Node(i)
+        else:
+            insert(i, n.left)
+    else:
+        if n.right is None:
+            n.right = Node(i)
+        else:
+            insert(i, n.right)
+
+a = list(map(int, input().split()))[:-1]
+root = Node(a[0])
+for i in a[1:]:
+    insert(i, root)
+
+def get_height(n : "Node"):
+    if n is None:
+        return 0
+    return 1 + max(get_height(n.left), get_height(n.right))
+
+print(get_height(root))
+===
+
+T Node
+   Int value
+   Node? left
+   Node? right
+   F (value)
+      .value = value
+
+F insert(i, Node &n)
+   I i == n.value
+      R
+   I i < n.value
+      I n.left == N
+         n.left = Node(i)
+      E
+         insert(i, &n.left)
+   E
+      I n.right == N
+         n.right = Node(i)
+      E
+         insert(i, &n.right)
+V a = input().split_py().map(Int)[0 .< (len)-1]
+V root = Node(a[0])
+L(i) a[1..]
+   insert(i, &root)
+
+F get_height(Node &n)
+   I n == N
+      R 0
+   R 1 + max(get_height(&n.left), get_height(&n.right))
+print(get_height(&root))
+===
+class Node
+{
+public:
+    int value;
+    std::unique_ptr<Node> left;
+    std::unique_ptr<Node> right;
+    template <typename T1> Node(const T1 &value) :
+        value(value)
+    {
+    }
+};
+
+template <typename T1> auto insert(const T1 &i, std::unique_ptr<Node> &n)
+{
+    if (i == n->value)
+        return;
+    if (i < n->value) {
+        if (n->left == nullptr)
+            n->left = std::make_unique<Node>(i);
+        else
+            insert(i, n->left);
+    }
+    else
+        if (n->right == nullptr)
+            n->right = std::make_unique<Node>(i);
+        else
+            insert(i, n->right);
+}
+auto a = input().split_py().map([](const auto &x){return to_int(x);})[range_e_llen(0,  - 1)];
+auto root = std::make_unique<Node>(_get<0>(a));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&i : a[range_ei(1)])
+            insert(i, root);
+    }
+} code_block_1;
+
+auto get_height(std::unique_ptr<Node> &n)
+{
+    if (n == nullptr)
+        return 0;
+    return 1 + max(get_height(n->left), get_height(n->right));
+}
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(get_height(std::move(root)));
+    }
+} code_block_2;

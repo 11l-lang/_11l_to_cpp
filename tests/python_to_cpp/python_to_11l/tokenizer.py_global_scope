@@ -15,7 +15,7 @@ tokenize
     type = ‘’
     node
         function_arguments = [
-            ‘source; ; ’
-            newline_chars; N; List[int]
-            comments; N; List[Tuple[int, int]]
+            ‘source; ; ; ’
+            ‘newline_chars; N; List[int]; ’
+            ‘comments; N; List[Tuple[int, int]]; ’
         ]
