@@ -1624,6 +1624,52 @@ struct CodeBlock1
 } code_block_1;
 
 
+// https://www.rosettacode.org/wiki/Kahan_summation#Python
+F kahansum(input)
+   V summ = 0.0s
+   V c = 0.0s
+   L(num) input
+      V y = num - c
+      V t = summ + y
+      c = (t - summ) - y
+      summ = t
+   R summ
+
+V eps = 1.0s
+L 1.0s + eps != 1.0s
+   eps = eps / 2.0s
+
+print(‘Epsilon     = ’eps)
+print(‘(a + b) + c = #.7’.format((1.0s + eps) - eps))
+print(‘Kahan sum   = #.7’.format(kahansum([1.0s, eps, -eps])))
+===
+template <typename T1> auto kahansum(const T1 &input)
+{
+    auto summ = 0.0f;
+    auto c = 0.0f;
+    for (auto &&num : input) {
+        auto y = num - c;
+        auto t = summ + y;
+        c = (t - summ) - y;
+        summ = t;
+    }
+    return summ;
+}
+auto eps = 1.0f;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (1.0f + eps != 1.0f)
+            eps = eps / 2.0f;
+        print(u"Epsilon     = "_S + eps);
+        print(u"(a + b) + c = #.7"_S.format((1.0f + eps) - eps));
+        print(u"Kahan sum   = #.7"_S.format(kahansum(create_array({1.0f, eps, -eps}))));
+    }
+} code_block_1;
+
+
 // https://www.rosettacode.org/wiki/Kernighans_large_earthquake_problem#Python
 L(ln) File(‘data.txt’).read_lines()
    I Float(ln.split(‘ ’, group_delimiters' 1B)[2]) > 6
@@ -1636,5 +1682,326 @@ struct CodeBlock1
         for (auto &&ln : File(u"data.txt"_S).read_lines())
             if (to_float(_get<2>(ln.split(u" "_S, nullptr, true))) > 6)
                 print(ln);
+    }
+} code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Knapsack_problem/0-1#Python
+F totalvalue(comb)
+   V totwt = 0
+   V totval = 0
+   L(item, wt, val) comb
+      totwt += wt
+      totval += val
+   R I totwt <= 400 {(totval, -totwt)} E (0, 0)
+
+V items = [
+   (‘map’, 9, 150), (‘compass’, 13, 35), (‘water’, 153, 200), (‘sandwich’, 50, 160),
+   (‘glucose’, 15, 60), (‘tin’, 68, 45), (‘banana’, 27, 60), (‘apple’, 39, 40),
+   (‘cheese’, 23, 30), (‘beer’, 52, 10), (‘suntan cream’, 11, 70), (‘camera’, 32, 30),
+   (‘t-shirt’, 24, 15), (‘trousers’, 48, 10), (‘umbrella’, 73, 40),
+   (‘waterproof trousers’, 42, 70), (‘waterproof overclothes’, 43, 75),
+   (‘note-case’, 22, 80), (‘sunglasses’, 7, 20), (‘towel’, 18, 12), (‘socks’, 4, 50),
+   (‘book’, 30, 10)
+]
+
+F knapsack01_dp(items, limit)
+   V table = [[0] * (limit + 1)] * (items.len + 1)
+
+   L(j) 1 .. items.len
+      V (item, wt, val) = items[j - 1]
+      L(w) 1 .. limit
+         I wt > w
+            table[j][w] = table[j - 1][w]
+         E
+            table[j][w] = max(table[j - 1][w], table[j - 1][w - wt] + val)
+
+   [(String, Int, Int)] result
+   V w = limit
+   L(j) (items.len .< 0).step(-1)
+      I table[j][w] != table[j - 1][w]
+         V (item, wt, val) = items[j - 1]
+         result.append(items[j - 1])
+         w -= wt
+   R result
+
+V bagged = knapsack01_dp(items, 400)
+print("Bagged the following items\n  "sorted(bagged.map((item, _, _2) -> item)).join("\n  "))
+V (val, wt) = totalvalue(bagged)
+print(‘for a total value of #. and a total weight of #.’.format(val, -wt))
+===
+template <typename T1> auto totalvalue(const T1 &comb)
+{
+    auto totwt = 0;
+    auto totval = 0;
+    for (auto &&[item, wt, val] : comb) {
+        totwt += wt;
+        totval += val;
+    }
+    return totwt <= 400 ? make_tuple(totval, -totwt) : make_tuple(0, 0);
+}
+auto items = create_array({make_tuple(u"map"_S, 9, 150), make_tuple(u"compass"_S, 13, 35), make_tuple(u"water"_S, 153, 200), make_tuple(u"sandwich"_S, 50, 160), make_tuple(u"glucose"_S, 15, 60), make_tuple(u"tin"_S, 68, 45), make_tuple(u"banana"_S, 27, 60), make_tuple(u"apple"_S, 39, 40), make_tuple(u"cheese"_S, 23, 30), make_tuple(u"beer"_S, 52, 10), make_tuple(u"suntan cream"_S, 11, 70), make_tuple(u"camera"_S, 32, 30), make_tuple(u"t-shirt"_S, 24, 15), make_tuple(u"trousers"_S, 48, 10), make_tuple(u"umbrella"_S, 73, 40), make_tuple(u"waterproof trousers"_S, 42, 70), make_tuple(u"waterproof overclothes"_S, 43, 75), make_tuple(u"note-case"_S, 22, 80), make_tuple(u"sunglasses"_S, 7, 20), make_tuple(u"towel"_S, 18, 12), make_tuple(u"socks"_S, 4, 50), make_tuple(u"book"_S, 30, 10)});
+
+template <typename T1, typename T2> auto knapsack01_dp(const T1 &items, const T2 &limit)
+{
+    auto table = create_array({create_array({0}) * (limit + 1)}) * (items.len() + 1);
+
+    for (auto j : range_ee(1, items.len())) {
+        auto [item, wt, val] = items[j - 1];
+        for (auto w : range_ee(1, limit))
+            if (wt > w)
+                table[j].set(w, table[j - 1][w]);
+            else
+                table[j].set(w, max(table[j - 1][w], table[j - 1][w - wt] + val));
+    }
+    Array<Tuple<String, int, int>> result;
+    auto w = limit;
+    for (auto j : range_el(items.len(), 0).step(-1))
+        if (table[j][w] != table[j - 1][w]) {
+            auto [item, wt, val] = items[j - 1];
+            result.append(items[j - 1]);
+            w -= wt;
+        }
+    return result;
+}
+auto bagged = knapsack01_dp(items, 400);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Bagged the following items\n  "_S + sorted(bagged.map([](const auto &item, const auto &_, const auto &_2){return item;})).join(u"\n  "_S));
+    }
+} code_block_1;
+auto [val, wt] = totalvalue(bagged);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"for a total value of #. and a total weight of #."_S.format(val, -wt));
+    }
+} code_block_2;
+
+
+// https://www.rosettacode.org/wiki/Knuth_shuffle#Python
+F knuth_shuffle(&x)
+   L(i) (x.len - 1 .< 0).step(-1)
+      V j = random:(0..i)
+      swap(&x[i], &x[j])
+
+V x = Array(0..9)
+knuth_shuffle(&x)
+print(‘shuffled: ’x)
+===
+template <typename T1> auto knuth_shuffle(T1 &x)
+{
+    for (auto i : range_el(x.len() - 1, 0).step(-1)) {
+        auto j = randomns::_(range_ee(0, i));
+        swap(x[i], x[j]);
+    }
+}
+auto x = create_array(range_ee(0, 9));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        knuth_shuffle(x);
+        print(u"shuffled: "_S + x);
+    }
+} code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Knapsack_problem/Bounded#Python
+V items = [
+   ‘sandwich’     = (50, 60, 2),
+   ‘map’          = (9, 150, 1),
+   ‘compass’      = (13, 35, 1),
+   ‘water’        = (153, 200, 3),
+   ‘glucose’      = (15, 60, 2),
+   ‘tin’          = (68, 45, 3),
+   ‘banana’       = (27, 60, 3),
+   ‘apple’        = (39, 40, 3),
+   ‘cheese’       = (23, 30, 1),
+   ‘beer’         = (52, 10, 3),
+   ‘suntan cream’ = (11, 70, 1),
+   ‘camera’       = (32, 30, 1),
+   ‘t-shirt’      = (24, 15, 2),
+   ‘trousers’     = (48, 10, 2),
+   ‘umbrella’     = (73, 40, 1),
+   ‘w-trousers’   = (42, 70, 1),
+   ‘w-overcoat’   = (43, 75, 1),
+   ‘note-case’    = (22, 80, 1),
+   ‘sunglasses’   = (7, 20, 1),
+   ‘towel’        = (18, 12, 2),
+   ‘socks’        = (4, 50, 1),
+   ‘book’         = (30, 10, 2)
+]
+
+V item_keys = items.keys()
+
+[(Int, Int) = (Int, [(Int, String)])] cache
+
+F choose_item(weight, idx)
+   [(Int, String)] best_list
+   I idx < 0
+      R (0, best_list)
+   V k = (weight, idx)
+   V? c = :cache.find(k)
+   I c != N
+      R c
+   V name = :item_keys[idx]
+   V (w, v, qty) = :items[name]
+   V best_v = 0
+
+   L(i) 0..qty
+      V wlim = weight - i * w
+      I wlim < 0
+         L.break
+      V (val, taken) = choose_item(wlim, idx - 1)
+      I val + i * v > best_v
+         best_v = val + i * v
+         best_list = copy(taken)
+         best_list.append((i, name))
+   :cache[k] = (best_v, best_list)
+   R (best_v, best_list)
+
+V (v, lst) = choose_item(400, items.len - 1)
+V w = 0
+L(cnt, name) lst
+   I cnt > 0
+      print(cnt‘ ’name)
+      w += items[name][0] * cnt
+
+print(‘Total weight: ’w‘ Value: ’v)
+===
+auto items = create_dict(dict_of(u"sandwich"_S, make_tuple(50, 60, 2))(u"map"_S, make_tuple(9, 150, 1))(u"compass"_S, make_tuple(13, 35, 1))(u"water"_S, make_tuple(153, 200, 3))(u"glucose"_S, make_tuple(15, 60, 2))(u"tin"_S, make_tuple(68, 45, 3))(u"banana"_S, make_tuple(27, 60, 3))(u"apple"_S, make_tuple(39, 40, 3))(u"cheese"_S, make_tuple(23, 30, 1))(u"beer"_S, make_tuple(52, 10, 3))(u"suntan cream"_S, make_tuple(11, 70, 1))(u"camera"_S, make_tuple(32, 30, 1))(u"t-shirt"_S, make_tuple(24, 15, 2))(u"trousers"_S, make_tuple(48, 10, 2))(u"umbrella"_S, make_tuple(73, 40, 1))(u"w-trousers"_S, make_tuple(42, 70, 1))(u"w-overcoat"_S, make_tuple(43, 75, 1))(u"note-case"_S, make_tuple(22, 80, 1))(u"sunglasses"_S, make_tuple(7, 20, 1))(u"towel"_S, make_tuple(18, 12, 2))(u"socks"_S, make_tuple(4, 50, 1))(u"book"_S, make_tuple(30, 10, 2)));
+auto item_keys = items.keys();
+Dict<ivec2, Tuple<int, Array<Tuple<int, String>>>> cache;
+
+template <typename T1, typename T2> auto choose_item(const T1 &weight, const T2 &idx)
+{
+    Array<Tuple<int, String>> best_list;
+    if (idx < 0)
+        return make_tuple(0, best_list);
+    auto k = make_tuple(weight, idx);
+    auto c = ::cache.find(k);
+    if (c != nullptr)
+        return *c;
+    auto name = ::item_keys[idx];
+    auto [w, v, qty] = ::items[name];
+    auto best_v = 0;
+
+    for (auto i : range_ee(0, qty)) {
+        auto wlim = weight - i * w;
+        if (wlim < 0)
+            break;
+        auto [val, taken] = choose_item(wlim, idx - 1);
+        if (val + i * v > best_v) {
+            best_v = val + i * v;
+            best_list = copy(taken);
+            best_list.append(make_tuple(i, name));
+        }
+    }
+    ::cache.set(k, make_tuple(best_v, best_list));
+    return make_tuple(best_v, best_list);
+}
+auto [v, lst] = choose_item(400, items.len() - 1);
+auto w = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[cnt, name] : lst)
+            if (cnt > 0) {
+                print(cnt + u" "_S + name);
+                w += _get<0>(items[name]) * cnt;
+            }
+        print(u"Total weight: "_S + w + u" Value: "_S + v);
+    }
+} code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Kosaraju#Python
+F kosaraju(g)
+   V size = g.len
+   V vis = [0B] * size
+   V l = [0] * size
+   V x = size
+   V t = [[Int]()] * size
+
+   F visit(Int u) -> N
+      I !@vis[u]
+         @vis[u] = 1B
+         L(v) @g[u]
+            @visit(v)
+            @t[v] [+]= u
+         @x--
+         @l[@x] = u
+
+   L(u) 0 .< g.len
+      visit(u)
+   V c = [0] * size
+
+   F assign(Int u, root) -> N
+      I @vis[u]
+         @vis[u] = 0B
+         @c[u] = root
+         L(v) @t[u]
+            @assign(v, root)
+
+   L(u) l
+      assign(u, u)
+   R c
+
+V g = [[1], [2], [0], [1, 2, 4], [3, 5], [2, 6], [5], [4, 6, 7]]
+print(kosaraju(g))
+===
+template <typename T1> auto kosaraju(const T1 &g)
+{
+    auto size = g.len();
+    auto vis = create_array({false}) * size;
+    auto l = create_array({0}) * size;
+    auto x = size;
+    auto t = create_array({Array<int>()}) * size;
+
+    std::function<void(int)> visit = [&g, &l, &t, &vis, &visit, &x](const int u)
+    {
+        if (!vis[u]) {
+            vis.set(u, true);
+            for (auto &&v : g[u]) {
+                visit(v);
+                t[v].append(u);
+            }
+            x--;
+            l.set(x, u);
+        }
+    };
+    for (auto u : range_el(0, g.len()))
+        visit(u);
+    auto c = create_array({0}) * size;
+
+    std::function<void(int, int)> assign = [&assign, &c, &t, &vis](const int u, const int root)
+    {
+        if (vis[u]) {
+            vis.set(u, false);
+            c.set(u, root);
+            for (auto &&v : t[u])
+                assign(v, root);
+        }
+    };
+    for (auto &&u : l)
+        assign(u, u);
+    return c;
+}
+auto g = create_array({create_array({1}), create_array({2}), create_array({0}), create_array({1, 2, 4}), create_array({3, 5}), create_array({2, 6}), create_array({5}), create_array({4, 6, 7})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(kosaraju(g));
     }
 } code_block_1;

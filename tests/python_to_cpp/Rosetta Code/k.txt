@@ -1,0 +1,831 @@
+# https://www.rosettacode.org/wiki/Kahan_summation#Python
+def kahansum(input):
+    summ = 0.0
+    c = 0.0
+    for num in input:
+        y = num - c
+        t = summ + y
+        c = (t - summ) - y
+        summ = t
+    return summ
+
+eps = 1.0
+while 1.0 + eps != 1.0:
+    eps = eps / 2.0
+print('Epsilon     =', eps)
+print('(a + b) + c = %.16f' % ((1.0 + eps) - eps))
+print('Kahan sum   = %.16f' % kahansum([1.0, eps, -eps]))
+===
+F kahansum(input)
+   V summ = 0.0
+   V c = 0.0
+   L(num) input
+      V y = num - c
+      V t = summ + y
+      c = (t - summ) - y
+      summ = t
+   R summ
+V eps = 1.0
+L 1.0 + eps != 1.0
+   eps = eps / 2.0
+print(‘Epsilon     = ’eps)
+print(‘(a + b) + c = #.16’.format((1.0 + eps) - eps))
+print(‘Kahan sum   = #.16’.format(kahansum([1.0, eps, -eps])))
+===
+template <typename T1> auto kahansum(const T1 &input)
+{
+    auto summ = 0.0;
+    auto c = 0.0;
+    for (auto &&num : input) {
+        auto y = num - c;
+        auto t = summ + y;
+        c = (t - summ) - y;
+        summ = t;
+    }
+    return summ;
+}
+auto eps = 1.0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (1.0 + eps != 1.0)
+            eps = eps / 2.0;
+        print(u"Epsilon     = "_S + eps);
+        print(u"(a + b) + c = #.16"_S.format((1.0 + eps) - eps));
+        print(u"Kahan sum   = #.16"_S.format(kahansum(create_array({1.0, eps, -eps}))));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Kaprekar_numbers#Python
+Int64 = int
+
+def k(n):
+    n2 = str(Int64(n)**2)
+    for i in range(len(n2)):
+        a = int(n2[:i]) if i > 0 else 0
+        b = int(n2[i:])
+        if b != 0 and a + b == n:
+            return True
+    return False
+
+print([x for x in range(1,10000) if k(x)])
+print(len([x for x in range(1,1000000) if k(x)]))
+===
+
+F k(n)
+   V n2 = String(Int64(n) ^ 2)
+   L(i) 0 .< n2.len
+      V a = I i > 0 {Int(n2[0 .< i])} E 0
+      V b = Int(n2[i ..])
+      I b != 0 & a + b == n
+         R 1B
+   R 0B
+print((1..9999).filter(x -> k(x)))
+print((1..999999).filter(x -> k(x)).len)
+===
+template <typename T1> auto k(const T1 &n)
+{
+    auto n2 = String(square(to_int64(n)));
+    for (auto i : range_el(0, n2.len())) {
+        auto a = i > 0 ? to_int(n2[range_el(0, i)]) : 0;
+        auto b = to_int(n2[range_ei(i)]);
+        if (b != 0 && a + b == n)
+            return true;
+    }
+    return false;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(range_ee(1, 9999).filter([](const auto &x){return k(x);}));
+        print(range_ee(1, 999999).filter([](const auto &x){return k(x);}).len());
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Knapsack_problem/0-1#Python
+def totalvalue(comb):
+    totwt = 0
+    totval = 0
+    for item, wt, val in comb:
+        totwt  += wt
+        totval += val
+    return (totval, -totwt) if totwt <= 400 else (0, 0)
+
+items = [
+    ("map", 9, 150), ("compass", 13, 35), ("water", 153, 200), ("sandwich", 50, 160),
+    ("glucose", 15, 60), ("tin", 68, 45), ("banana", 27, 60), ("apple", 39, 40),
+    ("cheese", 23, 30), ("beer", 52, 10), ("suntan cream", 11, 70), ("camera", 32, 30),
+    ("t-shirt", 24, 15), ("trousers", 48, 10), ("umbrella", 73, 40),
+    ("waterproof trousers", 42, 70), ("waterproof overclothes", 43, 75),
+    ("note-case", 22, 80), ("sunglasses", 7, 20), ("towel", 18, 12),
+    ("socks", 4, 50), ("book", 30, 10),
+]
+
+def knapsack01_dp(items, limit):
+    table = [[0 for w in range(limit + 1)] for j in range(len(items) + 1)]
+
+    for j in range(1, len(items) + 1):
+        (item, wt, val) = items[j-1]
+        for w in range(1, limit + 1):
+            if wt > w:
+                table[j][w] = table[j-1][w]
+            else:
+                table[j][w] = max(table[j-1][w],
+                                  table[j-1][w-wt] + val)
+
+    result : List[Tuple[str, int, int]] = []
+    w = limit
+    for j in range(len(items), 0, -1):
+        was_added = table[j][w] != table[j-1][w]
+
+        if was_added:
+            (item, wt, val) = items[j-1]
+            result.append(items[j-1])
+            w -= wt
+
+    return result
+
+bagged = knapsack01_dp(items, 400)
+print("Bagged the following items\n  " +
+      '\n  '.join(sorted(item for item,_,_2 in bagged)))
+(val, wt) = totalvalue(bagged)
+print("for a total value of %i and a total weight of %i" % (val, -wt))
+===
+F totalvalue(comb)
+   V totwt = 0
+   V totval = 0
+   L(item, wt, val) comb
+      totwt += wt
+      totval += val
+   R I totwt <= 400 {(totval, -totwt)} E (0, 0)
+V items = [(‘map’, 9, 150), (‘compass’, 13, 35), (‘water’, 153, 200), (‘sandwich’, 50, 160), (‘glucose’, 15, 60), (‘tin’, 68, 45), (‘banana’, 27, 60), (‘apple’, 39, 40), (‘cheese’, 23, 30), (‘beer’, 52, 10), (‘suntan cream’, 11, 70), (‘camera’, 32, 30), (‘t-shirt’, 24, 15), (‘trousers’, 48, 10), (‘umbrella’, 73, 40), (‘waterproof trousers’, 42, 70), (‘waterproof overclothes’, 43, 75), (‘note-case’, 22, 80), (‘sunglasses’, 7, 20), (‘towel’, 18, 12), (‘socks’, 4, 50), (‘book’, 30, 10)]
+
+F knapsack01_dp(items, limit)
+   V table = (0 .< items.len + 1).map(j -> (0 .< @limit + 1).map(w -> 0))
+
+   L(j) 1 .< items.len + 1
+      V (item, wt, val) = items[j - 1]
+      L(w) 1 .< limit + 1
+         I wt > w
+            table[j][w] = table[j - 1][w]
+         E
+            table[j][w] = max(table[j - 1][w], table[j - 1][w - wt] + val)
+   [(String, Int, Int)] result
+   V w = limit
+   L(j) (items.len .< 0).step(-1)
+      V was_added = table[j][w] != table[j - 1][w]
+
+      I was_added
+         V (item, wt, val) = items[j - 1]
+         result.append(items[j - 1])
+         w -= wt
+   R result
+V bagged = knapsack01_dp(items, 400)
+print("Bagged the following items\n  "sorted(bagged.map((item, _, _2) -> item)).join("\n  "))
+V (val, wt) = totalvalue(bagged)
+print(‘for a total value of #. and a total weight of #.’.format(val, -wt))
+===
+template <typename T1> auto totalvalue(const T1 &comb)
+{
+    auto totwt = 0;
+    auto totval = 0;
+    for (auto &&[item, wt, val] : comb) {
+        totwt += wt;
+        totval += val;
+    }
+    return totwt <= 400 ? make_tuple(totval, -totwt) : make_tuple(0, 0);
+}
+auto items = create_array({make_tuple(u"map"_S, 9, 150), make_tuple(u"compass"_S, 13, 35), make_tuple(u"water"_S, 153, 200), make_tuple(u"sandwich"_S, 50, 160), make_tuple(u"glucose"_S, 15, 60), make_tuple(u"tin"_S, 68, 45), make_tuple(u"banana"_S, 27, 60), make_tuple(u"apple"_S, 39, 40), make_tuple(u"cheese"_S, 23, 30), make_tuple(u"beer"_S, 52, 10), make_tuple(u"suntan cream"_S, 11, 70), make_tuple(u"camera"_S, 32, 30), make_tuple(u"t-shirt"_S, 24, 15), make_tuple(u"trousers"_S, 48, 10), make_tuple(u"umbrella"_S, 73, 40), make_tuple(u"waterproof trousers"_S, 42, 70), make_tuple(u"waterproof overclothes"_S, 43, 75), make_tuple(u"note-case"_S, 22, 80), make_tuple(u"sunglasses"_S, 7, 20), make_tuple(u"towel"_S, 18, 12), make_tuple(u"socks"_S, 4, 50), make_tuple(u"book"_S, 30, 10)});
+
+template <typename T1, typename T2> auto knapsack01_dp(const T1 &items, const T2 &limit)
+{
+    auto table = range_el(0, items.len() + 1).map([&limit](const auto &j){return range_el(0, limit + 1).map([](const auto &w){return 0;});});
+
+    for (auto j : range_el(1, items.len() + 1)) {
+        auto [item, wt, val] = items[j - 1];
+        for (auto w : range_el(1, limit + 1))
+            if (wt > w)
+                table[j].set(w, table[j - 1][w]);
+            else
+                table[j].set(w, max(table[j - 1][w], table[j - 1][w - wt] + val));
+    }
+    Array<Tuple<String, int, int>> result;
+    auto w = limit;
+    for (auto j : range_el(items.len(), 0).step(-1)) {
+        auto was_added = table[j][w] != table[j - 1][w];
+
+        if (was_added) {
+            auto [item, wt, val] = items[j - 1];
+            result.append(items[j - 1]);
+            w -= wt;
+        }
+    }
+    return result;
+}
+auto bagged = knapsack01_dp(items, 400);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Bagged the following items\n  "_S + sorted(bagged.map([](const auto &item, const auto &_, const auto &_2){return item;})).join(u"\n  "_S));
+    }
+} code_block_1;
+auto [val, wt] = totalvalue(bagged);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"for a total value of #. and a total weight of #."_S.format(val, -wt));
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Knapsack_problem/Continuous#Python
+items = [("beef",    3.8, 36.0),
+         ("pork",    5.4, 43.0),
+         ("ham",     3.6, 90.0),
+         ("greaves", 2.4, 45.0),
+         ("flitch",  4.0, 30.0),
+         ("brawn",   2.5, 56.0),
+         ("welt",    3.7, 67.0),
+         ("salami",  3.0, 95.0),
+         ("sausage", 5.9, 98.0)]
+
+MAXWT = 15.0
+
+sorted_items = sorted(((value/amount, amount, name)
+                       for name, amount, value in items),
+                      reverse = True)
+wt = 0.0
+val = 0.0
+bagged : List[Tuple[str, float, float]] = []
+for unit_value, amount, name in sorted_items:
+    portion = min(MAXWT - wt, amount)
+    wt     += portion
+    addval  = portion * unit_value
+    val    += addval
+    bagged += [(name, portion, addval)]
+    if wt >= MAXWT:
+        break
+
+print("    ITEM   PORTION VALUE")
+print("\n".join("%10s %6.2f %6.2f" % (n, p, a) for n, p, a in bagged))
+print("\nTOTAL WEIGHT: %5.2f\nTOTAL VALUE: %5.2f" % (wt, val))
+===
+V items = [(‘beef’, 3.8, 36.0), (‘pork’, 5.4, 43.0), (‘ham’, 3.6, 90.0), (‘greaves’, 2.4, 45.0), (‘flitch’, 4.0, 30.0), (‘brawn’, 2.5, 56.0), (‘welt’, 3.7, 67.0), (‘salami’, 3.0, 95.0), (‘sausage’, 5.9, 98.0)]
+V MAXWT = 15.0
+V sorted_items = sorted((items.map((name, amount, value) -> (value / amount, amount, name))), reverse' 1B)
+V wt = 0.0
+V val = 0.0
+[(String, Float, Float)] bagged
+L(unit_value, amount, name) sorted_items
+   V portion = min(MAXWT - wt, amount)
+   wt += portion
+   V addval = portion * unit_value
+   val += addval
+   bagged [+]= (name, portion, addval)
+   I wt >= MAXWT
+      L.break
+print(‘    ITEM   PORTION VALUE’)
+print(bagged.map((n, p, a) -> ‘#10 #3.2 #3.2’.format(n, p, a)).join("\n"))
+print("\nTOTAL WEIGHT: #2.2\nTOTAL VALUE: #2.2".format(wt, val))
+===
+auto items = create_array({make_tuple(u"beef"_S, 3.8, 36.0), make_tuple(u"pork"_S, 5.4, 43.0), make_tuple(u"ham"_S, 3.6, 90.0), make_tuple(u"greaves"_S, 2.4, 45.0), make_tuple(u"flitch"_S, 4.0, 30.0), make_tuple(u"brawn"_S, 2.5, 56.0), make_tuple(u"welt"_S, 3.7, 67.0), make_tuple(u"salami"_S, 3.0, 95.0), make_tuple(u"sausage"_S, 5.9, 98.0)});
+auto MAXWT = 15.0;
+auto sorted_items = sorted((items.map([](const auto &name, const auto &amount, const auto &value){return make_tuple(value / amount, amount, name);})), nullptr, true);
+auto wt = 0.0;
+auto val = 0.0;
+Array<Tuple<String, double, double>> bagged;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[unit_value, amount, name] : sorted_items) {
+            auto portion = min(MAXWT - wt, amount);
+            wt += portion;
+            auto addval = portion * unit_value;
+            val += addval;
+            bagged.append(make_tuple(name, portion, addval));
+            if (wt >= MAXWT)
+                break;
+        }
+        print(u"    ITEM   PORTION VALUE"_S);
+        print(bagged.map([](const auto &n, const auto &p, const auto &a){return u"#10 #3.2 #3.2"_S.format(n, p, a);}).join(u"\n"_S));
+        print(u"\nTOTAL WEIGHT: #2.2\nTOTAL VALUE: #2.2"_S.format(wt, val));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Knapsack_problem/Unbounded#Python
+class Bounty:
+    value : int
+    weight : float
+    volume : float
+    def __init__(self, value, weight, volume):
+        (self.value, self.weight, self.volume) = (value, weight, volume)
+
+panacea = Bounty(3000,  0.3, 0.025)
+ichor =   Bounty(1800,  0.2, 0.015)
+gold =    Bounty(2500,  2.0, 0.002)
+sack =    Bounty(   0, 25.0, 0.25)
+best =    Bounty(   0,    0, 0)
+current = Bounty(   0,    0, 0)
+
+best_amounts = (0, 0, 0)
+
+max_panacea = int(min(sack.weight // panacea.weight, sack.volume // panacea.volume))
+max_ichor   = int(min(sack.weight // ichor.weight,   sack.volume // ichor.volume))
+max_gold    = int(min(sack.weight // gold.weight,    sack.volume // gold.volume))
+
+for npanacea in range(max_panacea):
+    for nichor in range(max_ichor):
+        for ngold in range(max_gold):
+            current.value = npanacea * panacea.value + nichor * ichor.value + ngold * gold.value
+            current.weight = npanacea * panacea.weight + nichor * ichor.weight + ngold * gold.weight
+            current.volume = npanacea * panacea.volume + nichor * ichor.volume + ngold * gold.volume
+
+            if current.value > best.value and current.weight <= sack.weight and \
+               current.volume <= sack.volume:
+                best = Bounty(current.value, current.weight, current.volume)
+                best_amounts = (npanacea, nichor, ngold)
+
+print("Maximum value achievable is", best.value)
+print("This is achieved by carrying (one solution) %d panacea, %d ichor and %d gold" %
+       (best_amounts[0], best_amounts[1], best_amounts[2]))
+print("The weight to carry is %4.1f and the volume used is %5.3f" % (best.weight, best.volume))
+===
+T Bounty
+   Int value
+   Float weight
+   Float volume
+   F (value, weight, volume)
+      (.value, .weight, .volume) = (value, weight, volume)
+V panacea = Bounty(3000, 0.3, 0.025)
+V ichor = Bounty(1800, 0.2, 0.015)
+V gold = Bounty(2500, 2.0, 0.002)
+V sack = Bounty(0, 25.0, 0.25)
+V best = Bounty(0, 0, 0)
+V current = Bounty(0, 0, 0)
+V best_amounts = (0, 0, 0)
+V max_panacea = Int(min(sack.weight I/ panacea.weight, sack.volume I/ panacea.volume))
+V max_ichor = Int(min(sack.weight I/ ichor.weight, sack.volume I/ ichor.volume))
+V max_gold = Int(min(sack.weight I/ gold.weight, sack.volume I/ gold.volume))
+
+L(npanacea) 0 .< max_panacea
+   L(nichor) 0 .< max_ichor
+      L(ngold) 0 .< max_gold
+         current.value = npanacea * panacea.value + nichor * ichor.value + ngold * gold.value
+         current.weight = npanacea * panacea.weight + nichor * ichor.weight + ngold * gold.weight
+         current.volume = npanacea * panacea.volume + nichor * ichor.volume + ngold * gold.volume
+
+         I current.value > best.value & current.weight <= sack.weight & current.volume <= sack.volume
+            best = Bounty(current.value, current.weight, current.volume)
+            best_amounts = (npanacea, nichor, ngold)
+print(‘Maximum value achievable is ’(best.value))
+print(‘This is achieved by carrying (one solution) #. panacea, #. ichor and #. gold’.format(best_amounts[0], best_amounts[1], best_amounts[2]))
+print(‘The weight to carry is #2.1 and the volume used is #.3’.format(best.weight, best.volume))
+===
+class Bounty
+{
+public:
+    int value;
+    double weight;
+    double volume;
+    template <typename T1, typename T2, typename T3> Bounty(const T1 &value, const T2 &weight, const T3 &volume)
+    {
+        assign_from_tuple(this->value, this->weight, this->volume, make_tuple(value, weight, volume));
+    }
+};
+auto panacea = Bounty(3000, 0.3, 0.025);
+auto ichor = Bounty(1800, 0.2, 0.015);
+auto gold = Bounty(2500, 2.0, 0.002);
+auto sack = Bounty(0, 25.0, 0.25);
+auto best = Bounty(0, 0, 0);
+auto current = Bounty(0, 0, 0);
+auto best_amounts = make_tuple(0, 0, 0);
+auto max_panacea = to_int(min(idiv(sack.weight, panacea.weight), idiv(sack.volume, panacea.volume)));
+auto max_ichor = to_int(min(idiv(sack.weight, ichor.weight), idiv(sack.volume, ichor.volume)));
+auto max_gold = to_int(min(idiv(sack.weight, gold.weight), idiv(sack.volume, gold.volume)));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto npanacea : range_el(0, max_panacea))
+            for (auto nichor : range_el(0, max_ichor))
+                for (auto ngold : range_el(0, max_gold)) {
+                    current.value = npanacea * panacea.value + nichor * ichor.value + ngold * gold.value;
+                    current.weight = npanacea * panacea.weight + nichor * ichor.weight + ngold * gold.weight;
+                    current.volume = npanacea * panacea.volume + nichor * ichor.volume + ngold * gold.volume;
+
+                    if (current.value > best.value && current.weight <= sack.weight && current.volume <= sack.volume) {
+                        best = Bounty(current.value, current.weight, current.volume);
+                        best_amounts = make_tuple(npanacea, nichor, ngold);
+                    }
+                }
+        print(u"Maximum value achievable is "_S + (best.value));
+        print(u"This is achieved by carrying (one solution) #. panacea, #. ichor and #. gold"_S.format(_get<0>(best_amounts), _get<1>(best_amounts), _get<2>(best_amounts)));
+        print(u"The weight to carry is #2.1 and the volume used is #.3"_S.format(best.weight, best.volume));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Knuth_shuffle#Python
+import random
+
+def knuth_shuffle(x : List[int]):
+    for i in range(len(x)-1, 0, -1):
+        j = random.randrange(i + 1)
+        (x[i], x[j]) = (x[j], x[i])
+
+x = list(range(10))
+knuth_shuffle(x)
+print("shuffled:", x)
+===
+//import random
+
+F knuth_shuffle([Int] &x)
+   L(i) (x.len - 1 .< 0).step(-1)
+      V j = random:(i + 1)
+      (x[i], x[j]) = (x[j], x[i])
+V x = Array(0.<10)
+knuth_shuffle(&x)
+print(‘shuffled: ’x)
+===
+auto knuth_shuffle(Array<int> &x)
+{
+    for (auto i : range_el(x.len() - 1, 0).step(-1)) {
+        auto j = randomns::_(i + 1);
+        assign_from_tuple(x[i], x[j], make_tuple(x[j], x[i]));
+    }
+}
+auto x = create_array(range_el(0, 10));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        knuth_shuffle(x);
+        print(u"shuffled: "_S + x);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Knuth%27s_algorithm_S#Python
+import random
+
+class S_of_n_creator:
+    n : int
+    i = 0
+    def __init__(self, n):
+        self.n = n
+        self.sample : List[int] = []
+
+    def __call__(self, item):
+        self.i += 1
+        if self.i <= self.n:
+            # Keep first n items
+            self.sample.append(item)
+        elif random.randrange(self.i) < self.n:
+            # Keep item
+            self.sample[random.randrange(self.n)] = item
+
+binarr = [0] * 10
+items = list(range(10))
+print("Single run samples for n = 3:")
+s_of_n = S_of_n_creator(3)
+for item in items:
+    s_of_n(item)
+    print("  Item: %i -> sample: %s" % (item, s_of_n.sample))
+
+for trial in range(100000):
+    s_of_n = S_of_n_creator(3)
+    for item in items:
+        s_of_n(item)
+    for s in s_of_n.sample:
+        binarr[s] += 1
+print("\nTest item frequencies for 100000 runs:\n ",
+      '\n  '.join("%i:%i" % (i, x) for i, x in enumerate(binarr)))
+===
+//import random
+
+T S_of_n_creator
+   Int n
+   i = 0
+   [Int] sample
+   F (n)
+      .n = n
+
+   F ()(item)
+      .i++
+      I .i <= .n
+         .sample.append(item)
+      E I random:(.i) < .n
+         .sample[random:(.n)] = item
+V binarr = [0] * 10
+V items = Array(0.<10)
+print(‘Single run samples for n = 3:’)
+V s_of_n = S_of_n_creator(3)
+L(item) items
+   s_of_n(item)
+   print(‘  Item: #. -> sample: #.’.format(item, s_of_n.sample))
+
+L(trial) 100000
+   s_of_n = S_of_n_creator(3)
+   L(item) items
+      s_of_n(item)
+   L(s) s_of_n.sample
+      binarr[s]++
+print("\nTest item frequencies for 100000 runs:\n  "(enumerate(binarr).map((i, x) -> ‘#.:#.’.format(i, x)).join("\n  ")))
+===
+class S_of_n_creator
+{
+public:
+    int n;
+    decltype(0) i = 0;
+    Array<int> sample;
+    template <typename T1> S_of_n_creator(const T1 &n) :
+        n(n)
+    {
+    }
+
+    template <typename T1> auto operator()(const T1 &item)
+    {
+        i++;
+        if (i <= n)
+            sample.append(item);
+        else if (randomns::_(i) < n)
+            sample.set(randomns::_(n), item);
+    }
+};
+auto binarr = create_array({0}) * 10;
+auto items = create_array(range_el(0, 10));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Single run samples for n = 3:"_S);
+    }
+} code_block_1;
+auto s_of_n = S_of_n_creator(3);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&item : items) {
+            s_of_n(item);
+            print(u"  Item: #. -> sample: #."_S.format(item, s_of_n.sample));
+        }
+
+        for (int trial = 0; trial < 100000; trial++) {
+            s_of_n = S_of_n_creator(3);
+            for (auto &&item : items)
+                s_of_n(item);
+            for (auto &&s : s_of_n.sample)
+                binarr[s]++;
+        }
+        print(u"\nTest item frequencies for 100000 runs:\n  "_S + (enumerate(binarr).map([](const auto &i, const auto &x){return u"#.:#."_S.format(i, x);}).join(u"\n  "_S)));
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Kolakoski_sequence#C.2B.2B
+def gen_kolakoski(s, n):
+    seq : List[int] = []
+    i = 0
+    while len(seq) < n:
+        next = s[i % len(s)]
+        seq += [next] * (next if i >= len(seq) else seq[i])
+        i += 1
+    return seq[:n]
+
+def is_possible_kolakoski(s):
+    r : List[int] = []
+    i = 0
+    while i < len(s):
+        count = 1
+        for j in range(i + 1, len(s)):
+            if s[j] != s[i]:
+                break
+            count += 1
+        r.append(count)
+        i += count
+
+    for i in range(len(r)):
+        if r[i] != s[i]:
+            return False
+    return True
+
+for s in [[1, 2],
+          [2, 1],
+          [1, 3, 1, 2],
+          [1, 3, 2, 1]]:
+    kol = gen_kolakoski(s, 30 if len(s) > 2 else 20)
+    print('Starting with: ', s, ":\nKolakoski sequence: ", kol, "\nPossibly kolakoski? ", is_possible_kolakoski(kol), sep = '')
+===
+F gen_kolakoski(s, n)
+   [Int] seq
+   V i = 0
+   L seq.len < n
+      V next = s[i % s.len]
+      seq [+]= [next] * (I i >= seq.len {next} E seq[i])
+      i++
+   R seq[0 .< n]
+
+F is_possible_kolakoski(s)
+   [Int] r
+   V i = 0
+   L i < s.len
+      V count = 1
+      L(j) i + 1 .< s.len
+         I s[j] != s[i]
+            L.break
+         count++
+      r.append(count)
+      i += count
+
+   L(i) 0 .< r.len
+      I r[i] != s[i]
+         R 0B
+   R 1B
+
+L(s) [[1, 2], [2, 1], [1, 3, 1, 2], [1, 3, 2, 1]]
+   V kol = gen_kolakoski(s, I s.len > 2 {30} E 20)
+   print(‘Starting with: ’s":\nKolakoski sequence: "kol"\nPossibly kolakoski? "(is_possible_kolakoski(kol)))
+===
+template <typename T1, typename T2> auto gen_kolakoski(const T1 &s, const T2 &n)
+{
+    Array<int> seq;
+    auto i = 0;
+    while (seq.len() < n) {
+        auto next = s[mod(i, s.len())];
+        seq.append(create_array({next}) * (i >= seq.len() ? next : seq[i]));
+        i++;
+    }
+    return seq[range_el(0, n)];
+}
+
+template <typename T1> auto is_possible_kolakoski(const T1 &s)
+{
+    Array<int> r;
+    auto i = 0;
+    while (i < s.len()) {
+        auto count = 1;
+        for (auto j : range_el(i + 1, s.len())) {
+            if (s[j] != s[i])
+                break;
+            count++;
+        }
+        r.append(count);
+        i += count;
+    }
+    for (auto i : range_el(0, r.len()))
+        if (r[i] != s[i])
+            return false;
+    return true;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&s : create_array({create_array({1, 2}), create_array({2, 1}), create_array({1, 3, 1, 2}), create_array({1, 3, 2, 1})})) {
+            auto kol = gen_kolakoski(s, s.len() > 2 ? 30 : 20);
+            print(u"Starting with: "_S + s + u":\nKolakoski sequence: "_S + kol + u"\nPossibly kolakoski? "_S + (is_possible_kolakoski(kol)));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Kosaraju#Python
+def kosaraju(g):
+    # 1. For each vertex u of the graph, mark u as unvisited. Let l be empty.
+    size = len(g)
+
+    vis = [False]*size # vertexes that have been visited
+    l = [0]*size
+    x = size
+    t = [[0]*0 for i in range(size)] # transpose graph
+
+    def visit(u : int) -> None:
+        nonlocal x
+        if not vis[u]:
+            vis[u] = True
+            for v in g[u]:
+                visit(v)
+                t[v] += [u]
+            x -= 1
+            l[x] = u
+
+    # 2. For each vertex u of the graph do visit(u)
+    for u in range(len(g)):
+        visit(u)
+    c = [0]*size
+
+    def assign(u : int, root : int) -> None:
+        if vis[u]:
+            vis[u] = False
+            c[u] = root
+            for v in t[u]:
+                assign(v, root)
+
+    # 3: For each element u of l in order, do assign(u, u)
+    for u in l:
+        assign(u, u)
+
+    return c
+
+g = [[1], [2], [0], [1,2,4], [3,5], [2,6], [5], [4,6,7]]
+print(kosaraju(g))
+===
+F kosaraju(g)
+   V size = g.len
+   V vis = [0B] * size
+   V l = [0] * size
+   V x = size
+   V t = (0 .< size).map(i -> [0] * 0)
+
+   F visit(Int u) -> N
+      I !(@vis[u])
+         @vis[u] = 1B
+         L(v) @g[u]
+            @visit(v)
+            @t[v] [+]= u
+         @x--
+         @l[@x] = u
+
+   L(u) 0 .< g.len
+      visit(u)
+   V c = [0] * size
+
+   F assign(Int u, Int root) -> N
+      I @vis[u]
+         @vis[u] = 0B
+         @c[u] = root
+         L(v) @t[u]
+            @assign(v, root)
+
+   L(u) l
+      assign(u, u)
+   R c
+V g = [[1], [2], [0], [1, 2, 4], [3, 5], [2, 6], [5], [4, 6, 7]]
+print(kosaraju(g))
+===
+template <typename T1> auto kosaraju(const T1 &g)
+{
+    auto size = g.len();
+    auto vis = create_array({false}) * size;
+    auto l = create_array({0}) * size;
+    auto x = size;
+    auto t = range_el(0, size).map([](const auto &i){return create_array({0}) * 0;});
+
+    std::function<void(int)> visit = [&g, &l, &t, &vis, &visit, &x](const int u)
+    {
+        if (!(vis[u])) {
+            vis.set(u, true);
+            for (auto &&v : g[u]) {
+                visit(v);
+                t[v].append(u);
+            }
+            x--;
+            l.set(x, u);
+        }
+    };
+    for (auto u : range_el(0, g.len()))
+        visit(u);
+    auto c = create_array({0}) * size;
+
+    std::function<void(int, int)> assign = [&assign, &c, &t, &vis](const int u, const int root)
+    {
+        if (vis[u]) {
+            vis.set(u, false);
+            c.set(u, root);
+            for (auto &&v : t[u])
+                assign(v, root);
+        }
+    };
+    for (auto &&u : l)
+        assign(u, u);
+    return c;
+}
+auto g = create_array({create_array({1}), create_array({2}), create_array({0}), create_array({1, 2, 4}), create_array({3, 5}), create_array({2, 6}), create_array({5}), create_array({4, 6, 7})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(kosaraju(g));
+    }
+} code_block_1;
