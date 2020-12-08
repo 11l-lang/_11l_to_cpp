@@ -57,6 +57,8 @@ public:
 	      std::vector<Type>::clear,
 	      std::vector<Type>::reserve;
 
+	void drop() {clear();}
+
 	template <typename Func> auto map(Func &&func) const -> Array<decltype(func(std::declval<Type>()))>
 	{
 		Array<decltype(func(std::declval<Type>()))> r;
