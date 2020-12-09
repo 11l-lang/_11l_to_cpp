@@ -167,7 +167,7 @@ F totalvalue(comb)
 V items = [(‘map’, 9, 150), (‘compass’, 13, 35), (‘water’, 153, 200), (‘sandwich’, 50, 160), (‘glucose’, 15, 60), (‘tin’, 68, 45), (‘banana’, 27, 60), (‘apple’, 39, 40), (‘cheese’, 23, 30), (‘beer’, 52, 10), (‘suntan cream’, 11, 70), (‘camera’, 32, 30), (‘t-shirt’, 24, 15), (‘trousers’, 48, 10), (‘umbrella’, 73, 40), (‘waterproof trousers’, 42, 70), (‘waterproof overclothes’, 43, 75), (‘note-case’, 22, 80), (‘sunglasses’, 7, 20), (‘towel’, 18, 12), (‘socks’, 4, 50), (‘book’, 30, 10)]
 
 F knapsack01_dp(items, limit)
-   V table = (0 .< items.len + 1).map(j -> (0 .< @limit + 1).map(w -> 0))
+   V table = (0 .. items.len).map(j -> (0 .. @limit).map(w -> 0))
 
    L(j) 1 .. items.len
       V (item, wt, val) = items[j - 1]
@@ -205,7 +205,7 @@ auto items = create_array({make_tuple(u"map"_S, 9, 150), make_tuple(u"compass"_S
 
 template <typename T1, typename T2> auto knapsack01_dp(const T1 &items, const T2 &limit)
 {
-    auto table = range_el(0, items.len() + 1).map([&limit](const auto &j){return range_el(0, limit + 1).map([](const auto &w){return 0;});});
+    auto table = range_ee(0, items.len()).map([&limit](const auto &j){return range_ee(0, limit).map([](const auto &w){return 0;});});
 
     for (auto j : range_ee(1, items.len())) {
         auto [item, wt, val] = items[j - 1];
