@@ -522,8 +522,8 @@ T Converter
                            table[yy][xx].attrs += ‘ colspan="’String(x - xx + 1)‘"’
                         I yy < y
                            table[yy][xx].attrs += ‘ rowspan="’String(y - yy + 1)‘"’
-                        L(xxx) xx .< x + 1
-                           L(yyy) yy .< y + 1
+                        L(xxx) xx .. x
+                           L(yyy) yy .. y
                               I (xxx, yyy) != (xx, yy)
                                  table[yyy][xxx].attrs = ‘’
                V is_inline = 1B

@@ -169,9 +169,9 @@ V items = [(‘map’, 9, 150), (‘compass’, 13, 35), (‘water’, 153, 200)
 F knapsack01_dp(items, limit)
    V table = (0 .< items.len + 1).map(j -> (0 .< @limit + 1).map(w -> 0))
 
-   L(j) 1 .< items.len + 1
+   L(j) 1 .. items.len
       V (item, wt, val) = items[j - 1]
-      L(w) 1 .< limit + 1
+      L(w) 1 .. limit
          I wt > w
             table[j][w] = table[j - 1][w]
          E
@@ -207,9 +207,9 @@ template <typename T1, typename T2> auto knapsack01_dp(const T1 &items, const T2
 {
     auto table = range_el(0, items.len() + 1).map([&limit](const auto &j){return range_el(0, limit + 1).map([](const auto &w){return 0;});});
 
-    for (auto j : range_el(1, items.len() + 1)) {
+    for (auto j : range_ee(1, items.len())) {
         auto [item, wt, val] = items[j - 1];
-        for (auto w : range_el(1, limit + 1))
+        for (auto w : range_ee(1, limit))
             if (wt > w)
                 table[j].set(w, table[j - 1][w]);
             else

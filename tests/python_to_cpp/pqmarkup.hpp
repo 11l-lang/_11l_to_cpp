@@ -673,8 +673,8 @@ public:
                                     table[yy][xx].attrs += u" colspan=\""_S + String(x - xx + 1) + u"\""_S;
                                 if (yy < y)
                                     table[yy][xx].attrs += u" rowspan=\""_S + String(y - yy + 1) + u"\""_S;
-                                for (auto xxx : range_el(xx, x + 1))
-                                    for (auto yyy : range_el(yy, y + 1))
+                                for (auto xxx : range_ee(xx, x))
+                                    for (auto yyy : range_ee(yy, y))
                                         if (make_tuple(xxx, yyy) != make_tuple(xx, yy))
                                             table[yyy][xxx].attrs = u""_S;
                             }
