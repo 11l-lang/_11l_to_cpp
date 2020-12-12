@@ -482,3 +482,8 @@ inline void exit(const String &msg)
 	std::wcerr << std::wstring(msg.cbegin(), msg.cend()) << "\n";
 	exit(1);
 }
+
+inline void exit()
+{
+	exit(0);
+}

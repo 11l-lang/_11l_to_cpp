@@ -2882,7 +2882,7 @@ f.first_named_only_argument = 1
 builtins_scope.add_function('print_elements', f)
 builtins_scope.add_function('input', ASTFunctionDefinition([('prompt', token_to_str('‘’'), 'String')], 'String'))
 builtins_scope.add_function('assert', ASTFunctionDefinition([('expression', '', 'Bool'), ('message', token_to_str('‘’'), 'String')]))
-builtins_scope.add_function('exit', ASTFunctionDefinition([('arg', '', '')]))
+builtins_scope.add_function('exit', ASTFunctionDefinition([('arg', '0', '')]))
 builtins_scope.add_function('swap', ASTFunctionDefinition([('a', '', '', '&'), ('b', '', '', '&')]))
 builtins_scope.add_function('zip', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', ''), ('iterable3', token_to_str('N', Token.Category.CONSTANT), '')]))
 builtins_scope.add_function('all', ASTFunctionDefinition([('iterable', '', '')]))
