@@ -1798,6 +1798,8 @@ print({1,})
 Byte = int
 print([Byte(1), 2])
 print({Byte(1), 2})
+import collections
+print(collections.deque([3]))
 ===
 print(Set([1, 2, 3]).difference(Set([2, 4])))
 print(Set([1, 2, 3]).difference(Set([2, 4])))
@@ -1807,6 +1809,8 @@ print(Set([1]))
 print(Set([1]))
 print([Byte(1), 2])
 print(Set([Byte(1), 2]))
+//import collections
+print(Deque([3]))
 ===
 struct CodeBlock1
 {
@@ -1820,6 +1824,7 @@ struct CodeBlock1
         print(create_set({1}));
         print(create_array<Byte>({Byte(1), 2}));
         print(create_set<Byte>({Byte(1), 2}));
+        print(create_deque({3}));
     }
 } code_block_1;
 

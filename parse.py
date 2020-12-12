@@ -452,17 +452,17 @@ class SymbolNode:
                     func_name = 'create_dict'
                 elif func_name.startswith('DefaultDict['): # ]
                     func_name = 'DefaultDict<' + ', '.join(trans_type(c.to_type_str(), c.scope, c.token) for c in self.children[0].children[1:]) + '>'
-                elif func_name == 'Set':
+                elif func_name in ('Set', 'Deque'):
+                    func_name = 'create_set' if func_name == 'Set' else 'create_deque'
                     if self.children[2].is_list:
                         c = self.children[2].children
-                        res = 'create_set' + ('<' + trans_type(c[0].children[0].token_str(), self.scope, c[0].children[0].token)
-                                            + '>' if len(c) > 1 and c[0].function_call and c[0].children[0].token_str()[0].isupper() else '') + '({'
+                        res = func_name + ('<' + trans_type(c[0].children[0].token_str(), self.scope, c[0].children[0].token)
+                                         + '>' if len(c) > 1 and c[0].function_call and c[0].children[0].token_str()[0].isupper() else '') + '({'
                         for i in range(len(c)):
                             res += c[i].to_str()
                             if i < len(c)-1:
                                 res += ', '
                         return res + '})'
-                    func_name = 'create_set'
                 elif func_name.startswith(('Set[', 'Deque[')): # ]]
                     c = self.children[0].children[1]
                     func_name = func_name[:func_name.find('[')] + '<' + trans_type(c.to_type_str(), c.scope, c.token) + '>' # ]

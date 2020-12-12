@@ -4,6 +4,12 @@ template <typename Type> class Deque : public std::deque<Type>
 {
 public:
 	Deque() {}
+	Deque(std::initializer_list<Type> il)
+	{
+//		reserve(il.size());
+		for (auto &&el : il)
+			append(el);
+	}
 
 	using std::deque<Type>::begin,
 	      std::deque<Type>::end,
@@ -58,6 +64,11 @@ public:
 		std::deque<Type>::erase(it);
 	}
 };
+
+template <typename Type> Deque<Type> create_deque(std::initializer_list<Type> il)
+{
+	return Deque<Type>(il);
+}
 
 template <typename Type> inline bool in(const Type &val, const Deque<Type> &d)
 {
