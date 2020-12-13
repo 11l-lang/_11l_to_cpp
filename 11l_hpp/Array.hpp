@@ -710,6 +710,48 @@ template <typename Type> Type min(const Array<Type> &arr)
 	return r;
 }
 
+template <typename Iterable, typename Key> auto min_with_key(const Iterable &iterable, Key &&key)
+{
+	std::remove_const_t<std::remove_reference_t<decltype(*std::begin(iterable))>> minitem;
+	decltype(key(std::declval<decltype(*std::begin(iterable))>())) minval;
+	bool first_iteration = true;
+	for (auto &&el : iterable)
+		if (first_iteration) {
+			first_iteration = false;
+			minitem = el;
+			minval = key(el);
+		}
+		else {
+			auto val = key(el);
+			if (val < minval) {
+				minval = val;
+				minitem = el;
+			}
+		}
+	return minitem;
+}
+
+template <typename Iterable, typename Key> auto max_with_key(const Iterable &iterable, Key &&key)
+{
+	std::remove_const_t<std::remove_reference_t<decltype(*std::begin(iterable))>> maxitem;
+	decltype(key(std::declval<decltype(*std::begin(iterable))>())) maxval;
+	bool first_iteration = true;
+	for (auto &&el : iterable)
+		if (first_iteration) {
+			first_iteration = false;
+			maxitem = el;
+			maxval = key(el);
+		}
+		else {
+			auto val = key(el);
+			if (val > maxval) {
+				maxval = val;
+				maxitem = el;
+			}
+		}
+	return maxitem;
+}
+
 // [https://stackoverflow.com/a/51077813/2692494 <- google:‘structured binding vector’]
 template <class T, size_t N> struct array_binder {
 	//const Array<T> &arr; // this does not work with `auto [a, b] = bind_array<2>(create_array({1, 2}));` because destructor of Array is called before `get()`

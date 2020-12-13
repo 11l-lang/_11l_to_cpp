@@ -7859,3 +7859,130 @@ struct CodeBlock2
             print(elem);
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Last_letter-first_letter#Python
+import collections
+
+def order_words(words):
+    byfirst : DefaultDict[Char, Set[str]] = collections.defaultdict(set)
+    for word in words:
+        byfirst[word[0]].add( word )
+    #byfirst = dict(byfirst)
+    return byfirst
+
+def linkfirst(byfirst : DefaultDict[Char, Set[str]], sofar):
+    assert len(sofar) != 0
+    chmatch = sofar[-1][-1]
+    options = byfirst[chmatch] - set(sofar)
+    #print('  linkfirst options: %r %r' % (chmatch, options))
+    if len(options) == 0:
+        return sofar
+    else:
+        alternatives = ( linkfirst(byfirst, list(sofar) + [word])
+                         for word in options )
+        mx = max( alternatives, key = lambda s: len(s) )
+        #input('linkfirst: %r' % mx)
+        return mx
+
+def llfl(words):
+    byfirst = order_words(words)
+    return max( (linkfirst(byfirst, [word]) for word in words), key = lambda s: len(s) )
+
+pokemon_str = '''audino bagon baltoy banette bidoof braviary bronzor carracosta charmeleon
+cresselia croagunk darmanitan deino emboar emolga exeggcute gabite
+girafarig gulpin haxorus heatmor heatran ivysaur jellicent jumpluff kangaskhan
+kricketune landorus ledyba loudred lumineon lunatone machamp magnezone mamoswine
+nosepass petilil pidgeotto pikachu pinsir poliwrath poochyena porygon2
+porygonz registeel relicanth remoraid rufflet sableye scolipede scrafty seaking
+sealeo silcoon simisear snivy snorlax spoink starly tirtouga trapinch treecko
+tyrogue vigoroth vulpix wailord wartortle whismur wingull yamask'''
+pokemon = pokemon_str.split()
+l = llfl(pokemon)
+for i in range(0, len(l), 8): print(' '.join(l[i:i+8]))
+print(len(l))
+===
+//import collections
+
+F order_words(words)
+   DefaultDict[Char, Set[String]] byfirst
+   L(word) words
+      byfirst[word[0]].add(word)
+   R byfirst
+
+F linkfirst(DefaultDict[Char, Set[String]] &byfirst; sofar)
+   assert(!sofar.empty)
+   V chmatch = sofar.last.last
+   V options = byfirst[chmatch] - Set(sofar)
+
+   I options.empty
+      R sofar
+   E
+      V alternatives = (options.map(word -> linkfirst(&@byfirst, Array(@sofar) [+] [word])))
+      V mx = max(alternatives, key' s -> s.len)
+      R mx
+
+F llfl(words)
+   V byfirst = order_words(words)
+   R max((words.map(word -> linkfirst(&@byfirst, [word]))), key' s -> s.len)
+V pokemon_str = ‘audino bagon baltoy banette bidoof braviary bronzor carracosta charmeleon
+cresselia croagunk darmanitan deino emboar emolga exeggcute gabite
+girafarig gulpin haxorus heatmor heatran ivysaur jellicent jumpluff kangaskhan
+kricketune landorus ledyba loudred lumineon lunatone machamp magnezone mamoswine
+nosepass petilil pidgeotto pikachu pinsir poliwrath poochyena porygon2
+porygonz registeel relicanth remoraid rufflet sableye scolipede scrafty seaking
+sealeo silcoon simisear snivy snorlax spoink starly tirtouga trapinch treecko
+tyrogue vigoroth vulpix wailord wartortle whismur wingull yamask’
+V pokemon = pokemon_str.split_py()
+V l = llfl(pokemon)
+L(i) (0 .< l.len).step(8)
+   print((l[i .< i + 8]).join(‘ ’))
+print(l.len)
+===
+template <typename T1> auto order_words(const T1 &words)
+{
+    DefaultDict<Char, Set<String>> byfirst;
+    for (auto &&word : words)
+        byfirst[_get<0>(word)].add(word);
+    return byfirst;
+}
+
+template <typename T2> auto linkfirst(DefaultDict<Char, Set<String>> &byfirst, const T2 &sofar)
+{
+    assert(!sofar.empty());
+    auto chmatch = sofar.last().last();
+    auto options = byfirst[chmatch] - create_set(sofar);
+    if (options.empty())
+        return sofar;
+    else {
+        auto alternatives = (options.map([&byfirst, &sofar](const auto &word){return linkfirst(byfirst, create_array(sofar) + create_array({word}));}));
+        auto mx = max_with_key(alternatives, [](const auto &s){return s.len();});
+        return mx;
+    }
+}
+
+template <typename T1> auto llfl(const T1 &words)
+{
+    auto byfirst = order_words(words);
+    return max_with_key((words.map([&byfirst](const auto &word){return linkfirst(byfirst, create_array({word}));})), [](const auto &s){return s.len();});
+}
+auto pokemon_str = uR"(audino bagon baltoy banette bidoof braviary bronzor carracosta charmeleon
+cresselia croagunk darmanitan deino emboar emolga exeggcute gabite
+girafarig gulpin haxorus heatmor heatran ivysaur jellicent jumpluff kangaskhan
+kricketune landorus ledyba loudred lumineon lunatone machamp magnezone mamoswine
+nosepass petilil pidgeotto pikachu pinsir poliwrath poochyena porygon2
+porygonz registeel relicanth remoraid rufflet sableye scolipede scrafty seaking
+sealeo silcoon simisear snivy snorlax spoink starly tirtouga trapinch treecko
+tyrogue vigoroth vulpix wailord wartortle whismur wingull yamask)"_S;
+auto pokemon = pokemon_str.split_py();
+auto l = llfl(pokemon);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(0, l.len()).step(8))
+            print((l[range_el(i, i + 8)]).join(u" "_S));
+        print(l.len());
+    }
+} code_block_1;

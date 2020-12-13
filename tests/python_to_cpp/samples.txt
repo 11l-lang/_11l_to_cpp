@@ -2699,3 +2699,16 @@ struct CodeBlock2
         print(get_height(std::move(root)));
     }
 } code_block_2;
+
+
+print(max(['a' ,'bc'], key = lambda x: len(x)))
+===
+print(max([‘a’, ‘bc’], key' x -> x.len))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(max_with_key(create_array({u"a"_S, u"bc"_S}), [](const auto &x){return x.len();}));
+    }
+} code_block_1;

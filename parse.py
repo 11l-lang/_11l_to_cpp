@@ -469,6 +469,8 @@ class SymbolNode:
                 elif func_name == 'sum' and self.children[2].symbol.id == '(' and self.children[2].children[0].symbol.id == '.' and self.children[2].children[0].children[1].token_str() == 'map': # )
                     assert(len(self.children) == 3)
                     return 'sum_map(' + self.children[2].children[0].children[0].to_str() + ', ' + self.children[2].children[2].to_str() + ')'
+                elif func_name in ('min', 'max') and len(self.children) == 5 and self.children[3] is not None and self.children[3].to_str()[:-1] == 'key':
+                    return func_name + '_with_key(' + self.children[2].to_str() + ', ' + self.children[4].to_str() + ')'
                 elif func_name == 'copy':
                     s = self.scope
                     while True:
@@ -3019,6 +3021,7 @@ builtins_scope.ids['Dict'].ast_nodes[0].scope = dict_scope
 builtins_scope.ids['DefaultDict'].ast_nodes[0].scope = dict_scope
 set_scope = Scope(None)
 set_scope.add_name('difference', ASTFunctionDefinition([('other', '', 'Set')]))
+set_scope.add_name('add', ASTFunctionDefinition([('elem', '', '')]))
 builtins_scope.ids['Set'].ast_nodes[0].scope = set_scope
 
 module_scope = Scope(None)
