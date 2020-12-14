@@ -36,7 +36,7 @@ T soduko
       I .squares[row][col] == [x]
       {
       }
-      E I x !C 1 .< 9 + 1
+      E I x !C 1 .. 9
       {
       }
       E
@@ -50,7 +50,7 @@ T soduko
    }
 
    F cell_exclude(row, col, x)
-      assert(x C 1 .< 9 + 1, ‘inra’)
+      assert(x C 1 .. 9, ‘inra’)
       I x C .squares[row][col]
          .squares[row][col].remove(x)
          I .squares[row][col].empty
@@ -101,7 +101,7 @@ T soduko
    F check_for_single_occurances()
       L(check_type) [:ROW_ITER, :COL_ITER, TxT_ITER]
          L(check_list) check_type
-            L(x) 1 .< 9 + 1
+            L(x) 1 .. 9
                [(Int, Int)] x_in_list
                L(row, col) check_list
                   I x C .squares[row][col]
@@ -115,7 +115,7 @@ T soduko
       L(type_name, check_type) [(‘Row’, :ROW_ITER), (‘Col’, :COL_ITER), (‘3x3’, TxT_ITER)]
          L(check_list) check_type
             [(Int, Int)] unknown_entries
-            V unassigned_values = Array(1 .< 9 + 1)
+            V unassigned_values = Array(1 .. 9)
             [Int] known_values
             L(row, col) check_list
                I .squares[row][col].len == 1

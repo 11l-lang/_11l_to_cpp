@@ -486,7 +486,7 @@ int main()
     fileout.write(String(scene.imgAncho) + u" "_S + String(scene.endline - scene.startline + 1) + u"\n"_S);
     fileout.write(u"255\n"_S);
     print(u"Line (from #. to #.):"_S.format(scene.startline, scene.endline), u" "_S);
-    for (auto y : range_el(scene.startline, scene.endline + 1)) {
+    for (auto y : range_ee(scene.startline, scene.endline)) {
         for (auto x : range_el(0, scene.imgAncho))
             fileout.write(String(renderPixel(x, y)) + u" "_S);
         fileout.write(u"\n"_S);

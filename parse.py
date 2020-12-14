@@ -3016,6 +3016,7 @@ array_scope.add_name('sort', ASTFunctionDefinition([('key', token_to_str('N', To
 builtins_scope.ids['Array'].ast_nodes[0].scope = array_scope
 dict_scope = Scope(None)
 dict_scope.add_name('find', ASTFunctionDefinition([('k', '', '')]))
+dict_scope.add_name('keys', ASTFunctionDefinition([]))
 dict_scope.add_name('values', ASTFunctionDefinition([]))
 builtins_scope.ids['Dict'].ast_nodes[0].scope = dict_scope
 builtins_scope.ids['DefaultDict'].ast_nodes[0].scope = dict_scope

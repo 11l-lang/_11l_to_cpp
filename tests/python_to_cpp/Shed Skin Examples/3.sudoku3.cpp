@@ -52,7 +52,7 @@ public:
         if (squares[row][col] == create_array({x})) {
         }
 
-        else if (!in(x, range_el(1, 9 + 1))) {
+        else if (!in(x, range_ee(1, 9))) {
         }
 
         else {
@@ -69,7 +69,7 @@ public:
 
     template <typename T1, typename T2, typename T3> auto cell_exclude(const T1 &row, const T2 &col, const T3 &x)
     {
-        assert(in(x, range_el(1, 9 + 1)), u"inra"_S);
+        assert(in(x, range_ee(1, 9)), u"inra"_S);
         if (in(x, squares[row][col])) {
             squares[row][col].remove(x);
             if (squares[row][col].empty())
@@ -132,7 +132,7 @@ public:
     {
         for (auto &&check_type : create_array({::ROW_ITER, ::COL_ITER, TxT_ITER}))
             for (auto &&check_list : check_type)
-                for (auto x : range_el(1, 9 + 1)) {
+                for (auto x : range_ee(1, 9)) {
                     Array<ivec2> x_in_list;
                     for (auto &&[row, col] : check_list)
                         if (in(x, squares[row][col]))
@@ -150,7 +150,7 @@ public:
         for (auto &&[type_name, check_type] : create_array({make_tuple(u"Row"_S, ::ROW_ITER), make_tuple(u"Col"_S, ::COL_ITER), make_tuple(u"3x3"_S, TxT_ITER)}))
             for (auto &&check_list : check_type) {
                 Array<ivec2> unknown_entries;
-                auto unassigned_values = create_array(range_el(1, 9 + 1));
+                auto unassigned_values = create_array(range_ee(1, 9));
                 Array<int> known_values;
                 for (auto &&[row, col] : check_list)
                     if (squares[row][col].len() == 1) {

@@ -18,7 +18,7 @@ public:
         if (sup == 0)
             sup = ngenes - 1;
         auto result = 0;
-        for (auto i : range_el(inf, sup + 1))
+        for (auto i : range_ee(inf, sup))
             if (genome[i])
                 result += 1 << (i - inf);
         return result;
@@ -108,7 +108,7 @@ public:
             auto ind1 = randomns::choice(population);
             auto ind2 = randomns::choice(population);
             auto crossPosition = randomns::_(range_ee(0, genomeSize - 1));
-            for (auto j : range_el(0, crossPosition + 1))
+            for (auto j : range_ee(0, crossPosition))
                 assign_from_tuple(ind1.genome[j], ind2.genome[j], make_tuple(ind2.genome[j], ind1.genome[j]));
         }
     }
@@ -130,7 +130,7 @@ public:
     {
         generateRandomPop();
         bestIndividual = Individual(genomeSize);
-        for (auto generation : range_el(1, generationsMax + 1)) {
+        for (auto generation : range_ee(1, generationsMax)) {
             if (mod(generation, 300) == 0)
                 print(u"generation "_S + String(generation));
             computeFitnessPop();

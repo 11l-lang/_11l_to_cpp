@@ -94,6 +94,7 @@ template <typename Type, bool include_beginning, bool include_ending> Set<Type> 
 template <typename Type> Array<Type> create_array(const Set<Type> &set)
 {
 	Array<Type> r;
+	r.reserve(set.size());
 	for (auto &&el : set)
 		r.append(el);
 	return r;

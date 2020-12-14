@@ -13,7 +13,7 @@ T Individual
       I sup == 0
          sup = .ngenes - 1
       V result = 0
-      L(i) inf .< sup + 1
+      L(i) inf .. sup
          I .genome[i]
             result += 1 << (i - inf)
       R result
@@ -79,7 +79,7 @@ T SGA
          V ind1 = random:choice(.population)
          V ind2 = random:choice(.population)
          V crossPosition = random:(0 .. .genomeSize - 1)
-         L(j) 0 .< crossPosition + 1
+         L(j) 0 .. crossPosition
             (ind1.genome[j], ind2.genome[j]) = (ind2.genome[j], ind1.genome[j])
 
    F showGeneration_bestIndFind()
@@ -95,7 +95,7 @@ T SGA
    F run()
       .generateRandomPop()
       .bestIndividual = Individual(.genomeSize)
-      L(generation) 1 .< .generationsMax + 1
+      L(generation) 1 .. .generationsMax
          I generation % 300 == 0
             print(‘generation ’String(generation))
          .computeFitnessPop()

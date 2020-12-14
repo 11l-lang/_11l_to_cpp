@@ -6,10 +6,10 @@ css
     type = str
     node = N
 cat_to_class_python
-    type = ‘’
+    type = Dict
     node = N
 cat_to_class_11l
-    type = ‘’
+    type = Dict
     node = N
 is_lang_supported
     type = ‘’

@@ -353,7 +353,7 @@ fileout.write("P3\n")
 fileout.write(String(scene.imgAncho)‘ ’String(scene.endline - scene.startline + 1)"\n")
 fileout.write("255\n")
 print(‘Line (from #. to #.):’.format(scene.startline, scene.endline), end' ‘ ’)
-L(y) scene.startline .< scene.endline + 1
+L(y) scene.startline .. scene.endline
    L(x) 0 .< scene.imgAncho
       fileout.write(String(renderPixel(x, y))‘ ’)
    fileout.write("\n")
