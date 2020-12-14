@@ -103,6 +103,9 @@ int pow(int x, int y)
 {
 	return (int)pow(double(x), double(y));
 }
+int64_t pow(int64_t x, int     y) {return (int64_t)pow(double(x), double(y));}
+int64_t pow(int     x, int64_t y) {return (int64_t)pow(double(x), double(y));}
+int64_t pow(int64_t x, int64_t y) {return (int64_t)pow(double(x), double(y));}
 
 using std::swap;
 

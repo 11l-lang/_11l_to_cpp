@@ -3820,8 +3820,8 @@ Int64 = int
 
 def eulers_sum_of_powers():
     max_n = 150
-    pow_5 = [Int64(n**5) for n in range(max_n)]
-    pow5_to_n = {Int64(n**5): n for n in range(max_n)}
+    pow_5 = [Int64(n)**5 for n in range(max_n)]
+    pow5_to_n = {Int64(n)**5: n for n in range(max_n)}
     #pow5_to_n : Dict[Int64, int] = {}
     #for n in range(max_n):
     #    pow5_to_n[n**5] = n
@@ -3849,8 +3849,8 @@ print("%i^5 + %i^5 + %i^5 + %i^5 = %i^5" % (r[0], r[1], r[2], r[3], r[4]))
 
 F eulers_sum_of_powers()
    V max_n = 150
-   V pow_5 = (0 .< max_n).map(n -> Int64(n ^ 5))
-   V pow5_to_n = Dict(0 .< max_n, n -> (Int64(n ^ 5), n))
+   V pow_5 = (0 .< max_n).map(n -> Int64(n) ^ 5)
+   V pow5_to_n = Dict(0 .< max_n, n -> (Int64(n) ^ 5, n))
 
    L(x0) 1 .< max_n
       L(x1) 1 .< x0
@@ -3867,8 +3867,8 @@ print(‘#.^5 + #.^5 + #.^5 + #.^5 = #.^5’.format(r[0], r[1], r[2], r[3], r[4]
 auto eulers_sum_of_powers()
 {
     auto max_n = 150;
-    auto pow_5 = range_el(0, max_n).map([](const auto &n){return to_int64(pow(n, 5));});
-    auto pow5_to_n = create_dict(range_el(0, max_n), [](const auto &n){return make_tuple(to_int64(pow(n, 5)), n);});
+    auto pow_5 = range_el(0, max_n).map([](const auto &n){return pow(to_int64(n), 5);});
+    auto pow5_to_n = create_dict(range_el(0, max_n), [](const auto &n){return make_tuple(pow(to_int64(n), 5), n);});
     for (auto x0 : range_el(1, max_n))
         for (auto x1 : range_el(1, x0))
             for (auto x2 : range_el(1, x1))
