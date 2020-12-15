@@ -133,7 +133,6 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
     i = 0
     begin_of_line = True
     indentation_tabs : bool
-    prev_indentation_level : int
     prev_linestart : int
 
     def skip_multiline_comment():
@@ -245,18 +244,17 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
             indentation_level = ii - linestart
             if len(indentation_levels) and indentation_levels[-1][0] == -1: # сразу после символа `{` идёт новый произвольный отступ (понижение уровня отступа может быть полезно, если вдруг отступ оказался слишком большой), который действует вплоть до парного символа `}`
                 indentation_levels[-1] = (indentation_level, indentation_levels[-1][1]) #indentation_levels[-1][0] = indentation_level # || maybe this is unnecessary (actually it is necessary, see test "fn f()\n{\na = 1") // }
-                # // This is uncertain piece of code:
                 indentation_tabs = tabs
             else:
-                if indentation_level > 0 and len(indentation_levels) and prev_indentation_level > 0 and indentation_tabs != tabs:
+                prev_indentation_level = indentation_levels[-1][0] if len(indentation_levels) else 0
+
+                if indentation_level > 0 and prev_indentation_level > 0 and indentation_tabs != tabs:
                     e = i + 1
                     while e < len(source) and source[e] not in "\r\n":
                         e += 1
                     raise Error("inconsistent indentations:\n```\n" + prev_indentation_level*('TAB' if indentation_tabs else 'S') + source[prev_linestart:linestart]
                         + (ii-linestart)*('TAB' if tabs else 'S') + source[ii:e] + "\n```", ii)
                 prev_linestart = ii
-
-                prev_indentation_level = indentation_levels[-1][0] if len(indentation_levels) else 0
 
                 if indentation_level == prev_indentation_level: # [1:] [-1]:‘If it is equal, nothing happens.’ :)(: [:2]
                     if len(tokens) and tokens[-1].category != Token.Category.SCOPE_END:
@@ -281,8 +279,6 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                             break
                         if level < indentation_level:
                             raise Error('unindent does not match any outer indentation level', ii)
-
-                prev_indentation_level = indentation_level
 
         ch = source[i]
 
