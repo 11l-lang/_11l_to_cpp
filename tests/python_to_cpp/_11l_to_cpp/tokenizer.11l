@@ -67,11 +67,11 @@ Error: unindent does not match any outer indentation level
 ’
 V keywords = [‘V’, ‘C’, ‘I’, ‘E’, ‘F’, ‘L’, ‘N’, ‘R’, ‘S’, ‘T’, ‘X’, ‘П’, ‘С’, ‘Е’, ‘И’, ‘Ф’, ‘Ц’, ‘Н’, ‘Р’, ‘В’, ‘Т’, ‘Х’, ‘var’, ‘in’, ‘if’, ‘else’, ‘fn’, ‘loop’, ‘null’, ‘return’, ‘switch’, ‘type’, ‘exception’, ‘перем’, ‘С’, ‘если’, ‘иначе’, ‘фн’, ‘цикл’, ‘нуль’, ‘вернуть’, ‘выбрать’, ‘тип’, ‘исключение’]
 [String] empty_list_of_str
-[[String]] binary_operators = [empty_list_of_str, [String(‘+’), ‘-’, ‘*’, ‘/’, ‘%’, ‘^’, ‘&’, ‘|’, ‘<’, ‘>’, ‘=’, ‘?’], [‘<<’, ‘>>’, ‘<=’, ‘>=’, ‘==’, ‘!=’, ‘+=’, ‘-=’, ‘*=’, ‘/=’, ‘%=’, ‘&=’, ‘|=’, ‘^=’, ‘->’, ‘..’, ‘.<’, ‘<.’, ‘I/’, ‘Ц/’, ‘C ’, ‘С ’], [‘<<=’, ‘>>=’, ‘‘’=’, ‘[+]’, ‘[&]’, ‘[|]’, ‘(+)’, ‘<.<’, ‘I/=’, ‘Ц/=’, ‘in ’, ‘!C ’, ‘!С ’], [‘[+]=’, ‘[&]=’, ‘[|]=’, ‘(+)=’, ‘!in ’]]
+[[String]] binary_operators = [empty_list_of_str, [String(‘+’), ‘-’, ‘*’, ‘/’, ‘%’, ‘^’, ‘&’, ‘|’, ‘<’, ‘>’, ‘=’, ‘?’], [‘<<’, ‘>>’, ‘<=’, ‘>=’, ‘==’, ‘!=’, ‘+=’, ‘-=’, ‘*=’, ‘/=’, ‘%=’, ‘&=’, ‘|=’, ‘^=’, ‘->’, ‘..’, ‘.<’, ‘.+’, ‘<.’, ‘I/’, ‘Ц/’, ‘C ’, ‘С ’], [‘<<=’, ‘>>=’, ‘‘’=’, ‘[+]’, ‘[&]’, ‘[|]’, ‘(+)’, ‘<.<’, ‘I/=’, ‘Ц/=’, ‘in ’, ‘!C ’, ‘!С ’], [‘[+]=’, ‘[&]=’, ‘[|]=’, ‘(+)=’, ‘!in ’]]
 [[String]] unary_operators = [empty_list_of_str, [String(‘!’)], [‘++’, ‘--’], [‘(-)’]]
 V sorted_operators = sorted(binary_operators[1] + binary_operators[2] + binary_operators[3] + binary_operators[4] + unary_operators[1] + unary_operators[2] + unary_operators[3], key' x -> x.len, reverse' 1B)
-binary_operators[1].remove(‘-’)
 binary_operators[1].remove(‘^’)
+binary_operators[2].remove(‘..’)
 
 T Error
    String message
@@ -121,7 +121,6 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
    V i = 0
    V begin_of_line = 1B
    Bool indentation_tabs
-   Int prev_indentation_level
    Int prev_linestart
 
    F skip_multiline_comment()
@@ -193,7 +192,7 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
                line_continuations.append(tokens.last.end)
             L.continue
 
-         I ((source[i] C :binary_operators[1] | source[i .< i + 2] C :binary_operators[2] | source[i .< i + 3] C :binary_operators[3] | source[i .< i + 4] C :binary_operators[4]) & !(source[i] C :unary_operators[1] | source[i .< i + 2] C :unary_operators[2] | source[i .< i + 3] C :unary_operators[3]) & (source[i] != ‘&’ | source[i + 1 .< i + 2] == ‘ ’))
+         I ((source[i] C :binary_operators[1] | source[i .< i + 2] C :binary_operators[2] | source[i .< i + 3] C :binary_operators[3] | source[i .< i + 4] C :binary_operators[4]) & !(source[i] C :unary_operators[1] | source[i .< i + 2] C :unary_operators[2] | source[i .< i + 3] C :unary_operators[3]) & (source[i] !C (‘&’, ‘-’) | source[i + 1 .< i + 2] == ‘ ’))
             I tokens.empty
                X Error(‘source can not starts with a binary operator’, i)
             I line_continuations != N
@@ -216,13 +215,14 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
             indentation_levels.last = (indentation_level, indentation_levels.last[1])
             indentation_tabs = tabs
          E
-            I indentation_level > 0 & indentation_levels.len & prev_indentation_level > 0 & indentation_tabs != tabs
+            V prev_indentation_level = I !indentation_levels.empty {indentation_levels.last[0]} E 0
+
+            I indentation_level > 0 & prev_indentation_level > 0 & indentation_tabs != tabs
                V e = i + 1
                L e < source.len & source[e] !C "\r\n"
                   e++
                X Error("inconsistent indentations:\n```\n"prev_indentation_level * (I indentation_tabs {‘TAB’} E ‘S’) + source[prev_linestart .< linestart] + (ii - linestart) * (I tabs {‘TAB’} E ‘S’) + source[ii .< e]"\n```", ii)
             prev_linestart = ii
-            prev_indentation_level = I !indentation_levels.empty {indentation_levels.last[0]} E 0
 
             I indentation_level == prev_indentation_level
                I tokens.len & tokens.last.category != SCOPE_END
@@ -247,7 +247,6 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
                      L.break
                   I level < indentation_level
                      X Error(‘unindent does not match any outer indentation level’, ii)
-            prev_indentation_level = indentation_level
       V ch = source[i]
 
       I ch C " \t"
@@ -324,6 +323,8 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
             E I source[lexem_start .< i] C :keywords
                I source[lexem_start .< i] C (‘V’, ‘П’, ‘var’, ‘перем’)
                   category = NAME
+                  I source[i .< i + 1] == ‘&’
+                     i++
                E I source[lexem_start .< i] C (‘N’, ‘Н’, ‘null’, ‘нуль’)
                   category = CONSTANT
                E
@@ -400,13 +401,13 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
                         X Error(‘after this digit separator there should be 4 digits in hexadecimal number’, source.rfindi(‘'’, 0, i))
                E
                   L i < source.len & (source[i] C ‘0’..‘9’ | source[i] C ‘'.eE’)
-                     I source[i .< i + 2] C (‘..’, ‘.<’)
+                     I source[i .< i + 2] C (‘..’, ‘.<’, ‘.+’)
                         L.break
                      I source[i] C ‘eE’
                         I source[i + 1 .< i + 2] C ‘-+’
                            i++
                      i++
-                  I source[i .< i + 1] C (‘o’, ‘о’, ‘b’, ‘д’)
+                  I source[i .< i + 1] C (‘o’, ‘о’, ‘b’, ‘д’, ‘s’, ‘i’)
                      i++
                   E I ‘'’ C source[lexem_start .< i] & !(‘.’ C source[lexem_start .< i])
                      V number = source[lexem_start .< i].replace(‘'’, ‘’)
@@ -506,8 +507,12 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
             category = DELIMITER
 
          E I ch C ‘([’
-            nesting_elements.append((ch, lexem_start))
-            category = DELIMITER
+            I source[lexem_start .< lexem_start + 3] == ‘(.)’
+               i += 2
+               category = NAME
+            E
+               nesting_elements.append((ch, lexem_start))
+               category = DELIMITER
          E I ch C ‘])’
             I nesting_elements.empty | nesting_elements.last[0] != (S ch {‘]’ {‘[’}; ‘)’ {‘(’}})
                X Error(‘there is no corresponding opening parenthesis/bracket for `’ch‘`’, lexem_start)

@@ -36,7 +36,7 @@ class Error(Exception):
         self.end = pos
 
 class Token:
-    class Category(IntEnum):
+    class Category(IntEnum): # why ‘Category’: >[https://docs.python.org/3/reference/lexical_analysis.html#other-tokens]:‘the following categories of tokens exist’
         NAME = 0 # or IDENTIFIER
         KEYWORD = 1
         CONSTANT = 2
@@ -227,6 +227,8 @@ def tokenize(source, newline_chars : List[int] = None, comments : List[Tuple[int
                         if source[i] in 'eE':
                             if source[i+1:i+2] in '-+':
                                 i += 1
+                        i += 1
+                    if source[i] in 'jJ':
                         i += 1
                     if '_' in source[start:i] and not '.' in source[start:i]: # float numbers do not checked for a while
                         number = source[start:i].replace('_', '')

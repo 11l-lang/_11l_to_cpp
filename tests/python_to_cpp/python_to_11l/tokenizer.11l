@@ -197,6 +197,8 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
                      I source[i + 1 .< i + 2] C ‘-+’
                         i++
                   i++
+               I source[i] C ‘jJ’
+                  i++
                I ‘_’ C source[start .< i] & !(‘.’ C source[start .< i])
                   V number = source[start .< i].replace(‘_’, ‘’)
                   V number_with_separators = ‘’

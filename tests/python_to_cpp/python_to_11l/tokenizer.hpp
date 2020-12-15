@@ -235,6 +235,8 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                         }
                         i++;
                     }
+                    if (in(source[i], u"jJ"_S))
+                        i++;
                     if (in(u'_'_C, source[range_el(start, i)]) && !(in(u'.'_C, source[range_el(start, i)]))) {
                         auto number = source[range_el(start, i)].replace(u"_"_S, u""_S);
                         auto number_with_separators = u""_S;

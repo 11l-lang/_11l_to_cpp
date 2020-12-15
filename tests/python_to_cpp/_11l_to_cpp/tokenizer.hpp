@@ -73,7 +73,7 @@ Error: unindent does not match any outer indentation level
 } code_block_1;
 auto keywords = create_array({u"V"_S, u"C"_S, u"I"_S, u"E"_S, u"F"_S, u"L"_S, u"N"_S, u"R"_S, u"S"_S, u"T"_S, u"X"_S, u"П"_S, u"С"_S, u"Е"_S, u"И"_S, u"Ф"_S, u"Ц"_S, u"Н"_S, u"Р"_S, u"В"_S, u"Т"_S, u"Х"_S, u"var"_S, u"in"_S, u"if"_S, u"else"_S, u"fn"_S, u"loop"_S, u"null"_S, u"return"_S, u"switch"_S, u"type"_S, u"exception"_S, u"перем"_S, u"С"_S, u"если"_S, u"иначе"_S, u"фн"_S, u"цикл"_S, u"нуль"_S, u"вернуть"_S, u"выбрать"_S, u"тип"_S, u"исключение"_S});
 Array<String> empty_list_of_str;
-Array<Array<String>> binary_operators = create_array({empty_list_of_str, create_array<String>({String(u"+"_S), u"-"_S, u"*"_S, u"/"_S, u"%"_S, u"^"_S, u"&"_S, u"|"_S, u"<"_S, u">"_S, u"="_S, u"?"_S}), create_array({u"<<"_S, u">>"_S, u"<="_S, u">="_S, u"=="_S, u"!="_S, u"+="_S, u"-="_S, u"*="_S, u"/="_S, u"%="_S, u"&="_S, u"|="_S, u"^="_S, u"->"_S, u".."_S, u".<"_S, u"<."_S, u"I/"_S, u"Ц/"_S, u"C "_S, u"С "_S}), create_array({u"<<="_S, u">>="_S, u"‘’="_S, u"[+]"_S, u"[&]"_S, u"[|]"_S, u"(+)"_S, u"<.<"_S, u"I/="_S, u"Ц/="_S, u"in "_S, u"!C "_S, u"!С "_S}), create_array({u"[+]="_S, u"[&]="_S, u"[|]="_S, u"(+)="_S, u"!in "_S})});
+Array<Array<String>> binary_operators = create_array({empty_list_of_str, create_array<String>({String(u"+"_S), u"-"_S, u"*"_S, u"/"_S, u"%"_S, u"^"_S, u"&"_S, u"|"_S, u"<"_S, u">"_S, u"="_S, u"?"_S}), create_array({u"<<"_S, u">>"_S, u"<="_S, u">="_S, u"=="_S, u"!="_S, u"+="_S, u"-="_S, u"*="_S, u"/="_S, u"%="_S, u"&="_S, u"|="_S, u"^="_S, u"->"_S, u".."_S, u".<"_S, u".+"_S, u"<."_S, u"I/"_S, u"Ц/"_S, u"C "_S, u"С "_S}), create_array({u"<<="_S, u">>="_S, u"‘’="_S, u"[+]"_S, u"[&]"_S, u"[|]"_S, u"(+)"_S, u"<.<"_S, u"I/="_S, u"Ц/="_S, u"in "_S, u"!C "_S, u"!С "_S}), create_array({u"[+]="_S, u"[&]="_S, u"[|]="_S, u"(+)="_S, u"!in "_S})});
 Array<Array<String>> unary_operators = create_array({empty_list_of_str, create_array({String(u"!"_S)}), create_array({u"++"_S, u"--"_S}), create_array({u"(-)"_S})});
 auto sorted_operators = sorted(_get<1>(binary_operators) + _get<2>(binary_operators) + _get<3>(binary_operators) + _get<4>(binary_operators) + _get<1>(unary_operators) + _get<2>(unary_operators) + _get<3>(unary_operators), [](const auto &x){return x.len();}, true);
 
@@ -81,8 +81,8 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        _get<1>(binary_operators).remove(u"-"_S);
         _get<1>(binary_operators).remove(u"^"_S);
+        _get<2>(binary_operators).remove(u".."_S);
     }
 } code_block_2;
 
@@ -152,7 +152,6 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
     auto i = 0;
     auto begin_of_line = true;
     bool indentation_tabs;
-    int prev_indentation_level;
     int prev_linestart;
 
     auto skip_multiline_comment = [&comments, &i, &source]()
@@ -231,7 +230,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                 continue;
             }
 
-            if (((in(source[i], _get<1>(tokenizer::binary_operators)) || in(source[range_el(i, i + 2)], _get<2>(tokenizer::binary_operators)) || in(source[range_el(i, i + 3)], _get<3>(tokenizer::binary_operators)) || in(source[range_el(i, i + 4)], _get<4>(tokenizer::binary_operators))) && !(in(source[i], _get<1>(tokenizer::unary_operators)) || in(source[range_el(i, i + 2)], _get<2>(tokenizer::unary_operators)) || in(source[range_el(i, i + 3)], _get<3>(tokenizer::unary_operators))) && (source[i] != u'&' || source[range_el(i + 1, i + 2)] == u' '))) {
+            if (((in(source[i], _get<1>(tokenizer::binary_operators)) || in(source[range_el(i, i + 2)], _get<2>(tokenizer::binary_operators)) || in(source[range_el(i, i + 3)], _get<3>(tokenizer::binary_operators)) || in(source[range_el(i, i + 4)], _get<4>(tokenizer::binary_operators))) && !(in(source[i], _get<1>(tokenizer::unary_operators)) || in(source[range_el(i, i + 2)], _get<2>(tokenizer::unary_operators)) || in(source[range_el(i, i + 3)], _get<3>(tokenizer::unary_operators))) && (!in(source[i], make_tuple(u"&"_S, u"-"_S)) || source[range_el(i + 1, i + 2)] == u' '))) {
                 if (tokens.empty())
                     throw Error(u"source can not starts with a binary operator"_S, i);
                 if (line_continuations != nullptr)
@@ -258,14 +257,15 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                 indentation_tabs = tabs;
             }
             else {
-                if (indentation_level > 0 && indentation_levels.len() && prev_indentation_level > 0 && indentation_tabs != tabs) {
+                auto prev_indentation_level = !indentation_levels.empty() ? _get<0>(indentation_levels.last()) : 0;
+
+                if (indentation_level > 0 && prev_indentation_level > 0 && indentation_tabs != tabs) {
                     auto e = i + 1;
                     while (e < source.len() && !in(source[e], u"\r\n"_S))
                         e++;
                     throw Error(u"inconsistent indentations:\n```\n"_S + prev_indentation_level * (indentation_tabs ? u"TAB"_S : u"S"_S) + source[range_el(prev_linestart, linestart)] + (ii - linestart) * (tabs ? u"TAB"_S : u"S"_S) + source[range_el(ii, e)] + u"\n```"_S, ii);
                 }
                 prev_linestart = ii;
-                prev_indentation_level = !indentation_levels.empty() ? _get<0>(indentation_levels.last()) : 0;
 
                 if (indentation_level == prev_indentation_level) {
                     if (tokens.len() && tokens.last().category != decltype(tokens.last().category)::SCOPE_END)
@@ -293,7 +293,6 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                         if (level < indentation_level)
                             throw Error(u"unindent does not match any outer indentation level"_S, ii);
                     }
-                prev_indentation_level = indentation_level;
             }
         }
         auto ch = source[i];
@@ -381,8 +380,11 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                 }
 
                 else if (in(source[range_el(lexem_start, i)], tokenizer::keywords)) {
-                    if (in(source[range_el(lexem_start, i)], make_tuple(u"V"_S, u"П"_S, u"var"_S, u"перем"_S)))
+                    if (in(source[range_el(lexem_start, i)], make_tuple(u"V"_S, u"П"_S, u"var"_S, u"перем"_S))) {
                         category = decltype(category)::NAME;
+                        if (source[range_el(i, i + 1)] == u'&')
+                            i++;
+                    }
                     else if (in(source[range_el(lexem_start, i)], make_tuple(u"N"_S, u"Н"_S, u"null"_S, u"нуль"_S)))
                         category = decltype(category)::CONSTANT;
                     else {
@@ -477,7 +479,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                     }
                     else {
                         while (i < source.len() && (in(source[i], range_ee(u'0'_C, u'9'_C)) || in(source[i], u"'.eE"_S))) {
-                            if (in(source[range_el(i, i + 2)], make_tuple(u".."_S, u".<"_S)))
+                            if (in(source[range_el(i, i + 2)], make_tuple(u".."_S, u".<"_S, u".+"_S)))
                                 break;
                             if (in(source[i], u"eE"_S)) {
                                 if (in(source[range_el(i + 1, i + 2)], u"-+"_S))
@@ -485,7 +487,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                             }
                             i++;
                         }
-                        if (in(source[range_el(i, i + 1)], make_tuple(u"o"_S, u"о"_S, u"b"_S, u"д"_S)))
+                        if (in(source[range_el(i, i + 1)], make_tuple(u"o"_S, u"о"_S, u"b"_S, u"д"_S, u"s"_S, u"i"_S)))
                             i++;
                         else if (in(u'\''_C, source[range_el(lexem_start, i)]) && !(in(u'.'_C, source[range_el(lexem_start, i)]))) {
                             auto number = source[range_el(lexem_start, i)].replace(u"'"_S, u""_S);
@@ -605,8 +607,14 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                 category = decltype(category)::DELIMITER;
 
             else if (in(ch, u"(["_S)) {
-                nesting_elements.append(make_tuple(ch, lexem_start));
-                category = decltype(category)::DELIMITER;
+                if (source[range_el(lexem_start, lexem_start + 3)] == u"(.)") {
+                    i += 2;
+                    category = decltype(category)::NAME;
+                }
+                else {
+                    nesting_elements.append(make_tuple(ch, lexem_start));
+                    category = decltype(category)::DELIMITER;
+                }
             }
             else if (in(ch, u"])"_S)) {
                 if (nesting_elements.empty() || _get<0>(nesting_elements.last()) != ([&](const auto &a){return a == u']' ? u'['_C : a == u')' ? u'('_C : throw KeyError(a);}(ch)))

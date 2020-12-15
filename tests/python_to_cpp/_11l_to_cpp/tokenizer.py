@@ -77,11 +77,11 @@ keywords = ['V',     'C',  'I',    'E',     'F',  'L',    'N',    'R',       'S'
 # new_scope_keywords = ['else', 'fn', 'if', 'loop', 'switch', 'type']
 # Решил отказаться от учёта new_scope_keywords на уровне лексического анализатора из-за loop.break и case в switch
 empty_list_of_str : List[str] = []
-binary_operators : List[List[str]] = [empty_list_of_str, [str('+'), '-', '*', '/', '%', '^', '&', '|', '<', '>', '=', '?'], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '->', '..', '.<', '<.', 'I/', 'Ц/', 'C ', 'С '], ['<<=', '>>=', '‘’=', '[+]', '[&]', '[|]', '(+)', '<.<', 'I/=', 'Ц/=', 'in ', '!C ', '!С '], ['[+]=', '[&]=', '[|]=', '(+)=', '!in ']]
+binary_operators : List[List[str]] = [empty_list_of_str, [str('+'), '-', '*', '/', '%', '^', '&', '|', '<', '>', '=', '?'], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '->', '..', '.<', '.+', '<.', 'I/', 'Ц/', 'C ', 'С '], ['<<=', '>>=', '‘’=', '[+]', '[&]', '[|]', '(+)', '<.<', 'I/=', 'Ц/=', 'in ', '!C ', '!С '], ['[+]=', '[&]=', '[|]=', '(+)=', '!in ']]
 unary_operators  : List[List[str]] = [empty_list_of_str, [str('!')], ['++', '--'], ['(-)']]
 sorted_operators = sorted(binary_operators[1] + binary_operators[2] + binary_operators[3] + binary_operators[4] + unary_operators[1] + unary_operators[2] + unary_operators[3], key = lambda x: len(x), reverse = True)
-binary_operators[1].remove('-') # Решил просто не считать `-` за бинарный оператор в контексте автоматического склеивания строк, так как `-` к тому же ещё и квалификатор константности
 binary_operators[1].remove('^') # for `^L.break` support
+binary_operators[2].remove('..') # for `L(n) 1..`
 
 
 class Error(Exception):
@@ -95,7 +95,7 @@ class Error(Exception):
         self.end = pos
 
 class Token:
-    class Category(IntEnum):
+    class Category(IntEnum): # why ‘Category’: >[https://docs.python.org/3/reference/lexical_analysis.html#other-tokens]:‘the following categories of tokens exist’
         NAME = 0 # or IDENTIFIER
         KEYWORD = 1
         CONSTANT = 2
@@ -133,7 +133,6 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
     i = 0
     begin_of_line = True
     indentation_tabs : bool
-    prev_indentation_level : int
     prev_linestart : int
 
     def skip_multiline_comment():
@@ -222,7 +221,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
               and not (source[i    ] in unary_operators[1]  # Rude fix for:
                     or source[i:i+2] in unary_operators[2]  # a=b
                     or source[i:i+3] in unary_operators[3]) # ++i // Plus symbol at the beginning here should not be treated as binary + operator, so there is no implied line joining
-              and (source[i] != '&' or source[i+1:i+2] == ' ')): # Символ `&` обрабатывается по-особенному — склеивание строк происходит только если после него стоит пробел
+              and (source[i] not in ('&', '-') or source[i+1:i+2] == ' ')): # Символы `&` и `-` обрабатываются по-особенному — склеивание строк происходит только если после одного из этих символов стоит пробел
                 if len(tokens) == 0:
                     raise Error('source can not starts with a binary operator', i)
                 if line_continuations is not None:
@@ -231,7 +230,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
 
             if source[i:i+2] == R'\.': # // Support for constructions like: ||| You need just to add `\` at the each line starting from dot:
                 if len(tokens):        # \\ result = abc.method1()          ||| result = abc.method1()
-                    i += 1             # \\     .method2()                  |||     \.method2()
+                    i += 1             # \\             .method2()          |||            \.method2()
                #else: # with `if len(tokens): i += 1` there is no need for this else branch
                #    raise Error('unexpected character `\`')
                     if line_continuations is not None:
@@ -245,18 +244,17 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
             indentation_level = ii - linestart
             if len(indentation_levels) and indentation_levels[-1][0] == -1: # сразу после символа `{` идёт новый произвольный отступ (понижение уровня отступа может быть полезно, если вдруг отступ оказался слишком большой), который действует вплоть до парного символа `}`
                 indentation_levels[-1] = (indentation_level, indentation_levels[-1][1]) #indentation_levels[-1][0] = indentation_level # || maybe this is unnecessary (actually it is necessary, see test "fn f()\n{\na = 1") // }
-                # // This is uncertain piece of code:
                 indentation_tabs = tabs
             else:
-                if indentation_level > 0 and len(indentation_levels) and prev_indentation_level > 0 and indentation_tabs != tabs:
+                prev_indentation_level = indentation_levels[-1][0] if len(indentation_levels) else 0
+
+                if indentation_level > 0 and prev_indentation_level > 0 and indentation_tabs != tabs:
                     e = i + 1
                     while e < len(source) and source[e] not in "\r\n":
                         e += 1
                     raise Error("inconsistent indentations:\n```\n" + prev_indentation_level*('TAB' if indentation_tabs else 'S') + source[prev_linestart:linestart]
                         + (ii-linestart)*('TAB' if tabs else 'S') + source[ii:e] + "\n```", ii)
                 prev_linestart = ii
-
-                prev_indentation_level = indentation_levels[-1][0] if len(indentation_levels) else 0
 
                 if indentation_level == prev_indentation_level: # [1:] [-1]:‘If it is equal, nothing happens.’ :)(: [:2]
                     if len(tokens) and tokens[-1].category != Token.Category.SCOPE_END:
@@ -281,8 +279,6 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                             break
                         if level < indentation_level:
                             raise Error('unindent does not match any outer indentation level', ii)
-
-                prev_indentation_level = indentation_level
 
         ch = source[i]
 
@@ -368,6 +364,8 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                 elif source[lexem_start:i] in keywords:
                     if source[lexem_start:i] in ('V', 'П', 'var', 'перем'): # it is more convenient to consider V/var as [type] name, not a keyword
                         category = Token.Category.NAME
+                        if source[i:i+1] == '&':
+                            i += 1
                     elif source[lexem_start:i] in ('N', 'Н', 'null', 'нуль'):
                         category = Token.Category.CONSTANT
                     else:
@@ -445,13 +443,13 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                                 raise Error('after this digit separator there should be 4 digits in hexadecimal number', source.rfind("'", 0, i))
                     else:
                         while i < len(source) and ('0' <= source[i] <= '9' or source[i] in "'.eE"):
-                            if source[i:i+2] in ('..', '.<'):
+                            if source[i:i+2] in ('..', '.<', '.+'):
                                 break
                             if source[i] in 'eE':
                                 if source[i+1:i+2] in '-+':
                                     i += 1
                             i += 1
-                        if source[i:i+1] in ('o', 'о', 'b', 'д'):
+                        if source[i:i+1] in ('o', 'о', 'b', 'д', 's', 'i'):
                             i += 1
                         elif "'" in source[lexem_start:i] and not '.' in source[lexem_start:i]: # float numbers do not checked for a while
                             number = source[lexem_start:i].replace("'", '')
@@ -557,8 +555,12 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                 category = Token.Category.DELIMITER
 
             elif ch in '([':
-                nesting_elements.append((ch, lexem_start))
-                category = Token.Category.DELIMITER
+                if source[lexem_start:lexem_start+3] == '(.)':
+                    i += 2
+                    category = Token.Category.NAME
+                else:
+                    nesting_elements.append((ch, lexem_start))
+                    category = Token.Category.DELIMITER
             elif ch in '])': # ([
                 if len(nesting_elements) == 0 or nesting_elements[-1][0] != {']':'[', ')':'('}[ch]: # ])
                     raise Error('there is no corresponding opening parenthesis/bracket for `' + ch + '`', lexem_start)
