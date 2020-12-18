@@ -2712,3 +2712,19 @@ struct CodeBlock1
         print(max_with_key(create_array({u"a"_S, u"bc"_S}), [](const auto &x){return x.len();}));
     }
 } code_block_1;
+
+
+print({i: i + 1 for i in [1, 2, 3]})
+print({v: j for j, v in enumerate([1, 2, 3])})
+===
+print(Dict([1, 2, 3], i -> (i, i + 1)))
+print(Dict(enumerate([1, 2, 3]), (j, v) -> (v, j)))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(create_dict(create_array({1, 2, 3}), [](const auto &i){return make_tuple(i, i + 1);}));
+        print(create_dict(enumerate(create_array({1, 2, 3})), [](const auto &j, const auto &v){return make_tuple(v, j);}));
+    }
+} code_block_1;
