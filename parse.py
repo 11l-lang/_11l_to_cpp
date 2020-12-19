@@ -1370,6 +1370,7 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
     is_loop_variable_a_reference = False
     copy_loop_variable = False
     break_label_needed = -1
+    has_continue = False
     has_L_index = False
     has_L_last_iteration = False
     has_L_remove_current_element_and_continue = False
@@ -1435,7 +1436,10 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
             rr = self.children_to_str(indent, tr, False)
 
         if self.has_L_index and not (self.loop_variable is None and self.expression is not None and self.expression.token.category == Token.Category.NUMERIC_LITERAL):
-            r += ' ' * (indent*4) + "{int Lindex = 0;\n" + rr[:-indent*4-2] + ' ' * ((indent+1)*4) + "Lindex++;\n" + ' ' * (indent*4) + "}}\n"
+            if self.has_continue:
+                brace_pos = int(rr[0] == "\n") + indent*4 + len(tr) + 1
+                rr = rr[:brace_pos+1] + rr[brace_pos:] # {
+            r += ' ' * (indent*4) + "{int Lindex = 0;\n" + rr[:-indent*4-2] + "} on_continue:\n"*self.has_continue + ' ' * ((indent+1)*4) + "Lindex++;\n" + ' ' * (indent*4) + "}}\n"
         else:
             r += rr
 
@@ -1453,8 +1457,18 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
         if self.expression is not None: f(self.expression)
 
 class ASTContinue(ASTNode):
+    token : Token
+
     def to_str(self, indent):
-        return ' ' * (indent*4) + "continue;\n"
+        n = self.parent
+        while True:
+            if type(n) == ASTLoop:
+                n.has_continue = True
+                break
+            n = n.parent
+            if n is None:
+                raise Error('loop corresponding to this statement is not found', self.token)
+        return ' ' * (indent*4) + 'goto on_'*n.has_L_index + "continue;\n"
 
 break_label_index = -1
 
@@ -2577,6 +2591,7 @@ def parse_internal(this_node):
 
             elif token.value(source) in ('L.continue', 'Ц.продолжить', 'loop.continue', 'цикл.продолжить'):
                 node = ASTContinue()
+                node.token = token
                 next_token()
                 if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
                     next_token()

@@ -2728,3 +2728,31 @@ struct CodeBlock1
         print(create_dict(enumerate(create_array({1, 2, 3})), [](const auto &j, const auto &v){return make_tuple(v, j);}));
     }
 } code_block_1;
+
+
+for i, a in enumerate([1, 2, 3, 4, 5]):
+    if a % 2 == 0:
+        continue
+    print(i, a)
+===
+L(a) [1, 2, 3, 4, 5]
+   V i = L.index
+   I a % 2 == 0
+      L.continue
+   print(i‘ ’a)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {int Lindex = 0;
+        for (auto &&a : create_array({1, 2, 3, 4, 5})) {{
+            auto i = Lindex;
+            if (mod(a, 2) == 0)
+                goto on_continue;
+            print(i + u" "_S + a);
+} on_continue:
+            Lindex++;
+        }}
+    }
+} code_block_1;
