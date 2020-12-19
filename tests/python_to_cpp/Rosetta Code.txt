@@ -2042,7 +2042,6 @@ def gen(n):
 def is_balanced(s):
     nesting_level = 0
     for c in s:
-        c = c
         if c == '[':
             nesting_level += 1
         elif c == ']':
@@ -2065,12 +2064,12 @@ F gen(n)
 F is_balanced(s)
    V nesting_level = 0
    L(c) s
-      S c
-         ‘[’
-            nesting_level++
-         ‘]’
-            I --nesting_level < 0
-               R 0B
+      I c == ‘[’
+         nesting_level++
+      E I c == ‘]’
+         nesting_level--
+         I nesting_level < 0
+            R 0B
    R 1B
 
 L(n) 10
@@ -2088,15 +2087,12 @@ template <typename T1> auto is_balanced(const T1 &s)
 {
     auto nesting_level = 0;
     for (auto &&c : s)
-        switch (c)
-        {
-        case u'[':
+        if (c == u'[')
             nesting_level++;
-            break;
-        case u']':
-            if (--nesting_level < 0)
+        else if (c == u']') {
+            nesting_level--;
+            if (nesting_level < 0)
                 return false;
-            break;
         }
     return true;
 }
