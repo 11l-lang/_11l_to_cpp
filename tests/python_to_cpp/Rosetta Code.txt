@@ -7982,3 +7982,119 @@ struct CodeBlock1
         print(l.len());
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Law_of_cosines_-_triples#Python
+import math
+
+n = 13
+
+def method1(n):
+    squares = [x**2 for x in range(0, n+1)]
+    sqrset = set(squares)
+    tri90  = set() # Tuple[int, int, int]
+    tri60  = set() # Tuple[int, int, int]
+    tri120 = set() # Tuple[int, int, int]
+    for a in range(1, n+1):
+        a2 = squares[a]
+        for b in range(1, a + 1):
+            b2 = squares[b]
+            c2 = a2 + b2
+            if c2 in sqrset:
+                tri90.add(tuple(sorted((a, b, int(math.sqrt(c2))))))
+            ab = a * b
+            c2 -= ab
+            if c2 in sqrset:
+                tri60.add(tuple(sorted((a, b, int(math.sqrt(c2))))))
+            c2 += 2 * ab
+            if c2 in sqrset:
+                tri120.add(tuple(sorted((a, b, int(math.sqrt(c2))))))
+    return [sorted(list(tri90)),
+            sorted(list(tri60)),
+            sorted(list(tri120))]
+
+print('Integer triangular triples for sides 1..%d:' % n)
+for angle, triples in zip([90, 60, 120], method1(n)):
+    print('  %3d° has %d solutions:\n    %s' % (angle, len(triples), triples))
+t60 = method1(10_000)[1]
+notsame = sum(1 for a, b, c in t60 if a != b or b != c)
+print('Extra credit:', notsame)
+===
+//import math
+V n = 13
+
+F method1(n)
+   V squares = (0 .. n).map(x -> x ^ 2)
+   V sqrset = Set(squares)
+   V tri90 = Set[(Int, Int, Int)]()
+   V tri60 = Set[(Int, Int, Int)]()
+   V tri120 = Set[(Int, Int, Int)]()
+   L(a) 1 .. n
+      V a2 = squares[a]
+      L(b) 1 .. a
+         V b2 = squares[b]
+         V c2 = a2 + b2
+         I c2 C sqrset
+            tri90.add(tuple_sorted((a, b, Int(sqrt(c2)))))
+         V ab = a * b
+         c2 -= ab
+         I c2 C sqrset
+            tri60.add(tuple_sorted((a, b, Int(sqrt(c2)))))
+         c2 += 2 * ab
+         I c2 C sqrset
+            tri120.add(tuple_sorted((a, b, Int(sqrt(c2)))))
+   R [sorted(Array(tri90)), sorted(Array(tri60)), sorted(Array(tri120))]
+print(‘Integer triangular triples for sides 1..#.:’.format(n))
+L(angle, triples) zip([90, 60, 120], method1(n))
+   print("  #3° has #. solutions:\n    #.".format(angle, triples.len, triples))
+V t60 = method1(10'000)[1]
+V notsame = sum(t60.filter((a, b, c) -> a != b | b != c).map((a, b, c) -> 1))
+print(‘Extra credit: ’notsame)
+===
+auto n = 13;
+
+template <typename T1> auto method1(const T1 &n)
+{
+    auto squares = range_ee(0, n).map([](const auto &x){return square(x);});
+    auto sqrset = create_set(squares);
+    auto tri90 = Set<ivec3>();
+    auto tri60 = Set<ivec3>();
+    auto tri120 = Set<ivec3>();
+    for (auto a : range_ee(1, n)) {
+        auto a2 = squares[a];
+        for (auto b : range_ee(1, a)) {
+            auto b2 = squares[b];
+            auto c2 = a2 + b2;
+            if (in(c2, sqrset))
+                tri90.add(tuple_sorted(make_tuple(a, b, to_int(sqrt(c2)))));
+            auto ab = a * b;
+            c2 -= ab;
+            if (in(c2, sqrset))
+                tri60.add(tuple_sorted(make_tuple(a, b, to_int(sqrt(c2)))));
+            c2 += 2 * ab;
+            if (in(c2, sqrset))
+                tri120.add(tuple_sorted(make_tuple(a, b, to_int(sqrt(c2)))));
+        }
+    }
+    return create_array({sorted(create_array(tri90)), sorted(create_array(tri60)), sorted(create_array(tri120))});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Integer triangular triples for sides 1..#.:"_S.format(n));
+        for (auto &&[angle, triples] : zip(create_array({90, 60, 120}), method1(n)))
+            print(u"  #3° has #. solutions:\n    #."_S.format(angle, triples.len(), triples));
+    }
+} code_block_1;
+auto t60 = _get<1>(method1(10'000));
+auto notsame = sum_map(t60.filter([](const auto &a, const auto &b, const auto &c){return a != b || b != c;}), [](const auto &a, const auto &b, const auto &c){return 1;});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"Extra credit: "_S + notsame);
+    }
+} code_block_2;

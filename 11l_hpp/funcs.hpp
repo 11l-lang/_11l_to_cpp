@@ -22,6 +22,13 @@ namespace std {
 template <size_t i, typename Ty, int N> Ty& get(Tvec<Ty, N> &v) { return v[i]; }
 template <size_t i, typename Ty, int N> const Ty get(const Tvec<Ty, N> &v) { return v[i]; }
 
+template <typename Type, int dimension> inline const Tvec<Type, dimension> tuple_sorted(const Tvec<Type, dimension> &v)
+{
+	Tvec<Type, dimension> r = v;
+	std::sort(&r[0], &r[0] + dimension);
+	return r;
+}
+
 namespace math
 {
 	static const double pi = M_PI;
