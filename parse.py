@@ -2210,7 +2210,7 @@ def parse_internal(this_node):
         next_token()
         if token.category != Token.Category.NAME:
             raise Error('expected ' + what_name, token)
-        token_value = token.value(source)
+        token_value = tokensn.token_str()
         next_token()
         return token_value
 

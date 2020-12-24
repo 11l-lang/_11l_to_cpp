@@ -8098,3 +8098,54 @@ struct CodeBlock2
         print(u"Extra credit: "_S + notsame);
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Letter_frequency#Python
+import sys, collections
+
+def countletters(s):
+    results = collections.defaultdict(int) # Char
+    for char in s:
+        c = char.lower()
+        if 'a' <= c <= 'z':
+            results[c] += 1
+    return results
+
+if __name__ == '__main__':
+  for letter, count in countletters(open(sys.argv[1]).read()).items():
+      print("%s=%s" % (letter, count))
+===
+//import sys, collections
+
+F countletters(s)
+   V results = DefaultDict[Char, Int]()
+   L(char) s
+      V c = char.lowercase()
+      I c C ‘a’..‘z’
+         results[c]++
+   R results
+
+:start:
+L(letter, count) countletters(File(:argv[1]).read())
+   print(‘#.=#.’.format(letter, count))
+===
+Array<String> argv;
+
+template <typename T1> auto countletters(const T1 &s)
+{
+    auto results = DefaultDict<Char, int>();
+    for (auto &&_char_ : s) {
+        auto c = _char_.lowercase();
+        if (in(c, range_ee(u'a'_C, u'z'_C)))
+            results[c]++;
+    }
+    return results;
+}
+
+int MAIN_WITH_ARGV()
+{
+    INIT_ARGV();
+
+    for (auto &&[letter, count] : countletters(File(_get<1>(::argv)).read()))
+        print(u"#.=#."_S.format(letter, count));
+}
