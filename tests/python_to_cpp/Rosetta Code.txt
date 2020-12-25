@@ -8149,3 +8149,115 @@ int MAIN_WITH_ARGV()
     for (auto &&[letter, count] : countletters(File(_get<1>(::argv)).read()))
         print(u"#.=#."_S.format(letter, count));
 }
+
+
+# https://www.rosettacode.org/wiki/Long_multiplication#Python
+from typing import List
+Char = str
+
+def add_with_carry(result : List[Char], addend, addendpos):
+    while True:
+        while len(result) < addendpos + 1:
+            result.append('0')
+        addend_result = str(int(addend) + int(result[addendpos]))
+        addend_digits = list(addend_result)
+        result[addendpos] = addend_digits.pop()
+
+        if len(addend_digits) == 0:
+            break
+        addend = addend_digits.pop()
+        addendpos += 1
+
+def longhand_multiplication(multiplicand, multiplier):
+    result : List[Char] = []
+    for multiplicand_offset, multiplicand_digit in enumerate(reversed(multiplicand)):
+        for multiplier_offset, multiplier_digit in enumerate(reversed(multiplier), start=multiplicand_offset):
+            multiplication_result = str(int(multiplicand_digit) * int(multiplier_digit))
+
+            for addend_offset, result_digit_addend in enumerate(reversed(multiplication_result), start=multiplier_offset):
+                add_with_carry(result, result_digit_addend, addend_offset)
+
+    result.reverse()
+    return ''.join(result)
+
+sixtyfour = "18446744073709551616"
+print(longhand_multiplication(sixtyfour, sixtyfour))
+===
+
+F add_with_carry([Char] &result; =addend, =addendpos)
+   L
+      L result.len < addendpos + 1
+         result.append(‘0’)
+      V addend_result = String(Int(addend) + Int(result[addendpos]))
+      V addend_digits = Array(addend_result)
+      result[addendpos] = addend_digits.pop()
+
+      I addend_digits.empty
+         L.break
+      addend = addend_digits.pop()
+      addendpos++
+
+F longhand_multiplication(multiplicand, multiplier)
+   [Char] result
+   L(multiplicand_digit) reversed(multiplicand)
+      V multiplicand_offset = L.index
+      L(multiplier_digit) reversed(multiplier)
+         V multiplier_offset = L.index + multiplicand_offset
+         V multiplication_result = String(Int(multiplicand_digit) * Int(multiplier_digit))
+
+         L(result_digit_addend) reversed(multiplication_result)
+            V addend_offset = L.index + multiplier_offset
+            add_with_carry(&result, result_digit_addend, addend_offset)
+   result.reverse()
+   R result.join(‘’)
+V sixtyfour = ‘18446744073709551616’
+print(longhand_multiplication(sixtyfour, sixtyfour))
+===
+template <typename T2, typename T3> auto add_with_carry(Array<Char> &result, T2 addend, T3 addendpos)
+{
+    while (true) {
+        while (result.len() < addendpos + 1)
+            result.append(u"0"_S);
+        auto addend_result = String(to_int(addend) + to_int(result[addendpos]));
+        auto addend_digits = create_array(addend_result);
+        result.set(addendpos, addend_digits.pop());
+        if (addend_digits.empty())
+            break;
+        addend = addend_digits.pop();
+        addendpos++;
+    }
+}
+
+template <typename T1, typename T2> auto longhand_multiplication(const T1 &multiplicand, const T2 &multiplier)
+{
+    Array<Char> result;
+    {int Lindex = 0;
+    for (auto &&multiplicand_digit : reversed(multiplicand)) {
+        auto multiplicand_offset = Lindex;
+        {int Lindex = 0;
+        for (auto &&multiplier_digit : reversed(multiplier)) {
+            auto multiplier_offset = Lindex + multiplicand_offset;
+            auto multiplication_result = String(to_int(multiplicand_digit) * to_int(multiplier_digit));
+            {int Lindex = 0;
+
+            for (auto &&result_digit_addend : reversed(multiplication_result)) {
+                auto addend_offset = Lindex + multiplier_offset;
+                add_with_carry(result, result_digit_addend, addend_offset);
+                Lindex++;
+            }}
+            Lindex++;
+        }}
+        Lindex++;
+    }}
+    result.reverse();
+    return result.join(u""_S);
+}
+auto sixtyfour = u"18446744073709551616"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(longhand_multiplication(sixtyfour, sixtyfour));
+    }
+} code_block_1;
