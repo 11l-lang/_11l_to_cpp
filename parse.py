@@ -317,7 +317,8 @@ class SymbolNode:
             if tid is not None and len(tid.ast_nodes) and isinstance(tid.ast_nodes[0], ASTVariableDeclaration) and tid.ast_nodes[0].is_ptr and tid.ast_nodes[0].nullable:
                 if self.parent is None or (not (self.parent.symbol.id in ('==', '!=') and self.parent.children[1].token_str() in ('N', 'Н', 'null', 'нуль'))
                                        and not (self.parent.symbol.id == '.')
-                                       and not (self.parent.symbol.id == '?')):
+                                       and not (self.parent.symbol.id == '?')
+                                       and not (self.parent.symbol.id == '=' and self is self.parent.children[0])):
                     return '*' + self.token_str()
 
             return self.token_str().lstrip('@').replace(':', '::')

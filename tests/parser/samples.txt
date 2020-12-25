@@ -1243,3 +1243,19 @@ auto some_variable = 2 - 3;
 ===
 const auto one = 1;
 const auto [x, y] = bind_array<2>(input().split(u" "_S).map([](const auto &x){return to_int(x);}));
+
+
+V? i = ‘str’.find(‘s’)
+Int j
+j = i
+===
+auto i = u"str"_S.find(u"s"_S);
+int j;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        j = *i;
+    }
+} code_block_1;
