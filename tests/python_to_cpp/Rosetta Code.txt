@@ -8261,3 +8261,78 @@ struct CodeBlock1
         print(longhand_multiplication(sixtyfour, sixtyfour));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Look-and-say_sequence#Python
+def lookandsay(number):
+    result = ""
+
+    repeat = number[0]
+    number = number[1:]+" "
+    times = 1
+
+    for actual in number:
+        if actual != repeat:
+            result += str(times)+repeat
+            times = 1
+            repeat = actual
+        else:
+            times += 1
+
+    return result
+
+num = "1"
+
+for i in range(10):
+    print(num)
+    num = lookandsay(num)
+===
+F lookandsay(=number)
+   V result = ‘’
+   V repeat = number[0]
+   number = number[1..]‘ ’
+   V times = 1
+
+   L(actual) number
+      I actual != repeat
+         result ‘’= String(times)‘’repeat
+         times = 1
+         repeat = actual
+      E
+         times++
+   R result
+V num = ‘1’
+
+L(i) 10
+   print(num)
+   num = lookandsay(num)
+===
+template <typename T1> auto lookandsay(T1 number)
+{
+    auto result = u""_S;
+    auto repeat = _get<0>(number);
+    number = number[range_ei(1)] + u" "_S;
+    auto times = 1;
+    for (auto &&actual : number)
+        if (actual != repeat) {
+            result += String(times) + repeat;
+            times = 1;
+            repeat = actual;
+        }
+        else
+            times++;
+    return result;
+}
+auto num = u"1"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (int i = 0; i < 10; i++) {
+            print(num);
+            num = lookandsay(num);
+        }
+    }
+} code_block_1;
