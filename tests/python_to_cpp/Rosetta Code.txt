@@ -8336,3 +8336,170 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Lychrel_numbers#Python
+def reverse_int(num):
+    return int(str(num)[::-1])
+
+def move(obj):
+    return obj
+
+def add_reverse(num, max_iter=1000):
+    (i, nums) = (0, {num})
+    while True:
+        (i, num) = (i+1, num + reverse_int(num))
+        nums.add(num)
+        if reverse_int(num) == num or i >= max_iter:
+            break
+    return move(nums)
+
+def ref(obj):
+    return obj
+
+def split_roots_from_relateds(roots_and_relateds):
+    roots = roots_and_relateds[:]
+    i = 1
+    while i < len(roots):
+        this = ref(roots[i])
+        if any(len(this.intersection(prev)) != 0 for prev in roots[:i]):
+            roots.pop(i)
+        else:
+            i += 1
+    root = [min(each_set) for each_set in roots]
+    related = [min(each_set) for each_set in roots_and_relateds]
+    related = [n for n in related if n not in root]
+    return (root, related)
+
+def find_lychrel(maxn, max_reversions):
+    'Lychrel number generator'
+    series = [add_reverse(n, max_reversions*2) for n in range(1, maxn + 1)]
+    roots_and_relateds = [s for s in series if len(s) > max_reversions]
+    return split_roots_from_relateds(roots_and_relateds)
+
+maxn = 10000
+reversion_limit = 500
+print("Calculations using n = 1..%i and limiting each search to 2*%i reverse-digits-and-adds"
+      % (maxn, reversion_limit))
+(lychrel, l_related) = find_lychrel(maxn, reversion_limit)
+print('  Number of Lychrel numbers:', len(lychrel))
+print('    Lychrel numbers:', ', '.join(str(n) for n in lychrel))
+print('  Number of Lychrel related:', len(l_related))
+pals = [x for x in lychrel + l_related  if x == reverse_int(x)]
+print('  Number of Lychrel palindromes:', len(pals))
+print('    Lychrel palindromes:', ', '.join(str(n) for n in pals))
+===
+F reverse_int(num)
+   R Int(reversed(String(num)))
+
+F add_reverse(=num, max_iter = 1000)
+   V (i, nums) = (0, Set([num]))
+   L
+      (i, num) = (i + 1, num + reverse_int(num))
+      nums.add(num)
+      I reverse_int(num) == num | i >= max_iter
+         L.break
+   R move(nums)
+
+F split_roots_from_relateds(roots_and_relateds)
+   V roots = copy(roots_and_relateds)
+   V i = 1
+   L i < roots.len
+      V& this = roots[i]
+      I any(roots[0 .< i].map(prev -> !@this.intersection(prev).empty))
+         roots.pop(i)
+      E
+         i++
+   V root = roots.map(each_set -> min(each_set))
+   V related = roots_and_relateds.map(each_set -> min(each_set))
+   related = related.filter(n -> n !C @root)
+   R (root, related)
+
+F find_lychrel(maxn, max_reversions)
+   ‘Lychrel number generator’
+   V series = (1 .. maxn).map(n -> add_reverse(n, @max_reversions * 2))
+   V roots_and_relateds = series.filter(s -> s.len > @max_reversions)
+   R split_roots_from_relateds(roots_and_relateds)
+V maxn = 10000
+V reversion_limit = 500
+print(‘Calculations using n = 1..#. and limiting each search to 2*#. reverse-digits-and-adds’.format(maxn, reversion_limit))
+V (lychrel, l_related) = find_lychrel(maxn, reversion_limit)
+print(‘  Number of Lychrel numbers: ’(lychrel.len))
+print(‘    Lychrel numbers: ’(lychrel.map(n -> String(n)).join(‘, ’)))
+print(‘  Number of Lychrel related: ’(l_related.len))
+V pals = lychrel + l_related.filter(x -> x == reverse_int(x))
+print(‘  Number of Lychrel palindromes: ’(pals.len))
+print(‘    Lychrel palindromes: ’(pals.map(n -> String(n)).join(‘, ’)))
+===
+template <typename T1> auto reverse_int(const T1 &num)
+{
+    return to_int(reversed(String(num)));
+}
+
+template <typename T1, typename T2 = decltype(1000)> auto add_reverse(T1 num, const T2 &max_iter = 1000)
+{
+    auto [i, nums] = make_tuple(0, create_set({num}));
+    while (true) {
+        assign_from_tuple(i, num, make_tuple(i + 1, num + reverse_int(num)));
+        nums.add(num);
+        if (reverse_int(num) == num || i >= max_iter)
+            break;
+    }
+    return std::move(nums);
+}
+
+template <typename T1> auto split_roots_from_relateds(const T1 &roots_and_relateds)
+{
+    auto roots = copy(roots_and_relateds);
+    auto i = 1;
+    while (i < roots.len()) {
+        auto& _this_ = roots[i];
+        if (any(roots[range_el(0, i)].map([&_this_](const auto &prev){return !_this_.intersection(prev).empty();})))
+            roots.pop(i);
+        else
+            i++;
+    }
+    auto root = roots.map([](const auto &each_set){return min(each_set);});
+    auto related = roots_and_relateds.map([](const auto &each_set){return min(each_set);});
+    related = related.filter([&root](const auto &n){return !in(n, root);});
+    return make_tuple(root, related);
+}
+
+template <typename T1, typename T2> auto find_lychrel(const T1 &maxn, const T2 &max_reversions)
+{
+    u"Lychrel number generator"_S;
+    auto series = range_ee(1, maxn).map([&max_reversions](const auto &n){return add_reverse(n, max_reversions * 2);});
+    auto roots_and_relateds = series.filter([&max_reversions](const auto &s){return s.len() > max_reversions;});
+    return split_roots_from_relateds(roots_and_relateds);
+}
+auto maxn = 10000;
+auto reversion_limit = 500;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Calculations using n = 1..#. and limiting each search to 2*#. reverse-digits-and-adds"_S.format(maxn, reversion_limit));
+    }
+} code_block_1;
+auto [lychrel, l_related] = find_lychrel(maxn, reversion_limit);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"  Number of Lychrel numbers: "_S + (lychrel.len()));
+        print(u"    Lychrel numbers: "_S + (lychrel.map([](const auto &n){return String(n);}).join(u", "_S)));
+        print(u"  Number of Lychrel related: "_S + (l_related.len()));
+    }
+} code_block_2;
+auto pals = lychrel + l_related.filter([](const auto &x){return x == reverse_int(x);});
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print(u"  Number of Lychrel palindromes: "_S + (pals.len()));
+        print(u"    Lychrel palindromes: "_S + (pals.map([](const auto &n){return String(n);}).join(u", "_S)));
+    }
+} code_block_3;

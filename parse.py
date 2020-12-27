@@ -767,10 +767,10 @@ class SymbolNode:
                 captured_variables = set()
                 def gather_captured_variables(sn):
                     if sn.token.category == Token.Category.NAME:
-                        if sn.token.value(source).startswith('@'):
+                        if sn.token_str().startswith('@'):
                             by_ref = True # sn.parent.children[0] is sn and ((sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!='))
                                           #                               or (sn.parent.symbol.id == '.' and sn.parent.children[1].token_str() == 'append'))
-                            t = sn.token.value(source)[1:]
+                            t = sn.token_str()[1:]
                             captured_variables.add('this' if t == '' else '&'*by_ref + t)
                         elif sn.token.value(source) == '(.)':
                             captured_variables.add('this')
@@ -1827,7 +1827,10 @@ def next_token(): # why ‘next_token’: >[https://youtu.be/Nlqv6NtBXcA?t=1203]
                 key = '(literal)'
             elif token.category == Token.Category.NAME:
                 key = '(name)'
-                if token.value(source) in cpp_keywords:
+                if token.value(source)[0] == '@':
+                    if token.value(source)[1:] in cpp_keywords:
+                        tokensn.token_str_override = '@_' + token.value(source)[1:] + '_'
+                elif token.value(source) in cpp_keywords:
                     tokensn.token_str_override = '_' + token.value(source) + '_'
             elif token.category == Token.Category.CONSTANT:
                 key = '(constant)'

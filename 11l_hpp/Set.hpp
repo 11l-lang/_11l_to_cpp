@@ -41,6 +41,13 @@ public:
 		return r;
 	}
 
+	Set intersection(const Set &other) const
+	{
+		Set result;
+		std::set_intersection(std::set<KeyType>::begin(), std::set<KeyType>::end(), other.begin(), other.end(), std::inserter(result, result.end()));
+		return result;
+	}
+
 	Nullable<KeyType> lower_bound(const KeyType &key) const
 	{
 		auto it = std::set<KeyType>::lower_bound(key);
@@ -103,4 +110,20 @@ template <typename Type> Array<Type> create_array(const Set<Type> &set)
 template <typename KeyType> inline bool in(const KeyType &key, const Set<KeyType> &set)
 {
 	return set.find(key) != set.end();
+}
+
+template <typename KeyType> KeyType min(const Set<KeyType> &s)
+{
+	KeyType r = *begin(s);
+	for (auto i : s)
+		if (i < r) r = i;
+	return r;
+}
+
+template <typename KeyType> KeyType max(const Set<KeyType> &s)
+{
+	KeyType r = *begin(s);
+	for (auto i : s)
+		if (i > r) r = i;
+	return r;
 }
