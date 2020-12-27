@@ -2052,3 +2052,54 @@ struct CodeBlock1
         print(longest_common_substring(u"thisisatest"_S, u"testing123testing"_S));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Loops/N_plus_one_half
+L(i) 1..10
+   print(i, end' ‘’)
+   I !L.last_iteration
+      print(‘, ’, end' ‘’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {auto &&__range = range_ee(1, 10);
+        for (auto __begin = __range.begin(), __end = __range.end(); __begin != __end;) {
+            auto &&i = *__begin; ++__begin;
+            print(i, u""_S);
+            if (!(__begin == __end))
+                print(u", "_S, u""_S);
+        }}
+    }
+} code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Loops/Nested
+[[Int]] mat
+L 10
+   mat [+]= (1..10).map(x -> random:(1..20))
+
+L(row) mat
+   L(el) row
+      print(el, end' ‘ ’)
+      I el == 20
+         L(row).break
+===
+Array<Array<int>> mat;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int Lindex = 0; Lindex < 10; Lindex++)
+            mat.append(range_ee(1, 10).map([](const auto &x){return randomns::_(range_ee(1, 20));}));
+        for (auto &&row : mat)
+            for (auto &&el : row) {
+                print(el, u" "_S);
+                if (el == 20)
+                    goto break_;
+            }
+        break_:;
+    }
+} code_block_1;

@@ -1,0 +1,1657 @@
+# https://www.rosettacode.org/wiki/Largest_int_from_concatenated_ints#Python
+def maxnum(x):
+    maxlen = len(str(max(x)))
+    return ''.join(sorted((str(v) for v in x),
+                          key=lambda i: i*(maxlen * 2 // len(i)), reverse=True))
+
+for numbers in [[212, 21221], [1, 34, 3, 98, 9, 76, 45, 4], [54, 546, 548, 60]]:
+    print('Numbers: %s\n  Largest integer: %15s' % (numbers, maxnum(numbers)))
+===
+F maxnum(x)
+   V maxlen = String(max(x)).len
+   R sorted((x.map(v -> String(v))), key' i -> i * (@maxlen * 2 I/ i.len), reverse' 1B).join(‘’)
+
+L(numbers) [[212, 21221], [1, 34, 3, 98, 9, 76, 45, 4], [54, 546, 548, 60]]
+   print("Numbers: #.\n  Largest integer: #15".format(numbers, maxnum(numbers)))
+===
+template <typename T1> auto maxnum(const T1 &x)
+{
+    auto maxlen = String(max(x)).len();
+    return sorted((x.map([](const auto &v){return String(v);})), [&maxlen](const auto &i){return i * (idiv(maxlen * 2, i.len()));}, true).join(u""_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&numbers : create_array({create_array({212, 21221}), create_array({1, 34, 3, 98, 9, 76, 45, 4}), create_array({54, 546, 548, 60})}))
+            print(u"Numbers: #.\n  Largest integer: #15"_S.format(numbers, maxnum(numbers)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Largest_number_divisible_by_its_digits#C.2B.2B
+def check_dec(num):
+    st = set() # int
+    for c in str(num):
+        d = int(c)
+        if d == 0 or num % d != 0 or d in st:
+            return False
+        st.add(d)
+    return True
+
+for i in range(98764321, 0, -1):
+    if check_dec(i):
+        print(i)
+        break
+===
+F check_dec(num)
+   V st = Set[Int]()
+   L(c) String(num)
+      V d = Int(c)
+      I d == 0 | num % d != 0 | d C st
+         R 0B
+      st.add(d)
+   R 1B
+
+L(i) (98764321.<0).step(-1)
+   I check_dec(i)
+      print(i)
+      L.break
+===
+template <typename T1> auto check_dec(const T1 &num)
+{
+    auto st = Set<int>();
+    for (auto &&c : String(num)) {
+        auto d = to_int(c);
+        if (d == 0 || mod(num, d) != 0 || in(d, st))
+            return false;
+        st.add(d);
+    }
+    return true;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(98764321, 0).step(-1))
+            if (check_dec(i)) {
+                print(i);
+                break;
+            }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Leap_year#Python
+def is_leap_year(year):
+    if year % 100 == 0:
+        return year % 400 == 0
+    return year % 4 == 0
+===
+F is_leap_year(year)
+   I year % 100 == 0
+      R year % 400 == 0
+   R year % 4 == 0
+===
+template <typename T1> auto is_leap_year(const T1 &year)
+{
+    if (mod(year, 100) == 0)
+        return mod(year, 400) == 0;
+    return mod(year, 4) == 0;
+}
+
+
+# https://www.rosettacode.org/wiki/Least_common_multiple
+def gcd(a, b):
+    while b != 0:
+        (a, b) = (b, a % b)
+    return a
+
+def lcm(m, n):
+    return m // gcd(m, n) * n
+
+print(lcm(12, 18))
+===
+F gcd(=a, =b)
+   L b != 0
+      (a, b) = (b, a % b)
+   R a
+
+F lcm(m, n)
+   R m I/ gcd(m, n) * n
+print(lcm(12, 18))
+===
+template <typename T1, typename T2> auto gcd(T1 a, T2 b)
+{
+    while (b != 0)
+        assign_from_tuple(a, b, make_tuple(b, mod(a, b)));
+    return a;
+}
+
+template <typename T1, typename T2> auto lcm(const T1 &m, const T2 &n)
+{
+    return idiv(m, gcd(m, n)) * n;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(lcm(12, 18));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Length_of_an_arc_between_two_angles#Python
+import math
+
+def arc_length(r, angleA, angleB):
+    return (360.0 - abs(angleB - angleA)) * math.pi * r / 180.0
+
+print(arc_length(10, 10, 120))
+===
+//import math
+
+F arc_length(r, angleA, angleB)
+   R (360.0 - abs(angleB - angleA)) * math:pi * r / 180.0
+print(arc_length(10, 10, 120))
+===
+template <typename T1, typename T2, typename T3> auto arc_length(const T1 &r, const T2 &angleA, const T3 &angleB)
+{
+    return (360.0 - abs(angleB - angleA)) * math::pi * r / 180.0;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(arc_length(10, 10, 120));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Leonardo_numbers#C.2B.2B
+def leo_numbers(cnt, l0 = 1, l1 = 1, add = 1):
+    for i in range(cnt):
+        print(l0, end = ' ')
+        (l0, l1) = (l1, l0 + l1 + add)
+    print()
+
+print('Leonardo Numbers: ', end = '')
+leo_numbers(25)
+print('Fibonacci Numbers: ', end = '')
+leo_numbers(25, 0, 1, 0)
+===
+F leo_numbers(cnt, =l0 = 1, =l1 = 1, add = 1)
+   L(i) 0 .< cnt
+      print(l0, end' ‘ ’)
+      (l0, l1) = (l1, l0 + l1 + add)
+   print()
+print(‘Leonardo Numbers: ’, end' ‘’)
+leo_numbers(25)
+print(‘Fibonacci Numbers: ’, end' ‘’)
+leo_numbers(25, 0, 1, 0)
+===
+template <typename T1, typename T2 = decltype(1), typename T3 = decltype(1), typename T4 = decltype(1)> auto leo_numbers(const T1 &cnt, T2 l0 = 1, T3 l1 = 1, const T4 &add = 1)
+{
+    for (auto i : range_el(0, cnt)) {
+        print(l0, u" "_S);
+        assign_from_tuple(l0, l1, make_tuple(l1, l0 + l1 + add));
+    }
+    print();
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Leonardo Numbers: "_S, u""_S);
+        leo_numbers(25);
+        print(u"Fibonacci Numbers: "_S, u""_S);
+        leo_numbers(25, 0, 1, 0);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Levenshtein_distance#Python
+def minimumEditDistance(s1,s2):
+    if len(s1) > len(s2):
+        (s1, s2) = (s2, s1)
+    distances = list(range(len(s1) + 1))
+    for index2,char2 in enumerate(s2):
+        newDistances = [index2+1]
+        for index1,char1 in enumerate(s1):
+            if char1 == char2:
+                newDistances.append(distances[index1])
+            else:
+                newDistances.append(1 + min((distances[index1],
+                                             distances[index1+1],
+                                             newDistances[-1])))
+        distances = newDistances
+    return distances[-1]
+
+print(minimumEditDistance("kitten","sitting"))
+print(minimumEditDistance("rosettacode","raisethysword"))
+===
+F minimumEditDistance(=s1, =s2)
+   I s1.len > s2.len
+      (s1, s2) = (s2, s1)
+   V distances = Array(0 .. s1.len)
+   L(char2) s2
+      V index2 = L.index
+      V newDistances = [index2 + 1]
+      L(char1) s1
+         V index1 = L.index
+         I char1 == char2
+            newDistances.append(distances[index1])
+         E
+            newDistances.append(1 + min((distances[index1], distances[index1 + 1], newDistances.last)))
+      distances = newDistances
+   R distances.last
+print(minimumEditDistance(‘kitten’, ‘sitting’))
+print(minimumEditDistance(‘rosettacode’, ‘raisethysword’))
+===
+template <typename T1, typename T2> auto minimumEditDistance(T1 s1, T2 s2)
+{
+    if (s1.len() > s2.len())
+        assign_from_tuple(s1, s2, make_tuple(s2, s1));
+    auto distances = create_array(range_ee(0, s1.len()));
+    {int Lindex = 0;
+    for (auto &&char2 : s2) {
+        auto index2 = Lindex;
+        auto newDistances = create_array({index2 + 1});
+        {int Lindex = 0;
+        for (auto &&char1 : s1) {
+            auto index1 = Lindex;
+            if (char1 == char2)
+                newDistances.append(distances[index1]);
+            else
+                newDistances.append(1 + min(make_tuple(distances[index1], distances[index1 + 1], newDistances.last())));
+            Lindex++;
+        }}
+        distances = newDistances;
+        Lindex++;
+    }}
+    return distances.last();
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(minimumEditDistance(u"kitten"_S, u"sitting"_S));
+        print(minimumEditDistance(u"rosettacode"_S, u"raisethysword"_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Linear_congruential_generator
+class LinearCongruentialGenerator:
+    seed = 0
+    a : int
+    c : int
+    m : int
+    def __init__(self, a, c, m):
+        self.a = a
+        self.c = c
+        self.m = m
+
+    def __call__(self):
+        self.seed = (self.a * self.seed + self.c) & self.m
+        return self.seed
+
+bsd_rnd = LinearCongruentialGenerator(1103515245, 12345, 0x7FFF_FFFF)
+ms_rnd  = LinearCongruentialGenerator(214013, 2531011, 0x7FFF_FFFF)
+
+print('BSD RAND:')
+for i in range(5):
+    print(bsd_rnd())
+print()
+print('MS RAND:')
+for i in range(5):
+    print(ms_rnd() >> 16)
+===
+T LinearCongruentialGenerator
+   seed = 0
+   Int a
+   Int c
+   Int m
+   F (a, c, m)
+      .a = a
+      .c = c
+      .m = m
+
+   F ()()
+      .seed = (.a * .seed + .c) [&] .m
+      R .seed
+V bsd_rnd = LinearCongruentialGenerator(1103515245, 12345, 7FFF'FFFF)
+V ms_rnd = LinearCongruentialGenerator(214013, 2531011, 7FFF'FFFF)
+print(‘BSD RAND:’)
+L(i) 5
+   print(bsd_rnd())
+print()
+print(‘MS RAND:’)
+L(i) 5
+   print(ms_rnd() >> 16)
+===
+class LinearCongruentialGenerator
+{
+public:
+    decltype(0) seed = 0;
+    int a;
+    int c;
+    int m;
+    template <typename T1, typename T2, typename T3> LinearCongruentialGenerator(const T1 &a, const T2 &c, const T3 &m) :
+        a(a),
+        c(c),
+        m(m)
+    {
+    }
+
+    auto operator()()
+    {
+        seed = (a * seed + c) & m;
+        return seed;
+    }
+};
+auto bsd_rnd = LinearCongruentialGenerator(1103515245, 12345, 0x7FFF'FFFF);
+auto ms_rnd = LinearCongruentialGenerator(214013, 2531011, 0x7FFF'FFFF);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"BSD RAND:"_S);
+        for (int i = 0; i < 5; i++)
+            print(bsd_rnd());
+        print();
+        print(u"MS RAND:"_S);
+        for (int i = 0; i < 5; i++)
+            print(ms_rnd() >> 16);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/List_comprehensions#Python
+from itertools import product
+
+print([(x, y, z) for x, y, z in product(range(1,21), range(1,21), range(1,21)) if x**2 + y**2 == z**2 and x <= y <= z])
+===
+print(cart_product(1..20, 1..20, 1..20).filter((x, y, z) -> x ^ 2 + y ^ 2 == z ^ 2 & y C x .. z))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(cart_product(range_ee(1, 20), range_ee(1, 20), range_ee(1, 20)).filter([](const auto &x, const auto &y, const auto &z){return square(x) + square(y) == square(z) && in(y, range_ee(x, z));}));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/List_rooted_trees#Python
+def bagchain(x, n, bb, start=0):
+    if n == 0:
+        return [x]
+
+    out : List[Tuple[int, str]] = []
+    for i in range(start, len(bb)):
+        (c, s) = bb[i]
+        if c <= n:
+            out.extend(bagchain((x[0] + c, x[1] + '' + s), n-c, bb, i))
+    return out
+
+def bags(n):
+    if n == 0:
+        return [(0, "")]
+
+    upto : List[Tuple[int, str]] = []
+    for x in range(n-1, 0, -1):
+        upto.extend(bags(x))
+
+    return [(c+1, '('+s+')') for c, s in bagchain((0, ""), n-1, upto)]
+
+# Maybe this lessens eye strain. Maybe not.
+def replace_brackets(s):
+    depth = 0
+    out : List[str] = []
+    for c in s:
+        if c == '(':
+            out.append("([{"[depth%3])
+            depth += 1
+        else:
+            depth -= 1
+            out.append(")]}"[depth%3])
+    return "".join(out)
+
+for x in bags(5):
+    print(replace_brackets(x[1]))
+===
+F bagchain(x, n, bb, start = 0)
+   I n == 0
+      R [x]
+   [(Int, String)] out
+   L(i) start .< bb.len
+      V (c, s) = bb[i]
+      I c <= n
+         out.extend(bagchain((x[0] + c, x[1]‘’s), n - c, bb, i))
+   R out
+
+F bags(n)
+   I n == 0
+      R [(0, ‘’)]
+   [(Int, String)] upto
+   L(x) (n - 1 .< 0).step(-1)
+      upto.extend(bags(x))
+   R bagchain((0, ‘’), n - 1, upto).map((c, s) -> (c + 1, ‘(’s‘)’))
+
+F replace_brackets(s)
+   V depth = 0
+   [String] out
+   L(c) s
+      I c == ‘(’
+         out.append(‘([{’[depth % 3])
+         depth++
+      E
+         depth--
+         out.append(‘)]}’[depth % 3])
+   R out.join(‘’)
+
+L(x) bags(5)
+   print(replace_brackets(x[1]))
+===
+template <typename T1, typename T2, typename T3, typename T4 = decltype(0)> auto bagchain(const T1 &x, const T2 &n, const T3 &bb, const T4 &start = 0)
+{
+    if (n == 0)
+        return create_array({x});
+    Array<Tuple<int, String>> out;
+    for (auto i : range_el(start, bb.len())) {
+        auto [c, s] = bb[i];
+        if (c <= n)
+            out.extend(bagchain(make_tuple(_get<0>(x) + c, _get<1>(x) + s), n - c, bb, i));
+    }
+    return out;
+}
+
+template <typename T1> auto bags(const T1 &n)
+{
+    if (n == 0)
+        return create_array({make_tuple(0, u""_S)});
+    Array<Tuple<int, String>> upto;
+    for (auto x : range_el(n - 1, 0).step(-1))
+        upto.extend(bags(x));
+    return bagchain(make_tuple(0, u""_S), n - 1, upto).map([](const auto &c, const auto &s){return make_tuple(c + 1, u"("_S + s + u")"_S);});
+}
+
+template <typename T1> auto replace_brackets(const T1 &s)
+{
+    auto depth = 0;
+    Array<String> out;
+    for (auto &&c : s)
+        if (c == u'(') {
+            out.append(u"([{"_S[mod(depth, 3)]);
+            depth++;
+        }
+        else {
+            depth--;
+            out.append(u")]}"_S[mod(depth, 3)]);
+        }
+    return out.join(u""_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&x : bags(5))
+            print(replace_brackets(_get<1>(x)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Long_primes#Python
+def sieve(limit):
+    primes : List[int] = []
+    c = [False] * (limit + 1) # composite = true
+    # no need to process even numbers
+    p = 3
+    while True:
+        p2 = p * p
+        if p2 > limit: break
+        for i in range(p2, limit, 2 * p): c[i] = True
+        while True:
+            p += 2
+            if not c[p]: break
+
+    for i in range(3, limit, 2):
+        if not c[i]: primes.append(i)
+    return primes
+
+# finds the period of the reciprocal of n
+def findPeriod(n):
+    r = 1
+    for i in range(1, n): r = (10 * r) % n
+    rr = r
+    period = 0
+    while True:
+        r = (10 * r) % n
+        period += 1
+        if r == rr: break
+    return period
+
+primes = sieve(64000)
+longPrimes : List[int] = []
+for prime in primes:
+    if findPeriod(prime) == prime - 1:
+        longPrimes.append(prime)
+numbers = [500, 1000, 2000, 4000, 8000, 16000, 32000, 64000]
+count = 0
+index = 0
+totals = [0] * len(numbers)
+for longPrime in longPrimes:
+    if longPrime > numbers[index]:
+        totals[index] = count
+        index += 1
+    count += 1
+totals[-1] = count
+print('The long primes up to 500 are:')
+print(str(longPrimes[:totals[0]]).replace(',', ''))
+print('\nThe number of long primes up to:')
+for i, total in enumerate(totals):
+    print('  %5d is %d' % (numbers[i], total))
+===
+F sieve(limit)
+   [Int] primes
+   V c = [0B] * (limit + 1)
+   V p = 3
+   L
+      V p2 = p * p
+      I p2 > limit
+         L.break
+      L(i) (p2 .< limit).step(2 * p)
+         c[i] = 1B
+      L
+         p += 2
+         I !(c[p])
+            L.break
+
+   L(i) (3 .< limit).step(2)
+      I !(c[i])
+         primes.append(i)
+   R primes
+
+F findPeriod(n)
+   V r = 1
+   L(i) 1 .< n
+      r = (10 * r) % n
+   V rr = r
+   V period = 0
+   L
+      r = (10 * r) % n
+      period++
+      I r == rr
+         L.break
+   R period
+V primes = sieve(64000)
+[Int] longPrimes
+L(prime) primes
+   I findPeriod(prime) == prime - 1
+      longPrimes.append(prime)
+V numbers = [500, 1000, 2000, 4000, 8000, 16000, 32000, 64000]
+V count = 0
+V index = 0
+V totals = [0] * numbers.len
+L(longPrime) longPrimes
+   I longPrime > numbers[index]
+      totals[index] = count
+      index++
+   count++
+totals.last = count
+print(‘The long primes up to 500 are:’)
+print(String(longPrimes[0 .< totals[0]]).replace(‘,’, ‘’))
+print("\nThe number of long primes up to:")
+L(total) totals
+   V i = L.index
+   print(‘  #5 is #.’.format(numbers[i], total))
+===
+template <typename T1> auto sieve(const T1 &limit)
+{
+    Array<int> primes;
+    auto c = create_array({false}) * (limit + 1);
+    auto p = 3;
+    while (true) {
+        auto p2 = p * p;
+        if (p2 > limit)
+            break;
+        for (auto i : range_el(p2, limit).step(2 * p))
+            c.set(i, true);
+        while (true) {
+            p += 2;
+            if (!(c[p]))
+                break;
+        }
+    }
+    for (auto i : range_el(3, limit).step(2))
+        if (!(c[i]))
+            primes.append(i);
+    return primes;
+}
+
+template <typename T1> auto findPeriod(const T1 &n)
+{
+    auto r = 1;
+    for (auto i : range_el(1, n))
+        r = mod((10 * r), n);
+    auto rr = r;
+    auto period = 0;
+    while (true) {
+        r = mod((10 * r), n);
+        period++;
+        if (r == rr)
+            break;
+    }
+    return period;
+}
+auto primes = sieve(64000);
+Array<int> longPrimes;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&prime : primes)
+            if (findPeriod(prime) == prime - 1)
+                longPrimes.append(prime);
+    }
+} code_block_1;
+auto numbers = create_array({500, 1000, 2000, 4000, 8000, 16000, 32000, 64000});
+auto count = 0;
+auto index = 0;
+auto totals = create_array({0}) * numbers.len();
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&longPrime : longPrimes) {
+            if (longPrime > numbers[index]) {
+                totals.set(index, count);
+                index++;
+            }
+            count++;
+        }
+        totals.last() = count;
+        print(u"The long primes up to 500 are:"_S);
+        print(String(longPrimes[range_el(0, _get<0>(totals))]).replace(u","_S, u""_S));
+        print(u"\nThe number of long primes up to:"_S);
+        {int Lindex = 0;
+        for (auto &&total : totals) {
+            auto i = Lindex;
+            print(u"  #5 is #."_S.format(numbers[i], total));
+            Lindex++;
+        }}
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Long_year#C.2B.2B
+def is_long_year(year):
+    def p(year):
+        return (year + (year//4) - (year//100) + (year//400)) % 7
+    return p(year) == 4 or p(year - 1) == 3
+
+for year in range(2000, 2100 + 1):
+    if is_long_year(year):
+        print(year, end = ' ')
+===
+F is_long_year(year)
+   F p(year)
+      R (year + (year I/ 4) - (year I/ 100) + (year I/ 400)) % 7
+   R p(year) == 4 | p(year - 1) == 3
+
+L(year) 2000 .. 2100
+   I is_long_year(year)
+      print(year, end' ‘ ’)
+===
+template <typename T1> auto is_long_year(const T1 &year)
+{
+    auto p = [](const auto &year)
+    {
+        return mod((year + (idiv(year, 4)) - (idiv(year, 100)) + (idiv(year, 400))), 7);
+    };
+    return p(year) == 4 || p(year - 1) == 3;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto year : range_ee(2000, 2100))
+            if (is_long_year(year))
+                print(year, u" "_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Longest_common_prefix
+def lcp(sa):
+    if len(sa) == 0:
+        return ''
+    if len(sa) == 1:
+        return sa[0]
+
+    min_len = min(len(s) for s in sa)
+
+    for i in range(min_len):
+        p = sa[0][i]
+        for j in range(1, len(sa)):
+            if sa[j][i] != p:
+                return sa[0][:i]
+
+    return sa[0][:min_len]
+
+def test(sa):
+    print(str(sa), '->', lcp(sa))
+
+test(["interspecies", "interstellar", "interstate"])
+test(["throne", "throne"])
+test(["throne", "dungeon"])
+test(["throne", "", "throne"])
+test(["cheese"])
+test([""])
+test(["prefix", "suffix"])
+test(["foo", "foobar"])
+===
+F lcp(sa)
+   I sa.empty
+      R ‘’
+   I sa.len == 1
+      R sa[0]
+   V min_len = min(sa.map(s -> s.len))
+
+   L(i) 0 .< min_len
+      V p = sa[0][i]
+      L(j) 1 .< sa.len
+         I sa[j][i] != p
+            R sa[0][0 .< i]
+   R sa[0][0 .< min_len]
+
+F test(sa)
+   print((String(sa))‘ -> ’(lcp(sa)))
+test([‘interspecies’, ‘interstellar’, ‘interstate’])
+test([‘throne’, ‘throne’])
+test([‘throne’, ‘dungeon’])
+test([‘throne’, ‘’, ‘throne’])
+test([‘cheese’])
+test([‘’])
+test([‘prefix’, ‘suffix’])
+test([‘foo’, ‘foobar’])
+===
+template <typename T1> auto lcp(const T1 &sa)
+{
+    if (sa.empty())
+        return u""_S;
+    if (sa.len() == 1)
+        return _get<0>(sa);
+    auto min_len = min(sa.map([](const auto &s){return s.len();}));
+
+    for (auto i : range_el(0, min_len)) {
+        auto p = _get<0>(sa)[i];
+        for (auto j : range_el(1, sa.len()))
+            if (sa[j][i] != p)
+                return _get<0>(sa)[range_el(0, i)];
+    }
+    return _get<0>(sa)[range_el(0, min_len)];
+}
+
+template <typename T1> auto test(const T1 &sa)
+{
+    print((String(sa)) + u" -> "_S + (lcp(sa)));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        test(create_array({u"interspecies"_S, u"interstellar"_S, u"interstate"_S}));
+        test(create_array({u"throne"_S, u"throne"_S}));
+        test(create_array({u"throne"_S, u"dungeon"_S}));
+        test(create_array({u"throne"_S, u""_S, u"throne"_S}));
+        test(create_array({u"cheese"_S}));
+        test(create_array({u""_S}));
+        test(create_array({u"prefix"_S, u"suffix"_S}));
+        test(create_array({u"foo"_S, u"foobar"_S}));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Longest_common_subsequence#Python
+def lcs(a, b):
+    # generate matrix of length of longest common subsequence for substrings of both words
+    lengths = [[0] * (len(b)+1) for _ in range(len(a)+1)]
+    for i, x in enumerate(a):
+        for j, y in enumerate(b):
+            if x == y:
+                lengths[i+1][j+1] = lengths[i][j] + 1
+            else:
+                lengths[i+1][j+1] = max(lengths[i+1][j], lengths[i][j+1])
+
+    # read a substring from the matrix
+    result = ''
+    j = len(b)
+    for i in range(1, len(a)+1):
+        if lengths[i][j] != lengths[i-1][j]:
+            result += a[i-1]
+
+    return result
+
+print(lcs('1234', '1224533324'))
+print(lcs('thisisatest', 'testing123testing'))
+===
+F lcs(a, b)
+   V lengths = (0 .. a.len).map(_ -> [0] * (@b.len + 1))
+   L(x) a
+      V i = L.index
+      L(y) b
+         V j = L.index
+         I x == y
+            lengths[i + 1][j + 1] = lengths[i][j] + 1
+         E
+            lengths[i + 1][j + 1] = max(lengths[i + 1][j], lengths[i][j + 1])
+   V result = ‘’
+   V j = b.len
+   L(i) 1 .. a.len
+      I lengths[i][j] != lengths[i - 1][j]
+         result ‘’= a[i - 1]
+   R result
+print(lcs(‘1234’, ‘1224533324’))
+print(lcs(‘thisisatest’, ‘testing123testing’))
+===
+template <typename T1, typename T2> auto lcs(const T1 &a, const T2 &b)
+{
+    auto lengths = range_ee(0, a.len()).map([&b](const auto &_){return create_array({0}) * (b.len() + 1);});
+    {int Lindex = 0;
+    for (auto &&x : a) {
+        auto i = Lindex;
+        {int Lindex = 0;
+        for (auto &&y : b) {
+            auto j = Lindex;
+            if (x == y)
+                lengths[i + 1].set(j + 1, lengths[i][j] + 1);
+            else
+                lengths[i + 1].set(j + 1, max(lengths[i + 1][j], lengths[i][j + 1]));
+            Lindex++;
+        }}
+        Lindex++;
+    }}
+    auto result = u""_S;
+    auto j = b.len();
+    for (auto i : range_ee(1, a.len()))
+        if (lengths[i][j] != lengths[i - 1][j])
+            result += a[i - 1];
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(lcs(u"1234"_S, u"1224533324"_S));
+        print(lcs(u"thisisatest"_S, u"testing123testing"_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Longest_common_substring#Python
+def longest_common_substring(s1, s2):
+    ir = 0
+    jr = -1
+    for i1 in range(len(s1)):
+        i2 = s2.find(s1[i1])
+        while i2 >= 0:
+            (j1, j2) = (i1, i2)
+            while j1 < len(s1) and j2 < len(s2) and s2[j2] == s1[j1]:
+                if j1-i1 >= jr-ir:
+                    (ir, jr) = (i1, j1)
+                j1 += 1
+                j2 += 1
+            i2 = s2.find(s1[i1], i2+1)
+    return s1[ir:jr+1]
+
+print(longest_common_substring("thisisatest", "testing123testing"))
+===
+F longest_common_substring(s1, s2)
+   V ir = 0
+   V jr = -1
+   L(i1) 0 .< s1.len
+      V i2 = s2.findi(s1[i1])
+      L i2 >= 0
+         V (j1, j2) = (i1, i2)
+         L j1 < s1.len & j2 < s2.len & s2[j2] == s1[j1]
+            I j1 - i1 >= jr - ir
+               (ir, jr) = (i1, j1)
+            j1++
+            j2++
+         i2 = s2.findi(s1[i1], i2 + 1)
+   R s1[ir .< jr + 1]
+print(longest_common_substring(‘thisisatest’, ‘testing123testing’))
+===
+template <typename T1, typename T2> auto longest_common_substring(const T1 &s1, const T2 &s2)
+{
+    auto ir = 0;
+    auto jr = -1;
+    for (auto i1 : range_el(0, s1.len())) {
+        auto i2 = s2.findi(s1[i1]);
+        while (i2 >= 0) {
+            auto [_j1_, j2] = make_tuple(i1, i2);
+            while (_j1_ < s1.len() && j2 < s2.len() && s2[j2] == s1[_j1_]) {
+                if (_j1_ - i1 >= jr - ir)
+                    assign_from_tuple(ir, jr, make_tuple(i1, _j1_));
+                _j1_++;
+                j2++;
+            }
+            i2 = s2.findi(s1[i1], i2 + 1);
+        }
+    }
+    return s1[range_el(ir, jr + 1)];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(longest_common_substring(u"thisisatest"_S, u"testing123testing"_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Longest_common_suffix
+def lcs(sa):
+    if len(sa) == 0:
+        return ''
+    if len(sa) == 1:
+        return sa[0]
+
+    min_len = min(len(s) for s in sa)
+
+    for i in range(1, min_len + 1):
+        p = sa[0][-i]
+        for j in range(1, len(sa)):
+            if sa[j][-i] != p:
+                return sa[0][-i+1:]
+
+    return sa[0][-min_len:]
+
+print(lcs(["11Sunday", "2Sunday"]))
+print(lcs(["Sunday", "Monday", "Tuesday"]))
+print(lcs(["Sunday", "Monday", "Tuesday", "day"]))
+print(lcs(["Sondag", "Maandag", "Dinsdag", "Woensdag"]))
+===
+F lcs(sa)
+   I sa.empty
+      R ‘’
+   I sa.len == 1
+      R sa[0]
+   V min_len = min(sa.map(s -> s.len))
+
+   L(i) 1 .. min_len
+      V p = sa[0][(len)-i]
+      L(j) 1 .< sa.len
+         I sa[j][(len)-i] != p
+            R sa[0][(len)-i + 1 ..]
+   R sa[0][(len)-min_len ..]
+print(lcs([‘11Sunday’, ‘2Sunday’]))
+print(lcs([‘Sunday’, ‘Monday’, ‘Tuesday’]))
+print(lcs([‘Sunday’, ‘Monday’, ‘Tuesday’, ‘day’]))
+print(lcs([‘Sondag’, ‘Maandag’, ‘Dinsdag’, ‘Woensdag’]))
+===
+template <typename T1> auto lcs(const T1 &sa)
+{
+    if (sa.empty())
+        return u""_S;
+    if (sa.len() == 1)
+        return _get<0>(sa);
+    auto min_len = min(sa.map([](const auto &s){return s.len();}));
+
+    for (auto i : range_ee(1, min_len)) {
+        auto p = _get<0>(sa).at_plus_len( - i);
+        for (auto j : range_el(1, sa.len()))
+            if (sa[j].at_plus_len( - i) != p)
+                return _get<0>(sa)[range_elen_i( - i + 1)];
+    }
+    return _get<0>(sa)[range_elen_i( - min_len)];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(lcs(create_array({u"11Sunday"_S, u"2Sunday"_S})));
+        print(lcs(create_array({u"Sunday"_S, u"Monday"_S, u"Tuesday"_S})));
+        print(lcs(create_array({u"Sunday"_S, u"Monday"_S, u"Tuesday"_S, u"day"_S})));
+        print(lcs(create_array({u"Sondag"_S, u"Maandag"_S, u"Dinsdag"_S, u"Woensdag"_S})));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Longest_increasing_subsequence#Python
+def longest_increasing_subsequence(x):
+    """Returns the Longest Increasing Subsequence in the Given List/Array"""
+    n = len(x)
+    P = [0] * n
+    M = [0] * (n+1)
+    l = 0
+    for i in range(n):
+       lo = 1
+       hi = l
+       while lo <= hi:
+           mid = (lo+hi)//2
+           if (x[M[mid]] < x[i]):
+               lo = mid+1
+           else:
+               hi = mid-1
+
+       newl = lo
+       P[i] = M[newl-1]
+       M[newl] = i
+
+       if (newl > l):
+           l = newl
+
+    s : List[int] = []
+    k = M[l]
+    for i in range(l-1, -1, -1):
+        s.append(x[k])
+        k = P[k]
+    return s[::-1]
+
+for d in [[3,2,6,4,5,1], [0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15]]:
+    print('a L.I.S. of %s is %s' % (d, longest_increasing_subsequence(d)))
+===
+F longest_increasing_subsequence(x)
+   ‘Returns the Longest Increasing Subsequence in the Given List/Array’
+   V n = x.len
+   V P = [0] * n
+   V M = [0] * (n + 1)
+   V l = 0
+   L(i) 0 .< n
+      V lo = 1
+      V hi = l
+      L lo <= hi
+         V mid = (lo + hi) I/ 2
+         I (x[M[mid]] < x[i])
+            lo = mid + 1
+         E
+            hi = mid - 1
+      V newl = lo
+      P[i] = M[newl - 1]
+      M[newl] = i
+
+      I (newl > l)
+         l = newl
+   [Int] s
+   V k = M[l]
+   L(i) (l - 1 .< -1).step(-1)
+      s.append(x[k])
+      k = P[k]
+   R reversed(s)
+
+L(d) [[3, 2, 6, 4, 5, 1], [0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15]]
+   print(‘a L.I.S. of #. is #.’.format(d, longest_increasing_subsequence(d)))
+===
+template <typename T1> auto longest_increasing_subsequence(const T1 &x)
+{
+    u"Returns the Longest Increasing Subsequence in the Given List/Array"_S;
+    auto n = x.len();
+    auto P = create_array({0}) * n;
+    auto M = create_array({0}) * (n + 1);
+    auto l = 0;
+    for (auto i : range_el(0, n)) {
+        auto lo = 1;
+        auto hi = l;
+        while (lo <= hi) {
+            auto mid = idiv((lo + hi), 2);
+            if ((x[M[mid]] < x[i]))
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+        auto newl = lo;
+        P.set(i, M[newl - 1]);
+        M.set(newl, i);
+        if ((newl > l))
+            l = newl;
+    }
+    Array<int> s;
+    auto k = M[l];
+    for (auto i : range_el(l - 1, -1).step(-1)) {
+        s.append(x[k]);
+        k = P[k];
+    }
+    return reversed(s);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&d : create_array({create_array({3, 2, 6, 4, 5, 1}), create_array({0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15})}))
+            print(u"a L.I.S. of #. is #."_S.format(d, longest_increasing_subsequence(d)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Longest_palindromic_substrings
+# [https://leetcode.com/problems/longest-palindromic-substring/discuss/3337/Manacher-algorithm-in-Python-O(n) <- google:‘Manacher algorithm python’]
+def longest_palindrome(s):
+    # transform s into t.
+    # For example, s = "abba", t = "^#a#b#b#a#$".
+    # ^ and $ signs are sentinels appended to each end to avoid bounds checking
+    t = '#'.join(list('^'+s+'$'))
+    n = len(t)
+    p = [0] * n
+    c = 0
+    r = 0
+    for i in range (1, n-1):
+        p[i] = (r > i) and min(r - i, p[2*c - i]) != 0 # equals to i' = c - (i-c)
+        # Attempt to expand palindrome centered at i
+        while t[i + 1 + p[i]] == t[i - 1 - p[i]]:
+            p[i] += 1
+
+        # If palindrome centered at i expand past r,
+        # adjust center based on expanded palindrome.
+        if i + p[i] > r:
+            (c, r) = (i, i + p[i])
+
+    # Find the maximum element in p.
+    (max_len, center_index) = max((n, i) for i, n in enumerate(p))
+    return s[(center_index  - max_len)//2: (center_index  + max_len)//2]
+
+for s in [
+            'three old rotators',
+            'never reverse',
+            'stable was I ere I saw elbatrosses',
+            'abracadabra',
+            'drome',
+            'the abbatial palace'
+         ]:
+    print("'" + s + "' -> '" + longest_palindrome(s) + "'")
+===
+F longest_palindrome(s)
+   V t = Array(‘^’s‘$’).join(‘#’)
+   V n = t.len
+   V p = [0] * n
+   V c = 0
+   V r = 0
+   L(i) 1 .< n - 1
+      p[i] = (r > i) & min(r - i, p[2 * c - i]) != 0
+
+      L t[i + 1 + p[i]] == t[i - 1 - p[i]]
+         p[i]++
+
+      I i + p[i] > r
+         (c, r) = (i, i + p[i])
+   V (max_len, center_index) = max(enumerate(p).map((i, n) -> (n, i)))
+   R s[(center_index - max_len) I/ 2 .< (center_index + max_len) I/ 2]
+
+L(s) [‘three old rotators’, ‘never reverse’, ‘stable was I ere I saw elbatrosses’, ‘abracadabra’, ‘drome’, ‘the abbatial palace’]
+   print(‘'’s‘' -> '’longest_palindrome(s)‘'’)
+===
+template <typename T1> auto longest_palindrome(const T1 &s)
+{
+    auto t = create_array(u"^"_S + s + u"$"_S).join(u"#"_S);
+    auto n = t.len();
+    auto p = create_array({0}) * n;
+    auto c = 0;
+    auto r = 0;
+    for (auto i : range_el(1, n - 1)) {
+        p.set(i, (r > i) && min(r - i, p[2 * c - i]) != 0);
+        while (t[i + 1 + p[i]] == t[i - 1 - p[i]])
+            p[i]++;
+        if (i + p[i] > r)
+            assign_from_tuple(c, r, make_tuple(i, i + p[i]));
+    }
+    auto [max_len, center_index] = max(enumerate(p).map([](const auto &i, const auto &n){return make_tuple(n, i);}));
+    return s[range_el(idiv((center_index - max_len), 2), idiv((center_index + max_len), 2))];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&s : create_array({u"three old rotators"_S, u"never reverse"_S, u"stable was I ere I saw elbatrosses"_S, u"abracadabra"_S, u"drome"_S, u"the abbatial palace"_S}))
+            print(u"'"_S + s + u"' -> '"_S + longest_palindrome(s) + u"'"_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Loop_over_multiple_arrays_simultaneously#Python
+for x, y, z in zip('abc', 'ABC', '123'):
+    print(x, y, z, sep = '')
+===
+L(x, y, z) zip(‘abc’, ‘ABC’, ‘123’)
+   print(x‘’y‘’z)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[x, y, z] : zip(u"abc"_S, u"ABC"_S, u"123"_S))
+            print(x + y + z);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Loops/Continue#Python
+for i in range(1, 11):
+    if i % 5 == 0:
+        print(i)
+        continue
+    print(i, end = ', ')
+===
+L(i) 1..10
+   I i % 5 == 0
+      print(i)
+      L.continue
+   print(i, end' ‘, ’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(1, 10)) {
+            if (mod(i, 5) == 0) {
+                print(i);
+                continue;
+            }
+            print(i, u", "_S);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Loops/Do-while#Python
+val = 0
+while True:
+   val += 1
+   print(val)
+   if val % 6 == 0: break
+===
+V val = 0
+L
+   val++
+   print(val)
+   I val % 6 == 0
+      L.break
+===
+auto val = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            val++;
+            print(val);
+            if (mod(val, 6) == 0)
+                break;
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Loops/Downward_for#Python
+for i in range(10, -1, -1):
+    print(i)
+===
+L(i) (10 .< -1).step(-1)
+   print(i)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(10, -1).step(-1))
+            print(i);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Loops/For#Python
+for i in range(1, 6):
+    for j in range(i):
+        print("*", end = '')
+    print()
+===
+L(i) 1..5
+   L(j) 0 .< i
+      print(‘*’, end' ‘’)
+   print()
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(1, 5)) {
+            for (auto j : range_el(0, i))
+                print(u"*"_S, u""_S);
+            print();
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Loops/For#Python
+for i in range(1, 6):
+    print('*' * i)
+===
+L(i) 1..5
+   print(‘*’ * i)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(1, 5))
+            print(u"*"_S * i);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Loops/For_with_a_specified_step
+for i in range(1, 10, 2):
+    print(i)
+===
+L(i) (1.<10).step(2)
+   print(i)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(1, 10).step(2))
+            print(i);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Loops/Foreach#C.23
+things = ["Apple", "Banana", "Coconut"]
+
+for thing in things:
+    print(thing)
+===
+V things = [‘Apple’, ‘Banana’, ‘Coconut’]
+
+L(thing) things
+   print(thing)
+===
+auto things = create_array({u"Apple"_S, u"Banana"_S, u"Coconut"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&thing : things)
+            print(thing);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Loops/Increment_loop_index_within_loop_body#Python
+Int64 = int
+
+def is_prime(n):
+    for x in (2, 3):
+        if n % x == 0:
+            return n == x
+    d = Int64(5)
+    while d * d <= n:
+        for x in (2, 4):
+            if n % d == 0:
+                return False
+            d += x
+    return True
+
+i = Int64(42)
+n = 0
+while n < 42:
+    if is_prime(i):
+        n += 1
+        print('n = %2d %16d' % (n, i))
+        i += i - 1
+    i += 1
+===
+
+F is_prime(n)
+   L(x) (2, 3)
+      I n % x == 0
+         R n == x
+   V d = Int64(5)
+   L d * d <= n
+      L(x) (2, 4)
+         I n % d == 0
+            R 0B
+         d += x
+   R 1B
+V i = Int64(42)
+V n = 0
+L n < 42
+   I is_prime(i)
+      n++
+      print(‘n = #2 #16’.format(n, i))
+      i += i - 1
+   i++
+===
+template <typename T1> auto is_prime(const T1 &n)
+{
+    for (auto &&x : make_tuple(2, 3))
+        if (mod(n, x) == 0)
+            return n == x;
+    auto d = to_int64(5);
+    while (d * d <= n)
+        for (auto &&x : make_tuple(2, 4)) {
+            if (mod(n, d) == 0)
+                return false;
+            d += x;
+        }
+    return true;
+}
+auto i = to_int64(42);
+auto n = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (n < 42) {
+            if (is_prime(i)) {
+                n++;
+                print(u"n = #2 #16"_S.format(n, i));
+                i += i - 1;
+            }
+            i++;
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Loops/While#Python
+n = 1024
+while n > 0:
+    print(n)
+    n //= 2
+===
+V n = 1024
+L n > 0
+   print(n)
+   n I/= 2
+===
+auto n = 1024;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (n > 0) {
+            print(n);
+            n = idiv(n, 2);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Ludic_numbers#Python
+def ludic(nmax=100000):
+    r = [1]
+    lst = list(range(2, nmax + 1))
+    while len(lst):
+        r.append(lst[0])
+        newlst : List[int] = []
+        step = lst[0]
+        for i in range(len(lst)):
+            if i % step != 0:
+                newlst.append(lst[i])
+        lst = newlst
+    return r
+
+ludics = [l for l in ludic()]
+
+print('First 25 ludic primes:')
+print(ludics[:25])
+print("\nThere are %i ludic numbers <= 1000"
+      % sum(1 for l in ludics if l <= 1000))
+print("\n2000'th..2005'th ludic primes:")
+print(ludics[2000-1: 2005])
+
+n = 250
+triplets = [(x, x+2, x+6)
+            for x in ludics
+            if x+6 < n and x+2 in ludics and x+6 in ludics]
+print('\nThere are %i triplets less than %i:\n  %s'
+      % (len(triplets), n, triplets))
+===
+F ludic(nmax = 100000)
+   V r = [1]
+   V lst = Array(2 .. nmax)
+   L !lst.empty
+      r.append(lst[0])
+      [Int] newlst
+      V step = lst[0]
+      L(i) 0 .< lst.len
+         I i % step != 0
+            newlst.append(lst[i])
+      lst = newlst
+   R r
+V ludics = ludic()
+print(‘First 25 ludic primes:’)
+print(ludics[0.<25])
+print("\nThere are #. ludic numbers <= 1000".format(sum(ludics.filter(l -> l <= 1000).map(l -> 1))))
+print("\n2000'th..2005'th ludic primes:")
+print(ludics[2000 - 1 .< 2005])
+V n = 250
+V triplets = ludics.filter(x -> x + 6 < :n & x + 2 C :ludics & x + 6 C :ludics).map(x -> (x, x + 2, x + 6))
+print("\nThere are #. triplets less than #.:\n  #.".format(triplets.len, n, triplets))
+===
+template <typename T1 = decltype(100000)> auto ludic(const T1 &nmax = 100000)
+{
+    auto r = create_array({1});
+    auto lst = create_array(range_ee(2, nmax));
+    while (!lst.empty()) {
+        r.append(_get<0>(lst));
+        Array<int> newlst;
+        auto step = _get<0>(lst);
+        for (auto i : range_el(0, lst.len()))
+            if (mod(i, step) != 0)
+                newlst.append(lst[i]);
+        lst = newlst;
+    }
+    return r;
+}
+auto ludics = ludic();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"First 25 ludic primes:"_S);
+        print(ludics[range_el(0, 25)]);
+        print(u"\nThere are #. ludic numbers <= 1000"_S.format(sum_map(ludics.filter([](const auto &l){return l <= 1000;}), [](const auto &l){return 1;})));
+        print(u"\n2000'th..2005'th ludic primes:"_S);
+        print(ludics[range_el(2000 - 1, 2005)]);
+    }
+} code_block_1;
+auto n = 250;
+auto triplets = ludics.filter([](const auto &x){return x + 6 < ::n && in(x + 2, ::ludics) && in(x + 6, ::ludics);}).map([](const auto &x){return make_tuple(x, x + 2, x + 6);});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"\nThere are #. triplets less than #.:\n  #."_S.format(triplets.len(), n, triplets));
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Luhn_test_of_credit_card_numbers#Python
+def luhn(n):
+    ch = str(n)
+    sum = 0
+    chParity = len(ch) % 2
+    for i in range(len(ch)-1, -1, -1):
+        j = int(ch[i])
+        if (i + 1) % 2 != chParity:
+            j *= 2
+            if j > 9:
+                j -= 9
+        sum += j
+    return sum % 10 == 0
+
+for n in (49927398716,
+          49927398717,
+          1234567812345678,
+          1234567812345670):
+    print(luhn(n))
+===
+F luhn(n)
+   V ch = String(n)
+   V sum = 0
+   V chParity = ch.len % 2
+   L(i) (ch.len - 1 .< -1).step(-1)
+      V j = Int(ch[i])
+      I (i + 1) % 2 != chParity
+         j *= 2
+         I j > 9
+            j -= 9
+      sum += j
+   R sum % 10 == 0
+
+L(n) (49927398716, 49927398717, 1234567812345678, 1234567812345670)
+   print(luhn(n))
+===
+template <typename T1> auto luhn(const T1 &n)
+{
+    auto ch = String(n);
+    auto sum = 0;
+    auto chParity = mod(ch.len(), 2);
+    for (auto i : range_el(ch.len() - 1, -1).step(-1)) {
+        auto j = to_int(ch[i]);
+        if (mod((i + 1), 2) != chParity) {
+            j *= 2;
+            if (j > 9)
+                j -= 9;
+        }
+        sum += j;
+    }
+    return mod(sum, 10) == 0;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&n : make_tuple(49927398716, 49927398717, 1234567812345678, 1234567812345670))
+            print(luhn(n));
+    }
+} code_block_1;
