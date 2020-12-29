@@ -13,6 +13,9 @@
 
 from typing import Dict, Set
 
+def move(obj):
+    return obj
+
 def cross(aa, bb):
     return [a+''+b for a in aa for b in bb]
 
@@ -32,7 +35,7 @@ for s in squares:
         for s2 in u:
             if s2 != s:
                 se.add(s2)
-    peers[s] = se
+    peers[s] = move(se)
 
 def search(values) -> Dict[str, str]: # [-TODO: Optional[Dict[str, str]] support (for `return {}` -> `return None`)-]
     "Using depth-first search and propagation, try all possible values."
@@ -82,9 +85,9 @@ def eliminate(values : Dict[str, str], s, d) -> Dict[str, str]:
 
 def parse_grid(grid) -> Dict[str, str]:
     "Given a string of 81 digits (or .0-), return a dict of {cell:values}"
-    grid = [c for c in grid if c in '0.-123456789']
+    grid_arr = [c for c in grid if c in '0.-123456789']
     values = dict([(s, digits) for s in squares]) ## Each square can be any digit
-    for s,d in zip(squares, grid):
+    for s,d in zip(squares, grid_arr):
         if d in digits and len(assign(values, s, d)) == 0:
             return {}
     return values
@@ -102,8 +105,8 @@ def printboard(values):
     width = 1+max([len(values[s]) for s in squares])
     line = '\n' + '+'.join(['-'*(width*3)]*3)
     for r in rows:
-        print(''.join([values[r+c].center(width) + ('|' if c in '36' else '')
-                      for c in cols]) + (line if r in 'CF' else ''))
+        print(''.join([values[r+''+c].center(width) + '' + ('|' if c in '36' else '')
+                      for c in cols]) + '' + (line if r in 'CF' else ''))
     print()
     return values
 

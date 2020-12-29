@@ -15,6 +15,10 @@ public:
 		for (auto &&el : il)
 			add(el);
 	}
+	void operator=(Set &&s)
+	{
+		std::set<KeyType>::operator=(std::forward<std::set<KeyType>>(s));
+	}
 
 	int len() const {return (int)std::set<KeyType>::size();}
 

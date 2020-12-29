@@ -14,7 +14,7 @@ L(s) squares
       L(s2) u
          I s2 != s
             se.add(s2)
-   peers[s] = se
+   peers[s] = move(se)
 
 F search(values) -> [String = String]
    ‘Using depth-first search and propagation, try all possible values.’
@@ -58,11 +58,11 @@ F eliminate([String = String] &values; s, d) -> [String = String]
             R Dict()
    R values
 
-F parse_grid(=grid) -> [String = String]
+F parse_grid(grid) -> [String = String]
    ‘Given a string of 81 digits (or .0-), return a dict of {cell:values}’
-   grid = grid.filter(c -> c C ‘0.-123456789’)
+   V grid_arr = grid.filter(c -> c C ‘0.-123456789’)
    V values = Dict(:squares.map(s -> (s, :digits)))
-   L(s, d) zip(:squares, grid)
+   L(s, d) zip(:squares, grid_arr)
       I d C :digits & assign(&values, s, d).empty
          R Dict()
    R values
@@ -78,7 +78,7 @@ F printboard(values)
    V width = 1 + max(:squares.map(s -> @values[s].len))
    V line = "\n"([‘-’ * (width * 3)] * 3).join(‘+’)
    L(r) :rows
-      print((:cols.map(c -> @values[@r + c].center(@width) + (I c C ‘36’ {‘|’} E ‘’))).join(‘’) + (I r C ‘CF’ {line} E ‘’))
+      print((:cols.map(c -> @values[@r‘’c].center(@width)‘’(I c C ‘36’ {‘|’} E ‘’))).join(‘’)‘’(I r C ‘CF’ {line} E ‘’))
    print()
    R values
 

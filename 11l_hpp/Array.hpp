@@ -5,9 +5,9 @@ template <typename Type, int N> String to_string(const Tvec<Type, N> &v)
 {
 	String r;
 	for (int i = 0; i < N; i++) {
-		r += String(v[i]);
+		r &= String(v[i]);
 		if (i < N-1)
-			r += u", ";
+			r &= u", ";
 	}
 	return r;
 }

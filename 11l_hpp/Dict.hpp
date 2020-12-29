@@ -93,6 +93,11 @@ public:
 		std::map<KeyType, ValueType>::operator[](key) = value;
 	}
 
+	void set(const KeyType &key, ValueType &&value)
+	{
+		std::map<KeyType, ValueType>::operator[](key) = std::forward<ValueType>(value);
+	}
+
 	ConstValuePtr find(const KeyType &key) const
 	{
 		auto r = std::map<KeyType, ValueType>::find(key);

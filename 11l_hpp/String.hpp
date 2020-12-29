@@ -116,8 +116,8 @@ public:
 	{
 		assign(1, u'[');
 		for (int i=0; i<arr.len(); i++) {
-			*this += String(arr[i]);
-			if (i < arr.len()-1) *this += u", ";
+			*this &= String(arr[i]);
+			if (i < arr.len()-1) *this &= u", ";
 		}
 		append(1, u']');
 	}
@@ -653,7 +653,7 @@ template <typename ... Types> String String::format(const Types&... args) const
 	const char16_t *s = data();
 	for (int i=0; i<len();) {
 		if (s[i] == '#' && s[i+1] == '#') {
-			r += u'#';
+			r &= u'#';
 			i += 2;
 			continue;
 		}
@@ -688,14 +688,14 @@ template <typename ... Types> String String::format(const Types&... args) const
 				if (there_are_digits_after_period)
 					throw AssertionError();
 				if (left_align)
-					r += *fa.string;
+					r &= *fa.string;
 				r.resize(r.size() + max(before_period - fa.string->len(), 0), ' ');
 				if (!left_align)
-					r += *fa.string;
+					r &= *fa.string;
 			}
 			else {
 				if (before_period == 0 && after_period == 0 && !there_are_digits_after_period) // #.
-					r += fa.type == FormatArgument::Type::INTEGER ? String(fa.i) : String(fa.f);
+					r &= fa.type == FormatArgument::Type::INTEGER ? String(fa.i) : String(fa.f);
 				else {
 					String s; // (
 					if (!there_are_digits_after_period) // && fract(fa.number) != 0)
@@ -708,15 +708,15 @@ template <typename ... Types> String String::format(const Types&... args) const
 					else
 						s.assign(fa.f, after_period, false);
 					if (left_align)
-						r += s;
+						r &= s;
 					r.resize(r.size() + max(after_period + bool(after_period) + before_period - s.len(), 0), zero_padding ? '0' : ' ');
 					if (!left_align)
-						r += s;
+						r &= s;
 				}
 			}
 		}
 		else
-			r += s[i++];
+			r &= s[i++];
 	}
 
 	if (argument_index != sizeof...(args))

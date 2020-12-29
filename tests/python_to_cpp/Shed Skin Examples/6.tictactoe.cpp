@@ -17,13 +17,8 @@ class SpaceNotEmpty
 
 class MultiVictory
 {
-public:
-    Set<int> victors;
-    template <typename T1> MultiVictory(const T1 &victorslist) :
-        victors(victorslist)
-    {
-    }
 };
+
 
 class rectBoard
 {
@@ -87,7 +82,7 @@ public:
         if (victors.empty())
             return 0;
         if (create_set(victors).len() > 1)
-            throw MultiVictory(create_set(victors));
+            throw MultiVictory();
         return _get<0>(victors);
     }
 

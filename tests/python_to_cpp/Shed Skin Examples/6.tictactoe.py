@@ -16,9 +16,10 @@ class SpaceNotEmpty(Exception):
         pass
 
 class MultiVictory(Exception):
-        victors : Set[int]
-        def __init__(self, victorslist):
-                self.victors = victorslist
+        pass
+        # victors : Set[int]
+        # def __init__(self, victorslist):
+        #         self.victors = victorslist
 
 #classes
 class rectBoard:
@@ -74,7 +75,7 @@ class rectBoard:
                 if len(victors) == 0:
                         return 0
                 if len(set(victors)) > 1:
-                        raise MultiVictory(set(victors))
+                        raise MultiVictory()#(set(victors))
                 return victors[0]
 
         def __str__(self):

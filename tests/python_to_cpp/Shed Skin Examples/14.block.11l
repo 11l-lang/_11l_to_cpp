@@ -126,7 +126,7 @@ F iterate([node] &c) -> InternalNode
       V co = find_idx(c, second)
       deletednode.word = co.word‘0’
       c.append(deletednode)
-      co.word += ‘1’
+      co.word ‘’= ‘1’
       co.count -= deletednode.count
       V newnode0 = InternalNode()
       V newnode1 = InternalNode()

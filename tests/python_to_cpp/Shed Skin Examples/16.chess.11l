@@ -83,7 +83,7 @@ F toString(move)
          R ‘O-O’
    I move [&] 0200'0000
       mid = ‘x’
-   V retval = letters[fr [&] 7] + numbers[fr >> 4]‘’mid + letters[to [&] 7] + numbers[to >> 4]
+   V retval = letters[fr [&] 7]‘’numbers[fr >> 4]‘’mid‘’letters[to [&] 7]‘’numbers[to >> 4]
    R retval
 
 F moveStr([Int] &board; strMove)

@@ -107,7 +107,7 @@ def toString(move):
       return "O-O"
   if move & 0x02000000:
     mid = "x"
-  retval = letters[fr & 7] + numbers[fr >> 4] + mid + letters[to & 7] + numbers[to >> 4]
+  retval = letters[fr & 7] + '' + numbers[fr >> 4] + mid + '' + letters[to & 7] + '' + numbers[to >> 4]
   return retval
 
 def moveStr(board : List[int], strMove):

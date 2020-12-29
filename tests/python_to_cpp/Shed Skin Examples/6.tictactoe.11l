@@ -11,9 +11,8 @@ T SpaceNotEmpty
 }
 
 T MultiVictory
-   Set[Int] victors
-   F (victorslist)
-      .victors = victorslist
+{
+}
 
 T rectBoard
    Int edge
@@ -64,7 +63,7 @@ T rectBoard
       I victors.empty
          R 0
       I Set(victors).len > 1
-         X MultiVictory(Set(victors))
+         X MultiVictory()
       R victors[0]
 
    F String()

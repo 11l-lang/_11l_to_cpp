@@ -156,7 +156,7 @@ InternalNode iterate(Array<node> &c)
         auto co = find_idx(c, second);
         deletednode.word = co.word & u"0"_S;
         c.append(deletednode);
-        co.word += u"1"_S;
+        co.word &= u"1"_S;
         co.count -= deletednode.count;
         auto newnode0 = InternalNode();
         auto newnode1 = InternalNode();
