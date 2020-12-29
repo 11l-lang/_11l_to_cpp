@@ -111,7 +111,7 @@ T Converter
                L.break
             V k = @find_ending_sq_bracket(s, j, start) + 1
             start += k - j
-            s = s[0 .< j] + s[k ..]
+            s = s[0 .< j]‘’s[k ..]
          R s
       [Int = String] nonunique_links
       V link = ‘’
@@ -416,7 +416,7 @@ T Converter
                write_to_pos(prevci, endqpos + 1)
                I .habr_html
                   V contains_new_line = "\n" C ins
-                  outfile.write((I str_in_b != ‘’ {‘<source lang="’str_in_b‘">’} E I contains_new_line {‘<source>’} E ‘<code>’) + ins + (I str_in_b != ‘’ | contains_new_line {‘</source>’} E ‘</code>’))
+                  outfile.write((I str_in_b != ‘’ {‘<source lang="’str_in_b‘">’} E I contains_new_line {‘<source>’} E ‘<code>’)‘’ins‘’(I str_in_b != ‘’ | contains_new_line {‘</source>’} E ‘</code>’))
                E
                   V pre = ‘<pre ’(I ins[0] == "\n" {‘class="code_block"’} E ‘style="display: inline"’)‘>’
                   I .ohd & syntax_highlighter_for_pqmarkup:is_lang_supported(str_in_b)
@@ -424,11 +424,11 @@ T Converter
                         outfile.write(syntax_highlighter_for_pqmarkup:css)
                         .highlight_style_was_added = 1B
                      X.try
-                        outfile.write(pre + syntax_highlighter_for_pqmarkup:highlight(str_in_b, ins)‘</pre>’)
+                        outfile.write(pre‘’syntax_highlighter_for_pqmarkup:highlight(str_in_b, ins)‘</pre>’)
                      X.catch syntax_highlighter_for_pqmarkup:Error e
                         exit_with_error(‘Syntax highlighter: ’e.message, startqpos + 1 + e.pos)
                   E
-                     outfile.write(pre + html_escape(ins)‘</pre>’)
+                     outfile.write(pre‘’html_escape(ins)‘</pre>’)
                I ins[0] == "\n" & instr[i + 1 .< i + 2] == "\n"
                   outfile.write("\n")
                   new_line_tag = ‘’
@@ -468,7 +468,7 @@ T Converter
                               style ‘’= ‘vertical-align: ’(I ver_col_align != ‘’ {ver_col_align} E ver_row_align)
                            hor_col_align = ‘’
                            ver_col_align = ‘’
-                           table.last.append(TableCell(.to_html(instr[j + 1 .< end_of_column], outer_pos' j + 1), (I header_row {‘th’} E ‘td’) + (I style != ‘’ {‘ style="’style‘"’} E ‘’)))
+                           table.last.append(TableCell(.to_html(instr[j + 1 .< end_of_column], outer_pos' j + 1), (I header_row {‘th’} E ‘td’)‘’(I style != ‘’ {‘ style="’style‘"’} E ‘’)))
                            j = end_of_column
                         E I ch C ‘<>’ & instr[j + 1 .< j + 2] C (‘<’, ‘>’)
                            hor_col_align = S instr[j .< j + 2] {‘<<’ {‘left’}; ‘>>’ {‘right’}; ‘><’ {‘center’}; ‘<>’ {‘justify’}}
@@ -519,9 +519,9 @@ T Converter
                            E
                               L.break
                         I xx < x
-                           table[yy][xx].attrs += ‘ colspan="’String(x - xx + 1)‘"’
+                           table[yy][xx].attrs ‘’= ‘ colspan="’String(x - xx + 1)‘"’
                         I yy < y
-                           table[yy][xx].attrs += ‘ rowspan="’String(y - yy + 1)‘"’
+                           table[yy][xx].attrs ‘’= ‘ rowspan="’String(y - yy + 1)‘"’
                         L(xxx) xx .. x
                            L(yyy) yy .. y
                               I (xxx, yyy) != (xx, yy)
@@ -541,7 +541,7 @@ T Converter
                   new_line_tag = ‘’
             E I prevc C ‘<>’ & instr[prevci - 1] C ‘<>’
                write_to_pos(prevci - 1, endqpos + 1)
-               outfile.write(‘<div align="’(S instr[prevci - 1] + prevc {‘<<’ {‘left’}; ‘>>’ {‘right’}; ‘><’ {‘center’}; ‘<>’ {‘justify’}})‘">’(.to_html(instr[startqpos + 1 .< endqpos], outer_pos' startqpos + 1))"</div>\n")
+               outfile.write(‘<div align="’(S instr[prevci - 1]‘’prevc {‘<<’ {‘left’}; ‘>>’ {‘right’}; ‘><’ {‘center’}; ‘<>’ {‘justify’}})‘">’(.to_html(instr[startqpos + 1 .< endqpos], outer_pos' startqpos + 1))"</div>\n")
                new_line_tag = ‘’
             E I i_next_str(":‘") & instr[find_ending_pair_quote(i + 2) + 1 ..][0.<1] == ‘<’
                V endrq = find_ending_pair_quote(i + 2)
@@ -676,7 +676,7 @@ T Converter
          E I ch == ‘}’
             write_to_i(‘</span><span class="cu_brackets_b">’ * .ohd‘}’(.ohd * ‘</span></span>’))
          E I ch == "\n"
-            write_to_i((I new_line_tag != "\0" {new_line_tag} E ‘<br />’) + (I new_line_tag != ‘’ {"\n"} E ‘’))
+            write_to_i((I new_line_tag != "\0" {new_line_tag} E ‘<br />’)‘’(I new_line_tag != ‘’ {"\n"} E ‘’))
             new_line_tag = "\0"
          i++
       close_ordered_list()

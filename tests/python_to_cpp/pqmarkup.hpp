@@ -159,7 +159,7 @@ public:
                     break;
                 auto k = find_ending_sq_bracket(s, j, start) + 1;
                 start += k - j;
-                s = s[range_el(0, j)] + s[range_ei(k)];
+                s = s[range_el(0, j)] & s[range_ei(k)];
             }
             return s;
         };
@@ -542,7 +542,7 @@ public:
                     write_to_pos(prevci, endqpos + 1);
                     if (habr_html) {
                         auto contains_new_line = in(u'\n'_C, ins);
-                        outfile.write((str_in_b != u"" ? u"<source lang=\""_S & str_in_b & u"\">"_S : contains_new_line ? u"<source>"_S : u"<code>"_S) + ins + (str_in_b != u"" || contains_new_line ? u"</source>"_S : u"</code>"_S));
+                        outfile.write((str_in_b != u"" ? u"<source lang=\""_S & str_in_b & u"\">"_S : contains_new_line ? u"<source>"_S : u"<code>"_S) & ins & (str_in_b != u"" || contains_new_line ? u"</source>"_S : u"</code>"_S));
                     }
                     else {
                         auto pre = u"<pre "_S & (_get<0>(ins) == u'\n' ? u"class=\"code_block\""_S : u"style=\"display: inline\""_S) & u">"_S;
@@ -553,7 +553,7 @@ public:
                             }
                             try
                             {
-                                outfile.write(pre + (syntax_highlighter_for_pqmarkup::highlight(str_in_b, ins) & u"</pre>"_S));
+                                outfile.write(pre & syntax_highlighter_for_pqmarkup::highlight(str_in_b, ins) & u"</pre>"_S);
                             }
                             catch (const syntax_highlighter_for_pqmarkup::Error& e)
                             {
@@ -561,7 +561,7 @@ public:
                             }
                         }
                         else
-                            outfile.write(pre + (html_escape(ins) & u"</pre>"_S));
+                            outfile.write(pre & html_escape(ins) & u"</pre>"_S);
                     }
                     if (_get<0>(ins) == u'\n' && instr[range_el(i + 1, i + 2)] == u'\n') {
                         outfile.write(u"\n"_S);
@@ -610,7 +610,7 @@ public:
                                     }
                                     hor_col_align = u""_S;
                                     ver_col_align = u""_S;
-                                    table.last().append(TableCell(to_html(instr[range_el(j + 1, end_of_column)], nullptr, j + 1), (header_row ? u"th"_S : u"td"_S) + (style != u"" ? u" style=\""_S & style & u"\""_S : u""_S)));
+                                    table.last().append(TableCell(to_html(instr[range_el(j + 1, end_of_column)], nullptr, j + 1), (header_row ? u"th"_S : u"td"_S) & (style != u"" ? u" style=\""_S & style & u"\""_S : u""_S)));
                                     j = end_of_column;
                                 }
                                 else if (in(ch, u"<>"_S) && in(instr[range_el(j + 1, j + 2)], make_tuple(u"<"_S, u">"_S))) {
@@ -670,9 +670,9 @@ public:
                                     else
                                         break;
                                 if (xx < x)
-                                    table[yy][xx].attrs += u" colspan=\""_S & String(x - xx + 1) & u"\""_S;
+                                    table[yy][xx].attrs &= u" colspan=\""_S & String(x - xx + 1) & u"\""_S;
                                 if (yy < y)
-                                    table[yy][xx].attrs += u" rowspan=\""_S & String(y - yy + 1) & u"\""_S;
+                                    table[yy][xx].attrs &= u" rowspan=\""_S & String(y - yy + 1) & u"\""_S;
                                 for (auto xxx : range_ee(xx, x))
                                     for (auto yyy : range_ee(yy, y))
                                         if (make_tuple(xxx, yyy) != make_tuple(xx, yy))
@@ -695,7 +695,7 @@ public:
                 }
                 else if (in(prevc, u"<>"_S) && in(instr[prevci - 1], u"<>"_S)) {
                     write_to_pos(prevci - 1, endqpos + 1);
-                    outfile.write(u"<div align=\""_S & ([&](const auto &a){return a == u"<<" ? u"left"_S : a == u">>" ? u"right"_S : a == u"><" ? u"center"_S : a == u"<>" ? u"justify"_S : throw KeyError(a);}(instr[prevci - 1] + prevc)) & u"\">"_S & (to_html(instr[range_el(startqpos + 1, endqpos)], nullptr, startqpos + 1)) & u"</div>\n"_S);
+                    outfile.write(u"<div align=\""_S & ([&](const auto &a){return a == u"<<" ? u"left"_S : a == u">>" ? u"right"_S : a == u"><" ? u"center"_S : a == u"<>" ? u"justify"_S : throw KeyError(a);}(instr[prevci - 1] & prevc)) & u"\">"_S & (to_html(instr[range_el(startqpos + 1, endqpos)], nullptr, startqpos + 1)) & u"</div>\n"_S);
                     new_line_tag = u""_S;
                 }
                 else if (i_next_str(u":‘"_S) && instr[range_ei(find_ending_pair_quote(i + 2) + 1)][range_el(0, 1)] == u'<') {
@@ -863,7 +863,7 @@ public:
             else if (ch == u'}')
                 write_to_i(u"</span><span class=\"cu_brackets_b\">"_S * ohd & u"}"_S & (ohd * u"</span></span>"_S));
             else if (ch == u'\n') {
-                write_to_i((new_line_tag != u'\0' ? new_line_tag : u"<br />"_S) + (new_line_tag != u"" ? u"\n"_S : u""_S));
+                write_to_i((new_line_tag != u'\0' ? new_line_tag : u"<br />"_S) & (new_line_tag != u"" ? u"\n"_S : u""_S));
                 new_line_tag = u"\0"_S;
             }
             i++;

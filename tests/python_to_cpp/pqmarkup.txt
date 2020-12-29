@@ -123,7 +123,7 @@ class Converter:
                     break
                 k = find_ending_sq_bracket(s, j, start) + 1
                 start += k - j
-                s = s[0:j] + s[k:]
+                s = s[0:j] + '' + s[k:]
             return s
 
         nonunique_links : Dict[int, str] = {}
@@ -449,7 +449,7 @@ class Converter:
                     write_to_pos(prevci, endqpos+1)
                     if self.habr_html:
                         contains_new_line = "\n" in ins
-                        outfile.write(('<source lang="' + str_in_b + '">' if str_in_b != '' else '<source>' if contains_new_line else '<code>') + ins + ("</source>" if str_in_b != '' or contains_new_line else "</code>")) # так как <source> в Habr — блочный элемент, а не встроенный\inline
+                        outfile.write(('<source lang="' + str_in_b + '">' if str_in_b != '' else '<source>' if contains_new_line else '<code>') + '' + ins + '' + ("</source>" if str_in_b != '' or contains_new_line else "</code>")) # так как <source> в Habr — блочный элемент, а не встроенный\inline
                     else:
                         pre = '<pre ' + ('class="code_block"' if ins[0] == "\n" else 'style="display: inline"') + '>' # can not do `outfile.write('<pre ' + ...)` here because `outfile.write(syntax_highlighter_for_pqmarkup.css)` should be outside of <pre> block
                         if self.ohd and syntax_highlighter_for_pqmarkup.is_lang_supported(str_in_b):
@@ -504,7 +504,7 @@ class Converter:
                                         style += "vertical-align: " + (ver_col_align if ver_col_align != '' else ver_row_align)
                                     hor_col_align = ''
                                     ver_col_align = ''
-                                    table[-1].append(TableCell(self.to_html(instr[j+1:end_of_column], outer_pos = j+1), ("th" if header_row else "td") + (' style="'+style+'"' if style != '' else '')))
+                                    table[-1].append(TableCell(self.to_html(instr[j+1:end_of_column], outer_pos = j+1), ("th" if header_row else "td") + '' + (' style="'+style+'"' if style != '' else '')))
                                     j = end_of_column
                                 elif ch in '<>' and instr[j+1:j+2] in ('<', '>'):
                                     hor_col_align = {'<<':'left', '>>':'right', '><':'center', '<>':'justify'}[instr[j:j+2]]
@@ -584,7 +584,7 @@ class Converter:
                         new_line_tag = ''
                 elif prevc in '<>' and instr[prevci-1] in '<>': # выравнивание текста \ text alignment
                     write_to_pos(prevci-1, endqpos+1)
-                    outfile.write('<div align="' + {'<<':'left', '>>':'right', '><':'center', '<>':'justify'}[instr[prevci-1]+prevc] + '">'
+                    outfile.write('<div align="' + {'<<':'left', '>>':'right', '><':'center', '<>':'justify'}[instr[prevci-1]+''+prevc] + '">'
                                  + self.to_html(instr[startqpos+1:endqpos], outer_pos = startqpos+1) + "</div>\n")
                     new_line_tag = ''
                 elif i_next_str(":‘") and instr[find_ending_pair_quote(i+2)+1:][:1] == '<': # this is reversed quote ‘Quoted text.’:‘Author's name’< # ’
@@ -722,7 +722,7 @@ class Converter:
             elif ch == "}":
                 write_to_i('</span><span class="cu_brackets_b">'*self.ohd + '}' + self.ohd*'</span></span>')
             elif ch == "\n":
-                write_to_i((new_line_tag if new_line_tag != "\0" else "<br />") + ("\n" if new_line_tag != '' else "")) # код `"\n" if new_line_tag != ''` нужен только для списков (unordered/ordered list)
+                write_to_i((new_line_tag if new_line_tag != "\0" else "<br />") + '' + ("\n" if new_line_tag != '' else "")) # код `"\n" if new_line_tag != ''` нужен только для списков (unordered/ordered list)
                 new_line_tag = "\0"
 
             i += 1
@@ -1049,7 +1049,7 @@ T Converter
                L.break
             V k = @find_ending_sq_bracket(s, j, start) + 1
             start += k - j
-            s = s[0 .< j] + s[k ..]
+            s = s[0 .< j]‘’s[k ..]
          R s
       [Int = String] nonunique_links
       V link = ‘’
@@ -1354,7 +1354,7 @@ T Converter
                write_to_pos(prevci, endqpos + 1)
                I .habr_html
                   V contains_new_line = "\n" C ins
-                  outfile.write((I str_in_b != ‘’ {‘<source lang="’str_in_b‘">’} E I contains_new_line {‘<source>’} E ‘<code>’) + ins + (I str_in_b != ‘’ | contains_new_line {‘</source>’} E ‘</code>’))
+                  outfile.write((I str_in_b != ‘’ {‘<source lang="’str_in_b‘">’} E I contains_new_line {‘<source>’} E ‘<code>’)‘’ins‘’(I str_in_b != ‘’ | contains_new_line {‘</source>’} E ‘</code>’))
                E
                   V pre = ‘<pre ’(I ins[0] == "\n" {‘class="code_block"’} E ‘style="display: inline"’)‘>’
                   I .ohd & syntax_highlighter_for_pqmarkup:is_lang_supported(str_in_b)
@@ -1362,11 +1362,11 @@ T Converter
                         outfile.write(syntax_highlighter_for_pqmarkup:css)
                         .highlight_style_was_added = 1B
                      X.try
-                        outfile.write(pre + syntax_highlighter_for_pqmarkup:highlight(str_in_b, ins)‘</pre>’)
+                        outfile.write(pre‘’syntax_highlighter_for_pqmarkup:highlight(str_in_b, ins)‘</pre>’)
                      X.catch syntax_highlighter_for_pqmarkup:Error e
                         exit_with_error(‘Syntax highlighter: ’e.message, startqpos + 1 + e.pos)
                   E
-                     outfile.write(pre + html_escape(ins)‘</pre>’)
+                     outfile.write(pre‘’html_escape(ins)‘</pre>’)
                I ins[0] == "\n" & instr[i + 1 .< i + 2] == "\n"
                   outfile.write("\n")
                   new_line_tag = ‘’
@@ -1406,7 +1406,7 @@ T Converter
                               style ‘’= ‘vertical-align: ’(I ver_col_align != ‘’ {ver_col_align} E ver_row_align)
                            hor_col_align = ‘’
                            ver_col_align = ‘’
-                           table.last.append(TableCell(.to_html(instr[j + 1 .< end_of_column], outer_pos' j + 1), (I header_row {‘th’} E ‘td’) + (I style != ‘’ {‘ style="’style‘"’} E ‘’)))
+                           table.last.append(TableCell(.to_html(instr[j + 1 .< end_of_column], outer_pos' j + 1), (I header_row {‘th’} E ‘td’)‘’(I style != ‘’ {‘ style="’style‘"’} E ‘’)))
                            j = end_of_column
                         E I ch C ‘<>’ & instr[j + 1 .< j + 2] C (‘<’, ‘>’)
                            hor_col_align = S instr[j .< j + 2] {‘<<’ {‘left’}; ‘>>’ {‘right’}; ‘><’ {‘center’}; ‘<>’ {‘justify’}}
@@ -1457,9 +1457,9 @@ T Converter
                            E
                               L.break
                         I xx < x
-                           table[yy][xx].attrs += ‘ colspan="’String(x - xx + 1)‘"’
+                           table[yy][xx].attrs ‘’= ‘ colspan="’String(x - xx + 1)‘"’
                         I yy < y
-                           table[yy][xx].attrs += ‘ rowspan="’String(y - yy + 1)‘"’
+                           table[yy][xx].attrs ‘’= ‘ rowspan="’String(y - yy + 1)‘"’
                         L(xxx) xx .. x
                            L(yyy) yy .. y
                               I (xxx, yyy) != (xx, yy)
@@ -1479,7 +1479,7 @@ T Converter
                   new_line_tag = ‘’
             E I prevc C ‘<>’ & instr[prevci - 1] C ‘<>’
                write_to_pos(prevci - 1, endqpos + 1)
-               outfile.write(‘<div align="’(S instr[prevci - 1] + prevc {‘<<’ {‘left’}; ‘>>’ {‘right’}; ‘><’ {‘center’}; ‘<>’ {‘justify’}})‘">’(.to_html(instr[startqpos + 1 .< endqpos], outer_pos' startqpos + 1))"</div>\n")
+               outfile.write(‘<div align="’(S instr[prevci - 1]‘’prevc {‘<<’ {‘left’}; ‘>>’ {‘right’}; ‘><’ {‘center’}; ‘<>’ {‘justify’}})‘">’(.to_html(instr[startqpos + 1 .< endqpos], outer_pos' startqpos + 1))"</div>\n")
                new_line_tag = ‘’
             E I i_next_str(":‘") & instr[find_ending_pair_quote(i + 2) + 1 ..][0.<1] == ‘<’
                V endrq = find_ending_pair_quote(i + 2)
@@ -1614,7 +1614,7 @@ T Converter
          E I ch == ‘}’
             write_to_i(‘</span><span class="cu_brackets_b">’ * .ohd‘}’(.ohd * ‘</span></span>’))
          E I ch == "\n"
-            write_to_i((I new_line_tag != "\0" {new_line_tag} E ‘<br />’) + (I new_line_tag != ‘’ {"\n"} E ‘’))
+            write_to_i((I new_line_tag != "\0" {new_line_tag} E ‘<br />’)‘’(I new_line_tag != ‘’ {"\n"} E ‘’))
             new_line_tag = "\0"
          i++
       close_ordered_list()
@@ -1976,7 +1976,7 @@ public:
                     break;
                 auto k = find_ending_sq_bracket(s, j, start) + 1;
                 start += k - j;
-                s = s[range_el(0, j)] + s[range_ei(k)];
+                s = s[range_el(0, j)] & s[range_ei(k)];
             }
             return s;
         };
@@ -2359,7 +2359,7 @@ public:
                     write_to_pos(prevci, endqpos + 1);
                     if (habr_html) {
                         auto contains_new_line = in(u'\n'_C, ins);
-                        outfile.write((str_in_b != u"" ? u"<source lang=\""_S & str_in_b & u"\">"_S : contains_new_line ? u"<source>"_S : u"<code>"_S) + ins + (str_in_b != u"" || contains_new_line ? u"</source>"_S : u"</code>"_S));
+                        outfile.write((str_in_b != u"" ? u"<source lang=\""_S & str_in_b & u"\">"_S : contains_new_line ? u"<source>"_S : u"<code>"_S) & ins & (str_in_b != u"" || contains_new_line ? u"</source>"_S : u"</code>"_S));
                     }
                     else {
                         auto pre = u"<pre "_S & (_get<0>(ins) == u'\n' ? u"class=\"code_block\""_S : u"style=\"display: inline\""_S) & u">"_S;
@@ -2370,7 +2370,7 @@ public:
                             }
                             try
                             {
-                                outfile.write(pre + (syntax_highlighter_for_pqmarkup::highlight(str_in_b, ins) & u"</pre>"_S));
+                                outfile.write(pre & syntax_highlighter_for_pqmarkup::highlight(str_in_b, ins) & u"</pre>"_S);
                             }
                             catch (const syntax_highlighter_for_pqmarkup::Error& e)
                             {
@@ -2378,7 +2378,7 @@ public:
                             }
                         }
                         else
-                            outfile.write(pre + (html_escape(ins) & u"</pre>"_S));
+                            outfile.write(pre & html_escape(ins) & u"</pre>"_S);
                     }
                     if (_get<0>(ins) == u'\n' && instr[range_el(i + 1, i + 2)] == u'\n') {
                         outfile.write(u"\n"_S);
@@ -2427,7 +2427,7 @@ public:
                                     }
                                     hor_col_align = u""_S;
                                     ver_col_align = u""_S;
-                                    table.last().append(TableCell(to_html(instr[range_el(j + 1, end_of_column)], nullptr, j + 1), (header_row ? u"th"_S : u"td"_S) + (style != u"" ? u" style=\""_S & style & u"\""_S : u""_S)));
+                                    table.last().append(TableCell(to_html(instr[range_el(j + 1, end_of_column)], nullptr, j + 1), (header_row ? u"th"_S : u"td"_S) & (style != u"" ? u" style=\""_S & style & u"\""_S : u""_S)));
                                     j = end_of_column;
                                 }
                                 else if (in(ch, u"<>"_S) && in(instr[range_el(j + 1, j + 2)], make_tuple(u"<"_S, u">"_S))) {
@@ -2487,9 +2487,9 @@ public:
                                     else
                                         break;
                                 if (xx < x)
-                                    table[yy][xx].attrs += u" colspan=\""_S & String(x - xx + 1) & u"\""_S;
+                                    table[yy][xx].attrs &= u" colspan=\""_S & String(x - xx + 1) & u"\""_S;
                                 if (yy < y)
-                                    table[yy][xx].attrs += u" rowspan=\""_S & String(y - yy + 1) & u"\""_S;
+                                    table[yy][xx].attrs &= u" rowspan=\""_S & String(y - yy + 1) & u"\""_S;
                                 for (auto xxx : range_ee(xx, x))
                                     for (auto yyy : range_ee(yy, y))
                                         if (make_tuple(xxx, yyy) != make_tuple(xx, yy))
@@ -2512,7 +2512,7 @@ public:
                 }
                 else if (in(prevc, u"<>"_S) && in(instr[prevci - 1], u"<>"_S)) {
                     write_to_pos(prevci - 1, endqpos + 1);
-                    outfile.write(u"<div align=\""_S & ([&](const auto &a){return a == u"<<" ? u"left"_S : a == u">>" ? u"right"_S : a == u"><" ? u"center"_S : a == u"<>" ? u"justify"_S : throw KeyError(a);}(instr[prevci - 1] + prevc)) & u"\">"_S & (to_html(instr[range_el(startqpos + 1, endqpos)], nullptr, startqpos + 1)) & u"</div>\n"_S);
+                    outfile.write(u"<div align=\""_S & ([&](const auto &a){return a == u"<<" ? u"left"_S : a == u">>" ? u"right"_S : a == u"><" ? u"center"_S : a == u"<>" ? u"justify"_S : throw KeyError(a);}(instr[prevci - 1] & prevc)) & u"\">"_S & (to_html(instr[range_el(startqpos + 1, endqpos)], nullptr, startqpos + 1)) & u"</div>\n"_S);
                     new_line_tag = u""_S;
                 }
                 else if (i_next_str(u":‘"_S) && instr[range_ei(find_ending_pair_quote(i + 2) + 1)][range_el(0, 1)] == u'<') {
@@ -2680,7 +2680,7 @@ public:
             else if (ch == u'}')
                 write_to_i(u"</span><span class=\"cu_brackets_b\">"_S * ohd & u"}"_S & (ohd * u"</span></span>"_S));
             else if (ch == u'\n') {
-                write_to_i((new_line_tag != u'\0' ? new_line_tag : u"<br />"_S) + (new_line_tag != u"" ? u"\n"_S : u""_S));
+                write_to_i((new_line_tag != u'\0' ? new_line_tag : u"<br />"_S) & (new_line_tag != u"" ? u"\n"_S : u""_S));
                 new_line_tag = u"\0"_S;
             }
             i++;

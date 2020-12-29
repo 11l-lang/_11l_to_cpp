@@ -249,7 +249,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
 
             if (tabs && spaces) {
                 auto next_line_pos = source.findi(u"\n"_S, i);
-                throw Error((u"mixing tabs and spaces in indentation: `"_S & source[range_el(linestart, i)].replace(u" "_S, u"S"_S).replace(u"\t"_S, u"TAB"_S)) + (source[range_el(i, next_line_pos != -1 ? next_line_pos : !source.empty())] & u"`"_S), i);
+                throw Error(u"mixing tabs and spaces in indentation: `"_S & source[range_el(linestart, i)].replace(u" "_S, u"S"_S).replace(u"\t"_S, u"TAB"_S) & source[range_el(i, next_line_pos != -1 ? next_line_pos : !source.empty())] & u"`"_S, i);
             }
             auto indentation_level = ii - linestart;
             if (indentation_levels.len() && _get<0>(indentation_levels.last()) == -1) {
@@ -263,7 +263,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                     auto e = i + 1;
                     while (e < source.len() && !in(source[e], u"\r\n"_S))
                         e++;
-                    throw Error((u"inconsistent indentations:\n```\n"_S & prev_indentation_level * (indentation_tabs ? u"TAB"_S : u"S"_S)) + source[range_el(prev_linestart, linestart)] + (ii - linestart) * (tabs ? u"TAB"_S : u"S"_S) + (source[range_el(ii, e)] & u"\n```"_S), ii);
+                    throw Error(u"inconsistent indentations:\n```\n"_S & prev_indentation_level * (indentation_tabs ? u"TAB"_S : u"S"_S) & source[range_el(prev_linestart, linestart)] & (ii - linestart) * (tabs ? u"TAB"_S : u"S"_S) & source[range_el(ii, e)] & u"\n```"_S, ii);
                 }
                 prev_linestart = ii;
 

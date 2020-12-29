@@ -94,10 +94,10 @@ public:
 		String r;
 		auto it = begin();
 		if (it != end()) {
-			r += *it;
+			r &= *it;
 			for (++it; it != end(); ++it) {
-				r += str;
-				r += *it;
+				r &= str;
+				r &= *it;
 			}
 		}
 		return r;

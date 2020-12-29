@@ -43,7 +43,7 @@ public:
 		String name;
 	public:
 		Var(const String &name) : name(name) {}
-		void operator+=(const String &s)
+		void operator&=(const String &s)
 		{
 			setenv(name, getenv(name) & s);
 		}

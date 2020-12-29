@@ -465,7 +465,7 @@ os.system('pause')
 //import os, tempfile
 print(os:env_path_sep‘’fs:path:join(fs:get_temp_dir(), ‘right’))
 print(os:getenv(‘PATH’))
-os:environ[‘PATH’] += os:env_path_sep‘KDiff3’
+os:environ[‘PATH’] ‘’= os:env_path_sep‘KDiff3’
 print(os:getenv(‘PATH’))
 print(fs:list_dir())
 os:(‘pause’)
@@ -476,7 +476,7 @@ struct CodeBlock1
     {
         print(os::env_path_sep & fs::path::join(fs::get_temp_dir(), u"right"_S));
         print(os::getenv(u"PATH"_S));
-        os::environ[u"PATH"_S] += os::env_path_sep & u"KDiff3"_S;
+        os::environ[u"PATH"_S] &= os::env_path_sep & u"KDiff3"_S;
         print(os::getenv(u"PATH"_S));
         print(fs::list_dir());
         os::_(u"pause"_S);
