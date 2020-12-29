@@ -55,7 +55,7 @@ public:
 
     template <typename T1> auto to_str(const T1 &source)
     {
-        return u"Token("_S + String(category) + u", \""_S + (value(source)) + u"\")"_S;
+        return u"Token("_S & String(category) & u", \""_S & (value(source)) & u"\")"_S;
     }
 };
 
@@ -154,7 +154,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                     nesting_elements.append(make_tuple(ch, lexem_start));
                 else if (in(ch, u")]}"_S)) {
                     if (nesting_elements.empty() || _get<0>(nesting_elements.last()) != ([&](const auto &a){return a == u')' ? u'('_C : a == u']' ? u'['_C : a == u'}' ? u'{'_C : throw KeyError(a);}(ch)))
-                        throw Error(u"there is no corresponding opening parenthesis/bracket/brace for `"_S + ch + u"`"_S, lexem_start);
+                        throw Error(u"there is no corresponding opening parenthesis/bracket/brace for `"_S & ch & u"`"_S, lexem_start);
                     nesting_elements.pop();
                 }
                 else if (ch == u';')
@@ -242,12 +242,12 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                         auto number_with_separators = u""_S;
                         auto j = number.len();
                         while (j > 3) {
-                            number_with_separators = u"_"_S + number[range_el(j - 3, j)] + number_with_separators;
+                            number_with_separators = u"_"_S & number[range_el(j - 3, j)] & number_with_separators;
                             j -= 3;
                         }
-                        number_with_separators = number[range_el(0, j)] + number_with_separators;
+                        number_with_separators = number[range_el(0, j)] & number_with_separators;
                         if (source[range_el(start, i)] != number_with_separators)
-                            throw Error(u"digit separator in this number is located in the wrong place (should be: "_S + number_with_separators + u")"_S, start);
+                            throw Error(u"digit separator in this number is located in the wrong place (should be: "_S & number_with_separators & u")"_S, start);
                     }
                 }
                 category = decltype(category)::NUMERIC_LITERAL;
@@ -263,12 +263,12 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                 continue;
             }
             else
-                throw Error(u"unexpected character "_S + ch, lexem_start);
+                throw Error(u"unexpected character "_S & ch, lexem_start);
             tokens.append(Token(lexem_start, i, category));
         }
     }
     if (!nesting_elements.empty())
-        throw Error(u"there is no corresponding closing parenthesis/bracket/brace for `"_S + _get<0>(nesting_elements.last()) + u"`"_S, _get<1>(nesting_elements.last()));
+        throw Error(u"there is no corresponding closing parenthesis/bracket/brace for `"_S & _get<0>(nesting_elements.last()) & u"`"_S, _get<1>(nesting_elements.last()));
     if (expected_an_indented_block)
         throw Error(u"expected an indented block"_S, i);
 

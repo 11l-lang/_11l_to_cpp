@@ -149,9 +149,9 @@ public:
                     sitem = u"E"_S;
                 else
                     sitem = String(item);
-                s = s + u"  "_S + sitem + u"   "_S;
+                s = s & u"  "_S & sitem & u"   "_S;
             }
-            s = s + u"\n\n"_S;
+            s = s & u"\n\n"_S;
         }
         return s;
     }

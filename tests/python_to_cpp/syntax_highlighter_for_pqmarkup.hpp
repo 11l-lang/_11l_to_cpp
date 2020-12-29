@@ -49,18 +49,18 @@ template <typename T1, typename T2> auto highlight(const T1 &lang, const T2 &sou
         {
             for (auto &&token : python_to_11l::tokenizer::tokenize(source, nullptr, &comments) + create_array({python_to_11l::tokenizer::Token(source.len(), source.len(), python_to_11l::tokenizer::Token::Category::STATEMENT_SEPARATOR)})) {
                 while (comments.len() && _get<0>(_get<0>(comments)) < token.start) {
-                    res += html_escape(source[range_el(writepos, _get<0>(_get<0>(comments)))]);
+                    res &= html_escape(source[range_el(writepos, _get<0>(_get<0>(comments)))]);
                     writepos = _get<1>(_get<0>(comments));
-                    res += u"<span class=\"comment\">"_S + html_escape(source[range_el(_get<0>(_get<0>(comments)), _get<1>(_get<0>(comments)))]) + u"</span>"_S;
+                    res &= u"<span class=\"comment\">"_S & html_escape(source[range_el(_get<0>(_get<0>(comments)), _get<1>(_get<0>(comments)))]) & u"</span>"_S;
                     comments.pop(0);
                 }
-                res += html_escape(source[range_el(writepos, token.start)]);
+                res &= html_escape(source[range_el(writepos, token.start)]);
                 writepos = token.end;
                 auto css_class = syntax_highlighter_for_pqmarkup::cat_to_class_python[token.category];
                 if (css_class != u"")
-                    res += u"<span class=\""_S + css_class + u"\">"_S + html_escape(token.value(source)) + u"</span>"_S;
+                    res &= u"<span class=\""_S & css_class & u"\">"_S & html_escape(token.value(source)) & u"</span>"_S;
                 else
-                    res += html_escape(token.value(source));
+                    res &= html_escape(token.value(source));
             }
         }
 
@@ -75,12 +75,12 @@ template <typename T1, typename T2> auto highlight(const T1 &lang, const T2 &sou
         {
             for (auto &&token : _11l_to_cpp::tokenizer::tokenize(source, nullptr, nullptr, &comments) + create_array({_11l_to_cpp::tokenizer::Token(source.len(), source.len(), _11l_to_cpp::tokenizer::Token::Category::STATEMENT_SEPARATOR)})) {
                 while (comments.len() && _get<0>(_get<0>(comments)) < token.start) {
-                    res += html_escape(source[range_el(writepos, _get<0>(_get<0>(comments)))]);
+                    res &= html_escape(source[range_el(writepos, _get<0>(_get<0>(comments)))]);
                     writepos = _get<1>(_get<0>(comments));
-                    res += u"<span class=\"comment\">"_S + html_escape(source[range_el(_get<0>(_get<0>(comments)), _get<1>(_get<0>(comments)))]) + u"</span>"_S;
+                    res &= u"<span class=\"comment\">"_S & html_escape(source[range_el(_get<0>(_get<0>(comments)), _get<1>(_get<0>(comments)))]) & u"</span>"_S;
                     comments.pop(0);
                 }
-                res += html_escape(source[range_el(writepos, token.start)]);
+                res &= html_escape(source[range_el(writepos, token.start)]);
                 writepos = token.end;
                 auto tokstr = html_escape(token.value(source));
                 String css_class;
@@ -95,21 +95,21 @@ template <typename T1, typename T2> auto highlight(const T1 &lang, const T2 &sou
                             auto apos = 1;
                             while (tokstr[apos] == u'\'')
                                 apos++;
-                            assert(tokstr[range_el(0, apos * 2 + 1)] == (u"'"_S * apos) + (u"‘"_S * apos) + u"‘"_S);
-                            tokstr = u"<span style=\"opacity: 0.25\">"_S + tokstr[range_el(0, apos * 2)] + u"</span>"_S + tokstr[range_ei(apos * 2)];
+                            assert(tokstr[range_el(0, apos * 2 + 1)] == ((u"'"_S * apos) & (u"‘"_S * apos) & u"‘"_S));
+                            tokstr = u"<span style=\"opacity: 0.25\">"_S & tokstr[range_el(0, apos * 2)] & u"</span>"_S & tokstr[range_ei(apos * 2)];
                         }
                         if (tokstr.last() == u'\'') {
                             auto apos = 1;
                             while (tokstr.at_plus_len( - (apos + 1)) == u'\'')
                                 apos++;
-                            assert(tokstr[range_elen_i( - (apos * 2 + 1))] == u"’"_S + (u"’"_S * apos) + (u"'"_S * apos));
-                            tokstr = tokstr[range_e_llen(0,  - (apos * 2))] + u"<span style=\"opacity: 0.25\">"_S + tokstr[range_elen_i( - (apos * 2))] + u"</span>"_S;
+                            assert(tokstr[range_elen_i( - (apos * 2 + 1))] == (u"’"_S & (u"’"_S * apos) & (u"'"_S * apos)));
+                            tokstr = tokstr[range_e_llen(0,  - (apos * 2))] & u"<span style=\"opacity: 0.25\">"_S & tokstr[range_elen_i( - (apos * 2))] & u"</span>"_S;
                         }
                     }
-                    res += u"<span class=\""_S + css_class + u"\">"_S + tokstr + u"</span>"_S;
+                    res &= u"<span class=\""_S & css_class & u"\">"_S & tokstr & u"</span>"_S;
                 }
                 else
-                    res += tokstr;
+                    res &= tokstr;
             }
         }
 

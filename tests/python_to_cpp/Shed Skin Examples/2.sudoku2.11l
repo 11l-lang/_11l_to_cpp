@@ -130,7 +130,7 @@ T board
             E
                L(row, col) coords
                   V broken = 0B
-                  L(val) (0.<9).filter(i -> @_board.mergemask(@row, @col).v[i] == Byte(1))
+                  L(=val) (0.<9).filter(i -> @_board.mergemask(@row, @col).v[i] == Byte(1))
                      I !:board_completeSearch & .__status == 2
                         broken = 1B
                         L.break

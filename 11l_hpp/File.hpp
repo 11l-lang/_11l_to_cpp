@@ -61,9 +61,9 @@ public:
 	{
 #ifdef _WIN32
 		file = NULL;
-		_wfopen_s(&file, (wchar_t*)name.c_str(), (wchar_t*)(mode + u'b').c_str());
+		_wfopen_s(&file, (wchar_t*)name.c_str(), (wchar_t*)(mode & u'b').c_str());
 #else
-		file = fopen(convert_utf16_to_utf8(name).c_str(), convert_utf16_to_utf8(mode + u'b').c_str());
+		file = fopen(convert_utf16_to_utf8(name).c_str(), convert_utf16_to_utf8(mode & u'b').c_str());
 #endif
 		if (file == NULL)
 			throw FileNotFoundError();
@@ -150,11 +150,11 @@ public:
 			if (r[r.len()-1].empty()) {
 				r.resize(r.len()-1);
 				for (int i=0, n=r.len(); i < n; i++)
-					r[i] += u'\n';
+					r[i] &= u'\n';
 			}
 			else
 				for (int i=0, n=r.len()-1; i < n; i++)
-					r[i] += u'\n';
+					r[i] &= u'\n';
 		}
 		else
 			if (r[r.len()-1].empty())

@@ -121,9 +121,9 @@ public:
     {
         auto answer = u"   123   456   789\n"_S;
         for (auto row : range_ee(0, 8)) {
-            answer = answer + String(row + 1) + u" ["_S + (range_ee(0, 2).map([&row, this](const auto &col){return get_cell_digit_str(row, col).replace(u"0"_S, u"?"_S);})).join(u""_S) + u"] ["_S + (range_ee(3, 5).map([&row, this](const auto &col){return get_cell_digit_str(row, col).replace(u"0"_S, u"?"_S);})).join(u""_S) + u"] ["_S + (range_ee(6, 8).map([&row, this](const auto &col){return get_cell_digit_str(row, col).replace(u"0"_S, u"?"_S);})).join(u""_S) + u"]\n"_S;
+            answer = answer & String(row + 1) & u" ["_S & (range_ee(0, 2).map([&row, this](const auto &col){return get_cell_digit_str(row, col).replace(u"0"_S, u"?"_S);})).join(u""_S) & u"] ["_S & (range_ee(3, 5).map([&row, this](const auto &col){return get_cell_digit_str(row, col).replace(u"0"_S, u"?"_S);})).join(u""_S) & u"] ["_S & (range_ee(6, 8).map([&row, this](const auto &col){return get_cell_digit_str(row, col).replace(u"0"_S, u"?"_S);})).join(u""_S) & u"]\n"_S;
             if (in(row + 1, create_array({3, 6})))
-                answer = answer + u"   ---   ---   ---\n"_S;
+                answer = answer & u"   ---   ---   ---\n"_S;
         }
         return answer;
     }

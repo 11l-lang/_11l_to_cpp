@@ -184,7 +184,7 @@ T Scene
       V lines = File(scene_filename).read_lines(1B).filter(l -> l.trim((‘ ’, "\t", "\r", "\n")) != ‘’ & l.trim((‘ ’, "\t", "\r", "\n"))[0] != ‘#’).map(l -> l.split_py())
       .endline = .imgAlto - 1
 
-      L(line) lines
+      L(=line) lines
          V word = line[0]
          line = line[1..]
 

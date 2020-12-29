@@ -804,7 +804,7 @@ template <typename T1, typename T2, typename T3> auto range_check(const T1 &arra
 		 or to_index > array_len
 	)"_S;
     if (from_index > to_index)
-        throw ValueError(u"from_index("_S + String(from_index) + u") > to_index("_S + String(to_index) + u")"_S);
+        throw ValueError(u"from_index("_S & String(from_index) & u") > to_index("_S & String(to_index) & u")"_S);
     if (from_index < 0)
         throw IndexError(from_index);
     if (to_index > array_len)

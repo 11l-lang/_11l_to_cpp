@@ -31,7 +31,7 @@ public:
 	bool operator!=(char16_t c) const {return code != c;}
 
 	void operator++() {++code;}
-	Char operator+(int i) const {return Char(code + i);}
+//	Char operator+(int i) const {return Char(code + i);}
 	Char operator-(int i) const {return Char(code - i);}
 	int operator-(Char c) const {return Char(code - c.code);}
 
@@ -366,7 +366,7 @@ public:
 
 	String zfill(int width) const
 	{
-		return String(u"0") * max(width - len(), 0) + *this;
+		return String(u"0") * max(width - len(), 0) & *this;
 	}
 
 	String center(int width, String fillchar = String(u' ')) const
@@ -374,21 +374,21 @@ public:
 		if (fillchar.len() != 1)
 			throw AssertionError();
 		int w = width / 2 - len() / 2;
-		return fillchar * (width - len() - w) + *this + fillchar * w;
+		return fillchar * (width - len() - w) & *this & fillchar * w;
 	}
 
 	String ljust(int width, String fillchar = String(u' ')) const
 	{
 		if (fillchar.len() != 1)
 			throw AssertionError();
-		return *this + fillchar * (width - len());
+		return *this & fillchar * (width - len());
 	}
 
 	String rjust(int width, String fillchar = String(u' ')) const
 	{
 		if (fillchar.len() != 1)
 			throw AssertionError();
-		return fillchar * (width - len()) + *this;
+		return fillchar * (width - len()) & *this;
 	}
 
 	String ltrim(Char c, Nullable<int> limit = nullptr) const
@@ -543,31 +543,35 @@ public:
 	template <int N> bool operator==(const char16_t (&s)[N]) const {return   len() == N-1 && memcmp(c_str(), s, (N-1)*sizeof(char16_t)) == 0 ;}
 	template <int N> bool operator!=(const char16_t (&s)[N]) const {return !(len() == N-1 && memcmp(c_str(), s, (N-1)*sizeof(char16_t)) == 0);}
 
-	void operator+=(const char16_t *s) {append(s);}
-	void operator+=(const String &s) {append(s);}
-	void operator+=(Char ch) {append(1, ch.code);}
-	void operator+=(char16_t ch) {append(1, ch);}
-	void operator+=(int i)    {*this += String(i);}
-	void operator+=(double n) {*this += String(n);}
+	template <typename Ty> String operator+(const Ty &obj) const = delete;
+	template <typename Ty> void operator+=(const Ty &obj) const = delete;
+	template <typename Ty> friend String operator+(const Ty &obj, const String &s) = delete;
 
-	String operator+(const char16_t *s) const {String r(*this); r.append(s); return r;}
-	String operator+(const String &s) const {String r(*this); r.append(s); return r;}
-	String operator+(Char ch)         const {String r(*this); r.append(1, ch.code); return r;}
-	String operator+(char16_t ch)     const {String r(*this); r.append(1, ch); return r;}
+	void operator&=(const char16_t *s) {append(s);}
+	void operator&=(const String &s) {append(s);}
+	void operator&=(Char ch) {append(1, ch.code);}
+	void operator&=(char16_t ch) {append(1, ch);}
+	void operator&=(int i)    {*this &= String(i);}
+	void operator&=(double n) {*this &= String(n);}
 
-	String operator+(int i)    const {return *this + String(i);}
-	String operator+(bool b)   const {return *this + String(b);}
-	String operator+(double n) const {return *this + String(n);}
+	String operator&(const char16_t *s) const {String r(*this); r.append(s); return r;}
+	String operator&(const String &s) const {String r(*this); r.append(s); return r;}
+	String operator&(Char ch)         const {String r(*this); r.append(1, ch.code); return r;}
+	String operator&(char16_t ch)     const {String r(*this); r.append(1, ch); return r;}
 
-	template <typename Ty> String operator+(const Ty &obj) const {return *this + String(obj);}
+	String operator&(int i)    const {return *this & String(i);}
+	String operator&(bool b)   const {return *this & String(b);}
+	String operator&(double n) const {return *this & String(n);}
 
-	friend String operator+(int i, const String &s) {return String(i) + s;}
-	friend String operator+(bool b, const String &s) {return String(b) + s;}
-	friend String operator+(double n, const String &s) {return String(n) + s;}
-	friend String operator+(Char ch, const String &s) {return String(ch) + s;}
-	friend String operator+(char16_t ch, const String &s) {return String(ch) + s;}
+	template <typename Ty> String operator&(const Ty &obj) const {return *this & String(obj);}
 
-	template <typename Ty> friend String operator+(const Ty &obj, const String &s) {return String(obj) + s;}
+	friend String operator&(int i, const String &s) {return String(i) & s;}
+	friend String operator&(bool b, const String &s) {return String(b) & s;}
+	friend String operator&(double n, const String &s) {return String(n) & s;}
+	friend String operator&(Char ch, const String &s) {return String(ch) & s;}
+	friend String operator&(char16_t ch, const String &s) {return String(ch) & s;}
+
+	template <typename Ty> friend String operator&(const Ty &obj, const String &s) {return String(obj) & s;}
 
 	std::string to_string() const
 	{
@@ -721,9 +725,9 @@ template <typename ... Types> String String::format(const Types&... args) const
 	return r;
 }
 
-inline String operator+(Char ch1, Char ch2)
+inline String operator&(Char ch1, Char ch2)
 {
-	return String(ch1) + ch2;
+	return String(ch1) & ch2;
 }
 
 inline String operator*(Char c, int n)

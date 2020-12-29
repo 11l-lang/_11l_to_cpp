@@ -3,11 +3,11 @@
 template <typename T1 = decltype(6)> auto generateRandomPoints(const T1 &npoints = 6)
 {
     u"Generate a few random points v1...vn"_S;
-    print(String(npoints) + u" points x,y:"_S);
+    print(String(npoints) & u" points x,y:"_S);
     Array<dvec2> points;
     for (auto i : range_el(0, npoints)) {
         auto [xrand, yrand] = make_tuple(randomns::_(), randomns::_());
-        print(String(xrand) + u" "_S + String(yrand));
+        print(String(xrand) & u" "_S & String(yrand));
         for (auto xoff : range_el(-1, 2))
             for (auto yoff : range_el(-1, 2))
                 points.append(make_tuple(xrand + xoff, yrand + yoff));

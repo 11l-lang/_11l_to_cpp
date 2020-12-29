@@ -9,7 +9,7 @@ auto QUARTER = (1 << (M - 2));
 auto THREEQU = HALF + QUARTER;
 template <typename T1> auto clear(const T1 &c, Array<int> &charstack)
 {
-    auto a = String(c) + String(1 - c) * _get<0>(charstack);
+    auto a = String(c) & String(1 - c) * _get<0>(charstack);
     _set<0>(charstack, 0);
     return a;
 }
@@ -58,12 +58,12 @@ template <typename T1, typename T2 = decltype(BETA0), typename T3 = decltype(BET
 
         while (((a >= ::HALF) || (b <= ::HALF))) {
             if ((a >= ::HALF)) {
-                ans = ans + clear(1, charstack);
+                ans = ans & clear(1, charstack);
                 a = a - ::HALF;
                 b = b - ::HALF;
             }
             else
-                ans = ans + clear(0, charstack);
+                ans = ans & clear(0, charstack);
             a *= 2;
             b *= 2;
         }
@@ -85,17 +85,17 @@ template <typename T1, typename T2 = decltype(BETA0), typename T3 = decltype(BET
 
     if (((::HALF - a) > (b - ::HALF))) {
         auto w = (::HALF - a);
-        ans = ans + clear(0, charstack);
+        ans = ans & clear(0, charstack);
         while ((w < ::HALF)) {
-            ans = ans + clear(1, charstack);
+            ans = ans & clear(1, charstack);
             w *= 2;
         }
     }
     else {
         auto w = (b - ::HALF);
-        ans = ans + clear(1, charstack);
+        ans = ans & clear(1, charstack);
         while ((w < ::HALF)) {
-            ans = ans + clear(0, charstack);
+            ans = ans & clear(0, charstack);
             w *= 2;
         }
     }
@@ -150,7 +150,7 @@ template <typename T1, typename T2 = decltype(10000), typename T3 = decltype(BET
                 model_needs_updating = 0;
             }
             if ((boundary <= u)) {
-                ans = ans + u"1"_S;
+                ans = ans & u"1"_S;
                 tot1++;
                 if (adaptive)
                     c1++;
@@ -159,7 +159,7 @@ template <typename T1, typename T2 = decltype(10000), typename T3 = decltype(BET
                 n--;
             }
             else if ((boundary >= v)) {
-                ans = ans + u"0"_S;
+                ans = ans & u"0"_S;
                 tot0++;
                 if (adaptive)
                     c0++;
@@ -228,10 +228,10 @@ auto test()
 {
     auto sl = create_array({u"1010"_S, u"111"_S, u"00001000000000000000"_S, u"1"_S, u"10"_S, u"01"_S, u"0"_S, u"0000000"_S, u"000000000000000100000000000000000000000000000000100000000000000000011000000"_S});
     for (auto &&s : sl) {
-        print(u"encoding "_S + s);
+        print(u"encoding "_S & s);
         auto n = s.len();
         auto e = encode(s, 10, 1);
-        print(u"decoding "_S + e);
+        print(u"decoding "_S & e);
         auto ds = decode(e, n, 10, 1);
         print(ds);
         if ((ds != s)) {

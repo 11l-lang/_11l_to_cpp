@@ -2,7 +2,7 @@
 
 template <typename T1, typename T2> auto cross(const T1 &aa, const T2 &bb)
 {
-    return multiloop(aa, bb, [](const auto &a, const auto &b){return a + b;});
+    return multiloop(aa, bb, [](const auto &a, const auto &b){return a & b;});
 }
 auto rows = u"ABCDEFGHI"_S;
 auto cols = u"123456789"_S;
@@ -102,7 +102,7 @@ template <typename T1> auto printboard(const T1 &values)
 {
     u"Used for debugging."_S;
     auto width = 1 + max(::squares.map([&values](const auto &s){return values[s].len();}));
-    auto line = u"\n"_S + (create_array({u"-"_S * (width * 3)}) * 3).join(u"+"_S);
+    auto line = u"\n"_S & (create_array({u"-"_S * (width * 3)}) * 3).join(u"+"_S);
     for (auto &&r : ::rows)
         print((::cols.map([&r, &values, &width](const auto &c){return values[r + c].center(width) + (in(c, u"36"_S) ? u"|"_S : u""_S);})).join(u""_S) + (in(r, u"CF"_S) ? line : u""_S));
     print();

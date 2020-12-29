@@ -68,7 +68,7 @@ F print_seconds(sec)
 template <typename T1> auto print_seconds(const T1 &sec)
 {
     auto r60 = mod(sec, 60);
-    print(Char(u'0'_C.code + idiv(r60, 10)) + Char(u'0'_C.code + mod(r60, 10)));
+    print(Char(u'0'_C.code + idiv(r60, 10)) & Char(u'0'_C.code + mod(r60, 10)));
 }
 
 
@@ -474,9 +474,9 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(os::env_path_sep + fs::path::join(fs::get_temp_dir(), u"right"_S));
+        print(os::env_path_sep & fs::path::join(fs::get_temp_dir(), u"right"_S));
         print(os::getenv(u"PATH"_S));
-        os::environ[u"PATH"_S] += os::env_path_sep + u"KDiff3"_S;
+        os::environ[u"PATH"_S] += os::env_path_sep & u"KDiff3"_S;
         print(os::getenv(u"PATH"_S));
         print(fs::list_dir());
         os::_(u"pause"_S);
@@ -606,7 +606,7 @@ struct CodeBlock1
         assert(Time(2018, 8, 2) - Time(2018, 7, 1) == TimeDelta(32));
         assert(Time(2018, 8, 2) - Time(2018, 7, 1) == TimeDelta(32));
         print(d);
-        print(String(d.days()) + u", "_S + String(d.seconds));
+        print(String(d.days()) & u", "_S & String(d.seconds));
         print(timens::today());
         print(Time() - timens::today());
     }
@@ -683,13 +683,13 @@ struct CodeBlock1
         {int Lindex = 0;
         for (auto &&item : items) {
             auto index = Lindex;
-            print(String(index) + u". "_S + item);
+            print(String(index) & u". "_S & item);
             Lindex++;
         }}
         {int Lindex = 0;
         for (auto &&item : items) {
             auto index = Lindex + 1;
-            print(String(index) + u". "_S + item);
+            print(String(index) & u". "_S & item);
             Lindex++;
         }}
     }
@@ -1077,12 +1077,12 @@ struct CodeBlock1
             {bool was_break = false;
             for (auto x : range_el(2, n))
                 if (mod(n, x) == 0) {
-                    print(String(n) + u" equals "_S + String(x) + u" * "_S + String(n / x));
+                    print(String(n) & u" equals "_S & String(x) & u" * "_S & String(n / x));
                     was_break = true;
                     break;
                 }
             if (!was_break)
-                print(String(n) + u" is a prime number"_S);
+                print(String(n) & u" is a prime number"_S);
             }
     }
 } code_block_1;
@@ -1393,7 +1393,7 @@ struct CodeBlock1
         }
         catch (const syntax_highlighter_for_pqmarkup::Error& e)
         {
-            print(u"Syntax highlighter error: "_S + e.message + u" at "_S + String(e.pos));
+            print(u"Syntax highlighter error: "_S & e.message & u" at "_S & String(e.pos));
         }
     }
 } code_block_1;
@@ -1887,9 +1887,9 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto &&[x, y] : create_array({make_tuple(1, 2), make_tuple(3, 4)}))
-            print(String(x) + u", "_S + String(y));
+            print(String(x) & u", "_S & String(y));
         for (auto &&[x, y, z] : create_array({make_tuple(1, 2, 3), make_tuple(4, 5, 6)}))
-            print(String(x) + u", "_S + String(y) + u", "_S + String(z));
+            print(String(x) & u", "_S & String(y) & u", "_S & String(z));
     }
 } code_block_1;
 
@@ -2750,7 +2750,7 @@ struct CodeBlock1
             auto i = Lindex;
             if (mod(a, 2) == 0)
                 goto on_continue;
-            print(i + u" "_S + a);
+            print(i & u" "_S & a);
 } on_continue:
             Lindex++;
         }}

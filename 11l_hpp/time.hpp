@@ -44,22 +44,22 @@ public:
 		double days = floor(s / (24.0 * 3600));
 		String r;
 		if (days != 0)
-			r = String(days) + (days == 1 ? u" day, " : u" days, ");
+			r = String(days) & (days == 1 ? u" day, " : u" days, ");
 
 		s -= days * (24.0 * 3600);
 		double hours = floor(s / 3600.0);
-		r += String(hours);
-		r += u':';
+		r &= String(hours);
+		r &= u':';
 
 		s -= hours * 3600.0;
 		double minutes = floor(s / 60.0);
-		r += String(minutes).zfill(2);
-		r += u':';
+		r &= String(minutes).zfill(2);
+		r &= u':';
 
 		s -= minutes * 60.0;
 		if (s < 10)
-			r += u'0';
-		r += String(s);
+			r &= u'0';
+		r &= String(s);
 
 		return r;
 	}
@@ -129,13 +129,13 @@ public:
 	{
 		time_t t = (time_t)seconds_since_epoch;
 		GET_LOCALTIME_TM
-		String r = String(tm->tm_year + 1900) + u'-' + String(tm->tm_mon + 1).zfill(2) + u'-' + String(tm->tm_mday).zfill(2) + u' '
-		         + String(tm->tm_hour).zfill(2) + u':'
-		         + String(tm->tm_min ).zfill(2) + u':'
-		         + String(tm->tm_sec ).zfill(2);
+		String r = String(tm->tm_year + 1900) & u'-' & String(tm->tm_mon + 1).zfill(2) & u'-' & String(tm->tm_mday).zfill(2) & u' '
+		         & String(tm->tm_hour).zfill(2) & u':'
+		         & String(tm->tm_min ).zfill(2) & u':'
+		         & String(tm->tm_sec ).zfill(2);
 		double f = fract(seconds_since_epoch);
 		if (f != 0)
-			r += String(f).c_str() + 1;
+			r &= String(f).c_str() + 1;
 		return r;
 	}
 

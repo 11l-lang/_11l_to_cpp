@@ -738,7 +738,7 @@ auto kdiff_showed = false;
 template <typename T1, typename T2, typename T3 = decltype(false), typename T4 = decltype(false)> auto TEST(T1 str1, T2 str2, const T3 &ohd = false, const T4 &habr_html = false)
 {
     ::test_id++;
-    print(u"Test "_S + String(::test_id) + u" ..."_S, u""_S);
+    print(u"Test "_S & String(::test_id) & u" ..."_S, u""_S);
     str1 = pqmarkup::to_html(str1, nullptr, ohd, habr_html);
     if (str1 != str2) {
         str1 = String(str1);
@@ -746,11 +746,11 @@ template <typename T1, typename T2, typename T3 = decltype(false), typename T4 =
         print(u"FAILED!"_S);
         if (!::kdiff_showed) {
             for (auto &&envvar : create_array({u"ProgramFiles"_S, u"ProgramFiles(x86)"_S, u"ProgramW6432"_S}))
-                os::environ[u"PATH"_S] += os::env_path_sep + os::getenv(envvar, u""_S) + uR"(\KDiff3)"_S;
+                os::environ[u"PATH"_S] += os::env_path_sep & os::getenv(envvar, u""_S) & uR"(\KDiff3)"_S;
             auto command = u"kdiff3"_S;
             for (auto &&file : create_array({make_tuple(u"wrong"_S, str1), make_tuple(u"right"_S, str2)})) {
                 auto full_fname = fs::path::join(fs::get_temp_dir(), _get<0>(file));
-                command += u" \""_S + full_fname + u"\""_S;
+                command &= u" \""_S & full_fname & u"\""_S;
                 File(full_fname, u"w"_S, u"utf-8-sig"_S).write(_get<1>(file));
             }
             os::_(command);
@@ -770,7 +770,7 @@ struct CodeBlock1
         TEST(u"_‘underlined’"_S, u"<u>underlined</u>"_S);
         TEST(u"-‘strikethrough’"_S, u"<s>strikethrough</s>"_S);
         TEST(u"~‘italics’"_S, u"<i>italics</i>"_S);
-        TEST(u"H‘header’\n"_S + u"H(1)‘header’"_S, u"<h3>header</h3>\n"_S + u"<h2>header</h2>"_S);
+        TEST(u"H‘header’\n"_S & u"H(1)‘header’"_S, u"<h3>header</h3>\n"_S & u"<h2>header</h2>"_S);
         TEST(u"H(+1)‘header’"_S, u"<h2>header</h2>"_S);
         TEST(u"H(-1)‘header’"_S, u"<h4>header</h4>"_S);
         TEST(u"[http://address]"_S, u"<a href=\"http://address\">http://address</a>"_S);
@@ -867,9 +867,9 @@ Some text.)"_S, false, true);
 "_S);
         TEST(u"‘’<<"_S, u"‘’&lt;&lt;"_S);
         TEST(uR"(/\‘надстрочный\superscript’\/‘подстрочный\subscript’)"_S, uR"(<sup>надстрочный\superscript</sup><sub>подстрочный\subscript</sub>)"_S);
-        TEST(u"> Quote\n"_S + u">‘Quote2’\n"_S, u"<blockquote>Quote</blockquote>\n"_S + u"<blockquote>Quote2</blockquote>\n"_S);
+        TEST(u"> Quote\n"_S & u">‘Quote2’\n"_S, u"<blockquote>Quote</blockquote>\n"_S & u"<blockquote>Quote2</blockquote>\n"_S);
         TEST(u">[http://address]:‘Quoted text.’"_S, u"<blockquote><a href=\"http://address\"><i>http://address</i></a>:<br />\nQuoted text.</blockquote>"_S);
-        TEST(u">[http://another-address][-1]:‘Quoted text.’\n"_S + u">[-1]:‘Another quoted text.’"_S, u"<blockquote><a href=\"http://another-address\">[1]<i>http://another-address</i></a>:<br />\nQuoted text.</blockquote>\n"_S + u"<blockquote><a href=\"http://another-address\">[1]<i>http://another-address</i></a>:<br />\nAnother quoted text.</blockquote>"_S);
+        TEST(u">[http://another-address][-1]:‘Quoted text.’\n"_S & u">[-1]:‘Another quoted text.’"_S, u"<blockquote><a href=\"http://another-address\">[1]<i>http://another-address</i></a>:<br />\nQuoted text.</blockquote>\n"_S & u"<blockquote><a href=\"http://another-address\">[1]<i>http://another-address</i></a>:<br />\nAnother quoted text.</blockquote>"_S);
         TEST(u">‘Author's name’[http://address]:‘Quoted text.’"_S, u"<blockquote><i><a href=\"http://address\">Author's name</a></i>:<br />\nQuoted text.</blockquote>"_S);
         TEST(u">‘Author's name’:‘Quoted text.’"_S, u"<blockquote><i>Author's name</i>:<br />\nQuoted text.</blockquote>"_S);
         TEST(u"‘Quoted text.’:‘Author's name’<"_S, u"<blockquote>Quoted text.<br />\n<div align='right'><i>Author's name</i></div></blockquote>"_S);
@@ -1045,7 +1045,7 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        print(u"Test "_S + String(test_id) + u" (error handling) ..."_S, u""_S);
+        print(u"Test "_S & String(test_id) & u" (error handling) ..."_S, u""_S);
         try
         {
             pqmarkup::to_html(u"\nT‘‘‘`’’’"_S);
@@ -1062,7 +1062,7 @@ struct CodeBlock2
         }
         assert(was_error);
         test_id++;
-        print(u"Test "_S + String(test_id) + u". Checking source files for unallowed characters..."_S);
+        print(u"Test "_S & String(test_id) & u". Checking source files for unallowed characters..."_S);
         for (auto &&_fname : fs::walk_dir(u"."_S, [](const auto &d){return _get<0>(d) != u'.';}, false)) {
             auto root = fs::path::dir_name(_fname);
             Array<String> dirs, files;
@@ -1074,7 +1074,7 @@ struct CodeBlock2
                 if (name.ends_with(make_tuple(u".py"_S, u".txt"_S))) {
                     auto file_bytes = File(fs::path::join(root, name)).read_bytes();
                     if (in(u'\r'_C.code, file_bytes) || in(u'\t'_C.code, file_bytes)) {
-                        print(uR"(Unallowed character (\r or \t) found in file ')"_S + fs::path::join(root, name)[range_ei(2)] + u"'"_S);
+                        print(uR"(Unallowed character (\r or \t) found in file ')"_S & fs::path::join(root, name)[range_ei(2)] & u"'"_S);
                         failed_tests++;
                     }
                 }
@@ -1090,7 +1090,7 @@ template <typename T1> auto check_file(const T1 &fname)
     }
     catch (const pqmarkup::Exception& e)
     {
-        print(e.message + u" at file '"_S + fname + u"', line "_S + String(e.line) + u", column "_S + String(e.column));
+        print(e.message & u" at file '"_S & fname & u"', line "_S & String(e.line) & u", column "_S & String(e.column));
         exit(1);
     }
 }
@@ -1103,11 +1103,11 @@ struct CodeBlock3
         check_file(u"docs/ru/syntax.pq.txt"_S);
 
         if (failed_tests == 0) {
-            print(u"OK (all "_S + String(test_id) + u" tests passed)"_S);
+            print(u"OK (all "_S & String(test_id) & u" tests passed)"_S);
             exit(0);
         }
         else {
-            print(String(test_id - failed_tests) + u" tests passed and "_S + String(failed_tests) + u" failed."_S);
+            print(String(test_id - failed_tests) & u" tests passed and "_S & String(failed_tests) & u" failed."_S);
             exit(1);
         }
     }

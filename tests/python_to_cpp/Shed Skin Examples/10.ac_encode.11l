@@ -7,7 +7,7 @@ V HALF = (1 << (M - 1))
 V QUARTER = (1 << (M - 2))
 V THREEQU = HALF + QUARTER
 F clear(c, [Int] &charstack)
-   V a = String(c) + String(1 - c) * charstack[0]
+   V a = String(c)‘’String(1 - c) * charstack[0]
    charstack[0] = 0
    R a
 

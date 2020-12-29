@@ -219,67 +219,67 @@ template <typename T1> auto roman(T1 n)
     auto r = u""_S;
     while (n >= 1000) {
         n -= 1000;
-        r += u"M"_S;
+        r &= u"M"_S;
     }
 
     if (n >= 900) {
         n -= 900;
-        r += u"CM"_S;
+        r &= u"CM"_S;
     }
 
     if (n >= 500) {
         n -= 500;
-        r += u"D"_S;
+        r &= u"D"_S;
     }
 
     if (n >= 400) {
         n -= 400;
-        r += u"CD"_S;
+        r &= u"CD"_S;
     }
 
     while (n >= 100) {
         n -= 100;
-        r += u"C"_S;
+        r &= u"C"_S;
     }
 
     if (n >= 90) {
         n -= 90;
-        r += u"XC"_S;
+        r &= u"XC"_S;
     }
 
     if (n >= 50) {
         n -= 50;
-        r += u"L"_S;
+        r &= u"L"_S;
     }
 
     if (n >= 40) {
         n -= 40;
-        r += u"XL"_S;
+        r &= u"XL"_S;
     }
 
     while (n >= 10) {
         n -= 10;
-        r += u"X"_S;
+        r &= u"X"_S;
     }
 
     if (n >= 9) {
         n -= 9;
-        r += u"IX"_S;
+        r &= u"IX"_S;
     }
 
     if (n >= 5) {
         n -= 5;
-        r += u"V"_S;
+        r &= u"V"_S;
     }
 
     if (n >= 4) {
         n -= 4;
-        r += u"IV"_S;
+        r &= u"IV"_S;
     }
 
     while (n >= 1) {
         n--;
-        r += u"I"_S;
+        r &= u"I"_S;
     }
     return r;
 }
@@ -384,7 +384,7 @@ template <typename T1> auto checkio(T1 number)
     auto result = u""_S;
     for (auto &&[roman, n] : ::ELEMENTS)
         if (n <= number) {
-            result += roman * (idiv(number, n));
+            result &= roman * (idiv(number, n));
             number %= n;
         }
     return result;

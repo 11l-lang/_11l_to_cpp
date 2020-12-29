@@ -52,7 +52,7 @@ public:
     Array<String> tree_indent()
     {
         auto tr = right != nullptr ? right->tree_indent() : create_array({u"-- (null)"_S});
-        return create_array({u"--"_S + (value)}) + (left != nullptr ? left->tree_indent() : create_array({u"-- (null)"_S})).map([](const auto &a){return u"  |"_S + a;}) + create_array({u"  `"_S + _get<0>(tr)}) + tr[range_ei(1)].map([](const auto &a){return u"   "_S + a;});
+        return create_array({u"--"_S & (value)}) + (left != nullptr ? left->tree_indent() : create_array({u"-- (null)"_S})).map([](const auto &a){return u"  |"_S & a;}) + create_array({u"  `"_S & _get<0>(tr)}) + tr[range_ei(1)].map([](const auto &a){return u"   "_S & a;});
     }
 };
 auto tree = std::make_unique<Node>(1, std::make_unique<Node>(2, std::make_unique<Node>(4, std::make_unique<Node>(7)), std::make_unique<Node>(5)), std::make_unique<Node>(3, std::make_unique<Node>(6, std::make_unique<Node>(8), std::make_unique<Node>(9))));
@@ -96,7 +96,7 @@ template <typename T1> auto rangeexpand(const T1 &txt)
     for (auto &&r : txt.split(u","_S))
         if (in(u'-'_C, r[range_ei(1)])) {
             auto rr = r[range_ei(1)].split(u"-"_S, 1 + 1);
-            lst.append(range_ee(to_int(_get<0>(r) + _get<0>(rr)), to_int(_get<1>(rr))));
+            lst.append(range_ee(to_int(_get<0>(r) & _get<0>(rr)), to_int(_get<1>(rr))));
         }
         else
             lst.append(to_int(r));
@@ -532,7 +532,7 @@ template <typename T1> auto compress(const T1 &uncompressed)
     auto w = u""_S;
     Array<int> result;
     for (auto &&c : uncompressed) {
-        auto wc = w + c;
+        auto wc = w & c;
         if (in(wc, dictionary))
             w = wc;
         else {
@@ -553,17 +553,17 @@ auto decompress(Array<int> &compressed)
     auto dictionary = create_dict(range_el(0, dict_size).map([](const auto &i){return make_tuple(i, String(Char(i)));}));
     auto result = u""_S;
     auto w = String(Char(compressed.pop(0)));
-    result += w;
+    result &= w;
     for (auto &&k : compressed) {
         auto entry = u""_S;
         if (in(k, dictionary))
             entry = dictionary[k];
         else if (k == dict_size)
-            entry = w + _get<0>(w);
+            entry = w & _get<0>(w);
         else
-            exit(u"Bad compressed k: "_S + String(k));
-        result += entry;
-        dictionary.set(dict_size, w + _get<0>(entry));
+            exit(u"Bad compressed k: "_S & String(k));
+        result &= entry;
+        dictionary.set(dict_size, w & _get<0>(entry));
         dict_size++;
         w = entry;
     }
@@ -604,7 +604,7 @@ struct CodeBlock1
         for (int i = 0; i < 100; i++) {
             for (auto j : range_el(i, 100).step(i + 1))
                 doors.set(j, !(doors[j]));
-            print(u"Door "_S + String(i + 1) + u": "_S + (doors[i] ? u"open"_S : u"close"_S));
+            print(u"Door "_S & String(i + 1) & u": "_S & (doors[i] ? u"open"_S : u"close"_S));
         }
     }
 } code_block_1;
@@ -680,7 +680,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(create_array({u""_S, u"a"_S, u"baRk"_S, u"booK"_S, u"treat"_S, u"COMMON"_S, u"squad"_S, u"Confused"_S}).map([](const auto &w){return u"'"_S + w + u"': "_S + String(can_make_word(w));}).join(u", "_S));
+        print(create_array({u""_S, u"a"_S, u"baRk"_S, u"booK"_S, u"treat"_S, u"COMMON"_S, u"squad"_S, u"Confused"_S}).map([](const auto &w){return u"'"_S & w & u"': "_S & String(can_make_word(w));}).join(u", "_S));
     }
 } code_block_1;
 
@@ -744,9 +744,9 @@ struct CodeBlock1
             else if (sp > n)
                 abundant++;
         }
-        print(u"Deficient = "_S + String(deficient));
-        print(u"Perfect   = "_S + String(perfect));
-        print(u"Abundant  = "_S + String(abundant));
+        print(u"Deficient = "_S & String(deficient));
+        print(u"Perfect   = "_S & String(perfect));
+        print(u"Abundant  = "_S & String(abundant));
     }
 } code_block_1;
 
@@ -826,9 +826,9 @@ struct CodeBlock1
             }}
     }
 } code_block_1;
-std::function<String(const String&, const int)> ljust = [](const auto &s, const auto &w){return s + (u" "_S * (w - s.len()));};
-std::function<String(const String&, const int)> centr = [](const auto &s, const auto &w){return (u" "_S * (w - s.len() - (idiv(w, 2) - idiv(s.len(), 2)))) + s + (u" "_S * (idiv(w, 2) - idiv(s.len(), 2)));};
-std::function<String(const String&, const int)> rjust = [](const auto &s, const auto &w){return (u" "_S * (w - s.len())) + s;};
+std::function<String(const String&, const int)> ljust = [](const auto &s, const auto &w){return s & (u" "_S * (w - s.len()));};
+std::function<String(const String&, const int)> centr = [](const auto &s, const auto &w){return (u" "_S * (w - s.len() - (idiv(w, 2) - idiv(s.len(), 2)))) & s & (u" "_S * (idiv(w, 2) - idiv(s.len(), 2)));};
+std::function<String(const String&, const int)> rjust = [](const auto &s, const auto &w){return (u" "_S * (w - s.len())) & s;};
 
 struct CodeBlock2
 {
@@ -837,7 +837,7 @@ struct CodeBlock2
         {int Lindex = 0;
         for (auto &&justify : create_array({ljust, centr, rjust})) {
             auto i = Lindex;
-            print(create_array({u"Left"_S, u"Center"_S, u"Right"_S})[i] + u" column-aligned output:"_S);
+            print(create_array({u"Left"_S, u"Center"_S, u"Right"_S})[i] & u" column-aligned output:"_S);
             for (auto &&line : parts) {
                 {int Lindex = 0;
                 for (auto &&word : line) {
@@ -930,7 +930,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto k : range_ee(1, 5))
-            print(u"k = "_S + String(k) + u": "_S + String(primes(k, 10)));
+            print(u"k = "_S & String(k) & u": "_S & String(primes(k, 10)));
     }
 } code_block_1;
 
@@ -1649,7 +1649,7 @@ struct CodeBlock3
         symbol(u"("_S).nud = nud_parens;
         symbol(u")"_S);
         for (auto &&expr_str : create_array({u"-2 / 2 + 4 + 3 * 2"_S, u"2 * (3 + (4 * 5 + (6 * 7) * 8) - 9) * 10"_S}))
-            print(expr_str + u" = "_S + String(parse(expr_str)->eval()));
+            print(expr_str & u" = "_S & String(parse(expr_str)->eval()));
     }
 } code_block_3;
 
@@ -1684,7 +1684,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto &&[key, value] : d)
-            print(key + u" = "_S + value);
+            print(key & u" = "_S & value);
         for (auto &&key : d.keys())
             print(key);
         for (auto &&value : d.values())
@@ -2104,7 +2104,7 @@ struct CodeBlock1
 
         for (int n = 0; n < 10; n++) {
             auto s = gen(n);
-            print(s + (u" "_S * (20 - s.len())) + u"is "_S + (is_balanced(s) ? u"balanced"_S : u"not balanced"_S));
+            print(s & (u" "_S * (20 - s.len())) & u"is "_S & (is_balanced(s) ? u"balanced"_S : u"not balanced"_S));
         }
     }
 } code_block_1;
@@ -2418,14 +2418,14 @@ template <typename T1, typename T2 = decltype(0)> auto getitem(T1 s, const T2 &d
         if (c == u'{') {
             auto x = getgroup(s[range_ei(1)], depth + 1);
             if (!_get<0>(x).empty()) {
-                out = multiloop(out, _get<0>(x), [](const auto &a, const auto &b){return a + b;});
+                out = multiloop(out, _get<0>(x), [](const auto &a, const auto &b){return a & b;});
                 s = _get<1>(x);
                 continue;
             }
         }
         if (c == u'\\' && s.len() > 1)
-            assign_from_tuple(s, c, make_tuple(s[range_ei(1)], c + _get<1>(s)));
-        out = out.map([&c](const auto &a){return a + c;});
+            assign_from_tuple(s, c, make_tuple(s[range_ei(1)], c & _get<1>(s)));
+        out = out.map([&c](const auto &a){return a & c;});
         s = s[range_ei(1)];
     }
     return make_tuple(out, s);
@@ -2445,7 +2445,7 @@ template <typename T1, typename T2> auto getgroup(T1 s, const T2 &depth)
         if (_get<0>(s) == u'}') {
             if (comma)
                 return make_tuple(out, s[range_ei(1)]);
-            return make_tuple(out.map([](const auto &a){return u"{"_S + a + u"}"_S;}), s[range_ei(1)]);
+            return make_tuple(out.map([](const auto &a){return u"{"_S & a & u"}"_S;}), s[range_ei(1)]);
         }
         if (_get<0>(s) == u',')
             assign_from_tuple(comma, s, make_tuple(true, s[range_ei(1)]));
@@ -2461,7 +2461,7 @@ struct CodeBlock1
 It{{em,alic}iz,erat}e{d,}, please.
 {,{,gotta have{ ,\, again\, }}more }cowbell!
 {}} some }{,{\\{ edge, edge} \,}{ cases, {here} \\\\\})"_S.split(u"\n"_S))
-            print((create_array({s}) + _get<0>(getitem(s))).join(u"\n\t"_S) + u"\n"_S);
+            print((create_array({s}) + _get<0>(getitem(s))).join(u"\n\t"_S) & u"\n"_S);
     }
 } code_block_1;
 
@@ -2514,10 +2514,10 @@ struct CodeBlock1
             fact *= 2 * n * (2 * n + 1);
             e += (2.0 * n + 2) / fact;
         }
-        print(u"Computed e = "_S + String(e));
-        print(u"Real e = "_S + String(math::e));
-        print(u"Error = "_S + String(math::e - e));
-        print(u"Number of iterations = "_S + String(n));
+        print(u"Computed e = "_S & String(e));
+        print(u"Real e = "_S & String(math::e));
+        print(u"Error = "_S & String(math::e - e));
+        print(u"Number of iterations = "_S & String(n));
     }
 } code_block_1;
 
@@ -3037,7 +3037,7 @@ template <typename T1> auto duration(T1 sec)
         t.insert(0, m);
     }
     t.insert(0, sec);
-    return zip(t, create_array({u"wk"_S, u"d"_S, u"hr"_S, u"min"_S, u"sec"_S})).filter([](const auto &num_unit){return _get<0>(num_unit) > 0;}).map([](const auto &num_unit){return String(_get<0>(num_unit)) + u" "_S + String(_get<1>(num_unit));}).join(u", "_S);
+    return zip(t, create_array({u"wk"_S, u"d"_S, u"hr"_S, u"min"_S, u"sec"_S})).filter([](const auto &num_unit){return _get<0>(num_unit) > 0;}).map([](const auto &num_unit){return String(_get<0>(num_unit)) & u" "_S & String(_get<1>(num_unit));}).join(u", "_S);
 }
 
 struct CodeBlock1
@@ -3124,9 +3124,9 @@ struct CodeBlock1
         universe.set(make_tuple(3, 4), 1);
 
         for (int i = 0; i < 4; i++) {
-            print(u"\nGeneration "_S + String(i) + u":"_S);
+            print(u"\nGeneration "_S & String(i) & u":"_S);
             for (auto row : range_el(0, cellcounty))
-                print(u"  "_S + range_el(0, cellcountx).map([&row](const auto &col){return create_array({u". "_S, u"O "_S})[::universe[make_tuple(row, col)]];}).join(u""_S));
+                print(u"  "_S & range_el(0, cellcountx).map([&row](const auto &col){return create_array({u". "_S, u"O "_S})[::universe[make_tuple(row, col)]];}).join(u""_S));
             auto nextgeneration = DefaultDict<ivec2, int>();
             for (auto row : range_el(0, cellcounty))
                 for (auto col : range_el(0, cellcountx))
@@ -3315,7 +3315,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto &&value : create_array({2, 4, 4, 4, 5, 5, 7, 9}))
-            print(String(value) + u" "_S + String(sd_inst(value)));
+            print(String(value) & u" "_S & String(sd_inst(value)));
     }
 } code_block_1;
 
@@ -3369,7 +3369,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto &&test : create_array({5724, 5727, 112946}))
-            print(test + u"\t Validates as: "_S + damm(test));
+            print(test & u"\t Validates as: "_S & damm(test));
     }
 } code_block_1;
 
@@ -3591,7 +3591,7 @@ L(x) [[1, 2, 3], [0, 1, 2, 3], [1, 0, 3, 4], [1, 2, 0], [0, 0, 0], [0], [1, 1, 1
 ===
 template <typename T1> auto linear(const T1 &x)
 {
-    auto a = enumerate(x).filter([](const auto &i, const auto &v){return v != 0;}).map([](const auto &i, const auto &v){return u"#.e(#.)"_S.format(v == -1 ? u"-"_S : v == 1 ? u""_S : String(v) + u"*"_S, i + 1);});
+    auto a = enumerate(x).filter([](const auto &i, const auto &v){return v != 0;}).map([](const auto &i, const auto &v){return u"#.e(#.)"_S.format(v == -1 ? u"-"_S : v == 1 ? u""_S : String(v) & u"*"_S, i + 1);});
     return (!a.empty() ? a : create_array({String(u"0"_S)})).join(u" + "_S).replace(u" + -"_S, u" - "_S);
 }
 
@@ -4303,7 +4303,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto &&path : paths)
-            print(path.rjust(max(paths.map([](const auto &p){return p.len();}))) + u" -> "_S + extract_ext(path));
+            print(path.rjust(max(paths.map([](const auto &p){return p.len();}))) & u" -> "_S & extract_ext(path));
     }
 } code_block_1;
 
@@ -4351,7 +4351,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto &&i : make_tuple(45, 53, 64))
-            print(String(i) + u": factors: "_S + String(factor(i)));
+            print(String(i) & u": factors: "_S & String(factor(i)));
     }
 } code_block_1;
 
@@ -4408,7 +4408,7 @@ template <typename T1> auto farey(const T1 &n)
     while (c <= n) {
         auto k = idiv((n + b), d);
         assign_from_tuple(a, b, c, d, make_tuple(c, d, k * c - a, k * d - b));
-        far += String(a) + u"/"_S + String(b) + u" "_S;
+        far &= String(a) & u"/"_S & String(b) & u" "_S;
         farn++;
     }
     return make_tuple(far, farn);
@@ -4419,9 +4419,9 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto i : range_ee(1, 11))
-            print(String(i) + u": "_S + _get<0>(farey(i)));
+            print(String(i) & u": "_S & _get<0>(farey(i)));
         for (auto i : range_el(100, 1000 + 100).step(100))
-            print(String(i) + u": "_S + String(_get<1>(farey(i))) + u" items"_S);
+            print(String(i) & u": "_S & String(_get<1>(farey(i))) & u" items"_S);
     }
 } code_block_1;
 
@@ -4543,7 +4543,7 @@ template <typename T1> auto fasta_parse(const T1 &instr)
             assign_from_tuple(key, val, make_tuple(_get<0>(line[range_ei(1)].split_py()), u""_S));
         }
         else if (key != u"")
-            val += line;
+            val &= line;
     if (key != u"")
         r.append(make_tuple(key, val));
     return r;
@@ -4553,7 +4553,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(fasta_parse(instr).map([](const auto &key, const auto &val){return key + u": "_S + val;}).join(u"\n"_S));
+        print(fasta_parse(instr).map([](const auto &key, const auto &val){return key & u": "_S & val;}).join(u"\n"_S));
     }
 } code_block_1;
 
@@ -4946,13 +4946,13 @@ test([‘MyData_v1.0.tar.bz2’, ‘MyData_v1.0.bz2’], [‘tar.bz2’])
 ===
 template <typename T1, typename T2> auto is_ext(const T1 &file_name, const T2 &extensions)
 {
-    return any(extensions.map([&file_name](const auto &e){return file_name.lowercase().ends_with(u"."_S + e.lowercase());}));
+    return any(extensions.map([&file_name](const auto &e){return file_name.lowercase().ends_with(u"."_S & e.lowercase());}));
 }
 
 template <typename T1, typename T2> auto test(const T1 &file_names, const T2 &extensions)
 {
     for (auto &&file_name : file_names)
-        print(file_name.ljust(max(file_names.map([](const auto &f_n){return f_n.len();}))) + u" "_S + String(is_ext(file_name, extensions)));
+        print(file_name.ljust(max(file_names.map([](const auto &f_n){return f_n.len();}))) & u" "_S & String(is_ext(file_name, extensions)));
 }
 
 struct CodeBlock1
@@ -5131,7 +5131,7 @@ template <typename T1, typename T2> auto baseN(T1 num, const T2 &b)
     while (num != 0) {
         TUPLE_ELEMENT_T(1, divmod(num, b)) d;
         assign_from_tuple(num, d, divmod(num, b));
-        result += ::digits[to_int(d)];
+        result &= ::digits[to_int(d)];
     }
     return reversed(result);
 }
@@ -5153,7 +5153,7 @@ template <typename T1> auto pal_23(const T1 &limit)
         auto b = baseN(n, 3);
         auto revb = reversed(b);
 
-        for (auto &&trial : make_tuple(b + revb, b + u"0"_S + revb, b + u"1"_S + revb, b + u"2"_S + revb)) {
+        for (auto &&trial : make_tuple(b & revb, b & u"0"_S & revb, b & u"1"_S & revb, b & u"2"_S & revb)) {
             auto t = to_int64(trial, 3);
             if (pal2(t)) {
                 r.append(t);
@@ -5169,7 +5169,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto &&pal23 : pal_23(6))
-            print(String(pal23) + u" "_S + baseN(pal23, 3) + u" "_S + baseN(pal23, 2));
+            print(String(pal23) & u" "_S & baseN(pal23, 3) & u" "_S & baseN(pal23, 2));
     }
 } code_block_1;
 
@@ -5221,7 +5221,7 @@ struct CodeBlock1
                 cnt[perms[j][i].code - u'A'_C.code]++;
             for (int j = 0; j < 4; j++)
                 if (cnt[j] != factorial(4 - 1)) {
-                    missing += Char(u'A'_C.code + j);
+                    missing &= Char(u'A'_C.code + j);
                     break;
                 }
         }
@@ -5316,9 +5316,9 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        print(indent + dates[range_el(0, 5)].map([](const auto &d){return d.strftime(::fmt);}).join(u"\n"_S + indent));
-        print(indent + u"..."_S);
-        print(indent + dates[range_elen_i( - 5)].map([](const auto &d){return d.strftime(::fmt);}).join(u"\n"_S + indent));
+        print(indent & dates[range_el(0, 5)].map([](const auto &d){return d.strftime(::fmt);}).join(u"\n"_S & indent));
+        print(indent & u"..."_S);
+        print(indent & dates[range_elen_i( - 5)].map([](const auto &d){return d.strftime(::fmt);}).join(u"\n"_S & indent));
         print(u"\nThere are #. years in the range that do not have months with five weekends"_S.format((create_set(range_ee(2000, 2100)) - create_set(dates.map([](const auto &d){return to_int(d.strftime(u"%Y"_S));}))).len()));
     }
 } code_block_2;
@@ -6768,8 +6768,8 @@ struct CodeBlock1
         _set<2>(qseq, 1);
         for (auto i : range_el(3, qseq.len()))
             qseq.set(i, qseq[i - qseq[i - 1]] + qseq[i - qseq[i - 2]]);
-        print(u"The first 10 terms are: "_S + qseq[range_el(1, 11)].map([](const auto &q){return String(q);}).join(u", "_S));
-        print(u"The 1000'th term is "_S + String(_get<1000>(qseq)));
+        print(u"The first 10 terms are: "_S & qseq[range_el(1, 11)].map([](const auto &q){return String(q);}).join(u", "_S));
+        print(u"The 1000'th term is "_S & String(_get<1000>(qseq)));
     }
 } code_block_1;
 auto less_than_preceding = 0;
@@ -6781,7 +6781,7 @@ struct CodeBlock2
         for (auto i : range_el(2, qseq.len()))
             if (qseq[i] < qseq[i - 1])
                 less_than_preceding++;
-        print(u"Times a member of the sequence is less than its preceding term: "_S + String(less_than_preceding));
+        print(u"Times a member of the sequence is less than its preceding term: "_S & String(less_than_preceding));
     }
 } code_block_2;
 
@@ -7002,7 +7002,7 @@ struct CodeBlock1
         }
         print();
         print();
-        print(u"Of the first "_S + String(count) + u" humble numbers:"_S);
+        print(u"Of the first "_S & String(count) & u" humble numbers:"_S);
 
         for (auto num : range_el(1, humble.len() - 1)) {
             if (!in(num, humble))
@@ -7136,15 +7136,15 @@ template <typename T1> auto mod97(const T1 &numberstring)
     auto prepended = u""_S;
     auto number = 0;
     while (segstart < numberstring.len() - step) {
-        number = to_int(prepended + numberstring[range_el(segstart, segstart + step)]);
+        number = to_int(prepended & numberstring[range_el(segstart, segstart + step)]);
         auto remainder = mod(number, 97);
         prepended = String(remainder);
         if (remainder < 10)
-            prepended = u"0"_S + prepended;
+            prepended = u"0"_S & prepended;
         segstart += step;
         step = 7;
     }
-    number = to_int(prepended + numberstring[range_ei(segstart)]);
+    number = to_int(prepended & numberstring[range_ei(segstart)]);
     return mod(number, 97);
 }
 auto country2length = create_dict(dict_of(u"IS"_S, 26)(u"IT"_S, 27)(u"MT"_S, 31)(u"MU"_S, 30)(u"MR"_S, 27)(u"MK"_S, 19)(u"IE"_S, 22)(u"MD"_S, 24)(u"ME"_S, 22)(u"MC"_S, 27)(u"IL"_S, 23)(u"DE"_S, 22)(u"DO"_S, 28)(u"DK"_S, 18)(u"PK"_S, 24)(u"HR"_S, 21)(u"HU"_S, 28)(u"FI"_S, 18)(u"LU"_S, 20)(u"LT"_S, 20)(u"LV"_S, 21)(u"KW"_S, 30)(u"LI"_S, 21)(u"PS"_S, 29)(u"PT"_S, 25)(u"LB"_S, 28)(u"GB"_S, 22)(u"GE"_S, 22)(u"CR"_S, 21)(u"TR"_S, 26)(u"GI"_S, 23)(u"GL"_S, 18)(u"CY"_S, 28)(u"CZ"_S, 24)(u"GR"_S, 27)(u"GT"_S, 28)(u"KZ"_S, 20)(u"TN"_S, 24)(u"CH"_S, 21)(u"SE"_S, 24)(u"SA"_S, 24)(u"SM"_S, 27)(u"SI"_S, 19)(u"SK"_S, 24)(u"PL"_S, 28)(u"BR"_S, 29)(u"FR"_S, 27)(u"FO"_S, 18)(u"BA"_S, 20)(u"BG"_S, 22)(u"BE"_S, 16)(u"BH"_S, 22)(u"VG"_S, 24)(u"RO"_S, 24)(u"RS"_S, 22)(u"NO"_S, 15)(u"NL"_S, 18)(u"AZ"_S, 28)(u"EE"_S, 20)(u"AT"_S, 20)(u"ES"_S, 24)(u"AL"_S, 28)(u"AD"_S, 24)(u"AE"_S, 23));
@@ -7156,7 +7156,7 @@ template <typename T1> auto valid_iban(const T1 &iban_)
         return false;
     if (iban.len() != ::country2length[iban[range_el(0, 2)]])
         return false;
-    iban = iban[range_ei(4)] + iban[range_el(0, 4)];
+    iban = iban[range_ei(4)] & iban[range_el(0, 4)];
     return mod97(iban.map([](const auto &ch){return String(to_int(ch, 36));}).join(u""_S)) == 1;
 }
 
@@ -7223,7 +7223,7 @@ template <typename T1> auto unrank(T1 n)
 {
     auto s = u""_S;
     while (n != 0)
-        assign_from_tuple(s, n, make_tuple(u"0123456789a"_S[mod(n, 11)] + s, idiv(n, 11)));
+        assign_from_tuple(s, n, make_tuple(u"0123456789a"_S[mod(n, 11)] & s, idiv(n, 11)));
     return s.split(u"a"_S).map([](const auto &x){return to_int(x);})[range_ei(1)];
 }
 auto l = create_array({1, 2, 3, 10, 100, 987654321});
@@ -7539,7 +7539,7 @@ struct CodeBlock1
     {
 
         for (auto &&STR : MISSPELLINGS) {
-            print(u"\nClose dictionary words ( distance < 0.15 using Jaro-Winkler distance) to \" "_S + STR + u" \" are:\n        Word   | Distance"_S);
+            print(u"\nClose dictionary words ( distance < 0.15 using Jaro-Winkler distance) to \" "_S & STR & u" \" are:\n        Word   | Distance"_S);
             for (auto &&w : within_distance(0.15, STR, 5))
                 print(u"#14 | #.4"_S.format(w, jaro_winkler_distance(STR, w)));
         }
@@ -7729,10 +7729,10 @@ struct CodeBlock1
     {
         for (auto &&[cnt, name] : lst)
             if (cnt > 0) {
-                print(cnt + u" "_S + name);
+                print(cnt & u" "_S & name);
                 w = w + _get<0>(items[name]) * cnt;
             }
-        print(u"Total weight: "_S + w + u" Value: "_S + v);
+        print(u"Total weight: "_S & w & u" Value: "_S & v);
     }
 } code_block_1;
 
@@ -8095,7 +8095,7 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        print(u"Extra credit: "_S + notsame);
+        print(u"Extra credit: "_S & notsame);
     }
 } code_block_2;
 
@@ -8311,11 +8311,11 @@ template <typename T1> auto lookandsay(T1 number)
 {
     auto result = u""_S;
     auto repeat = _get<0>(number);
-    number = number[range_ei(1)] + u" "_S;
+    number = number[range_ei(1)] & u" "_S;
     auto times = 1;
     for (auto &&actual : number)
         if (actual != repeat) {
-            result += String(times) + repeat;
+            result &= String(times) & repeat;
             times = 1;
             repeat = actual;
         }
@@ -8488,9 +8488,9 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        print(u"  Number of Lychrel numbers: "_S + (lychrel.len()));
-        print(u"    Lychrel numbers: "_S + (lychrel.map([](const auto &n){return String(n);}).join(u", "_S)));
-        print(u"  Number of Lychrel related: "_S + (l_related.len()));
+        print(u"  Number of Lychrel numbers: "_S & (lychrel.len()));
+        print(u"    Lychrel numbers: "_S & (lychrel.map([](const auto &n){return String(n);}).join(u", "_S)));
+        print(u"  Number of Lychrel related: "_S & (l_related.len()));
     }
 } code_block_2;
 auto pals = lychrel + l_related.filter([](const auto &x){return x == reverse_int(x);});
@@ -8499,7 +8499,7 @@ struct CodeBlock3
 {
     CodeBlock3()
     {
-        print(u"  Number of Lychrel palindromes: "_S + (pals.len()));
-        print(u"    Lychrel palindromes: "_S + (pals.map([](const auto &n){return String(n);}).join(u", "_S)));
+        print(u"  Number of Lychrel palindromes: "_S & (pals.len()));
+        print(u"    Lychrel palindromes: "_S & (pals.map([](const auto &n){return String(n);}).join(u", "_S)));
     }
 } code_block_3;

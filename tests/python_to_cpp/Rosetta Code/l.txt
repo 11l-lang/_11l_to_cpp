@@ -469,7 +469,7 @@ template <typename T1, typename T2, typename T3, typename T4 = decltype(0)> auto
     for (auto i : range_el(start, bb.len())) {
         auto [c, s] = bb[i];
         if (c <= n)
-            out.extend(bagchain(make_tuple(_get<0>(x) + c, _get<1>(x) + s), n - c, bb, i));
+            out.extend(bagchain(make_tuple(_get<0>(x) + c, _get<1>(x) & s), n - c, bb, i));
     }
     return out;
 }
@@ -481,7 +481,7 @@ template <typename T1> auto bags(const T1 &n)
     Array<Tuple<int, String>> upto;
     for (auto x : range_el(n - 1, 0).step(-1))
         upto.extend(bags(x));
-    return bagchain(make_tuple(0, u""_S), n - 1, upto).map([](const auto &c, const auto &s){return make_tuple(c + 1, u"("_S + s + u")"_S);});
+    return bagchain(make_tuple(0, u""_S), n - 1, upto).map([](const auto &c, const auto &s){return make_tuple(c + 1, u"("_S & s & u")"_S);});
 }
 
 template <typename T1> auto replace_brackets(const T1 &s)
@@ -807,7 +807,7 @@ template <typename T1> auto lcp(const T1 &sa)
 
 template <typename T1> auto test(const T1 &sa)
 {
-    print((String(sa)) + u" -> "_S + (lcp(sa)));
+    print((String(sa)) & u" -> "_S & (lcp(sa)));
 }
 
 struct CodeBlock1
@@ -889,7 +889,7 @@ template <typename T1, typename T2> auto lcs(const T1 &a, const T2 &b)
     auto j = b.len();
     for (auto i : range_ee(1, a.len()))
         if (lengths[i][j] != lengths[i - 1][j])
-            result += a[i - 1];
+            result &= a[i - 1];
     return result;
 }
 
@@ -1200,7 +1200,7 @@ L(s) [‘three old rotators’, ‘never reverse’, ‘stable was I ere I saw e
 ===
 template <typename T1> auto longest_palindrome(const T1 &s)
 {
-    auto t = create_array(u"^"_S + s + u"$"_S).join(u"#"_S);
+    auto t = create_array(u"^"_S & s & u"$"_S).join(u"#"_S);
     auto n = t.len();
     auto p = create_array({0}) * n;
     auto c = 0;
@@ -1221,7 +1221,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto &&s : create_array({u"three old rotators"_S, u"never reverse"_S, u"stable was I ere I saw elbatrosses"_S, u"abracadabra"_S, u"drome"_S, u"the abbatial palace"_S}))
-            print(u"'"_S + s + u"' -> '"_S + longest_palindrome(s) + u"'"_S);
+            print(u"'"_S & s & u"' -> '"_S & longest_palindrome(s) & u"'"_S);
     }
 } code_block_1;
 
@@ -1238,7 +1238,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto &&[x, y, z] : zip(u"abc"_S, u"ABC"_S, u"123"_S))
-            print(x + y + z);
+            print(x & y & z);
     }
 } code_block_1;
 

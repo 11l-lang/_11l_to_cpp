@@ -45,7 +45,7 @@ public:
 		Var(const String &name) : name(name) {}
 		void operator+=(const String &s)
 		{
-			setenv(name, getenv(name) + s);
+			setenv(name, getenv(name) & s);
 		}
 		operator String() const
 		{

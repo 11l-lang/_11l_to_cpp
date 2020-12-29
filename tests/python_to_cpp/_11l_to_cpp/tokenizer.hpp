@@ -140,7 +140,7 @@ public:
 
     template <typename T1> auto to_str(const T1 &source)
     {
-        return u"Token("_S + String(category) + u", \""_S + (value(source)) + u"\")"_S;
+        return u"Token("_S & String(category) & u", \""_S & (value(source)) & u"\")"_S;
     }
 };
 
@@ -172,7 +172,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                     break;
             }
             if (i == source.len())
-                throw Error(u"there is no corresponding opening parenthesis/bracket/brace/qoute for `"_S + lbr + u"`"_S, comment_start + 1);
+                throw Error(u"there is no corresponding opening parenthesis/bracket/brace/qoute for `"_S & lbr & u"`"_S, comment_start + 1);
         }
         if (comments != nullptr)
             comments->append(make_tuple(comment_start, i));
@@ -249,7 +249,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
 
             if (tabs && spaces) {
                 auto next_line_pos = source.findi(u"\n"_S, i);
-                throw Error(u"mixing tabs and spaces in indentation: `"_S + source[range_el(linestart, i)].replace(u" "_S, u"S"_S).replace(u"\t"_S, u"TAB"_S) + source[range_el(i, next_line_pos != -1 ? next_line_pos : !source.empty())] + u"`"_S, i);
+                throw Error((u"mixing tabs and spaces in indentation: `"_S & source[range_el(linestart, i)].replace(u" "_S, u"S"_S).replace(u"\t"_S, u"TAB"_S)) + (source[range_el(i, next_line_pos != -1 ? next_line_pos : !source.empty())] & u"`"_S), i);
             }
             auto indentation_level = ii - linestart;
             if (indentation_levels.len() && _get<0>(indentation_levels.last()) == -1) {
@@ -263,7 +263,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                     auto e = i + 1;
                     while (e < source.len() && !in(source[e], u"\r\n"_S))
                         e++;
-                    throw Error(u"inconsistent indentations:\n```\n"_S + prev_indentation_level * (indentation_tabs ? u"TAB"_S : u"S"_S) + source[range_el(prev_linestart, linestart)] + (ii - linestart) * (tabs ? u"TAB"_S : u"S"_S) + source[range_el(ii, e)] + u"\n```"_S, ii);
+                    throw Error((u"inconsistent indentations:\n```\n"_S & prev_indentation_level * (indentation_tabs ? u"TAB"_S : u"S"_S)) + source[range_el(prev_linestart, linestart)] + (ii - linestart) * (tabs ? u"TAB"_S : u"S"_S) + (source[range_el(ii, e)] & u"\n```"_S), ii);
                 }
                 prev_linestart = ii;
 
@@ -494,12 +494,12 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                             auto number_with_separators = u""_S;
                             auto j = number.len();
                             while (j > 3) {
-                                number_with_separators = u"'"_S + number[range_el(j - 3, j)] + number_with_separators;
+                                number_with_separators = u"'"_S & number[range_el(j - 3, j)] & number_with_separators;
                                 j -= 3;
                             }
-                            number_with_separators = number[range_el(0, j)] + number_with_separators;
+                            number_with_separators = number[range_el(0, j)] & number_with_separators;
                             if (source[range_el(lexem_start, i)] != number_with_separators)
-                                throw Error(u"digit separator in this number is located in the wrong place (should be: "_S + number_with_separators + u")"_S, lexem_start);
+                                throw Error(u"digit separator in this number is located in the wrong place (should be: "_S & number_with_separators & u")"_S, lexem_start);
                         }
                     }
                     category = decltype(category)::NUMERIC_LITERAL;
@@ -618,17 +618,17 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
             }
             else if (in(ch, u"])"_S)) {
                 if (nesting_elements.empty() || _get<0>(nesting_elements.last()) != ([&](const auto &a){return a == u']' ? u'['_C : a == u')' ? u'('_C : throw KeyError(a);}(ch)))
-                    throw Error(u"there is no corresponding opening parenthesis/bracket for `"_S + ch + u"`"_S, lexem_start);
+                    throw Error(u"there is no corresponding opening parenthesis/bracket for `"_S & ch & u"`"_S, lexem_start);
                 nesting_elements.pop();
                 category = decltype(category)::DELIMITER;
             }
             else
-                throw Error(u"unexpected character `"_S + ch + u"`"_S, lexem_start);
+                throw Error(u"unexpected character `"_S & ch & u"`"_S, lexem_start);
             tokens.append(Token(lexem_start, i, category));
         }
     }
     if (!nesting_elements.empty())
-        throw Error(u"there is no corresponding closing parenthesis/bracket/brace for `"_S + _get<0>(nesting_elements.last()) + u"`"_S, _get<1>(nesting_elements.last()));
+        throw Error(u"there is no corresponding closing parenthesis/bracket/brace for `"_S & _get<0>(nesting_elements.last()) & u"`"_S, _get<1>(nesting_elements.last()));
 
     while (!indentation_levels.empty()) {
         assert(_get<1>(indentation_levels.last()) != true);

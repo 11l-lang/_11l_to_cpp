@@ -132,7 +132,7 @@ public:
         bestIndividual = Individual(genomeSize);
         for (auto generation : range_ee(1, generationsMax)) {
             if (mod(generation, 300) == 0)
-                print(u"generation "_S + String(generation));
+                print(u"generation "_S & String(generation));
             computeFitnessPop();
             showGeneration_bestIndFind();
             population = tounamentSelectionPop();

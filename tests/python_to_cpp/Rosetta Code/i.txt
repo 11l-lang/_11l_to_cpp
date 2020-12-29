@@ -247,7 +247,7 @@ A: 1 2 3
 A: 1 B 2; B: 3 4
 A: 1 D D; D: 6 7 8
 A: 1 B C; B: 3 4; C: 5 B)"_S.trim(u"\n"_S).split(u"\n"_S)) {
-            print(u"Intersecting Number Wheel group:\n  "_S + group);
+            print(u"Intersecting Number Wheel group:\n  "_S & group);
             Dict<String, Array<String>> wheel;
             auto first = u""_S;
             for (auto &&w : group.split(u";"_S)) {
@@ -257,7 +257,7 @@ A: 1 B C; B: 3 4; C: 5 B)"_S.trim(u"\n"_S).split(u"\n"_S)) {
                 first = first == u"" ? name[range_e_llen(0,  - 1)] : first;
             }
             auto gen = range_el(0, 20).map([&first, &wheel](const auto &i){return nextfrom(wheel, first);}).join(u" "_S);
-            print(u"  Generates:\n    "_S + gen + u" ...\n"_S);
+            print(u"  Generates:\n    "_S & gen & u" ...\n"_S);
         }
     }
 } code_block_1;
@@ -313,6 +313,6 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto &&t : tests)
-            print(u"ISBN13 "_S + t + u" validates "_S + is_isbn13(t));
+            print(u"ISBN13 "_S & t & u" validates "_S & is_isbn13(t));
     }
 } code_block_1;

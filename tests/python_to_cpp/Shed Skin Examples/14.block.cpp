@@ -85,7 +85,7 @@ public:
     {
         this->count = to_float(count);
         if (this->name == u"")
-            this->name = u"_"_S + String(index);
+            this->name = u"_"_S & String(index);
     }
 
     template <typename T1> auto operator<(const T1 &other) const
@@ -154,7 +154,7 @@ InternalNode iterate(Array<node> &c)
         c.pop(0);
         root = iterate(c);
         auto co = find_idx(c, second);
-        deletednode.word = co.word + u"0"_S;
+        deletednode.word = co.word & u"0"_S;
         c.append(deletednode);
         co.word += u"1"_S;
         co.count -= deletednode.count;
@@ -182,9 +182,9 @@ template <typename T1, typename T2> auto encode(const T1 &sourcelist, const T2 &
     for (auto &&s : sourcelist) {
         auto co = find_name(code, s);
         if (co.index == -1)
-            print(u"Warning: symbol "_S + s + u" has no encoding!"_S);
+            print(u"Warning: symbol "_S & s & u" has no encoding!"_S);
         else
-            answer = answer + co.word;
+            answer = answer & co.word;
     }
     return answer;
 }
@@ -258,7 +258,7 @@ template <typename T1, typename T2> auto dec_to_bin(const T1 &n, const T2 &digit
     while (i >= 0) {
         auto b = (((1 << i) & n) > 0);
         i--;
-        ans = ans + String(to_int(b));
+        ans = ans & String(to_int(b));
     }
     return ans;
 }
@@ -297,7 +297,7 @@ template <typename T1 = decltype(0.01), typename T2 = decltype(6)> auto findprob
         auto s = dec_to_bin(n, nn);
         auto [w0, w1] = weight(s);
         if (::verbose && 0)
-            print(s + u" "_S + w0 + u" "_S + w1);
+            print(s & u" "_S & w0 & u" "_S & w1);
         answer.append(make_tuple(s, pow(f, w1) * pow((1 - f), w0)));
     }
     assert(answer.len() == pow(2, nn));
@@ -316,7 +316,7 @@ template <typename T1, typename T2, typename T3> auto Bencode(const T1 &string, 
     auto chars = create_array(string);
     auto s = u""_S;
     for (auto &&c : chars) {
-        s = s + c;
+        s = s & c;
         if ((s.len() >= n)) {
             blocks.append(s);
             s = u""_S;
@@ -325,7 +325,7 @@ template <typename T1, typename T2, typename T3> auto Bencode(const T1 &string, 
     if ((s.len() > 0)) {
         print(u"warning, padding last block with 0s"_S);
         while ((s.len() < n))
-            s = s + u"0"_S;
+            s = s & u"0"_S;
         blocks.append(s);
     }
 
@@ -379,7 +379,7 @@ auto easytest()
         co.report();
     auto source = create_array({u"000"_S, u"001"_S, u"010"_S, u"011"_S, u"100"_S, u"100"_S, u"000"_S});
     auto zipped = encode(source, symbols);
-    print(u"zipped  = "_S + zipped);
+    print(u"zipped  = "_S & zipped);
     auto answer = decode(zipped, root);
     print(u"decoded = "_S, u""_S);
     print(answer);

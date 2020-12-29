@@ -112,5 +112,5 @@ int main()
     auto cities = randomMatrix(numCities, maxDistance, cityDistanceSeed);
     auto path = bestPath(cities, seed, iter, boost);
     print(path);
-    print(u"len = "_S + String(pathLength(cities, path)));
+    print(u"len = "_S & String(pathLength(cities, path)));
 }

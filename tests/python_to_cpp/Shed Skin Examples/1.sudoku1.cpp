@@ -93,13 +93,13 @@ template <typename T1> auto printpuzzle(const T1 &puzzle)
             switch (puzzle[x][y])
             {
             case 0:
-                s += u"."_S;
+                s &= u"."_S;
                 break;
             default:
-                s += String(puzzle[x][y]);
+                s &= String(puzzle[x][y]);
                 break;
             }
-            s += u" "_S;
+            s &= u" "_S;
         }
         print(s);
     }
@@ -123,7 +123,7 @@ template <typename T2, typename T3, typename T4> auto perm(Array<Array<int>> &pu
     if (u.empty() && l.empty()) {
         print(u"Solved!"_S);
         printpuzzle(puzzle);
-        print(u"iterations: "_S + String(::iterations));
+        print(u"iterations: "_S & String(::iterations));
         return true;
     }
     else

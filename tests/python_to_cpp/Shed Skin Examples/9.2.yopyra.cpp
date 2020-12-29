@@ -372,15 +372,15 @@ template <typename T1, typename T2> auto renderPixel(T1 x, T2 y)
 
 int main()
 {
-    print(u"Rendering: "_S + scene_namefile);
-    auto fileout = File(scene_namefile + u".ppm"_S, u"w"_S);
+    print(u"Rendering: "_S & scene_namefile);
+    auto fileout = File(scene_namefile & u".ppm"_S, u"w"_S);
     fileout.write(u"P3\n"_S);
-    fileout.write(String(scene.imgAncho) + u" "_S + String(scene.endline - scene.startline + 1) + u"\n"_S);
+    fileout.write(String(scene.imgAncho) & u" "_S & String(scene.endline - scene.startline + 1) & u"\n"_S);
     fileout.write(u"255\n"_S);
     print(u"Line (from #.0 to #.0):"_S.format(scene.startline, scene.endline), u" "_S);
     for (auto y : range_el(scene.startline, scene.endline + 1)) {
         for (auto x : range_el(0, scene.imgAncho))
-            fileout.write(colorToString(renderPixel(x, y)) + u" "_S);
+            fileout.write(colorToString(renderPixel(x, y)) & u" "_S);
         fileout.write(u"\n"_S);
         print(y, u" "_S);
         _stdout.flush();

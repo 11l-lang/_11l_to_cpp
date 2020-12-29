@@ -171,8 +171,8 @@ inline String join(const String &path1, const String &path2)
 {
 	String r(path1);
 	if (!(r.ends_with(u"\\") || r.ends_with(u"/")))
-		r += sep;
-	return r + path2;
+		r &= sep;
+	return r & path2;
 }
 
 inline String dir_name(const String &path)

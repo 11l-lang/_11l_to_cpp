@@ -96,22 +96,22 @@ public:
         auto ret = u""_S;
         for (auto row : range_el(0, edge)) {
             if (row != 0) {
-                ret += u"\n"_S;
+                ret &= u"\n"_S;
                 for (auto i : range_el(0, edge)) {
                     if (i != 0)
-                        ret += u"+"_S;
-                    ret += u"---"_S;
+                        ret &= u"+"_S;
+                    ret &= u"---"_S;
                 }
-                ret += u"\n"_S;
+                ret &= u"\n"_S;
             }
-            ret += u" "_S;
+            ret &= u" "_S;
             for (auto col : range_el(0, edge)) {
                 if (col != 0)
-                    ret += u" | "_S;
+                    ret &= u" | "_S;
                 if (__board[row][col] == 0)
-                    ret += u" "_S;
+                    ret &= u" "_S;
                 else
-                    ret += String(__board[row][col]);
+                    ret &= String(__board[row][col]);
             }
         }
         return ret;
@@ -189,7 +189,7 @@ template <typename T1 = decltype(10), typename T2 = decltype(1), typename T3 = d
     if ((b.isvictory() == 0))
         print(u"Board is full! Draw!"_S);
     else
-        print(u"Victory for player "_S + String(b.isvictory()) + u"!"_S);
+        print(u"Victory for player "_S & String(b.isvictory()) & u"!"_S);
 }
 
 int main()

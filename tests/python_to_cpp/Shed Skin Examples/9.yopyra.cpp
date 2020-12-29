@@ -282,7 +282,7 @@ public:
         auto lines = File(scene_filename).read_lines(true).filter([](const auto &l){return l.trim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S)) != u"" && _get<0>(l.trim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S))) != u'#';}).map([](const auto &l){return l.split_py();});
         endline = imgAlto - 1;
 
-        for (auto &&line : lines) {
+        for (auto line : lines) {
             auto word = _get<0>(line);
             line = line[range_ei(1)];
 
@@ -480,15 +480,15 @@ template <typename T1, typename T2> auto renderPixel(T1 x, T2 y)
 
 int main()
 {
-    print(u"Rendering: "_S + scene_namefile);
-    auto fileout = File(scene_namefile + u".ppm"_S, u"w"_S);
+    print(u"Rendering: "_S & scene_namefile);
+    auto fileout = File(scene_namefile & u".ppm"_S, u"w"_S);
     fileout.write(u"P3\n"_S);
-    fileout.write(String(scene.imgAncho) + u" "_S + String(scene.endline - scene.startline + 1) + u"\n"_S);
+    fileout.write(String(scene.imgAncho) & u" "_S & String(scene.endline - scene.startline + 1) & u"\n"_S);
     fileout.write(u"255\n"_S);
     print(u"Line (from #. to #.):"_S.format(scene.startline, scene.endline), u" "_S);
     for (auto y : range_ee(scene.startline, scene.endline)) {
         for (auto x : range_el(0, scene.imgAncho))
-            fileout.write(String(renderPixel(x, y)) + u" "_S);
+            fileout.write(String(renderPixel(x, y)) & u" "_S);
         fileout.write(u"\n"_S);
         print(y, u" "_S);
         _stdout.flush();

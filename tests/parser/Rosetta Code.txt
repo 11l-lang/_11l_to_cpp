@@ -14,7 +14,7 @@ struct CodeBlock1
         for (int i = 0; i < 100; i++) {
             for (auto j : range_el(i, 100).step(i + 1))
                 doors.set(j, !doors[j]);
-            print(u"Door "_S + (i + 1) + u": "_S + (doors[i] ? u"open"_S : u"close"_S));
+            print(u"Door "_S & (i + 1) & u": "_S & (doors[i] ? u"open"_S : u"close"_S));
         }
     }
 } code_block_1;
@@ -63,9 +63,9 @@ struct CodeBlock1
             else if (sp > n)
                 abundant++;
         }
-        print(u"Deficient = "_S + deficient);
-        print(u"Perfect   = "_S + perfect);
-        print(u"Abundant  = "_S + abundant);
+        print(u"Deficient = "_S & deficient);
+        print(u"Perfect   = "_S & perfect);
+        print(u"Abundant  = "_S & abundant);
     }
 } code_block_1;
 
@@ -151,7 +151,7 @@ struct CodeBlock1
         for (auto n : range_ee(1, 20000)) {
             auto m = sum_proper_divisors(n);
             if (m > n && sum_proper_divisors(m) == n)
-                print(n + u"\t"_S + m);
+                print(n & u"\t"_S & m);
         }
     }
 } code_block_1;
@@ -175,12 +175,12 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(u"a + b = "_S + (a + b));
-        print(u"a - b = "_S + (a - b));
-        print(u"a * b = "_S + (a * b));
-        print(u"a / b = "_S + (idiv(a, b)));
-        print(u"a % b = "_S + (mod(a, b)));
-        print(u"a ^ b = "_S + (pow(a, b)));
+        print(u"a + b = "_S & (a + b));
+        print(u"a - b = "_S & (a - b));
+        print(u"a * b = "_S & (a * b));
+        print(u"a / b = "_S & (idiv(a, b)));
+        print(u"a % b = "_S & (mod(a, b)));
+        print(u"a ^ b = "_S & (pow(a, b)));
     }
 } code_block_1;
 
@@ -262,16 +262,16 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(u"x       = "_S + x);
-        print(u"y       = "_S + y);
-        print(u"NOT x   = "_S + ~x);
-        print(u"x AND y = "_S + (x & y));
-        print(u"x OR  y = "_S + (x | y));
-        print(u"x XOR y = "_S + (x ^ y));
-        print(u"x SHL y = "_S + (x << y));
-        print(u"x SHR y = "_S + (x >> y));
-        print(u"x ROL y = "_S + rotl(x, y));
-        print(u"x ROR y = "_S + rotr(x, y));
+        print(u"x       = "_S & x);
+        print(u"y       = "_S & y);
+        print(u"NOT x   = "_S & ~x);
+        print(u"x AND y = "_S & (x & y));
+        print(u"x OR  y = "_S & (x | y));
+        print(u"x XOR y = "_S & (x ^ y));
+        print(u"x SHL y = "_S & (x << y));
+        print(u"x SHR y = "_S & (x >> y));
+        print(u"x ROL y = "_S & rotl(x, y));
+        print(u"x ROR y = "_S & rotr(x, y));
     }
 } code_block_1;
 
@@ -406,7 +406,7 @@ struct CodeBlock1
                     auto r = 1 + (idiv(p * q, h3));
                     if (!is_prime(r) || mod((q * r), (p - 1)) != 1)
                         continue;
-                    print(p + u" x "_S + q + u" x "_S + r);
+                    print(p & u" x "_S & q & u" x "_S & r);
                 }
             }
         }
@@ -470,7 +470,7 @@ print(quibble([‘ABC’, ‘DEF’, ‘G’, ‘H’]))
 ===
 template <typename T1> auto quibble(const T1 &words)
 {
-    return [&](const auto &a){return a == 0 ? u"{}"_S : a == 1 ? u"{"_S + _get<0>(words) + u"}"_S : u"{"_S + words[range_e_llen(0,  - 1)].join(u", "_S) + u" and "_S + words.last() + u"}"_S;}(words.len());
+    return [&](const auto &a){return a == 0 ? u"{}"_S : a == 1 ? u"{"_S & _get<0>(words) & u"}"_S : u"{"_S & words[range_e_llen(0,  - 1)].join(u", "_S) & u" and "_S & words.last() & u"}"_S;}(words.len());
 }
 
 struct CodeBlock1
@@ -496,8 +496,8 @@ int MAIN_WITH_ARGV()
 {
     INIT_ARGV();
 
-    print(u"Program name: "_S + _get<0>(::argv));
-    print(u"Arguments:\n"_S + ::argv[range_ei(1)].join(u"\n"_S));
+    print(u"Program name: "_S & _get<0>(::argv));
+    print(u"Arguments:\n"_S & ::argv[range_ei(1)].join(u"\n"_S));
 }
 
 
@@ -588,9 +588,9 @@ struct CodeBlock1
         universe.set(make_tuple(3, 4), 1);
 
         for (int i = 0; i < 4; i++) {
-            print(u"\nGeneration "_S + i + u":"_S);
+            print(u"\nGeneration "_S & i & u":"_S);
             for (auto row : range_el(0, cellcounty))
-                print(u"  "_S + range_el(0, cellcountx).map([&row](const auto &col){return create_array({u". "_S, u"O "_S})[::universe[make_tuple(row, col)]];}).join(u""_S));
+                print(u"  "_S & range_el(0, cellcountx).map([&row](const auto &col){return create_array({u". "_S, u"O "_S})[::universe[make_tuple(row, col)]];}).join(u""_S));
             DefaultDict<ivec2, int> nextgeneration;
             for (auto row : range_el(0, cellcounty))
                 for (auto col : range_el(0, cellcountx))
@@ -667,7 +667,7 @@ struct CodeBlock2
     {
 
         for (int i = 0; i < 4; i++) {
-            print(u"\nGeneration "_S + i + u":"_S);
+            print(u"\nGeneration "_S & i & u":"_S);
             for (auto row : range_el(0, cellcounty)) {
                 print(u"  "_S, u""_S);
                 for (auto col : range_el(0, cellcountx))
@@ -734,11 +734,11 @@ template <typename T1> auto get_prime_factors(T1 li)
         auto f = 2;
         while (true)
             if (mod(li, f) == 0) {
-                res += f;
+                res &= f;
                 li /= f;
                 if (li == 1)
                     break;
-                res += u" x "_S;
+                res &= u" x "_S;
             }
             else
                 f++;
@@ -752,7 +752,7 @@ struct CodeBlock1
     {
         for (auto x : range_ee(1, 17))
             print(u"#4: #."_S.format(x, get_prime_factors(x)));
-        print(u"2144: "_S + get_prime_factors(2144));
+        print(u"2144: "_S & get_prime_factors(2144));
     }
 } code_block_1;
 
@@ -877,9 +877,9 @@ struct CodeBlock1
         {int Lindex = 0;
         for (auto line : File(u"data.csv"_S).read_lines()) {
             if (Lindex == 0)
-                line += u",SUM"_S;
+                line &= u",SUM"_S;
             else
-                line += u","_S + sum_map(line.split(u","_S), [](const auto &i){return to_int(i);});
+                line &= u","_S & sum_map(line.split(u","_S), [](const auto &i){return to_int(i);});
             print(line);
             Lindex++;
         }}
@@ -1002,8 +1002,8 @@ template <typename T1, typename T2> auto brent(const T1 &f, const T2 &x0)
 
 template <typename T1, typename T2, typename T3, typename T4> auto print_result(const T1 &x0, const T2 &f, const T3 &len, const T4 &start)
 {
-    print(u"Cycle length = "_S + len);
-    print(u"Start index = "_S + start);
+    print(u"Cycle length = "_S & len);
+    print(u"Start index = "_S & start);
     auto i = x0;
     for (auto __unused : range_ee(1, start))
         i = f(i);
@@ -1136,7 +1136,7 @@ struct CodeBlock1
             for (auto sanitation : range_ee(1, 7))
                 for (auto fire : range_ee(1, 7))
                     if (police != sanitation && sanitation != fire && fire != police && police + fire + sanitation == 12)
-                        print(police + u"\t\t"_S + sanitation + u"\t\t"_S + fire);
+                        print(police & u"\t\t"_S & sanitation & u"\t\t"_S & fire);
     }
 } code_block_1;
 
@@ -1227,7 +1227,7 @@ template <typename T1, typename T2> auto average_square_diff(const T1 &a, const 
 template <typename T1, typename T2> auto diversity_theorem(const T1 &truth, const T2 &predictions)
 {
     auto average = sum(predictions) / predictions.len();
-    print(u"average-error: "_S + average_square_diff(truth, predictions) + u"\n"_S + u"crowd-error:   "_S + (square((truth - average))) + u"\n"_S + u"diversity:     "_S + average_square_diff(average, predictions));
+    print(u"average-error: "_S & average_square_diff(truth, predictions) & u"\n"_S & u"crowd-error:   "_S & (square((truth - average))) & u"\n"_S & u"diversity:     "_S & average_square_diff(average, predictions));
 }
 
 struct CodeBlock1
@@ -1323,7 +1323,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto n : range_ee(0, 5))
-            print(n + u" "_S + factorial(n));
+            print(n & u" "_S & factorial(n));
     }
 } code_block_1;
 
@@ -1369,7 +1369,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(u"The ray intersects the plane at "_S + intersection_point(make_tuple(0.0, -1.0, -1.0), make_tuple(0.0, 0.0, 10.0), make_tuple(0.0, 0.0, 1.0), make_tuple(0.0, 0.0, 5.0)));
+        print(u"The ray intersects the plane at "_S & intersection_point(make_tuple(0.0, -1.0, -1.0), make_tuple(0.0, 0.0, 10.0), make_tuple(0.0, 0.0, 1.0), make_tuple(0.0, 0.0, 5.0)));
     }
 } code_block_1;
 
@@ -1397,7 +1397,7 @@ template <typename T1> auto last_sundays(const T1 &year)
         while (true) {
             last_day_of_month -= TimeDelta(1);
             if (last_day_of_month.strftime(u"%w"_S) == u'0') {
-                sundays.append(year + u"-"_S + (u"#02"_S.format(month)) + u"-"_S + last_day_of_month.strftime(u"%d"_S));
+                sundays.append(year & u"-"_S & (u"#02"_S.format(month)) & u"-"_S & last_day_of_month.strftime(u"%d"_S));
                 break;
             }
         }
@@ -1663,7 +1663,7 @@ struct CodeBlock1
     {
         while (1.0f + eps != 1.0f)
             eps = eps / 2.0f;
-        print(u"Epsilon     = "_S + eps);
+        print(u"Epsilon     = "_S & eps);
         print(u"(a + b) + c = #.7"_S.format((1.0f + eps) - eps));
         print(u"Kahan sum   = #.7"_S.format(kahansum(create_array({1.0f, eps, -eps}))));
     }
@@ -1770,7 +1770,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(u"Bagged the following items\n  "_S + sorted(bagged.map([](const auto &item, const auto &_, const auto &_2){return item;})).join(u"\n  "_S));
+        print(u"Bagged the following items\n  "_S & sorted(bagged.map([](const auto &item, const auto &_, const auto &_2){return item;})).join(u"\n  "_S));
     }
 } code_block_1;
 auto [val, wt] = totalvalue(bagged);
@@ -1808,7 +1808,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         knuth_shuffle(x);
-        print(u"shuffled: "_S + x);
+        print(u"shuffled: "_S & x);
     }
 } code_block_1;
 
@@ -1916,10 +1916,10 @@ struct CodeBlock1
     {
         for (auto &&[cnt, name] : lst)
             if (cnt > 0) {
-                print(cnt + u" "_S + name);
+                print(cnt & u" "_S & name);
                 w += _get<0>(items[name]) * cnt;
             }
-        print(u"Total weight: "_S + w + u" Value: "_S + v);
+        print(u"Total weight: "_S & w & u" Value: "_S & v);
     }
 } code_block_1;
 
