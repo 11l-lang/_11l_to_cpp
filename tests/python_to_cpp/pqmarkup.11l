@@ -23,7 +23,7 @@ T Converter
       .habr_html = habr_html
       .ohd = ohd
 
-   F to_html(instr, File? outfilef = N; ', outer_pos = 0) -> String
+   F to_html(String instr, File? outfilef = N; ', outer_pos = 0) -> String
       .to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
       [String] result
       T Writer
@@ -104,7 +104,7 @@ T Converter
             I i == str.len
                @exit_with_error(‘Unended comment started’, start + starti)
 
-      F remove_comments(=s, =start, level = 3)
+      F remove_comments(String =s; =start, level = 3)
          L
             V j = s.findi(‘[’ * level)
             I j == -1

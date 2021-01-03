@@ -35,7 +35,7 @@ public:
     {
     }
 
-    template <typename T1, typename T3 = decltype(0)> String to_html(const T1 &instr, File* const outfilef = nullptr, const T3 &outer_pos = 0)
+    template <typename T3 = decltype(0)> String to_html(const String &instr, File* const outfilef = nullptr, const T3 &outer_pos = 0)
     {
         to_html_called_inside_to_html_outer_pos_list.append(outer_pos);
         Array<String> result;
@@ -151,7 +151,7 @@ public:
             }
         };
 
-        auto remove_comments = [&find_ending_sq_bracket](auto s, auto start, const decltype(3) level = 3)
+        auto remove_comments = [&find_ending_sq_bracket](String s, auto start, const decltype(3) level = 3)
         {
             while (true) {
                 auto j = s.findi(u"["_S * level);

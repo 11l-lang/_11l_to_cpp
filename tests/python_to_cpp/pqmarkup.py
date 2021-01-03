@@ -27,7 +27,7 @@ class Converter:
         self.habr_html = habr_html
         self.ohd = ohd
 
-    def to_html(self, instr, outfilef : IO[str] = None, *, outer_pos = 0) -> str:
+    def to_html(self, instr : str, outfilef : IO[str] = None, *, outer_pos = 0) -> str:
         self.to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
 
         result : List[str] = [] # this should be faster than using regular string
@@ -116,14 +116,14 @@ class Converter:
                 if i == len(str):
                     exit_with_error('Unended comment started', start + starti)
 
-        def remove_comments(s, start, level = 3):
+        def remove_comments(s : str, start, level = 3):
             while True:
                 j = s.find("["*level) # ]
                 if j == -1:
                     break
                 k = find_ending_sq_bracket(s, j, start) + 1
                 start += k - j
-                s = s[0:j] + '' + s[k:]
+                s = s[0:j] + s[k:]
             return s
 
         nonunique_links : Dict[int, str] = {}
@@ -449,7 +449,7 @@ class Converter:
                     write_to_pos(prevci, endqpos+1)
                     if self.habr_html:
                         contains_new_line = "\n" in ins
-                        outfile.write(('<source lang="' + str_in_b + '">' if str_in_b != '' else '<source>' if contains_new_line else '<code>') + '' + ins + '' + ("</source>" if str_in_b != '' or contains_new_line else "</code>")) # так как <source> в Habr — блочный элемент, а не встроенный\inline
+                        outfile.write(('<source lang="' + str_in_b + '">' if str_in_b != '' else '<source>' if contains_new_line else '<code>') + ins + ("</source>" if str_in_b != '' or contains_new_line else "</code>")) # так как <source> в Habr — блочный элемент, а не встроенный\inline
                     else:
                         pre = '<pre ' + ('class="code_block"' if ins[0] == "\n" else 'style="display: inline"') + '>' # can not do `outfile.write('<pre ' + ...)` here because `outfile.write(syntax_highlighter_for_pqmarkup.css)` should be outside of <pre> block
                         if self.ohd and syntax_highlighter_for_pqmarkup.is_lang_supported(str_in_b):
@@ -504,7 +504,7 @@ class Converter:
                                         style += "vertical-align: " + (ver_col_align if ver_col_align != '' else ver_row_align)
                                     hor_col_align = ''
                                     ver_col_align = ''
-                                    table[-1].append(TableCell(self.to_html(instr[j+1:end_of_column], outer_pos = j+1), ("th" if header_row else "td") + '' + (' style="'+style+'"' if style != '' else '')))
+                                    table[-1].append(TableCell(self.to_html(instr[j+1:end_of_column], outer_pos = j+1), ("th" if header_row else "td") + (' style="'+style+'"' if style != '' else '')))
                                     j = end_of_column
                                 elif ch in '<>' and instr[j+1:j+2] in ('<', '>'):
                                     hor_col_align = {'<<':'left', '>>':'right', '><':'center', '<>':'justify'}[instr[j:j+2]]
@@ -584,7 +584,7 @@ class Converter:
                         new_line_tag = ''
                 elif prevc in '<>' and instr[prevci-1] in '<>': # выравнивание текста \ text alignment
                     write_to_pos(prevci-1, endqpos+1)
-                    outfile.write('<div align="' + {'<<':'left', '>>':'right', '><':'center', '<>':'justify'}[instr[prevci-1]+''+prevc] + '">'
+                    outfile.write('<div align="' + {'<<':'left', '>>':'right', '><':'center', '<>':'justify'}[instr[prevci-1]+prevc] + '">'
                                  + self.to_html(instr[startqpos+1:endqpos], outer_pos = startqpos+1) + "</div>\n")
                     new_line_tag = ''
                 elif i_next_str(":‘") and instr[find_ending_pair_quote(i+2)+1:][:1] == '<': # this is reversed quote ‘Quoted text.’:‘Author's name’< # ’
@@ -722,7 +722,7 @@ class Converter:
             elif ch == "}":
                 write_to_i('</span><span class="cu_brackets_b">'*self.ohd + '}' + self.ohd*'</span></span>')
             elif ch == "\n":
-                write_to_i((new_line_tag if new_line_tag != "\0" else "<br />") + '' + ("\n" if new_line_tag != '' else "")) # код `"\n" if new_line_tag != ''` нужен только для списков (unordered/ordered list)
+                write_to_i((new_line_tag if new_line_tag != "\0" else "<br />") + ("\n" if new_line_tag != '' else "")) # код `"\n" if new_line_tag != ''` нужен только для списков (unordered/ordered list)
                 new_line_tag = "\0"
 
             i += 1
