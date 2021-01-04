@@ -67,9 +67,9 @@ public:
 		return r;
 	}
 
-	template <typename Func> Type reduce(const Type &initial, Func &&func) const
+	template <typename Ty, typename Func> Ty reduce(const Ty &initial, Func &&func) const
 	{
-		Type r = initial;
+		Ty r = initial;
 		for (auto &&el : *this)
 			r = func(r, el);
 		return r;

@@ -8503,3 +8503,47 @@ struct CodeBlock3
         print(u"    Lychrel palindromes: "_S & (pals.map([](const auto &n){return String(n);}).join(u", "_S)));
     }
 } code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Mandelbrot_set#Python
+from functools import reduce
+
+def mandelbrot(a):
+    return reduce(lambda z, _: z * z + a, range(50), 0j)
+
+def step(start, step, iterations):
+    return (start + (i * step) for i in range(iterations))
+
+rows = ((("*" if abs(mandelbrot(x + 1j*y)) < 2 else " ")
+        for x in step(-2.0, 0.0315, 80))
+        for y in step(1, -0.05, 41))
+
+print("\n".join("".join(row) for row in rows))
+===
+
+F mandelbrot(a)
+   R (0.<50).reduce(0i, (z, _) -> z * z + @a)
+
+F step(start, step, iterations)
+   R ((0 .< iterations).map(i -> @start + (i * @step)))
+V rows = (step(1, -0.05, 41).map(y -> (step(-2.0, 0.0315, 80).map(x -> (I abs(mandelbrot(x + 1i * @y)) < 2 {‘*’} E ‘ ’)))))
+print(rows.map(row -> row.join(‘’)).join("\n"))
+===
+template <typename T1> auto mandelbrot(const T1 &a)
+{
+    return range_el(0, 50).reduce(0i, [&a](const auto &z, const auto &_){return z * z + a;});
+}
+
+template <typename T1, typename T2, typename T3> auto step(const T1 &start, const T2 &step, const T3 &iterations)
+{
+    return (range_el(0, iterations).map([&start, &step](const auto &i){return start + (i * step);}));
+}
+auto rows = (step(1, -0.05, 41).map([](const auto &y){return (step(-2.0, 0.0315, 80).map([&y](const auto &x){return (abs(mandelbrot(x + 1i * y)) < 2 ? u"*"_S : u" "_S);}));}));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(rows.map([](const auto &row){return row.join(u""_S);}).join(u"\n"_S));
+    }
+} code_block_1;
