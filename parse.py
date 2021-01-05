@@ -3052,6 +3052,7 @@ builtins_scope.ids['DefaultDict'].ast_nodes[0].scope = dict_scope
 set_scope = Scope(None)
 set_scope.add_name('difference', ASTFunctionDefinition([('other', '', 'Set')]))
 set_scope.add_name('add', ASTFunctionDefinition([('elem', '', '')]))
+set_scope.add_name('discard', ASTFunctionDefinition([('elem', '', '')]))
 builtins_scope.ids['Set'].ast_nodes[0].scope = set_scope
 
 module_scope = Scope(None)

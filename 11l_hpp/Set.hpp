@@ -36,6 +36,13 @@ public:
 		std::set<KeyType>::erase(it);
 	}
 
+	void discard(const KeyType &elem)
+	{
+		auto it = std::set<KeyType>::find(elem);
+		if (it != std::set<KeyType>::end())
+			std::set<KeyType>::erase(it);
+	}
+
 	Set difference(const Set &other) const
 	{
 		Set r;

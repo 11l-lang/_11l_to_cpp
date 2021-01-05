@@ -8648,3 +8648,29 @@ struct CodeBlock1
         print(make_maze());
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/McNuggets_problem#Python
+from itertools import product
+nuggets = set(range(101))
+for s, n, t in product(range(100//6+1), range(100//9+1), range(100//20+1)):
+    nuggets.discard(6*s + 9*n + 20*t)
+
+print(max(nuggets))
+===
+V nuggets = Set(0.<101)
+L(s, n, t) cart_product(0 .. 100 I/ 6, 0 .. 100 I/ 9, 0 .. 100 I/ 20)
+   nuggets.discard(6 * s + 9 * n + 20 * t)
+print(max(nuggets))
+===
+auto nuggets = create_set(range_el(0, 101));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[s, n, t] : cart_product(range_ee(0, idiv(100, 6)), range_ee(0, idiv(100, 9)), range_ee(0, idiv(100, 20))))
+            nuggets.discard(6 * s + 9 * n + 20 * t);
+        print(max(nuggets));
+    }
+} code_block_1;
