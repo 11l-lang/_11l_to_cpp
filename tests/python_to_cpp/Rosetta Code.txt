@@ -8547,3 +8547,104 @@ struct CodeBlock1
         print(rows.map([](const auto &row){return row.join(u""_S);}).join(u"\n"_S));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Maze_generation#Python
+import random
+
+def make_maze(w = 16, h = 8):
+    vis = [[0] * w + [1] for _ in range(h)] + [[1] * (w + 1)]
+    ver = [["|  "] * w + [str('|')] for _ in range(h)] + [['']*0]
+    hor = [["+--"] * w + [str('+')] for _ in range(h + 1)]
+
+    def walk(x : int, y : int) -> None:
+        vis[y][x] = 1
+
+        d = [(x - 1, y), (x, y + 1), (x + 1, y), (x, y - 1)]
+        random.shuffle(d)
+        for xx, yy in d:
+            if yy == -1: yy = len(vis) - 1
+            if xx == -1: xx = len(vis[yy]) - 1
+            if vis[yy][xx]: continue
+            if xx == x: hor[max(y, yy)][x] = "+  "
+            if yy == y: ver[y][max(x, xx)] = "   "
+            walk(xx, yy)
+
+    walk(random.randrange(w), random.randrange(h))
+
+    s = ""
+    for a, b in zip(hor, ver):
+        s += ''.join(a + [str('\n')] + b + [str('\n')])
+    return s
+
+print(make_maze())
+===
+//import random
+
+F make_maze(w = 16, h = 8)
+   V vis = (0 .< h).map(_ -> [0] * @w [+] [1]) [+] [[1] * (w + 1)]
+   V ver = (0 .< h).map(_ -> [‘|  ’] * @w [+] [String(‘|’)]) [+] [[‘’] * 0]
+   V hor = (0 .. h).map(_ -> [‘+--’] * @w [+] [String(‘+’)])
+
+   F walk(Int x, Int y) -> N
+      @vis[y][x] = 1
+      V d = [(x - 1, y), (x, y + 1), (x + 1, y), (x, y - 1)]
+      random:shuffle(&d)
+      L(=xx, =yy) d
+         I yy == -1
+            yy = @vis.len - 1
+         I xx == -1
+            xx = @vis[yy].len - 1
+         I @vis[yy][xx]
+            L.continue
+         I xx == x
+            @hor[max(y, yy)][x] = ‘+  ’
+         I yy == y
+            @ver[y][max(x, xx)] = ‘   ’
+         @walk(xx, yy)
+   walk(random:(w), random:(h))
+   V s = ‘’
+   L(a, b) zip(hor, ver)
+      s ‘’= (a [+] [String("\n")] + b [+] [String("\n")]).join(‘’)
+   R s
+print(make_maze())
+===
+template <typename T1 = decltype(16), typename T2 = decltype(8)> auto make_maze(const T1 &w = 16, const T2 &h = 8)
+{
+    auto vis = range_el(0, h).map([&w](const auto &_){return create_array({0}) * w + create_array({1});}) + create_array({create_array({1}) * (w + 1)});
+    auto ver = range_el(0, h).map([&w](const auto &_){return create_array({u"|  "_S}) * w + create_array({String(u"|"_S)});}) + create_array({create_array({u""_S}) * 0});
+    auto hor = range_ee(0, h).map([&w](const auto &_){return create_array({u"+--"_S}) * w + create_array({String(u"+"_S)});});
+
+    std::function<void(int, int)> walk = [&hor, &ver, &vis, &walk](const int x, const int y)
+    {
+        vis[y].set(x, 1);
+        auto d = create_array({make_tuple(x - 1, y), make_tuple(x, y + 1), make_tuple(x + 1, y), make_tuple(x, y - 1)});
+        randomns::shuffle(d);
+        for (auto [xx, yy] : d) {
+            if (yy == -1)
+                yy = vis.len() - 1;
+            if (xx == -1)
+                xx = vis[yy].len() - 1;
+            if (vis[yy][xx])
+                continue;
+            if (xx == x)
+                hor[max(y, yy)].set(x, u"+  "_S);
+            if (yy == y)
+                ver[y].set(max(x, xx), u"   "_S);
+            walk(xx, yy);
+        }
+    };
+    walk(randomns::_(w), randomns::_(h));
+    auto s = u""_S;
+    for (auto &&[a, b] : zip(hor, ver))
+        s &= (a + create_array({String(u"\n"_S)}) + b + create_array({String(u"\n"_S)})).join(u""_S);
+    return s;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(make_maze());
+    }
+} code_block_1;

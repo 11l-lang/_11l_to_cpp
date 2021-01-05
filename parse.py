@@ -1395,7 +1395,7 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
         else:
             if self.loop_variable is not None or (self.expression is not None and self.expression.symbol.id in ('..', '.<')):
                 if self.loop_variable is not None and ',' in self.loop_variable:
-                    tr = 'for (auto &&[' + self.loop_variable + '] : ' + self.expression.to_str() + ')'
+                    tr = 'for (auto ' + '&&'*(not self.copy_loop_variable) + '[' + self.loop_variable + '] : ' + self.expression.to_str() + ')'
                 else:
                     loop_auto = True
                     tr = 'for (auto ' + ('&' if self.is_loop_variable_a_reference else '&&'*(self.is_loop_variable_a_ptr or (not self.copy_loop_variable and not (
@@ -1900,7 +1900,7 @@ def prefix(id, bp):
         return self
     symbol(id).set_nud_bp(bp, nud)
 
-infix('[+]', 15); #infix('->', 20)
+infix('[+]', 20); #infix('->', 15) # for `(0 .< h).map(_ -> [0] * @w [+] [1])`
 
 infix('?', 25) # based on C# operator precedence ([http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-334.pdf])
 
@@ -1965,7 +1965,7 @@ def led(self, left):
     self.append_child(expression(self.symbol.led_bp))
     scope = prev_scope
     return self
-symbol('->', 20).set_led_bp(20, led)
+symbol('->', 15).set_led_bp(15, led)
 
 def led(self, left):
     self.append_child(left) # [(
@@ -2570,6 +2570,9 @@ def parse_internal(this_node):
                                 next_token()
                             node.loop_variable = expected_name('loop variable')
                             while token.value(source) == ',':
+                                if peek_token().value(source) == '=':
+                                    node.copy_loop_variable = True
+                                    next_token()
                                 node.loop_variable += ', ' + expected_name('loop variable')
                             advance(')')
                         node.set_expression(expression())
