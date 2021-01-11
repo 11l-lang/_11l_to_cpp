@@ -620,6 +620,11 @@ struct String::FormatArgument//Field
 		type = Type::INTEGER;
 		i = n;
 	}
+	void set(char16_t n)
+	{
+		type = Type::INTEGER;
+		i = n;
+	}
 	void set(float n)
 	{
 		type = Type::FLOAT;

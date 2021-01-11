@@ -8676,7 +8676,7 @@ struct CodeBlock1
 } code_block_1;
 
 
-# https://www.rosettacode.org/wiki/Middle_three_digits#Python
+# https://www.rosettacode.org/wiki/Middle_three_digits#Python # `.+`
 def middle_three_digits(i):
     s = str(abs(i))
     assert len(s) >= 3 and len(s) % 2 == 1, "Need odd and >= 3 digits"
@@ -8899,3 +8899,27 @@ struct CodeBlock4
             print(u"Whoops - The mathematicians (or my card manipulations) are flakey"_S);
     }
 } code_block_4;
+
+
+# https://www.rosettacode.org/wiki/Modulinos
+def meaning_of_life():
+    return ord('*')
+
+if __name__ == "__main__":
+    print("Main: The meaning of life is %s" % meaning_of_life())
+===
+F meaning_of_life()
+   R ‘*’.code
+
+:start:
+print(‘Main: The meaning of life is #.’.format(meaning_of_life()))
+===
+auto meaning_of_life()
+{
+    return u'*'_C.code;
+}
+
+int main()
+{
+    print(u"Main: The meaning of life is #."_S.format(meaning_of_life()));
+}
