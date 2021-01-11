@@ -117,7 +117,16 @@ public:
 	IndexError(int index) : index(index) {}
 };
 
-class AssertionError {};
+#include <memory>
+class String;
+class AssertionError
+{
+	std::unique_ptr<String> message;
+public:
+	AssertionError() {}
+	AssertionError(const String &message);
+	operator String() const;
+};
 
 typedef unsigned char Byte;
 
@@ -129,6 +138,8 @@ template <typename Type, int dimension> inline const Type *end  (const Tvec<Type
 #include "11l_hpp/Range.hpp"
 #include <iostream> // for std::wcerr in String.hpp
 #include "11l_hpp/String.hpp"
+AssertionError::AssertionError(const String &message) : message(std::make_unique<String>(message)) {}
+AssertionError::operator String() const {return message != nullptr ? *message : String();}
 #include "11l_hpp/Array.hpp"
 #include "11l_hpp/Dict.hpp"
 #include "11l_hpp/Set.hpp"
@@ -160,7 +171,7 @@ inline void assert_file_line(const char *file_name, int line, bool expression, c
 		if (!message.empty())
 			std::wcerr << " '" << std::wstring(message.cbegin(), message.cend()) << "'";
 		std::wcerr << " at file '" << file_name << "', line " << line << "\n";
-		throw AssertionError();
+		throw AssertionError(message);
 	}
 }
 

@@ -8674,3 +8674,62 @@ struct CodeBlock1
         print(max(nuggets));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Middle_three_digits#Python
+def middle_three_digits(i):
+    s = str(abs(i))
+    assert len(s) >= 3 and len(s) % 2 == 1, "Need odd and >= 3 digits"
+    mid = len(s) // 2
+    return s[mid-1:mid+2]
+
+passing = [123, 12345, 1234567, 987654321, 10001, -10001, -123, -100, 100, -12345]
+failing = [1, 2, -1, -10, 2002, -2002, 0]
+for x in passing + failing:
+    try:
+        answer = middle_three_digits(x)
+        print("middle_three_digits(%s) returned: %s" % (x, answer))
+    except AssertionError as error:
+        print("middle_three_digits(%s) returned error: " % x + str(error))
+===
+F middle_three_digits(i)
+   V s = String(abs(i))
+   assert(s.len >= 3 & s.len % 2 == 1, ‘Need odd and >= 3 digits’)
+   V mid = s.len I/ 2
+   R s[mid - 1 .< mid + 2]
+V passing = [123, 12345, 1234567, 987654321, 10001, -10001, -123, -100, 100, -12345]
+V failing = [1, 2, -1, -10, 2002, -2002, 0]
+L(x) passing [+] failing
+   X.try
+      V answer = middle_three_digits(x)
+      print(‘middle_three_digits(#.) returned: #.’.format(x, answer))
+   X.catch AssertionError error
+      print(‘middle_three_digits(#.) returned error: ’.format(x)‘’String(error))
+===
+template <typename T1> auto middle_three_digits(const T1 &i)
+{
+    auto s = String(abs(i));
+    assert(s.len() >= 3 && mod(s.len(), 2) == 1, u"Need odd and >= 3 digits"_S);
+    auto mid = idiv(s.len(), 2);
+    return s[range_el(mid - 1, mid + 2)];
+}
+auto passing = create_array({123, 12345, 1234567, 987654321, 10001, -10001, -123, -100, 100, -12345});
+auto failing = create_array({1, 2, -1, -10, 2002, -2002, 0});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&x : passing + failing) {
+            try
+            {
+                auto answer = middle_three_digits(x);
+                print(u"middle_three_digits(#.) returned: #."_S.format(x, answer));
+            }
+            catch (const AssertionError& error)
+            {
+                print(u"middle_three_digits(#.) returned error: "_S.format(x) & String(error));
+            }
+        }
+    }
+} code_block_1;
