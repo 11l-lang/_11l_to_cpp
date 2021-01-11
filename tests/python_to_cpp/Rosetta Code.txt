@@ -8733,3 +8733,169 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Mind_boggling_card_trick#Python
+from typing import List
+import random
+
+## 1. Cards
+n = 52
+Black = 'Black'
+Red = 'Red'
+blacks = [Black] * (n // 2)
+reds = [Red] * (n // 2)
+pack = blacks + reds
+# Give the pack a good shuffle.
+random.shuffle(pack)
+
+## 2. Deal from the randomised pack into three stacks
+black_stack : List[str] = []
+red_stack : List[str] = []
+discard : List[str] = []
+while len(pack):
+    top = pack.pop()
+    if top == Black:
+        black_stack.append(pack.pop())
+    else:
+        red_stack.append(pack.pop())
+    discard.append(top)
+print('(Discards:', ' '.join(d[0] for d in discard), ')\n')
+
+## 3. Swap the same, random, number of cards between the two stacks.
+# We can't swap more than the number of cards in a stack.
+max_swaps = min(len(black_stack), len(red_stack))
+# Randomly choose the number of cards to swap.
+swap_count = random.randint(0, max_swaps)
+print('Swapping', swap_count)
+# Randomly choose that number of cards out of each stack to swap.
+def random_partition(stack, count):
+    "Partition the stack into 'count' randomly selected members and the rest"
+    stack_copy = stack[:]
+    random.shuffle(stack_copy)
+    return (stack_copy[count:], stack_copy[:count])
+    #sample = random.sample(stack, count)
+    #rest = stack[:]
+    #for card in sample:
+    #    rest.remove(card)
+    #return (rest, sample)
+
+(black_stack, black_swap) = random_partition(black_stack, swap_count)
+(red_stack, red_swap) = random_partition(red_stack, swap_count)
+
+# Perform the swap.
+black_stack += red_swap
+red_stack += black_swap
+
+## 4. Order from randomness?
+if black_stack.count(Black) == red_stack.count(Red):
+    print('Yeha! The mathematicians assertion is correct.')
+else:
+    print('Whoops - The mathematicians (or my card manipulations) are flakey')
+===
+//import random
+V n = 52
+V Black = ‘Black’
+V Red = ‘Red’
+V blacks = [Black] * (n I/ 2)
+V reds = [Red] * (n I/ 2)
+V pack = blacks [+] reds
+random:shuffle(&pack)
+[String] black_stack
+[String] red_stack
+[String] discard
+L !pack.empty
+   V top = pack.pop()
+   I top == Black
+      black_stack.append(pack.pop())
+   E
+      red_stack.append(pack.pop())
+   discard.append(top)
+print(‘(Discards: ’(discard.map(d -> d[0]).join(‘ ’))" )\n")
+V max_swaps = min(black_stack.len, red_stack.len)
+V swap_count = random:(0 .. max_swaps)
+print(‘Swapping ’swap_count)
+
+F random_partition(stack, count)
+   ‘Partition the stack into 'count' randomly selected members and the rest’
+   V stack_copy = copy(stack)
+   random:shuffle(&stack_copy)
+   R (stack_copy[count ..], stack_copy[0 .< count])
+(black_stack, V black_swap) = random_partition(black_stack, swap_count)
+(red_stack, V red_swap) = random_partition(red_stack, swap_count)
+black_stack [+]= red_swap
+red_stack [+]= black_swap
+
+I black_stack.count(Black) == red_stack.count(Red)
+   print(‘Yeha! The mathematicians assertion is correct.’)
+E
+   print(‘Whoops - The mathematicians (or my card manipulations) are flakey’)
+===
+auto n = 52;
+auto Black = u"Black"_S;
+auto Red = u"Red"_S;
+auto blacks = create_array({Black}) * (idiv(n, 2));
+auto reds = create_array({Red}) * (idiv(n, 2));
+auto pack = blacks + reds;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        randomns::shuffle(pack);
+    }
+} code_block_1;
+Array<String> black_stack;
+Array<String> red_stack;
+Array<String> discard;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (!pack.empty()) {
+            auto top = pack.pop();
+            if (top == Black)
+                black_stack.append(pack.pop());
+            else
+                red_stack.append(pack.pop());
+            discard.append(top);
+        }
+        print(u"(Discards: "_S & (discard.map([](const auto &d){return _get<0>(d);}).join(u" "_S)) & u" )\n"_S);
+    }
+} code_block_2;
+auto max_swaps = min(black_stack.len(), red_stack.len());
+auto swap_count = randomns::_(range_ee(0, max_swaps));
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print(u"Swapping "_S & swap_count);
+    }
+} code_block_3;
+
+template <typename T1, typename T2> auto random_partition(const T1 &stack, const T2 &count)
+{
+    u"Partition the stack into 'count' randomly selected members and the rest"_S;
+    auto stack_copy = copy(stack);
+    randomns::shuffle(stack_copy);
+    return make_tuple(stack_copy[range_ei(count)], stack_copy[range_el(0, count)]);
+}
+
+struct CodeBlock4
+{
+    CodeBlock4()
+    {
+        TUPLE_ELEMENT_T(1, random_partition(black_stack, swap_count)) black_swap;
+        assign_from_tuple(black_stack, black_swap, random_partition(black_stack, swap_count));
+        TUPLE_ELEMENT_T(1, random_partition(red_stack, swap_count)) red_swap;
+        assign_from_tuple(red_stack, red_swap, random_partition(red_stack, swap_count));
+        black_stack.append(red_swap);
+        red_stack.append(black_swap);
+        if (black_stack.count(Black) == red_stack.count(Red))
+            print(u"Yeha! The mathematicians assertion is correct."_S);
+        else
+            print(u"Whoops - The mathematicians (or my card manipulations) are flakey"_S);
+    }
+} code_block_4;
