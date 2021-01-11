@@ -2103,3 +2103,21 @@ struct CodeBlock1
         break_:;
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Modulinos
+F meaning_of_life()
+   R ‘*’.code
+
+:start:
+print(‘Main: The meaning of life is ’meaning_of_life())
+===
+auto meaning_of_life()
+{
+    return u'*'_C.code;
+}
+
+int main()
+{
+    print(u"Main: The meaning of life is "_S & meaning_of_life());
+}

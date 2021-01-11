@@ -66,7 +66,7 @@ public:
 	String() {}
 	String(Char c) : basic_string(1, c.code) {}
 	String(std::u16string &&s) : std::u16string(std::forward<std::u16string>(s)) {}
-	explicit String(char16_t c) : basic_string(1, c) {}
+	explicit String(char16_t c) {assign(int(c));}
 	explicit String(bool b) : basic_string(b ? u"1B" : u"0B", 2) {}
 	explicit String(int num) {assign(num);}
 	explicit String(int64_t num) {assign(num);}
@@ -550,15 +550,15 @@ public:
 	void operator&=(const char16_t *s) {append(s);}
 	void operator&=(const String &s) {append(s);}
 	void operator&=(Char ch) {append(1, ch.code);}
-	void operator&=(char16_t ch) {append(1, ch);}
+	void operator&=(char16_t ch) {*this &= String(ch);}
 	void operator&=(int i)    {*this &= String(i);}
 	void operator&=(double n) {*this &= String(n);}
 
 	String operator&(const char16_t *s) const {String r(*this); r.append(s); return r;}
 	String operator&(const String &s) const {String r(*this); r.append(s); return r;}
 	String operator&(Char ch)         const {String r(*this); r.append(1, ch.code); return r;}
-	String operator&(char16_t ch)     const {String r(*this); r.append(1, ch); return r;}
 
+	String operator&(char16_t ch) const {return *this & String(ch);}
 	String operator&(int i)    const {return *this & String(i);}
 	String operator&(bool b)   const {return *this & String(b);}
 	String operator&(double n) const {return *this & String(n);}
