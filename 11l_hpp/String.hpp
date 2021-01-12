@@ -658,7 +658,7 @@ template <typename ... Types> String String::format(const Types&... args) const
 	const char16_t *s = data();
 	for (int i=0; i<len();) {
 		if (s[i] == '#' && s[i+1] == '#') {
-			r &= u'#';
+			r &= u'#'_C;
 			i += 2;
 			continue;
 		}
@@ -721,7 +721,7 @@ template <typename ... Types> String String::format(const Types&... args) const
 			}
 		}
 		else
-			r &= s[i++];
+			r &= Char(s[i++]);
 	}
 
 	if (argument_index != sizeof...(args))
