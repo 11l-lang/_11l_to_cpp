@@ -522,10 +522,10 @@ template <typename Type, typename Func, typename Dummy = int, typename = decltyp
 	return r;
 }
 
-template <typename Type> Type product(const Array<Type> &arr)
+template <typename Iterable> auto product(const Iterable &iterable)
 {
-	Type r = 1;
-	for (auto v : arr)
+	std::remove_const_t<std::remove_reference_t<decltype(*std::begin(iterable))>> r = 1;
+	for (auto v : iterable)
 		r *= v;
 	return r;
 }

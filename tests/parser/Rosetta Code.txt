@@ -2121,3 +2121,25 @@ int main()
 {
     print(u"Main: The meaning of life is "_S & meaning_of_life());
 }
+
+
+// https://www.rosettacode.org/wiki/Multifactorial#Crystal
+F multifact(n, d)
+   R product((n .< 1).step(-d))
+
+L(d) 1..5
+   print(‘Degree ’d‘: ’(1..10).map(n -> multifact(n, @d)))
+===
+template <typename T1, typename T2> auto multifact(const T1 &n, const T2 &d)
+{
+    return product(range_el(n, 1).step(-d));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto d : range_ee(1, 5))
+            print(u"Degree "_S & d & u": "_S & range_ee(1, 10).map([&d](const auto &n){return multifact(n, d);}));
+    }
+} code_block_1;
