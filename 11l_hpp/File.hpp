@@ -61,9 +61,9 @@ public:
 	{
 #ifdef _WIN32
 		file = NULL;
-		_wfopen_s(&file, (wchar_t*)name.c_str(), (wchar_t*)(mode & u'b').c_str());
+		_wfopen_s(&file, (wchar_t*)name.c_str(), (wchar_t*)(mode & u'b'_C).c_str());
 #else
-		file = fopen(convert_utf16_to_utf8(name).c_str(), convert_utf16_to_utf8(mode & u'b').c_str());
+		file = fopen(convert_utf16_to_utf8(name).c_str(), convert_utf16_to_utf8(mode & u'b'_C).c_str());
 #endif
 		if (file == NULL)
 			throw FileNotFoundError();

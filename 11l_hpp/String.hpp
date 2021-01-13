@@ -2,11 +2,20 @@
 #include <cstring> // for memcmp in GCC
 #include <cwctype>
 #include <array>
+#ifdef _WIN32
+#include <io.h>
+#include <fcntl.h>
+#endif
 
 static class LocaleInitializer
 {
 public:
-	LocaleInitializer() {setlocale(LC_CTYPE, "");} // for correct work of `Char::towlower()` and `Char::iswlower()`
+	LocaleInitializer() {
+		setlocale(LC_CTYPE, ""); // for correct work of `towlower()` and `iswlower()` [example: `print('Ф'.lower() == 'ф')`]
+#ifdef _WIN32
+		_setmode(_fileno(stdout), _O_U16TEXT); // [https://stackoverflow.com/questions/2492077/output-unicode-strings-in-windows-console-app <- google:‘wcout cyrillic msvc widechartomultibyte’]
+#endif
+	}
 } locale_initializer;
 
 class Char
@@ -600,6 +609,11 @@ public:
 	template <typename ... Types> String format(const Types&... args) const;
 };
 
+inline Char operator ""_C(char16_t c) // Fix GCC error: unable to find character literal operator ‘operator""_C’ with ‘char16_t’ argument [in line `r &= u'#'_C;`]
+{
+	return Char(c);
+}
+
 struct String::FormatArgument//Field
 {
 	enum class Type {STRING, INTEGER, FLOAT} type;
@@ -743,11 +757,6 @@ inline String operator*(Char c, int n)
 inline String operator ""_S(const char16_t *s, size_t sz)
 {
 	return String(s, sz);
-}
-
-inline Char operator ""_C(char16_t c)
-{
-	return Char(c);
 }
 
 template <typename Type> String to_string(const Type &v)

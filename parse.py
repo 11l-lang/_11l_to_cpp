@@ -3017,6 +3017,8 @@ string_scope.add_name('findi', ASTFunctionDefinition([('s', '', 'String'), ('sta
 string_scope.add_name('rfindi', ASTFunctionDefinition([('s', '', 'String'), ('start', '0', 'Int'), ('end', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
 string_scope.add_name('count', ASTFunctionDefinition([('s', '', 'String')]))
 string_scope.add_name('replace', ASTFunctionDefinition([('old', '', 'String'), ('new', '', 'String')]))
+string_scope.add_name('lowercase', ASTFunctionDefinition([]))
+string_scope.add_name('uppercase', ASTFunctionDefinition([]))
 string_scope.add_name('zfill', ASTFunctionDefinition([('width', '', 'Int')]))
 string_scope.add_name('center', ASTFunctionDefinition([('width', '', 'Int'), ('fillchar', token_to_str('‘ ’'), 'Char')]))
 string_scope.add_name('ljust',  ASTFunctionDefinition([('width', '', 'Int'), ('fillchar', token_to_str('‘ ’'), 'Char')]))

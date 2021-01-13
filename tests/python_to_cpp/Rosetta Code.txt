@@ -9015,3 +9015,52 @@ struct CodeBlock1
         print(u"Switch = "_S & _switch_);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Multiplication_tables#C
+n = 12
+for j in range(1, n + 1):
+    print('%3d' % j, end = ' ')
+print('│')
+for j in range(n):
+    print('────', end = '')
+print('┼───')
+
+for i in range(1, n + 1):
+    for j in range(1, n + 1):
+        print('    ' if j < i else "%3d " % (i * j), end = '')
+    print('│', i)
+===
+V n = 12
+L(j) 1 .. n
+   print(‘#3’.format(j), end' ‘ ’)
+print(‘│’)
+L(j) 0 .< n
+   print(‘────’, end' ‘’)
+print(‘┼───’)
+
+L(i) 1 .. n
+   L(j) 1 .. n
+      print(I j < i {‘    ’} E ‘#3 ’.format(i * j), end' ‘’)
+   print(‘│ ’i)
+===
+auto n = 12;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto j : range_ee(1, n))
+            print(u"#3"_S.format(j), u" "_S);
+        print(u"│"_S);
+        for (auto j : range_el(0, n))
+            print(u"────"_S, u""_S);
+        print(u"┼───"_S);
+
+        for (auto i : range_ee(1, n)) {
+            for (auto j : range_ee(1, n))
+                print(j < i ? u"    "_S : u"#3 "_S.format(i * j), u""_S);
+            print(u"│ "_S & i);
+        }
+    }
+} code_block_1;
