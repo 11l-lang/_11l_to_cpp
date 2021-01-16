@@ -735,6 +735,7 @@ struct CodeBlock1
 
 
 # https://www.rosettacode.org/wiki/Longest_common_prefix
+# (based on Kotlin solution)
 def lcp(sa):
     if len(sa) == 0:
         return ''

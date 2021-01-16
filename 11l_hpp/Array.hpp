@@ -566,13 +566,14 @@ inline Array<String> String::split(const String &delim, Nullable<int> limit, boo
 				arr.append(String(begin, str-begin));
 			str += delim.len();
 			if (--lim == 0) {
-				arr.append(String(str, end-str));
+				arr.append(String(str, data() + len() - str));
 				return arr;
 			}
 			begin = str;
 		}
 		else
 			str++;
+	str += delim.len() - 1;
 
 	if (!group_delimiters || str != begin)
 		arr.append(String(begin, str-begin));
