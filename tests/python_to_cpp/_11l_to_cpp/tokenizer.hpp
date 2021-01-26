@@ -532,7 +532,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                     else if (ch == u'"')
                         break;
                 }
-                if (source[range_el(i, i + 1)].is_alpha() || in(source[range_el(i, i + 1)], make_tuple(u"@"_S, u":"_S, u"‘"_S, u"("_S))) {
+                if (source[range_el(i, i + 1)].is_alpha() || in(source[range_el(i, i + 1)], make_tuple(u"_"_S, u"@"_S, u":"_S, u"‘"_S, u"("_S))) {
                     tokens.append(Token(lexem_start, i, Token::Category::STRING_LITERAL));
                     tokens.append(Token(i, i, Token::Category::STRING_CONCATENATOR));
                     continue;
@@ -575,7 +575,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* 
                 }
                 while (i < source.len() && source[i] == u'\'')
                     i++;
-                if (source[range_el(i, i + 1)].is_alpha() || in(source[range_el(i, i + 1)], make_tuple(u"@"_S, u":"_S, u"\""_S, u"("_S))) {
+                if (source[range_el(i, i + 1)].is_alpha() || in(source[range_el(i, i + 1)], make_tuple(u"_"_S, u"@"_S, u":"_S, u"\""_S, u"("_S))) {
                     tokens.append(Token(lexem_start, i, Token::Category::STRING_LITERAL));
                     tokens.append(Token(i, i, Token::Category::STRING_CONCATENATOR));
                     continue;

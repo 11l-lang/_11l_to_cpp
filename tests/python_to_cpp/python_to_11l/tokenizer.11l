@@ -155,10 +155,10 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
                i++
             category = STRING_LITERAL
 
-         E I ch C ‘a’..‘z’ | ch C ‘A’..‘Z’ | ch == ‘_’
+         E I ch.is_alpha() | ch == ‘_’
             L i < source.len
                ch = source[i]
-               I !(ch C ‘a’..‘z’ | ch C ‘A’..‘Z’ | ch == ‘_’ | ch C ‘0’..‘9’ | ch == ‘?’)
+               I !(ch.is_alpha() | ch == ‘_’ | ch C ‘0’..‘9’ | ch == ‘?’)
                   L.break
                i++
             I source[lexem_start .< i] C :keywords
@@ -197,7 +197,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
                      I source[i + 1 .< i + 2] C ‘-+’
                         i++
                   i++
-               I source[i] C ‘jJ’
+               I source[i .< i + 1] C (‘j’, ‘J’)
                   i++
                I ‘_’ C source[start .< i] & !(‘.’ C source[start .< i])
                   V number = source[start .< i].replace(‘_’, ‘’)

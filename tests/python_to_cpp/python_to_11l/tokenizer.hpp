@@ -187,10 +187,10 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                 category = decltype(category)::STRING_LITERAL;
             }
 
-            else if (in(ch, range_ee(u'a'_C, u'z'_C)) || in(ch, range_ee(u'A'_C, u'Z'_C)) || ch == u'_') {
+            else if (ch.is_alpha() || ch == u'_') {
                 while (i < source.len()) {
                     ch = source[i];
-                    if (!(in(ch, range_ee(u'a'_C, u'z'_C)) || in(ch, range_ee(u'A'_C, u'Z'_C)) || ch == u'_' || in(ch, range_ee(u'0'_C, u'9'_C)) || ch == u'?'))
+                    if (!(ch.is_alpha() || ch == u'_' || in(ch, range_ee(u'0'_C, u'9'_C)) || ch == u'?'))
                         break;
                     i++;
                 }
@@ -235,7 +235,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                         }
                         i++;
                     }
-                    if (in(source[i], u"jJ"_S))
+                    if (in(source[range_el(i, i + 1)], make_tuple(u"j"_S, u"J"_S)))
                         i++;
                     if (in(u'_'_C, source[range_el(start, i)]) && !(in(u'.'_C, source[range_el(start, i)]))) {
                         auto number = source[range_el(start, i)].replace(u"_"_S, u""_S);

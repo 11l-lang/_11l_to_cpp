@@ -443,7 +443,7 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
                   i++
                E I ch == ‘"’
                   L.break
-            I source[i .< i + 1].is_alpha() | source[i .< i + 1] C (‘@’, ‘:’, "‘", ‘(’)
+            I source[i .< i + 1].is_alpha() | source[i .< i + 1] C (‘_’, ‘@’, ‘:’, "‘", ‘(’)
                tokens.append(Token(lexem_start, i, Token.Category.STRING_LITERAL))
                tokens.append(Token(i, i, Token.Category.STRING_CONCATENATOR))
                L.continue
@@ -479,7 +479,7 @@ F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuation
                      L.break
             L i < source.len & source[i] == ‘'’
                i++
-            I source[i .< i + 1].is_alpha() | source[i .< i + 1] C (‘@’, ‘:’, ‘"’, ‘(’)
+            I source[i .< i + 1].is_alpha() | source[i .< i + 1] C (‘_’, ‘@’, ‘:’, ‘"’, ‘(’)
                tokens.append(Token(lexem_start, i, Token.Category.STRING_LITERAL))
                tokens.append(Token(i, i, Token.Category.STRING_CONCATENATOR))
                L.continue

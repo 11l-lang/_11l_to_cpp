@@ -183,10 +183,10 @@ def tokenize(source, newline_chars : List[int] = None, comments : List[Tuple[int
                     i += 1
                 category = Token.Category.STRING_LITERAL
 
-            elif 'a' <= ch <= 'z' or 'A' <= ch <= 'Z' or ch == '_': # this is NAME/IDENTIFIER or KEYWORD
+            elif ch.isalpha() or ch == '_': # this is NAME/IDENTIFIER or KEYWORD
                 while i < len(source):
                     ch = source[i]
-                    if not ('a' <= ch <= 'z' or 'A' <= ch <= 'Z' or ch == '_' or '0' <= ch <= '9' or ch == '?'):
+                    if not (ch.isalpha() or ch == '_' or '0' <= ch <= '9' or ch == '?'):
                         break
                     i += 1
                 if source[lexem_start:i] in keywords:
@@ -228,7 +228,7 @@ def tokenize(source, newline_chars : List[int] = None, comments : List[Tuple[int
                             if source[i+1:i+2] in '-+':
                                 i += 1
                         i += 1
-                    if source[i] in 'jJ':
+                    if source[i:i+1] in ('j', 'J'):
                         i += 1
                     if '_' in source[start:i] and not '.' in source[start:i]: # float numbers do not checked for a while
                         number = source[start:i].replace('_', '')
