@@ -145,6 +145,10 @@ TEST(">‘Author's name’[http://address]:‘Quoted text.’", '<blockquote><i>
 TEST(">‘Author's name’:‘Quoted text.’",                 '<blockquote><i>Author\'s name</i>:<br />\nQuoted text.</blockquote>')
 TEST("‘Quoted text.’:‘Author's name’<",                 "<blockquote>Quoted text.<br />\n<div align='right'><i>Author's name</i></div></blockquote>")
 TEST('>‘Как люди думают. Дмитрий Чернышев. 2015. 304с.’:‘[[[стр.89:]]]...’', "<blockquote><i>Как люди думают. Дмитрий Чернышев. 2015. 304с.</i>:<br />\n<!--[[[стр.89:]]]-->...</blockquote>")
+TEST(">‘>‘Автор против nullable-типов?’\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.’", '<blockquote><blockquote>Автор против nullable-типов?</blockquote>\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.</blockquote>')
+TEST(">‘> Автор против nullable-типов?\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.’", '<blockquote><blockquote>Автор против nullable-типов?</blockquote>\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.</blockquote>')
+TEST(">‘1. A\n’", "<blockquote><ol>\n<li>A</li>\n</ol>\n</blockquote>")
+TEST("!‘1. A\n’", "<div class=\"note\"><ol>\n<li>A</li>\n</ol>\n</div>")
 TEST("‘понимание [[[процесса]]] разбора [[[разметки]]] человеком’[‘говоря проще: приходится [[[гораздо]]] меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё’]", '<abbr title="говоря проще: приходится  меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё">понимание  разбора  человеком</abbr>')
 TEST(
 """. unordered
@@ -524,6 +528,10 @@ TEST(‘>‘Author's name’[http://address]:‘Quoted text.’’, "<blockquote
 TEST(‘>‘Author's name’:‘Quoted text.’’, "<blockquote><i>Author's name</i>:<br />\nQuoted text.</blockquote>")
 TEST(‘‘Quoted text.’:‘Author's name’<’, "<blockquote>Quoted text.<br />\n<div align='right'><i>Author's name</i></div></blockquote>")
 TEST(‘>‘Как люди думают. Дмитрий Чернышев. 2015. 304с.’:‘[[[стр.89:]]]...’’, "<blockquote><i>Как люди думают. Дмитрий Чернышев. 2015. 304с.</i>:<br />\n<!--[[[стр.89:]]]-->...</blockquote>")
+TEST(">‘>‘Автор против nullable-типов?’\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.’", "<blockquote><blockquote>Автор против nullable-типов?</blockquote>\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.</blockquote>")
+TEST(">‘> Автор против nullable-типов?\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.’", "<blockquote><blockquote>Автор против nullable-типов?</blockquote>\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.</blockquote>")
+TEST(">‘1. A\n’", "<blockquote><ol>\n<li>A</li>\n</ol>\n</blockquote>")
+TEST("!‘1. A\n’", "<div class=\"note\"><ol>\n<li>A</li>\n</ol>\n</div>")
 TEST(‘‘понимание [[[процесса]]] разбора [[[разметки]]] человеком’[‘говоря проще: приходится [[[гораздо]]] меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё’]’, ‘<abbr title="говоря проще: приходится  меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё">понимание  разбора  человеком</abbr>’)
 TEST(‘. unordered
 . list’, ‘<ul>
@@ -874,6 +882,10 @@ Some text.)"_S, false, true);
         TEST(u">‘Author's name’:‘Quoted text.’"_S, u"<blockquote><i>Author's name</i>:<br />\nQuoted text.</blockquote>"_S);
         TEST(u"‘Quoted text.’:‘Author's name’<"_S, u"<blockquote>Quoted text.<br />\n<div align='right'><i>Author's name</i></div></blockquote>"_S);
         TEST(u">‘Как люди думают. Дмитрий Чернышев. 2015. 304с.’:‘[[[стр.89:]]]...’"_S, u"<blockquote><i>Как люди думают. Дмитрий Чернышев. 2015. 304с.</i>:<br />\n<!--[[[стр.89:]]]-->...</blockquote>"_S);
+        TEST(u">‘>‘Автор против nullable-типов?’\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.’"_S, u"<blockquote><blockquote>Автор против nullable-типов?</blockquote>\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.</blockquote>"_S);
+        TEST(u">‘> Автор против nullable-типов?\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.’"_S, u"<blockquote><blockquote>Автор против nullable-типов?</blockquote>\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.</blockquote>"_S);
+        TEST(u">‘1. A\n’"_S, u"<blockquote><ol>\n<li>A</li>\n</ol>\n</blockquote>"_S);
+        TEST(u"!‘1. A\n’"_S, u"<div class=\"note\"><ol>\n<li>A</li>\n</ol>\n</div>"_S);
         TEST(u"‘понимание [[[процесса]]] разбора [[[разметки]]] человеком’[‘говоря проще: приходится [[[гораздо]]] меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё’]"_S, u"<abbr title=\"говоря проще: приходится  меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё\">понимание  разбора  человеком</abbr>"_S);
         TEST(uR"(. unordered
 . list)"_S, uR"(<ul>

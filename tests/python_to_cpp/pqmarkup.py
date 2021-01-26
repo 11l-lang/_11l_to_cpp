@@ -232,7 +232,8 @@ class Converter:
 
         while i < len(instr):
             ch = instr[i]
-            if i == 0 or prev_char() == "\n": # if beginning of line
+            if (i == 0 or prev_char() == "\n" # if beginning of line
+                       or (i == writepos and len(ending_tags) != 0 and ending_tags[-1] in ('</blockquote>', '</div>') and instr[i-2:i] in ('>‘', '<‘', '!‘'))): # ’’’ # or beginning of blockquote or note
                 if ch == '.' and (next_char() in ' ‘'): # ’ this is unordered list
                     close_ordered_list()
                     s = ''

@@ -204,7 +204,7 @@ T Converter
 
       L i < instr.len
          V ch = instr[i]
-         I i == 0 | prev_char() == "\n"
+         I (i == 0 | prev_char() == "\n" | (i == writepos & !ending_tags.empty & ending_tags.last C (‘</blockquote>’, ‘</div>’) & instr[i - 2 .< i] C (">‘", "<‘", "!‘")))
             I ch == ‘.’ & (next_char() C " ‘")
                close_ordered_list()
                V s = ‘’

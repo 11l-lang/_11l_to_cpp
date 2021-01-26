@@ -287,7 +287,7 @@ public:
 
         while (i < instr.len()) {
             auto ch = instr[i];
-            if (i == 0 || prev_char() == u'\n') {
+            if ((i == 0 || prev_char() == u'\n' || (i == writepos && !ending_tags.empty() && in(ending_tags.last(), make_tuple(u"</blockquote>"_S, u"</div>"_S)) && in(instr[range_el(i - 2, i)], make_tuple(u">‘"_S, u"<‘"_S, u"!‘"_S))))) {
                 if (ch == u'.' && (in(next_char(), u" ‘"_S))) {
                     close_ordered_list();
                     auto s = u""_S;
