@@ -114,7 +114,7 @@ T Token
    F to_str(source)
       R ‘Token(’String(.category)‘, "’(.value(source))‘")’
 
-F tokenize(source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuations = N, [(Int, Int)]? &comments = N)
+F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuations = N, [(Int, Int)]? &comments = N)
    [Token] tokens
    [(Int, Bool)] indentation_levels
    [(Char, Int)] nesting_elements

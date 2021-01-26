@@ -144,7 +144,7 @@ public:
     }
 };
 
-template <typename T1> auto tokenize(const T1 &source, Array<Tuple<Char, int>>* const implied_scopes = nullptr, Array<int>* const line_continuations = nullptr, Array<ivec2>* const comments = nullptr)
+auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scopes = nullptr, Array<int>* const line_continuations = nullptr, Array<ivec2>* const comments = nullptr)
 {
     Array<Token> tokens;
     Array<Tuple<int, bool>> indentation_levels;

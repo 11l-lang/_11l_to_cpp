@@ -41,7 +41,7 @@ tokenize
     ast_nodes = [
     .   node_type = function
         function_arguments = [
-            ‘source; ; ; ’
+            ‘source; ; String; ’
             implied_scopes; nullptr; [(Char, Int)]?; &
             line_continuations; nullptr; [Int]?; &
             comments; nullptr; [(Int, Int)]?; &

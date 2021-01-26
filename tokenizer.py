@@ -126,7 +126,7 @@ class Token:
     def to_str(self, source):
         return 'Token('+str(self.category)+', "'+self.value(source)+'")'
 
-def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_continuations : List[int] = None, comments : List[Tuple[int, int]] = None):
+def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_continuations : List[int] = None, comments : List[Tuple[int, int]] = None):
     tokens : List[Token] = []
     indentation_levels : List[Tuple[int, bool]] = []
     nesting_elements : List[Tuple[Char, int]] = [] # логически этот стек можно объединить с indentation_levels, но так немного удобнее (конкретно: для проверок `nesting_elements[-1][0] != ...`)
@@ -239,7 +239,7 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
 
             if tabs and spaces:
                 next_line_pos = source.find("\n", i)
-                raise Error('mixing tabs and spaces in indentation: `' + source[linestart:i].replace(' ', 'S').replace("\t", 'TAB') + '' + source[i:next_line_pos if next_line_pos != -1 else len(source)] + '`', i)
+                raise Error('mixing tabs and spaces in indentation: `' + source[linestart:i].replace(' ', 'S').replace("\t", 'TAB') + source[i:next_line_pos if next_line_pos != -1 else len(source)] + '`', i)
 
             indentation_level = ii - linestart
             if len(indentation_levels) and indentation_levels[-1][0] == -1: # сразу после символа `{` идёт новый произвольный отступ (понижение уровня отступа может быть полезно, если вдруг отступ оказался слишком большой), который действует вплоть до парного символа `}`
@@ -252,8 +252,8 @@ def tokenize(source, implied_scopes : List[Tuple[Char, int]] = None, line_contin
                     e = i + 1
                     while e < len(source) and source[e] not in "\r\n":
                         e += 1
-                    raise Error("inconsistent indentations:\n```\n" + prev_indentation_level*('TAB' if indentation_tabs else 'S') + '' + source[prev_linestart:linestart] + ''
-                        + (ii-linestart)*('TAB' if tabs else 'S') + '' + source[ii:e] + "\n```", ii)
+                    raise Error("inconsistent indentations:\n```\n" + prev_indentation_level*('TAB' if indentation_tabs else 'S') + source[prev_linestart:linestart]
+                        + (ii-linestart)*('TAB' if tabs else 'S') + source[ii:e] + "\n```", ii)
                 prev_linestart = ii
 
                 if indentation_level == prev_indentation_level: # [1:] [-1]:‘If it is equal, nothing happens.’ :)(: [:2]
