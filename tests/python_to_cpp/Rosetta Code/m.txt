@@ -1,0 +1,984 @@
+# https://www.rosettacode.org/wiki/Mad_Libs#Python
+import re
+
+template = '''<name> went for a walk in the park. <he or she>
+found a <noun>. <name> decided to take it home.'''
+
+def madlibs(template):
+    print('The story template is:\n' + template)
+    fields = sorted(list(set( re.findall('<[^>]+>', template) )))
+    values = input('\nInput a comma-separated list of words to replace the following items\n  %s: ' % ','.join(fields)).split(',')
+    story = template
+    for f,v in zip(fields, values):
+        story = story.replace(f, v)
+    print('\nThe story becomes:\n\n' + story)
+
+madlibs(template)
+===
+//import re
+V template = ‘<name> went for a walk in the park. <he or she>
+found a <noun>. <name> decided to take it home.’
+
+F madlibs(template)
+   print("The story template is:\n"template)
+   V fields = sorted(Array(Set(re:‘<[^>]+>’.find_strings(template))))
+   V values = input("\nInput a comma-separated list of words to replace the following items\n  #.: ".format(fields.join(‘,’))).split(‘,’)
+   V story = template
+   L(f, v) zip(fields, values)
+      story = story.replace(f, v)
+   print("\nThe story becomes:\n\n"story)
+madlibs(template)
+===
+auto _template_ = uR"(<name> went for a walk in the park. <he or she>
+found a <noun>. <name> decided to take it home.)"_S;
+
+template <typename T1> auto madlibs(const T1 &_template_)
+{
+    print(u"The story template is:\n"_S & _template_);
+    auto fields = sorted(create_array(create_set(re::_(u"<[^>]+>"_S).find_strings(_template_))));
+    auto values = input(u"\nInput a comma-separated list of words to replace the following items\n  #.: "_S.format(fields.join(u","_S))).split(u","_S);
+    auto story = _template_;
+    for (auto &&[f, v] : zip(fields, values))
+        story = story.replace(f, v);
+    print(u"\nThe story becomes:\n\n"_S & story);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        madlibs(_template_);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Magic_squares_of_odd_order#Python
+def magic(n):
+    for row in range(1, n + 1):
+        print(' '.join(str(cell).rjust(len(str(n**2))) for cell in
+                       (n * ((row + col - 1 + n // 2) % n) +
+                       ((row + 2 * col - 2) % n) + 1
+                       for col in range(1, n + 1))))
+    print('\nAll sum to magic number %i' % ((n * n + 1) * n // 2))
+
+for n in (5, 3, 7):
+    print('\nOrder %i\n=======' % n)
+    magic(n)
+===
+F magic(n)
+   L(row) 1 .. n
+      print(((1 .. n).map(col -> @n * ((@row + col - 1 + @n I/ 2) % @n) + ((@row + 2 * col - 2) % @n) + 1)).map(cell -> String(cell).rjust(String(@n ^ 2).len)).join(‘ ’))
+   print("\nAll sum to magic number #.".format((n * n + 1) * n I/ 2))
+
+L(n) (5, 3, 7)
+   print("\nOrder #.\n=======".format(n))
+   magic(n)
+===
+template <typename T1> auto magic(const T1 &n)
+{
+    for (auto row : range_ee(1, n))
+        print((range_ee(1, n).map([&n, &row](const auto &col){return n * (mod((row + col - 1 + idiv(n, 2)), n)) + (mod((row + 2 * col - 2), n)) + 1;})).map([&n](const auto &cell){return String(cell).rjust(String(square(n)).len());}).join(u" "_S));
+    print(u"\nAll sum to magic number #."_S.format(idiv((n * n + 1) * n, 2)));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&n : make_tuple(5, 3, 7)) {
+            print(u"\nOrder #.\n======="_S.format(n));
+            magic(n);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Magic_squares_of_singly_even_order#Python
+import math
+
+LOG_10 = 2.302585092994
+
+# build odd magic square
+def build_oms(s):
+    if s % 2 == 0:
+        s += 1
+    q = [[0 for j in range(s)] for i in range(s)]
+    p = 1
+    i = s // 2
+    j = 0
+    while p <= (s * s):
+        q[i][j] = p
+        ti = i + 1
+        if ti >= s: ti = 0
+        tj = j - 1
+        if tj < 0: tj = s - 1
+        if q[ti][tj] != 0:
+            ti = i
+            tj = j + 1
+        i = ti
+        j = tj
+        p += 1
+
+    return (q, s)
+
+# build singly even magic square
+def build_sems(s):
+    if s % 2 == 1:
+        s += 1
+    while s % 4 == 0:
+        s += 2
+
+    q = [[0 for j in range(s)] for i in range(s)]
+    z = s // 2
+    b = z * z
+    c = 2 * b
+    d = 3 * b
+    o = build_oms(z)
+
+    for j in range(0, z):
+        for i in range(0, z):
+            a = o[0][i][j]
+            q[i][j] = a
+            q[i + z][j + z] = a + b
+            q[i + z][j] = a + c
+            q[i][j + z] = a + d
+
+    lc = z // 2
+    rc = lc
+    for j in range(0, z):
+        for i in range(0, s):
+            if i < lc or i > s - rc or (i == lc and j == lc):
+                if not (i == 0 and j == lc):
+                    (q[i][j], q[i][j + z]) = (q[i][j + z], q[i][j])
+
+    return (q, s)
+
+def display(q):
+    s = q[1]
+    print(" - %i x %i\n" % (s, s))
+    k = 1 + int(math.floor(math.log(s * s) / LOG_10))
+    for j in range(0, s):
+        for i in range(0, s):
+            print(str(q[0][i][j]).zfill(k), end = ' ')
+        print()
+    print("Magic sum: %i" % (s * ((s * s) + 1) // 2))
+
+print("Singly Even Magic Square", end = '')
+display(build_sems(6))
+===
+//import math
+V LOG_10 = 2.302585092994
+
+F build_oms(=s)
+   I s % 2 == 0
+      s++
+   V q = (0 .< s).map(i -> (0 .< @s).map(j -> 0))
+   V p = 1
+   V i = s I/ 2
+   V j = 0
+   L p <= (s * s)
+      q[i][j] = p
+      V ti = i + 1
+      I ti >= s
+         ti = 0
+      V tj = j - 1
+      I tj < 0
+         tj = s - 1
+      I q[ti][tj] != 0
+         ti = i
+         tj = j + 1
+      i = ti
+      j = tj
+      p++
+   R (q, s)
+
+F build_sems(=s)
+   I s % 2 == 1
+      s++
+   L s % 4 == 0
+      s += 2
+   V q = (0 .< s).map(i -> (0 .< @s).map(j -> 0))
+   V z = s I/ 2
+   V b = z * z
+   V c = 2 * b
+   V d = 3 * b
+   V o = build_oms(z)
+
+   L(j) 0 .< z
+      L(i) 0 .< z
+         V a = o[0][i][j]
+         q[i][j] = a
+         q[i + z][j + z] = a + b
+         q[i + z][j] = a + c
+         q[i][j + z] = a + d
+   V lc = z I/ 2
+   V rc = lc
+   L(j) 0 .< z
+      L(i) 0 .< s
+         I i < lc | i > s - rc | (i == lc & j == lc)
+            I !(i == 0 & j == lc)
+               (q[i][j], q[i][j + z]) = (q[i][j + z], q[i][j])
+   R (q, s)
+
+F display(q)
+   V s = q[1]
+   print(" - #. x #.\n".format(s, s))
+   V k = 1 + Int(floor(log(s * s) / :LOG_10))
+   L(j) 0 .< s
+      L(i) 0 .< s
+         print(String(q[0][i][j]).zfill(k), end' ‘ ’)
+      print()
+   print(‘Magic sum: #.’.format(s * ((s * s) + 1) I/ 2))
+print(‘Singly Even Magic Square’, end' ‘’)
+display(build_sems(6))
+===
+auto LOG_10 = 2.302585092994;
+
+template <typename T1> auto build_oms(T1 s)
+{
+    if (mod(s, 2) == 0)
+        s++;
+    auto q = range_el(0, s).map([&s](const auto &i){return range_el(0, s).map([](const auto &j){return 0;});});
+    auto p = 1;
+    auto i = idiv(s, 2);
+    auto j = 0;
+    while (p <= (s * s)) {
+        q[i].set(j, p);
+        auto ti = i + 1;
+        if (ti >= s)
+            ti = 0;
+        auto tj = j - 1;
+        if (tj < 0)
+            tj = s - 1;
+        if (q[ti][tj] != 0) {
+            ti = i;
+            tj = j + 1;
+        }
+        i = ti;
+        j = tj;
+        p++;
+    }
+    return make_tuple(q, s);
+}
+
+template <typename T1> auto build_sems(T1 s)
+{
+    if (mod(s, 2) == 1)
+        s++;
+    while (mod(s, 4) == 0)
+        s += 2;
+    auto q = range_el(0, s).map([&s](const auto &i){return range_el(0, s).map([](const auto &j){return 0;});});
+    auto z = idiv(s, 2);
+    auto b = z * z;
+    auto c = 2 * b;
+    auto d = 3 * b;
+    auto o = build_oms(z);
+    for (auto j : range_el(0, z))
+        for (auto i : range_el(0, z)) {
+            auto a = _get<0>(o)[i][j];
+            q[i].set(j, a);
+            q[i + z].set(j + z, a + b);
+            q[i + z].set(j, a + c);
+            q[i].set(j + z, a + d);
+        }
+    auto lc = idiv(z, 2);
+    auto rc = lc;
+    for (auto j : range_el(0, z))
+        for (auto i : range_el(0, s))
+            if (i < lc || i > s - rc || (i == lc && j == lc)) {
+                if (!(i == 0 && j == lc))
+                    assign_from_tuple(q[i][j], q[i][j + z], make_tuple(q[i][j + z], q[i][j]));
+            }
+    return make_tuple(q, s);
+}
+
+template <typename T1> auto display(const T1 &q)
+{
+    auto s = _get<1>(q);
+    print(u" - #. x #.\n"_S.format(s, s));
+    auto k = 1 + to_int(floor(log(s * s) / ::LOG_10));
+    for (auto j : range_el(0, s)) {
+        for (auto i : range_el(0, s))
+            print(String(_get<0>(q)[i][j]).zfill(k), u" "_S);
+        print();
+    }
+    print(u"Magic sum: #."_S.format(idiv(s * ((s * s) + 1), 2)));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Singly Even Magic Square"_S, u""_S);
+        display(build_sems(6));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Map_range#Python
+def maprange( a, b, s):
+    return  b[0] + (float(s - a[0]) * (b[1] - b[0]) / (a[1] - a[0]))
+
+for s in range(11):
+    print("%2g maps to %g" % (s, maprange( (0, 10), (-1, 0), s)))
+===
+F maprange(a, b, s)
+   R b[0] + (Float(s - a[0]) * (b[1] - b[0]) / (a[1] - a[0]))
+
+L(s) 11
+   print(‘#2 maps to #.’.format(s, maprange((0, 10), (-1, 0), s)))
+===
+template <typename T1, typename T2, typename T3> auto maprange(const T1 &a, const T2 &b, const T3 &s)
+{
+    return _get<0>(b) + (to_float(s - _get<0>(a)) * (_get<1>(b) - _get<0>(b)) / (_get<1>(a) - _get<0>(a)));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int s = 0; s < 11; s++)
+            print(u"#2 maps to #."_S.format(s, maprange(make_tuple(0, 10), make_tuple(-1, 0), s)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Maximum_triangle_path_sum#Python
+from typing import List
+
+def solve(tri : List[List[int]]):
+    while len(tri) > 1:
+        t0 = tri.pop()
+        t1 = tri.pop()
+        tri.append([max(t0[i], t0[i+1]) + t for i,t in enumerate(t1)])
+    return tri[0][0]
+
+data = """                55
+                        94 48
+                       95 30 96
+                     77 71 26 67
+                    97 13 76 38 45
+                  07 36 79 16 37 68
+                 48 07 09 18 70 26 06
+               18 72 79 46 59 79 29 90
+              20 76 87 11 32 07 07 49 18
+            27 83 58 35 71 11 25 57 29 85
+           14 64 36 96 27 11 58 56 92 18 55
+         02 90 03 60 48 49 41 46 33 36 47 23
+        92 50 48 02 36 59 42 79 72 20 82 77 42
+      56 78 38 80 39 75 02 71 66 66 01 03 55 72
+     44 25 67 84 71 67 11 61 40 57 58 89 40 56 36
+   85 32 25 85 57 48 84 35 47 62 17 01 01 99 89 52
+  06 71 28 75 94 48 37 10 23 51 06 48 53 18 74 98 15
+27 02 92 23 08 71 76 84 15 52 92 63 81 10 44 10 69 93"""
+
+print(solve([list(map(int, row.split())) for row in data.split("\n")]))
+===
+
+F solve([[Int]] &tri)
+   L tri.len > 1
+      V t0 = tri.pop()
+      V t1 = tri.pop()
+      tri.append(enumerate(t1).map((i, t) -> max(@t0[i], @t0[i + 1]) + t))
+   R tri[0][0]
+V data = ‘                55
+                        94 48
+                       95 30 96
+                     77 71 26 67
+                    97 13 76 38 45
+                  07 36 79 16 37 68
+                 48 07 09 18 70 26 06
+               18 72 79 46 59 79 29 90
+              20 76 87 11 32 07 07 49 18
+            27 83 58 35 71 11 25 57 29 85
+           14 64 36 96 27 11 58 56 92 18 55
+         02 90 03 60 48 49 41 46 33 36 47 23
+        92 50 48 02 36 59 42 79 72 20 82 77 42
+      56 78 38 80 39 75 02 71 66 66 01 03 55 72
+     44 25 67 84 71 67 11 61 40 57 58 89 40 56 36
+   85 32 25 85 57 48 84 35 47 62 17 01 01 99 89 52
+  06 71 28 75 94 48 37 10 23 51 06 48 53 18 74 98 15
+27 02 92 23 08 71 76 84 15 52 92 63 81 10 44 10 69 93’
+print(solve(&data.split("\n").map(row -> row.split_py().map(Int))))
+===
+auto solve(Array<Array<int>> &tri)
+{
+    while (tri.len() > 1) {
+        auto t0 = tri.pop();
+        auto t1 = tri.pop();
+        tri.append(enumerate(t1).map([&t0](const auto &i, const auto &t){return max(t0[i], t0[i + 1]) + t;}));
+    }
+    return _get<0>(_get<0>(tri));
+}
+auto data = uR"(                55
+                        94 48
+                       95 30 96
+                     77 71 26 67
+                    97 13 76 38 45
+                  07 36 79 16 37 68
+                 48 07 09 18 70 26 06
+               18 72 79 46 59 79 29 90
+              20 76 87 11 32 07 07 49 18
+            27 83 58 35 71 11 25 57 29 85
+           14 64 36 96 27 11 58 56 92 18 55
+         02 90 03 60 48 49 41 46 33 36 47 23
+        92 50 48 02 36 59 42 79 72 20 82 77 42
+      56 78 38 80 39 75 02 71 66 66 01 03 55 72
+     44 25 67 84 71 67 11 61 40 57 58 89 40 56 36
+   85 32 25 85 57 48 84 35 47 62 17 01 01 99 89 52
+  06 71 28 75 94 48 37 10 23 51 06 48 53 18 74 98 15
+27 02 92 23 08 71 76 84 15 52 92 63 81 10 44 10 69 93)"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(solve(data.split(u"\n"_S).map([](const auto &row){return row.split_py().map([](const auto &x){return to_int(x);});})));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Menu
+items = ['fee fie', 'huff and puff', 'mirror mirror', 'tick tock']
+
+while True:
+    for i, item in enumerate(items):
+        print ("%2i. %s" % (i + 1, item))
+    reply = input('Which is from the three pigs: ').strip(' ')
+    if not reply.isdigit():
+        continue
+    if 1 <= int(reply) <= len(items):
+        print('You chose:', items[int(reply) - 1])
+        break
+===
+V items = [‘fee fie’, ‘huff and puff’, ‘mirror mirror’, ‘tick tock’]
+
+L
+   L(item) items
+      V i = L.index
+      print(‘#2. #.’.format(i + 1, item))
+   V reply = input(‘Which is from the three pigs: ’).trim(‘ ’)
+   I !reply.is_digit()
+      L.continue
+   I Int(reply) C 1 .. items.len
+      print(‘You chose: ’items[Int(reply) - 1])
+      L.break
+===
+auto items = create_array({u"fee fie"_S, u"huff and puff"_S, u"mirror mirror"_S, u"tick tock"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        while (true) {
+            {int Lindex = 0;
+            for (auto &&item : items) {
+                auto i = Lindex;
+                print(u"#2. #."_S.format(i + 1, item));
+                Lindex++;
+            }}
+            auto reply = input(u"Which is from the three pigs: "_S).trim(u" "_S);
+            if (!reply.is_digit())
+                continue;
+            if (in(to_int(reply), range_ee(1, items.len()))) {
+                print(u"You chose: "_S & items[to_int(reply) - 1]);
+                break;
+            }
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Metronome
+import time
+
+def main(bpm = 72, bpb = 4):
+    t = 60.0 / bpm
+    counter = 0
+    while True:
+        counter += 1
+        if counter % bpb != 0:
+            print('tick')
+        else:
+            print('TICK')
+        time.sleep(t)
+
+main()
+===
+//import time
+
+F main(bpm = 72, bpb = 4)
+   V t = 60.0 / bpm
+   V counter = 0
+   L
+      counter++
+      I counter % bpb != 0
+         print(‘tick’)
+      E
+         print(‘TICK’)
+      sleep(t)
+main()
+===
+template <typename T1 = decltype(72), typename T2 = decltype(4)> auto _main_(const T1 &bpm = 72, const T2 &bpb = 4)
+{
+    auto t = 60.0 / bpm;
+    auto counter = 0;
+    while (true) {
+        counter++;
+        if (mod(counter, bpb) != 0)
+            print(u"tick"_S);
+        else
+            print(u"TICK"_S);
+        sleep(t);
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _main_();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Mian-Chowla_sequence#C.2B.2B
+def contains(sums, s, ss):
+    for i in range(ss):
+        if sums[i] == s:
+            return True
+    return False
+
+def mian_chowla():
+    n = 100
+    mc = [0] * n
+    mc[0] = 1
+    sums = [0] * ((n * (n + 1)) >> 1)
+    sums[0] = 2
+    ss = 1
+    for i in range(1, n):
+        le = ss
+        j = mc[i - 1] + 1
+        while True:
+            mc[i] = j
+            nxtJ = False
+            for k in range(i + 1):
+                sum = mc[k] + j
+                if contains(sums, sum, ss):
+                    ss = le
+                    nxtJ = True
+                    break
+                sums[ss] = sum
+                ss += 1
+            if not nxtJ:
+                break
+            j += 1
+    return mc
+
+print('The first 30 terms of the Mian-Chowla sequence are:')
+mc = mian_chowla()
+print(*mc[:30])
+print()
+print('Terms 91 to 100 of the Mian-Chowla sequence are:')
+print(*mc[90:])
+===
+F contains(sums, s, ss)
+   L(i) 0 .< ss
+      I sums[i] == s
+         R 1B
+   R 0B
+
+F mian_chowla()
+   V n = 100
+   V mc = [0] * n
+   mc[0] = 1
+   V sums = [0] * ((n * (n + 1)) >> 1)
+   sums[0] = 2
+   V ss = 1
+   L(i) 1 .< n
+      V le = ss
+      V j = mc[i - 1] + 1
+      L
+         mc[i] = j
+         V nxtJ = 0B
+         L(k) 0 .. i
+            V sum = mc[k] + j
+            I contains(sums, sum, ss)
+               ss = le
+               nxtJ = 1B
+               L.break
+            sums[ss] = sum
+            ss++
+         I !nxtJ
+            L.break
+         j++
+   R mc
+print(‘The first 30 terms of the Mian-Chowla sequence are:’)
+V mc = mian_chowla()
+print_elements(mc[0.<30])
+print()
+print(‘Terms 91 to 100 of the Mian-Chowla sequence are:’)
+print_elements(mc[90..])
+===
+template <typename T1, typename T2, typename T3> auto contains(const T1 &sums, const T2 &s, const T3 &ss)
+{
+    for (auto i : range_el(0, ss))
+        if (sums[i] == s)
+            return true;
+    return false;
+}
+
+auto mian_chowla()
+{
+    auto n = 100;
+    auto mc = create_array({0}) * n;
+    _set<0>(mc, 1);
+    auto sums = create_array({0}) * ((n * (n + 1)) >> 1);
+    _set<0>(sums, 2);
+    auto ss = 1;
+    for (auto i : range_el(1, n)) {
+        auto le = ss;
+        auto j = mc[i - 1] + 1;
+        while (true) {
+            mc.set(i, j);
+            auto nxtJ = false;
+            for (auto k : range_ee(0, i)) {
+                auto sum = mc[k] + j;
+                if (contains(sums, sum, ss)) {
+                    ss = le;
+                    nxtJ = true;
+                    break;
+                }
+                sums.set(ss, sum);
+                ss++;
+            }
+            if (!nxtJ)
+                break;
+            j++;
+        }
+    }
+    return mc;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"The first 30 terms of the Mian-Chowla sequence are:"_S);
+    }
+} code_block_1;
+auto mc = mian_chowla();
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print_elements(mc[range_el(0, 30)]);
+        print();
+        print(u"Terms 91 to 100 of the Mian-Chowla sequence are:"_S);
+        print_elements(mc[range_ei(90)]);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Modular_inverse#C
+def mul_inv(a, b):
+    b0 = b
+    x0 = 0
+    x1 = 1
+    if b == 1: return 1
+    while a > 1:
+        q = a // b
+        (a, b) = (b, a % b)
+        (x0, x1) = (x1 - q * x0, x0)
+    if x1 < 0: x1 += b0
+    return x1
+
+print(mul_inv(42, 2017))
+===
+F mul_inv(=a, =b)
+   V b0 = b
+   V x0 = 0
+   V x1 = 1
+   I b == 1
+      R 1
+   L a > 1
+      V q = a I/ b
+      (a, b) = (b, a % b)
+      (x0, x1) = (x1 - q * x0, x0)
+   I x1 < 0
+      x1 += b0
+   R x1
+print(mul_inv(42, 2017))
+===
+template <typename T1, typename T2> auto mul_inv(T1 a, T2 b)
+{
+    auto b0 = b;
+    auto x0 = 0;
+    auto x1 = 1;
+    if (b == 1)
+        return 1;
+    while (a > 1) {
+        auto q = idiv(a, b);
+        assign_from_tuple(a, b, make_tuple(b, mod(a, b)));
+        assign_from_tuple(x0, x1, make_tuple(x1 - q * x0, x0));
+    }
+    if (x1 < 0)
+        x1 += b0;
+    return x1;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(mul_inv(42, 2017));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Monte_Carlo_methods
+import random
+
+def monte_carlo_pi(n):
+    inside = 0
+    for i in range(n):
+        x = random.random()
+        y = random.random()
+        if x*x + y*y <= 1:
+            inside += 1
+    return 4.0 * inside / n
+
+print(monte_carlo_pi(1000000))
+===
+//import random
+
+F monte_carlo_pi(n)
+   V inside = 0
+   L(i) 0 .< n
+      V x = random:()
+      V y = random:()
+      I x * x + y * y <= 1
+         inside++
+   R 4.0 * inside / n
+print(monte_carlo_pi(1000000))
+===
+template <typename T1> auto monte_carlo_pi(const T1 &n)
+{
+    auto inside = 0;
+    for (auto i : range_el(0, n)) {
+        auto x = randomns::_();
+        auto y = randomns::_();
+        if (x * x + y * y <= 1)
+            inside++;
+    }
+    return 4.0 * inside / n;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(monte_carlo_pi(1000000));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Move-to-front_algorithm#Python
+symboltable = list('abcdefghijklmnopqrstuvwxyz')
+
+def move2front_encode(strng):
+    sequence : List[int] = []
+    pad = symboltable[:]
+    for char in strng:
+        indx = pad.index(char)
+        sequence.append(indx)
+        pad = [pad.pop(indx)] + pad
+    return sequence
+
+def move2front_decode(sequence):
+    chars : List[Char] = []
+    pad = symboltable[:]
+    for indx in sequence:
+        char = pad[indx]
+        chars.append(char)
+        pad = [pad.pop(indx)] + pad
+    return ''.join(chars)
+
+for s in ['broood', 'bananaaa', 'hiphophiphop']:
+    encode = move2front_encode(s)
+    print('%14s encodes to %s' % (s, encode), end=', ')
+    decode = move2front_decode(encode)
+    print('which decodes back to %s' % decode)
+    assert s == decode, 'Whoops!'
+===
+V symboltable = Array(‘abcdefghijklmnopqrstuvwxyz’)
+
+F move2front_encode(strng)
+   [Int] sequence
+   V pad = copy(:symboltable)
+   L(char) strng
+      V indx = pad.index(char)
+      sequence.append(indx)
+      pad = [pad.pop(indx)] [+] pad
+   R sequence
+
+F move2front_decode(sequence)
+   [Char] chars
+   V pad = copy(:symboltable)
+   L(indx) sequence
+      V char = pad[indx]
+      chars.append(char)
+      pad = [pad.pop(indx)] [+] pad
+   R chars.join(‘’)
+
+L(s) [‘broood’, ‘bananaaa’, ‘hiphophiphop’]
+   V encode = move2front_encode(s)
+   print(‘#14 encodes to #.’.format(s, encode), end' ‘, ’)
+   V decode = move2front_decode(encode)
+   print(‘which decodes back to #.’.format(decode))
+   assert(s == decode, ‘Whoops!’)
+===
+auto symboltable = create_array(u"abcdefghijklmnopqrstuvwxyz"_S);
+
+template <typename T1> auto move2front_encode(const T1 &strng)
+{
+    Array<int> sequence;
+    auto pad = copy(::symboltable);
+    for (auto &&_char_ : strng) {
+        auto indx = pad.index(_char_);
+        sequence.append(indx);
+        pad = create_array({pad.pop(indx)}) + pad;
+    }
+    return sequence;
+}
+
+template <typename T1> auto move2front_decode(const T1 &sequence)
+{
+    Array<Char> chars;
+    auto pad = copy(::symboltable);
+    for (auto &&indx : sequence) {
+        auto _char_ = pad[indx];
+        chars.append(_char_);
+        pad = create_array({pad.pop(indx)}) + pad;
+    }
+    return chars.join(u""_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&s : create_array({u"broood"_S, u"bananaaa"_S, u"hiphophiphop"_S})) {
+            auto encode = move2front_encode(s);
+            print(u"#14 encodes to #."_S.format(s, encode), u", "_S);
+            auto decode = move2front_decode(encode);
+            print(u"which decodes back to #."_S.format(decode));
+            assert(s == decode, u"Whoops!"_S);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Multisplit#Python
+def multisplit(text, sep):
+    lastmatch = 0
+    i = 0
+    matches = ''
+    while i < len(text):
+        for j, s in enumerate(sep):
+            if text[i:].startswith(s):
+                if i > lastmatch:
+                    matches += text[lastmatch:i]
+                matches += '{' + s + '}'
+                lastmatch = i + len(s)
+                i += len(s)
+                break
+        else:
+            i += 1
+    if i > lastmatch:
+        matches += text[lastmatch:i]
+    return matches
+
+print(multisplit('a!===b=!=c', ['==', '!=', '=']))
+===
+F multisplit(text, sep)
+   V lastmatch = 0
+   V i = 0
+   V matches = ‘’
+   L i < text.len
+      L(s) sep
+         V j = L.index
+         I text[i ..].starts_with(s)
+            I i > lastmatch
+               matches ‘’= text[lastmatch .< i]
+            matches ‘’= ‘{’s‘}’
+            lastmatch = i + s.len
+            i += s.len
+            L.break
+      L.was_no_break
+         i++
+   I i > lastmatch
+      matches ‘’= text[lastmatch .< i]
+   R matches
+print(multisplit(‘a!===b=!=c’, [‘==’, ‘!=’, ‘=’]))
+===
+template <typename T1, typename T2> auto multisplit(const T1 &text, const T2 &sep)
+{
+    auto lastmatch = 0;
+    auto i = 0;
+    auto matches = u""_S;
+    while (i < text.len())
+        {bool was_break = false;
+        {int Lindex = 0;
+        for (auto &&s : sep) {
+            auto j = Lindex;
+            if (text[range_ei(i)].starts_with(s)) {
+                if (i > lastmatch)
+                    matches &= text[range_el(lastmatch, i)];
+                matches &= u"{"_S & s & u"}"_S;
+                lastmatch = i + s.len();
+                i += s.len();
+                was_break = true;
+                break;
+            }
+            Lindex++;
+        }}
+        if (!was_break)
+            i++;
+        }
+    if (i > lastmatch)
+        matches &= text[range_el(lastmatch, i)];
+    return matches;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(multisplit(u"a!===b=!=c"_S, create_array({u"=="_S, u"!="_S, u"="_S})));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Munchausen_numbers#Python
+for i in range(5000):
+    if i == sum(int(x) ** int(x) for x in str(i)):
+        print(i)
+===
+L(i) 5000
+   I i == sum(String(i).map(x -> Int(x) ^ Int(x)))
+      print(i)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int i = 0; i < 5000; i++)
+            if (i == sum_map(String(i), [](const auto &x){return pow(to_int(x), to_int(x));}))
+                print(i);
+    }
+} code_block_1;
