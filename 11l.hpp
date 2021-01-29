@@ -146,7 +146,7 @@ AssertionError::operator String() const {return message != nullptr ? *message : 
 #include "11l_hpp/Deque.hpp"
 #include "11l_hpp/pointers.hpp"
 
-#include <limits>
+#include <limits> // for `std::numeric_limits<double>::infinity()` and `std::numeric_limits<int>::min()/max()`
 
 #include <functional>
 #include <complex>

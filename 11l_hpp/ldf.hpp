@@ -113,4 +113,15 @@ const char16_t *read_number(const char16_t *s, const char16_t *end, Element &el)
 }
 
 #include "ldf/json.hpp"
+#include "ldf/serializer.hpp"
+}
+
+namespace json {
+template <typename Ty> void to_object(const String &json, Ty &obj)
+{
+	ldf::Element el;
+	ldf::from_json(json, el);
+	ldf::Serializer ser(&el, true, true);
+	ser.serialize(obj);
+}
 }
