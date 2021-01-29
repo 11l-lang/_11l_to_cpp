@@ -65,22 +65,61 @@ namespace detail {
 const char16_t *read_string(const char16_t *s, const char16_t *end, String &str)
 {
 	assert(s < end && *s == '"');
+	assert(str.empty());
 	s++;
-	const char16_t *start = s;
 	while (true) {
 		assert(s < end);
-		if (*s == '"') {
-			str.assign(start, s - start);
+		if (*s == '"')
 			return s + 1;
+
+		if (*s == '\\') {
+			s++;
+			assert(s < end);
+			switch (*s)
+			{
+			case '"' : str &= u'"'_C;  break;
+			case '\\': str &= u'\\'_C; break;
+			case '/' : str &= u'/'_C;  break;
+			case 'b' : str &= u'\b'_C; break;
+			case 'f' : str &= u'\f'_C; break;
+			case 'n' : str &= u'\n'_C; break;
+			case 'r' : str &= u'\r'_C; break;
+			case 't' : str &= u'\t'_C; break;
+			case 'u':
+				s++;
+				assert(s + 4 <= end);
+				str &= Char(to_int(String(s, 4), 16));
+				s += 4;
+				continue;
+			default: assert(false);
+			}
 		}
-		// [-TODO: `\` support-]
+		else
+			str &= Char(*s);
+
 		s++;
 	}
 }
 
 String string(const String &s)
 {
-	return u'"'_C & s & u'"'_C; // [-TODO: `\` support-]
+	String r;
+	r.reserve(2 + s.length());
+	r = u'"'_C;
+	for (Char c : s)
+		switch (c)
+		{
+		case u'"' : r &= u"\\\""; break;
+		case u'\\': r &= u"\\\\"; break;
+		case u'\b': r &= u"\\b";  break;
+		case u'\f': r &= u"\\f";  break;
+		case u'\n': r &= u"\\n";  break;
+		case u'\r': r &= u"\\r";  break;
+		case u'\t': r &= u"\\t";  break;
+		default: r &= c;
+		}
+	r &= u'"'_C;
+	return r;
 }
 
 const char16_t *read_number(const char16_t *s, const char16_t *end, Element &el)
