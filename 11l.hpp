@@ -164,7 +164,7 @@ template <typename Ty> inline std::complex<Ty> conjugate(const std::complex<Ty> 
 
 #define assert(...) assert_file_line(__FILE__, __LINE__, __VA_ARGS__)
 
-inline void assert_file_line(const char *file_name, int line, bool expression, const String &message = String())
+[[noreturn]] inline void assert_file_line(const char *file_name, int line, bool expression, const String &message = String())
 {
 	if (!expression) {
 		std::wcerr << "AssertionError";
@@ -182,6 +182,7 @@ inline void assert_file_line(const char *file_name, int line, bool expression, c
 #include "11l_hpp/re.hpp"
 #include "11l_hpp/random.hpp"
 #include "11l_hpp/minmaxheap.hpp"
+#include "11l_hpp/ldf.hpp"
 
 #include <thread>
 
