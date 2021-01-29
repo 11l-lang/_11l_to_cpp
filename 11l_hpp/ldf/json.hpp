@@ -95,6 +95,7 @@ const char16_t *from_json(const char16_t *s, const char16_t *end, Element &el)
 	}
 
 	assert(false);
+	return s; // to suppress warning C4715
 }
 }
 
