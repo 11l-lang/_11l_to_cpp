@@ -24,7 +24,7 @@ enum class ValueType // inspired by [https://github.com/nlohmann/json/blob/devel
 	BOOLEAN
 };
 
-class Element // name `element` was taken from [https://json.org]
+class Element // name `element` was taken from [https://www.json.org/json-en.html <- http://json.org]
 {
 public:
 	ValueType value_type = ValueType::N;
@@ -162,5 +162,29 @@ template <typename Ty> void to_object(const String &json, Ty &obj)
 	ldf::from_json(json, el);
 	ldf::Serializer ser(&el, true, true);
 	ser.serialize(obj);
+}
+
+template <typename Ty, typename IndentType = int> String from_object(const Ty &obj, IndentType indent = 4)
+{
+	ldf::Element el;
+	ldf::Serializer ser(&el, false, false);
+	ser.serialize(const_cast<Ty&>(obj));
+	return ldf::to_json(el, indent);
+}
+
+template <typename Ty, typename IndentType = int> String from_object(Ty &obj, IndentType indent = 4)
+{
+	ldf::Element el;
+	ldf::Serializer ser(&el, false, false);
+	ser.serialize(obj);
+	return ldf::to_json(el, indent);
+}
+
+template <typename Ty, typename IndentType = int> String from_object(Ty &&obj, IndentType indent = 4) // for `from_object(std::move(obj))`
+{
+	ldf::Element el;
+	ldf::Serializer ser(&el, false, true);
+	ser.serialize(obj);
+	return ldf::to_json(el, indent);
 }
 }

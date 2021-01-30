@@ -13,6 +13,11 @@ public:
 			assert(element->value_type == ValueType::OBJECT);
 			obj.serialize(*this);
 		}
+		else {
+			element->value_type = ValueType::OBJECT;
+			element->value.object = new Object;
+			obj.serialize(*this);
+		}
 	}
 
 	template <typename Ty> void serialize(::Array<Ty> &arr)
@@ -27,6 +32,16 @@ public:
 				ser.serialize(arr.back());
 			}
 		}
+		else {
+			element->value_type = ValueType::ARRAY;
+			element->value.array = new Array;
+			element->value.array->elements.reserve(arr.size());
+			for (auto &el : arr) {
+				element->value.array->elements.push_back(Element());
+				ldf::Serializer ser(&element->value.array->elements.back(), false, move_strings);
+				ser.serialize(el);
+			}
+		}
 	}
 
 	void serialize(String &val)
@@ -38,6 +53,13 @@ public:
 			else
 				val = *element->value.string;
 		}
+		else {
+			element->value_type = ValueType::STRING;
+			if (move_strings)
+				element->value.string = new String(std::move(val));
+			else
+				element->value.string = new String(val);
+		}
 	}
 
 	void serialize(int64_t &val)
@@ -45,6 +67,10 @@ public:
 		if (from_element_to_object) {
 			assert(element->value_type == ValueType::NUMBER_INT);
 			val = element->value.number_int;
+		}
+		else {
+			element->value_type = ValueType::NUMBER_INT;
+			element->value.number_int = val;
 		}
 	}
 
@@ -55,6 +81,10 @@ public:
 			assert(element->value.number_int >= std::numeric_limits<int>::min() && element->value.number_int <= std::numeric_limits<int>::max());
 			val = int(element->value.number_int);
 		}
+		else {
+			element->value_type = ValueType::NUMBER_INT;
+			element->value.number_int = val;
+		}
 	}
 
 	void serialize(double &val)
@@ -62,6 +92,10 @@ public:
 		if (from_element_to_object) {
 			assert(element->value_type == ValueType::NUMBER_FLOAT || element->value_type == ValueType::NUMBER_INT);
 			val = element->value_type == ValueType::NUMBER_FLOAT ? element->value.number_float : element->value.number_int;
+		}
+		else {
+			element->value_type = ValueType::NUMBER_FLOAT;
+			element->value.number_float = val;
 		}
 	}
 
@@ -71,6 +105,10 @@ public:
 			assert(element->value_type == ValueType::NUMBER_FLOAT || element->value_type == ValueType::NUMBER_INT);
 			val = element->value_type == ValueType::NUMBER_FLOAT ? float(element->value.number_float) : element->value.number_int;
 		}
+		else {
+			element->value_type = ValueType::NUMBER_FLOAT;
+			element->value.number_float = val;
+		}
 	}
 
 	void serialize(bool &val)
@@ -78,6 +116,10 @@ public:
 		if (from_element_to_object) {
 			assert(element->value_type == ValueType::BOOLEAN);
 			val = element->value.boolean;
+		}
+		else {
+			element->value_type = ValueType::BOOLEAN;
+			element->value.boolean = val;
 		}
 	}
 
@@ -89,6 +131,11 @@ public:
 			auto p = element->value.object->members.find(key);
 			assert(p != nullptr);
 			ldf::Serializer ser(&*p, true, move_strings);
+			ser.serialize(val);
+		}
+		else {
+			assert(element->value_type == ValueType::OBJECT);
+			ldf::Serializer ser(&element->value.object->members[key], false, move_strings);
 			ser.serialize(val);
 		}
 	}
