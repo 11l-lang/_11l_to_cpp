@@ -2143,3 +2143,97 @@ struct CodeBlock1
             print(u"Degree "_S & d & u": "_S & range_ee(1, 10).map([&d](const auto &n){return multifact(n, d);}));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/JSON
+T.serializable Person
+   String firstName, lastName
+   Int age
+   T PhoneNumber
+      String ntype
+      String number
+   [PhoneNumber] phoneNumbers
+   [String] children
+
+Person p
+
+json:to_object(‘
+{
+  "firstName": "John",
+  "lastName": "Smith",
+  "age": 27,
+  "phoneNumbers": [
+    {
+      "ntype": "home",
+      "number": "212 555-1234"
+    },
+    {
+      "ntype": "office",
+      "number": "646 555-4567"
+    }
+  ],
+  "children": ["Mary", "Kate"]
+}’, &p)
+
+p.phoneNumbers.pop(0)
+p.children.append(‘Alex’)
+
+print(json:from_object(p))
+===
+class Person
+{
+public:
+    String firstName, lastName;
+    int age;
+    class PhoneNumber
+    {
+    public:
+        String ntype;
+        String number;
+
+        void serialize(ldf::Serializer &s)
+        {
+            s(u"ntype", ntype);
+            s(u"number", number);
+        }
+    };
+    Array<PhoneNumber> phoneNumbers;
+    Array<String> children;
+
+    void serialize(ldf::Serializer &s)
+    {
+        s(u"firstName", firstName);
+        s(u"lastName", lastName);
+        s(u"age", age);
+        s(u"phoneNumbers", phoneNumbers);
+        s(u"children", children);
+    }
+};
+Person p;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        json::to_object(uR"(
+{
+  "firstName": "John",
+  "lastName": "Smith",
+  "age": 27,
+  "phoneNumbers": [
+    {
+      "ntype": "home",
+      "number": "212 555-1234"
+    },
+    {
+      "ntype": "office",
+      "number": "646 555-4567"
+    }
+  ],
+  "children": ["Mary", "Kate"]
+})"_S, p);
+        p.phoneNumbers.pop(0);
+        p.children.append(u"Alex"_S);
+        print(json::from_object(p));
+    }
+} code_block_1;
