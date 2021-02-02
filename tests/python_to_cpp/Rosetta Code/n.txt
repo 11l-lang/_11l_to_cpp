@@ -1,0 +1,826 @@
+# https://www.rosettacode.org/wiki/N%27th#Python
+_suffix = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th']
+
+def nth(n):
+    return "%i'%s" % (n, _suffix[n%10] if n % 100 <= 10 or n % 100 > 20 else 'th')
+
+for j in range(0, 1001, 250):
+    print(*(nth(i) for i in list(range(j, j+25))))
+===
+V _suffix = [‘th’, ‘st’, ‘nd’, ‘rd’, ‘th’, ‘th’, ‘th’, ‘th’, ‘th’, ‘th’]
+
+F nth(n)
+   R ‘#.'#.’.format(n, I n % 100 <= 10 | n % 100 > 20 {:_suffix[n % 10]} E ‘th’)
+
+L(j) (0.<1001).step(250)
+   print_elements((Array(j .< j + 25).map(i -> nth(i))))
+===
+auto _suffix = create_array({u"th"_S, u"st"_S, u"nd"_S, u"rd"_S, u"th"_S, u"th"_S, u"th"_S, u"th"_S, u"th"_S, u"th"_S});
+
+template <typename T1> auto nth(const T1 &n)
+{
+    return u"#.'#."_S.format(n, mod(n, 100) <= 10 || mod(n, 100) > 20 ? ::_suffix[mod(n, 10)] : u"th"_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto j : range_el(0, 1001).step(250))
+            print_elements((create_array(range_el(j, j + 25)).map([](const auto &i){return nth(i);})));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Narcissistic_decimal_number#Python
+import itertools
+
+def narcissists(m):
+    result : List[int] = []
+    for digits in itertools.count(0):
+        digitpowers = [i**digits for i in range(10)]
+        for n in range(int(10**(digits-1)), 10**digits):
+            (div, digitpsum) = (n, 0)
+            while div != 0:
+                (div, mod) = divmod(div, 10)
+                digitpsum += digitpowers[mod]
+            if n == digitpsum:
+                result += [n]
+                if len(result) == m:
+                    return result
+
+for i, n in enumerate(narcissists(25), 1):
+    print(n, end = ' ')
+    if i % 5 == 0: print()
+===
+//import itertools
+
+F narcissists(m)
+   [Int] result
+   L(digits) 0..
+      V digitpowers = (0.<10).map(i -> i ^ @digits)
+      L(n) Int(10 ^ (digits - 1)) .< 10 ^ digits
+         V (div, digitpsum) = (n, 0)
+         L div != 0
+            (div, V mod) = divmod(div, 10)
+            digitpsum += digitpowers[mod]
+         I n == digitpsum
+            result [+]= n
+            I result.len == m
+               R result
+
+L(n) narcissists(25)
+   V i = L.index + 1
+   print(n, end' ‘ ’)
+   I i % 5 == 0
+      print()
+===
+template <typename T1> auto narcissists(const T1 &m)
+{
+    Array<int> result;
+    for (auto digits : range_ei(0)) {
+        auto digitpowers = range_el(0, 10).map([&digits](const auto &i){return pow(i, digits);});
+        for (auto n : range_el(to_int(pow(10, (digits - 1))), pow(10, digits))) {
+            auto [div, digitpsum] = make_tuple(n, 0);
+            while (div != 0) {
+                TUPLE_ELEMENT_T(1, divmod(div, 10)) mod;
+                assign_from_tuple(div, mod, divmod(div, 10));
+                digitpsum += digitpowers[mod];
+            }
+            if (n == digitpsum) {
+                result.append(n);
+                if (result.len() == m)
+                    return result;
+            }
+        }
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {int Lindex = 0;
+
+        for (auto &&n : narcissists(25)) {
+            auto i = Lindex + 1;
+            print(n, u" "_S);
+            if (mod(i, 5) == 0)
+                print();
+            Lindex++;
+        }}
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Negative_base_numbers#Python
+def encode_neg_base(n, b): #Converts from decimal
+    if n == 0:
+        return "0"
+    out : List[int] = []
+    while n != 0:
+        (n, rem) = divmod(n, b)
+        if rem < 0:
+            n += 1
+            rem -= b
+        out.append(rem)
+    return "".join(map(str, out[::-1]))
+
+def decode_neg_base(nstr, b): #Converts to decimal
+    if nstr == "0":
+        return 0
+
+    total = 0
+    for i, ch in enumerate(nstr[::-1]):
+        total += int(ch) * b**i
+    return total
+
+print ("Encode 10 as negabinary (expect 11110)")
+result = encode_neg_base(10, -2)
+print (result)
+if decode_neg_base(result, -2) == 10: print ("Converted back to decimal")
+else: print ("Error converting back to decimal")
+
+print ("Encode 146 as negaternary (expect 21102)")
+result = encode_neg_base(146, -3)
+print (result)
+if decode_neg_base(result, -3) == 146: print ("Converted back to decimal")
+else: print ("Error converting back to decimal")
+
+print ("Encode 15 as negadecimal (expect 195)")
+result = encode_neg_base(15, -10)
+print (result)
+if decode_neg_base(result, -10) == 15: print ("Converted back to decimal")
+else: print ("Error converting back to decimal")
+===
+F encode_neg_base(=n, b)
+   I n == 0
+      R ‘0’
+   [Int] out
+   L n != 0
+      (n, V rem) = divmod(n, b)
+      I rem < 0
+         n++
+         rem -= b
+      out.append(rem)
+   R reversed(out).map(String).join(‘’)
+
+F decode_neg_base(nstr, b)
+   I nstr == ‘0’
+      R 0
+   V total = 0
+   L(ch) reversed(nstr)
+      V i = L.index
+      total += Int(ch) * b ^ i
+   R total
+print(‘Encode 10 as negabinary (expect 11110)’)
+V result = encode_neg_base(10, -2)
+print(result)
+I decode_neg_base(result, -2) == 10
+   print(‘Converted back to decimal’)
+E
+   print(‘Error converting back to decimal’)
+print(‘Encode 146 as negaternary (expect 21102)’)
+result = encode_neg_base(146, -3)
+print(result)
+I decode_neg_base(result, -3) == 146
+   print(‘Converted back to decimal’)
+E
+   print(‘Error converting back to decimal’)
+print(‘Encode 15 as negadecimal (expect 195)’)
+result = encode_neg_base(15, -10)
+print(result)
+I decode_neg_base(result, -10) == 15
+   print(‘Converted back to decimal’)
+E
+   print(‘Error converting back to decimal’)
+===
+template <typename T1, typename T2> auto encode_neg_base(T1 n, const T2 &b)
+{
+    if (n == 0)
+        return u"0"_S;
+    Array<int> out;
+    while (n != 0) {
+        TUPLE_ELEMENT_T(1, divmod(n, b)) rem;
+        assign_from_tuple(n, rem, divmod(n, b));
+        if (rem < 0) {
+            n++;
+            rem -= b;
+        }
+        out.append(rem);
+    }
+    return reversed(out).map([](const auto &x){return String(x);}).join(u""_S);
+}
+
+template <typename T1, typename T2> auto decode_neg_base(const T1 &nstr, const T2 &b)
+{
+    if (nstr == u'0')
+        return 0;
+    auto total = 0;
+    {int Lindex = 0;
+    for (auto &&ch : reversed(nstr)) {
+        auto i = Lindex;
+        total += to_int(ch) * pow(b, i);
+        Lindex++;
+    }}
+    return total;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Encode 10 as negabinary (expect 11110)"_S);
+    }
+} code_block_1;
+auto result = encode_neg_base(10, -2);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(result);
+        if (decode_neg_base(result, -2) == 10)
+            print(u"Converted back to decimal"_S);
+        else
+            print(u"Error converting back to decimal"_S);
+        print(u"Encode 146 as negaternary (expect 21102)"_S);
+        result = encode_neg_base(146, -3);
+        print(result);
+        if (decode_neg_base(result, -3) == 146)
+            print(u"Converted back to decimal"_S);
+        else
+            print(u"Error converting back to decimal"_S);
+        print(u"Encode 15 as negadecimal (expect 195)"_S);
+        result = encode_neg_base(15, -10);
+        print(result);
+        if (decode_neg_base(result, -10) == 15)
+            print(u"Converted back to decimal"_S);
+        else
+            print(u"Error converting back to decimal"_S);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Nested_function#Python
+def makeList(separator):
+    counter = 1
+
+    def makeItem(item):
+        nonlocal counter
+        result = str(counter) + separator + '' + item + "\n"
+        counter += 1
+        return result
+
+    return makeItem("first") + '' + makeItem("second") + '' + makeItem("third")
+
+print(makeList(". "))
+===
+F makeList(separator)
+   V counter = 1
+
+   F makeItem(item)
+      V result = String(@counter)‘’@separator‘’item"\n"
+      @counter++
+      R result
+   R makeItem(‘first’)‘’makeItem(‘second’)‘’makeItem(‘third’)
+print(makeList(‘. ’))
+===
+template <typename T1> auto makeList(const T1 &separator)
+{
+    auto counter = 1;
+
+    auto makeItem = [&counter, &separator](const auto &item)
+    {
+        auto result = String(counter) & separator & item & u"\n"_S;
+        counter++;
+        return result;
+    };
+    return makeItem(u"first"_S) & makeItem(u"second"_S) & makeItem(u"third"_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(makeList(u". "_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Nim_game#Python
+tokens = 12
+
+def getTokens(curTokens) -> None:
+    global tokens
+
+    print("How many tokens would you like to take? ", end='')
+    take = int(input())
+
+    if take < 1 or take > 3:
+        print("Number must be between 1 and 3.\n")
+        getTokens(curTokens)
+        return
+
+    tokens = curTokens - take
+    print('You take %i tokens.' % take)
+    print('%i tokens remaining.\n' % tokens)
+
+def compTurn(curTokens):
+    global tokens
+
+    take = curTokens % 4
+    tokens = curTokens - take
+    print('Computer takes %i tokens.' % take)
+    print('%i tokens remaining.\n' % tokens)
+
+while tokens > 0:
+    getTokens(tokens)
+    compTurn(tokens)
+
+print("Computer wins!")
+===
+V tokens = 12
+
+F getTokens(curTokens) -> N
+   print(‘How many tokens would you like to take? ’, end' ‘’)
+   V take = Int(input())
+
+   I take < 1 | take > 3
+      print("Number must be between 1 and 3.\n")
+      getTokens(curTokens)
+      R
+   :tokens = curTokens - take
+   print(‘You take #. tokens.’.format(take))
+   print("#. tokens remaining.\n".format(:tokens))
+
+F compTurn(curTokens)
+   V take = curTokens % 4
+   :tokens = curTokens - take
+   print(‘Computer takes #. tokens.’.format(take))
+   print("#. tokens remaining.\n".format(:tokens))
+
+L tokens > 0
+   getTokens(tokens)
+   compTurn(tokens)
+print(‘Computer wins!’)
+===
+auto tokens = 12;
+
+template <typename T1> void getTokens(const T1 &curTokens)
+{
+    print(u"How many tokens would you like to take? "_S, u""_S);
+    auto take = to_int(input());
+
+    if (take < 1 || take > 3) {
+        print(u"Number must be between 1 and 3.\n"_S);
+        getTokens(curTokens);
+        return;
+    }
+    ::tokens = curTokens - take;
+    print(u"You take #. tokens."_S.format(take));
+    print(u"#. tokens remaining.\n"_S.format(::tokens));
+}
+
+template <typename T1> auto compTurn(const T1 &curTokens)
+{
+    auto take = mod(curTokens, 4);
+    ::tokens = curTokens - take;
+    print(u"Computer takes #. tokens."_S.format(take));
+    print(u"#. tokens remaining.\n"_S.format(::tokens));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        while (tokens > 0) {
+            getTokens(tokens);
+            compTurn(tokens);
+        }
+        print(u"Computer wins!"_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Non-continuous_subsequences#Python
+def ncsub(seq, s=0):
+    if len(seq) == 0:
+        r : List[List[int]] = []
+        if s >= 3:
+            l : List[int] = []
+            r.append(l)
+        return r
+    else:
+        x = seq[:1]
+        xs = seq[1:]
+        p2 = s % 2
+        p1 = not p2
+        return [x + ys for ys in ncsub(xs, s + p1)] + ncsub(xs, s + p2)
+
+print(ncsub(list(range(1, 4))))
+print(ncsub(list(range(1, 5))))
+print(ncsub(list(range(1, 6))))
+===
+F ncsub(seq, s = 0)
+   I seq.empty
+      [[Int]] r
+      I s >= 3
+         [Int] l
+         r.append(l)
+      R r
+   E
+      V x = seq[0.<1]
+      V xs = seq[1..]
+      V p2 = s % 2
+      V p1 = !p2
+      R ncsub(xs, s + p1).map(ys -> @x + ys) [+] ncsub(xs, s + p2)
+print(ncsub(Array(1..3)))
+print(ncsub(Array(1..4)))
+print(ncsub(Array(1..5)))
+===
+template <typename T1, typename T2 = decltype(0)> auto ncsub(const T1 &seq, const T2 &s = 0)
+{
+    if (seq.empty()) {
+        Array<Array<int>> r;
+        if (s >= 3) {
+            Array<int> l;
+            r.append(l);
+        }
+        return r;
+    }
+    else {
+        auto x = seq[range_el(0, 1)];
+        auto xs = seq[range_ei(1)];
+        auto p2 = mod(s, 2);
+        auto p1 = !p2;
+        return ncsub(xs, s + p1).map([&x](const auto &ys){return x + ys;}) + ncsub(xs, s + p2);
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(ncsub(create_array(range_ee(1, 3))));
+        print(ncsub(create_array(range_ee(1, 4))));
+        print(ncsub(create_array(range_ee(1, 5))));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Non-decimal_radices/Input#Python
+s = '100'
+for base in range(2,21):
+    print("String '%s' in base %i is %i in base 10"
+        % (s, base, int(s, base)))
+===
+V s = ‘100’
+L(base) 2..20
+   print(‘String '#.' in base #. is #. in base 10’.format(s, base, Int(s, base)))
+===
+auto s = u"100"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto base : range_ee(2, 20))
+            print(u"String '#.' in base #. is #. in base 10"_S.format(s, base, to_int(s, base)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Nth_root#Nim
+def nthroot(a, n):
+    result = a
+    x = a / n
+    while abs(result-x) > 10e-15:
+        x = result
+        result = (1.0/n) * (((n-1)*x) + (a / pow(x, n-1)))
+    return result
+
+print(nthroot(34.0, 5))
+print(nthroot(42.0, 10))
+print(nthroot(5.0, 2))
+===
+F nthroot(a, n)
+   V result = a
+   V x = a / n
+   L abs(result - x) > 10e-15
+      x = result
+      result = (1.0 / n) * (((n - 1) * x) + (a / pow(x, n - 1)))
+   R result
+print(nthroot(34.0, 5))
+print(nthroot(42.0, 10))
+print(nthroot(5.0, 2))
+===
+template <typename T1, typename T2> auto nthroot(const T1 &a, const T2 &n)
+{
+    auto result = a;
+    auto x = a / n;
+    while (abs(result - x) > 10e-15) {
+        x = result;
+        result = (1.0 / n) * (((n - 1) * x) + (a / pow(x, n - 1)));
+    }
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(nthroot(34.0, 5));
+        print(nthroot(42.0, 10));
+        print(nthroot(5.0, 2));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Number_reversal_game#Python
+data = list('139275486')
+trials = 0
+
+while data != sorted(data):
+    trials += 1
+    flip = int(input("#%2i: LIST: '%s' Flip how many?: " % (trials, ' '.join(data))))
+    data[:flip] = reversed(data[:flip])
+
+print('\nYou took %i attempts to put the digits in order!' % trials)
+===
+V data = Array(‘139275486’)
+V trials = 0
+
+L data != sorted(data)
+   trials++
+   V flip = Int(input(‘###2: LIST: '#.' Flip how many?: ’.format(trials, data.join(‘ ’))))
+   data.reverse_range(0 .< flip)
+print("\nYou took #. attempts to put the digits in order!".format(trials))
+===
+auto data = create_array(u"139275486"_S);
+auto trials = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        while (data != sorted(data)) {
+            trials++;
+            auto flip = to_int(input(u"###2: LIST: '#.' Flip how many?: "_S.format(trials, data.join(u" "_S))));
+            data.reverse_range(range_el(0, flip));
+        }
+        print(u"\nYou took #. attempts to put the digits in order!"_S.format(trials));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Numbers_with_equal_rises_and_falls#Python
+def riseEqFall(num):
+    """Check whether a number belongs to sequence A296712."""
+    height = 0
+    d1 = num % 10
+    num //= 10
+    while num != 0:
+        d2 = num % 10
+        height += (d1<d2) - (d1>d2)
+        d1 = d2
+        num //= 10
+    return height == 0
+
+num = 0
+def nextNum():
+    global num
+    while True:
+        num += 1
+        if riseEqFall(num):
+            break
+    return num
+
+print('The first 200 numbers are:')
+for i in range(200):
+    print(nextNum(), end = ' ')
+print()
+
+for i in range(10_000_000 - 200 - 1):
+    nextNum()
+print('The 10,000,000th number is:', nextNum())
+===
+F riseEqFall(=num)
+   ‘Check whether a number belongs to sequence A296712.’
+   V height = 0
+   V d1 = num % 10
+   num I/= 10
+   L num != 0
+      V d2 = num % 10
+      height += (d1 < d2) - (d1 > d2)
+      d1 = d2
+      num I/= 10
+   R height == 0
+V num = 0
+F nextNum()
+   L
+      :num++
+      I riseEqFall(:num)
+         L.break
+   R :num
+print(‘The first 200 numbers are:’)
+L(i) 200
+   print(nextNum(), end' ‘ ’)
+print()
+
+L(i) 0 .< 10'000'000 - 200 - 1
+   nextNum()
+print(‘The 10,000,000th number is: ’(nextNum()))
+===
+template <typename T1> auto riseEqFall(T1 num)
+{
+    u"Check whether a number belongs to sequence A296712."_S;
+    auto height = 0;
+    auto d1 = mod(num, 10);
+    num = idiv(num, 10);
+    while (num != 0) {
+        auto d2 = mod(num, 10);
+        height += (d1 < d2) - (d1 > d2);
+        d1 = d2;
+        num = idiv(num, 10);
+    }
+    return height == 0;
+}
+auto num = 0;
+auto nextNum()
+{
+    while (true) {
+        ::num++;
+        if (riseEqFall(::num))
+            break;
+    }
+    return ::num;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"The first 200 numbers are:"_S);
+        for (int i = 0; i < 200; i++)
+            print(nextNum(), u" "_S);
+        print();
+        for (auto i : range_el(0, 10'000'000 - 200 - 1))
+            nextNum();
+        print(u"The 10,000,000th number is: "_S & (nextNum()));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/NYSIIS#Python
+import re
+
+_vowels = 'AEIOU'
+
+def replace_at(text : str, position, fromlist, tolist):
+    for f, t in zip(fromlist, tolist):
+        if text[position:position+len(f)] == f:
+            return text[:position] + t + text[position+len(f):]
+    return text
+
+def replace_end(text : str, fromlist, tolist):
+    for f, t in zip(fromlist, tolist):
+        if text.endswith(f):
+            return text[:-len(f)] + t
+    return text
+
+def nysiis(name : str):
+    name = re.sub(r'\W', '', name).upper()
+    name = replace_at(name, 0, ['MAC', 'KN', 'K', 'PH', 'PF', 'SCH'],
+                               ['MCC', 'N',  'C', 'FF', 'FF', 'SSS'])
+    name = replace_end(name, ['EE', 'IE', 'DT', 'RT', 'RD', 'NT', 'ND'],
+                             ['Y',  'Y',  'D',  'D',  'D',  'D',  'D'])
+    key = str(name[0])
+    key1 = ''
+    i = 1
+    while i < len(name):
+        #print(i, name, key1, key)
+        (n_1, n) = (name[i-1], name[i])
+        n1_ = name[i+1] if i+1 < len(name) else ''
+        name = replace_at(name, i, ['EV'] + list(map(str, list(_vowels))), ['AF'] + [str('A')]*5)
+        name = replace_at(name, i, [str('Q'), 'Z', 'M'], [str('G'), 'S', 'N'])
+        name = replace_at(name, i, ['KN', 'K'], [str('N'), 'C'])
+        name = replace_at(name, i, ['SCH', 'PH'], ['SSS', 'FF'])
+        if n == 'H' and (n_1 not in _vowels or n1_ not in _vowels):
+            name = name[:i] + n_1 + name[i+1:]
+        if n == 'W' and n_1 in _vowels:
+            name = name[:i] + 'A' + name[i+1:]
+        if key != '' and key[-1] != name[i]:
+            key += name[i]
+        i += 1
+    key = replace_end(key, ['S', 'AY', 'A'], ['', 'Y', ''])
+    return key1 + key
+
+names = ['Bishop', 'Carlson', 'Carr', 'Chapman', 'Franklin',
+         'Greene', 'Harper', 'Jacobs', 'Larson', 'Lawrence',
+         'Lawson', 'Louis, XVI', 'Lynch', 'Mackenzie', 'Matthews',
+         'McCormack', 'McDaniel', 'McDonald', 'Mclaughlin', 'Morrison',
+         "O'Banion", "O'Brien", 'Richards', 'Silva', 'Watkins',
+         'Wheeler', 'Willis', 'brown, sr', 'browne, III', 'browne, IV',
+         'knight', 'mitchell', "o'daniel"]
+for name in names:
+    print('%15s: %s' % (name, nysiis(name)))
+===
+//import re
+V _vowels = ‘AEIOU’
+
+F replace_at(String text; position, fromlist, tolist)
+   L(f, t) zip(fromlist, tolist)
+      I text[position .< position + f.len] == f
+         R text[0 .< position]‘’t‘’text[position + f.len ..]
+   R text
+
+F replace_end(String text; fromlist, tolist)
+   L(f, t) zip(fromlist, tolist)
+      I text.ends_with(f)
+         R text[0 .< (len)-f.len]‘’t
+   R text
+
+F nysiis(String =name)
+   name = name.replace(re:‘\W’, ‘’).uppercase()
+   name = replace_at(name, 0, [‘MAC’, ‘KN’, ‘K’, ‘PH’, ‘PF’, ‘SCH’], [‘MCC’, ‘N’, ‘C’, ‘FF’, ‘FF’, ‘SSS’])
+   name = replace_end(name, [‘EE’, ‘IE’, ‘DT’, ‘RT’, ‘RD’, ‘NT’, ‘ND’], [‘Y’, ‘Y’, ‘D’, ‘D’, ‘D’, ‘D’, ‘D’])
+   V key = String(name[0])
+   V key1 = ‘’
+   V i = 1
+   L i < name.len
+      V (n_1, n) = (name[i - 1], name[i])
+      V n1_ = I i + 1 < name.len {name[i + 1]} E ‘’
+      name = replace_at(name, i, [‘EV’] [+] Array(:_vowels).map(String), [‘AF’] [+] [String(‘A’)] * 5)
+      name = replace_at(name, i, [String(‘Q’), ‘Z’, ‘M’], [String(‘G’), ‘S’, ‘N’])
+      name = replace_at(name, i, [‘KN’, ‘K’], [String(‘N’), ‘C’])
+      name = replace_at(name, i, [‘SCH’, ‘PH’], [‘SSS’, ‘FF’])
+      I n == ‘H’ & (n_1 !C :_vowels | n1_ !C :_vowels)
+         name = name[0 .< i]‘’n_1‘’name[i + 1 ..]
+      I n == ‘W’ & n_1 C :_vowels
+         name = name[0 .< i]‘A’name[i + 1 ..]
+      I key != ‘’ & key.last != name[i]
+         key ‘’= name[i]
+      i++
+   key = replace_end(key, [‘S’, ‘AY’, ‘A’], [‘’, ‘Y’, ‘’])
+   R key1‘’key
+V names = [‘Bishop’, ‘Carlson’, ‘Carr’, ‘Chapman’, ‘Franklin’, ‘Greene’, ‘Harper’, ‘Jacobs’, ‘Larson’, ‘Lawrence’, ‘Lawson’, ‘Louis, XVI’, ‘Lynch’, ‘Mackenzie’, ‘Matthews’, ‘McCormack’, ‘McDaniel’, ‘McDonald’, ‘Mclaughlin’, ‘Morrison’, ‘O'Banion’, ‘O'Brien’, ‘Richards’, ‘Silva’, ‘Watkins’, ‘Wheeler’, ‘Willis’, ‘brown, sr’, ‘browne, III’, ‘browne, IV’, ‘knight’, ‘mitchell’, ‘o'daniel’]
+L(name) names
+   print(‘#15: #.’.format(name, nysiis(name)))
+===
+auto _vowels = u"AEIOU"_S;
+
+template <typename T2, typename T3, typename T4> auto replace_at(const String &text, const T2 &position, const T3 &fromlist, const T4 &tolist)
+{
+    for (auto &&[f, t] : zip(fromlist, tolist))
+        if (text[range_el(position, position + f.len())] == f)
+            return text[range_el(0, position)] & t & text[range_ei(position + f.len())];
+    return text;
+}
+
+template <typename T2, typename T3> auto replace_end(const String &text, const T2 &fromlist, const T3 &tolist)
+{
+    for (auto &&[f, t] : zip(fromlist, tolist))
+        if (text.ends_with(f))
+            return text[range_e_llen(0,  - f.len())] & t;
+    return text;
+}
+
+auto nysiis(String name)
+{
+    name = name.replace(re::_(uR"(\W)"_S), u""_S).uppercase();
+    name = replace_at(name, 0, create_array({u"MAC"_S, u"KN"_S, u"K"_S, u"PH"_S, u"PF"_S, u"SCH"_S}), create_array({u"MCC"_S, u"N"_S, u"C"_S, u"FF"_S, u"FF"_S, u"SSS"_S}));
+    name = replace_end(name, create_array({u"EE"_S, u"IE"_S, u"DT"_S, u"RT"_S, u"RD"_S, u"NT"_S, u"ND"_S}), create_array({u'Y'_C, u'Y'_C, u'D'_C, u'D'_C, u'D'_C, u'D'_C, u'D'_C}));
+    auto key = String(_get<0>(name));
+    auto key1 = u""_S;
+    auto i = 1;
+    while (i < name.len()) {
+        auto [n_1, n] = make_tuple(name[i - 1], name[i]);
+        auto n1_ = i + 1 < name.len() ? name[i + 1] : u""_S;
+        name = replace_at(name, i, create_array({u"EV"_S}) + create_array(::_vowels).map([](const auto &x){return String(x);}), create_array({u"AF"_S}) + create_array({String(u"A"_S)}) * 5);
+        name = replace_at(name, i, create_array<String>({String(u"Q"_S), u"Z"_S, u"M"_S}), create_array<String>({String(u"G"_S), u"S"_S, u"N"_S}));
+        name = replace_at(name, i, create_array({u"KN"_S, u"K"_S}), create_array<String>({String(u"N"_S), u"C"_S}));
+        name = replace_at(name, i, create_array({u"SCH"_S, u"PH"_S}), create_array({u"SSS"_S, u"FF"_S}));
+        if (n == u'H' && (!in(n_1, ::_vowels) || !in(n1_, ::_vowels)))
+            name = name[range_el(0, i)] & n_1 & name[range_ei(i + 1)];
+        if (n == u'W' && in(n_1, ::_vowels))
+            name = name[range_el(0, i)] & u"A"_S & name[range_ei(i + 1)];
+        if (key != u"" && key.last() != name[i])
+            key &= name[i];
+        i++;
+    }
+    key = replace_end(key, create_array({u"S"_S, u"AY"_S, u"A"_S}), create_array({u""_S, u"Y"_S, u""_S}));
+    return key1 & key;
+}
+auto names = create_array({u"Bishop"_S, u"Carlson"_S, u"Carr"_S, u"Chapman"_S, u"Franklin"_S, u"Greene"_S, u"Harper"_S, u"Jacobs"_S, u"Larson"_S, u"Lawrence"_S, u"Lawson"_S, u"Louis, XVI"_S, u"Lynch"_S, u"Mackenzie"_S, u"Matthews"_S, u"McCormack"_S, u"McDaniel"_S, u"McDonald"_S, u"Mclaughlin"_S, u"Morrison"_S, u"O'Banion"_S, u"O'Brien"_S, u"Richards"_S, u"Silva"_S, u"Watkins"_S, u"Wheeler"_S, u"Willis"_S, u"brown, sr"_S, u"browne, III"_S, u"browne, IV"_S, u"knight"_S, u"mitchell"_S, u"o'daniel"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&name : names)
+            print(u"#15: #."_S.format(name, nysiis(name)));
+    }
+} code_block_1;

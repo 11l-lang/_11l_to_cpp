@@ -1247,7 +1247,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 else:
                     ty = trans_type(arg[2], self.scope, tokens[self.tokeni])
                     arguments.append(
-                        (('' if arg[3] == '=' else 'const ') + ty + ' ' + '&'*(arg[2] not in ('Int', 'Float')) if arg[3] != '&' else ty + ' &')
+                        (('' if arg[3] == '=' else 'const ') + ty + ' ' + '&'*(arg[2] not in ('Int', 'Float') and arg[3] != '=') if arg[3] != '&' else ty + ' &')
                         + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
 
         if self.member_initializer_list == '' and self.function_name == '' and type(self.parent) == ASTTypeDefinition:
@@ -3058,6 +3058,7 @@ array_scope.add_name('index', ASTFunctionDefinition([('x', '', ''), ('i', '0', '
 array_scope.add_name('pop', ASTFunctionDefinition([('i', '-1', 'Int')]))
 array_scope.add_name('insert', ASTFunctionDefinition([('i', '', 'Int'), ('x', '', '')]))
 array_scope.add_name('reverse', ASTFunctionDefinition([]))
+array_scope.add_name('reverse_range', ASTFunctionDefinition([('range', '', 'Range')]))
 array_scope.add_name('clear', ASTFunctionDefinition([]))
 array_scope.add_name('drop', ASTFunctionDefinition([]))
 array_scope.add_name('map', ASTFunctionDefinition([('f', '', '')]))

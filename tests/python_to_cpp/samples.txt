@@ -2756,3 +2756,18 @@ struct CodeBlock1
         }}
     }
 } code_block_1;
+
+
+def nysiis(name : str):
+    name = name.upper()
+    return str(name[0])
+===
+F nysiis(String =name)
+   name = name.uppercase()
+   R String(name[0])
+===
+auto nysiis(String name)
+{
+    name = name.uppercase();
+    return String(_get<0>(name));
+}

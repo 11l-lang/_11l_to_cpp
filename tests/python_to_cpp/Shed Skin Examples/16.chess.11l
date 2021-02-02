@@ -1,7 +1,7 @@
 V iNone = -999
 V iTrue = 1
 V iFalse = 0
-V setup = [4, 2, 3, 5, 6, 3, 2, 4, iNone, iNone] [+] [iTrue] * 4 [+] [iNone, iNone] + [1] * 8 [+] [iNone, iNone, iTrue, iNone, iNone, iNone, iNone, iNone] + ([0] * 8 + [iNone] * 8) * 4 + [-1] * 8 + [iNone] * 8 [+] [-4, -2, -3, -5, -6, -3, -2, -4] + [iNone] * 40
+V setup = [4, 2, 3, 5, 6, 3, 2, 4, iNone, iNone] [+] [iTrue] * 4 [+] [iNone, iNone] [+] [1] * 8 [+] [iNone, iNone, iTrue, iNone, iNone, iNone, iNone, iNone] + ([0] * 8 [+] [iNone] * 8) * 4 [+] [-1] * 8 [+] [iNone] * 8 [+] [-4, -2, -3, -5, -6, -3, -2, -4] [+] [iNone] * 40
 V squares = (0.<128).filter(i -> !(i [&] 8))
 V knightMoves = [-33, -31, -18, -14, 14, 18, 31, 33]
 V bishopLines = [Array((17.<120).step(17)), Array((-17 .< -120).step(-17)), Array((15.<106).step(15)), Array((-15 .< -106).step(-15))]

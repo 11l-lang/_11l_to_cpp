@@ -2237,3 +2237,41 @@ struct CodeBlock1
         print(json::from_object(p));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Non-decimal_radices/Convert#Python
+-V digits = Array(‘0’..‘9’).join(‘’)‘’Array(‘A’..‘Z’).join(‘’)
+
+F base_n(=num, b)
+   I num == 0
+      R ‘0’
+   V result = ‘’
+   L num != 0
+      (num, V d) = divmod(num, b)
+      result ‘’= digits[d]
+   R reversed(result)
+
+print(base_n(26, 16))
+===
+const auto digits = create_array(range_ee(u'0'_C, u'9'_C)).join(u""_S) & create_array(range_ee(u'A'_C, u'Z'_C)).join(u""_S);
+
+template <typename T1, typename T2> auto base_n(T1 num, const T2 &b)
+{
+    if (num == 0)
+        return u"0"_S;
+    auto result = u""_S;
+    while (num != 0) {
+        TUPLE_ELEMENT_T(1, divmod(num, b)) d;
+        assign_from_tuple(num, d, divmod(num, b));
+        result &= digits[d];
+    }
+    return reversed(result);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(base_n(26, 16));
+    }
+} code_block_1;
