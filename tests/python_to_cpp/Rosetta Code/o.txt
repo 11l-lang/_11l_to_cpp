@@ -1,0 +1,358 @@
+# https://www.rosettacode.org/wiki/Old_lady_swallowed_a_fly#Python
+animals = [
+        ("fly", "I don't know why she swallowed a fly, perhaps she'll die."),
+        ("spider", "It wiggled and jiggled and tickled inside her."),
+        ("bird", "How absurd, to swallow a bird."),
+        ("cat", "Imagine that, she swallowed a cat."),
+        ("dog", "What a hog, to swallow a dog."),
+        ("goat", "She just opened her throat and swallowed a goat."),
+        ("cow", "I don't know how she swallowed a cow."),
+        ("horse", "She's dead, of course.")]
+
+for i, animal_lyric in enumerate(animals):
+    (animal, lyric) = animal_lyric
+    print("There was an old lady who swallowed a %s.\n%s" % (animal, lyric))
+
+    if animal == "horse": break
+
+    for predator, prey in zip(animals[i:0:-1], animals[i-1::-1]):
+        print("\tShe swallowed the %s to catch the %s" % (predator[0], prey[0]))
+
+    if animal != "fly": print(animals[0][1])  # fly lyric
+    print()  # new line
+===
+V animals = [(‘fly’, ‘I don't know why she swallowed a fly, perhaps she'll die.’), (‘spider’, ‘It wiggled and jiggled and tickled inside her.’), (‘bird’, ‘How absurd, to swallow a bird.’), (‘cat’, ‘Imagine that, she swallowed a cat.’), (‘dog’, ‘What a hog, to swallow a dog.’), (‘goat’, ‘She just opened her throat and swallowed a goat.’), (‘cow’, ‘I don't know how she swallowed a cow.’), (‘horse’, ‘She's dead, of course.’)]
+
+L(animal_lyric) animals
+   V i = L.index
+   V (animal, lyric) = animal_lyric
+   print("There was an old lady who swallowed a #..\n#.".format(animal, lyric))
+
+   I animal == ‘horse’
+      L.break
+
+   L(predator, prey) zip(animals[(i .< 0).step(-1)], animals[(i - 1 ..).step(-1)])
+      print("\tShe swallowed the #. to catch the #.".format(predator[0], prey[0]))
+
+   I animal != ‘fly’
+      print(animals[0][1])
+   print()
+===
+auto animals = create_array({make_tuple(u"fly"_S, u"I don't know why she swallowed a fly, perhaps she'll die."_S), make_tuple(u"spider"_S, u"It wiggled and jiggled and tickled inside her."_S), make_tuple(u"bird"_S, u"How absurd, to swallow a bird."_S), make_tuple(u"cat"_S, u"Imagine that, she swallowed a cat."_S), make_tuple(u"dog"_S, u"What a hog, to swallow a dog."_S), make_tuple(u"goat"_S, u"She just opened her throat and swallowed a goat."_S), make_tuple(u"cow"_S, u"I don't know how she swallowed a cow."_S), make_tuple(u"horse"_S, u"She's dead, of course."_S)});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {int Lindex = 0;
+
+        for (auto &&animal_lyric : animals) {
+            auto i = Lindex;
+            auto [animal, lyric] = animal_lyric;
+            print(u"There was an old lady who swallowed a #..\n#."_S.format(animal, lyric));
+            if (animal == u"horse")
+                break;
+            for (auto &&[predator, prey] : zip(animals[range_el(i, 0).step(-1)], animals[range_ei(i - 1).step(-1)]))
+                print(u"\tShe swallowed the #. to catch the #."_S.format(_get<0>(predator), _get<0>(prey)));
+            if (animal != u"fly")
+                print(_get<1>(_get<0>(animals)));
+            print();
+            Lindex++;
+        }}
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Old_Russian_measure_of_length#Python
+import sys
+
+unit2mult = {"arshin": 0.7112, "centimeter": 0.01,     "diuym":   0.0254,
+             "fut":    0.3048, "kilometer":  1000.0,   "liniya":  0.00254,
+             "meter":  1.0,    "milia":      7467.6,   "piad":    0.1778,
+             "sazhen": 2.1336, "tochka":     0.000254, "vershok": 0.04445,
+             "versta": 1066.8}
+
+if __name__ == '__main__':
+    assert len(sys.argv) == 3, 'ERROR. Need two arguments - number then units'
+    value : float
+    try:
+        value = float(sys.argv[1])
+    except:
+        sys.exit('ERROR. First argument must be a (float) number')
+    unit = sys.argv[2]
+    assert unit in unit2mult, ( 'ERROR. Only know the following units: '
+                                + ' '.join(unit2mult.keys()) )
+
+    print("%g %s to:" % (value, unit))
+    for unt, mlt in sorted(unit2mult.items()):
+        print('  %10s: %g' % (unt, value * unit2mult[unit] / mlt))
+===
+//import sys
+V unit2mult = [‘arshin’ = 0.7112, ‘centimeter’ = 0.01, ‘diuym’ = 0.0254, ‘fut’ = 0.3048, ‘kilometer’ = 1000.0, ‘liniya’ = 0.00254, ‘meter’ = 1.0, ‘milia’ = 7467.6, ‘piad’ = 0.1778, ‘sazhen’ = 2.1336, ‘tochka’ = 0.000254, ‘vershok’ = 0.04445, ‘versta’ = 1066.8]
+
+:start:
+assert(:argv.len == 3, ‘ERROR. Need two arguments - number then units’)
+Float value
+X.try
+   value = Float(:argv[1])
+X.catch
+   exit(‘ERROR. First argument must be a (float) number’)
+V unit = :argv[2]
+assert(unit C unit2mult, (‘ERROR. Only know the following units: ’unit2mult.keys().join(‘ ’)))
+print(‘#. #. to:’.format(value, unit))
+L(unt, mlt) sorted(unit2mult.items())
+   print(‘  #10: #.’.format(unt, value * unit2mult[unit] / mlt))
+===
+Array<String> argv;
+
+auto unit2mult = create_dict(dict_of(u"arshin"_S, 0.7112)(u"centimeter"_S, 0.01)(u"diuym"_S, 0.0254)(u"fut"_S, 0.3048)(u"kilometer"_S, 1000.0)(u"liniya"_S, 0.00254)(u"meter"_S, 1.0)(u"milia"_S, 7467.6)(u"piad"_S, 0.1778)(u"sazhen"_S, 2.1336)(u"tochka"_S, 0.000254)(u"vershok"_S, 0.04445)(u"versta"_S, 1066.8));
+
+int MAIN_WITH_ARGV()
+{
+    INIT_ARGV();
+
+    assert(::argv.len() == 3, u"ERROR. Need two arguments - number then units"_S);
+    double value;
+    try
+    {
+        value = to_float(_get<1>(::argv));
+    }
+    catch (...)
+    {
+        exit(u"ERROR. First argument must be a (float) number"_S);
+    }
+    auto unit = _get<2>(::argv);
+    assert(in(unit, unit2mult), (u"ERROR. Only know the following units: "_S & unit2mult.keys().join(u" "_S)));
+    print(u"#. #. to:"_S.format(value, unit));
+    for (auto &&[unt, mlt] : sorted(unit2mult.items()))
+        print(u"  #10: #."_S.format(unt, value * unit2mult[unit] / mlt));
+}
+
+
+# https://www.rosettacode.org/wiki/One_of_n_lines_in_a_file#Python
+import random
+
+def one_of_n(lines): # lines is any iterable
+    choice = 0
+    for i, line in enumerate(lines):
+        if random.randrange(i+1) == 0:
+            choice = line
+    return choice
+
+def one_of_n_test(n=10, trials=1000000):
+    bins = [0] * n
+    if n != 0:
+        for i in range(trials):
+            bins[one_of_n(range(n))] += 1
+    return bins
+
+print(one_of_n_test())
+===
+//import random
+
+F one_of_n(lines)
+   V choice = 0
+   L(line) lines
+      V i = L.index
+      I random:(i + 1) == 0
+         choice = line
+   R choice
+
+F one_of_n_test(n = 10, trials = 1000000)
+   V bins = [0] * n
+   I n != 0
+      L(i) 0 .< trials
+         bins[one_of_n(0 .< n)]++
+   R bins
+print(one_of_n_test())
+===
+template <typename T1> auto one_of_n(const T1 &lines)
+{
+    auto choice = 0;
+    {int Lindex = 0;
+    for (auto &&line : lines) {
+        auto i = Lindex;
+        if (randomns::_(i + 1) == 0)
+            choice = line;
+        Lindex++;
+    }}
+    return choice;
+}
+
+template <typename T1 = decltype(10), typename T2 = decltype(1000000)> auto one_of_n_test(const T1 &n = 10, const T2 &trials = 1000000)
+{
+    auto bins = create_array({0}) * n;
+    if (n != 0)
+        for (auto i : range_el(0, trials))
+            bins[one_of_n(range_el(0, n))]++;
+    return bins;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(one_of_n_test());
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/One-dimensional_cellular_automata#Python
+gen = [int(ch == '#') for ch in '_###_##_#_#_#_#__#__']
+for n in range(10):
+    print(''.join(('#' if cell != 0 else '_') for cell in gen))
+    gen = [0] + gen + [0]
+    gen = [int(sum(gen[m:m+3]) == 2) for m in range(len(gen)-2)]
+===
+V gen = ‘_###_##_#_#_#_#__#__’.map(ch -> Int(ch == ‘#’))
+L(n) 10
+   print(gen.map(cell -> (I cell != 0 {‘#’} E ‘_’)).join(‘’))
+   gen = [0] [+] gen [+] [0]
+   gen = (0 .< gen.len - 2).map(m -> Int(sum(:gen[m .< m + 3]) == 2))
+===
+auto gen = u"_###_##_#_#_#_#__#__"_S.map([](const auto &ch){return to_int(ch == u'#');});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int n = 0; n < 10; n++) {
+            print(gen.map([](const auto &cell){return (cell != 0 ? u"#"_S : u"_"_S);}).join(u""_S));
+            gen = create_array({0}) + gen + create_array({0});
+            gen = range_el(0, gen.len() - 2).map([](const auto &m){return to_int(sum(::gen[range_el(m, m + 3)]) == 2);});
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Order_disjoint_list_items#Python
+from typing import List
+
+def order_disjoint_list_items(data : list, items):
+    #Modifies data list in-place
+    itemindices : List[int] = []
+    for item in set(items):
+        itemcount = items.count(item)
+        #assert data.count(item) >= itemcount, 'More of %r than in data' % item
+        lastindex = [-1]
+        for i in range(itemcount):
+            lastindex.append(data.index(item, lastindex[-1] + 1))
+        itemindices += lastindex[1:]
+    itemindices.sort()
+    for index, item in zip(itemindices, items):
+        data[index] = item
+
+def slist(s):
+    return list(map(str, list(s)))
+
+def tostring(l):
+    return "'"+' '.join(l)+"'"
+
+for data, items in [('the cat sat on the mat'.split(' '), ('mat cat').split(' ')),
+                    ('the cat sat on the mat'.split(' '), ('cat mat').split(' ')),
+                    (slist('ABCABCABC'), slist('CACA')),
+                    (slist('ABCABDABE'), slist('EADA')),
+                    (slist('AB'), slist('B')),
+                    (slist('AB'), slist('BA')),
+                    (slist('ABBA'), slist('BA')),
+                    (slist(''), slist('')),
+                    (slist('A'), slist('A')),
+                    (slist('AB'), slist('')),
+                    (slist('ABBA'), slist('AB')),
+                    (slist('ABAB'), slist('AB')),
+                    (slist('ABAB'), slist('BABA')),
+                    (slist('ABCCBA'), slist('ACAC')),
+                    (slist('ABCCBA'), slist('CACA')),
+                   ]:
+    print('Data M: %-24s Order N: %-9s' % (tostring(data), tostring(items)), end=' ')
+    order_disjoint_list_items(data, items)
+    print("-> M' %s" % tostring(data))
+===
+
+F order_disjoint_list_items(&data, items)
+   [Int] itemindices
+   L(item) Set(items)
+      V itemcount = items.count(item)
+      V lastindex = [-1]
+      L(i) 0 .< itemcount
+         lastindex.append(data.index(item, lastindex.last + 1))
+      itemindices [+]= lastindex[1..]
+   itemindices.sort()
+   L(index, item) zip(itemindices, items)
+      data[index] = item
+
+F slist(s)
+   R Array(s).map(String)
+
+F tostring(l)
+   R ‘'’l.join(‘ ’)‘'’
+
+L(data, items) [(‘the cat sat on the mat’.split(‘ ’), (‘mat cat’).split(‘ ’)), (‘the cat sat on the mat’.split(‘ ’), (‘cat mat’).split(‘ ’)), (slist(‘ABCABCABC’), slist(‘CACA’)), (slist(‘ABCABDABE’), slist(‘EADA’)), (slist(‘AB’), slist(‘B’)), (slist(‘AB’), slist(‘BA’)), (slist(‘ABBA’), slist(‘BA’)), (slist(‘’), slist(‘’)), (slist(‘A’), slist(‘A’)), (slist(‘AB’), slist(‘’)), (slist(‘ABBA’), slist(‘AB’)), (slist(‘ABAB’), slist(‘AB’)), (slist(‘ABAB’), slist(‘BABA’)), (slist(‘ABCCBA’), slist(‘ACAC’)), (slist(‘ABCCBA’), slist(‘CACA’))]
+   print(‘Data M: #<24 Order N: #<9’.format(tostring(data), tostring(items)), end' ‘ ’)
+   order_disjoint_list_items(&data, items)
+   print(‘-> M' #.’.format(tostring(data)))
+===
+template <typename T1, typename T2> auto order_disjoint_list_items(T1 &data, const T2 &items)
+{
+    Array<int> itemindices;
+    for (auto &&item : create_set(items)) {
+        auto itemcount = items.count(item);
+        auto lastindex = create_array({-1});
+        for (auto i : range_el(0, itemcount))
+            lastindex.append(data.index(item, lastindex.last() + 1));
+        itemindices.append(lastindex[range_ei(1)]);
+    }
+    itemindices.sort();
+    for (auto &&[index, item] : zip(itemindices, items))
+        data.set(index, item);
+}
+
+template <typename T1> auto slist(const T1 &s)
+{
+    return create_array(s).map([](const auto &x){return String(x);});
+}
+
+template <typename T1> auto tostring(const T1 &l)
+{
+    return u"'"_S & l.join(u" "_S) & u"'"_S;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&[data, items] : create_array({make_tuple(u"the cat sat on the mat"_S.split(u" "_S), (u"mat cat"_S).split(u" "_S)), make_tuple(u"the cat sat on the mat"_S.split(u" "_S), (u"cat mat"_S).split(u" "_S)), make_tuple(slist(u"ABCABCABC"_S), slist(u"CACA"_S)), make_tuple(slist(u"ABCABDABE"_S), slist(u"EADA"_S)), make_tuple(slist(u"AB"_S), slist(u"B"_S)), make_tuple(slist(u"AB"_S), slist(u"BA"_S)), make_tuple(slist(u"ABBA"_S), slist(u"BA"_S)), make_tuple(slist(u""_S), slist(u""_S)), make_tuple(slist(u"A"_S), slist(u"A"_S)), make_tuple(slist(u"AB"_S), slist(u""_S)), make_tuple(slist(u"ABBA"_S), slist(u"AB"_S)), make_tuple(slist(u"ABAB"_S), slist(u"AB"_S)), make_tuple(slist(u"ABAB"_S), slist(u"BABA"_S)), make_tuple(slist(u"ABCCBA"_S), slist(u"ACAC"_S)), make_tuple(slist(u"ABCCBA"_S), slist(u"CACA"_S))})) {
+            print(u"Data M: #<24 Order N: #<9"_S.format(tostring(data), tostring(items)), u" "_S);
+            order_disjoint_list_items(data, items);
+            print(u"-> M' #."_S.format(tostring(data)));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Ordered_words#Python
+words = open('unixdict.txt').read().split("\n")
+ordered = [word for word in words if word==''.join(sorted(word))]
+maxlen = len(max(ordered, key = lambda w: len(w)))
+maxorderedwords = [word for word in ordered if len(word) == maxlen]
+print(' '.join(maxorderedwords))
+===
+V words = File(‘unixdict.txt’).read().split("\n")
+V ordered = words.filter(word -> word == sorted(word).join(‘’))
+V maxlen = max(ordered, key' w -> w.len).len
+V maxorderedwords = ordered.filter(word -> word.len == :maxlen)
+print(maxorderedwords.join(‘ ’))
+===
+auto words = File(u"unixdict.txt"_S).read().split(u"\n"_S);
+auto ordered = words.filter([](const auto &word){return word == sorted(word).join(u""_S);});
+auto maxlen = max_with_key(ordered, [](const auto &w){return w.len();}).len();
+auto maxorderedwords = ordered.filter([](const auto &word){return word.len() == ::maxlen;});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(maxorderedwords.join(u" "_S));
+    }
+} code_block_1;
