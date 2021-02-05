@@ -2771,3 +2771,13 @@ auto nysiis(String name)
     name = name.uppercase();
     return String(_get<0>(name));
 }
+
+
+f : Callable[[float, int], bool]
+b : Dict[str, Callable[[float, int], bool]] = {}
+===
+(Float, Int -> Bool) f
+[String = (Float, Int -> Bool)] b
+===
+std::function<bool(const double, const int)> f;
+Dict<String, std::function<bool(const double, const int)>> b;

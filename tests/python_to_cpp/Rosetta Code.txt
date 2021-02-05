@@ -9064,3 +9064,68 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Parsing/RPN_calculator_algorithm#Python
+from typing import List, Dict, Callable
+
+a:List[float]=[]
+b:Dict[str, Callable[[float, float], float]] = {}
+b['+'] = lambda x,y: y+x
+b['-'] = lambda x,y: y-x
+b['*'] = lambda x,y: y*x
+b['/'] = lambda x,y: y/x
+b['^'] = lambda x,y:y**x
+
+for c in '3 4 2 * 1 5 - 2 3 ^ ^ / +'.split(' '):
+    if c in b:
+        #a.append(b[c](a.pop(), a.pop()))
+        first  = a.pop()
+        second = a.pop()
+        a.append(b[c](first, second))
+    else:
+        a.append(float(c))
+    print(c, a)
+===
+[Float] a
+[String = (Float, Float -> Float)] b
+b[‘+’] = (x, y) -> y + x
+b[‘-’] = (x, y) -> y - x
+b[‘*’] = (x, y) -> y * x
+b[‘/’] = (x, y) -> y / x
+b[‘^’] = (x, y) -> y ^ x
+
+L(c) ‘3 4 2 * 1 5 - 2 3 ^ ^ / +’.split(‘ ’)
+   I c C b
+      V first = a.pop()
+      V second = a.pop()
+      a.append(b[c](first, second))
+   E
+      a.append(Float(c))
+   print(c‘ ’a)
+===
+Array<double> a;
+Dict<String, std::function<double(const double, const double)>> b;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        b.set(u"+"_S, [](const auto &x, const auto &y){return y + x;});
+        b.set(u"-"_S, [](const auto &x, const auto &y){return y - x;});
+        b.set(u"*"_S, [](const auto &x, const auto &y){return y * x;});
+        b.set(u"/"_S, [](const auto &x, const auto &y){return y / x;});
+        b.set(u"^"_S, [](const auto &x, const auto &y){return pow(y, x);});
+
+        for (auto &&c : u"3 4 2 * 1 5 - 2 3 ^ ^ / +"_S.split(u" "_S)) {
+            if (in(c, b)) {
+                auto first = a.pop();
+                auto second = a.pop();
+                a.append(b[c](first, second));
+            }
+            else
+                a.append(to_float(c));
+            print(c & u" "_S & a);
+        }
+    }
+} code_block_1;

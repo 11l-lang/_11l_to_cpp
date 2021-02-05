@@ -255,6 +255,9 @@ class SymbolNode:
             assert(self.tuple)
             r = '('
             for i in range(len(self.children)):
+                if self.children[i].symbol.id == '->':
+                    assert(i == len(self.children) - 1)
+                    return 'Callable[' + r[1:] + self.children[i].children[0].to_type_str() + ', ' + self.children[i].children[1].to_type_str() + ']'
                 r += self.children[i].to_type_str()
                 if i < len(self.children) - 1:
                     r += ', '
@@ -487,6 +490,8 @@ class SymbolNode:
                     func_name = 'std::move'
                 elif func_name == '*this':
                     func_name = '(*this)' # function call has higher precedence than dereference in C++, so `*this(...)` is equivalent to `*(this(...))`
+                elif self.children[0].symbol.id == '[': # ]
+                    pass
                 else:
                     if self.children[0].symbol.id == ':':
                         fid, sc = find_module(self.children[0].children[0].to_str()).scope.find_and_return_scope(self.children[0].children[1].token_str())
@@ -1040,6 +1045,12 @@ def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False
                 assert(len(tylist) == 2)
                 return 'Dict<' + trans_type(tylist[0], scope, type_token, ast_type_node) + ', ' \
                                + trans_type(tylist[1], scope, type_token, ast_type_node) + '>'
+            if ty.startswith('Callable['): # ]
+                tylist = ty[p+1:-1].split(', ')
+                def trans_ty(ty):
+                    tt = trans_type(ty, scope, type_token, ast_type_node)
+                    return tt if tt.startswith('std::unique_ptr<') else 'const ' + tt + ('&'*(ty not in ('Int', 'Float')))
+                return 'std::function<' + trans_type(tylist[-1], scope, type_token, ast_type_node) + '(' + ', '.join(trans_ty(t) for t in tylist[:-1]) + ')>'
             return (trans_type(ty[:p], scope, type_token, ast_type_node) if p != 0 else 'Array') + '<' + trans_type(ty[p+1:-1], scope, type_token, ast_type_node) + '>'
         p = ty.find(',')
         if p != -1:
@@ -1084,7 +1095,7 @@ class ASTVariableDeclaration(ASTNode):
         if self.function_pointer:
             def trans_type(ty):
                 tt = self.trans_type(ty)
-                return tt if tt.startswith('std::unique_ptr<') else 'const ' + tt + ('&'*(ty not in ('Int',)))
+                return tt if tt.startswith('std::unique_ptr<') else 'const ' + tt + ('&'*(ty not in ('Int', 'Float')))
             return ' ' * (indent*4) + 'std::function<' + self.trans_type(self.type) + '(' + ', '.join(trans_type(ty) for ty in self.type_args) + ')> ' + ', '.join(self.vars) + ";\n"
         return ' ' * (indent*4) + 'const '*self.is_const + self.trans_type(self.type, self.is_reference) + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + '*'*self.is_reference + ', '.join(self.vars) + ";\n"
 
