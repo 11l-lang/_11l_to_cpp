@@ -9129,3 +9129,40 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Pascal%27s_triangle#Python
+def pascal(n):
+   row = [1]
+   k = [0]
+   for x in range(max(n,0)):
+      print(' '.join(map(str, row)).center(16))
+      row=[l+r for l,r in zip(row+k,k+row)]
+
+pascal(7)
+===
+F pascal(n)
+   V row = [1]
+   V k = [0]
+   L(x) 0 .< max(n, 0)
+      print(row.map(String).join(‘ ’).center(16))
+      row = zip(row [+] k, k [+] row).map((l, r) -> l + r)
+pascal(7)
+===
+template <typename T1> auto _pascal_(const T1 &n)
+{
+    auto row = create_array({1});
+    auto k = create_array({0});
+    for (auto x : range_el(0, max(n, 0))) {
+        print(row.map([](const auto &x){return String(x);}).join(u" "_S).center(16));
+        row = zip(row + k, k + row).map([](const auto &l, const auto &r){return l + r;});
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _pascal_(7);
+    }
+} code_block_1;

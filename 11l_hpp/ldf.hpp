@@ -1,4 +1,4 @@
-﻿namespace ldf // namespace for lightweight data formats (such as JSON and eldf)
+﻿namespace ldf // namespace for lightweight data formats (such as JSON and ELDF)
 {
 class Object;
 class Array;

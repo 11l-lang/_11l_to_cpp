@@ -51,6 +51,11 @@ public:
 	bool is_alpha    () const {return iswalpha(code);}
 };
 
+inline Char operator ""_C(char16_t c)
+{
+	return Char(c);
+}
+
 namespace re {class RegEx;}
 
 class String : public std::u16string
@@ -378,7 +383,7 @@ public:
 		return String(u"0") * max(width - len(), 0) & *this;
 	}
 
-	String center(int width, String fillchar = String(u' ')) const
+	String center(int width, String fillchar = String(u' '_C)) const
 	{
 		if (fillchar.len() != 1)
 			throw AssertionError();
@@ -386,14 +391,14 @@ public:
 		return fillchar * (width - len() - w) & *this & fillchar * w;
 	}
 
-	String ljust(int width, String fillchar = String(u' ')) const
+	String ljust(int width, String fillchar = String(u' '_C)) const
 	{
 		if (fillchar.len() != 1)
 			throw AssertionError();
 		return *this & fillchar * (width - len());
 	}
 
-	String rjust(int width, String fillchar = String(u' ')) const
+	String rjust(int width, String fillchar = String(u' '_C)) const
 	{
 		if (fillchar.len() != 1)
 			throw AssertionError();
@@ -608,11 +613,6 @@ private:
 public:
 	template <typename ... Types> String format(const Types&... args) const;
 };
-
-inline Char operator ""_C(char16_t c) // Fix GCC error: unable to find character literal operator ‘operator""_C’ with ‘char16_t’ argument [in line `r &= u'#'_C;`]
-{
-	return Char(c);
-}
 
 struct String::FormatArgument//Field
 {
@@ -973,7 +973,7 @@ inline String bin(int n)
 				*p++ = u'0' + (unsigned(n) >> 31);
 			return String(r, p - r);
 		}
-	return String(u'0');
+	return String(u'0'_C);
 }
 
 inline String bin(int64_t n)
@@ -986,7 +986,7 @@ inline String bin(int64_t n)
 				*p++ = u'0' + (uint64_t(n) >> 63);
 			return String(r, p - r);
 		}
-	return String(u'0');
+	return String(u'0'_C);
 }
 
 inline String reversed(const String &s)
