@@ -239,17 +239,17 @@ public:
 		return (*this)[len() + i];
 	}
 
-	void set(int i, const Type &v)
+	const Type &set(int i, const Type &v) // return `const Type&` for [https://www.rosettacode.org/wiki/Perlin_noise#Python]:‘p[256+i] = p[i] = permutation[i]’
 	{
 		if (in(i, range_el(0, len())))
-			std::vector<Type>::at(i) = v;
+			return std::vector<Type>::at(i) = v;
 		else
 			throw IndexError(i);
 	}
 
-	void set_plus_len(int i, const Type &v)
+	const Type &set_plus_len(int i, const Type &v)
 	{
-		set(len() + i, v);
+		return set(len() + i, v);
 	}
 
 	void append(Type &&v) {std::vector<Type>::push_back(std::move(v));}
