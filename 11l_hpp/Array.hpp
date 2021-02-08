@@ -356,6 +356,11 @@ public:
 	void reverse_range(const Range<int, true, false> range) {std::reverse(begin() + range.b, begin() + range.e);}
 	void reverse_range(const RangeEI<int>            range) {std::reverse(begin() + range.b, end());}
 
+	bool next_permutation()
+	{
+		return std::next_permutation(begin(), end());
+	}
+
 	const Type &last() const
 	{
 		if (std::vector<Type>::empty())

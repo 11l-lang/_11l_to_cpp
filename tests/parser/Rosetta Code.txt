@@ -2275,3 +2275,63 @@ struct CodeBlock1
         print(base_n(26, 16));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Palindrome_dates#Java
+V date = Time(2020, 2, 3)
+print(‘First 15 palindrome dates after 2020-02-02 are:’)
+V count = 0
+L count < 15
+   V date_formatted = date.format(‘YYYYMMDD’)
+   I date_formatted == reversed(date_formatted)
+      print(‘date = ’date.format(‘YYYY-MM-DD’))
+      count++
+   date += TimeDelta(days' 1)
+===
+auto date = Time(2020, 2, 3);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"First 15 palindrome dates after 2020-02-02 are:"_S);
+    }
+} code_block_1;
+auto count = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (count < 15) {
+            auto date_formatted = date.format(u"YYYYMMDD"_S);
+            if (date_formatted == reversed(date_formatted)) {
+                print(u"date = "_S & date.format(u"YYYY-MM-DD"_S));
+                count++;
+            }
+            date += TimeDelta(1);
+        }
+    }
+} code_block_2;
+
+
+// https://www.rosettacode.org/wiki/Permutations#C.2B.2B
+V a = [1, 2, 3]
+L
+   print(a)
+   I !a.next_permutation()
+      L.break
+===
+auto a = create_array({1, 2, 3});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            print(a);
+            if (!a.next_permutation())
+                break;
+        }
+    }
+} code_block_1;
