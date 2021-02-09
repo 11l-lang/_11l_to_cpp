@@ -31,7 +31,7 @@ T Node
 
    F tree_indent() -> [String]
       V tr = I .right != N {.right.tree_indent()} E [‘-- (null)’]
-      R [‘--’(.value)] [+] (I .left != N {.left.tree_indent()} E [‘-- (null)’]).map(a -> ‘  |’a) [+] [‘  `’tr[0]] + tr[1..].map(a -> ‘   ’a)
+      R [‘--’(.value)] [+] (I .left != N {.left.tree_indent()} E [‘-- (null)’]).map(a -> ‘  |’a) [+] [‘  `’tr[0]] [+] tr[1..].map(a -> ‘   ’a)
 V tree = Node(1, Node(2, Node(4, Node(7)), Node(5)), Node(3, Node(6, Node(8), Node(9))))
 print(tree.tree_indent().join("\n"))
 ===
@@ -8605,7 +8605,7 @@ F make_maze(w = 16, h = 8)
    walk(random:(w), random:(h))
    V s = ‘’
    L(a, b) zip(hor, ver)
-      s ‘’= (a [+] [String("\n")] + b [+] [String("\n")]).join(‘’)
+      s ‘’= (a [+] [String("\n")] [+] b [+] [String("\n")]).join(‘’)
    R s
 print(make_maze())
 ===
@@ -9353,9 +9353,9 @@ F s_permutations(seq)
       L(item) items
          V i = L.index
          I i % 2
-            new_items [+]= (0 .. item.len).map(i -> @item[0 .< i] [+] [@j] + @item[i ..])
+            new_items [+]= (0 .. item.len).map(i -> @item[0 .< i] [+] [@j] [+] @item[i ..])
          E
-            new_items [+]= (item.len .< -1).step(-1).map(i -> @item[0 .< i] [+] [@j] + @item[i ..])
+            new_items [+]= (item.len .< -1).step(-1).map(i -> @item[0 .< i] [+] [@j] [+] @item[i ..])
       items = new_items
    R enumerate(items).map((i, item) -> (item, I i % 2 {-1} E 1))
 
