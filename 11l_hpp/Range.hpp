@@ -113,7 +113,8 @@ public:
 	template <typename Func> auto map(Func &&func) -> Array<decltype(func(std::declval<Type>()))>
 	{
 		Array<decltype(func(std::declval<Type>()))> r;
-		for (Type i = b + !include_beginning; i <= e - !include_ending; i+=step)
+		//for (Type i = b + !include_beginning; i <= e - !include_ending; i+=step) // this line does not support negative `step`
+		for (Type i : *this)
 			r.push_back(func(i));
 		return r;
 	}
