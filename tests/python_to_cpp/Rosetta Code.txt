@@ -9399,3 +9399,126 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Polynomial_long_division#Python
+import sys
+
+def degree(poly : list):
+    while len(poly) != 0 and poly[-1] == 0:
+        poly.pop()   # normalize
+    return len(poly)-1
+
+def poly_div(n : list, D : list):
+    dD = degree(D)
+    dN = degree(n)
+    if dD < 0: sys.exit(1)
+    q : List[float]
+    if dN >= dD:
+        q = [0.0] * dN
+        while dN >= dD:
+            d = [0.0]*(dN - dD) + D
+            mult = n[-1] / float(d[-1])
+            q[dN - dD] = mult
+            d = [coeff*mult for coeff in d]
+            n = [coeffN - coeffd for coeffN, coeffd in zip(n, d)]
+            dN = degree(n)
+    else:
+        q = [0.0]
+    return (q, n)
+
+print("POLYNOMIAL LONG DIVISION")
+n = [-42.0, 0.0, -12.0, 1.0]
+D = [-3.0, 1.0, 0.0, 0.0]
+print("  %s / %s =" % (n,D), end=' ')
+(q, r) = poly_div(n, D)
+print("%s remainder %s" % (q, r))
+===
+//import sys
+
+F degree(&poly)
+   L !poly.empty & poly.last == 0
+      poly.pop()
+   R poly.len - 1
+
+F poly_div(&n, &D)
+   V dD = degree(&D)
+   V dN = degree(&n)
+   I dD < 0
+      exit(1)
+   [Float] q
+   I dN >= dD
+      q = [0.0] * dN
+      L dN >= dD
+         V d = [0.0] * (dN - dD) [+] D
+         V mult = n.last / Float(d.last)
+         q[dN - dD] = mult
+         d = d.map(coeff -> coeff * @mult)
+         n = zip(n, d).map((coeffN, coeffd) -> coeffN - coeffd)
+         dN = degree(&n)
+   E
+      q = [0.0]
+   R (q, n)
+print(‘POLYNOMIAL LONG DIVISION’)
+V n = [-42.0, 0.0, -12.0, 1.0]
+V D = [-3.0, 1.0, 0.0, 0.0]
+print(‘  #. / #. =’.format(n, D), end' ‘ ’)
+V (q, r) = poly_div(&n, &D)
+print(‘#. remainder #.’.format(q, r))
+===
+template <typename T1> auto degree(T1 &poly)
+{
+    while (!poly.empty() && poly.last() == 0)
+        poly.pop();
+    return poly.len() - 1;
+}
+
+template <typename T1, typename T2> auto poly_div(T1 &n, T2 &D)
+{
+    auto dD = degree(D);
+    auto dN = degree(n);
+    if (dD < 0)
+        exit(1);
+    Array<double> q;
+    if (dN >= dD) {
+        q = create_array({0.0}) * dN;
+        while (dN >= dD) {
+            auto d = create_array({0.0}) * (dN - dD) + D;
+            auto mult = n.last() / to_float(d.last());
+            q.set(dN - dD, mult);
+            d = d.map([&mult](const auto &coeff){return coeff * mult;});
+            n = zip(n, d).map([](const auto &coeffN, const auto &coeffd){return coeffN - coeffd;});
+            dN = degree(n);
+        }
+    }
+    else
+        q = create_array({0.0});
+    return make_tuple(q, n);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"POLYNOMIAL LONG DIVISION"_S);
+    }
+} code_block_1;
+auto n = create_array({-42.0, 0.0, -12.0, 1.0});
+auto D = create_array({-3.0, 1.0, 0.0, 0.0});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"  #. / #. ="_S.format(n, D), u" "_S);
+    }
+} code_block_2;
+auto [q, r] = poly_div(n, D);
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print(u"#. remainder #."_S.format(q, r));
+    }
+} code_block_3;
