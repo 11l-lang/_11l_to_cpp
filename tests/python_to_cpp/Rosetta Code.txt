@@ -9319,9 +9319,8 @@ struct CodeBlock2
 
 # https://www.rosettacode.org/wiki/Permutations_by_swapping#Python:_Iterative_version_of_the_recursive
 def s_permutations(seq):
-    items : List[List[int]] = []
     empty_list : List[int] = []
-    items.append(empty_list)
+    items = [empty_list]
     for j in seq:
         new_items : List[List[int]] = []
         for i, item in enumerate(items):
@@ -9345,9 +9344,8 @@ for n in (3, 4):
     print()
 ===
 F s_permutations(seq)
-   [[Int]] items
    [Int] empty_list
-   items.append(empty_list)
+   V items = [empty_list]
    L(j) seq
       [[Int]] new_items
       L(item) items
@@ -9367,9 +9365,8 @@ L(n) (3, 4)
 ===
 template <typename T1> auto s_permutations(const T1 &seq)
 {
-    Array<Array<int>> items;
     Array<int> empty_list;
-    items.append(empty_list);
+    auto items = create_array({empty_list});
     for (auto &&j : seq) {
         Array<Array<int>> new_items;
         {int Lindex = 0;
