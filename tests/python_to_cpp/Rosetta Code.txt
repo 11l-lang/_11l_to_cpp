@@ -791,9 +791,9 @@ L(line) parts
    L(word) line
       V i = L.index
       max_widths[i] = max(max_widths[i], word.len)
-(String, Int -> String) ljust = (s, w) -> s‘’(‘ ’ * (w - s.len))
-(String, Int -> String) centr = (s, w) -> (‘ ’ * (w - s.len - (w I/ 2 - s.len I/ 2)))‘’s‘’(‘ ’ * (w I/ 2 - s.len I/ 2))
-(String, Int -> String) rjust = (s, w) -> (‘ ’ * (w - s.len))‘’s
+((String, Int) -> String) ljust = (s, w) -> s‘’(‘ ’ * (w - s.len))
+((String, Int) -> String) centr = (s, w) -> (‘ ’ * (w - s.len - (w I/ 2 - s.len I/ 2)))‘’s‘’(‘ ’ * (w I/ 2 - s.len I/ 2))
+((String, Int) -> String) rjust = (s, w) -> (‘ ’ * (w - s.len))‘’s
 L(justify) [ljust, centr, rjust]
    V i = L.index
    print([‘Left’, ‘Center’, ‘Right’][i]‘ column-aligned output:’)
@@ -1374,7 +1374,7 @@ T Symbol
    Int nud_bp
    Int led_bp
    (ASTNode -> ASTNode) nud
-   (ASTNode, ASTNode -> ASTNode) led
+   ((ASTNode, ASTNode) -> ASTNode) led
 
    F set_nud_bp(nud_bp, nud)
       .nud_bp = nud_bp
@@ -9088,7 +9088,7 @@ for c in '3 4 2 * 1 5 - 2 3 ^ ^ / +'.split(' '):
     print(c, a)
 ===
 [Float] a
-[String = (Float, Float -> Float)] b
+[String = ((Float, Float) -> Float)] b
 b[‘+’] = (x, y) -> y + x
 b[‘-’] = (x, y) -> y - x
 b[‘*’] = (x, y) -> y * x

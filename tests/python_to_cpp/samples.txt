@@ -310,13 +310,23 @@ auto x = ~1 ^ 2;
 
 if __name__ == '__main__':
     f : Callable[[str, int], str]
+    ft : Tuple[str, Callable[[int], str]]
+    fe : Callable[[], str]
+    b0 : Dict[str, Callable[[str, int], str]] = {}
+    b : Dict[str, Callable[[int], str]] = {}
+    bemp : Dict[str, Callable[[], str]] = {}
     def ff(s, i):
         return s * i
     f = ff
     assert(f('s', 2) == 'ss')
 ===
 :start:
-(String, Int -> String) f
+((String, Int) -> String) f
+(String, (Int -> String)) ft
+(() -> String) fe
+[String = ((String, Int) -> String)] b0
+[String = (Int -> String)] b
+[String = (() -> String)] bemp
 F ff(s, i)
    R s * i
 f = ff
@@ -325,6 +335,11 @@ assert(f(‘s’, 2) == ‘ss’)
 int main()
 {
     std::function<String(const String&, const int)> f;
+    Tuple<String, std::function<String(const int)>> ft;
+    std::function<String()> fe;
+    Dict<String, std::function<String(const String&, const int)>> b0;
+    Dict<String, std::function<String(const int)>> b;
+    Dict<String, std::function<String()>> bemp;
     auto ff = [](const auto &s, const auto &i)
     {
         return s * i;
@@ -2776,8 +2791,8 @@ auto nysiis(String name)
 f : Callable[[float, int], bool]
 b : Dict[str, Callable[[float, int], bool]] = {}
 ===
-(Float, Int -> Bool) f
-[String = (Float, Int -> Bool)] b
+((Float, Int) -> Bool) f
+[String = ((Float, Int) -> Bool)] b
 ===
 std::function<bool(const double, const int)> f;
 Dict<String, std::function<bool(const double, const int)>> b;

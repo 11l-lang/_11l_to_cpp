@@ -110,7 +110,7 @@ f(c' 20)
 
 
 :start:
-(String, Int -> String) f
+((String, Int) -> String) f
 F ff(s, i)
    R s * i
 f = ff

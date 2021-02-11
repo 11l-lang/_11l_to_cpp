@@ -238,7 +238,7 @@ F count_run_and_make_ascending([Int] &list_; low, high, comparefn)
 T Timsort
    [Int] list_
    [Int] tmp
-   (Int, Int -> Int) comparefn
+   ((Int, Int) -> Int) comparefn
    Int min_gallop
    min_merge = 32
    initial_min_gallop = 7

@@ -252,16 +252,24 @@ class SymbolNode:
                         r += ', '
                 return r + ']'
         elif self.symbol.id == '(': # )
-            assert(self.tuple)
-            r = '('
-            for i in range(len(self.children)):
-                if self.children[i].symbol.id == '->':
-                    assert(i == len(self.children) - 1)
-                    return 'Callable[' + r[1:] + self.children[i].children[0].to_type_str() + ', ' + self.children[i].children[1].to_type_str() + ']'
-                r += self.children[i].to_type_str()
-                if i < len(self.children) - 1:
-                    r += ', '
-            return r + ')'
+            if len(self.children) == 1 and self.children[0].symbol.id == '->':
+                r = 'Callable['
+                c0 = self.children[0]
+                if c0.children[0].symbol.id == '(': # )
+                    for child in c0.children[0].children:
+                        r += child.to_type_str() + ', '
+                else:
+                    r += c0.children[0].to_type_str() + ', '
+                return r + c0.children[1].to_type_str() + ']'
+            else:
+                assert(self.tuple)
+                r = '('
+                for i in range(len(self.children)):
+                    assert(self.children[i].symbol.id != '->')
+                    r += self.children[i].to_type_str()
+                    if i < len(self.children) - 1:
+                        r += ', '
+                return r + ')'
 
         assert(self.token.category == Token.Category.NAME)
         return self.token_str()
@@ -1015,9 +1023,9 @@ def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False
             nesting_level = 0
             types = ''
             while True:
-                if ty[i] == '(':
+                if ty[i] in ('(', '['):
                     nesting_level += 1
-                elif ty[i] == ')':
+                elif ty[i] in (')', ']'):
                     if nesting_level == 0:
                         assert(i == len(ty)-1)
                         types += trans_type(ty[s:i], scope, type_token, ast_type_node)
@@ -1988,7 +1996,8 @@ def led(self, left):
     scope.is_lambda = True
     tokensn.scope = scope
     for c in left.children if left.symbol.id == '(' else [left]: # )
-        scope.add_name(c.token_str(), None)
+        if not c.token_str()[0].isupper(): # for `((ASTNode, ASTNode) -> ASTNode) led` and `[String = ((Float, Float) -> Float)] b` (fix error 'redefinition of already defined identifier is not allowed')
+            scope.add_name(c.token_str(), None)
     self.append_child(expression(self.symbol.led_bp))
     scope = prev_scope
     return self
@@ -2874,18 +2883,21 @@ def parse_internal(this_node):
                             for i in range(1, len(node_expression.children)):
                                 node.type_args.append(node_expression.children[i].to_type_str())
                     elif node.type == '(': # )
-                        for i in range(len(node_expression.children)):
-                            child = node_expression.children[i]
-                            if child.token.category == Token.Category.NAME:
-                                node.type_args.append(child.token_str())
+                        if len(node_expression.children) == 1 and node_expression.children[0].symbol.id == '->':
+                            node.function_pointer = True
+                            c0 = node_expression.children[0]
+                            assert(c0.children[1].token.category == Token.Category.NAME or c0.children[1].token_str() in ('N', 'Н', 'null', 'нуль'))
+                            node.type = c0.children[1].token_str() # return value type
+                            if c0.children[0].token.category == Token.Category.NAME:
+                                node.type_args.append(c0.children[0].token_str())
                             else:
-                                node.function_pointer = True
-                                assert(child.symbol.id == '->' and i == len(node_expression.children) - 1)
-                                assert(child.children[0].token.category == Token.Category.NAME)
-                                assert(child.children[1].token.category == Token.Category.NAME or child.children[1].token_str() in ('N', 'Н', 'null', 'нуль'))
-                                node.type_args.append(child.children[0].token_str())
-                                node.type = child.children[1].token_str() # return value is the last
-                        if not node.function_pointer: # this is a tuple
+                                assert(c0.children[0].symbol.id == '(') # )
+                                for child in c0.children[0].children:
+                                    assert(child.token.category == Token.Category.NAME)
+                                    node.type_args.append(child.token_str())
+                        else: # this is a tuple
+                            for child in node_expression.children:
+                                node.type_args.append(child.to_type_str())
                             node.type = '(' + ', '.join(node.type_args) + ')'
                             node.type_args.clear()
                     elif node.type == '.':
