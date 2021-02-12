@@ -9519,3 +9519,158 @@ struct CodeBlock3
         print(u"#. remainder #."_S.format(q, r));
     }
 } code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Pseudo-random_numbers/Combined_recursive_generator_MRG32k3a#Python
+from typing import List
+Int64 = int
+
+# Constants
+a1 = [Int64(0), 1403580, -810728]
+m1 = Int64(2)**32 - 209
+#
+a2 = [Int64(527612), 0, -1370589]
+m2 = Int64(2)**32 - 22853
+#
+d = m1 + 1
+
+class MRG32k3a:
+    x1 : List[Int64]
+    x2 : List[Int64]
+
+    def __init__(self, seed_state=123):
+        self.seed(seed_state)
+
+    def seed(self, seed_state : Int64):
+        assert Int64(0) <seed_state < d, "Out of Range 0 x < %d" % d
+        self.x1 = [Int64(seed_state), 0, 0]
+        self.x2 = [Int64(seed_state), 0, 0]
+
+    def next_int(self):
+        "return random int in range 0..d"
+        x1i = (sum(aa * xx  for aa, xx in zip(a1, self.x1)) % m1 + m1) % m1
+        x2i = (sum(aa * xx  for aa, xx in zip(a2, self.x2)) % m2 + m2) % m2
+        self.x1 = [x1i] + self.x1[:2]
+        self.x2 = [x2i] + self.x2[:2]
+        z = ((x1i - x2i) % m1 + m1) % m1
+        return z + 1
+
+    def  next_float(self):
+        "return random float between 0 and 1"
+        return float(self.next_int()) / d
+
+random_gen = MRG32k3a()
+random_gen.seed(1234567)
+for i in range(5):
+    print(random_gen.next_int())
+
+random_gen.seed(987654321)
+hist = {i:0 for i in range(5)}
+for i in range(100_000):
+    hist[int(random_gen.next_float() *5)] += 1
+print(hist)
+===
+V a1 = [Int64(0), 1403580, -810728]
+V m1 = Int64(2) ^ 32 - 209
+V a2 = [Int64(527612), 0, -1370589]
+V m2 = Int64(2) ^ 32 - 22853
+V d = m1 + 1
+
+T MRG32k3a
+   [Int64] x1
+   [Int64] x2
+
+   F (seed_state = 123)
+      .seed(seed_state)
+
+   F seed(Int64 seed_state)
+      assert(seed_state C Int64(0) <.< :d, ‘Out of Range 0 x < #.’.format(:d))
+      .x1 = [Int64(seed_state), 0, 0]
+      .x2 = [Int64(seed_state), 0, 0]
+
+   F next_int()
+      ‘return random int in range 0..d’
+      V x1i = (sum(zip(:a1, .x1).map((aa, xx) -> aa * xx)) % :m1 + :m1) % :m1
+      V x2i = (sum(zip(:a2, .x2).map((aa, xx) -> aa * xx)) % :m2 + :m2) % :m2
+      .x1 = [x1i] [+] .x1[0.<2]
+      .x2 = [x2i] [+] .x2[0.<2]
+      V z = ((x1i - x2i) % :m1 + :m1) % :m1
+      R z + 1
+
+   F next_float()
+      ‘return random float between 0 and 1’
+      R Float(.next_int()) / :d
+V random_gen = MRG32k3a()
+random_gen.seed(1234567)
+L(i) 5
+   print(random_gen.next_int())
+random_gen.seed(987654321)
+V hist = Dict(0.<5, i -> (i, 0))
+L(i) 100'000
+   hist[Int(random_gen.next_float() * 5)]++
+print(hist)
+===
+auto a1 = create_array<int64_t>({to_int64(0), 1403580, -810728});
+auto m1 = pow(to_int64(2), 32) - 209;
+auto a2 = create_array<int64_t>({to_int64(527612), 0, -1370589});
+auto m2 = pow(to_int64(2), 32) - 22853;
+auto d = m1 + 1;
+
+class MRG32k3a
+{
+public:
+    Array<int64_t> x1;
+    Array<int64_t> x2;
+
+    template <typename T1 = decltype(123)> MRG32k3a(const T1 &seed_state = 123)
+    {
+        seed(seed_state);
+    }
+
+    auto seed(const int64_t &seed_state)
+    {
+        assert(in(seed_state, range_ll(to_int64(0), ::d)), u"Out of Range 0 x < #."_S.format(::d));
+        x1 = create_array<int64_t>({to_int64(seed_state), 0, 0});
+        x2 = create_array<int64_t>({to_int64(seed_state), 0, 0});
+    }
+
+    auto next_int()
+    {
+        u"return random int in range 0..d"_S;
+        auto x1i = mod((mod(sum_map(zip(::a1, x1), [](const auto &aa, const auto &xx){return aa * xx;}), ::m1) + ::m1), ::m1);
+        auto x2i = mod((mod(sum_map(zip(::a2, x2), [](const auto &aa, const auto &xx){return aa * xx;}), ::m2) + ::m2), ::m2);
+        x1 = create_array({x1i}) + x1[range_el(0, 2)];
+        x2 = create_array({x2i}) + x2[range_el(0, 2)];
+        auto z = mod((mod((x1i - x2i), ::m1) + ::m1), ::m1);
+        return z + 1;
+    }
+
+    auto next_float()
+    {
+        u"return random float between 0 and 1"_S;
+        return to_float(next_int()) / ::d;
+    }
+};
+auto random_gen = MRG32k3a();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        random_gen.seed(1234567);
+        for (int i = 0; i < 5; i++)
+            print(random_gen.next_int());
+        random_gen.seed(987654321);
+    }
+} code_block_1;
+auto hist = create_dict(range_el(0, 5), [](const auto &i){return make_tuple(i, 0);});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (int i = 0; i < 100'000; i++)
+            hist[to_int(random_gen.next_float() * 5)]++;
+        print(hist);
+    }
+} code_block_2;

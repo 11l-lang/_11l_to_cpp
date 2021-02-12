@@ -88,7 +88,7 @@ const char16_t *read_string(const char16_t *s, const char16_t *end, String &str)
 			case 'u':
 				s++;
 				assert(s + 4 <= end);
-				str &= Char(to_int(String(s, 4), 16));
+				str &= Char((char16_t)to_int(String(s, 4), 16));
 				s += 4;
 				continue;
 			default: assert(false);

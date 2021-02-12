@@ -28,16 +28,16 @@ template <typename Type, size_t i, typename = std::enable_if_t<!is_tuple_or_vec<
 
 template <typename Type> class Array : public std::vector<Type>
 {
-	Array slice(int begin, int end, int step = 1) const
+	Array slice(Int begin, Int end, Int step = 1) const
 	{
 		Array r;
 		if (step > 0) {
 			r.reserve((end - begin + step - 1) / step);
-			for (int i = begin; i < end; i += step)
+			for (Int i = begin; i < end; i += step)
 				r.push_back(std::vector<Type>::at(i));
 		}
 		else
-			for (int i = begin; i > end; i += step)
+			for (Int i = begin; i > end; i += step)
 				r.push_back(std::vector<Type>::at(i));
 		return r;
 	}
@@ -149,65 +149,65 @@ public:
 		return r;
 	}
 
-	int len() const {return (int)std::vector<Type>::size();}
+	Int len() const {return (int)std::vector<Type>::size();}
 
-	friend Array operator*(Array a, int n)
+	friend Array operator*(Array a, Int n)
 	{
 		if (n < 1) // mimic Python's behavior in which [1] * 0 = [] and [1] * -1 = []
 			a.clear();
 		else {
-			int len = a.len();
+			Int len = a.len();
 			a.reserve(len * n);
-			for (int i = 1; i < n; i++)
-				for (int j = 0; j < len; j++)
+			for (Int i = 1; i < n; i++)
+				for (Int j = 0; j < len; j++)
 					a.append(a[j]);
 		}
 		return std::move(a);
 	}
-	friend Array operator*(int n, Array a)
+	friend Array operator*(Int n, Array a)
 	{
 		return std::move(a) * n;
 	}
-/*	friend Array operator*(const Array &a, int n)
+/*	friend Array operator*(const Array &a, Int n)
 	{
 		Array r;
 		if (n >= 1) { // mimic Python's behavior in which [1] * 0 = [] and [1] * -1 = []
-			int len = a.len();
+			Int len = a.len();
 			r.reserve(len * n);
-			for (int i = 0; i < n; i++)
-				for (int j = 0; j < len; j++)
+			for (Int i = 0; i < n; i++)
+				for (Int j = 0; j < len; j++)
 					r.append(a[j]);
 		}
 		return r;
 	}
-	friend Array operator*(int n, const Array &a)
+	friend Array operator*(Int n, const Array &a)
 	{
 		return a * n;
 	}*/
 
-	void operator*=(int n)
+	void operator*=(Int n)
 	{
 		if (n < 1)
 			clear();
 		else {
-			int l = len();
+			Int l = len();
 			reserve(l * n);
-			for (int i = 1; i < n; i++)
-				for (int j = 0; j < l; j++)
+			for (Int i = 1; i < n; i++)
+				for (Int j = 0; j < l; j++)
 					append(std::vector<Type>::data()[j]);
 		}
 	}
 
-	Array operator[](const Range<int, true,  true > range) const {return slice(max(range.b    , 0), min(range.e + 1, len()));}
-	Array operator[](const Range<int, true,  false> range) const {return slice(max(range.b    , 0), min(range.e    , len()));}
-	Array operator[](const Range<int, false, true > range) const {return slice(max(range.b + 1, 0), min(range.e + 1, len()));}
-	Array operator[](const Range<int, false, false> range) const {return slice(max(range.b + 1, 0), min(range.e    , len()));}
-	Array operator[](const RangeEI<int>             range) const {return slice(max(range.b    , 0),                  len() );}
-	Array operator[](const RangeWithStep<int, true,  true > range) const {return slice(max(range.b    , 0), min(range.e + 1, len()), range.step);}
-	Array operator[](const RangeWithStep<int, true,  false> range) const {return slice(max(range.b    , 0), min(range.e    , len()), range.step);}
-	Array operator[](const RangeWithStep<int, false, true > range) const {return slice(max(range.b + 1, 0), min(range.e + 1, len()), range.step);}
-	Array operator[](const RangeWithStep<int, false, false> range) const {return slice(max(range.b + 1, 0), min(range.e    , len()), range.step);}
-	Array operator[](const RangeEIWithStep<int>             range) const {return slice(max(range.b    , 0), range.step > 0 ? len() : -1, range.step);}
+	Array operator[](const Range<Int, true,  true > range) const {return slice(max(range.b    , Int(0)), min(range.e + 1, len()));}
+	Array operator[](const Range<Int, true,  false> range) const {return slice(max(range.b    , Int(0)), min(range.e    , len()));}
+	Array operator[](const Range<Int, false, true > range) const {return slice(max(range.b + 1, Int(0)), min(range.e + 1, len()));}
+	Array operator[](const Range<Int, false, false> range) const {return slice(max(range.b + 1, Int(0)), min(range.e    , len()));}
+	Array operator[](const RangeEI<Int>             range) const {return slice(max(range.b    , Int(0)),                  len() );}
+	Array operator[](const RangeWithStep<Int, true,  true > range) const {return slice(max(range.b    , Int(0)), min(range.e + 1, len()), range.step);}
+	Array operator[](const RangeWithStep<Int, true,  false> range) const {return slice(max(range.b    , Int(0)), min(range.e    , len()), range.step);}
+	Array operator[](const RangeWithStep<Int, false, true > range) const {return slice(max(range.b + 1, Int(0)), min(range.e + 1, len()), range.step);}
+	Array operator[](const RangeWithStep<Int, false, false> range) const {return slice(max(range.b + 1, Int(0)), min(range.e    , len()), range.step);}
+	Array operator[](const RangeEIWithStep<Int>             range) const {return slice(max(range.b    , Int(0)), range.step > 0 ? len() : -1, range.step);}
 
 	Array operator[](const range_e_llen    range) const {return (*this)[range_el(        range.b, len() + range.e)];}
 	Array operator[](const range_elen_elen range) const {return (*this)[range_ee(len() + range.b, len() + range.e)];}
@@ -215,31 +215,31 @@ public:
 	Array operator[](const range_elen_i    range) const {return (*this)[range_ei(len() + range.b)];}
 	Array operator[](const range_elen_i_wstep range) const {return (*this)[range_ei(len() + range.b).step(range.s)];}
 
-	decltype(std::declval<const std::vector<Type>>().at(0)) operator[](int i) const // decltype is needed for Array<bool> support
+	decltype(std::declval<const std::vector<Type>>().at(0)) operator[](Int i) const // decltype is needed for Array<bool> support
 	{
 		if (in(i, range_el(0, len())))
 			return std::vector<Type>::at(i);
 		throw IndexError(i);
 	}
 
-	decltype(std::declval<std::vector<Type>>().at(0)) operator[](int i) // decltype is needed for Array<bool> support
+	decltype(std::declval<std::vector<Type>>().at(0)) operator[](Int i) // decltype is needed for Array<bool> support
 	{
-		if (in(i, range_el(0, len())))
+		if (in(i, range_el(Int(0), len())))
 			return std::vector<Type>::at(i);
 		throw IndexError(i);
 	}
 
-	const Type &at_plus_len(int i) const
+	const Type &at_plus_len(Int i) const
 	{
 		return (*this)[len() + i];
 	}
 
-	Type &at_plus_len(int i)
+	Type &at_plus_len(Int i)
 	{
 		return (*this)[len() + i];
 	}
 
-	const Type &set(int i, const Type &v) // return `const Type&` for [https://www.rosettacode.org/wiki/Perlin_noise#Python]:‘p[256+i] = p[i] = permutation[i]’
+	const Type &set(Int i, const Type &v) // return `const Type&` for [https://www.rosettacode.org/wiki/Perlin_noise#Python]:‘p[256+i] = p[i] = permutation[i]’
 	{
 		if (in(i, range_el(0, len())))
 			return std::vector<Type>::at(i) = v;
@@ -247,7 +247,7 @@ public:
 			throw IndexError(i);
 	}
 
-	const Type &set_plus_len(int i, const Type &v)
+	const Type &set_plus_len(Int i, const Type &v)
 	{
 		return set(len() + i, v);
 	}
@@ -280,47 +280,47 @@ public:
 			append(el);
 	}
 
-	void insert(int index, const Type &v)
+	void insert(Int index, const Type &v)
 	{
 		std::vector<Type>::insert(begin() + index, v);
 	}
 
-	int index(const Type &v, int start = 0) const
+	Int index(const Type &v, Int start = 0) const
 	{
-		for (int i=start, l=len(); i<l; i++)
+		for (Int i=start, l=len(); i<l; i++)
 			if (std::vector<Type>::data()[i] == v) return i;
 		throw ValueError(v);
 	}
 
-	Nullable<int> find(const Type &val, int start = 0) const
+	Nullable<Int> find(const Type &val, Int start = 0) const
 	{
 		auto it = std::find(begin() + start, end(), val);
 		if (it != end())
-			return int(it - begin());
+			return Int(it - begin());
 		return nullptr;
 	}
 
-	Nullable<int> find(const decltype(make_tuple(std::declval<Type>(), std::declval<Type>())) &t, int start = 0) const
+	Nullable<Int> find(const decltype(make_tuple(std::declval<Type>(), std::declval<Type>())) &t, Int start = 0) const
 	{
 		for (auto it = begin() + start; it != end(); ++it) {
-			if (*it == _get<0>(t)) return int(it - begin());
-			if (*it == _get<1>(t)) return int(it - begin());
+			if (*it == _get<0>(t)) return Int(it - begin());
+			if (*it == _get<1>(t)) return Int(it - begin());
 		}
 		return nullptr;
 	}
 
-	template <typename Ty> Nullable<int> find(const Tuple<Ty, Ty> &t, int start = 0) const
+	template <typename Ty> Nullable<Int> find(const Tuple<Ty, Ty> &t, Int start = 0) const
 	{
 		return find(make_tuple((Type)_get<0>(t), (Type)_get<1>(t)), start);
 	}
-	template <typename Ty> Nullable<int> find(const Tvec<Ty, 2> &t, int start = 0) const
+	template <typename Ty> Nullable<Int> find(const Tvec<Ty, 2> &t, Int start = 0) const
 	{
 		return find(make_tuple((Type)_get<0>(t), (Type)_get<1>(t)), start);
 	}
 
-	int count(const Type &val) const
+	Int count(const Type &val) const
 	{
-		return (int)std::count(begin(), end(), val);
+		return (Int)std::count(begin(), end(), val);
 	}
 
 	void sort()
@@ -344,17 +344,17 @@ public:
 			std::sort(begin(), end(), std::greater<>()); // [https://stackoverflow.com/a/37757410/2692494 <- google:‘std sort reverse’]
 	}
 
-	void sort_range(const Range<int, true,  true> range) {std::sort(begin() + range.b, begin() + range.e + 1);}
-	void sort_range(const Range<int, true, false> range) {std::sort(begin() + range.b, begin() + range.e);}
+	void sort_range(const Range<Int, true,  true> range) {std::sort(begin() + range.b, begin() + range.e + 1);}
+	void sort_range(const Range<Int, true, false> range) {std::sort(begin() + range.b, begin() + range.e);}
 
 	void reverse()
 	{
 		std::reverse(begin(), end());
 	}
 
-	void reverse_range(const Range<int, true,  true> range) {std::reverse(begin() + range.b, begin() + range.e + 1);}
-	void reverse_range(const Range<int, true, false> range) {std::reverse(begin() + range.b, begin() + range.e);}
-	void reverse_range(const RangeEI<int>            range) {std::reverse(begin() + range.b, end());}
+	void reverse_range(const Range<Int, true,  true> range) {std::reverse(begin() + range.b, begin() + range.e + 1);}
+	void reverse_range(const Range<Int, true, false> range) {std::reverse(begin() + range.b, begin() + range.e);}
+	void reverse_range(const RangeEI<Int>            range) {std::reverse(begin() + range.b, end());}
 
 	bool next_permutation()
 	{
@@ -384,7 +384,7 @@ public:
 		return r;
 	}
 
-	Type pop(int i)
+	Type pop(Int i)
 	{
 		Type r(std::move((*this)[i]));
 		std::vector<Type>::erase(begin() + i);
@@ -399,7 +399,7 @@ public:
 		std::vector<Type>::erase(it);
 	}
 
-	void del(int start, int stop)
+	void del(Int start, Int stop)
 	{
 		std::vector<Type>::erase(begin() + start, begin() + stop);
 	}
@@ -407,7 +407,7 @@ public:
 	template <typename Ty> bool operator==(const Array<Ty> &arr) const
 	{
 		if (len() != arr.len()) return false;
-		for (int i=0, n=len(); i<n; i++)
+		for (Int i=0, n=len(); i<n; i++)
 			if (!(std::vector<Type>::at(i) == arr.at(i)))
 				return false;
 		return true;
@@ -535,11 +535,11 @@ template <typename Iterable> auto product(const Iterable &iterable)
 	return r;
 }
 
-template <typename Type> auto enumerate(const Array<Type> &arr, int start = 0)
+template <typename Type> auto enumerate(const Array<Type> &arr, Int start = 0)
 {
-	Array<decltype(make_tuple(int(), std::declval<Type>()))> r;
+	Array<decltype(make_tuple(Int(), std::declval<Type>()))> r;
 	r.reserve(arr.size());
-	int i = start;
+	Int i = start;
 	for (auto &&v : arr)
 		r.append(make_tuple(i++, v));
 	return r;
@@ -762,7 +762,7 @@ template <typename Iterable, typename Key> auto max_with_key(const Iterable &ite
 template <class T, size_t N> struct array_binder {
 	//const Array<T> &arr; // this does not work with `auto [a, b] = bind_array<2>(create_array({1, 2}));` because destructor of Array is called before `get()`
 	T a[N];
-	array_binder(const Array<T> &arr) { for (size_t i=0; i<N; i++) a[i] = arr[(int)i]; }
+	array_binder(const Array<T> &arr) { for (size_t i=0; i<N; i++) a[i] = arr[(Int)i]; }
 	template <size_t I> const T &get() const { return a[I]; }
 	template <size_t I>       T &get()       { return a[I]; }
 };

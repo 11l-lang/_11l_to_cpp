@@ -149,11 +149,11 @@ public:
 		if (keep_newline) {
 			if (r[r.len()-1].empty()) {
 				r.resize(r.len()-1);
-				for (int i=0, n=r.len(); i < n; i++)
+				for (Int i=0, n=r.len(); i < n; i++)
 					r[i] &= u'\n';
 			}
 			else
-				for (int i=0, n=r.len()-1; i < n; i++)
+				for (Int i=0, n=r.len()-1; i < n; i++)
 					r[i] &= u'\n';
 		}
 		else

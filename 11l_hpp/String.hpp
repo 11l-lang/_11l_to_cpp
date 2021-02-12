@@ -120,9 +120,9 @@ public:
 	{
 		assign(1, u'(');
 		for (int i = 0; i < dimension; i++) {
-			*this += String(v[i]);
+			*this &= String(v[i]);
 			if (i < dimension - 1)
-				*this += u", ";
+				*this &= u", ";
 		}
 		append(1, u')');
 	}
@@ -796,12 +796,6 @@ template <typename TInt> inline TInt to_int_t(const String &str)
 	return res * sign;
 }
 
-#ifdef INT_IS_INT64
-typedef int64_t Int;
-#else
-typedef int32_t Int;
-#endif
-
 inline Int to_int(const String &str)
 {
 	return to_int_t<Int>(str);
@@ -887,6 +881,11 @@ inline int64_t to_int64(double d)
 }
 
 inline int64_t to_int64(int i)
+{
+	return i;
+}
+
+inline int64_t to_int64(int64_t i)
 {
 	return i;
 }

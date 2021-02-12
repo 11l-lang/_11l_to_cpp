@@ -109,12 +109,18 @@ public:
 	      Ty &operator*()       {if (!has_value) throw NullPointerException(); return value;}
 };
 
+#ifdef INT_IS_INT64
+typedef int64_t Int;
+#else
+typedef int32_t Int;
+#endif
+
 class IndexError
 {
 public:
-	int index;
+	Int index;
 
-	IndexError(int index) : index(index) {}
+	IndexError(Int index) : index(index) {}
 };
 
 #include <memory>

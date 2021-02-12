@@ -213,7 +213,7 @@ template <typename KeyType, typename ValueType> Dict<KeyType, ValueType> create_
 }
 
 template <typename Iterable, typename Func,
-    typename = decltype(std::declval<Func>()(std::declval<decltype(*std::begin(Iterable()))>()))> auto create_dict(const Iterable &iterable, Func &&func)
+    typename = decltype(std::declval<Func>()(std::declval<decltype(*std::begin(std::declval<Iterable>()))>()))> auto create_dict(const Iterable &iterable, Func &&func)
 {
 	using Type = decltype(func(std::declval<decltype(*std::begin(iterable))>()));
 	Dict<std::tuple_element_t<0, Type>, std::tuple_element_t<1, Type>> r;
@@ -225,8 +225,8 @@ template <typename Iterable, typename Func,
 }
 
 template <typename Iterable, typename Func, typename Dummy = int, typename = decltype(
-    std::declval<Func>()(std::declval<decltype(tuple_element_f<std::remove_const_t<std::remove_reference_t<decltype(*std::begin(Iterable()))>>, 0>())>(),
-                         std::declval<decltype(tuple_element_f<std::remove_const_t<std::remove_reference_t<decltype(*std::begin(Iterable()))>>, 1>())>()))> auto create_dict(const Iterable &iterable, Func &&func)
+    std::declval<Func>()(std::declval<decltype(tuple_element_f<std::remove_const_t<std::remove_reference_t<decltype(*std::begin(std::declval<Iterable>()))>>, 0>())>(),
+                         std::declval<decltype(tuple_element_f<std::remove_const_t<std::remove_reference_t<decltype(*std::begin(std::declval<Iterable>()))>>, 1>())>()))> auto create_dict(const Iterable &iterable, Func &&func)
 {
 	using Ty = std::remove_const_t<std::remove_reference_t<decltype(*std::begin(iterable))>>;
 	using Type = decltype(func(std::declval<std::tuple_element_t<0, Ty>>(), std::declval<std::tuple_element_t<1, Ty>>()));
