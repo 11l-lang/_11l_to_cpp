@@ -8,7 +8,7 @@ union Value // inspired by [https://github.com/nlohmann/json/blob/develop/includ
 	Object *object;
 	Array  *array;
 	String *string;
-	int64_t number_int;
+	Int64 number_int;
 	double number_float;
 	bool boolean;
 };

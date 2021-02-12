@@ -1000,7 +1000,7 @@ class ASTExpression(ASTNodeWithExpression):
         return ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
 cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'перем':'auto',
-                     'Int':'int', 'Int64':'int64_t', 'UInt32':'uint32_t', 'Float':'double', 'Float32':'float', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte',
+                     'Int':'int', 'Int64':'Int64', 'UInt32':'uint32_t', 'Float':'double', 'Float32':'float', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
                      'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque'}
 
@@ -1010,7 +1010,7 @@ def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False
     t = cpp_type_from_11l.get(ty)
     if t is not None:
         if t == 'int' and int_is_int64:
-            return 'int64_t'
+            return 'Int64'
         return t
     else:
         if '.' in ty: # for `Token.Category category`

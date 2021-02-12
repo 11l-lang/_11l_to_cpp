@@ -62,7 +62,7 @@ public:
 		}
 	}
 
-	void serialize(int64_t &val)
+	void serialize(Int64 &val)
 	{
 		if (from_element_to_object) {
 			assert(element->value_type == ValueType::NUMBER_INT);

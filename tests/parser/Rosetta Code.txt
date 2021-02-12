@@ -2376,7 +2376,7 @@ template <typename T1> auto derangements(const T1 &n)
     return r;
 }
 
-template <typename T1> int64_t subfact(const T1 &n)
+template <typename T1> Int64 subfact(const T1 &n)
 {
     return n < 2 ? 1 - n : (subfact(n - 1) + subfact(n - 2)) * (n - 1);
 }

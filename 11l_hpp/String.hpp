@@ -83,7 +83,7 @@ public:
 	explicit String(char16_t c) {assign(int(c));}
 	explicit String(bool b) : basic_string(b ? u"1B" : u"0B", 2) {}
 	explicit String(int num) {assign(num);}
-	explicit String(int64_t num) {assign(num);}
+	explicit String(Int64 num) {assign(num);}
 	template <typename IntType> void assign_int(IntType num)
 	{
 		char16_t staticBuffer[30];
@@ -105,8 +105,8 @@ public:
 			*end=staticBuffer+len-1; start<end; start++, end--) std::swap(*start, *end);
 		assign(staticBuffer, len);
 	}
-	void assign(int     num) { assign_int(num); }
-	void assign(int64_t num) { assign_int(num); }
+	void assign(int   num) { assign_int(num); }
+	void assign(Int64 num) { assign_int(num); }
 	explicit String(float  num, int digits = 6, bool remove_trailing_zeroes = true) {assign(num, digits, remove_trailing_zeroes);}
 	explicit String(double num, int digits = 9, bool remove_trailing_zeroes = true) {assign(num, digits, remove_trailing_zeroes);}
 	explicit String(const char16_t *&s) : basic_string(s) {} // reference is needed here because otherwise String(const char16_t (&s)[N]) is never called (`String(u"str")` calls `String(const char16_t *s)`)
@@ -620,7 +620,7 @@ struct String::FormatArgument//Field
 	union {
 		const String *string;
 		double f;
-		int64_t i;
+		Int64 i;
 	};
 	String s;
 
@@ -629,7 +629,7 @@ struct String::FormatArgument//Field
 		type = Type::INTEGER;
 		i = n;
 	}
-	void set(int64_t n)
+	void set(Int64 n)
 	{
 		type = Type::INTEGER;
 		i = n;
@@ -801,9 +801,9 @@ inline Int to_int(const String &str)
 	return to_int_t<Int>(str);
 }
 
-inline int64_t to_int64(const String &str)
+inline Int64 to_int64(const String &str)
 {
-	return to_int_t<int64_t>(str);
+	return to_int_t<Int64>(str);
 }
 
 template <typename TInt> inline TInt to_int_t(const String &str, int base)
@@ -850,9 +850,9 @@ inline Int to_int(const String &str, int base)
 	return to_int_t<Int>(str, base);
 }
 
-inline int64_t to_int64(const String &str, int base)
+inline Int64 to_int64(const String &str, int base)
 {
-	return to_int_t<int64_t>(str, base);
+	return to_int_t<Int64>(str, base);
 }
 
 inline Int to_int(Char ch)
@@ -870,30 +870,30 @@ inline Int to_int(int i)
 	return i;
 }
 
-inline Int to_int(int64_t i)
+inline Int to_int(Int64 i)
 {
 	return (Int)i;
 }
 
-inline int64_t to_int64(double d)
+inline Int64 to_int64(double d)
 {
-	return (int64_t)d;
+	return (Int64)d;
 }
 
-inline int64_t to_int64(int i)
-{
-	return i;
-}
-
-inline int64_t to_int64(int64_t i)
+inline Int64 to_int64(int i)
 {
 	return i;
 }
 
-inline uint64_t to_uint64( int     i) { return i; }
-inline uint64_t to_uint64(uint32_t i) { return i; }
-inline uint64_t to_uint64( int64_t i) { return i; }
-inline uint64_t to_uint64(uint64_t i) { return i; }
+inline Int64 to_int64(Int64 i)
+{
+	return i;
+}
+
+inline UInt64 to_uint64( int     i) { return i; }
+inline UInt64 to_uint64(uint32_t i) { return i; }
+inline UInt64 to_uint64( Int64   i) { return i; }
+inline UInt64 to_uint64(UInt64   i) { return i; }
 
 inline uint32_t to_uint32(int i)
 {
@@ -910,10 +910,10 @@ inline double to_float(Char ch)
 	return ch.is_digit() ? ch.code - '0' : 0;
 }
 
-inline double to_float(int     i) { return i; }
-inline double to_float(int64_t i) { return (double)i; }
-inline double to_float(float   f) { return f; }
-inline double to_float(double  d) { return d; }
+inline double to_float(int    i) { return i; }
+inline double to_float(Int64  i) { return (double)i; }
+inline double to_float(float  f) { return f; }
+inline double to_float(double d) { return d; }
 
 inline double parse_float(const char16_t *s)
 {
@@ -975,14 +975,14 @@ inline String bin(int n)
 	return String(u'0'_C);
 }
 
-inline String bin(int64_t n)
+inline String bin(Int64 n)
 {
 	char16_t r[64], *p = r;
 	for (int i=0; i<64; i++, n <<= 1)
 		if (n & 0x8000'0000'0000'0000) {
 			*p++ = u'1';
 			for (i++, n <<= 1; i<64; i++, n <<= 1)
-				*p++ = u'0' + (uint64_t(n) >> 63);
+				*p++ = u'0' + (UInt64(n) >> 63);
 			return String(r, p - r);
 		}
 	return String(u'0'_C);

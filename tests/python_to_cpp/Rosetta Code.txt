@@ -3447,9 +3447,9 @@ struct CodeBlock1
     CodeBlock1()
     {
 
-        for (auto &&n : create_array<int64_t>({to_int64(627615), 39390, 588225, 393900588225, 55})) {
-            int64_t persistance;
-            int64_t root;
+        for (auto &&n : create_array<Int64>({to_int64(627615), 39390, 588225, 393900588225, 55})) {
+            Int64 persistance;
+            Int64 root;
             assign_from_tuple(persistance, root, digital_root(n));
             print(u"#12 has additive persistance #2 and digital root #.."_S.format(n, persistance, root));
         }
@@ -5146,7 +5146,7 @@ template <typename T1> auto pal2(const T1 &num)
 
 template <typename T1> auto pal_23(const T1 &limit)
 {
-    auto r = create_array<int64_t>({to_int64(0), 1});
+    auto r = create_array<Int64>({to_int64(0), 1});
     auto n = 1;
     while (true) {
         n++;
@@ -9610,28 +9610,28 @@ L(i) 100'000
    hist[Int(random_gen.next_float() * 5)]++
 print(hist)
 ===
-auto a1 = create_array<int64_t>({to_int64(0), 1403580, -810728});
+auto a1 = create_array<Int64>({to_int64(0), 1403580, -810728});
 auto m1 = pow(to_int64(2), 32) - 209;
-auto a2 = create_array<int64_t>({to_int64(527612), 0, -1370589});
+auto a2 = create_array<Int64>({to_int64(527612), 0, -1370589});
 auto m2 = pow(to_int64(2), 32) - 22853;
 auto d = m1 + 1;
 
 class MRG32k3a
 {
 public:
-    Array<int64_t> x1;
-    Array<int64_t> x2;
+    Array<Int64> x1;
+    Array<Int64> x2;
 
     template <typename T1 = decltype(123)> MRG32k3a(const T1 &seed_state = 123)
     {
         seed(seed_state);
     }
 
-    auto seed(const int64_t &seed_state)
+    auto seed(const Int64 &seed_state)
     {
         assert(in(seed_state, range_ll(to_int64(0), ::d)), u"Out of Range 0 x < #."_S.format(::d));
-        x1 = create_array<int64_t>({to_int64(seed_state), 0, 0});
-        x2 = create_array<int64_t>({to_int64(seed_state), 0, 0});
+        x1 = create_array<Int64>({to_int64(seed_state), 0, 0});
+        x2 = create_array<Int64>({to_int64(seed_state), 0, 0});
     }
 
     auto next_int()

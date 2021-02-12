@@ -66,10 +66,10 @@ inline unsigned long long rotr(unsigned long long value, int shift) {return (val
 inline int rotl(int value, int shift) {return _rotl(value, shift);}
 inline int rotr(int value, int shift) {return _rotr(value, shift);}
 
-inline int     ext_int(int     n) {return n;}
-inline int64_t ext_int(int64_t n) {return n;}
-inline int     ext_int(float   n) {return (int)n;}
-inline int64_t ext_int(double  n) {return (int64_t)n;}
+inline int   ext_int(int    n) {return n;}
+inline Int64 ext_int(Int64  n) {return n;}
+inline int   ext_int(float  n) {return (int)n;}
+inline Int64 ext_int(double n) {return (Int64)n;}
 
 template <typename Type1, typename Type2> inline auto idiv(Type1 a, Type2 b)
 {
@@ -77,26 +77,26 @@ template <typename Type1, typename Type2> inline auto idiv(Type1 a, Type2 b)
 }
 
 #ifdef __GNUC__
-inline int bsr(int     x) {return __builtin_clz  (x) ^ 31;}
-inline int bsr(int64_t x) {return __builtin_clzll(x) ^ 63;}
-inline int bsf(int     x) {return __builtin_ctz  (x);}
-inline int bsf(int64_t x) {return __builtin_ctzll(x);}
+inline int bsr(int   x) {return __builtin_clz  (x) ^ 31;}
+inline int bsr(Int64 x) {return __builtin_clzll(x) ^ 63;}
+inline int bsf(int   x) {return __builtin_ctz  (x);}
+inline int bsf(Int64 x) {return __builtin_ctzll(x);}
 #elif _MSC_VER
 inline int bsr(int x)     {unsigned long r; _BitScanReverse  (&r, x); return r;}
 inline int bsf(int x)     {unsigned long r; _BitScanForward  (&r, x); return r;}
 #ifdef _M_AMD64
-inline int bsr(int64_t x) {unsigned long r; _BitScanReverse64(&r, x); return r;}
-inline int bsf(int64_t x) {unsigned long r; _BitScanForward64(&r, x); return r;}
+inline int bsr(Int64 x) {unsigned long r; _BitScanReverse64(&r, x); return r;}
+inline int bsf(Int64 x) {unsigned long r; _BitScanForward64(&r, x); return r;}
 #endif
 #else
 #error Unsupported compiler
 #endif
 template <typename Ty> int bit_length(Ty x) {return x != 0 ? bsr(x) + 1 : 0;}
 
-auto divmod(int     x, int     y) {  div_t r =   div(x, y); return make_tuple(r.quot, r.rem);}
-auto divmod(int64_t x, int64_t y) {lldiv_t r = lldiv(x, y); return make_tuple(r.quot, r.rem);}
-auto divmod(int     x, int64_t y) {return divmod(int64_t(x), y);}
-auto divmod(int64_t x, int     y) {return divmod(x, int64_t(y));}
+auto divmod(int   x, int   y) {  div_t r =   div(x, y); return make_tuple(r.quot, r.rem);}
+auto divmod(Int64 x, Int64 y) {lldiv_t r = lldiv(x, y); return make_tuple(r.quot, r.rem);}
+auto divmod(int   x, Int64 y) {return divmod(Int64(x), y);}
+auto divmod(Int64 x, int   y) {return divmod(x, Int64(y));}
 
 template <typename Ty> Ty factorial(Ty n)
 {
@@ -110,9 +110,9 @@ int pow(int x, int y)
 {
 	return (int)pow(double(x), double(y));
 }
-int64_t pow(int64_t x, int     y) {return (int64_t)pow(double(x), double(y));}
-int64_t pow(int     x, int64_t y) {return (int64_t)pow(double(x), double(y));}
-int64_t pow(int64_t x, int64_t y) {return (int64_t)pow(double(x), double(y));}
+Int64 pow(Int64 x, int   y) {return (Int64)pow(double(x), double(y));}
+Int64 pow(int   x, Int64 y) {return (Int64)pow(double(x), double(y));}
+Int64 pow(Int64 x, Int64 y) {return (Int64)pow(double(x), double(y));}
 
 using std::swap;
 

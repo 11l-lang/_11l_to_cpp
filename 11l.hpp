@@ -109,8 +109,10 @@ public:
 	      Ty &operator*()       {if (!has_value) throw NullPointerException(); return value;}
 };
 
+typedef long long Int64; // this is needed because in GCC `int64_t` is `long` in 64-bit mode
+typedef unsigned long long UInt64;
 #ifdef INT_IS_INT64
-typedef int64_t Int;
+typedef Int64 Int;
 #else
 typedef int32_t Int;
 #endif
@@ -235,7 +237,7 @@ inline void print(int i, const String &end = u"\n", bool flush = false)
 		std::wcout.flush();
 }
 
-inline void print(int64_t i, const String &end = u"\n", bool flush = false)
+inline void print(Int64 i, const String &end = u"\n", bool flush = false)
 {
 	std::wcout << i << std::wstring(end.cbegin(), end.cend());
 	if (flush)
