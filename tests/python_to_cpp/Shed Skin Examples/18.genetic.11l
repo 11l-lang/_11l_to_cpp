@@ -80,7 +80,7 @@ T SGA
          V ind2 = random:choice(.population)
          V crossPosition = random:(0 .. .genomeSize - 1)
          L(j) 0 .. crossPosition
-            (ind1.genome[j], ind2.genome[j]) = (ind2.genome[j], ind1.genome[j])
+            swap(&ind1.genome[j], &ind2.genome[j])
 
    F showGeneration_bestIndFind()
       V fitnessTot = 0.0

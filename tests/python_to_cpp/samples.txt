@@ -1858,7 +1858,7 @@ V (a, b) = (1, 2)
 (V d, c) = (7, 8)
 V u = [1, 2]
 V (i, j) = (0, 1)
-(u[i], u[j]) = (u[j], u[i])
+swap(&u[i], &u[j])
 ===
 auto [a, b] = make_tuple(1, 2);
 
@@ -1880,7 +1880,7 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        assign_from_tuple(u[i], u[j], make_tuple(u[j], u[i]));
+        swap(u[i], u[j]);
     }
 } code_block_2;
 

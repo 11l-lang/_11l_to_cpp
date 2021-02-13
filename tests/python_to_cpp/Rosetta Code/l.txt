@@ -237,7 +237,7 @@ print(minimumEditDistance("rosettacode","raisethysword"))
 ===
 F minimumEditDistance(=s1, =s2)
    I s1.len > s2.len
-      (s1, s2) = (s2, s1)
+      swap(&s1, &s2)
    V distances = Array(0 .. s1.len)
    L(char2) s2
       V index2 = L.index
@@ -256,7 +256,7 @@ print(minimumEditDistance(‘rosettacode’, ‘raisethysword’))
 template <typename T1, typename T2> auto minimumEditDistance(T1 s1, T2 s2)
 {
     if (s1.len() > s2.len())
-        assign_from_tuple(s1, s2, make_tuple(s2, s1));
+        swap(s1, s2);
     auto distances = create_array(range_ee(0, s1.len()));
     {int Lindex = 0;
     for (auto &&char2 : s2) {

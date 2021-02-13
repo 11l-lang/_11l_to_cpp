@@ -215,7 +215,7 @@ template <typename T2, typename T3> auto reverse_range(Array<int> &list_, T2 low
 	)"_S;
     high--;
     while (low < high) {
-        assign_from_tuple(list_[low], list_[high], make_tuple(list_[high], list_[low]));
+        swap(list_[low], list_[high]);
         low++;
         high--;
     }

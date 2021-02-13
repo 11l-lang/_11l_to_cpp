@@ -146,8 +146,8 @@ F solve()
       L(i) j .< 9
          I i != j
             I lcount[i] < lcount[j]
-               (u[i], u[j]) = (u[j], u[i])
-               (lcount[i], lcount[j]) = (lcount[j], lcount[i])
+               swap(&u[i], &u[j])
+               swap(&lcount[i], &lcount[j])
    V l = genMoveList(puzzle, 0, 0)
    perm(&puzzle, 0, 0, l, &u)
 

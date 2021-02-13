@@ -189,7 +189,7 @@ F reverse_range([Int] &list_; =low, =high)
 	’
    high--
    L low < high
-      (list_[low], list_[high]) = (list_[high], list_[low])
+      swap(&list_[low], &list_[high])
       low++
       high--
 

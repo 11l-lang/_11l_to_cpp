@@ -218,7 +218,7 @@ F build_sems(=s)
       L(i) 0 .< s
          I i < lc | i > s - rc | (i == lc & j == lc)
             I !(i == 0 & j == lc)
-               (q[i][j], q[i][j + z]) = (q[i][j + z], q[i][j])
+               swap(&q[i][j], &q[i][j + z])
    R (q, s)
 
 F display(q)
@@ -288,7 +288,7 @@ template <typename T1> auto build_sems(T1 s)
         for (auto i : range_el(0, s))
             if (i < lc || i > s - rc || (i == lc && j == lc)) {
                 if (!(i == 0 && j == lc))
-                    assign_from_tuple(q[i][j], q[i][j + z], make_tuple(q[i][j + z], q[i][j]));
+                    swap(q[i][j], q[i][j + z]);
             }
     return make_tuple(q, s);
 }

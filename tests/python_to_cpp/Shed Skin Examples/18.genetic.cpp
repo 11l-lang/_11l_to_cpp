@@ -109,7 +109,7 @@ public:
             auto ind2 = randomns::choice(population);
             auto crossPosition = randomns::_(range_ee(0, genomeSize - 1));
             for (auto j : range_ee(0, crossPosition))
-                assign_from_tuple(ind1.genome[j], ind2.genome[j], make_tuple(ind2.genome[j], ind1.genome[j]));
+                swap(ind1.genome[j], ind2.genome[j]);
         }
     }
 

@@ -184,8 +184,8 @@ auto solve()
         for (auto i : range_el(j, 9))
             if (i != j) {
                 if (lcount[i] < lcount[j]) {
-                    assign_from_tuple(u[i], u[j], make_tuple(u[j], u[i]));
-                    assign_from_tuple(lcount[i], lcount[j], make_tuple(lcount[j], lcount[i]));
+                    swap(u[i], u[j]);
+                    swap(lcount[i], lcount[j]);
                 }
             }
     auto l = genMoveList(puzzle, 0, 0);

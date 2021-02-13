@@ -7299,7 +7299,7 @@ F jacobi(=a, =n)
          V n_mod_8 = n % 8
          I n_mod_8 C (3, 5)
             result = -result
-      (a, n) = (n, a)
+      swap(&a, &n)
       I a % 4 == 3 & n % 4 == 3
          result = -result
       a %= n
@@ -7336,7 +7336,7 @@ template <typename T1, typename T2> auto jacobi(T1 a, T2 n)
             if (in(n_mod_8, make_tuple(3, 5)))
                 result = -result;
         }
-        assign_from_tuple(a, n, make_tuple(n, a));
+        swap(a, n);
         if (mod(a, 4) == 3 && mod(n, 4) == 3)
             result = -result;
         a %= n;
@@ -7434,7 +7434,7 @@ V MISSPELLINGS = [‘accomodate’, ‘definately’, ‘goverment’]
 
 F jaro_winkler_distance(=st1, =st2)
    I st1.len < st2.len
-      (st1, st2) = (st2, st1)
+      swap(&st1, &st2)
    V len1 = st1.len
    V len2 = st2.len
    I len2 == 0
@@ -7482,7 +7482,7 @@ auto MISSPELLINGS = create_array({u"accomodate"_S, u"definately"_S, u"goverment"
 template <typename T1, typename T2> auto jaro_winkler_distance(T1 st1, T2 st2)
 {
     if (st1.len() < st2.len())
-        assign_from_tuple(st1, st2, make_tuple(st2, st1));
+        swap(st1, st2);
     auto len1 = st1.len();
     auto len2 = st2.len();
     if (len2 == 0)
@@ -9783,5 +9783,144 @@ struct CodeBlock1
         print(my_queue.pop_left());
         print(my_queue.pop_left());
         print(my_queue.pop_left());
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Quickselect_algorithm#Python
+def partition(vector : list, left, right, pivotIndex):
+    pivotValue = vector[pivotIndex]
+    (vector[pivotIndex], vector[right]) = (vector[right], vector[pivotIndex])  # Move pivot to end
+    storeIndex = left
+    for i in range(left, right):
+        if vector[i] < pivotValue:
+            (vector[storeIndex], vector[i]) = (vector[i], vector[storeIndex])
+            storeIndex += 1
+    (vector[right], vector[storeIndex]) = (vector[storeIndex], vector[right])  # Move pivot to its final place
+    return storeIndex
+
+def _select(vector : list, left, right, k):
+    "Returns the k-th smallest, (k >= 0), element of vector within vector[left:right+1] inclusive."
+    while True:
+        pivotIndex = (left + right) // 2     # select pivotIndex between left and right
+        pivotNewIndex = partition(vector, left, right, pivotIndex)
+        pivotDist = pivotNewIndex - left
+        if pivotDist == k:
+            return vector[pivotNewIndex]
+        elif k < pivotDist:
+            right = pivotNewIndex - 1
+        else:
+            k -= pivotDist + 1
+            left = pivotNewIndex + 1
+
+def select(vector : list, k):
+    """
+    Returns the k-th smallest, (k >= 0), element of vector within vector[left:right+1].
+    left, right default to (0, len(vector) - 1) if omitted
+    """
+    left = 0
+    lv1 = len(vector) - 1
+    right = lv1
+    assert len(vector) != 0 and k >= 0, "Either null vector or k < 0 "
+    assert 0 <= left <= lv1, "left is out of range"
+    assert left <= right <= lv1, "right is out of range"
+    return _select(vector, left, right, k)
+
+v = [9, 8, 7, 6, 5, 0, 1, 2, 3, 4]
+print([select(v, i) for i in range(10)])
+===
+F partition(&vector, left, right, pivotIndex)
+   V pivotValue = vector[pivotIndex]
+   swap(&vector[pivotIndex], &vector[right])
+   V storeIndex = left
+   L(i) left .< right
+      I vector[i] < pivotValue
+         swap(&vector[storeIndex], &vector[i])
+         storeIndex++
+   swap(&vector[right], &vector[storeIndex])
+   R storeIndex
+
+F _select(&vector, =left, =right, =k)
+   ‘Returns the k-th smallest, (k >= 0), element of vector within vector[left:right+1] inclusive.’
+   L
+      V pivotIndex = (left + right) I/ 2
+      V pivotNewIndex = partition(&vector, left, right, pivotIndex)
+      V pivotDist = pivotNewIndex - left
+      I pivotDist == k
+         R vector[pivotNewIndex]
+      E I k < pivotDist
+         right = pivotNewIndex - 1
+      E
+         k -= pivotDist + 1
+         left = pivotNewIndex + 1
+
+F select(&vector, k)
+   ‘
+    Returns the k-th smallest, (k >= 0), element of vector within vector[left:right+1].
+    left, right default to (0, len(vector) - 1) if omitted
+    ’
+   V left = 0
+   V lv1 = vector.len - 1
+   V right = lv1
+   assert(!vector.empty & k >= 0, ‘Either null vector or k < 0 ’)
+   assert(left C 0 .. lv1, ‘left is out of range’)
+   assert(right C left .. lv1, ‘right is out of range’)
+   R _select(&vector, left, right, k)
+V v = [9, 8, 7, 6, 5, 0, 1, 2, 3, 4]
+print((0.<10).map(i -> select(&:v, i)))
+===
+template <typename T1, typename T2, typename T3, typename T4> auto partition(T1 &vector, const T2 &left, const T3 &right, const T4 &pivotIndex)
+{
+    auto pivotValue = vector[pivotIndex];
+    swap(vector[pivotIndex], vector[right]);
+    auto storeIndex = left;
+    for (auto i : range_el(left, right))
+        if (vector[i] < pivotValue) {
+            swap(vector[storeIndex], vector[i]);
+            storeIndex++;
+        }
+    swap(vector[right], vector[storeIndex]);
+    return storeIndex;
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto _select(T1 &vector, T2 left, T3 right, T4 k)
+{
+    u"Returns the k-th smallest, (k >= 0), element of vector within vector[left:right+1] inclusive."_S;
+    while (true) {
+        auto pivotIndex = idiv((left + right), 2);
+        auto pivotNewIndex = partition(vector, left, right, pivotIndex);
+        auto pivotDist = pivotNewIndex - left;
+        if (pivotDist == k)
+            return vector[pivotNewIndex];
+        else if (k < pivotDist)
+            right = pivotNewIndex - 1;
+        else {
+            k -= pivotDist + 1;
+            left = pivotNewIndex + 1;
+        }
+    }
+}
+
+template <typename T1, typename T2> auto select(T1 &vector, const T2 &k)
+{
+    uR"(
+    Returns the k-th smallest, (k >= 0), element of vector within vector[left:right+1].
+    left, right default to (0, len(vector) - 1) if omitted
+    )"_S;
+    auto left = 0;
+    auto lv1 = vector.len() - 1;
+    auto right = lv1;
+    assert(!vector.empty() && k >= 0, u"Either null vector or k < 0 "_S);
+    assert(in(left, range_ee(0, lv1)), u"left is out of range"_S);
+    assert(in(right, range_ee(left, lv1)), u"right is out of range"_S);
+    return _select(vector, left, right, k);
+}
+auto v = create_array({9, 8, 7, 6, 5, 0, 1, 2, 3, 4});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(range_el(0, 10).map([](const auto &i){return select(::v, i);}));
     }
 } code_block_1;
