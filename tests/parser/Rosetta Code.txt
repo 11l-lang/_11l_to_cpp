@@ -2426,7 +2426,7 @@ L 5
 
 random_gen.seed(987654321, 1)
 V hist = Dict(0.<5, i -> (i, 0))
-L(i) 100'000
+L 100'000
    hist[Int(random_gen.next_float() * 5)]++
 print(hist)
 ===
@@ -2476,7 +2476,84 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        for (int i = 0; i < 100'000; i++)
+        for (int Lindex = 0; Lindex < 100'000; Lindex++)
+            hist[to_int(random_gen.next_float() * 5)]++;
+        print(hist);
+    }
+} code_block_2;
+
+
+// https://www.rosettacode.org/wiki/Pseudo-random_numbers/Splitmix64#Python
+T Splitmix64
+   UInt64 state
+
+   F seed(seed_state)
+      .state = seed_state
+
+   F next_int()
+      .state += 9E37'79B9'7F4A'7C15
+      V z = .state
+      z = (z (+) (z >> 30)) * BF58'476D'1CE4'E5B9
+      z = (z (+) (z >> 27)) * 94D0'49BB'1331'11EB
+      R z (+) (z >> 31)
+
+   F next_float()
+      R Float(.next_int()) / 2.0^64
+
+V random_gen = Splitmix64()
+random_gen.seed(1234567)
+L 5
+   print(random_gen.next_int())
+
+random_gen.seed(987654321)
+V hist = Dict(0.<5, i -> (i, 0))
+L 100'000
+   hist[Int(random_gen.next_float() * 5)]++
+print(hist)
+===
+class Splitmix64
+{
+public:
+    UInt64 state;
+
+    template <typename T1> auto seed(const T1 &seed_state)
+    {
+        state = seed_state;
+    }
+
+    auto next_int()
+    {
+        state += 0x9E37'79B9'7F4A'7C15;
+        auto z = state;
+        z = (z ^ (z >> 30)) * 0xBF58'476D'1CE4'E5B9;
+        z = (z ^ (z >> 27)) * 0x94D0'49BB'1331'11EB;
+        return z ^ (z >> 31);
+    }
+
+    auto next_float()
+    {
+        return to_float(next_int()) / pow(2.0, 64);
+    }
+};
+auto random_gen = Splitmix64();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        random_gen.seed(1234567);
+        for (int Lindex = 0; Lindex < 5; Lindex++)
+            print(random_gen.next_int());
+        random_gen.seed(987654321);
+    }
+} code_block_1;
+auto hist = create_dict(range_el(0, 5), [](const auto &i){return make_tuple(i, 0);});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (int Lindex = 0; Lindex < 100'000; Lindex++)
             hist[to_int(random_gen.next_float() * 5)]++;
         print(hist);
     }

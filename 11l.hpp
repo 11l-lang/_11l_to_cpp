@@ -251,6 +251,13 @@ inline void print(Int64 i, const String &end = u"\n", bool flush = false)
 		std::wcout.flush();
 }
 
+inline void print(UInt64 i, const String &end = u"\n", bool flush = false)
+{
+	std::wcout << i << std::wstring(end.cbegin(), end.cend());
+	if (flush)
+		std::wcout.flush();
+}
+
 inline void print(double i, const String &end = u"\n", bool flush = false)
 {
 	std::wcout << i << std::wstring(end.cbegin(), end.cend());
