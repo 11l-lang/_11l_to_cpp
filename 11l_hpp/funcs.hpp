@@ -106,6 +106,13 @@ template <typename Ty> Ty factorial(Ty n)
 	return r;
 }
 
+template <typename Ty> Ty gcd(Ty a, Ty b)
+{
+	while (b != 0)
+		std::tie(a, b) = std::make_tuple(b, a % b);
+	return a;
+}
+
 int pow(int x, int y)
 {
 	return (int)pow(double(x), double(y));

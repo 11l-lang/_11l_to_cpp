@@ -2558,3 +2558,153 @@ struct CodeBlock2
         print(hist);
     }
 } code_block_2;
+
+
+// https://www.rosettacode.org/wiki/Pseudo-random_numbers/Xorshift_star#Python
+T XorShiftStar
+   UInt64 state
+
+   F seed(seed_state)
+      .state = seed_state
+
+   F next_int() -> UInt32
+      V x = .state
+      x (+)= x >> 12
+      x (+)= x << 25
+      x (+)= x >> 27
+      .state = x
+      R (x * 2545'F491'4F6C'DD1D) >> 32
+
+   F next_float()
+      R Float(.next_int()) / 2.0^32
+
+V random_gen = XorShiftStar()
+random_gen.seed(1234567)
+L 5
+   print(random_gen.next_int())
+
+random_gen.seed(987654321)
+V hist = Dict(0.<5, i -> (i, 0))
+L 100'000
+   hist[Int(random_gen.next_float() * 5)]++
+print(hist)
+===
+class XorShiftStar
+{
+public:
+    UInt64 state;
+
+    template <typename T1> auto seed(const T1 &seed_state)
+    {
+        state = seed_state;
+    }
+
+    uint32_t next_int()
+    {
+        auto x = state;
+        x ^= x >> 12;
+        x ^= x << 25;
+        x ^= x >> 27;
+        state = x;
+        return (x * 0x2545'F491'4F6C'DD1D) >> 32;
+    }
+
+    auto next_float()
+    {
+        return to_float(next_int()) / pow(2.0, 32);
+    }
+};
+auto random_gen = XorShiftStar();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        random_gen.seed(1234567);
+        for (int Lindex = 0; Lindex < 5; Lindex++)
+            print(random_gen.next_int());
+        random_gen.seed(987654321);
+    }
+} code_block_1;
+auto hist = create_dict(range_el(0, 5), [](const auto &i){return make_tuple(i, 0);});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (int Lindex = 0; Lindex < 100'000; Lindex++)
+            hist[to_int(random_gen.next_float() * 5)]++;
+        print(hist);
+    }
+} code_block_2;
+
+
+// https://www.rosettacode.org/wiki/Pythagorean_triples#D
+Int64 nTriples, nPrimitives, limit
+
+F countTriples(Int64 =x, =y, =z)
+   L
+      V p = x + y + z
+      I p > :limit
+         R
+
+      :nPrimitives++
+      :nTriples += :limit I/ p
+
+      V t0 = x - 2 * y + 2 * z
+      V t1 = 2 * x - y + 2 * z
+      V t2 = t1 - y + z
+      countTriples(t0, t1, t2)
+
+      t0 += 4 * y
+      t1 += 2 * y
+      t2 += 4 * y
+      countTriples(t0, t1, t2)
+
+      z = t2 - 4 * x
+      y = t1 - 4 * x
+      x = t0 - 2 * x
+
+L(p) 1..8
+   limit = Int64(10) ^ p
+   nTriples = nPrimitives = 0
+   countTriples(3, 4, 5)
+   print(‘Up to #11: #11 triples, #9 primitives.’.format(limit, nTriples, nPrimitives))
+===
+Int64 nTriples, nPrimitives, limit;
+
+auto countTriples(Int64 x, Int64 y, Int64 z)
+{
+    while (true) {
+        auto p = x + y + z;
+        if (p > ::limit)
+            return;
+        ::nPrimitives++;
+        ::nTriples += idiv(::limit, p);
+        auto t0 = x - 2 * y + 2 * z;
+        auto t1 = 2 * x - y + 2 * z;
+        auto t2 = t1 - y + z;
+        countTriples(t0, t1, t2);
+        t0 += 4 * y;
+        t1 += 2 * y;
+        t2 += 4 * y;
+        countTriples(t0, t1, t2);
+        z = t2 - 4 * x;
+        y = t1 - 4 * x;
+        x = t0 - 2 * x;
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto p : range_ee(1, 8)) {
+            limit = pow(to_int64(10), p);
+            nTriples = nPrimitives = 0;
+            countTriples(3, 4, 5);
+            print(u"Up to #11: #11 triples, #9 primitives."_S.format(limit, nTriples, nPrimitives));
+        }
+    }
+} code_block_1;

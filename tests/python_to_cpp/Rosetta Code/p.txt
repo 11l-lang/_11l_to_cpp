@@ -1,0 +1,1602 @@
+# https://www.rosettacode.org/wiki/Pangram_checker
+def is_pangram(sentence):
+    return len(set(ch for ch in sentence.lower() if 'a' <= ch <= 'z')) == 26
+
+for sentence in ['The quick brown fox jumps over the lazy dog.',
+                 'The quick brown fox jumped over the lazy dog.']:
+    print("'%s' is %sa pangram" % (sentence, 'not ' * (not is_pangram(sentence))))
+===
+F is_pangram(sentence)
+   R Set(sentence.lowercase().filter(ch -> ch C ‘a’..‘z’)).len == 26
+
+L(sentence) [‘The quick brown fox jumps over the lazy dog.’, ‘The quick brown fox jumped over the lazy dog.’]
+   print(‘'#.' is #.a pangram’.format(sentence, ‘not ’ * (!is_pangram(sentence))))
+===
+template <typename T1> auto is_pangram(const T1 &sentence)
+{
+    return create_set(sentence.lowercase().filter([](const auto &ch){return in(ch, range_ee(u'a'_C, u'z'_C));})).len() == 26;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&sentence : create_array({u"The quick brown fox jumps over the lazy dog."_S, u"The quick brown fox jumped over the lazy dog."_S}))
+            print(u"'#.' is #.a pangram"_S.format(sentence, u"not "_S * (!is_pangram(sentence))));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Parsing/Shunting-yard_algorithm#Java
+import re
+
+def infix_to_postfix(infix):
+    ops = '-+/*^'
+    sb = ''
+    s : List[int] = []
+
+    for token in re.split(r'\s', infix):
+        if len(token) == 0:
+            continue
+
+        c = token[0]
+        idx = ops.find(c)
+        if idx != -1:
+            if len(s) == 0:
+                s.append(idx)
+            else:
+                while len(s) != 0:
+                    prec2 = s[-1] // 2
+                    prec1 = idx // 2
+                    if prec2 > prec1 or (prec2 == prec1 and c != '^'):
+                        sb += ops[s.pop()] + ' '
+                    else:
+                        break
+                s.append(idx)
+
+        elif c == '(': # )
+            s.append(-2) # -2 stands for '('
+
+        elif c == ')':
+            while s[-1] != -2:
+                sb += ops[s.pop()] + ' '
+            s.pop()
+
+        else:
+            sb += token + ' '
+
+    while len(s) != 0:
+        sb += ops[s.pop()] + ' '
+
+    return sb
+
+infix = '3 + 4 * 2 / ( 1 - 5 ) ^ 2 ^ 3'
+print('infix:   ' + infix)
+print('postfix: ' + infix_to_postfix(infix))
+===
+//import re
+
+F infix_to_postfix(infix)
+   V ops = ‘-+/*^’
+   V sb = ‘’
+   [Int] s
+
+   L(token) infix.split(re:‘\s’)
+      I token.empty
+         L.continue
+      V c = token[0]
+      V idx = ops.findi(c)
+      I idx != -1
+         I s.empty
+            s.append(idx)
+         E
+            L !s.empty
+               V prec2 = s.last I/ 2
+               V prec1 = idx I/ 2
+               I prec2 > prec1 | (prec2 == prec1 & c != ‘^’)
+                  sb ‘’= ops[s.pop()]‘ ’
+               E
+                  L.break
+            s.append(idx)
+
+      E I c == ‘(’
+         s.append(-2)
+
+      E I c == ‘)’
+         L s.last != -2
+            sb ‘’= ops[s.pop()]‘ ’
+         s.pop()
+
+      E
+         sb ‘’= token‘ ’
+
+   L !s.empty
+      sb ‘’= ops[s.pop()]‘ ’
+   R sb
+V infix = ‘3 + 4 * 2 / ( 1 - 5 ) ^ 2 ^ 3’
+print(‘infix:   ’infix)
+print(‘postfix: ’infix_to_postfix(infix))
+===
+template <typename T1> auto infix_to_postfix(const T1 &infix)
+{
+    auto ops = u"-+/*^"_S;
+    auto sb = u""_S;
+    Array<int> s;
+
+    for (auto &&token : infix.split(re::_(uR"(\s)"_S))) {
+        if (token.empty())
+            continue;
+        auto c = _get<0>(token);
+        auto idx = ops.findi(c);
+        if (idx != -1) {
+            if (s.empty())
+                s.append(idx);
+            else {
+                while (!s.empty()) {
+                    auto prec2 = idiv(s.last(), 2);
+                    auto prec1 = idiv(idx, 2);
+                    if (prec2 > prec1 || (prec2 == prec1 && c != u'^'))
+                        sb &= ops[s.pop()] & u" "_S;
+                    else
+                        break;
+                }
+                s.append(idx);
+            }
+        }
+        else if (c == u'(')
+            s.append(-2);
+
+        else if (c == u')') {
+            while (s.last() != -2)
+                sb &= ops[s.pop()] & u" "_S;
+            s.pop();
+        }
+        else
+            sb &= token & u" "_S;
+    }
+    while (!s.empty())
+        sb &= ops[s.pop()] & u" "_S;
+    return sb;
+}
+auto infix = u"3 + 4 * 2 / ( 1 - 5 ) ^ 2 ^ 3"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"infix:   "_S & infix);
+        print(u"postfix: "_S & infix_to_postfix(infix));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Parsing/RPN_to_infix_conversion#Java
+import re
+
+ops = '-+/*^'
+
+def postfix_to_infix(postfix):
+    class Expression:
+        op : str
+        ex : str
+        prec = 3
+
+        def __init__(self, e1 : str, e2 : str = '', o : str = ''):
+            if o == '':
+                self.ex = e1
+            else:
+                self.ex = e1 + ' ' + o + ' ' + e2
+                self.op = o
+                self.prec = ops.index(o) // 2
+
+        def __str__(self):
+            return self.ex
+
+        def __repr__(self):
+            return self.ex
+
+    expr : List[Expression] = []
+
+    for token in re.split(r'\s+', postfix):
+        c = token[0]
+        idx = ops.find(c)
+        if idx != -1:# and len(token) == 1:
+            r = expr.pop()
+            l = expr.pop()
+            opPrec = idx // 2
+
+            if l.prec < opPrec or (l.prec == opPrec and c == '^'):
+                l.ex = '(' + l.ex + ')'
+
+            if r.prec < opPrec or (r.prec == opPrec and c != '^'):
+                r.ex = '(' + r.ex + ')'
+
+            expr.append(Expression(l.ex, r.ex, token))
+
+        else:
+            expr.append(Expression(token))
+
+        print(token + ' -> ' + str(expr))
+
+    assert(len(expr) == 1)
+    return expr[0].ex
+
+for e in ['3 4 2 * 1 5 - 2 3 ^ ^ / +',
+          '1 2 + 3 4 + ^ 5 6 + ^']:
+    print('Postfix : ' + e)
+    print('Infix : ' + postfix_to_infix(e))
+    print()
+===
+//import re
+V ops = ‘-+/*^’
+
+F postfix_to_infix(postfix)
+   T Expression
+      String op
+      String ex
+      prec = 3
+
+      F (String e1, String e2 = ‘’, String o = ‘’)
+         I o == ‘’
+            .ex = e1
+         E
+            .ex = e1‘ ’o‘ ’e2
+            .op = o
+            .prec = :ops.index(o) I/ 2
+
+      F String()
+         R .ex
+
+      F __repr__()
+         R .ex
+   [Expression] expr
+
+   L(token) postfix.split(re:‘\s+’)
+      V c = token[0]
+      V idx = :ops.findi(c)
+      I idx != -1
+         V r = expr.pop()
+         V l = expr.pop()
+         V opPrec = idx I/ 2
+
+         I l.prec < opPrec | (l.prec == opPrec & c == ‘^’)
+            l.ex = ‘(’l.ex‘)’
+
+         I r.prec < opPrec | (r.prec == opPrec & c != ‘^’)
+            r.ex = ‘(’r.ex‘)’
+         expr.append(Expression(l.ex, r.ex, token))
+
+      E
+         expr.append(Expression(token))
+      print(token‘ -> ’String(expr))
+   assert(expr.len == 1)
+   R expr[0].ex
+
+L(e) [‘3 4 2 * 1 5 - 2 3 ^ ^ / +’, ‘1 2 + 3 4 + ^ 5 6 + ^’]
+   print(‘Postfix : ’e)
+   print(‘Infix : ’postfix_to_infix(e))
+   print()
+===
+auto ops = u"-+/*^"_S;
+
+template <typename T1> auto postfix_to_infix(const T1 &postfix)
+{
+    class Expression
+    {
+    public:
+        String op;
+        String ex;
+        decltype(3) prec = 3;
+
+        Expression(const String &e1, const String &e2 = u""_S, const String &o = u""_S)
+        {
+            if (o == u"")
+                ex = e1;
+            else {
+                ex = e1 & u" "_S & o & u" "_S & e2;
+                op = o;
+                prec = idiv(::ops.index(o), 2);
+            }
+        }
+
+        operator String() const
+        {
+            return ex;
+        }
+
+        auto __repr__()
+        {
+            return ex;
+        }
+    };
+    Array<Expression> expr;
+
+    for (auto &&token : postfix.split(re::_(uR"(\s+)"_S))) {
+        auto c = _get<0>(token);
+        auto idx = ::ops.findi(c);
+        if (idx != -1) {
+            auto r = expr.pop();
+            auto l = expr.pop();
+            auto opPrec = idiv(idx, 2);
+            if (l.prec < opPrec || (l.prec == opPrec && c == u'^'))
+                l.ex = u"("_S & l.ex & u")"_S;
+            if (r.prec < opPrec || (r.prec == opPrec && c != u'^'))
+                r.ex = u"("_S & r.ex & u")"_S;
+            expr.append(Expression(l.ex, r.ex, token));
+        }
+        else
+            expr.append(Expression(token));
+        print(token & u" -> "_S & String(expr));
+    }
+    assert(expr.len() == 1);
+    return _get<0>(expr).ex;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&e : create_array({u"3 4 2 * 1 5 - 2 3 ^ ^ / +"_S, u"1 2 + 3 4 + ^ 5 6 + ^"_S})) {
+            print(u"Postfix : "_S & e);
+            print(u"Infix : "_S & postfix_to_infix(e));
+            print();
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Pascal_matrix_generation#Python
+def pascal_upp(n):
+    s = [[0] * n for _ in range(n)]
+    s[0] = [1] * n
+    for i in range(1, n):
+        for j in range(i, n):
+            s[i][j] = s[i-1][j-1] + s[i][j-1]
+    return s
+
+def pascal_low(n):
+    # transpose of pascal_upp(n)
+    upp = pascal_upp(n)
+    s = [[0] * n for _ in range(n)]
+    for x in range(n):
+        for y in range(n):
+            s[y][x] = upp[x][y]
+    return s
+
+def pascal_sym(n):
+    s = [[1] * n for _ in range(n)]
+    for i in range(1, n):
+        for j in range(1, n):
+            s[i][j] = s[i-1][j] + s[i][j-1]
+    return s
+
+def pp(mat):
+    print('[' + ",\n ".join(map(str, mat)) + ']')
+
+n = 5
+print("Upper:")
+pp(pascal_upp(n))
+print("\nLower:")
+pp(pascal_low(n))
+print("\nSymmetric:")
+pp(pascal_sym(n))
+===
+F pascal_upp(n)
+   V s = (0 .< n).map(_ -> [0] * @n)
+   s[0] = [1] * n
+   L(i) 1 .< n
+      L(j) i .< n
+         s[i][j] = s[i - 1][j - 1] + s[i][j - 1]
+   R s
+
+F pascal_low(n)
+   V upp = pascal_upp(n)
+   V s = (0 .< n).map(_ -> [0] * @n)
+   L(x) 0 .< n
+      L(y) 0 .< n
+         s[y][x] = upp[x][y]
+   R s
+
+F pascal_sym(n)
+   V s = (0 .< n).map(_ -> [1] * @n)
+   L(i) 1 .< n
+      L(j) 1 .< n
+         s[i][j] = s[i - 1][j] + s[i][j - 1]
+   R s
+
+F pp(mat)
+   print(‘[’mat.map(String).join(",\n ")‘]’)
+V n = 5
+print(‘Upper:’)
+pp(pascal_upp(n))
+print("\nLower:")
+pp(pascal_low(n))
+print("\nSymmetric:")
+pp(pascal_sym(n))
+===
+template <typename T1> auto pascal_upp(const T1 &n)
+{
+    auto s = range_el(0, n).map([&n](const auto &_){return create_array({0}) * n;});
+    _set<0>(s, create_array({1}) * n);
+    for (auto i : range_el(1, n))
+        for (auto j : range_el(i, n))
+            s[i].set(j, s[i - 1][j - 1] + s[i][j - 1]);
+    return s;
+}
+
+template <typename T1> auto pascal_low(const T1 &n)
+{
+    auto upp = pascal_upp(n);
+    auto s = range_el(0, n).map([&n](const auto &_){return create_array({0}) * n;});
+    for (auto x : range_el(0, n))
+        for (auto y : range_el(0, n))
+            s[y].set(x, upp[x][y]);
+    return s;
+}
+
+template <typename T1> auto pascal_sym(const T1 &n)
+{
+    auto s = range_el(0, n).map([&n](const auto &_){return create_array({1}) * n;});
+    for (auto i : range_el(1, n))
+        for (auto j : range_el(1, n))
+            s[i].set(j, s[i - 1][j] + s[i][j - 1]);
+    return s;
+}
+
+template <typename T1> auto pp(const T1 &mat)
+{
+    print(u"["_S & mat.map([](const auto &x){return String(x);}).join(u",\n "_S) & u"]"_S);
+}
+auto n = 5;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Upper:"_S);
+        pp(pascal_upp(n));
+        print(u"\nLower:"_S);
+        pp(pascal_low(n));
+        print(u"\nSymmetric:"_S);
+        pp(pascal_sym(n));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Perfect_numbers#Python
+def perf(n):
+    sum = 0
+    for i in range(1, n):
+        if n % i == 0:
+            sum += i
+    return sum == n
+
+for i in range(1, 10001):
+    if perf(i):
+        print(i, end = ' ')
+===
+F perf(n)
+   V sum = 0
+   L(i) 1 .< n
+      I n % i == 0
+         sum += i
+   R sum == n
+
+L(i) 1..10000
+   I perf(i)
+      print(i, end' ‘ ’)
+===
+template <typename T1> auto perf(const T1 &n)
+{
+    auto sum = 0;
+    for (auto i : range_el(1, n))
+        if (mod(n, i) == 0)
+            sum += i;
+    return sum == n;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(1, 10000))
+            if (perf(i))
+                print(i, u" "_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Perfect_shuffle#Python
+def flatten(lst):
+    r : List[int] = []
+    for sublst in lst:
+        for i in sublst:
+            r += [i]
+    return r
+
+def magic_shuffle(deck):
+    half = len(deck) // 2
+    return flatten(zip(deck[:half], deck[half:]))
+
+def after_how_many_is_equal(start, end):
+    deck = magic_shuffle(start)
+    counter = 1
+    while deck != end:
+        deck = magic_shuffle(deck)
+        counter += 1
+    return counter
+
+print("Length of the deck of cards | Perfect shuffles needed to obtain the same deck back")
+for length in (8, 24, 52, 100, 1020, 1024, 10000):
+    deck = list(range(length))
+    shuffles_needed = after_how_many_is_equal(deck,deck)
+    print("%-5d | %d" % (length,shuffles_needed))
+===
+F flatten(lst)
+   [Int] r
+   L(sublst) lst
+      L(i) sublst
+         r [+]= i
+   R r
+
+F magic_shuffle(deck)
+   V half = deck.len I/ 2
+   R flatten(zip(deck[0 .< half], deck[half ..]))
+
+F after_how_many_is_equal(start, end)
+   V deck = magic_shuffle(start)
+   V counter = 1
+   L deck != end
+      deck = magic_shuffle(deck)
+      counter++
+   R counter
+print(‘Length of the deck of cards | Perfect shuffles needed to obtain the same deck back’)
+L(length) (8, 24, 52, 100, 1020, 1024, 10000)
+   V deck = Array(0 .< length)
+   V shuffles_needed = after_how_many_is_equal(deck, deck)
+   print(‘#<5 | #.’.format(length, shuffles_needed))
+===
+template <typename T1> auto flatten(const T1 &lst)
+{
+    Array<int> r;
+    for (auto &&sublst : lst)
+        for (auto &&i : sublst)
+            r.append(i);
+    return r;
+}
+
+template <typename T1> auto magic_shuffle(const T1 &deck)
+{
+    auto half = idiv(deck.len(), 2);
+    return flatten(zip(deck[range_el(0, half)], deck[range_ei(half)]));
+}
+
+template <typename T1, typename T2> auto after_how_many_is_equal(const T1 &start, const T2 &end)
+{
+    auto deck = magic_shuffle(start);
+    auto counter = 1;
+    while (deck != end) {
+        deck = magic_shuffle(deck);
+        counter++;
+    }
+    return counter;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Length of the deck of cards | Perfect shuffles needed to obtain the same deck back"_S);
+        for (auto &&length : make_tuple(8, 24, 52, 100, 1020, 1024, 10000)) {
+            auto deck = create_array(range_el(0, length));
+            auto shuffles_needed = after_how_many_is_equal(deck, deck);
+            print(u"#<5 | #."_S.format(length, shuffles_needed));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Perfect_totient_numbers#Python
+import math, itertools
+
+def φ(n):
+    return sum(1 for k in range(1, n + 1) if math.gcd(n, k) == 1)
+
+def perfect_totient(cnt):
+    r : List[int] = []
+
+    for n0 in itertools.count(1):
+        parts = 0
+        n = n0
+        while n != 1:
+            n = φ(n)
+            parts += n
+        if parts == n0:
+            r += [n0]
+            if len(r) == cnt:
+                return r
+
+print(perfect_totient(20))
+===
+//import math, itertools
+
+F φ(n)
+   R sum((1 .. n).filter(k -> gcd(@n, k) == 1).map(k -> 1))
+
+F perfect_totient(cnt)
+   [Int] r
+
+   L(n0) 1..
+      V parts = 0
+      V n = n0
+      L n != 1
+         n = φ(n)
+         parts += n
+      I parts == n0
+         r [+]= n0
+         I r.len == cnt
+            R r
+print(perfect_totient(20))
+===
+template <typename T1> auto φ(const T1 &n)
+{
+    return sum_map(range_ee(1, n).filter([&n](const auto &k){return gcd(n, k) == 1;}), [](const auto &k){return 1;});
+}
+
+template <typename T1> auto perfect_totient(const T1 &cnt)
+{
+    Array<int> r;
+
+    for (auto n0 : range_ei(1)) {
+        auto parts = 0;
+        auto n = n0;
+        while (n != 1) {
+            n = φ(n);
+            parts += n;
+        }
+        if (parts == n0) {
+            r.append(n0);
+            if (r.len() == cnt)
+                return r;
+        }
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(perfect_totient(20));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Permutation_test#Kotlin
+data = [85, 88, 75, 66, 25, 29, 83, 39, 97,
+    68, 41, 10, 49, 16, 65, 32, 92, 28, 98]
+
+def pick(at, remain, accu, treat):
+    if remain == 0:
+        return 1 if accu > treat else 0
+    return pick(at - 1, remain - 1, accu + data[at - 1], treat) + \
+          (pick(at - 1, remain, accu, treat) if at > remain else 0)
+
+treat = 0
+total = 1.0
+for i in range(0, 9):
+    treat += data[i]
+for i in range(19, 10, -1):
+    total *= i
+for i in range(9, 0, -1):
+    total /= i
+
+gt = pick(19, 9, 0, treat)
+le = int(total - gt)
+
+print('<= : %f%%  %d' % (100 * le / total, le))
+print(' > : %f%%  %d' % (100 * gt / total, gt))
+===
+V data = [85, 88, 75, 66, 25, 29, 83, 39, 97, 68, 41, 10, 49, 16, 65, 32, 92, 28, 98]
+
+F pick(at, remain, accu, treat)
+   I remain == 0
+      R I accu > treat {1} E 0
+   R pick(at - 1, remain - 1, accu + :data[at - 1], treat) + (I at > remain {pick(at - 1, remain, accu, treat)} E 0)
+V treat = 0
+V total = 1.0
+L(i) 0..8
+   treat += data[i]
+L(i) (19.<10).step(-1)
+   total *= i
+L(i) (9.<0).step(-1)
+   total /= i
+V gt = pick(19, 9, 0, treat)
+V le = Int(total - gt)
+print(‘<= : #.6%  #.’.format(100 * le / total, le))
+print(‘ > : #.6%  #.’.format(100 * gt / total, gt))
+===
+auto data = create_array({85, 88, 75, 66, 25, 29, 83, 39, 97, 68, 41, 10, 49, 16, 65, 32, 92, 28, 98});
+
+template <typename T1, typename T2, typename T3, typename T4> auto pick(const T1 &at, const T2 &remain, const T3 &accu, const T4 &treat)
+{
+    if (remain == 0)
+        return accu > treat ? 1 : 0;
+    return pick(at - 1, remain - 1, accu + ::data[at - 1], treat) + (at > remain ? pick(at - 1, remain, accu, treat) : 0);
+}
+auto treat = 0;
+auto total = 1.0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(0, 8))
+            treat += data[i];
+        for (auto i : range_el(19, 10).step(-1))
+            total *= i;
+        for (auto i : range_el(9, 0).step(-1))
+            total /= i;
+    }
+} code_block_1;
+auto gt = pick(19, 9, 0, treat);
+auto le = to_int(total - gt);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"<= : #.6%  #."_S.format(100 * le / total, le));
+        print(u" > : #.6%  #."_S.format(100 * gt / total, gt));
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Permutations_with_repetitions#Kotlin
+import sys
+
+n = 3
+values = ['A', 'B', 'C', 'D']
+k = len(values)
+decide = lambda pc: pc[0] == 'B' and pc[1] == 'C'
+pn = [0] * n
+pc = ["\0"] * n
+while True:
+    for i, x in enumerate(pn):
+        pc[i] = values[x]
+    print(pc)
+
+    if decide(pc):
+        break
+
+    i = 0
+    while True:
+        pn[i] += 1
+        if pn[i] < k: break
+        pn[i] = 0
+        i += 1
+        if i == n:
+            sys.exit(0) # ^L.break
+===
+//import sys
+V n = 3
+V values = [‘A’, ‘B’, ‘C’, ‘D’]
+V k = values.len
+V decide = pc -> pc[0] == ‘B’ & pc[1] == ‘C’
+V pn = [0] * n
+V pc = ["\0"] * n
+L
+   L(x) pn
+      V i = L.index
+      pc[i] = values[x]
+   print(pc)
+
+   I decide(pc)
+      L.break
+   V i = 0
+   L
+      pn[i]++
+      I pn[i] < k
+         L.break
+      pn[i] = 0
+      i++
+      I i == n
+         exit(0)
+===
+auto n = 3;
+auto values = create_array({u'A'_C, u'B'_C, u'C'_C, u'D'_C});
+auto k = values.len();
+auto decide = [](const auto &pc){return _get<0>(pc) == u'B' && _get<1>(pc) == u'C';};
+auto pn = create_array({0}) * n;
+auto pc = create_array({u'\0'_C}) * n;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            {int Lindex = 0;
+            for (auto &&x : pn) {
+                auto i = Lindex;
+                pc.set(i, values[x]);
+                Lindex++;
+            }}
+            print(pc);
+            if (decide(pc))
+                break;
+            auto i = 0;
+            while (true) {
+                pn[i]++;
+                if (pn[i] < k)
+                    break;
+                pn.set(i, 0);
+                i++;
+                if (i == n)
+                    exit(0);
+            }
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Pernicious_numbers#Python
+import math
+
+def popcount(n):
+    return bin(n).count('1')
+
+def is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, int(math.sqrt(n)) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+i = 0
+cnt = 0
+while True:
+    if is_prime(popcount(i)):
+        print(i, end = ' ')
+        cnt += 1
+        if cnt == 25:
+            break
+    i += 1
+
+print()
+for i in range(888888877, 888888888 + 1):
+    if is_prime(popcount(i)):
+        print(i, end = ' ')
+===
+//import math
+
+F popcount(n)
+   R bin(n).count(‘1’)
+
+F is_prime(n)
+   I n < 2
+      R 0B
+   L(i) 2 .. Int(sqrt(n))
+      I n % i == 0
+         R 0B
+   R 1B
+V i = 0
+V cnt = 0
+L
+   I is_prime(popcount(i))
+      print(i, end' ‘ ’)
+      cnt++
+      I cnt == 25
+         L.break
+   i++
+print()
+L(i) 888888877 .. 888888888
+   I is_prime(popcount(i))
+      print(i, end' ‘ ’)
+===
+template <typename T1> auto popcount(const T1 &n)
+{
+    return bin(n).count(u"1"_S);
+}
+
+template <typename T1> auto is_prime(const T1 &n)
+{
+    if (n < 2)
+        return false;
+    for (auto i : range_ee(2, to_int(sqrt(n))))
+        if (mod(n, i) == 0)
+            return false;
+    return true;
+}
+auto i = 0;
+auto cnt = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            if (is_prime(popcount(i))) {
+                print(i, u" "_S);
+                cnt++;
+                if (cnt == 25)
+                    break;
+            }
+            i++;
+        }
+        print();
+        for (auto i : range_ee(888888877, 888888888))
+            if (is_prime(popcount(i)))
+                print(i, u" "_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Phrase_reversals#Python
+phrase = 'rosetta code phrase reversal'
+print(phrase[::-1])
+print(' '.join(word[::-1] for word in phrase.split(' ')))
+print(' '.join(phrase.split(' ')[::-1]))
+===
+V phrase = ‘rosetta code phrase reversal’
+print(reversed(phrase))
+print(phrase.split(‘ ’).map(word -> reversed(word)).join(‘ ’))
+print((reversed(phrase.split(‘ ’))).join(‘ ’))
+===
+auto phrase = u"rosetta code phrase reversal"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(reversed(phrase));
+        print(phrase.split(u" "_S).map([](const auto &word){return reversed(word);}).join(u" "_S));
+        print((reversed(phrase.split(u" "_S))).join(u" "_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Polynomial_regression#Swift
+def average(arr):
+    return sum(arr) / float(len(arr))
+
+def poly_regression(x, y):
+    xm = average(x)
+    ym = average(y)
+    x2m = average(list(map(lambda i: i * i,  x)))
+    x3m = average(list(map(lambda i: i ** 3, x)))
+    x4m = average(list(map(lambda i: i ** 4, x)))
+    xym = average(list(map(lambda ij: ij[0] * ij[1], zip(x,y))))
+    x2ym = average(list(map(lambda ij: ij[0] * ij[0] * ij[1], zip(x,y))))
+
+    sxx = x2m - xm * xm
+    sxy = xym - xm * ym
+    sxx2 = x3m - xm * x2m
+    sx2x2 = x4m - x2m * x2m
+    sx2y = x2ym - x2m * ym
+
+    b = (sxy * sx2x2 - sx2y * sxx2) / (sxx * sx2x2 - sxx2 * sxx2)
+    c = (sx2y * sxx - sxy * sxx2) / (sxx * sx2x2 - sxx2 * sxx2)
+    a = ym - b * xm - c * x2m
+
+    def abc(xx):
+        return (a + b * xx) + (c * xx * xx)
+
+    print("y = %g + %gx + %gx^2\n" % (a, b, c))
+    print(' Input  Approximation')
+    print(' x   y     y1')
+
+    for i in range(len(x)):
+        print('%2d %3d  %5.1f' % (x[i], y[i], abc(i)))
+
+x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+y = [1, 6, 17, 34, 57, 86, 121, 162, 209, 262, 321]
+poly_regression(x, y)
+===
+F average(arr)
+   R sum(arr) / Float(arr.len)
+
+F poly_regression(x, y)
+   V xm = average(x)
+   V ym = average(y)
+   V x2m = average(x.map(i -> i * i))
+   V x3m = average(x.map(i -> i ^ 3))
+   V x4m = average(x.map(i -> i ^ 4))
+   V xym = average(zip(x, y).map(ij -> ij[0] * ij[1]))
+   V x2ym = average(zip(x, y).map(ij -> ij[0] * ij[0] * ij[1]))
+   V sxx = x2m - xm * xm
+   V sxy = xym - xm * ym
+   V sxx2 = x3m - xm * x2m
+   V sx2x2 = x4m - x2m * x2m
+   V sx2y = x2ym - x2m * ym
+   V b = (sxy * sx2x2 - sx2y * sxx2) / (sxx * sx2x2 - sxx2 * sxx2)
+   V c = (sx2y * sxx - sxy * sxx2) / (sxx * sx2x2 - sxx2 * sxx2)
+   V a = ym - b * xm - c * x2m
+
+   F abc(xx)
+      R (@a + @b * xx) + (@c * xx * xx)
+   print("y = #. + #.x + #.x^2\n".format(a, b, c))
+   print(‘ Input  Approximation’)
+   print(‘ x   y     y1’)
+
+   L(i) 0 .< x.len
+      print(‘#2 #3  #3.1’.format(x[i], y[i], abc(i)))
+V x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+V y = [1, 6, 17, 34, 57, 86, 121, 162, 209, 262, 321]
+poly_regression(x, y)
+===
+template <typename T1> auto average(const T1 &arr)
+{
+    return sum(arr) / to_float(arr.len());
+}
+
+template <typename T1, typename T2> auto poly_regression(const T1 &x, const T2 &y)
+{
+    auto xm = average(x);
+    auto ym = average(y);
+    auto x2m = average(x.map([](const auto &i){return i * i;}));
+    auto x3m = average(x.map([](const auto &i){return cube(i);}));
+    auto x4m = average(x.map([](const auto &i){return pow(i, 4);}));
+    auto xym = average(zip(x, y).map([](const auto &ij){return _get<0>(ij) * _get<1>(ij);}));
+    auto x2ym = average(zip(x, y).map([](const auto &ij){return _get<0>(ij) * _get<0>(ij) * _get<1>(ij);}));
+    auto sxx = x2m - xm * xm;
+    auto sxy = xym - xm * ym;
+    auto sxx2 = x3m - xm * x2m;
+    auto sx2x2 = x4m - x2m * x2m;
+    auto sx2y = x2ym - x2m * ym;
+    auto b = (sxy * sx2x2 - sx2y * sxx2) / (sxx * sx2x2 - sxx2 * sxx2);
+    auto c = (sx2y * sxx - sxy * sxx2) / (sxx * sx2x2 - sxx2 * sxx2);
+    auto a = ym - b * xm - c * x2m;
+
+    auto abc = [&a, &b, &c](const auto &xx)
+    {
+        return (a + b * xx) + (c * xx * xx);
+    };
+    print(u"y = #. + #.x + #.x^2\n"_S.format(a, b, c));
+    print(u" Input  Approximation"_S);
+    print(u" x   y     y1"_S);
+    for (auto i : range_el(0, x.len()))
+        print(u"#2 #3  #3.1"_S.format(x[i], y[i], abc(i)));
+}
+auto x = create_array({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+auto y = create_array({1, 6, 17, 34, 57, 86, 121, 162, 209, 262, 321});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        poly_regression(x, y);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Polynomial_synthetic_division#Python
+def extended_synthetic_division(dividend, divisor):
+    '''Fast polynomial division by using Extended Synthetic Division. Also works with non-monic polynomials.'''
+    # dividend and divisor are both polynomials, which are here simply lists of coefficients. Eg: x^2 + 3x + 5 will be represented as [1, 3, 5]
+
+    out = dividend[:] # Copy the dividend
+    normalizer = divisor[0]
+    for i in range(len(dividend)-(len(divisor)-1)):
+        out[i] /= normalizer # for general polynomial division (when polynomials are non-monic),
+                                 # we need to normalize by dividing the coefficient with the divisor's first coefficient
+        coef = out[i]
+        if coef != 0: # useless to multiply if coef is 0
+            for j in range(1, len(divisor)): # in synthetic division, we always skip the first coefficient of the divisor,
+                                              # because it's only used to normalize the dividend coefficients
+                out[i + j] += -divisor[j] * coef
+
+    # The resulting out contains both the quotient and the remainder, the remainder being the size of the divisor (the remainder
+    # has necessarily the same degree as the divisor since it's what we couldn't divide from the dividend), so we compute the index
+    # where this separation is, and return the quotient and remainder.
+    separator = len(divisor)-1
+    return (out[:-separator], out[-separator:]) # return quotient, remainder.
+
+print("POLYNOMIAL SYNTHETIC DIVISION")
+n = [1, -12, 0, -42]
+D = [1, -3]
+print("  %s / %s =" % (n,D), end = ' ')
+(a, b) = extended_synthetic_division(n, D)
+print("%s remainder %s" % (a, b))
+===
+F extended_synthetic_division(dividend, divisor)
+   ‘Fast polynomial division by using Extended Synthetic Division. Also works with non-monic polynomials.’
+   V out = copy(dividend)
+   V normalizer = divisor[0]
+   L(i) 0 .< dividend.len - (divisor.len - 1)
+      out[i] /= normalizer
+      V coef = out[i]
+      I coef != 0
+         L(j) 1 .< divisor.len
+            out[i + j] += -divisor[j] * coef
+   V separator = divisor.len - 1
+   R (out[0 .< (len)-separator], out[(len)-separator ..])
+print(‘POLYNOMIAL SYNTHETIC DIVISION’)
+V n = [1, -12, 0, -42]
+V D = [1, -3]
+print(‘  #. / #. =’.format(n, D), end' ‘ ’)
+V (a, b) = extended_synthetic_division(n, D)
+print(‘#. remainder #.’.format(a, b))
+===
+template <typename T1, typename T2> auto extended_synthetic_division(const T1 &dividend, const T2 &divisor)
+{
+    u"Fast polynomial division by using Extended Synthetic Division. Also works with non-monic polynomials."_S;
+    auto out = copy(dividend);
+    auto normalizer = _get<0>(divisor);
+    for (auto i : range_el(0, dividend.len() - (divisor.len() - 1))) {
+        out[i] /= normalizer;
+        auto coef = out[i];
+        if (coef != 0)
+            for (auto j : range_el(1, divisor.len()))
+                out[i + j] += -divisor[j] * coef;
+    }
+    auto separator = divisor.len() - 1;
+    return make_tuple(out[range_e_llen(0,  - separator)], out[range_elen_i( - separator)]);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"POLYNOMIAL SYNTHETIC DIVISION"_S);
+    }
+} code_block_1;
+auto n = create_array({1, -12, 0, -42});
+auto D = create_array({1, -3});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"  #. / #. ="_S.format(n, D), u" "_S);
+    }
+} code_block_2;
+auto [a, b] = extended_synthetic_division(n, D);
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print(u"#. remainder #."_S.format(a, b));
+    }
+} code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Population_count#Python
+from typing import List
+Int64 = int
+
+def popcount(n):
+    return bin(n).count('1')
+
+print([popcount(Int64(3)**i) for i in range(30)])
+
+evil : List[int] = []
+odious : List[int] = []
+i = 0
+while len(evil) < 30 or len(odious) < 30:
+    p = popcount(i)
+    if (p % 2) != 0: odious.append(i)
+    else: evil.append(i)
+    i += 1
+
+print(evil[:30])
+print(odious[:30])
+===
+
+F popcount(n)
+   R bin(n).count(‘1’)
+print((0.<30).map(i -> popcount(Int64(3) ^ i)))
+[Int] evil
+[Int] odious
+V i = 0
+L evil.len < 30 | odious.len < 30
+   V p = popcount(i)
+   I (p % 2) != 0
+      odious.append(i)
+   E
+      evil.append(i)
+   i++
+print(evil[0.<30])
+print(odious[0.<30])
+===
+template <typename T1> auto popcount(const T1 &n)
+{
+    return bin(n).count(u"1"_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(range_el(0, 30).map([](const auto &i){return popcount(pow(to_int64(3), i));}));
+    }
+} code_block_1;
+Array<int> evil;
+Array<int> odious;
+auto i = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (evil.len() < 30 || odious.len() < 30) {
+            auto p = popcount(i);
+            if ((mod(p, 2)) != 0)
+                odious.append(i);
+            else
+                evil.append(i);
+            i++;
+        }
+        print(evil[range_el(0, 30)]);
+        print(odious[range_el(0, 30)]);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Power_set#Python
+def list_powerset(lst):
+    # the power set of the empty set has one element, the empty set
+    empty_list : List[int] = []
+    result = [empty_list]
+    for x in lst:
+        # for every additional element in our set
+        # the power set consists of the subsets that don't
+        # contain this element (just take the previous power set)
+        # plus the subsets that do contain the element (use list
+        # comprehension to add [x] onto everything in the
+        # previous power set)
+        result.extend([subset + [x] for subset in result])
+    return result
+
+print(list_powerset([1,2,3]))
+===
+F list_powerset(lst)
+   [Int] empty_list
+   V result = [empty_list]
+   L(x) lst
+      result.extend(result.map(subset -> subset [+] [@x]))
+   R result
+print(list_powerset([1, 2, 3]))
+===
+template <typename T1> auto list_powerset(const T1 &lst)
+{
+    Array<int> empty_list;
+    auto result = create_array({empty_list});
+    for (auto &&x : lst)
+        result.extend(result.map([&x](const auto &subset){return subset + create_array({x});}));
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(list_powerset(create_array({1, 2, 3})));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Primality_by_Wilson%27s_theorem#Python
+import math
+Int64 = int
+
+def is_wprime(n : Int64):
+    return n > 1 and (n == 2 or
+                      (n % 2 and (math.factorial(n - 1) + 1) % n == 0))
+
+c = 20
+print("Primes under %d:" % c, end="\n  ")
+print([n for n in range(c) if is_wprime(n)])
+===
+//import math
+
+F is_wprime(Int64 n)
+   R n > 1 & (n == 2 | (n % 2 & (factorial(n - 1) + 1) % n == 0))
+V c = 20
+print(‘Primes under #.:’.format(c), end' "\n  ")
+print((0 .< c).filter(n -> is_wprime(n)))
+===
+auto is_wprime(const Int64 &n)
+{
+    return n > 1 && (n == 2 || (mod(n, 2) && mod((factorial(n - 1) + 1), n) == 0));
+}
+auto c = 20;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Primes under #.:"_S.format(c), u"\n  "_S);
+        print(range_el(0, c).filter([](const auto &n){return is_wprime(n);}));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Prime_conspiracy#Python
+import math, collections
+
+limit = 1000000
+k = limit
+n = k * 17
+primes = [True] * n
+primes[0] = primes[1] = False
+
+for i in range(2, int(math.sqrt(n)) + 1):
+    if not primes[i]:
+        continue
+    for j in range(i * i, n, i):
+        primes[j] = False
+
+trans_map = collections.defaultdict(int) # Tuple[int, int]
+prev = -1
+
+for i in range(n):
+    if primes[i]:
+        if prev != -1:
+            trans_map[(prev, i % 10)] += 1
+        prev = i % 10
+
+        if k == 1:
+            break
+        k -= 1
+
+print("First %d primes. Transitions prime %% 10 > next-prime %% 10." % limit)
+for trans in sorted(trans_map.keys()):
+    print('%d -> %d count %5d frequency: %.4f%%' % (trans[0], trans[1], trans_map[trans], 100.0 * trans_map[trans] / limit))
+===
+//import math, collections
+V limit = 1000000
+V k = limit
+V n = k * 17
+V primes = [1B] * n
+primes[0] = primes[1] = 0B
+
+L(i) 2 .. Int(sqrt(n))
+   I !(primes[i])
+      L.continue
+   L(j) (i * i .< n).step(i)
+      primes[j] = 0B
+V trans_map = DefaultDict[(Int, Int), Int]()
+V prev = -1
+
+L(i) 0 .< n
+   I primes[i]
+      I prev != -1
+         trans_map[(prev, i % 10)]++
+      prev = i % 10
+
+      I k == 1
+         L.break
+      k--
+print(‘First #. primes. Transitions prime % 10 > next-prime % 10.’.format(limit))
+L(trans) sorted(trans_map.keys())
+   print(‘#. -> #. count #5 frequency: #.4%’.format(trans[0], trans[1], trans_map[trans], 100.0 * trans_map[trans] / limit))
+===
+auto limit = 1000000;
+auto k = limit;
+auto n = k * 17;
+auto primes = create_array({true}) * n;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _set<0>(primes, _set<1>(primes, false));
+
+        for (auto i : range_ee(2, to_int(sqrt(n)))) {
+            if (!(primes[i]))
+                continue;
+            for (auto j : range_el(i * i, n).step(i))
+                primes.set(j, false);
+        }
+    }
+} code_block_1;
+auto trans_map = DefaultDict<ivec2, int>();
+auto prev = -1;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto i : range_el(0, n))
+            if (primes[i]) {
+                if (prev != -1)
+                    trans_map[make_tuple(prev, mod(i, 10))]++;
+                prev = mod(i, 10);
+                if (k == 1)
+                    break;
+                k--;
+            }
+        print(u"First #. primes. Transitions prime % 10 > next-prime % 10."_S.format(limit));
+        for (auto &&trans : sorted(trans_map.keys()))
+            print(u"#. -> #. count #5 frequency: #.4%"_S.format(_get<0>(trans), _get<1>(trans), trans_map[trans], 100.0 * trans_map[trans] / limit));
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Priority_queue#Python
+import heapq
+items = [(3, "Clear drains"), (4, "Feed cat"), (5, "Make tea"), (1, "Solve RC tasks"), (2, "Tax return")]
+heapq.heapify(items)
+while len(items):
+    print(heapq.heappop(items))
+===
+//import heapq
+V items = [(3, ‘Clear drains’), (4, ‘Feed cat’), (5, ‘Make tea’), (1, ‘Solve RC tasks’), (2, ‘Tax return’)]
+minheap:heapify(&items)
+L !items.empty
+   print(minheap:pop(&items))
+===
+auto items = create_array({make_tuple(3, u"Clear drains"_S), make_tuple(4, u"Feed cat"_S), make_tuple(5, u"Make tea"_S), make_tuple(1, u"Solve RC tasks"_S), make_tuple(2, u"Tax return"_S)});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        minheap::heapify(items);
+        while (!items.empty())
+            print(minheap::pop(items));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Product_of_divisors#Python
+def product_of_divisors(n):
+    ans = 1
+    i = 1
+    j = 1
+    while i*i <= n:
+        if 0 == n%i:
+            ans *= i
+            j = n//i
+            if j != i:
+                ans *= j
+        i += 1
+    return ans
+
+print([product_of_divisors(n) for n in range(1,51)])
+===
+F product_of_divisors(n)
+   V ans = 1
+   V i = 1
+   V j = 1
+   L i * i <= n
+      I 0 == n % i
+         ans *= i
+         j = n I/ i
+         I j != i
+            ans *= j
+      i++
+   R ans
+print((1..50).map(n -> product_of_divisors(n)))
+===
+template <typename T1> auto product_of_divisors(const T1 &n)
+{
+    auto ans = 1;
+    auto i = 1;
+    auto j = 1;
+    while (i * i <= n) {
+        if (0 == mod(n, i)) {
+            ans *= i;
+            j = idiv(n, i);
+            if (j != i)
+                ans *= j;
+        }
+        i++;
+    }
+    return ans;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(range_ee(1, 50).map([](const auto &n){return product_of_divisors(n);}));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Proper_divisors#Python
+def proper_divs(n):
+    return list({x for x in range(1, (n + 1) // 2 + 1) if n % x == 0 and n != x})
+
+print([proper_divs(n) for n in range(1, 11)])
+
+(n, leng) = max(((n, len(proper_divs(n))) for n in range(1, 20001)), key=lambda pd: pd[1])
+print(n, leng)
+===
+F proper_divs(n)
+   R Array(Set((1 .. (n + 1) I/ 2).filter(x -> @n % x == 0 & @n != x)))
+print((1..10).map(n -> proper_divs(n)))
+V (n, leng) = max(((1..20000).map(n -> (n, proper_divs(n).len))), key' pd -> pd[1])
+print(n‘ ’leng)
+===
+template <typename T1> auto proper_divs(const T1 &n)
+{
+    return create_array(create_set(range_ee(1, idiv((n + 1), 2)).filter([&n](const auto &x){return mod(n, x) == 0 && n != x;})));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(range_ee(1, 10).map([](const auto &n){return proper_divs(n);}));
+    }
+} code_block_1;
+auto [n, leng] = max_with_key((range_ee(1, 20000).map([](const auto &n){return make_tuple(n, proper_divs(n).len());})), [](const auto &pd){return _get<1>(pd);});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(n & u" "_S & leng);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Pythagorean_quadruples#Python
+def quad(top = 2200):
+    r = [False] * top
+    ab = [False] * (top * 2)**2
+    for a in range(1, top):
+        for b in range(a, top):
+            ab[a * a + b * b] = True
+    s = 3
+    for c in range(1, top):
+        (s1, s, s2) = (s, s + 2, s + 2)
+        for d in range(c + 1, top):
+            if ab[s1]:
+                r[d] = True
+            s1 += s2
+            s2 += 2
+    return [i for i, val in enumerate(r) if not val and i]
+
+print(quad())
+===
+F quad(top = 2200)
+   V r = [0B] * top
+   V ab = [0B] * (top * 2) ^ 2
+   L(a) 1 .< top
+      L(b) a .< top
+         ab[a * a + b * b] = 1B
+   V s = 3
+   L(c) 1 .< top
+      (V s1, s, V s2) = (s, s + 2, s + 2)
+      L(d) c + 1 .< top
+         I ab[s1]
+            r[d] = 1B
+         s1 += s2
+         s2 += 2
+   R enumerate(r).filter((i, val) -> !val & i).map((i, val) -> i)
+print(quad())
+===
+template <typename T1 = decltype(2200)> auto quad(const T1 &top = 2200)
+{
+    auto r = create_array({false}) * top;
+    auto ab = create_array({false}) * square((top * 2));
+    for (auto a : range_el(1, top))
+        for (auto b : range_el(a, top))
+            ab.set(a * a + b * b, true);
+    auto s = 3;
+    for (auto c : range_el(1, top)) {
+        TUPLE_ELEMENT_T(0, make_tuple(s, s + 2, s + 2)) s1;
+        TUPLE_ELEMENT_T(2, make_tuple(s, s + 2, s + 2)) s2;
+        assign_from_tuple(s1, s, s2, make_tuple(s, s + 2, s + 2));
+        for (auto d : range_el(c + 1, top)) {
+            if (ab[s1])
+                r.set(d, true);
+            s1 += s2;
+            s2 += 2;
+        }
+    }
+    return enumerate(r).filter([](const auto &i, const auto &val){return !val && i;}).map([](const auto &i, const auto &val){return i;});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(quad());
+    }
+} code_block_1;
