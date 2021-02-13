@@ -9674,3 +9674,76 @@ struct CodeBlock2
         print(hist);
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Queue/Definition#Python
+class FIFO:
+    def __init__(self):
+        self.contents : List[int] = []
+    def push(self, item):
+        self.contents.append(item)
+    def pop(self):
+        return self.contents.pop(0)
+    def empty(self):
+        return len(self.contents) == 0
+
+# Sample usage:
+f = FIFO()
+f.push(3)
+f.push(2)
+f.push(1)
+while not f.empty():
+    print(f.pop())
+===
+T FIFO
+   [Int] contents
+   F ()
+   {
+   }
+   F push(item)
+      .contents.append(item)
+   F pop()
+      R .contents.pop(0)
+   F empty()
+      R .contents.empty
+V f = FIFO()
+f.push(3)
+f.push(2)
+f.push(1)
+L !f.empty()
+   print(f.pop())
+===
+class FIFO
+{
+public:
+    Array<int> contents;
+    FIFO()
+    {
+    }
+
+    template <typename T1> auto push(const T1 &item)
+    {
+        contents.append(item);
+    }
+    auto pop()
+    {
+        return contents.pop(0);
+    }
+    auto empty()
+    {
+        return contents.empty();
+    }
+};
+auto f = FIFO();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        f.push(3);
+        f.push(2);
+        f.push(1);
+        while (!f.empty())
+            print(f.pop());
+    }
+} code_block_1;

@@ -768,7 +768,7 @@ class SymbolNode:
                     #assert(c0[0].isupper())
                     return c0.replace('.', '::') + '::' + c1 # replace `Token.Category.STATEMENT_SEPARATOR` with `Token::Category::STATEMENT_SEPARATOR`
 
-                return char_if_len_1(self.children[0]) + '.' + c1 + '()'*(c1 in ('len', 'last', 'empty', 'real', 'imag')) # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
+                return char_if_len_1(self.children[0]) + '.' + c1 + '()'*(c1 in ('len', 'last', 'empty', 'real', 'imag') and not (self.parent is not None and self.parent.function_call and self is self.parent.children[0])) # char_if_len_1 is needed here because `u"0"_S.code` (have gotten from #(11l)‘‘0’.code’) is illegal [correct: `u'0'_C.code`]
 
             elif self.symbol.id == ':':
                 c0 = self.children[0].to_str()
