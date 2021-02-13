@@ -9747,3 +9747,41 @@ struct CodeBlock1
             print(f.pop());
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Queue/Usage
+import collections
+
+my_queue = collections.deque() # str
+
+my_queue.append('foo')
+my_queue.append('bar')
+my_queue.append('baz')
+
+print(my_queue.popleft())
+print(my_queue.popleft())
+print(my_queue.popleft())
+===
+//import collections
+V my_queue = Deque[String]()
+my_queue.append(‘foo’)
+my_queue.append(‘bar’)
+my_queue.append(‘baz’)
+print(my_queue.pop_left())
+print(my_queue.pop_left())
+print(my_queue.pop_left())
+===
+auto my_queue = Deque<String>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        my_queue.append(u"foo"_S);
+        my_queue.append(u"bar"_S);
+        my_queue.append(u"baz"_S);
+        print(my_queue.pop_left());
+        print(my_queue.pop_left());
+        print(my_queue.pop_left());
+    }
+} code_block_1;

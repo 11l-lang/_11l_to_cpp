@@ -3102,6 +3102,10 @@ set_scope.add_name('difference', ASTFunctionDefinition([('other', '', 'Set')]))
 set_scope.add_name('add', ASTFunctionDefinition([('elem', '', '')]))
 set_scope.add_name('discard', ASTFunctionDefinition([('elem', '', '')]))
 builtins_scope.ids['Set'].ast_nodes[0].scope = set_scope
+deque_scope = Scope(None)
+deque_scope.add_name('append', ASTFunctionDefinition([('x', '', '')]))
+deque_scope.add_name('pop_left', ASTFunctionDefinition([]))
+builtins_scope.ids['Deque'].ast_nodes[0].scope = deque_scope
 
 module_scope = Scope(None)
 builtin_modules['math'] = Module(module_scope)
