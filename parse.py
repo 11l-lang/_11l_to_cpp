@@ -1000,7 +1000,7 @@ class ASTExpression(ASTNodeWithExpression):
         return ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
 cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'перем':'auto',
-                     'Int':'int', 'Int64':'Int64', 'UInt32':'uint32_t', 'Float':'double', 'Float32':'float', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte',
+                     'Int':'int', 'Int64':'Int64', 'UInt64':'UInt64', 'UInt32':'uint32_t', 'Float':'double', 'Float32':'float', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
                      'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque'}
 

@@ -910,10 +910,11 @@ inline double to_float(Char ch)
 	return ch.is_digit() ? ch.code - '0' : 0;
 }
 
-inline double to_float(int    i) { return i; }
-inline double to_float(Int64  i) { return (double)i; }
-inline double to_float(float  f) { return f; }
-inline double to_float(double d) { return d; }
+inline double to_float(int      i) { return i; }
+inline double to_float(uint32_t i) { return i; }
+inline double to_float(Int64    i) { return (double)i; }
+inline double to_float(float    f) { return f; }
+inline double to_float(double   d) { return d; }
 
 inline double parse_float(const char16_t *s)
 {
