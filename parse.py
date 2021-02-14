@@ -441,12 +441,16 @@ class SymbolNode:
                         f_node = type_of(self.children[0])
                 elif func_name == 'Int':
                     func_name = 'to_int'
+                    f_node = builtins_scope.find('Int').ast_nodes[0].constructors[0]
                 elif func_name == 'Int64':
                     func_name = 'to_int64'
+                    f_node = builtins_scope.find('Int').ast_nodes[0].constructors[0]
                 elif func_name == 'UInt64':
                     func_name = 'to_uint64'
+                    f_node = builtins_scope.find('Int').ast_nodes[0].constructors[0]
                 elif func_name == 'UInt32':
                     func_name = 'to_uint32'
+                    f_node = builtins_scope.find('Int').ast_nodes[0].constructors[0]
                 elif func_name == 'Float':
                     func_name = 'to_float'
                 elif func_name == 'Char' and self.children[2].token.category == Token.Category.STRING_LITERAL:
@@ -3045,6 +3049,11 @@ builtins_scope.ids['File'].ast_nodes[0].scope = file_scope
 
 for type_ in cpp_type_from_11l:
     builtins_scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', token_to_str('‘’'), '')])]))
+
+f = ASTFunctionDefinition([('x', '', ''), ('radix', '10', 'Int')])
+f.first_named_only_argument = 1
+builtins_scope.ids['Int'].ast_nodes[0] = ASTTypeDefinition([f])
+
 string_scope = Scope(None)
 str_last_member_var_decl = ASTVariableDeclaration()
 str_last_member_var_decl.type = 'Char'

@@ -478,7 +478,7 @@ for base in range(2,21):
 ===
 V s = ‘100’
 L(base) 2..20
-   print(‘String '#.' in base #. is #. in base 10’.format(s, base, Int(s, base)))
+   print(‘String '#.' in base #. is #. in base 10’.format(s, base, Int(s, radix' base)))
 ===
 auto s = u"100"_S;
 

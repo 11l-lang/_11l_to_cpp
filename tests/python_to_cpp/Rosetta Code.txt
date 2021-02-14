@@ -5112,7 +5112,7 @@ F pal_23(limit)
       V revb = reversed(b)
 
       L(trial) (b‘’revb, b‘0’revb, b‘1’revb, b‘2’revb)
-         V t = Int64(trial, 3)
+         V t = Int64(trial, radix' 3)
          I pal2(t)
             r.append(t)
             I r.len == limit
@@ -7124,7 +7124,7 @@ F valid_iban(iban_)
    I iban.len != :country2length[iban[0.<2]]
       R 0B
    iban = iban[4..]‘’iban[0.<4]
-   R mod97(iban.map(ch -> String(Int(ch, 36))).join(‘’)) == 1
+   R mod97(iban.map(ch -> String(Int(ch, radix' 36))).join(‘’)) == 1
 
 L(account) [‘GB82 WEST 1234 5698 7654 32’, ‘GB82 TEST 1234 5698 7654 32’]
    print(‘#. validation is: #.’.format(account, valid_iban(account)))
@@ -7200,7 +7200,7 @@ l = unrank(n)
 print(l)
 ===
 F rank(x)
-   R Int(([1] [+] x).map(String).join(‘a’), 11)
+   R Int(([1] [+] x).map(String).join(‘a’), radix' 11)
 
 F unrank(=n)
    V s = ‘’
