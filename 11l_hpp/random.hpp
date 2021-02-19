@@ -51,7 +51,7 @@ template <typename Type> inline void shuffle(Array<Type> &arr)
 		std::swap(arr[_(l)], arr[_(l)]);
 }
 
-template <typename Type> inline auto choice(Array<Type> &arr)
+template <typename Type> inline auto choice(const Array<Type> &arr)
 {
 	return arr[_(arr.len())];
 }
