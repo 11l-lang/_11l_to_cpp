@@ -399,9 +399,9 @@ public:
 		std::vector<Type>::erase(it);
 	}
 
-	void del(Int start, Int stop)
+	void del(const Range<Int, true, false> range)
 	{
-		std::vector<Type>::erase(begin() + start, begin() + stop);
+		std::vector<Type>::erase(begin() + range.b, begin() + range.e);
 	}
 
 	template <typename Ty> bool operator==(const Array<Ty> &arr) const
