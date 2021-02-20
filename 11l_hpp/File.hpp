@@ -150,11 +150,11 @@ public:
 			if (r[r.len()-1].empty()) {
 				r.resize(r.len()-1);
 				for (Int i=0, n=r.len(); i < n; i++)
-					r[i] &= u'\n';
+					r[i] &= u'\n'_C;
 			}
 			else
 				for (Int i=0, n=r.len()-1; i < n; i++)
-					r[i] &= u'\n';
+					r[i] &= u'\n'_C;
 		}
 		else
 			if (r[r.len()-1].empty())
