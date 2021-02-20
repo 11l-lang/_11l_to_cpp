@@ -10196,3 +10196,134 @@ struct CodeBlock1
             print(k & u" = "_S & v);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Recaman%27s_sequence#Python
+def recamanSucc(seen, n, r):
+    '''The successor for a given Recaman term,
+       given the set of Recaman terms seen so far.'''
+    back = r - n
+    return n + r if 0 > back or (back in seen) else back
+
+def recamanUntil(p):
+    '''All terms of the Recaman series before the
+       first term for which the predicate p holds.'''
+    n = 1
+    r = 0  # First term of series
+    rs = [r]
+    seen = set(rs)
+    blnNew = True
+    while not p(seen, n, r, blnNew):
+        r = recamanSucc(seen, n, r)
+        blnNew = r not in seen
+        seen.add(r)
+        rs.append(r)
+        n = 1 + n
+    return rs
+
+def enumFromTo(m):
+    '''Integer enumeration from m to n.'''
+    return lambda n: range(m, 1 + n)
+
+print(
+    'First 15 Recaman:\n',
+    recamanUntil(
+        lambda seen, n, r, _: n == 15
+    )
+)
+print(
+    'First duplicated Recaman:\n',
+    recamanUntil(
+        lambda seen, n, r, blnNew: not blnNew
+    )[-1]
+)
+setK = set(enumFromTo(0)(1000))
+print(
+    'Number of Recaman terms needed to generate all integers from [0..1000]:\n',
+    len(recamanUntil(
+        lambda seen, n, r, blnNew: (
+            blnNew and r < 1001 and setK.issubset(seen)
+        )
+    )) - 1
+)
+===
+F recamanSucc(seen, n, r)
+   ‘The successor for a given Recaman term,
+       given the set of Recaman terms seen so far.’
+   V back = r - n
+   R I 0 > back | (back C seen) {n + r} E back
+
+F recamanUntil(p)
+   ‘All terms of the Recaman series before the
+       first term for which the predicate p holds.’
+   V n = 1
+   V r = 0
+   V rs = [r]
+   V seen = Set(rs)
+   V blnNew = 1B
+   L !p(seen, n, r, blnNew)
+      r = recamanSucc(seen, n, r)
+      blnNew = r !C seen
+      seen.add(r)
+      rs.append(r)
+      n = 1 + n
+   R rs
+
+F enumFromTo(m)
+   ‘Integer enumeration from m to n.’
+   R n -> @m .< 1 + n
+print("First 15 Recaman:\n "(recamanUntil((seen, n, r, _) -> n == 15)))
+print("First duplicated Recaman:\n "recamanUntil((seen, n, r, blnNew) -> !blnNew).last)
+V setK = Set(enumFromTo(0)(1000))
+print("Number of Recaman terms needed to generate all integers from [0..1000]:\n "(recamanUntil((seen, n, r, blnNew) -> (blnNew & r < 1001 & :setK.is_subset(seen))).len - 1))
+===
+template <typename T1, typename T2, typename T3> auto recamanSucc(const T1 &seen, const T2 &n, const T3 &r)
+{
+    uR"(The successor for a given Recaman term,
+       given the set of Recaman terms seen so far.)"_S;
+    auto back = r - n;
+    return 0 > back || (in(back, seen)) ? n + r : back;
+}
+
+template <typename T1> auto recamanUntil(const T1 &p)
+{
+    uR"(All terms of the Recaman series before the
+       first term for which the predicate p holds.)"_S;
+    auto n = 1;
+    auto r = 0;
+    auto rs = create_array({r});
+    auto seen = create_set(rs);
+    auto blnNew = true;
+    while (!p(seen, n, r, blnNew)) {
+        r = recamanSucc(seen, n, r);
+        blnNew = !in(r, seen);
+        seen.add(r);
+        rs.append(r);
+        n = 1 + n;
+    }
+    return rs;
+}
+
+template <typename T1> auto enumFromTo(const T1 &m)
+{
+    u"Integer enumeration from m to n."_S;
+    return [&m](const auto &n){return range_el(m, 1 + n);};
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"First 15 Recaman:\n "_S & (recamanUntil([](const auto &seen, const auto &n, const auto &r, const auto &_){return n == 15;})));
+        print(u"First duplicated Recaman:\n "_S & recamanUntil([](const auto &seen, const auto &n, const auto &r, const auto &blnNew){return !blnNew;}).last());
+    }
+} code_block_1;
+auto setK = create_set(enumFromTo(0)(1000));
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"Number of Recaman terms needed to generate all integers from [0..1000]:\n "_S & (recamanUntil([](const auto &seen, const auto &n, const auto &r, const auto &blnNew){return (blnNew && r < 1001 && ::setK.is_subset(seen));}).len() - 1));
+    }
+} code_block_2;

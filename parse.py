@@ -504,6 +504,8 @@ class SymbolNode:
                     func_name = '(*this)' # function call has higher precedence than dereference in C++, so `*this(...)` is equivalent to `*(this(...))`
                 elif self.children[0].symbol.id == '[': # ]
                     pass
+                elif self.children[0].function_call: # for `enumFromTo(0)(1000)`
+                    pass
                 else:
                     if self.children[0].symbol.id == ':':
                         fid, sc = find_module(self.children[0].children[0].to_str()).scope.find_and_return_scope(self.children[0].children[1].token_str())
@@ -3108,6 +3110,7 @@ builtins_scope.ids['Dict'].ast_nodes[0].scope = dict_scope
 builtins_scope.ids['DefaultDict'].ast_nodes[0].scope = dict_scope
 set_scope = Scope(None)
 set_scope.add_name('difference', ASTFunctionDefinition([('other', '', 'Set')]))
+set_scope.add_name('is_subset', ASTFunctionDefinition([('other', '', 'Set')]))
 set_scope.add_name('add', ASTFunctionDefinition([('elem', '', '')]))
 set_scope.add_name('discard', ASTFunctionDefinition([('elem', '', '')]))
 builtins_scope.ids['Set'].ast_nodes[0].scope = set_scope

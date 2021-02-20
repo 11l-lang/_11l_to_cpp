@@ -59,6 +59,11 @@ public:
 		return result;
 	}
 
+	bool is_subset(const Set &other) const
+	{
+		return std::includes(other.begin(), other.end(), std::set<KeyType>::begin(), std::set<KeyType>::end());
+	}
+
 	Nullable<KeyType> lower_bound(const KeyType &key) const
 	{
 		auto it = std::set<KeyType>::lower_bound(key);
