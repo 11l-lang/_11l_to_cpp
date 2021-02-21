@@ -10596,3 +10596,247 @@ struct CodeBlock1
         node->report();
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Resistor_mesh#Python
+DIFF_THRESHOLD = 1e-40
+
+from enum import IntEnum
+
+class Fixed(IntEnum):
+    FREE = 0
+    A = 1
+    B = 2
+
+class Node:
+    voltage : float
+    fixed : Fixed
+    def __init__(self, v=0.0, f=Fixed.FREE):
+        self.voltage = v
+        self.fixed = f
+
+def set_boundary(m : list):
+    m[1][1] = Node( 1.0, Fixed.A)
+    m[6][7] = Node(-1.0, Fixed.B)
+
+def calc_difference(m, d : list):
+    h = len(m)
+    w = len(m[0])
+    total = 0.0
+
+    for i in range(h):
+        for j in range(w):
+            v = 0.0
+            n = 0
+            if i != 0:  v += m[i-1][j].voltage; n += 1
+            if j != 0:  v += m[i][j-1].voltage; n += 1
+            if i < h-1: v += m[i+1][j].voltage; n += 1
+            if j < w-1: v += m[i][j+1].voltage; n += 1
+            v = m[i][j].voltage - v / n
+
+            d[i][j].voltage = v
+            if m[i][j].fixed == Fixed.FREE:
+                total += v ** 2
+    return total
+
+def iter(m : list):
+    h = len(m)
+    w = len(m[0])
+    difference = [[Node() for j in range(w)] for i in range(h)]
+
+    while True:
+        set_boundary(m) # Enforce boundary conditions.
+        if calc_difference(m, difference) < DIFF_THRESHOLD:
+            break
+        for i, di in enumerate(difference):
+            for j, dij in enumerate(di):
+                m[i][j].voltage -= dij.voltage
+
+    cur = [0.0] * 3
+    for i, di in enumerate(difference):
+        for j, dij in enumerate(di):
+            cur[int(m[i][j].fixed)] += (dij.voltage *
+               (int(i != 0) + int(j != 0) + (i < h-1) + (j < w-1)))
+
+    return (cur[int(Fixed.A)] - cur[int(Fixed.B)]) / 2.0
+
+w = 10
+h = 10
+mesh = [[Node() for j in range(w)] for i in range(h)]
+print("R = %.16f" % (2 / iter(mesh)))
+===
+V DIFF_THRESHOLD = 1e-40
+T.enum Fixed
+   FREE
+   A
+   B
+
+T Node
+   Float voltage
+   Fixed fixed
+   F (v = 0.0, f = Fixed.FREE)
+      .voltage = v
+      .fixed = f
+
+F set_boundary(&m)
+   m[1][1] = Node(1.0, Fixed.A)
+   m[6][7] = Node(-1.0, Fixed.B)
+
+F calc_difference(m, &d)
+   V h = m.len
+   V w = m[0].len
+   V total = 0.0
+
+   L(i) 0 .< h
+      L(j) 0 .< w
+         V v = 0.0
+         V n = 0
+         I i != 0
+            v += m[i - 1][j].voltage
+            n++
+         I j != 0
+            v += m[i][j - 1].voltage
+            n++
+         I i < h - 1
+            v += m[i + 1][j].voltage
+            n++
+         I j < w - 1
+            v += m[i][j + 1].voltage
+            n++
+         v = m[i][j].voltage - v / n
+         d[i][j].voltage = v
+         I m[i][j].fixed == FREE
+            total += v ^ 2
+   R total
+
+F iter(&m)
+   V h = m.len
+   V w = m[0].len
+   V difference = (0 .< h).map(i -> (0 .< @w).map(j -> Node()))
+
+   L
+      set_boundary(&m)
+      I calc_difference(m, &difference) < :DIFF_THRESHOLD
+         L.break
+      L(di) difference
+         V i = L.index
+         L(dij) di
+            V j = L.index
+            m[i][j].voltage -= dij.voltage
+   V cur = [0.0] * 3
+   L(di) difference
+      V i = L.index
+      L(dij) di
+         V j = L.index
+         cur[Int(m[i][j].fixed)] += (dij.voltage * (Int(i != 0) + Int(j != 0) + (i < h - 1) + (j < w - 1)))
+   R (cur[Int(Fixed.A)] - cur[Int(Fixed.B)]) / 2.0
+V w = 10
+V h = 10
+V mesh = (0 .< h).map(i -> (0 .< :w).map(j -> Node()))
+print(‘R = #.16’.format(2 / iter(&mesh)))
+===
+auto DIFF_THRESHOLD = 1e-40;
+enum class Fixed {
+    FREE,
+    A,
+    B
+};
+
+class Node
+{
+public:
+    double voltage;
+    Fixed fixed;
+    template <typename T1 = decltype(0.0), typename T2 = decltype(Fixed::FREE)> Node(const T1 &v = 0.0, const T2 &f = Fixed::FREE) :
+        voltage(v),
+        fixed(f)
+    {
+    }
+};
+
+template <typename T1> auto set_boundary(T1 &m)
+{
+    _set<1>(_get<1>(m), Node(1.0, Fixed::A));
+    _set<7>(_get<6>(m), Node(-1.0, Fixed::B));
+}
+
+template <typename T1, typename T2> auto calc_difference(const T1 &m, T2 &d)
+{
+    auto h = m.len();
+    auto w = _get<0>(m).len();
+    auto total = 0.0;
+    for (auto i : range_el(0, h))
+        for (auto j : range_el(0, w)) {
+            auto v = 0.0;
+            auto n = 0;
+            if (i != 0) {
+                v += m[i - 1][j].voltage;
+                n++;
+            }
+            if (j != 0) {
+                v += m[i][j - 1].voltage;
+                n++;
+            }
+            if (i < h - 1) {
+                v += m[i + 1][j].voltage;
+                n++;
+            }
+            if (j < w - 1) {
+                v += m[i][j + 1].voltage;
+                n++;
+            }
+            v = m[i][j].voltage - v / n;
+            d[i][j].voltage = v;
+            if (m[i][j].fixed == decltype(m[i][j].fixed)::FREE)
+                total += square(v);
+        }
+    return total;
+}
+
+template <typename T1> auto iter(T1 &m)
+{
+    auto h = m.len();
+    auto w = _get<0>(m).len();
+    auto difference = range_el(0, h).map([&w](const auto &i){return range_el(0, w).map([](const auto &j){return Node();});});
+
+    while (true) {
+        set_boundary(m);
+        if (calc_difference(m, difference) < ::DIFF_THRESHOLD)
+            break;
+        {int Lindex = 0;
+        for (auto &&di : difference) {
+            auto i = Lindex;
+            {int Lindex = 0;
+            for (auto &&dij : di) {
+                auto j = Lindex;
+                m[i][j].voltage -= dij.voltage;
+                Lindex++;
+            }}
+            Lindex++;
+        }}
+    }
+    auto cur = create_array({0.0}) * 3;
+    {int Lindex = 0;
+    for (auto &&di : difference) {
+        auto i = Lindex;
+        {int Lindex = 0;
+        for (auto &&dij : di) {
+            auto j = Lindex;
+            cur[to_int(m[i][j].fixed)] += (dij.voltage * (to_int(i != 0) + to_int(j != 0) + (i < h - 1) + (j < w - 1)));
+            Lindex++;
+        }}
+        Lindex++;
+    }}
+    return (cur[to_int(Fixed::A)] - cur[to_int(Fixed::B)]) / 2.0;
+}
+auto w = 10;
+auto h = 10;
+auto mesh = range_el(0, h).map([](const auto &i){return range_el(0, ::w).map([](const auto &j){return Node();});});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"R = #.16"_S.format(2.0 / iter(mesh)));
+    }
+} code_block_1;

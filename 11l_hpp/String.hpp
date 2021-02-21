@@ -870,6 +870,11 @@ inline Int to_int(int i)
 	return i;
 }
 
+template <typename Ty, typename = std::enable_if_t<std::is_enum<Ty>::value>> Int to_int(Ty e)
+{
+	return Int(e);
+}
+
 inline Int to_int(Int64 i)
 {
 	return (Int)i;
