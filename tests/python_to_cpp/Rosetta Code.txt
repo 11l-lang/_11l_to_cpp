@@ -10327,3 +10327,272 @@ struct CodeBlock2
         print(u"Number of Recaman terms needed to generate all integers from [0..1000]:\n "_S & (recamanUntil([](const auto &seen, const auto &n, const auto &r, const auto &blnNew){return (blnNew && r < 1001 && ::setK.is_subset(seen));}).len() - 1));
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Resistance_calculator#Python [RPN]
+Char = str
+def move(obj):
+    return obj
+
+class Resistor:
+    resistance : float
+    voltage = 0.0
+    a : 'Resistor' = None
+    b : 'Resistor' = None
+    symbol : Char
+
+    def __init__(self, resistance = 0.0, a : 'Resistor' = None, b : 'Resistor' = None, symbol = Char('r')):
+        self.resistance = resistance
+        self.a = a
+        self.b = b
+        self.symbol = symbol
+
+    def res(self) -> float: return self.resistance
+    def setVoltage(self, voltage : float) -> None: self.voltage = voltage
+    def current(self): return self.voltage / self.res()
+    def effect(self): return self.current() * self.voltage
+    def report(self,level="") -> None:
+        print('%8.3f %8.3f %8.3f %8.3f  %s%s' % (self.res(), self.voltage, self.current(), self.effect(), level, self.symbol))
+        if self.a is not None: self.a.report(level + "| ")
+        if self.b is not None: self.b.report(level + "| ")
+
+class Serial(Resistor):
+    def __init__(self, a : Resistor, b : Resistor):
+        self.a = move(b)
+        self.b = a
+        self.symbol = Char('+')
+
+    def res(self): return self.a.res() + self.b.res()
+
+    def setVoltage(self, voltage : float):
+        ra = self.a.res()
+        rb = self.b.res()
+        self.a.setVoltage(ra/(ra+rb) * voltage)
+        self.b.setVoltage(rb/(ra+rb) * voltage)
+        self.voltage = voltage
+
+class Parallel(Resistor):
+    def __init__(self, a : Resistor, b : Resistor):
+        self.a = move(b)
+        self.b = a
+        self.symbol = Char('*')
+
+    def res(self): return 1 / (1 / self.a.res() + 1 / self.b.res())
+
+    def setVoltage(self, voltage : float):
+        self.a.setVoltage(voltage)
+        self.b.setVoltage(voltage)
+        self.voltage = voltage
+
+def build(s):
+    stack : List[Resistor] = []
+    for word in s.split(' '):
+        if   word == "+":
+            p : Resistor = stack.pop()
+            stack.append(Serial(p, stack.pop()))
+        elif word == "*":
+            p : Resistor = stack.pop()
+            stack.append(Parallel(p, stack.pop()))
+        else:
+            stack.append(Resistor(float(word)))
+    return stack.pop()
+
+node : Resistor = build("10 2 + 6 * 8 + 6 * 4 + 8 * 4 + 8 * 6 +")
+print("     Ohm     Volt   Ampere     Watt  Network tree")
+node.setVoltage(18.0)
+node.report()
+===
+
+T Resistor
+   Float resistance
+   voltage = 0.0
+   Resistor? a
+   Resistor? b
+   Char symbol
+
+   F (resistance = 0.0, Resistor? a = N, Resistor? b = N; symbol = Char(‘r’))
+      .resistance = resistance
+      .a = a
+      .b = b
+      .symbol = symbol
+
+   F.virtual.new res() -> Float
+      R .resistance
+   F.virtual.new setVoltage(Float voltage) -> N
+      .voltage = voltage
+   F current()
+      R .voltage / .res()
+   F effect()
+      R .current() * .voltage
+   F report(level = ‘’) -> N
+      print(‘#4.3 #4.3 #4.3 #4.3  #.#.’.format(.res(), .voltage, .current(), .effect(), level, .symbol))
+      I .a != N
+         .a.report(level‘| ’)
+      I .b != N
+         .b.report(level‘| ’)
+
+T Serial(Resistor)
+   F (Resistor a, Resistor b)
+      .a = move(b)
+      .b = a
+      .symbol = Char(‘+’)
+
+   F.virtual.override res() -> Float
+      R .a.res() + .b.res()
+
+   F.virtual.override setVoltage(Float voltage) -> N
+      V ra = .a.res()
+      V rb = .b.res()
+      .a.setVoltage(ra / (ra + rb) * voltage)
+      .b.setVoltage(rb / (ra + rb) * voltage)
+      .voltage = voltage
+
+T Parallel(Resistor)
+   F (Resistor a, Resistor b)
+      .a = move(b)
+      .b = a
+      .symbol = Char(‘*’)
+
+   F.virtual.override res() -> Float
+      R 1 / (1 / .a.res() + 1 / .b.res())
+
+   F.virtual.override setVoltage(Float voltage) -> N
+      .a.setVoltage(voltage)
+      .b.setVoltage(voltage)
+      .voltage = voltage
+
+F build(s)
+   [Resistor] stack
+   L(word) s.split(‘ ’)
+      I word == ‘+’
+         Resistor p = stack.pop()
+         stack.append(Serial(p, stack.pop()))
+      E I word == ‘*’
+         Resistor p = stack.pop()
+         stack.append(Parallel(p, stack.pop()))
+      E
+         stack.append(Resistor(Float(word)))
+   R stack.pop()
+Resistor node = build(‘10 2 + 6 * 8 + 6 * 4 + 8 * 4 + 8 * 6 +’)
+print(‘     Ohm     Volt   Ampere     Watt  Network tree’)
+node.setVoltage(18.0)
+node.report()
+===
+class Resistor
+{
+public:
+    double resistance;
+    decltype(0.0) voltage = 0.0;
+    std::unique_ptr<Resistor> a;
+    std::unique_ptr<Resistor> b;
+    Char symbol;
+
+    template <typename T1 = decltype(0.0), typename T4 = decltype(u'r'_C)> Resistor(const T1 &resistance = 0.0, std::unique_ptr<Resistor> a = nullptr, std::unique_ptr<Resistor> b = nullptr, const T4 &symbol = u'r'_C) :
+        resistance(resistance),
+        a(std::move(a)),
+        b(std::move(b)),
+        symbol(symbol)
+    {
+    }
+
+    virtual double res()
+    {
+        return resistance;
+    }
+    virtual void setVoltage(const double &voltage)
+    {
+        this->voltage = voltage;
+    }
+    auto current()
+    {
+        return voltage / res();
+    }
+    auto effect()
+    {
+        return current() * voltage;
+    }
+    template <typename T1 = decltype(u""_S)> void report(const T1 &level = u""_S)
+    {
+        print(u"#4.3 #4.3 #4.3 #4.3  #.#."_S.format(res(), voltage, current(), effect(), level, symbol));
+        if (a != nullptr)
+            a->report(level & u"| "_S);
+        if (b != nullptr)
+            b->report(level & u"| "_S);
+    }
+};
+
+class Serial : public Resistor
+{
+public:
+    Serial(std::unique_ptr<Resistor> a, std::unique_ptr<Resistor> b)
+    {
+        this->a = std::move(b);
+        this->b = std::move(a);
+        symbol = u'+'_C;
+    }
+
+    virtual double res() override
+    {
+        return a->res() + b->res();
+    }
+
+    virtual void setVoltage(const double &voltage) override
+    {
+        auto ra = a->res();
+        auto rb = b->res();
+        a->setVoltage(ra / (ra + rb) * voltage);
+        b->setVoltage(rb / (ra + rb) * voltage);
+        this->voltage = voltage;
+    }
+};
+
+class Parallel : public Resistor
+{
+public:
+    Parallel(std::unique_ptr<Resistor> a, std::unique_ptr<Resistor> b)
+    {
+        this->a = std::move(b);
+        this->b = std::move(a);
+        symbol = u'*'_C;
+    }
+
+    virtual double res() override
+    {
+        return 1.0 / (1.0 / a->res() + 1.0 / b->res());
+    }
+
+    virtual void setVoltage(const double &voltage) override
+    {
+        a->setVoltage(voltage);
+        b->setVoltage(voltage);
+        this->voltage = voltage;
+    }
+};
+
+template <typename T1> auto build(const T1 &s)
+{
+    Array<std::unique_ptr<Resistor>> stack;
+    for (auto &&word : s.split(u" "_S))
+        if (word == u'+') {
+            std::unique_ptr<Resistor> p = stack.pop();
+            stack.append(std::make_unique<Serial>(std::move(p), stack.pop()));
+        }
+        else if (word == u'*') {
+            std::unique_ptr<Resistor> p = stack.pop();
+            stack.append(std::make_unique<Parallel>(std::move(p), stack.pop()));
+        }
+        else
+            stack.append(std::make_unique<Resistor>(to_float(word)));
+    return stack.pop();
+}
+std::unique_ptr<Resistor> node = build(u"10 2 + 6 * 8 + 6 * 4 + 8 * 4 + 8 * 6 +"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"     Ohm     Volt   Ampere     Watt  Network tree"_S);
+        node->setVoltage(18.0);
+        node->report();
+    }
+} code_block_1;

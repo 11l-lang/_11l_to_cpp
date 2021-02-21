@@ -67,11 +67,11 @@ F printpuzzle(puzzle)
    L(x) 9
       V s = ‘ ’
       L(y) 9
-         S puzzle[x][y]
-            0
-               s ‘’= ‘.’
-            E
-               s ‘’= String(puzzle[x][y])
+         V p = puzzle[x][y]
+         I p == 0
+            s ‘’= ‘.’
+         E
+            s ‘’= String(puzzle[x][y])
          s ‘’= ‘ ’
       print(s)
 

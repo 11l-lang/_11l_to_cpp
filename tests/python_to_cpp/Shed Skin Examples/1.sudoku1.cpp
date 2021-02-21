@@ -90,15 +90,11 @@ template <typename T1> auto printpuzzle(const T1 &puzzle)
     for (int x = 0; x < 9; x++) {
         auto s = u" "_S;
         for (int y = 0; y < 9; y++) {
-            switch (puzzle[x][y])
-            {
-            case 0:
+            auto p = puzzle[x][y];
+            if (p == 0)
                 s &= u"."_S;
-                break;
-            default:
+            else
                 s &= String(puzzle[x][y]);
-                break;
-            }
             s &= u" "_S;
         }
         print(s);

@@ -720,13 +720,16 @@ class SymbolNode:
                     else:
                         return c1
                 if cts0 == '.' and len(self.children[0].children) == 1: # `.left.tree_indent()` -> `left->tree_indent()`
-                    id_ = self.scope.find(self.children[0].children[0].token_str())
+                    c00 = self.children[0].children[0].token_str()
+                    id_ = self.scope.find(c00)
+                    if id_ is None and type(self.scope.node) == ASTFunctionDefinition and type(self.scope.node.parent) == ASTTypeDefinition:
+                        id_ = self.scope.node.parent.find_id_including_base_types(c00)
                     if id_ is not None and len(id_.ast_nodes) and type(id_.ast_nodes[0]) in (ASTVariableInitialization, ASTVariableDeclaration):
                         if id_.ast_nodes[0].is_reference:
-                            return self.children[0].children[0].token_str() + '->' + c1
+                            return c00 + '->' + c1
                         tid = self.scope.find(id_.ast_nodes[0].type.rstrip('?'))
                         if tid is not None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
-                            return self.children[0].children[0].token_str() + '->' + c1
+                            return c00 + '->' + c1
 
                 if cts0 == ':' and len(self.children[0].children) == 1: # `:token_node.symbol` -> `::token_node->symbol`
                     id_ = global_scope.find(self.children[0].children[0].token_str())
@@ -1285,6 +1288,11 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                         and c.expression.children[0].children[0].token.category == Token.Category.NAME \
                         and c.expression.children[1].token.category == Token.Category.NAME \
                         and c.expression.children[1].token_str() in (arg[0] for arg in self.function_arguments):
+
+                    if self.scope.parent.ids.get(c.expression.children[0].children[0].token_str()) is None: # this member variable is defined in the base type/class
+                        i += 1
+                        continue
+
                     if self.member_initializer_list == '':
                         self.member_initializer_list = " :\n"
                     else:
