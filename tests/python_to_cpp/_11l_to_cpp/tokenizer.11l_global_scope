@@ -42,8 +42,8 @@ tokenize
     .   node_type = function
         function_arguments = [
             ‘source; ; String; ’
-            implied_scopes; nullptr; [(Char, Int)]?; &
-            line_continuations; nullptr; [Int]?; &
-            comments; nullptr; [(Int, Int)]?; &
+            ‘implied_scopes; nullptr; [(Char, Int)]?; &’
+            ‘line_continuations; nullptr; [Int]?; &’
+            ‘comments; nullptr; [(Int, Int)]?; &’
         ]
     ]

@@ -6,7 +6,7 @@ except ImportError:
     from . import tokenizer
 from typing import List, Tuple, Dict, Callable, Set
 from enum import IntEnum
-import os, thindf
+import os, eldf
 
 class Error(Exception):
     def __init__(self, message, token):
@@ -2083,11 +2083,11 @@ def led(self, left):
             open(module_file_name + '.hpp', 'w', encoding = 'utf-8-sig', newline = "\n").write(s) # utf-8-sig is for MSVC (fix of error C2015: too many characters in constant [`u'‘'`]) # ’
             modules[module_name] = Module(scope)
             assert(scope.is_function == False) # serializing `is_function` member variable is not necessary because it is always equal to `False`
-            open(module_file_name + '.11l_global_scope', 'w', encoding = 'utf-8', newline = "\n").write(thindf.to_thindf(scope.serialize_to_dict()))
+            open(module_file_name + '.11l_global_scope', 'w', encoding = 'utf-8', newline = "\n").write(eldf.to_eldf(scope.serialize_to_dict()))
             scope = prev_scope
         else:
             module_scope = Scope(None)
-            module_scope.deserialize_from_dict(thindf.parse(open(module_file_name + '.11l_global_scope', encoding = 'utf-8-sig').read()))
+            module_scope.deserialize_from_dict(eldf.parse(open(module_file_name + '.11l_global_scope', encoding = 'utf-8-sig').read()))
             modules[module_name] = Module(module_scope)
 
     self.append_child(left)
