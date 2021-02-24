@@ -20,6 +20,34 @@ public:
 		}
 	}
 
+	template <typename KeyType, typename ValueTy> void serialize(DefaultDict<KeyType, ValueTy> &dict)
+	{
+		if (from_element_to_object) {
+			assert(element->value_type == ValueType::OBJECT);
+			assert(dict.empty());
+			//dict.reserve(element->value.object->members.size());
+			for (auto &[k, el] : element->value.object->members) {
+				ValueTy &dv = dict[k];
+				ldf::Serializer ser(&el, true, move_strings);
+				ser.serialize(dv);
+			}
+		}
+		else {
+			element->value_type = ValueType::OBJECT;
+			element->value.object = new Object;
+			//element->value.object->members.reserve(dict.size());
+			for (auto &[k, v] : dict) {
+				Element &el = element->value.object->members[k];
+				ldf::Serializer ser(&el, false, move_strings);
+				ser.serialize(v);
+			}
+		}
+	}
+	template <typename KeyType, typename ValueTy> void serialize(Dict<KeyType, ValueTy> &dict)
+	{
+		serialize(static_cast<DefaultDict<KeyType, ValueTy>&>(dict));
+	}
+
 	template <typename Ty> void serialize(::Array<Ty> &arr)
 	{
 		if (from_element_to_object) {
