@@ -149,7 +149,7 @@ public:
 		return r;
 	}
 
-	Int len() const {return (int)std::vector<Type>::size();}
+	Int len() const {return (Int)std::vector<Type>::size();}
 
 	friend Array operator*(Array a, Int n)
 	{

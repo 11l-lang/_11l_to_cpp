@@ -35,6 +35,13 @@ public:
 	{
 		other.value_type = ValueType::N;
 	}
+	void operator=(Element &&other)
+	{
+		assert(value_type == ValueType::N);
+		value_type = other.value_type;
+		value = other.value;
+		other.value_type = ValueType::N;
+	}
 	~Element();
 };
 
@@ -50,7 +57,7 @@ public:
 	::Array<Element> elements;
 };
 
-Element::~Element() // moved from class `Element` because of warning C4150: deletion of pointer to incomplete type 'Object'; no destructor called
+Element::~Element() // moved from class `Element` because of warning C4150: deletion of pointer to incomplete type 'ldf::Object'; no destructor called
 {
 	switch (value_type)
 	{
@@ -59,6 +66,15 @@ Element::~Element() // moved from class `Element` because of warning C4150: dele
 	case ValueType::STRING: delete value.string; break;
 	}
 }
+
+class Error
+{
+public:
+	String message;
+	size_t pos;
+
+	Error(const String &message, size_t pos) : message(message), pos(pos) {}
+};
 
 // Some common functions
 namespace detail {
@@ -152,6 +168,7 @@ const char16_t *read_number(const char16_t *s, const char16_t *end, Element &el)
 }
 
 #include "ldf/json.hpp"
+#include "ldf/eldf.hpp"
 #include "ldf/serializer.hpp"
 }
 
@@ -186,5 +203,15 @@ template <typename Ty, typename IndentType = int> String from_object(Ty &&obj, I
 	ldf::Serializer ser(&el, false, true);
 	ser.serialize(obj);
 	return ldf::to_json(el, indent);
+}
+}
+
+namespace eldf {
+template <typename Ty> void to_object(const String &eldf, Ty &obj)
+{
+	ldf::Element el;
+	ldf::from_eldf(eldf, el);
+	ldf::Serializer ser(&el, true, true);
+	ser.serialize(obj);
 }
 }

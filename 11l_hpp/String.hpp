@@ -481,7 +481,7 @@ public:
 
 	//String &operator=(const String &s) {assign(s); return *this;}
 
-	friend String &&operator*(String &&s, int n)
+	friend String &&operator*(String &&s, Int n)
 	{
 		size_t s_len = s.length();
 		if (n < 1) // mimic Python's behavior in which 's' * 0 = '' and 's' * -1 = ''
@@ -493,11 +493,11 @@ public:
 		}
 		return std::move(s);
 	}
-	friend String &&operator*(int n, String &&s)
+	friend String &&operator*(Int n, String &&s)
 	{
 		return std::move(s) * n;
 	}
-	String operator*(int n) const
+	String operator*(Int n) const
 	{
 		return String(*this) * n;
 	}
@@ -749,12 +749,12 @@ inline String operator&(Char ch1, Char ch2)
 	return String(ch1) & ch2;
 }
 
-inline String operator*(Char c, int n)
+inline String operator*(Char c, Int n)
 {
 	return String(c) * n;
 }
 
-inline String operator*(int n, Char c)
+inline String operator*(Int n, Char c)
 {
 	return String(c) * n;
 }
