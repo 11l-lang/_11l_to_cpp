@@ -388,3 +388,127 @@ void from_eldf(const String &eldf, Element &el)
 	assert(obj_stack.size() == 1);
 	obj_stack.back().move_to_element(el);
 }
+
+namespace detail {
+String balance_pq_string(const String &s)
+{
+	int min_nesting_level = 0,
+	    nesting_level = 0;
+	for (Char ch : s)
+		if (ch == u'‘')
+			nesting_level++;
+		else if (ch == u'’') {
+			nesting_level--;
+			min_nesting_level = min(min_nesting_level, nesting_level);
+		}
+	nesting_level -= min_nesting_level;
+	return u'\''_C*-min_nesting_level & u'‘'_C*-min_nesting_level & u'‘'_C & s & u'’'_C & u'’'_C*nesting_level & u'\''_C*nesting_level;
+}
+
+String to_str(const String &vs, char16_t additional_prohibited_character = 0, char16_t additional_prohibited_character2 = 0)
+{
+	if (vs.len() < 100 && in(u'\n', vs))
+		return string(vs);
+
+	if (vs.empty() || in(vs[0], u" \t['") || vs.starts_with(u". ") || in(vs.last(), u" \t") || in(u'‘', vs) || in(u'’', vs) || in(u';', vs) || in(u'\n', vs) || vs == u'N'_C || vs == u'Н'_C // ]
+		|| (additional_prohibited_character  != 0 && (in(additional_prohibited_character, vs) ||
+		   (additional_prohibited_character2 != 0 && in(additional_prohibited_character2, vs)))) || vs[0].is_digit() || (vs[0] == u'-' && vs.len() > 1 && vs[1].is_digit()))
+		return balance_pq_string(vs);
+
+	return vs;
+}
+
+String to_str(const Element &el, char16_t additional_prohibited_character = 0, char16_t additional_prohibited_character2 = 0)
+{
+	if (el.value_type == ValueType::NUMBER_INT)
+		return String(el.value.number_int);
+
+	if (el.value_type == ValueType::NUMBER_FLOAT)
+		return String(el.value.number_float);
+
+	if (el.value_type == ValueType::BOOLEAN)
+		return el.value.boolean ? u"1B" : u"0B";
+
+	if (el.value_type == ValueType::N)
+		return u"N";
+
+	assert(el.value_type == ValueType::STRING);
+	return to_str(*el.value.string, additional_prohibited_character, additional_prohibited_character2);
+}
+}
+
+String to_eldf(const Element &el, int indent = 4, int level = 0, bool toplevel = true)
+{
+	String r;
+	if (el.value_type == ValueType::OBJECT) {
+		if (el.value.object->members.empty() && toplevel)
+			return u"{}\n";
+		for (auto it = el.value.object->members.begin(),
+		         end = el.value.object->members.end(); it != end;) {
+			auto &&[key, element] = *it;
+			++it;
+			r &= indent * level * u' '_C & detail::to_str(key, u'=', u'{'); // }
+			if (element.value_type == ValueType::OBJECT) {
+				if (element.value.object->members.empty())
+					r &= u" {}\n";
+				else {
+					r &= u'\n'_C & to_eldf(element, indent, level+1, false);
+					if (element.value.object->members.len() > 2 && it != end)
+						r &= u'\n'_C;
+				}
+			}
+			else if (element.value_type == ValueType::ARRAY) {
+				if (element.value.array->elements.empty())
+					r &= u" = []\n";
+				else
+					r &= u" = [\n" & to_eldf(element, indent, level, false) & indent * level * u' '_C & u"]\n";
+			}
+			else // this is value
+				r &= u" = " & detail::to_str(element) & u'\n'_C;
+		}
+	}
+	else if (el.value_type == ValueType::ARRAY) {
+		if (toplevel) {
+			if (el.value.array->elements.empty())
+				return u"[]\n";
+			r &= u"[\n";
+		}
+		for (auto it = el.value.array->elements.begin(),
+		         end = el.value.array->elements.end(); it != end;) {
+			const Element &element = *it;
+			++it;
+			if (element.value_type == ValueType::ARRAY) {
+				r &= indent * (level+1) * u' '_C & u'['_C;
+				for (auto it = element.value.array->elements.begin(),
+				         end = element.value.array->elements.end(); it != end;) {
+					const Element &sub_element = *it;
+					if (sub_element.value_type == ValueType::OBJECT
+					 || sub_element.value_type == ValueType::ARRAY)
+						throw Error(u"sorry, but this object can not be represented in ELDF", 0);
+					r &= detail::to_str(sub_element, u',');
+					++it;
+					if (it != end)
+						r &= u", ";
+				}
+				r &= u"]\n";
+			}
+			else if (element.value_type == ValueType::OBJECT) {
+				if (element.value.object->members.empty())
+					r &= indent * level * u' '_C & u'.'_C & (indent-1) * u' '_C & u"{}\n";
+				else {
+					r &= indent * level * u' '_C & u'.'_C & to_eldf(element, indent, level+1, false)[range_ei(indent * level + 1)];
+					if (element.value.object->members.len() > 2 && it != end)
+						r &= u'\n'_C;
+				}
+			}
+			else
+				r &= indent * (level+1) * u' '_C & detail::to_str(element, u'=', u'{') & u'\n'_C; // }
+		}
+		if (toplevel)
+			r &= u"]\n";
+	}
+	else
+		throw Error(u"sorry, but this object can not be represented in ELDF", 0);
+
+	return r;
+}

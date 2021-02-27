@@ -3194,6 +3194,10 @@ module_scope = Scope(None)
 module_scope.add_function('to_object', ASTFunctionDefinition([('json_str', '', 'String'), ('obj', '', '', '&')]))
 module_scope.add_function('from_object', ASTFunctionDefinition([('obj', '', ''), ('indent', '4', '')]))
 builtin_modules['json'] = Module(module_scope)
+module_scope = Scope(None)
+module_scope.add_function('to_object', ASTFunctionDefinition([('eldf_str', '', 'String'), ('obj', '', '', '&')]))
+module_scope.add_function('from_object', ASTFunctionDefinition([('obj', '', ''), ('indent', '4', 'Int')]))
+builtin_modules['eldf'] = Module(module_scope)
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
     if len(tokens_) == 0: return ASTProgram().to_str()

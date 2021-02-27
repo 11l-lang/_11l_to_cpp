@@ -557,6 +557,7 @@ public:
 	template <int N> bool operator==(const char16_t (&s)[N]) const {return   len() == N-1 && memcmp(c_str(), s, (N-1)*sizeof(char16_t)) == 0 ;}
 	template <int N> bool operator!=(const char16_t (&s)[N]) const {return !(len() == N-1 && memcmp(c_str(), s, (N-1)*sizeof(char16_t)) == 0);}
 
+	String operator+(const String &s) const = delete;
 	template <typename Ty> String operator+(const Ty &obj) const = delete;
 	template <typename Ty> void operator+=(const Ty &obj) const = delete;
 	template <typename Ty> friend String operator+(const Ty &obj, const String &s) = delete;

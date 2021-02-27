@@ -214,4 +214,28 @@ template <typename Ty> void to_object(const String &eldf, Ty &obj)
 	ldf::Serializer ser(&el, true, true);
 	ser.serialize(obj);
 }
+
+template <typename Ty> String from_object(const Ty &obj, int indent = 4)
+{
+	ldf::Element el;
+	ldf::Serializer ser(&el, false, false);
+	ser.serialize(const_cast<Ty&>(obj));
+	return ldf::to_eldf(el, indent);
+}
+
+template <typename Ty> String from_object(Ty &obj, int indent = 4)
+{
+	ldf::Element el;
+	ldf::Serializer ser(&el, false, false);
+	ser.serialize(obj);
+	return ldf::to_eldf(el, indent);
+}
+
+template <typename Ty> String from_object(Ty &&obj, int indent = 4) // for `from_object(std::move(obj))`
+{
+	ldf::Element el;
+	ldf::Serializer ser(&el, false, true);
+	ser.serialize(obj);
+	return ldf::to_eldf(el, indent);
+}
 }

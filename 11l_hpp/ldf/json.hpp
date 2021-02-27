@@ -118,7 +118,7 @@ String to_json(const Element &el, const String &indent, int level = 0)
 		if (!el.value.object->members.empty()) {
 			r &= u'\n'_C;
 			for (auto it = el.value.object->members.begin(),
-					 end = el.value.object->members.end(); it != end;) {
+			         end = el.value.object->members.end(); it != end;) {
 				auto &&[key, element] = *it;
 				r &= indent*(level + 1) & detail::string(key) & u": " & to_json(element, indent, level + 1);
 				++it;
@@ -136,7 +136,7 @@ String to_json(const Element &el, const String &indent, int level = 0)
 		if (!el.value.array->elements.empty()) {
 			r &= u'\n'_C;
 			for (auto it = el.value.array->elements.begin(),
-					 end = el.value.array->elements.end(); it != end;) {
+			         end = el.value.array->elements.end(); it != end;) {
 				r &= indent*(level + 1) & to_json(*it, indent, level + 1);
 				++it;
 				if (it != end)
