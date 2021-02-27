@@ -1,4 +1,6 @@
-﻿namespace ldf // namespace for lightweight data formats (such as JSON and ELDF)
+﻿#include <list> // for `std::list<ElementRef> obj_stack`
+
+namespace ldf // namespace for lightweight data formats (such as JSON and ELDF)
 {
 class Object;
 class Array;
