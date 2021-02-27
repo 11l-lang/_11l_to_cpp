@@ -3197,6 +3197,10 @@ builtin_modules['json'] = Module(module_scope)
 module_scope = Scope(None)
 module_scope.add_function('to_object', ASTFunctionDefinition([('eldf_str', '', 'String'), ('obj', '', '', '&')]))
 module_scope.add_function('from_object', ASTFunctionDefinition([('obj', '', ''), ('indent', '4', 'Int')]))
+module_scope.add_function('from_json', ASTFunctionDefinition([('json_str', '', 'String')]))
+module_scope.add_function('to_json', ASTFunctionDefinition([('eldf_str', '', 'String')]))
+module_scope.add_function('reparse', ASTFunctionDefinition([('eldf_str', '', 'String')]))
+module_scope.add_function('test_parse', ASTFunctionDefinition([('eldf_str', '', 'String')]))
 builtin_modules['eldf'] = Module(module_scope)
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++

@@ -157,8 +157,10 @@ public:
 		if (from_element_to_object) {
 			assert(element->value_type == ValueType::OBJECT);
 			auto p = element->value.object->members.find(key);
-			assert(p != nullptr);
-			ldf::Serializer ser(&*p, true, move_strings);
+			//assert(p != nullptr);
+			//ldf::Serializer ser(&*p, true, move_strings);
+			assert(p != element->value.object->members.end());
+			ldf::Serializer ser(const_cast<Element*>(&p->second), true, move_strings);
 			ser.serialize(val);
 		}
 		else {

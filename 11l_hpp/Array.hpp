@@ -578,7 +578,8 @@ inline Array<String> String::split(const String &delim, Nullable<int> limit, boo
 		}
 		else
 			str++;
-	str += delim.len() - 1;
+	//str += delim.len() - 1; // with this line of code there was an error in `u"[]\n===\n[]"_S.split(u"===\n"_S)` (second string in the resulting array has additional null character)
+	str = data() + len();
 
 	if (!group_delimiters || str != begin)
 		arr.append(String(begin, str-begin));

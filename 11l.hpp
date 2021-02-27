@@ -190,6 +190,14 @@ template <typename Ty> inline std::complex<Ty> conjugate(const std::complex<Ty> 
 #include "11l_hpp/re.hpp"
 #include "11l_hpp/random.hpp"
 #include "11l_hpp/minmaxheap.hpp"
+namespace std {
+template <> class hash<String>
+{
+public:
+	size_t operator()(const String &s) const { return hash<u16string>()(s); }
+};
+}
+#include "11l_hpp/ordered_map.h"
 #include "11l_hpp/ldf.hpp"
 
 #include <thread>
@@ -199,13 +207,6 @@ void sleep(double secs) // I could not pick up an appropriate namespace for this
 	std::this_thread::sleep_for(std::chrono::duration<double>(secs));
 }
 
-namespace std {
-template <> class hash<String>
-{
-public:
-	size_t operator()(const String &s) const { return hash<u16string>()(s); }
-};
-}
 template <typename Ty> auto hash(const Ty &obj)
 {
 	return std::hash<Ty>()(obj);

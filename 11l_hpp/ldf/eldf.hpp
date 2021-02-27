@@ -21,7 +21,7 @@ String substr(const char16_t *s, const char16_t *e)
 	return String(s, e - s);
 }
 
-const char16_t *from_str(const char16_t *s, const char16_t *end, const char16_t *sstart, Element &el, const char *stop_characters)
+const char16_t *from_str(const char16_t *s, const char16_t *end, const char16_t *sstart, Element &el, const wchar_t *stop_characters)
 {
 	assert(el.value_type == ValueType::N);
 
@@ -80,7 +80,7 @@ const char16_t *from_str(const char16_t *s, const char16_t *end, const char16_t 
 	}
 
 	while (s < end) {
-		if (strchr(stop_characters, (char)*s) || *s == '\r' || *s == '\n')
+		if (wcschr(stop_characters, *s) || *s == '\r' || *s == '\n')
 			break;
 		s++;
 	}
@@ -296,7 +296,7 @@ void from_eldf(const String &eldf, Element &el)
 					break; // [
 				}
 				new_list.value.array->elements.append(Element());
-				s = detail::from_str(s, end, start, new_list.value.array->elements.back(), ",]");
+				s = detail::from_str(s, end, start, new_list.value.array->elements.back(), L",]");
 				if (s < end)
 					if (*s == ',') {
 						s++;
@@ -316,7 +316,7 @@ void from_eldf(const String &eldf, Element &el)
 
 		const char16_t *key_start = s;
 		Element key;
-		s = detail::from_str(s, end, start, key, "={"); // }
+		s = detail::from_str(s, end, start, key, L"={"); // }
 
 		while (s < end && (*s == ' ' || *s == '\t')) // skip spaces after key
 			s++;
@@ -347,7 +347,7 @@ void from_eldf(const String &eldf, Element &el)
 					element.value_type = ValueType::ARRAY;
 				}
 				else
-					s = detail::from_str(s, end, start, element, ";");
+					s = detail::from_str(s, end, start, element, L";");
 			}
 		}
 		else {
@@ -453,7 +453,7 @@ String to_eldf(const Element &el, int indent = 4, int level = 0, bool toplevel =
 					r &= u" {}\n";
 				else {
 					r &= u'\n'_C & to_eldf(element, indent, level+1, false);
-					if (element.value.object->members.len() > 2 && it != end)
+					if (element.value.object->members.size() > 2 && it != end)
 						r &= u'\n'_C;
 				}
 			}
@@ -497,7 +497,7 @@ String to_eldf(const Element &el, int indent = 4, int level = 0, bool toplevel =
 					r &= indent * level * u' '_C & u'.'_C & (indent-1) * u' '_C & u"{}\n";
 				else {
 					r &= indent * level * u' '_C & u'.'_C & to_eldf(element, indent, level+1, false)[range_ei(indent * level + 1)];
-					if (element.value.object->members.len() > 2 && it != end)
+					if (element.value.object->members.size() > 2 && it != end)
 						r &= u'\n'_C;
 				}
 			}

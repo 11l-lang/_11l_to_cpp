@@ -48,7 +48,8 @@ public:
 class Object
 {
 public:
-	DefaultDict<String, Element> members;
+	//DefaultDict<String, Element> members;
+	tsl::ordered_map<String, Element> members;
 };
 
 class Array
@@ -71,9 +72,9 @@ class Error
 {
 public:
 	String message;
-	size_t pos;
+	int pos;
 
-	Error(const String &message, size_t pos) : message(message), pos(pos) {}
+	Error(const String &message, size_t pos) : message(message), pos(int(pos)) {}
 };
 
 // Some common functions
@@ -154,7 +155,7 @@ const char16_t *read_number(const char16_t *s, const char16_t *end, Element &el)
 		el.value.number_int = to_int64(String(start, s - start));
 		return s;
 	}
-	s++;
+	//s++; // this line was commented to fix `1e-21`
 	while (s < end && (Char(*s).is_digit() || *s == 'e' || *s == 'E')) {
 		if ((*s == 'e' || *s == 'E') && s + 1 < end)
 			if (s[1] == '-' || s[1] == '+')
@@ -207,6 +208,8 @@ template <typename Ty, typename IndentType = int> String from_object(Ty &&obj, I
 }
 
 namespace eldf {
+using Error = ldf::Error;
+
 template <typename Ty> void to_object(const String &eldf, Ty &obj)
 {
 	ldf::Element el;
@@ -237,5 +240,32 @@ template <typename Ty> String from_object(Ty &&obj, int indent = 4) // for `from
 	ldf::Serializer ser(&el, false, true);
 	ser.serialize(obj);
 	return ldf::to_eldf(el, indent);
+}
+
+String from_json(const String &json_str)
+{
+	ldf::Element el;
+	ldf::from_json(json_str, el);
+	return ldf::to_eldf(el);
+}
+
+String to_json(const String &eldf_str)
+{
+	ldf::Element el;
+	ldf::from_eldf(eldf_str, el);
+	return ldf::to_json(el);
+}
+
+String reparse(const String &eldf_str)
+{
+	ldf::Element el;
+	ldf::from_eldf(eldf_str, el);
+	return ldf::to_eldf(el);
+}
+
+void test_parse(const String &eldf_str)
+{
+	ldf::Element el;
+	ldf::from_eldf(eldf_str, el);
 }
 }
