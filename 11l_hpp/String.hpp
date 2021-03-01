@@ -135,6 +135,22 @@ public:
 		}
 		append(1, u']');
 	}
+	explicit String(Complex c)
+	{
+		if (abs(c.imag()) < 1e-9)
+			assign(c.real());
+		else {
+			if (abs(c.real()) < 1e-9)
+				assign(c.imag());
+			else {
+				assign(c.real());
+				if (c.imag() > 0)
+					append(1, u'+');
+				(*this) &= String(c.imag());
+			}
+			append(1, u'i');
+		}
+	}
 
 	using std::u16string::assign;
 	void assign(double num, int digits = 9, bool remove_trailing_zeroes = true)

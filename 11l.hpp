@@ -145,6 +145,8 @@ template <typename Type, int dimension> inline const Type *end  (const Tvec<Type
 }
 #include "11l_hpp/Range.hpp"
 #include <iostream> // for std::wcerr in String.hpp
+#include <complex>
+typedef std::complex<double> Complex;
 #include "11l_hpp/String.hpp"
 AssertionError::AssertionError(const String &message) : message(std::make_unique<String>(message)) {}
 AssertionError::operator String() const {return message != nullptr ? *message : String();}
@@ -157,8 +159,6 @@ AssertionError::operator String() const {return message != nullptr ? *message : 
 #include <limits> // for `std::numeric_limits<double>::infinity()` and `std::numeric_limits<int>::min()/max()`
 
 #include <functional>
-#include <complex>
-typedef std::complex<double> Complex;
 using namespace std::complex_literals;
 template <typename Ty, typename Ty2> inline std::complex<Ty> operator+(const std::complex<Ty> &c, const Ty2 &n) {return std::complex<Ty>(c.real() + n, c.imag());}
 template <typename Ty, typename Ty2> inline std::complex<Ty> operator+(const Ty2 &n, const std::complex<Ty> &c) {return std::complex<Ty>(c.real() + n, c.imag());}

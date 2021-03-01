@@ -10840,3 +10840,46 @@ struct CodeBlock1
         print(u"R = #.16"_S.format(2.0 / iter(mesh)));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Roots_of_unity#Python
+import math
+
+def polar(r, theta):
+    return r * (math.cos(theta) + math.sin(theta) * 1j) # [https://en.cppreference.com/w/cpp/numeric/complex/polar]
+
+def croots(n):
+    return [polar(1, 2 * k * math.pi / n) for k in range(n)]
+
+for nr in range(2, 11):
+    print(nr, croots(nr))
+===
+//import math
+
+F polar(r, theta)
+   R r * (cos(theta) + sin(theta) * 1i)
+
+F croots(n)
+   R (0 .< n).map(k -> polar(1, 2 * k * math:pi / @n))
+
+L(nr) 2..10
+   print(nr‘ ’(croots(nr)))
+===
+template <typename T1, typename T2> auto polar(const T1 &r, const T2 &theta)
+{
+    return r * (cos(theta) + sin(theta) * 1i);
+}
+
+template <typename T1> auto croots(const T1 &n)
+{
+    return range_el(0, n).map([&n](const auto &k){return polar(1, 2 * k * math::pi / n);});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto nr : range_ee(2, 10))
+            print(nr & u" "_S & (croots(nr)));
+    }
+} code_block_1;
