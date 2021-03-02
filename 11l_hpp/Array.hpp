@@ -776,3 +776,12 @@ namespace std {
 template <size_t N, class T> auto bind_array(const Array<T> &vec) {
 	return array_binder<T, N>(vec);
 }
+
+inline Int int_from_bytes(const Array<Byte> &bytes)
+{
+	Int r = 0;
+	if (bytes.len() > sizeof(Int))
+		throw AssertionError();
+	memcpy(&r, bytes.data(), bytes.len());
+	return r;
+}

@@ -2796,3 +2796,83 @@ b : Dict[str, Callable[[float, int], bool]] = {}
 ===
 std::function<bool(const double, const int)> f;
 Dict<String, std::function<bool(const double, const int)>> b;
+
+
+# https://proglangs.ru/8
+def print_image(fname):
+    bytes = open(fname, 'rb').read()
+
+    w = int.from_bytes(bytes[18:22], 'little')
+    h = int.from_bytes(bytes[22:26], 'little')
+
+    for y in range(h-1, -1, -1):
+        for x in range(w):
+            #b = bytes[54 + (x + y*w)*3]
+            b = bytes[54::3][x + y*w]
+            if   b >= 204: print('  ', end = '')
+            elif b >= 153: print('░░', end = '')
+            elif b >= 102: print('▒▒', end = '')
+            elif b >=  51: print('▓▓', end = '')
+            else         : print('██', end = '')
+        print()
+
+print_image('1.bmp')
+print_image('2.bmp')
+print_image('3.bmp')
+===
+F print_image(fname)
+   V bytes = File(fname).read_bytes()
+   V w = Int(bytes' bytes[18.<22])
+   V h = Int(bytes' bytes[22.<26])
+
+   L(y) (h - 1 .< -1).step(-1)
+      L(x) 0 .< w
+         V b = bytes[(54..).step(3)][x + y * w]
+         I b >= 204
+            print(‘  ’, end' ‘’)
+         E I b >= 153
+            print(‘░░’, end' ‘’)
+         E I b >= 102
+            print(‘▒▒’, end' ‘’)
+         E I b >= 51
+            print(‘▓▓’, end' ‘’)
+         E
+            print(‘██’, end' ‘’)
+      print()
+print_image(‘1.bmp’)
+print_image(‘2.bmp’)
+print_image(‘3.bmp’)
+===
+template <typename T1> auto print_image(const T1 &fname)
+{
+    auto bytes = File(fname).read_bytes();
+    auto w = int_from_bytes(bytes[range_el(18, 22)]);
+    auto h = int_from_bytes(bytes[range_el(22, 26)]);
+
+    for (auto y : range_el(h - 1, -1).step(-1)) {
+        for (auto x : range_el(0, w)) {
+            auto b = bytes[range_ei(54).step(3)][x + y * w];
+            if (b >= 204)
+                print(u"  "_S, u""_S);
+            else if (b >= 153)
+                print(u"░░"_S, u""_S);
+            else if (b >= 102)
+                print(u"▒▒"_S, u""_S);
+            else if (b >= 51)
+                print(u"▓▓"_S, u""_S);
+            else
+                print(u"██"_S, u""_S);
+        }
+        print();
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print_image(u"1.bmp"_S);
+        print_image(u"2.bmp"_S);
+        print_image(u"3.bmp"_S);
+    }
+} code_block_1;

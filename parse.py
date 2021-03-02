@@ -440,6 +440,8 @@ class SymbolNode:
                     else:
                         f_node = type_of(self.children[0])
                 elif func_name == 'Int':
+                    if self.children[1] is not None and self.children[1].token_str() == "bytes'":
+                        return 'int_from_bytes(' + self.children[2].to_str() + ')'
                     func_name = 'to_int'
                     f_node = builtins_scope.find('Int').ast_nodes[0].constructors[0]
                 elif func_name == 'Int64':
@@ -485,7 +487,7 @@ class SymbolNode:
                 elif func_name == 'sum' and self.children[2].symbol.id == '(' and self.children[2].children[0].symbol.id == '.' and self.children[2].children[0].children[1].token_str() == 'map': # )
                     assert(len(self.children) == 3)
                     return 'sum_map(' + self.children[2].children[0].children[0].to_str() + ', ' + self.children[2].children[2].to_str() + ')'
-                elif func_name in ('min', 'max') and len(self.children) == 5 and self.children[3] is not None and self.children[3].to_str()[:-1] == 'key':
+                elif func_name in ('min', 'max') and len(self.children) == 5 and self.children[3] is not None and self.children[3].token_str() == "key'":
                     return func_name + '_with_key(' + self.children[2].to_str() + ', ' + self.children[4].to_str() + ')'
                 elif func_name == 'copy':
                     s = self.scope
@@ -561,7 +563,7 @@ class SymbolNode:
                     else:
                         if f_node is None or type(f_node) != ASTFunctionDefinition:
                             raise Error('function `' + func_name + '` is not found (you can remove named arguments in function call to suppress this error)', self.children[0].left_to_right_token())
-                        argument_name = self.children[i].to_str()[:-1]
+                        argument_name = self.children[i].token_str()[:-1]
                         while True:
                             if last_function_arg == len(f_node.function_arguments):
                                 raise Error('argument `' + argument_name + '` is not found in function `' + func_name + '`', self.children[i].token)
