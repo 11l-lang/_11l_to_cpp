@@ -1149,7 +1149,7 @@ F decode(lst)
    R q
 V value = encode(‘aaaaahhhhhhmmmmmmmuiiiiiiiaaaaaa’)
 print(‘Encoded value is ’value.map(v -> String(v[1])‘’v[0]))
-print(‘Decoded value is ’(decode(value)))
+print(‘Decoded value is ’decode(value))
 ===
 template <typename T1> auto encode(const T1 &input_string)
 {
@@ -1183,7 +1183,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         print(u"Encoded value is "_S & value.map([](const auto &v){return String(_get<1>(v)) & _get<0>(v);}));
-        print(u"Decoded value is "_S & (decode(value)));
+        print(u"Decoded value is "_S & decode(value));
     }
 } code_block_1;
 

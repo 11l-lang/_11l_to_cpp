@@ -8424,12 +8424,12 @@ V maxn = 10000
 V reversion_limit = 500
 print(‘Calculations using n = 1..#. and limiting each search to 2*#. reverse-digits-and-adds’.format(maxn, reversion_limit))
 V (lychrel, l_related) = find_lychrel(maxn, reversion_limit)
-print(‘  Number of Lychrel numbers: ’(lychrel.len))
-print(‘    Lychrel numbers: ’(lychrel.map(n -> String(n)).join(‘, ’)))
-print(‘  Number of Lychrel related: ’(l_related.len))
+print(‘  Number of Lychrel numbers: ’lychrel.len)
+print(‘    Lychrel numbers: ’lychrel.map(n -> String(n)).join(‘, ’))
+print(‘  Number of Lychrel related: ’l_related.len)
 V pals = lychrel + l_related.filter(x -> x == reverse_int(x))
-print(‘  Number of Lychrel palindromes: ’(pals.len))
-print(‘    Lychrel palindromes: ’(pals.map(n -> String(n)).join(‘, ’)))
+print(‘  Number of Lychrel palindromes: ’pals.len)
+print(‘    Lychrel palindromes: ’pals.map(n -> String(n)).join(‘, ’))
 ===
 template <typename T1> auto reverse_int(const T1 &num)
 {
@@ -8488,9 +8488,9 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        print(u"  Number of Lychrel numbers: "_S & (lychrel.len()));
-        print(u"    Lychrel numbers: "_S & (lychrel.map([](const auto &n){return String(n);}).join(u", "_S)));
-        print(u"  Number of Lychrel related: "_S & (l_related.len()));
+        print(u"  Number of Lychrel numbers: "_S & lychrel.len());
+        print(u"    Lychrel numbers: "_S & lychrel.map([](const auto &n){return String(n);}).join(u", "_S));
+        print(u"  Number of Lychrel related: "_S & l_related.len());
     }
 } code_block_2;
 auto pals = lychrel + l_related.filter([](const auto &x){return x == reverse_int(x);});
@@ -8499,8 +8499,8 @@ struct CodeBlock3
 {
     CodeBlock3()
     {
-        print(u"  Number of Lychrel palindromes: "_S & (pals.len()));
-        print(u"    Lychrel palindromes: "_S & (pals.map([](const auto &n){return String(n);}).join(u", "_S)));
+        print(u"  Number of Lychrel palindromes: "_S & pals.len());
+        print(u"    Lychrel palindromes: "_S & pals.map([](const auto &n){return String(n);}).join(u", "_S));
     }
 } code_block_3;
 
@@ -8811,7 +8811,7 @@ L !pack.empty
    E
       red_stack.append(pack.pop())
    discard.append(top)
-print(‘(Discards: ’(discard.map(d -> d[0]).join(‘ ’))" )\n")
+print(‘(Discards: ’discard.map(d -> d[0]).join(‘ ’)" )\n")
 V max_swaps = min(black_stack.len, red_stack.len)
 V swap_count = random:(0 .. max_swaps)
 print(‘Swapping ’swap_count)
@@ -8861,7 +8861,7 @@ struct CodeBlock2
                 red_stack.append(pack.pop());
             discard.append(top);
         }
-        print(u"(Discards: "_S & (discard.map([](const auto &d){return _get<0>(d);}).join(u" "_S)) & u" )\n"_S);
+        print(u"(Discards: "_S & discard.map([](const auto &d){return _get<0>(d);}).join(u" "_S) & u" )\n"_S);
     }
 } code_block_2;
 auto max_swaps = min(black_stack.len(), red_stack.len());
@@ -10272,7 +10272,7 @@ F recamanUntil(p)
 F enumFromTo(m)
    ‘Integer enumeration from m to n.’
    R n -> @m .< 1 + n
-print("First 15 Recaman:\n "(recamanUntil((seen, n, r, _) -> n == 15)))
+print("First 15 Recaman:\n "recamanUntil((seen, n, r, _) -> n == 15))
 print("First duplicated Recaman:\n "recamanUntil((seen, n, r, blnNew) -> !blnNew).last)
 V setK = Set(enumFromTo(0)(1000))
 print("Number of Recaman terms needed to generate all integers from [0..1000]:\n "(recamanUntil((seen, n, r, blnNew) -> (blnNew & r < 1001 & :setK.is_subset(seen))).len - 1))
@@ -10314,7 +10314,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(u"First 15 Recaman:\n "_S & (recamanUntil([](const auto &seen, const auto &n, const auto &r, const auto &_){return n == 15;})));
+        print(u"First 15 Recaman:\n "_S & recamanUntil([](const auto &seen, const auto &n, const auto &r, const auto &_){return n == 15;}));
         print(u"First duplicated Recaman:\n "_S & recamanUntil([](const auto &seen, const auto &n, const auto &r, const auto &blnNew){return !blnNew;}).last());
     }
 } code_block_1;
@@ -10863,7 +10863,7 @@ F croots(n)
    R (0 .< n).map(k -> polar(1, 2 * k * math:pi / @n))
 
 L(nr) 2..10
-   print(nr‘ ’(croots(nr)))
+   print(nr‘ ’croots(nr))
 ===
 template <typename T1, typename T2> auto polar(const T1 &r, const T2 &theta)
 {
@@ -10880,6 +10880,6 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto nr : range_ee(2, 10))
-            print(nr & u" "_S & (croots(nr)));
+            print(nr & u" "_S & croots(nr));
     }
 } code_block_1;

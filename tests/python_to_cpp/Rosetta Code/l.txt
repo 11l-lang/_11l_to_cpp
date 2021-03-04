@@ -779,7 +779,7 @@ F lcp(sa)
    R sa[0][0 .< min_len]
 
 F test(sa)
-   print((String(sa))‘ -> ’(lcp(sa)))
+   print(String(sa)‘ -> ’lcp(sa))
 test([‘interspecies’, ‘interstellar’, ‘interstate’])
 test([‘throne’, ‘throne’])
 test([‘throne’, ‘dungeon’])
@@ -808,7 +808,7 @@ template <typename T1> auto lcp(const T1 &sa)
 
 template <typename T1> auto test(const T1 &sa)
 {
-    print((String(sa)) & u" -> "_S & (lcp(sa)));
+    print(String(sa) & u" -> "_S & lcp(sa));
 }
 
 struct CodeBlock1
