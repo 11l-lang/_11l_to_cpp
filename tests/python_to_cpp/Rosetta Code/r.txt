@@ -1,0 +1,1276 @@
+# https://www.rosettacode.org/wiki/Ramsey%27s_theorem#Python
+a = [['0'] * 17 for i in range(17)]
+idx = [0] * 4
+
+def find_group(mark, min_n, max_n, depth=1):
+    if depth == 4:
+        prefix = "" if mark == '1' else "un"
+        print("Fail, found totally %sconnected group:" % prefix)
+        for i in range(4):
+            print(idx[i])
+        return True
+
+    for i in range(min_n, max_n):
+        n = 0
+        while n < depth:
+            if a[idx[n]][i] != mark:
+                break
+            n += 1
+
+        if n == depth:
+            idx[n] = i
+            if find_group(mark, 1, max_n, depth + 1):
+                return True
+
+    return False
+
+for i in range(17):
+    a[i][i] = '-'
+for k in range(4):
+    for i in range(17):
+        j = (i + pow(2, k)) % 17
+        a[i][j] = a[j][i] = '1'
+
+# testcase breakage
+# a[2][1] = a[1][2] = '0'
+
+for row in a:
+    print(' '.join(row))
+
+for i in range(17):
+    idx[0] = i
+    if find_group('1', i + 1, 17) or find_group('0', i + 1, 17):
+        print("no good")
+        break
+else:
+    print("all good")
+===
+V a = (0.<17).map(i -> [‘0’] * 17)
+V idx = [0] * 4
+
+F find_group(mark, min_n, max_n, depth = 1)
+   I depth == 4
+      V prefix = I mark == ‘1’ {‘’} E ‘un’
+      print(‘Fail, found totally #.connected group:’.format(prefix))
+      L(i) 4
+         print(:idx[i])
+      R 1B
+
+   L(i) min_n .< max_n
+      V n = 0
+      L n < depth
+         I :a[:idx[n]][i] != mark
+            L.break
+         n++
+
+      I n == depth
+         :idx[n] = i
+         I find_group(mark, 1, max_n, depth + 1)
+            R 1B
+   R 0B
+
+L(i) 17
+   a[i][i] = ‘-’
+L(k) 4
+   L(i) 17
+      V j = (i + pow(2, k)) % 17
+      a[i][j] = a[j][i] = ‘1’
+
+L(row) a
+   print(row.join(‘ ’))
+
+L(i) 17
+   idx[0] = i
+   I find_group(‘1’, i + 1, 17) | find_group(‘0’, i + 1, 17)
+      print(‘no good’)
+      L.break
+L.was_no_break
+   print(‘all good’)
+===
+auto a = range_el(0, 17).map([](const auto &i){return create_array({u'0'_C}) * 17;});
+auto idx = create_array({0}) * 4;
+
+template <typename T1, typename T2, typename T3, typename T4 = decltype(1)> auto find_group(const T1 &mark, const T2 &min_n, const T3 &max_n, const T4 &depth = 1)
+{
+    if (depth == 4) {
+        auto prefix = mark == u'1' ? u""_S : u"un"_S;
+        print(u"Fail, found totally #.connected group:"_S.format(prefix));
+        for (int i = 0; i < 4; i++)
+            print(::idx[i]);
+        return true;
+    }
+
+    for (auto i : range_el(min_n, max_n)) {
+        auto n = 0;
+        while (n < depth) {
+            if (::a[::idx[n]][i] != mark)
+                break;
+            n++;
+        }
+
+        if (n == depth) {
+            ::idx.set(n, i);
+            if (find_group(mark, 1, max_n, depth + 1))
+                return true;
+        }
+    }
+    return false;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int i = 0; i < 17; i++)
+            a[i].set(i, u'-'_C);
+        for (int k = 0; k < 4; k++)
+            for (int i = 0; i < 17; i++) {
+                auto j = mod((i + pow(2, k)), 17);
+                a[i].set(j, a[j].set(i, u'1'_C));
+            }
+        for (auto &&row : a)
+            print(row.join(u" "_S));
+        {bool was_break = false;
+
+        for (int i = 0; i < 17; i++) {
+            _set<0>(idx, i);
+            if (find_group(u"1"_S, i + 1, 17) || find_group(u"0"_S, i + 1, 17)) {
+                print(u"no good"_S);
+                was_break = true;
+                break;
+            }
+        }
+        if (!was_break)
+            print(u"all good"_S);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Range_extraction#Python
+def range_extract(lst):
+    r : List[List[int]] = []
+    lenlst = len(lst)
+    i = 0
+    while i< lenlst:
+        low = lst[i]
+        while i <lenlst-1 and lst[i]+1 == lst[i+1]: i +=1
+        hi = lst[i]
+        if   hi - low >= 2:
+            r += [[low, hi]]
+        elif hi - low == 1:
+            r += [[low]]
+            r += [[hi]]
+        else:
+            r += [[low]]
+        i += 1
+    return r
+
+def printr(ranges):
+    print( ','.join( (str(r[0]) + '-' + str(r[1]) if len(r) == 2 else str(r[0]))
+                     for r in ranges ) )
+
+for lst in [[-8, -7, -6, -3, -2, -1, 0, 1, 3, 4, 5, 7,
+             8, 9, 10, 11, 14, 15, 17, 18, 19, 20],
+            [0, 1, 2, 4, 6, 7, 8, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+             23, 24, 25, 27, 28, 29, 30, 31, 32, 33, 35, 36, 37, 38, 39]]:
+    printr(range_extract(lst))
+===
+F range_extract(lst)
+   [[Int]] r
+   V lenlst = lst.len
+   V i = 0
+   L i < lenlst
+      V low = lst[i]
+      L i < lenlst - 1 & lst[i] + 1 == lst[i + 1]
+         i++
+      V hi = lst[i]
+      I hi - low >= 2
+         r [+]= [low, hi]
+      E I hi - low == 1
+         r [+]= [low]
+         r [+]= [hi]
+      E
+         r [+]= [low]
+      i++
+   R r
+
+F printr(ranges)
+   print(ranges.map(r -> (I r.len == 2 {String(r[0])‘-’String(r[1])} E String(r[0]))).join(‘,’))
+
+L(lst) [[-8, -7, -6, -3, -2, -1, 0, 1, 3, 4, 5, 7, 8, 9, 10, 11, 14, 15, 17, 18, 19, 20], [0, 1, 2, 4, 6, 7, 8, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 27, 28, 29, 30, 31, 32, 33, 35, 36, 37, 38, 39]]
+   printr(range_extract(lst))
+===
+template <typename T1> auto range_extract(const T1 &lst)
+{
+    Array<Array<int>> r;
+    auto lenlst = lst.len();
+    auto i = 0;
+    while (i < lenlst) {
+        auto low = lst[i];
+        while (i < lenlst - 1 && lst[i] + 1 == lst[i + 1])
+            i++;
+        auto hi = lst[i];
+        if (hi - low >= 2)
+            r.append(create_array({low, hi}));
+        else if (hi - low == 1) {
+            r.append(create_array({low}));
+            r.append(create_array({hi}));
+        }
+        else
+            r.append(create_array({low}));
+        i++;
+    }
+    return r;
+}
+
+template <typename T1> auto printr(const T1 &ranges)
+{
+    print(ranges.map([](const auto &r){return (r.len() == 2 ? String(_get<0>(r)) & u"-"_S & String(_get<1>(r)) : String(_get<0>(r)));}).join(u","_S));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&lst : create_array({create_array({-8, -7, -6, -3, -2, -1, 0, 1, 3, 4, 5, 7, 8, 9, 10, 11, 14, 15, 17, 18, 19, 20}), create_array({0, 1, 2, 4, 6, 7, 8, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 27, 28, 29, 30, 31, 32, 33, 35, 36, 37, 38, 39})}))
+            printr(range_extract(lst));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Real_constants_and_functions#Python
+x = 0
+y = 0
+
+import math
+
+math.e          # e
+math.pi         # pi
+math.sqrt(x)    # square root  (Also commonly seen as x ** 0.5 to obviate importing the math module)
+math.log(x)     # natural logarithm
+math.log10(x)   # base 10 logarithm
+math.exp(x)     # e raised to the power of x
+abs(x)          # absolute value
+math.floor(x)   # floor
+math.ceil(x)    # ceiling
+x ** y          # exponentiation
+===
+V x = 0
+V y = 0
+//import math
+math:e
+math:pi
+sqrt(x)
+log(x)
+log10(x)
+exp(x)
+abs(x)
+floor(x)
+ceil(x)
+x ^ y
+===
+auto x = 0;
+auto y = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        math::e;
+        math::pi;
+        sqrt(x);
+        log(x);
+        log10(x);
+        exp(x);
+        abs(x);
+        floor(x);
+        ceil(x);
+        pow(x, y);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Reduced_row_echelon_form#Python
+def ToReducedRowEchelonForm(M : list):
+    lead = 0
+    rowCount = len(M)
+    columnCount = len(M[0])
+    for r in range(rowCount):
+        if lead >= columnCount:
+            return
+        i = r
+        while M[i][lead] == 0:
+            i += 1
+            if i == rowCount:
+                i = r
+                lead += 1
+                if columnCount == lead:
+                    return
+        (M[i],M[r]) = (M[r],M[i])
+        lv = M[r][lead]
+        M[r] = [ mrx / float(lv) for mrx in M[r]]
+        for i in range(rowCount):
+            if i != r:
+                lv = M[i][lead]
+                M[i] = [ iv - lv*rv for rv,iv in zip(M[r],M[i])]
+        lead += 1
+
+mtx = [
+   [ 1.0, 2.0, -1.0, -4.0],
+   [ 2.0, 3.0, -1.0, -11.0],
+   [-2.0, 0.0, -3.0,  22.0],]
+
+ToReducedRowEchelonForm( mtx )
+
+for rw in mtx:
+    print(', '.join( (str(rv) for rv in rw) ))
+===
+F ToReducedRowEchelonForm(&M)
+   V lead = 0
+   V rowCount = M.len
+   V columnCount = M[0].len
+   L(r) 0 .< rowCount
+      I lead >= columnCount
+         R
+      V i = r
+      L M[i][lead] == 0
+         i++
+         I i == rowCount
+            i = r
+            lead++
+            I columnCount == lead
+               R
+      swap(&M[i], &M[r])
+      V lv = M[r][lead]
+      M[r] = M[r].map(mrx -> mrx / Float(@lv))
+      L(i) 0 .< rowCount
+         I i != r
+            lv = M[i][lead]
+            M[i] = zip(M[r], M[i]).map((rv, iv) -> iv - @lv * rv)
+      lead++
+V mtx = [[1.0, 2.0, -1.0, -4.0], [2.0, 3.0, -1.0, -11.0], [-2.0, 0.0, -3.0, 22.0]]
+ToReducedRowEchelonForm(&mtx)
+
+L(rw) mtx
+   print(((rw.map(rv -> String(rv)))).join(‘, ’))
+===
+template <typename T1> auto ToReducedRowEchelonForm(T1 &M)
+{
+    auto lead = 0;
+    auto rowCount = M.len();
+    auto columnCount = _get<0>(M).len();
+    for (auto r : range_el(0, rowCount)) {
+        if (lead >= columnCount)
+            return;
+        auto i = r;
+        while (M[i][lead] == 0) {
+            i++;
+            if (i == rowCount) {
+                i = r;
+                lead++;
+                if (columnCount == lead)
+                    return;
+            }
+        }
+        swap(M[i], M[r]);
+        auto lv = M[r][lead];
+        M.set(r, M[r].map([&lv](const auto &mrx){return mrx / to_float(lv);}));
+        for (auto i : range_el(0, rowCount))
+            if (i != r) {
+                lv = M[i][lead];
+                M.set(i, zip(M[r], M[i]).map([&lv](const auto &rv, const auto &iv){return iv - lv * rv;}));
+            }
+        lead++;
+    }
+}
+auto mtx = create_array({create_array({1.0, 2.0, -1.0, -4.0}), create_array({2.0, 3.0, -1.0, -11.0}), create_array({-2.0, 0.0, -3.0, 22.0})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        ToReducedRowEchelonForm(mtx);
+        for (auto &&rw : mtx)
+            print(((rw.map([](const auto &rv){return String(rv);}))).join(u", "_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Regular_expressions#Python
+import re
+
+string = "This is a string"
+
+if re.search('string$', string):
+    print("Ends with string.")
+
+string = re.sub(" a ", " another ", string)
+print(string)
+===
+//import re
+V string = ‘This is a string’
+
+I re:‘string$’.search(string)
+   print(‘Ends with string.’)
+string = string.replace(re:‘ a ’, ‘ another ’)
+print(string)
+===
+auto string = u"This is a string"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        if (re::_(u"string$"_S).search(string))
+            print(u"Ends with string."_S);
+        string = string.replace(re::_(u" a "_S), u" another "_S);
+        print(string);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Remove_duplicate_elements#Python
+items = ['1', '2', '3', 'a', 'b', 'c', '2', '3', '4', 'b', 'c', 'd']
+unique = list(set(items))
+print(unique)
+===
+V items = [‘1’, ‘2’, ‘3’, ‘a’, ‘b’, ‘c’, ‘2’, ‘3’, ‘4’, ‘b’, ‘c’, ‘d’]
+V unique = Array(Set(items))
+print(unique)
+===
+auto items = create_array({u'1'_C, u'2'_C, u'3'_C, u'a'_C, u'b'_C, u'c'_C, u'2'_C, u'3'_C, u'4'_C, u'b'_C, u'c'_C, u'd'_C});
+auto unique = create_array(create_set(items));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(unique);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Remove_vowels_from_a_string#Python
+def exceptGlyphs(exclusions, s):
+    return ''.join([c for c in s if c not in exclusions])
+
+txt = '''
+    Rosetta Code is a programming chrestomathy site.
+    The idea is to present solutions to the same
+    task in as many different languages as possible,
+    to demonstrate how languages are similar and
+    different, and to aid a person with a grounding
+    in one approach to a problem in learning another.'''
+
+print(exceptGlyphs('eau', txt))
+===
+F exceptGlyphs(exclusions, s)
+   R (s.filter(c -> c !C @exclusions)).join(‘’)
+V txt = ‘
+    Rosetta Code is a programming chrestomathy site.
+    The idea is to present solutions to the same
+    task in as many different languages as possible,
+    to demonstrate how languages are similar and
+    different, and to aid a person with a grounding
+    in one approach to a problem in learning another.’
+print(exceptGlyphs(‘eau’, txt))
+===
+template <typename T1, typename T2> auto exceptGlyphs(const T1 &exclusions, const T2 &s)
+{
+    return (s.filter([&exclusions](const auto &c){return !in(c, exclusions);})).join(u""_S);
+}
+auto txt = uR"(
+    Rosetta Code is a programming chrestomathy site.
+    The idea is to present solutions to the same
+    task in as many different languages as possible,
+    to demonstrate how languages are similar and
+    different, and to aid a person with a grounding
+    in one approach to a problem in learning another.)"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(exceptGlyphs(u"eau"_S, txt));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Rep-string#Python
+def reps(text):
+    return [text[:x] for x in range(1, 1 + len(text) // 2)
+            if text.startswith(text[x:])]
+
+matchstr = \
+"""1001110011
+1110111011
+0010010010
+1010101010
+1111111111
+0100101101
+0100100
+101
+11
+00
+1"""
+
+for line in matchstr.split("\n"):
+    print("'%s' has reps %s" % (line, reps(line)))
+===
+F reps(text)
+   R (1 .< 1 + text.len I/ 2).filter(x -> @text.starts_with(@text[x ..])).map(x -> @text[0 .< x])
+V matchstr = ‘1001110011
+1110111011
+0010010010
+1010101010
+1111111111
+0100101101
+0100100
+101
+11
+00
+1’
+
+L(line) matchstr.split("\n")
+   print(‘'#.' has reps #.’.format(line, reps(line)))
+===
+template <typename T1> auto reps(const T1 &text)
+{
+    return range_el(1, 1 + idiv(text.len(), 2)).filter([&text](const auto &x){return text.starts_with(text[range_ei(x)]);}).map([&text](const auto &x){return text[range_el(0, x)];});
+}
+auto matchstr = uR"(1001110011
+1110111011
+0010010010
+1010101010
+1111111111
+0100101101
+0100100
+101
+11
+00
+1)"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&line : matchstr.split(u"\n"_S))
+            print(u"'#.' has reps #."_S.format(line, reps(line)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Repeat#Python
+def repeat(f,n):
+  for i in range(n):
+    f();
+
+def procedure():
+  print("Example")
+
+repeat(procedure,3)
+===
+F repeat(f, n)
+   L(i) 0 .< n
+      f()
+
+F procedure()
+   print(‘Example’)
+repeat(procedure, 3)
+===
+template <typename T1, typename T2> auto repeat(const T1 &f, const T2 &n)
+{
+    for (auto i : range_el(0, n))
+        f();
+}
+
+auto procedure()
+{
+    print(u"Example"_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        repeat(procedure, 3);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Resistance_network_calculator#Python
+def gauss(m : list):
+    (n, p) = (len(m), len(m[0]))
+    for i in range(n):
+        k = max(range(i, n), key = lambda x: abs(m[x][i]))
+        (m[i], m[k]) = (m[k], m[i])
+        t = 1 / m[i][i]
+        for j in range(i + 1, p): m[i][j] *= t
+        for j in range(i + 1, n):
+            t = m[j][i]
+            for k in range(i + 1, p): m[j][k] -= t * m[i][k]
+    for i in range(n - 1, -1, -1):
+        for j in range(i): m[j][-1] -= m[j][i] * m[i][-1]
+    return [row[-1] for row in m]
+
+def network(n,k0,k1,s):
+    m = [[0.0] * (n+1) for i in range(n)]
+    resistors = s.split('|')
+    for resistor in resistors:
+        (aa,bb,rr) = resistor.split(' ')
+        (a,b,r) = (int(aa), int(bb), (1 / int(rr)))
+        m[a][a] += r
+        m[b][b] += r
+        if a > 0: m[a][b] -= r
+        if b > 0: m[b][a] -= r
+    m[k0][k0] = 1
+    m[k1][-1] = 1
+    return gauss(m)[k1]
+
+def is_equal(a, b):
+    return abs(a - b) < 1e-6
+
+assert is_equal(10  , network(7,0,1,"0 2 6|2 3 4|3 4 10|4 5 2|5 6 8|6 1 4|3 5 6|3 6 6|3 1 8|2 1 8"))
+assert is_equal(3/2 , network(3*3,0,3*3-1,"0 1 1|1 2 1|3 4 1|4 5 1|6 7 1|7 8 1|0 3 1|3 6 1|1 4 1|4 7 1|2 5 1|5 8 1"))
+assert is_equal(13/7, network(4*4,0,4*4-1,"0 1 1|1 2 1|2 3 1|4 5 1|5 6 1|6 7 1|8 9 1|9 10 1|10 11 1|12 13 1|13 14 1|14 15 1|0 4 1|4 8 1|8 12 1|1 5 1|5 9 1|9 13 1|2 6 1|6 10 1|10 14 1|3 7 1|7 11 1|11 15 1"))
+assert is_equal(180 , network(4,0,3,"0 1 150|0 2 50|1 3 300|2 3 250"))
+print('OK')
+===
+F gauss(&m)
+   V (n, p) = (m.len, m[0].len)
+   L(i) 0 .< n
+      V k = max(i .< n, key' x -> abs(@m[x][@i]))
+      swap(&m[i], &m[k])
+      V t = 1 / m[i][i]
+      L(j) i + 1 .< p
+         m[i][j] *= t
+      L(j) i + 1 .< n
+         t = m[j][i]
+         L(k) i + 1 .< p
+            m[j][k] -= t * m[i][k]
+   L(i) (n - 1 .< -1).step(-1)
+      L(j) 0 .< i
+         m[j].last -= m[j][i] * m[i].last
+   R m.map(row -> row.last)
+
+F network(n, k0, k1, s)
+   V m = (0 .< n).map(i -> [0.0] * (@n + 1))
+   V resistors = s.split(‘|’)
+   L(resistor) resistors
+      V (aa, bb, rr) = resistor.split(‘ ’)
+      V (a, b, r) = (Int(aa), Int(bb), (1 / Int(rr)))
+      m[a][a] += r
+      m[b][b] += r
+      I a > 0
+         m[a][b] -= r
+      I b > 0
+         m[b][a] -= r
+   m[k0][k0] = 1
+   m[k1].last = 1
+   R gauss(&m)[k1]
+
+F is_equal(a, b)
+   R abs(a - b) < 1e-6
+assert(is_equal(10, network(7, 0, 1, ‘0 2 6|2 3 4|3 4 10|4 5 2|5 6 8|6 1 4|3 5 6|3 6 6|3 1 8|2 1 8’)))
+assert(is_equal(3 / 2, network(3 * 3, 0, 3 * 3 - 1, ‘0 1 1|1 2 1|3 4 1|4 5 1|6 7 1|7 8 1|0 3 1|3 6 1|1 4 1|4 7 1|2 5 1|5 8 1’)))
+assert(is_equal(13 / 7, network(4 * 4, 0, 4 * 4 - 1, ‘0 1 1|1 2 1|2 3 1|4 5 1|5 6 1|6 7 1|8 9 1|9 10 1|10 11 1|12 13 1|13 14 1|14 15 1|0 4 1|4 8 1|8 12 1|1 5 1|5 9 1|9 13 1|2 6 1|6 10 1|10 14 1|3 7 1|7 11 1|11 15 1’)))
+assert(is_equal(180, network(4, 0, 3, ‘0 1 150|0 2 50|1 3 300|2 3 250’)))
+print(‘OK’)
+===
+template <typename T1> auto gauss(T1 &m)
+{
+    auto [n, p] = make_tuple(m.len(), _get<0>(m).len());
+    for (auto i : range_el(0, n)) {
+        auto k = max_with_key(range_el(i, n), [&i, &m](const auto &x){return abs(m[x][i]);});
+        swap(m[i], m[k]);
+        auto t = 1.0 / m[i][i];
+        for (auto j : range_el(i + 1, p))
+            m[i][j] *= t;
+        for (auto j : range_el(i + 1, n)) {
+            t = m[j][i];
+            for (auto k : range_el(i + 1, p))
+                m[j][k] -= t * m[i][k];
+        }
+    }
+    for (auto i : range_el(n - 1, -1).step(-1))
+        for (auto j : range_el(0, i))
+            m[j].last() -= m[j][i] * m[i].last();
+    return m.map([](const auto &row){return row.last();});
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto network(const T1 &n, const T2 &k0, const T3 &k1, const T4 &s)
+{
+    auto m = range_el(0, n).map([&n](const auto &i){return create_array({0.0}) * (n + 1);});
+    auto resistors = s.split(u"|"_S);
+    for (auto &&resistor : resistors) {
+        auto [aa, bb, rr] = bind_array<3>(resistor.split(u" "_S));
+        auto [a, b, r] = make_tuple(to_int(aa), to_int(bb), (1.0 / to_int(rr)));
+        m[a][a] += r;
+        m[b][b] += r;
+        if (a > 0)
+            m[a][b] -= r;
+        if (b > 0)
+            m[b][a] -= r;
+    }
+    m[k0].set(k0, 1);
+    m[k1].last() = 1;
+    return gauss(m)[k1];
+}
+
+template <typename T1, typename T2> auto is_equal(const T1 &a, const T2 &b)
+{
+    return abs(a - b) < 1e-6;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        assert(is_equal(10, network(7, 0, 1, u"0 2 6|2 3 4|3 4 10|4 5 2|5 6 8|6 1 4|3 5 6|3 6 6|3 1 8|2 1 8"_S)));
+        assert(is_equal(3.0 / 2, network(3 * 3, 0, 3 * 3 - 1, u"0 1 1|1 2 1|3 4 1|4 5 1|6 7 1|7 8 1|0 3 1|3 6 1|1 4 1|4 7 1|2 5 1|5 8 1"_S)));
+        assert(is_equal(13.0 / 7, network(4 * 4, 0, 4 * 4 - 1, u"0 1 1|1 2 1|2 3 1|4 5 1|5 6 1|6 7 1|8 9 1|9 10 1|10 11 1|12 13 1|13 14 1|14 15 1|0 4 1|4 8 1|8 12 1|1 5 1|5 9 1|9 13 1|2 6 1|6 10 1|10 14 1|3 7 1|7 11 1|11 15 1"_S)));
+        assert(is_equal(180, network(4, 0, 3, u"0 1 150|0 2 50|1 3 300|2 3 250"_S)));
+        print(u"OK"_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Return_multiple_values#Python
+def addsub(x, y):
+    return (x + y, x - y)
+
+(summ, difference) = addsub(33, 12)
+print("33 + 12 = %s" % summ)
+print("33 - 12 = %s" % difference)
+===
+F addsub(x, y)
+   R (x + y, x - y)
+V (summ, difference) = addsub(33, 12)
+print(‘33 + 12 = #.’.format(summ))
+print(‘33 - 12 = #.’.format(difference))
+===
+template <typename T1, typename T2> auto addsub(const T1 &x, const T2 &y)
+{
+    return make_tuple(x + y, x - y);
+}
+auto [summ, difference] = addsub(33, 12);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"33 + 12 = #."_S.format(summ));
+        print(u"33 - 12 = #."_S.format(difference));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Reverse_the_gender_of_a_string#Kotlin
+import re
+
+def reverse_gender(s):
+    words = ["She", "she", "Her",  "her",  "hers", "He",   "he",   "His",  "his",  "him"]
+    repls = ["He_", "he_", "His_", "his_" ,"his_", "She_", "she_", "Her_", "her_", "her_"]
+
+    for word, repl in zip(words, repls):
+        s = re.sub(r'\b' + word + r'\b', repl, s)
+
+    return s.replace('_', '')
+
+print(reverse_gender("She was a soul stripper. She took his heart!"))
+print(reverse_gender("He was a soul stripper. He took her heart!"))
+print(reverse_gender("She wants what's hers, he wants her and she wants him!"))
+print(reverse_gender("Her dog belongs to him but his dog is hers!"))
+===
+//import re
+
+F reverse_gender(=s)
+   V words = [‘She’, ‘she’, ‘Her’, ‘her’, ‘hers’, ‘He’, ‘he’, ‘His’, ‘his’, ‘him’]
+   V repls = [‘He_’, ‘he_’, ‘His_’, ‘his_’, ‘his_’, ‘She_’, ‘she_’, ‘Her_’, ‘her_’, ‘her_’]
+
+   L(word, repl) zip(words, repls)
+      s = s.replace(re:(‘\b’word‘\b’), repl)
+   R s.replace(‘_’, ‘’)
+print(reverse_gender(‘She was a soul stripper. She took his heart!’))
+print(reverse_gender(‘He was a soul stripper. He took her heart!’))
+print(reverse_gender(‘She wants what's hers, he wants her and she wants him!’))
+print(reverse_gender(‘Her dog belongs to him but his dog is hers!’))
+===
+template <typename T1> auto reverse_gender(T1 s)
+{
+    auto words = create_array({u"She"_S, u"she"_S, u"Her"_S, u"her"_S, u"hers"_S, u"He"_S, u"he"_S, u"His"_S, u"his"_S, u"him"_S});
+    auto repls = create_array({u"He_"_S, u"he_"_S, u"His_"_S, u"his_"_S, u"his_"_S, u"She_"_S, u"she_"_S, u"Her_"_S, u"her_"_S, u"her_"_S});
+    for (auto &&[word, repl] : zip(words, repls))
+        s = s.replace(re::_(uR"(\b)"_S & word & uR"(\b)"_S), repl);
+    return s.replace(u"_"_S, u""_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(reverse_gender(u"She was a soul stripper. She took his heart!"_S));
+        print(reverse_gender(u"He was a soul stripper. He took her heart!"_S));
+        print(reverse_gender(u"She wants what's hers, he wants her and she wants him!"_S));
+        print(reverse_gender(u"Her dog belongs to him but his dog is hers!"_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Reverse_words_in_a_string#Python
+text = \
+'''---------- Ice and Fire ------------
+
+fire, in end will world the say Some
+ice. in say Some
+desire of tasted I've what From
+fire. favor who those with hold I
+
+... elided paragraph last ...
+
+Frost Robert -----------------------'''
+
+for line in text.split('\n'):
+    print(' '.join(line.split(' ')[::-1]))
+===
+V text = ‘---------- Ice and Fire ------------
+
+fire, in end will world the say Some
+ice. in say Some
+desire of tasted I've what From
+fire. favor who those with hold I
+
+... elided paragraph last ...
+
+Frost Robert -----------------------’
+
+L(line) text.split("\n")
+   print((reversed(line.split(‘ ’))).join(‘ ’))
+===
+auto text = uR"(---------- Ice and Fire ------------
+
+fire, in end will world the say Some
+ice. in say Some
+desire of tasted I've what From
+fire. favor who those with hold I
+
+... elided paragraph last ...
+
+Frost Robert -----------------------)"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&line : text.split(u"\n"_S))
+            print((reversed(line.split(u" "_S))).join(u" "_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Roman_numerals/Decode#Python
+roman_values = [('I',1), ('IV',4), ('V',5), ('IX',9),('X',10),
+                ('XL',40),('L',50),('XC',90),('C',100),
+                ('CD', 400), ('D', 500), ('CM', 900), ('M',1000)]
+
+def roman_value(roman):
+    total=0
+    for symbol, value in reversed(roman_values):
+        while roman.startswith(symbol):
+            total += value
+            roman = roman[len(symbol):]
+    return total
+
+for value in ["MCMXC", "MMVIII", "MDCLXVI"]:
+    print('%s = %i' % (value, roman_value(value)))
+===
+V roman_values = [(‘I’, 1), (‘IV’, 4), (‘V’, 5), (‘IX’, 9), (‘X’, 10), (‘XL’, 40), (‘L’, 50), (‘XC’, 90), (‘C’, 100), (‘CD’, 400), (‘D’, 500), (‘CM’, 900), (‘M’, 1000)]
+
+F roman_value(=roman)
+   V total = 0
+   L(symbol, value) reversed(:roman_values)
+      L roman.starts_with(symbol)
+         total += value
+         roman = roman[symbol.len ..]
+   R total
+
+L(value) [‘MCMXC’, ‘MMVIII’, ‘MDCLXVI’]
+   print(‘#. = #.’.format(value, roman_value(value)))
+===
+auto roman_values = create_array({make_tuple(u"I"_S, 1), make_tuple(u"IV"_S, 4), make_tuple(u"V"_S, 5), make_tuple(u"IX"_S, 9), make_tuple(u"X"_S, 10), make_tuple(u"XL"_S, 40), make_tuple(u"L"_S, 50), make_tuple(u"XC"_S, 90), make_tuple(u"C"_S, 100), make_tuple(u"CD"_S, 400), make_tuple(u"D"_S, 500), make_tuple(u"CM"_S, 900), make_tuple(u"M"_S, 1000)});
+
+template <typename T1> auto roman_value(T1 roman)
+{
+    auto total = 0;
+    for (auto &&[symbol, value] : reversed(::roman_values))
+        while (roman.starts_with(symbol)) {
+            total += value;
+            roman = roman[range_ei(symbol.len())];
+        }
+    return total;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&value : create_array({u"MCMXC"_S, u"MMVIII"_S, u"MDCLXVI"_S}))
+            print(u"#. = #."_S.format(value, roman_value(value)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Roman_numerals/Encode#Python
+anums = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1]
+rnums = "M CM D CD C XC L XL X IX V IV I".split(' ')
+
+def to_roman(x):
+    ret = ''
+    for a,r in zip(anums, rnums):
+        (n,x) = divmod(x,a)
+        ret += r*n
+    return ret
+
+test = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,25,30,40,
+        50,60,69,70,80,90,99,100,200,300,400,500,600,666,700,800,900,
+        1000,1009,1444,1666,1945,1997,1999,2000,2008,2010,2011,2500,
+        3000,3999]
+for val in test:
+    print('%d - %s'%(val, to_roman(val)))
+===
+V anums = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1]
+V rnums = ‘M CM D CD C XC L XL X IX V IV I’.split(‘ ’)
+
+F to_roman(=x)
+   V ret = ‘’
+   L(a, r) zip(:anums, :rnums)
+      (V n, x) = divmod(x, a)
+      ret ‘’= r * n
+   R ret
+V test = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 30, 40, 50, 60, 69, 70, 80, 90, 99, 100, 200, 300, 400, 500, 600, 666, 700, 800, 900, 1000, 1009, 1444, 1666, 1945, 1997, 1999, 2000, 2008, 2010, 2011, 2500, 3000, 3999]
+L(val) test
+   print(‘#. - #.’.format(val, to_roman(val)))
+===
+auto anums = create_array({1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1});
+auto rnums = u"M CM D CD C XC L XL X IX V IV I"_S.split(u" "_S);
+
+template <typename T1> auto to_roman(T1 x)
+{
+    auto ret = u""_S;
+    for (auto &&[a, r] : zip(::anums, ::rnums)) {
+        TUPLE_ELEMENT_T(0, divmod(x, a)) n;
+        assign_from_tuple(n, x, divmod(x, a));
+        ret &= r * n;
+    }
+    return ret;
+}
+auto test = create_array({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 30, 40, 50, 60, 69, 70, 80, 90, 99, 100, 200, 300, 400, 500, 600, 666, 700, 800, 900, 1000, 1009, 1444, 1666, 1945, 1997, 1999, 2000, 2008, 2010, 2011, 2500, 3000, 3999});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&val : test)
+            print(u"#. - #."_S.format(val, to_roman(val)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Roots_of_a_function#Python
+def f(x):
+    return x**3 - 3 * x**2 + 2 * x
+
+step = 0.001 # Smaller step values produce more accurate and precise results
+start = -1.0
+stop = 3.0
+
+sgn = f(start) > 0
+
+x = start
+while x <= stop:
+    value = f(x)
+
+    if value == 0:
+        # We hit a root
+        print("Root found at", x)
+    elif (value > 0) != sgn:
+        # We passed a root
+        print("Root found near", x)
+
+    # Update our sign
+    sgn = value > 0
+
+    x += step
+===
+F f(x)
+   R x ^ 3 - 3 * x ^ 2 + 2 * x
+V step = 0.001
+V start = -1.0
+V stop = 3.0
+V sgn = f(start) > 0
+V x = start
+L x <= stop
+   V value = f(x)
+
+   I value == 0
+      print(‘Root found at ’x)
+   E I (value > 0) != sgn
+      print(‘Root found near ’x)
+   sgn = value > 0
+   x += step
+===
+template <typename T1> auto f(const T1 &x)
+{
+    return cube(x) - 3 * square(x) + 2 * x;
+}
+auto step = 0.001;
+auto start = -1.0;
+auto stop = 3.0;
+auto sgn = f(start) > 0;
+auto x = start;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (x <= stop) {
+            auto value = f(x);
+            if (value == 0)
+                print(u"Root found at "_S & x);
+            else if ((value > 0) != sgn)
+                print(u"Root found near "_S & x);
+            sgn = value > 0;
+            x += step;
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Roots_of_a_quadratic_function
+def quad_roots(a, b, c):
+    sqd = complex(b**2 - 4*a*c) ** 0.5
+    return ((-b + sqd) / (2 * a),
+            (-b - sqd) / (2 * a))
+
+testcases = [
+    (3.0, 4.0, 4/3),    # real, equal
+    (3.0, 2.0, -1.0),     # real, unequal
+    (3.0, 2.0,  1.0),      # complex
+    (1.0, -1e9, 1.0),   # ill-conditioned "quadratic in question" required by task.
+    (1.0, -1e100, 1.0)
+]
+
+for a, b, c in testcases:
+    (r1, r2) = quad_roots(a, b, c)
+    print(r1, end = ' ')
+    print(r2)
+===
+F quad_roots(a, b, c)
+   V sqd = Complex(b ^ 2 - 4 * a * c) ^ 0.5
+   R ((-b + sqd) / (2 * a), (-b - sqd) / (2 * a))
+V testcases = [(3.0, 4.0, 4 / 3), (3.0, 2.0, -1.0), (3.0, 2.0, 1.0), (1.0, -1e9, 1.0), (1.0, -1e100, 1.0)]
+
+L(a, b, c) testcases
+   V (r1, r2) = quad_roots(a, b, c)
+   print(r1, end' ‘ ’)
+   print(r2)
+===
+template <typename T1, typename T2, typename T3> auto quad_roots(const T1 &a, const T2 &b, const T3 &c)
+{
+    auto sqd = pow(Complex(square(b) - 4 * a * c), 0.5);
+    return make_tuple((-b + sqd) / (2 * a), (-b - sqd) / (2 * a));
+}
+auto testcases = create_array({make_tuple(3.0, 4.0, 4.0 / 3), make_tuple(3.0, 2.0, -1.0), make_tuple(3.0, 2.0, 1.0), make_tuple(1.0, -1e9, 1.0), make_tuple(1.0, -1e100, 1.0)});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&[a, b, c] : testcases) {
+            auto [r1, r2] = quad_roots(a, b, c);
+            print(r1, u" "_S);
+            print(r2);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Run-length_encoding#Python
+Char = str
+
+def encode(input_string):
+    count = 1
+    prev = Char("\0")
+    lst : List[Tuple[Char, int]] = []
+    for character in input_string:
+        if character != prev:
+            if prev != Char("\0"):
+                lst.append((prev, count))
+            count = 1
+            prev = character
+        else:
+            count += 1
+
+    lst.append((input_string[-1], count))
+    return lst
+
+def decode(lst):
+    q = ""
+    for character, count in lst:
+        q += character * count
+    return q
+
+value = encode("aaaaahhhhhhmmmmmmmuiiiiiiiaaaaaa")
+print('Encoded value is', [str(v[1])+v[0] for v in value])
+print('Decoded value is', decode(value))
+===
+
+F encode(input_string)
+   V count = 1
+   V prev = Char("\0")
+   [(Char, Int)] lst
+   L(character) input_string
+      I character != prev
+         I prev != Char("\0")
+            lst.append((prev, count))
+         count = 1
+         prev = character
+      E
+         count++
+   lst.append((input_string.last, count))
+   R lst
+
+F decode(lst)
+   V q = ‘’
+   L(character, count) lst
+      q ‘’= character * count
+   R q
+V value = encode(‘aaaaahhhhhhmmmmmmmuiiiiiiiaaaaaa’)
+print(‘Encoded value is ’value.map(v -> String(v[1])‘’v[0]))
+print(‘Decoded value is ’(decode(value)))
+===
+template <typename T1> auto encode(const T1 &input_string)
+{
+    auto count = 1;
+    auto prev = u'\0'_C;
+    Array<Tuple<Char, int>> lst;
+    for (auto &&character : input_string)
+        if (character != prev) {
+            if (prev != u'\0'_C)
+                lst.append(make_tuple(prev, count));
+            count = 1;
+            prev = character;
+        }
+        else
+            count++;
+    lst.append(make_tuple(input_string.last(), count));
+    return lst;
+}
+
+template <typename T1> auto decode(const T1 &lst)
+{
+    auto q = u""_S;
+    for (auto &&[character, count] : lst)
+        q &= character * count;
+    return q;
+}
+auto value = encode(u"aaaaahhhhhhmmmmmmmuiiiiiiiaaaaaa"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Encoded value is "_S & value.map([](const auto &v){return String(_get<1>(v)) & _get<0>(v);}));
+        print(u"Decoded value is "_S & (decode(value)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Runge-Kutta_method#Python
+import math
+
+def rk4(f, x0, y0, x1, n):
+    vx = [0.0] * (n + 1)
+    vy = [0.0] * (n + 1)
+    h = (x1 - x0) / float(n)
+    x = x0
+    y = y0
+    vx[0] = x
+    vy[0] = y
+    for i in range(1, n + 1):
+        k1 = h * f(x, y)
+        k2 = h * f(x + 0.5 * h, y + 0.5 * k1)
+        k3 = h * f(x + 0.5 * h, y + 0.5 * k2)
+        k4 = h * f(x + h, y + k3)
+        vx[i] = x = x0 + i * h
+        vy[i] = y = y + (k1 + k2 + k2 + k3 + k3 + k4) / 6
+    return (vx, vy)
+
+def f(x : float, y : float) -> float:
+    return x * math.sqrt(y)
+
+(vx, vy) = rk4(f, 0.0, 1.0, 10.0, 100)
+for x, y in list(zip(vx, vy))[::10]:
+    print("%4.1f %10.5f %11.8f" % (x, y, y - (4 + x * x)**2 / 16))
+===
+//import math
+
+F rk4(f, x0, y0, x1, n)
+   V vx = [0.0] * (n + 1)
+   V vy = [0.0] * (n + 1)
+   V h = (x1 - x0) / Float(n)
+   V x = x0
+   V y = y0
+   vx[0] = x
+   vy[0] = y
+   L(i) 1 .. n
+      V k1 = h * f(x, y)
+      V k2 = h * f(x + 0.5 * h, y + 0.5 * k1)
+      V k3 = h * f(x + 0.5 * h, y + 0.5 * k2)
+      V k4 = h * f(x + h, y + k3)
+      vx[i] = x = x0 + i * h
+      vy[i] = y = y + (k1 + k2 + k2 + k3 + k3 + k4) / 6
+   R (vx, vy)
+
+F f(Float x, Float y) -> Float
+   R x * sqrt(y)
+V (vx, vy) = rk4(f, 0.0, 1.0, 10.0, 100)
+L(x, y) zip(vx, vy)[(0..).step(10)]
+   print(‘#2.1 #4.5 #2.8’.format(x, y, y - (4 + x * x) ^ 2 / 16))
+===
+template <typename T1, typename T2, typename T3, typename T4, typename T5> auto rk4(const T1 &f, const T2 &x0, const T3 &_y0_, const T4 &x1, const T5 &n)
+{
+    auto vx = create_array({0.0}) * (n + 1);
+    auto vy = create_array({0.0}) * (n + 1);
+    auto h = (x1 - x0) / to_float(n);
+    auto x = x0;
+    auto y = _y0_;
+    _set<0>(vx, x);
+    _set<0>(vy, y);
+    for (auto i : range_ee(1, n)) {
+        auto k1 = h * f(x, y);
+        auto k2 = h * f(x + 0.5 * h, y + 0.5 * k1);
+        auto k3 = h * f(x + 0.5 * h, y + 0.5 * k2);
+        auto k4 = h * f(x + h, y + k3);
+        vx.set(i, x = x0 + i * h);
+        vy.set(i, y = y + (k1 + k2 + k2 + k3 + k3 + k4) / 6.0);
+    }
+    return make_tuple(vx, vy);
+}
+
+double f(const double x, const double y)
+{
+    return x * sqrt(y);
+}
+auto [vx, vy] = rk4(f, 0.0, 1.0, 10.0, 100);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[x, y] : zip(vx, vy)[range_ei(0).step(10)])
+            print(u"#2.1 #4.5 #2.8"_S.format(x, y, y - square((4 + x * x)) / 16.0));
+    }
+} code_block_1;

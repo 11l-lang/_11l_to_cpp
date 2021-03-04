@@ -2710,6 +2710,123 @@ struct CodeBlock1
 } code_block_1;
 
 
+// https://www.rosettacode.org/wiki/Ramer-Douglas-Peucker_line_simplification#Go
+F rdp(l, ε) -> [(Float, Float)]
+   V x = 0
+   V dMax = -1.0
+   V p1 = l[0]
+   V p2 = l.last
+   V p21 = p2 - p1
+
+   L(p) l[1.<(len)-1]
+      V d = abs(cross(p, p21) + cross(p2, p1))
+      I d > dMax
+         x = L.index + 1
+         dMax = d
+
+   I dMax > ε
+      R rdp(l[0..x], ε) [+] rdp(l[x..], ε)[1..]
+
+   R [l[0], l.last]
+
+print(rdp([(0.0, 0.0),
+           (1.0, 0.1),
+           (2.0,-0.1),
+           (3.0, 5.0),
+           (4.0, 6.0),
+           (5.0, 7.0),
+           (6.0, 8.1),
+           (7.0, 9.0),
+           (8.0, 9.0),
+           (9.0, 9.0)], 1.0))
+===
+template <typename T1, typename T2> Array<dvec2> rdp(const T1 &l, const T2 &ε)
+{
+    auto x = 0;
+    auto dMax = -1.0;
+    auto p1 = _get<0>(l);
+    auto p2 = l.last();
+    auto p21 = p2 - p1;
+    {int Lindex = 0;
+
+    for (auto &&p : l[range_e_llen(1,  - 1)]) {
+        auto d = abs(cross(p, p21) + cross(p2, p1));
+        if (d > dMax) {
+            x = Lindex + 1;
+            dMax = d;
+        }
+        Lindex++;
+    }}
+    if (dMax > ε)
+        return rdp(l[range_ee(0, x)], ε) + rdp(l[range_ei(x)], ε)[range_ei(1)];
+    return create_array({_get<0>(l), l.last()});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(rdp(create_array({make_tuple(0.0, 0.0), make_tuple(1.0, 0.1), make_tuple(2.0, -0.1), make_tuple(3.0, 5.0), make_tuple(4.0, 6.0), make_tuple(5.0, 7.0), make_tuple(6.0, 8.1), make_tuple(7.0, 9.0), make_tuple(8.0, 9.0), make_tuple(9.0, 9.0)}), 1.0));
+    }
+} code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Range_consolidation#Python
+F consolidate(ranges)
+   F normalize(s)
+      R sorted(s.filter(bounds -> !bounds.empty).map(bounds -> sorted(bounds)))
+
+   V norm = normalize(ranges)
+   L(&r1) norm
+      V i = L.index
+      I !r1.empty
+         L(j) i + 1 .< norm.len
+            V& r2 = norm[j]
+            I !r2.empty & r1.last >= r2[0]
+               r1 = [r1[0], max(r1.last, r2.last)]
+               r2.clear()
+   R norm.filter(rnge -> !rnge.empty)
+
+L(s) [[[1.1, 2.2]],
+      [[6.1, 7.2], [7.2, 8.3]],
+      [[4.0, 3.0], [2.0, 1.0]],
+      [[4.0, 3.0], [2.0, 1.0], [-1.0, -2.0], [3.9, 10.0]],
+      [[1.0, 3.0], [-6.0, -1.0], [-4.0, -5.0], [8.0, 2.0], [-6.0, -6.0]]]
+   print(String(s)[1 .< (len)-1]‘ => ’String(consolidate(s))[1 .< (len)-1])
+===
+template <typename T1> auto consolidate(const T1 &ranges)
+{
+    auto normalize = [](const auto &s)
+    {
+        return sorted(s.filter([](const auto &bounds){return !bounds.empty();}).map([](const auto &bounds){return sorted(bounds);}));
+    };
+    auto norm = normalize(ranges);
+    {int Lindex = 0;
+    for (auto &r1 : norm) {
+        auto i = Lindex;
+        if (!r1.empty())
+            for (auto j : range_el(i + 1, norm.len())) {
+                auto& r2 = norm[j];
+                if (!r2.empty() && r1.last() >= _get<0>(r2)) {
+                    r1 = create_array({_get<0>(r1), max(r1.last(), r2.last())});
+                    r2.clear();
+                }
+            }
+        Lindex++;
+    }}
+    return norm.filter([](const auto &rnge){return !rnge.empty();});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&s : create_array({create_array({create_array({1.1, 2.2})}), create_array({create_array({6.1, 7.2}), create_array({7.2, 8.3})}), create_array({create_array({4.0, 3.0}), create_array({2.0, 1.0})}), create_array({create_array({4.0, 3.0}), create_array({2.0, 1.0}), create_array({-1.0, -2.0}), create_array({3.9, 10.0})}), create_array({create_array({1.0, 3.0}), create_array({-6.0, -1.0}), create_array({-4.0, -5.0}), create_array({8.0, 2.0}), create_array({-6.0, -6.0})})}))
+            print(String(s)[range_e_llen(1,  - 1)] & u" => "_S & String(consolidate(s))[range_e_llen(1,  - 1)]);
+    }
+} code_block_1;
+
+
 // https://www.rosettacode.org/wiki/Remove_lines_from_a_file
 :start:
 V l = File(:argv[1]).read_lines()

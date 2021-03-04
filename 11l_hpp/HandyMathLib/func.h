@@ -234,7 +234,7 @@ template <class T,class Ta> INLINE const T herp3(const T &x,const T &y,const Ta 
 template <class T,class Ta> INLINE const T herp5(const T &x,const T &y,const Ta &a) {return mix(x,y,a*a*a*(Ta(10)+a*(Ta(6)*a-Ta(15))));}
 template <class T> INLINE const T unlerp(const T &x, const T &y, const T &a) {return (a - x)/(y - x);}//returns t, such as lerp(x,y,t) = a
 
-template <class Ta,class T> INLINE const T step(const Ta &edge,const T &x) {return x<edge ? T(0) : T(1);}
+//template <class Ta,class T> INLINE const T step(const Ta &edge,const T &x) {return x<edge ? T(0) : T(1);}
 template <class Ta,class T> INLINE const T smoothstep(const Ta &edge0,const Ta &edge1,const T &x)
 {
 	T t;
