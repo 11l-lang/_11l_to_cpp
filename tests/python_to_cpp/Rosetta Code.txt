@@ -10883,3 +10883,33 @@ struct CodeBlock1
             print(nr & u" "_S & croots(nr));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Semordnilap#Python
+wordset = set(open('unixdict.txt').read().split("\n"))
+
+revlist = (word[::-1] for word in wordset)
+pairs   = set((wrd, rev) for wrd, rev in zip(wordset, revlist)
+                 if wrd < rev and rev in wordset)
+
+print(len(pairs))
+print(sorted(list(pairs), key=lambda p: (len(p[0]), p))[-5:])
+===
+V wordset = Set(File(‘unixdict.txt’).read().split("\n"))
+V revlist = (wordset.map(word -> reversed(word)))
+V pairs = Set(zip(wordset, revlist).filter((wrd, rev) -> wrd < rev & rev C :wordset))
+print(pairs.len)
+print(sorted(Array(pairs), key' p -> (p[0].len, p))[(len)-5 ..])
+===
+auto wordset = create_set(File(u"unixdict.txt"_S).read().split(u"\n"_S));
+auto revlist = (wordset.map([](const auto &word){return reversed(word);}));
+auto pairs = create_set(zip(wordset, revlist).filter([](const auto &wrd, const auto &rev){return wrd < rev && in(rev, ::wordset);}));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(pairs.len());
+        print(sorted(create_array(pairs), [](const auto &p){return make_tuple(_get<0>(p).len(), p);})[range_elen_i( - 5)]);
+    }
+} code_block_1;

@@ -3123,6 +3123,7 @@ set_scope.add_name('difference', ASTFunctionDefinition([('other', '', 'Set')]))
 set_scope.add_name('is_subset', ASTFunctionDefinition([('other', '', 'Set')]))
 set_scope.add_name('add', ASTFunctionDefinition([('elem', '', '')]))
 set_scope.add_name('discard', ASTFunctionDefinition([('elem', '', '')]))
+set_scope.add_name('map', ASTFunctionDefinition([('f', '', '')]))
 builtins_scope.ids['Set'].ast_nodes[0].scope = set_scope
 deque_scope = Scope(None)
 deque_scope.add_name('append', ASTFunctionDefinition([('x', '', '')]))
