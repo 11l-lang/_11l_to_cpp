@@ -160,7 +160,7 @@ inline void rename(const String &old_path, const String &new_path)
 
 namespace path
 {
-static const char16_t sep =
+static const Char sep =
 #ifdef _WIN32
 u'\\'
 #else
