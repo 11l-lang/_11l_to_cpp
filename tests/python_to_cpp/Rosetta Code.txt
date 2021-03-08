@@ -10913,3 +10913,81 @@ struct CodeBlock1
         print(sorted(create_array(pairs), [](const auto &p){return make_tuple(_get<0>(p).len(), p);})[range_elen_i( - 5)]);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Set#Python
+s1 = {1, 2, 3, 4}
+s2 = {3, 4, 5, 6}
+print(s1.union(s2))
+print(s1.intersection(s2))
+print(s1.difference(s2))
+print(s1 < s1)
+print({3, 1} < s1)
+print(s1 <= s1)
+print({3, 1} <= s1)
+print({3, 2, 4, 1} == s1)
+print(s1 == s2)
+print(2 in s1)
+print(10 not in s1)
+print({1, 2, 3, 4, 5} > s1)
+print({1, 2, 3, 4} > s1)
+print({1, 2, 3, 4} >= s1)
+print(s1.symmetric_difference(s2))
+print(len(s1))
+s1.add(99)
+print(s1)
+s1.discard(99)
+print(s1)
+===
+V s1 = Set([1, 2, 3, 4])
+V s2 = Set([3, 4, 5, 6])
+print(s1.union(s2))
+print(s1.intersection(s2))
+print(s1.difference(s2))
+print(s1 < s1)
+print(Set([3, 1]) < s1)
+print(s1 <= s1)
+print(Set([3, 1]) <= s1)
+print(Set([3, 2, 4, 1]) == s1)
+print(s1 == s2)
+print(2 C s1)
+print(10 !C s1)
+print(Set([1, 2, 3, 4, 5]) > s1)
+print(Set([1, 2, 3, 4]) > s1)
+print(Set([1, 2, 3, 4]) >= s1)
+print(s1.symmetric_difference(s2))
+print(s1.len)
+s1.add(99)
+print(s1)
+s1.discard(99)
+print(s1)
+===
+auto s1 = create_set({1, 2, 3, 4});
+auto s2 = create_set({3, 4, 5, 6});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(s1.set_union(s2));
+        print(s1.intersection(s2));
+        print(s1.difference(s2));
+        print(s1 < s1);
+        print(create_set({3, 1}) < s1);
+        print(s1 <= s1);
+        print(create_set({3, 1}) <= s1);
+        print(create_set({3, 2, 4, 1}) == s1);
+        print(s1 == s2);
+        print(in(2, s1));
+        print(!in(10, s1));
+        print(create_set({1, 2, 3, 4, 5}) > s1);
+        print(create_set({1, 2, 3, 4}) > s1);
+        print(create_set({1, 2, 3, 4}) >= s1);
+        print(s1.symmetric_difference(s2));
+        print(s1.len());
+        s1.add(99);
+        print(s1);
+        s1.discard(99);
+        print(s1);
+    }
+} code_block_1;

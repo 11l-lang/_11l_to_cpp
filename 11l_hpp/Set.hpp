@@ -59,10 +59,28 @@ public:
 		return result;
 	}
 
+	Set set_union(const Set &other) const
+	{
+		Set result;
+		std::set_union(std::set<KeyType>::begin(), std::set<KeyType>::end(), other.begin(), other.end(), std::inserter(result, result.end()));
+		return result;
+	}
+
+	Set symmetric_difference(const Set &other) const
+	{
+		Set result;
+		std::set_symmetric_difference(std::set<KeyType>::begin(), std::set<KeyType>::end(), other.begin(), other.end(), std::inserter(result, result.end()));
+		return result;
+	}
+
 	bool is_subset(const Set &other) const
 	{
 		return std::includes(other.begin(), other.end(), std::set<KeyType>::begin(), std::set<KeyType>::end());
 	}
+	bool operator<=(const Set &other) const { return is_subset(other); }
+	bool operator< (const Set &other) const { return is_subset(other) && len() != other.len(); }
+	bool operator>=(const Set &other) const { return other <= *this; }
+	bool operator> (const Set &other) const { return other <  *this; }
 
 	Nullable<KeyType> lower_bound(const KeyType &key) const
 	{

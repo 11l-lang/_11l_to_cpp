@@ -437,6 +437,8 @@ class SymbolNode:
                         f_node = type_of(self.children[0])
                         if f_node is None: # assume this is String method
                             f_node = builtins_scope.find('String').ast_nodes[0].scope.ids.get('split').ast_nodes[0]
+                    elif self.children[0].children[1].token.value(source) == 'union':
+                        func_name = self.children[0].children[0].to_str() + '.set_union'
                     else:
                         f_node = type_of(self.children[0])
                 elif func_name == 'Int':
@@ -3119,7 +3121,9 @@ dict_scope.add_name('values', ASTFunctionDefinition([]))
 builtins_scope.ids['Dict'].ast_nodes[0].scope = dict_scope
 builtins_scope.ids['DefaultDict'].ast_nodes[0].scope = dict_scope
 set_scope = Scope(None)
+set_scope.add_name('intersection', ASTFunctionDefinition([('other', '', 'Set')]))
 set_scope.add_name('difference', ASTFunctionDefinition([('other', '', 'Set')]))
+set_scope.add_name('symmetric_difference', ASTFunctionDefinition([('other', '', 'Set')]))
 set_scope.add_name('is_subset', ASTFunctionDefinition([('other', '', 'Set')]))
 set_scope.add_name('add', ASTFunctionDefinition([('elem', '', '')]))
 set_scope.add_name('discard', ASTFunctionDefinition([('elem', '', '')]))
