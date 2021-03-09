@@ -303,6 +303,20 @@ template <typename Key, typename Value> inline void print(const Dict<Key, Value>
 		std::wcout.flush();
 }
 
+template <typename Key, typename Value> inline void print(const DefaultDict<Key, Value> &dict, const String &end = u"\n", bool flush = false)
+{
+	std::wcout << L"DefaultDict([";
+	bool first = true;
+	for (auto &&[key, value] : dict) {
+		if (!first) std::wcout << L", "; else first = false;
+		print(key, u" = "_S);
+		print(value, u""_S);
+	}
+	std::wcout << L"])" << std::wstring(end.cbegin(), end.cend());
+	if (flush)
+		std::wcout.flush();
+}
+
 template <typename Ty> inline void print(const Set<Ty> &set, const String &end = u"\n", bool flush = false)
 {
 	std::wcout << L"Set([";

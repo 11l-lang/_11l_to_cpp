@@ -148,9 +148,9 @@ public:
 		return r;
 	}
 
-	Array<Tuple<KeyType, ValueType>> items() const
+	auto items() const
 	{
-		Array<Tuple<KeyType, ValueType>> r;
+		Array<decltype(make_tuple(std::declval<KeyType>(), std::declval<ValueType>()))> r;
 		r.reserve(size());
 		for (auto &&el : *this)
 			r.push_back(make_tuple(el.first, el.second));

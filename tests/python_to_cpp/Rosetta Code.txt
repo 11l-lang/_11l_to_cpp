@@ -10991,3 +10991,82 @@ struct CodeBlock1
         print(s1);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Seven-sided_dice_from_five-sided_dice#Python
+# https://www.rosettacode.org/wiki/Verify_distribution_uniformity/Naive#Python
+import random, collections
+
+def dice5():
+    return random.randint(1, 5)
+
+def dice7() -> int:
+    r = dice5() + dice5() * 5 - 6
+    return (r % 7) + 1 if r < 21 else dice7()
+
+def distcheck(func, repeats, delta):
+    bin = collections.defaultdict(int) # int
+    for i in range(repeats):
+        bin[func()] += 1
+    target = repeats // len(bin)
+    deltacount = int(delta / 100.0 * target)
+    assert all( abs(target - count) < deltacount
+                for count in bin.values() ), "Bin distribution skewed from %i +/- %i: %s" % (
+                    target, deltacount, [ (key, target - count)
+                                          for key, count in sorted(bin.items()) ]
+                    )
+    print(bin)
+
+distcheck(dice5, 1000000, 1)
+distcheck(dice7, 1000000, 1)
+===
+//import random, collections
+
+F dice5()
+   R random:(1 .. 5)
+
+F dice7() -> Int
+   V r = dice5() + dice5() * 5 - 6
+   R I r < 21 {(r % 7) + 1} E dice7()
+
+F distcheck(func, repeats, delta)
+   V bin = DefaultDict[Int, Int]()
+   L(i) 0 .< repeats
+      bin[func()]++
+   V target = repeats I/ bin.len
+   V deltacount = Int(delta / 100.0 * target)
+   assert(all(bin.values().map(count -> abs(@target - count) < @deltacount)), ‘Bin distribution skewed from #. +/- #.: #.’.format(target, deltacount, sorted(bin.items()).map((key, count) -> (key, @target - count))))
+   print(bin)
+distcheck(dice5, 1000000, 1)
+distcheck(dice7, 1000000, 1)
+===
+auto dice5()
+{
+    return randomns::_(range_ee(1, 5));
+}
+
+int dice7()
+{
+    auto r = dice5() + dice5() * 5 - 6;
+    return r < 21 ? (mod(r, 7)) + 1 : dice7();
+}
+
+template <typename T1, typename T2, typename T3> auto distcheck(const T1 &func, const T2 &repeats, const T3 &delta)
+{
+    auto bin = DefaultDict<int, int>();
+    for (auto i : range_el(0, repeats))
+        bin[func()]++;
+    auto target = idiv(repeats, bin.len());
+    auto deltacount = to_int(delta / 100.0 * target);
+    assert(all(bin.values().map([&deltacount, &target](const auto &count){return abs(target - count) < deltacount;})), u"Bin distribution skewed from #. +/- #.: #."_S.format(target, deltacount, sorted(bin.items()).map([&target](const auto &key, const auto &count){return make_tuple(key, target - count);})));
+    print(bin);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        distcheck(dice5, 1000000, 1);
+        distcheck(dice7, 1000000, 1);
+    }
+} code_block_1;
