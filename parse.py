@@ -619,7 +619,7 @@ class SymbolNode:
                         type_of_values_is_char = False
                         break
                 res = 'create_array' + ('<' + trans_type(self.children[0].children[0].token_str(), self.scope, self.children[0].children[0].token)
-                                      + '>' if len(self.children) > 1 and self.children[0].function_call and self.children[0].children[0].token_str()[0].isupper() and self.children[0].children[0].token_str() != 'Array' else '') + '({'
+                                      + '>' if len(self.children) > 1 and self.children[0].function_call and self.children[0].children[0].token_str()[0].isupper() and self.children[0].children[0].token_str() not in ('Array', 'Set') else '') + '({'
                 for i in range(len(self.children)):
                     res += char_or_str(self.children[i], type_of_values_is_char)
                     if i < len(self.children)-1:

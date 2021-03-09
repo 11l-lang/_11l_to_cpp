@@ -28,6 +28,11 @@ public:
 		return r.second;
 	}
 
+	void update(const Set &other)
+	{
+		std::set<KeyType>::insert(other.begin(), other.end());
+	}
+
 	void remove(const KeyType &elem)
 	{
 		auto it = std::set<KeyType>::find(elem);
