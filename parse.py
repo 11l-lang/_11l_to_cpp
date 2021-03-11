@@ -486,7 +486,7 @@ class SymbolNode:
                 elif func_name.startswith(('Set[', 'Deque[')): # ]]
                     c = self.children[0].children[1]
                     func_name = func_name[:func_name.find('[')] + '<' + trans_type(c.to_type_str(), c.scope, c.token) + '>' # ]
-                elif func_name == 'sum' and self.children[2].symbol.id == '(' and self.children[2].children[0].symbol.id == '.' and self.children[2].children[0].children[1].token_str() == 'map': # )
+                elif func_name == 'sum' and self.children[2].function_call and self.children[2].children[0].symbol.id == '.' and self.children[2].children[0].children[1].token_str() == 'map':
                     assert(len(self.children) == 3)
                     return 'sum_map(' + self.children[2].children[0].children[0].to_str() + ', ' + self.children[2].children[2].to_str() + ')'
                 elif func_name in ('min', 'max') and len(self.children) == 5 and self.children[3] is not None and self.children[3].token_str() == "key'":
@@ -1579,7 +1579,7 @@ class ASTReturn(ASTNodeWithExpression):
                 if not n.function_return_type.startswith('Array['): # ]
                     raise Error('Function returning an empty array should have an Array based return type', self.expression.left_to_right_token())
                 expr_str = trans_type(n.function_return_type, self.expression.scope, self.expression.token) + '()'
-            elif self.expression.symbol.id == '(' and self.expression.function_call and self.expression.children[0].token_str() == 'Dict' and len(self.expression.children) == 1: # ) # `R Dict()`
+            elif self.expression.function_call and self.expression.children[0].token_str() == 'Dict' and len(self.expression.children) == 1: # `R Dict()`
                 n = self.parent
                 while type(n) != ASTFunctionDefinition:
                     n = n.parent
@@ -1828,7 +1828,7 @@ def type_of(sn):
         raise Error('left type is `' + str(type(left)) + '`', sn.left_to_right_token())
     if left.type in ('V', 'П', 'var', 'перем', 'V?', 'П?', 'var?', 'перем?', 'V&', 'П&', 'var&', 'перем&'): # for `V selection_strings = ... selection_strings.map(...)`
         assert(type(left) == ASTVariableInitialization)
-        if left.expression.symbol.id == '(' and left.expression.children[0].token.category == Token.Category.NAME and left.expression.children[0].token_str()[0].isupper(): # ) # for `V n = Node()`
+        if left.expression.function_call and left.expression.children[0].token.category == Token.Category.NAME and left.expression.children[0].token_str()[0].isupper(): # for `V n = Node()`
             tid = sn.scope.find(left.expression.children[0].token_str())
             assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
             tid = tid.ast_nodes[0].find_id_including_base_types(sn.children[1].token_str())
@@ -1837,7 +1837,7 @@ def type_of(sn):
             if isinstance(tid.ast_nodes[0], ASTExpression):
                 return None
             return tid.ast_nodes[0]
-        if ((left.expression.symbol.id == '(' and left.expression.children[0].symbol.id == '.' and len(left.expression.children[0].children) == 2 and left.expression.children[0].children[1].token_str() in ('map', 'filter')) # ) # for `V a = ....map(Int); a.sort(reverse' 1B)`
+        if ((left.expression.function_call and left.expression.children[0].symbol.id == '.' and len(left.expression.children[0].children) == 2 and left.expression.children[0].children[1].token_str() in ('map', 'filter')) # for `V a = ....map(Int); a.sort(reverse' 1B)`
                 or left.expression.is_list): # for `V employees = [...]; employees.sort(key' e -> e.name)`
             tid = builtins_scope.find('Array').ast_nodes[0].scope.ids.get(sn.children[1].token_str())
             if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition)):
@@ -2775,14 +2775,14 @@ def parse_internal(this_node):
             advance('=')
             node.set_expression(expression())
 
-            if node.expression.symbol.id == '(' and node.expression.children[0].symbol.id == '.' \
-                                            and len(node.expression.children[0].children) == 2   \
-                                               and (node.expression.children[0].children[1].token_str() in ('split', 'split_py') # ) # `V (name, ...) = ....split(...)` ~> `(V name, V ...) = ....split(...)` -> `...assign_from_tuple(name, ...);` (because `auto [name, ...] = ....split(...);` does not working)
-                                                or (node.expression.children[0].children[1].token_str() == 'map' # for `V (w, h) = lines[1].split_py().map(i -> Int(i))`
-                                                and node.expression.children[0].children[0].function_call)
-                                                and node.expression.children[0].children[0].children[0].symbol.id == '.'
-                                            and len(node.expression.children[0].children[0].children[0].children) == 2
-                                                and node.expression.children[0].children[0].children[0].children[1].token_str() in ('split', 'split_py')):
+            if node.expression.function_call and node.expression.children[0].symbol.id == '.' \
+                                         and len(node.expression.children[0].children) == 2   \
+                                            and (node.expression.children[0].children[1].token_str() in ('split', 'split_py') # `V (name, ...) = ....split(...)` ~> `(V name, V ...) = ....split(...)` -> `...assign_from_tuple(name, ...);` (because `auto [name, ...] = ....split(...);` does not working)
+                                             or (node.expression.children[0].children[1].token_str() == 'map' # for `V (w, h) = lines[1].split_py().map(i -> Int(i))`
+                                             and node.expression.children[0].children[0].function_call)
+                                             and node.expression.children[0].children[0].children[0].symbol.id == '.'
+                                         and len(node.expression.children[0].children[0].children[0].children) == 2
+                                             and node.expression.children[0].children[0].children[0].children[1].token_str() in ('split', 'split_py')):
                 # n = node
                 # node = ASTTupleAssignment()
                 # for dv in n.dest_vars:
@@ -2855,7 +2855,7 @@ def parse_internal(this_node):
                                 if id is not None and len(id.ast_nodes) != 0:
                                     if type(id.ast_nodes[0]) == ASTTypeDefinition and (id.ast_nodes[0].has_virtual_functions or id.ast_nodes[0].has_pointers_to_the_same_type):
                                         node.is_ptr = True
-                        elif node.expression.symbol.id == '(' and node.expression.children[0].token.category == Token.Category.NAME and node.expression.children[0].token_str()[0].isupper(): # ) # for `V animal = Sheep(); animal.say()` -> `...; animal->say();`
+                        elif node.expression.function_call and node.expression.children[0].token.category == Token.Category.NAME and node.expression.children[0].token_str()[0].isupper(): # for `V animal = Sheep(); animal.say()` -> `...; animal->say();`
                             id = scope.find(node.expression.children[0].token_str())
                             if not (id is not None and len(id.ast_nodes) != 0):
                                 raise Error('identifier `' + node.expression.children[0].token_str() + '` is not found', node.expression.children[0].token)
