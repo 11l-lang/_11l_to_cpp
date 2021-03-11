@@ -11301,3 +11301,64 @@ struct CodeBlock1
         print_board();
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Sort_an_array_of_composite_structures#Kotlin
+class Employee:
+    name : str
+    category : str
+
+    def __init__(self, name, category):
+        self.name = name
+        self.category = category
+
+employees = [
+    Employee("David", "Manager"),
+    Employee("Alice", "Sales"),
+    Employee("Joanna", "Director"),
+    Employee("Henry", "Admin"),
+    Employee("Tim", "Sales"),
+    Employee("Juan", "Admin")
+]
+
+employees.sort(key = lambda e: e.name)
+
+for e in employees:
+    print('%-6s : %s' % (e.name, e.category))
+===
+T Employee
+   String name
+   String category
+
+   F (name, category)
+      .name = name
+      .category = category
+V employees = [Employee(‘David’, ‘Manager’), Employee(‘Alice’, ‘Sales’), Employee(‘Joanna’, ‘Director’), Employee(‘Henry’, ‘Admin’), Employee(‘Tim’, ‘Sales’), Employee(‘Juan’, ‘Admin’)]
+employees.sort(key' e -> e.name)
+
+L(e) employees
+   print(‘#<6 : #.’.format(e.name, e.category))
+===
+class Employee
+{
+public:
+    String name;
+    String category;
+
+    template <typename T1, typename T2> Employee(const T1 &name, const T2 &category) :
+        name(name),
+        category(category)
+    {
+    }
+};
+auto employees = create_array<Employee>({Employee(u"David"_S, u"Manager"_S), Employee(u"Alice"_S, u"Sales"_S), Employee(u"Joanna"_S, u"Director"_S), Employee(u"Henry"_S, u"Admin"_S), Employee(u"Tim"_S, u"Sales"_S), Employee(u"Juan"_S, u"Admin"_S)});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        employees.sort([](const auto &e){return e.name;});
+        for (auto &&e : employees)
+            print(u"#<6 : #."_S.format(e.name, e.category));
+    }
+} code_block_1;
