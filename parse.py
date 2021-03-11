@@ -2289,7 +2289,7 @@ def parse_internal(this_node):
     access_specifier_private = False
 
     while token is not None:
-        if token.value(source) == ':' and peek_token().value(source) in ('start', 'старт'):
+        if token.value(source) == ':' and peek_token().value(source) in ('start', 'старт') and peek_token(2).value(source) == ':':
             node = ASTMain()
             next_token()
             next_token()

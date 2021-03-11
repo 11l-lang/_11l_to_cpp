@@ -11070,3 +11070,234 @@ struct CodeBlock1
         distcheck(dice7, 1000000, 1);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Solve_a_Hidato_puzzle#Python
+from typing import List
+
+board : List[List[int]] = []
+given : List[int] = []
+start = (-1, -1)
+
+def setup(s):
+    global board, given, start
+    lines = s.split("\n")
+    ncols = len(lines[0].split())
+    nrows = len(lines)
+    board = [[-1] * (ncols + 2) for _ in range(nrows + 2)]
+
+    for r, row in enumerate(lines):
+        for c, cell in enumerate(row.split()):
+            if cell == "__" :
+                board[r + 1][c + 1] = 0
+                continue
+            elif cell == ".":
+                continue # -1
+            else:
+                val = int(cell)
+                board[r + 1][c + 1] = val
+                given.append(val)
+                if val == 1:
+                    start = (r + 1, c + 1)
+    given.sort()
+
+def solve(r, c, n, next=0):
+    if n > given[-1]:
+        return True
+    if board[r][c] and board[r][c] != n:
+        return False
+    if board[r][c] == 0 and given[next] == n:
+        return False
+
+    back = 0
+    if board[r][c] == n:
+        next += 1
+        back = n
+
+    board[r][c] = n
+    for i in range(-1, 2):
+        for j in range(-1, 2):
+            if solve(r + i, c + j, n + 1, next):
+                return True
+    board[r][c] = back
+    return False
+
+def print_board():
+    d = {-1: "  ", 0: "__"}
+    bmax = max(max(r) for r in board)
+    lbmax = len(str(bmax)) + 1
+    for r in board[1:-1]:
+        print("".join(d.get(c, str(c)).rjust(lbmax) for c in r[1:-1]))
+
+hi = """\
+__ 33 35 __ __  .  .  .
+__ __ 24 22 __  .  .  .
+__ __ __ 21 __ __  .  .
+__ 26 __ 13 40 11  .  .
+27 __ __ __  9 __  1  .
+ .  . __ __ 18 __ __  .
+ .  .  .  . __  7 __ __
+ .  .  .  .  .  .  5 __"""
+
+setup(hi)
+print_board()
+solve(start[0], start[1], 1)
+print()
+print_board()
+===
+[[Int]] board
+[Int] given
+V start = (-1, -1)
+
+F setup(s)
+   V lines = s.split("\n")
+   V ncols = lines[0].split_py().len
+   V nrows = lines.len
+   :board = (0 .< nrows + 2).map(_ -> [-1] * (@ncols + 2))
+
+   L(row) lines
+      V r = L.index
+      L(cell) row.split_py()
+         V c = L.index
+         I cell == ‘__’
+            :board[r + 1][c + 1] = 0
+            L.continue
+         E I cell == ‘.’
+            L.continue
+         E
+            V val = Int(cell)
+            :board[r + 1][c + 1] = val
+            :given.append(val)
+            I val == 1
+               :start = (r + 1, c + 1)
+   :given.sort()
+
+F solve(r, c, n, =next = 0)
+   I n > :given.last
+      R 1B
+   I :board[r][c] & :board[r][c] != n
+      R 0B
+   I :board[r][c] == 0 & :given[next] == n
+      R 0B
+   V back = 0
+   I :board[r][c] == n
+      next++
+      back = n
+   :board[r][c] = n
+   L(i) -1 .< 2
+      L(j) -1 .< 2
+         I solve(r + i, c + j, n + 1, next)
+            R 1B
+   :board[r][c] = back
+   R 0B
+
+F print_board()
+   V d = [-1 = ‘  ’, 0 = ‘__’]
+   V bmax = max(:board.map(r -> max(r)))
+   V lbmax = String(bmax).len + 1
+   L(r) :board[1 .< (len)-1]
+      print(r[1 .< (len)-1].map(c -> @d.get(c, String(c)).rjust(@lbmax)).join(‘’))
+V hi = "\
+__ 33 35 __ __  .  .  .\n\
+__ __ 24 22 __  .  .  .\n\
+__ __ __ 21 __ __  .  .\n\
+__ 26 __ 13 40 11  .  .\n\
+27 __ __ __  9 __  1  .\n\
+ .  . __ __ 18 __ __  .\n\
+ .  .  .  . __  7 __ __\n\
+ .  .  .  .  .  .  5 __"
+setup(hi)
+print_board()
+solve(start[0], start[1], 1)
+print()
+print_board()
+===
+Array<Array<int>> board;
+Array<int> given;
+auto start = make_tuple(-1, -1);
+
+template <typename T1> auto setup(const T1 &s)
+{
+    auto lines = s.split(u"\n"_S);
+    auto ncols = _get<0>(lines).split_py().len();
+    auto nrows = lines.len();
+    ::board = range_el(0, nrows + 2).map([&ncols](const auto &_){return create_array({-1}) * (ncols + 2);});
+    {int Lindex = 0;
+
+    for (auto &&row : lines) {
+        auto r = Lindex;
+        {int Lindex = 0;
+        for (auto &&cell : row.split_py()) {{
+            auto c = Lindex;
+            if (cell == u"__") {
+                ::board[r + 1].set(c + 1, 0);
+                goto on_continue;
+            }
+            else if (cell == u'.')
+                goto on_continue;
+            else {
+                auto val = to_int(cell);
+                ::board[r + 1].set(c + 1, val);
+                ::given.append(val);
+                if (val == 1)
+                    ::start = make_tuple(r + 1, c + 1);
+            }
+} on_continue:
+            Lindex++;
+        }}
+        Lindex++;
+    }}
+    ::given.sort();
+}
+
+template <typename T1, typename T2, typename T3, typename T4 = decltype(0)> auto solve(const T1 &r, const T2 &c, const T3 &n, T4 next = 0)
+{
+    if (n > ::given.last())
+        return true;
+    if (::board[r][c] && ::board[r][c] != n)
+        return false;
+    if (::board[r][c] == 0 && ::given[next] == n)
+        return false;
+    auto back = 0;
+    if (::board[r][c] == n) {
+        next++;
+        back = n;
+    }
+    ::board[r].set(c, n);
+    for (auto i : range_el(-1, 2))
+        for (auto j : range_el(-1, 2))
+            if (solve(r + i, c + j, n + 1, next))
+                return true;
+    ::board[r].set(c, back);
+    return false;
+}
+
+auto print_board()
+{
+    auto d = create_dict(dict_of(-1, u"  "_S)(0, u"__"_S));
+    auto bmax = max(::board.map([](const auto &r){return max(r);}));
+    auto lbmax = String(bmax).len() + 1;
+    for (auto &&r : ::board[range_e_llen(1,  - 1)])
+        print(r[range_e_llen(1,  - 1)].map([&d, &lbmax](const auto &c){return d.get(c, String(c)).rjust(lbmax);}).join(u""_S));
+}
+auto hi = u"\
+__ 33 35 __ __  .  .  .\n\
+__ __ 24 22 __  .  .  .\n\
+__ __ __ 21 __ __  .  .\n\
+__ 26 __ 13 40 11  .  .\n\
+27 __ __ __  9 __  1  .\n\
+ .  . __ __ 18 __ __  .\n\
+ .  .  .  . __  7 __ __\n\
+ .  .  .  .  .  .  5 __"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        setup(hi);
+        print_board();
+        solve(_get<0>(start), _get<1>(start), 1);
+        print();
+        print_board();
+    }
+} code_block_1;
