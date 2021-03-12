@@ -2876,3 +2876,50 @@ struct CodeBlock1
         print_image(u"3.bmp"_S);
     }
 } code_block_1;
+
+
+def get_f(a):
+    def f(b):
+        nonlocal a # =
+        return a + b
+    return f
+
+f10 = get_f(10)
+f20 = get_f(20)
+print(f10(1))
+print(f10(2))
+print(f20(1))
+print(f20(2))
+===
+F get_f(a)
+   F f(b)
+      R @=a + b
+   R f
+V f10 = get_f(10)
+V f20 = get_f(20)
+print(f10(1))
+print(f10(2))
+print(f20(1))
+print(f20(2))
+===
+template <typename T1> auto get_f(const T1 &a)
+{
+    auto f = [a](const auto &b)
+    {
+        return a + b;
+    };
+    return f;
+}
+auto f10 = get_f(10);
+auto f20 = get_f(20);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(f10(1));
+        print(f10(2));
+        print(f20(1));
+        print(f20(2));
+    }
+} code_block_1;

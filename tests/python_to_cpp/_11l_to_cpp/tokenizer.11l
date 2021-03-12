@@ -286,8 +286,11 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
             category = OPERATOR
 
          E I ch.is_alpha() | ch C (‘_’, ‘@’)
-            L i < source.len & source[i] == ‘@’
-               i++
+            I ch == ‘@’
+               L i < source.len & source[i] == ‘@’
+                  i++
+               I i < source.len & source[i] == ‘=’
+                  i++
             L i < source.len
                ch = source[i]
                I !(ch.is_alpha() | ch C ‘_?:’ | ch C ‘0’..‘9’)

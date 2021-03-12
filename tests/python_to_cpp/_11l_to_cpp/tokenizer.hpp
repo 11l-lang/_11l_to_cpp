@@ -338,8 +338,12 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
             }
 
             else if (ch.is_alpha() || in(ch, make_tuple(u"_"_S, u"@"_S))) {
-                while (i < source.len() && source[i] == u'@')
-                    i++;
+                if (ch == u'@') {
+                    while (i < source.len() && source[i] == u'@')
+                        i++;
+                    if (i < source.len() && source[i] == u'=')
+                        i++;
+                }
                 while (i < source.len()) {
                     ch = source[i];
                     if (!(ch.is_alpha() || in(ch, u"_?:"_S) || in(ch, range_ee(u'0'_C, u'9'_C))))

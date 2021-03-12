@@ -332,7 +332,7 @@ class SymbolNode:
                                        and not (self.parent.symbol.id == '=' and self is self.parent.children[0])):
                     return '*' + self.token_str()
 
-            return self.token_str().lstrip('@').replace(':', '::')
+            return self.token_str().lstrip('@=').replace(':', '::')
 
         if self.token.category == Token.Category.KEYWORD and self.token_str() in ('L.last_iteration', 'Ц.последняя_итерация', 'loop.last_iteration', 'цикл.последняя_итерация'):
             parent = self
@@ -759,10 +759,10 @@ class SymbolNode:
                 if cts0 in ('Float', 'Float32') and c1 == 'infinity':
                     return 'std::numeric_limits<' + cpp_type_from_11l[cts0] + '>::infinity()'
 
-                id_, s = self.scope.find_and_return_scope(cts0.lstrip('@'))
+                id_, s = self.scope.find_and_return_scope(cts0.lstrip('@='))
                 if id_ is not None:
                     if id_.type != '' and id_.type.endswith('?'):
-                        return cts0.lstrip('@') + '->' + c1
+                        return cts0.lstrip('@=') + '->' + c1
                     if len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTLoop and id_.ast_nodes[0].is_loop_variable_a_ptr and cts0 == id_.ast_nodes[0].loop_variable:
                         return cts0 + '->' + c1
                     if len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTVariableInitialization and (id_.ast_nodes[0].is_ptr): # ( # or id_.ast_nodes[0].is_shared_ptr):
@@ -797,6 +797,9 @@ class SymbolNode:
                             by_ref = True # sn.parent.children[0] is sn and ((sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!='))
                                           #                               or (sn.parent.symbol.id == '.' and sn.parent.children[1].token_str() == 'append'))
                             t = sn.token_str()[1:]
+                            if t.startswith('='):
+                                t = t[1:]
+                                by_ref = False
                             captured_variables.add('this' if t == '' else '&'*by_ref + t)
                         elif sn.token.value(source) == '(.)':
                             captured_variables.add('this')
@@ -1225,6 +1228,9 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                         if sn.token.value(source)[0] == '@':
                             by_ref = True # sn.parent and sn.parent.children[0] is sn and sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!=')
                             t = sn.token.value(source)[1:]
+                            if t.startswith('='):
+                                t = t[1:]
+                                by_ref = False
                             captured_variables.add('this' if t == '' else '&'*by_ref + t)
                         elif sn.token.value(source) == '(.)':
                             captured_variables.add('this')
@@ -1884,7 +1890,10 @@ def next_token(): # why ‘next_token’: >[https://youtu.be/Nlqv6NtBXcA?t=1203]
             elif token.category == Token.Category.NAME:
                 key = '(name)'
                 if token.value(source)[0] == '@':
-                    if token.value(source)[1:] in cpp_keywords:
+                    if token.value(source)[1:2] == '=':
+                        if token.value(source)[2:] in cpp_keywords:
+                            tokensn.token_str_override = '@=_' + token.value(source)[2:] + '_'
+                    elif token.value(source)[1:] in cpp_keywords:
                         tokensn.token_str_override = '@_' + token.value(source)[1:] + '_'
                 elif token.value(source) in cpp_keywords:
                     tokensn.token_str_override = '_' + token.value(source) + '_'

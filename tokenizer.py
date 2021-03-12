@@ -326,8 +326,11 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                 category = Token.Category.OPERATOR
 
             elif ch.isalpha() or ch in ('_', '@'): # this is NAME/IDENTIFIER or KEYWORD
-                while i < len(source) and source[i] == '@':
-                    i += 1
+                if ch == '@':
+                    while i < len(source) and source[i] == '@':
+                        i += 1
+                    if i < len(source) and source[i] == '=':
+                        i += 1
                 while i < len(source):
                     ch = source[i]
                     if not (ch.isalpha() or ch in '_?:' or '0' <= ch <= '9'):
