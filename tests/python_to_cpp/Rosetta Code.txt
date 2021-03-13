@@ -11362,3 +11362,65 @@ struct CodeBlock1
             print(u"#<6 : #."_S.format(e.name, e.category));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Sorting_algorithms/Bubble_sort#Python
+def bubble_sort(seq : list):
+    changed = True
+    while changed == True:
+        changed = False
+        for i in range(len(seq) - 1):
+            if seq[i] > seq[i+1]:
+                (seq[i], seq[i+1]) = (seq[i+1], seq[i])
+                changed = True
+
+import random
+
+testset = list(range(100))
+testcase = testset[:] # make a copy
+random.shuffle(testcase)
+assert testcase != testset  # we've shuffled it
+bubble_sort(testcase)
+assert testcase == testset  # we've unshuffled it back into a copy
+===
+F bubble_sort(&seq)
+   V changed = 1B
+   L changed == 1B
+      changed = 0B
+      L(i) 0 .< seq.len - 1
+         I seq[i] > seq[i + 1]
+            swap(&seq[i], &seq[i + 1])
+            changed = 1B
+//import random
+V testset = Array(0.<100)
+V testcase = copy(testset)
+random:shuffle(&testcase)
+assert(testcase != testset)
+bubble_sort(&testcase)
+assert(testcase == testset)
+===
+template <typename T1> auto bubble_sort(T1 &seq)
+{
+    auto changed = true;
+    while (changed == true) {
+        changed = false;
+        for (auto i : range_el(0, seq.len() - 1))
+            if (seq[i] > seq[i + 1]) {
+                swap(seq[i], seq[i + 1]);
+                changed = true;
+            }
+    }
+}
+auto testset = create_array(range_el(0, 100));
+auto testcase = copy(testset);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        randomns::shuffle(testcase);
+        assert(testcase != testset);
+        bubble_sort(testcase);
+        assert(testcase == testset);
+    }
+} code_block_1;

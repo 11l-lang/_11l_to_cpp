@@ -501,7 +501,8 @@ class SymbolNode:
                                     func_name = '::copy'
                             break
                         s = s.parent
-                        assert(s)
+                        if s is None:
+                            break
                 elif func_name == 'move':
                     func_name = 'std::move'
                 elif func_name == '*this':
