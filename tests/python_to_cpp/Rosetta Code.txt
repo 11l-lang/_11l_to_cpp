@@ -11424,3 +11424,98 @@ struct CodeBlock1
         assert(testcase == testset);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Soundex#Java
+from typing import Dict
+Char = str
+
+inv_code = {
+    '1': ['B', 'F', 'P', 'V'],
+    '2': ['C', 'G', 'J', 'K', 'Q', 'S', 'X', 'Z'],
+    '3': ['D', 'T'],
+    '4': ['L'],
+    '5': ['M', 'N'],
+    '6': ['R']
+}
+
+_code : Dict[Char, Char] = {}
+for k, arr in inv_code.items():
+    for el in arr:
+        _code[el] = k
+
+def soundex(s):
+    code = str(s[0].upper())
+    previous = _code.get(s[0].upper(), Char("\0"))
+
+    for c in s[1:]:
+        current = _code.get(c.upper(), Char("\0"))
+        if current != "\0" and current != previous:
+            code += current
+        previous = current
+
+    return (code + '0000')[:4]
+
+print(soundex("Soundex"))
+print(soundex("Example"))
+print(soundex("Sownteks"))
+print(soundex("Ekzampul"))
+===
+V inv_code = [‘1’ = [‘B’, ‘F’, ‘P’, ‘V’], ‘2’ = [‘C’, ‘G’, ‘J’, ‘K’, ‘Q’, ‘S’, ‘X’, ‘Z’], ‘3’ = [‘D’, ‘T’], ‘4’ = [‘L’], ‘5’ = [‘M’, ‘N’], ‘6’ = [‘R’]]
+[Char = Char] _code
+L(k, arr) inv_code
+   L(el) arr
+      _code[el] = k
+
+F soundex(s)
+   V code = String(s[0].uppercase())
+   V previous = :_code.get(s[0].uppercase(), Char("\0"))
+
+   L(c) s[1..]
+      V current = :_code.get(c.uppercase(), Char("\0"))
+      I current != "\0" & current != previous
+         code ‘’= current
+      previous = current
+   R (code‘0000’)[0.<4]
+print(soundex(‘Soundex’))
+print(soundex(‘Example’))
+print(soundex(‘Sownteks’))
+print(soundex(‘Ekzampul’))
+===
+auto inv_code = create_dict(dict_of(u'1'_C, create_array({u'B'_C, u'F'_C, u'P'_C, u'V'_C}))(u'2'_C, create_array({u'C'_C, u'G'_C, u'J'_C, u'K'_C, u'Q'_C, u'S'_C, u'X'_C, u'Z'_C}))(u'3'_C, create_array({u'D'_C, u'T'_C}))(u'4'_C, create_array({u'L'_C}))(u'5'_C, create_array({u'M'_C, u'N'_C}))(u'6'_C, create_array({u'R'_C})));
+Dict<Char, Char> _code;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[k, arr] : inv_code)
+            for (auto &&el : arr)
+                _code.set(el, k);
+    }
+} code_block_1;
+
+template <typename T1> auto soundex(const T1 &s)
+{
+    auto code = String(_get<0>(s).uppercase());
+    auto previous = ::_code.get(_get<0>(s).uppercase(), u'\0'_C);
+
+    for (auto &&c : s[range_ei(1)]) {
+        auto current = ::_code.get(c.uppercase(), u'\0'_C);
+        if (current != u'\0' && current != previous)
+            code &= current;
+        previous = current;
+    }
+    return (code & u"0000"_S)[range_el(0, 4)];
+}
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(soundex(u"Soundex"_S));
+        print(soundex(u"Example"_S));
+        print(soundex(u"Sownteks"_S));
+        print(soundex(u"Ekzampul"_S));
+    }
+} code_block_2;

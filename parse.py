@@ -3126,7 +3126,8 @@ array_scope.add_name('join', ASTFunctionDefinition([('sep', '', 'String')]))
 array_scope.add_name('sort', ASTFunctionDefinition([('key', token_to_str('N', Token.Category.CONSTANT), ''), ('reverse', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
 builtins_scope.ids['Array'].ast_nodes[0].scope = array_scope
 dict_scope = Scope(None)
-dict_scope.add_name('find', ASTFunctionDefinition([('k', '', '')]))
+dict_scope.add_name('find', ASTFunctionDefinition([('key', '', '')]))
+dict_scope.add_name('get', ASTFunctionDefinition([('key', '', ''), ('default', '', '')]))
 dict_scope.add_name('keys', ASTFunctionDefinition([]))
 dict_scope.add_name('values', ASTFunctionDefinition([]))
 builtins_scope.ids['Dict'].ast_nodes[0].scope = dict_scope
