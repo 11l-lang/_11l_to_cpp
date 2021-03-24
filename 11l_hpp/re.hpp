@@ -66,7 +66,7 @@ public:
 #endif
 		{
 			int group = it->size() == 2 ? 1 : 0;
-			r.append(s[range_el((int)it->position(group), int(it->position(group) + it->length(group)))]);
+			r.append(s[range_el((Int)it->position(group), Int(it->position(group) + it->length(group)))]);
 		}
 		return r;
 	}

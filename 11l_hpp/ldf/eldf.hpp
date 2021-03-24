@@ -392,7 +392,7 @@ void from_eldf(const String &eldf, Element &el)
 namespace detail {
 String balance_pq_string(const String &s)
 {
-	int min_nesting_level = 0,
+	Int min_nesting_level = 0,
 	    nesting_level = 0;
 	for (Char ch : s)
 		if (ch == u'‘')
@@ -437,7 +437,7 @@ String to_str(const Element &el, char16_t additional_prohibited_character = 0, c
 }
 }
 
-String to_eldf(const Element &el, int indent = 4, int level = 0, bool toplevel = true)
+String to_eldf(const Element &el, Int indent = 4, Int level = 0, bool toplevel = true)
 {
 	String r;
 	if (el.value_type == ValueType::OBJECT) {

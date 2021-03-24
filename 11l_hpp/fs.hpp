@@ -211,7 +211,7 @@ inline Tuple<String, String> split_ext(const String &path)
 	if (dot_pos == String::npos || dot_pos < sep_pos)
 		return Tuple<String, String>(path, String());
 
-	return Tuple<String, String>(path[range_el(0, (int)dot_pos)], path[range_ei((int)dot_pos)]);
+	return Tuple<String, String>(path[range_el(Int(0), (Int)dot_pos)], path[range_ei((Int)dot_pos)]);
 }
 }
 }

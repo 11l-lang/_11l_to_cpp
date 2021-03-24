@@ -175,7 +175,7 @@ String to_json(const Element &el, const String &indent, int level = 0)
 	return r;
 }
 
-String to_json(const Element &el, int indent = 4)
+String to_json(const Element &el, Int indent = 4)
 {
 	return to_json(el, indent * Char(' '));
 }

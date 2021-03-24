@@ -60,18 +60,18 @@ namespace re {class RegEx;}
 
 class String : public std::u16string
 {
-	String slice(int begin, int end) const
+	String slice(Int begin, Int end) const
 	{
 		return String(c_str() + begin, end - begin);
 	}
-	String slice(int begin, int end, int step) const
+	String slice(Int begin, Int end, Int step) const
 	{
 		String r;
 		if (step > 0)
-			for (int i = begin; i < end; i += step)
+			for (Int i = begin; i < end; i += step)
 				r.append(1, at(i));
 		else
-			for (int i = begin; i > end; i += step)
+			for (Int i = begin; i > end; i += step)
 				r.append(1, at(i));
 		return r;
 	}
@@ -213,7 +213,7 @@ public:
 	Iterator begin() const {return Iterator(const_cast<char16_t*>(data()));}
 	Iterator end()   const {return Iterator(const_cast<char16_t*>(data() + len()));}
 
-	int len() const { return (int)size(); } // return `int` (not `size_t`) to avoid warning C4018: '<': signed/unsigned mismatch
+	Int len() const { return (Int)size(); } // return `int` (not `size_t`) to avoid warning C4018: '<': signed/unsigned mismatch
 
 	bool starts_with(const char16_t *s, size_t sz) const
 	{
@@ -274,41 +274,41 @@ public:
 	}
 	String replace(const re::RegEx &regex, const String &repl) const;
 
-	Nullable<int> find(Char c, int start = 0) const
+	Nullable<Int> find(Char c, int start = 0) const
 	{
 		const char16_t *s = data();
-		for (int i=start, n=len(); i<n; i++)
-			if (s[i] == c) return Nullable<int>(i);
-		return Nullable<int>();
+		for (Int i=start, n=len(); i<n; i++)
+			if (s[i] == c) return Nullable<Int>(i);
+		return Nullable<Int>();
 	}
 
-	Nullable<int> find(const String &s, int start = 0) const
+	Nullable<Int> find(const String &s, int start = 0) const
 	{
 		size_t r = basic_string::find(s, start);
-		return r == npos ? Nullable<int>() : Nullable<int>((int)r);
+		return r == npos ? Nullable<Int>() : Nullable<Int>((Int)r);
 	}
 
-	Nullable<int> find(const Tuple<String, String> &t, int start = 0) const
+	Nullable<Int> find(const Tuple<String, String> &t, int start = 0) const
 	{
-		for (int i = start, l = len() - min(std::get<0>(t).len(), std::get<1>(t).len()); i <= l; i++) {
+		for (Int i = start, l = len() - min(std::get<0>(t).len(), std::get<1>(t).len()); i <= l; i++) {
 			if (i <= len() - std::get<0>(t).len() && memcmp(c_str() + i, std::get<0>(t).c_str(), std::get<0>(t).len() * sizeof(char16_t)) == 0) return i;
 			if (i <= len() - std::get<1>(t).len() && memcmp(c_str() + i, std::get<1>(t).c_str(), std::get<1>(t).len() * sizeof(char16_t)) == 0) return i;
 		}
 		return nullptr;
 	}
 
-	int findi(Char c, int start = 0) const
+	Int findi(Char c, Int start = 0) const
 	{
 		const char16_t *s = data();
-		for (int i=start, n=len(); i<n; i++)
+		for (Int i=start, n=len(); i<n; i++)
 			if (s[i] == c) return i;
 		return -1;
 	}
 
-	int findi(const String &s, int start = 0) const
+	Int findi(const String &s, Int start = 0) const
 	{
 		size_t r = basic_string::find(s, start);
-		return r != String::npos ? (int)r : -1;
+		return r != String::npos ? (Int)r : -1;
 	}
 
 	template <typename ValType> int index(const ValType &v) const;
@@ -355,7 +355,7 @@ public:
 	{
 		if (empty()) return false;
 		const char16_t *s = data();
-		for (int i=0, n=len(); i<n; i++)
+		for (Int i=0, n=len(); i<n; i++)
 			if (!Char(s[i]).is_digit()) return false;
 		return true;
 	}
@@ -364,7 +364,7 @@ public:
 	{
 		if (empty()) return false;
 		const char16_t *s = data();
-		for (int i=0, n=len(); i<n; i++)
+		for (Int i=0, n=len(); i<n; i++)
 			if (!Char(s[i]).is_alpha()) return false;
 		return true;
 	}
@@ -394,90 +394,90 @@ public:
 		return r;
 	}
 
-	String zfill(int width) const
+	String zfill(Int width) const
 	{
-		return String(u"0") * max(width - len(), 0) & *this;
+		return String(u"0") * max(width - len(), Int(0)) & *this;
 	}
 
-	String center(int width, String fillchar = String(u' '_C)) const
+	String center(Int width, String fillchar = String(u' '_C)) const
 	{
 		if (fillchar.len() != 1)
 			throw AssertionError();
-		int w = width / 2 - len() / 2;
+		Int w = width / 2 - len() / 2;
 		return fillchar * (width - len() - w) & *this & fillchar * w;
 	}
 
-	String ljust(int width, String fillchar = String(u' '_C)) const
+	String ljust(Int width, String fillchar = String(u' '_C)) const
 	{
 		if (fillchar.len() != 1)
 			throw AssertionError();
 		return *this & fillchar * (width - len());
 	}
 
-	String rjust(int width, String fillchar = String(u' '_C)) const
+	String rjust(Int width, String fillchar = String(u' '_C)) const
 	{
 		if (fillchar.len() != 1)
 			throw AssertionError();
 		return fillchar * (width - len()) & *this;
 	}
 
-	String ltrim(Char c, Nullable<int> limit = nullptr) const
+	String ltrim(Char c, Nullable<Int> limit = nullptr) const
 	{
 		const char16_t *s = data();
 		int i = 0;
-		for (int l=limit == nullptr ? len() : min(len(), *limit); i<l; i++)
+		for (Int l=limit == nullptr ? len() : min(len(), *limit); i<l; i++)
 			if (s[i] != c) break;
 		return String(s + i, len() - i);
 	}
 
-	String ltrim(const String &str, Nullable<int> limit = nullptr) const
+	String ltrim(const String &str, Nullable<Int> limit = nullptr) const
 	{
 		const char16_t *s = data();
-		int i = 0, l = len()-str.len();
-		for (int lim = limit == nullptr ? -1 : *limit; i<=l; i+=str.len())
+		Int i = 0, l = len()-str.len();
+		for (Int lim = limit == nullptr ? -1 : *limit; i<=l; i+=str.len())
 			if (memcmp(str.c_str(), s+i, str.len()*sizeof(char16_t)) || lim-- == 0) break;
 		return String(s + i, len() - i);
 	}
 
-	template <typename ... Types> String ltrim(const Tuple<Types...> &tuple, Nullable<int> limit = nullptr) const
+	template <typename ... Types> String ltrim(const Tuple<Types...> &tuple, Nullable<Int> limit = nullptr) const
 	{
 		const char16_t *s = data();
-		int i = 0;
-		for (int l=limit == nullptr ? len() : min(len(), *limit); i<l; i++)
+		Int i = 0;
+		for (Int l=limit == nullptr ? len() : min(len(), *limit); i<l; i++)
 			if (!in(s[i], tuple)) break;
 		return String(s + i, len() - i);
 	}
 
-	String ltrim(const Array<Char> &arr, Nullable<int> limit = nullptr) const;
+	String ltrim(const Array<Char> &arr, Nullable<Int> limit = nullptr) const;
 
-	String rtrim(Char c, Nullable<int> limit = nullptr) const
+	String rtrim(Char c, Nullable<Int> limit = nullptr) const
 	{
 		const char16_t *s = data();
-		int l = len()-1;
-		for (int ll=limit == nullptr ? 0 : max(0, len()-*limit); l>=ll; l--)
+		Int l = len()-1;
+		for (Int ll=limit == nullptr ? 0 : max(Int(0), len()-*limit); l>=ll; l--)
 			if (s[l] != c) break;
 		return String(s, l+1);
 	}
 
-	String rtrim(const String &str, Nullable<int> limit = nullptr) const
+	String rtrim(const String &str, Nullable<Int> limit = nullptr) const
 	{
 		const char16_t *s = data();
-		int l = len()-str.len();
-		for (int lim = limit == nullptr ? -1 : *limit; l>=0; l-=str.len())
+		Int l = len()-str.len();
+		for (Int lim = limit == nullptr ? -1 : *limit; l>=0; l-=str.len())
 			if (memcmp(str.c_str(), s+l, str.len()*sizeof(char16_t)) || lim-- == 0) break;
 		return String(s, l+str.len());
 	}
 
-	template <typename ... Types> String rtrim(const Tuple<Types...> &tuple, Nullable<int> limit = nullptr) const
+	template <typename ... Types> String rtrim(const Tuple<Types...> &tuple, Nullable<Int> limit = nullptr) const
 	{
 		const char16_t *s = data();
-		int l = len()-1;
-		for (int ll=limit == nullptr ? 0 : max(0, len()-*limit); l>=ll; l--)
+		Int l = len()-1;
+		for (Int ll=limit == nullptr ? 0 : max(Int(0), len()-*limit); l>=ll; l--)
 			if (!in(s[l], tuple)) break;
 		return String(s, l+1);
 	}
 
-	String rtrim(const Array<Char> &arr, Nullable<int> limit = nullptr) const;
+	String rtrim(const Array<Char> &arr, Nullable<Int> limit = nullptr) const;
 
 	template <typename Ty> String trim(const Ty &s) const
 	{
@@ -527,12 +527,12 @@ public:
 		return Char(at(pos));
 	}
 
-	String operator[](const Range<int, true,  true > range) const {return slice(max(range.b    , 0), min((unsigned)range.e + 1u, (unsigned)len()));} // `(unsigned)` is needed when `instr` starts with left single quotation mark
-	String operator[](const Range<int, true,  false> range) const {return slice(max(range.b    , 0), min((unsigned)range.e     , (unsigned)len()));}
-	String operator[](const Range<int, false, true > range) const {return slice(max(range.b + 1, 0), min((unsigned)range.e + 1u, (unsigned)len()));}
-	String operator[](const Range<int, false, false> range) const {return slice(max(range.b + 1, 0), min((unsigned)range.e     , (unsigned)len()));}
-	String operator[](const RangeEI<int>             range) const {return slice(max(range.b    , 0), len());}
-	String operator[](const RangeEIWithStep<int>     range) const {return slice(max(range.b    , 0), range.step > 0 ? len() : -1, range.step);}
+	String operator[](const Range<Int, true,  true > range) const {return slice(max(range.b    , Int(0)), min((unsigned)range.e + 1u, (unsigned)len()));} // `(unsigned)` is needed when `instr` starts with left single quotation mark
+	String operator[](const Range<Int, true,  false> range) const {return slice(max(range.b    , Int(0)), min((unsigned)range.e     , (unsigned)len()));}
+	String operator[](const Range<Int, false, true > range) const {return slice(max(range.b + 1, Int(0)), min((unsigned)range.e + 1u, (unsigned)len()));}
+	String operator[](const Range<Int, false, false> range) const {return slice(max(range.b + 1, Int(0)), min((unsigned)range.e     , (unsigned)len()));}
+	String operator[](const RangeEI<Int>             range) const {return slice(max(range.b    , Int(0)), len());}
+	String operator[](const RangeEIWithStep<Int>     range) const {return slice(max(range.b    , Int(0)), range.step > 0 ? len() : -1, range.step);}
 
 	String operator[](const range_e_llen    range) const {return (*this)[range_el(        range.b, len() + range.e)];}
 	String operator[](const range_elen_elen range) const {return (*this)[range_ee(len() + range.b, len() + range.e)];}
@@ -547,20 +547,20 @@ public:
 		return (*this)[len() - 1];
 	}
 
-	Char at_plus_len(int i) const
+	Char at_plus_len(Int i) const
 	{
 		return (*this)[len() + i];
 	}
 
-	void set(int i, char16_t c)
+	void set(Int i, char16_t c)
 	{
-		if (in(i, range_el(0, len())))
+		if (in(i, range_el(Int(0), len())))
 			at(i) = c;
 		else
 			throw IndexError(i);
 	}
 
-	void set_plus_len(int i, char16_t c)
+	void set_plus_len(Int i, char16_t c)
 	{
 		set(len() + i, c);
 	}

@@ -622,20 +622,20 @@ inline Array<String> String::split_py() const
 	return split(make_tuple(u' '_C, u'\t'_C, u'\r'_C, u'\n'_C), nullptr, true);
 }
 
-inline String String::ltrim(const Array<Char> &arr, Nullable<int> limit) const
+inline String String::ltrim(const Array<Char> &arr, Nullable<Int> limit) const
 {
 	const char16_t *s = data();
-	int i = 0;
-	for (int l=limit == nullptr ? len() : min(len(), *limit); i<l; i++)
+	Int i = 0;
+	for (Int l=limit == nullptr ? len() : min(len(), *limit); i<l; i++)
 		if (!in(s[i], arr)) break;
 	return String(s + i, len() - i);
 }
 
-inline String String::rtrim(const Array<Char> &arr, Nullable<int> limit) const
+inline String String::rtrim(const Array<Char> &arr, Nullable<Int> limit) const
 {
 	const char16_t *s = data();
-	int l = len()-1;
-	for (int ll=limit == nullptr ? 0 : max(0, len()-*limit); l>=ll; l--)
+	Int l = len()-1;
+	for (Int ll=limit == nullptr ? 0 : max(Int(0), len()-*limit); l>=ll; l--)
 		if (!in(s[l], arr)) break;
 	return String(s, l+1);
 }

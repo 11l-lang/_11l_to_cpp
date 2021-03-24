@@ -156,29 +156,29 @@ public:
 
 struct range_e_llen // `a.<(len)-b`
 {
-	int b, e;
-	range_e_llen(int b, int e) : b(b), e(e) {}
+	Int b, e;
+	range_e_llen(Int b, Int e) : b(b), e(e) {}
 };
 struct range_elen_elen // `(len)-a..(len)-b`
 {
-	int b, e;
-	range_elen_elen(int b, int e) : b(b), e(e) {}
+	Int b, e;
+	range_elen_elen(Int b, Int e) : b(b), e(e) {}
 };
 struct range_elen_llen // `(len)-a.<(len)-b`
 {
-	int b, e;
-	range_elen_llen(int b, int e) : b(b), e(e) {}
+	Int b, e;
+	range_elen_llen(Int b, Int e) : b(b), e(e) {}
 };
 struct range_elen_i_wstep // `((len)-a..).step(s)`
 {
-	int b, s;
-	range_elen_i_wstep(int b, int s) : b(b), s(s) {}
+	Int b, s;
+	range_elen_i_wstep(Int b, Int s) : b(b), s(s) {}
 };
 struct range_elen_i // `(len)-a..`
 {
-	int b;
-	range_elen_i(int b) : b(b) {}
-	range_elen_i_wstep step(int s) {return range_elen_i_wstep(b, s);}
+	Int b;
+	range_elen_i(Int b) : b(b) {}
+	range_elen_i_wstep step(Int s) {return range_elen_i_wstep(b, s);}
 };
 
 template <typename Ty> inline auto range_ee(const Ty &begin, const Ty &end) {return Range<Ty, true,  true >(begin, end);} // equal-equal range (`a..b`)
