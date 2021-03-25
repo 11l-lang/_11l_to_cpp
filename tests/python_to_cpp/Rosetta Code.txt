@@ -11519,3 +11519,99 @@ struct CodeBlock2
         print(soundex(u"Ekzampul"_S));
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Taxicab_numbers#Python
+from typing import Dict, List, Tuple
+
+cubes = [x**3 for x in range(1,1200)]
+crev : Dict[int, int] = {}
+# for cube root lookup
+for x,x3 in enumerate(cubes): crev[x3] = x + 1
+
+sums = sorted(x+y for x in cubes for y in cubes if y < x)
+
+idx = 0
+for i in range(1, len(sums)-1):
+    if sums[i-1] != sums[i] and sums[i] == sums[i+1]:
+        idx += 1
+        if (idx > 25 and idx < 2000) or idx > 2006: continue
+
+        n = sums[i]
+        p : List[Tuple[int, int]] = []
+        for x in cubes:
+            if n-x < x: break
+            if n-x in crev:
+                p.append((crev[x], crev[n-x]))
+        print("%4d: %10d"%(idx,n), end = ' ')
+        for x1, x2 in p: print(" = %4d^3 + %4d^3" % (x1, x2), end = ' ')
+        print()
+===
+V cubes = (1..1199).map(x -> x ^ 3)
+[Int = Int] crev
+
+L(x3) cubes
+   V x = L.index
+   crev[x3] = x + 1
+V sums = sorted(multiloop_filtered(cubes, cubes, (x, y) -> y < x, (x, y) -> x + y))
+V idx = 0
+L(i) 1 .< sums.len - 1
+   I sums[i - 1] != sums[i] & sums[i] == sums[i + 1]
+      idx++
+      I (idx > 25 & idx < 2000) | idx > 2006
+         L.continue
+      V n = sums[i]
+      [(Int, Int)] p
+      L(x) cubes
+         I n - x < x
+            L.break
+         I n - x C crev
+            p.append((crev[x], crev[n - x]))
+      print(‘#4: #10’.format(idx, n), end' ‘ ’)
+      L(x1, x2) p
+         print(‘ = #4^3 + #4^3’.format(x1, x2), end' ‘ ’)
+      print()
+===
+auto cubes = range_ee(1, 1199).map([](const auto &x){return cube(x);});
+Dict<int, int> crev;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {int Lindex = 0;
+
+        for (auto &&x3 : cubes) {
+            auto x = Lindex;
+            crev.set(x3, x + 1);
+            Lindex++;
+        }}
+    }
+} code_block_1;
+auto sums = sorted(multiloop_filtered(cubes, cubes, [](const auto &x, const auto &y){return y < x;}, [](const auto &x, const auto &y){return x + y;}));
+auto idx = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto i : range_el(1, sums.len() - 1))
+            if (sums[i - 1] != sums[i] && sums[i] == sums[i + 1]) {
+                idx++;
+                if ((idx > 25 && idx < 2000) || idx > 2006)
+                    continue;
+                auto n = sums[i];
+                Array<ivec2> p;
+                for (auto &&x : cubes) {
+                    if (n - x < x)
+                        break;
+                    if (in(n - x, crev))
+                        p.append(make_tuple(crev[x], crev[n - x]));
+                }
+                print(u"#4: #10"_S.format(idx, n), u" "_S);
+                for (auto &&[x1, x2] : p)
+                    print(u" = #4^3 + #4^3"_S.format(x1, x2), u" "_S);
+                print();
+            }
+    }
+} code_block_2;

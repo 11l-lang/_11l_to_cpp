@@ -725,7 +725,7 @@ template <typename ... Types> String String::format(const Types&... args) const
 					throw AssertionError();
 				if (left_align)
 					r &= *fa.string;
-				r.resize(r.size() + max(before_period - fa.string->len(), 0), ' ');
+				r.resize(r.size() + max(before_period - fa.string->len(), Int(0)), ' ');
 				if (!left_align)
 					r &= *fa.string;
 			}
@@ -745,7 +745,7 @@ template <typename ... Types> String String::format(const Types&... args) const
 						s.assign(fa.f, after_period, false);
 					if (left_align)
 						r &= s;
-					r.resize(r.size() + max(after_period + bool(after_period) + before_period - s.len(), 0), zero_padding ? '0' : ' ');
+					r.resize(r.size() + max(after_period + bool(after_period) + before_period - s.len(), Int(0)), zero_padding ? '0' : ' ');
 					if (!left_align)
 						r &= s;
 				}

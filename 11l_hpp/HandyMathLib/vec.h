@@ -301,6 +301,7 @@ INLINE bvec3::bvec3(const bvec4 &v) {x=v.x; y=v.y; z=v.z;}
 #define typedef_vectors(dimension)						 \
 typedef Tvec<HMfloat      ,dimension>	  vec##dimension;\
 typedef Tvec<HMint        ,dimension>	 ivec##dimension;\
+typedef Tvec<HMlong_long  ,dimension>	llvec##dimension;\
 typedef Tvec<HMdouble     ,dimension>	 dvec##dimension;\
 typedef Tvec<HMlong_double,dimension>	ldvec##dimension;\
 typedef Tvec<HMshort      ,dimension>	 svec##dimension;\

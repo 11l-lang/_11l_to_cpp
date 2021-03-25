@@ -1058,8 +1058,8 @@ def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False
                         continue
                 i += 1
             tuple_types = types.split(', ')
-            if tuple_types[0] in ('int', 'float', 'double') and tuple_types.count(tuple_types[0]) == len(tuple_types) and len(tuple_types) in range(2, 5):
-                return {'int':'i', 'float':'', 'double':'d'}[tuple_types[0]] + 'vec' + str(len(tuple_types))
+            if tuple_types[0] in ('int', 'Int64', 'float', 'double') and tuple_types.count(tuple_types[0]) == len(tuple_types) and len(tuple_types) in range(2, 5):
+                return {'int':'i', 'Int64':'ll', 'float':'', 'double':'d'}[tuple_types[0]] + 'vec' + str(len(tuple_types))
             return 'Tuple<' + types + '>'
 
         p = ty.find('[') # ]

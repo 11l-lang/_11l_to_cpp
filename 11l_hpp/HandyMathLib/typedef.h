@@ -5,6 +5,7 @@ typedef bool HMbool;
 typedef signed char HMbyte;
 typedef signed short HMshort;
 typedef signed int HMint;
+typedef signed long long HMlong_long;
 typedef unsigned char HMubyte;
 typedef unsigned short HMushort;
 typedef unsigned int HMuint;
