@@ -2845,6 +2845,93 @@ int MAIN_WITH_ARGV()
 }
 
 
+// https://www.rosettacode.org/wiki/Sorting_algorithms/Permutation_sort
+F is_sorted(arr)
+   L(i) 1..arr.len-1
+      I arr[i-1] > arr[i]
+         R 0B
+   R 1B
+
+F permutation_sort(&arr)
+   L !is_sorted(arr)
+      arr.next_permutation()
+
+V arr = [7, 6, 5, 9, 8, 4, 3, 1, 2, 0]
+permutation_sort(&arr)
+print(arr)
+===
+template <typename T1> auto is_sorted(const T1 &arr)
+{
+    for (auto i : range_ee(1, arr.len() - 1))
+        if (arr[i - 1] > arr[i])
+            return false;
+    return true;
+}
+
+template <typename T1> auto permutation_sort(T1 &arr)
+{
+    while (!is_sorted(arr))
+        arr.next_permutation();
+}
+auto arr = create_array({7, 6, 5, 9, 8, 4, 3, 1, 2, 0});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        permutation_sort(arr);
+        print(arr);
+    }
+} code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Strip_comments_from_a_string
+F remove_comments(line, sep)
+   V? p = line.find(sep)
+   I p != N
+      R line[0.<p].rtrim(‘ ’)
+   R line
+
+print(remove_comments(‘apples ; pears # and bananas’, (‘;’, ‘#’)))
+print(remove_comments(‘apples ; pears # and bananas’, ‘#’))
+print(remove_comments(‘apples ; pears # and bananas’, ‘!’))
+===
+template <typename T1, typename T2> auto remove_comments(const T1 &line, const T2 &sep)
+{
+    auto p = line.find(sep);
+    if (p != nullptr)
+        return line[range_el(0, *p)].rtrim(u" "_S);
+    return line;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(remove_comments(u"apples ; pears # and bananas"_S, make_tuple(u";"_S, u"#"_S)));
+        print(remove_comments(u"apples ; pears # and bananas"_S, u"#"_S));
+        print(remove_comments(u"apples ; pears # and bananas"_S, u"!"_S));
+    }
+} code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Sum_and_product_of_an_array
+V arr = [1, 2, 3, 4]
+print(sum(arr))
+print(product(arr))
+===
+auto arr = create_array({1, 2, 3, 4});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum(arr));
+        print(product(arr));
+    }
+} code_block_1;
+
+
 // https://www.rosettacode.org/wiki/System_time
 print(Time())
 ===
