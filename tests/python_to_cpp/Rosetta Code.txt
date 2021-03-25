@@ -11523,9 +11523,10 @@ struct CodeBlock2
 
 # https://www.rosettacode.org/wiki/Taxicab_numbers#Python
 from typing import Dict, List, Tuple
+Int64 = int
 
-cubes = [x**3 for x in range(1,1200)]
-crev : Dict[int, int] = {}
+cubes = [Int64(x)**3 for x in range(1,1200)]
+crev : Dict[Int64, Int64] = {}
 # for cube root lookup
 for x,x3 in enumerate(cubes): crev[x3] = x + 1
 
@@ -11538,7 +11539,7 @@ for i in range(1, len(sums)-1):
         if (idx > 25 and idx < 2000) or idx > 2006: continue
 
         n = sums[i]
-        p : List[Tuple[int, int]] = []
+        p : List[Tuple[Int64, Int64]] = []
         for x in cubes:
             if n-x < x: break
             if n-x in crev:
@@ -11547,8 +11548,8 @@ for i in range(1, len(sums)-1):
         for x1, x2 in p: print(" = %4d^3 + %4d^3" % (x1, x2), end = ' ')
         print()
 ===
-V cubes = (1..1199).map(x -> x ^ 3)
-[Int = Int] crev
+V cubes = (1..1199).map(x -> Int64(x) ^ 3)
+[Int64 = Int64] crev
 
 L(x3) cubes
    V x = L.index
@@ -11561,7 +11562,7 @@ L(i) 1 .< sums.len - 1
       I (idx > 25 & idx < 2000) | idx > 2006
          L.continue
       V n = sums[i]
-      [(Int, Int)] p
+      [(Int64, Int64)] p
       L(x) cubes
          I n - x < x
             L.break
@@ -11572,8 +11573,8 @@ L(i) 1 .< sums.len - 1
          print(‘ = #4^3 + #4^3’.format(x1, x2), end' ‘ ’)
       print()
 ===
-auto cubes = range_ee(1, 1199).map([](const auto &x){return cube(x);});
-Dict<int, int> crev;
+auto cubes = range_ee(1, 1199).map([](const auto &x){return cube(to_int64(x));});
+Dict<Int64, Int64> crev;
 
 struct CodeBlock1
 {
@@ -11601,7 +11602,7 @@ struct CodeBlock2
                 if ((idx > 25 && idx < 2000) || idx > 2006)
                     continue;
                 auto n = sums[i];
-                Array<ivec2> p;
+                Array<llvec2> p;
                 for (auto &&x : cubes) {
                     if (n - x < x)
                         break;
