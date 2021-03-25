@@ -49,16 +49,16 @@ public:
 		s -= days * (24.0 * 3600);
 		double hours = floor(s / 3600.0);
 		r &= String(hours);
-		r &= u':';
+		r &= u':'_C;
 
 		s -= hours * 3600.0;
 		double minutes = floor(s / 60.0);
 		r &= String(minutes).zfill(2);
-		r &= u':';
+		r &= u':'_C;
 
 		s -= minutes * 60.0;
 		if (s < 10)
-			r &= u'0';
+			r &= u'0'_C;
 		r &= String(s);
 
 		return r;
@@ -129,9 +129,9 @@ public:
 	{
 		time_t t = (time_t)seconds_since_epoch;
 		GET_LOCALTIME_TM
-		String r = String(tm->tm_year + 1900) & u'-' & String(tm->tm_mon + 1).zfill(2) & u'-' & String(tm->tm_mday).zfill(2) & u' '
-		         & String(tm->tm_hour).zfill(2) & u':'
-		         & String(tm->tm_min ).zfill(2) & u':'
+		String r = String(tm->tm_year + 1900) & u'-'_C & String(tm->tm_mon + 1).zfill(2) & u'-'_C & String(tm->tm_mday).zfill(2) & u' '_C
+		         & String(tm->tm_hour).zfill(2) & u':'_C
+		         & String(tm->tm_min ).zfill(2) & u':'_C
 		         & String(tm->tm_sec ).zfill(2);
 		double f = fract(seconds_since_epoch);
 		if (f != 0)

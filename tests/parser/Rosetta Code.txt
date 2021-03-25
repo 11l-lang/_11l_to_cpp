@@ -2843,3 +2843,15 @@ int MAIN_WITH_ARGV()
     l.del(range_ep(to_int(_get<2>(::argv)) - 1, to_int(_get<3>(::argv))));
     File(_get<1>(::argv), u"w"_S).write(l.join(u"\n"_S));
 }
+
+
+// https://www.rosettacode.org/wiki/System_time
+print(Time())
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(Time());
+    }
+} code_block_1;
