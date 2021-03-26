@@ -11616,3 +11616,100 @@ struct CodeBlock2
             }
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Teacup_rim_text#Python
+def rotated(s : str):
+    return s[1:] + s[0]
+
+s = set(open('unixdict.txt').read().rstrip("\n").split("\n"))
+while len(s):
+    for word_ in s:
+        word = word_ # because after `s.remove(word)` `word` becomes invalid
+        s.remove(word)
+        if len(word) < 3:
+            break
+
+        w = word
+        for i in range(len(word) - 1):
+            w = rotated(w)
+            if w in s:
+                s.remove(w)
+            else:
+                break
+        else:
+            print(word, end = '')
+            w = word
+            for i in range(len(word) - 1):
+                w = rotated(w)
+                print(' -> ' + w, end = '')
+            print()
+
+        break
+===
+F rotated(String s)
+   R s[1..]‘’s[0]
+V s = Set(File(‘unixdict.txt’).read().rtrim("\n").split("\n"))
+L !s.empty
+   L(word_) s
+      V word = word_
+      s.remove(word)
+      I word.len < 3
+         L.break
+      V w = word
+      L(i) 0 .< word.len - 1
+         w = rotated(w)
+         I w C s
+            s.remove(w)
+         E
+            L.break
+      L.was_no_break
+         print(word, end' ‘’)
+         w = word
+         L(i) 0 .< word.len - 1
+            w = rotated(w)
+            print(‘ -> ’w, end' ‘’)
+         print()
+      L.break
+===
+auto rotated(const String &s)
+{
+    return s[range_ei(1)] & _get<0>(s);
+}
+auto s = create_set(File(u"unixdict.txt"_S).read().rtrim(u"\n"_S).split(u"\n"_S));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (!s.empty())
+            for (auto &&word_ : s) {
+                auto word = word_;
+                s.remove(word);
+                if (word.len() < 3)
+                    break;
+                auto w = word;
+                {bool was_break = false;
+                for (auto i : range_el(0, word.len() - 1)) {
+                    w = rotated(w);
+                    if (in(w, s))
+                        s.remove(w);
+                    else {
+                        was_break = true;
+                        break;
+                    }
+                }
+                if (!was_break) {
+                    print(word, u""_S);
+                    w = word;
+                    for (auto i : range_el(0, word.len() - 1)) {
+                        w = rotated(w);
+                        print(u" -> "_S & w, u""_S);
+                    }
+                    print();
+                }
+                }
+                break;
+            }
+    }
+} code_block_1;
