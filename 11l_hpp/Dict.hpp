@@ -159,11 +159,21 @@ public:
 		return r;
 	}
 
-	template <typename Func> Array<Tuple<KeyType, ValueType>> filter(Func &&func) const
+	template <typename Func, typename = decltype(std::declval<Func>()(std::declval<decltype(make_tuple(std::declval<KeyType>(), std::declval<ValueType>()))>()))> auto filter(Func &&func) const
 	{
-		Array<Tuple<KeyType, ValueType>> r;
+		Array<decltype(make_tuple(std::declval<KeyType>(), std::declval<ValueType>()))> r;
 		for (auto &&el : *this)
 			if (func(make_tuple(el.first, el.second)))
+				r.push_back(make_tuple(el.first, el.second));
+		return r;
+	}
+
+	template <typename Func, typename Dummy = int, typename = decltype(std::declval<Func>()(std::declval<KeyType>(),
+	                                                                                        std::declval<ValueType>()))> auto filter(Func &&func) const
+	{
+		Array<decltype(make_tuple(std::declval<KeyType>(), std::declval<ValueType>()))> r;
+		for (auto &&el : *this)
+			if (func(el.first, el.second))
 				r.push_back(make_tuple(el.first, el.second));
 		return r;
 	}

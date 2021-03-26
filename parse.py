@@ -2658,7 +2658,9 @@ def parse_internal(this_node):
                                 tid = scope.find(lv_node.type_args[0])
                                 if tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_virtual_functions:
                                     node.is_loop_variable_a_ptr = True
-                        scope.add_name(node.loop_variable, node)
+
+                            for loop_var in node.loop_variable.split(', '):
+                                scope.add_name(loop_var, node)
 
                     new_scope(node)
                     scope = prev_scope

@@ -11713,3 +11713,194 @@ struct CodeBlock1
             }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Textonyms#Python
+from typing import Dict
+import collections
+Char = str
+
+CH2NUM : Dict[Char, str] = {}
+for num, chars in enumerate('abc def ghi jkl mno pqrs tuv wxyz'.split(' '), 2):
+    for ch in chars:
+        CH2NUM[ch] = str(num)
+
+def mapnum2words(words):
+    number2words : DefaultDict[str, List[str]] = collections.defaultdict(list)
+    reject = 0
+    for word in words:
+        try:
+            number2words[''.join(CH2NUM[ch] for ch in word)].append(word)
+        except KeyError:
+            # Reject words with non a-z e.g. '10th'
+            reject += 1
+    return (number2words, reject)
+
+words = open('unixdict.txt').read().rstrip("\n").split("\n")
+print("Read %i words from 'unixdict.txt'" % len(words))
+wordset = set(words)
+(num2words, reject) = mapnum2words(words)
+
+def interactiveconversions():
+    for inp in ('rosetta', 'code', '2468', '3579'):
+        print("\nType a number or a word to get the translation and textonyms:", inp)
+        if all(ch in '23456789' for ch in inp):
+            if inp in num2words:
+                print("  Number %s has the following textonyms in the dictionary: %s" % (inp, ', '.join(
+                    num2words[inp])))
+            else:
+                print("  Number %s has no textonyms in the dictionary." % inp)
+        elif all(ch in CH2NUM for ch in inp):
+            num = ''.join(CH2NUM[ch] for ch in inp)
+            print("  Word %s is%s in the dictionary and is number %s with textonyms: %s" % (
+                inp, ('' if inp in wordset else "n't"), num, ', '.join(num2words[num])))
+        else:
+            print("  I don't understand '%s'" % inp)
+
+morethan1word = sum(1 for w in num2words.keys() if len(num2words[w]) > 1)
+maxwordpernum = max(len(values) for values in num2words.values())
+print("""
+There are %d words in %s which can be represented by the Textonyms mapping.
+They require %d digit combinations to represent them.
+%d digit combinations represent Textonyms.""" % (len(words) - reject, "'unixdict.txt'", len(num2words), morethan1word))
+
+print("\nThe numbers mapping to the most words map to %i words each:" % maxwordpernum)
+maxwpn = sorted((key, val) for key, val in num2words.items() if len(val) == maxwordpernum)
+for num, wrds in maxwpn:
+    print("  %s maps to: %s" % (num, ', '.join(wrds)))
+
+interactiveconversions()
+===
+//import collections
+[Char = String] CH2NUM
+L(chars) ‘abc def ghi jkl mno pqrs tuv wxyz’.split(‘ ’)
+   V num = L.index + 2
+   L(ch) chars
+      CH2NUM[ch] = String(num)
+
+F mapnum2words(words)
+   DefaultDict[String, [String]] number2words
+   V reject = 0
+   L(word) words
+      X.try
+         number2words[word.map(ch -> :CH2NUM[ch]).join(‘’)].append(word)
+      X.catch KeyError
+         reject++
+   R (number2words, reject)
+V words = File(‘unixdict.txt’).read().rtrim("\n").split("\n")
+print(‘Read #. words from 'unixdict.txt'’.format(words.len))
+V wordset = Set(words)
+V (num2words, reject) = mapnum2words(words)
+
+F interactiveconversions()
+   L(inp) (‘rosetta’, ‘code’, ‘2468’, ‘3579’)
+      print("\nType a number or a word to get the translation and textonyms: "inp)
+      I all(inp.map(ch -> ch C ‘23456789’))
+         I inp C :num2words
+            print(‘  Number #. has the following textonyms in the dictionary: #.’.format(inp, (:num2words[inp]).join(‘, ’)))
+         E
+            print(‘  Number #. has no textonyms in the dictionary.’.format(inp))
+      E I all(inp.map(ch -> ch C :CH2NUM))
+         V num = inp.map(ch -> :CH2NUM[ch]).join(‘’)
+         print(‘  Word #. is#. in the dictionary and is number #. with textonyms: #.’.format(inp, (I inp C :wordset {‘’} E ‘n't’), num, (:num2words[num]).join(‘, ’)))
+      E
+         print(‘  I don't understand '#.'’.format(inp))
+V morethan1word = sum(num2words.keys().filter(w -> :num2words[w].len > 1).map(w -> 1))
+V maxwordpernum = max(num2words.values().map(values -> values.len))
+print(‘
+There are #. words in #. which can be represented by the Textonyms mapping.
+They require #. digit combinations to represent them.
+#. digit combinations represent Textonyms.’.format(words.len - reject, ‘'unixdict.txt'’, num2words.len, morethan1word))
+print("\nThe numbers mapping to the most words map to #. words each:".format(maxwordpernum))
+V maxwpn = sorted(num2words.filter((key, val) -> val.len == :maxwordpernum))
+L(num, wrds) maxwpn
+   print(‘  #. maps to: #.’.format(num, wrds.join(‘, ’)))
+interactiveconversions()
+===
+Dict<Char, String> CH2NUM;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {int Lindex = 0;
+        for (auto &&chars : u"abc def ghi jkl mno pqrs tuv wxyz"_S.split(u" "_S)) {
+            auto num = Lindex + 2;
+            for (auto &&ch : chars)
+                CH2NUM.set(ch, String(num));
+            Lindex++;
+        }}
+    }
+} code_block_1;
+
+template <typename T1> auto mapnum2words(const T1 &words)
+{
+    DefaultDict<String, Array<String>> number2words;
+    auto reject = 0;
+    for (auto &&word : words) {
+        try
+        {
+            number2words[word.map([](const auto &ch){return ::CH2NUM[ch];}).join(u""_S)].append(word);
+        }
+        catch (const KeyError&)
+        {
+            reject++;
+        }
+    }
+    return make_tuple(number2words, reject);
+}
+auto words = File(u"unixdict.txt"_S).read().rtrim(u"\n"_S).split(u"\n"_S);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"Read #. words from 'unixdict.txt'"_S.format(words.len()));
+    }
+} code_block_2;
+auto wordset = create_set(words);
+auto [num2words, reject] = mapnum2words(words);
+
+auto interactiveconversions()
+{
+    for (auto &&inp : make_tuple(u"rosetta"_S, u"code"_S, u"2468"_S, u"3579"_S)) {
+        print(u"\nType a number or a word to get the translation and textonyms: "_S & inp);
+        if (all(inp.map([](const auto &ch){return in(ch, u"23456789"_S);}))) {
+            if (in(inp, ::num2words))
+                print(u"  Number #. has the following textonyms in the dictionary: #."_S.format(inp, (::num2words[inp]).join(u", "_S)));
+            else
+                print(u"  Number #. has no textonyms in the dictionary."_S.format(inp));
+        }
+        else if (all(inp.map([](const auto &ch){return in(ch, ::CH2NUM);}))) {
+            auto num = inp.map([](const auto &ch){return ::CH2NUM[ch];}).join(u""_S);
+            print(u"  Word #. is#. in the dictionary and is number #. with textonyms: #."_S.format(inp, (in(inp, ::wordset) ? u""_S : u"n't"_S), num, (::num2words[num]).join(u", "_S)));
+        }
+        else
+            print(u"  I don't understand '#.'"_S.format(inp));
+    }
+}
+auto morethan1word = sum_map(num2words.keys().filter([](const auto &w){return ::num2words[w].len() > 1;}), [](const auto &w){return 1;});
+auto maxwordpernum = max(num2words.values().map([](const auto &values){return values.len();}));
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print(uR"(
+There are #. words in #. which can be represented by the Textonyms mapping.
+They require #. digit combinations to represent them.
+#. digit combinations represent Textonyms.)"_S.format(words.len() - reject, u"'unixdict.txt'"_S, num2words.len(), morethan1word));
+        print(u"\nThe numbers mapping to the most words map to #. words each:"_S.format(maxwordpernum));
+    }
+} code_block_3;
+auto maxwpn = sorted(num2words.filter([](const auto &key, const auto &val){return val.len() == ::maxwordpernum;}));
+
+struct CodeBlock4
+{
+    CodeBlock4()
+    {
+        for (auto &&[num, wrds] : maxwpn)
+            print(u"  #. maps to: #."_S.format(num, wrds.join(u", "_S)));
+        interactiveconversions();
+    }
+} code_block_4;
