@@ -11904,3 +11904,75 @@ struct CodeBlock4
         interactiveconversions();
     }
 } code_block_4;
+
+
+# https://www.rosettacode.org/wiki/The_Twelve_Days_of_Christmas#Python
+gifts = \
+'''A partridge in a pear tree.
+Two turtle doves
+Three french hens
+Four calling birds
+Five golden rings
+Six geese a-laying
+Seven swans a-swimming
+Eight maids a-milking
+Nine ladies dancing
+Ten lords a-leaping
+Eleven pipers piping
+Twelve drummers drumming'''.split('\n')
+
+days = 'first second third fourth fifth sixth seventh eighth ninth tenth eleventh twelfth'.split(' ')
+
+for n, day in enumerate(days, 1):
+    g = gifts[:n][::-1]
+    print(('\nOn the %s day of Christmas\nMy true love gave to me:\n' % day) +
+          '\n'.join(g[:-1]) +
+          (' and\n' + g[-1] if n > 1 else g[-1]))
+===
+V gifts = ‘A partridge in a pear tree.
+Two turtle doves
+Three french hens
+Four calling birds
+Five golden rings
+Six geese a-laying
+Seven swans a-swimming
+Eight maids a-milking
+Nine ladies dancing
+Ten lords a-leaping
+Eleven pipers piping
+Twelve drummers drumming’.split("\n")
+V days = ‘first second third fourth fifth sixth seventh eighth ninth tenth eleventh twelfth’.split(‘ ’)
+
+L(day) days
+   V n = L.index + 1
+   V g = reversed(gifts[0 .< n])
+   print(("\nOn the #. day of Christmas\nMy true love gave to me:\n".format(day))‘’(g[0 .< (len)-1]).join("\n")‘’(I n > 1 {" and\n"g.last} E g.last))
+===
+auto gifts = uR"(A partridge in a pear tree.
+Two turtle doves
+Three french hens
+Four calling birds
+Five golden rings
+Six geese a-laying
+Seven swans a-swimming
+Eight maids a-milking
+Nine ladies dancing
+Ten lords a-leaping
+Eleven pipers piping
+Twelve drummers drumming)"_S.split(u"\n"_S);
+auto days = u"first second third fourth fifth sixth seventh eighth ninth tenth eleventh twelfth"_S.split(u" "_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {int Lindex = 0;
+
+        for (auto &&day : days) {
+            auto n = Lindex + 1;
+            auto g = reversed(gifts[range_el(0, n)]);
+            print((u"\nOn the #. day of Christmas\nMy true love gave to me:\n"_S.format(day)) & (g[range_e_llen(0,  - 1)]).join(u"\n"_S) & (n > 1 ? u" and\n"_S & g.last() : g.last()));
+            Lindex++;
+        }}
+    }
+} code_block_1;
