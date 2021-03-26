@@ -2942,3 +2942,39 @@ struct CodeBlock1
         print(Time());
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/The_Name_Game#Python
+F print_verse(n)
+   V l = [String(‘b’), ‘f’, ‘m’]
+   V s = n[1..]
+   V? i = l.find(n[0].lowercase())
+   I i != N
+      l[i] = ‘’
+   E I n[0] C (‘A’, ‘E’, ‘I’, ‘O’, ‘U’)
+      s = n.lowercase()
+   print("#., #., bo-#.#.\nBanana-fana fo-#.#.\nFee-fi-mo-#.#.\n#.!\n".format(n, n, l[0], s, l[1], s, l[2], s, n))
+
+L(n) [‘Gary’, ‘Earl’, ‘Billy’, ‘Felix’, ‘Mary’]
+   print_verse(n)
+===
+template <typename T1> auto print_verse(const T1 &n)
+{
+    auto l = create_array<String>({String(u"b"_S), u"f"_S, u"m"_S});
+    auto s = n[range_ei(1)];
+    auto i = l.find(_get<0>(n).lowercase());
+    if (i != nullptr)
+        l.set(*i, u""_S);
+    else if (in(_get<0>(n), make_tuple(u"A"_S, u"E"_S, u"I"_S, u"O"_S, u"U"_S)))
+        s = n.lowercase();
+    print(u"#., #., bo-#.#.\nBanana-fana fo-#.#.\nFee-fi-mo-#.#.\n#.!\n"_S.format(n, n, _get<0>(l), s, _get<1>(l), s, _get<2>(l), s, n));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&n : create_array({u"Gary"_S, u"Earl"_S, u"Billy"_S, u"Felix"_S, u"Mary"_S}))
+            print_verse(n);
+    }
+} code_block_1;
