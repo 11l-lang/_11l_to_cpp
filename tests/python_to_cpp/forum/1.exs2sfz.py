@@ -508,11 +508,11 @@ class EXSInstrument(object):
 
 				if (key[0] == key[1] == key[2]):
 					# one key triggers a sample, use minimal parameters
-					print(" key={key:#}".format(key=key[0]), end='', file=sfzfile)
+					print(" key={key}".format(key=key[0]), end='', file=sfzfile)
 				else:
 					# multiple keys triggering a sample, add extra parameters
 					# studio one's presence gets confused when it encounters key=nn pitch_keytrack=1; be explicit
-					print("lokey={startnote:#} hikey={endnote:#} pitch_keycenter={rootnote}".
+					print("lokey={startnote} hikey={endnote} pitch_keycenter={rootnote}".
 							format(startnote=keyrange[0].startnote, endnote=keyrange[0].endnote,
 								   rootnote=keyrange[0].rootnote),
 							end='', file=sfzfile)
@@ -536,52 +536,52 @@ class EXSInstrument(object):
 						# group 0 can't be used as a choke group in sfz, so change it where needed
 						choke_group = len(self.groups)
 
-					print(" group={group:#} off_by={group:#} polyphony={polyphony} off_mode=fast".
+					print(" group={group} off_by={group} polyphony={polyphony} off_mode=fast".
 							format(group=choke_group, polyphony=self.groups[keyrange[0].group].polyphony),
 							end='', file=sfzfile)
 
 				if self.groups[keyrange[0].group].output > 0:
-					print(" output={output:#}".format(output=self.groups[keyrange[0].group].output),
+					print(" output={output}".format(output=self.groups[keyrange[0].group].output),
 							end='', file=sfzfile)
 
 				if keyrange[0].pan:
-					print(" pan={pan:#}".format(pan=keyrange[0].pan), end='', file=sfzfile)
+					print(" pan={pan}".format(pan=keyrange[0].pan), end='', file=sfzfile)
 
 				if keyrange[0].oneshot:
 					print(" loop_mode=one_shot", end='', file=sfzfile)
 
 				for sequence in sequences:
 					if keyrange[0].group in sequence:
-						print(" seq_length={seq_length:#} seq_position={seq_position:#}".
+						print(" seq_length={seq_length} seq_position={seq_position}".
 								format(seq_length=len(sequence), seq_position=sequence.index(keyrange[0].group) + 1),
 								end='', file=sfzfile)
 						break
 
-				print(" pitch_keytrack={pitchtrack:#}".format(pitchtrack=keyrange[0].pitchtrack), file=sfzfile)
+				print(" pitch_keytrack={pitchtrack}".format(pitchtrack=int(keyrange[0].pitchtrack)), file=sfzfile)
 
 				for zone in keyrange:
-					print("\t<region> lovel={lovel:#03} hivel={hivel:#03} amp_velcurve_{hivel:#03}=1".
+					print("\t<region> lovel={lovel:03} hivel={hivel:03} amp_velcurve_{hivel:03}=1".
 							format(lovel=zone.minvel, hivel=zone.maxvel),
 							end='', file=sfzfile)
 
 					if zone.finetune:
-						print(" tune={finetune:#}".
+						print(" tune={finetune}".
 								format(finetune=zone.finetune), end='', file=sfzfile)
 
 					if zone.volumeadjust:
-						print(" volume={volumeadjust:#}".
+						print(" volume={volumeadjust}".
 								format(volumeadjust=zone.volumeadjust), end='', file=sfzfile)
 
 					if zone.samplestart:
-						print(" offset={samplestart:#}".
+						print(" offset={samplestart}".
 								format(samplestart=zone.samplestart), end='', file=sfzfile)
 
 					if zone.sampleend and zone.sampleend < self.samples[zone.sampleindex].length:
-						print(" end={sampleend:#}".
+						print(" end={sampleend}".
 								format(sampleend=zone.sampleend), end='', file=sfzfile)
 
 					if zone.loop:
-						print(" loop_mode=loop_sustain loop_start={loopstart:#} loop_end={loopend:#}".
+						print(" loop_mode=loop_sustain loop_start={loopstart} loop_end={loopend}".
 								format(loopstart=zone.loopstart, loopend=zone.loopend - 1), end='', file=sfzfile)
 
 					if self.groups[zone.group].trigger == 1:
