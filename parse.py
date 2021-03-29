@@ -443,6 +443,8 @@ class SymbolNode:
                         f_node = type_of(self.children[0])
                 elif func_name == 'Int':
                     if self.children[1] is not None and self.children[1].token_str() == "bytes'":
+                        if self.children[2].symbol.id == '[' and not self.children[2].is_list and self.children[2].children[1].symbol.id in ('..', '.<', '.+', '<.', '<.<'): # ]
+                            return 'int_from_bytes(' + self.children[2].children[0].to_str() + ', ' + self.children[2].children[1].to_str() + ')'
                         return 'int_from_bytes(' + self.children[2].to_str() + ')'
                     func_name = 'to_int'
                     f_node = builtins_scope.find('Int').ast_nodes[0].constructors[0]

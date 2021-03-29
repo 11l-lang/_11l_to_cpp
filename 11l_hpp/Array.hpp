@@ -785,3 +785,12 @@ inline Int int_from_bytes(const Array<Byte> &bytes)
 	memcpy(&r, bytes.data(), bytes.len());
 	return r;
 }
+
+template <typename Ty, bool include_beginning, bool include_ending> inline Int int_from_bytes(const Array<Byte> &bytes, const Range<Ty, include_beginning, include_ending> &range)
+{
+	Int r = 0;
+	if (range.len() > sizeof(Int))
+		throw AssertionError();
+	memcpy(&r, bytes.data() + range.b, range.len());
+	return r;
+}

@@ -2846,8 +2846,8 @@ print_image(‘3.bmp’)
 template <typename T1> auto print_image(const T1 &fname)
 {
     auto bytes = File(fname).read_bytes();
-    auto w = int_from_bytes(bytes[range_el(18, 22)]);
-    auto h = int_from_bytes(bytes[range_el(22, 26)]);
+    auto w = int_from_bytes(bytes, range_el(18, 22));
+    auto h = int_from_bytes(bytes, range_el(22, 26));
 
     for (auto y : range_el(h - 1, -1).step(-1)) {
         for (auto x : range_el(0, w)) {
