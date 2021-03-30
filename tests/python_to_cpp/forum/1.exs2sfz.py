@@ -20,7 +20,7 @@ import os.path
 import struct
 
 
-class EXSChunk(object):
+class EXSChunk:
 
 	__size = None
 
@@ -191,7 +191,7 @@ class EXSParam(EXSChunk):
 		self.offset = offset
 
 
-class EXSSamplePool(object):
+class EXSSamplePool:
 
 	locations = None
 
@@ -304,7 +304,7 @@ def EXSChunk_parse(instrument, offset):
 	raise RuntimeError("Encountered an unknown chunk signature! signature is " + hex(sig))
 
 
-class EXSInstrument(object):
+class EXSInstrument:
 
 	data = None
 	pool = None
@@ -323,19 +323,13 @@ class EXSInstrument(object):
 		if os.stat(exsfile_name).st_size > 1024 * 1024:
 			raise RuntimeError("EXS file is too large; will not parse! (size > 1 MebiByte)")
 
-		with open(exsfile_name, 'rb') as exsfile:
+		self.data = open(exsfile_name, 'rb').read()
 
-			# read the header
-			self.data = exsfile.read(84)
-
-			# ensure this is a valid file we can parse
-			if struct.unpack_from('>I', self.data, 0)[0] == EXSHeader_sig and self.data[16:20] == b'SOBT':
-				raise RuntimeError("File is a big endian EXS file; cannot parse!")
-			if not struct.unpack_from('<I', self.data, 0)[0] == EXSHeader_sig and self.data[16:20] == b'TBOS':
-				raise RuntimeError("File is not an EXS file; will not parse!")
-
-			# now read the rest of the file
-			self.data += exsfile.read(1024 * 1024 - 84)
+		# ensure this is a valid file we can parse
+		if struct.unpack_from('>I', self.data, 0)[0] == EXSHeader_sig and self.data[16:20] == b'SOBT':
+			raise RuntimeError("File is a big endian EXS file; cannot parse!")
+		if not struct.unpack_from('<I', self.data, 0)[0] == EXSHeader_sig and self.data[16:20] == b'TBOS':
+			raise RuntimeError("File is not an EXS file; will not parse!")
 
 		if isinstance(sample_location, EXSSamplePool):
 			self.pool = sample_location
