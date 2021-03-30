@@ -1,3 +1,4 @@
+# [https://forum.11l-lang.org/threads/supported-modules.10/#post-20]
 """ EXS24 to SFZ sample library metadata converter.
 
     Might work. Might awaken some forgotten trickster goddess and lure her to your computer. Enjoy.
@@ -33,7 +34,8 @@ class EXSChunk(object):
 			if subclass.sig == sig:
 				return subclass(instrument, offset)
 
-		raise RuntimeError("Encountered an unknown chunk signature! signature is 0x{1:08X}".format(sig))
+		#raise RuntimeError("Encountered an unknown chunk signature! signature is 0x{1:08X}".format(sig))
+		raise RuntimeError("Encountered an unknown chunk signature! signature is " + hex(sig))
 
 	@property
 	def size(self):
@@ -61,7 +63,8 @@ class EXSChunk(object):
 
 	def display(self):
 		"""" display the raw chunk data in hexdump format """
-
+		raise NotImplementedError() # [-`"0x{0:04X}: ".format(...)` and `"{0:02X}".format(...)` are not supported yet-]
+'''
 		for line in range(0, self.size, 16):
 			print("0x{0:04X}: ".format(line), end='')
 			for i in range(0, 16, 4):
@@ -81,7 +84,7 @@ class EXSChunk(object):
 					print(chr(c), end='')
 				else:
 					print(" ", end='')
-			print("")
+			print("")'''
 
 
 class EXSHeader(EXSChunk):
