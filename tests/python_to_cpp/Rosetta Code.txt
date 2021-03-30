@@ -11986,8 +11986,8 @@ def print_verse(n):
         l[l.index(n[0].lower())] = ''
     elif n[0] in ('A', 'E', 'I', 'O', 'U'):
         s = n.lower()
-    #print('{0}, {0}, bo-{2}{1}\nBanana-fana fo-{3}{1}\nFee-fi-mo-{4}{1}\n{0}!\n'.format(n, s, l[0], l[1], l[2]))
-    print('%s, %s, bo-%s%s\nBanana-fana fo-%s%s\nFee-fi-mo-%s%s\n%s!\n' % (n, n, l[0], s, l[1], s, l[2], s, n))
+    print('{0}, {0}, bo-{2}{1}\nBanana-fana fo-{3}{1}\nFee-fi-mo-{4}{1}\n{0}!\n'.format(n, s, l[0], l[1], l[2]))
+    #print('%s, %s, bo-%s%s\nBanana-fana fo-%s%s\nFee-fi-mo-%s%s\n%s!\n' % (n, n, l[0], s, l[1], s, l[2], s, n))
 
 # Assume that the names are in title-case and they're more than one character long
 for n in ['Gary', 'Earl', 'Billy', 'Felix', 'Mary']:
@@ -12055,9 +12055,9 @@ iSin = thieleInterpolator(tSin, xVal)
 iCos = thieleInterpolator(tCos, xVal)
 iTan = thieleInterpolator(tTan, xVal)
 # task 3: demonstrate identities
-print('%16.14f' % (6*iSin(0.5)))
-print('%16.14f' % (3*iCos(0.5)))
-print('%16.14f' % (4*iTan(1)))
+print('{:16.14f}'.format(6*iSin(0.5)))
+print('{:16.14f}'.format(3*iCos(0.5)))
+print('{:16.14f}'.format(4*iTan(1)))
 ===
 //import math
 
