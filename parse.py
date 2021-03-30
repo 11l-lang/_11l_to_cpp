@@ -464,6 +464,8 @@ class SymbolNode:
                     if not is_char(self.children[2]):
                         raise Error('Char can be constructed only from single character string literals', self.children[2].token)
                     return char_or_str(self.children[2], True)
+                elif func_name == 'Bytes' and self.children[2].token.category == Token.Category.STRING_LITERAL:
+                    return '"' + self.children[2].token_str()[1:-1] + '"_B'
                 elif func_name.startswith('Array['): # ]
                     func_name = 'Array<' + func_name[6:-1] + '>'
                 elif func_name == 'Array': # `list(range(1,10))` -> `Array(1.<10)` -> `create_array(range_el(1, 10))`

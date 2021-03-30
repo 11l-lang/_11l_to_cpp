@@ -2923,3 +2923,22 @@ struct CodeBlock1
         print(f20(2));
     }
 } code_block_1;
+
+
+print(b"n")
+print(b"\n")
+print(b'SOBT')
+===
+print("n".code)
+print("\n".code)
+print(Bytes(‘SOBT’))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u'n'_C.code);
+        print(u'\n'_C.code);
+        print("SOBT"_B);
+    }
+} code_block_1;

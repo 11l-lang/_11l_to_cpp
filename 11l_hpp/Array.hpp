@@ -794,3 +794,11 @@ template <typename Ty, bool include_beginning, bool include_ending> inline Int i
 	memcpy(&r, bytes.data() + range.b, range.len());
 	return r;
 }
+
+inline Array<Byte> operator ""_B(const char *s, size_t sz)
+{
+	Array<Byte> r;
+	r.resize(sz);
+	memcpy(r.data(), s, sz);
+	return r;
+}
