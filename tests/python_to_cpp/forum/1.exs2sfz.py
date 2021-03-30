@@ -24,19 +24,6 @@ class EXSChunk(object):
 
 	__size = None
 
-	@classmethod
-	def parse(cls, instrument, offset):
-		""" read the chunk signature, and add a wrapper for the type-specific data """
-
-		sig = struct.unpack_from('<I', instrument.data, offset)[0]
-
-		for subclass in cls.__subclasses__():
-			if subclass.sig == sig:
-				return subclass(instrument, offset)
-
-		#raise RuntimeError("Encountered an unknown chunk signature! signature is 0x{1:08X}".format(sig))
-		raise RuntimeError("Encountered an unknown chunk signature! signature is " + hex(sig))
-
 	def size(self):
 		""" size is specified in bytes, at byte 4-8, and does not include common chunk elements;
 			that is, does not include the first 84 bytes """
@@ -83,10 +70,10 @@ class EXSChunk(object):
 					print(" ", end='')
 			print("")'''
 
+EXSHeader_sig = 0x00000101
 
 class EXSHeader(EXSChunk):
 
-	sig = 0x00000101
 	offset = None
 
 	def __init__(self, instrument, offset):
@@ -99,7 +86,6 @@ class EXSHeader(EXSChunk):
 
 class EXSZone(EXSChunk):
 
-	sig = 0x01000101
 	offset = None
 
 	def __init__(self, instrument, offset):
@@ -160,7 +146,6 @@ class EXSZone(EXSChunk):
 
 class EXSGroup(EXSChunk):
 
-	sig = 0x02000101
 	offset = None
 
 	def __init__(self, instrument, offset):
@@ -181,7 +166,6 @@ class EXSGroup(EXSChunk):
 
 class EXSSample(EXSChunk):
 
-	sig = 0x03000101
 	offset = None
 
 	def __init__(self, instrument, offset):
@@ -200,7 +184,6 @@ class EXSSample(EXSChunk):
 
 class EXSParam(EXSChunk):
 
-	sig = 0x04000101
 	offset = None
 
 	def __init__(self, instrument, offset):
@@ -301,6 +284,26 @@ class EXSSamplePoolLocator(EXSSamplePool):
 		return os.path.join(self.locate(filename, 4), filename)
 
 
+def EXSChunk_parse(instrument, offset):
+	""" read the chunk signature, and add a wrapper for the type-specific data """
+
+	sig = struct.unpack_from('<I', instrument.data, offset)[0]
+
+	if sig == EXSHeader_sig:
+		return EXSHeader(instrument, offset)
+	if sig == 0x01000101:
+		return EXSZone(instrument, offset)
+	if sig == 0x02000101:
+		return EXSGroup(instrument, offset)
+	if sig == 0x03000101:
+		return EXSSample(instrument, offset)
+	if sig == 0x04000101:
+		return EXSParam(instrument, offset)
+
+	#raise RuntimeError("Encountered an unknown chunk signature! signature is 0x{1:08X}".format(sig))
+	raise RuntimeError("Encountered an unknown chunk signature! signature is " + hex(sig))
+
+
 class EXSInstrument(object):
 
 	data = None
@@ -326,9 +329,9 @@ class EXSInstrument(object):
 			self.data = exsfile.read(84)
 
 			# ensure this is a valid file we can parse
-			if struct.unpack_from('>I', self.data, 0)[0] == EXSHeader.sig and self.data[16:20] == b'SOBT':
+			if struct.unpack_from('>I', self.data, 0)[0] == EXSHeader_sig and self.data[16:20] == b'SOBT':
 				raise RuntimeError("File is a big endian EXS file; cannot parse!")
-			if not struct.unpack_from('<I', self.data, 0)[0] == EXSHeader.sig and self.data[16:20] == b'TBOS':
+			if not struct.unpack_from('<I', self.data, 0)[0] == EXSHeader_sig and self.data[16:20] == b'TBOS':
 				raise RuntimeError("File is not an EXS file; will not parse!")
 
 			# now read the rest of the file
@@ -347,7 +350,7 @@ class EXSInstrument(object):
 			offset = 0
 			end = len(self.data)
 			while offset < end:
-				new_object = EXSChunk.parse(self, offset)
+				new_object = EXSChunk_parse(self, offset)
 				self.__objects.append(new_object)
 				offset += new_object.size()
 
