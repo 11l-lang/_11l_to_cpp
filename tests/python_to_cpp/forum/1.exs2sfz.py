@@ -37,7 +37,6 @@ class EXSChunk(object):
 		#raise RuntimeError("Encountered an unknown chunk signature! signature is 0x{1:08X}".format(sig))
 		raise RuntimeError("Encountered an unknown chunk signature! signature is " + hex(sig))
 
-	@property
 	def size(self):
 		""" size is specified in bytes, at byte 4-8, and does not include common chunk elements;
 			that is, does not include the first 84 bytes """
@@ -47,14 +46,12 @@ class EXSChunk(object):
 
 		return self.__size
 
-	@property
 	def id(self):
 		""" return the chunk's id number; n.b. that this does not seem to actually be used --
 			the sequence of chunks of each type in the file is used instead """
 
 		return struct.unpack_from('<I', self.instrument.data, self.offset + 8)[0]
 
-	@property
 	def name(self):
 		""" the name of a chunk starts at byte 20, and has a max. length of 64 bytes;
 			this is treated as a zero-terminated utf-8 string """
@@ -65,20 +62,20 @@ class EXSChunk(object):
 		"""" display the raw chunk data in hexdump format """
 		raise NotImplementedError() # [-`"0x{0:04X}: ".format(...)` and `"{0:02X}".format(...)` are not supported yet-]
 '''
-		for line in range(0, self.size, 16):
+		for line in range(0, self.size(), 16):
 			print("0x{0:04X}: ".format(line), end='')
 			for i in range(0, 16, 4):
 				for j in range(0, 4):
 					index = line + i + j
-					if index >= self.size:
+					if index >= self.size():
 						print("  ", end='')
 					else:
 						print("{0:02X}".format(self.instrument.data[self.offset + index]), end='')
 				print(" ", end='')
 			print(" ", end='')
 			end = line + 16
-			if end > self.size:
-				end = self.size
+			if end > self.size():
+				end = self.size()
 			for c in self.instrument.data[self.offset + line:self.offset + end]:
 				if c > 13 and c < 128:
 					print(chr(c), end='')
@@ -109,71 +106,54 @@ class EXSZone(EXSChunk):
 		self.instrument = instrument
 		self.offset = offset
 
-	@property
 	def rootnote(self):
 		return struct.unpack_from('B', self.instrument.data, self.offset + 85)[0]
 
-	@property
 	def finetune(self):
 		return struct.unpack_from('b', self.instrument.data, self.offset + 86)[0]
 
-	@property
 	def pan(self):
 		return struct.unpack_from('b', self.instrument.data, self.offset + 87)[0]
 
-	@property
 	def volumeadjust(self):
 		return struct.unpack_from('b', self.instrument.data, self.offset + 88)[0]
 
-	@property
 	def startnote(self):
 		return struct.unpack_from('B', self.instrument.data, self.offset + 90)[0]
-	@property
 	def endnote(self):
 		return struct.unpack_from('B', self.instrument.data, self.offset + 91)[0]
 
-	@property
 	def minvel(self):
 		return struct.unpack_from('B', self.instrument.data, self.offset + 93)[0]
-	@property
 	def maxvel(self):
 		return struct.unpack_from('B', self.instrument.data, self.offset + 94)[0]
 
-	@property
 	def samplestart(self):
 		return struct.unpack_from('<i', self.instrument.data, self.offset + 96)[0]
-	@property
 	def sampleend(self):
 		return struct.unpack_from('<i', self.instrument.data, self.offset + 100)[0]
 
-	@property
 	def loopstart(self):
 		return struct.unpack_from('<i', self.instrument.data, self.offset + 104)[0]
-	@property
 	def loopend(self):
 		return struct.unpack_from('<i', self.instrument.data, self.offset + 108)[0]
 
-	@property
 	def loop(self):
 		return struct.unpack_from('B', self.instrument.data, self.offset + 117)[0]
 
-	@property
 	def pitchtrack(self):
 		return not (struct.unpack_from('B', self.instrument.data, self.offset + 84)[0] & 1)
-	@property
 	def oneshot(self):
 		return struct.unpack_from('B', self.instrument.data, self.offset + 84)[0] & 2
 
-	@property
 	def group(self):
 		group = struct.unpack_from('<i', self.instrument.data, self.offset + 172)[0]
 		if group >= 0:
 			return group
 
 		# FIXME: the group can be -1 -- just returning the last group for now
-		return len(self.instrument.groups) - 1
+		return len(self.instrument.groups()) - 1
 
-	@property
 	def sampleindex(self):
 		return struct.unpack_from('<I', self.instrument.data, self.offset + 176)[0]
 
@@ -187,18 +167,14 @@ class EXSGroup(EXSChunk):
 		self.instrument = instrument
 		self.offset = offset
 
-	@property
 	def polyphony(self):
 		return struct.unpack_from('B', self.instrument.data, self.offset + 86)[0]
 
-	@property
 	def trigger(self):
 		return struct.unpack_from('B', self.instrument.data, self.offset + 157)[0]
 
-	@property
 	def output(self):
 		return struct.unpack_from('B', self.instrument.data, self.offset + 158)[0]
-	@property
 	def sequence(self):
 		return struct.unpack_from('<i', self.instrument.data, self.offset + 164)[0]
 
@@ -212,15 +188,12 @@ class EXSSample(EXSChunk):
 		self.instrument = instrument
 		self.offset = offset
 
-	@property
 	def length(self):
 		return struct.unpack_from('<i', self.instrument.data, self.offset + 88)[0]
 
-	@property
 	def rate(self):
 		return struct.unpack_from('<i', self.instrument.data, self.offset + 92)[0]
 
-	@property
 	def bitdepth(self):
 		return struct.unpack_from('B', self.instrument.data, self.offset + 96)[0]
 
@@ -368,7 +341,6 @@ class EXSInstrument(object):
 		else:
 			self.pool = EXSSamplePoolFixed(sample_location)
 
-	@property
 	def objects(self):
 		if not self.__objects:
 			self.__objects = []
@@ -377,36 +349,33 @@ class EXSInstrument(object):
 			while offset < end:
 				new_object = EXSChunk.parse(self, offset)
 				self.__objects.append(new_object)
-				offset += new_object.size
+				offset += new_object.size()
 
 				if isinstance(new_object, EXSZone):
-					self.zones.append(new_object)
+					self.zones().append(new_object)
 				elif isinstance(new_object, EXSGroup):
-					self.groups.append(new_object)
+					self.groups().append(new_object)
 				elif isinstance(new_object, EXSSample):
-					self.samples.append(new_object)
+					self.samples().append(new_object)
 
 		return self.__objects
 
-	@property
 	def zones(self):
 		if not self.__zones:
 			self.__zones = []
-			len(self.objects)
+			len(self.objects())
 		return self.__zones
 
-	@property
 	def samples(self):
 		if not self.__samples:
 			self.__samples = []
-			len(self.objects)
+			len(self.objects())
 		return self.__samples
 
-	@property
 	def groups(self):
 		if not self.__groups:
 			self.__groups = []
-			len(self.objects)
+			len(self.objects())
 		return self.__groups
 
 	def build_sequences(self):
@@ -416,8 +385,8 @@ class EXSInstrument(object):
 
 		sequences = []
 
-		for group in self.groups:
-			if not group.sequence:
+		for group in self.groups():
+			if not group.sequence():
 				continue
 
 			for sequence in sequences:
@@ -428,16 +397,16 @@ class EXSInstrument(object):
 				# trace back to the first group in the chain by looking for a group that points to this chain,
 				# and repeating the process until we end up at a group that's not pointed to
 
-				gid = self.groups.index(group)
+				gid = self.groups().index(group)
 				sequence = []
 
 				cont = True
 				while cont:
 					cont = False
-					for g in self.groups:
-						if g.sequence == gid and not self.groups.index(g) == g.sequence and not gid in sequence:
+					for g in self.groups():
+						if g.sequence() == gid and not self.groups().index(g) == g.sequence() and not gid in sequence:
 							sequence.append(gid)
-							gid = self.groups.index(g)
+							gid = self.groups().index(g)
 							cont = True
 							break
 
@@ -446,7 +415,7 @@ class EXSInstrument(object):
 				sequence = []
 				while not gid == -1 and not gid in sequence:
 					sequence.append(gid)
-					gid = self.groups[gid].sequence
+					gid = self.groups()[gid].sequence()
 
 				if len(sequence) > 1:
 					sequences.append(sequence)
@@ -457,21 +426,21 @@ class EXSInstrument(object):
 
 		def get_sequence_position(zone):
 			for sequence in sequences:
-				if zone.group in sequence:
-					return sequence.index(zone.group)
+				if zone.group() in sequence:
+					return sequence.index(zone.group())
 			return 0
 
 		def get_rootnote(zpne):
-			if not zone.pitchtrack:
-				if zone.rootnote < zone.startnote or zone.rootnote > zone.endnote:
-					return zone.startnote
-			return zone.rootnote
+			if not zone.pitchtrack():
+				if zone.rootnote() < zone.startnote() or zone.rootnote() > zone.endnote():
+					return zone.startnote()
+			return zone.rootnote()
 
 		sequences = self.build_sequences()
 
 		ranges = {}
-		for zone in self.zones:
-			key = (zone.startnote, zone.endnote, get_rootnote(zone), zone.pan, get_sequence_position(zone))
+		for zone in self.zones():
+			key = (zone.startnote(), zone.endnote(), get_rootnote(zone), zone.pan(), get_sequence_position(zone))
 			if not key in ranges:
 				ranges[key] = []
 			ranges[key].append(zone)
@@ -483,7 +452,7 @@ class EXSInstrument(object):
 			# take the first exs group in a sequence and use that for all members of the sequence
 
 			keyrange = ranges[key]
-			group = keyrange[0].group
+			group = keyrange[0].group()
 
 			for sequence in sequences:
 				if group in sequence:
@@ -514,77 +483,77 @@ class EXSInstrument(object):
 				# multiple keys triggering a sample, add extra parameters
 				# studio one's presence gets confused when it encounters key=nn pitch_keytrack=1; be explicit
 				sfzfile.write("lokey={startnote} hikey={endnote} pitch_keycenter={rootnote}".
-						format(startnote=keyrange[0].startnote, endnote=keyrange[0].endnote,
-							   rootnote=keyrange[0].rootnote))
+						format(startnote=keyrange[0].startnote(), endnote=keyrange[0].endnote(),
+							   rootnote=keyrange[0].rootnote()))
 
 			if key in key_sequence:
 				choke_group = key_sequence[key]
 			else:
-				choke_group = keyrange[0].group
+				choke_group = keyrange[0].group()
 
 			choke_voices = {}
 			for zone in keyrange:
-				if (zone.minvel, zone.maxvel) in choke_voices:
-					choke_voices[(zone.minvel, zone.maxvel)] += 1;
+				if (zone.minvel(), zone.maxvel()) in choke_voices:
+					choke_voices[(zone.minvel(), zone.maxvel())] += 1;
 				else:
-					choke_voices[(zone.minvel, zone.maxvel)] = 1
+					choke_voices[(zone.minvel(), zone.maxvel())] = 1
 
-			if self.groups[keyrange[0].group].polyphony == choke_voices[(keyrange[0].minvel, keyrange[0].maxvel)]:
+			if self.groups()[keyrange[0].group()].polyphony() == choke_voices[(keyrange[0].minvel(), keyrange[0].maxvel())]:
 				# add a choke group for e.g. hihats in drum libraries
 
 				if choke_group == 0:
 					# group 0 can't be used as a choke group in sfz, so change it where needed
-					choke_group = len(self.groups)
+					choke_group = len(self.groups())
 
 				sfzfile.write(" group={group} off_by={group} polyphony={polyphony} off_mode=fast".
-						format(group=choke_group, polyphony=self.groups[keyrange[0].group].polyphony))
+						format(group=choke_group, polyphony=self.groups()[keyrange[0].group()].polyphony()))
 
-			if self.groups[keyrange[0].group].output > 0:
-				sfzfile.write(" output={output}".format(output=self.groups[keyrange[0].group].output))
+			if self.groups()[keyrange[0].group()].output() > 0:
+				sfzfile.write(" output={output}".format(output=self.groups()[keyrange[0].group()].output()))
 
-			if keyrange[0].pan:
-				sfzfile.write(" pan={pan}".format(pan=keyrange[0].pan))
+			if keyrange[0].pan():
+				sfzfile.write(" pan={pan}".format(pan=keyrange[0].pan()))
 
-			if keyrange[0].oneshot:
+			if keyrange[0].oneshot():
 				sfzfile.write(" loop_mode=one_shot")
 
 			for sequence in sequences:
-				if keyrange[0].group in sequence:
+				if keyrange[0].group() in sequence:
 					sfzfile.write(" seq_length={seq_length} seq_position={seq_position}".
-							format(seq_length=len(sequence), seq_position=sequence.index(keyrange[0].group) + 1))
+							format(seq_length=len(sequence), seq_position=sequence.index(keyrange[0].group()) + 1))
 					break
 
-			sfzfile.write(" pitch_keytrack={pitchtrack}\n".format(pitchtrack=int(keyrange[0].pitchtrack)))
+			sfzfile.write(" pitch_keytrack={pitchtrack}\n".format(pitchtrack=int(keyrange[0].pitchtrack())))
 
 			for zone in keyrange:
 				sfzfile.write("\t<region> lovel={lovel:03} hivel={hivel:03} amp_velcurve_{hivel:03}=1".
-						format(lovel=zone.minvel, hivel=zone.maxvel))
+						format(lovel=zone.minvel(), hivel=zone.maxvel()))
 
-				if zone.finetune:
+				if zone.finetune():
 					sfzfile.write(" tune={finetune}".
-							format(finetune=zone.finetune))
+							format(finetune=zone.finetune()))
 
-				if zone.volumeadjust:
+				if zone.volumeadjust():
 					sfzfile.write(" volume={volumeadjust}".
-							format(volumeadjust=zone.volumeadjust))
+							format(volumeadjust=zone.volumeadjust()))
 
-				if zone.samplestart:
+				if zone.samplestart():
 					sfzfile.write(" offset={samplestart}".
-							format(samplestart=zone.samplestart))
+							format(samplestart=zone.samplestart()))
 
-				if zone.sampleend and zone.sampleend < self.samples[zone.sampleindex].length:
+				if zone.sampleend() and zone.sampleend() < self.samples()[zone.sampleindex()].length():
 					sfzfile.write(" end={sampleend}".
-							format(sampleend=zone.sampleend))
+							format(sampleend=zone.sampleend()))
 
-				if zone.loop:
+				if zone.loop():
 					sfzfile.write(" loop_mode=loop_sustain loop_start={loopstart} loop_end={loopend}".
-							format(loopstart=zone.loopstart, loopend=zone.loopend - 1))
+							format(loopstart=zone.loopstart(), loopend=zone.loopend() - 1))
 
-				if self.groups[zone.group].trigger == 1:
+				if self.groups()[zone.group()].trigger() == 1:
 					sfzfile.write(" trigger=release")
 
 				sfzfile.write(" sample={sample}".
-						format(sample=self.pool.path(self.samples[zone.sampleindex].name)))
+						format(sample=self.pool.path(self.samples()[zone.sampleindex()].name())))
 
 				sfzfile.write("\n")
 
