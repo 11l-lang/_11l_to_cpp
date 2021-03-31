@@ -16,7 +16,7 @@
 
 
 import sys
-import os.path
+import os
 import struct
 from typing import List
 
@@ -197,6 +197,7 @@ class EXSSamplePool:
 
 		# note that, as NTFS and HFS are not (usually) case-sensitive, neither are filename comparisons here
 
+		last = ""
 		def search_location(search):
 			if search in self.locations:
 				return ''
@@ -227,7 +228,6 @@ class EXSSamplePool:
 						return location
 
 		# try to locate the file
-		last = ""
 		search = ""
 		for _i in range(0, search_depth):
 			location = search_location(search)
@@ -338,9 +338,9 @@ class EXSInstrument:
 			until the sequence is reset by pointing to group -1;
 			here we trace each of those chains for simple processing later """
 
-		sequences = []
+		sequences : List[List[int]] = []
 
-		for group in self.groups:
+		for gid, group in enumerate(self.groups):
 			if not group.sequence():
 				continue
 
@@ -352,16 +352,15 @@ class EXSInstrument:
 				# trace back to the first group in the chain by looking for a group that points to this chain,
 				# and repeating the process until we end up at a group that's not pointed to
 
-				gid = self.groups.index(group)
-				sequence = []
+				sequence : List[int] = []
 
 				cont = True
 				while cont:
 					cont = False
-					for g in self.groups:
-						if g.sequence() == gid and not self.groups.index(g) == g.sequence() and not gid in sequence:
+					for gid2, g in enumerate(self.groups):
+						if g.sequence() == gid and not gid2 == g.sequence() and not gid in sequence:
 							sequence.append(gid)
-							gid = self.groups.index(g)
+							gid = gid2
 							cont = True
 							break
 
@@ -379,29 +378,30 @@ class EXSInstrument:
 
 	def convert(self, sfzfilename, overwrite=False):
 
+		sequences = self.build_sequences()
+
 		def get_sequence_position(zone):
 			for sequence in sequences:
 				if zone.group() in sequence:
 					return sequence.index(zone.group())
 			return 0
 
-		def get_rootnote(zpne):
+		def get_rootnote(zone):
 			if not zone.pitchtrack():
 				if zone.rootnote() < zone.startnote() or zone.rootnote() > zone.endnote():
 					return zone.startnote()
 			return zone.rootnote()
 
-		sequences = self.build_sequences()
-
-		ranges = {}
+		ranges : Dict[Tuple[int, int, int, int, int], EXSZone] = {}
 		for zone in self.zones:
 			key = (zone.startnote(), zone.endnote(), get_rootnote(zone), zone.pan(), get_sequence_position(zone))
 			if not key in ranges:
-				ranges[key] = []
+				empty_list : List[EXSZone] = []
+				ranges[key] = empty_list
 			ranges[key].append(zone)
 
-		key_sequence = {}
-		for key in sorted(ranges):
+		key_sequence : Dict[Tuple[int, int, int, int, int], int] = {}
+		for key in sorted(ranges.keys()):
 
 			# to make round robin samples and choke groups work together,
 			# take the first exs group in a sequence and use that for all members of the sequence
@@ -424,9 +424,9 @@ class EXSInstrument:
 		sfzfile = open(sfzfilename, 'wt')
 
 		sfzfile.write("// this file was generated from {exsfile} using vonred's {name}. Trickster goddess incoming.\n\n".
-				format(exsfile=os.path.basename(self.exsfile_name), name=os.path.basename(__file__)))
+				format(exsfile=os.path.basename(self.exsfile_name), name=os.path.basename('1.exs2sfz.py')))
 
-		for key in sorted(ranges):
+		for key in sorted(ranges.keys()):
 			keyrange = ranges[key]
 
 			sfzfile.write("<group>")
@@ -441,12 +441,13 @@ class EXSInstrument:
 						format(startnote=keyrange[0].startnote(), endnote=keyrange[0].endnote(),
 							   rootnote=keyrange[0].rootnote()))
 
+			choke_group : int
 			if key in key_sequence:
 				choke_group = key_sequence[key]
 			else:
 				choke_group = keyrange[0].group()
 
-			choke_voices = {}
+			choke_voices : Dict[Tuple[int, int], int] = {}
 			for zone in keyrange:
 				if (zone.minvel(), zone.maxvel()) in choke_voices:
 					choke_voices[(zone.minvel(), zone.maxvel())] += 1;
@@ -516,7 +517,7 @@ class EXSInstrument:
 if __name__ == '__main__':
 
 	if len(sys.argv) < 3 or len(sys.argv) > 4:
-		print("Usage: {0} EXSfile.exs SFZfile.sfz [samplefolder]".format(__file__))
+		print("Usage: {0} EXSfile.exs SFZfile.sfz [samplefolder]".format('1.exs2sfz.py'))
 		print()
 		print("    the samplefolder argument is optional; if not specified, the program will")
 		print("    attempt to locate the samples by searching folders surrounding the exs file")
