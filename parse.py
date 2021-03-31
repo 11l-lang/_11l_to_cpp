@@ -439,9 +439,9 @@ class SymbolNode:
                             f_node = builtins_scope.find('String').ast_nodes[0].scope.ids.get('split').ast_nodes[0]
                     elif self.children[0].children[1].token.value(source) == 'union':
                         func_name = self.children[0].children[0].to_str() + '.set_union'
-                    elif func_name.endswith(('.unpack', '.unpack_from')) and self.children[0].children[0].token_str() in ('Int32', 'UInt32', 'Int16', 'UInt16', 'Int8', 'Byte'):
-                        res = 'unpack_from_bytes<' + self.children[0].children[0].token_str() + '>(' + self.children[2].to_str()
-                        if func_name.endswith('.unpack_from'):
+                    elif func_name.endswith(('.unpack', '.unpack_from', '.unpack_be', '.unpack_from_be')) and self.children[0].children[0].token_str() in ('Int32', 'UInt32', 'Int16', 'UInt16', 'Int8', 'Byte'):
+                        res = 'unpack_from_bytes' + '_be'*func_name.endswith('_be') + '<' + self.children[0].children[0].token_str() + '>(' + self.children[2].to_str()
+                        if func_name.endswith(('.unpack_from', '.unpack_from_be')):
                             res += ', ' + self.children[4].to_str()
                         return res + ')'
                     else:

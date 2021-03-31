@@ -820,3 +820,23 @@ template <typename Ty> inline Int unpack_from_bytes(const Array<Byte> &bytes, In
 	memcpy(&r, bytes.data() + offset, sizeof(Ty));
 	return Int(r);
 }
+
+template <typename Ty> inline Int unpack_from_bytes_be(const Array<Byte> &bytes)
+{
+	Ty r;
+	if (sizeof(Ty) != bytes.len())
+		throw AssertionError();
+	for (int i=0; i<sizeof(Ty); i++)
+		((char*)&r)[i] = bytes.data()[sizeof(Ty) - 1 - i];
+	return Int(r);
+}
+
+template <typename Ty> inline Int unpack_from_bytes_be(const Array<Byte> &bytes, Int offset)
+{
+	Ty r;
+	if (offset + sizeof(Ty) > bytes.len())
+		throw AssertionError();
+	for (int i=0; i<sizeof(Ty); i++)
+		((char*)&r)[i] = bytes.data()[offset + sizeof(Ty) - 1 - i];
+	return Int(r);
+}
