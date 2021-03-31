@@ -136,6 +136,11 @@ public:
 	operator String() const;
 };
 
+typedef  int32_t  Int32;
+typedef uint32_t UInt32;
+typedef  int16_t  Int16;
+typedef uint16_t UInt16;
+typedef   int8_t  Int8;
 typedef unsigned char Byte;
 
 #include "11l_hpp/funcs.hpp"

@@ -802,3 +802,12 @@ inline Array<Byte> operator ""_B(const char *s, size_t sz)
 	memcpy(r.data(), s, sz);
 	return r;
 }
+
+template <typename Ty> inline Int unpack_from_bytes(const Array<Byte> &bytes)
+{
+	Ty r;
+	if (sizeof(Ty) != bytes.len())
+		throw AssertionError();
+	memcpy(&r, bytes.data(), bytes.len());
+	return Int(r);
+}

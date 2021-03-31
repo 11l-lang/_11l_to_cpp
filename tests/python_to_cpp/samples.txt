@@ -2942,3 +2942,60 @@ struct CodeBlock1
         print("SOBT"_B);
     }
 } code_block_1;
+
+
+import struct
+
+print(struct.unpack('i', b"\xFF\xFF\xFF\xFF")[0])
+print(struct.unpack('I', b"\xFF\xFF\xFF\xFF")[0])
+print(struct.unpack('h', b"\xFF\xFF")[0])
+print(struct.unpack('H', b"\xFF\xFF")[0])
+print(struct.unpack('b', b"\xFF")[0])
+print(struct.unpack('B', b"\xFF")[0])
+===
+//import struct
+print(Int32.unpack(Bytes("\xFF\xFF\xFF\xFF")))
+print(UInt32.unpack(Bytes("\xFF\xFF\xFF\xFF")))
+print(Int16.unpack(Bytes("\xFF\xFF")))
+print(UInt16.unpack(Bytes("\xFF\xFF")))
+print(Int8.unpack(Bytes("\xFF")))
+print(Byte.unpack(Bytes("\xFF")))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(unpack_from_bytes<Int32>("\xFF\xFF\xFF\xFF"_B));
+        print(unpack_from_bytes<UInt32>("\xFF\xFF\xFF\xFF"_B));
+        print(unpack_from_bytes<Int16>("\xFF\xFF"_B));
+        print(unpack_from_bytes<UInt16>("\xFF\xFF"_B));
+        print(unpack_from_bytes<Int8>("\xFF"_B));
+        print(unpack_from_bytes<Byte>("\xFF"_B));
+    }
+} code_block_1;
+
+
+import struct
+
+bmp = open('1.bmp', 'rb')
+t = bmp.read(2)
+print('Type:', chr(t[0]) + chr(t[1]))
+print('Size: %s' % struct.unpack('I', bmp.read(4))[0])
+===
+//import struct
+V bmp = File(‘1.bmp’, ‘rb’)
+V t = bmp.read(2)
+print(‘Type: ’(Char(code' t[0])‘’Char(code' t[1])))
+print(‘Size: #.’.format(UInt32.unpack(bmp.read(4))))
+===
+auto bmp = File(u"1.bmp"_S, u"rb"_S);
+auto t = bmp.read(2);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Type: "_S & (Char(_get<0>(t)) & Char(_get<1>(t))));
+        print(u"Size: #."_S.format(unpack_from_bytes<UInt32>(bmp.read(4))));
+    }
+} code_block_1;
