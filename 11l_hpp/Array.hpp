@@ -808,6 +808,15 @@ template <typename Ty> inline Int unpack_from_bytes(const Array<Byte> &bytes)
 	Ty r;
 	if (sizeof(Ty) != bytes.len())
 		throw AssertionError();
-	memcpy(&r, bytes.data(), bytes.len());
+	memcpy(&r, bytes.data(), sizeof(Ty));
+	return Int(r);
+}
+
+template <typename Ty> inline Int unpack_from_bytes(const Array<Byte> &bytes, Int offset)
+{
+	Ty r;
+	if (offset + sizeof(Ty) > bytes.len())
+		throw AssertionError();
+	memcpy(&r, bytes.data() + offset, sizeof(Ty));
 	return Int(r);
 }

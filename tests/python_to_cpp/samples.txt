@@ -2982,6 +2982,7 @@ bmp = open('1.bmp', 'rb')
 t = bmp.read(2)
 print('Type:', chr(t[0]) + chr(t[1]))
 print('Size: %s' % struct.unpack('I', bmp.read(4))[0])
+print('Size: %s' % struct.unpack_from('I', open('1.bmp', 'rb').read(), 2)[0])
 print('Reserved 1: %s' % struct.unpack('H', bmp.read(2))[0])
 print('Reserved 2: %s' % struct.unpack('H', bmp.read(2))[0])
 print('Offset: %s' % struct.unpack('I', bmp.read(4))[0])
@@ -3003,6 +3004,7 @@ V bmp = File(‘1.bmp’, ‘r’)
 V t = bmp.read_bytes(2)
 print(‘Type: ’(Char(code' t[0])‘’Char(code' t[1])))
 print(‘Size: #.’.format(UInt32.unpack(bmp.read_bytes(4))))
+print(‘Size: #.’.format(UInt32.unpack_from(File(‘1.bmp’).read_bytes(), 2)))
 print(‘Reserved 1: #.’.format(UInt16.unpack(bmp.read_bytes(2))))
 print(‘Reserved 2: #.’.format(UInt16.unpack(bmp.read_bytes(2))))
 print(‘Offset: #.’.format(UInt32.unpack(bmp.read_bytes(4))))
@@ -3027,6 +3029,7 @@ struct CodeBlock1
     {
         print(u"Type: "_S & (Char(_get<0>(t)) & Char(_get<1>(t))));
         print(u"Size: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
+        print(u"Size: #."_S.format(unpack_from_bytes<UInt32>(File(u"1.bmp"_S).read_bytes(), 2)));
         print(u"Reserved 1: #."_S.format(unpack_from_bytes<UInt16>(bmp.read_bytes(2))));
         print(u"Reserved 2: #."_S.format(unpack_from_bytes<UInt16>(bmp.read_bytes(2))));
         print(u"Offset: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
