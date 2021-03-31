@@ -229,6 +229,11 @@ public:
 		return c;
 	}
 
+	void seek(Int offset, Int whence = 0)
+	{
+		fseek(file, offset, whence);
+	}
+
 	void flush()
 	{
 		fflush(file);

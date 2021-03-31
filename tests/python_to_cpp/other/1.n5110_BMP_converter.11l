@@ -1,0 +1,65 @@
+//import sys
+//import struct
+
+:start:
+V file_name = :argv[1]
+file_name = file_name.split(‘.’)[0]
+V bmp = File(file_name‘.bmp’, ‘r’)
+bmp.seek(10, 0)
+V offset = UInt32.unpack(bmp.read_bytes(4))
+bmp.seek(18, 0)
+V bmp_w = UInt32.unpack(bmp.read_bytes(4))
+V bmp_h = UInt32.unpack(bmp.read_bytes(4))
+print(bmp_h‘ ’bmp_w)
+bmp.seek(34, 0)
+V bmp_s = UInt32.unpack(bmp.read_bytes(4))
+V bmp_b = Int(bmp_s / bmp_h)
+print(bmp_h‘ ’bmp_w‘ ’bmp_s‘ ’bmp_b)
+bmp.seek(offset, 0)
+V bmp_line = ‘’
+[String] bmp_list
+[String] bmp_list_v
+
+L(line) 0 .< bmp_h
+   L(byte) 0 .< bmp_b
+      V bmp_byte = bmp.read_bytes(1)
+      bmp_line ‘’= bin(255 - Byte.unpack(bmp_byte)).zfill(8)
+   bmp_list.append(bmp_line[0 .< bmp_w])
+   bmp_list_v.append(bmp_line[0 .< bmp_w].replace(‘0’, ‘ ’))
+   bmp_line = ‘’
+bmp_list_v.reverse()
+L(line) bmp_list_v
+   print(line)
+V byte_word = ‘’
+[String] n5110_line
+[[String]] n5110_array
+
+L(line) (0 .< bmp_h).step(8)
+   L(bit_num) 0 .< bmp_w
+      L(bit) line .< line + 8
+         I bit > bmp_h - 1
+            byte_word ‘’= ‘0’
+         E
+            byte_word ‘’= bmp_list[bit][bit_num]
+      n5110_line.append(‘0x’hex(Int(byte_word, radix' 2)).lowercase())
+      byte_word = ‘’
+   n5110_array.append(n5110_line)
+   n5110_line.drop()
+n5110_array.reverse()
+V text_file = File(file_name‘.txt’, ‘w’)
+text_file.write(‘static unsigned short ’file_name‘_rows = ’String(n5110_array.len)";\n")
+text_file.write(‘static unsigned short ’file_name‘_cols = ’String(n5110_array[0].len)";\n")
+text_file.write(‘static unsigned char ’file_name"[] =\n")
+text_file.write("{\n")
+L(lines) n5110_array
+   V l_cnt = L.index
+   L(hexa) lines
+      V cnt = L.index
+      text_file.write(hexa)
+      I cnt < lines.len - 1
+         text_file.write(‘,’)
+   I l_cnt < n5110_array.len - 1
+      text_file.write(",\n")
+   E
+      text_file.write("\n")
+text_file.write(‘};’)
