@@ -2975,27 +2975,71 @@ struct CodeBlock1
 } code_block_1;
 
 
+# [https://stackoverflow.com/a/47003923/2692494 <- https://stackoverflow.com/questions/47003833/how-to-read-bmp-file-header-in-python <- google:‘python bmp’]
 import struct
 
 bmp = open('1.bmp', 'rb')
 t = bmp.read(2)
 print('Type:', chr(t[0]) + chr(t[1]))
 print('Size: %s' % struct.unpack('I', bmp.read(4))[0])
+print('Reserved 1: %s' % struct.unpack('H', bmp.read(2))[0])
+print('Reserved 2: %s' % struct.unpack('H', bmp.read(2))[0])
+print('Offset: %s' % struct.unpack('I', bmp.read(4))[0])
+
+print('DIB Header Size: %s' % struct.unpack('I', bmp.read(4))[0])
+print('Width: %s' % struct.unpack('I', bmp.read(4))[0])
+print('Height: %s' % struct.unpack('I', bmp.read(4))[0])
+print('Colour Planes: %s' % struct.unpack('H', bmp.read(2))[0])
+print('Bits per Pixel: %s' % struct.unpack('H', bmp.read(2))[0])
+print('Compression Method: %s' % struct.unpack('I', bmp.read(4))[0])
+print('Raw Image Size: %s' % struct.unpack('I', bmp.read(4))[0])
+print('Horizontal Resolution: %s' % struct.unpack('I', bmp.read(4))[0])
+print('Vertical Resolution: %s' % struct.unpack('I', bmp.read(4))[0])
+print('Number of Colours: %s' % struct.unpack('I', bmp.read(4))[0])
+print('Important Colours: %s' % struct.unpack('I', bmp.read(4))[0])
 ===
 //import struct
-V bmp = File(‘1.bmp’, ‘rb’)
-V t = bmp.read(2)
+V bmp = File(‘1.bmp’, ‘r’)
+V t = bmp.read_bytes(2)
 print(‘Type: ’(Char(code' t[0])‘’Char(code' t[1])))
-print(‘Size: #.’.format(UInt32.unpack(bmp.read(4))))
+print(‘Size: #.’.format(UInt32.unpack(bmp.read_bytes(4))))
+print(‘Reserved 1: #.’.format(UInt16.unpack(bmp.read_bytes(2))))
+print(‘Reserved 2: #.’.format(UInt16.unpack(bmp.read_bytes(2))))
+print(‘Offset: #.’.format(UInt32.unpack(bmp.read_bytes(4))))
+print(‘DIB Header Size: #.’.format(UInt32.unpack(bmp.read_bytes(4))))
+print(‘Width: #.’.format(UInt32.unpack(bmp.read_bytes(4))))
+print(‘Height: #.’.format(UInt32.unpack(bmp.read_bytes(4))))
+print(‘Colour Planes: #.’.format(UInt16.unpack(bmp.read_bytes(2))))
+print(‘Bits per Pixel: #.’.format(UInt16.unpack(bmp.read_bytes(2))))
+print(‘Compression Method: #.’.format(UInt32.unpack(bmp.read_bytes(4))))
+print(‘Raw Image Size: #.’.format(UInt32.unpack(bmp.read_bytes(4))))
+print(‘Horizontal Resolution: #.’.format(UInt32.unpack(bmp.read_bytes(4))))
+print(‘Vertical Resolution: #.’.format(UInt32.unpack(bmp.read_bytes(4))))
+print(‘Number of Colours: #.’.format(UInt32.unpack(bmp.read_bytes(4))))
+print(‘Important Colours: #.’.format(UInt32.unpack(bmp.read_bytes(4))))
 ===
-auto bmp = File(u"1.bmp"_S, u"rb"_S);
-auto t = bmp.read(2);
+auto bmp = File(u"1.bmp"_S, u"r"_S);
+auto t = bmp.read_bytes(2);
 
 struct CodeBlock1
 {
     CodeBlock1()
     {
         print(u"Type: "_S & (Char(_get<0>(t)) & Char(_get<1>(t))));
-        print(u"Size: #."_S.format(unpack_from_bytes<UInt32>(bmp.read(4))));
+        print(u"Size: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
+        print(u"Reserved 1: #."_S.format(unpack_from_bytes<UInt16>(bmp.read_bytes(2))));
+        print(u"Reserved 2: #."_S.format(unpack_from_bytes<UInt16>(bmp.read_bytes(2))));
+        print(u"Offset: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
+        print(u"DIB Header Size: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
+        print(u"Width: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
+        print(u"Height: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
+        print(u"Colour Planes: #."_S.format(unpack_from_bytes<UInt16>(bmp.read_bytes(2))));
+        print(u"Bits per Pixel: #."_S.format(unpack_from_bytes<UInt16>(bmp.read_bytes(2))));
+        print(u"Compression Method: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
+        print(u"Raw Image Size: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
+        print(u"Horizontal Resolution: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
+        print(u"Vertical Resolution: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
+        print(u"Number of Colours: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
+        print(u"Important Colours: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
     }
 } code_block_1;

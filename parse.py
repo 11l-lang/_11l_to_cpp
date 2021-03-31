@@ -3070,7 +3070,7 @@ builtins_scope.ids['Char'].ast_nodes[0].scope = char_scope
 
 builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('mode', token_to_str('‘r’'), 'String'), ('encoding', token_to_str('‘utf-8’'), 'String')])]))
 file_scope = Scope(None)
-file_scope.add_name('read_bytes', ASTFunctionDefinition([]))
+file_scope.add_name('read_bytes', ASTFunctionDefinition([('size', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
 file_scope.add_name('write_bytes', ASTFunctionDefinition([('bytes', '', '[Byte]')]))
 file_scope.add_name('read', ASTFunctionDefinition([('size', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
 file_scope.add_name('write', ASTFunctionDefinition([('s', '', 'String')]))

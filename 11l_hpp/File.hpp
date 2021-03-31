@@ -212,6 +212,15 @@ public:
 		return file_bytes;
 	}
 
+	Array<Byte> read_bytes(size_t n)
+	{
+		Array<Byte> file_bytes;
+		file_bytes.resize(n);
+		size_t read = fread(file_bytes.data(), 1, n, file);
+		assert(read == n);
+		return file_bytes;
+	}
+
 	Char read(int n)
 	{
 		assert(n == 1);
