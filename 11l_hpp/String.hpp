@@ -126,6 +126,16 @@ public:
 		}
 		append(1, u')');
 	}
+	template <typename...Types> explicit String(const Tuple<Types...> &t)
+	{
+		assign(1, u'(');
+		for (auto &&el : t) {
+			if (len() > 1)
+				*this &= u", ";
+			*this &= String(el);
+		}
+		append(1, u')');
+	}
 	template <typename Type> explicit String(const Array<Type> &arr)
 	{
 		assign(1, u'[');

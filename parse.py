@@ -742,7 +742,7 @@ class SymbolNode:
                         if id_.ast_nodes[0].is_reference:
                             return c00 + '->' + c1
                         tid = self.scope.find(id_.ast_nodes[0].type.rstrip('?'))
-                        if tid is not None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
+                        if tid is not None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and (tid.ast_nodes[0].has_pointers_to_the_same_type or tid.ast_nodes[0].has_virtual_functions):
                             return c00 + '->' + c1
 
                 if cts0 == ':' and len(self.children[0].children) == 1: # `:token_node.symbol` -> `::token_node->symbol`

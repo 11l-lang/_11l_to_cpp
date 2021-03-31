@@ -169,6 +169,8 @@ u'/'
 ;
 inline String join(const String &path1, const String &path2)
 {
+	if (path1.empty())
+		return path2;
 	String r(path1);
 	if (!(r.ends_with(u"\\") || r.ends_with(u"/")))
 		r &= sep;
@@ -208,6 +210,8 @@ inline String relative(const String &path, const String &base)
 
 inline String canonical(const String &path)
 {
+	if (path.empty()) // for compatibility with Python's `os.path.realpath()`
+		return canonical(u"."_S);
 	return std::filesystem::canonical((std::u16string&)path).u16string();
 }
 

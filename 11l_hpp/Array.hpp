@@ -404,6 +404,19 @@ public:
 		std::vector<Type>::erase(begin() + range.b, begin() + range.e);
 	}
 
+	String decode(const String &encoding = u""_S) const
+	{
+		static_assert(std::is_same_v<Type, Byte>, "`decode()` can be called only on `Array<Byte>`");
+		String r;
+		r.reserve(len());
+		for (auto el : *this) {
+			if (!(el < 128))
+				throw AssertionError();
+			r &= Char(el);
+		}
+		return r;
+	}
+
 	template <typename Ty> bool operator==(const Array<Ty> &arr) const
 	{
 		if (len() != arr.len()) return false;

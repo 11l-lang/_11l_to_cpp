@@ -93,7 +93,7 @@ class EXSZone(EXSChunk):
 	def __init__(self, offset):
 		self.offset = offset
 
-	def rootnote(self):
+	def rootnote(self): # const
 		return struct.unpack_from('B', instrument_data, self.offset + 85)[0]
 
 	def finetune(self):
@@ -105,9 +105,9 @@ class EXSZone(EXSChunk):
 	def volumeadjust(self):
 		return struct.unpack_from('b', instrument_data, self.offset + 88)[0]
 
-	def startnote(self):
+	def startnote(self): # const
 		return struct.unpack_from('B', instrument_data, self.offset + 90)[0]
-	def endnote(self):
+	def endnote(self): # const
 		return struct.unpack_from('B', instrument_data, self.offset + 91)[0]
 
 	def minvel(self):
@@ -128,12 +128,12 @@ class EXSZone(EXSChunk):
 	def loop(self):
 		return struct.unpack_from('B', instrument_data, self.offset + 117)[0]
 
-	def pitchtrack(self):
+	def pitchtrack(self): # const
 		return not (struct.unpack_from('B', instrument_data, self.offset + 84)[0] & 1)
 	def oneshot(self):
 		return struct.unpack_from('B', instrument_data, self.offset + 84)[0] & 2
 
-	def group(self):
+	def group(self): # const
 		group = struct.unpack_from('<i', instrument_data, self.offset + 172)[0]
 		if group >= 0:
 			return group
@@ -187,6 +187,7 @@ class EXSParam(EXSChunk):
 class EXSSamplePool:
 
 	locations : List[str]
+	base : str
 
 	def __init__(self):
 		self.locations = []
@@ -198,7 +199,7 @@ class EXSSamplePool:
 		# note that, as NTFS and HFS are not (usually) case-sensitive, neither are filename comparisons here
 
 		last = ""
-		def search_location(search):
+		def search_location(search : str) -> str:
 			if search in self.locations:
 				return ''
 
@@ -238,6 +239,9 @@ class EXSSamplePool:
 
 		raise RuntimeError("Couldn't locate sample {0}!".format(filename))
 
+	def path(self, filename : str) -> str:
+		raise NotImplementedError()
+
 
 class EXSSamplePoolDummy(EXSSamplePool):
 
@@ -246,13 +250,11 @@ class EXSSamplePoolDummy(EXSSamplePool):
 	def __init__(self, name=''):
 		self.name = name
 
-	def path(self, filename):
+	def path(self, filename : str):
 		return os.path.join(self.name, filename)
 
 
 class EXSSamplePoolFixed(EXSSamplePool):
-
-	base : str
 
 	def __init__(self, path):
 		if os.path.isdir(path):
@@ -262,19 +264,17 @@ class EXSSamplePoolFixed(EXSSamplePool):
 
 		super().__init__()
 
-	def path(self, filename):
+	def path(self, filename : str):
 		return os.path.join(self.base, self.locate(filename), filename)
 
 
 class EXSSamplePoolLocator(EXSSamplePool):
 
-	base : str
-
 	def __init__(self, exsfile_name):
 		self.base = os.path.dirname(exsfile_name)
 		super().__init__()
 
-	def path(self, filename):
+	def path(self, filename : str):
 		return os.path.join(self.locate(filename, 4), filename)
 
 
@@ -319,7 +319,7 @@ class EXSInstrument:
 			sig = struct.unpack_from('<I', instrument_data, offset)[0]
 
 			if sig == EXSHeader_sig:
-				EXSHeader(offset)
+				t = EXSHeader(offset)
 			elif sig == 0x01000101:
 				self.zones.append(EXSZone(offset))
 			elif sig == 0x02000101:
@@ -327,7 +327,7 @@ class EXSInstrument:
 			elif sig == 0x03000101:
 				self.samples.append(EXSSample(offset))
 			elif sig == 0x04000101:
-				EXSParam(offset)
+				t = EXSParam(offset)
 			else:
 				raise RuntimeError("Encountered an unknown chunk signature! signature is " + hex(sig))
 
@@ -345,7 +345,7 @@ class EXSInstrument:
 				continue
 
 			for sequence in sequences:
-				if group in sequence:
+				if False:#group in sequence: # (it looks like here is a bug in the original code [because type of `group` is `EXSGroup`, but type of `sequence` is `List[int]`])
 					break
 			else:
 
@@ -392,7 +392,7 @@ class EXSInstrument:
 					return zone.startnote()
 			return zone.rootnote()
 
-		ranges : Dict[Tuple[int, int, int, int, int], EXSZone] = {}
+		ranges : Dict[Tuple[int, int, int, int, int], List[EXSZone]] = {}
 		for zone in self.zones:
 			key = (zone.startnote(), zone.endnote(), get_rootnote(zone), zone.pan(), get_sequence_position(zone))
 			if not key in ranges:

@@ -113,7 +113,7 @@ public:
         this->offset = offset;
     }
 
-    auto rootnote()
+    auto rootnote() const
     {
         return unpack_from_bytes<Byte>(::instrument_data, offset + 85);
     }
@@ -133,11 +133,11 @@ public:
         return unpack_from_bytes<Int8>(::instrument_data, offset + 88);
     }
 
-    auto startnote()
+    auto startnote() const
     {
         return unpack_from_bytes<Byte>(::instrument_data, offset + 90);
     }
-    auto endnote()
+    auto endnote() const
     {
         return unpack_from_bytes<Byte>(::instrument_data, offset + 91);
     }
@@ -174,7 +174,7 @@ public:
         return unpack_from_bytes<Byte>(::instrument_data, offset + 117);
     }
 
-    auto pitchtrack()
+    auto pitchtrack() const
     {
         return !(unpack_from_bytes<Byte>(::instrument_data, offset + 84) & 1);
     }
@@ -183,7 +183,7 @@ public:
         return unpack_from_bytes<Byte>(::instrument_data, offset + 84) & 2;
     }
 
-    auto group()
+    auto group() const
     {
         auto group = unpack_from_bytes<Int32>(::instrument_data, offset + 172);
         if (group >= 0)
@@ -262,6 +262,7 @@ class EXSSamplePool
 {
 public:
     Array<String> locations;
+    String base;
 
     EXSSamplePool()
     {
@@ -272,7 +273,7 @@ public:
         uR"( try to locate the directory containing a sample; if found,
 			it will be added to the list of known locations which are searched first )"_S;
         auto last = u""_S;
-        auto search_location = [&filename, &last, &search_location, this](const auto &search)
+        std::function<String(String)> search_location = [&filename, &last, &search_location, this](const String &search)
         {
             if (in(search, locations))
                 return u""_S;
@@ -313,6 +314,7 @@ public:
         }
         throw RuntimeError(u"Couldn't locate sample #.!"_S.format(filename));
     }
+    virtual String path(const String &filename) = 0;
 };
 
 class EXSSamplePoolDummy : public EXSSamplePool
@@ -325,7 +327,7 @@ public:
     {
     }
 
-    template <typename T1> auto path(const T1 &filename)
+    virtual String path(const String &filename) override
     {
         return fs::path::join(name, filename);
     }
@@ -334,8 +336,6 @@ public:
 class EXSSamplePoolFixed : public EXSSamplePool
 {
 public:
-    String base;
-
     template <typename T1> EXSSamplePoolFixed(const T1 &path)
     {
         if (fs::is_dir(path))
@@ -344,7 +344,7 @@ public:
             throw RuntimeError(u"#.is not a valid path!"_S.format(path));
     }
 
-    template <typename T1> auto path(const T1 &filename)
+    virtual String path(const String &filename) override
     {
         return fs::path::join(base, locate(filename), filename);
     }
@@ -353,14 +353,12 @@ public:
 class EXSSamplePoolLocator : public EXSSamplePool
 {
 public:
-    String base;
-
     template <typename T1> EXSSamplePoolLocator(const T1 &exsfile_name)
     {
         base = fs::path::dir_name(exsfile_name);
     }
 
-    template <typename T1> auto path(const T1 &filename)
+    virtual String path(const String &filename) override
     {
         return fs::path::join(locate(filename, 4), filename);
     }
@@ -369,7 +367,7 @@ public:
 class EXSInstrument
 {
 public:
-    EXSSamplePool pool;
+    std::unique_ptr<EXSSamplePool> pool;
     String exsfile_name;
     Array<EXSZone> zones;
     Array<EXSGroup> groups;
@@ -386,15 +384,15 @@ public:
         if (!(unpack_from_bytes<UInt32>(::instrument_data, 0) == EXSHeader_sig) && ::instrument_data[range_el(16, 20)] == "TBOS"_B)
             throw RuntimeError(u"File is not an EXS file; will not parse!"_S);
         if (sample_location == u"")
-            pool = EXSSamplePoolLocator(exsfile_name);
+            pool = std::make_unique<EXSSamplePoolLocator>(exsfile_name);
         else
-            pool = EXSSamplePoolFixed(sample_location);
+            pool = std::make_unique<EXSSamplePoolFixed>(sample_location);
         auto offset = 0;
         auto end = ::instrument_data.len();
         while (offset < end) {
             auto sig = unpack_from_bytes<UInt32>(::instrument_data, offset);
             if (sig == EXSHeader_sig)
-                EXSHeader(offset);
+                auto t = EXSHeader(offset);
             else if (sig == 0x0100'0101)
                 zones.append(EXSZone(offset));
             else if (sig == 0x0200'0101)
@@ -402,7 +400,7 @@ public:
             else if (sig == 0x0300'0101)
                 samples.append(EXSSample(offset));
             else if (sig == 0x0400'0101)
-                EXSParam(offset);
+                auto t = EXSParam(offset);
             else
                 throw RuntimeError(u"Encountered an unknown chunk signature! signature is "_S & hex(sig));
             offset += chunk_size(::instrument_data, offset);
@@ -423,7 +421,7 @@ public:
                 goto on_continue;
             {bool was_break = false;
             for (auto sequence : sequences)
-                if (in(group, sequence)) {
+                if (false) {
                     was_break = true;
                     break;
                 }
@@ -479,7 +477,7 @@ public:
             }
             return zone.rootnote();
         };
-        Dict<Tuple<int, int, int, int, int>, EXSZone> ranges;
+        Dict<Tuple<int, int, int, int, int>, Array<EXSZone>> ranges;
         for (auto &&zone : zones) {
             auto key = make_tuple(zone.startnote(), zone.endnote(), get_rootnote(zone), zone.pan(), get_sequence_position(zone));
             if (!(in(key, ranges))) {
@@ -506,7 +504,7 @@ public:
         }
         if (!overwrite && fs::is_file(sfzfilename))
             throw RuntimeError(u"file #. already exists; will not overwrite!"_S.format(sfzfilename));
-        auto sfzfile = File(sfzfilename, u"wt"_S);
+        auto sfzfile = File(sfzfilename, u"w"_S);
         sfzfile.write(u"// this file was generated from #. using vonred's #.. Trickster goddess incoming.\n\n"_S.format(fs::path::base_name(exsfile_name), fs::path::base_name(u"1.exs2sfz.py"_S)));
 
         for (auto &&key : sorted(ranges.keys())) {
@@ -560,7 +558,7 @@ public:
                     sfzfile.write(u" loop_mode=loop_sustain loop_start=#. loop_end=#."_S.format(zone.loopstart(), zone.loopend() - 1));
                 if (groups[zone.group()].trigger() == 1)
                     sfzfile.write(u" trigger=release"_S);
-                sfzfile.write(u" sample=#."_S.format(pool.path(samples[zone.sampleindex()].name())));
+                sfzfile.write(u" sample=#."_S.format(pool->path(samples[zone.sampleindex()].name())));
                 sfzfile.write(u"\n"_S);
             }
         }

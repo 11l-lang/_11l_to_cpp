@@ -79,7 +79,7 @@ T EXSZone(EXSChunk)
    F (offset)
       .offset = offset
 
-   F rootnote()
+   F.const rootnote()
       R Byte.unpack_from(:instrument_data, .offset + 85)
 
    F finetune()
@@ -91,9 +91,9 @@ T EXSZone(EXSChunk)
    F volumeadjust()
       R Int8.unpack_from(:instrument_data, .offset + 88)
 
-   F startnote()
+   F.const startnote()
       R Byte.unpack_from(:instrument_data, .offset + 90)
-   F endnote()
+   F.const endnote()
       R Byte.unpack_from(:instrument_data, .offset + 91)
 
    F minvel()
@@ -114,12 +114,12 @@ T EXSZone(EXSChunk)
    F _loop_()
       R Byte.unpack_from(:instrument_data, .offset + 117)
 
-   F pitchtrack()
+   F.const pitchtrack()
       R !(Byte.unpack_from(:instrument_data, .offset + 84) [&] 1)
    F oneshot()
       R Byte.unpack_from(:instrument_data, .offset + 84) [&] 2
 
-   F group()
+   F.const group()
       V group = Int32.unpack_from(:instrument_data, .offset + 172)
       I group >= 0
          R group
@@ -162,6 +162,7 @@ T EXSParam(EXSChunk)
 
 T EXSSamplePool
    [String] locations
+   String base
 
    F ()
    {
@@ -171,7 +172,7 @@ T EXSSamplePool
       ‘ try to locate the directory containing a sample; if found,
 			it will be added to the list of known locations which are searched first ’
       V last = ‘’
-      F search_location(search)
+      F search_location(String search) -> String
          I search C @.locations
             R ‘’
          V path = fs:path:canonical(fs:path:absolute(fs:path:join(@.base, search)))
@@ -204,6 +205,7 @@ T EXSSamplePool
          last = fs:path:canonical(fs:path:absolute(fs:path:join(.base, search)))
          search = fs:path:join(search, ‘..’)
       X RuntimeError(‘Couldn't locate sample #.!’.format(filename))
+   F.virtual.abstract path(String filename) -> String
 
 T EXSSamplePoolDummy(EXSSamplePool)
    String name
@@ -211,28 +213,24 @@ T EXSSamplePoolDummy(EXSSamplePool)
    F (name = ‘’)
       .name = name
 
-   F path(filename)
+   F.virtual.assign path(String filename) -> String
       R fs:path:join(.name, filename)
 
 T EXSSamplePoolFixed(EXSSamplePool)
-   String base
-
    F (path)
       I fs:is_dir(path)
          .base = fs:path:dir_name(path)
       E
          X RuntimeError(‘#.is not a valid path!’.format(path))
 
-   F path(filename)
+   F.virtual.assign path(String filename) -> String
       R fs:path:join(.base, .locate(filename), filename)
 
 T EXSSamplePoolLocator(EXSSamplePool)
-   String base
-
    F (exsfile_name)
       .base = fs:path:dir_name(exsfile_name)
 
-   F path(filename)
+   F.virtual.assign path(String filename) -> String
       R fs:path:join(.locate(filename, 4), filename)
 
 T EXSInstrument
@@ -264,7 +262,7 @@ T EXSInstrument
          V sig = UInt32.unpack_from(:instrument_data, offset)
 
          I sig == EXSHeader_sig
-            EXSHeader(offset)
+            V t = EXSHeader(offset)
          E I sig == 0100'0101
             .zones.append(EXSZone(offset))
          E I sig == 0200'0101
@@ -272,7 +270,7 @@ T EXSInstrument
          E I sig == 0300'0101
             .samples.append(EXSSample(offset))
          E I sig == 0400'0101
-            EXSParam(offset)
+            V t = EXSParam(offset)
          E
             X RuntimeError(‘Encountered an unknown chunk signature! signature is ’hex(sig))
          offset += chunk_size(:instrument_data, offset)
@@ -289,7 +287,7 @@ T EXSInstrument
             L.continue
 
          L(=sequence) sequences
-            I group C sequence
+            I 0B
                L.break
          L.was_no_break
             [Int] sequence
@@ -326,7 +324,7 @@ T EXSInstrument
             I zone.rootnote() < zone.startnote() | zone.rootnote() > zone.endnote()
                R zone.startnote()
          R zone.rootnote()
-      [(Int, Int, Int, Int, Int) = EXSZone] ranges
+      [(Int, Int, Int, Int, Int) = [EXSZone]] ranges
       L(zone) .zones
          V key = (zone.startnote(), zone.endnote(), get_rootnote(zone), zone.pan(), get_sequence_position(zone))
          I !(key C ranges)
@@ -348,7 +346,7 @@ T EXSInstrument
 
       I !overwrite & fs:is_file(sfzfilename)
          X RuntimeError(‘file #. already exists; will not overwrite!’.format(sfzfilename))
-      V sfzfile = File(sfzfilename, ‘wt’)
+      V sfzfile = File(sfzfilename, ‘w’)
       sfzfile.write("// this file was generated from #. using vonred's #.. Trickster goddess incoming.\n\n".format(fs:path:base_name(.exsfile_name), fs:path:base_name(‘1.exs2sfz.py’)))
 
       L(key) sorted(ranges.keys())
