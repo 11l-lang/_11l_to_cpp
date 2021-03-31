@@ -174,7 +174,7 @@ T EXSSamplePool
       F search_location(search)
          I search C @.locations
             R ‘’
-         V path = fs:path:normpath(fs:path:absolute(fs:path:join(@.base, search)))
+         V path = fs:path:canonical(fs:path:absolute(fs:path:join(@.base, search)))
          I path == @last
             R ‘’
 
@@ -201,7 +201,7 @@ T EXSSamplePool
          V location = search_location(search)
          I location != ‘’
             R location
-         last = fs:path:normpath(fs:path:absolute(fs:path:join(.base, search)))
+         last = fs:path:canonical(fs:path:absolute(fs:path:join(.base, search)))
          search = fs:path:join(search, ‘..’)
       X RuntimeError(‘Couldn't locate sample #.!’.format(filename))
 
@@ -218,7 +218,7 @@ T EXSSamplePoolFixed(EXSSamplePool)
    String base
 
    F (path)
-      I fs:path:exists(path)
+      I fs:is_dir(path)
          .base = fs:path:dir_name(path)
       E
          X RuntimeError(‘#.is not a valid path!’.format(path))
@@ -245,7 +245,7 @@ T EXSInstrument
    F (exsfile_name, sample_location = ‘’)
       .exsfile_name = exsfile_name
 
-      I os:stat(exsfile_name).st_size > 1024 * 1024
+      I fs:file_size(exsfile_name) > 1024 * 1024
          X RuntimeError(‘EXS file is too large; will not parse! (size > 1 MebiByte)’)
       :instrument_data = File(exsfile_name).read_bytes()
 
@@ -294,7 +294,7 @@ T EXSInstrument
          L.was_no_break
             [Int] sequence
             V cont = 1B
-            L cont
+            L cont == 1B
                cont = 0B
                L(g) .groups
                   V gid2 = L.index
@@ -346,7 +346,7 @@ T EXSInstrument
             L.continue
          key_sequence[key] = group
 
-      I !overwrite & fs:path:exists(sfzfilename)
+      I !overwrite & fs:is_file(sfzfilename)
          X RuntimeError(‘file #. already exists; will not overwrite!’.format(sfzfilename))
       V sfzfile = File(sfzfilename, ‘wt’)
       sfzfile.write("// this file was generated from #. using vonred's #.. Trickster goddess incoming.\n\n".format(fs:path:base_name(.exsfile_name), fs:path:base_name(‘1.exs2sfz.py’)))

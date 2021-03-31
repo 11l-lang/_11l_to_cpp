@@ -202,7 +202,7 @@ class EXSSamplePool:
 			if search in self.locations:
 				return ''
 
-			path = os.path.normpath(os.path.abspath(os.path.join(self.base, search)))
+			path = os.path.realpath(os.path.abspath(os.path.join(self.base, search)))
 			if path == last:
 				return ''
 
@@ -233,7 +233,7 @@ class EXSSamplePool:
 			location = search_location(search)
 			if location != '':
 				return location
-			last = os.path.normpath(os.path.abspath(os.path.join(self.base, search)))
+			last = os.path.realpath(os.path.abspath(os.path.join(self.base, search)))
 			search = os.path.join(search, "..")
 
 		raise RuntimeError("Couldn't locate sample {0}!".format(filename))
@@ -255,7 +255,7 @@ class EXSSamplePoolFixed(EXSSamplePool):
 	base : str
 
 	def __init__(self, path):
-		if os.path.exists(path):
+		if os.path.isdir(path):
 			self.base = os.path.dirname(path)
 		else:
 			raise RuntimeError("{0}is not a valid path!".format(path))
@@ -292,7 +292,7 @@ class EXSInstrument:
 
 		self.exsfile_name = exsfile_name
 
-		if os.stat(exsfile_name).st_size > 1024 * 1024:
+		if os.path.getsize(exsfile_name) > 1024 * 1024:
 			raise RuntimeError("EXS file is too large; will not parse! (size > 1 MebiByte)")
 
 		global instrument_data
@@ -355,7 +355,7 @@ class EXSInstrument:
 				sequence : List[int] = []
 
 				cont = True
-				while cont:
+				while cont == True:
 					cont = False
 					for gid2, g in enumerate(self.groups):
 						if g.sequence() == gid and not gid2 == g.sequence() and not gid in sequence:
@@ -418,7 +418,7 @@ class EXSInstrument:
 
 			key_sequence[key] = group
 
-		if not overwrite and os.path.exists(sfzfilename):
+		if not overwrite and os.path.isfile(sfzfilename):
 			raise RuntimeError("file {0} already exists; will not overwrite!".format(sfzfilename))
 
 		sfzfile = open(sfzfilename, 'wt')

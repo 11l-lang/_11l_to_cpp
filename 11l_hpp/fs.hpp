@@ -175,6 +175,11 @@ inline String join(const String &path1, const String &path2)
 	return r & path2;
 }
 
+inline String join(const String &path1, const String &path2, const String &path3)
+{
+	return join(join(path1, path2), path3);
+}
+
 inline String dir_name(const String &path)
 {
 	size_t sep_pos = path.find_last_of(u"/\\");
@@ -199,6 +204,11 @@ inline String absolute(const String &path)
 inline String relative(const String &path, const String &base)
 {
 	return std::filesystem::relative((std::u16string&)path, (std::u16string&)base).u16string();
+}
+
+inline String canonical(const String &path)
+{
+	return std::filesystem::canonical((std::u16string&)path).u16string();
 }
 
 inline Tuple<String, String> split_ext(const String &path)
