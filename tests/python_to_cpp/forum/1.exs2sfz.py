@@ -18,18 +18,22 @@
 import sys
 import os.path
 import struct
+from typing import List
 
+
+def chunk_size(instrument_data, offset):
+	return 84 + struct.unpack_from('<I', instrument_data, offset + 4)[0]
 
 class EXSChunk:
 
-	__size = None
+	__size = 0
 
 	def size(self):
 		""" size is specified in bytes, at byte 4-8, and does not include common chunk elements;
 			that is, does not include the first 84 bytes """
 
-		if self.__size is None:
-			self.__size = 84 + struct.unpack_from('<I', self.instrument.data, self.offset + 4)[0]
+		if self.__size == 0:
+			self.__size = chunk_size(self.instrument.data, self.offset)
 
 		return self.__size
 
@@ -74,19 +78,19 @@ EXSHeader_sig = 0x00000101
 
 class EXSHeader(EXSChunk):
 
-	offset = None
+	offset = 0
 
 	def __init__(self, instrument, offset):
 		self.instrument = instrument
 		self.offset = offset
 
 		if not offset == 0:
-			raise RuntimeError("Found header at location  other than beginning of file! offset is ".format(offset))
+			raise RuntimeError("Found header at location  other than beginning of file! offset is {}".format(offset))
 
 
 class EXSZone(EXSChunk):
 
-	offset = None
+	offset = 0
 
 	def __init__(self, instrument, offset):
 		self.instrument = instrument
@@ -138,7 +142,7 @@ class EXSZone(EXSChunk):
 			return group
 
 		# FIXME: the group can be -1 -- just returning the last group for now
-		return len(self.instrument.groups()) - 1
+		return len(self.instrument.groups) - 1
 
 	def sampleindex(self):
 		return struct.unpack_from('<I', self.instrument.data, self.offset + 176)[0]
@@ -146,7 +150,7 @@ class EXSZone(EXSChunk):
 
 class EXSGroup(EXSChunk):
 
-	offset = None
+	offset = 0
 
 	def __init__(self, instrument, offset):
 		self.instrument = instrument
@@ -166,7 +170,7 @@ class EXSGroup(EXSChunk):
 
 class EXSSample(EXSChunk):
 
-	offset = None
+	offset = 0
 
 	def __init__(self, instrument, offset):
 		self.instrument = instrument
@@ -184,7 +188,7 @@ class EXSSample(EXSChunk):
 
 class EXSParam(EXSChunk):
 
-	offset = None
+	offset : int
 
 	def __init__(self, instrument, offset):
 		self.instrument = instrument
@@ -193,7 +197,7 @@ class EXSParam(EXSChunk):
 
 class EXSSamplePool:
 
-	locations = None
+	locations : List[str]
 
 	def __init__(self):
 		self.locations = []
@@ -206,11 +210,11 @@ class EXSSamplePool:
 
 		def search_location(search):
 			if search in self.locations:
-				return
+				return ''
 
 			path = os.path.normpath(os.path.abspath(os.path.join(self.base, search)))
 			if path == last:
-				return
+				return ''
 
 			for name in os.listdir(path):
 				location = os.path.join(path, name)
@@ -220,8 +224,9 @@ class EXSSamplePool:
 						return search
 				elif os.path.isdir(location):
 					location = search_location(os.path.join(search, name))
-					if not location is None:
-						return location;
+					if location != '':
+						return location
+			return ''
 
 		filename = filename.lower()
 
@@ -237,8 +242,8 @@ class EXSSamplePool:
 		search = ""
 		for _i in range(0, search_depth):
 			location = search_location(search)
-			if not location is None:
-				return location;
+			if location != '':
+				return location
 			last = os.path.normpath(os.path.abspath(os.path.join(self.base, search)))
 			search = os.path.join(search, "..")
 
@@ -247,9 +252,9 @@ class EXSSamplePool:
 
 class EXSSamplePoolDummy(EXSSamplePool):
 
-	name = None
+	name : str
 
-	def __init__(self, name=None):
+	def __init__(self, name=''):
 		self.name = name
 
 	def path(self, filename):
@@ -258,7 +263,7 @@ class EXSSamplePoolDummy(EXSSamplePool):
 
 class EXSSamplePoolFixed(EXSSamplePool):
 
-	base = None
+	base : str
 
 	def __init__(self, path):
 		if os.path.exists(path):
@@ -274,7 +279,7 @@ class EXSSamplePoolFixed(EXSSamplePool):
 
 class EXSSamplePoolLocator(EXSSamplePool):
 
-	base = None
+	base : str
 
 	def __init__(self, exsfile_name):
 		self.base = os.path.dirname(exsfile_name)
@@ -284,39 +289,18 @@ class EXSSamplePoolLocator(EXSSamplePool):
 		return os.path.join(self.locate(filename, 4), filename)
 
 
-def EXSChunk_parse(instrument, offset):
-	""" read the chunk signature, and add a wrapper for the type-specific data """
-
-	sig = struct.unpack_from('<I', instrument.data, offset)[0]
-
-	if sig == EXSHeader_sig:
-		return EXSHeader(instrument, offset)
-	if sig == 0x01000101:
-		return EXSZone(instrument, offset)
-	if sig == 0x02000101:
-		return EXSGroup(instrument, offset)
-	if sig == 0x03000101:
-		return EXSSample(instrument, offset)
-	if sig == 0x04000101:
-		return EXSParam(instrument, offset)
-
-	#raise RuntimeError("Encountered an unknown chunk signature! signature is 0x{1:08X}".format(sig))
-	raise RuntimeError("Encountered an unknown chunk signature! signature is " + hex(sig))
-
-
 class EXSInstrument:
 
-	data = None
-	pool = None
+	data : bytes
+	pool : EXSSamplePool
 
-	exsfile_name = None
+	exsfile_name : str
 
-	def __init__(self, exsfile_name, sample_location=None):
+	def __init__(self, exsfile_name, sample_location=''):
 
-		self.__zones = None
-		self.__groups = None
-		self.__samples = None
-		self.__objects = None
+		self.zones : List[EXSZone] = []
+		self.groups : List[EXSGroup] = []
+		self.samples : List[EXSSample] = []
 
 		self.exsfile_name = exsfile_name
 
@@ -331,49 +315,34 @@ class EXSInstrument:
 		if not struct.unpack_from('<I', self.data, 0)[0] == EXSHeader_sig and self.data[16:20] == b'TBOS':
 			raise RuntimeError("File is not an EXS file; will not parse!")
 
-		if isinstance(sample_location, EXSSamplePool):
-			self.pool = sample_location
-		elif sample_location is None:
+		# if isinstance(sample_location, EXSSamplePool):
+		# 	self.pool = sample_location
+		# elif sample_location is None:
+		if sample_location == '':
 			self.pool = EXSSamplePoolLocator(exsfile_name)
 		else:
 			self.pool = EXSSamplePoolFixed(sample_location)
 
-	def objects(self):
-		if not self.__objects:
-			self.__objects = []
-			offset = 0
-			end = len(self.data)
-			while offset < end:
-				new_object = EXSChunk_parse(self, offset)
-				self.__objects.append(new_object)
-				offset += new_object.size()
+		# parse EXS file
+		offset = 0
+		end = len(self.data)
+		while offset < end:
+			sig = struct.unpack_from('<I', self.data, offset)[0]
 
-				if isinstance(new_object, EXSZone):
-					self.zones().append(new_object)
-				elif isinstance(new_object, EXSGroup):
-					self.groups().append(new_object)
-				elif isinstance(new_object, EXSSample):
-					self.samples().append(new_object)
+			if sig == EXSHeader_sig:
+				EXSHeader(self, offset)
+			elif sig == 0x01000101:
+				self.zones.append(EXSZone(self, offset))
+			elif sig == 0x02000101:
+				self.groups.append(EXSGroup(self, offset))
+			elif sig == 0x03000101:
+				self.samples.append(EXSSample(self, offset))
+			elif sig == 0x04000101:
+				EXSParam(self, offset)
+			else:
+				raise RuntimeError("Encountered an unknown chunk signature! signature is " + hex(sig))
 
-		return self.__objects
-
-	def zones(self):
-		if not self.__zones:
-			self.__zones = []
-			len(self.objects())
-		return self.__zones
-
-	def samples(self):
-		if not self.__samples:
-			self.__samples = []
-			len(self.objects())
-		return self.__samples
-
-	def groups(self):
-		if not self.__groups:
-			self.__groups = []
-			len(self.objects())
-		return self.__groups
+			offset += chunk_size(self.data, offset)
 
 	def build_sequences(self):
 		""" exs handles round robin samples by using groups that point to the next group, and so on
@@ -382,7 +351,7 @@ class EXSInstrument:
 
 		sequences = []
 
-		for group in self.groups():
+		for group in self.groups:
 			if not group.sequence():
 				continue
 
@@ -394,16 +363,16 @@ class EXSInstrument:
 				# trace back to the first group in the chain by looking for a group that points to this chain,
 				# and repeating the process until we end up at a group that's not pointed to
 
-				gid = self.groups().index(group)
+				gid = self.groups.index(group)
 				sequence = []
 
 				cont = True
 				while cont:
 					cont = False
-					for g in self.groups():
-						if g.sequence() == gid and not self.groups().index(g) == g.sequence() and not gid in sequence:
+					for g in self.groups:
+						if g.sequence() == gid and not self.groups.index(g) == g.sequence() and not gid in sequence:
 							sequence.append(gid)
-							gid = self.groups().index(g)
+							gid = self.groups.index(g)
 							cont = True
 							break
 
@@ -412,7 +381,7 @@ class EXSInstrument:
 				sequence = []
 				while not gid == -1 and not gid in sequence:
 					sequence.append(gid)
-					gid = self.groups()[gid].sequence()
+					gid = self.groups[gid].sequence()
 
 				if len(sequence) > 1:
 					sequences.append(sequence)
@@ -436,7 +405,7 @@ class EXSInstrument:
 		sequences = self.build_sequences()
 
 		ranges = {}
-		for zone in self.zones():
+		for zone in self.zones:
 			key = (zone.startnote(), zone.endnote(), get_rootnote(zone), zone.pan(), get_sequence_position(zone))
 			if not key in ranges:
 				ranges[key] = []
@@ -495,18 +464,18 @@ class EXSInstrument:
 				else:
 					choke_voices[(zone.minvel(), zone.maxvel())] = 1
 
-			if self.groups()[keyrange[0].group()].polyphony() == choke_voices[(keyrange[0].minvel(), keyrange[0].maxvel())]:
+			if self.groups[keyrange[0].group()].polyphony() == choke_voices[(keyrange[0].minvel(), keyrange[0].maxvel())]:
 				# add a choke group for e.g. hihats in drum libraries
 
 				if choke_group == 0:
 					# group 0 can't be used as a choke group in sfz, so change it where needed
-					choke_group = len(self.groups())
+					choke_group = len(self.groups)
 
 				sfzfile.write(" group={group} off_by={group} polyphony={polyphony} off_mode=fast".
-						format(group=choke_group, polyphony=self.groups()[keyrange[0].group()].polyphony()))
+						format(group=choke_group, polyphony=self.groups[keyrange[0].group()].polyphony()))
 
-			if self.groups()[keyrange[0].group()].output() > 0:
-				sfzfile.write(" output={output}".format(output=self.groups()[keyrange[0].group()].output()))
+			if self.groups[keyrange[0].group()].output() > 0:
+				sfzfile.write(" output={output}".format(output=self.groups[keyrange[0].group()].output()))
 
 			if keyrange[0].pan():
 				sfzfile.write(" pan={pan}".format(pan=keyrange[0].pan()))
@@ -538,7 +507,7 @@ class EXSInstrument:
 					sfzfile.write(" offset={samplestart}".
 							format(samplestart=zone.samplestart()))
 
-				if zone.sampleend() and zone.sampleend() < self.samples()[zone.sampleindex()].length():
+				if zone.sampleend() and zone.sampleend() < self.samples[zone.sampleindex()].length():
 					sfzfile.write(" end={sampleend}".
 							format(sampleend=zone.sampleend()))
 
@@ -546,11 +515,11 @@ class EXSInstrument:
 					sfzfile.write(" loop_mode=loop_sustain loop_start={loopstart} loop_end={loopend}".
 							format(loopstart=zone.loopstart(), loopend=zone.loopend() - 1))
 
-				if self.groups()[zone.group()].trigger() == 1:
+				if self.groups[zone.group()].trigger() == 1:
 					sfzfile.write(" trigger=release")
 
 				sfzfile.write(" sample={sample}".
-						format(sample=self.pool.path(self.samples()[zone.sampleindex()].name())))
+						format(sample=self.pool.path(self.samples[zone.sampleindex()].name())))
 
 				sfzfile.write("\n")
 
@@ -566,9 +535,9 @@ if __name__ == '__main__':
 
 		sys.exit(64)
 
-	samplefolder = sys.argv[3] if len(sys.argv) == 4 else None
+	samplefolder = sys.argv[3] if len(sys.argv) == 4 else ''
 	try:
 		exs = EXSInstrument(sys.argv[1], samplefolder)
 		exs.convert(sys.argv[2])
 	except RuntimeError as rerr:
-		sys.exit(rerr.args[0])
+		sys.exit(rerr)
