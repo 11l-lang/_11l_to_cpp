@@ -21,6 +21,8 @@ import struct
 from typing import List
 
 
+instrument_data : bytes
+
 def chunk_size(instrument_data, offset):
 	return 84 + struct.unpack_from('<I', instrument_data, offset + 4)[0]
 
@@ -33,7 +35,7 @@ class EXSChunk:
 			that is, does not include the first 84 bytes """
 
 		if self.__size == 0:
-			self.__size = chunk_size(self.instrument.data, self.offset)
+			self.__size = chunk_size(instrument_data, self.offset)
 
 		return self.__size
 
@@ -41,13 +43,13 @@ class EXSChunk:
 		""" return the chunk's id number; n.b. that this does not seem to actually be used --
 			the sequence of chunks of each type in the file is used instead """
 
-		return struct.unpack_from('<I', self.instrument.data, self.offset + 8)[0]
+		return struct.unpack_from('<I', instrument_data, self.offset + 8)[0]
 
 	def name(self):
 		""" the name of a chunk starts at byte 20, and has a max. length of 64 bytes;
 			this is treated as a zero-terminated utf-8 string """
 
-		return self.instrument.data[self.offset + 20:self.offset + 84].decode('utf-8').split('\x00')[0]
+		return instrument_data[self.offset + 20:self.offset + 84].decode('utf-8').split('\x00')[0]
 
 	def display(self):
 		"""" display the raw chunk data in hexdump format """
@@ -61,13 +63,13 @@ class EXSChunk:
 					if index >= self.size():
 						print("  ", end='')
 					else:
-						print("{0:02X}".format(self.instrument.data[self.offset + index]), end='')
+						print("{0:02X}".format(instrument_data[self.offset + index]), end='')
 				print(" ", end='')
 			print(" ", end='')
 			end = line + 16
 			if end > self.size():
 				end = self.size()
-			for c in self.instrument.data[self.offset + line:self.offset + end]:
+			for c in instrument_data[self.offset + line:self.offset + end]:
 				if c > 13 and c < 128:
 					print(chr(c), end='')
 				else:
@@ -80,8 +82,7 @@ class EXSHeader(EXSChunk):
 
 	offset = 0
 
-	def __init__(self, instrument, offset):
-		self.instrument = instrument
+	def __init__(self, offset):
 		self.offset = offset
 
 		if not offset == 0:
@@ -92,106 +93,103 @@ class EXSZone(EXSChunk):
 
 	offset = 0
 
-	def __init__(self, instrument, offset):
-		self.instrument = instrument
+	def __init__(self, offset):
 		self.offset = offset
 
 	def rootnote(self):
-		return struct.unpack_from('B', self.instrument.data, self.offset + 85)[0]
+		return struct.unpack_from('B', instrument_data, self.offset + 85)[0]
 
 	def finetune(self):
-		return struct.unpack_from('b', self.instrument.data, self.offset + 86)[0]
+		return struct.unpack_from('b', instrument_data, self.offset + 86)[0]
 
 	def pan(self):
-		return struct.unpack_from('b', self.instrument.data, self.offset + 87)[0]
+		return struct.unpack_from('b', instrument_data, self.offset + 87)[0]
 
 	def volumeadjust(self):
-		return struct.unpack_from('b', self.instrument.data, self.offset + 88)[0]
+		return struct.unpack_from('b', instrument_data, self.offset + 88)[0]
 
 	def startnote(self):
-		return struct.unpack_from('B', self.instrument.data, self.offset + 90)[0]
+		return struct.unpack_from('B', instrument_data, self.offset + 90)[0]
 	def endnote(self):
-		return struct.unpack_from('B', self.instrument.data, self.offset + 91)[0]
+		return struct.unpack_from('B', instrument_data, self.offset + 91)[0]
 
 	def minvel(self):
-		return struct.unpack_from('B', self.instrument.data, self.offset + 93)[0]
+		return struct.unpack_from('B', instrument_data, self.offset + 93)[0]
 	def maxvel(self):
-		return struct.unpack_from('B', self.instrument.data, self.offset + 94)[0]
+		return struct.unpack_from('B', instrument_data, self.offset + 94)[0]
 
 	def samplestart(self):
-		return struct.unpack_from('<i', self.instrument.data, self.offset + 96)[0]
+		return struct.unpack_from('<i', instrument_data, self.offset + 96)[0]
 	def sampleend(self):
-		return struct.unpack_from('<i', self.instrument.data, self.offset + 100)[0]
+		return struct.unpack_from('<i', instrument_data, self.offset + 100)[0]
 
 	def loopstart(self):
-		return struct.unpack_from('<i', self.instrument.data, self.offset + 104)[0]
+		return struct.unpack_from('<i', instrument_data, self.offset + 104)[0]
 	def loopend(self):
-		return struct.unpack_from('<i', self.instrument.data, self.offset + 108)[0]
+		return struct.unpack_from('<i', instrument_data, self.offset + 108)[0]
 
 	def loop(self):
-		return struct.unpack_from('B', self.instrument.data, self.offset + 117)[0]
+		return struct.unpack_from('B', instrument_data, self.offset + 117)[0]
 
 	def pitchtrack(self):
-		return not (struct.unpack_from('B', self.instrument.data, self.offset + 84)[0] & 1)
+		return not (struct.unpack_from('B', instrument_data, self.offset + 84)[0] & 1)
 	def oneshot(self):
-		return struct.unpack_from('B', self.instrument.data, self.offset + 84)[0] & 2
+		return struct.unpack_from('B', instrument_data, self.offset + 84)[0] & 2
 
 	def group(self):
-		group = struct.unpack_from('<i', self.instrument.data, self.offset + 172)[0]
+		group = struct.unpack_from('<i', instrument_data, self.offset + 172)[0]
 		if group >= 0:
 			return group
 
 		# FIXME: the group can be -1 -- just returning the last group for now
-		return len(self.instrument.groups) - 1
+		## Because `self.instrument.groups` became inaccessible just return 0 [there is no difference in converted files anyway]
+		return 0 # len(self.instrument.groups) - 1
 
 	def sampleindex(self):
-		return struct.unpack_from('<I', self.instrument.data, self.offset + 176)[0]
+		return struct.unpack_from('<I', instrument_data, self.offset + 176)[0]
 
 
 class EXSGroup(EXSChunk):
 
 	offset = 0
 
-	def __init__(self, instrument, offset):
-		self.instrument = instrument
+	def __init__(self, offset):
 		self.offset = offset
 
 	def polyphony(self):
-		return struct.unpack_from('B', self.instrument.data, self.offset + 86)[0]
+		return struct.unpack_from('B', instrument_data, self.offset + 86)[0]
 
 	def trigger(self):
-		return struct.unpack_from('B', self.instrument.data, self.offset + 157)[0]
+		return struct.unpack_from('B', instrument_data, self.offset + 157)[0]
 
 	def output(self):
-		return struct.unpack_from('B', self.instrument.data, self.offset + 158)[0]
+		return struct.unpack_from('B', instrument_data, self.offset + 158)[0]
 	def sequence(self):
-		return struct.unpack_from('<i', self.instrument.data, self.offset + 164)[0]
+		return struct.unpack_from('<i', instrument_data, self.offset + 164)[0]
 
 
 class EXSSample(EXSChunk):
 
 	offset = 0
 
-	def __init__(self, instrument, offset):
-		self.instrument = instrument
+	def __init__(self, offset):
 		self.offset = offset
 
 	def length(self):
-		return struct.unpack_from('<i', self.instrument.data, self.offset + 88)[0]
+		return struct.unpack_from('<i', instrument_data, self.offset + 88)[0]
 
 	def rate(self):
-		return struct.unpack_from('<i', self.instrument.data, self.offset + 92)[0]
+		return struct.unpack_from('<i', instrument_data, self.offset + 92)[0]
 
 	def bitdepth(self):
-		return struct.unpack_from('B', self.instrument.data, self.offset + 96)[0]
+		return struct.unpack_from('B', instrument_data, self.offset + 96)[0]
 
 
 class EXSParam(EXSChunk):
 
 	offset : int
 
-	def __init__(self, instrument, offset):
-		self.instrument = instrument
+	def __init__(self, offset):
 		self.offset = offset
 
 
@@ -291,7 +289,6 @@ class EXSSamplePoolLocator(EXSSamplePool):
 
 class EXSInstrument:
 
-	data : bytes
 	pool : EXSSamplePool
 
 	exsfile_name : str
@@ -307,12 +304,13 @@ class EXSInstrument:
 		if os.stat(exsfile_name).st_size > 1024 * 1024:
 			raise RuntimeError("EXS file is too large; will not parse! (size > 1 MebiByte)")
 
-		self.data = open(exsfile_name, 'rb').read()
+		global instrument_data
+		instrument_data = open(exsfile_name, 'rb').read()
 
 		# ensure this is a valid file we can parse
-		if struct.unpack_from('>I', self.data, 0)[0] == EXSHeader_sig and self.data[16:20] == b'SOBT':
+		if struct.unpack_from('>I', instrument_data, 0)[0] == EXSHeader_sig and instrument_data[16:20] == b'SOBT':
 			raise RuntimeError("File is a big endian EXS file; cannot parse!")
-		if not struct.unpack_from('<I', self.data, 0)[0] == EXSHeader_sig and self.data[16:20] == b'TBOS':
+		if not struct.unpack_from('<I', instrument_data, 0)[0] == EXSHeader_sig and instrument_data[16:20] == b'TBOS':
 			raise RuntimeError("File is not an EXS file; will not parse!")
 
 		# if isinstance(sample_location, EXSSamplePool):
@@ -325,24 +323,24 @@ class EXSInstrument:
 
 		# parse EXS file
 		offset = 0
-		end = len(self.data)
+		end = len(instrument_data)
 		while offset < end:
-			sig = struct.unpack_from('<I', self.data, offset)[0]
+			sig = struct.unpack_from('<I', instrument_data, offset)[0]
 
 			if sig == EXSHeader_sig:
-				EXSHeader(self, offset)
+				EXSHeader(offset)
 			elif sig == 0x01000101:
-				self.zones.append(EXSZone(self, offset))
+				self.zones.append(EXSZone(offset))
 			elif sig == 0x02000101:
-				self.groups.append(EXSGroup(self, offset))
+				self.groups.append(EXSGroup(offset))
 			elif sig == 0x03000101:
-				self.samples.append(EXSSample(self, offset))
+				self.samples.append(EXSSample(offset))
 			elif sig == 0x04000101:
-				EXSParam(self, offset)
+				EXSParam(offset)
 			else:
 				raise RuntimeError("Encountered an unknown chunk signature! signature is " + hex(sig))
 
-			offset += chunk_size(self.data, offset)
+			offset += chunk_size(instrument_data, offset)
 
 	def build_sequences(self):
 		""" exs handles round robin samples by using groups that point to the next group, and so on
