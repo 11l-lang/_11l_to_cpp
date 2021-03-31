@@ -28,6 +28,7 @@ def chunk_size(instrument_data, offset):
 
 class EXSChunk:
 
+	offset : int
 	__size = 0
 
 	def size(self):
@@ -80,8 +81,6 @@ EXSHeader_sig = 0x00000101
 
 class EXSHeader(EXSChunk):
 
-	offset = 0
-
 	def __init__(self, offset):
 		self.offset = offset
 
@@ -90,8 +89,6 @@ class EXSHeader(EXSChunk):
 
 
 class EXSZone(EXSChunk):
-
-	offset = 0
 
 	def __init__(self, offset):
 		self.offset = offset
@@ -151,8 +148,6 @@ class EXSZone(EXSChunk):
 
 class EXSGroup(EXSChunk):
 
-	offset = 0
-
 	def __init__(self, offset):
 		self.offset = offset
 
@@ -170,8 +165,6 @@ class EXSGroup(EXSChunk):
 
 class EXSSample(EXSChunk):
 
-	offset = 0
-
 	def __init__(self, offset):
 		self.offset = offset
 
@@ -186,8 +179,6 @@ class EXSSample(EXSChunk):
 
 
 class EXSParam(EXSChunk):
-
-	offset : int
 
 	def __init__(self, offset):
 		self.offset = offset
