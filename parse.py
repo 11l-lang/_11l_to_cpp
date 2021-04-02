@@ -3145,6 +3145,7 @@ dict_scope.add_name('find', ASTFunctionDefinition([('key', '', '')]))
 dict_scope.add_name('get', ASTFunctionDefinition([('key', '', ''), ('default', '', '')]))
 dict_scope.add_name('keys', ASTFunctionDefinition([]))
 dict_scope.add_name('values', ASTFunctionDefinition([]))
+dict_scope.add_name('items', ASTFunctionDefinition([]))
 builtins_scope.ids['Dict'].ast_nodes[0].scope = dict_scope
 builtins_scope.ids['DefaultDict'].ast_nodes[0].scope = dict_scope
 set_scope = Scope(None)
