@@ -100,6 +100,12 @@ public:
 		std::map<KeyType, ValueType>::insert_or_assign(key, std::forward<ValueType>(value));
 	}
 
+	void update(const DefaultDict &other)
+	{
+		for (auto &&el : other)
+			set(el.first, el.second);
+	}
+
 	ConstValuePtr find(const KeyType &key) const
 	{
 		auto r = std::map<KeyType, ValueType>::find(key);
@@ -146,8 +152,8 @@ public:
 		Array<ValueType> r;
 		r.reserve(size());
 		for (auto &&kv : *this)
-			r.push_back(kv.second);
-		return r;
+			r.push_back(copy(kv.second));
+		return r;//std::move(r);
 	}
 
 	auto items() const

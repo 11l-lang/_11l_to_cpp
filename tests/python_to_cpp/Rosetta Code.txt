@@ -12192,3 +12192,139 @@ struct CodeBlock2
         }
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Topological_sort#Python
+#from functools import reduce
+
+empty_set = set() # str
+def move(obj):
+    return obj
+
+data = {
+    'des_system_lib':   set('std synopsys std_cell_lib des_system_lib dw02 dw01 ramlib ieee'.split(' ')),
+    'dw01':             set('ieee dw01 dware gtech'.split(' ')),
+    'dw02':             set('ieee dw02 dware'.split(' ')),
+    'dw03':             set('std synopsys dware dw03 dw02 dw01 ieee gtech'.split(' ')),
+    'dw04':             set('dw04 ieee dw01 dware gtech'.split(' ')),
+    'dw05':             set('dw05 ieee dware'.split(' ')),
+    'dw06':             set('dw06 ieee dware'.split(' ')),
+    'dw07':             set('ieee dware'.split(' ')),
+    'dware':            set('ieee dware'.split(' ')),
+    'gtech':            set('ieee gtech'.split(' ')),
+    'ramlib':           set('std ieee'.split(' ')),
+    'std_cell_lib':     set('ieee std_cell_lib'.split(' ')),
+    'synopsys':         move(empty_set),
+    }
+
+# def create_empty_set():
+#     empty_set = set() # str
+#     return empty_set
+
+def toposort2(data : dict):
+    for k, v in data.items():
+        v.discard(k) # Ignore self dependencies
+
+    #extra_items_in_deps = reduce(lambda a, b: a.union(b), data.values()) - set(data.keys())
+    extra_items_in_deps = set() # str
+    for v in data.values():
+        extra_items_in_deps.update(v)
+    extra_items_in_deps = extra_items_in_deps - set(data.keys())
+
+    #data.update({item:create_empty_set() for item in extra_items_in_deps})
+    for item in extra_items_in_deps:
+        data[item] = set() # str
+
+    r : List[str] = []
+    while True:
+        #ordered = set(item for item,dep in data.items() if len(dep) == 0)
+        ordered = set() # str
+        for item, dep in data.items():
+            if len(dep) == 0:
+                ordered.add(item)
+        if len(ordered) == 0:
+            break
+        r.append(' '.join(sorted(list(ordered))))
+        #data = {item: (dep - ordered) for item,dep in data.items()
+        #        if item not in ordered}
+        new_data : Dict[str, Set[str]] = {}
+        for item, dep in data.items():
+            if item not in ordered:
+                new_data[item] = dep - ordered
+        data = move(new_data)
+    #assert len(data) == 0, "A cyclic dependency exists amongst %s" % data
+    assert len(data) == 0, "A cyclic dependency exists"
+    return r
+
+print('\n'.join( toposort2(data) ))
+===
+V empty_set = Set[String]()
+V data = [‘des_system_lib’ = Set(‘std synopsys std_cell_lib des_system_lib dw02 dw01 ramlib ieee’.split(‘ ’)), ‘dw01’ = Set(‘ieee dw01 dware gtech’.split(‘ ’)), ‘dw02’ = Set(‘ieee dw02 dware’.split(‘ ’)), ‘dw03’ = Set(‘std synopsys dware dw03 dw02 dw01 ieee gtech’.split(‘ ’)), ‘dw04’ = Set(‘dw04 ieee dw01 dware gtech’.split(‘ ’)), ‘dw05’ = Set(‘dw05 ieee dware’.split(‘ ’)), ‘dw06’ = Set(‘dw06 ieee dware’.split(‘ ’)), ‘dw07’ = Set(‘ieee dware’.split(‘ ’)), ‘dware’ = Set(‘ieee dware’.split(‘ ’)), ‘gtech’ = Set(‘ieee gtech’.split(‘ ’)), ‘ramlib’ = Set(‘std ieee’.split(‘ ’)), ‘std_cell_lib’ = Set(‘ieee std_cell_lib’.split(‘ ’)), ‘synopsys’ = move(empty_set)]
+
+F toposort2(&data)
+   L(k, v) data
+      v.discard(k)
+   V extra_items_in_deps = Set[String]()
+   L(v) data.values()
+      extra_items_in_deps.update(v)
+   extra_items_in_deps = extra_items_in_deps - Set(data.keys())
+
+   L(item) extra_items_in_deps
+      data[item] = Set[String]()
+   [String] r
+   L
+      V ordered = Set[String]()
+      L(item, dep) data
+         I dep.empty
+            ordered.add(item)
+      I ordered.empty
+         L.break
+      r.append(sorted(Array(ordered)).join(‘ ’))
+      [String = Set[String]] new_data
+      L(item, dep) data
+         I item !C ordered
+            new_data[item] = dep - ordered
+      data = move(new_data)
+   assert(data.empty, ‘A cyclic dependency exists’)
+   R r
+print(toposort2(&data).join("\n"))
+===
+auto empty_set = Set<String>();
+auto data = create_dict(dict_of(u"des_system_lib"_S, create_set(u"std synopsys std_cell_lib des_system_lib dw02 dw01 ramlib ieee"_S.split(u" "_S)))(u"dw01"_S, create_set(u"ieee dw01 dware gtech"_S.split(u" "_S)))(u"dw02"_S, create_set(u"ieee dw02 dware"_S.split(u" "_S)))(u"dw03"_S, create_set(u"std synopsys dware dw03 dw02 dw01 ieee gtech"_S.split(u" "_S)))(u"dw04"_S, create_set(u"dw04 ieee dw01 dware gtech"_S.split(u" "_S)))(u"dw05"_S, create_set(u"dw05 ieee dware"_S.split(u" "_S)))(u"dw06"_S, create_set(u"dw06 ieee dware"_S.split(u" "_S)))(u"dw07"_S, create_set(u"ieee dware"_S.split(u" "_S)))(u"dware"_S, create_set(u"ieee dware"_S.split(u" "_S)))(u"gtech"_S, create_set(u"ieee gtech"_S.split(u" "_S)))(u"ramlib"_S, create_set(u"std ieee"_S.split(u" "_S)))(u"std_cell_lib"_S, create_set(u"ieee std_cell_lib"_S.split(u" "_S)))(u"synopsys"_S, std::move(empty_set)));
+
+template <typename T1> auto toposort2(T1 &data)
+{
+    for (auto &&[k, v] : data)
+        v.discard(k);
+    auto extra_items_in_deps = Set<String>();
+    for (auto &&v : data.values())
+        extra_items_in_deps.update(v);
+    extra_items_in_deps = extra_items_in_deps - create_set(data.keys());
+    for (auto &&item : extra_items_in_deps)
+        data.set(item, Set<String>());
+    Array<String> r;
+    while (true) {
+        auto ordered = Set<String>();
+        for (auto &&[item, dep] : data)
+            if (dep.empty())
+                ordered.add(item);
+        if (ordered.empty())
+            break;
+        r.append(sorted(create_array(ordered)).join(u" "_S));
+        Dict<String, Set<String>> new_data;
+        for (auto &&[item, dep] : data)
+            if (!in(item, ordered))
+                new_data.set(item, dep - ordered);
+        data = std::move(new_data);
+    }
+    assert(data.empty(), u"A cyclic dependency exists"_S);
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(toposort2(data).join(u"\n"_S));
+    }
+} code_block_1;
