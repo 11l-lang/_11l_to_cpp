@@ -209,7 +209,7 @@ F bf(source)
          :stdout.write(Char(code' tape[cell]))
       E I opcode == ‘,’
          tape[cell] = :stdin.read(1).code
-      E I (opcode == ‘[’ & !(tape[cell])) | (opcode == ‘]’ & tape[cell])
+      E I (opcode == ‘[’ & !tape[cell]) | (opcode == ‘]’ & tape[cell])
          ptr = loop_ptrs[ptr]
       ptr++
 bf(‘++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.’)
@@ -247,7 +247,7 @@ template <typename T1> auto bf(const T1 &source)
             _stdout.write(Char(tape[cell]));
         else if (opcode == u',')
             tape.set(cell, _stdin.read(1).code);
-        else if ((opcode == u'[' && !(tape[cell])) || (opcode == u']' && tape[cell]))
+        else if ((opcode == u'[' && !tape[cell]) || (opcode == u']' && tape[cell]))
             ptr = loop_ptrs[ptr];
         ptr++;
     }
@@ -592,7 +592,7 @@ for i in range(100):
 V doors = [0B] * 100
 L(i) 100
    L(j) (i .< 100).step(i + 1)
-      doors[j] = !(doors[j])
+      doors[j] = !doors[j]
    print(‘Door ’String(i + 1)‘: ’(I doors[i] {‘open’} E ‘close’))
 ===
 auto doors = create_array({false}) * 100;
@@ -603,7 +603,7 @@ struct CodeBlock1
     {
         for (int i = 0; i < 100; i++) {
             for (auto j : range_el(i, 100).step(i + 1))
-                doors.set(j, !(doors[j]));
+                doors.set(j, !doors[j]);
             print(u"Door "_S & String(i + 1) & u": "_S & (doors[i] ? u"open"_S : u"close"_S));
         }
     }
@@ -4160,7 +4160,7 @@ F snusp(store, code)
          ‘!’
             step()
          ‘?’
-            I !(ds[dp])
+            I !ds[dp]
                step()
       step()
 snusp(5, HW)
@@ -4227,7 +4227,7 @@ template <typename T1, typename T2> auto snusp(const T1 &store, const T2 &code)
             step();
             break;
         case u'?':
-            if (!(ds[dp]))
+            if (!ds[dp])
                 step();
             break;
         }
@@ -7446,7 +7446,7 @@ F jaro_winkler_distance(=st1, =st2)
       V idx1 = L.index
       L(ch2) st2
          V idx2 = L.index
-         I idx2 <= idx1 + delta & idx2 >= idx1 - delta & ch1 == ch2 & !(flag[idx2])
+         I idx2 <= idx1 + delta & idx2 >= idx1 - delta & ch1 == ch2 & !flag[idx2]
             flag[idx2] = 1B
             ch1_match.append(ch1)
             L.break
@@ -7496,7 +7496,7 @@ template <typename T1, typename T2> auto jaro_winkler_distance(T1 st1, T2 st2)
         {int Lindex = 0;
         for (auto &&ch2 : st2) {
             auto idx2 = Lindex;
-            if (idx2 <= idx1 + delta && idx2 >= idx1 - delta && ch1 == ch2 && !(flag[idx2])) {
+            if (idx2 <= idx1 + delta && idx2 >= idx1 - delta && ch1 == ch2 && !flag[idx2]) {
                 flag.set(idx2, true);
                 ch1_match.append(ch1);
                 break;
@@ -12553,3 +12553,161 @@ struct CodeBlock1
         print();
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Truncatable_primes#C
+MAX_PRIME = 1000000
+primes = [True] * MAX_PRIME
+primes[0] = primes[1] = False
+
+i = 2
+while i * i < MAX_PRIME:
+    for j in range(i * i, MAX_PRIME, i):
+        primes[j] = False
+    i += 1
+    while i < MAX_PRIME and not primes[i]:
+        i += 1
+
+def left_trunc(n):
+    tens = 1
+    while tens < n:
+        tens *= 10
+
+    while n != 0:
+        if not primes[n]:
+            return False
+        tens //= 10
+        if n < tens:
+            return False
+        n %= tens
+
+    return True
+
+def right_trunc(n):
+    while n != 0:
+        if not primes[n]:
+            return False
+        n //= 10
+    return True
+
+for n in range(MAX_PRIME - 1, 0, -2):
+    if left_trunc(n):
+        print('Left:', n)
+        break
+
+for n in range(MAX_PRIME - 1, 0, -2):
+    if right_trunc(n):
+        print('Right:', n)
+        break
+===
+V MAX_PRIME = 1000000
+V primes = [1B] * MAX_PRIME
+primes[0] = primes[1] = 0B
+V i = 2
+L i * i < MAX_PRIME
+   L(j) (i * i .< MAX_PRIME).step(i)
+      primes[j] = 0B
+   i++
+   L i < MAX_PRIME & !primes[i]
+      i++
+
+F left_trunc(=n)
+   V tens = 1
+   L tens < n
+      tens *= 10
+
+   L n != 0
+      I !:primes[n]
+         R 0B
+      tens I/= 10
+      I n < tens
+         R 0B
+      n %= tens
+   R 1B
+
+F right_trunc(=n)
+   L n != 0
+      I !:primes[n]
+         R 0B
+      n I/= 10
+   R 1B
+
+L(n) (MAX_PRIME - 1 .< 0).step(-2)
+   I left_trunc(n)
+      print(‘Left: ’n)
+      L.break
+
+L(n) (MAX_PRIME - 1 .< 0).step(-2)
+   I right_trunc(n)
+      print(‘Right: ’n)
+      L.break
+===
+auto MAX_PRIME = 1000000;
+auto primes = create_array({true}) * MAX_PRIME;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _set<0>(primes, _set<1>(primes, false));
+    }
+} code_block_1;
+auto i = 2;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (i * i < MAX_PRIME) {
+            for (auto j : range_el(i * i, MAX_PRIME).step(i))
+                primes.set(j, false);
+            i++;
+            while (i < MAX_PRIME && !primes[i])
+                i++;
+        }
+    }
+} code_block_2;
+
+template <typename T1> auto left_trunc(T1 n)
+{
+    auto tens = 1;
+    while (tens < n)
+        tens *= 10;
+
+    while (n != 0) {
+        if (!::primes[n])
+            return false;
+        tens = idiv(tens, 10);
+        if (n < tens)
+            return false;
+        n %= tens;
+    }
+    return true;
+}
+
+template <typename T1> auto right_trunc(T1 n)
+{
+    while (n != 0) {
+        if (!::primes[n])
+            return false;
+        n = idiv(n, 10);
+    }
+    return true;
+}
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        for (auto n : range_el(MAX_PRIME - 1, 0).step(-2))
+            if (left_trunc(n)) {
+                print(u"Left: "_S & n);
+                break;
+            }
+        for (auto n : range_el(MAX_PRIME - 1, 0).step(-2))
+            if (right_trunc(n)) {
+                print(u"Right: "_S & n);
+                break;
+            }
+    }
+} code_block_3;

@@ -470,7 +470,8 @@ Array<char> create_array(std::initializer_list<bool> il) // avoid using std::vec
 template <typename Type, bool include_beginning, bool include_ending> Array<Type> create_array(const Range<Type, include_beginning, include_ending> &range)
 {
 	Array<Type> r;
-	r.reserve(range.size());
+	if (range.len() > 0)
+		r.reserve(range.len());
 	for (auto i : range)
 		r.push_back(i);
 	return r;
@@ -479,7 +480,8 @@ template <typename Type, bool include_beginning, bool include_ending> Array<Type
 template <typename Type, bool include_beginning, bool include_ending> Array<Type> create_array(const RangeWithStep<Type, include_beginning, include_ending> &range)
 {
 	Array<Type> r;
-	r.reserve(range.size());
+	if (range.len() > 0)
+		r.reserve(range.len());
 	for (auto i : range)
 		r.push_back(i);
 	return r;
