@@ -3064,6 +3064,8 @@ def tokenize(source, comments : List[Tuple[int, int]] = None):
 comments : List[Tuple[int, int]] = []
 tokenize('', comments = comments)
 tokenize('', comments)
+tokenize('', comments = None)
+tokenize('', None)
 ===
 F tokenize(source, [(Int, Int)]? &comments = N)
    I comments != N
@@ -3071,6 +3073,8 @@ F tokenize(source, [(Int, Int)]? &comments = N)
 [(Int, Int)] comments
 tokenize(‘’, comments' &comments)
 tokenize(‘’, &comments)
+tokenize(‘’, comments' N)
+tokenize(‘’, N)
 ===
 template <typename T1> auto tokenize(const T1 &source, Array<ivec2>* const comments = nullptr)
 {
@@ -3085,5 +3089,7 @@ struct CodeBlock1
     {
         tokenize(u""_S, &comments);
         tokenize(u""_S, &comments);
+        tokenize(u""_S, nullptr);
+        tokenize(u""_S, nullptr);
     }
 } code_block_1;

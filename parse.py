@@ -562,13 +562,13 @@ class SymbolNode:
                                 raise Error('too many arguments for function `' + func_name + '`', self.children[0].left_to_right_token())
                             if f_node.first_named_only_argument is not None and last_function_arg >= f_node.first_named_only_argument:
                                 raise Error('argument `' + f_node.function_arguments[last_function_arg][0] + '` of function `' + func_name + '` is named-only', self.children[i+1].token)
-                            if len(f_node.function_arguments[last_function_arg]) > 3 and '&' in f_node.function_arguments[last_function_arg][3] and not (self.children[i+1].symbol.id == '&' and len(self.children[i+1].children) == 1):
+                            if len(f_node.function_arguments[last_function_arg]) > 3 and '&' in f_node.function_arguments[last_function_arg][3] and not (self.children[i+1].symbol.id == '&' and len(self.children[i+1].children) == 1) and self.children[i+1].token_str() not in ('N', 'Н', 'null', 'нуль'):
                                 raise Error('argument `' + f_node.function_arguments[last_function_arg][0] + '` of function `' + func_name + '` is in-out, but there is no `&` prefix', self.children[i+1].token)
                             if f_node.function_arguments[last_function_arg][2] == 'File?':
                                 tid = self.scope.find(self.children[i+1].token_str())
                                 if tid is None or tid.type != 'File?':
                                     res += '&'
-                            elif f_node.function_arguments[last_function_arg][2].endswith('?') and f_node.function_arguments[last_function_arg][2].startswith('['): # ] #f_node.function_arguments[last_function_arg][2] != 'Int?' and not cstr.startswith(('std::make_unique<', 'make_SharedPtr<')):
+                            elif f_node.function_arguments[last_function_arg][2].endswith('?') and f_node.function_arguments[last_function_arg][2].startswith('[') and cstr != 'nullptr': # ] #f_node.function_arguments[last_function_arg][2] != 'Int?' and not cstr.startswith(('std::make_unique<', 'make_SharedPtr<')):
                                 res += '&'
                         res += cstr
                         last_function_arg += 1
@@ -586,7 +586,7 @@ class SymbolNode:
                                 raise Error('argument `' + f_node.function_arguments[last_function_arg][0] + '` of function `' + func_name + '` has no default value, please specify its value here', self.children[i].token)
                             res += f_node.function_arguments[last_function_arg][1] + ', '
                             last_function_arg += 1
-                        if f_node.function_arguments[last_function_arg-1][2].endswith('?') and not '->' in f_node.function_arguments[last_function_arg-1][2]:
+                        if f_node.function_arguments[last_function_arg-1][2].endswith('?') and not '->' in f_node.function_arguments[last_function_arg-1][2] and self.children[i+1].token_str() not in ('N', 'Н', 'null', 'нуль'):
                             res += '&'
                         res += self.children[i+1].to_str()
                     if i < len(self.children)-2:
