@@ -12328,3 +12328,228 @@ struct CodeBlock1
         print(toposort2(data).join(u"\n"_S));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Tree_traversal#Python:_Class_based
+import collections
+
+class Node:
+    data : int
+    left : 'Node' = None
+    right : 'Node' = None
+
+    def __init__(self, data, left : 'Node' = None, right : 'Node' = None):
+        self.data = data
+        self.left = left
+        self.right = right
+
+    def preorder(self, visitor) -> None:
+        visitor(self.data)
+        if self.left is not None:
+            self.left.preorder(visitor)
+        if self.right is not None:
+            self.right.preorder(visitor)
+
+    def inorder(self, visitor) -> None:
+        if self.left is not None:
+            self.left.inorder(visitor)
+        visitor(self.data)
+        if self.right is not None:
+            self.right.inorder(visitor)
+
+    def postorder(self, visitor) -> None:
+        if self.left is not None:
+            self.left.postorder(visitor)
+        if self.right is not None:
+            self.right.postorder(visitor)
+        visitor(self.data)
+
+    def preorder2(self, d : dict, level = 0) -> None:
+        d[level].append(self.data)
+        if self.left is not None:
+            self.left.preorder2(d, level + 1)
+        if self.right is not None:
+            self.right.preorder2(d, level + 1)
+
+    def levelorder(self, visitor):
+        d : DefaultDict[int, List[int]] = collections.defaultdict(list)
+        self.preorder2(d)
+        for k in sorted(d.keys()):
+            for v in d[k]:
+                visitor(v)
+
+tree = Node(1,
+            Node(2,
+                 Node(4,
+                      Node(7, None, None),
+                      None),
+                 Node(5, None, None)),
+            Node(3,
+                 Node(6,
+                      Node(8, None, None),
+                      Node(9, None, None)),
+                 None))
+
+def printwithspace(i : int):
+    print('%i ' % i, end = '')
+
+print('  preorder: ', end = '')
+tree.preorder(printwithspace)
+print()
+print('   inorder: ', end = '')
+tree.inorder(printwithspace)
+print()
+print(' postorder: ', end = '')
+tree.postorder(printwithspace)
+print()
+print('levelorder: ', end = '')
+tree.levelorder(printwithspace)
+print()
+===
+//import collections
+
+T Node
+   Int data
+   Node? left
+   Node? right
+
+   F (data, Node? left = N, Node? right = N)
+      .data = data
+      .left = left
+      .right = right
+
+   F preorder(visitor) -> N
+      visitor(.data)
+      I .left != N
+         .left.preorder(visitor)
+      I .right != N
+         .right.preorder(visitor)
+
+   F inorder(visitor) -> N
+      I .left != N
+         .left.inorder(visitor)
+      visitor(.data)
+      I .right != N
+         .right.inorder(visitor)
+
+   F postorder(visitor) -> N
+      I .left != N
+         .left.postorder(visitor)
+      I .right != N
+         .right.postorder(visitor)
+      visitor(.data)
+
+   F preorder2(&d, level = 0) -> N
+      d[level].append(.data)
+      I .left != N
+         .left.preorder2(d, level + 1)
+      I .right != N
+         .right.preorder2(d, level + 1)
+
+   F levelorder(visitor)
+      DefaultDict[Int, [Int]] d
+      .preorder2(&d)
+      L(k) sorted(d.keys())
+         L(v) d[k]
+            visitor(v)
+V tree = Node(1, Node(2, Node(4, Node(7, N, N), N), Node(5, N, N)), Node(3, Node(6, Node(8, N, N), Node(9, N, N)), N))
+
+F printwithspace(Int i)
+   print(‘#. ’.format(i), end' ‘’)
+print(‘  preorder: ’, end' ‘’)
+tree.preorder(printwithspace)
+print()
+print(‘   inorder: ’, end' ‘’)
+tree.inorder(printwithspace)
+print()
+print(‘ postorder: ’, end' ‘’)
+tree.postorder(printwithspace)
+print()
+print(‘levelorder: ’, end' ‘’)
+tree.levelorder(printwithspace)
+print()
+===
+class Node
+{
+public:
+    int data;
+    std::unique_ptr<Node> left;
+    std::unique_ptr<Node> right;
+
+    template <typename T1> Node(const T1 &data, std::unique_ptr<Node> left = nullptr, std::unique_ptr<Node> right = nullptr) :
+        data(data),
+        left(std::move(left)),
+        right(std::move(right))
+    {
+    }
+
+    template <typename T1> void preorder(const T1 &visitor)
+    {
+        visitor(data);
+        if (left != nullptr)
+            left->preorder(visitor);
+        if (right != nullptr)
+            right->preorder(visitor);
+    }
+
+    template <typename T1> void inorder(const T1 &visitor)
+    {
+        if (left != nullptr)
+            left->inorder(visitor);
+        visitor(data);
+        if (right != nullptr)
+            right->inorder(visitor);
+    }
+
+    template <typename T1> void postorder(const T1 &visitor)
+    {
+        if (left != nullptr)
+            left->postorder(visitor);
+        if (right != nullptr)
+            right->postorder(visitor);
+        visitor(data);
+    }
+
+    template <typename T1, typename T2 = decltype(0)> void preorder2(T1 &d, const T2 &level = 0)
+    {
+        d[level].append(data);
+        if (left != nullptr)
+            left->preorder2(d, level + 1);
+        if (right != nullptr)
+            right->preorder2(d, level + 1);
+    }
+
+    template <typename T1> auto levelorder(const T1 &visitor)
+    {
+        DefaultDict<int, Array<int>> d;
+        preorder2(d);
+        for (auto &&k : sorted(d.keys()))
+            for (auto &&v : d[k])
+                visitor(v);
+    }
+};
+auto tree = std::make_unique<Node>(1, std::make_unique<Node>(2, std::make_unique<Node>(4, std::make_unique<Node>(7, nullptr, nullptr), nullptr), std::make_unique<Node>(5, nullptr, nullptr)), std::make_unique<Node>(3, std::make_unique<Node>(6, std::make_unique<Node>(8, nullptr, nullptr), std::make_unique<Node>(9, nullptr, nullptr)), nullptr));
+
+auto printwithspace(const int i)
+{
+    print(u"#. "_S.format(i), u""_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"  preorder: "_S, u""_S);
+        tree->preorder(printwithspace);
+        print();
+        print(u"   inorder: "_S, u""_S);
+        tree->inorder(printwithspace);
+        print();
+        print(u" postorder: "_S, u""_S);
+        tree->postorder(printwithspace);
+        print();
+        print(u"levelorder: "_S, u""_S);
+        tree->levelorder(printwithspace);
+        print();
+    }
+} code_block_1;

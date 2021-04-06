@@ -568,7 +568,7 @@ class SymbolNode:
                                 tid = self.scope.find(self.children[i+1].token_str())
                                 if tid is None or tid.type != 'File?':
                                     res += '&'
-                            elif f_node.function_arguments[last_function_arg][2].endswith('?') and f_node.function_arguments[last_function_arg][2] != 'Int?' and not cstr.startswith(('std::make_unique<', 'make_SharedPtr<')):
+                            elif f_node.function_arguments[last_function_arg][2].endswith('?') and f_node.function_arguments[last_function_arg][2].startswith('['): # ] #f_node.function_arguments[last_function_arg][2] != 'Int?' and not cstr.startswith(('std::make_unique<', 'make_SharedPtr<')):
                                 res += '&'
                         res += cstr
                         last_function_arg += 1

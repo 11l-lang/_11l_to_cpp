@@ -3055,3 +3055,35 @@ struct CodeBlock1
         print(u"Important Colours: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
     }
 } code_block_1;
+
+
+def tokenize(source, comments : List[Tuple[int, int]] = None):
+    if comments is not None:
+        comments.append((10, 20))
+
+comments : List[Tuple[int, int]] = []
+tokenize('', comments = comments)
+tokenize('', comments)
+===
+F tokenize(source, [(Int, Int)]? &comments = N)
+   I comments != N
+      comments.append((10, 20))
+[(Int, Int)] comments
+tokenize(‘’, comments' &comments)
+tokenize(‘’, &comments)
+===
+template <typename T1> auto tokenize(const T1 &source, Array<ivec2>* const comments = nullptr)
+{
+    if (comments != nullptr)
+        comments->append(make_tuple(10, 20));
+}
+Array<ivec2> comments;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        tokenize(u""_S, &comments);
+        tokenize(u""_S, &comments);
+    }
+} code_block_1;
