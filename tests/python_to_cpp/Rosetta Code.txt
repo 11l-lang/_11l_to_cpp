@@ -12711,3 +12711,35 @@ struct CodeBlock3
             }
     }
 } code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Truncate_a_file#Python
+import os
+
+def truncate_file(name, length):
+    if not os.path.isfile(name):
+        return False
+    if length >= os.path.getsize(name):
+        return False
+    os.truncate(name, length)
+    return True
+===
+//import os
+
+F truncate_file(name, length)
+   I !fs:is_file(name)
+      R 0B
+   I length >= fs:file_size(name)
+      R 0B
+   fs:resize_file(name, length)
+   R 1B
+===
+template <typename T1, typename T2> auto truncate_file(const T1 &name, const T2 &length)
+{
+    if (!fs::is_file(name))
+        return false;
+    if (length >= fs::file_size(name))
+        return false;
+    fs::resize_file(name, length);
+    return true;
+}

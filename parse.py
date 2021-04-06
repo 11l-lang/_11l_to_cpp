@@ -3175,6 +3175,7 @@ module_scope.add_function('is_dir', ASTFunctionDefinition([('path', '', 'String'
 module_scope.add_function('is_file', ASTFunctionDefinition([('path', '', 'String')]))
 module_scope.add_function('is_symlink', ASTFunctionDefinition([('path', '', 'String')]))
 module_scope.add_function('file_size', ASTFunctionDefinition([('path', '', 'String')]))
+module_scope.add_function('resize_file', ASTFunctionDefinition([('path', '', 'String'), ('new_size', '', 'Int')]))
 module_scope.add_function('create_dir', ASTFunctionDefinition([('path', '', 'String')]))
 module_scope.add_function('create_dirs', ASTFunctionDefinition([('path', '', 'String')]))
 module_scope.add_function('remove_file', ASTFunctionDefinition([('path', '', 'String')]))

@@ -120,6 +120,11 @@ inline uintmax_t file_size(const String &path)
 	return std::filesystem::file_size((std::u16string&)path);
 }
 
+inline void resize_file(const String &path, uintmax_t new_size)
+{
+	std::filesystem::resize_file((std::u16string&)path, new_size);
+}
+
 inline bool create_dir(const String &path)
 {
 	return std::filesystem::create_directory((std::u16string&)path);
