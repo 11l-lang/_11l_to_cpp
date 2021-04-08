@@ -1259,3 +1259,23 @@ struct CodeBlock1
         j = *i;
     }
 } code_block_1;
+
+
+F gnomesort(&a)
+   R a
+print(gnomesort(&[3, 4, 2, 5, 1, 6]))
+print(gnomesort(a' &[3, 4, 2, 5, 1, 6]))
+===
+template <typename T1> auto gnomesort(T1 &a)
+{
+    return a;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(gnomesort(make_ref(create_array({3, 4, 2, 5, 1, 6}))));
+        print(gnomesort(make_ref(create_array({3, 4, 2, 5, 1, 6}))));
+    }
+} code_block_1;

@@ -109,6 +109,37 @@ public:
 	      Ty &operator*()       {if (!has_value) throw NullPointerException(); return value;}
 };
 
+/*template <class Ty> class OptionalMutableArgument
+{
+	Ty object, *p;
+public:
+	OptionalMutableArgument(nullptr_t) : p(&object) {}
+	OptionalMutableArgument(Ty &ref) : p(&ref) {}
+//	OptionalMutableArgument(const Ty &ref) : p(&const_cast<Ty&>(ref)) {}
+
+	const Ty &operator*() const {return *p;}
+	      Ty &operator*()       {return *p;}
+};*/
+
+/*template <class Ty> class MutableArgument
+{
+	Ty *p;
+public:
+//	MutableArgument(nullptr_t) : p(&object) {}
+	MutableArgument(Ty &ref) : p(&ref) {}
+	MutableArgument(const Ty &ref) : p(&const_cast<Ty&>(ref)) {}
+
+	const Ty &operator*() const {return *p;}
+	      Ty &operator*()       {return *p;}
+
+	Ty *operator->() const {return p;}
+};*/
+
+template <typename Ty> Ty &make_ref(const Ty &cref)
+{
+	return const_cast<Ty&>(cref);
+}
+
 typedef long long Int64; // this is needed because in GCC `int64_t` is `long` in 64-bit mode
 typedef unsigned long long UInt64;
 #ifdef INT_IS_INT64

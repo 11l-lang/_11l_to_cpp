@@ -2584,7 +2584,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(gnomesort(create_array({3, 4, 2, 5, 1, 6})));
+        print(gnomesort(make_ref(create_array({3, 4, 2, 5, 1, 6}))));
     }
 } code_block_1;
 
@@ -3352,7 +3352,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(strand_sort(create_array({1, 6, 3, 2, 1, 7, 5, 3})));
+        print(strand_sort(make_ref(create_array({1, 6, 3, 2, 1, 7, 5, 3}))));
     }
 } code_block_1;
 
@@ -4451,7 +4451,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        subleq(create_array({15, 17, -1, 17, -1, -1, 16, 1, -1, 16, 3, -1, 15, 15, 0, 0, -1, 72, 101, 108, 108, 111, 44, 32, 119, 111, 114, 108, 100, 33, 10, 0}));
+        subleq(make_ref(create_array({15, 17, -1, 17, -1, -1, 16, 1, -1, 16, 3, -1, 15, 15, 0, 0, -1, 72, 101, 108, 108, 111, 44, 32, 119, 111, 114, 108, 100, 33, 10, 0})));
     }
 } code_block_1;
 

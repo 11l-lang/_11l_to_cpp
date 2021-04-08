@@ -555,6 +555,7 @@ class SymbolNode:
                 last_function_arg = 0
                 res = func_name + '('
                 for i in range(1, len(self.children), 2):
+                    make_ref = self.children[i+1].symbol.id == '&' and len(self.children[i+1].children) == 1 and (self.children[i+1].children[0].is_list or self.children[i+1].children[0].is_dict)
                     if self.children[i] is None:
                         cstr = self.children[i+1].to_str()
                         if f_node is not None and type(f_node) == ASTFunctionDefinition:
@@ -570,7 +571,7 @@ class SymbolNode:
                                     res += '&'
                             elif f_node.function_arguments[last_function_arg][2].endswith('?') and f_node.function_arguments[last_function_arg][2].startswith('[') and cstr != 'nullptr': # ] #f_node.function_arguments[last_function_arg][2] != 'Int?' and not cstr.startswith(('std::make_unique<', 'make_SharedPtr<')):
                                 res += '&'
-                        res += cstr
+                        res += 'make_ref('*make_ref + cstr + ')'*make_ref
                         last_function_arg += 1
                     else:
                         if f_node is None or type(f_node) != ASTFunctionDefinition:
@@ -588,7 +589,7 @@ class SymbolNode:
                             last_function_arg += 1
                         if f_node.function_arguments[last_function_arg-1][2].endswith('?') and not '->' in f_node.function_arguments[last_function_arg-1][2] and self.children[i+1].token_str() not in ('N', 'Н', 'null', 'нуль'):
                             res += '&'
-                        res += self.children[i+1].to_str()
+                        res += 'make_ref('*make_ref + self.children[i+1].to_str() + ')'*make_ref
                     if i < len(self.children)-2:
                         res += ', '
 
