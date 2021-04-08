@@ -1,0 +1,1804 @@
+# https://www.rosettacode.org/wiki/Tau_function#Python
+def tau(n):
+    ans = 0
+    i = 1
+    j = 1
+    while i*i <= n:
+        if 0 == n%i:
+            ans += 1
+            j = n//i
+            if j != i:
+                ans += 1
+        i += 1
+    return ans
+
+print([tau(n) for n in range(1,101)])
+===
+F tau(n)
+   V ans = 0
+   V i = 1
+   V j = 1
+   L i * i <= n
+      I 0 == n % i
+         ans++
+         j = n I/ i
+         I j != i
+            ans++
+      i++
+   R ans
+print((1..100).map(n -> tau(n)))
+===
+template <typename T1> auto tau(const T1 &n)
+{
+    auto ans = 0;
+    auto i = 1;
+    auto j = 1;
+    while (i * i <= n) {
+        if (0 == mod(n, i)) {
+            ans++;
+            j = idiv(n, i);
+            if (j != i)
+                ans++;
+        }
+        i++;
+    }
+    return ans;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(range_ee(1, 100).map([](const auto &n){return tau(n);}));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Tau_number#Python
+from typing import List
+
+def tau(n):
+    ans = 0
+    i = 1
+    j = 1
+    while i*i <= n:
+        if 0 == n%i:
+            ans += 1
+            j = n//i
+            if j != i:
+                ans += 1
+        i += 1
+    return ans
+
+def is_tau_number(n):
+    if n <= 0:
+        return False
+    return 0 == n%tau(n)
+
+n = 1
+ans : List[int] = []
+while len(ans) < 100:
+    if is_tau_number(n):
+        ans.append(n)
+    n += 1
+print(ans)
+===
+
+F tau(n)
+   V ans = 0
+   V i = 1
+   V j = 1
+   L i * i <= n
+      I 0 == n % i
+         ans++
+         j = n I/ i
+         I j != i
+            ans++
+      i++
+   R ans
+
+F is_tau_number(n)
+   I n <= 0
+      R 0B
+   R 0 == n % tau(n)
+V n = 1
+[Int] ans
+L ans.len < 100
+   I is_tau_number(n)
+      ans.append(n)
+   n++
+print(ans)
+===
+template <typename T1> auto tau(const T1 &n)
+{
+    auto ans = 0;
+    auto i = 1;
+    auto j = 1;
+    while (i * i <= n) {
+        if (0 == mod(n, i)) {
+            ans++;
+            j = idiv(n, i);
+            if (j != i)
+                ans++;
+        }
+        i++;
+    }
+    return ans;
+}
+
+template <typename T1> auto is_tau_number(const T1 &n)
+{
+    if (n <= 0)
+        return false;
+    return 0 == mod(n, tau(n));
+}
+auto n = 1;
+Array<int> ans;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (ans.len() < 100) {
+            if (is_tau_number(n))
+                ans.append(n);
+            n++;
+        }
+        print(ans);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Temperature_conversion#Python
+k = 21.0
+print('K ', k)
+print('C ', k - 273.15)
+print('F ', k * 1.8 - 459.67)
+print('R ', k * 1.8)
+===
+V k = 21.0
+print(‘K  ’k)
+print(‘C  ’(k - 273.15))
+print(‘F  ’(k * 1.8 - 459.67))
+print(‘R  ’(k * 1.8))
+===
+auto k = 21.0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"K  "_S & k);
+        print(u"C  "_S & (k - 273.15));
+        print(u"F  "_S & (k * 1.8 - 459.67));
+        print(u"R  "_S & (k * 1.8));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Terminal_control/Clear_the_screen#Python
+import os
+os.system("cls")
+===
+//import os
+os:(‘cls’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        os::_(u"cls"_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Test_integerness#Python
+def isint(f):
+    return complex(f).imag == 0 and complex(f).real.is_integer()
+
+print([isint(f) for f in [complex(1.0), 2, (3.0+0.0j), 4.1, (3+4j), (5.6+0j)]])
+print(isint(25.000000))
+print(isint(24.999999))
+print(isint(25.000100))
+print(isint(-5e-2))
+print(isint(float('inf')))
+print(isint(5.0+0.0j))
+print(isint(5-5j))
+===
+F isint(f)
+   R Complex(f).imag == 0 & fract(Complex(f).real) == 0
+print([Complex(1.0), 2, (3.0 + 0.0i), 4.1, (3 + 4i), (5.6 + 0i)].map(f -> isint(f)))
+print(isint(25.000000))
+print(isint(24.999999))
+print(isint(25.000100))
+print(isint(-5e-2))
+print(isint(Float.infinity))
+print(isint(5.0 + 0.0i))
+print(isint(5 - 5i))
+===
+template <typename T1> auto isint(const T1 &f)
+{
+    return Complex(f).imag() == 0 && fract(Complex(f).real()) == 0;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(create_array<Complex>({Complex(1.0), 2, (3.0 + 0.0i), 4.1, (3 + 4i), (5.6 + 0i)}).map([](const auto &f){return isint(f);}));
+        print(isint(25.000000));
+        print(isint(24.999999));
+        print(isint(25.000100));
+        print(isint(-5e-2));
+        print(isint(std::numeric_limits<double>::infinity()));
+        print(isint(5.0 + 0.0i));
+        print(isint(5 - 5i));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Text_between#Python
+import sys
+
+def textBetween( thisText, startString, endString ):
+    try:
+        startIndex : int
+        if startString == 'start':
+            startIndex = 0
+        else:
+            startIndex = thisText.index( startString )
+
+        if not (startIndex >= 0):
+            return 'Start delimiter not found'
+        else:
+            if startString != 'start':
+                startIndex = startIndex + len( startString )
+
+        returnText = thisText[startIndex:]
+
+        if endString == 'end':
+            return returnText
+        else:
+            endIndex = returnText.index( endString )
+
+            if not (endIndex >= 0):
+                return 'End delimiter not found'
+            else:
+                returnText = returnText[:endIndex]
+
+        return returnText
+
+    except ValueError:
+        return "Value error"
+
+if __name__ == '__main__':
+    thisText    = sys.argv[1]
+    startString = sys.argv[2]
+    endString   = sys.argv[3]
+    print(textBetween(thisText, startString, endString))
+===
+//import sys
+
+F textBetween(thisText, startString, endString)
+   X.try
+      Int startIndex
+      I startString == ‘start’
+         startIndex = 0
+      E
+         startIndex = thisText.index(startString)
+
+      I !(startIndex >= 0)
+         R ‘Start delimiter not found’
+      E
+         I startString != ‘start’
+            startIndex = startIndex + startString.len
+      V returnText = thisText[startIndex ..]
+
+      I endString == ‘end’
+         R returnText
+      E
+         V endIndex = returnText.index(endString)
+
+         I !(endIndex >= 0)
+            R ‘End delimiter not found’
+         E
+            returnText = returnText[0 .< endIndex]
+      R returnText
+
+   X.catch ValueError
+      R ‘Value error’
+
+:start:
+V thisText = :argv[1]
+V startString = :argv[2]
+V endString = :argv[3]
+print(textBetween(thisText, startString, endString))
+===
+Array<String> argv;
+
+template <typename T1, typename T2, typename T3> auto textBetween(const T1 &thisText, const T2 &startString, const T3 &endString)
+{
+    try
+    {
+        int startIndex;
+        if (startString == u"start")
+            startIndex = 0;
+        else
+            startIndex = thisText.index(startString);
+        if (!(startIndex >= 0))
+            return u"Start delimiter not found"_S;
+        else
+            if (startString != u"start")
+                startIndex = startIndex + startString.len();
+        auto returnText = thisText[range_ei(startIndex)];
+        if (endString == u"end")
+            return returnText;
+        else {
+            auto endIndex = returnText.index(endString);
+            if (!(endIndex >= 0))
+                return u"End delimiter not found"_S;
+            else
+                returnText = returnText[range_el(0, endIndex)];
+        }
+        return returnText;
+    }
+
+    catch (const ValueError&)
+    {
+        return u"Value error"_S;
+    }
+}
+
+int MAIN_WITH_ARGV()
+{
+    INIT_ARGV();
+
+    auto thisText = _get<1>(::argv);
+    auto startString = _get<2>(::argv);
+    auto endString = _get<3>(::argv);
+    print(textBetween(thisText, startString, endString));
+}
+
+
+# https://www.rosettacode.org/wiki/Text_processing/Max_licenses_in_use#Python
+from typing import List
+
+out = 0
+max_out = -1
+max_times : List[str] = []
+for job in open('mlijobs.txt').readlines():
+    out += 1 if "OUT" in job else -1
+    if out > max_out:
+        max_out = out
+        max_times.clear()
+    if out == max_out:
+        max_times.append(job.split(' ')[3])
+
+print("Maximum simultaneous license use is %i at the following times:" % max_out)
+print('  ' + '\n  '.join(max_times))
+===
+V out = 0
+V max_out = -1
+[String] max_times
+L(job) File(‘mlijobs.txt’).read_lines(1B)
+   out += I ‘OUT’ C job {1} E -1
+   I out > max_out
+      max_out = out
+      max_times.clear()
+   I out == max_out
+      max_times.append(job.split(‘ ’)[3])
+print(‘Maximum simultaneous license use is #. at the following times:’.format(max_out))
+print(‘  ’max_times.join("\n  "))
+===
+auto out = 0;
+auto max_out = -1;
+Array<String> max_times;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&job : File(u"mlijobs.txt"_S).read_lines(true)) {
+            out += in(u"OUT"_S, job) ? 1 : -1;
+            if (out > max_out) {
+                max_out = out;
+                max_times.clear();
+            }
+            if (out == max_out)
+                max_times.append(_get<3>(job.split(u" "_S)));
+        }
+        print(u"Maximum simultaneous license use is #. at the following times:"_S.format(max_out));
+        print(u"  "_S & max_times.join(u"\n  "_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Thiele%27s_interpolation_formula#Python
+import math
+
+def thieleInterpolator(x, y, val):
+    ρ = [[yi]*(len(y)-i) for i, yi in enumerate(y)]
+    for i in range(len(ρ)-1):
+        ρ[i][1] = (x[i] - x[i+1]) / (ρ[i][0] - ρ[i+1][0])
+    for i in range(2, len(ρ)):
+        for j in range(len(ρ)-i):
+            ρ[j][i] = (x[j]-x[j+i]) / (ρ[j][i-1]-ρ[j+1][i-1]) + ρ[j+1][i-2]
+    ρ0 = ρ[0]
+    def t(xin):
+        a = 0.0
+        for i in range(len(ρ0)-1, 1, -1):
+            a = (xin - x[i-1]) / (ρ0[i] - ρ0[i-2] + a)
+        return y[0] + (xin-x[0]) / (ρ0[1]+a)
+    return t(val)
+
+# task 1: build 32 row trig table
+xVal = [i*0.05 for i in range(32)]
+tSin = [math.sin(x) for x in xVal]
+tCos = [math.cos(x) for x in xVal]
+tTan = [math.tan(x) for x in xVal]
+# task 2: define inverses
+iSin = thieleInterpolator(tSin, xVal, 0.5)
+iCos = thieleInterpolator(tCos, xVal, 0.5)
+iTan = thieleInterpolator(tTan, xVal, 1)
+# task 3: demonstrate identities
+print('%16.14f' % (6*iSin))
+print('%16.14f' % (3*iCos))
+print('%16.14f' % (4*iTan))
+===
+//import math
+
+F thieleInterpolator(x, y, val)
+   V ρ = enumerate(y).map((i, yi) -> [yi] * (@y.len - i))
+   L(i) 0 .< ρ.len - 1
+      ρ[i][1] = (x[i] - x[i + 1]) / (ρ[i][0] - ρ[i + 1][0])
+   L(i) 2 .< ρ.len
+      L(j) 0 .< ρ.len - i
+         ρ[j][i] = (x[j] - x[j + i]) / (ρ[j][i - 1] - ρ[j + 1][i - 1]) + ρ[j + 1][i - 2]
+   V ρ0 = ρ[0]
+   F t(xin)
+      V a = 0.0
+      L(i) (@ρ0.len - 1 .< 1).step(-1)
+         a = (xin - @x[i - 1]) / (@ρ0[i] - @ρ0[i - 2] + a)
+      R @y[0] + (xin - @x[0]) / (@ρ0[1] + a)
+   R t(val)
+V xVal = (0.<32).map(i -> i * 0.05)
+V tSin = xVal.map(x -> sin(x))
+V tCos = xVal.map(x -> cos(x))
+V tTan = xVal.map(x -> tan(x))
+V iSin = thieleInterpolator(tSin, xVal, 0.5)
+V iCos = thieleInterpolator(tCos, xVal, 0.5)
+V iTan = thieleInterpolator(tTan, xVal, 1)
+print(‘#.14’.format(6 * iSin))
+print(‘#.14’.format(3 * iCos))
+print(‘#.14’.format(4 * iTan))
+===
+template <typename T1, typename T2, typename T3> auto thieleInterpolator(const T1 &x, const T2 &y, const T3 &val)
+{
+    auto ρ = enumerate(y).map([&y](const auto &i, const auto &yi){return create_array({yi}) * (y.len() - i);});
+    for (auto i : range_el(0, ρ.len() - 1))
+        _set<1>(ρ[i], (x[i] - x[i + 1]) / (_get<0>(ρ[i]) - _get<0>(ρ[i + 1])));
+    for (auto i : range_el(2, ρ.len()))
+        for (auto j : range_el(0, ρ.len() - i))
+            ρ[j].set(i, (x[j] - x[j + i]) / (ρ[j][i - 1] - ρ[j + 1][i - 1]) + ρ[j + 1][i - 2]);
+    auto ρ0 = _get<0>(ρ);
+    auto t = [&x, &y, &ρ0](const auto &xin)
+    {
+        auto a = 0.0;
+        for (auto i : range_el(ρ0.len() - 1, 1).step(-1))
+            a = (xin - x[i - 1]) / (ρ0[i] - ρ0[i - 2] + a);
+        return _get<0>(y) + (xin - _get<0>(x)) / (_get<1>(ρ0) + a);
+    };
+    return t(val);
+}
+auto xVal = range_el(0, 32).map([](const auto &i){return i * 0.05;});
+auto tSin = xVal.map([](const auto &x){return sin(x);});
+auto tCos = xVal.map([](const auto &x){return cos(x);});
+auto tTan = xVal.map([](const auto &x){return tan(x);});
+auto iSin = thieleInterpolator(tSin, xVal, 0.5);
+auto iCos = thieleInterpolator(tCos, xVal, 0.5);
+auto iTan = thieleInterpolator(tTan, xVal, 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"#.14"_S.format(6 * iSin));
+        print(u"#.14"_S.format(3 * iCos));
+        print(u"#.14"_S.format(4 * iTan));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Thue-Morse#Python:_By_counting_set_ones_in_binary_representation
+def thue_morse_digits(digits):
+    return  [bin(n).count('1') % 2 for n in range(digits)]
+
+print(thue_morse_digits(20))
+===
+F thue_morse_digits(digits)
+   R (0 .< digits).map(n -> bin(n).count(‘1’) % 2)
+print(thue_morse_digits(20))
+===
+template <typename T1> auto thue_morse_digits(const T1 &digits)
+{
+    return range_el(0, digits).map([](const auto &n){return mod(bin(n).count(u"1"_S), 2);});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(thue_morse_digits(20));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Time_a_function#Nim
+import time
+
+def do_work(x):
+    n = x
+    for i in range(10000000):
+        n += i
+    return n
+
+def time_func(f):
+    start = time.perf_counter()
+    f()
+    return time.perf_counter() - start
+
+print(time_func(lambda: do_work(100)))
+===
+//import time
+
+F do_work(x)
+   V n = x
+   L(i) 10000000
+      n += i
+   R n
+
+F time_func(f)
+   V start = time:perf_counter()
+   f()
+   R time:perf_counter() - start
+print(time_func(() -> do_work(100)))
+===
+template <typename T1> auto do_work(const T1 &x)
+{
+    auto n = x;
+    for (int i = 0; i < 10000000; i++)
+        n += i;
+    return n;
+}
+
+template <typename T1> auto time_func(const T1 &f)
+{
+    auto start = timens::perf_counter();
+    f();
+    return timens::perf_counter() - start;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(time_func([](){return do_work(100);}));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Tokenize_a_string#Python
+text = "Hello,How,Are,You,Today"
+tokens = text.split(',')
+print ('.'.join(tokens))
+===
+V text = ‘Hello,How,Are,You,Today’
+V tokens = text.split(‘,’)
+print(tokens.join(‘.’))
+===
+auto text = u"Hello,How,Are,You,Today"_S;
+auto tokens = text.split(u","_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(tokens.join(u"."_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Tokenize_a_string_with_escaping#Python
+def token_with_escape(a, escape = '^', separator = '|'):
+    result : List[str] = []
+    token = ''
+    state = 0
+    for c in a:
+        if state == 0:
+            if c == escape:
+                state = 1
+            elif c == separator:
+                result.append(token)
+                token = ''
+            else:
+                token += c
+        elif state == 1:
+            token += c
+            state = 0
+    result.append(token)
+    return result
+
+print(', '.join("'"+s+"'" for s in token_with_escape('one^|uno||three^^^^|four^^^|^cuatro|')))
+===
+F token_with_escape(a, escape = ‘^’, separator = ‘|’)
+   [String] result
+   V token = ‘’
+   V state = 0
+   L(c) a
+      I state == 0
+         I c == escape
+            state = 1
+         E I c == separator
+            result.append(token)
+            token = ‘’
+         E
+            token ‘’= c
+      E I state == 1
+         token ‘’= c
+         state = 0
+   result.append(token)
+   R result
+print(token_with_escape(‘one^|uno||three^^^^|four^^^|^cuatro|’).map(s -> ‘'’s‘'’).join(‘, ’))
+===
+template <typename T1, typename T2 = decltype(u"^"_S), typename T3 = decltype(u"|"_S)> auto token_with_escape(const T1 &a, const T2 &escape = u"^"_S, const T3 &separator = u"|"_S)
+{
+    Array<String> result;
+    auto token = u""_S;
+    auto state = 0;
+    for (auto &&c : a)
+        if (state == 0) {
+            if (c == escape)
+                state = 1;
+            else if (c == separator) {
+                result.append(token);
+                token = u""_S;
+            }
+            else
+                token &= c;
+        }
+        else if (state == 1) {
+            token &= c;
+            state = 0;
+        }
+    result.append(token);
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(token_with_escape(u"one^|uno||three^^^^|four^^^|^cuatro|"_S).map([](const auto &s){return u"'"_S & s & u"'"_S;}).join(u", "_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Topswops#Python:_Faster_Version
+best = [0] * 16
+
+def try_swaps(deck : list, f, s, d, n):
+    if d > best[n]:
+        best[n] = d
+
+    i = 0
+    k = 1 << s
+    while s != 0:
+        k >>= 1
+        s -= 1
+        if deck[s] == -1 or deck[s] == s:
+            break
+        i |= k
+        if (i & f) == i and d + best[s] <= best[n]:
+            return d
+    s += 1
+
+    deck2 = deck[:]
+    k = 1
+    for i2 in range(1, s):
+        k <<= 1
+        if deck2[i2] == -1:
+            if (f & k) != 0: continue
+        elif deck2[i2] != i2:
+            continue
+
+        deck[i2] = i2
+        #deck2[:i2 + 1] = reversed(deck[:i2 + 1])
+        for j in range(i2 + 1):
+            deck2[j] = deck[i2 - j]
+        try_swaps(deck2, f | k, s, 1 + d, n)
+
+def topswops(n):
+    best[n] = 0
+    deck0 = [-1] * 16
+    deck0[0] = 0
+    try_swaps(deck0, 1, n, 0, n)
+    return best[n]
+
+for i in range(1, 13):
+    print("%2d: %d" % (i, topswops(i)))
+===
+V best = [0] * 16
+
+F try_swaps(&deck, f, =s, d, n)
+   I d > :best[n]
+      :best[n] = d
+   V i = 0
+   V k = 1 << s
+   L s != 0
+      k >>= 1
+      s--
+      I deck[s] == -1 | deck[s] == s
+         L.break
+      i [|]= k
+      I (i [&] f) == i & d + :best[s] <= :best[n]
+         R d
+   s++
+   V deck2 = copy(deck)
+   k = 1
+   L(i2) 1 .< s
+      k <<= 1
+      I deck2[i2] == -1
+         I (f [&] k) != 0
+            L.continue
+      E I deck2[i2] != i2
+         L.continue
+      deck[i2] = i2
+
+      L(j) 0 .. i2
+         deck2[j] = deck[i2 - j]
+      try_swaps(&deck2, f [|] k, s, 1 + d, n)
+
+F topswops(n)
+   :best[n] = 0
+   V deck0 = [-1] * 16
+   deck0[0] = 0
+   try_swaps(&deck0, 1, n, 0, n)
+   R :best[n]
+
+L(i) 1..12
+   print(‘#2: #.’.format(i, topswops(i)))
+===
+auto best = create_array({0}) * 16;
+
+template <typename T1, typename T2, typename T3, typename T4, typename T5> auto try_swaps(T1 &deck, const T2 &f, T3 s, const T4 &d, const T5 &n)
+{
+    if (d > ::best[n])
+        ::best.set(n, d);
+    auto i = 0;
+    auto k = 1 << s;
+    while (s != 0) {
+        k >>= 1;
+        s--;
+        if (deck[s] == -1 || deck[s] == s)
+            break;
+        i |= k;
+        if ((i & f) == i && d + ::best[s] <= ::best[n])
+            return d;
+    }
+    s++;
+    auto deck2 = copy(deck);
+    k = 1;
+    for (auto i2 : range_el(1, s)) {
+        k <<= 1;
+        if (deck2[i2] == -1) {
+            if ((f & k) != 0)
+                continue;
+        }
+        else if (deck2[i2] != i2)
+            continue;
+        deck.set(i2, i2);
+        for (auto j : range_ee(0, i2))
+            deck2.set(j, deck[i2 - j]);
+        try_swaps(deck2, f | k, s, 1 + d, n);
+    }
+}
+
+template <typename T1> auto topswops(const T1 &n)
+{
+    ::best.set(n, 0);
+    auto deck0 = create_array({-1}) * 16;
+    _set<0>(deck0, 0);
+    try_swaps(deck0, 1, n, 0, n);
+    return ::best[n];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(1, 12))
+            print(u"#2: #."_S.format(i, topswops(i)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Total_circles_area#Python
+class Circle:
+    x : float
+    y : float
+    r : float
+    def __init__(self, x, y, r):
+        self.x = x
+        self.y = y
+        self.r = r
+
+circles = [
+    Circle( 1.6417233788,  1.6121789534, 0.0848270516),
+    Circle(-1.4944608174,  1.2077959613, 1.1039549836),
+    Circle( 0.6110294452, -0.6907087527, 0.9089162485),
+    Circle( 0.3844862411,  0.2923344616, 0.2375743054),
+    Circle(-0.2495892950, -0.3832854473, 1.0845181219),
+    Circle( 1.7813504266,  1.6178237031, 0.8162655711),
+    Circle(-0.1985249206, -0.8343333301, 0.0538864941),
+    Circle(-1.7011985145, -0.1263820964, 0.4776976918),
+    Circle(-0.4319462812,  1.4104420482, 0.7886291537),
+    Circle( 0.2178372997, -0.9499557344, 0.0357871187),
+    Circle(-0.6294854565, -1.3078893852, 0.7653357688),
+    Circle( 1.7952608455,  0.6281269104, 0.2727652452),
+    Circle( 1.4168575317,  1.0683357171, 1.1016025378),
+    Circle( 1.4637371396,  0.9463877418, 1.1846214562),
+    Circle(-0.5263668798,  1.7315156631, 1.4428514068),
+    Circle(-1.2197352481,  0.9144146579, 1.0727263474),
+    Circle(-0.1389358881,  0.1092805780, 0.7350208828),
+    Circle( 1.5293954595,  0.0030278255, 1.2472867347),
+    Circle(-0.5258728625,  1.3782633069, 1.3495508831),
+    Circle(-0.1403562064,  0.2437382535, 1.3804956588),
+    Circle( 0.8055826339, -0.0482092025, 0.3327165165),
+    Circle(-0.6311979224,  0.7184578971, 0.2491045282),
+    Circle( 1.4685857879, -0.8347049536, 1.3670667538),
+    Circle(-0.6855727502,  1.6465021616, 1.0593087096),
+    Circle( 0.0152957411,  0.0638919221, 0.9771215985)]
+
+# compute the bounding box of the circles
+x_min = min(c.x - c.r for c in circles)
+x_max = max(c.x + c.r for c in circles)
+y_min = min(c.y - c.r for c in circles)
+y_max = max(c.y + c.r for c in circles)
+
+box_side = 500
+
+dx = (x_max - x_min) / box_side
+dy = (y_max - y_min) / box_side
+
+count = 0
+
+for r in range(box_side):
+    y = y_min + r * dy
+    for c in range(box_side):
+        x = x_min + c * dx
+        if any((x-circle.x)**2 + (y-circle.y)**2 <= (circle.r ** 2)
+               for circle in circles):
+            count += 1
+
+print("Approximated area:", count * dx * dy)
+===
+T Circle
+   Float x
+   Float y
+   Float r
+   F (x, y, r)
+      .x = x
+      .y = y
+      .r = r
+V circles = [Circle(1.6417233788, 1.6121789534, 0.0848270516), Circle(-1.4944608174, 1.2077959613, 1.1039549836), Circle(0.6110294452, -0.6907087527, 0.9089162485), Circle(0.3844862411, 0.2923344616, 0.2375743054), Circle(-0.2495892950, -0.3832854473, 1.0845181219), Circle(1.7813504266, 1.6178237031, 0.8162655711), Circle(-0.1985249206, -0.8343333301, 0.0538864941), Circle(-1.7011985145, -0.1263820964, 0.4776976918), Circle(-0.4319462812, 1.4104420482, 0.7886291537), Circle(0.2178372997, -0.9499557344, 0.0357871187), Circle(-0.6294854565, -1.3078893852, 0.7653357688), Circle(1.7952608455, 0.6281269104, 0.2727652452), Circle(1.4168575317, 1.0683357171, 1.1016025378), Circle(1.4637371396, 0.9463877418, 1.1846214562), Circle(-0.5263668798, 1.7315156631, 1.4428514068), Circle(-1.2197352481, 0.9144146579, 1.0727263474), Circle(-0.1389358881, 0.1092805780, 0.7350208828), Circle(1.5293954595, 0.0030278255, 1.2472867347), Circle(-0.5258728625, 1.3782633069, 1.3495508831), Circle(-0.1403562064, 0.2437382535, 1.3804956588), Circle(0.8055826339, -0.0482092025, 0.3327165165), Circle(-0.6311979224, 0.7184578971, 0.2491045282), Circle(1.4685857879, -0.8347049536, 1.3670667538), Circle(-0.6855727502, 1.6465021616, 1.0593087096), Circle(0.0152957411, 0.0638919221, 0.9771215985)]
+V x_min = min(circles.map(c -> c.x - c.r))
+V x_max = max(circles.map(c -> c.x + c.r))
+V y_min = min(circles.map(c -> c.y - c.r))
+V y_max = max(circles.map(c -> c.y + c.r))
+V box_side = 500
+V dx = (x_max - x_min) / box_side
+V dy = (y_max - y_min) / box_side
+V count = 0
+
+L(r) 0 .< box_side
+   V y = y_min + r * dy
+   L(c) 0 .< box_side
+      V x = x_min + c * dx
+      I any(circles.map(circle -> (@x - circle.x) ^ 2 + (@y - circle.y) ^ 2 <= (circle.r ^ 2)))
+         count++
+print(‘Approximated area: ’(count * dx * dy))
+===
+class Circle
+{
+public:
+    double x;
+    double y;
+    double r;
+    template <typename T1, typename T2, typename T3> Circle(const T1 &x, const T2 &y, const T3 &r) :
+        x(x),
+        y(y),
+        r(r)
+    {
+    }
+};
+auto circles = create_array<Circle>({Circle(1.6417233788, 1.6121789534, 0.0848270516), Circle(-1.4944608174, 1.2077959613, 1.1039549836), Circle(0.6110294452, -0.6907087527, 0.9089162485), Circle(0.3844862411, 0.2923344616, 0.2375743054), Circle(-0.2495892950, -0.3832854473, 1.0845181219), Circle(1.7813504266, 1.6178237031, 0.8162655711), Circle(-0.1985249206, -0.8343333301, 0.0538864941), Circle(-1.7011985145, -0.1263820964, 0.4776976918), Circle(-0.4319462812, 1.4104420482, 0.7886291537), Circle(0.2178372997, -0.9499557344, 0.0357871187), Circle(-0.6294854565, -1.3078893852, 0.7653357688), Circle(1.7952608455, 0.6281269104, 0.2727652452), Circle(1.4168575317, 1.0683357171, 1.1016025378), Circle(1.4637371396, 0.9463877418, 1.1846214562), Circle(-0.5263668798, 1.7315156631, 1.4428514068), Circle(-1.2197352481, 0.9144146579, 1.0727263474), Circle(-0.1389358881, 0.1092805780, 0.7350208828), Circle(1.5293954595, 0.0030278255, 1.2472867347), Circle(-0.5258728625, 1.3782633069, 1.3495508831), Circle(-0.1403562064, 0.2437382535, 1.3804956588), Circle(0.8055826339, -0.0482092025, 0.3327165165), Circle(-0.6311979224, 0.7184578971, 0.2491045282), Circle(1.4685857879, -0.8347049536, 1.3670667538), Circle(-0.6855727502, 1.6465021616, 1.0593087096), Circle(0.0152957411, 0.0638919221, 0.9771215985)});
+auto x_min = min(circles.map([](const auto &c){return c.x - c.r;}));
+auto x_max = max(circles.map([](const auto &c){return c.x + c.r;}));
+auto y_min = min(circles.map([](const auto &c){return c.y - c.r;}));
+auto y_max = max(circles.map([](const auto &c){return c.y + c.r;}));
+auto box_side = 500;
+auto dx = (x_max - x_min) / box_side;
+auto dy = (y_max - y_min) / box_side;
+auto count = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto r : range_el(0, box_side)) {
+            auto y = y_min + r * dy;
+            for (auto c : range_el(0, box_side)) {
+                auto x = x_min + c * dx;
+                if (any(circles.map([&x, &y](const auto &circle){return square((x - circle.x)) + square((y - circle.y)) <= (square(circle.r));})))
+                    count++;
+            }
+        }
+        print(u"Approximated area: "_S & (count * dx * dy));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Totient_function#Python
+import math
+
+def f(n):
+    return sum(1 for k in range(1, n + 1) if math.gcd(n, k) == 1)
+
+def is_prime(n):
+    return f(n) == n - 1
+
+for n in range(1, 26):
+    print(' f(%d) == %d' % (n, f(n)) + (', is prime' if is_prime(n)  else ''))
+count = 0
+for n in range(1, 10_000 + 1):
+    count += is_prime(n)
+    if n in (100, 1000, 10_000):
+        print("Primes up to %d: %d" % (n, count))
+===
+//import math
+
+F f(n)
+   R sum((1 .. n).filter(k -> gcd(@n, k) == 1).map(k -> 1))
+
+F is_prime(n)
+   R f(n) == n - 1
+
+L(n) 1..25
+   print(‘ f(#.) == #.’.format(n, f(n))‘’(I is_prime(n) {‘, is prime’} E ‘’))
+V count = 0
+L(n) 1 .. 10'000
+   count += is_prime(n)
+   I n C (100, 1000, 10'000)
+      print(‘Primes up to #.: #.’.format(n, count))
+===
+template <typename T1> auto f(const T1 &n)
+{
+    return sum_map(range_ee(1, n).filter([&n](const auto &k){return gcd(n, k) == 1;}), [](const auto &k){return 1;});
+}
+
+template <typename T1> auto is_prime(const T1 &n)
+{
+    return f(n) == n - 1;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(1, 25))
+            print(u" f(#.) == #."_S.format(n, f(n)) & (is_prime(n) ? u", is prime"_S : u""_S));
+    }
+} code_block_1;
+auto count = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto n : range_ee(1, 10'000)) {
+            count += is_prime(n);
+            if (in(n, make_tuple(100, 1000, 10'000)))
+                print(u"Primes up to #.: #."_S.format(n, count));
+        }
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Towers_of_Hanoi#Python
+def hanoi(ndisks, startPeg=1, endPeg=3) -> None:
+    if ndisks:
+        hanoi(ndisks-1, startPeg, 6-startPeg-endPeg)
+        print("Move disk %d from peg %d to peg %d" % (ndisks, startPeg, endPeg))
+        hanoi(ndisks-1, 6-startPeg-endPeg, endPeg)
+
+hanoi(ndisks=3)
+===
+F hanoi(ndisks, startPeg = 1, endPeg = 3) -> N
+   I ndisks
+      hanoi(ndisks - 1, startPeg, 6 - startPeg - endPeg)
+      print(‘Move disk #. from peg #. to peg #.’.format(ndisks, startPeg, endPeg))
+      hanoi(ndisks - 1, 6 - startPeg - endPeg, endPeg)
+hanoi(ndisks' 3)
+===
+template <typename T1, typename T2 = decltype(1), typename T3 = decltype(3)> void hanoi(const T1 &ndisks, const T2 &startPeg = 1, const T3 &endPeg = 3)
+{
+    if (ndisks) {
+        hanoi(ndisks - 1, startPeg, 6 - startPeg - endPeg);
+        print(u"Move disk #. from peg #. to peg #."_S.format(ndisks, startPeg, endPeg));
+        hanoi(ndisks - 1, 6 - startPeg - endPeg, endPeg);
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        hanoi(3);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Trabb_Pardo%E2%80%93Knuth_algorithm#Python
+import math
+
+def f(x):
+    return math.sqrt(abs(x)) + 5 * x**3
+
+s = list(range(1, 12))
+s.reverse()
+for x in s:
+    result = f(x)
+    if result > 400:
+        print('%s: %s' % (x, "TOO LARGE!"))
+    else:
+        print('%s: %s' % (x, result))
+print()
+===
+//import math
+
+F f(x)
+   R sqrt(abs(x)) + 5 * x ^ 3
+V s = Array(1..11)
+s.reverse()
+L(x) s
+   V result = f(x)
+   I result > 400
+      print(‘#.: #.’.format(x, ‘TOO LARGE!’))
+   E
+      print(‘#.: #.’.format(x, result))
+print()
+===
+template <typename T1> auto f(const T1 &x)
+{
+    return sqrt(abs(x)) + 5 * cube(x);
+}
+auto s = create_array(range_ee(1, 11));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        s.reverse();
+        for (auto &&x : s) {
+            auto result = f(x);
+            if (result > 400)
+                print(u"#.: #."_S.format(x, u"TOO LARGE!"_S));
+            else
+                print(u"#.: #."_S.format(x, result));
+        }
+        print();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Trigonometric_functions#Python
+import math
+rad = math.pi/4
+deg = 45.0
+print("Sine:", math.sin(rad), math.sin(math.radians(deg)))
+print("Cosine:", math.cos(rad), math.cos(math.radians(deg)))
+print("Tangent:", math.tan(rad), math.tan(math.radians(deg)))
+arcsine = math.asin(math.sin(rad))
+print("Arcsine:", arcsine, math.degrees(arcsine))
+arccosine = math.acos(math.cos(rad))
+print("Arccosine:", arccosine, math.degrees(arccosine))
+arctangent = math.atan(math.tan(rad))
+print("Arctangent:", arctangent, math.degrees(arctangent))
+===
+//import math
+V rad = math:pi / 4
+V deg = 45.0
+print(‘Sine: ’sin(rad)‘ ’sin(radians(deg)))
+print(‘Cosine: ’cos(rad)‘ ’cos(radians(deg)))
+print(‘Tangent: ’tan(rad)‘ ’tan(radians(deg)))
+V arcsine = asin(sin(rad))
+print(‘Arcsine: ’arcsine‘ ’degrees(arcsine))
+V arccosine = acos(cos(rad))
+print(‘Arccosine: ’arccosine‘ ’degrees(arccosine))
+V arctangent = atan(tan(rad))
+print(‘Arctangent: ’arctangent‘ ’degrees(arctangent))
+===
+auto rad = math::pi / 4.0;
+auto deg = 45.0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Sine: "_S & sin(rad) & u" "_S & sin(radians(deg)));
+        print(u"Cosine: "_S & cos(rad) & u" "_S & cos(radians(deg)));
+        print(u"Tangent: "_S & tan(rad) & u" "_S & tan(radians(deg)));
+    }
+} code_block_1;
+auto arcsine = asin(sin(rad));
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"Arcsine: "_S & arcsine & u" "_S & degrees(arcsine));
+    }
+} code_block_2;
+auto arccosine = acos(cos(rad));
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print(u"Arccosine: "_S & arccosine & u" "_S & degrees(arccosine));
+    }
+} code_block_3;
+auto arctangent = atan(tan(rad));
+
+struct CodeBlock4
+{
+    CodeBlock4()
+    {
+        print(u"Arctangent: "_S & arctangent & u" "_S & degrees(arctangent));
+    }
+} code_block_4;
+
+
+# https://www.rosettacode.org/wiki/Truth_table
+import re
+from typing import Callable, Dict, List, Optional
+
+def move(obj):
+    return obj
+
+# class T_shared_ASTNode:
+#     pass
+
+class Symbol:
+    id : str
+    lbp : int
+    nud_bp : int
+    led_bp : int
+    nud : Callable[['ASTNode'], 'ASTNode']
+    led : Callable[['ASTNode', 'ASTNode'], 'ASTNode']
+
+    def set_nud_bp(self, nud_bp, nud):
+        self.nud_bp = nud_bp
+        self.nud    = nud
+
+    def set_led_bp(self, led_bp, led):
+        self.led_bp = led_bp
+        self.led    = led
+
+class Var:
+    name : str
+    value : int
+    def __init__(self, name):
+        self.name = name
+vars : List[Var] = []
+
+class ASTNode:
+    symbol : Symbol # &
+    var_index : int
+    first_child : Optional['ASTNode'] = None
+    second_child : Optional['ASTNode'] = None
+
+    def eval(self):
+        sid = self.symbol.id
+        if sid == '(var)':
+            return vars[self.var_index].value
+        elif sid == '|':
+            return self.first_child.eval() | self.second_child.eval()
+        elif sid == '^':
+            return self.first_child.eval() ^ self.second_child.eval()
+        elif sid == '&':
+            return self.first_child.eval() & self.second_child.eval()
+        elif sid == '!':
+            return ~self.first_child.eval() & 1
+        elif sid == '(': # )
+            return self.first_child.eval()
+        else:
+            assert(False)
+            return 0
+
+symbol_table : Dict[str, Symbol] = {}
+tokens : List[str]
+tokeni = -1
+token_node : ASTNode
+
+def advance(sid = ''):
+    global token_node, tokeni
+    if sid != '':
+        assert(token_node.symbol.id == sid)
+    tokeni += 1
+    token_node = ASTNode()
+    if tokeni == len(tokens):
+        token_node.symbol = symbol_table['(end)']
+        return
+    token = tokens[tokeni]
+    if token[0].isalpha():
+        token_node.symbol = symbol_table['(var)']
+        for i, var in enumerate(vars):
+            if var.name == token:
+                token_node.var_index = i
+                break
+        else:
+            token_node.var_index = len(vars)
+            vars.append(Var(token))
+    else:
+        token_node.symbol = symbol_table[token]
+
+def expression(rbp = 0):
+    t : ASTNode = move(token_node)
+    advance()
+    left = t.symbol.nud(move(t))
+    while rbp < token_node.symbol.lbp:
+        t = move(token_node)
+        advance()
+        left = t.symbol.led(t, move(left))
+    return left
+
+def parse(expr_str) -> ASTNode:
+    global tokens, tokeni
+    tokens = re.findall(R'\s*(\w+|.)', expr_str)
+    tokeni = -1
+    vars.clear()
+    advance()
+    return expression()
+
+def symbol(id, bp = 0): # -> &
+    if id not in symbol_table: # Bool was_added
+        s = Symbol()           # V &s = :symbol_table.add(id, &was_added)
+        s.id = id              # I was_added
+        s.lbp = bp             #    s.id = id
+        symbol_table[id] = s   #    s.lbp = bp
+    return symbol_table[id]    # R s
+
+def infix(id, bp):
+    def led(self : ASTNode, left : ASTNode):
+        self.first_child = left
+        self.second_child = expression(self.symbol.led_bp)
+        return self
+    symbol(id, bp).set_led_bp(bp, led)
+
+def prefix(id, bp):
+    def nud(self : ASTNode):
+        self.first_child = expression(self.symbol.nud_bp)
+        return self
+    symbol(id).set_nud_bp(bp, nud)
+
+infix('|', 1)
+infix('^', 2)
+infix('&', 3)
+prefix('!', 4)
+
+def nud(self : ASTNode):
+    return self
+symbol('(var)').nud = nud
+symbol('(end)')
+
+def nud_parens(self : ASTNode):
+    expr = expression() # (
+    advance(')')
+    return expr
+symbol('(').nud = nud_parens
+symbol(')')
+
+for expr_str in ['!A | B', 'A ^ B', 'S | ( T ^ U )', 'A ^ (B ^ (C ^ D))']:
+    print('Boolean expression: ' + expr_str)
+    print()
+    p : ASTNode = parse(expr_str)
+    print(' '.join(var.name for var in vars) + ' : ' + expr_str)
+    for i in range(1 << len(vars)):
+        for vi, var in enumerate(vars):
+            var.value = (i >> (len(vars) - 1 - vi)) & 1
+            print(var.value, end = ' ')
+        print(':', p.eval())
+    print()
+===
+//import re
+
+T Symbol
+   String id
+   Int lbp
+   Int nud_bp
+   Int led_bp
+   (ASTNode -> ASTNode) nud
+   ((ASTNode, ASTNode) -> ASTNode) led
+
+   F set_nud_bp(nud_bp, nud)
+      .nud_bp = nud_bp
+      .nud = nud
+
+   F set_led_bp(led_bp, led)
+      .led_bp = led_bp
+      .led = led
+
+T Var
+   String name
+   Int value
+   F (name)
+      .name = name
+[Var] vars
+
+T ASTNode
+   Symbol& symbol
+   Int var_index
+   ASTNode? first_child
+   ASTNode? second_child
+
+   F eval()
+      S .symbol.id
+         ‘(var)’
+            R :vars[.var_index].value
+         ‘|’
+            R .first_child.eval() [|] .second_child.eval()
+         ‘^’
+            R .first_child.eval() (+) .second_child.eval()
+         ‘&’
+            R .first_child.eval() [&] .second_child.eval()
+         ‘!’
+            R (-).first_child.eval() [&] 1
+         ‘(’
+            R .first_child.eval()
+         E
+            assert(0B)
+            R 0
+[String = Symbol] symbol_table
+[String] tokens
+V tokeni = -1
+ASTNode token_node
+
+F advance(sid = ‘’)
+   I sid != ‘’
+      assert(:token_node.symbol.id == sid)
+   :tokeni++
+   :token_node = ASTNode()
+   I :tokeni == :tokens.len
+      :token_node.symbol = :symbol_table[‘(end)’]
+      R
+   V token = :tokens[:tokeni]
+   I token[0].is_alpha()
+      :token_node.symbol = :symbol_table[‘(var)’]
+      L(_var_) :vars
+         V i = L.index
+         I _var_.name == token
+            :token_node.var_index = i
+            L.break
+      L.was_no_break
+         :token_node.var_index = :vars.len
+         :vars.append(Var(token))
+   E
+      :token_node.symbol = :symbol_table[token]
+
+F expression(rbp = 0)
+   ASTNode t = move(:token_node)
+   advance()
+   V left = t.symbol.nud(move(t))
+   L rbp < :token_node.symbol.lbp
+      t = move(:token_node)
+      advance()
+      left = t.symbol.led(t, move(left))
+   R left
+
+F parse(expr_str) -> ASTNode
+   :tokens = re:‘\s*(\w+|.)’.find_strings(expr_str)
+   :tokeni = -1
+   :vars.clear()
+   advance()
+   R expression()
+
+F symbol(id, bp = 0) -> &
+   I id !C :symbol_table
+      V s = Symbol()
+      s.id = id
+      s.lbp = bp
+      :symbol_table[id] = s
+   R :symbol_table[id]
+
+F infix(id, bp)
+   F led(ASTNode self, ASTNode left)
+      self.first_child = left
+      self.second_child = expression(self.symbol.led_bp)
+      R self
+   symbol(id, bp).set_led_bp(bp, led)
+
+F prefix(id, bp)
+   F nud(ASTNode self)
+      self.first_child = expression(self.symbol.nud_bp)
+      R self
+   symbol(id).set_nud_bp(bp, nud)
+infix(‘|’, 1)
+infix(‘^’, 2)
+infix(‘&’, 3)
+prefix(‘!’, 4)
+
+F nud(ASTNode self)
+   R self
+symbol(‘(var)’).nud = nud
+symbol(‘(end)’)
+
+F nud_parens(ASTNode self)
+   V expr = expression()
+   advance(‘)’)
+   R expr
+symbol(‘(’).nud = nud_parens
+symbol(‘)’)
+
+L(expr_str) [‘!A | B’, ‘A ^ B’, ‘S | ( T ^ U )’, ‘A ^ (B ^ (C ^ D))’]
+   print(‘Boolean expression: ’expr_str)
+   print()
+   ASTNode p = parse(expr_str)
+   print(vars.map(_var_ -> _var_.name).join(‘ ’)‘ : ’expr_str)
+   L(i) 0 .< 1 << vars.len
+      L(_var_) vars
+         V vi = L.index
+         _var_.value = (i >> (vars.len - 1 - vi)) [&] 1
+         print(_var_.value, end' ‘ ’)
+      print(‘: ’p.eval())
+   print()
+===
+class ASTNode;
+
+class Symbol
+{
+public:
+    String id;
+    int lbp;
+    int nud_bp;
+    int led_bp;
+    std::function<std::unique_ptr<ASTNode>(std::unique_ptr<ASTNode>)> nud;
+    std::function<std::unique_ptr<ASTNode>(std::unique_ptr<ASTNode>, std::unique_ptr<ASTNode>)> led;
+
+    template <typename T1, typename T2> auto set_nud_bp(const T1 &nud_bp, const T2 &nud)
+    {
+        this->nud_bp = nud_bp;
+        this->nud = nud;
+    }
+
+    template <typename T1, typename T2> auto set_led_bp(const T1 &led_bp, const T2 &led)
+    {
+        this->led_bp = led_bp;
+        this->led = led;
+    }
+};
+
+class Var
+{
+public:
+    String name;
+    int value;
+    template <typename T1> Var(const T1 &name) :
+        name(name)
+    {
+    }
+};
+Array<Var> vars;
+
+class ASTNode
+{
+public:
+    Symbol *symbol;
+    int var_index;
+    std::unique_ptr<ASTNode> first_child;
+    std::unique_ptr<ASTNode> second_child;
+
+    auto eval()
+    {
+        if (symbol->id == u"(var)"_S)
+            return ::vars[var_index].value;
+        else if (symbol->id == u'|')
+            return first_child->eval() | second_child->eval();
+        else if (symbol->id == u'^')
+            return first_child->eval() ^ second_child->eval();
+        else if (symbol->id == u'&')
+            return first_child->eval() & second_child->eval();
+        else if (symbol->id == u'!')
+            return ~first_child->eval() & 1;
+        else if (symbol->id == u'(')
+            return first_child->eval();
+        else {
+            assert(false);
+            return 0;
+        }
+    }
+};
+Dict<String, Symbol> symbol_table;
+Array<String> tokens;
+auto tokeni = -1;
+std::unique_ptr<ASTNode> token_node;
+
+template <typename T1 = decltype(u""_S)> auto advance(const T1 &sid = u""_S)
+{
+    if (sid != u"")
+        assert(::token_node->symbol->id == sid);
+    ::tokeni++;
+    ::token_node = std::make_unique<ASTNode>();
+    if (::tokeni == ::tokens.len()) {
+        ::token_node->symbol = &::symbol_table[u"(end)"_S];
+        return;
+    }
+    auto token = ::tokens[::tokeni];
+    if (_get<0>(token).is_alpha()) {
+        ::token_node->symbol = &::symbol_table[u"(var)"_S];
+        {bool was_break = false;
+        {int Lindex = 0;
+        for (auto &&_var_ : ::vars) {
+            auto i = Lindex;
+            if (_var_.name == token) {
+                ::token_node->var_index = i;
+                was_break = true;
+                break;
+            }
+            Lindex++;
+        }}
+        if (!was_break) {
+            ::token_node->var_index = ::vars.len();
+            ::vars.append(Var(token));
+        }
+        }
+    }
+    else
+        ::token_node->symbol = &::symbol_table[token];
+}
+
+template <typename T1 = decltype(0)> auto expression(const T1 &rbp = 0)
+{
+    std::unique_ptr<ASTNode> t = std::move(::token_node);
+    advance();
+    auto left = t->symbol->nud(std::move(t));
+    while (rbp < ::token_node->symbol->lbp) {
+        t = std::move(::token_node);
+        advance();
+        left = t->symbol->led(std::move(t), std::move(left));
+    }
+    return left;
+}
+
+template <typename T1> std::unique_ptr<ASTNode> parse(const T1 &expr_str)
+{
+    ::tokens = re::_(uR"(\s*(\w+|.))"_S).find_strings(expr_str);
+    ::tokeni = -1;
+    ::vars.clear();
+    advance();
+    return expression();
+}
+
+template <typename T1, typename T2 = decltype(0)> auto& symbol(const T1 &id, const T2 &bp = 0)
+{
+    if (!in(id, ::symbol_table)) {
+        auto s = Symbol();
+        s.id = id;
+        s.lbp = bp;
+        ::symbol_table.set(id, s);
+    }
+    return ::symbol_table[id];
+}
+
+template <typename T1, typename T2> auto infix(const T1 &id, const T2 &bp)
+{
+    auto led = [](std::unique_ptr<ASTNode> self, std::unique_ptr<ASTNode> left)
+    {
+        self->first_child = std::move(left);
+        self->second_child = expression(self->symbol->led_bp);
+        return std::move(self);
+    };
+    symbol(id, bp).set_led_bp(bp, led);
+}
+
+template <typename T1, typename T2> auto prefix(const T1 &id, const T2 &bp)
+{
+    auto nud = [](std::unique_ptr<ASTNode> self)
+    {
+        self->first_child = expression(self->symbol->nud_bp);
+        return std::move(self);
+    };
+    symbol(id).set_nud_bp(bp, nud);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        infix(u"|"_S, 1);
+        infix(u"^"_S, 2);
+        infix(u"&"_S, 3);
+        prefix(u"!"_S, 4);
+    }
+} code_block_1;
+
+auto nud(std::unique_ptr<ASTNode> self)
+{
+    return std::move(self);
+}
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        symbol(u"(var)"_S).nud = nud;
+        symbol(u"(end)"_S);
+    }
+} code_block_2;
+
+auto nud_parens(std::unique_ptr<ASTNode> self)
+{
+    auto expr = expression();
+    advance(u")"_S);
+    return expr;
+}
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        symbol(u"("_S).nud = nud_parens;
+        symbol(u")"_S);
+
+        for (auto &&expr_str : create_array({u"!A | B"_S, u"A ^ B"_S, u"S | ( T ^ U )"_S, u"A ^ (B ^ (C ^ D))"_S})) {
+            print(u"Boolean expression: "_S & expr_str);
+            print();
+            std::unique_ptr<ASTNode> p = parse(expr_str);
+            print(vars.map([](const auto &_var_){return _var_.name;}).join(u" "_S) & u" : "_S & expr_str);
+            for (auto i : range_el(0, 1 << vars.len())) {
+                {int Lindex = 0;
+                for (auto &&_var_ : vars) {
+                    auto vi = Lindex;
+                    _var_.value = (i >> (vars.len() - 1 - vi)) & 1;
+                    print(_var_.value, u" "_S);
+                    Lindex++;
+                }}
+                print(u": "_S & p->eval());
+            }
+            print();
+        }
+    }
+} code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Two_identical_strings#Python
+def bits(n):
+    """Count the amount of bits required to represent n"""
+    r = 0
+    while n != 0:
+        n >>= 1
+        r += 1
+    return r
+
+def concat(n):
+    """Concatenate the binary representation of n to itself"""
+    return n << bits(n) | n
+
+n = 1
+while concat(n) <= 1000:
+    print("%d: %s" % (concat(n), bin(concat(n))[2:]))
+    n += 1
+===
+F bits(=n)
+   ‘Count the amount of bits required to represent n’
+   V r = 0
+   L n != 0
+      n >>= 1
+      r++
+   R r
+
+F concat(n)
+   ‘Concatenate the binary representation of n to itself’
+   R n << bits(n) [|] n
+V n = 1
+L concat(n) <= 1000
+   print(‘#.: #.’.format(concat(n), bin(concat(n))))
+   n++
+===
+template <typename T1> auto bits(T1 n)
+{
+    u"Count the amount of bits required to represent n"_S;
+    auto r = 0;
+    while (n != 0) {
+        n >>= 1;
+        r++;
+    }
+    return r;
+}
+
+template <typename T1> auto concat(const T1 &n)
+{
+    u"Concatenate the binary representation of n to itself"_S;
+    return n << bits(n) | n;
+}
+auto n = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (concat(n) <= 1000) {
+            print(u"#.: #."_S.format(concat(n), bin(concat(n))));
+            n++;
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Two_sum#Python
+def two_sum(arr, num):
+    i = 0
+    j = len(arr) - 1
+    while i < j:
+        if arr[i] + arr[j] == num:
+            return [i, j]
+        if arr[i] + arr[j] < num:
+            i += 1
+        else:
+            j -= 1
+    return [0] * 0
+
+numbers = [0, 2, 11, 19, 90]
+print(two_sum(numbers, 21))
+print(two_sum(numbers, 25))
+===
+F two_sum(arr, num)
+   V i = 0
+   V j = arr.len - 1
+   L i < j
+      I arr[i] + arr[j] == num
+         R [i, j]
+      I arr[i] + arr[j] < num
+         i++
+      E
+         j--
+   R [0] * 0
+V numbers = [0, 2, 11, 19, 90]
+print(two_sum(numbers, 21))
+print(two_sum(numbers, 25))
+===
+template <typename T1, typename T2> auto two_sum(const T1 &arr, const T2 &num)
+{
+    auto i = 0;
+    auto j = arr.len() - 1;
+    while (i < j) {
+        if (arr[i] + arr[j] == num)
+            return create_array({i, j});
+        if (arr[i] + arr[j] < num)
+            i++;
+        else
+            j--;
+    }
+    return create_array({0}) * 0;
+}
+auto numbers = create_array({0, 2, 11, 19, 90});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(two_sum(numbers, 21));
+        print(two_sum(numbers, 25));
+    }
+} code_block_1;
