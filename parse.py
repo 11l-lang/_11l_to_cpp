@@ -1235,7 +1235,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
             def gather_captured_variables(node):
                 def f(sn : SymbolNode):
                     if sn.token.category == Token.Category.NAME:
-                        if sn.token.value(source)[0] == '@':
+                        if sn.token.value(source).startswith('@'):
                             by_ref = True # sn.parent and sn.parent.children[0] is sn and sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!=')
                             t = sn.token.value(source)[1:]
                             if t.startswith('='):

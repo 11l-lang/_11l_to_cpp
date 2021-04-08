@@ -12743,3 +12743,91 @@ template <typename T1, typename T2> auto truncate_file(const T1 &name, const T2 
     fs::resize_file(name, length);
     return true;
 }
+
+
+# https://www.rosettacode.org/wiki/Unbias_a_random_generator#Python
+import random
+
+def randN(n):
+    "1,0 random generator factory with 1 appearing 1/n'th of the time"
+    def f():
+        nonlocal n # =
+        return random.randrange(n) == 0
+    return f
+
+def unbiased(biased):
+    'uses a biased() generator of 1 or 0, to create an unbiased one'
+    (this, that) = (biased(), biased())
+    while this == that: # Loop until 10 or 01
+        (this, that) = (biased(), biased())
+    return this         # return the first
+
+for n in range(3, 7):
+    biased = randN(n)
+    v = [biased() for x in range(1000000)]
+    (v1, v0) = (v.count(1), v.count(0))
+    print ( "Biased(%i):  count1=%d, count0=%d, percent=%.2f" % (n, v1, v0, 100.0 * v1/(v1 + v0)) )
+
+    v = [unbiased(biased) for x in range(1000000)]
+    (v1, v0) = (v.count(1), v.count(0))
+    print ( "  Unbiased: count1=%d, count0=%d, percent=%.2f" % (v1, v0, 100.0 * v1/(v1 + v0) ) )
+===
+//import random
+
+F randN(n)
+   ‘1,0 random generator factory with 1 appearing 1/n'th of the time’
+   F f()
+      R random:(@=n) == 0
+   R f
+
+F unbiased(biased)
+   ‘uses a biased() generator of 1 or 0, to create an unbiased one’
+   V (this, that) = (biased(), biased())
+   L this == that
+      (this, that) = (biased(), biased())
+   R this
+
+L(n) 3..6
+   V biased = randN(n)
+   V v = (0.<1000000).map(x -> @biased())
+   V (v1, v0) = (v.count(1), v.count(0))
+   print(‘Biased(#.):  count1=#., count0=#., percent=#.2’.format(n, v1, v0, 100.0 * v1 / (v1 + v0)))
+   v = (0.<1000000).map(x -> unbiased(@biased))
+   (v1, v0) = (v.count(1), v.count(0))
+   print(‘  Unbiased: count1=#., count0=#., percent=#.2’.format(v1, v0, 100.0 * v1 / (v1 + v0)))
+===
+template <typename T1> auto randN(const T1 &n)
+{
+    u"1,0 random generator factory with 1 appearing 1/n'th of the time"_S;
+    auto f = [n]()
+    {
+        return randomns::_(n) == 0;
+    };
+    return f;
+}
+
+template <typename T1> auto unbiased(const T1 &biased)
+{
+    u"uses a biased() generator of 1 or 0, to create an unbiased one"_S;
+    auto [_this_, that] = make_tuple(biased(), biased());
+    while (_this_ == that)
+        assign_from_tuple(_this_, that, make_tuple(biased(), biased()));
+    return _this_;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto n : range_ee(3, 6)) {
+            auto biased = randN(n);
+            auto v = range_el(0, 1000000).map([&biased](const auto &x){return biased();});
+            auto [v1, v0] = make_tuple(v.count(1), v.count(0));
+            print(u"Biased(#.):  count1=#., count0=#., percent=#.2"_S.format(n, v1, v0, 100.0 * v1 / (v1 + v0)));
+            v = range_el(0, 1000000).map([&biased](const auto &x){return unbiased(biased);});
+            assign_from_tuple(v1, v0, make_tuple(v.count(1), v.count(0)));
+            print(u"  Unbiased: count1=#., count0=#., percent=#.2"_S.format(v1, v0, 100.0 * v1 / (v1 + v0)));
+        }
+    }
+} code_block_1;
