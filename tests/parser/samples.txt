@@ -1302,3 +1302,26 @@ struct CodeBlock1
         f();
     }
 } code_block_1;
+
+
+F f([Int] &l = [0, 2])
+   l.append(1)
+   print(l)
+
+f()
+f()
+===
+auto f(Array<int> &l = make_ref(create_array({0, 2})))
+{
+    l.append(1);
+    print(l);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        f();
+        f();
+    }
+} code_block_1;
