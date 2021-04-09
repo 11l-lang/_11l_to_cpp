@@ -1279,3 +1279,26 @@ struct CodeBlock1
         print(gnomesort(make_ref(create_array({3, 4, 2, 5, 1, 6}))));
     }
 } code_block_1;
+
+
+F f([Int] &l = [Int]())
+   l.append(1)
+   print(l)
+
+f()
+f()
+===
+auto f(Array<int> &l = make_ref(Array<int>()))
+{
+    l.append(1);
+    print(l);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        f();
+        f();
+    }
+} code_block_1;

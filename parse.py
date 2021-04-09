@@ -1295,9 +1295,10 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                             + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
                 else:
                     ty = trans_type(arg[2], self.scope, tokens[self.tokeni])
+                    make_ref = arg[3] == '&'
                     arguments.append(
                         (('' if arg[3] == '=' else 'const ') + ty + ' ' + '&'*(arg[2] not in ('Int', 'Float') and arg[3] != '=') if arg[3] != '&' else ty + ' &')
-                        + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
+                        + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + 'make_ref('*make_ref + arg[1] + ')'*make_ref))
 
         if self.member_initializer_list == '' and self.function_name == '' and type(self.parent) == ASTTypeDefinition:
             i = 0
