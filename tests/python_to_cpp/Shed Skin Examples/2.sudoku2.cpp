@@ -10,7 +10,7 @@ public:
     {
         v = vals[range_el(0, 9)];
         if (n >= 0)
-            v.set(n, !(v[n]));
+            v.set(n, !v[n]);
     }
     template <typename T1> auto operator&(const T1 &other) const
     {

@@ -24,7 +24,7 @@ for fname in os.listdir('.'):
 If you do not have Visual Studio 2017 or 2019 installed please install it or Build Tools for Visual Studio from here[https://visualstudio.microsoft.com/downloads/].''')
 
             stderr_fname = 'output/' + fname + '.txt'
-            r = os.system('"' + vcvarsall + '" ' + ('x64' if platform.machine().endswith('64') else 'x86') + ' > nul && cl.exe /std:c++17 /MT /EHsc /nologo ' + '/O2 '*enopt + fname + ' > ' + stderr_fname)
+            r = os.system('"' + vcvarsall + '" ' + ('x64' if platform.machine().endswith('64') else 'x86') + ' > nul && cl.exe /std:c++17 /MT /EHsc /nologo /we4239 ' + '/O2 '*enopt + fname + ' > ' + stderr_fname)
             if r == 0:
                 ok += 1
                 os.remove(stderr_fname)

@@ -53,7 +53,7 @@ template <typename T2> auto mov(Array<int> &board, const T2 &mv)
     board.set(ix, 0);
     for (auto &&i : ::clearCastlingOpportunities[ix])
         board.set(i, ::iFalse);
-    _set<26>(board, to_int(!(_get<26>(board))));
+    _set<26>(board, to_int(!_get<26>(board)));
     if ((mv & 0x7fff'0000) == 0)
         return;
     if ((mv & 0x0100'0000))
@@ -368,7 +368,7 @@ template <typename T1> auto legalMoves(const T1 &board)
 template <typename T1, typename T2, typename T3, typename T4> auto alphaBetaQui(const T1 &board, T2 alpha, const T3 &beta, const T4 &n)
 {
     auto e = evaluate(board);
-    if (!(_get<26>(board)))
+    if (!_get<26>(board))
         e = -e;
     if (e >= beta)
         return make_tuple(beta, ::iNone);

@@ -76,7 +76,7 @@ public:
         for (auto i : range_el(0, nmutations)) {
             auto individual = randomns::choice(population);
             auto gene = randomns::_(range_ee(0, genomeSize - 1));
-            individual.genome.set(gene, !(individual.genome[gene]));
+            individual.genome.set(gene, !individual.genome[gene]);
         }
     }
 

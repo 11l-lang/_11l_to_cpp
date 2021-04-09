@@ -80,9 +80,9 @@ F jaro(s, t)
       R 0.0
    V k = 0
    L(i) 0 .< s_len
-      I !(s_matches[i])
+      I !s_matches[i]
          L.continue
-      L !(t_matches[k])
+      L !t_matches[k]
          k++
       I s[i] != t[k]
          transpositions++
@@ -123,9 +123,9 @@ template <typename T1, typename T2> auto jaro(const T1 &s, const T2 &t)
         return 0.0;
     auto k = 0;
     for (auto i : range_el(0, s_len)) {
-        if (!(s_matches[i]))
+        if (!s_matches[i])
             continue;
-        while (!(t_matches[k]))
+        while (!t_matches[k])
             k++;
         if (s[i] != t[k])
             transpositions++;

@@ -31,7 +31,7 @@ F BF_interpreter(=prog)
       E I x == ‘,’
          tape[p] = :stdin.read(1).code
       E I x == ‘[’
-         I !(tape[p])
+         I !tape[p]
             L
                I prog[ip] == ‘[’
                   level++

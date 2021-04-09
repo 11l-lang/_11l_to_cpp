@@ -1353,7 +1353,7 @@ V primes = [1B] * n
 primes[0] = primes[1] = 0B
 
 L(i) 2 .. Int(sqrt(n))
-   I !(primes[i])
+   I !primes[i]
       L.continue
    L(j) (i * i .< n).step(i)
       primes[j] = 0B
@@ -1385,7 +1385,7 @@ struct CodeBlock1
         _set<0>(primes, _set<1>(primes, false));
 
         for (auto i : range_ee(2, to_int(sqrt(n)))) {
-            if (!(primes[i]))
+            if (!primes[i])
                 continue;
             for (auto j : range_el(i * i, n).step(i))
                 primes.set(j, false);

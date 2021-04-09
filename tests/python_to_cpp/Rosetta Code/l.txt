@@ -573,11 +573,11 @@ F sieve(limit)
          c[i] = 1B
       L
          p += 2
-         I !(c[p])
+         I !c[p]
             L.break
 
    L(i) (3 .< limit).step(2)
-      I !(c[i])
+      I !c[i]
          primes.append(i)
    R primes
 
@@ -628,12 +628,12 @@ template <typename T1> auto sieve(const T1 &limit)
             c.set(i, true);
         while (true) {
             p += 2;
-            if (!(c[p]))
+            if (!c[p])
                 break;
         }
     }
     for (auto i : range_el(3, limit).step(2))
-        if (!(c[i]))
+        if (!c[i])
             primes.append(i);
     return primes;
 }

@@ -54,7 +54,7 @@ T SGA
       L(i) 0 .< nmutations
          V individual = random:choice(.population)
          V gene = random:(0 .. .genomeSize - 1)
-         individual.genome[gene] = !(individual.genome[gene])
+         individual.genome[gene] = !individual.genome[gene]
 
    F tounamentSelectionPop()
       [Individual] pop2

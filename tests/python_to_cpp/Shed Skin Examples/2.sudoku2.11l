@@ -8,7 +8,7 @@ T bmp
    F (vals = _9_bytes, n = -1)
       .v = vals[0.<9]
       I n >= 0
-         .v[n] = !(.v[n])
+         .v[n] = !.v[n]
    F [&](other)
       R bmp((0.<9).map(i -> Byte(@.v[i] & @other.v[i])))
    F cnt()

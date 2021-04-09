@@ -33,7 +33,7 @@ template <typename T1> auto BF_interpreter(T1 prog)
         else if (x == u',')
             tape.set(p, _stdin.read(1).code);
         else if (x == u'[') {
-            if (!(tape[p])) {
+            if (!tape[p]) {
                 while (true) {
                     if (prog[ip] == u'[')
                         level++;

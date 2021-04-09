@@ -758,7 +758,7 @@ F kosaraju(g)
    V t = (0 .< size).map(i -> [0] * 0)
 
    F visit(Int u) -> N
-      I !(@vis[u])
+      I !@vis[u]
          @vis[u] = 1B
          L(v) @g[u]
             @visit(v)
@@ -793,7 +793,7 @@ template <typename T1> auto kosaraju(const T1 &g)
 
     std::function<void(int)> visit = [&g, &l, &t, &vis, &visit, &x](const int u)
     {
-        if (!(vis[u])) {
+        if (!vis[u]) {
             vis.set(u, true);
             for (auto &&v : g[u]) {
                 visit(v);
