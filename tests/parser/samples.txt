@@ -1325,3 +1325,29 @@ struct CodeBlock1
         f();
     }
 } code_block_1;
+
+
+F run_utm(halt, state, rules_in)
+   V st = state
+
+run_utm(
+   halt' ‘halt’,
+   state' ‘a’,
+   rules_in'
+      [‘a 0 1 right b’.split(‘ ’, group_delimiters' 1B),
+       ‘a 1 1 left  c’.split(‘ ’, group_delimiters' 1B),
+       ‘b 0 1 left  a’.split(‘ ’, group_delimiters' 1B)]
+   )
+===
+template <typename T1, typename T2, typename T3> auto run_utm(const T1 &halt, const T2 &state, const T3 &rules_in)
+{
+    auto st = state;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        run_utm(u"halt"_S, u"a"_S, create_array({u"a 0 1 right b"_S.split(u" "_S, nullptr, true), u"a 1 1 left  c"_S.split(u" "_S, nullptr, true), u"b 0 1 left  a"_S.split(u" "_S, nullptr, true)}));
+    }
+} code_block_1;
