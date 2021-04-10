@@ -110,9 +110,10 @@ public:
 	void assign(Int64 num) { assign_int(num); }
 	explicit String(float  num, int digits = 6, bool remove_trailing_zeroes = true) {assign(num, digits, remove_trailing_zeroes);}
 	explicit String(double num, int digits = 9, bool remove_trailing_zeroes = true) {assign(num, digits, remove_trailing_zeroes);}
-	explicit String(const char16_t *&s) : basic_string(s) {} // reference is needed here because otherwise String(const char16_t (&s)[N]) is never called (`String(u"str")` calls `String(const char16_t *s)`)
+	explicit String(const char16_t *&s) : basic_string(s) {} // reference is needed here because otherwise `String(const char16_t (&s)[N])` is never called (`String(u"str")` calls `String(const char16_t *s)`)
+	explicit String(const char16_t *&&s) : basic_string(s) {} // to fix `String(path.c_str() + sep_pos + 1)` in `fs::base_name(u"./file_name")` (otherwise [without this constructor] `explicit String(bool b)` is called)
 	String(const char16_t *s, size_t sz) : basic_string(s, sz) {}
-	String(const char16_t *s) : basic_string(s) {}
+	//String(const char16_t *s) : basic_string(s) {} // commented out because otherwise `String(const char16_t (&s)[N])` is never called
 	String(nullptr_t) = delete;
 	template <int N> String(const char16_t (&s)[N]) : basic_string(s, N-1) {}
 	template <typename Ty> explicit String(const Ty s, const Ty e) : basic_string(s, e) {}

@@ -161,7 +161,7 @@ String to_json(const Element &el, const String &indent, int level = 0)
 		break;
 
 	case ValueType::BOOLEAN:
-		r = el.value.boolean ? u"true" : u"false";
+		r = el.value.boolean ? u"true"_S : u"false"_S;
 		break;
 
 	case ValueType::N:
