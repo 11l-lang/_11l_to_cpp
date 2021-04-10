@@ -12918,7 +12918,7 @@ run_utm(halt = 'STOP',
         "D 3 1 right A".split(),
         "E 1 1 left  E".split(),
         "E 0 0 right STOP".split()],
-    tape = map(Char, "2 2 2 1 2 2 1 2 1 2 1 2 1 2".split(' '))
+    tape = list(map(Char, "2 2 2 1 2 2 1 2 1 2 1 2 1 2".split(' ')))
     )
 ===
 
