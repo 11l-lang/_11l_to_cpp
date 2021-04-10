@@ -24,6 +24,7 @@ public:
 	char16_t code;
 
 	Char(char16_t code) : code(code) {}
+	explicit Char(const String &s);
 
 	operator char16_t() const {return code;} // for `switch (instr[i])` support
 
@@ -124,6 +125,14 @@ public:
 			if (i < dimension - 1)
 				*this &= u", ";
 		}
+		append(1, u')');
+	}
+	template <typename Type1, typename Type2> explicit String(const Tuple<Type1, Type2> &tuple)
+	{
+		assign(1, u'(');
+		*this &= _get<0>(tuple);
+		*this &= u", ";
+		*this &= _get<1>(tuple);
 		append(1, u')');
 	}
 	template <typename...Types> explicit String(const Tuple<Types...> &t)
@@ -769,6 +778,13 @@ template <typename ... Types> String String::format(const Types&... args) const
 		throw AssertionError();
 
 	return r;
+}
+
+inline Char::Char(const String &s)
+{
+	if (s.len() != 1)
+		throw AssertionError();
+	code = s[0].code;
 }
 
 inline String operator&(Char ch1, Char ch2)

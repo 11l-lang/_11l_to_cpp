@@ -555,7 +555,9 @@ class SymbolNode:
                 last_function_arg = 0
                 res = func_name + '('
                 for i in range(1, len(self.children), 2):
-                    make_ref = self.children[i+1].symbol.id == '&' and len(self.children[i+1].children) == 1 and (self.children[i+1].children[0].is_list or self.children[i+1].children[0].is_dict)
+                    make_ref = self.children[i+1].symbol.id == '&' and len(self.children[i+1].children) == 1 and (self.children[i+1].children[0].is_list
+                                                                                                               or self.children[i+1].children[0].is_dict
+                                                                                                               or self.children[i+1].children[0].function_call)
                     if self.children[i] is None:
                         cstr = self.children[i+1].to_str()
                         if f_node is not None and type(f_node) == ASTFunctionDefinition:

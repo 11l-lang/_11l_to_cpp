@@ -45,7 +45,7 @@ template <typename Type> class Array : public std::vector<Type>
 public:
 	Array() {}
 	Array(std::initializer_list<Type> il) : std::vector<Type>(il) {}
-	Array(const String &s)
+	explicit Array(const String &s)
 	{
 		std::vector<Type>::reserve(s.len());
 		for (auto c : s)
