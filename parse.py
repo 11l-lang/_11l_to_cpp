@@ -599,8 +599,8 @@ class SymbolNode:
                     if type(f_node) == ASTFunctionDefinition:
                         while last_function_arg < len(f_node.function_arguments):
                             if f_node.function_arguments[last_function_arg][1] == '':
-                                t = self.children[len(self.children)-1].token
-                                raise Error('missing required argument `'+ f_node.function_arguments[last_function_arg][0] + '`', Token(t.end, t.end, Token.Category.DELIMITER))
+                                t = self.children[len(self.children)-1].rightmost()
+                                raise Error('missing required argument `'+ f_node.function_arguments[last_function_arg][0] + '`', Token(t, t, Token.Category.DELIMITER))
                             last_function_arg += 1
                     elif f_node.function_pointer:
                         if last_function_arg != len(f_node.type_args):
