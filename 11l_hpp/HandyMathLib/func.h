@@ -159,16 +159,23 @@ template <class T, int N> INLINE const Tvec<T,N> ceil(const Tvec<T,N> &v)
 	for (int i=0; i<N; i++) r[i] = ceil(v[i]);
 	return r;
 }
-INLINE const HMbyte mod(const HMbyte x,const HMbyte y) {return x%y;}
-INLINE const HMshort mod(const HMshort x,const HMshort y) {return x%y;}
-INLINE const HMint mod(const HMint x,const HMint y) {return x%y;}
-INLINE const HMubyte mod(const HMubyte x,const HMubyte y) {return x%y;}
-INLINE const HMushort mod(const HMushort x,const HMushort y) {return x%y;}
-INLINE const HMuint mod(const HMuint x,const HMuint y) {return x%y;}
-INLINE const int64_t mod(const int64_t x,const int64_t y) {return x%y;}
-INLINE const uint64_t mod(const uint64_t x,const uint64_t y) {return x%y;}
-INLINE const int64_t mod(const int x,const int64_t y) {return x%y;}
-INLINE const int64_t mod(const int64_t x,const int y) {return x%y;}
+#ifndef PYTHON_REMAINDER                                                  // s = 0
+#define MOD_CODE return x%y;                                  // 0.4 sec  //
+#else                                                                     // for i in range(100_000_000):
+//#define MOD_CODE return ((x % y) + y) % y;                  // 1.1 sec  //     s += i % 10
+#define MOD_CODE auto r = x % y; if (r < 0) r += y; return r; // 0.7 sec  //
+#endif                                                                    // print(s)
+INLINE const HMbyte mod(const HMbyte x,const HMbyte y) {MOD_CODE}
+INLINE const HMshort mod(const HMshort x,const HMshort y) {MOD_CODE}
+INLINE const HMint mod(const HMint x,const HMint y) {MOD_CODE}
+INLINE const HMubyte mod(const HMubyte x,const HMubyte y) {MOD_CODE}
+INLINE const HMushort mod(const HMushort x,const HMushort y) {MOD_CODE}
+INLINE const HMuint mod(const HMuint x,const HMuint y) {MOD_CODE}
+INLINE const int64_t mod(const int64_t x,const int64_t y) {MOD_CODE}
+INLINE const uint64_t mod(const uint64_t x,const uint64_t y) {MOD_CODE}
+INLINE const int64_t mod(const int x,const int64_t y) {MOD_CODE}
+INLINE const int64_t mod(const int64_t x,const int y) {MOD_CODE}
+#undef MOD_CODE
 template <class T,class Ta> INLINE const T mod(const T &x,const Ta &y) {return x - y*floor(x/y);}
 template <class T,class Ta> INLINE const T wrap(const T &x,const Ta &maxVal) {return mod(x,maxVal);}
 template <class T,class Ta> INLINE const T wrap(const T &x,const Ta &minVal,const Ta &maxVal)
