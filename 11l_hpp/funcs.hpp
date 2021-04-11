@@ -76,6 +76,16 @@ template <typename Type1, typename Type2> inline auto idiv(Type1 a, Type2 b)
 	return ext_int(a / b);
 }
 
+template <typename Type1, typename Type2> inline auto fdiv(Type1 a, Type2 b)
+{
+	return double(a) / b;
+}
+
+inline float fdiv(float a, float b)
+{
+	return a / b;
+}
+
 #ifdef __GNUC__
 inline int bsr(int   x) {return __builtin_clz  (x) ^ 31;}
 inline int bsr(Int64 x) {return __builtin_clzll(x) ^ 63;}

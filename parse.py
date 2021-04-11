@@ -170,6 +170,7 @@ class SymbolBase:
         self.led = led
 
 int_is_int64 = False
+python_division = False
 
 class SymbolNode:
     token : Token
@@ -896,6 +897,9 @@ class SymbolNode:
                         return self.children[0].token_str() + '.0 / ' + self.children[1].to_str()
                     else:
                         return self.children[0].to_str() + ' / ' + self.children[1].token_str() + '.0'
+
+                if self.symbol.id == '/' and python_division:
+                    return 'fdiv(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
 
                 if self.symbol.id == '=' and self.children[0].symbol.id == '.' and len(self.children[0].children) == 2: # `:token_node.symbol = :symbol_table[...]` -> `::token_node->symbol = &::symbol_table[...]`
                     t_node = type_of(self.children[0])
