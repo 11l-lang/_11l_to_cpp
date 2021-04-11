@@ -404,17 +404,26 @@ public:
 		std::vector<Type>::erase(begin() + range.b, begin() + range.e);
 	}
 
-	String decode(const String &encoding = u""_S) const
+	String decode(const String &encoding = u"utf-8"_S) const
 	{
 		static_assert(std::is_same_v<Type, Byte>, "`decode()` can be called only on `Array<Byte>`");
-		String r;
-		r.reserve(len());
-		for (auto el : *this) {
-			if (!(el < 128))
-				throw AssertionError();
-			r &= Char(el);
+
+		if (encoding == u"ascii") {
+			String r;
+			r.reserve(len());
+			for (auto el : *this) {
+				if (!(el < 128))
+					throw AssertionError();
+				r &= Char(el);
+			}
+			return r;
 		}
-		return r;
+		else if (encoding == u"utf-8") {
+			String convert_utf8_string_to_String(const char *s, size_t len);
+			return convert_utf8_string_to_String((char*)std::vector<Type>::data(), std::vector<Type>::size());
+		}
+		else
+			throw AssertionError();
 	}
 
 	template <typename Ty> bool operator==(const Array<Ty> &arr) const

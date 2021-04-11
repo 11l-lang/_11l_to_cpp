@@ -13017,3 +13017,72 @@ struct CodeBlock1
         run_utm(u"STOP"_S, u"A"_S, u'0'_C, create_array({u"A 1 1 right A"_S.split_py(), u"A 2 3 right B"_S.split_py(), u"A 0 0 left  E"_S.split_py(), u"B 1 1 right B"_S.split_py(), u"B 2 2 right B"_S.split_py(), u"B 0 0 left  C"_S.split_py(), u"C 1 2 left  D"_S.split_py(), u"C 2 2 left  C"_S.split_py(), u"C 3 2 left  E"_S.split_py(), u"D 1 1 left  D"_S.split_py(), u"D 2 2 left  D"_S.split_py(), u"D 3 1 right A"_S.split_py(), u"E 1 1 left  E"_S.split_py(), u"E 0 0 right STOP"_S.split_py()}), make_ref(u"2 2 2 1 2 2 1 2 1 2 1 2 1 2"_S.split(u" "_S).map([](const auto &x){return Char(x);})));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/URL_decoding
+def url_decode(s):
+    r = ''
+    i = 0
+    while i < len(s):
+        if s[i] == '%':
+            b = bytearray()
+            while i < len(s) and s[i] == '%':
+                i += 1
+                b.append(int(s[i:i+2], base = 16))
+                i += 2
+            r += b.decode('utf-8')
+        else:
+            r += s[i]
+            i += 1
+    return r
+
+print(url_decode('http%3A%2F%2Ffoo%20bar%2F'))
+print(url_decode('https://ru.wikipedia.org/wiki/%D0%A2%D1%80%D0%B0%D0%BD%D1%81%D0%BF%D0%B0%D0%B9%D0%BB%D0%B5%D1%80'))
+===
+F url_decode(s)
+   V r = ‘’
+   V i = 0
+   L i < s.len
+      I s[i] == ‘%’
+         V b = [Byte]()
+         L i < s.len & s[i] == ‘%’
+            i++
+            b.append(Int(s[i .< i + 2], radix' 16))
+            i += 2
+         r ‘’= b.decode(‘utf-8’)
+      E
+         r ‘’= s[i]
+         i++
+   R r
+print(url_decode(‘http%3A%2F%2Ffoo%20bar%2F’))
+print(url_decode(‘https://ru.wikipedia.org/wiki/%D0%A2%D1%80%D0%B0%D0%BD%D1%81%D0%BF%D0%B0%D0%B9%D0%BB%D0%B5%D1%80’))
+===
+template <typename T1> auto url_decode(const T1 &s)
+{
+    auto r = u""_S;
+    auto i = 0;
+    while (i < s.len())
+        if (s[i] == u'%') {
+            auto b = Array<Byte>();
+            while (i < s.len() && s[i] == u'%') {
+                i++;
+                b.append(to_int(s[range_el(i, i + 2)], 16));
+                i += 2;
+            }
+            r &= b.decode(u"utf-8"_S);
+        }
+        else {
+            r &= s[i];
+            i++;
+        }
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(url_decode(u"http%3A%2F%2Ffoo%20bar%2F"_S));
+        print(url_decode(u"https://ru.wikipedia.org/wiki/%D0%A2%D1%80%D0%B0%D0%BD%D1%81%D0%BF%D0%B0%D0%B9%D0%BB%D0%B5%D1%80"_S));
+    }
+} code_block_1;

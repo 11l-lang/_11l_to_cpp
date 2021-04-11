@@ -3143,6 +3143,7 @@ array_scope.add_name('map', ASTFunctionDefinition([('f', '', '')]))
 array_scope.add_name('filter', ASTFunctionDefinition([('f', '', '')]))
 array_scope.add_name('join', ASTFunctionDefinition([('sep', '', 'String')]))
 array_scope.add_name('sort', ASTFunctionDefinition([('key', token_to_str('N', Token.Category.CONSTANT), ''), ('reverse', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
+array_scope.add_name('decode', ASTFunctionDefinition([('encoding', token_to_str('‘utf-8’'), 'String')]))
 builtins_scope.ids['Array'].ast_nodes[0].scope = array_scope
 dict_scope = Scope(None)
 dict_scope.add_name('update', ASTFunctionDefinition([('other', '', 'Dict')]))

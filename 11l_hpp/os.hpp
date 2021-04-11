@@ -22,7 +22,7 @@ inline String getenv(const String &name, const String &def = String())
 	return r;
 #else
 	char *v = ::getenv(convert_utf16_to_utf8(name).c_str());
-	return v != nullptr ? String(convert_utf8_to_utf16(v)) : def;
+	return v != nullptr ? String(convert_utf8_to_utf16(v, strlen(v))) : def;
 #endif
 }
 

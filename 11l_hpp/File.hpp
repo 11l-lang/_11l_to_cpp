@@ -14,22 +14,22 @@ std::string convert_utf16_to_utf8(const std::u16string &u16)
 	return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(u16);
 }
 
-std::u16string convert_utf8_to_utf16(const std::string &u8)
+std::u16string convert_utf8_to_utf16(const char *s, size_t len)
 {
-	return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes(u8);
+	return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes(s, s + len);
 }
 #endif
 
 class UnicodeDecodeError {};
 
-String convert_utf8_string_to_String(const std::string &s)
+String convert_utf8_string_to_String(const char *s, size_t len)
 {
 #ifdef _WIN32
 	String r;
-	if (!s.empty()) {
-		r.resize(s.size());
+	if (len != 0) {
+		r.resize(len);
 		SetLastError(ERROR_SUCCESS);
-		r.resize(MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s.data(), (int)s.size(), (LPWSTR)r.data(), (int)r.size()));
+		r.resize(MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s, (int)len, (LPWSTR)r.data(), (int)r.size()));
 		if (GetLastError() != ERROR_SUCCESS) {
 			assert(GetLastError() == ERROR_NO_UNICODE_TRANSLATION);
 			throw UnicodeDecodeError();
@@ -37,8 +37,13 @@ String convert_utf8_string_to_String(const std::string &s)
 	}
 	return r;
 #else
-	return String(convert_utf8_to_utf16(s));
+	return String(convert_utf8_to_utf16(s, len));
 #endif
+}
+
+String convert_utf8_string_to_String(const std::string &s)
+{
+	return convert_utf8_string_to_String(s.data(), s.size());
 }
 
 class FileNotFoundError {};
