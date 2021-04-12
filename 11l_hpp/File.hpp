@@ -46,6 +46,36 @@ String convert_utf8_string_to_String(const std::string &s)
 	return convert_utf8_string_to_String(s.data(), s.size());
 }
 
+class UnicodeEncodeError {};
+
+Array<Byte> String::encode(const String &encoding) const
+{
+	assert(encoding == u"utf-8");
+
+	if (empty())
+		return Array<Byte>();
+
+#ifdef _WIN32
+	SetLastError(ERROR_SUCCESS);
+	int r = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, (LPCWCH)data(), (int)size(), NULL, 0, NULL, NULL);
+	if (GetLastError() != ERROR_SUCCESS) {
+		assert(GetLastError() == ERROR_NO_UNICODE_TRANSLATION);
+		throw UnicodeEncodeError();
+	}
+
+	Array<Byte> bytes;
+	bytes.resize(r);
+	WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, (LPCWCH)data(), (int)size(), (LPSTR)bytes.data(), r, NULL, NULL);
+	return bytes;
+#else
+	std::string utf8 = convert_utf16_to_utf8(*this);
+	Array<Byte> bytes;
+	bytes.resize(utf8.size());
+	memcpy(bytes.data(), utf8.data(), utf8.size());
+	return bytes;
+#endif
+}
+
 class FileNotFoundError {};
 
 class File

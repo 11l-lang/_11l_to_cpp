@@ -13086,3 +13086,99 @@ struct CodeBlock1
         print(url_decode(u"https://ru.wikipedia.org/wiki/%D0%A2%D1%80%D0%B0%D0%BD%D1%81%D0%BF%D0%B0%D0%B9%D0%BB%D0%B5%D1%80"_S));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/URL_encoding
+def url_encode(s):
+    r = ''
+    i = 0
+    buf = ''
+
+    def flush_buf():
+        nonlocal buf, r
+
+        if buf != '':
+            bytes = buf.encode('utf-8')
+            for b in bytes:
+                r += '%' + hex(b)[2:].upper().zfill(2)
+            buf = ''
+
+    while i < len(s):
+        c = s[i]
+        if '0' <= c <= '9' or 'a' <= c <= 'z' or 'A' <= c <= 'Z' or c in '_.-~':
+            flush_buf()
+            r += c
+        else:
+            buf += c
+        i += 1
+
+    flush_buf()
+    return r
+
+print(url_encode('http://foo bar/'))
+print(url_encode('https://ru.wikipedia.org/wiki/Транспайлер'))
+===
+F url_encode(s)
+   V r = ‘’
+   V i = 0
+   V buf = ‘’
+
+   F flush_buf()
+
+      I @buf != ‘’
+         V bytes = @buf.encode(‘utf-8’)
+         L(b) bytes
+            @r ‘’= ‘%’hex(b).zfill(2)
+         @buf = ‘’
+
+   L i < s.len
+      V c = s[i]
+      I c C ‘0’..‘9’ | c C ‘a’..‘z’ | c C ‘A’..‘Z’ | c C ‘_.-~’
+         flush_buf()
+         r ‘’= c
+      E
+         buf ‘’= c
+      i++
+   flush_buf()
+   R r
+print(url_encode(‘http://foo bar/’))
+print(url_encode(‘https://ru.wikipedia.org/wiki/Транспайлер’))
+===
+template <typename T1> auto url_encode(const T1 &s)
+{
+    auto r = u""_S;
+    auto i = 0;
+    auto buf = u""_S;
+
+    auto flush_buf = [&buf, &r]()
+    {
+        if (buf != u"") {
+            auto bytes = buf.encode(u"utf-8"_S);
+            for (auto &&b : bytes)
+                r &= u"%"_S & hex(b).zfill(2);
+            buf = u""_S;
+        }
+    };
+
+    while (i < s.len()) {
+        auto c = s[i];
+        if (in(c, range_ee(u'0'_C, u'9'_C)) || in(c, range_ee(u'a'_C, u'z'_C)) || in(c, range_ee(u'A'_C, u'Z'_C)) || in(c, u"_.-~"_S)) {
+            flush_buf();
+            r &= c;
+        }
+        else
+            buf &= c;
+        i++;
+    }
+    flush_buf();
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(url_encode(u"http://foo bar/"_S));
+        print(url_encode(u"https://ru.wikipedia.org/wiki/Транспайлер"_S));
+    }
+} code_block_1;

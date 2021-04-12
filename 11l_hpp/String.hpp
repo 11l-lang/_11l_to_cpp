@@ -633,6 +633,8 @@ public:
 		return s;
 	}
 
+	Array<Byte> encode(const String &encoding = u"utf-8") const;
+
 private:
 	struct FormatArgument;//Field
 
