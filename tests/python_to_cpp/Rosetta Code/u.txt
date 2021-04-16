@@ -1,0 +1,230 @@
+# https://www.rosettacode.org/wiki/Ulam_numbers#Python
+def ulam(n):
+    if n <= 2:
+        return n
+    mx = 1352000
+    lst = [1, 2] + [0] * mx
+    sums = [0] * (mx * 2 + 1)
+    sums[3] = 1
+    size = 2
+    query : int
+    while size < n:
+        query = lst[size-1] + 1
+        while True:
+            if sums[query] == 1:
+                for i in range(size):
+                    sum = query + lst[i]
+                    t = sums[sum] + 1
+                    if t <= 2:
+                        sums[sum] = t
+                (lst[size], size) = (query, size + 1)
+                break
+            query += 1
+    return query
+
+for p in range(5):
+    n = 10**p
+    print("The %d%s Ulam number is %d" % (n, 'th' if n!=1 else 'st', ulam(n)))
+===
+F ulam(n)
+   I n <= 2
+      R n
+   V mx = 1352000
+   V lst = [1, 2] [+] [0] * mx
+   V sums = [0] * (mx * 2 + 1)
+   sums[3] = 1
+   V size = 2
+   Int query
+   L size < n
+      query = lst[size - 1] + 1
+      L
+         I sums[query] == 1
+            L(i) 0 .< size
+               V sum = query + lst[i]
+               V t = sums[sum] + 1
+               I t <= 2
+                  sums[sum] = t
+            (lst[size], size) = (query, size + 1)
+            L.break
+         query++
+   R query
+
+L(p) 5
+   V n = 10 ^ p
+   print(‘The #.#. Ulam number is #.’.format(n, I n != 1 {‘th’} E ‘st’, ulam(n)))
+===
+template <typename T1> auto ulam(const T1 &n)
+{
+    if (n <= 2)
+        return n;
+    auto mx = 1352000;
+    auto lst = create_array({1, 2}) + create_array({0}) * mx;
+    auto sums = create_array({0}) * (mx * 2 + 1);
+    _set<3>(sums, 1);
+    auto size = 2;
+    int query;
+    while (size < n) {
+        query = lst[size - 1] + 1;
+        while (true) {
+            if (sums[query] == 1) {
+                for (auto i : range_el(0, size)) {
+                    auto sum = query + lst[i];
+                    auto t = sums[sum] + 1;
+                    if (t <= 2)
+                        sums.set(sum, t);
+                }
+                assign_from_tuple(lst[size], size, make_tuple(query, size + 1));
+                break;
+            }
+            query++;
+        }
+    }
+    return query;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (int p = 0; p < 5; p++) {
+            auto n = pow(10, p);
+            print(u"The #.#. Ulam number is #."_S.format(n, n != 1 ? u"th"_S : u"st"_S, ulam(n)));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Ulam_spiral_(for_primes)#Python
+import math
+
+def cell(n, x, y, start=1):
+    d = 0
+    y = y - n//2
+    x = x - (n - 1)//2
+    l = 2*max(abs(x), abs(y))
+    d = (l*3 + x + y) if y >= x else (l - x - y)
+    return (l - 1)**2 + d + start - 1
+
+def show_spiral(n, symbol='# ', start=1, space=''):
+    top = start + n*n + 1
+    is_prime = [False,False,True] + [True,False]*(top//2)
+    for x in range(3, 1 + int(math.sqrt(top))):
+        if not is_prime[x]: continue
+        for i in range(x*x, top, x*2):
+            is_prime[i] = False
+
+    f : Callable[[int], str] = lambda _: symbol # how to show prime cells
+
+    if space == '': space = ' '*len(symbol)
+
+    if len(symbol) == 0: # print numbers instead
+        max_str = len(str(n*n + start - 1))
+        if space == '': space = ('.'*max_str) + ' '
+        f = lambda x: str(x).rjust(max_str) + ' ' # ('%' + str(max_str) + 'd ')%x
+
+    cell_str = lambda x: f(x) if is_prime[x] else space
+
+    for y in range(n):
+        print(''.join(cell_str(v) for v in [cell(n, x, y, start) for x in range(n)]))
+    print()
+
+show_spiral(10, symbol='# ', space='  ')
+show_spiral(9, symbol='', space=' - ')
+===
+//import math
+
+F cell(n, =x, =y, start = 1)
+   V d = 0
+   y = y - n I/ 2
+   x = x - (n - 1) I/ 2
+   V l = 2 * max(abs(x), abs(y))
+   d = I y >= x {(l * 3 + x + y)} E (l - x - y)
+   R (l - 1) ^ 2 + d + start - 1
+
+F show_spiral(n, symbol = ‘# ’, start = 1, =space = ‘’)
+   V top = start + n * n + 1
+   V is_prime = [0B, 0B, 1B] [+] [1B, 0B] * (top I/ 2)
+   L(x) 3 .< 1 + Int(sqrt(top))
+      I !is_prime[x]
+         L.continue
+      L(i) (x * x .< top).step(x * 2)
+         is_prime[i] = 0B
+   (Int -> String) f = _ -> @symbol
+
+   I space == ‘’
+      space = ‘ ’ * symbol.len
+
+   I symbol.empty
+      V max_str = String(n * n + start - 1).len
+      I space == ‘’
+         space = (‘.’ * max_str)‘ ’
+      f = x -> String(x).rjust(@max_str)‘ ’
+   V cell_str = x -> I @is_prime[x] {@f(x)} E @space
+
+   L(y) 0 .< n
+      print((0 .< n).map(x -> cell(@n, x, @y, @start)).map(v -> @cell_str(v)).join(‘’))
+   print()
+show_spiral(10, symbol' ‘# ’, space' ‘  ’)
+show_spiral(9, symbol' ‘’, space' ‘ - ’)
+===
+template <typename T1, typename T2, typename T3, typename T4 = decltype(1)> auto cell(const T1 &n, T2 x, T3 y, const T4 &start = 1)
+{
+    auto d = 0;
+    y = y - idiv(n, 2);
+    x = x - idiv((n - 1), 2);
+    auto l = 2 * max(abs(x), abs(y));
+    d = y >= x ? (l * 3 + x + y) : (l - x - y);
+    return square((l - 1)) + d + start - 1;
+}
+
+template <typename T1, typename T2 = decltype(u"# "_S), typename T3 = decltype(1), typename T4 = decltype(u""_S)> auto show_spiral(const T1 &n, const T2 &symbol = u"# "_S, const T3 &start = 1, T4 space = u""_S)
+{
+    auto top = start + n * n + 1;
+    auto is_prime = create_array({false, false, true}) + create_array({true, false}) * (idiv(top, 2));
+    for (auto x : range_el(3, 1 + to_int(sqrt(top)))) {
+        if (!is_prime[x])
+            continue;
+        for (auto i : range_el(x * x, top).step(x * 2))
+            is_prime.set(i, false);
+    }
+    std::function<String(const int)> f = [&symbol](const auto &_){return symbol;};
+    if (space == u"")
+        space = u" "_S * symbol.len();
+
+    if (symbol.empty()) {
+        auto max_str = String(n * n + start - 1).len();
+        if (space == u"")
+            space = (u"."_S * max_str) & u" "_S;
+        f = [&max_str](const auto &x){return String(x).rjust(max_str) & u" "_S;};
+    }
+    auto cell_str = [&f, &is_prime, &space](const auto &x){return is_prime[x] ? f(x) : space;};
+    for (auto y : range_el(0, n))
+        print(range_el(0, n).map([&n, &start, &y](const auto &x){return cell(n, x, y, start);}).map([&cell_str](const auto &v){return cell_str(v);}).join(u""_S));
+    print();
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        show_spiral(10, u"# "_S, 1, u"  "_S);
+        show_spiral(9, u""_S, 1, u" - "_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Unix/ls#Python
+import os
+print('\n'.join(sorted(os.listdir('.'))))
+===
+//import os
+print(sorted(fs:list_dir(‘.’)).join("\n"))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sorted(fs::list_dir(u"."_S)).join(u"\n"_S));
+    }
+} code_block_1;
