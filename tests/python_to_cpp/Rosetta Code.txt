@@ -13171,3 +13171,54 @@ struct CodeBlock1
         print(url_encode(u"https://ru.wikipedia.org/wiki/Транспайлер"_S));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/UTF-8_encode_and_decode#Python
+def unicode_code(ch):
+    return 'U+' + hex(ord(ch))[2:].upper().zfill(4)
+
+def utf8hex(ch):
+    return " ".join([hex(c)[2:].upper() for c in ch.encode('utf-8')])
+
+print('{:<11} {:<15} {:<15}'.format('Character', 'Unicode', 'UTF-8 encoding (hex)'))
+chars = ['A', 'ö', 'Ж', '€']
+for char in chars:
+    print('{:<11} {:<15} {:<15}'.format(char, unicode_code(char), utf8hex(char)))
+===
+F unicode_code(ch)
+   R ‘U+’hex(ch.code).zfill(4)
+
+F utf8hex(ch)
+   R (ch.encode(‘utf-8’).map(c -> hex(c))).join(‘ ’)
+print(‘#<11 #<15 #<15’.format(‘Character’, ‘Unicode’, ‘UTF-8 encoding (hex)’))
+V chars = [‘A’, ‘ö’, ‘Ж’, ‘€’]
+L(char) chars
+   print(‘#<11 #<15 #<15’.format(char, unicode_code(char), utf8hex(char)))
+===
+template <typename T1> auto unicode_code(const T1 &ch)
+{
+    return u"U+"_S & hex(ch.code).zfill(4);
+}
+
+template <typename T1> auto utf8hex(const T1 &ch)
+{
+    return (ch.encode(u"utf-8"_S).map([](const auto &c){return hex(c);})).join(u" "_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"#<11 #<15 #<15"_S.format(u"Character"_S, u"Unicode"_S, u"UTF-8 encoding (hex)"_S));
+    }
+} code_block_1;
+auto chars = create_array({u'A'_C, u'ö'_C, u'Ж'_C, u'€'_C});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&_char_ : chars)
+            print(u"#<11 #<15 #<15"_S.format(_char_, unicode_code(_char_), utf8hex(_char_)));
+    }
+} code_block_2;

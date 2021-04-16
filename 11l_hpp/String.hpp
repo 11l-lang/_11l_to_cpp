@@ -50,6 +50,8 @@ public:
 	Char    uppercase() const {return towupper(code);}
 	bool is_uppercase() const {return iswupper(code);}
 	bool is_alpha    () const {return iswalpha(code);}
+
+	Array<Byte> encode(const String &encoding) const;
 };
 
 inline Char operator ""_C(char16_t c)

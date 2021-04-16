@@ -76,6 +76,11 @@ Array<Byte> String::encode(const String &encoding) const
 #endif
 }
 
+inline Array<Byte> Char::encode(const String &encoding = u"utf-8") const
+{
+	return String(*this).encode(encoding);
+}
+
 class FileNotFoundError {};
 
 class File
