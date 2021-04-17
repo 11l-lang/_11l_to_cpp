@@ -13222,3 +13222,93 @@ struct CodeBlock2
             print(u"#<11 #<15 #<15"_S.format(_char_, unicode_code(_char_), utf8hex(_char_)));
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Validate_International_Securities_Identification_Number#Python
+def check_isin(a):
+    if len(a) != 12:
+        return False
+    s : List[int] = []
+    for i, c in enumerate(a):
+        if c.isdigit():
+            if i < 2:
+                return False
+            s.append(ord(c) - 48)
+        elif c.isupper():
+            if i == 11:
+                return False
+            (d, m) = divmod(ord(c) - 55, 10)
+            s += [d, m]
+        else:
+            return False
+    v = sum(s[::-2])
+    for k in s[-2::-2]:
+        k = 2 * k
+        v += k - 9 if k > 9 else k
+    return v % 10 == 0
+
+print([check_isin(s) for s in ["US0378331005", "US0373831005", "U50378331005", "US03378331005",
+                               "AU0000XVGZA3", "AU0000VXGZA3", "FR0000988040"]])
+===
+F check_isin(a)
+   I a.len != 12
+      R 0B
+   [Int] s
+   L(c) a
+      V i = L.index
+      I c.is_digit()
+         I i < 2
+            R 0B
+         s.append(c.code - 48)
+      E I c.is_uppercase()
+         I i == 11
+            R 0B
+         V (d, m) = divmod(c.code - 55, 10)
+         s [+]= [d, m]
+      E
+         R 0B
+   V v = sum(s[((len)-1..0).step(-2)])
+   L(=k) s[((len)-2 ..).step(-2)]
+      k = 2 * k
+      v += I k > 9 {k - 9} E k
+   R v % 10 == 0
+print([‘US0378331005’, ‘US0373831005’, ‘U50378331005’, ‘US03378331005’, ‘AU0000XVGZA3’, ‘AU0000VXGZA3’, ‘FR0000988040’].map(s -> check_isin(s)))
+===
+template <typename T1> auto check_isin(const T1 &a)
+{
+    if (a.len() != 12)
+        return false;
+    Array<int> s;
+    {int Lindex = 0;
+    for (auto &&c : a) {
+        auto i = Lindex;
+        if (c.is_digit()) {
+            if (i < 2)
+                return false;
+            s.append(c.code - 48);
+        }
+        else if (c.is_uppercase()) {
+            if (i == 11)
+                return false;
+            auto [d, m] = divmod(c.code - 55, 10);
+            s.append(create_array({d, m}));
+        }
+        else
+            return false;
+        Lindex++;
+    }}
+    auto v = sum(s[range_elen_e( - 1, 0).step(-2)]);
+    for (auto k : s[range_elen_i( - 2).step(-2)]) {
+        k = 2 * k;
+        v += k > 9 ? k - 9 : k;
+    }
+    return mod(v, 10) == 0;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(create_array({u"US0378331005"_S, u"US0373831005"_S, u"U50378331005"_S, u"US03378331005"_S, u"AU0000XVGZA3"_S, u"AU0000VXGZA3"_S, u"FR0000988040"_S}).map([](const auto &s){return check_isin(s);}));
+    }
+} code_block_1;

@@ -42,6 +42,20 @@ template <typename Type> class Array : public std::vector<Type>
 		return r;
 	}
 
+	Array slice_e(Int begin, Int end, Int step = 1) const
+	{
+		Array r;
+		if (step > 0) {
+			r.reserve((end - begin + step) / step);
+			for (Int i = begin; i <= end; i += step)
+				r.push_back(std::vector<Type>::at(i));
+		}
+		else
+			for (Int i = begin; i >= end; i += step)
+				r.push_back(std::vector<Type>::at(i));
+		return r;
+	}
+
 public:
 	Array() {}
 	Array(std::initializer_list<Type> il) : std::vector<Type>(il) {}
@@ -198,22 +212,23 @@ public:
 		}
 	}
 
-	Array operator[](const Range<Int, true,  true > range) const {return slice(max(range.b    , Int(0)), min(range.e + 1, len()));}
-	Array operator[](const Range<Int, true,  false> range) const {return slice(max(range.b    , Int(0)), min(range.e    , len()));}
-	Array operator[](const Range<Int, false, true > range) const {return slice(max(range.b + 1, Int(0)), min(range.e + 1, len()));}
-	Array operator[](const Range<Int, false, false> range) const {return slice(max(range.b + 1, Int(0)), min(range.e    , len()));}
-	Array operator[](const RangeEI<Int>             range) const {return slice(max(range.b    , Int(0)),                  len() );}
-	Array operator[](const RangeWithStep<Int, true,  true > range) const {return slice(max(range.b    , Int(0)), min(range.e + 1, len()), range.step);}
-	Array operator[](const RangeWithStep<Int, true,  false> range) const {return slice(max(range.b    , Int(0)), min(range.e    , len()), range.step);}
-	Array operator[](const RangeWithStep<Int, false, true > range) const {return slice(max(range.b + 1, Int(0)), min(range.e + 1, len()), range.step);}
-	Array operator[](const RangeWithStep<Int, false, false> range) const {return slice(max(range.b + 1, Int(0)), min(range.e    , len()), range.step);}
-	Array operator[](const RangeEIWithStep<Int>             range) const {return slice(max(range.b    , Int(0)), range.step > 0 ? len() : -1, range.step);}
+	Array operator[](const Range<Int, true,  true > range) const {return slice_e(max(range.b    , Int(0)), min(range.e, len()));}
+	Array operator[](const Range<Int, true,  false> range) const {return slice  (max(range.b    , Int(0)), min(range.e, len()));}
+	Array operator[](const Range<Int, false, true > range) const {return slice_e(max(range.b + 1, Int(0)), min(range.e, len()));}
+	Array operator[](const Range<Int, false, false> range) const {return slice  (max(range.b + 1, Int(0)), min(range.e, len()));}
+	Array operator[](const RangeEI<Int>             range) const {return slice  (max(range.b    , Int(0)),              len() );}
+	Array operator[](const RangeWithStep<Int, true,  true > range) const {return slice_e(max(range.b    , Int(0)), min(range.e, len()), range.step);}
+	Array operator[](const RangeWithStep<Int, true,  false> range) const {return slice  (max(range.b    , Int(0)), min(range.e, len()), range.step);}
+	Array operator[](const RangeWithStep<Int, false, true > range) const {return slice_e(max(range.b + 1, Int(0)), min(range.e, len()), range.step);}
+	Array operator[](const RangeWithStep<Int, false, false> range) const {return slice  (max(range.b + 1, Int(0)), min(range.e, len()), range.step);}
+	Array operator[](const RangeEIWithStep<Int>             range) const {return slice  (max(range.b    , Int(0)), range.step > 0 ? len() : -1, range.step);}
 
 	Array operator[](const range_e_llen    range) const {return (*this)[range_el(        range.b, len() + range.e)];}
 	Array operator[](const range_elen_elen range) const {return (*this)[range_ee(len() + range.b, len() + range.e)];}
 	Array operator[](const range_elen_llen range) const {return (*this)[range_el(len() + range.b, len() + range.e)];}
 	Array operator[](const range_elen_i    range) const {return (*this)[range_ei(len() + range.b)];}
 	Array operator[](const range_elen_i_wstep range) const {return (*this)[range_ei(len() + range.b).step(range.s)];}
+	Array operator[](const range_elen_e_wstep range) const {return (*this)[range_ee(len() + range.b, range.e).step(range.s)];}
 
 	decltype(std::declval<const std::vector<Type>>().at(0)) operator[](Int i) const // decltype is needed for Array<bool> support
 	{

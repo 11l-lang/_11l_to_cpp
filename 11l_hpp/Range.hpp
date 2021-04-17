@@ -180,6 +180,17 @@ struct range_elen_i // `(len)-a..`
 	range_elen_i(Int b) : b(b) {}
 	range_elen_i_wstep step(Int s) {return range_elen_i_wstep(b, s);}
 };
+struct range_elen_e_wstep // `((len)-a..b).step(s)`
+{
+	Int b, e, s;
+	range_elen_e_wstep(Int b, Int e, Int s) : b(b), e(e), s(s) {}
+};
+struct range_elen_e // `(len)-a..b`
+{
+	Int b, e;
+	range_elen_e(Int b, Int e) : b(b), e(e) {}
+	range_elen_e_wstep step(Int s) {return range_elen_e_wstep(b, e, s);}
+};
 
 template <typename Ty> inline auto range_ee(const Ty &begin, const Ty &end) {return Range<Ty, true,  true >(begin, end);} // equal-equal range (`a..b`)
 template <typename Ty> inline auto range_el(const Ty &begin, const Ty &end) {return Range<Ty, true,  false>(begin, end);} // equal-less  range (`a.<b`)
