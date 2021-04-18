@@ -13267,7 +13267,7 @@ F check_isin(a)
          s [+]= [d, m]
       E
          R 0B
-   V v = sum(s[((len)-1..0).step(-2)])
+   V v = sum(s[((len)-1..).step(-2)])
    L(=k) s[((len)-2 ..).step(-2)]
       k = 2 * k
       v += I k > 9 {k - 9} E k
@@ -13297,7 +13297,7 @@ template <typename T1> auto check_isin(const T1 &a)
             return false;
         Lindex++;
     }}
-    auto v = sum(s[range_elen_e( - 1, 0).step(-2)]);
+    auto v = sum(s[range_elen_i( - 1).step(-2)]);
     for (auto k : s[range_elen_i( - 2).step(-2)]) {
         k = 2 * k;
         v += k > 9 ? k - 9 : k;
