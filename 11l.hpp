@@ -561,7 +561,7 @@ template <typename Ty> Ty copy(const Ty &obj)
 #define INIT_ARGV() for (int i=0; i<argc; i++) ::argv.append(String((char16_t*)argv[i], wcslen(argv[i])))
 #else
 #define MAIN_WITH_ARGV() main(int argc, char *argv[])
-#define INIT_ARGV() for (int i=0; i<argc; i++) ::argv.append(String(convert_utf8_to_utf16(argv[i])))
+#define INIT_ARGV() for (int i=0; i<argc; i++) ::argv.append(convert_utf8_string_to_String(argv[i]))
 #endif
 
 inline void exit(const String &msg)

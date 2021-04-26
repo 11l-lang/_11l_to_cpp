@@ -284,16 +284,36 @@ public:
 		return ends_with(_get<0>(tuple)) || ends_with(_get<1>(tuple)) || ends_with(_get<2>(tuple)) || ends_with(_get<3>(tuple));
 	}
 
+	/*
 	String replace(const String &old, const String &n) const
 	{
 		String str(*this);
 		size_t start_pos = 0;
-		while((start_pos = str.findi(old, (int)start_pos)) != -1) {
+		while((start_pos = str.std::u16string::find(old, start_pos)) != str.npos) {
 			str.std::u16string::replace(start_pos, old.length(), n);
 			start_pos += n.length();
 		}
 		return str;
 	}
+	*/
+	String replace(const String &from, const String &to) const // [https://stackoverflow.com/a/29752943/2692494 <- google:‘replace_all c++’]
+	{
+		String newString;
+		newString.reserve(length());
+
+		size_t lastPos = 0;
+		size_t findPos;
+
+		while ((findPos = std::u16string::find(from, lastPos)) != std::u16string::npos) {
+			newString.append(*this, lastPos, findPos - lastPos);
+			newString &= to;
+			lastPos = findPos + from.length();
+		}
+
+		newString.append(*this, lastPos, length() - lastPos);
+		return newString;
+	}
+
 	String replace(const re::RegEx &regex, const String &repl) const;
 
 	Nullable<Int> find(Char c, int start = 0) const
