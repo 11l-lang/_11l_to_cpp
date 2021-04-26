@@ -363,7 +363,9 @@ public:
 
 	int rfindi(const String &sub, int start, int end) const
 	{
-		size_t r = basic_string::rfind(sub, end - 1);
+		if (end < sub.len())
+			return -1;
+		size_t r = basic_string::rfind(sub, end - sub.len());
 		if (r == String::npos || (int)r < start) return -1;
 		return (int)r;
 	}
