@@ -207,6 +207,10 @@ template <> inline bool in(const int &val, const Range<int, true,  true > &range
 template <> inline bool in(const int &val, const Range<int, true,  false> &range) {return unsigned(val - range.b) <  unsigned(range.size());}
 template <> inline bool in(const int &val, const Range<int, false, true > &range) {return unsigned(val - range.b - 1) < unsigned(range.e - range.b);}
 template <> inline bool in(const int &val, const Range<int, false, false> &range) {return unsigned(val - range.b - 1) < unsigned(range.size());}
+template <> inline bool in(const Int64 &val, const Range<Int64, true,  true > &range) {return UInt64(val - range.b) <= UInt64(range.e - range.b);}
+template <> inline bool in(const Int64 &val, const Range<Int64, true,  false> &range) {return UInt64(val - range.b) <  UInt64(range.size());}
+template <> inline bool in(const Int64 &val, const Range<Int64, false, true > &range) {return UInt64(val - range.b - 1) < UInt64(range.e - range.b);}
+template <> inline bool in(const Int64 &val, const Range<Int64, false, false> &range) {return UInt64(val - range.b - 1) < UInt64(range.size());}
 
 template <typename Ty> inline bool in(const Ty &val, const RangeEI<Ty> &range) {return val >= range.b;}
 
