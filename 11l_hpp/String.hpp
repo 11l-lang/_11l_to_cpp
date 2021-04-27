@@ -41,9 +41,9 @@ public:
 	bool operator!=(char16_t c) const {return code != c;}
 
 	void operator++() {++code;}
-//	Char operator+(int i) const {return Char(code + i);}
-	Char operator-(int i) const {return Char(code - i);}
-	int operator-(Char c) const {return Char(code - c.code);}
+//	Char operator+(Int i) const {return Char(code + (int)i);}
+	Char operator-(Int i) const {return Char(code - (int)i);}
+	Int operator-(Char c) const {return code - c.code;}
 
 	Char    lowercase() const {return towlower(code);}
 	bool is_lowercase() const {return iswlower(code);}
@@ -151,7 +151,7 @@ public:
 	template <typename Type> explicit String(const Array<Type> &arr)
 	{
 		assign(1, u'[');
-		for (int i=0; i<arr.len(); i++) {
+		for (Int i=0; i<arr.len(); i++) {
 			*this &= String(arr[i]);
 			if (i < arr.len()-1) *this &= u", ";
 		}
@@ -191,15 +191,15 @@ public:
 		}
 
 		num += sign(num) * pow(.1, digits) * .5; // adjust number (0.199999 -> 0.2)
-		if ((int)num)
-			assign((int)num);
+		if ((Int64)num)
+			assign((Int64)num);
 		else // for numbers in range (-1; 0), as `(int)num` for them equals to 0
 		{
 			clear();
 			if (num < 0) append(1, u'-');
 			append(1, u'0');
 		}
-		num = fabs(num - (double)(int)num);
+		num = fabs(num - (double)(Int64)num);
 		if (digits > 0)
 		{
 			append(1, u'.');
@@ -207,7 +207,7 @@ public:
 			{
 				num *= 10.;
 				append(1, u'0'+int(num));
-				num -= (double)(int)num;
+				num -= (double)(Int64)num;
 			}
 			// Remove trailing zeroes ...
 			if (remove_trailing_zeroes) {
@@ -239,7 +239,7 @@ public:
 
 	bool starts_with(const char16_t *s, size_t sz) const
 	{
-		return len() >= (int)sz && memcmp(data(), s, sz*sizeof(char16_t)) == 0;
+		return len() >= (Int)sz && memcmp(data(), s, sz*sizeof(char16_t)) == 0;
 	}
 	bool starts_with(const char16_t *&s_) const
 	{
@@ -267,7 +267,7 @@ public:
 
 	bool ends_with(const char16_t *s, size_t sz) const
 	{
-		return len() >= (int)sz && memcmp(data() + len() - sz, s, sz*sizeof(char16_t)) == 0;
+		return len() >= (Int)sz && memcmp(data() + len() - sz, s, sz*sizeof(char16_t)) == 0;
 	}
 	template <int N> bool ends_with(const char16_t (&s)[N]) const {return ends_with(s, N-1);}
 	bool ends_with(const String &s) const {return ends_with(s.data(), s.len());}
@@ -316,7 +316,7 @@ public:
 
 	String replace(const re::RegEx &regex, const String &repl) const;
 
-	Nullable<Int> find(Char c, int start = 0) const
+	Nullable<Int> find(Char c, Int start = 0) const
 	{
 		const char16_t *s = data();
 		for (Int i=start, n=len(); i<n; i++)
@@ -324,13 +324,13 @@ public:
 		return Nullable<Int>();
 	}
 
-	Nullable<Int> find(const String &s, int start = 0) const
+	Nullable<Int> find(const String &s, Int start = 0) const
 	{
 		size_t r = basic_string::find(s, start);
 		return r == npos ? Nullable<Int>() : Nullable<Int>((Int)r);
 	}
 
-	Nullable<Int> find(const Tuple<String, String> &t, int start = 0) const
+	Nullable<Int> find(const Tuple<String, String> &t, Int start = 0) const
 	{
 		for (Int i = start, l = len() - min(std::get<0>(t).len(), std::get<1>(t).len()); i <= l; i++) {
 			if (i <= len() - std::get<0>(t).len() && memcmp(c_str() + i, std::get<0>(t).c_str(), std::get<0>(t).len() * sizeof(char16_t)) == 0) return i;
@@ -353,44 +353,44 @@ public:
 		return r != String::npos ? (Int)r : -1;
 	}
 
-	template <typename ValType> int index(const ValType &v) const;
+	template <typename ValType> Int index(const ValType &v) const;
 
-	Nullable<int> rfind(const String &s, int start = (int)npos) const
+	Nullable<Int> rfind(const String &s, Int start = (Int)npos) const
 	{
 		size_t r = basic_string::rfind(s, start);
-		return r == npos ? Nullable<int>() : Nullable<int>((int)r);
+		return r == npos ? Nullable<Int>() : Nullable<Int>((Int)r);
 	}
 
-	int rfindi(const String &sub, int start, int end) const
+	Int rfindi(const String &sub, Int start, Int end) const
 	{
 		if (end < sub.len())
 			return -1;
 		size_t r = basic_string::rfind(sub, end - sub.len());
-		if (r == String::npos || (int)r < start) return -1;
-		return (int)r;
+		if (r == String::npos || (Int)r < start) return -1;
+		return (Int)r;
 	}
 
-	int count(const char16_t *s, size_t sz) const
+	Int count(const char16_t *s, size_t sz) const
 	{
-		int c = 0;
-		for (int i=0; i<len();)
+		Int c = 0;
+		for (Int i=0; i<len();)
 			if (memcmp(s, data() + i, sz * sizeof(char16_t)) == 0) {
 				c++;
-				i += (int)sz;
+				i += (Int)sz;
 			} else
 				i++;
 		return c;
 	}
-	template <int N> int count(const char16_t(&s)[N]) const
+	template <int N> Int count(const char16_t(&s)[N]) const
 	{
 		return count(s, N-1);
 	}
-	int count(const String &s) const
+	Int count(const String &s) const
 	{
 		return count(s.data(), s.len());
 	}
 
-	Array<String> split(const String &delim, Nullable<int> limit = nullptr, bool group_delimiters = false) const;
+	Array<String> split(const String &delim, Nullable<Int> limit = nullptr, bool group_delimiters = false) const;
 	template <typename ... Types> Array<String> split(const Tuple<Types...> &delim_tuple, Nullable<int> limit = nullptr, bool group_delimiters = false) const;
 	Array<String> split(const re::RegEx &regex) const;
 	Array<String> split_py() const;

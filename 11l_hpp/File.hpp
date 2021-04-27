@@ -271,7 +271,7 @@ public:
 
 	void seek(Int offset, Int whence = 0)
 	{
-		fseek(file, offset, whence);
+		fseek(file, (long)offset, (int)whence);
 	}
 
 	void flush()

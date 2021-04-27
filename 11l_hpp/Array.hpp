@@ -12,9 +12,9 @@ template <typename Type, int N> String to_string(const Tvec<Type, N> &v)
 	return r;
 }
 
-template <typename ValType> int String::index(const ValType &v) const
+template <typename ValType> Int String::index(const ValType &v) const
 {
-	int r = findi(v);
+	Int r = findi(v);
 	if (r == -1) throw ValueError(v);
 	return r;
 }
@@ -232,7 +232,7 @@ public:
 
 	decltype(std::declval<const std::vector<Type>>().at(0)) operator[](Int i) const // decltype is needed for Array<bool> support
 	{
-		if (in(i, range_el(0, len())))
+		if (in(i, range_el(Int(0), len())))
 			return std::vector<Type>::at(i);
 		throw IndexError(i);
 	}
@@ -593,9 +593,9 @@ template <typename Func> Array<Char> String::filter(Func &&func) const
 	return r;
 }
 
-inline Array<String> String::split(const String &delim, Nullable<int> limit, bool group_delimiters) const
+inline Array<String> String::split(const String &delim, Nullable<Int> limit, bool group_delimiters) const
 {
-	int lim = limit == nullptr ? -1 : *limit - 1;
+	Int lim = limit == nullptr ? -1 : *limit - 1;
 	Array<String> arr;
 	if (lim == 0) {
 		arr.append(*this);
