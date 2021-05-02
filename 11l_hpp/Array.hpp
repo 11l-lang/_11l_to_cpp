@@ -494,7 +494,7 @@ Array<char> create_array(std::initializer_list<bool> il) // avoid using std::vec
 template <typename Type, bool include_beginning, bool include_ending> Array<Type> create_array(const Range<Type, include_beginning, include_ending> &range)
 {
 	Array<Type> r;
-	if (range.len() > 0)
+	if (ptrdiff_t(range.len()) > 0)
 		r.reserve(range.len());
 	for (auto i : range)
 		r.push_back(i);
@@ -504,7 +504,7 @@ template <typename Type, bool include_beginning, bool include_ending> Array<Type
 template <typename Type, bool include_beginning, bool include_ending> Array<Type> create_array(const RangeWithStep<Type, include_beginning, include_ending> &range)
 {
 	Array<Type> r;
-	if (range.len() > 0)
+	if (ptrdiff_t(range.len()) > 0)
 		r.reserve(range.len());
 	for (auto i : range)
 		r.push_back(i);
@@ -625,9 +625,9 @@ inline Array<String> String::split(const String &delim, Nullable<Int> limit, boo
 	return arr;
 }
 
-template <typename ... Types> inline Array<String> String::split(const Tuple<Types...> &delim_tuple, Nullable<int> limit, bool group_delimiters) const
+template <typename ... Types> inline Array<String> String::split(const Tuple<Types...> &delim_tuple, Nullable<Int> limit, bool group_delimiters) const
 {
-	int lim = limit == nullptr ? -1 : *limit - 1;
+	Int lim = limit == nullptr ? -1 : *limit - 1;
 	Array<String> arr;
 	if (lim == 0) {
 		arr.append(*this);
