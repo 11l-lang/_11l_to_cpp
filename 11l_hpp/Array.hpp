@@ -758,7 +758,7 @@ template <typename Type> Type min(const Array<Type> &arr)
 
 template <typename Iterable, typename Key> auto min_with_key(const Iterable &iterable, Key &&key)
 {
-	std::remove_const_t<std::remove_reference_t<decltype(*std::begin(iterable))>> minitem;
+	std::remove_const_t<std::remove_reference_t<decltype(*std::begin(iterable))>> minitem = *std::begin(iterable);
 	decltype(key(std::declval<decltype(*std::begin(iterable))>())) minval;
 	bool first_iteration = true;
 	for (auto &&el : iterable)
@@ -779,7 +779,7 @@ template <typename Iterable, typename Key> auto min_with_key(const Iterable &ite
 
 template <typename Iterable, typename Key> auto max_with_key(const Iterable &iterable, Key &&key)
 {
-	std::remove_const_t<std::remove_reference_t<decltype(*std::begin(iterable))>> maxitem;
+	std::remove_const_t<std::remove_reference_t<decltype(*std::begin(iterable))>> maxitem = *std::begin(iterable);
 	decltype(key(std::declval<decltype(*std::begin(iterable))>())) maxval;
 	bool first_iteration = true;
 	for (auto &&el : iterable)

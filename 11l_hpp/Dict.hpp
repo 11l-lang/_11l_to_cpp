@@ -138,6 +138,15 @@ public:
 		return std::map<KeyType, ValueType>::operator[](key);
 	}
 
+	ValueType pop(const KeyType &key)
+	{
+		auto r = std::map<KeyType, ValueType>::find(key);
+		if (r == std::map<KeyType, ValueType>::end()) throw KeyError(String(key));
+		ValueType el = std::move(r->second);
+		std::map<KeyType, ValueType>::erase(r);
+		return std::move(el);
+	}
+
 	Array<KeyType> keys() const
 	{
 		Array<KeyType> r;
