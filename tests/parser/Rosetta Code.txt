@@ -2978,3 +2978,46 @@ struct CodeBlock1
             print_verse(n);
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Vector_products#Python
+F scalartriplep(a, b, c)
+    return dot(a, cross(b, c))
+
+F vectortriplep(a, b, c)
+    return cross(a, cross(b, c))
+
+V a = (3, 4, 5)
+V b = (4, 3, 5)
+V c = (-5, -12, -13)
+
+print(‘a = #.;  b = #.;  c = #.’.format(a, b, c))
+print(‘a . b = #.’.format(dot(a, b)))
+print(‘a x b = #.’.format(cross(a,b)))
+print(‘a . (b x c) = #.’.format(scalartriplep(a, b, c)))
+print(‘a x (b x c) = #.’.format(vectortriplep(a, b, c)))
+===
+template <typename T1, typename T2, typename T3> auto scalartriplep(const T1 &a, const T2 &b, const T3 &c)
+{
+    return dot(a, cross(b, c));
+}
+
+template <typename T1, typename T2, typename T3> auto vectortriplep(const T1 &a, const T2 &b, const T3 &c)
+{
+    return cross(a, cross(b, c));
+}
+auto a = make_tuple(3, 4, 5);
+auto b = make_tuple(4, 3, 5);
+auto c = make_tuple(-5, -12, -13);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"a = #.;  b = #.;  c = #."_S.format(a, b, c));
+        print(u"a . b = #."_S.format(dot(a, b)));
+        print(u"a x b = #."_S.format(cross(a, b)));
+        print(u"a . (b x c) = #."_S.format(scalartriplep(a, b, c)));
+        print(u"a x (b x c) = #."_S.format(vectortriplep(a, b, c)));
+    }
+} code_block_1;

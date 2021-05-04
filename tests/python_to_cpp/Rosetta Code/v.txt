@@ -1,0 +1,507 @@
+# https://www.rosettacode.org/wiki/Van_der_Corput_sequence#Python
+def vdc(n, base=2):
+    (vdc, denom) = (0.0, 1)
+    while n != 0:
+        denom *= base
+        (n, remainder) = divmod(n, base)
+        vdc += float(remainder) / denom
+    return vdc
+
+print([vdc(i) for i in range(10)])
+print([vdc(i, 3) for i in range(10)])
+===
+F vdc(=n, base = 2)
+   V (vdc, denom) = (0.0, 1)
+   L n != 0
+      denom *= base
+      (n, V remainder) = divmod(n, base)
+      vdc += Float(remainder) / denom
+   R vdc
+print((0.<10).map(i -> vdc(i)))
+print((0.<10).map(i -> vdc(i, 3)))
+===
+template <typename T1, typename T2 = decltype(2)> auto vdc(T1 n, const T2 &base = 2)
+{
+    auto [vdc, denom] = make_tuple(0.0, 1);
+    while (n != 0) {
+        denom *= base;
+        TUPLE_ELEMENT_T(1, divmod(n, base)) remainder;
+        assign_from_tuple(n, remainder, divmod(n, base));
+        vdc += to_float(remainder) / denom;
+    }
+    return vdc;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(range_el(0, 10).map([](const auto &i){return vdc(i);}));
+        print(range_el(0, 10).map([](const auto &i){return vdc(i, 3);}));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Van_Eck_sequence#Python:_List_based
+def van_eck(c):
+    r : List[int] = []
+    n = 0
+    seen = [0]
+    val = 0
+    while True:
+        r.append(val)
+        if len(r) == c:
+            return r
+        if val in seen[1:]:
+            val = seen.index(val, 1)
+        else:
+            val = 0
+        seen.insert(0, val)
+        n += 1
+
+print("Van Eck: first 10 terms:  ", van_eck(10))
+print("Van Eck: terms 991 - 1000:", van_eck(1000)[-10:])
+===
+F van_eck(c)
+   [Int] r
+   V n = 0
+   V seen = [0]
+   V val = 0
+   L
+      r.append(val)
+      I r.len == c
+         R r
+      I val C seen[1..]
+         val = seen.index(val, 1)
+      E
+         val = 0
+      seen.insert(0, val)
+      n++
+print(‘Van Eck: first 10 terms:   ’van_eck(10))
+print(‘Van Eck: terms 991 - 1000: ’van_eck(1000)[(len)-10 ..])
+===
+template <typename T1> auto van_eck(const T1 &c)
+{
+    Array<int> r;
+    auto n = 0;
+    auto seen = create_array({0});
+    auto val = 0;
+    while (true) {
+        r.append(val);
+        if (r.len() == c)
+            return r;
+        if (in(val, seen[range_ei(1)]))
+            val = seen.index(val, 1);
+        else
+            val = 0;
+        seen.insert(0, val);
+        n++;
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Van Eck: first 10 terms:   "_S & van_eck(10));
+        print(u"Van Eck: terms 991 - 1000: "_S & van_eck(1000)[range_elen_i( - 10)]);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Vigen%C3%A8re_cipher#C.2B.2B
+def encrypt(key, text):
+    out = ''
+    j = 0
+    for c in text:
+        if not c.isalpha():
+            continue
+        out += chr((ord(c.upper()) + ord(key[j]) - 2 * ord('A')) % 26 + ord('A'))
+        j = (j + 1) % len(key)
+    return out
+
+def decrypt(key, text):
+    out = ''
+    j = 0
+    for c in text:
+        if not c.isalpha():
+            continue
+        out += chr((ord(c) - ord(key[j]) + 26) % 26 + ord('A'))
+        j = (j + 1) % len(key)
+    return out
+
+key = 'VIGENERECIPHER'
+original = "Beware the Jabberwock, my son! The jaws that bite, the claws that catch!"
+encrypted = encrypt(key, original)
+decrypted = decrypt(key, encrypted)
+
+print(original)
+print("Encrypted: " + encrypted)
+print("Decrypted: " + decrypted)
+===
+F encrypt(key, text)
+   V out = ‘’
+   V j = 0
+   L(c) text
+      I !c.is_alpha()
+         L.continue
+      out ‘’= Char(code' (c.uppercase().code + key[j].code - 2 * ‘A’.code) % 26 + ‘A’.code)
+      j = (j + 1) % key.len
+   R out
+
+F decrypt(key, text)
+   V out = ‘’
+   V j = 0
+   L(c) text
+      I !c.is_alpha()
+         L.continue
+      out ‘’= Char(code' (c.code - key[j].code + 26) % 26 + ‘A’.code)
+      j = (j + 1) % key.len
+   R out
+V key = ‘VIGENERECIPHER’
+V original = ‘Beware the Jabberwock, my son! The jaws that bite, the claws that catch!’
+V encrypted = encrypt(key, original)
+V decrypted = decrypt(key, encrypted)
+print(original)
+print(‘Encrypted: ’encrypted)
+print(‘Decrypted: ’decrypted)
+===
+template <typename T1, typename T2> auto encrypt(const T1 &key, const T2 &text)
+{
+    auto out = u""_S;
+    auto j = 0;
+    for (auto &&c : text) {
+        if (!c.is_alpha())
+            continue;
+        out &= Char(mod((c.uppercase().code + key[j].code - 2 * u'A'_C.code), 26) + u'A'_C.code);
+        j = mod((j + 1), key.len());
+    }
+    return out;
+}
+
+template <typename T1, typename T2> auto decrypt(const T1 &key, const T2 &text)
+{
+    auto out = u""_S;
+    auto j = 0;
+    for (auto &&c : text) {
+        if (!c.is_alpha())
+            continue;
+        out &= Char(mod((c.code - key[j].code + 26), 26) + u'A'_C.code);
+        j = mod((j + 1), key.len());
+    }
+    return out;
+}
+auto key = u"VIGENERECIPHER"_S;
+auto original = u"Beware the Jabberwock, my son! The jaws that bite, the claws that catch!"_S;
+auto encrypted = encrypt(key, original);
+auto decrypted = decrypt(key, encrypted);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(original);
+        print(u"Encrypted: "_S & encrypted);
+        print(u"Decrypted: "_S & decrypted);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Vigen%C3%A8re_cipher/Cryptanalysis#Python
+#from string import ascii_uppercase
+ascii_uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' # Array(‘A’..‘Z’)
+
+def vigenere_decrypt(target_freqs, input):
+    nchars = len(ascii_uppercase)
+    ordA = ord('A')
+    sorted_targets = sorted(target_freqs)
+
+    def frequency(input):
+        result = [(c, 0.0) for c in ascii_uppercase]
+        for c in input:
+            #result[c - ordA][1] += 1
+            result[c - ordA] = (result[c - ordA][0], result[c - ordA][1] + 1)
+        return result
+
+    def correlation(input):
+        result = 0.0
+        freq = sorted(frequency(input), key=lambda a: a[1])
+
+        for i, f in enumerate(freq):
+            result += f[1] * sorted_targets[i]
+        return result
+
+    cleaned = [ord(c) for c in input.upper() if c.isupper()]
+    best_len = 0
+    best_corr = -100.0
+
+    # Assume that if there are less than 20 characters
+    # per column, the key's too long to guess
+    for i in range(2, len(cleaned) // 20):
+        pieces = [[0]*0 for _ in range(i)]
+        for j, c in enumerate(cleaned):
+            pieces[j % i].append(c)
+
+        # The correlation seems to increase for smaller
+        # pieces/longer keys, so weigh against them a little
+        corr = -0.5 * i + sum(correlation(p) for p in pieces)
+
+        if corr > best_corr:
+            best_len = i
+            best_corr = corr
+
+    if best_len == 0:
+        return ("Text is too short to analyze", "")
+
+    pieces = [[0]*0 for _ in range(best_len)]
+    for i, c in enumerate(cleaned):
+        pieces[i % best_len].append(c)
+
+    freqs = [frequency(p) for p in pieces]
+
+    key = ""
+    for fr_ in freqs:
+        fr = sorted(fr_, key=lambda a: a[1], reverse=True)
+
+        m = 0
+        max_corr = 0.0
+        for j in range(nchars):
+            corr = 0.0
+            c = ordA + j
+            for frc in fr:
+                d = (ord(frc[0]) - c + nchars) % nchars
+                corr += frc[1] * target_freqs[d]
+
+            if corr > max_corr:
+                m = j
+                max_corr = corr
+
+        key += chr(m + ordA)
+
+    r = (chr((c - ord(key[i % best_len]) + nchars) % nchars + ordA)
+         for i, c in enumerate(cleaned))
+    return (key, "".join(r))
+
+encoded = """
+    MOMUD EKAPV TQEFM OEVHP AJMII CDCTI FGYAG JSPXY ALUYM NSMYH
+    VUXJE LEPXJ FXGCM JHKDZ RYICU HYPUS PGIGM OIYHF WHTCQ KMLRD
+    ITLXZ LJFVQ GHOLW CUHLO MDSOE KTALU VYLNZ RFGBX PHVGA LWQIS
+    FGRPH JOOFW GUBYI LAPLA LCAFA AMKLG CETDW VOELJ IKGJB XPHVG
+    ALWQC SNWBU BYHCU HKOCE XJEYK BQKVY KIIEH GRLGH XEOLW AWFOJ
+    ILOVV RHPKD WIHKN ATUHN VRYAQ DIVHX FHRZV QWMWV LGSHN NLVZS
+    JLAKI FHXUF XJLXM TBLQV RXXHR FZXGV LRAJI EXPRV OSMNP KEPDT
+    LPRWM JAZPK LQUZA ALGZX GVLKL GJTUI ITDSU REZXJ ERXZS HMPST
+    MTEOE PAPJH SMFNB YVQUZ AALGA YDNMP AQOWT UHDBV TSMUE UIMVH
+    QGVRW AEFSP EMPVE PKXZY WLKJA GWALT VYYOB YIXOK IHPDS EVLEV
+    RVSGB JOGYW FHKBL GLXYA MVKIS KIEHY IMAPX UOISK PVAGN MZHPW
+    TTZPV XFCCD TUHJH WLAPF YULTB UXJLN SIJVV YOVDJ SOLXG TGRVO
+    SFRII CTMKO JFCQF KTINQ BWVHG TENLH HOGCS PSFPV GJOKM SIFPR
+    ZPAAS ATPTZ FTPPD PORRF TAXZP KALQA WMIUD BWNCT LEFKO ZQDLX
+    BUXJL ASIMR PNMBF ZCYLV WAPVF QRHZV ZGZEF KBYIO OFXYE VOWGB
+    BXVCB XBAWG LQKCM ICRRX MACUO IKHQU AJEGL OIJHH XPVZW JEWBA
+    FWAML ZZRXJ EKAHV FASMU LVVUT TGK"""
+
+english_frequences = [
+    0.08167, 0.01492, 0.02782, 0.04253, 0.12702, 0.02228, 0.02015,
+    0.06094, 0.06966, 0.00153, 0.00772, 0.04025, 0.02406, 0.06749,
+    0.07507, 0.01929, 0.00095, 0.05987, 0.06327, 0.09056, 0.02758,
+    0.00978, 0.02360, 0.00150, 0.01974, 0.00074]
+
+(key, decoded) = vigenere_decrypt(english_frequences, encoded)
+print("Key:", key)
+print("\nText:", decoded)
+===
+V ascii_uppercase = ‘ABCDEFGHIJKLMNOPQRSTUVWXYZ’
+
+F vigenere_decrypt(target_freqs, input)
+   V nchars = :ascii_uppercase.len
+   V ordA = ‘A’.code
+   V sorted_targets = sorted(target_freqs)
+
+   F frequency(input)
+      V result = :ascii_uppercase.map(c -> (c, 0.0))
+      L(c) input
+         result[c - @ordA] = (result[c - @ordA][0], result[c - @ordA][1] + 1)
+      R result
+
+   F correlation(input)
+      V result = 0.0
+      V freq = sorted(@frequency(input), key' a -> a[1])
+
+      L(f) freq
+         V i = L.index
+         result += f[1] * @sorted_targets[i]
+      R result
+   V cleaned = input.uppercase().filter(c -> c.is_uppercase()).map(c -> c.code)
+   V best_len = 0
+   V best_corr = -100.0
+
+   L(i) 2 .< cleaned.len I/ 20
+      V pieces = (0 .< i).map(_ -> [0] * 0)
+      L(c) cleaned
+         V j = L.index
+         pieces[j % i].append(c)
+      V corr = -0.5 * i + sum(pieces.map(p -> @correlation(p)))
+
+      I corr > best_corr
+         best_len = i
+         best_corr = corr
+
+   I best_len == 0
+      R (‘Text is too short to analyze’, ‘’)
+   V pieces = (0 .< best_len).map(_ -> [0] * 0)
+   L(c) cleaned
+      V i = L.index
+      pieces[i % best_len].append(c)
+   V freqs = pieces.map(p -> @frequency(p))
+   V key = ‘’
+   L(fr_) freqs
+      V fr = sorted(fr_, key' a -> a[1], reverse' 1B)
+      V m = 0
+      V max_corr = 0.0
+      L(j) 0 .< nchars
+         V corr = 0.0
+         V c = ordA + j
+         L(frc) fr
+            V d = (frc[0].code - c + nchars) % nchars
+            corr += frc[1] * target_freqs[d]
+
+         I corr > max_corr
+            m = j
+            max_corr = corr
+      key ‘’= Char(code' m + ordA)
+   V r = (enumerate(cleaned).map((i, c) -> Char(code' (c - @key[i % @best_len].code + @nchars) % @nchars + @ordA)))
+   R (key, r.join(‘’))
+V encoded = ‘
+    MOMUD EKAPV TQEFM OEVHP AJMII CDCTI FGYAG JSPXY ALUYM NSMYH
+    VUXJE LEPXJ FXGCM JHKDZ RYICU HYPUS PGIGM OIYHF WHTCQ KMLRD
+    ITLXZ LJFVQ GHOLW CUHLO MDSOE KTALU VYLNZ RFGBX PHVGA LWQIS
+    FGRPH JOOFW GUBYI LAPLA LCAFA AMKLG CETDW VOELJ IKGJB XPHVG
+    ALWQC SNWBU BYHCU HKOCE XJEYK BQKVY KIIEH GRLGH XEOLW AWFOJ
+    ILOVV RHPKD WIHKN ATUHN VRYAQ DIVHX FHRZV QWMWV LGSHN NLVZS
+    JLAKI FHXUF XJLXM TBLQV RXXHR FZXGV LRAJI EXPRV OSMNP KEPDT
+    LPRWM JAZPK LQUZA ALGZX GVLKL GJTUI ITDSU REZXJ ERXZS HMPST
+    MTEOE PAPJH SMFNB YVQUZ AALGA YDNMP AQOWT UHDBV TSMUE UIMVH
+    QGVRW AEFSP EMPVE PKXZY WLKJA GWALT VYYOB YIXOK IHPDS EVLEV
+    RVSGB JOGYW FHKBL GLXYA MVKIS KIEHY IMAPX UOISK PVAGN MZHPW
+    TTZPV XFCCD TUHJH WLAPF YULTB UXJLN SIJVV YOVDJ SOLXG TGRVO
+    SFRII CTMKO JFCQF KTINQ BWVHG TENLH HOGCS PSFPV GJOKM SIFPR
+    ZPAAS ATPTZ FTPPD PORRF TAXZP KALQA WMIUD BWNCT LEFKO ZQDLX
+    BUXJL ASIMR PNMBF ZCYLV WAPVF QRHZV ZGZEF KBYIO OFXYE VOWGB
+    BXVCB XBAWG LQKCM ICRRX MACUO IKHQU AJEGL OIJHH XPVZW JEWBA
+    FWAML ZZRXJ EKAHV FASMU LVVUT TGK’
+V english_frequences = [0.08167, 0.01492, 0.02782, 0.04253, 0.12702, 0.02228, 0.02015, 0.06094, 0.06966, 0.00153, 0.00772, 0.04025, 0.02406, 0.06749, 0.07507, 0.01929, 0.00095, 0.05987, 0.06327, 0.09056, 0.02758, 0.00978, 0.02360, 0.00150, 0.01974, 0.00074]
+V (key, decoded) = vigenere_decrypt(english_frequences, encoded)
+print(‘Key: ’key)
+print("\nText: "decoded)
+===
+auto ascii_uppercase = u"ABCDEFGHIJKLMNOPQRSTUVWXYZ"_S;
+
+template <typename T1, typename T2> auto vigenere_decrypt(const T1 &target_freqs, const T2 &input)
+{
+    auto nchars = ::ascii_uppercase.len();
+    auto ordA = u'A'_C.code;
+    auto sorted_targets = sorted(target_freqs);
+
+    auto frequency = [&ordA](const auto &input)
+    {
+        auto result = ::ascii_uppercase.map([](const auto &c){return make_tuple(c, 0.0);});
+        for (auto &&c : input)
+            result.set(c - ordA, make_tuple(_get<0>(result[c - ordA]), _get<1>(result[c - ordA]) + 1));
+        return result;
+    };
+
+    auto correlation = [&frequency, &sorted_targets](const auto &input)
+    {
+        auto result = 0.0;
+        auto freq = sorted(frequency(input), [](const auto &a){return _get<1>(a);});
+        {int Lindex = 0;
+
+        for (auto &&f : freq) {
+            auto i = Lindex;
+            result += _get<1>(f) * sorted_targets[i];
+            Lindex++;
+        }}
+        return result;
+    };
+    auto cleaned = input.uppercase().filter([](const auto &c){return c.is_uppercase();}).map([](const auto &c){return c.code;});
+    auto best_len = 0;
+    auto best_corr = -100.0;
+
+    for (auto i : range_el(2, idiv(cleaned.len(), 20))) {
+        auto pieces = range_el(0, i).map([](const auto &_){return create_array({0}) * 0;});
+        {int Lindex = 0;
+        for (auto &&c : cleaned) {
+            auto j = Lindex;
+            pieces[mod(j, i)].append(c);
+            Lindex++;
+        }}
+        auto corr = -0.5 * i + sum_map(pieces, [&correlation](const auto &p){return correlation(p);});
+
+        if (corr > best_corr) {
+            best_len = i;
+            best_corr = corr;
+        }
+    }
+    if (best_len == 0)
+        return make_tuple(u"Text is too short to analyze"_S, u""_S);
+    auto pieces = range_el(0, best_len).map([](const auto &_){return create_array({0}) * 0;});
+    {int Lindex = 0;
+    for (auto &&c : cleaned) {
+        auto i = Lindex;
+        pieces[mod(i, best_len)].append(c);
+        Lindex++;
+    }}
+    auto freqs = pieces.map([&frequency](const auto &p){return frequency(p);});
+    auto key = u""_S;
+    for (auto &&fr_ : freqs) {
+        auto fr = sorted(fr_, [](const auto &a){return _get<1>(a);}, true);
+        auto m = 0;
+        auto max_corr = 0.0;
+        for (auto j : range_el(0, nchars)) {
+            auto corr = 0.0;
+            auto c = ordA + j;
+            for (auto &&frc : fr) {
+                auto d = mod((_get<0>(frc).code - c + nchars), nchars);
+                corr += _get<1>(frc) * target_freqs[d];
+            }
+
+            if (corr > max_corr) {
+                m = j;
+                max_corr = corr;
+            }
+        }
+        key &= Char(m + ordA);
+    }
+    auto r = (enumerate(cleaned).map([&best_len, &key, &nchars, &ordA](const auto &i, const auto &c){return Char(mod((c - key[mod(i, best_len)].code + nchars), nchars) + ordA);}));
+    return make_tuple(key, r.join(u""_S));
+}
+auto encoded = uR"(
+    MOMUD EKAPV TQEFM OEVHP AJMII CDCTI FGYAG JSPXY ALUYM NSMYH
+    VUXJE LEPXJ FXGCM JHKDZ RYICU HYPUS PGIGM OIYHF WHTCQ KMLRD
+    ITLXZ LJFVQ GHOLW CUHLO MDSOE KTALU VYLNZ RFGBX PHVGA LWQIS
+    FGRPH JOOFW GUBYI LAPLA LCAFA AMKLG CETDW VOELJ IKGJB XPHVG
+    ALWQC SNWBU BYHCU HKOCE XJEYK BQKVY KIIEH GRLGH XEOLW AWFOJ
+    ILOVV RHPKD WIHKN ATUHN VRYAQ DIVHX FHRZV QWMWV LGSHN NLVZS
+    JLAKI FHXUF XJLXM TBLQV RXXHR FZXGV LRAJI EXPRV OSMNP KEPDT
+    LPRWM JAZPK LQUZA ALGZX GVLKL GJTUI ITDSU REZXJ ERXZS HMPST
+    MTEOE PAPJH SMFNB YVQUZ AALGA YDNMP AQOWT UHDBV TSMUE UIMVH
+    QGVRW AEFSP EMPVE PKXZY WLKJA GWALT VYYOB YIXOK IHPDS EVLEV
+    RVSGB JOGYW FHKBL GLXYA MVKIS KIEHY IMAPX UOISK PVAGN MZHPW
+    TTZPV XFCCD TUHJH WLAPF YULTB UXJLN SIJVV YOVDJ SOLXG TGRVO
+    SFRII CTMKO JFCQF KTINQ BWVHG TENLH HOGCS PSFPV GJOKM SIFPR
+    ZPAAS ATPTZ FTPPD PORRF TAXZP KALQA WMIUD BWNCT LEFKO ZQDLX
+    BUXJL ASIMR PNMBF ZCYLV WAPVF QRHZV ZGZEF KBYIO OFXYE VOWGB
+    BXVCB XBAWG LQKCM ICRRX MACUO IKHQU AJEGL OIJHH XPVZW JEWBA
+    FWAML ZZRXJ EKAHV FASMU LVVUT TGK)"_S;
+auto english_frequences = create_array({0.08167, 0.01492, 0.02782, 0.04253, 0.12702, 0.02228, 0.02015, 0.06094, 0.06966, 0.00153, 0.00772, 0.04025, 0.02406, 0.06749, 0.07507, 0.01929, 0.00095, 0.05987, 0.06327, 0.09056, 0.02758, 0.00978, 0.02360, 0.00150, 0.01974, 0.00074});
+auto [key, decoded] = vigenere_decrypt(english_frequences, encoded);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Key: "_S & key);
+        print(u"\nText: "_S & decoded);
+    }
+} code_block_1;
