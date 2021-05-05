@@ -13681,3 +13681,194 @@ struct CodeBlock1
             }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Wireworld#Python
+from copy import deepcopy
+
+allstates = 'Ht. '
+head      = allstates[0]
+tail      = allstates[1]
+conductor = allstates[2]
+empty     = allstates[3]
+
+w = '''tH.........
+.   .
+   ...
+.   .
+Ht.. ......'''
+
+def readfile(f):
+    '''file > initial world configuration'''
+    world  = [row.rstrip('\r\n') for row in f]
+    height = len(world)
+    width  = max(len(row) for row in world)
+    # fill right and frame in empty cells
+    nonrow = [ ' ' + ' '*width + ' ' ]
+    world2 = nonrow + \
+               [ ' ' + str(row).ljust(width) + ' ' for row in world ] + \
+               nonrow
+    world3 = [list(row) for row in world2]
+    return (world3, width, height)
+
+def newcell(currentworld, x, y):
+    istate = currentworld[y][x]
+    assert istate in allstates, 'Wireworld cell set to unknown value "%s"' % istate
+    ostate = empty
+    if istate == head:
+        ostate = tail
+    elif istate == tail:
+        ostate = conductor
+    elif istate == empty:
+        ostate = empty
+    else: # istate == conductor
+        n = sum( int(currentworld[y+dy][x+dx] == head)
+                 for dx,dy in [ (-1,-1), (-1,+0), (-1,+1),
+                                (+0,-1),          (+0,+1),
+                                (+1,-1), (+1,+0), (+1,+1) ] )
+        ostate = head if 1 <= n <= 2 else conductor
+    return ostate
+
+def nextgen(ww):
+    'compute next generation of wireworld'
+    (world, width, height) = ww
+    newworld = deepcopy(world)
+    for x in range(1, width+1):
+        for y in range(1, height+1):
+            newworld[y][x] = newcell(world, x, y)
+    return (newworld, width, height)
+
+def world2string(ww):
+    return '\n'.join( ''.join(row[1:-1]).rstrip() for row in ww[0][1:-1] )
+
+ww = readfile(w.split("\n"))
+
+for gen in range(10):
+    print ( ("\n%3i " % gen) + '=' * (ww[1]-4) + '\n' )
+    print ( world2string(ww) )
+    ww = nextgen(ww)
+===
+V allstates = ‘Ht. ’
+V head = allstates[0]
+V tail = allstates[1]
+V conductor = allstates[2]
+V empty = allstates[3]
+V w = ‘tH.........
+.   .
+   ...
+.   .
+Ht.. ......’
+
+F readfile(f)
+   ‘file > initial world configuration’
+   V world = f.map(row -> row.rtrim(Array[Char]("\r\n")))
+   V height = world.len
+   V width = max(world.map(row -> row.len))
+   V nonrow = [‘ ’(‘ ’ * width)‘ ’]
+   V world2 = nonrow [+] world.map(row -> ‘ ’String(row).ljust(@width)‘ ’) [+] nonrow
+   V world3 = world2.map(row -> Array(row))
+   R (world3, width, height)
+
+F newcell(currentworld, x, y)
+   V istate = currentworld[y][x]
+   assert(istate C :allstates, ‘Wireworld cell set to unknown value "#."’.format(istate))
+   V ostate = :empty
+   I istate == :head
+      ostate = :tail
+   E I istate == :tail
+      ostate = :conductor
+   E I istate == :empty
+      ostate = :empty
+   E
+      V n = sum([(-1, -1), (-1, +0), (-1, +1), (+0, -1), (+0, +1), (+1, -1), (+1, +0), (+1, +1)].map((dx, dy) -> Int(@currentworld[@y + dy][@x + dx] == :head)))
+      ostate = I n C 1..2 {:head} E :conductor
+   R ostate
+
+F nextgen(ww)
+   ‘compute next generation of wireworld’
+   V (world, width, height) = ww
+   V newworld = copy(world)
+   L(x) 1 .. width
+      L(y) 1 .. height
+         newworld[y][x] = newcell(world, x, y)
+   R (newworld, width, height)
+
+F world2string(ww)
+   R ww[0][1 .< (len)-1].map(row -> (row[1 .< (len)-1]).join(‘’).rtrim((‘ ’, "\t", "\r", "\n"))).join("\n")
+V ww = readfile(w.split("\n"))
+
+L(gen) 10
+   print(("\n#3 ".format(gen))‘’(‘=’ * (ww[1] - 4))"\n")
+   print(world2string(ww))
+   ww = nextgen(ww)
+===
+auto allstates = u"Ht. "_S;
+auto head = _get<0>(allstates);
+auto tail = _get<1>(allstates);
+auto conductor = _get<2>(allstates);
+auto empty = _get<3>(allstates);
+auto w = uR"(tH.........
+.   .
+   ...
+.   .
+Ht.. ......)"_S;
+
+template <typename T1> auto readfile(const T1 &f)
+{
+    u"file > initial world configuration"_S;
+    auto world = f.map([](const auto &row){return row.rtrim(Array<Char>(u"\r\n"_S));});
+    auto height = world.len();
+    auto width = max(world.map([](const auto &row){return row.len();}));
+    auto nonrow = create_array({u" "_S & (u" "_S * width) & u" "_S});
+    auto world2 = nonrow + world.map([&width](const auto &row){return u" "_S & String(row).ljust(width) & u" "_S;}) + nonrow;
+    auto world3 = world2.map([](const auto &row){return create_array(row);});
+    return make_tuple(world3, width, height);
+}
+
+template <typename T1, typename T2, typename T3> auto newcell(const T1 &currentworld, const T2 &x, const T3 &y)
+{
+    auto istate = currentworld[y][x];
+    assert(in(istate, ::allstates), u"Wireworld cell set to unknown value \"#.\""_S.format(istate));
+    auto ostate = ::empty;
+    if (istate == ::head)
+        ostate = ::tail;
+    else if (istate == ::tail)
+        ostate = ::conductor;
+    else if (istate == ::empty)
+        ostate = ::empty;
+    else {
+        auto n = sum_map(create_array({make_tuple(-1, -1), make_tuple(-1, +0), make_tuple(-1, +1), make_tuple(+0, -1), make_tuple(+0, +1), make_tuple(+1, -1), make_tuple(+1, +0), make_tuple(+1, +1)}), [&currentworld, &x, &y](const auto &dx, const auto &dy){return to_int(currentworld[y + dy][x + dx] == ::head);});
+        ostate = in(n, range_ee(1, 2)) ? ::head : ::conductor;
+    }
+    return ostate;
+}
+
+template <typename T1> auto nextgen(const T1 &ww)
+{
+    u"compute next generation of wireworld"_S;
+    auto [world, width, height] = ww;
+    auto newworld = copy(world);
+    for (auto x : range_ee(1, width))
+        for (auto y : range_ee(1, height))
+            newworld[y].set(x, newcell(world, x, y));
+    return make_tuple(newworld, width, height);
+}
+
+template <typename T1> auto world2string(const T1 &ww)
+{
+    return _get<0>(ww)[range_e_llen(1,  - 1)].map([](const auto &row){return (row[range_e_llen(1,  - 1)]).join(u""_S).rtrim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S));}).join(u"\n"_S);
+}
+auto ww = readfile(w.split(u"\n"_S));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (int gen = 0; gen < 10; gen++) {
+            print((u"\n#3 "_S.format(gen)) & (u"="_S * (_get<1>(ww) - 4)) & u"\n"_S);
+            print(world2string(ww));
+            ww = nextgen(ww);
+        }
+    }
+} code_block_1;
