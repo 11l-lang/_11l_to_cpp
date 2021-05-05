@@ -13507,3 +13507,177 @@ struct CodeBlock2
         print(u"\n\nTotal Cost =  "_S & cost);
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Weird_numbers#D
+import itertools
+
+def divisors(n):
+    divs = [1]
+    divs2 : List[int] = []
+    i = 2
+    while i * i <= n:
+        if n % i == 0:
+            j = n // i
+            divs += [i]
+            if i != j:
+                divs2 += [j]
+        i += 1
+    return divs2 + list(reversed(divs))
+
+def abundant(n, divs):
+    return sum(divs) > n
+
+def semiperfect(n, divs) -> bool:
+    if len(divs) != 0:
+        h = divs[0]
+        t = divs[1:]
+        if n < h:
+            return semiperfect(n, t)
+        else:
+            return n == h or semiperfect(n - h, t) or semiperfect(n, t)
+    else:
+        return False
+
+def sieve(limit):
+    w = [False] * limit
+    for i in range(2, limit, 2):
+        if w[i]:
+            continue
+        divs = divisors(i)
+        if not abundant(i, divs):
+            w[i] = True
+        elif semiperfect(i, divs):
+            for j in range(i, limit, i):
+                w[j] = True
+    return w
+
+w = sieve(17_000)
+count = 0
+print('The first 25 weird numbers:')
+for n in itertools.count(2, 2):
+    if not w[n]:
+        print(n, end = ' ')
+        count += 1
+        if count == 25:
+            break
+===
+//import itertools
+
+F divisors(n)
+   V divs = [1]
+   [Int] divs2
+   V i = 2
+   L i * i <= n
+      I n % i == 0
+         V j = n I/ i
+         divs [+]= i
+         I i != j
+            divs2 [+]= j
+      i++
+   R divs2 [+] Array(reversed(divs))
+
+F abundant(n, divs)
+   R sum(divs) > n
+
+F semiperfect(n, divs) -> Bool
+   I !divs.empty
+      V h = divs[0]
+      V t = divs[1..]
+      I n < h
+         R semiperfect(n, t)
+      E
+         R n == h | semiperfect(n - h, t) | semiperfect(n, t)
+   E
+      R 0B
+
+F sieve(limit)
+   V w = [0B] * limit
+   L(i) (2 .< limit).step(2)
+      I w[i]
+         L.continue
+      V divs = divisors(i)
+      I !abundant(i, divs)
+         w[i] = 1B
+      E I semiperfect(i, divs)
+         L(j) (i .< limit).step(i)
+            w[j] = 1B
+   R w
+V w = sieve(17'000)
+V count = 0
+print(‘The first 25 weird numbers:’)
+L(n) (2..).step(2)
+   I !w[n]
+      print(n, end' ‘ ’)
+      count++
+      I count == 25
+         L.break
+===
+template <typename T1> auto divisors(const T1 &n)
+{
+    auto divs = create_array({1});
+    Array<int> divs2;
+    auto i = 2;
+    while (i * i <= n) {
+        if (mod(n, i) == 0) {
+            auto j = idiv(n, i);
+            divs.append(i);
+            if (i != j)
+                divs2.append(j);
+        }
+        i++;
+    }
+    return divs2 + create_array(reversed(divs));
+}
+
+template <typename T1, typename T2> auto abundant(const T1 &n, const T2 &divs)
+{
+    return sum(divs) > n;
+}
+
+template <typename T1, typename T2> bool semiperfect(const T1 &n, const T2 &divs)
+{
+    if (!divs.empty()) {
+        auto h = _get<0>(divs);
+        auto t = divs[range_ei(1)];
+        if (n < h)
+            return semiperfect(n, t);
+        else
+            return n == h || semiperfect(n - h, t) || semiperfect(n, t);
+    }
+    else
+        return false;
+}
+
+template <typename T1> auto sieve(const T1 &limit)
+{
+    auto w = create_array({false}) * limit;
+    for (auto i : range_el(2, limit).step(2)) {
+        if (w[i])
+            continue;
+        auto divs = divisors(i);
+        if (!abundant(i, divs))
+            w.set(i, true);
+        else if (semiperfect(i, divs))
+            for (auto j : range_el(i, limit).step(i))
+                w.set(j, true);
+    }
+    return w;
+}
+auto w = sieve(17'000);
+auto count = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"The first 25 weird numbers:"_S);
+        for (auto n : range_ei(2).step(2))
+            if (!w[n]) {
+                print(n, u" "_S);
+                count++;
+                if (count == 25)
+                    break;
+            }
+    }
+} code_block_1;

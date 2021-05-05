@@ -126,6 +126,18 @@ public:
 	Type b, step;
 
 	RangeEIWithStep(const Type &begin, const Type &step) : b(begin), step(step) {}
+
+	class Iterator
+	{
+		Type value, step;
+	public:
+		explicit Iterator(Type value, Type step) : value(value), step(step) {}
+		bool operator!=(Iterator i) {return value != i.value;}
+		void operator++() {value += step;}
+		Type operator*() {return value;}
+	};
+	Iterator begin() const {return Iterator(b, step);}
+	Iterator end  () const {return Iterator(std::numeric_limits<Type>::max(), step);}
 };
 
 template <typename Type> class RangeEI

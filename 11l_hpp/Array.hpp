@@ -401,6 +401,8 @@ public:
 
 	Type pop(Int i)
 	{
+		if (!in(i, range_el(0, len())))
+			throw IndexError(i);
 		Type r(std::move((*this)[i]));
 		std::vector<Type>::erase(begin() + i);
 		return r;
