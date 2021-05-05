@@ -13685,6 +13685,8 @@ struct CodeBlock1
 
 # https://www.rosettacode.org/wiki/Wireworld#Python
 from copy import deepcopy
+from typing import NamedTuple, List
+Char = str
 
 allstates = 'Ht. '
 head      = allstates[0]
@@ -13698,6 +13700,11 @@ w = '''tH.........
 .   .
 Ht.. ......'''
 
+class WW(NamedTuple):
+    world : List[List[Char]]
+    w : int
+    h : int
+
 def readfile(f):
     '''file > initial world configuration'''
     world  = [row.rstrip('\r\n') for row in f]
@@ -13709,7 +13716,7 @@ def readfile(f):
                [ ' ' + str(row).ljust(width) + ' ' for row in world ] + \
                nonrow
     world3 = [list(row) for row in world2]
-    return (world3, width, height)
+    return WW(world3, width, height)
 
 def newcell(currentworld, x, y):
     istate = currentworld[y][x]
@@ -13736,15 +13743,15 @@ def nextgen(ww):
     for x in range(1, width+1):
         for y in range(1, height+1):
             newworld[y][x] = newcell(world, x, y)
-    return (newworld, width, height)
+    return WW(newworld, width, height)
 
 def world2string(ww):
-    return '\n'.join( ''.join(row[1:-1]).rstrip() for row in ww[0][1:-1] )
+    return '\n'.join( ''.join(row[1:-1]).rstrip() for row in ww.world[1:-1] )
 
 ww = readfile(w.split("\n"))
 
 for gen in range(10):
-    print ( ("\n%3i " % gen) + '=' * (ww[1]-4) + '\n' )
+    print ( ("\n%3i " % gen) + '=' * (ww.w-4) + '\n' )
     print ( world2string(ww) )
     ww = nextgen(ww)
 ===
@@ -13759,6 +13766,15 @@ V w = ‘tH.........
 .   .
 Ht.. ......’
 
+T WW
+   [[Char]] world
+   Int w
+   Int h
+   F (world, w, h)
+      .world = world
+      .w = w
+      .h = h
+
 F readfile(f)
    ‘file > initial world configuration’
    V world = f.map(row -> row.rtrim(Array[Char]("\r\n")))
@@ -13767,7 +13783,7 @@ F readfile(f)
    V nonrow = [‘ ’(‘ ’ * width)‘ ’]
    V world2 = nonrow [+] world.map(row -> ‘ ’String(row).ljust(@width)‘ ’) [+] nonrow
    V world3 = world2.map(row -> Array(row))
-   R (world3, width, height)
+   R WW(world3, width, height)
 
 F newcell(currentworld, x, y)
    V istate = currentworld[y][x]
@@ -13791,14 +13807,14 @@ F nextgen(ww)
    L(x) 1 .. width
       L(y) 1 .. height
          newworld[y][x] = newcell(world, x, y)
-   R (newworld, width, height)
+   R WW(newworld, width, height)
 
 F world2string(ww)
-   R ww[0][1 .< (len)-1].map(row -> (row[1 .< (len)-1]).join(‘’).rtrim((‘ ’, "\t", "\r", "\n"))).join("\n")
+   R ww.world[1 .< (len)-1].map(row -> (row[1 .< (len)-1]).join(‘’).rtrim((‘ ’, "\t", "\r", "\n"))).join("\n")
 V ww = readfile(w.split("\n"))
 
 L(gen) 10
-   print(("\n#3 ".format(gen))‘’(‘=’ * (ww[1] - 4))"\n")
+   print(("\n#3 ".format(gen))‘’(‘=’ * (ww.w - 4))"\n")
    print(world2string(ww))
    ww = nextgen(ww)
 ===
@@ -13813,6 +13829,20 @@ auto w = uR"(tH.........
 .   .
 Ht.. ......)"_S;
 
+class WW
+{
+public:
+    Array<Array<Char>> world;
+    int w;
+    int h;
+    template <typename T1, typename T2, typename T3> WW(const T1 &world, const T2 &w, const T3 &h) :
+        world(world),
+        w(w),
+        h(h)
+    {
+    }
+};
+
 template <typename T1> auto readfile(const T1 &f)
 {
     u"file > initial world configuration"_S;
@@ -13822,7 +13852,7 @@ template <typename T1> auto readfile(const T1 &f)
     auto nonrow = create_array({u" "_S & (u" "_S * width) & u" "_S});
     auto world2 = nonrow + world.map([&width](const auto &row){return u" "_S & String(row).ljust(width) & u" "_S;}) + nonrow;
     auto world3 = world2.map([](const auto &row){return create_array(row);});
-    return make_tuple(world3, width, height);
+    return WW(world3, width, height);
 }
 
 template <typename T1, typename T2, typename T3> auto newcell(const T1 &currentworld, const T2 &x, const T3 &y)
@@ -13851,12 +13881,12 @@ template <typename T1> auto nextgen(const T1 &ww)
     for (auto x : range_ee(1, width))
         for (auto y : range_ee(1, height))
             newworld[y].set(x, newcell(world, x, y));
-    return make_tuple(newworld, width, height);
+    return WW(newworld, width, height);
 }
 
 template <typename T1> auto world2string(const T1 &ww)
 {
-    return _get<0>(ww)[range_e_llen(1,  - 1)].map([](const auto &row){return (row[range_e_llen(1,  - 1)]).join(u""_S).rtrim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S));}).join(u"\n"_S);
+    return ww.world[range_e_llen(1,  - 1)].map([](const auto &row){return (row[range_e_llen(1,  - 1)]).join(u""_S).rtrim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S));}).join(u"\n"_S);
 }
 auto ww = readfile(w.split(u"\n"_S));
 
@@ -13866,7 +13896,7 @@ struct CodeBlock1
     {
 
         for (int gen = 0; gen < 10; gen++) {
-            print((u"\n#3 "_S.format(gen)) & (u"="_S * (_get<1>(ww) - 4)) & u"\n"_S);
+            print((u"\n#3 "_S.format(gen)) & (u"="_S * (ww.w - 4)) & u"\n"_S);
             print(world2string(ww));
             ww = nextgen(ww);
         }
