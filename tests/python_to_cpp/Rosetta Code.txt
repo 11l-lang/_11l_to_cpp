@@ -13902,3 +13902,140 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Word_break_problem#D
+from typing import List
+import collections
+
+class Node:
+    val : str
+    parsed : List[str]
+    def __init__(self, val, parsed : List[str] = None):
+        if parsed is None: parsed = []
+        self.val = val
+        self.parsed = parsed
+
+def word_break(s, dictionary):
+    matches : List[List[str]] = []
+    queue = collections.deque([Node(s)])
+    while len(queue) != 0:
+        node = queue.popleft()
+        # Check if fully parsed
+        if len(node.val) == 0:
+            matches += [node.parsed]
+        else:
+            for word in dictionary:
+                # Check for match
+                if node.val.startswith(word):
+                    val_new = node.val[len(word):len(node.val)]
+                    parsed_new = node.parsed[:]
+                    parsed_new += [word]
+                    queue += [Node(val_new, parsed_new)]
+    return matches
+
+def process(d, test_strings):
+    for test_string in test_strings:
+        matches = word_break(test_string, d)
+        print("String = " + test_string + ", Dictionary = " + str(d) + ".  Solutions =", len(matches))
+        for match in matches:
+            print("  Word Break =", match)
+        print()
+
+d = ["a", "aa", "b", "ab", "aab"]
+process(d, ["aab", "aa b"])
+
+d = ["abc", "a", "ac", "b", "c", "cb", "d"]
+process(d, ["abcd", "abbc", "abcbcd", "acdbc", "abcdd"])
+===
+//import collections
+
+T Node
+   String val
+   [String] parsed
+   F (val, [String] &parsed = [String]())
+      .val = val
+      .parsed = parsed
+
+F word_break(s, dictionary)
+   [[String]] matches
+   V queue = Deque([Node(s)])
+   L !queue.empty
+      V node = queue.pop_left()
+
+      I node.val.empty
+         matches [+]= node.parsed
+      E
+         L(word) dictionary
+            I node.val.starts_with(word)
+               V val_new = node.val[word.len .< node.val.len]
+               V parsed_new = copy(node.parsed)
+               parsed_new [+]= word
+               queue [+]= Node(val_new, &parsed_new)
+   R matches
+
+F process(d, test_strings)
+   L(test_string) test_strings
+      V matches = word_break(test_string, d)
+      print((‘String = ’test_string‘, Dictionary = ’String(d)‘.  Solutions =’)‘ ’matches.len)
+      L(match) matches
+         print(‘  Word Break = ’match)
+      print()
+V d = [‘a’, ‘aa’, ‘b’, ‘ab’, ‘aab’]
+process(d, [‘aab’, ‘aa b’])
+d = [‘abc’, ‘a’, ‘ac’, ‘b’, ‘c’, ‘cb’, ‘d’]
+process(d, [‘abcd’, ‘abbc’, ‘abcbcd’, ‘acdbc’, ‘abcdd’])
+===
+class Node
+{
+public:
+    String val;
+    Array<String> parsed;
+    template <typename T1> Node(const T1 &val, Array<String> &parsed = make_ref(Array<String>())) :
+        val(val),
+        parsed(parsed)
+    {
+    }
+};
+
+template <typename T1, typename T2> auto word_break(const T1 &s, const T2 &dictionary)
+{
+    Array<Array<String>> matches;
+    auto queue = create_deque({Node(s)});
+    while (!queue.empty()) {
+        auto node = queue.pop_left();
+        if (node.val.empty())
+            matches.append(node.parsed);
+        else
+            for (auto &&word : dictionary)
+                if (node.val.starts_with(word)) {
+                    auto val_new = node.val[range_el(word.len(), node.val.len())];
+                    auto parsed_new = copy(node.parsed);
+                    parsed_new.append(word);
+                    queue.append(Node(val_new, parsed_new));
+                }
+    }
+    return matches;
+}
+
+template <typename T1, typename T2> auto process(const T1 &d, const T2 &test_strings)
+{
+    for (auto &&test_string : test_strings) {
+        auto matches = word_break(test_string, d);
+        print((u"String = "_S & test_string & u", Dictionary = "_S & String(d) & u".  Solutions ="_S) & u" "_S & matches.len());
+        for (auto &&match : matches)
+            print(u"  Word Break = "_S & match);
+        print();
+    }
+}
+auto d = create_array({u"a"_S, u"aa"_S, u"b"_S, u"ab"_S, u"aab"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        process(d, create_array({u"aab"_S, u"aa b"_S}));
+        d = create_array({u"abc"_S, u"a"_S, u"ac"_S, u"b"_S, u"c"_S, u"cb"_S, u"d"_S});
+        process(d, create_array({u"abcd"_S, u"abbc"_S, u"abcbcd"_S, u"acdbc"_S, u"abcdd"_S}));
+    }
+} code_block_1;
