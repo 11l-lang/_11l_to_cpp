@@ -2853,6 +2853,45 @@ def parse_internal(this_node):
             if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
                 next_token()
 
+        elif ((token.value(source) in ('V', 'П', 'var', 'перем') and peek_token().category == Token.Category.SCOPE_BEGIN) # this is `V {v1 = ...; v2 = ...; ...}`
+           or (token.value(source) == '-' and
+        peek_token().value(source) in ('V', 'П', 'var', 'перем') and peek_token(2).category == Token.Category.SCOPE_BEGIN)): # this is `-V {v1 = ...; v2 = ...; ...}`
+            is_const = False
+            if token.value(source) == '-':
+                is_const = True
+                next_token()
+            type_token = token
+            next_token()
+            next_token()
+
+            while True:
+                assert(token.category == Token.Category.NAME)
+                var_name = tokensn.token_str()
+                next_token()
+                advance('=')
+
+                node = ASTVariableInitialization()
+                node.is_const = is_const
+                node.vars = [var_name]
+                node.set_expression(expression())
+                node.type = type_token.value(source)
+                node.type_token = type_token
+                node.type_args = []
+
+                scope.add_name(var_name, node)
+
+                node.parent = this_node
+                this_node.children.append(node)
+
+                if token.category != Token.Category.STATEMENT_SEPARATOR:
+                    assert(token.category == Token.Category.SCOPE_END)
+                    next_token()
+                    break
+
+                next_token()
+
+            continue
+
         else:
             node_expression = expression()
             if node_expression.symbol.id == '.' and node_expression.children[1].token.category == Token.Category.SCOPE_BEGIN: # this is a "with"-statement

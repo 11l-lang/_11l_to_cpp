@@ -1351,3 +1351,15 @@ struct CodeBlock1
         run_utm(u"halt"_S, u"a"_S, create_array({u"a 0 1 right b"_S.split(u" "_S, nullptr, true), u"a 1 1 left  c"_S.split(u" "_S, nullptr, true), u"b 0 1 left  a"_S.split(u" "_S, nullptr, true)}));
     }
 } code_block_1;
+
+
+-V
+   n_rows = 10
+   n_cols = 10
+   grid_size = n_rows * n_cols
+   min_words = 25
+===
+const auto n_rows = 10;
+const auto n_cols = 10;
+const auto grid_size = n_rows * n_cols;
+const auto min_words = 25;
