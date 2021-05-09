@@ -1253,7 +1253,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                             captured_variables.add('this')
                     else:
                         for child in sn.children:
-                            if child is not None:
+                            if child is not None and child.symbol.id != '->':
                                 f(child)
 
                 node.walk_expressions(f)
