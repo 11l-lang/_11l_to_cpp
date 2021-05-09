@@ -805,22 +805,24 @@ class SymbolNode:
                 return c0 + '::' + (c1 if c1 != '' else '_')
             elif self.symbol.id == '->':
                 captured_variables = set()
-                def gather_captured_variables(sn):
+                def gather_captured_variables(sn, capture_level = 0):
                     if sn.token.category == Token.Category.NAME:
                         if sn.token_str().startswith('@'):
                             by_ref = True # sn.parent.children[0] is sn and ((sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!='))
                                           #                               or (sn.parent.symbol.id == '.' and sn.parent.children[1].token_str() == 'append'))
-                            t = sn.token_str()[1:]
-                            if t.startswith('='):
-                                t = t[1:]
-                                by_ref = False
-                            captured_variables.add('this' if t == '' else '&'*by_ref + t)
+                            c = sn.token_str().count('@')
+                            if c > capture_level:
+                                t = sn.token_str()[c:]
+                                if t.startswith('='):
+                                    t = t[1:]
+                                    by_ref = False
+                                captured_variables.add('this' if t == '' else '&'*by_ref + t)
                         elif sn.token.value(source) == '(.)':
                             captured_variables.add('this')
                     else:
                         for child in sn.children:
-                            if child is not None and child.symbol.id != '->':
-                                gather_captured_variables(child)
+                            if child is not None:
+                                gather_captured_variables(child, capture_level + int(child.symbol.id == '->'))
                 gather_captured_variables(self.children[1])
                 return '[' + ', '.join(sorted(captured_variables)) + '](' + ', '.join(map(lambda c: 'const ' + ('auto &' if c.symbol.id != '=' else 'decltype(' + c.children[1].to_str() + ') &') + c.to_str(),
                     self.children[0].children if self.children[0].symbol.id == '(' else [self.children[0]])) + '){return ' + self.children[1].to_str() + ';}' # )
@@ -1240,21 +1242,23 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         elif type(self.parent) != ASTProgram: # local functions [i.e. functions inside functions] are represented as C++ lambdas
             captured_variables = set()
             def gather_captured_variables(node):
-                def f(sn : SymbolNode):
+                def f(sn : SymbolNode, capture_level = 0):
                     if sn.token.category == Token.Category.NAME:
                         if sn.token.value(source).startswith('@'):
                             by_ref = True # sn.parent and sn.parent.children[0] is sn and sn.parent.symbol.id[-1] == '=' and sn.parent.symbol.id not in ('==', '!=')
-                            t = sn.token.value(source)[1:]
-                            if t.startswith('='):
-                                t = t[1:]
-                                by_ref = False
-                            captured_variables.add('this' if t == '' else '&'*by_ref + t)
+                            c = sn.token.value(source).count('@')
+                            if c > capture_level:
+                                t = sn.token.value(source)[c:]
+                                if t.startswith('='):
+                                    t = t[1:]
+                                    by_ref = False
+                                captured_variables.add('this' if t == '' else '&'*by_ref + t)
                         elif sn.token.value(source) == '(.)':
                             captured_variables.add('this')
                     else:
                         for child in sn.children:
-                            if child is not None and child.symbol.id != '->':
-                                f(child)
+                            if child is not None:
+                                f(child, capture_level + int(child.symbol.id == '->'))
 
                 node.walk_expressions(f)
                 node.walk_children(gather_captured_variables)
