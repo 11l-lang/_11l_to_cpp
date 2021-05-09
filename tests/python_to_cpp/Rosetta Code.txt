@@ -14154,9 +14154,10 @@ def yinyang(n=3):
     for x,y in circles[-3]:
         m[(x,y+3*n)] = '·'
         m[(x,y-3*n)] = '*'
-    def f(y):
-        return ''.join(m[(x,y)] for x in reversed(ranges[-1]))
-    return '\n'.join(f(y) for y in ranges[-1])
+    #def f(y):
+    #    return ''.join(m[(x,y)] for x in reversed(ranges[-1]))
+    #return '\n'.join(f(y) for y in ranges[-1])
+    return '\n'.join(''.join(m[(x,y)] for x in reversed(ranges[-1])) for y in ranges[-1])
 
 print(yinyang(2))
 print(yinyang(1))
@@ -14180,9 +14181,7 @@ F yinyang(n = 3)
    L(x, y) circles[(len)-3]
       m[(x, y + 3 * n)] = ‘·’
       m[(x, y - 3 * n)] = ‘*’
-   F f(y)
-      R reversed(@ranges.last).map(x -> @@m[(x, @y)]).join(‘’)
-   R ranges.last.map(y -> @f(y)).join("\n")
+   R ranges.last.map(y -> reversed(@ranges.last).map(x -> @@m[(x, @y)]).join(‘’)).join("\n")
 print(yinyang(2))
 print(yinyang(1))
 ===
@@ -14206,11 +14205,7 @@ template <typename T1 = decltype(3)> auto yinyang(const T1 &n = 3)
         m.set(make_tuple(x, y + 3 * n), u'·'_C);
         m.set(make_tuple(x, y - 3 * n), u'*'_C);
     }
-    auto f = [&m, &ranges](const auto &y)
-    {
-        return reversed(ranges.last()).map([&m, &y](const auto &x){return m[make_tuple(x, y)];}).join(u""_S);
-    };
-    return ranges.last().map([&f](const auto &y){return f(y);}).join(u"\n"_S);
+    return ranges.last().map([&m, &ranges](const auto &y){return reversed(ranges.last()).map([&m, &y](const auto &x){return m[make_tuple(x, y)];}).join(u""_S);}).join(u"\n"_S);
 }
 
 struct CodeBlock1
