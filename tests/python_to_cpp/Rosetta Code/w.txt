@@ -1,0 +1,938 @@
+# https://www.rosettacode.org/wiki/Water_collected_between_towers#Python
+def water_collected(tower):
+    N = len(tower)
+    highest_left = [0] + [max(tower[:n]) for n in range(1,N)]
+    highest_right = [max(tower[n:N]) for n in range(1,N)] + [0]
+    water_level = [max(min(highest_left[n], highest_right[n]) - tower[n], 0)
+        for n in range(N)]
+    print("highest_left:  ", highest_left)
+    print("highest_right: ", highest_right)
+    print("water_level:   ", water_level)
+    print("tower_level:   ", tower)
+    print("total_water:   ", sum(water_level))
+    print("")
+    return sum(water_level)
+
+towers = [[1, 5, 3, 7, 2],
+    [5, 3, 7, 2, 6, 4, 5, 9, 1, 2],
+    [2, 6, 3, 5, 2, 8, 1, 4, 2, 2, 5, 3, 5, 7, 4, 1],
+    [5, 5, 5, 5],
+    [5, 6, 7, 8],
+    [8, 7, 7, 6],
+    [6, 7, 10, 7, 6]]
+
+print([water_collected(tower) for tower in towers])
+===
+F water_collected(tower)
+   V _n_ = tower.len
+   V highest_left = [0] [+] (1 .< _n_).map(n -> max(@tower[0 .< n]))
+   V highest_right = (1 .< _n_).map(n -> max(@tower[n .< @_n_])) [+] [0]
+   V water_level = (0 .< _n_).map(n -> max(min(@highest_left[n], @highest_right[n]) - @tower[n], 0))
+   print(‘highest_left:   ’highest_left)
+   print(‘highest_right:  ’highest_right)
+   print(‘water_level:    ’water_level)
+   print(‘tower_level:    ’tower)
+   print(‘total_water:    ’sum(water_level))
+   print(‘’)
+   R sum(water_level)
+V towers = [[1, 5, 3, 7, 2], [5, 3, 7, 2, 6, 4, 5, 9, 1, 2], [2, 6, 3, 5, 2, 8, 1, 4, 2, 2, 5, 3, 5, 7, 4, 1], [5, 5, 5, 5], [5, 6, 7, 8], [8, 7, 7, 6], [6, 7, 10, 7, 6]]
+print(towers.map(tower -> water_collected(tower)))
+===
+template <typename T1> auto water_collected(const T1 &tower)
+{
+    auto _n_ = tower.len();
+    auto highest_left = create_array({0}) + range_el(1, _n_).map([&tower](const auto &n){return max(tower[range_el(0, n)]);});
+    auto highest_right = range_el(1, _n_).map([&_n_, &tower](const auto &n){return max(tower[range_el(n, _n_)]);}) + create_array({0});
+    auto water_level = range_el(0, _n_).map([&highest_left, &highest_right, &tower](const auto &n){return max(min(highest_left[n], highest_right[n]) - tower[n], 0);});
+    print(u"highest_left:   "_S & highest_left);
+    print(u"highest_right:  "_S & highest_right);
+    print(u"water_level:    "_S & water_level);
+    print(u"tower_level:    "_S & tower);
+    print(u"total_water:    "_S & sum(water_level));
+    print(u""_S);
+    return sum(water_level);
+}
+auto towers = create_array({create_array({1, 5, 3, 7, 2}), create_array({5, 3, 7, 2, 6, 4, 5, 9, 1, 2}), create_array({2, 6, 3, 5, 2, 8, 1, 4, 2, 2, 5, 3, 5, 7, 4, 1}), create_array({5, 5, 5, 5}), create_array({5, 6, 7, 8}), create_array({8, 7, 7, 6}), create_array({6, 7, 10, 7, 6})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(towers.map([](const auto &tower){return water_collected(tower);}));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Word_frequency#Python
+import collections, re
+
+cnt = collections.defaultdict(int) # str
+for word in re.findall(r"\w+", open('135-0.txt', encoding = 'utf-8-sig').read().lower()):
+    cnt[word] += 1
+
+print(sorted(cnt.items(), key = lambda wordc: wordc[1], reverse = True)[:10])
+===
+//import collections, re
+V cnt = DefaultDict[String, Int]()
+L(word) re:‘\w+’.find_strings(File(‘135-0.txt’, encoding' ‘utf-8-sig’).read().lowercase())
+   cnt[word]++
+print(sorted(cnt.items(), key' wordc -> wordc[1], reverse' 1B)[0.<10])
+===
+auto cnt = DefaultDict<String, int>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&word : re::_(uR"(\w+)"_S).find_strings(File(u"135-0.txt"_S, u"r"_S, u"utf-8-sig"_S).read().lowercase()))
+            cnt[word]++;
+        print(sorted(cnt.items(), [](const auto &wordc){return _get<1>(wordc);}, true)[range_el(0, 10)]);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Word_search#Python
+import re, random
+
+dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
+n_rows = 10
+n_cols = 10
+grid_size = n_rows * n_cols
+min_words = 25
+
+class Grid:
+    def __init__(self):
+        self.num_attempts = 0
+        self.cells : List[List[str]] = [['' for _ in range(n_cols)] for _ in range(n_rows)]
+        self.solutions : List[str] = []
+
+def read_words(filename):
+    #max_len = max(n_rows, n_cols)
+
+    words : List[str] = []
+    for line in open(filename, "r").readlines():
+        s = line.strip().lower()
+        #if re.match(r'^[a-z]{3,' + re.escape(str(max_len)) + r'}$', s) is not None:
+        if re.match(r'^[a-z]{3,10}$', s):
+            words.append(s)
+
+    return words
+
+def place_message(grid : "Grid", msg):
+    msg = re.sub(r'[^A-Z]', "", msg.upper())
+
+    message_len = len(msg)
+    if 0 < message_len < grid_size:
+        gap_size = grid_size // message_len
+
+        for i in range(0, message_len):
+            pos = i * gap_size + random.randint(0, gap_size)
+            grid.cells[pos // n_cols][pos % n_cols] = msg[i]
+
+        return message_len
+
+    return 0
+
+def try_location(grid : "Grid", word, direction, pos):
+    r = pos // n_cols
+    c = pos % n_cols
+    length = len(word)
+
+    # check bounds
+    if (dirs[direction][0] == 1 and (length + c) > n_cols) or \
+       (dirs[direction][0] == -1 and (length - 1) > c) or \
+       (dirs[direction][1] == 1 and (length + r) > n_rows) or \
+       (dirs[direction][1] == -1 and (length - 1) > r):
+        return 0
+
+    rr = r
+    cc = c
+    i = 0
+    overlaps = 0
+
+    # check cells
+    while i < length:
+        if grid.cells[rr][cc] != '' and grid.cells[rr][cc] != word[i]:
+            return 0
+        cc += dirs[direction][0]
+        rr += dirs[direction][1]
+        i += 1
+
+    rr = r
+    cc = c
+    i = 0
+    # place
+    while i < length:
+        if grid.cells[rr][cc] == word[i]:
+            overlaps += 1
+        else:
+            grid.cells[rr][cc] = word[i]
+
+        if i < length - 1:
+            cc += dirs[direction][0]
+            rr += dirs[direction][1]
+
+        i += 1
+
+    letters_placed = length - overlaps
+    if letters_placed > 0:
+        grid.solutions.append("{0:<10} ({1},{2})({3},{4})".format(word, c, r, cc, rr))
+
+    return letters_placed
+
+def try_place_word(grid : "Grid", word):
+    rand_dir = random.randint(0, len(dirs))
+    rand_pos = random.randint(0, grid_size)
+
+    for direction in range(0, len(dirs)):
+        direction = (direction + rand_dir) % len(dirs)
+
+        for pos in range(0, grid_size):
+            pos = (pos + rand_pos) % grid_size
+
+            letters_placed = try_location(grid, word, direction, pos)
+            if letters_placed > 0:
+                return letters_placed
+
+    return 0
+
+def create_word_search(words : list):
+    grid = Grid()
+    num_attempts = 0
+
+    while num_attempts < 100:
+        num_attempts += 1
+        random.shuffle(words)
+
+        grid = Grid()
+        message_len = place_message(grid, "Rosetta Code")
+        target = grid_size - message_len
+
+        cells_filled = 0
+        for word in words:
+            cells_filled += try_place_word(grid, word)
+            if cells_filled == target:
+                if len(grid.solutions) >= min_words:
+                    grid.num_attempts = num_attempts
+                    return grid
+                else:
+                    break # grid is full but we didn't pack enough words, start over
+
+    return grid
+
+def print_result(grid):
+    if grid.num_attempts == 0:
+        print("No grid to display")
+        return
+
+    size = len(grid.solutions)
+
+    print("Attempts: {0}".format(grid.num_attempts))
+    print("Number of words: {0}".format(size))
+
+    print("\n     0  1  2  3  4  5  6  7  8  9\n")
+    for r in range(0, n_rows):
+        print("{0}   ".format(r), end='')
+        for c in range(0, n_cols):
+            print(" %s " % grid.cells[r][c], end='')
+        print()
+    print()
+
+    for i in range(0, size - 1, 2):
+        print("{0}   {1}".format(grid.solutions[i], grid.solutions[i+1]))
+
+    if size % 2 == 1:
+        print(grid.solutions[size - 1])
+
+print_result(create_word_search(read_words("unixdict.txt")))
+===
+//import re, random
+V dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
+V n_rows = 10
+V n_cols = 10
+V grid_size = n_rows * n_cols
+V min_words = 25
+
+T Grid
+   num_attempts = 0
+   [[String]] cells = (0 .< :n_rows).map(_ -> (0 .< :n_cols).map(_ -> ‘’))
+   [String] solutions
+   F ()
+   {
+   }
+
+F read_words(filename)
+   [String] words
+   L(line) File(filename, ‘r’).read_lines(1B)
+      V s = line.trim((‘ ’, "\t", "\r", "\n")).lowercase()
+
+      I re:‘^[a-z]{3,10}’.match(s)
+         words.append(s)
+   R words
+
+F place_message(Grid &grid; =msg)
+   msg = msg.uppercase().replace(re:‘[^A-Z]’, ‘’)
+   V message_len = msg.len
+   I message_len C 0 <.< :grid_size
+      V gap_size = :grid_size I/ message_len
+
+      L(i) 0 .< message_len
+         V pos = i * gap_size + random:(0 .. gap_size)
+         grid.cells[pos I/ :n_cols][pos % :n_cols] = msg[i]
+      R message_len
+   R 0
+
+F try_location(Grid &grid; word, direction, pos)
+   V r = pos I/ :n_cols
+   V c = pos % :n_cols
+   V length = word.len
+
+   I (:dirs[direction][0] == 1 & (length + c) > :n_cols) | (:dirs[direction][0] == -1 & (length - 1) > c) | (:dirs[direction][1] == 1 & (length + r) > :n_rows) | (:dirs[direction][1] == -1 & (length - 1) > r)
+      R 0
+   V rr = r
+   V cc = c
+   V i = 0
+   V overlaps = 0
+
+   L i < length
+      I grid.cells[rr][cc] != ‘’ & grid.cells[rr][cc] != word[i]
+         R 0
+      cc += :dirs[direction][0]
+      rr += :dirs[direction][1]
+      i++
+   rr = r
+   cc = c
+   i = 0
+
+   L i < length
+      I grid.cells[rr][cc] == word[i]
+         overlaps++
+      E
+         grid.cells[rr][cc] = word[i]
+
+      I i < length - 1
+         cc += :dirs[direction][0]
+         rr += :dirs[direction][1]
+      i++
+   V letters_placed = length - overlaps
+   I letters_placed > 0
+      grid.solutions.append(‘#<10 (#.,#.)(#.,#.)’.format(word, c, r, cc, rr))
+   R letters_placed
+
+F try_place_word(Grid &grid; word)
+   V rand_dir = random:(0 .. :dirs.len)
+   V rand_pos = random:(0 .. :grid_size)
+
+   L(=direction) 0 .< :dirs.len
+      direction = (direction + rand_dir) % :dirs.len
+
+      L(=pos) 0 .< :grid_size
+         pos = (pos + rand_pos) % :grid_size
+         V letters_placed = try_location(&grid, word, direction, pos)
+         I letters_placed > 0
+            R letters_placed
+   R 0
+
+F create_word_search(&words)
+   V grid = Grid()
+   V num_attempts = 0
+
+   L num_attempts < 100
+      num_attempts++
+      random:shuffle(&words)
+      grid = Grid()
+      V message_len = place_message(&grid, ‘Rosetta Code’)
+      V target = :grid_size - message_len
+      V cells_filled = 0
+      L(word) words
+         cells_filled += try_place_word(&grid, word)
+         I cells_filled == target
+            I grid.solutions.len >= :min_words
+               grid.num_attempts = num_attempts
+               R grid
+            E
+               L.break
+   R grid
+
+F print_result(grid)
+   I grid.num_attempts == 0
+      print(‘No grid to display’)
+      R
+   V size = grid.solutions.len
+   print(‘Attempts: #.’.format(grid.num_attempts))
+   print(‘Number of words: #.’.format(size))
+   print("\n     0  1  2  3  4  5  6  7  8  9\n")
+   L(r) 0 .< :n_rows
+      print(‘#.   ’.format(r), end' ‘’)
+      L(c) 0 .< :n_cols
+         print(‘ #. ’.format(grid.cells[r][c]), end' ‘’)
+      print()
+   print()
+
+   L(i) (0 .< size - 1).step(2)
+      print(‘#.   #.’.format(grid.solutions[i], grid.solutions[i + 1]))
+
+   I size % 2 == 1
+      print(grid.solutions[size - 1])
+print_result(create_word_search(&read_words(‘unixdict.txt’)))
+===
+auto dirs = create_array({create_array({1, 0}), create_array({0, 1}), create_array({1, 1}), create_array({1, -1}), create_array({-1, 0}), create_array({0, -1}), create_array({-1, -1}), create_array({-1, 1})});
+auto n_rows = 10;
+auto n_cols = 10;
+auto grid_size = n_rows * n_cols;
+auto min_words = 25;
+
+class Grid
+{
+public:
+    decltype(0) num_attempts = 0;
+    Array<Array<String>> cells = range_el(0, ::n_rows).map([](const auto &_){return range_el(0, ::n_cols).map([](const auto &_){return u""_S;});});
+    Array<String> solutions;
+    Grid()
+    {
+    }
+};
+
+template <typename T1> auto read_words(const T1 &filename)
+{
+    Array<String> words;
+    for (auto &&line : File(filename, u"r"_S).read_lines(true)) {
+        auto s = line.trim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S)).lowercase();
+        if (re::_(u"^[a-z]{3,10}"_S).match(s))
+            words.append(s);
+    }
+    return words;
+}
+
+template <typename T2> auto place_message(Grid &grid, T2 msg)
+{
+    msg = msg.uppercase().replace(re::_(u"[^A-Z]"_S), u""_S);
+    auto message_len = msg.len();
+    if (in(message_len, range_ll(0, ::grid_size))) {
+        auto gap_size = idiv(::grid_size, message_len);
+
+        for (auto i : range_el(0, message_len)) {
+            auto pos = i * gap_size + randomns::_(range_ee(0, gap_size));
+            grid.cells[idiv(pos, ::n_cols)].set(mod(pos, ::n_cols), msg[i]);
+        }
+        return message_len;
+    }
+    return 0;
+}
+
+template <typename T2, typename T3, typename T4> auto try_location(Grid &grid, const T2 &word, const T3 &direction, const T4 &pos)
+{
+    auto r = idiv(pos, ::n_cols);
+    auto c = mod(pos, ::n_cols);
+    auto length = word.len();
+    if ((_get<0>(::dirs[direction]) == 1 && (length + c) > ::n_cols) || (_get<0>(::dirs[direction]) == -1 && (length - 1) > c) || (_get<1>(::dirs[direction]) == 1 && (length + r) > ::n_rows) || (_get<1>(::dirs[direction]) == -1 && (length - 1) > r))
+        return 0;
+    auto rr = r;
+    auto cc = c;
+    auto i = 0;
+    auto overlaps = 0;
+
+    while (i < length) {
+        if (grid.cells[rr][cc] != u"" && grid.cells[rr][cc] != word[i])
+            return 0;
+        cc += _get<0>(::dirs[direction]);
+        rr += _get<1>(::dirs[direction]);
+        i++;
+    }
+    rr = r;
+    cc = c;
+    i = 0;
+
+    while (i < length) {
+        if (grid.cells[rr][cc] == word[i])
+            overlaps++;
+        else
+            grid.cells[rr].set(cc, word[i]);
+
+        if (i < length - 1) {
+            cc += _get<0>(::dirs[direction]);
+            rr += _get<1>(::dirs[direction]);
+        }
+        i++;
+    }
+    auto letters_placed = length - overlaps;
+    if (letters_placed > 0)
+        grid.solutions.append(u"#<10 (#.,#.)(#.,#.)"_S.format(word, c, r, cc, rr));
+    return letters_placed;
+}
+
+template <typename T2> auto try_place_word(Grid &grid, const T2 &word)
+{
+    auto rand_dir = randomns::_(range_ee(0, ::dirs.len()));
+    auto rand_pos = randomns::_(range_ee(0, ::grid_size));
+
+    for (auto direction : range_el(0, ::dirs.len())) {
+        direction = mod((direction + rand_dir), ::dirs.len());
+
+        for (auto pos : range_el(0, ::grid_size)) {
+            pos = mod((pos + rand_pos), ::grid_size);
+            auto letters_placed = try_location(grid, word, direction, pos);
+            if (letters_placed > 0)
+                return letters_placed;
+        }
+    }
+    return 0;
+}
+
+template <typename T1> auto create_word_search(T1 &words)
+{
+    auto grid = Grid();
+    auto num_attempts = 0;
+
+    while (num_attempts < 100) {
+        num_attempts++;
+        randomns::shuffle(words);
+        grid = Grid();
+        auto message_len = place_message(grid, u"Rosetta Code"_S);
+        auto target = ::grid_size - message_len;
+        auto cells_filled = 0;
+        for (auto &&word : words) {
+            cells_filled += try_place_word(grid, word);
+            if (cells_filled == target) {
+                if (grid.solutions.len() >= ::min_words) {
+                    grid.num_attempts = num_attempts;
+                    return grid;
+                }
+                else
+                    break;
+            }
+        }
+    }
+    return grid;
+}
+
+template <typename T1> auto print_result(const T1 &grid)
+{
+    if (grid.num_attempts == 0) {
+        print(u"No grid to display"_S);
+        return;
+    }
+    auto size = grid.solutions.len();
+    print(u"Attempts: #."_S.format(grid.num_attempts));
+    print(u"Number of words: #."_S.format(size));
+    print(u"\n     0  1  2  3  4  5  6  7  8  9\n"_S);
+    for (auto r : range_el(0, ::n_rows)) {
+        print(u"#.   "_S.format(r), u""_S);
+        for (auto c : range_el(0, ::n_cols))
+            print(u" #. "_S.format(grid.cells[r][c]), u""_S);
+        print();
+    }
+    print();
+    for (auto i : range_el(0, size - 1).step(2))
+        print(u"#.   #."_S.format(grid.solutions[i], grid.solutions[i + 1]));
+    if (mod(size, 2) == 1)
+        print(grid.solutions[size - 1]);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print_result(create_word_search(make_ref(read_words(u"unixdict.txt"_S))));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Word_wheel#Python
+import collections
+
+GRID = """
+N   D   E
+O   K   G
+E   L   W
+"""
+
+def getwords():
+    "Return lowercased words of 3 to 9 characters"
+    words = open('unixdict.txt').read().lower().split("\n")
+    return [w for w in words if 3 <= len(w) <= 9]
+
+def solve(grid, dictionary):
+    gridcount = collections.defaultdict(int) # Char
+    for g in grid:
+        gridcount[g] += 1
+
+    def check_word(word):
+        lcount = collections.defaultdict(int) # Char
+        for l in word:
+            lcount[l] += 1
+        for l, c in lcount.items():
+            if c > gridcount[l]:
+                return True
+        return False
+
+    mid = grid[4]
+    return [word for word in dictionary
+            if mid in word and not check_word(word)]
+
+chars = ''.join(GRID.strip().lower().split())
+found = solve(chars, dictionary=getwords())
+print('\n'.join(found))
+===
+//import collections
+V GRID = ‘
+N   D   E
+O   K   G
+E   L   W
+’
+
+F getwords()
+   ‘Return lowercased words of 3 to 9 characters’
+   V words = File(‘unixdict.txt’).read().lowercase().split("\n")
+   R words.filter(w -> w.len C 3..9)
+
+F solve(grid, dictionary)
+   V gridcount = DefaultDict[Char, Int]()
+   L(g) grid
+      gridcount[g]++
+
+   F check_word(word)
+      V lcount = DefaultDict[Char, Int]()
+      L(l) word
+         lcount[l]++
+      L(l, c) lcount
+         I c > @gridcount[l]
+            R 1B
+      R 0B
+   V mid = grid[4]
+   R dictionary.filter(word -> @mid C word & !@check_word(word))
+V chars = GRID.trim((‘ ’, "\t", "\r", "\n")).lowercase().split_py().join(‘’)
+V found = solve(chars, dictionary' getwords())
+print(found.join("\n"))
+===
+auto GRID = uR"(
+N   D   E
+O   K   G
+E   L   W
+)"_S;
+
+auto getwords()
+{
+    u"Return lowercased words of 3 to 9 characters"_S;
+    auto words = File(u"unixdict.txt"_S).read().lowercase().split(u"\n"_S);
+    return words.filter([](const auto &w){return in(w.len(), range_ee(3, 9));});
+}
+
+template <typename T1, typename T2> auto solve(const T1 &grid, const T2 &dictionary)
+{
+    auto gridcount = DefaultDict<Char, int>();
+    for (auto &&g : grid)
+        gridcount[g]++;
+
+    auto check_word = [&gridcount](const auto &word)
+    {
+        auto lcount = DefaultDict<Char, int>();
+        for (auto &&l : word)
+            lcount[l]++;
+        for (auto &&[l, c] : lcount)
+            if (c > gridcount[l])
+                return true;
+        return false;
+    };
+    auto mid = _get<4>(grid);
+    return dictionary.filter([&check_word, &mid](const auto &word){return in(mid, word) && !check_word(word);});
+}
+auto chars = GRID.trim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S)).lowercase().split_py().join(u""_S);
+auto found = solve(chars, getwords());
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(found.join(u"\n"_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Word_wrap#Go
+def word_wrap(text, line_width):
+    words = text.split()
+    if len(words) == 0:
+        return ''
+    wrapped = words[0]
+    space_left = line_width - len(wrapped)
+    for word in words[1:]:
+        if len(word)+1 > space_left:
+            wrapped += "\n" + word
+            space_left = line_width - len(word)
+        else:
+            wrapped += " " + word
+            space_left -= 1 + len(word)
+    return wrapped
+
+frog = '''
+In olden times when wishing still helped one, there lived a king
+whose daughters were all beautiful, but the youngest was so beautiful
+that the sun itself, which has seen so much, was astonished whenever
+it shone in her face.  Close by the king's castle lay a great dark
+forest, and under an old lime-tree in the forest was a well, and when
+the day was very warm, the king's child went out into the forest and
+sat down by the side of the cool fountain, and when she was bored she
+took a golden ball, and threw it up on high and caught it, and this
+ball was her favorite plaything.'''
+
+for width in (72, 80):
+    print('Wrapped at ' + str(width) + ":\n" + word_wrap(frog, width))
+    print()
+===
+F word_wrap(text, line_width)
+   V words = text.split_py()
+   I words.empty
+      R ‘’
+   V wrapped = words[0]
+   V space_left = line_width - wrapped.len
+   L(word) words[1..]
+      I word.len + 1 > space_left
+         wrapped ‘’= "\n"word
+         space_left = line_width - word.len
+      E
+         wrapped ‘’= ‘ ’word
+         space_left -= 1 + word.len
+   R wrapped
+V frog = ‘
+In olden times when wishing still helped one, there lived a king
+whose daughters were all beautiful, but the youngest was so beautiful
+that the sun itself, which has seen so much, was astonished whenever
+it shone in her face.  Close by the king's castle lay a great dark
+forest, and under an old lime-tree in the forest was a well, and when
+the day was very warm, the king's child went out into the forest and
+sat down by the side of the cool fountain, and when she was bored she
+took a golden ball, and threw it up on high and caught it, and this
+ball was her favorite plaything.’
+
+L(width) (72, 80)
+   print(‘Wrapped at ’String(width)":\n"word_wrap(frog, width))
+   print()
+===
+template <typename T1, typename T2> auto word_wrap(const T1 &text, const T2 &line_width)
+{
+    auto words = text.split_py();
+    if (words.empty())
+        return u""_S;
+    auto wrapped = _get<0>(words);
+    auto space_left = line_width - wrapped.len();
+    for (auto &&word : words[range_ei(1)])
+        if (word.len() + 1 > space_left) {
+            wrapped &= u"\n"_S & word;
+            space_left = line_width - word.len();
+        }
+        else {
+            wrapped &= u" "_S & word;
+            space_left -= 1 + word.len();
+        }
+    return wrapped;
+}
+auto frog = uR"(
+In olden times when wishing still helped one, there lived a king
+whose daughters were all beautiful, but the youngest was so beautiful
+that the sun itself, which has seen so much, was astonished whenever
+it shone in her face.  Close by the king's castle lay a great dark
+forest, and under an old lime-tree in the forest was a well, and when
+the day was very warm, the king's child went out into the forest and
+sat down by the side of the cool fountain, and when she was bored she
+took a golden ball, and threw it up on high and caught it, and this
+ball was her favorite plaything.)"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&width : make_tuple(72, 80)) {
+            print(u"Wrapped at "_S & String(width) & u":\n"_S & word_wrap(frog, width));
+            print();
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Words_containing_%22the%22_substring#Python
+for word in open('unixdict.txt').read().split("\n"):
+    if "the" in word and len(word) > 11:
+        print(word)
+===
+L(word) File(‘unixdict.txt’).read().split("\n")
+   I ‘the’ C word & word.len > 11
+      print(word)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&word : File(u"unixdict.txt"_S).read().split(u"\n"_S))
+            if (in(u"the"_S, word) && word.len() > 11)
+                print(word);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/World_Cup_group_stage#Go
+games = ["12", "13", "14", "23", "24", "34"]
+results = "000000"
+
+# [https://stackoverflow.com/a/28666223/2692494 <- google:‘python integer to string radix’]
+def numberToBase(n, b):
+    if n == 0:
+        return '0'
+    digits = ''
+    while n != 0:
+        digits += str(int(n % b))
+        n //= b
+    return digits[::-1]
+
+def nextResult():
+    global results
+    if results == "222222":
+        return False
+    res = int(results, base = 3) + 1
+    results = numberToBase(res, 3).zfill(6)
+    return True
+
+points = [[0]*10 for i in range(4)]
+while True:
+    records = [0]*4
+    for i in range(len(games)):
+        r = results[i]
+        if r == '2':
+            records[ord(games[i][0]) - ord('1')] += 3
+        elif r == '1':
+            records[ord(games[i][0]) - ord('1')] += 1
+            records[ord(games[i][1]) - ord('1')] += 1
+        elif r == '0':
+            records[ord(games[i][1]) - ord('1')] += 3
+
+    records.sort()
+    for i in range(4):
+        points[i][records[i]] += 1
+
+    if not nextResult():
+        break
+
+print("POINTS       0    1    2    3    4    5    6    7    8    9")
+print("-------------------------------------------------------------")
+places = ["1st", "2nd", "3rd", "4th"]
+for i in range(4):
+    print(places[i], end = ' place    ')
+    for j in range(10):
+        print("%-5d" % points[3-i][j], end = '')
+    print()
+===
+V games = [‘12’, ‘13’, ‘14’, ‘23’, ‘24’, ‘34’]
+V results = ‘000000’
+
+F numberToBase(=n, b)
+   I n == 0
+      R ‘0’
+   V digits = ‘’
+   L n != 0
+      digits ‘’= String(Int(n % b))
+      n I/= b
+   R reversed(digits)
+
+F nextResult()
+   I :results == ‘222222’
+      R 0B
+   V res = Int(:results, radix' 3) + 1
+   :results = numberToBase(res, 3).zfill(6)
+   R 1B
+V points = (0.<4).map(i -> [0] * 10)
+L
+   V records = [0] * 4
+   L(i) 0 .< games.len
+      S results[i]
+         ‘2’
+            records[games[i][0].code - ‘1’.code] += 3
+         ‘1’
+            records[games[i][0].code - ‘1’.code]++
+            records[games[i][1].code - ‘1’.code]++
+         ‘0’
+            records[games[i][1].code - ‘1’.code] += 3
+   records.sort()
+   L(i) 4
+      points[i][records[i]]++
+
+   I !nextResult()
+      L.break
+print(‘POINTS       0    1    2    3    4    5    6    7    8    9’)
+print(‘-------------------------------------------------------------’)
+V places = [‘1st’, ‘2nd’, ‘3rd’, ‘4th’]
+L(i) 4
+   print(places[i], end' ‘ place    ’)
+   L(j) 10
+      print(‘#<5’.format(points[3 - i][j]), end' ‘’)
+   print()
+===
+auto games = create_array({u"12"_S, u"13"_S, u"14"_S, u"23"_S, u"24"_S, u"34"_S});
+auto results = u"000000"_S;
+
+template <typename T1, typename T2> auto numberToBase(T1 n, const T2 &b)
+{
+    if (n == 0)
+        return u"0"_S;
+    auto digits = u""_S;
+    while (n != 0) {
+        digits &= String(to_int(mod(n, b)));
+        n = idiv(n, b);
+    }
+    return reversed(digits);
+}
+
+auto nextResult()
+{
+    if (::results == u"222222")
+        return false;
+    auto res = to_int(::results, 3) + 1;
+    ::results = numberToBase(res, 3).zfill(6);
+    return true;
+}
+auto points = range_el(0, 4).map([](const auto &i){return create_array({0}) * 10;});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            auto records = create_array({0}) * 4;
+            for (auto i : range_el(0, games.len()))
+                switch (results[i])
+                {
+                case u'2':
+                    records[_get<0>(games[i]).code - u'1'_C.code] += 3;
+                    break;
+                case u'1':
+                    records[_get<0>(games[i]).code - u'1'_C.code]++;
+                    records[_get<1>(games[i]).code - u'1'_C.code]++;
+                    break;
+                case u'0':
+                    records[_get<1>(games[i]).code - u'1'_C.code] += 3;
+                    break;
+                }
+            records.sort();
+            for (int i = 0; i < 4; i++)
+                points[i][records[i]]++;
+            if (!nextResult())
+                break;
+        }
+        print(u"POINTS       0    1    2    3    4    5    6    7    8    9"_S);
+        print(u"-------------------------------------------------------------"_S);
+    }
+} code_block_1;
+auto places = create_array({u"1st"_S, u"2nd"_S, u"3rd"_S, u"4th"_S});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (int i = 0; i < 4; i++) {
+            print(places[i], u" place    "_S);
+            for (int j = 0; j < 10; j++)
+                print(u"#<5"_S.format(points[3 - i][j]), u""_S);
+            print();
+        }
+    }
+} code_block_2;
