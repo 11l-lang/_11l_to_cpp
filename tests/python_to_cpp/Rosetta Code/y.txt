@@ -1,0 +1,182 @@
+# https://www.rosettacode.org/wiki/Yellowstone_sequence#C.2B.2B
+import math
+
+class YellowstoneGenerator:
+    min_ = 1
+    n_ = 0
+    n1_ = 0
+    n2_ = 0
+    def __init__(self):
+        self.sequence_ = set() # int
+
+    def next(self):
+        self.n2_ = self.n1_
+        self.n1_ = self.n_
+        if self.n_ < 3:
+            self.n_ += 1
+        else:
+            self.n_ = self.min_
+            while not (self.n_ not in self.sequence_
+                   and math.gcd(self.n1_, self.n_) == 1
+                   and math.gcd(self.n2_, self.n_) > 1):
+                self.n_ += 1
+        self.sequence_.add(self.n_)
+        while True:
+            if self.min_ not in self.sequence_:
+                break
+            self.sequence_.remove(self.min_)
+            self.min_ += 1
+        return self.n_
+
+print('First 30 Yellowstone numbers:')
+ygen = YellowstoneGenerator()
+print(ygen.next(), end = '')
+for i in range(1, 30):
+    print(' ' + str(ygen.next()), end = '')
+print()
+===
+//import math
+
+T YellowstoneGenerator
+   min_ = 1
+   n_ = 0
+   n1_ = 0
+   n2_ = 0
+   sequence_ = Set[Int]()
+   F ()
+   {
+   }
+
+   F next()
+      .n2_ = .n1_
+      .n1_ = .n_
+      I .n_ < 3
+         .n_++
+      E
+         .n_ = .min_
+         L !(.n_ !C .sequence_ & gcd(.n1_, .n_) == 1 & gcd(.n2_, .n_) > 1)
+            .n_++
+      .sequence_.add(.n_)
+      L
+         I .min_ !C .sequence_
+            L.break
+         .sequence_.remove(.min_)
+         .min_++
+      R .n_
+print(‘First 30 Yellowstone numbers:’)
+V ygen = YellowstoneGenerator()
+print(ygen.next(), end' ‘’)
+L(i) 1..29
+   print(‘ ’String(ygen.next()), end' ‘’)
+print()
+===
+class YellowstoneGenerator
+{
+public:
+    decltype(1) min_ = 1;
+    decltype(0) n_ = 0;
+    decltype(0) n1_ = 0;
+    decltype(0) n2_ = 0;
+    decltype(Set<int>()) sequence_ = Set<int>();
+    YellowstoneGenerator()
+    {
+    }
+
+    auto next()
+    {
+        n2_ = n1_;
+        n1_ = n_;
+        if (n_ < 3)
+            n_++;
+        else {
+            n_ = min_;
+            while (!(!in(n_, sequence_) && gcd(n1_, n_) == 1 && gcd(n2_, n_) > 1))
+                n_++;
+        }
+        sequence_.add(n_);
+        while (true) {
+            if (!in(min_, sequence_))
+                break;
+            sequence_.remove(min_);
+            min_++;
+        }
+        return n_;
+    }
+};
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"First 30 Yellowstone numbers:"_S);
+    }
+} code_block_1;
+auto ygen = YellowstoneGenerator();
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(ygen.next(), u""_S);
+        for (auto i : range_ee(1, 29))
+            print(u" "_S & String(ygen.next()), u""_S);
+        print();
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Yellowstone_sequence#Ruby
+import math
+
+def yellow(n):
+    a = [1, 2, 3]
+    b = {1, 2, 3}
+    i = 4
+    while n > len(a):
+        if i not in b and math.gcd(i, a[-1]) == 1 and math.gcd(i, a[-2]) > 1:
+            a.append(i)
+            b.add(i)
+            i = 4
+        i += 1
+    return a
+
+print(yellow(30))
+===
+//import math
+
+F yellow(n)
+   V a = [1, 2, 3]
+   V b = Set([1, 2, 3])
+   V i = 4
+   L n > a.len
+      I i !C b & gcd(i, a.last) == 1 & gcd(i, a[(len)-2]) > 1
+         a.append(i)
+         b.add(i)
+         i = 4
+      i++
+   R a
+print(yellow(30))
+===
+template <typename T1> auto yellow(const T1 &n)
+{
+    auto a = create_array({1, 2, 3});
+    auto b = create_set({1, 2, 3});
+    auto i = 4;
+    while (n > a.len()) {
+        if (!in(i, b) && gcd(i, a.last()) == 1 && gcd(i, a.at_plus_len( - 2)) > 1) {
+            a.append(i);
+            b.add(i);
+            i = 4;
+        }
+        i++;
+    }
+    return a;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(yellow(30));
+    }
+} code_block_1;
