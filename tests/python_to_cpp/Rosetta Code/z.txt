@@ -1,0 +1,484 @@
+# https://www.rosettacode.org/wiki/Zeckendorf_number_representation#Python
+n = 20
+def z(n):
+    if n == 0 : return [0]
+    fib = [2,1]
+    while fib[0] < n: fib = [sum(fib[:2])] + fib
+    dig : List[int] = []
+    for f in fib:
+        if f <= n:
+            dig += [1]
+            n -= f
+        else:
+            dig += [0]
+    return dig if dig[0] else dig[1:]
+
+for i in range(n + 1):
+    print('%3i: %8s' % (i, ''.join(str(d) for d in z(i))))
+===
+V n = 20
+F z(=n)
+   I n == 0
+      R [0]
+   V fib = [2, 1]
+   L fib[0] < n
+      fib = [sum(fib[0.<2])] [+] fib
+   [Int] dig
+   L(f) fib
+      I f <= n
+         dig [+]= 1
+         n -= f
+      E
+         dig [+]= 0
+   R I dig[0] {dig} E dig[1..]
+
+L(i) 0 .. n
+   print(‘#3: #8’.format(i, z(i).map(d -> String(d)).join(‘’)))
+===
+auto n = 20;
+template <typename T1> auto z(T1 n)
+{
+    if (n == 0)
+        return create_array({0});
+    auto fib = create_array({2, 1});
+    while (_get<0>(fib) < n)
+        fib = create_array({sum(fib[range_el(0, 2)])}) + fib;
+    Array<int> dig;
+    for (auto &&f : fib)
+        if (f <= n) {
+            dig.append(1);
+            n -= f;
+        }
+        else
+            dig.append(0);
+    return _get<0>(dig) ? dig : dig[range_ei(1)];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(0, n))
+            print(u"#3: #8"_S.format(i, z(i).map([](const auto &d){return String(d);}).join(u""_S)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Zhang-Suen_thinning_algorithm#Python
+# Example from [http://nayefreza.wordpress.com/2013/05/11/zhang-suen-thinning-algorithm-java-implementation/ this blog post].
+beforeTxt = \
+R'''1100111
+1100111
+1100111
+1100111
+1100110
+1100110
+1100110
+1100110
+1100110
+1100110
+1100110
+1100110
+1111110
+0000000'''
+
+# Thanks to [http://www.network-science.de/ascii/ this site] and vim for these next two examples
+smallrc01 = \
+R'''00000000000000000000000000000000
+01111111110000000111111110000000
+01110001111000001111001111000000
+01110000111000001110000111000000
+01110001111000001110000000000000
+01111111110000001110000000000000
+01110111100000001110000111000000
+01110011110011101111001111011100
+01110001111011100111111110011100
+00000000000000000000000000000000'''
+
+rc01 = \
+R'''00000000000000000000000000000000000000000000000000000000000
+01111111111111111100000000000000000001111111111111000000000
+01111111111111111110000000000000001111111111111111000000000
+01111111111111111111000000000000111111111111111111000000000
+01111111100000111111100000000001111111111111111111000000000
+00011111100000111111100000000011111110000000111111000000000
+00011111100000111111100000000111111100000000000000000000000
+00011111111111111111000000000111111100000000000000000000000
+00011111111111111110000000000111111100000000000000000000000
+00011111111111111111000000000111111100000000000000000000000
+00011111100000111111100000000111111100000000000000000000000
+00011111100000111111100000000111111100000000000000000000000
+00011111100000111111100000000011111110000000111111000000000
+01111111100000111111100000000001111111111111111111000000000
+01111111100000111111101111110000111111111111111111011111100
+01111111100000111111101111110000001111111111111111011111100
+01111111100000111111101111110000000001111111111111011111100
+00000000000000000000000000000000000000000000000000000000000'''
+
+def intarray(binstring):
+    '''Change a 2D matrix of 01 chars into a list of lists of ints'''
+    return [[(1 if ch == '1' else 0) for ch in line]
+            for line in binstring.split("\n")]
+
+def chararray(intmatrix):
+    '''Change a 2d list of lists of 1/0 ints into lines of 1/0 chars'''
+    return '\n'.join(''.join(str(p) for p in row) for row in intmatrix)
+
+def toTxt(intmatrix):
+    '''Change a 2d list of lists of 1/0 ints into lines of '#' and '.' chars'''
+    return '\n'.join(''.join(('#' if p else '.') for p in row) for row in intmatrix)
+
+def neighbours_array(x, y, image):
+    '''Return 8-neighbours of point p1 of picture, in order'''
+    i = image
+    (x1, y1, x_1, y_1) = (x+1, y-1, x-1, y+1)
+    #print ((x,y))
+    return [i[y1][x],  i[y1][x1],   i[y][x1],  i[y_1][x1],  # P2,P3,P4,P5
+            i[y_1][x], i[y_1][x_1], i[y][x_1], i[y1][x_1]]  # P6,P7,P8,P9
+
+def neighbours_tuple(x, y, image):
+    '''Return 8-neighbours of point p1 of picture, in order'''
+    i = image
+    (x1, y1, x_1, y_1) = (x+1, y-1, x-1, y+1)
+    #print ((x,y))
+    return (i[y1][x],  i[y1][x1],   i[y][x1],  i[y_1][x1],  # P2,P3,P4,P5
+            i[y_1][x], i[y_1][x_1], i[y][x_1], i[y1][x_1])  # P6,P7,P8,P9
+
+def transitions(neighbours):
+    #n = neighbours + neighbours[0:1]    # P2, ... P9, P2
+    #return sum((n1, n2) == (0, 1) for n1, n2 in zip(n, n[1:]))
+    s = 0
+    for i in range(7):
+        s += int((neighbours[i], neighbours[i+1]) == (0, 1))
+    return s + int((neighbours[7], neighbours[0]) == (0, 1))
+
+def zhangSuen(image : list):
+    changing1 = [(-1, -1)]
+    changing2 = [(-1, -1)]
+    while len(changing1) != 0 or len(changing2) != 0:
+        # Step 1
+        changing1 = []
+        for y in range(1, len(image) - 1):
+            for x in range(1, len(image[0]) - 1):
+                n = neighbours_array(x, y, image)
+                (P2,P3,P4,P5,P6,P7,P8,P9) = neighbours_tuple(x, y, image)
+                if (image[y][x] == 1 and    # (Condition 0)
+                    P4 * P6 * P8 == 0 and   # Condition 4
+                    P2 * P4 * P6 == 0 and   # Condition 3
+                    transitions(n) == 1 and # Condition 2
+                    2 <= sum(n) <= 6):      # Condition 1
+                    changing1.append((x,y))
+        for x, y in changing1: image[y][x] = 0
+        # Step 2
+        changing2 = []
+        for y in range(1, len(image) - 1):
+            for x in range(1, len(image[0]) - 1):
+                n = neighbours_array(x, y, image)
+                (P2,P3,P4,P5,P6,P7,P8,P9) = neighbours_tuple(x, y, image)
+                if (image[y][x] == 1 and    # (Condition 0)
+                    P2 * P6 * P8 == 0 and   # Condition 4
+                    P2 * P4 * P8 == 0 and   # Condition 3
+                    transitions(n) == 1 and # Condition 2
+                    2 <= sum(n) <= 6):      # Condition 1
+                    changing2.append((x,y))
+        for x, y in changing2: image[y][x] = 0
+        #print changing1
+        #print changing2
+    return image
+
+for picture in (beforeTxt, smallrc01, rc01):
+    image = intarray(picture)
+    print('\nFrom:\n%s' % toTxt(image))
+    after = zhangSuen(image)
+    print('\nTo thinned:\n%s' % toTxt(after))
+===
+V beforeTxt = ‘1100111
+1100111
+1100111
+1100111
+1100110
+1100110
+1100110
+1100110
+1100110
+1100110
+1100110
+1100110
+1111110
+0000000’
+V smallrc01 = ‘00000000000000000000000000000000
+01111111110000000111111110000000
+01110001111000001111001111000000
+01110000111000001110000111000000
+01110001111000001110000000000000
+01111111110000001110000000000000
+01110111100000001110000111000000
+01110011110011101111001111011100
+01110001111011100111111110011100
+00000000000000000000000000000000’
+V rc01 = ‘00000000000000000000000000000000000000000000000000000000000
+01111111111111111100000000000000000001111111111111000000000
+01111111111111111110000000000000001111111111111111000000000
+01111111111111111111000000000000111111111111111111000000000
+01111111100000111111100000000001111111111111111111000000000
+00011111100000111111100000000011111110000000111111000000000
+00011111100000111111100000000111111100000000000000000000000
+00011111111111111111000000000111111100000000000000000000000
+00011111111111111110000000000111111100000000000000000000000
+00011111111111111111000000000111111100000000000000000000000
+00011111100000111111100000000111111100000000000000000000000
+00011111100000111111100000000111111100000000000000000000000
+00011111100000111111100000000011111110000000111111000000000
+01111111100000111111100000000001111111111111111111000000000
+01111111100000111111101111110000111111111111111111011111100
+01111111100000111111101111110000001111111111111111011111100
+01111111100000111111101111110000000001111111111111011111100
+00000000000000000000000000000000000000000000000000000000000’
+
+F intarray(binstring)
+   ‘Change a 2D matrix of 01 chars into a list of lists of ints’
+   R binstring.split("\n").map(line -> line.map(ch -> (I ch == ‘1’ {1} E 0)))
+
+F chararray(intmatrix)
+   ‘Change a 2d list of lists of 1/0 ints into lines of 1/0 chars’
+   R intmatrix.map(row -> row.map(p -> String(p)).join(‘’)).join("\n")
+
+F toTxt(intmatrix)
+   ‘Change a 2d list of lists of 1/0 ints into lines of '#' and '.' chars’
+   R intmatrix.map(row -> row.map(p -> (I p {‘#’} E ‘.’)).join(‘’)).join("\n")
+
+F neighbours_array(x, y, image)
+   ‘Return 8-neighbours of point p1 of picture, in order’
+   V i = image
+   V (x1, y1, x_1, y_1) = (x + 1, y - 1, x - 1, y + 1)
+   R [i[y1][x], i[y1][x1], i[y][x1], i[y_1][x1], i[y_1][x], i[y_1][x_1], i[y][x_1], i[y1][x_1]]
+
+F neighbours_tuple(x, y, image)
+   ‘Return 8-neighbours of point p1 of picture, in order’
+   V i = image
+   V (x1, y1, x_1, y_1) = (x + 1, y - 1, x - 1, y + 1)
+   R (i[y1][x], i[y1][x1], i[y][x1], i[y_1][x1], i[y_1][x], i[y_1][x_1], i[y][x_1], i[y1][x_1])
+
+F transitions(neighbours)
+   V s = 0
+   L(i) 7
+      s += Int((neighbours[i], neighbours[i + 1]) == (0, 1))
+   R s + Int((neighbours[7], neighbours[0]) == (0, 1))
+
+F zhangSuen(&image)
+   V changing1 = [(-1, -1)]
+   V changing2 = [(-1, -1)]
+   L !changing1.empty | !changing2.empty
+      changing1.drop()
+      L(y) 1 .< image.len - 1
+         L(x) 1 .< image[0].len - 1
+            V n = neighbours_array(x, y, image)
+            V (P2, P3, P4, P5, P6, P7, P8, P9) = neighbours_tuple(x, y, image)
+            I (image[y][x] == 1 & P4 * P6 * P8 == 0 & P2 * P4 * P6 == 0 & transitions(n) == 1 & sum(n) C 2..6)
+               changing1.append((x, y))
+      L(x, y) changing1
+         image[y][x] = 0
+      changing2.drop()
+      L(y) 1 .< image.len - 1
+         L(x) 1 .< image[0].len - 1
+            V n = neighbours_array(x, y, image)
+            V (P2, P3, P4, P5, P6, P7, P8, P9) = neighbours_tuple(x, y, image)
+            I (image[y][x] == 1 & P2 * P6 * P8 == 0 & P2 * P4 * P8 == 0 & transitions(n) == 1 & sum(n) C 2..6)
+               changing2.append((x, y))
+      L(x, y) changing2
+         image[y][x] = 0
+   R image
+
+L(picture) (beforeTxt, smallrc01, rc01)
+   V image = intarray(picture)
+   print("\nFrom:\n#.".format(toTxt(image)))
+   V after = zhangSuen(&image)
+   print("\nTo thinned:\n#.".format(toTxt(after)))
+===
+auto beforeTxt = uR"(1100111
+1100111
+1100111
+1100111
+1100110
+1100110
+1100110
+1100110
+1100110
+1100110
+1100110
+1100110
+1111110
+0000000)"_S;
+auto smallrc01 = uR"(00000000000000000000000000000000
+01111111110000000111111110000000
+01110001111000001111001111000000
+01110000111000001110000111000000
+01110001111000001110000000000000
+01111111110000001110000000000000
+01110111100000001110000111000000
+01110011110011101111001111011100
+01110001111011100111111110011100
+00000000000000000000000000000000)"_S;
+auto rc01 = uR"(00000000000000000000000000000000000000000000000000000000000
+01111111111111111100000000000000000001111111111111000000000
+01111111111111111110000000000000001111111111111111000000000
+01111111111111111111000000000000111111111111111111000000000
+01111111100000111111100000000001111111111111111111000000000
+00011111100000111111100000000011111110000000111111000000000
+00011111100000111111100000000111111100000000000000000000000
+00011111111111111111000000000111111100000000000000000000000
+00011111111111111110000000000111111100000000000000000000000
+00011111111111111111000000000111111100000000000000000000000
+00011111100000111111100000000111111100000000000000000000000
+00011111100000111111100000000111111100000000000000000000000
+00011111100000111111100000000011111110000000111111000000000
+01111111100000111111100000000001111111111111111111000000000
+01111111100000111111101111110000111111111111111111011111100
+01111111100000111111101111110000001111111111111111011111100
+01111111100000111111101111110000000001111111111111011111100
+00000000000000000000000000000000000000000000000000000000000)"_S;
+
+template <typename T1> auto intarray(const T1 &binstring)
+{
+    u"Change a 2D matrix of 01 chars into a list of lists of ints"_S;
+    return binstring.split(u"\n"_S).map([](const auto &line){return line.map([](const auto &ch){return (ch == u'1' ? 1 : 0);});});
+}
+
+template <typename T1> auto chararray(const T1 &intmatrix)
+{
+    u"Change a 2d list of lists of 1/0 ints into lines of 1/0 chars"_S;
+    return intmatrix.map([](const auto &row){return row.map([](const auto &p){return String(p);}).join(u""_S);}).join(u"\n"_S);
+}
+
+template <typename T1> auto toTxt(const T1 &intmatrix)
+{
+    u"Change a 2d list of lists of 1/0 ints into lines of '#' and '.' chars"_S;
+    return intmatrix.map([](const auto &row){return row.map([](const auto &p){return (p ? u"#"_S : u"."_S);}).join(u""_S);}).join(u"\n"_S);
+}
+
+template <typename T1, typename T2, typename T3> auto neighbours_array(const T1 &x, const T2 &y, const T3 &image)
+{
+    u"Return 8-neighbours of point p1 of picture, in order"_S;
+    auto i = image;
+    auto [x1, _y1_, x_1, y_1] = make_tuple(x + 1, y - 1, x - 1, y + 1);
+    return create_array({i[_y1_][x], i[_y1_][x1], i[y][x1], i[y_1][x1], i[y_1][x], i[y_1][x_1], i[y][x_1], i[_y1_][x_1]});
+}
+
+template <typename T1, typename T2, typename T3> auto neighbours_tuple(const T1 &x, const T2 &y, const T3 &image)
+{
+    u"Return 8-neighbours of point p1 of picture, in order"_S;
+    auto i = image;
+    auto [x1, _y1_, x_1, y_1] = make_tuple(x + 1, y - 1, x - 1, y + 1);
+    return make_tuple(i[_y1_][x], i[_y1_][x1], i[y][x1], i[y_1][x1], i[y_1][x], i[y_1][x_1], i[y][x_1], i[_y1_][x_1]);
+}
+
+template <typename T1> auto transitions(const T1 &neighbours)
+{
+    auto s = 0;
+    for (int i = 0; i < 7; i++)
+        s += to_int(make_tuple(neighbours[i], neighbours[i + 1]) == make_tuple(0, 1));
+    return s + to_int(make_tuple(_get<7>(neighbours), _get<0>(neighbours)) == make_tuple(0, 1));
+}
+
+template <typename T1> auto zhangSuen(T1 &image)
+{
+    auto changing1 = create_array({make_tuple(-1, -1)});
+    auto changing2 = create_array({make_tuple(-1, -1)});
+    while (!changing1.empty() || !changing2.empty()) {
+        changing1.drop();
+        for (auto y : range_el(1, image.len() - 1))
+            for (auto x : range_el(1, _get<0>(image).len() - 1)) {
+                auto n = neighbours_array(x, y, image);
+                auto [P2, P3, P4, P5, P6, P7, P8, P9] = neighbours_tuple(x, y, image);
+                if ((image[y][x] == 1 && P4 * P6 * P8 == 0 && P2 * P4 * P6 == 0 && transitions(n) == 1 && in(sum(n), range_ee(2, 6))))
+                    changing1.append(make_tuple(x, y));
+            }
+        for (auto &&[x, y] : changing1)
+            image[y].set(x, 0);
+        changing2.drop();
+        for (auto y : range_el(1, image.len() - 1))
+            for (auto x : range_el(1, _get<0>(image).len() - 1)) {
+                auto n = neighbours_array(x, y, image);
+                auto [P2, P3, P4, P5, P6, P7, P8, P9] = neighbours_tuple(x, y, image);
+                if ((image[y][x] == 1 && P2 * P6 * P8 == 0 && P2 * P4 * P8 == 0 && transitions(n) == 1 && in(sum(n), range_ee(2, 6))))
+                    changing2.append(make_tuple(x, y));
+            }
+        for (auto &&[x, y] : changing2)
+            image[y].set(x, 0);
+    }
+    return image;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&picture : make_tuple(beforeTxt, smallrc01, rc01)) {
+            auto image = intarray(picture);
+            print(u"\nFrom:\n#."_S.format(toTxt(image)));
+            auto after = zhangSuen(image);
+            print(u"\nTo thinned:\n#."_S.format(toTxt(after)));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Zig-zag_matrix#Python
+def zigzag(n):
+    def compare(xy):
+        (x, y) = xy
+        return (x + y, -y if (x + y) % 2 else y)
+    xs = range(n)
+    return {index: n for n, index in enumerate(sorted(
+        ((x, y) for x in xs for y in xs),
+        key=compare
+    ))}
+
+def printzz(myarray):
+    n = int(len(myarray) ** 0.5 + 0.5)
+    xs = range(n)
+    print('\n'.join(
+        [''.join("%3i" % myarray[(x, y)] for x in xs) for y in xs]
+    ))
+
+printzz(zigzag(6))
+===
+F zigzag(n)
+   F compare(xy)
+      V (x, y) = xy
+      R (x + y, I (x + y) % 2 {-y} E y)
+   V xs = 0 .< n
+   R Dict(enumerate(sorted((multiloop(xs, xs, (x, y) -> (x, y))), key' compare)), (n, index) -> (index, n))
+
+F printzz(myarray)
+   V n = Int(myarray.len ^ 0.5 + 0.5)
+   V xs = 0 .< n
+   print((xs.map(y -> @xs.map(x -> ‘#3’.format(@@myarray[(x, @y)])).join(‘’))).join("\n"))
+printzz(zigzag(6))
+===
+template <typename T1> auto zigzag(const T1 &n)
+{
+    auto compare = [](const auto &xy)
+    {
+        auto [x, y] = xy;
+        return make_tuple(x + y, mod((x + y), 2) ? -y : y);
+    };
+    auto xs = range_el(0, n);
+    return create_dict(enumerate(sorted((multiloop(xs, xs, [](const auto &x, const auto &y){return make_tuple(x, y);})), compare)), [](const auto &n, const auto &index){return make_tuple(index, n);});
+}
+
+template <typename T1> auto printzz(const T1 &myarray)
+{
+    auto n = to_int(pow(myarray.len(), 0.5) + 0.5);
+    auto xs = range_el(0, n);
+    print((xs.map([&myarray, &xs](const auto &y){return xs.map([&myarray, &y](const auto &x){return u"#3"_S.format(myarray[make_tuple(x, y)]);}).join(u""_S);})).join(u"\n"_S));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        printzz(zigzag(6));
+    }
+} code_block_1;
