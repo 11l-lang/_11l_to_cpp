@@ -1009,6 +1009,9 @@ inline double parse_float(const char16_t *s)
 }
 inline double parse_float(const String &s) {return parse_float(s.c_str());}
 
+inline String format_float(float  x, int precision) {return String(x, precision);}
+inline String format_float(double x, int precision) {return String(x, precision);}
+
 inline bool in(Char c, const String &s) {return s.find(c) != nullptr;}
 inline bool in(const String &c, const String &s) {return s.find(c) != nullptr;}
 

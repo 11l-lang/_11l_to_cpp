@@ -3021,3 +3021,102 @@ struct CodeBlock1
         print(u"a x (b x c) = #."_S.format(vectortriplep(a, b, c)));
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Suffixation_of_decimal_numbers#Python
+F suffize(numstr, digits = -1, base = 10)
+   V suffixes = [‘’, ‘K’, ‘M’, ‘G’, ‘T’, ‘P’, ‘E’, ‘Z’, ‘Y’, ‘X’, ‘W’, ‘V’, ‘U’, ‘googol’]
+
+   V exponent_distance = I base == 2 {10} E 3
+   V num_sign = I numstr[0] C ‘+-’ {numstr[0]} E ‘’
+
+   V num = abs(Float(numstr.replace(‘,’, ‘’)))
+
+   Int suffix_index
+   I base == 10 & num >= 1e100
+      suffix_index = 13
+      num /= 1e100
+   E I num > 1
+      V magnitude = floor(log(num, base))
+      suffix_index = min(Int(floor(magnitude / exponent_distance)), 12)
+      num /= Float(base) ^ (exponent_distance * suffix_index)
+   E
+      suffix_index = 0
+
+   String num_str
+   I digits != -1
+      num_str = format_float(num, digits)
+   E
+      num_str = format_float(num, 3).rtrim(‘0’).rtrim(‘.’)
+
+   R num_sign‘’num_str‘’suffixes[suffix_index]‘’(I base == 2 {‘i’} E ‘’)
+
+F p(num, digits = -1, base = 10)
+   print(num, end' ‘ ’)
+   I digits != -1
+      print(digits, end' ‘ ’)
+   I base != 10
+      print(‘base = ’base, end' ‘ ’)
+   print(‘: ’suffize(num, digits, base))
+
+p(‘87,654,321’)
+p(‘-998,877,665,544,332,211,000’, 3)
+p(‘+112,233’, 0)
+p(‘16,777,216’, 1)
+p(‘456,789,100,000,000’, 2)
+p(‘456,789,100,000,000’, 5, 2)
+p(‘456,789,100,000.000e+00’, 0, 10)
+p(‘+16777216’, -1, 2)
+p(‘1.2e101’)
+===
+template <typename T1, typename T2 = decltype(-1), typename T3 = decltype(10)> auto suffize(const T1 &numstr, const T2 &digits = -1, const T3 &base = 10)
+{
+    auto suffixes = create_array({u""_S, u"K"_S, u"M"_S, u"G"_S, u"T"_S, u"P"_S, u"E"_S, u"Z"_S, u"Y"_S, u"X"_S, u"W"_S, u"V"_S, u"U"_S, u"googol"_S});
+    auto exponent_distance = base == 2 ? 10 : 3;
+    auto num_sign = in(_get<0>(numstr), u"+-"_S) ? _get<0>(numstr) : u""_S;
+    auto num = abs(to_float(numstr.replace(u","_S, u""_S)));
+    int suffix_index;
+    if (base == 10 && num >= 1e100) {
+        suffix_index = 13;
+        num /= 1e100;
+    }
+    else if (num > 1) {
+        auto magnitude = floor(log(num, base));
+        suffix_index = min(to_int(floor(magnitude / exponent_distance)), 12);
+        num /= pow(to_float(base), (exponent_distance * suffix_index));
+    }
+    else
+        suffix_index = 0;
+    String num_str;
+    if (digits != -1)
+        num_str = format_float(num, digits);
+    else
+        num_str = format_float(num, 3).rtrim(u"0"_S).rtrim(u"."_S);
+    return num_sign & num_str & suffixes[suffix_index] & (base == 2 ? u"i"_S : u""_S);
+}
+
+template <typename T1, typename T2 = decltype(-1), typename T3 = decltype(10)> auto p(const T1 &num, const T2 &digits = -1, const T3 &base = 10)
+{
+    print(num, u" "_S);
+    if (digits != -1)
+        print(digits, u" "_S);
+    if (base != 10)
+        print(u"base = "_S & base, u" "_S);
+    print(u": "_S & suffize(num, digits, base));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        p(u"87,654,321"_S);
+        p(u"-998,877,665,544,332,211,000"_S, 3);
+        p(u"+112,233"_S, 0);
+        p(u"16,777,216"_S, 1);
+        p(u"456,789,100,000,000"_S, 2);
+        p(u"456,789,100,000,000"_S, 5, 2);
+        p(u"456,789,100,000.000e+00"_S, 0, 10);
+        p(u"+16777216"_S, -1, 2);
+        p(u"1.2e101"_S);
+    }
+} code_block_1;
