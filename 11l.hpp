@@ -237,6 +237,7 @@ public:
 #undef assert
 #define assert(...) assert_file_line(__FILE__, __LINE__, __VA_ARGS__) // to fix warning C4002 for assert with 2 arguments
 #include "11l_hpp/ldf.hpp"
+#include "11l_hpp/BigInt.hpp"
 
 #include <thread>
 

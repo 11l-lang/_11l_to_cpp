@@ -14216,3 +14216,104 @@ struct CodeBlock1
         print(yinyang(1));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Lah_numbers#Python
+import math
+BigInt = int
+
+def lah(n : BigInt, k : BigInt):
+    if k == 1:
+        return math.factorial(n)
+    if k == n:
+        return BigInt(1)
+    if k > n:
+        return BigInt(0)
+    if k < 1 or n < 1:
+        return BigInt(0)
+    return (math.factorial(n) * math.factorial(n - 1)) // (math.factorial(k) * math.factorial(k - 1)) // math.factorial(n - k)
+
+print("Unsigned Lah numbers: L(n, k):")
+print("n/k ", end=' ')
+for i in range(13):
+    print("%11d" % i, end=' ')
+print()
+for row in range(13):
+    print("%-4d" % row, end=' ')
+    for i in range(row + 1):
+        l = lah(row, i)
+        print("%11d" % l, end=' ')
+    print()
+print("\nMaximum value from the L(100, *) row:")
+maxVal = max([lah(100, a) for a in range(100)])
+print(maxVal)
+===
+//import math
+
+F lah(BigInt n, BigInt k)
+   I k == 1
+      R factorial(n)
+   I k == n
+      R BigInt(1)
+   I k > n
+      R BigInt(0)
+   I k < 1 | n < 1
+      R BigInt(0)
+   R (factorial(n) * factorial(n - 1)) I/ (factorial(k) * factorial(k - 1)) I/ factorial(n - k)
+print(‘Unsigned Lah numbers: L(n, k):’)
+print(‘n/k ’, end' ‘ ’)
+L(i) 13
+   print(‘#11’.format(i), end' ‘ ’)
+print()
+L(row) 13
+   print(‘#<4’.format(row), end' ‘ ’)
+   L(i) 0 .. row
+      V l = lah(row, i)
+      print(‘#11’.format(l), end' ‘ ’)
+   print()
+print("\nMaximum value from the L(100, *) row:")
+V maxVal = max((0.<100).map(a -> lah(100, a)))
+print(maxVal)
+===
+auto lah(const BigInt &n, const BigInt &k)
+{
+    if (k == 1)
+        return factorial(n);
+    if (k == n)
+        return BigInt(1);
+    if (k > n)
+        return BigInt(0);
+    if (k < 1 || n < 1)
+        return BigInt(0);
+    return idiv(idiv((factorial(n) * factorial(n - 1)), (factorial(k) * factorial(k - 1))), factorial(n - k));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Unsigned Lah numbers: L(n, k):"_S);
+        print(u"n/k "_S, u" "_S);
+        for (int i = 0; i < 13; i++)
+            print(u"#11"_S.format(i), u" "_S);
+        print();
+        for (int row = 0; row < 13; row++) {
+            print(u"#<4"_S.format(row), u" "_S);
+            for (auto i : range_ee(0, row)) {
+                auto l = lah(row, i);
+                print(u"#11"_S.format(l), u" "_S);
+            }
+            print();
+        }
+        print(u"\nMaximum value from the L(100, *) row:"_S);
+    }
+} code_block_1;
+auto maxVal = max(range_el(0, 100).map([](const auto &a){return lah(100, a);}));
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(maxVal);
+    }
+} code_block_2;

@@ -1035,7 +1035,7 @@ class ASTExpression(ASTNodeWithExpression):
         return ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
 cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'перем':'auto',
-                     'Int':'int', 'Int64':'Int64', 'UInt64':'UInt64', 'UInt32':'uint32_t', 'Float':'double', 'Float32':'float', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte',
+                     'Int':'int', 'Int64':'Int64', 'UInt64':'UInt64', 'UInt32':'uint32_t', 'BigInt':'BigInt', 'Float':'double', 'Float32':'float', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
                      'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque'}
 
@@ -1456,7 +1456,7 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
         loop_auto = False
         if self.expression is not None and self.expression.token.category == Token.Category.NUMERIC_LITERAL:
             lv = self.loop_variable if self.loop_variable is not None else 'Lindex'
-            tr = 'for (int ' + lv + ' = 0; ' + lv + ' < ' + self.expression.to_str() + '; ' + lv + '++)'
+            tr = 'for (' + ('Int' if int_is_int64 else 'int') + ' ' + lv + ' = 0; ' + lv + ' < ' + self.expression.to_str() + '; ' + lv + '++)'
         else:
             if self.loop_variable is not None or (self.expression is not None and self.expression.symbol.id in ('..', '.<')):
                 if self.loop_variable is not None and ',' in self.loop_variable:
@@ -1507,7 +1507,7 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
             if self.has_continue:
                 brace_pos = int(rr[0] == "\n") + indent*4 + len(tr) + 1
                 rr = rr[:brace_pos+1] + rr[brace_pos:] # {
-            r += ' ' * (indent*4) + "{int Lindex = 0;\n" + rr[:-indent*4-2] + "} on_continue:\n"*self.has_continue + ' ' * ((indent+1)*4) + "Lindex++;\n" + ' ' * (indent*4) + "}}\n"
+            r += ' ' * (indent*4) + '{' + ('Int' if int_is_int64 else 'int') + " Lindex = 0;\n" + rr[:-indent*4-2] + "} on_continue:\n"*self.has_continue + ' ' * ((indent+1)*4) + "Lindex++;\n" + ' ' * (indent*4) + "}}\n"
         else:
             r += rr
 
