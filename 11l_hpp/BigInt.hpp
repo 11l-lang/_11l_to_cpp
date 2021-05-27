@@ -181,6 +181,9 @@ public:
 	BigInt operator%(const BigInt &v) const {
 		return divmod(*this, v).second;
 	}
+	friend BigInt mod(const BigInt &a, const BigInt &b) {
+		return a % b;
+	}
 
 	void operator/=(int v) {
 		if (v < 0)

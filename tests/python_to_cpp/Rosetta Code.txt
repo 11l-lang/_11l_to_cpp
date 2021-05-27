@@ -14317,3 +14317,90 @@ struct CodeBlock2
         print(maxVal);
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Lucas-Lehmer_test#D
+# Slow BigInt
+import math
+BigInt = int
+
+def isPrime(p):
+    if p < 2 or p % 2 == 0:
+        return p == 2
+    for i in range(3, int(math.sqrt(p)) + 1):
+        if p % i == 0:
+            return False
+    return True
+
+def isMersennePrime(p):
+    if not isPrime(p):
+        return False
+    if p == 2:
+        return True
+    mp = BigInt(2) ** p - 1
+    s = BigInt(4)
+    for _ in range(3, p + 1):
+        s = (s ** 2 - 2) % mp
+    return s == 0
+
+for p in range(2, 2300):
+    if isMersennePrime(p):
+        print('M' + str(p), end = ' ')
+===
+//import math
+
+F isPrime(p)
+   I p < 2 | p % 2 == 0
+      R p == 2
+   L(i) 3 .. Int(sqrt(p))
+      I p % i == 0
+         R 0B
+   R 1B
+
+F isMersennePrime(p)
+   I !isPrime(p)
+      R 0B
+   I p == 2
+      R 1B
+   V mp = BigInt(2) ^ p - 1
+   V s = BigInt(4)
+   L(_) 3 .. p
+      s = (s ^ 2 - 2) % mp
+   R s == 0
+
+L(p) 2..2299
+   I isMersennePrime(p)
+      print(‘M’String(p), end' ‘ ’)
+===
+template <typename T1> auto isPrime(const T1 &p)
+{
+    if (p < 2 || mod(p, 2) == 0)
+        return p == 2;
+    for (auto i : range_ee(3, to_int(sqrt(p))))
+        if (mod(p, i) == 0)
+            return false;
+    return true;
+}
+
+template <typename T1> auto isMersennePrime(const T1 &p)
+{
+    if (!isPrime(p))
+        return false;
+    if (p == 2)
+        return true;
+    auto mp = pow(BigInt(2), p) - 1;
+    auto s = BigInt(4);
+    for (auto _ : range_ee(3, p))
+        s = mod((square(s) - 2), mp);
+    return s == 0;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto p : range_ee(2, 2299))
+            if (isMersennePrime(p))
+                print(u"M"_S & String(p), u" "_S);
+    }
+} code_block_1;
