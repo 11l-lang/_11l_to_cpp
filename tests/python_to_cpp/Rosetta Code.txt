@@ -14404,3 +14404,120 @@ struct CodeBlock1
                 print(u"M"_S & String(p), u" "_S);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Most_frequent_k_chars_distance#Python
+import collections
+def most_freq_khashing(inputString, K):
+    occuDict = collections.defaultdict(int) # Char
+    for c in inputString:
+        occuDict[c] += 1
+    occuList = sorted(occuDict.items(), key = lambda x: x[1], reverse = True)
+    outputDict = dict(occuList[:K])
+    return outputDict
+
+def most_freq_ksimilarity(inputStr1, inputStr2):
+    similarity = 0
+    for c, cnt1 in inputStr1.items():
+        #Reduce the time complexity of lookup operation to about O(1).
+        if c in inputStr2:
+            cnt2 = inputStr2[c]
+            similarity += cnt1 + cnt2
+    return similarity
+
+def most_freq_ksdf(inputStr1, inputStr2, K, maxDistance):
+    return maxDistance - most_freq_ksimilarity(most_freq_khashing(inputStr1,K), most_freq_khashing(inputStr2,K))
+
+str1 = "LCLYTHIGRNIYYGSYLYSETWNTGIMLLLITMATAFMGYVLPWGQMSFWGATVITNLFSAIPYIGTNLV"
+str2 = "EWIWGGFSVDKATLNRFFAFHFILPFTMVALAGVHLTFLHETGSNNPLGLTSDSDKIPFHPYYTIKDFLG"
+K = 2
+maxDistance = 100
+dict1 = most_freq_khashing(str1, 2)
+print(dict1, end = ":\n")
+print(''.join(c + str(cnt) for c, cnt in dict1.items()))
+dict2 = most_freq_khashing(str2, 2)
+print(dict2, end = ":\n")
+print(''.join(c + str(cnt) for c, cnt in dict2.items()))
+print(most_freq_ksdf(str1, str2, K, maxDistance))
+===
+//import collections
+F most_freq_khashing(inputString, K)
+   V occuDict = DefaultDict[Char, Int]()
+   L(c) inputString
+      occuDict[c]++
+   V occuList = sorted(occuDict.items(), key' x -> x[1], reverse' 1B)
+   V outputDict = Dict(occuList[0 .< K])
+   R outputDict
+
+F most_freq_ksimilarity(inputStr1, inputStr2)
+   V similarity = 0
+   L(c, cnt1) inputStr1
+      I c C inputStr2
+         V cnt2 = inputStr2[c]
+         similarity += cnt1 + cnt2
+   R similarity
+
+F most_freq_ksdf(inputStr1, inputStr2, K, maxDistance)
+   R maxDistance - most_freq_ksimilarity(most_freq_khashing(inputStr1, K), most_freq_khashing(inputStr2, K))
+V str1 = ‘LCLYTHIGRNIYYGSYLYSETWNTGIMLLLITMATAFMGYVLPWGQMSFWGATVITNLFSAIPYIGTNLV’
+V str2 = ‘EWIWGGFSVDKATLNRFFAFHFILPFTMVALAGVHLTFLHETGSNNPLGLTSDSDKIPFHPYYTIKDFLG’
+V K = 2
+V maxDistance = 100
+V dict1 = most_freq_khashing(str1, 2)
+print(dict1, end' ":\n")
+print(dict1.map((c, cnt) -> c‘’String(cnt)).join(‘’))
+V dict2 = most_freq_khashing(str2, 2)
+print(dict2, end' ":\n")
+print(dict2.map((c, cnt) -> c‘’String(cnt)).join(‘’))
+print(most_freq_ksdf(str1, str2, K, maxDistance))
+===
+template <typename T1, typename T2> auto most_freq_khashing(const T1 &inputString, const T2 &K)
+{
+    auto occuDict = DefaultDict<Char, int>();
+    for (auto &&c : inputString)
+        occuDict[c]++;
+    auto occuList = sorted(occuDict.items(), [](const auto &x){return _get<1>(x);}, true);
+    auto outputDict = create_dict(occuList[range_el(0, K)]);
+    return outputDict;
+}
+
+template <typename T1, typename T2> auto most_freq_ksimilarity(const T1 &inputStr1, const T2 &inputStr2)
+{
+    auto similarity = 0;
+    for (auto &&[c, cnt1] : inputStr1)
+        if (in(c, inputStr2)) {
+            auto cnt2 = inputStr2[c];
+            similarity += cnt1 + cnt2;
+        }
+    return similarity;
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto most_freq_ksdf(const T1 &inputStr1, const T2 &inputStr2, const T3 &K, const T4 &maxDistance)
+{
+    return maxDistance - most_freq_ksimilarity(most_freq_khashing(inputStr1, K), most_freq_khashing(inputStr2, K));
+}
+auto str1 = u"LCLYTHIGRNIYYGSYLYSETWNTGIMLLLITMATAFMGYVLPWGQMSFWGATVITNLFSAIPYIGTNLV"_S;
+auto str2 = u"EWIWGGFSVDKATLNRFFAFHFILPFTMVALAGVHLTFLHETGSNNPLGLTSDSDKIPFHPYYTIKDFLG"_S;
+auto K = 2;
+auto maxDistance = 100;
+auto dict1 = most_freq_khashing(str1, 2);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(dict1, u":\n"_S);
+        print(dict1.map([](const auto &c, const auto &cnt){return c & String(cnt);}).join(u""_S));
+    }
+} code_block_1;
+auto dict2 = most_freq_khashing(str2, 2);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(dict2, u":\n"_S);
+        print(dict2.map([](const auto &c, const auto &cnt){return c & String(cnt);}).join(u""_S));
+        print(most_freq_ksdf(str1, str2, K, maxDistance));
+    }
+} code_block_2;

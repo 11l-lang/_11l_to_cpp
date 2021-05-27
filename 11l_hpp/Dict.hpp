@@ -174,6 +174,15 @@ public:
 		return r;
 	}
 
+	template <typename Func> auto map(Func &&func) const
+	{
+		Array<decltype(func(std::declval<KeyType>(), std::declval<ValueType>()))> r;
+		r.reserve(len());
+		for (auto &&el : *this)
+			r.push_back(func(el.first, el.second));
+		return r;
+	}
+
 	template <typename Func, typename = decltype(std::declval<Func>()(std::declval<decltype(make_tuple(std::declval<KeyType>(), std::declval<ValueType>()))>()))> auto filter(Func &&func) const
 	{
 		Array<decltype(make_tuple(std::declval<KeyType>(), std::declval<ValueType>()))> r;
