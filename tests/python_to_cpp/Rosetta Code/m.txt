@@ -434,7 +434,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(solve(data.split(u"\n"_S).map([](const auto &row){return row.split_py().map([](const auto &x){return to_int(x);});})));
+        print(solve(make_ref(data.split(u"\n"_S).map([](const auto &row){return row.split_py().map([](const auto &x){return to_int(x);});}))));
     }
 } code_block_1;
 
@@ -980,5 +980,77 @@ struct CodeBlock1
         for (int i = 0; i < 5000; i++)
             if (i == sum_map(String(i), [](const auto &x){return pow(to_int(x), to_int(x));}))
                 print(i);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Magic_squares_of_doubly_even_order#Java
+def magicSquareDoublyEven(n):
+    bits = 0b1001_0110_0110_1001
+    size = n * n
+    mult = n // 4
+
+    result = [[0]*n for i in range(n)]
+    i = 0
+    for r in range(n):
+        for c in range(n):
+            bitPos = c // mult + (r // mult) * 4
+            result[r][c] = i + 1 if (bits & (1 << bitPos)) != 0 else size - i
+            i += 1
+    return result
+
+n = 8
+for row in magicSquareDoublyEven(n):
+    for x in row:
+        print('%2s ' % x, end = '')
+    print()
+print("\nMagic constant: %d" % ((n * n + 1) * n // 2))
+===
+F magicSquareDoublyEven(n)
+   V bits = 1001'0110'0110'1001b
+   V size = n * n
+   V mult = n I/ 4
+   V result = (0 .< n).map(i -> [0] * @n)
+   V i = 0
+   L(r) 0 .< n
+      L(c) 0 .< n
+         V bitPos = c I/ mult + (r I/ mult) * 4
+         result[r][c] = I (bits [&] (1 << bitPos)) != 0 {i + 1} E size - i
+         i++
+   R result
+V n = 8
+L(row) magicSquareDoublyEven(n)
+   L(x) row
+      print(‘#2 ’.format(x), end' ‘’)
+   print()
+print("\nMagic constant: #.".format((n * n + 1) * n I/ 2))
+===
+template <typename T1> auto magicSquareDoublyEven(const T1 &n)
+{
+    auto bits = 0b1001'0110'0110'1001;
+    auto size = n * n;
+    auto mult = idiv(n, 4);
+    auto result = range_el(0, n).map([&n](const auto &i){return create_array({0}) * n;});
+    auto i = 0;
+    for (auto r : range_el(0, n))
+        for (auto c : range_el(0, n)) {
+            auto bitPos = idiv(c, mult) + (idiv(r, mult)) * 4;
+            result[r].set(c, (bits & (1 << bitPos)) != 0 ? i + 1 : size - i);
+            i++;
+        }
+    return result;
+}
+auto n = 8;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&row : magicSquareDoublyEven(n)) {
+            for (auto &&x : row)
+                print(u"#2 "_S.format(x), u""_S);
+            print();
+        }
+        print(u"\nMagic constant: #."_S.format(idiv((n * n + 1) * n, 2)));
     }
 } code_block_1;

@@ -3344,7 +3344,7 @@ template <typename T1> auto strand_sort(T1 &a)
 {
     auto out = strand(a);
     while (!a.empty())
-        out = merge_list(out, strand(a));
+        out = merge_list(out, make_ref(strand(a)));
     return out;
 }
 
