@@ -177,6 +177,9 @@ public:
 	friend BigInt idiv(const BigInt &a, const BigInt &b) {
 		return a / b;
 	}
+	friend BigInt idiv(const BigInt &a, Int b) {
+		return a / b;
+	}
 
 	BigInt operator%(const BigInt &v) const {
 		return divmod(*this, v).second;

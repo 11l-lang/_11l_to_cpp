@@ -14601,3 +14601,55 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Modular_exponentiation#D
+BigInt = int
+
+def pow_mod(base : BigInt, exponent : BigInt, modulus : BigInt):
+    result : BigInt = 1
+
+    while exponent != 0:
+        if exponent % 2 != 0:
+            result = (result * base) % modulus
+        exponent //= 2
+        base = (base * base) % modulus
+
+    return result
+
+print(pow_mod(BigInt('2988348162058574136915891421498819466320163312926952423791023078876139'),
+              BigInt('2351399303373464486466122544523690094744975233415544072992656881240319'),
+              BigInt(10) ** 40))
+===
+
+F pow_mod(BigInt =base, BigInt =exponent, BigInt modulus)
+   BigInt result = 1
+
+   L exponent != 0
+      I exponent % 2 != 0
+         result = (result * base) % modulus
+      exponent I/= 2
+      base = (base * base) % modulus
+   R result
+print(pow_mod(BigInt(‘2988348162058574136915891421498819466320163312926952423791023078876139’), BigInt(‘2351399303373464486466122544523690094744975233415544072992656881240319’), BigInt(10) ^ 40))
+===
+auto pow_mod(BigInt base, BigInt exponent, const BigInt &modulus)
+{
+    BigInt result = 1;
+
+    while (exponent != 0) {
+        if (mod(exponent, 2) != 0)
+            result = mod((result * base), modulus);
+        exponent = idiv(exponent, 2);
+        base = mod((base * base), modulus);
+    }
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(pow_mod(BigInt(u"2988348162058574136915891421498819466320163312926952423791023078876139"_S), BigInt(u"2351399303373464486466122544523690094744975233415544072992656881240319"_S), pow(BigInt(10), 40)));
+    }
+} code_block_1;
