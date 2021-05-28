@@ -14521,3 +14521,83 @@ struct CodeBlock2
         print(most_freq_ksdf(str1, str2, K, maxDistance));
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Mersenne_primes#D
+BigInt = int
+
+def is_prime(bi : BigInt):
+    if bi < 2: return False
+    if bi % 2 == 0: return bi == 2
+    if bi % 3 == 0: return bi == 3
+
+    test = BigInt(5)
+    while test * test < bi:
+        if bi % test == 0: return False
+        test += 2
+        if bi % test == 0: return False
+        test += 4
+
+    return True
+
+base = BigInt(2)
+for p in range(1, 32):
+    if is_prime(base-1):
+        print('2 ^', p, '- 1')
+    base *= 2
+===
+
+F is_prime(BigInt bi)
+   I bi < 2
+      R 0B
+   I bi % 2 == 0
+      R bi == 2
+   I bi % 3 == 0
+      R bi == 3
+   V test = BigInt(5)
+   L test * test < bi
+      I bi % test == 0
+         R 0B
+      test += 2
+      I bi % test == 0
+         R 0B
+      test += 4
+   R 1B
+V base = BigInt(2)
+L(p) 1..31
+   I is_prime(base - 1)
+      print(‘2 ^ ’p‘ - 1’)
+   base *= 2
+===
+auto is_prime(const BigInt &bi)
+{
+    if (bi < 2)
+        return false;
+    if (mod(bi, 2) == 0)
+        return bi == 2;
+    if (mod(bi, 3) == 0)
+        return bi == 3;
+    auto test = BigInt(5);
+    while (test * test < bi) {
+        if (mod(bi, test) == 0)
+            return false;
+        test += 2;
+        if (mod(bi, test) == 0)
+            return false;
+        test += 4;
+    }
+    return true;
+}
+auto base = BigInt(2);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto p : range_ee(1, 31)) {
+            if (is_prime(base - 1))
+                print(u"2 ^ "_S & p & u" - 1"_S);
+            base *= 2;
+        }
+    }
+} code_block_1;

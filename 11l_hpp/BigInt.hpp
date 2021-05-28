@@ -184,6 +184,9 @@ public:
 	friend BigInt mod(const BigInt &a, const BigInt &b) {
 		return a % b;
 	}
+	friend BigInt mod(const BigInt &a, Int b) {
+		return a % b;
+	}
 
 	void operator/=(int v) {
 		if (v < 0)
