@@ -177,8 +177,11 @@ public:
 	friend BigInt idiv(const BigInt &a, const BigInt &b) {
 		return a / b;
 	}
-	friend BigInt idiv(const BigInt &a, Int b) {
+	friend BigInt idiv(const BigInt &a, int b) {
 		return a / b;
+	}
+	friend BigInt idiv(const BigInt &a, Int64 b) {
+		return a / BigInt(b);
 	}
 
 	BigInt operator%(const BigInt &v) const {
@@ -187,8 +190,11 @@ public:
 	friend BigInt mod(const BigInt &a, const BigInt &b) {
 		return a % b;
 	}
-	friend BigInt mod(const BigInt &a, Int b) {
+	friend BigInt mod(const BigInt &a, int b) {
 		return a % b;
+	}
+	friend BigInt mod(const BigInt &a, Int64 b) {
+		return a % BigInt(b);
 	}
 
 	void operator/=(int v) {
