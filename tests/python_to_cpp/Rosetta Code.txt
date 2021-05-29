@@ -14738,3 +14738,40 @@ struct CodeBlock1
             print(u"#12 -> #12"_S.format(x, nexthigh(x)));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Sorting_algorithms/Permutation_sort
+import _11l
+
+def permutation_sort(arr : list):
+   while not _11l.is_sorted(arr):
+      _11l.next_permutation(arr)
+
+arr = [7, 6, 5, 9, 8, 4, 3, 1, 2, 0]
+permutation_sort(arr)
+print(arr)
+===
+//import _11l
+
+F permutation_sort(&arr)
+   L !arr.is_sorted()
+      arr.next_permutation()
+V arr = [7, 6, 5, 9, 8, 4, 3, 1, 2, 0]
+permutation_sort(&arr)
+print(arr)
+===
+template <typename T1> auto permutation_sort(T1 &arr)
+{
+    while (!arr.is_sorted())
+        arr.next_permutation();
+}
+auto arr = create_array({7, 6, 5, 9, 8, 4, 3, 1, 2, 0});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        permutation_sort(arr);
+        print(arr);
+    }
+} code_block_1;

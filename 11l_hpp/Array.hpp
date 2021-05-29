@@ -384,6 +384,11 @@ public:
 		return std::next_permutation(begin(), end());
 	}
 
+	bool is_sorted() const
+	{
+		return std::is_sorted(begin(), end());
+	}
+
 	const Type &last() const
 	{
 		if (std::vector<Type>::empty())

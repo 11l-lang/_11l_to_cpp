@@ -3193,6 +3193,7 @@ array_scope.add_name('insert', ASTFunctionDefinition([('i', '', 'Int'), ('x', ''
 array_scope.add_name('reverse', ASTFunctionDefinition([]))
 array_scope.add_name('reverse_range', ASTFunctionDefinition([('range', '', 'Range')]))
 array_scope.add_name('next_permutation', ASTFunctionDefinition([]))
+array_scope.add_name('is_sorted', ASTFunctionDefinition([]))
 array_scope.add_name('clear', ASTFunctionDefinition([]))
 array_scope.add_name('drop', ASTFunctionDefinition([]))
 array_scope.add_name('map', ASTFunctionDefinition([('f', '', '')]))
