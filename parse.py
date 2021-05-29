@@ -989,7 +989,8 @@ class ASTNodeWithChildren(ASTNode):
                 node = node.children[0]
         if (len(self.children) != 1
                 or (check_for_if and (type(self.children[0]) == ASTIf or has_if(self.children[0]))) # for correctly handling of dangling-else
-                or type(self.children[0]) == ASTLoopRemoveCurrentElementAndContinue): # `L.remove_current_element_and_continue` ‘раскрывается в 2 строки кода’\‘is translated into 2 statements’
+                or type(self.children[0]) == ASTLoopRemoveCurrentElementAndContinue # `L.remove_current_element_and_continue` ‘раскрывается в 2 строки кода’\‘is translated into 2 statements’
+                or (type(self.children[0]) == ASTTupleAssignment and self.children[0].is_multi_st())): # for `mx, mx_index = digit, i` in [https://www.rosettacode.org/wiki/Next_highest_int_from_digits#Python:_Algorithm_2]
             return self.children_to_str(indent, r, False)
         assert(len(self.children) == 1)
         c0str = self.children[0].to_str(indent+1)
@@ -1169,6 +1170,9 @@ class ASTTupleAssignment(ASTNodeWithExpression):
 
     def __init__(self):
         self.dest_vars = []
+
+    def is_multi_st(self):
+        return any(b for s, b in self.dest_vars)
 
     def to_str(self, indent):
         r = ''
