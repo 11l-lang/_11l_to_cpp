@@ -14653,3 +14653,88 @@ struct CodeBlock1
         print(pow_mod(BigInt(u"2988348162058574136915891421498819466320163312926952423791023078876139"_S), BigInt(u"2351399303373464486466122544523690094744975233415544072992656881240319"_S), pow(BigInt(10), 40)));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Next_highest_int_from_digits#Python:_Algorithm_2
+def closest_more_than(n, lst):
+    "(index of) closest int from lst, to n that is also > n"
+    large = max(lst) + 1
+    return lst.index(min(lst, key=lambda x: (large if x <= n else x)))
+
+def nexthigh(n):
+    "Return nxt highest number from n's digits using scan & re-order"
+    this = list(int(digit) for digit in n)[::-1]
+    mx = this[0]
+    for i, digit in enumerate(this[1:], 1):
+        if digit < mx:
+            mx_index = closest_more_than(digit, this[:i + 1])
+            (this[mx_index], this[i]) = (this[i], this[mx_index])
+            this[:i] = sorted(this[:i], reverse=True)
+            return ''.join(str(d) for d in this[::-1])
+        elif digit > mx:
+            mx = digit
+    return '0'
+
+for x in ['0', '9', '12', '21', '12453', '738440', '45072010', '95322020',
+          '9589776899767587796600']:
+    print('%12s -> %12s' % (x, nexthigh(x)))
+===
+F closest_more_than(n, lst)
+   ‘(index of) closest int from lst, to n that is also > n’
+   V large = max(lst) + 1
+   R lst.index(min(lst, key' x -> (I x <= @n {@large} E x)))
+
+F nexthigh(n)
+   ‘Return nxt highest number from n's digits using scan & re-order’
+   V this = reversed(Array(n.map(digit -> Int(digit))))
+   V mx = this[0]
+   L(digit) this[1..]
+      V i = L.index + 1
+      I digit < mx
+         V mx_index = closest_more_than(digit, this[0 .< i + 1])
+         swap(&this[mx_index], &this[i])
+         this.sort_range(0 .< i, reverse' 1B)
+         R reversed(this).map(d -> String(d)).join(‘’)
+      E I digit > mx
+         mx = digit
+   R ‘0’
+
+L(x) [‘0’, ‘9’, ‘12’, ‘21’, ‘12453’, ‘738440’, ‘45072010’, ‘95322020’, ‘9589776899767587796600’]
+   print(‘#12 -> #12’.format(x, nexthigh(x)))
+===
+template <typename T1, typename T2> auto closest_more_than(const T1 &n, const T2 &lst)
+{
+    u"(index of) closest int from lst, to n that is also > n"_S;
+    auto large = max(lst) + 1;
+    return lst.index(min_with_key(lst, [&large, &n](const auto &x){return (x <= n ? large : x);}));
+}
+
+template <typename T1> auto nexthigh(const T1 &n)
+{
+    u"Return nxt highest number from n's digits using scan & re-order"_S;
+    auto _this_ = reversed(create_array(n.map([](const auto &digit){return to_int(digit);})));
+    auto mx = _get<0>(_this_);
+    {int Lindex = 0;
+    for (auto &&digit : _this_[range_ei(1)]) {
+        auto i = Lindex + 1;
+        if (digit < mx) {
+            auto mx_index = closest_more_than(digit, _this_[range_el(0, i + 1)]);
+            swap(_this_[mx_index], _this_[i]);
+            _this_.sort_range(range_el(0, i), nullptr, true);
+            return reversed(_this_).map([](const auto &d){return String(d);}).join(u""_S);
+        }
+        else if (digit > mx)
+            mx = digit;
+        Lindex++;
+    }}
+    return u"0"_S;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&x : create_array({u"0"_S, u"9"_S, u"12"_S, u"21"_S, u"12453"_S, u"738440"_S, u"45072010"_S, u"95322020"_S, u"9589776899767587796600"_S}))
+            print(u"#12 -> #12"_S.format(x, nexthigh(x)));
+    }
+} code_block_1;

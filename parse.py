@@ -438,6 +438,10 @@ class SymbolNode:
                         f_node = type_of(self.children[0])
                         if f_node is None: # assume this is String method
                             f_node = builtins_scope.find('String').ast_nodes[0].scope.ids.get('split').ast_nodes[0]
+                    elif func_name.endswith('.sort_range'):
+                        f_node = type_of(self.children[0])
+                        if f_node is None: # assume this is Array method
+                            f_node = builtins_scope.find('Array').ast_nodes[0].scope.ids.get('sort_range').ast_nodes[0]
                     elif self.children[0].children[1].token.value(source) == 'union':
                         func_name = self.children[0].children[0].to_str() + '.set_union'
                     elif func_name.endswith(('.unpack', '.unpack_from', '.unpack_be', '.unpack_from_be')) and self.children[0].children[0].token_str() in ('Int32', 'UInt32', 'Int16', 'UInt16', 'Int8', 'Byte'):
@@ -3191,6 +3195,7 @@ array_scope.add_name('map', ASTFunctionDefinition([('f', '', '')]))
 array_scope.add_name('filter', ASTFunctionDefinition([('f', '', '')]))
 array_scope.add_name('join', ASTFunctionDefinition([('sep', '', 'String')]))
 array_scope.add_name('sort', ASTFunctionDefinition([('key', token_to_str('N', Token.Category.CONSTANT), ''), ('reverse', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
+array_scope.add_name('sort_range', ASTFunctionDefinition([('range', '', 'Range'), ('key', token_to_str('N', Token.Category.CONSTANT), ''), ('reverse', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
 array_scope.add_name('decode', ASTFunctionDefinition([('encoding', token_to_str('‘utf-8’'), 'String')]))
 builtins_scope.ids['Array'].ast_nodes[0].scope = array_scope
 dict_scope = Scope(None)
