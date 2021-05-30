@@ -755,7 +755,7 @@ F kosaraju(g)
    V vis = [0B] * size
    V l = [0] * size
    V x = size
-   V t = (0 .< size).map(i -> [Int]())
+   V t = [[Int]()] * size
 
    F visit(Int u) -> N
       I !@vis[u]
@@ -789,7 +789,7 @@ template <typename T1> auto kosaraju(const T1 &g)
     auto vis = create_array({false}) * size;
     auto l = create_array({0}) * size;
     auto x = size;
-    auto t = range_el(0, size).map([](const auto &i){return Array<int>();});
+    auto t = create_array({Array<int>()}) * size;
 
     std::function<void(int)> visit = [&g, &l, &t, &vis, &visit, &x](const int u)
     {

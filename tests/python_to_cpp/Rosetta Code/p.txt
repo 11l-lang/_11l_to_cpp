@@ -383,7 +383,7 @@ print("\nSymmetric:")
 pp(pascal_sym(n))
 ===
 F pascal_upp(n)
-   V s = (0 .< n).map(_ -> [0] * @n)
+   V s = [[0] * n] * n
    s[0] = [1] * n
    L(i) 1 .< n
       L(j) i .< n
@@ -392,14 +392,14 @@ F pascal_upp(n)
 
 F pascal_low(n)
    V upp = pascal_upp(n)
-   V s = (0 .< n).map(_ -> [0] * @n)
+   V s = [[0] * n] * n
    L(x) 0 .< n
       L(y) 0 .< n
          s[y][x] = upp[x][y]
    R s
 
 F pascal_sym(n)
-   V s = (0 .< n).map(_ -> [1] * @n)
+   V s = [[1] * n] * n
    L(i) 1 .< n
       L(j) 1 .< n
          s[i][j] = s[i - 1][j] + s[i][j - 1]
@@ -417,7 +417,7 @@ pp(pascal_sym(n))
 ===
 template <typename T1> auto pascal_upp(const T1 &n)
 {
-    auto s = range_el(0, n).map([&n](const auto &_){return create_array({0}) * n;});
+    auto s = create_array({create_array({0}) * n}) * n;
     _set<0>(s, create_array({1}) * n);
     for (auto i : range_el(1, n))
         for (auto j : range_el(i, n))
@@ -428,7 +428,7 @@ template <typename T1> auto pascal_upp(const T1 &n)
 template <typename T1> auto pascal_low(const T1 &n)
 {
     auto upp = pascal_upp(n);
-    auto s = range_el(0, n).map([&n](const auto &_){return create_array({0}) * n;});
+    auto s = create_array({create_array({0}) * n}) * n;
     for (auto x : range_el(0, n))
         for (auto y : range_el(0, n))
             s[y].set(x, upp[x][y]);
@@ -437,7 +437,7 @@ template <typename T1> auto pascal_low(const T1 &n)
 
 template <typename T1> auto pascal_sym(const T1 &n)
 {
-    auto s = range_el(0, n).map([&n](const auto &_){return create_array({1}) * n;});
+    auto s = create_array({create_array({1}) * n}) * n;
     for (auto i : range_el(1, n))
         for (auto j : range_el(1, n))
             s[i].set(j, s[i - 1][j] + s[i][j - 1]);

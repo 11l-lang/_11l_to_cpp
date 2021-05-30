@@ -30,7 +30,7 @@ public:
     template <typename T1 = decltype(3)> rectBoard(const T1 &edge = 3) :
         edge(edge)
     {
-        __board = range_el(0, edge).map([&edge](const auto &i){return edge * create_array({0});});
+        __board = create_array({create_array({0}) * edge}) * edge;
         __empty = square(edge);
     }
 
@@ -128,7 +128,7 @@ public:
 
     template <typename T1> auto makeAImove(const T1 &player)
     {
-        auto scores = range_el(0, edge).map([this](const auto &i){return edge * create_array({0.0});});
+        auto scores = create_array({create_array({0.0}) * edge}) * edge;
 
         for (auto rown : range_el(0, edge)) {
             auto row = __board[rown];

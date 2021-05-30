@@ -1728,13 +1728,13 @@ class Class:
         self.a = a
         self.b = 0
         self.s = set() # str
-        self.final : List[List[int]] = [9 * [0] for i in range(9)]
+        self.final : List[List[int]] = [[0] * 9 for i in range(9)]
 ===
 T Class
    Int a
    b = 0
    s = Set[String]()
-   [[Int]] final = (0.<9).map(i -> 9 * [0])
+   [[Int]] final = [[0] * 9] * 9
 
    F (a)
       .a = a
@@ -1745,7 +1745,7 @@ public:
     int a;
     decltype(0) b = 0;
     decltype(Set<String>()) s = Set<String>();
-    Array<Array<int>> final = range_el(0, 9).map([](const auto &i){return 9 * create_array({0});});
+    Array<Array<int>> final = create_array({create_array({0}) * 9}) * 9;
 
     template <typename T1> Class(const T1 &a) :
         a(a)

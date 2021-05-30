@@ -337,7 +337,7 @@ F vigenere_decrypt(target_freqs, input)
    V best_corr = -100.0
 
    L(i) 2 .< cleaned.len I/ 20
-      V pieces = (0 .< i).map(_ -> [Int]())
+      V pieces = [[Int]()] * i
       L(c) cleaned
          V j = L.index
          pieces[j % i].append(c)
@@ -349,7 +349,7 @@ F vigenere_decrypt(target_freqs, input)
 
    I best_len == 0
       R (‘Text is too short to analyze’, ‘’)
-   V pieces = (0 .< best_len).map(_ -> [Int]())
+   V pieces = [[Int]()] * best_len
    L(c) cleaned
       V i = L.index
       pieces[i % best_len].append(c)
@@ -429,7 +429,7 @@ template <typename T1, typename T2> auto vigenere_decrypt(const T1 &target_freqs
     auto best_corr = -100.0;
 
     for (auto i : range_el(2, idiv(cleaned.len(), 20))) {
-        auto pieces = range_el(0, i).map([](const auto &_){return Array<int>();});
+        auto pieces = create_array({Array<int>()}) * i;
         {int Lindex = 0;
         for (auto &&c : cleaned) {
             auto j = Lindex;
@@ -445,7 +445,7 @@ template <typename T1, typename T2> auto vigenere_decrypt(const T1 &target_freqs
     }
     if (best_len == 0)
         return make_tuple(u"Text is too short to analyze"_S, u""_S);
-    auto pieces = range_el(0, best_len).map([](const auto &_){return Array<int>();});
+    auto pieces = create_array({Array<int>()}) * best_len;
     {int Lindex = 0;
     for (auto &&c : cleaned) {
         auto i = Lindex;

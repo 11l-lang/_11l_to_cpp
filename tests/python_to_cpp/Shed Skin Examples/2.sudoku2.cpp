@@ -58,10 +58,10 @@ auto board_completeSearch = false;
 class board
 {
 public:
-    Array<Array<int>> final = range_el(0, 9).map([](const auto &i){return 9 * create_array({0});});
+    Array<Array<int>> final = create_array({create_array({0}) * 9}) * 9;
     Array<bmp> rows = 9 * create_array({bmp()});
     Array<bmp> cols = 9 * create_array({bmp()});
-    Array<Array<bmp>> cels = range_el(0, 3).map([](const auto &i){return 3 * create_array({bmp()});});
+    Array<Array<bmp>> cels = create_array({create_array({bmp()}) * 3}) * 3;
     decltype(0) __turns = 0;
     decltype(0) __backtracks = 0;
     decltype(0.0) __starttime = 0.0;

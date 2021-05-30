@@ -851,7 +851,7 @@ print(lcs('1234', '1224533324'))
 print(lcs('thisisatest', 'testing123testing'))
 ===
 F lcs(a, b)
-   V lengths = (0 .. a.len).map(_ -> [0] * (@b.len + 1))
+   V lengths = [[0] * (b.len + 1)] * (a.len + 1)
    L(x) a
       V i = L.index
       L(y) b
@@ -871,7 +871,7 @@ print(lcs(‘thisisatest’, ‘testing123testing’))
 ===
 template <typename T1, typename T2> auto lcs(const T1 &a, const T2 &b)
 {
-    auto lengths = range_ee(0, a.len()).map([&b](const auto &_){return create_array({0}) * (b.len() + 1);});
+    auto lengths = create_array({create_array({0}) * (b.len() + 1)}) * (a.len() + 1);
     {int Lindex = 0;
     for (auto &&x : a) {
         auto i = Lindex;

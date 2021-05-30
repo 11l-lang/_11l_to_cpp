@@ -21,7 +21,7 @@ T rectBoard
 
    F (edge = 3)
       .edge = edge
-      .__board = (0 .< edge).map(i -> @edge * [0])
+      .__board = [[0] * @edge] * edge
       .__empty = edge ^ 2
 
    F assign(row, col, value)
@@ -98,7 +98,7 @@ T rectBoard
                scores[rown][coln] += 15 * fields.count(Array(players)[0]) / Float(.edge)
 
    F makeAImove(player)
-      V scores = (0 .< .edge).map(i -> @.edge * [0.0])
+      V scores = [[0.0] * @.edge] * .edge
 
       L(rown) 0 .< .edge
          V row = .__board[rown]

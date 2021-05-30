@@ -45,7 +45,7 @@ for i in range(17):
 else:
     print("all good")
 ===
-V a = (0.<17).map(i -> [‘0’] * 17)
+V a = [[‘0’] * 17] * 17
 V idx = [0] * 4
 
 F find_group(mark, min_n, max_n, depth = 1)
@@ -87,7 +87,7 @@ L(i) 17
 L.was_no_break
    print(‘all good’)
 ===
-auto a = range_el(0, 17).map([](const auto &i){return create_array({u'0'_C}) * 17;});
+auto a = create_array({create_array({u'0'_C}) * 17}) * 17;
 auto idx = create_array({0}) * 4;
 
 template <typename T1, typename T2, typename T3, typename T4 = decltype(1)> auto find_group(const T1 &mark, const T2 &min_n, const T3 &max_n, const T4 &depth = 1)
@@ -655,7 +655,7 @@ F gauss(&m)
    R m.map(row -> row.last)
 
 F network(n, k0, k1, s)
-   V m = (0 .< n).map(i -> [0.0] * (@n + 1))
+   V m = [[0.0] * (n + 1)] * n
    V resistors = s.split(‘|’)
    L(resistor) resistors
       V (aa, bb, rr) = resistor.split(‘ ’)
@@ -701,7 +701,7 @@ template <typename T1> auto gauss(T1 &m)
 
 template <typename T1, typename T2, typename T3, typename T4> auto network(const T1 &n, const T2 &k0, const T3 &k1, const T4 &s)
 {
-    auto m = range_el(0, n).map([&n](const auto &i){return create_array({0.0}) * (n + 1);});
+    auto m = create_array({create_array({0.0}) * (n + 1)}) * n;
     auto resistors = s.split(u"|"_S);
     for (auto &&resistor : resistors) {
         auto [aa, bb, rr] = bind_array<3>(resistor.split(u" "_S));

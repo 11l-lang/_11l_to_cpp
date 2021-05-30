@@ -840,7 +840,7 @@ F nextResult()
    V res = Int(:results, radix' 3) + 1
    :results = numberToBase(res, 3).zfill(6)
    R 1B
-V points = (0.<4).map(i -> [0] * 10)
+V points = [[0] * 10] * 4
 L
    V records = [0] * 4
    L(i) 0 .< games.len
@@ -890,7 +890,7 @@ auto nextResult()
     ::results = numberToBase(res, 3).zfill(6);
     return true;
 }
-auto points = range_el(0, 4).map([](const auto &i){return create_array({0}) * 10;});
+auto points = create_array({create_array({0}) * 10}) * 4;
 
 struct CodeBlock1
 {

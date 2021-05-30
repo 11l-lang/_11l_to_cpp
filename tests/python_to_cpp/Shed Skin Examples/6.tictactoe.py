@@ -29,7 +29,7 @@ class rectBoard:
 
         def __init__(self, edge=3):
                 self.edge = edge
-                self.__board = [edge * [0] for i in range(edge)]
+                self.__board = [[0] * edge for i in range(edge)]
                 self.__empty = edge**2
 
         def assign(self, row, col, value):
@@ -106,7 +106,7 @@ class rectBoard:
                                         scores[rown][coln] += 15 * fields.count(list(players)[0]) / float(self.edge)
 
         def makeAImove(self, player):
-                scores = [self.edge * [0.0] for i in range(self.edge)]
+                scores = [[0.0] * self.edge for i in range(self.edge)]
 
                 for rown in range(self.edge):
                         row = self.__board[rown]

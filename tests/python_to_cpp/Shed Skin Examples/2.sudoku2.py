@@ -52,10 +52,10 @@ board_completeSearch = False                  #search past the first solution
 class board:
         def __init__(self):
                 #final numbers: a 9 by 9 grid
-                self.final : List[List[int]] = [9 * [0] for i in range(9)]
+                self.final : List[List[int]] = [[0] * 9 for i in range(9)]
                 self.rows : List[bmp] = 9 * [bmp()]
                 self.cols : List[bmp] = 9 * [bmp()]
-                self.cels : List[List[bmp]] = [3 * [bmp()] for i in range(3)]
+                self.cels : List[List[bmp]] = [[bmp()] * 3 for i in range(3)]
 
                 #statistics
                 self.__turns = 0

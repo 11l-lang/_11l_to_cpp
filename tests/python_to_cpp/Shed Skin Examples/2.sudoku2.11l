@@ -37,10 +37,10 @@ V board_notifyOnCompletion = 1B
 V board_completeSearch = 0B
 
 T board
-   [[Int]] final = (0.<9).map(i -> 9 * [0])
+   [[Int]] final = [[0] * 9] * 9
    [bmp] rows = 9 * [bmp()]
    [bmp] cols = 9 * [bmp()]
-   [[bmp]] cels = (0.<3).map(i -> 3 * [bmp()])
+   [[bmp]] cels = [[bmp()] * 3] * 3
    __turns = 0
    __backtracks = 0
    __starttime = 0.0

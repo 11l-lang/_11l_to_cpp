@@ -1519,7 +1519,7 @@ F solve(&pz, sz, sx, sy, idx, cnt)
    R 0
 
 F find_solution(pz, sz)
-   V p = (0 .< sz).map(i -> [-1] * @sz)
+   V p = [[-1] * sz] * sz
    V idx = 0
    V x = 0
    V y = 0
@@ -1572,7 +1572,7 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5, typen
 
 template <typename T1, typename T2> auto find_solution(const T1 &pz, const T2 &sz)
 {
-    auto p = range_el(0, sz).map([&sz](const auto &i){return create_array({-1}) * sz;});
+    auto p = create_array({create_array({-1}) * sz}) * sz;
     auto idx = 0;
     auto x = 0;
     auto y = 0;
@@ -1699,7 +1699,7 @@ F iterate(&pa, x, y, v)
    R 0
 
 F solve(pz, w, h)
-   V pa = (0 .< w).map(i -> [-1] * @h)
+   V pa = [[-1] * h] * w
    V f = 0
    :pWid = w
    :pHei = h
@@ -1761,7 +1761,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto iterate(T1 &p
 
 template <typename T1, typename T2, typename T3> auto solve(const T1 &pz, const T2 &w, const T3 &h)
 {
-    auto pa = range_el(0, w).map([&h](const auto &i){return create_array({-1}) * h;});
+    auto pa = create_array({create_array({-1}) * h}) * w;
     auto f = 0;
     ::pWid = w;
     ::pHei = h;
@@ -3050,7 +3050,7 @@ F radix_sort(l, =p = -1, =s = -1)
 
    I i >= s
       R l
-   V bins = (0.<10).map(_ -> [Int]())
+   V bins = [[Int]()] * 10
 
    L(e) l
       bins[Int(String(e).zfill(s)[i])] [+]= e
@@ -3075,7 +3075,7 @@ template <typename T1, typename T2 = decltype(-1), typename T3 = decltype(-1)> a
     auto i = s - p;
     if (i >= s)
         return l;
-    auto bins = range_el(0, 10).map([](const auto &_){return Array<int>();});
+    auto bins = create_array({Array<int>()}) * 10;
     for (auto &&e : l)
         bins[to_int(String(e).zfill(s)[i])].append(e);
     return flatten(bins.map([&p, &s](const auto &b){return radix_sort(b, p - 1, s);}));
@@ -3402,7 +3402,7 @@ def printspiral(myarray):
 printspiral(spiral_matrix(5))
 ===
 F spiral_matrix(n)
-   V m = (0 .< n).map(i -> [0] * @n)
+   V m = [[0] * n] * n
    V dx = [0, 1, 0, -1]
    V dy = [1, 0, -1, 0]
    V x = 0
@@ -3426,7 +3426,7 @@ printspiral(spiral_matrix(5))
 ===
 template <typename T1> auto spiral_matrix(const T1 &n)
 {
-    auto m = range_el(0, n).map([&n](const auto &i){return create_array({0}) * n;});
+    auto m = create_array({create_array({0}) * n}) * n;
     auto dx = create_array({0, 1, 0, -1});
     auto dy = create_array({1, 0, -1, 0});
     auto x = 0;

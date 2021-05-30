@@ -1010,7 +1010,7 @@ F magicSquareDoublyEven(n)
    V bits = 1001'0110'0110'1001b
    V size = n * n
    V mult = n I/ 4
-   V result = (0 .< n).map(i -> [0] * @n)
+   V result = [[0] * n] * n
    V i = 0
    L(r) 0 .< n
       L(c) 0 .< n
@@ -1030,7 +1030,7 @@ template <typename T1> auto magicSquareDoublyEven(const T1 &n)
     auto bits = 0b1001'0110'0110'1001;
     auto size = n * n;
     auto mult = idiv(n, 4);
-    auto result = range_el(0, n).map([&n](const auto &i){return create_array({0}) * n;});
+    auto result = create_array({create_array({0}) * n}) * n;
     auto i = 0;
     for (auto r : range_el(0, n))
         for (auto c : range_el(0, n)) {
