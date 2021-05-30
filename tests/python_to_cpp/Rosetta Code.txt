@@ -14741,17 +14741,16 @@ struct CodeBlock1
 
 
 # https://www.rosettacode.org/wiki/Sorting_algorithms/Permutation_sort
-import _11l
+from _11l import *
 
 def permutation_sort(arr : list):
-   while not _11l.is_sorted(arr):
-      _11l.next_permutation(arr)
+   while not is_sorted(arr):
+      next_permutation(arr)
 
 arr = [7, 6, 5, 9, 8, 4, 3, 1, 2, 0]
 permutation_sort(arr)
 print(arr)
 ===
-//import _11l
 
 F permutation_sort(&arr)
    L !arr.is_sorted()
