@@ -1969,9 +1969,10 @@ struct CodeBlock1
 
 # https://www.rosettacode.org/wiki/Sorting_algorithms/Bogosort
 import random
+from _11l import *
 
-def is_sorted(data):
-    return all(data[i] <= data[i + 1] for i in range(len(data) - 1))
+#def is_sorted(data):
+#    return all(data[i] <= data[i + 1] for i in range(len(data) - 1))
 
 def bogosort(data : list):
     while not is_sorted(data):
@@ -1983,24 +1984,16 @@ print(arr)
 ===
 //import random
 
-F is_sorted(data)
-   R all((0 .< data.len - 1).map(i -> @data[i] <= @data[i + 1]))
-
 F bogosort(&data)
-   L !is_sorted(data)
+   L !data.is_sorted()
       random:shuffle(&data)
 V arr = [2, 1, 3]
 bogosort(&arr)
 print(arr)
 ===
-template <typename T1> auto is_sorted(const T1 &data)
-{
-    return all(range_el(0, data.len() - 1).map([&data](const auto &i){return data[i] <= data[i + 1];}));
-}
-
 template <typename T1> auto bogosort(T1 &data)
 {
-    while (!is_sorted(data))
+    while (!data.is_sorted())
         randomns::shuffle(data);
 }
 auto arr = create_array({2, 1, 3});
@@ -3057,7 +3050,7 @@ F radix_sort(l, =p = -1, =s = -1)
 
    I i >= s
       R l
-   V bins = (0.<10).map(_ -> [0] * 0)
+   V bins = (0.<10).map(_ -> [Int]())
 
    L(e) l
       bins[Int(String(e).zfill(s)[i])] [+]= e
@@ -3082,7 +3075,7 @@ template <typename T1, typename T2 = decltype(-1), typename T3 = decltype(-1)> a
     auto i = s - p;
     if (i >= s)
         return l;
-    auto bins = range_el(0, 10).map([](const auto &_){return create_array({0}) * 0;});
+    auto bins = range_el(0, 10).map([](const auto &_){return Array<int>();});
     for (auto &&e : l)
         bins[to_int(String(e).zfill(s)[i])].append(e);
     return flatten(bins.map([&p, &s](const auto &b){return radix_sort(b, p - 1, s);}));
@@ -4897,7 +4890,7 @@ T Node
       .ch = children
 
 T SuffixTree
-   nodes = [Node(‘’, [0] * 0)]
+   nodes = [Node(‘’, [Int]())]
    F (str)
       L(i) 0 .< str.len
          .addSuffix(str[i ..])
@@ -4913,7 +4906,7 @@ T SuffixTree
             V children = .nodes[n].ch
             I x2 == children.len
                n2 = .nodes.len
-               .nodes.append(Node(suf[i ..], [0] * 0))
+               .nodes.append(Node(suf[i ..], [Int]()))
                .nodes[n].ch.append(n2)
                R
             n2 = children[x2]
@@ -4968,7 +4961,7 @@ public:
 class SuffixTree
 {
 public:
-    decltype(create_array({Node(u""_S, create_array({0}) * 0)})) nodes = create_array({Node(u""_S, create_array({0}) * 0)});
+    decltype(create_array({Node(u""_S, Array<int>())})) nodes = create_array({Node(u""_S, Array<int>())});
     template <typename T1> SuffixTree(const T1 &str)
     {
         for (auto i : range_el(0, str.len()))
@@ -4987,7 +4980,7 @@ public:
                 auto children = nodes[n].ch;
                 if (x2 == children.len()) {
                     n2 = nodes.len();
-                    nodes.append(Node(suf[range_ei(i)], create_array({0}) * 0));
+                    nodes.append(Node(suf[range_ei(i)], Array<int>()));
                     nodes[n].ch.append(n2);
                     return;
                 }

@@ -3507,7 +3507,7 @@ print(‘======  =========’)
 L(n) (123321, 7739, 893, 899998)
    print(‘#6: ’.format(n), end' ‘’)
    print(mdroot(n))
-V table = (0.<10).map(i -> [0] * 0)
+V table = (0.<10).map(i -> [Int]())
 V n = 0
 L min(table.map(row -> row.len)) < 5
    table[mdroot(n)[1]].append(n)
@@ -3549,7 +3549,7 @@ struct CodeBlock1
         }
     }
 } code_block_1;
-auto table = range_el(0, 10).map([](const auto &i){return create_array({0}) * 0;});
+auto table = range_el(0, 10).map([](const auto &i){return Array<int>();});
 auto n = 0;
 
 struct CodeBlock2

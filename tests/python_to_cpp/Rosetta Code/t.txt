@@ -1773,7 +1773,7 @@ F two_sum(arr, num)
          i++
       E
          j--
-   R [0] * 0
+   R [Int]()
 V numbers = [0, 2, 11, 19, 90]
 print(two_sum(numbers, 21))
 print(two_sum(numbers, 25))
@@ -1790,7 +1790,7 @@ template <typename T1, typename T2> auto two_sum(const T1 &arr, const T2 &num)
         else
             j--;
     }
-    return create_array({0}) * 0;
+    return Array<int>();
 }
 auto numbers = create_array({0, 2, 11, 19, 90});
 
