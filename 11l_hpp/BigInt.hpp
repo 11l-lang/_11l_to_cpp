@@ -120,6 +120,9 @@ public:
 		res *= v;
 		return res;
 	}
+	friend BigInt operator*(int v, const BigInt &b) {
+		return b * v;
+	}
 
 	void operator*=(long long v) {
 		if (v < 0)
@@ -143,6 +146,9 @@ public:
 		BigInt res = *this;
 		res *= v;
 		return res;
+	}
+	friend BigInt operator*(long long v, const BigInt &b) {
+		return b * v;
 	}
 
 	friend std::pair<BigInt, BigInt> divmod(const BigInt &a1, const BigInt &b1) {

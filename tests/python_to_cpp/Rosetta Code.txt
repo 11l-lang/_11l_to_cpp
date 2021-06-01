@@ -14774,3 +14774,86 @@ struct CodeBlock1
         print(arr);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Pell%27s_equation#Python
+import math
+BigInt = int
+
+def solvePell(n):
+    x = int(math.sqrt(n))
+    (y, z, r) = (x, 1, x << 1)
+    e1 : BigInt = 1
+    e2 : BigInt = 0
+    f1 : BigInt = 0
+    f2 : BigInt = 1
+    while True:
+        y = r * z - y
+        z = (n - y * y) // z
+        r = (x + y) // z
+
+        (e1, e2) = (e2, e1 + e2 * r)
+        (f1, f2) = (f2, f1 + f2 * r)
+
+        (a, b) = (f2 * x + e2, f2)
+        if a * a - n * b * b == 1:
+            return (a, b)
+
+for n in [61, 109, 181, 277]:
+    (x, y) = solvePell(n)
+    print("x^2 - %3d * y^2 = 1 for x = %27d and y = %25d" % (n, x, y))
+===
+//import math
+
+F solvePell(n)
+   V x = Int(sqrt(n))
+   V (y, z, r) = (x, 1, x << 1)
+   BigInt e1 = 1
+   BigInt e2 = 0
+   BigInt f1 = 0
+   BigInt f2 = 1
+   L
+      y = r * z - y
+      z = (n - y * y) I/ z
+      r = (x + y) I/ z
+      (e1, e2) = (e2, e1 + e2 * r)
+      (f1, f2) = (f2, f1 + f2 * r)
+      V (a, b) = (f2 * x + e2, f2)
+      I a * a - n * b * b == 1
+         R (a, b)
+
+L(n) [61, 109, 181, 277]
+   V (x, y) = solvePell(n)
+   print(‘x^2 - #3 * y^2 = 1 for x = #27 and y = #25’.format(n, x, y))
+===
+template <typename T1> auto solvePell(const T1 &n)
+{
+    auto x = to_int(sqrt(n));
+    auto [y, z, r] = make_tuple(x, 1, x << 1);
+    BigInt e1 = 1;
+    BigInt e2 = 0;
+    BigInt f1 = 0;
+    BigInt f2 = 1;
+    while (true) {
+        y = r * z - y;
+        z = idiv((n - y * y), z);
+        r = idiv((x + y), z);
+        assign_from_tuple(e1, e2, make_tuple(e2, e1 + e2 * r));
+        assign_from_tuple(f1, f2, make_tuple(f2, f1 + f2 * r));
+        auto [a, b] = make_tuple(f2 * x + e2, f2);
+        if (a * a - n * b * b == 1)
+            return make_tuple(a, b);
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&n : create_array({61, 109, 181, 277})) {
+            auto [x, y] = solvePell(n);
+            print(u"x^2 - #3 * y^2 = 1 for x = #27 and y = #25"_S.format(n, x, y));
+        }
+    }
+} code_block_1;
