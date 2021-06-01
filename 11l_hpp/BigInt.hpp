@@ -26,6 +26,17 @@ public:
 		}
 		return ans;
 	}
+	friend BigInt pow(BigInt base, BigInt exponent, const BigInt &modulus) {
+	    BigInt result = 1;
+
+	    while (exponent != 0) {
+	        if (exponent % 2 != 0)
+	            result = (result * base) % modulus;
+	        exponent = exponent / 2;
+	        base = (base * base) % modulus;
+	    }
+	    return result;
+	}
 	operator String() const {
 		std::stringstream ss;
 		ss << *this;
@@ -431,3 +442,5 @@ public:
 		return res;
 	}
 };
+
+Char::Char(const BigInt &b) : code((char16_t)b.longValue()) {}

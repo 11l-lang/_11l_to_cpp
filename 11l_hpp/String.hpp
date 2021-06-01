@@ -24,6 +24,7 @@ public:
 	char16_t code;
 
 	Char(char16_t code) : code(code) {}
+	explicit Char(const class BigInt &b);
 	explicit Char(const String &s);
 
 	operator char16_t() const {return code;} // for `switch (instr[i])` support
@@ -532,12 +533,20 @@ public:
 	{
 		Array<decltype(func(std::declval<Char>()))> r;
 		r.reserve(len());
-		for (auto &&el : *this)
-			r.push_back(func(el));
+		for (Char c : *this)
+			r.push_back(func(c));
 		return r;
 	}
 
 	template <typename Func> Array<Char> filter(Func &&func) const;
+
+	template <typename Type, typename Func> Type reduce(const Type &initial, Func &&func) const
+	{
+		Type r = initial;
+		for (Char c : *this)
+			r = func(r, c);
+		return r;
+	}
 
 	//String &operator=(const String &s) {assign(s); return *this;}
 
