@@ -3057,7 +3057,7 @@ builtins_scope.add_function('swap', ASTFunctionDefinition([('a', '', '', '&'), (
 builtins_scope.add_function('zip', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', ''), ('iterable3', token_to_str('N', Token.Category.CONSTANT), '')]))
 builtins_scope.add_function('all', ASTFunctionDefinition([('iterable', '', '')]))
 builtins_scope.add_function('any', ASTFunctionDefinition([('iterable', '', '')]))
-builtins_scope.add_function('cart_product', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', ''), ('iterable3', token_to_str('N', Token.Category.CONSTANT), '')]))
+builtins_scope.add_function('cart_product', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', ''), ('iterable3', token_to_str('N', Token.Category.CONSTANT), ''), ('iterable4', token_to_str('N', Token.Category.CONSTANT), '')]))
 builtins_scope.add_function('multiloop', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', ''), ('function', '', ''), ('optional', token_to_str('N', Token.Category.CONSTANT), '')]))
 builtins_scope.add_function('multiloop_filtered', ASTFunctionDefinition([('iterable1', '', ''), ('iterable2', '', ''), ('filter_function', '', ''), ('function', '', ''), ('optional', token_to_str('N', Token.Category.CONSTANT), '')]))
 builtins_scope.add_function('sum', ASTFunctionDefinition([('iterable', '', '')]))
@@ -3212,6 +3212,7 @@ dict_scope.add_name('pop', ASTFunctionDefinition([('key', '', '')]))
 dict_scope.add_name('keys', ASTFunctionDefinition([]))
 dict_scope.add_name('values', ASTFunctionDefinition([]))
 dict_scope.add_name('items', ASTFunctionDefinition([]))
+dict_scope.add_name('map', ASTFunctionDefinition([('f', '', '')]))
 builtins_scope.ids['Dict'].ast_nodes[0].scope = dict_scope
 builtins_scope.ids['DefaultDict'].ast_nodes[0].scope = dict_scope
 set_scope = Scope(None)

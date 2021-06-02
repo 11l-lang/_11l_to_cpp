@@ -14956,3 +14956,228 @@ struct CodeBlock5
         print(u"Decoded number as text: "_S & reversed(decTxt));
     }
 } code_block_5;
+
+
+# https://www.rosettacode.org/wiki/Playfair_cipher#Python
+from itertools import product
+from typing import Dict
+
+def uniq(seq):
+    seen : List[Char] = []
+    for x in seq:
+        if x not in seen:
+            seen.append(x)
+    return seen
+
+def partition(seq, n):
+    return [seq[i : i + n] for i in range(0, len(seq), n)]
+
+def canonicalize(s):
+    return ''.join(filter(lambda c: c.isupper(), s.upper())).replace('J', 'I')
+
+class Playfair:
+    dec : Dict[str, str]
+
+    def __init__(self, key):
+        # Build 5x5 matrix.
+        m = partition(uniq(canonicalize(key + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')), 5)
+
+        # Pregenerate all forward translations.
+        self.enc : Dict[str, str] = {}
+
+        # Map pairs in same row.
+        for row in m:
+            for i, j in product(range(5), range(5)):
+                if i != j:
+                    self.enc[row[i] + '' + row[j]] = row[(i + 1) % 5] + '' + row[(j + 1) % 5]
+
+        # Map pairs in same column.
+        for ci in range(5):
+            c = [m[0][ci], m[1][ci], m[2][ci], m[3][ci], m[4][ci]]
+            for i, j in product(range(5), range(5)):
+                if i != j:
+                    self.enc[c[i] + '' + c[j]] = c[(i + 1) % 5] + '' + c[(j + 1) % 5]
+
+        # Map pairs with cross-connections.
+        for i1, j1, i2, j2 in product(range(5), range(5), range(5), range(5)):
+            if i1 != i2 and j1 != j2:
+                self.enc[m[i1][j1] + '' + m[i2][j2]] = m[i1][j2] + '' + m[i2][j1]
+
+        # Generate reverse translations.
+        self.dec = dict((v, k) for k, v in self.enc.items())
+
+    def encode(self, txt):
+        c = canonicalize(txt)
+        lst : List[str] = []
+        i = 0
+        while i < len(c) - 1:
+            if c[i + 1] == c[i]:
+                lst += [c[i] + 'X']
+                i += 1
+            else:
+                lst += [c[i] + '' + c[i + 1]]
+                i += 2
+        if i == len(c) - 1:
+            lst += [c[-1] + 'X']
+        return ' '.join(self.enc[a] for a in lst)
+
+    def decode(self, encoded):
+        return ' '.join(self.dec[p] for p in partition(canonicalize(encoded), 2))
+
+playfair = Playfair("Playfair example")
+orig = "Hide the gold in...the TREESTUMP!!!"
+print("Original:", orig)
+enc = playfair.encode(orig)
+print("Encoded:", enc)
+print("Decoded:", playfair.decode(enc))
+===
+
+F uniq(seq)
+   [Char] seen
+   L(x) seq
+      I x !C seen
+         seen.append(x)
+   R seen
+
+F partition(seq, n)
+   R (0 .< seq.len).step(n).map(i -> @seq[i .< i + @n])
+
+F canonicalize(s)
+   R s.uppercase().filter(c -> c.is_uppercase()).join(‘’).replace(‘J’, ‘I’)
+
+T Playfair
+   [String = String] dec
+   [String = String] enc
+
+   F (key)
+      V m = partition(uniq(canonicalize(key‘ABCDEFGHIJKLMNOPQRSTUVWXYZ’)), 5)
+
+      L(row) m
+         L(i, j) cart_product(0.<5, 0.<5)
+            I i != j
+               .enc[row[i]‘’row[j]] = row[(i + 1) % 5]‘’row[(j + 1) % 5]
+
+      L(ci) 5
+         V c = [m[0][ci], m[1][ci], m[2][ci], m[3][ci], m[4][ci]]
+         L(i, j) cart_product(0.<5, 0.<5)
+            I i != j
+               .enc[c[i]‘’c[j]] = c[(i + 1) % 5]‘’c[(j + 1) % 5]
+
+      L(i1, j1, i2, j2) cart_product(0.<5, 0.<5, 0.<5, 0.<5)
+         I i1 != i2 & j1 != j2
+            .enc[m[i1][j1]‘’m[i2][j2]] = m[i1][j2]‘’m[i2][j1]
+      .dec = Dict(.enc.map((k, v) -> (v, k)))
+
+   F encode(txt)
+      V c = canonicalize(txt)
+      [String] lst
+      V i = 0
+      L i < c.len - 1
+         I c[i + 1] == c[i]
+            lst [+]= c[i]‘X’
+            i++
+         E
+            lst [+]= c[i]‘’c[i + 1]
+            i += 2
+      I i == c.len - 1
+         lst [+]= c.last‘X’
+      R lst.map(a -> @.enc[a]).join(‘ ’)
+
+   F decode(encoded)
+      R partition(canonicalize(encoded), 2).map(p -> @.dec[p]).join(‘ ’)
+V playfair = Playfair(‘Playfair example’)
+V orig = ‘Hide the gold in...the TREESTUMP!!!’
+print(‘Original: ’orig)
+V enc = playfair.encode(orig)
+print(‘Encoded: ’enc)
+print(‘Decoded: ’playfair.decode(enc))
+===
+template <typename T1> auto uniq(const T1 &seq)
+{
+    Array<Char> seen;
+    for (auto &&x : seq)
+        if (!in(x, seen))
+            seen.append(x);
+    return seen;
+}
+
+template <typename T1, typename T2> auto partition(const T1 &seq, const T2 &n)
+{
+    return range_el(0, seq.len()).step(n).map([&n, &seq](const auto &i){return seq[range_el(i, i + n)];});
+}
+
+template <typename T1> auto canonicalize(const T1 &s)
+{
+    return s.uppercase().filter([](const auto &c){return c.is_uppercase();}).join(u""_S).replace(u"J"_S, u"I"_S);
+}
+
+class Playfair
+{
+public:
+    Dict<String, String> dec;
+    Dict<String, String> enc;
+
+    template <typename T1> Playfair(const T1 &key)
+    {
+        auto m = partition(uniq(canonicalize(key & u"ABCDEFGHIJKLMNOPQRSTUVWXYZ"_S)), 5);
+        for (auto &&row : m)
+            for (auto &&[i, j] : cart_product(range_el(0, 5), range_el(0, 5)))
+                if (i != j)
+                    enc.set(row[i] & row[j], row[mod((i + 1), 5)] & row[mod((j + 1), 5)]);
+
+        for (int ci = 0; ci < 5; ci++) {
+            auto c = create_array({_get<0>(m)[ci], _get<1>(m)[ci], _get<2>(m)[ci], _get<3>(m)[ci], _get<4>(m)[ci]});
+            for (auto &&[i, j] : cart_product(range_el(0, 5), range_el(0, 5)))
+                if (i != j)
+                    enc.set(c[i] & c[j], c[mod((i + 1), 5)] & c[mod((j + 1), 5)]);
+        }
+        for (auto &&[i1, _j1_, i2, j2] : cart_product(range_el(0, 5), range_el(0, 5), range_el(0, 5), range_el(0, 5)))
+            if (i1 != i2 && _j1_ != j2)
+                enc.set(m[i1][_j1_] & m[i2][j2], m[i1][j2] & m[i2][_j1_]);
+        dec = create_dict(enc.map([](const auto &k, const auto &v){return make_tuple(v, k);}));
+    }
+
+    template <typename T1> auto encode(const T1 &txt)
+    {
+        auto c = canonicalize(txt);
+        Array<String> lst;
+        auto i = 0;
+        while (i < c.len() - 1)
+            if (c[i + 1] == c[i]) {
+                lst.append(c[i] & u"X"_S);
+                i++;
+            }
+            else {
+                lst.append(c[i] & c[i + 1]);
+                i += 2;
+            }
+        if (i == c.len() - 1)
+            lst.append(c.last() & u"X"_S);
+        return lst.map([this](const auto &a){return enc[a];}).join(u" "_S);
+    }
+
+    template <typename T1> auto decode(const T1 &encoded)
+    {
+        return partition(canonicalize(encoded), 2).map([this](const auto &p){return dec[p];}).join(u" "_S);
+    }
+};
+auto playfair = Playfair(u"Playfair example"_S);
+auto orig = u"Hide the gold in...the TREESTUMP!!!"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Original: "_S & orig);
+    }
+} code_block_1;
+auto enc = playfair.encode(orig);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"Encoded: "_S & enc);
+        print(u"Decoded: "_S & playfair.decode(enc));
+    }
+} code_block_2;
