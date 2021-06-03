@@ -5359,3 +5359,293 @@ struct CodeBlock1
         print(setB - setA);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Stirling_numbers_of_the_first_kind#Python
+from typing import Dict, Tuple
+BigInt = int
+
+computed : Dict[Tuple[int, int], BigInt] = {}
+
+def sterling1(n, k):
+    key = (n, k)
+
+    if key in computed:
+        return computed[key]
+    if n == k == 0:
+        return BigInt(1)
+    if n > 0 and k == 0:
+        return BigInt(0)
+    if k > n:
+        return BigInt(0)
+    result = sterling1(n - 1, k - 1) + (n - 1) * sterling1(n - 1, k)
+    computed[key] = result
+    return result
+
+print("Unsigned Stirling numbers of the first kind:")
+MAX = 12
+print("n/k".ljust(10), end="")
+for n in range(MAX + 1):
+    print(str(n).rjust(10), end="")
+print()
+for n in range(MAX + 1):
+    print(str(n).ljust(10), end="")
+    for k in range(n + 1):
+        print(str(sterling1(n, k)).rjust(10), end="")
+    print()
+print("The maximum value of S1(100, k) = ")
+previous : BigInt = 0
+for k in range(1, 100 + 1):
+    current = sterling1(100, k)
+    if current > previous:
+        previous = current
+    else:
+        print("{0}\n({1} digits, k = {2})\n".format(previous, len(str(previous)), k - 1))
+        break
+===
+[(Int, Int) = BigInt] computed
+
+F sterling1(n, k)
+   V key = (n, k)
+
+   I key C :computed
+      R :computed[key]
+   I n == k == 0
+      R BigInt(1)
+   I n > 0 & k == 0
+      R BigInt(0)
+   I k > n
+      R BigInt(0)
+   V result = sterling1(n - 1, k - 1) + (n - 1) * sterling1(n - 1, k)
+   :computed[key] = result
+   R result
+print(‘Unsigned Stirling numbers of the first kind:’)
+V MAX = 12
+print(‘n/k’.ljust(10), end' ‘’)
+L(n) 0 .. MAX
+   print(String(n).rjust(10), end' ‘’)
+print()
+L(n) 0 .. MAX
+   print(String(n).ljust(10), end' ‘’)
+   L(k) 0 .. n
+      print(String(sterling1(n, k)).rjust(10), end' ‘’)
+   print()
+print(‘The maximum value of S1(100, k) = ’)
+BigInt previous = 0
+L(k) 1 .. 100
+   V current = sterling1(100, k)
+   I current > previous
+      previous = current
+   E
+      print("#.\n(#. digits, k = #.)\n".format(previous, String(previous).len, k - 1))
+      L.break
+===
+Dict<ivec2, BigInt> computed;
+
+template <typename T1, typename T2> auto sterling1(const T1 &n, const T2 &k)
+{
+    auto key = make_tuple(n, k);
+    if (in(key, ::computed))
+        return ::computed[key];
+    if (equal(n, k, 0))
+        return BigInt(1);
+    if (n > 0 && k == 0)
+        return BigInt(0);
+    if (k > n)
+        return BigInt(0);
+    auto result = sterling1(n - 1, k - 1) + (n - 1) * sterling1(n - 1, k);
+    ::computed.set(key, result);
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Unsigned Stirling numbers of the first kind:"_S);
+    }
+} code_block_1;
+auto MAX = 12;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"n/k"_S.ljust(10), u""_S);
+        for (auto n : range_ee(0, MAX))
+            print(String(n).rjust(10), u""_S);
+        print();
+        for (auto n : range_ee(0, MAX)) {
+            print(String(n).ljust(10), u""_S);
+            for (auto k : range_ee(0, n))
+                print(String(sterling1(n, k)).rjust(10), u""_S);
+            print();
+        }
+        print(u"The maximum value of S1(100, k) = "_S);
+    }
+} code_block_2;
+BigInt previous = 0;
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        for (auto k : range_ee(1, 100)) {
+            auto current = sterling1(100, k);
+            if (current > previous)
+                previous = current;
+            else {
+                print(u"#.\n(#. digits, k = #.)\n"_S.format(previous, String(previous).len(), k - 1));
+                break;
+            }
+        }
+    }
+} code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Stirling_numbers_of_the_second_kind#Python
+from typing import Dict, Tuple
+BigInt = int
+
+computed : Dict[Tuple[int, int], BigInt] = {}
+
+def sterling2(n, k):
+    key = (n, k)
+
+    if key in computed:
+        return computed[key]
+    if n == k == 0:
+        return BigInt(1)
+    if (n > 0 and k == 0) or (n == 0 and k > 0):
+        return BigInt(0)
+    if n == k:
+        return BigInt(1)
+    if k > n:
+        return BigInt(0)
+    result = k * sterling2(n - 1, k) + sterling2(n - 1, k - 1)
+    computed[key] = result
+    return result
+
+print("Stirling numbers of the second kind:")
+MAX = 12
+print("n/k".ljust(10), end="")
+for n in range(MAX + 1):
+    print(str(n).rjust(10), end="")
+print()
+for n in range(MAX + 1):
+    print(str(n).ljust(10), end="")
+    for k in range(n + 1):
+        print(str(sterling2(n, k)).rjust(10), end="")
+    print()
+print("The maximum value of S2(100, k) = ")
+previous : BigInt = 0
+for k in range(1, 100 + 1):
+    current = sterling2(100, k)
+    if current > previous:
+        previous = current
+    else:
+        print("{0}\n({1} digits, k = {2})\n".format(previous, len(str(previous)), k - 1))
+        break
+===
+[(Int, Int) = BigInt] computed
+
+F sterling2(n, k)
+   V key = (n, k)
+
+   I key C :computed
+      R :computed[key]
+   I n == k == 0
+      R BigInt(1)
+   I (n > 0 & k == 0) | (n == 0 & k > 0)
+      R BigInt(0)
+   I n == k
+      R BigInt(1)
+   I k > n
+      R BigInt(0)
+   V result = k * sterling2(n - 1, k) + sterling2(n - 1, k - 1)
+   :computed[key] = result
+   R result
+print(‘Stirling numbers of the second kind:’)
+V MAX = 12
+print(‘n/k’.ljust(10), end' ‘’)
+L(n) 0 .. MAX
+   print(String(n).rjust(10), end' ‘’)
+print()
+L(n) 0 .. MAX
+   print(String(n).ljust(10), end' ‘’)
+   L(k) 0 .. n
+      print(String(sterling2(n, k)).rjust(10), end' ‘’)
+   print()
+print(‘The maximum value of S2(100, k) = ’)
+BigInt previous = 0
+L(k) 1 .. 100
+   V current = sterling2(100, k)
+   I current > previous
+      previous = current
+   E
+      print("#.\n(#. digits, k = #.)\n".format(previous, String(previous).len, k - 1))
+      L.break
+===
+Dict<ivec2, BigInt> computed;
+
+template <typename T1, typename T2> auto sterling2(const T1 &n, const T2 &k)
+{
+    auto key = make_tuple(n, k);
+    if (in(key, ::computed))
+        return ::computed[key];
+    if (equal(n, k, 0))
+        return BigInt(1);
+    if ((n > 0 && k == 0) || (n == 0 && k > 0))
+        return BigInt(0);
+    if (n == k)
+        return BigInt(1);
+    if (k > n)
+        return BigInt(0);
+    auto result = k * sterling2(n - 1, k) + sterling2(n - 1, k - 1);
+    ::computed.set(key, result);
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Stirling numbers of the second kind:"_S);
+    }
+} code_block_1;
+auto MAX = 12;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"n/k"_S.ljust(10), u""_S);
+        for (auto n : range_ee(0, MAX))
+            print(String(n).rjust(10), u""_S);
+        print();
+        for (auto n : range_ee(0, MAX)) {
+            print(String(n).ljust(10), u""_S);
+            for (auto k : range_ee(0, n))
+                print(String(sterling2(n, k)).rjust(10), u""_S);
+            print();
+        }
+        print(u"The maximum value of S2(100, k) = "_S);
+    }
+} code_block_2;
+BigInt previous = 0;
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        for (auto k : range_ee(1, 100)) {
+            auto current = sterling2(100, k);
+            if (current > previous)
+                previous = current;
+            else {
+                print(u"#.\n(#. digits, k = #.)\n"_S.format(previous, String(previous).len(), k - 1));
+                break;
+            }
+        }
+    }
+} code_block_3;

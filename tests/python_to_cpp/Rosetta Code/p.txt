@@ -1600,3 +1600,302 @@ struct CodeBlock1
         print(quad());
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Partition_function_P#Python
+import time
+BigInt = int
+
+def partitions(n):
+    """Count partitions."""
+    p = [BigInt(1)] + [BigInt(0)] * n
+    for i in range(1, n + 1):
+        k = 0
+        while True:
+            k += 1
+            j = (k * (3*k - 1)) // 2
+            if j > i:
+                break
+            if k & 1:
+                p[i] += p[i - j]
+            else:
+                p[i] -= p[i - j]
+            j = (k * (3*k + 1)) // 2
+            if j > i:
+                break
+            if k & 1:
+                p[i] += p[i - j]
+            else:
+                p[i] -= p[i - j]
+
+    return p[n]
+
+print("Partitions:", [partitions(x) for x in range(15)])
+
+start = time.perf_counter()
+print(partitions(6666))
+print(time.perf_counter() - start)
+===
+//import time
+
+F partitions(n)
+   ‘Count partitions.’
+   V p = [BigInt(1)] [+] [BigInt(0)] * n
+   L(i) 1 .. n
+      V k = 0
+      L
+         k++
+         V j = (k * (3 * k - 1)) I/ 2
+         I j > i
+            L.break
+         I k [&] 1
+            p[i] += p[i - j]
+         E
+            p[i] -= p[i - j]
+         j = (k * (3 * k + 1)) I/ 2
+         I j > i
+            L.break
+         I k [&] 1
+            p[i] += p[i - j]
+         E
+            p[i] -= p[i - j]
+   R p[n]
+print(‘Partitions: ’(0.<15).map(x -> partitions(x)))
+V start = time:perf_counter()
+print(partitions(6666))
+print(time:perf_counter() - start)
+===
+template <typename T1> auto partitions(const T1 &n)
+{
+    u"Count partitions."_S;
+    auto p = create_array({BigInt(1)}) + create_array({BigInt(0)}) * n;
+    for (auto i : range_ee(1, n)) {
+        auto k = 0;
+        while (true) {
+            k++;
+            auto j = idiv((k * (3 * k - 1)), 2);
+            if (j > i)
+                break;
+            if (k & 1)
+                p[i] += p[i - j];
+            else
+                p[i] -= p[i - j];
+            j = idiv((k * (3 * k + 1)), 2);
+            if (j > i)
+                break;
+            if (k & 1)
+                p[i] += p[i - j];
+            else
+                p[i] -= p[i - j];
+        }
+    }
+    return p[n];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Partitions: "_S & range_el(0, 15).map([](const auto &x){return partitions(x);}));
+    }
+} code_block_1;
+auto start = timens::perf_counter();
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(partitions(6666));
+        print(timens::perf_counter() - start);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Prime_decomposition#D
+# Slow BigInt
+BigInt = int
+
+def decompose(number : BigInt):
+    result : List[BigInt] = []
+    n = number
+    i : BigInt = 2
+    while n % i == 0:
+        result.append(i)
+        n //= i
+    i = 3
+    while n >= i * i:
+        while n % i == 0:
+            result.append(i)
+            n //= i
+        i += 2
+    if n != 1:
+        result.append(n)
+    return result
+
+for i in range(2, 10):
+    print(decompose(i))
+print(decompose(1023 * 1024))
+print(decompose(2 * 3 * 5 * 7 * 11 * 11 * 13 * 17))
+print(decompose(BigInt(16860167264933) * 179951))
+===
+
+F decompose(BigInt number)
+   [BigInt] result
+   V n = number
+   BigInt i = 2
+   L n % i == 0
+      result.append(i)
+      n I/= i
+   i = 3
+   L n >= i * i
+      L n % i == 0
+         result.append(i)
+         n I/= i
+      i += 2
+   I n != 1
+      result.append(n)
+   R result
+
+L(i) 2..9
+   print(decompose(i))
+print(decompose(1023 * 1024))
+print(decompose(2 * 3 * 5 * 7 * 11 * 11 * 13 * 17))
+print(decompose(BigInt(16860167264933) * 179951))
+===
+auto decompose(const BigInt &number)
+{
+    Array<BigInt> result;
+    auto n = number;
+    BigInt i = 2;
+    while (mod(n, i) == 0) {
+        result.append(i);
+        n = idiv(n, i);
+    }
+    i = 3;
+    while (n >= i * i) {
+        while (mod(n, i) == 0) {
+            result.append(i);
+            n = idiv(n, i);
+        }
+        i += 2;
+    }
+    if (n != 1)
+        result.append(n);
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(2, 9))
+            print(decompose(i));
+        print(decompose(1023 * 1024));
+        print(decompose(2 * 3 * 5 * 7 * 11 * 11 * 13 * 17));
+        print(decompose(BigInt(16860167264933) * 179951));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Primorial_numbers#Python
+BigInt = int
+
+def get_primes(primes_count):
+    limit = 17 * primes_count
+    is_prime = [False] * 2 + [True] * (limit - 1)
+    for n in range(int(limit**0.5 + 1.5)): # stop at ``sqrt(limit)``
+        if is_prime[n]:
+            for i in range(n*n, limit+1, n):
+                is_prime[i] = False
+
+    primes : List[int] = []
+    for i, prime in enumerate(is_prime):
+        if prime:
+            primes.append(i)
+            if len(primes) == primes_count:
+                break
+    return primes
+
+primes = get_primes(100000)
+
+def primorial(n):
+    r : BigInt = 1
+    for i in range(n):
+        r *= primes[i]
+    return r
+
+print('First ten primorials:', [primorial(n) for n in range(10)])
+for e in range(6):
+    n = 10**e
+    print('primorial(%i) has %i digits' % (n, len(str(primorial(n)))))
+===
+
+F get_primes(primes_count)
+   V limit = 17 * primes_count
+   V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
+   L(n) 0 .< Int(limit ^ 0.5 + 1.5)
+      I is_prime[n]
+         L(i) (n * n .< limit + 1).step(n)
+            is_prime[i] = 0B
+   [Int] primes
+   L(prime) is_prime
+      V i = L.index
+      I prime
+         primes.append(i)
+         I primes.len == primes_count
+            L.break
+   R primes
+V primes = get_primes(100000)
+
+F primorial(n)
+   BigInt r = 1
+   L(i) 0 .< n
+      r *= :primes[i]
+   R r
+print(‘First ten primorials: ’(0.<10).map(n -> primorial(n)))
+L(e) 6
+   V n = 10 ^ e
+   print(‘primorial(#.) has #. digits’.format(n, String(primorial(n)).len))
+===
+template <typename T1> auto get_primes(const T1 &primes_count)
+{
+    auto limit = 17 * primes_count;
+    auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
+    for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
+        if (is_prime[n])
+            for (auto i : range_el(n * n, limit + 1).step(n))
+                is_prime.set(i, false);
+    Array<int> primes;
+    {int Lindex = 0;
+    for (auto &&prime : is_prime) {
+        auto i = Lindex;
+        if (prime) {
+            primes.append(i);
+            if (primes.len() == primes_count)
+                break;
+        }
+        Lindex++;
+    }}
+    return primes;
+}
+auto primes = get_primes(100000);
+
+template <typename T1> auto primorial(const T1 &n)
+{
+    BigInt r = 1;
+    for (auto i : range_el(0, n))
+        r *= ::primes[i];
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"First ten primorials: "_S & range_el(0, 10).map([](const auto &n){return primorial(n);}));
+        for (int e = 0; e < 6; e++) {
+            auto n = pow(10, e);
+            print(u"primorial(#.) has #. digits"_S.format(n, String(primorial(n)).len()));
+        }
+    }
+} code_block_1;

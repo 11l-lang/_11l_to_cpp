@@ -1802,3 +1802,158 @@ struct CodeBlock1
         print(two_sum(numbers, 25));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Tonelli-Shanks_algorithm#Python
+BigInt = int
+Int64 = int
+
+def legendre(a, p):
+    return pow(a, (p - 1) // 2, p)
+
+def tonelli(n, p):
+    assert legendre(n, p) == 1, "not a square (mod p)"
+    q = p - 1
+    s = 0
+    while q % 2 == 0:
+        q //= 2
+        s += 1
+    if s == 1:
+        return pow(n, (p + 1) // 4, p)
+    z = 2
+    while True:
+        if p - 1 == legendre(z, p):
+            break
+        z += 1
+    c = pow(z, q, p)
+    r = pow(n, (q + 1) // 2, p)
+    t = pow(n, q, p)
+    m = s
+    t2 = BigInt(0)
+    while (t - 1) % p != 0:
+        t2 = (t * t) % p
+        i = 1
+        for ii in range(1, m):
+            if (t2 - 1) % p == 0:
+                i = ii
+                break
+            t2 = (t2 * t2) % p
+        b = pow(c, Int64(1 << (m - i - 1)), p)
+        r = (r * b) % p
+        c = (b * b) % p
+        t = (t * c) % p
+        m = i
+    return r
+
+ttest = [(BigInt(10), BigInt(13)), (BigInt(56), BigInt(101)), (BigInt(1030), BigInt(10009)), (BigInt(44402), BigInt(100049)),
+         (BigInt(665820697), BigInt(1000000009)), (BigInt(881398088036), BigInt(1000000000039)),
+         (BigInt('41660815127637347468140745042827704103445750172002'), BigInt(10)**50 + 577)]
+for n, p in ttest:
+    r = tonelli(n, p)
+    assert (r * r - n) % p == 0
+    print("n = %d p = %d" % (n, p))
+    print("\t  roots : %d %d" % (r, p - r))
+===
+
+F legendre(a, p)
+   R pow(a, (p - 1) I/ 2, p)
+
+F tonelli(n, p)
+   assert(legendre(n, p) == 1, ‘not a square (mod p)’)
+   V q = p - 1
+   V s = 0
+   L q % 2 == 0
+      q I/= 2
+      s++
+   I s == 1
+      R pow(n, (p + 1) I/ 4, p)
+   V z = 2
+   L
+      I p - 1 == legendre(z, p)
+         L.break
+      z++
+   V c = pow(z, q, p)
+   V r = pow(n, (q + 1) I/ 2, p)
+   V t = pow(n, q, p)
+   V m = s
+   V t2 = BigInt(0)
+   L (t - 1) % p != 0
+      t2 = (t * t) % p
+      V i = 1
+      L(ii) 1 .< m
+         I (t2 - 1) % p == 0
+            i = ii
+            L.break
+         t2 = (t2 * t2) % p
+      V b = pow(c, Int64(1 << (m - i - 1)), p)
+      r = (r * b) % p
+      c = (b * b) % p
+      t = (t * c) % p
+      m = i
+   R r
+V ttest = [(BigInt(10), BigInt(13)), (BigInt(56), BigInt(101)), (BigInt(1030), BigInt(10009)), (BigInt(44402), BigInt(100049)), (BigInt(665820697), BigInt(1000000009)), (BigInt(881398088036), BigInt(1000000000039)), (BigInt(‘41660815127637347468140745042827704103445750172002’), BigInt(10) ^ 50 + 577)]
+L(n, p) ttest
+   V r = tonelli(n, p)
+   assert((r * r - n) % p == 0)
+   print(‘n = #. p = #.’.format(n, p))
+   print("\t  roots : #. #.".format(r, p - r))
+===
+template <typename T1, typename T2> auto legendre(const T1 &a, const T2 &p)
+{
+    return pow(a, idiv((p - 1), 2), p);
+}
+
+template <typename T1, typename T2> auto tonelli(const T1 &n, const T2 &p)
+{
+    assert(legendre(n, p) == 1, u"not a square (mod p)"_S);
+    auto q = p - 1;
+    auto s = 0;
+    while (mod(q, 2) == 0) {
+        q = idiv(q, 2);
+        s++;
+    }
+    if (s == 1)
+        return pow(n, idiv((p + 1), 4), p);
+    auto z = 2;
+    while (true) {
+        if (p - 1 == legendre(z, p))
+            break;
+        z++;
+    }
+    auto c = pow(z, q, p);
+    auto r = pow(n, idiv((q + 1), 2), p);
+    auto t = pow(n, q, p);
+    auto m = s;
+    auto t2 = BigInt(0);
+    while (mod((t - 1), p) != 0) {
+        t2 = mod((t * t), p);
+        auto i = 1;
+        for (auto ii : range_el(1, m)) {
+            if (mod((t2 - 1), p) == 0) {
+                i = ii;
+                break;
+            }
+            t2 = mod((t2 * t2), p);
+        }
+        auto b = pow(c, to_int64(1 << (m - i - 1)), p);
+        r = mod((r * b), p);
+        c = mod((b * b), p);
+        t = mod((t * c), p);
+        m = i;
+    }
+    return r;
+}
+auto ttest = create_array({make_tuple(BigInt(10), BigInt(13)), make_tuple(BigInt(56), BigInt(101)), make_tuple(BigInt(1030), BigInt(10009)), make_tuple(BigInt(44402), BigInt(100049)), make_tuple(BigInt(665820697), BigInt(1000000009)), make_tuple(BigInt(881398088036), BigInt(1000000000039)), make_tuple(BigInt(u"41660815127637347468140745042827704103445750172002"_S), pow(BigInt(10), 50) + 577)});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[n, p] : ttest) {
+            auto r = tonelli(n, p);
+            assert(mod((r * r - n), p) == 0);
+            print(u"n = #. p = #."_S.format(n, p));
+            print(u"\t  roots : #. #."_S.format(r, p - r));
+        }
+    }
+} code_block_1;

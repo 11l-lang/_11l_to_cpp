@@ -1656,3 +1656,214 @@ struct CodeBlock1
             print(luhn(n));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Left_factorials#D
+BigInt = int
+
+def left_fact(n):
+    result : BigInt = 0
+    factorial : BigInt = 1
+    for i in range(1, n + 1):
+        result += factorial
+        factorial *= i
+    return result
+
+print("First 11 left factorials:")
+print([left_fact(i) for i in range(11)])
+print("\n20 through 110 (inclusive) by tens:")
+for i in range(20, 111, 10):
+    print(left_fact(i))
+print("\nDigits in 1,000 through 10,000 by thousands:")
+print([len(str(left_fact(i))) for i in range(1000, 10001, 1000)])
+===
+
+F left_fact(n)
+   BigInt result = 0
+   BigInt factorial = 1
+   L(i) 1 .. n
+      result += factorial
+      factorial *= i
+   R result
+print(‘First 11 left factorials:’)
+print((0.<11).map(i -> left_fact(i)))
+print("\n20 through 110 (inclusive) by tens:")
+L(i) (20.<111).step(10)
+   print(left_fact(i))
+print("\nDigits in 1,000 through 10,000 by thousands:")
+print((1000.<10001).step(1000).map(i -> String(left_fact(i)).len))
+===
+template <typename T1> auto left_fact(const T1 &n)
+{
+    BigInt result = 0;
+    BigInt factorial = 1;
+    for (auto i : range_ee(1, n)) {
+        result += factorial;
+        factorial *= i;
+    }
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"First 11 left factorials:"_S);
+        print(range_el(0, 11).map([](const auto &i){return left_fact(i);}));
+        print(u"\n20 through 110 (inclusive) by tens:"_S);
+        for (auto i : range_el(20, 111).step(10))
+            print(left_fact(i));
+        print(u"\nDigits in 1,000 through 10,000 by thousands:"_S);
+        print(range_el(1000, 10001).step(1000).map([](const auto &i){return String(left_fact(i)).len();}));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Lychrel_numbers#D
+from typing import Dict, Tuple, List
+BigInt = int
+
+def rev(n):
+    return BigInt(str(n)[::-1])
+
+cache : Dict[BigInt, Tuple[bool, BigInt]] = {}
+
+def lychrel(n : BigInt):
+    if n in cache:
+        return cache[n]
+
+    r = rev(n)
+    res = (True, n)
+    seen : List[BigInt] = []
+    for i in range(1000):
+        n += r
+        r = rev(n)
+        if n == r:
+            res = (False, BigInt(0))
+            break
+        if n in cache:
+            res = cache[n]
+            break
+        seen += [n]
+
+    for x in seen:
+        cache[x] = res
+    return res
+
+seeds : List[int] = []
+related : List[int] = []
+palin : List[int] = []
+
+for i in range(1, 10000):
+    tf_s = lychrel(i)
+    if not tf_s[0]:
+        continue
+    if BigInt(i) == tf_s[1]:
+        seeds += [i]
+    else:
+        related += [i]
+    if BigInt(i) == rev(i):
+        palin += [i]
+
+print(len(seeds), 'Lychrel seeds:', seeds)
+print(len(related), 'Lychrel related')
+print(len(palin), 'Lychrel palindromes:', palin)
+===
+
+F rev(n)
+   R BigInt(reversed(String(n)))
+[BigInt = (Bool, BigInt)] cache
+
+F lychrel(BigInt =n)
+   I n C :cache
+      R :cache[n]
+   V r = rev(n)
+   V res = (1B, n)
+   [BigInt] seen
+   L(i) 1000
+      n += r
+      r = rev(n)
+      I n == r
+         res = (0B, BigInt(0))
+         L.break
+      I n C :cache
+         res = :cache[n]
+         L.break
+      seen [+]= n
+
+   L(x) seen
+      :cache[x] = res
+   R res
+[Int] seeds
+[Int] related
+[Int] palin
+
+L(i) 1..9999
+   V tf_s = lychrel(i)
+   I !tf_s[0]
+      L.continue
+   I BigInt(i) == tf_s[1]
+      seeds [+]= i
+   E
+      related [+]= i
+   I BigInt(i) == rev(i)
+      palin [+]= i
+print(seeds.len‘ Lychrel seeds: ’seeds)
+print(related.len‘ Lychrel related’)
+print(palin.len‘ Lychrel palindromes: ’palin)
+===
+template <typename T1> auto rev(const T1 &n)
+{
+    return BigInt(reversed(String(n)));
+}
+Dict<BigInt, Tuple<bool, BigInt>> cache;
+
+auto lychrel(BigInt n)
+{
+    if (in(n, ::cache))
+        return ::cache[n];
+    auto r = rev(n);
+    auto res = make_tuple(true, n);
+    Array<BigInt> seen;
+    for (int i = 0; i < 1000; i++) {
+        n += r;
+        r = rev(n);
+        if (n == r) {
+            res = make_tuple(false, BigInt(0));
+            break;
+        }
+        if (in(n, ::cache)) {
+            res = ::cache[n];
+            break;
+        }
+        seen.append(n);
+    }
+    for (auto &&x : seen)
+        ::cache.set(x, res);
+    return res;
+}
+Array<int> seeds;
+Array<int> related;
+Array<int> palin;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto i : range_ee(1, 9999)) {
+            auto tf_s = lychrel(i);
+            if (!_get<0>(tf_s))
+                continue;
+            if (BigInt(i) == _get<1>(tf_s))
+                seeds.append(i);
+            else
+                related.append(i);
+            if (BigInt(i) == rev(i))
+                palin.append(i);
+        }
+        print(seeds.len() & u" Lychrel seeds: "_S & seeds);
+        print(related.len() & u" Lychrel related"_S);
+        print(palin.len() & u" Lychrel palindromes: "_S & palin);
+    }
+} code_block_1;
