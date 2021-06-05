@@ -5649,3 +5649,343 @@ struct CodeBlock3
         }
     }
 } code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Strange_unique_prime_triplets#Python
+def primes_upto(limit):
+    is_prime = [False] * 2 + [True] * (limit - 1)
+    for n in range(int(limit**0.5 + 1.5)): # stop at ``sqrt(limit)``
+        if is_prime[n]:
+            for i in range(n*n, limit+1, n):
+                is_prime[i] = False
+    return [i for i, prime in enumerate(is_prime) if prime]
+
+def strange_triplets(mx: int = 30):
+    r : List[Tuple[int, int, int]] = []
+    primes = list(primes_upto(mx))
+    primes3 = set(primes_upto(3 * mx))
+    for i, n in enumerate(primes):
+        for j, m in enumerate(primes[i + 1:], i + 1):
+            for p in primes[j + 1:]:
+                if n + m + p in primes3:
+                    r.append((n, m, p))
+    return r
+
+for c, nmp in enumerate(strange_triplets(), 1):
+    (n, m, p) = nmp
+    print('%2d: %2d+%2d+%2d = %d' % (c, n, m, p, n + m + p))
+
+mx = 1_000
+print("\nIf n, m, p < %d finds %d" % (mx, len(strange_triplets(mx))))
+===
+F primes_upto(limit)
+   V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
+   L(n) 0 .< Int(limit ^ 0.5 + 1.5)
+      I is_prime[n]
+         L(i) (n * n .< limit + 1).step(n)
+            is_prime[i] = 0B
+   R enumerate(is_prime).filter((i, prime) -> prime).map((i, prime) -> i)
+
+F strange_triplets(Int mx = 30)
+   [(Int, Int, Int)] r
+   V primes = Array(primes_upto(mx))
+   V primes3 = Set(primes_upto(3 * mx))
+   L(n) primes
+      V i = L.index
+      L(m) primes[i + 1 ..]
+         V j = L.index + i + 1
+         L(p) primes[j + 1 ..]
+            I n + m + p C primes3
+               r.append((n, m, p))
+   R r
+
+L(nmp) strange_triplets()
+   V c = L.index + 1
+   V (n, m, p) = nmp
+   print(‘#2: #2+#2+#2 = #.’.format(c, n, m, p, n + m + p))
+V mx = 1'000
+print("\nIf n, m, p < #. finds #.".format(mx, strange_triplets(mx).len))
+===
+template <typename T1> auto primes_upto(const T1 &limit)
+{
+    auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
+    for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
+        if (is_prime[n])
+            for (auto i : range_el(n * n, limit + 1).step(n))
+                is_prime.set(i, false);
+    return enumerate(is_prime).filter([](const auto &i, const auto &prime){return prime;}).map([](const auto &i, const auto &prime){return i;});
+}
+
+auto strange_triplets(const int mx = 30)
+{
+    Array<ivec3> r;
+    auto primes = create_array(primes_upto(mx));
+    auto primes3 = create_set(primes_upto(3 * mx));
+    {int Lindex = 0;
+    for (auto &&n : primes) {
+        auto i = Lindex;
+        {int Lindex = 0;
+        for (auto &&m : primes[range_ei(i + 1)]) {
+            auto j = Lindex + i + 1;
+            for (auto &&p : primes[range_ei(j + 1)])
+                if (in(n + m + p, primes3))
+                    r.append(make_tuple(n, m, p));
+            Lindex++;
+        }}
+        Lindex++;
+    }}
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {int Lindex = 0;
+
+        for (auto &&nmp : strange_triplets()) {
+            auto c = Lindex + 1;
+            auto [n, m, p] = nmp;
+            print(u"#2: #2+#2+#2 = #."_S.format(c, n, m, p, n + m + p));
+            Lindex++;
+        }}
+    }
+} code_block_1;
+auto mx = 1'000;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"\nIf n, m, p < #. finds #."_S.format(mx, strange_triplets(mx).len()));
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Strong_and_weak_primes
+from typing import List
+
+def primes_upto(limit):
+    is_prime = [False] * 2 + [True] * (limit - 1)
+    for n in range(int(limit**0.5 + 1.5)): # stop at ``sqrt(limit)``
+        if is_prime[n]:
+            for i in range(n*n, limit+1, n):
+                is_prime[i] = False
+    return [i for i, prime in enumerate(is_prime) if prime]
+
+p = primes_upto(10_000_000)
+s : List[int] = []
+w : List[int] = []
+b : List[int] = []
+for i in range(1, len(p) - 1):
+    if p[i] > (p[i-1] + p[i+1]) * 0.5:
+        s += [p[i]]
+    elif p[i] < (p[i-1] + p[i+1]) * 0.5:
+        w += [p[i]]
+    else:
+        b += [p[i]]
+
+print('The first   36   strong primes:', s[:36])
+print('The   count   of the strong primes below   1,000,000:',
+      sum(1 for p in s if p < 1_000_000))
+print('The   count   of the strong primes below  10,000,000:', len(s))
+print('\nThe first   37   weak primes:', w[:37])
+print('The   count   of the weak   primes below   1,000,000:',
+      sum(1 for p in w if p < 1_000_000))
+print('The   count   of the weak   primes below  10,000,000:', len(w))
+print('\n\nThe first   10 balanced primes:', b[:10])
+print('The   count   of balanced   primes below   1,000,000:',
+      sum(1 for p in b if p < 1_000_000))
+print('The   count   of balanced   primes below  10,000,000:', len(b))
+print('\nTOTAL primes below   1,000,000:',
+      sum(1 for pr in p if pr < 1_000_000))
+print('TOTAL primes below  10,000,000:', len(p))
+===
+
+F primes_upto(limit)
+   V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
+   L(n) 0 .< Int(limit ^ 0.5 + 1.5)
+      I is_prime[n]
+         L(i) (n * n .< limit + 1).step(n)
+            is_prime[i] = 0B
+   R enumerate(is_prime).filter((i, prime) -> prime).map((i, prime) -> i)
+V p = primes_upto(10'000'000)
+[Int] s
+[Int] w
+[Int] b
+L(i) 1 .< p.len - 1
+   I p[i] > (p[i - 1] + p[i + 1]) * 0.5
+      s [+]= p[i]
+   E I p[i] < (p[i - 1] + p[i + 1]) * 0.5
+      w [+]= p[i]
+   E
+      b [+]= p[i]
+print(‘The first   36   strong primes: ’s[0.<36])
+print(‘The   count   of the strong primes below   1,000,000: ’sum(s.filter(p -> p < 1'000'000).map(p -> 1)))
+print(‘The   count   of the strong primes below  10,000,000: ’s.len)
+print("\nThe first   37   weak primes: "w[0.<37])
+print(‘The   count   of the weak   primes below   1,000,000: ’sum(w.filter(p -> p < 1'000'000).map(p -> 1)))
+print(‘The   count   of the weak   primes below  10,000,000: ’w.len)
+print("\n\nThe first   10 balanced primes: "b[0.<10])
+print(‘The   count   of balanced   primes below   1,000,000: ’sum(b.filter(p -> p < 1'000'000).map(p -> 1)))
+print(‘The   count   of balanced   primes below  10,000,000: ’b.len)
+print("\nTOTAL primes below   1,000,000: "sum(p.filter(pr -> pr < 1'000'000).map(pr -> 1)))
+print(‘TOTAL primes below  10,000,000: ’p.len)
+===
+template <typename T1> auto primes_upto(const T1 &limit)
+{
+    auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
+    for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
+        if (is_prime[n])
+            for (auto i : range_el(n * n, limit + 1).step(n))
+                is_prime.set(i, false);
+    return enumerate(is_prime).filter([](const auto &i, const auto &prime){return prime;}).map([](const auto &i, const auto &prime){return i;});
+}
+auto p = primes_upto(10'000'000);
+Array<int> s;
+Array<int> w;
+Array<int> b;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(1, p.len() - 1))
+            if (p[i] > (p[i - 1] + p[i + 1]) * 0.5)
+                s.append(p[i]);
+            else if (p[i] < (p[i - 1] + p[i + 1]) * 0.5)
+                w.append(p[i]);
+            else
+                b.append(p[i]);
+        print(u"The first   36   strong primes: "_S & s[range_el(0, 36)]);
+        print(u"The   count   of the strong primes below   1,000,000: "_S & sum_map(s.filter([](const auto &p){return p < 1'000'000;}), [](const auto &p){return 1;}));
+        print(u"The   count   of the strong primes below  10,000,000: "_S & s.len());
+        print(u"\nThe first   37   weak primes: "_S & w[range_el(0, 37)]);
+        print(u"The   count   of the weak   primes below   1,000,000: "_S & sum_map(w.filter([](const auto &p){return p < 1'000'000;}), [](const auto &p){return 1;}));
+        print(u"The   count   of the weak   primes below  10,000,000: "_S & w.len());
+        print(u"\n\nThe first   10 balanced primes: "_S & b[range_el(0, 10)]);
+        print(u"The   count   of balanced   primes below   1,000,000: "_S & sum_map(b.filter([](const auto &p){return p < 1'000'000;}), [](const auto &p){return 1;}));
+        print(u"The   count   of balanced   primes below  10,000,000: "_S & b.len());
+        print(u"\nTOTAL primes below   1,000,000: "_S & sum_map(p.filter([](const auto &pr){return pr < 1'000'000;}), [](const auto &pr){return 1;}));
+        print(u"TOTAL primes below  10,000,000: "_S & p.len());
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Successive_prime_differences#D
+def primes_upto(limit):
+    is_prime = [False] * 2 + [True] * (limit - 1)
+    for n in range(int(limit**0.5 + 1.5)): # stop at ``sqrt(limit)``
+        if is_prime[n]:
+            for i in range(n*n, limit+1, n):
+                is_prime[i] = False
+    return [i for i, prime in enumerate(is_prime) if prime]
+
+def successive_primes(primes, diffs):
+    results : List[List[int]] = []
+    dl = len(diffs)
+
+    for i in range(len(primes) - dl):
+        group = [0] * (dl + 1)
+        group[0] = primes[i]
+        for j in range(i, i + dl):
+            if primes[j + 1] - primes[j] != diffs[j - i]:
+                break
+            group[j - i + 1] = primes[j + 1]
+        else:
+            results += [group]
+
+    return results
+
+prime_list = primes_upto(1_000_000)
+
+print('For primes less than 1,000,000:-')
+for diffs in [[2], [1], [2, 2], [2, 4], [4, 2], [6, 4, 2]]:
+    print('  For differences of %s ->' % diffs)
+    sp = successive_primes(prime_list, diffs)
+    print('    First group   =', sp[0])
+    print('    Last group    =', sp[-1])
+    print('    Number found  =', len(sp))
+    print()
+===
+F primes_upto(limit)
+   V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
+   L(n) 0 .< Int(limit ^ 0.5 + 1.5)
+      I is_prime[n]
+         L(i) (n * n .< limit + 1).step(n)
+            is_prime[i] = 0B
+   R enumerate(is_prime).filter((i, prime) -> prime).map((i, prime) -> i)
+
+F successive_primes(primes, diffs)
+   [[Int]] results
+   V dl = diffs.len
+
+   L(i) 0 .< primes.len - dl
+      V group = [0] * (dl + 1)
+      group[0] = primes[i]
+      L(j) i .< i + dl
+         I primes[j + 1] - primes[j] != diffs[j - i]
+            L.break
+         group[j - i + 1] = primes[j + 1]
+      L.was_no_break
+         results [+]= group
+   R results
+V prime_list = primes_upto(1'000'000)
+print(‘For primes less than 1,000,000:-’)
+L(diffs) [[2], [1], [2, 2], [2, 4], [4, 2], [6, 4, 2]]
+   print(‘  For differences of #. ->’.format(diffs))
+   V sp = successive_primes(prime_list, diffs)
+   print(‘    First group   = ’sp[0])
+   print(‘    Last group    = ’sp.last)
+   print(‘    Number found  = ’sp.len)
+   print()
+===
+template <typename T1> auto primes_upto(const T1 &limit)
+{
+    auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
+    for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
+        if (is_prime[n])
+            for (auto i : range_el(n * n, limit + 1).step(n))
+                is_prime.set(i, false);
+    return enumerate(is_prime).filter([](const auto &i, const auto &prime){return prime;}).map([](const auto &i, const auto &prime){return i;});
+}
+
+template <typename T1, typename T2> auto successive_primes(const T1 &primes, const T2 &diffs)
+{
+    Array<Array<int>> results;
+    auto dl = diffs.len();
+
+    for (auto i : range_el(0, primes.len() - dl)) {
+        auto group = create_array({0}) * (dl + 1);
+        _set<0>(group, primes[i]);
+        {bool was_break = false;
+        for (auto j : range_el(i, i + dl)) {
+            if (primes[j + 1] - primes[j] != diffs[j - i]) {
+                was_break = true;
+                break;
+            }
+            group.set(j - i + 1, primes[j + 1]);
+        }
+        if (!was_break)
+            results.append(group);
+        }
+    }
+    return results;
+}
+auto prime_list = primes_upto(1'000'000);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"For primes less than 1,000,000:-"_S);
+        for (auto &&diffs : create_array({create_array({2}), create_array({1}), create_array({2, 2}), create_array({2, 4}), create_array({4, 2}), create_array({6, 4, 2})})) {
+            print(u"  For differences of #. ->"_S.format(diffs));
+            auto sp = successive_primes(prime_list, diffs);
+            print(u"    First group   = "_S & _get<0>(sp));
+            print(u"    Last group    = "_S & sp.last());
+            print(u"    Number found  = "_S & sp.len());
+            print();
+        }
+    }
+} code_block_1;
