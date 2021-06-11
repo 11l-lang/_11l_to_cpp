@@ -1,4 +1,4 @@
-﻿import os, tokenizer, parse, re, tempfile, sys
+﻿import os, tokenizer, parse, re, tempfile, sys, locale
 sys.path.insert(0, '..') # `append(..)` here works incorrectly if 11l package is installed
 import python_to_11l.tokenizer as py_tokenizer, python_to_11l.parse as py_parser
 
@@ -11,6 +11,10 @@ def kdiff3(str1, str2):
         command += ' "' + full_fname + '"'
         open(full_fname, "wt", encoding='utf-8-sig').write(file[1])
     os.system(command)
+
+def p(s):
+    sys_encoding = locale.getpreferredencoding(False)
+    return s.encode(sys_encoding, errors = 'backslashreplace').decode(sys_encoding)
 
 tokenizer_tests = []
 for root, dirs, files in os.walk('tests/tokenizer'):
@@ -174,7 +178,7 @@ for fname in os.listdir('tests/python_to_cpp'):
                 exit(1)
             in_cpp = parse.parse_and_to_str(tokenizer.tokenize(expected_11l), expected_11l, full_fname)
             if in_cpp != expected_cpp:
-                print("Mismatch C++ for test:\n" + test + "\n[in file '" + full_fname + "']")
+                print("Mismatch C++ for test:\n" + p(test) + "\n[in file '" + full_fname + "']")
                 kdiff3(in_cpp, expected_cpp)
                 exit(1)
         except Exception as e:

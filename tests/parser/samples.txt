@@ -243,9 +243,11 @@ F f(str) {}
 f(‘id=’id)
 V s = ‘str’"\n"
 V s2 = a‘’b
-F to_str(indent)
-   V t = ‘str’(.expression.to_str())
-   R (‘ ’ * (indent * 3))‘’(.expression.to_str())"\n"
+T Node
+   String expression
+   F to_str(indent)
+      V t = ‘str’(.expression.to_str())
+      R (‘ ’ * (indent * 3))‘’(.expression.to_str())"\n"
 String tag = ‘<a href="’link‘"’
 tag ‘’= s
 ===
@@ -263,11 +265,16 @@ struct CodeBlock1
 } code_block_1;
 auto s = u"str"_S & u"\n"_S;
 auto s2 = a & b;
-template <typename T1> auto to_str(const T1 &indent)
+class Node
 {
-    auto t = u"str"_S & (expression.to_str());
-    return (u" "_S * (indent * 3)) & (expression.to_str()) & u"\n"_S;
-}
+public:
+    String expression;
+    template <typename T1> auto to_str(const T1 &indent)
+    {
+        auto t = u"str"_S & (expression.to_str());
+        return (u" "_S * (indent * 3)) & (expression.to_str()) & u"\n"_S;
+    }
+};
 String tag = u"<a href=\""_S & link & u"\""_S;
 
 struct CodeBlock2
@@ -395,31 +402,38 @@ auto f()
 
 F newlines()
    R ‘’
-F f()
-   V indent = 0
-   V r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
-   r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(’
-     ‘’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
-   r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘’
-     ‘(’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
-   r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘’ // ((
-     ‘’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
-   r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(some big ...’""
-     ‘... string’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
+T ASTFunctionDefinition
+   String function_name
+   F f()
+      V indent = 0
+      V r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
+      r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(’
+        ‘’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
+      r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘’
+        ‘(’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
+      r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘’ // ((
+        ‘’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
+      r = newlines()‘’(‘ ’ * (indent * 3))‘F ’(I .function_name != ‘__init__’ {.function_name} E ‘’)‘(some big ...’""
+        ‘... string’(I .function_arguments.empty | .function_arguments[0] != ‘self’ {.function_arguments} E .function_arguments[1..]).join(‘, ’)")\n"
 ===
 auto newlines()
 {
     return u""_S;
 }
-auto f()
+class ASTFunctionDefinition
 {
-    auto indent = 0;
-    auto r = newlines() & (u" "_S * (indent * 3)) & u"F "_S & (function_name != u"__init__" ? function_name : u""_S) & u"("_S & (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) & u")\n"_S;
-    r = newlines() & (u" "_S * (indent * 3)) & u"F "_S & (function_name != u"__init__" ? function_name : u""_S) & u"("_S & (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) & u")\n"_S;
-    r = newlines() & (u" "_S * (indent * 3)) & u"F "_S & (function_name != u"__init__" ? function_name : u""_S) & u"("_S & (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) & u")\n"_S;
-    r = newlines() & (u" "_S * (indent * 3)) & u"F "_S & (function_name != u"__init__" ? function_name : u""_S) & (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) & u")\n"_S;
-    r = newlines() & (u" "_S * (indent * 3)) & u"F "_S & (function_name != u"__init__" ? function_name : u""_S) & u"(some big ..."_S & u"... string"_S & (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) & u")\n"_S;
-}
+public:
+    String function_name;
+    auto f()
+    {
+        auto indent = 0;
+        auto r = newlines() & (u" "_S * (indent * 3)) & u"F "_S & (function_name != u"__init__" ? function_name : u""_S) & u"("_S & (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) & u")\n"_S;
+        r = newlines() & (u" "_S * (indent * 3)) & u"F "_S & (function_name != u"__init__" ? function_name : u""_S) & u"("_S & (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) & u")\n"_S;
+        r = newlines() & (u" "_S * (indent * 3)) & u"F "_S & (function_name != u"__init__" ? function_name : u""_S) & u"("_S & (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) & u")\n"_S;
+        r = newlines() & (u" "_S * (indent * 3)) & u"F "_S & (function_name != u"__init__" ? function_name : u""_S) & (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) & u")\n"_S;
+        r = newlines() & (u" "_S * (indent * 3)) & u"F "_S & (function_name != u"__init__" ? function_name : u""_S) & u"(some big ..."_S & u"... string"_S & (function_arguments.empty() || _get<0>(function_arguments) != u"self" ? function_arguments : function_arguments[range_ei(1)]).join(u", "_S) & u")\n"_S;
+    }
+};
 
 
 F tag(ch)
@@ -437,15 +451,22 @@ template <typename T1> auto tag2(const T1 &ch)
 }
 
 
-F f()
-   R .children[0].to_str()‘ ’(S .symbol.id {‘and’ {‘&’}; ‘or’ {‘|’}; ‘in’ {‘C’} E {‘symbol-’(.symbol.id)}})‘ ’(.children[1].to_str())
-   R .children[0].to_str()‘ ’(S .symbol.id {‘and’ {‘&’}; ‘or’ {‘|’}; ‘in’ {‘C’} E  ‘symbol-’(.symbol.id) })‘ ’(.children[1].to_str())
+T Node
+   [String] children
+   F f()
+      R .children[0].to_str()‘ ’(S .symbol.id {‘and’ {‘&’}; ‘or’ {‘|’}; ‘in’ {‘C’} E {‘symbol-’(.symbol.id)}})‘ ’(.children[1].to_str())
+      R .children[0].to_str()‘ ’(S .symbol.id {‘and’ {‘&’}; ‘or’ {‘|’}; ‘in’ {‘C’} E  ‘symbol-’(.symbol.id) })‘ ’(.children[1].to_str())
 ===
-auto f()
+class Node
 {
-    return _get<0>(children).to_str() & u" "_S & ([&](const auto &a){return a == u"and" ? u"&"_S : a == u"or" ? u"|"_S : a == u"in" ? u"C"_S : u"symbol-"_S & (symbol.id);}(symbol.id)) & u" "_S & (_get<1>(children).to_str());
-    return _get<0>(children).to_str() & u" "_S & ([&](const auto &a){return a == u"and" ? u"&"_S : a == u"or" ? u"|"_S : a == u"in" ? u"C"_S : u"symbol-"_S & (symbol.id);}(symbol.id)) & u" "_S & (_get<1>(children).to_str());
-}
+public:
+    Array<String> children;
+    auto f()
+    {
+        return _get<0>(children).to_str() & u" "_S & ([&](const auto &a){return a == u"and" ? u"&"_S : a == u"or" ? u"|"_S : a == u"in" ? u"C"_S : u"symbol-"_S & (symbol.id);}(symbol.id)) & u" "_S & (_get<1>(children).to_str());
+        return _get<0>(children).to_str() & u" "_S & ([&](const auto &a){return a == u"and" ? u"&"_S : a == u"or" ? u"|"_S : a == u"in" ? u"C"_S : u"symbol-"_S & (symbol.id);}(symbol.id)) & u" "_S & (_get<1>(children).to_str());
+    }
+};
 
 
 ---

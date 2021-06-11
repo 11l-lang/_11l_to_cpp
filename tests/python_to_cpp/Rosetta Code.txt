@@ -15181,3 +15181,201 @@ struct CodeBlock2
         print(u"Decoded: "_S & playfair.decode(enc));
     }
 } code_block_2;
+
+
+---
+# https://www.rosettacode.org/wiki/Generator/Exponential#D
+
+# Rejected this implementation as making lambdas mutable prevent passing them as `const T &` argument
+from copy import copy
+
+def powers(e):
+    i = 0.0
+    def f():
+        nonlocal e, i # =
+        r = i ** e
+        i += 1
+        return r
+    return f
+
+def filter2(af, bf):
+    caf = copy(af)
+    cbf = copy(bf)
+    a = caf()
+    b = cbf()
+
+    def f():
+        nonlocal a, b, caf, cbf # =
+        r : float
+        while True:
+            if a < b:
+                r = a
+                a = caf()
+                break
+            if b == a:
+                a = caf()
+            b = cbf()
+        return r
+
+    return f
+
+fgen = filter2(powers(2), powers(3))
+for i in range(20):
+    fgen()
+for i in range(10):
+    print(fgen(), end = ' ')
+
+
+# https://www.rosettacode.org/wiki/Generator/Exponential#C.2B.2B
+class Generator:
+    def next(self) -> float:
+        raise NotImplementedError()
+
+class PowersGenerator(Generator):
+    i = 0.0
+    e : float
+
+    def __init__(self, e):
+        self.e = e
+
+    def next(self) -> float:
+        r = self.i ** self.e
+        self.i += 1
+        return r
+
+class Filter:
+    gen : Generator
+    filter : Generator
+    lastG : float
+    lastF : float
+
+    def __init__(self, gen_ : Generator, filter : Generator):
+        self.gen = gen_
+        self.filter = filter
+        self.lastG = self.gen.next()
+        self.lastF = self.filter.next()
+
+    def __call__(self):
+        while self.lastG >= self.lastF:
+            if self.lastG == self.lastF:
+                self.lastG = self.gen.next()
+            self.lastF = self.filter.next()
+
+        out = self.lastG
+        self.lastG = self.gen.next()
+        return out
+
+gen = Filter(PowersGenerator(2), PowersGenerator(3))
+
+for i in range(20):
+    gen()
+for i in range(10):
+    print(gen(), end = ' ')
+===
+T Generator
+   F.virtual.abstract next() -> Float
+
+T PowersGenerator(Generator)
+   i = 0.0
+   Float e
+
+   F (e)
+      .e = e
+
+   F.virtual.assign next() -> Float
+      V r = .i ^ .e
+      .i++
+      R r
+
+T Filter
+   Generator gen
+   Generator filter
+   Float lastG
+   Float lastF
+
+   F (Generator gen_, Generator filter)
+      .gen = gen_
+      .filter = filter
+      .lastG = .gen.next()
+      .lastF = .filter.next()
+
+   F ()()
+      L .lastG >= .lastF
+         I .lastG == .lastF
+            .lastG = .gen.next()
+         .lastF = .filter.next()
+      V out = .lastG
+      .lastG = .gen.next()
+      R out
+V gen = Filter(PowersGenerator(2), PowersGenerator(3))
+
+L(i) 20
+   gen()
+L(i) 10
+   print(gen(), end' ‘ ’)
+===
+class Generator
+{
+public:
+    virtual double next() = 0;
+};
+
+class PowersGenerator : public Generator
+{
+public:
+    decltype(0.0) i = 0.0;
+    double e;
+
+    template <typename T1> PowersGenerator(const T1 &e) :
+        e(e)
+    {
+    }
+
+    virtual double next() override
+    {
+        auto r = pow(i, e);
+        i++;
+        return r;
+    }
+};
+
+class Filter
+{
+public:
+    std::unique_ptr<Generator> gen;
+    std::unique_ptr<Generator> filter;
+    double lastG;
+    double lastF;
+
+    Filter(std::unique_ptr<Generator> gen_, std::unique_ptr<Generator> filter) :
+        gen(std::move(gen_)),
+        filter(std::move(filter))
+    {
+        lastG = gen->next();
+        lastF = this->filter->next();
+    }
+
+    auto operator()()
+    {
+        while (lastG >= lastF) {
+            if (lastG == lastF)
+                lastG = gen->next();
+            lastF = filter->next();
+        }
+        auto out = lastG;
+        lastG = gen->next();
+        return out;
+    }
+};
+auto gen = Filter(std::make_unique<PowersGenerator>(2), std::make_unique<PowersGenerator>(3));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int i = 0; i < 20; i++)
+            gen();
+        for (int i = 0; i < 10; i++)
+            print(gen(), u" "_S);
+    }
+} code_block_1;

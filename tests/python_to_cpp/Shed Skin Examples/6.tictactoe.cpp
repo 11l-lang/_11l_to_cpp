@@ -128,7 +128,7 @@ public:
 
     template <typename T1> auto makeAImove(const T1 &player)
     {
-        auto scores = create_array({create_array({0.0}) * edge}) * edge;
+        auto scores = create_array({create_array({0.0}) * edge}) * (edge);
 
         for (auto rown : range_el(0, edge)) {
             auto row = __board[rown];

@@ -743,10 +743,13 @@ class SymbolNode:
                         return c1
                 if cts0 == '.' and len(self.children[0].children) == 1: # `.left.tree_indent()` -> `left->tree_indent()`
                     c00 = self.children[0].children[0].token_str()
-                    id_ = self.scope.find(c00)
-                    if id_ is None and type(self.scope.node) == ASTFunctionDefinition and type(self.scope.node.parent) == ASTTypeDefinition:
-                        id_ = self.scope.node.parent.find_id_including_base_types(c00)
+                    scp = self.scope
+                    while not (type(scp.node) == ASTFunctionDefinition and type(scp.node.parent) == ASTTypeDefinition):
+                        scp = scp.parent
+                    id_ = scp.node.parent.find_id_including_base_types(c00)
                     if id_ is not None and len(id_.ast_nodes) and type(id_.ast_nodes[0]) in (ASTVariableInitialization, ASTVariableDeclaration):
+                        if self.scope.find_in_current_function(c00):
+                            c00 = 'this->' + c00
                         if id_.ast_nodes[0].is_reference:
                             return c00 + '->' + c1
                         tid = self.scope.find(id_.ast_nodes[0].type.rstrip('?'))
