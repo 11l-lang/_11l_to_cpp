@@ -1,0 +1,168 @@
+# https://www.rosettacode.org/wiki/Circles_of_given_radius_through_two_points#Python
+from typing import NamedTuple
+import math
+
+class Circle(NamedTuple):
+    x : float
+    y : float
+    r : float
+    def __str__(self):
+        return 'Circle(x=%f, y=%f, r=%f)' % (self.x, self.y, self.r)
+
+class Error(Exception):
+    msg : str
+    def __init__(self, msg):
+        self.msg = msg
+
+def circles_from_p1p2r(p1, p2, r):
+    'Following explanation at http://mathforum.org/library/drmath/view/53027.html'
+    if r == 0.0:
+        raise Error('radius of zero')
+    (x1, y1) = p1
+    (x2, y2) = p2
+    if p1 == p2:
+        raise Error('coincident points gives infinite number of Circles')
+    # delta x, delta y between points
+    (dx, dy) = (x2 - x1, y2 - y1)
+    # dist between points
+    q = math.sqrt(dx**2 + dy**2)
+    if q > 2.0*r:
+        raise Error('separation of points > diameter')
+    # halfway point
+    (x3, y3) = ((x1+x2)/2, (y1+y2)/2)
+    # distance along the mirror line
+    d = math.sqrt(r**2-(q/2)**2)
+    # One answer
+    c1 = Circle(x = x3 - d*dy/q,
+                y = y3 + d*dx/q,
+                r = abs(r))
+    # The other answer
+    c2 = Circle(x = x3 + d*dy/q,
+                y = y3 - d*dx/q,
+                r = abs(r))
+    return (c1, c2)
+
+for p1, p2, r in [((0.1234, 0.9876), (0.8765, 0.2345), 2.0),
+                  ((0.0000, 2.0000), (0.0000, 0.0000), 1.0),
+                  ((0.1234, 0.9876), (0.1234, 0.9876), 2.0),
+                  ((0.1234, 0.9876), (0.8765, 0.2345), 0.5),
+                  ((0.1234, 0.9876), (0.1234, 0.9876), 0.0)]:
+    print('Through points:\n  %s,\n  %s\n  and radius %f\nYou can construct the following circles:'
+          % (p1, p2, r))
+    try:
+        (c1, c2) = circles_from_p1p2r(p1, p2, r)
+        print('  %s\n  %s\n' % (c1, c2))
+    except Error as v:
+        print('  ERROR: %s\n' % v.msg)
+===
+//import math
+
+T Circle
+   Float x
+   Float y
+   Float r
+   F String()
+      R ‘Circle(x=#.6, y=#.6, r=#.6)’.format(.x, .y, .r)
+   F (x, y, r)
+      .x = x
+      .y = y
+      .r = r
+
+T Error
+   String msg
+   F (msg)
+      .msg = msg
+
+F circles_from_p1p2r(p1, p2, r)
+   ‘Following explanation at http://mathforum.org/library/drmath/view/53027.html’
+   I r == 0.0
+      X Error(‘radius of zero’)
+   V (x1, y1) = p1
+   V (x2, y2) = p2
+   I p1 == p2
+      X Error(‘coincident points gives infinite number of Circles’)
+   V (dx, dy) = (x2 - x1, y2 - y1)
+   V q = sqrt(dx ^ 2 + dy ^ 2)
+   I q > 2.0 * r
+      X Error(‘separation of points > diameter’)
+   V (x3, y3) = ((x1 + x2) / 2, (y1 + y2) / 2)
+   V d = sqrt(r ^ 2 - (q / 2) ^ 2)
+   V c1 = Circle(x' x3 - d * dy / q, y' y3 + d * dx / q, r' abs(r))
+   V c2 = Circle(x' x3 + d * dy / q, y' y3 - d * dx / q, r' abs(r))
+   R (c1, c2)
+
+L(p1, p2, r) [((0.1234, 0.9876), (0.8765, 0.2345), 2.0), ((0.0000, 2.0000), (0.0000, 0.0000), 1.0), ((0.1234, 0.9876), (0.1234, 0.9876), 2.0), ((0.1234, 0.9876), (0.8765, 0.2345), 0.5), ((0.1234, 0.9876), (0.1234, 0.9876), 0.0)]
+   print("Through points:\n  #.,\n  #.\n  and radius #.6\nYou can construct the following circles:".format(p1, p2, r))
+   X.try
+      V (c1, c2) = circles_from_p1p2r(p1, p2, r)
+      print("  #.\n  #.\n".format(c1, c2))
+   X.catch Error v
+      print("  ERROR: #.\n".format(v.msg))
+===
+class Circle
+{
+public:
+    double x;
+    double y;
+    double r;
+    operator String() const
+    {
+        return u"Circle(x=#.6, y=#.6, r=#.6)"_S.format(x, y, r);
+    }
+    template <typename T1, typename T2, typename T3> Circle(const T1 &x, const T2 &y, const T3 &r) :
+        x(x),
+        y(y),
+        r(r)
+    {
+    }
+};
+
+class Error
+{
+public:
+    String msg;
+    template <typename T1> Error(const T1 &msg) :
+        msg(msg)
+    {
+    }
+};
+
+template <typename T1, typename T2, typename T3> auto circles_from_p1p2r(const T1 &p1, const T2 &p2, const T3 &r)
+{
+    u"Following explanation at http://mathforum.org/library/drmath/view/53027.html"_S;
+    if (r == 0.0)
+        throw Error(u"radius of zero"_S);
+    auto [x1, _y1_] = p1;
+    auto [x2, y2] = p2;
+    if (p1 == p2)
+        throw Error(u"coincident points gives infinite number of Circles"_S);
+    auto [dx, dy] = make_tuple(x2 - x1, y2 - _y1_);
+    auto q = sqrt(square(dx) + square(dy));
+    if (q > 2.0 * r)
+        throw Error(u"separation of points > diameter"_S);
+    auto [x3, y3] = make_tuple((x1 + x2) / 2.0, (_y1_ + y2) / 2.0);
+    auto d = sqrt(square(r) - square((q / 2.0)));
+    auto c1 = Circle(x3 - d * dy / q, y3 + d * dx / q, abs(r));
+    auto c2 = Circle(x3 + d * dy / q, y3 - d * dx / q, abs(r));
+    return make_tuple(c1, c2);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&[p1, p2, r] : create_array({make_tuple(make_tuple(0.1234, 0.9876), make_tuple(0.8765, 0.2345), 2.0), make_tuple(make_tuple(0.0000, 2.0000), make_tuple(0.0000, 0.0000), 1.0), make_tuple(make_tuple(0.1234, 0.9876), make_tuple(0.1234, 0.9876), 2.0), make_tuple(make_tuple(0.1234, 0.9876), make_tuple(0.8765, 0.2345), 0.5), make_tuple(make_tuple(0.1234, 0.9876), make_tuple(0.1234, 0.9876), 0.0)})) {
+            print(u"Through points:\n  #.,\n  #.\n  and radius #.6\nYou can construct the following circles:"_S.format(p1, p2, r));
+            try
+            {
+                auto [c1, c2] = circles_from_p1p2r(p1, p2, r);
+                print(u"  #.\n  #.\n"_S.format(c1, c2));
+            }
+            catch (const Error& v)
+            {
+                print(u"  ERROR: #.\n"_S.format(v.msg));
+            }
+        }
+    }
+} code_block_1;

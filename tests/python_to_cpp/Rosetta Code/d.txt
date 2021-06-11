@@ -1,0 +1,515 @@
+# https://www.rosettacode.org/wiki/Determine_if_two_triangles_overlap#D
+from typing import Tuple
+
+class Triangle:
+    p1 : Tuple[float, float]
+    p2 : Tuple[float, float]
+    p3 : Tuple[float, float]
+
+    def __init__(self, p1, p2, p3):
+        self.p1 = p1
+        self.p2 = p2
+        self.p3 = p3
+
+    def __str__(self):
+        return 'Triangle: %s, %s, %s' % (self.p1, self.p2, self.p3)
+
+    def det2D(self): # const
+        return self.p1[0] *(self.p2[1] - self.p3[1]) \
+             + self.p2[0] *(self.p3[1] - self.p1[1]) \
+             + self.p3[0] *(self.p1[1] - self.p2[1])
+
+def checkTriWinding(t : "Triangle", allowReversed):
+    detTri = t.det2D()
+    if detTri < 0.0:
+        assert allowReversed, "Triangle has wrong winding direction"
+        (t.p2, t.p3) = (t.p3, t.p2)
+
+def boundaryCollideChk(t : Triangle, eps : float):
+    return t.det2D() < eps
+
+def boundaryDoesntCollideChk(t : Triangle, eps : float):
+    return t.det2D() <= eps
+
+def triTri2D(t1 : "Triangle", t2 : "Triangle", eps = 0.0, allowReversed = False, onBoundary = True):
+    # Triangles must be expressed anti-clockwise
+    checkTriWinding(t1, allowReversed)
+    checkTriWinding(t2, allowReversed)
+    # 'onBoundary' determines whether points on boundary are considered as colliding or not
+    chkEdge = boundaryCollideChk if onBoundary else boundaryDoesntCollideChk
+    lp1 = [t1.p1, t1.p2, t1.p3]
+    lp2 = [t2.p1, t2.p2, t2.p3]
+
+    # for each edge E of t1
+    for i in range(3):
+        j = (i + 1) % 3
+        # Check all points of t2 lay on the external side of edge E.
+        # If they do, the triangles do not overlap.
+        if chkEdge(Triangle(lp1[i], lp1[j], lp2[0]), eps) and \
+           chkEdge(Triangle(lp1[i], lp1[j], lp2[1]), eps) and \
+           chkEdge(Triangle(lp1[i], lp1[j], lp2[2]), eps):
+            return False
+
+    # for each edge E of t2
+    for i in range(3):
+        j = (i + 1) % 3
+        # Check all points of t1 lay on the external side of edge E.
+        # If they do, the triangles do not overlap.
+        if chkEdge(Triangle(lp2[i], lp2[j], lp1[0]), eps) and \
+           chkEdge(Triangle(lp2[i], lp2[j], lp1[1]), eps) and \
+           chkEdge(Triangle(lp2[i], lp2[j], lp1[2]), eps):
+            return False
+
+    # The triangles overlap
+    return True
+
+def overlap(t1 : "Triangle", t2 : "Triangle", eps = 0.0, allowReversed = False, onBoundary = True):
+    if triTri2D(t1, t2, eps, allowReversed, onBoundary):
+        print('overlap')
+    else:
+        print('do not overlap')
+
+t1 = Triangle((0.0, 0.0), (5.0, 0.0), (0.0, 5.0))
+t2 = Triangle((0.0, 0.0), (5.0, 0.0), (0.0, 6.0))
+print(t1, " and\n", t2, sep = '')
+overlap(t1, t2)
+print()
+
+# need to allow reversed for this pair to avoid exception
+t1 = Triangle((0.0, 0.0), (0.0, 5.0), (5.0, 0.0))
+t2 = t1
+print(t1, " and\n", t2, sep = '')
+overlap(t1, t2, 0.0, True)
+print()
+
+t1 = Triangle((0.0, 0.0), (5.0, 0.0), (0.0, 5.0))
+t2 = Triangle((-10.0, 0.0), (-5.0, 0.0), (-1.0, 6.0))
+print(t1, " and\n", t2, sep = '')
+overlap(t1, t2)
+print()
+
+t1.p3 = (2.5, 5.0)
+t2 = Triangle((0.0, 4.0), (2.5, -1.0), (5.0, 4.0))
+print(t1, " and\n", t2, sep = '')
+overlap(t1, t2)
+print()
+
+t1 = Triangle((0.0, 0.0), (1.0, 1.0), (0.0, 2.0))
+t2 = Triangle((2.0, 1.0), (3.0, 0.0), (3.0, 2.0))
+print(t1, " and\n", t2, sep = '')
+overlap(t1, t2)
+print()
+
+t2 = Triangle((2.0, 1.0), (3.0, -2.0), (3.0, 4.0))
+print(t1, " and\n", t2, sep = '')
+overlap(t1, t2)
+print()
+
+t1 = Triangle((0.0, 0.0), (1.0, 0.0), (0.0, 1.0))
+t2 = Triangle((1.0, 0.0), (2.0, 0.0), (1.0, 1.1))
+print(t1, " and\n", t2, sep = '')
+print("which have only a single corner in contact, if boundary points collide")
+overlap(t1, t2)
+print()
+
+print(t1, " and\n", t2, sep = '')
+print("which have only a single corner in contact, if boundary points do not collide")
+overlap(t1, t2, 0.0, False, False)
+===
+
+T Triangle
+   (Float, Float) p1
+   (Float, Float) p2
+   (Float, Float) p3
+
+   F (p1, p2, p3)
+      .p1 = p1
+      .p2 = p2
+      .p3 = p3
+
+   F String()
+      R ‘Triangle: #., #., #.’.format(.p1, .p2, .p3)
+
+   F.const det2D()
+      R .p1[0] * (.p2[1] - .p3[1]) + .p2[0] * (.p3[1] - .p1[1]) + .p3[0] * (.p1[1] - .p2[1])
+
+F checkTriWinding(Triangle &t; allowReversed)
+   V detTri = t.det2D()
+   I detTri < 0.0
+      assert(allowReversed, ‘Triangle has wrong winding direction’)
+      swap(&t.p2, &t.p3)
+
+F boundaryCollideChk(Triangle t, Float eps)
+   R t.det2D() < eps
+
+F boundaryDoesntCollideChk(Triangle t, Float eps)
+   R t.det2D() <= eps
+
+F triTri2D(Triangle &t1, Triangle &t2; eps = 0.0, allowReversed = 0B, onBoundary = 1B)
+   checkTriWinding(&t1, allowReversed)
+   checkTriWinding(&t2, allowReversed)
+   V chkEdge = I onBoundary {:boundaryCollideChk} E :boundaryDoesntCollideChk
+   V lp1 = [t1.p1, t1.p2, t1.p3]
+   V lp2 = [t2.p1, t2.p2, t2.p3]
+
+   L(i) 3
+      V j = (i + 1) % 3
+
+      I chkEdge(Triangle(lp1[i], lp1[j], lp2[0]), eps) & chkEdge(Triangle(lp1[i], lp1[j], lp2[1]), eps) & chkEdge(Triangle(lp1[i], lp1[j], lp2[2]), eps)
+         R 0B
+
+   L(i) 3
+      V j = (i + 1) % 3
+
+      I chkEdge(Triangle(lp2[i], lp2[j], lp1[0]), eps) & chkEdge(Triangle(lp2[i], lp2[j], lp1[1]), eps) & chkEdge(Triangle(lp2[i], lp2[j], lp1[2]), eps)
+         R 0B
+   R 1B
+
+F overlap(Triangle &t1, Triangle &t2; eps = 0.0, allowReversed = 0B, onBoundary = 1B)
+   I triTri2D(&t1, &t2, eps, allowReversed, onBoundary)
+      print(‘overlap’)
+   E
+      print(‘do not overlap’)
+V t1 = Triangle((0.0, 0.0), (5.0, 0.0), (0.0, 5.0))
+V t2 = Triangle((0.0, 0.0), (5.0, 0.0), (0.0, 6.0))
+print(t1" and\n"t2)
+overlap(&t1, &t2)
+print()
+t1 = Triangle((0.0, 0.0), (0.0, 5.0), (5.0, 0.0))
+t2 = t1
+print(t1" and\n"t2)
+overlap(&t1, &t2, 0.0, 1B)
+print()
+t1 = Triangle((0.0, 0.0), (5.0, 0.0), (0.0, 5.0))
+t2 = Triangle((-10.0, 0.0), (-5.0, 0.0), (-1.0, 6.0))
+print(t1" and\n"t2)
+overlap(&t1, &t2)
+print()
+t1.p3 = (2.5, 5.0)
+t2 = Triangle((0.0, 4.0), (2.5, -1.0), (5.0, 4.0))
+print(t1" and\n"t2)
+overlap(&t1, &t2)
+print()
+t1 = Triangle((0.0, 0.0), (1.0, 1.0), (0.0, 2.0))
+t2 = Triangle((2.0, 1.0), (3.0, 0.0), (3.0, 2.0))
+print(t1" and\n"t2)
+overlap(&t1, &t2)
+print()
+t2 = Triangle((2.0, 1.0), (3.0, -2.0), (3.0, 4.0))
+print(t1" and\n"t2)
+overlap(&t1, &t2)
+print()
+t1 = Triangle((0.0, 0.0), (1.0, 0.0), (0.0, 1.0))
+t2 = Triangle((1.0, 0.0), (2.0, 0.0), (1.0, 1.1))
+print(t1" and\n"t2)
+print(‘which have only a single corner in contact, if boundary points collide’)
+overlap(&t1, &t2)
+print()
+print(t1" and\n"t2)
+print(‘which have only a single corner in contact, if boundary points do not collide’)
+overlap(&t1, &t2, 0.0, 0B, 0B)
+===
+class Triangle
+{
+public:
+    dvec2 p1;
+    dvec2 p2;
+    dvec2 p3;
+
+    template <typename T1, typename T2, typename T3> Triangle(const T1 &p1, const T2 &p2, const T3 &p3) :
+        p1(p1),
+        p2(p2),
+        p3(p3)
+    {
+    }
+
+    operator String() const
+    {
+        return u"Triangle: #., #., #."_S.format(p1, p2, p3);
+    }
+
+    auto det2D() const
+    {
+        return _get<0>(p1) * (_get<1>(p2) - _get<1>(p3)) + _get<0>(p2) * (_get<1>(p3) - _get<1>(p1)) + _get<0>(p3) * (_get<1>(p1) - _get<1>(p2));
+    }
+};
+
+template <typename T2> auto checkTriWinding(Triangle &t, const T2 &allowReversed)
+{
+    auto detTri = t.det2D();
+    if (detTri < 0.0) {
+        assert(allowReversed, u"Triangle has wrong winding direction"_S);
+        swap(t.p2, t.p3);
+    }
+}
+
+auto boundaryCollideChk(const Triangle &t, const double eps)
+{
+    return t.det2D() < eps;
+}
+
+auto boundaryDoesntCollideChk(const Triangle &t, const double eps)
+{
+    return t.det2D() <= eps;
+}
+
+template <typename T3 = decltype(0.0), typename T4 = decltype(false), typename T5 = decltype(true)> auto triTri2D(Triangle &t1, Triangle &t2, const T3 &eps = 0.0, const T4 &allowReversed = false, const T5 &onBoundary = true)
+{
+    checkTriWinding(t1, allowReversed);
+    checkTriWinding(t2, allowReversed);
+    auto chkEdge = onBoundary ? ::boundaryCollideChk : ::boundaryDoesntCollideChk;
+    auto lp1 = create_array({t1.p1, t1.p2, t1.p3});
+    auto lp2 = create_array({t2.p1, t2.p2, t2.p3});
+
+    for (int i = 0; i < 3; i++) {
+        auto j = mod((i + 1), 3);
+        if (chkEdge(Triangle(lp1[i], lp1[j], _get<0>(lp2)), eps) && chkEdge(Triangle(lp1[i], lp1[j], _get<1>(lp2)), eps) && chkEdge(Triangle(lp1[i], lp1[j], _get<2>(lp2)), eps))
+            return false;
+    }
+
+    for (int i = 0; i < 3; i++) {
+        auto j = mod((i + 1), 3);
+        if (chkEdge(Triangle(lp2[i], lp2[j], _get<0>(lp1)), eps) && chkEdge(Triangle(lp2[i], lp2[j], _get<1>(lp1)), eps) && chkEdge(Triangle(lp2[i], lp2[j], _get<2>(lp1)), eps))
+            return false;
+    }
+    return true;
+}
+
+template <typename T3 = decltype(0.0), typename T4 = decltype(false), typename T5 = decltype(true)> auto overlap(Triangle &t1, Triangle &t2, const T3 &eps = 0.0, const T4 &allowReversed = false, const T5 &onBoundary = true)
+{
+    if (triTri2D(t1, t2, eps, allowReversed, onBoundary))
+        print(u"overlap"_S);
+    else
+        print(u"do not overlap"_S);
+}
+auto t1 = Triangle(make_tuple(0.0, 0.0), make_tuple(5.0, 0.0), make_tuple(0.0, 5.0));
+auto t2 = Triangle(make_tuple(0.0, 0.0), make_tuple(5.0, 0.0), make_tuple(0.0, 6.0));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(t1 & u" and\n"_S & t2);
+        overlap(t1, t2);
+        print();
+        t1 = Triangle(make_tuple(0.0, 0.0), make_tuple(0.0, 5.0), make_tuple(5.0, 0.0));
+        t2 = t1;
+        print(t1 & u" and\n"_S & t2);
+        overlap(t1, t2, 0.0, true);
+        print();
+        t1 = Triangle(make_tuple(0.0, 0.0), make_tuple(5.0, 0.0), make_tuple(0.0, 5.0));
+        t2 = Triangle(make_tuple(-10.0, 0.0), make_tuple(-5.0, 0.0), make_tuple(-1.0, 6.0));
+        print(t1 & u" and\n"_S & t2);
+        overlap(t1, t2);
+        print();
+        t1.p3 = make_tuple(2.5, 5.0);
+        t2 = Triangle(make_tuple(0.0, 4.0), make_tuple(2.5, -1.0), make_tuple(5.0, 4.0));
+        print(t1 & u" and\n"_S & t2);
+        overlap(t1, t2);
+        print();
+        t1 = Triangle(make_tuple(0.0, 0.0), make_tuple(1.0, 1.0), make_tuple(0.0, 2.0));
+        t2 = Triangle(make_tuple(2.0, 1.0), make_tuple(3.0, 0.0), make_tuple(3.0, 2.0));
+        print(t1 & u" and\n"_S & t2);
+        overlap(t1, t2);
+        print();
+        t2 = Triangle(make_tuple(2.0, 1.0), make_tuple(3.0, -2.0), make_tuple(3.0, 4.0));
+        print(t1 & u" and\n"_S & t2);
+        overlap(t1, t2);
+        print();
+        t1 = Triangle(make_tuple(0.0, 0.0), make_tuple(1.0, 0.0), make_tuple(0.0, 1.0));
+        t2 = Triangle(make_tuple(1.0, 0.0), make_tuple(2.0, 0.0), make_tuple(1.0, 1.1));
+        print(t1 & u" and\n"_S & t2);
+        print(u"which have only a single corner in contact, if boundary points collide"_S);
+        overlap(t1, t2);
+        print();
+        print(t1 & u" and\n"_S & t2);
+        print(u"which have only a single corner in contact, if boundary points do not collide"_S);
+        overlap(t1, t2, 0.0, false, false);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Dijkstra%27s_algorithm#Python
+import collections
+from typing import NamedTuple, List, Set
+from copy import copy
+
+class Edge(NamedTuple):
+    start : str
+    end : str
+    cost : int
+
+class Graph:
+    edges : List[Edge]
+    vertices : Set[str]
+
+    def __init__(self, edges):
+        self.edges = [Edge(s, e, c) for s, e, c in edges]
+        # print(dir(self.edges[0]))
+        self.vertices = {e.start for e in self.edges}.union({e.end for e in self.edges})
+
+    def dijkstra(self, source, dest):
+        assert source in self.vertices
+        dist = {vertex: float('inf') for vertex in self.vertices}
+        previous = {vertex: '' for vertex in self.vertices}
+        dist[source] = 0
+        q = copy(self.vertices)
+        def create_list():
+            l : List[Tuple[str, int]] = []
+            return l
+        neighbours = {vertex: create_list() for vertex in self.vertices}
+        for start, end, cost in self.edges:
+            neighbours[start].append((end, cost))
+        #pp(neighbours)
+
+        while len(q) != 0:
+            # pp(q)
+            u = min(q, key=lambda vertex: dist[vertex])
+            q.remove(u)
+            if dist[u] == float('inf') or u == dest:
+                break
+            for v, cost in neighbours[u]:
+                alt = dist[u] + cost
+                if alt < dist[v]:                                  # Relax (u,v,a)
+                    dist[v] = alt
+                    previous[v] = u
+        #pp(previous)
+        s = collections.deque() # str
+        u = dest
+        while previous[u] != '':
+            s.appendleft(u)
+            u = previous[u]
+        s.appendleft(u)
+        return s
+
+graph = Graph([("a", "b", 7),  ("a", "c", 9),  ("a", "f", 14), ("b", "c", 10),
+               ("b", "d", 15), ("c", "d", 11), ("c", "f", 2),  ("d", "e", 6),
+               ("e", "f", 9)])
+print(graph.dijkstra("a", "e"))
+===
+//import collections
+
+T Edge
+   String start
+   String end
+   Int cost
+   F (start, end, cost)
+      .start = start
+      .end = end
+      .cost = cost
+
+T Graph
+   [Edge] edges
+   Set[String] vertices
+
+   F (edges)
+      .edges = edges.map((s, e, c) -> Edge(s, e, c))
+      .vertices = Set(.edges.map(e -> e.start)).union(Set(.edges.map(e -> e.end)))
+
+   F dijkstra(source, dest)
+      assert(source C .vertices)
+      V dist = Dict(.vertices, vertex -> (vertex, Float.infinity))
+      V previous = Dict(.vertices, vertex -> (vertex, ‘’))
+      dist[source] = 0
+      V q = copy(.vertices)
+      F create_list()
+         [(String, Int)] l
+         R l
+      V neighbours = Dict(.vertices, vertex -> (vertex, @create_list()))
+      L(start, end, cost) .edges
+         neighbours[start].append((end, cost))
+
+      L !q.empty
+         V u = min(q, key' vertex -> @dist[vertex])
+         q.remove(u)
+         I dist[u] == Float.infinity | u == dest
+            L.break
+         L(v, cost) neighbours[u]
+            V alt = dist[u] + cost
+            I alt < dist[v]
+               dist[v] = alt
+               previous[v] = u
+      V s = Deque[String]()
+      V u = dest
+      L previous[u] != ‘’
+         s.append_left(u)
+         u = previous[u]
+      s.append_left(u)
+      R s
+V graph = Graph([(‘a’, ‘b’, 7), (‘a’, ‘c’, 9), (‘a’, ‘f’, 14), (‘b’, ‘c’, 10), (‘b’, ‘d’, 15), (‘c’, ‘d’, 11), (‘c’, ‘f’, 2), (‘d’, ‘e’, 6), (‘e’, ‘f’, 9)])
+print(graph.dijkstra(‘a’, ‘e’))
+===
+class Edge
+{
+public:
+    String start;
+    String end;
+    int cost;
+    template <typename T1, typename T2, typename T3> Edge(const T1 &start, const T2 &end, const T3 &cost) :
+        start(start),
+        end(end),
+        cost(cost)
+    {
+    }
+};
+
+class Graph
+{
+public:
+    Array<Edge> edges;
+    Set<String> vertices;
+
+    template <typename T1> Graph(const T1 &edges)
+    {
+        this->edges = edges.map([](const auto &s, const auto &e, const auto &c){return Edge(s, e, c);});
+        vertices = create_set(this->edges.map([](const auto &e){return e.start;})).set_union(create_set(this->edges.map([](const auto &e){return e.end;})));
+    }
+
+    template <typename T1, typename T2> auto dijkstra(const T1 &source, const T2 &dest)
+    {
+        assert(in(source, vertices));
+        auto dist = create_dict(vertices, [](const auto &vertex){return make_tuple(vertex, std::numeric_limits<double>::infinity());});
+        auto previous = create_dict(vertices, [](const auto &vertex){return make_tuple(vertex, u""_S);});
+        dist.set(source, 0);
+        auto q = copy(vertices);
+        auto create_list = []()
+        {
+            Array<Tuple<String, int>> l;
+            return l;
+        };
+        auto neighbours = create_dict(vertices, [&create_list](const auto &vertex){return make_tuple(vertex, create_list());});
+        for (auto &&[start, end, cost] : edges)
+            neighbours[start].append(make_tuple(end, cost));
+
+        while (!q.empty()) {
+            auto u = min_with_key(q, [&dist](const auto &vertex){return dist[vertex];});
+            q.remove(u);
+            if (dist[u] == std::numeric_limits<double>::infinity() || u == dest)
+                break;
+            for (auto &&[v, cost] : neighbours[u]) {
+                auto alt = dist[u] + cost;
+                if (alt < dist[v]) {
+                    dist.set(v, alt);
+                    previous.set(v, u);
+                }
+            }
+        }
+        auto s = Deque<String>();
+        auto u = dest;
+        while (previous[u] != u"") {
+            s.append_left(u);
+            u = previous[u];
+        }
+        s.append_left(u);
+        return s;
+    }
+};
+auto graph = Graph(create_array({make_tuple(u"a"_S, u"b"_S, 7), make_tuple(u"a"_S, u"c"_S, 9), make_tuple(u"a"_S, u"f"_S, 14), make_tuple(u"b"_S, u"c"_S, 10), make_tuple(u"b"_S, u"d"_S, 15), make_tuple(u"c"_S, u"d"_S, 11), make_tuple(u"c"_S, u"f"_S, 2), make_tuple(u"d"_S, u"e"_S, 6), make_tuple(u"e"_S, u"f"_S, 9)}));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(graph.dijkstra(u"a"_S, u"e"_S));
+    }
+} code_block_1;

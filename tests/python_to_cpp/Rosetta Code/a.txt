@@ -1,0 +1,52 @@
+# https://www.rosettacode.org/wiki/Arrays#Python
+from typing import List
+
+array : List[int] = []
+array.append(1)
+array.append(3)
+array[0] = 2
+print(array[0]) # retrieve first element in an array
+print(array[-1]) # retrieve last element in an array
+print(array.pop())  # pop last item in an array
+print(array.pop(0)) # pop first item in an array
+
+size = 10
+myArray = [0] * size # create single-dimensional array
+width = 3
+height = 4
+myArray2 = [[0]* width] * height # create array of arrays
+===
+[Int] array
+array.append(1)
+array.append(3)
+array[0] = 2
+print(array[0])
+print(array.last)
+print(array.pop())
+print(array.pop(0))
+V size = 10
+V myArray = [0] * size
+V width = 3
+V height = 4
+V myArray2 = [[0] * width] * height
+===
+Array<int> array;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        array.append(1);
+        array.append(3);
+        _set<0>(array, 2);
+        print(_get<0>(array));
+        print(array.last());
+        print(array.pop());
+        print(array.pop(0));
+    }
+} code_block_1;
+auto size = 10;
+auto myArray = create_array({0}) * size;
+auto width = 3;
+auto height = 4;
+auto myArray2 = create_array({create_array({0}) * width}) * height;

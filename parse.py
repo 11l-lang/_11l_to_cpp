@@ -3228,6 +3228,7 @@ set_scope.add_name('map', ASTFunctionDefinition([('f', '', '')]))
 builtins_scope.ids['Set'].ast_nodes[0].scope = set_scope
 deque_scope = Scope(None)
 deque_scope.add_name('append', ASTFunctionDefinition([('x', '', '')]))
+deque_scope.add_name('append_left', ASTFunctionDefinition([('x', '', '')]))
 deque_scope.add_name('pop_left', ASTFunctionDefinition([]))
 builtins_scope.ids['Deque'].ast_nodes[0].scope = deque_scope
 

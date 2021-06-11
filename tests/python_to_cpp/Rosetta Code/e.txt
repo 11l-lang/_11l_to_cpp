@@ -1,0 +1,212 @@
+# https://www.rosettacode.org/wiki/Eertree#D
+Char = str
+
+class Node:
+    length : int
+    suffix : int
+
+    def __init__(self, length, suffix = 0):
+        self.length = length
+        self.suffix = suffix
+        self.edges : Dict[Char, int] = {}
+
+oddRoot = 1
+
+def eertree(s):
+    tree = [Node(0, oddRoot), Node(-1, oddRoot)]
+    suffix = oddRoot
+    for i, c in enumerate(s):
+        n = suffix
+        k : int
+        while True:
+            k = tree[n].length
+            b = i-k-1
+            if b>=0 and s[b]==c:
+                break
+            n=tree[n].suffix
+
+        if c in tree[n].edges:
+            suffix = tree[n].edges[c]
+            continue
+
+        suffix = len(tree)
+        tree += [Node(k+2)]
+        tree[n].edges[c] = suffix
+        if tree[suffix].length == 1:
+            tree[suffix].suffix = 0
+            continue
+
+        while True:
+            n = tree[n].suffix
+            b = i-tree[n].length-1
+            if b>=0 and s[b]==c:
+                break
+
+        tree[suffix].suffix = tree[n].edges[c]
+
+    return tree
+
+def subPalindromes(tree):
+    s : List[str] = []
+
+    def children(n : int, p : str) -> None:
+        nonlocal s
+        for c, n in tree[n].edges.items():
+            p = c + p + c
+            s += [p]
+            children(n, p)
+
+    children(0, '')
+    for c, n in tree[1].edges.items():
+        s += [c]
+        children(n, c)
+
+    return s
+
+tree = eertree("eertree")
+print(subPalindromes(tree))
+===
+
+T Node
+   Int length
+   Int suffix
+   [Char = Int] edges
+
+   F (length, suffix = 0)
+      .length = length
+      .suffix = suffix
+V oddRoot = 1
+
+F eertree(s)
+   V tree = [Node(0, :oddRoot), Node(-1, :oddRoot)]
+   V suffix = :oddRoot
+   L(c) s
+      V i = L.index
+      V n = suffix
+      Int k
+      L
+         k = tree[n].length
+         V b = i - k - 1
+         I b >= 0 & s[b] == c
+            L.break
+         n = tree[n].suffix
+
+      I c C tree[n].edges
+         suffix = tree[n].edges[c]
+         L.continue
+      suffix = tree.len
+      tree [+]= Node(k + 2)
+      tree[n].edges[c] = suffix
+      I tree[suffix].length == 1
+         tree[suffix].suffix = 0
+         L.continue
+
+      L
+         n = tree[n].suffix
+         V b = i - tree[n].length - 1
+         I b >= 0 & s[b] == c
+            L.break
+      tree[suffix].suffix = tree[n].edges[c]
+   R tree
+
+F subPalindromes(tree)
+   [String] s
+
+   F children(Int n, String =p) -> N
+      L(c, n) @tree[n].edges
+         p = c‘’p‘’c
+         @s [+]= p
+         @children(n, p)
+   children(0, ‘’)
+   L(c, n) tree[1].edges
+      s [+]= c
+      children(n, c)
+   R s
+V tree = eertree(‘eertree’)
+print(subPalindromes(tree))
+===
+class Node
+{
+public:
+    int length;
+    int suffix;
+    Dict<Char, int> edges;
+
+    template <typename T1, typename T2 = decltype(0)> Node(const T1 &length, const T2 &suffix = 0) :
+        length(length),
+        suffix(suffix)
+    {
+    }
+};
+auto oddRoot = 1;
+
+template <typename T1> auto eertree(const T1 &s)
+{
+    auto tree = create_array<Node>({Node(0, ::oddRoot), Node(-1, ::oddRoot)});
+    auto suffix = ::oddRoot;
+    {int Lindex = 0;
+    for (auto &&c : s) {{
+        auto i = Lindex;
+        auto n = suffix;
+        int k;
+        while (true) {
+            k = tree[n].length;
+            auto b = i - k - 1;
+            if (b >= 0 && s[b] == c)
+                break;
+            n = tree[n].suffix;
+        }
+
+        if (in(c, tree[n].edges)) {
+            suffix = tree[n].edges[c];
+            goto on_continue;
+        }
+        suffix = tree.len();
+        tree.append(Node(k + 2));
+        tree[n].edges.set(c, suffix);
+        if (tree[suffix].length == 1) {
+            tree[suffix].suffix = 0;
+            goto on_continue;
+        }
+
+        while (true) {
+            n = tree[n].suffix;
+            auto b = i - tree[n].length - 1;
+            if (b >= 0 && s[b] == c)
+                break;
+        }
+        tree[suffix].suffix = tree[n].edges[c];
+} on_continue:
+        Lindex++;
+    }}
+    return tree;
+}
+
+template <typename T1> auto subPalindromes(const T1 &tree)
+{
+    Array<String> s;
+
+    std::function<void(int, String)> children = [&children, &s, &tree](const int n, String p)
+    {
+        for (auto &&[c, n] : tree[n].edges) {
+            p = c & p & c;
+            s.append(p);
+            children(n, p);
+        }
+    };
+    children(0, u""_S);
+    for (auto &&[c, n] : _get<1>(tree).edges) {
+        s.append(c);
+        children(n, c);
+    }
+    return s;
+}
+auto tree = eertree(u"eertree"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(subPalindromes(tree));
+    }
+} code_block_1;

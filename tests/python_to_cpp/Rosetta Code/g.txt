@@ -1,0 +1,48 @@
+# https://www.rosettacode.org/wiki/Generate_Chess960_starting_position#Python
+import random
+Char = str
+
+def random960():
+    start = ['R', 'K', 'R']         # Subsequent order unchanged by insertions.
+    #
+    for piece in ['Q', 'N', 'N']:
+        start.insert(random.randrange(len(start)+1), piece)
+    #
+    bishpos = random.randrange(len(start)+1)
+    start.insert(bishpos, Char('B'))
+    start.insert(random.randrange(bishpos + 1, len(start) + 1, 2), Char('B'))
+    return start
+
+print(random960())
+===
+//import random
+
+F random960()
+   V start = [‘R’, ‘K’, ‘R’]
+
+   L(piece) [‘Q’, ‘N’, ‘N’]
+      start.insert(random:(start.len + 1), piece)
+   V bishpos = random:(start.len + 1)
+   start.insert(bishpos, Char(‘B’))
+   start.insert(random:(bishpos + 1), Char(‘B’))
+   R start
+print(random960())
+===
+auto random960()
+{
+    auto start = create_array({u'R'_C, u'K'_C, u'R'_C});
+    for (auto &&piece : create_array({u'Q'_C, u'N'_C, u'N'_C}))
+        start.insert(randomns::_(start.len() + 1), piece);
+    auto bishpos = randomns::_(start.len() + 1);
+    start.insert(bishpos, u'B'_C);
+    start.insert(randomns::_(bishpos + 1), u'B'_C);
+    return start;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(random960());
+    }
+} code_block_1;
