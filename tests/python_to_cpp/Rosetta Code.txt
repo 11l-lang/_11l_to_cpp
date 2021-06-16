@@ -10787,7 +10787,7 @@ template <typename T1, typename T2> auto calc_difference(const T1 &m, T2 &d)
             }
             v = m[i][j].voltage - v / n;
             d[i][j].voltage = v;
-            if (m[i][j].fixed == decltype(m[i][j].fixed)::FREE)
+            if (m[i][j].fixed == TYPE_RM_REF(m[i][j].fixed)::FREE)
                 total += square(v);
         }
     return total;
@@ -15377,5 +15377,211 @@ struct CodeBlock1
             gen();
         for (int i = 0; i < 10; i++)
             print(gen(), u" "_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Langton%27s_ant#Python
+from enum import Enum, IntEnum
+Char = str
+
+class Dir(IntEnum):
+    UP = 0
+    RIGHT = 1
+    DOWN = 2
+    LEFT = 3
+
+color_WHITE = Char(' ')
+color_BLACK = Char('#')
+
+def invert_color(grid : list, x, y):
+    """Invert the color of grid at x, y coordinate."""
+    if grid[y][x] == color_BLACK:
+        grid[y][x] = color_WHITE
+    else:
+        grid[y][x] = color_BLACK
+
+def next_direction(grid, x, y, direction):
+    """Compute next direction according to current position and direction."""
+    turn_right = grid[y][x] != color_BLACK
+    direction_index = int(direction)
+    if turn_right:
+        direction_index = (direction_index + 1) % 4
+    else:
+        direction_index = (direction_index + 4 - 1) % 4
+    directions = [Dir.UP, Dir.RIGHT, Dir.DOWN, Dir.LEFT]
+    direction = directions[direction_index]
+    return direction
+
+def next_position(x, y, direction):
+    """Compute next position according to direction."""
+    if direction == Dir.UP:
+        y -= 1
+    elif direction == Dir.RIGHT:
+        x -= 1
+    elif direction == Dir.DOWN:
+        y += 1
+    elif direction == Dir.LEFT:
+        x += 1
+    return (x, y)
+
+def print_grid(grid):
+    """Display grid."""
+    print(80 * "#")
+    print("\n".join("".join(row) for row in grid))
+
+def ant(width, height, max_nb_steps):
+    """Langton's ant."""
+    grid = [[color_WHITE] * width for _ in range(height)]
+    x = width // 2
+    y = height // 2
+    direction = Dir.UP
+
+    i = 0
+    while i < max_nb_steps and 0 <= x < width and 0 <= y < height:
+        invert_color(grid, x, y)
+        direction = next_direction(grid, x, y, direction)
+        (x, y) = next_position(x, y, direction)
+        #print_grid(grid)
+        i += 1
+
+    print_grid(grid)
+
+ant(width=75, height=52, max_nb_steps=12000)
+===
+T.enum Dir
+   UP
+   RIGHT
+   DOWN
+   LEFT
+V color_WHITE = Char(‘ ’)
+V color_BLACK = Char(‘#’)
+
+F invert_color(&grid, x, y)
+   ‘Invert the color of grid at x, y coordinate.’
+   I grid[y][x] == :color_BLACK
+      grid[y][x] = :color_WHITE
+   E
+      grid[y][x] = :color_BLACK
+
+F next_direction(grid, x, y, =direction)
+   ‘Compute next direction according to current position and direction.’
+   V turn_right = grid[y][x] != :color_BLACK
+   V direction_index = Int(direction)
+   I turn_right
+      direction_index = (direction_index + 1) % 4
+   E
+      direction_index = (direction_index + 4 - 1) % 4
+   V directions = [Dir.UP, Dir.RIGHT, Dir.DOWN, Dir.LEFT]
+   direction = directions[direction_index]
+   R direction
+
+F next_position(=x, =y, direction)
+   ‘Compute next position according to direction.’
+   I direction == UP
+      y--
+   E I direction == RIGHT
+      x--
+   E I direction == DOWN
+      y++
+   E I direction == LEFT
+      x++
+   R (x, y)
+
+F print_grid(grid)
+   ‘Display grid.’
+   print(80 * ‘#’)
+   print(grid.map(row -> row.join(‘’)).join("\n"))
+
+F ant(width, height, max_nb_steps)
+   ‘Langton's ant.’
+   V grid = [[:color_WHITE] * width] * height
+   V x = width I/ 2
+   V y = height I/ 2
+   V direction = Dir.UP
+   V i = 0
+   L i < max_nb_steps & x C 0 .< width & y C 0 .< height
+      invert_color(&grid, x, y)
+      direction = next_direction(grid, x, y, direction)
+      (x, y) = next_position(x, y, direction)
+      i++
+   print_grid(grid)
+ant(width' 75, height' 52, max_nb_steps' 12000)
+===
+enum class Dir {
+    UP,
+    RIGHT,
+    DOWN,
+    LEFT
+};
+auto color_WHITE = u' '_C;
+auto color_BLACK = u'#'_C;
+
+template <typename T1, typename T2, typename T3> auto invert_color(T1 &grid, const T2 &x, const T3 &y)
+{
+    u"Invert the color of grid at x, y coordinate."_S;
+    if (grid[y][x] == ::color_BLACK)
+        grid[y].set(x, ::color_WHITE);
+    else
+        grid[y].set(x, ::color_BLACK);
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto next_direction(const T1 &grid, const T2 &x, const T3 &y, T4 direction)
+{
+    u"Compute next direction according to current position and direction."_S;
+    auto turn_right = grid[y][x] != ::color_BLACK;
+    auto direction_index = to_int(direction);
+    if (turn_right)
+        direction_index = mod((direction_index + 1), 4);
+    else
+        direction_index = mod((direction_index + 4 - 1), 4);
+    auto directions = create_array({Dir::UP, Dir::RIGHT, Dir::DOWN, Dir::LEFT});
+    direction = directions[direction_index];
+    return direction;
+}
+
+template <typename T1, typename T2, typename T3> auto next_position(T1 x, T2 y, const T3 &direction)
+{
+    u"Compute next position according to direction."_S;
+    if (direction == TYPE_RM_REF(direction)::UP)
+        y--;
+    else if (direction == TYPE_RM_REF(direction)::RIGHT)
+        x--;
+    else if (direction == TYPE_RM_REF(direction)::DOWN)
+        y++;
+    else if (direction == TYPE_RM_REF(direction)::LEFT)
+        x++;
+    return make_tuple(x, y);
+}
+
+template <typename T1> auto print_grid(const T1 &grid)
+{
+    u"Display grid."_S;
+    print(80 * u"#"_S);
+    print(grid.map([](const auto &row){return row.join(u""_S);}).join(u"\n"_S));
+}
+
+template <typename T1, typename T2, typename T3> auto ant(const T1 &width, const T2 &height, const T3 &max_nb_steps)
+{
+    u"Langton's ant."_S;
+    auto grid = create_array({create_array({::color_WHITE}) * width}) * height;
+    auto x = idiv(width, 2);
+    auto y = idiv(height, 2);
+    auto direction = Dir::UP;
+    auto i = 0;
+    while (i < max_nb_steps && in(x, range_el(0, width)) && in(y, range_el(0, height))) {
+        invert_color(grid, x, y);
+        direction = next_direction(grid, x, y, direction);
+        assign_from_tuple(x, y, next_position(x, y, direction));
+        i++;
+    }
+    print_grid(grid);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        ant(75, 52, 12000);
     }
 } code_block_1;

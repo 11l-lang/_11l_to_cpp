@@ -208,7 +208,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
             if (in(source[i], u"{}"_S))
                 continue;
 
-            if (tokens.len() && tokens.last().category == decltype(tokens.last().category)::STRING_CONCATENATOR && in(source[i], u"\"'‘"_S)) {
+            if (tokens.len() && tokens.last().category == TYPE_RM_REF(tokens.last().category)::STRING_CONCATENATOR && in(source[i], u"\"'‘"_S)) {
                 if (line_continuations != nullptr)
                     line_continuations->append(tokens.last().end);
                 if (in(source[range_el(i, i + 2)], make_tuple(u"\"\""_S, u"‘’"_S)))
@@ -216,7 +216,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                 continue;
             }
 
-            if (tokens.len() && tokens.last().category == decltype(tokens.last().category)::STRING_LITERAL && in(source[range_el(i, i + 2)], make_tuple(u"\"\""_S, u"‘’"_S))) {
+            if (tokens.len() && tokens.last().category == TYPE_RM_REF(tokens.last().category)::STRING_LITERAL && in(source[range_el(i, i + 2)], make_tuple(u"\"\""_S, u"‘’"_S))) {
                 if (line_continuations != nullptr)
                     line_continuations->append(tokens.last().end);
                 tokens.append(Token(i, i, Token::Category::STRING_CONCATENATOR));
@@ -224,7 +224,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                 continue;
             }
 
-            if ((tokens.len() && tokens.last().category == decltype(tokens.last().category)::OPERATOR && in(tokens.last().value(source), tokenizer::binary_operators[tokens.last().end - tokens.last().start]) && source[range_el(tokens.last().end - 4, tokens.last().end)] != u"-> &")) {
+            if ((tokens.len() && tokens.last().category == TYPE_RM_REF(tokens.last().category)::OPERATOR && in(tokens.last().value(source), tokenizer::binary_operators[tokens.last().end - tokens.last().start]) && source[range_el(tokens.last().end - 4, tokens.last().end)] != u"-> &")) {
                 if (line_continuations != nullptr)
                     line_continuations->append(tokens.last().end);
                 continue;
@@ -268,7 +268,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                 prev_linestart = ii;
 
                 if (indentation_level == prev_indentation_level) {
-                    if (tokens.len() && tokens.last().category != decltype(tokens.last().category)::SCOPE_END)
+                    if (tokens.len() && tokens.last().category != TYPE_RM_REF(tokens.last().category)::SCOPE_END)
                         tokens.append(Token(linestart - 1, linestart, Token::Category::STATEMENT_SEPARATOR));
                 }
                 else if (indentation_level > prev_indentation_level) {
@@ -334,7 +334,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                 i = lexem_start + operator_s.len();
                 if (source[i - 1] == u' ')
                     i--;
-                category = decltype(category)::OPERATOR;
+                category = TYPE_RM_REF(category)::OPERATOR;
             }
 
             else if (ch.is_alpha() || in(ch, make_tuple(u"_"_S, u"@"_S))) {
@@ -361,7 +361,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
 
                 if (source[range_el(i, i + 1)] == u'/' && in(source[range_el(i - 1, i)], u"IЦ"_S)) {
                     if (source[range_el(i - 2, i - 1)] == u' ')
-                        category = decltype(category)::OPERATOR;
+                        category = TYPE_RM_REF(category)::OPERATOR;
                     else
                         throw Error(u"please clarify your intention by putting space character before or after `I`"_S, i - 1);
                 }
@@ -369,47 +369,47 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                 else if (source[range_el(i, i + 1)] == u'\'') {
                     i++;
                     if (source[range_el(i, i + 1)] == u' ')
-                        category = decltype(category)::NAME;
+                        category = TYPE_RM_REF(category)::NAME;
                     else if (in(source[range_el(i, i + 1)], make_tuple(u"‘"_S, u"'"_S))) {
                         i--;
-                        category = decltype(category)::NAME;
+                        category = TYPE_RM_REF(category)::NAME;
                     }
                     else {
                         while (i < source.len() && (is_hexadecimal_digit(source[i]) || source[i] == u'\''))
                             i++;
                         if (!(source[range_el(lexem_start + 4, lexem_start + 5)] == u'\'' || source[range_el(i - 3, i - 2)] == u'\'' || source[range_el(i - 2, i - 1)] == u'\''))
                             throw Error(u"digit separator in this hexadecimal number is located in the wrong place"_S, lexem_start);
-                        category = decltype(category)::NUMERIC_LITERAL;
+                        category = TYPE_RM_REF(category)::NUMERIC_LITERAL;
                     }
                 }
 
                 else if (in(source[range_el(lexem_start, i)], tokenizer::keywords)) {
                     if (in(source[range_el(lexem_start, i)], make_tuple(u"V"_S, u"П"_S, u"var"_S, u"перем"_S))) {
-                        category = decltype(category)::NAME;
+                        category = TYPE_RM_REF(category)::NAME;
                         if (source[range_el(i, i + 1)] == u'&')
                             i++;
                     }
                     else if (in(source[range_el(lexem_start, i)], make_tuple(u"N"_S, u"Н"_S, u"null"_S, u"нуль"_S)))
-                        category = decltype(category)::CONSTANT;
+                        category = TYPE_RM_REF(category)::CONSTANT;
                     else {
-                        category = decltype(category)::KEYWORD;
+                        category = TYPE_RM_REF(category)::KEYWORD;
                         if (source[range_el(i, i + 1)] == u'.') {
                             i++;
                             while (i < source.len() && (source[i].is_alpha() || in(source[i], u"_."_S)))
                                 i++;
                             if (in(source[range_el(lexem_start, i)], make_tuple(u"L.index"_S, u"Ц.индекс"_S, u"loop.index"_S, u"цикл.индекс"_S)))
-                                category = decltype(category)::NAME;
+                                category = TYPE_RM_REF(category)::NAME;
                         }
                     }
                 }
                 else
-                    category = decltype(category)::NAME;
+                    category = TYPE_RM_REF(category)::NAME;
             }
 
             else if (in(ch, range_ee(u'0'_C, u'9'_C))) {
                 if (in(ch, u"01"_S) && in(source[range_el(i, i + 1)], make_tuple(u"B"_S, u"В"_S)) && !(is_hexadecimal_digit(source[range_el(i + 1, i + 2)]) || source[range_el(i + 1, i + 2)] == u'\'')) {
                     i++;
-                    category = decltype(category)::CONSTANT;
+                    category = TYPE_RM_REF(category)::CONSTANT;
                 }
                 else {
                     auto is_hex = false;
@@ -506,22 +506,22 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                                 throw Error(u"digit separator in this number is located in the wrong place (should be: "_S & number_with_separators & u")"_S, lexem_start);
                         }
                     }
-                    category = decltype(category)::NUMERIC_LITERAL;
+                    category = TYPE_RM_REF(category)::NUMERIC_LITERAL;
                 }
             }
 
             else if (ch == u'\'' && source[range_el(i, i + 1)] == u',') {
                 i++;
-                category = decltype(category)::DELIMITER;
+                category = TYPE_RM_REF(category)::DELIMITER;
             }
 
             else if (ch == u'"') {
-                if (source[i] == u'"' && tokens.last().category == decltype(tokens.last().category)::STRING_CONCATENATOR && tokens.at_plus_len( - 2).category == decltype(tokens.at_plus_len( - 2).category)::STRING_LITERAL && _get<0>(tokens.at_plus_len( - 2).value(source)) == u'‘') {
+                if (source[i] == u'"' && tokens.last().category == TYPE_RM_REF(tokens.last().category)::STRING_CONCATENATOR && tokens.at_plus_len( - 2).category == TYPE_RM_REF(tokens.at_plus_len( - 2).category)::STRING_LITERAL && _get<0>(tokens.at_plus_len( - 2).value(source)) == u'‘') {
                     i++;
                     continue;
                 }
                 auto startqpos = i - 1;
-                if (tokens.len() && tokens.last().end == startqpos && ((tokens.last().category == decltype(tokens.last().category)::NAME && tokens.last().value(source).last() != u'\'') || in(tokens.last().value(source), make_tuple(u")"_S, u"]"_S))))
+                if (tokens.len() && tokens.last().end == startqpos && ((tokens.last().category == TYPE_RM_REF(tokens.last().category)::NAME && tokens.last().value(source).last() != u'\'') || in(tokens.last().value(source), make_tuple(u")"_S, u"]"_S))))
                     tokens.append(Token(lexem_start, lexem_start, Token::Category::STRING_CONCATENATOR));
                 while (true) {
                     if (i == source.len())
@@ -541,15 +541,15 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                     tokens.append(Token(i, i, Token::Category::STRING_CONCATENATOR));
                     continue;
                 }
-                category = decltype(category)::STRING_LITERAL;
+                category = TYPE_RM_REF(category)::STRING_LITERAL;
             }
 
             else if (in(ch, u"‘'"_S)) {
-                if (source[i] == u'’' && tokens.last().category == decltype(tokens.last().category)::STRING_CONCATENATOR && tokens.at_plus_len( - 2).category == decltype(tokens.at_plus_len( - 2).category)::STRING_LITERAL && _get<0>(tokens.at_plus_len( - 2).value(source)) == u'"') {
+                if (source[i] == u'’' && tokens.last().category == TYPE_RM_REF(tokens.last().category)::STRING_CONCATENATOR && tokens.at_plus_len( - 2).category == TYPE_RM_REF(tokens.at_plus_len( - 2).category)::STRING_LITERAL && _get<0>(tokens.at_plus_len( - 2).value(source)) == u'"') {
                     i++;
                     continue;
                 }
-                if (tokens.len() && tokens.last().end == i - 1 && ((tokens.last().category == decltype(tokens.last().category)::NAME && tokens.last().value(source).last() != u'\'') || in(tokens.last().value(source), make_tuple(u")"_S, u"]"_S)))) {
+                if (tokens.len() && tokens.last().end == i - 1 && ((tokens.last().category == TYPE_RM_REF(tokens.last().category)::NAME && tokens.last().value(source).last() != u'\'') || in(tokens.last().value(source), make_tuple(u")"_S, u"]"_S)))) {
                     tokens.append(Token(lexem_start, lexem_start, Token::Category::STRING_CONCATENATOR));
                     if (source[i] == u'’') {
                         i++;
@@ -584,13 +584,13 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                     tokens.append(Token(i, i, Token::Category::STRING_CONCATENATOR));
                     continue;
                 }
-                category = decltype(category)::STRING_LITERAL;
+                category = TYPE_RM_REF(category)::STRING_LITERAL;
             }
 
             else if (ch == u'{') {
                 indentation_levels.append(make_tuple(-1, true));
                 nesting_elements.append(make_tuple(u'{'_C, lexem_start));
-                category = decltype(category)::SCOPE_BEGIN;
+                category = TYPE_RM_REF(category)::SCOPE_BEGIN;
             }
             else if (ch == u'}') {
                 if (nesting_elements.empty() || _get<0>(nesting_elements.last()) != u'{')
@@ -603,28 +603,28 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                     indentation_levels.pop();
                 }
                 assert(_get<1>(indentation_levels.pop()) == true);
-                category = decltype(category)::SCOPE_END;
+                category = TYPE_RM_REF(category)::SCOPE_END;
             }
             else if (ch == u';')
-                category = decltype(category)::STATEMENT_SEPARATOR;
+                category = TYPE_RM_REF(category)::STATEMENT_SEPARATOR;
             else if (in(ch, make_tuple(u","_S, u"."_S, u":"_S)))
-                category = decltype(category)::DELIMITER;
+                category = TYPE_RM_REF(category)::DELIMITER;
 
             else if (in(ch, u"(["_S)) {
                 if (source[range_el(lexem_start, lexem_start + 3)] == u"(.)") {
                     i += 2;
-                    category = decltype(category)::NAME;
+                    category = TYPE_RM_REF(category)::NAME;
                 }
                 else {
                     nesting_elements.append(make_tuple(ch, lexem_start));
-                    category = decltype(category)::DELIMITER;
+                    category = TYPE_RM_REF(category)::DELIMITER;
                 }
             }
             else if (in(ch, u"])"_S)) {
                 if (nesting_elements.empty() || _get<0>(nesting_elements.last()) != ([&](const auto &a){return a == u']' ? u'['_C : a == u')' ? u'('_C : throw KeyError(a);}(ch)))
                     throw Error(u"there is no corresponding opening parenthesis/bracket for `"_S & ch & u"`"_S, lexem_start);
                 nesting_elements.pop();
-                category = decltype(category)::DELIMITER;
+                category = TYPE_RM_REF(category)::DELIMITER;
             }
             else
                 throw Error(u"unexpected character `"_S & ch & u"`"_S, lexem_start);

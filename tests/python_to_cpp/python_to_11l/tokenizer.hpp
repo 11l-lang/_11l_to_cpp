@@ -149,7 +149,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
 
             if (operator_or_delimiter != u"") {
                 i = lexem_start + operator_or_delimiter.len();
-                category = decltype(category)::OPERATOR_OR_DELIMITER;
+                category = TYPE_RM_REF(category)::OPERATOR_OR_DELIMITER;
                 if (in(ch, u"([{"_S))
                     nesting_elements.append(make_tuple(ch, lexem_start));
                 else if (in(ch, u")]}"_S)) {
@@ -158,7 +158,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                     nesting_elements.pop();
                 }
                 else if (ch == u';')
-                    category = decltype(category)::STATEMENT_SEPARATOR;
+                    category = TYPE_RM_REF(category)::STATEMENT_SEPARATOR;
             }
 
             else if (in(ch, make_tuple(u"\""_S, u"'"_S)) || (in(ch, u"rRbB"_S) && in(source[range_el(i, i + 1)], make_tuple(u"\""_S, u"'"_S)))) {
@@ -184,7 +184,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                     }
                     i++;
                 }
-                category = decltype(category)::STRING_LITERAL;
+                category = TYPE_RM_REF(category)::STRING_LITERAL;
             }
 
             else if (ch.is_alpha() || ch == u'_') {
@@ -196,12 +196,12 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                 }
                 if (in(source[range_el(lexem_start, i)], tokenizer::keywords)) {
                     if (in(source[range_el(lexem_start, i)], make_tuple(u"None"_S, u"False"_S, u"True"_S)))
-                        category = decltype(category)::CONSTANT;
+                        category = TYPE_RM_REF(category)::CONSTANT;
                     else
-                        category = decltype(category)::KEYWORD;
+                        category = TYPE_RM_REF(category)::KEYWORD;
                 }
                 else
-                    category = decltype(category)::NAME;
+                    category = TYPE_RM_REF(category)::NAME;
             }
 
             else if ((in(ch, u"-+"_S) && in(source[range_el(i, i + 1)], range_ee(u'0'_C, u'9'_C))) || in(ch, range_ee(u'0'_C, u'9'_C))) {
@@ -250,7 +250,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                             throw Error(u"digit separator in this number is located in the wrong place (should be: "_S & number_with_separators & u")"_S, start);
                     }
                 }
-                category = decltype(category)::NUMERIC_LITERAL;
+                category = TYPE_RM_REF(category)::NUMERIC_LITERAL;
             }
 
             else if (ch == u'\\') {
