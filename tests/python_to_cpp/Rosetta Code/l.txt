@@ -1867,3 +1867,608 @@ struct CodeBlock1
         print(palin.len() & u" Lychrel palindromes: "_S & palin);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Latin_Squares_in_reduced_form#Python
+import math
+
+def dList(n, start):
+    start -= 1 # use 0 basing
+    a = list(range(n))
+    a[start] = a[0]
+    a[0] = start
+    a[1:] = sorted(a[1:])
+    first = a[1]
+    # rescursive closure permutes a[1:]
+    r : List[List[int]] = []
+    def recurse(last : int) -> None:
+        if (last == first):
+            # bottom of recursion. you get here once for each permutation.
+            # test if permutation is deranged.
+            # yes, save a copy with 1 based indexing
+            for j,v in enumerate(a[1:]):
+                if j + 1 == v:
+                    return # no, ignore it
+            b = [x + 1 for x in a]
+            r.append(b)
+            return
+        for i in range(last, 0, -1):
+            (a[i], a[last]) = (a[last], a[i])
+            recurse(last - 1)
+            (a[i], a[last]) = (a[last], a[i])
+    recurse(n - 1)
+    return r
+
+def printSquare(latin,n):
+    for row in latin:
+        print(row)
+    print()
+
+def reducedLatinSquares(n,echo):
+    if n <= 0:
+        if echo:
+            print('[]')
+        return 0
+    elif n == 1:
+        if echo:
+            print([1])
+        return 1
+
+    rlatin  = [[0] * n for i in range(n)]
+    # first row
+    for j in range(0, n):
+        rlatin[0][j] = j + 1
+
+    count = 0
+    def recurse(i : int) -> None:
+        nonlocal count
+
+        rows = dList(n, i)
+
+        for r in range(len(rows)):
+            rlatin[i - 1] = rows[r]
+            justContinue = False
+            k = 0
+            while not justContinue and k < i - 1:
+                for j in range(1, n):
+                    if rlatin[k][j] == rlatin[i - 1][j]:
+                        if r < len(rows) - 1:
+                            justContinue = True
+                            break
+                        if i > 2:
+                            return
+                k += 1
+            if not justContinue:
+                if i < n:
+                    recurse(i + 1)
+                else:
+                    count += 1
+                    if echo:
+                        printSquare(rlatin, n)
+
+    # remaining rows
+    recurse(2)
+    return count
+
+print("The four reduced latin squares of order 4 are:\n")
+reducedLatinSquares(4,True)
+
+print("The size of the set of reduced latin squares for the following orders")
+print("and hence the total number of latin squares of these orders are:\n")
+for n in range(1, 7):
+    size = reducedLatinSquares(n, False)
+    f = math.factorial(n - 1)
+    f *= f * n * size
+    print("Order %d: Size %-4d x %d! x %d! => Total %d" % (n, size, n, n - 1, f))
+===
+//import math
+
+F dList(n, =start)
+   start--
+   V a = Array(0 .< n)
+   a[start] = a[0]
+   a[0] = start
+   a.sort_range(1..)
+   V first = a[1]
+   [[Int]] r
+   F recurse(Int last) -> N
+      I (last == @first)
+         L(v) @a[1..]
+            V j = L.index
+            I j + 1 == v
+               R
+         V b = @a.map(x -> x + 1)
+         @r.append(b)
+         R
+      L(i) (last .< 0).step(-1)
+         swap(&@a[i], &@a[last])
+         @recurse(last - 1)
+         swap(&@a[i], &@a[last])
+   recurse(n - 1)
+   R r
+
+F printSquare(latin, n)
+   L(row) latin
+      print(row)
+   print()
+
+F reducedLatinSquares(n, echo)
+   I n <= 0
+      I echo
+         print(‘[]’)
+      R 0
+   E I n == 1
+      I echo
+         print([1])
+      R 1
+   V rlatin = [[0] * n] * n
+
+   L(j) 0 .< n
+      rlatin[0][j] = j + 1
+   V count = 0
+   F recurse(Int i) -> N
+      V rows = dList(@n, i)
+
+      L(r) 0 .< rows.len
+         @rlatin[i - 1] = rows[r]
+         V justContinue = 0B
+         V k = 0
+         L !justContinue & k < i - 1
+            L(j) 1 .< @n
+               I @rlatin[k][j] == @rlatin[i - 1][j]
+                  I r < rows.len - 1
+                     justContinue = 1B
+                     L.break
+                  I i > 2
+                     R
+            k++
+         I !justContinue
+            I i < @n
+               @recurse(i + 1)
+            E
+               @count++
+               I @echo
+                  printSquare(@rlatin, @n)
+   recurse(2)
+   R count
+print("The four reduced latin squares of order 4 are:\n")
+reducedLatinSquares(4, 1B)
+print(‘The size of the set of reduced latin squares for the following orders’)
+print("and hence the total number of latin squares of these orders are:\n")
+L(n) 1..6
+   V size = reducedLatinSquares(n, 0B)
+   V f = factorial(n - 1)
+   f *= f * n * size
+   print(‘Order #.: Size #<4 x #.! x #.! => Total #.’.format(n, size, n, n - 1, f))
+===
+template <typename T1, typename T2> auto dList(const T1 &n, T2 start)
+{
+    start--;
+    auto a = create_array(range_el(0, n));
+    a.set(start, _get<0>(a));
+    _set<0>(a, start);
+    a.sort_range(range_ei(1));
+    auto first = _get<1>(a);
+    Array<Array<int>> r;
+    std::function<void(int)> recurse = [&a, &first, &r, &recurse](const int last)
+    {
+        if ((last == first)) {
+            {int Lindex = 0;
+            for (auto &&v : a[range_ei(1)]) {
+                auto j = Lindex;
+                if (j + 1 == v)
+                    return;
+                Lindex++;
+            }}
+            auto b = a.map([](const auto &x){return x + 1;});
+            r.append(b);
+            return;
+        }
+        for (auto i : range_el(last, 0).step(-1)) {
+            swap(a[i], a[last]);
+            recurse(last - 1);
+            swap(a[i], a[last]);
+        }
+    };
+    recurse(n - 1);
+    return r;
+}
+
+template <typename T1, typename T2> auto printSquare(const T1 &latin, const T2 &n)
+{
+    for (auto &&row : latin)
+        print(row);
+    print();
+}
+
+template <typename T1, typename T2> auto reducedLatinSquares(const T1 &n, const T2 &echo)
+{
+    if (n <= 0) {
+        if (echo)
+            print(u"[]"_S);
+        return 0;
+    }
+    else if (n == 1) {
+        if (echo)
+            print(create_array({1}));
+        return 1;
+    }
+    auto rlatin = create_array({create_array({0}) * n}) * n;
+    for (auto j : range_el(0, n))
+        _get<0>(rlatin).set(j, j + 1);
+    auto count = 0;
+    std::function<void(int)> recurse = [&count, &echo, &n, &recurse, &rlatin](const int i)
+    {
+        auto rows = dList(n, i);
+
+        for (auto r : range_el(0, rows.len())) {
+            rlatin.set(i - 1, rows[r]);
+            auto justContinue = false;
+            auto k = 0;
+            while (!justContinue && k < i - 1) {
+                for (auto j : range_el(1, n))
+                    if (rlatin[k][j] == rlatin[i - 1][j]) {
+                        if (r < rows.len() - 1) {
+                            justContinue = true;
+                            break;
+                        }
+                        if (i > 2)
+                            return;
+                    }
+                k++;
+            }
+            if (!justContinue) {
+                if (i < n)
+                    recurse(i + 1);
+                else {
+                    count++;
+                    if (echo)
+                        printSquare(rlatin, n);
+                }
+            }
+        }
+    };
+    recurse(2);
+    return count;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"The four reduced latin squares of order 4 are:\n"_S);
+        reducedLatinSquares(4, true);
+        print(u"The size of the set of reduced latin squares for the following orders"_S);
+        print(u"and hence the total number of latin squares of these orders are:\n"_S);
+        for (auto n : range_ee(1, 6)) {
+            auto size = reducedLatinSquares(n, false);
+            auto f = factorial(n - 1);
+            f *= f * n * size;
+            print(u"Order #.: Size #<4 x #.! x #.! => Total #."_S.format(n, size, n, n - 1, f));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Logistic_curve_fitting_in_epidemiology#C.2B.2B
+import math
+
+K = 7.8e9
+n0 = 27
+actual = [
+    27, 27, 27, 44, 44, 59, 59, 59, 59, 59, 59, 59, 59, 60, 60,
+    61, 61, 66, 83, 219, 239, 392, 534, 631, 897, 1350, 2023, 2820,
+    4587, 6067, 7823, 9826, 11946, 14554, 17372, 20615, 24522, 28273,
+    31491, 34933, 37552, 40540, 43105, 45177, 60328, 64543, 67103,
+    69265, 71332, 73327, 75191, 75723, 76719, 77804, 78812, 79339,
+    80132, 80995, 82101, 83365, 85203, 87024, 89068, 90664, 93077,
+    95316, 98172, 102133, 105824, 109695, 114232, 118610, 125497,
+    133852, 143227, 151367, 167418, 180096, 194836, 213150, 242364,
+    271106, 305117, 338133, 377918, 416845, 468049, 527767, 591704,
+    656866, 715353, 777796, 851308, 928436, 1000249, 1082054, 1174652
+]
+
+def f(r : float) -> float:
+    sq = 0.0
+    for i, act in enumerate(actual):
+        eri = math.exp(r * i)
+        guess = (n0 * eri)/(1 + n0 * (eri - 1)/K)
+        diff = guess - act
+        sq += diff * diff
+    return sq
+
+def solve(func, guess = 0.5, epsilon = 0.0):
+    delta = guess if guess != 0 else 1
+    f0 = func(guess)
+    factor = 2.0
+    while delta > epsilon and guess != guess - delta:
+        nf = func(guess - delta)
+        if nf < f0:
+            f0 = nf
+            guess -= delta
+        else:
+            nf = func(guess + delta)
+            if nf < f0:
+                f0 = nf
+                guess += delta
+            else:
+                factor = 0.5
+        delta *= factor
+    return guess
+
+r = solve(f)
+R0 = math.exp(12 * r)
+print('r = %f, R0 = %f' % (r, R0))
+===
+//import math
+V K = 7.8e9
+V n0 = 27
+V actual = [27, 27, 27, 44, 44, 59, 59, 59, 59, 59, 59, 59, 59, 60, 60, 61, 61, 66, 83, 219, 239, 392, 534, 631, 897, 1350, 2023, 2820, 4587, 6067, 7823, 9826, 11946, 14554, 17372, 20615, 24522, 28273, 31491, 34933, 37552, 40540, 43105, 45177, 60328, 64543, 67103, 69265, 71332, 73327, 75191, 75723, 76719, 77804, 78812, 79339, 80132, 80995, 82101, 83365, 85203, 87024, 89068, 90664, 93077, 95316, 98172, 102133, 105824, 109695, 114232, 118610, 125497, 133852, 143227, 151367, 167418, 180096, 194836, 213150, 242364, 271106, 305117, 338133, 377918, 416845, 468049, 527767, 591704, 656866, 715353, 777796, 851308, 928436, 1000249, 1082054, 1174652]
+
+F f(Float r) -> Float
+   V sq = 0.0
+   L(act) :actual
+      V i = L.index
+      V eri = exp(r * i)
+      V guess = (:n0 * eri) / (1 + :n0 * (eri - 1) / :K)
+      V diff = guess - act
+      sq += diff * diff
+   R sq
+
+F solve(func, =guess = 0.5, epsilon = 0.0)
+   V delta = I guess != 0 {guess} E 1
+   V f0 = func(guess)
+   V factor = 2.0
+   L delta > epsilon & guess != guess - delta
+      V nf = func(guess - delta)
+      I nf < f0
+         f0 = nf
+         guess -= delta
+      E
+         nf = func(guess + delta)
+         I nf < f0
+            f0 = nf
+            guess += delta
+         E
+            factor = 0.5
+      delta *= factor
+   R guess
+V r = solve(f)
+V R0 = exp(12 * r)
+print(‘r = #.6, R0 = #.6’.format(r, R0))
+===
+auto K = 7.8e9;
+auto n0 = 27;
+auto actual = create_array({27, 27, 27, 44, 44, 59, 59, 59, 59, 59, 59, 59, 59, 60, 60, 61, 61, 66, 83, 219, 239, 392, 534, 631, 897, 1350, 2023, 2820, 4587, 6067, 7823, 9826, 11946, 14554, 17372, 20615, 24522, 28273, 31491, 34933, 37552, 40540, 43105, 45177, 60328, 64543, 67103, 69265, 71332, 73327, 75191, 75723, 76719, 77804, 78812, 79339, 80132, 80995, 82101, 83365, 85203, 87024, 89068, 90664, 93077, 95316, 98172, 102133, 105824, 109695, 114232, 118610, 125497, 133852, 143227, 151367, 167418, 180096, 194836, 213150, 242364, 271106, 305117, 338133, 377918, 416845, 468049, 527767, 591704, 656866, 715353, 777796, 851308, 928436, 1000249, 1082054, 1174652});
+
+double f(const double r)
+{
+    auto sq = 0.0;
+    {int Lindex = 0;
+    for (auto &&act : ::actual) {
+        auto i = Lindex;
+        auto eri = exp(r * i);
+        auto guess = (::n0 * eri) / (1 + ::n0 * (eri - 1) / ::K);
+        auto diff = guess - act;
+        sq += diff * diff;
+        Lindex++;
+    }}
+    return sq;
+}
+
+template <typename T1, typename T2 = decltype(0.5), typename T3 = decltype(0.0)> auto solve(const T1 &func, T2 guess = 0.5, const T3 &epsilon = 0.0)
+{
+    auto delta = guess != 0 ? guess : 1;
+    auto f0 = func(guess);
+    auto factor = 2.0;
+    while (delta > epsilon && guess != guess - delta) {
+        auto nf = func(guess - delta);
+        if (nf < f0) {
+            f0 = nf;
+            guess -= delta;
+        }
+        else {
+            nf = func(guess + delta);
+            if (nf < f0) {
+                f0 = nf;
+                guess += delta;
+            }
+            else
+                factor = 0.5;
+        }
+        delta *= factor;
+    }
+    return guess;
+}
+auto r = solve(f);
+auto R0 = exp(12 * r);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"r = #.6, R0 = #.6"_S.format(r, R0));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/LU_decomposition#Python
+def pprint(m):
+    for row in m:
+        print(row)
+
+def matrix_mul(a, b):
+    result = [[0.0]*len(a) for i in range(len(a))]
+    for j in range(len(a)):
+        for i in range(len(a)):
+            r = 0.0
+            for k in range(len(a)):
+                r += a[i][k] * b[k][j]
+            result[i][j] = r
+    return result
+
+def pivotize(m):
+    """Creates the pivoting matrix for m."""
+    n = len(m)
+    ID = [[float(i == j) for i in range(n)] for j in range(n)]
+    for j in range(n):
+        row = max(range(j, n), key=lambda i: abs(m[i][j]))
+        if j != row:
+            (ID[j], ID[row]) = (ID[row], ID[j])
+    return ID
+
+def lu(A):
+    """Decomposes a nxn matrix A by PA=lU and returns l, U and P."""
+    n = len(A)
+    l = [[0.0] * n for i in range(n)]
+    U = [[0.0] * n for i in range(n)]
+    P = pivotize(A)
+    A2 = matrix_mul(P, A)
+    for j in range(n):
+        l[j][j] = 1.0
+        for i in range(j+1):
+            s1 = sum(U[k][j] * l[i][k] for k in range(i))
+            U[i][j] = A2[i][j] - s1
+        for i in range(j, n):
+            s2 = sum(U[k][j] * l[i][k] for k in range(j))
+            l[i][j] = (A2[i][j] - s2) / U[j][j]
+    return (l, U, P)
+
+a = [[1, 3, 5], [2, 4, 7], [1, 1, 0]]
+for part in lu(a):
+    pprint(part)
+    print()
+print()
+b = [[11,9,24,2],[1,5,2,6],[3,17,18,1],[2,5,7,1]]
+for part in lu(b):
+    pprint(part)
+    print()
+===
+F pprint(m)
+   L(row) m
+      print(row)
+
+F matrix_mul(a, b)
+   V result = [[0.0] * a.len] * (a.len)
+   L(j) 0 .< a.len
+      L(i) 0 .< a.len
+         V r = 0.0
+         L(k) 0 .< a.len
+            r += a[i][k] * b[k][j]
+         result[i][j] = r
+   R result
+
+F pivotize(m)
+   ‘Creates the pivoting matrix for m.’
+   V n = m.len
+   V ID = (0 .< n).map(j -> (0 .< @n).map(i -> Float(i == @j)))
+   L(j) 0 .< n
+      V row = max(j .< n, key' i -> abs(@m[i][@j]))
+      I j != row
+         swap(&ID[j], &ID[row])
+   R ID
+
+F lu(A)
+   ‘Decomposes a nxn matrix A by PA=lU and returns l, U and P.’
+   V n = A.len
+   V l = [[0.0] * n] * n
+   V U = [[0.0] * n] * n
+   V P = pivotize(A)
+   V A2 = matrix_mul(P, A)
+   L(j) 0 .< n
+      l[j][j] = 1.0
+      L(i) 0 .. j
+         V s1 = sum((0 .< i).map(k -> @U[k][@j] * @l[@i][k]))
+         U[i][j] = A2[i][j] - s1
+      L(i) j .< n
+         V s2 = sum((0 .< j).map(k -> @U[k][@j] * @l[@i][k]))
+         l[i][j] = (A2[i][j] - s2) / U[j][j]
+   R (l, U, P)
+V a = [[1, 3, 5], [2, 4, 7], [1, 1, 0]]
+L(part) lu(a)
+   pprint(part)
+   print()
+print()
+V b = [[11, 9, 24, 2], [1, 5, 2, 6], [3, 17, 18, 1], [2, 5, 7, 1]]
+L(part) lu(b)
+   pprint(part)
+   print()
+===
+template <typename T1> auto pprint(const T1 &m)
+{
+    for (auto &&row : m)
+        print(row);
+}
+
+template <typename T1, typename T2> auto matrix_mul(const T1 &a, const T2 &b)
+{
+    auto result = create_array({create_array({0.0}) * a.len()}) * (a.len());
+    for (auto j : range_el(0, a.len()))
+        for (auto i : range_el(0, a.len())) {
+            auto r = 0.0;
+            for (auto k : range_el(0, a.len()))
+                r += a[i][k] * b[k][j];
+            result[i].set(j, r);
+        }
+    return result;
+}
+
+template <typename T1> auto pivotize(const T1 &m)
+{
+    u"Creates the pivoting matrix for m."_S;
+    auto n = m.len();
+    auto ID = range_el(0, n).map([&n](const auto &j){return range_el(0, n).map([&j](const auto &i){return to_float(i == j);});});
+    for (auto j : range_el(0, n)) {
+        auto row = max_with_key(range_el(j, n), [&j, &m](const auto &i){return abs(m[i][j]);});
+        if (j != row)
+            swap(ID[j], ID[row]);
+    }
+    return ID;
+}
+
+template <typename T1> auto lu(const T1 &A)
+{
+    u"Decomposes a nxn matrix A by PA=lU and returns l, U and P."_S;
+    auto n = A.len();
+    auto l = create_array({create_array({0.0}) * n}) * n;
+    auto U = create_array({create_array({0.0}) * n}) * n;
+    auto P = pivotize(A);
+    auto A2 = matrix_mul(P, A);
+    for (auto j : range_el(0, n)) {
+        l[j].set(j, 1.0);
+        for (auto i : range_ee(0, j)) {
+            auto s1 = sum_map(range_el(0, i), [&U, &i, &j, &l](const auto &k){return U[k][j] * l[i][k];});
+            U[i].set(j, A2[i][j] - s1);
+        }
+        for (auto i : range_el(j, n)) {
+            auto s2 = sum_map(range_el(0, j), [&U, &i, &j, &l](const auto &k){return U[k][j] * l[i][k];});
+            l[i].set(j, (A2[i][j] - s2) / U[j][j]);
+        }
+    }
+    return make_tuple(l, U, P);
+}
+auto a = create_array({create_array({1, 3, 5}), create_array({2, 4, 7}), create_array({1, 1, 0})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&part : lu(a)) {
+            pprint(part);
+            print();
+        }
+        print();
+    }
+} code_block_1;
+auto b = create_array({create_array({11, 9, 24, 2}), create_array({1, 5, 2, 6}), create_array({3, 17, 18, 1}), create_array({2, 5, 7, 1})});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&part : lu(b)) {
+            pprint(part);
+            print();
+        }
+    }
+} code_block_2;

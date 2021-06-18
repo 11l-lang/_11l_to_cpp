@@ -1054,3 +1054,291 @@ struct CodeBlock1
         print(u"\nMagic constant: #."_S.format(idiv((n * n + 1) * n, 2)));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Maze_solving#Python
+def dijkstra(graph, source):
+    # graph[u][v] is the weight from u to v (however 0 means infinity)
+    n = len(graph)
+    dist = [float('infinity')]*n   # Unknown distance function from source to v
+    previous = [-1]*n # Previous node in optimal path from source
+    dist[source] = 0        # Distance from source to source
+    Q = list(range(n)) # All nodes in the graph are unoptimized - thus are in Q
+    while len(Q) != 0:           # The main loop
+        u = min(Q, key=lambda n:dist[n])                 # vertex in Q with smallest dist[]
+        Q.remove(u)
+        if dist[u] == float('infinity'):
+            break # all remaining vertices are inaccessible from source
+        for v in range(n):               # each neighbor v of u
+            if graph[u][v] and (v in Q): # where v has not yet been visited
+                alt = dist[u] + graph[u][v]
+                if alt < dist[v]:       # Relax (u,v,a)
+                    dist[v] = alt
+                    previous[v] = u
+    return previous
+
+def display_solution(predecessor):
+    cell = len(predecessor)-1
+    while cell != 0:
+        print(cell,end='<')
+        cell = predecessor[cell]
+    print(0)
+
+graph = [
+    [0,1,0,0,0,0,],
+    [1,0,1,0,1,0,],
+    [0,1,0,0,0,1,],
+    [0,0,0,0,1,0,],
+    [0,1,0,1,0,0,],
+    [0,0,1,0,0,0,]
+]
+
+display_solution(dijkstra(graph, 0))
+===
+F dijkstra(graph, source)
+   V n = graph.len
+   V dist = [Float.infinity] * n
+   V previous = [-1] * n
+   dist[source] = 0
+   V Q = Array(0 .< n)
+   L !Q.empty
+      V u = min(Q, key' n -> @dist[n])
+      Q.remove(u)
+      I dist[u] == Float.infinity
+         L.break
+      L(v) 0 .< n
+         I graph[u][v] & (v C Q)
+            V alt = dist[u] + graph[u][v]
+            I alt < dist[v]
+               dist[v] = alt
+               previous[v] = u
+   R previous
+
+F display_solution(predecessor)
+   V cell = predecessor.len - 1
+   L cell != 0
+      print(cell, end' ‘<’)
+      cell = predecessor[cell]
+   print(0)
+V graph = [[0, 1, 0, 0, 0, 0], [1, 0, 1, 0, 1, 0], [0, 1, 0, 0, 0, 1], [0, 0, 0, 0, 1, 0], [0, 1, 0, 1, 0, 0], [0, 0, 1, 0, 0, 0]]
+display_solution(dijkstra(graph, 0))
+===
+template <typename T1, typename T2> auto dijkstra(const T1 &graph, const T2 &source)
+{
+    auto n = graph.len();
+    auto dist = create_array({std::numeric_limits<double>::infinity()}) * n;
+    auto previous = create_array({-1}) * n;
+    dist.set(source, 0);
+    auto Q = create_array(range_el(0, n));
+    while (!Q.empty()) {
+        auto u = min_with_key(Q, [&dist](const auto &n){return dist[n];});
+        Q.remove(u);
+        if (dist[u] == std::numeric_limits<double>::infinity())
+            break;
+        for (auto v : range_el(0, n))
+            if (graph[u][v] && (in(v, Q))) {
+                auto alt = dist[u] + graph[u][v];
+                if (alt < dist[v]) {
+                    dist.set(v, alt);
+                    previous.set(v, u);
+                }
+            }
+    }
+    return previous;
+}
+
+template <typename T1> auto display_solution(const T1 &predecessor)
+{
+    auto cell = predecessor.len() - 1;
+    while (cell != 0) {
+        print(cell, u"<"_S);
+        cell = predecessor[cell];
+    }
+    print(0);
+}
+auto graph = create_array({create_array({0, 1, 0, 0, 0, 0}), create_array({1, 0, 1, 0, 1, 0}), create_array({0, 1, 0, 0, 0, 1}), create_array({0, 0, 0, 0, 1, 0}), create_array({0, 1, 0, 1, 0, 0}), create_array({0, 0, 1, 0, 0, 0})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        display_solution(dijkstra(graph, 0));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Merge_and_aggregate_datasets#Python
+from copy import deepcopy
+
+patients_csv = '''PATIENT_ID,LASTNAME
+1001,Hopper
+4004,Wirth
+3003,Kemeny
+2002,Gosling
+5005,Kurtz'''
+
+visits_csv = '''PATIENT_ID,VISIT_DATE,SCORE
+2002,2020-09-10,6.8
+1001,2020-09-17,5.5
+4004,2020-09-24,8.4
+2002,2020-10-08,
+1001,,6.6
+3003,2020-11-12,
+4004,2020-11-05,7.0
+1001,2020-11-19,5.3'''
+
+def csv2list(s):
+    rows : List[List[str]] = []
+    for row in s.split("\n"):
+        rows += [row.split(',')]
+    return rows
+
+patients = csv2list(patients_csv)
+visits   = csv2list(visits_csv)
+result = deepcopy(patients)
+result[1:] = sorted(result[1:])
+#%%
+result[0].append('LAST_VISIT')
+last = {p_vis[0]: p_vis[1] for p_vis in visits[1:]}
+for record in range(1, len(result)):
+    result[record].append(last.get(result[record][0], ''))
+#%%
+result[0] += ['SCORE_SUM', 'SCORE_AVG']
+n = {p[0]: 0 for p in patients[1:]}
+tot = {p[0]: 0.0 for p in patients[1:]}
+for record in visits[1:]:
+    p = record[0]
+    score = record[2]
+    if len(score) != 0:
+        n[p] += 1
+        tot[p] += float(score)
+for record in range(1, len(result)):
+    p = result[record][0]
+    if n[p] != 0:
+        result[record] += ['{:5.1f}'.format(tot[p]), '{:5.2f}'.format(tot[p] / n[p])]
+    else:
+        result[record] += ['', '']
+#%%
+for record in result:
+    print('| ' + ' | '.join(r.center(10) for r in record) + ' |')
+===
+V patients_csv = ‘PATIENT_ID,LASTNAME
+1001,Hopper
+4004,Wirth
+3003,Kemeny
+2002,Gosling
+5005,Kurtz’
+V visits_csv = ‘PATIENT_ID,VISIT_DATE,SCORE
+2002,2020-09-10,6.8
+1001,2020-09-17,5.5
+4004,2020-09-24,8.4
+2002,2020-10-08,
+1001,,6.6
+3003,2020-11-12,
+4004,2020-11-05,7.0
+1001,2020-11-19,5.3’
+
+F csv2list(s)
+   [[String]] rows
+   L(row) s.split("\n")
+      rows [+]= row.split(‘,’)
+   R rows
+V patients = csv2list(patients_csv)
+V visits = csv2list(visits_csv)
+V result = copy(patients)
+result.sort_range(1..)
+result[0].append(‘LAST_VISIT’)
+V last = Dict(visits[1..], p_vis -> (p_vis[0], p_vis[1]))
+L(record) 1 .< result.len
+   result[record].append(last.get(result[record][0], ‘’))
+result[0] [+]= [‘SCORE_SUM’, ‘SCORE_AVG’]
+V n = Dict(patients[1..], p -> (p[0], 0))
+V tot = Dict(patients[1..], p -> (p[0], 0.0))
+L(record) visits[1..]
+   V p = record[0]
+   V score = record[2]
+   I !score.empty
+      n[p]++
+      tot[p] += Float(score)
+L(record) 1 .< result.len
+   V p = result[record][0]
+   I n[p] != 0
+      result[record] [+]= [‘#3.1’.format(tot[p]), ‘#2.2’.format(tot[p] / n[p])]
+   E
+      result[record] [+]= [‘’, ‘’]
+
+L(record) result
+   print(‘| ’record.map(r -> r.center(10)).join(‘ | ’)‘ |’)
+===
+auto patients_csv = uR"(PATIENT_ID,LASTNAME
+1001,Hopper
+4004,Wirth
+3003,Kemeny
+2002,Gosling
+5005,Kurtz)"_S;
+auto visits_csv = uR"(PATIENT_ID,VISIT_DATE,SCORE
+2002,2020-09-10,6.8
+1001,2020-09-17,5.5
+4004,2020-09-24,8.4
+2002,2020-10-08,
+1001,,6.6
+3003,2020-11-12,
+4004,2020-11-05,7.0
+1001,2020-11-19,5.3)"_S;
+
+template <typename T1> auto csv2list(const T1 &s)
+{
+    Array<Array<String>> rows;
+    for (auto &&row : s.split(u"\n"_S))
+        rows.append(row.split(u","_S));
+    return rows;
+}
+auto patients = csv2list(patients_csv);
+auto visits = csv2list(visits_csv);
+auto result = copy(patients);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        result.sort_range(range_ei(1));
+        _get<0>(result).append(u"LAST_VISIT"_S);
+    }
+} code_block_1;
+auto last = create_dict(visits[range_ei(1)], [](const auto &p_vis){return make_tuple(_get<0>(p_vis), _get<1>(p_vis));});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto record : range_el(1, result.len()))
+            result[record].append(last.get(_get<0>(result[record]), u""_S));
+        _get<0>(result).append(create_array({u"SCORE_SUM"_S, u"SCORE_AVG"_S}));
+    }
+} code_block_2;
+auto n = create_dict(patients[range_ei(1)], [](const auto &p){return make_tuple(_get<0>(p), 0);});
+auto tot = create_dict(patients[range_ei(1)], [](const auto &p){return make_tuple(_get<0>(p), 0.0);});
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        for (auto &&record : visits[range_ei(1)]) {
+            auto p = _get<0>(record);
+            auto score = _get<2>(record);
+            if (!score.empty()) {
+                n[p]++;
+                tot[p] += to_float(score);
+            }
+        }
+        for (auto record : range_el(1, result.len())) {
+            auto p = _get<0>(result[record]);
+            if (n[p] != 0)
+                result[record].append(create_array({u"#3.1"_S.format(tot[p]), u"#2.2"_S.format(tot[p] / n[p])}));
+            else
+                result[record].append(create_array({u""_S, u""_S}));
+        }
+        for (auto &&record : result)
+            print(u"| "_S & record.map([](const auto &r){return r.center(10);}).join(u" | "_S) & u" |"_S);
+    }
+} code_block_3;

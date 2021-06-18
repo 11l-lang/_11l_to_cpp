@@ -361,6 +361,7 @@ public:
 
 	void sort_range(const Range<Int, true,  true> range) {std::sort(begin() + range.b, begin() + range.e + 1);}
 	void sort_range(const Range<Int, true, false> range) {std::sort(begin() + range.b, begin() + range.e);}
+	void sort_range(const RangeEI<Int>            range) {std::sort(begin() + range.b, end());}
 
 	void sort_range(const Range<Int, true, false> range, nullptr_t, bool reverse)
 	{

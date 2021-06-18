@@ -316,3 +316,365 @@ struct CodeBlock1
             print(u"ISBN13 "_S & t & u" validates "_S & is_isbn13(t));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/I_before_E_except_after_C#Python
+import re
+
+PLAUSIBILITY_RATIO = 2
+
+def plausibility_check(comment, x, y):
+    print('\n  Checking plausibility of: %s' % comment)
+    if x > PLAUSIBILITY_RATIO * y:
+        print('    PLAUSIBLE. As we have counts of %i vs %i, a ratio of %4.1f times'
+              % (x, y, float(x) / y))
+    else:
+        if x > y:
+            print('    IMPLAUSIBLE. As although we have counts of %i vs %i, a ratio of %4.1f times does not make it plausible'
+                  % (x, y, float(x) / y))
+        else:
+            print('    IMPLAUSIBLE, probably contra-indicated. As we have counts of %i vs %i, a ratio of %4.1f times'
+                  % (x, y, float(x) / y))
+    return x > PLAUSIBILITY_RATIO * y
+
+def simple_stats():
+    words = open('unixdict.txt').read().split("\n")
+    cie = len({word for word in words if 'cie' in word})
+    cei = len({word for word in words if 'cei' in word})
+    not_c_ie = len({word for word in words if re.search(r'(^ie|[^c]ie)', word)})
+    not_c_ei = len({word for word in words if re.search(r'(^ei|[^c]ei)', word)})
+    return (cei, cie, not_c_ie, not_c_ei)
+
+def print_result(cei, cie, not_c_ie, not_c_ei):
+    if ( plausibility_check('I before E when not preceded by C', not_c_ie, not_c_ei)
+         and plausibility_check('E before I when preceded by C', cei, cie) ):
+        print('\nOVERALL IT IS PLAUSIBLE!')
+    else:
+        print('\nOVERALL IT IS IMPLAUSIBLE!')
+    print('(To be plausible, one count must exceed another by %i times)' % PLAUSIBILITY_RATIO)
+
+print('Checking plausibility of "I before E except after C":')
+(cei, cie, not_c_ie, not_c_ei) = simple_stats()
+print_result(cei, cie, not_c_ie, not_c_ei)
+===
+//import re
+V PLAUSIBILITY_RATIO = 2
+
+F plausibility_check(comment, x, y)
+   print("\n  Checking plausibility of: #.".format(comment))
+   I x > :PLAUSIBILITY_RATIO * y
+      print(‘    PLAUSIBLE. As we have counts of #. vs #., a ratio of #2.1 times’.format(x, y, Float(x) / y))
+   E
+      I x > y
+         print(‘    IMPLAUSIBLE. As although we have counts of #. vs #., a ratio of #2.1 times does not make it plausible’.format(x, y, Float(x) / y))
+      E
+         print(‘    IMPLAUSIBLE, probably contra-indicated. As we have counts of #. vs #., a ratio of #2.1 times’.format(x, y, Float(x) / y))
+   R x > :PLAUSIBILITY_RATIO * y
+
+F simple_stats()
+   V words = File(‘unixdict.txt’).read().split("\n")
+   V cie = Set(words.filter(word -> ‘cie’ C word)).len
+   V cei = Set(words.filter(word -> ‘cei’ C word)).len
+   V not_c_ie = Set(words.filter(word -> re:‘(^ie|[^c]ie)’.search(word))).len
+   V not_c_ei = Set(words.filter(word -> re:‘(^ei|[^c]ei)’.search(word))).len
+   R (cei, cie, not_c_ie, not_c_ei)
+
+F print_result(cei, cie, not_c_ie, not_c_ei)
+   I (plausibility_check(‘I before E when not preceded by C’, not_c_ie, not_c_ei) & plausibility_check(‘E before I when preceded by C’, cei, cie))
+      print("\nOVERALL IT IS PLAUSIBLE!")
+   E
+      print("\nOVERALL IT IS IMPLAUSIBLE!")
+   print(‘(To be plausible, one count must exceed another by #. times)’.format(:PLAUSIBILITY_RATIO))
+print(‘Checking plausibility of "I before E except after C":’)
+V (cei, cie, not_c_ie, not_c_ei) = simple_stats()
+print_result(cei, cie, not_c_ie, not_c_ei)
+===
+auto PLAUSIBILITY_RATIO = 2;
+
+template <typename T1, typename T2, typename T3> auto plausibility_check(const T1 &comment, const T2 &x, const T3 &y)
+{
+    print(u"\n  Checking plausibility of: #."_S.format(comment));
+    if (x > ::PLAUSIBILITY_RATIO * y)
+        print(u"    PLAUSIBLE. As we have counts of #. vs #., a ratio of #2.1 times"_S.format(x, y, to_float(x) / y));
+    else
+        if (x > y)
+            print(u"    IMPLAUSIBLE. As although we have counts of #. vs #., a ratio of #2.1 times does not make it plausible"_S.format(x, y, to_float(x) / y));
+        else
+            print(u"    IMPLAUSIBLE, probably contra-indicated. As we have counts of #. vs #., a ratio of #2.1 times"_S.format(x, y, to_float(x) / y));
+    return x > ::PLAUSIBILITY_RATIO * y;
+}
+
+auto simple_stats()
+{
+    auto words = File(u"unixdict.txt"_S).read().split(u"\n"_S);
+    auto cie = create_set(words.filter([](const auto &word){return in(u"cie"_S, word);})).len();
+    auto cei = create_set(words.filter([](const auto &word){return in(u"cei"_S, word);})).len();
+    auto not_c_ie = create_set(words.filter([](const auto &word){return re::_(u"(^ie|[^c]ie)"_S).search(word);})).len();
+    auto not_c_ei = create_set(words.filter([](const auto &word){return re::_(u"(^ei|[^c]ei)"_S).search(word);})).len();
+    return make_tuple(cei, cie, not_c_ie, not_c_ei);
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto print_result(const T1 &cei, const T2 &cie, const T3 &not_c_ie, const T4 &not_c_ei)
+{
+    if ((plausibility_check(u"I before E when not preceded by C"_S, not_c_ie, not_c_ei) && plausibility_check(u"E before I when preceded by C"_S, cei, cie)))
+        print(u"\nOVERALL IT IS PLAUSIBLE!"_S);
+    else
+        print(u"\nOVERALL IT IS IMPLAUSIBLE!"_S);
+    print(u"(To be plausible, one count must exceed another by #. times)"_S.format(::PLAUSIBILITY_RATIO));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Checking plausibility of \"I before E except after C\":"_S);
+    }
+} code_block_1;
+auto [cei, cie, not_c_ie, not_c_ei] = simple_stats();
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print_result(cei, cie, not_c_ie, not_c_ei);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Inverted_index#D
+from typing import DefaultDict, Set
+import collections, re
+
+index : DefaultDict[str, Set[str]] = collections.defaultdict(set)
+
+def parse_file(fname, fcontents):
+    for word in re.split(r"\W", fcontents):
+        index[word.lower()].add(fname)
+
+for fname, fcontents in [('inv1.txt', 'It is what it is.'),
+                         ('inv2.txt', 'What is it?'),
+                         ('inv3.txt', 'It is a banana!')]:
+    parse_file(fname, fcontents)
+
+for w in ['cat', 'is', 'banana', 'it', 'what']:
+    print("\nEnter a word to search for: (q to quit):", w)
+    if w in index:
+        print("'%s' found in %s." % (w, sorted(list(index[w]))))
+    else:
+        print("'%s' not found." % w)
+===
+//import collections, re
+DefaultDict[String, Set[String]] index
+
+F parse_file(fname, fcontents)
+   L(word) fcontents.split(re:‘\W’)
+      :index[word.lowercase()].add(fname)
+
+L(fname, fcontents) [(‘inv1.txt’, ‘It is what it is.’), (‘inv2.txt’, ‘What is it?’), (‘inv3.txt’, ‘It is a banana!’)]
+   parse_file(fname, fcontents)
+
+L(w) [‘cat’, ‘is’, ‘banana’, ‘it’, ‘what’]
+   print("\nEnter a word to search for: (q to quit): "w)
+   I w C index
+      print(‘'#.' found in #..’.format(w, sorted(Array(index[w]))))
+   E
+      print(‘'#.' not found.’.format(w))
+===
+DefaultDict<String, Set<String>> index;
+
+template <typename T1, typename T2> auto parse_file(const T1 &fname, const T2 &fcontents)
+{
+    for (auto &&word : fcontents.split(re::_(uR"(\W)"_S)))
+        ::index[word.lowercase()].add(fname);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[fname, fcontents] : create_array({make_tuple(u"inv1.txt"_S, u"It is what it is."_S), make_tuple(u"inv2.txt"_S, u"What is it?"_S), make_tuple(u"inv3.txt"_S, u"It is a banana!"_S)}))
+            parse_file(fname, fcontents);
+
+        for (auto &&w : create_array({u"cat"_S, u"is"_S, u"banana"_S, u"it"_S, u"what"_S})) {
+            print(u"\nEnter a word to search for: (q to quit): "_S & w);
+            if (in(w, index))
+                print(u"'#.' found in #.."_S.format(w, sorted(create_array(index[w]))));
+            else
+                print(u"'#.' not found."_S.format(w));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Iterated_digits_squaring#Python
+import math
+
+def next_step(x):
+    result = 0
+    while x > 0:
+        result += (x % 10) ** 2
+        x //= 10
+    return result
+
+def check(number):
+    candidate = 0
+    for n in number:
+        candidate = candidate * 10 + n
+
+    while candidate != 89 and candidate != 1:
+        candidate = next_step(candidate)
+
+    if candidate == 89:
+        digits_count = [0] * 10
+        for d in number:
+            digits_count[d] += 1
+
+        result = math.factorial(len(number))
+        for c in digits_count:
+            result //= math.factorial(c)
+        return result
+
+    return 0
+
+limit = 100000000
+cache_size = int(math.ceil(math.log10(limit)))
+assert 10 ** cache_size == limit
+
+number = [0] * cache_size
+result = 0
+i = cache_size - 1
+
+while True:
+    if i == 0 and number[i] == 9:
+        break
+    if i == cache_size - 1 and number[i] < 9:
+        number[i] += 1
+        result += check(number)
+    elif number[i] == 9:
+        i -= 1
+    else:
+        number[i] += 1
+        for j in range(i + 1, cache_size):
+            number[j] = number[i]
+        i = cache_size - 1
+        result += check(number)
+
+print(result)
+===
+//import math
+
+F next_step(=x)
+   V result = 0
+   L x > 0
+      result += (x % 10) ^ 2
+      x I/= 10
+   R result
+
+F check(number)
+   V candidate = 0
+   L(n) number
+      candidate = candidate * 10 + n
+
+   L candidate != 89 & candidate != 1
+      candidate = next_step(candidate)
+
+   I candidate == 89
+      V digits_count = [0] * 10
+      L(d) number
+         digits_count[d]++
+      V result = factorial(number.len)
+      L(c) digits_count
+         result I/= factorial(c)
+      R result
+   R 0
+V limit = 100000000
+V cache_size = Int(ceil(log10(limit)))
+assert(10 ^ cache_size == limit)
+V number = [0] * cache_size
+V result = 0
+V i = cache_size - 1
+
+L
+   I i == 0 & number[i] == 9
+      L.break
+   I i == cache_size - 1 & number[i] < 9
+      number[i]++
+      result += check(number)
+   E I number[i] == 9
+      i--
+   E
+      number[i]++
+      L(j) i + 1 .< cache_size
+         number[j] = number[i]
+      i = cache_size - 1
+      result += check(number)
+print(result)
+===
+template <typename T1> auto next_step(T1 x)
+{
+    auto result = 0;
+    while (x > 0) {
+        result += square((mod(x, 10)));
+        x = idiv(x, 10);
+    }
+    return result;
+}
+
+template <typename T1> auto check(const T1 &number)
+{
+    auto candidate = 0;
+    for (auto &&n : number)
+        candidate = candidate * 10 + n;
+    while (candidate != 89 && candidate != 1)
+        candidate = next_step(candidate);
+
+    if (candidate == 89) {
+        auto digits_count = create_array({0}) * 10;
+        for (auto &&d : number)
+            digits_count[d]++;
+        auto result = factorial(number.len());
+        for (auto &&c : digits_count)
+            result = idiv(result, factorial(c));
+        return result;
+    }
+    return 0;
+}
+auto limit = 100000000;
+auto cache_size = to_int(ceil(log10(limit)));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        assert(pow(10, cache_size) == limit);
+    }
+} code_block_1;
+auto number = create_array({0}) * cache_size;
+auto result = 0;
+auto i = cache_size - 1;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+
+        while (true) {
+            if (i == 0 && number[i] == 9)
+                break;
+            if (i == cache_size - 1 && number[i] < 9) {
+                number[i]++;
+                result += check(number);
+            }
+            else if (number[i] == 9)
+                i--;
+            else {
+                number[i]++;
+                for (auto j : range_el(i + 1, cache_size))
+                    number.set(j, number[i]);
+                i = cache_size - 1;
+                result += check(number);
+            }
+        }
+        print(result);
+    }
+} code_block_2;

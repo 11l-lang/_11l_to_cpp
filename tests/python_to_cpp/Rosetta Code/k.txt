@@ -829,3 +829,207 @@ struct CodeBlock1
         print(kosaraju(g));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Knight%27s_tour#Python
+from copy import deepcopy
+
+_kmoves = [(2,1), (1,2), (-1,2), (-2,1), (-2,-1), (-1,-2), (1,-2), (2,-1)]
+
+def chess2index(chess, boardsize):
+    'Convert Algebraic chess notation to internal index format'
+    chess = chess.lower()
+    x = ord(chess[0]) - ord('a')
+    y = boardsize - int(chess[1:])
+    return (x, y)
+
+def boardstring(board, boardsize):
+    r = range(boardsize)
+    lines = ''
+    for y in r:
+        lines += '\n' + ','.join(('%2i' % board[(x,y)] if board[(x,y)] else '  ')
+                                 for x in r)
+    return lines
+
+def knightmoves(board, P, boardsize):
+    (Px, Py) = P
+    kmoves = set((Px+x, Py+y) for x,y in _kmoves)
+    kmoves = set( (x,y)
+                  for x,y in list(kmoves)
+                  if 0 <= x < boardsize
+                     and 0 <= y < boardsize
+                     and not board[(x,y)] )
+    return kmoves
+
+def accessibility(board, P, boardsize):
+    access : List[Tuple[int, Tuple[int, int]]] = []
+    brd = deepcopy(board)
+    for pos in knightmoves(board, P, boardsize=boardsize):
+        brd[pos] = -1
+        access.append( (len(knightmoves(brd, pos, boardsize=boardsize)), pos) )
+        brd[pos] = 0
+    return access
+
+def knights_tour(start, boardsize, _debug=False):
+    board : Dict[Tuple[int, int], int] = {}
+    for x in range(boardsize):
+        for y in range(boardsize):
+            board[(x, y)] = 0
+    move = 1
+    P = chess2index(start, boardsize)
+    board[P] = move
+    move += 1
+    if _debug:
+        print(boardstring(board, boardsize=boardsize))
+    while move <= len(board):
+        P = min(accessibility(board, P, boardsize))[1]
+        board[P] = move
+        move += 1
+        if _debug:
+            print(boardstring(board, boardsize=boardsize))
+            input('\n%2i next: ' % move)
+    return board
+
+for boardsize, start in [(5, 'c3'), (8, 'h8'), (10, 'e6')]:
+    print('boardsize:', boardsize)
+    print('Start position:', start)
+    board = knights_tour(start, boardsize)
+    print(boardstring(board, boardsize=boardsize))
+    print()
+===
+V _kmoves = [(2, 1), (1, 2), (-1, 2), (-2, 1), (-2, -1), (-1, -2), (1, -2), (2, -1)]
+
+F chess2index(=chess, boardsize)
+   ‘Convert Algebraic chess notation to internal index format’
+   chess = chess.lowercase()
+   V x = chess[0].code - ‘a’.code
+   V y = boardsize - Int(chess[1..])
+   R (x, y)
+
+F boardstring(board, boardsize)
+   V r = 0 .< boardsize
+   V lines = ‘’
+   L(y) r
+      lines ‘’= "\n"r.map(x -> (I @board[(x, @y)] {‘#2’.format(@board[(x, @y)])} E ‘  ’)).join(‘,’)
+   R lines
+
+F knightmoves(board, P, boardsize)
+   V (Px, Py) = P
+   V kmoves = Set(:_kmoves.map((x, y) -> (@Px + x, @Py + y)))
+   kmoves = Set(Array(kmoves).filter((x, y) -> x C 0 .< @boardsize & y C 0 .< @boardsize & !@board[(x, y)]))
+   R kmoves
+
+F accessibility(board, P, boardsize)
+   [(Int, (Int, Int))] access
+   V brd = copy(board)
+   L(pos) knightmoves(board, P, boardsize' boardsize)
+      brd[pos] = -1
+      access.append((knightmoves(brd, pos, boardsize' boardsize).len, pos))
+      brd[pos] = 0
+   R access
+
+F knights_tour(start, boardsize, _debug = 0B)
+   [(Int, Int) = Int] board
+   L(x) 0 .< boardsize
+      L(y) 0 .< boardsize
+         board[(x, y)] = 0
+   V move = 1
+   V P = chess2index(start, boardsize)
+   board[P] = move
+   move++
+   I _debug
+      print(boardstring(board, boardsize' boardsize))
+   L move <= board.len
+      P = min(accessibility(board, P, boardsize))[1]
+      board[P] = move
+      move++
+      I _debug
+         print(boardstring(board, boardsize' boardsize))
+         input("\n#2 next: ".format(move))
+   R board
+
+L(boardsize, start) [(5, ‘c3’), (8, ‘h8’), (10, ‘e6’)]
+   print(‘boardsize: ’boardsize)
+   print(‘Start position: ’start)
+   V board = knights_tour(start, boardsize)
+   print(boardstring(board, boardsize' boardsize))
+   print()
+===
+auto _kmoves = create_array({make_tuple(2, 1), make_tuple(1, 2), make_tuple(-1, 2), make_tuple(-2, 1), make_tuple(-2, -1), make_tuple(-1, -2), make_tuple(1, -2), make_tuple(2, -1)});
+
+template <typename T1, typename T2> auto chess2index(T1 chess, const T2 &boardsize)
+{
+    u"Convert Algebraic chess notation to internal index format"_S;
+    chess = chess.lowercase();
+    auto x = _get<0>(chess).code - u'a'_C.code;
+    auto y = boardsize - to_int(chess[range_ei(1)]);
+    return make_tuple(x, y);
+}
+
+template <typename T1, typename T2> auto boardstring(const T1 &board, const T2 &boardsize)
+{
+    auto r = range_el(0, boardsize);
+    auto lines = u""_S;
+    for (auto &&y : r)
+        lines &= u"\n"_S & r.map([&board, &y](const auto &x){return (board[make_tuple(x, y)] ? u"#2"_S.format(board[make_tuple(x, y)]) : u"  "_S);}).join(u","_S);
+    return lines;
+}
+
+template <typename T1, typename T2, typename T3> auto knightmoves(const T1 &board, const T2 &P, const T3 &boardsize)
+{
+    auto [Px, Py] = P;
+    auto kmoves = create_set(::_kmoves.map([&Px, &Py](const auto &x, const auto &y){return make_tuple(Px + x, Py + y);}));
+    kmoves = create_set(create_array(kmoves).filter([&board, &boardsize](const auto &x, const auto &y){return in(x, range_el(0, boardsize)) && in(y, range_el(0, boardsize)) && !board[make_tuple(x, y)];}));
+    return kmoves;
+}
+
+template <typename T1, typename T2, typename T3> auto accessibility(const T1 &board, const T2 &P, const T3 &boardsize)
+{
+    Array<Tuple<int, ivec2>> access;
+    auto brd = copy(board);
+    for (auto &&pos : knightmoves(board, P, boardsize)) {
+        brd.set(pos, -1);
+        access.append(make_tuple(knightmoves(brd, pos, boardsize).len(), pos));
+        brd.set(pos, 0);
+    }
+    return access;
+}
+
+template <typename T1, typename T2, typename T3 = decltype(false)> auto knights_tour(const T1 &start, const T2 &boardsize, const T3 &_debug = false)
+{
+    Dict<ivec2, int> board;
+    for (auto x : range_el(0, boardsize))
+        for (auto y : range_el(0, boardsize))
+            board.set(make_tuple(x, y), 0);
+    auto move = 1;
+    auto P = chess2index(start, boardsize);
+    board.set(P, move);
+    move++;
+    if (_debug)
+        print(boardstring(board, boardsize));
+    while (move <= board.len()) {
+        P = _get<1>(min(accessibility(board, P, boardsize)));
+        board.set(P, move);
+        move++;
+        if (_debug) {
+            print(boardstring(board, boardsize));
+            input(u"\n#2 next: "_S.format(move));
+        }
+    }
+    return board;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&[boardsize, start] : create_array({make_tuple(5, u"c3"_S), make_tuple(8, u"h8"_S), make_tuple(10, u"e6"_S)})) {
+            print(u"boardsize: "_S & boardsize);
+            print(u"Start position: "_S & start);
+            auto board = knights_tour(start, boardsize);
+            print(boardstring(board, boardsize));
+            print();
+        }
+    }
+} code_block_1;
