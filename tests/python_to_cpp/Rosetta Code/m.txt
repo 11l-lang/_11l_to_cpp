@@ -1342,3 +1342,198 @@ struct CodeBlock3
             print(u"| "_S & record.map([](const auto &r){return r.center(10);}).join(u" | "_S) & u" |"_S);
     }
 } code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Montgomery_reduction#Python
+BigInt = int
+
+class Montgomery:
+    m : BigInt
+    n : int
+    rrm : BigInt
+
+    def __init__(self, m):
+        self.m = m
+        self.n = m.bit_length()
+        self.rrm = (BigInt(2) ** (self.n * 2)) % m
+
+    def reduce(self, t):
+        a = t
+        for i in range(self.n):
+            if (a % 2) == 1:
+                a += self.m
+            a //= 2
+        if a >= self.m:
+            a -= self.m
+        return a
+
+m  = BigInt('750791094644726559640638407699')
+x1 = BigInt('540019781128412936473322405310')
+x2 = BigInt('515692107665463680305819378593')
+
+mont = Montgomery(m)
+t1 = x1 * mont.rrm
+t2 = x2 * mont.rrm
+
+r1 = mont.reduce(t1)
+r2 = mont.reduce(t2)
+r = BigInt(2) ** mont.n
+
+print("b :", 2)
+print("n :", mont.n)
+print("r :", r)
+print("m :", mont.m)
+print("t1:", t1)
+print("t2:", t2)
+print("r1:", r1)
+print("r2:", r2)
+print()
+print("Original x1       :", x1)
+print("Recovered from r1 :", mont.reduce(r1))
+print("Original x2       :", x2)
+print("Recovered from r2 :", mont.reduce(r2))
+
+print("\nMontgomery computation of x1 ^ x2 mod m:")
+prod = mont.reduce(mont.rrm)
+base = mont.reduce(x1 * mont.rrm)
+ex = x2
+while ex.bit_length() > 0:
+    if (ex % 2) == 1:
+        prod = mont.reduce(prod * base)
+    ex //= 2
+    base = mont.reduce(base * base)
+print(mont.reduce(prod))
+print("\nAlternate computation of x1 ^ x2 mod m:")
+print(pow(x1, x2, m))
+===
+
+T Montgomery
+   BigInt m
+   Int n
+   BigInt rrm
+
+   F (m)
+      .m = m
+      .n = bit_length(m)
+      .rrm = (BigInt(2) ^ (.n * 2)) % m
+
+   F reduce(t)
+      V a = t
+      L(i) 0 .< .n
+         I (a % 2) == 1
+            a += .m
+         a I/= 2
+      I a >= .m
+         a -= .m
+      R a
+V m = BigInt(‘750791094644726559640638407699’)
+V x1 = BigInt(‘540019781128412936473322405310’)
+V x2 = BigInt(‘515692107665463680305819378593’)
+V mont = Montgomery(m)
+V t1 = x1 * mont.rrm
+V t2 = x2 * mont.rrm
+V r1 = mont.reduce(t1)
+V r2 = mont.reduce(t2)
+V r = BigInt(2) ^ mont.n
+print(‘b : ’(2))
+print(‘n : ’(mont.n))
+print(‘r : ’r)
+print(‘m : ’(mont.m))
+print(‘t1: ’t1)
+print(‘t2: ’t2)
+print(‘r1: ’r1)
+print(‘r2: ’r2)
+print()
+print(‘Original x1       : ’x1)
+print(‘Recovered from r1 : ’mont.reduce(r1))
+print(‘Original x2       : ’x2)
+print(‘Recovered from r2 : ’mont.reduce(r2))
+print("\nMontgomery computation of x1 ^ x2 mod m:")
+V prod = mont.reduce(mont.rrm)
+V base = mont.reduce(x1 * mont.rrm)
+V ex = x2
+L bit_length(ex) > 0
+   I (ex % 2) == 1
+      prod = mont.reduce(prod * base)
+   ex I/= 2
+   base = mont.reduce(base * base)
+print(mont.reduce(prod))
+print("\nAlternate computation of x1 ^ x2 mod m:")
+print(pow(x1, x2, m))
+===
+class Montgomery
+{
+public:
+    BigInt m;
+    int n;
+    BigInt rrm;
+
+    template <typename T1> Montgomery(const T1 &m) :
+        m(m)
+    {
+        n = bit_length(m);
+        rrm = mod((pow(BigInt(2), (n * 2))), m);
+    }
+
+    template <typename T1> auto reduce(const T1 &t)
+    {
+        auto a = t;
+        for (auto i : range_el(0, n)) {
+            if ((mod(a, 2)) == 1)
+                a += m;
+            a = idiv(a, 2);
+        }
+        if (a >= m)
+            a -= m;
+        return a;
+    }
+};
+auto m = BigInt(u"750791094644726559640638407699"_S);
+auto x1 = BigInt(u"540019781128412936473322405310"_S);
+auto x2 = BigInt(u"515692107665463680305819378593"_S);
+auto mont = Montgomery(m);
+auto t1 = x1 * mont.rrm;
+auto t2 = x2 * mont.rrm;
+auto r1 = mont.reduce(t1);
+auto r2 = mont.reduce(t2);
+auto r = pow(BigInt(2), mont.n);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"b : "_S & (2));
+        print(u"n : "_S & (mont.n));
+        print(u"r : "_S & r);
+        print(u"m : "_S & (mont.m));
+        print(u"t1: "_S & t1);
+        print(u"t2: "_S & t2);
+        print(u"r1: "_S & r1);
+        print(u"r2: "_S & r2);
+        print();
+        print(u"Original x1       : "_S & x1);
+        print(u"Recovered from r1 : "_S & mont.reduce(r1));
+        print(u"Original x2       : "_S & x2);
+        print(u"Recovered from r2 : "_S & mont.reduce(r2));
+        print(u"\nMontgomery computation of x1 ^ x2 mod m:"_S);
+    }
+} code_block_1;
+auto prod = mont.reduce(mont.rrm);
+auto base = mont.reduce(x1 * mont.rrm);
+auto ex = x2;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (bit_length(ex) > 0) {
+            if ((mod(ex, 2)) == 1)
+                prod = mont.reduce(prod * base);
+            ex = idiv(ex, 2);
+            base = mont.reduce(base * base);
+        }
+        print(mont.reduce(prod));
+        print(u"\nAlternate computation of x1 ^ x2 mod m:"_S);
+        print(pow(x1, x2, m));
+    }
+} code_block_2;

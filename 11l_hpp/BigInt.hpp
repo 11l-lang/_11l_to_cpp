@@ -32,7 +32,7 @@ public:
 	    while (exponent != 0) {
 	        if (exponent % 2 != 0)
 	            result = (result * base) % modulus;
-	        exponent = exponent / 2;
+	        exponent /= 2;
 	        base = (base * base) % modulus;
 	    }
 	    return result;
@@ -318,6 +318,14 @@ public:
 	}
 	friend BigInt lcm(const BigInt &a, const BigInt &b) {
 		return a / gcd(a, b) * b;
+	}
+	friend int bit_length(BigInt v) {
+		int result = 0;
+		while (v > 0) {
+			v /= 2;
+			result++;
+		}
+		return result;
 	}
 
 	void read(const String &s) {
