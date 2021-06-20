@@ -1790,6 +1790,8 @@ def type_of(sn):
             if tid.ast_nodes[0].function_return_type == '':
                 return None
             type_name = tid.ast_nodes[0].function_return_type
+            if type_name.startswith('Array['): # ]
+                type_name = 'Array'
             tid = tid.ast_nodes[0].scope.find(type_name)
         else: # `Converter(habr_html, ohd).to_html(instr, outfilef)`
             type_name = sn.children[0].children[0].token_str()
@@ -3227,6 +3229,7 @@ set_scope.add_name('is_subset', ASTFunctionDefinition([('other', '', 'Set')]))
 set_scope.add_name('add', ASTFunctionDefinition([('elem', '', '')]))
 set_scope.add_name('remove', ASTFunctionDefinition([('elem', '', '')]))
 set_scope.add_name('discard', ASTFunctionDefinition([('elem', '', '')]))
+set_scope.add_name('clear', ASTFunctionDefinition([]))
 set_scope.add_name('map', ASTFunctionDefinition([('f', '', '')]))
 builtins_scope.ids['Set'].ast_nodes[0].scope = set_scope
 deque_scope = Scope(None)

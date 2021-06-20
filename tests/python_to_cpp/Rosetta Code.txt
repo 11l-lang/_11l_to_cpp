@@ -15585,3 +15585,379 @@ struct CodeBlock1
         ant(75, 52, 12000);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Nonogram_solver#Python
+from typing import List
+ConstList = List
+from functools import reduce
+
+def gen_row(w, s):
+    """Create all patterns of a row or col that match given runs."""
+    def gen_seg(o : ConstList[List[int]], sp : int) -> List[List[int]]:
+        if len(o) == 0:
+            return [[2] * sp]
+        # return [[2] * x + o[0] + tail
+        #         for x in range(1, sp - len(o) + 2)
+        #         for tail in gen_seg(o[1:], sp - x)]
+        r : List[List[int]] = []
+        for x in range(1, sp - len(o) + 2):
+            for tail in gen_seg(o[1:], sp - x):
+                r += [[2] * x + o[0] + tail]
+        return r
+
+    return [x[1:] for x in gen_seg([[1] * i for i in s], w + 1 - sum(s))]
+
+def deduce(hr, vr):
+    """Fix inevitable value of cells, and propagate."""
+    def allowable(row):
+        return reduce(lambda a, b: [x | y for x, y in zip(a, b)], row)
+
+    def fits(a, b):
+        return all(x & y for x, y in zip(a, b))
+
+    (w, h) = (len(vr), len(hr))
+    rows = [gen_row(w, x) for x in hr]
+    cols = [gen_row(h, x) for x in vr]
+    can_do = list(map(allowable, rows))
+
+    # Initially mark all columns for update.
+    mod_rows = set() # int
+    mod_cols = set(range(w))
+
+    def fix_col(n):
+        """See if any value in a given column is fixed;
+        if so, mark its corresponding row for future fixup."""
+        c = [x[n] for x in can_do]
+        cols[n] = [x for x in cols[n] if fits(x, c)]
+        for i, x in enumerate(allowable(cols[n])):
+            if x != can_do[i][n]:
+                mod_rows.add(i)
+                can_do[i][n] &= x
+
+    def fix_row(n):
+        """Ditto, for rows."""
+        c = can_do[n]
+        rows[n] = [x for x in rows[n] if fits(x, c)]
+        for i, x in enumerate(allowable(rows[n])):
+            if x != can_do[n][i]:
+                mod_cols.add(i)
+                can_do[n][i] &= x
+
+    def show_gram(m):
+        # If there's 'x', something is wrong.
+        # If there's '?', needs more work.
+        for x in m:
+            print(" ".join("x#.?"[i] for i in x))
+        print()
+
+    while len(mod_cols) != 0:
+        for i in mod_cols:
+            fix_col(i)
+        mod_cols.clear()
+        for i in mod_rows:
+            fix_row(i)
+        mod_rows.clear()
+
+    if all(can_do[i][j] in (1, 2) for j in range(w) for i in range(h)):
+        print("Solution would be unique")  # but could be incorrect!
+    else:
+        print("Solution may not be unique, doing exhaustive search:")
+
+    # We actually do exhaustive search anyway. Unique solution takes
+    # no time in this phase anyway, but just in case there's no
+    # solution (could happen?).
+    out = [[0]*0] * h
+
+    def try_all(n : int) -> int: # `(n = 0)` does not work here (see [https://stackoverflow.com/questions/22916784/how-should-i-define-a-stdfunction-variable-with-default-arguments <- google:‘c++ std function default argument’])
+        if n >= h:
+            for j in range(w):
+                if [x[j] for x in out] not in cols[j]:
+                    return 0
+            show_gram(out)
+            return 1
+        sol = 0
+        for x in rows[n]:
+            out[n] = x
+            sol += try_all(n + 1)
+        return sol
+
+    n = try_all(0)
+    if n == 0:
+        print("No solution.")
+    elif n == 1:
+        print("Unique solution.")
+    else:
+        print(n, "solutions.")
+    print()
+
+def solve(p, show_runs=True):
+    # s = [[[ord(c) - ord('A') + 1 for c in w] for w in l.split()]
+    #      for l in p.splitlines()]
+    s : List[List[List[int]]] = []
+    for l in p.split("\n"):
+        s += [[[ord(c) - ord('A') + 1 for c in w] for w in l.split(' ')]]
+    if show_runs:
+        print("Horizontal runs:", s[0])
+        print("Vertical runs:", s[1])
+    deduce(s[0], s[1])
+
+for p in open('nonogram_problems.txt').read().split("\n\n"):
+    solve(p)
+
+print("Extra example not solvable by deduction alone:")
+solve("B B A A\nB B A A")
+
+print("Extra example where there is no solution:")
+solve("B A A\nA A A")
+===
+
+F gen_row(w, s)
+   ‘Create all patterns of a row or col that match given runs.’
+   F gen_seg([[Int]] o, Int sp) -> [[Int]]
+      I o.empty
+         R [[2] * sp]
+      [[Int]] r
+      L(x) 1 .< sp - o.len + 2
+         L(tail) @gen_seg(o[1..], sp - x)
+            r [+]= [2] * x [+] o[0] [+] tail
+      R r
+   R gen_seg(s.map(i -> [1] * i), w + 1 - sum(s)).map(x -> x[1..])
+
+F deduce(hr, vr)
+   ‘Fix inevitable value of cells, and propagate.’
+   F allowable(row)
+      R row.reduce((a, b) -> zip(a, b).map((x, y) -> x [|] y))
+
+   F fits(a, b)
+      R all(zip(a, b).map((x, y) -> x [&] y))
+   V (w, h) = (vr.len, hr.len)
+   V rows = hr.map(x -> gen_row(@w, x))
+   V cols = vr.map(x -> gen_row(@h, x))
+   V can_do = rows.map(allowable)
+   V mod_rows = Set[Int]()
+   V mod_cols = Set(0 .< w)
+
+   F fix_col(n)
+      ‘See if any value in a given column is fixed;
+        if so, mark its corresponding row for future fixup.’
+      V c = @can_do.map(x -> x[@n])
+      @cols[n] = @cols[n].filter(x -> @@fits(x, @c))
+      L(x) @allowable(@cols[n])
+         V i = L.index
+         I x != @can_do[i][n]
+            @mod_rows.add(i)
+            @can_do[i][n] [&]= x
+
+   F fix_row(n)
+      ‘Ditto, for rows.’
+      V c = @can_do[n]
+      @rows[n] = @rows[n].filter(x -> @@fits(x, @c))
+      L(x) @allowable(@rows[n])
+         V i = L.index
+         I x != @can_do[n][i]
+            @mod_cols.add(i)
+            @can_do[n][i] [&]= x
+
+   F show_gram(m)
+      L(x) m
+         print(x.map(i -> ‘x#.?’[i]).join(‘ ’))
+      print()
+
+   L !mod_cols.empty
+      L(i) mod_cols
+         fix_col(i)
+      mod_cols.clear()
+      L(i) mod_rows
+         fix_row(i)
+      mod_rows.clear()
+
+   I all(multiloop((0 .< w), (0 .< h), (j, i) -> @can_do[i][j] C (1, 2)))
+      print(‘Solution would be unique’)
+   E
+      print(‘Solution may not be unique, doing exhaustive search:’)
+   V out = [[Int]()] * h
+
+   F try_all(Int n) -> Int
+      I n >= @h
+         L(j) 0 .< @w
+            I @out.map(x -> x[@j]) !C @cols[j]
+               R 0
+         @show_gram(@out)
+         R 1
+      V sol = 0
+      L(x) @rows[n]
+         @out[n] = x
+         sol += @try_all(n + 1)
+      R sol
+   V n = try_all(0)
+   S n
+      0
+         print(‘No solution.’)
+      1
+         print(‘Unique solution.’)
+      E
+         print(n‘ solutions.’)
+   print()
+
+F solve(p, show_runs = 1B)
+   [[[Int]]] s
+   L(l) p.split("\n")
+      s [+]= l.split(‘ ’).map(w -> w.map(c -> c.code - ‘A’.code + 1))
+   I show_runs
+      print(‘Horizontal runs: ’s[0])
+      print(‘Vertical runs: ’s[1])
+   deduce(s[0], s[1])
+
+L(p) File(‘nonogram_problems.txt’).read().split("\n\n")
+   solve(p)
+print(‘Extra example not solvable by deduction alone:’)
+solve("B B A A\nB B A A")
+print(‘Extra example where there is no solution:’)
+solve("B A A\nA A A")
+===
+template <typename T1, typename T2> auto gen_row(const T1 &w, const T2 &s)
+{
+    u"Create all patterns of a row or col that match given runs."_S;
+    std::function<Array<Array<int>>(Array<Array<int>>, int)> gen_seg = [&gen_seg](const Array<Array<int>> &o, const int sp)
+    {
+        if (o.empty())
+            return create_array({create_array({2}) * sp});
+        Array<Array<int>> r;
+        for (auto x : range_el(1, sp - o.len() + 2))
+            for (auto &&tail : gen_seg(o[range_ei(1)], sp - x))
+                r.append(create_array({2}) * x + _get<0>(o) + tail);
+        return r;
+    };
+    return gen_seg(s.map([](const auto &i){return create_array({1}) * i;}), w + 1 - sum(s)).map([](const auto &x){return x[range_ei(1)];});
+}
+
+template <typename T1, typename T2> auto deduce(const T1 &hr, const T2 &vr)
+{
+    u"Fix inevitable value of cells, and propagate."_S;
+    auto allowable = [](const auto &row)
+    {
+        return row.reduce([](const auto &a, const auto &b){return zip(a, b).map([](const auto &x, const auto &y){return x | y;});});
+    };
+
+    auto fits = [](const auto &a, const auto &b)
+    {
+        return all(zip(a, b).map([](const auto &x, const auto &y){return x & y;}));
+    };
+    auto [w, h] = make_tuple(vr.len(), hr.len());
+    auto rows = hr.map([&w](const auto &x){return gen_row(w, x);});
+    auto cols = vr.map([&h](const auto &x){return gen_row(h, x);});
+    auto can_do = rows.map(allowable);
+    auto mod_rows = Set<int>();
+    auto mod_cols = create_set(range_el(0, w));
+
+    auto fix_col = [&allowable, &can_do, &cols, &fits, &mod_rows](const auto &n)
+    {
+        uR"(See if any value in a given column is fixed;
+        if so, mark its corresponding row for future fixup.)"_S;
+        auto c = can_do.map([&n](const auto &x){return x[n];});
+        cols.set(n, cols[n].filter([&c, &fits](const auto &x){return fits(x, c);}));
+        {int Lindex = 0;
+        for (auto &&x : allowable(cols[n])) {
+            auto i = Lindex;
+            if (x != can_do[i][n]) {
+                mod_rows.add(i);
+                can_do[i][n] &= x;
+            }
+            Lindex++;
+        }}
+    };
+
+    auto fix_row = [&allowable, &can_do, &fits, &mod_cols, &rows](const auto &n)
+    {
+        u"Ditto, for rows."_S;
+        auto c = can_do[n];
+        rows.set(n, rows[n].filter([&c, &fits](const auto &x){return fits(x, c);}));
+        {int Lindex = 0;
+        for (auto &&x : allowable(rows[n])) {
+            auto i = Lindex;
+            if (x != can_do[n][i]) {
+                mod_cols.add(i);
+                can_do[n][i] &= x;
+            }
+            Lindex++;
+        }}
+    };
+
+    auto show_gram = [](const auto &m)
+    {
+        for (auto &&x : m)
+            print(x.map([](const auto &i){return u"x#.?"_S[i];}).join(u" "_S));
+        print();
+    };
+
+    while (!mod_cols.empty()) {
+        for (auto &&i : mod_cols)
+            fix_col(i);
+        mod_cols.clear();
+        for (auto &&i : mod_rows)
+            fix_row(i);
+        mod_rows.clear();
+    }
+    if (all(multiloop(range_el(0, w), range_el(0, h), [&can_do](const auto &j, const auto &i){return in(can_do[i][j], make_tuple(1, 2));})))
+        print(u"Solution would be unique"_S);
+    else
+        print(u"Solution may not be unique, doing exhaustive search:"_S);
+    auto out = create_array({Array<int>()}) * h;
+
+    std::function<int(int)> try_all = [&cols, &h, &out, &rows, &show_gram, &try_all, &w](const int n)
+    {
+        if (n >= h) {
+            for (auto j : range_el(0, w))
+                if (!in(out.map([&j](const auto &x){return x[j];}), cols[j]))
+                    return 0;
+            show_gram(out);
+            return 1;
+        }
+        auto sol = 0;
+        for (auto &&x : rows[n]) {
+            out.set(n, x);
+            sol += try_all(n + 1);
+        }
+        return sol;
+    };
+    auto n = try_all(0);
+    switch (n)
+    {
+    case 0:
+        print(u"No solution."_S);
+        break;
+    case 1:
+        print(u"Unique solution."_S);
+        break;
+    default:
+        print(n & u" solutions."_S);
+        break;
+    }
+    print();
+}
+
+template <typename T1, typename T2 = decltype(true)> auto solve(const T1 &p, const T2 &show_runs = true)
+{
+    Array<Array<Array<int>>> s;
+    for (auto &&l : p.split(u"\n"_S))
+        s.append(l.split(u" "_S).map([](const auto &w){return w.map([](const auto &c){return c.code - u'A'_C.code + 1;});}));
+    if (show_runs) {
+        print(u"Horizontal runs: "_S & _get<0>(s));
+        print(u"Vertical runs: "_S & _get<1>(s));
+    }
+    deduce(_get<0>(s), _get<1>(s));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&p : File(u"nonogram_problems.txt"_S).read().split(u"\n\n"_S))
+            solve(p);
+        print(u"Extra example not solvable by deduction alone:"_S);
+        solve(u"B B A A\nB B A A"_S);
+        print(u"Extra example where there is no solution:"_S);
+        solve(u"B A A\nA A A"_S);
+    }
+} code_block_1;
