@@ -209,7 +209,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
 
          I tabs & spaces
             V next_line_pos = source.findi("\n", i)
-            X Error(‘mixing tabs and spaces in indentation: `’source[linestart .< i].replace(‘ ’, ‘S’).replace("\t", ‘TAB’)‘’source[i .< I next_line_pos != -1 {next_line_pos} E !source.empty]‘`’, i)
+            X Error(‘mixing tabs and spaces in indentation: `’source[linestart .< i].replace(‘ ’, ‘S’).replace("\t", ‘TAB’)‘’source[i .< I next_line_pos != -1 {next_line_pos} E source.len]‘`’, i)
          V indentation_level = ii - linestart
          I indentation_levels.len & indentation_levels.last[0] == -1
             indentation_levels.last = (indentation_level, indentation_levels.last[1])

@@ -1899,3 +1899,1299 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Partition_an_integer_x_into_n_primes#D
+def is_prime(a):
+    return not (a < 2 or any(a % x == 0 for x in range(2, int(a**0.5) + 1)))
+
+def generate_primes(n):
+    r = [2]
+    i = 3
+    while True:
+        if is_prime(i):
+            r.append(i)
+            if len(r) == n:
+                break
+        i += 2
+    return r
+
+primes = generate_primes(50_000)
+
+def find_combo(k, x, m, n, combo : list):
+    if k >= m:
+        if sum(primes[idx] for idx in combo) == x:
+            print('Partitioned %5d with %2d %s: ' % (x, m, 'primes' if m > 1 else 'prime '), end = '')
+            for i in range(m):
+                print(primes[combo[i]], end = '+' if i < m - 1 else "\n") # L.last_iteration
+            return True
+    else:
+        for j in range(n):
+            if k == 0 or j > combo[k-1]:
+                combo[k] = j
+                if find_combo(k+1, x, m, n, combo):
+                    return True
+    return False
+
+def partition(x, m):
+    n = len([a for a in primes if a <= x])
+    combo = [0] * m
+    if not find_combo(0, x, m, n, combo):
+        print('Partitioned %5d with %2d %s: (not possible)' % (x, m, 'primes' if m > 1 else 'prime '))
+
+data = [(99809, 1), (18, 2), (19, 3), (20, 4), (2017, 24),
+        (22699, 1), (22699, 2), (22699, 3), (22699, 4), (40355, 3)]
+
+for n, cnt in data:
+    partition(n, cnt)
+===
+F is_prime(a)
+   R !(a < 2 | any((2 .. Int(a ^ 0.5)).map(x -> @a % x == 0)))
+
+F generate_primes(n)
+   V r = [2]
+   V i = 3
+   L
+      I is_prime(i)
+         r.append(i)
+         I r.len == n
+            L.break
+      i += 2
+   R r
+V primes = generate_primes(50'000)
+
+F find_combo(k, x, m, n, &combo)
+   I k >= m
+      I sum(combo.map(idx -> :primes[idx])) == x
+         print(‘Partitioned #5 with #2 #.: ’.format(x, m, I m > 1 {‘primes’} E ‘prime ’), end' ‘’)
+         L(i) 0 .< m
+            print(:primes[combo[i]], end' I i < m - 1 {‘+’} E "\n")
+         R 1B
+   E
+      L(j) 0 .< n
+         I k == 0 | j > combo[k - 1]
+            combo[k] = j
+            I find_combo(k + 1, x, m, n, &combo)
+               R 1B
+   R 0B
+
+F partition(x, m)
+   V n = :primes.filter(a -> a <= @x).len
+   V combo = [0] * m
+   I !find_combo(0, x, m, n, &combo)
+      print(‘Partitioned #5 with #2 #.: (not possible)’.format(x, m, I m > 1 {‘primes’} E ‘prime ’))
+V data = [(99809, 1), (18, 2), (19, 3), (20, 4), (2017, 24), (22699, 1), (22699, 2), (22699, 3), (22699, 4), (40355, 3)]
+
+L(n, cnt) data
+   partition(n, cnt)
+===
+template <typename T1> auto is_prime(const T1 &a)
+{
+    return !(a < 2 || any(range_ee(2, to_int(pow(a, 0.5))).map([&a](const auto &x){return mod(a, x) == 0;})));
+}
+
+template <typename T1> auto generate_primes(const T1 &n)
+{
+    auto r = create_array({2});
+    auto i = 3;
+    while (true) {
+        if (is_prime(i)) {
+            r.append(i);
+            if (r.len() == n)
+                break;
+        }
+        i += 2;
+    }
+    return r;
+}
+auto primes = generate_primes(50'000);
+
+template <typename T1, typename T2, typename T3, typename T4, typename T5> auto find_combo(const T1 &k, const T2 &x, const T3 &m, const T4 &n, T5 &combo)
+{
+    if (k >= m) {
+        if (sum_map(combo, [](const auto &idx){return ::primes[idx];}) == x) {
+            print(u"Partitioned #5 with #2 #.: "_S.format(x, m, m > 1 ? u"primes"_S : u"prime "_S), u""_S);
+            for (auto i : range_el(0, m))
+                print(::primes[combo[i]], i < m - 1 ? u"+"_S : u"\n"_S);
+            return true;
+        }
+    }
+    else
+        for (auto j : range_el(0, n))
+            if (k == 0 || j > combo[k - 1]) {
+                combo.set(k, j);
+                if (find_combo(k + 1, x, m, n, combo))
+                    return true;
+            }
+    return false;
+}
+
+template <typename T1, typename T2> auto partition(const T1 &x, const T2 &m)
+{
+    auto n = ::primes.filter([&x](const auto &a){return a <= x;}).len();
+    auto combo = create_array({0}) * m;
+    if (!find_combo(0, x, m, n, combo))
+        print(u"Partitioned #5 with #2 #.: (not possible)"_S.format(x, m, m > 1 ? u"primes"_S : u"prime "_S));
+}
+auto data = create_array({make_tuple(99809, 1), make_tuple(18, 2), make_tuple(19, 3), make_tuple(20, 4), make_tuple(2017, 24), make_tuple(22699, 1), make_tuple(22699, 2), make_tuple(22699, 3), make_tuple(22699, 4), make_tuple(40355, 3)});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[n, cnt] : data)
+            partition(n, cnt);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Pascal%27s_triangle/Puzzle#D
+def e(x : list, row, col): # -> &
+    return x[row * (row + 1) // 2 + col]
+
+def iterate(v : list, diff : list, do_print = True):
+    tot = 0.0
+    while True:
+        e(v, 0, 0) = 151
+        e(v, 2, 0) = 40
+        e(v, 4, 1) = 11
+        e(v, 4, 3) = 4
+
+        for i in range(1, 5):
+            for j in range(i + 1):
+                e(diff, i, j) = 0
+                if j < i:
+                    e(diff, i, j) += e(v, i - 1, j) - e(v, i, j + 1) - e(v, i, j)
+                if j != 0:
+                    e(diff, i, j) += e(v, i - 1, j - 1) - e(v, i, j - 1) - e(v, i, j)
+
+        for i in range(1, 4):
+            for j in range(0, i):
+                e(diff, i, j) += e(v, i + 1, j) + e(v, i + 1, j + 1) - e(v, i, j)
+
+        e(diff, 4, 2) += e(v, 4, 0) + e(v, 4, 4) - e(v, 4, 2)
+
+        for i in range(len(v)):
+            v[i] += diff[i] / 4
+
+        tot = sum(a * a for a in diff)
+        if do_print:
+            print('dev:', tot)
+        if tot < 0.1:
+            break
+
+v = [0.0] * 15
+diff = [0.0] * 15
+iterate(v, diff)
+
+idx = 0
+for i in range(5):
+    for j in range(i + 1):
+        print('%4d' % int(0.5 + v[idx]), end = ' ' if j < i else "\n")
+        idx += 1
+===
+F e(&x, row, col) -> &
+   R x[row * (row + 1) I/ 2 + col]
+
+F iterate(&v, &diff, do_print = 1B)
+   V tot = 0.0
+   L
+      e(&v, 0, 0) = 151
+      e(&v, 2, 0) = 40
+      e(&v, 4, 1) = 11
+      e(&v, 4, 3) = 4
+
+      L(i) 1..4
+         L(j) 0 .. i
+            e(&diff, i, j) = 0
+            I j < i
+               e(&diff, i, j) += e(&v, i - 1, j) - e(&v, i, j + 1) - e(&v, i, j)
+            I j != 0
+               e(&diff, i, j) += e(&v, i - 1, j - 1) - e(&v, i, j - 1) - e(&v, i, j)
+
+      L(i) 1..3
+         L(j) 0 .< i
+            e(&diff, i, j) += e(&v, i + 1, j) + e(&v, i + 1, j + 1) - e(&v, i, j)
+      e(&diff, 4, 2) += e(&v, 4, 0) + e(&v, 4, 4) - e(&v, 4, 2)
+
+      L(i) 0 .< v.len
+         v[i] += diff[i] / 4
+      tot = sum(diff.map(a -> a * a))
+      I do_print
+         print(‘dev: ’tot)
+      I tot < 0.1
+         L.break
+V v = [0.0] * 15
+V diff = [0.0] * 15
+iterate(&v, &diff)
+V idx = 0
+L(i) 5
+   L(j) 0 .. i
+      print(‘#4’.format(Int(0.5 + v[idx])), end' I j < i {‘ ’} E "\n")
+      idx++
+===
+template <typename T1, typename T2, typename T3> auto& e(T1 &x, const T2 &row, const T3 &col)
+{
+    return x[idiv(row * (row + 1), 2) + col];
+}
+
+template <typename T1, typename T2, typename T3 = decltype(true)> auto iterate(T1 &v, T2 &diff, const T3 &do_print = true)
+{
+    auto tot = 0.0;
+    while (true) {
+        e(v, 0, 0) = 151;
+        e(v, 2, 0) = 40;
+        e(v, 4, 1) = 11;
+        e(v, 4, 3) = 4;
+        for (auto i : range_ee(1, 4))
+            for (auto j : range_ee(0, i)) {
+                e(diff, i, j) = 0;
+                if (j < i)
+                    e(diff, i, j) += e(v, i - 1, j) - e(v, i, j + 1) - e(v, i, j);
+                if (j != 0)
+                    e(diff, i, j) += e(v, i - 1, j - 1) - e(v, i, j - 1) - e(v, i, j);
+            }
+        for (auto i : range_ee(1, 3))
+            for (auto j : range_el(0, i))
+                e(diff, i, j) += e(v, i + 1, j) + e(v, i + 1, j + 1) - e(v, i, j);
+        e(diff, 4, 2) += e(v, 4, 0) + e(v, 4, 4) - e(v, 4, 2);
+        for (auto i : range_el(0, v.len()))
+            v[i] += diff[i] / 4.0;
+        tot = sum_map(diff, [](const auto &a){return a * a;});
+        if (do_print)
+            print(u"dev: "_S & tot);
+        if (tot < 0.1)
+            break;
+    }
+}
+auto v = create_array({0.0}) * 15;
+auto diff = create_array({0.0}) * 15;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        iterate(v, diff);
+    }
+} code_block_1;
+auto idx = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (int i = 0; i < 5; i++)
+            for (auto j : range_ee(0, i)) {
+                print(u"#4"_S.format(to_int(0.5 + v[idx])), j < i ? u" "_S : u"\n"_S);
+                idx++;
+            }
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Peaceful_chess_queen_armies#D
+from enum import IntEnum
+from typing import List, Tuple
+
+class Piece(IntEnum):
+    EMPTY = 0
+    BLACK = 1
+    WHITE = 2
+
+def isAttacking(queen, pos):
+    return queen[0] == pos[0] \
+        or queen[1] == pos[1] \
+        or abs(queen[0] - pos[0]) == abs(queen[1] - pos[1])
+
+def place(m, n, pBlackQueens : list, pWhiteQueens : list):
+    if m == 0:
+        return True
+
+    placingBlack = True
+    for i in range(n):
+        for j in range(n):
+            pos = (i, j)
+            for queen in pBlackQueens:
+                if queen == pos or ((not placingBlack) and isAttacking(queen, pos)):
+                    break # `L(j).continue`
+            else:
+                for queen in pWhiteQueens:
+                    if queen == pos or (placingBlack and isAttacking(queen, pos)):
+                        break
+                else:
+                    if placingBlack:
+                        pBlackQueens += [pos]
+                        placingBlack = False
+                    else:
+                        pWhiteQueens += [pos]
+                        if place(m - 1, n, pBlackQueens, pWhiteQueens):
+                            return True
+                        pBlackQueens.pop()
+                        pWhiteQueens.pop()
+                        placingBlack = True
+
+    if not placingBlack:
+        pBlackQueens.pop()
+    return False
+
+def printBoard(n, blackQueens, whiteQueens):
+    board = [Piece.EMPTY] * (n * n)
+
+    for queen in blackQueens:
+        board[queen[0] * n + queen[1]] = Piece.BLACK
+
+    for queen in whiteQueens:
+        board[queen[0] * n + queen[1]] = Piece.WHITE
+
+    for i, b in enumerate(board):
+        if i != 0 and i % n == 0:
+            print()
+        if b == Piece.BLACK:
+            print('B ', end = '')
+        elif b == Piece.WHITE:
+            print('W ', end = '')
+        else:
+            j = i // n
+            k = i - j * n
+            if j % 2 == k % 2:
+                print('x ', end = '')
+            else:
+                print('o ', end = '')
+    print("\n")
+
+nms = [
+        (2, 1), (3, 1), (3, 2), (4, 1), (4, 2), (4, 3),
+        (5, 1), (5, 2), (5, 3), (5, 4), (5, 5),
+        (6, 1), (6, 2), (6, 3), (6, 4), (6, 5), (6, 6),
+        (7, 1), (7, 2), (7, 3), (7, 4), (7, 5), (7, 6), (7, 7),
+      ]
+
+for nm in nms:
+    print("%d black and %d white queens on a %d x %d board:" % (nm[1], nm[1], nm[0], nm[0]))
+    blackQueens : List[Tuple[int, int]] = []
+    whiteQueens : List[Tuple[int, int]] = []
+    if place(nm[1], nm[0], blackQueens, whiteQueens):
+        printBoard(nm[0], blackQueens, whiteQueens)
+    else:
+        print("No solution exists.\n")
+===
+T.enum Piece
+   EMPTY
+   BLACK
+   WHITE
+
+F isAttacking(queen, pos)
+   R queen[0] == pos[0] | queen[1] == pos[1] | abs(queen[0] - pos[0]) == abs(queen[1] - pos[1])
+
+F place(m, n, &pBlackQueens, &pWhiteQueens)
+   I m == 0
+      R 1B
+   V placingBlack = 1B
+   L(i) 0 .< n
+      L(j) 0 .< n
+         V pos = (i, j)
+         L(queen) pBlackQueens
+            I queen == pos | ((!placingBlack) & isAttacking(queen, pos))
+               L.break
+         L.was_no_break
+            L(queen) pWhiteQueens
+               I queen == pos | (placingBlack & isAttacking(queen, pos))
+                  L.break
+            L.was_no_break
+               I placingBlack
+                  pBlackQueens [+]= pos
+                  placingBlack = 0B
+               E
+                  pWhiteQueens [+]= pos
+                  I place(m - 1, n, &pBlackQueens, &pWhiteQueens)
+                     R 1B
+                  pBlackQueens.pop()
+                  pWhiteQueens.pop()
+                  placingBlack = 1B
+
+   I !placingBlack
+      pBlackQueens.pop()
+   R 0B
+
+F printBoard(n, blackQueens, whiteQueens)
+   V board = [Piece.EMPTY] * (n * n)
+
+   L(queen) blackQueens
+      board[queen[0] * n + queen[1]] = Piece.BLACK
+
+   L(queen) whiteQueens
+      board[queen[0] * n + queen[1]] = Piece.WHITE
+
+   L(b) board
+      V i = L.index
+      I i != 0 & i % n == 0
+         print()
+      I b == BLACK
+         print(‘B ’, end' ‘’)
+      E I b == WHITE
+         print(‘W ’, end' ‘’)
+      E
+         V j = i I/ n
+         V k = i - j * n
+         I j % 2 == k % 2
+            print(‘x ’, end' ‘’)
+         E
+            print(‘o ’, end' ‘’)
+   print("\n")
+V nms = [(2, 1), (3, 1), (3, 2), (4, 1), (4, 2), (4, 3), (5, 1), (5, 2), (5, 3), (5, 4), (5, 5), (6, 1), (6, 2), (6, 3), (6, 4), (6, 5), (6, 6), (7, 1), (7, 2), (7, 3), (7, 4), (7, 5), (7, 6), (7, 7)]
+
+L(nm) nms
+   print(‘#. black and #. white queens on a #. x #. board:’.format(nm[1], nm[1], nm[0], nm[0]))
+   [(Int, Int)] blackQueens
+   [(Int, Int)] whiteQueens
+   I place(nm[1], nm[0], &blackQueens, &whiteQueens)
+      printBoard(nm[0], blackQueens, whiteQueens)
+   E
+      print("No solution exists.\n")
+===
+enum class Piece {
+    EMPTY,
+    BLACK,
+    WHITE
+};
+
+template <typename T1, typename T2> auto isAttacking(const T1 &queen, const T2 &pos)
+{
+    return _get<0>(queen) == _get<0>(pos) || _get<1>(queen) == _get<1>(pos) || abs(_get<0>(queen) - _get<0>(pos)) == abs(_get<1>(queen) - _get<1>(pos));
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto place(const T1 &m, const T2 &n, T3 &pBlackQueens, T4 &pWhiteQueens)
+{
+    if (m == 0)
+        return true;
+    auto placingBlack = true;
+    for (auto i : range_el(0, n))
+        for (auto j : range_el(0, n)) {
+            auto pos = make_tuple(i, j);
+            {bool was_break = false;
+            for (auto &&queen : pBlackQueens)
+                if (queen == pos || ((!placingBlack) && isAttacking(queen, pos))) {
+                    was_break = true;
+                    break;
+                }
+            if (!was_break)
+                {bool was_break = false;
+                for (auto &&queen : pWhiteQueens)
+                    if (queen == pos || (placingBlack && isAttacking(queen, pos))) {
+                        was_break = true;
+                        break;
+                    }
+                if (!was_break)
+                    if (placingBlack) {
+                        pBlackQueens.append(pos);
+                        placingBlack = false;
+                    }
+                    else {
+                        pWhiteQueens.append(pos);
+                        if (place(m - 1, n, pBlackQueens, pWhiteQueens))
+                            return true;
+                        pBlackQueens.pop();
+                        pWhiteQueens.pop();
+                        placingBlack = true;
+                    }
+                }
+            }
+        }
+    if (!placingBlack)
+        pBlackQueens.pop();
+    return false;
+}
+
+template <typename T1, typename T2, typename T3> auto printBoard(const T1 &n, const T2 &blackQueens, const T3 &whiteQueens)
+{
+    auto board = create_array({Piece::EMPTY}) * (n * n);
+    for (auto &&queen : blackQueens)
+        board.set(_get<0>(queen) * n + _get<1>(queen), Piece::BLACK);
+    for (auto &&queen : whiteQueens)
+        board.set(_get<0>(queen) * n + _get<1>(queen), Piece::WHITE);
+    {int Lindex = 0;
+
+    for (auto &&b : board) {
+        auto i = Lindex;
+        if (i != 0 && mod(i, n) == 0)
+            print();
+        if (b == TYPE_RM_REF(b)::BLACK)
+            print(u"B "_S, u""_S);
+        else if (b == TYPE_RM_REF(b)::WHITE)
+            print(u"W "_S, u""_S);
+        else {
+            auto j = idiv(i, n);
+            auto k = i - j * n;
+            if (mod(j, 2) == mod(k, 2))
+                print(u"x "_S, u""_S);
+            else
+                print(u"o "_S, u""_S);
+        }
+        Lindex++;
+    }}
+    print(u"\n"_S);
+}
+auto nms = create_array({make_tuple(2, 1), make_tuple(3, 1), make_tuple(3, 2), make_tuple(4, 1), make_tuple(4, 2), make_tuple(4, 3), make_tuple(5, 1), make_tuple(5, 2), make_tuple(5, 3), make_tuple(5, 4), make_tuple(5, 5), make_tuple(6, 1), make_tuple(6, 2), make_tuple(6, 3), make_tuple(6, 4), make_tuple(6, 5), make_tuple(6, 6), make_tuple(7, 1), make_tuple(7, 2), make_tuple(7, 3), make_tuple(7, 4), make_tuple(7, 5), make_tuple(7, 6), make_tuple(7, 7)});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&nm : nms) {
+            print(u"#. black and #. white queens on a #. x #. board:"_S.format(_get<1>(nm), _get<1>(nm), _get<0>(nm), _get<0>(nm)));
+            Array<ivec2> blackQueens;
+            Array<ivec2> whiteQueens;
+            if (place(_get<1>(nm), _get<0>(nm), blackQueens, whiteQueens))
+                printBoard(_get<0>(nm), blackQueens, whiteQueens);
+            else
+                print(u"No solution exists.\n"_S);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Pi#D
+# Slow BigInt
+BigInt = int
+
+ndigits = 0
+q = BigInt(1)
+r = BigInt(0)
+t = q
+k = q
+n = BigInt(3)
+l = n
+
+first = True
+while ndigits < 1_000:
+    if 4 * q + r - t < n * t:
+        print(n, end = '')
+        ndigits += 1
+        if ndigits % 70 == 0:
+            print()
+        if first:
+            first = False
+            print('.', end = '')
+        nr = 10 * (r - n * t)
+        n = ((10 * (3 * q + r)) // t) - 10 * n
+        q *= 10
+        r = nr
+    else:
+        nr = (2 * q + r) * l
+        nn = (q * (7 * k + 2) + r * l) // (t * l)
+        q *= k
+        t *= l
+        l += 2
+        k += 1
+        n = nn
+        r = nr
+===
+V ndigits = 0
+V q = BigInt(1)
+V r = BigInt(0)
+V t = q
+V k = q
+V n = BigInt(3)
+V l = n
+V first = 1B
+L ndigits < 1'000
+   I 4 * q + r - t < n * t
+      print(n, end' ‘’)
+      ndigits++
+      I ndigits % 70 == 0
+         print()
+      I first
+         first = 0B
+         print(‘.’, end' ‘’)
+      V nr = 10 * (r - n * t)
+      n = ((10 * (3 * q + r)) I/ t) - 10 * n
+      q *= 10
+      r = nr
+   E
+      V nr = (2 * q + r) * l
+      V nn = (q * (7 * k + 2) + r * l) I/ (t * l)
+      q *= k
+      t *= l
+      l += 2
+      k++
+      n = nn
+      r = nr
+===
+auto ndigits = 0;
+auto q = BigInt(1);
+auto r = BigInt(0);
+auto t = q;
+auto k = q;
+auto n = BigInt(3);
+auto l = n;
+auto first = true;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (ndigits < 1'000)
+            if (4 * q + r - t < n * t) {
+                print(n, u""_S);
+                ndigits++;
+                if (mod(ndigits, 70) == 0)
+                    print();
+                if (first) {
+                    first = false;
+                    print(u"."_S, u""_S);
+                }
+                auto nr = 10 * (r - n * t);
+                n = (idiv((10 * (3 * q + r)), t)) - 10 * n;
+                q *= 10;
+                r = nr;
+            }
+            else {
+                auto nr = (2 * q + r) * l;
+                auto nn = idiv((q * (7 * k + 2) + r * l), (t * l));
+                q *= k;
+                t *= l;
+                l += 2;
+                k++;
+                n = nn;
+                r = nr;
+            }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Poker_hand_analyser#D
+def analyzeHandHelper(faceCount, suitCount):
+    p1 = False
+    p2 = False
+    t = False
+    f = False
+    fl = False
+    st = False
+
+    for fc in faceCount:
+        fc = fc
+        if fc == 2:
+            if p1:
+                p2 = True
+            else:
+                p1 = True
+        elif fc == 3:
+            t = True
+        elif fc == 4:
+            f = True
+
+    for sc in suitCount:
+        if sc == 5:
+            fl = True
+
+    if (not p1) and (not p2) and (not t) and (not f):
+        s = 0
+        for fc in faceCount:
+            if fc != 0:
+                s += 1
+            else:
+                s = 0
+            if s == 5:
+                break
+
+        st = (s == 5) or (s == 4 and faceCount[0] != 0 and faceCount[1] == 0)
+
+    if st and fl:   return "straight-flush"
+    elif f:         return "four-of-a-kind"
+    elif p1 and t:  return "full-house"
+    elif fl:        return "flush"
+    elif st:        return "straight"
+    elif t:         return "three-of-a-kind"
+    elif p1 and p2: return "two-pair"
+    elif p1:        return "one-pair"
+    else:           return "high-card"
+
+def analyzeHand(inHand):
+    handLen = 5
+    face = "A23456789TJQK"
+    suit = "SHCD"
+    errorMessage = "invalid hand."
+
+    hand = sorted(inHand.split(' '))
+    if len(hand) != handLen:
+        return errorMessage
+    if len(set(hand)) != handLen:
+        return errorMessage + " Duplicated cards."
+
+    faceCount = [0] * len(face)
+    suitCount = [0] * len(suit)
+    for card in hand:
+        if len(card) != 2:
+            return errorMessage
+        n = face.find(card[0])
+        l = suit.find(card[1])
+        if n < 0 or l < 0:
+            return errorMessage
+        faceCount[n] += 1
+        suitCount[l] += 1
+
+    return analyzeHandHelper(faceCount, suitCount)
+
+for hand in ["2H 2D 2S KS QD",
+             "2H 5H 7D 8S 9D",
+             "AH 2D 3S 4S 5S",
+             "2H 3H 2D 3S 3D",
+             "2H 7H 2D 3S 3D",
+             "2H 7H 7D 7S 7C",
+             "TH JH QH KH AH",
+             "4H 4C KC 5D TC",
+             "QC TC 7C 6C 4C"]:
+    print(hand + ":", analyzeHand(hand))
+===
+F analyzeHandHelper(faceCount, suitCount)
+   V p1 = 0B
+   V p2 = 0B
+   V t = 0B
+   V f = 0B
+   V fl = 0B
+   V st = 0B
+
+   L(=fc) faceCount
+      S fc
+         2
+            I p1
+               p2 = 1B
+            E
+               p1 = 1B
+         3
+            t = 1B
+         4
+            f = 1B
+
+   L(sc) suitCount
+      I sc == 5
+         fl = 1B
+
+   I (!p1) & (!p2) & (!t) & (!f)
+      V s = 0
+      L(fc) faceCount
+         I fc != 0
+            s++
+         E
+            s = 0
+         I s == 5
+            L.break
+      st = (s == 5) | (s == 4 & faceCount[0] != 0 & faceCount[1] == 0)
+
+   I st & fl
+      R ‘straight-flush’
+   E I f
+      R ‘four-of-a-kind’
+   E I p1 & t
+      R ‘full-house’
+   E I fl
+      R ‘flush’
+   E I st
+      R ‘straight’
+   E I t
+      R ‘three-of-a-kind’
+   E I p1 & p2
+      R ‘two-pair’
+   E I p1
+      R ‘one-pair’
+   E
+      R ‘high-card’
+
+F analyzeHand(inHand)
+   V handLen = 5
+   V face = ‘A23456789TJQK’
+   V suit = ‘SHCD’
+   V errorMessage = ‘invalid hand.’
+   V hand = sorted(inHand.split(‘ ’))
+   I hand.len != handLen
+      R errorMessage
+   I Set(hand).len != handLen
+      R errorMessage‘ Duplicated cards.’
+   V faceCount = [0] * face.len
+   V suitCount = [0] * suit.len
+   L(card) hand
+      I card.len != 2
+         R errorMessage
+      V n = face.findi(card[0])
+      V l = suit.findi(card[1])
+      I n < 0 | l < 0
+         R errorMessage
+      faceCount[n]++
+      suitCount[l]++
+   R analyzeHandHelper(faceCount, suitCount)
+
+L(hand) [‘2H 2D 2S KS QD’, ‘2H 5H 7D 8S 9D’, ‘AH 2D 3S 4S 5S’, ‘2H 3H 2D 3S 3D’, ‘2H 7H 2D 3S 3D’, ‘2H 7H 7D 7S 7C’, ‘TH JH QH KH AH’, ‘4H 4C KC 5D TC’, ‘QC TC 7C 6C 4C’]
+   print((hand‘:’)‘ ’analyzeHand(hand))
+===
+template <typename T1, typename T2> auto analyzeHandHelper(const T1 &faceCount, const T2 &suitCount)
+{
+    auto p1 = false;
+    auto p2 = false;
+    auto t = false;
+    auto f = false;
+    auto fl = false;
+    auto st = false;
+    for (auto fc : faceCount)
+        switch (fc)
+        {
+        case 2:
+            if (p1)
+                p2 = true;
+            else
+                p1 = true;
+            break;
+        case 3:
+            t = true;
+            break;
+        case 4:
+            f = true;
+            break;
+        }
+    for (auto &&sc : suitCount)
+        if (sc == 5)
+            fl = true;
+
+    if ((!p1) && (!p2) && (!t) && (!f)) {
+        auto s = 0;
+        for (auto &&fc : faceCount) {
+            if (fc != 0)
+                s++;
+            else
+                s = 0;
+            if (s == 5)
+                break;
+        }
+        st = (s == 5) || (s == 4 && _get<0>(faceCount) != 0 && _get<1>(faceCount) == 0);
+    }
+    if (st && fl)
+        return u"straight-flush"_S;
+    else if (f)
+        return u"four-of-a-kind"_S;
+    else if (p1 && t)
+        return u"full-house"_S;
+    else if (fl)
+        return u"flush"_S;
+    else if (st)
+        return u"straight"_S;
+    else if (t)
+        return u"three-of-a-kind"_S;
+    else if (p1 && p2)
+        return u"two-pair"_S;
+    else if (p1)
+        return u"one-pair"_S;
+    else
+        return u"high-card"_S;
+}
+
+template <typename T1> auto analyzeHand(const T1 &inHand)
+{
+    auto handLen = 5;
+    auto face = u"A23456789TJQK"_S;
+    auto suit = u"SHCD"_S;
+    auto errorMessage = u"invalid hand."_S;
+    auto hand = sorted(inHand.split(u" "_S));
+    if (hand.len() != handLen)
+        return errorMessage;
+    if (create_set(hand).len() != handLen)
+        return errorMessage & u" Duplicated cards."_S;
+    auto faceCount = create_array({0}) * face.len();
+    auto suitCount = create_array({0}) * suit.len();
+    for (auto &&card : hand) {
+        if (card.len() != 2)
+            return errorMessage;
+        auto n = face.findi(_get<0>(card));
+        auto l = suit.findi(_get<1>(card));
+        if (n < 0 || l < 0)
+            return errorMessage;
+        faceCount[n]++;
+        suitCount[l]++;
+    }
+    return analyzeHandHelper(faceCount, suitCount);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&hand : create_array({u"2H 2D 2S KS QD"_S, u"2H 5H 7D 8S 9D"_S, u"AH 2D 3S 4S 5S"_S, u"2H 3H 2D 3S 3D"_S, u"2H 7H 2D 3S 3D"_S, u"2H 7H 7D 7S 7C"_S, u"TH JH QH KH AH"_S, u"4H 4C KC 5D TC"_S, u"QC TC 7C 6C 4C"_S}))
+            print((hand & u":"_S) & u" "_S & analyzeHand(hand));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Price_fraction#Python
+def bisect_right(a, x):
+    lo = 0
+    hi = len(a)
+    while lo < hi:
+        mid = (lo+hi)//2
+        if x < a[mid]: hi = mid
+        else: lo = mid+1
+    return lo
+
+_cin  = [0.06, 0.11, 0.16, 0.21, 0.26, 0.31, 0.36, 0.41, 0.46, 0.51, 0.56, 0.61, 0.66, 0.71, 0.76, 0.81, 0.86, 0.91, 0.96, 1.01]
+_cout = [0.10, 0.18, 0.26, 0.32, 0.38, 0.44, 0.50, 0.54, 0.58, 0.62, 0.66, 0.70, 0.74, 0.78, 0.82, 0.86, 0.90, 0.94, 0.98, 1.00]
+def pricerounder(pricein):
+    return _cout[ bisect_right(_cin, pricein) ]
+
+for i in range(11):
+    print('%.2f %.2f' % (i / 10, pricerounder(i / 10)))
+===
+F bisect_right(a, x)
+   V lo = 0
+   V hi = a.len
+   L lo < hi
+      V mid = (lo + hi) I/ 2
+      I x < a[mid]
+         hi = mid
+      E
+         lo = mid + 1
+   R lo
+V _cin = [0.06, 0.11, 0.16, 0.21, 0.26, 0.31, 0.36, 0.41, 0.46, 0.51, 0.56, 0.61, 0.66, 0.71, 0.76, 0.81, 0.86, 0.91, 0.96, 1.01]
+V _cout = [0.10, 0.18, 0.26, 0.32, 0.38, 0.44, 0.50, 0.54, 0.58, 0.62, 0.66, 0.70, 0.74, 0.78, 0.82, 0.86, 0.90, 0.94, 0.98, 1.00]
+F pricerounder(pricein)
+   R :_cout[bisect_right(:_cin, pricein)]
+
+L(i) 11
+   print(‘#.2 #.2’.format(i / 10, pricerounder(i / 10)))
+===
+template <typename T1, typename T2> auto bisect_right(const T1 &a, const T2 &x)
+{
+    auto lo = 0;
+    auto hi = a.len();
+    while (lo < hi) {
+        auto mid = idiv((lo + hi), 2);
+        if (x < a[mid])
+            hi = mid;
+        else
+            lo = mid + 1;
+    }
+    return lo;
+}
+auto _cin = create_array({0.06, 0.11, 0.16, 0.21, 0.26, 0.31, 0.36, 0.41, 0.46, 0.51, 0.56, 0.61, 0.66, 0.71, 0.76, 0.81, 0.86, 0.91, 0.96, 1.01});
+auto _cout = create_array({0.10, 0.18, 0.26, 0.32, 0.38, 0.44, 0.50, 0.54, 0.58, 0.62, 0.66, 0.70, 0.74, 0.78, 0.82, 0.86, 0.90, 0.94, 0.98, 1.00});
+template <typename T1> auto pricerounder(const T1 &pricein)
+{
+    return ::_cout[bisect_right(::_cin, pricein)];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int i = 0; i < 11; i++)
+            print(u"#.2 #.2"_S.format(i / 10.0, pricerounder(i / 10.0)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Primes_-_allocate_descendants_to_their_ancestors#Python
+Int64 = int
+
+maxsum = 99
+
+def get_primes(max):
+    # if max < 2:
+    #     return []
+    lprimes = [2]
+    for x in range(3, max + 1, 2):
+        for p in lprimes:
+            if x % p == 0:
+                break
+        else:
+            lprimes.append(x)
+    return lprimes
+
+descendants = [[Int64(0)]*0 for _ in range(maxsum + 1)]
+ancestors = [[Int64(0)]*0 for _ in range(maxsum + 1)]
+
+primes = get_primes(maxsum)
+
+for p in primes:
+    descendants[p].append(p)
+    for s in range(1, len(descendants) - p):
+        descendants[s + p] += [p * pr for pr in descendants[s]]
+
+for p in primes + [4]:
+    descendants[p].pop()
+
+total = 0
+for s in range(1, maxsum + 1):
+    descendants[s].sort()
+    for d in descendants[s]:
+        if d > maxsum:
+            break
+        ancestors[int(d)] = ancestors[s] + [Int64(s)]
+    print([s], "Level:", len(ancestors[s]))
+    print("Ancestors:", str(ancestors[s]) if len(ancestors[s]) else "None")
+    print("Descendants:", str(len(descendants[s])) if len(descendants[s]) else "None")
+    if len(descendants[s]):
+        print(descendants[s])
+    print()
+    total += len(descendants[s])
+
+print("Total descendants", total)
+===
+V maxsum = 99
+
+F get_primes(max)
+   V lprimes = [2]
+   L(x) (3 .< max + 1).step(2)
+      L(p) lprimes
+         I x % p == 0
+            L.break
+      L.was_no_break
+         lprimes.append(x)
+   R lprimes
+V descendants = [[Int64(0)] * 0] * (maxsum + 1)
+V ancestors = [[Int64(0)] * 0] * (maxsum + 1)
+V primes = get_primes(maxsum)
+
+L(p) primes
+   descendants[p].append(p)
+   L(s) 1 .< descendants.len - p
+      descendants[s + p] [+]= descendants[s].map(pr -> @p * pr)
+
+L(p) primes [+] [4]
+   descendants[p].pop()
+V total = 0
+L(s) 1 .. maxsum
+   descendants[s].sort()
+   L(d) descendants[s]
+      I d > maxsum
+         L.break
+      ancestors[Int(d)] = ancestors[s] [+] [Int64(s)]
+   print([s]‘ Level: ’ancestors[s].len)
+   print(‘Ancestors: ’(I !ancestors[s].empty {String(ancestors[s])} E ‘None’))
+   print(‘Descendants: ’(I !descendants[s].empty {String(descendants[s].len)} E ‘None’))
+   I !descendants[s].empty
+      print(descendants[s])
+   print()
+   total += descendants[s].len
+print(‘Total descendants ’total)
+===
+auto maxsum = 99;
+
+template <typename T1> auto get_primes(const T1 &max)
+{
+    auto lprimes = create_array({2});
+    for (auto x : range_el(3, max + 1).step(2))
+        {bool was_break = false;
+        for (auto &&p : lprimes)
+            if (mod(x, p) == 0) {
+                was_break = true;
+                break;
+            }
+        if (!was_break)
+            lprimes.append(x);
+        }
+    return lprimes;
+}
+auto descendants = create_array({create_array({to_int64(0)}) * 0}) * (maxsum + 1);
+auto ancestors = create_array({create_array({to_int64(0)}) * 0}) * (maxsum + 1);
+auto primes = get_primes(maxsum);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&p : primes) {
+            descendants[p].append(p);
+            for (auto s : range_el(1, descendants.len() - p))
+                descendants[s + p].append(descendants[s].map([&p](const auto &pr){return p * pr;}));
+        }
+        for (auto &&p : primes + create_array({4}))
+            descendants[p].pop();
+    }
+} code_block_1;
+auto total = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto s : range_ee(1, maxsum)) {
+            descendants[s].sort();
+            for (auto &&d : descendants[s]) {
+                if (d > maxsum)
+                    break;
+                ancestors.set(to_int(d), ancestors[s] + create_array({to_int64(s)}));
+            }
+            print(create_array({s}) & u" Level: "_S & ancestors[s].len());
+            print(u"Ancestors: "_S & (!ancestors[s].empty() ? String(ancestors[s]) : u"None"_S));
+            print(u"Descendants: "_S & (!descendants[s].empty() ? String(descendants[s].len()) : u"None"_S));
+            if (!descendants[s].empty())
+                print(descendants[s]);
+            print();
+            total += descendants[s].len();
+        }
+        print(u"Total descendants "_S & total);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Problem_of_Apollonius#Python
+from typing import NamedTuple
+import math
+
+class Circle(NamedTuple):
+    x : float
+    y : float
+    r : float
+    def __str__(self):
+        return 'Circle(x=%s, y=%s, r=%s)' % (self.x, self.y, self.r)
+
+def solveApollonius(c1, c2, c3, s1, s2, s3):
+    (x1, y1, r1) = c1
+    (x2, y2, r2) = c2
+    (x3, y3, r3) = c3
+
+    v11 = 2*x2 - 2*x1
+    v12 = 2*y2 - 2*y1
+    v13 = x1*x1 - x2*x2 + y1*y1 - y2*y2 - r1*r1 + r2*r2
+    v14 = 2*s2*r2 - 2*s1*r1
+
+    v21 = 2*x3 - 2*x2
+    v22 = 2*y3 - 2*y2
+    v23 = x2*x2 - x3*x3 + y2*y2 - y3*y3 - r2*r2 + r3*r3
+    v24 = 2*s3*r3 - 2*s2*r2
+
+    w12 = v12/v11
+    w13 = v13/v11
+    w14 = v14/v11
+
+    w22 = v22/v21-w12
+    w23 = v23/v21-w13
+    w24 = v24/v21-w14
+
+    P = -w23/w22
+    Q = w24/w22
+    M = -w12*P-w13
+    n = w14 - w12*Q
+
+    a = n*n + Q*Q - 1
+    b = 2*M*n - 2*n*x1 + 2*P*Q - 2*Q*y1 + 2*s1*r1
+    c = x1*x1 + M*M - 2*M*x1 + P*P + y1*y1 - 2*P*y1 - r1*r1
+
+    # Find a root of a quadratic equation. This requires the circle centers not to be e.g. colinear
+    D = b*b-4*a*c
+    rs = (-b-math.sqrt(D))/(2*a)
+
+    xs = M+n*rs
+    ys = P+Q*rs
+
+    return Circle(xs, ys, rs)
+
+(c1, c2, c3) = (Circle(0, 0, 1), Circle(4, 0, 1), Circle(2, 4, 2))
+print(solveApollonius(c1, c2, c3, 1, 1, 1))    #Expects "Circle[x=2.00,y=2.10,r=3.90]" (green circle in image)
+print(solveApollonius(c1, c2, c3, -1, -1, -1)) #Expects "Circle[x=2.00,y=0.83,r=1.17]" (red circle in image)
+===
+//import math
+
+T Circle
+   Float x
+   Float y
+   Float r
+   F String()
+      R ‘Circle(x=#., y=#., r=#.)’.format(.x, .y, .r)
+   F (x, y, r)
+      .x = x
+      .y = y
+      .r = r
+
+F solveApollonius(c1, c2, c3, s1, s2, s3)
+   V (x1, y1, r1) = c1
+   V (x2, y2, r2) = c2
+   V (x3, y3, r3) = c3
+   V v11 = 2 * x2 - 2 * x1
+   V v12 = 2 * y2 - 2 * y1
+   V v13 = x1 * x1 - x2 * x2 + y1 * y1 - y2 * y2 - r1 * r1 + r2 * r2
+   V v14 = 2 * s2 * r2 - 2 * s1 * r1
+   V v21 = 2 * x3 - 2 * x2
+   V v22 = 2 * y3 - 2 * y2
+   V v23 = x2 * x2 - x3 * x3 + y2 * y2 - y3 * y3 - r2 * r2 + r3 * r3
+   V v24 = 2 * s3 * r3 - 2 * s2 * r2
+   V w12 = v12 / v11
+   V w13 = v13 / v11
+   V w14 = v14 / v11
+   V w22 = v22 / v21 - w12
+   V w23 = v23 / v21 - w13
+   V w24 = v24 / v21 - w14
+   V P = -w23 / w22
+   V Q = w24 / w22
+   V M = -w12 * P - w13
+   V n = w14 - w12 * Q
+   V a = n * n + Q * Q - 1
+   V b = 2 * M * n - 2 * n * x1 + 2 * P * Q - 2 * Q * y1 + 2 * s1 * r1
+   V c = x1 * x1 + M * M - 2 * M * x1 + P * P + y1 * y1 - 2 * P * y1 - r1 * r1
+   V D = b * b - 4 * a * c
+   V rs = (-b - sqrt(D)) / (2 * a)
+   V xs = M + n * rs
+   V ys = P + Q * rs
+   R Circle(xs, ys, rs)
+V (c1, c2, c3) = (Circle(0, 0, 1), Circle(4, 0, 1), Circle(2, 4, 2))
+print(solveApollonius(c1, c2, c3, 1, 1, 1))
+print(solveApollonius(c1, c2, c3, -1, -1, -1))
+===
+class Circle
+{
+public:
+    double x;
+    double y;
+    double r;
+    operator String() const
+    {
+        return u"Circle(x=#., y=#., r=#.)"_S.format(x, y, r);
+    }
+    template <typename T1, typename T2, typename T3> Circle(const T1 &x, const T2 &y, const T3 &r) :
+        x(x),
+        y(y),
+        r(r)
+    {
+    }
+};
+
+template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6> auto solveApollonius(const T1 &c1, const T2 &c2, const T3 &c3, const T4 &s1, const T5 &s2, const T6 &s3)
+{
+    auto [x1, _y1_, r1] = c1;
+    auto [x2, y2, r2] = c2;
+    auto [x3, y3, r3] = c3;
+    auto v11 = 2 * x2 - 2 * x1;
+    auto v12 = 2 * y2 - 2 * _y1_;
+    auto v13 = x1 * x1 - x2 * x2 + _y1_ * _y1_ - y2 * y2 - r1 * r1 + r2 * r2;
+    auto v14 = 2 * s2 * r2 - 2 * s1 * r1;
+    auto v21 = 2 * x3 - 2 * x2;
+    auto v22 = 2 * y3 - 2 * y2;
+    auto v23 = x2 * x2 - x3 * x3 + y2 * y2 - y3 * y3 - r2 * r2 + r3 * r3;
+    auto v24 = 2 * s3 * r3 - 2 * s2 * r2;
+    auto w12 = v12 / v11;
+    auto w13 = v13 / v11;
+    auto w14 = v14 / v11;
+    auto w22 = v22 / v21 - w12;
+    auto w23 = v23 / v21 - w13;
+    auto w24 = v24 / v21 - w14;
+    auto P = -w23 / w22;
+    auto Q = w24 / w22;
+    auto M = -w12 * P - w13;
+    auto n = w14 - w12 * Q;
+    auto a = n * n + Q * Q - 1;
+    auto b = 2 * M * n - 2 * n * x1 + 2 * P * Q - 2 * Q * _y1_ + 2 * s1 * r1;
+    auto c = x1 * x1 + M * M - 2 * M * x1 + P * P + _y1_ * _y1_ - 2 * P * _y1_ - r1 * r1;
+    auto D = b * b - 4 * a * c;
+    auto rs = (-b - sqrt(D)) / (2 * a);
+    auto xs = M + n * rs;
+    auto ys = P + Q * rs;
+    return Circle(xs, ys, rs);
+}
+auto [c1, c2, c3] = make_tuple(Circle(0, 0, 1), Circle(4, 0, 1), Circle(2, 4, 2));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(solveApollonius(c1, c2, c3, 1, 1, 1));
+        print(solveApollonius(c1, c2, c3, -1, -1, -1));
+    }
+} code_block_1;

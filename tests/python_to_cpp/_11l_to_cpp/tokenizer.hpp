@@ -249,7 +249,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
 
             if (tabs && spaces) {
                 auto next_line_pos = source.findi(u"\n"_S, i);
-                throw Error(u"mixing tabs and spaces in indentation: `"_S & source[range_el(linestart, i)].replace(u" "_S, u"S"_S).replace(u"\t"_S, u"TAB"_S) & source[range_el(i, next_line_pos != -1 ? next_line_pos : !source.empty())] & u"`"_S, i);
+                throw Error(u"mixing tabs and spaces in indentation: `"_S & source[range_el(linestart, i)].replace(u" "_S, u"S"_S).replace(u"\t"_S, u"TAB"_S) & source[range_el(i, next_line_pos != -1 ? next_line_pos : source.len())] & u"`"_S, i);
             }
             auto indentation_level = ii - linestart;
             if (indentation_levels.len() && _get<0>(indentation_levels.last()) == -1) {

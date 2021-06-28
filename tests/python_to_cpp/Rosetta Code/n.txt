@@ -824,3 +824,294 @@ struct CodeBlock1
             print(u"#15: #."_S.format(name, nysiis(name)));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Nonoblock#Python
+from typing import List, Tuple
+Char = str
+
+def nonoblocks(blocks : List[int], cells : int) -> List[List[Tuple[int, int]]]:
+    r : List[List[Tuple[int, int]]] = []
+    if len(blocks) == 0 or blocks[0] == 0:
+        r += [[(0, 0)]]
+    else:
+        assert sum(blocks) + len(blocks)-1 <= cells, \
+            'Those blocks will not fit in those cells'
+        (blength, brest) = (blocks[0], blocks[1:])      # Deal with the first block of length
+        minspace4rest = sum(1+b for b in brest)     # The other blocks need space
+        # Slide the start position from left to max RH index allowing for other blocks.
+        for bpos in range(0, cells - minspace4rest - blength + 1):
+            if len(brest) == 0:
+                # No other blocks to the right so just yield this one.
+                r += [[(bpos, blength)]]
+            else:
+                # More blocks to the right so create a *sub-problem* of placing
+                # the brest blocks in the cells one space to the right of the RHS of
+                # this block.
+                offset = bpos + blength +1
+                # recursive call to nonoblocks yields multiple sub-positions
+                for subpos in nonoblocks(brest, cells - offset):
+                    # Remove the offset from sub block positions
+                    rest = [(offset + bp, bl) for bp, bl in subpos]
+                    # Yield this block plus sub blocks positions
+                    vec = [(bpos, blength)] + rest
+                    r += [vec]
+    return r
+
+def pblock(vec, cells):
+    'Prettyprints each run of blocks with a different letter A.. for each block of filled cells'
+    vector = ['_'] * cells
+    for ch, bp_bl in enumerate(vec, ord('A')):
+        (bp, bl) = bp_bl
+        for i in range(bp, bp + bl):
+            vector[i] = chr(ch) if vector[i] == '_' else Char('?')
+    return '|' + '|'.join(vector) + '|'
+
+for blocks, cells in [
+        ([2, 1], 5),
+        ([0]*0, 5),
+        ([8], 10),
+        ([2, 3, 2, 3], 15),
+       # ([4, 3], 10),
+       # ([2, 1], 5),
+       # ([3, 1], 10),
+        #([2, 3], 5),
+        ]:
+    print('\nConfiguration:\n    %s # %i cells and %s blocks' % (pblock([(0, 0)]*0, cells), cells, blocks))
+    print('  Possibilities:')
+    nb = nonoblocks(blocks, cells)
+    for vector in nb:
+        print('   ', pblock(vector, cells))
+    print('  A total of %i Possible configurations.' % len(nb))
+===
+
+F nonoblocks([Int] &blocks, Int cells) -> [[(Int, Int)]]
+   [[(Int, Int)]] r
+   I blocks.empty | blocks[0] == 0
+      r [+]= [(0, 0)]
+   E
+      assert(sum(blocks) + blocks.len - 1 <= cells, ‘Those blocks will not fit in those cells’)
+      V (blength, brest) = (blocks[0], blocks[1..])
+      V minspace4rest = sum(brest.map(b -> 1 + b))
+
+      L(bpos) 0 .. cells - minspace4rest - blength
+         I brest.empty
+            r [+]= [(bpos, blength)]
+         E
+            V offset = bpos + blength + 1
+
+            L(subpos) nonoblocks(&brest, cells - offset)
+               V rest = subpos.map((bp, bl) -> (@offset + bp, bl))
+               V vec = [(bpos, blength)] [+] rest
+               r [+]= vec
+   R r
+
+F pblock(vec, cells)
+   ‘Prettyprints each run of blocks with a different letter A.. for each block of filled cells’
+   V vector = [‘_’] * cells
+   L(bp_bl) vec
+      V ch = L.index + ‘A’.code
+      V (bp, bl) = bp_bl
+      L(i) bp .< bp + bl
+         vector[i] = I vector[i] == ‘_’ {Char(code' ch)} E Char(‘?’)
+   R ‘|’vector.join(‘|’)‘|’
+
+L(blocks, cells) [([2, 1], 5), ([Int](), 5), ([8], 10), ([2, 3, 2, 3], 15)]
+   print("\nConfiguration:\n    #. ## #. cells and #. blocks".format(pblock([(0, 0)] * 0, cells), cells, blocks))
+   print(‘  Possibilities:’)
+   V nb = nonoblocks(&blocks, cells)
+   L(vector) nb
+      print(‘    ’pblock(vector, cells))
+   print(‘  A total of #. Possible configurations.’.format(nb.len))
+===
+Array<Array<ivec2>> nonoblocks(Array<int> &blocks, const int cells)
+{
+    Array<Array<ivec2>> r;
+    if (blocks.empty() || _get<0>(blocks) == 0)
+        r.append(create_array({make_tuple(0, 0)}));
+    else {
+        assert(sum(blocks) + blocks.len() - 1 <= cells, u"Those blocks will not fit in those cells"_S);
+        auto [blength, brest] = make_tuple(_get<0>(blocks), blocks[range_ei(1)]);
+        auto minspace4rest = sum_map(brest, [](const auto &b){return 1 + b;});
+        for (auto bpos : range_ee(0, cells - minspace4rest - blength))
+            if (brest.empty())
+                r.append(create_array({make_tuple(bpos, blength)}));
+            else {
+                auto offset = bpos + blength + 1;
+
+                for (auto &&subpos : nonoblocks(brest, cells - offset)) {
+                    auto rest = subpos.map([&offset](const auto &bp, const auto &bl){return make_tuple(offset + bp, bl);});
+                    auto vec = create_array({make_tuple(bpos, blength)}) + rest;
+                    r.append(vec);
+                }
+            }
+    }
+    return r;
+}
+
+template <typename T1, typename T2> auto pblock(const T1 &vec, const T2 &cells)
+{
+    u"Prettyprints each run of blocks with a different letter A.. for each block of filled cells"_S;
+    auto vector = create_array({u'_'_C}) * cells;
+    {int Lindex = 0;
+    for (auto &&bp_bl : vec) {
+        auto ch = Lindex + u'A'_C.code;
+        auto [bp, bl] = bp_bl;
+        for (auto i : range_el(bp, bp + bl))
+            vector.set(i, vector[i] == u'_' ? Char(ch) : u'?'_C);
+        Lindex++;
+    }}
+    return u"|"_S & vector.join(u"|"_S) & u"|"_S;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&[blocks, cells] : create_array({make_tuple(create_array({2, 1}), 5), make_tuple(Array<int>(), 5), make_tuple(create_array({8}), 10), make_tuple(create_array({2, 3, 2, 3}), 15)})) {
+            print(u"\nConfiguration:\n    #. ## #. cells and #. blocks"_S.format(pblock(create_array({make_tuple(0, 0)}) * 0, cells), cells, blocks));
+            print(u"  Possibilities:"_S);
+            auto nb = nonoblocks(blocks, cells);
+            for (auto &&vector : nb)
+                print(u"    "_S & pblock(vector, cells));
+            print(u"  A total of #. Possible configurations."_S.format(nb.len()));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Numerical_integration#Nim
+from typing import Callable
+
+def left_rect(f : Callable[[float], float], x : float, h : float) -> float:
+  return f(x)
+
+def mid_rect(f : Callable[[float], float], x : float, h : float) -> float:
+  return f(x + h/2)
+
+def right_rect(f : Callable[[float], float], x : float, h : float) -> float:
+  return f(x+h)
+
+def trapezium(f : Callable[[float], float], x : float, h : float) -> float:
+  return (f(x) + f(x+h))/2.0
+
+def simpson(f : Callable[[float], float], x : float, h : float) -> float:
+  return (f(x) + 4*f(x + h/2) + f(x+h))/6.0
+
+def cube(x : float) -> float:
+  return x*x*x
+
+def reciprocal(x : float) -> float:
+  return 1/x
+
+def identity(x : float) -> float:
+  return x
+
+def integrate(f, a, b, steps, meth):
+   h = (b-a)/steps
+   ival = h * sum(meth(f, a+i*h, h) for i in range(steps))
+   return ival
+
+for a, b, steps, func, func_name in [(0.0, 1.0, 100, cube, 'cube'),
+                                     (1.0, 100.0, 1000, reciprocal, 'reciprocal'),
+                                     (0.0, 5000.0, 5_000_000, identity, 'identity'),
+                                     (0.0, 6000.0, 6_000_000, identity, 'identity')]:
+    for rule, rule_name in [(left_rect,  'left_rect'),
+                             (mid_rect,   'mid_rect'),
+                           (right_rect, 'right_rect'),
+                            (trapezium,  'trapezium'),
+                              (simpson,    'simpson')]:
+        print('%s integrated using %s\n  from %s to %s (%i steps) = %s' %
+              (func_name, rule_name, a, b, steps, integrate(func, a, b, steps, rule)))
+===
+
+F left_rect((Float -> Float) f, Float x, Float h) -> Float
+   R f(x)
+
+F mid_rect((Float -> Float) f, Float x, Float h) -> Float
+   R f(x + h / 2)
+
+F right_rect((Float -> Float) f, Float x, Float h) -> Float
+   R f(x + h)
+
+F trapezium((Float -> Float) f, Float x, Float h) -> Float
+   R (f(x) + f(x + h)) / 2.0
+
+F simpson((Float -> Float) f, Float x, Float h) -> Float
+   R (f(x) + 4 * f(x + h / 2) + f(x + h)) / 6.0
+
+F cube(Float x) -> Float
+   R x * x * x
+
+F reciprocal(Float x) -> Float
+   R 1 / x
+
+F identity(Float x) -> Float
+   R x
+
+F integrate(f, a, b, steps, meth)
+   V h = (b - a) / steps
+   V ival = h * sum((0 .< steps).map(i -> @meth(@f, @a + i * @h, @h)))
+   R ival
+
+L(a, b, steps, func, func_name) [(0.0, 1.0, 100, cube, ‘cube’), (1.0, 100.0, 1000, reciprocal, ‘reciprocal’), (0.0, 5000.0, 5'000'000, identity, ‘identity’), (0.0, 6000.0, 6'000'000, identity, ‘identity’)]
+   L(rule, rule_name) [(left_rect, ‘left_rect’), (mid_rect, ‘mid_rect’), (right_rect, ‘right_rect’), (trapezium, ‘trapezium’), (simpson, ‘simpson’)]
+      print("#. integrated using #.\n  from #. to #. (#. steps) = #.".format(func_name, rule_name, a, b, steps, integrate(func, a, b, steps, rule)))
+===
+double left_rect(const std::function<double(const double)> &f, const double x, const double h)
+{
+    return f(x);
+}
+
+double mid_rect(const std::function<double(const double)> &f, const double x, const double h)
+{
+    return f(x + h / 2.0);
+}
+
+double right_rect(const std::function<double(const double)> &f, const double x, const double h)
+{
+    return f(x + h);
+}
+
+double trapezium(const std::function<double(const double)> &f, const double x, const double h)
+{
+    return (f(x) + f(x + h)) / 2.0;
+}
+
+double simpson(const std::function<double(const double)> &f, const double x, const double h)
+{
+    return (f(x) + 4 * f(x + h / 2.0) + f(x + h)) / 6.0;
+}
+
+double cube(const double x)
+{
+    return x * x * x;
+}
+
+double reciprocal(const double x)
+{
+    return 1.0 / x;
+}
+
+double identity(const double x)
+{
+    return x;
+}
+
+template <typename T1, typename T2, typename T3, typename T4, typename T5> auto integrate(const T1 &f, const T2 &a, const T3 &b, const T4 &steps, const T5 &meth)
+{
+    auto h = (b - a) / steps;
+    auto ival = h * sum_map(range_el(0, steps), [&a, &f, &h, &meth](const auto &i){return meth(f, a + i * h, h);});
+    return ival;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[a, b, steps, func, func_name] : create_array({make_tuple(0.0, 1.0, 100, cube, u"cube"_S), make_tuple(1.0, 100.0, 1000, reciprocal, u"reciprocal"_S), make_tuple(0.0, 5000.0, 5'000'000, identity, u"identity"_S), make_tuple(0.0, 6000.0, 6'000'000, identity, u"identity"_S)}))
+            for (auto &&[rule, rule_name] : create_array({make_tuple(left_rect, u"left_rect"_S), make_tuple(mid_rect, u"mid_rect"_S), make_tuple(right_rect, u"right_rect"_S), make_tuple(trapezium, u"trapezium"_S), make_tuple(simpson, u"simpson"_S)}))
+                print(u"#. integrated using #.\n  from #. to #. (#. steps) = #."_S.format(func_name, rule_name, a, b, steps, integrate(func, a, b, steps, rule)));
+    }
+} code_block_1;

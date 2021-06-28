@@ -256,7 +256,7 @@ public:
 
 	const Type &set(Int i, const Type &v) // return `const Type&` for [https://www.rosettacode.org/wiki/Perlin_noise#Python]:‘p[256+i] = p[i] = permutation[i]’
 	{
-		if (in(i, range_el(0, len())))
+		if (in(i, range_el(Int(0), len())))
 			return std::vector<Type>::at(i) = v;
 		else
 			throw IndexError(i);
@@ -415,7 +415,7 @@ public:
 
 	Type pop(Int i)
 	{
-		if (!in(i, range_el(0, len())))
+		if (!in(i, range_el(Int(0), len())))
 			throw IndexError(i);
 		Type r(std::move((*this)[i]));
 		std::vector<Type>::erase(begin() + i);
