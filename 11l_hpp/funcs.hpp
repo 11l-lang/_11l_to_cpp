@@ -22,6 +22,8 @@ namespace std {
 template <size_t i, typename Ty, int N> Ty& get(Tvec<Ty, N> &v) { return v[i]; }
 template <size_t i, typename Ty, int N> const Ty get(const Tvec<Ty, N> &v) { return v[i]; }
 
+template <int n, typename Ty, int N, typename Value> inline const Value &_set(Tvec<Ty, N> &c, const Value &v) {c[n] = v; return v;}
+
 template <typename Type, int dimension> inline const Tvec<Type, dimension> tuple_sorted(const Tvec<Type, dimension> &v)
 {
 	Tvec<Type, dimension> r = v;
