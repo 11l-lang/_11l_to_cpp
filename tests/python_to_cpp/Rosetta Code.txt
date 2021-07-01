@@ -15961,3 +15961,125 @@ struct CodeBlock1
         solve(u"B A A\nA A A"_S);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Readline_interface#D
+from typing import List
+
+histArr : List[str] = []
+
+def hello():
+    print("Hello World!")
+    global histArr
+    histArr += ['hello'];
+
+def hist():
+    global histArr
+    if len(histArr) == 0:
+        print("No history")
+    else:
+        for cmd in histArr:
+            print(" -", cmd)
+    histArr += ['hist']
+
+def help():
+    print("Available commands:")
+    print("  hello")
+    print("  hist")
+    print("  exit")
+    print("  help")
+    global histArr
+    histArr += ['help']
+
+aa : Dict[str, Callable[[], None]] = {}
+aa['help'] = help
+aa['hist'] = hist
+aa['hello'] = hello
+
+print("Enter a command, type help for a listing.")
+
+while True:
+    line = input('>')
+    if line == 'exit':
+        break
+    aa.get(line, help)()
+===
+[String] histArr
+
+F hello()
+   print(‘Hello World!’)
+   :histArr [+]= ‘hello’
+
+F hist()
+   I :histArr.empty
+      print(‘No history’)
+   E
+      L(cmd) :histArr
+         print(‘ - ’cmd)
+   :histArr [+]= ‘hist’
+
+F help()
+   print(‘Available commands:’)
+   print(‘  hello’)
+   print(‘  hist’)
+   print(‘  exit’)
+   print(‘  help’)
+   :histArr [+]= ‘help’
+[String = (() -> N)] aa
+aa[‘help’] = help
+aa[‘hist’] = hist
+aa[‘hello’] = hello
+print(‘Enter a command, type help for a listing.’)
+
+L
+   V line = input(‘>’)
+   I line == ‘exit’
+      L.break
+   aa.get(line, help)()
+===
+Array<String> histArr;
+
+auto hello()
+{
+    print(u"Hello World!"_S);
+    ::histArr.append(u"hello"_S);
+}
+
+auto hist()
+{
+    if (::histArr.empty())
+        print(u"No history"_S);
+    else
+        for (auto &&cmd : ::histArr)
+            print(u" - "_S & cmd);
+    ::histArr.append(u"hist"_S);
+}
+
+auto help()
+{
+    print(u"Available commands:"_S);
+    print(u"  hello"_S);
+    print(u"  hist"_S);
+    print(u"  exit"_S);
+    print(u"  help"_S);
+    ::histArr.append(u"help"_S);
+}
+Dict<String, std::function<void()>> aa;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        aa.set(u"help"_S, help);
+        aa.set(u"hist"_S, hist);
+        aa.set(u"hello"_S, hello);
+        print(u"Enter a command, type help for a listing."_S);
+
+        while (true) {
+            auto line = input(u">"_S);
+            if (line == u"exit")
+                break;
+            aa.get(line, help)();
+        }
+    }
+} code_block_1;

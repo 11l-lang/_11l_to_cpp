@@ -272,7 +272,7 @@ class SymbolNode:
                         r += ', '
                 return r + ')'
 
-        assert(self.token.category == Token.Category.NAME)
+        assert(self.token.category == Token.Category.NAME or (self.token.category == Token.Category.CONSTANT and self.token.value(source) in ('N', 'Н', 'null', 'нуль')))
         return self.token_str()
 
     def to_str(self):
