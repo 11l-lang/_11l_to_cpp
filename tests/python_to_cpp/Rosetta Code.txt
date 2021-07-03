@@ -16083,3 +16083,405 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Range_modifications#Python
+from _11l import *
+
+class Sequence:
+    ranges : List[MutTuple[int, int]]
+
+    def __init__(self, sequence_string):
+        self.ranges = []
+        if sequence_string != '':
+            self.ranges = self.to_ranges(sequence_string)
+        assert self.ranges == sorted(self.ranges), "Sequence order error"
+
+    def to_ranges(self, txt):
+        return [MutTuple(int(r.split('-')[0]),
+                         int(r.split('-')[1])) for r in txt.split(',')]
+        # return [[int(x) for x in r.split('-')]
+        #         for r in txt.split(',')]
+
+    def remove(self, rem):
+        for i, r in enumerate(self.ranges):
+            if r[0] <= rem <= r[1]:
+                if r[0] == rem:     # range min
+                    if r[1] > rem:
+                        r[0] += 1
+                    else:
+                        del self.ranges[i]
+                elif r[1] == rem:   # range max
+                    if r[0] < rem:
+                        r[1] -= 1
+                    else:
+                        del self.ranges[i]
+                else:               # inside, range extremes.
+                    (r1, splitrange) = (rem - 1, MutTuple(rem + 1, r[1]))
+                    r[1] = r1
+                    self.ranges.insert(i + 1, splitrange)
+                break
+            if r[0] > rem:  # Not in sorted list
+                break
+
+    def add(self, add):
+        for i, r in enumerate(self.ranges):
+            if r[0] <= add <= r[1]:     # already included
+                break
+            elif r[0] - 1 == add:      # rough extend to here
+                r[0] = add
+                break
+            elif r[1] + 1 == add:      # rough extend to here
+                r[1] = add
+                break
+            elif r[0] > add:      # rough insert here
+                self.ranges.insert(i, MutTuple(add, add))
+                break
+        else:
+            self.ranges.append(MutTuple(add, add))
+
+        self.consolidate()
+
+    def consolidate(self):
+        "Combine overlapping ranges"
+        '''ranges = self.ranges
+        for this, that in zip(ranges, ranges[1:]):
+            if this[1] + 1 >= that[0]:  # Ranges interract
+                if this[1] >= that[1]:  # this covers that
+                    this[:], that[:] = [], this
+                else:   # that extends this
+                    this[:], that[:] = [], [this[0], that[1]]
+        ranges[:] = [r for r in ranges if r]'''
+        for i in range(len(self.ranges) - 1):
+            this = i
+            that = i + 1
+            if self.ranges[this][1] + 1 >= self.ranges[that][0]:  # Ranges interract
+                if self.ranges[this][1] >= self.ranges[that][1]:  # this covers that
+                    self.ranges[that] = self.ranges[this]
+                    self.ranges[this] = MutTuple(-1, -1)
+                else:                                             # that extends this
+                    self.ranges[that] = MutTuple(self.ranges[this][0], self.ranges[that][1])
+                    self.ranges[this] = MutTuple(-1, -1)
+        self.ranges = [r for r in self.ranges if r != MutTuple(-1, -1)]
+
+    def __str__(self):
+        return ",".join(str(r[0]) + '-' + str(r[1]) for r in self.ranges)
+
+def demo(opp_txt):
+    by_line = opp_txt.split("\n")
+    start = by_line.pop(0)
+    ex = Sequence(start.split(' ')[-1][1:-1])
+    lines = [line.lstrip(' ').split(' ') for line in by_line]
+    opps = [(word[0], int(word[1])) for word in lines]
+    print('Start: "' + str(ex) + '"')
+    for op, val in opps:
+        #print(f"    {op.__name__:>6} {val:2} => {op(val)}")
+        if op == 'add':
+            ex.add(val)
+        else:
+            assert(op == 'remove')
+            ex.remove(val)
+        print('    %6s %2d => %s' % (op, val, ex))
+    print()
+
+demo(
+"""   Start with ""
+            add 77
+            add 79
+            add 78
+            remove 77
+            remove 78
+            remove 79""")
+demo(
+"""   Start with "1-3,5-5"
+            add 1
+            remove 4
+            add 7
+            add 8
+            add 6
+            remove 7""")
+demo(
+"""   Start with "1-5,10-25,27-30"
+            add 26
+            add 9
+            add 7
+            remove 26
+            remove 9
+            remove 7""")
+===
+
+T Sequence
+   [(Int, Int)] ranges
+
+   F (sequence_string)
+      I sequence_string != ‘’
+         .ranges = .to_ranges(sequence_string)
+      assert(.ranges == sorted(.ranges), ‘Sequence order error’)
+
+   F to_ranges(txt)
+      R txt.split(‘,’).map(r -> (Int(r.split(‘-’)[0]), Int(r.split(‘-’)[1])))
+
+   F remove(rem)
+      L(r) .ranges
+         V i = L.index
+         I rem C r[0] .. r[1]
+            I r[0] == rem
+               I r[1] > rem
+                  r[0]++
+               E
+                  .ranges.pop(i)
+            E I r[1] == rem
+               I r[0] < rem
+                  r[1]--
+               E
+                  .ranges.pop(i)
+            E
+               V (r1, splitrange) = (rem - 1, (rem + 1, r[1]))
+               r[1] = r1
+               .ranges.insert(i + 1, splitrange)
+            L.break
+         I r[0] > rem
+            L.break
+
+   F add(add)
+      L(r) .ranges
+         V i = L.index
+         I add C r[0] .. r[1]
+            L.break
+         E I r[0] - 1 == add
+            r[0] = add
+            L.break
+         E I r[1] + 1 == add
+            r[1] = add
+            L.break
+         E I r[0] > add
+            .ranges.insert(i, (add, add))
+            L.break
+      L.was_no_break
+         .ranges.append((add, add))
+      .consolidate()
+
+   F consolidate()
+      ‘Combine overlapping ranges’
+      ‘ranges = self.ranges
+        for this, that in zip(ranges, ranges[1:]):
+            if this[1] + 1 >= that[0]:  # Ranges interract
+                if this[1] >= that[1]:  # this covers that
+                    this[:], that[:] = [], this
+                else:   # that extends this
+                    this[:], that[:] = [], [this[0], that[1]]
+        ranges[:] = [r for r in ranges if r]’
+      L(i) 0 .< .ranges.len - 1
+         V this = i
+         V that = i + 1
+         I .ranges[this][1] + 1 >= .ranges[that][0]
+            I .ranges[this][1] >= .ranges[that][1]
+               .ranges[that] = .ranges[this]
+               .ranges[this] = (-1, -1)
+            E
+               .ranges[that] = (.ranges[this][0], .ranges[that][1])
+               .ranges[this] = (-1, -1)
+      .ranges = .ranges.filter(r -> r != (-1, -1))
+
+   F String()
+      R .ranges.map(r -> String(r[0])‘-’String(r[1])).join(‘,’)
+
+F demo(opp_txt)
+   V by_line = opp_txt.split("\n")
+   V start = by_line.pop(0)
+   V ex = Sequence(start.split(‘ ’).last[1 .< (len)-1])
+   V lines = by_line.map(line -> line.ltrim(‘ ’).split(‘ ’))
+   V opps = lines.map(word -> (word[0], Int(word[1])))
+   print(‘Start: "’String(ex)‘"’)
+   L(op, val) opps
+      I op == ‘add’
+         ex.add(val)
+      E
+         assert(op == ‘remove’)
+         ex.remove(val)
+      print(‘    #6 #2 => #.’.format(op, val, ex))
+   print()
+demo(‘   Start with ""
+            add 77
+            add 79
+            add 78
+            remove 77
+            remove 78
+            remove 79’)
+demo(‘   Start with "1-3,5-5"
+            add 1
+            remove 4
+            add 7
+            add 8
+            add 6
+            remove 7’)
+demo(‘   Start with "1-5,10-25,27-30"
+            add 26
+            add 9
+            add 7
+            remove 26
+            remove 9
+            remove 7’)
+===
+class Sequence
+{
+public:
+    Array<ivec2> ranges;
+
+    template <typename T1> Sequence(const T1 &sequence_string)
+    {
+        if (sequence_string != u"")
+            ranges = to_ranges(sequence_string);
+        assert(ranges == sorted(ranges), u"Sequence order error"_S);
+    }
+
+    template <typename T1> auto to_ranges(const T1 &txt)
+    {
+        return txt.split(u","_S).map([](const auto &r){return make_tuple(to_int(_get<0>(r.split(u"-"_S))), to_int(_get<1>(r.split(u"-"_S))));});
+    }
+
+    template <typename T1> auto remove(const T1 &rem)
+    {
+        {int Lindex = 0;
+        for (auto &&r : ranges) {
+            auto i = Lindex;
+            if (in(rem, range_ee(_get<0>(r), _get<1>(r)))) {
+                if (_get<0>(r) == rem) {
+                    if (_get<1>(r) > rem)
+                        _get<0>(r)++;
+                    else
+                        ranges.pop(i);
+                }
+                else if (_get<1>(r) == rem) {
+                    if (_get<0>(r) < rem)
+                        _get<1>(r)--;
+                    else
+                        ranges.pop(i);
+                }
+                else {
+                    auto [r1, splitrange] = make_tuple(rem - 1, make_tuple(rem + 1, _get<1>(r)));
+                    _set<1>(r, r1);
+                    ranges.insert(i + 1, splitrange);
+                }
+                break;
+            }
+            if (_get<0>(r) > rem)
+                break;
+            Lindex++;
+        }}
+    }
+
+    template <typename T1> auto add(const T1 &add)
+    {
+        {bool was_break = false;
+        {int Lindex = 0;
+        for (auto &&r : ranges) {
+            auto i = Lindex;
+            if (in(add, range_ee(_get<0>(r), _get<1>(r)))) {
+                was_break = true;
+                break;
+            }
+            else if (_get<0>(r) - 1 == add) {
+                _set<0>(r, add);
+                was_break = true;
+                break;
+            }
+            else if (_get<1>(r) + 1 == add) {
+                _set<1>(r, add);
+                was_break = true;
+                break;
+            }
+            else if (_get<0>(r) > add) {
+                ranges.insert(i, make_tuple(add, add));
+                was_break = true;
+                break;
+            }
+            Lindex++;
+        }}
+        if (!was_break)
+            ranges.append(make_tuple(add, add));
+        }
+        consolidate();
+    }
+
+    auto consolidate()
+    {
+        u"Combine overlapping ranges"_S;
+        uR"(ranges = self.ranges
+        for this, that in zip(ranges, ranges[1:]):
+            if this[1] + 1 >= that[0]:  # Ranges interract
+                if this[1] >= that[1]:  # this covers that
+                    this[:], that[:] = [], this
+                else:   # that extends this
+                    this[:], that[:] = [], [this[0], that[1]]
+        ranges[:] = [r for r in ranges if r])"_S;
+        for (auto i : range_el(0, ranges.len() - 1)) {
+            auto _this_ = i;
+            auto that = i + 1;
+            if (_get<1>(ranges[_this_]) + 1 >= _get<0>(ranges[that])) {
+                if (_get<1>(ranges[_this_]) >= _get<1>(ranges[that])) {
+                    ranges.set(that, ranges[_this_]);
+                    ranges.set(_this_, make_tuple(-1, -1));
+                }
+                else {
+                    ranges.set(that, make_tuple(_get<0>(ranges[_this_]), _get<1>(ranges[that])));
+                    ranges.set(_this_, make_tuple(-1, -1));
+                }
+            }
+        }
+        ranges = ranges.filter([](const auto &r){return r != make_tuple(-1, -1);});
+    }
+
+    operator String() const
+    {
+        return ranges.map([](const auto &r){return String(_get<0>(r)) & u"-"_S & String(_get<1>(r));}).join(u","_S);
+    }
+};
+
+template <typename T1> auto demo(const T1 &opp_txt)
+{
+    auto by_line = opp_txt.split(u"\n"_S);
+    auto start = by_line.pop(0);
+    auto ex = Sequence(start.split(u" "_S).last()[range_e_llen(1,  - 1)]);
+    auto lines = by_line.map([](const auto &line){return line.ltrim(u" "_S).split(u" "_S);});
+    auto opps = lines.map([](const auto &word){return make_tuple(_get<0>(word), to_int(_get<1>(word)));});
+    print(u"Start: \""_S & String(ex) & u"\""_S);
+    for (auto &&[op, val] : opps) {
+        if (op == u"add")
+            ex.add(val);
+        else {
+            assert(op == u"remove");
+            ex.remove(val);
+        }
+        print(u"    #6 #2 => #."_S.format(op, val, ex));
+    }
+    print();
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        demo(uR"(   Start with ""
+            add 77
+            add 79
+            add 78
+            remove 77
+            remove 78
+            remove 79)"_S);
+        demo(uR"(   Start with "1-3,5-5"
+            add 1
+            remove 4
+            add 7
+            add 8
+            add 6
+            remove 7)"_S);
+        demo(uR"(   Start with "1-5,10-25,27-30"
+            add 26
+            add 9
+            add 7
+            remove 26
+            remove 9
+            remove 7)"_S);
+    }
+} code_block_1;
