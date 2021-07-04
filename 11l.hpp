@@ -81,6 +81,7 @@ template <typename Type0, typename Type1, typename Type2, typename Type3, typena
 }
 
 #define TYPE_RM_REF(x) std::remove_reference<decltype(x)>::type // `std::remove_reference_t` does not work for some reason
+#define TYPE_OF(x) std::remove_const_t<std::remove_reference_t<decltype(x)>>
 
 #if __GNUC__ || __INTEL_COMPILER // || __clang__ // Clang already defines __GNUC__
 #define likely(x) __builtin_expect(!!(x), 1)

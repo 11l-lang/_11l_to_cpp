@@ -262,6 +262,9 @@ class SymbolNode:
                 else:
                     r += c0.children[0].to_type_str() + ', '
                 return r + c0.children[1].to_type_str() + ']'
+            elif self.function_call:
+                assert(self.children[0].token_str() in ('T', 'Т', 'type', 'тип'))
+                return 'TYPE_OF(' + self.children[2].to_str() + ')'
             else:
                 assert(self.tuple)
                 r = '('
@@ -1058,6 +1061,10 @@ def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False
     else:
         if '.' in ty: # for `Token.Category category`
             return ty.replace('.', '::') # [-TODO: generalize-]
+
+        if ty.startswith('TYPE_OF('):
+            assert(ty[-1] == ')')
+            return ty
 
         if ty.startswith('('):
             assert(ty[-1] == ')')
@@ -2045,6 +2052,11 @@ symbol('L.last_iteration').nud = lambda self: self
 symbol('Ц.последняя_итерация').nud = lambda self: self
 symbol('loop.last_iteration').nud = lambda self: self
 symbol('цикл.последняя_итерация').nud = lambda self: self
+
+symbol('T').nud = lambda self: self
+symbol('Т').nud = lambda self: self
+symbol('type').nud = lambda self: self
+symbol('тип').nud = lambda self: self
 
 symbol(';')
 symbol(',')

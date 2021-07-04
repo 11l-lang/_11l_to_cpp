@@ -3120,3 +3120,105 @@ struct CodeBlock1
         p(u"1.2e101"_S);
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Sorting_algorithms/Patience_sort#Kotlin
+F patience_sort(&arr)
+   I arr.len < 2 {R}
+
+   [[T(arr[0])]] piles
+   L(el) arr
+      L(&pile) piles
+         I pile.last > el
+            pile.append(el)
+            L.break
+      L.was_no_break
+         piles.append([el])
+
+   L(i) 0 .< arr.len
+      V min = piles[0].last
+      V minPileIndex = 0
+      L(j) 1 .< piles.len
+         I piles[j].last < min
+            min = piles[j].last
+            minPileIndex = j
+      arr[i] = min
+      V& minPile = piles[minPileIndex]
+      minPile.pop()
+      I minPile.empty
+         piles.pop(minPileIndex)
+
+V iArr = [4, 65, 2, -31, 0, 99, 83, 782, 1]
+patience_sort(&iArr)
+print(iArr)
+
+V cArr = [‘n’, ‘o’, ‘n’, ‘z’, ‘e’, ‘r’, ‘o’, ‘s’, ‘u’, ‘m’]
+patience_sort(&cArr)
+print(cArr)
+
+V sArr = [‘dog’, ‘cow’, ‘cat’, ‘ape’, ‘ant’, ‘man’, ‘pig’, ‘ass’, ‘gnu’]
+patience_sort(&sArr)
+print(sArr)
+===
+template <typename T1> auto patience_sort(T1 &arr)
+{
+    if (arr.len() < 2)
+        return;
+    Array<Array<TYPE_OF(_get<0>(arr))>> piles;
+    for (auto &&el : arr)
+        {bool was_break = false;
+        for (auto &pile : piles)
+            if (pile.last() > el) {
+                pile.append(el);
+                was_break = true;
+                break;
+            }
+        if (!was_break)
+            piles.append(create_array({el}));
+        }
+
+    for (auto i : range_el(0, arr.len())) {
+        auto min = _get<0>(piles).last();
+        auto minPileIndex = 0;
+        for (auto j : range_el(1, piles.len()))
+            if (piles[j].last() < min) {
+                min = piles[j].last();
+                minPileIndex = j;
+            }
+        arr.set(i, min);
+        auto& minPile = piles[minPileIndex];
+        minPile.pop();
+        if (minPile.empty())
+            piles.pop(minPileIndex);
+    }
+}
+auto iArr = create_array({4, 65, 2, -31, 0, 99, 83, 782, 1});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        patience_sort(iArr);
+        print(iArr);
+    }
+} code_block_1;
+auto cArr = create_array({u'n'_C, u'o'_C, u'n'_C, u'z'_C, u'e'_C, u'r'_C, u'o'_C, u's'_C, u'u'_C, u'm'_C});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        patience_sort(cArr);
+        print(cArr);
+    }
+} code_block_2;
+auto sArr = create_array({u"dog"_S, u"cow"_S, u"cat"_S, u"ape"_S, u"ant"_S, u"man"_S, u"pig"_S, u"ass"_S, u"gnu"_S});
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        patience_sort(sArr);
+        print(sArr);
+    }
+} code_block_3;
