@@ -135,6 +135,8 @@ for fname in os.listdir('tests/parser'):
                 line_start = source.rfind("\n", 0, len(source))
                 if e.message == error_message and e.pos == source.rfind("\n", 0, line_start) + len(source) - line_start:
                     print('OK (Error)')
+                    #py_parser.file_name = ''
+                    parse.file_name = ''
                     continue
                 else:
                     kdiff3(e.message, error_message)
@@ -183,7 +185,9 @@ for fname in os.listdir('tests/python_to_cpp'):
                 exit(1)
         except Exception as e:
             print("Exception in test:\n" + test + "\n[in file '" + full_fname + "']")
-            print("[in file '" + (py_parser.file_name if type(e) == py_parser.Error else parse.file_name) + "']")
+            file_name = py_parser.file_name if type(e) == py_parser.Error else parse.file_name
+            if file_name != '':
+                print("[in file '" + file_name + "']")
             raise e
         print('OK')
 
