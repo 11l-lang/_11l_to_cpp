@@ -2219,22 +2219,23 @@ def nud(self):
             i += 1
     if peek_token(i).value(source) == '=':
         self.is_dict = True
-        while True: # [
+        while True: # [[
             self.append_child(expression())
             if token.value(source) != ',':
                 break
             advance(',')
+            if token.value(source) == ']':
+                break
         advance(']')
     else:
         self.is_list = True
-        if token.value(source) != ']':
-            while True: # [[
-                # if token.value(source) == ']':
-                #     break
-                self.append_child(expression())
-                if token.value(source) != ',':
-                    break
-                advance(',')
+        while True: # [
+            if token.value(source) == ']':
+                break
+            self.append_child(expression())
+            if token.value(source) != ',':
+                break
+            advance(',')
         advance(']')
     return self
 symbol('[').nud = nud # ]
