@@ -1274,3 +1274,1061 @@ struct CodeBlock1
             print(u"#2.1 #4.5 #2.8"_S.format(x, y, y - square((4 + x * x)) / 16.0));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Range_modifications#Python
+from typing import List, Tuple
+
+class Sequence:
+    ranges : List[List[int]]
+
+    def __init__(self, sequence_string):
+        self.ranges = []
+        if sequence_string != '':
+            self.ranges = self.to_ranges(sequence_string)
+        assert self.ranges == sorted(self.ranges), "Sequence order error"
+
+    def to_ranges(self, txt):
+        return [[int(x) for x in r.split('-')]
+                for r in txt.split(',')]
+
+    def remove(self, rem):
+        for i, r in enumerate(self.ranges):
+            if r[0] <= rem <= r[1]:
+                if r[0] == rem:     # range min
+                    if r[1] > rem:
+                        r[0] += 1
+                    else:
+                        del self.ranges[i]
+                elif r[1] == rem:   # range max
+                    if r[0] < rem:
+                        r[1] -= 1
+                    else:
+                        del self.ranges[i]
+                else:               # inside, range extremes.
+                    (r1, splitrange) = (rem - 1, [rem + 1, r[1]])
+                    r[1] = r1
+                    self.ranges.insert(i + 1, splitrange)
+                break
+            if r[0] > rem:  # Not in sorted list
+                break
+
+    def add(self, add):
+        for i, r in enumerate(self.ranges):
+            if r[0] <= add <= r[1]:     # already included
+                break
+            elif r[0] - 1 == add:      # rough extend to here
+                r[0] = add
+                break
+            elif r[1] + 1 == add:      # rough extend to here
+                r[1] = add
+                break
+            elif r[0] > add:      # rough insert here
+                self.ranges.insert(i, [add, add])
+                break
+        else:
+            self.ranges.append([add, add])
+
+        self.consolidate()
+
+    def consolidate(self):
+        "Combine overlapping ranges"
+        '''ranges = self.ranges
+        for this, that in zip(ranges, ranges[1:]):
+            if this[1] + 1 >= that[0]:  # Ranges interract
+                if this[1] >= that[1]:  # this covers that
+                    this[:], that[:] = [], this
+                else:   # that extends this
+                    this[:], that[:] = [], [this[0], that[1]]
+        ranges[:] = [r for r in ranges if r]'''
+        for i in range(len(self.ranges) - 1):
+            this = i
+            that = i + 1
+            if self.ranges[this][1] + 1 >= self.ranges[that][0]:  # Ranges interract
+                if self.ranges[this][1] >= self.ranges[that][1]:  # this covers that
+                    self.ranges[that] = self.ranges[this]
+                    self.ranges[this] = [-1, -1]
+                else:                                             # that extends this
+                    self.ranges[that] = [self.ranges[this][0], self.ranges[that][1]]
+                    self.ranges[this] = [-1, -1]
+        self.ranges = [r for r in self.ranges if r != [-1, -1]]
+
+    def __str__(self):
+        return ",".join(str(r[0]) + '-' + str(r[1]) for r in self.ranges)
+
+def demo(opp_txt):
+    by_line = opp_txt.split("\n")
+    start = by_line.pop(0)
+    ex = Sequence(start.split(' ')[-1][1:-1])
+    lines = [line.lstrip(' ').split(' ') for line in by_line]
+    opps = [(word[0], int(word[1])) for word in lines]
+    print('Start: "' + str(ex) + '"')
+    for op, val in opps:
+        #print(f"    {op.__name__:>6} {val:2} => {op(val)}")
+        if op == 'add':
+            ex.add(val)
+        else:
+            assert(op == 'remove')
+            ex.remove(val)
+        print('    %6s %2d => %s' % (op, val, ex))
+    print()
+
+demo(
+"""   Start with ""
+            add 77
+            add 79
+            add 78
+            remove 77
+            remove 78
+            remove 79""")
+demo(
+"""   Start with "1-3,5-5"
+            add 1
+            remove 4
+            add 7
+            add 8
+            add 6
+            remove 7""")
+demo(
+"""   Start with "1-5,10-25,27-30"
+            add 26
+            add 9
+            add 7
+            remove 26
+            remove 9
+            remove 7""")
+===
+
+T Sequence
+   [[Int]] ranges
+
+   F (sequence_string)
+      I sequence_string != ‘’
+         .ranges = .to_ranges(sequence_string)
+      assert(.ranges == sorted(.ranges), ‘Sequence order error’)
+
+   F to_ranges(txt)
+      R txt.split(‘,’).map(r -> r.split(‘-’).map(x -> Int(x)))
+
+   F remove(rem)
+      L(r) .ranges
+         V i = L.index
+         I rem C r[0] .. r[1]
+            I r[0] == rem
+               I r[1] > rem
+                  r[0]++
+               E
+                  .ranges.pop(i)
+            E I r[1] == rem
+               I r[0] < rem
+                  r[1]--
+               E
+                  .ranges.pop(i)
+            E
+               V (r1, splitrange) = (rem - 1, [rem + 1, r[1]])
+               r[1] = r1
+               .ranges.insert(i + 1, splitrange)
+            L.break
+         I r[0] > rem
+            L.break
+
+   F add(add)
+      L(r) .ranges
+         V i = L.index
+         I add C r[0] .. r[1]
+            L.break
+         E I r[0] - 1 == add
+            r[0] = add
+            L.break
+         E I r[1] + 1 == add
+            r[1] = add
+            L.break
+         E I r[0] > add
+            .ranges.insert(i, [add, add])
+            L.break
+      L.was_no_break
+         .ranges.append([add, add])
+      .consolidate()
+
+   F consolidate()
+      ‘Combine overlapping ranges’
+      ‘ranges = self.ranges
+        for this, that in zip(ranges, ranges[1:]):
+            if this[1] + 1 >= that[0]:  # Ranges interract
+                if this[1] >= that[1]:  # this covers that
+                    this[:], that[:] = [], this
+                else:   # that extends this
+                    this[:], that[:] = [], [this[0], that[1]]
+        ranges[:] = [r for r in ranges if r]’
+      L(i) 0 .< .ranges.len - 1
+         V this = i
+         V that = i + 1
+         I .ranges[this][1] + 1 >= .ranges[that][0]
+            I .ranges[this][1] >= .ranges[that][1]
+               .ranges[that] = .ranges[this]
+               .ranges[this] = [-1, -1]
+            E
+               .ranges[that] = [.ranges[this][0], .ranges[that][1]]
+               .ranges[this] = [-1, -1]
+      .ranges = .ranges.filter(r -> r != [-1, -1])
+
+   F String()
+      R .ranges.map(r -> String(r[0])‘-’String(r[1])).join(‘,’)
+
+F demo(opp_txt)
+   V by_line = opp_txt.split("\n")
+   V start = by_line.pop(0)
+   V ex = Sequence(start.split(‘ ’).last[1 .< (len)-1])
+   V lines = by_line.map(line -> line.ltrim(‘ ’).split(‘ ’))
+   V opps = lines.map(word -> (word[0], Int(word[1])))
+   print(‘Start: "’String(ex)‘"’)
+   L(op, val) opps
+      I op == ‘add’
+         ex.add(val)
+      E
+         assert(op == ‘remove’)
+         ex.remove(val)
+      print(‘    #6 #2 => #.’.format(op, val, ex))
+   print()
+demo(‘   Start with ""
+            add 77
+            add 79
+            add 78
+            remove 77
+            remove 78
+            remove 79’)
+demo(‘   Start with "1-3,5-5"
+            add 1
+            remove 4
+            add 7
+            add 8
+            add 6
+            remove 7’)
+demo(‘   Start with "1-5,10-25,27-30"
+            add 26
+            add 9
+            add 7
+            remove 26
+            remove 9
+            remove 7’)
+===
+class Sequence
+{
+public:
+    Array<Array<int>> ranges;
+
+    template <typename T1> Sequence(const T1 &sequence_string)
+    {
+        if (sequence_string != u"")
+            ranges = to_ranges(sequence_string);
+        assert(ranges == sorted(ranges), u"Sequence order error"_S);
+    }
+
+    template <typename T1> auto to_ranges(const T1 &txt)
+    {
+        return txt.split(u","_S).map([](const auto &r){return r.split(u"-"_S).map([](const auto &x){return to_int(x);});});
+    }
+
+    template <typename T1> auto remove(const T1 &rem)
+    {
+        {int Lindex = 0;
+        for (auto &&r : ranges) {
+            auto i = Lindex;
+            if (in(rem, range_ee(_get<0>(r), _get<1>(r)))) {
+                if (_get<0>(r) == rem) {
+                    if (_get<1>(r) > rem)
+                        _get<0>(r)++;
+                    else
+                        ranges.pop(i);
+                }
+                else if (_get<1>(r) == rem) {
+                    if (_get<0>(r) < rem)
+                        _get<1>(r)--;
+                    else
+                        ranges.pop(i);
+                }
+                else {
+                    auto [r1, splitrange] = make_tuple(rem - 1, create_array({rem + 1, _get<1>(r)}));
+                    _set<1>(r, r1);
+                    ranges.insert(i + 1, splitrange);
+                }
+                break;
+            }
+            if (_get<0>(r) > rem)
+                break;
+            Lindex++;
+        }}
+    }
+
+    template <typename T1> auto add(const T1 &add)
+    {
+        {bool was_break = false;
+        {int Lindex = 0;
+        for (auto &&r : ranges) {
+            auto i = Lindex;
+            if (in(add, range_ee(_get<0>(r), _get<1>(r)))) {
+                was_break = true;
+                break;
+            }
+            else if (_get<0>(r) - 1 == add) {
+                _set<0>(r, add);
+                was_break = true;
+                break;
+            }
+            else if (_get<1>(r) + 1 == add) {
+                _set<1>(r, add);
+                was_break = true;
+                break;
+            }
+            else if (_get<0>(r) > add) {
+                ranges.insert(i, create_array({add, add}));
+                was_break = true;
+                break;
+            }
+            Lindex++;
+        }}
+        if (!was_break)
+            ranges.append(create_array({add, add}));
+        }
+        consolidate();
+    }
+
+    auto consolidate()
+    {
+        u"Combine overlapping ranges"_S;
+        uR"(ranges = self.ranges
+        for this, that in zip(ranges, ranges[1:]):
+            if this[1] + 1 >= that[0]:  # Ranges interract
+                if this[1] >= that[1]:  # this covers that
+                    this[:], that[:] = [], this
+                else:   # that extends this
+                    this[:], that[:] = [], [this[0], that[1]]
+        ranges[:] = [r for r in ranges if r])"_S;
+        for (auto i : range_el(0, ranges.len() - 1)) {
+            auto _this_ = i;
+            auto that = i + 1;
+            if (_get<1>(ranges[_this_]) + 1 >= _get<0>(ranges[that])) {
+                if (_get<1>(ranges[_this_]) >= _get<1>(ranges[that])) {
+                    ranges.set(that, ranges[_this_]);
+                    ranges.set(_this_, create_array({-1, -1}));
+                }
+                else {
+                    ranges.set(that, create_array({_get<0>(ranges[_this_]), _get<1>(ranges[that])}));
+                    ranges.set(_this_, create_array({-1, -1}));
+                }
+            }
+        }
+        ranges = ranges.filter([](const auto &r){return r != create_array({-1, -1});});
+    }
+
+    operator String() const
+    {
+        return ranges.map([](const auto &r){return String(_get<0>(r)) & u"-"_S & String(_get<1>(r));}).join(u","_S);
+    }
+};
+
+template <typename T1> auto demo(const T1 &opp_txt)
+{
+    auto by_line = opp_txt.split(u"\n"_S);
+    auto start = by_line.pop(0);
+    auto ex = Sequence(start.split(u" "_S).last()[range_e_llen(1,  - 1)]);
+    auto lines = by_line.map([](const auto &line){return line.ltrim(u" "_S).split(u" "_S);});
+    auto opps = lines.map([](const auto &word){return make_tuple(_get<0>(word), to_int(_get<1>(word)));});
+    print(u"Start: \""_S & String(ex) & u"\""_S);
+    for (auto &&[op, val] : opps) {
+        if (op == u"add")
+            ex.add(val);
+        else {
+            assert(op == u"remove");
+            ex.remove(val);
+        }
+        print(u"    #6 #2 => #."_S.format(op, val, ex));
+    }
+    print();
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        demo(uR"(   Start with ""
+            add 77
+            add 79
+            add 78
+            remove 77
+            remove 78
+            remove 79)"_S);
+        demo(uR"(   Start with "1-3,5-5"
+            add 1
+            remove 4
+            add 7
+            add 8
+            add 6
+            remove 7)"_S);
+        demo(uR"(   Start with "1-5,10-25,27-30"
+            add 26
+            add 9
+            add 7
+            remove 26
+            remove 9
+            remove 7)"_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Ranking_methods#Python
+from typing import List, Tuple
+
+def mc_rank(iterable : List[Tuple[int, str]]):
+    """Modified competition ranking"""
+    r : List[Tuple[float, Tuple[int, str]]] = []
+    lastresult = -1
+    fifo : List[Tuple[int, str]] = []
+    for n, item in enumerate(iterable):
+        if item[0] == lastresult:
+            fifo += [item]
+        else:
+            while len(fifo):
+                r.append((n, fifo.pop(0)))
+            lastresult = item[0]
+            fifo += [item]
+    while len(fifo):
+        r.append((len(iterable), fifo.pop(0)))
+    return r
+
+def sc_rank(iterable : List[Tuple[int, str]]):
+    """Standard competition ranking"""
+    r : List[Tuple[float, Tuple[int, str]]] = []
+    lastresult = -1
+    lastrank = -1
+    for n, item in enumerate(iterable, 1):
+        if item[0] == lastresult:
+            r.append((lastrank, item))
+        else:
+            r.append((n, item))
+            lastresult = item[0]
+            lastrank = n
+    return r
+
+def d_rank(iterable : List[Tuple[int, str]]):
+    """Dense ranking"""
+    r : List[Tuple[float, Tuple[int, str]]] = []
+    lastresult = -1
+    lastrank = 0
+    for item in iterable:
+        if item[0] == lastresult:
+            r.append((lastrank, item))
+        else:
+            lastresult = item[0]
+            lastrank += 1
+            r.append((lastrank, item))
+    return r
+
+def o_rank(iterable : List[Tuple[int, str]]):
+    """Ordinal ranking"""
+    #return enumerate(iterable, 1)
+    return [((float(i), item)) for i, item in enumerate(iterable, 1)]
+
+def f_rank(iterable : List[Tuple[int, str]]):
+    """Fractional ranking"""
+    r : List[Tuple[float, Tuple[int, str]]] = []
+    last = -1
+    fifo : List[Tuple[int, Tuple[int, str]]] = []
+    for n, item in enumerate(iterable, 1):
+        if item[0] != last:
+            if len(fifo):
+                mean = float(sum(f[0] for f in fifo)) / len(fifo)
+                while len(fifo):
+                    r.append((mean, fifo.pop(0)[1]))
+        last = item[0]
+        fifo.append((n, item))
+    if len(fifo):
+        mean = sum(f[0] for f in fifo) / len(fifo)
+        while len(fifo):
+            r.append((mean, fifo.pop(0)[1]))
+    return r
+
+scores = [(44, 'Solomon'),
+          (42, 'Jason'),
+          (42, 'Errol'),
+          (41, 'Garry'),
+          (41, 'Bernard'),
+          (41, 'Barry'),
+          (39, 'Stephen')]
+
+print('\nScores to be ranked (best first):')
+for n, s in scores:
+    print('        %2i %s' % (n, s))
+
+for ranker, ranking_method in [(sc_rank, 'Standard competition ranking'),
+                               (mc_rank, 'Modified competition ranking'),
+                                (d_rank, 'Dense ranking'),
+                                (o_rank, 'Ordinal ranking'),
+                                (f_rank, 'Fractional ranking')]:
+    print('\n%s:' % ranking_method)
+    for rank, score in ranker(scores):
+        print('  %3g, (%d, %s)' % (rank, score[0], score[1]))
+===
+
+F mc_rank([(Int, String)] &iterable)
+   ‘Modified competition ranking’
+   [(Float, (Int, String))] r
+   V lastresult = -1
+   [(Int, String)] fifo
+   L(item) iterable
+      V n = L.index
+      I item[0] == lastresult
+         fifo [+]= item
+      E
+         L !fifo.empty
+            r.append((n, fifo.pop(0)))
+         lastresult = item[0]
+         fifo [+]= item
+   L !fifo.empty
+      r.append((iterable.len, fifo.pop(0)))
+   R r
+
+F sc_rank([(Int, String)] &iterable)
+   ‘Standard competition ranking’
+   [(Float, (Int, String))] r
+   V lastresult = -1
+   V lastrank = -1
+   L(item) iterable
+      V n = L.index + 1
+      I item[0] == lastresult
+         r.append((lastrank, item))
+      E
+         r.append((n, item))
+         lastresult = item[0]
+         lastrank = n
+   R r
+
+F d_rank([(Int, String)] &iterable)
+   ‘Dense ranking’
+   [(Float, (Int, String))] r
+   V lastresult = -1
+   V lastrank = 0
+   L(item) iterable
+      I item[0] == lastresult
+         r.append((lastrank, item))
+      E
+         lastresult = item[0]
+         lastrank++
+         r.append((lastrank, item))
+   R r
+
+F o_rank([(Int, String)] &iterable)
+   ‘Ordinal ranking’
+   R enumerate(iterable, 1).map((i, item) -> ((Float(i), item)))
+
+F f_rank([(Int, String)] &iterable)
+   ‘Fractional ranking’
+   [(Float, (Int, String))] r
+   V last = -1
+   [(Int, (Int, String))] fifo
+   L(item) iterable
+      V n = L.index + 1
+      I item[0] != last
+         I !fifo.empty
+            V mean = Float(sum(fifo.map(f -> f[0]))) / fifo.len
+            L !fifo.empty
+               r.append((mean, fifo.pop(0)[1]))
+      last = item[0]
+      fifo.append((n, item))
+   I !fifo.empty
+      V mean = sum(fifo.map(f -> f[0])) / fifo.len
+      L !fifo.empty
+         r.append((mean, fifo.pop(0)[1]))
+   R r
+V scores = [(44, ‘Solomon’), (42, ‘Jason’), (42, ‘Errol’), (41, ‘Garry’), (41, ‘Bernard’), (41, ‘Barry’), (39, ‘Stephen’)]
+print("\nScores to be ranked (best first):")
+L(n, s) scores
+   print(‘        #2 #.’.format(n, s))
+
+L(ranker, ranking_method) [(sc_rank, ‘Standard competition ranking’), (mc_rank, ‘Modified competition ranking’), (d_rank, ‘Dense ranking’), (o_rank, ‘Ordinal ranking’), (f_rank, ‘Fractional ranking’)]
+   print("\n#.:".format(ranking_method))
+   L(rank, score) ranker(scores)
+      print(‘  #3, (#., #.)’.format(rank, score[0], score[1]))
+===
+auto mc_rank(Array<Tuple<int, String>> &iterable)
+{
+    u"Modified competition ranking"_S;
+    Array<Tuple<double, Tuple<int, String>>> r;
+    auto lastresult = -1;
+    Array<Tuple<int, String>> fifo;
+    {int Lindex = 0;
+    for (auto &&item : iterable) {
+        auto n = Lindex;
+        if (_get<0>(item) == lastresult)
+            fifo.append(item);
+        else {
+            while (!fifo.empty())
+                r.append(make_tuple(n, fifo.pop(0)));
+            lastresult = _get<0>(item);
+            fifo.append(item);
+        }
+        Lindex++;
+    }}
+    while (!fifo.empty())
+        r.append(make_tuple(iterable.len(), fifo.pop(0)));
+    return r;
+}
+
+auto sc_rank(Array<Tuple<int, String>> &iterable)
+{
+    u"Standard competition ranking"_S;
+    Array<Tuple<double, Tuple<int, String>>> r;
+    auto lastresult = -1;
+    auto lastrank = -1;
+    {int Lindex = 0;
+    for (auto &&item : iterable) {
+        auto n = Lindex + 1;
+        if (_get<0>(item) == lastresult)
+            r.append(make_tuple(lastrank, item));
+        else {
+            r.append(make_tuple(n, item));
+            lastresult = _get<0>(item);
+            lastrank = n;
+        }
+        Lindex++;
+    }}
+    return r;
+}
+
+auto d_rank(Array<Tuple<int, String>> &iterable)
+{
+    u"Dense ranking"_S;
+    Array<Tuple<double, Tuple<int, String>>> r;
+    auto lastresult = -1;
+    auto lastrank = 0;
+    for (auto &&item : iterable)
+        if (_get<0>(item) == lastresult)
+            r.append(make_tuple(lastrank, item));
+        else {
+            lastresult = _get<0>(item);
+            lastrank++;
+            r.append(make_tuple(lastrank, item));
+        }
+    return r;
+}
+
+auto o_rank(Array<Tuple<int, String>> &iterable)
+{
+    u"Ordinal ranking"_S;
+    return enumerate(iterable, 1).map([](const auto &i, const auto &item){return (make_tuple(to_float(i), item));});
+}
+
+auto f_rank(Array<Tuple<int, String>> &iterable)
+{
+    u"Fractional ranking"_S;
+    Array<Tuple<double, Tuple<int, String>>> r;
+    auto last = -1;
+    Array<Tuple<int, Tuple<int, String>>> fifo;
+    {int Lindex = 0;
+    for (auto &&item : iterable) {
+        auto n = Lindex + 1;
+        if (_get<0>(item) != last) {
+            if (!fifo.empty()) {
+                auto mean = to_float(sum_map(fifo, [](const auto &f){return _get<0>(f);})) / fifo.len();
+                while (!fifo.empty())
+                    r.append(make_tuple(mean, _get<1>(fifo.pop(0))));
+            }
+        }
+        last = _get<0>(item);
+        fifo.append(make_tuple(n, item));
+        Lindex++;
+    }}
+    if (!fifo.empty()) {
+        auto mean = sum_map(fifo, [](const auto &f){return _get<0>(f);}) / fifo.len();
+        while (!fifo.empty())
+            r.append(make_tuple(mean, _get<1>(fifo.pop(0))));
+    }
+    return r;
+}
+auto scores = create_array({make_tuple(44, u"Solomon"_S), make_tuple(42, u"Jason"_S), make_tuple(42, u"Errol"_S), make_tuple(41, u"Garry"_S), make_tuple(41, u"Bernard"_S), make_tuple(41, u"Barry"_S), make_tuple(39, u"Stephen"_S)});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"\nScores to be ranked (best first):"_S);
+        for (auto &&[n, s] : scores)
+            print(u"        #2 #."_S.format(n, s));
+
+        for (auto &&[ranker, ranking_method] : create_array({make_tuple(sc_rank, u"Standard competition ranking"_S), make_tuple(mc_rank, u"Modified competition ranking"_S), make_tuple(d_rank, u"Dense ranking"_S), make_tuple(o_rank, u"Ordinal ranking"_S), make_tuple(f_rank, u"Fractional ranking"_S)})) {
+            print(u"\n#.:"_S.format(ranking_method));
+            for (auto &&[rank, score] : ranker(scores))
+                print(u"  #3, (#., #.)"_S.format(rank, _get<0>(score), _get<1>(score)));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Ray-casting_algorithm#Python
+from typing import NamedTuple, List
+
+class Pt(NamedTuple):
+    x : float
+    y : float
+    def __str__(self):
+        return 'Pt(x=%s, y=%s)' % (self.x, self.y)
+
+class Edge(NamedTuple):
+    a : Pt
+    b : Pt
+    def __str__(self):
+        return 'Edge(a=%s, b=%s)' % (self.a, self.b)
+
+class Poly(NamedTuple):
+    name : str
+    edges : List[Edge]
+
+_eps = 0.00001
+_huge = 1e+100
+_tiny = 1e-100
+
+def rayintersectseg(p, edge):
+    ''' takes a point p=Pt() and an edge of two endpoints a,b=Pt() of a line segment returns boolean
+    '''
+    a = edge.a
+    b = edge.b
+    if a.y > b.y:
+        (a,b) = (b,a)
+    if p.y == a.y or p.y == b.y:
+        p = Pt(p.x, p.y + _eps)
+
+    intersect = False
+
+    if (p.y > b.y or p.y < a.y) or (
+        p.x > max(a.x, b.x)):
+        return False
+
+    if p.x < min(a.x, b.x):
+        intersect = True
+    else:
+        m_red : float
+        m_blue : float
+        if abs(a.x - b.x) > _tiny:
+            m_red = (b.y - a.y) / float(b.x - a.x)
+        else:
+            m_red = _huge
+        if abs(a.x - p.x) > _tiny:
+            m_blue = (p.y - a.y) / float(p.x - a.x)
+        else:
+            m_blue = _huge
+        intersect = m_blue >= m_red
+    return intersect
+
+def ispointinside(p, poly):
+    return sum(int(rayintersectseg(p, edge))
+                    for edge in poly.edges) % 2 == 1
+
+def polypp(poly):
+    print("\n  Polygon(name='%s', edges=(" % poly.name)
+    print('   ', ',\n    '.join(str(e) for e in poly.edges) + '\n    ))')
+
+polys = [
+  Poly(name='square', edges=[
+    Edge(Pt(0, 0), Pt(10, 0)),
+    Edge(Pt(10, 0), Pt(10, 10)),
+    Edge(Pt(10, 10), Pt(0, 10)),
+    Edge(Pt(0, 10), Pt(0, 0))
+    ]),
+  Poly(name='square_hole', edges=[
+    Edge(Pt(0, 0), Pt(10, 0)),
+    Edge(Pt(10, 0), Pt(10, 10)),
+    Edge(Pt(10, 10), Pt(0, 10)),
+    Edge(Pt(0, 10), Pt(0, 0)),
+    Edge(Pt(2.5, 2.5), Pt(7.5, 2.5)),
+    Edge(Pt(7.5, 2.5), Pt(7.5, 7.5)),
+    Edge(Pt(7.5, 7.5), Pt(2.5, 7.5)),
+    Edge(Pt(2.5, 7.5), Pt(2.5, 2.5))
+    ]),
+  Poly(name='strange', edges=[
+    Edge(Pt(0, 0), Pt(2.5, 2.5)),
+    Edge(Pt(2.5, 2.5), Pt(0, 10)),
+    Edge(Pt(0, 10), Pt(2.5, 7.5)),
+    Edge(Pt(2.5, 7.5), Pt(7.5, 7.5)),
+    Edge(Pt(7.5, 7.5), Pt(10, 10)),
+    Edge(Pt(10, 10), Pt(10, 0)),
+    Edge(Pt(10, 0), Pt(2.5, 2.5))
+    ]),
+  Poly(name='exagon', edges=[
+    Edge(Pt(3, 0), Pt(7, 0)),
+    Edge(Pt(7, 0), Pt(10, 5)),
+    Edge(Pt(10, 5), Pt(7, 10)),
+    Edge(Pt(7, 10), Pt(3, 10)),
+    Edge(Pt(3, 10), Pt(0, 5)),
+    Edge(Pt(0, 5), Pt(3, 0))
+    ]),
+  ]
+testpoints = [Pt(5, 5), Pt(5, 8),
+              Pt(-10, 5), Pt(0, 5),
+              Pt(10, 5), Pt(8, 5),
+              Pt(10, 10)]
+
+print ("\n TESTING WHETHER POINTS ARE WITHIN POLYGONS")
+for poly in polys:
+    polypp(poly)
+    print ('   ', '\t'.join("%s: %s" % (p, 'True' if ispointinside(p, poly) else 'False')
+                           for p in testpoints[:3]))
+    print ('   ', '\t'.join("%s: %s" % (p, 'True' if ispointinside(p, poly) else 'False')
+                           for p in testpoints[3:6]))
+    print ('   ', '\t'.join("%s: %s" % (p, 'True' if ispointinside(p, poly) else 'False')
+                           for p in testpoints[6:]))
+===
+
+T Pt
+   Float x
+   Float y
+   F String()
+      R ‘Pt(x=#., y=#.)’.format(.x, .y)
+   F (x, y)
+      .x = x
+      .y = y
+
+T Edge
+   Pt a
+   Pt b
+   F String()
+      R ‘Edge(a=#., b=#.)’.format(.a, .b)
+   F (a, b)
+      .a = a
+      .b = b
+
+T Poly
+   String name
+   [Edge] edges
+   F (name, edges)
+      .name = name
+      .edges = edges
+V _eps = 0.00001
+V _huge = 1e+100
+V _tiny = 1e-100
+
+F rayintersectseg(=p, edge)
+   ‘ takes a point p=Pt() and an edge of two endpoints a,b=Pt() of a line segment returns boolean
+    ’
+   V a = edge.a
+   V b = edge.b
+   I a.y > b.y
+      swap(&a, &b)
+   I p.y == a.y | p.y == b.y
+      p = Pt(p.x, p.y + :_eps)
+   V intersect = 0B
+
+   I (p.y > b.y | p.y < a.y) | (p.x > max(a.x, b.x))
+      R 0B
+
+   I p.x < min(a.x, b.x)
+      intersect = 1B
+   E
+      Float m_red
+      Float m_blue
+      I abs(a.x - b.x) > :_tiny
+         m_red = (b.y - a.y) / Float(b.x - a.x)
+      E
+         m_red = :_huge
+      I abs(a.x - p.x) > :_tiny
+         m_blue = (p.y - a.y) / Float(p.x - a.x)
+      E
+         m_blue = :_huge
+      intersect = m_blue >= m_red
+   R intersect
+
+F ispointinside(p, poly)
+   R sum(poly.edges.map(edge -> Int(rayintersectseg(@p, edge)))) % 2 == 1
+
+F polypp(poly)
+   print("\n  Polygon(name='#.', edges=(".format(poly.name))
+   print(‘    ’(poly.edges.map(e -> String(e)).join(",\n    ")"\n    ))"))
+V polys = [Poly(name' ‘square’, edges' [Edge(Pt(0, 0), Pt(10, 0)), Edge(Pt(10, 0), Pt(10, 10)), Edge(Pt(10, 10), Pt(0, 10)), Edge(Pt(0, 10), Pt(0, 0))]), Poly(name' ‘square_hole’, edges' [Edge(Pt(0, 0), Pt(10, 0)), Edge(Pt(10, 0), Pt(10, 10)), Edge(Pt(10, 10), Pt(0, 10)), Edge(Pt(0, 10), Pt(0, 0)), Edge(Pt(2.5, 2.5), Pt(7.5, 2.5)), Edge(Pt(7.5, 2.5), Pt(7.5, 7.5)), Edge(Pt(7.5, 7.5), Pt(2.5, 7.5)), Edge(Pt(2.5, 7.5), Pt(2.5, 2.5))]), Poly(name' ‘strange’, edges' [Edge(Pt(0, 0), Pt(2.5, 2.5)), Edge(Pt(2.5, 2.5), Pt(0, 10)), Edge(Pt(0, 10), Pt(2.5, 7.5)), Edge(Pt(2.5, 7.5), Pt(7.5, 7.5)), Edge(Pt(7.5, 7.5), Pt(10, 10)), Edge(Pt(10, 10), Pt(10, 0)), Edge(Pt(10, 0), Pt(2.5, 2.5))]), Poly(name' ‘exagon’, edges' [Edge(Pt(3, 0), Pt(7, 0)), Edge(Pt(7, 0), Pt(10, 5)), Edge(Pt(10, 5), Pt(7, 10)), Edge(Pt(7, 10), Pt(3, 10)), Edge(Pt(3, 10), Pt(0, 5)), Edge(Pt(0, 5), Pt(3, 0))])]
+V testpoints = [Pt(5, 5), Pt(5, 8), Pt(-10, 5), Pt(0, 5), Pt(10, 5), Pt(8, 5), Pt(10, 10)]
+print("\n TESTING WHETHER POINTS ARE WITHIN POLYGONS")
+L(poly) polys
+   polypp(poly)
+   print(‘    ’testpoints[0.<3].map(p -> ‘#.: #.’.format(p, I ispointinside(p, @poly) {‘True’} E ‘False’)).join("\t"))
+   print(‘    ’testpoints[3.<6].map(p -> ‘#.: #.’.format(p, I ispointinside(p, @poly) {‘True’} E ‘False’)).join("\t"))
+   print(‘    ’testpoints[6..].map(p -> ‘#.: #.’.format(p, I ispointinside(p, @poly) {‘True’} E ‘False’)).join("\t"))
+===
+class Pt
+{
+public:
+    double x;
+    double y;
+    operator String() const
+    {
+        return u"Pt(x=#., y=#.)"_S.format(x, y);
+    }
+    template <typename T1, typename T2> Pt(const T1 &x, const T2 &y) :
+        x(x),
+        y(y)
+    {
+    }
+};
+
+class Edge
+{
+public:
+    Pt a;
+    Pt b;
+    operator String() const
+    {
+        return u"Edge(a=#., b=#.)"_S.format(a, b);
+    }
+    template <typename T1, typename T2> Edge(const T1 &a, const T2 &b) :
+        a(a),
+        b(b)
+    {
+    }
+};
+
+class Poly
+{
+public:
+    String name;
+    Array<Edge> edges;
+    template <typename T1, typename T2> Poly(const T1 &name, const T2 &edges) :
+        name(name),
+        edges(edges)
+    {
+    }
+};
+auto _eps = 0.00001;
+auto _huge = 1e+100;
+auto _tiny = 1e-100;
+
+template <typename T1, typename T2> auto rayintersectseg(T1 p, const T2 &edge)
+{
+    uR"( takes a point p=Pt() and an edge of two endpoints a,b=Pt() of a line segment returns boolean
+    )"_S;
+    auto a = edge.a;
+    auto b = edge.b;
+    if (a.y > b.y)
+        swap(a, b);
+    if (p.y == a.y || p.y == b.y)
+        p = Pt(p.x, p.y + ::_eps);
+    auto intersect = false;
+    if ((p.y > b.y || p.y < a.y) || (p.x > max(a.x, b.x)))
+        return false;
+    if (p.x < min(a.x, b.x))
+        intersect = true;
+    else {
+        double m_red;
+        double m_blue;
+        if (abs(a.x - b.x) > ::_tiny)
+            m_red = (b.y - a.y) / to_float(b.x - a.x);
+        else
+            m_red = ::_huge;
+        if (abs(a.x - p.x) > ::_tiny)
+            m_blue = (p.y - a.y) / to_float(p.x - a.x);
+        else
+            m_blue = ::_huge;
+        intersect = m_blue >= m_red;
+    }
+    return intersect;
+}
+
+template <typename T1, typename T2> auto ispointinside(const T1 &p, const T2 &poly)
+{
+    return mod(sum_map(poly.edges, [&p](const auto &edge){return to_int(rayintersectseg(p, edge));}), 2) == 1;
+}
+
+template <typename T1> auto polypp(const T1 &poly)
+{
+    print(u"\n  Polygon(name='#.', edges=("_S.format(poly.name));
+    print(u"    "_S & (poly.edges.map([](const auto &e){return String(e);}).join(u",\n    "_S) & u"\n    ))"_S));
+}
+auto polys = create_array<Poly>({Poly(u"square"_S, create_array<Edge>({Edge(Pt(0, 0), Pt(10, 0)), Edge(Pt(10, 0), Pt(10, 10)), Edge(Pt(10, 10), Pt(0, 10)), Edge(Pt(0, 10), Pt(0, 0))})), Poly(u"square_hole"_S, create_array<Edge>({Edge(Pt(0, 0), Pt(10, 0)), Edge(Pt(10, 0), Pt(10, 10)), Edge(Pt(10, 10), Pt(0, 10)), Edge(Pt(0, 10), Pt(0, 0)), Edge(Pt(2.5, 2.5), Pt(7.5, 2.5)), Edge(Pt(7.5, 2.5), Pt(7.5, 7.5)), Edge(Pt(7.5, 7.5), Pt(2.5, 7.5)), Edge(Pt(2.5, 7.5), Pt(2.5, 2.5))})), Poly(u"strange"_S, create_array<Edge>({Edge(Pt(0, 0), Pt(2.5, 2.5)), Edge(Pt(2.5, 2.5), Pt(0, 10)), Edge(Pt(0, 10), Pt(2.5, 7.5)), Edge(Pt(2.5, 7.5), Pt(7.5, 7.5)), Edge(Pt(7.5, 7.5), Pt(10, 10)), Edge(Pt(10, 10), Pt(10, 0)), Edge(Pt(10, 0), Pt(2.5, 2.5))})), Poly(u"exagon"_S, create_array<Edge>({Edge(Pt(3, 0), Pt(7, 0)), Edge(Pt(7, 0), Pt(10, 5)), Edge(Pt(10, 5), Pt(7, 10)), Edge(Pt(7, 10), Pt(3, 10)), Edge(Pt(3, 10), Pt(0, 5)), Edge(Pt(0, 5), Pt(3, 0))}))});
+auto testpoints = create_array<Pt>({Pt(5, 5), Pt(5, 8), Pt(-10, 5), Pt(0, 5), Pt(10, 5), Pt(8, 5), Pt(10, 10)});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"\n TESTING WHETHER POINTS ARE WITHIN POLYGONS"_S);
+        for (auto &&poly : polys) {
+            polypp(poly);
+            print(u"    "_S & testpoints[range_el(0, 3)].map([&poly](const auto &p){return u"#.: #."_S.format(p, ispointinside(p, poly) ? u"True"_S : u"False"_S);}).join(u"\t"_S));
+            print(u"    "_S & testpoints[range_el(3, 6)].map([&poly](const auto &p){return u"#.: #."_S.format(p, ispointinside(p, poly) ? u"True"_S : u"False"_S);}).join(u"\t"_S));
+            print(u"    "_S & testpoints[range_ei(6)].map([&poly](const auto &p){return u"#.: #."_S.format(p, ispointinside(p, poly) ? u"True"_S : u"False"_S);}).join(u"\t"_S));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Rosetta_Code/Fix_code_tags#Java
+languages = ["abap", "actionscript", "actionscript3",
+             "ada", "apache", "applescript", "apt_sources", "asm", "asp",
+             "autoit", "avisynth", "bar", "bash", "basic4gl", "bf",
+             "blitzbasic", "bnf", "boo", "c", "caddcl", "cadlisp", "cfdg",
+             "cfm", "cil", "c_mac", "cobol", "cpp", "cpp-qt", "csharp", "css",
+             "d", "delphi", "diff", "_div", "dos", "dot", "eiffel", "email",
+             "foo", "fortran", "freebasic", "genero", "gettext", "glsl", "gml",
+             "gnuplot", "go", "groovy", "haskell", "hq9plus", "html4strict",
+             "idl", "ini", "inno", "intercal", "io", "java", "java5",
+             "javascript", "kixtart", "klonec", "klonecpp", "latex", "lisp",
+             "lolcode", "lotusformulas", "lotusscript", "lscript", "lua",
+             "m68k", "make", "matlab", "mirc", "modula3", "mpasm", "mxml",
+             "mysql", "nsis", "objc", "ocaml", "ocaml-brief", "oobas",
+             "oracle11", "oracle8", "pascal", "per", "perl", "php", "php-brief",
+             "pic16", "pixelbender", "plsql", "povray", "powershell",
+             "progress", "prolog", "providex", "python", "qbasic", "rails",
+             "reg", "robots", "ruby", "sas", "scala", "scheme", "scilab",
+             "sdlbasic", "smalltalk", "smarty", "sql", "tcl", "teraterm",
+             "text", "thinbasic", "tsql", "typoscript", "vb", "vbnet",
+             "verilog", "vhdl", "vim", "visualfoxpro", "visualprolog",
+             "whitespace", "winbatch", "xml", "xorg_conf", "xpp", "z80"]
+
+text = '''Lorem ipsum <code foo>saepe audire</code> elaboraret ne quo, id equidem
+atomorum inciderint usu. <foo>In sit inermis deleniti percipit</foo>,
+ius ex tale civibus omittam. <barf>Vix ut doctus cetero invenire</barf>, his eu
+altera electram. Tota adhuc altera te sea, <code bar>soluta appetere ut mel</bar>.
+Quo quis graecis vivendo te, <baz>posse nullam lobortis ex usu</code>. Eam volumus perpetua
+constituto id, mea an omittam fierent vituperatoribus.'''
+
+for lang in languages:
+    text=text.replace("<"+lang+">", "<lang "+lang+">")
+    text=text.replace("</"+lang+">", "</"+"lang>")
+    text=text.replace("<code "+lang+">", "<lang "+lang+">")
+text=text.replace("</code>", "</"+"lang>")
+
+print(text)
+===
+V languages = [‘abap’, ‘actionscript’, ‘actionscript3’, ‘ada’, ‘apache’, ‘applescript’, ‘apt_sources’, ‘asm’, ‘asp’, ‘autoit’, ‘avisynth’, ‘bar’, ‘bash’, ‘basic4gl’, ‘bf’, ‘blitzbasic’, ‘bnf’, ‘boo’, ‘c’, ‘caddcl’, ‘cadlisp’, ‘cfdg’, ‘cfm’, ‘cil’, ‘c_mac’, ‘cobol’, ‘cpp’, ‘cpp-qt’, ‘csharp’, ‘css’, ‘d’, ‘delphi’, ‘diff’, ‘_div’, ‘dos’, ‘dot’, ‘eiffel’, ‘email’, ‘foo’, ‘fortran’, ‘freebasic’, ‘genero’, ‘gettext’, ‘glsl’, ‘gml’, ‘gnuplot’, ‘go’, ‘groovy’, ‘haskell’, ‘hq9plus’, ‘html4strict’, ‘idl’, ‘ini’, ‘inno’, ‘intercal’, ‘io’, ‘java’, ‘java5’, ‘javascript’, ‘kixtart’, ‘klonec’, ‘klonecpp’, ‘latex’, ‘lisp’, ‘lolcode’, ‘lotusformulas’, ‘lotusscript’, ‘lscript’, ‘lua’, ‘m68k’, ‘make’, ‘matlab’, ‘mirc’, ‘modula3’, ‘mpasm’, ‘mxml’, ‘mysql’, ‘nsis’, ‘objc’, ‘ocaml’, ‘ocaml-brief’, ‘oobas’, ‘oracle11’, ‘oracle8’, ‘pascal’, ‘per’, ‘perl’, ‘php’, ‘php-brief’, ‘pic16’, ‘pixelbender’, ‘plsql’, ‘povray’, ‘powershell’, ‘progress’, ‘prolog’, ‘providex’, ‘python’, ‘qbasic’, ‘rails’, ‘reg’, ‘robots’, ‘ruby’, ‘sas’, ‘scala’, ‘scheme’, ‘scilab’, ‘sdlbasic’, ‘smalltalk’, ‘smarty’, ‘sql’, ‘tcl’, ‘teraterm’, ‘text’, ‘thinbasic’, ‘tsql’, ‘typoscript’, ‘vb’, ‘vbnet’, ‘verilog’, ‘vhdl’, ‘vim’, ‘visualfoxpro’, ‘visualprolog’, ‘whitespace’, ‘winbatch’, ‘xml’, ‘xorg_conf’, ‘xpp’, ‘z80’]
+V text = ‘Lorem ipsum <code foo>saepe audire</code> elaboraret ne quo, id equidem
+atomorum inciderint usu. <foo>In sit inermis deleniti percipit</foo>,
+ius ex tale civibus omittam. <barf>Vix ut doctus cetero invenire</barf>, his eu
+altera electram. Tota adhuc altera te sea, <code bar>soluta appetere ut mel</bar>.
+Quo quis graecis vivendo te, <baz>posse nullam lobortis ex usu</code>. Eam volumus perpetua
+constituto id, mea an omittam fierent vituperatoribus.’
+
+L(lang) languages
+   text = text.replace(‘<’lang‘>’, ‘<lang ’lang‘>’)
+   text = text.replace(‘</’lang‘>’, ‘</’""‘lang>’)
+   text = text.replace(‘<code ’lang‘>’, ‘<lang ’lang‘>’)
+text = text.replace(‘</code>’, ‘</’""‘lang>’)
+print(text)
+===
+auto languages = create_array({u"abap"_S, u"actionscript"_S, u"actionscript3"_S, u"ada"_S, u"apache"_S, u"applescript"_S, u"apt_sources"_S, u"asm"_S, u"asp"_S, u"autoit"_S, u"avisynth"_S, u"bar"_S, u"bash"_S, u"basic4gl"_S, u"bf"_S, u"blitzbasic"_S, u"bnf"_S, u"boo"_S, u"c"_S, u"caddcl"_S, u"cadlisp"_S, u"cfdg"_S, u"cfm"_S, u"cil"_S, u"c_mac"_S, u"cobol"_S, u"cpp"_S, u"cpp-qt"_S, u"csharp"_S, u"css"_S, u"d"_S, u"delphi"_S, u"diff"_S, u"_div"_S, u"dos"_S, u"dot"_S, u"eiffel"_S, u"email"_S, u"foo"_S, u"fortran"_S, u"freebasic"_S, u"genero"_S, u"gettext"_S, u"glsl"_S, u"gml"_S, u"gnuplot"_S, u"go"_S, u"groovy"_S, u"haskell"_S, u"hq9plus"_S, u"html4strict"_S, u"idl"_S, u"ini"_S, u"inno"_S, u"intercal"_S, u"io"_S, u"java"_S, u"java5"_S, u"javascript"_S, u"kixtart"_S, u"klonec"_S, u"klonecpp"_S, u"latex"_S, u"lisp"_S, u"lolcode"_S, u"lotusformulas"_S, u"lotusscript"_S, u"lscript"_S, u"lua"_S, u"m68k"_S, u"make"_S, u"matlab"_S, u"mirc"_S, u"modula3"_S, u"mpasm"_S, u"mxml"_S, u"mysql"_S, u"nsis"_S, u"objc"_S, u"ocaml"_S, u"ocaml-brief"_S, u"oobas"_S, u"oracle11"_S, u"oracle8"_S, u"pascal"_S, u"per"_S, u"perl"_S, u"php"_S, u"php-brief"_S, u"pic16"_S, u"pixelbender"_S, u"plsql"_S, u"povray"_S, u"powershell"_S, u"progress"_S, u"prolog"_S, u"providex"_S, u"python"_S, u"qbasic"_S, u"rails"_S, u"reg"_S, u"robots"_S, u"ruby"_S, u"sas"_S, u"scala"_S, u"scheme"_S, u"scilab"_S, u"sdlbasic"_S, u"smalltalk"_S, u"smarty"_S, u"sql"_S, u"tcl"_S, u"teraterm"_S, u"text"_S, u"thinbasic"_S, u"tsql"_S, u"typoscript"_S, u"vb"_S, u"vbnet"_S, u"verilog"_S, u"vhdl"_S, u"vim"_S, u"visualfoxpro"_S, u"visualprolog"_S, u"whitespace"_S, u"winbatch"_S, u"xml"_S, u"xorg_conf"_S, u"xpp"_S, u"z80"_S});
+auto text = uR"(Lorem ipsum <code foo>saepe audire</code> elaboraret ne quo, id equidem
+atomorum inciderint usu. <foo>In sit inermis deleniti percipit</foo>,
+ius ex tale civibus omittam. <barf>Vix ut doctus cetero invenire</barf>, his eu
+altera electram. Tota adhuc altera te sea, <code bar>soluta appetere ut mel</bar>.
+Quo quis graecis vivendo te, <baz>posse nullam lobortis ex usu</code>. Eam volumus perpetua
+constituto id, mea an omittam fierent vituperatoribus.)"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&lang : languages) {
+            text = text.replace(u"<"_S & lang & u">"_S, u"<lang "_S & lang & u">"_S);
+            text = text.replace(u"</"_S & lang & u">"_S, u"</"_S & u"lang>"_S);
+            text = text.replace(u"<code "_S & lang & u">"_S, u"<lang "_S & lang & u">"_S);
+        }
+        text = text.replace(u"</code>"_S, u"</"_S & u"lang>"_S);
+        print(text);
+    }
+} code_block_1;

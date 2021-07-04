@@ -5989,3 +5989,1303 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Sexy_primes#Python
+LIMIT = 1_000_000
+def get_primes(limit):
+    is_prime = [False] * 2 + [True] * (limit - 1)
+    for n in range(int(limit**0.5 + 1.5)): # stop at ``sqrt(limit)``
+        if is_prime[n]:
+            for i in range(n*n, limit+1, n):
+                is_prime[i] = False
+    return [i for i, prime in enumerate(is_prime) if prime]
+
+primes = get_primes(LIMIT)
+primeset = set(primes)
+
+s = [[[0]*0]*0 for x in range(4)]
+unsexy = [0]*0
+for p in primes:
+    if p + 6 in primeset:
+        s[0].append([p, p+6])
+    else:
+        if p - 6 not in primeset:
+            unsexy.append(p)
+        continue
+    if p + 12 in primeset:
+        s[1].append([p, p+6, p+12])
+    else:
+        continue
+    if p + 18 in primeset:
+        s[2].append([p, p+6, p+12, p+18])
+    else:
+        continue
+    if p + 24 in primeset:
+        s[3].append([p, p+6, p+12, p+18, p+24])
+
+print('"SEXY" PRIME GROUPINGS:')
+for sexy, name in zip(s, 'pairs triplets quadruplets quintuplets'.split(' ')):
+    print('  {} {} ending with ...'.format(len(sexy), name))
+    for sx in sexy[-5:]:
+        print('   ',sx)
+
+print('\nThere are %d unsexy primes ending with ...' % len(unsexy))
+for usx in unsexy[-10:]:
+    print(' ',usx)
+===
+V LIMIT = 1'000'000
+F get_primes(limit)
+   V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
+   L(n) 0 .< Int(limit ^ 0.5 + 1.5)
+      I is_prime[n]
+         L(i) (n * n .< limit + 1).step(n)
+            is_prime[i] = 0B
+   R enumerate(is_prime).filter((i, prime) -> prime).map((i, prime) -> i)
+V primes = get_primes(LIMIT)
+V primeset = Set(primes)
+V s = [[[Int]()] * 0] * 4
+V unsexy = [Int]()
+L(p) primes
+   I p + 6 C primeset
+      s[0].append([p, p + 6])
+   E
+      I p - 6 !C primeset
+         unsexy.append(p)
+      L.continue
+   I p + 12 C primeset
+      s[1].append([p, p + 6, p + 12])
+   E
+      L.continue
+   I p + 18 C primeset
+      s[2].append([p, p + 6, p + 12, p + 18])
+   E
+      L.continue
+   I p + 24 C primeset
+      s[3].append([p, p + 6, p + 12, p + 18, p + 24])
+print(‘"SEXY" PRIME GROUPINGS:’)
+L(sexy, name) zip(s, ‘pairs triplets quadruplets quintuplets’.split(‘ ’))
+   print(‘  #. #. ending with ...’.format(sexy.len, name))
+   L(sx) sexy[(len)-5 ..]
+      print(‘    ’sx)
+print("\nThere are #. unsexy primes ending with ...".format(unsexy.len))
+L(usx) unsexy[(len)-10 ..]
+   print(‘  ’usx)
+===
+auto LIMIT = 1'000'000;
+template <typename T1> auto get_primes(const T1 &limit)
+{
+    auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
+    for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
+        if (is_prime[n])
+            for (auto i : range_el(n * n, limit + 1).step(n))
+                is_prime.set(i, false);
+    return enumerate(is_prime).filter([](const auto &i, const auto &prime){return prime;}).map([](const auto &i, const auto &prime){return i;});
+}
+auto primes = get_primes(LIMIT);
+auto primeset = create_set(primes);
+auto s = create_array({create_array({Array<int>()}) * 0}) * 4;
+auto unsexy = Array<int>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&p : primes) {
+            if (in(p + 6, primeset))
+                _get<0>(s).append(create_array({p, p + 6}));
+            else {
+                if (!in(p - 6, primeset))
+                    unsexy.append(p);
+                continue;
+            }
+            if (in(p + 12, primeset))
+                _get<1>(s).append(create_array({p, p + 6, p + 12}));
+            else
+                continue;
+            if (in(p + 18, primeset))
+                _get<2>(s).append(create_array({p, p + 6, p + 12, p + 18}));
+            else
+                continue;
+            if (in(p + 24, primeset))
+                _get<3>(s).append(create_array({p, p + 6, p + 12, p + 18, p + 24}));
+        }
+        print(u"\"SEXY\" PRIME GROUPINGS:"_S);
+        for (auto &&[sexy, name] : zip(s, u"pairs triplets quadruplets quintuplets"_S.split(u" "_S))) {
+            print(u"  #. #. ending with ..."_S.format(sexy.len(), name));
+            for (auto &&sx : sexy[range_elen_i( - 5)])
+                print(u"    "_S & sx);
+        }
+        print(u"\nThere are #. unsexy primes ending with ..."_S.format(unsexy.len()));
+        for (auto &&usx : unsexy[range_elen_i( - 10)])
+            print(u"  "_S & usx);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Sokoban#Python
+from typing import List
+import collections
+
+data : List[str] = []
+nrows = 0
+px = 0
+py = 0
+sdata = ""
+ddata = ""
+
+def init(board):
+    global data, nrows, sdata, ddata, px, py
+    data = board.split("\n")
+    nrows = max(len(r) for r in data)
+
+    maps = {' ':' ', '.': '.', '@':' ', '#':'#', '$':' '}
+    mapd = {' ':' ', '.': ' ', '@':'@', '#':' ', '$':'*'}
+
+    for r, row in enumerate(data):
+        for c, ch in enumerate(row):
+            sdata += maps[ch]
+            ddata += mapd[ch]
+            if ch == '@':
+                px = c
+                py = r
+
+def push(x, y, dx, dy, data):
+    if sdata[(y+2*dy) * nrows + x+2*dx] == '#' or \
+       data[(y+2*dy) * nrows + x+2*dx] != ' ':
+        return ''
+
+    data2 = list(data)
+    data2[y * nrows + x] = ' '
+    data2[(y+dy) * nrows + x+dx] = '@'
+    data2[(y+2*dy) * nrows + x+2*dx] = '*'
+    return ''.join(data2)
+
+def is_solved(data):
+    for i in range(len(data)):
+        if (sdata[i] == '.') != (data[i] == '*'):
+            return False
+    return True
+
+def solve():
+    open = collections.deque([(ddata, "", px, py)])
+    visited = set([ddata])
+    dirs = ((0, -1, 'u', 'U'), ( 1, 0, 'r', 'R'),
+            (0,  1, 'd', 'D'), (-1, 0, 'l', 'L'))
+
+    lnrows = nrows
+    while len(open):
+        (cur, csol, x, y) = open.popleft()
+
+        for di in dirs:
+            temp = cur
+            (dx, dy) = (di[0], di[1])
+
+            if temp[(y+dy) * lnrows + x+dx] == '*':
+                temp = push(x, y, dx, dy, temp)
+                if temp != '' and temp not in visited:
+                    if is_solved(temp):
+                        return csol + '' + di[3]
+                    open.append((temp, csol + '' + di[3], x+dx, y+dy))
+                    visited.add(temp)
+            else:
+                if sdata[(y+dy) * lnrows + x+dx] == '#' or \
+                   temp[(y+dy) * lnrows + x+dx] != ' ':
+                    continue
+
+                data2 = list(temp)
+                data2[y * lnrows + x] = ' '
+                data2[(y+dy) * lnrows + x+dx] = '@'
+                temp = ''.join(data2)
+
+                if temp not in visited:
+                    if is_solved(temp):
+                        return csol + '' + di[2]
+                    open.append((temp, csol + '' + di[2], x+dx, y+dy))
+                    visited.add(temp)
+
+    return "No solution"
+
+level = \
+"""#######
+#     #
+#     #
+#. #  #
+#. $$ #
+#.$$  #
+#.#  @#
+#######"""
+
+init(level)
+print(level + "\n\n" + solve())
+===
+//import collections
+[String] data
+V nrows = 0
+V px = 0
+V py = 0
+V sdata = ‘’
+V ddata = ‘’
+
+F init(board)
+   :data = board.split("\n")
+   :nrows = max(:data.map(r -> r.len))
+   V maps = [‘ ’ = ‘ ’, ‘.’ = ‘.’, ‘@’ = ‘ ’, ‘#’ = ‘#’, ‘$’ = ‘ ’]
+   V mapd = [‘ ’ = ‘ ’, ‘.’ = ‘ ’, ‘@’ = ‘@’, ‘#’ = ‘ ’, ‘$’ = ‘*’]
+
+   L(row) :data
+      V r = L.index
+      L(ch) row
+         V c = L.index
+         :sdata ‘’= maps[ch]
+         :ddata ‘’= mapd[ch]
+         I ch == ‘@’
+            :px = c
+            :py = r
+
+F push(x, y, dx, dy, data)
+   I :sdata[(y + 2 * dy) * :nrows + x + 2 * dx] == ‘#’ | data[(y + 2 * dy) * :nrows + x + 2 * dx] != ‘ ’
+      R ‘’
+   V data2 = Array(data)
+   data2[y * :nrows + x] = ‘ ’
+   data2[(y + dy) * :nrows + x + dx] = ‘@’
+   data2[(y + 2 * dy) * :nrows + x + 2 * dx] = ‘*’
+   R data2.join(‘’)
+
+F is_solved(data)
+   L(i) 0 .< data.len
+      I (:sdata[i] == ‘.’) != (data[i] == ‘*’)
+         R 0B
+   R 1B
+
+F solve()
+   V open = Deque([(:ddata, ‘’, :px, :py)])
+   V visited = Set([:ddata])
+   V dirs = ((0, -1, ‘u’, ‘U’), (1, 0, ‘r’, ‘R’), (0, 1, ‘d’, ‘D’), (-1, 0, ‘l’, ‘L’))
+   V lnrows = :nrows
+   L !open.empty
+      V (cur, csol, x, y) = open.pop_left()
+
+      L(di) dirs
+         V temp = cur
+         V (dx, dy) = (di[0], di[1])
+
+         I temp[(y + dy) * lnrows + x + dx] == ‘*’
+            temp = push(x, y, dx, dy, temp)
+            I temp != ‘’ & temp !C visited
+               I is_solved(temp)
+                  R csol‘’di[3]
+               open.append((temp, csol‘’di[3], x + dx, y + dy))
+               visited.add(temp)
+         E
+            I :sdata[(y + dy) * lnrows + x + dx] == ‘#’ | temp[(y + dy) * lnrows + x + dx] != ‘ ’
+               L.continue
+            V data2 = Array(temp)
+            data2[y * lnrows + x] = ‘ ’
+            data2[(y + dy) * lnrows + x + dx] = ‘@’
+            temp = data2.join(‘’)
+
+            I temp !C visited
+               I is_solved(temp)
+                  R csol‘’di[2]
+               open.append((temp, csol‘’di[2], x + dx, y + dy))
+               visited.add(temp)
+   R ‘No solution’
+V level = ‘#######
+#     #
+#     #
+#. #  #
+#. $$ #
+#.$$  #
+#.#  @#
+#######’
+init(level)
+print(level"\n\n"solve())
+===
+Array<String> data;
+auto nrows = 0;
+auto px = 0;
+auto py = 0;
+auto sdata = u""_S;
+auto ddata = u""_S;
+
+template <typename T1> auto init(const T1 &board)
+{
+    ::data = board.split(u"\n"_S);
+    ::nrows = max(::data.map([](const auto &r){return r.len();}));
+    auto maps = create_dict(dict_of(u' '_C, u' '_C)(u'.'_C, u'.'_C)(u'@'_C, u' '_C)(u'#'_C, u'#'_C)(u'$'_C, u' '_C));
+    auto mapd = create_dict(dict_of(u' '_C, u' '_C)(u'.'_C, u' '_C)(u'@'_C, u'@'_C)(u'#'_C, u' '_C)(u'$'_C, u'*'_C));
+    {int Lindex = 0;
+
+    for (auto &&row : ::data) {
+        auto r = Lindex;
+        {int Lindex = 0;
+        for (auto &&ch : row) {
+            auto c = Lindex;
+            ::sdata &= maps[ch];
+            ::ddata &= mapd[ch];
+            if (ch == u'@') {
+                ::px = c;
+                ::py = r;
+            }
+            Lindex++;
+        }}
+        Lindex++;
+    }}
+}
+
+template <typename T1, typename T2, typename T3, typename T4, typename T5> auto push(const T1 &x, const T2 &y, const T3 &dx, const T4 &dy, const T5 &data)
+{
+    if (::sdata[(y + 2 * dy) * ::nrows + x + 2 * dx] == u'#' || data[(y + 2 * dy) * ::nrows + x + 2 * dx] != u' ')
+        return u""_S;
+    auto data2 = create_array(data);
+    data2.set(y * ::nrows + x, u' '_C);
+    data2.set((y + dy) * ::nrows + x + dx, u'@'_C);
+    data2.set((y + 2 * dy) * ::nrows + x + 2 * dx, u'*'_C);
+    return data2.join(u""_S);
+}
+
+template <typename T1> auto is_solved(const T1 &data)
+{
+    for (auto i : range_el(0, data.len()))
+        if ((::sdata[i] == u'.') != (data[i] == u'*'))
+            return false;
+    return true;
+}
+
+auto solve()
+{
+    auto open = create_deque({make_tuple(::ddata, u""_S, ::px, ::py)});
+    auto visited = create_set({::ddata});
+    auto dirs = make_tuple(make_tuple(0, -1, u"u"_S, u"U"_S), make_tuple(1, 0, u"r"_S, u"R"_S), make_tuple(0, 1, u"d"_S, u"D"_S), make_tuple(-1, 0, u"l"_S, u"L"_S));
+    auto lnrows = ::nrows;
+    while (!open.empty()) {
+        auto [cur, csol, x, y] = open.pop_left();
+
+        for (auto &&di : dirs) {
+            auto temp = cur;
+            auto [dx, dy] = make_tuple(_get<0>(di), _get<1>(di));
+
+            if (temp[(y + dy) * lnrows + x + dx] == u'*') {
+                temp = push(x, y, dx, dy, temp);
+                if (temp != u"" && !in(temp, visited)) {
+                    if (is_solved(temp))
+                        return csol & _get<3>(di);
+                    open.append(make_tuple(temp, csol & _get<3>(di), x + dx, y + dy));
+                    visited.add(temp);
+                }
+            }
+            else {
+                if (::sdata[(y + dy) * lnrows + x + dx] == u'#' || temp[(y + dy) * lnrows + x + dx] != u' ')
+                    continue;
+                auto data2 = create_array(temp);
+                data2.set(y * lnrows + x, u' '_C);
+                data2.set((y + dy) * lnrows + x + dx, u'@'_C);
+                temp = data2.join(u""_S);
+
+                if (!in(temp, visited)) {
+                    if (is_solved(temp))
+                        return csol & _get<2>(di);
+                    open.append(make_tuple(temp, csol & _get<2>(di), x + dx, y + dy));
+                    visited.add(temp);
+                }
+            }
+        }
+    }
+    return u"No solution"_S;
+}
+auto level = uR"(#######
+#     #
+#     #
+#. #  #
+#. $$ #
+#.$$  #
+#.#  @#
+#######)"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        init(level);
+        print(level & u"\n\n"_S & solve());
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Solve_a_Numbrix_puzzle#Python
+from typing import List
+
+neighbours = [[-1, 0], [0, -1], [1, 0], [0, 1]]
+exists : List[int] = []
+lastNumber = 0
+wid = 0
+hei = 0
+
+def find_next(pa, x, y, z):
+    for i in range(4):
+        a = x + neighbours[i][0]
+        b = y + neighbours[i][1]
+        if -1 < a < wid and -1 < b < hei:
+            if pa[a][b] == z:
+                return (a, b)
+
+    return (-1, -1)
+
+def find_solution(pa : list, x, y, z):
+    if z > lastNumber:
+        return 1
+    if exists[z] == 1:
+        s = find_next(pa, x, y, z)
+        if s[0] < 0:
+            return 0
+        return find_solution(pa, s[0], s[1], z + 1)
+
+    for i in range(4):
+        a = x + neighbours[i][0]
+        b = y + neighbours[i][1]
+        if -1 < a < wid and -1 < b < hei:
+            if pa[a][b] == 0:
+                pa[a][b] = z
+                r = find_solution(pa, a, b, z + 1)
+                if r == 1:
+                    return 1
+                pa[a][b] = 0
+
+    return 0
+
+def solve(pz, w, h):
+    global lastNumber, wid, hei, exists
+
+    lastNumber = w * h
+    wid = w
+    hei = h
+    exists = [0] * (lastNumber + 1)
+
+    pa = [[0] * h for i in range(w)]
+    st = pz.split(' ')
+    idx = 0
+    for j in range(h):
+        for i in range(w):
+            if st[idx] == ".":
+                idx += 1
+            else:
+                pa[i][j] = int(st[idx])
+                exists[pa[i][j]] = 1
+                idx += 1
+
+    x = 0
+    y = 0
+    t = w * h + 1
+    for j in range(h):
+        for i in range(w):
+            if pa[i][j] != 0 and pa[i][j] < t:
+                t = pa[i][j]
+                x = i
+                y = j
+
+    return (find_solution(pa, x, y, t + 1), pa)
+
+def show_result(r):
+    if r[0] == 1:
+        for j in range(hei):
+            for i in range(wid):
+                print(" {:02}".format(r[1][i][j]), end = '')
+            print()
+    else:
+        print("No Solution!")
+
+    print()
+
+r = solve(". . . . . . . . . . . 46 45 . 55 74 . . . 38 . . 43 . . 78 . . 35 . . . . . 71 . . . 33 . . . 59 . . . 17" +
+          " . . . . . 67 . . 18 . . 11 . . 64 . . . 24 21 . 1 2 . . . . . . . . . . .", 9, 9)
+show_result(r)
+
+r = solve(". . . . . . . . . . 11 12 15 18 21 62 61 . . 6 . . . . . 60 . . 33 . . . . . 57 . . 32 . . . . . 56 . . 37" +
+          " . 1 . . . 73 . . 38 . . . . . 72 . . 43 44 47 48 51 76 77 . . . . . . . . . .", 9, 9)
+show_result(r)
+
+r = solve("17 . . . 11 . . . 59 . 15 . . 6 . . 61 . . . 3 . . . 63 . . . . . . 66 . . . . 23 24 . 68 67 78 . 54 55" +
+          " . . . . 72 . . . . . . 35 . . . 49 . . . 29 . . 40 . . 47 . 31 . . . 39 . . . 45", 9, 9)
+show_result(r)
+===
+V neighbours = [[-1, 0], [0, -1], [1, 0], [0, 1]]
+[Int] exists
+V lastNumber = 0
+V wid = 0
+V hei = 0
+
+F find_next(pa, x, y, z)
+   L(i) 4
+      V a = x + :neighbours[i][0]
+      V b = y + :neighbours[i][1]
+      I a C -1 <.< :wid & b C -1 <.< :hei
+         I pa[a][b] == z
+            R (a, b)
+   R (-1, -1)
+
+F find_solution(&pa, x, y, z)
+   I z > :lastNumber
+      R 1
+   I :exists[z] == 1
+      V s = find_next(pa, x, y, z)
+      I s[0] < 0
+         R 0
+      R find_solution(&pa, s[0], s[1], z + 1)
+
+   L(i) 4
+      V a = x + :neighbours[i][0]
+      V b = y + :neighbours[i][1]
+      I a C -1 <.< :wid & b C -1 <.< :hei
+         I pa[a][b] == 0
+            pa[a][b] = z
+            V r = find_solution(&pa, a, b, z + 1)
+            I r == 1
+               R 1
+            pa[a][b] = 0
+   R 0
+
+F solve(pz, w, h)
+   :lastNumber = w * h
+   :wid = w
+   :hei = h
+   :exists = [0] * (:lastNumber + 1)
+   V pa = [[0] * h] * w
+   V st = pz.split(‘ ’)
+   V idx = 0
+   L(j) 0 .< h
+      L(i) 0 .< w
+         I st[idx] == ‘.’
+            idx++
+         E
+            pa[i][j] = Int(st[idx])
+            :exists[pa[i][j]] = 1
+            idx++
+   V x = 0
+   V y = 0
+   V t = w * h + 1
+   L(j) 0 .< h
+      L(i) 0 .< w
+         I pa[i][j] != 0 & pa[i][j] < t
+            t = pa[i][j]
+            x = i
+            y = j
+   R (find_solution(&pa, x, y, t + 1), pa)
+
+F show_result(r)
+   I r[0] == 1
+      L(j) 0 .< :hei
+         L(i) 0 .< :wid
+            print(‘ #02’.format(r[1][i][j]), end' ‘’)
+         print()
+   E
+      print(‘No Solution!’)
+   print()
+V r = solve(‘. . . . . . . . . . . 46 45 . 55 74 . . . 38 . . 43 . . 78 . . 35 . . . . . 71 . . . 33 . . . 59 . . . 17’""‘ . . . . . 67 . . 18 . . 11 . . 64 . . . 24 21 . 1 2 . . . . . . . . . . .’, 9, 9)
+show_result(r)
+r = solve(‘. . . . . . . . . . 11 12 15 18 21 62 61 . . 6 . . . . . 60 . . 33 . . . . . 57 . . 32 . . . . . 56 . . 37’""‘ . 1 . . . 73 . . 38 . . . . . 72 . . 43 44 47 48 51 76 77 . . . . . . . . . .’, 9, 9)
+show_result(r)
+r = solve(‘17 . . . 11 . . . 59 . 15 . . 6 . . 61 . . . 3 . . . 63 . . . . . . 66 . . . . 23 24 . 68 67 78 . 54 55’""‘ . . . . 72 . . . . . . 35 . . . 49 . . . 29 . . 40 . . 47 . 31 . . . 39 . . . 45’, 9, 9)
+show_result(r)
+===
+auto neighbours = create_array({create_array({-1, 0}), create_array({0, -1}), create_array({1, 0}), create_array({0, 1})});
+Array<int> exists;
+auto lastNumber = 0;
+auto wid = 0;
+auto hei = 0;
+
+template <typename T1, typename T2, typename T3, typename T4> auto find_next(const T1 &pa, const T2 &x, const T3 &y, const T4 &z)
+{
+    for (int i = 0; i < 4; i++) {
+        auto a = x + _get<0>(::neighbours[i]);
+        auto b = y + _get<1>(::neighbours[i]);
+        if (in(a, range_ll(-1, ::wid)) && in(b, range_ll(-1, ::hei))) {
+            if (pa[a][b] == z)
+                return make_tuple(a, b);
+        }
+    }
+    return make_tuple(-1, -1);
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto find_solution(T1 &pa, const T2 &x, const T3 &y, const T4 &z)
+{
+    if (z > ::lastNumber)
+        return 1;
+    if (::exists[z] == 1) {
+        auto s = find_next(pa, x, y, z);
+        if (_get<0>(s) < 0)
+            return 0;
+        return find_solution(pa, _get<0>(s), _get<1>(s), z + 1);
+    }
+
+    for (int i = 0; i < 4; i++) {
+        auto a = x + _get<0>(::neighbours[i]);
+        auto b = y + _get<1>(::neighbours[i]);
+        if (in(a, range_ll(-1, ::wid)) && in(b, range_ll(-1, ::hei))) {
+            if (pa[a][b] == 0) {
+                pa[a].set(b, z);
+                auto r = find_solution(pa, a, b, z + 1);
+                if (r == 1)
+                    return 1;
+                pa[a].set(b, 0);
+            }
+        }
+    }
+    return 0;
+}
+
+template <typename T1, typename T2, typename T3> auto solve(const T1 &pz, const T2 &w, const T3 &h)
+{
+    ::lastNumber = w * h;
+    ::wid = w;
+    ::hei = h;
+    ::exists = create_array({0}) * (::lastNumber + 1);
+    auto pa = create_array({create_array({0}) * h}) * w;
+    auto st = pz.split(u" "_S);
+    auto idx = 0;
+    for (auto j : range_el(0, h))
+        for (auto i : range_el(0, w))
+            if (st[idx] == u'.')
+                idx++;
+            else {
+                pa[i].set(j, to_int(st[idx]));
+                ::exists.set(pa[i][j], 1);
+                idx++;
+            }
+    auto x = 0;
+    auto y = 0;
+    auto t = w * h + 1;
+    for (auto j : range_el(0, h))
+        for (auto i : range_el(0, w))
+            if (pa[i][j] != 0 && pa[i][j] < t) {
+                t = pa[i][j];
+                x = i;
+                y = j;
+            }
+    return make_tuple(find_solution(pa, x, y, t + 1), pa);
+}
+
+template <typename T1> auto show_result(const T1 &r)
+{
+    if (_get<0>(r) == 1)
+        for (auto j : range_el(0, ::hei)) {
+            for (auto i : range_el(0, ::wid))
+                print(u" #02"_S.format(_get<1>(r)[i][j]), u""_S);
+            print();
+        }
+    else
+        print(u"No Solution!"_S);
+    print();
+}
+auto r = solve(u". . . . . . . . . . . 46 45 . 55 74 . . . 38 . . 43 . . 78 . . 35 . . . . . 71 . . . 33 . . . 59 . . . 17"_S & u" . . . . . 67 . . 18 . . 11 . . 64 . . . 24 21 . 1 2 . . . . . . . . . . ."_S, 9, 9);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        show_result(r);
+        r = solve(u". . . . . . . . . . 11 12 15 18 21 62 61 . . 6 . . . . . 60 . . 33 . . . . . 57 . . 32 . . . . . 56 . . 37"_S & u" . 1 . . . 73 . . 38 . . . . . 72 . . 43 44 47 48 51 76 77 . . . . . . . . . ."_S, 9, 9);
+        show_result(r);
+        r = solve(u"17 . . . 11 . . . 59 . 15 . . 6 . . 61 . . . 3 . . . 63 . . . . . . 66 . . . . 23 24 . 68 67 78 . 54 55"_S & u" . . . . 72 . . . . . . 35 . . . 49 . . . 29 . . 40 . . 47 . 31 . . . 39 . . . 45"_S, 9, 9);
+        show_result(r);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Solve_the_no_connection_puzzle#Python
+from _11l import *
+
+connections = [(0, 2), (0, 3), (0, 4),
+               (1, 3), (1, 4), (1, 5),
+               (6, 2), (6, 3), (6, 4),
+               (7, 3), (7, 4), (7, 5),
+               (2, 3), (3, 4), (4, 5)]
+
+def ok(conn, perm):
+    """Connected numbers ok?"""
+    return abs(perm[conn[0]] - perm[conn[1]]) != 1
+
+def solve():
+    r : List[List[int]] = []
+    perm = list(range(1, 9))
+    while True:
+        if all(ok(conn, perm) for conn in connections):
+            r += [perm[:]]
+        if not next_permutation(perm):
+            break
+    return r
+
+solutions = solve()
+print("A, B, C, D, E, F, G, H =", ', '.join(str(i) for i in solutions[0]))
+===
+V connections = [(0, 2), (0, 3), (0, 4), (1, 3), (1, 4), (1, 5), (6, 2), (6, 3), (6, 4), (7, 3), (7, 4), (7, 5), (2, 3), (3, 4), (4, 5)]
+
+F ok(conn, perm)
+   ‘Connected numbers ok?’
+   R abs(perm[conn[0]] - perm[conn[1]]) != 1
+
+F solve()
+   [[Int]] r
+   V perm = Array(1..8)
+   L
+      I all(:connections.map(conn -> ok(conn, @perm)))
+         r [+]= copy(perm)
+      I !perm.next_permutation()
+         L.break
+   R r
+V solutions = solve()
+print(‘A, B, C, D, E, F, G, H = ’solutions[0].map(i -> String(i)).join(‘, ’))
+===
+auto connections = create_array({make_tuple(0, 2), make_tuple(0, 3), make_tuple(0, 4), make_tuple(1, 3), make_tuple(1, 4), make_tuple(1, 5), make_tuple(6, 2), make_tuple(6, 3), make_tuple(6, 4), make_tuple(7, 3), make_tuple(7, 4), make_tuple(7, 5), make_tuple(2, 3), make_tuple(3, 4), make_tuple(4, 5)});
+
+template <typename T1, typename T2> auto ok(const T1 &conn, const T2 &perm)
+{
+    u"Connected numbers ok?"_S;
+    return abs(perm[_get<0>(conn)] - perm[_get<1>(conn)]) != 1;
+}
+
+auto solve()
+{
+    Array<Array<int>> r;
+    auto perm = create_array(range_ee(1, 8));
+    while (true) {
+        if (all(::connections.map([&perm](const auto &conn){return ok(conn, perm);})))
+            r.append(copy(perm));
+        if (!perm.next_permutation())
+            break;
+    }
+    return r;
+}
+auto solutions = solve();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"A, B, C, D, E, F, G, H = "_S & _get<0>(solutions).map([](const auto &i){return String(i);}).join(u", "_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Solve_triangle_solitare_puzzle#Python
+from typing import Tuple, List
+
+def DrawBoard(board):
+  peg = [''] * 16
+  for n in range(1,16):
+    peg[n] = '.'
+    if n in board:
+      peg[n] = hex(n)[2:].upper()
+  print("     %s" % peg[1])
+  print("    %s %s" % (peg[2],peg[3]))
+  print("   %s %s %s" % (peg[4],peg[5],peg[6]))
+  print("  %s %s %s %s" % (peg[7],peg[8],peg[9],peg[10]))
+  print(" %s %s %s %s %s" % (peg[11],peg[12],peg[13],peg[14],peg[15]))
+#
+
+# remove peg n from board
+def RemovePeg(board : list,n):
+  board.remove(n)
+
+# Add peg n on board
+def AddPeg(board : list,n):
+  board.append(n)
+
+# return true if peg N is on board else false is empty position
+def IsPeg(board,n):
+  return n in board
+
+# A dictionary of valid jump moves index by jumping peg
+# then a list of moves where move has jumpOver and LandAt positions
+JumpMoves = { 1: [ (2,4),(3,6) ],  # 1 can jump over 2 to land on 4, or jumper over 3 to land on 6
+              2: [ (4,7),(5,9)  ],
+              3: [ (5,8),(6,10) ],
+              4: [ (2,1),(5,6),(7,11),(8,13) ],
+              5: [ (8,12),(9,14) ],
+              6: [ (3,1),(5,4),(9,13),(10,15) ],
+              7: [ (4,2),(8,9)  ],
+              8: [ (5,3),(9,10) ],
+              9: [ (5,2),(8,7)  ],
+             10: [ (9,8) ],
+             11: [ (12,13) ],
+             12: [ (8,5),(13,14) ],
+             13: [ (8,4),(9,6),(12,11),(14,15) ],
+             14: [ (9,5),(13,12)  ],
+             15: [ (10,6),(14,13) ]
+            }
+
+Solution : List[Tuple[int, int, int]] = []
+#
+# Recursively solve the problem
+#
+def Solve(board):
+  #DrawBoard(board)
+  if len(board) == 1:
+    return board # Solved one peg left
+  # try a move for each peg on the board
+  for peg in range(1,16): # try in numeric order not board order
+    if IsPeg(board,peg):
+      movelist = JumpMoves[peg]
+      for over,land in movelist:
+        if IsPeg(board,over) and not IsPeg(board,land):
+          saveboard = board[:] # for back tracking
+          RemovePeg(board,peg)
+          RemovePeg(board,over)
+          AddPeg(board,land) # board order changes!
+
+          Solution.append((peg,over,land))
+
+          board = Solve(board)
+          if len(board) == 1:
+            return board
+        ## undo move and back track when stuck!
+          board = saveboard[:] # back track
+          Solution.pop() # remove last move
+  return board
+
+#
+# Remove one peg and start solving
+#
+def InitSolve(empty):
+  board = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+  RemovePeg(board,empty)
+  Solve(board)
+
+#
+empty_start = 1
+InitSolve(empty_start)
+
+board = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+RemovePeg(board,empty_start)
+for peg,over,land in Solution:
+  RemovePeg(board,peg)
+  RemovePeg(board,over)
+  AddPeg(board,land) # board order changes!
+  DrawBoard(board)
+  print("Peg %s jumped over %s to land on %s\n" % (hex(peg)[2:].upper(),hex(over)[2:].upper(),hex(land)[2:].upper()))
+===
+
+F DrawBoard(board)
+   V peg = [‘’] * 16
+   L(n) 1..15
+      peg[n] = ‘.’
+      I n C board
+         peg[n] = hex(n)
+   print(‘     #.’.format(peg[1]))
+   print(‘    #. #.’.format(peg[2], peg[3]))
+   print(‘   #. #. #.’.format(peg[4], peg[5], peg[6]))
+   print(‘  #. #. #. #.’.format(peg[7], peg[8], peg[9], peg[10]))
+   print(‘ #. #. #. #. #.’.format(peg[11], peg[12], peg[13], peg[14], peg[15]))
+
+F RemovePeg(&board, n)
+   board.remove(n)
+
+F AddPeg(&board, n)
+   board.append(n)
+
+F IsPeg(board, n)
+   R n C board
+V JumpMoves = [1 = [(2, 4), (3, 6)], 2 = [(4, 7), (5, 9)], 3 = [(5, 8), (6, 10)], 4 = [(2, 1), (5, 6), (7, 11), (8, 13)], 5 = [(8, 12), (9, 14)], 6 = [(3, 1), (5, 4), (9, 13), (10, 15)], 7 = [(4, 2), (8, 9)], 8 = [(5, 3), (9, 10)], 9 = [(5, 2), (8, 7)], 10 = [(9, 8)], 11 = [(12, 13)], 12 = [(8, 5), (13, 14)], 13 = [(8, 4), (9, 6), (12, 11), (14, 15)], 14 = [(9, 5), (13, 12)], 15 = [(10, 6), (14, 13)]]
+[(Int, Int, Int)] Solution
+
+F Solve(=board)
+   I board.len == 1
+      R board
+
+   L(peg) 1..15
+      I IsPeg(board, peg)
+         V movelist = JumpMoves[peg]
+         L(over, land) movelist
+            I IsPeg(board, over) & !IsPeg(board, land)
+               V saveboard = copy(board)
+               RemovePeg(&board, peg)
+               RemovePeg(&board, over)
+               AddPeg(&board, land)
+               Solution.append((peg, over, land))
+               board = Solve(board)
+               I board.len == 1
+                  R board
+               board = copy(saveboard)
+               Solution.pop()
+   R board
+
+F InitSolve(empty)
+   V board = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+   RemovePeg(&board, empty)
+   Solve(board)
+V empty_start = 1
+InitSolve(empty_start)
+V board = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+RemovePeg(&board, empty_start)
+L(peg, over, land) Solution
+   RemovePeg(&board, peg)
+   RemovePeg(&board, over)
+   AddPeg(&board, land)
+   DrawBoard(board)
+   print("Peg #. jumped over #. to land on #.\n".format(hex(peg), hex(over), hex(land)))
+===
+template <typename T1> auto DrawBoard(const T1 &board)
+{
+    auto peg = create_array({u""_S}) * 16;
+    for (auto n : range_ee(1, 15)) {
+        peg.set(n, u'.'_C);
+        if (in(n, board))
+            peg.set(n, hex(n));
+    }
+    print(u"     #."_S.format(_get<1>(peg)));
+    print(u"    #. #."_S.format(_get<2>(peg), _get<3>(peg)));
+    print(u"   #. #. #."_S.format(_get<4>(peg), _get<5>(peg), _get<6>(peg)));
+    print(u"  #. #. #. #."_S.format(_get<7>(peg), _get<8>(peg), _get<9>(peg), _get<10>(peg)));
+    print(u" #. #. #. #. #."_S.format(_get<11>(peg), _get<12>(peg), _get<13>(peg), _get<14>(peg), _get<15>(peg)));
+}
+
+template <typename T1, typename T2> auto RemovePeg(T1 &board, const T2 &n)
+{
+    board.remove(n);
+}
+
+template <typename T1, typename T2> auto AddPeg(T1 &board, const T2 &n)
+{
+    board.append(n);
+}
+
+template <typename T1, typename T2> auto IsPeg(const T1 &board, const T2 &n)
+{
+    return in(n, board);
+}
+auto JumpMoves = create_dict(dict_of(1, create_array({make_tuple(2, 4), make_tuple(3, 6)}))(2, create_array({make_tuple(4, 7), make_tuple(5, 9)}))(3, create_array({make_tuple(5, 8), make_tuple(6, 10)}))(4, create_array({make_tuple(2, 1), make_tuple(5, 6), make_tuple(7, 11), make_tuple(8, 13)}))(5, create_array({make_tuple(8, 12), make_tuple(9, 14)}))(6, create_array({make_tuple(3, 1), make_tuple(5, 4), make_tuple(9, 13), make_tuple(10, 15)}))(7, create_array({make_tuple(4, 2), make_tuple(8, 9)}))(8, create_array({make_tuple(5, 3), make_tuple(9, 10)}))(9, create_array({make_tuple(5, 2), make_tuple(8, 7)}))(10, create_array({make_tuple(9, 8)}))(11, create_array({make_tuple(12, 13)}))(12, create_array({make_tuple(8, 5), make_tuple(13, 14)}))(13, create_array({make_tuple(8, 4), make_tuple(9, 6), make_tuple(12, 11), make_tuple(14, 15)}))(14, create_array({make_tuple(9, 5), make_tuple(13, 12)}))(15, create_array({make_tuple(10, 6), make_tuple(14, 13)})));
+Array<ivec3> Solution;
+
+template <typename T1> auto Solve(T1 board)
+{
+    if (board.len() == 1)
+        return board;
+    for (auto peg : range_ee(1, 15))
+        if (IsPeg(board, peg)) {
+            auto movelist = JumpMoves[peg];
+            for (auto &&[over, land] : movelist)
+                if (IsPeg(board, over) && !IsPeg(board, land)) {
+                    auto saveboard = copy(board);
+                    RemovePeg(board, peg);
+                    RemovePeg(board, over);
+                    AddPeg(board, land);
+                    Solution.append(make_tuple(peg, over, land));
+                    board = Solve(board);
+                    if (board.len() == 1)
+                        return board;
+                    board = copy(saveboard);
+                    Solution.pop();
+                }
+        }
+    return board;
+}
+
+template <typename T1> auto InitSolve(const T1 &empty)
+{
+    auto board = create_array({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15});
+    RemovePeg(board, empty);
+    Solve(board);
+}
+auto empty_start = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        InitSolve(empty_start);
+    }
+} code_block_1;
+auto board = create_array({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        RemovePeg(board, empty_start);
+        for (auto &&[peg, over, land] : Solution) {
+            RemovePeg(board, peg);
+            RemovePeg(board, over);
+            AddPeg(board, land);
+            DrawBoard(board);
+            print(u"Peg #. jumped over #. to land on #.\n"_S.format(hex(peg), hex(over), hex(land)));
+        }
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Sorting_algorithms/Bead_sort#Nim
+def bead_sort(a : list):
+    maxv = max(a)
+    beads = [0] * (maxv * len(a))
+
+    for i in range(len(a)):
+        for j in range(a[i]):
+            beads[i * maxv + j] = 1
+
+    for j in range(maxv):
+        sum = 0
+        for i in range(len(a)):
+            sum += beads[i * maxv + j]
+            beads[i * maxv + j] = 0
+
+        for i in range(len(a) - sum, len(a)):
+            beads[i * maxv + j] = 1
+
+    for i in range(len(a)):
+        j = 0
+        while j < maxv and beads[i * maxv + j] > 0:
+            j += 1
+        a[i] = j
+
+a = [5, 3, 1, 7, 4, 1, 1, 20]
+bead_sort(a)
+print(a)
+===
+F bead_sort(&a)
+   V maxv = max(a)
+   V beads = [0] * (maxv * a.len)
+
+   L(i) 0 .< a.len
+      L(j) 0 .< a[i]
+         beads[i * maxv + j] = 1
+
+   L(j) 0 .< maxv
+      V sum = 0
+      L(i) 0 .< a.len
+         sum += beads[i * maxv + j]
+         beads[i * maxv + j] = 0
+
+      L(i) a.len - sum .< a.len
+         beads[i * maxv + j] = 1
+
+   L(i) 0 .< a.len
+      V j = 0
+      L j < maxv & beads[i * maxv + j] > 0
+         j++
+      a[i] = j
+V a = [5, 3, 1, 7, 4, 1, 1, 20]
+bead_sort(&a)
+print(a)
+===
+template <typename T1> auto bead_sort(T1 &a)
+{
+    auto maxv = max(a);
+    auto beads = create_array({0}) * (maxv * a.len());
+    for (auto i : range_el(0, a.len()))
+        for (auto j : range_el(0, a[i]))
+            beads.set(i * maxv + j, 1);
+
+    for (auto j : range_el(0, maxv)) {
+        auto sum = 0;
+        for (auto i : range_el(0, a.len())) {
+            sum += beads[i * maxv + j];
+            beads.set(i * maxv + j, 0);
+        }
+        for (auto i : range_el(a.len() - sum, a.len()))
+            beads.set(i * maxv + j, 1);
+    }
+
+    for (auto i : range_el(0, a.len())) {
+        auto j = 0;
+        while (j < maxv && beads[i * maxv + j] > 0)
+            j++;
+        a.set(i, j);
+    }
+}
+auto a = create_array({5, 3, 1, 7, 4, 1, 1, 20});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        bead_sort(a);
+        print(a);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Sorting_algorithms/Patience_sort#Kotlin
+def ref(obj):
+    return obj
+
+def patience_sort(arr : list):
+    if len(arr) < 2: return
+
+    piles : List[List[int]] = []
+    for el in arr:
+        for pile in piles:
+            if pile[-1] > el:
+                pile.append(el)
+                break
+        else:
+            piles.append([el])
+
+    for i in range(len(arr)):
+        min = piles[0][-1]
+        minPileIndex = 0
+        for j in range(1, len(piles)):
+            if piles[j][-1] < min:
+                min = piles[j][-1]
+                minPileIndex = j
+        arr[i] = min
+        minPile = ref(piles[minPileIndex])
+        minPile.pop()
+        if len(minPile) == 0:
+            piles.pop(minPileIndex)
+
+iArr = [4, 65, 2, -31, 0, 99, 83, 782, 1]
+patience_sort(iArr)
+print(iArr)
+===
+
+F patience_sort(&arr)
+   I arr.len < 2
+      R
+   [[Int]] piles
+   L(el) arr
+      L(pile) piles
+         I pile.last > el
+            pile.append(el)
+            L.break
+      L.was_no_break
+         piles.append([el])
+
+   L(i) 0 .< arr.len
+      V min = piles[0].last
+      V minPileIndex = 0
+      L(j) 1 .< piles.len
+         I piles[j].last < min
+            min = piles[j].last
+            minPileIndex = j
+      arr[i] = min
+      V& minPile = piles[minPileIndex]
+      minPile.pop()
+      I minPile.empty
+         piles.pop(minPileIndex)
+V iArr = [4, 65, 2, -31, 0, 99, 83, 782, 1]
+patience_sort(&iArr)
+print(iArr)
+===
+template <typename T1> auto patience_sort(T1 &arr)
+{
+    if (arr.len() < 2)
+        return;
+    Array<Array<int>> piles;
+    for (auto &&el : arr)
+        {bool was_break = false;
+        for (auto &&pile : piles)
+            if (pile.last() > el) {
+                pile.append(el);
+                was_break = true;
+                break;
+            }
+        if (!was_break)
+            piles.append(create_array({el}));
+        }
+
+    for (auto i : range_el(0, arr.len())) {
+        auto min = _get<0>(piles).last();
+        auto minPileIndex = 0;
+        for (auto j : range_el(1, piles.len()))
+            if (piles[j].last() < min) {
+                min = piles[j].last();
+                minPileIndex = j;
+            }
+        arr.set(i, min);
+        auto& minPile = piles[minPileIndex];
+        minPile.pop();
+        if (minPile.empty())
+            piles.pop(minPileIndex);
+    }
+}
+auto iArr = create_array({4, 65, 2, -31, 0, 99, 83, 782, 1});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        patience_sort(iArr);
+        print(iArr);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Square-free_integers#Python
+import math
+Int64 = int
+
+def SquareFree ( _number ) :
+    max = int(math.sqrt ( _number ))
+
+    for root in range ( 2, max+1 ):                 # Create a custom prime sieve
+        if 0 == _number % ( Int64(root) ** 2 ):
+            return False
+
+    return True
+
+def ListSquareFrees( _start : Int64, _end : Int64 ):
+    count = 0
+    for i in range ( _start, _end+1 ):
+        if True == SquareFree( i ):
+            print ( "{}\t".format(i), end="" )
+            if count % 5 == 4:
+                print()
+            count += 1
+
+    print ( "\n\nTotal count of square-free numbers between {} and {}: {}".format(_start, _end, count))
+
+ListSquareFrees( 1, 100 )
+ListSquareFrees( 1000000000000, 1000000000145 )
+===
+//import math
+
+F SquareFree(_number)
+   V max = Int(sqrt(_number))
+
+   L(root) 2 .. max
+      I 0 == _number % (Int64(root) ^ 2)
+         R 0B
+   R 1B
+
+F ListSquareFrees(Int64 _start, Int64 _end)
+   V count = 0
+   L(i) _start .. _end
+      I 1B == SquareFree(i)
+         print("#.\t".format(i), end' ‘’)
+         I count % 5 == 4
+            print()
+         count++
+   print("\n\nTotal count of square-free numbers between #. and #.: #.".format(_start, _end, count))
+ListSquareFrees(1, 100)
+ListSquareFrees(1000000000000, 1000000000145)
+===
+template <typename T1> auto SquareFree(const T1 &_number)
+{
+    auto max = to_int(sqrt(_number));
+    for (auto root : range_ee(2, max))
+        if (0 == mod(_number, (square(to_int64(root)))))
+            return false;
+    return true;
+}
+
+auto ListSquareFrees(const Int64 &_start, const Int64 &_end)
+{
+    auto count = 0;
+    for (auto i : range_ee(_start, _end))
+        if (true == SquareFree(i)) {
+            print(u"#.\t"_S.format(i), u""_S);
+            if (mod(count, 5) == 4)
+                print();
+            count++;
+        }
+    print(u"\n\nTotal count of square-free numbers between #. and #.: #."_S.format(_start, _end, count));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        ListSquareFrees(1, 100);
+        ListSquareFrees(1000000000000, 1000000000145);
+    }
+} code_block_1;
