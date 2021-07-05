@@ -7113,10 +7113,10 @@ def patience_sort(arr : list):
 
     piles : List[List[int]] = []
     for el in arr:
-        for pile in piles:
+        for pile in piles: # &
             if pile[-1] > el:
                 pile.append(el)
-                break
+                break # `L(el).continue`
         else:
             piles.append([el])
 
@@ -7143,7 +7143,7 @@ F patience_sort(&arr)
       R
    [[Int]] piles
    L(el) arr
-      L(pile) piles
+      L(&pile) piles
          I pile.last > el
             pile.append(el)
             L.break
@@ -7173,7 +7173,7 @@ template <typename T1> auto patience_sort(T1 &arr)
     Array<Array<int>> piles;
     for (auto &&el : arr)
         {bool was_break = false;
-        for (auto &&pile : piles)
+        for (auto &pile : piles)
             if (pile.last() > el) {
                 pile.append(el);
                 was_break = true;
