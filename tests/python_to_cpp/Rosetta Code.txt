@@ -16485,3 +16485,296 @@ struct CodeBlock1
             remove 7)"_S);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Sum_to_100#Kotlin
+from enum import IntEnum
+import collections
+
+NUMBER_OF_DIGITS = 9
+THREE_POW_4 = 3 * 3 * 3 * 3
+NUMBER_OF_EXPRESSIONS = 2 * THREE_POW_4 * THREE_POW_4
+
+class Op(IntEnum):
+    ADD = 0
+    SUB = 1
+    JOIN = 2
+
+class Expression:
+    def __init__(self):
+        self.code = [Op.ADD] * NUMBER_OF_DIGITS
+
+    def inc(self):
+        for i in range(len(self.code)):
+            self.code[i] = Op((int(self.code[i]) + 1) % 3)
+            if self.code[i] != Op.ADD:
+                break
+
+    def toInt(self):
+        value = 0
+        number = 0
+        sign = 1
+        for digit in range(1, 10):
+            c = self.code[NUMBER_OF_DIGITS - digit]
+            if   c == Op.ADD: value += sign * number; number = digit; sign =  1
+            elif c == Op.SUB: value += sign * number; number = digit; sign = -1
+            else: number = 10 * number + digit
+        return value + sign * number
+
+    def __str__(self):
+        s = ''
+        for digit in range(1, NUMBER_OF_DIGITS + 1):
+            c = self.code[NUMBER_OF_DIGITS - digit]
+            if c == Op.ADD:
+                if digit > 1: s += ' + '
+            elif c == Op.SUB:
+                s += ' - '
+            s += str(digit)
+        return s.lstrip(' ')
+
+def printe(givenSum):
+    expression = Expression()
+    for i in range(NUMBER_OF_EXPRESSIONS):
+        if expression.toInt() == givenSum:
+            print('%9d' % givenSum, '=', expression)
+        expression.inc()
+
+class Stat:
+    def __init__(self):
+        self.countSum : DefaultDict[int, int] = collections.defaultdict(int)
+        self.sumCount : DefaultDict[int, Set[int]] = collections.defaultdict(set)
+        expression = Expression()
+        for i in range(NUMBER_OF_EXPRESSIONS):
+            sum = expression.toInt()
+            self.countSum[sum] += 1
+            expression.inc()
+        for k, v in self.countSum.items():
+            self.sumCount[v].add(k)
+
+print("100 has the following solutions:\n")
+printe(100)
+
+stat = Stat()
+maxCount = max(stat.sumCount.keys())
+maxSum = max(stat.sumCount[maxCount])
+print("\n%d has the maximum number of solutions, namely %d" % (maxSum, maxCount))
+
+value = 0
+while value in stat.countSum:
+    value += 1
+print("\n%d is the lowest positive number with no solutions" % value)
+
+print("\nThe ten highest numbers that do have solutions are:\n")
+for i in sorted(stat.countSum.keys(), reverse = True)[:10]:
+    printe(i)
+===
+//import collections
+V NUMBER_OF_DIGITS = 9
+V THREE_POW_4 = 3 * 3 * 3 * 3
+V NUMBER_OF_EXPRESSIONS = 2 * THREE_POW_4 * THREE_POW_4
+T.enum Op
+   ADD
+   SUB
+   JOIN
+
+T Expression
+   code = [Op.ADD] * :NUMBER_OF_DIGITS
+   F ()
+   {
+   }
+
+   F inc()
+      L(i) 0 .< .code.len
+         .code[i] = Op((Int(.code[i]) + 1) % 3)
+         I .code[i] != ADD
+            L.break
+
+   F toInt()
+      V value = 0
+      V number = 0
+      V _sign_ = 1
+      L(digit) 1..9
+         V c = .code[:NUMBER_OF_DIGITS - digit]
+         I c == ADD
+            value += _sign_ * number
+            number = digit
+            _sign_ = 1
+         E I c == SUB
+            value += _sign_ * number
+            number = digit
+            _sign_ = -1
+         E
+            number = 10 * number + digit
+      R value + _sign_ * number
+
+   F String()
+      V s = ‘’
+      L(digit) 1 .. :NUMBER_OF_DIGITS
+         V c = .code[:NUMBER_OF_DIGITS - digit]
+         I c == ADD
+            I digit > 1
+               s ‘’= ‘ + ’
+         E I c == SUB
+            s ‘’= ‘ - ’
+         s ‘’= String(digit)
+      R s.ltrim(‘ ’)
+
+F printe(givenSum)
+   V expression = Expression()
+   L(i) 0 .< :NUMBER_OF_EXPRESSIONS
+      I expression.toInt() == givenSum
+         print((‘#9’.format(givenSum))‘ = ’expression)
+      expression.inc()
+
+T Stat
+   DefaultDict[Int, Int] countSum
+   DefaultDict[Int, Set[Int]] sumCount
+   F ()
+      V expression = Expression()
+      L(i) 0 .< :NUMBER_OF_EXPRESSIONS
+         V sum = expression.toInt()
+         .countSum[sum]++
+         expression.inc()
+      L(k, v) .countSum
+         .sumCount[v].add(k)
+print("100 has the following solutions:\n")
+printe(100)
+V stat = Stat()
+V maxCount = max(stat.sumCount.keys())
+V maxSum = max(stat.sumCount[maxCount])
+print("\n#. has the maximum number of solutions, namely #.".format(maxSum, maxCount))
+V value = 0
+L value C stat.countSum
+   value++
+print("\n#. is the lowest positive number with no solutions".format(value))
+print("\nThe ten highest numbers that do have solutions are:\n")
+L(i) sorted(stat.countSum.keys(), reverse' 1B)[0.<10]
+   printe(i)
+===
+auto NUMBER_OF_DIGITS = 9;
+auto THREE_POW_4 = 3 * 3 * 3 * 3;
+auto NUMBER_OF_EXPRESSIONS = 2 * THREE_POW_4 * THREE_POW_4;
+enum class Op {
+    ADD,
+    SUB,
+    JOIN
+};
+
+class Expression
+{
+public:
+    decltype(create_array({Op::ADD}) * ::NUMBER_OF_DIGITS) code = create_array({Op::ADD}) * ::NUMBER_OF_DIGITS;
+    Expression()
+    {
+    }
+
+    auto inc()
+    {
+        for (auto i : range_el(0, code.len())) {
+            code.set(i, Op(mod((to_int(code[i]) + 1), 3)));
+            if (code[i] != TYPE_RM_REF(code[i])::ADD)
+                break;
+        }
+    }
+
+    auto toInt()
+    {
+        auto value = 0;
+        auto number = 0;
+        auto _sign_ = 1;
+        for (auto digit : range_ee(1, 9)) {
+            auto c = code[::NUMBER_OF_DIGITS - digit];
+            if (c == TYPE_RM_REF(c)::ADD) {
+                value += _sign_ * number;
+                number = digit;
+                _sign_ = 1;
+            }
+            else if (c == TYPE_RM_REF(c)::SUB) {
+                value += _sign_ * number;
+                number = digit;
+                _sign_ = -1;
+            }
+            else
+                number = 10 * number + digit;
+        }
+        return value + _sign_ * number;
+    }
+
+    operator String() const
+    {
+        auto s = u""_S;
+        for (auto digit : range_ee(1, ::NUMBER_OF_DIGITS)) {
+            auto c = code[::NUMBER_OF_DIGITS - digit];
+            if (c == TYPE_RM_REF(c)::ADD) {
+                if (digit > 1)
+                    s &= u" + "_S;
+            }
+            else if (c == TYPE_RM_REF(c)::SUB)
+                s &= u" - "_S;
+            s &= String(digit);
+        }
+        return s.ltrim(u" "_S);
+    }
+};
+
+template <typename T1> auto printe(const T1 &givenSum)
+{
+    auto expression = Expression();
+    for (auto i : range_el(0, ::NUMBER_OF_EXPRESSIONS)) {
+        if (expression.toInt() == givenSum)
+            print((u"#9"_S.format(givenSum)) & u" = "_S & expression);
+        expression.inc();
+    }
+}
+
+class Stat
+{
+public:
+    DefaultDict<int, int> countSum;
+    DefaultDict<int, Set<int>> sumCount;
+    Stat()
+    {
+        auto expression = Expression();
+        for (auto i : range_el(0, ::NUMBER_OF_EXPRESSIONS)) {
+            auto sum = expression.toInt();
+            countSum[sum]++;
+            expression.inc();
+        }
+        for (auto &&[k, v] : countSum)
+            sumCount[v].add(k);
+    }
+};
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"100 has the following solutions:\n"_S);
+        printe(100);
+    }
+} code_block_1;
+auto _stat_ = Stat();
+auto maxCount = max(_stat_.sumCount.keys());
+auto maxSum = max(_stat_.sumCount[maxCount]);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"\n#. has the maximum number of solutions, namely #."_S.format(maxSum, maxCount));
+    }
+} code_block_2;
+auto value = 0;
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        while (in(value, _stat_.countSum))
+            value++;
+        print(u"\n#. is the lowest positive number with no solutions"_S.format(value));
+        print(u"\nThe ten highest numbers that do have solutions are:\n"_S);
+        for (auto &&i : sorted(_stat_.countSum.keys(), nullptr, true)[range_el(0, 10)])
+            printe(i);
+    }
+} code_block_3;

@@ -610,6 +610,8 @@ class SymbolNode:
                                 t = self.children[len(self.children)-1].rightmost()
                                 raise Error('missing required argument `'+ f_node.function_arguments[last_function_arg][0] + '`', Token(t, t, Token.Category.DELIMITER))
                             last_function_arg += 1
+                    elif type(f_node) == ASTTypeEnum:
+                        pass
                     elif f_node.function_pointer:
                         if last_function_arg != len(f_node.type_args):
                             raise Error('wrong number of arguments passed to function pointer', Token(self.children[0].token.end, self.children[0].token.end, Token.Category.DELIMITER))
@@ -1912,7 +1914,7 @@ cpp_keywords = {'alignas', 'alignof', 'and', 'and_eq', 'asm', 'auto', 'bitand', 
     'export', 'extern', 'false', 'float', 'for', 'friend', 'goto', 'if', 'inline', 'int', 'long', 'mutable', 'namespace', 'new', 'noexcept', 'not', 'not_eq', 'nullptr', 'operator', 'or', 'or_eq',
     'private', 'protected', 'public', 'reflexpr', 'register', 'reinterpret_cast', 'requires', 'return', 'short', 'signed', 'sizeof', 'static', 'static_assert', 'static_cast', 'struct', 'switch',
     'template', 'this', 'thread_local', 'throw', 'true', 'try', 'typedef', 'typeid', 'typename', 'union', 'unsigned', 'using', 'virtual', 'void', 'volatile', 'wchar_t', 'while', 'xor', 'xor_eq',
-    'j0', 'j1', 'jn', 'y0', 'y1', 'yn', 'pascal', 'main'}
+    'j0', 'j1', 'jn', 'y0', 'y1', 'yn', 'pascal', 'main', 'stat'}
 
 def next_token(): # why ‘next_token’: >[https://youtu.be/Nlqv6NtBXcA?t=1203]:‘we'll have an advance method which will fetch the next token’
     global token, tokeni, tokensn
@@ -3196,6 +3198,7 @@ string_scope.add_name('rjust',  ASTFunctionDefinition([('width', '', 'Int'), ('f
 string_scope.add_name('format', ASTFunctionDefinition([('arg', token_to_str('N', Token.Category.CONSTANT), '')] * 32))
 string_scope.add_name('map', ASTFunctionDefinition([('function', '', '(Char -> T)')]))
 string_scope.add_name('reduce', ASTFunctionDefinition([('initial', '', 'T'), ('function', '', '((T, Char) -> T)')]))
+string_scope.add_name('encode', ASTFunctionDefinition([('encoding', token_to_str('‘utf-8’'), 'String')]))
 builtins_scope.ids['String'].ast_nodes[0].scope = string_scope
 array_scope = Scope(None)
 arr_last_member_var_decl = ASTVariableDeclaration()
