@@ -434,6 +434,10 @@ public:
 	{
 		std::vector<Type>::erase(begin() + range.b, begin() + range.e);
 	}
+	void del(const RangeEI<Int> range)
+	{
+		std::vector<Type>::erase(begin() + range.b, end());
+	}
 
 	String decode(const String &encoding = u"utf-8"_S) const
 	{
