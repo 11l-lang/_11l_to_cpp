@@ -3222,3 +3222,28 @@ struct CodeBlock3
         print(sArr);
     }
 } code_block_3;
+
+
+// https://www.rosettacode.org/wiki/Take_notes_on_the_command_line
+:start:
+I :argv.len == 1
+   print(File(‘notes.txt’).read(), end' ‘’)
+E
+   V f = File(‘notes.txt’, ‘a’)
+   f.write(Time().format("YYYY-MM-DD hh:mm:ss\n"))
+   f.write("\t"(:argv[1..].join(‘ ’))"\n")
+===
+Array<String> argv;
+
+int MAIN_WITH_ARGV()
+{
+    INIT_ARGV();
+
+    if (::argv.len() == 1)
+        print(File(u"notes.txt"_S).read(), u""_S);
+    else {
+        auto f = File(u"notes.txt"_S, u"a"_S);
+        f.write(Time().format(u"YYYY-MM-DD hh:mm:ss\n"_S));
+        f.write(u"\t"_S & (::argv[range_ei(1)].join(u" "_S)) & u"\n"_S);
+    }
+}

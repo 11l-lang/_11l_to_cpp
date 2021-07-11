@@ -7105,6 +7105,8 @@ struct CodeBlock1
 
 
 # https://www.rosettacode.org/wiki/Sorting_algorithms/Patience_sort#Kotlin
+from typing import List
+
 def ref(obj):
     return obj
 
@@ -7287,5 +7289,955 @@ struct CodeBlock1
     {
         ListSquareFrees(1, 100);
         ListSquareFrees(1000000000000, 1000000000145);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Stable_marriage_problem#Python
+from copy import deepcopy
+
+def ref(obj):
+    return obj
+
+guyprefers = {
+ 'abe':  ['abi', 'eve', 'cath', 'ivy', 'jan', 'dee', 'fay', 'bea', 'hope', 'gay'],
+ 'bob':  ['cath', 'hope', 'abi', 'dee', 'eve', 'fay', 'bea', 'jan', 'ivy', 'gay'],
+ 'col':  ['hope', 'eve', 'abi', 'dee', 'bea', 'fay', 'ivy', 'gay', 'cath', 'jan'],
+ 'dan':  ['ivy', 'fay', 'dee', 'gay', 'hope', 'eve', 'jan', 'bea', 'cath', 'abi'],
+ 'ed':   ['jan', 'dee', 'bea', 'cath', 'fay', 'eve', 'abi', 'ivy', 'hope', 'gay'],
+ 'fred': ['bea', 'abi', 'dee', 'gay', 'eve', 'ivy', 'cath', 'jan', 'hope', 'fay'],
+ 'gav':  ['gay', 'eve', 'ivy', 'bea', 'cath', 'abi', 'dee', 'hope', 'jan', 'fay'],
+ 'hal':  ['abi', 'eve', 'hope', 'fay', 'ivy', 'cath', 'jan', 'bea', 'gay', 'dee'],
+ 'ian':  ['hope', 'cath', 'dee', 'gay', 'bea', 'abi', 'fay', 'ivy', 'jan', 'eve'],
+ 'jon':  ['abi', 'fay', 'jan', 'gay', 'eve', 'bea', 'dee', 'cath', 'ivy', 'hope']}
+galprefers = {
+ 'abi':  ['bob', 'fred', 'jon', 'gav', 'ian', 'abe', 'dan', 'ed', 'col', 'hal'],
+ 'bea':  ['bob', 'abe', 'col', 'fred', 'gav', 'dan', 'ian', 'ed', 'jon', 'hal'],
+ 'cath': ['fred', 'bob', 'ed', 'gav', 'hal', 'col', 'ian', 'abe', 'dan', 'jon'],
+ 'dee':  ['fred', 'jon', 'col', 'abe', 'ian', 'hal', 'gav', 'dan', 'bob', 'ed'],
+ 'eve':  ['jon', 'hal', 'fred', 'dan', 'abe', 'gav', 'col', 'ed', 'ian', 'bob'],
+ 'fay':  ['bob', 'abe', 'ed', 'ian', 'jon', 'dan', 'fred', 'gav', 'col', 'hal'],
+ 'gay':  ['jon', 'gav', 'hal', 'fred', 'bob', 'abe', 'col', 'ed', 'dan', 'ian'],
+ 'hope': ['gav', 'jon', 'bob', 'abe', 'ian', 'dan', 'hal', 'ed', 'col', 'fred'],
+ 'ivy':  ['ian', 'col', 'hal', 'gav', 'fred', 'bob', 'abe', 'ed', 'jon', 'dan'],
+ 'jan':  ['ed', 'hal', 'gav', 'abe', 'bob', 'jon', 'col', 'ian', 'fred', 'dan']}
+
+guys = sorted(guyprefers.keys())
+gals = sorted(galprefers.keys())
+
+def check(engaged):
+    inverseengaged = dict((v,k) for k,v in engaged.items())
+    for she, he in engaged.items():
+        shelikes = galprefers[she]
+        shelikesbetter = shelikes[:shelikes.index(he)]
+        helikes = guyprefers[he]
+        helikesbetter = helikes[:helikes.index(she)]
+        for guy in shelikesbetter:
+            guysgirl = inverseengaged[guy]
+            guylikes = guyprefers[guy]
+            if guylikes.index(guysgirl) > guylikes.index(she):
+                print("%s and %s like each other better than their present partners: %s and %s, respectively"
+                      % (she, guy, he, guysgirl))
+                return False
+        for gal in helikesbetter:
+            girlsguy = engaged[gal]
+            gallikes = galprefers[gal]
+            if gallikes.index(girlsguy) > gallikes.index(he):
+                print("%s and %s like each other better than their present partners: %s and %s, respectively"
+                      % (he, gal, she, girlsguy))
+                return False
+    return True
+
+def matchmaker():
+    guysfree = guys[:]
+    engaged : Dict[str, str] = {}
+    guyprefers2 = deepcopy(guyprefers)
+    galprefers2 = deepcopy(galprefers)
+    while len(guysfree):
+        guy = guysfree.pop(0)
+        guyslist = ref(guyprefers2[guy])
+        gal = guyslist.pop(0)
+        fiance = engaged.get(gal, '')
+        if fiance == '':
+            # She's free
+            engaged[gal] = guy
+            print("  %s and %s" % (guy, gal))
+        else:
+            # The bounder proposes to an engaged lass!
+            galslist = galprefers2[gal]
+            if galslist.index(fiance) > galslist.index(guy):
+                # She prefers new guy
+                engaged[gal] = guy
+                print("  %s dumped %s for %s" % (gal, fiance, guy))
+                if len(guyprefers2[fiance]):
+                    # Ex has more girls to try
+                    guysfree.append(fiance)
+            else:
+                # She is faithful to old fiance
+                if len(guyslist):
+                    # Look again
+                    guysfree.append(guy)
+    return engaged
+
+print('\nEngagements:')
+engaged = matchmaker()
+
+print('\nCouples:')
+print('  ' + ',\n  '.join('%s is engaged to %s' % (couple_key, couple_val)
+                          for couple_key, couple_val in sorted(engaged.items())))
+print()
+print('Engagement stability check PASSED'
+      if check(engaged) else 'Engagement stability check FAILED')
+
+print('\n\nSwapping two fiances to introduce an error')
+(engaged[gals[0]], engaged[gals[1]]) = (engaged[gals[1]], engaged[gals[0]])
+for gal in gals[:2]:
+    print('  %s is now engaged to %s' % (gal, engaged[gal]))
+print()
+print('Engagement stability check PASSED'
+      if check(engaged) else 'Engagement stability check FAILED')
+===
+V guyprefers = [‘abe’ = [‘abi’, ‘eve’, ‘cath’, ‘ivy’, ‘jan’, ‘dee’, ‘fay’, ‘bea’, ‘hope’, ‘gay’], ‘bob’ = [‘cath’, ‘hope’, ‘abi’, ‘dee’, ‘eve’, ‘fay’, ‘bea’, ‘jan’, ‘ivy’, ‘gay’], ‘col’ = [‘hope’, ‘eve’, ‘abi’, ‘dee’, ‘bea’, ‘fay’, ‘ivy’, ‘gay’, ‘cath’, ‘jan’], ‘dan’ = [‘ivy’, ‘fay’, ‘dee’, ‘gay’, ‘hope’, ‘eve’, ‘jan’, ‘bea’, ‘cath’, ‘abi’], ‘ed’ = [‘jan’, ‘dee’, ‘bea’, ‘cath’, ‘fay’, ‘eve’, ‘abi’, ‘ivy’, ‘hope’, ‘gay’], ‘fred’ = [‘bea’, ‘abi’, ‘dee’, ‘gay’, ‘eve’, ‘ivy’, ‘cath’, ‘jan’, ‘hope’, ‘fay’], ‘gav’ = [‘gay’, ‘eve’, ‘ivy’, ‘bea’, ‘cath’, ‘abi’, ‘dee’, ‘hope’, ‘jan’, ‘fay’], ‘hal’ = [‘abi’, ‘eve’, ‘hope’, ‘fay’, ‘ivy’, ‘cath’, ‘jan’, ‘bea’, ‘gay’, ‘dee’], ‘ian’ = [‘hope’, ‘cath’, ‘dee’, ‘gay’, ‘bea’, ‘abi’, ‘fay’, ‘ivy’, ‘jan’, ‘eve’], ‘jon’ = [‘abi’, ‘fay’, ‘jan’, ‘gay’, ‘eve’, ‘bea’, ‘dee’, ‘cath’, ‘ivy’, ‘hope’]]
+V galprefers = [‘abi’ = [‘bob’, ‘fred’, ‘jon’, ‘gav’, ‘ian’, ‘abe’, ‘dan’, ‘ed’, ‘col’, ‘hal’], ‘bea’ = [‘bob’, ‘abe’, ‘col’, ‘fred’, ‘gav’, ‘dan’, ‘ian’, ‘ed’, ‘jon’, ‘hal’], ‘cath’ = [‘fred’, ‘bob’, ‘ed’, ‘gav’, ‘hal’, ‘col’, ‘ian’, ‘abe’, ‘dan’, ‘jon’], ‘dee’ = [‘fred’, ‘jon’, ‘col’, ‘abe’, ‘ian’, ‘hal’, ‘gav’, ‘dan’, ‘bob’, ‘ed’], ‘eve’ = [‘jon’, ‘hal’, ‘fred’, ‘dan’, ‘abe’, ‘gav’, ‘col’, ‘ed’, ‘ian’, ‘bob’], ‘fay’ = [‘bob’, ‘abe’, ‘ed’, ‘ian’, ‘jon’, ‘dan’, ‘fred’, ‘gav’, ‘col’, ‘hal’], ‘gay’ = [‘jon’, ‘gav’, ‘hal’, ‘fred’, ‘bob’, ‘abe’, ‘col’, ‘ed’, ‘dan’, ‘ian’], ‘hope’ = [‘gav’, ‘jon’, ‘bob’, ‘abe’, ‘ian’, ‘dan’, ‘hal’, ‘ed’, ‘col’, ‘fred’], ‘ivy’ = [‘ian’, ‘col’, ‘hal’, ‘gav’, ‘fred’, ‘bob’, ‘abe’, ‘ed’, ‘jon’, ‘dan’], ‘jan’ = [‘ed’, ‘hal’, ‘gav’, ‘abe’, ‘bob’, ‘jon’, ‘col’, ‘ian’, ‘fred’, ‘dan’]]
+V guys = sorted(guyprefers.keys())
+V gals = sorted(galprefers.keys())
+
+F check(engaged)
+   V inverseengaged = Dict(engaged.map((k, v) -> (v, k)))
+   L(she, he) engaged
+      V shelikes = :galprefers[she]
+      V shelikesbetter = shelikes[0 .< shelikes.index(he)]
+      V helikes = :guyprefers[he]
+      V helikesbetter = helikes[0 .< helikes.index(she)]
+      L(guy) shelikesbetter
+         V guysgirl = inverseengaged[guy]
+         V guylikes = :guyprefers[guy]
+         I guylikes.index(guysgirl) > guylikes.index(she)
+            print(‘#. and #. like each other better than their present partners: #. and #., respectively’.format(she, guy, he, guysgirl))
+            R 0B
+      L(gal) helikesbetter
+         V girlsguy = engaged[gal]
+         V gallikes = :galprefers[gal]
+         I gallikes.index(girlsguy) > gallikes.index(he)
+            print(‘#. and #. like each other better than their present partners: #. and #., respectively’.format(he, gal, she, girlsguy))
+            R 0B
+   R 1B
+
+F matchmaker()
+   V guysfree = copy(:guys)
+   [String = String] engaged
+   V guyprefers2 = copy(:guyprefers)
+   V galprefers2 = copy(:galprefers)
+   L !guysfree.empty
+      V guy = guysfree.pop(0)
+      V& guyslist = guyprefers2[guy]
+      V gal = guyslist.pop(0)
+      V fiance = engaged.get(gal, ‘’)
+      I fiance == ‘’
+         engaged[gal] = guy
+         print(‘  #. and #.’.format(guy, gal))
+      E
+         V galslist = galprefers2[gal]
+         I galslist.index(fiance) > galslist.index(guy)
+            engaged[gal] = guy
+            print(‘  #. dumped #. for #.’.format(gal, fiance, guy))
+            I !guyprefers2[fiance].empty
+               guysfree.append(fiance)
+         E
+            I !guyslist.empty
+               guysfree.append(guy)
+   R engaged
+print("\nEngagements:")
+V engaged = matchmaker()
+print("\nCouples:")
+print(‘  ’sorted(engaged.items()).map((couple_key, couple_val) -> ‘#. is engaged to #.’.format(couple_key, couple_val)).join(",\n  "))
+print()
+print(I check(engaged) {‘Engagement stability check PASSED’} E ‘Engagement stability check FAILED’)
+print("\n\nSwapping two fiances to introduce an error")
+swap(&engaged[gals[0]], &engaged[gals[1]])
+L(gal) gals[0.<2]
+   print(‘  #. is now engaged to #.’.format(gal, engaged[gal]))
+print()
+print(I check(engaged) {‘Engagement stability check PASSED’} E ‘Engagement stability check FAILED’)
+===
+auto guyprefers = create_dict(dict_of(u"abe"_S, create_array({u"abi"_S, u"eve"_S, u"cath"_S, u"ivy"_S, u"jan"_S, u"dee"_S, u"fay"_S, u"bea"_S, u"hope"_S, u"gay"_S}))(u"bob"_S, create_array({u"cath"_S, u"hope"_S, u"abi"_S, u"dee"_S, u"eve"_S, u"fay"_S, u"bea"_S, u"jan"_S, u"ivy"_S, u"gay"_S}))(u"col"_S, create_array({u"hope"_S, u"eve"_S, u"abi"_S, u"dee"_S, u"bea"_S, u"fay"_S, u"ivy"_S, u"gay"_S, u"cath"_S, u"jan"_S}))(u"dan"_S, create_array({u"ivy"_S, u"fay"_S, u"dee"_S, u"gay"_S, u"hope"_S, u"eve"_S, u"jan"_S, u"bea"_S, u"cath"_S, u"abi"_S}))(u"ed"_S, create_array({u"jan"_S, u"dee"_S, u"bea"_S, u"cath"_S, u"fay"_S, u"eve"_S, u"abi"_S, u"ivy"_S, u"hope"_S, u"gay"_S}))(u"fred"_S, create_array({u"bea"_S, u"abi"_S, u"dee"_S, u"gay"_S, u"eve"_S, u"ivy"_S, u"cath"_S, u"jan"_S, u"hope"_S, u"fay"_S}))(u"gav"_S, create_array({u"gay"_S, u"eve"_S, u"ivy"_S, u"bea"_S, u"cath"_S, u"abi"_S, u"dee"_S, u"hope"_S, u"jan"_S, u"fay"_S}))(u"hal"_S, create_array({u"abi"_S, u"eve"_S, u"hope"_S, u"fay"_S, u"ivy"_S, u"cath"_S, u"jan"_S, u"bea"_S, u"gay"_S, u"dee"_S}))(u"ian"_S, create_array({u"hope"_S, u"cath"_S, u"dee"_S, u"gay"_S, u"bea"_S, u"abi"_S, u"fay"_S, u"ivy"_S, u"jan"_S, u"eve"_S}))(u"jon"_S, create_array({u"abi"_S, u"fay"_S, u"jan"_S, u"gay"_S, u"eve"_S, u"bea"_S, u"dee"_S, u"cath"_S, u"ivy"_S, u"hope"_S})));
+auto galprefers = create_dict(dict_of(u"abi"_S, create_array({u"bob"_S, u"fred"_S, u"jon"_S, u"gav"_S, u"ian"_S, u"abe"_S, u"dan"_S, u"ed"_S, u"col"_S, u"hal"_S}))(u"bea"_S, create_array({u"bob"_S, u"abe"_S, u"col"_S, u"fred"_S, u"gav"_S, u"dan"_S, u"ian"_S, u"ed"_S, u"jon"_S, u"hal"_S}))(u"cath"_S, create_array({u"fred"_S, u"bob"_S, u"ed"_S, u"gav"_S, u"hal"_S, u"col"_S, u"ian"_S, u"abe"_S, u"dan"_S, u"jon"_S}))(u"dee"_S, create_array({u"fred"_S, u"jon"_S, u"col"_S, u"abe"_S, u"ian"_S, u"hal"_S, u"gav"_S, u"dan"_S, u"bob"_S, u"ed"_S}))(u"eve"_S, create_array({u"jon"_S, u"hal"_S, u"fred"_S, u"dan"_S, u"abe"_S, u"gav"_S, u"col"_S, u"ed"_S, u"ian"_S, u"bob"_S}))(u"fay"_S, create_array({u"bob"_S, u"abe"_S, u"ed"_S, u"ian"_S, u"jon"_S, u"dan"_S, u"fred"_S, u"gav"_S, u"col"_S, u"hal"_S}))(u"gay"_S, create_array({u"jon"_S, u"gav"_S, u"hal"_S, u"fred"_S, u"bob"_S, u"abe"_S, u"col"_S, u"ed"_S, u"dan"_S, u"ian"_S}))(u"hope"_S, create_array({u"gav"_S, u"jon"_S, u"bob"_S, u"abe"_S, u"ian"_S, u"dan"_S, u"hal"_S, u"ed"_S, u"col"_S, u"fred"_S}))(u"ivy"_S, create_array({u"ian"_S, u"col"_S, u"hal"_S, u"gav"_S, u"fred"_S, u"bob"_S, u"abe"_S, u"ed"_S, u"jon"_S, u"dan"_S}))(u"jan"_S, create_array({u"ed"_S, u"hal"_S, u"gav"_S, u"abe"_S, u"bob"_S, u"jon"_S, u"col"_S, u"ian"_S, u"fred"_S, u"dan"_S})));
+auto guys = sorted(guyprefers.keys());
+auto gals = sorted(galprefers.keys());
+
+template <typename T1> auto check(const T1 &engaged)
+{
+    auto inverseengaged = create_dict(engaged.map([](const auto &k, const auto &v){return make_tuple(v, k);}));
+    for (auto &&[she, he] : engaged) {
+        auto shelikes = ::galprefers[she];
+        auto shelikesbetter = shelikes[range_el(0, shelikes.index(he))];
+        auto helikes = ::guyprefers[he];
+        auto helikesbetter = helikes[range_el(0, helikes.index(she))];
+        for (auto &&guy : shelikesbetter) {
+            auto guysgirl = inverseengaged[guy];
+            auto guylikes = ::guyprefers[guy];
+            if (guylikes.index(guysgirl) > guylikes.index(she)) {
+                print(u"#. and #. like each other better than their present partners: #. and #., respectively"_S.format(she, guy, he, guysgirl));
+                return false;
+            }
+        }
+        for (auto &&gal : helikesbetter) {
+            auto girlsguy = engaged[gal];
+            auto gallikes = ::galprefers[gal];
+            if (gallikes.index(girlsguy) > gallikes.index(he)) {
+                print(u"#. and #. like each other better than their present partners: #. and #., respectively"_S.format(he, gal, she, girlsguy));
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+auto matchmaker()
+{
+    auto guysfree = copy(::guys);
+    Dict<String, String> engaged;
+    auto guyprefers2 = copy(::guyprefers);
+    auto galprefers2 = copy(::galprefers);
+    while (!guysfree.empty()) {
+        auto guy = guysfree.pop(0);
+        auto& guyslist = guyprefers2[guy];
+        auto gal = guyslist.pop(0);
+        auto fiance = engaged.get(gal, u""_S);
+        if (fiance == u"") {
+            engaged.set(gal, guy);
+            print(u"  #. and #."_S.format(guy, gal));
+        }
+        else {
+            auto galslist = galprefers2[gal];
+            if (galslist.index(fiance) > galslist.index(guy)) {
+                engaged.set(gal, guy);
+                print(u"  #. dumped #. for #."_S.format(gal, fiance, guy));
+                if (!guyprefers2[fiance].empty())
+                    guysfree.append(fiance);
+            }
+            else
+                if (!guyslist.empty())
+                    guysfree.append(guy);
+        }
+    }
+    return engaged;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"\nEngagements:"_S);
+    }
+} code_block_1;
+auto engaged = matchmaker();
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"\nCouples:"_S);
+        print(u"  "_S & sorted(engaged.items()).map([](const auto &couple_key, const auto &couple_val){return u"#. is engaged to #."_S.format(couple_key, couple_val);}).join(u",\n  "_S));
+        print();
+        print(check(engaged) ? u"Engagement stability check PASSED"_S : u"Engagement stability check FAILED"_S);
+        print(u"\n\nSwapping two fiances to introduce an error"_S);
+        swap(engaged[_get<0>(gals)], engaged[_get<1>(gals)]);
+        for (auto &&gal : gals[range_el(0, 2)])
+            print(u"  #. is now engaged to #."_S.format(gal, engaged[gal]));
+        print();
+        print(check(engaged) ? u"Engagement stability check PASSED"_S : u"Engagement stability check FAILED"_S);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Straddling_checkerboard#Python
+from typing import List
+
+t = [[str("79"), "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+     [str(""),   "H", "O", "L", "",  "M", "E", "S", "",  "R", "T"],
+     [str("3"),  "A", "B", "C", "D", "F", "G", "I", "J", "K", "N"],
+     [str("7"),  "P", "Q", "U", "V", "W", "X", "Y", "Z", ".", "/"]]
+
+def straddle(s):
+    return "".join(l[0]+''+t[0][l.index(c)] for c in list(s.upper()) for l in t if c in l) # [-`list(s.upper())` -> `s.upper()` [`String` support in `multiloop_filtered()`]-]
+
+def unstraddle(s):
+    r : List[str] = []
+    si = 0
+    def next():
+        nonlocal si
+        r = s[si]
+        si += 1
+        return r
+    while True:
+        if si == len(s):
+            break
+        c = s[si]
+        si += 1
+        if c in (t[2][0], t[3][0]):
+            i = [t[2][0], t[3][0]].index(c)
+            n = t[2 + i][t[0].index(next())]
+            r += [next() if n == "/" else n]
+        else:
+            r += [t[1][t[0].index(c)]]
+    return r
+
+O = "One night-it was on the twentieth of March, 1888-I was returning"
+print("Encoded:", straddle(O))
+print("Decoded:", "".join(unstraddle(straddle(O))))
+===
+V t = [[String(‘79’), ‘0’, ‘1’, ‘2’, ‘3’, ‘4’, ‘5’, ‘6’, ‘7’, ‘8’, ‘9’], [String(‘’), ‘H’, ‘O’, ‘L’, ‘’, ‘M’, ‘E’, ‘S’, ‘’, ‘R’, ‘T’], [String(‘3’), ‘A’, ‘B’, ‘C’, ‘D’, ‘F’, ‘G’, ‘I’, ‘J’, ‘K’, ‘N’], [String(‘7’), ‘P’, ‘Q’, ‘U’, ‘V’, ‘W’, ‘X’, ‘Y’, ‘Z’, ‘.’, ‘/’]]
+
+F straddle(s)
+   R multiloop_filtered(Array(s.uppercase()), :t, (c, l) -> c C l, (c, l) -> l[0]‘’:t[0][l.index(c)]).join(‘’)
+
+F unstraddle(s)
+   [String] r
+   V si = 0
+   F next()
+      V r = @s[@si]
+      @si++
+      R r
+   L
+      I si == s.len
+         L.break
+      V c = s[si]
+      si++
+      I c C (:t[2][0], :t[3][0])
+         V i = [:t[2][0], :t[3][0]].index(c)
+         V n = :t[2 + i][:t[0].index(next())]
+         r [+]= I n == ‘/’ {next()} E n
+      E
+         r [+]= :t[1][:t[0].index(c)]
+   R r
+V O = ‘One night-it was on the twentieth of March, 1888-I was returning’
+print(‘Encoded: ’straddle(O))
+print(‘Decoded: ’unstraddle(straddle(O)).join(‘’))
+===
+auto t = create_array({create_array<String>({String(u"79"_S), u"0"_S, u"1"_S, u"2"_S, u"3"_S, u"4"_S, u"5"_S, u"6"_S, u"7"_S, u"8"_S, u"9"_S}), create_array<String>({String(u""_S), u"H"_S, u"O"_S, u"L"_S, u""_S, u"M"_S, u"E"_S, u"S"_S, u""_S, u"R"_S, u"T"_S}), create_array<String>({String(u"3"_S), u"A"_S, u"B"_S, u"C"_S, u"D"_S, u"F"_S, u"G"_S, u"I"_S, u"J"_S, u"K"_S, u"N"_S}), create_array<String>({String(u"7"_S), u"P"_S, u"Q"_S, u"U"_S, u"V"_S, u"W"_S, u"X"_S, u"Y"_S, u"Z"_S, u"."_S, u"/"_S})});
+
+template <typename T1> auto straddle(const T1 &s)
+{
+    return multiloop_filtered(create_array(s.uppercase()), ::t, [](const auto &c, const auto &l){return in(c, l);}, [](const auto &c, const auto &l){return _get<0>(l) & _get<0>(::t)[l.index(c)];}).join(u""_S);
+}
+
+template <typename T1> auto unstraddle(const T1 &s)
+{
+    Array<String> r;
+    auto si = 0;
+    auto next = [&s, &si]()
+    {
+        auto r = s[si];
+        si++;
+        return r;
+    };
+    while (true) {
+        if (si == s.len())
+            break;
+        auto c = s[si];
+        si++;
+        if (in(c, make_tuple(_get<0>(_get<2>(::t)), _get<0>(_get<3>(::t))))) {
+            auto i = create_array({_get<0>(_get<2>(::t)), _get<0>(_get<3>(::t))}).index(c);
+            auto n = ::t[2 + i][_get<0>(::t).index(next())];
+            r.append(n == u'/' ? next() : n);
+        }
+        else
+            r.append(_get<1>(::t)[_get<0>(::t).index(c)]);
+    }
+    return r;
+}
+auto O = u"One night-it was on the twentieth of March, 1888-I was returning"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Encoded: "_S & straddle(O));
+        print(u"Decoded: "_S & unstraddle(straddle(O)).join(u""_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Sudoku#Kotlin
+class Sudoku:
+    solved = False
+
+    def __init__(self, rows):
+        assert len(rows) == 9 and all(len(row) == 9 for row in rows), "Grid must be 9 x 9"
+        self.grid = [0] * 81
+        for i in range(9):
+            for j in range(9):
+                self.grid[9 * i + j] = int(rows[i][j])
+
+    def solve(self):
+        print("Starting grid:\n\n" + str(self))
+        self.placeNumber(0)
+        print("Solution:\n\n" + str(self) if self.solved else "Unsolvable!")
+
+    def placeNumber(self, pos):
+        if self.solved:
+            return
+        if pos == 81:
+            self.solved = True
+            return
+
+        if self.grid[pos] > 0:
+            self.placeNumber(pos + 1)
+            return
+
+        for n in range(1, 10):
+            if self.checkValidity(n, pos % 9, pos // 9):
+                self.grid[pos] = n
+                self.placeNumber(pos + 1)
+                if self.solved:
+                    return
+                self.grid[pos] = 0
+
+    def checkValidity(self, v, x, y):
+        for i in range(9):
+            if self.grid[y * 9 + i] == v or \
+               self.grid[i * 9 + x] == v: return False
+
+        startX = (x // 3) * 3
+        startY = (y // 3) * 3
+        for i in range(startY, startY + 3):
+            for j in range(startX, startX + 3):
+                if self.grid[i * 9 + j] == v: return False
+
+        return True
+
+    def __str__(self):
+        s = ''
+        for i in range(9):
+            for j in range(9):
+                s += str(self.grid[i * 9 + j]) + ' '
+                if j in (2, 5):
+                    s += '| '
+            s += "\n"
+            if i in (2, 5):
+                s += "------+-------+------\n"
+        return s
+
+rows = ["850002400",
+        "720000009",
+        "004000000",
+        "000107002",
+        "305000900",
+        "040000000",
+        "000080070",
+        "017000000",
+        "000036040"]
+
+Sudoku(rows).solve()
+===
+T Sudoku
+   solved = 0B
+   grid = [0] * 81
+
+   F (rows)
+      assert(rows.len == 9 & all(rows.map(row -> row.len == 9)), ‘Grid must be 9 x 9’)
+      L(i) 9
+         L(j) 9
+            .grid[9 * i + j] = Int(rows[i][j])
+
+   F solve()
+      print("Starting grid:\n\n"String((.)))
+      .placeNumber(0)
+      print(I .solved {"Solution:\n\n"String((.))} E ‘Unsolvable!’)
+
+   F placeNumber(pos)
+      I .solved
+         R
+      I pos == 81
+         .solved = 1B
+         R
+
+      I .grid[pos] > 0
+         .placeNumber(pos + 1)
+         R
+
+      L(n) 1..9
+         I .checkValidity(n, pos % 9, pos I/ 9)
+            .grid[pos] = n
+            .placeNumber(pos + 1)
+            I .solved
+               R
+            .grid[pos] = 0
+
+   F checkValidity(v, x, y)
+      L(i) 9
+         I .grid[y * 9 + i] == v | .grid[i * 9 + x] == v
+            R 0B
+      V startX = (x I/ 3) * 3
+      V startY = (y I/ 3) * 3
+      L(i) startY .< startY + 3
+         L(j) startX .< startX + 3
+            I .grid[i * 9 + j] == v
+               R 0B
+      R 1B
+
+   F String()
+      V s = ‘’
+      L(i) 9
+         L(j) 9
+            s ‘’= String(.grid[i * 9 + j])‘ ’
+            I j C (2, 5)
+               s ‘’= ‘| ’
+         s ‘’= "\n"
+         I i C (2, 5)
+            s ‘’= "------+-------+------\n"
+      R s
+V rows = [‘850002400’, ‘720000009’, ‘004000000’, ‘000107002’, ‘305000900’, ‘040000000’, ‘000080070’, ‘017000000’, ‘000036040’]
+Sudoku(rows).solve()
+===
+class Sudoku
+{
+public:
+    decltype(false) solved = false;
+    decltype(create_array({0}) * 81) grid = create_array({0}) * 81;
+
+    template <typename T1> Sudoku(const T1 &rows)
+    {
+        assert(rows.len() == 9 && all(rows.map([](const auto &row){return row.len() == 9;})), u"Grid must be 9 x 9"_S);
+        for (int i = 0; i < 9; i++)
+            for (int j = 0; j < 9; j++)
+                grid.set(9 * i + j, to_int(rows[i][j]));
+    }
+
+    auto solve()
+    {
+        print(u"Starting grid:\n\n"_S & String(*this));
+        placeNumber(0);
+        print(solved ? u"Solution:\n\n"_S & String(*this) : u"Unsolvable!"_S);
+    }
+
+    template <typename T1> auto placeNumber(const T1 &pos)
+    {
+        if (solved)
+            return;
+        if (pos == 81) {
+            solved = true;
+            return;
+        }
+
+        if (grid[pos] > 0) {
+            placeNumber(pos + 1);
+            return;
+        }
+        for (auto n : range_ee(1, 9))
+            if (checkValidity(n, mod(pos, 9), idiv(pos, 9))) {
+                grid.set(pos, n);
+                placeNumber(pos + 1);
+                if (solved)
+                    return;
+                grid.set(pos, 0);
+            }
+    }
+
+    template <typename T1, typename T2, typename T3> auto checkValidity(const T1 &v, const T2 &x, const T3 &y)
+    {
+        for (int i = 0; i < 9; i++)
+            if (grid[y * 9 + i] == v || grid[i * 9 + x] == v)
+                return false;
+        auto startX = (idiv(x, 3)) * 3;
+        auto startY = (idiv(y, 3)) * 3;
+        for (auto i : range_el(startY, startY + 3))
+            for (auto j : range_el(startX, startX + 3))
+                if (grid[i * 9 + j] == v)
+                    return false;
+        return true;
+    }
+
+    operator String() const
+    {
+        auto s = u""_S;
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                s &= String(grid[i * 9 + j]) & u" "_S;
+                if (in(j, make_tuple(2, 5)))
+                    s &= u"| "_S;
+            }
+            s &= u"\n"_S;
+            if (in(i, make_tuple(2, 5)))
+                s &= u"------+-------+------\n"_S;
+        }
+        return s;
+    }
+};
+auto rows = create_array({u"850002400"_S, u"720000009"_S, u"004000000"_S, u"000107002"_S, u"305000900"_S, u"040000000"_S, u"000080070"_S, u"017000000"_S, u"000036040"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        Sudoku(rows).solve();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Summarize_and_say_sequence#C++
+import collections
+from typing import List
+
+result : List[str] = []
+longest = 0
+
+def make_sequence(n) -> None:
+    map : DefaultDict[Char, int] = collections.defaultdict(int)
+    for c in n:
+        map[c] += 1
+
+    z = ''
+    for k in sorted(map.keys(), reverse = True):
+        z += chr(map[k] + ord('0'))
+        z += k
+
+    global longest, result
+    if longest <= len(z):
+        longest = len(z)
+        if z not in result:
+            result += [z]
+            make_sequence(z)
+
+for test in ['9900', '9090', '9009']:
+    result.clear()
+    longest = 0
+    make_sequence(test)
+    print('[%s] Iterations: %d' % (test, len(result) + 1))
+    print("\n".join(result))
+    print("\n")
+===
+//import collections
+[String] result
+V longest = 0
+
+F make_sequence(n) -> N
+   DefaultDict[Char, Int] map
+   L(c) n
+      map[c]++
+   V z = ‘’
+   L(k) sorted(map.keys(), reverse' 1B)
+      z ‘’= Char(code' map[k] + ‘0’.code)
+      z ‘’= k
+   I :longest <= z.len
+      :longest = z.len
+      I z !C :result
+         :result [+]= z
+         make_sequence(z)
+
+L(test) [‘9900’, ‘9090’, ‘9009’]
+   result.clear()
+   longest = 0
+   make_sequence(test)
+   print(‘[#.] Iterations: #.’.format(test, result.len + 1))
+   print(result.join("\n"))
+   print("\n")
+===
+Array<String> result;
+auto longest = 0;
+
+template <typename T1> void make_sequence(const T1 &n)
+{
+    DefaultDict<Char, int> map;
+    for (auto &&c : n)
+        map[c]++;
+    auto z = u""_S;
+    for (auto &&k : sorted(map.keys(), nullptr, true)) {
+        z &= Char(map[k] + u'0'_C.code);
+        z &= k;
+    }
+    if (::longest <= z.len()) {
+        ::longest = z.len();
+        if (!in(z, ::result)) {
+            ::result.append(z);
+            make_sequence(z);
+        }
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&test : create_array({u"9900"_S, u"9090"_S, u"9009"_S})) {
+            result.clear();
+            longest = 0;
+            make_sequence(test);
+            print(u"[#.] Iterations: #."_S.format(test, result.len() + 1));
+            print(result.join(u"\n"_S));
+            print(u"\n"_S);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Sunflower_fractal#Perl
+import math
+
+phi = (1 + math.sqrt(5)) / 2
+
+size = 600
+seeds = 5 * size
+
+print('<svg xmlns="http://www.w3.org/2000/svg" width="' + str(size) + '" height="' + str(size) + '" style="stroke:gold">')
+print('<rect width="100%" height="100%" fill="black" />')
+
+for i in range(1, seeds + 1):
+    r = 2 * (i**phi) / seeds
+    t = 2 * math.pi * phi * i
+    print('<circle cx="%.2f" cy="%.2f" r="%.1f" />' % (r * math.sin(t) + size/2,
+                                                       r * math.cos(t) + size/2, math.sqrt(i)/13))
+
+print('</svg>')
+===
+//import math
+V phi = (1 + sqrt(5)) / 2
+V size = 600
+V seeds = 5 * size
+print(‘<svg xmlns="http://www.w3.org/2000/svg" width="’String(size)‘" height="’String(size)‘" style="stroke:gold">’)
+print(‘<rect width="100%" height="100%" fill="black" />’)
+
+L(i) 1 .. seeds
+   V r = 2 * (i ^ phi) / seeds
+   V t = 2 * math:pi * phi * i
+   print(‘<circle cx="#.2" cy="#.2" r="#.1" />’.format(r * sin(t) + size / 2, r * cos(t) + size / 2, sqrt(i) / 13))
+print(‘</svg>’)
+===
+auto phi = (1 + sqrt(5)) / 2.0;
+auto size = 600;
+auto seeds = 5 * size;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\""_S & String(size) & u"\" height=\""_S & String(size) & u"\" style=\"stroke:gold\">"_S);
+        print(u"<rect width=\"100%\" height=\"100%\" fill=\"black\" />"_S);
+
+        for (auto i : range_ee(1, seeds)) {
+            auto r = 2 * (pow(i, phi)) / seeds;
+            auto t = 2 * math::pi * phi * i;
+            print(u"<circle cx=\"#.2\" cy=\"#.2\" r=\"#.1\" />"_S.format(r * sin(t) + size / 2.0, r * cos(t) + size / 2.0, sqrt(i) / 13.0));
+        }
+        print(u"</svg>"_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Super-d_numbers#D
+# Slow BigInt
+BigInt = int
+
+rd = ["22", "333", "4444", "55555", "666666", "7777777", "88888888", "999999999"]
+
+for ii in range(2, 8):
+    print('First 10 super-%d numbers:' % ii)
+    count = 0
+
+    j : BigInt = 3
+    while True:
+        k = ii * j**ii
+        if rd[ii-2] in str(k):
+            count += 1
+            print(j, end = ' ')
+            if count == 10:
+                print("\n")
+                break
+        j += 1
+===
+V rd = [‘22’, ‘333’, ‘4444’, ‘55555’, ‘666666’, ‘7777777’, ‘88888888’, ‘999999999’]
+
+L(ii) 2..7
+   print(‘First 10 super-#. numbers:’.format(ii))
+   V count = 0
+   BigInt j = 3
+   L
+      V k = ii * j ^ ii
+      I rd[ii - 2] C String(k)
+         count++
+         print(j, end' ‘ ’)
+         I count == 10
+            print("\n")
+            L.break
+      j++
+===
+auto rd = create_array({u"22"_S, u"333"_S, u"4444"_S, u"55555"_S, u"666666"_S, u"7777777"_S, u"88888888"_S, u"999999999"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto ii : range_ee(2, 7)) {
+            print(u"First 10 super-#. numbers:"_S.format(ii));
+            auto count = 0;
+            BigInt j = 3;
+            while (true) {
+                auto k = ii * pow(j, ii);
+                if (in(rd[ii - 2], String(k))) {
+                    count++;
+                    print(j, u" "_S);
+                    if (count == 10) {
+                        print(u"\n"_S);
+                        break;
+                    }
+                }
+                j++;
+            }
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Superpermutation_minimisation#Kotlin
+from typing import List
+Char = str
+
+MAX = 12
+
+sp : List[Char] = []
+count = [0] * MAX
+pos = 0
+
+def factSum(n):
+    s = 0
+    x = 0
+    f = 1
+    while x < n:
+        x += 1
+        f *= x
+        s += f
+    return s
+
+def r(n):
+    if n == 0: return False
+    global pos
+    c = sp[pos - n]
+    count[n] -= 1
+    if count[n] == 0:
+        count[n] = n
+        if not r(n - 1): return False
+    sp[pos] = c
+    pos += 1
+    return True
+
+def superPerm(n):
+    global pos, sp
+    pos = n
+    len = factSum(n)
+    if len > 0: sp = [Char("\0")] * len
+    for i in range(n + 1):
+        count[i] = i
+    for i in range(1, n + 1):
+        sp[i - 1] = chr(ord('0') + i)
+    while r(n):
+        pass
+
+for n in range(MAX):
+    superPerm(n)
+    print("superPerm(%2d) len = %i" % (n, len(sp)))
+===
+V MAX = 12
+[Char] sp
+V count = [0] * MAX
+V pos = 0
+
+F factSum(n)
+   V s = 0
+   V x = 0
+   V f = 1
+   L x < n
+      x++
+      f *= x
+      s += f
+   R s
+
+F r(n)
+   I n == 0
+      R 0B
+   V c = :sp[:pos - n]
+   I --:count[n] == 0
+      :count[n] = n
+      I !r(n - 1)
+         R 0B
+   :sp[:pos] = c
+   :pos++
+   R 1B
+
+F superPerm(n)
+   :pos = n
+   V len = factSum(n)
+   I len > 0
+      :sp = [Char("\0")] * len
+   L(i) 0 .. n
+      :count[i] = i
+   L(i) 1 .. n
+      :sp[i - 1] = Char(code' ‘0’.code + i)
+   L r(n)
+   {
+   }
+
+L(n) 0 .< MAX
+   superPerm(n)
+   print(‘superPerm(#2) len = #.’.format(n, sp.len))
+===
+auto MAX = 12;
+Array<Char> sp;
+auto count = create_array({0}) * MAX;
+auto pos = 0;
+
+template <typename T1> auto factSum(const T1 &n)
+{
+    auto s = 0;
+    auto x = 0;
+    auto f = 1;
+    while (x < n) {
+        x++;
+        f *= x;
+        s += f;
+    }
+    return s;
+}
+
+template <typename T1> auto r(const T1 &n)
+{
+    if (n == 0)
+        return false;
+    auto c = ::sp[::pos - n];
+    if (--::count[n] == 0) {
+        ::count.set(n, n);
+        if (!r(n - 1))
+            return false;
+    }
+    ::sp.set(::pos, c);
+    ::pos++;
+    return true;
+}
+
+template <typename T1> auto superPerm(const T1 &n)
+{
+    ::pos = n;
+    auto len = factSum(n);
+    if (len > 0)
+        ::sp = create_array({u'\0'_C}) * len;
+    for (auto i : range_ee(0, n))
+        ::count.set(i, i);
+    for (auto i : range_ee(1, n))
+        ::sp.set(i - 1, Char(u'0'_C.code + i));
+    while (r(n)) {
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto n : range_el(0, MAX)) {
+            superPerm(n);
+            print(u"superPerm(#2) len = #."_S.format(n, sp.len()));
+        }
     }
 } code_block_1;
