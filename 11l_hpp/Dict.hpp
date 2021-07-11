@@ -87,17 +87,19 @@ public:
 
 	int len() const {return (int)size();}
 
-	void set(const KeyType &key, const ValueType &value)
+	const ValueType &set(const KeyType &key, const ValueType &value)
 	{
 		//insert(std::make_pair(key, value)); //`insert()` does not assign value if it already exists in the map
 		//std::map<KeyType, ValueType>::operator[](key) = value; // this does not work with ValueType = Char (as `Char` has no default constructor)
 		std::map<KeyType, ValueType>::insert_or_assign(key, value);
+		return value;
 	}
 
-	void set(const KeyType &key, ValueType &&value)
+	const ValueType &set(const KeyType &key, ValueType &&value)
 	{
 		//std::map<KeyType, ValueType>::operator[](key) = std::forward<ValueType>(value);
 		std::map<KeyType, ValueType>::insert_or_assign(key, std::forward<ValueType>(value));
+		return value;
 	}
 
 	void update(const DefaultDict &other)
@@ -208,6 +210,7 @@ template <typename KeyType, typename ValueType> class Dict : public DefaultDict<
 public:
 	Dict() {}
 	Dict(DictInitializer<KeyType, ValueType> &&di) : DefaultDict<KeyType, ValueType>(std::forward<DictInitializer<KeyType, ValueType>>(di)) {}
+	Dict(DefaultDict<KeyType, ValueType> &&d) : DefaultDict<KeyType, ValueType>(std::forward<DefaultDict<KeyType, ValueType>>(d)) {}
 
 	ValueType &operator[](const KeyType &key)
 	{
@@ -272,6 +275,11 @@ template <typename Iterable, typename Func, typename Dummy = int, typename = dec
 		r.set(_get<0>(e), _get<1>(e));
 	}
 	return r;
+}
+
+template <typename KeyType, typename ValueType> Dict<KeyType, ValueType> create_dict(DefaultDict<KeyType, ValueType> &&d)
+{
+	return Dict<KeyType, ValueType>(std::forward<DefaultDict<KeyType, ValueType>>(d));
 }
 
 template <typename KeyType, typename ValueType> inline bool in(const KeyType &key, const DefaultDict<KeyType, ValueType> &dict)

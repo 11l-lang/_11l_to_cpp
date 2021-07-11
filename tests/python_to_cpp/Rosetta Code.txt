@@ -16964,3 +16964,272 @@ struct CodeBlock1
             print(g);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Tarjan#Python:_As_class
+import collections
+from typing import Dict, List
+Char = str
+
+def move(obj):
+    return obj
+
+class Graph:
+    name : str
+    graph : Dict[Char, List[Char]]
+    _order : int
+
+    #"Directed Graph Tarjan's strongly connected components algorithm"
+
+    def __init__(self, name, connections):
+        self.name = name
+        #self.connections = connections
+        g : DefaultDict[Char, List[Char]] = collections.defaultdict(list)  # map node vertex to direct connections
+        for n in connections:
+            (n1, n2) = (n[0], n[1])
+            if n1 != n2:
+                g[n1].append(n2)
+            else:
+                g[n1]
+        #for _, n2 in connections:
+            g[n2]   # For leaf nodes having no edges from themselves
+        self.graph = dict(move(g))
+
+        self.disc : Dict[Char, int] = {}
+        self.low  : Dict[Char, int] = {}
+        self.stack : List[Char] = []
+        self.scc : List[List[Char]] = []
+        self.tarjan_algo()
+
+    def _visitor(self, this) -> None:
+        '''
+        Recursive function that finds SCC's
+        using DFS traversal of vertices.
+
+        Arguments:
+            this        --> Vertex to be visited in this call.
+            disc{}      --> Discovery order of visited vertices.
+            low{}       --> Connected vertex of earliest discovery order
+            stack       --> Ancestor node stack during DFS.
+        '''
+
+        self.disc[this] = self.low[this] = self._order
+        self._order += 1
+        self.stack.append(this)
+
+        for neighbr in self.graph[this]:
+            if neighbr not in self.disc:
+                # neighbour not visited so do DFS recurrence.
+                self._visitor(neighbr)
+                self.low[this] = min(self.low[this], self.low[neighbr])  # Prior connection?
+
+            elif neighbr in self.stack:
+                # Update low value of this only if neighbr in stack
+                self.low[this] = min(self.low[this], self.disc[neighbr])
+
+        if self.low[this] == self.disc[this]:
+            # Head node found of SCC
+            new : List[Char] = []
+            while True:
+                top = self.stack.pop()
+                new.append(top)
+                if top == this:
+                    break
+            self.scc.append(new)
+
+    def tarjan_algo(self):
+        '''
+        Recursive function that finds strongly connected components
+        using the Tarjan Algorithm and function _visitor() to visit nodes.
+        '''
+
+        self._order = 0         # Visitation order counter
+        #self.disc, self.low = {}, {}
+        #self.stack = []
+
+        #self.scc = []           # SCC result accumulator
+        for vertex in sorted(self.graph.keys()):
+            if vertex not in self.disc:
+                self._visitor(vertex)
+
+for n, m in [('Tx1', '10 02 21 03 34'.split(' ')),
+             ('Tx2', '01 12 23'.split(' ')),
+             ('Tx3', '01 12 20 13 14 16 35 45'.split(' ')),
+             ('Tx4', '01 03 12 14 20 26 32 45 46 56 57 58 59 64 79 89 98 AA'.split(' ')),
+             ('Tx5', '01 12 23 24 30 42'.split(' ')),
+             ]:
+    print("\n\nGraph('%s', %s):\n" % (n, m))
+    g = Graph(n, m)
+    print("               : ", '  '.join(str(v) for v in sorted(g.disc.keys())))
+    print("    DISC of", g.name + ':', [v for _, v in sorted(g.disc.items())])
+    print("     LOW of", g.name + ':', [v for _, v in sorted(g.low.items())])
+    scc = (str(g.scc).replace("'", '').replace(',', '')[1:-1] if len(g.scc) else '')
+    print("\n   SCC's of", g.name + ':', scc)
+===
+//import collections
+
+T Graph
+   String name
+   [Char = [Char]] graph
+   Int _order
+   [Char = Int] disc
+   [Char = Int] low
+   [Char] stack
+   [[Char]] scc
+
+   F (name, connections)
+      .name = name
+      DefaultDict[Char, [Char]] g
+      L(n) connections
+         V (n1, n2) = (n[0], n[1])
+         I n1 != n2
+            g[n1].append(n2)
+         E
+            g[n1]
+         g[n2]
+      .graph = Dict(move(g))
+      .tarjan_algo()
+
+   F _visitor(this) -> N
+      ‘
+        Recursive function that finds SCC's
+        using DFS traversal of vertices.
+
+        Arguments:
+            this        --> Vertex to be visited in this call.
+            disc{}      --> Discovery order of visited vertices.
+            low{}       --> Connected vertex of earliest discovery order
+            stack       --> Ancestor node stack during DFS.
+        ’
+      .disc[this] = .low[this] = ._order
+      ._order++
+      .stack.append(this)
+
+      L(neighbr) .graph[this]
+         I neighbr !C .disc
+            ._visitor(neighbr)
+            .low[this] = min(.low[this], .low[neighbr])
+
+         E I neighbr C .stack
+            .low[this] = min(.low[this], .disc[neighbr])
+
+      I .low[this] == .disc[this]
+         [Char] new
+         L
+            V top = .stack.pop()
+            new.append(top)
+            I top == this
+               L.break
+         .scc.append(new)
+
+   F tarjan_algo()
+      ‘
+        Recursive function that finds strongly connected components
+        using the Tarjan Algorithm and function _visitor() to visit nodes.
+        ’
+      ._order = 0
+
+      L(vertex) sorted(.graph.keys())
+         I vertex !C .disc
+            ._visitor(vertex)
+
+L(n, m) [(‘Tx1’, ‘10 02 21 03 34’.split(‘ ’)), (‘Tx2’, ‘01 12 23’.split(‘ ’)), (‘Tx3’, ‘01 12 20 13 14 16 35 45’.split(‘ ’)), (‘Tx4’, ‘01 03 12 14 20 26 32 45 46 56 57 58 59 64 79 89 98 AA’.split(‘ ’)), (‘Tx5’, ‘01 12 23 24 30 42’.split(‘ ’))]
+   print("\n\nGraph('#.', #.):\n".format(n, m))
+   V g = Graph(n, m)
+   print(‘               :  ’sorted(g.disc.keys()).map(v -> String(v)).join(‘  ’))
+   print(‘    DISC of ’(g.name‘:’)‘ ’sorted(g.disc.items()).map((_, v) -> v))
+   print(‘     LOW of ’(g.name‘:’)‘ ’sorted(g.low.items()).map((_, v) -> v))
+   V scc = (I !g.scc.empty {String(g.scc).replace(‘'’, ‘’).replace(‘,’, ‘’)[1 .< (len)-1]} E ‘’)
+   print("\n   SCC's of "(g.name‘:’)‘ ’scc)
+===
+class Graph
+{
+public:
+    String name;
+    Dict<Char, Array<Char>> graph;
+    int _order;
+    Dict<Char, int> disc;
+    Dict<Char, int> low;
+    Array<Char> stack;
+    Array<Array<Char>> scc;
+
+    template <typename T1, typename T2> Graph(const T1 &name, const T2 &connections) :
+        name(name)
+    {
+        DefaultDict<Char, Array<Char>> g;
+        for (auto &&n : connections) {
+            auto [n1, n2] = make_tuple(_get<0>(n), _get<1>(n));
+            if (n1 != n2)
+                g[n1].append(n2);
+            else
+                g[n1];
+            g[n2];
+        }
+        graph = create_dict(std::move(g));
+        tarjan_algo();
+    }
+
+    template <typename T1> void _visitor(const T1 &_this_)
+    {
+        uR"(
+        Recursive function that finds SCC's
+        using DFS traversal of vertices.
+
+        Arguments:
+            this        --> Vertex to be visited in this call.
+            disc{}      --> Discovery order of visited vertices.
+            low{}       --> Connected vertex of earliest discovery order
+            stack       --> Ancestor node stack during DFS.
+        )"_S;
+        disc.set(_this_, low.set(_this_, _order));
+        _order++;
+        stack.append(_this_);
+        for (auto &&neighbr : graph[_this_])
+            if (!in(neighbr, disc)) {
+                _visitor(neighbr);
+                low.set(_this_, min(low[_this_], low[neighbr]));
+            }
+            else if (in(neighbr, stack))
+                low.set(_this_, min(low[_this_], disc[neighbr]));
+
+        if (low[_this_] == disc[_this_]) {
+            Array<Char> _new_;
+            while (true) {
+                auto top = stack.pop();
+                _new_.append(top);
+                if (top == _this_)
+                    break;
+            }
+            scc.append(_new_);
+        }
+    }
+
+    auto tarjan_algo()
+    {
+        uR"(
+        Recursive function that finds strongly connected components
+        using the Tarjan Algorithm and function _visitor() to visit nodes.
+        )"_S;
+        _order = 0;
+        for (auto &&vertex : sorted(graph.keys()))
+            if (!in(vertex, disc))
+                _visitor(vertex);
+    }
+};
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&[n, m] : create_array({make_tuple(u"Tx1"_S, u"10 02 21 03 34"_S.split(u" "_S)), make_tuple(u"Tx2"_S, u"01 12 23"_S.split(u" "_S)), make_tuple(u"Tx3"_S, u"01 12 20 13 14 16 35 45"_S.split(u" "_S)), make_tuple(u"Tx4"_S, u"01 03 12 14 20 26 32 45 46 56 57 58 59 64 79 89 98 AA"_S.split(u" "_S)), make_tuple(u"Tx5"_S, u"01 12 23 24 30 42"_S.split(u" "_S))})) {
+            print(u"\n\nGraph('#.', #.):\n"_S.format(n, m));
+            auto g = Graph(n, m);
+            print(u"               :  "_S & sorted(g.disc.keys()).map([](const auto &v){return String(v);}).join(u"  "_S));
+            print(u"    DISC of "_S & (g.name & u":"_S) & u" "_S & sorted(g.disc.items()).map([](const auto &_, const auto &v){return v;}));
+            print(u"     LOW of "_S & (g.name & u":"_S) & u" "_S & sorted(g.low.items()).map([](const auto &_, const auto &v){return v;}));
+            auto scc = (!g.scc.empty() ? String(g.scc).replace(u"'"_S, u""_S).replace(u","_S, u""_S)[range_e_llen(1,  - 1)] : u""_S);
+            print(u"\n   SCC's of "_S & (g.name & u":"_S) & u" "_S & scc);
+        }
+    }
+} code_block_1;
