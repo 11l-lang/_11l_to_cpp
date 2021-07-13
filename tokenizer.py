@@ -312,6 +312,8 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
             # else:
             for op in sorted_operators:
                 if source[i:i+len(op)] == op:
+                    if op == '|' and source[i+1:i+2] in ('‘', "'"): # ’ # this is an indented multi-line string literal
+                        break
                     operator_s = op
                     break
 
@@ -497,7 +499,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                     continue
                 category = Token.Category.STRING_LITERAL
 
-            elif ch in "‘'":
+            elif ch in "‘'" or (ch == '|' and source[i:i+1] in ('‘', "'")): # ’
                 if source[i] == '’' \
                         and tokens[-1].category == Token.Category.STRING_CONCATENATOR \
                         and tokens[-2].category == Token.Category.STRING_LITERAL \
@@ -509,7 +511,8 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                     if source[i] == '’': # for cases like `a‘’b`
                         i += 1
                         continue
-                i -= 1
+                if ch != '|':
+                    i -= 1
                 while i < len(source) and source[i] == "'":
                     i += 1
                 if source[i:i+1] != '‘': # ’

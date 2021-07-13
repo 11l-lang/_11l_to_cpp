@@ -1384,3 +1384,32 @@ const auto n_rows = 10;
 const auto n_cols = 10;
 const auto grid_size = n_rows * n_cols;
 const auto min_words = 25;
+
+
+V str = |‘First line.
+          Second line.’
+
+F f(s)
+   V str = s|‘First line.
+
+              Second line.
+               Third line.’
+   V s1 = |‘Don‘t!
+            Don‘t!’’’''
+   V s2 = |''‘‘‘Don’t!
+                Don’t!’
+===
+auto str = uR"(First line.
+Second line.)"_S;
+
+template <typename T1> auto f(const T1 &s)
+{
+    auto str = s & uR"(First line.
+
+Second line.
+ Third line.)"_S;
+    auto s1 = uR"(Don‘t!
+Don‘t!)"_S;
+    auto s2 = uR"(Don’t!
+Don’t!)"_S;
+}

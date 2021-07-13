@@ -252,3 +252,14 @@ T Converter
          I 1B
             R @.to_html(a' 2)
               ^Error: methods' overloading is not supported for now
+
+
+V str = |‘First line.
+         Second line.’
+^Error: incorrect indentation of line in indented multi-line string literal
+
+
+// Check for `if s[newline_pos:newline_pos+1] == "\n":` vs `if s[newline_pos] == "\n":`
+V str = |‘First line.
+’
+^Error: incorrect indentation of line in indented multi-line string literal

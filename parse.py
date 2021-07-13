@@ -371,6 +371,11 @@ class SymbolNode:
 
         if self.token.category == Token.Category.STRING_LITERAL:
             s = self.token_str()
+            indented = False
+            if s[0] == '|':
+                indented = True
+                s = s[1:]
+                assert(s[0] != '"')
             if s[0] == '"':
                 return 'u' + s + '_S'
 
@@ -381,6 +386,38 @@ class SymbolNode:
             while s[-1-eat_right] == "'":
                 eat_right += 1
             s = s[1+eat_left*2:-1-eat_right*2]
+
+            if indented:
+                line_start = source.rfind("\n", 0, self.token.start) + 1
+                indentation = ''
+                for i in range(line_start, self.token.start):
+                    indentation += "\t" if source[i] == "\t" else ' '
+                indentation += ' ' * (2+eat_left*2)
+
+                newline_pos = s.find("\n")
+                if newline_pos != -1:
+                    newline_pos += 1
+                    new_s = s[:newline_pos]
+
+                    while True:
+                        if s[newline_pos:newline_pos+1] == "\n":
+                            new_s += "\n"
+                            newline_pos += 1
+                            continue
+
+                        if s[newline_pos:newline_pos+len(indentation)] != indentation:
+                            error_pos = self.token.start + (2+eat_left*2) + newline_pos
+                            raise Error('incorrect indentation of line in indented multi-line string literal', Token(error_pos, error_pos, Token.Category.STRING_LITERAL))
+
+                        prev_newline_pos = newline_pos
+                        newline_pos = s.find("\n", newline_pos)
+                        if newline_pos == -1:
+                            new_s += s[prev_newline_pos + len(indentation):]
+                            break
+                        newline_pos += 1
+                        new_s += s[prev_newline_pos + len(indentation):newline_pos]
+
+                    s = new_s
 
             if '\\' in s or "\n" in s:
                 delimiter = '' # (
