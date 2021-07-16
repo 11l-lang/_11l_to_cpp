@@ -637,6 +637,7 @@ public:
 	void operator&=(char16_t ch) {*this &= String(ch);}
 	void operator&=(int i)    {*this &= String(i);}
 	void operator&=(double n) {*this &= String(n);}
+	template <typename Ty> void operator&=(const Ty &obj) {*this &= String(obj);}
 
 	String operator&(const char16_t *s) const {String r(*this); r.append(s); return r;}
 	String operator&(const String &s) const {String r(*this); r.append(s); return r;}
