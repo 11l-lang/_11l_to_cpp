@@ -329,7 +329,7 @@ class SymbolNode:
                 if id(tid.last_occurrence) == id(self):
                     return 'std::move(' + self.token_str() + ')'
 
-            if tid is not None and len(tid.ast_nodes) and isinstance(tid.ast_nodes[0], ASTVariableDeclaration) and tid.ast_nodes[0].is_ptr and tid.ast_nodes[0].nullable:
+            if tid is not None and len(tid.ast_nodes) and isinstance(tid.ast_nodes[0], ASTVariableDeclaration) and tid.ast_nodes[0].type.endswith('?'):
                 if self.parent is None or (not (self.parent.symbol.id in ('==', '!=') and self.parent.children[1].token_str() in ('N', 'Н', 'null', 'нуль'))
                                        and not (self.parent.symbol.id == '.')
                                        and not (self.parent.symbol.id == '?')
@@ -1194,6 +1194,11 @@ class ASTVariableDeclaration(ASTNode):
                 tt = self.trans_type(ty)
                 return tt if tt.startswith('std::unique_ptr<') else 'const ' + tt + ('&'*(ty not in ('Int', 'Float')))
             return ' ' * (indent*4) + 'std::function<' + self.trans_type(self.type) + '(' + ', '.join(trans_type(ty) for ty in self.type_args) + ')> ' + ', '.join(self.vars) + ";\n"
+        if self.type.endswith('?') and self.type not in ('V?', 'П?', 'var?', 'перем?'):
+            tt = self.trans_type(self.type)
+            if not tt.startswith('std::unique_ptr<'):
+                assert(not self.is_const and not self.is_reference)
+                return ' ' * (indent*4) + 'Nullable<' + tt + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + '> ' + ', '.join(self.vars) + ";\n"
         return ' ' * (indent*4) + 'const '*self.is_const + self.trans_type(self.type, self.is_reference) + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + '*'*self.is_reference + ', '.join(self.vars) + ";\n"
 
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
