@@ -3123,3 +3123,10 @@ auto f()
     auto choice = [&]{auto R = oneblock; return R != nullptr ? *R : 0;}();
     print(*oneblock + 1);
 }
+
+
+a : Optional[List[int]] = [1, 2, 3]
+===
+[Int]? a = [1, 2, 3]
+===
+Nullable<Array<int>> a = create_array({1, 2, 3});

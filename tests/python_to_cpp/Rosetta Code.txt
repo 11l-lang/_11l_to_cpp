@@ -17236,6 +17236,7 @@ struct CodeBlock1
 
 
 # https://www.rosettacode.org/wiki/Tic-tac-toe#Python
+from typing import Optional, Tuple, List
 UInt32 = int
 Char = str
 
@@ -17253,12 +17254,12 @@ wins = ([0,1,2], [3,4,5], [6,7,8],
 def printboard():
     print('\n'.join(' '.join(board[x:x+3]) for x in[0,3,6]))
 
-def score(board=board):
+def score(board=board) -> Optional[Tuple[Char, List[int]]]:
     for w in wins:
         b = board[w[0]]
         if b in 'XO' and all (board[i] == b for i in w):
             return (b, [i+1 for i in w])
-    return (Char("\0"), [0]*0)
+    return None
 
 def finished():
     return all (b in 'XO' for b in board)
@@ -17281,12 +17282,12 @@ def my_better_turn(xo, board : list):
     for chc in options:
         brd = board[:]
         brd[chc] = xo
-        if score(brd)[0] != Char("\0"):
+        if score(brd) is not None:
             choice = chc
             break
         if oneblock is None:
             brd[chc] = ox
-            if score(brd)[0] != Char("\0"):
+            if score(brd) is not None:
                 oneblock = chc
     else:
         choice = oneblock if oneblock is not None else nonrandom_choice(options)
@@ -17315,14 +17316,14 @@ def you(xo=Char('O')):
     return score()
 
 while not finished():
-    s = me(Char('X'))
-    if s[0] != Char("\0"):
+    s : Optional[Tuple[Char, List[int]]] = me(Char('X'))
+    if s is not None:
         printboard()
         print("\n%s wins along %s" % (s[0], s[1]))
         break
     if not finished():
         s = you(Char('O'))
-        if s[0] != Char("\0"):
+        if s is not None:
             printboard()
             print("\n%s wins along %s" % (s[0], s[1]))
             break
@@ -17339,12 +17340,12 @@ V wins = ([0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 
 F printboard()
    print([0, 3, 6].map(x -> (:board[x .< x + 3]).join(‘ ’)).join("\n"))
 
-F score(board = board)
+F score(board = board) -> (Char, [Int])?
    L(w) :wins
       V b = board[w[0]]
       I b C ‘XO’ & all(w.map(i -> @board[i] == @b))
          R (b, w.map(i -> i + 1))
-   R (Char("\0"), [Int]())
+   R N
 
 F finished()
    R all(:board.map(b -> b C ‘XO’))
@@ -17367,12 +17368,12 @@ F my_better_turn(xo, &board)
    L(chc) options
       V brd = copy(board)
       brd[chc] = xo
-      I score(brd)[0] != Char("\0")
+      I score(brd) != N
          choice = chc
          L.break
       I oneblock == N
          brd[chc] = ox
-         I score(brd)[0] != Char("\0")
+         I score(brd) != N
             oneblock = chc
    L.was_no_break
       choice = oneblock ? nonrandom_choice(options)
@@ -17399,14 +17400,14 @@ F you(xo = Char(‘O’))
    R score()
 
 L !finished()
-   V s = me(Char(‘X’))
-   I s[0] != Char("\0")
+   (Char, [Int])? s = me(Char(‘X’))
+   I s != N
       printboard()
       print("\n#. wins along #.".format(s[0], s[1]))
       L.break
    I !finished()
       s = you(Char(‘O’))
-      I s[0] != Char("\0")
+      I s != N
          printboard()
          print("\n#. wins along #.".format(s[0], s[1]))
          L.break
@@ -17427,14 +17428,14 @@ auto printboard()
     print(create_array({0, 3, 6}).map([](const auto &x){return (::board[range_el(x, x + 3)]).join(u" "_S);}).join(u"\n"_S));
 }
 
-template <typename T1 = decltype(board)> auto score(const T1 &board = board)
+template <typename T1 = decltype(board)> Nullable<Tuple<Char, Array<int>>> score(const T1 &board = board)
 {
     for (auto &&w : ::wins) {
         auto b = board[_get<0>(w)];
         if (in(b, u"XO"_S) && all(w.map([&b, &board](const auto &i){return board[i] == b;})))
             return make_tuple(b, w.map([](const auto &i){return i + 1;}));
     }
-    return make_tuple(u'\0'_C, Array<int>());
+    return nullptr;
 }
 
 auto finished()
@@ -17466,14 +17467,14 @@ template <typename T1, typename T2> auto my_better_turn(const T1 &xo, T2 &board)
     for (auto &&chc : options) {
         auto brd = copy(board);
         brd.set(chc, xo);
-        if (_get<0>(score(brd)) != u'\0'_C) {
+        if (score(brd) != nullptr) {
             choice = chc;
             was_break = true;
             break;
         }
         if (oneblock == nullptr) {
             brd.set(chc, ox);
-            if (_get<0>(score(brd)) != u'\0'_C)
+            if (score(brd) != nullptr)
                 oneblock = chc;
         }
     }
@@ -17518,18 +17519,18 @@ struct CodeBlock1
         {bool was_break = false;
 
         while (!finished()) {
-            auto s = me(u'X'_C);
-            if (_get<0>(s) != u'\0'_C) {
+            Nullable<Tuple<Char, Array<int>>> s = me(u'X'_C);
+            if (s != nullptr) {
                 printboard();
-                print(u"\n#. wins along #."_S.format(_get<0>(s), _get<1>(s)));
+                print(u"\n#. wins along #."_S.format(_get<0>(*s), _get<1>(*s)));
                 was_break = true;
                 break;
             }
             if (!finished()) {
                 s = you(u'O'_C);
-                if (_get<0>(s) != u'\0'_C) {
+                if (s != nullptr) {
                     printboard();
-                    print(u"\n#. wins along #."_S.format(_get<0>(s), _get<1>(s)));
+                    print(u"\n#. wins along #."_S.format(_get<0>(*s), _get<1>(*s)));
                     was_break = true;
                     break;
                 }

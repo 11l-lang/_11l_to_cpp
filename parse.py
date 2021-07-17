@@ -274,6 +274,8 @@ class SymbolNode:
                     if i < len(self.children) - 1:
                         r += ', '
                 return r + ')'
+        elif self.symbol.id == 'T?':
+            return self.children[0].to_type_str() + '?'
 
         assert(self.token.category == Token.Category.NAME or (self.token.category == Token.Category.CONSTANT and self.token.value(source) in ('N', 'Н', 'null', 'нуль')))
         return self.token_str()
@@ -981,7 +983,7 @@ def symbol(id, bp = 0):
         s.id = id
         s.lbp = bp
         symbol_table[id] = s
-        if id[0].isalpha() and not id in ('I/', 'Ц/', 'I/=', 'Ц/=', 'C', 'С', 'in'): # this is keyword-in-expression
+        if id[0].isalpha() and not id in ('I/', 'Ц/', 'I/=', 'Ц/=', 'C', 'С', 'in', 'T?'): # this is keyword-in-expression
             assert(id.isalpha() or id in ('L.last_iteration', 'Ц.последняя_итерация', 'loop.last_iteration', 'цикл.последняя_итерация'))
             allowed_keywords_in_expressions.append(id)
     else:
@@ -1091,6 +1093,10 @@ cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'п
 
 def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False):
     if ty[-1] == '?':
+        if ty not in ('V?', 'П?', 'var?', 'перем?'):
+            tt = trans_type(ty[:-1], scope, type_token, ast_type_node, is_reference)
+            if not tt.startswith('std::unique_ptr<'):
+                return 'Nullable<' + tt + '>'
         ty = ty[:-1]
     t = cpp_type_from_11l.get(ty)
     if t is not None:
@@ -1196,7 +1202,7 @@ class ASTVariableDeclaration(ASTNode):
             return ' ' * (indent*4) + 'std::function<' + self.trans_type(self.type) + '(' + ', '.join(trans_type(ty) for ty in self.type_args) + ')> ' + ', '.join(self.vars) + ";\n"
         if self.type.endswith('?') and self.type not in ('V?', 'П?', 'var?', 'перем?'):
             tt = self.trans_type(self.type)
-            if not tt.startswith('std::unique_ptr<'):
+            if not tt.startswith(('std::unique_ptr<', 'Nullable<')):
                 assert(not self.is_const and not self.is_reference)
                 return ' ' * (indent*4) + 'Nullable<' + tt + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + '> ' + ', '.join(self.vars) + ";\n"
         return ' ' * (indent*4) + 'const '*self.is_const + self.trans_type(self.type, self.is_reference) + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + '*'*self.is_reference + ', '.join(self.vars) + ";\n"
@@ -1993,6 +1999,8 @@ def next_token(): # why ‘next_token’: >[https://youtu.be/Nlqv6NtBXcA?t=1203]
                 key = ';'
             else:
                 key = token.value(source)
+                if key == '?' and source[token.end] in (' ', "\n") and source[token.start-1] != ' ': # for `(Char, [Int])?` (but `i?1` must be equivalent to `i ? 1`)
+                    key = 'T?'
             tokensn.symbol = symbol_table[key]
 
 def advance(value):
@@ -2080,7 +2088,7 @@ prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('(-)', 130); prefix
 
 infix_r('^', 140)
 
-symbol('.', 150); symbol(':', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('--', 150); postfix('++', 150)
+symbol('.', 150); symbol(':', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('T?', 150); postfix('--', 150); postfix('++', 150)
 prefix('.', 150); prefix(':', 150)
 
 infix_r('=', 10); infix_r('+=', 10); infix_r('-=', 10); infix_r('*=', 10); infix_r('/=', 10); infix_r('I/=', 10); infix_r('Ц/=', 10); infix_r('%=', 10); infix_r('>>=', 10); infix_r('<<=', 10); infix_r('^=', 10)
@@ -3027,6 +3035,11 @@ def parse_internal(this_node):
                         node.is_const = True
                         node_expression = node_expression.children[0]
                         node.type = node_expression.token.value(source)
+                    is_nullable = False
+                    if node.type == '?' and len(node_expression.children) == 1:
+                        is_nullable = True
+                        node_expression = node_expression.children[0]
+                        node.type = node_expression.token.value(source)
                     node.type_token = node_expression.token
                     node.type_args = []
                     if node.type == '[': # ]
@@ -3063,6 +3076,12 @@ def parse_internal(this_node):
                             node.type_args.clear()
                     elif node.type == '.':
                         node.type = node_expression.to_str()
+                    if is_nullable:
+                        if len(node.type_args):
+                            node.type += '[' + ', '.join(node.type_args) + ']?'
+                            node.type_args.clear()
+                        else:
+                            node.type += '?'
                     if not (node.type[0].isupper() or node.type[0] == '(' or node.type in ('var', 'перем')): # )
                         raise Error('type name must starts with an upper case letter', node.type_token)
                     for var in node.vars:

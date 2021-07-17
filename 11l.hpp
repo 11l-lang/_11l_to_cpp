@@ -97,19 +97,23 @@ class NullPointerException
 template <typename Ty> class Nullable
 {
 	bool has_value;
-	Ty value;
+	char value[sizeof(Ty)]; // can not use just `Ty value;` here because `Ty` may not have a default constructor (e.g. `Tuple<Char, Array<int>>`)
+	void destroy() {if (has_value) reinterpret_cast<Ty*>(value)->~Ty();}
 public:
 	Nullable() : has_value(false) {}
 	Nullable(nullptr_t) : has_value(false) {}
-	Nullable(const Ty &value) : has_value(true), value(value) {}
+	Nullable(const Ty &val) : has_value(true) {new(value)Ty(val);}
 //	Nullable(const Nullable &n) : has_value(n.has_value), value(n.value) {}
 //	template <typename Type> Nullable(Type &&value) : has_value(true), value(value) {} // for `Nullable<std::function<...>>`
+	~Nullable() {destroy();}
+
+	void operator=(const Nullable &n) {destroy(); has_value = n.has_value; if (has_value) new(value)Ty(*n);}
 
 	bool operator==(nullptr_t) const {return !has_value;}
 	bool operator!=(nullptr_t) const {return  has_value;}
 
-	const Ty &operator*() const {if (!has_value) throw NullPointerException(); return value;}
-	      Ty &operator*()       {if (!has_value) throw NullPointerException(); return value;}
+	const Ty &operator*() const {if (!has_value) throw NullPointerException(); return *reinterpret_cast<const Ty*>(value);}
+	      Ty &operator*()       {if (!has_value) throw NullPointerException(); return *reinterpret_cast<      Ty*>(value);}
 };
 
 /*template <class Ty> class OptionalMutableArgument
