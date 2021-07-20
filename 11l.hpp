@@ -571,6 +571,14 @@ template <typename Iterable> bool any(const Iterable &i)
 	return false;
 }
 
+template <typename Iterable, typename Func> bool any_map(const Iterable &i, Func &&func)
+{
+	for (auto &&el : i)
+		if (func(el))
+			return true;
+	return false;
+}
+
 template <typename Ty> Ty copy(const Ty &obj)
 {
 	return obj;

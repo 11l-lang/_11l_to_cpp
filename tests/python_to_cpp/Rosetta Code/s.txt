@@ -588,7 +588,7 @@ print(primes_below(100))
 ===
 template <typename T1> auto prime(const T1 &a)
 {
-    return !(a < 2 || any(range_ee(2, to_int(pow(a, 0.5))).map([&a](const auto &x){return mod(a, x) == 0;})));
+    return !(a < 2 || any_map(range_ee(2, to_int(pow(a, 0.5))), [&a](const auto &x){return mod(a, x) == 0;}));
 }
 
 template <typename T1> auto primes_below(const T1 &n)

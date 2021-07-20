@@ -940,7 +940,7 @@ struct CodeBlock1
             auto y = y_min + r * dy;
             for (auto c : range_el(0, box_side)) {
                 auto x = x_min + c * dx;
-                if (any(circles.map([&x, &y](const auto &circle){return square((x - circle.x)) + square((y - circle.y)) <= (square(circle.r));})))
+                if (any_map(circles, [&x, &y](const auto &circle){return square((x - circle.x)) + square((y - circle.y)) <= (square(circle.r));}))
                     count++;
             }
         }
@@ -2215,13 +2215,13 @@ struct CodeBlock1
                 badform.add(date);
             }
 
-            if (pairs.len() != 24 || any(pairs.map([](const auto &p){return to_int(_get<1>(p)) < 1;}))) {
+            if (pairs.len() != 24 || any_map(pairs, [](const auto &p){return to_int(_get<1>(p)) < 1;})) {
                 if (debug)
                     print(u"Missing values "_S & line);
             }
             if (pairs.len() != 24)
                 badlen.add(date);
-            if (any(pairs.map([](const auto &p){return to_int(_get<1>(p)) < 1;})))
+            if (any_map(pairs, [](const auto &p){return to_int(_get<1>(p)) < 1;}))
                 badreading++;
 
             if (in(date, datestamps)) {

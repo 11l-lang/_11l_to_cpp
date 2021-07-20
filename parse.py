@@ -542,9 +542,9 @@ class SymbolNode:
                 elif func_name.startswith(('Set[', 'Deque[')): # ]]
                     c = self.children[0].children[1]
                     func_name = func_name[:func_name.find('[')] + '<' + trans_type(c.to_type_str(), c.scope, c.token) + '>' # ]
-                elif func_name == 'sum' and self.children[2].function_call and self.children[2].children[0].symbol.id == '.' and self.children[2].children[0].children[1].token_str() == 'map':
+                elif func_name in ('sum', 'any') and self.children[2].function_call and self.children[2].children[0].symbol.id == '.' and self.children[2].children[0].children[1].token_str() == 'map':
                     assert(len(self.children) == 3)
-                    return 'sum_map(' + self.children[2].children[0].children[0].to_str() + ', ' + self.children[2].children[2].to_str() + ')'
+                    return func_name + '_map(' + self.children[2].children[0].children[0].to_str() + ', ' + self.children[2].children[2].to_str() + ')'
                 elif func_name in ('min', 'max') and len(self.children) == 5 and self.children[3] is not None and self.children[3].token_str() == "key'":
                     return func_name + '_with_key(' + self.children[2].to_str() + ', ' + self.children[4].to_str() + ')'
                 elif func_name == 'copy':

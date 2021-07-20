@@ -1987,7 +1987,7 @@ L(n, cnt) data
 ===
 template <typename T1> auto is_prime(const T1 &a)
 {
-    return !(a < 2 || any(range_ee(2, to_int(pow(a, 0.5))).map([&a](const auto &x){return mod(a, x) == 0;})));
+    return !(a < 2 || any_map(range_ee(2, to_int(pow(a, 0.5))), [&a](const auto &x){return mod(a, x) == 0;}));
 }
 
 template <typename T1> auto generate_primes(const T1 &n)

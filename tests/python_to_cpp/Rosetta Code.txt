@@ -4946,7 +4946,7 @@ test([‘MyData_v1.0.tar.bz2’, ‘MyData_v1.0.bz2’], [‘tar.bz2’])
 ===
 template <typename T1, typename T2> auto is_ext(const T1 &file_name, const T2 &extensions)
 {
-    return any(extensions.map([&file_name](const auto &e){return file_name.lowercase().ends_with(u"."_S & e.lowercase());}));
+    return any_map(extensions, [&file_name](const auto &e){return file_name.lowercase().ends_with(u"."_S & e.lowercase());});
 }
 
 template <typename T1, typename T2> auto test(const T1 &file_names, const T2 &extensions)
@@ -8454,7 +8454,7 @@ template <typename T1> auto split_roots_from_relateds(const T1 &roots_and_relate
     auto i = 1;
     while (i < roots.len()) {
         auto& _this_ = roots[i];
-        if (any(roots[range_el(0, i)].map([&_this_](const auto &prev){return !_this_.intersection(prev).empty();})))
+        if (any_map(roots[range_el(0, i)], [&_this_](const auto &prev){return !_this_.intersection(prev).empty();}))
             roots.pop(i);
         else
             i++;
@@ -17294,7 +17294,7 @@ def my_better_turn(xo, board : list):
     board[choice] = xo
     return choice+1
 
-def your_turn(xo, board):
+def your_turn(xo, board : list):
     options = space()
     while True:
         choice = input("\nPut your %s in any of these positions: %s "
@@ -17380,7 +17380,7 @@ F my_better_turn(xo, &board)
    board[choice] = xo
    R choice + 1
 
-F your_turn(xo, board)
+F your_turn(xo, &board)
    V options = space()
    L
       V choice = input("\nPut your #. in any of these positions: #. ".format(xo, options.join(‘’))).trim((‘ ’, "\t", "\r", "\n"))
@@ -17485,7 +17485,7 @@ template <typename T1, typename T2> auto my_better_turn(const T1 &xo, T2 &board)
     return choice + 1;
 }
 
-template <typename T1, typename T2> auto your_turn(const T1 &xo, const T2 &board)
+template <typename T1, typename T2> auto your_turn(const T1 &xo, T2 &board)
 {
     auto options = space();
     while (true) {
@@ -17541,3 +17541,181 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Unprimeable_numbers#Python
+import itertools
+
+limit = 10_000_000
+is_prime = [False] * 2 + [True] * (limit - 1)
+for n in range(int(limit**0.5 + 1.5)): # stop at ``sqrt(limit)``
+    if is_prime[n]:
+        for i in range(n*n, limit+1, n):
+            is_prime[i] = False
+
+def unprimeable(a):
+    if is_prime[a]:
+        return False
+
+    d = 1
+    while d <= a:
+        base = (a//(d*10))*(d*10) + (a%d) # remove current digit
+        if any(is_prime[y] for y in range(base, base + d*10, d)):
+            return False
+        d *= 10
+    return True
+
+def unprime(n):
+    r : List[int] = []
+    for a in itertools.count(1):
+        if unprimeable(a):
+            r += [a]
+            if len(r) == n:
+                break
+    return r
+
+print('First 35:')
+print(' '.join(str(i) for i in unprime(35)))
+
+print('\nThe 600-th:')
+print(unprime(600)[-1])
+print()
+
+first = [0]*10
+need = 10
+for p in itertools.count(1):
+    if unprimeable(p):
+        i = p%10
+        if first[i] != 0: continue
+
+        first[i] = p
+        need -= 1
+        if need == 0:
+            break
+
+for i,v in enumerate(first):
+    print(i, 'ending:', v)
+===
+//import itertools
+V limit = 10'000'000
+V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
+L(n) 0 .< Int(limit ^ 0.5 + 1.5)
+   I is_prime[n]
+      L(i) (n * n .< limit + 1).step(n)
+         is_prime[i] = 0B
+
+F unprimeable(a)
+   I :is_prime[a]
+      R 0B
+   V d = 1
+   L d <= a
+      V base = (a I/ (d * 10)) * (d * 10) + (a % d)
+      I any((base .< base + d * 10).step(d).map(y -> :is_prime[y]))
+         R 0B
+      d *= 10
+   R 1B
+
+F unprime(n)
+   [Int] r
+   L(a) 1..
+      I unprimeable(a)
+         r [+]= a
+         I r.len == n
+            L.break
+   R r
+print(‘First 35:’)
+print(unprime(35).map(i -> String(i)).join(‘ ’))
+print("\nThe 600-th:")
+print(unprime(600).last)
+print()
+V first = [0] * 10
+V need = 10
+L(p) 1..
+   I unprimeable(p)
+      V i = p % 10
+      I first[i] != 0
+         L.continue
+      first[i] = p
+      I --need == 0
+         L.break
+
+L(v) first
+   V i = L.index
+   print(i‘ ending: ’v)
+===
+auto limit = 10'000'000;
+auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
+            if (is_prime[n])
+                for (auto i : range_el(n * n, limit + 1).step(n))
+                    is_prime.set(i, false);
+    }
+} code_block_1;
+
+template <typename T1> auto unprimeable(const T1 &a)
+{
+    if (::is_prime[a])
+        return false;
+    auto d = 1;
+    while (d <= a) {
+        auto base = (idiv(a, (d * 10))) * (d * 10) + (mod(a, d));
+        if (any_map(range_el(base, base + d * 10).step(d), [](const auto &y){return ::is_prime[y];}))
+            return false;
+        d *= 10;
+    }
+    return true;
+}
+
+template <typename T1> auto unprime(const T1 &n)
+{
+    Array<int> r;
+    for (auto a : range_ei(1))
+        if (unprimeable(a)) {
+            r.append(a);
+            if (r.len() == n)
+                break;
+        }
+    return r;
+}
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"First 35:"_S);
+        print(unprime(35).map([](const auto &i){return String(i);}).join(u" "_S));
+        print(u"\nThe 600-th:"_S);
+        print(unprime(600).last());
+        print();
+    }
+} code_block_2;
+auto first = create_array({0}) * 10;
+auto need = 10;
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        for (auto p : range_ei(1))
+            if (unprimeable(p)) {
+                auto i = mod(p, 10);
+                if (first[i] != 0)
+                    continue;
+                first.set(i, p);
+                if (--need == 0)
+                    break;
+            }
+        {int Lindex = 0;
+
+        for (auto &&v : first) {
+            auto i = Lindex;
+            print(i & u" ending: "_S & v);
+            Lindex++;
+        }}
+    }
+} code_block_3;
