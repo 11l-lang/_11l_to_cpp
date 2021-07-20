@@ -563,6 +563,23 @@ template <typename Iterable> bool all(const Iterable &i)
 	return true;
 }
 
+template <typename Iterable, typename Func> bool all_map(const Iterable &i, Func &&func)
+{
+	for (auto &&el : i)
+		if (!func(el))
+			return false;
+	return true;
+}
+
+template <typename Type, typename Func, typename = decltype(std::declval<Func>()(std::declval<decltype(tuple_element_f<Type, 0>())>(),
+                                                                                 std::declval<decltype(tuple_element_f<Type, 1>())>()))> bool all_map(const Array<Type> &arr, Func &&func)
+{
+	for (auto &&el : arr)
+		if (!func(_get<0>(el), _get<1>(el)))
+			return false;
+	return true;
+}
+
 template <typename Iterable> bool any(const Iterable &i)
 {
 	for (auto &&el : i)

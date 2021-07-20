@@ -32,7 +32,7 @@ template <typename T1> Dict<String, String> search(const T1 &values)
     u"Using depth-first search and propagation, try all possible values."_S;
     if (values.empty())
         return Dict<String, String>();
-    if (all(::squares.map([&values](const auto &s){return values[s].len() == 1;})))
+    if (all_map(::squares, [&values](const auto &s){return values[s].len() == 1;}))
         return values;
     auto s = _get<1>(min(::squares.filter([&values](const auto &s){return values[s].len() > 1;}).map([&values](const auto &s){return make_tuple(values[s].len(), s);})));
     for (auto &&d : values[s]) {
@@ -47,7 +47,7 @@ template <typename T1> Dict<String, String> search(const T1 &values)
 template <typename T2, typename T3> Dict<String, String> assign(Dict<String, String> &values, const T2 &s, const T3 &d)
 {
     u"Eliminate all the other values (except d) from values[s] and propagate."_S;
-    if (all(values[s].filter([&d](const auto &d2){return d2 != d;}).map([&s, &values](const auto &d2){return !eliminate(values, s, d2).empty();})))
+    if (all_map(values[s].filter([&d](const auto &d2){return d2 != d;}), [&s, &values](const auto &d2){return !eliminate(values, s, d2).empty();}))
         return values;
     else
         return Dict<String, String>();
@@ -63,7 +63,7 @@ template <typename T2, typename T3> Dict<String, String> eliminate(Dict<String, 
         return Dict<String, String>();
     else if (values[s].len() == 1) {
         auto d2 = _get<0>(values[s]);
-        if (!all(::peers[s].map([&d2, &values](const auto &s2){return !eliminate(values, s2, d2).empty();})))
+        if (!all_map(::peers[s], [&d2, &values](const auto &s2){return !eliminate(values, s2, d2).empty();}))
             return Dict<String, String>();
     }
 

@@ -2208,7 +2208,7 @@ struct CodeBlock1
             auto fields = line.split(u"\t"_S);
             auto date = _get<0>(fields);
             auto pairs = range_el(1, fields.len()).step(2).map([&fields](const auto &i){return make_tuple(fields[i], fields[i + 1]);});
-            auto lineFormatOk = datePat.match(date) && all(pairs.map([](const auto &p){return ::valuPat.match(_get<0>(p));})) && all(pairs.map([](const auto &p){return ::statPat.match(_get<1>(p));}));
+            auto lineFormatOk = datePat.match(date) && all_map(pairs, [](const auto &p){return ::valuPat.match(_get<0>(p));}) && all_map(pairs, [](const auto &p){return ::statPat.match(_get<1>(p));});
             if (!lineFormatOk) {
                 if (debug)
                     print(u"Bad formatting "_S & line);

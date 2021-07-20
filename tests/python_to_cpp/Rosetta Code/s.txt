@@ -439,7 +439,7 @@ print((0.<4000000).filter(x -> is_self_describing(x)))
 template <typename T1> auto is_self_describing(const T1 &n)
 {
     auto s = String(n);
-    return all(enumerate(create_array(s)).map([&s](const auto &i, const auto &ch){return s.count(String(i)) == to_int(ch);}));
+    return all_map(enumerate(create_array(s)), [&s](const auto &i, const auto &ch){return s.count(String(i)) == to_int(ch);});
 }
 
 struct CodeBlock1
@@ -3894,7 +3894,7 @@ struct CodeBlock3
 {
     CodeBlock3()
     {
-        assert(all(zip(s, s[range_ei(1)]).map([](const auto &prev, const auto &_this_){return gcd(prev, _this_) == 1;})), u"A fraction from adjacent terms is reducible"_S);
+        assert(all_map(zip(s, s[range_ei(1)]), [](const auto &prev, const auto &_this_){return gcd(prev, _this_) == 1;}), u"A fraction from adjacent terms is reducible"_S);
     }
 } code_block_3;
 
@@ -3927,7 +3927,7 @@ L(el) xs
 template <typename T1> auto is_strange(const T1 &n)
 {
     auto xs = String(n).map([](const auto &c){return to_int(c);});
-    return all(zip(xs, xs[range_ei(1)]).map([](const auto &a, const auto &b){return in(abs(a - b), make_tuple(2, 3, 5, 7));}));
+    return all_map(zip(xs, xs[range_ei(1)]), [](const auto &a, const auto &b){return in(abs(a - b), make_tuple(2, 3, 5, 7));});
 }
 auto xs = range_ee(100, 500).filter([](const auto &n){return is_strange(n);});
 
@@ -3977,7 +3977,7 @@ L(el) xs
 template <typename T1> auto is_strange_plus(const T1 &n)
 {
     auto xs = String(n).map([](const auto &c){return to_int(c);});
-    return all(zip(xs, xs[range_ei(1)]).map([](const auto &a, const auto &b){return in(a + b, make_tuple(2, 3, 5, 7, 11, 13, 17));}));
+    return all_map(zip(xs, xs[range_ei(1)]), [](const auto &a, const auto &b){return in(a + b, make_tuple(2, 3, 5, 7, 11, 13, 17));});
 }
 auto xs = range_ee(100, 500).filter([](const auto &n){return is_strange_plus(n);});
 
@@ -6749,7 +6749,7 @@ auto solve()
     Array<Array<int>> r;
     auto perm = create_array(range_ee(1, 8));
     while (true) {
-        if (all(::connections.map([&perm](const auto &conn){return ok(conn, perm);})))
+        if (all_map(::connections, [&perm](const auto &conn){return ok(conn, perm);}))
             r.append(copy(perm));
         if (!perm.next_permutation())
             break;
@@ -7799,7 +7799,7 @@ public:
 
     template <typename T1> Sudoku(const T1 &rows)
     {
-        assert(rows.len() == 9 && all(rows.map([](const auto &row){return row.len() == 9;})), u"Grid must be 9 x 9"_S);
+        assert(rows.len() == 9 && all_map(rows, [](const auto &row){return row.len() == 9;}), u"Grid must be 9 x 9"_S);
         for (int i = 0; i < 9; i++)
             for (int j = 0; j < 9; j++)
                 grid.set(9 * i + j, to_int(rows[i][j]));

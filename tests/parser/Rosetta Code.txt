@@ -2368,7 +2368,7 @@ template <typename T1> auto derangements(const T1 &n)
     Array<Array<int>> r;
     auto perm = create_array(range_el(0, n));
     while (true) {
-        if (all(enumerate(perm).map([](const auto &indx, const auto &p){return indx != p;})))
+        if (all_map(enumerate(perm), [](const auto &indx, const auto &p){return indx != p;}))
             r.append(perm);
         if (!perm.next_permutation())
             break;

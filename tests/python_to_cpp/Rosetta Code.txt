@@ -2953,8 +2953,8 @@ struct CodeBlock1
         for (auto &&strings_s : create_array({u"AA AA AA AA"_S, u"AA ACB BB CC"_S})) {
             auto strings = strings_s.split(u" "_S);
             print(strings);
-            print(all(zip(strings, strings[range_ei(1)]).map([](const auto &a){return _get<0>(a) == _get<1>(a);})));
-            print(all(zip(strings, strings[range_ei(1)]).map([](const auto &a){return _get<0>(a) < _get<1>(a);})));
+            print(all_map(zip(strings, strings[range_ei(1)]), [](const auto &a){return _get<0>(a) == _get<1>(a);}));
+            print(all_map(zip(strings, strings[range_ei(1)]), [](const auto &a){return _get<0>(a) < _get<1>(a);}));
             print();
         }
     }
@@ -6719,7 +6719,7 @@ struct CodeBlock2
             arr[ff_R(i)]++;
         for (auto i : range_el(960, 0).step(-1))
             arr[ff_S(i)]++;
-        if (all(arr[range_el(1, 1001)].map([](const auto &a){return a == 1;})))
+        if (all_map(arr[range_el(1, 1001)], [](const auto &a){return a == 1;}))
             print(u"All Integers 1..1000 found OK"_S);
         else
             print(u"All Integers 1..1000 NOT found only once: ERROR"_S);
@@ -10072,7 +10072,7 @@ template <typename T1> auto rls(const T1 &n)
 template <typename T1> auto _check_rows(const T1 &square)
 {
     auto set_row0 = create_set(_get<0>(square));
-    return all(square.map([&set_row0](const auto &row){return row.len() == create_set(row).len() && create_set(row) == set_row0;}));
+    return all_map(square, [&set_row0](const auto &row){return row.len() == create_set(row).len() && create_set(row) == set_row0;});
 }
 
 template <typename T1> auto _check(const T1 &square)
@@ -11058,7 +11058,7 @@ template <typename T1, typename T2, typename T3> auto distcheck(const T1 &func, 
         bin[func()]++;
     auto target = idiv(repeats, bin.len());
     auto deltacount = to_int(delta / 100.0 * target);
-    assert(all(bin.values().map([&deltacount, &target](const auto &count){return abs(target - count) < deltacount;})), u"Bin distribution skewed from #. +/- #.: #."_S.format(target, deltacount, sorted(bin.items()).map([&target](const auto &key, const auto &count){return make_tuple(key, target - count);})));
+    assert(all_map(bin.values(), [&deltacount, &target](const auto &count){return abs(target - count) < deltacount;}), u"Bin distribution skewed from #. +/- #.: #."_S.format(target, deltacount, sorted(bin.items()).map([&target](const auto &key, const auto &count){return make_tuple(key, target - count);})));
     print(bin);
 }
 
@@ -11865,13 +11865,13 @@ auto interactiveconversions()
 {
     for (auto &&inp : make_tuple(u"rosetta"_S, u"code"_S, u"2468"_S, u"3579"_S)) {
         print(u"\nType a number or a word to get the translation and textonyms: "_S & inp);
-        if (all(inp.map([](const auto &ch){return in(ch, u"23456789"_S);}))) {
+        if (all_map(inp, [](const auto &ch){return in(ch, u"23456789"_S);})) {
             if (in(inp, ::num2words))
                 print(u"  Number #. has the following textonyms in the dictionary: #."_S.format(inp, (::num2words[inp]).join(u", "_S)));
             else
                 print(u"  Number #. has no textonyms in the dictionary."_S.format(inp));
         }
-        else if (all(inp.map([](const auto &ch){return in(ch, ::CH2NUM);}))) {
+        else if (all_map(inp, [](const auto &ch){return in(ch, ::CH2NUM);})) {
             auto num = inp.map([](const auto &ch){return ::CH2NUM[ch];}).join(u""_S);
             print(u"  Word #. is#. in the dictionary and is number #. with textonyms: #."_S.format(inp, (in(inp, ::wordset) ? u""_S : u"n't"_S), num, (::num2words[num]).join(u", "_S)));
         }
@@ -15842,7 +15842,7 @@ template <typename T1, typename T2> auto deduce(const T1 &hr, const T2 &vr)
 
     auto fits = [](const auto &a, const auto &b)
     {
-        return all(zip(a, b).map([](const auto &x, const auto &y){return x & y;}));
+        return all_map(zip(a, b), [](const auto &x, const auto &y){return x & y;});
     };
     auto [w, h] = make_tuple(vr.len(), hr.len());
     auto rows = hr.map([&w](const auto &x){return gen_row(w, x);});
@@ -17432,7 +17432,7 @@ template <typename T1 = decltype(board)> Nullable<Tuple<Char, Array<int>>> score
 {
     for (auto &&w : ::wins) {
         auto b = board[_get<0>(w)];
-        if (in(b, u"XO"_S) && all(w.map([&b, &board](const auto &i){return board[i] == b;})))
+        if (in(b, u"XO"_S) && all_map(w, [&b, &board](const auto &i){return board[i] == b;}))
             return make_tuple(b, w.map([](const auto &i){return i + 1;}));
     }
     return nullptr;
@@ -17440,7 +17440,7 @@ template <typename T1 = decltype(board)> Nullable<Tuple<Char, Array<int>>> score
 
 auto finished()
 {
-    return all(::board.map([](const auto &b){return in(b, u"XO"_S);}));
+    return all_map(::board, [](const auto &b){return in(b, u"XO"_S);});
 }
 
 template <typename T1 = decltype(board)> auto space(const T1 &board = board)

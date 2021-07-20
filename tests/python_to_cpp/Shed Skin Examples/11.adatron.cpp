@@ -130,7 +130,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto train_adatron
                 if (difference > _get<0>(max_differences[klass]))
                     max_differences.set(klass, make_tuple(difference, col_counter));
             }
-            if (all(max_differences.map([&tolerance](const auto &max_difference){return _get<0>(max_difference) < tolerance;})))
+            if (all_map(max_differences, [&tolerance](const auto &max_difference){return _get<0>(max_difference) < tolerance;}))
                 return make_tuple(alphas, bias);
             else {
                 alphas[klass].set(_get<1>(max_differences[klass]), betas[klass][_get<1>(max_differences[klass])]);
