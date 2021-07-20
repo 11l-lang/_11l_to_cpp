@@ -2238,3 +2238,435 @@ struct CodeBlock1
         print(u"Total records:  "_S & totalLines);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Topological_sort/Extracted_top_item#Python
+from typing import List
+
+def copy(obj):
+    return obj
+
+def _topx(data, tops, _sofar : list) -> List[List[str]]:
+    'Recursive topological extractor'
+    _sofar += [copy(tops)] # Accumulates order in reverse
+    depends = set() # str
+    for top in tops:
+        if top in data:
+            depends.update(data[top])
+    if len(depends):
+        _topx(data, depends, _sofar)
+    ordered : List[List[str]] = []
+    accum = set() # str
+    # for s in _sofar[::-1]:
+    #     ordered += [sorted(list(s - accum))]
+    #     accum.update(s)
+    for i in range(len(_sofar)-1, -1, -1):
+        ordered += [sorted(list(_sofar[i] - accum))]
+        accum.update(_sofar[i])
+    return ordered
+
+def toplevels(data : dict):
+    '''
+    Extract all top levels from dependency data
+    Top levels are never dependents
+    '''
+    for k, v in data.items():
+        v.discard(k) # Ignore self dependencies
+    dependents = set() # str
+    #for v in data.values():
+    for k, v in data.items():
+        dependents.update(v)
+    return set(data.keys()) - dependents
+
+def topx(data : dict, tops):
+    'Extract the set of top-level(s) in topological order'
+    for k, v in data.items():
+        v.discard(k) # Ignore self dependencies
+    # if tops is None:
+    #     tops = toplevels(data)
+    _sofar : List[Set[str]] = []
+    return _topx(data, tops, _sofar)
+
+def printorder(order):
+    'Prettyprint topological ordering'
+    if len(order):
+        print("First: " + ', '.join(str(s) for s in order[0]))
+    for o in order[1:]:
+        print(" Then: " + ', '.join(str(s) for s in o))
+
+data = {
+    'top1'  : {'ip1', 'des1', 'ip2'},
+    'top2'  : {'ip2', 'des1', 'ip3'},
+    'des1'  : {'des1a', 'des1b', 'des1c'},
+    'des1a' : {'des1a1', 'des1a2'},
+    'des1c' : {'des1c1', 'extra1'},
+    'ip2'   : {'ip2a', 'ip2b', 'ip2c', 'ipcommon'},
+    'ip1'   : {'ip1a', 'ipcommon', 'extra1'},
+    }
+
+tops = toplevels(data)
+print("The top levels of the dependency graph are: " + ' '.join(list(tops)))
+
+for t in sorted(list(tops)):
+    print("\nThe compile order for top level: %s is..." % t)
+    printorder(topx(data, {t}))
+if len(tops) > 1:
+    print("\nThe compile order for top levels: %s is..."
+          % ' and '.join(str(s) for s in sorted(list(tops))) )
+    printorder(topx(data, tops))
+===
+
+F _topx(data, tops, &_sofar) -> [[String]]
+   ‘Recursive topological extractor’
+   _sofar [+]= copy(tops)
+   V depends = Set[String]()
+   L(top) tops
+      I top C data
+         depends.update(data[top])
+   I !depends.empty
+      _topx(data, depends, &_sofar)
+   [[String]] ordered
+   V accum = Set[String]()
+
+   L(i) (_sofar.len - 1 .< -1).step(-1)
+      ordered [+]= sorted(Array(_sofar[i] - accum))
+      accum.update(_sofar[i])
+   R ordered
+
+F toplevels(&data)
+   ‘
+    Extract all top levels from dependency data
+    Top levels are never dependents
+    ’
+   L(k, v) data
+      v.discard(k)
+   V dependents = Set[String]()
+
+   L(k, v) data
+      dependents.update(v)
+   R Set(data.keys()) - dependents
+
+F topx(&data, tops)
+   ‘Extract the set of top-level(s) in topological order’
+   L(k, v) data
+      v.discard(k)
+   [Set[String]] _sofar
+   R _topx(data, tops, &_sofar)
+
+F printorder(order)
+   ‘Prettyprint topological ordering’
+   I !order.empty
+      print(‘First: ’order[0].map(s -> String(s)).join(‘, ’))
+   L(o) order[1..]
+      print(‘ Then: ’o.map(s -> String(s)).join(‘, ’))
+V data = [‘top1’ = Set([‘ip1’, ‘des1’, ‘ip2’]), ‘top2’ = Set([‘ip2’, ‘des1’, ‘ip3’]), ‘des1’ = Set([‘des1a’, ‘des1b’, ‘des1c’]), ‘des1a’ = Set([‘des1a1’, ‘des1a2’]), ‘des1c’ = Set([‘des1c1’, ‘extra1’]), ‘ip2’ = Set([‘ip2a’, ‘ip2b’, ‘ip2c’, ‘ipcommon’]), ‘ip1’ = Set([‘ip1a’, ‘ipcommon’, ‘extra1’])]
+V tops = toplevels(&data)
+print(‘The top levels of the dependency graph are: ’Array(tops).join(‘ ’))
+
+L(t) sorted(Array(tops))
+   print("\nThe compile order for top level: #. is...".format(t))
+   printorder(topx(&data, Set([t])))
+I tops.len > 1
+   print("\nThe compile order for top levels: #. is...".format(sorted(Array(tops)).map(s -> String(s)).join(‘ and ’)))
+   printorder(topx(&data, tops))
+===
+template <typename T1, typename T2, typename T3> Array<Array<String>> _topx(const T1 &data, const T2 &tops, T3 &_sofar)
+{
+    u"Recursive topological extractor"_S;
+    _sofar.append(copy(tops));
+    auto depends = Set<String>();
+    for (auto &&top : tops)
+        if (in(top, data))
+            depends.update(data[top]);
+    if (!depends.empty())
+        _topx(data, depends, _sofar);
+    Array<Array<String>> ordered;
+    auto accum = Set<String>();
+
+    for (auto i : range_el(_sofar.len() - 1, -1).step(-1)) {
+        ordered.append(sorted(create_array(_sofar[i] - accum)));
+        accum.update(_sofar[i]);
+    }
+    return ordered;
+}
+
+template <typename T1> auto toplevels(T1 &data)
+{
+    uR"(
+    Extract all top levels from dependency data
+    Top levels are never dependents
+    )"_S;
+    for (auto &&[k, v] : data)
+        v.discard(k);
+    auto dependents = Set<String>();
+    for (auto &&[k, v] : data)
+        dependents.update(v);
+    return create_set(data.keys()) - dependents;
+}
+
+template <typename T1, typename T2> auto topx(T1 &data, const T2 &tops)
+{
+    u"Extract the set of top-level(s) in topological order"_S;
+    for (auto &&[k, v] : data)
+        v.discard(k);
+    Array<Set<String>> _sofar;
+    return _topx(data, tops, _sofar);
+}
+
+template <typename T1> auto printorder(const T1 &order)
+{
+    u"Prettyprint topological ordering"_S;
+    if (!order.empty())
+        print(u"First: "_S & _get<0>(order).map([](const auto &s){return String(s);}).join(u", "_S));
+    for (auto &&o : order[range_ei(1)])
+        print(u" Then: "_S & o.map([](const auto &s){return String(s);}).join(u", "_S));
+}
+auto data = create_dict(dict_of(u"top1"_S, create_set({u"ip1"_S, u"des1"_S, u"ip2"_S}))(u"top2"_S, create_set({u"ip2"_S, u"des1"_S, u"ip3"_S}))(u"des1"_S, create_set({u"des1a"_S, u"des1b"_S, u"des1c"_S}))(u"des1a"_S, create_set({u"des1a1"_S, u"des1a2"_S}))(u"des1c"_S, create_set({u"des1c1"_S, u"extra1"_S}))(u"ip2"_S, create_set({u"ip2a"_S, u"ip2b"_S, u"ip2c"_S, u"ipcommon"_S}))(u"ip1"_S, create_set({u"ip1a"_S, u"ipcommon"_S, u"extra1"_S})));
+auto tops = toplevels(data);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"The top levels of the dependency graph are: "_S & create_array(tops).join(u" "_S));
+
+        for (auto &&t : sorted(create_array(tops))) {
+            print(u"\nThe compile order for top level: #. is..."_S.format(t));
+            printorder(topx(data, create_set({t})));
+        }
+        if (tops.len() > 1) {
+            print(u"\nThe compile order for top levels: #. is..."_S.format(sorted(create_array(tops)).map([](const auto &s){return String(s);}).join(u" and "_S)));
+            printorder(topx(data, tops));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Two_bullet_roulette#Go
+UInt32 = int
+
+seed : UInt32 = 0
+def nonrandom(n):
+    global seed
+    seed = (1664525 * seed + 1013904223) & 0xFFFF_FFFF
+    return int(seed >> 16) % n
+
+cylinder = [False] * 6
+
+def rshift():
+    t = cylinder[5]
+    for i in range(4, -1, -1):
+        cylinder[i+1] = cylinder[i]
+    cylinder[0] = t
+
+def unload():
+    for i in range(6):
+        cylinder[i] = False
+
+def load():
+    while cylinder[0]:
+        rshift()
+    cylinder[0] = True
+    rshift()
+
+def spin():
+    for i in range(1, nonrandom(6) + 1):
+        rshift()
+
+def fire():
+    shot = cylinder[0]
+    rshift()
+    return shot
+
+def method(s):
+    unload()
+    for c in s:
+        c = c
+        if c == 'L':
+            load()
+        elif c == 'S':
+            spin()
+        elif c == 'F':
+            if fire():
+                return 1
+    return 0
+
+def mstring(s):
+    l : List[str] = []
+    for c in s:
+        c = c
+        if c == 'L':
+            l += ['load']
+        elif c == 'S':
+            l += ['spin']
+        elif c == 'F':
+            l += ['fire']
+    return ', '.join(l)
+
+tests = 100000
+for m in ["LSLSFSF", "LSLSFF", "LLSFSF", "LLSFF"]:
+    sum = 0
+    for t in range(tests):
+        sum += method(m)
+    pc = float(sum) * 100 / tests
+    print("%-40s produces %6.3f%% deaths." % (mstring(m), pc))
+===
+UInt32 seed = 0
+F nonrandom(n)
+   :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
+   R Int(:seed >> 16) % n
+V cylinder = [0B] * 6
+
+F rshift()
+   V t = :cylinder[5]
+   L(i) (4 .< -1).step(-1)
+      :cylinder[i + 1] = :cylinder[i]
+   :cylinder[0] = t
+
+F unload()
+   L(i) 6
+      :cylinder[i] = 0B
+
+F load()
+   L :cylinder[0]
+      rshift()
+   :cylinder[0] = 1B
+   rshift()
+
+F spin()
+   L(i) 1 .. nonrandom(6)
+      rshift()
+
+F fire()
+   V shot = :cylinder[0]
+   rshift()
+   R shot
+
+F method(s)
+   unload()
+   L(=c) s
+      S c
+         ‘L’
+            load()
+         ‘S’
+            spin()
+         ‘F’
+            I fire()
+               R 1
+   R 0
+
+F mstring(s)
+   [String] l
+   L(=c) s
+      S c
+         ‘L’
+            l [+]= ‘load’
+         ‘S’
+            l [+]= ‘spin’
+         ‘F’
+            l [+]= ‘fire’
+   R l.join(‘, ’)
+V tests = 100000
+L(m) [‘LSLSFSF’, ‘LSLSFF’, ‘LLSFSF’, ‘LLSFF’]
+   V sum = 0
+   L(t) 0 .< tests
+      sum += method(m)
+   V pc = Float(sum) * 100 / tests
+   print(‘#<40 produces #2.3% deaths.’.format(mstring(m), pc))
+===
+uint32_t seed = 0;
+template <typename T1> auto nonrandom(const T1 &n)
+{
+    ::seed = (1664525 * ::seed + 1013904223) & 0xFFFF'FFFF;
+    return mod(to_int(::seed >> 16), n);
+}
+auto cylinder = create_array({false}) * 6;
+
+auto rshift()
+{
+    auto t = _get<5>(::cylinder);
+    for (auto i : range_el(4, -1).step(-1))
+        ::cylinder.set(i + 1, ::cylinder[i]);
+    _set<0>(::cylinder, t);
+}
+
+auto unload()
+{
+    for (int i = 0; i < 6; i++)
+        ::cylinder.set(i, false);
+}
+
+auto load()
+{
+    while (_get<0>(::cylinder))
+        rshift();
+    _set<0>(::cylinder, true);
+    rshift();
+}
+
+auto spin()
+{
+    for (auto i : range_ee(1, nonrandom(6)))
+        rshift();
+}
+
+auto fire()
+{
+    auto shot = _get<0>(::cylinder);
+    rshift();
+    return shot;
+}
+
+template <typename T1> auto method(const T1 &s)
+{
+    unload();
+    for (auto c : s)
+        switch (c)
+        {
+        case u'L':
+            load();
+            break;
+        case u'S':
+            spin();
+            break;
+        case u'F':
+            if (fire())
+                return 1;
+            break;
+        }
+    return 0;
+}
+
+template <typename T1> auto mstring(const T1 &s)
+{
+    Array<String> l;
+    for (auto c : s)
+        switch (c)
+        {
+        case u'L':
+            l.append(u"load"_S);
+            break;
+        case u'S':
+            l.append(u"spin"_S);
+            break;
+        case u'F':
+            l.append(u"fire"_S);
+            break;
+        }
+    return l.join(u", "_S);
+}
+auto tests = 100000;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&m : create_array({u"LSLSFSF"_S, u"LSLSFF"_S, u"LLSFSF"_S, u"LLSFF"_S})) {
+            auto sum = 0;
+            for (auto t : range_el(0, tests))
+                sum += method(m);
+            auto pc = to_float(sum) * 100 / tests;
+            print(u"#<40 produces #2.3% deaths."_S.format(mstring(m), pc));
+        }
+    }
+} code_block_1;

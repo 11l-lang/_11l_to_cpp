@@ -950,6 +950,11 @@ inline Int to_int(int i)
 	return i;
 }
 
+inline Int to_int(uint32_t i)
+{
+	return i;
+}
+
 template <typename Ty, typename = std::enable_if_t<std::is_enum<Ty>::value>> Int to_int(Ty e)
 {
 	return Int(e);
