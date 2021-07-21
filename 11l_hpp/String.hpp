@@ -1039,10 +1039,10 @@ template <bool include_beginning, bool include_ending> inline bool in(const Stri
 
 inline char hex_to_char(int c) {return (char)c + ((unsigned)c <= 9u ? '0' : 'A' - 10);}
 
-inline String hex(int n)
+template <typename TInt> inline String hex(TInt n)
 {
-	char16_t rr[9], *h = rr;
-	rr[8] = 0;
+	char16_t rr[sizeof(n)*2+1], *h = rr;
+	rr[sizeof(n)*2] = 0;
 	for (const unsigned char *d = (unsigned char*)&n + sizeof(n)-1; d >= (unsigned char*)&n; d--)
 		*h++ = hex_to_char(*d >> 4),
 		*h++ = hex_to_char(*d & 0xF);

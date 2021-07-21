@@ -228,3 +228,554 @@ struct CodeBlock1
         print(sorted(fs::list_dir(u"."_S)).join(u"\n"_S));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/UPC#Kotlin
+LEFT_DIGITS = {
+    "   ## #": 0,
+    "  ##  #": 1,
+    "  #  ##": 2,
+    " #### #": 3,
+    " #   ##": 4,
+    " ##   #": 5,
+    " # ####": 6,
+    " ### ##": 7,
+    " ## ###": 8,
+    "   # ##": 9
+}
+
+RIGHT_DIGITS = {k.replace(' ', 's').replace('#', ' ').replace('s', '#') : v for k, v in LEFT_DIGITS.items()}
+
+END_SENTINEL = "# #"
+MID_SENTINEL = " # # "
+
+def decodeUPC(input):
+    def decode(candidate):
+        pos = 0
+        part = candidate[pos : pos + len(END_SENTINEL)]
+        if part == END_SENTINEL:
+            pos += len(END_SENTINEL)
+        else:
+            return (False, [0]*0)
+
+        output : List[int] = []
+        for i in range(6):
+            part = candidate[pos : pos + 7]
+            pos += 7
+
+            if part in LEFT_DIGITS:
+                output += [LEFT_DIGITS[part]]
+            else:
+                return (False, output)
+
+        part = candidate[pos : pos + len(MID_SENTINEL)]
+        if part == MID_SENTINEL:
+            pos += len(MID_SENTINEL)
+        else:
+            return (False, output)
+
+        for i in range(6):
+            part = candidate[pos : pos + 7]
+            pos += 7
+
+            if part in RIGHT_DIGITS:
+                output += [RIGHT_DIGITS[part]]
+            else:
+                return (False, output)
+
+        part = candidate[pos : pos + len(END_SENTINEL)]
+        if part == END_SENTINEL:
+            pos += len(END_SENTINEL)
+        else:
+            return (False, output)
+
+        sum = 0
+        for i, v in enumerate(output):
+            if i % 2 == 0:
+                sum += 3 * v
+            else:
+                sum += v
+        return (sum % 10 == 0, output)
+
+    candidate = input.strip(' ')
+    out = decode(candidate)
+    if out[0]:
+        print(out[1])
+    else:
+        out = decode(candidate[::-1])
+        if out[0]:
+            print(out[1], 'Upside down')
+        else:
+            if len(out[1]) == 12:
+                print('Invalid checksum')
+            else:
+                print('Invalid digit(s)')
+
+barcodes = [
+    "         # #   # ##  #  ## #   ## ### ## ### ## #### # # # ## ##  #   #  ##  ## ###  # ##  ## ### #  # #       ",
+    "        # # #   ##   ## # #### #   # ## #   ## #   ## # # # ###  # ###  ##  ## ###  # #  ### ###  # # #         ",
+    "         # #    # # #  ###  #   #    # #  #   #    # # # # ## #   ## #   ## #   ##   # # #### ### ## # #         ",
+    "       # # ##  ## ##  ##   #  #   #  # ###  # ##  ## # # #   ## ##  #  ### ## ## #   # #### ## #   # #        ",
+    "         # # ### ## #   ## ## ###  ##  # ##   #   # ## # # ### #  ## ##  #    # ### #  ## ##  #      # #          ",
+    "          # #  #   # ##  ##  #   #   #  # ##  ##  #   # # # # #### #  ##  # #### #### # #  ##  # #### # #         ",
+    "         # #  #  ##  ##  # #   ## ##   # ### ## ##   # # # #  #   #   #  #  ### # #    ###  # #  #   # #        ",
+    "        # # #    # ##  ##   #  # ##  ##  ### #   #  # # # ### ## ## ### ## ### ### ## #  ##  ### ## # #         ",
+    "         # # ### ##   ## # # #### #   ## # #### # #### # # #   #  # ###  #    # ###  # #    # ###  # # #       ",
+    "        # # # #### ##   # #### # #   ## ## ### #### # # # #  ### # ###  ###  # # ###  #    # #  ### # #         ",
+]
+
+for barcode in barcodes:
+    decodeUPC(barcode)
+===
+V LEFT_DIGITS = [‘   ## #’ = 0, ‘  ##  #’ = 1, ‘  #  ##’ = 2, ‘ #### #’ = 3, ‘ #   ##’ = 4, ‘ ##   #’ = 5, ‘ # ####’ = 6, ‘ ### ##’ = 7, ‘ ## ###’ = 8, ‘   # ##’ = 9]
+V RIGHT_DIGITS = Dict(LEFT_DIGITS.items(), (k, v) -> (k.replace(‘ ’, ‘s’).replace(‘#’, ‘ ’).replace(‘s’, ‘#’), v))
+V END_SENTINEL = ‘# #’
+V MID_SENTINEL = ‘ # # ’
+
+F decodeUPC(input)
+   F decode(candidate)
+      V pos = 0
+      V part = candidate[pos .< pos + :END_SENTINEL.len]
+      I part == :END_SENTINEL
+         pos += :END_SENTINEL.len
+      E
+         R (0B, [Int]())
+      [Int] output
+      L(i) 6
+         part = candidate[pos .< pos + 7]
+         pos += 7
+
+         I part C :LEFT_DIGITS
+            output [+]= :LEFT_DIGITS[part]
+         E
+            R (0B, output)
+      part = candidate[pos .< pos + :MID_SENTINEL.len]
+      I part == :MID_SENTINEL
+         pos += :MID_SENTINEL.len
+      E
+         R (0B, output)
+
+      L(i) 6
+         part = candidate[pos .< pos + 7]
+         pos += 7
+
+         I part C :RIGHT_DIGITS
+            output [+]= :RIGHT_DIGITS[part]
+         E
+            R (0B, output)
+      part = candidate[pos .< pos + :END_SENTINEL.len]
+      I part == :END_SENTINEL
+         pos += :END_SENTINEL.len
+      E
+         R (0B, output)
+      V sum = 0
+      L(v) output
+         V i = L.index
+         I i % 2 == 0
+            sum += 3 * v
+         E
+            sum += v
+      R (sum % 10 == 0, output)
+   V candidate = input.trim(‘ ’)
+   V out = decode(candidate)
+   I out[0]
+      print(out[1])
+   E
+      out = decode(reversed(candidate))
+      I out[0]
+         print(out[1]‘ Upside down’)
+      E
+         I out[1].len == 12
+            print(‘Invalid checksum’)
+         E
+            print(‘Invalid digit(s)’)
+V barcodes = [‘         # #   # ##  #  ## #   ## ### ## ### ## #### # # # ## ##  #   #  ##  ## ###  # ##  ## ### #  # #       ’, ‘        # # #   ##   ## # #### #   # ## #   ## #   ## # # # ###  # ###  ##  ## ###  # #  ### ###  # # #         ’, ‘         # #    # # #  ###  #   #    # #  #   #    # # # # ## #   ## #   ## #   ##   # # #### ### ## # #         ’, ‘       # # ##  ## ##  ##   #  #   #  # ###  # ##  ## # # #   ## ##  #  ### ## ## #   # #### ## #   # #        ’, ‘         # # ### ## #   ## ## ###  ##  # ##   #   # ## # # ### #  ## ##  #    # ### #  ## ##  #      # #          ’, ‘          # #  #   # ##  ##  #   #   #  # ##  ##  #   # # # # #### #  ##  # #### #### # #  ##  # #### # #         ’, ‘         # #  #  ##  ##  # #   ## ##   # ### ## ##   # # # #  #   #   #  #  ### # #    ###  # #  #   # #        ’, ‘        # # #    # ##  ##   #  # ##  ##  ### #   #  # # # ### ## ## ### ## ### ### ## #  ##  ### ## # #         ’, ‘         # # ### ##   ## # # #### #   ## # #### # #### # # #   #  # ###  #    # ###  # #    # ###  # # #       ’, ‘        # # # #### ##   # #### # #   ## ## ### #### # # # #  ### # ###  ###  # # ###  #    # #  ### # #         ’]
+
+L(barcode) barcodes
+   decodeUPC(barcode)
+===
+auto LEFT_DIGITS = create_dict(dict_of(u"   ## #"_S, 0)(u"  ##  #"_S, 1)(u"  #  ##"_S, 2)(u" #### #"_S, 3)(u" #   ##"_S, 4)(u" ##   #"_S, 5)(u" # ####"_S, 6)(u" ### ##"_S, 7)(u" ## ###"_S, 8)(u"   # ##"_S, 9));
+auto RIGHT_DIGITS = create_dict(LEFT_DIGITS.items(), [](const auto &k, const auto &v){return make_tuple(k.replace(u" "_S, u"s"_S).replace(u"#"_S, u" "_S).replace(u"s"_S, u"#"_S), v);});
+auto END_SENTINEL = u"# #"_S;
+auto MID_SENTINEL = u" # # "_S;
+
+template <typename T1> auto decodeUPC(const T1 &input)
+{
+    auto decode = [](const auto &candidate)
+    {
+        auto pos = 0;
+        auto part = candidate[range_el(pos, pos + ::END_SENTINEL.len())];
+        if (part == ::END_SENTINEL)
+            pos += ::END_SENTINEL.len();
+        else
+            return make_tuple(false, Array<int>());
+        Array<int> output;
+        for (int i = 0; i < 6; i++) {
+            part = candidate[range_el(pos, pos + 7)];
+            pos += 7;
+            if (in(part, ::LEFT_DIGITS))
+                output.append(::LEFT_DIGITS[part]);
+            else
+                return make_tuple(false, output);
+        }
+        part = candidate[range_el(pos, pos + ::MID_SENTINEL.len())];
+        if (part == ::MID_SENTINEL)
+            pos += ::MID_SENTINEL.len();
+        else
+            return make_tuple(false, output);
+
+        for (int i = 0; i < 6; i++) {
+            part = candidate[range_el(pos, pos + 7)];
+            pos += 7;
+            if (in(part, ::RIGHT_DIGITS))
+                output.append(::RIGHT_DIGITS[part]);
+            else
+                return make_tuple(false, output);
+        }
+        part = candidate[range_el(pos, pos + ::END_SENTINEL.len())];
+        if (part == ::END_SENTINEL)
+            pos += ::END_SENTINEL.len();
+        else
+            return make_tuple(false, output);
+        auto sum = 0;
+        {int Lindex = 0;
+        for (auto &&v : output) {
+            auto i = Lindex;
+            if (mod(i, 2) == 0)
+                sum += 3 * v;
+            else
+                sum += v;
+            Lindex++;
+        }}
+        return make_tuple(mod(sum, 10) == 0, output);
+    };
+    auto candidate = input.trim(u" "_S);
+    auto out = decode(candidate);
+    if (_get<0>(out))
+        print(_get<1>(out));
+    else {
+        out = decode(reversed(candidate));
+        if (_get<0>(out))
+            print(_get<1>(out) & u" Upside down"_S);
+        else
+            if (_get<1>(out).len() == 12)
+                print(u"Invalid checksum"_S);
+            else
+                print(u"Invalid digit(s)"_S);
+    }
+}
+auto barcodes = create_array({u"         # #   # ##  #  ## #   ## ### ## ### ## #### # # # ## ##  #   #  ##  ## ###  # ##  ## ### #  # #       "_S, u"        # # #   ##   ## # #### #   # ## #   ## #   ## # # # ###  # ###  ##  ## ###  # #  ### ###  # # #         "_S, u"         # #    # # #  ###  #   #    # #  #   #    # # # # ## #   ## #   ## #   ##   # # #### ### ## # #         "_S, u"       # # ##  ## ##  ##   #  #   #  # ###  # ##  ## # # #   ## ##  #  ### ## ## #   # #### ## #   # #        "_S, u"         # # ### ## #   ## ## ###  ##  # ##   #   # ## # # ### #  ## ##  #    # ### #  ## ##  #      # #          "_S, u"          # #  #   # ##  ##  #   #   #  # ##  ##  #   # # # # #### #  ##  # #### #### # #  ##  # #### # #         "_S, u"         # #  #  ##  ##  # #   ## ##   # ### ## ##   # # # #  #   #   #  #  ### # #    ###  # #  #   # #        "_S, u"        # # #    # ##  ##   #  # ##  ##  ### #   #  # # # ### ## ## ### ## ### ### ## #  ##  ### ## # #         "_S, u"         # # ### ##   ## # # #### #   ## # #### # #### # # #   #  # ###  #    # ###  # #    # ###  # # #       "_S, u"        # # # #### ##   # #### # #   ## ## ### #### # # # #  ### # ###  ###  # # ###  #    # #  ### # #         "_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&barcode : barcodes)
+            decodeUPC(barcode);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Update_a_configuration_file#D
+import re
+from enum import IntEnum
+from typing import Optional
+
+class EntryType(IntEnum):
+    EMPTY = 0
+    ENABLED = 1
+    DISABLED = 2
+    COMMENT = 3
+    IGNORE = 4
+
+class Entry:
+    etype : EntryType
+    name : str
+    value : str
+
+    def __init__(self, etype, name = '', value = ''):
+        self.etype = etype
+        self.name  = name
+        self.value = value
+
+class Config:
+    path : str
+
+    def __init__(self, path):
+        self.entries : List[Entry] = []
+
+        self.path = path
+        for line in open(path).readlines():
+            line = line.rstrip("\n").lstrip(' ')
+            if len(line) == 0:
+                self.entries.append(Entry(EntryType.EMPTY))
+            elif line[0] == '#':
+                self.entries.append(Entry(EntryType.COMMENT, line))
+            else:
+                line = re.sub(r'[^a-zA-Z0-9\x20;]', '', line)
+                m = re.match(r'(;*)\s*([a-zA-Z0-9]+)\s*([a-zA-Z0-9]*)', line)
+                if m and len(m.group(2)) != 0:
+                    t = EntryType.ENABLED if len(m.group(1)) == 0 else EntryType.DISABLED
+                    self.addOption(m.group(2), m.group(3), t)
+
+    def enableOption(self, name):
+        i : Optional[int] = self.getOptionIndex(name)
+        if i is not None:
+            self.entries[i].etype = EntryType.ENABLED
+
+    def disableOption(self, name):
+        i : Optional[int] = self.getOptionIndex(name)
+        if i is not None:
+            self.entries[i].etype = EntryType.DISABLED
+
+    def setOption(self, name, value):
+        i : Optional[int] = self.getOptionIndex(name)
+        if i is not None:
+            self.entries[i].value = value
+
+    def addOption(self, name, val, t = EntryType.ENABLED):
+        self.entries.append(Entry(t, name.upper(), val))
+
+    def removeOption(self, name):
+        i : Optional[int] = self.getOptionIndex(name)
+        if i is not None:
+            self.entries[i].etype = EntryType.IGNORE
+
+    def getOptionIndex(self, name) -> Optional[int]:
+        for i, e in enumerate(self.entries):
+            if e.etype not in (EntryType.ENABLED, EntryType.DISABLED):
+                continue
+            if e.name == name.upper():
+                return i
+        return None
+
+    def store(self):
+        f = open(self.path, 'w')
+        for e in self.entries:
+            if e.etype == EntryType.EMPTY:
+                f.write("\n")
+            elif e.etype == EntryType.ENABLED:
+                f.write("%s %s\n" % (e.name, e.value))
+            elif e.etype == EntryType.DISABLED:
+                f.write("; %s %s\n" % (e.name, e.value))
+            elif e.etype == EntryType.COMMENT:
+                f.write(e.name + "\n")
+
+cfg = Config("config.txt")
+cfg.enableOption("seedsremoved")
+cfg.disableOption("needspeeling")
+cfg.setOption("numberofbananas", "1024")
+cfg.addOption("numberofstrawberries", "62000")
+cfg.store()
+===
+//import re
+T.enum EntryType
+   EMPTY
+   ENABLED
+   DISABLED
+   COMMENT
+   IGNORE
+
+T Entry
+   EntryType etype
+   String name
+   String value
+
+   F (etype, name = ‘’, value = ‘’)
+      .etype = etype
+      .name = name
+      .value = value
+
+T Config
+   String path
+   [Entry] entries
+
+   F (path)
+      .path = path
+      L(=line) File(path).read_lines(1B)
+         line = line.rtrim("\n").ltrim(‘ ’)
+         I line.empty
+            .entries.append(Entry(EntryType.EMPTY))
+         E I line[0] == ‘#’
+            .entries.append(Entry(EntryType.COMMENT, line))
+         E
+            line = line.replace(re:‘[^a-zA-Z0-9\x20;]’, ‘’)
+            V m = re:‘^(;*)\s*([a-zA-Z0-9]+)\s*([a-zA-Z0-9]*)’.search(line)
+            I m & !m.group(2).empty
+               V t = I m.group(1).empty {EntryType.ENABLED} E EntryType.DISABLED
+               .addOption(m.group(2), m.group(3), t)
+
+   F enableOption(name)
+      Int? i = .getOptionIndex(name)
+      I i != N
+         .entries[i].etype = EntryType.ENABLED
+
+   F disableOption(name)
+      Int? i = .getOptionIndex(name)
+      I i != N
+         .entries[i].etype = EntryType.DISABLED
+
+   F setOption(name, value)
+      Int? i = .getOptionIndex(name)
+      I i != N
+         .entries[i].value = value
+
+   F addOption(name, val, t = EntryType.ENABLED)
+      .entries.append(Entry(t, name.uppercase(), val))
+
+   F removeOption(name)
+      Int? i = .getOptionIndex(name)
+      I i != N
+         .entries[i].etype = EntryType.IGNORE
+
+   F getOptionIndex(name) -> Int?
+      L(e) .entries
+         V i = L.index
+         I e.etype !C (EntryType.ENABLED, EntryType.DISABLED)
+            L.continue
+         I e.name == name.uppercase()
+            R i
+      R N
+
+   F store()
+      V f = File(.path, ‘w’)
+      L(e) .entries
+         I e.etype == EMPTY
+            f.write("\n")
+         E I e.etype == ENABLED
+            f.write("#. #.\n".format(e.name, e.value))
+         E I e.etype == DISABLED
+            f.write("; #. #.\n".format(e.name, e.value))
+         E I e.etype == COMMENT
+            f.write(e.name"\n")
+V cfg = Config(‘config.txt’)
+cfg.enableOption(‘seedsremoved’)
+cfg.disableOption(‘needspeeling’)
+cfg.setOption(‘numberofbananas’, ‘1024’)
+cfg.addOption(‘numberofstrawberries’, ‘62000’)
+cfg.store()
+===
+enum class EntryType {
+    EMPTY,
+    ENABLED,
+    DISABLED,
+    COMMENT,
+    IGNORE
+};
+
+class Entry
+{
+public:
+    EntryType etype;
+    String name;
+    String value;
+
+    template <typename T1, typename T2 = decltype(u""_S), typename T3 = decltype(u""_S)> Entry(const T1 &etype, const T2 &name = u""_S, const T3 &value = u""_S) :
+        etype(etype),
+        name(name),
+        value(value)
+    {
+    }
+};
+
+class Config
+{
+public:
+    String path;
+    Array<Entry> entries;
+
+    template <typename T1> Config(const T1 &path) :
+        path(path)
+    {
+        for (auto line : File(path).read_lines(true)) {
+            line = line.rtrim(u"\n"_S).ltrim(u" "_S);
+            if (line.empty())
+                entries.append(Entry(EntryType::EMPTY));
+            else if (_get<0>(line) == u'#')
+                entries.append(Entry(EntryType::COMMENT, line));
+            else {
+                line = line.replace(re::_(uR"([^a-zA-Z0-9\x20;])"_S), u""_S);
+                auto m = re::_(uR"(^(;*)\s*([a-zA-Z0-9]+)\s*([a-zA-Z0-9]*))"_S).search(line);
+                if (m && !m.group(2).empty()) {
+                    auto t = m.group(1).empty() ? EntryType::ENABLED : EntryType::DISABLED;
+                    addOption(m.group(2), m.group(3), t);
+                }
+            }
+        }
+    }
+
+    template <typename T1> auto enableOption(const T1 &name)
+    {
+        Nullable<int> i = getOptionIndex(name);
+        if (i != nullptr)
+            entries[*i].etype = EntryType::ENABLED;
+    }
+
+    template <typename T1> auto disableOption(const T1 &name)
+    {
+        Nullable<int> i = getOptionIndex(name);
+        if (i != nullptr)
+            entries[*i].etype = EntryType::DISABLED;
+    }
+
+    template <typename T1, typename T2> auto setOption(const T1 &name, const T2 &value)
+    {
+        Nullable<int> i = getOptionIndex(name);
+        if (i != nullptr)
+            entries[*i].value = value;
+    }
+
+    template <typename T1, typename T2, typename T3 = decltype(EntryType::ENABLED)> auto addOption(const T1 &name, const T2 &val, const T3 &t = EntryType::ENABLED)
+    {
+        entries.append(Entry(t, name.uppercase(), val));
+    }
+
+    template <typename T1> auto removeOption(const T1 &name)
+    {
+        Nullable<int> i = getOptionIndex(name);
+        if (i != nullptr)
+            entries[*i].etype = EntryType::IGNORE;
+    }
+
+    template <typename T1> Nullable<int> getOptionIndex(const T1 &name)
+    {
+        {int Lindex = 0;
+        for (auto &&e : entries) {{
+            auto i = Lindex;
+            if (!in(e.etype, make_tuple(EntryType::ENABLED, EntryType::DISABLED)))
+                goto on_continue;
+            if (e.name == name.uppercase())
+                return i;
+} on_continue:
+            Lindex++;
+        }}
+        return nullptr;
+    }
+
+    auto store()
+    {
+        auto f = File(path, u"w"_S);
+        for (auto &&e : entries)
+            if (e.etype == TYPE_RM_REF(e.etype)::EMPTY)
+                f.write(u"\n"_S);
+            else if (e.etype == TYPE_RM_REF(e.etype)::ENABLED)
+                f.write(u"#. #.\n"_S.format(e.name, e.value));
+            else if (e.etype == TYPE_RM_REF(e.etype)::DISABLED)
+                f.write(u"; #. #.\n"_S.format(e.name, e.value));
+            else if (e.etype == TYPE_RM_REF(e.etype)::COMMENT)
+                f.write(e.name & u"\n"_S);
+    }
+};
+auto cfg = Config(u"config.txt"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        cfg.enableOption(u"seedsremoved"_S);
+        cfg.disableOption(u"needspeeling"_S);
+        cfg.setOption(u"numberofbananas"_S, u"1024"_S);
+        cfg.addOption(u"numberofstrawberries"_S, u"62000"_S);
+        cfg.store();
+    }
+} code_block_1;

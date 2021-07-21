@@ -505,3 +505,280 @@ struct CodeBlock1
         print(u"\nText: "_S & decoded);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Vampire_number#Nim
+Int64 = int
+
+Pow10 = [Int64(10) ** n for n in range(19)]
+
+def isOdd(n):
+    return (n & 1) != 0
+
+def fangs(n):
+    r : List[Tuple[Int64, Int64]] = []
+
+    nDigits = sorted(str(n))
+    if isOdd(len(nDigits)):
+        return r
+
+    fangLen = len(nDigits) // 2
+    inf = Pow10[fangLen - 1]
+    for d in range(inf, inf * 10):
+        if n % d != 0: continue
+        q = n // d
+        if q < d: return r
+        dDigits = str(d)
+        qDigits = str(q)
+        if len(qDigits) > fangLen: continue
+        if len(qDigits) < fangLen: return r
+        if nDigits != sorted(dDigits + qDigits): continue
+        if dDigits[-1] != '0' or qDigits[-1] != '0':
+            r.append((d, q))
+
+    return r
+
+print('First 25 vampire numbers with their fangs:')
+count = 0
+n = 10
+limit = 100
+while count != 25:
+    fangList = fangs(n)
+    if len(fangList) != 0:
+        count += 1
+        print('%2d: %6d =' % (count, n), ' = '.join('%3d x %3d' % (it[0], it[1]) for it in fangList))
+    n += 1
+    if n == limit:
+        n *= 10
+        limit *= 10
+
+print()
+for n in [16_758_243_290_880, 24_959_017_348_650, 14_593_825_548_650]:
+    fangList = fangs(n)
+    if len(fangList) == 0:
+        print(n, 'is not vampiric.')
+    else:
+        print(n, '=', ' = '.join('%d x %d' % (it[0], it[1]) for it in fangList))
+===
+V Pow10 = (0.<19).map(n -> Int64(10) ^ n)
+
+F isOdd(n)
+   R (n [&] 1) != 0
+
+F fangs(n)
+   [(Int64, Int64)] r
+   V nDigits = sorted(String(n))
+   I isOdd(nDigits.len)
+      R r
+   V fangLen = nDigits.len I/ 2
+   V inf = Pow10[fangLen - 1]
+   L(d) inf .< inf * 10
+      I n % d != 0
+         L.continue
+      V q = n I/ d
+      I q < d
+         R r
+      V dDigits = String(d)
+      V qDigits = String(q)
+      I qDigits.len > fangLen
+         L.continue
+      I qDigits.len < fangLen
+         R r
+      I nDigits != sorted(dDigits‘’qDigits)
+         L.continue
+      I dDigits.last != ‘0’ | qDigits.last != ‘0’
+         r.append((d, q))
+   R r
+print(‘First 25 vampire numbers with their fangs:’)
+V count = 0
+V n = 10
+V limit = 100
+L count != 25
+   V fangList = fangs(n)
+   I !fangList.empty
+      count++
+      print((‘#2: #6 =’.format(count, n))‘ ’fangList.map(it -> ‘#3 x #3’.format(it[0], it[1])).join(‘ = ’))
+   n++
+   I n == limit
+      n *= 10
+      limit *= 10
+print()
+L(n) [16'758'243'290'880, 24'959'017'348'650, 14'593'825'548'650]
+   V fangList = fangs(n)
+   I fangList.empty
+      print(n‘ is not vampiric.’)
+   E
+      print(n‘ = ’fangList.map(it -> ‘#. x #.’.format(it[0], it[1])).join(‘ = ’))
+===
+auto Pow10 = range_el(0, 19).map([](const auto &n){return pow(to_int64(10), n);});
+
+template <typename T1> auto isOdd(const T1 &n)
+{
+    return (n & 1) != 0;
+}
+
+template <typename T1> auto fangs(const T1 &n)
+{
+    Array<llvec2> r;
+    auto nDigits = sorted(String(n));
+    if (isOdd(nDigits.len()))
+        return r;
+    auto fangLen = idiv(nDigits.len(), 2);
+    auto inf = Pow10[fangLen - 1];
+    for (auto d : range_el(inf, inf * 10)) {
+        if (mod(n, d) != 0)
+            continue;
+        auto q = idiv(n, d);
+        if (q < d)
+            return r;
+        auto dDigits = String(d);
+        auto qDigits = String(q);
+        if (qDigits.len() > fangLen)
+            continue;
+        if (qDigits.len() < fangLen)
+            return r;
+        if (nDigits != sorted(dDigits & qDigits))
+            continue;
+        if (dDigits.last() != u'0' || qDigits.last() != u'0')
+            r.append(make_tuple(d, q));
+    }
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"First 25 vampire numbers with their fangs:"_S);
+    }
+} code_block_1;
+auto count = 0;
+auto n = 10;
+auto limit = 100;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (count != 25) {
+            auto fangList = fangs(n);
+            if (!fangList.empty()) {
+                count++;
+                print((u"#2: #6 ="_S.format(count, n)) & u" "_S & fangList.map([](const auto &it){return u"#3 x #3"_S.format(_get<0>(it), _get<1>(it));}).join(u" = "_S));
+            }
+            n++;
+            if (n == limit) {
+                n *= 10;
+                limit *= 10;
+            }
+        }
+        print();
+        for (auto &&n : create_array({16'758'243'290'880, 24'959'017'348'650, 14'593'825'548'650})) {
+            auto fangList = fangs(n);
+            if (fangList.empty())
+                print(n & u" is not vampiric."_S);
+            else
+                print(n & u" = "_S & fangList.map([](const auto &it){return u"#. x #."_S.format(_get<0>(it), _get<1>(it));}).join(u" = "_S));
+        }
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Variable-length_quantity#C.2B.2B
+from _11l import *
+
+def to_str(v):
+    return '[ ' + ' '.join(hexu(n).lower().zfill(2) for n in v) + ' ]'
+
+def to_seq(x : UInt64):
+    i = 0
+    for ii in range(9, 0, -1):
+        if x & (UInt64(127) << ii * 7) != 0:
+            i = ii
+            break
+
+    out : List[Byte] = []
+    for j in range(i + 1):
+        out += [((x >> ((i - j) * 7)) & 127) | 128]
+
+    out[i] ^= 128
+    return out
+
+def from_seq(seq):
+    r : UInt64 = 0
+
+    for b in seq:
+        r = (r << 7) | (b & 127)
+
+    return r
+
+for x in [UInt64(0x7f), 0x4000, 0, 0x3ffffe, 0x1fffff, 0x200000, 0x3311a1234df31413]:
+    s = to_seq(x)
+    print('seq from', hexu(x).lower(), to_str(s), 'back:', hexu(from_seq(s)).lower())
+===
+
+F to_str(v)
+   R ‘[ ’v.map(n -> hex(n).lowercase().zfill(2)).join(‘ ’)‘ ]’
+
+F to_seq(UInt64 x)
+   V i = 0
+   L(ii) (9.<0).step(-1)
+      I x [&] (UInt64(127) << ii * 7) != 0
+         i = ii
+         L.break
+   [Byte] out
+   L(j) 0 .. i
+      out [+]= ((x >> ((i - j) * 7)) [&] 127) [|] 128
+   out[i] (+)= 128
+   R out
+
+F from_seq(seq)
+   UInt64 r = 0
+
+   L(b) seq
+      r = (r << 7) [|] (b [&] 127)
+   R r
+
+L(x) [UInt64(7'f), 40'00, 0, 003f'fffe, 001f'ffff, 0020'0000, 3311'a123'4df3'1413]
+   V s = to_seq(x)
+   print(‘seq from ’hex(x).lowercase()‘ ’to_str(s)‘ back: ’hex(from_seq(s)).lowercase())
+===
+template <typename T1> auto to_str(const T1 &v)
+{
+    return u"[ "_S & v.map([](const auto &n){return hex(n).lowercase().zfill(2);}).join(u" "_S) & u" ]"_S;
+}
+
+auto to_seq(const UInt64 &x)
+{
+    auto i = 0;
+    for (auto ii : range_el(9, 0).step(-1))
+        if ((x & (to_uint64(127) << ii * 7)) != 0) {
+            i = ii;
+            break;
+        }
+    Array<Byte> out;
+    for (auto j : range_ee(0, i))
+        out.append(((x >> ((i - j) * 7)) & 127) | 128);
+    out[i] ^= 128;
+    return out;
+}
+
+template <typename T1> auto from_seq(const T1 &seq)
+{
+    UInt64 r = 0;
+    for (auto &&b : seq)
+        r = (r << 7) | (b & 127);
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+
+        for (auto &&x : create_array<UInt64>({to_uint64(0x7f), 0x40'00, 0, 0x003f'fffe, 0x001f'ffff, 0x0020'0000, 0x3311'a123'4df3'1413})) {
+            auto s = to_seq(x);
+            print(u"seq from "_S & hex(x).lowercase() & u" "_S & to_str(s) & u" back: "_S & hex(from_seq(s)).lowercase());
+        }
+    }
+} code_block_1;

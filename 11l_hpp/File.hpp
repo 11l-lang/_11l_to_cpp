@@ -5,6 +5,7 @@
 #include <windows.h>
 #undef far
 #undef near
+#undef IGNORE
 #else
 #include <codecvt>
 #include <locale>
