@@ -1291,7 +1291,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 is_const = True
             else:
                 s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + \
-                    {'()':'operator()', '[&]':'operator&', '<':'operator<', '==':'operator==', '+':'operator+', '-':'operator-', '*':'operator*'}.get(self.function_name, self.function_name)
+                    {'()':'operator()', '[&]':'operator&', '<':'operator<', '==':'operator==', '+':'operator+', '-':'operator-', '*':'operator*', '/':'operator/'}.get(self.function_name, self.function_name)
 
             if self.virtual_category != self.VirtualCategory.NO:
                 arguments = []
