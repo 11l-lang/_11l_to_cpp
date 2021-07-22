@@ -187,8 +187,10 @@ public:
         auto [x, y] = pt;
         auto w = _width;
         auto h = _height;
+
         if (x > w - 1 || x < 0)
             throw MazeError(u"x co-ordinate out of range!"_S);
+
         if (y > h - 1 || y < 0)
             throw MazeError(u"y co-ordinate out of range!"_S);
     }
@@ -299,6 +301,7 @@ public:
     {
         auto exits1 = maze.getExitPoints(_start);
         auto exits2 = maze.getExitPoints(_end);
+
         if (exits1.empty() || exits2.empty())
             return false;
 
@@ -380,6 +383,7 @@ public:
     {
         auto l = create_array(range_el(0, _path.len() - 1).step(2));
         l.reverse();
+
         for (auto &&x : l)
             if (_path[x] == point) {
                 _loops++;
@@ -490,6 +494,7 @@ public:
     auto printResult()
     {
         u" Print the maze showing the path "_S;
+
         for (auto &&[x, y] : _path)
             maze.setItem(x, y, ::PATH);
 
@@ -518,6 +523,7 @@ public:
         while (!isSolved()) {
             _steps++;
             auto pt = getNextPoint();
+
             if (pt != ::null_point)
                 setCurrentPoint(pt);
             else {

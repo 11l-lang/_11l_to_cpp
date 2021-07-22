@@ -50,10 +50,13 @@ struct CodeBlock1
             auto i = Lindex;
             auto [animal, lyric] = animal_lyric;
             print(u"There was an old lady who swallowed a #..\n#."_S.format(animal, lyric));
+
             if (animal == u"horse")
                 break;
+
             for (auto &&[predator, prey] : zip(animals[range_el(i, 0).step(-1)], animals[range_ei(i - 1).step(-1)]))
                 print(u"\tShe swallowed the #. to catch the #."_S.format(_get<0>(predator), _get<0>(prey)));
+
             if (animal != u"fly")
                 print(_get<1>(_get<0>(animals)));
             print();

@@ -206,8 +206,10 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                 if (i == source.len())
                     break;
             }
+
             if (in(source[i], u"\r\n"_S) || in(source[range_el(i, i + 2)], make_tuple(u"//"_S, uR"(\\)"_S)))
                 continue;
+
             if (in(source[i], u"{}"_S))
                 continue;
 
@@ -301,6 +303,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
         }
 
         auto ch = source[i];
+
         if (in(ch, u" \t"_S))
             i++;
         else if (in(ch, u"\r\n"_S)) {
@@ -615,6 +618,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
             }
             else if (ch == u';')
                 category = TYPE_RM_REF(category)::STATEMENT_SEPARATOR;
+
             else if (in(ch, make_tuple(u","_S, u"."_S, u":"_S)))
                 category = TYPE_RM_REF(category)::DELIMITER;
 
@@ -634,12 +638,14 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                 nesting_elements.pop();
                 category = TYPE_RM_REF(category)::DELIMITER;
             }
+
             else
                 throw Error(u"unexpected character `"_S & ch & u"`"_S, lexem_start);
 
             tokens.append(Token(lexem_start, i, category));
         }
     }
+
     if (!nesting_elements.empty())
         throw Error(u"there is no corresponding closing parenthesis/bracket/brace for `"_S & _get<0>(nesting_elements.last()) & u"`"_S, _get<1>(nesting_elements.last()));
 

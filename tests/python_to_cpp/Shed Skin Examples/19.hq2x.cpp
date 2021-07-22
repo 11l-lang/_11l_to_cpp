@@ -349,6 +349,7 @@ template <typename T1, typename T2, typename T3> auto hq2x(const T1 &xres, const
                 }
                 flag <<= 1;
             }
+
             for (auto k : range_ee(1, 9))
                 c.set(k, LUT16to32[w[k]]);
 
@@ -1925,8 +1926,10 @@ template <typename T1, typename T2, typename T3> auto hq2x(const T1 &xres, const
 
 auto init_LUTs()
 {
+
     for (int i = 0; i < 65536; i++)
         LUT16to32.set(i, ((i & 0xF8'00) << 8) | ((i & 0x07'E0) << 5) | ((i & 0x00'1F) << 3));
+
     for (int i = 0; i < 32; i++)
         for (int j = 0; j < 64; j++)
             for (int k = 0; k < 32; k++) {

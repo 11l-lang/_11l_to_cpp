@@ -101,6 +101,7 @@ template <typename T1, typename T2> auto jaro(const T1 &s, const T2 &t)
 {
     auto s_len = s.len();
     auto t_len = t.len();
+
     if (s_len == 0 && t_len == 0)
         return 1.0;
 
@@ -127,6 +128,7 @@ template <typename T1, typename T2> auto jaro(const T1 &s, const T2 &t)
             break;
         }
     }
+
     if (matches == 0)
         return 0.0;
 

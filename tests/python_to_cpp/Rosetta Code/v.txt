@@ -461,6 +461,7 @@ template <typename T1, typename T2> auto vigenere_decrypt(const T1 &target_freqs
             best_corr = corr;
         }
     }
+
     if (best_len == 0)
         return make_tuple(u"Text is too short to analyze"_S, u""_S);
 
@@ -805,6 +806,7 @@ auto to_seq(const UInt64 &x)
 template <typename T1> auto from_seq(const T1 &seq)
 {
     UInt64 r = 0;
+
     for (auto &&b : seq)
         r = (r << 7) | (b & 127);
 

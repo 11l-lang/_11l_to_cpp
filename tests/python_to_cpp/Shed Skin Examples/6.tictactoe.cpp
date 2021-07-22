@@ -81,6 +81,7 @@ public:
             if (_get<0>(rd) != 0)
                 victors.append(_get<0>(rd));
         }
+
         if (victors.empty())
             return 0;
         if (create_set(victors).len() > 1)
@@ -170,6 +171,7 @@ public:
 template <typename T1 = decltype(10), typename T2 = decltype(1), typename T3 = decltype(2)> auto aigame(const T1 &size = 10, T2 turn = 1, const T3 &players = 2)
 {
     auto b = rectBoard(size);
+
     while (((!b.isfull()) && (b.isvictory() == 0)))
         if ((turn == 1)) {
             auto [r, c] = b.makeAImove(turn);

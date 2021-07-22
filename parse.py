@@ -1053,7 +1053,7 @@ class ASTNodeWithChildren(ASTNode):
         c0str = self.children[0].to_str(indent+1)
         if c0str.startswith(' ' * ((indent+1)*4) + "was_break = true;\n"):
             return self.children_to_str(indent, r, False)
-        return ' ' * (indent*4) + r + "\n" + c0str
+        return pre_nl(self.tokeni) + ' ' * (indent*4) + r + "\n" + c0str
 
 class ASTNodeWithExpression(ASTNode):
     expression : SymbolNode

@@ -327,6 +327,7 @@ template <typename T1, typename T2, typename T3> auto textBetween(const T1 &this
             startIndex = 0;
         else
             startIndex = thisText.index(startString);
+
         if (!(startIndex >= 0))
             return u"Start delimiter not found"_S;
         else
@@ -334,10 +335,12 @@ template <typename T1, typename T2, typename T3> auto textBetween(const T1 &this
                 startIndex = startIndex + startString.len();
 
         auto returnText = thisText[range_ei(startIndex)];
+
         if (endString == u"end")
             return returnText;
         else {
             auto endIndex = returnText.index(endString);
+
             if (!(endIndex >= 0))
                 return u"End delimiter not found"_S;
             else
@@ -2107,6 +2110,7 @@ int MAIN_WITH_ARGV()
         auto date = _get<0>(field);
         auto data = field[range_ei(1).step(2)].map([](const auto &f){return to_float(f);});
         auto flags = field[range_ei(2).step(2)].map([](const auto &f){return to_int(f);});
+
         for (auto &&[datum, flag] : zip(data, flags))
             if (flag < 1)
                 nodata++;

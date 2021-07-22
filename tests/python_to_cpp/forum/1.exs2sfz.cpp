@@ -41,6 +41,7 @@ public:
     {
         uR"( size is specified in bytes, at byte 4-8, and does not include common chunk elements;
 			that is, does not include the first 84 bytes )"_S;
+
         if (__size == 0)
             __size = chunk_size(::instrument_data, offset);
 
@@ -107,6 +108,7 @@ public:
     template <typename T1> EXSHeader(const T1 &offset)
     {
         this->offset = offset;
+
         if (!(offset == 0))
             throw RuntimeError(u"Found header at location  other than beginning of file! offset is #."_S.format(offset));
     }
@@ -314,6 +316,7 @@ public:
         };
 
         filename = filename.lowercase();
+
         for (auto &&location : locations)
             for (auto &&name : fs::list_dir(fs::path::join(base, location)))
                 if (name.lowercase() == filename) {
@@ -399,13 +402,16 @@ public:
     template <typename T1, typename T2 = decltype(u""_S)> EXSInstrument(const T1 &exsfile_name, const T2 &sample_location = u""_S) :
         exsfile_name(exsfile_name)
     {
+
         if (fs::file_size(exsfile_name) > 1024 * 1024)
             throw RuntimeError(u"EXS file is too large; will not parse! (size > 1 MebiByte)"_S);
         ::instrument_data = File(exsfile_name).read_bytes();
+
         if (unpack_from_bytes_be<UInt32>(::instrument_data, 0) == EXSHeader_sig && ::instrument_data[range_el(16, 20)] == "SOBT"_B)
             throw RuntimeError(u"File is a big endian EXS file; cannot parse!"_S);
         if (!(unpack_from_bytes<UInt32>(::instrument_data, 0) == EXSHeader_sig) && ::instrument_data[range_el(16, 20)] == "TBOS"_B)
             throw RuntimeError(u"File is not an EXS file; will not parse!"_S);
+
         if (sample_location == u"")
             pool = std::make_unique<EXSSamplePoolLocator>(exsfile_name);
         else
@@ -415,6 +421,7 @@ public:
         auto end = ::instrument_data.len();
         while (offset < end) {
             auto sig = unpack_from_bytes<UInt32>(::instrument_data, offset);
+
             if (sig == EXSHeader_sig)
                 auto t = EXSHeader(offset);
             else if (sig == 0x0100'0101)
@@ -446,6 +453,7 @@ public:
             if (!group.sequence())
                 goto on_continue;
             {bool was_break = false;
+
             for (auto sequence : sequences)
                 if (false) {
                     was_break = true;
@@ -476,6 +484,7 @@ public:
                     sequence.append(gid);
                     gid = groups[gid].sequence();
                 }
+
                 if (sequence.len() > 1)
                     sequences.append(sequence);
             }
@@ -525,6 +534,7 @@ public:
             auto keyrange = ranges[key];
             auto group = _get<0>(keyrange).group();
             {bool was_break = false;
+
             for (auto &&sequence : sequences)
                 if (in(group, sequence)) {
                     group = _get<0>(sequence);
@@ -537,6 +547,7 @@ public:
 
             key_sequence.set(key, group);
         }
+
         if (!overwrite && fs::is_file(sfzfilename))
             throw RuntimeError(u"file #. already exists; will not overwrite!"_S.format(sfzfilename));
 
@@ -548,6 +559,7 @@ public:
             auto keyrange = ranges[key];
 
             sfzfile.write(u"<group>"_S);
+
             if ((equal(_get<0>(key), _get<1>(key), _get<2>(key))))
                 sfzfile.write(u" key=#."_S.format(_get<0>(key)));
             else
@@ -567,17 +579,22 @@ public:
                     choke_voices.set(make_tuple(zone.minvel(), zone.maxvel()), 1);
 
             if (groups[_get<0>(keyrange).group()].polyphony() == choke_voices[make_tuple(_get<0>(keyrange).minvel(), _get<0>(keyrange).maxvel())]) {
+
                 if (choke_group == 0)
                     choke_group = groups.len();
 
                 sfzfile.write(u" group=#. off_by=#. polyphony=#. off_mode=fast"_S.format(choke_group, choke_group, groups[_get<0>(keyrange).group()].polyphony()));
             }
+
             if (groups[_get<0>(keyrange).group()].output() > 0)
                 sfzfile.write(u" output=#."_S.format(groups[_get<0>(keyrange).group()].output()));
+
             if (_get<0>(keyrange).pan())
                 sfzfile.write(u" pan=#."_S.format(_get<0>(keyrange).pan()));
+
             if (_get<0>(keyrange).oneshot())
                 sfzfile.write(u" loop_mode=one_shot"_S);
+
             for (auto &&sequence : sequences)
                 if (in(_get<0>(keyrange).group(), sequence)) {
                     sfzfile.write(u" seq_length=#. seq_position=#."_S.format(sequence.len(), sequence.index(_get<0>(keyrange).group()) + 1));
@@ -588,16 +605,22 @@ public:
 
             for (auto &&zone : keyrange) {
                 sfzfile.write(u"\t<region> lovel=#03 hivel=#03 amp_velcurve_#03=1"_S.format(zone.minvel(), zone.maxvel(), zone.maxvel()));
+
                 if (zone.finetune())
                     sfzfile.write(u" tune=#."_S.format(zone.finetune()));
+
                 if (zone.volumeadjust())
                     sfzfile.write(u" volume=#."_S.format(zone.volumeadjust()));
+
                 if (zone.samplestart())
                     sfzfile.write(u" offset=#."_S.format(zone.samplestart()));
+
                 if (zone.sampleend() && zone.sampleend() < samples[zone.sampleindex()].length())
                     sfzfile.write(u" end=#."_S.format(zone.sampleend()));
+
                 if (zone._loop_())
                     sfzfile.write(u" loop_mode=loop_sustain loop_start=#. loop_end=#."_S.format(zone.loopstart(), zone.loopend() - 1));
+
                 if (groups[zone.group()].trigger() == 1)
                     sfzfile.write(u" trigger=release"_S);
 

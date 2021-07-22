@@ -629,6 +629,7 @@ template <typename T1> auto check(const T1 &number)
     auto candidate = 0;
     for (auto &&n : number)
         candidate = candidate * 10 + n;
+
     while (candidate != 89 && candidate != 1)
         candidate = next_step(candidate);
 

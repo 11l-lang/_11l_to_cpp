@@ -190,6 +190,7 @@ template <typename T1, typename T2 = decltype(u"# "_S), typename T3 = decltype(1
     }
 
     std::function<String(const int)> f = [&symbol](const auto &_){return symbol;};
+
     if (space == u"")
         space = u" "_S * symbol.len();
 
@@ -201,6 +202,7 @@ template <typename T1, typename T2 = decltype(u"# "_S), typename T3 = decltype(1
     }
 
     auto cell_str = [&f, &is_prime, &space](const auto &x){return is_prime[x] ? f(x) : space;};
+
     for (auto y : range_el(0, n))
         print(range_el(0, n).map([&n, &start, &y](const auto &x){return cell(n, x, y, start);}).map([&cell_str](const auto &v){return cell_str(v);}).join(u""_S));
     print();
@@ -425,6 +427,7 @@ template <typename T1> auto decodeUPC(const T1 &input)
         for (int i = 0; i < 6; i++) {
             part = candidate[range_el(pos, pos + 7)];
             pos += 7;
+
             if (in(part, ::LEFT_DIGITS))
                 output.append(::LEFT_DIGITS[part]);
             else
@@ -440,6 +443,7 @@ template <typename T1> auto decodeUPC(const T1 &input)
         for (int i = 0; i < 6; i++) {
             part = candidate[range_el(pos, pos + 7)];
             pos += 7;
+
             if (in(part, ::RIGHT_DIGITS))
                 output.append(::RIGHT_DIGITS[part]);
             else

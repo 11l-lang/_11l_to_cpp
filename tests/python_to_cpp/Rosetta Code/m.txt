@@ -279,6 +279,7 @@ template <typename T1> auto build_sems(T1 s)
     auto c = 2 * b;
     auto d = 3 * b;
     auto o = build_oms(z);
+
     for (auto j : range_el(0, z))
         for (auto i : range_el(0, z)) {
             auto a = _get<0>(o)[i][j];

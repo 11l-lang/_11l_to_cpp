@@ -644,6 +644,7 @@ template <typename T1> auto sieve(const T1 &limit)
                 break;
         }
     }
+
     for (auto i : range_el(3, limit).step(2))
         if (!c[i])
             primes.append(i);
@@ -1153,6 +1154,7 @@ template <typename T1> auto longest_increasing_subsequence(const T1 &x)
         auto newl = lo;
         P.set(i, M[newl - 1]);
         M.set(newl, i);
+
         if ((newl > l))
             l = newl;
     }
@@ -1243,6 +1245,7 @@ template <typename T1> auto longest_palindrome(const T1 &s)
         p.set(i, (r > i) && min(r - i, p[2 * c - i]) != 0);
         while (t[i + 1 + p[i]] == t[i - 1 - p[i]])
             p[i]++;
+
         if (i + p[i] > r)
             assign_from_tuple(c, r, make_tuple(i, i + p[i]));
     }
@@ -1882,6 +1885,7 @@ auto lychrel(BigInt n)
         }
         seen.append(n);
     }
+
     for (auto &&x : seen)
         ::cache.set(x, res);
     return res;

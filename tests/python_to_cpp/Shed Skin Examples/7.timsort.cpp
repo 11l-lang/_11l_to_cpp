@@ -34,6 +34,7 @@ template <typename T1, typename T2, typename T4, typename T5> auto array_copy(co
     }
     else
         copy_forward = true;
+
     if (copy_forward)
         for (auto offset : range_el(0, length))
             list2.set(base2 + offset, list1[base1 + offset]);
@@ -95,6 +96,7 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5, typen
     last_offset++;
     while (last_offset < offset) {
         auto midpoint = last_offset + (idiv((offset - last_offset), 2));
+
         if (comparefn(key, list_[base + midpoint]) < 0)
             offset = midpoint;
         else
@@ -161,6 +163,7 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5, typen
     last_offset++;
     while (last_offset < offset) {
         auto midpoint = last_offset + (idiv((offset - last_offset), 2));
+
         if (comparefn(key, list_[base + midpoint]) > 0)
             last_offset = midpoint + 1;
         else
@@ -485,6 +488,7 @@ public:
         assert(len2 >= 0);
         if (len2 == 0)
             return;
+
         if (len1 <= len2)
             merge_low(base1, len1, base2, len2);
         else
@@ -610,11 +614,14 @@ public:
                     break;
                 }
                 min_gallop--;
+
                 if (!(count1 >= initial_min_gallop || count2 >= initial_min_gallop))
                     break;
             }
+
             if (loops_done)
                 break;
+
             if (min_gallop < 0)
                 min_gallop = 0;
             min_gallop += 2;
@@ -714,6 +721,7 @@ public:
                 if (!((count1 | count2) < min_gallop))
                     break;
             }
+
             if (loops_done)
                 break;
 
@@ -760,8 +768,10 @@ public:
                 if (!(count1 >= initial_min_gallop || count2 >= initial_min_gallop))
                     break;
             }
+
             if (loops_done)
                 break;
+
             if (min_gallop < 0)
                 min_gallop = 0;
             min_gallop += 2;
@@ -808,6 +818,7 @@ public:
             new_size |= new_size >> 8;
             new_size |= new_size >> 16;
             new_size++;
+
             if (new_size < 0)
                 new_size = min_capacity;
             else

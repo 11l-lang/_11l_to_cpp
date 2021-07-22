@@ -79,6 +79,7 @@ auto create_tables()
     u"Create the feature and label tables."_S;
     Array<Array<double>> feature_table;
     Array<Array<int>> label_table;
+
     for (auto &&protein : ::PROTEINS)
         feature_table.append(protein.create_vector());
 
@@ -135,6 +136,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto train_adatron
                 if (difference > _get<0>(max_differences[klass]))
                     max_differences.set(klass, make_tuple(difference, col_counter));
             }
+
             if (all_map(max_differences, [&tolerance](const auto &max_difference){return _get<0>(max_difference) < tolerance;}))
                 return make_tuple(alphas, bias);
             else {
@@ -166,6 +168,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto calculate_err
             current_predictions.append(predictions[row_counter][col_counter]);
 
         auto predicted_class = current_predictions.index(max(current_predictions));
+
         if (label_table[col_counter][predicted_class] < 0)
             error++;
 

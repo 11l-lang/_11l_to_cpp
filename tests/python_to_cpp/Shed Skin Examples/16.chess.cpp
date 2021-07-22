@@ -221,6 +221,7 @@ template <typename T1> auto pseudoLegalMovesBlack(const T1 &board)
                             break;
                         retval.append(sq * 0x01'01 + k);
                     }
+
             if (b == -4 || b == -5)
                 for (auto &&line : ::rookLines)
                     for (auto &&k : line) {

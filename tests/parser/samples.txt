@@ -554,6 +554,7 @@ auto f()
         }
         print(n);
     }
+
     if (!was_break)
         print(u"no break"_S);
     }

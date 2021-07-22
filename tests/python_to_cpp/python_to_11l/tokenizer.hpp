@@ -88,6 +88,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
             }
             if (i == source.len())
                 break;
+
             if (in(source[i], u"\r\n#"_S))
                 continue;
 
@@ -122,6 +123,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
         }
 
         auto ch = source[i];
+
         if (in(ch, u" \t"_S))
             i++;
         else if (in(ch, u"\r\n"_S)) {
@@ -270,14 +272,17 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                     i++;
                 continue;
             }
+
             else
                 throw Error(u"unexpected character "_S & ch, lexem_start);
 
             tokens.append(Token(lexem_start, i, category));
         }
     }
+
     if (!nesting_elements.empty())
         throw Error(u"there is no corresponding closing parenthesis/bracket/brace for `"_S & _get<0>(nesting_elements.last()) & u"`"_S, _get<1>(nesting_elements.last()));
+
     if (expected_an_indented_block)
         throw Error(u"expected an indented block"_S, i);
 

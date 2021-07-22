@@ -110,10 +110,12 @@ template <typename T1, typename T2, typename T3 = decltype(u""_S)> Array<String>
     for (auto &&opt : _get<0>(options)) {
         if (prev != u"" && !comp(prev, opt))
             continue;
+
         if (options.len() == 1)
             return create_array({opt});
 
         auto res = amb(comp, options[range_ei(1)], opt);
+
         if (!res.empty())
             return opt + res;
     }
@@ -537,6 +539,7 @@ template <typename T1, typename T2, typename T3> auto print_circle(const T1 &lo,
             i++;
         }
     }
+
     for (auto i : range_ee(0, 2 * hi))
         print(canvas[i].map([](const auto &j){return j ? u"♦ "_S : u"  "_S;}).join(u""_S));
 }
@@ -682,6 +685,7 @@ struct CodeBlock2
                     print(universe[row][col] ? u"O "_S : u". "_S, u""_S);
                 print();
             }
+
             for (auto row : range_el(0, cellcounty))
                 for (auto col : range_el(0, cellcountx)) {
                     auto s = 0;
@@ -929,6 +933,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         print(u"<table>\n<tr><td>"_S, u""_S);
+
         for (auto &&c : input_csv)
             print([&](const auto &a){return a == u'\n' ? u"</td></tr>\n<tr><td>"_S : a == u',' ? u"</td><td>"_S : a == u'<' ? u"&lt;"_S : a == u'>' ? u"&gt;"_S : a == u'&' ? u"&amp;"_S : c;}(c), u""_S);
 
@@ -1145,6 +1150,7 @@ struct CodeBlock1
     {
         print(u"Police     Sanitation         Fire"_S);
         print(u"----------------------------------"_S);
+
         for (auto police : range_ee(2, 6).step(2))
             for (auto sanitation : range_ee(1, 7))
                 for (auto fire : range_ee(1, 7))
@@ -2007,6 +2013,7 @@ template <typename T1> auto kosaraju(const T1 &g)
             l.set(x, u);
         }
     };
+
     for (auto u : range_el(0, g.len()))
         visit(u);
     auto c = create_array({0}) * size;
@@ -2020,6 +2027,7 @@ template <typename T1> auto kosaraju(const T1 &g)
                 assign(v, root);
         }
     };
+
     for (auto &&u : l)
         assign(u, u);
     return c;
@@ -2123,6 +2131,7 @@ struct CodeBlock1
     {
         for (int Lindex = 0; Lindex < 10; Lindex++)
             mat.append(range_ee(1, 10).map([](const auto &x){return randomns::_(range_ee(1, 20));}));
+
         for (auto &&row : mat)
             for (auto &&el : row) {
                 print(el, u" "_S);
@@ -2801,6 +2810,7 @@ template <typename T1, typename T2> Array<dvec2> rdp(const T1 &l, const T2 &ε)
         }
         Lindex++;
     }}
+
     if (dMax > ε)
         return rdp(l[range_ee(0, x)], ε) + rdp(l[range_ei(x)], ε)[range_ei(1)];
 

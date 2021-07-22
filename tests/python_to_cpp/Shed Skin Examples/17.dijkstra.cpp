@@ -81,6 +81,7 @@ public:
     Graph()
     {
         Array<Vertex> v;
+
         for (int n = 0; n < 100; n++)
             v.append(Vertex(String(n + 1)));
 
@@ -114,6 +115,7 @@ public:
         if (!was_break)
             assert(false);
         }
+
         for (auto &&[u, v] : zip(ss[range_e_llen(0,  - 1)], ss[range_ei(1)]))
             {bool was_break = false;
             for (auto &&edge : ::G.e.filter([&u, &v](const auto &e){return e.u == u && e.v == v;})) {

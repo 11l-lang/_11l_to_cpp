@@ -197,6 +197,7 @@ public:
     {
         auto esfera_rayo = posicion - r.origen;
         auto v = esfera_rayo.pEscalar(r.direccion);
+
         if (v - radio > r.disInter)
             return false;
         auto distChoque = radio * radio + v * v - esfera_rayo.x * esfera_rayo.x - esfera_rayo.y * esfera_rayo.y - esfera_rayo.z * esfera_rayo.z;
@@ -306,6 +307,7 @@ public:
                 startline = max(0, to_int(_get<0>(line)));
                 endline = min(imgAlto - 1, to_int(_get<1>(line)));
             }
+
             else if (word == u"posCamara")
                 posCamara = parse_vector(line);
             else if (word == u"lookCamara")
@@ -378,6 +380,7 @@ template <typename T2> auto calculaSombra(Rayo &r, const T2 &objChoque)
     for (auto &&obj : ::scene.lObjetos) {
         r.objInter = nullptr;
         r.disInter = ::MAX_DIST;
+
         if (obj->intersecta(r) && &*obj != objChoque)
             sombra *= ::scene.lMateriales[obj->material].cTransmitividad;
     }
@@ -388,6 +391,7 @@ template <typename T2> auto calculaSombra(Rayo &r, const T2 &objChoque)
 template <typename T2> Color trazar(Rayo &r, const T2 &prof)
 {
     auto c = Color();
+
     for (auto &&obj : ::scene.lObjetos)
         obj->intersecta(r);
 

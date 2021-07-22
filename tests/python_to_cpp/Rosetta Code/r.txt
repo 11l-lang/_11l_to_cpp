@@ -130,6 +130,7 @@ struct CodeBlock1
                 auto j = mod((i + pow(2, k)), 17);
                 a[i].set(j, a[j].set(i, u'1'_C));
             }
+
         for (auto &&row : a)
             print(row.join(u" "_S));
         {bool was_break = false;
@@ -396,6 +397,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         ToReducedRowEchelonForm(mtx);
+
         for (auto &&rw : mtx)
             print(((rw.map([](const auto &rv){return String(rv);}))).join(u", "_S));
     }
@@ -814,6 +816,7 @@ template <typename T1> auto reverse_gender(T1 s)
 {
     auto words = create_array({u"She"_S, u"she"_S, u"Her"_S, u"her"_S, u"hers"_S, u"He"_S, u"he"_S, u"His"_S, u"his"_S, u"him"_S});
     auto repls = create_array({u"He_"_S, u"he_"_S, u"His_"_S, u"his_"_S, u"his_"_S, u"She_"_S, u"she_"_S, u"Her_"_S, u"her_"_S, u"her_"_S});
+
     for (auto &&[word, repl] : zip(words, repls))
         s = s.replace(re::_(uR"(\b)"_S & word & uR"(\b)"_S), repl);
 
@@ -1060,6 +1063,7 @@ struct CodeBlock1
     {
         while (x <= stop) {
             auto value = f(x);
+
             if (value == 0)
                 print(u"Root found at "_S & x);
             else if ((value > 0) != sgn)
@@ -2247,8 +2251,10 @@ template <typename T1, typename T2> auto rayintersectseg(T1 p, const T2 &edge)
         p = Pt(p.x, p.y + ::_eps);
 
     auto intersect = false;
+
     if ((p.y > b.y || p.y < a.y) || (p.x > max(a.x, b.x)))
         return false;
+
     if (p.x < min(a.x, b.x))
         intersect = true;
     else {

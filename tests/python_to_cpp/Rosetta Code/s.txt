@@ -561,6 +561,7 @@ struct CodeBlock2
     CodeBlock2()
     {
         {bool was_break = false;
+
         for (auto i : range_el(1, pow(10, 6)))
             if (is_square(non_square(i))) {
                 print(u"Square found "_S & i);
@@ -1613,6 +1614,7 @@ template <typename T1, typename T2> auto find_solution(const T1 &pz, const T2 &s
             }
             idx++;
         }
+
     if (1 == solve(p, sz, x, y, 2, cnt))
         for (auto j : range_el(0, sz)) {
             for (auto i : range_el(0, sz))
@@ -1799,6 +1801,7 @@ template <typename T1, typename T2, typename T3> auto solve(const T1 &pz, const 
             }
             f++;
         }
+
     for (auto y : range_el(0, h))
         for (auto x : range_el(0, w))
             if (pa[x][y] == 0) {
@@ -2286,6 +2289,7 @@ template <typename T1> auto cocktailshiftingbounds(T1 &A)
             }
 
         endIdx = newEndIdx;
+
         for (auto ii : range_el(endIdx, beginIdx - 1).step(-1))
             if (A[ii] > A[ii + 1]) {
                 swap(A[ii + 1], A[ii]);
@@ -2531,8 +2535,10 @@ template <typename T1> auto cycleSort(T1 &vector)
         for (auto &&item2 : vector[range_ei(cycleStart + 1)])
             if (item2 < item)
                 pos++;
+
         if (pos == cycleStart)
             goto on_continue;
+
         while (item == vector[pos])
             pos++;
         swap(vector[pos], item);
@@ -2544,6 +2550,7 @@ template <typename T1> auto cycleSort(T1 &vector)
             for (auto &&item2 : vector[range_ei(cycleStart + 1)])
                 if (item2 < item)
                     pos++;
+
             while (item == vector[pos])
                 pos++;
             swap(vector[pos], item);
@@ -2866,6 +2873,7 @@ template <typename T1, typename T2> auto merge(const T1 &left, const T2 &right)
             result.append(right[right_idx]);
             right_idx++;
         }
+
     if (left_idx < left.len())
         result.extend(left[range_ei(left_idx)]);
     if (right_idx < right.len())
@@ -3147,10 +3155,12 @@ template <typename T1, typename T2 = decltype(-1), typename T3 = decltype(-1)> a
         p = s;
 
     auto i = s - p;
+
     if (i >= s)
         return l;
 
     auto bins = create_array({Array<int>()}) * 10;
+
     for (auto &&e : l)
         bins[to_int(String(e).zfill(s)[i])].append(e);
 
@@ -3662,6 +3672,7 @@ struct CodeBlock1
     {
         for (auto i : range_ee(1, 10))
             stack.append(i);
+
         for (int i = 0; i < 10; i++)
             print(stack.pop());
     }
@@ -3734,6 +3745,7 @@ struct CodeBlock2
                 smap[sorted(s1 & s2).join(u""_S)].append(s1 & u" + "_S & s2);
             Lindex++;
         }}
+
         for (auto &&pairs : sorted(smap.values()))
             if (pairs.len() > 1)
                 print(pairs.join(u" = "_S));
@@ -4875,6 +4887,7 @@ struct CodeBlock1
     {
         s.append(seed);
         s.append(1);
+
         for (auto n : range_ee(2, 54))
             s.append(mod((s[n - 2] - s[n - 1]), pow(10, 9)));
     }
@@ -4911,6 +4924,7 @@ struct CodeBlock3
     {
         for (auto n : range_el(0, 219 - 54))
             getnextr();
+
         for (int i = 0; i < 5; i++)
             print(u"result = "_S & getnextr());
     }
@@ -5568,6 +5582,7 @@ Dict<ivec2, BigInt> computed;
 template <typename T1, typename T2> auto sterling1(const T1 &n, const T2 &k)
 {
     auto key = make_tuple(n, k);
+
     if (in(key, ::computed))
         return ::computed[key];
     if (equal(n, k, 0))
@@ -5715,6 +5730,7 @@ Dict<ivec2, BigInt> computed;
 template <typename T1, typename T2> auto sterling2(const T1 &n, const T2 &k)
 {
     auto key = make_tuple(n, k);
+
     if (in(key, ::computed))
         return ::computed[key];
     if (equal(n, k, 0))
@@ -7256,6 +7272,7 @@ template <typename T1> auto bead_sort(T1 &a)
 {
     auto maxv = max(a);
     auto beads = create_array({0}) * (maxv * a.len());
+
     for (auto i : range_el(0, a.len()))
         for (auto j : range_el(0, a[i]))
             beads.set(i * maxv + j, 1);
@@ -7266,6 +7283,7 @@ template <typename T1> auto bead_sort(T1 &a)
             sum += beads[i * maxv + j];
             beads.set(i * maxv + j, 0);
         }
+
         for (auto i : range_el(a.len() - sum, a.len()))
             beads.set(i * maxv + j, 1);
     }
@@ -7454,6 +7472,7 @@ ListSquareFrees(1000000000000, 1000000000145)
 template <typename T1> auto SquareFree(const T1 &_number)
 {
     auto max = to_int(sqrt(_number));
+
     for (auto root : range_ee(2, max))
         if (0 == mod(_number, (square(to_int64(root)))))
             return false;
@@ -8029,6 +8048,7 @@ public:
             placeNumber(pos + 1);
             return;
         }
+
         for (auto n : range_ee(1, 9))
             if (checkValidity(n, mod(pos, 9), idiv(pos, 9))) {
                 grid.set(pos, n);

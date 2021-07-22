@@ -14,6 +14,7 @@ template <typename T1> auto BF_interpreter(T1 prog)
     while (ip < len_prog) {
         auto x = prog[ip];
         ip++;
+
         if (x == u'+')
             tape.set(p, (tape[p] + 1) & CELL);
         else if (x == u'-')

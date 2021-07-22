@@ -79,6 +79,7 @@ template <typename T1, typename T2> auto kpp(T1 &points, T2 &cluster_centers)
             Lindex++;
         }}
     }
+
     for (auto &&p : points)
         p.group = _get<0>(nearest_cluster_center(p, cluster_centers));
 }
@@ -118,6 +119,7 @@ template <typename T1, typename T2> auto lloyd(T1 &points, const T2 &nclusters)
                 p.group = min_i;
             }
         }
+
         if (changed <= lenpts10)
             break;
     }

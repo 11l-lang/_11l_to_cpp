@@ -230,6 +230,7 @@ public:
     {
         __endtime = Time().unix_time();
         __status = 2;
+
         if (::board_notifyOnCompletion)
             print(stats()[u"turns"_S]);
     }

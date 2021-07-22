@@ -714,6 +714,7 @@ template <typename T1> auto is_possible_kolakoski(const T1 &s)
         r.append(count);
         i += count;
     }
+
     for (auto i : range_el(0, r.len()))
         if (r[i] != s[i])
             return false;
@@ -830,6 +831,7 @@ template <typename T1> auto kosaraju(const T1 &g)
             l.set(x, u);
         }
     };
+
     for (auto u : range_el(0, g.len()))
         visit(u);
     auto c = create_array({0}) * size;
@@ -843,6 +845,7 @@ template <typename T1> auto kosaraju(const T1 &g)
                 assign(v, root);
         }
     };
+
     for (auto &&u : l)
         assign(u, u);
 

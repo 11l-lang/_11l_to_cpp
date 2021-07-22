@@ -50,6 +50,7 @@ public:
             outfile.write = [&result](const auto &s){return result.append(s);};
         else
             outfile.write = [&outfilef](const auto &s){return outfilef->write(s);};
+
         if (to_html_called_inside_to_html_outer_pos_list.len() == 1)
             this->instr = instr;
 
@@ -354,6 +355,7 @@ public:
                     else
                         close_ordered_list();
                 }
+
                 if (ch == u' ')
                     write_to_i(u"&emsp;"_S);
                 else if (ch == u'-') {
@@ -669,6 +671,7 @@ public:
 
                         j++;
                     }
+
                     for (auto y : range_el(table.len() - 1, -1).step(-1))
                         for (auto x : range_el(table[y].len() - 1, -1).step(-1))
                             if (in(table[y][x].attrs, make_tuple(u"-"_S, u"|"_S))) {

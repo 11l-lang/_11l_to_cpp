@@ -131,6 +131,7 @@ template <typename T2, typename T3, typename T4> auto perm(Array<Array<int>> &pu
             for (int c = 0; c < 9; c++)
                 puzzlebackup.append(puzzle[c][range_ei(0)]);
             solvePuzzleSimple(puzzle);
+
             for (auto c : range_el(0, u.len()))
                 if (!hash_lookup(puzzle)) {
                     int inew;
@@ -143,6 +144,7 @@ template <typename T2, typename T3, typename T4> auto perm(Array<Array<int>> &pu
                         hash_add(puzzle);
                     u.insert(c, make_tuple(inew, jnew));
                 }
+
             for (int y = 0; y < 9; y++)
                 for (int x = 0; x < 9; x++)
                     puzzle[x].set(y, puzzlebackup[x][y]);
@@ -180,6 +182,7 @@ auto solve()
             u.append(make_tuple(x, y));
             lcount.append(genMoveList(puzzle, x, y).len());
         }
+
     for (auto j : range_ee(0, 8))
         for (auto i : range_el(j, 9))
             if (i != j) {

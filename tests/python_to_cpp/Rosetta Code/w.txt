@@ -450,6 +450,7 @@ template <typename T2, typename T3, typename T4> auto try_location(Grid &grid, c
     auto r = idiv(pos, ::n_cols);
     auto c = mod(pos, ::n_cols);
     auto length = word.len();
+
     if ((_get<0>(::dirs[direction]) == 1 && (length + c) > ::n_cols) || (_get<0>(::dirs[direction]) == -1 && (length - 1) > c) || (_get<1>(::dirs[direction]) == 1 && (length + r) > ::n_rows) || (_get<1>(::dirs[direction]) == -1 && (length - 1) > r))
         return 0;
 
@@ -560,8 +561,10 @@ template <typename T1> auto print_result(const T1 &grid)
         print();
     }
     print();
+
     for (auto i : range_el(0, size - 1).step(2))
         print(u"#.   #."_S.format(grid.solutions[i], grid.solutions[i + 1]));
+
     if (mod(size, 2) == 1)
         print(grid.solutions[size - 1]);
 }
@@ -961,6 +964,7 @@ struct CodeBlock1
             records.sort();
             for (int i = 0; i < 4; i++)
                 points[i][records[i]]++;
+
             if (!nextResult())
                 break;
         }

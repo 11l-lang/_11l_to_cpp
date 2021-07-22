@@ -546,6 +546,7 @@ template <typename T1> auto compress(const T1 &uncompressed)
             w = c;
         }
     }
+
     if (!w.empty())
         result.append(dictionary[w]);
     return result;
@@ -673,6 +674,7 @@ template <typename T1> auto can_make_word(const T1 &word)
         return false;
 
     auto blocks_remaining = u"BO XK DQ CP NA GT RE TG QD FS JW HU VI AN OB ER FS LY PC ZM"_S.split(u" "_S);
+
     for (auto &&ch : word.uppercase())
         {bool was_break = false;
         for (auto &&block : blocks_remaining)
@@ -1086,6 +1088,7 @@ struct CodeBlock1
                 }
                 }
         }
+
         for (auto &&ana : anagram.values())
             if (ana.len() > 1 && _get<0>(ana).len() == count)
                 print(ana);
@@ -1672,6 +1675,7 @@ struct CodeBlock3
     {
         symbol(u"("_S).nud = nud_parens;
         symbol(u")"_S);
+
         for (auto &&expr_str : create_array({u"-2 / 2 + 4 + 3 * 2"_S, u"2 * (3 + (4 * 5 + (6 * 7) * 8) - 9) * 10"_S}))
             print(expr_str & u" = "_S & String(parse(expr_str)->eval()));
     }
@@ -1709,8 +1713,10 @@ struct CodeBlock1
     {
         for (auto &&[key, value] : d)
             print(key & u" = "_S & value);
+
         for (auto &&key : d.keys())
             print(key);
+
         for (auto &&value : d.values())
             print(value);
     }
@@ -2209,6 +2215,7 @@ template <typename T1> auto benford(const T1 &seq)
             freqs.set(i, make_tuple(_get<0>(freqs[i]), _get<1>(freqs[i]) + 1));
             seq_len++;
         }
+
     for (auto i : range_el(0, freqs.len()))
         freqs.set(i, make_tuple(log10(1.0 + 1.0 / (i + 1)), _get<1>(freqs[i]) / seq_len));
 
@@ -2472,6 +2479,7 @@ template <typename T1, typename T2> auto getgroup(T1 s, const T2 &depth)
                 return make_tuple(out, s[range_ei(1)]);
             return make_tuple(out.map([](const auto &a){return u"{"_S & a & u"}"_S;}), s[range_ei(1)]);
         }
+
         if (_get<0>(s) == u',')
             assign_from_tuple(comma, s, make_tuple(true, s[range_ei(1)]));
     }
@@ -4458,6 +4466,7 @@ struct CodeBlock1
     {
         for (auto i : range_ee(1, 11))
             print(String(i) & u": "_S & _get<0>(farey(i)));
+
         for (auto i : range_el(100, 1000 + 100).step(100))
             print(String(i) & u": "_S & String(_get<1>(farey(i))) & u" items"_S);
     }
@@ -6411,6 +6420,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         print(harshad(20));
+
         for (auto n : range_ei(1001))
             if (is_harshad(n)) {
                 print(n);
@@ -6843,6 +6853,7 @@ struct CodeBlock1
     {
         _set<1>(qseq, 1);
         _set<2>(qseq, 1);
+
         for (auto i : range_el(3, qseq.len()))
             qseq.set(i, qseq[i - qseq[i - 1]] + qseq[i - qseq[i - 2]]);
 
@@ -7122,6 +7133,7 @@ L(row) identity_matrix(3)
 template <typename T1> auto identity_matrix(const T1 &size)
 {
     auto matrix = create_array({create_array({0}) * size}) * size;
+
     for (auto i : range_el(0, size))
         matrix[i].set(i, 1);
 
@@ -8337,6 +8349,7 @@ template <typename T2, typename T3> auto add_with_carry(Array<Char> &result, T2 
         auto addend_result = String(to_int(addend) + to_int(result[addendpos]));
         auto addend_digits = create_array(addend_result);
         result.set(addendpos, addend_digits.pop());
+
         if (addend_digits.empty())
             break;
         addend = addend_digits.pop();
@@ -8435,6 +8448,7 @@ template <typename T1> auto lookandsay(T1 number)
     auto repeat = _get<0>(number);
     number = number[range_ei(1)] & u" "_S;
     auto times = 1;
+
     for (auto &&actual : number)
         if (actual != repeat) {
             result &= String(times) & repeat;
@@ -9033,6 +9047,7 @@ struct CodeBlock4
 
         black_stack.append(red_swap);
         red_stack.append(black_swap);
+
         if (black_stack.count(Black) == red_stack.count(Red))
             print(u"Yeha! The mathematicians assertion is correct."_S);
         else
@@ -9153,8 +9168,10 @@ struct CodeBlock1
                 }
                 huh++;
             }
+
             if (user == 1)
                 stay++;
+
             if (_get<0>(lst) == 1)
                 _switch_++;
         }
@@ -10934,6 +10951,7 @@ template <typename T1, typename T2> auto calc_difference(const T1 &m, T2 &d)
     auto h = m.len();
     auto w = _get<0>(m).len();
     auto total = 0.0;
+
     for (auto i : range_el(0, h))
         for (auto j : range_el(0, w)) {
             auto v = 0.0;
@@ -11541,6 +11559,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         employees.sort([](const auto &e){return e.name;});
+
         for (auto &&e : employees)
             print(u"#<6 : #."_S.format(e.name, e.category));
     }
@@ -12515,6 +12534,7 @@ template <typename T1> auto toposort2(T1 &data)
     for (auto &&v : data.values())
         extra_items_in_deps.update(v);
     extra_items_in_deps = extra_items_in_deps - create_set(data.keys());
+
     for (auto &&item : extra_items_in_deps)
         data.set(item, Set<String>());
 
@@ -12925,6 +12945,7 @@ struct CodeBlock3
                 print(u"Left: "_S & n);
                 break;
             }
+
         for (auto n : range_el(MAX_PRIME - 1, 0).step(-2))
             if (right_trunc(n)) {
                 print(u"Right: "_S & n);
@@ -13207,6 +13228,7 @@ template <typename T1, typename T2, typename T4, typename T6 = decltype(0)> auto
             Lindex++;
         }}
         print();
+
         if (st == halt)
             break;
         if (!in(make_tuple(st, tape[pos]), rules))
@@ -13381,6 +13403,7 @@ template <typename T1> auto url_encode(const T1 &s)
             buf = u""_S;
         }
     };
+
     for (auto &&c : s)
         if (in(c, range_ee(u'0'_C, u'9'_C)) || in(c, range_ee(u'a'_C, u'z'_C)) || in(c, range_ee(u'A'_C, u'Z'_C)) || in(c, u"_.-~"_S)) {
             flush_buf();
@@ -13713,6 +13736,7 @@ struct CodeBlock1
                 supply.pop(f);
             }
         }
+
         for (auto &&n : cols)
             print(u"\t "_S & n, u" "_S);
         print();
@@ -15374,6 +15398,7 @@ public:
     template <typename T1> Playfair(const T1 &key)
     {
         auto m = partition(uniq(canonicalize(key & u"ABCDEFGHIJKLMNOPQRSTUVWXYZ"_S)), 5);
+
         for (auto &&row : m)
             for (auto &&[i, j] : cart_product(range_el(0, 5), range_el(0, 5)))
                 if (i != j)
@@ -15385,6 +15410,7 @@ public:
                 if (i != j)
                     enc.set(c[i] & c[j], c[mod((i + 1), 5)] & c[mod((j + 1), 5)]);
         }
+
         for (auto &&[i1, _j1_, i2, j2] : cart_product(range_el(0, 5), range_el(0, 5), range_el(0, 5), range_el(0, 5)))
             if (i1 != i2 && _j1_ != j2)
                 enc.set(m[i1][_j1_] & m[i2][j2], m[i1][j2] & m[i2][_j1_]);
@@ -16174,6 +16200,7 @@ template <typename T1, typename T2> auto deduce(const T1 &hr, const T2 &vr)
             fix_row(i);
         mod_rows.clear();
     }
+
     if (all(multiloop(range_el(0, w), range_el(0, h), [&can_do](const auto &j, const auto &i){return in(can_do[i][j], make_tuple(1, 2));})))
         print(u"Solution would be unique"_S);
     else
@@ -17211,6 +17238,7 @@ template <typename T1> auto from_edges(const T1 &edges)
     auto nodes = DefaultDict<int, Node>();
     for (auto &&[v, w] : edges)
         nodes[v].succ.append(nodes[w]);
+
     for (auto &&[i, v] : nodes)
         v.id = i;
 
@@ -17229,6 +17257,7 @@ template <typename T1> auto trajan(T1 &vv)
         for (auto &&w : v.succ) {
             if (w.root == -2)
                 r.extend(strongconnect(w, s));
+
             if (w.root >= 0)
                 v.root = min(v.root, w.root);
         }
@@ -17485,11 +17514,13 @@ public:
         disc.set(_this_, low.set(_this_, _order));
         _order++;
         stack.append(_this_);
+
         for (auto &&neighbr : graph[_this_])
             if (!in(neighbr, disc)) {
                 _visitor(neighbr);
                 low.set(_this_, min(low[_this_], low[neighbr]));
             }
+
             else if (in(neighbr, stack))
                 low.set(_this_, min(low[_this_], disc[neighbr]));
 
@@ -17513,6 +17544,7 @@ public:
         )"_S;
 
         _order = 0;
+
         for (auto &&vertex : sorted(graph.keys()))
             if (!in(vertex, disc))
                 _visitor(vertex);
