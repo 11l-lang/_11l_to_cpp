@@ -73,7 +73,6 @@ Error: unindent does not match any outer indentation level
 } code_block_1;
 
 auto keywords = create_array({u"V"_S, u"C"_S, u"I"_S, u"E"_S, u"F"_S, u"L"_S, u"N"_S, u"R"_S, u"S"_S, u"T"_S, u"X"_S, u"П"_S, u"С"_S, u"Е"_S, u"И"_S, u"Ф"_S, u"Ц"_S, u"Н"_S, u"Р"_S, u"В"_S, u"Т"_S, u"Х"_S, u"var"_S, u"in"_S, u"if"_S, u"else"_S, u"fn"_S, u"loop"_S, u"null"_S, u"return"_S, u"switch"_S, u"type"_S, u"exception"_S, u"перем"_S, u"С"_S, u"если"_S, u"иначе"_S, u"фн"_S, u"цикл"_S, u"нуль"_S, u"вернуть"_S, u"выбрать"_S, u"тип"_S, u"исключение"_S});
-
 Array<String> empty_list_of_str;
 Array<Array<String>> binary_operators = create_array({empty_list_of_str, create_array<String>({String(u"+"_S), u"-"_S, u"*"_S, u"/"_S, u"%"_S, u"^"_S, u"&"_S, u"|"_S, u"<"_S, u">"_S, u"="_S, u"?"_S}), create_array({u"<<"_S, u">>"_S, u"<="_S, u">="_S, u"=="_S, u"!="_S, u"+="_S, u"-="_S, u"*="_S, u"/="_S, u"%="_S, u"&="_S, u"|="_S, u"^="_S, u"->"_S, u".."_S, u".<"_S, u".+"_S, u"<."_S, u"I/"_S, u"Ц/"_S, u"C "_S, u"С "_S}), create_array({u"<<="_S, u">>="_S, u"‘’="_S, u"[+]"_S, u"[&]"_S, u"[|]"_S, u"(+)"_S, u"<.<"_S, u"I/="_S, u"Ц/="_S, u"in "_S, u"!C "_S, u"!С "_S}), create_array({u"[+]="_S, u"[&]="_S, u"[|]="_S, u"(+)="_S, u"!in "_S})});
 Array<Array<String>> unary_operators = create_array({empty_list_of_str, create_array({String(u"!"_S)}), create_array({u"++"_S, u"--"_S}), create_array({u"(-)"_S})});
@@ -358,7 +357,6 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                         break;
                     i++;
                 }
-
                 auto j = i - 1;
                 while (j > lexem_start) {
                     if (source[j] == u':') {

@@ -432,7 +432,6 @@ public:
                                 writepos = i + 2;
                             }
                         }
-
                         ending_tags.append(u"</blockquote>"_S);
                     }
                     i++;
@@ -442,7 +441,6 @@ public:
             if (ch == u'‘') {
                 auto prevci = i - 1;
                 auto prevc = prevci >= 0 ? instr[prevci] : u'\0'_C;
-
                 auto startqpos = i;
                 i = find_ending_pair_quote(i);
                 auto endqpos = i;

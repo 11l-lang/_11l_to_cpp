@@ -470,11 +470,9 @@ V xVal = (0.<32).map(i -> i * 0.05)
 V tSin = xVal.map(x -> sin(x))
 V tCos = xVal.map(x -> cos(x))
 V tTan = xVal.map(x -> tan(x))
-
 V iSin = thieleInterpolator(tSin, xVal, 0.5)
 V iCos = thieleInterpolator(tCos, xVal, 0.5)
 V iTan = thieleInterpolator(tTan, xVal, 1)
-
 print(‘#.14’.format(6 * iSin))
 print(‘#.14’.format(3 * iCos))
 print(‘#.14’.format(4 * iTan))
@@ -502,7 +500,6 @@ auto xVal = range_el(0, 32).map([](const auto &i){return i * 0.05;});
 auto tSin = xVal.map([](const auto &x){return sin(x);});
 auto tCos = xVal.map([](const auto &x){return cos(x);});
 auto tTan = xVal.map([](const auto &x){return tan(x);});
-
 auto iSin = thieleInterpolator(tSin, xVal, 0.5);
 auto iCos = thieleInterpolator(tCos, xVal, 0.5);
 auto iTan = thieleInterpolator(tTan, xVal, 1);
@@ -766,7 +763,6 @@ F try_swaps(&deck, f, =s, d, n)
          L.continue
 
       deck[i2] = i2
-
       L(j) 0 .. i2
          deck2[j] = deck[i2 - j]
       try_swaps(&deck2, f [|] k, s, 1 + d, n)
@@ -2073,9 +2069,7 @@ L(line) File(:argv[1]).read().rtrim("\n").split("\n")
          I nodata_max < nodata & nodata > 0
             nodata_max = nodata
             nodata_maxline = [date]
-
          nodata = 0
-
          tot_line += datum
          num_line++
 
@@ -2123,9 +2117,7 @@ int MAIN_WITH_ARGV()
                     nodata_max = nodata;
                     nodata_maxline = create_array({date});
                 }
-
                 nodata = 0;
-
                 tot_line += datum;
                 num_line++;
             }
@@ -2376,7 +2368,6 @@ F _topx(data, tops, &_sofar) -> [[String]]
       _topx(data, depends, &_sofar)
    [[String]] ordered
    V accum = Set[String]()
-
    L(i) (_sofar.len - 1 .< -1).step(-1)
       ordered [+]= sorted(Array(_sofar[i] - accum))
       accum.update(_sofar[i])
@@ -2390,7 +2381,6 @@ F toplevels(&data)
    L(k, v) data
       v.discard(k)
    V dependents = Set[String]()
-
    L(k, v) data
       dependents.update(v)
    R Set(data.keys()) - dependents
@@ -2399,7 +2389,6 @@ F topx(&data, tops)
    ‘Extract the set of top-level(s) in topological order’
    L(k, v) data
       v.discard(k)
-
    [Set[String]] _sofar
    R _topx(data, tops, &_sofar)
 
@@ -2434,7 +2423,6 @@ template <typename T1, typename T2, typename T3> Array<Array<String>> _topx(cons
         _topx(data, depends, _sofar);
     Array<Array<String>> ordered;
     auto accum = Set<String>();
-
     for (auto i : range_el(_sofar.len() - 1, -1).step(-1)) {
         ordered.append(sorted(create_array(_sofar[i] - accum)));
         accum.update(_sofar[i]);
@@ -2461,7 +2449,6 @@ template <typename T1, typename T2> auto topx(T1 &data, const T2 &tops)
     u"Extract the set of top-level(s) in topological order"_S;
     for (auto &&[k, v] : data)
         v.discard(k);
-
     Array<Set<String>> _sofar;
     return _topx(data, tops, _sofar);
 }

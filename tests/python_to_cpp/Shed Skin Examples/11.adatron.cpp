@@ -86,7 +86,6 @@ auto create_tables()
         if (protein.type_id == ::BLIND)
             continue;
         auto labels = create_array({-1}) * 4;
-
         labels[protein.type_id] *= -1;
         label_table.append(labels);
     }
@@ -180,7 +179,6 @@ int main()
         load_file(filename, type_id);
     print(u"Creating feature tables..."_S);
     auto [feature_table, label_table] = create_tables();
-
     print(u"Creating kernel table..."_S);
     auto kernel_table = create_kernel_table(feature_table);
     print(u"Training SVM..."_S);

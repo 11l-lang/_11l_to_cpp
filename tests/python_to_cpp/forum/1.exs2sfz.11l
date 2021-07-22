@@ -19,6 +19,7 @@ F chunk_size(instrument_data, offset)
    R 84 + UInt32.unpack_from(instrument_data, offset + 4)
 
 T EXSChunk
+
    Int offset
    __size = 0
 
@@ -71,6 +72,7 @@ T EXSChunk
 V EXSHeader_sig = 0000'0101
 
 T EXSHeader(EXSChunk)
+
    F (offset)
       .offset = offset
 
@@ -78,6 +80,7 @@ T EXSHeader(EXSChunk)
          X RuntimeError(‘Found header at location  other than beginning of file! offset is #.’.format(offset))
 
 T EXSZone(EXSChunk)
+
    F (offset)
       .offset = offset
 
@@ -132,6 +135,7 @@ T EXSZone(EXSChunk)
       R UInt32.unpack_from(:instrument_data, .offset + 176)
 
 T EXSGroup(EXSChunk)
+
    F (offset)
       .offset = offset
 
@@ -147,6 +151,7 @@ T EXSGroup(EXSChunk)
       R Int32.unpack_from(:instrument_data, .offset + 164)
 
 T EXSSample(EXSChunk)
+
    F (offset)
       .offset = offset
 
@@ -160,10 +165,12 @@ T EXSSample(EXSChunk)
       R Byte.unpack_from(:instrument_data, .offset + 96)
 
 T EXSParam(EXSChunk)
+
    F (offset)
       .offset = offset
 
 T EXSSamplePool
+
    [String] locations
    String base
 
@@ -215,6 +222,7 @@ T EXSSamplePool
    F.virtual.abstract path(String filename) -> String
 
 T EXSSamplePoolDummy(EXSSamplePool)
+
    String name
 
    F (name = ‘’)
@@ -224,6 +232,7 @@ T EXSSamplePoolDummy(EXSSamplePool)
       R fs:path:join(.name, filename)
 
 T EXSSamplePoolFixed(EXSSamplePool)
+
    F (path)
       I fs:is_dir(path)
          .base = fs:path:dir_name(path)
@@ -234,6 +243,7 @@ T EXSSamplePoolFixed(EXSSamplePool)
       R fs:path:join(.base, .locate(filename), filename)
 
 T EXSSamplePoolLocator(EXSSamplePool)
+
    F (exsfile_name)
       .base = fs:path:dir_name(exsfile_name)
 
@@ -241,9 +251,11 @@ T EXSSamplePoolLocator(EXSSamplePool)
       R fs:path:join(.locate(filename, 4), filename)
 
 T EXSInstrument
+
    EXSSamplePool pool
 
    String exsfile_name
+
    [EXSZone] zones
    [EXSGroup] groups
    [EXSSample] samples
@@ -302,6 +314,7 @@ T EXSInstrument
             I 0B
                L.break
          L.was_no_break
+
             [Int] sequence
 
             V cont = 1B
@@ -326,6 +339,7 @@ T EXSInstrument
       R sequences
 
    F convert(sfzfilename, overwrite = 0B)
+
       V sequences = .build_sequences()
 
       F get_sequence_position(zone)
@@ -350,6 +364,7 @@ T EXSInstrument
 
       [(Int, Int, Int, Int, Int) = Int] key_sequence
       L(key) sorted(ranges.keys())
+
          V keyrange = ranges[key]
          V group = keyrange[0].group()
 
@@ -393,6 +408,7 @@ T EXSInstrument
                choke_voices[(zone.minvel(), zone.maxvel())] = 1
 
          I .groups[keyrange[0].group()].polyphony() == choke_voices[(keyrange[0].minvel(), keyrange[0].maxvel())]
+
             I choke_group == 0
                choke_group = .groups.len
 
@@ -440,6 +456,7 @@ T EXSInstrument
             sfzfile.write("\n")
 
 :start:
+
 I :argv.len < 3 | :argv.len > 4
    print(‘Usage: #. EXSfile.exs SFZfile.sfz [samplefolder]’.format(‘1.exs2sfz.py’))
    print()

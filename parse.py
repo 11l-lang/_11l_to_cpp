@@ -6,7 +6,7 @@ except ImportError:
     from . import tokenizer
 from typing import List, Tuple, Dict, Callable, Set
 from enum import IntEnum
-import os, eldf
+import os, re, eldf
 
 class Error(Exception):
     def __init__(self, message, token):
@@ -1004,9 +1004,11 @@ def pre_nl(toki = None):
         toki = tokeni
     if toki > 0:
         ti = toki - 1
-        while ti > 0 and tokens[ti].category in (Token.Category.SCOPE_END, Token.Category.STATEMENT_SEPARATOR):
+        while ti > 0 and (tokens[ti].category in (Token.Category.SCOPE_END, Token.Category.STATEMENT_SEPARATOR) or (tokens[ti].category == Token.Category.SCOPE_BEGIN and tokens[ti].value(source) != '{')): # }
             ti -= 1
-        return (min(source[tokens[ti].end:tokens[toki].start].count("\n"), 2) - 1) * "\n"
+        lines_with_comments = len(re.findall(r'\n[ \t]*//',
+                    source[tokens[ti].end:tokens[toki].start]))
+        return (min(source[tokens[ti].end:tokens[toki].start].count("\n") - lines_with_comments, 2) - 1) * "\n"
     return ''
 
 class ASTNodeWithChildren(ASTNode):
@@ -1028,7 +1030,10 @@ class ASTNodeWithChildren(ASTNode):
         r += ' ' * (indent*4) + t + (("\n" + ' ' * (indent*4) + "{\n") if place_opening_curly_bracket_on_its_own_line else " {\n") # }
         r += add_at_beginning
         for c in self.children:
-            r += c.to_str(indent+1)
+            s = c.to_str(indent+1)
+            if c is self.children[0] and add_at_beginning.endswith("\n\n"):
+                s = s.lstrip("\n")
+            r += s
         return r + ' ' * (indent*4) + "}\n"
 
     def children_to_str_detect_single_stmt(self, indent, r, check_for_if = False):

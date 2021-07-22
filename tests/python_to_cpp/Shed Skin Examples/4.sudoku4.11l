@@ -22,7 +22,6 @@ F search(values) -> [String = String]
       R Dict()
    I all(:squares.map(s -> @values[s].len == 1))
       R values
-
    V s = min(:squares.filter(s -> @values[s].len > 1).map(s -> (@values[s].len, s)))[1]
    L(d) values[s]
       V values_copy = values.copy()
@@ -49,7 +48,6 @@ F eliminate([String = String] &values; s, d) -> [String = String]
       V d2 = values[s][0]
       I !all(:peers[s].map(s2 -> !eliminate(&@values, s2, @d2).empty))
          R Dict()
-
    L(u) :units[s]
       V dplaces = u.filter(s -> @d C @values[s])
       I dplaces.empty

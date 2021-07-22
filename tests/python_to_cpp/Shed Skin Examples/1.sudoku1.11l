@@ -94,6 +94,7 @@ F perm([[Int]] &puzzle; i, j, =l, [(Int, Int)] &u)
       R 1B
    E
       I l.empty
+
          [[Int]] puzzlebackup
          L(c) 9
             puzzlebackup.append(puzzle[c][0..])
@@ -105,7 +106,6 @@ F perm([[Int]] &puzzle; i, j, =l, [(Int, Int)] &u)
                Int jnew
                (inew, jnew) = u.pop(c)
                l = genMoveList(puzzle, inew, jnew)
-
                I perm(&puzzle, inew, jnew, l, &u)
                   R 1B
                E

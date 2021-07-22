@@ -38,7 +38,6 @@ F mov([Int] &board; mv)
    V ix = (mv >> 8) [&] f'f
    board[mv [&] f'f] = board[ix]
    board[ix] = 0
-
    L(i) :clearCastlingOpportunities[ix]
       board[i] = :iFalse
 
@@ -278,14 +277,12 @@ F pseudoLegalCaptures(board)
 F legalMoves(board)
    V allMoves = pseudoLegalMoves(board)
    [Int] retval
-
    V kingVal = 6
    I board[26]
       kingVal = -kingVal
    L(mv) allMoves
       V board2 = copy(board)
       mov(&board2, mv)
-
       I pseudoLegalCaptures(board2).filter(i -> @board2[i [&] f'f] == @kingVal).empty
          retval.append(mv)
    R retval
@@ -315,7 +312,6 @@ F alphaBetaQui(board, =alpha, beta, n)
 F alphaBeta(board, =alpha, beta, n)
    I n == 0
       R alphaBetaQui(board, alpha, beta, n)
-
    V bestMove = :iNone
 
    L(mv) legalMoves(board)

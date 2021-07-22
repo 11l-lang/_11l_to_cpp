@@ -42,7 +42,6 @@ template <typename T1, typename T2 = decltype(BETA0), typename T3 = decltype(BET
             boundary--;
             print(u"warningB"_S);
         }
-
         if ((c == u'1')) {
             a = boundary;
             tot1++;
@@ -71,7 +70,6 @@ template <typename T1, typename T2 = decltype(BETA0), typename T3 = decltype(BET
         assert(b >= ::HALF);
         assert(a >= 0);
         assert(b <= ::ONE);
-
         while (((a > ::QUARTER) && (b < ::THREEQU))) {
             _get<0>(charstack)++;
             a = 2 * a - ::HALF;
@@ -129,7 +127,6 @@ template <typename T1, typename T2 = decltype(10000), typename T3 = decltype(BET
             u = halfway;
         else if ((c == u'0'))
             v = halfway;
-
         while ((1)) {
             auto firsttime = 0;
             if ((model_needs_updating)) {
@@ -185,7 +182,6 @@ template <typename T1, typename T2 = decltype(10000), typename T3 = decltype(BET
             assert(b >= ::HALF);
             assert(a >= 0);
             assert(b <= ::ONE);
-
             while (((a > ::QUARTER) && (b < ::THREEQU))) {
                 a = 2 * a - ::HALF;
                 b = 2 * b - ::HALF;

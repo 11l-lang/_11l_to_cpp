@@ -493,7 +493,6 @@ F compress(uncompressed)
          w = wc
       E
          result.append(dictionary[w])
-
          dictionary[wc] = dict_size
          dict_size++
          w = c
@@ -542,7 +541,6 @@ template <typename T1> auto compress(const T1 &uncompressed)
             w = wc;
         else {
             result.append(dictionary[w]);
-
             dictionary.set(wc, dict_size);
             dict_size++;
             w = c;
@@ -1826,7 +1824,6 @@ F mean_time(times)
    V m = mean_seconds % 3600
    V s = m % 60
    m = m I/ 60
-
    R ‘#02:#02:#02’.format(h, m, s)
 
 print(mean_time([‘23:00:17’, ‘23:40:20’, ‘00:12:45’, ‘00:17:19’]))
@@ -1852,7 +1849,6 @@ template <typename T1> auto mean_time(const T1 &times)
     auto m = mod(mean_seconds, 3600);
     auto s = mod(m, 60);
     m = idiv(m, 60);
-
     return u"#02:#02:#02"_S.format(h, m, s);
 }
 
@@ -3422,7 +3418,6 @@ os.rmdir("/docs")
 ===
 fs:remove_file(‘output.txt’)
 fs:remove_dir(‘docs’)
-
 fs:remove_file(‘/output.txt’)
 fs:remove_dir(‘/docs’)
 ===
@@ -3432,7 +3427,6 @@ struct CodeBlock1
     {
         fs::remove_file(u"output.txt"_S);
         fs::remove_dir(u"docs"_S);
-
         fs::remove_file(u"/output.txt"_S);
         fs::remove_dir(u"/docs"_S);
     }
@@ -3892,13 +3886,11 @@ F eulers_sum_of_powers()
    V max_n = 150
    V pow_5 = (0 .< max_n).map(n -> Int64(n) ^ 5)
    V pow5_to_n = Dict(0 .< max_n, n -> (Int64(n) ^ 5, n))
-
    L(x0) 1 .< max_n
       L(x1) 1 .< x0
          L(x2) 1 .< x1
             L(x3) 1 .< x2
                V pow_5_sum = pow_5[x0] + pow_5[x1] + pow_5[x2] + pow_5[x3]
-
                I pow_5_sum C pow5_to_n
                   V y = pow5_to_n[pow_5_sum]
                   R (x0, x1, x2, x3, y)
@@ -3917,7 +3909,6 @@ auto eulers_sum_of_powers()
             for (auto x2 : range_el(1, x1))
                 for (auto x3 : range_el(1, x2)) {
                     auto pow_5_sum = pow_5[x0] + pow_5[x1] + pow_5[x2] + pow_5[x3];
-
                     if (in(pow_5_sum, pow5_to_n)) {
                         auto y = pow5_to_n[pow_5_sum];
                         return make_tuple(x0, x1, x2, x3, y);
@@ -5161,7 +5152,6 @@ F pal_23(limit)
       n++
       V b = baseN(n, 3)
       V revb = reversed(b)
-
       L(trial) (b‘’revb, b‘0’revb, b‘1’revb, b‘2’revb)
          V t = Int64(trial, radix' 3)
          I pal2(t)
@@ -5203,7 +5193,6 @@ template <typename T1> auto pal_23(const T1 &limit)
         n++;
         auto b = baseN(n, 3);
         auto revb = reversed(b);
-
         for (auto &&trial : make_tuple(b & revb, b & u"0"_S & revb, b & u"1"_S & revb, b & u"2"_S & revb)) {
             auto t = to_int64(trial, 3);
             if (pal2(t)) {
@@ -5719,7 +5708,6 @@ V tot = [0B] * (width + 1)
 L(a) 0 .< 2 ^ width
    L(b) 0 .< 2 ^ width
       V (ta, tlast) = fa4(int2bus(a), int2bus(b))
-
       L(i) 0 .< width
          tot[i] = ta[i]
       tot[width] = tlast
@@ -6487,10 +6475,8 @@ for row in hash_join(table1, table2):
 ===
 F hash_join(table1, table2)
    DefaultDict[String, [(Int, String)]] h
-
    L(s) table1
       h[s[1]].append(s)
-
    [((Int, String), (String, String))] res
    L(r) table2
       L(s) h[r[0]]
@@ -6508,7 +6494,6 @@ template <typename T1, typename T2> auto hash_join(const T1 &table1, const T2 &t
     DefaultDict<String, Array<Tuple<int, String>>> h;
     for (auto &&s : table1)
         h[_get<1>(s)].append(s);
-
     Array<Tuple<Tuple<int, String>, Tuple<String, String>>> res;
     for (auto &&r : table2)
         for (auto &&s : h[_get<0>(r)])
@@ -7218,10 +7203,8 @@ F valid_iban(iban_)
    V iban = iban_.replace(‘ ’, ‘’).replace("\t", ‘’)
    I !re:‘[\dA-Z]+’.match(iban)
       R 0B
-
    I iban.len != :country2length[iban[0.<2]]
       R 0B
-
    iban = iban[4..]‘’iban[0.<4]
    R mod97(iban.map(ch -> String(Int(ch, radix' 36))).join(‘’)) == 1
 
@@ -7256,7 +7239,6 @@ template <typename T1> auto valid_iban(const T1 &iban_)
         return false;
     if (iban.len() != ::country2length[iban[range_el(0, 2)]])
         return false;
-
     iban = iban[range_ei(4)] & iban[range_el(0, 4)];
     return mod97(iban.map([](const auto &ch){return String(to_int(ch, 36));}).join(u""_S)) == 1;
 }
@@ -8038,20 +8020,17 @@ F order_words(words)
    DefaultDict[Char, Set[String]] byfirst
    L(word) words
       byfirst[word[0]].add(word)
-
    R byfirst
 
 F linkfirst(DefaultDict[Char, Set[String]] &byfirst; sofar)
    assert(!sofar.empty)
    V chmatch = sofar.last.last
    V options = byfirst[chmatch] - Set(sofar)
-
    I options.empty
       R sofar
    E
       V alternatives = (options.map(word -> linkfirst(&@byfirst, Array(@sofar) [+] [word])))
       V mx = max(alternatives, key' s -> s.len)
-
       R mx
 
 F llfl(words)
@@ -8077,7 +8056,6 @@ template <typename T1> auto order_words(const T1 &words)
     DefaultDict<Char, Set<String>> byfirst;
     for (auto &&word : words)
         byfirst[_get<0>(word)].add(word);
-
     return byfirst;
 }
 
@@ -8091,7 +8069,6 @@ template <typename T2> auto linkfirst(DefaultDict<Char, Set<String>> &byfirst, c
     else {
         auto alternatives = (options.map([&byfirst, &sofar](const auto &word){return linkfirst(byfirst, create_array(sofar) + create_array({word}));}));
         auto mx = max_with_key(alternatives, [](const auto &s){return s.len();});
-
         return mx;
     }
 }
@@ -8958,7 +8935,6 @@ V Red = ‘Red’
 V blacks = [Black] * (n I/ 2)
 V reds = [Red] * (n I/ 2)
 V pack = blacks [+] reds
-
 random:shuffle(&pack)
 
 [String] black_stack
@@ -8974,10 +8950,8 @@ L !pack.empty
 print(‘(Discards: ’discard.map(d -> d[0]).join(‘ ’)" )\n")
 
 V max_swaps = min(black_stack.len, red_stack.len)
-
 V swap_count = random:(0 .. max_swaps)
 print(‘Swapping ’swap_count)
-
 F random_partition(stack, count)
    ‘Partition the stack into 'count' randomly selected members and the rest’
    V stack_copy = copy(stack)
@@ -9031,7 +9005,6 @@ struct CodeBlock2
 } code_block_2;
 
 auto max_swaps = min(black_stack.len(), red_stack.len());
-
 auto swap_count = randomns::_(range_ee(0, max_swaps));
 
 struct CodeBlock3
@@ -9041,7 +9014,6 @@ struct CodeBlock3
         print(u"Swapping "_S & swap_count);
     }
 } code_block_3;
-
 template <typename T1, typename T2> auto random_partition(const T1 &stack, const T2 &count)
 {
     u"Partition the stack into 'count' randomly selected members and the rest"_S;
@@ -9752,10 +9724,8 @@ print(hist)
 ===
 V a1 = [Int64(0), 1403580, -810728]
 V m1 = Int64(2) ^ 32 - 209
-
 V a2 = [Int64(527612), 0, -1370589]
 V m2 = Int64(2) ^ 32 - 22853
-
 V d = m1 + 1
 
 T MRG32k3a
@@ -9796,10 +9766,8 @@ print(hist)
 ===
 auto a1 = create_array<Int64>({to_int64(0), 1403580, -810728});
 auto m1 = pow(to_int64(2), 32) - 209;
-
 auto a2 = create_array<Int64>({to_int64(527612), 0, -1370589});
 auto m2 = pow(to_int64(2), 32) - 22853;
-
 auto d = m1 + 1;
 
 class MRG32k3a
@@ -10329,10 +10297,8 @@ F readconf(fname)
          L.continue
 
       V boolval = 1B
-
       I line.starts_with(‘;’)
          line = line.ltrim(‘;’)
-
          I line.split_py().len != 1
             L.continue
          boolval = 0B
@@ -10361,7 +10327,6 @@ template <typename T1> auto readconf(const T1 &fname)
             continue;
 
         auto boolval = true;
-
         if (line.starts_with(u";"_S)) {
             line = line.ltrim(u";"_S);
             if (line.split_py().len() != 1)
@@ -11774,7 +11739,6 @@ for i in range(1, len(sums)-1):
 ===
 V cubes = (1..1199).map(x -> Int64(x) ^ 3)
 [Int64 = Int64] crev
-
 L(x3) cubes
    V x = L.index
    crev[x3] = x + 1
@@ -11808,7 +11772,6 @@ struct CodeBlock1
     CodeBlock1()
     {
         {int Lindex = 0;
-
         for (auto &&x3 : cubes) {
             auto x = Lindex;
             crev.set(x3, x + 1);
@@ -12321,11 +12284,9 @@ V xVal = (0.<32).map(i -> i * 0.05)
 V tSin = xVal.map(x -> sin(x))
 V tCos = xVal.map(x -> cos(x))
 V tTan = xVal.map(x -> tan(x))
-
 V iSin = thieleInterpolator(tSin, xVal)
 V iCos = thieleInterpolator(tCos, xVal)
 V iTan = thieleInterpolator(tTan, xVal)
-
 print(‘#.14’.format(6 * iSin(0.5)))
 print(‘#.14’.format(3 * iCos(0.5)))
 print(‘#.14’.format(4 * iTan(1)))
@@ -12353,7 +12314,6 @@ auto xVal = range_el(0, 32).map([](const auto &i){return i * 0.05;});
 auto tSin = xVal.map([](const auto &x){return sin(x);});
 auto tCos = xVal.map([](const auto &x){return cos(x);});
 auto tTan = xVal.map([](const auto &x){return tan(x);});
-
 auto iSin = thieleInterpolator(tSin, xVal);
 auto iCos = thieleInterpolator(tCos, xVal);
 auto iTan = thieleInterpolator(tTan, xVal);
@@ -12532,7 +12492,6 @@ F toposort2(&data)
       I ordered.empty
          L.break
       r.append(sorted(Array(ordered)).join(‘ ’))
-
       [String = Set[String]] new_data
       L(item, dep) data
          I item !C ordered
@@ -12568,7 +12527,6 @@ template <typename T1> auto toposort2(T1 &data)
         if (ordered.empty())
             break;
         r.append(sorted(create_array(ordered)).join(u" "_S));
-
         Dict<String, Set<String>> new_data;
         for (auto &&[item, dep] : data)
             if (!in(item, ordered))
@@ -13188,7 +13146,6 @@ F run_utm(halt, state, Char blank; rules_in, [Char] &tape = [Char](); =pos = 0)
       tape.append(blank)
    I pos < 0
       pos += tape.len
-
    V rules = Dict(rules_in, r -> ((r[0], Char(r[1])), (Char(r[2]), r[3], r[4])))
 
    L
@@ -13230,12 +13187,12 @@ run_utm(halt' ‘STOP’, state' ‘A’, blank' Char(‘0’), rules_in' [‘A 
 ===
 template <typename T1, typename T2, typename T4, typename T6 = decltype(0)> auto run_utm(const T1 &halt, const T2 &state, const Char &blank, const T4 &rules_in, Array<Char> &tape = make_ref(Array<Char>()), T6 pos = 0)
 {
+
     auto st = state;
     if (tape.empty())
         tape.append(blank);
     if (pos < 0)
         pos += tape.len();
-
     auto rules = create_dict(rules_in, [](const auto &r){return make_tuple(make_tuple(_get<0>(r), Char(_get<1>(r))), make_tuple(Char(_get<2>(r)), _get<3>(r), _get<4>(r)));});
 
     while (true) {
@@ -13416,6 +13373,7 @@ template <typename T1> auto url_encode(const T1 &s)
 
     auto flush_buf = [&buf, &r]()
     {
+
         if (buf != u"") {
             auto bytes = buf.encode(u"utf-8"_S);
             for (auto &&b : bytes)
@@ -14054,7 +14012,6 @@ F readfile(f)
    V world = f.map(row -> row.rtrim(Array[Char]("\r\n")))
    V height = world.len
    V width = max(world.map(row -> row.len))
-
    V nonrow = [‘ ’(‘ ’ * width)‘ ’]
    V world2 = nonrow [+] world.map(row -> ‘ ’String(row).ljust(@width)‘ ’) [+] nonrow
    V world3 = world2.map(row -> Array(row))
@@ -14126,7 +14083,6 @@ template <typename T1> auto readfile(const T1 &f)
     auto world = f.map([](const auto &row){return row.rtrim(Array<Char>(u"\r\n"_S));});
     auto height = world.len();
     auto width = max(world.map([](const auto &row){return row.len();}));
-
     auto nonrow = create_array({u" "_S & (u" "_S * width) & u" "_S});
     auto world2 = nonrow + world.map([&width](const auto &row){return u" "_S & String(row).ljust(width) & u" "_S;}) + nonrow;
     auto world3 = world2.map([](const auto &row){return create_array(row);});
@@ -14238,7 +14194,6 @@ F word_break(s, dictionary)
    V queue = Deque([Node(s)])
    L !queue.empty
       V node = queue.pop_left()
-
       I node.val.empty
          matches [+]= node.parsed
       E
@@ -14458,7 +14413,6 @@ F yinyang(n = 3)
    L(x, y) circles[(len)-3]
       m[(x, y + 3 * n)] = ‘·’
       m[(x, y - 3 * n)] = ‘*’
-
    R ranges.last.map(y -> reversed(@ranges.last).map(x -> @@m[(x, @y)]).join(‘’)).join("\n")
 
 print(yinyang(2))
@@ -14484,7 +14438,6 @@ template <typename T1 = decltype(3)> auto yinyang(const T1 &n = 3)
         m.set(make_tuple(x, y + 3 * n), u'·'_C);
         m.set(make_tuple(x, y - 3 * n), u'*'_C);
     }
-
     return ranges.last().map([&m, &ranges](const auto &y){return reversed(ranges.last()).map([&m, &y](const auto &x){return m[make_tuple(x, y)];}).join(u""_S);}).join(u"\n"_S);
 }
 
@@ -15813,7 +15766,6 @@ F ant(width, height, max_nb_steps)
       invert_color(&grid, x, y)
       direction = next_direction(grid, x, y, direction)
       (x, y) = next_position(x, y, direction)
-
       i++
 
    print_grid(grid)
@@ -15887,7 +15839,6 @@ template <typename T1, typename T2, typename T3> auto ant(const T1 &width, const
         invert_color(grid, x, y);
         direction = next_direction(grid, x, y, direction);
         assign_from_tuple(x, y, next_position(x, y, direction));
-
         i++;
     }
 
@@ -16032,7 +15983,6 @@ F gen_row(w, s)
    F gen_seg([[Int]] o, Int sp) -> [[Int]]
       I o.empty
          R [[2] * sp]
-
       [[Int]] r
       L(x) 1 .< sp - o.len + 2
          L(tail) @gen_seg(o[1..], sp - x)
@@ -16146,7 +16096,6 @@ template <typename T1, typename T2> auto gen_row(const T1 &w, const T2 &s)
     {
         if (o.empty())
             return create_array({create_array({2}) * sp});
-
         Array<Array<int>> r;
         for (auto x : range_el(1, sp - o.len() + 2))
             for (auto &&tail : gen_seg(o[range_ei(1)], sp - x))
@@ -17427,7 +17376,6 @@ T Graph
 
    F (name, connections)
       .name = name
-
       DefaultDict[Char, [Char]] g
       L(n) connections
          V (n1, n2) = (n[0], n[1])
@@ -17435,7 +17383,6 @@ T Graph
             g[n1].append(n2)
          E
             g[n1]
-
          g[n2]
       .graph = Dict(move(g))
       .tarjan_algo()
@@ -17509,7 +17456,6 @@ public:
     template <typename T1, typename T2> Graph(const T1 &name, const T2 &connections) :
         name(name)
     {
-
         DefaultDict<Char, Array<Char>> g;
         for (auto &&n : connections) {
             auto [n1, n2] = make_tuple(_get<0>(n), _get<1>(n));
@@ -17517,7 +17463,6 @@ public:
                 g[n1].append(n2);
             else
                 g[n1];
-
             g[n2];
         }
         graph = create_dict(std::move(g));
@@ -17753,7 +17698,6 @@ F me(xo = Char(‘X’))
 
 F you(xo = Char(‘O’))
    printboard()
-
    print("\nYou went at "my_turn(xo, &:board))
    R score()
 
@@ -17867,7 +17811,6 @@ template <typename T1 = decltype(u'X'_C)> auto me(const T1 &xo = u'X'_C)
 template <typename T1 = decltype(u'O'_C)> auto you(const T1 &xo = u'O'_C)
 {
     printboard();
-
     print(u"\nYou went at "_S & my_turn(xo, ::board));
     return score();
 }

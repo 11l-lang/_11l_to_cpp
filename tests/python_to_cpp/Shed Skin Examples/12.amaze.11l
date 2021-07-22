@@ -33,6 +33,7 @@ V null_point = (1 << 30, 1 << 30)
 
 T MazeReader
    [[Int]] maze_rows
+
    F ()
    {
    }
@@ -268,6 +269,7 @@ T MazeSolver
       V point = .getBestPoint(points)
 
       L .checkClosedLoop(point)
+
          I .endlessLoop()
             print(._loops)
             point = :null_point
@@ -369,6 +371,7 @@ T MazeSolver
          R :null_point
 
    F getNextClosestPointNotInPath(points, point)
+
       V point2 = .getNextClosestPoint(points, point)
       L point2 C ._path
          point2 = .getNextClosestPoint(points, point2)
@@ -385,6 +388,7 @@ T MazeSolver
       .maze.setItem(._end[0], ._end[1], :EXIT)
 
    F solve()
+
       I ._start == ._end
          print(‘Start/end points are the same. Trivial maze.’)
          print([._start, ._end])
@@ -439,6 +443,7 @@ T MazeGame
       solver.solve()
 
 T FilebasedMazeGame(MazeGame)
+
    F.virtual.assign createMaze() -> Maze
       V f = MazeFactory()
       V m = f.makeMaze(:FILE_)
@@ -446,6 +451,7 @@ T FilebasedMazeGame(MazeGame)
       R m
 
    F.virtual.assign getStartEndPoints(Maze maze) -> N
+
       L
          X.try
             V pt1 = ‘0 4’

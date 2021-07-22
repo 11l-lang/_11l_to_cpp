@@ -575,7 +575,6 @@ for i, total in enumerate(totals):
 F sieve(limit)
    [Int] primes
    V c = [0B] * (limit + 1)
-
    V p = 3
    L
       V p2 = p * p
@@ -632,7 +631,6 @@ template <typename T1> auto sieve(const T1 &limit)
 {
     Array<int> primes;
     auto c = create_array({false}) * (limit + 1);
-
     auto p = 3;
     while (true) {
         auto p2 = p * p;
@@ -1222,7 +1220,6 @@ F longest_palindrome(s)
    V r = 0
    L(i) 1 .< n - 1
       p[i] = (r > i) & min(r - i, p[2 * c - i]) != 0
-
       L t[i + 1 + p[i]] == t[i - 1 - p[i]]
          p[i]++
 
@@ -2016,7 +2013,6 @@ F dList(n, =start)
    a[0] = start
    a.sort_range(1..)
    V first = a[1]
-
    [[Int]] r
    F recurse(Int last) -> N
       I (last == @first)
@@ -2050,7 +2046,6 @@ F reducedLatinSquares(n, echo)
       R 1
 
    V rlatin = [[0] * n] * n
-
    L(j) 0 .< n
       rlatin[0][j] = j + 1
 
@@ -2102,7 +2097,6 @@ template <typename T1, typename T2> auto dList(const T1 &n, T2 start)
     _set<0>(a, start);
     a.sort_range(range_ei(1));
     auto first = _get<1>(a);
-
     Array<Array<int>> r;
     std::function<void(int)> recurse = [&a, &first, &r, &recurse](const int last)
     {
@@ -2155,6 +2149,7 @@ template <typename T1, typename T2> auto reducedLatinSquares(const T1 &n, const 
     auto count = 0;
     std::function<void(int)> recurse = [&count, &echo, &n, &recurse, &rlatin](const int i)
     {
+
         auto rows = dList(n, i);
 
         for (auto r : range_el(0, rows.len())) {

@@ -25,7 +25,6 @@ int MAIN_WITH_ARGV()
 
     auto bmp_b = to_int(bmp_s / bmp_h);
     print(bmp_h & u" "_S & bmp_w & u" "_S & bmp_s & u" "_S & bmp_b);
-
     bmp.seek(offset, 0);
 
     auto bmp_line = u""_S;

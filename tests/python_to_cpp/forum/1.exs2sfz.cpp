@@ -33,6 +33,7 @@ template <typename T1, typename T2> auto chunk_size(const T1 &instrument_data, c
 class EXSChunk
 {
 public:
+
     int offset;
     decltype(0) __size = 0;
 
@@ -102,6 +103,7 @@ auto EXSHeader_sig = 0x0000'0101;
 class EXSHeader : public EXSChunk
 {
 public:
+
     template <typename T1> EXSHeader(const T1 &offset)
     {
         this->offset = offset;
@@ -113,6 +115,7 @@ public:
 class EXSZone : public EXSChunk
 {
 public:
+
     template <typename T1> EXSZone(const T1 &offset)
     {
         this->offset = offset;
@@ -206,6 +209,7 @@ public:
 class EXSGroup : public EXSChunk
 {
 public:
+
     template <typename T1> EXSGroup(const T1 &offset)
     {
         this->offset = offset;
@@ -234,6 +238,7 @@ public:
 class EXSSample : public EXSChunk
 {
 public:
+
     template <typename T1> EXSSample(const T1 &offset)
     {
         this->offset = offset;
@@ -258,6 +263,7 @@ public:
 class EXSParam : public EXSChunk
 {
 public:
+
     template <typename T1> EXSParam(const T1 &offset)
     {
         this->offset = offset;
@@ -267,6 +273,7 @@ public:
 class EXSSamplePool
 {
 public:
+
     Array<String> locations;
     String base;
 
@@ -330,6 +337,7 @@ public:
 class EXSSamplePoolDummy : public EXSSamplePool
 {
 public:
+
     String name;
 
     template <typename T1 = decltype(u""_S)> EXSSamplePoolDummy(const T1 &name = u""_S) :
@@ -346,6 +354,7 @@ public:
 class EXSSamplePoolFixed : public EXSSamplePool
 {
 public:
+
     template <typename T1> EXSSamplePoolFixed(const T1 &path)
     {
         if (fs::is_dir(path))
@@ -363,6 +372,7 @@ public:
 class EXSSamplePoolLocator : public EXSSamplePool
 {
 public:
+
     template <typename T1> EXSSamplePoolLocator(const T1 &exsfile_name)
     {
         base = fs::path::dir_name(exsfile_name);
@@ -377,9 +387,11 @@ public:
 class EXSInstrument
 {
 public:
+
     std::unique_ptr<EXSSamplePool> pool;
 
     String exsfile_name;
+
     Array<EXSZone> zones;
     Array<EXSGroup> groups;
     Array<EXSSample> samples;
@@ -440,6 +452,7 @@ public:
                     break;
                 }
             if (!was_break) {
+
                 Array<int> sequence;
 
                 auto cont = true;
@@ -476,6 +489,7 @@ public:
 
     template <typename T1, typename T2 = decltype(false)> auto convert(const T1 &sfzfilename, const T2 &overwrite = false)
     {
+
         auto sequences = build_sequences();
 
         auto get_sequence_position = [&sequences](const auto &zone)
@@ -507,6 +521,7 @@ public:
 
         Dict<Tuple<int, int, int, int, int>, int> key_sequence;
         for (auto &&key : sorted(ranges.keys())) {
+
             auto keyrange = ranges[key];
             auto group = _get<0>(keyrange).group();
             {bool was_break = false;

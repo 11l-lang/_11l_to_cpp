@@ -318,7 +318,6 @@ auto f()
     r = abc & u"some big \n ..."_S & u"... string\n"_S;
     r = abc & u"it’s"_S;
     r = abc & u"it’s"_S & def;
-
     r = u"Host: api.dropboxapi.com"_S & u"\r\n"_S & u"Connection: close"_S & u"\r\n"_S;
 }
 

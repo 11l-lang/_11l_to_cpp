@@ -1849,7 +1849,6 @@ F d_rank([(Int, String)] &iterable)
 
 F o_rank([(Int, String)] &iterable)
    ‘Ordinal ranking’
-
    R enumerate(iterable, 1).map((i, item) -> ((Float(i), item)))
 
 F f_rank([(Int, String)] &iterable)
@@ -1948,7 +1947,6 @@ auto d_rank(Array<Tuple<int, String>> &iterable)
 auto o_rank(Array<Tuple<int, String>> &iterable)
 {
     u"Ordinal ranking"_S;
-
     return enumerate(iterable, 1).map([](const auto &i, const auto &item){return (make_tuple(to_float(i), item));});
 }
 

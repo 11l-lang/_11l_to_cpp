@@ -3,7 +3,6 @@ V keywords = [‘False’, ‘await’, ‘else’, ‘import’, ‘pass’, �
 V operators = [‘+’, ‘-’, ‘*’, ‘**’, ‘/’, ‘//’, ‘%’, ‘@’, ‘<<’, ‘>>’, ‘&’, ‘|’, ‘^’, ‘~’, ‘<’, ‘>’, ‘<=’, ‘>=’, ‘==’, ‘!=’]
 
 V delimiters = [‘(’, ‘)’, ‘[’, ‘]’, ‘{’, ‘}’, ‘,’, ‘:’, ‘.’, ‘;’, ‘@’, ‘=’, ‘->’, ‘+=’, ‘-=’, ‘*=’, ‘/=’, ‘//=’, ‘%=’, ‘@=’, ‘&=’, ‘|=’, ‘^=’, ‘>>=’, ‘<<=’, ‘**=’]
-
 V operators_and_delimiters = sorted(operators [+] delimiters, key' x -> x.len, reverse' 1B)
 
 T Error
@@ -181,7 +180,6 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
          E I (ch C ‘-+’ & source[i .< i + 1] C ‘0’..‘9’) | ch C ‘0’..‘9’
             I ch C ‘-+’
                assert(0B)
-
                ch = source[i + 1]
             E
                i--
@@ -190,7 +188,6 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
             V is_bin = ch == ‘0’ & source[i + 1 .< i + 2] C (‘b’, ‘B’)
             I is_hex | is_oct | is_bin
                i += 2
-
             V start = i
             i++
             I is_hex

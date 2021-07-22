@@ -1408,7 +1408,6 @@ template <typename T1, typename T2, typename T3> auto hq2x(const T1 &xres, const
                 PIXEL10_11(rgb_out, pOut, BpL, c);
                 PIXEL11_12(rgb_out, pOut, BpL, c);
             }
-
             if (pattern == 115) {
                 PIXEL00_11(rgb_out, pOut, BpL, c);
                 if ((diff(_get<2>(w), _get<6>(w))))

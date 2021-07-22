@@ -17,7 +17,6 @@ T Converter
    String instr
 
    F (habr_html, ohd)
-
       .habr_html = habr_html
       .ohd = ohd
 
@@ -119,7 +118,6 @@ T Converter
       V link = ‘’
 
       F write_http_link(startpos, Int endpos; q_offset = 1, =text = ‘’)
-
          V nesting_level = 0
          @i += 2
          L
@@ -329,14 +327,12 @@ T Converter
                         I instr[i .< i + 2] != ":‘"
                            exit_with_error(‘Quotation with author's name should be in the form >‘Author's name’:‘Quoted text.’’, i)
                         writepos = i + 2
-
                   ending_tags.append(‘</blockquote>’)
                i++
 
          I ch == "‘"
             V prevci = i - 1
             V prevc = I prevci >= 0 {instr[prevci]} E Char("\0")
-
             V startqpos = i
             i = find_ending_pair_quote(i)
             V endqpos = i

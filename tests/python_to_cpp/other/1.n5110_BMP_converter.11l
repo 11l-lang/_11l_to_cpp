@@ -18,7 +18,6 @@ V bmp_s = UInt32.unpack(bmp.read_bytes(4))
 
 V bmp_b = Int(bmp_s / bmp_h)
 print(bmp_h‘ ’bmp_w‘ ’bmp_s‘ ’bmp_b)
-
 bmp.seek(offset, 0)
 
 V bmp_line = ‘’

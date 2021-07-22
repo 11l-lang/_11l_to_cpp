@@ -158,7 +158,6 @@ template <typename T1, typename T2, typename T3> auto dijkstra(const T1 &g, cons
         d.set(v, 1e50);
         previous.set(v, Vertex(u""_S));
     }
-
     d.set(s, 0);
     Array<Vertex> ss;
     auto Q = copy(g.v);

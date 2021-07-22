@@ -86,7 +86,6 @@ public:
         if (this->name == u"")
             this->name = u"_"_S & String(index);
     }
-
     template <typename T1> auto operator<(const T1 &other) const
     {
         return count < other.count;
@@ -149,14 +148,12 @@ InternalNode iterate(Array<node> &c)
         c.sort();
         auto deletednode = _get<0>(c);
         auto second = _get<1>(c).index;
-
         _get<1>(c).count += _get<0>(c).count;
         c.pop(0);
 
         root = iterate(c);
 
         auto co = find_idx(c, second);
-
         deletednode.word = co.word & u"0"_S;
         c.append(deletednode);
         co.word &= u"1"_S;
@@ -198,10 +195,8 @@ template <typename T1, typename T2> auto decode(const T1 &string, const T2 &root
     uR"(
     Decodes a binary string using the Huffman tree accessed via root
     )"_S;
-
     Array<String> answer;
     auto clist = create_array(string);
-
     auto currentnode = root;
     for (auto &&c : clist) {
         if ((c == u'\n'))
@@ -213,7 +208,6 @@ template <typename T1, typename T2> auto decode(const T1 &string, const T2 &root
             currentnode = root;
         }
     }
-
     return answer;
 }
 
@@ -357,7 +351,6 @@ template <typename T1, typename T2, typename T3> auto Bdecode(const T1 &string, 
         print(answer);
     }
     auto output = answer.join(u""_S);
-
     return output;
 }
 
@@ -382,7 +375,6 @@ auto easytest()
     auto n = 3;
     auto f = 0.01;
     auto probs = findprobs(f, n);
-
     auto symbols = makenodes(probs);
     auto root = iterate(symbols);
 
@@ -424,7 +416,6 @@ template <typename T1, typename T2> auto compress_it(const T1 &inputfile, const 
     )"_S;
     auto probs = findprobs(::f, ::n);
     auto symbols = makenodes(probs);
-
     auto root = iterate(symbols);
 
     auto string = inputfile.read();
@@ -438,7 +429,6 @@ template <typename T1, typename T2> auto uncompress_it(const T1 &inputfile, cons
     UNCompress from file (possibly stdin).
     )"_S;
     auto probs = findprobs(::f, ::n);
-
     auto symbols = makenodes(probs);
     auto root = iterate(symbols);
 

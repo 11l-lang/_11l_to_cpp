@@ -381,6 +381,7 @@ auto tokens = 12;
 
 template <typename T1> void getTokens(const T1 &curTokens)
 {
+
     print(u"How many tokens would you like to take? "_S, u""_S);
     auto take = to_int(input());
 
@@ -397,6 +398,7 @@ template <typename T1> void getTokens(const T1 &curTokens)
 
 template <typename T1> auto compTurn(const T1 &curTokens)
 {
+
     auto take = mod(curTokens, 4);
     ::tokens = curTokens - take;
     print(u"Computer takes #. tokens."_S.format(take));
@@ -912,16 +914,13 @@ F nonoblocks([Int] &blocks, Int cells) -> [[(Int, Int)]]
       assert(sum(blocks) + blocks.len - 1 <= cells, ‘Those blocks will not fit in those cells’)
       V (blength, brest) = (blocks[0], blocks[1..])
       V minspace4rest = sum(brest.map(b -> 1 + b))
-
       L(bpos) 0 .. cells - minspace4rest - blength
          I brest.empty
             r [+]= [(bpos, blength)]
          E
             V offset = bpos + blength + 1
-
             L(subpos) nonoblocks(&brest, cells - offset)
                V rest = subpos.map((bp, bl) -> (@offset + bp, bl))
-
                V vec = [(bpos, blength)] [+] rest
                r [+]= vec
    R r
@@ -958,10 +957,8 @@ Array<Array<ivec2>> nonoblocks(Array<int> &blocks, const int cells)
                 r.append(create_array({make_tuple(bpos, blength)}));
             else {
                 auto offset = bpos + blength + 1;
-
                 for (auto &&subpos : nonoblocks(brest, cells - offset)) {
                     auto rest = subpos.map([&offset](const auto &bp, const auto &bl){return make_tuple(offset + bp, bl);});
-
                     auto vec = create_array({make_tuple(bpos, blength)}) + rest;
                     r.append(vec);
                 }

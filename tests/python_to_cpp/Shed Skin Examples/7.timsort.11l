@@ -176,7 +176,6 @@ F binary_sort([Int] &list_; low, high, =start, comparefn)
       V left = low
       V right = start
       assert(left <= right)
-
       L left < right
          V mid = (left + right) I/ 2
          I comparefn(pivot, list_[mid]) < 0
@@ -186,7 +185,6 @@ F binary_sort([Int] &list_; low, high, =start, comparefn)
       assert(left == right)
 
       V number = start - left
-
       array_copy(list_, left, &list_, left + 1, number)
       list_[left] = pivot
 
@@ -198,7 +196,6 @@ F reverse_range([Int] &list_; =low, =high)
 	@param low the index of the first element in the range to be reversed
 	@param high the index after the last element in the range to be reversed
 	’
-
    high--
    L low < high
       swap(&list_[low], &list_[high])
@@ -249,6 +246,7 @@ F count_run_and_make_ascending([Int] &list_; low, high, comparefn)
    R run_high - low
 
 T Timsort
+
    [Int] list_
    [Int] tmp
    ((Int, Int) -> Int) comparefn
@@ -272,7 +270,6 @@ T Timsort
       .comparefn = comparefn
 
       V length = list_.len
-
       Int ternary
       I length < .initial_tmp_storage_length * 2
          ternary = length I/ 2
@@ -299,7 +296,6 @@ T Timsort
 
       I num_remaining < .min_merge
          V initial_run_len = count_run_and_make_ascending(&.list_, low, high, comparefn)
-
          binary_sort(&.list_, low, high, low + initial_run_len, comparefn)
          R
 
@@ -348,7 +344,6 @@ T Timsort
 		’
       assert(number >= 0)
       V low_bit = 0
-
       L number >= .min_merge
          low_bit [|]= (number [&] 1)
          number >>= 1
@@ -464,9 +459,7 @@ T Timsort
       array_copy(.list_, base1, &tmp, 0, len1)
 
       V cursor1 = 0
-
       V cursor2 = base2
-
       V dest = base1
 
       .list_[dest] = .list_[cursor2]
@@ -477,18 +470,15 @@ T Timsort
          R
       I len1 == 1
          array_copy(.list_, cursor2, &.list_, dest, len2)
-
          .list_[dest + len2] = tmp[cursor1]
          R
 
       V comparefn = .comparefn
-
       V min_gallop = .min_gallop
 
       V loops_done = 0B
       L
          V count1 = 0
-
          V count2 = 0
 
          L
@@ -560,7 +550,6 @@ T Timsort
 
          I min_gallop < 0
             min_gallop = 0
-
          min_gallop += 2
 
       Int ternary
@@ -573,7 +562,6 @@ T Timsort
       I len1 == 1
          assert(len2 > 0)
          array_copy(.list_, cursor2, &.list_, dest, len2)
-
          .list_[dest + len2] = tmp[cursor1]
       E I len1 == 0
          X ValueError(‘Comparison function violates its general contract!’)
@@ -600,9 +588,7 @@ T Timsort
       array_copy(.list_, base2, &tmp, 0, len2)
 
       V cursor1 = base1 + len1 - 1
-
       V cursor2 = len2 - 1
-
       V dest = base2 + len2 - 1
 
       .list_[dest] = .list_[cursor1]
@@ -619,13 +605,11 @@ T Timsort
          R
 
       V comparefn = .comparefn
-
       V min_gallop = .min_gallop
 
       V loops_done = 0B
       L
          V count1 = 0
-
          V count2 = 0
 
          L
@@ -697,7 +681,6 @@ T Timsort
 
          I min_gallop < 0
             min_gallop = 0
-
          min_gallop += 2
 
       Int ternary
@@ -712,7 +695,6 @@ T Timsort
          dest -= len1
          cursor1 -= len1
          array_copy(.list_, cursor1 + 1, &.list_, dest + 1, len1)
-
          .list_[dest] = tmp[cursor2]
       E I len2 == 0
          X ValueError(‘Comparison function violates its general contract!’)

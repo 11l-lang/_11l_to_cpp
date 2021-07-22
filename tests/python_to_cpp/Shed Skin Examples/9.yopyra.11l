@@ -45,10 +45,8 @@ T Color
 
    F +(other)
       R Color(.r + other.r, .g + other.g, .b + other.b)
-
    F *(other)
       R Color(.r * other, .g * other, .b * other)
-
    F String()
       R ‘#. #. #.’.format(Int(max(0.0, min(.r * 255.0, 255.0))), Int(max(0.0, min(.g * 255.0, 255.0))), Int(max(0.0, min(.b * 255.0, 255.0))))
 

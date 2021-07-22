@@ -442,7 +442,6 @@ TEST(‘Примечание 1: только режимы ‘r’ и ‘w’ п�
 TEST(‘Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [[‘’]‘мои мысли на тему режимов открытия файлов’[./File]]’, ‘Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [<abbr title=""></abbr><a href="./File" target="_self">мои мысли на тему режимов открытия файлов</a>]’)
 TEST(‘[[‘’][[[Справка/]]]Документация по методам доступна на данный момент только ‘на английском’[./../../built-in-types].]’, ‘[<abbr title=""></abbr><!--[[[Справка/]]]-->Документация по методам доступна на данный момент только <a href="./../../built-in-types" target="_self">на английском</a>.]’)
 TEST(‘[‘мои мысли на тему режимов открытия файлов’[./File]]’, ‘[<a href="./File" target="_self">мои мысли на тему режимов открытия файлов</a>]’)
-
 TEST(‘P‘http://image-url’’, ‘<img src="http://image-url" />’)
 TEST(‘P‘http://image-url’[http://address]’, ‘<a href="http://address"><img src="http://image-url" /></a>’)
 TEST(‘P‘http://image-url’[‘title text[[[comment]]]’]’, ‘<img src="http://image-url" title="title text" />’)
@@ -487,7 +486,6 @@ xt’, ‘<span class="spoiler_title" onclick="return spoiler2(this, event)">tit
 te<br />
 </div>
 xt’, ohd' 1B)
-
 TEST(‘#(JavaScript)‘
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
 ’’, ‘<source lang="JavaScript">
@@ -512,7 +510,6 @@ TEST(‘'‘<Don‘t! Don‘t! Don‘t!>’’’’''''’, "<Don‘t! Don‘t!
 TEST(‘`'‘<div>&lt;</div>’'`’, ‘<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>’, habr_html' 1B)
 TEST(‘''‘‘’‘’’''’, '‘‘’‘’’')
 TEST(‘''''‘‘‘‘Don’t! Don’t! Don’t!’'’, "Don’t! Don’t! Don’t!")
-
 TEST(‘<<‘выравнивание по левому краю’
 >>‘выравнивание по правому краю’
 ><‘выравнивание по центру’
@@ -801,7 +798,6 @@ struct CodeBlock1
         TEST(u"Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [[‘’]‘мои мысли на тему режимов открытия файлов’[./File]]"_S, u"Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [<abbr title=\"\"></abbr><a href=\"./File\" target=\"_self\">мои мысли на тему режимов открытия файлов</a>]"_S);
         TEST(u"[[‘’][[[Справка/]]]Документация по методам доступна на данный момент только ‘на английском’[./../../built-in-types].]"_S, u"[<abbr title=\"\"></abbr><!--[[[Справка/]]]-->Документация по методам доступна на данный момент только <a href=\"./../../built-in-types\" target=\"_self\">на английском</a>.]"_S);
         TEST(u"[‘мои мысли на тему режимов открытия файлов’[./File]]"_S, u"[<a href=\"./File\" target=\"_self\">мои мысли на тему режимов открытия файлов</a>]"_S);
-
         TEST(u"P‘http://image-url’"_S, u"<img src=\"http://image-url\" />"_S);
         TEST(u"P‘http://image-url’[http://address]"_S, u"<a href=\"http://address\"><img src=\"http://image-url\" /></a>"_S);
         TEST(u"P‘http://image-url’[‘title text[[[comment]]]’]"_S, u"<img src=\"http://image-url\" title=\"title text\" />"_S);
@@ -846,7 +842,6 @@ xt)"_S, uR"'(<span class="spoiler_title" onclick="return spoiler2(this, event)">
 te<br />
 </div>
 xt)'"_S, true);
-
         TEST(uR"(#(JavaScript)‘
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
 ’)"_S, uR"(<source lang="JavaScript">
@@ -871,7 +866,6 @@ Some text.)"_S, false, true);
         TEST(u"`'‘<div>&lt;</div>’'`"_S, u"<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>"_S, false, true);
         TEST(u"''‘‘’‘’’''"_S, u"’‘"_S);
         TEST(u"''''‘‘‘‘Don’t! Don’t! Don’t!’'"_S, u"Don’t! Don’t! Don’t!"_S);
-
         TEST(uR"(<<‘выравнивание по левому краю’
 >>‘выравнивание по правому краю’
 ><‘выравнивание по центру’

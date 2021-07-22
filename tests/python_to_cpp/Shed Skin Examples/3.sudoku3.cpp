@@ -14,6 +14,7 @@ public:
     decltype(false) _changed = false;
     template <typename T1> soduko(const T1 &start_grid)
     {
+
         if (!start_grid.empty()) {
             assert(start_grid.len() == 9, u"Bad input!"_S);
             for (auto row : range_ee(0, 8))
@@ -210,7 +211,6 @@ public:
                                 bad_x.append(x);
                             }
                         }
-
                         if (bad_x.empty()) {
                         }
 

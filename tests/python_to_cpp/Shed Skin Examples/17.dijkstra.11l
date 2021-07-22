@@ -105,7 +105,6 @@ F dijkstra(g, t, s)
    L(v) g.v
       d[v] = 1e50
       previous[v] = Vertex(‘’)
-
    d[s] = 0
    [Vertex] ss
    V Q = copy(g.v)

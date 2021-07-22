@@ -3,7 +3,6 @@
 auto operators = create_array({u"+"_S, u"-"_S, u"*"_S, u"**"_S, u"/"_S, u"//"_S, u"%"_S, u"@"_S, u"<<"_S, u">>"_S, u"&"_S, u"|"_S, u"^"_S, u"~"_S, u"<"_S, u">"_S, u"<="_S, u">="_S, u"=="_S, u"!="_S});
 
 auto delimiters = create_array({u"("_S, u")"_S, u"["_S, u"]"_S, u"{"_S, u"}"_S, u","_S, u":"_S, u"."_S, u";"_S, u"@"_S, u"="_S, u"->"_S, u"+="_S, u"-="_S, u"*="_S, u"/="_S, u"//="_S, u"%="_S, u"@="_S, u"&="_S, u"|="_S, u"^="_S, u">>="_S, u"<<="_S, u"**="_S});
-
 auto operators_and_delimiters = sorted(operators + delimiters, [](const auto &x){return x.len();}, true);
 
 class Error
@@ -216,7 +215,6 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
             else if ((in(ch, u"-+"_S) && in(source[range_el(i, i + 1)], range_ee(u'0'_C, u'9'_C))) || in(ch, range_ee(u'0'_C, u'9'_C))) {
                 if (in(ch, u"-+"_S)) {
                     assert(false);
-
                     ch = source[i + 1];
                 }
                 else
@@ -226,7 +224,6 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                 auto is_bin = ch == u'0' && in(source[range_el(i + 1, i + 2)], make_tuple(u"b"_S, u"B"_S));
                 if (is_hex || is_oct || is_bin)
                     i += 2;
-
                 auto start = i;
                 i++;
                 if (is_hex)

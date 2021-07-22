@@ -1786,6 +1786,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto iterate(T1 &p
 
 template <typename T1, typename T2, typename T3> auto solve(const T1 &pz, const T2 &w, const T3 &h)
 {
+
     auto pa = create_array({create_array({-1}) * h}) * w;
     auto f = 0;
     ::pWid = w;
@@ -2481,6 +2482,7 @@ F cycleSort(&vector)
 
    L(=item) vector
       V cycleStart = L.index
+
       V pos = cycleStart
       L(item2) vector[cycleStart + 1 ..]
          I item2 < item
@@ -2495,6 +2497,7 @@ F cycleSort(&vector)
       writes++
 
       L pos != cycleStart
+
          pos = cycleStart
          L(item2) vector[cycleStart + 1 ..]
             I item2 < item
@@ -2523,6 +2526,7 @@ template <typename T1> auto cycleSort(T1 &vector)
 
     for (auto item : vector) {{
         auto cycleStart = Lindex;
+
         auto pos = cycleStart;
         for (auto &&item2 : vector[range_ei(cycleStart + 1)])
             if (item2 < item)
@@ -2535,6 +2539,7 @@ template <typename T1> auto cycleSort(T1 &vector)
         writes++;
 
         while (pos != cycleStart) {
+
             pos = cycleStart;
             for (auto &&item2 : vector[range_ei(cycleStart + 1)])
                 if (item2 < item)
@@ -2934,7 +2939,6 @@ F pancakesort(&data)
             I :tutor
                print(‘With: #. doflip  #.’.format(data.map(x -> String(x)).join(‘ ’), maxindex + 1))
             data.reverse_range(0 .< maxindex + 1)
-
          I :tutor
             print(‘With: #.  doflip #.’.format(data.map(x -> String(x)).join(‘ ’), size))
          data.reverse_range(0 .< size)
@@ -5024,7 +5028,6 @@ T SuffixTree
          L j < sub2.len
             I suf[i + j] != sub2[j]
                V n3 = n2
-
                n2 = .nodes.len
                .nodes.append(Node(sub2[0 .< j], [n3]))
                .nodes[n3].sub = sub2[j ..]
@@ -5104,7 +5107,6 @@ public:
             while (j < sub2.len()) {
                 if (suf[i + j] != sub2[j]) {
                     auto n3 = n2;
-
                     n2 = nodes.len();
                     nodes.append(Node(sub2[range_el(0, j)], create_array({n3})));
                     nodes[n3].sub = sub2[range_ei(j)];
@@ -6800,6 +6802,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto find_solution
 
 template <typename T1, typename T2, typename T3> auto solve(const T1 &pz, const T2 &w, const T3 &h)
 {
+
     ::lastNumber = w * h;
     ::wid = w;
     ::hei = h;
@@ -7061,11 +7064,9 @@ F IsPeg(board, n)
 V JumpMoves = [1 = [(2, 4), (3, 6)], 2 = [(4, 7), (5, 9)], 3 = [(5, 8), (6, 10)], 4 = [(2, 1), (5, 6), (7, 11), (8, 13)], 5 = [(8, 12), (9, 14)], 6 = [(3, 1), (5, 4), (9, 13), (10, 15)], 7 = [(4, 2), (8, 9)], 8 = [(5, 3), (9, 10)], 9 = [(5, 2), (8, 7)], 10 = [(9, 8)], 11 = [(12, 13)], 12 = [(8, 5), (13, 14)], 13 = [(8, 4), (9, 6), (12, 11), (14, 15)], 14 = [(9, 5), (13, 12)], 15 = [(10, 6), (14, 13)]]
 
 [(Int, Int, Int)] Solution
-
 F Solve(=board)
    I board.len == 1
       R board
-
    L(peg) 1..15
       I IsPeg(board, peg)
          V movelist = JumpMoves[peg]
@@ -7081,7 +7082,6 @@ F Solve(=board)
                board = Solve(board)
                I board.len == 1
                   R board
-
                board = copy(saveboard)
                Solution.pop()
    R board
@@ -7136,7 +7136,6 @@ template <typename T1, typename T2> auto IsPeg(const T1 &board, const T2 &n)
 auto JumpMoves = create_dict(dict_of(1, create_array({make_tuple(2, 4), make_tuple(3, 6)}))(2, create_array({make_tuple(4, 7), make_tuple(5, 9)}))(3, create_array({make_tuple(5, 8), make_tuple(6, 10)}))(4, create_array({make_tuple(2, 1), make_tuple(5, 6), make_tuple(7, 11), make_tuple(8, 13)}))(5, create_array({make_tuple(8, 12), make_tuple(9, 14)}))(6, create_array({make_tuple(3, 1), make_tuple(5, 4), make_tuple(9, 13), make_tuple(10, 15)}))(7, create_array({make_tuple(4, 2), make_tuple(8, 9)}))(8, create_array({make_tuple(5, 3), make_tuple(9, 10)}))(9, create_array({make_tuple(5, 2), make_tuple(8, 7)}))(10, create_array({make_tuple(9, 8)}))(11, create_array({make_tuple(12, 13)}))(12, create_array({make_tuple(8, 5), make_tuple(13, 14)}))(13, create_array({make_tuple(8, 4), make_tuple(9, 6), make_tuple(12, 11), make_tuple(14, 15)}))(14, create_array({make_tuple(9, 5), make_tuple(13, 12)}))(15, create_array({make_tuple(10, 6), make_tuple(14, 13)})));
 
 Array<ivec3> Solution;
-
 template <typename T1> auto Solve(T1 board)
 {
     if (board.len() == 1)
@@ -7156,7 +7155,6 @@ template <typename T1> auto Solve(T1 board)
                     board = Solve(board);
                     if (board.len() == 1)
                         return board;
-
                     board = copy(saveboard);
                     Solution.pop();
                 }

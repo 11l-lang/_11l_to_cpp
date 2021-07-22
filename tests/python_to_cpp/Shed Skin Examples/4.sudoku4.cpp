@@ -35,7 +35,6 @@ template <typename T1> Dict<String, String> search(const T1 &values)
         return Dict<String, String>();
     if (all_map(::squares, [&values](const auto &s){return values[s].len() == 1;}))
         return values;
-
     auto s = _get<1>(min(::squares.filter([&values](const auto &s){return values[s].len() > 1;}).map([&values](const auto &s){return make_tuple(values[s].len(), s);})));
     for (auto &&d : values[s]) {
         auto values_copy = values.copy();
@@ -68,7 +67,6 @@ template <typename T2, typename T3> Dict<String, String> eliminate(Dict<String, 
         if (!all_map(::peers[s], [&d2, &values](const auto &s2){return !eliminate(values, s2, d2).empty();}))
             return Dict<String, String>();
     }
-
     for (auto &&u : ::units[s]) {
         auto dplaces = u.filter([&d, &values](const auto &s){return in(d, values[s]);});
         if (dplaces.empty())

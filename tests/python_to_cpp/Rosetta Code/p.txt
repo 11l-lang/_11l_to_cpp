@@ -1132,7 +1132,6 @@ F extended_synthetic_division(dividend, divisor)
    V normalizer = divisor[0]
    L(i) 0 .< dividend.len - (divisor.len - 1)
       out[i] /= normalizer
-
       V coef = out[i]
       I coef != 0
          L(j) 1 .< divisor.len
@@ -1156,7 +1155,6 @@ template <typename T1, typename T2> auto extended_synthetic_division(const T1 &d
     auto normalizer = _get<0>(divisor);
     for (auto i : range_el(0, dividend.len() - (divisor.len() - 1))) {
         out[i] /= normalizer;
-
         auto coef = out[i];
         if (coef != 0)
             for (auto j : range_el(1, divisor.len()))

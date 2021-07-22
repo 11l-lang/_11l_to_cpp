@@ -161,7 +161,6 @@ T soduko
                         soduko_copy.check()
                      X.catch .Error e
                         bad_x.append(x)
-
                   I bad_x.empty
                   {
                   }

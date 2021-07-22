@@ -1264,12 +1264,10 @@ V patients = csv2list(patients_csv)
 V visits = csv2list(visits_csv)
 V result = copy(patients)
 result.sort_range(1..)
-
 result[0].append(‘LAST_VISIT’)
 V last = Dict(visits[1..], p_vis -> (p_vis[0], p_vis[1]))
 L(record) 1 .< result.len
    result[record].append(last.get(result[record][0], ‘’))
-
 result[0] [+]= [‘SCORE_SUM’, ‘SCORE_AVG’]
 V n = Dict(patients[1..], p -> (p[0], 0))
 V tot = Dict(patients[1..], p -> (p[0], 0.0))
@@ -1285,7 +1283,6 @@ L(record) 1 .< result.len
       result[record] [+]= [‘#3.1’.format(tot[p]), ‘#2.2’.format(tot[p] / n[p])]
    E
       result[record] [+]= [‘’, ‘’]
-
 L(record) result
    print(‘| ’record.map(r -> r.center(10)).join(‘ | ’)‘ |’)
 ===
@@ -1323,7 +1320,6 @@ struct CodeBlock1
     CodeBlock1()
     {
         result.sort_range(range_ei(1));
-
         _get<0>(result).append(u"LAST_VISIT"_S);
     }
 } code_block_1;
@@ -1335,7 +1331,6 @@ struct CodeBlock2
     {
         for (auto record : range_el(1, result.len()))
             result[record].append(last.get(_get<0>(result[record]), u""_S));
-
         _get<0>(result).append(create_array({u"SCORE_SUM"_S, u"SCORE_AVG"_S}));
     }
 } code_block_2;

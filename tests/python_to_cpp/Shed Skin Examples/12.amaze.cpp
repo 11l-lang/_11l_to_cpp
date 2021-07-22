@@ -46,6 +46,7 @@ class MazeReader
 {
 public:
     Array<Array<int>> maze_rows;
+
     MazeReader()
     {
     }
@@ -349,6 +350,7 @@ public:
         auto point = getBestPoint(points);
 
         while (checkClosedLoop(point)) {
+
             if (endlessLoop()) {
                 print(_loops);
                 point = ::null_point;
@@ -477,6 +479,7 @@ public:
 
     template <typename T1, typename T2> auto getNextClosestPointNotInPath(const T1 &points, const T2 &point)
     {
+
         auto point2 = getNextClosestPoint(points, point);
         while (in(point2, _path))
             point2 = getNextClosestPoint(points, point2);
@@ -496,6 +499,7 @@ public:
 
     auto solve()
     {
+
         if (_start == _end) {
             print(u"Start/end points are the same. Trivial maze."_S);
             print(create_array({_start, _end}));
@@ -563,6 +567,7 @@ public:
 class FilebasedMazeGame : public MazeGame
 {
 public:
+
     virtual Maze createMaze() override
     {
         auto f = MazeFactory();
@@ -573,6 +578,7 @@ public:
 
     virtual void getStartEndPoints(const Maze &maze) override
     {
+
         while (true) {
             try
             {

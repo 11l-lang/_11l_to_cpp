@@ -21,7 +21,6 @@ T BoardRep
    [[Int]] __fields
    F (board)
       .__fields = board.final
-
    F __hash__()
       V rep = ‘’
       L(i) 9
@@ -49,7 +48,6 @@ T board
    __openspaces = 81
 
    solutions = Set[BoardRep]()
-
    examined = Set[BoardRep]()
    F ()
    {
@@ -73,10 +71,8 @@ T board
       .__openspaces--
 
       V mask = bmp(n' val - 1)
-
       .rows[row] = .rows[row] [&] mask
       .cols[col] = .cols[col] [&] mask
-
       V cr = .cell(row)
       V cc = .cell(col)
       .cels[cr][cc] = .cels[cr][cc] [&] mask
@@ -143,7 +139,6 @@ T board
                      V t = _board.clone()
                      t.setval(row, col, val)
                      .__solve(t, depth + 1)
-
                   I broken
                      L.break
 
@@ -165,7 +160,6 @@ T board
             I .final[row][col] == 0
                V numallowed = .mergemask(row, col).cnt()
                masks.append((numallowed, row, col))
-
       R (min(masks)[0], masks.filter(i -> i[0] == min(@masks)[0]).map(i -> (i[1], i[2])))
 
    F stats()

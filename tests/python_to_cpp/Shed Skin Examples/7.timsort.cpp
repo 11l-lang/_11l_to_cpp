@@ -199,7 +199,6 @@ template <typename T2, typename T3, typename T4, typename T5> auto binary_sort(A
         auto left = low;
         auto right = start;
         assert(left <= right);
-
         while (left < right) {
             auto mid = idiv((left + right), 2);
             if (comparefn(pivot, list_[mid]) < 0)
@@ -210,7 +209,6 @@ template <typename T2, typename T3, typename T4, typename T5> auto binary_sort(A
         assert(left == right);
 
         auto number = start - left;
-
         array_copy(list_, left, list_, left + 1, number);
         list_.set(left, pivot);
     }
@@ -225,7 +223,6 @@ template <typename T2, typename T3> auto reverse_range(Array<int> &list_, T2 low
 	@param low the index of the first element in the range to be reversed
 	@param high the index after the last element in the range to be reversed
 	)"_S;
-
     high--;
     while (low < high) {
         swap(list_[low], list_[high]);
@@ -284,6 +281,7 @@ template <typename T2, typename T3, typename T4> auto count_run_and_make_ascendi
 class Timsort
 {
 public:
+
     Array<int> list_;
     Array<int> tmp;
     std::function<int(const int, const int)> comparefn;
@@ -303,10 +301,10 @@ public:
         list_(list_),
         comparefn(comparefn)
     {
+
         min_gallop = initial_min_gallop;
 
         auto length = list_.len();
-
         int ternary;
         if (length < initial_tmp_storage_length * 2)
             ternary = idiv(length, 2);
@@ -335,7 +333,6 @@ public:
 
         if (num_remaining < min_merge) {
             auto initial_run_len = count_run_and_make_ascending(list_, low, high, comparefn);
-
             binary_sort(list_, low, high, low + initial_run_len, comparefn);
             return;
         }
@@ -389,7 +386,6 @@ public:
 		)"_S;
         assert(number >= 0);
         auto low_bit = 0;
-
         while (number >= min_merge) {
             low_bit |= (number & 1);
             number >>= 1;
@@ -519,9 +515,7 @@ public:
         array_copy(list_, base1, tmp, 0, len1);
 
         auto cursor1 = 0;
-
         auto cursor2 = base2;
-
         auto dest = base1;
 
         list_.set(dest, list_[cursor2]);
@@ -533,19 +527,16 @@ public:
         }
         if (len1 == 1) {
             array_copy(list_, cursor2, list_, dest, len2);
-
             list_.set(dest + len2, tmp[cursor1]);
             return;
         }
 
         auto comparefn = this->comparefn;
-
         auto min_gallop = this->min_gallop;
 
         auto loops_done = false;
         while (true) {
             auto count1 = 0;
-
             auto count2 = 0;
 
             while (true) {
@@ -626,7 +617,6 @@ public:
                 break;
             if (min_gallop < 0)
                 min_gallop = 0;
-
             min_gallop += 2;
         }
 
@@ -640,7 +630,6 @@ public:
         if (len1 == 1) {
             assert(len2 > 0);
             array_copy(list_, cursor2, list_, dest, len2);
-
             list_.set(dest + len2, tmp[cursor1]);
         }
         else if (len1 == 0)
@@ -671,9 +660,7 @@ public:
         array_copy(list_, base2, tmp, 0, len2);
 
         auto cursor1 = base1 + len1 - 1;
-
         auto cursor2 = len2 - 1;
-
         auto dest = base2 + len2 - 1;
 
         list_.set(dest, list_[cursor1]);
@@ -692,13 +679,11 @@ public:
         }
 
         auto comparefn = this->comparefn;
-
         auto min_gallop = this->min_gallop;
 
         auto loops_done = false;
         while (true) {
             auto count1 = 0;
-
             auto count2 = 0;
 
             while (true) {
@@ -779,7 +764,6 @@ public:
                 break;
             if (min_gallop < 0)
                 min_gallop = 0;
-
             min_gallop += 2;
         }
 
@@ -795,7 +779,6 @@ public:
             dest -= len1;
             cursor1 -= len1;
             array_copy(list_, cursor1 + 1, list_, dest + 1, len1);
-
             list_.set(dest, tmp[cursor2]);
         }
         else if (len2 == 0)

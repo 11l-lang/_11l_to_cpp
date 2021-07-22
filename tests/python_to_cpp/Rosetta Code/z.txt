@@ -253,14 +253,12 @@ F neighbours_array(x, y, image)
    ‘Return 8-neighbours of point p1 of picture, in order’
    V i = image
    V (x1, y1, x_1, y_1) = (x + 1, y - 1, x - 1, y + 1)
-
    R [i[y1][x], i[y1][x1], i[y][x1], i[y_1][x1], i[y_1][x], i[y_1][x_1], i[y][x_1], i[y1][x_1]]
 
 F neighbours_tuple(x, y, image)
    ‘Return 8-neighbours of point p1 of picture, in order’
    V i = image
    V (x1, y1, x_1, y_1) = (x + 1, y - 1, x - 1, y + 1)
-
    R (i[y1][x], i[y1][x1], i[y][x1], i[y_1][x1], i[y_1][x], i[y_1][x_1], i[y][x_1], i[y1][x_1])
 
 F transitions(neighbours)
@@ -282,7 +280,6 @@ F zhangSuen(&image)
                changing1.append((x, y))
       L(x, y) changing1
          image[y][x] = 0
-
       changing2.drop()
       L(y) 1 .< image.len - 1
          L(x) 1 .< image[0].len - 1
@@ -292,7 +289,6 @@ F zhangSuen(&image)
                changing2.append((x, y))
       L(x, y) changing2
          image[y][x] = 0
-
    R image
 
 L(picture) (beforeTxt, smallrc01, rc01)
@@ -369,7 +365,6 @@ template <typename T1, typename T2, typename T3> auto neighbours_array(const T1 
     u"Return 8-neighbours of point p1 of picture, in order"_S;
     auto i = image;
     auto [x1, _y1_, x_1, y_1] = make_tuple(x + 1, y - 1, x - 1, y + 1);
-
     return create_array({i[_y1_][x], i[_y1_][x1], i[y][x1], i[y_1][x1], i[y_1][x], i[y_1][x_1], i[y][x_1], i[_y1_][x_1]});
 }
 
@@ -378,7 +373,6 @@ template <typename T1, typename T2, typename T3> auto neighbours_tuple(const T1 
     u"Return 8-neighbours of point p1 of picture, in order"_S;
     auto i = image;
     auto [x1, _y1_, x_1, y_1] = make_tuple(x + 1, y - 1, x - 1, y + 1);
-
     return make_tuple(i[_y1_][x], i[_y1_][x1], i[y][x1], i[y_1][x1], i[y_1][x], i[y_1][x_1], i[y][x_1], i[_y1_][x_1]);
 }
 
@@ -405,7 +399,6 @@ template <typename T1> auto zhangSuen(T1 &image)
             }
         for (auto &&[x, y] : changing1)
             image[y].set(x, 0);
-
         changing2.drop();
         for (auto y : range_el(1, image.len() - 1))
             for (auto x : range_el(1, _get<0>(image).len() - 1)) {
@@ -417,7 +410,6 @@ template <typename T1> auto zhangSuen(T1 &image)
         for (auto &&[x, y] : changing2)
             image[y].set(x, 0);
     }
-
     return image;
 }
 

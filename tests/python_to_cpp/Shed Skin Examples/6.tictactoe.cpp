@@ -161,7 +161,6 @@ public:
                     scorelist.append(make_tuple(scores[rown][coln], make_tuple(rown, coln)));
         scorelist.sort();
         scorelist.reverse();
-
         scorelist = scorelist.filter([&scorelist](const auto &x){return _get<0>(x) == _get<0>(_get<0>(scorelist));});
 
         return make_tuple(_get<0>(_get<1>(_get<0>(scorelist))), _get<1>(_get<1>(_get<0>(scorelist))));

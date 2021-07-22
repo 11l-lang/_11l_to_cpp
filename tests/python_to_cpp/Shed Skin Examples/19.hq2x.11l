@@ -1132,7 +1132,6 @@ F hq2x(xres, yres, rgb)
                PIXEL01_70(&rgb_out, pOut, BpL, c)
             PIXEL10_11(&rgb_out, pOut, BpL, c)
             PIXEL11_12(&rgb_out, pOut, BpL, c)
-
          I pattern == 115
             PIXEL00_11(&rgb_out, pOut, BpL, c)
             I (diff(w[2], w[6]))

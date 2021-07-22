@@ -34,7 +34,6 @@ T rectBoard
 
    F isvictory()
       [Int] victors
-
       L(row) .__board
          I Set(row).len == 1
             I row[0] != 0
@@ -111,14 +110,12 @@ T rectBoard
       V indices = (0 .< .edge).map(i -> (i, i))
       V ld = (0 .< .edge).map(i -> @.__board[i][i])
       .doRow(ld, indices, player, &scores)
-
       L(rown, coln) indices
          scores[rown][coln]++
 
       indices = (0 .< .edge).map(i -> (i, (@.edge - 1) - i))
       V rd = (0 .< .edge).map(i -> @.__board[i][(@.edge - 1) - i])
       .doRow(rd, indices, player, &scores)
-
       L(rown, coln) indices
          scores[rown][coln]++
 
@@ -129,7 +126,6 @@ T rectBoard
                scorelist.append((scores[rown][coln], (rown, coln)))
       scorelist.sort()
       scorelist.reverse()
-
       scorelist = scorelist.filter(x -> x[0] == @scorelist[0][0])
 
       R (scorelist[0][1][0], scorelist[0][1][1])

@@ -68,7 +68,6 @@ T node
       .name = name
       I .name == ‘’
          .name = ‘_’String(index)
-
    F <(other)
       R .count < other.count
    F report()
@@ -119,14 +118,12 @@ F iterate([node] &c) -> InternalNode
       c.sort()
       V deletednode = c[0]
       V second = c[1].index
-
       c[1].count += c[0].count
       c.pop(0)
 
       root = iterate(&c)
 
       V co = find_idx(c, second)
-
       deletednode.word = co.word‘0’
       c.append(deletednode)
       co.word ‘’= ‘1’
@@ -151,7 +148,6 @@ F encode(sourcelist, code)
    V answer = ‘’
    L(s) sourcelist
       V co = find_name(code, s)
-
       I co.index == -1
          print(‘Warning: symbol ’s‘ has no encoding!’)
       E
@@ -162,10 +158,8 @@ F decode(string, root)
    ‘
     Decodes a binary string using the Huffman tree accessed via root
     ’
-
    [String] answer
    V clist = Array(string)
-
    V currentnode = root
    L(c) clist
       I (c == "\n")
@@ -175,7 +169,6 @@ F decode(string, root)
       I currentnode.leaf != 0
          answer.append(String(currentnode.name))
          currentnode = root
-
    R answer
 
 F makenodes(probs)
@@ -299,7 +292,6 @@ F Bdecode(string, root, n)
       print(‘blocks from decoder:’)
       print(answer)
    V output = answer.join(‘’)
-
    R output
 
 F easytest()
@@ -322,7 +314,6 @@ F easytest()
    V n = 3
    V f = 0.01
    V probs = findprobs(f, n)
-
    V symbols = makenodes(probs)
    V root = iterate(&symbols)
 
@@ -355,7 +346,6 @@ F compress_it(inputfile, outputfile)
     ’
    V probs = findprobs(:f, :n)
    V symbols = makenodes(probs)
-
    V root = iterate(&symbols)
 
    V string = inputfile.read()
@@ -367,7 +357,6 @@ F uncompress_it(inputfile, outputfile)
     UNCompress from file (possibly stdin).
     ’
    V probs = findprobs(:f, :n)
-
    V symbols = makenodes(probs)
    V root = iterate(&symbols)
 

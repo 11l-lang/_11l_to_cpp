@@ -360,7 +360,6 @@ template <typename T1> auto legalMoves(const T1 &board)
 {
     auto allMoves = pseudoLegalMoves(board);
     Array<int> retval;
-
     auto kingVal = 6;
     if (_get<26>(board))
         kingVal = -kingVal;
@@ -403,7 +402,6 @@ template <typename T1, typename T2, typename T3, typename T4> auto alphaBeta(con
 {
     if (n == 0)
         return alphaBetaQui(board, alpha, beta, n);
-
     auto bestMove = ::iNone;
 
     for (auto &&mv : legalMoves(board)) {

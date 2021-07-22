@@ -71,7 +71,6 @@ F create_tables()
       I protein.type_id == :BLIND
          L.continue
       V labels = [-1] * 4
-
       labels[protein.type_id] *= -1
       label_table.append(labels)
 
@@ -150,7 +149,6 @@ L(filename, type_id) [(‘testdata/c.txt’, CYTOSOLIC), (‘testdata/e.txt’, 
    load_file(filename, type_id)
 print(‘Creating feature tables...’)
 V (feature_table, label_table) = create_tables()
-
 print(‘Creating kernel table...’)
 V kernel_table = create_kernel_table(feature_table)
 print(‘Training SVM...’)

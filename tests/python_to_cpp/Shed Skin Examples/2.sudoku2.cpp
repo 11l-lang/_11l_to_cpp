@@ -38,7 +38,6 @@ public:
     {
         __fields = board.final;
     }
-
     auto __hash__()
     {
         auto rep = u""_S;
@@ -73,7 +72,6 @@ public:
     decltype(81) __openspaces = 81;
 
     decltype(Set<BoardRep>()) solutions = Set<BoardRep>();
-
     decltype(Set<BoardRep>()) examined = Set<BoardRep>();
     board()
     {
@@ -103,10 +101,8 @@ public:
         __openspaces--;
 
         auto mask = bmp(_9_bytes, val - 1);
-
         rows.set(row, rows[row] & mask);
         cols.set(col, cols[col] & mask);
-
         auto cr = cell(row);
         auto cc = cell(col);
         cels[cr].set(cc, cels[cr][cc] & mask);
@@ -221,7 +217,6 @@ public:
                     auto numallowed = mergemask(row, col).cnt();
                     masks.append(make_tuple(numallowed, row, col));
                 }
-
         return make_tuple(_get<0>(min(masks)), masks.filter([&masks](const auto &i){return _get<0>(i) == _get<0>(min(masks));}).map([](const auto &i){return make_tuple(_get<1>(i), _get<2>(i));}));
     }
 

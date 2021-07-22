@@ -265,10 +265,10 @@ T Grid
    }
 
 F read_words(filename)
+
    [String] words
    L(line) File(filename, ‘r’).read_lines(1B)
       V s = line.trim((‘ ’, "\t", "\r", "\n")).lowercase()
-
       I re:‘^[a-z]{3,10}’.match(s)
          words.append(s)
 
@@ -312,7 +312,6 @@ F try_location(Grid &grid; word, direction, pos)
    rr = r
    cc = c
    i = 0
-
    L i < length
       I grid.cells[rr][cc] == word[i]
          overlaps++
@@ -416,6 +415,7 @@ public:
 
 template <typename T1> auto read_words(const T1 &filename)
 {
+
     Array<String> words;
     for (auto &&line : File(filename, u"r"_S).read_lines(true)) {
         auto s = line.trim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S)).lowercase();
@@ -469,7 +469,6 @@ template <typename T2, typename T3, typename T4> auto try_location(Grid &grid, c
     rr = r;
     cc = c;
     i = 0;
-
     while (i < length) {
         if (grid.cells[rr][cc] == word[i])
             overlaps++;

@@ -126,6 +126,7 @@ template <typename T2, typename T3, typename T4> auto perm(Array<Array<int>> &pu
     }
     else
         if (l.empty()) {
+
             Array<Array<int>> puzzlebackup;
             for (int c = 0; c < 9; c++)
                 puzzlebackup.append(puzzle[c][range_ei(0)]);
