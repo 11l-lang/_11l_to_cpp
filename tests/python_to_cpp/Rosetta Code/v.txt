@@ -17,6 +17,7 @@ F vdc(=n, base = 2)
       (n, V remainder) = divmod(n, base)
       vdc += Float(remainder) / denom
    R vdc
+
 print((0.<10).map(i -> vdc(i)))
 print((0.<10).map(i -> vdc(i, 3)))
 ===
@@ -77,6 +78,7 @@ F van_eck(c)
          val = 0
       seen.insert(0, val)
       n++
+
 print(‘Van Eck: first 10 terms:   ’van_eck(10))
 print(‘Van Eck: terms 991 - 1000: ’van_eck(1000)[(len)-10 ..])
 ===
@@ -158,10 +160,12 @@ F decrypt(key, text)
       out ‘’= Char(code' (c.code - key[j].code + 26) % 26 + ‘A’.code)
       j = (j + 1) % key.len
    R out
+
 V key = ‘VIGENERECIPHER’
 V original = ‘Beware the Jabberwock, my son! The jaws that bite, the claws that catch!’
 V encrypted = encrypt(key, original)
 V decrypted = decrypt(key, encrypted)
+
 print(original)
 print(‘Encrypted: ’encrypted)
 print(‘Decrypted: ’decrypted)
@@ -191,6 +195,7 @@ template <typename T1, typename T2> auto decrypt(const T1 &key, const T2 &text)
     }
     return out;
 }
+
 auto key = u"VIGENERECIPHER"_S;
 auto original = u"Beware the Jabberwock, my son! The jaws that bite, the claws that catch!"_S;
 auto encrypted = encrypt(key, original);
@@ -332,6 +337,7 @@ F vigenere_decrypt(target_freqs, input)
          V i = L.index
          result += f[1] * @sorted_targets[i]
       R result
+
    V cleaned = input.uppercase().filter(c -> c.is_uppercase()).map(c -> c.code)
    V best_len = 0
    V best_corr = -100.0
@@ -341,6 +347,7 @@ F vigenere_decrypt(target_freqs, input)
       L(c) cleaned
          V j = L.index
          pieces[j % i].append(c)
+
       V corr = -0.5 * i + sum(pieces.map(p -> @correlation(p)))
 
       I corr > best_corr
@@ -349,14 +356,18 @@ F vigenere_decrypt(target_freqs, input)
 
    I best_len == 0
       R (‘Text is too short to analyze’, ‘’)
+
    V pieces = [[Int]()] * best_len
    L(c) cleaned
       V i = L.index
       pieces[i % best_len].append(c)
+
    V freqs = pieces.map(p -> @frequency(p))
+
    V key = ‘’
    L(fr_) freqs
       V fr = sorted(fr_, key' a -> a[1], reverse' 1B)
+
       V m = 0
       V max_corr = 0.0
       L(j) 0 .< nchars
@@ -369,9 +380,12 @@ F vigenere_decrypt(target_freqs, input)
          I corr > max_corr
             m = j
             max_corr = corr
+
       key ‘’= Char(code' m + ordA)
+
    V r = (enumerate(cleaned).map((i, c) -> Char(code' (c - @key[i % @best_len].code + @nchars) % @nchars + @ordA)))
    R (key, r.join(‘’))
+
 V encoded = ‘
     MOMUD EKAPV TQEFM OEVHP AJMII CDCTI FGYAG JSPXY ALUYM NSMYH
     VUXJE LEPXJ FXGCM JHKDZ RYICU HYPUS PGIGM OIYHF WHTCQ KMLRD
@@ -390,7 +404,9 @@ V encoded = ‘
     BUXJL ASIMR PNMBF ZCYLV WAPVF QRHZV ZGZEF KBYIO OFXYE VOWGB
     BXVCB XBAWG LQKCM ICRRX MACUO IKHQU AJEGL OIJHH XPVZW JEWBA
     FWAML ZZRXJ EKAHV FASMU LVVUT TGK’
+
 V english_frequences = [0.08167, 0.01492, 0.02782, 0.04253, 0.12702, 0.02228, 0.02015, 0.06094, 0.06966, 0.00153, 0.00772, 0.04025, 0.02406, 0.06749, 0.07507, 0.01929, 0.00095, 0.05987, 0.06327, 0.09056, 0.02758, 0.00978, 0.02360, 0.00150, 0.01974, 0.00074]
+
 V (key, decoded) = vigenere_decrypt(english_frequences, encoded)
 print(‘Key: ’key)
 print("\nText: "decoded)
@@ -424,6 +440,7 @@ template <typename T1, typename T2> auto vigenere_decrypt(const T1 &target_freqs
         }}
         return result;
     };
+
     auto cleaned = input.uppercase().filter([](const auto &c){return c.is_uppercase();}).map([](const auto &c){return c.code;});
     auto best_len = 0;
     auto best_corr = -100.0;
@@ -436,6 +453,7 @@ template <typename T1, typename T2> auto vigenere_decrypt(const T1 &target_freqs
             pieces[mod(j, i)].append(c);
             Lindex++;
         }}
+
         auto corr = -0.5 * i + sum_map(pieces, [&correlation](const auto &p){return correlation(p);});
 
         if (corr > best_corr) {
@@ -445,6 +463,7 @@ template <typename T1, typename T2> auto vigenere_decrypt(const T1 &target_freqs
     }
     if (best_len == 0)
         return make_tuple(u"Text is too short to analyze"_S, u""_S);
+
     auto pieces = create_array({Array<int>()}) * best_len;
     {int Lindex = 0;
     for (auto &&c : cleaned) {
@@ -452,10 +471,13 @@ template <typename T1, typename T2> auto vigenere_decrypt(const T1 &target_freqs
         pieces[mod(i, best_len)].append(c);
         Lindex++;
     }}
+
     auto freqs = pieces.map([&frequency](const auto &p){return frequency(p);});
+
     auto key = u""_S;
     for (auto &&fr_ : freqs) {
         auto fr = sorted(fr_, [](const auto &a){return _get<1>(a);}, true);
+
         auto m = 0;
         auto max_corr = 0.0;
         for (auto j : range_el(0, nchars)) {
@@ -471,11 +493,14 @@ template <typename T1, typename T2> auto vigenere_decrypt(const T1 &target_freqs
                 max_corr = corr;
             }
         }
+
         key &= Char(m + ordA);
     }
+
     auto r = (enumerate(cleaned).map([&best_len, &key, &nchars, &ordA](const auto &i, const auto &c){return Char(mod((c - key[mod(i, best_len)].code + nchars), nchars) + ordA);}));
     return make_tuple(key, r.join(u""_S));
 }
+
 auto encoded = uR"(
     MOMUD EKAPV TQEFM OEVHP AJMII CDCTI FGYAG JSPXY ALUYM NSMYH
     VUXJE LEPXJ FXGCM JHKDZ RYICU HYPUS PGIGM OIYHF WHTCQ KMLRD
@@ -494,6 +519,7 @@ auto encoded = uR"(
     BUXJL ASIMR PNMBF ZCYLV WAPVF QRHZV ZGZEF KBYIO OFXYE VOWGB
     BXVCB XBAWG LQKCM ICRRX MACUO IKHQU AJEGL OIJHH XPVZW JEWBA
     FWAML ZZRXJ EKAHV FASMU LVVUT TGK)"_S;
+
 auto english_frequences = create_array({0.08167, 0.01492, 0.02782, 0.04253, 0.12702, 0.02228, 0.02015, 0.06094, 0.06966, 0.00153, 0.00772, 0.04025, 0.02406, 0.06749, 0.07507, 0.01929, 0.00095, 0.05987, 0.06327, 0.09056, 0.02758, 0.00978, 0.02360, 0.00150, 0.01974, 0.00074});
 auto [key, decoded] = vigenere_decrypt(english_frequences, encoded);
 
@@ -567,9 +593,11 @@ F isOdd(n)
 
 F fangs(n)
    [(Int64, Int64)] r
+
    V nDigits = sorted(String(n))
    I isOdd(nDigits.len)
       R r
+
    V fangLen = nDigits.len I/ 2
    V inf = Pow10[fangLen - 1]
    L(d) inf .< inf * 10
@@ -588,7 +616,9 @@ F fangs(n)
          L.continue
       I dDigits.last != ‘0’ | qDigits.last != ‘0’
          r.append((d, q))
+
    R r
+
 print(‘First 25 vampire numbers with their fangs:’)
 V count = 0
 V n = 10
@@ -602,6 +632,7 @@ L count != 25
    I n == limit
       n *= 10
       limit *= 10
+
 print()
 L(n) [16'758'243'290'880, 24'959'017'348'650, 14'593'825'548'650]
    V fangList = fangs(n)
@@ -620,9 +651,11 @@ template <typename T1> auto isOdd(const T1 &n)
 template <typename T1> auto fangs(const T1 &n)
 {
     Array<llvec2> r;
+
     auto nDigits = sorted(String(n));
     if (isOdd(nDigits.len()))
         return r;
+
     auto fangLen = idiv(nDigits.len(), 2);
     auto inf = Pow10[fangLen - 1];
     for (auto d : range_el(inf, inf * 10)) {
@@ -642,6 +675,7 @@ template <typename T1> auto fangs(const T1 &n)
         if (dDigits.last() != u'0' || qDigits.last() != u'0')
             r.append(make_tuple(d, q));
     }
+
     return r;
 }
 
@@ -672,6 +706,7 @@ struct CodeBlock2
                 limit *= 10;
             }
         }
+
         print();
         for (auto &&n : create_array({16'758'243'290'880, 24'959'017'348'650, 14'593'825'548'650})) {
             auto fangList = fangs(n);
@@ -716,7 +751,6 @@ for x in [UInt64(0x7f), 0x4000, 0, 0x3ffffe, 0x1fffff, 0x200000, 0x3311a1234df31
     s = to_seq(x)
     print('seq from', hexu(x).lower(), to_str(s), 'back:', hexu(from_seq(s)).lower())
 ===
-
 F to_str(v)
    R ‘[ ’v.map(n -> hex(n).lowercase().zfill(2)).join(‘ ’)‘ ]’
 
@@ -726,9 +760,11 @@ F to_seq(UInt64 x)
       I x [&] (UInt64(127) << ii * 7) != 0
          i = ii
          L.break
+
    [Byte] out
    L(j) 0 .. i
       out [+]= ((x >> ((i - j) * 7)) [&] 127) [|] 128
+
    out[i] (+)= 128
    R out
 
@@ -737,6 +773,7 @@ F from_seq(seq)
 
    L(b) seq
       r = (r << 7) [|] (b [&] 127)
+
    R r
 
 L(x) [UInt64(7'f), 40'00, 0, 003f'fffe, 001f'ffff, 0020'0000, 3311'a123'4df3'1413]
@@ -756,9 +793,11 @@ auto to_seq(const UInt64 &x)
             i = ii;
             break;
         }
+
     Array<Byte> out;
     for (auto j : range_ee(0, i))
         out.append(((x >> ((i - j) * 7)) & 127) | 128);
+
     out[i] ^= 128;
     return out;
 }
@@ -768,6 +807,7 @@ template <typename T1> auto from_seq(const T1 &seq)
     UInt64 r = 0;
     for (auto &&b : seq)
         r = (r << 7) | (b & 127);
+
     return r;
 }
 
@@ -775,7 +815,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&x : create_array<UInt64>({to_uint64(0x7f), 0x40'00, 0, 0x003f'fffe, 0x001f'ffff, 0x0020'0000, 0x3311'a123'4df3'1413})) {
             auto s = to_seq(x);
             print(u"seq from "_S & hex(x).lowercase() & u" "_S & to_str(s) & u" back: "_S & hex(from_seq(s)).lowercase());
@@ -851,8 +890,6 @@ for ds in (dset1, dset2):
     print("probability: %.4f"%prob, end=' ')
     print("uniform? ", "Yes"if chi2IsUniform(ds,0.05) else "No")
 ===
-//import math
-//import random
 V a = 12
 V k1_factrl = 1.0
 [Float] c
@@ -876,16 +913,19 @@ F GammaInc_Q(a, x)
 
    F df0(t)
       R (@a1 - t) * t ^ @a2 * exp(-t)
+
    V y = a1
    L f0(y) * (x - y) > 2.0e-8 & y < x
       y += 0.3
    I y > x
       y = x
+
    V h = 3.0e-4
    V n = Int(y / h)
    h = y / n
    V hh = 0.5 * h
    V gamax = h * sum(((n - 1 .< -1).step(-1).map(j -> @h * j)).map(t -> @f0(t) + @hh * @df0(t)))
+
    R gamax / gamma_spounge(a)
 
 F chi2UniformDistance(dataSet)
@@ -900,6 +940,7 @@ F chi2IsUniform(dataSet, significance)
    V dof = dataSet.len - 1
    V dist = chi2UniformDistance(dataSet)
    R chi2Probability(dof, dist) > significance
+
 V dset1 = [199809, 200665, 199607, 200270, 199649]
 V dset2 = [522573, 244456, 139979, 71531, 21461]
 
@@ -950,16 +991,19 @@ template <typename T1, typename T2> auto GammaInc_Q(const T1 &a, const T2 &x)
     {
         return (a1 - t) * pow(t, a2) * exp(-t);
     };
+
     auto y = a1;
     while (f0(y) * (x - y) > 2.0e-8 && y < x)
         y += 0.3;
     if (y > x)
         y = x;
+
     auto h = 3.0e-4;
     auto n = to_int(y / h);
     h = y / n;
     auto hh = 0.5 * h;
     auto gamax = h * sum_map((range_el(n - 1, -1).step(-1).map([&h](const auto &j){return h * j;})), [&df0, &f0, &hh](const auto &t){return f0(t) + hh * df0(t);});
+
     return gamax / gamma_spounge(a);
 }
 
@@ -981,6 +1025,7 @@ template <typename T1, typename T2> auto chi2IsUniform(const T1 &dataSet, const 
     auto dist = chi2UniformDistance(dataSet);
     return chi2Probability(dof, dist) > significance;
 }
+
 auto dset1 = create_array({199809, 200665, 199607, 200270, 199649});
 auto dset2 = create_array({522573, 244456, 139979, 71531, 21461});
 
@@ -988,7 +1033,6 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-
         for (auto &&ds : make_tuple(dset1, dset2)) {
             print(u"Data set: "_S & ds);
             auto dof = ds.len() - 1;

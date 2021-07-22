@@ -49,6 +49,7 @@ T Graph
 
       L(n) 100
          v.append(Vertex(String(n + 1)))
+
       [Edge] e
       L(n) 0 .< 10 * v.len
          V ui = randint(v.len)
@@ -60,6 +61,7 @@ T Graph
             I tvi != ui
                L.break
          e.append(Edge(u, tv, random_uniform(10, 100)))
+
       .v = v
       .e = e
 
@@ -78,6 +80,7 @@ T Graph
          L.was_no_break
             assert(0B)
       R d
+
 V G = Graph()
 
 F Extract_Min([Vertex] &q; d)
@@ -102,6 +105,7 @@ F dijkstra(g, t, s)
    L(v) g.v
       d[v] = 1e50
       previous[v] = Vertex(‘’)
+
    d[s] = 0
    [Vertex] ss
    V Q = copy(g.v)
@@ -115,6 +119,7 @@ F dijkstra(g, t, s)
          I d[u] + edge.d < d[edge.v]
             d[edge.v] = d[u] + edge.d
             previous[edge.v] = u
+
    ss.clear()
    V u = t
    L previous[u].name != ‘’

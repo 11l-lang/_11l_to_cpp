@@ -121,6 +121,7 @@ F gcd(=a, =b)
 
 F lcm(m, n)
    R m I/ gcd(m, n) * n
+
 print(lcm(12, 18))
 ===
 template <typename T1, typename T2> auto gcd(T1 a, T2 b)
@@ -152,10 +153,9 @@ def arc_length(r, angleA, angleB):
 
 print(arc_length(10, 10, 120))
 ===
-//import math
-
 F arc_length(r, angleA, angleB)
    R (360.0 - abs(angleB - angleA)) * math:pi * r / 180.0
+
 print(arc_length(10, 10, 120))
 ===
 template <typename T1, typename T2, typename T3> auto arc_length(const T1 &r, const T2 &angleA, const T3 &angleB)
@@ -189,6 +189,7 @@ F leo_numbers(cnt, =l0 = 1, =l1 = 1, add = 1)
       print(l0, end' ‘ ’)
       (l0, l1) = (l1, l0 + l1 + add)
    print()
+
 print(‘Leonardo Numbers: ’, end' ‘’)
 leo_numbers(25)
 print(‘Fibonacci Numbers: ’, end' ‘’)
@@ -250,6 +251,7 @@ F minimumEditDistance(=s1, =s2)
             newDistances.append(1 + min((distances[index1], distances[index1 + 1], newDistances.last)))
       distances = newDistances
    R distances.last
+
 print(minimumEditDistance(‘kitten’, ‘sitting’))
 print(minimumEditDistance(‘rosettacode’, ‘raisethysword’))
 ===
@@ -326,8 +328,10 @@ T LinearCongruentialGenerator
    F ()()
       .seed = (.a * .seed + .c) [&] .m
       R .seed
+
 V bsd_rnd = LinearCongruentialGenerator(1103515245, 12345, 7FFF'FFFF)
 V ms_rnd = LinearCongruentialGenerator(214013, 2531011, 7FFF'FFFF)
+
 print(‘BSD RAND:’)
 L(i) 5
    print(bsd_rnd())
@@ -356,6 +360,7 @@ public:
         return seed;
     }
 };
+
 auto bsd_rnd = LinearCongruentialGenerator(1103515245, 12345, 0x7FFF'FFFF);
 auto ms_rnd = LinearCongruentialGenerator(214013, 2531011, 0x7FFF'FFFF);
 
@@ -431,6 +436,7 @@ for x in bags(5):
 F bagchain(x, n, bb, start = 0)
    I n == 0
       R [x]
+
    [(Int, String)] out
    L(i) start .< bb.len
       V (c, s) = bb[i]
@@ -441,9 +447,11 @@ F bagchain(x, n, bb, start = 0)
 F bags(n)
    I n == 0
       R [(0, ‘’)]
+
    [(Int, String)] upto
    L(x) (n - 1 .< 0).step(-1)
       upto.extend(bags(x))
+
    R bagchain((0, ‘’), n - 1, upto).map((c, s) -> (c + 1, ‘(’s‘)’))
 
 F replace_brackets(s)
@@ -465,6 +473,7 @@ template <typename T1, typename T2, typename T3, typename T4 = decltype(0)> auto
 {
     if (n == 0)
         return create_array({x});
+
     Array<Tuple<int, String>> out;
     for (auto i : range_el(start, bb.len())) {
         auto [c, s] = bb[i];
@@ -478,9 +487,11 @@ template <typename T1> auto bags(const T1 &n)
 {
     if (n == 0)
         return create_array({make_tuple(0, u""_S)});
+
     Array<Tuple<int, String>> upto;
     for (auto x : range_el(n - 1, 0).step(-1))
         upto.extend(bags(x));
+
     return bagchain(make_tuple(0, u""_S), n - 1, upto).map([](const auto &c, const auto &s){return make_tuple(c + 1, u"("_S & s & u")"_S);});
 }
 
@@ -564,6 +575,7 @@ for i, total in enumerate(totals):
 F sieve(limit)
    [Int] primes
    V c = [0B] * (limit + 1)
+
    V p = 3
    L
       V p2 = p * p
@@ -593,6 +605,7 @@ F findPeriod(n)
       I r == rr
          L.break
    R period
+
 V primes = sieve(64000)
 [Int] longPrimes
 L(prime) primes
@@ -619,6 +632,7 @@ template <typename T1> auto sieve(const T1 &limit)
 {
     Array<int> primes;
     auto c = create_array({false}) * (limit + 1);
+
     auto p = 3;
     while (true) {
         auto p2 = p * p;
@@ -653,6 +667,7 @@ template <typename T1> auto findPeriod(const T1 &n)
     }
     return period;
 }
+
 auto primes = sieve(64000);
 Array<int> longPrimes;
 
@@ -769,6 +784,7 @@ F lcp(sa)
       R ‘’
    I sa.len == 1
       R sa[0]
+
    V min_len = min(sa.map(s -> s.len))
 
    L(i) 0 .< min_len
@@ -776,10 +792,12 @@ F lcp(sa)
       L(j) 1 .< sa.len
          I sa[j][i] != p
             R sa[0][0 .< i]
+
    R sa[0][0 .< min_len]
 
 F test(sa)
    print(String(sa)‘ -> ’lcp(sa))
+
 test([‘interspecies’, ‘interstellar’, ‘interstate’])
 test([‘throne’, ‘throne’])
 test([‘throne’, ‘dungeon’])
@@ -795,6 +813,7 @@ template <typename T1> auto lcp(const T1 &sa)
         return u""_S;
     if (sa.len() == 1)
         return _get<0>(sa);
+
     auto min_len = min(sa.map([](const auto &s){return s.len();}));
 
     for (auto i : range_el(0, min_len)) {
@@ -803,6 +822,7 @@ template <typename T1> auto lcp(const T1 &sa)
             if (sa[j][i] != p)
                 return _get<0>(sa)[range_el(0, i)];
     }
+
     return _get<0>(sa)[range_el(0, min_len)];
 }
 
@@ -860,12 +880,15 @@ F lcs(a, b)
             lengths[i + 1][j + 1] = lengths[i][j] + 1
          E
             lengths[i + 1][j + 1] = max(lengths[i + 1][j], lengths[i][j + 1])
+
    V result = ‘’
    V j = b.len
    L(i) 1 .. a.len
       I lengths[i][j] != lengths[i - 1][j]
          result ‘’= a[i - 1]
+
    R result
+
 print(lcs(‘1234’, ‘1224533324’))
 print(lcs(‘thisisatest’, ‘testing123testing’))
 ===
@@ -886,11 +909,13 @@ template <typename T1, typename T2> auto lcs(const T1 &a, const T2 &b)
         }}
         Lindex++;
     }}
+
     auto result = u""_S;
     auto j = b.len();
     for (auto i : range_ee(1, a.len()))
         if (lengths[i][j] != lengths[i - 1][j])
             result &= a[i - 1];
+
     return result;
 }
 
@@ -936,6 +961,7 @@ F longest_common_substring(s1, s2)
             j2++
          i2 = s2.findi(s1[i1], i2 + 1)
    R s1[ir .< jr + 1]
+
 print(longest_common_substring(‘thisisatest’, ‘testing123testing’))
 ===
 template <typename T1, typename T2> auto longest_common_substring(const T1 &s1, const T2 &s2)
@@ -994,6 +1020,7 @@ F lcs(sa)
       R ‘’
    I sa.len == 1
       R sa[0]
+
    V min_len = min(sa.map(s -> s.len))
 
    L(i) 1 .. min_len
@@ -1001,7 +1028,9 @@ F lcs(sa)
       L(j) 1 .< sa.len
          I sa[j][(len)-i] != p
             R sa[0][(len)-i + 1 ..]
+
    R sa[0][(len)-min_len ..]
+
 print(lcs([‘11Sunday’, ‘2Sunday’]))
 print(lcs([‘Sunday’, ‘Monday’, ‘Tuesday’]))
 print(lcs([‘Sunday’, ‘Monday’, ‘Tuesday’, ‘day’]))
@@ -1013,6 +1042,7 @@ template <typename T1> auto lcs(const T1 &sa)
         return u""_S;
     if (sa.len() == 1)
         return _get<0>(sa);
+
     auto min_len = min(sa.map([](const auto &s){return s.len();}));
 
     for (auto i : range_ee(1, min_len)) {
@@ -1021,6 +1051,7 @@ template <typename T1> auto lcs(const T1 &sa)
             if (sa[j].at_plus_len( - i) != p)
                 return _get<0>(sa)[range_elen_i( - i + 1)];
     }
+
     return _get<0>(sa)[range_elen_i( - min_len)];
 }
 
@@ -1085,12 +1116,14 @@ F longest_increasing_subsequence(x)
             lo = mid + 1
          E
             hi = mid - 1
+
       V newl = lo
       P[i] = M[newl - 1]
       M[newl] = i
 
       I (newl > l)
          l = newl
+
    [Int] s
    V k = M[l]
    L(i) (l - 1 .< -1).step(-1)
@@ -1118,12 +1151,14 @@ template <typename T1> auto longest_increasing_subsequence(const T1 &x)
             else
                 hi = mid - 1;
         }
+
         auto newl = lo;
         P.set(i, M[newl - 1]);
         M.set(newl, i);
         if ((newl > l))
             l = newl;
     }
+
     Array<int> s;
     auto k = M[l];
     for (auto i : range_el(l - 1, -1).step(-1)) {
@@ -1193,6 +1228,7 @@ F longest_palindrome(s)
 
       I i + p[i] > r
          (c, r) = (i, i + p[i])
+
    V (max_len, center_index) = max(enumerate(p).map((i, n) -> (n, i)))
    R s[(center_index - max_len) I/ 2 .< (center_index + max_len) I/ 2]
 
@@ -1424,7 +1460,6 @@ while n < 42:
         i += i - 1
     i += 1
 ===
-
 F is_prime(n)
    L(x) (2, 3)
       I n % x == 0
@@ -1436,6 +1471,7 @@ F is_prime(n)
             R 0B
          d += x
    R 1B
+
 V i = Int64(42)
 V n = 0
 L n < 42
@@ -1459,6 +1495,7 @@ template <typename T1> auto is_prime(const T1 &n)
         }
     return true;
 }
+
 auto i = to_int64(42);
 auto n = 0;
 
@@ -1545,12 +1582,15 @@ F ludic(nmax = 100000)
             newlst.append(lst[i])
       lst = newlst
    R r
+
 V ludics = ludic()
+
 print(‘First 25 ludic primes:’)
 print(ludics[0.<25])
 print("\nThere are #. ludic numbers <= 1000".format(sum(ludics.filter(l -> l <= 1000).map(l -> 1))))
 print("\n2000'th..2005'th ludic primes:")
 print(ludics[2000 - 1 .< 2005])
+
 V n = 250
 V triplets = ludics.filter(x -> x + 6 < :n & x + 2 C :ludics & x + 6 C :ludics).map(x -> (x, x + 2, x + 6))
 print("\nThere are #. triplets less than #.:\n  #.".format(triplets.len, n, triplets))
@@ -1570,6 +1610,7 @@ template <typename T1 = decltype(100000)> auto ludic(const T1 &nmax = 100000)
     }
     return r;
 }
+
 auto ludics = ludic();
 
 struct CodeBlock1
@@ -1583,6 +1624,7 @@ struct CodeBlock1
         print(ludics[range_el(2000 - 1, 2005)]);
     }
 } code_block_1;
+
 auto n = 250;
 auto triplets = ludics.filter([](const auto &x){return x + 6 < ::n && in(x + 2, ::ludics) && in(x + 6, ::ludics);}).map([](const auto &x){return make_tuple(x, x + 2, x + 6);});
 
@@ -1677,7 +1719,6 @@ for i in range(20, 111, 10):
 print("\nDigits in 1,000 through 10,000 by thousands:")
 print([len(str(left_fact(i))) for i in range(1000, 10001, 1000)])
 ===
-
 F left_fact(n)
    BigInt result = 0
    BigInt factorial = 1
@@ -1685,6 +1726,7 @@ F left_fact(n)
       result += factorial
       factorial *= i
    R result
+
 print(‘First 11 left factorials:’)
 print((0.<11).map(i -> left_fact(i)))
 print("\n20 through 110 (inclusive) by tens:")
@@ -1769,14 +1811,15 @@ print(len(seeds), 'Lychrel seeds:', seeds)
 print(len(related), 'Lychrel related')
 print(len(palin), 'Lychrel palindromes:', palin)
 ===
-
 F rev(n)
    R BigInt(reversed(String(n)))
+
 [BigInt = (Bool, BigInt)] cache
 
 F lychrel(BigInt =n)
    I n C :cache
       R :cache[n]
+
    V r = rev(n)
    V res = (1B, n)
    [BigInt] seen
@@ -1794,6 +1837,7 @@ F lychrel(BigInt =n)
    L(x) seen
       :cache[x] = res
    R res
+
 [Int] seeds
 [Int] related
 [Int] palin
@@ -1808,6 +1852,7 @@ L(i) 1..9999
       related [+]= i
    I BigInt(i) == rev(i)
       palin [+]= i
+
 print(seeds.len‘ Lychrel seeds: ’seeds)
 print(related.len‘ Lychrel related’)
 print(palin.len‘ Lychrel palindromes: ’palin)
@@ -1816,12 +1861,14 @@ template <typename T1> auto rev(const T1 &n)
 {
     return BigInt(reversed(String(n)));
 }
+
 Dict<BigInt, Tuple<bool, BigInt>> cache;
 
 auto lychrel(BigInt n)
 {
     if (in(n, ::cache))
         return ::cache[n];
+
     auto r = rev(n);
     auto res = make_tuple(true, n);
     Array<BigInt> seen;
@@ -1842,6 +1889,7 @@ auto lychrel(BigInt n)
         ::cache.set(x, res);
     return res;
 }
+
 Array<int> seeds;
 Array<int> related;
 Array<int> palin;
@@ -1850,7 +1898,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto i : range_ee(1, 9999)) {
             auto tf_s = lychrel(i);
             if (!_get<0>(tf_s))
@@ -1862,6 +1909,7 @@ struct CodeBlock1
             if (BigInt(i) == rev(i))
                 palin.append(i);
         }
+
         print(seeds.len() & u" Lychrel seeds: "_S & seeds);
         print(related.len() & u" Lychrel related"_S);
         print(palin.len() & u" Lychrel palindromes: "_S & palin);
@@ -1961,8 +2009,6 @@ for n in range(1, 7):
     f *= f * n * size
     print("Order %d: Size %-4d x %d! x %d! => Total %d" % (n, size, n, n - 1, f))
 ===
-//import math
-
 F dList(n, =start)
    start--
    V a = Array(0 .< n)
@@ -1970,6 +2016,7 @@ F dList(n, =start)
    a[0] = start
    a.sort_range(1..)
    V first = a[1]
+
    [[Int]] r
    F recurse(Int last) -> N
       I (last == @first)
@@ -2001,12 +2048,15 @@ F reducedLatinSquares(n, echo)
       I echo
          print([1])
       R 1
+
    V rlatin = [[0] * n] * n
 
    L(j) 0 .< n
       rlatin[0][j] = j + 1
+
    V count = 0
    F recurse(Int i) -> N
+
       V rows = dList(@n, i)
 
       L(r) 0 .< rows.len
@@ -2029,10 +2079,13 @@ F reducedLatinSquares(n, echo)
                @count++
                I @echo
                   printSquare(@rlatin, @n)
+
    recurse(2)
    R count
+
 print("The four reduced latin squares of order 4 are:\n")
 reducedLatinSquares(4, 1B)
+
 print(‘The size of the set of reduced latin squares for the following orders’)
 print("and hence the total number of latin squares of these orders are:\n")
 L(n) 1..6
@@ -2049,6 +2102,7 @@ template <typename T1, typename T2> auto dList(const T1 &n, T2 start)
     _set<0>(a, start);
     a.sort_range(range_ei(1));
     auto first = _get<1>(a);
+
     Array<Array<int>> r;
     std::function<void(int)> recurse = [&a, &first, &r, &recurse](const int last)
     {
@@ -2093,9 +2147,11 @@ template <typename T1, typename T2> auto reducedLatinSquares(const T1 &n, const 
             print(create_array({1}));
         return 1;
     }
+
     auto rlatin = create_array({create_array({0}) * n}) * n;
     for (auto j : range_el(0, n))
         _get<0>(rlatin).set(j, j + 1);
+
     auto count = 0;
     std::function<void(int)> recurse = [&count, &echo, &n, &recurse, &rlatin](const int i)
     {
@@ -2128,6 +2184,7 @@ template <typename T1, typename T2> auto reducedLatinSquares(const T1 &n, const 
             }
         }
     };
+
     recurse(2);
     return count;
 }
@@ -2138,6 +2195,7 @@ struct CodeBlock1
     {
         print(u"The four reduced latin squares of order 4 are:\n"_S);
         reducedLatinSquares(4, true);
+
         print(u"The size of the set of reduced latin squares for the following orders"_S);
         print(u"and hence the total number of latin squares of these orders are:\n"_S);
         for (auto n : range_ee(1, 6)) {
@@ -2200,7 +2258,6 @@ r = solve(f)
 R0 = math.exp(12 * r)
 print('r = %f, R0 = %f' % (r, R0))
 ===
-//import math
 V K = 7.8e9
 V n0 = 27
 V actual = [27, 27, 27, 44, 44, 59, 59, 59, 59, 59, 59, 59, 59, 60, 60, 61, 61, 66, 83, 219, 239, 392, 534, 631, 897, 1350, 2023, 2820, 4587, 6067, 7823, 9826, 11946, 14554, 17372, 20615, 24522, 28273, 31491, 34933, 37552, 40540, 43105, 45177, 60328, 64543, 67103, 69265, 71332, 73327, 75191, 75723, 76719, 77804, 78812, 79339, 80132, 80995, 82101, 83365, 85203, 87024, 89068, 90664, 93077, 95316, 98172, 102133, 105824, 109695, 114232, 118610, 125497, 133852, 143227, 151367, 167418, 180096, 194836, 213150, 242364, 271106, 305117, 338133, 377918, 416845, 468049, 527767, 591704, 656866, 715353, 777796, 851308, 928436, 1000249, 1082054, 1174652]
@@ -2233,6 +2290,7 @@ F solve(func, =guess = 0.5, epsilon = 0.0)
             factor = 0.5
       delta *= factor
    R guess
+
 V r = solve(f)
 V R0 = exp(12 * r)
 print(‘r = #.6, R0 = #.6’.format(r, R0))
@@ -2280,6 +2338,7 @@ template <typename T1, typename T2 = decltype(0.5), typename T3 = decltype(0.0)>
     }
     return guess;
 }
+
 auto r = solve(f);
 auto R0 = exp(12 * r);
 
@@ -2384,6 +2443,7 @@ F lu(A)
          V s2 = sum((0 .< j).map(k -> @U[k][@j] * @l[@i][k]))
          l[i][j] = (A2[i][j] - s2) / U[j][j]
    R (l, U, P)
+
 V a = [[1, 3, 5], [2, 4, 7], [1, 1, 0]]
 L(part) lu(a)
    pprint(part)
@@ -2447,6 +2507,7 @@ template <typename T1> auto lu(const T1 &A)
     }
     return make_tuple(l, U, P);
 }
+
 auto a = create_array({create_array({1, 3, 5}), create_array({2, 4, 7}), create_array({1, 1, 0})});
 
 struct CodeBlock1

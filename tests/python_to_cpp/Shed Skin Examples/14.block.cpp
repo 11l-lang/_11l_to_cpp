@@ -51,7 +51,6 @@ The package contains the following functions:
     }
 } code_block_1;
 
-
 class InternalNode
 {
 public:
@@ -150,14 +149,19 @@ InternalNode iterate(Array<node> &c)
         c.sort();
         auto deletednode = _get<0>(c);
         auto second = _get<1>(c).index;
+
         _get<1>(c).count += _get<0>(c).count;
         c.pop(0);
+
         root = iterate(c);
+
         auto co = find_idx(c, second);
+
         deletednode.word = co.word & u"0"_S;
         c.append(deletednode);
         co.word &= u"1"_S;
         co.count -= deletednode.count;
+
         auto newnode0 = InternalNode();
         auto newnode1 = InternalNode();
         auto treenode = co.internalnode;
@@ -194,8 +198,10 @@ template <typename T1, typename T2> auto decode(const T1 &string, const T2 &root
     uR"(
     Decodes a binary string using the Huffman tree accessed via root
     )"_S;
+
     Array<String> answer;
     auto clist = create_array(string);
+
     auto currentnode = root;
     for (auto &&c : clist) {
         if ((c == u'\n'))
@@ -207,6 +213,7 @@ template <typename T1, typename T2> auto decode(const T1 &string, const T2 &root
             currentnode = root;
         }
     }
+
     return answer;
 }
 
@@ -262,6 +269,7 @@ template <typename T1, typename T2> auto dec_to_bin(const T1 &n, const T2 &digit
     }
     return ans;
 }
+
 auto verbose = 0;
 
 template <typename T1> auto weight(const T1 &string)
@@ -314,6 +322,7 @@ template <typename T1, typename T2, typename T3> auto Bencode(const T1 &string, 
     )"_S;
     Array<String> blocks;
     auto chars = create_array(string);
+
     auto s = u""_S;
     for (auto &&c : chars) {
         s = s & c;
@@ -348,6 +357,7 @@ template <typename T1, typename T2, typename T3> auto Bdecode(const T1 &string, 
         print(answer);
     }
     auto output = answer.join(u""_S);
+
     return output;
 }
 
@@ -372,11 +382,14 @@ auto easytest()
     auto n = 3;
     auto f = 0.01;
     auto probs = findprobs(f, n);
+
     auto symbols = makenodes(probs);
     auto root = iterate(symbols);
+
     symbols = sorted(symbols, [](const auto &x){return x.index;});
     for (auto &&co : symbols)
         co.report();
+
     auto source = create_array({u"000"_S, u"001"_S, u"010"_S, u"011"_S, u"100"_S, u"100"_S, u"000"_S});
     auto zipped = encode(source, symbols);
     print(u"zipped  = "_S & zipped);
@@ -388,6 +401,7 @@ auto easytest()
     else
         print(u"OK!"_S);
 }
+
 auto f = 0.01;
 auto n = 12;
 
@@ -410,7 +424,9 @@ template <typename T1, typename T2> auto compress_it(const T1 &inputfile, const 
     )"_S;
     auto probs = findprobs(::f, ::n);
     auto symbols = makenodes(probs);
+
     auto root = iterate(symbols);
+
     auto string = inputfile.read();
     outputfile.write(Bencode(string, symbols, ::n));
 }
@@ -422,8 +438,10 @@ template <typename T1, typename T2> auto uncompress_it(const T1 &inputfile, cons
     UNCompress from file (possibly stdin).
     )"_S;
     auto probs = findprobs(::f, ::n);
+
     auto symbols = makenodes(probs);
     auto root = iterate(symbols);
+
     auto string = inputfile.read();
     outputfile.write(Bdecode(string, root, ::n));
 }
@@ -437,12 +455,14 @@ auto hardertest()
     compress_it(inputfile, outputfile);
     outputfile.close();
     inputfile.close();
+
     inputfile = File(u"tmp.zip"_S, u"r"_S);
     outputfile = File(u"tmp2"_S, u"w"_S);
     print(u"Uncompressing to tmp2"_S);
     uncompress_it(inputfile, outputfile);
     outputfile.close();
     inputfile.close();
+
     print(u"Checking for differences..."_S);
     print((File(u"testdata/BentCoinFile"_S).read() == File(u"tmp2"_S).read()));
 }

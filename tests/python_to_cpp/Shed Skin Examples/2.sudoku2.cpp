@@ -52,6 +52,7 @@ public:
         return __fields < other.__fields;
     }
 };
+
 auto board_notifyOnCompletion = true;
 auto board_completeSearch = false;
 
@@ -62,6 +63,7 @@ public:
     Array<bmp> rows = 9 * create_array({bmp()});
     Array<bmp> cols = 9 * create_array({bmp()});
     Array<Array<bmp>> cels = create_array({create_array({bmp()}) * 3}) * 3;
+
     decltype(0) __turns = 0;
     decltype(0) __backtracks = 0;
     decltype(0.0) __starttime = 0.0;
@@ -69,7 +71,9 @@ public:
     decltype(0) __status = 0;
     decltype(0) __maxdepth = 0;
     decltype(81) __openspaces = 81;
+
     decltype(Set<BoardRep>()) solutions = Set<BoardRep>();
+
     decltype(Set<BoardRep>()) examined = Set<BoardRep>();
     board()
     {
@@ -97,9 +101,12 @@ public:
     {
         final[row].set(col, val);
         __openspaces--;
+
         auto mask = bmp(_9_bytes, val - 1);
+
         rows.set(row, rows[row] & mask);
         cols.set(col, cols[col] & mask);
+
         auto cr = cell(row);
         auto cc = cell(col);
         cels[cr].set(cc, cels[cr][cc] & mask);
@@ -161,6 +168,7 @@ public:
                 __turns++;
                 if (depth > __maxdepth)
                     __maxdepth = depth;
+
                 int mincnt;
                 Array<ivec2> coords;
                 assign_from_tuple(mincnt, coords, _board.findmincounts());
@@ -213,6 +221,7 @@ public:
                     auto numallowed = mergemask(row, col).cnt();
                     masks.append(make_tuple(numallowed, row, col));
                 }
+
         return make_tuple(_get<0>(min(masks)), masks.filter([&masks](const auto &i){return _get<0>(i) == _get<0>(min(masks));}).map([](const auto &i){return make_tuple(_get<1>(i), _get<2>(i));}));
     }
 

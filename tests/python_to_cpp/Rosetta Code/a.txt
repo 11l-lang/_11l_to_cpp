@@ -24,6 +24,7 @@ print(array[0])
 print(array.last)
 print(array.pop())
 print(array.pop(0))
+
 V size = 10
 V myArray = [0] * size
 V width = 3
@@ -45,6 +46,7 @@ struct CodeBlock1
         print(array.pop(0));
     }
 } code_block_1;
+
 auto size = 10;
 auto myArray = create_array({0}) * size;
 auto width = 3;

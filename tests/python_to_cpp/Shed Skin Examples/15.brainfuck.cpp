@@ -3,8 +3,10 @@
 template <typename T1> auto BF_interpreter(T1 prog)
 {
     auto CELL = 255;
+
     prog = (prog.filter([](const auto &c){return in(c, u"><+-.,[]"_S);})).join(u""_S);
     auto len_prog = prog.len();
+
     auto tape = create_array({0});
     auto ip = 0;
     auto p = 0;

@@ -67,6 +67,7 @@ F find_group(mark, min_n, max_n, depth = 1)
          :idx[n] = i
          I find_group(mark, 1, max_n, depth + 1)
             R 1B
+
    R 0B
 
 L(i) 17
@@ -114,6 +115,7 @@ template <typename T1, typename T2, typename T3, typename T4 = decltype(1)> auto
                 return true;
         }
     }
+
     return false;
 }
 
@@ -258,7 +260,7 @@ x ** y          # exponentiation
 ===
 V x = 0
 V y = 0
-//import math
+
 math:e
 math:pi
 sqrt(x)
@@ -349,7 +351,9 @@ F ToReducedRowEchelonForm(&M)
             lv = M[i][lead]
             M[i] = zip(M[r], M[i]).map((rv, iv) -> iv - @lv * rv)
       lead++
+
 V mtx = [[1.0, 2.0, -1.0, -4.0], [2.0, 3.0, -1.0, -11.0], [-2.0, 0.0, -3.0, 22.0]]
+
 ToReducedRowEchelonForm(&mtx)
 
 L(rw) mtx
@@ -384,6 +388,7 @@ template <typename T1> auto ToReducedRowEchelonForm(T1 &M)
         lead++;
     }
 }
+
 auto mtx = create_array({create_array({1.0, 2.0, -1.0, -4.0}), create_array({2.0, 3.0, -1.0, -11.0}), create_array({-2.0, 0.0, -3.0, 22.0})});
 
 struct CodeBlock1
@@ -408,11 +413,11 @@ if re.search('string$', string):
 string = re.sub(" a ", " another ", string)
 print(string)
 ===
-//import re
 V string = ‘This is a string’
 
 I re:‘string$’.search(string)
    print(‘Ends with string.’)
+
 string = string.replace(re:‘ a ’, ‘ another ’)
 print(string)
 ===
@@ -424,6 +429,7 @@ struct CodeBlock1
     {
         if (re::_(u"string$"_S).search(string))
             print(u"Ends with string."_S);
+
         string = string.replace(re::_(u" a "_S), u" another "_S);
         print(string);
     }
@@ -467,6 +473,7 @@ print(exceptGlyphs('eau', txt))
 ===
 F exceptGlyphs(exclusions, s)
    R (s.filter(c -> c !C @exclusions)).join(‘’)
+
 V txt = ‘
     Rosetta Code is a programming chrestomathy site.
     The idea is to present solutions to the same
@@ -474,12 +481,14 @@ V txt = ‘
     to demonstrate how languages are similar and
     different, and to aid a person with a grounding
     in one approach to a problem in learning another.’
+
 print(exceptGlyphs(‘eau’, txt))
 ===
 template <typename T1, typename T2> auto exceptGlyphs(const T1 &exclusions, const T2 &s)
 {
     return (s.filter([&exclusions](const auto &c){return !in(c, exclusions);})).join(u""_S);
 }
+
 auto txt = uR"(
     Rosetta Code is a programming chrestomathy site.
     The idea is to present solutions to the same
@@ -520,6 +529,7 @@ for line in matchstr.split("\n"):
 ===
 F reps(text)
    R (1 .< 1 + text.len I/ 2).filter(x -> @text.starts_with(@text[x ..])).map(x -> @text[0 .< x])
+
 V matchstr = ‘1001110011
 1110111011
 0010010010
@@ -539,6 +549,7 @@ template <typename T1> auto reps(const T1 &text)
 {
     return range_el(1, 1 + idiv(text.len(), 2)).filter([&text](const auto &x){return text.starts_with(text[range_ei(x)]);}).map([&text](const auto &x){return text[range_el(0, x)];});
 }
+
 auto matchstr = uR"(1001110011
 1110111011
 0010010010
@@ -577,6 +588,7 @@ F repeat(f, n)
 
 F procedure()
    print(‘Example’)
+
 repeat(procedure, 3)
 ===
 template <typename T1, typename T2> auto repeat(const T1 &f, const T2 &n)
@@ -746,6 +758,7 @@ print("33 - 12 = %s" % difference)
 ===
 F addsub(x, y)
    R (x + y, x - y)
+
 V (summ, difference) = addsub(33, 12)
 print(‘33 + 12 = #.’.format(summ))
 print(‘33 - 12 = #.’.format(difference))
@@ -783,15 +796,15 @@ print(reverse_gender("He was a soul stripper. He took her heart!"))
 print(reverse_gender("She wants what's hers, he wants her and she wants him!"))
 print(reverse_gender("Her dog belongs to him but his dog is hers!"))
 ===
-//import re
-
 F reverse_gender(=s)
    V words = [‘She’, ‘she’, ‘Her’, ‘her’, ‘hers’, ‘He’, ‘he’, ‘His’, ‘his’, ‘him’]
    V repls = [‘He_’, ‘he_’, ‘His_’, ‘his_’, ‘his_’, ‘She_’, ‘she_’, ‘Her_’, ‘her_’, ‘her_’]
 
    L(word, repl) zip(words, repls)
       s = s.replace(re:(‘\b’word‘\b’), repl)
+
    R s.replace(‘_’, ‘’)
+
 print(reverse_gender(‘She was a soul stripper. She took his heart!’))
 print(reverse_gender(‘He was a soul stripper. He took her heart!’))
 print(reverse_gender(‘She wants what's hers, he wants her and she wants him!’))
@@ -803,6 +816,7 @@ template <typename T1> auto reverse_gender(T1 s)
     auto repls = create_array({u"He_"_S, u"he_"_S, u"His_"_S, u"his_"_S, u"his_"_S, u"She_"_S, u"she_"_S, u"Her_"_S, u"her_"_S, u"her_"_S});
     for (auto &&[word, repl] : zip(words, repls))
         s = s.replace(re::_(uR"(\b)"_S & word & uR"(\b)"_S), repl);
+
     return s.replace(u"_"_S, u""_S);
 }
 
@@ -948,6 +962,7 @@ F to_roman(=x)
       (V n, x) = divmod(x, a)
       ret ‘’= r * n
    R ret
+
 V test = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 30, 40, 50, 60, 69, 70, 80, 90, 99, 100, 200, 300, 400, 500, 600, 666, 700, 800, 900, 1000, 1009, 1444, 1666, 1945, 1997, 1999, 2000, 2008, 2010, 2011, 2500, 3000, 3999]
 L(val) test
    print(‘#. - #.’.format(val, to_roman(val)))
@@ -965,6 +980,7 @@ template <typename T1> auto to_roman(T1 x)
     }
     return ret;
 }
+
 auto test = create_array({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 30, 40, 50, 60, 69, 70, 80, 90, 99, 100, 200, 300, 400, 500, 600, 666, 700, 800, 900, 1000, 1009, 1444, 1666, 1945, 1997, 1999, 2000, 2008, 2010, 2011, 2500, 3000, 3999});
 
 struct CodeBlock1
@@ -1005,10 +1021,13 @@ while x <= stop:
 ===
 F f(x)
    R x ^ 3 - 3 * x ^ 2 + 2 * x
+
 V step = 0.001
 V start = -1.0
 V stop = 3.0
+
 V sgn = f(start) > 0
+
 V x = start
 L x <= stop
    V value = f(x)
@@ -1017,17 +1036,22 @@ L x <= stop
       print(‘Root found at ’x)
    E I (value > 0) != sgn
       print(‘Root found near ’x)
+
    sgn = value > 0
+
    x += step
 ===
 template <typename T1> auto f(const T1 &x)
 {
     return cube(x) - 3 * square(x) + 2 * x;
 }
+
 auto step = 0.001;
 auto start = -1.0;
 auto stop = 3.0;
+
 auto sgn = f(start) > 0;
+
 auto x = start;
 
 struct CodeBlock1
@@ -1040,7 +1064,9 @@ struct CodeBlock1
                 print(u"Root found at "_S & x);
             else if ((value > 0) != sgn)
                 print(u"Root found near "_S & x);
+
             sgn = value > 0;
+
             x += step;
         }
     }
@@ -1069,6 +1095,7 @@ for a, b, c in testcases:
 F quad_roots(a, b, c)
    V sqd = Complex(b ^ 2 - 4 * a * c) ^ 0.5
    R ((-b + sqd) / (2 * a), (-b - sqd) / (2 * a))
+
 V testcases = [(3.0, 4.0, 4 / 3), (3.0, 2.0, -1.0), (3.0, 2.0, 1.0), (1.0, -1e9, 1.0), (1.0, -1e100, 1.0)]
 
 L(a, b, c) testcases
@@ -1081,13 +1108,13 @@ template <typename T1, typename T2, typename T3> auto quad_roots(const T1 &a, co
     auto sqd = pow(Complex(square(b) - 4 * a * c), 0.5);
     return make_tuple((-b + sqd) / (2 * a), (-b - sqd) / (2 * a));
 }
+
 auto testcases = create_array({make_tuple(3.0, 4.0, 4.0 / 3), make_tuple(3.0, 2.0, -1.0), make_tuple(3.0, 2.0, 1.0), make_tuple(1.0, -1e9, 1.0), make_tuple(1.0, -1e100, 1.0)});
 
 struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&[a, b, c] : testcases) {
             auto [r1, r2] = quad_roots(a, b, c);
             print(r1, u" "_S);
@@ -1126,7 +1153,6 @@ value = encode("aaaaahhhhhhmmmmmmmuiiiiiiiaaaaaa")
 print('Encoded value is', [str(v[1])+v[0] for v in value])
 print('Decoded value is', decode(value))
 ===
-
 F encode(input_string)
    V count = 1
    V prev = Char("\0")
@@ -1139,6 +1165,7 @@ F encode(input_string)
          prev = character
       E
          count++
+
    lst.append((input_string.last, count))
    R lst
 
@@ -1147,6 +1174,7 @@ F decode(lst)
    L(character, count) lst
       q ‘’= character * count
    R q
+
 V value = encode(‘aaaaahhhhhhmmmmmmmuiiiiiiiaaaaaa’)
 print(‘Encoded value is ’value.map(v -> String(v[1])‘’v[0]))
 print(‘Decoded value is ’decode(value))
@@ -1165,6 +1193,7 @@ template <typename T1> auto encode(const T1 &input_string)
         }
         else
             count++;
+
     lst.append(make_tuple(input_string.last(), count));
     return lst;
 }
@@ -1176,6 +1205,7 @@ template <typename T1> auto decode(const T1 &lst)
         q &= character * count;
     return q;
 }
+
 auto value = encode(u"aaaaahhhhhhmmmmmmmuiiiiiiiaaaaaa"_S);
 
 struct CodeBlock1
@@ -1215,8 +1245,6 @@ def f(x : float, y : float) -> float:
 for x, y in list(zip(vx, vy))[::10]:
     print("%4.1f %10.5f %11.8f" % (x, y, y - (4 + x * x)**2 / 16))
 ===
-//import math
-
 F rk4(f, x0, y0, x1, n)
    V vx = [0.0] * (n + 1)
    V vy = [0.0] * (n + 1)
@@ -1236,6 +1264,7 @@ F rk4(f, x0, y0, x1, n)
 
 F f(Float x, Float y) -> Float
    R x * sqrt(y)
+
 V (vx, vy) = rk4(f, 0.0, 1.0, 10.0, 100)
 L(x, y) zip(vx, vy)[(0..).step(10)]
    print(‘#2.1 #4.5 #2.8’.format(x, y, y - (4 + x * x) ^ 2 / 16))
@@ -1398,7 +1427,6 @@ demo(
             remove 9
             remove 7""")
 ===
-
 T Sequence
    [[Int]] ranges
 
@@ -1448,6 +1476,7 @@ T Sequence
             L.break
       L.was_no_break
          .ranges.append([add, add])
+
       .consolidate()
 
    F consolidate()
@@ -1490,6 +1519,7 @@ F demo(opp_txt)
          ex.remove(val)
       print(‘    #6 #2 => #.’.format(op, val, ex))
    print()
+
 demo(‘   Start with ""
             add 77
             add 79
@@ -1590,6 +1620,7 @@ public:
         if (!was_break)
             ranges.append(create_array({add, add}));
         }
+
         consolidate();
     }
 
@@ -1769,7 +1800,6 @@ for ranker, ranking_method in [(sc_rank, 'Standard competition ranking'),
     for rank, score in ranker(scores):
         print('  %3g, (%d, %s)' % (rank, score[0], score[1]))
 ===
-
 F mc_rank([(Int, String)] &iterable)
    ‘Modified competition ranking’
    [(Float, (Int, String))] r
@@ -1819,6 +1849,7 @@ F d_rank([(Int, String)] &iterable)
 
 F o_rank([(Int, String)] &iterable)
    ‘Ordinal ranking’
+
    R enumerate(iterable, 1).map((i, item) -> ((Float(i), item)))
 
 F f_rank([(Int, String)] &iterable)
@@ -1840,7 +1871,9 @@ F f_rank([(Int, String)] &iterable)
       L !fifo.empty
          r.append((mean, fifo.pop(0)[1]))
    R r
+
 V scores = [(44, ‘Solomon’), (42, ‘Jason’), (42, ‘Errol’), (41, ‘Garry’), (41, ‘Bernard’), (41, ‘Barry’), (39, ‘Stephen’)]
+
 print("\nScores to be ranked (best first):")
 L(n, s) scores
    print(‘        #2 #.’.format(n, s))
@@ -1915,6 +1948,7 @@ auto d_rank(Array<Tuple<int, String>> &iterable)
 auto o_rank(Array<Tuple<int, String>> &iterable)
 {
     u"Ordinal ranking"_S;
+
     return enumerate(iterable, 1).map([](const auto &i, const auto &item){return (make_tuple(to_float(i), item));});
 }
 
@@ -1945,6 +1979,7 @@ auto f_rank(Array<Tuple<int, String>> &iterable)
     }
     return r;
 }
+
 auto scores = create_array({make_tuple(44, u"Solomon"_S), make_tuple(42, u"Jason"_S), make_tuple(42, u"Errol"_S), make_tuple(41, u"Garry"_S), make_tuple(41, u"Bernard"_S), make_tuple(41, u"Barry"_S), make_tuple(39, u"Stephen"_S)});
 
 struct CodeBlock1
@@ -2077,7 +2112,6 @@ for poly in polys:
     print ('   ', '\t'.join("%s: %s" % (p, 'True' if ispointinside(p, poly) else 'False')
                            for p in testpoints[6:]))
 ===
-
 T Pt
    Float x
    Float y
@@ -2102,6 +2136,7 @@ T Poly
    F (name, edges)
       .name = name
       .edges = edges
+
 V _eps = 0.00001
 V _huge = 1e+100
 V _tiny = 1e-100
@@ -2115,6 +2150,7 @@ F rayintersectseg(=p, edge)
       swap(&a, &b)
    I p.y == a.y | p.y == b.y
       p = Pt(p.x, p.y + :_eps)
+
    V intersect = 0B
 
    I (p.y > b.y | p.y < a.y) | (p.x > max(a.x, b.x))
@@ -2142,8 +2178,10 @@ F ispointinside(p, poly)
 F polypp(poly)
    print("\n  Polygon(name='#.', edges=(".format(poly.name))
    print(‘    ’(poly.edges.map(e -> String(e)).join(",\n    ")"\n    ))"))
+
 V polys = [Poly(name' ‘square’, edges' [Edge(Pt(0, 0), Pt(10, 0)), Edge(Pt(10, 0), Pt(10, 10)), Edge(Pt(10, 10), Pt(0, 10)), Edge(Pt(0, 10), Pt(0, 0))]), Poly(name' ‘square_hole’, edges' [Edge(Pt(0, 0), Pt(10, 0)), Edge(Pt(10, 0), Pt(10, 10)), Edge(Pt(10, 10), Pt(0, 10)), Edge(Pt(0, 10), Pt(0, 0)), Edge(Pt(2.5, 2.5), Pt(7.5, 2.5)), Edge(Pt(7.5, 2.5), Pt(7.5, 7.5)), Edge(Pt(7.5, 7.5), Pt(2.5, 7.5)), Edge(Pt(2.5, 7.5), Pt(2.5, 2.5))]), Poly(name' ‘strange’, edges' [Edge(Pt(0, 0), Pt(2.5, 2.5)), Edge(Pt(2.5, 2.5), Pt(0, 10)), Edge(Pt(0, 10), Pt(2.5, 7.5)), Edge(Pt(2.5, 7.5), Pt(7.5, 7.5)), Edge(Pt(7.5, 7.5), Pt(10, 10)), Edge(Pt(10, 10), Pt(10, 0)), Edge(Pt(10, 0), Pt(2.5, 2.5))]), Poly(name' ‘exagon’, edges' [Edge(Pt(3, 0), Pt(7, 0)), Edge(Pt(7, 0), Pt(10, 5)), Edge(Pt(10, 5), Pt(7, 10)), Edge(Pt(7, 10), Pt(3, 10)), Edge(Pt(3, 10), Pt(0, 5)), Edge(Pt(0, 5), Pt(3, 0))])]
 V testpoints = [Pt(5, 5), Pt(5, 8), Pt(-10, 5), Pt(0, 5), Pt(10, 5), Pt(8, 5), Pt(10, 10)]
+
 print("\n TESTING WHETHER POINTS ARE WITHIN POLYGONS")
 L(poly) polys
    polypp(poly)
@@ -2194,6 +2232,7 @@ public:
     {
     }
 };
+
 auto _eps = 0.00001;
 auto _huge = 1e+100;
 auto _tiny = 1e-100;
@@ -2208,6 +2247,7 @@ template <typename T1, typename T2> auto rayintersectseg(T1 p, const T2 &edge)
         swap(a, b);
     if (p.y == a.y || p.y == b.y)
         p = Pt(p.x, p.y + ::_eps);
+
     auto intersect = false;
     if ((p.y > b.y || p.y < a.y) || (p.x > max(a.x, b.x)))
         return false;
@@ -2239,6 +2279,7 @@ template <typename T1> auto polypp(const T1 &poly)
     print(u"\n  Polygon(name='#.', edges=("_S.format(poly.name));
     print(u"    "_S & (poly.edges.map([](const auto &e){return String(e);}).join(u",\n    "_S) & u"\n    ))"_S));
 }
+
 auto polys = create_array<Poly>({Poly(u"square"_S, create_array<Edge>({Edge(Pt(0, 0), Pt(10, 0)), Edge(Pt(10, 0), Pt(10, 10)), Edge(Pt(10, 10), Pt(0, 10)), Edge(Pt(0, 10), Pt(0, 0))})), Poly(u"square_hole"_S, create_array<Edge>({Edge(Pt(0, 0), Pt(10, 0)), Edge(Pt(10, 0), Pt(10, 10)), Edge(Pt(10, 10), Pt(0, 10)), Edge(Pt(0, 10), Pt(0, 0)), Edge(Pt(2.5, 2.5), Pt(7.5, 2.5)), Edge(Pt(7.5, 2.5), Pt(7.5, 7.5)), Edge(Pt(7.5, 7.5), Pt(2.5, 7.5)), Edge(Pt(2.5, 7.5), Pt(2.5, 2.5))})), Poly(u"strange"_S, create_array<Edge>({Edge(Pt(0, 0), Pt(2.5, 2.5)), Edge(Pt(2.5, 2.5), Pt(0, 10)), Edge(Pt(0, 10), Pt(2.5, 7.5)), Edge(Pt(2.5, 7.5), Pt(7.5, 7.5)), Edge(Pt(7.5, 7.5), Pt(10, 10)), Edge(Pt(10, 10), Pt(10, 0)), Edge(Pt(10, 0), Pt(2.5, 2.5))})), Poly(u"exagon"_S, create_array<Edge>({Edge(Pt(3, 0), Pt(7, 0)), Edge(Pt(7, 0), Pt(10, 5)), Edge(Pt(10, 5), Pt(7, 10)), Edge(Pt(7, 10), Pt(3, 10)), Edge(Pt(3, 10), Pt(0, 5)), Edge(Pt(0, 5), Pt(3, 0))}))});
 auto testpoints = create_array<Pt>({Pt(5, 5), Pt(5, 8), Pt(-10, 5), Pt(0, 5), Pt(10, 5), Pt(8, 5), Pt(10, 10)});
 
@@ -2296,6 +2337,7 @@ text=text.replace("</code>", "</"+"lang>")
 print(text)
 ===
 V languages = [‘abap’, ‘actionscript’, ‘actionscript3’, ‘ada’, ‘apache’, ‘applescript’, ‘apt_sources’, ‘asm’, ‘asp’, ‘autoit’, ‘avisynth’, ‘bar’, ‘bash’, ‘basic4gl’, ‘bf’, ‘blitzbasic’, ‘bnf’, ‘boo’, ‘c’, ‘caddcl’, ‘cadlisp’, ‘cfdg’, ‘cfm’, ‘cil’, ‘c_mac’, ‘cobol’, ‘cpp’, ‘cpp-qt’, ‘csharp’, ‘css’, ‘d’, ‘delphi’, ‘diff’, ‘_div’, ‘dos’, ‘dot’, ‘eiffel’, ‘email’, ‘foo’, ‘fortran’, ‘freebasic’, ‘genero’, ‘gettext’, ‘glsl’, ‘gml’, ‘gnuplot’, ‘go’, ‘groovy’, ‘haskell’, ‘hq9plus’, ‘html4strict’, ‘idl’, ‘ini’, ‘inno’, ‘intercal’, ‘io’, ‘java’, ‘java5’, ‘javascript’, ‘kixtart’, ‘klonec’, ‘klonecpp’, ‘latex’, ‘lisp’, ‘lolcode’, ‘lotusformulas’, ‘lotusscript’, ‘lscript’, ‘lua’, ‘m68k’, ‘make’, ‘matlab’, ‘mirc’, ‘modula3’, ‘mpasm’, ‘mxml’, ‘mysql’, ‘nsis’, ‘objc’, ‘ocaml’, ‘ocaml-brief’, ‘oobas’, ‘oracle11’, ‘oracle8’, ‘pascal’, ‘per’, ‘perl’, ‘php’, ‘php-brief’, ‘pic16’, ‘pixelbender’, ‘plsql’, ‘povray’, ‘powershell’, ‘progress’, ‘prolog’, ‘providex’, ‘python’, ‘qbasic’, ‘rails’, ‘reg’, ‘robots’, ‘ruby’, ‘sas’, ‘scala’, ‘scheme’, ‘scilab’, ‘sdlbasic’, ‘smalltalk’, ‘smarty’, ‘sql’, ‘tcl’, ‘teraterm’, ‘text’, ‘thinbasic’, ‘tsql’, ‘typoscript’, ‘vb’, ‘vbnet’, ‘verilog’, ‘vhdl’, ‘vim’, ‘visualfoxpro’, ‘visualprolog’, ‘whitespace’, ‘winbatch’, ‘xml’, ‘xorg_conf’, ‘xpp’, ‘z80’]
+
 V text = ‘Lorem ipsum <code foo>saepe audire</code> elaboraret ne quo, id equidem
 atomorum inciderint usu. <foo>In sit inermis deleniti percipit</foo>,
 ius ex tale civibus omittam. <barf>Vix ut doctus cetero invenire</barf>, his eu
@@ -2308,9 +2350,11 @@ L(lang) languages
    text = text.replace(‘</’lang‘>’, ‘</’""‘lang>’)
    text = text.replace(‘<code ’lang‘>’, ‘<lang ’lang‘>’)
 text = text.replace(‘</code>’, ‘</’""‘lang>’)
+
 print(text)
 ===
 auto languages = create_array({u"abap"_S, u"actionscript"_S, u"actionscript3"_S, u"ada"_S, u"apache"_S, u"applescript"_S, u"apt_sources"_S, u"asm"_S, u"asp"_S, u"autoit"_S, u"avisynth"_S, u"bar"_S, u"bash"_S, u"basic4gl"_S, u"bf"_S, u"blitzbasic"_S, u"bnf"_S, u"boo"_S, u"c"_S, u"caddcl"_S, u"cadlisp"_S, u"cfdg"_S, u"cfm"_S, u"cil"_S, u"c_mac"_S, u"cobol"_S, u"cpp"_S, u"cpp-qt"_S, u"csharp"_S, u"css"_S, u"d"_S, u"delphi"_S, u"diff"_S, u"_div"_S, u"dos"_S, u"dot"_S, u"eiffel"_S, u"email"_S, u"foo"_S, u"fortran"_S, u"freebasic"_S, u"genero"_S, u"gettext"_S, u"glsl"_S, u"gml"_S, u"gnuplot"_S, u"go"_S, u"groovy"_S, u"haskell"_S, u"hq9plus"_S, u"html4strict"_S, u"idl"_S, u"ini"_S, u"inno"_S, u"intercal"_S, u"io"_S, u"java"_S, u"java5"_S, u"javascript"_S, u"kixtart"_S, u"klonec"_S, u"klonecpp"_S, u"latex"_S, u"lisp"_S, u"lolcode"_S, u"lotusformulas"_S, u"lotusscript"_S, u"lscript"_S, u"lua"_S, u"m68k"_S, u"make"_S, u"matlab"_S, u"mirc"_S, u"modula3"_S, u"mpasm"_S, u"mxml"_S, u"mysql"_S, u"nsis"_S, u"objc"_S, u"ocaml"_S, u"ocaml-brief"_S, u"oobas"_S, u"oracle11"_S, u"oracle8"_S, u"pascal"_S, u"per"_S, u"perl"_S, u"php"_S, u"php-brief"_S, u"pic16"_S, u"pixelbender"_S, u"plsql"_S, u"povray"_S, u"powershell"_S, u"progress"_S, u"prolog"_S, u"providex"_S, u"python"_S, u"qbasic"_S, u"rails"_S, u"reg"_S, u"robots"_S, u"ruby"_S, u"sas"_S, u"scala"_S, u"scheme"_S, u"scilab"_S, u"sdlbasic"_S, u"smalltalk"_S, u"smarty"_S, u"sql"_S, u"tcl"_S, u"teraterm"_S, u"text"_S, u"thinbasic"_S, u"tsql"_S, u"typoscript"_S, u"vb"_S, u"vbnet"_S, u"verilog"_S, u"vhdl"_S, u"vim"_S, u"visualfoxpro"_S, u"visualprolog"_S, u"whitespace"_S, u"winbatch"_S, u"xml"_S, u"xorg_conf"_S, u"xpp"_S, u"z80"_S});
+
 auto text = uR"(Lorem ipsum <code foo>saepe audire</code> elaboraret ne quo, id equidem
 atomorum inciderint usu. <foo>In sit inermis deleniti percipit</foo>,
 ius ex tale civibus omittam. <barf>Vix ut doctus cetero invenire</barf>, his eu
@@ -2322,13 +2366,13 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&lang : languages) {
             text = text.replace(u"<"_S & lang & u">"_S, u"<lang "_S & lang & u">"_S);
             text = text.replace(u"</"_S & lang & u">"_S, u"</"_S & u"lang>"_S);
             text = text.replace(u"<code "_S & lang & u">"_S, u"<lang "_S & lang & u">"_S);
         }
         text = text.replace(u"</code>"_S, u"</"_S & u"lang>"_S);
+
         print(text);
     }
 } code_block_1;

@@ -65,7 +65,9 @@ Error: unindent does not match any outer indentation level
 [-Добавить описание ошибки.-]
 ===============================================================================================================
 ’
+
 V keywords = [‘V’, ‘C’, ‘I’, ‘E’, ‘F’, ‘L’, ‘N’, ‘R’, ‘S’, ‘T’, ‘X’, ‘П’, ‘С’, ‘Е’, ‘И’, ‘Ф’, ‘Ц’, ‘Н’, ‘Р’, ‘В’, ‘Т’, ‘Х’, ‘var’, ‘in’, ‘if’, ‘else’, ‘fn’, ‘loop’, ‘null’, ‘return’, ‘switch’, ‘type’, ‘exception’, ‘перем’, ‘С’, ‘если’, ‘иначе’, ‘фн’, ‘цикл’, ‘нуль’, ‘вернуть’, ‘выбрать’, ‘тип’, ‘исключение’]
+
 [String] empty_list_of_str
 [[String]] binary_operators = [empty_list_of_str, [String(‘+’), ‘-’, ‘*’, ‘/’, ‘%’, ‘^’, ‘&’, ‘|’, ‘<’, ‘>’, ‘=’, ‘?’], [‘<<’, ‘>>’, ‘<=’, ‘>=’, ‘==’, ‘!=’, ‘+=’, ‘-=’, ‘*=’, ‘/=’, ‘%=’, ‘&=’, ‘|=’, ‘^=’, ‘->’, ‘..’, ‘.<’, ‘.+’, ‘<.’, ‘I/’, ‘Ц/’, ‘C ’, ‘С ’], [‘<<=’, ‘>>=’, ‘‘’=’, ‘[+]’, ‘[&]’, ‘[|]’, ‘(+)’, ‘<.<’, ‘I/=’, ‘Ц/=’, ‘in ’, ‘!C ’, ‘!С ’], [‘[+]=’, ‘[&]=’, ‘[|]=’, ‘(+)=’, ‘!in ’]]
 [[String]] unary_operators = [empty_list_of_str, [String(‘!’)], [‘++’, ‘--’], [‘(-)’]]
@@ -96,6 +98,7 @@ T Token
       SCOPE_BEGIN
       SCOPE_END
       STATEMENT_SEPARATOR
+
    Int start
    Int end
    Category category
@@ -159,6 +162,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
             i++
          I i == source.len
             L.break
+
          V ii = i
          I source[i .< i + 2] C (‘\‘’’', ‘\(’, ‘\{’, ‘\[’)
             skip_multiline_comment()
@@ -210,6 +214,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
          I tabs & spaces
             V next_line_pos = source.findi("\n", i)
             X Error(‘mixing tabs and spaces in indentation: `’source[linestart .< i].replace(‘ ’, ‘S’).replace("\t", ‘TAB’)‘’source[i .< I next_line_pos != -1 {next_line_pos} E source.len]‘`’, i)
+
          V indentation_level = ii - linestart
          I indentation_levels.len & indentation_levels.last[0] == -1
             indentation_levels.last = (indentation_level, indentation_levels.last[1])
@@ -247,6 +252,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                      L.break
                   I level < indentation_level
                      X Error(‘unindent does not match any outer indentation level’, ii)
+
       V ch = source[i]
 
       I ch C " \t"
@@ -269,12 +275,14 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
       E
          F is_hexadecimal_digit(ch)
             R ch C ‘0’..‘9’ | ch C ‘A’..‘F’ | ch C ‘a’..‘f’ | ch C ‘абсдефАБСДЕФ’
+
          V operator_s = ‘’
 
          L(op) :sorted_operators
             I source[i .< i + op.len] == op
                operator_s = op
                L.break
+
          V lexem_start = i
          i++
          Token.Category category
@@ -296,6 +304,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                I !(ch.is_alpha() | ch C ‘_?:’ | ch C ‘0’..‘9’)
                   L.break
                i++
+
             V j = i - 1
             L j > lexem_start
                I source[j] == ‘:’
@@ -353,6 +362,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                         L.break
                      is_hex = 1B
                   i++
+
                V next_digit_separator = 0
                V is_oct_or_bin = 0B
                I i < source.len & source[i] == ‘'’
@@ -524,6 +534,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
 
          E
             X Error(‘unexpected character `’ch‘`’, lexem_start)
+
          tokens.append(Token(lexem_start, i, category))
 
    I !nesting_elements.empty
@@ -535,4 +546,5 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
       I implied_scopes != N
          implied_scopes.append((Char(‘}’), I source.last == "\n" {i - 1} E i))
       indentation_levels.pop()
+
    R tokens

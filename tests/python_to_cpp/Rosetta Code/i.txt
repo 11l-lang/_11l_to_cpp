@@ -58,6 +58,7 @@ for x in range(linecount):
 ===
 F do_stuff(words)
    print(words)
+
 V linecount = Int(input())
 L(x) 0 .< linecount
    V line = input()
@@ -67,6 +68,7 @@ template <typename T1> auto do_stuff(const T1 &words)
 {
     print(words);
 }
+
 auto linecount = to_int(input());
 
 struct CodeBlock1
@@ -92,6 +94,7 @@ for x in range(0, t):
 ===
 F do_stuff(a, b)
    R a + b
+
 V t = Int(input())
 L(x) 0 .< t
    V (a, b) = input().split(‘ ’).map(Int)
@@ -101,6 +104,7 @@ template <typename T1, typename T2> auto do_stuff(const T1 &a, const T2 &b)
 {
     return a + b;
 }
+
 auto t = to_int(input());
 
 struct CodeBlock1
@@ -159,8 +163,6 @@ import itertools
 for i in itertools.count(1):
     print(i)
 ===
-//import itertools
-
 L(i) 1..
    print(i)
 ===
@@ -201,7 +203,6 @@ A: 1 B C; B: 3 4; C: 5 B'''.strip("\n").split('\n'):
     gen = ' '.join(nextfrom(wheel, first) for i in range(20))
     print("  Generates:\n    " + gen + " ...\n")
 ===
-
 F nextfrom(&w, =name)
    L
       V nxt = w[name][0]
@@ -241,7 +242,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&group : uR"(
 A: 1 2 3
 A: 1 B 2; B: 3 4
@@ -286,6 +286,7 @@ F is_isbn13(=n)
       R 0B
    V product = (sum(n[(0..).step(2)].map(ch -> Int(ch))) + sum(n[(1..).step(2)].map(ch -> Int(ch) * 3)))
    R product % 10 == 0
+
 V tests = ‘
 978-1734314502
 978-1734314509
@@ -302,6 +303,7 @@ template <typename T1> auto is_isbn13(T1 n)
     auto product = (sum_map(n[range_ei(0).step(2)], [](const auto &ch){return to_int(ch);}) + sum_map(n[range_ei(1).step(2)], [](const auto &ch){return to_int(ch) * 3;}));
     return mod(product, 10) == 0;
 }
+
 auto tests = uR"(
 978-1734314502
 978-1734314509
@@ -357,7 +359,6 @@ print('Checking plausibility of "I before E except after C":')
 (cei, cie, not_c_ie, not_c_ei) = simple_stats()
 print_result(cei, cie, not_c_ie, not_c_ei)
 ===
-//import re
 V PLAUSIBILITY_RATIO = 2
 
 F plausibility_check(comment, x, y)
@@ -385,6 +386,7 @@ F print_result(cei, cie, not_c_ie, not_c_ei)
    E
       print("\nOVERALL IT IS IMPLAUSIBLE!")
    print(‘(To be plausible, one count must exceed another by #. times)’.format(:PLAUSIBILITY_RATIO))
+
 print(‘Checking plausibility of "I before E except after C":’)
 V (cei, cie, not_c_ie, not_c_ei) = simple_stats()
 print_result(cei, cie, not_c_ie, not_c_ei)
@@ -463,7 +465,6 @@ for w in ['cat', 'is', 'banana', 'it', 'what']:
     else:
         print("'%s' not found." % w)
 ===
-//import collections, re
 DefaultDict[String, Set[String]] index
 
 F parse_file(fname, fcontents)
@@ -561,8 +562,6 @@ while True:
 
 print(result)
 ===
-//import math
-
 F next_step(=x)
    V result = 0
    L x > 0
@@ -582,14 +581,18 @@ F check(number)
       V digits_count = [0] * 10
       L(d) number
          digits_count[d]++
+
       V result = factorial(number.len)
       L(c) digits_count
          result I/= factorial(c)
       R result
+
    R 0
+
 V limit = 100000000
 V cache_size = Int(ceil(log10(limit)))
 assert(10 ^ cache_size == limit)
+
 V number = [0] * cache_size
 V result = 0
 V i = cache_size - 1
@@ -608,6 +611,7 @@ L
          number[j] = number[i]
       i = cache_size - 1
       result += check(number)
+
 print(result)
 ===
 template <typename T1> auto next_step(T1 x)
@@ -632,13 +636,16 @@ template <typename T1> auto check(const T1 &number)
         auto digits_count = create_array({0}) * 10;
         for (auto &&d : number)
             digits_count[d]++;
+
         auto result = factorial(number.len());
         for (auto &&c : digits_count)
             result = idiv(result, factorial(c));
         return result;
     }
+
     return 0;
 }
+
 auto limit = 100000000;
 auto cache_size = to_int(ceil(log10(limit)));
 
@@ -649,6 +656,7 @@ struct CodeBlock1
         assert(pow(10, cache_size) == limit);
     }
 } code_block_1;
+
 auto number = create_array({0}) * cache_size;
 auto result = 0;
 auto i = cache_size - 1;
@@ -657,7 +665,6 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-
         while (true) {
             if (i == 0 && number[i] == 9)
                 break;
@@ -675,6 +682,7 @@ struct CodeBlock2
                 result += check(number);
             }
         }
+
         print(result);
     }
 } code_block_2;

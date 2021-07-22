@@ -56,6 +56,7 @@ auto solvePuzzleSimple(Array<Array<int>> &puzzle)
     while (solvePuzzleStep(puzzle) == true)
         iterationCount++;
 }
+
 Dict<int, bool> hashtable;
 
 template <typename T1> auto calc_hash_of_list(const T1 &l)
@@ -83,6 +84,7 @@ template <typename T1> auto hash_lookup(const T1 &puzzle)
 {
     return in(calc_hash(puzzle), ::hashtable);
 }
+
 auto iterations = 0;
 
 template <typename T1> auto printpuzzle(const T1 &puzzle)
@@ -169,6 +171,7 @@ template <typename T2, typename T3, typename T4> auto perm(Array<Array<int>> &pu
 auto solve()
 {
     auto puzzle = create_array({create_array({0, 9, 3, 0, 8, 0, 4, 0, 0}), create_array({0, 4, 0, 0, 3, 0, 0, 0, 0}), create_array({6, 0, 0, 0, 0, 9, 2, 0, 5}), create_array({3, 0, 0, 0, 0, 0, 0, 9, 0}), create_array({0, 2, 7, 0, 0, 0, 5, 1, 0}), create_array({0, 8, 0, 0, 0, 0, 0, 0, 4}), create_array({7, 0, 1, 6, 0, 0, 0, 0, 2}), create_array({0, 0, 0, 0, 7, 0, 0, 6, 0}), create_array({0, 0, 4, 0, 1, 0, 8, 5, 0})});
+
     Array<ivec2> u;
     Array<int> lcount;
     for (int y = 0; y < 3; y++)
@@ -184,6 +187,7 @@ auto solve()
                     swap(lcount[i], lcount[j]);
                 }
             }
+
     auto l = genMoveList(puzzle, 0, 0);
     perm(puzzle, 0, 0, l, u);
 }

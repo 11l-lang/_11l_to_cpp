@@ -1,6 +1,3 @@
-//import random
-//import math
-
 F generateRandomPoints(npoints = 6)
    ‘Generate a few random points v1...vn’
    print(String(npoints)‘ points x,y:’)
@@ -35,7 +32,6 @@ F generateScreen(points, rows = 40, cols = 80)
       screen.extend(line)
       screen.append("\n")
    R screen.join(‘’)
-//import time
 
 :start:
 V points = generateRandomPoints(10)

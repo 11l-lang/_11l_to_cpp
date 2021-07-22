@@ -67,7 +67,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&sailors : create_array({5, 6})) {
             auto [nuts, wake_stats] = monkey_coconuts(sailors);
             print(u"\nFor #. sailors the initial nut count is #."_S.format(sailors, nuts));
@@ -90,8 +89,6 @@ for _ in range(3):
     sattolo_cycle(lst)
     print(lst)
 ===
-//import random
-
 F sattolo_cycle(&items)
    L(i) (items.len - 1 .< 0).step(-1)
       V j = random:(i)
@@ -114,7 +111,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (int _ = 0; _ < 3; _++) {
             auto lst = create_array({1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
             sattolo_cycle(lst);
@@ -164,6 +160,7 @@ F outerfunc()
    F scoped_global()
       R ‘scoped_global scope gives x = ’:x
    print(scoped_global())
+
 outerfunc()
 ===
 auto x = u"From global scope"_S;
@@ -224,7 +221,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&needle : make_tuple(u"Washington"_S, u"Bush"_S)) {
             try
             {
@@ -282,6 +278,7 @@ T City
    F (name, population)
       .name = name
       .population = population
+
 V cities = [City(‘Lagos’, 21), City(‘Cairo’, 15.2), City(‘Kinshasa-Brazzaville’, 11.3), City(‘Greater Johannesburg’, 7.55), City(‘Mogadishu’, 5.85), City(‘Khartoum-Omdurman’, 4.98), City(‘Dar Es Salaam’, 4.7), City(‘Alexandria’, 4.58), City(‘Abidjan’, 4.4), City(‘Casablanca’, 3.98)]
 
 F first_index(cities, condition)
@@ -294,6 +291,7 @@ F first(cities, condition)
    L(city) cities
       I condition(city)
          R city
+
 print(first_index(cities, city -> city.name == ‘Dar Es Salaam’))
 print(first(cities, city -> city.population < 5.0).name)
 print(first(cities, city -> city.name[0] == ‘A’).population)
@@ -310,6 +308,7 @@ public:
     {
     }
 };
+
 auto cities = create_array<City>({City(u"Lagos"_S, 21), City(u"Cairo"_S, 15.2), City(u"Kinshasa-Brazzaville"_S, 11.3), City(u"Greater Johannesburg"_S, 7.55), City(u"Mogadishu"_S, 5.85), City(u"Khartoum-Omdurman"_S, 4.98), City(u"Dar Es Salaam"_S, 4.7), City(u"Alexandria"_S, 4.58), City(u"Abidjan"_S, 4.4), City(u"Casablanca"_S, 3.98)});
 
 template <typename T1, typename T2> auto first_index(const T1 &cities, const T2 &condition)
@@ -372,11 +371,13 @@ for sedol in sedols.split("\n"):
 F char2value(c)
    assert(c !C ‘AEIOU’, ‘No vowels’)
    R Int(c, radix' 36)
+
 V sedolweight = [1, 3, 1, 7, 3, 9]
 
 F checksum(sedol)
    V tmp = sum(zip(sedol, :sedolweight).map((ch, weight) -> char2value(ch) * weight))
    R String((10 - (tmp % 10)) % 10)
+
 V sedols = ‘710889
 B0YBKJ
 406566
@@ -396,6 +397,7 @@ template <typename T1> auto char2value(const T1 &c)
     assert(!in(c, u"AEIOU"_S), u"No vowels"_S);
     return to_int(c, 36);
 }
+
 auto sedolweight = create_array({1, 3, 1, 7, 3, 9});
 
 template <typename T1> auto checksum(const T1 &sedol)
@@ -403,6 +405,7 @@ template <typename T1> auto checksum(const T1 &sedol)
     auto tmp = sum_map(zip(sedol, ::sedolweight), [](const auto &ch, const auto &weight){return char2value(ch) * weight;});
     return String(mod((10 - (mod(tmp, 10))), 10));
 }
+
 auto sedols = uR"(710889
 B0YBKJ
 406566
@@ -434,6 +437,7 @@ print([x for x in range(4000000) if is_self_describing(x)])
 F is_self_describing(n)
    V s = String(n)
    R all(enumerate(Array(s)).map((i, ch) -> @s.count(String(i)) == Int(ch)))
+
 print((0.<4000000).filter(x -> is_self_describing(x)))
 ===
 template <typename T1> auto is_self_describing(const T1 &n)
@@ -475,6 +479,7 @@ F is_semiprime(=c)
       E
          a++
    R b == 2
+
 print((1..100).filter(n -> is_semiprime(n)))
 ===
 template <typename T1> auto is_semiprime(T1 c)
@@ -518,10 +523,9 @@ for i in range(1, 10 ** 6):
 else:
     print('No squares found')
 ===
-//import math
-
 F non_square(Int n)
    R n + Int(floor(1 / 2 + sqrt(n)))
+
 print_elements((1..22).map(non_square))
 
 F is_square(n)
@@ -584,6 +588,7 @@ F prime(a)
 
 F primes_below(n)
    R (0 .< n).filter(i -> prime(i))
+
 print(primes_below(100))
 ===
 template <typename T1> auto prime(const T1 &a)
@@ -818,15 +823,18 @@ print(area_by_shoelace(x, y))
 ===
 F area_by_shoelace(x, y)
    R abs(sum(zip(x, y[1..] + y[0.<1]).map((i, j) -> i * j)) - sum(zip(x[1..] + x[0.<1], y).map((i, j) -> i * j))) / 2
+
 V points = [(3, 4), (5, 11), (12, 8), (9, 5), (5, 6)]
 V x = points.map(p -> p[0])
 V y = points.map(p -> p[1])
+
 print(area_by_shoelace(x, y))
 ===
 template <typename T1, typename T2> auto area_by_shoelace(const T1 &x, const T2 &y)
 {
     return abs(sum_map(zip(x, y[range_ei(1)] + y[range_el(0, 1)]), [](const auto &i, const auto &j){return i * j;}) - sum_map(zip(x[range_ei(1)] + x[range_el(0, 1)], y), [](const auto &i, const auto &j){return i * j;})) / 2.0;
 }
+
 auto points = create_array({make_tuple(3, 4), make_tuple(5, 11), make_tuple(12, 8), make_tuple(9, 5), make_tuple(5, 6)});
 auto x = points.map([](const auto &p){return _get<0>(p);});
 auto y = points.map([](const auto &p){return _get<1>(p);});
@@ -924,6 +932,7 @@ F scs(String x, String y)
       R y[0]‘’scs(x, y[1..])
    E
       R x[0]‘’scs(x[1..], y)
+
 print(scs(‘abcbdab’, ‘bdcaba’))
 ===
 auto scs(const String &x, const String &y)
@@ -1011,6 +1020,7 @@ F sierpinski_carpet(n)
    L(i) 0 .< n
       carpet = carpet.map(x -> x‘’x‘’x) [+] carpet.map(x -> x‘’x.replace(‘#’, ‘ ’)‘’x) [+] carpet.map(x -> x‘’x‘’x)
    R carpet.join("\n")
+
 print(sierpinski_carpet(3))
 ===
 template <typename T1> auto sierpinski_carpet(const T1 &n)
@@ -1046,6 +1056,7 @@ F sierpinski(n)
       V sp = ‘ ’ * (2 ^ i)
       d = d.map(x -> @sp‘’x‘’@sp) [+] d.map(x -> x‘ ’x)
    R d
+
 print(sierpinski(4).join("\n"))
 ===
 template <typename T1> auto sierpinski(const T1 &n)
@@ -1085,6 +1096,7 @@ F primes_upto(limit)
          L(i) (n * n .< limit + 1).step(n)
             is_prime[i] = 0B
    R enumerate(is_prime).filter((i, prime) -> prime).map((i, prime) -> i)
+
 print(primes_upto(100))
 ===
 template <typename T1> auto primes_upto(const T1 &limit)
@@ -1114,7 +1126,6 @@ print("Sleeping...")
 time.sleep(seconds) # number is in seconds ... but accepts fractions
 print("Awake!")
 ===
-//import time
 V seconds = Float(input())
 print(‘Sleeping...’)
 sleep(seconds)
@@ -1210,6 +1221,7 @@ F sequence(max_n)
             n++
             r.append(ii)
    R r
+
 V seq = sequence(100)
 print(‘First 25 SPDS primes:’)
 L(item) seq[0.<25]
@@ -1264,6 +1276,7 @@ template <typename T1> auto sequence(const T1 &max_n)
     }
     return r;
 }
+
 auto seq = sequence(100);
 
 struct CodeBlock1
@@ -1354,12 +1367,14 @@ F sum_digits(=n)
       sum += m
       n -= m
       n I/= 10
+
    R sum
 
 F add_all_digits(lst)
    V sum = 0
    L(i) 0 .< lst.len
       sum += sum_digits(lst[i])
+
    R sum
 
 F list_smith_numbers(cnt)
@@ -1370,6 +1385,7 @@ F list_smith_numbers(cnt)
          I sum_digits(i) == add_all_digits(fac)
             r.append(i)
    R r
+
 V sn = list_smith_numbers(10'000)
 print(‘Count of Smith Numbers below 10k: ’sn.len)
 print()
@@ -1407,6 +1423,7 @@ template <typename T1> auto sum_digits(T1 n)
         n -= m;
         n = idiv(n, 10);
     }
+
     return sum;
 }
 
@@ -1415,6 +1432,7 @@ template <typename T1> auto add_all_digits(const T1 &lst)
     auto sum = 0;
     for (auto i : range_el(0, lst.len()))
         sum += sum_digits(lst[i]);
+
     return sum;
 }
 
@@ -1430,6 +1448,7 @@ template <typename T1> auto list_smith_numbers(const T1 &cnt)
     }
     return r;
 }
+
 auto sn = list_smith_numbers(10'000);
 
 struct CodeBlock1
@@ -1516,6 +1535,7 @@ F solve(&pz, sz, sx, sy, idx, cnt)
          I 1 == solve(&pz, sz, x, y, idx + 1, cnt)
             R 1
          pz[x][y] = 0
+
    R 0
 
 F find_solution(pz, sz)
@@ -1546,6 +1566,7 @@ F find_solution(pz, sz)
          print()
    E
       print(‘Cannot solve this puzzle!’)
+
 find_solution(‘.xxx.....x.xx....xxxxxxxxxx..x.xx.x..xxxsxxxxxx...xx.x.....xxx..’, 8)
 print()
 find_solution(‘.....s.x..........x.x.........xxxxx.........xxx.......x..x.x..x..xxxxx...xxxxx..xx.....xx..xxxxx...xxxxx..x..x.x..x.......xxx.........xxxxx.........x.x..........x.x.....’, 13)
@@ -1567,6 +1588,7 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5, typen
             pz[x].set(y, 0);
         }
     }
+
     return 0;
 }
 
@@ -1699,6 +1721,7 @@ F iterate(&pa, x, y, v)
    R 0
 
 F solve(pz, w, h)
+
    V pa = [[-1] * h] * w
    V f = 0
    :pWid = w
@@ -1717,7 +1740,9 @@ F solve(pz, w, h)
             I 1 == iterate(&pa, x, y, 2)
                R (1, pa)
             pa[x][y] = 0
+
    R (0, pa)
+
 V r = solve(‘011011011111111111111011111000111000001000’, 7, 6)
 I r[0] == 1
    L(j) 6
@@ -1781,8 +1806,10 @@ template <typename T1, typename T2, typename T3> auto solve(const T1 &pz, const 
                     return make_tuple(1, pa);
                 pa[x].set(y, 0);
             }
+
     return make_tuple(0, pa);
 }
+
 auto r = solve(u"011011011111111111111011111000111000001000"_S, 7, 6);
 
 struct CodeBlock1
@@ -1820,12 +1847,14 @@ for s in sorted(data, key=lambda x: list(map(int, x.split(delim)))):
     print(s)
 ===
 V data = [‘1.3.6.1.4.1.11.2.17.19.3.4.0.10’, ‘1.3.6.1.4.1.11.2.17.5.2.0.79’, ‘1.3.6.1.4.1.11.2.17.19.3.4.0.4’, ‘1.3.6.1.4.1.11150.3.4.0.1’, ‘1.3.6.1.4.1.11.2.17.19.3.4.0.1’, ‘1.3.6.1.4.1.11150.3.4.0’]
+
 V delim = ‘.’
 
 L(s) sorted(data, key' x -> x.split(:delim).map(Int))
    print(s)
 ===
 auto data = create_array({u"1.3.6.1.4.1.11.2.17.19.3.4.0.10"_S, u"1.3.6.1.4.1.11.2.17.5.2.0.79"_S, u"1.3.6.1.4.1.11.2.17.19.3.4.0.4"_S, u"1.3.6.1.4.1.11150.3.4.0.1"_S, u"1.3.6.1.4.1.11.2.17.19.3.4.0.1"_S, u"1.3.6.1.4.1.11150.3.4.0"_S});
+
 auto delim = u"."_S;
 
 struct CodeBlock1
@@ -1855,6 +1884,7 @@ F sort_disjoint_sublist(&data, indices)
    V values = sorted(sindices.map(i -> @data[i]))
    L(index, value) zip(sindices, values)
       data[index] = value
+
 V d = [7, 6, 5, 4, 3, 2, 1, 0]
 V i = [6, 1, 7]
 sort_disjoint_sublist(&d, i)
@@ -1867,6 +1897,7 @@ template <typename T1, typename T2> auto sort_disjoint_sublist(T1 &data, const T
     for (auto &&[index, value] : zip(sindices, values))
         data.set(index, value);
 }
+
 auto d = create_array({7, 6, 5, 4, 3, 2, 1, 0});
 auto i = create_array({6, 1, 7});
 
@@ -1916,6 +1947,7 @@ V y = -12
 V z = 0
 (x, y, z) = tuple_sorted((x, y, z))
 print(x‘ ’y‘ ’z)
+
 V xs = ‘lions, tigers, and’
 V ys = ‘bears, oh my!’
 V zs = ‘(from the "Wizard of OZ")’
@@ -1934,6 +1966,7 @@ struct CodeBlock1
         print(x & u" "_S & y & u" "_S & z);
     }
 } code_block_1;
+
 auto xs = u"lions, tigers, and"_S;
 auto ys = u"bears, oh my!"_S;
 auto zs = u"(from the \"Wizard of OZ\")"_S;
@@ -1954,6 +1987,7 @@ strings = "here are Some sample strings to be sorted".split(' ')
 print(sorted(strings, key = lambda x: (-len(x), x.upper())))
 ===
 V strings = ‘here are Some sample strings to be sorted’.split(‘ ’)
+
 print(sorted(strings, key' x -> (-x.len, x.uppercase())))
 ===
 auto strings = u"here are Some sample strings to be sorted"_S.split(u" "_S);
@@ -1982,11 +2016,10 @@ arr = [2, 1, 3]
 bogosort(arr)
 print(arr)
 ===
-//import random
-
 F bogosort(&data)
    L !data.is_sorted()
       random:shuffle(&data)
+
 V arr = [2, 1, 3]
 bogosort(&arr)
 print(arr)
@@ -1996,6 +2029,7 @@ template <typename T1> auto bogosort(T1 &data)
     while (!data.is_sorted())
         randomns::shuffle(data);
 }
+
 auto arr = create_array({2, 1, 3});
 
 struct CodeBlock1
@@ -2066,7 +2100,6 @@ F circle_sort(&l)
       s = circle_sort_backend(&l, 0, l.len)
       swaps += s
    R swaps
-//import random
 L(i) 309
    V l = Array(0 .< i)
    V m = copy(l)
@@ -2112,7 +2145,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (int i = 0; i < 309; i++) {
             auto l = create_array(range_el(0, i));
             auto m = copy(l);
@@ -2155,6 +2187,7 @@ F cocktailSort(&A)
                swapped = 1B
          I !swapped
             R
+
 V test1 = [7, 6, 5, 9, 8, 4, 3, 1, 2, 0]
 cocktailSort(&test1)
 print(test1)
@@ -2173,6 +2206,7 @@ template <typename T1> auto cocktailSort(T1 &A)
                 return;
         }
 }
+
 auto test1 = create_array({7, 6, 5, 9, 8, 4, 3, 1, 2, 0});
 
 struct CodeBlock1
@@ -2222,13 +2256,16 @@ F cocktailshiftingbounds(&A)
          I A[ii] > A[ii + 1]
             swap(&A[ii + 1], &A[ii])
             newEndIdx = ii
+
       endIdx = newEndIdx
 
       L(ii) (endIdx .< beginIdx - 1).step(-1)
          I A[ii] > A[ii + 1]
             swap(&A[ii + 1], &A[ii])
             newBeginIdx = ii
+
       beginIdx = newBeginIdx + 1
+
 V test1 = [7, 6, 5, 9, 8, 4, 3, 1, 2, 0]
 cocktailshiftingbounds(&test1)
 print(test1)
@@ -2246,15 +2283,18 @@ template <typename T1> auto cocktailshiftingbounds(T1 &A)
                 swap(A[ii + 1], A[ii]);
                 newEndIdx = ii;
             }
+
         endIdx = newEndIdx;
         for (auto ii : range_el(endIdx, beginIdx - 1).step(-1))
             if (A[ii] > A[ii + 1]) {
                 swap(A[ii + 1], A[ii]);
                 newBeginIdx = ii;
             }
+
         beginIdx = newBeginIdx + 1;
     }
 }
+
 auto test1 = create_array({7, 6, 5, 9, 8, 4, 3, 1, 2, 0});
 
 struct CodeBlock1
@@ -2296,6 +2336,7 @@ F combsort(&input)
          I input[i] > input[j]
             swap(&input[i], &input[j])
             swaps = 1B
+
 V y = [88, 18, 31, 44, 4, 0, 8, 81, 14, 78, 20, 76, 84, 33, 73, 75, 82, 5, 62, 70]
 combsort(&y)
 assert(y == sorted(y))
@@ -2317,6 +2358,7 @@ template <typename T1> auto combsort(T1 &input)
         }
     }
 }
+
 auto y = create_array({88, 18, 31, 44, 4, 0, 8, 81, 14, 78, 20, 76, 84, 33, 73, 75, 82, 5, 62, 70});
 
 struct CodeBlock1
@@ -2348,11 +2390,13 @@ F countingSort(a, min, max)
    V cnt = [0] * (max - min + 1)
    L(x) a
       cnt[x - min]++
+
    [Int] result
    L(n) cnt
       V x = L.index + min
       result [+]= [x] * n
    R result
+
 V data = [9, 7, 10, 2, 9, 7, 4, 3, 10, 2, 7, 10, 2, 1, 3, 8, 7, 3, 9, 5, 8, 5, 1, 6, 3, 7, 5, 4, 6, 9, 9, 6, 6, 10, 2, 4, 5, 2, 8, 2, 2, 5, 2, 9, 3, 3, 5, 7, 8, 4]
 print(countingSort(data, min(data), max(data)) == sorted(data))
 ===
@@ -2361,6 +2405,7 @@ template <typename T1, typename T2, typename T3> auto countingSort(const T1 &a, 
     auto cnt = create_array({0}) * (max - min + 1);
     for (auto &&x : a)
         cnt[x - min]++;
+
     Array<int> result;
     {int Lindex = 0;
     for (auto &&n : cnt) {
@@ -2370,6 +2415,7 @@ template <typename T1, typename T2, typename T3> auto countingSort(const T1 &a, 
     }}
     return result;
 }
+
 auto data = create_array({9, 7, 10, 2, 9, 7, 4, 3, 10, 2, 7, 10, 2, 1, 3, 8, 7, 3, 9, 5, 8, 5, 1, 6, 3, 7, 5, 4, 6, 9, 9, 6, 6, 10, 2, 4, 5, 2, 8, 2, 2, 5, 2, 9, 3, 3, 5, 7, 8, 4});
 
 struct CodeBlock1
@@ -2458,7 +2504,9 @@ F cycleSort(&vector)
             pos++
          swap(&vector[pos], &item)
          writes++
+
    R writes
+
 V x = [Float(0), 1, 2, 2, 2, 2, 1, 9, 3.5, 5, 8, 4, 7, 0, 6]
 V xcopy = copy(x)
 V writes = cycleSort(&xcopy)
@@ -2499,8 +2547,10 @@ template <typename T1> auto cycleSort(T1 &vector)
 } on_continue:
         Lindex++;
     }}
+
     return writes;
 }
+
 auto x = create_array<double>({to_float(0), 1, 2, 2, 2, 2, 1, 9, 3.5, 5, 8, 4, 7, 0, 6});
 auto xcopy = copy(x);
 auto writes = cycleSort(xcopy);
@@ -2551,6 +2601,7 @@ F gnomesort(&a)
             i = j
             j++
    R a
+
 print(gnomesort(&[3, 4, 2, 5, 1, 6]))
 ===
 template <typename T1> auto gnomesort(T1 &a)
@@ -2630,6 +2681,7 @@ F heapsort(&lst)
    L(end) (lst.len - 1 .< 0).step(-1)
       swap(&lst[end], &lst[0])
       siftdown(&lst, 0, end - 1)
+
 V arr = [7, 6, 5, 9, 8, 4, 3, 1, 2, 0]
 heapsort(&arr)
 print(arr)
@@ -2662,6 +2714,7 @@ template <typename T1> auto heapsort(T1 &lst)
         siftdown(lst, 0, end - 1);
     }
 }
+
 auto arr = create_array({7, 6, 5, 9, 8, 4, 3, 1, 2, 0});
 
 struct CodeBlock1
@@ -2696,6 +2749,7 @@ F insertion_sort(&l)
          l[j + 1] = l[j]
          j--
       l[j + 1] = key
+
 V arr = [7, 6, 5, 9, 8, 4, 3, 1, 2, 0]
 insertion_sort(&arr)
 print(arr)
@@ -2712,6 +2766,7 @@ template <typename T1> auto insertion_sort(T1 &l)
         l.set(j + 1, key);
     }
 }
+
 auto arr = create_array({7, 6, 5, 9, 8, 4, 3, 1, 2, 0});
 
 struct CodeBlock1
@@ -2780,12 +2835,15 @@ F merge(left, right)
 F merge_sort(m)
    I m.len <= 1
       R m
+
    V middle = m.len I/ 2
    V left = m[0 .< middle]
    V right = m[middle ..]
+
    left = merge_sort(left)
    right = merge_sort(right)
    R Array(merge(left, right))
+
 V arr = [7, 6, 5, 9, 8, 4, 3, 1, 2, 0]
 print(merge_sort(arr))
 ===
@@ -2814,13 +2872,16 @@ template <typename T1> auto merge_sort(const T1 &m)
 {
     if (m.len() <= 1)
         return m;
+
     auto middle = idiv(m.len(), 2);
     auto left = m[range_el(0, middle)];
     auto right = m[range_ei(middle)];
+
     left = merge_sort(left);
     right = merge_sort(right);
     return create_array(merge(left, right));
 }
+
 auto arr = create_array({7, 6, 5, 9, 8, 4, 3, 1, 2, 0});
 
 struct CodeBlock1
@@ -2879,6 +2940,7 @@ F pancakesort(&data)
          data.reverse_range(0 .< size)
    I :tutor
       print()
+
 V data = ‘6 7 2 1 8 9 5 3 4’.split(‘ ’)
 print(‘Original List: ’data.join(‘ ’))
 pancakesort(&data)
@@ -2908,6 +2970,7 @@ template <typename T1> auto pancakesort(T1 &data)
     if (::tutor)
         print();
 }
+
 auto data = u"6 7 2 1 8 9 5 3 4"_S.split(u" "_S);
 
 struct CodeBlock1
@@ -2965,6 +3028,7 @@ F _quicksort(&array, start, stop) -> N
 
 F quicksort(&array)
    _quicksort(&array, 0, array.len - 1)
+
 V arr = [7, 6, 5, 9, 8, 4, 3, 1, 2, 0]
 quicksort(&arr)
 print(arr)
@@ -2995,6 +3059,7 @@ template <typename T1> auto quicksort(T1 &array)
 {
     _quicksort(array, 0, array.len() - 1);
 }
+
 auto arr = create_array({7, 6, 5, 9, 8, 4, 3, 1, 2, 0});
 
 struct CodeBlock1
@@ -3046,15 +3111,19 @@ F radix_sort(l, =p = -1, =s = -1)
       s = String(max(l)).len
    I p == -1
       p = s
+
    V i = s - p
 
    I i >= s
       R l
+
    V bins = [[Int]()] * 10
 
    L(e) l
       bins[Int(String(e).zfill(s)[i])] [+]= e
+
    R flatten(bins.map(b -> radix_sort(b, @p - 1, @s)))
+
 V arr = [7, 6, 5, 9, 8, 4, 3, 1, 2, 0]
 print(radix_sort(arr))
 ===
@@ -3072,14 +3141,18 @@ template <typename T1, typename T2 = decltype(-1), typename T3 = decltype(-1)> a
         s = String(max(l)).len();
     if (p == -1)
         p = s;
+
     auto i = s - p;
     if (i >= s)
         return l;
+
     auto bins = create_array({Array<int>()}) * 10;
     for (auto &&e : l)
         bins[to_int(String(e).zfill(s)[i])].append(e);
+
     return flatten(bins.map([&p, &s](const auto &b){return radix_sort(b, p - 1, s);}));
 }
+
 auto arr = create_array({7, 6, 5, 9, 8, 4, 3, 1, 2, 0});
 
 struct CodeBlock1
@@ -3106,6 +3179,7 @@ F selection_sort(&lst)
       V i = L.index
       V mn = min(i .< lst.len, key' x -> @lst[x])
       (lst[i], lst[mn]) = (lst[mn], e)
+
 V arr = [7, 6, 5, 9, 8, 4, 3, 1, 2, 0]
 selection_sort(&arr)
 print(arr)
@@ -3120,6 +3194,7 @@ template <typename T1> auto selection_sort(T1 &lst)
         Lindex++;
     }}
 }
+
 auto arr = create_array({7, 6, 5, 9, 8, 4, 3, 1, 2, 0});
 
 struct CodeBlock1
@@ -3157,6 +3232,7 @@ F shell_sort(&seq)
             i -= inc
          seq[i] = el
       inc = I inc == 2 {1} E inc * 5 I/ 11
+
 V data = [22, 7, 2, -5, 8, 4]
 shell_sort(&data)
 print(data)
@@ -3178,6 +3254,7 @@ template <typename T1> auto shell_sort(T1 &seq)
         inc = inc == 2 ? 1 : idiv(inc * 5, 11);
     }
 }
+
 auto data = create_array({22, 7, 2, -5, 8, 4});
 
 struct CodeBlock1
@@ -3218,6 +3295,7 @@ F stoogesort(&l, i, j) -> N
 
 F stooge(&l)
    R stoogesort(&l, 0, l.len - 1)
+
 V data = [1, 4, 5, 3, -6, 3, 7, 10, -2, -5, 7, 5, 9, -3, 7]
 stooge(&data)
 print(data)
@@ -3238,6 +3316,7 @@ template <typename T1> auto stooge(T1 &l)
 {
     return stoogesort(l, 0, l.len() - 1);
 }
+
 auto data = create_array({1, 4, 5, 3, -6, 3, 7, 10, -2, -5, 7, 5, 9, -3, 7});
 
 struct CodeBlock1
@@ -3306,6 +3385,7 @@ F strand_sort(&a)
    L !a.empty
       out = merge_list(&out, &strand(&a))
    R out
+
 print(strand_sort(&[1, 6, 3, 2, 1, 7, 5, 3]))
 ===
 template <typename T1, typename T2> auto merge_list(T1 &a, T2 &b)
@@ -3357,7 +3437,6 @@ while True:
         print(rod, end='\r')
         time.sleep(0.25)
 ===
-//import time
 L
    L(rod) ‘\|/-’
       print(rod, end' "\r")
@@ -3422,6 +3501,7 @@ F printspiral(myarray)
       L(x) n
          print(‘#2’.format(myarray[y][x]), end' ‘ ’)
       print()
+
 printspiral(spiral_matrix(5))
 ===
 template <typename T1> auto spiral_matrix(const T1 &n)
@@ -3479,6 +3559,7 @@ F split(input, delim)
          res ‘’= delim
       res ‘’= ch
    R res
+
 print(split("gHHH5YY++///\\", ‘, ’))
 ===
 template <typename T1, typename T2> auto split(const T1 &input, const T2 &delim)
@@ -3535,7 +3616,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         while (count < 30) {
             auto sq = n * n;
             auto cr = to_int(pow(sq, (1.0 / 3)) + 1e-6);
@@ -3613,9 +3693,10 @@ for pairs in sorted(smap.values()):
     if len(pairs) > 1:
         print(" = ".join(pairs))
 ===
-//import collections
 V states = [‘Alabama’, ‘Alaska’, ‘Arizona’, ‘Arkansas’, ‘California’, ‘Colorado’, ‘Connecticut’, ‘Delaware’, ‘Florida’, ‘Georgia’, ‘Hawaii’, ‘Idaho’, ‘Illinois’, ‘Indiana’, ‘Iowa’, ‘Kansas’, ‘Kentucky’, ‘Louisiana’, ‘Maine’, ‘Maryland’, ‘Massachusetts’, ‘Michigan’, ‘Minnesota’, ‘Mississippi’, ‘Missouri’, ‘Montana’, ‘Nebraska’, ‘Nevada’, ‘New Hampshire’, ‘New Jersey’, ‘New Mexico’, ‘New York’, ‘North Carolina’, ‘North Dakota’, ‘Ohio’, ‘Oklahoma’, ‘Oregon’, ‘Pennsylvania’, ‘Rhode Island’, ‘South Carolina’, ‘South Dakota’, ‘Tennessee’, ‘Texas’, ‘Utah’, ‘Vermont’, ‘Virginia’, ‘Washington’, ‘West Virginia’, ‘Wisconsin’, ‘Wyoming’]
+
 states = sorted(states)
+
 DefaultDict[String, [String]] smap
 L(s1) states[0 .< (len)-1]
    V i = L.index
@@ -3635,6 +3716,7 @@ struct CodeBlock1
         states = sorted(states);
     }
 } code_block_1;
+
 DefaultDict<String, Array<String>> smap;
 
 struct CodeBlock2
@@ -3696,7 +3778,6 @@ F histogram(numbers)
       V n = L.index
       print(‘#.1: #.’.format(n / 10, ‘+’ * (i * maxwidth I/ mx)))
    print()
-//import random
 L(i) (1, 5)
    V n = (0 .< 10 ^ i).map(j -> random:())
    print("\n####\n#### #. numbers\n####".format(10 ^ i))
@@ -3732,7 +3813,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&i : make_tuple(1, 5)) {
             auto n = range_el(0, pow(10, i)).map([](const auto &j){return randomns::_();});
             print(u"\n####\n#### #. numbers\n####"_S.format(pow(10, i)));
@@ -3780,7 +3860,9 @@ F leaf_plot(&x)
          print(‘#.#3 |’.format((j != 0) * "\n", i), end' ‘’)
       print(‘ ’(x[j] % 10), end' ‘’)
    print()
+
 V data = [12, 127, 28, 42, 39, 113, 42, 18, 44, 118, 44, 37, 113, 124, 37, 48, 127, 36, 29, 31, 125, 139, 131, 115, 105, 132, 104, 123, 35, 113, 122, 42, 117, 119, 58, 109, 23, 105, 63, 27, 44, 105, 99, 41, 128, 121, 116, 125, 32, 61, 37, 127, 29, 113, 121, 58, 114, 126, 53, 114, 96, 25, 109, 7, 31, 141, 46, 13, 27, 43, 117, 116, 27, 7, 68, 40, 31, 115, 124, 42, 128, 52, 71, 118, 117, 38, 27, 106, 33, 117, 116, 111, 40, 119, 47, 105, 57, 122, 109, 124, 115, 43, 120, 43, 27, 27, 18, 28, 48, 125, 107, 114, 34, 133, 45, 120, 30, 127, 31, 116, 146]
+
 leaf_plot(&data)
 ===
 template <typename T1> auto leaf_plot(T1 &x)
@@ -3797,6 +3879,7 @@ template <typename T1> auto leaf_plot(T1 &x)
     }
     print();
 }
+
 auto data = create_array({12, 127, 28, 42, 39, 113, 42, 18, 44, 118, 44, 37, 113, 124, 37, 48, 127, 36, 29, 31, 125, 139, 131, 115, 105, 132, 104, 123, 35, 113, 122, 42, 117, 119, 58, 109, 23, 105, 63, 27, 44, 105, 99, 41, 128, 121, 116, 125, 32, 61, 37, 127, 29, 113, 121, 58, 114, 126, 53, 114, 96, 25, 109, 7, 31, 141, 46, 13, 27, 43, 117, 116, 27, 7, 68, 40, 31, 115, 124, 42, 128, 52, 71, 118, 117, 38, 27, 106, 33, 117, 116, 111, 40, 119, 47, 105, 57, 122, 109, 124, 115, 43, 120, 43, 27, 27, 18, 28, 48, 125, 107, 114, 34, 133, 45, 120, 30, 127, 31, 116, 146});
 
 struct CodeBlock1
@@ -3836,8 +3919,6 @@ s = stern_brocot(lambda series: len(series) < n_gcd)[:n_gcd]
 assert all(math.gcd(prev, this) == 1
            for prev, this in zip(s, s[1:])), 'A fraction from adjacent terms is reducible'
 ===
-//import math
-
 F stern_brocot(predicate = series -> series.len < 20)
    V sb = [1, 1]
    V i = 0
@@ -3845,12 +3926,14 @@ F stern_brocot(predicate = series -> series.len < 20)
       sb [+]= [sum(sb[i .< i + 2]), sb[i + 1]]
       i++
    R sb
+
 V n_first = 15
 print(("The first #. values:\n  ".format(n_first))‘ ’stern_brocot(series -> series.len < :n_first)[0 .< n_first])
 print()
 V n_max = 10
 L(n_occur) Array(1 .. n_max) [+] [100]
    print((‘1-based index of the first occurrence of #3 in the series:’.format(n_occur))‘ ’(stern_brocot(series -> @n_occur !C series).index(n_occur) + 1))
+
 print()
 V n_gcd = 1000
 V s = stern_brocot(series -> series.len < :n_gcd)[0 .< n_gcd]
@@ -3866,6 +3949,7 @@ template <typename T1 = decltype([](const auto &series){return series.len() < 20
     }
     return sb;
 }
+
 auto n_first = 15;
 
 struct CodeBlock1
@@ -3884,6 +3968,7 @@ struct CodeBlock2
     {
         for (auto &&n_occur : create_array(range_ee(1, n_max)) + create_array({100}))
             print((u"1-based index of the first occurrence of #3 in the series:"_S.format(n_occur)) & u" "_S & (stern_brocot([&n_occur](const auto &series){return !in(n_occur, series);}).index(n_occur) + 1));
+
         print();
     }
 } code_block_2;
@@ -3915,6 +4000,7 @@ for i, el in enumerate(xs):
 F is_strange(n)
    V xs = String(n).map(c -> Int(c))
    R all(zip(xs, xs[1..]).map((a, b) -> abs(a - b) C (2, 3, 5, 7)))
+
 V xs = (100..500).filter(n -> is_strange(n))
 print("\nStrange numbers in range [100..500]\n")
 print(‘(Total: ’String(xs.len)")\n")
@@ -3929,6 +4015,7 @@ template <typename T1> auto is_strange(const T1 &n)
     auto xs = String(n).map([](const auto &c){return to_int(c);});
     return all_map(zip(xs, xs[range_ei(1)]), [](const auto &a, const auto &b){return in(abs(a - b), make_tuple(2, 3, 5, 7));});
 }
+
 auto xs = range_ee(100, 500).filter([](const auto &n){return is_strange(n);});
 
 struct CodeBlock1
@@ -3965,6 +4052,7 @@ for i, el in enumerate(xs):
 F is_strange_plus(n)
    V xs = String(n).map(c -> Int(c))
    R all(zip(xs, xs[1..]).map((a, b) -> a + b C (2, 3, 5, 7, 11, 13, 17)))
+
 V xs = (100..500).filter(n -> is_strange_plus(n))
 print("\n\"Strange Plus\" numbers in range [100..500]\n")
 print(‘(Total: ’String(xs.len)")\n")
@@ -3979,6 +4067,7 @@ template <typename T1> auto is_strange_plus(const T1 &n)
     auto xs = String(n).map([](const auto &c){return to_int(c);});
     return all_map(zip(xs, xs[range_ei(1)]), [](const auto &a, const auto &b){return in(a + b, make_tuple(2, 3, 5, 7, 11, 13, 17));});
 }
+
 auto xs = range_ee(100, 500).filter([](const auto &n){return is_strange_plus(n);});
 
 struct CodeBlock1
@@ -4067,6 +4156,7 @@ F compare(a, b)
       print(‘'#.' is equal to '#.'’.format(a, b))
    I a != b
       print(‘'#.' is not equal to '#.'’.format(a, b))
+
 compare(‘YUP’, ‘YUP’)
 compare(‘BALL’, ‘BELL’)
 compare(‘24’, ‘123’)
@@ -4107,6 +4197,7 @@ print(s2)
 ===
 V s1 = ‘hello’
 print(s1‘ world’)
+
 V s2 = s1‘ world’
 print(s2)
 ===
@@ -4119,6 +4210,7 @@ struct CodeBlock1
         print(s1 & u" world"_S);
     }
 } code_block_1;
+
 auto s2 = s1 & u" world"_S;
 
 struct CodeBlock2
@@ -4209,6 +4301,7 @@ print(stripchars("She was a soul stripper. She took my heart!", "aei"))
 ===
 F stripchars(s, chars)
    R s.filter(c -> c !C @chars).join(‘’)
+
 print(stripchars(‘She was a soul stripper. She took my heart!’, ‘aei’))
 ===
 template <typename T1, typename T2> auto stripchars(const T1 &s, const T2 &chars)
@@ -4273,6 +4366,7 @@ F strip_comments(s, b_delim = ‘/*’, e_delim = ‘*/’)
       i = e + e_delim.len
    r ‘’= s[i ..]
    R r
+
 V text = ‘
   /**
    * Some comments
@@ -4290,6 +4384,7 @@ V text = ‘
     */
     function something() {
     }’
+
 print(strip_comments(text))
 ===
 template <typename T1, typename T2 = decltype(u"/*"_S), typename T3 = decltype(u"*/"_S)> auto strip_comments(const T1 &s, const T2 &b_delim = u"/*"_S, const T3 &e_delim = u"*/"_S)
@@ -4308,6 +4403,7 @@ template <typename T1, typename T2 = decltype(u"/*"_S), typename T3 = decltype(u
     r &= s[range_ei(i)];
     return r;
 }
+
 auto text = uR"(
   /**
    * Some comments
@@ -4343,6 +4439,7 @@ print(stripped("\ba\u0000b\n\rc\fd\xc3"))
 ===
 F stripped(s)
    R s.filter(i -> Int(i.code) C 32..126).join(‘’)
+
 print(stripped("\ba\u0000b\n\rc\fd\xc3"))
 ===
 template <typename T1> auto stripped(const T1 &s)
@@ -4404,8 +4501,6 @@ subleq([15, 17, -1, 17, -1, -1, 16, 1, -1, 16, 3, -1, 15, 15,
         0, 0, -1, 72, 101, 108, 108, 111, 44, 32, 119, 111,
         114, 108, 100, 33, 10, 0])
 ===
-//import sys
-
 F subleq(&a)
    V i = 0
    L i >= 0
@@ -4419,6 +4514,7 @@ F subleq(&a)
             i = a[i + 2]
             L.continue
       i += 3
+
 subleq(&[15, 17, -1, 17, -1, -1, 16, 1, -1, 16, 3, -1, 15, 15, 0, 0, -1, 72, 101, 108, 108, 111, 44, 32, 119, 111, 114, 108, 100, 33, 10, 0])
 ===
 template <typename T1> auto subleq(T1 &a)
@@ -4487,6 +4583,7 @@ for w,v in words.items():
         break
 ===
 V words = [‘alliance’ = -624, ‘archbishop’ = -925, ‘balm’ = 397, ‘bonnet’ = 452, ‘brute’ = 870, ‘centipede’ = -658, ‘cobol’ = 362, ‘covariate’ = 590, ‘departure’ = 952, ‘deploy’ = 44, ‘diophantine’ = 645, ‘efferent’ = 54, ‘elysee’ = -326, ‘eradicate’ = 376, ‘escritoire’ = 856, ‘exorcism’ = -983, ‘fiat’ = 170, ‘filmy’ = -874, ‘flatworm’ = 503, ‘gestapo’ = 915, ‘infra’ = -847, ‘isis’ = -982, ‘lindholm’ = 999, ‘markham’ = 475, ‘mincemeat’ = -880, ‘moresby’ = 756, ‘mycenae’ = 183, ‘plugging’ = -266, ‘smokescreen’ = 423, ‘speakeasy’ = -745, ‘vein’ = 813]
+
 V neg = 0
 V pos = 0
 L(w, v) words
@@ -4494,6 +4591,7 @@ L(w, v) words
       pos += v
    E
       neg += v
+
 V sums = [[‘’] * 0] * (pos - neg + 1)
 
 L(w, v) words
@@ -4505,6 +4603,7 @@ L(w, v) words
       V i = L.index
       I !w2.empty & s[i + v].empty
          s[i + v] = w2 [+] [w]
+
    sums = s
    I !s[(-neg)].empty
       L(x) s[(-neg)]
@@ -4512,6 +4611,7 @@ L(w, v) words
       L.break
 ===
 auto words = create_dict(dict_of(u"alliance"_S, -624)(u"archbishop"_S, -925)(u"balm"_S, 397)(u"bonnet"_S, 452)(u"brute"_S, 870)(u"centipede"_S, -658)(u"cobol"_S, 362)(u"covariate"_S, 590)(u"departure"_S, 952)(u"deploy"_S, 44)(u"diophantine"_S, 645)(u"efferent"_S, 54)(u"elysee"_S, -326)(u"eradicate"_S, 376)(u"escritoire"_S, 856)(u"exorcism"_S, -983)(u"fiat"_S, 170)(u"filmy"_S, -874)(u"flatworm"_S, 503)(u"gestapo"_S, 915)(u"infra"_S, -847)(u"isis"_S, -982)(u"lindholm"_S, 999)(u"markham"_S, 475)(u"mincemeat"_S, -880)(u"moresby"_S, 756)(u"mycenae"_S, 183)(u"plugging"_S, -266)(u"smokescreen"_S, 423)(u"speakeasy"_S, -745)(u"vein"_S, 813));
+
 auto neg = 0;
 auto pos = 0;
 
@@ -4526,13 +4626,13 @@ struct CodeBlock1
                 neg += v;
     }
 } code_block_1;
+
 auto sums = create_array({create_array({u""_S}) * 0}) * (pos - neg + 1);
 
 struct CodeBlock2
 {
     CodeBlock2()
     {
-
         for (auto &&[w, v] : words) {
             auto s = copy(sums);
             if (s[v - neg].empty())
@@ -4545,6 +4645,7 @@ struct CodeBlock2
                     s.set(i + v, w2 + create_array({w}));
                 Lindex++;
             }}
+
             sums = s;
             if (!s[(-neg)].empty()) {
                 for (auto &&x : s[(-neg)])
@@ -4589,6 +4690,7 @@ F decode(s)
    L(c) s
       r ‘’= Char(code' :key.index(c) + 32)
    R r
+
 V s = ‘The quick brown fox jumps over the lazy dog, who barks VERY loudly!’
 V enc = encode(s)
 print(‘Encoded:  ’enc)
@@ -4611,6 +4713,7 @@ template <typename T1> auto decode(const T1 &s)
         r &= Char(::key.index(c) + 32);
     return r;
 }
+
 auto s = u"The quick brown fox jumps over the lazy dog, who barks VERY loudly!"_S;
 auto enc = encode(s);
 
@@ -4644,6 +4747,7 @@ V n = 2
 V m = 3
 V char = ‘d’
 V chars = ‘cd’
+
 print(s[n - 1 .< n + m - 1])
 print(s[n - 1 ..])
 print(s[0 .< (len)-1])
@@ -4730,14 +4834,15 @@ for n in range(219 - 54):
 for i in range(5):
     print("result =", getnextr())
 ===
-//import collections
 V s = Deque[Int]()
 V seed = 292929
+
 s.append(seed)
 s.append(1)
 
 L(n) 2..54
    s.append((s[n - 2] - s[n - 1]) % 10 ^ 9)
+
 V r = Deque[Int]()
 L(n) 55
    V i = (34 * (n + 1)) % 55
@@ -4770,6 +4875,7 @@ struct CodeBlock1
             s.append(mod((s[n - 2] - s[n - 1]), pow(10, 9)));
     }
 } code_block_1;
+
 auto r = Deque<int>();
 
 struct CodeBlock2
@@ -4881,7 +4987,6 @@ class SuffixTree:
 
 SuffixTree("banana$").visualize()
 ===
-
 T Node
    String sub
    [Int] ch
@@ -4913,11 +5018,13 @@ T SuffixTree
             I .nodes[n2].sub[0] == b
                L.break
             x2 = x2 + 1
+
          V sub2 = .nodes[n2].sub
          V j = 0
          L j < sub2.len
             I suf[i + j] != sub2[j]
                V n3 = n2
+
                n2 = .nodes.len
                .nodes.append(Node(sub2[0 .< j], [n3]))
                .nodes[n3].sub = sub2[j ..]
@@ -4943,7 +5050,9 @@ T SuffixTree
             @f(c, pre‘ | ’)
          print(pre‘ +-’, end' ‘ ’)
          @f(children.last, pre‘  ’)
+
       f(0, ‘’)
+
 SuffixTree(‘banana$’).visualize()
 ===
 class Node
@@ -4989,11 +5098,13 @@ public:
                     break;
                 x2 = x2 + 1;
             }
+
             auto sub2 = nodes[n2].sub;
             auto j = 0;
             while (j < sub2.len()) {
                 if (suf[i + j] != sub2[j]) {
                     auto n3 = n2;
+
                     n2 = nodes.len();
                     nodes.append(Node(sub2[range_el(0, j)], create_array({n3})));
                     nodes[n3].sub = sub2[range_ei(j)];
@@ -5029,6 +5140,7 @@ public:
             print(pre & u" +-"_S, u" "_S);
             f(children.last(), pre & u"  "_S);
         };
+
         f(0, u""_S);
     }
 };
@@ -5061,6 +5173,7 @@ F sum_digits(=n, base)
       r += n % base
       n I/= base
    R r
+
 print(sum_digits(1, 10))
 print(sum_digits(1234, 10))
 print(sum_digits(F'E, 16))
@@ -5104,6 +5217,7 @@ F sum35(limit)
       I i % 3 == 0 | i % 5 == 0
          sum += i
    R sum
+
 print(sum35(1000))
 ===
 template <typename T1> auto sum35(const T1 &limit)
@@ -5166,6 +5280,7 @@ F sum_of_divisors(n)
             ans += j
       i++
    R ans
+
 print((1..100).map(n -> sum_of_divisors(n)))
 ===
 template <typename T1> auto sum_of_divisors(const T1 &n)
@@ -5258,6 +5373,7 @@ F clip(subjectPolygon, clipPolygon)
       V n2 = s[0] * e[1] - s[1] * e[0]
       V n3 = 1.0 / (dc[0] * dp[1] - dc[1] * dp[0])
       R ((n1 * dp[0] - n2 * dc[0]) * n3, (n1 * dp[1] - n2 * dc[1]) * n3)
+
    V outputList = subjectPolygon
    V cp1 = clipPolygon.last
 
@@ -5278,8 +5394,10 @@ F clip(subjectPolygon, clipPolygon)
          s = e
       cp1 = cp2
    R (outputList)
+
 V subjectp = [(50.0, 150.0), (200.0, 50.0), (350.0, 150.0), (350.0, 300.0), (250.0, 300.0), (200.0, 250.0), (150.0, 350.0), (100.0, 250.0), (100.0, 200.0)]
 V clipp = [(100.0, 100.0), (300.0, 100.0), (300.0, 300.0), (100.0, 300.0)]
+
 print_elements(clip(subjectp, clipp), sep' "\n")
 ===
 template <typename T1, typename T2> auto clip(const T1 &subjectPolygon, const T2 &clipPolygon)
@@ -5298,6 +5416,7 @@ template <typename T1, typename T2> auto clip(const T1 &subjectPolygon, const T2
         auto n3 = 1.0 / (_get<0>(dc) * _get<1>(dp) - _get<1>(dc) * _get<0>(dp));
         return make_tuple((n1 * _get<0>(dp) - n2 * _get<0>(dc)) * n3, (n1 * _get<1>(dp) - n2 * _get<1>(dc)) * n3);
     };
+
     auto outputList = subjectPolygon;
     auto cp1 = clipPolygon.last();
 
@@ -5322,6 +5441,7 @@ template <typename T1, typename T2> auto clip(const T1 &subjectPolygon, const T2
     }
     return (outputList);
 }
+
 auto subjectp = create_array({make_tuple(50.0, 150.0), make_tuple(200.0, 50.0), make_tuple(350.0, 150.0), make_tuple(350.0, 300.0), make_tuple(250.0, 300.0), make_tuple(200.0, 250.0), make_tuple(150.0, 350.0), make_tuple(100.0, 250.0), make_tuple(100.0, 200.0)});
 auto clipp = create_array({make_tuple(100.0, 100.0), make_tuple(300.0, 100.0), make_tuple(300.0, 300.0), make_tuple(100.0, 300.0)});
 
@@ -5419,6 +5539,7 @@ F sterling1(n, k)
    V result = sterling1(n - 1, k - 1) + (n - 1) * sterling1(n - 1, k)
    :computed[key] = result
    R result
+
 print(‘Unsigned Stirling numbers of the first kind:’)
 V MAX = 12
 print(‘n/k’.ljust(10), end' ‘’)
@@ -5565,6 +5686,7 @@ F sterling2(n, k)
    V result = k * sterling2(n - 1, k) + sterling2(n - 1, k - 1)
    :computed[key] = result
    R result
+
 print(‘Stirling numbers of the second kind:’)
 V MAX = 12
 print(‘n/k’.ljust(10), end' ‘’)
@@ -5703,6 +5825,7 @@ L(nmp) strange_triplets()
    V c = L.index + 1
    V (n, m, p) = nmp
    print(‘#2: #2+#2+#2 = #.’.format(c, n, m, p, n + m + p))
+
 V mx = 1'000
 print("\nIf n, m, p < #. finds #.".format(mx, strange_triplets(mx).len))
 ===
@@ -5751,6 +5874,7 @@ struct CodeBlock1
         }}
     }
 } code_block_1;
+
 auto mx = 1'000;
 
 struct CodeBlock2
@@ -5801,7 +5925,6 @@ print('\nTOTAL primes below   1,000,000:',
       sum(1 for pr in p if pr < 1_000_000))
 print('TOTAL primes below  10,000,000:', len(p))
 ===
-
 F primes_upto(limit)
    V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
    L(n) 0 .< Int(limit ^ 0.5 + 1.5)
@@ -5809,6 +5932,7 @@ F primes_upto(limit)
          L(i) (n * n .< limit + 1).step(n)
             is_prime[i] = 0B
    R enumerate(is_prime).filter((i, prime) -> prime).map((i, prime) -> i)
+
 V p = primes_upto(10'000'000)
 [Int] s
 [Int] w
@@ -5820,6 +5944,7 @@ L(i) 1 .< p.len - 1
       w [+]= p[i]
    E
       b [+]= p[i]
+
 print(‘The first   36   strong primes: ’s[0.<36])
 print(‘The   count   of the strong primes below   1,000,000: ’sum(s.filter(p -> p < 1'000'000).map(p -> 1)))
 print(‘The   count   of the strong primes below  10,000,000: ’s.len)
@@ -5841,6 +5966,7 @@ template <typename T1> auto primes_upto(const T1 &limit)
                 is_prime.set(i, false);
     return enumerate(is_prime).filter([](const auto &i, const auto &prime){return prime;}).map([](const auto &i, const auto &prime){return i;});
 }
+
 auto p = primes_upto(10'000'000);
 Array<int> s;
 Array<int> w;
@@ -5857,6 +5983,7 @@ struct CodeBlock1
                 w.append(p[i]);
             else
                 b.append(p[i]);
+
         print(u"The first   36   strong primes: "_S & s[range_el(0, 36)]);
         print(u"The   count   of the strong primes below   1,000,000: "_S & sum_map(s.filter([](const auto &p){return p < 1'000'000;}), [](const auto &p){return 1;}));
         print(u"The   count   of the strong primes below  10,000,000: "_S & s.len());
@@ -5929,8 +6056,11 @@ F successive_primes(primes, diffs)
          group[j - i + 1] = primes[j + 1]
       L.was_no_break
          results [+]= group
+
    R results
+
 V prime_list = primes_upto(1'000'000)
+
 print(‘For primes less than 1,000,000:-’)
 L(diffs) [[2], [1], [2, 2], [2, 4], [4, 2], [6, 4, 2]]
    print(‘  For differences of #. ->’.format(diffs))
@@ -5970,8 +6100,10 @@ template <typename T1, typename T2> auto successive_primes(const T1 &primes, con
             results.append(group);
         }
     }
+
     return results;
 }
+
 auto prime_list = primes_upto(1'000'000);
 
 struct CodeBlock1
@@ -6042,8 +6174,10 @@ F get_primes(limit)
          L(i) (n * n .< limit + 1).step(n)
             is_prime[i] = 0B
    R enumerate(is_prime).filter((i, prime) -> prime).map((i, prime) -> i)
+
 V primes = get_primes(LIMIT)
 V primeset = Set(primes)
+
 V s = [[[Int]()] * 0] * 4
 V unsexy = [Int]()
 L(p) primes
@@ -6063,11 +6197,13 @@ L(p) primes
       L.continue
    I p + 24 C primeset
       s[3].append([p, p + 6, p + 12, p + 18, p + 24])
+
 print(‘"SEXY" PRIME GROUPINGS:’)
 L(sexy, name) zip(s, ‘pairs triplets quadruplets quintuplets’.split(‘ ’))
    print(‘  #. #. ending with ...’.format(sexy.len, name))
    L(sx) sexy[(len)-5 ..]
       print(‘    ’sx)
+
 print("\nThere are #. unsexy primes ending with ...".format(unsexy.len))
 L(usx) unsexy[(len)-10 ..]
    print(‘  ’usx)
@@ -6082,8 +6218,10 @@ template <typename T1> auto get_primes(const T1 &limit)
                 is_prime.set(i, false);
     return enumerate(is_prime).filter([](const auto &i, const auto &prime){return prime;}).map([](const auto &i, const auto &prime){return i;});
 }
+
 auto primes = get_primes(LIMIT);
 auto primeset = create_set(primes);
+
 auto s = create_array({create_array({Array<int>()}) * 0}) * 4;
 auto unsexy = Array<int>();
 
@@ -6110,12 +6248,14 @@ struct CodeBlock1
             if (in(p + 24, primeset))
                 _get<3>(s).append(create_array({p, p + 6, p + 12, p + 18, p + 24}));
         }
+
         print(u"\"SEXY\" PRIME GROUPINGS:"_S);
         for (auto &&[sexy, name] : zip(s, u"pairs triplets quadruplets quintuplets"_S.split(u" "_S))) {
             print(u"  #. #. ending with ..."_S.format(sexy.len(), name));
             for (auto &&sx : sexy[range_elen_i( - 5)])
                 print(u"    "_S & sx);
         }
+
         print(u"\nThere are #. unsexy primes ending with ..."_S.format(unsexy.len()));
         for (auto &&usx : unsexy[range_elen_i( - 10)])
             print(u"  "_S & usx);
@@ -6219,7 +6359,6 @@ level = \
 init(level)
 print(level + "\n\n" + solve())
 ===
-//import collections
 [String] data
 V nrows = 0
 V px = 0
@@ -6230,6 +6369,7 @@ V ddata = ‘’
 F init(board)
    :data = board.split("\n")
    :nrows = max(:data.map(r -> r.len))
+
    V maps = [‘ ’ = ‘ ’, ‘.’ = ‘.’, ‘@’ = ‘ ’, ‘#’ = ‘#’, ‘$’ = ‘ ’]
    V mapd = [‘ ’ = ‘ ’, ‘.’ = ‘ ’, ‘@’ = ‘@’, ‘#’ = ‘ ’, ‘$’ = ‘*’]
 
@@ -6246,6 +6386,7 @@ F init(board)
 F push(x, y, dx, dy, data)
    I :sdata[(y + 2 * dy) * :nrows + x + 2 * dx] == ‘#’ | data[(y + 2 * dy) * :nrows + x + 2 * dx] != ‘ ’
       R ‘’
+
    V data2 = Array(data)
    data2[y * :nrows + x] = ‘ ’
    data2[(y + dy) * :nrows + x + dx] = ‘@’
@@ -6262,6 +6403,7 @@ F solve()
    V open = Deque([(:ddata, ‘’, :px, :py)])
    V visited = Set([:ddata])
    V dirs = ((0, -1, ‘u’, ‘U’), (1, 0, ‘r’, ‘R’), (0, 1, ‘d’, ‘D’), (-1, 0, ‘l’, ‘L’))
+
    V lnrows = :nrows
    L !open.empty
       V (cur, csol, x, y) = open.pop_left()
@@ -6280,6 +6422,7 @@ F solve()
          E
             I :sdata[(y + dy) * lnrows + x + dx] == ‘#’ | temp[(y + dy) * lnrows + x + dx] != ‘ ’
                L.continue
+
             V data2 = Array(temp)
             data2[y * lnrows + x] = ‘ ’
             data2[(y + dy) * lnrows + x + dx] = ‘@’
@@ -6290,7 +6433,9 @@ F solve()
                   R csol‘’di[2]
                open.append((temp, csol‘’di[2], x + dx, y + dy))
                visited.add(temp)
+
    R ‘No solution’
+
 V level = ‘#######
 #     #
 #     #
@@ -6299,6 +6444,7 @@ V level = ‘#######
 #.$$  #
 #.#  @#
 #######’
+
 init(level)
 print(level"\n\n"solve())
 ===
@@ -6313,6 +6459,7 @@ template <typename T1> auto init(const T1 &board)
 {
     ::data = board.split(u"\n"_S);
     ::nrows = max(::data.map([](const auto &r){return r.len();}));
+
     auto maps = create_dict(dict_of(u' '_C, u' '_C)(u'.'_C, u'.'_C)(u'@'_C, u' '_C)(u'#'_C, u'#'_C)(u'$'_C, u' '_C));
     auto mapd = create_dict(dict_of(u' '_C, u' '_C)(u'.'_C, u' '_C)(u'@'_C, u'@'_C)(u'#'_C, u' '_C)(u'$'_C, u'*'_C));
     {int Lindex = 0;
@@ -6338,6 +6485,7 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5> auto 
 {
     if (::sdata[(y + 2 * dy) * ::nrows + x + 2 * dx] == u'#' || data[(y + 2 * dy) * ::nrows + x + 2 * dx] != u' ')
         return u""_S;
+
     auto data2 = create_array(data);
     data2.set(y * ::nrows + x, u' '_C);
     data2.set((y + dy) * ::nrows + x + dx, u'@'_C);
@@ -6358,6 +6506,7 @@ auto solve()
     auto open = create_deque({make_tuple(::ddata, u""_S, ::px, ::py)});
     auto visited = create_set({::ddata});
     auto dirs = make_tuple(make_tuple(0, -1, u"u"_S, u"U"_S), make_tuple(1, 0, u"r"_S, u"R"_S), make_tuple(0, 1, u"d"_S, u"D"_S), make_tuple(-1, 0, u"l"_S, u"L"_S));
+
     auto lnrows = ::nrows;
     while (!open.empty()) {
         auto [cur, csol, x, y] = open.pop_left();
@@ -6378,6 +6527,7 @@ auto solve()
             else {
                 if (::sdata[(y + dy) * lnrows + x + dx] == u'#' || temp[(y + dy) * lnrows + x + dx] != u' ')
                     continue;
+
                 auto data2 = create_array(temp);
                 data2.set(y * lnrows + x, u' '_C);
                 data2.set((y + dy) * lnrows + x + dx, u'@'_C);
@@ -6392,8 +6542,10 @@ auto solve()
             }
         }
     }
+
     return u"No solution"_S;
 }
+
 auto level = uR"(#######
 #     #
 #     #
@@ -6522,6 +6674,7 @@ F find_next(pa, x, y, z)
       I a C -1 <.< :wid & b C -1 <.< :hei
          I pa[a][b] == z
             R (a, b)
+
    R (-1, -1)
 
 F find_solution(&pa, x, y, z)
@@ -6543,13 +6696,16 @@ F find_solution(&pa, x, y, z)
             I r == 1
                R 1
             pa[a][b] = 0
+
    R 0
 
 F solve(pz, w, h)
+
    :lastNumber = w * h
    :wid = w
    :hei = h
    :exists = [0] * (:lastNumber + 1)
+
    V pa = [[0] * h] * w
    V st = pz.split(‘ ’)
    V idx = 0
@@ -6561,6 +6717,7 @@ F solve(pz, w, h)
             pa[i][j] = Int(st[idx])
             :exists[pa[i][j]] = 1
             idx++
+
    V x = 0
    V y = 0
    V t = w * h + 1
@@ -6570,6 +6727,7 @@ F solve(pz, w, h)
             t = pa[i][j]
             x = i
             y = j
+
    R (find_solution(&pa, x, y, t + 1), pa)
 
 F show_result(r)
@@ -6580,11 +6738,15 @@ F show_result(r)
          print()
    E
       print(‘No Solution!’)
+
    print()
+
 V r = solve(‘. . . . . . . . . . . 46 45 . 55 74 . . . 38 . . 43 . . 78 . . 35 . . . . . 71 . . . 33 . . . 59 . . . 17’""‘ . . . . . 67 . . 18 . . 11 . . 64 . . . 24 21 . 1 2 . . . . . . . . . . .’, 9, 9)
 show_result(r)
+
 r = solve(‘. . . . . . . . . . 11 12 15 18 21 62 61 . . 6 . . . . . 60 . . 33 . . . . . 57 . . 32 . . . . . 56 . . 37’""‘ . 1 . . . 73 . . 38 . . . . . 72 . . 43 44 47 48 51 76 77 . . . . . . . . . .’, 9, 9)
 show_result(r)
+
 r = solve(‘17 . . . 11 . . . 59 . 15 . . 6 . . 61 . . . 3 . . . 63 . . . . . . 66 . . . . 23 24 . 68 67 78 . 54 55’""‘ . . . . 72 . . . . . . 35 . . . 49 . . . 29 . . 40 . . 47 . 31 . . . 39 . . . 45’, 9, 9)
 show_result(r)
 ===
@@ -6604,6 +6766,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto find_next(con
                 return make_tuple(a, b);
         }
     }
+
     return make_tuple(-1, -1);
 }
 
@@ -6631,6 +6794,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto find_solution
             }
         }
     }
+
     return 0;
 }
 
@@ -6640,6 +6804,7 @@ template <typename T1, typename T2, typename T3> auto solve(const T1 &pz, const 
     ::wid = w;
     ::hei = h;
     ::exists = create_array({0}) * (::lastNumber + 1);
+
     auto pa = create_array({create_array({0}) * h}) * w;
     auto st = pz.split(u" "_S);
     auto idx = 0;
@@ -6652,6 +6817,7 @@ template <typename T1, typename T2, typename T3> auto solve(const T1 &pz, const 
                 ::exists.set(pa[i][j], 1);
                 idx++;
             }
+
     auto x = 0;
     auto y = 0;
     auto t = w * h + 1;
@@ -6662,6 +6828,7 @@ template <typename T1, typename T2, typename T3> auto solve(const T1 &pz, const 
                 x = i;
                 y = j;
             }
+
     return make_tuple(find_solution(pa, x, y, t + 1), pa);
 }
 
@@ -6675,8 +6842,10 @@ template <typename T1> auto show_result(const T1 &r)
         }
     else
         print(u"No Solution!"_S);
+
     print();
 }
+
 auto r = solve(u". . . . . . . . . . . 46 45 . 55 74 . . . 38 . . 43 . . 78 . . 35 . . . . . 71 . . . 33 . . . 59 . . . 17"_S & u" . . . . . 67 . . 18 . . 11 . . 64 . . . 24 21 . 1 2 . . . . . . . . . . ."_S, 9, 9);
 
 struct CodeBlock1
@@ -6684,8 +6853,10 @@ struct CodeBlock1
     CodeBlock1()
     {
         show_result(r);
+
         r = solve(u". . . . . . . . . . 11 12 15 18 21 62 61 . . 6 . . . . . 60 . . 33 . . . . . 57 . . 32 . . . . . 56 . . 37"_S & u" . 1 . . . 73 . . 38 . . . . . 72 . . 43 44 47 48 51 76 77 . . . . . . . . . ."_S, 9, 9);
         show_result(r);
+
         r = solve(u"17 . . . 11 . . . 59 . 15 . . 6 . . 61 . . . 3 . . . 63 . . . . . . 66 . . . . 23 24 . 68 67 78 . 54 55"_S & u" . . . . 72 . . . . . . 35 . . . 49 . . . 29 . . 40 . . 47 . 31 . . . 39 . . . 45"_S, 9, 9);
         show_result(r);
     }
@@ -6733,6 +6904,7 @@ F solve()
       I !perm.next_permutation()
          L.break
    R r
+
 V solutions = solve()
 print(‘A, B, C, D, E, F, G, H = ’solutions[0].map(i -> String(i)).join(‘, ’))
 ===
@@ -6756,6 +6928,7 @@ auto solve()
     }
     return r;
 }
+
 auto solutions = solve();
 
 struct CodeBlock1
@@ -6864,7 +7037,6 @@ for peg,over,land in Solution:
   DrawBoard(board)
   print("Peg %s jumped over %s to land on %s\n" % (hex(peg)[2:].upper(),hex(over)[2:].upper(),hex(land)[2:].upper()))
 ===
-
 F DrawBoard(board)
    V peg = [‘’] * 16
    L(n) 1..15
@@ -6885,7 +7057,9 @@ F AddPeg(&board, n)
 
 F IsPeg(board, n)
    R n C board
+
 V JumpMoves = [1 = [(2, 4), (3, 6)], 2 = [(4, 7), (5, 9)], 3 = [(5, 8), (6, 10)], 4 = [(2, 1), (5, 6), (7, 11), (8, 13)], 5 = [(8, 12), (9, 14)], 6 = [(3, 1), (5, 4), (9, 13), (10, 15)], 7 = [(4, 2), (8, 9)], 8 = [(5, 3), (9, 10)], 9 = [(5, 2), (8, 7)], 10 = [(9, 8)], 11 = [(12, 13)], 12 = [(8, 5), (13, 14)], 13 = [(8, 4), (9, 6), (12, 11), (14, 15)], 14 = [(9, 5), (13, 12)], 15 = [(10, 6), (14, 13)]]
+
 [(Int, Int, Int)] Solution
 
 F Solve(=board)
@@ -6901,10 +7075,13 @@ F Solve(=board)
                RemovePeg(&board, peg)
                RemovePeg(&board, over)
                AddPeg(&board, land)
+
                Solution.append((peg, over, land))
+
                board = Solve(board)
                I board.len == 1
                   R board
+
                board = copy(saveboard)
                Solution.pop()
    R board
@@ -6913,8 +7090,10 @@ F InitSolve(empty)
    V board = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
    RemovePeg(&board, empty)
    Solve(board)
+
 V empty_start = 1
 InitSolve(empty_start)
+
 V board = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
 RemovePeg(&board, empty_start)
 L(peg, over, land) Solution
@@ -6953,7 +7132,9 @@ template <typename T1, typename T2> auto IsPeg(const T1 &board, const T2 &n)
 {
     return in(n, board);
 }
+
 auto JumpMoves = create_dict(dict_of(1, create_array({make_tuple(2, 4), make_tuple(3, 6)}))(2, create_array({make_tuple(4, 7), make_tuple(5, 9)}))(3, create_array({make_tuple(5, 8), make_tuple(6, 10)}))(4, create_array({make_tuple(2, 1), make_tuple(5, 6), make_tuple(7, 11), make_tuple(8, 13)}))(5, create_array({make_tuple(8, 12), make_tuple(9, 14)}))(6, create_array({make_tuple(3, 1), make_tuple(5, 4), make_tuple(9, 13), make_tuple(10, 15)}))(7, create_array({make_tuple(4, 2), make_tuple(8, 9)}))(8, create_array({make_tuple(5, 3), make_tuple(9, 10)}))(9, create_array({make_tuple(5, 2), make_tuple(8, 7)}))(10, create_array({make_tuple(9, 8)}))(11, create_array({make_tuple(12, 13)}))(12, create_array({make_tuple(8, 5), make_tuple(13, 14)}))(13, create_array({make_tuple(8, 4), make_tuple(9, 6), make_tuple(12, 11), make_tuple(14, 15)}))(14, create_array({make_tuple(9, 5), make_tuple(13, 12)}))(15, create_array({make_tuple(10, 6), make_tuple(14, 13)})));
+
 Array<ivec3> Solution;
 
 template <typename T1> auto Solve(T1 board)
@@ -6969,10 +7150,13 @@ template <typename T1> auto Solve(T1 board)
                     RemovePeg(board, peg);
                     RemovePeg(board, over);
                     AddPeg(board, land);
+
                     Solution.append(make_tuple(peg, over, land));
+
                     board = Solve(board);
                     if (board.len() == 1)
                         return board;
+
                     board = copy(saveboard);
                     Solution.pop();
                 }
@@ -6986,6 +7170,7 @@ template <typename T1> auto InitSolve(const T1 &empty)
     RemovePeg(board, empty);
     Solve(board);
 }
+
 auto empty_start = 1;
 
 struct CodeBlock1
@@ -6995,6 +7180,7 @@ struct CodeBlock1
         InitSolve(empty_start);
     }
 } code_block_1;
+
 auto board = create_array({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15});
 
 struct CodeBlock2
@@ -7063,6 +7249,7 @@ F bead_sort(&a)
       L j < maxv & beads[i * maxv + j] > 0
          j++
       a[i] = j
+
 V a = [5, 3, 1, 7, 4, 1, 1, 20]
 bead_sort(&a)
 print(a)
@@ -7092,6 +7279,7 @@ template <typename T1> auto bead_sort(T1 &a)
         a.set(i, j);
     }
 }
+
 auto a = create_array({5, 3, 1, 7, 4, 1, 1, 20});
 
 struct CodeBlock1
@@ -7139,10 +7327,10 @@ iArr = [4, 65, 2, -31, 0, 99, 83, 782, 1]
 patience_sort(iArr)
 print(iArr)
 ===
-
 F patience_sort(&arr)
    I arr.len < 2
       R
+
    [[Int]] piles
    L(el) arr
       L(&pile) piles
@@ -7164,6 +7352,7 @@ F patience_sort(&arr)
       minPile.pop()
       I minPile.empty
          piles.pop(minPileIndex)
+
 V iArr = [4, 65, 2, -31, 0, 99, 83, 782, 1]
 patience_sort(&iArr)
 print(iArr)
@@ -7172,6 +7361,7 @@ template <typename T1> auto patience_sort(T1 &arr)
 {
     if (arr.len() < 2)
         return;
+
     Array<Array<int>> piles;
     for (auto &&el : arr)
         {bool was_break = false;
@@ -7200,6 +7390,7 @@ template <typename T1> auto patience_sort(T1 &arr)
             piles.pop(minPileIndex);
     }
 }
+
 auto iArr = create_array({4, 65, 2, -31, 0, 99, 83, 782, 1});
 
 struct CodeBlock1
@@ -7239,14 +7430,13 @@ def ListSquareFrees( _start : Int64, _end : Int64 ):
 ListSquareFrees( 1, 100 )
 ListSquareFrees( 1000000000000, 1000000000145 )
 ===
-//import math
-
 F SquareFree(_number)
    V max = Int(sqrt(_number))
 
    L(root) 2 .. max
       I 0 == _number % (Int64(root) ^ 2)
          R 0B
+
    R 1B
 
 F ListSquareFrees(Int64 _start, Int64 _end)
@@ -7257,7 +7447,9 @@ F ListSquareFrees(Int64 _start, Int64 _end)
          I count % 5 == 4
             print()
          count++
+
    print("\n\nTotal count of square-free numbers between #. and #.: #.".format(_start, _end, count))
+
 ListSquareFrees(1, 100)
 ListSquareFrees(1000000000000, 1000000000145)
 ===
@@ -7267,6 +7459,7 @@ template <typename T1> auto SquareFree(const T1 &_number)
     for (auto root : range_ee(2, max))
         if (0 == mod(_number, (square(to_int64(root)))))
             return false;
+
     return true;
 }
 
@@ -7280,6 +7473,7 @@ auto ListSquareFrees(const Int64 &_start, const Int64 &_end)
                 print();
             count++;
         }
+
     print(u"\n\nTotal count of square-free numbers between #. and #.: #."_S.format(_start, _end, count));
 }
 
@@ -7399,6 +7593,7 @@ print('Engagement stability check PASSED'
 ===
 V guyprefers = [‘abe’ = [‘abi’, ‘eve’, ‘cath’, ‘ivy’, ‘jan’, ‘dee’, ‘fay’, ‘bea’, ‘hope’, ‘gay’], ‘bob’ = [‘cath’, ‘hope’, ‘abi’, ‘dee’, ‘eve’, ‘fay’, ‘bea’, ‘jan’, ‘ivy’, ‘gay’], ‘col’ = [‘hope’, ‘eve’, ‘abi’, ‘dee’, ‘bea’, ‘fay’, ‘ivy’, ‘gay’, ‘cath’, ‘jan’], ‘dan’ = [‘ivy’, ‘fay’, ‘dee’, ‘gay’, ‘hope’, ‘eve’, ‘jan’, ‘bea’, ‘cath’, ‘abi’], ‘ed’ = [‘jan’, ‘dee’, ‘bea’, ‘cath’, ‘fay’, ‘eve’, ‘abi’, ‘ivy’, ‘hope’, ‘gay’], ‘fred’ = [‘bea’, ‘abi’, ‘dee’, ‘gay’, ‘eve’, ‘ivy’, ‘cath’, ‘jan’, ‘hope’, ‘fay’], ‘gav’ = [‘gay’, ‘eve’, ‘ivy’, ‘bea’, ‘cath’, ‘abi’, ‘dee’, ‘hope’, ‘jan’, ‘fay’], ‘hal’ = [‘abi’, ‘eve’, ‘hope’, ‘fay’, ‘ivy’, ‘cath’, ‘jan’, ‘bea’, ‘gay’, ‘dee’], ‘ian’ = [‘hope’, ‘cath’, ‘dee’, ‘gay’, ‘bea’, ‘abi’, ‘fay’, ‘ivy’, ‘jan’, ‘eve’], ‘jon’ = [‘abi’, ‘fay’, ‘jan’, ‘gay’, ‘eve’, ‘bea’, ‘dee’, ‘cath’, ‘ivy’, ‘hope’]]
 V galprefers = [‘abi’ = [‘bob’, ‘fred’, ‘jon’, ‘gav’, ‘ian’, ‘abe’, ‘dan’, ‘ed’, ‘col’, ‘hal’], ‘bea’ = [‘bob’, ‘abe’, ‘col’, ‘fred’, ‘gav’, ‘dan’, ‘ian’, ‘ed’, ‘jon’, ‘hal’], ‘cath’ = [‘fred’, ‘bob’, ‘ed’, ‘gav’, ‘hal’, ‘col’, ‘ian’, ‘abe’, ‘dan’, ‘jon’], ‘dee’ = [‘fred’, ‘jon’, ‘col’, ‘abe’, ‘ian’, ‘hal’, ‘gav’, ‘dan’, ‘bob’, ‘ed’], ‘eve’ = [‘jon’, ‘hal’, ‘fred’, ‘dan’, ‘abe’, ‘gav’, ‘col’, ‘ed’, ‘ian’, ‘bob’], ‘fay’ = [‘bob’, ‘abe’, ‘ed’, ‘ian’, ‘jon’, ‘dan’, ‘fred’, ‘gav’, ‘col’, ‘hal’], ‘gay’ = [‘jon’, ‘gav’, ‘hal’, ‘fred’, ‘bob’, ‘abe’, ‘col’, ‘ed’, ‘dan’, ‘ian’], ‘hope’ = [‘gav’, ‘jon’, ‘bob’, ‘abe’, ‘ian’, ‘dan’, ‘hal’, ‘ed’, ‘col’, ‘fred’], ‘ivy’ = [‘ian’, ‘col’, ‘hal’, ‘gav’, ‘fred’, ‘bob’, ‘abe’, ‘ed’, ‘jon’, ‘dan’], ‘jan’ = [‘ed’, ‘hal’, ‘gav’, ‘abe’, ‘bob’, ‘jon’, ‘col’, ‘ian’, ‘fred’, ‘dan’]]
+
 V guys = sorted(guyprefers.keys())
 V gals = sorted(galprefers.keys())
 
@@ -7447,12 +7642,15 @@ F matchmaker()
             I !guyslist.empty
                guysfree.append(guy)
    R engaged
+
 print("\nEngagements:")
 V engaged = matchmaker()
+
 print("\nCouples:")
 print(‘  ’sorted(engaged.items()).map((couple_key, couple_val) -> ‘#. is engaged to #.’.format(couple_key, couple_val)).join(",\n  "))
 print()
 print(I check(engaged) {‘Engagement stability check PASSED’} E ‘Engagement stability check FAILED’)
+
 print("\n\nSwapping two fiances to introduce an error")
 swap(&engaged[gals[0]], &engaged[gals[1]])
 L(gal) gals[0.<2]
@@ -7462,6 +7660,7 @@ print(I check(engaged) {‘Engagement stability check PASSED’} E ‘Engagement
 ===
 auto guyprefers = create_dict(dict_of(u"abe"_S, create_array({u"abi"_S, u"eve"_S, u"cath"_S, u"ivy"_S, u"jan"_S, u"dee"_S, u"fay"_S, u"bea"_S, u"hope"_S, u"gay"_S}))(u"bob"_S, create_array({u"cath"_S, u"hope"_S, u"abi"_S, u"dee"_S, u"eve"_S, u"fay"_S, u"bea"_S, u"jan"_S, u"ivy"_S, u"gay"_S}))(u"col"_S, create_array({u"hope"_S, u"eve"_S, u"abi"_S, u"dee"_S, u"bea"_S, u"fay"_S, u"ivy"_S, u"gay"_S, u"cath"_S, u"jan"_S}))(u"dan"_S, create_array({u"ivy"_S, u"fay"_S, u"dee"_S, u"gay"_S, u"hope"_S, u"eve"_S, u"jan"_S, u"bea"_S, u"cath"_S, u"abi"_S}))(u"ed"_S, create_array({u"jan"_S, u"dee"_S, u"bea"_S, u"cath"_S, u"fay"_S, u"eve"_S, u"abi"_S, u"ivy"_S, u"hope"_S, u"gay"_S}))(u"fred"_S, create_array({u"bea"_S, u"abi"_S, u"dee"_S, u"gay"_S, u"eve"_S, u"ivy"_S, u"cath"_S, u"jan"_S, u"hope"_S, u"fay"_S}))(u"gav"_S, create_array({u"gay"_S, u"eve"_S, u"ivy"_S, u"bea"_S, u"cath"_S, u"abi"_S, u"dee"_S, u"hope"_S, u"jan"_S, u"fay"_S}))(u"hal"_S, create_array({u"abi"_S, u"eve"_S, u"hope"_S, u"fay"_S, u"ivy"_S, u"cath"_S, u"jan"_S, u"bea"_S, u"gay"_S, u"dee"_S}))(u"ian"_S, create_array({u"hope"_S, u"cath"_S, u"dee"_S, u"gay"_S, u"bea"_S, u"abi"_S, u"fay"_S, u"ivy"_S, u"jan"_S, u"eve"_S}))(u"jon"_S, create_array({u"abi"_S, u"fay"_S, u"jan"_S, u"gay"_S, u"eve"_S, u"bea"_S, u"dee"_S, u"cath"_S, u"ivy"_S, u"hope"_S})));
 auto galprefers = create_dict(dict_of(u"abi"_S, create_array({u"bob"_S, u"fred"_S, u"jon"_S, u"gav"_S, u"ian"_S, u"abe"_S, u"dan"_S, u"ed"_S, u"col"_S, u"hal"_S}))(u"bea"_S, create_array({u"bob"_S, u"abe"_S, u"col"_S, u"fred"_S, u"gav"_S, u"dan"_S, u"ian"_S, u"ed"_S, u"jon"_S, u"hal"_S}))(u"cath"_S, create_array({u"fred"_S, u"bob"_S, u"ed"_S, u"gav"_S, u"hal"_S, u"col"_S, u"ian"_S, u"abe"_S, u"dan"_S, u"jon"_S}))(u"dee"_S, create_array({u"fred"_S, u"jon"_S, u"col"_S, u"abe"_S, u"ian"_S, u"hal"_S, u"gav"_S, u"dan"_S, u"bob"_S, u"ed"_S}))(u"eve"_S, create_array({u"jon"_S, u"hal"_S, u"fred"_S, u"dan"_S, u"abe"_S, u"gav"_S, u"col"_S, u"ed"_S, u"ian"_S, u"bob"_S}))(u"fay"_S, create_array({u"bob"_S, u"abe"_S, u"ed"_S, u"ian"_S, u"jon"_S, u"dan"_S, u"fred"_S, u"gav"_S, u"col"_S, u"hal"_S}))(u"gay"_S, create_array({u"jon"_S, u"gav"_S, u"hal"_S, u"fred"_S, u"bob"_S, u"abe"_S, u"col"_S, u"ed"_S, u"dan"_S, u"ian"_S}))(u"hope"_S, create_array({u"gav"_S, u"jon"_S, u"bob"_S, u"abe"_S, u"ian"_S, u"dan"_S, u"hal"_S, u"ed"_S, u"col"_S, u"fred"_S}))(u"ivy"_S, create_array({u"ian"_S, u"col"_S, u"hal"_S, u"gav"_S, u"fred"_S, u"bob"_S, u"abe"_S, u"ed"_S, u"jon"_S, u"dan"_S}))(u"jan"_S, create_array({u"ed"_S, u"hal"_S, u"gav"_S, u"abe"_S, u"bob"_S, u"jon"_S, u"col"_S, u"ian"_S, u"fred"_S, u"dan"_S})));
+
 auto guys = sorted(guyprefers.keys());
 auto gals = sorted(galprefers.keys());
 
@@ -7541,6 +7740,7 @@ struct CodeBlock2
         print(u"  "_S & sorted(engaged.items()).map([](const auto &couple_key, const auto &couple_val){return u"#. is engaged to #."_S.format(couple_key, couple_val);}).join(u",\n  "_S));
         print();
         print(check(engaged) ? u"Engagement stability check PASSED"_S : u"Engagement stability check FAILED"_S);
+
         print(u"\n\nSwapping two fiances to introduce an error"_S);
         swap(engaged[_get<0>(gals)], engaged[_get<1>(gals)]);
         for (auto &&gal : gals[range_el(0, 2)])
@@ -7611,6 +7811,7 @@ F unstraddle(s)
       E
          r [+]= :t[1][:t[0].index(c)]
    R r
+
 V O = ‘One night-it was on the twentieth of March, 1888-I was returning’
 print(‘Encoded: ’straddle(O))
 print(‘Decoded: ’unstraddle(straddle(O)).join(‘’))
@@ -7647,6 +7848,7 @@ template <typename T1> auto unstraddle(const T1 &s)
     }
     return r;
 }
+
 auto O = u"One night-it was on the twentieth of March, 1888-I was returning"_S;
 
 struct CodeBlock1
@@ -7769,12 +7971,14 @@ T Sudoku
       L(i) 9
          I .grid[y * 9 + i] == v | .grid[i * 9 + x] == v
             R 0B
+
       V startX = (x I/ 3) * 3
       V startY = (y I/ 3) * 3
       L(i) startY .< startY + 3
          L(j) startX .< startX + 3
             I .grid[i * 9 + j] == v
                R 0B
+
       R 1B
 
    F String()
@@ -7788,7 +7992,9 @@ T Sudoku
          I i C (2, 5)
             s ‘’= "------+-------+------\n"
       R s
+
 V rows = [‘850002400’, ‘720000009’, ‘004000000’, ‘000107002’, ‘305000900’, ‘040000000’, ‘000080070’, ‘017000000’, ‘000036040’]
+
 Sudoku(rows).solve()
 ===
 class Sudoku
@@ -7840,12 +8046,14 @@ public:
         for (int i = 0; i < 9; i++)
             if (grid[y * 9 + i] == v || grid[i * 9 + x] == v)
                 return false;
+
         auto startX = (idiv(x, 3)) * 3;
         auto startY = (idiv(y, 3)) * 3;
         for (auto i : range_el(startY, startY + 3))
             for (auto j : range_el(startX, startX + 3))
                 if (grid[i * 9 + j] == v)
                     return false;
+
         return true;
     }
 
@@ -7865,6 +8073,7 @@ public:
         return s;
     }
 };
+
 auto rows = create_array({u"850002400"_S, u"720000009"_S, u"004000000"_S, u"000107002"_S, u"305000900"_S, u"040000000"_S, u"000080070"_S, u"017000000"_S, u"000036040"_S});
 
 struct CodeBlock1
@@ -7908,7 +8117,6 @@ for test in ['9900', '9090', '9009']:
     print("\n".join(result))
     print("\n")
 ===
-//import collections
 [String] result
 V longest = 0
 
@@ -7916,6 +8124,7 @@ F make_sequence(n) -> N
    DefaultDict[Char, Int] map
    L(c) n
       map[c]++
+
    V z = ‘’
    L(k) sorted(map.keys(), reverse' 1B)
       z ‘’= Char(code' map[k] + ‘0’.code)
@@ -7942,6 +8151,7 @@ template <typename T1> void make_sequence(const T1 &n)
     DefaultDict<Char, int> map;
     for (auto &&c : n)
         map[c]++;
+
     auto z = u""_S;
     for (auto &&k : sorted(map.keys(), nullptr, true)) {
         z &= Char(map[k] + u'0'_C.code);
@@ -7960,7 +8170,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&test : create_array({u"9900"_S, u"9090"_S, u"9009"_S})) {
             result.clear();
             longest = 0;
@@ -7992,10 +8201,11 @@ for i in range(1, seeds + 1):
 
 print('</svg>')
 ===
-//import math
 V phi = (1 + sqrt(5)) / 2
+
 V size = 600
 V seeds = 5 * size
+
 print(‘<svg xmlns="http://www.w3.org/2000/svg" width="’String(size)‘" height="’String(size)‘" style="stroke:gold">’)
 print(‘<rect width="100%" height="100%" fill="black" />’)
 
@@ -8003,9 +8213,11 @@ L(i) 1 .. seeds
    V r = 2 * (i ^ phi) / seeds
    V t = 2 * math:pi * phi * i
    print(‘<circle cx="#.2" cy="#.2" r="#.1" />’.format(r * sin(t) + size / 2, r * cos(t) + size / 2, sqrt(i) / 13))
+
 print(‘</svg>’)
 ===
 auto phi = (1 + sqrt(5)) / 2.0;
+
 auto size = 600;
 auto seeds = 5 * size;
 
@@ -8021,6 +8233,7 @@ struct CodeBlock1
             auto t = 2 * math::pi * phi * i;
             print(u"<circle cx=\"#.2\" cy=\"#.2\" r=\"#.1\" />"_S.format(r * sin(t) + size / 2.0, r * cos(t) + size / 2.0, sqrt(i) / 13.0));
         }
+
         print(u"</svg>"_S);
     }
 } code_block_1;
@@ -8052,6 +8265,7 @@ V rd = [‘22’, ‘333’, ‘4444’, ‘55555’, ‘666666’, ‘7777777�
 L(ii) 2..7
    print(‘First 10 super-#. numbers:’.format(ii))
    V count = 0
+
    BigInt j = 3
    L
       V k = ii * j ^ ii
@@ -8069,10 +8283,10 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto ii : range_ee(2, 7)) {
             print(u"First 10 super-#. numbers:"_S.format(ii));
             auto count = 0;
+
             BigInt j = 3;
             while (true) {
                 auto k = ii * pow(j, ii);
@@ -8140,6 +8354,7 @@ for n in range(MAX):
     print("superPerm(%2d) len = %i" % (n, len(sp)))
 ===
 V MAX = 12
+
 [Char] sp
 V count = [0] * MAX
 V pos = 0
@@ -8184,6 +8399,7 @@ L(n) 0 .< MAX
    print(‘superPerm(#2) len = #.’.format(n, sp.len))
 ===
 auto MAX = 12;
+
 Array<Char> sp;
 auto count = create_array({0}) * MAX;
 auto pos = 0;
@@ -8234,7 +8450,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto n : range_el(0, MAX)) {
             superPerm(n);
             print(u"superPerm(#2) len = #."_S.format(n, sp.len()));

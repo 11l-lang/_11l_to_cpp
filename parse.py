@@ -999,6 +999,16 @@ class ASTNode:
     def walk_children(self, f):
         pass
 
+def pre_nl(toki = None):
+    if toki is None:
+        toki = tokeni
+    if toki > 0:
+        ti = toki - 1
+        while ti > 0 and tokens[ti].category in (Token.Category.SCOPE_END, Token.Category.STATEMENT_SEPARATOR):
+            ti -= 1
+        return (min(source[tokens[ti].end:tokens[toki].start].count("\n"), 2) - 1) * "\n"
+    return ''
+
 class ASTNodeWithChildren(ASTNode):
     # children : List['ASTNode'] = [] # OMFG! This actually means static (common for all objects of type ASTNode) variable, not default value of member variable, that was unexpected to me as it contradicts C++11 behavior
     children : List['ASTNode']
@@ -1014,12 +1024,7 @@ class ASTNodeWithChildren(ASTNode):
             f(child)
 
     def children_to_str(self, indent, t, place_opening_curly_bracket_on_its_own_line = True, add_at_beginning = ''):
-        r = ''
-        if self.tokeni > 0:
-            ti = self.tokeni - 1
-            while ti > 0 and tokens[ti].category in (Token.Category.SCOPE_END, Token.Category.STATEMENT_SEPARATOR):
-                ti -= 1
-            r = (min(source[tokens[ti].end:tokens[self.tokeni].start].count("\n"), 2) - 1) * "\n"
+        r = pre_nl(self.tokeni)
         r += ' ' * (indent*4) + t + (("\n" + ' ' * (indent*4) + "{\n") if place_opening_curly_bracket_on_its_own_line else " {\n") # }
         r += add_at_beginning
         for c in self.children:
@@ -1065,15 +1070,20 @@ class ASTProgram(ASTNodeWithChildren):
 
         for c in self.children:
             global_statement = type(c) in (ASTVariableDeclaration, ASTVariableInitialization, ASTTupleInitialization, ASTFunctionDefinition, ASTTypeDefinition, ASTTypeAlias, ASTTypeEnum, ASTMain)
+            beginning_of_codeblock = False
             if global_statement != prev_global_statement:
                 prev_global_statement = global_statement
                 if not global_statement:
                     sname = 'CodeBlock' + str(code_block_id)
                     r += "\n"*(c is not self.children[0]) + 'struct ' + sname + "\n{\n    " + sname + "()\n    {\n"
+                    beginning_of_codeblock = True
                 else:
                     r += "    }\n} code_block_" + str(code_block_id) + ";\n"
                     code_block_id += 1
-            r += c.to_str(2*(not global_statement))
+            s = c.to_str(2*(not global_statement))
+            if beginning_of_codeblock:
+                s = s.lstrip("\n")
+            r += s
 
         if prev_global_statement != True: # {{
             r += "    }\n} code_block_" + str(code_block_id) + ";\n"
@@ -1083,8 +1093,8 @@ class ASTProgram(ASTNodeWithChildren):
 class ASTExpression(ASTNodeWithExpression):
     def to_str(self, indent):
         if self.expression.symbol.id == '=' and type(self.parent) == ASTTypeDefinition:
-            return ' ' * (indent*4) + 'decltype(' + self.expression.children[1].to_str() + ') ' + self.expression.to_str() + ";\n"
-        return ' ' * (indent*4) + self.expression.to_str() + ";\n"
+            return self.pre_nl + ' ' * (indent*4) + 'decltype(' + self.expression.children[1].to_str() + ') ' + self.expression.to_str() + ";\n"
+        return self.pre_nl + ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
 cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'перем':'auto',
                      'Int':'int', 'Int64':'Int64', 'UInt64':'UInt64', 'UInt32':'uint32_t', 'BigInt':'BigInt', 'Float':'double', 'Float32':'float', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte',
@@ -1199,13 +1209,13 @@ class ASTVariableDeclaration(ASTNode):
             def trans_type(ty):
                 tt = self.trans_type(ty)
                 return tt if tt.startswith('std::unique_ptr<') else 'const ' + tt + ('&'*(ty not in ('Int', 'Float')))
-            return ' ' * (indent*4) + 'std::function<' + self.trans_type(self.type) + '(' + ', '.join(trans_type(ty) for ty in self.type_args) + ')> ' + ', '.join(self.vars) + ";\n"
+            return self.pre_nl + ' ' * (indent*4) + 'std::function<' + self.trans_type(self.type) + '(' + ', '.join(trans_type(ty) for ty in self.type_args) + ')> ' + ', '.join(self.vars) + ";\n"
         if self.type.endswith('?') and self.type not in ('V?', 'П?', 'var?', 'перем?'):
             tt = self.trans_type(self.type)
             if not tt.startswith(('std::unique_ptr<', 'Nullable<')):
                 assert(not self.is_const and not self.is_reference)
                 return ' ' * (indent*4) + 'Nullable<' + tt + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + '> ' + ', '.join(self.vars) + ";\n"
-        return ' ' * (indent*4) + 'const '*self.is_const + self.trans_type(self.type, self.is_reference) + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + '*'*self.is_reference + ', '.join(self.vars) + ";\n"
+        return self.pre_nl + ' ' * (indent*4) + 'const '*self.is_const + self.trans_type(self.type, self.is_reference) + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + '*'*self.is_reference + ', '.join(self.vars) + ";\n"
 
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
     def to_str(self, indent):
@@ -1663,6 +1673,9 @@ class ASTLoopRemoveCurrentElementAndContinue(ASTNode):
              + ' ' * (indent*4) + "continue;\n"
 
 class ASTReturn(ASTNodeWithExpression):
+    def __init__(self):
+        self.pre_nl = pre_nl()
+
     def to_str(self, indent):
         expr_str = ''
         if self.expression is not None:
@@ -1686,7 +1699,7 @@ class ASTReturn(ASTNodeWithExpression):
                 expr_str = trans_type(n.function_return_type, self.expression.scope, self.expression.token) + '()'
             else:
                 expr_str = self.expression.to_str()
-        return ' ' * (indent*4) + 'return' + (' ' + expr_str if expr_str != '' else '') + ";\n"
+        return self.pre_nl + ' ' * (indent*4) + 'return' + (' ' + expr_str if expr_str != '' else '') + ";\n"
 
     def walk_expressions(self, f):
         if self.expression is not None: f(self.expression)
@@ -2677,6 +2690,7 @@ def parse_internal(this_node):
                             new_scope(n.else_or_elif)
                         else: # for support `I fs:is_dir(_fname) {...} E ...` (without this `else` only `I fs:is_dir(_fname) {...} E {...}` is allowed)
                             expr_node = ASTExpression()
+                            expr_node.pre_nl = pre_nl()
                             expr_node.set_expression(expression())
                             expr_node.parent = n.else_or_elif
                             n.else_or_elif.children.append(expr_node)
@@ -2938,6 +2952,7 @@ def parse_internal(this_node):
         elif ((token.value(source) in ('V', 'П', 'var', 'перем') and peek_token().category == Token.Category.SCOPE_BEGIN) # this is `V {v1 = ...; v2 = ...; ...}`
            or (token.value(source) == '-' and
         peek_token().value(source) in ('V', 'П', 'var', 'перем') and peek_token(2).category == Token.Category.SCOPE_BEGIN)): # this is `-V {v1 = ...; v2 = ...; ...}`
+            npre_nl = pre_nl()
             is_const = False
             if token.value(source) == '-':
                 is_const = True
@@ -2953,6 +2968,7 @@ def parse_internal(this_node):
                 advance('=')
 
                 node = ASTVariableInitialization()
+                node.pre_nl = npre_nl
                 node.is_const = is_const
                 node.vars = [var_name]
                 node.set_expression(expression())
@@ -2975,6 +2991,7 @@ def parse_internal(this_node):
             continue
 
         else:
+            npre_nl = pre_nl()
             node_expression = expression()
             if node_expression.symbol.id == '.' and node_expression.children[1].token.category == Token.Category.SCOPE_BEGIN: # this is a "with"-statement
                 node = ASTWith()
@@ -3094,6 +3111,8 @@ def parse_internal(this_node):
                     node.set_expression(node_expression)
                     if isinstance(this_node, ASTTypeDefinition) and node_expression.symbol.id == '=': # fix error ‘identifier `disInter` is not found in `r`’ in '9.yopyra.py'
                         scope.add_name(node_expression.children[0].token_str(), node)
+
+                node.pre_nl = npre_nl
 
                 if not (token is None or token.category in (Token.Category.STATEMENT_SEPARATOR, Token.Category.SCOPE_END) or tokens[tokeni-1].category == Token.Category.SCOPE_END):
                     raise Error('expected end of statement', token)

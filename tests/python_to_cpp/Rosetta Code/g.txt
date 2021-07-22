@@ -15,17 +15,17 @@ def random960():
 
 print(random960())
 ===
-//import random
-
 F random960()
    V start = [‘R’, ‘K’, ‘R’]
 
    L(piece) [‘Q’, ‘N’, ‘N’]
       start.insert(random:(start.len + 1), piece)
+
    V bishpos = random:(start.len + 1)
    start.insert(bishpos, Char(‘B’))
    start.insert(random:(bishpos + 1), Char(‘B’))
    R start
+
 print(random960())
 ===
 auto random960()
@@ -33,6 +33,7 @@ auto random960()
     auto start = create_array({u'R'_C, u'K'_C, u'R'_C});
     for (auto &&piece : create_array({u'Q'_C, u'N'_C, u'N'_C}))
         start.insert(randomns::_(start.len() + 1), piece);
+
     auto bishpos = randomns::_(start.len() + 1);
     start.insert(bishpos, u'B'_C);
     start.insert(randomns::_(bishpos + 1), u'B'_C);

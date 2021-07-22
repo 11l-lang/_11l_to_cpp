@@ -66,7 +66,6 @@ def subPalindromes(tree):
 tree = eertree("eertree")
 print(subPalindromes(tree))
 ===
-
 T Node
    Int length
    Int suffix
@@ -75,6 +74,7 @@ T Node
    F (length, suffix = 0)
       .length = length
       .suffix = suffix
+
 V oddRoot = 1
 
 F eertree(s)
@@ -94,6 +94,7 @@ F eertree(s)
       I c C tree[n].edges
          suffix = tree[n].edges[c]
          L.continue
+
       suffix = tree.len
       tree [+]= Node(k + 2)
       tree[n].edges[c] = suffix
@@ -106,7 +107,9 @@ F eertree(s)
          V b = i - tree[n].length - 1
          I b >= 0 & s[b] == c
             L.break
+
       tree[suffix].suffix = tree[n].edges[c]
+
    R tree
 
 F subPalindromes(tree)
@@ -117,11 +120,14 @@ F subPalindromes(tree)
          p = c‘’p‘’c
          @s [+]= p
          @children(n, p)
+
    children(0, ‘’)
    L(c, n) tree[1].edges
       s [+]= c
       children(n, c)
+
    R s
+
 V tree = eertree(‘eertree’)
 print(subPalindromes(tree))
 ===
@@ -138,6 +144,7 @@ public:
     {
     }
 };
+
 auto oddRoot = 1;
 
 template <typename T1> auto eertree(const T1 &s)
@@ -161,6 +168,7 @@ template <typename T1> auto eertree(const T1 &s)
             suffix = tree[n].edges[c];
             goto on_continue;
         }
+
         suffix = tree.len();
         tree.append(Node(k + 2));
         tree[n].edges.set(c, suffix);
@@ -175,10 +183,12 @@ template <typename T1> auto eertree(const T1 &s)
             if (b >= 0 && s[b] == c)
                 break;
         }
+
         tree[suffix].suffix = tree[n].edges[c];
 } on_continue:
         Lindex++;
     }}
+
     return tree;
 }
 
@@ -194,13 +204,16 @@ template <typename T1> auto subPalindromes(const T1 &tree)
             children(n, p);
         }
     };
+
     children(0, u""_S);
     for (auto &&[c, n] : _get<1>(tree).edges) {
         s.append(c);
         children(n, c);
     }
+
     return s;
 }
+
 auto tree = eertree(u"eertree"_S);
 
 struct CodeBlock1

@@ -38,6 +38,7 @@ public:
     template <typename T3 = decltype(0)> String to_html(const String &instr, File* const outfilef = nullptr, const T3 &outer_pos = 0)
     {
         to_html_called_inside_to_html_outer_pos_list.append(outer_pos);
+
         Array<String> result;
         class Writer
         {
@@ -67,6 +68,7 @@ public:
             }
             throw Exception(message, line, pos - line_start, pos);
         };
+
         auto i = 0;
         auto next_char = [&i, &instr](const decltype(1) offset = 1)
         {
@@ -94,6 +96,7 @@ public:
         {
             return str.replace(u"&"_S, u"&amp;"_S).replace(u"\""_S, u"&quot;"_S);
         };
+
         auto writepos = 0;
         auto write_to_pos = [&html_escape, &instr, &outfile, &writepos](const auto &pos, const auto &npos)
         {
@@ -163,6 +166,7 @@ public:
             }
             return s;
         };
+
         Dict<int, String> nonunique_links;
         auto link = u""_S;
 
@@ -190,6 +194,7 @@ public:
                 i++;
             }
             break_:;
+
             link = html_escapeq(instr[range_el(endpos + 1 + q_offset, i)]);
             String tag = u"<a href=\""_S & link & u"\""_S;
             if (link.starts_with(u"./"_S))
@@ -241,6 +246,7 @@ public:
             outfile.write(u"<abbr title=\""_S & html_escapeq(remove_comments(instr[range_el(i + 2, endqpos2)], i + 2)) & u"\">"_S & html_escape(remove_comments(instr[range_el(startpos + q_offset, endpos)], startpos + q_offset)) & u"</abbr>"_S);
             i = endqpos2 + 1;
         };
+
         auto endi = 0;
         auto numbered_link = [&endi, &exit_with_error, &i, &instr, &link, &next_char, &nonunique_links](const decltype(1) offset = 1)
         {
@@ -266,6 +272,7 @@ public:
             }
             return false;
         };
+
         auto ordered_list_current_number = -1;
         auto close_ordered_list = [&ordered_list_current_number, &write_to_i]()
         {
@@ -274,6 +281,7 @@ public:
                 ordered_list_current_number = -1;
             }
         };
+
         auto in_unordered_list = false;
         auto close_unordered_list = [&in_unordered_list, &write_to_i]()
         {
@@ -282,6 +290,7 @@ public:
                 in_unordered_list = false;
             }
         };
+
         Array<String> ending_tags;
         auto new_line_tag = u"\0"_S;
 
@@ -423,6 +432,7 @@ public:
                                 writepos = i + 2;
                             }
                         }
+
                         ending_tags.append(u"</blockquote>"_S);
                     }
                     i++;
@@ -432,6 +442,7 @@ public:
             if (ch == u'‘') {
                 auto prevci = i - 1;
                 auto prevc = prevci >= 0 ? instr[prevci] : u'\0'_C;
+
                 auto startqpos = i;
                 i = find_ending_pair_quote(i);
                 auto endqpos = i;
@@ -595,6 +606,7 @@ public:
                             auto endrow = find_ending_pair_quote(j);
                             auto hor_col_align = u""_S;
                             auto ver_col_align = u""_S;
+
                             j++;
                             while (j < endrow) {
                                 ch = instr[j];
@@ -637,6 +649,7 @@ public:
                                     exit_with_error(u"Unknown formatting character inside table row"_S, j);
                                 j++;
                             }
+
                             header_row = false;
                             hor_row_align = u""_S;
                             ver_row_align = u""_S;
@@ -655,6 +668,7 @@ public:
                             j = find_ending_sq_bracket(instr, j);
                         else if (!in(ch, u"  \t\n"_S))
                             exit_with_error(u"Unknown formatting character inside table"_S, j);
+
                         j++;
                     }
                     for (auto y : range_el(table.len() - 1, -1).step(-1))
@@ -678,6 +692,7 @@ public:
                                         if (make_tuple(xxx, yyy) != make_tuple(xx, yy))
                                             table[yyy][xxx].attrs = u""_S;
                             }
+
                     auto is_inline = true;
                     if ((prevci == 0 || instr[prevci - 1] == u'\n' || (prevci - 3 >= 0 && instr[range_el(prevci - 3, prevci)] == u"]]]" && instr[range_el(0, 3)] == u"[[[" && find_ending_sq_bracket(instr, 0) == prevci - 1)))
                         is_inline = false;
@@ -866,10 +881,13 @@ public:
                 write_to_i((new_line_tag != u'\0' ? new_line_tag : u"<br />"_S) & (new_line_tag != u"" ? u"\n"_S : u""_S));
                 new_line_tag = u"\0"_S;
             }
+
             i++;
         }
+
         close_ordered_list();
         close_unordered_list();
+
         write_to_pos(instr.len(), 0);
         assert(ending_tags.empty());
         assert(to_html_called_inside_to_html_outer_pos_list.pop() == outer_pos);
@@ -880,6 +898,7 @@ public:
                 r = r.replace(u"</blockquote>\n"_S, u"</blockquote>"_S);
             return r;
         }
+
         return u""_S;
     }
 };

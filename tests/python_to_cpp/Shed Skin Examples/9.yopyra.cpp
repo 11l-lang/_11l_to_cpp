@@ -204,9 +204,11 @@ public:
         auto distChoque = radio * radio + v * v - esfera_rayo.x * esfera_rayo.x - esfera_rayo.y * esfera_rayo.y - esfera_rayo.z * esfera_rayo.z;
         if (distChoque < 0.0)
             return false;
+
         distChoque = v - sqrt(distChoque);
         if (distChoque > r.disInter || distChoque < 0.0)
             return false;
+
         r.disInter = distChoque;
         r.objInter = &*this;
         return true;
@@ -238,11 +240,13 @@ public:
         auto v = normal.pEscalar(r.direccion);
         if (v == 0.0)
             return false;
+
         auto distChoque = -(normal.pEscalar(r.origen) + distancia) / v;
         if (distChoque < 0.0)
             return false;
         if (distChoque > r.disInter)
             return false;
+
         r.disInter = distChoque;
         r.objInter = &*this;
         return true;
@@ -270,11 +274,14 @@ public:
     Array<std::unique_ptr<Cuerpo>> lObjetos;
     Array<Luz> lLuces;
     Array<Material> lMateriales;
+
     decltype(320) imgAncho = 320;
     decltype(200) imgAlto = 200;
+
     decltype(3) profTrazado = 3;
     decltype(1) oversampling = 1;
     decltype(60.0) campoVision = 60.0;
+
     decltype(0) startline = 0;
 
     template <typename T1> Scene(const T1 &scene_filename)
@@ -328,14 +335,19 @@ public:
                 lMateriales.append(mat);
             }
         }
+
         anchoGrid = imgAncho * oversampling;
         altoGrid = imgAlto * oversampling;
+
         look = lookCamara - posCamara;
         Vhor = look.pVectorial(upCamara);
         Vhor.normalizar();
+
         Vver = look.pVectorial(Vhor);
         Vver.normalizar();
+
         auto fl = anchoGrid / (2 * tan((0.5 * campoVision) * ::PI_SOBRE_180));
+
         auto Vp = look;
         Vp.normalizar();
         Vp.x = Vp.x * fl - 0.5 * (anchoGrid * Vhor.x + altoGrid * Vver.x);
@@ -358,6 +370,7 @@ public:
         return Material(parse_color(line[range_el(0, 3)]), _get<0>(f), _get<1>(f), _get<2>(f), _get<3>(f), _get<4>(f), _get<5>(f));
     }
 };
+
 auto scene_namefile = u"testdata/scene.txt"_S;
 auto scene = Scene(scene_namefile);
 
@@ -370,6 +383,7 @@ template <typename T2> auto calculaSombra(Rayo &r, const T2 &objChoque)
         if (obj->intersecta(r) && &*obj != objChoque)
             sombra *= ::scene.lMateriales[obj->material].cTransmitividad;
     }
+
     return sombra;
 }
 
@@ -466,6 +480,7 @@ template <typename T1, typename T2> auto renderPixel(T1 x, T2 y)
             direc.z = x * ::scene.Vhor.z + y * ::scene.Vver.z + ::scene.Vp.z;
             direc.normalizar();
             auto r = Rayo(::scene.posCamara, direc);
+
             c += trazar(r, 1.0);
             y++;
         }
@@ -481,10 +496,12 @@ template <typename T1, typename T2> auto renderPixel(T1 x, T2 y)
 int main()
 {
     print(u"Rendering: "_S & scene_namefile);
+
     auto fileout = File(scene_namefile & u".ppm"_S, u"w"_S);
     fileout.write(u"P3\n"_S);
     fileout.write(String(scene.imgAncho) & u" "_S & String(scene.endline - scene.startline + 1) & u"\n"_S);
     fileout.write(u"255\n"_S);
+
     print(u"Line (from #. to #.):"_S.format(scene.startline, scene.endline), u" "_S);
     for (auto y : range_ee(scene.startline, scene.endline)) {
         for (auto x : range_el(0, scene.imgAncho))

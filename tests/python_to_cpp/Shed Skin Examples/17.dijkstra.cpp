@@ -83,6 +83,7 @@ public:
         Array<Vertex> v;
         for (int n = 0; n < 100; n++)
             v.append(Vertex(String(n + 1)));
+
         Array<Edge> e;
         for (auto n : range_el(0, 10 * v.len())) {
             auto ui = randint(v.len());
@@ -96,6 +97,7 @@ public:
             }
             e.append(Edge(u, tv, random_uniform(10, 100)));
         }
+
         this->v = v;
         this->e = e;
     }
@@ -125,6 +127,7 @@ public:
         return d;
     }
 };
+
 auto G = Graph();
 
 template <typename T2> auto Extract_Min(Array<Vertex> &q, const T2 &d)
@@ -155,6 +158,7 @@ template <typename T1, typename T2, typename T3> auto dijkstra(const T1 &g, cons
         d.set(v, 1e50);
         previous.set(v, Vertex(u""_S));
     }
+
     d.set(s, 0);
     Array<Vertex> ss;
     auto Q = copy(g.v);
@@ -170,6 +174,7 @@ template <typename T1, typename T2, typename T3> auto dijkstra(const T1 &g, cons
                 previous.set(edge.v, u);
             }
     }
+
     ss.clear();
     auto u = t;
     while (previous[u].name != u"") {

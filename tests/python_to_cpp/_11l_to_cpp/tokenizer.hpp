@@ -71,7 +71,9 @@ Error: unindent does not match any outer indentation level
 )"_S;
     }
 } code_block_1;
+
 auto keywords = create_array({u"V"_S, u"C"_S, u"I"_S, u"E"_S, u"F"_S, u"L"_S, u"N"_S, u"R"_S, u"S"_S, u"T"_S, u"X"_S, u"П"_S, u"С"_S, u"Е"_S, u"И"_S, u"Ф"_S, u"Ц"_S, u"Н"_S, u"Р"_S, u"В"_S, u"Т"_S, u"Х"_S, u"var"_S, u"in"_S, u"if"_S, u"else"_S, u"fn"_S, u"loop"_S, u"null"_S, u"return"_S, u"switch"_S, u"type"_S, u"exception"_S, u"перем"_S, u"С"_S, u"если"_S, u"иначе"_S, u"фн"_S, u"цикл"_S, u"нуль"_S, u"вернуть"_S, u"выбрать"_S, u"тип"_S, u"исключение"_S});
+
 Array<String> empty_list_of_str;
 Array<Array<String>> binary_operators = create_array({empty_list_of_str, create_array<String>({String(u"+"_S), u"-"_S, u"*"_S, u"/"_S, u"%"_S, u"^"_S, u"&"_S, u"|"_S, u"<"_S, u">"_S, u"="_S, u"?"_S}), create_array({u"<<"_S, u">>"_S, u"<="_S, u">="_S, u"=="_S, u"!="_S, u"+="_S, u"-="_S, u"*="_S, u"/="_S, u"%="_S, u"&="_S, u"|="_S, u"^="_S, u"->"_S, u".."_S, u".<"_S, u".+"_S, u"<."_S, u"I/"_S, u"Ц/"_S, u"C "_S, u"С "_S}), create_array({u"<<="_S, u">>="_S, u"‘’="_S, u"[+]"_S, u"[&]"_S, u"[|]"_S, u"(+)"_S, u"<.<"_S, u"I/="_S, u"Ц/="_S, u"in "_S, u"!C "_S, u"!С "_S}), create_array({u"[+]="_S, u"[&]="_S, u"[|]="_S, u"(+)="_S, u"!in "_S})});
 Array<Array<String>> unary_operators = create_array({empty_list_of_str, create_array({String(u"!"_S)}), create_array({u"++"_S, u"--"_S}), create_array({u"(-)"_S})});
@@ -117,6 +119,7 @@ public:
         SCOPE_END,
         STATEMENT_SEPARATOR
     };
+
     int start;
     int end;
     Category category;
@@ -195,6 +198,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
             }
             if (i == source.len())
                 break;
+
             auto ii = i;
             if (in(source[range_el(i, i + 2)], make_tuple(uR"(\‘)"_S, uR"(\()"_S, uR"(\{)"_S, uR"(\[)"_S))) {
                 skip_multiline_comment();
@@ -251,6 +255,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                 auto next_line_pos = source.findi(u"\n"_S, i);
                 throw Error(u"mixing tabs and spaces in indentation: `"_S & source[range_el(linestart, i)].replace(u" "_S, u"S"_S).replace(u"\t"_S, u"TAB"_S) & source[range_el(i, next_line_pos != -1 ? next_line_pos : source.len())] & u"`"_S, i);
             }
+
             auto indentation_level = ii - linestart;
             if (indentation_levels.len() && _get<0>(indentation_levels.last()) == -1) {
                 indentation_levels.last() = make_tuple(indentation_level, _get<1>(indentation_levels.last()));
@@ -295,6 +300,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                     }
             }
         }
+
         auto ch = source[i];
         if (in(ch, u" \t"_S))
             i++;
@@ -320,12 +326,14 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
             {
                 return in(ch, range_ee(u'0'_C, u'9'_C)) || in(ch, range_ee(u'A'_C, u'F'_C)) || in(ch, range_ee(u'a'_C, u'f'_C)) || in(ch, u"абсдефАБСДЕФ"_S);
             };
+
             auto operator_s = u""_S;
             for (auto &&op : tokenizer::sorted_operators)
                 if (source[range_el(i, i + op.len())] == op) {
                     operator_s = op;
                     break;
                 }
+
             auto lexem_start = i;
             i++;
             Token::Category category;
@@ -350,6 +358,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                         break;
                     i++;
                 }
+
                 auto j = i - 1;
                 while (j > lexem_start) {
                     if (source[j] == u':') {
@@ -421,6 +430,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                         }
                         i++;
                     }
+
                     auto next_digit_separator = 0;
                     auto is_oct_or_bin = false;
                     if (i < source.len() && source[i] == u'\'') {
@@ -628,6 +638,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
             }
             else
                 throw Error(u"unexpected character `"_S & ch & u"`"_S, lexem_start);
+
             tokens.append(Token(lexem_start, i, category));
         }
     }
@@ -641,5 +652,6 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
             implied_scopes->append(make_tuple(u'}'_C, source.last() == u'\n' ? i - 1 : i));
         indentation_levels.pop();
     }
+
     return tokens;
 }

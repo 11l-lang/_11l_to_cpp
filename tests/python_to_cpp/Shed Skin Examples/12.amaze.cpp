@@ -24,8 +24,6 @@ http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/496884
     }
 } code_block_1;
 
-
-
 class MazeReaderException
 {
 public:
@@ -33,12 +31,15 @@ public:
     {
     }
 };
+
 auto STDIN = 0;
 auto FILE_ = 1;
 auto SOCKET = 2;
+
 auto PATH = -1;
 auto START = -2;
 auto EXIT = -3;
+
 auto null_point = make_tuple(1 << 30, 1 << 30);
 
 class MazeReader
@@ -54,6 +55,7 @@ public:
         print(u"Enter a maze"_S);
         print(u"You can enter a maze row by row"_S);
         print();
+
         auto data = input(u"Enter the dimension of the maze as Width X Height: "_S);
         auto [w1, h1] = bind_array<2>(data.split_py());
         auto [w, h] = make_tuple(to_int(w1), to_int(h1));
@@ -108,6 +110,7 @@ public:
             readStdin();
         else if (source == ::FILE_)
             readFile();
+
         return getData();
     }
 };
@@ -149,10 +152,12 @@ public:
                     sitem = u"E"_S;
                 else
                     sitem = String(item);
+
                 s = s & u"  "_S & sitem & u"   "_S;
             }
             s = s & u"\n\n"_S;
         }
+
         return s;
     }
 
@@ -162,6 +167,7 @@ public:
         auto widths = _rows.map([](const auto &row){return row.len();});
         if (widths.count(width) != widths.len())
             throw MazeError(u"Invalid maze!"_S);
+
         _height = _rows.len();
         _width = width;
     }
@@ -189,8 +195,10 @@ public:
     template <typename T1, typename T2> auto getItem(const T1 &x, const T2 &y)
     {
         validatePoint(make_tuple(x, y));
+
         auto w = _width;
         auto h = _height;
+
         auto row = _rows[h - y - 1];
         return row[x];
     }
@@ -198,6 +206,7 @@ public:
     template <typename T1, typename T2, typename T3> auto setItem(const T1 &x, const T2 &y, const T3 &value)
     {
         auto h = _height;
+
         validatePoint(make_tuple(x, y));
         auto row = _rows[h - y - 1];
         row.set(x, value);
@@ -207,13 +216,17 @@ public:
     {
         validatePoint(pt);
         auto [x, y] = pt;
+
         auto h = _height;
         auto w = _width;
+
         auto poss_nbors = make_tuple(make_tuple(x - 1, y), make_tuple(x - 1, y + 1), make_tuple(x, y + 1), make_tuple(x + 1, y + 1), make_tuple(x + 1, y), make_tuple(x + 1, y - 1), make_tuple(x, y - 1), make_tuple(x - 1, y - 1));
+
         Array<ivec2> nbors;
         for (auto &&[xx, yy] : poss_nbors)
             if ((xx >= 0 && xx <= w - 1) && (yy >= 0 && yy <= h - 1))
                 nbors.append(make_tuple(xx, yy));
+
         return nbors;
     }
 
@@ -223,6 +236,7 @@ public:
         for (auto &&[xx, yy] : getNeighBours(pt))
             if (getItem(xx, yy) == 0)
                 exits.append(make_tuple(xx, yy));
+
         return exits;
     }
 
@@ -232,6 +246,7 @@ public:
         validatePoint(pt2);
         auto [x1, _y1_] = pt1;
         auto [x2, y2] = pt2;
+
         return pow((pow((x1 - x2), 2) + pow((_y1_ - y2), 2)), 0.5);
     }
 };
@@ -285,6 +300,7 @@ public:
         auto exits2 = maze.getExitPoints(_end);
         if (exits1.empty() || exits2.empty())
             return false;
+
         return true;
     }
 
@@ -303,8 +319,10 @@ public:
     {
         print(u"Retracing..."_S);
         _retrace = true;
+
         auto path2 = copy(_path);
         path2.reverse();
+
         auto idx = path2.index(_start);
         _path.extend(_path[range_el(_path.len() - 2, idx).step(-1)]);
         _numretraces++;
@@ -320,12 +338,14 @@ public:
             print(u"Seem to be retracing loop."_S);
             return true;
         }
+
         return false;
     }
 
     auto getNextPoint()
     {
         auto points = maze.getExitPoints(_current);
+
         auto point = getBestPoint(points);
 
         while (checkClosedLoop(point)) {
@@ -334,6 +354,7 @@ public:
                 point = ::null_point;
                 break;
             }
+
             auto point2 = point;
             if (point == _start && _path.len() > 2) {
                 _tryalternate = true;
@@ -349,6 +370,7 @@ public:
                 }
             }
         }
+
         return point;
     }
 
@@ -361,6 +383,7 @@ public:
                 _loops++;
                 return true;
             }
+
         return false;
     }
 
@@ -382,9 +405,11 @@ public:
             print(_current, u" "_S);
             print(point);
         }
+
         _trynextbest = false;
         _tryalternate = false;
         _retrace = false;
+
         return point;
     }
 
@@ -392,7 +417,9 @@ public:
     {
         auto distances = points.map([this](const auto &point){return maze.calcDistance(point, _end);});
         auto distances2 = copy(distances);
+
         distances.sort();
+
         auto points2 = create_array({make_tuple(0, 0)}) * points.len();
         auto count = 0;
 
@@ -404,15 +431,18 @@ public:
                 idx = distances2.index(dist, idx + 1);
                 point = points[idx];
             }
+
             points2.set(count, point);
             count++;
         }
+
         return points2;
     }
 
     template <typename T1> auto getClosestPoint(const T1 &points)
     {
         auto points2 = sortPoints(points);
+
         auto closest = _get<0>(points2);
         return closest;
     }
@@ -422,9 +452,11 @@ public:
         auto points2 = copy(points);
         print(points2, u" "_S);
         print(point);
+
         points2.remove(point);
         if (!points2.empty())
             return randomns::choice(points2);
+
         return ::null_point;
     }
 
@@ -448,6 +480,7 @@ public:
         auto point2 = getNextClosestPoint(points, point);
         while (in(point2, _path))
             point2 = getNextClosestPoint(points, point2);
+
         return point2;
     }
 
@@ -456,6 +489,7 @@ public:
         u" Print the maze showing the path "_S;
         for (auto &&[x, y] : _path)
             maze.setItem(x, y, ::PATH);
+
         maze.setItem(_get<0>(_start), _get<1>(_start), ::START);
         maze.setItem(_get<0>(_end), _get<1>(_end), ::EXIT);
     }
@@ -472,7 +506,9 @@ public:
             print(u"Either start/end point are unreachable. Maze cannot be solved."_S);
             return;
         }
+
         setCurrentPoint(_start);
+
         auto unsolvable = false;
 
         while (!isSolved()) {
@@ -494,6 +530,7 @@ public:
             print(u"Path till deadlock is "_S, u""_S);
             print(_path);
         }
+
         printResult();
     }
 };
@@ -512,8 +549,11 @@ public:
     auto runGame()
     {
         auto maze = createMaze();
+
         getStartEndPoints(maze);
+
         auto solver = MazeSolver(maze);
+
         solver.setStartPoint(_start);
         solver.setEndPoint(_end);
         solver.solve();

@@ -1,6 +1,3 @@
-//import math
-//import time
-//import sys
 V _9_bytes = 9 * [Byte(1)]
 
 T bmp
@@ -33,6 +30,7 @@ T BoardRep
       R calc_hash_of_str(rep)
    F <(other)
       R .__fields < other.__fields
+
 V board_notifyOnCompletion = 1B
 V board_completeSearch = 0B
 
@@ -41,6 +39,7 @@ T board
    [bmp] rows = 9 * [bmp()]
    [bmp] cols = 9 * [bmp()]
    [[bmp]] cels = [[bmp()] * 3] * 3
+
    __turns = 0
    __backtracks = 0
    __starttime = 0.0
@@ -48,7 +47,9 @@ T board
    __status = 0
    __maxdepth = 0
    __openspaces = 81
+
    solutions = Set[BoardRep]()
+
    examined = Set[BoardRep]()
    F ()
    {
@@ -70,9 +71,12 @@ T board
    F setval(row, col, val)
       .final[row][col] = val
       .__openspaces--
+
       V mask = bmp(n' val - 1)
+
       .rows[row] = .rows[row] [&] mask
       .cols[col] = .cols[col] [&] mask
+
       V cr = .cell(row)
       V cc = .cell(col)
       .cels[cr][cc] = .cels[cr][cc] [&] mask
@@ -120,6 +124,7 @@ T board
             .__turns++
             I depth > .__maxdepth
                .__maxdepth = depth
+
             Int mincnt
             [(Int, Int)] coords
             (mincnt, coords) = _board.findmincounts()
@@ -160,6 +165,7 @@ T board
             I .final[row][col] == 0
                V numallowed = .mergemask(row, col).cnt()
                masks.append((numallowed, row, col))
+
       R (min(masks)[0], masks.filter(i -> i[0] == min(@masks)[0]).map(i -> (i[1], i[2])))
 
    F stats()

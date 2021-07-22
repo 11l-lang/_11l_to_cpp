@@ -1,5 +1,3 @@
-//import math
-//import sys
 V MAX_DIST = 1999999999.0
 V PI_SOBRE_180 = 0.017453292
 V PEQUENO = 0.000000001
@@ -122,9 +120,11 @@ T Esfera(Cuerpo)
       V distChoque = .radio * .radio + v * v - esfera_rayo.x * esfera_rayo.x - esfera_rayo.y * esfera_rayo.y - esfera_rayo.z * esfera_rayo.z
       I distChoque < 0.0
          R 0B
+
       distChoque = v - sqrt(distChoque)
       I distChoque > r.disInter | distChoque < 0.0
          R 0B
+
       r.disInter = distChoque
       r.objInter = (.)
       R 1B
@@ -147,11 +147,13 @@ T Plano(Cuerpo)
       V v = .normal.pEscalar(r.direccion)
       I v == 0.0
          R 0B
+
       V distChoque = -(.normal.pEscalar(r.origen) + .distancia) / v
       I distChoque < 0.0
          R 0B
       I distChoque > r.disInter
          R 0B
+
       r.disInter = distChoque
       r.objInter = (.)
       R 1B
@@ -173,11 +175,14 @@ T Scene
    [Cuerpo] lObjetos
    [Luz] lLuces
    [Material] lMateriales
+
    imgAncho = 320
    imgAlto = 200
+
    profTrazado = 3
    oversampling = 1
    campoVision = 60.0
+
    startline = 0
 
    F (scene_filename)
@@ -224,14 +229,19 @@ T Scene
          E I word == ‘material’
             V mat = .parse_material(line)
             .lMateriales.append(mat)
+
       .anchoGrid = .imgAncho * .oversampling
       .altoGrid = .imgAlto * .oversampling
+
       .look = .lookCamara - .posCamara
       .Vhor = .look.pVectorial(.upCamara)
       .Vhor.normalizar()
+
       .Vver = .look.pVectorial(.Vhor)
       .Vver.normalizar()
+
       V fl = .anchoGrid / (2 * tan((0.5 * .campoVision) * :PI_SOBRE_180))
+
       V Vp = .look
       Vp.normalizar()
       Vp.x = Vp.x * fl - 0.5 * (.anchoGrid * .Vhor.x + .altoGrid * .Vver.x)
@@ -246,6 +256,7 @@ T Scene
    F parse_material(line)
       V f = line[3..].map(x -> Float(x))
       R Material(.parse_color(line[0.<3]), f[0], f[1], f[2], f[3], f[4], f[5])
+
 V scene_namefile = ‘testdata/scene.txt’
 V scene = Scene(scene_namefile)
 
@@ -257,6 +268,7 @@ F calculaSombra(Rayo& r; objChoque)
 
       I obj.intersecta(r) & &obj != &objChoque
          sombra *= :scene.lMateriales[obj.material].cTransmitividad
+
    R sombra
 
 F trazar(Rayo& r; prof) -> Color
@@ -337,6 +349,7 @@ F renderPixel(=x, =y)
          direc.z = x * :scene.Vhor.z + y * :scene.Vver.z + :scene.Vp.z
          direc.normalizar()
          V r = Rayo(:scene.posCamara, direc)
+
          c += trazar(&r, 1.0)
          y++
       x++
@@ -348,10 +361,12 @@ F renderPixel(=x, =y)
 
 :start:
 print(‘Rendering: ’scene_namefile)
+
 V fileout = File(scene_namefile‘.ppm’, ‘w’)
 fileout.write("P3\n")
 fileout.write(String(scene.imgAncho)‘ ’String(scene.endline - scene.startline + 1)"\n")
 fileout.write("255\n")
+
 print(‘Line (from #. to #.):’.format(scene.startline, scene.endline), end' ‘ ’)
 L(y) scene.startline .. scene.endline
    L(x) 0 .< scene.imgAncho

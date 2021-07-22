@@ -395,7 +395,6 @@ else:
     print(str(test_id-failed_tests) + " tests passed and " + str(failed_tests) + " failed.")
     sys.exit(1)
 ===
-//import os, tempfile, sys, pqmarkup
 V test_id = 0
 V failed_tests = 0
 V kdiff_showed = 0B
@@ -420,6 +419,7 @@ F TEST(=str1, =str2, ohd = 0B, habr_html = 0B)
       :failed_tests++
    E
       print(‘passed’)
+
 TEST(‘*‘bold’’, ‘<b>bold</b>’)
 TEST(‘_‘underlined’’, ‘<u>underlined</u>’)
 TEST(‘-‘strikethrough’’, ‘<s>strikethrough</s>’)
@@ -442,6 +442,7 @@ TEST(‘Примечание 1: только режимы ‘r’ и ‘w’ п�
 TEST(‘Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [[‘’]‘мои мысли на тему режимов открытия файлов’[./File]]’, ‘Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [<abbr title=""></abbr><a href="./File" target="_self">мои мысли на тему режимов открытия файлов</a>]’)
 TEST(‘[[‘’][[[Справка/]]]Документация по методам доступна на данный момент только ‘на английском’[./../../built-in-types].]’, ‘[<abbr title=""></abbr><!--[[[Справка/]]]-->Документация по методам доступна на данный момент только <a href="./../../built-in-types" target="_self">на английском</a>.]’)
 TEST(‘[‘мои мысли на тему режимов открытия файлов’[./File]]’, ‘[<a href="./File" target="_self">мои мысли на тему режимов открытия файлов</a>]’)
+
 TEST(‘P‘http://image-url’’, ‘<img src="http://image-url" />’)
 TEST(‘P‘http://image-url’[http://address]’, ‘<a href="http://address"><img src="http://image-url" /></a>’)
 TEST(‘P‘http://image-url’[‘title text[[[comment]]]’]’, ‘<img src="http://image-url" title="title text" />’)
@@ -486,6 +487,7 @@ xt’, ‘<span class="spoiler_title" onclick="return spoiler2(this, event)">tit
 te<br />
 </div>
 xt’, ohd' 1B)
+
 TEST(‘#(JavaScript)‘
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
 ’’, ‘<source lang="JavaScript">
@@ -510,6 +512,7 @@ TEST(‘'‘<Don‘t! Don‘t! Don‘t!>’’’’''''’, "<Don‘t! Don‘t!
 TEST(‘`'‘<div>&lt;</div>’'`’, ‘<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>’, habr_html' 1B)
 TEST(‘''‘‘’‘’’''’, '‘‘’‘’’')
 TEST(‘''''‘‘‘‘Don’t! Don’t! Don’t!’'’, "Don’t! Don’t! Don’t!")
+
 TEST(‘<<‘выравнивание по левому краю’
 >>‘выравнивание по правому краю’
 ><‘выравнивание по центру’
@@ -694,6 +697,7 @@ span.comment {color: #808080;}
 (<span class="string-literal"><span style="opacity: 0.25">'''‘‘‘</span>‘Don’t! Don’t! Don’t!’</span>)
 (<span class="string-literal">‘Don‘t! Don‘t! Don‘t!’<span style="opacity: 0.25">’’’'''</span></span>)
 (<span class="string-literal"><span style="opacity: 0.25">'‘</span>‘’‘’<span style="opacity: 0.25">’'</span></span>)</pre>’, ohd' 1B)
+
 test_id++
 V was_error = 0B
 print(‘Test ’String(test_id)‘ (error handling) ...’, end' ‘’)
@@ -707,6 +711,7 @@ X.catch pqmarkup:Exception e
       print(‘FAILED!’)
       failed_tests++
 assert(was_error)
+
 test_id++
 print(‘Test ’String(test_id)‘. Checking source files for unallowed characters...’)
 L(_fname) fs:walk_dir(‘.’, dir_filter' d -> d[0] != ‘.’, files_only' 0B)
@@ -796,6 +801,7 @@ struct CodeBlock1
         TEST(u"Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [[‘’]‘мои мысли на тему режимов открытия файлов’[./File]]"_S, u"Примечание 1: только режимы ‘r’ и ‘w’ поддерживаются на данный момент [<abbr title=\"\"></abbr><a href=\"./File\" target=\"_self\">мои мысли на тему режимов открытия файлов</a>]"_S);
         TEST(u"[[‘’][[[Справка/]]]Документация по методам доступна на данный момент только ‘на английском’[./../../built-in-types].]"_S, u"[<abbr title=\"\"></abbr><!--[[[Справка/]]]-->Документация по методам доступна на данный момент только <a href=\"./../../built-in-types\" target=\"_self\">на английском</a>.]"_S);
         TEST(u"[‘мои мысли на тему режимов открытия файлов’[./File]]"_S, u"[<a href=\"./File\" target=\"_self\">мои мысли на тему режимов открытия файлов</a>]"_S);
+
         TEST(u"P‘http://image-url’"_S, u"<img src=\"http://image-url\" />"_S);
         TEST(u"P‘http://image-url’[http://address]"_S, u"<a href=\"http://address\"><img src=\"http://image-url\" /></a>"_S);
         TEST(u"P‘http://image-url’[‘title text[[[comment]]]’]"_S, u"<img src=\"http://image-url\" title=\"title text\" />"_S);
@@ -840,6 +846,7 @@ xt)"_S, uR"'(<span class="spoiler_title" onclick="return spoiler2(this, event)">
 te<br />
 </div>
 xt)'"_S, true);
+
         TEST(uR"(#(JavaScript)‘
     { "keys": ["‘"], "command": "insert_pq" }, //also insert balancing ’
 ’)"_S, uR"(<source lang="JavaScript">
@@ -864,6 +871,7 @@ Some text.)"_S, false, true);
         TEST(u"`'‘<div>&lt;</div>’'`"_S, u"<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>"_S, false, true);
         TEST(u"''‘‘’‘’’''"_S, u"’‘"_S);
         TEST(u"''''‘‘‘‘Don’t! Don’t! Don’t!’'"_S, u"Don’t! Don’t! Don’t!"_S);
+
         TEST(uR"(<<‘выравнивание по левому краю’
 >>‘выравнивание по правому краю’
 ><‘выравнивание по центру’
@@ -1048,6 +1056,7 @@ span.comment {color: #808080;}
 (<span class="string-literal"><span style="opacity: 0.25">'''‘‘‘</span>‘Don’t! Don’t! Don’t!’</span>)
 (<span class="string-literal">‘Don‘t! Don‘t! Don‘t!’<span style="opacity: 0.25">’’’'''</span></span>)
 (<span class="string-literal"><span style="opacity: 0.25">'‘</span>‘’‘’<span style="opacity: 0.25">’'</span></span>)</pre>)"_S, true);
+
         test_id++;
     }
 } code_block_1;
@@ -1073,6 +1082,7 @@ struct CodeBlock2
             }
         }
         assert(was_error);
+
         test_id++;
         print(u"Test "_S & String(test_id) & u". Checking source files for unallowed characters..."_S);
         for (auto &&_fname : fs::walk_dir(u"."_S, [](const auto &d){return _get<0>(d) != u'.';}, false)) {

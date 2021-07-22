@@ -35,8 +35,6 @@ for i in range(1, 30):
     print(' ' + str(ygen.next()), end = '')
 print()
 ===
-//import math
-
 T YellowstoneGenerator
    min_ = 1
    n_ = 0
@@ -63,6 +61,7 @@ T YellowstoneGenerator
          .sequence_.remove(.min_)
          .min_++
       R .n_
+
 print(‘First 30 Yellowstone numbers:’)
 V ygen = YellowstoneGenerator()
 print(ygen.next(), end' ‘’)
@@ -142,8 +141,6 @@ def yellow(n):
 
 print(yellow(30))
 ===
-//import math
-
 F yellow(n)
    V a = [1, 2, 3]
    V b = Set([1, 2, 3])
@@ -155,6 +152,7 @@ F yellow(n)
          i = 4
       i++
    R a
+
 print(yellow(30))
 ===
 template <typename T1> auto yellow(const T1 &n)

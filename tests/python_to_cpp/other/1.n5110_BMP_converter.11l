@@ -1,21 +1,26 @@
-//import sys
-//import struct
-
 :start:
 V file_name = :argv[1]
 file_name = file_name.split(‘.’)[0]
+
 V bmp = File(file_name‘.bmp’, ‘r’)
+
 bmp.seek(10, 0)
 V offset = UInt32.unpack(bmp.read_bytes(4))
+
 bmp.seek(18, 0)
 V bmp_w = UInt32.unpack(bmp.read_bytes(4))
 V bmp_h = UInt32.unpack(bmp.read_bytes(4))
+
 print(bmp_h‘ ’bmp_w)
+
 bmp.seek(34, 0)
 V bmp_s = UInt32.unpack(bmp.read_bytes(4))
+
 V bmp_b = Int(bmp_s / bmp_h)
 print(bmp_h‘ ’bmp_w‘ ’bmp_s‘ ’bmp_b)
+
 bmp.seek(offset, 0)
+
 V bmp_line = ‘’
 [String] bmp_list
 [String] bmp_list_v
@@ -30,6 +35,7 @@ L(line) 0 .< bmp_h
 bmp_list_v.reverse()
 L(line) bmp_list_v
    print(line)
+
 V byte_word = ‘’
 [String] n5110_line
 [[String]] n5110_array
@@ -45,7 +51,9 @@ L(line) (0 .< bmp_h).step(8)
       byte_word = ‘’
    n5110_array.append(n5110_line)
    n5110_line.drop()
+
 n5110_array.reverse()
+
 V text_file = File(file_name‘.txt’, ‘w’)
 text_file.write(‘static unsigned short ’file_name‘_rows = ’String(n5110_array.len)";\n")
 text_file.write(‘static unsigned short ’file_name‘_cols = ’String(n5110_array[0].len)";\n")

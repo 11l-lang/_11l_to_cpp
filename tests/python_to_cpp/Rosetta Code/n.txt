@@ -53,8 +53,6 @@ for i, n in enumerate(narcissists(25), 1):
     print(n, end = ' ')
     if i % 5 == 0: print()
 ===
-//import itertools
-
 F narcissists(m)
    [Int] result
    L(digits) 0..
@@ -168,11 +166,13 @@ F encode_neg_base(=n, b)
 F decode_neg_base(nstr, b)
    I nstr == ‘0’
       R 0
+
    V total = 0
    L(ch) reversed(nstr)
       V i = L.index
       total += Int(ch) * b ^ i
    R total
+
 print(‘Encode 10 as negabinary (expect 11110)’)
 V result = encode_neg_base(10, -2)
 print(result)
@@ -180,6 +180,7 @@ I decode_neg_base(result, -2) == 10
    print(‘Converted back to decimal’)
 E
    print(‘Error converting back to decimal’)
+
 print(‘Encode 146 as negaternary (expect 21102)’)
 result = encode_neg_base(146, -3)
 print(result)
@@ -187,6 +188,7 @@ I decode_neg_base(result, -3) == 146
    print(‘Converted back to decimal’)
 E
    print(‘Error converting back to decimal’)
+
 print(‘Encode 15 as negadecimal (expect 195)’)
 result = encode_neg_base(15, -10)
 print(result)
@@ -216,6 +218,7 @@ template <typename T1, typename T2> auto decode_neg_base(const T1 &nstr, const T
 {
     if (nstr == u'0')
         return 0;
+
     auto total = 0;
     {int Lindex = 0;
     for (auto &&ch : reversed(nstr)) {
@@ -244,6 +247,7 @@ struct CodeBlock2
             print(u"Converted back to decimal"_S);
         else
             print(u"Error converting back to decimal"_S);
+
         print(u"Encode 146 as negaternary (expect 21102)"_S);
         result = encode_neg_base(146, -3);
         print(result);
@@ -251,6 +255,7 @@ struct CodeBlock2
             print(u"Converted back to decimal"_S);
         else
             print(u"Error converting back to decimal"_S);
+
         print(u"Encode 15 as negadecimal (expect 195)"_S);
         result = encode_neg_base(15, -10);
         print(result);
@@ -283,7 +288,9 @@ F makeList(separator)
       V result = String(@counter)‘’@separator‘’item"\n"
       @counter++
       R result
+
    R makeItem(‘first’)‘’makeItem(‘second’)‘’makeItem(‘third’)
+
 print(makeList(‘. ’))
 ===
 template <typename T1> auto makeList(const T1 &separator)
@@ -296,6 +303,7 @@ template <typename T1> auto makeList(const T1 &separator)
         counter++;
         return result;
     };
+
     return makeItem(u"first"_S) & makeItem(u"second"_S) & makeItem(u"third"_S);
 }
 
@@ -343,6 +351,7 @@ print("Computer wins!")
 V tokens = 12
 
 F getTokens(curTokens) -> N
+
    print(‘How many tokens would you like to take? ’, end' ‘’)
    V take = Int(input())
 
@@ -350,11 +359,13 @@ F getTokens(curTokens) -> N
       print("Number must be between 1 and 3.\n")
       getTokens(curTokens)
       R
+
    :tokens = curTokens - take
    print(‘You take #. tokens.’.format(take))
    print("#. tokens remaining.\n".format(:tokens))
 
 F compTurn(curTokens)
+
    V take = curTokens % 4
    :tokens = curTokens - take
    print(‘Computer takes #. tokens.’.format(take))
@@ -363,6 +374,7 @@ F compTurn(curTokens)
 L tokens > 0
    getTokens(tokens)
    compTurn(tokens)
+
 print(‘Computer wins!’)
 ===
 auto tokens = 12;
@@ -377,6 +389,7 @@ template <typename T1> void getTokens(const T1 &curTokens)
         getTokens(curTokens);
         return;
     }
+
     ::tokens = curTokens - take;
     print(u"You take #. tokens."_S.format(take));
     print(u"#. tokens remaining.\n"_S.format(::tokens));
@@ -394,11 +407,11 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         while (tokens > 0) {
             getTokens(tokens);
             compTurn(tokens);
         }
+
         print(u"Computer wins!"_S);
     }
 } code_block_1;
@@ -436,6 +449,7 @@ F ncsub(seq, s = 0)
       V p2 = s % 2
       V p1 = !p2
       R ncsub(xs, s + p1).map(ys -> @x + ys) [+] ncsub(xs, s + p2)
+
 print(ncsub(Array(1..3)))
 print(ncsub(Array(1..4)))
 print(ncsub(Array(1..5)))
@@ -512,6 +526,7 @@ F nthroot(a, n)
       x = result
       result = (1.0 / n) * (((n - 1) * x) + (a / pow(x, n - 1)))
    R result
+
 print(nthroot(34.0, 5))
 print(nthroot(42.0, 10))
 print(nthroot(5.0, 2))
@@ -556,6 +571,7 @@ L data != sorted(data)
    trials++
    V flip = Int(input(‘###2: LIST: '#.' Flip how many?: ’.format(trials, data.join(‘ ’))))
    data.reverse_range(0 .< flip)
+
 print("\nYou took #. attempts to put the digits in order!".format(trials))
 ===
 auto data = create_array(u"139275486"_S);
@@ -565,12 +581,12 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         while (data != sorted(data)) {
             trials++;
             auto flip = to_int(input(u"###2: LIST: '#.' Flip how many?: "_S.format(trials, data.join(u" "_S))));
             data.reverse_range(range_el(0, flip));
         }
+
         print(u"\nYou took #. attempts to put the digits in order!"_S.format(trials));
     }
 } code_block_1;
@@ -618,6 +634,7 @@ F riseEqFall(=num)
       d1 = d2
       num I/= 10
    R height == 0
+
 V num = 0
 F nextNum()
    L
@@ -625,6 +642,7 @@ F nextNum()
       I riseEqFall(:num)
          L.break
    R :num
+
 print(‘The first 200 numbers are:’)
 L(i) 200
    print(nextNum(), end' ‘ ’)
@@ -648,6 +666,7 @@ template <typename T1> auto riseEqFall(T1 num)
     }
     return height == 0;
 }
+
 auto num = 0;
 auto nextNum()
 {
@@ -728,7 +747,6 @@ names = ['Bishop', 'Carlson', 'Carr', 'Chapman', 'Franklin',
 for name in names:
     print('%15s: %s' % (name, nysiis(name)))
 ===
-//import re
 V _vowels = ‘AEIOU’
 
 F replace_at(String text; position, fromlist, tolist)
@@ -766,6 +784,7 @@ F nysiis(String =name)
       i++
    key = replace_end(key, [‘S’, ‘AY’, ‘A’], [‘’, ‘Y’, ‘’])
    R key1‘’key
+
 V names = [‘Bishop’, ‘Carlson’, ‘Carr’, ‘Chapman’, ‘Franklin’, ‘Greene’, ‘Harper’, ‘Jacobs’, ‘Larson’, ‘Lawrence’, ‘Lawson’, ‘Louis, XVI’, ‘Lynch’, ‘Mackenzie’, ‘Matthews’, ‘McCormack’, ‘McDaniel’, ‘McDonald’, ‘Mclaughlin’, ‘Morrison’, ‘O'Banion’, ‘O'Brien’, ‘Richards’, ‘Silva’, ‘Watkins’, ‘Wheeler’, ‘Willis’, ‘brown, sr’, ‘browne, III’, ‘browne, IV’, ‘knight’, ‘mitchell’, ‘o'daniel’]
 L(name) names
    print(‘#15: #.’.format(name, nysiis(name)))
@@ -814,6 +833,7 @@ auto nysiis(String name)
     key = replace_end(key, create_array({u"S"_S, u"AY"_S, u"A"_S}), create_array({u""_S, u"Y"_S, u""_S}));
     return key1 & key;
 }
+
 auto names = create_array({u"Bishop"_S, u"Carlson"_S, u"Carr"_S, u"Chapman"_S, u"Franklin"_S, u"Greene"_S, u"Harper"_S, u"Jacobs"_S, u"Larson"_S, u"Lawrence"_S, u"Lawson"_S, u"Louis, XVI"_S, u"Lynch"_S, u"Mackenzie"_S, u"Matthews"_S, u"McCormack"_S, u"McDaniel"_S, u"McDonald"_S, u"Mclaughlin"_S, u"Morrison"_S, u"O'Banion"_S, u"O'Brien"_S, u"Richards"_S, u"Silva"_S, u"Watkins"_S, u"Wheeler"_S, u"Willis"_S, u"brown, sr"_S, u"browne, III"_S, u"browne, IV"_S, u"knight"_S, u"mitchell"_S, u"o'daniel"_S});
 
 struct CodeBlock1
@@ -884,7 +904,6 @@ for blocks, cells in [
         print('   ', pblock(vector, cells))
     print('  A total of %i Possible configurations.' % len(nb))
 ===
-
 F nonoblocks([Int] &blocks, Int cells) -> [[(Int, Int)]]
    [[(Int, Int)]] r
    I blocks.empty | blocks[0] == 0
@@ -902,6 +921,7 @@ F nonoblocks([Int] &blocks, Int cells) -> [[(Int, Int)]]
 
             L(subpos) nonoblocks(&brest, cells - offset)
                V rest = subpos.map((bp, bl) -> (@offset + bp, bl))
+
                V vec = [(bpos, blength)] [+] rest
                r [+]= vec
    R r
@@ -941,6 +961,7 @@ Array<Array<ivec2>> nonoblocks(Array<int> &blocks, const int cells)
 
                 for (auto &&subpos : nonoblocks(brest, cells - offset)) {
                     auto rest = subpos.map([&offset](const auto &bp, const auto &bl){return make_tuple(offset + bp, bl);});
+
                     auto vec = create_array({make_tuple(bpos, blength)}) + rest;
                     r.append(vec);
                 }
@@ -968,7 +989,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&[blocks, cells] : create_array({make_tuple(create_array({2, 1}), 5), make_tuple(Array<int>(), 5), make_tuple(create_array({8}), 10), make_tuple(create_array({2, 3, 2, 3}), 15)})) {
             print(u"\nConfiguration:\n    #. ## #. cells and #. blocks"_S.format(pblock(create_array({make_tuple(0, 0)}) * 0, cells), cells, blocks));
             print(u"  Possibilities:"_S);
@@ -1025,7 +1045,6 @@ for a, b, steps, func, func_name in [(0.0, 1.0, 100, cube, 'cube'),
         print('%s integrated using %s\n  from %s to %s (%i steps) = %s' %
               (func_name, rule_name, a, b, steps, integrate(func, a, b, steps, rule)))
 ===
-
 F left_rect((Float -> Float) f, Float x, Float h) -> Float
    R f(x)
 

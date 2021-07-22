@@ -1,12 +1,13 @@
-//import sys
-//import math
 V CYTOSOLIC = 0
 V EXTRACELLULAR = 1
 V NUCLEAR = 2
 V MITOCHONDRIAL = 3
 V BLIND = 4
+
 V D = 5.0
+
 V LENGTH = 50
+
 V AMINOACIDS = ‘ACDEFGHIKLMNPQRSTVWY’
 
 T Protein
@@ -45,6 +46,7 @@ T Protein
       L(key) sorted(.global_composition.keys())
          vector.append(last_value)
       R vector
+
 [Protein] PROTEINS
 
 F load_file(filename, type_id)
@@ -69,8 +71,10 @@ F create_tables()
       I protein.type_id == :BLIND
          L.continue
       V labels = [-1] * 4
+
       labels[protein.type_id] *= -1
       label_table.append(labels)
+
    R (feature_table, label_table)
 
 F create_kernel_table(feature_table)
@@ -133,10 +137,12 @@ F calculate_error(alphas, bias, kernel_table, label_table)
       V error = 0
       L(row_counter) 0 .< label_table[0].len
          current_predictions.append(predictions[row_counter][col_counter])
+
       V predicted_class = current_predictions.index(max(current_predictions))
 
       I label_table[col_counter][predicted_class] < 0
          error++
+
       R 1.0 * error / kernel_table.len
 
 :start:
@@ -144,6 +150,7 @@ L(filename, type_id) [(‘testdata/c.txt’, CYTOSOLIC), (‘testdata/e.txt’, 
    load_file(filename, type_id)
 print(‘Creating feature tables...’)
 V (feature_table, label_table) = create_tables()
+
 print(‘Creating kernel table...’)
 V kernel_table = create_kernel_table(feature_table)
 print(‘Training SVM...’)

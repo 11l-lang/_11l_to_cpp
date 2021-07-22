@@ -1,5 +1,3 @@
-//import python_to_11l.tokenizer
-//import _11l_to_cpp.tokenizer
 V css = ‘<style>
 span.keyword {color: #0000FF; font-weight: bold;}
 span.identifier {color: #00009F;}
@@ -8,7 +6,9 @@ span.numeric-literal {color: #008000;}
 span.constant {color: #008000;}
 span.comment {color: #808080;}
 </style>’
+
 V cat_to_class_python = [python_to_11l:tokenizer:Token.Category.NAME = ‘identifier’, python_to_11l:tokenizer:Token.Category.KEYWORD = ‘keyword’, python_to_11l:tokenizer:Token.Category.CONSTANT = ‘constant’, python_to_11l:tokenizer:Token.Category.OPERATOR_OR_DELIMITER = ‘’, python_to_11l:tokenizer:Token.Category.NUMERIC_LITERAL = ‘numeric-literal’, python_to_11l:tokenizer:Token.Category.STRING_LITERAL = ‘string-literal’, python_to_11l:tokenizer:Token.Category.INDENT = ‘’, python_to_11l:tokenizer:Token.Category.DEDENT = ‘’, python_to_11l:tokenizer:Token.Category.STATEMENT_SEPARATOR = ‘’]
+
 V cat_to_class_11l = [_11l_to_cpp:tokenizer:Token.Category.NAME = ‘identifier’, _11l_to_cpp:tokenizer:Token.Category.KEYWORD = ‘keyword’, _11l_to_cpp:tokenizer:Token.Category.CONSTANT = ‘constant’, _11l_to_cpp:tokenizer:Token.Category.DELIMITER = ‘’, _11l_to_cpp:tokenizer:Token.Category.OPERATOR = ‘’, _11l_to_cpp:tokenizer:Token.Category.NUMERIC_LITERAL = ‘numeric-literal’, _11l_to_cpp:tokenizer:Token.Category.STRING_LITERAL = ‘string-literal’, _11l_to_cpp:tokenizer:Token.Category.STRING_CONCATENATOR = ‘’, _11l_to_cpp:tokenizer:Token.Category.SCOPE_BEGIN = ‘’, _11l_to_cpp:tokenizer:Token.Category.SCOPE_END = ‘’, _11l_to_cpp:tokenizer:Token.Category.STATEMENT_SEPARATOR = ‘’]
 
 F is_lang_supported(lang)
@@ -58,6 +58,7 @@ F highlight(lang, source)
                comments.pop(0)
             res ‘’= html_escape(source[writepos .< token.start])
             writepos = token.end
+
             V tokstr = html_escape(token.value(source))
             String css_class
             I (token.category == NAME & tokstr C (‘V’, ‘П’, ‘var’, ‘перем’)) | (token.category == OPERATOR & tokstr C (‘C’, ‘С’, ‘in’, ‘!C’, ‘!С’, ‘!in’)) | tokstr.split(‘.’)[0] C _11l_to_cpp:tokenizer:keywords
@@ -85,4 +86,5 @@ F highlight(lang, source)
 
       X.catch _11l_to_cpp:tokenizer:Error e
          X Error(e.message, e.pos)
+
    R res

@@ -15,19 +15,20 @@ The matrix is represented internally as a list of lists.
 Have fun ☺
 http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/496884
 ’
-//import sys
-//import random
 
 T MazeReaderException
    F (message)
    {
    }
+
 V STDIN = 0
 V FILE_ = 1
 V SOCKET = 2
+
 V PATH = -1
 V START = -2
 V EXIT = -3
+
 V null_point = (1 << 30, 1 << 30)
 
 T MazeReader
@@ -40,6 +41,7 @@ T MazeReader
       print(‘Enter a maze’)
       print(‘You can enter a maze row by row’)
       print()
+
       V data = input(‘Enter the dimension of the maze as Width X Height: ’)
       V (w1, h1) = data.split_py()
       V (w, h) = (Int(w1), Int(h1))
@@ -80,6 +82,7 @@ T MazeReader
          .readStdin()
       E I source == :FILE_
          .readFile()
+
       R .getData()
 
 T MazeError
@@ -110,8 +113,10 @@ T Maze
                sitem = ‘E’
             E
                sitem = String(item)
+
             s = s‘  ’sitem‘   ’
          s = s"\n\n"
+
       R s
 
    F __validate()
@@ -119,6 +124,7 @@ T Maze
       V widths = ._rows.map(row -> row.len)
       I widths.count(width) != widths.len
          X MazeError(‘Invalid maze!’)
+
       ._height = ._rows.len
       ._width = width
 
@@ -141,27 +147,35 @@ T Maze
 
    F getItem(x, y)
       .validatePoint((x, y))
+
       V w = ._width
       V h = ._height
+
       V row = ._rows[h - y - 1]
       R row[x]
 
    F setItem(x, y, value)
       V h = ._height
+
       .validatePoint((x, y))
       V row = ._rows[h - y - 1]
       row[x] = value
 
    F getNeighBours(pt)
       .validatePoint(pt)
+
       V (x, y) = pt
+
       V h = ._height
       V w = ._width
+
       V poss_nbors = ((x - 1, y), (x - 1, y + 1), (x, y + 1), (x + 1, y + 1), (x + 1, y), (x + 1, y - 1), (x, y - 1), (x - 1, y - 1))
+
       [(Int, Int)] nbors
       L(xx, yy) poss_nbors
          I (xx >= 0 & xx <= w - 1) & (yy >= 0 & yy <= h - 1)
             nbors.append((xx, yy))
+
       R nbors
 
    F getExitPoints(pt)
@@ -169,13 +183,16 @@ T Maze
       L(xx, yy) .getNeighBours(pt)
          I .getItem(xx, yy) == 0
             exits.append((xx, yy))
+
       R exits
 
    F calcDistance(pt1, pt2)
       .validatePoint(pt1)
       .validatePoint(pt2)
+
       V (x1, y1) = pt1
       V (x2, y2) = pt2
+
       R pow((pow((x1 - x2), 2) + pow((y1 - y2), 2)), 0.5)
 
 T MazeFactory
@@ -214,6 +231,7 @@ T MazeSolver
 
       I exits1.empty | exits2.empty
          R 0B
+
       R 1B
 
    F setCurrentPoint(point)
@@ -226,8 +244,10 @@ T MazeSolver
    F retracePath()
       print(‘Retracing...’)
       ._retrace = 1B
+
       V path2 = copy(._path)
       path2.reverse()
+
       V idx = path2.index(._start)
       ._path.extend(._path[(._path.len - 2 .< idx).step(-1)])
       ._numretraces++
@@ -239,10 +259,12 @@ T MazeSolver
       E I ._numretraces > 8
          print(‘Seem to be retracing loop.’)
          R 1B
+
       R 0B
 
    F getNextPoint()
       V points = .maze.getExitPoints(._current)
+
       V point = .getBestPoint(points)
 
       L .checkClosedLoop(point)
@@ -250,6 +272,7 @@ T MazeSolver
             print(._loops)
             point = :null_point
             L.break
+
          V point2 = point
          I point == ._start & ._path.len > 2
             ._tryalternate = 1B
@@ -261,6 +284,7 @@ T MazeSolver
                ._tryalternate = 1B
                point = ._start
                L.break
+
       R point
 
    F checkClosedLoop(point)
@@ -271,6 +295,7 @@ T MazeSolver
          I ._path[x] == point
             ._loops++
             R 1B
+
       R 0B
 
    F getBestPoint(points)
@@ -288,15 +313,19 @@ T MazeSolver
          print(‘Trying alternate... ’, end' ‘’)
          print(._current, end' ‘ ’)
          print(point)
+
       ._trynextbest = 0B
       ._tryalternate = 0B
       ._retrace = 0B
+
       R point
 
    F sortPoints(points)
       V distances = points.map(point -> @.maze.calcDistance(point, @._end))
       V distances2 = copy(distances)
+
       distances.sort()
+
       V points2 = [(0, 0)] * points.len
       V count = 0
 
@@ -307,12 +336,15 @@ T MazeSolver
          L point C points2
             idx = distances2.index(dist, idx + 1)
             point = points[idx]
+
          points2[count] = point
          count++
+
       R points2
 
    F getClosestPoint(points)
       V points2 = .sortPoints(points)
+
       V closest = points2[0]
       R closest
 
@@ -320,9 +352,11 @@ T MazeSolver
       V points2 = copy(points)
       print(points2, end' ‘ ’)
       print(point)
+
       points2.remove(point)
       I !points2.empty
          R random:choice(points2)
+
       R :null_point
 
    F getNextClosestPoint(points, point)
@@ -338,6 +372,7 @@ T MazeSolver
       V point2 = .getNextClosestPoint(points, point)
       L point2 C ._path
          point2 = .getNextClosestPoint(points, point2)
+
       R point2
 
    F printResult()
@@ -345,6 +380,7 @@ T MazeSolver
 
       L(x, y) ._path
          .maze.setItem(x, y, :PATH)
+
       .maze.setItem(._start[0], ._start[1], :START)
       .maze.setItem(._end[0], ._end[1], :EXIT)
 
@@ -357,7 +393,9 @@ T MazeSolver
       I !.boundaryCheck()
          print(‘Either start/end point are unreachable. Maze cannot be solved.’)
          R
+
       .setCurrentPoint(._start)
+
       V unsolvable = 0B
 
       L !.isSolved()
@@ -377,6 +415,7 @@ T MazeSolver
       E
          print(‘Path till deadlock is ’, end' ‘’)
          print(._path)
+
       .printResult()
 
 T MazeGame
@@ -390,8 +429,11 @@ T MazeGame
 
    F runGame()
       V maze = .createMaze()
+
       .getStartEndPoints(maze)
+
       V solver = MazeSolver(maze)
+
       solver.setStartPoint(._start)
       solver.setEndPoint(._end)
       solver.solve()

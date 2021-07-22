@@ -1,6 +1,9 @@
 V keywords = [‘False’, ‘await’, ‘else’, ‘import’, ‘pass’, ‘None’, ‘break’, ‘except’, ‘in’, ‘raise’, ‘True’, ‘class’, ‘finally’, ‘is’, ‘return’, ‘and’, ‘continue’, ‘for’, ‘lambda’, ‘try’, ‘as’, ‘def’, ‘from’, ‘nonlocal’, ‘while’, ‘assert’, ‘del’, ‘global’, ‘not’, ‘with’, ‘async’, ‘elif’, ‘if’, ‘or’, ‘yield’]
+
 V operators = [‘+’, ‘-’, ‘*’, ‘**’, ‘/’, ‘//’, ‘%’, ‘@’, ‘<<’, ‘>>’, ‘&’, ‘|’, ‘^’, ‘~’, ‘<’, ‘>’, ‘<=’, ‘>=’, ‘==’, ‘!=’]
+
 V delimiters = [‘(’, ‘)’, ‘[’, ‘]’, ‘{’, ‘}’, ‘,’, ‘:’, ‘.’, ‘;’, ‘@’, ‘=’, ‘->’, ‘+=’, ‘-=’, ‘*=’, ‘/=’, ‘//=’, ‘%=’, ‘@=’, ‘&=’, ‘|=’, ‘^=’, ‘>>=’, ‘<<=’, ‘**=’]
+
 V operators_and_delimiters = sorted(operators [+] delimiters, key' x -> x.len, reverse' 1B)
 
 T Error
@@ -24,6 +27,7 @@ T Token
       INDENT
       DEDENT
       STATEMENT_SEPARATOR
+
    Int start
    Int end
    Category category
@@ -46,6 +50,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
    [Token] tokens
    [Int] indentation_levels
    [(Char, Int)] nesting_elements
+
    V begin_of_line = 1B
    V expected_an_indented_block = 0B
    V i = 0
@@ -68,6 +73,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
 
          I source[i] C "\r\n#"
             L.continue
+
          V prev_indentation_level = I !indentation_levels.empty {indentation_levels.last} E 0
 
          I expected_an_indented_block
@@ -92,6 +98,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
                   L.break
                I level < indentation_level
                   X Error(‘unindent does not match any outer indentation level’, i)
+
       V ch = source[i]
 
       I ch C " \t"
@@ -113,11 +120,13 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
             comments.append((comment_start, i))
       E
          expected_an_indented_block = ch == ‘:’
+
          V operator_or_delimiter = ‘’
          L(op) :operators_and_delimiters
             I source[i .< i + op.len] == op
                operator_or_delimiter = op
                L.break
+
          V lexem_start = i
          i++
          Token.Category category
@@ -172,6 +181,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
          E I (ch C ‘-+’ & source[i .< i + 1] C ‘0’..‘9’) | ch C ‘0’..‘9’
             I ch C ‘-+’
                assert(0B)
+
                ch = source[i + 1]
             E
                i--
@@ -180,6 +190,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
             V is_bin = ch == ‘0’ & source[i + 1 .< i + 2] C (‘b’, ‘B’)
             I is_hex | is_oct | is_bin
                i += 2
+
             V start = i
             i++
             I is_hex
@@ -222,6 +233,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
 
          E
             X Error(‘unexpected character ’ch, lexem_start)
+
          tokens.append(Token(lexem_start, i, category))
 
    I !nesting_elements.empty
@@ -233,4 +245,5 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
    L !indentation_levels.empty
       tokens.append(Token(i, i, Token.Category.DEDENT))
       indentation_levels.pop()
+
    R tokens

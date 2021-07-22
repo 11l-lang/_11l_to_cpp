@@ -1,5 +1,3 @@
-//import random
-
 F randomMatrix(n, upperBound, seed)
    random:seed(seed)
    [[Float]] m

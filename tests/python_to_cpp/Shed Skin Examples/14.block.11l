@@ -42,7 +42,6 @@ The package contains the following functions:
  or one argument.
 
 ’
-//import sys, os
 
 T InternalNode
    String name
@@ -120,14 +119,19 @@ F iterate([node] &c) -> InternalNode
       c.sort()
       V deletednode = c[0]
       V second = c[1].index
+
       c[1].count += c[0].count
       c.pop(0)
+
       root = iterate(&c)
+
       V co = find_idx(c, second)
+
       deletednode.word = co.word‘0’
       c.append(deletednode)
       co.word ‘’= ‘1’
       co.count -= deletednode.count
+
       V newnode0 = InternalNode()
       V newnode1 = InternalNode()
       V treenode = co.internalnode
@@ -158,8 +162,10 @@ F decode(string, root)
    ‘
     Decodes a binary string using the Huffman tree accessed via root
     ’
+
    [String] answer
    V clist = Array(string)
+
    V currentnode = root
    L(c) clist
       I (c == "\n")
@@ -169,6 +175,7 @@ F decode(string, root)
       I currentnode.leaf != 0
          answer.append(String(currentnode.name))
          currentnode = root
+
    R answer
 
 F makenodes(probs)
@@ -217,6 +224,7 @@ F dec_to_bin(n, digits)
       i--
       ans = ans‘’String(Int(b))
    R ans
+
 V verbose = 0
 
 F weight(string)
@@ -263,6 +271,7 @@ F Bencode(string, symbols, n)
     ’
    [String] blocks
    V chars = Array(string)
+
    V s = ‘’
    L(c) chars
       s = s‘’c
@@ -290,6 +299,7 @@ F Bdecode(string, root, n)
       print(‘blocks from decoder:’)
       print(answer)
    V output = answer.join(‘’)
+
    R output
 
 F easytest()
@@ -312,11 +322,14 @@ F easytest()
    V n = 3
    V f = 0.01
    V probs = findprobs(f, n)
+
    V symbols = makenodes(probs)
    V root = iterate(&symbols)
+
    symbols = sorted(symbols, key' x -> x.index)
    L(co) symbols
       co.report()
+
    V source = [‘000’, ‘001’, ‘010’, ‘011’, ‘100’, ‘100’, ‘000’]
    V zipped = encode(source, symbols)
    print(‘zipped  = ’zipped)
@@ -327,6 +340,7 @@ F easytest()
       print(‘ERROR’)
    E
       print(‘OK!’)
+
 V f = 0.01
 V n = 12
 f = 0.01
@@ -341,7 +355,9 @@ F compress_it(inputfile, outputfile)
     ’
    V probs = findprobs(:f, :n)
    V symbols = makenodes(probs)
+
    V root = iterate(&symbols)
+
    V string = inputfile.read()
    outputfile.write(Bencode(string, symbols, :n))
 
@@ -351,8 +367,10 @@ F uncompress_it(inputfile, outputfile)
     UNCompress from file (possibly stdin).
     ’
    V probs = findprobs(:f, :n)
+
    V symbols = makenodes(probs)
    V root = iterate(&symbols)
+
    V string = inputfile.read()
    outputfile.write(Bdecode(string, root, :n))
 
@@ -364,12 +382,14 @@ F hardertest()
    compress_it(inputfile, outputfile)
    outputfile.close()
    inputfile.close()
+
    inputfile = File(‘tmp.zip’, ‘r’)
    outputfile = File(‘tmp2’, ‘w’)
    print(‘Uncompressing to tmp2’)
    uncompress_it(inputfile, outputfile)
    outputfile.close()
    inputfile.close()
+
    print(‘Checking for differences...’)
    print((File(‘testdata/BentCoinFile’).read() == File(‘tmp2’).read()))
 

@@ -8,18 +8,26 @@ int MAIN_WITH_ARGV()
 
     auto file_name = _get<1>(::argv);
     file_name = _get<0>(file_name.split(u"."_S));
+
     auto bmp = File(file_name & u".bmp"_S, u"r"_S);
+
     bmp.seek(10, 0);
     auto offset = unpack_from_bytes<UInt32>(bmp.read_bytes(4));
+
     bmp.seek(18, 0);
     auto bmp_w = unpack_from_bytes<UInt32>(bmp.read_bytes(4));
     auto bmp_h = unpack_from_bytes<UInt32>(bmp.read_bytes(4));
+
     print(bmp_h & u" "_S & bmp_w);
+
     bmp.seek(34, 0);
     auto bmp_s = unpack_from_bytes<UInt32>(bmp.read_bytes(4));
+
     auto bmp_b = to_int(bmp_s / bmp_h);
     print(bmp_h & u" "_S & bmp_w & u" "_S & bmp_s & u" "_S & bmp_b);
+
     bmp.seek(offset, 0);
+
     auto bmp_line = u""_S;
     Array<String> bmp_list;
     Array<String> bmp_list_v;
@@ -36,6 +44,7 @@ int MAIN_WITH_ARGV()
     bmp_list_v.reverse();
     for (auto &&line : bmp_list_v)
         print(line);
+
     auto byte_word = u""_S;
     Array<String> n5110_line;
     Array<Array<String>> n5110_array;
@@ -53,7 +62,9 @@ int MAIN_WITH_ARGV()
         n5110_array.append(n5110_line);
         n5110_line.drop();
     }
+
     n5110_array.reverse();
+
     auto text_file = File(file_name & u".txt"_S, u"w"_S);
     text_file.write(u"static unsigned short "_S & file_name & u"_rows = "_S & String(n5110_array.len()) & u";\n"_S);
     text_file.write(u"static unsigned short "_S & file_name & u"_cols = "_S & String(_get<0>(n5110_array).len()) & u";\n"_S);

@@ -1,10 +1,12 @@
 V TRIPLETS = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+
 V ROW_ITER = (0..8).map(row -> (0..8).map(col -> (@row, col)))
 V COL_ITER = (0..8).map(col -> (0..8).map(row -> (row, @col)))
 V TxT_ITER = multiloop(TRIPLETS, TRIPLETS, (rows, cols) -> multiloop(rows, cols, (row, col) -> (row, col)))
 
 T soduko
    [[[Int]]] squares = (0..8).map(row -> (0..8).map(col -> Array(1..9)))
+
    _changed = 0B
    F (start_grid)
 
@@ -41,6 +43,7 @@ T soduko
       }
       E
          assert(x C .squares[row][col], ‘bugger2’)
+
          .squares[row][col] = [x]
          .update_neighbours(row, col, x)
          ._changed = 1B
@@ -120,8 +123,10 @@ T soduko
             L(row, col) check_list
                I .squares[row][col].len == 1
                   assert(.squares[row][col][0] !C known_values, ‘bugger3’)
+
                   known_values.append(.squares[row][col][0])
                   assert(.squares[row][col][0] C unassigned_values, ‘bugger4’)
+
                   unassigned_values.remove(.squares[row][col][0])
                E
                   unknown_entries.append((row, col))
@@ -171,6 +176,7 @@ T soduko
 :start:
 L(x) 50
    V t = soduko([‘800000600’, ‘040500100’, ‘070090000’, ‘030020007’, ‘600008004’, ‘500000090’, ‘000030020’, ‘001006050’, ‘004000003’])
+
    t.check()
    t.one_level_supposition()
    t.check()

@@ -1,6 +1,9 @@
 ﻿auto keywords = create_array({u"False"_S, u"await"_S, u"else"_S, u"import"_S, u"pass"_S, u"None"_S, u"break"_S, u"except"_S, u"in"_S, u"raise"_S, u"True"_S, u"class"_S, u"finally"_S, u"is"_S, u"return"_S, u"and"_S, u"continue"_S, u"for"_S, u"lambda"_S, u"try"_S, u"as"_S, u"def"_S, u"from"_S, u"nonlocal"_S, u"while"_S, u"assert"_S, u"del"_S, u"global"_S, u"not"_S, u"with"_S, u"async"_S, u"elif"_S, u"if"_S, u"or"_S, u"yield"_S});
+
 auto operators = create_array({u"+"_S, u"-"_S, u"*"_S, u"**"_S, u"/"_S, u"//"_S, u"%"_S, u"@"_S, u"<<"_S, u">>"_S, u"&"_S, u"|"_S, u"^"_S, u"~"_S, u"<"_S, u">"_S, u"<="_S, u">="_S, u"=="_S, u"!="_S});
+
 auto delimiters = create_array({u"("_S, u")"_S, u"["_S, u"]"_S, u"{"_S, u"}"_S, u","_S, u":"_S, u"."_S, u";"_S, u"@"_S, u"="_S, u"->"_S, u"+="_S, u"-="_S, u"*="_S, u"/="_S, u"//="_S, u"%="_S, u"@="_S, u"&="_S, u"|="_S, u"^="_S, u">>="_S, u"<<="_S, u"**="_S});
+
 auto operators_and_delimiters = sorted(operators + delimiters, [](const auto &x){return x.len();}, true);
 
 class Error
@@ -32,6 +35,7 @@ public:
         DEDENT,
         STATEMENT_SEPARATOR
     };
+
     int start;
     int end;
     Category category;
@@ -64,6 +68,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
     Array<Token> tokens;
     Array<int> indentation_levels;
     Array<Tuple<Char, int>> nesting_elements;
+
     auto begin_of_line = true;
     auto expected_an_indented_block = false;
     auto i = 0;
@@ -86,6 +91,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                 break;
             if (in(source[i], u"\r\n#"_S))
                 continue;
+
             auto prev_indentation_level = !indentation_levels.empty() ? indentation_levels.last() : 0;
 
             if (expected_an_indented_block) {
@@ -115,6 +121,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                         throw Error(u"unindent does not match any outer indentation level"_S, i);
                 }
         }
+
         auto ch = source[i];
         if (in(ch, u" \t"_S))
             i++;
@@ -137,12 +144,14 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
         }
         else {
             expected_an_indented_block = ch == u':';
+
             auto operator_or_delimiter = u""_S;
             for (auto &&op : tokenizer::operators_and_delimiters)
                 if (source[range_el(i, i + op.len())] == op) {
                     operator_or_delimiter = op;
                     break;
                 }
+
             auto lexem_start = i;
             i++;
             Token::Category category;
@@ -207,6 +216,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
             else if ((in(ch, u"-+"_S) && in(source[range_el(i, i + 1)], range_ee(u'0'_C, u'9'_C))) || in(ch, range_ee(u'0'_C, u'9'_C))) {
                 if (in(ch, u"-+"_S)) {
                     assert(false);
+
                     ch = source[i + 1];
                 }
                 else
@@ -216,6 +226,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                 auto is_bin = ch == u'0' && in(source[range_el(i + 1, i + 2)], make_tuple(u"b"_S, u"B"_S));
                 if (is_hex || is_oct || is_bin)
                     i += 2;
+
                 auto start = i;
                 i++;
                 if (is_hex)
@@ -264,6 +275,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
             }
             else
                 throw Error(u"unexpected character "_S & ch, lexem_start);
+
             tokens.append(Token(lexem_start, i, category));
         }
     }
@@ -276,5 +288,6 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
         tokens.append(Token(i, i, Token::Category::DEDENT));
         indentation_levels.pop();
     }
+
     return tokens;
 }

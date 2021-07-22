@@ -65,6 +65,7 @@ public:
                     victors.append(_get<0>(col));
             }
         }
+
         Array<int> ld;
         for (auto i : range_el(0, edge))
             ld.append(__board[i][i]);
@@ -72,6 +73,7 @@ public:
             if (_get<0>(ld) != 0)
                 victors.append(_get<0>(ld));
         }
+
         Array<int> rd;
         for (auto i : range_el(0, edge))
             rd.append(__board[i][edge - (1 + i)]);
@@ -139,16 +141,19 @@ public:
             auto col = __board.map([&coln](const auto &row){return row[coln];});
             doRow(col, range_el(0, edge).map([&coln](const auto &i){return make_tuple(i, coln);}), player, scores);
         }
+
         auto indices = range_el(0, edge).map([](const auto &i){return make_tuple(i, i);});
         auto ld = range_el(0, edge).map([this](const auto &i){return __board[i][i];});
         doRow(ld, indices, player, scores);
         for (auto &&[rown, coln] : indices)
             scores[rown][coln]++;
+
         indices = range_el(0, edge).map([this](const auto &i){return make_tuple(i, (edge - 1) - i);});
         auto rd = range_el(0, edge).map([this](const auto &i){return __board[i][(edge - 1) - i];});
         doRow(rd, indices, player, scores);
         for (auto &&[rown, coln] : indices)
             scores[rown][coln]++;
+
         Array<Tuple<double, ivec2>> scorelist;
         for (auto rown : range_el(0, edge))
             for (auto coln : range_el(0, edge))
@@ -156,7 +161,9 @@ public:
                     scorelist.append(make_tuple(scores[rown][coln], make_tuple(rown, coln)));
         scorelist.sort();
         scorelist.reverse();
+
         scorelist = scorelist.filter([&scorelist](const auto &x){return _get<0>(x) == _get<0>(_get<0>(scorelist));});
+
         return make_tuple(_get<0>(_get<1>(_get<0>(scorelist))), _get<1>(_get<1>(_get<0>(scorelist))));
     }
 };

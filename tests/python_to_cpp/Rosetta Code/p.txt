@@ -74,8 +74,6 @@ infix = '3 + 4 * 2 / ( 1 - 5 ) ^ 2 ^ 3'
 print('infix:   ' + infix)
 print('postfix: ' + infix_to_postfix(infix))
 ===
-//import re
-
 F infix_to_postfix(infix)
    V ops = ‘-+/*^’
    V sb = ‘’
@@ -84,6 +82,7 @@ F infix_to_postfix(infix)
    L(token) infix.split(re:‘\s’)
       I token.empty
          L.continue
+
       V c = token[0]
       V idx = ops.findi(c)
       I idx != -1
@@ -112,7 +111,9 @@ F infix_to_postfix(infix)
 
    L !s.empty
       sb ‘’= ops[s.pop()]‘ ’
+
    R sb
+
 V infix = ‘3 + 4 * 2 / ( 1 - 5 ) ^ 2 ^ 3’
 print(‘infix:   ’infix)
 print(‘postfix: ’infix_to_postfix(infix))
@@ -126,6 +127,7 @@ template <typename T1> auto infix_to_postfix(const T1 &infix)
     for (auto &&token : infix.split(re::_(uR"(\s)"_S))) {
         if (token.empty())
             continue;
+
         auto c = _get<0>(token);
         auto idx = ops.findi(c);
         if (idx != -1) {
@@ -156,8 +158,10 @@ template <typename T1> auto infix_to_postfix(const T1 &infix)
     }
     while (!s.empty())
         sb &= ops[s.pop()] & u" "_S;
+
     return sb;
 }
+
 auto infix = u"3 + 4 * 2 / ( 1 - 5 ) ^ 2 ^ 3"_S;
 
 struct CodeBlock1
@@ -227,7 +231,6 @@ for e in ['3 4 2 * 1 5 - 2 3 ^ ^ / +',
     print('Infix : ' + postfix_to_infix(e))
     print()
 ===
-//import re
 V ops = ‘-+/*^’
 
 F postfix_to_infix(postfix)
@@ -249,6 +252,7 @@ F postfix_to_infix(postfix)
 
       F __repr__()
          R .ex
+
    [Expression] expr
 
    L(token) postfix.split(re:‘\s+’)
@@ -264,10 +268,12 @@ F postfix_to_infix(postfix)
 
          I r.prec < opPrec | (r.prec == opPrec & c != ‘^’)
             r.ex = ‘(’r.ex‘)’
+
          expr.append(Expression(l.ex, r.ex, token))
 
       E
          expr.append(Expression(token))
+
       print(token‘ -> ’String(expr))
    assert(expr.len == 1)
    R expr[0].ex
@@ -309,6 +315,7 @@ template <typename T1> auto postfix_to_infix(const T1 &postfix)
             return ex;
         }
     };
+
     Array<Expression> expr;
 
     for (auto &&token : postfix.split(re::_(uR"(\s+)"_S))) {
@@ -322,10 +329,12 @@ template <typename T1> auto postfix_to_infix(const T1 &postfix)
                 l.ex = u"("_S & l.ex & u")"_S;
             if (r.prec < opPrec || (r.prec == opPrec && c != u'^'))
                 r.ex = u"("_S & r.ex & u")"_S;
+
             expr.append(Expression(l.ex, r.ex, token));
         }
         else
             expr.append(Expression(token));
+
         print(token & u" -> "_S & String(expr));
     }
     assert(expr.len() == 1);
@@ -336,7 +345,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&e : create_array({u"3 4 2 * 1 5 - 2 3 ^ ^ / +"_S, u"1 2 + 3 4 + ^ 5 6 + ^"_S})) {
             print(u"Postfix : "_S & e);
             print(u"Infix : "_S & postfix_to_infix(e));
@@ -407,6 +415,7 @@ F pascal_sym(n)
 
 F pp(mat)
    print(‘[’mat.map(String).join(",\n ")‘]’)
+
 V n = 5
 print(‘Upper:’)
 pp(pascal_upp(n))
@@ -448,6 +457,7 @@ template <typename T1> auto pp(const T1 &mat)
 {
     print(u"["_S & mat.map([](const auto &x){return String(x);}).join(u",\n "_S) & u"]"_S);
 }
+
 auto n = 5;
 
 struct CodeBlock1
@@ -551,6 +561,7 @@ F after_how_many_is_equal(start, end)
       deck = magic_shuffle(deck)
       counter++
    R counter
+
 print(‘Length of the deck of cards | Perfect shuffles needed to obtain the same deck back’)
 L(length) (8, 24, 52, 100, 1020, 1024, 10000)
    V deck = Array(0 .< length)
@@ -619,8 +630,6 @@ def perfect_totient(cnt):
 
 print(perfect_totient(20))
 ===
-//import math, itertools
-
 F φ(n)
    R sum((1 .. n).filter(k -> gcd(@n, k) == 1).map(k -> 1))
 
@@ -637,6 +646,7 @@ F perfect_totient(cnt)
          r [+]= n0
          I r.len == cnt
             R r
+
 print(perfect_totient(20))
 ===
 template <typename T1> auto φ(const T1 &n)
@@ -703,6 +713,7 @@ F pick(at, remain, accu, treat)
    I remain == 0
       R I accu > treat {1} E 0
    R pick(at - 1, remain - 1, accu + :data[at - 1], treat) + (I at > remain {pick(at - 1, remain, accu, treat)} E 0)
+
 V treat = 0
 V total = 1.0
 L(i) 0..8
@@ -711,8 +722,10 @@ L(i) (19.<10).step(-1)
    total *= i
 L(i) (9.<0).step(-1)
    total /= i
+
 V gt = pick(19, 9, 0, treat)
 V le = Int(total - gt)
+
 print(‘<= : #.6%  #.’.format(100 * le / total, le))
 print(‘ > : #.6%  #.’.format(100 * gt / total, gt))
 ===
@@ -724,6 +737,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto pick(const T1
         return accu > treat ? 1 : 0;
     return pick(at - 1, remain - 1, accu + ::data[at - 1], treat) + (at > remain ? pick(at - 1, remain, accu, treat) : 0);
 }
+
 auto treat = 0;
 auto total = 1.0;
 
@@ -739,6 +753,7 @@ struct CodeBlock1
             total /= i;
     }
 } code_block_1;
+
 auto gt = pick(19, 9, 0, treat);
 auto le = to_int(total - gt);
 
@@ -778,7 +793,6 @@ while True:
         if i == n:
             sys.exit(0) # ^L.break
 ===
-//import sys
 V n = 3
 V values = [‘A’, ‘B’, ‘C’, ‘D’]
 V k = values.len
@@ -793,6 +807,7 @@ L
 
    I decide(pc)
       L.break
+
    V i = 0
    L
       pn[i]++
@@ -824,6 +839,7 @@ struct CodeBlock1
             print(pc);
             if (decide(pc))
                 break;
+
             auto i = 0;
             while (true) {
                 pn[i]++;
@@ -868,8 +884,6 @@ for i in range(888888877, 888888888 + 1):
     if is_prime(popcount(i)):
         print(i, end = ' ')
 ===
-//import math
-
 F popcount(n)
    R bin(n).count(‘1’)
 
@@ -880,6 +894,7 @@ F is_prime(n)
       I n % i == 0
          R 0B
    R 1B
+
 V i = 0
 V cnt = 0
 L
@@ -889,6 +904,7 @@ L
       I cnt == 25
          L.break
    i++
+
 print()
 L(i) 888888877 .. 888888888
    I is_prime(popcount(i))
@@ -908,6 +924,7 @@ template <typename T1> auto is_prime(const T1 &n)
             return false;
     return true;
 }
+
 auto i = 0;
 auto cnt = 0;
 
@@ -924,6 +941,7 @@ struct CodeBlock1
             }
             i++;
         }
+
         print();
         for (auto i : range_ee(888888877, 888888888))
             if (is_prime(popcount(i)))
@@ -1004,23 +1022,27 @@ F poly_regression(x, y)
    V x4m = average(x.map(i -> i ^ 4))
    V xym = average(zip(x, y).map(ij -> ij[0] * ij[1]))
    V x2ym = average(zip(x, y).map(ij -> ij[0] * ij[0] * ij[1]))
+
    V sxx = x2m - xm * xm
    V sxy = xym - xm * ym
    V sxx2 = x3m - xm * x2m
    V sx2x2 = x4m - x2m * x2m
    V sx2y = x2ym - x2m * ym
+
    V b = (sxy * sx2x2 - sx2y * sxx2) / (sxx * sx2x2 - sxx2 * sxx2)
    V c = (sx2y * sxx - sxy * sxx2) / (sxx * sx2x2 - sxx2 * sxx2)
    V a = ym - b * xm - c * x2m
 
    F abc(xx)
       R (@a + @b * xx) + (@c * xx * xx)
+
    print("y = #. + #.x + #.x^2\n".format(a, b, c))
    print(‘ Input  Approximation’)
    print(‘ x   y     y1’)
 
    L(i) 0 .< x.len
       print(‘#2 #3  #3.1’.format(x[i], y[i], abc(i)))
+
 V x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 V y = [1, 6, 17, 34, 57, 86, 121, 162, 209, 262, 321]
 poly_regression(x, y)
@@ -1039,11 +1061,13 @@ template <typename T1, typename T2> auto poly_regression(const T1 &x, const T2 &
     auto x4m = average(x.map([](const auto &i){return pow(i, 4);}));
     auto xym = average(zip(x, y).map([](const auto &ij){return _get<0>(ij) * _get<1>(ij);}));
     auto x2ym = average(zip(x, y).map([](const auto &ij){return _get<0>(ij) * _get<0>(ij) * _get<1>(ij);}));
+
     auto sxx = x2m - xm * xm;
     auto sxy = xym - xm * ym;
     auto sxx2 = x3m - xm * x2m;
     auto sx2x2 = x4m - x2m * x2m;
     auto sx2y = x2ym - x2m * ym;
+
     auto b = (sxy * sx2x2 - sx2y * sxx2) / (sxx * sx2x2 - sxx2 * sxx2);
     auto c = (sx2y * sxx - sxy * sxx2) / (sxx * sx2x2 - sxx2 * sxx2);
     auto a = ym - b * xm - c * x2m;
@@ -1052,12 +1076,14 @@ template <typename T1, typename T2> auto poly_regression(const T1 &x, const T2 &
     {
         return (a + b * xx) + (c * xx * xx);
     };
+
     print(u"y = #. + #.x + #.x^2\n"_S.format(a, b, c));
     print(u" Input  Approximation"_S);
     print(u" x   y     y1"_S);
     for (auto i : range_el(0, x.len()))
         print(u"#2 #3  #3.1"_S.format(x[i], y[i], abc(i)));
 }
+
 auto x = create_array({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
 auto y = create_array({1, 6, 17, 34, 57, 86, 121, 162, 209, 262, 321});
 
@@ -1101,16 +1127,20 @@ print("%s remainder %s" % (a, b))
 ===
 F extended_synthetic_division(dividend, divisor)
    ‘Fast polynomial division by using Extended Synthetic Division. Also works with non-monic polynomials.’
+
    V out = copy(dividend)
    V normalizer = divisor[0]
    L(i) 0 .< dividend.len - (divisor.len - 1)
       out[i] /= normalizer
+
       V coef = out[i]
       I coef != 0
          L(j) 1 .< divisor.len
             out[i + j] += -divisor[j] * coef
+
    V separator = divisor.len - 1
    R (out[0 .< (len)-separator], out[(len)-separator ..])
+
 print(‘POLYNOMIAL SYNTHETIC DIVISION’)
 V n = [1, -12, 0, -42]
 V D = [1, -3]
@@ -1121,15 +1151,18 @@ print(‘#. remainder #.’.format(a, b))
 template <typename T1, typename T2> auto extended_synthetic_division(const T1 &dividend, const T2 &divisor)
 {
     u"Fast polynomial division by using Extended Synthetic Division. Also works with non-monic polynomials."_S;
+
     auto out = copy(dividend);
     auto normalizer = _get<0>(divisor);
     for (auto i : range_el(0, dividend.len() - (divisor.len() - 1))) {
         out[i] /= normalizer;
+
         auto coef = out[i];
         if (coef != 0)
             for (auto j : range_el(1, divisor.len()))
                 out[i + j] += -divisor[j] * coef;
     }
+
     auto separator = divisor.len() - 1;
     return make_tuple(out[range_e_llen(0,  - separator)], out[range_elen_i( - separator)]);
 }
@@ -1183,10 +1216,11 @@ while len(evil) < 30 or len(odious) < 30:
 print(evil[:30])
 print(odious[:30])
 ===
-
 F popcount(n)
    R bin(n).count(‘1’)
+
 print((0.<30).map(i -> popcount(Int64(3) ^ i)))
+
 [Int] evil
 [Int] odious
 V i = 0
@@ -1197,6 +1231,7 @@ L evil.len < 30 | odious.len < 30
    E
       evil.append(i)
    i++
+
 print(evil[0.<30])
 print(odious[0.<30])
 ===
@@ -1212,6 +1247,7 @@ struct CodeBlock1
         print(range_el(0, 30).map([](const auto &i){return popcount(pow(to_int64(3), i));}));
     }
 } code_block_1;
+
 Array<int> evil;
 Array<int> odious;
 auto i = 0;
@@ -1228,6 +1264,7 @@ struct CodeBlock2
                 evil.append(i);
             i++;
         }
+
         print(evil[range_el(0, 30)]);
         print(odious[range_el(0, 30)]);
     }
@@ -1257,6 +1294,7 @@ F list_powerset(lst)
    L(x) lst
       result.extend(result.map(subset -> subset [+] [@x]))
    R result
+
 print(list_powerset([1, 2, 3]))
 ===
 template <typename T1> auto list_powerset(const T1 &lst)
@@ -1289,10 +1327,9 @@ c = 20
 print("Primes under %d:" % c, end="\n  ")
 print([n for n in range(c) if is_wprime(n)])
 ===
-//import math
-
 F is_wprime(Int64 n)
    R n > 1 & (n == 2 | (n % 2 & (factorial(n - 1) + 1) % n == 0))
+
 V c = 20
 print(‘Primes under #.:’.format(c), end' "\n  ")
 print((0 .< c).filter(n -> is_wprime(n)))
@@ -1301,6 +1338,7 @@ auto is_wprime(const Int64 &n)
 {
     return n > 1 && (n == 2 || (mod(n, 2) && mod((factorial(n - 1) + 1), n) == 0));
 }
+
 auto c = 20;
 
 struct CodeBlock1
@@ -1345,7 +1383,6 @@ print("First %d primes. Transitions prime %% 10 > next-prime %% 10." % limit)
 for trans in sorted(trans_map.keys()):
     print('%d -> %d count %5d frequency: %.4f%%' % (trans[0], trans[1], trans_map[trans], 100.0 * trans_map[trans] / limit))
 ===
-//import math, collections
 V limit = 1000000
 V k = limit
 V n = k * 17
@@ -1357,6 +1394,7 @@ L(i) 2 .. Int(sqrt(n))
       L.continue
    L(j) (i * i .< n).step(i)
       primes[j] = 0B
+
 V trans_map = DefaultDict[(Int, Int), Int]()
 V prev = -1
 
@@ -1369,6 +1407,7 @@ L(i) 0 .< n
       I k == 1
          L.break
       k--
+
 print(‘First #. primes. Transitions prime % 10 > next-prime % 10.’.format(limit))
 L(trans) sorted(trans_map.keys())
    print(‘#. -> #. count #5 frequency: #.4%’.format(trans[0], trans[1], trans_map[trans], 100.0 * trans_map[trans] / limit))
@@ -1392,6 +1431,7 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
 auto trans_map = DefaultDict<ivec2, int>();
 auto prev = -1;
 
@@ -1408,6 +1448,7 @@ struct CodeBlock2
                     break;
                 k--;
             }
+
         print(u"First #. primes. Transitions prime % 10 > next-prime % 10."_S.format(limit));
         for (auto &&trans : sorted(trans_map.keys()))
             print(u"#. -> #. count #5 frequency: #.4%"_S.format(_get<0>(trans), _get<1>(trans), trans_map[trans], 100.0 * trans_map[trans] / limit));
@@ -1422,7 +1463,6 @@ heapq.heapify(items)
 while len(items):
     print(heapq.heappop(items))
 ===
-//import heapq
 V items = [(3, ‘Clear drains’), (4, ‘Feed cat’), (5, ‘Make tea’), (1, ‘Solve RC tasks’), (2, ‘Tax return’)]
 minheap:heapify(&items)
 L !items.empty
@@ -1469,6 +1509,7 @@ F product_of_divisors(n)
             ans *= j
       i++
    R ans
+
 print((1..50).map(n -> product_of_divisors(n)))
 ===
 template <typename T1> auto product_of_divisors(const T1 &n)
@@ -1508,7 +1549,9 @@ print(n, leng)
 ===
 F proper_divs(n)
    R Array(Set((1 .. (n + 1) I/ 2).filter(x -> @n % x == 0 & @n != x)))
+
 print((1..10).map(n -> proper_divs(n)))
+
 V (n, leng) = max(((1..20000).map(n -> (n, proper_divs(n).len))), key' pd -> pd[1])
 print(n‘ ’leng)
 ===
@@ -1569,6 +1612,7 @@ F quad(top = 2200)
          s1 += s2
          s2 += 2
    R enumerate(r).filter((i, val) -> !val & i).map((i, val) -> i)
+
 print(quad())
 ===
 template <typename T1 = decltype(2200)> auto quad(const T1 &top = 2200)
@@ -1636,8 +1680,6 @@ start = time.perf_counter()
 print(partitions(6666))
 print(time.perf_counter() - start)
 ===
-//import time
-
 F partitions(n)
    ‘Count partitions.’
    V p = [BigInt(1)] [+] [BigInt(0)] * n
@@ -1659,8 +1701,11 @@ F partitions(n)
             p[i] += p[i - j]
          E
             p[i] -= p[i - j]
+
    R p[n]
+
 print(‘Partitions: ’(0.<15).map(x -> partitions(x)))
+
 V start = time:perf_counter()
 print(partitions(6666))
 print(time:perf_counter() - start)
@@ -1689,6 +1734,7 @@ template <typename T1> auto partitions(const T1 &n)
                 p[i] -= p[i - j];
         }
     }
+
     return p[n];
 }
 
@@ -1699,6 +1745,7 @@ struct CodeBlock1
         print(u"Partitions: "_S & range_el(0, 15).map([](const auto &x){return partitions(x);}));
     }
 } code_block_1;
+
 auto start = timens::perf_counter();
 
 struct CodeBlock2
@@ -1738,7 +1785,6 @@ print(decompose(1023 * 1024))
 print(decompose(2 * 3 * 5 * 7 * 11 * 11 * 13 * 17))
 print(decompose(BigInt(16860167264933) * 179951))
 ===
-
 F decompose(BigInt number)
    [BigInt] result
    V n = number
@@ -1829,7 +1875,6 @@ for e in range(6):
     n = 10**e
     print('primorial(%i) has %i digits' % (n, len(str(primorial(n)))))
 ===
-
 F get_primes(primes_count)
    V limit = 17 * primes_count
    V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
@@ -1837,6 +1882,7 @@ F get_primes(primes_count)
       I is_prime[n]
          L(i) (n * n .< limit + 1).step(n)
             is_prime[i] = 0B
+
    [Int] primes
    L(prime) is_prime
       V i = L.index
@@ -1845,6 +1891,7 @@ F get_primes(primes_count)
          I primes.len == primes_count
             L.break
    R primes
+
 V primes = get_primes(100000)
 
 F primorial(n)
@@ -1852,6 +1899,7 @@ F primorial(n)
    L(i) 0 .< n
       r *= :primes[i]
    R r
+
 print(‘First ten primorials: ’(0.<10).map(n -> primorial(n)))
 L(e) 6
    V n = 10 ^ e
@@ -1865,6 +1913,7 @@ template <typename T1> auto get_primes(const T1 &primes_count)
         if (is_prime[n])
             for (auto i : range_el(n * n, limit + 1).step(n))
                 is_prime.set(i, false);
+
     Array<int> primes;
     {int Lindex = 0;
     for (auto &&prime : is_prime) {
@@ -1878,6 +1927,7 @@ template <typename T1> auto get_primes(const T1 &primes_count)
     }}
     return primes;
 }
+
 auto primes = get_primes(100000);
 
 template <typename T1> auto primorial(const T1 &n)
@@ -1958,6 +2008,7 @@ F generate_primes(n)
             L.break
       i += 2
    R r
+
 V primes = generate_primes(50'000)
 
 F find_combo(k, x, m, n, &combo)
@@ -1980,6 +2031,7 @@ F partition(x, m)
    V combo = [0] * m
    I !find_combo(0, x, m, n, &combo)
       print(‘Partitioned #5 with #2 #.: (not possible)’.format(x, m, I m > 1 {‘primes’} E ‘prime ’))
+
 V data = [(99809, 1), (18, 2), (19, 3), (20, 4), (2017, 24), (22699, 1), (22699, 2), (22699, 3), (22699, 4), (40355, 3)]
 
 L(n, cnt) data
@@ -2004,6 +2056,7 @@ template <typename T1> auto generate_primes(const T1 &n)
     }
     return r;
 }
+
 auto primes = generate_primes(50'000);
 
 template <typename T1, typename T2, typename T3, typename T4, typename T5> auto find_combo(const T1 &k, const T2 &x, const T3 &m, const T4 &n, T5 &combo)
@@ -2033,6 +2086,7 @@ template <typename T1, typename T2> auto partition(const T1 &x, const T2 &m)
     if (!find_combo(0, x, m, n, combo))
         print(u"Partitioned #5 with #2 #.: (not possible)"_S.format(x, m, m > 1 ? u"primes"_S : u"prime "_S));
 }
+
 auto data = create_array({make_tuple(99809, 1), make_tuple(18, 2), make_tuple(19, 3), make_tuple(20, 4), make_tuple(2017, 24), make_tuple(22699, 1), make_tuple(22699, 2), make_tuple(22699, 3), make_tuple(22699, 4), make_tuple(40355, 3)});
 
 struct CodeBlock1
@@ -2112,18 +2166,22 @@ F iterate(&v, &diff, do_print = 1B)
       L(i) 1..3
          L(j) 0 .< i
             e(&diff, i, j) += e(&v, i + 1, j) + e(&v, i + 1, j + 1) - e(&v, i, j)
+
       e(&diff, 4, 2) += e(&v, 4, 0) + e(&v, 4, 4) - e(&v, 4, 2)
 
       L(i) 0 .< v.len
          v[i] += diff[i] / 4
+
       tot = sum(diff.map(a -> a * a))
       I do_print
          print(‘dev: ’tot)
       I tot < 0.1
          L.break
+
 V v = [0.0] * 15
 V diff = [0.0] * 15
 iterate(&v, &diff)
+
 V idx = 0
 L(i) 5
    L(j) 0 .. i
@@ -2154,9 +2212,11 @@ template <typename T1, typename T2, typename T3 = decltype(true)> auto iterate(T
         for (auto i : range_ee(1, 3))
             for (auto j : range_el(0, i))
                 e(diff, i, j) += e(v, i + 1, j) + e(v, i + 1, j + 1) - e(v, i, j);
+
         e(diff, 4, 2) += e(v, 4, 0) + e(v, 4, 4) - e(v, 4, 2);
         for (auto i : range_el(0, v.len()))
             v[i] += diff[i] / 4.0;
+
         tot = sum_map(diff, [](const auto &a){return a * a;});
         if (do_print)
             print(u"dev: "_S & tot);
@@ -2164,6 +2224,7 @@ template <typename T1, typename T2, typename T3 = decltype(true)> auto iterate(T
             break;
     }
 }
+
 auto v = create_array({0.0}) * 15;
 auto diff = create_array({0.0}) * 15;
 
@@ -2174,6 +2235,7 @@ struct CodeBlock1
         iterate(v, diff);
     }
 } code_block_1;
+
 auto idx = 0;
 
 struct CodeBlock2
@@ -2286,6 +2348,7 @@ F isAttacking(queen, pos)
 F place(m, n, &pBlackQueens, &pWhiteQueens)
    I m == 0
       R 1B
+
    V placingBlack = 1B
    L(i) 0 .< n
       L(j) 0 .< n
@@ -2338,6 +2401,7 @@ F printBoard(n, blackQueens, whiteQueens)
          E
             print(‘o ’, end' ‘’)
    print("\n")
+
 V nms = [(2, 1), (3, 1), (3, 2), (4, 1), (4, 2), (4, 3), (5, 1), (5, 2), (5, 3), (5, 4), (5, 5), (6, 1), (6, 2), (6, 3), (6, 4), (6, 5), (6, 6), (7, 1), (7, 2), (7, 3), (7, 4), (7, 5), (7, 6), (7, 7)]
 
 L(nm) nms
@@ -2364,6 +2428,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto place(const T
 {
     if (m == 0)
         return true;
+
     auto placingBlack = true;
     for (auto i : range_el(0, n))
         for (auto j : range_el(0, n)) {
@@ -2431,13 +2496,13 @@ template <typename T1, typename T2, typename T3> auto printBoard(const T1 &n, co
     }}
     print(u"\n"_S);
 }
+
 auto nms = create_array({make_tuple(2, 1), make_tuple(3, 1), make_tuple(3, 2), make_tuple(4, 1), make_tuple(4, 2), make_tuple(4, 3), make_tuple(5, 1), make_tuple(5, 2), make_tuple(5, 3), make_tuple(5, 4), make_tuple(5, 5), make_tuple(6, 1), make_tuple(6, 2), make_tuple(6, 3), make_tuple(6, 4), make_tuple(6, 5), make_tuple(6, 6), make_tuple(7, 1), make_tuple(7, 2), make_tuple(7, 3), make_tuple(7, 4), make_tuple(7, 5), make_tuple(7, 6), make_tuple(7, 7)});
 
 struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&nm : nms) {
             print(u"#. black and #. white queens on a #. x #. board:"_S.format(_get<1>(nm), _get<1>(nm), _get<0>(nm), _get<0>(nm)));
             Array<ivec2> blackQueens;
@@ -2494,6 +2559,7 @@ V t = q
 V k = q
 V n = BigInt(3)
 V l = n
+
 V first = 1B
 L ndigits < 1'000
    I 4 * q + r - t < n * t
@@ -2525,6 +2591,7 @@ auto t = q;
 auto k = q;
 auto n = BigInt(3);
 auto l = n;
+
 auto first = true;
 
 struct CodeBlock1
@@ -2677,6 +2744,7 @@ F analyzeHandHelper(faceCount, suitCount)
             s = 0
          I s == 5
             L.break
+
       st = (s == 5) | (s == 4 & faceCount[0] != 0 & faceCount[1] == 0)
 
    I st & fl
@@ -2703,11 +2771,13 @@ F analyzeHand(inHand)
    V face = ‘A23456789TJQK’
    V suit = ‘SHCD’
    V errorMessage = ‘invalid hand.’
+
    V hand = sorted(inHand.split(‘ ’))
    I hand.len != handLen
       R errorMessage
    I Set(hand).len != handLen
       R errorMessage‘ Duplicated cards.’
+
    V faceCount = [0] * face.len
    V suitCount = [0] * suit.len
    L(card) hand
@@ -2719,6 +2789,7 @@ F analyzeHand(inHand)
          R errorMessage
       faceCount[n]++
       suitCount[l]++
+
    R analyzeHandHelper(faceCount, suitCount)
 
 L(hand) [‘2H 2D 2S KS QD’, ‘2H 5H 7D 8S 9D’, ‘AH 2D 3S 4S 5S’, ‘2H 3H 2D 3S 3D’, ‘2H 7H 2D 3S 3D’, ‘2H 7H 7D 7S 7C’, ‘TH JH QH KH AH’, ‘4H 4C KC 5D TC’, ‘QC TC 7C 6C 4C’]
@@ -2762,6 +2833,7 @@ template <typename T1, typename T2> auto analyzeHandHelper(const T1 &faceCount, 
             if (s == 5)
                 break;
         }
+
         st = (s == 5) || (s == 4 && _get<0>(faceCount) != 0 && _get<1>(faceCount) == 0);
     }
     if (st && fl)
@@ -2790,11 +2862,13 @@ template <typename T1> auto analyzeHand(const T1 &inHand)
     auto face = u"A23456789TJQK"_S;
     auto suit = u"SHCD"_S;
     auto errorMessage = u"invalid hand."_S;
+
     auto hand = sorted(inHand.split(u" "_S));
     if (hand.len() != handLen)
         return errorMessage;
     if (create_set(hand).len() != handLen)
         return errorMessage & u" Duplicated cards."_S;
+
     auto faceCount = create_array({0}) * face.len();
     auto suitCount = create_array({0}) * suit.len();
     for (auto &&card : hand) {
@@ -2807,6 +2881,7 @@ template <typename T1> auto analyzeHand(const T1 &inHand)
         faceCount[n]++;
         suitCount[l]++;
     }
+
     return analyzeHandHelper(faceCount, suitCount);
 }
 
@@ -2848,6 +2923,7 @@ F bisect_right(a, x)
       E
          lo = mid + 1
    R lo
+
 V _cin = [0.06, 0.11, 0.16, 0.21, 0.26, 0.31, 0.36, 0.41, 0.46, 0.51, 0.56, 0.61, 0.66, 0.71, 0.76, 0.81, 0.86, 0.91, 0.96, 1.01]
 V _cout = [0.10, 0.18, 0.26, 0.32, 0.38, 0.44, 0.50, 0.54, 0.58, 0.62, 0.66, 0.70, 0.74, 0.78, 0.82, 0.86, 0.90, 0.94, 0.98, 1.00]
 F pricerounder(pricein)
@@ -2869,6 +2945,7 @@ template <typename T1, typename T2> auto bisect_right(const T1 &a, const T2 &x)
     }
     return lo;
 }
+
 auto _cin = create_array({0.06, 0.11, 0.16, 0.21, 0.26, 0.31, 0.36, 0.41, 0.46, 0.51, 0.56, 0.61, 0.66, 0.71, 0.76, 0.81, 0.86, 0.91, 0.96, 1.01});
 auto _cout = create_array({0.10, 0.18, 0.26, 0.32, 0.38, 0.44, 0.50, 0.54, 0.58, 0.62, 0.66, 0.70, 0.74, 0.78, 0.82, 0.86, 0.90, 0.94, 0.98, 1.00});
 template <typename T1> auto pricerounder(const T1 &pricein)
@@ -2944,8 +3021,10 @@ F get_primes(max)
       L.was_no_break
          lprimes.append(x)
    R lprimes
+
 V descendants = [[Int64(0)] * 0] * (maxsum + 1)
 V ancestors = [[Int64(0)] * 0] * (maxsum + 1)
+
 V primes = get_primes(maxsum)
 
 L(p) primes
@@ -2955,6 +3034,7 @@ L(p) primes
 
 L(p) primes [+] [4]
    descendants[p].pop()
+
 V total = 0
 L(s) 1 .. maxsum
    descendants[s].sort()
@@ -2969,6 +3049,7 @@ L(s) 1 .. maxsum
       print(descendants[s])
    print()
    total += descendants[s].len
+
 print(‘Total descendants ’total)
 ===
 auto maxsum = 99;
@@ -2988,15 +3069,16 @@ template <typename T1> auto get_primes(const T1 &max)
         }
     return lprimes;
 }
+
 auto descendants = create_array({create_array({to_int64(0)}) * 0}) * (maxsum + 1);
 auto ancestors = create_array({create_array({to_int64(0)}) * 0}) * (maxsum + 1);
+
 auto primes = get_primes(maxsum);
 
 struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&p : primes) {
             descendants[p].append(p);
             for (auto s : range_el(1, descendants.len() - p))
@@ -3006,6 +3088,7 @@ struct CodeBlock1
             descendants[p].pop();
     }
 } code_block_1;
+
 auto total = 0;
 
 struct CodeBlock2
@@ -3027,6 +3110,7 @@ struct CodeBlock2
             print();
             total += descendants[s].len();
         }
+
         print(u"Total descendants "_S & total);
     }
 } code_block_2;
@@ -3088,8 +3172,6 @@ def solveApollonius(c1, c2, c3, s1, s2, s3):
 print(solveApollonius(c1, c2, c3, 1, 1, 1))    #Expects "Circle[x=2.00,y=2.10,r=3.90]" (green circle in image)
 print(solveApollonius(c1, c2, c3, -1, -1, -1)) #Expects "Circle[x=2.00,y=0.83,r=1.17]" (red circle in image)
 ===
-//import math
-
 T Circle
    Float x
    Float y
@@ -3105,32 +3187,42 @@ F solveApollonius(c1, c2, c3, s1, s2, s3)
    V (x1, y1, r1) = c1
    V (x2, y2, r2) = c2
    V (x3, y3, r3) = c3
+
    V v11 = 2 * x2 - 2 * x1
    V v12 = 2 * y2 - 2 * y1
    V v13 = x1 * x1 - x2 * x2 + y1 * y1 - y2 * y2 - r1 * r1 + r2 * r2
    V v14 = 2 * s2 * r2 - 2 * s1 * r1
+
    V v21 = 2 * x3 - 2 * x2
    V v22 = 2 * y3 - 2 * y2
    V v23 = x2 * x2 - x3 * x3 + y2 * y2 - y3 * y3 - r2 * r2 + r3 * r3
    V v24 = 2 * s3 * r3 - 2 * s2 * r2
+
    V w12 = v12 / v11
    V w13 = v13 / v11
    V w14 = v14 / v11
+
    V w22 = v22 / v21 - w12
    V w23 = v23 / v21 - w13
    V w24 = v24 / v21 - w14
+
    V P = -w23 / w22
    V Q = w24 / w22
    V M = -w12 * P - w13
    V n = w14 - w12 * Q
+
    V a = n * n + Q * Q - 1
    V b = 2 * M * n - 2 * n * x1 + 2 * P * Q - 2 * Q * y1 + 2 * s1 * r1
    V c = x1 * x1 + M * M - 2 * M * x1 + P * P + y1 * y1 - 2 * P * y1 - r1 * r1
+
    V D = b * b - 4 * a * c
    V rs = (-b - sqrt(D)) / (2 * a)
+
    V xs = M + n * rs
    V ys = P + Q * rs
+
    R Circle(xs, ys, rs)
+
 V (c1, c2, c3) = (Circle(0, 0, 1), Circle(4, 0, 1), Circle(2, 4, 2))
 print(solveApollonius(c1, c2, c3, 1, 1, 1))
 print(solveApollonius(c1, c2, c3, -1, -1, -1))
@@ -3158,31 +3250,40 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5, typen
     auto [x1, _y1_, r1] = c1;
     auto [x2, y2, r2] = c2;
     auto [x3, y3, r3] = c3;
+
     auto v11 = 2 * x2 - 2 * x1;
     auto v12 = 2 * y2 - 2 * _y1_;
     auto v13 = x1 * x1 - x2 * x2 + _y1_ * _y1_ - y2 * y2 - r1 * r1 + r2 * r2;
     auto v14 = 2 * s2 * r2 - 2 * s1 * r1;
+
     auto v21 = 2 * x3 - 2 * x2;
     auto v22 = 2 * y3 - 2 * y2;
     auto v23 = x2 * x2 - x3 * x3 + y2 * y2 - y3 * y3 - r2 * r2 + r3 * r3;
     auto v24 = 2 * s3 * r3 - 2 * s2 * r2;
+
     auto w12 = v12 / v11;
     auto w13 = v13 / v11;
     auto w14 = v14 / v11;
+
     auto w22 = v22 / v21 - w12;
     auto w23 = v23 / v21 - w13;
     auto w24 = v24 / v21 - w14;
+
     auto P = -w23 / w22;
     auto Q = w24 / w22;
     auto M = -w12 * P - w13;
     auto n = w14 - w12 * Q;
+
     auto a = n * n + Q * Q - 1;
     auto b = 2 * M * n - 2 * n * x1 + 2 * P * Q - 2 * Q * _y1_ + 2 * s1 * r1;
     auto c = x1 * x1 + M * M - 2 * M * x1 + P * P + _y1_ * _y1_ - 2 * P * _y1_ - r1 * r1;
+
     auto D = b * b - 4 * a * c;
     auto rs = (-b - sqrt(D)) / (2 * a);
+
     auto xs = M + n * rs;
     auto ys = P + Q * rs;
+
     return Circle(xs, ys, rs);
 }
 auto [c1, c2, c3] = make_tuple(Circle(0, 0, 1), Circle(4, 0, 1), Circle(2, 4, 2));

@@ -56,9 +56,12 @@ F jaro(s, t)
 
    I s_len == 0 & t_len == 0
       R 1.0
+
    V match_distance = (max(s_len, t_len) I/ 2) - 1
+
    V s_matches = [0B] * s_len
    V t_matches = [0B] * t_len
+
    V matches = 0
    V transpositions = 0
 
@@ -78,6 +81,7 @@ F jaro(s, t)
 
    I matches == 0
       R 0.0
+
    V k = 0
    L(i) 0 .< s_len
       I !s_matches[i]
@@ -87,6 +91,7 @@ F jaro(s, t)
       I s[i] != t[k]
          transpositions++
       k++
+
    R ((Float(matches) / s_len) + (Float(matches) / t_len) + ((matches - transpositions / 2) / matches)) / 3
 
 L(s, t) [(‘MARTHA’, ‘MARHTA’), (‘DIXON’, ‘DICKSONX’), (‘JELLYFISH’, ‘SMELLYFISH’)]
@@ -98,9 +103,12 @@ template <typename T1, typename T2> auto jaro(const T1 &s, const T2 &t)
     auto t_len = t.len();
     if (s_len == 0 && t_len == 0)
         return 1.0;
+
     auto match_distance = (idiv(max(s_len, t_len), 2)) - 1;
+
     auto s_matches = create_array({false}) * s_len;
     auto t_matches = create_array({false}) * t_len;
+
     auto matches = 0;
     auto transpositions = 0;
 
@@ -121,6 +129,7 @@ template <typename T1, typename T2> auto jaro(const T1 &s, const T2 &t)
     }
     if (matches == 0)
         return 0.0;
+
     auto k = 0;
     for (auto i : range_el(0, s_len)) {
         if (!s_matches[i])
@@ -131,6 +140,7 @@ template <typename T1, typename T2> auto jaro(const T1 &s, const T2 &t)
             transpositions++;
         k++;
     }
+
     return ((to_float(matches) / s_len) + (to_float(matches) / t_len) + ((matches - transpositions / 2.0) / matches)) / 3.0;
 }
 
@@ -153,6 +163,7 @@ print(count_jewels("ZZ", "z"))
 ===
 F count_jewels(s, j)
    R sum(s.map(x -> Int(x C @j)))
+
 print(count_jewels(‘aAAbbbb’, ‘aA’))
 print(count_jewels(‘ZZ’, ‘z’))
 ===
@@ -192,6 +203,7 @@ F j(n, k)
       i = (i + k - 1) % p.len
       seq.append(p.pop(i))
    R "Prisoner killing order: #..\nSurvivor: #.".format(seq[0 .< (len)-1].map(i -> String(i)).join(‘, ’), seq.last)
+
 print(j(5, 2))
 print(j(41, 3))
 ===

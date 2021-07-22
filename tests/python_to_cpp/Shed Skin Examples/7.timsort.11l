@@ -6,8 +6,8 @@ converted from java version by dan stromberg
 modified by mark.dufour@gmail.com to work with shedskin
 
 ’
-//import random
 random:seed(1)
+
 V cmp = (a, b) -> a - b
 
 F array_copy(list1, base1, [Int] &list2; base2, length)
@@ -15,6 +15,7 @@ F array_copy(list1, base1, [Int] &list2; base2, length)
 	Copy from list1 to list2 at offsets base1 and base2, for length elements.
 	Like Java's System.arraycopy.
 	’
+
    Bool copy_forward
    I &list1 == &list2
       I base1 < base2
@@ -46,6 +47,7 @@ F gallop_right(key, list_, base, length, hint, comparefn)
 	@return the int k,  0 <= k <= number such that list_[b + k - 1] <= key < list_[b + k]
 	’
    assert(length > 0 & hint >= 0 & hint < length)
+
    V offset = 1
    V last_offset = 0
    I comparefn(key, list_[base + hint]) < 0
@@ -57,6 +59,7 @@ F gallop_right(key, list_, base, length, hint, comparefn)
             offset = max_offset
       I offset > max_offset
          offset = max_offset
+
       V tmp = last_offset
       last_offset = hint - offset
       offset = hint - tmp
@@ -69,9 +72,11 @@ F gallop_right(key, list_, base, length, hint, comparefn)
             offset = max_offset
       I offset > max_offset
          offset = max_offset
+
       last_offset += hint
       offset += hint
    assert(-1 <= last_offset & last_offset < offset & offset <= length)
+
    last_offset++
    L last_offset < offset
       V midpoint = last_offset + ((offset - last_offset) I/ 2)
@@ -114,6 +119,7 @@ F gallop_left(key, list_, base, length, hint, comparefn)
             offset = max_offset
       I offset > max_offset
          offset = max_offset
+
       last_offset += hint
       offset += hint
    E
@@ -125,10 +131,12 @@ F gallop_left(key, list_, base, length, hint, comparefn)
             offset = max_offset
       I offset > max_offset
          offset = max_offset
+
       V tmp = last_offset
       last_offset = hint - offset
       offset = hint - tmp
    assert(-1 <= last_offset & last_offset < offset & offset <= length)
+
    last_offset++
    L last_offset < offset
       V midpoint = last_offset + ((offset - last_offset) I/ 2)
@@ -164,6 +172,7 @@ F binary_sort([Int] &list_; low, high, =start, comparefn)
       start++
    L(start) start .< high
       V pivot = list_[start]
+
       V left = low
       V right = start
       assert(left <= right)
@@ -175,7 +184,9 @@ F binary_sort([Int] &list_; low, high, =start, comparefn)
          E
             left = mid + 1
       assert(left == right)
+
       V number = start - left
+
       array_copy(list_, left, &list_, left + 1, number)
       list_[left] = pivot
 
@@ -187,6 +198,7 @@ F reverse_range([Int] &list_; =low, =high)
 	@param low the index of the first element in the range to be reversed
 	@param high the index after the last element in the range to be reversed
 	’
+
    high--
    L low < high
       swap(&list_[low], &list_[high])
@@ -233,6 +245,7 @@ F count_run_and_make_ascending([Int] &list_; low, high, comparefn)
       run_high++
       L run_high < high & comparefn(list_[run_high], list_[run_high - 1]) >= 0
          run_high++
+
    R run_high - low
 
 T Timsort
@@ -243,16 +256,23 @@ T Timsort
    min_merge = 32
    initial_min_gallop = 7
    stack_size = 0
+
    initial_tmp_storage_length = 256
+
    [Int] run_base
    [Int] run_len
+
    Int stack_len
 
    F (list_, comparefn = cmp)
+
       .min_gallop = .initial_min_gallop
+
       .list_ = list_
       .comparefn = comparefn
+
       V length = list_.len
+
       Int ternary
       I length < .initial_tmp_storage_length * 2
          ternary = length I/ 2
@@ -279,8 +299,10 @@ T Timsort
 
       I num_remaining < .min_merge
          V initial_run_len = count_run_and_make_ascending(&.list_, low, high, comparefn)
+
          binary_sort(&.list_, low, high, low + initial_run_len, comparefn)
          R
+
       V min_run = .min_run_length(num_remaining)
       L
          V run_len = count_run_and_make_ascending(&.list_, low, high, comparefn)
@@ -294,8 +316,10 @@ T Timsort
             V force = ternary
             binary_sort(&.list_, low, low + force, low + run_len, comparefn)
             run_len = force
+
          .push_run(low, run_len)
          .merge_collapse()
+
          low += run_len
          num_remaining -= run_len
          I num_remaining == 0
@@ -386,23 +410,27 @@ T Timsort
       assert(.stack_size >= 2)
       assert(i >= 0)
       assert(i == .stack_size - 2 | i == .stack_size - 3)
+
       V base1 = .run_base[i]
       V len1 = .run_len[i]
       V base2 = .run_base[i + 1]
       V len2 = .run_len[i + 1]
       assert(len1 > 0 & len2 > 0)
       assert(base1 + len1 == base2)
+
       .run_len[i] = len1 + len2
       I i == .stack_size - 3
          .run_base[i + 1] = .run_base[i + 2]
          .run_len[i + 1] = .run_len[i + 2]
       .stack_size--
+
       V k = gallop_right(.list_[base2], .list_, base1, len1, 0, .comparefn)
       assert(k >= 0)
       base1 += k
       len1 -= k
       I len1 == 0
          R
+
       len2 = gallop_left(.list_[base1 + len1 - 1], .list_, base2, len2, len2 - 1, .comparefn)
       assert(len2 >= 0)
       I len2 == 0
@@ -431,11 +459,16 @@ T Timsort
 		@param len2  length of second run to be merged (must be > 0)
 		’
       assert(len1 > 0 & len2 > 0 & base1 + len1 == base2)
+
       V tmp = .ensure_capacity(len1)
       array_copy(.list_, base1, &tmp, 0, len1)
+
       V cursor1 = 0
+
       V cursor2 = base2
+
       V dest = base1
+
       .list_[dest] = .list_[cursor2]
       dest++
       cursor2++
@@ -444,13 +477,18 @@ T Timsort
          R
       I len1 == 1
          array_copy(.list_, cursor2, &.list_, dest, len2)
+
          .list_[dest + len2] = tmp[cursor1]
          R
+
       V comparefn = .comparefn
+
       V min_gallop = .min_gallop
+
       V loops_done = 0B
       L
          V count1 = 0
+
          V count2 = 0
 
          L
@@ -496,6 +534,7 @@ T Timsort
             I --len2 == 0
                loops_done = 1B
                L.break
+
             count2 = gallop_left(tmp[cursor1], .list_, cursor2, len2, 0, comparefn)
             I count2 != 0
                array_copy(.list_, cursor2, &.list_, dest, count2)
@@ -521,7 +560,9 @@ T Timsort
 
          I min_gallop < 0
             min_gallop = 0
+
          min_gallop += 2
+
       Int ternary
       I min_gallop < 1
          ternary = 1
@@ -532,6 +573,7 @@ T Timsort
       I len1 == 1
          assert(len2 > 0)
          array_copy(.list_, cursor2, &.list_, dest, len2)
+
          .list_[dest + len2] = tmp[cursor1]
       E I len1 == 0
          X ValueError(‘Comparison function violates its general contract!’)
@@ -553,11 +595,16 @@ T Timsort
 		@param len2  length of second run to be merged (must be > 0)
 		’
       assert(len1 > 0 & len2 > 0 & base1 + len1 == base2)
+
       V tmp = .ensure_capacity(len2)
       array_copy(.list_, base2, &tmp, 0, len2)
+
       V cursor1 = base1 + len1 - 1
+
       V cursor2 = len2 - 1
+
       V dest = base2 + len2 - 1
+
       .list_[dest] = .list_[cursor1]
       dest--
       cursor1--
@@ -570,11 +617,15 @@ T Timsort
          array_copy(.list_, cursor1 + 1, &.list_, dest + 1, len1)
          .list_[dest] = tmp[cursor2]
          R
+
       V comparefn = .comparefn
+
       V min_gallop = .min_gallop
+
       V loops_done = 0B
       L
          V count1 = 0
+
          V count2 = 0
 
          L
@@ -621,6 +672,7 @@ T Timsort
             I --len2 == 1
                loops_done = 1B
                L.break
+
             count2 = len2 - gallop_left(.list_[cursor1], tmp, 0, len2, len2 - 1, comparefn)
             I count2 != 0
                dest -= count2
@@ -645,7 +697,9 @@ T Timsort
 
          I min_gallop < 0
             min_gallop = 0
+
          min_gallop += 2
+
       Int ternary
       I min_gallop < 1
          ternary = 1
@@ -658,6 +712,7 @@ T Timsort
          dest -= len1
          cursor1 -= len1
          array_copy(.list_, cursor1 + 1, &.list_, dest + 1, len1)
+
          .list_[dest] = tmp[cursor2]
       E I len2 == 0
          X ValueError(‘Comparison function violates its general contract!’)
@@ -688,6 +743,7 @@ T Timsort
             new_size = min_capacity
          E
             new_size = min(new_size, .list_.len I/ 2)
+
          .tmp = Array(0 .< new_size)
       R .tmp
 

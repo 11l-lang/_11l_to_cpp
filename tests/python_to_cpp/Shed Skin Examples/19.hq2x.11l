@@ -1,5 +1,6 @@
 V LUT16to32 = 65536 * [0]
 V RGBtoYUV = 65536 * [0]
+
 V Ymask = 00FF'0000
 V Umask = 0000'FF00
 V Vmask = 0000'00FF
@@ -188,6 +189,7 @@ F hq2x(xres, yres, rgb)
       L(i) 0 .< xres
          V pos = j * xres + i
          V pOut = j * xres * 4 + 2 * i
+
          w[3] = rgb[pos + prevline]
          w[2] = w[3]
          w[1] = w[3]
@@ -207,6 +209,7 @@ F hq2x(xres, yres, rgb)
             w[3] = rgb[pos + prevline + 1]
             w[6] = rgb[pos + 1]
             w[9] = rgb[pos + nextline + 1]
+
          V pattern = 0
          V flag = 1
          V YUV1 = RGBtoYUV[w[5]]

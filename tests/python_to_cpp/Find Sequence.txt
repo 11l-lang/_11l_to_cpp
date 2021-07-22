@@ -66,6 +66,7 @@ assert(has_sequence([[1, 2, 1, 1], [1, 1, 4, 1], [1, 3, 1, 6], [1, 7, 2, 5]]), �
 assert(!has_sequence([[7, 1, 4, 1], [1, 2, 5, 2], [3, 4, 1, 3], [1, 1, 8, 1]]), ‘Nothing here’)
 assert(has_sequence([[2, 1, 1, 6, 1], [1, 3, 2, 1, 1], [4, 1, 1, 3, 1], [5, 5, 5, 5, 5], [1, 1, 3, 1, 1]]), ‘Long Horizontal’)
 assert(has_sequence([[7, 1, 1, 8, 1, 1], [1, 1, 7, 3, 1, 5], [2, 3, 1, 2, 5, 1], [1, 1, 1, 5, 1, 4], [4, 6, 5, 1, 3, 1], [1, 1, 9, 1, 2, 1]]), ‘Diagonal’)
+
 print(‘All set? Click 'Check' to review your code and earn rewards!’)
 ===
 template <typename T1> auto has_sequence(const T1 &m)
@@ -91,5 +92,6 @@ int main()
     assert(!has_sequence(create_array({create_array({7, 1, 4, 1}), create_array({1, 2, 5, 2}), create_array({3, 4, 1, 3}), create_array({1, 1, 8, 1})})), u"Nothing here"_S);
     assert(has_sequence(create_array({create_array({2, 1, 1, 6, 1}), create_array({1, 3, 2, 1, 1}), create_array({4, 1, 1, 3, 1}), create_array({5, 5, 5, 5, 5}), create_array({1, 1, 3, 1, 1})})), u"Long Horizontal"_S);
     assert(has_sequence(create_array({create_array({7, 1, 1, 8, 1, 1}), create_array({1, 1, 7, 3, 1, 5}), create_array({2, 3, 1, 2, 5, 1}), create_array({1, 1, 1, 5, 1, 4}), create_array({4, 6, 5, 1, 3, 1}), create_array({1, 1, 9, 1, 2, 1})})), u"Diagonal"_S);
+
     print(u"All set? Click 'Check' to review your code and earn rewards!"_S);
 }

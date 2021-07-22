@@ -25,6 +25,7 @@ F kahansum(input)
       c = (t - summ) - y
       summ = t
    R summ
+
 V eps = 1.0
 L 1.0 + eps != 1.0
    eps = eps / 2.0
@@ -44,6 +45,7 @@ template <typename T1> auto kahansum(const T1 &input)
     }
     return summ;
 }
+
 auto eps = 1.0;
 
 struct CodeBlock1
@@ -74,7 +76,6 @@ def k(n):
 print([x for x in range(1,10000) if k(x)])
 print(len([x for x in range(1,1000000) if k(x)]))
 ===
-
 F k(n)
    V n2 = String(Int64(n) ^ 2)
    L(i) 0 .< n2.len
@@ -83,6 +84,7 @@ F k(n)
       I b != 0 & a + b == n
          R 1B
    R 0B
+
 print((1..9999).filter(x -> k(x)))
 print((1..999999).filter(x -> k(x)).len)
 ===
@@ -164,6 +166,7 @@ F totalvalue(comb)
       totwt += wt
       totval += val
    R I totwt <= 400 {(totval, -totwt)} E (0, 0)
+
 V items = [(‘map’, 9, 150), (‘compass’, 13, 35), (‘water’, 153, 200), (‘sandwich’, 50, 160), (‘glucose’, 15, 60), (‘tin’, 68, 45), (‘banana’, 27, 60), (‘apple’, 39, 40), (‘cheese’, 23, 30), (‘beer’, 52, 10), (‘suntan cream’, 11, 70), (‘camera’, 32, 30), (‘t-shirt’, 24, 15), (‘trousers’, 48, 10), (‘umbrella’, 73, 40), (‘waterproof trousers’, 42, 70), (‘waterproof overclothes’, 43, 75), (‘note-case’, 22, 80), (‘sunglasses’, 7, 20), (‘towel’, 18, 12), (‘socks’, 4, 50), (‘book’, 30, 10)]
 
 F knapsack01_dp(items, limit)
@@ -176,6 +179,7 @@ F knapsack01_dp(items, limit)
             table[j][w] = table[j - 1][w]
          E
             table[j][w] = max(table[j - 1][w], table[j - 1][w - wt] + val)
+
    [(String, Int, Int)] result
    V w = limit
    L(j) (items.len .< 0).step(-1)
@@ -185,7 +189,9 @@ F knapsack01_dp(items, limit)
          V (item, wt, val) = items[j - 1]
          result.append(items[j - 1])
          w -= wt
+
    R result
+
 V bagged = knapsack01_dp(items, 400)
 print("Bagged the following items\n  "sorted(bagged.map((item, _, _2) -> item)).join("\n  "))
 V (val, wt) = totalvalue(bagged)
@@ -201,6 +207,7 @@ template <typename T1> auto totalvalue(const T1 &comb)
     }
     return totwt <= 400 ? make_tuple(totval, -totwt) : make_tuple(0, 0);
 }
+
 auto items = create_array({make_tuple(u"map"_S, 9, 150), make_tuple(u"compass"_S, 13, 35), make_tuple(u"water"_S, 153, 200), make_tuple(u"sandwich"_S, 50, 160), make_tuple(u"glucose"_S, 15, 60), make_tuple(u"tin"_S, 68, 45), make_tuple(u"banana"_S, 27, 60), make_tuple(u"apple"_S, 39, 40), make_tuple(u"cheese"_S, 23, 30), make_tuple(u"beer"_S, 52, 10), make_tuple(u"suntan cream"_S, 11, 70), make_tuple(u"camera"_S, 32, 30), make_tuple(u"t-shirt"_S, 24, 15), make_tuple(u"trousers"_S, 48, 10), make_tuple(u"umbrella"_S, 73, 40), make_tuple(u"waterproof trousers"_S, 42, 70), make_tuple(u"waterproof overclothes"_S, 43, 75), make_tuple(u"note-case"_S, 22, 80), make_tuple(u"sunglasses"_S, 7, 20), make_tuple(u"towel"_S, 18, 12), make_tuple(u"socks"_S, 4, 50), make_tuple(u"book"_S, 30, 10)});
 
 template <typename T1, typename T2> auto knapsack01_dp(const T1 &items, const T2 &limit)
@@ -215,6 +222,7 @@ template <typename T1, typename T2> auto knapsack01_dp(const T1 &items, const T2
             else
                 table[j].set(w, max(table[j - 1][w], table[j - 1][w - wt] + val));
     }
+
     Array<Tuple<String, int, int>> result;
     auto w = limit;
     for (auto j : range_el(items.len(), 0).step(-1)) {
@@ -226,8 +234,10 @@ template <typename T1, typename T2> auto knapsack01_dp(const T1 &items, const T2
             w -= wt;
         }
     }
+
     return result;
 }
+
 auto bagged = knapsack01_dp(items, 400);
 
 struct CodeBlock1
@@ -281,7 +291,9 @@ print("\n".join("%10s %6.2f %6.2f" % (n, p, a) for n, p, a in bagged))
 print("\nTOTAL WEIGHT: %5.2f\nTOTAL VALUE: %5.2f" % (wt, val))
 ===
 V items = [(‘beef’, 3.8, 36.0), (‘pork’, 5.4, 43.0), (‘ham’, 3.6, 90.0), (‘greaves’, 2.4, 45.0), (‘flitch’, 4.0, 30.0), (‘brawn’, 2.5, 56.0), (‘welt’, 3.7, 67.0), (‘salami’, 3.0, 95.0), (‘sausage’, 5.9, 98.0)]
+
 V MAXWT = 15.0
+
 V sorted_items = sorted((items.map((name, amount, value) -> (value / amount, amount, name))), reverse' 1B)
 V wt = 0.0
 V val = 0.0
@@ -294,12 +306,15 @@ L(unit_value, amount, name) sorted_items
    bagged [+]= (name, portion, addval)
    I wt >= MAXWT
       L.break
+
 print(‘    ITEM   PORTION VALUE’)
 print(bagged.map((n, p, a) -> ‘#10 #3.2 #3.2’.format(n, p, a)).join("\n"))
 print("\nTOTAL WEIGHT: #2.2\nTOTAL VALUE: #2.2".format(wt, val))
 ===
 auto items = create_array({make_tuple(u"beef"_S, 3.8, 36.0), make_tuple(u"pork"_S, 5.4, 43.0), make_tuple(u"ham"_S, 3.6, 90.0), make_tuple(u"greaves"_S, 2.4, 45.0), make_tuple(u"flitch"_S, 4.0, 30.0), make_tuple(u"brawn"_S, 2.5, 56.0), make_tuple(u"welt"_S, 3.7, 67.0), make_tuple(u"salami"_S, 3.0, 95.0), make_tuple(u"sausage"_S, 5.9, 98.0)});
+
 auto MAXWT = 15.0;
+
 auto sorted_items = sorted((items.map([](const auto &name, const auto &amount, const auto &value){return make_tuple(value / amount, amount, name);})), nullptr, true);
 auto wt = 0.0;
 auto val = 0.0;
@@ -318,6 +333,7 @@ struct CodeBlock1
             if (wt >= MAXWT)
                 break;
         }
+
         print(u"    ITEM   PORTION VALUE"_S);
         print(bagged.map([](const auto &n, const auto &p, const auto &a){return u"#10 #3.2 #3.2"_S.format(n, p, a);}).join(u"\n"_S));
         print(u"\nTOTAL WEIGHT: #2.2\nTOTAL VALUE: #2.2"_S.format(wt, val));
@@ -369,13 +385,16 @@ T Bounty
    Float volume
    F (value, weight, volume)
       (.value, .weight, .volume) = (value, weight, volume)
+
 V panacea = Bounty(3000, 0.3, 0.025)
 V ichor = Bounty(1800, 0.2, 0.015)
 V gold = Bounty(2500, 2.0, 0.002)
 V sack = Bounty(0, 25.0, 0.25)
 V best = Bounty(0, 0, 0)
 V current = Bounty(0, 0, 0)
+
 V best_amounts = (0, 0, 0)
+
 V max_panacea = Int(min(sack.weight I/ panacea.weight, sack.volume I/ panacea.volume))
 V max_ichor = Int(min(sack.weight I/ ichor.weight, sack.volume I/ ichor.volume))
 V max_gold = Int(min(sack.weight I/ gold.weight, sack.volume I/ gold.volume))
@@ -390,6 +409,7 @@ L(npanacea) 0 .< max_panacea
          I current.value > best.value & current.weight <= sack.weight & current.volume <= sack.volume
             best = Bounty(current.value, current.weight, current.volume)
             best_amounts = (npanacea, nichor, ngold)
+
 print(‘Maximum value achievable is ’(best.value))
 print(‘This is achieved by carrying (one solution) #. panacea, #. ichor and #. gold’.format(best_amounts[0], best_amounts[1], best_amounts[2]))
 print(‘The weight to carry is #2.1 and the volume used is #.3’.format(best.weight, best.volume))
@@ -405,13 +425,16 @@ public:
         assign_from_tuple(this->value, this->weight, this->volume, make_tuple(value, weight, volume));
     }
 };
+
 auto panacea = Bounty(3000, 0.3, 0.025);
 auto ichor = Bounty(1800, 0.2, 0.015);
 auto gold = Bounty(2500, 2.0, 0.002);
 auto sack = Bounty(0, 25.0, 0.25);
 auto best = Bounty(0, 0, 0);
 auto current = Bounty(0, 0, 0);
+
 auto best_amounts = make_tuple(0, 0, 0);
+
 auto max_panacea = to_int(min(idiv(sack.weight, panacea.weight), idiv(sack.volume, panacea.volume)));
 auto max_ichor = to_int(min(idiv(sack.weight, ichor.weight), idiv(sack.volume, ichor.volume)));
 auto max_gold = to_int(min(idiv(sack.weight, gold.weight), idiv(sack.volume, gold.volume)));
@@ -432,6 +455,7 @@ struct CodeBlock1
                         best_amounts = make_tuple(npanacea, nichor, ngold);
                     }
                 }
+
         print(u"Maximum value achievable is "_S & (best.value));
         print(u"This is achieved by carrying (one solution) #. panacea, #. ichor and #. gold"_S.format(_get<0>(best_amounts), _get<1>(best_amounts), _get<2>(best_amounts)));
         print(u"The weight to carry is #2.1 and the volume used is #.3"_S.format(best.weight, best.volume));
@@ -451,12 +475,11 @@ x = list(range(10))
 knuth_shuffle(x)
 print("shuffled:", x)
 ===
-//import random
-
 F knuth_shuffle([Int] &x)
    L(i) (x.len - 1 .< 0).step(-1)
       V j = random:(i + 1)
       swap(&x[i], &x[j])
+
 V x = Array(0.<10)
 knuth_shuffle(&x)
 print(‘shuffled: ’x)
@@ -468,6 +491,7 @@ auto knuth_shuffle(Array<int> &x)
         swap(x[i], x[j]);
     }
 }
+
 auto x = create_array(range_el(0, 10));
 
 struct CodeBlock1
@@ -516,8 +540,6 @@ for trial in range(100000):
 print("\nTest item frequencies for 100000 runs:\n ",
       '\n  '.join("%i:%i" % (i, x) for i, x in enumerate(binarr)))
 ===
-//import random
-
 T S_of_n_creator
    Int n
    i = 0
@@ -531,6 +553,7 @@ T S_of_n_creator
          .sample.append(item)
       E I random:(.i) < .n
          .sample[random:(.n)] = item
+
 V binarr = [0] * 10
 V items = Array(0.<10)
 print(‘Single run samples for n = 3:’)
@@ -567,6 +590,7 @@ public:
             sample.set(randomns::_(n), item);
     }
 };
+
 auto binarr = create_array({0}) * 10;
 auto items = create_array(range_el(0, 10));
 
@@ -700,7 +724,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&s : create_array({create_array({1, 2}), create_array({2, 1}), create_array({1, 3, 1, 2}), create_array({1, 3, 2, 1})})) {
             auto kol = gen_kolakoski(s, s.len() > 2 ? 30 : 20);
             print(u"Starting with: "_S & s & u":\nKolakoski sequence: "_S & kol & u"\nPossibly kolakoski? "_S & is_possible_kolakoski(kol));
@@ -752,6 +775,7 @@ print(kosaraju(g))
 ===
 F kosaraju(g)
    V size = g.len
+
    V vis = [0B] * size
    V l = [0] * size
    V x = size
@@ -779,13 +803,16 @@ F kosaraju(g)
 
    L(u) l
       assign(u, u)
+
    R c
+
 V g = [[1], [2], [0], [1, 2, 4], [3, 5], [2, 6], [5], [4, 6, 7]]
 print(kosaraju(g))
 ===
 template <typename T1> auto kosaraju(const T1 &g)
 {
     auto size = g.len();
+
     auto vis = create_array({false}) * size;
     auto l = create_array({0}) * size;
     auto x = size;
@@ -818,8 +845,10 @@ template <typename T1> auto kosaraju(const T1 &g)
     };
     for (auto &&u : l)
         assign(u, u);
+
     return c;
 }
+
 auto g = create_array({create_array({1}), create_array({2}), create_array({0}), create_array({1, 2, 4}), create_array({3, 5}), create_array({2, 6}), create_array({5}), create_array({4, 6, 7})});
 
 struct CodeBlock1
@@ -1023,7 +1052,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&[boardsize, start] : create_array({make_tuple(5, u"c3"_S), make_tuple(8, u"h8"_S), make_tuple(10, u"e6"_S)})) {
             print(u"boardsize: "_S & boardsize);
             print(u"Start position: "_S & start);

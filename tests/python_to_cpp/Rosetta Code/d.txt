@@ -116,7 +116,6 @@ print(t1, " and\n", t2, sep = '')
 print("which have only a single corner in contact, if boundary points do not collide")
 overlap(t1, t2, 0.0, False, False)
 ===
-
 T Triangle
    (Float, Float) p1
    (Float, Float) p2
@@ -148,6 +147,7 @@ F boundaryDoesntCollideChk(Triangle t, Float eps)
 F triTri2D(Triangle &t1, Triangle &t2; eps = 0.0, allowReversed = 0B, onBoundary = 1B)
    checkTriWinding(&t1, allowReversed)
    checkTriWinding(&t2, allowReversed)
+
    V chkEdge = I onBoundary {:boundaryCollideChk} E :boundaryDoesntCollideChk
    V lp1 = [t1.p1, t1.p2, t1.p3]
    V lp2 = [t2.p1, t2.p2, t2.p3]
@@ -163,6 +163,7 @@ F triTri2D(Triangle &t1, Triangle &t2; eps = 0.0, allowReversed = 0B, onBoundary
 
       I chkEdge(Triangle(lp2[i], lp2[j], lp1[0]), eps) & chkEdge(Triangle(lp2[i], lp2[j], lp1[1]), eps) & chkEdge(Triangle(lp2[i], lp2[j], lp1[2]), eps)
          R 0B
+
    R 1B
 
 F overlap(Triangle &t1, Triangle &t2; eps = 0.0, allowReversed = 0B, onBoundary = 1B)
@@ -170,41 +171,49 @@ F overlap(Triangle &t1, Triangle &t2; eps = 0.0, allowReversed = 0B, onBoundary 
       print(‘overlap’)
    E
       print(‘do not overlap’)
+
 V t1 = Triangle((0.0, 0.0), (5.0, 0.0), (0.0, 5.0))
 V t2 = Triangle((0.0, 0.0), (5.0, 0.0), (0.0, 6.0))
 print(t1" and\n"t2)
 overlap(&t1, &t2)
 print()
+
 t1 = Triangle((0.0, 0.0), (0.0, 5.0), (5.0, 0.0))
 t2 = t1
 print(t1" and\n"t2)
 overlap(&t1, &t2, 0.0, 1B)
 print()
+
 t1 = Triangle((0.0, 0.0), (5.0, 0.0), (0.0, 5.0))
 t2 = Triangle((-10.0, 0.0), (-5.0, 0.0), (-1.0, 6.0))
 print(t1" and\n"t2)
 overlap(&t1, &t2)
 print()
+
 t1.p3 = (2.5, 5.0)
 t2 = Triangle((0.0, 4.0), (2.5, -1.0), (5.0, 4.0))
 print(t1" and\n"t2)
 overlap(&t1, &t2)
 print()
+
 t1 = Triangle((0.0, 0.0), (1.0, 1.0), (0.0, 2.0))
 t2 = Triangle((2.0, 1.0), (3.0, 0.0), (3.0, 2.0))
 print(t1" and\n"t2)
 overlap(&t1, &t2)
 print()
+
 t2 = Triangle((2.0, 1.0), (3.0, -2.0), (3.0, 4.0))
 print(t1" and\n"t2)
 overlap(&t1, &t2)
 print()
+
 t1 = Triangle((0.0, 0.0), (1.0, 0.0), (0.0, 1.0))
 t2 = Triangle((1.0, 0.0), (2.0, 0.0), (1.0, 1.1))
 print(t1" and\n"t2)
 print(‘which have only a single corner in contact, if boundary points collide’)
 overlap(&t1, &t2)
 print()
+
 print(t1" and\n"t2)
 print(‘which have only a single corner in contact, if boundary points do not collide’)
 overlap(&t1, &t2, 0.0, 0B, 0B)
@@ -257,6 +266,7 @@ template <typename T3 = decltype(0.0), typename T4 = decltype(false), typename T
 {
     checkTriWinding(t1, allowReversed);
     checkTriWinding(t2, allowReversed);
+
     auto chkEdge = onBoundary ? ::boundaryCollideChk : ::boundaryDoesntCollideChk;
     auto lp1 = create_array({t1.p1, t1.p2, t1.p3});
     auto lp2 = create_array({t2.p1, t2.p2, t2.p3});
@@ -272,6 +282,7 @@ template <typename T3 = decltype(0.0), typename T4 = decltype(false), typename T
         if (chkEdge(Triangle(lp2[i], lp2[j], _get<0>(lp1)), eps) && chkEdge(Triangle(lp2[i], lp2[j], _get<1>(lp1)), eps) && chkEdge(Triangle(lp2[i], lp2[j], _get<2>(lp1)), eps))
             return false;
     }
+
     return true;
 }
 
@@ -282,6 +293,7 @@ template <typename T3 = decltype(0.0), typename T4 = decltype(false), typename T
     else
         print(u"do not overlap"_S);
 }
+
 auto t1 = Triangle(make_tuple(0.0, 0.0), make_tuple(5.0, 0.0), make_tuple(0.0, 5.0));
 auto t2 = Triangle(make_tuple(0.0, 0.0), make_tuple(5.0, 0.0), make_tuple(0.0, 6.0));
 
@@ -292,36 +304,43 @@ struct CodeBlock1
         print(t1 & u" and\n"_S & t2);
         overlap(t1, t2);
         print();
+
         t1 = Triangle(make_tuple(0.0, 0.0), make_tuple(0.0, 5.0), make_tuple(5.0, 0.0));
         t2 = t1;
         print(t1 & u" and\n"_S & t2);
         overlap(t1, t2, 0.0, true);
         print();
+
         t1 = Triangle(make_tuple(0.0, 0.0), make_tuple(5.0, 0.0), make_tuple(0.0, 5.0));
         t2 = Triangle(make_tuple(-10.0, 0.0), make_tuple(-5.0, 0.0), make_tuple(-1.0, 6.0));
         print(t1 & u" and\n"_S & t2);
         overlap(t1, t2);
         print();
+
         t1.p3 = make_tuple(2.5, 5.0);
         t2 = Triangle(make_tuple(0.0, 4.0), make_tuple(2.5, -1.0), make_tuple(5.0, 4.0));
         print(t1 & u" and\n"_S & t2);
         overlap(t1, t2);
         print();
+
         t1 = Triangle(make_tuple(0.0, 0.0), make_tuple(1.0, 1.0), make_tuple(0.0, 2.0));
         t2 = Triangle(make_tuple(2.0, 1.0), make_tuple(3.0, 0.0), make_tuple(3.0, 2.0));
         print(t1 & u" and\n"_S & t2);
         overlap(t1, t2);
         print();
+
         t2 = Triangle(make_tuple(2.0, 1.0), make_tuple(3.0, -2.0), make_tuple(3.0, 4.0));
         print(t1 & u" and\n"_S & t2);
         overlap(t1, t2);
         print();
+
         t1 = Triangle(make_tuple(0.0, 0.0), make_tuple(1.0, 0.0), make_tuple(0.0, 1.0));
         t2 = Triangle(make_tuple(1.0, 0.0), make_tuple(2.0, 0.0), make_tuple(1.0, 1.1));
         print(t1 & u" and\n"_S & t2);
         print(u"which have only a single corner in contact, if boundary points collide"_S);
         overlap(t1, t2);
         print();
+
         print(t1 & u" and\n"_S & t2);
         print(u"which have only a single corner in contact, if boundary points do not collide"_S);
         overlap(t1, t2, 0.0, false, false);
@@ -387,8 +406,6 @@ graph = Graph([("a", "b", 7),  ("a", "c", 9),  ("a", "f", 14), ("b", "c", 10),
                ("e", "f", 9)])
 print(graph.dijkstra("a", "e"))
 ===
-//import collections
-
 T Edge
    String start
    String end
@@ -404,6 +421,7 @@ T Graph
 
    F (edges)
       .edges = edges.map((s, e, c) -> Edge(s, e, c))
+
       .vertices = Set(.edges.map(e -> e.start)).union(Set(.edges.map(e -> e.end)))
 
    F dijkstra(source, dest)
@@ -429,6 +447,7 @@ T Graph
             I alt < dist[v]
                dist[v] = alt
                previous[v] = u
+
       V s = Deque[String]()
       V u = dest
       L previous[u] != ‘’
@@ -436,6 +455,7 @@ T Graph
          u = previous[u]
       s.append_left(u)
       R s
+
 V graph = Graph([(‘a’, ‘b’, 7), (‘a’, ‘c’, 9), (‘a’, ‘f’, 14), (‘b’, ‘c’, 10), (‘b’, ‘d’, 15), (‘c’, ‘d’, 11), (‘c’, ‘f’, 2), (‘d’, ‘e’, 6), (‘e’, ‘f’, 9)])
 print(graph.dijkstra(‘a’, ‘e’))
 ===
@@ -462,6 +482,7 @@ public:
     template <typename T1> Graph(const T1 &edges)
     {
         this->edges = edges.map([](const auto &s, const auto &e, const auto &c){return Edge(s, e, c);});
+
         vertices = create_set(this->edges.map([](const auto &e){return e.start;})).set_union(create_set(this->edges.map([](const auto &e){return e.end;})));
     }
 
@@ -494,6 +515,7 @@ public:
                 }
             }
         }
+
         auto s = Deque<String>();
         auto u = dest;
         while (previous[u] != u"") {
@@ -504,6 +526,7 @@ public:
         return s;
     }
 };
+
 auto graph = Graph(create_array({make_tuple(u"a"_S, u"b"_S, 7), make_tuple(u"a"_S, u"c"_S, 9), make_tuple(u"a"_S, u"f"_S, 14), make_tuple(u"b"_S, u"c"_S, 10), make_tuple(u"b"_S, u"d"_S, 15), make_tuple(u"c"_S, u"d"_S, 11), make_tuple(u"c"_S, u"f"_S, 2), make_tuple(u"d"_S, u"e"_S, 6), make_tuple(u"e"_S, u"f"_S, 9)}));
 
 struct CodeBlock1

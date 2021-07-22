@@ -5,8 +5,11 @@ auto EXTRACELLULAR = 1;
 auto NUCLEAR = 2;
 auto MITOCHONDRIAL = 3;
 auto BLIND = 4;
+
 auto D = 5.0;
+
 auto LENGTH = 50;
+
 auto AMINOACIDS = u"ACDEFGHIKLMNPQRSTVWY"_S;
 
 class Protein
@@ -55,6 +58,7 @@ public:
         return vector;
     }
 };
+
 Array<Protein> PROTEINS;
 
 template <typename T1, typename T2> auto load_file(const T1 &filename, const T2 &type_id)
@@ -82,9 +86,11 @@ auto create_tables()
         if (protein.type_id == ::BLIND)
             continue;
         auto labels = create_array({-1}) * 4;
+
         labels[protein.type_id] *= -1;
         label_table.append(labels);
     }
+
     return make_tuple(feature_table, label_table);
 }
 
@@ -159,9 +165,11 @@ template <typename T1, typename T2, typename T3, typename T4> auto calculate_err
         auto error = 0;
         for (auto row_counter : range_el(0, _get<0>(label_table).len()))
             current_predictions.append(predictions[row_counter][col_counter]);
+
         auto predicted_class = current_predictions.index(max(current_predictions));
         if (label_table[col_counter][predicted_class] < 0)
             error++;
+
         return 1.0 * error / kernel_table.len();
     }
 }
@@ -172,6 +180,7 @@ int main()
         load_file(filename, type_id);
     print(u"Creating feature tables..."_S);
     auto [feature_table, label_table] = create_tables();
+
     print(u"Creating kernel table..."_S);
     auto kernel_table = create_kernel_table(feature_table);
     print(u"Training SVM..."_S);

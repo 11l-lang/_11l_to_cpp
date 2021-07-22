@@ -87,7 +87,6 @@ if __name__ == '__main__':
     for unt, mlt in sorted(unit2mult.items()):
         print('  %10s: %g' % (unt, value * unit2mult[unit] / mlt))
 ===
-//import sys
 V unit2mult = [‘arshin’ = 0.7112, ‘centimeter’ = 0.01, ‘diuym’ = 0.0254, ‘fut’ = 0.3048, ‘kilometer’ = 1000.0, ‘liniya’ = 0.00254, ‘meter’ = 1.0, ‘milia’ = 7467.6, ‘piad’ = 0.1778, ‘sazhen’ = 2.1336, ‘tochka’ = 0.000254, ‘vershok’ = 0.04445, ‘versta’ = 1066.8]
 
 :start:
@@ -99,6 +98,7 @@ X.catch
    exit(‘ERROR. First argument must be a (float) number’)
 V unit = :argv[2]
 assert(unit C unit2mult, (‘ERROR. Only know the following units: ’unit2mult.keys().join(‘ ’)))
+
 print(‘#. #. to:’.format(value, unit))
 L(unt, mlt) sorted(unit2mult.items())
    print(‘  #10: #.’.format(unt, value * unit2mult[unit] / mlt))
@@ -123,6 +123,7 @@ int MAIN_WITH_ARGV()
     }
     auto unit = _get<2>(::argv);
     assert(in(unit, unit2mult), (u"ERROR. Only know the following units: "_S & unit2mult.keys().join(u" "_S)));
+
     print(u"#. #. to:"_S.format(value, unit));
     for (auto &&[unt, mlt] : sorted(unit2mult.items()))
         print(u"  #10: #."_S.format(unt, value * unit2mult[unit] / mlt));
@@ -148,8 +149,6 @@ def one_of_n_test(n=10, trials=1000000):
 
 print(one_of_n_test())
 ===
-//import random
-
 F one_of_n(lines)
    V choice = 0
    L(line) lines
@@ -164,6 +163,7 @@ F one_of_n_test(n = 10, trials = 1000000)
       L(i) 0 .< trials
          bins[one_of_n(0 .< n)]++
    R bins
+
 print(one_of_n_test())
 ===
 template <typename T1> auto one_of_n(const T1 &lines)
@@ -268,11 +268,11 @@ for data, items in [('the cat sat on the mat'.split(' '), ('mat cat').split(' ')
     order_disjoint_list_items(data, items)
     print("-> M' %s" % tostring(data))
 ===
-
 F order_disjoint_list_items(&data, items)
    [Int] itemindices
    L(item) Set(items)
       V itemcount = items.count(item)
+
       V lastindex = [-1]
       L(i) 0 .< itemcount
          lastindex.append(data.index(item, lastindex.last + 1))
@@ -297,6 +297,7 @@ template <typename T1, typename T2> auto order_disjoint_list_items(T1 &data, con
     Array<int> itemindices;
     for (auto &&item : create_set(items)) {
         auto itemcount = items.count(item);
+
         auto lastindex = create_array({-1});
         for (auto i : range_el(0, itemcount))
             lastindex.append(data.index(item, lastindex.last() + 1));
@@ -321,7 +322,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&[data, items] : create_array({make_tuple(u"the cat sat on the mat"_S.split(u" "_S), (u"mat cat"_S).split(u" "_S)), make_tuple(u"the cat sat on the mat"_S.split(u" "_S), (u"cat mat"_S).split(u" "_S)), make_tuple(slist(u"ABCABCABC"_S), slist(u"CACA"_S)), make_tuple(slist(u"ABCABDABE"_S), slist(u"EADA"_S)), make_tuple(slist(u"AB"_S), slist(u"B"_S)), make_tuple(slist(u"AB"_S), slist(u"BA"_S)), make_tuple(slist(u"ABBA"_S), slist(u"BA"_S)), make_tuple(slist(u""_S), slist(u""_S)), make_tuple(slist(u"A"_S), slist(u"A"_S)), make_tuple(slist(u"AB"_S), slist(u""_S)), make_tuple(slist(u"ABBA"_S), slist(u"AB"_S)), make_tuple(slist(u"ABAB"_S), slist(u"AB"_S)), make_tuple(slist(u"ABAB"_S), slist(u"BABA"_S)), make_tuple(slist(u"ABCCBA"_S), slist(u"ACAC"_S)), make_tuple(slist(u"ABCCBA"_S), slist(u"CACA"_S))})) {
             print(u"Data M: #<24 Order N: #<9"_S.format(tostring(data), tostring(items)), u" "_S);
             order_disjoint_list_items(data, items);

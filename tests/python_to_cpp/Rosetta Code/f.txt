@@ -115,9 +115,11 @@ F removeDigit(digits, le, idx)
       pow = Int(pow / 10)
       i++
    R sum
+
 V lims = [[12, 97], [123, 986], [1234, 9875], [12345, 98764]]
 V count = [0] * 5
 V omitted = [[0] * 10] * 5
+
 V i = 0
 L i < lims.len
    V n = lims[i][0]
@@ -151,6 +153,7 @@ L i < lims.len
       n++
    print()
    i++
+
 i = 2
 L i <= 5
    print(‘There are #. #.-digit fractions of which:’.format(count[i - 2], i))
@@ -205,9 +208,11 @@ template <typename T1, typename T2, typename T3> auto removeDigit(const T1 &digi
     }
     return sum;
 }
+
 auto lims = create_array({create_array({12, 97}), create_array({123, 986}), create_array({1234, 9875}), create_array({12345, 98764})});
 auto count = create_array({0}) * 5;
 auto omitted = create_array({create_array({0}) * 10}) * 5;
+
 auto i = 0;
 
 struct CodeBlock1
@@ -254,6 +259,7 @@ struct CodeBlock1
             print();
             i++;
         }
+
         i = 2;
         while (i <= 5) {
             print(u"There are #. #.-digit fractions of which:"_S.format(count[i - 2], i));

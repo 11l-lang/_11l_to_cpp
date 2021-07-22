@@ -477,7 +477,6 @@ print(os.getenv('PATH'))
 print(os.listdir())
 os.system('pause')
 ===
-//import os, tempfile
 print(os:env_path_sep‘’fs:path:join(fs:get_temp_dir(), ‘right’))
 print(os:getenv(‘PATH’))
 os:environ[‘PATH’] ‘’= os:env_path_sep‘KDiff3’
@@ -512,8 +511,6 @@ def process_files2():
         for name in files:
             print(os.path.join(root, name))
 ===
-//import os
-
 F process_files(exclude_dir)
    L(_fname) fs:walk_dir(‘.’, dir_filter' d -> d[0] != ‘.’ & d != @exclude_dir, files_only' 0B)
       V root = fs:path:dir_name(_fname)
@@ -577,7 +574,6 @@ start = time.perf_counter()
 time.sleep(0.1)
 print(time.perf_counter() - start)
 ===
-//import time
 V start = time:perf_counter()
 sleep(0.1)
 print(time:perf_counter() - start)
@@ -603,7 +599,6 @@ print(str(d.days) + ', ' + str(d.total_seconds()))
 print(datetime.date.today())
 print(datetime.datetime.now() - datetime.date.today())
 ===
-//import datetime
 V d = TimeDelta(days' 1, hours' 2, minutes' 3, seconds' 4.5)
 assert(Time(2018, 8, 2) - Time(2018, 7, 1) == TimeDelta(days' 32))
 assert(Time(2018, 8, 2) - Time(2018, 7, 1) == TimeDelta(days' 32))
@@ -637,7 +632,6 @@ print(datetime.datetime(1970, 1, 2).timestamp())
 print(datetime.datetime.fromtimestamp(datetime.datetime(1970, 1, 2).timestamp()))
 # [-TODO: Add `time:gmtime()` and `time:timegm()` [<- `calendar.timegm()`] (need good (practical) test cases!)-]
 ===
-//import datetime
 print(Time(2001, 2, 3, 4, 5, 6).strftime(‘%Y.%m.%d %H:%M:%S’) == ‘2001.02.03 04:05:06’)
 print(Time(2001, 2, 3, 4, 5, 6).format(‘YYYY.MM.DD hh:mm:ss’) == ‘2001.02.03 04:05:06’)
 print(Time(2001, 2, 3, 4, 5, 6).format(‘ГГГГ.ММ.ДД чч:мм:сс’) == ‘2001.02.03 04:05:06’)
@@ -745,7 +739,6 @@ if __name__ == '__main__':
     for animal in animals:
         animal.say()
 ===
-
 T Animal
    F.virtual.abstract say() -> N
 
@@ -756,6 +749,7 @@ T Sheep(Animal)
 T Cat(Animal)
    F.virtual.assign say() -> N
       print(‘meow’)
+
 [Animal] animals
 
 F add_animal(Animal animal)
@@ -799,6 +793,7 @@ public:
         print(u"meow"_S);
     }
 };
+
 Array<std::unique_ptr<Animal>> animals;
 
 auto add_animal(std::unique_ptr<Animal> animal)
@@ -936,7 +931,6 @@ print(math.radians(1) - 0.017453292519943295 + 1)
 print(math.pi - 2.141592653589793)
 print(math.factorial(3))
 ===
-//import math
 print(ceil(3.6) == 4)
 print(floor(3.6) == 3)
 print(trunc(-3.6) == -3)
@@ -1007,7 +1001,6 @@ print(re.findall("[A-Z][1-9]", "B1, C2, D3") == ['B1', 'C2', 'D3'])
 print(re.findall("[A-Z]([1-9])", "B1, C2, D3") == ['1', '2', '3'])
 print([m.start(0) for m in re.finditer("[A-Z]([1-9])", "B1, C2, D3")] == [0, 4, 8])
 ===
-//import re
 print(re:‘[a-z]’.search(‘_12b’).start(0) == 3)
 print(re:‘[a-z]’.search(‘_12b’).end(0) == 4)
 print(re:(‘[a-z]’).search(‘_12b’).start(0) == 3)
@@ -1050,7 +1043,6 @@ os.mkdir('temp_dir')
 os.makedirs('temp_dir/dir1/dir2')
 os.rename('temp_dir', 'temp_dir_')
 ===
-//import os
 fs:create_dir(‘temp_dir’)
 fs:create_dirs(‘temp_dir/dir1/dir2’)
 fs:rename(‘temp_dir’, ‘temp_dir_’)
@@ -1125,7 +1117,6 @@ print(os.path.splitext('a/b/c.txt') == ('a/b/c', '.txt'))
 print(os.path.splitext('c.txt') == ('c', '.txt'))
 print(os.path.splitext('a/b.c/d') == ('a/b.c/d', ''))
 ===
-//import os
 print(fs:path:absolute(‘.’))
 print(fs:path:relative(‘a/b’, ‘a/c’).replace(‘\’, ‘/’) == ‘../b’)
 print(fs:path:dir_name(‘a/b/c’) == ‘a/b’)
@@ -1386,7 +1377,6 @@ try:
 except syntax_highlighter_for_pqmarkup.Error as e:
     print('Syntax highlighter error: ' + e.message + ' at ' + str(e.pos))
 ===
-//import syntax_highlighter_for_pqmarkup
 X.try
    print(syntax_highlighter_for_pqmarkup:highlight(‘Python’, ‘a = 0 # c’))
    print(syntax_highlighter_for_pqmarkup:highlight(‘11l’, ‘V a = 0 // c’))
@@ -1417,7 +1407,6 @@ struct CodeBlock1
 import test_deep_imports
 print()
 ===
-//import test_deep_imports
 print()
 ===
 struct CodeBlock1
@@ -1521,6 +1510,7 @@ T Aa
 
 F f(Aa a)
    print(a.b.d)
+
 f(Aa())
 ===
 class Aa
@@ -1577,6 +1567,7 @@ T Aa
 
 F f(Aa a)
    print(a.b.c.d)
+
 f(Aa())
 ===
 class Aa
@@ -1790,6 +1781,7 @@ print(list(zip([1.0, 2.0], [10, 20])))
 print(cart_product([1, 2], [3, 4]))
 print(cart_product([1.0, 2.0], [3, 4]))
 print(cart_product(0.<3, 1..3))
+
 print(zip([1, 2], [10, 20]))
 print(zip([1.0, 2.0], [10, 20]))
 ===
@@ -1800,6 +1792,7 @@ struct CodeBlock1
         print(cart_product(create_array({1, 2}), create_array({3, 4})));
         print(cart_product(create_array({1.0, 2.0}), create_array({3, 4})));
         print(cart_product(range_el(0, 3), range_ee(1, 3)));
+
         print(zip(create_array({1, 2}), create_array({10, 20})));
         print(zip(create_array({1.0, 2.0}), create_array({10, 20})));
     }
@@ -1824,7 +1817,6 @@ print(Set([1]))
 print(Set([1]))
 print([Byte(1), 2])
 print(Set([Byte(1), 2]))
-//import collections
 print(Deque([3]))
 ===
 struct CodeBlock1
@@ -2016,7 +2008,6 @@ def trazar(r : Rayo):
 r = Rayo()
 trazar(r)
 ===
-
 T Rayo
    Cuerpo& objInter
 
@@ -2053,6 +2044,7 @@ T Scene
       .lObjetos.append(sph)
       V pl = Plano(2)
       .lObjetos.append(pl)
+
 V scene = Scene()
 
 F calculaSombra(Rayo& r; objChoque)
@@ -2069,6 +2061,7 @@ F trazar(Rayo& r)
       V matIndex = r.objInter.material
       V rayoLuz = Rayo()
       calculaSombra(&rayoLuz, r.objInter)
+
 V r = Rayo()
 trazar(&r)
 ===
@@ -2139,6 +2132,7 @@ public:
         lObjetos.append(std::move(pl));
     }
 };
+
 auto scene = Scene();
 
 template <typename T2> auto calculaSombra(Rayo &r, const T2 &objChoque)
@@ -2161,6 +2155,7 @@ auto trazar(Rayo &r)
         calculaSombra(rayoLuz, r.objInter);
     }
 }
+
 auto r = Rayo();
 
 struct CodeBlock1
@@ -2189,7 +2184,6 @@ print(random.randrange(3))
 print(random.randrange(1, 3))
 print(random.randint(1, 3))
 ===
-//import random
 print(random:(3))
 print(random:(1 .< 3))
 print(random:(1 .. 3))
@@ -2303,7 +2297,6 @@ print(d.popleft())
 d.remove(5)
 print(d)
 ===
-//import collections
 V d = Deque[Int]()
 d.append(1)
 d.append(2)
@@ -2359,7 +2352,6 @@ print_set(set_values, 1)
 print_set(set_values, 2)
 s = {1}
 ===
-
 F print_set(DefaultDict[Int, Set[Int]] &map; key)
    V& s = map[key]
    I s.empty
@@ -2368,7 +2360,6 @@ F print_set(DefaultDict[Int, Set[Int]] &map; key)
    L(value) s
       print(value, end' ‘ ’)
    print()
-//import collections
 DefaultDict[Int, Set[Int]] set_values
 set_values[1].add(2)
 print_set(&set_values, 1)
@@ -2438,7 +2429,6 @@ heapq.heappush(a, 0)
 while len(a):
     print(heapq.heappop(a))
 ===
-//import heapq
 V a = [3, 1, 2]
 minheap:heapify(&a)
 minheap:push(&a, 5)
@@ -2628,7 +2618,6 @@ def get_height(n : "Node"):
 
 print(get_height(root))
 ===
-
 T Node
    Int value
    Node? left
@@ -2649,6 +2638,7 @@ F insert(i, Node &n)
          n.right = Node(i)
       E
          insert(i, &n.right)
+
 V a = input().split_py().map(Int)[0 .< (len)-1]
 V root = Node(a[0])
 L(i) a[1..]
@@ -2658,6 +2648,7 @@ F get_height(Node &n)
    I n == N
       R 0
    R 1 + max(get_height(&n.left), get_height(&n.right))
+
 print(get_height(&root))
 ===
 class Node
@@ -2688,6 +2679,7 @@ template <typename T1> auto insert(const T1 &i, std::unique_ptr<Node> &n)
         else
             insert(i, n->right);
 }
+
 auto a = input().split_py().map([](const auto &x){return to_int(x);})[range_e_llen(0,  - 1)];
 auto root = std::make_unique<Node>(_get<0>(a));
 
@@ -2822,6 +2814,7 @@ print_image('3.bmp')
 ===
 F print_image(fname)
    V bytes = File(fname).read_bytes()
+
    V w = Int(bytes' bytes[18.<22])
    V h = Int(bytes' bytes[22.<26])
 
@@ -2839,6 +2832,7 @@ F print_image(fname)
          E
             print(‘██’, end' ‘’)
       print()
+
 print_image(‘1.bmp’)
 print_image(‘2.bmp’)
 print_image(‘3.bmp’)
@@ -2846,6 +2840,7 @@ print_image(‘3.bmp’)
 template <typename T1> auto print_image(const T1 &fname)
 {
     auto bytes = File(fname).read_bytes();
+
     auto w = int_from_bytes(bytes, range_el(18, 22));
     auto h = int_from_bytes(bytes, range_el(22, 26));
 
@@ -2895,6 +2890,7 @@ F get_f(a)
    F f(b)
       R @=a + b
    R f
+
 V f10 = get_f(10)
 V f20 = get_f(20)
 print(f10(1))
@@ -2910,6 +2906,7 @@ template <typename T1> auto get_f(const T1 &a)
     };
     return f;
 }
+
 auto f10 = get_f(10);
 auto f20 = get_f(20);
 
@@ -2953,7 +2950,6 @@ print(struct.unpack('H', b"\xFF\xFF")[0])
 print(struct.unpack('b', b"\xFF")[0])
 print(struct.unpack('B', b"\xFF")[0])
 ===
-//import struct
 print(Int32.unpack(Bytes("\xFF\xFF\xFF\xFF")))
 print(UInt32.unpack(Bytes("\xFF\xFF\xFF\xFF")))
 print(Int16.unpack(Bytes("\xFF\xFF")))
@@ -3002,7 +2998,6 @@ print('Vertical Resolution: %s' % struct.unpack('I', bmp.read(4))[0])
 print('Number of Colours: %s' % struct.unpack('I', bmp.read(4))[0])
 print('Important Colours: %s' % struct.unpack('I', bmp.read(4))[0])
 ===
-//import struct
 V bmp = File(‘1.bmp’, ‘r’)
 V t = bmp.read_bytes(2)
 print(‘Type: ’(Char(code' t[0])‘’Char(code' t[1])))
@@ -3012,6 +3007,7 @@ print(‘Size BE: #.’.format(UInt32.unpack_from_be(File(‘1.bmp’).read_byte
 print(‘Reserved 1: #.’.format(UInt16.unpack(bmp.read_bytes(2))))
 print(‘Reserved 2: #.’.format(UInt16.unpack(bmp.read_bytes(2))))
 print(‘Offset: #.’.format(UInt32.unpack(bmp.read_bytes(4))))
+
 print(‘DIB Header Size: #.’.format(UInt32.unpack(bmp.read_bytes(4))))
 print(‘Width: #.’.format(UInt32.unpack(bmp.read_bytes(4))))
 print(‘Height: #.’.format(UInt32.unpack(bmp.read_bytes(4))))
@@ -3040,6 +3036,7 @@ struct CodeBlock1
         print(u"Reserved 1: #."_S.format(unpack_from_bytes<UInt16>(bmp.read_bytes(2))));
         print(u"Reserved 2: #."_S.format(unpack_from_bytes<UInt16>(bmp.read_bytes(2))));
         print(u"Offset: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
+
         print(u"DIB Header Size: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
         print(u"Width: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
         print(u"Height: #."_S.format(unpack_from_bytes<UInt32>(bmp.read_bytes(4))));
@@ -3070,6 +3067,7 @@ tokenize('', None)
 F tokenize(source, [(Int, Int)]? &comments = N)
    I comments != N
       comments.append((10, 20))
+
 [(Int, Int)] comments
 tokenize(‘’, comments' &comments)
 tokenize(‘’, &comments)
@@ -3081,6 +3079,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<ivec2>* const comme
     if (comments != nullptr)
         comments->append(make_tuple(10, 20));
 }
+
 Array<ivec2> comments;
 
 struct CodeBlock1
@@ -3105,7 +3104,6 @@ def f():
     choice = oneblock if oneblock is not None else 0
     print(oneblock + 1)
 ===
-
 F f()
    Int? oneblock
    L(choice) [1, 2]

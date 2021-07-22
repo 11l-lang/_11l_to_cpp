@@ -22,6 +22,7 @@ struct CodeBlock1
     ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. )"_S;
     }
 } code_block_1;
+
 Array<Byte> instrument_data;
 
 template <typename T1, typename T2> auto chunk_size(const T1 &instrument_data, const T2 &offset)
@@ -41,6 +42,7 @@ public:
 			that is, does not include the first 84 bytes )"_S;
         if (__size == 0)
             __size = chunk_size(::instrument_data, offset);
+
         return __size;
     }
 
@@ -48,6 +50,7 @@ public:
     {
         uR"( return the chunk's id number; n.b. that this does not seem to actually be used --
 			the sequence of chunks of each type in the file is used instead )"_S;
+
         return unpack_from_bytes<UInt32>(::instrument_data, offset + 8);
     }
 
@@ -55,6 +58,7 @@ public:
     {
         uR"( the name of a chunk starts at byte 20, and has a max. length of 64 bytes;
 			this is treated as a zero-terminated utf-8 string )"_S;
+
         return _get<0>(::instrument_data[range_el(offset + 20, offset + 84)].decode(u"utf-8"_S).split(u"\x00"_S));
     }
 
@@ -92,6 +96,7 @@ struct CodeBlock2
 			print(""))"_S;
     }
 } code_block_2;
+
 auto EXSHeader_sig = 0x0000'0101;
 
 class EXSHeader : public EXSChunk
@@ -188,6 +193,7 @@ public:
         auto group = unpack_from_bytes<Int32>(::instrument_data, offset + 172);
         if (group >= 0)
             return group;
+
         return 0;
     }
 
@@ -272,11 +278,13 @@ public:
     {
         uR"( try to locate the directory containing a sample; if found,
 			it will be added to the list of known locations which are searched first )"_S;
+
         auto last = u""_S;
         std::function<String(String)> search_location = [&filename, &last, &search_location, this](const String &search)
         {
             if (in(search, locations))
                 return u""_S;
+
             auto path = fs::path::canonical(fs::path::absolute(fs::path::join(base, search)));
             if (path == last)
                 return u""_S;
@@ -297,6 +305,7 @@ public:
             }
             return u""_S;
         };
+
         filename = filename.lowercase();
         for (auto &&location : locations)
             for (auto &&name : fs::list_dir(fs::path::join(base, location)))
@@ -304,6 +313,7 @@ public:
                     if (fs::is_file(fs::path::join(base, location, filename)))
                         return location;
                 }
+
         auto search = u""_S;
         for (auto _i : range_el(0, search_depth)) {
             auto location = search_location(search);
@@ -368,6 +378,7 @@ class EXSInstrument
 {
 public:
     std::unique_ptr<EXSSamplePool> pool;
+
     String exsfile_name;
     Array<EXSZone> zones;
     Array<EXSGroup> groups;
@@ -387,6 +398,7 @@ public:
             pool = std::make_unique<EXSSamplePoolLocator>(exsfile_name);
         else
             pool = std::make_unique<EXSSamplePoolFixed>(sample_location);
+
         auto offset = 0;
         auto end = ::instrument_data.len();
         while (offset < end) {
@@ -403,6 +415,7 @@ public:
                 auto t = EXSParam(offset);
             else
                 throw RuntimeError(u"Encountered an unknown chunk signature! signature is "_S & (u"0x"_S & hex(sig).lowercase()));
+
             offset += chunk_size(::instrument_data, offset);
         }
     }
@@ -412,6 +425,7 @@ public:
         uR"( exs handles round robin samples by using groups that point to the next group, and so on
 			until the sequence is reset by pointing to group -1;
 			here we trace each of those chains for simple processing later )"_S;
+
         Array<Array<int>> sequences;
         {int Lindex = 0;
 
@@ -427,6 +441,7 @@ public:
                 }
             if (!was_break) {
                 Array<int> sequence;
+
                 auto cont = true;
                 while (cont == true) {
                     cont = false;
@@ -442,6 +457,7 @@ public:
                         Lindex++;
                     }}
                 }
+
                 sequence.drop();
                 while (!(gid == -1) && !(in(gid, sequence))) {
                     sequence.append(gid);
@@ -454,6 +470,7 @@ public:
 } on_continue:
             Lindex++;
         }}
+
         return sequences;
     }
 
@@ -477,6 +494,7 @@ public:
             }
             return zone.rootnote();
         };
+
         Dict<Tuple<int, int, int, int, int>, Array<EXSZone>> ranges;
         for (auto &&zone : zones) {
             auto key = make_tuple(zone.startnote(), zone.endnote(), get_rootnote(zone), zone.pan(), get_sequence_position(zone));
@@ -486,6 +504,7 @@ public:
             }
             ranges[key].append(zone);
         }
+
         Dict<Tuple<int, int, int, int, int>, int> key_sequence;
         for (auto &&key : sorted(ranges.keys())) {
             auto keyrange = ranges[key];
@@ -500,25 +519,31 @@ public:
             if (!was_break)
                 continue;
             }
+
             key_sequence.set(key, group);
         }
         if (!overwrite && fs::is_file(sfzfilename))
             throw RuntimeError(u"file #. already exists; will not overwrite!"_S.format(sfzfilename));
+
         auto sfzfile = File(sfzfilename, u"w"_S);
+
         sfzfile.write(u"// this file was generated from #. using vonred's #.. Trickster goddess incoming.\n\n"_S.format(fs::path::base_name(exsfile_name), fs::path::base_name(u"1.exs2sfz.py"_S)));
 
         for (auto &&key : sorted(ranges.keys())) {
             auto keyrange = ranges[key];
+
             sfzfile.write(u"<group>"_S);
             if ((equal(_get<0>(key), _get<1>(key), _get<2>(key))))
                 sfzfile.write(u" key=#."_S.format(_get<0>(key)));
             else
                 sfzfile.write(u"lokey=#. hikey=#. pitch_keycenter=#."_S.format(_get<0>(keyrange).startnote(), _get<0>(keyrange).endnote(), _get<0>(keyrange).rootnote()));
+
             int choke_group;
             if (in(key, key_sequence))
                 choke_group = key_sequence[key];
             else
                 choke_group = _get<0>(keyrange).group();
+
             Dict<ivec2, int> choke_voices;
             for (auto &&zone : keyrange)
                 if (in(make_tuple(zone.minvel(), zone.maxvel()), choke_voices))
@@ -529,6 +554,7 @@ public:
             if (groups[_get<0>(keyrange).group()].polyphony() == choke_voices[make_tuple(_get<0>(keyrange).minvel(), _get<0>(keyrange).maxvel())]) {
                 if (choke_group == 0)
                     choke_group = groups.len();
+
                 sfzfile.write(u" group=#. off_by=#. polyphony=#. off_mode=fast"_S.format(choke_group, choke_group, groups[_get<0>(keyrange).group()].polyphony()));
             }
             if (groups[_get<0>(keyrange).group()].output() > 0)
@@ -542,6 +568,7 @@ public:
                     sfzfile.write(u" seq_length=#. seq_position=#."_S.format(sequence.len(), sequence.index(_get<0>(keyrange).group()) + 1));
                     break;
                 }
+
             sfzfile.write(u" pitch_keytrack=#.\n"_S.format(to_int(_get<0>(keyrange).pitchtrack())));
 
             for (auto &&zone : keyrange) {
@@ -558,7 +585,9 @@ public:
                     sfzfile.write(u" loop_mode=loop_sustain loop_start=#. loop_end=#."_S.format(zone.loopstart(), zone.loopend() - 1));
                 if (groups[zone.group()].trigger() == 1)
                     sfzfile.write(u" trigger=release"_S);
+
                 sfzfile.write(u" sample=#."_S.format(pool->path(samples[zone.sampleindex()].name())));
+
                 sfzfile.write(u"\n"_S);
             }
         }
@@ -575,8 +604,10 @@ int MAIN_WITH_ARGV()
         print(u"    the samplefolder argument is optional; if not specified, the program will"_S);
         print(u"    attempt to locate the samples by searching folders surrounding the exs file"_S);
         print();
+
         exit(64);
     }
+
     auto samplefolder = ::argv.len() == 4 ? _get<3>(::argv) : u""_S;
     try
     {

@@ -1,18 +1,23 @@
 V iNone = -999
 V iTrue = 1
 V iFalse = 0
+
 V setup = [4, 2, 3, 5, 6, 3, 2, 4, iNone, iNone] [+] [iTrue] * 4 [+] [iNone, iNone] [+] [1] * 8 [+] [iNone, iNone, iTrue, iNone, iNone, iNone, iNone, iNone] [+] ([0] * 8 [+] [iNone] * 8) * 4 [+] [-1] * 8 [+] [iNone] * 8 [+] [-4, -2, -3, -5, -6, -3, -2, -4] [+] [iNone] * 40
+
 V squares = (0.<128).filter(i -> !(i [&] 8))
 V knightMoves = [-33, -31, -18, -14, 14, 18, 31, 33]
 V bishopLines = [Array((17.<120).step(17)), Array((-17 .< -120).step(-17)), Array((15.<106).step(15)), Array((-15 .< -106).step(-15))]
 V rookLines = [Array(1..7), Array((-1 .< -8).step(-1)), Array((16.<128).step(16)), Array((-16 .< -128).step(-16))]
 V queenLines = bishopLines [+] rookLines
 V kingMoves = (-17, -16, -15, -1, 1, 15, 16, 17)
+
 [Int] empty_list
 V linePieces = [[empty_list], [empty_list], [empty_list], bishopLines, rookLines, queenLines, [empty_list], [empty_list], queenLines, rookLines, bishopLines, [empty_list], [empty_list]]
+
 V clearCastlingOpportunities = [empty_list] * 8'0
 L(i, v) ((0'0, [10]), (0'4, [10, 11]), (0'7, [11]), (7'0, [12]), (7'4, [12, 13]), (7'7, [13]))
    clearCastlingOpportunities[i] = v
+
 V pieces = ‘.pnbrqkKQRBNP’
 
 F listGet(l, i)
@@ -36,6 +41,7 @@ F mov([Int] &board; mv)
 
    L(i) :clearCastlingOpportunities[ix]
       board[i] = :iFalse
+
    board[26] = Int(!board[26])
    I (mv [&] 7fff'0000) == 0
       R
@@ -106,6 +112,7 @@ F rowAttack(board, attackers, ix, dir)
 
 F nonpawnAttacks(board, ix, color)
    R (max(:knightMoves.map(i -> @board[@ix + i] == @color * 2)) | max(:bishopLines.map(bishopLine -> rowAttack(@board, (@color * 3, @color * 5), @ix, bishopLine))) | max(:rookLines.map(rookLine -> rowAttack(@board, (@color * 4, @color * 5), @ix, rookLine))))
+
 V nonpawnBlackAttacks = (board, ix) -> nonpawnAttacks(board, ix, -1)
 V nonpawnWhiteAttacks = (board, ix) -> nonpawnAttacks(board, ix, 1)
 
@@ -271,6 +278,7 @@ F pseudoLegalCaptures(board)
 F legalMoves(board)
    V allMoves = pseudoLegalMoves(board)
    [Int] retval
+
    V kingVal = 6
    I board[26]
       kingVal = -kingVal
@@ -307,6 +315,7 @@ F alphaBetaQui(board, =alpha, beta, n)
 F alphaBeta(board, =alpha, beta, n)
    I n == 0
       R alphaBetaQui(board, alpha, beta, n)
+
    V bestMove = :iNone
 
    L(mv) legalMoves(board)
@@ -326,6 +335,7 @@ F speedTest()
    moveStr(&board, ‘c2-c4’)
    moveStr(&board, ‘e7-e5’)
    moveStr(&board, ‘d2-d4’)
+
    V res = alphaBeta(board, -99999999, 99999999, 4)
    print(res)
    moveStr(&board, ‘d7-d6’)

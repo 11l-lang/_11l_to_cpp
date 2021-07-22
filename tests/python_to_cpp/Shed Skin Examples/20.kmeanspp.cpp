@@ -20,6 +20,7 @@ template <typename T1, typename T2> auto generate_points(const T1 &npoints, cons
         p.x = r * cos(ang);
         p.y = r * sin(ang);
     }
+
     return points;
 }
 
@@ -31,6 +32,7 @@ template <typename T1, typename T2> auto sqr_distance_2D(const T1 &a, const T2 &
 template <typename T1, typename T2> auto nearest_cluster_center(const T1 &point, const T2 &cluster_centers)
 {
     u"Distance and index of the closest cluster center"_S;
+
     auto min_index = point.group;
     auto min_dist = ::FLOAT_MAX;
     {int Lindex = 0;
@@ -44,6 +46,7 @@ template <typename T1, typename T2> auto nearest_cluster_center(const T1 &point,
         }
         Lindex++;
     }}
+
     return make_tuple(min_index, min_dist);
 }
 
@@ -61,6 +64,7 @@ template <typename T1, typename T2> auto kpp(T1 &points, T2 &cluster_centers)
             sum += d[j];
             Lindex++;
         }}
+
         sum *= randomns::_();
         {int Lindex = 0;
 
@@ -82,8 +86,11 @@ template <typename T1, typename T2> auto kpp(T1 &points, T2 &cluster_centers)
 template <typename T1, typename T2> auto lloyd(T1 &points, const T2 &nclusters)
 {
     auto cluster_centers = range_el(0, nclusters).map([](const auto &_){return Point();});
+
     kpp(points, cluster_centers);
+
     auto lenpts10 = points.len() >> 10;
+
     auto changed = 0;
     while (true) {
         for (auto &&cc : cluster_centers) {
@@ -102,6 +109,7 @@ template <typename T1, typename T2> auto lloyd(T1 &points, const T2 &nclusters)
             cc.x /= cc.group;
             cc.y /= cc.group;
         }
+
         changed = 0;
         for (auto &&p : points) {
             auto min_i = _get<0>(nearest_cluster_center(p, cluster_centers));
@@ -120,6 +128,7 @@ template <typename T1, typename T2> auto lloyd(T1 &points, const T2 &nclusters)
         cc.group = i;
         Lindex++;
     }}
+
     return cluster_centers;
 }
 
@@ -142,6 +151,7 @@ template <typename T1, typename T2, typename T3 = decltype(400), typename T4 = d
     Array<Color> colors;
     for (auto i : range_el(0, cluster_centers.len()))
         colors.append(Color((mod(3 * (i + 1), 11)) / 11.0, (mod(7 * i, 11)) / 11.0, (mod(9 * i, 11)) / 11.0));
+
     auto max_x = -::FLOAT_MAX;
     auto max_y = -::FLOAT_MAX;
     auto min_x = ::FLOAT_MAX;
@@ -157,10 +167,13 @@ template <typename T1, typename T2, typename T3 = decltype(400), typename T4 = d
         if (min_y > p.y)
             min_y = p.y;
     }
+
     auto scale = min(w / (max_x - min_x), h / (max_y - min_y));
     auto cx = (max_x + min_x) / 2.0;
     auto cy = (max_y + min_y) / 2.0;
+
     print(u"%!PS-Adobe-3.0\n%%BoundingBox: -5 -5 #. #."_S.format(w + 10, h + 10));
+
     print((u"/l {rlineto} def /m {rmoveto} def\n"_S & u"/c { .25 sub exch .25 sub exch .5 0 360 arc fill } def\n"_S & u"/s { moveto -2 0 m 2 2 l 2 -2 l -2 -2 l closepath "_S & u"   gsave 1 setgray fill grestore gsave 3 setlinewidth"_S & u" 1 setgray stroke grestore 0 setgray stroke }def"_S));
     {int Lindex = 0;
 
@@ -173,9 +186,11 @@ template <typename T1, typename T2, typename T3 = decltype(400), typename T4 = d
                 continue;
             print((u"#.3 #.3 c"_S.format((p.x - cx) * scale + w / 2.0, (p.y - cy) * scale + h / 2.0)));
         }
+
         print((u"\n0 setgray #. #. s"_S.format((cc.x - cx) * scale + w / 2.0, (cc.y - cy) * scale + h / 2.0)));
         Lindex++;
     }}
+
     print(u"\n%%%%EOF"_S);
 }
 
@@ -183,6 +198,7 @@ auto _main_()
 {
     auto npoints = 30000;
     auto k = 7;
+
     auto points = generate_points(npoints, 10);
     auto cluster_centers = lloyd(points, k);
     print_eps(points, cluster_centers);

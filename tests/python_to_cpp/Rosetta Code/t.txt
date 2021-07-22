@@ -26,6 +26,7 @@ F tau(n)
             ans++
       i++
    R ans
+
 print((1..100).map(n -> tau(n)))
 ===
 template <typename T1> auto tau(const T1 &n)
@@ -83,7 +84,6 @@ while len(ans) < 100:
     n += 1
 print(ans)
 ===
-
 F tau(n)
    V ans = 0
    V i = 1
@@ -101,6 +101,7 @@ F is_tau_number(n)
    I n <= 0
       R 0B
    R 0 == n % tau(n)
+
 V n = 1
 [Int] ans
 L ans.len < 100
@@ -132,6 +133,7 @@ template <typename T1> auto is_tau_number(const T1 &n)
         return false;
     return 0 == mod(n, tau(n));
 }
+
 auto n = 1;
 Array<int> ans;
 
@@ -180,7 +182,6 @@ struct CodeBlock1
 import os
 os.system("cls")
 ===
-//import os
 os:(‘cls’)
 ===
 struct CodeBlock1
@@ -207,6 +208,7 @@ print(isint(5-5j))
 ===
 F isint(f)
    R Complex(f).imag == 0 & fract(Complex(f).real) == 0
+
 print([Complex(1.0), 2, (3.0 + 0.0i), 4.1, (3 + 4i), (5.6 + 0i)].map(f -> isint(f)))
 print(isint(25.000000))
 print(isint(24.999999))
@@ -277,8 +279,6 @@ if __name__ == '__main__':
     endString   = sys.argv[3]
     print(textBetween(thisText, startString, endString))
 ===
-//import sys
-
 F textBetween(thisText, startString, endString)
    X.try
       Int startIndex
@@ -292,6 +292,7 @@ F textBetween(thisText, startString, endString)
       E
          I startString != ‘start’
             startIndex = startIndex + startString.len
+
       V returnText = thisText[startIndex ..]
 
       I endString == ‘end’
@@ -303,6 +304,7 @@ F textBetween(thisText, startString, endString)
             R ‘End delimiter not found’
          E
             returnText = returnText[0 .< endIndex]
+
       R returnText
 
    X.catch ValueError
@@ -330,6 +332,7 @@ template <typename T1, typename T2, typename T3> auto textBetween(const T1 &this
         else
             if (startString != u"start")
                 startIndex = startIndex + startString.len();
+
         auto returnText = thisText[range_ei(startIndex)];
         if (endString == u"end")
             return returnText;
@@ -340,6 +343,7 @@ template <typename T1, typename T2, typename T3> auto textBetween(const T1 &this
             else
                 returnText = returnText[range_el(0, endIndex)];
         }
+
         return returnText;
     }
 
@@ -387,6 +391,7 @@ L(job) File(‘mlijobs.txt’).read_lines(1B)
       max_times.clear()
    I out == max_out
       max_times.append(job.split(‘ ’)[3])
+
 print(‘Maximum simultaneous license use is #. at the following times:’.format(max_out))
 print(‘  ’max_times.join("\n  "))
 ===
@@ -407,6 +412,7 @@ struct CodeBlock1
             if (out == max_out)
                 max_times.append(_get<3>(job.split(u" "_S)));
         }
+
         print(u"Maximum simultaneous license use is #. at the following times:"_S.format(max_out));
         print(u"  "_S & max_times.join(u"\n  "_S));
     }
@@ -445,8 +451,6 @@ print('%16.14f' % (6*iSin))
 print('%16.14f' % (3*iCos))
 print('%16.14f' % (4*iTan))
 ===
-//import math
-
 F thieleInterpolator(x, y, val)
    V ρ = enumerate(y).map((i, yi) -> [yi] * (@y.len - i))
    L(i) 0 .< ρ.len - 1
@@ -461,13 +465,16 @@ F thieleInterpolator(x, y, val)
          a = (xin - @x[i - 1]) / (@ρ0[i] - @ρ0[i - 2] + a)
       R @y[0] + (xin - @x[0]) / (@ρ0[1] + a)
    R t(val)
+
 V xVal = (0.<32).map(i -> i * 0.05)
 V tSin = xVal.map(x -> sin(x))
 V tCos = xVal.map(x -> cos(x))
 V tTan = xVal.map(x -> tan(x))
+
 V iSin = thieleInterpolator(tSin, xVal, 0.5)
 V iCos = thieleInterpolator(tCos, xVal, 0.5)
 V iTan = thieleInterpolator(tTan, xVal, 1)
+
 print(‘#.14’.format(6 * iSin))
 print(‘#.14’.format(3 * iCos))
 print(‘#.14’.format(4 * iTan))
@@ -490,10 +497,12 @@ template <typename T1, typename T2, typename T3> auto thieleInterpolator(const T
     };
     return t(val);
 }
+
 auto xVal = range_el(0, 32).map([](const auto &i){return i * 0.05;});
 auto tSin = xVal.map([](const auto &x){return sin(x);});
 auto tCos = xVal.map([](const auto &x){return cos(x);});
 auto tTan = xVal.map([](const auto &x){return tan(x);});
+
 auto iSin = thieleInterpolator(tSin, xVal, 0.5);
 auto iCos = thieleInterpolator(tCos, xVal, 0.5);
 auto iTan = thieleInterpolator(tTan, xVal, 1);
@@ -517,6 +526,7 @@ print(thue_morse_digits(20))
 ===
 F thue_morse_digits(digits)
    R (0 .< digits).map(n -> bin(n).count(‘1’) % 2)
+
 print(thue_morse_digits(20))
 ===
 template <typename T1> auto thue_morse_digits(const T1 &digits)
@@ -549,8 +559,6 @@ def time_func(f):
 
 print(time_func(lambda: do_work(100)))
 ===
-//import time
-
 F do_work(x)
    V n = x
    L(i) 10000000
@@ -561,6 +569,7 @@ F time_func(f)
    V start = time:perf_counter()
    f()
    R time:perf_counter() - start
+
 print(time_func(() -> do_work(100)))
 ===
 template <typename T1> auto do_work(const T1 &x)
@@ -648,6 +657,7 @@ F token_with_escape(a, escape = ‘^’, separator = ‘|’)
          state = 0
    result.append(token)
    R result
+
 print(token_with_escape(‘one^|uno||three^^^^|four^^^|^cuatro|’).map(s -> ‘'’s‘'’).join(‘, ’))
 ===
 template <typename T1, typename T2 = decltype(u"^"_S), typename T3 = decltype(u"|"_S)> auto token_with_escape(const T1 &a, const T2 &escape = u"^"_S, const T3 &separator = u"|"_S)
@@ -732,6 +742,7 @@ V best = [0] * 16
 F try_swaps(&deck, f, =s, d, n)
    I d > :best[n]
       :best[n] = d
+
    V i = 0
    V k = 1 << s
    L s != 0
@@ -743,6 +754,7 @@ F try_swaps(&deck, f, =s, d, n)
       I (i [&] f) == i & d + :best[s] <= :best[n]
          R d
    s++
+
    V deck2 = copy(deck)
    k = 1
    L(i2) 1 .< s
@@ -752,6 +764,7 @@ F try_swaps(&deck, f, =s, d, n)
             L.continue
       E I deck2[i2] != i2
          L.continue
+
       deck[i2] = i2
 
       L(j) 0 .. i2
@@ -774,6 +787,7 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5> auto 
 {
     if (d > ::best[n])
         ::best.set(n, d);
+
     auto i = 0;
     auto k = 1 << s;
     while (s != 0) {
@@ -786,6 +800,7 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5> auto 
             return d;
     }
     s++;
+
     auto deck2 = copy(deck);
     k = 1;
     for (auto i2 : range_el(1, s)) {
@@ -796,6 +811,7 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5> auto 
         }
         else if (deck2[i2] != i2)
             continue;
+
         deck.set(i2, i2);
         for (auto j : range_ee(0, i2))
             deck2.set(j, deck[i2 - j]);
@@ -890,14 +906,19 @@ T Circle
       .x = x
       .y = y
       .r = r
+
 V circles = [Circle(1.6417233788, 1.6121789534, 0.0848270516), Circle(-1.4944608174, 1.2077959613, 1.1039549836), Circle(0.6110294452, -0.6907087527, 0.9089162485), Circle(0.3844862411, 0.2923344616, 0.2375743054), Circle(-0.2495892950, -0.3832854473, 1.0845181219), Circle(1.7813504266, 1.6178237031, 0.8162655711), Circle(-0.1985249206, -0.8343333301, 0.0538864941), Circle(-1.7011985145, -0.1263820964, 0.4776976918), Circle(-0.4319462812, 1.4104420482, 0.7886291537), Circle(0.2178372997, -0.9499557344, 0.0357871187), Circle(-0.6294854565, -1.3078893852, 0.7653357688), Circle(1.7952608455, 0.6281269104, 0.2727652452), Circle(1.4168575317, 1.0683357171, 1.1016025378), Circle(1.4637371396, 0.9463877418, 1.1846214562), Circle(-0.5263668798, 1.7315156631, 1.4428514068), Circle(-1.2197352481, 0.9144146579, 1.0727263474), Circle(-0.1389358881, 0.1092805780, 0.7350208828), Circle(1.5293954595, 0.0030278255, 1.2472867347), Circle(-0.5258728625, 1.3782633069, 1.3495508831), Circle(-0.1403562064, 0.2437382535, 1.3804956588), Circle(0.8055826339, -0.0482092025, 0.3327165165), Circle(-0.6311979224, 0.7184578971, 0.2491045282), Circle(1.4685857879, -0.8347049536, 1.3670667538), Circle(-0.6855727502, 1.6465021616, 1.0593087096), Circle(0.0152957411, 0.0638919221, 0.9771215985)]
+
 V x_min = min(circles.map(c -> c.x - c.r))
 V x_max = max(circles.map(c -> c.x + c.r))
 V y_min = min(circles.map(c -> c.y - c.r))
 V y_max = max(circles.map(c -> c.y + c.r))
+
 V box_side = 500
+
 V dx = (x_max - x_min) / box_side
 V dy = (y_max - y_min) / box_side
+
 V count = 0
 
 L(r) 0 .< box_side
@@ -906,6 +927,7 @@ L(r) 0 .< box_side
       V x = x_min + c * dx
       I any(circles.map(circle -> (@x - circle.x) ^ 2 + (@y - circle.y) ^ 2 <= (circle.r ^ 2)))
          count++
+
 print(‘Approximated area: ’(count * dx * dy))
 ===
 class Circle
@@ -921,21 +943,25 @@ public:
     {
     }
 };
+
 auto circles = create_array<Circle>({Circle(1.6417233788, 1.6121789534, 0.0848270516), Circle(-1.4944608174, 1.2077959613, 1.1039549836), Circle(0.6110294452, -0.6907087527, 0.9089162485), Circle(0.3844862411, 0.2923344616, 0.2375743054), Circle(-0.2495892950, -0.3832854473, 1.0845181219), Circle(1.7813504266, 1.6178237031, 0.8162655711), Circle(-0.1985249206, -0.8343333301, 0.0538864941), Circle(-1.7011985145, -0.1263820964, 0.4776976918), Circle(-0.4319462812, 1.4104420482, 0.7886291537), Circle(0.2178372997, -0.9499557344, 0.0357871187), Circle(-0.6294854565, -1.3078893852, 0.7653357688), Circle(1.7952608455, 0.6281269104, 0.2727652452), Circle(1.4168575317, 1.0683357171, 1.1016025378), Circle(1.4637371396, 0.9463877418, 1.1846214562), Circle(-0.5263668798, 1.7315156631, 1.4428514068), Circle(-1.2197352481, 0.9144146579, 1.0727263474), Circle(-0.1389358881, 0.1092805780, 0.7350208828), Circle(1.5293954595, 0.0030278255, 1.2472867347), Circle(-0.5258728625, 1.3782633069, 1.3495508831), Circle(-0.1403562064, 0.2437382535, 1.3804956588), Circle(0.8055826339, -0.0482092025, 0.3327165165), Circle(-0.6311979224, 0.7184578971, 0.2491045282), Circle(1.4685857879, -0.8347049536, 1.3670667538), Circle(-0.6855727502, 1.6465021616, 1.0593087096), Circle(0.0152957411, 0.0638919221, 0.9771215985)});
+
 auto x_min = min(circles.map([](const auto &c){return c.x - c.r;}));
 auto x_max = max(circles.map([](const auto &c){return c.x + c.r;}));
 auto y_min = min(circles.map([](const auto &c){return c.y - c.r;}));
 auto y_max = max(circles.map([](const auto &c){return c.y + c.r;}));
+
 auto box_side = 500;
+
 auto dx = (x_max - x_min) / box_side;
 auto dy = (y_max - y_min) / box_side;
+
 auto count = 0;
 
 struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto r : range_el(0, box_side)) {
             auto y = y_min + r * dy;
             for (auto c : range_el(0, box_side)) {
@@ -944,6 +970,7 @@ struct CodeBlock1
                     count++;
             }
         }
+
         print(u"Approximated area: "_S & (count * dx * dy));
     }
 } code_block_1;
@@ -966,8 +993,6 @@ for n in range(1, 10_000 + 1):
     if n in (100, 1000, 10_000):
         print("Primes up to %d: %d" % (n, count))
 ===
-//import math
-
 F f(n)
    R sum((1 .. n).filter(k -> gcd(@n, k) == 1).map(k -> 1))
 
@@ -1029,6 +1054,7 @@ F hanoi(ndisks, startPeg = 1, endPeg = 3) -> N
       hanoi(ndisks - 1, startPeg, 6 - startPeg - endPeg)
       print(‘Move disk #. from peg #. to peg #.’.format(ndisks, startPeg, endPeg))
       hanoi(ndisks - 1, 6 - startPeg - endPeg, endPeg)
+
 hanoi(ndisks' 3)
 ===
 template <typename T1, typename T2 = decltype(1), typename T3 = decltype(3)> void hanoi(const T1 &ndisks, const T2 &startPeg = 1, const T3 &endPeg = 3)
@@ -1065,10 +1091,9 @@ for x in s:
         print('%s: %s' % (x, result))
 print()
 ===
-//import math
-
 F f(x)
    R sqrt(abs(x)) + 5 * x ^ 3
+
 V s = Array(1..11)
 s.reverse()
 L(x) s
@@ -1083,6 +1108,7 @@ template <typename T1> auto f(const T1 &x)
 {
     return sqrt(abs(x)) + 5 * cube(x);
 }
+
 auto s = create_array(range_ee(1, 11));
 
 struct CodeBlock1
@@ -1116,7 +1142,6 @@ print("Arccosine:", arccosine, math.degrees(arccosine))
 arctangent = math.atan(math.tan(rad))
 print("Arctangent:", arctangent, math.degrees(arctangent))
 ===
-//import math
 V rad = math:pi / 4
 V deg = 45.0
 print(‘Sine: ’sin(rad)‘ ’sin(radians(deg)))
@@ -1322,8 +1347,6 @@ for expr_str in ['!A | B', 'A ^ B', 'S | ( T ^ U )', 'A ^ (B ^ (C ^ D))']:
         print(':', p.eval())
     print()
 ===
-//import re
-
 T Symbol
    String id
    Int lbp
@@ -1370,6 +1393,7 @@ T ASTNode
          E
             assert(0B)
             R 0
+
 [String = Symbol] symbol_table
 [String] tokens
 V tokeni = -1
@@ -1434,6 +1458,7 @@ F prefix(id, bp)
       self.first_child = expression(self.symbol.nud_bp)
       R self
    symbol(id).set_nud_bp(bp, nud)
+
 infix(‘|’, 1)
 infix(‘^’, 2)
 infix(‘&’, 3)
@@ -1529,6 +1554,7 @@ public:
         }
     }
 };
+
 Dict<String, Symbol> symbol_table;
 Array<String> tokens;
 auto tokeni = -1;
@@ -1711,6 +1737,7 @@ F bits(=n)
 F concat(n)
    ‘Concatenate the binary representation of n to itself’
    R n << bits(n) [|] n
+
 V n = 1
 L concat(n) <= 1000
    print(‘#.: #.’.format(concat(n), bin(concat(n))))
@@ -1732,6 +1759,7 @@ template <typename T1> auto concat(const T1 &n)
     u"Concatenate the binary representation of n to itself"_S;
     return n << bits(n) | n;
 }
+
 auto n = 1;
 
 struct CodeBlock1
@@ -1774,6 +1802,7 @@ F two_sum(arr, num)
       E
          j--
    R [Int]()
+
 V numbers = [0, 2, 11, 19, 90]
 print(two_sum(numbers, 21))
 print(two_sum(numbers, 25))
@@ -1792,6 +1821,7 @@ template <typename T1, typename T2> auto two_sum(const T1 &arr, const T2 &num)
     }
     return Array<int>();
 }
+
 auto numbers = create_array({0, 2, 11, 19, 90});
 
 struct CodeBlock1
@@ -1854,7 +1884,6 @@ for n, p in ttest:
     print("n = %d p = %d" % (n, p))
     print("\t  roots : %d %d" % (r, p - r))
 ===
-
 F legendre(a, p)
    R pow(a, (p - 1) I/ 2, p)
 
@@ -1891,6 +1920,7 @@ F tonelli(n, p)
       t = (t * c) % p
       m = i
    R r
+
 V ttest = [(BigInt(10), BigInt(13)), (BigInt(56), BigInt(101)), (BigInt(1030), BigInt(10009)), (BigInt(44402), BigInt(100049)), (BigInt(665820697), BigInt(1000000009)), (BigInt(881398088036), BigInt(1000000000039)), (BigInt(‘41660815127637347468140745042827704103445750172002’), BigInt(10) ^ 50 + 577)]
 L(n, p) ttest
    V r = tonelli(n, p)
@@ -1943,6 +1973,7 @@ template <typename T1, typename T2> auto tonelli(const T1 &n, const T2 &p)
     }
     return r;
 }
+
 auto ttest = create_array({make_tuple(BigInt(10), BigInt(13)), make_tuple(BigInt(56), BigInt(101)), make_tuple(BigInt(1030), BigInt(10009)), make_tuple(BigInt(44402), BigInt(100049)), make_tuple(BigInt(665820697), BigInt(1000000009)), make_tuple(BigInt(881398088036), BigInt(1000000000039)), make_tuple(BigInt(u"41660815127637347468140745042827704103445750172002"_S), pow(BigInt(10), 50) + 577)});
 
 struct CodeBlock1
@@ -2016,10 +2047,10 @@ if __name__ == '__main__':
   print("\nMaximum run(s) of %i consecutive false readings ends at line starting with date(s): %s" % (
       nodata_max, ", ".join(nodata_maxline)))
 ===
-//import sys
 V nodata = 0
 V nodata_max = -1
 [String] nodata_maxline
+
 V tot_file = 0.0
 V num_file = 0
 
@@ -2027,6 +2058,7 @@ V num_file = 0
 L(line) File(:argv[1]).read().rtrim("\n").split("\n")
    V tot_line = 0.0
    V num_line = 0
+
    V field = line.split_py()
    V date = field[0]
    V data = field[(1..).step(2)].map(f -> Float(f))
@@ -2041,17 +2073,23 @@ L(line) File(:argv[1]).read().rtrim("\n").split("\n")
          I nodata_max < nodata & nodata > 0
             nodata_max = nodata
             nodata_maxline = [date]
+
          nodata = 0
+
          tot_line += datum
          num_line++
+
    tot_file += tot_line
    num_file += num_line
+
    print(‘Line: #11  Reject: #2  Accept: #2  Line_tot: #6.3  Line_avg: #6.3’.format(date, data.len - num_line, num_line, tot_line, I (num_line > 0) {tot_line / num_line} E 0))
+
 print(‘’)
 print(‘File(s)  = #.’.format(:argv[1]))
 print(‘Total    = #6.3’.format(tot_file))
 print(‘Readings = #6’.format(num_file))
 print(‘Average  = #6.3’.format(tot_file / num_file))
+
 print("\nMaximum run(s) of #. consecutive false readings ends at line starting with date(s): #.".format(nodata_max, nodata_maxline.join(‘, ’)))
 ===
 Array<String> argv;
@@ -2059,6 +2097,7 @@ Array<String> argv;
 auto nodata = 0;
 auto nodata_max = -1;
 Array<String> nodata_maxline;
+
 auto tot_file = 0.0;
 auto num_file = 0;
 
@@ -2069,6 +2108,7 @@ int MAIN_WITH_ARGV()
     for (auto &&line : File(_get<1>(::argv)).read().rtrim(u"\n"_S).split(u"\n"_S)) {
         auto tot_line = 0.0;
         auto num_line = 0;
+
         auto field = line.split_py();
         auto date = _get<0>(field);
         auto data = field[range_ei(1).step(2)].map([](const auto &f){return to_float(f);});
@@ -2083,19 +2123,25 @@ int MAIN_WITH_ARGV()
                     nodata_max = nodata;
                     nodata_maxline = create_array({date});
                 }
+
                 nodata = 0;
+
                 tot_line += datum;
                 num_line++;
             }
+
         tot_file += tot_line;
         num_file += num_line;
+
         print(u"Line: #11  Reject: #2  Accept: #2  Line_tot: #6.3  Line_avg: #6.3"_S.format(date, data.len() - num_line, num_line, tot_line, (num_line > 0) ? tot_line / num_line : 0));
     }
+
     print(u""_S);
     print(u"File(s)  = #."_S.format(_get<1>(::argv)));
     print(u"Total    = #6.3"_S.format(tot_file));
     print(u"Readings = #6"_S.format(num_file));
     print(u"Average  = #6.3"_S.format(tot_file / num_file));
+
     print(u"\nMaximum run(s) of #. consecutive false readings ends at line starting with date(s): #."_S.format(nodata_max, nodata_maxline.join(u", "_S)));
 }
 
@@ -2145,7 +2191,6 @@ print('Records with good readings: %i = %5.2f%%\n' % (
    totalLines-badreading, (totalLines-badreading)/float(totalLines)*100 ))
 print('Total records: ', totalLines)
 ===
-//import re
 V debug = 0B
 V datePat = re:(‘\d{4}-\d{2}-\d{2}’)
 V valuPat = re:(‘[-+]?\d+\.\d+’)
@@ -2162,6 +2207,7 @@ L(line) File(‘readings.txt’).read().rtrim("\n").split("\n")
    V fields = line.split("\t")
    V date = fields[0]
    V pairs = (1 .< fields.len).step(2).map(i -> (@fields[i], @fields[i + 1]))
+
    V lineFormatOk = datePat.match(date) & all(pairs.map(p -> :valuPat.match(p[0]))) & all(pairs.map(p -> :statPat.match(p[1])))
    I !lineFormatOk
       I debug
@@ -2180,7 +2226,9 @@ L(line) File(‘readings.txt’).read().rtrim("\n").split("\n")
       I debug
          print(‘Duplicate datestamp ’line)
       dupdate.add(date)
+
    datestamps.add(date)
+
 print("Duplicate dates:\n  "sorted(Array(dupdate)).join("\n  "))
 print("Bad format:\n  "sorted(Array(badform)).join("\n  "))
 print("Bad number of fields:\n  "sorted(Array(badlen)).join("\n  "))
@@ -2202,12 +2250,12 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&line : File(u"readings.txt"_S).read().rtrim(u"\n"_S).split(u"\n"_S)) {
             totalLines++;
             auto fields = line.split(u"\t"_S);
             auto date = _get<0>(fields);
             auto pairs = range_el(1, fields.len()).step(2).map([&fields](const auto &i){return make_tuple(fields[i], fields[i + 1]);});
+
             auto lineFormatOk = datePat.match(date) && all_map(pairs, [](const auto &p){return ::valuPat.match(_get<0>(p));}) && all_map(pairs, [](const auto &p){return ::statPat.match(_get<1>(p));});
             if (!lineFormatOk) {
                 if (debug)
@@ -2229,8 +2277,10 @@ struct CodeBlock1
                     print(u"Duplicate datestamp "_S & line);
                 dupdate.add(date);
             }
+
             datestamps.add(date);
         }
+
         print(u"Duplicate dates:\n  "_S & sorted(create_array(dupdate)).join(u"\n  "_S));
         print(u"Bad format:\n  "_S & sorted(create_array(badform)).join(u"\n  "_S));
         print(u"Bad number of fields:\n  "_S & sorted(create_array(badlen)).join(u"\n  "_S));
@@ -2315,7 +2365,6 @@ if len(tops) > 1:
           % ' and '.join(str(s) for s in sorted(list(tops))) )
     printorder(topx(data, tops))
 ===
-
 F _topx(data, tops, &_sofar) -> [[String]]
    ‘Recursive topological extractor’
    _sofar [+]= copy(tops)
@@ -2350,6 +2399,7 @@ F topx(&data, tops)
    ‘Extract the set of top-level(s) in topological order’
    L(k, v) data
       v.discard(k)
+
    [Set[String]] _sofar
    R _topx(data, tops, &_sofar)
 
@@ -2359,7 +2409,9 @@ F printorder(order)
       print(‘First: ’order[0].map(s -> String(s)).join(‘, ’))
    L(o) order[1..]
       print(‘ Then: ’o.map(s -> String(s)).join(‘, ’))
+
 V data = [‘top1’ = Set([‘ip1’, ‘des1’, ‘ip2’]), ‘top2’ = Set([‘ip2’, ‘des1’, ‘ip3’]), ‘des1’ = Set([‘des1a’, ‘des1b’, ‘des1c’]), ‘des1a’ = Set([‘des1a1’, ‘des1a2’]), ‘des1c’ = Set([‘des1c1’, ‘extra1’]), ‘ip2’ = Set([‘ip2a’, ‘ip2b’, ‘ip2c’, ‘ipcommon’]), ‘ip1’ = Set([‘ip1a’, ‘ipcommon’, ‘extra1’])]
+
 V tops = toplevels(&data)
 print(‘The top levels of the dependency graph are: ’Array(tops).join(‘ ’))
 
@@ -2409,6 +2461,7 @@ template <typename T1, typename T2> auto topx(T1 &data, const T2 &tops)
     u"Extract the set of top-level(s) in topological order"_S;
     for (auto &&[k, v] : data)
         v.discard(k);
+
     Array<Set<String>> _sofar;
     return _topx(data, tops, _sofar);
 }
@@ -2421,7 +2474,9 @@ template <typename T1> auto printorder(const T1 &order)
     for (auto &&o : order[range_ei(1)])
         print(u" Then: "_S & o.map([](const auto &s){return String(s);}).join(u", "_S));
 }
+
 auto data = create_dict(dict_of(u"top1"_S, create_set({u"ip1"_S, u"des1"_S, u"ip2"_S}))(u"top2"_S, create_set({u"ip2"_S, u"des1"_S, u"ip3"_S}))(u"des1"_S, create_set({u"des1a"_S, u"des1b"_S, u"des1c"_S}))(u"des1a"_S, create_set({u"des1a1"_S, u"des1a2"_S}))(u"des1c"_S, create_set({u"des1c1"_S, u"extra1"_S}))(u"ip2"_S, create_set({u"ip2a"_S, u"ip2b"_S, u"ip2c"_S, u"ipcommon"_S}))(u"ip1"_S, create_set({u"ip1a"_S, u"ipcommon"_S, u"extra1"_S})));
+
 auto tops = toplevels(data);
 
 struct CodeBlock1
@@ -2515,6 +2570,7 @@ UInt32 seed = 0
 F nonrandom(n)
    :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
    R Int(:seed >> 16) % n
+
 V cylinder = [0B] * 6
 
 F rshift()
@@ -2566,6 +2622,7 @@ F mstring(s)
          ‘F’
             l [+]= ‘fire’
    R l.join(‘, ’)
+
 V tests = 100000
 L(m) [‘LSLSFSF’, ‘LSLSFF’, ‘LLSFSF’, ‘LLSFF’]
    V sum = 0
@@ -2580,6 +2637,7 @@ template <typename T1> auto nonrandom(const T1 &n)
     ::seed = (1664525 * ::seed + 1013904223) & 0xFFFF'FFFF;
     return mod(to_int(::seed >> 16), n);
 }
+
 auto cylinder = create_array({false}) * 6;
 
 auto rshift()
@@ -2655,6 +2713,7 @@ template <typename T1> auto mstring(const T1 &s)
         }
     return l.join(u", "_S);
 }
+
 auto tests = 100000;
 
 struct CodeBlock1

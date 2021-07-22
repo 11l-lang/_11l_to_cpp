@@ -205,6 +205,7 @@ auto hardertest()
     auto inputfile = File(u"testdata/BentCoinFile"_S, u"r"_S);
     auto outputfile = File(u"tmp.zip"_S, u"w"_S);
     print(u"Compressing to tmp.zip"_S);
+
     auto s = inputfile.read();
     auto n = s.len();
     auto zip = encode(s, 10, 1);
@@ -212,6 +213,7 @@ auto hardertest()
     outputfile.close();
     inputfile.close();
     print(u"DONE compressing"_S);
+
     inputfile = File(u"tmp.zip"_S, u"r"_S);
     outputfile = File(u"tmp2"_S, u"w"_S);
     print(u"Uncompressing to tmp2"_S);
@@ -220,6 +222,7 @@ auto hardertest()
     outputfile.close();
     inputfile.close();
     print(u"DONE uncompressing"_S);
+
     print(u"Checking for differences..."_S);
     print(s == unc);
 }

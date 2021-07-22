@@ -1,4 +1,3 @@
-//import os
 V BETA0 = 1
 V BETA1 = 1
 V M = 30
@@ -173,6 +172,7 @@ F hardertest()
    V inputfile = File(‘testdata/BentCoinFile’, ‘r’)
    V outputfile = File(‘tmp.zip’, ‘w’)
    print(‘Compressing to tmp.zip’)
+
    V s = inputfile.read()
    V n = s.len
    V zip = encode(s, 10, 1)
@@ -180,6 +180,7 @@ F hardertest()
    outputfile.close()
    inputfile.close()
    print(‘DONE compressing’)
+
    inputfile = File(‘tmp.zip’, ‘r’)
    outputfile = File(‘tmp2’, ‘w’)
    print(‘Uncompressing to tmp2’)
@@ -188,6 +189,7 @@ F hardertest()
    outputfile.close()
    inputfile.close()
    print(‘DONE uncompressing’)
+
    print(‘Checking for differences...’)
    print(s == unc)
 

@@ -1,5 +1,3 @@
-//import math
-
 F sigmoid(x)
    R Float(1) / (1 + exp(-x))
 
@@ -47,12 +45,14 @@ T rectBoard
          I Set(col).len == 1
             I col[0] != 0
                victors.append(col[0])
+
       [Int] ld
       L(i) 0 .< .edge
          ld.append(.__board[i][i])
       I Set(ld).len == 1
          I ld[0] != 0
             victors.append(ld[0])
+
       [Int] rd
       L(i) 0 .< .edge
          rd.append(.__board[i][.edge - (1 + i)])
@@ -107,18 +107,21 @@ T rectBoard
       L(coln) 0 .< .edge
          V col = .__board.map(row -> row[@coln])
          .doRow(col, (0 .< .edge).map(i -> (i, @coln)), player, &scores)
+
       V indices = (0 .< .edge).map(i -> (i, i))
       V ld = (0 .< .edge).map(i -> @.__board[i][i])
       .doRow(ld, indices, player, &scores)
 
       L(rown, coln) indices
          scores[rown][coln]++
+
       indices = (0 .< .edge).map(i -> (i, (@.edge - 1) - i))
       V rd = (0 .< .edge).map(i -> @.__board[i][(@.edge - 1) - i])
       .doRow(rd, indices, player, &scores)
 
       L(rown, coln) indices
          scores[rown][coln]++
+
       [(Float, (Int, Int))] scorelist
       L(rown) 0 .< .edge
          L(coln) 0 .< .edge
@@ -126,7 +129,9 @@ T rectBoard
                scorelist.append((scores[rown][coln], (rown, coln)))
       scorelist.sort()
       scorelist.reverse()
+
       scorelist = scorelist.filter(x -> x[0] == @scorelist[0][0])
+
       R (scorelist[0][1][0], scorelist[0][1][1])
 
 F aigame(size = 10, =turn = 1, players = 2)

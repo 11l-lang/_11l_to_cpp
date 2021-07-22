@@ -44,9 +44,6 @@ print("Symbol\tWeight\tHuffman Code")
 for p in huff:
     print("%s\t%s\t%s" % (p[0], symb2freq[p[0]], p[1]))
 ===
-//import heapq
-//import collections
-
 T Element
    Int weight
    [(Char, String)] symbols
@@ -59,6 +56,7 @@ T Element
 
 F encode(symb2freq)
    ‘Huffman encode the given dict mapping symbols to weights’
+
    V heap = symb2freq.map((sym, wt) -> Element(wt, [(sym, ‘’)]))
    minheap:heapify(&heap)
    L heap.len > 1
@@ -70,12 +68,16 @@ F encode(symb2freq)
 
       L(i) 0 .< hi.symbols.len
          hi.symbols[i] = (hi.symbols[i][0], ‘1’hi.symbols[i][1])
+
       minheap:push(&heap, Element(lo.weight + hi.weight, lo.symbols + hi.symbols))
+
    R sorted(minheap:pop(&heap).symbols, key' p -> (p[1].len, p))
+
 V txt = ‘this is an example for huffman encoding’
 V symb2freq = DefaultDict[Char, Int]()
 L(ch) txt
    symb2freq[ch]++
+
 V huff = encode(symb2freq)
 print("Symbol\tWeight\tHuffman Code")
 L(p) huff
@@ -101,6 +103,7 @@ public:
 template <typename T1> auto encode(const T1 &symb2freq)
 {
     u"Huffman encode the given dict mapping symbols to weights"_S;
+
     auto heap = symb2freq.map([](const auto &sym, const auto &wt){return Element(wt, create_array({make_tuple(sym, u""_S)}));});
     minheap::heapify(heap);
     while (heap.len() > 1) {
@@ -110,10 +113,13 @@ template <typename T1> auto encode(const T1 &symb2freq)
             lo.symbols.set(i, make_tuple(_get<0>(lo.symbols[i]), u"0"_S & _get<1>(lo.symbols[i])));
         for (auto i : range_el(0, hi.symbols.len()))
             hi.symbols.set(i, make_tuple(_get<0>(hi.symbols[i]), u"1"_S & _get<1>(hi.symbols[i])));
+
         minheap::push(heap, Element(lo.weight + hi.weight, lo.symbols + hi.symbols));
     }
+
     return sorted(minheap::pop(heap).symbols, [](const auto &p){return make_tuple(_get<1>(p).len(), p);});
 }
+
 auto txt = u"this is an example for huffman encoding"_S;
 auto symb2freq = DefaultDict<Char, int>();
 
@@ -125,6 +131,7 @@ struct CodeBlock1
             symb2freq[ch]++;
     }
 } code_block_1;
+
 auto huff = encode(symb2freq);
 
 struct CodeBlock2

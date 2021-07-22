@@ -13,7 +13,9 @@ span.numeric-literal {color: #008000;}
 span.constant {color: #008000;}
 span.comment {color: #808080;}
 </style>)"_S;
+
 auto cat_to_class_python = create_dict(dict_of(python_to_11l::tokenizer::Token::Category::NAME, u"identifier"_S)(python_to_11l::tokenizer::Token::Category::KEYWORD, u"keyword"_S)(python_to_11l::tokenizer::Token::Category::CONSTANT, u"constant"_S)(python_to_11l::tokenizer::Token::Category::OPERATOR_OR_DELIMITER, u""_S)(python_to_11l::tokenizer::Token::Category::NUMERIC_LITERAL, u"numeric-literal"_S)(python_to_11l::tokenizer::Token::Category::STRING_LITERAL, u"string-literal"_S)(python_to_11l::tokenizer::Token::Category::INDENT, u""_S)(python_to_11l::tokenizer::Token::Category::DEDENT, u""_S)(python_to_11l::tokenizer::Token::Category::STATEMENT_SEPARATOR, u""_S));
+
 auto cat_to_class_11l = create_dict(dict_of(_11l_to_cpp::tokenizer::Token::Category::NAME, u"identifier"_S)(_11l_to_cpp::tokenizer::Token::Category::KEYWORD, u"keyword"_S)(_11l_to_cpp::tokenizer::Token::Category::CONSTANT, u"constant"_S)(_11l_to_cpp::tokenizer::Token::Category::DELIMITER, u""_S)(_11l_to_cpp::tokenizer::Token::Category::OPERATOR, u""_S)(_11l_to_cpp::tokenizer::Token::Category::NUMERIC_LITERAL, u"numeric-literal"_S)(_11l_to_cpp::tokenizer::Token::Category::STRING_LITERAL, u"string-literal"_S)(_11l_to_cpp::tokenizer::Token::Category::STRING_CONCATENATOR, u""_S)(_11l_to_cpp::tokenizer::Token::Category::SCOPE_BEGIN, u""_S)(_11l_to_cpp::tokenizer::Token::Category::SCOPE_END, u""_S)(_11l_to_cpp::tokenizer::Token::Category::STATEMENT_SEPARATOR, u""_S));
 
 template <typename T1> auto is_lang_supported(const T1 &lang)
@@ -82,6 +84,7 @@ template <typename T1, typename T2> auto highlight(const T1 &lang, const T2 &sou
                 }
                 res &= html_escape(source[range_el(writepos, token.start)]);
                 writepos = token.end;
+
                 auto tokstr = html_escape(token.value(source));
                 String css_class;
                 if ((token.category == TYPE_RM_REF(token.category)::NAME && in(tokstr, make_tuple(u"V"_S, u"П"_S, u"var"_S, u"перем"_S))) || (token.category == TYPE_RM_REF(token.category)::OPERATOR && in(tokstr, make_tuple(u"C"_S, u"С"_S, u"in"_S, u"!C"_S, u"!С"_S, u"!in"_S))) || in(_get<0>(tokstr.split(u"."_S)), _11l_to_cpp::tokenizer::keywords))
@@ -118,5 +121,6 @@ template <typename T1, typename T2> auto highlight(const T1 &lang, const T2 &sou
             throw Error(e.message, e.pos);
         }
     }
+
     return res;
 }

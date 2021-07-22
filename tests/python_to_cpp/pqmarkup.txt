@@ -937,9 +937,6 @@ div#main {width: 100%;}
 </body>
 </html>''')
 ===
-//import sys
-//import syntax_highlighter_for_pqmarkup
-
 T Exception
    String message
    Int line
@@ -959,11 +956,13 @@ T Converter
    String instr
 
    F (habr_html, ohd)
+
       .habr_html = habr_html
       .ohd = ohd
 
    F to_html(String instr, File? outfilef = N; ', outer_pos = 0) -> String
       .to_html_called_inside_to_html_outer_pos_list.append(outer_pos)
+
       [String] result
       T Writer
          (String -> N) write
@@ -987,6 +986,7 @@ T Converter
                line_start = t
             t++
          X Exception(message, line, pos - line_start, pos)
+
       V i = 0
       F next_char(offset = 1)
          R I @i + offset < @instr.len {@instr[@i + offset]} E Char("\0")
@@ -1004,6 +1004,7 @@ T Converter
          R str
       F html_escapeq(str)
          R str.replace(‘&’, ‘&amp;’).replace(‘"’, ‘&quot;’)
+
       V writepos = 0
       F write_to_pos(pos, npos)
          @outfile.write(@html_escape(@instr[@writepos .< pos]))
@@ -1052,10 +1053,12 @@ T Converter
             start += k - j
             s = s[0 .< j]‘’s[k ..]
          R s
+
       [Int = String] nonunique_links
       V link = ‘’
 
       F write_http_link(startpos, Int endpos; q_offset = 1, =text = ‘’)
+
          V nesting_level = 0
          @i += 2
          L
@@ -1071,6 +1074,7 @@ T Converter
                ‘ ’
                   L.break
             @i++
+
          @link = @html_escapeq(@instr[endpos + 1 + q_offset .< @i])
          String tag = ‘<a href="’@link‘"’
          I @link.starts_with(‘./’)
@@ -1112,6 +1116,7 @@ T Converter
          @write_to_pos(startpos, endqpos2 + 2)
          @outfile.write(‘<abbr title="’@html_escapeq(@remove_comments(@instr[@i + 2 .< endqpos2], @i + 2))‘">’@html_escape(@remove_comments(@instr[startpos + q_offset .< endpos], startpos + q_offset))‘</abbr>’)
          @i = endqpos2 + 1
+
       V endi = 0
       F numbered_link(offset = 1)
          I @next_char(offset) == ‘-’ & @next_char(offset + 1).is_digit()
@@ -1128,16 +1133,19 @@ T Converter
                   L.break
                j++
          R 0B
+
       V ordered_list_current_number = -1
       F close_ordered_list()
          I @ordered_list_current_number != -1
             @write_to_i("</li>\n</ol>\n", 0)
             @ordered_list_current_number = -1
+
       V in_unordered_list = 0B
       F close_unordered_list()
          I @in_unordered_list
             @write_to_i("</li>\n</ul>\n", 0)
             @in_unordered_list = 0B
+
       [String] ending_tags
       V new_line_tag = "\0"
 
@@ -1260,12 +1268,14 @@ T Converter
                         I instr[i .< i + 2] != ":‘"
                            exit_with_error(‘Quotation with author's name should be in the form >‘Author's name’:‘Quoted text.’’, i)
                         writepos = i + 2
+
                   ending_tags.append(‘</blockquote>’)
                i++
 
          I ch == "‘"
             V prevci = i - 1
             V prevc = I prevci >= 0 {instr[prevci]} E Char("\0")
+
             V startqpos = i
             i = find_ending_pair_quote(i)
             V endqpos = i
@@ -1393,6 +1403,7 @@ T Converter
                      V endrow = find_ending_pair_quote(j)
                      V hor_col_align = ‘’
                      V ver_col_align = ‘’
+
                      j++
                      L j < endrow
                         ch = instr[j]
@@ -1428,6 +1439,7 @@ T Converter
                         E I ch !C "  \t\n"
                            exit_with_error(‘Unknown formatting character inside table row’, j)
                         j++
+
                      header_row = 0B
                      hor_row_align = ‘’
                      ver_row_align = ‘’
@@ -1443,6 +1455,7 @@ T Converter
                      j = find_ending_sq_bracket(instr, j)
                   E I ch !C "  \t\n"
                      exit_with_error(‘Unknown formatting character inside table’, j)
+
                   j++
 
                L(y) (table.len - 1 .< -1).step(-1)
@@ -1465,6 +1478,7 @@ T Converter
                            L(yyy) yy .. y
                               I (xxx, yyy) != (xx, yy)
                                  table[yyy][xxx].attrs = ‘’
+
                V is_inline = 1B
                I (prevci == 0 | instr[prevci - 1] == "\n" | (prevci - 3 >= 0 & instr[prevci - 3 .< prevci] == ‘]]]’ & instr[0.<3] == ‘[[[’ & find_ending_sq_bracket(instr, 0) == prevci - 1))
                   is_inline = 0B
@@ -1617,9 +1631,12 @@ T Converter
          E I ch == "\n"
             write_to_i((I new_line_tag != "\0" {new_line_tag} E ‘<br />’)‘’(I new_line_tag != ‘’ {"\n"} E ‘’))
             new_line_tag = "\0"
+
          i++
+
       close_ordered_list()
       close_unordered_list()
+
       write_to_pos(instr.len, 0)
       assert(ending_tags.empty)
       assert(.to_html_called_inside_to_html_outer_pos_list.pop() == outer_pos)
@@ -1629,6 +1646,7 @@ T Converter
          I .habr_html
             r = r.replace("</blockquote>\n", ‘</blockquote>’)
          R r
+
       R ‘’
 
 F to_html(instr, File? outfilef = N; ohd = 0B, ', habr_html = 0B)
@@ -1653,6 +1671,7 @@ Options:
   -f [OUTPUT_FILE], --file [OUTPUT_FILE]
                         write output to OUTPUT_FILE (defaults to STDOUT)’)
    exit(0)
+
 V args_habr_html = ‘--habr-html’ C :argv
 V args_output_html_document = ‘--output-html-document’ C :argv
 V args_infile = :stdin
@@ -1682,6 +1701,7 @@ X.catch
 
 I args_output_html_document & args_habr_html
    exit(‘Options --output-html-document and --habr-html are mutually exclusive’)
+
 String infile_str
 X.try
    infile_str = args_infile.read()
@@ -1856,6 +1876,7 @@ public:
     template <typename T3 = decltype(0)> String to_html(const String &instr, File* const outfilef = nullptr, const T3 &outer_pos = 0)
     {
         to_html_called_inside_to_html_outer_pos_list.append(outer_pos);
+
         Array<String> result;
         class Writer
         {
@@ -1885,6 +1906,7 @@ public:
             }
             throw Exception(message, line, pos - line_start, pos);
         };
+
         auto i = 0;
         auto next_char = [&i, &instr](const decltype(1) offset = 1)
         {
@@ -1912,6 +1934,7 @@ public:
         {
             return str.replace(u"&"_S, u"&amp;"_S).replace(u"\""_S, u"&quot;"_S);
         };
+
         auto writepos = 0;
         auto write_to_pos = [&html_escape, &instr, &outfile, &writepos](const auto &pos, const auto &npos)
         {
@@ -1981,6 +2004,7 @@ public:
             }
             return s;
         };
+
         Dict<int, String> nonunique_links;
         auto link = u""_S;
 
@@ -2008,6 +2032,7 @@ public:
                 i++;
             }
             break_:;
+
             link = html_escapeq(instr[range_el(endpos + 1 + q_offset, i)]);
             String tag = u"<a href=\""_S & link & u"\""_S;
             if (link.starts_with(u"./"_S))
@@ -2059,6 +2084,7 @@ public:
             outfile.write(u"<abbr title=\""_S & html_escapeq(remove_comments(instr[range_el(i + 2, endqpos2)], i + 2)) & u"\">"_S & html_escape(remove_comments(instr[range_el(startpos + q_offset, endpos)], startpos + q_offset)) & u"</abbr>"_S);
             i = endqpos2 + 1;
         };
+
         auto endi = 0;
         auto numbered_link = [&endi, &exit_with_error, &i, &instr, &link, &next_char, &nonunique_links](const decltype(1) offset = 1)
         {
@@ -2084,6 +2110,7 @@ public:
             }
             return false;
         };
+
         auto ordered_list_current_number = -1;
         auto close_ordered_list = [&ordered_list_current_number, &write_to_i]()
         {
@@ -2092,6 +2119,7 @@ public:
                 ordered_list_current_number = -1;
             }
         };
+
         auto in_unordered_list = false;
         auto close_unordered_list = [&in_unordered_list, &write_to_i]()
         {
@@ -2100,6 +2128,7 @@ public:
                 in_unordered_list = false;
             }
         };
+
         Array<String> ending_tags;
         auto new_line_tag = u"\0"_S;
 
@@ -2241,6 +2270,7 @@ public:
                                 writepos = i + 2;
                             }
                         }
+
                         ending_tags.append(u"</blockquote>"_S);
                     }
                     i++;
@@ -2250,6 +2280,7 @@ public:
             if (ch == u'‘') {
                 auto prevci = i - 1;
                 auto prevc = prevci >= 0 ? instr[prevci] : u'\0'_C;
+
                 auto startqpos = i;
                 i = find_ending_pair_quote(i);
                 auto endqpos = i;
@@ -2413,6 +2444,7 @@ public:
                             auto endrow = find_ending_pair_quote(j);
                             auto hor_col_align = u""_S;
                             auto ver_col_align = u""_S;
+
                             j++;
                             while (j < endrow) {
                                 ch = instr[j];
@@ -2455,6 +2487,7 @@ public:
                                     exit_with_error(u"Unknown formatting character inside table row"_S, j);
                                 j++;
                             }
+
                             header_row = false;
                             hor_row_align = u""_S;
                             ver_row_align = u""_S;
@@ -2473,6 +2506,7 @@ public:
                             j = find_ending_sq_bracket(instr, j);
                         else if (!in(ch, u"  \t\n"_S))
                             exit_with_error(u"Unknown formatting character inside table"_S, j);
+
                         j++;
                     }
                     for (auto y : range_el(table.len() - 1, -1).step(-1))
@@ -2496,6 +2530,7 @@ public:
                                         if (make_tuple(xxx, yyy) != make_tuple(xx, yy))
                                             table[yyy][xxx].attrs = u""_S;
                             }
+
                     auto is_inline = true;
                     if ((prevci == 0 || instr[prevci - 1] == u'\n' || (prevci - 3 >= 0 && instr[range_el(prevci - 3, prevci)] == u"]]]" && instr[range_el(0, 3)] == u"[[[" && find_ending_sq_bracket(instr, 0) == prevci - 1)))
                         is_inline = false;
@@ -2684,10 +2719,13 @@ public:
                 write_to_i((new_line_tag != u'\0' ? new_line_tag : u"<br />"_S) & (new_line_tag != u"" ? u"\n"_S : u""_S));
                 new_line_tag = u"\0"_S;
             }
+
             i++;
         }
+
         close_ordered_list();
         close_unordered_list();
+
         write_to_pos(instr.len(), 0);
         assert(ending_tags.empty());
         assert(to_html_called_inside_to_html_outer_pos_list.pop() == outer_pos);
@@ -2698,6 +2736,7 @@ public:
                 r = r.replace(u"</blockquote>\n"_S, u"</blockquote>"_S);
             return r;
         }
+
         return u""_S;
     }
 };
@@ -2730,6 +2769,7 @@ Options:
                         write output to OUTPUT_FILE (defaults to STDOUT))"_S);
         exit(0);
     }
+
     auto args_habr_html = in(u"--habr-html"_S, ::argv);
     auto args_output_html_document = in(u"--output-html-document"_S, ::argv);
     auto args_infile = _stdin;
@@ -2771,6 +2811,7 @@ Options:
     }
     if (args_output_html_document && args_habr_html)
         exit(u"Options --output-html-document and --habr-html are mutually exclusive"_S);
+
     String infile_str;
     try
     {

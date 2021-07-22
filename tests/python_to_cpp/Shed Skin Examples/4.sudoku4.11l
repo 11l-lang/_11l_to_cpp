@@ -1,6 +1,6 @@
-
 F cross(aa, bb)
    R multiloop(aa, bb, (a, b) -> a‘’b)
+
 V rows = ‘ABCDEFGHI’
 V cols = ‘123456789’
 V digits = ‘123456789’
@@ -22,6 +22,7 @@ F search(values) -> [String = String]
       R Dict()
    I all(:squares.map(s -> @values[s].len == 1))
       R values
+
    V s = min(:squares.filter(s -> @values[s].len > 1).map(s -> (@values[s].len, s)))[1]
    L(d) values[s]
       V values_copy = values.copy()

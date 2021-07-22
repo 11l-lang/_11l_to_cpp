@@ -45,6 +45,7 @@ template <typename T1> auto sum_proper_divisors(const T1 &n)
 {
     return n < 2 ? 0 : sum(range_ee(1, idiv(n, 2)).filter([&n](const auto &it){return (mod(n, it)) == 0;}));
 }
+
 auto deficient = 0;
 auto perfect = 0;
 auto abundant = 0;
@@ -53,7 +54,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto n : range_ee(1, 20000)) {
             auto sp = sum_proper_divisors(n);
             if (sp < n)
@@ -63,6 +63,7 @@ struct CodeBlock1
             else if (sp > n)
                 abundant++;
         }
+
         print(u"Deficient = "_S & deficient);
         print(u"Perfect   = "_S & perfect);
         print(u"Abundant  = "_S & abundant);
@@ -111,13 +112,17 @@ template <typename T1, typename T2, typename T3 = decltype(u""_S)> Array<String>
             continue;
         if (options.len() == 1)
             return create_array({opt});
+
         auto res = amb(comp, options[range_ei(1)], opt);
         if (!res.empty())
             return opt + res;
     }
+
     return Array<String>();
 }
+
 auto sets = create_array({create_array({u"the"_S, u"that"_S, u"a"_S}), create_array({u"frog"_S, u"elephant"_S, u"thing"_S}), create_array({u"walked"_S, u"treaded"_S, u"grows"_S}), create_array({u"slowly"_S, u"quickly"_S})});
+
 auto result = amb([](const auto &s, const auto &t){return s.last() == _get<0>(t);}, sets);
 
 struct CodeBlock1
@@ -147,7 +152,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto n : range_ee(1, 20000)) {
             auto m = sum_proper_divisors(n);
             if (m > n && sum_proper_divisors(m) == n)
@@ -214,6 +218,7 @@ template <typename T1> auto hmean(const T1 &num)
 {
     return num.len() / sum_map(num, [](const auto &n){return 1.0 / n;});
 }
+
 auto numbers = create_array({1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
 
 struct CodeBlock1
@@ -302,6 +307,7 @@ template <typename T1, typename T2, typename T3 = decltype(false)> auto caesar(c
 {
     if (decode)
         key = 26 - key;
+
     auto r = u" "_S * string.len();
     {int Lindex = 0;
     for (auto &&c : string) {
@@ -310,6 +316,7 @@ template <typename T1, typename T2, typename T3 = decltype(false)> auto caesar(c
     }}
     return r;
 }
+
 auto msg = u"The quick brown fox jumped over the lazy dogs"_S;
 
 struct CodeBlock1
@@ -391,7 +398,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto p : range_el(2, 62)) {
             if (!is_prime(p))
                 continue;
@@ -433,6 +439,7 @@ template <typename T1, typename T2> auto comb(const T1 &arr, const T2 &k)
 {
     if (k == 0)
         return create_array({Array<int>()});
+
     Array<Array<int>> result;
     {int Lindex = 0;
     for (auto &&x : arr) {
@@ -441,6 +448,7 @@ template <typename T1, typename T2> auto comb(const T1 &arr, const T2 &k)
             result.append(x + suffix);
         Lindex++;
     }}
+
     return result;
 }
 
@@ -591,6 +599,7 @@ struct CodeBlock1
             print(u"\nGeneration "_S & i & u":"_S);
             for (auto row : range_el(0, cellcounty))
                 print(u"  "_S & range_el(0, cellcountx).map([&row](const auto &col){return create_array({u". "_S, u"O "_S})[::universe[make_tuple(row, col)]];}).join(u""_S));
+
             DefaultDict<ivec2, int> nextgeneration;
             for (auto row : range_el(0, cellcounty))
                 for (auto col : range_el(0, cellcountx))
@@ -665,7 +674,6 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-
         for (int i = 0; i < 4; i++) {
             print(u"\nGeneration "_S & i & u":"_S);
             for (auto row : range_el(0, cellcounty)) {
@@ -923,6 +931,7 @@ struct CodeBlock1
         print(u"<table>\n<tr><td>"_S, u""_S);
         for (auto &&c : input_csv)
             print([&](const auto &a){return a == u'\n' ? u"</td></tr>\n<tr><td>"_S : a == u',' ? u"</td><td>"_S : a == u'<' ? u"&lt;"_S : a == u'>' ? u"&gt;"_S : a == u'&' ? u"&amp;"_S : c;}(c), u""_S);
+
         print(u"</td></tr>\n</table>"_S);
     }
 } code_block_1;
@@ -987,9 +996,11 @@ template <typename T1, typename T2> auto brent(const T1 &f, const T2 &x0)
         power *= 2;
     }
     break_:;
+
     hare = x0;
     for (auto __unused : range_ee(1, cycle_length))
         hare = f(hare);
+
     auto cycle_start = 0;
     auto tortoise = x0;
     while (tortoise != hare) {
@@ -997,6 +1008,7 @@ template <typename T1, typename T2> auto brent(const T1 &f, const T2 &x0)
         hare = f(hare);
         cycle_start++;
     }
+
     print_result(x0, f, cycle_length, cycle_start);
 }
 
@@ -1102,6 +1114,7 @@ template <typename T1, typename T2> auto deconv(const T1 &g, const T2 &f)
     }}
     return result;
 }
+
 auto h = create_array({-8, -9, -3, -1, -6, 7});
 auto f = create_array({-3, -6, -1, 8, -6, 3, -1, -9, -9, 3, -2, 5, 2, -2, -7, -1});
 auto g = create_array({24, 75, 71, -34, 3, 22, -45, 23, 245, 25, 52, 25, -67, -96, 96, 31, 55, 36, 29, -43, -7});
@@ -1185,10 +1198,13 @@ template <typename T1, typename T2, typename T3, typename T4> auto beating_proba
     auto len1 = (n_sides1 + 1) * n_dice1;
     auto C1 = create_array({0}) * len1;
     throw_die(n_sides1, n_dice1, 0, C1);
+
     auto len2 = (n_sides2 + 1) * n_dice2;
     auto C2 = create_array({0}) * len2;
     throw_die(n_sides2, n_dice2, 0, C2);
+
     double p12 = (pow(n_sides1, n_dice1)) * (pow(n_sides2, n_dice2));
+
     auto tot = 0.0;
     for (auto i : range_el(0, len1))
         for (auto j : range_el(0, min(i, len2)))
@@ -1514,6 +1530,7 @@ template <typename T1, typename T2> auto gauss_eliminate(T1 &a, T2 &b)
             if (tmp > max)
                 assign_from_tuple(max_row, max, make_tuple(row, tmp));
         }
+
         swap_row(a, b, dia, max_row);
 
         for (auto row : range_el(dia + 1, a.len())) {
@@ -1524,6 +1541,7 @@ template <typename T1, typename T2> auto gauss_eliminate(T1 &a, T2 &b)
             b[row] -= tmp * b[dia];
         }
     }
+
     auto r = create_array({0.0}) * a.len();
     for (auto row : range_ee(a.len() - 1, 0).step(-1)) {
         auto tmp = b[row];
@@ -1533,6 +1551,7 @@ template <typename T1, typename T2> auto gauss_eliminate(T1 &a, T2 &b)
     }
     return r;
 }
+
 auto a = create_array({create_array({1.00, 0.00, 0.00, 0.00, 0.00, 0.00}), create_array({1.00, 0.63, 0.39, 0.25, 0.16, 0.10}), create_array({1.00, 1.26, 1.58, 1.98, 2.49, 3.13}), create_array({1.00, 1.88, 3.55, 6.70, 12.62, 23.80}), create_array({1.00, 2.51, 6.32, 15.88, 39.90, 100.28}), create_array({1.00, 3.14, 9.87, 31.01, 97.41, 306.02})});
 auto b = create_array({-0.01, 0.61, 0.91, 0.99, 0.60, 0.02});
 
@@ -1655,6 +1674,7 @@ template <typename T1> auto kahansum(const T1 &input)
     }
     return summ;
 }
+
 auto eps = 1.0f;
 
 struct CodeBlock1
@@ -1663,6 +1683,7 @@ struct CodeBlock1
     {
         while (1.0f + eps != 1.0f)
             eps = eps / 2.0f;
+
         print(u"Epsilon     = "_S & eps);
         print(u"(a + b) + c = #.7"_S.format((1.0f + eps) - eps));
         print(u"Kahan sum   = #.7"_S.format(kahansum(create_array({1.0f, eps, -eps}))));
@@ -1740,6 +1761,7 @@ template <typename T1> auto totalvalue(const T1 &comb)
     }
     return totwt <= 400 ? make_tuple(totval, -totwt) : make_tuple(0, 0);
 }
+
 auto items = create_array({make_tuple(u"map"_S, 9, 150), make_tuple(u"compass"_S, 13, 35), make_tuple(u"water"_S, 153, 200), make_tuple(u"sandwich"_S, 50, 160), make_tuple(u"glucose"_S, 15, 60), make_tuple(u"tin"_S, 68, 45), make_tuple(u"banana"_S, 27, 60), make_tuple(u"apple"_S, 39, 40), make_tuple(u"cheese"_S, 23, 30), make_tuple(u"beer"_S, 52, 10), make_tuple(u"suntan cream"_S, 11, 70), make_tuple(u"camera"_S, 32, 30), make_tuple(u"t-shirt"_S, 24, 15), make_tuple(u"trousers"_S, 48, 10), make_tuple(u"umbrella"_S, 73, 40), make_tuple(u"waterproof trousers"_S, 42, 70), make_tuple(u"waterproof overclothes"_S, 43, 75), make_tuple(u"note-case"_S, 22, 80), make_tuple(u"sunglasses"_S, 7, 20), make_tuple(u"towel"_S, 18, 12), make_tuple(u"socks"_S, 4, 50), make_tuple(u"book"_S, 30, 10)});
 
 template <typename T1, typename T2> auto knapsack01_dp(const T1 &items, const T2 &limit)
@@ -1754,6 +1776,7 @@ template <typename T1, typename T2> auto knapsack01_dp(const T1 &items, const T2
             else
                 table[j].set(w, max(table[j - 1][w], table[j - 1][w - wt] + val));
     }
+
     Array<Tuple<String, int, int>> result;
     auto w = limit;
     for (auto j : range_el(items.len(), 0).step(-1))
@@ -1764,6 +1787,7 @@ template <typename T1, typename T2> auto knapsack01_dp(const T1 &items, const T2
         }
     return result;
 }
+
 auto bagged = knapsack01_dp(items, 400);
 
 struct CodeBlock1
@@ -1801,6 +1825,7 @@ template <typename T1> auto knuth_shuffle(T1 &x)
         swap(x[i], x[j]);
     }
 }
+
 auto x = create_array(range_ee(0, 9));
 
 struct CodeBlock1
@@ -1877,7 +1902,9 @@ L(cnt, name) lst
 print(‘Total weight: ’w‘ Value: ’v)
 ===
 auto items = create_dict(dict_of(u"sandwich"_S, make_tuple(50, 60, 2))(u"map"_S, make_tuple(9, 150, 1))(u"compass"_S, make_tuple(13, 35, 1))(u"water"_S, make_tuple(153, 200, 3))(u"glucose"_S, make_tuple(15, 60, 2))(u"tin"_S, make_tuple(68, 45, 3))(u"banana"_S, make_tuple(27, 60, 3))(u"apple"_S, make_tuple(39, 40, 3))(u"cheese"_S, make_tuple(23, 30, 1))(u"beer"_S, make_tuple(52, 10, 3))(u"suntan cream"_S, make_tuple(11, 70, 1))(u"camera"_S, make_tuple(32, 30, 1))(u"t-shirt"_S, make_tuple(24, 15, 2))(u"trousers"_S, make_tuple(48, 10, 2))(u"umbrella"_S, make_tuple(73, 40, 1))(u"w-trousers"_S, make_tuple(42, 70, 1))(u"w-overcoat"_S, make_tuple(43, 75, 1))(u"note-case"_S, make_tuple(22, 80, 1))(u"sunglasses"_S, make_tuple(7, 20, 1))(u"towel"_S, make_tuple(18, 12, 2))(u"socks"_S, make_tuple(4, 50, 1))(u"book"_S, make_tuple(30, 10, 2)));
+
 auto item_keys = items.keys();
+
 Dict<ivec2, Tuple<int, Array<Tuple<int, String>>>> cache;
 
 template <typename T1, typename T2> auto choose_item(const T1 &weight, const T2 &idx)
@@ -1919,6 +1946,7 @@ struct CodeBlock1
                 print(cnt & u" "_S & name);
                 w += _get<0>(items[name]) * cnt;
             }
+
         print(u"Total weight: "_S & w & u" Value: "_S & v);
     }
 } code_block_1;
@@ -1996,6 +2024,7 @@ template <typename T1> auto kosaraju(const T1 &g)
         assign(u, u);
     return c;
 }
+
 auto g = create_array({create_array({1}), create_array({2}), create_array({0}), create_array({1, 2, 4}), create_array({3, 5}), create_array({2, 6}), create_array({5}), create_array({4, 6, 7})});
 
 struct CodeBlock1
@@ -2209,6 +2238,7 @@ public:
         s(u"children", children);
     }
 };
+
 Person p;
 
 struct CodeBlock1
@@ -2232,8 +2262,10 @@ struct CodeBlock1
   ],
   "children": ["Mary", "Kate"]
 })"_S, p);
+
         p.phoneNumbers.pop(0);
         p.children.append(u"Alex"_S);
+
         print(json::from_object(p));
     }
 } code_block_1;
@@ -2380,6 +2412,7 @@ template <typename T1> Int64 subfact(const T1 &n)
 {
     return n < 2 ? 1 - n : (subfact(n - 1) + subfact(n - 2)) * (n - 1);
 }
+
 auto n = 4;
 
 struct CodeBlock1
@@ -2389,9 +2422,11 @@ struct CodeBlock1
         print(u"Derangements of "_S & create_array(range_el(0, n)));
         for (auto &&d : derangements(n))
             print(u"  "_S & d);
+
         print(u"\nTable of n vs counted vs calculated derangements"_S);
         for (int n = 0; n < 10; n++)
             print(u"#2 #<6 #."_S.format(n, derangements(n).len(), subfact(n)));
+
         n = 20;
         print(u"\n!#. = #."_S.format(n, subfact(n)));
     }
@@ -2458,6 +2493,7 @@ public:
         return to_float(next_int()) / (to_uint64(1) << 32);
     }
 };
+
 auto random_gen = PCG32();
 
 struct CodeBlock1
@@ -2467,6 +2503,7 @@ struct CodeBlock1
         random_gen.seed(42, 54);
         for (int Lindex = 0; Lindex < 5; Lindex++)
             print(random_gen.next_int());
+
         random_gen.seed(987654321, 1);
     }
 } code_block_1;
@@ -2535,6 +2572,7 @@ public:
         return to_float(next_int()) / pow(2.0, 64);
     }
 };
+
 auto random_gen = Splitmix64();
 
 struct CodeBlock1
@@ -2544,6 +2582,7 @@ struct CodeBlock1
         random_gen.seed(1234567);
         for (int Lindex = 0; Lindex < 5; Lindex++)
             print(random_gen.next_int());
+
         random_gen.seed(987654321);
     }
 } code_block_1;
@@ -2614,6 +2653,7 @@ public:
         return to_float(next_int()) / pow(2.0, 32);
     }
 };
+
 auto random_gen = XorShiftStar();
 
 struct CodeBlock1
@@ -2623,6 +2663,7 @@ struct CodeBlock1
         random_gen.seed(1234567);
         for (int Lindex = 0; Lindex < 5; Lindex++)
             print(random_gen.next_int());
+
         random_gen.seed(987654321);
     }
 } code_block_1;
@@ -2679,16 +2720,20 @@ auto countTriples(Int64 x, Int64 y, Int64 z)
         auto p = x + y + z;
         if (p > ::limit)
             return;
+
         ::nPrimitives++;
         ::nTriples += idiv(::limit, p);
+
         auto t0 = x - 2 * y + 2 * z;
         auto t1 = 2 * x - y + 2 * z;
         auto t2 = t1 - y + z;
         countTriples(t0, t1, t2);
+
         t0 += 4 * y;
         t1 += 2 * y;
         t2 += 4 * y;
         countTriples(t0, t1, t2);
+
         z = t2 - 4 * x;
         y = t1 - 4 * x;
         x = t0 - 2 * x;
@@ -2699,7 +2744,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto p : range_ee(1, 8)) {
             limit = pow(to_int64(10), p);
             nTriples = nPrimitives = 0;
@@ -2759,6 +2803,7 @@ template <typename T1, typename T2> Array<dvec2> rdp(const T1 &l, const T2 &ε)
     }}
     if (dMax > ε)
         return rdp(l[range_ee(0, x)], ε) + rdp(l[range_ei(x)], ε)[range_ei(1)];
+
     return create_array({_get<0>(l), l.last()});
 }
 
@@ -2800,6 +2845,7 @@ template <typename T1> auto consolidate(const T1 &ranges)
     {
         return sorted(s.filter([](const auto &bounds){return !bounds.empty();}).map([](const auto &bounds){return sorted(bounds);}));
     };
+
     auto norm = normalize(ranges);
     {int Lindex = 0;
     for (auto &r1 : norm) {
@@ -2873,6 +2919,7 @@ template <typename T1> auto permutation_sort(T1 &arr)
     while (!is_sorted(arr))
         arr.next_permutation();
 }
+
 auto arr = create_array({7, 6, 5, 9, 8, 4, 3, 1, 2, 0});
 
 struct CodeBlock1
@@ -3006,6 +3053,7 @@ template <typename T1, typename T2, typename T3> auto vectortriplep(const T1 &a,
 {
     return cross(a, cross(b, c));
 }
+
 auto a = make_tuple(3, 4, 5);
 auto b = make_tuple(4, 3, 5);
 auto c = make_tuple(-5, -12, -13);
@@ -3072,9 +3120,12 @@ p(‘1.2e101’)
 template <typename T1, typename T2 = decltype(-1), typename T3 = decltype(10)> auto suffize(const T1 &numstr, const T2 &digits = -1, const T3 &base = 10)
 {
     auto suffixes = create_array({u""_S, u"K"_S, u"M"_S, u"G"_S, u"T"_S, u"P"_S, u"E"_S, u"Z"_S, u"Y"_S, u"X"_S, u"W"_S, u"V"_S, u"U"_S, u"googol"_S});
+
     auto exponent_distance = base == 2 ? 10 : 3;
     auto num_sign = in(_get<0>(numstr), u"+-"_S) ? _get<0>(numstr) : u""_S;
+
     auto num = abs(to_float(numstr.replace(u","_S, u""_S)));
+
     int suffix_index;
     if (base == 10 && num >= 1e100) {
         suffix_index = 13;
@@ -3087,11 +3138,13 @@ template <typename T1, typename T2 = decltype(-1), typename T3 = decltype(10)> a
     }
     else
         suffix_index = 0;
+
     String num_str;
     if (digits != -1)
         num_str = format_float(num, digits);
     else
         num_str = format_float(num, 3).rtrim(u"0"_S).rtrim(u"."_S);
+
     return num_sign & num_str & suffixes[suffix_index] & (base == 2 ? u"i"_S : u""_S);
 }
 
@@ -3164,6 +3217,7 @@ template <typename T1> auto patience_sort(T1 &arr)
 {
     if (arr.len() < 2)
         return;
+
     Array<Array<TYPE_OF(_get<0>(arr))>> piles;
     for (auto &&el : arr)
         {bool was_break = false;
@@ -3192,6 +3246,7 @@ template <typename T1> auto patience_sort(T1 &arr)
             piles.pop(minPileIndex);
     }
 }
+
 auto iArr = create_array({4, 65, 2, -31, 0, 99, 83, 782, 1});
 
 struct CodeBlock1
@@ -3202,6 +3257,7 @@ struct CodeBlock1
         print(iArr);
     }
 } code_block_1;
+
 auto cArr = create_array({u'n'_C, u'o'_C, u'n'_C, u'z'_C, u'e'_C, u'r'_C, u'o'_C, u's'_C, u'u'_C, u'm'_C});
 
 struct CodeBlock2
@@ -3212,6 +3268,7 @@ struct CodeBlock2
         print(cArr);
     }
 } code_block_2;
+
 auto sArr = create_array({u"dog"_S, u"cow"_S, u"cat"_S, u"ape"_S, u"ant"_S, u"man"_S, u"pig"_S, u"ass"_S, u"gnu"_S});
 
 struct CodeBlock3

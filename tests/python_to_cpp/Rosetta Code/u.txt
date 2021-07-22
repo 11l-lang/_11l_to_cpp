@@ -86,7 +86,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (int p = 0; p < 5; p++) {
             auto n = pow(10, p);
             print(u"The #.#. Ulam number is #."_S.format(n, n != 1 ? u"th"_S : u"st"_S, ulam(n)));
@@ -132,8 +131,6 @@ def show_spiral(n, symbol='# ', start=1, space=''):
 show_spiral(10, symbol='# ', space='  ')
 show_spiral(9, symbol='', space=' - ')
 ===
-//import math
-
 F cell(n, =x, =y, start = 1)
    V d = 0
    y = y - n I/ 2
@@ -150,6 +147,7 @@ F show_spiral(n, symbol = ‘# ’, start = 1, =space = ‘’)
          L.continue
       L(i) (x * x .< top).step(x * 2)
          is_prime[i] = 0B
+
    (Int -> String) f = _ -> @symbol
 
    I space == ‘’
@@ -160,11 +158,13 @@ F show_spiral(n, symbol = ‘# ’, start = 1, =space = ‘’)
       I space == ‘’
          space = (‘.’ * max_str)‘ ’
       f = x -> String(x).rjust(@max_str)‘ ’
+
    V cell_str = x -> I @is_prime[x] {@f(x)} E @space
 
    L(y) 0 .< n
       print((0 .< n).map(x -> cell(@n, x, @y, @start)).map(v -> @cell_str(v)).join(‘’))
    print()
+
 show_spiral(10, symbol' ‘# ’, space' ‘  ’)
 show_spiral(9, symbol' ‘’, space' ‘ - ’)
 ===
@@ -188,6 +188,7 @@ template <typename T1, typename T2 = decltype(u"# "_S), typename T3 = decltype(1
         for (auto i : range_el(x * x, top).step(x * 2))
             is_prime.set(i, false);
     }
+
     std::function<String(const int)> f = [&symbol](const auto &_){return symbol;};
     if (space == u"")
         space = u" "_S * symbol.len();
@@ -198,6 +199,7 @@ template <typename T1, typename T2 = decltype(u"# "_S), typename T3 = decltype(1
             space = (u"."_S * max_str) & u" "_S;
         f = [&max_str](const auto &x){return String(x).rjust(max_str) & u" "_S;};
     }
+
     auto cell_str = [&f, &is_prime, &space](const auto &x){return is_prime[x] ? f(x) : space;};
     for (auto y : range_el(0, n))
         print(range_el(0, n).map([&n, &start, &y](const auto &x){return cell(n, x, y, start);}).map([&cell_str](const auto &v){return cell_str(v);}).join(u""_S));
@@ -218,7 +220,6 @@ struct CodeBlock1
 import os
 print('\n'.join(sorted(os.listdir('.'))))
 ===
-//import os
 print(sorted(fs:list_dir(‘.’)).join("\n"))
 ===
 struct CodeBlock1
@@ -328,7 +329,9 @@ for barcode in barcodes:
     decodeUPC(barcode)
 ===
 V LEFT_DIGITS = [‘   ## #’ = 0, ‘  ##  #’ = 1, ‘  #  ##’ = 2, ‘ #### #’ = 3, ‘ #   ##’ = 4, ‘ ##   #’ = 5, ‘ # ####’ = 6, ‘ ### ##’ = 7, ‘ ## ###’ = 8, ‘   # ##’ = 9]
+
 V RIGHT_DIGITS = Dict(LEFT_DIGITS.items(), (k, v) -> (k.replace(‘ ’, ‘s’).replace(‘#’, ‘ ’).replace(‘s’, ‘#’), v))
+
 V END_SENTINEL = ‘# #’
 V MID_SENTINEL = ‘ # # ’
 
@@ -340,6 +343,7 @@ F decodeUPC(input)
          pos += :END_SENTINEL.len
       E
          R (0B, [Int]())
+
       [Int] output
       L(i) 6
          part = candidate[pos .< pos + 7]
@@ -349,6 +353,7 @@ F decodeUPC(input)
             output [+]= :LEFT_DIGITS[part]
          E
             R (0B, output)
+
       part = candidate[pos .< pos + :MID_SENTINEL.len]
       I part == :MID_SENTINEL
          pos += :MID_SENTINEL.len
@@ -363,11 +368,13 @@ F decodeUPC(input)
             output [+]= :RIGHT_DIGITS[part]
          E
             R (0B, output)
+
       part = candidate[pos .< pos + :END_SENTINEL.len]
       I part == :END_SENTINEL
          pos += :END_SENTINEL.len
       E
          R (0B, output)
+
       V sum = 0
       L(v) output
          V i = L.index
@@ -376,6 +383,7 @@ F decodeUPC(input)
          E
             sum += v
       R (sum % 10 == 0, output)
+
    V candidate = input.trim(‘ ’)
    V out = decode(candidate)
    I out[0]
@@ -389,13 +397,16 @@ F decodeUPC(input)
             print(‘Invalid checksum’)
          E
             print(‘Invalid digit(s)’)
+
 V barcodes = [‘         # #   # ##  #  ## #   ## ### ## ### ## #### # # # ## ##  #   #  ##  ## ###  # ##  ## ### #  # #       ’, ‘        # # #   ##   ## # #### #   # ## #   ## #   ## # # # ###  # ###  ##  ## ###  # #  ### ###  # # #         ’, ‘         # #    # # #  ###  #   #    # #  #   #    # # # # ## #   ## #   ## #   ##   # # #### ### ## # #         ’, ‘       # # ##  ## ##  ##   #  #   #  # ###  # ##  ## # # #   ## ##  #  ### ## ## #   # #### ## #   # #        ’, ‘         # # ### ## #   ## ## ###  ##  # ##   #   # ## # # ### #  ## ##  #    # ### #  ## ##  #      # #          ’, ‘          # #  #   # ##  ##  #   #   #  # ##  ##  #   # # # # #### #  ##  # #### #### # #  ##  # #### # #         ’, ‘         # #  #  ##  ##  # #   ## ##   # ### ## ##   # # # #  #   #   #  #  ### # #    ###  # #  #   # #        ’, ‘        # # #    # ##  ##   #  # ##  ##  ### #   #  # # # ### ## ## ### ## ### ### ## #  ##  ### ## # #         ’, ‘         # # ### ##   ## # # #### #   ## # #### # #### # # #   #  # ###  #    # ###  # #    # ###  # # #       ’, ‘        # # # #### ##   # #### # #   ## ## ### #### # # # #  ### # ###  ###  # # ###  #    # #  ### # #         ’]
 
 L(barcode) barcodes
    decodeUPC(barcode)
 ===
 auto LEFT_DIGITS = create_dict(dict_of(u"   ## #"_S, 0)(u"  ##  #"_S, 1)(u"  #  ##"_S, 2)(u" #### #"_S, 3)(u" #   ##"_S, 4)(u" ##   #"_S, 5)(u" # ####"_S, 6)(u" ### ##"_S, 7)(u" ## ###"_S, 8)(u"   # ##"_S, 9));
+
 auto RIGHT_DIGITS = create_dict(LEFT_DIGITS.items(), [](const auto &k, const auto &v){return make_tuple(k.replace(u" "_S, u"s"_S).replace(u"#"_S, u" "_S).replace(u"s"_S, u"#"_S), v);});
+
 auto END_SENTINEL = u"# #"_S;
 auto MID_SENTINEL = u" # # "_S;
 
@@ -409,6 +420,7 @@ template <typename T1> auto decodeUPC(const T1 &input)
             pos += ::END_SENTINEL.len();
         else
             return make_tuple(false, Array<int>());
+
         Array<int> output;
         for (int i = 0; i < 6; i++) {
             part = candidate[range_el(pos, pos + 7)];
@@ -418,6 +430,7 @@ template <typename T1> auto decodeUPC(const T1 &input)
             else
                 return make_tuple(false, output);
         }
+
         part = candidate[range_el(pos, pos + ::MID_SENTINEL.len())];
         if (part == ::MID_SENTINEL)
             pos += ::MID_SENTINEL.len();
@@ -432,11 +445,13 @@ template <typename T1> auto decodeUPC(const T1 &input)
             else
                 return make_tuple(false, output);
         }
+
         part = candidate[range_el(pos, pos + ::END_SENTINEL.len())];
         if (part == ::END_SENTINEL)
             pos += ::END_SENTINEL.len();
         else
             return make_tuple(false, output);
+
         auto sum = 0;
         {int Lindex = 0;
         for (auto &&v : output) {
@@ -449,6 +464,7 @@ template <typename T1> auto decodeUPC(const T1 &input)
         }}
         return make_tuple(mod(sum, 10) == 0, output);
     };
+
     auto candidate = input.trim(u" "_S);
     auto out = decode(candidate);
     if (_get<0>(out))
@@ -464,6 +480,7 @@ template <typename T1> auto decodeUPC(const T1 &input)
                 print(u"Invalid digit(s)"_S);
     }
 }
+
 auto barcodes = create_array({u"         # #   # ##  #  ## #   ## ### ## ### ## #### # # # ## ##  #   #  ##  ## ###  # ##  ## ### #  # #       "_S, u"        # # #   ##   ## # #### #   # ## #   ## #   ## # # # ###  # ###  ##  ## ###  # #  ### ###  # # #         "_S, u"         # #    # # #  ###  #   #    # #  #   #    # # # # ## #   ## #   ## #   ##   # # #### ### ## # #         "_S, u"       # # ##  ## ##  ##   #  #   #  # ###  # ##  ## # # #   ## ##  #  ### ## ## #   # #### ## #   # #        "_S, u"         # # ### ## #   ## ## ###  ##  # ##   #   # ## # # ### #  ## ##  #    # ### #  ## ##  #      # #          "_S, u"          # #  #   # ##  ##  #   #   #  # ##  ##  #   # # # # #### #  ##  # #### #### # #  ##  # #### # #         "_S, u"         # #  #  ##  ##  # #   ## ##   # ### ## ##   # # # #  #   #   #  #  ### # #    ###  # #  #   # #        "_S, u"        # # #    # ##  ##   #  # ##  ##  ### #   #  # # # ### ## ## ### ## ### ### ## #  ##  ### ## # #         "_S, u"         # # ### ##   ## # # #### #   ## # #### # #### # # #   #  # ###  #    # ###  # #    # ###  # # #       "_S, u"        # # # #### ##   # #### # #   ## ## ### #### # # # #  ### # ###  ###  # # ###  #    # #  ### # #         "_S});
 
 struct CodeBlock1
@@ -568,7 +585,6 @@ cfg.setOption("numberofbananas", "1024")
 cfg.addOption("numberofstrawberries", "62000")
 cfg.store()
 ===
-//import re
 T.enum EntryType
    EMPTY
    ENABLED
@@ -591,6 +607,7 @@ T Config
    [Entry] entries
 
    F (path)
+
       .path = path
       L(=line) File(path).read_lines(1B)
          line = line.rtrim("\n").ltrim(‘ ’)
@@ -648,6 +665,7 @@ T Config
             f.write("; #. #.\n".format(e.name, e.value))
          E I e.etype == COMMENT
             f.write(e.name"\n")
+
 V cfg = Config(‘config.txt’)
 cfg.enableOption(‘seedsremoved’)
 cfg.disableOption(‘needspeeling’)
@@ -766,6 +784,7 @@ public:
                 f.write(e.name & u"\n"_S);
     }
 };
+
 auto cfg = Config(u"config.txt"_S);
 
 struct CodeBlock1

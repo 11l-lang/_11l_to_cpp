@@ -2,6 +2,7 @@
 
 auto LUT16to32 = 65536 * create_array({0});
 auto RGBtoYUV = 65536 * create_array({0});
+
 auto Ymask = 0x00FF'0000;
 auto Umask = 0x0000'FF00;
 auto Vmask = 0x0000'00FF;
@@ -312,6 +313,7 @@ template <typename T1, typename T2, typename T3> auto hq2x(const T1 &xres, const
         for (auto i : range_el(0, xres)) {
             auto pos = j * xres + i;
             auto pOut = j * xres * 4 + 2 * i;
+
             _set<3>(w, rgb[pos + prevline]);
             _set<2>(w, _get<3>(w));
             _set<1>(w, _get<3>(w));
@@ -333,6 +335,7 @@ template <typename T1, typename T2, typename T3> auto hq2x(const T1 &xres, const
                 _set<6>(w, rgb[pos + 1]);
                 _set<9>(w, rgb[pos + nextline + 1]);
             }
+
             auto pattern = 0;
             auto flag = 1;
             auto YUV1 = RGBtoYUV[_get<5>(w)];

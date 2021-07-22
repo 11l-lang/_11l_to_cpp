@@ -1,5 +1,3 @@
-//import math
-//import random
 V FLOAT_MAX = 1e100
 
 T Point
@@ -15,6 +13,7 @@ F generate_points(npoints, radius)
       V ang = random:() * 2 * math:pi
       p.x = r * cos(ang)
       p.y = r * sin(ang)
+
    R points
 
 F sqr_distance_2D(a, b)
@@ -22,6 +21,7 @@ F sqr_distance_2D(a, b)
 
 F nearest_cluster_center(point, cluster_centers)
    ‘Distance and index of the closest cluster center’
+
    V min_index = point.group
    V min_dist = :FLOAT_MAX
 
@@ -31,6 +31,7 @@ F nearest_cluster_center(point, cluster_centers)
       I min_dist > d
          min_dist = d
          min_index = i
+
    R (min_index, min_dist)
 
 F kpp(&points, &cluster_centers)
@@ -43,6 +44,7 @@ F kpp(&points, &cluster_centers)
          V j = L.index
          d[j] = nearest_cluster_center(p, cluster_centers[0 .< i])[1]
          sum += d[j]
+
       sum *= random:()
 
       L(di) d
@@ -58,8 +60,11 @@ F kpp(&points, &cluster_centers)
 
 F lloyd(&points, nclusters)
    V cluster_centers = (0 .< nclusters).map(_ -> Point())
+
    kpp(&points, &cluster_centers)
+
    V lenpts10 = points.len >> 10
+
    V changed = 0
    L
       L(cc) cluster_centers
@@ -75,6 +80,7 @@ F lloyd(&points, nclusters)
       L(cc) cluster_centers
          cc.x /= cc.group
          cc.y /= cc.group
+
       changed = 0
       L(p) points
          V min_i = nearest_cluster_center(p, cluster_centers)[0]
@@ -88,6 +94,7 @@ F lloyd(&points, nclusters)
    L(cc) cluster_centers
       V i = L.index
       cc.group = i
+
    R cluster_centers
 
 T Color
@@ -103,6 +110,7 @@ F print_eps(points, cluster_centers, w = 400, h = 400)
    [Color] colors
    L(i) 0 .< cluster_centers.len
       colors.append(Color((3 * (i + 1) % 11) / 11.0, (7 * i % 11) / 11.0, (9 * i % 11) / 11.0))
+
    V max_x = -:FLOAT_MAX
    V max_y = -:FLOAT_MAX
    V min_x = :FLOAT_MAX
@@ -117,10 +125,13 @@ F print_eps(points, cluster_centers, w = 400, h = 400)
          max_y = p.y
       I min_y > p.y
          min_y = p.y
+
    V scale = min(w / (max_x - min_x), h / (max_y - min_y))
    V cx = (max_x + min_x) / 2
    V cy = (max_y + min_y) / 2
+
    print("%!PS-Adobe-3.0\n%%BoundingBox: -5 -5 #. #.".format(w + 10, h + 10))
+
    print(("/l {rlineto} def /m {rmoveto} def\n"‘’"/c { .25 sub exch .25 sub exch .5 0 360 arc fill } def\n"‘/s { moveto -2 0 m 2 2 l 2 -2 l -2 -2 l closepath ’""‘   gsave 1 setgray fill grestore gsave 3 setlinewidth’""‘ 1 setgray stroke grestore 0 setgray stroke }def’))
 
    L(cc) cluster_centers
@@ -131,13 +142,17 @@ F print_eps(points, cluster_centers, w = 400, h = 400)
          I p.group != i
             L.continue
          print((‘#.3 #.3 c’.format((p.x - cx) * scale + w / 2, (p.y - cy) * scale + h / 2)))
+
       print(("\n0 setgray #. #. s".format((cc.x - cx) * scale + w / 2, (cc.y - cy) * scale + h / 2)))
+
    print("\n%%%%EOF")
 
 F main()
    V npoints = 30000
    V k = 7
+
    V points = generate_points(npoints, 10)
    V cluster_centers = lloyd(&points, k)
    print_eps(points, cluster_centers)
+
 main()

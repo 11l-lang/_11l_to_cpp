@@ -205,6 +205,7 @@ F roman(=n)
    L n >= 1
       n--
       r ‘’= ‘I’
+
    R r
 
 :start:
@@ -281,6 +282,7 @@ template <typename T1> auto roman(T1 n)
         n--;
         r &= u"I"_S;
     }
+
     return r;
 }
 
@@ -318,6 +320,7 @@ if __name__ == '__main__':
 ===
 F checkio(=data)
    V coding = zip([1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1], [‘M’, ‘CM’, ‘D’, ‘CD’, ‘C’, ‘XC’, ‘L’, ‘XL’, ‘X’, ‘IX’, ‘V’, ‘IV’, ‘I’])
+
    [String] result
    L(d, r) coding
       L data >= d
@@ -335,6 +338,7 @@ print(‘OK’)
 template <typename T1> auto checkio(T1 data)
 {
     auto coding = zip(create_array({1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1}), create_array({u"M"_S, u"CM"_S, u"D"_S, u"CD"_S, u"C"_S, u"XC"_S, u"L"_S, u"XL"_S, u"X"_S, u"IX"_S, u"V"_S, u"IV"_S, u"I"_S}));
+
     Array<String> result;
     for (auto &&[d, r] : coding)
         while (data >= d) {

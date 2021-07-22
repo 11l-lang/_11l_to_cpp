@@ -3,15 +3,19 @@
 auto iNone = -999;
 auto iTrue = 1;
 auto iFalse = 0;
+
 auto setup = create_array({4, 2, 3, 5, 6, 3, 2, 4, iNone, iNone}) + create_array({iTrue}) * 4 + create_array({iNone, iNone}) + create_array({1}) * 8 + create_array({iNone, iNone, iTrue, iNone, iNone, iNone, iNone, iNone}) + (create_array({0}) * 8 + create_array({iNone}) * 8) * 4 + create_array({-1}) * 8 + create_array({iNone}) * 8 + create_array({-4, -2, -3, -5, -6, -3, -2, -4}) + create_array({iNone}) * 40;
+
 auto squares = range_el(0, 128).filter([](const auto &i){return !(i & 8);});
 auto knightMoves = create_array({-33, -31, -18, -14, 14, 18, 31, 33});
 auto bishopLines = create_array({create_array(range_el(17, 120).step(17)), create_array(range_el(-17, -120).step(-17)), create_array(range_el(15, 106).step(15)), create_array(range_el(-15, -106).step(-15))});
 auto rookLines = create_array({create_array(range_ee(1, 7)), create_array(range_el(-1, -8).step(-1)), create_array(range_el(16, 128).step(16)), create_array(range_el(-16, -128).step(-16))});
 auto queenLines = bishopLines + rookLines;
 auto kingMoves = make_tuple(-17, -16, -15, -1, 1, 15, 16, 17);
+
 Array<int> empty_list;
 auto linePieces = create_array({create_array({empty_list}), create_array({empty_list}), create_array({empty_list}), bishopLines, rookLines, queenLines, create_array({empty_list}), create_array({empty_list}), queenLines, rookLines, bishopLines, create_array({empty_list}), create_array({empty_list})});
+
 auto clearCastlingOpportunities = create_array({empty_list}) * 0x80;
 
 struct CodeBlock1
@@ -22,6 +26,7 @@ struct CodeBlock1
             clearCastlingOpportunities.set(i, v);
     }
 } code_block_1;
+
 auto pieces = u".pnbrqkKQRBNP"_S;
 
 template <typename T1, typename T2> auto listGet(const T1 &l, const T2 &i)
@@ -53,6 +58,7 @@ template <typename T2> auto mov(Array<int> &board, const T2 &mv)
     board.set(ix, 0);
     for (auto &&i : ::clearCastlingOpportunities[ix])
         board.set(i, ::iFalse);
+
     _set<26>(board, to_int(!_get<26>(board)));
     if ((mv & 0x7fff'0000) == 0)
         return;
@@ -144,6 +150,7 @@ template <typename T1, typename T2, typename T3> auto nonpawnAttacks(const T1 &b
 {
     return (max(::knightMoves.map([&board, &color, &ix](const auto &i){return board[ix + i] == color * 2;})) || max(::bishopLines.map([&board, &color, &ix](const auto &bishopLine){return rowAttack(board, make_tuple(color * 3, color * 5), ix, bishopLine);})) || max(::rookLines.map([&board, &color, &ix](const auto &rookLine){return rowAttack(board, make_tuple(color * 4, color * 5), ix, rookLine);})));
 }
+
 auto nonpawnBlackAttacks = [](const auto &board, const auto &ix){return nonpawnAttacks(board, ix, -1);};
 auto nonpawnWhiteAttacks = [](const auto &board, const auto &ix){return nonpawnAttacks(board, ix, 1);};
 
@@ -353,6 +360,7 @@ template <typename T1> auto legalMoves(const T1 &board)
 {
     auto allMoves = pseudoLegalMoves(board);
     Array<int> retval;
+
     auto kingVal = 6;
     if (_get<26>(board))
         kingVal = -kingVal;
@@ -395,6 +403,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto alphaBeta(con
 {
     if (n == 0)
         return alphaBetaQui(board, alpha, beta, n);
+
     auto bestMove = ::iNone;
 
     for (auto &&mv : legalMoves(board)) {
@@ -418,6 +427,7 @@ auto speedTest()
     moveStr(board, u"c2-c4"_S);
     moveStr(board, u"e7-e5"_S);
     moveStr(board, u"d2-d4"_S);
+
     auto res = alphaBeta(board, -99999999, 99999999, 4);
     print(res);
     moveStr(board, u"d7-d6"_S);

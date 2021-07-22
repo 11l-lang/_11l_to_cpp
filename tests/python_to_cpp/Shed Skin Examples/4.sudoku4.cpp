@@ -4,6 +4,7 @@ template <typename T1, typename T2> auto cross(const T1 &aa, const T2 &bb)
 {
     return multiloop(aa, bb, [](const auto &a, const auto &b){return a & b;});
 }
+
 auto rows = u"ABCDEFGHI"_S;
 auto cols = u"123456789"_S;
 auto digits = u"123456789"_S;
@@ -34,6 +35,7 @@ template <typename T1> Dict<String, String> search(const T1 &values)
         return Dict<String, String>();
     if (all_map(::squares, [&values](const auto &s){return values[s].len() == 1;}))
         return values;
+
     auto s = _get<1>(min(::squares.filter([&values](const auto &s){return values[s].len() > 1;}).map([&values](const auto &s){return make_tuple(values[s].len(), s);})));
     for (auto &&d : values[s]) {
         auto values_copy = values.copy();

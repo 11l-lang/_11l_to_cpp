@@ -15,7 +15,6 @@ def madlibs(template):
 
 madlibs(template)
 ===
-//import re
 V template = ‘<name> went for a walk in the park. <he or she>
 found a <noun>. <name> decided to take it home.’
 
@@ -27,6 +26,7 @@ F madlibs(template)
    L(f, v) zip(fields, values)
       story = story.replace(f, v)
    print("\nThe story becomes:\n\n"story)
+
 madlibs(template)
 ===
 auto _template_ = uR"(<name> went for a walk in the park. <he or she>
@@ -85,7 +85,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&n : make_tuple(5, 3, 7)) {
             print(u"\nOrder #.\n======="_S.format(n));
             magic(n);
@@ -167,7 +166,6 @@ def display(q):
 print("Singly Even Magic Square", end = '')
 display(build_sems(6))
 ===
-//import math
 V LOG_10 = 2.302585092994
 
 F build_oms(=s)
@@ -191,6 +189,7 @@ F build_oms(=s)
       i = ti
       j = tj
       p++
+
    R (q, s)
 
 F build_sems(=s)
@@ -198,6 +197,7 @@ F build_sems(=s)
       s++
    L s % 4 == 0
       s += 2
+
    V q = (0 .< s).map(i -> (0 .< @s).map(j -> 0))
    V z = s I/ 2
    V b = z * z
@@ -212,6 +212,7 @@ F build_sems(=s)
          q[i + z][j + z] = a + b
          q[i + z][j] = a + c
          q[i][j + z] = a + d
+
    V lc = z I/ 2
    V rc = lc
    L(j) 0 .< z
@@ -219,6 +220,7 @@ F build_sems(=s)
          I i < lc | i > s - rc | (i == lc & j == lc)
             I !(i == 0 & j == lc)
                swap(&q[i][j], &q[i][j + z])
+
    R (q, s)
 
 F display(q)
@@ -230,6 +232,7 @@ F display(q)
          print(String(q[0][i][j]).zfill(k), end' ‘ ’)
       print()
    print(‘Magic sum: #.’.format(s * ((s * s) + 1) I/ 2))
+
 print(‘Singly Even Magic Square’, end' ‘’)
 display(build_sems(6))
 ===
@@ -259,6 +262,7 @@ template <typename T1> auto build_oms(T1 s)
         j = tj;
         p++;
     }
+
     return make_tuple(q, s);
 }
 
@@ -268,6 +272,7 @@ template <typename T1> auto build_sems(T1 s)
         s++;
     while (mod(s, 4) == 0)
         s += 2;
+
     auto q = range_el(0, s).map([&s](const auto &i){return range_el(0, s).map([](const auto &j){return 0;});});
     auto z = idiv(s, 2);
     auto b = z * z;
@@ -282,6 +287,7 @@ template <typename T1> auto build_sems(T1 s)
             q[i + z].set(j, a + c);
             q[i].set(j + z, a + d);
         }
+
     auto lc = idiv(z, 2);
     auto rc = lc;
     for (auto j : range_el(0, z))
@@ -290,6 +296,7 @@ template <typename T1> auto build_sems(T1 s)
                 if (!(i == 0 && j == lc))
                     swap(q[i][j], q[i][j + z]);
             }
+
     return make_tuple(q, s);
 }
 
@@ -375,13 +382,13 @@ data = """                55
 
 print(solve([list(map(int, row.split())) for row in data.split("\n")]))
 ===
-
 F solve([[Int]] &tri)
    L tri.len > 1
       V t0 = tri.pop()
       V t1 = tri.pop()
       tri.append(enumerate(t1).map((i, t) -> max(@t0[i], @t0[i + 1]) + t))
    R tri[0][0]
+
 V data = ‘                55
                         94 48
                        95 30 96
@@ -400,6 +407,7 @@ V data = ‘                55
    85 32 25 85 57 48 84 35 47 62 17 01 01 99 89 52
   06 71 28 75 94 48 37 10 23 51 06 48 53 18 74 98 15
 27 02 92 23 08 71 76 84 15 52 92 63 81 10 44 10 69 93’
+
 print(solve(&data.split("\n").map(row -> row.split_py().map(Int))))
 ===
 auto solve(Array<Array<int>> &tri)
@@ -411,6 +419,7 @@ auto solve(Array<Array<int>> &tri)
     }
     return _get<0>(_get<0>(tri));
 }
+
 auto data = uR"(                55
                         94 48
                        95 30 96
@@ -471,7 +480,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         while (true) {
             {int Lindex = 0;
             for (auto &&item : items) {
@@ -507,8 +515,6 @@ def main(bpm = 72, bpb = 4):
 
 main()
 ===
-//import time
-
 F main(bpm = 72, bpb = 4)
    V t = 60.0 / bpm
    V counter = 0
@@ -519,6 +525,7 @@ F main(bpm = 72, bpb = 4)
       E
          print(‘TICK’)
       sleep(t)
+
 main()
 ===
 template <typename T1 = decltype(72), typename T2 = decltype(4)> auto _main_(const T1 &bpm = 72, const T2 &bpb = 4)
@@ -615,6 +622,7 @@ F mian_chowla()
             L.break
          j++
    R mc
+
 print(‘The first 30 terms of the Mian-Chowla sequence are:’)
 V mc = mian_chowla()
 print_elements(mc[0.<30])
@@ -711,6 +719,7 @@ F mul_inv(=a, =b)
    I x1 < 0
       x1 += b0
    R x1
+
 print(mul_inv(42, 2017))
 ===
 template <typename T1, typename T2> auto mul_inv(T1 a, T2 b)
@@ -753,8 +762,6 @@ def monte_carlo_pi(n):
 
 print(monte_carlo_pi(1000000))
 ===
-//import random
-
 F monte_carlo_pi(n)
    V inside = 0
    L(i) 0 .< n
@@ -763,6 +770,7 @@ F monte_carlo_pi(n)
       I x * x + y * y <= 1
          inside++
    R 4.0 * inside / n
+
 print(monte_carlo_pi(1000000))
 ===
 template <typename T1> auto monte_carlo_pi(const T1 &n)
@@ -871,7 +879,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-
         for (auto &&s : create_array({u"broood"_S, u"bananaaa"_S, u"hiphophiphop"_S})) {
             auto encode = move2front_encode(s);
             print(u"#14 encodes to #."_S.format(s, encode), u", "_S);
@@ -924,6 +931,7 @@ F multisplit(text, sep)
    I i > lastmatch
       matches ‘’= text[lastmatch .< i]
    R matches
+
 print(multisplit(‘a!===b=!=c’, [‘==’, ‘!=’, ‘=’]))
 ===
 template <typename T1, typename T2> auto multisplit(const T1 &text, const T2 &sep)
@@ -1010,6 +1018,7 @@ F magicSquareDoublyEven(n)
    V bits = 1001'0110'0110'1001b
    V size = n * n
    V mult = n I/ 4
+
    V result = [[0] * n] * n
    V i = 0
    L(r) 0 .< n
@@ -1018,6 +1027,7 @@ F magicSquareDoublyEven(n)
          result[r][c] = I (bits [&] (1 << bitPos)) != 0 {i + 1} E size - i
          i++
    R result
+
 V n = 8
 L(row) magicSquareDoublyEven(n)
    L(x) row
@@ -1030,6 +1040,7 @@ template <typename T1> auto magicSquareDoublyEven(const T1 &n)
     auto bits = 0b1001'0110'0110'1001;
     auto size = n * n;
     auto mult = idiv(n, 4);
+
     auto result = create_array({create_array({0}) * n}) * n;
     auto i = 0;
     for (auto r : range_el(0, n))
@@ -1040,6 +1051,7 @@ template <typename T1> auto magicSquareDoublyEven(const T1 &n)
         }
     return result;
 }
+
 auto n = 8;
 
 struct CodeBlock1
@@ -1120,7 +1132,9 @@ F display_solution(predecessor)
       print(cell, end' ‘<’)
       cell = predecessor[cell]
    print(0)
+
 V graph = [[0, 1, 0, 0, 0, 0], [1, 0, 1, 0, 1, 0], [0, 1, 0, 0, 0, 1], [0, 0, 0, 0, 1, 0], [0, 1, 0, 1, 0, 0], [0, 0, 1, 0, 0, 0]]
+
 display_solution(dijkstra(graph, 0))
 ===
 template <typename T1, typename T2> auto dijkstra(const T1 &graph, const T2 &source)
@@ -1156,6 +1170,7 @@ template <typename T1> auto display_solution(const T1 &predecessor)
     }
     print(0);
 }
+
 auto graph = create_array({create_array({0, 1, 0, 0, 0, 0}), create_array({1, 0, 1, 0, 1, 0}), create_array({0, 1, 0, 0, 0, 1}), create_array({0, 0, 0, 0, 1, 0}), create_array({0, 1, 0, 1, 0, 0}), create_array({0, 0, 1, 0, 0, 0})});
 
 struct CodeBlock1
@@ -1228,6 +1243,7 @@ V patients_csv = ‘PATIENT_ID,LASTNAME
 3003,Kemeny
 2002,Gosling
 5005,Kurtz’
+
 V visits_csv = ‘PATIENT_ID,VISIT_DATE,SCORE
 2002,2020-09-10,6.8
 1001,2020-09-17,5.5
@@ -1243,14 +1259,17 @@ F csv2list(s)
    L(row) s.split("\n")
       rows [+]= row.split(‘,’)
    R rows
+
 V patients = csv2list(patients_csv)
 V visits = csv2list(visits_csv)
 V result = copy(patients)
 result.sort_range(1..)
+
 result[0].append(‘LAST_VISIT’)
 V last = Dict(visits[1..], p_vis -> (p_vis[0], p_vis[1]))
 L(record) 1 .< result.len
    result[record].append(last.get(result[record][0], ‘’))
+
 result[0] [+]= [‘SCORE_SUM’, ‘SCORE_AVG’]
 V n = Dict(patients[1..], p -> (p[0], 0))
 V tot = Dict(patients[1..], p -> (p[0], 0.0))
@@ -1276,6 +1295,7 @@ auto patients_csv = uR"(PATIENT_ID,LASTNAME
 3003,Kemeny
 2002,Gosling
 5005,Kurtz)"_S;
+
 auto visits_csv = uR"(PATIENT_ID,VISIT_DATE,SCORE
 2002,2020-09-10,6.8
 1001,2020-09-17,5.5
@@ -1293,6 +1313,7 @@ template <typename T1> auto csv2list(const T1 &s)
         rows.append(row.split(u","_S));
     return rows;
 }
+
 auto patients = csv2list(patients_csv);
 auto visits = csv2list(visits_csv);
 auto result = copy(patients);
@@ -1302,6 +1323,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         result.sort_range(range_ei(1));
+
         _get<0>(result).append(u"LAST_VISIT"_S);
     }
 } code_block_1;
@@ -1313,6 +1335,7 @@ struct CodeBlock2
     {
         for (auto record : range_el(1, result.len()))
             result[record].append(last.get(_get<0>(result[record]), u""_S));
+
         _get<0>(result).append(create_array({u"SCORE_SUM"_S, u"SCORE_AVG"_S}));
     }
 } code_block_2;
@@ -1406,7 +1429,6 @@ print(mont.reduce(prod))
 print("\nAlternate computation of x1 ^ x2 mod m:")
 print(pow(x1, x2, m))
 ===
-
 T Montgomery
    BigInt m
    Int n
@@ -1426,15 +1448,19 @@ T Montgomery
       I a >= .m
          a -= .m
       R a
+
 V m = BigInt(‘750791094644726559640638407699’)
 V x1 = BigInt(‘540019781128412936473322405310’)
 V x2 = BigInt(‘515692107665463680305819378593’)
+
 V mont = Montgomery(m)
 V t1 = x1 * mont.rrm
 V t2 = x2 * mont.rrm
+
 V r1 = mont.reduce(t1)
 V r2 = mont.reduce(t2)
 V r = BigInt(2) ^ mont.n
+
 print(‘b : ’(2))
 print(‘n : ’(mont.n))
 print(‘r : ’r)
@@ -1448,6 +1474,7 @@ print(‘Original x1       : ’x1)
 print(‘Recovered from r1 : ’mont.reduce(r1))
 print(‘Original x2       : ’x2)
 print(‘Recovered from r2 : ’mont.reduce(r2))
+
 print("\nMontgomery computation of x1 ^ x2 mod m:")
 V prod = mont.reduce(mont.rrm)
 V base = mont.reduce(x1 * mont.rrm)
@@ -1488,12 +1515,15 @@ public:
         return a;
     }
 };
+
 auto m = BigInt(u"750791094644726559640638407699"_S);
 auto x1 = BigInt(u"540019781128412936473322405310"_S);
 auto x2 = BigInt(u"515692107665463680305819378593"_S);
+
 auto mont = Montgomery(m);
 auto t1 = x1 * mont.rrm;
 auto t2 = x2 * mont.rrm;
+
 auto r1 = mont.reduce(t1);
 auto r2 = mont.reduce(t2);
 auto r = pow(BigInt(2), mont.n);
@@ -1515,6 +1545,7 @@ struct CodeBlock1
         print(u"Recovered from r1 : "_S & mont.reduce(r1));
         print(u"Original x2       : "_S & x2);
         print(u"Recovered from r2 : "_S & mont.reduce(r2));
+
         print(u"\nMontgomery computation of x1 ^ x2 mod m:"_S);
     }
 } code_block_1;

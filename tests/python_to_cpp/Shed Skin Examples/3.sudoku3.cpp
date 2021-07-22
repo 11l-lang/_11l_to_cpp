@@ -1,6 +1,7 @@
 ﻿#include "C:\!!BITBUCKET\11l-lang\_11l_to_cpp\11l.hpp"
 
 auto TRIPLETS = create_array({create_array({0, 1, 2}), create_array({3, 4, 5}), create_array({6, 7, 8})});
+
 auto ROW_ITER = range_ee(0, 8).map([](const auto &row){return range_ee(0, 8).map([&row](const auto &col){return make_tuple(row, col);});});
 auto COL_ITER = range_ee(0, 8).map([](const auto &col){return range_ee(0, 8).map([&col](const auto &row){return make_tuple(row, col);});});
 auto TxT_ITER = multiloop(TRIPLETS, TRIPLETS, [](const auto &rows, const auto &cols){return multiloop(rows, cols, [](const auto &row, const auto &col){return make_tuple(row, col);});});
@@ -9,6 +10,7 @@ class soduko
 {
 public:
     Array<Array<Array<int>>> squares = range_ee(0, 8).map([](const auto &row){return range_ee(0, 8).map([](const auto &col){return create_array(range_ee(1, 9));});});
+
     decltype(false) _changed = false;
     template <typename T1> soduko(const T1 &start_grid)
     {
@@ -57,6 +59,7 @@ public:
 
         else {
             assert(in(x, squares[row][col]), u"bugger2"_S);
+
             squares[row].set(col, create_array({x}));
             update_neighbours(row, col, x);
             _changed = true;
@@ -81,6 +84,7 @@ public:
         }
         else {
         }
+
         return;
     }
 
@@ -155,8 +159,10 @@ public:
                 for (auto &&[row, col] : check_list)
                     if (squares[row][col].len() == 1) {
                         assert(!in(_get<0>(squares[row][col]), known_values), u"bugger3"_S);
+
                         known_values.append(_get<0>(squares[row][col]));
                         assert(in(_get<0>(squares[row][col]), unassigned_values), u"bugger4"_S);
+
                         unassigned_values.remove(_get<0>(squares[row][col]));
                     }
                     else
@@ -226,6 +232,7 @@ int main()
 {
     for (int x = 0; x < 50; x++) {
         auto t = soduko(create_array({u"800000600"_S, u"040500100"_S, u"070090000"_S, u"030020007"_S, u"600008004"_S, u"500000090"_S, u"000030020"_S, u"001006050"_S, u"004000003"_S}));
+
         t.check();
         t.one_level_supposition();
         t.check();

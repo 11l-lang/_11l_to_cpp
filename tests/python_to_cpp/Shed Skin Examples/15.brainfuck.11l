@@ -1,9 +1,9 @@
-//import sys
-
 F BF_interpreter(=prog)
    V CELL = 255
+
    prog = (prog.filter(c -> c C ‘><+-.,[]’)).join(‘’)
    V len_prog = prog.len
+
    V tape = [0]
    V ip = 0
    V p = 0

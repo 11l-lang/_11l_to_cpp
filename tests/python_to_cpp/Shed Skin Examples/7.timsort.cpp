@@ -15,6 +15,7 @@ modified by mark.dufour@gmail.com to work with shedskin
         randomns::seed(1);
     }
 } code_block_1;
+
 auto cmp = [](const auto &a, const auto &b){return a - b;};
 
 template <typename T1, typename T2, typename T4, typename T5> auto array_copy(const T1 &list1, const T2 &base1, Array<int> &list2, const T4 &base2, const T5 &length)
@@ -23,6 +24,7 @@ template <typename T1, typename T2, typename T4, typename T5> auto array_copy(co
 	Copy from list1 to list2 at offsets base1 and base2, for length elements.
 	Like Java's System.arraycopy.
 	)"_S;
+
     bool copy_forward;
     if (&list1 == &list2) {
         if (base1 < base2)
@@ -56,6 +58,7 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5, typen
 	@return the int k,  0 <= k <= number such that list_[b + k - 1] <= key < list_[b + k]
 	)"_S;
     assert(length > 0 && hint >= 0 && hint < length);
+
     auto offset = 1;
     auto last_offset = 0;
     if (comparefn(key, list_[base + hint]) < 0) {
@@ -68,6 +71,7 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5, typen
         }
         if (offset > max_offset)
             offset = max_offset;
+
         auto tmp = last_offset;
         last_offset = hint - offset;
         offset = hint - tmp;
@@ -82,10 +86,12 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5, typen
         }
         if (offset > max_offset)
             offset = max_offset;
+
         last_offset += hint;
         offset += hint;
     }
     assert(-1 <= last_offset && last_offset < offset && offset <= length);
+
     last_offset++;
     while (last_offset < offset) {
         auto midpoint = last_offset + (idiv((offset - last_offset), 2));
@@ -131,6 +137,7 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5, typen
         }
         if (offset > max_offset)
             offset = max_offset;
+
         last_offset += hint;
         offset += hint;
     }
@@ -144,11 +151,13 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5, typen
         }
         if (offset > max_offset)
             offset = max_offset;
+
         auto tmp = last_offset;
         last_offset = hint - offset;
         offset = hint - tmp;
     }
     assert(-1 <= last_offset && last_offset < offset && offset <= length);
+
     last_offset++;
     while (last_offset < offset) {
         auto midpoint = last_offset + (idiv((offset - last_offset), 2));
@@ -186,6 +195,7 @@ template <typename T2, typename T3, typename T4, typename T5> auto binary_sort(A
         start++;
     for (auto start : range_el(start, high)) {
         auto pivot = list_[start];
+
         auto left = low;
         auto right = start;
         assert(left <= right);
@@ -198,7 +208,9 @@ template <typename T2, typename T3, typename T4, typename T5> auto binary_sort(A
                 left = mid + 1;
         }
         assert(left == right);
+
         auto number = start - left;
+
         array_copy(list_, left, list_, left + 1, number);
         list_.set(left, pivot);
     }
@@ -213,6 +225,7 @@ template <typename T2, typename T3> auto reverse_range(Array<int> &list_, T2 low
 	@param low the index of the first element in the range to be reversed
 	@param high the index after the last element in the range to be reversed
 	)"_S;
+
     high--;
     while (low < high) {
         swap(list_[low], list_[high]);
@@ -264,6 +277,7 @@ template <typename T2, typename T3, typename T4> auto count_run_and_make_ascendi
         while (run_high < high && comparefn(list_[run_high], list_[run_high - 1]) >= 0)
             run_high++;
     }
+
     return run_high - low;
 }
 
@@ -277,9 +291,12 @@ public:
     decltype(32) min_merge = 32;
     decltype(7) initial_min_gallop = 7;
     decltype(0) stack_size = 0;
+
     decltype(256) initial_tmp_storage_length = 256;
+
     Array<int> run_base;
     Array<int> run_len;
+
     int stack_len;
 
     template <typename T1, typename T2 = decltype(cmp)> Timsort(const T1 &list_, const T2 &comparefn = cmp) :
@@ -287,7 +304,9 @@ public:
         comparefn(comparefn)
     {
         min_gallop = initial_min_gallop;
+
         auto length = list_.len();
+
         int ternary;
         if (length < initial_tmp_storage_length * 2)
             ternary = idiv(length, 2);
@@ -316,9 +335,11 @@ public:
 
         if (num_remaining < min_merge) {
             auto initial_run_len = count_run_and_make_ascending(list_, low, high, comparefn);
+
             binary_sort(list_, low, high, low + initial_run_len, comparefn);
             return;
         }
+
         auto min_run = min_run_length(num_remaining);
         while (true) {
             auto run_len = count_run_and_make_ascending(list_, low, high, comparefn);
@@ -333,8 +354,10 @@ public:
                 binary_sort(list_, low, low + force, low + run_len, comparefn);
                 run_len = force;
             }
+
             push_run(low, run_len);
             merge_collapse();
+
             low += run_len;
             num_remaining -= run_len;
             if (num_remaining == 0)
@@ -440,24 +463,28 @@ public:
         assert(stack_size >= 2);
         assert(i >= 0);
         assert(i == stack_size - 2 || i == stack_size - 3);
+
         auto base1 = run_base[i];
         auto len1 = run_len[i];
         auto base2 = run_base[i + 1];
         auto len2 = run_len[i + 1];
         assert(len1 > 0 && len2 > 0);
         assert(base1 + len1 == base2);
+
         run_len.set(i, len1 + len2);
         if (i == stack_size - 3) {
             run_base.set(i + 1, run_base[i + 2]);
             run_len.set(i + 1, run_len[i + 2]);
         }
         stack_size--;
+
         auto k = gallop_right(list_[base2], list_, base1, len1, 0, comparefn);
         assert(k >= 0);
         base1 += k;
         len1 -= k;
         if (len1 == 0)
             return;
+
         len2 = gallop_left(list_[base1 + len1 - 1], list_, base2, len2, len2 - 1, comparefn);
         assert(len2 >= 0);
         if (len2 == 0)
@@ -487,11 +514,16 @@ public:
 		@param len2  length of second run to be merged (must be > 0)
 		)"_S;
         assert(len1 > 0 && len2 > 0 && base1 + len1 == base2);
+
         auto tmp = ensure_capacity(len1);
         array_copy(list_, base1, tmp, 0, len1);
+
         auto cursor1 = 0;
+
         auto cursor2 = base2;
+
         auto dest = base1;
+
         list_.set(dest, list_[cursor2]);
         dest++;
         cursor2++;
@@ -501,14 +533,19 @@ public:
         }
         if (len1 == 1) {
             array_copy(list_, cursor2, list_, dest, len2);
+
             list_.set(dest + len2, tmp[cursor1]);
             return;
         }
+
         auto comparefn = this->comparefn;
+
         auto min_gallop = this->min_gallop;
+
         auto loops_done = false;
         while (true) {
             auto count1 = 0;
+
             auto count2 = 0;
 
             while (true) {
@@ -562,6 +599,7 @@ public:
                     loops_done = true;
                     break;
                 }
+
                 count2 = gallop_left(tmp[cursor1], list_, cursor2, len2, 0, comparefn);
                 if (count2 != 0) {
                     array_copy(list_, cursor2, list_, dest, count2);
@@ -588,8 +626,10 @@ public:
                 break;
             if (min_gallop < 0)
                 min_gallop = 0;
+
             min_gallop += 2;
         }
+
         int ternary;
         if (min_gallop < 1)
             ternary = 1;
@@ -600,6 +640,7 @@ public:
         if (len1 == 1) {
             assert(len2 > 0);
             array_copy(list_, cursor2, list_, dest, len2);
+
             list_.set(dest + len2, tmp[cursor1]);
         }
         else if (len1 == 0)
@@ -625,11 +666,16 @@ public:
 		@param len2  length of second run to be merged (must be > 0)
 		)"_S;
         assert(len1 > 0 && len2 > 0 && base1 + len1 == base2);
+
         auto tmp = ensure_capacity(len2);
         array_copy(list_, base2, tmp, 0, len2);
+
         auto cursor1 = base1 + len1 - 1;
+
         auto cursor2 = len2 - 1;
+
         auto dest = base2 + len2 - 1;
+
         list_.set(dest, list_[cursor1]);
         dest--;
         cursor1--;
@@ -644,11 +690,15 @@ public:
             list_.set(dest, tmp[cursor2]);
             return;
         }
+
         auto comparefn = this->comparefn;
+
         auto min_gallop = this->min_gallop;
+
         auto loops_done = false;
         while (true) {
             auto count1 = 0;
+
             auto count2 = 0;
 
             while (true) {
@@ -702,6 +752,7 @@ public:
                     loops_done = true;
                     break;
                 }
+
                 count2 = len2 - gallop_left(list_[cursor1], tmp, 0, len2, len2 - 1, comparefn);
                 if (count2 != 0) {
                     dest -= count2;
@@ -728,8 +779,10 @@ public:
                 break;
             if (min_gallop < 0)
                 min_gallop = 0;
+
             min_gallop += 2;
         }
+
         int ternary;
         if (min_gallop < 1)
             ternary = 1;
@@ -742,6 +795,7 @@ public:
             dest -= len1;
             cursor1 -= len1;
             array_copy(list_, cursor1 + 1, list_, dest + 1, len1);
+
             list_.set(dest, tmp[cursor2]);
         }
         else if (len2 == 0)
@@ -775,6 +829,7 @@ public:
                 new_size = min_capacity;
             else
                 new_size = min(new_size, idiv(list_.len(), 2));
+
             tmp = create_array(range_el(0, new_size));
         }
         return tmp;
