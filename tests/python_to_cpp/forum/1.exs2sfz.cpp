@@ -402,7 +402,7 @@ public:
             else if (sig == 0x0400'0101)
                 auto t = EXSParam(offset);
             else
-                throw RuntimeError(u"Encountered an unknown chunk signature! signature is "_S & hex(sig));
+                throw RuntimeError(u"Encountered an unknown chunk signature! signature is "_S & (u"0x"_S & hex(sig).lowercase()));
             offset += chunk_size(::instrument_data, offset);
         }
     }

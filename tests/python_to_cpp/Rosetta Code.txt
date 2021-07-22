@@ -3683,7 +3683,7 @@ struct CodeBlock1
 def halve(x):
     return x // 2
 
-def double_(x):
+def double(x):
     return x * 2
 
 def even(x):
@@ -3696,7 +3696,7 @@ def ethiopian(multiplier, multiplicand):
         if not even(multiplier):
             result += multiplicand
         multiplier   = halve(multiplier)
-        multiplicand = double_(multiplicand)
+        multiplicand = double(multiplicand)
 
     return result
 
@@ -3705,7 +3705,7 @@ print(ethiopian(17, 34))
 F halve(x)
    R x I/ 2
 
-F double_(x)
+F double(x)
    R x * 2
 
 F even(x)
@@ -3718,7 +3718,7 @@ F ethiopian(=multiplier, =multiplicand)
       I !even(multiplier)
          result += multiplicand
       multiplier = halve(multiplier)
-      multiplicand = double_(multiplicand)
+      multiplicand = double(multiplicand)
    R result
 print(ethiopian(17, 34))
 ===
@@ -3727,7 +3727,7 @@ template <typename T1> auto halve(const T1 &x)
     return idiv(x, 2);
 }
 
-template <typename T1> auto double_(const T1 &x)
+template <typename T1> auto _double_(const T1 &x)
 {
     return x * 2;
 }
@@ -3745,7 +3745,7 @@ template <typename T1, typename T2> auto ethiopian(T1 multiplier, T2 multiplican
         if (!even(multiplier))
             result += multiplicand;
         multiplier = halve(multiplier);
-        multiplicand = double_(multiplicand);
+        multiplicand = _double_(multiplicand);
     }
     return result;
 }

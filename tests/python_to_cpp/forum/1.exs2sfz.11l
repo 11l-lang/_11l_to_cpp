@@ -272,7 +272,7 @@ T EXSInstrument
          E I sig == 0400'0101
             V t = EXSParam(offset)
          E
-            X RuntimeError(‘Encountered an unknown chunk signature! signature is ’hex(sig))
+            X RuntimeError(‘Encountered an unknown chunk signature! signature is ’(‘0x’hex(sig).lowercase()))
          offset += chunk_size(:instrument_data, offset)
 
    F build_sequences()

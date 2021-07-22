@@ -177,7 +177,7 @@ struct CodeBlock1
 # https://www.rosettacode.org/wiki/Intersecting_number_wheels#Python:_Simplified_procedural
 from typing import Dict, List
 
-def nextfrom(w : Dict[str, List[str]], name):
+def nextfrom(w : dict, name):
     while True:
         nxt = w[name][0]
         w[name] = w[name][1:] + w[name][:1]
@@ -202,7 +202,7 @@ A: 1 B C; B: 3 4; C: 5 B'''.strip("\n").split('\n'):
     print("  Generates:\n    " + gen + " ...\n")
 ===
 
-F nextfrom([String = [String]] &w; =name)
+F nextfrom(&w, =name)
    L
       V nxt = w[name][0]
       w[name] = w[name][1..] + w[name][0.<1]
@@ -226,7 +226,7 @@ A: 1 B C; B: 3 4; C: 5 B’.trim("\n").split("\n")
    V gen = (0.<20).map(i -> nextfrom(&@wheel, @first)).join(‘ ’)
    print("  Generates:\n    "gen" ...\n")
 ===
-template <typename T2> auto nextfrom(Dict<String, Array<String>> &w, T2 name)
+template <typename T1, typename T2> auto nextfrom(T1 &w, T2 name)
 {
     while (true) {
         auto nxt = _get<0>(w[name]);
