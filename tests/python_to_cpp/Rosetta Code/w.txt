@@ -936,3 +936,244 @@ struct CodeBlock2
         }
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/War_card_game#Python
+from typing import List
+UInt32 = int
+
+seed : UInt32 = 0
+def nonrandom(n):
+    global seed
+    seed = (1664525 * seed + 1013904223) & 0xFFFF_FFFF
+    return int(seed >> 16) % n
+
+def nonrandom_shuffle(x : list):
+    for i in range(len(x)-1, 0, -1):
+        j = nonrandom(i + 1)
+        (x[i], x[j]) = (x[j], x[i])
+
+SUITS = ['♣', '♦', '♥', '♠']
+FACES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+DECK = [f + '' + s for f in FACES for s in SUITS]
+CARD_TO_RANK = dict((DECK[i], (i + 3) // 4) for i in range(len(DECK)))
+
+class WarCardGame:
+    deck1 : List[str]
+    deck2 : List[str]
+
+    def __init__(self):
+        deck = DECK[:]
+        nonrandom_shuffle(deck)
+        self.deck1 = deck[:26]
+        self.deck2 = deck[26:]
+        self.pending : List[str] = []
+
+    def gameover(self):
+        """ game over who won message """
+        if len(self.deck2) == 0:
+            if len(self.deck1) == 0:
+                print('\nGame ends as a tie.')
+            else:
+                print('\nPlayer 1 wins the game.')
+        else:
+            print('\nPlayer 2 wins the game.')
+
+        return False
+
+    def turn(self):
+        """ one turn, may recurse on tie """
+        if len(self.deck1) == 0 or len(self.deck2) == 0:
+            return self.gameover()
+
+        card1 = self.deck1.pop(0)
+        card2 = self.deck2.pop(0)
+        (rank1, rank2) = (CARD_TO_RANK[card1], CARD_TO_RANK[card2])
+        print("{:<10}{:<10}".format(card1, card2), end='')
+        if rank1 > rank2:
+            print('Player 1 takes the cards.')
+            self.deck1.extend([card1, card2])
+            self.deck1.extend(self.pending)
+            self.pending.clear()
+        elif rank1 < rank2:
+            print('Player 2 takes the cards.')
+            self.deck2.extend([card2, card1])
+            self.deck2.extend(self.pending)
+            self.pending.clear()
+        else:  #  rank1 == rank2
+            print('Tie!')
+            if len(self.deck1) == 0 or len(self.deck2) == 0:
+                return self.gameover()
+
+            card3 = self.deck1.pop(0)
+            card4 = self.deck2.pop(0)
+            self.pending.extend([card1, card2, card3, card4])
+            print("{:<10}{:<10}".format("?", "?"), 'Cards are face down.', sep='')
+            return self.turn()
+
+        return True
+
+WG = WarCardGame()
+while WG.turn():
+    continue
+===
+UInt32 seed = 0
+F nonrandom(n)
+   :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
+   R Int(:seed >> 16) % n
+
+F nonrandom_shuffle(&x)
+   L(i) (x.len - 1 .< 0).step(-1)
+      V j = nonrandom(i + 1)
+      swap(&x[i], &x[j])
+V SUITS = [‘♣’, ‘♦’, ‘♥’, ‘♠’]
+V FACES = [‘2’, ‘3’, ‘4’, ‘5’, ‘6’, ‘7’, ‘8’, ‘9’, ‘10’, ‘J’, ‘Q’, ‘K’, ‘A’]
+V DECK = multiloop(FACES, SUITS, (f, s) -> f‘’s)
+V CARD_TO_RANK = Dict((0 .< DECK.len).map(i -> (:DECK[i], (i + 3) I/ 4)))
+
+T WarCardGame
+   [String] deck1
+   [String] deck2
+   [String] pending
+
+   F ()
+      V deck = copy(:DECK)
+      nonrandom_shuffle(&deck)
+      .deck1 = deck[0.<26]
+      .deck2 = deck[26..]
+
+   F gameover()
+      ‘ game over who won message ’
+      I .deck2.empty
+         I .deck1.empty
+            print("\nGame ends as a tie.")
+         E
+            print("\nPlayer 1 wins the game.")
+      E
+         print("\nPlayer 2 wins the game.")
+      R 0B
+
+   F turn()
+      ‘ one turn, may recurse on tie ’
+      I .deck1.empty | .deck2.empty
+         R .gameover()
+      V card1 = .deck1.pop(0)
+      V card2 = .deck2.pop(0)
+      V (rank1, rank2) = (:CARD_TO_RANK[card1], :CARD_TO_RANK[card2])
+      print(‘#<10#<10’.format(card1, card2), end' ‘’)
+      I rank1 > rank2
+         print(‘Player 1 takes the cards.’)
+         .deck1.extend([card1, card2])
+         .deck1.extend(.pending)
+         .pending.clear()
+      E I rank1 < rank2
+         print(‘Player 2 takes the cards.’)
+         .deck2.extend([card2, card1])
+         .deck2.extend(.pending)
+         .pending.clear()
+      E
+         print(‘Tie!’)
+         I .deck1.empty | .deck2.empty
+            R .gameover()
+         V card3 = .deck1.pop(0)
+         V card4 = .deck2.pop(0)
+         .pending.extend([card1, card2, card3, card4])
+         print(‘#<10#<10’.format(‘?’, ‘?’)‘Cards are face down.’)
+         R .turn()
+      R 1B
+V WG = WarCardGame()
+L WG.turn()
+   L.continue
+===
+uint32_t seed = 0;
+template <typename T1> auto nonrandom(const T1 &n)
+{
+    ::seed = (1664525 * ::seed + 1013904223) & 0xFFFF'FFFF;
+    return mod(to_int(::seed >> 16), n);
+}
+
+template <typename T1> auto nonrandom_shuffle(T1 &x)
+{
+    for (auto i : range_el(x.len() - 1, 0).step(-1)) {
+        auto j = nonrandom(i + 1);
+        swap(x[i], x[j]);
+    }
+}
+auto SUITS = create_array({u'♣'_C, u'♦'_C, u'♥'_C, u'♠'_C});
+auto FACES = create_array({u"2"_S, u"3"_S, u"4"_S, u"5"_S, u"6"_S, u"7"_S, u"8"_S, u"9"_S, u"10"_S, u"J"_S, u"Q"_S, u"K"_S, u"A"_S});
+auto DECK = multiloop(FACES, SUITS, [](const auto &f, const auto &s){return f & s;});
+auto CARD_TO_RANK = create_dict(range_el(0, DECK.len()).map([](const auto &i){return make_tuple(::DECK[i], idiv((i + 3), 4));}));
+
+class WarCardGame
+{
+public:
+    Array<String> deck1;
+    Array<String> deck2;
+    Array<String> pending;
+
+    WarCardGame()
+    {
+        auto deck = copy(::DECK);
+        nonrandom_shuffle(deck);
+        deck1 = deck[range_el(0, 26)];
+        deck2 = deck[range_ei(26)];
+    }
+
+    auto gameover()
+    {
+        u" game over who won message "_S;
+        if (deck2.empty()) {
+            if (deck1.empty())
+                print(u"\nGame ends as a tie."_S);
+            else
+                print(u"\nPlayer 1 wins the game."_S);
+        }
+        else
+            print(u"\nPlayer 2 wins the game."_S);
+        return false;
+    }
+
+    auto turn()
+    {
+        u" one turn, may recurse on tie "_S;
+        if (deck1.empty() || deck2.empty())
+            return gameover();
+        auto card1 = deck1.pop(0);
+        auto card2 = deck2.pop(0);
+        auto [rank1, rank2] = make_tuple(::CARD_TO_RANK[card1], ::CARD_TO_RANK[card2]);
+        print(u"#<10#<10"_S.format(card1, card2), u""_S);
+        if (rank1 > rank2) {
+            print(u"Player 1 takes the cards."_S);
+            deck1.extend(create_array({card1, card2}));
+            deck1.extend(pending);
+            pending.clear();
+        }
+        else if (rank1 < rank2) {
+            print(u"Player 2 takes the cards."_S);
+            deck2.extend(create_array({card2, card1}));
+            deck2.extend(pending);
+            pending.clear();
+        }
+        else {
+            print(u"Tie!"_S);
+            if (deck1.empty() || deck2.empty())
+                return gameover();
+            auto card3 = deck1.pop(0);
+            auto card4 = deck2.pop(0);
+            pending.extend(create_array({card1, card2, card3, card4}));
+            print(u"#<10#<10"_S.format(u"?"_S, u"?"_S) & u"Cards are face down."_S);
+            return turn();
+        }
+        return true;
+    }
+};
+auto WG = WarCardGame();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (WG.turn())
+            continue;
+    }
+} code_block_1;
