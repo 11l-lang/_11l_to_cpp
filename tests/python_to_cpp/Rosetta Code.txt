@@ -18192,9 +18192,11 @@ struct CodeBlock1
 
 
 # https://www.rosettacode.org/wiki/Write_language_name_in_3D_ASCII
-# Inspired by C# solution
+# Inspired by UNIX Shell solution
 s = \
 '''  XX
+   X
+   X
    X
    X
    X
@@ -18204,9 +18206,11 @@ lines = s.split("\n")
 width = max(len(l) for l in lines)
 
 for i, line in enumerate(lines):
-    print(' ' * (len(lines) - i - 1) + line.ljust(width).replace(' ', '  ').replace('X', '_/') * 3)
+    print(' ' * (len(lines) - i - 1) + line.ljust(width).replace(' ', '   ').replace('X', '__/') * 3)
 ===
 V s = ‘  XX
+   X
+   X
    X
    X
    X
@@ -18217,9 +18221,11 @@ V width = max(lines.map(l -> l.len))
 
 L(line) lines
    V i = L.index
-   print((‘ ’ * (lines.len - i - 1))‘’line.ljust(width).replace(‘ ’, ‘  ’).replace(‘X’, ‘_/’) * 3)
+   print((‘ ’ * (lines.len - i - 1))‘’line.ljust(width).replace(‘ ’, ‘   ’).replace(‘X’, ‘__/’) * 3)
 ===
 auto s = uR"(  XX
+   X
+   X
    X
    X
    X
@@ -18236,7 +18242,7 @@ struct CodeBlock1
 
         for (auto &&line : lines) {
             auto i = Lindex;
-            print((u" "_S * (lines.len() - i - 1)) & line.ljust(width).replace(u" "_S, u"  "_S).replace(u"X"_S, u"_/"_S) * 3);
+            print((u" "_S * (lines.len() - i - 1)) & line.ljust(width).replace(u" "_S, u"   "_S).replace(u"X"_S, u"__/"_S) * 3);
             Lindex++;
         }}
     }
