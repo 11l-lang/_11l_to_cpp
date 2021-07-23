@@ -35,7 +35,7 @@ template <typename T1> Dict<String, String> search(const T1 &values)
         return Dict<String, String>();
     if (all_map(::squares, [&values](const auto &s){return values[s].len() == 1;}))
         return values;
-    auto s = _get<1>(min(::squares.filter([&values](const auto &s){return values[s].len() > 1;}).map([&values](const auto &s){return make_tuple(values[s].len(), s);})));
+    auto s = _get<1>(min_map(::squares.filter([&values](const auto &s){return values[s].len() > 1;}), [&values](const auto &s){return make_tuple(values[s].len(), s);}));
     for (auto &&d : values[s]) {
         auto values_copy = values.copy();
         auto r = search(assign(values_copy, s, d));
@@ -101,7 +101,7 @@ template <typename T1, typename T2, typename T3> auto solve_file(const T1 &filen
 template <typename T1> auto printboard(const T1 &values)
 {
     u"Used for debugging."_S;
-    auto width = 1 + max(::squares.map([&values](const auto &s){return values[s].len();}));
+    auto width = 1 + max_map(::squares, [&values](const auto &s){return values[s].len();});
     auto line = u"\n"_S & (create_array({u"-"_S * (width * 3)}) * 3).join(u"+"_S);
     for (auto &&r : ::rows)
         print((::cols.map([&r, &values, &width](const auto &c){return values[r & c].center(width) & (in(c, u"36"_S) ? u"|"_S : u""_S);})).join(u""_S) & (in(r, u"CF"_S) ? line : u""_S));

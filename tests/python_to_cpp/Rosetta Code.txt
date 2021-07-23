@@ -992,7 +992,7 @@ struct CodeBlock1
     }
 } code_block_1;
 
-auto count = max(anagram.values().map([](const auto &ana){return ana.len();}));
+auto count = max_map(anagram.values(), [](const auto &ana){return ana.len();});
 
 struct CodeBlock2
 {
@@ -3598,7 +3598,7 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        while (min(table.map([](const auto &row){return row.len();})) < 5) {
+        while (min_map(table, [](const auto &row){return row.len();}) < 5) {
             table[_get<1>(mdroot(n))].append(n);
             n++;
         }
@@ -4351,7 +4351,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto &&path : paths)
-            print(path.rjust(max(paths.map([](const auto &p){return p.len();}))) & u" -> "_S & extract_ext(path));
+            print(path.rjust(max_map(paths, [](const auto &p){return p.len();})) & u" -> "_S & extract_ext(path));
     }
 } code_block_1;
 
@@ -5001,7 +5001,7 @@ template <typename T1, typename T2> auto is_ext(const T1 &file_name, const T2 &e
 template <typename T1, typename T2> auto test(const T1 &file_names, const T2 &extensions)
 {
     for (auto &&file_name : file_names)
-        print(file_name.ljust(max(file_names.map([](const auto &f_n){return f_n.len();}))) & u" "_S & String(is_ext(file_name, extensions)));
+        print(file_name.ljust(max_map(file_names, [](const auto &f_n){return f_n.len();})) & u" "_S & String(is_ext(file_name, extensions)));
 }
 
 struct CodeBlock1
@@ -6219,7 +6219,7 @@ struct CodeBlock1
         assert(h.len() == 112 && h[range_el(0, 4)] == create_array({27, 82, 41, 124}) && h[range_elen_i( - 4)] == create_array({8, 4, 2, 1}));
     }
 } code_block_1;
-auto m = max(range_ee(1, 99999).map([](const auto &i){return make_tuple(hailstone(i).len(), i);}));
+auto m = max_map(range_ee(1, 99999), [](const auto &i){return make_tuple(hailstone(i).len(), i);});
 
 struct CodeBlock2
 {
@@ -11472,7 +11472,7 @@ template <typename T1, typename T2, typename T3, typename T4 = decltype(0)> auto
 auto print_board()
 {
     auto d = create_dict(dict_of(-1, u"  "_S)(0, u"__"_S));
-    auto bmax = max(::board.map([](const auto &r){return max(r);}));
+    auto bmax = max_map(::board, [](const auto &r){return max(r);});
     auto lbmax = String(bmax).len() + 1;
     for (auto &&r : ::board[range_e_llen(1,  - 1)])
         print(r[range_e_llen(1,  - 1)].map([&d, &lbmax](const auto &c){return d.get(c, String(c)).rjust(lbmax);}).join(u""_S));
@@ -12101,7 +12101,7 @@ auto interactiveconversions()
 }
 
 auto morethan1word = sum_map(num2words.keys().filter([](const auto &w){return ::num2words[w].len() > 1;}), [](const auto &w){return 1;});
-auto maxwordpernum = max(num2words.values().map([](const auto &values){return values.len();}));
+auto maxwordpernum = max_map(num2words.values(), [](const auto &values){return values.len();});
 
 struct CodeBlock3
 {
@@ -14106,7 +14106,7 @@ template <typename T1> auto readfile(const T1 &f)
     u"file > initial world configuration"_S;
     auto world = f.map([](const auto &row){return row.rtrim(Array<Char>(u"\r\n"_S));});
     auto height = world.len();
-    auto width = max(world.map([](const auto &row){return row.len();}));
+    auto width = max_map(world, [](const auto &row){return row.len();});
     auto nonrow = create_array({u" "_S & (u" "_S * width) & u" "_S});
     auto world2 = nonrow + world.map([&width](const auto &row){return u" "_S & String(row).ljust(width) & u" "_S;}) + nonrow;
     auto world3 = world2.map([](const auto &row){return create_array(row);});
@@ -14564,7 +14564,7 @@ struct CodeBlock1
         print(u"\nMaximum value from the L(100, *) row:"_S);
     }
 } code_block_1;
-auto maxVal = max(range_el(0, 100).map([](const auto &a){return lah(100, a);}));
+auto maxVal = max_map(range_el(0, 100), [](const auto &a){return lah(100, a);});
 
 struct CodeBlock2
 {
@@ -18187,5 +18187,57 @@ struct CodeBlock1
         print(Vector(5, 7) - Vector(2, 3));
         print(Vector(5, 7) * 11);
         print(Vector(5, 7) / 2.0);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Write_language_name_in_3D_ASCII
+# Inspired by C# solution
+s = \
+'''  XX
+   X
+   X
+   X
+ XXXXX'''
+
+lines = s.split("\n")
+width = max(len(l) for l in lines)
+
+for i, line in enumerate(lines):
+    print(' ' * (len(lines) - i - 1) + line.ljust(width).replace(' ', '  ').replace('X', '_/') * 3)
+===
+V s = ‘  XX
+   X
+   X
+   X
+ XXXXX’
+
+V lines = s.split("\n")
+V width = max(lines.map(l -> l.len))
+
+L(line) lines
+   V i = L.index
+   print((‘ ’ * (lines.len - i - 1))‘’line.ljust(width).replace(‘ ’, ‘  ’).replace(‘X’, ‘_/’) * 3)
+===
+auto s = uR"(  XX
+   X
+   X
+   X
+ XXXXX)"_S;
+
+auto lines = s.split(u"\n"_S);
+auto width = max_map(lines, [](const auto &l){return l.len();});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {int Lindex = 0;
+
+        for (auto &&line : lines) {
+            auto i = Lindex;
+            print((u" "_S * (lines.len() - i - 1)) & line.ljust(width).replace(u" "_S, u"  "_S).replace(u"X"_S, u"_/"_S) * 3);
+            Lindex++;
+        }}
     }
 } code_block_1;

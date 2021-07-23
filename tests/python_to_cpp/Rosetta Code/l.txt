@@ -813,7 +813,7 @@ template <typename T1> auto lcp(const T1 &sa)
     if (sa.len() == 1)
         return _get<0>(sa);
 
-    auto min_len = min(sa.map([](const auto &s){return s.len();}));
+    auto min_len = min_map(sa, [](const auto &s){return s.len();});
 
     for (auto i : range_el(0, min_len)) {
         auto p = _get<0>(sa)[i];
@@ -1042,7 +1042,7 @@ template <typename T1> auto lcs(const T1 &sa)
     if (sa.len() == 1)
         return _get<0>(sa);
 
-    auto min_len = min(sa.map([](const auto &s){return s.len();}));
+    auto min_len = min_map(sa, [](const auto &s){return s.len();});
 
     for (auto i : range_ee(1, min_len)) {
         auto p = _get<0>(sa).at_plus_len( - i);
@@ -1249,7 +1249,7 @@ template <typename T1> auto longest_palindrome(const T1 &s)
         if (i + p[i] > r)
             assign_from_tuple(c, r, make_tuple(i, i + p[i]));
     }
-    auto [max_len, center_index] = max(enumerate(p).map([](const auto &i, const auto &n){return make_tuple(n, i);}));
+    auto [max_len, center_index] = max_map(enumerate(p), [](const auto &i, const auto &n){return make_tuple(n, i);});
     return s[range_el(idiv((center_index - max_len), 2), idiv((center_index + max_len), 2))];
 }
 

@@ -6476,7 +6476,7 @@ auto ddata = u""_S;
 template <typename T1> auto init(const T1 &board)
 {
     ::data = board.split(u"\n"_S);
-    ::nrows = max(::data.map([](const auto &r){return r.len();}));
+    ::nrows = max_map(::data, [](const auto &r){return r.len();});
 
     auto maps = create_dict(dict_of(u' '_C, u' '_C)(u'.'_C, u'.'_C)(u'@'_C, u' '_C)(u'#'_C, u'#'_C)(u'$'_C, u' '_C));
     auto mapd = create_dict(dict_of(u' '_C, u' '_C)(u'.'_C, u' '_C)(u'@'_C, u'@'_C)(u'#'_C, u' '_C)(u'$'_C, u'*'_C));

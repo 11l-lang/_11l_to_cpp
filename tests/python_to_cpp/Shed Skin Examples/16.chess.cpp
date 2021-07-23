@@ -148,7 +148,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto rowAttack(con
 
 template <typename T1, typename T2, typename T3> auto nonpawnAttacks(const T1 &board, const T2 &ix, const T3 &color)
 {
-    return (max(::knightMoves.map([&board, &color, &ix](const auto &i){return board[ix + i] == color * 2;})) || max(::bishopLines.map([&board, &color, &ix](const auto &bishopLine){return rowAttack(board, make_tuple(color * 3, color * 5), ix, bishopLine);})) || max(::rookLines.map([&board, &color, &ix](const auto &rookLine){return rowAttack(board, make_tuple(color * 4, color * 5), ix, rookLine);})));
+    return (max_map(::knightMoves, [&board, &color, &ix](const auto &i){return board[ix + i] == color * 2;}) || max_map(::bishopLines, [&board, &color, &ix](const auto &bishopLine){return rowAttack(board, make_tuple(color * 3, color * 5), ix, bishopLine);}) || max_map(::rookLines, [&board, &color, &ix](const auto &rookLine){return rowAttack(board, make_tuple(color * 4, color * 5), ix, rookLine);}));
 }
 
 auto nonpawnBlackAttacks = [](const auto &board, const auto &ix){return nonpawnAttacks(board, ix, -1);};
