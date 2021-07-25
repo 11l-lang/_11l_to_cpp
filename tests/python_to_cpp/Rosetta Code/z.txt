@@ -486,3 +486,760 @@ struct CodeBlock1
         printzz(zigzag(6));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Zeckendorf_arithmetic#Python
+from copy import deepcopy
+
+class Zeckendorf:
+    dLen : int
+
+    def __init__(self, x='0'):
+        q = 1
+        i = len(x) - 1
+        self.dLen = i // 2
+        self.dVal = 0
+        while i >= 0:
+            self.dVal = self.dVal + (ord(x[i]) - ord('0')) * q
+            q = q * 2
+            i = i -1
+
+    def a(self, n):
+        i = n
+        while True:
+            if self.dLen < i:
+                self.dLen = i
+            j = (self.dVal >> (i * 2)) & 3
+            if j == 0 or j == 1:
+                return
+            if j == 2:
+                if (self.dVal >> ((i + 1) * 2) & 1) != 1:
+                    return
+                self.dVal = self.dVal + (1 << (i * 2 + 1))
+                return
+            if j == 3:
+                temp = 3 << (i * 2)
+                temp = temp ^ -1
+                self.dVal = self.dVal & temp
+                self.b((i + 1) * 2)
+            i = i + 1
+
+    def b(self, pos):
+        if pos == 0:
+            self.inc()
+            return
+        if (self.dVal >> pos) & 1 == 0:
+            self.dVal = self.dVal + (1 << pos)
+            self.a(int(pos / 2))
+            if pos > 1:
+                self.a(int(pos / 2) - 1)
+        else:
+            temp = 1 << pos
+            temp = temp ^ -1
+            self.dVal = self.dVal & temp
+            self.b(pos + 1)
+            self.b(pos - (2 if pos > 1 else 1))
+
+    def c(self, pos):
+        if (self.dVal >> pos) & 1 == 1:
+            temp = 1 << pos
+            temp = temp ^ -1
+            self.dVal = self.dVal & temp
+            return
+        self.c(pos + 1)
+        if pos > 0:
+            self.b(pos - 1)
+        else:
+            self.inc()
+
+    def inc(self) -> None:
+        self.dVal = self.dVal + 1
+        self.a(0)
+
+    def __add__(self, rhs):
+        copy = self
+        rhs_dVal = rhs.dVal
+        limit = (rhs.dLen + 1) * 2
+        for gn in range(0, limit):
+            if ((rhs_dVal >> gn) & 1) == 1:
+                copy.b(gn)
+        return copy
+
+    def __sub__(self, rhs):
+        copy = self
+        rhs_dVal = rhs.dVal
+        limit = (rhs.dLen + 1) * 2
+        for gn in range(0, limit):
+            if (rhs_dVal >> gn) & 1 == 1:
+                copy.c(gn)
+        while (((copy.dVal >> ((copy.dLen * 2) & 31)) & 3) == 0) or (copy.dLen == 0):
+            copy.dLen = copy.dLen - 1
+        return copy
+
+    def __mul__(self, rhs):
+        na = deepcopy(rhs)
+        nb = deepcopy(rhs)
+        nr = Zeckendorf()
+        dVal = self.dVal
+        for i in range(0, (self.dLen + 1) * 2):
+            if ((dVal >> i) & 1) > 0:
+                nr = nr + nb
+            nt = deepcopy(nb)
+            nb = nb + na
+            na = deepcopy(nt)
+        return nr
+
+    def __str__(self):
+        dig = ["00", "01", "10"]
+        dig1 = ["", "1", "10"]
+
+        if self.dVal == 0:
+            return '0'
+        idx = (self.dVal >> ((self.dLen * 2) & 31)) & 3
+        sb : str = dig1[idx]
+        i = self.dLen - 1
+        while i >= 0:
+            idx = (self.dVal >> (i * 2)) & 3
+            sb += dig[idx]
+            i = i - 1
+        return sb
+
+# main
+print("Addition:")
+g = Zeckendorf("10")
+g = g + Zeckendorf("10")
+print(g)
+g = g + Zeckendorf("10")
+print(g)
+g = g + Zeckendorf("1001")
+print(g)
+g = g + Zeckendorf("1000")
+print(g)
+g = g + Zeckendorf("10101")
+print(g)
+print()
+
+print("Subtraction:")
+g = Zeckendorf("1000")
+g = g - Zeckendorf("101")
+print(g)
+g = Zeckendorf("10101010")
+g = g - Zeckendorf("1010101")
+print(g)
+print()
+
+print("Multiplication:")
+g = Zeckendorf("1001")
+g = g * Zeckendorf("101")
+print(g)
+g = Zeckendorf("101010")
+g = g + Zeckendorf("101")
+print(g)
+===
+T Zeckendorf
+   Int dLen
+   dVal = 0
+
+   F (x = ‘0’)
+      V q = 1
+      V i = x.len - 1
+      .dLen = i I/ 2
+      L i >= 0
+         .dVal = .dVal + (x[i].code - ‘0’.code) * q
+         q = q * 2
+         i = i - 1
+
+   F a(n)
+      V i = n
+      L
+         I .dLen < i
+            .dLen = i
+         V j = (.dVal >> (i * 2)) [&] 3
+         I j == 0 | j == 1
+            R
+         I j == 2
+            I (.dVal >> ((i + 1) * 2) [&] 1) != 1
+               R
+            .dVal = .dVal + (1 << (i * 2 + 1))
+            R
+         I j == 3
+            V temp = 3 << (i * 2)
+            temp = temp (+) -1
+            .dVal = .dVal [&] temp
+            .b((i + 1) * 2)
+         i = i + 1
+
+   F b(pos)
+      I pos == 0
+         .inc()
+         R
+      I (.dVal >> pos) [&] 1 == 0
+         .dVal = .dVal + (1 << pos)
+         .a(Int(pos / 2))
+         I pos > 1
+            .a(Int(pos / 2) - 1)
+      E
+         V temp = 1 << pos
+         temp = temp (+) -1
+         .dVal = .dVal [&] temp
+         .b(pos + 1)
+         .b(pos - (I pos > 1 {2} E 1))
+
+   F c(pos)
+      I (.dVal >> pos) [&] 1 == 1
+         V temp = 1 << pos
+         temp = temp (+) -1
+         .dVal = .dVal [&] temp
+         R
+      .c(pos + 1)
+      I pos > 0
+         .b(pos - 1)
+      E
+         .inc()
+
+   F inc() -> N
+      .dVal = .dVal + 1
+      .a(0)
+
+   F +(rhs)
+      V copy = (.)
+      V rhs_dVal = rhs.dVal
+      V limit = (rhs.dLen + 1) * 2
+      L(gn) 0 .< limit
+         I ((rhs_dVal >> gn) [&] 1) == 1
+            copy.b(gn)
+      R copy
+
+   F -(rhs)
+      V copy = (.)
+      V rhs_dVal = rhs.dVal
+      V limit = (rhs.dLen + 1) * 2
+      L(gn) 0 .< limit
+         I (rhs_dVal >> gn) [&] 1 == 1
+            copy.c(gn)
+      L (((copy.dVal >> ((copy.dLen * 2) [&] 31)) [&] 3) == 0) | (copy.dLen == 0)
+         copy.dLen = copy.dLen - 1
+      R copy
+
+   F *(rhs)
+      V na = copy(rhs)
+      V nb = copy(rhs)
+      V nr = Zeckendorf()
+      V dVal = .dVal
+      L(i) 0 .< (.dLen + 1) * 2
+         I ((dVal >> i) [&] 1) > 0
+            nr = nr + nb
+         V nt = copy(nb)
+         nb = nb + na
+         na = copy(nt)
+      R nr
+
+   F String()
+      V dig = [‘00’, ‘01’, ‘10’]
+      V dig1 = [‘’, ‘1’, ‘10’]
+
+      I .dVal == 0
+         R ‘0’
+      V idx = (.dVal >> ((.dLen * 2) [&] 31)) [&] 3
+      String sb = dig1[idx]
+      V i = .dLen - 1
+      L i >= 0
+         idx = (.dVal >> (i * 2)) [&] 3
+         sb ‘’= dig[idx]
+         i = i - 1
+      R sb
+
+print(‘Addition:’)
+V g = Zeckendorf(‘10’)
+g = g + Zeckendorf(‘10’)
+print(g)
+g = g + Zeckendorf(‘10’)
+print(g)
+g = g + Zeckendorf(‘1001’)
+print(g)
+g = g + Zeckendorf(‘1000’)
+print(g)
+g = g + Zeckendorf(‘10101’)
+print(g)
+print()
+
+print(‘Subtraction:’)
+g = Zeckendorf(‘1000’)
+g = g - Zeckendorf(‘101’)
+print(g)
+g = Zeckendorf(‘10101010’)
+g = g - Zeckendorf(‘1010101’)
+print(g)
+print()
+
+print(‘Multiplication:’)
+g = Zeckendorf(‘1001’)
+g = g * Zeckendorf(‘101’)
+print(g)
+g = Zeckendorf(‘101010’)
+g = g + Zeckendorf(‘101’)
+print(g)
+===
+class Zeckendorf
+{
+public:
+    int dLen;
+    decltype(0) dVal = 0;
+
+    template <typename T1 = decltype(u"0"_S)> Zeckendorf(const T1 &x = u"0"_S)
+    {
+        auto q = 1;
+        auto i = x.len() - 1;
+        dLen = idiv(i, 2);
+        while (i >= 0) {
+            dVal = dVal + (x[i].code - u'0'_C.code) * q;
+            q = q * 2;
+            i = i - 1;
+        }
+    }
+
+    template <typename T1> auto a(const T1 &n)
+    {
+        auto i = n;
+        while (true) {
+            if (dLen < i)
+                dLen = i;
+            auto j = (dVal >> (i * 2)) & 3;
+            if (j == 0 || j == 1)
+                return;
+            if (j == 2) {
+                if ((dVal >> ((i + 1) * 2) & 1) != 1)
+                    return;
+                dVal = dVal + (1 << (i * 2 + 1));
+                return;
+            }
+            if (j == 3) {
+                auto temp = 3 << (i * 2);
+                temp = temp ^ -1;
+                dVal = dVal & temp;
+                b((i + 1) * 2);
+            }
+            i = i + 1;
+        }
+    }
+
+    template <typename T1> auto b(const T1 &pos)
+    {
+        if (pos == 0) {
+            inc();
+            return;
+        }
+        if (((dVal >> pos) & 1) == 0) {
+            dVal = dVal + (1 << pos);
+            a(to_int(pos / 2.0));
+            if (pos > 1)
+                a(to_int(pos / 2.0) - 1);
+        }
+        else {
+            auto temp = 1 << pos;
+            temp = temp ^ -1;
+            dVal = dVal & temp;
+            b(pos + 1);
+            b(pos - (pos > 1 ? 2 : 1));
+        }
+    }
+
+    template <typename T1> auto c(const T1 &pos)
+    {
+        if (((dVal >> pos) & 1) == 1) {
+            auto temp = 1 << pos;
+            temp = temp ^ -1;
+            dVal = dVal & temp;
+            return;
+        }
+        c(pos + 1);
+        if (pos > 0)
+            b(pos - 1);
+        else
+            inc();
+    }
+
+    void inc()
+    {
+        dVal = dVal + 1;
+        a(0);
+    }
+
+    template <typename T1> auto operator+(const T1 &rhs) const
+    {
+        auto copy = *this;
+        auto rhs_dVal = rhs.dVal;
+        auto limit = (rhs.dLen + 1) * 2;
+        for (auto gn : range_el(0, limit))
+            if (((rhs_dVal >> gn) & 1) == 1)
+                copy.b(gn);
+        return copy;
+    }
+    template <typename Ty> auto &operator+=(const Ty &t)
+    {
+        *this = *this + t;
+        return *this;
+    }
+
+    template <typename T1> auto operator-(const T1 &rhs) const
+    {
+        auto copy = *this;
+        auto rhs_dVal = rhs.dVal;
+        auto limit = (rhs.dLen + 1) * 2;
+        for (auto gn : range_el(0, limit))
+            if (((rhs_dVal >> gn) & 1) == 1)
+                copy.c(gn);
+        while ((((copy.dVal >> ((copy.dLen * 2) & 31)) & 3) == 0) || (copy.dLen == 0))
+            copy.dLen = copy.dLen - 1;
+        return copy;
+    }
+    template <typename Ty> auto &operator-=(const Ty &t)
+    {
+        *this = *this - t;
+        return *this;
+    }
+
+    template <typename T1> auto operator*(const T1 &rhs) const
+    {
+        auto na = copy(rhs);
+        auto nb = copy(rhs);
+        auto nr = Zeckendorf();
+        auto dVal = this->dVal;
+        for (auto i : range_el(0, (dLen + 1) * 2)) {
+            if (((dVal >> i) & 1) > 0)
+                nr = nr + nb;
+            auto nt = copy(nb);
+            nb = nb + na;
+            na = copy(nt);
+        }
+        return nr;
+    }
+    template <typename Ty> auto &operator*=(const Ty &t)
+    {
+        *this = *this * t;
+        return *this;
+    }
+
+    operator String() const
+    {
+        auto dig = create_array({u"00"_S, u"01"_S, u"10"_S});
+        auto dig1 = create_array({u""_S, u"1"_S, u"10"_S});
+
+        if (dVal == 0)
+            return u"0"_S;
+        auto idx = (dVal >> ((dLen * 2) & 31)) & 3;
+        String sb = dig1[idx];
+        auto i = dLen - 1;
+        while (i >= 0) {
+            idx = (dVal >> (i * 2)) & 3;
+            sb &= dig[idx];
+            i = i - 1;
+        }
+        return sb;
+    }
+};
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Addition:"_S);
+    }
+} code_block_1;
+auto g = Zeckendorf(u"10"_S);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        g = g + Zeckendorf(u"10"_S);
+        print(g);
+        g = g + Zeckendorf(u"10"_S);
+        print(g);
+        g = g + Zeckendorf(u"1001"_S);
+        print(g);
+        g = g + Zeckendorf(u"1000"_S);
+        print(g);
+        g = g + Zeckendorf(u"10101"_S);
+        print(g);
+        print();
+
+        print(u"Subtraction:"_S);
+        g = Zeckendorf(u"1000"_S);
+        g = g - Zeckendorf(u"101"_S);
+        print(g);
+        g = Zeckendorf(u"10101010"_S);
+        g = g - Zeckendorf(u"1010101"_S);
+        print(g);
+        print();
+
+        print(u"Multiplication:"_S);
+        g = Zeckendorf(u"1001"_S);
+        g = g * Zeckendorf(u"101"_S);
+        print(g);
+        g = Zeckendorf(u"101010"_S);
+        g = g + Zeckendorf(u"101"_S);
+        print(g);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Zumkeller_numbers#D
+def getDivisors(n):
+    divs = [1, n]
+    i = 2
+    while i * i <= n:
+        if n % i == 0:
+            divs += [i]
+
+            j = n // i
+            if i != j:
+                divs += [j]
+        i += 1
+    return divs
+
+def isPartSum(divs, sum):
+    if sum == 0:
+        return True
+
+    le = len(divs)
+    if le == 0:
+        return False
+
+    last = divs[-1]
+    newDivs : List[int] = []
+    for i in range(le - 1):
+        newDivs += [divs[i]]
+
+    if last > sum:
+        return isPartSum(newDivs, sum)
+    else:
+        return isPartSum(newDivs, sum) or isPartSum(newDivs, sum - last)
+
+def isZumkeller(n):
+    divs = getDivisors(n)
+    s = sum(divs)
+
+    if s % 2 == 1:
+        return False
+
+    if n % 2 == 1:
+        abundance = s - 2 * n
+        return abundance > 0 and abundance % 2 == 0
+
+    return isPartSum(divs, s // 2)
+
+print('The first 220 Zumkeller numbers are:')
+i = 2
+count = 0
+while count < 220:
+    if isZumkeller(i):
+        print('%3d ' % i, end = '')
+        count += 1
+        if count % 20 == 0:
+            print()
+    i += 1
+
+print("\nThe first 40 odd Zumkeller numbers are:")
+i = 3
+count = 0
+while count < 40:
+    if isZumkeller(i):
+        print('%5d ' % i, end = '')
+        count += 1
+        if count % 10 == 0:
+            print()
+    i += 2
+
+print("\nThe first 40 odd Zumkeller numbers which don't end in 5 are:")
+i = 3
+count = 0
+while count < 40:
+    if i % 10 != 5 and isZumkeller(i):
+        print('%7d ' % i, end = '')
+        count += 1
+        if count % 8 == 0:
+            print()
+    i += 2
+===
+F getDivisors(n)
+   V divs = [1, n]
+   V i = 2
+   L i * i <= n
+      I n % i == 0
+         divs [+]= i
+
+         V j = n I/ i
+         I i != j
+            divs [+]= j
+      i++
+   R divs
+
+F isPartSum(divs, sum)
+   I sum == 0
+      R 1B
+
+   V le = divs.len
+   I le == 0
+      R 0B
+
+   V last = divs.last
+   [Int] newDivs
+   L(i) 0 .< le - 1
+      newDivs [+]= divs[i]
+
+   I last > sum
+      R isPartSum(newDivs, sum)
+   E
+      R isPartSum(newDivs, sum) | isPartSum(newDivs, sum - last)
+
+F isZumkeller(n)
+   V divs = getDivisors(n)
+   V s = sum(divs)
+
+   I s % 2 == 1
+      R 0B
+
+   I n % 2 == 1
+      V abundance = s - 2 * n
+      R abundance > 0 & abundance % 2 == 0
+
+   R isPartSum(divs, s I/ 2)
+
+print(‘The first 220 Zumkeller numbers are:’)
+V i = 2
+V count = 0
+L count < 220
+   I isZumkeller(i)
+      print(‘#3 ’.format(i), end' ‘’)
+      count++
+      I count % 20 == 0
+         print()
+   i++
+
+print("\nThe first 40 odd Zumkeller numbers are:")
+i = 3
+count = 0
+L count < 40
+   I isZumkeller(i)
+      print(‘#5 ’.format(i), end' ‘’)
+      count++
+      I count % 10 == 0
+         print()
+   i += 2
+
+print("\nThe first 40 odd Zumkeller numbers which don't end in 5 are:")
+i = 3
+count = 0
+L count < 40
+   I i % 10 != 5 & isZumkeller(i)
+      print(‘#7 ’.format(i), end' ‘’)
+      count++
+      I count % 8 == 0
+         print()
+   i += 2
+===
+template <typename T1> auto getDivisors(const T1 &n)
+{
+    auto divs = create_array({1, n});
+    auto i = 2;
+    while (i * i <= n) {
+        if (mod(n, i) == 0) {
+            divs.append(i);
+
+            auto j = idiv(n, i);
+            if (i != j)
+                divs.append(j);
+        }
+        i++;
+    }
+    return divs;
+}
+
+template <typename T1, typename T2> auto isPartSum(const T1 &divs, const T2 &sum)
+{
+    if (sum == 0)
+        return true;
+
+    auto le = divs.len();
+    if (le == 0)
+        return false;
+
+    auto last = divs.last();
+    Array<int> newDivs;
+    for (auto i : range_el(0, le - 1))
+        newDivs.append(divs[i]);
+
+    if (last > sum)
+        return isPartSum(newDivs, sum);
+    else
+        return isPartSum(newDivs, sum) || isPartSum(newDivs, sum - last);
+}
+
+template <typename T1> auto isZumkeller(const T1 &n)
+{
+    auto divs = getDivisors(n);
+    auto s = sum(divs);
+
+    if (mod(s, 2) == 1)
+        return false;
+
+    if (mod(n, 2) == 1) {
+        auto abundance = s - 2 * n;
+        return abundance > 0 && mod(abundance, 2) == 0;
+    }
+
+    return isPartSum(divs, idiv(s, 2));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"The first 220 Zumkeller numbers are:"_S);
+    }
+} code_block_1;
+auto i = 2;
+auto count = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (count < 220) {
+            if (isZumkeller(i)) {
+                print(u"#3 "_S.format(i), u""_S);
+                count++;
+                if (mod(count, 20) == 0)
+                    print();
+            }
+            i++;
+        }
+
+        print(u"\nThe first 40 odd Zumkeller numbers are:"_S);
+        i = 3;
+        count = 0;
+        while (count < 40) {
+            if (isZumkeller(i)) {
+                print(u"#5 "_S.format(i), u""_S);
+                count++;
+                if (mod(count, 10) == 0)
+                    print();
+            }
+            i += 2;
+        }
+
+        print(u"\nThe first 40 odd Zumkeller numbers which don't end in 5 are:"_S);
+        i = 3;
+        count = 0;
+        while (count < 40) {
+            if (mod(i, 10) != 5 && isZumkeller(i)) {
+                print(u"#7 "_S.format(i), u""_S);
+                count++;
+                if (mod(count, 8) == 0)
+                    print();
+            }
+            i += 2;
+        }
+    }
+} code_block_2;

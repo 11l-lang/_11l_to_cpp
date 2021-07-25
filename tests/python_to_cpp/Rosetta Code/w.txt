@@ -1240,3 +1240,240 @@ struct CodeBlock1
             continue;
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Welch%27s_t-test#Python
+import math
+
+def betain(x, p, q):
+    if p <= 0 or q <= 0 or x < 0 or x > 1:
+        raise ValueError(0)
+
+    if x == 0 or x == 1:
+        return x
+
+    acu = 1e-15
+    lnbeta = math.lgamma(p) + math.lgamma(q) - math.lgamma(p + q)
+
+    xx = x
+    cx = 1 - x
+    pp = p
+    qq = q
+    indx = False
+    psq = p + q
+    if p < psq * x:
+        xx = 1 - x
+        cx = x
+        pp = q
+        qq = p
+        indx = True
+
+    term = 1.0
+    ai = 1.0
+    value = 1.0
+    ns = math.floor(qq + cx * psq)
+    rx = xx / cx
+    temp = qq - ai
+    if ns == 0:
+        rx = xx
+
+    while True:
+        term *= temp * rx / (pp + ai)
+        value += term
+        temp = abs(term)
+
+        if temp <= acu and temp <= acu * value:
+            value *= math.exp(pp * math.log(xx) + (qq - 1) * math.log(cx) - lnbeta) / pp
+            return 1 - value if indx else value
+
+        ai += 1
+        ns -= 1
+        if ns >= 0:
+            temp = qq - ai
+            if ns == 0:
+                rx = xx
+        else:
+            temp = psq
+            psq += 1
+
+def welch_ttest(a1, a2):
+    n1 = len(a1)
+    n2 = len(a2)
+    if n1 <= 1 or n2 <= 1:
+        raise ValueError(0)
+
+    mean1 = sum(a1) / n1
+    mean2 = sum(a2) / n2
+
+    var1 = sum((x - mean1)**2 for x in a1) / (n1 - 1)
+    var2 = sum((x - mean2)**2 for x in a2) / (n2 - 1)
+
+    t = (mean1 - mean2) / math.sqrt(var1 / n1 + var2 / n2)
+    df = (var1 / n1 + var2 / n2)**2 / (var1**2 / (n1**2 * (n1 - 1)) + var2**2 / (n2**2 * (n2 - 1)))
+    p = betain(df / (t**2 + df), df / 2, 1 / 2)
+
+    return (t, df, p)
+
+a1 = [float(3), 4, 1, 2.1]
+a2 = [float(490.2), 340, 433.9]
+print(welch_ttest(a1, a2))
+===
+F betain(x, p, q)
+   I p <= 0 | q <= 0 | x < 0 | x > 1
+      X ValueError(0)
+
+   I x == 0 | x == 1
+      R x
+
+   V acu = 1e-15
+   V lnbeta = lgamma(p) + lgamma(q) - lgamma(p + q)
+
+   V xx = x
+   V cx = 1 - x
+   V pp = p
+   V qq = q
+   V indx = 0B
+   V psq = p + q
+   I p < psq * x
+      xx = 1 - x
+      cx = x
+      pp = q
+      qq = p
+      indx = 1B
+
+   V term = 1.0
+   V ai = 1.0
+   V value = 1.0
+   V ns = floor(qq + cx * psq)
+   V rx = xx / cx
+   V temp = qq - ai
+   I ns == 0
+      rx = xx
+
+   L
+      term *= temp * rx / (pp + ai)
+      value += term
+      temp = abs(term)
+
+      I temp <= acu & temp <= acu * value
+         value *= exp(pp * log(xx) + (qq - 1) * log(cx) - lnbeta) / pp
+         R I indx {1 - value} E value
+
+      ai++
+      I --ns >= 0
+         temp = qq - ai
+         I ns == 0
+            rx = xx
+      E
+         temp = psq
+         psq++
+
+F welch_ttest(a1, a2)
+   V n1 = a1.len
+   V n2 = a2.len
+   I n1 <= 1 | n2 <= 1
+      X ValueError(0)
+
+   V mean1 = sum(a1) / n1
+   V mean2 = sum(a2) / n2
+
+   V var1 = sum(a1.map(x -> (x - @mean1) ^ 2)) / (n1 - 1)
+   V var2 = sum(a2.map(x -> (x - @mean2) ^ 2)) / (n2 - 1)
+
+   V t = (mean1 - mean2) / sqrt(var1 / n1 + var2 / n2)
+   V df = (var1 / n1 + var2 / n2) ^ 2 / (var1 ^ 2 / (n1 ^ 2 * (n1 - 1)) + var2 ^ 2 / (n2 ^ 2 * (n2 - 1)))
+   V p = betain(df / (t ^ 2 + df), df / 2, 1 / 2)
+
+   R (t, df, p)
+
+V a1 = [Float(3), 4, 1, 2.1]
+V a2 = [Float(490.2), 340, 433.9]
+print(welch_ttest(a1, a2))
+===
+template <typename T1, typename T2, typename T3> auto betain(const T1 &x, const T2 &p, const T3 &q)
+{
+    if (p <= 0 || q <= 0 || x < 0 || x > 1)
+        throw ValueError(0);
+
+    if (x == 0 || x == 1)
+        return x;
+
+    auto acu = 1e-15;
+    auto lnbeta = lgamma(p) + lgamma(q) - lgamma(p + q);
+
+    auto xx = x;
+    auto cx = 1 - x;
+    auto pp = p;
+    auto qq = q;
+    auto indx = false;
+    auto psq = p + q;
+    if (p < psq * x) {
+        xx = 1 - x;
+        cx = x;
+        pp = q;
+        qq = p;
+        indx = true;
+    }
+
+    auto term = 1.0;
+    auto ai = 1.0;
+    auto value = 1.0;
+    auto ns = floor(qq + cx * psq);
+    auto rx = xx / cx;
+    auto temp = qq - ai;
+    if (ns == 0)
+        rx = xx;
+
+    while (true) {
+        term *= temp * rx / (pp + ai);
+        value += term;
+        temp = abs(term);
+
+        if (temp <= acu && temp <= acu * value) {
+            value *= exp(pp * log(xx) + (qq - 1) * log(cx) - lnbeta) / pp;
+            return indx ? 1 - value : value;
+        }
+
+        ai++;
+        if (--ns >= 0) {
+            temp = qq - ai;
+            if (ns == 0)
+                rx = xx;
+        }
+        else {
+            temp = psq;
+            psq++;
+        }
+    }
+}
+
+template <typename T1, typename T2> auto welch_ttest(const T1 &a1, const T2 &a2)
+{
+    auto n1 = a1.len();
+    auto n2 = a2.len();
+    if (n1 <= 1 || n2 <= 1)
+        throw ValueError(0);
+
+    auto mean1 = sum(a1) / n1;
+    auto mean2 = sum(a2) / n2;
+
+    auto var1 = sum_map(a1, [&mean1](const auto &x){return square((x - mean1));}) / (n1 - 1);
+    auto var2 = sum_map(a2, [&mean2](const auto &x){return square((x - mean2));}) / (n2 - 1);
+
+    auto t = (mean1 - mean2) / sqrt(var1 / n1 + var2 / n2);
+    auto df = square((var1 / n1 + var2 / n2)) / (square(var1) / (square(n1) * (n1 - 1)) + square(var2) / (square(n2) * (n2 - 1)));
+    auto p = betain(df / (square(t) + df), df / 2.0, 1.0 / 2);
+
+    return make_tuple(t, df, p);
+}
+
+auto a1 = create_array<double>({to_float(3), 4, 1, 2.1});
+auto a2 = create_array<double>({to_float(490.2), 340, 433.9});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(welch_ttest(a1, a2));
+    }
+} code_block_1;
