@@ -315,6 +315,8 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                 if source[i:i+len(op)] == op:
                     if op == '|' and source[i+1:i+2] in ('‘', "'"): # ’ # this is an indented multi-line string literal
                         break
+                    if op == '.' and source[i+1:i+2].isdigit():
+                        break
                     operator_s = op
                     break
 
@@ -385,7 +387,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                 else:
                     category = Token.Category.NAME
 
-            elif '0' <= ch <= '9': # this is NUMERIC_LITERAL or CONSTANT 0B or 1B
+            elif '0' <= ch <= '9' or (ch == '.' and '0' <= source[i:i+1] <= '9'): # this is NUMERIC_LITERAL or CONSTANT 0B or 1B
                 if ch in '01' and source[i:i+1] in ('B', 'В') and not (is_hexadecimal_digit(source[i+1:i+2]) or source[i+1:i+2] == "'"):
                     i += 1
                     category = Token.Category.CONSTANT
