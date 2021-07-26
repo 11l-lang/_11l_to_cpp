@@ -27,6 +27,12 @@ inline int _(int max)
 	return ((unsigned long long)_random() * max) >> 32u;
 }
 
+inline int _(Int64 max)
+{
+	assert(max <= INT_MAX);
+	return _(int(max));
+}
+
 inline int __(int min, int max)
 {
 	return _(max - min) + min;
@@ -54,5 +60,25 @@ template <typename Type> inline void shuffle(Array<Type> &arr)
 template <typename Type> inline auto choice(const Array<Type> &arr)
 {
 	return arr[_(arr.len())];
+}
+
+template <typename Type> inline auto sample(const Array<Type> &population, Int k) // [https://github.com/python/cpython/blob/0363a4014d90df17a29042de008ef0b659f92505/Lib/random.py#L470-L478]
+{
+	Int n = population.len();
+	if (!(k <= n))
+		throw ValueError(u"Sample larger than population"_S);
+
+	Array<Type> result;
+	result.reserve(k);
+
+	Set<Int> selected;
+	for (Int i=0; i<k; i++) {
+		Int j;
+		do j = _(n); while (in(j, selected));
+		selected.add(j);
+		result.append(population[j]);
+	}
+
+	return result;
 }
 }
