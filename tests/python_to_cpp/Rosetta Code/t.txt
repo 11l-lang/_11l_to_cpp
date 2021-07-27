@@ -1024,6 +1024,7 @@ struct CodeBlock1
             print(u" f(#.) == #."_S.format(n, f(n)) & (is_prime(n) ? u", is prime"_S : u""_S));
     }
 } code_block_1;
+
 auto count = 0;
 
 struct CodeBlock2
@@ -1165,6 +1166,7 @@ struct CodeBlock1
         print(u"Tangent: "_S & tan(rad) & u" "_S & tan(radians(deg)));
     }
 } code_block_1;
+
 auto arcsine = asin(sin(rad));
 
 struct CodeBlock2
@@ -1174,6 +1176,7 @@ struct CodeBlock2
         print(u"Arcsine: "_S & arcsine & u" "_S & degrees(arcsine));
     }
 } code_block_2;
+
 auto arccosine = acos(cos(rad));
 
 struct CodeBlock3
@@ -1183,6 +1186,7 @@ struct CodeBlock3
         print(u"Arccosine: "_S & arccosine & u" "_S & degrees(arccosine));
     }
 } code_block_3;
+
 auto arctangent = atan(tan(rad));
 
 struct CodeBlock4

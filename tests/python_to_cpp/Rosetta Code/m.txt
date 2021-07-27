@@ -678,6 +678,7 @@ struct CodeBlock1
         print(u"The first 30 terms of the Mian-Chowla sequence are:"_S);
     }
 } code_block_1;
+
 auto mc = mian_chowla();
 
 struct CodeBlock2
@@ -1324,6 +1325,7 @@ struct CodeBlock1
         _get<0>(result).append(u"LAST_VISIT"_S);
     }
 } code_block_1;
+
 auto last = create_dict(visits[range_ei(1)], [](const auto &p_vis){return make_tuple(_get<0>(p_vis), _get<1>(p_vis));});
 
 struct CodeBlock2
@@ -1335,6 +1337,7 @@ struct CodeBlock2
         _get<0>(result).append(create_array({u"SCORE_SUM"_S, u"SCORE_AVG"_S}));
     }
 } code_block_2;
+
 auto n = create_dict(patients[range_ei(1)], [](const auto &p){return make_tuple(_get<0>(p), 0);});
 auto tot = create_dict(patients[range_ei(1)], [](const auto &p){return make_tuple(_get<0>(p), 0.0);});
 
@@ -1545,6 +1548,7 @@ struct CodeBlock1
         print(u"\nMontgomery computation of x1 ^ x2 mod m:"_S);
     }
 } code_block_1;
+
 auto prod = mont.reduce(mont.rrm);
 auto base = mont.reduce(x1 * mont.rrm);
 auto ex = x2;

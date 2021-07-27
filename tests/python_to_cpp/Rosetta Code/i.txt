@@ -432,6 +432,7 @@ struct CodeBlock1
         print(u"Checking plausibility of \"I before E except after C\":"_S);
     }
 } code_block_1;
+
 auto [cei, cie, not_c_ie, not_c_ei] = simple_stats();
 
 struct CodeBlock2

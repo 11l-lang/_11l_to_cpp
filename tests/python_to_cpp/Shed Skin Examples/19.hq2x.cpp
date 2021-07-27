@@ -30,9 +30,9 @@ public:
         f.write(String(w) & u" "_S & String(h) & u"\n"_S);
         f.write(u"255\n"_S);
         for (auto &&rgb : this->rgb) {
-            auto r = ((rgb >> 16) & 0xff);
-            auto g = ((rgb >> 8) & 0xff);
-            auto b = (rgb & 0xff);
+            auto r = ((rgb >> 16) & 0xFF);
+            auto g = ((rgb >> 8) & 0xFF);
+            auto b = (rgb & 0xFF);
             f.write(String(r) & u" "_S & String(g) & u" "_S & String(b) & u"\n"_S);
         }
         f.close();

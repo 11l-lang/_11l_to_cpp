@@ -263,6 +263,7 @@ struct CodeBlock1
         f(u"id="_S & id);
     }
 } code_block_1;
+
 auto s = u"str"_S & u"\n"_S;
 auto s2 = a & b;
 class Node
@@ -1216,6 +1217,7 @@ struct CodeBlock1
         print_set(set_values, 3);
     }
 } code_block_1;
+
 auto it = set_values.find(1);
 
 struct CodeBlock2

@@ -1054,6 +1054,7 @@ span.comment {color: #808080;}
         test_id++;
     }
 } code_block_1;
+
 auto was_error = false;
 
 struct CodeBlock2

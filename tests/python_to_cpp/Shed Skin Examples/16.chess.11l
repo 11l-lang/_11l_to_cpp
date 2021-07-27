@@ -35,21 +35,21 @@ F printBoard(board)
       print()
 
 F mov([Int] &board; mv)
-   V ix = (mv >> 8) [&] f'f
-   board[mv [&] f'f] = board[ix]
+   V ix = (mv >> 8) [&] F'F
+   board[mv [&] F'F] = board[ix]
    board[ix] = 0
    L(i) :clearCastlingOpportunities[ix]
       board[i] = :iFalse
 
    board[26] = Int(!board[26])
-   I (mv [&] 7fff'0000) == 0
+   I (mv [&] 7FFF'0000) == 0
       R
    I (mv [&] 0100'0000)
       board[27] = mv [&] 7
    E
       board[27] = :iNone
    I (mv [&] 0400'0000)
-      S mv [&] f'f
+      S mv [&] F'F
          0'2
             board[0'0] = 0
             board[0'3] = 4
@@ -70,14 +70,14 @@ F mov([Int] &board; mv)
       E
          board[mv [&] 0'7 + 48] = 0
    I mv [&] 1000'0000
-      V a = (mv [&] 00ff'0000) >> 16
+      V a = (mv [&] 00FF'0000) >> 16
       I (a >= 8'0)
          a = a - 01'00
-      board[mv [&] f'f] = a
+      board[mv [&] F'F] = a
 
 F toString(move)
-   V fr = (move >> 8) [&] f'f
-   V to = move [&] f'f
+   V fr = (move >> 8) [&] F'F
+   V to = move [&] F'F
    V letters = ‘abcdefgh’
    V numbers = ‘12345678’
    V mid = ‘-’
@@ -233,7 +233,7 @@ F pseudoLegalCapturesBlack(board)
             I listGet(board, sq - 15) >= 1
                retval.append(0200'0000 + sq * 01'01 - 15)
             I sq >= 48 & sq < 56 & abs((sq [&] 7) - board[27]) == 1
-               retval.append(0a00'0000 + sq * 01'00 + (sq [&] 7'0) - 16 + board[27])
+               retval.append(0A00'0000 + sq * 01'00 + (sq [&] 7'0) - 16 + board[27])
          E I b == -2
             L(k) :knightMoves
                I !(sq + k [&] 8'8) & board[k + sq] >= 1
@@ -283,7 +283,7 @@ F legalMoves(board)
    L(mv) allMoves
       V board2 = copy(board)
       mov(&board2, mv)
-      I pseudoLegalCaptures(board2).filter(i -> @board2[i [&] f'f] == @kingVal).empty
+      I pseudoLegalCaptures(board2).filter(i -> @board2[i [&] F'F] == @kingVal).empty
          retval.append(mv)
    R retval
 

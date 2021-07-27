@@ -247,6 +247,7 @@ struct CodeBlock1
         print(u"Bagged the following items\n  "_S & sorted(bagged.map([](const auto &item, const auto &_, const auto &_2){return item;})).join(u"\n  "_S));
     }
 } code_block_1;
+
 auto [val, wt] = totalvalue(bagged);
 
 struct CodeBlock2
@@ -601,6 +602,7 @@ struct CodeBlock1
         print(u"Single run samples for n = 3:"_S);
     }
 } code_block_1;
+
 auto s_of_n = S_of_n_creator(3);
 
 struct CodeBlock2

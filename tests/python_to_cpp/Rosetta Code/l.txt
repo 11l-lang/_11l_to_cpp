@@ -679,6 +679,7 @@ struct CodeBlock1
                 longPrimes.append(prime);
     }
 } code_block_1;
+
 auto numbers = create_array({500, 1000, 2000, 4000, 8000, 16000, 32000, 64000});
 auto count = 0;
 auto index = 0;
@@ -2520,6 +2521,7 @@ struct CodeBlock1
         print();
     }
 } code_block_1;
+
 auto b = create_array({create_array({11, 9, 24, 2}), create_array({1, 5, 2, 6}), create_array({3, 17, 18, 1}), create_array({2, 5, 7, 1})});
 
 struct CodeBlock2

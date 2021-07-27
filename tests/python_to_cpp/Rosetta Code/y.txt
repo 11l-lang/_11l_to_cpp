@@ -110,6 +110,7 @@ struct CodeBlock1
         print(u"First 30 Yellowstone numbers:"_S);
     }
 } code_block_1;
+
 auto ygen = YellowstoneGenerator();
 
 struct CodeBlock2

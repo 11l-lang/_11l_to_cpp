@@ -687,6 +687,7 @@ struct CodeBlock1
         print(u"First 25 vampire numbers with their fangs:"_S);
     }
 } code_block_1;
+
 auto count = 0;
 auto n = 10;
 auto limit = 100;
@@ -777,7 +778,7 @@ F from_seq(seq)
 
    R r
 
-L(x) [UInt64(7'f), 40'00, 0, 003f'fffe, 001f'ffff, 0020'0000, 3311'a123'4df3'1413]
+L(x) [UInt64(7'F), 40'00, 0, 003F'FFFE, 001F'FFFF, 0020'0000, 3311'A123'4DF3'1413]
    V s = to_seq(x)
    print(‘seq from ’hex(x).lowercase()‘ ’to_str(s)‘ back: ’hex(from_seq(s)).lowercase())
 ===
@@ -817,7 +818,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto &&x : create_array<UInt64>({to_uint64(0x7f), 0x40'00, 0, 0x003f'fffe, 0x001f'ffff, 0x0020'0000, 0x3311'a123'4df3'1413})) {
+        for (auto &&x : create_array<UInt64>({to_uint64(0x7F), 0x40'00, 0, 0x003F'FFFE, 0x001F'FFFF, 0x0020'0000, 0x3311'A123'4DF3'1413})) {
             auto s = to_seq(x);
             print(u"seq from "_S & hex(x).lowercase() & u" "_S & to_str(s) & u" back: "_S & hex(from_seq(s)).lowercase());
         }

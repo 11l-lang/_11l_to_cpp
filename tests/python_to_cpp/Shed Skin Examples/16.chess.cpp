@@ -53,21 +53,21 @@ template <typename T1> auto printBoard(const T1 &board)
 
 template <typename T2> auto mov(Array<int> &board, const T2 &mv)
 {
-    auto ix = (mv >> 8) & 0xff;
-    board.set(mv & 0xff, board[ix]);
+    auto ix = (mv >> 8) & 0xFF;
+    board.set(mv & 0xFF, board[ix]);
     board.set(ix, 0);
     for (auto &&i : ::clearCastlingOpportunities[ix])
         board.set(i, ::iFalse);
 
     _set<26>(board, to_int(!_get<26>(board)));
-    if ((mv & 0x7fff'0000) == 0)
+    if ((mv & 0x7FFF'0000) == 0)
         return;
     if ((mv & 0x0100'0000))
         _set<27>(board, mv & 7);
     else
         _set<27>(board, ::iNone);
     if ((mv & 0x0400'0000))
-        switch (mv & 0xff)
+        switch (mv & 0xFF)
         {
         case 0x02:
             _set<0x00>(board, 0);
@@ -96,17 +96,17 @@ template <typename T2> auto mov(Array<int> &board, const T2 &mv)
             board.set(mv & 0x07 + 48, 0);
     }
     if (mv & 0x1000'0000) {
-        auto a = (mv & 0x00ff'0000) >> 16;
+        auto a = (mv & 0x00FF'0000) >> 16;
         if ((a >= 0x80))
             a = a - 0x01'00;
-        board.set(mv & 0xff, a);
+        board.set(mv & 0xFF, a);
     }
 }
 
 template <typename T1> auto toString(const T1 &move)
 {
-    auto fr = (move >> 8) & 0xff;
-    auto to = move & 0xff;
+    auto fr = (move >> 8) & 0xFF;
+    auto to = move & 0xFF;
     auto letters = u"abcdefgh"_S;
     auto numbers = u"12345678"_S;
     auto mid = u"-"_S;
@@ -302,7 +302,7 @@ template <typename T1> auto pseudoLegalCapturesBlack(const T1 &board)
                 if (listGet(board, sq - 15) >= 1)
                     retval.append(0x0200'0000 + sq * 0x01'01 - 15);
                 if (sq >= 48 && sq < 56 && abs((sq & 7) - _get<27>(board)) == 1)
-                    retval.append(0x0a00'0000 + sq * 0x01'00 + (sq & 0x70) - 16 + _get<27>(board));
+                    retval.append(0x0A00'0000 + sq * 0x01'00 + (sq & 0x70) - 16 + _get<27>(board));
             }
             else if (b == -2) {
                 for (auto &&k : ::knightMoves)
@@ -367,7 +367,7 @@ template <typename T1> auto legalMoves(const T1 &board)
     for (auto &&mv : allMoves) {
         auto board2 = copy(board);
         mov(board2, mv);
-        if (pseudoLegalCaptures(board2).filter([&board2, &kingVal](const auto &i){return board2[i & 0xff] == kingVal;}).empty())
+        if (pseudoLegalCaptures(board2).filter([&board2, &kingVal](const auto &i){return board2[i & 0xFF] == kingVal;}).empty())
             retval.append(mv);
     }
     return retval;

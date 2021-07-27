@@ -1077,13 +1077,13 @@ class ASTProgram(ASTNodeWithChildren):
             global_statement = type(c) in (ASTVariableDeclaration, ASTVariableInitialization, ASTTupleInitialization, ASTFunctionDefinition, ASTTypeDefinition, ASTTypeAlias, ASTTypeEnum, ASTMain)
             beginning_of_codeblock = False
             if global_statement != prev_global_statement:
+                beginning_of_codeblock = True
                 prev_global_statement = global_statement
                 if not global_statement:
                     sname = 'CodeBlock' + str(code_block_id)
                     r += "\n"*(c is not self.children[0]) + 'struct ' + sname + "\n{\n    " + sname + "()\n    {\n"
-                    beginning_of_codeblock = True
                 else:
-                    r += "    }\n} code_block_" + str(code_block_id) + ";\n"
+                    r += "    }\n} code_block_" + str(code_block_id) + ";\n\n"
                     code_block_id += 1
             s = c.to_str(2*(not global_statement))
             if beginning_of_codeblock:

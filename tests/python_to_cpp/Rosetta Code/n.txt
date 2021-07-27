@@ -236,6 +236,7 @@ struct CodeBlock1
         print(u"Encode 10 as negabinary (expect 11110)"_S);
     }
 } code_block_1;
+
 auto result = encode_neg_base(10, -2);
 
 struct CodeBlock2

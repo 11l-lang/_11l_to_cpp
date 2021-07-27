@@ -328,6 +328,7 @@ struct CodeBlock1
         print(msg);
     }
 } code_block_1;
+
 auto enc = caesar(msg, 11);
 
 struct CodeBlock2
@@ -671,6 +672,7 @@ struct CodeBlock1
         _set<4>(_get<3>(universe), true);
     }
 } code_block_1;
+
 auto nextgeneration = create_array({create_array({false}) * cellcountx}) * cellcounty;
 
 struct CodeBlock2
@@ -1803,6 +1805,7 @@ struct CodeBlock1
         print(u"Bagged the following items\n  "_S & sorted(bagged.map([](const auto &item, const auto &_, const auto &_2){return item;})).join(u"\n  "_S));
     }
 } code_block_1;
+
 auto [val, wt] = totalvalue(bagged);
 
 struct CodeBlock2
@@ -2338,6 +2341,7 @@ struct CodeBlock1
         print(u"First 15 palindrome dates after 2020-02-02 are:"_S);
     }
 } code_block_1;
+
 auto count = 0;
 
 struct CodeBlock2
@@ -2516,6 +2520,7 @@ struct CodeBlock1
         random_gen.seed(987654321, 1);
     }
 } code_block_1;
+
 auto hist = create_dict(range_el(0, 5), [](const auto &i){return make_tuple(i, 0);});
 
 struct CodeBlock2
@@ -2595,6 +2600,7 @@ struct CodeBlock1
         random_gen.seed(987654321);
     }
 } code_block_1;
+
 auto hist = create_dict(range_el(0, 5), [](const auto &i){return make_tuple(i, 0);});
 
 struct CodeBlock2
@@ -2676,6 +2682,7 @@ struct CodeBlock1
         random_gen.seed(987654321);
     }
 } code_block_1;
+
 auto hist = create_dict(range_el(0, 5), [](const auto &i){return make_tuple(i, 0);});
 
 struct CodeBlock2

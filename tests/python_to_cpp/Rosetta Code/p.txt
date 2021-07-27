@@ -1180,6 +1180,7 @@ struct CodeBlock1
         print(u"POLYNOMIAL SYNTHETIC DIVISION"_S);
     }
 } code_block_1;
+
 auto n = create_array({1, -12, 0, -42});
 auto D = create_array({1, -3});
 
@@ -1190,6 +1191,7 @@ struct CodeBlock2
         print(u"  #. / #. ="_S.format(n, D), u" "_S);
     }
 } code_block_2;
+
 auto [a, b] = extended_synthetic_division(n, D);
 
 struct CodeBlock3
@@ -1574,6 +1576,7 @@ struct CodeBlock1
         print(range_ee(1, 10).map([](const auto &n){return proper_divs(n);}));
     }
 } code_block_1;
+
 auto [n, leng] = max_with_key((range_ee(1, 20000).map([](const auto &n){return make_tuple(n, proper_divs(n).len());})), [](const auto &pd){return _get<1>(pd);});
 
 struct CodeBlock2

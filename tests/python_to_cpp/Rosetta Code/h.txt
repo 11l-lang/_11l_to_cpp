@@ -122,6 +122,7 @@ struct CodeBlock1
             symb2freq[ch]++;
     }
 } code_block_1;
+
 auto huff = encode(symb2freq);
 
 struct CodeBlock2

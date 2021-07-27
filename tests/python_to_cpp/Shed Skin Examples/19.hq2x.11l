@@ -23,9 +23,9 @@ T PPM
       f.write(String(.w)‘ ’String(.h)"\n")
       f.write("255\n")
       L(rgb) .rgb
-         V r = ((rgb >> 16) [&] f'f)
-         V g = ((rgb >> 8) [&] f'f)
-         V b = (rgb [&] f'f)
+         V r = ((rgb >> 16) [&] F'F)
+         V g = ((rgb >> 8) [&] F'F)
+         V b = (rgb [&] F'F)
          f.write(String(r)‘ ’String(g)‘ ’String(b)"\n")
       f.close()
 

@@ -973,6 +973,7 @@ struct CodeBlock1
         print(u"-------------------------------------------------------------"_S);
     }
 } code_block_1;
+
 auto places = create_array({u"1st"_S, u"2nd"_S, u"3rd"_S, u"4th"_S});
 
 struct CodeBlock2

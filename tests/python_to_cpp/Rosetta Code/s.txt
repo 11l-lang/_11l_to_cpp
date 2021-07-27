@@ -3976,6 +3976,7 @@ struct CodeBlock1
         print();
     }
 } code_block_1;
+
 auto n_max = 10;
 
 struct CodeBlock2
@@ -3988,6 +3989,7 @@ struct CodeBlock2
         print();
     }
 } code_block_2;
+
 auto n_gcd = 1000;
 auto s = stern_brocot([](const auto &series){return series.len() < ::n_gcd;})[range_el(0, n_gcd)];
 
@@ -4787,6 +4789,7 @@ struct CodeBlock1
         print(s[range_e_llen(0,  - 1)]);
     }
 } code_block_1;
+
 auto indx = s.index(_char_);
 
 struct CodeBlock2
@@ -5603,6 +5606,7 @@ struct CodeBlock1
         print(u"Unsigned Stirling numbers of the first kind:"_S);
     }
 } code_block_1;
+
 auto MAX = 12;
 
 struct CodeBlock2
@@ -5622,6 +5626,7 @@ struct CodeBlock2
         print(u"The maximum value of S1(100, k) = "_S);
     }
 } code_block_2;
+
 BigInt previous = 0;
 
 struct CodeBlock3
@@ -5753,6 +5758,7 @@ struct CodeBlock1
         print(u"Stirling numbers of the second kind:"_S);
     }
 } code_block_1;
+
 auto MAX = 12;
 
 struct CodeBlock2
@@ -5772,6 +5778,7 @@ struct CodeBlock2
         print(u"The maximum value of S2(100, k) = "_S);
     }
 } code_block_2;
+
 BigInt previous = 0;
 
 struct CodeBlock3
@@ -7747,6 +7754,7 @@ struct CodeBlock1
         print(u"\nEngagements:"_S);
     }
 } code_block_1;
+
 auto engaged = matchmaker();
 
 struct CodeBlock2
