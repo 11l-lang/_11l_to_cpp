@@ -1,0 +1,733 @@
+# https://www.rosettacode.org/wiki/15_puzzle_game#Python:_Original.2C_with_output
+import random
+from typing import List
+
+def ref(obj):
+    return obj
+
+class Puzzle:
+    position = 0
+
+    def __init__(self):
+        self.items : Dict[int, str] = {}
+
+    def main_frame(self):
+        d = ref(self.items)
+        print('+-----+-----+-----+-----+')
+        print('|%s|%s|%s|%s|' % (d[1], d[2], d[3], d[4]))
+        print('+-----+-----+-----+-----+')
+        print('|%s|%s|%s|%s|' % (d[5], d[6], d[7], d[8]))
+        print('+-----+-----+-----+-----+')
+        print('|%s|%s|%s|%s|' % (d[9], d[10], d[11], d[12]))
+        print('+-----+-----+-----+-----+')
+        print('|%s|%s|%s|%s|' % (d[13], d[14], d[15], d[16]))
+        print('+-----+-----+-----+-----+')
+
+    def format(self, ch):
+        ch = ch.strip(' ')
+        if len(ch) == 1:
+            return '  ' + ch + '  '
+        elif len(ch) == 2:
+            return '  ' + ch + ' '
+        else:
+            assert(len(ch) == 0)
+            return '     '
+
+    def change(self, to):
+        fro = self.position
+        for a, b in self.items.items():
+            if b == self.format(str(to)):
+                to = a
+                break
+        (self.items[fro], self.items[to]) = (self.items[to], self.items[fro])
+        self.position = to
+
+    def build_board(self, difficulty):
+        for i in range(1, 17):
+            self.items[i] = self.format(str(i))
+        tmp = 0
+        for a, b in self.items.items():
+            if b == '  16 ':
+                self.items[a] = '     '
+                tmp = a
+                break
+        self.position = tmp
+        diff : int
+        if difficulty == 0:
+            diff = 10
+        elif difficulty == 1:
+            diff = 50
+        else:
+            diff = 100
+        for _ in range(diff):
+            lst = self.valid_moves()
+            lst1 : List[int] = []
+            for j in lst:
+                lst1.append(int(j.strip(' ')))
+            self.change(lst1[random.randrange(len(lst1))])
+
+    def valid_moves(self):
+        pos = self.position
+        if pos in [6, 7, 10, 11]:
+            return [self.items[pos - 4], self.items[pos - 1],
+                    self.items[pos + 1], self.items[pos + 4]]
+        elif pos in [5, 9]:
+            return [self.items[pos - 4], self.items[pos + 4],
+                    self.items[pos + 1]]
+        elif pos in [8, 12]:
+            return [self.items[pos - 4], self.items[pos + 4],
+                    self.items[pos - 1]]
+        elif pos in [2, 3]:
+            return [self.items[pos - 1], self.items[pos + 1], self.items[pos + 4]]
+        elif pos in [14, 15]:
+            return [self.items[pos - 1], self.items[pos + 1],
+                    self.items[pos - 4]]
+        elif pos == 1:
+            return [self.items[pos + 1], self.items[pos + 4]]
+        elif pos == 4:
+            return [self.items[pos - 1], self.items[pos + 4]]
+        elif pos == 13:
+            return [self.items[pos + 1], self.items[pos - 4]]
+        else:
+            assert(pos == 16)
+            return [self.items[pos - 1], self.items[pos - 4]]
+
+    def game_over(self):
+        flag = False
+        for a, b in self.items.items():
+            if b != '     ':
+                if a == int(b.strip(' ')):
+                    flag = True
+                else:
+                    flag = False
+        return flag
+
+g = Puzzle()
+g.build_board(int(input('Enter the difficulty : 0 1 2\n2 => highest 0 => lowest\n')))
+g.main_frame()
+print('Enter 0 to exit')
+while True:
+    print('Hello user:\nTo change the position just enter the no. near it')
+    lst = g.valid_moves()
+    lst1 : List[int] = []
+    for i in lst:
+        lst1.append(int(i.strip(' ')))
+        print(i.strip(' '), '\t', end='')
+    print()
+    x = int(input())
+    if x == 0:
+        break
+    elif x not in lst1:
+        print('Wrong move')
+    else:
+        g.change(x)
+    g.main_frame()
+    if g.game_over():
+        print('You WON')
+        break
+===
+T Puzzle
+   position = 0
+   [Int = String] items
+
+   F ()
+   {
+   }
+
+   F main_frame()
+      V& d = .items
+      print(‘+-----+-----+-----+-----+’)
+      print(‘|#.|#.|#.|#.|’.format(d[1], d[2], d[3], d[4]))
+      print(‘+-----+-----+-----+-----+’)
+      print(‘|#.|#.|#.|#.|’.format(d[5], d[6], d[7], d[8]))
+      print(‘+-----+-----+-----+-----+’)
+      print(‘|#.|#.|#.|#.|’.format(d[9], d[10], d[11], d[12]))
+      print(‘+-----+-----+-----+-----+’)
+      print(‘|#.|#.|#.|#.|’.format(d[13], d[14], d[15], d[16]))
+      print(‘+-----+-----+-----+-----+’)
+
+   F format(=ch)
+      ch = ch.trim(‘ ’)
+      I ch.len == 1
+         R ‘  ’ch‘  ’
+      E I ch.len == 2
+         R ‘  ’ch‘ ’
+      E
+         assert(ch.empty)
+         R ‘     ’
+
+   F change(=to)
+      V fro = .position
+      L(a, b) .items
+         I b == .format(String(to))
+            to = a
+            L.break
+      swap(&.items[fro], &.items[to])
+      .position = to
+
+   F build_board(difficulty)
+      L(i) 1..16
+         .items[i] = .format(String(i))
+      V tmp = 0
+      L(a, b) .items
+         I b == ‘  16 ’
+            .items[a] = ‘     ’
+            tmp = a
+            L.break
+      .position = tmp
+      Int diff
+      I difficulty == 0
+         diff = 10
+      E I difficulty == 1
+         diff = 50
+      E
+         diff = 100
+      L(_) 0 .< diff
+         V lst = .valid_moves()
+         [Int] lst1
+         L(j) lst
+            lst1.append(Int(j.trim(‘ ’)))
+         .change(lst1[random:(lst1.len)])
+
+   F valid_moves()
+      V pos = .position
+      I pos C [6, 7, 10, 11]
+         R [.items[pos - 4], .items[pos - 1], .items[pos + 1], .items[pos + 4]]
+      E I pos C [5, 9]
+         R [.items[pos - 4], .items[pos + 4], .items[pos + 1]]
+      E I pos C [8, 12]
+         R [.items[pos - 4], .items[pos + 4], .items[pos - 1]]
+      E I pos C [2, 3]
+         R [.items[pos - 1], .items[pos + 1], .items[pos + 4]]
+      E I pos C [14, 15]
+         R [.items[pos - 1], .items[pos + 1], .items[pos - 4]]
+      E I pos == 1
+         R [.items[pos + 1], .items[pos + 4]]
+      E I pos == 4
+         R [.items[pos - 1], .items[pos + 4]]
+      E I pos == 13
+         R [.items[pos + 1], .items[pos - 4]]
+      E
+         assert(pos == 16)
+         R [.items[pos - 1], .items[pos - 4]]
+
+   F game_over()
+      V flag = 0B
+      L(a, b) .items
+         I b != ‘     ’
+            I a == Int(b.trim(‘ ’))
+               flag = 1B
+            E
+               flag = 0B
+      R flag
+
+V g = Puzzle()
+g.build_board(Int(input("Enter the difficulty : 0 1 2\n2 => highest 0 => lowest\n")))
+g.main_frame()
+print(‘Enter 0 to exit’)
+L
+   print("Hello user:\nTo change the position just enter the no. near it")
+   V lst = g.valid_moves()
+   [Int] lst1
+   L(i) lst
+      lst1.append(Int(i.trim(‘ ’)))
+      print(i.trim(‘ ’)" \t", end' ‘’)
+   print()
+   V x = Int(input())
+   I x == 0
+      L.break
+   E I x !C lst1
+      print(‘Wrong move’)
+   E
+      g.change(x)
+   g.main_frame()
+   I g.game_over()
+      print(‘You WON’)
+      L.break
+===
+class Puzzle
+{
+public:
+    decltype(0) position = 0;
+    Dict<int, String> items;
+
+    Puzzle()
+    {
+    }
+
+    auto main_frame()
+    {
+        auto& d = items;
+        print(u"+-----+-----+-----+-----+"_S);
+        print(u"|#.|#.|#.|#.|"_S.format(_get<1>(d), _get<2>(d), _get<3>(d), _get<4>(d)));
+        print(u"+-----+-----+-----+-----+"_S);
+        print(u"|#.|#.|#.|#.|"_S.format(_get<5>(d), _get<6>(d), _get<7>(d), _get<8>(d)));
+        print(u"+-----+-----+-----+-----+"_S);
+        print(u"|#.|#.|#.|#.|"_S.format(_get<9>(d), _get<10>(d), _get<11>(d), _get<12>(d)));
+        print(u"+-----+-----+-----+-----+"_S);
+        print(u"|#.|#.|#.|#.|"_S.format(_get<13>(d), _get<14>(d), _get<15>(d), _get<16>(d)));
+        print(u"+-----+-----+-----+-----+"_S);
+    }
+
+    template <typename T1> auto format(T1 ch)
+    {
+        ch = ch.trim(u" "_S);
+        if (ch.len() == 1)
+            return u"  "_S & ch & u"  "_S;
+        else if (ch.len() == 2)
+            return u"  "_S & ch & u" "_S;
+        else {
+            assert(ch.empty());
+            return u"     "_S;
+        }
+    }
+
+    template <typename T1> auto change(T1 to)
+    {
+        auto fro = position;
+        for (auto &&[a, b] : items)
+            if (b == format(String(to))) {
+                to = a;
+                break;
+            }
+        swap(items[fro], items[to]);
+        position = to;
+    }
+
+    template <typename T1> auto build_board(const T1 &difficulty)
+    {
+        for (auto i : range_ee(1, 16))
+            items.set(i, format(String(i)));
+        auto tmp = 0;
+        for (auto &&[a, b] : items)
+            if (b == u"  16 ") {
+                items.set(a, u"     "_S);
+                tmp = a;
+                break;
+            }
+        position = tmp;
+        int diff;
+        if (difficulty == 0)
+            diff = 10;
+        else if (difficulty == 1)
+            diff = 50;
+        else
+            diff = 100;
+        for (auto _ : range_el(0, diff)) {
+            auto lst = valid_moves();
+            Array<int> lst1;
+            for (auto &&j : lst)
+                lst1.append(to_int(j.trim(u" "_S)));
+            change(lst1[randomns::_(lst1.len())]);
+        }
+    }
+
+    auto valid_moves()
+    {
+        auto pos = position;
+        if (in(pos, create_array({6, 7, 10, 11})))
+            return create_array({items[pos - 4], items[pos - 1], items[pos + 1], items[pos + 4]});
+        else if (in(pos, create_array({5, 9})))
+            return create_array({items[pos - 4], items[pos + 4], items[pos + 1]});
+        else if (in(pos, create_array({8, 12})))
+            return create_array({items[pos - 4], items[pos + 4], items[pos - 1]});
+        else if (in(pos, create_array({2, 3})))
+            return create_array({items[pos - 1], items[pos + 1], items[pos + 4]});
+        else if (in(pos, create_array({14, 15})))
+            return create_array({items[pos - 1], items[pos + 1], items[pos - 4]});
+        else if (pos == 1)
+            return create_array({items[pos + 1], items[pos + 4]});
+        else if (pos == 4)
+            return create_array({items[pos - 1], items[pos + 4]});
+        else if (pos == 13)
+            return create_array({items[pos + 1], items[pos - 4]});
+        else {
+            assert(pos == 16);
+            return create_array({items[pos - 1], items[pos - 4]});
+        }
+    }
+
+    auto game_over()
+    {
+        auto flag = false;
+        for (auto &&[a, b] : items)
+            if (b != u"     ") {
+                if (a == to_int(b.trim(u" "_S)))
+                    flag = true;
+                else
+                    flag = false;
+            }
+        return flag;
+    }
+};
+
+auto g = Puzzle();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        g.build_board(to_int(input(u"Enter the difficulty : 0 1 2\n2 => highest 0 => lowest\n"_S)));
+        g.main_frame();
+        print(u"Enter 0 to exit"_S);
+        while (true) {
+            print(u"Hello user:\nTo change the position just enter the no. near it"_S);
+            auto lst = g.valid_moves();
+            Array<int> lst1;
+            for (auto &&i : lst) {
+                lst1.append(to_int(i.trim(u" "_S)));
+                print(i.trim(u" "_S) & u" \t"_S, u""_S);
+            }
+            print();
+            auto x = to_int(input());
+            if (x == 0)
+                break;
+            else if (!in(x, lst1))
+                print(u"Wrong move"_S);
+            else
+                g.change(x);
+            g.main_frame();
+            if (g.game_over()) {
+                print(u"You WON"_S);
+                break;
+            }
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/15_puzzle_solver#Nim
+UInt64 = int
+Char = str
+
+nr = [3, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3]
+nc = [3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2]
+
+class Solver:
+    n  = 0
+    np = 0
+
+    def __init__(self, values):
+        self.n0 = [0] * 100
+        self.n2 = [UInt64(0)] * 100
+        self.n3 = [Char("\0")] * 100
+        self.n4 = [0] * 100
+        self.n0[0] = values.index(0)
+
+        tmp : UInt64 = 0
+        for val in values:
+            tmp = (tmp << 4) | val
+        self.n2[0] = tmp
+
+    def fI(self):
+        n = self.n
+        g = (11 - self.n0[n]) * 4
+        a = self.n2[n] & (UInt64(15) << g)
+        self.n0[n + 1] = self.n0[n] + 4
+        self.n2[n + 1] = self.n2[n] - a + (a << 16)
+        self.n3[n + 1] = Char('d')
+        self.n4[n + 1] = self.n4[n] + int(nr[int(a >> g)] > self.n0[n] // 4)
+
+    def fG(self):
+        n = self.n
+        g = (19 - self.n0[n]) * 4
+        a = self.n2[n] & (UInt64(15) << g)
+        self.n0[n + 1] = self.n0[n] - 4
+        self.n2[n + 1] = self.n2[n] - a + (a >> 16)
+        self.n3[n + 1] = Char('u')
+        self.n4[n + 1] = self.n4[n] + int(nr[int(a >> g)] < self.n0[n] // 4)
+
+    def fE(self):
+        n = self.n
+        g = (14 - self.n0[n]) * 4
+        a = self.n2[n] & (UInt64(15) << g)
+        self.n0[n + 1] = self.n0[n] + 1
+        self.n2[n + 1] = self.n2[n] - a + (a << 4)
+        self.n3[n + 1] = Char('r')
+        self.n4[n + 1] = self.n4[n] + int(nc[int(a >> g)] > self.n0[n] % 4)
+
+    def fL(self):
+        n = self.n
+        g = (16 - self.n0[n]) * 4
+        a = self.n2[n] & (UInt64(15) << g)
+        self.n0[n + 1] = self.n0[n] - 1
+        self.n2[n + 1] = self.n2[n] - a + (a >> 4)
+        self.n3[n + 1] = Char('l')
+        self.n4[n + 1] = self.n4[n] + int(nc[int(a >> g)] < self.n0[n] % 4)
+
+    def fY(self):
+        if self.n2[self.n] == 0x123456789abcdef0:
+            return True
+        if self.n4[self.n] <= self.np:
+            return self.fN()
+        return False
+
+    def fN(self) -> bool:
+        n = self.n
+        if self.n3[n] != 'u' and self.n0[n] // 4 < 3:
+            self.fI()
+            self.n += 1
+            if self.fY(): return True
+            self.n -= 1
+        if self.n3[n] != 'd' and self.n0[n] // 4 > 0:
+            self.fG()
+            self.n += 1
+            if self.fY(): return True
+            self.n -= 1
+        if self.n3[n] != 'l' and self.n0[n] % 4 < 3:
+            self.fE()
+            self.n += 1
+            if self.fY(): return True
+            self.n -= 1
+        if self.n3[n] != 'r' and self.n0[n] % 4 > 0:
+            self.fL()
+            self.n += 1
+            if self.fY(): return True
+            self.n -= 1
+        return False
+
+    def run(self):
+        while not self.fY():
+            self.np += 1
+        print('Solution found with', self.n, 'moves: ', end = '')
+        for g in range(1, self.n + 1):
+            print(self.n3[g], end = '')
+        print('.')
+
+solver = Solver([15, 14,  1,  6,
+                  9, 11,  4, 12,
+                  0, 10,  7,  3,
+                 13,  8,  5,  2])
+solver.run()
+===
+V nr = [3, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3]
+V nc = [3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2]
+
+T Solver
+   n = 0
+   np = 0
+   n0 = [0] * 100
+   n2 = [UInt64(0)] * 100
+   n3 = [Char("\0")] * 100
+   n4 = [0] * 100
+
+   F (values)
+      .n0[0] = values.index(0)
+
+      UInt64 tmp = 0
+      L(val) values
+         tmp = (tmp << 4) [|] val
+      .n2[0] = tmp
+
+   F fI()
+      V n = .n
+      V g = (11 - .n0[n]) * 4
+      V a = .n2[n] [&] (UInt64(15) << g)
+      .n0[n + 1] = .n0[n] + 4
+      .n2[n + 1] = .n2[n] - a + (a << 16)
+      .n3[n + 1] = Char(‘d’)
+      .n4[n + 1] = .n4[n] + Int(:nr[Int(a >> g)] > .n0[n] I/ 4)
+
+   F fG()
+      V n = .n
+      V g = (19 - .n0[n]) * 4
+      V a = .n2[n] [&] (UInt64(15) << g)
+      .n0[n + 1] = .n0[n] - 4
+      .n2[n + 1] = .n2[n] - a + (a >> 16)
+      .n3[n + 1] = Char(‘u’)
+      .n4[n + 1] = .n4[n] + Int(:nr[Int(a >> g)] < .n0[n] I/ 4)
+
+   F fE()
+      V n = .n
+      V g = (14 - .n0[n]) * 4
+      V a = .n2[n] [&] (UInt64(15) << g)
+      .n0[n + 1] = .n0[n] + 1
+      .n2[n + 1] = .n2[n] - a + (a << 4)
+      .n3[n + 1] = Char(‘r’)
+      .n4[n + 1] = .n4[n] + Int(:nc[Int(a >> g)] > .n0[n] % 4)
+
+   F fL()
+      V n = .n
+      V g = (16 - .n0[n]) * 4
+      V a = .n2[n] [&] (UInt64(15) << g)
+      .n0[n + 1] = .n0[n] - 1
+      .n2[n + 1] = .n2[n] - a + (a >> 4)
+      .n3[n + 1] = Char(‘l’)
+      .n4[n + 1] = .n4[n] + Int(:nc[Int(a >> g)] < .n0[n] % 4)
+
+   F fY()
+      I .n2[.n] == 1234'5678'9ABC'DEF0
+         R 1B
+      I .n4[.n] <= .np
+         R .fN()
+      R 0B
+
+   F fN() -> Bool
+      V n = .n
+      I .n3[n] != ‘u’ & .n0[n] I/ 4 < 3
+         .fI()
+         .n++
+         I .fY()
+            R 1B
+         .n--
+      I .n3[n] != ‘d’ & .n0[n] I/ 4 > 0
+         .fG()
+         .n++
+         I .fY()
+            R 1B
+         .n--
+      I .n3[n] != ‘l’ & .n0[n] % 4 < 3
+         .fE()
+         .n++
+         I .fY()
+            R 1B
+         .n--
+      I .n3[n] != ‘r’ & .n0[n] % 4 > 0
+         .fL()
+         .n++
+         I .fY()
+            R 1B
+         .n--
+      R 0B
+
+   F run()
+      L !.fY()
+         .np++
+      print(‘Solution found with ’(.n)‘ moves: ’, end' ‘’)
+      L(g) 1 .. .n
+         print(.n3[g], end' ‘’)
+      print(‘.’)
+
+V solver = Solver([15, 14, 1, 6, 9, 11, 4, 12, 0, 10, 7, 3, 13, 8, 5, 2])
+solver.run()
+===
+auto nr = create_array({3, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3});
+auto nc = create_array({3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2});
+
+class Solver
+{
+public:
+    decltype(0) n = 0;
+    decltype(0) np = 0;
+    decltype(create_array({0}) * 100) n0 = create_array({0}) * 100;
+    decltype(create_array({to_uint64(0)}) * 100) n2 = create_array({to_uint64(0)}) * 100;
+    decltype(create_array({u'\0'_C}) * 100) n3 = create_array({u'\0'_C}) * 100;
+    decltype(create_array({0}) * 100) n4 = create_array({0}) * 100;
+
+    template <typename T1> Solver(const T1 &values)
+    {
+        _set<0>(n0, values.index(0));
+
+        UInt64 tmp = 0;
+        for (auto &&val : values)
+            tmp = (tmp << 4) | val;
+        _set<0>(n2, tmp);
+    }
+
+    auto fI()
+    {
+        auto n = this->n;
+        auto g = (11 - n0[n]) * 4;
+        auto a = n2[n] & (to_uint64(15) << g);
+        n0.set(n + 1, n0[n] + 4);
+        n2.set(n + 1, n2[n] - a + (a << 16));
+        n3.set(n + 1, u'd'_C);
+        n4.set(n + 1, n4[n] + to_int(::nr[to_int(a >> g)] > idiv(n0[n], 4)));
+    }
+
+    auto fG()
+    {
+        auto n = this->n;
+        auto g = (19 - n0[n]) * 4;
+        auto a = n2[n] & (to_uint64(15) << g);
+        n0.set(n + 1, n0[n] - 4);
+        n2.set(n + 1, n2[n] - a + (a >> 16));
+        n3.set(n + 1, u'u'_C);
+        n4.set(n + 1, n4[n] + to_int(::nr[to_int(a >> g)] < idiv(n0[n], 4)));
+    }
+
+    auto fE()
+    {
+        auto n = this->n;
+        auto g = (14 - n0[n]) * 4;
+        auto a = n2[n] & (to_uint64(15) << g);
+        n0.set(n + 1, n0[n] + 1);
+        n2.set(n + 1, n2[n] - a + (a << 4));
+        n3.set(n + 1, u'r'_C);
+        n4.set(n + 1, n4[n] + to_int(::nc[to_int(a >> g)] > mod(n0[n], 4)));
+    }
+
+    auto fL()
+    {
+        auto n = this->n;
+        auto g = (16 - n0[n]) * 4;
+        auto a = n2[n] & (to_uint64(15) << g);
+        n0.set(n + 1, n0[n] - 1);
+        n2.set(n + 1, n2[n] - a + (a >> 4));
+        n3.set(n + 1, u'l'_C);
+        n4.set(n + 1, n4[n] + to_int(::nc[to_int(a >> g)] < mod(n0[n], 4)));
+    }
+
+    auto fY()
+    {
+        if (n2[n] == 0x1234'5678'9ABC'DEF0)
+            return true;
+        if (n4[n] <= np)
+            return fN();
+        return false;
+    }
+
+    bool fN()
+    {
+        auto n = this->n;
+        if (n3[n] != u'u' && idiv(n0[n], 4) < 3) {
+            fI();
+            this->n++;
+            if (fY())
+                return true;
+            this->n--;
+        }
+        if (n3[n] != u'd' && idiv(n0[n], 4) > 0) {
+            fG();
+            this->n++;
+            if (fY())
+                return true;
+            this->n--;
+        }
+        if (n3[n] != u'l' && mod(n0[n], 4) < 3) {
+            fE();
+            this->n++;
+            if (fY())
+                return true;
+            this->n--;
+        }
+        if (n3[n] != u'r' && mod(n0[n], 4) > 0) {
+            fL();
+            this->n++;
+            if (fY())
+                return true;
+            this->n--;
+        }
+        return false;
+    }
+
+    auto run()
+    {
+        while (!fY())
+            np++;
+        print(u"Solution found with "_S & (n) & u" moves: "_S, u""_S);
+        for (auto g : range_ee(1, n))
+            print(n3[g], u""_S);
+        print(u"."_S);
+    }
+};
+
+auto solver = Solver(create_array({15, 14, 1, 6, 9, 11, 4, 12, 0, 10, 7, 3, 13, 8, 5, 2}));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        solver.run();
+    }
+} code_block_1;

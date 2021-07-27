@@ -965,6 +965,11 @@ inline Int to_int(Int64 i)
 	return (Int)i;
 }
 
+inline Int to_int(UInt64 i)
+{
+	return (Int)i;
+}
+
 inline Int64 to_int64(double d)
 {
 	return (Int64)d;
