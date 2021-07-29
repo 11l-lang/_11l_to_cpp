@@ -428,7 +428,9 @@ T MazeGame
    F ()
    {
    }
+
    F.virtual.abstract createMaze() -> Maze
+
    F.virtual.abstract getStartEndPoints(Maze maze) -> N
 
    F runGame()

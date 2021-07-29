@@ -97,7 +97,9 @@ T Cuerpo
    F init(tipo, material)
       .tipo = tipo
       .material = material
+
    F.virtual.abstract intersecta(Rayo& r) -> Bool
+
    F.virtual.abstract getNormal(Vector punto) -> Vector
 
 T Esfera(Cuerpo)

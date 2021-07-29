@@ -176,7 +176,9 @@ public:
         this->tipo = tipo;
         this->material = material;
     }
+
     virtual bool intersecta(Rayo &r) = 0;
+
     virtual Vector getNormal(const Vector &punto) = 0;
 };
 

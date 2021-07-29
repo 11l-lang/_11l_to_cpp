@@ -332,8 +332,10 @@ public:
             last = fs::path::canonical(fs::path::absolute(fs::path::join(base, search)));
             search = fs::path::join(search, u".."_S);
         }
+
         throw RuntimeError(u"Couldn't locate sample #.!"_S.format(filename));
     }
+
     virtual String path(const String &filename) = 0;
 };
 

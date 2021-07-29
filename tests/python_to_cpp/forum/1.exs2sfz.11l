@@ -218,7 +218,9 @@ T EXSSamplePool
             R location
          last = fs:path:canonical(fs:path:absolute(fs:path:join(.base, search)))
          search = fs:path:join(search, ‘..’)
+
       X RuntimeError(‘Couldn't locate sample #.!’.format(filename))
+
    F.virtual.abstract path(String filename) -> String
 
 T EXSSamplePoolDummy(EXSSamplePool)

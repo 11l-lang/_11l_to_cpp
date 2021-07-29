@@ -1320,7 +1320,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                             + ('&' if '&' in arg[3] or '=' not in arg[3] else '')
                             + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
                 s = 'virtual ' + s + '(' + ', '.join(arguments) + ')' + ('', ' override', ' = 0', ' override', ' final')[self.virtual_category - 1]
-                return ' ' * (indent*4) + s + ";\n" if self.virtual_category == self.VirtualCategory.ABSTRACT else self.children_to_str(indent, s)
+                return pre_nl(self.tokeni) + ' ' * (indent*4) + s + ";\n" if self.virtual_category == self.VirtualCategory.ABSTRACT else self.children_to_str(indent, s)
 
         elif type(self.parent) != ASTProgram: # local functions [i.e. functions inside functions] are represented as C++ lambdas
             captured_variables = set()

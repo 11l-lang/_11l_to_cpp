@@ -553,7 +553,9 @@ public:
     MazeGame()
     {
     }
+
     virtual Maze createMaze() = 0;
+
     virtual void getStartEndPoints(const Maze &maze) = 0;
 
     auto runGame()
