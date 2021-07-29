@@ -7,6 +7,7 @@ public:
 
 	KeyError(Char c) : key(c) {}
 	KeyError(const String &key) : key(key) {}
+	template <typename KeyTy> KeyError(const KeyTy &key) : key(key) {}
 };
 
 // Mimic boost::assign::map_list_of behavior

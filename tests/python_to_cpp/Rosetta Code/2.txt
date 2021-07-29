@@ -213,3 +213,374 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/24_game#C.2B.2B
+import random
+from typing import List
+
+class Error(Exception):
+    message : str
+    def __init__(self, message):
+        self.message = message
+
+class RPNParse:
+    def  __init__(self):
+        self.stk : List[float] = []
+        self.digits : List[int] = []
+
+    def op(self, f):
+        if len(self.stk) < 2:
+            raise Error('Improperly written expression')
+        b = self.stk.pop()
+        a = self.stk.pop()
+        self.stk.append(f(a, b))
+
+    def parse(self, s):
+        for c in s:
+            if '0' <= c <= '9':
+                self.stk.append(float(c))
+                self.digits.append(int(c))
+            elif c == '+':
+                self.op(lambda a, b: a + b)
+            elif c == '-':
+                self.op(lambda a, b: a - b)
+            elif c == '*':
+                self.op(lambda a, b: a * b)
+            elif c == '/':
+                self.op(lambda a, b: a / b)
+            elif c != ' ':
+                raise Error('Wrong char: ' + c)
+
+    def get_result(self):
+        if len(self.stk) != 1:
+            raise Error('Improperly written expression')
+        return self.stk[-1]
+
+digits : List[int] = []
+print('Make 24 with the digits:', end = '')
+for i in range(4):
+    n = random.randint(1, 9)
+    print(' ' + str(n), end = '')
+    digits.append(n)
+print()
+
+parser = RPNParse()
+
+try:
+    parser.parse(input())
+    r = parser.get_result()
+
+    if sorted(digits) != sorted(parser.digits):
+        print('Error: Not using the given digits')
+    else:
+        print('Result:', r)
+
+        if 23.999 < r < 24.001:
+            print('Good job!')
+        else:
+            print('Try again.')
+
+except Error as error:
+    print('Error:', error.message)
+===
+T Error
+   String message
+   F (message)
+      .message = message
+
+T RPNParse
+   [Float] stk
+   [Int] digits
+   F ()
+   {
+   }
+
+   F op(f)
+      I .stk.len < 2
+         X Error(‘Improperly written expression’)
+      V b = .stk.pop()
+      V a = .stk.pop()
+      .stk.append(f(a, b))
+
+   F parse(s)
+      L(c) s
+         I c C ‘0’..‘9’
+            .stk.append(Float(c))
+            .digits.append(Int(c))
+         E I c == ‘+’
+            .op((a, b) -> a + b)
+         E I c == ‘-’
+            .op((a, b) -> a - b)
+         E I c == ‘*’
+            .op((a, b) -> a * b)
+         E I c == ‘/’
+            .op((a, b) -> a / b)
+         E I c != ‘ ’
+            X Error(‘Wrong char: ’c)
+
+   F get_result()
+      I .stk.len != 1
+         X Error(‘Improperly written expression’)
+      R .stk.last
+
+[Int] digits
+print(‘Make 24 with the digits:’, end' ‘’)
+L(i) 4
+   V n = random:(1 .. 9)
+   print(‘ ’String(n), end' ‘’)
+   digits.append(n)
+print()
+
+V parser = RPNParse()
+
+X.try
+   parser.parse(input())
+   V r = parser.get_result()
+
+   I sorted(digits) != sorted(parser.digits)
+      print(‘Error: Not using the given digits’)
+   E
+      print(‘Result: ’r)
+
+      I r C 23.999<.<24.001
+         print(‘Good job!’)
+      E
+         print(‘Try again.’)
+
+X.catch Error error
+   print(‘Error: ’(error.message))
+===
+class Error
+{
+public:
+    String message;
+    template <typename T1> Error(const T1 &message) :
+        message(message)
+    {
+    }
+};
+
+class RPNParse
+{
+public:
+    Array<double> stk;
+    Array<int> digits;
+    RPNParse()
+    {
+    }
+
+    template <typename T1> auto op(const T1 &f)
+    {
+        if (stk.len() < 2)
+            throw Error(u"Improperly written expression"_S);
+        auto b = stk.pop();
+        auto a = stk.pop();
+        stk.append(f(a, b));
+    }
+
+    template <typename T1> auto parse(const T1 &s)
+    {
+        for (auto &&c : s)
+            if (in(c, range_ee(u'0'_C, u'9'_C))) {
+                stk.append(to_float(c));
+                digits.append(to_int(c));
+            }
+            else if (c == u'+')
+                op([](const auto &a, const auto &b){return a + b;});
+            else if (c == u'-')
+                op([](const auto &a, const auto &b){return a - b;});
+            else if (c == u'*')
+                op([](const auto &a, const auto &b){return a * b;});
+            else if (c == u'/')
+                op([](const auto &a, const auto &b){return a / b;});
+            else if (c != u' ')
+                throw Error(u"Wrong char: "_S & c);
+    }
+
+    auto get_result()
+    {
+        if (stk.len() != 1)
+            throw Error(u"Improperly written expression"_S);
+        return stk.last();
+    }
+};
+
+Array<int> digits;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Make 24 with the digits:"_S, u""_S);
+        for (int i = 0; i < 4; i++) {
+            auto n = randomns::_(range_ee(1, 9));
+            print(u" "_S & String(n), u""_S);
+            digits.append(n);
+        }
+        print();
+    }
+} code_block_1;
+
+auto parser = RPNParse();
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        try
+        {
+            parser.parse(input());
+            auto r = parser.get_result();
+
+            if (sorted(digits) != sorted(parser.digits))
+                print(u"Error: Not using the given digits"_S);
+            else {
+                print(u"Result: "_S & r);
+
+                if (in(r, range_ll(23.999, 24.001)))
+                    print(u"Good job!"_S);
+                else
+                    print(u"Try again."_S);
+            }
+        }
+
+        catch (const Error& error)
+        {
+            print(u"Error: "_S & (error.message));
+        }
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/24_game/Solve#Nim
+from _11l import *
+from itertools import product
+
+op : Dict[Char, Callable[[float, float], float]] = {}
+op[Char('+')] = lambda x, y: x + y
+op[Char('-')] = lambda x, y: x - y
+op[Char('*')] = lambda x, y: x * y
+op[Char('/')] = lambda x, y: x / y if y != 0 else 9999999
+
+def almost_equal(a, b):
+    return abs(a - b) <= 1e-5
+
+def solve(nums):
+    syms = '+-*/'
+    sorted_nums = list(map(float, sorted(nums)))
+    for x, y, z in product(syms, syms, syms):
+        n = sorted_nums[:]
+        while True:
+            (a, b, c, d) = (int(n[0]), int(n[1]), int(n[2]), int(n[3]))
+            if almost_equal(op[x](op[y](a, b), op[z](c, d)), 24.0):
+                #return f"({a:0} {y} {b:0}) {x} ({c:0} {z} {d:0})"
+                return '(' + str(a) + ' ' + y + ' ' + str(b) + ') ' + x + ' (' + str(c) + ' ' + z + ' ' + str(d) + ')'
+            if almost_equal(op[x](a, op[y](b, op[z](c, d))), 24.0):
+                #return f"{a:0} {x} ({b:0} {y} ({c:0} {z} {d:0}))"
+                return str(a) + ' ' + x + ' (' + str(b) + ' ' + y + ' (' + str(c) + ' ' + z + ' ' + str(d) + '))'
+            if almost_equal(op[x](op[y](op[z](c, d), b), a), 24.0):
+                #return f"(({c:0} {z} {d:0}) {y} {b:0}) {x} {a:0}"
+                return '((' + str(c) + ' ' + z + ' ' + str(d) + ') ' + y + ' ' + str(b) + ') ' + x + ' ' + str(a)
+            if almost_equal(op[x](op[y](b, op[z](c, d)), a), 24.0):
+                #return f"({b:0} {y} ({c:0} {z} {d:0})) {x} {a:0}"
+                return '(' + str(b) + ' ' + y + ' (' + str(c) + ' ' + z + ' ' + str(d) + ')) ' + x + str(a)
+            if not next_permutation(n):
+                break
+    return 'not found'
+
+for nums in [
+            [9, 4, 4, 5],
+            [1, 7, 2, 7],
+            [5, 7, 5, 4],
+            [1, 4, 6, 6],
+            [2, 3, 7, 3],
+            [8, 7, 9, 7],
+            [1, 6, 2, 6],
+            [7, 9, 4, 1],
+            [6, 4, 2, 2],
+            [5, 7, 9, 7],
+            [3, 3, 8, 8],
+          ]:
+    print('solve(' + str(nums) + ') -> ' + solve(nums))
+===
+[Char = ((Float, Float) -> Float)] op
+op[Char(‘+’)] = (x, y) -> x + y
+op[Char(‘-’)] = (x, y) -> x - y
+op[Char(‘*’)] = (x, y) -> x * y
+op[Char(‘/’)] = (x, y) -> I y != 0 {x / y} E 9999999
+
+F almost_equal(a, b)
+   R abs(a - b) <= 1e-5
+
+F solve(nums)
+   V syms = ‘+-*/’
+   V sorted_nums = sorted(nums).map(Float)
+   L(x, y, z) cart_product(syms, syms, syms)
+      V n = copy(sorted_nums)
+      L
+         V (a, b, c, d) = (Int(n[0]), Int(n[1]), Int(n[2]), Int(n[3]))
+         I almost_equal(:op[x](:op[y](a, b), :op[z](c, d)), 24.0)
+            R ‘(’String(a)‘ ’y‘ ’String(b)‘) ’x‘ (’String(c)‘ ’z‘ ’String(d)‘)’
+         I almost_equal(:op[x](a, :op[y](b, :op[z](c, d))), 24.0)
+            R String(a)‘ ’x‘ (’String(b)‘ ’y‘ (’String(c)‘ ’z‘ ’String(d)‘))’
+         I almost_equal(:op[x](:op[y](:op[z](c, d), b), a), 24.0)
+            R ‘((’String(c)‘ ’z‘ ’String(d)‘) ’y‘ ’String(b)‘) ’x‘ ’String(a)
+         I almost_equal(:op[x](:op[y](b, :op[z](c, d)), a), 24.0)
+            R ‘(’String(b)‘ ’y‘ (’String(c)‘ ’z‘ ’String(d)‘)) ’x‘’String(a)
+         I !n.next_permutation()
+            L.break
+   R ‘not found’
+
+L(nums) [[9, 4, 4, 5], [1, 7, 2, 7], [5, 7, 5, 4], [1, 4, 6, 6], [2, 3, 7, 3], [8, 7, 9, 7], [1, 6, 2, 6], [7, 9, 4, 1], [6, 4, 2, 2], [5, 7, 9, 7], [3, 3, 8, 8]]
+   print(‘solve(’String(nums)‘) -> ’solve(nums))
+===
+Dict<Char, std::function<double(const double, const double)>> op;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        op.set(u'+'_C, [](const auto &x, const auto &y){return x + y;});
+        op.set(u'-'_C, [](const auto &x, const auto &y){return x - y;});
+        op.set(u'*'_C, [](const auto &x, const auto &y){return x * y;});
+        op.set(u'/'_C, [](const auto &x, const auto &y){return y != 0 ? x / y : 9999999;});
+    }
+} code_block_1;
+
+template <typename T1, typename T2> auto almost_equal(const T1 &a, const T2 &b)
+{
+    return abs(a - b) <= 1e-5;
+}
+
+template <typename T1> auto solve(const T1 &nums)
+{
+    auto syms = u"+-*/"_S;
+    auto sorted_nums = sorted(nums).map([](const auto &x){return to_float(x);});
+    for (auto &&[x, y, z] : cart_product(syms, syms, syms)) {
+        auto n = copy(sorted_nums);
+        while (true) {
+            auto [a, b, c, d] = make_tuple(to_int(_get<0>(n)), to_int(_get<1>(n)), to_int(_get<2>(n)), to_int(_get<3>(n)));
+            if (almost_equal(::op[x](::op[y](a, b), ::op[z](c, d)), 24.0))
+                return u"("_S & String(a) & u" "_S & y & u" "_S & String(b) & u") "_S & x & u" ("_S & String(c) & u" "_S & z & u" "_S & String(d) & u")"_S;
+            if (almost_equal(::op[x](a, ::op[y](b, ::op[z](c, d))), 24.0))
+                return String(a) & u" "_S & x & u" ("_S & String(b) & u" "_S & y & u" ("_S & String(c) & u" "_S & z & u" "_S & String(d) & u"))"_S;
+            if (almost_equal(::op[x](::op[y](::op[z](c, d), b), a), 24.0))
+                return u"(("_S & String(c) & u" "_S & z & u" "_S & String(d) & u") "_S & y & u" "_S & String(b) & u") "_S & x & u" "_S & String(a);
+            if (almost_equal(::op[x](::op[y](b, ::op[z](c, d)), a), 24.0))
+                return u"("_S & String(b) & u" "_S & y & u" ("_S & String(c) & u" "_S & z & u" "_S & String(d) & u")) "_S & x & String(a);
+            if (!n.next_permutation())
+                break;
+        }
+    }
+    return u"not found"_S;
+}
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&nums : create_array({create_array({9, 4, 4, 5}), create_array({1, 7, 2, 7}), create_array({5, 7, 5, 4}), create_array({1, 4, 6, 6}), create_array({2, 3, 7, 3}), create_array({8, 7, 9, 7}), create_array({1, 6, 2, 6}), create_array({7, 9, 4, 1}), create_array({6, 4, 2, 2}), create_array({5, 7, 9, 7}), create_array({3, 3, 8, 8})}))
+            print(u"solve("_S & String(nums) & u") -> "_S & solve(nums));
+    }
+} code_block_2;

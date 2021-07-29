@@ -1002,7 +1002,7 @@ inline double to_float(const String &str)
 
 inline double to_float(Char ch)
 {
-	return ch.is_digit() ? ch.code - '0' : 0;
+	return ch.is_digit() ? ch.code - '0' : throw ValueError(ch);
 }
 
 inline double to_float(int      i) { return i; }

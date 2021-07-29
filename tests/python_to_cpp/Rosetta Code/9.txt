@@ -1,0 +1,215 @@
+# https://www.rosettacode.org/wiki/99_bottles_of_beer#Python
+for i in range(99, 0, -1):
+    print(i, 'bottles of beer on the wall')
+    print(i, 'bottles of beer')
+    print('Take one down, pass it around')
+    print(i - 1, "bottles of beer on the wall\n")
+===
+L(i) (99.<0).step(-1)
+   print(i‘ bottles of beer on the wall’)
+   print(i‘ bottles of beer’)
+   print(‘Take one down, pass it around’)
+   print((i - 1)" bottles of beer on the wall\n")
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(99, 0).step(-1)) {
+            print(i & u" bottles of beer on the wall"_S);
+            print(i & u" bottles of beer"_S);
+            print(u"Take one down, pass it around"_S);
+            print((i - 1) & u" bottles of beer on the wall\n"_S);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/9_billion_names_of_God_the_integer#Python
+BigInt = int
+
+cache = [[BigInt(1)]]
+def cumu(n):
+    for l in range(len(cache), n+1):
+        r = [BigInt(0)]
+        for x in range(1, l+1):
+            r.append(r[-1] + cache[l-x][min(x, l-x)])
+        cache.append(r)
+    return cache[n]
+
+def row(n):
+    r = cumu(n)
+    return [r[i+1] - r[i] for i in range(n)]
+
+print("rows:")
+for x in range(1, 11): print("%2d:"%x, row(x))
+
+print("\nsums:")
+#for x in [23, 123, 1234, 12345]: print x, cumu(x)[-1]
+
+pp = [BigInt(1)]
+
+def partitions(n):
+    pp.append(BigInt(0))
+
+    for k in range(1, n + 1):
+        d = n - k * (3 * k - 1) // 2
+        if d < 0:
+            break
+
+        if k & 1 != 0:
+            pp[n] += pp[d]
+        else:
+            pp[n] -= pp[d]
+
+        d -= k
+        if d < 0:
+            break
+
+        if k & 1 != 0:
+            pp[n] += pp[d]
+        else:
+            pp[n] -= pp[d]
+
+    return pp[-1]
+
+ns = set([23, 123, 1234, 12345])
+max_ns = max(ns)
+
+for i in range(1, max_ns + 1):
+    if i > max_ns:
+        break
+    p = partitions(i)
+    if i in ns:
+        print("%6d: %s" % (i, p))
+===
+V cache = [[BigInt(1)]]
+F cumu(n)
+   L(l) :cache.len .. n
+      V r = [BigInt(0)]
+      L(x) 1 .. l
+         r.append(r.last + :cache[l - x][min(x, l - x)])
+      :cache.append(r)
+   R :cache[n]
+
+F row(n)
+   V r = cumu(n)
+   R (0 .< n).map(i -> @r[i + 1] - @r[i])
+
+print(‘rows:’)
+L(x) 1..10
+   print((‘#2:’.format(x))‘ ’row(x))
+
+print("\nsums:")
+
+V pp = [BigInt(1)]
+
+F partitions(n)
+   :pp.append(BigInt(0))
+
+   L(k) 1 .. n
+      V d = n - k * (3 * k - 1) I/ 2
+      I d < 0
+         L.break
+
+      I k [&] 1 != 0
+         :pp[n] += :pp[d]
+      E
+         :pp[n] -= :pp[d]
+
+      d -= k
+      I d < 0
+         L.break
+
+      I k [&] 1 != 0
+         :pp[n] += :pp[d]
+      E
+         :pp[n] -= :pp[d]
+
+   R :pp.last
+
+V ns = Set([23, 123, 1234, 12345])
+V max_ns = max(ns)
+
+L(i) 1 .. max_ns
+   I i > max_ns
+      L.break
+   V p = partitions(i)
+   I i C ns
+      print(‘#6: #.’.format(i, p))
+===
+auto cache = create_array({create_array({BigInt(1)})});
+template <typename T1> auto cumu(const T1 &n)
+{
+    for (auto l : range_ee(::cache.len(), n)) {
+        auto r = create_array({BigInt(0)});
+        for (auto x : range_ee(1, l))
+            r.append(r.last() + ::cache[l - x][min(x, l - x)]);
+        ::cache.append(r);
+    }
+    return ::cache[n];
+}
+
+template <typename T1> auto row(const T1 &n)
+{
+    auto r = cumu(n);
+    return range_el(0, n).map([&r](const auto &i){return r[i + 1] - r[i];});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"rows:"_S);
+        for (auto x : range_ee(1, 10))
+            print((u"#2:"_S.format(x)) & u" "_S & row(x));
+
+        print(u"\nsums:"_S);
+    }
+} code_block_1;
+
+auto pp = create_array({BigInt(1)});
+
+template <typename T1> auto partitions(const T1 &n)
+{
+    ::pp.append(BigInt(0));
+
+    for (auto k : range_ee(1, n)) {
+        auto d = n - idiv(k * (3 * k - 1), 2);
+        if (d < 0)
+            break;
+
+        if ((k & 1) != 0)
+            ::pp[n] += ::pp[d];
+        else
+            ::pp[n] -= ::pp[d];
+
+        d -= k;
+        if (d < 0)
+            break;
+
+        if ((k & 1) != 0)
+            ::pp[n] += ::pp[d];
+        else
+            ::pp[n] -= ::pp[d];
+    }
+
+    return ::pp.last();
+}
+
+auto ns = create_set({23, 123, 1234, 12345});
+auto max_ns = max(ns);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto i : range_ee(1, max_ns)) {
+            if (i > max_ns)
+                break;
+            auto p = partitions(i);
+            if (in(i, ns))
+                print(u"#6: #."_S.format(i, p));
+        }
+    }
+} code_block_2;

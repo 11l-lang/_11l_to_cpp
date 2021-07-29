@@ -1,0 +1,353 @@
+# https://www.rosettacode.org/wiki/4-rings_or_4-squares_puzzle#Python
+def foursquares(lo,hi,unique,show):
+
+    def acd_arr():
+        """
+        Iterates through all the possible valid values of
+        a, c, and d.
+
+        a = c + d
+        """
+        r : List[Tuple[int, int, int]] = []
+        for c in range(lo,hi+1):
+            for d in range(lo,hi+1):
+                if (not unique) or (c != d):
+                    a = c + d
+                    if a >= lo and a <= hi:
+                        if (not unique) or (c != 0 and d != 0):
+                            r += [(a,c,d)]
+        return r
+
+    solutions = 0
+    for acd in acd_arr():
+        (a,c,d) = acd
+
+        def ge_arr():
+            """
+            Iterates through all the possible valid values of
+            g and e.
+
+            g = d + e
+            """
+            r : List[Tuple[int, int]] = []
+            for e in range(lo,hi+1):
+                if (not unique) or (e not in (a,c,d)):
+                    g = d + e
+                    if g >= lo and g <= hi:
+                        if (not unique) or (g not in (a,c,d,e)):
+                            r += [(g,e)]
+            return r
+
+        for ge in ge_arr():
+            (g,e) = ge
+
+            def bf_arr():
+                """
+                Iterates through all the possible valid values of
+                b and f.
+
+                b = e + f - c
+                """
+                r : List[Tuple[int, int]] = []
+                for f in range(lo,hi+1):
+                    if (not unique) or (f not in (a,c,d,g,e)):
+                        b = e + f - c
+                        if b >= lo and b <= hi:
+                            if (not unique) or (b not in (a,c,d,g,e,f)):
+                                r += [(b,f)]
+                return r
+
+            for bf in bf_arr():
+                (b,f) = bf
+                solutions += 1
+                if show:
+                    print(str((a,b,c,d,e,f,g))[1:-1])
+
+    uorn = "unique" if unique else "non-unique"
+
+    print(str(solutions)+" "+uorn+" solutions in "+str(lo)+" to "+str(hi))
+    print()
+
+foursquares(1,7,True,True)
+foursquares(3,9,True,True)
+foursquares(0,9,False,False)
+===
+F foursquares(lo, hi, unique, show)
+
+   F acd_arr()
+      ‘
+        Iterates through all the possible valid values of
+        a, c, and d.
+
+        a = c + d
+        ’
+      [(Int, Int, Int)] r
+      L(c) @lo .. @hi
+         L(d) @lo .. @hi
+            I (!@unique) | (c != d)
+               V a = c + d
+               I a >= @lo & a <= @hi
+                  I (!@unique) | (c != 0 & d != 0)
+                     r [+]= (a, c, d)
+      R r
+
+   V solutions = 0
+   L(acd) acd_arr()
+      V (a, c, d) = acd
+
+      F ge_arr()
+         ‘
+            Iterates through all the possible valid values of
+            g and e.
+
+            g = d + e
+            ’
+         [(Int, Int)] r
+         L(e) @lo .. @hi
+            I (!@unique) | (e !C (@a, @c, @d))
+               V g = @d + e
+               I g >= @lo & g <= @hi
+                  I (!@unique) | (g !C (@a, @c, @d, e))
+                     r [+]= (g, e)
+         R r
+
+      L(ge) ge_arr()
+         V (g, e) = ge
+
+         F bf_arr()
+            ‘
+                Iterates through all the possible valid values of
+                b and f.
+
+                b = e + f - c
+                ’
+            [(Int, Int)] r
+            L(f) @lo .. @hi
+               I (!@unique) | (f !C (@a, @c, @d, @g, @e))
+                  V b = @e + f - @c
+                  I b >= @lo & b <= @hi
+                     I (!@unique) | (b !C (@a, @c, @d, @g, @e, f))
+                        r [+]= (b, f)
+            R r
+
+         L(bf) bf_arr()
+            V (b, f) = bf
+            solutions++
+            I show
+               print(String((a, b, c, d, e, f, g))[1 .< (len)-1])
+
+   V uorn = I unique {‘unique’} E ‘non-unique’
+
+   print(String(solutions)‘ ’uorn‘ solutions in ’String(lo)‘ to ’String(hi))
+   print()
+
+foursquares(1, 7, 1B, 1B)
+foursquares(3, 9, 1B, 1B)
+foursquares(0, 9, 0B, 0B)
+===
+template <typename T1, typename T2, typename T3, typename T4> auto foursquares(const T1 &lo, const T2 &hi, const T3 &unique, const T4 &show)
+{
+
+    auto acd_arr = [&hi, &lo, &unique]()
+    {
+        uR"(
+        Iterates through all the possible valid values of
+        a, c, and d.
+
+        a = c + d
+        )"_S;
+        Array<ivec3> r;
+        for (auto c : range_ee(lo, hi))
+            for (auto d : range_ee(lo, hi))
+                if ((!unique) || (c != d)) {
+                    auto a = c + d;
+                    if (a >= lo && a <= hi) {
+                        if ((!unique) || (c != 0 && d != 0))
+                            r.append(make_tuple(a, c, d));
+                    }
+                }
+        return r;
+    };
+
+    auto solutions = 0;
+    for (auto &&acd : acd_arr()) {
+        auto [a, c, d] = acd;
+
+        auto ge_arr = [&a, &c, &d, &hi, &lo, &unique]()
+        {
+            uR"(
+            Iterates through all the possible valid values of
+            g and e.
+
+            g = d + e
+            )"_S;
+            Array<ivec2> r;
+            for (auto e : range_ee(lo, hi))
+                if ((!unique) || (!in(e, make_tuple(a, c, d)))) {
+                    auto g = d + e;
+                    if (g >= lo && g <= hi) {
+                        if ((!unique) || (!in(g, make_tuple(a, c, d, e))))
+                            r.append(make_tuple(g, e));
+                    }
+                }
+            return r;
+        };
+
+        for (auto &&ge : ge_arr()) {
+            auto [g, e] = ge;
+
+            auto bf_arr = [&a, &c, &d, &e, &g, &hi, &lo, &unique]()
+            {
+                uR"(
+                Iterates through all the possible valid values of
+                b and f.
+
+                b = e + f - c
+                )"_S;
+                Array<ivec2> r;
+                for (auto f : range_ee(lo, hi))
+                    if ((!unique) || (!in(f, make_tuple(a, c, d, g, e)))) {
+                        auto b = e + f - c;
+                        if (b >= lo && b <= hi) {
+                            if ((!unique) || (!in(b, make_tuple(a, c, d, g, e, f))))
+                                r.append(make_tuple(b, f));
+                        }
+                    }
+                return r;
+            };
+
+            for (auto &&bf : bf_arr()) {
+                auto [b, f] = bf;
+                solutions++;
+                if (show)
+                    print(String(make_tuple(a, b, c, d, e, f, g))[range_e_llen(1,  - 1)]);
+            }
+        }
+    }
+
+    auto uorn = unique ? u"unique"_S : u"non-unique"_S;
+
+    print(String(solutions) & u" "_S & uorn & u" solutions in "_S & String(lo) & u" to "_S & String(hi));
+    print();
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        foursquares(1, 7, true, true);
+        foursquares(3, 9, true, true);
+        foursquares(0, 9, false, false);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/4-rings_or_4-squares_puzzle#Python
+# (Shortened version)
+def foursquares(lo,hi,unique,show):
+    solutions = 0
+    for c in range(lo,hi+1):
+        for d in range(lo,hi+1):
+            if not unique or (c != d):
+                a = c + d
+                if a >= lo and a <= hi:
+                    if not unique or (c != 0 and d != 0):
+                        for e in range(lo,hi+1):
+                            if not unique or (e not in (a,c,d)):
+                                g = d + e
+                                if g >= lo and g <= hi:
+                                    if not unique or (g not in (a,c,d,e)):
+                                        for f in range(lo,hi+1):
+                                            if not unique or (f not in (a,c,d,g,e)):
+                                                b = e + f - c
+                                                if b >= lo and b <= hi:
+                                                    if not unique or (b not in (a,c,d,g,e,f)):
+                                                        solutions += 1
+                                                        if show:
+                                                            print(str((a,b,c,d,e,f,g))[1:-1])
+
+    uorn = "unique" if unique else "non-unique"
+
+    print(str(solutions)+" "+uorn+" solutions in "+str(lo)+" to "+str(hi))
+    print()
+
+foursquares(1,7,True,True)
+foursquares(3,9,True,True)
+foursquares(0,9,False,False)
+===
+F foursquares(lo, hi, unique, show)
+   V solutions = 0
+   L(c) lo .. hi
+      L(d) lo .. hi
+         I !unique | (c != d)
+            V a = c + d
+            I a >= lo & a <= hi
+               I !unique | (c != 0 & d != 0)
+                  L(e) lo .. hi
+                     I !unique | (e !C (a, c, d))
+                        V g = d + e
+                        I g >= lo & g <= hi
+                           I !unique | (g !C (a, c, d, e))
+                              L(f) lo .. hi
+                                 I !unique | (f !C (a, c, d, g, e))
+                                    V b = e + f - c
+                                    I b >= lo & b <= hi
+                                       I !unique | (b !C (a, c, d, g, e, f))
+                                          solutions++
+                                          I show
+                                             print(String((a, b, c, d, e, f, g))[1 .< (len)-1])
+
+   V uorn = I unique {‘unique’} E ‘non-unique’
+
+   print(String(solutions)‘ ’uorn‘ solutions in ’String(lo)‘ to ’String(hi))
+   print()
+
+foursquares(1, 7, 1B, 1B)
+foursquares(3, 9, 1B, 1B)
+foursquares(0, 9, 0B, 0B)
+===
+template <typename T1, typename T2, typename T3, typename T4> auto foursquares(const T1 &lo, const T2 &hi, const T3 &unique, const T4 &show)
+{
+    auto solutions = 0;
+    for (auto c : range_ee(lo, hi))
+        for (auto d : range_ee(lo, hi))
+            if (!unique || (c != d)) {
+                auto a = c + d;
+                if (a >= lo && a <= hi) {
+                    if (!unique || (c != 0 && d != 0))
+                        for (auto e : range_ee(lo, hi))
+                            if (!unique || (!in(e, make_tuple(a, c, d)))) {
+                                auto g = d + e;
+                                if (g >= lo && g <= hi) {
+                                    if (!unique || (!in(g, make_tuple(a, c, d, e))))
+                                        for (auto f : range_ee(lo, hi))
+                                            if (!unique || (!in(f, make_tuple(a, c, d, g, e)))) {
+                                                auto b = e + f - c;
+                                                if (b >= lo && b <= hi) {
+                                                    if (!unique || (!in(b, make_tuple(a, c, d, g, e, f)))) {
+                                                        solutions++;
+                                                        if (show)
+                                                            print(String(make_tuple(a, b, c, d, e, f, g))[range_e_llen(1,  - 1)]);
+                                                    }
+                                                }
+                                            }
+                                }
+                            }
+                }
+            }
+
+    auto uorn = unique ? u"unique"_S : u"non-unique"_S;
+
+    print(String(solutions) & u" "_S & uorn & u" solutions in "_S & String(lo) & u" to "_S & String(hi));
+    print();
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        foursquares(1, 7, true, true);
+        foursquares(3, 9, true, true);
+        foursquares(0, 9, false, false);
+    }
+} code_block_1;
