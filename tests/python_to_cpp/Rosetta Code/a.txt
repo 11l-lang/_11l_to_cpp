@@ -772,6 +772,8 @@ struct CodeBlock1
 
 
 # https://www.rosettacode.org/wiki/Abelian_sandpile_model
+Byte = int
+
 grid = [[0] * 10 for i in range(10)]
 grid[5][5] = 64
 
@@ -779,27 +781,45 @@ print('Before:')
 for row in grid:
     print(''.join('%3d' % c for c in row))
 
-while True:
-    changed = False
-    for ii, arr in enumerate(grid):
-        for jj, val in enumerate(arr):
-            if val > 3:
-                grid[ii][jj] -= 4
-                if ii > 0:
-                    grid[ii - 1][jj] += 1
-                if ii < len(grid)-1:
-                    grid[ii + 1][jj] += 1
-                if jj > 0:
-                    grid[ii][jj - 1] += 1
-                if jj < len(grid)-1:
-                    grid[ii][jj + 1] += 1
-                changed = True
-    if not changed:
-        break
+def simulate(grid : list):
+    while True:
+        changed = False
+        for ii, arr in enumerate(grid):
+            for jj, val in enumerate(arr):
+                if val > 3:
+                    grid[ii][jj] -= 4
+                    if ii > 0:
+                        grid[ii - 1][jj] += 1
+                    if ii < len(grid)-1:
+                        grid[ii + 1][jj] += 1
+                    if jj > 0:
+                        grid[ii][jj - 1] += 1
+                    if jj < len(grid)-1:
+                        grid[ii][jj + 1] += 1
+                    changed = True
+        if not changed:
+            break
+
+simulate(grid)
 
 print("\nAfter:")
 for row in grid:
     print(''.join('%3d' % c for c in row))
+
+grid = [[0] * 65 for i in range(65)]
+grid[32][32] = 64*64
+
+simulate(grid)
+
+ppm = open('sand_pile.ppm', 'wb')
+ppm.write(("P6\n%d %d\n255\n" % (len(grid), len(grid))).encode())
+colors = [[Byte(0),   0,   0],
+          [Byte(255), 0,   0],
+          [Byte(0), 255,   0],
+          [Byte(0),   0, 255]]
+for row in grid:
+    for c in row:
+        ppm.write(bytes(colors[c]))
 ===
 V grid = [[0] * 10] * 10
 grid[5][5] = 64
@@ -808,29 +828,44 @@ print(‘Before:’)
 L(row) grid
    print(row.map(c -> ‘#3’.format(c)).join(‘’))
 
-L
-   V changed = 0B
-   L(arr) grid
-      V ii = L.index
-      L(val) arr
-         V jj = L.index
-         I val > 3
-            grid[ii][jj] -= 4
-            I ii > 0
-               grid[ii - 1][jj]++
-            I ii < grid.len - 1
-               grid[ii + 1][jj]++
-            I jj > 0
-               grid[ii][jj - 1]++
-            I jj < grid.len - 1
-               grid[ii][jj + 1]++
-            changed = 1B
-   I !changed
-      L.break
+F simulate(&grid)
+   L
+      V changed = 0B
+      L(arr) grid
+         V ii = L.index
+         L(val) arr
+            V jj = L.index
+            I val > 3
+               grid[ii][jj] -= 4
+               I ii > 0
+                  grid[ii - 1][jj]++
+               I ii < grid.len - 1
+                  grid[ii + 1][jj]++
+               I jj > 0
+                  grid[ii][jj - 1]++
+               I jj < grid.len - 1
+                  grid[ii][jj + 1]++
+               changed = 1B
+      I !changed
+         L.break
+
+simulate(&grid)
 
 print("\nAfter:")
 L(row) grid
    print(row.map(c -> ‘#3’.format(c)).join(‘’))
+
+grid = [[0] * 65] * 65
+grid[32][32] = 64 * 64
+
+simulate(&grid)
+
+V ppm = File(‘sand_pile.ppm’, ‘w’)
+ppm.write_bytes(("P6\n#. #.\n255\n".format(grid.len, grid.len)).encode())
+V colors = [[Byte(0), 0, 0], [Byte(255), 0, 0], [Byte(0), 255, 0], [Byte(0), 0, 255]]
+L(row) grid
+   L(c) row
+      ppm.write_bytes(colors[c])
 ===
 auto grid = create_array({create_array({0}) * 10}) * 10;
 
@@ -843,40 +878,78 @@ struct CodeBlock1
         print(u"Before:"_S);
         for (auto &&row : grid)
             print(row.map([](const auto &c){return u"#3"_S.format(c);}).join(u""_S));
+    }
+} code_block_1;
 
-        while (true) {
-            auto changed = false;
+template <typename T1> auto simulate(T1 &grid)
+{
+    while (true) {
+        auto changed = false;
+        {int Lindex = 0;
+        for (auto &&arr : grid) {
+            auto ii = Lindex;
             {int Lindex = 0;
-            for (auto &&arr : grid) {
-                auto ii = Lindex;
-                {int Lindex = 0;
-                for (auto &&val : arr) {
-                    auto jj = Lindex;
-                    if (val > 3) {
-                        grid[ii][jj] -= 4;
-                        if (ii > 0)
-                            grid[ii - 1][jj]++;
-                        if (ii < grid.len() - 1)
-                            grid[ii + 1][jj]++;
-                        if (jj > 0)
-                            grid[ii][jj - 1]++;
-                        if (jj < grid.len() - 1)
-                            grid[ii][jj + 1]++;
-                        changed = true;
-                    }
-                    Lindex++;
-                }}
+            for (auto &&val : arr) {
+                auto jj = Lindex;
+                if (val > 3) {
+                    grid[ii][jj] -= 4;
+                    if (ii > 0)
+                        grid[ii - 1][jj]++;
+                    if (ii < grid.len() - 1)
+                        grid[ii + 1][jj]++;
+                    if (jj > 0)
+                        grid[ii][jj - 1]++;
+                    if (jj < grid.len() - 1)
+                        grid[ii][jj + 1]++;
+                    changed = true;
+                }
                 Lindex++;
             }}
-            if (!changed)
-                break;
-        }
+            Lindex++;
+        }}
+        if (!changed)
+            break;
+    }
+}
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        simulate(grid);
 
         print(u"\nAfter:"_S);
         for (auto &&row : grid)
             print(row.map([](const auto &c){return u"#3"_S.format(c);}).join(u""_S));
+
+        grid = create_array({create_array({0}) * 65}) * 65;
+        _set<32>(_get<32>(grid), 64 * 64);
+
+        simulate(grid);
     }
-} code_block_1;
+} code_block_2;
+
+auto ppm = File(u"sand_pile.ppm"_S, u"w"_S);
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        ppm.write_bytes((u"P6\n#. #.\n255\n"_S.format(grid.len(), grid.len())).encode());
+    }
+} code_block_3;
+
+auto colors = create_array({create_array<Byte>({Byte(0), 0, 0}), create_array<Byte>({Byte(255), 0, 0}), create_array<Byte>({Byte(0), 255, 0}), create_array<Byte>({Byte(0), 0, 255})});
+
+struct CodeBlock4
+{
+    CodeBlock4()
+    {
+        for (auto &&row : grid)
+            for (auto &&c : row)
+                ppm.write_bytes(colors[c]);
+    }
+} code_block_4;
 
 
 # https://www.rosettacode.org/wiki/Abelian_sandpile_model/Identity#Python
