@@ -306,3 +306,850 @@ struct CodeBlock1
         print(u"cost "_S & cost);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Abbreviations,_automatic#Python
+def shortest_abbreviation_length(line, list_size):
+    words = line.split(' ')
+    word_count = len(words)
+    # Can't give true answer with unexpected number of entries
+    if word_count != list_size:
+        raise ValueError('Not enough entries, expected {} found {}'.format(list_size, word_count))
+
+    # Find the small slice length that gives list_size unique values
+    abbreviation_length = 1
+    #abbreviations = set()
+    while True:
+        abbreviations = {word[:abbreviation_length] for word in words}
+        if len(abbreviations) == list_size:
+            return abbreviation_length
+        abbreviation_length += 1
+        #abbreviations.clear()
+
+def automatic_abbreviations(filename, words_per_line):
+    for line in open(filename, encoding = 'utf-8').read().split("\n"):
+        if len(line) > 0:
+            length = shortest_abbreviation_length(line, words_per_line)
+            print('{:2} {}'.format(length, line))
+        else:
+            print()
+
+automatic_abbreviations('daysOfWeek.txt', 7)
+===
+F shortest_abbreviation_length(line, list_size)
+   V words = line.split(‘ ’)
+   V word_count = words.len
+   I word_count != list_size
+      X ValueError(‘Not enough entries, expected #. found #.’.format(list_size, word_count))
+
+   V abbreviation_length = 1
+   L
+      V abbreviations = Set(words.map(word -> word[0 .< @abbreviation_length]))
+      I abbreviations.len == list_size
+         R abbreviation_length
+      abbreviation_length++
+
+F automatic_abbreviations(filename, words_per_line)
+   L(line) File(filename, encoding' ‘utf-8’).read().split("\n")
+      I line.len > 0
+         V length = shortest_abbreviation_length(line, words_per_line)
+         print(‘#2 #.’.format(length, line))
+      E
+         print()
+
+automatic_abbreviations(‘daysOfWeek.txt’, 7)
+===
+template <typename T1, typename T2> auto shortest_abbreviation_length(const T1 &line, const T2 &list_size)
+{
+    auto words = line.split(u" "_S);
+    auto word_count = words.len();
+    if (word_count != list_size)
+        throw ValueError(u"Not enough entries, expected #. found #."_S.format(list_size, word_count));
+
+    auto abbreviation_length = 1;
+    while (true) {
+        auto abbreviations = create_set(words.map([&abbreviation_length](const auto &word){return word[range_el(0, abbreviation_length)];}));
+        if (abbreviations.len() == list_size)
+            return abbreviation_length;
+        abbreviation_length++;
+    }
+}
+
+template <typename T1, typename T2> auto automatic_abbreviations(const T1 &filename, const T2 &words_per_line)
+{
+    for (auto &&line : File(filename, u"r"_S, u"utf-8"_S).read().split(u"\n"_S))
+        if (line.len() > 0) {
+            auto length = shortest_abbreviation_length(line, words_per_line);
+            print(u"#2 #."_S.format(length, line));
+        }
+        else
+            print();
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        automatic_abbreviations(u"daysOfWeek.txt"_S, 7);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Abbreviations,_easy#Python
+from typing import Dict
+
+command_table_text = \
+"""Add ALTer  BAckup Bottom  CAppend Change SCHANGE  CInsert CLAst COMPress COpy
+COUnt COVerlay CURsor DELete CDelete Down DUPlicate Xedit EXPand EXTract Find
+NFind NFINDUp NFUp CFind FINdup FUp FOrward GET Help HEXType Input POWerinput
+Join SPlit SPLTJOIN  LOAD  Locate CLocate  LOWercase UPPercase  LPrefix MACRO
+MErge MODify MOve MSG Next Overlay PARSE PREServe PURge PUT PUTD  Query  QUIT
+READ  RECover REFRESH RENum REPeat  Replace CReplace  RESet  RESTore  RGTLEFT
+RIght LEft  SAVE  SET SHift SI  SORT  SOS  STAck STATus  TOP TRAnsfer Type Up"""
+
+user_words = "riG   rePEAT copies  put mo   rest    types   fup.    6       poweRin"
+
+def find_abbreviations_length(command_table_text):
+    """ find the minimal abbreviation length for each word by counting capital letters.
+        a word that does not have capital letters gets it's full length as the minimum.
+    """
+    command_table : Dict[str, int] = dict()
+    for word in command_table_text.split():
+        abbr_len = sum(1 for c in word if c.isupper())
+        if abbr_len == 0:
+            abbr_len = len(word)
+        command_table[word] = abbr_len
+    return command_table
+
+def find_abbreviations(command_table):
+    """ for each command insert all possible abbreviations"""
+    abbreviations : Dict[str, str] = dict()
+    for command, min_abbr_len in command_table.items():
+        for l in range(min_abbr_len, len(command)+1):
+            abbr = command[:l].lower()
+            abbreviations[abbr] = command.upper()
+    return abbreviations
+
+def parse_user_string(user_string, abbreviations):
+    user_words = [word.lower() for word in user_string.split()]
+    commands = [abbreviations.get(user_word, "*error*") for user_word in user_words]
+    return " ".join(commands)
+
+command_table = find_abbreviations_length(command_table_text)
+abbreviations_table = find_abbreviations(command_table)
+
+full_words = parse_user_string(user_words, abbreviations_table)
+
+print("user words:", user_words)
+print("full words:", full_words)
+===
+V command_table_text = ‘Add ALTer  BAckup Bottom  CAppend Change SCHANGE  CInsert CLAst COMPress COpy
+COUnt COVerlay CURsor DELete CDelete Down DUPlicate Xedit EXPand EXTract Find
+NFind NFINDUp NFUp CFind FINdup FUp FOrward GET Help HEXType Input POWerinput
+Join SPlit SPLTJOIN  LOAD  Locate CLocate  LOWercase UPPercase  LPrefix MACRO
+MErge MODify MOve MSG Next Overlay PARSE PREServe PURge PUT PUTD  Query  QUIT
+READ  RECover REFRESH RENum REPeat  Replace CReplace  RESet  RESTore  RGTLEFT
+RIght LEft  SAVE  SET SHift SI  SORT  SOS  STAck STATus  TOP TRAnsfer Type Up’
+
+V user_words = ‘riG   rePEAT copies  put mo   rest    types   fup.    6       poweRin’
+
+F find_abbreviations_length(command_table_text)
+   ‘ find the minimal abbreviation length for each word by counting capital letters.
+        a word that does not have capital letters gets it's full length as the minimum.
+    ’
+   [String = Int] command_table
+   L(word) command_table_text.split_py()
+      V abbr_len = sum(word.filter(c -> c.is_uppercase()).map(c -> 1))
+      I abbr_len == 0
+         abbr_len = word.len
+      command_table[word] = abbr_len
+   R command_table
+
+F find_abbreviations(command_table)
+   ‘ for each command insert all possible abbreviations’
+   [String = String] abbreviations
+   L(command, min_abbr_len) command_table
+      L(l) min_abbr_len .. command.len
+         V abbr = command[0 .< l].lowercase()
+         abbreviations[abbr] = command.uppercase()
+   R abbreviations
+
+F parse_user_string(user_string, abbreviations)
+   V user_words = user_string.split_py().map(word -> word.lowercase())
+   V commands = user_words.map(user_word -> @abbreviations.get(user_word, ‘*error*’))
+   R commands.join(‘ ’)
+
+V command_table = find_abbreviations_length(command_table_text)
+V abbreviations_table = find_abbreviations(command_table)
+
+V full_words = parse_user_string(user_words, abbreviations_table)
+
+print(‘user words: ’user_words)
+print(‘full words: ’full_words)
+===
+auto command_table_text = uR"(Add ALTer  BAckup Bottom  CAppend Change SCHANGE  CInsert CLAst COMPress COpy
+COUnt COVerlay CURsor DELete CDelete Down DUPlicate Xedit EXPand EXTract Find
+NFind NFINDUp NFUp CFind FINdup FUp FOrward GET Help HEXType Input POWerinput
+Join SPlit SPLTJOIN  LOAD  Locate CLocate  LOWercase UPPercase  LPrefix MACRO
+MErge MODify MOve MSG Next Overlay PARSE PREServe PURge PUT PUTD  Query  QUIT
+READ  RECover REFRESH RENum REPeat  Replace CReplace  RESet  RESTore  RGTLEFT
+RIght LEft  SAVE  SET SHift SI  SORT  SOS  STAck STATus  TOP TRAnsfer Type Up)"_S;
+
+auto user_words = u"riG   rePEAT copies  put mo   rest    types   fup.    6       poweRin"_S;
+
+template <typename T1> auto find_abbreviations_length(const T1 &command_table_text)
+{
+    uR"( find the minimal abbreviation length for each word by counting capital letters.
+        a word that does not have capital letters gets it's full length as the minimum.
+    )"_S;
+    Dict<String, int> command_table;
+    for (auto &&word : command_table_text.split_py()) {
+        auto abbr_len = sum_map(word.filter([](const auto &c){return c.is_uppercase();}), [](const auto &c){return 1;});
+        if (abbr_len == 0)
+            abbr_len = word.len();
+        command_table.set(word, abbr_len);
+    }
+    return command_table;
+}
+
+template <typename T1> auto find_abbreviations(const T1 &command_table)
+{
+    u" for each command insert all possible abbreviations"_S;
+    Dict<String, String> abbreviations;
+    for (auto &&[command, min_abbr_len] : command_table)
+        for (auto l : range_ee(min_abbr_len, command.len())) {
+            auto abbr = command[range_el(0, l)].lowercase();
+            abbreviations.set(abbr, command.uppercase());
+        }
+    return abbreviations;
+}
+
+template <typename T1, typename T2> auto parse_user_string(const T1 &user_string, const T2 &abbreviations)
+{
+    auto user_words = user_string.split_py().map([](const auto &word){return word.lowercase();});
+    auto commands = user_words.map([&abbreviations](const auto &user_word){return abbreviations.get(user_word, u"*error*"_S);});
+    return commands.join(u" "_S);
+}
+
+auto command_table = find_abbreviations_length(command_table_text);
+auto abbreviations_table = find_abbreviations(command_table);
+
+auto full_words = parse_user_string(user_words, abbreviations_table);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"user words: "_S & user_words);
+        print(u"full words: "_S & full_words);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Abbreviations,_simple#Python
+from typing import Dict, Optional
+
+command_table_text = """add 1  alter 3  backup 2  bottom 1  Cappend 2  change 1  Schange  Cinsert 2  Clast 3
+   compress 4 copy 2 count 3 Coverlay 3 cursor 3  delete 3 Cdelete 2  down 1  duplicate
+   3 xEdit 1 expand 3 extract 3  find 1 Nfind 2 Nfindup 6 NfUP 3 Cfind 2 findUP 3 fUP 2
+   forward 2  get  help 1 hexType 4  input 1 powerInput 3  join 1 split 2 spltJOIN load
+   locate 1 Clocate 2 lowerCase 3 upperCase 3 Lprefix 2  macro  merge 2 modify 3 move 2
+   msg  next 1 overlay 1 parse preserve 4 purge 3 put putD query 1 quit  read recover 3
+   refresh renum 3 repeat 3 replace 1 Creplace 2 reset 3 restore 4 rgtLEFT right 2 left
+   2  save  set  shift 2  si  sort  sos  stack 3 status 4 top  transfer 3  type 1  up 1"""
+
+user_words = "riG   rePEAT copies  put mo   rest    types   fup.    6       poweRin"
+
+def find_abbreviations_length(command_table_text):
+    """ find the minimal abbreviation length for each word.
+        a word that does not have minimum abbreviation length specified
+        gets it's full lengths as the minimum.
+    """
+    command_table : Dict[str, int] = dict()
+    input_list = command_table_text.split()
+    i = 0
+
+    word = ''
+    while i < len(input_list) or word != '':
+        if word == '':
+            word = input_list[i]
+            i += 1
+        abbr_len = input_list[i] if i < len(input_list) else str(len(word))
+        i += 1
+        try:
+            command_table[word] = int(abbr_len)
+            word = ''
+        except ValueError:
+            command_table[word] = len(word)
+            word = abbr_len
+    return command_table
+
+def find_abbreviations(command_table):
+    """ for each command insert all possible abbreviations"""
+    abbreviations : Dict[str, str] = dict()
+    for command, min_abbr_len in command_table.items():
+        for l in range(min_abbr_len, len(command)+1):
+            abbr = command[:l].lower()
+            abbreviations[abbr] = command.upper()
+    return abbreviations
+
+def parse_user_string(user_string, abbreviations):
+    user_words = [word.lower() for word in user_string.split()]
+    commands = [abbreviations.get(user_word, "*error*") for user_word in user_words]
+    return " ".join(commands)
+
+command_table = find_abbreviations_length(command_table_text)
+abbreviations_table = find_abbreviations(command_table)
+
+full_words = parse_user_string(user_words, abbreviations_table)
+
+print("user words:", user_words)
+print("full words:", full_words)
+===
+V command_table_text = ‘add 1  alter 3  backup 2  bottom 1  Cappend 2  change 1  Schange  Cinsert 2  Clast 3
+   compress 4 copy 2 count 3 Coverlay 3 cursor 3  delete 3 Cdelete 2  down 1  duplicate
+   3 xEdit 1 expand 3 extract 3  find 1 Nfind 2 Nfindup 6 NfUP 3 Cfind 2 findUP 3 fUP 2
+   forward 2  get  help 1 hexType 4  input 1 powerInput 3  join 1 split 2 spltJOIN load
+   locate 1 Clocate 2 lowerCase 3 upperCase 3 Lprefix 2  macro  merge 2 modify 3 move 2
+   msg  next 1 overlay 1 parse preserve 4 purge 3 put putD query 1 quit  read recover 3
+   refresh renum 3 repeat 3 replace 1 Creplace 2 reset 3 restore 4 rgtLEFT right 2 left
+   2  save  set  shift 2  si  sort  sos  stack 3 status 4 top  transfer 3  type 1  up 1’
+
+V user_words = ‘riG   rePEAT copies  put mo   rest    types   fup.    6       poweRin’
+
+F find_abbreviations_length(command_table_text)
+   ‘ find the minimal abbreviation length for each word.
+        a word that does not have minimum abbreviation length specified
+        gets it's full lengths as the minimum.
+    ’
+   [String = Int] command_table
+   V input_list = command_table_text.split_py()
+   V i = 0
+
+   V word = ‘’
+   L i < input_list.len | word != ‘’
+      I word == ‘’
+         word = input_list[i]
+         i++
+      V abbr_len = I i < input_list.len {input_list[i]} E String(word.len)
+      i++
+      X.try
+         command_table[word] = Int(abbr_len)
+         word = ‘’
+      X.catch ValueError
+         command_table[word] = word.len
+         word = abbr_len
+   R command_table
+
+F find_abbreviations(command_table)
+   ‘ for each command insert all possible abbreviations’
+   [String = String] abbreviations
+   L(command, min_abbr_len) command_table
+      L(l) min_abbr_len .. command.len
+         V abbr = command[0 .< l].lowercase()
+         abbreviations[abbr] = command.uppercase()
+   R abbreviations
+
+F parse_user_string(user_string, abbreviations)
+   V user_words = user_string.split_py().map(word -> word.lowercase())
+   V commands = user_words.map(user_word -> @abbreviations.get(user_word, ‘*error*’))
+   R commands.join(‘ ’)
+
+V command_table = find_abbreviations_length(command_table_text)
+V abbreviations_table = find_abbreviations(command_table)
+
+V full_words = parse_user_string(user_words, abbreviations_table)
+
+print(‘user words: ’user_words)
+print(‘full words: ’full_words)
+===
+auto command_table_text = uR"(add 1  alter 3  backup 2  bottom 1  Cappend 2  change 1  Schange  Cinsert 2  Clast 3
+   compress 4 copy 2 count 3 Coverlay 3 cursor 3  delete 3 Cdelete 2  down 1  duplicate
+   3 xEdit 1 expand 3 extract 3  find 1 Nfind 2 Nfindup 6 NfUP 3 Cfind 2 findUP 3 fUP 2
+   forward 2  get  help 1 hexType 4  input 1 powerInput 3  join 1 split 2 spltJOIN load
+   locate 1 Clocate 2 lowerCase 3 upperCase 3 Lprefix 2  macro  merge 2 modify 3 move 2
+   msg  next 1 overlay 1 parse preserve 4 purge 3 put putD query 1 quit  read recover 3
+   refresh renum 3 repeat 3 replace 1 Creplace 2 reset 3 restore 4 rgtLEFT right 2 left
+   2  save  set  shift 2  si  sort  sos  stack 3 status 4 top  transfer 3  type 1  up 1)"_S;
+
+auto user_words = u"riG   rePEAT copies  put mo   rest    types   fup.    6       poweRin"_S;
+
+template <typename T1> auto find_abbreviations_length(const T1 &command_table_text)
+{
+    uR"( find the minimal abbreviation length for each word.
+        a word that does not have minimum abbreviation length specified
+        gets it's full lengths as the minimum.
+    )"_S;
+    Dict<String, int> command_table;
+    auto input_list = command_table_text.split_py();
+    auto i = 0;
+
+    auto word = u""_S;
+    while (i < input_list.len() || word != u"") {
+        if (word == u"") {
+            word = input_list[i];
+            i++;
+        }
+        auto abbr_len = i < input_list.len() ? input_list[i] : String(word.len());
+        i++;
+        try
+        {
+            command_table.set(word, to_int(abbr_len));
+            word = u""_S;
+        }
+        catch (const ValueError&)
+        {
+            command_table.set(word, word.len());
+            word = abbr_len;
+        }
+    }
+    return command_table;
+}
+
+template <typename T1> auto find_abbreviations(const T1 &command_table)
+{
+    u" for each command insert all possible abbreviations"_S;
+    Dict<String, String> abbreviations;
+    for (auto &&[command, min_abbr_len] : command_table)
+        for (auto l : range_ee(min_abbr_len, command.len())) {
+            auto abbr = command[range_el(0, l)].lowercase();
+            abbreviations.set(abbr, command.uppercase());
+        }
+    return abbreviations;
+}
+
+template <typename T1, typename T2> auto parse_user_string(const T1 &user_string, const T2 &abbreviations)
+{
+    auto user_words = user_string.split_py().map([](const auto &word){return word.lowercase();});
+    auto commands = user_words.map([&abbreviations](const auto &user_word){return abbreviations.get(user_word, u"*error*"_S);});
+    return commands.join(u" "_S);
+}
+
+auto command_table = find_abbreviations_length(command_table_text);
+auto abbreviations_table = find_abbreviations(command_table);
+
+auto full_words = parse_user_string(user_words, abbreviations_table);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"user words: "_S & user_words);
+        print(u"full words: "_S & full_words);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/ABC_words#Python
+for ln in open('unixdict.txt').read().split("\n"):
+    a = ln.find("a")
+    if a != -1:
+        b = ln.find("b")
+        if a < b and b < ln.find("c"):
+            print(ln)
+===
+L(ln) File(‘unixdict.txt’).read().split("\n")
+   V a = ln.findi(‘a’)
+   I a != -1
+      V b = ln.findi(‘b’)
+      I a < b & b < ln.findi(‘c’)
+         print(ln)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&ln : File(u"unixdict.txt"_S).read().split(u"\n"_S)) {
+            auto a = ln.findi(u"a"_S);
+            if (a != -1) {
+                auto b = ln.findi(u"b"_S);
+                if (a < b && b < ln.findi(u"c"_S))
+                    print(ln);
+            }
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Abelian_sandpile_model
+grid = [[0] * 10 for i in range(10)]
+grid[5][5] = 64
+
+print('Before:')
+for row in grid:
+    print(''.join('%3d' % c for c in row))
+
+while True:
+    changed = False
+    for ii, arr in enumerate(grid):
+        for jj, val in enumerate(arr):
+            if val > 3:
+                grid[ii][jj] -= 4
+                if ii > 0:
+                    grid[ii - 1][jj] += 1
+                if ii < len(grid)-1:
+                    grid[ii + 1][jj] += 1
+                if jj > 0:
+                    grid[ii][jj - 1] += 1
+                if jj < len(grid)-1:
+                    grid[ii][jj + 1] += 1
+                changed = True
+    if not changed:
+        break
+
+print("\nAfter:")
+for row in grid:
+    print(''.join('%3d' % c for c in row))
+===
+V grid = [[0] * 10] * 10
+grid[5][5] = 64
+
+print(‘Before:’)
+L(row) grid
+   print(row.map(c -> ‘#3’.format(c)).join(‘’))
+
+L
+   V changed = 0B
+   L(arr) grid
+      V ii = L.index
+      L(val) arr
+         V jj = L.index
+         I val > 3
+            grid[ii][jj] -= 4
+            I ii > 0
+               grid[ii - 1][jj]++
+            I ii < grid.len - 1
+               grid[ii + 1][jj]++
+            I jj > 0
+               grid[ii][jj - 1]++
+            I jj < grid.len - 1
+               grid[ii][jj + 1]++
+            changed = 1B
+   I !changed
+      L.break
+
+print("\nAfter:")
+L(row) grid
+   print(row.map(c -> ‘#3’.format(c)).join(‘’))
+===
+auto grid = create_array({create_array({0}) * 10}) * 10;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _set<5>(_get<5>(grid), 64);
+
+        print(u"Before:"_S);
+        for (auto &&row : grid)
+            print(row.map([](const auto &c){return u"#3"_S.format(c);}).join(u""_S));
+
+        while (true) {
+            auto changed = false;
+            {int Lindex = 0;
+            for (auto &&arr : grid) {
+                auto ii = Lindex;
+                {int Lindex = 0;
+                for (auto &&val : arr) {
+                    auto jj = Lindex;
+                    if (val > 3) {
+                        grid[ii][jj] -= 4;
+                        if (ii > 0)
+                            grid[ii - 1][jj]++;
+                        if (ii < grid.len() - 1)
+                            grid[ii + 1][jj]++;
+                        if (jj > 0)
+                            grid[ii][jj - 1]++;
+                        if (jj < grid.len() - 1)
+                            grid[ii][jj + 1]++;
+                        changed = true;
+                    }
+                    Lindex++;
+                }}
+                Lindex++;
+            }}
+            if (!changed)
+                break;
+        }
+
+        print(u"\nAfter:"_S);
+        for (auto &&row : grid)
+            print(row.map([](const auto &c){return u"#3"_S.format(c);}).join(u""_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Abelian_sandpile_model/Identity#Python
+from itertools import product
+import collections
+from typing import Set, Tuple
+
+def ref(obj):
+    return obj
+
+class Sandpile:
+    def __init__(self, gridtext):
+        array = [int(x) for x in gridtext.split()]
+        self.grid : DefaultDict[Tuple[int, int], int] = collections.defaultdict(int)
+        for i, x in enumerate(array):
+            self.grid[(i // 3, i % 3)] = x
+
+    _border : Set[Tuple[int, int]] = set((r, c)
+                  for r, c in product(range(-1, 4), range(-1, 4))
+                  if not 0 <= r <= 2 or not 0 <= c <= 2
+                  )
+    _cell_coords = list(product(range(3), range(3)))
+
+    def topple(self):
+        g = ref(self.grid)
+        for r, c in self._cell_coords:
+            if g[(r, c)] >= 4:
+                g[(r - 1, c)] += 1
+                g[(r + 1, c)] += 1
+                g[(r, c - 1)] += 1
+                g[(r, c + 1)] += 1
+                g[(r, c)] -= 4
+                return True
+        return False
+
+    def stabilise(self):
+        while self.topple():
+            pass
+        # Remove extraneous grid border
+        for row_col in self._border.intersection(set(self.grid.keys())):
+            del self.grid[row_col]
+
+    #__pos__ = stabilise     # +s == s.stabilise()
+
+    def __eq__(self, other):
+        return all(self.grid[row_col] == other.grid[row_col]
+                   for row_col in self._cell_coords)
+
+    def __add__(self, other):
+        ans = Sandpile("")
+        for row_col in self._cell_coords:
+            ans.grid[row_col] = self.grid[row_col] + other.grid[row_col]
+        ans.stabilise()
+        return ans
+
+    def __str__(self):
+        txt : List[str] = []
+        for row in range(3):
+            txt.append(' '.join(str(self.grid[(row, col)])
+                                for col in range(3)))
+        return '\n'.join(txt)
+
+unstable = Sandpile("""4 3 3
+                       3 1 2
+                       0 2 3""")
+s1 = Sandpile("""1 2 0
+                 2 1 1
+                 0 1 3""")
+s2 = Sandpile("""2 1 3
+                 1 0 1
+                 0 1 0""")
+s3 = Sandpile("3 3 3  3 3 3  3 3 3")
+s3_id = Sandpile("2 1 2  1 0 1  2 1 2")
+
+print(unstable)
+print()
+unstable.stabilise()
+print(unstable)
+print()
+print(s1 + s2)
+print()
+print(s2 + s1)
+print()
+print(s1 + s2 == s2 + s1)
+print()
+print(s3 + s3_id)
+print()
+print(s3 + s3_id == s3)
+print()
+print(s3_id + s3_id)
+print()
+print(s3_id + s3_id == s3_id)
+===
+T Sandpile
+   DefaultDict[(Int, Int), Int] grid
+   F (gridtext)
+      V array = gridtext.split_py().map(x -> Int(x))
+      L(x) array
+         V i = L.index
+         .grid[(i I/ 3, i % 3)] = x
+
+   Set[(Int, Int)] _border = Set(cart_product(-1 .< 4, -1 .< 4).filter((r, c) -> !(r C 0..2) | !(c C 0..2)))
+   _cell_coords = cart_product(0.<3, 0.<3)
+
+   F topple()
+      V& g = .grid
+      L(r, c) ._cell_coords
+         I g[(r, c)] >= 4
+            g[(r - 1, c)]++
+            g[(r + 1, c)]++
+            g[(r, c - 1)]++
+            g[(r, c + 1)]++
+            g[(r, c)] -= 4
+            R 1B
+      R 0B
+
+   F stabilise()
+      L .topple()
+      {
+      }
+      L(row_col) ._border.intersection(Set(.grid.keys()))
+         .grid.pop(row_col)
+
+   F ==(other)
+      R all(._cell_coords.map(row_col -> @.grid[row_col] == @other.grid[row_col]))
+
+   F +(other)
+      V ans = Sandpile(‘’)
+      L(row_col) ._cell_coords
+         ans.grid[row_col] = .grid[row_col] + other.grid[row_col]
+      ans.stabilise()
+      R ans
+
+   F String()
+      [String] txt
+      L(row) 3
+         txt.append((0.<3).map(col -> String(@.grid[(@row, col)])).join(‘ ’))
+      R txt.join("\n")
+
+V unstable = Sandpile(‘4 3 3
+                       3 1 2
+                       0 2 3’)
+V s1 = Sandpile(‘1 2 0
+                 2 1 1
+                 0 1 3’)
+V s2 = Sandpile(‘2 1 3
+                 1 0 1
+                 0 1 0’)
+V s3 = Sandpile(‘3 3 3  3 3 3  3 3 3’)
+V s3_id = Sandpile(‘2 1 2  1 0 1  2 1 2’)
+
+print(unstable)
+print()
+unstable.stabilise()
+print(unstable)
+print()
+print(s1 + s2)
+print()
+print(s2 + s1)
+print()
+print(s1 + s2 == s2 + s1)
+print()
+print(s3 + s3_id)
+print()
+print(s3 + s3_id == s3)
+print()
+print(s3_id + s3_id)
+print()
+print(s3_id + s3_id == s3_id)
+===
+class Sandpile
+{
+public:
+    DefaultDict<ivec2, int> grid;
+    template <typename T1> Sandpile(const T1 &gridtext)
+    {
+        auto array = gridtext.split_py().map([](const auto &x){return to_int(x);});
+        {int Lindex = 0;
+        for (auto &&x : array) {
+            auto i = Lindex;
+            grid.set(make_tuple(idiv(i, 3), mod(i, 3)), x);
+            Lindex++;
+        }}
+    }
+
+    Set<ivec2> _border = create_set(cart_product(range_el(-1, 4), range_el(-1, 4)).filter([](const auto &r, const auto &c){return !(in(r, range_ee(0, 2))) || !(in(c, range_ee(0, 2)));}));
+    decltype(cart_product(range_el(0, 3), range_el(0, 3))) _cell_coords = cart_product(range_el(0, 3), range_el(0, 3));
+
+    auto topple()
+    {
+        auto& g = grid;
+        for (auto &&[r, c] : _cell_coords)
+            if (g[make_tuple(r, c)] >= 4) {
+                g[make_tuple(r - 1, c)]++;
+                g[make_tuple(r + 1, c)]++;
+                g[make_tuple(r, c - 1)]++;
+                g[make_tuple(r, c + 1)]++;
+                g[make_tuple(r, c)] -= 4;
+                return true;
+            }
+        return false;
+    }
+
+    auto stabilise()
+    {
+        while (topple()) {
+        }
+
+        for (auto &&row_col : _border.intersection(create_set(grid.keys())))
+            grid.pop(row_col);
+    }
+
+    template <typename T1> auto operator==(const T1 &other) const
+    {
+        return all_map(_cell_coords, [&other, this](const auto &row_col){return grid[row_col] == other.grid[row_col];});
+    }
+
+    template <typename T1> auto operator+(const T1 &other) const
+    {
+        auto ans = Sandpile(u""_S);
+        for (auto &&row_col : _cell_coords)
+            ans.grid.set(row_col, grid[row_col] + other.grid[row_col]);
+        ans.stabilise();
+        return ans;
+    }
+    template <typename Ty> auto &operator+=(const Ty &t)
+    {
+        *this = *this + t;
+        return *this;
+    }
+
+    operator String() const
+    {
+        Array<String> txt;
+        for (int row = 0; row < 3; row++)
+            txt.append(range_el(0, 3).map([&row, this](const auto &col){return String(grid[make_tuple(row, col)]);}).join(u" "_S));
+        return txt.join(u"\n"_S);
+    }
+};
+
+auto unstable = Sandpile(uR"(4 3 3
+                       3 1 2
+                       0 2 3)"_S);
+auto s1 = Sandpile(uR"(1 2 0
+                 2 1 1
+                 0 1 3)"_S);
+auto s2 = Sandpile(uR"(2 1 3
+                 1 0 1
+                 0 1 0)"_S);
+auto s3 = Sandpile(u"3 3 3  3 3 3  3 3 3"_S);
+auto s3_id = Sandpile(u"2 1 2  1 0 1  2 1 2"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(unstable);
+        print();
+        unstable.stabilise();
+        print(unstable);
+        print();
+        print(s1 + s2);
+        print();
+        print(s2 + s1);
+        print();
+        print(s1 + s2 == s2 + s1);
+        print();
+        print(s3 + s3_id);
+        print();
+        print(s3 + s3_id == s3);
+        print();
+        print(s3_id + s3_id);
+        print();
+        print(s3_id + s3_id == s3_id);
+    }
+} code_block_1;
