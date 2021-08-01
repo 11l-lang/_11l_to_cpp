@@ -244,7 +244,8 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
 
             indentation_level = ii - linestart
             if len(indentation_levels) and indentation_levels[-1][0] == -1: # сразу после символа `{` идёт новый произвольный отступ (понижение уровня отступа может быть полезно, если вдруг отступ оказался слишком большой), который действует вплоть до парного символа `}`
-                indentation_levels[-1] = (indentation_level, indentation_levels[-1][1]) #indentation_levels[-1][0] = indentation_level # || maybe this is unnecessary (actually it is necessary, see test "fn f()\n{\na = 1") // }
+                assert(indentation_levels[-1][1])
+                indentation_levels[-1] = (indentation_level, True) #indentation_levels[-1][0] = indentation_level # || maybe this is unnecessary (actually it is necessary, see test "fn f()\n{\na = 1") // }
                 indentation_tabs = tabs
             else:
                 prev_indentation_level = indentation_levels[-1][0] if len(indentation_levels) else 0

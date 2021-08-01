@@ -1226,3 +1226,647 @@ struct CodeBlock1
         print(s3_id + s3_id == s3_id);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Abstract_type
+class AbstractQueue:
+    def enqueue(self, item : int) -> None:
+        raise NotImplementedError()
+
+class PrintQueue(AbstractQueue):
+    def enqueue(self, item : int):
+        print(item)
+===
+T AbstractQueue
+   F.virtual.abstract enqueue(Int item) -> N
+
+T PrintQueue(AbstractQueue)
+   F.virtual.assign enqueue(Int item) -> N
+      print(item)
+===
+class AbstractQueue
+{
+public:
+    virtual void enqueue(const int &item) = 0;
+};
+
+class PrintQueue : public AbstractQueue
+{
+public:
+    virtual void enqueue(const int &item) override
+    {
+        print(item);
+    }
+};
+
+
+# https://www.rosettacode.org/wiki/Abundant_odd_numbers#Python
+oddNumber  = 1
+aCount  = 0
+dSum  = 0
+
+import math
+
+def divisorSum(n):
+    sum = 1
+    i = int(math.sqrt(n)+1)
+
+    for d in range (2, i):
+        if n % d == 0:
+            sum += d
+            otherD = n // d
+            if otherD != d:
+                sum += otherD
+    return sum
+
+print ("The first 25 abundant odd numbers:")
+while aCount  < 25:
+    dSum  = divisorSum(oddNumber )
+    if dSum  > oddNumber :
+        aCount  += 1
+        print("{0:5} proper divisor sum: {1}". format(oddNumber ,dSum ))
+    oddNumber  += 2
+
+while aCount  < 1000:
+    dSum  = divisorSum(oddNumber )
+    if dSum  > oddNumber :
+        aCount  += 1
+    oddNumber  += 2
+print ("\n1000th abundant odd number:")
+print ("    ",(oddNumber - 2)," proper divisor sum: ",dSum)
+
+oddNumber  = 1000000001
+found  = False
+while not found :
+    dSum  = divisorSum(oddNumber )
+    if dSum  > oddNumber :
+        found  = True
+        print ("\nFirst abundant odd number > 1 000 000 000:")
+        print ("    ",oddNumber," proper divisor sum: ",dSum)
+    oddNumber  += 2
+===
+V oddNumber = 1
+V aCount = 0
+V dSum = 0
+
+F divisorSum(n)
+   V sum = 1
+   V i = Int(sqrt(n) + 1)
+
+   L(d) 2 .< i
+      I n % d == 0
+         sum += d
+         V otherD = n I/ d
+         I otherD != d
+            sum += otherD
+   R sum
+
+print(‘The first 25 abundant odd numbers:’)
+L aCount < 25
+   dSum = divisorSum(oddNumber)
+   I dSum > oddNumber
+      aCount++
+      print(‘#5 proper divisor sum: #.’.format(oddNumber, dSum))
+   oddNumber += 2
+
+L aCount < 1000
+   dSum = divisorSum(oddNumber)
+   I dSum > oddNumber
+      aCount++
+   oddNumber += 2
+print("\n1000th abundant odd number:")
+print(‘     ’(oddNumber - 2)‘  proper divisor sum:  ’dSum)
+
+oddNumber = 1000000001
+V found = 0B
+L !found
+   dSum = divisorSum(oddNumber)
+   I dSum > oddNumber
+      found = 1B
+      print("\nFirst abundant odd number > 1 000 000 000:")
+      print(‘     ’oddNumber‘  proper divisor sum:  ’dSum)
+   oddNumber += 2
+===
+auto oddNumber = 1;
+auto aCount = 0;
+auto dSum = 0;
+
+template <typename T1> auto divisorSum(const T1 &n)
+{
+    auto sum = 1;
+    auto i = to_int(sqrt(n) + 1);
+
+    for (auto d : range_el(2, i))
+        if (mod(n, d) == 0) {
+            sum += d;
+            auto otherD = idiv(n, d);
+            if (otherD != d)
+                sum += otherD;
+        }
+    return sum;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"The first 25 abundant odd numbers:"_S);
+        while (aCount < 25) {
+            dSum = divisorSum(oddNumber);
+            if (dSum > oddNumber) {
+                aCount++;
+                print(u"#5 proper divisor sum: #."_S.format(oddNumber, dSum));
+            }
+            oddNumber += 2;
+        }
+
+        while (aCount < 1000) {
+            dSum = divisorSum(oddNumber);
+            if (dSum > oddNumber)
+                aCount++;
+            oddNumber += 2;
+        }
+        print(u"\n1000th abundant odd number:"_S);
+        print(u"     "_S & (oddNumber - 2) & u"  proper divisor sum:  "_S & dSum);
+
+        oddNumber = 1000000001;
+    }
+} code_block_1;
+
+auto found = false;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (!found) {
+            dSum = divisorSum(oddNumber);
+            if (dSum > oddNumber) {
+                found = true;
+                print(u"\nFirst abundant odd number > 1 000 000 000:"_S);
+                print(u"     "_S & oddNumber & u"  proper divisor sum:  "_S & dSum);
+            }
+            oddNumber += 2;
+        }
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Accumulator_factory
+def accumulator(n):
+    class Accumulator:
+        s : float
+        def __init__(self, n : float):
+            self.s = n
+        def __call__(self, n : float):
+            self.s += n
+            return self.s
+    return Accumulator(n)
+
+x = accumulator(1)
+print(x(5))
+print(x(2.3))
+
+x2 = accumulator(3)
+print(x2(5))
+print(x2(3.3))
+print(x2(0))
+===
+F accumulator(n)
+   T Accumulator
+      Float s
+      F (Float n)
+         .s = n
+      F ()(Float n)
+         .s += n
+         R .s
+   R Accumulator(n)
+
+V x = accumulator(1)
+print(x(5))
+print(x(2.3))
+
+V x2 = accumulator(3)
+print(x2(5))
+print(x2(3.3))
+print(x2(0))
+===
+template <typename T1> auto accumulator(const T1 &n)
+{
+    class Accumulator
+    {
+    public:
+        double s;
+        Accumulator(const double n) :
+            s(n)
+        {
+        }
+        auto operator()(const double n)
+        {
+            s += n;
+            return s;
+        }
+    };
+    return Accumulator(n);
+}
+
+auto x = accumulator(1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(x(5));
+        print(x(2.3));
+    }
+} code_block_1;
+
+auto x2 = accumulator(3);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(x2(5));
+        print(x2(3.3));
+        print(x2(0));
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Ackermann_function#Python
+def ack2(m, n) -> int:
+   return (n + 1)   if m == 0 else (
+          (n + 2)   if m == 1 else (
+          (2*n + 3) if m == 2 else (
+          (8*(2**n - 1) + 5) if m == 3 else (
+          ack2(m-1, 1) if n == 0 else ack2(m-1, ack2(m, n-1))))))
+
+print(ack2(0,0))
+print(ack2(3,4))
+print(ack2(4,1))
+===
+F ack2(m, n) -> Int
+   R I m == 0 {(n + 1)} E (I m == 1 {(n + 2)} E (I m == 2 {(2 * n + 3)} E (I m == 3 {(8 * (2 ^ n - 1) + 5)} E (I n == 0 {ack2(m - 1, 1)} E ack2(m - 1, ack2(m, n - 1))))))
+
+print(ack2(0, 0))
+print(ack2(3, 4))
+print(ack2(4, 1))
+===
+template <typename T1, typename T2> int ack2(const T1 &m, const T2 &n)
+{
+    return m == 0 ? (n + 1) : (m == 1 ? (n + 2) : (m == 2 ? (2 * n + 3) : (m == 3 ? (8 * (pow(2, n) - 1) + 5) : (n == 0 ? ack2(m - 1, 1) : ack2(m - 1, ack2(m, n - 1))))));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(ack2(0, 0));
+        print(ack2(3, 4));
+        print(ack2(4, 1));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Addition_chains#Python
+# Slow BigInt (if there is `x * BigInt(2)**(best_len - pos) < n` instead of `x<<(best_len - pos) < n`)
+def bauer(n):
+    chain = [0]*n
+    in_chain = [False]*(n + 1)
+    best : List[int] = []
+    best_len = n
+    cnt = 0
+
+    def extend_chain(x : int, pos : int) -> None:
+        nonlocal best, best_len, cnt
+
+        if best_len - pos < 32 and x < n >> (best_len - pos):
+            return
+
+        chain[pos] = x
+        in_chain[x] = True
+        pos += 1
+
+        if in_chain[n - x]:  # found solution
+            if pos == best_len:
+                cnt += 1
+            else:
+                best = chain[:pos]
+                best_len = pos
+                cnt = 1
+        elif pos < best_len:
+            for i in range(pos - 1, -1, -1):
+                c = x + chain[i]
+                if c < n:
+                    extend_chain(c, pos)
+
+        in_chain[x] = False
+
+    extend_chain(1, 0)
+    return (best + [n], cnt)
+
+for n in [7, 14, 21, 29, 32, 42, 64, 47, 79, 191, 382, 379]:
+    (best, cnt) = bauer(n)
+    print('L({}) = {}, count of minimum chain: {}\ne.g.: {}\n'.format(n, len(best) - 1, cnt, best))
+===
+F bauer(n)
+   V chain = [0] * n
+   V in_chain = [0B] * (n + 1)
+   [Int] best
+   V best_len = n
+   V cnt = 0
+
+   F extend_chain(Int x, Int =pos) -> N
+
+      I @best_len - pos < 32 & x < @n >> (@best_len - pos)
+         R
+
+      @chain[pos] = x
+      @in_chain[x] = 1B
+      pos++
+
+      I @in_chain[@n - x]
+         I pos == @best_len
+            @cnt++
+         E
+            @best = @chain[0 .< pos]
+            @best_len = pos
+            @cnt = 1
+      E I pos < @best_len
+         L(i) (pos - 1 .< -1).step(-1)
+            V c = x + @chain[i]
+            I c < @n
+               @extend_chain(c, pos)
+
+      @in_chain[x] = 0B
+
+   extend_chain(1, 0)
+   R (best [+] [n], cnt)
+
+L(n) [7, 14, 21, 29, 32, 42, 64, 47, 79, 191, 382, 379]
+   V (best, cnt) = bauer(n)
+   print("L(#.) = #., count of minimum chain: #.\ne.g.: #.\n".format(n, best.len - 1, cnt, best))
+===
+template <typename T1> auto bauer(const T1 &n)
+{
+    auto chain = create_array({0}) * n;
+    auto in_chain = create_array({false}) * (n + 1);
+    Array<int> best;
+    auto best_len = n;
+    auto cnt = 0;
+
+    std::function<void(int, int)> extend_chain = [&best, &best_len, &chain, &cnt, &extend_chain, &in_chain, &n](const int x, int pos)
+    {
+
+        if (best_len - pos < 32 && x < n >> (best_len - pos))
+            return;
+
+        chain.set(pos, x);
+        in_chain.set(x, true);
+        pos++;
+
+        if (in_chain[n - x]) {
+            if (pos == best_len)
+                cnt++;
+            else {
+                best = chain[range_el(0, pos)];
+                best_len = pos;
+                cnt = 1;
+            }
+        }
+        else if (pos < best_len)
+            for (auto i : range_el(pos - 1, -1).step(-1)) {
+                auto c = x + chain[i];
+                if (c < n)
+                    extend_chain(c, pos);
+            }
+
+        in_chain.set(x, false);
+    };
+
+    extend_chain(1, 0);
+    return make_tuple(best + create_array({n}), cnt);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&n : create_array({7, 14, 21, 29, 32, 42, 64, 47, 79, 191, 382, 379})) {
+            auto [best, cnt] = bauer(n);
+            print(u"L(#.) = #., count of minimum chain: #.\ne.g.: #.\n"_S.format(n, best.len() - 1, cnt, best));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/AKS_test_for_primes#Python
+BigInt = int
+
+def expand_x_1(p):
+    ex = [BigInt(1)]
+    for i in range(p):
+        ex.append(ex[-1] * -(p-i) // (i+1))
+    return ex[::-1]
+
+def aks_test(p):
+    if p < 2: return False
+    ex = expand_x_1(p)
+    ex[0] += 1
+    return not any(mult % p != 0 for mult in ex[0:-1])
+
+print('# p: (x-1)^p for small p')
+for p in range(12):
+    print('%3i: %s' % (p, ' '.join('%s%i%s' % ('+' * (e>=0), e, ('x^%i' % n) if n else '')
+                                   for n,e in enumerate(expand_x_1(p)))))
+
+print('\n# small primes using the aks test')
+print([p for p in range(101) if aks_test(p)])
+===
+F expand_x_1(p)
+   V ex = [BigInt(1)]
+   L(i) 0 .< p
+      ex.append(ex.last * -(p - i) I/ (i + 1))
+   R reversed(ex)
+
+F aks_test(p)
+   I p < 2
+      R 0B
+   V ex = expand_x_1(p)
+   ex[0]++
+   R !any(ex[0 .< (len)-1].map(mult -> mult % @p != 0))
+
+print(‘# p: (x-1)^p for small p’)
+L(p) 12
+   print(‘#3: #.’.format(p, enumerate(expand_x_1(p)).map((n, e) -> ‘#.#.#.’.format(‘+’ * (e >= 0), e, I n {(‘x^#.’.format(n))} E ‘’)).join(‘ ’)))
+
+print("\n# small primes using the aks test")
+print((0.<101).filter(p -> aks_test(p)))
+===
+template <typename T1> auto expand_x_1(const T1 &p)
+{
+    auto ex = create_array({BigInt(1)});
+    for (auto i : range_el(0, p))
+        ex.append(idiv(ex.last() * -(p - i), (i + 1)));
+    return reversed(ex);
+}
+
+template <typename T1> auto aks_test(const T1 &p)
+{
+    if (p < 2)
+        return false;
+    auto ex = expand_x_1(p);
+    _get<0>(ex)++;
+    return !any_map(ex[range_e_llen(0,  - 1)], [&p](const auto &mult){return mod(mult, p) != 0;});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"# p: (x-1)^p for small p"_S);
+        for (int p = 0; p < 12; p++)
+            print(u"#3: #."_S.format(p, enumerate(expand_x_1(p)).map([](const auto &n, const auto &e){return u"#.#.#."_S.format(u"+"_S * (e >= 0), e, n ? (u"x^#."_S.format(n)) : u""_S);}).join(u" "_S)));
+
+        print(u"\n# small primes using the aks test"_S);
+        print(range_el(0, 101).filter([](const auto &p){return aks_test(p);}));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Aliquot_sequence_classifications#Python
+def pdsum(n):
+    return sum(x for x in range(1, (n + 1) // 2 + 1) if n % x == 0 and n != x)
+
+def aliquot(n, maxlen=16, maxterm=2**30):
+    if n == 0:
+        return ('terminating', [0])
+    s = [n]
+    slen = 1
+    new = n
+    while slen <= maxlen and new < maxterm:
+        new = pdsum(s[-1])
+        if new in s:
+            if s[0] == new:
+                if slen == 1:
+                    return ('perfect', s)
+                elif slen == 2:
+                    return ('amicable', s)
+                else:
+                    return ('sociable of length %i' % slen, s)
+            elif s[-1] == new:
+                return ('aspiring', s)
+            else:
+                return ('cyclic back to %i' % new, s)
+        elif new == 0:
+            return ('terminating', s + [0])
+        else:
+            s.append(new)
+            slen += 1
+    else:
+        return ('non-terminating', s)
+
+for n in range(1, 11):
+    (cls, seq) = aliquot(n)
+    print('%s: %s' % (cls, seq))
+print()
+for n in [11, 12, 28, 496, 220, 1184,  12496, 1264460, 790, 909, 562, 1064, 1488]:#, 15355717786080]:
+    (cls, seq) = aliquot(n)
+    print('%s: %s' % (cls, seq))
+===
+F pdsum(n)
+   R sum((1 .. (n + 1) I/ 2).filter(x -> @n % x == 0 & @n != x))
+
+F aliquot(n, maxlen = 16, maxterm = 2 ^ 30)
+   I n == 0
+      R (‘terminating’, [0])
+   V s = [n]
+   V slen = 1
+   V new = n
+   L slen <= maxlen & new < maxterm
+      new = pdsum(s.last)
+      I new C s
+         I s[0] == new
+            I slen == 1
+               R (‘perfect’, s)
+            E I slen == 2
+               R (‘amicable’, s)
+            E
+               R (‘sociable of length #.’.format(slen), s)
+         E I s.last == new
+            R (‘aspiring’, s)
+         E
+            R (‘cyclic back to #.’.format(new), s)
+      E I new == 0
+         R (‘terminating’, s [+] [0])
+      E
+         s.append(new)
+         slen++
+   L.was_no_break
+      R (‘non-terminating’, s)
+
+L(n) 1..10
+   V (cls, seq) = aliquot(n)
+   print(‘#.: #.’.format(cls, seq))
+print()
+L(n) [11, 12, 28, 496, 220, 1184, 12496, 1264460, 790, 909, 562, 1064, 1488]
+   V (cls, seq) = aliquot(n)
+   print(‘#.: #.’.format(cls, seq))
+===
+template <typename T1> auto pdsum(const T1 &n)
+{
+    return sum(range_ee(1, idiv((n + 1), 2)).filter([&n](const auto &x){return mod(n, x) == 0 && n != x;}));
+}
+
+template <typename T1, typename T2 = decltype(16), typename T3 = decltype(pow(2, 30))> auto aliquot(const T1 &n, const T2 &maxlen = 16, const T3 &maxterm = pow(2, 30))
+{
+    if (n == 0)
+        return make_tuple(u"terminating"_S, create_array({0}));
+    auto s = create_array({n});
+    auto slen = 1;
+    auto _new_ = n;
+    {bool was_break = false;
+    while (slen <= maxlen && _new_ < maxterm) {
+        _new_ = pdsum(s.last());
+        if (in(_new_, s)) {
+            if (_get<0>(s) == _new_) {
+                if (slen == 1)
+                    return make_tuple(u"perfect"_S, s);
+                else if (slen == 2)
+                    return make_tuple(u"amicable"_S, s);
+                else
+                    return make_tuple(u"sociable of length #."_S.format(slen), s);
+            }
+            else if (s.last() == _new_)
+                return make_tuple(u"aspiring"_S, s);
+            else
+                return make_tuple(u"cyclic back to #."_S.format(_new_), s);
+        }
+        else if (_new_ == 0)
+            return make_tuple(u"terminating"_S, s + create_array({0}));
+        else {
+            s.append(_new_);
+            slen++;
+        }
+    }
+    if (!was_break)
+        return make_tuple(u"non-terminating"_S, s);
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(1, 10)) {
+            auto [cls, seq] = aliquot(n);
+            print(u"#.: #."_S.format(cls, seq));
+        }
+        print();
+        for (auto &&n : create_array({11, 12, 28, 496, 220, 1184, 12496, 1264460, 790, 909, 562, 1064, 1488})) {
+            auto [cls, seq] = aliquot(n);
+            print(u"#.: #."_S.format(cls, seq));
+        }
+    }
+} code_block_1;
