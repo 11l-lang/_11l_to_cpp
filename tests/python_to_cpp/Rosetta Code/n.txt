@@ -938,7 +938,7 @@ F pblock(vec, cells)
    R ‘|’vector.join(‘|’)‘|’
 
 L(blocks, cells) [([2, 1], 5), ([Int](), 5), ([8], 10), ([2, 3, 2, 3], 15)]
-   print("\nConfiguration:\n    #. ## #. cells and #. blocks".format(pblock([(0, 0)] * 0, cells), cells, blocks))
+   print("\nConfiguration:\n    #. # #. cells and #. blocks".format(pblock([(0, 0)] * 0, cells), cells, blocks))
    print(‘  Possibilities:’)
    V nb = nonoblocks(&blocks, cells)
    L(vector) nb
@@ -989,7 +989,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto &&[blocks, cells] : create_array({make_tuple(create_array({2, 1}), 5), make_tuple(Array<int>(), 5), make_tuple(create_array({8}), 10), make_tuple(create_array({2, 3, 2, 3}), 15)})) {
-            print(u"\nConfiguration:\n    #. ## #. cells and #. blocks"_S.format(pblock(create_array({make_tuple(0, 0)}) * 0, cells), cells, blocks));
+            print(u"\nConfiguration:\n    #. # #. cells and #. blocks"_S.format(pblock(create_array({make_tuple(0, 0)}) * 0, cells), cells, blocks));
             print(u"  Possibilities:"_S);
             auto nb = nonoblocks(blocks, cells);
             for (auto &&vector : nb)

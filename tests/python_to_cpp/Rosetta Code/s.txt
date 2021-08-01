@@ -866,11 +866,11 @@ for i in (False, True):
         y = a(i) or  b(j)
 ===
 F a(v)
-   print(‘  ## Called function a(#.)’.format(v))
+   print(‘  # Called function a(#.)’.format(v))
    R v
 
 F b(v)
-   print(‘  ## Called function b(#.)’.format(v))
+   print(‘  # Called function b(#.)’.format(v))
    R v
 
 L(i) (0B, 1B)
@@ -882,13 +882,13 @@ L(i) (0B, 1B)
 ===
 template <typename T1> auto a(const T1 &v)
 {
-    print(u"  ## Called function a(#.)"_S.format(v));
+    print(u"  # Called function a(#.)"_S.format(v));
     return v;
 }
 
 template <typename T1> auto b(const T1 &v)
 {
-    print(u"  ## Called function b(#.)"_S.format(v));
+    print(u"  # Called function b(#.)"_S.format(v));
     return v;
 }
 
@@ -3796,7 +3796,7 @@ F histogram(numbers)
    print()
 L(i) (1, 5)
    V n = (0 .< 10 ^ i).map(j -> random:())
-   print("\n####\n#### #. numbers\n####".format(10 ^ i))
+   print("\n###\n### #. numbers\n###".format(10 ^ i))
    V (sd, mean) = sd_mean(n)
    print(‘  sd: #.6, mean: #.6’.format(sd, mean))
    histogram(n)
@@ -3831,7 +3831,7 @@ struct CodeBlock1
     {
         for (auto &&i : make_tuple(1, 5)) {
             auto n = range_el(0, pow(10, i)).map([](const auto &j){return randomns::_();});
-            print(u"\n####\n#### #. numbers\n####"_S.format(pow(10, i)));
+            print(u"\n###\n### #. numbers\n###"_S.format(pow(10, i)));
             auto [sd, mean] = sd_mean(n);
             print(u"  sd: #.6, mean: #.6"_S.format(sd, mean));
             histogram(n);
