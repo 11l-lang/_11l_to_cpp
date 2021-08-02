@@ -18433,3 +18433,202 @@ struct CodeBlock1
         print(u"Optimal play wins: #2.1% of simulations"_S.format(play_optimal(n)));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Almkvist-Giullera_formula_for_pi#C.23
+BigInt = int
+
+def isqrt(x : BigInt):
+    q : BigInt = 1
+    r : BigInt = 0
+    t : BigInt
+    while q <= x:
+        q *= 4
+    while q > 1:
+        q //= 4
+        t = x - r - q
+        r //= 2
+        if t >= 0:
+            x = t
+            r += q
+    return r
+
+def dump(digs, show):
+    gb = 1
+    digs += 1
+    dg = digs + gb
+    t1 : BigInt = 1
+    t2 : BigInt = 9
+    t3 : BigInt = 1
+    te : BigInt
+    su : BigInt = 0
+    t = BigInt(10) ** (0 if dg <= 60 else dg - 60)
+    d : BigInt = -1
+    fn : BigInt = 1
+
+    n = 0
+    while n < dg:
+        if n > 0:
+            t3 *= BigInt(n) ** 6
+        te = t1 * t2 // t3
+        z = dg - 1 - n * 6
+        if z > 0:
+            te *= BigInt(10) ** z
+        else:
+            te //= BigInt(10) ** -z
+        if show and n < 10:
+            print("{:2} {:62}".format(n, te * 32 // 3 // t))
+        su += te
+
+        if te < 10:
+            if show:
+                digs -= 1
+                print("\n{0} iterations required for {1} digits after the decimal point.\n".format(n, digs))
+            break
+
+        for j in range(n * 6 + 1, n * 6 + 6 + 1):
+            t1 *= j
+        d += 2
+        t2 += 126 + 532 * d
+
+        n += 1
+
+    s = str(isqrt(BigInt(10) ** (dg * 2 + 3) // su // 32 * 3 * BigInt(10) ** (dg + 5)))
+    return s[0] + "." + s[1:1+digs]
+
+print(dump(70, True))
+===
+F isqrt(BigInt =x)
+   BigInt q = 1
+   BigInt r = 0
+   BigInt t
+   L q <= x
+      q *= 4
+   L q > 1
+      q I/= 4
+      t = x - r - q
+      r I/= 2
+      I t >= 0
+         x = t
+         r += q
+   R r
+
+F dump(=digs, show)
+   V gb = 1
+   digs++
+   V dg = digs + gb
+   BigInt t1 = 1
+   BigInt t2 = 9
+   BigInt t3 = 1
+   BigInt te
+   BigInt su = 0
+   V t = BigInt(10) ^ (I dg <= 60 {0} E dg - 60)
+   BigInt d = -1
+   BigInt _fn_ = 1
+
+   V n = 0
+   L n < dg
+      I n > 0
+         t3 *= BigInt(n) ^ 6
+      te = t1 * t2 I/ t3
+      V z = dg - 1 - n * 6
+      I z > 0
+         te *= BigInt(10) ^ z
+      E
+         te I/= BigInt(10) ^ -z
+      I show & n < 10
+         print(‘#2 #62’.format(n, te * 32 I/ 3 I/ t))
+      su += te
+
+      I te < 10
+         I show
+            digs--
+            print("\n#. iterations required for #. digits after the decimal point.\n".format(n, digs))
+         L.break
+
+      L(j) n * 6 + 1 .. n * 6 + 6
+         t1 *= j
+      d += 2
+      t2 += 126 + 532 * d
+
+      n++
+
+   V s = String(isqrt(BigInt(10) ^ (dg * 2 + 3) I/ su I/ 32 * 3 * BigInt(10) ^ (dg + 5)))
+   R s[0]‘.’s[1 .< 1 + digs]
+
+print(dump(70, 1B))
+===
+auto isqrt(BigInt x)
+{
+    BigInt q = 1;
+    BigInt r = 0;
+    BigInt t;
+    while (q <= x)
+        q *= 4;
+    while (q > 1) {
+        q = idiv(q, 4);
+        t = x - r - q;
+        r = idiv(r, 2);
+        if (t >= 0) {
+            x = t;
+            r += q;
+        }
+    }
+    return r;
+}
+
+template <typename T1, typename T2> auto dump(T1 digs, const T2 &show)
+{
+    auto gb = 1;
+    digs++;
+    auto dg = digs + gb;
+    BigInt t1 = 1;
+    BigInt t2 = 9;
+    BigInt t3 = 1;
+    BigInt te;
+    BigInt su = 0;
+    auto t = pow(BigInt(10), (dg <= 60 ? 0 : dg - 60));
+    BigInt d = -1;
+    BigInt _fn_ = 1;
+
+    auto n = 0;
+    while (n < dg) {
+        if (n > 0)
+            t3 *= pow(BigInt(n), 6);
+        te = idiv(t1 * t2, t3);
+        auto z = dg - 1 - n * 6;
+        if (z > 0)
+            te *= pow(BigInt(10), z);
+        else
+            te = idiv(te, pow(BigInt(10), -z));
+        if (show && n < 10)
+            print(u"#2 #62"_S.format(n, idiv(idiv(te * 32, 3), t)));
+        su += te;
+
+        if (te < 10) {
+            if (show) {
+                digs--;
+                print(u"\n#. iterations required for #. digits after the decimal point.\n"_S.format(n, digs));
+            }
+            break;
+        }
+
+        for (auto j : range_ee(n * 6 + 1, n * 6 + 6))
+            t1 *= j;
+        d += 2;
+        t2 += 126 + 532 * d;
+
+        n++;
+    }
+
+    auto s = String(isqrt(idiv(idiv(pow(BigInt(10), (dg * 2 + 3)), su), 32) * 3 * pow(BigInt(10), (dg + 5))));
+    return _get<0>(s) & u"."_S & s[range_el(1, 1 + digs)];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(dump(70, true));
+    }
+} code_block_1;

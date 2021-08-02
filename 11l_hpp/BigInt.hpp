@@ -58,6 +58,9 @@ public:
 	BigInt(long long v) {
 		*this = v;
 	}
+	BigInt(int v) {
+		*this = v;
+	}
 
 	BigInt(const String &s) {
 		read(s);
@@ -76,6 +79,9 @@ public:
 		for (; v > 0; v = v / base)
 			a.push_back(v % base);
 	}
+	void operator=(int v) {
+		*this = (long long)v;
+	}
 
 	BigInt operator+(const BigInt &v) const {
 		if (sign == v.sign) {
@@ -92,6 +98,18 @@ public:
 			return res;
 		}
 		return *this - (-v);
+	}
+	BigInt operator+(int v) const {
+		return *this + BigInt(v);
+	}
+	friend BigInt operator+(int v, const BigInt &b) {
+		return b + v;
+	}
+	BigInt operator+(Int64 v) const {
+		return *this + BigInt(v);
+	}
+	friend BigInt operator+(Int64 v, const BigInt &b) {
+		return b + v;
 	}
 
 	BigInt operator-(const BigInt &v) const {

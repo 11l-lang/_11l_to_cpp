@@ -229,7 +229,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                     line_continuations.append(tokens[-1].end)
                 continue
 
-            if source[i:i+2] == R'\.': # // Support for constructions like: ||| You need just to add `\` at the each line starting from dot:
+            if source[i:i+2] == R'\.': # // Support for constructions like: ||| You need just to add `\` at the each line starting with dot:
                 if len(tokens):        # \\ result = abc.method1()          ||| result = abc.method1()
                     i += 1             # \\             .method2()          |||            \.method2()
                #else: # with `if len(tokens): i += 1` there is no need for this else branch
