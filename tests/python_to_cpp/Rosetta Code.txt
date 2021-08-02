@@ -18632,3 +18632,81 @@ struct CodeBlock1
         print(dump(70, true));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Alternade_words#Nim
+from typing import List
+
+def alternating_words(word):
+    r = ['', '']
+    for i, c in enumerate(word):
+        r[i & 1] += str(c)
+    return r
+
+words = set(open('unixdict.txt').read().split("\n"))
+
+result : List[str] = []
+for word in words:
+    if len(word) >= 6:
+        alt_words = alternating_words(word)
+        if alt_words[0] in words and alt_words[1] in words:
+            result.append(word.rjust(8) + ' → ' + alt_words[0] + ' ' + alt_words[1])
+result.sort()
+for i, line in enumerate(result):
+    print('%2d:' % (i + 1), line)
+===
+F alternating_words(word)
+   V r = [‘’, ‘’]
+   L(c) word
+      V i = L.index
+      r[i [&] 1] ‘’= String(c)
+   R r
+
+V words = Set(File(‘unixdict.txt’).read().split("\n"))
+
+[String] result
+L(word) words
+   I word.len >= 6
+      V alt_words = alternating_words(word)
+      I alt_words[0] C words & alt_words[1] C words
+         result.append(word.rjust(8)‘ → ’alt_words[0]‘ ’alt_words[1])
+result.sort()
+L(line) result
+   V i = L.index
+   print((‘#2:’.format(i + 1))‘ ’line)
+===
+template <typename T1> auto alternating_words(const T1 &word)
+{
+    auto r = create_array({u""_S, u""_S});
+    {int Lindex = 0;
+    for (auto &&c : word) {
+        auto i = Lindex;
+        r[i & 1] &= String(c);
+        Lindex++;
+    }}
+    return r;
+}
+
+auto words = create_set(File(u"unixdict.txt"_S).read().split(u"\n"_S));
+
+Array<String> result;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&word : words)
+            if (word.len() >= 6) {
+                auto alt_words = alternating_words(word);
+                if (in(_get<0>(alt_words), words) && in(_get<1>(alt_words), words))
+                    result.append(word.rjust(8) & u" → "_S & _get<0>(alt_words) & u" "_S & _get<1>(alt_words));
+            }
+        result.sort();
+        {int Lindex = 0;
+        for (auto &&line : result) {
+            auto i = Lindex;
+            print((u"#2:"_S.format(i + 1)) & u" "_S & line);
+            Lindex++;
+        }}
+    }
+} code_block_1;
