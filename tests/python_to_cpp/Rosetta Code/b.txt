@@ -1,0 +1,740 @@
+# https://www.rosettacode.org/wiki/Bacon_cipher#Nim
+Char = str
+
+codes = {'a': "AAAAA", 'b': "AAAAB", 'c': "AAABA", 'd': "AAABB", 'e': "AABAA",
+         'f': "AABAB", 'g': "AABBA", 'h': "AABBB", 'i': "ABAAA", 'j': "ABAAB",
+         'k': "ABABA", 'l': "ABABB", 'm': "ABBAA", 'n': "ABBAB", 'o': "ABBBA",
+         'p': "ABBBB", 'q': "BAAAA", 'r': "BAAAB", 's': "BAABA", 't': "BAABB",
+         'u': "BABAA", 'v': "BABAB", 'w': "BABBA", 'x': "BABBB", 'y': "BBAAA",
+         'z': "BBAAB", ' ': "BBBAA"}
+
+rev_codes = {v: k for k, v in codes.items()}
+
+def encode(plaintext, message):
+    et = ''
+    for c in plaintext.lower():
+        et += codes[c] if 'a' <= c <= 'z' else codes[Char(' ')]
+
+    result = ''
+    count = 0
+    for c in message.lower():
+        if 'a' <= c <= 'z':
+            result += c if et[count] == 'A' else c.upper()
+            count += 1
+            if count == len(et): break
+        else:
+            result += c
+    return result
+
+def decode(message):
+    result = ''
+    et = ''
+    for c in message:
+        if 'A' <= c <= 'Z' or 'a' <= c <= 'z':
+            et += 'A' if c.islower() else 'B'
+    for i in range(0, len(et) - 4, 5):
+        result += rev_codes[et[i:i+5]]
+    return result
+
+plaintext = "the quick brown fox jumps over the lazy dog"
+message = "bacon's cipher is a method of steganography created by francis bacon." + \
+          "this task is to implement a program for encryption and decryption of " + \
+          "plaintext using the simple alphabet of the baconian cipher or some " + \
+          "other kind of representation of this alphabet (make anything signify anything). " + \
+          "the baconian alphabet may optionally be extended to encode all lower " + \
+          "case characters individually and/or adding a few punctuation characters " + \
+          "such as the space."
+
+ciphertext = encode(plaintext, message)
+print('Cipher text →')
+print(ciphertext)
+decodedtext = decode(ciphertext)
+print("\nHidden text →")
+print(decodedtext)
+===
+V codes = [‘a’ = ‘AAAAA’, ‘b’ = ‘AAAAB’, ‘c’ = ‘AAABA’, ‘d’ = ‘AAABB’, ‘e’ = ‘AABAA’, ‘f’ = ‘AABAB’, ‘g’ = ‘AABBA’, ‘h’ = ‘AABBB’, ‘i’ = ‘ABAAA’, ‘j’ = ‘ABAAB’, ‘k’ = ‘ABABA’, ‘l’ = ‘ABABB’, ‘m’ = ‘ABBAA’, ‘n’ = ‘ABBAB’, ‘o’ = ‘ABBBA’, ‘p’ = ‘ABBBB’, ‘q’ = ‘BAAAA’, ‘r’ = ‘BAAAB’, ‘s’ = ‘BAABA’, ‘t’ = ‘BAABB’, ‘u’ = ‘BABAA’, ‘v’ = ‘BABAB’, ‘w’ = ‘BABBA’, ‘x’ = ‘BABBB’, ‘y’ = ‘BBAAA’, ‘z’ = ‘BBAAB’, ‘ ’ = ‘BBBAA’]
+
+V rev_codes = Dict(codes.items(), (k, v) -> (v, k))
+
+F encode(plaintext, message)
+   V et = ‘’
+   L(c) plaintext.lowercase()
+      et ‘’= I c C ‘a’..‘z’ {:codes[c]} E :codes[Char(‘ ’)]
+
+   V result = ‘’
+   V count = 0
+   L(c) message.lowercase()
+      I c C ‘a’..‘z’
+         result ‘’= I et[count] == ‘A’ {c} E c.uppercase()
+         count++
+         I count == et.len
+            L.break
+      E
+         result ‘’= c
+   R result
+
+F decode(message)
+   V result = ‘’
+   V et = ‘’
+   L(c) message
+      I c C ‘A’..‘Z’ | c C ‘a’..‘z’
+         et ‘’= I c.is_lowercase() {‘A’} E ‘B’
+   L(i) (0 .< et.len - 4).step(5)
+      result ‘’= :rev_codes[et[i .< i + 5]]
+   R result
+
+V plaintext = ‘the quick brown fox jumps over the lazy dog’
+V message = ‘bacon's cipher is a method of steganography created by francis bacon.’""‘this task is to implement a program for encryption and decryption of ’""‘plaintext using the simple alphabet of the baconian cipher or some ’""‘other kind of representation of this alphabet (make anything signify anything). ’""‘the baconian alphabet may optionally be extended to encode all lower ’""‘case characters individually and/or adding a few punctuation characters ’""‘such as the space.’
+
+V ciphertext = encode(plaintext, message)
+print(‘Cipher text →’)
+print(ciphertext)
+V decodedtext = decode(ciphertext)
+print("\nHidden text →")
+print(decodedtext)
+===
+auto codes = create_dict(dict_of(u'a'_C, u"AAAAA"_S)(u'b'_C, u"AAAAB"_S)(u'c'_C, u"AAABA"_S)(u'd'_C, u"AAABB"_S)(u'e'_C, u"AABAA"_S)(u'f'_C, u"AABAB"_S)(u'g'_C, u"AABBA"_S)(u'h'_C, u"AABBB"_S)(u'i'_C, u"ABAAA"_S)(u'j'_C, u"ABAAB"_S)(u'k'_C, u"ABABA"_S)(u'l'_C, u"ABABB"_S)(u'm'_C, u"ABBAA"_S)(u'n'_C, u"ABBAB"_S)(u'o'_C, u"ABBBA"_S)(u'p'_C, u"ABBBB"_S)(u'q'_C, u"BAAAA"_S)(u'r'_C, u"BAAAB"_S)(u's'_C, u"BAABA"_S)(u't'_C, u"BAABB"_S)(u'u'_C, u"BABAA"_S)(u'v'_C, u"BABAB"_S)(u'w'_C, u"BABBA"_S)(u'x'_C, u"BABBB"_S)(u'y'_C, u"BBAAA"_S)(u'z'_C, u"BBAAB"_S)(u' '_C, u"BBBAA"_S));
+
+auto rev_codes = create_dict(codes.items(), [](const auto &k, const auto &v){return make_tuple(v, k);});
+
+template <typename T1, typename T2> auto encode(const T1 &plaintext, const T2 &message)
+{
+    auto et = u""_S;
+    for (auto &&c : plaintext.lowercase())
+        et &= in(c, range_ee(u'a'_C, u'z'_C)) ? ::codes[c] : ::codes[u' '_C];
+
+    auto result = u""_S;
+    auto count = 0;
+    for (auto &&c : message.lowercase())
+        if (in(c, range_ee(u'a'_C, u'z'_C))) {
+            result &= et[count] == u'A' ? c : c.uppercase();
+            count++;
+            if (count == et.len())
+                break;
+        }
+        else
+            result &= c;
+    return result;
+}
+
+template <typename T1> auto decode(const T1 &message)
+{
+    auto result = u""_S;
+    auto et = u""_S;
+    for (auto &&c : message)
+        if (in(c, range_ee(u'A'_C, u'Z'_C)) || in(c, range_ee(u'a'_C, u'z'_C)))
+            et &= c.is_lowercase() ? u"A"_S : u"B"_S;
+    for (auto i : range_el(0, et.len() - 4).step(5))
+        result &= ::rev_codes[et[range_el(i, i + 5)]];
+    return result;
+}
+
+auto plaintext = u"the quick brown fox jumps over the lazy dog"_S;
+auto message = u"bacon's cipher is a method of steganography created by francis bacon."_S & u"this task is to implement a program for encryption and decryption of "_S & u"plaintext using the simple alphabet of the baconian cipher or some "_S & u"other kind of representation of this alphabet (make anything signify anything). "_S & u"the baconian alphabet may optionally be extended to encode all lower "_S & u"case characters individually and/or adding a few punctuation characters "_S & u"such as the space."_S;
+
+auto ciphertext = encode(plaintext, message);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Cipher text →"_S);
+        print(ciphertext);
+    }
+} code_block_1;
+
+auto decodedtext = decode(ciphertext);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"\nHidden text →"_S);
+        print(decodedtext);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Balanced_ternary#Python
+from typing import List
+from functools import reduce
+
+def py_idiv(a, b): # ‘floored quotient of x and y’/‘python floor division implementation’
+    if a >= 0:
+        return a // b
+    #return (a - b + 1) // b
+    return -(-(a - b + 1) // b)
+
+def BalancedTernary_int2ternary(n):
+    if n == 0: return [0]*0
+    n3 = ((n % 3) + 3) % 3
+    if n3 == 0: return [0] + BalancedTernary_int2ternary(py_idiv(n, 3))
+    if n3 == 1: return [1] + BalancedTernary_int2ternary(py_idiv(n, 3))
+    if n3 == 2: return [-1] + BalancedTernary_int2ternary(py_idiv((n + 1), 3))
+    raise RuntimeError('')
+
+def BalancedTernary_neg(digs):
+    return [-d for d in digs]
+
+table = [(0, -1), (1, -1), (-1, 0), (0, 0), (1, 0), (-1, 1), (0, 1)] # immutable
+
+def BalancedTernary_add(a, b, c=0):
+    if not (len(a) != 0 and len(b) != 0):
+        if c == 0:
+            return a if len(a) else b
+        else:
+            return BalancedTernary_add([c], a if len(a) else b)
+    else:
+        (d, c) = table[3 + (a[0] if len(a) else 0) + (b[0] if len(b) else 0) + c]
+        res = BalancedTernary_add(a[1:], b[1:], c)
+        # trim leading zeros
+        if len(res) != 0 or d != 0:
+            return [d] + res
+        else:
+            return res
+
+BalancedTernary_str2dig = {'+': 1, '-': -1, '0': 0} # immutable
+BalancedTernary_dig2str = {1: '+', -1: '-', 0: '0'} # immutable
+
+class BalancedTernary:
+    # Represented as a list of 0, 1 or -1s, with least significant digit first.
+    digits : List[int]
+
+    def __init__(self, inp):
+        if all(d in (0, 1, -1) for d in inp):
+            self.digits = inp[:]
+        else:
+            raise ValueError("BalancedTernary: Wrong input digits.")
+
+    def to_int(self):
+        return reduce(lambda y,x: x + 3 * y, reversed(self.digits), 0)
+
+    def __str__(self):
+        if len(self.digits) == 0: return "0"
+        return "".join(BalancedTernary_dig2str[d] for d in reversed(self.digits))
+
+    # def __neg__(self):
+    #     return BalancedTernary(BalancedTernary_neg(self.digits))
+
+    def __add__(self, b):
+        return BalancedTernary(BalancedTernary_add(self.digits, b.digits))
+
+    def __sub__(self, b):
+        #return self + (-b)
+        return self + BalancedTernary(BalancedTernary_neg(b.digits))
+
+    def __mul__(self, b):
+        def _mul(a : List[int], b : List[int]) -> List[int]:
+            if not (len(a) != 0 and len(b) != 0):
+                return [0]*0
+            else:
+                x : List[int] = []
+                if   a[0] == -1: x = BalancedTernary_neg(b)
+                elif a[0] ==  0: pass#x = []
+                elif a[0] ==  1: x = b
+                else: assert False
+                y = [0] + _mul(list(a[1:]), b)
+                return BalancedTernary_add(x, y)
+
+        return BalancedTernary(_mul(list(self.digits), list(b.digits)))
+
+def createBalancedTernaryFromStr(inp):
+    return BalancedTernary([BalancedTernary_str2dig[c] for c in reversed(inp)])
+def createBalancedTernaryFromInt(inp):
+    return BalancedTernary(BalancedTernary_int2ternary(inp))
+
+a = createBalancedTernaryFromStr("+-0++0+")
+print("a:", a.to_int(), a)
+
+b = createBalancedTernaryFromInt(-436)
+print("b:", b.to_int(), b)
+
+c = createBalancedTernaryFromStr("+-++-")
+print("c:", c.to_int(), c)
+
+r = a * (b - c)
+print("a * (b - c):", r.to_int(), r)
+===
+F py_idiv(a, b)
+   I a >= 0
+      R a I/ b
+   R -(-(a - b + 1) I/ b)
+
+F BalancedTernary_int2ternary(n)
+   I n == 0
+      R [Int]()
+   V n3 = ((n % 3) + 3) % 3
+   I n3 == 0
+      R [0] [+] BalancedTernary_int2ternary(py_idiv(n, 3))
+   I n3 == 1
+      R [1] [+] BalancedTernary_int2ternary(py_idiv(n, 3))
+   I n3 == 2
+      R [-1] [+] BalancedTernary_int2ternary(py_idiv((n + 1), 3))
+   X RuntimeError(‘’)
+
+F BalancedTernary_neg(digs)
+   R digs.map(d -> -d)
+
+V table = [(0, -1), (1, -1), (-1, 0), (0, 0), (1, 0), (-1, 1), (0, 1)]
+
+F BalancedTernary_add(a, b, =c = 0)
+   I !(!a.empty & !b.empty)
+      I c == 0
+         R I !a.empty {a} E b
+      E
+         R BalancedTernary_add([c], I !a.empty {a} E b)
+   E
+      (V d, c) = :table[3 + (I !a.empty {a[0]} E 0) + (I !b.empty {b[0]} E 0) + c]
+      V res = BalancedTernary_add(a[1..], b[1..], c)
+      I !res.empty | d != 0
+         R [d] [+] res
+      E
+         R res
+
+V BalancedTernary_str2dig = [‘+’ = 1, ‘-’ = -1, ‘0’ = 0]
+V BalancedTernary_dig2str = [1 = ‘+’, -1 = ‘-’, 0 = ‘0’]
+
+T BalancedTernary
+   [Int] digits
+
+   F (inp)
+      I all(inp.map(d -> d C (0, 1, -1)))
+         .digits = copy(inp)
+      E
+         X ValueError(‘BalancedTernary: Wrong input digits.’)
+
+   F to_int()
+      R reversed(.digits).reduce(0, (y, x) -> x + 3 * y)
+
+   F String()
+      I .digits.empty
+         R ‘0’
+      R reversed(.digits).map(d -> BalancedTernary_dig2str[d]).join(‘’)
+
+   F +(b)
+      R BalancedTernary(BalancedTernary_add(.digits, b.digits))
+
+   F -(b)
+      R (.) + BalancedTernary(BalancedTernary_neg(b.digits))
+
+   F *(b)
+      F _mul([Int] &a, [Int] &b) -> [Int]
+         I !(!a.empty & !b.empty)
+            R [Int]()
+         E
+            [Int] x
+            I a[0] == -1
+               x = BalancedTernary_neg(b)
+            E I a[0] == 0
+            {
+            }
+            E I a[0] == 1
+               x = b
+            E
+               assert(0B)
+            V y = [0] [+] @_mul(&Array(a[1..]), &b)
+            R BalancedTernary_add(x, y)
+
+      R BalancedTernary(_mul(&Array(.digits), &Array(b.digits)))
+
+F createBalancedTernaryFromStr(inp)
+   R BalancedTernary(reversed(inp).map(c -> BalancedTernary_str2dig[c]))
+F createBalancedTernaryFromInt(inp)
+   R BalancedTernary(BalancedTernary_int2ternary(inp))
+
+V a = createBalancedTernaryFromStr(‘+-0++0+’)
+print(‘a: ’a.to_int()‘ ’a)
+
+V b = createBalancedTernaryFromInt(-436)
+print(‘b: ’b.to_int()‘ ’b)
+
+V c = createBalancedTernaryFromStr(‘+-++-’)
+print(‘c: ’c.to_int()‘ ’c)
+
+V r = a * (b - c)
+print(‘a * (b - c): ’r.to_int()‘ ’r)
+===
+template <typename T1, typename T2> auto py_idiv(const T1 &a, const T2 &b)
+{
+    if (a >= 0)
+        return idiv(a, b);
+    return -(idiv(-(a - b + 1), b));
+}
+
+template <typename T1> auto BalancedTernary_int2ternary(const T1 &n)
+{
+    if (n == 0)
+        return Array<int>();
+    auto n3 = mod(((mod(n, 3)) + 3), 3);
+    if (n3 == 0)
+        return create_array({0}) + BalancedTernary_int2ternary(py_idiv(n, 3));
+    if (n3 == 1)
+        return create_array({1}) + BalancedTernary_int2ternary(py_idiv(n, 3));
+    if (n3 == 2)
+        return create_array({-1}) + BalancedTernary_int2ternary(py_idiv((n + 1), 3));
+    throw RuntimeError(u""_S);
+}
+
+template <typename T1> auto BalancedTernary_neg(const T1 &digs)
+{
+    return digs.map([](const auto &d){return -d;});
+}
+
+auto table = create_array({make_tuple(0, -1), make_tuple(1, -1), make_tuple(-1, 0), make_tuple(0, 0), make_tuple(1, 0), make_tuple(-1, 1), make_tuple(0, 1)});
+
+template <typename T1, typename T2, typename T3 = decltype(0)> auto BalancedTernary_add(const T1 &a, const T2 &b, T3 c = 0)
+{
+    if (!(!a.empty() && !b.empty())) {
+        if (c == 0)
+            return !a.empty() ? a : b;
+        else
+            return BalancedTernary_add(create_array({c}), !a.empty() ? a : b);
+    }
+    else {
+        TUPLE_ELEMENT_T(0, ::table[3 + (!a.empty() ? _get<0>(a) : 0) + (!b.empty() ? _get<0>(b) : 0) + c]) d;
+        assign_from_tuple(d, c, ::table[3 + (!a.empty() ? _get<0>(a) : 0) + (!b.empty() ? _get<0>(b) : 0) + c]);
+        auto res = BalancedTernary_add(a[range_ei(1)], b[range_ei(1)], c);
+        if (!res.empty() || d != 0)
+            return create_array({d}) + res;
+        else
+            return res;
+    }
+}
+
+auto BalancedTernary_str2dig = create_dict(dict_of(u'+'_C, 1)(u'-'_C, -1)(u'0'_C, 0));
+auto BalancedTernary_dig2str = create_dict(dict_of(1, u'+'_C)(-1, u'-'_C)(0, u'0'_C));
+
+class BalancedTernary
+{
+public:
+    Array<int> digits;
+
+    template <typename T1> BalancedTernary(const T1 &inp)
+    {
+        if (all_map(inp, [](const auto &d){return in(d, make_tuple(0, 1, -1));}))
+            digits = copy(inp);
+        else
+            throw ValueError(u"BalancedTernary: Wrong input digits."_S);
+    }
+
+    auto to_int()
+    {
+        return reversed(digits).reduce(0, [](const auto &y, const auto &x){return x + 3 * y;});
+    }
+
+    operator String() const
+    {
+        if (digits.empty())
+            return u"0"_S;
+        return reversed(digits).map([](const auto &d){return BalancedTernary_dig2str[d];}).join(u""_S);
+    }
+
+    template <typename T1> auto operator+(const T1 &b) const
+    {
+        return BalancedTernary(BalancedTernary_add(digits, b.digits));
+    }
+    template <typename Ty> auto &operator+=(const Ty &t)
+    {
+        *this = *this + t;
+        return *this;
+    }
+
+    template <typename T1> auto operator-(const T1 &b) const
+    {
+        return *this + BalancedTernary(BalancedTernary_neg(b.digits));
+    }
+    template <typename Ty> auto &operator-=(const Ty &t)
+    {
+        *this = *this - t;
+        return *this;
+    }
+
+    template <typename T1> auto operator*(const T1 &b) const
+    {
+        std::function<Array<int>(Array<int>&, Array<int>&)> _mul = [&_mul](Array<int> &a, Array<int> &b)
+        {
+            if (!(!a.empty() && !b.empty()))
+                return Array<int>();
+            else {
+                Array<int> x;
+                if (_get<0>(a) == -1)
+                    x = BalancedTernary_neg(b);
+                else if (_get<0>(a) == 0) {
+                }
+
+                else if (_get<0>(a) == 1)
+                    x = b;
+                else
+                    assert(false);
+                auto y = create_array({0}) + _mul(make_ref(create_array(a[range_ei(1)])), b);
+                return BalancedTernary_add(x, y);
+            }
+        };
+
+        return BalancedTernary(_mul(make_ref(create_array(digits)), make_ref(create_array(b.digits))));
+    }
+    template <typename Ty> auto &operator*=(const Ty &t)
+    {
+        *this = *this * t;
+        return *this;
+    }
+};
+
+template <typename T1> auto createBalancedTernaryFromStr(const T1 &inp)
+{
+    return BalancedTernary(reversed(inp).map([](const auto &c){return BalancedTernary_str2dig[c];}));
+}
+template <typename T1> auto createBalancedTernaryFromInt(const T1 &inp)
+{
+    return BalancedTernary(BalancedTernary_int2ternary(inp));
+}
+
+auto a = createBalancedTernaryFromStr(u"+-0++0+"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"a: "_S & a.to_int() & u" "_S & a);
+    }
+} code_block_1;
+
+auto b = createBalancedTernaryFromInt(-436);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"b: "_S & b.to_int() & u" "_S & b);
+    }
+} code_block_2;
+
+auto c = createBalancedTernaryFromStr(u"+-++-"_S);
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print(u"c: "_S & c.to_int() & u" "_S & c);
+    }
+} code_block_3;
+
+auto r = a * (b - c);
+
+struct CodeBlock4
+{
+    CodeBlock4()
+    {
+        print(u"a * (b - c): "_S & r.to_int() & u" "_S & r);
+    }
+} code_block_4;
+
+
+# https://www.rosettacode.org/wiki/Banker%27s_algorithm#Python
+resources = int(input("Cantidad de recursos: "))
+processes = int(input("Cantidad de procesos: "))
+max_resources = [int(i) for i in input("Recursos máximos: ").split()]
+
+print("\n-- recursos asignados para cada proceso  --")
+currently_allocated = [[int(i) for i in input("proceso {}: ".format(j + 1)).split()] for j in range(processes)]
+
+print("\n--- recursos máximos para cada proceso  ---")
+max_need = [[int(i) for i in input("proceso {}: ".format(j + 1)).split()] for j in range(processes)]
+
+allocated = [0] * resources
+for i in range(processes):
+    for j in range(resources):
+        allocated[j] += currently_allocated[i][j]
+print("\nRecursos totales asignados  : {}".format(allocated))
+
+available = [max_resources[i] - allocated[i] for i in range(resources)]
+print("Recursos totales disponibles: {}\n".format(available))
+
+running = [True] * processes
+count = processes
+while count != 0:
+    safe = False
+    for i in range(processes):
+        if running[i]:
+            executing = True
+            for j in range(resources):
+                if max_need[i][j] - currently_allocated[i][j] > available[j]:
+                    executing = False
+                    break
+            if executing:
+                print("proceso {} ejecutándose".format(i + 1))
+                running[i] = False
+                count -= 1
+                safe = True
+                for j in range(resources):
+                    available[j] += currently_allocated[i][j]
+                break
+    if not safe:
+        print("El proceso está en un estado inseguro.")
+        break
+
+    print("El proceso está en un estado seguro.\nRecursos disponibles: {}\n".format(available))
+===
+V resources = Int(input(‘Cantidad de recursos: ’))
+V processes = Int(input(‘Cantidad de procesos: ’))
+V max_resources = input(‘Recursos máximos: ’).split_py().map(i -> Int(i))
+
+print("\n-- recursos asignados para cada proceso  --")
+V currently_allocated = (0 .< processes).map(j -> input(‘proceso #.: ’.format(j + 1)).split_py().map(i -> Int(i)))
+
+print("\n--- recursos máximos para cada proceso  ---")
+V max_need = (0 .< processes).map(j -> input(‘proceso #.: ’.format(j + 1)).split_py().map(i -> Int(i)))
+
+V allocated = [0] * resources
+L(i) 0 .< processes
+   L(j) 0 .< resources
+      allocated[j] += currently_allocated[i][j]
+print("\nRecursos totales asignados  : #.".format(allocated))
+
+V available = (0 .< resources).map(i -> :max_resources[i] - :allocated[i])
+print("Recursos totales disponibles: #.\n".format(available))
+
+V running = [1B] * processes
+V count = processes
+L count != 0
+   V safe = 0B
+   L(i) 0 .< processes
+      I running[i]
+         V executing = 1B
+         L(j) 0 .< resources
+            I max_need[i][j] - currently_allocated[i][j] > available[j]
+               executing = 0B
+               L.break
+         I executing
+            print(‘proceso #. ejecutándose’.format(i + 1))
+            running[i] = 0B
+            count--
+            safe = 1B
+            L(j) 0 .< resources
+               available[j] += currently_allocated[i][j]
+            L.break
+   I !safe
+      print(‘El proceso está en un estado inseguro.’)
+      L.break
+
+   print("El proceso está en un estado seguro.\nRecursos disponibles: #.\n".format(available))
+===
+auto resources = to_int(input(u"Cantidad de recursos: "_S));
+auto processes = to_int(input(u"Cantidad de procesos: "_S));
+auto max_resources = input(u"Recursos máximos: "_S).split_py().map([](const auto &i){return to_int(i);});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"\n-- recursos asignados para cada proceso  --"_S);
+    }
+} code_block_1;
+
+auto currently_allocated = range_el(0, processes).map([](const auto &j){return input(u"proceso #.: "_S.format(j + 1)).split_py().map([](const auto &i){return to_int(i);});});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"\n--- recursos máximos para cada proceso  ---"_S);
+    }
+} code_block_2;
+
+auto max_need = range_el(0, processes).map([](const auto &j){return input(u"proceso #.: "_S.format(j + 1)).split_py().map([](const auto &i){return to_int(i);});});
+
+auto allocated = create_array({0}) * resources;
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        for (auto i : range_el(0, processes))
+            for (auto j : range_el(0, resources))
+                allocated[j] += currently_allocated[i][j];
+        print(u"\nRecursos totales asignados  : #."_S.format(allocated));
+    }
+} code_block_3;
+
+auto available = range_el(0, resources).map([](const auto &i){return ::max_resources[i] - ::allocated[i];});
+
+struct CodeBlock4
+{
+    CodeBlock4()
+    {
+        print(u"Recursos totales disponibles: #.\n"_S.format(available));
+    }
+} code_block_4;
+
+auto running = create_array({true}) * processes;
+auto count = processes;
+
+struct CodeBlock5
+{
+    CodeBlock5()
+    {
+        while (count != 0) {
+            auto safe = false;
+            for (auto i : range_el(0, processes))
+                if (running[i]) {
+                    auto executing = true;
+                    for (auto j : range_el(0, resources))
+                        if (max_need[i][j] - currently_allocated[i][j] > available[j]) {
+                            executing = false;
+                            break;
+                        }
+                    if (executing) {
+                        print(u"proceso #. ejecutándose"_S.format(i + 1));
+                        running.set(i, false);
+                        count--;
+                        safe = true;
+                        for (auto j : range_el(0, resources))
+                            available[j] += currently_allocated[i][j];
+                        break;
+                    }
+                }
+            if (!safe) {
+                print(u"El proceso está en un estado inseguro."_S);
+                break;
+            }
+
+            print(u"El proceso está en un estado seguro.\nRecursos disponibles: #.\n"_S.format(available));
+        }
+    }
+} code_block_5;
+
+
+# https://www.rosettacode.org/wiki/Base-16_representation#Nim
+from _11l import *
+
+l = [n for n in range(500+1) if not hexu(n).isdigit()]
+
+print('Found', len(l), "numbers between 0 and 500:\n")
+for i, n in enumerate(l):
+    print('%3d' % n, end = "\n" if (i + 1) % 19 == 0 else ' ')
+print()
+===
+V l = (0 .. 500).filter(n -> !hex(n).is_digit())
+
+print(‘Found ’l.len" numbers between 0 and 500:\n")
+L(n) l
+   V i = L.index
+   print(‘#3’.format(n), end' I (i + 1) % 19 == 0 {"\n"} E ‘ ’)
+print()
+===
+auto l = range_ee(0, 500).filter([](const auto &n){return !hex(n).is_digit();});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Found "_S & l.len() & u" numbers between 0 and 500:\n"_S);
+        {int Lindex = 0;
+        for (auto &&n : l) {
+            auto i = Lindex;
+            print(u"#3"_S.format(n), mod((i + 1), 19) == 0 ? u"\n"_S : u" "_S);
+            Lindex++;
+        }}
+        print();
+    }
+} code_block_1;

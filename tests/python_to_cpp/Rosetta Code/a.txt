@@ -1870,3 +1870,878 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Angles_(geometric),_normalization_and_conversion#Nim
+import math
+
+values = [float(-2), -1, 0, 1, 2, 6.2831853, 16, 57.2957795, 359, 399, 6399, 1000000]
+
+def normd(x): return math.fmod(x, 360)
+def normg(x): return math.fmod(x, 400)
+def normm(x): return math.fmod(x, 6400)
+def normr(x): return math.fmod(x, (2 * math.pi))
+
+def d2g(x): return normd(x) * 10 / 9
+def d2m(x): return normd(x) * 160 / 9
+def d2r(x): return normd(x) * math.pi / 180
+
+def g2d(x): return normg(x) * 9 / 10
+def g2m(x): return normg(x) * 16
+def g2r(x): return normg(x) * math.pi / 200
+
+def m2d(x): return normm(x) * 9 / 160
+def m2g(x): return normm(x) / 16
+def m2r(x): return normm(x) * math.pi / 3200
+
+def r2d(x): return normr(x) * 180 / math.pi
+def r2g(x): return normr(x) * 200 / math.pi
+def r2m(x): return normr(x) * 3200 / math.pi
+
+print("       Degrees        Normalized         Gradians          Mils            Radians")
+print("───────────────────────────────────────────────────────────────────────────────────")
+for val in values:
+    print('{:15.7f}  {:15.7f}  {:15.7f}  {:15.7f}  {:15.7f}'.format(val, normd(val), d2g(val), d2m(val), d2r(val)))
+
+print()
+print("      Gradians        Normalized         Degrees           Mils            Radians")
+print("───────────────────────────────────────────────────────────────────────────────────")
+for val in values:
+    print('{:15.7f}  {:15.7f}  {:15.7f}  {:15.7f}  {:15.7f}'.format(val, normg(val), g2d(val), g2m(val), g2r(val)))
+
+print()
+print("        Mils          Normalized         Degrees         Gradians          Radians")
+print("───────────────────────────────────────────────────────────────────────────────────")
+for val in values:
+    print('{:15.7f}  {:15.7f}  {:15.7f}  {:15.7f}  {:15.7f}'.format(val, normm(val), m2d(val), m2g(val), m2r(val)))
+
+print()
+print("       Radians        Normalized         Degrees         Gradians          Mils")
+print("───────────────────────────────────────────────────────────────────────────────────")
+for val in values:
+    print('{:15.7f}  {:15.7f}  {:15.7f}  {:15.7f}  {:15.7f}'.format(val, normr(val), r2d(val), r2g(val), r2m(val)))
+===
+V values = [Float(-2), -1, 0, 1, 2, 6.2831853, 16, 57.2957795, 359, 399, 6399, 1000000]
+
+F normd(x)
+   R fmod(x, 360)
+F normg(x)
+   R fmod(x, 400)
+F normm(x)
+   R fmod(x, 6400)
+F normr(x)
+   R fmod(x, (2 * math:pi))
+
+F d2g(x)
+   R normd(x) * 10 / 9
+F d2m(x)
+   R normd(x) * 160 / 9
+F d2r(x)
+   R normd(x) * math:pi / 180
+
+F g2d(x)
+   R normg(x) * 9 / 10
+F g2m(x)
+   R normg(x) * 16
+F g2r(x)
+   R normg(x) * math:pi / 200
+
+F m2d(x)
+   R normm(x) * 9 / 160
+F m2g(x)
+   R normm(x) / 16
+F m2r(x)
+   R normm(x) * math:pi / 3200
+
+F r2d(x)
+   R normr(x) * 180 / math:pi
+F r2g(x)
+   R normr(x) * 200 / math:pi
+F r2m(x)
+   R normr(x) * 3200 / math:pi
+
+print(‘       Degrees        Normalized         Gradians          Mils            Radians’)
+print(‘───────────────────────────────────────────────────────────────────────────────────’)
+L(val) values
+   print(‘#7.7  #7.7  #7.7  #7.7  #7.7’.format(val, normd(val), d2g(val), d2m(val), d2r(val)))
+
+print()
+print(‘      Gradians        Normalized         Degrees           Mils            Radians’)
+print(‘───────────────────────────────────────────────────────────────────────────────────’)
+L(val) values
+   print(‘#7.7  #7.7  #7.7  #7.7  #7.7’.format(val, normg(val), g2d(val), g2m(val), g2r(val)))
+
+print()
+print(‘        Mils          Normalized         Degrees         Gradians          Radians’)
+print(‘───────────────────────────────────────────────────────────────────────────────────’)
+L(val) values
+   print(‘#7.7  #7.7  #7.7  #7.7  #7.7’.format(val, normm(val), m2d(val), m2g(val), m2r(val)))
+
+print()
+print(‘       Radians        Normalized         Degrees         Gradians          Mils’)
+print(‘───────────────────────────────────────────────────────────────────────────────────’)
+L(val) values
+   print(‘#7.7  #7.7  #7.7  #7.7  #7.7’.format(val, normr(val), r2d(val), r2g(val), r2m(val)))
+===
+auto values = create_array<double>({to_float(-2), -1, 0, 1, 2, 6.2831853, 16, 57.2957795, 359, 399, 6399, 1000000});
+
+template <typename T1> auto normd(const T1 &x)
+{
+    return fmod(x, 360);
+}
+template <typename T1> auto normg(const T1 &x)
+{
+    return fmod(x, 400);
+}
+template <typename T1> auto normm(const T1 &x)
+{
+    return fmod(x, 6400);
+}
+template <typename T1> auto normr(const T1 &x)
+{
+    return fmod(x, (2 * math::pi));
+}
+
+template <typename T1> auto d2g(const T1 &x)
+{
+    return normd(x) * 10 / 9.0;
+}
+template <typename T1> auto d2m(const T1 &x)
+{
+    return normd(x) * 160 / 9.0;
+}
+template <typename T1> auto d2r(const T1 &x)
+{
+    return normd(x) * math::pi / 180.0;
+}
+
+template <typename T1> auto g2d(const T1 &x)
+{
+    return normg(x) * 9 / 10.0;
+}
+template <typename T1> auto g2m(const T1 &x)
+{
+    return normg(x) * 16;
+}
+template <typename T1> auto g2r(const T1 &x)
+{
+    return normg(x) * math::pi / 200.0;
+}
+
+template <typename T1> auto m2d(const T1 &x)
+{
+    return normm(x) * 9 / 160.0;
+}
+template <typename T1> auto m2g(const T1 &x)
+{
+    return normm(x) / 16.0;
+}
+template <typename T1> auto m2r(const T1 &x)
+{
+    return normm(x) * math::pi / 3200.0;
+}
+
+template <typename T1> auto r2d(const T1 &x)
+{
+    return normr(x) * 180 / math::pi;
+}
+template <typename T1> auto r2g(const T1 &x)
+{
+    return normr(x) * 200 / math::pi;
+}
+template <typename T1> auto r2m(const T1 &x)
+{
+    return normr(x) * 3200 / math::pi;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"       Degrees        Normalized         Gradians          Mils            Radians"_S);
+        print(u"───────────────────────────────────────────────────────────────────────────────────"_S);
+        for (auto &&val : values)
+            print(u"#7.7  #7.7  #7.7  #7.7  #7.7"_S.format(val, normd(val), d2g(val), d2m(val), d2r(val)));
+
+        print();
+        print(u"      Gradians        Normalized         Degrees           Mils            Radians"_S);
+        print(u"───────────────────────────────────────────────────────────────────────────────────"_S);
+        for (auto &&val : values)
+            print(u"#7.7  #7.7  #7.7  #7.7  #7.7"_S.format(val, normg(val), g2d(val), g2m(val), g2r(val)));
+
+        print();
+        print(u"        Mils          Normalized         Degrees         Gradians          Radians"_S);
+        print(u"───────────────────────────────────────────────────────────────────────────────────"_S);
+        for (auto &&val : values)
+            print(u"#7.7  #7.7  #7.7  #7.7  #7.7"_S.format(val, normm(val), m2d(val), m2g(val), m2r(val)));
+
+        print();
+        print(u"       Radians        Normalized         Degrees         Gradians          Mils"_S);
+        print(u"───────────────────────────────────────────────────────────────────────────────────"_S);
+        for (auto &&val : values)
+            print(u"#7.7  #7.7  #7.7  #7.7  #7.7"_S.format(val, normr(val), r2d(val), r2g(val), r2m(val)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Apply_a_digital_filter_(direct_form_II_transposed)#Nim
+def apply_filter(a, b, signal):
+    result = [0.0] * len(signal)
+    for i in range(len(signal)):
+        tmp = 0.0
+        for j in range(min(i + 1, len(b))):
+            tmp += b[j] * signal[i - j]
+        for j in range(1, min(i + 1, len(a))):
+            tmp -= a[j] * result[i - j]
+        tmp /= a[0]
+        result[i] = tmp
+    return result
+
+a = [1.00000000, -2.77555756e-16, 3.33333333e-01, -1.85037171e-17]
+b = [0.16666667, 0.5, 0.5, 0.16666667]
+
+signal = [-0.917843918645,  0.141984778794, 1.20536903482,   0.190286794412,
+          -0.662370894973, -1.00700480494, -0.404707073677,  0.800482325044,
+           0.743500089861,  1.01090520172,  0.741527555207,  0.277841675195,
+           0.400833448236, -0.2085993586,  -0.172842103641, -0.134316096293,
+           0.0259303398477, 0.490105989562, 0.549391221511,  0.9047198589]
+
+result = apply_filter(a, b, signal)
+for i, r in enumerate(result):
+    print('%11.8f' % r, end = '')
+    print(', ' if (i + 1) % 5 != 0 else "\n", end = '')
+===
+F apply_filter(a, b, signal)
+   V result = [0.0] * signal.len
+   L(i) 0 .< signal.len
+      V tmp = 0.0
+      L(j) 0 .< min(i + 1, b.len)
+         tmp += b[j] * signal[i - j]
+      L(j) 1 .< min(i + 1, a.len)
+         tmp -= a[j] * result[i - j]
+      tmp /= a[0]
+      result[i] = tmp
+   R result
+
+V a = [1.00000000, -2.77555756e-16, 3.33333333e-01, -1.85037171e-17]
+V b = [0.16666667, 0.5, 0.5, 0.16666667]
+
+V signal = [-0.917843918645, 0.141984778794, 1.20536903482, 0.190286794412, -0.662370894973, -1.00700480494, -0.404707073677, 0.800482325044, 0.743500089861, 1.01090520172, 0.741527555207, 0.277841675195, 0.400833448236, -0.2085993586, -0.172842103641, -0.134316096293, 0.0259303398477, 0.490105989562, 0.549391221511, 0.9047198589]
+
+V result = apply_filter(a, b, signal)
+L(r) result
+   V i = L.index
+   print(‘#2.8’.format(r), end' ‘’)
+   print(I (i + 1) % 5 != 0 {‘, ’} E "\n", end' ‘’)
+===
+template <typename T1, typename T2, typename T3> auto apply_filter(const T1 &a, const T2 &b, const T3 &signal)
+{
+    auto result = create_array({0.0}) * signal.len();
+    for (auto i : range_el(0, signal.len())) {
+        auto tmp = 0.0;
+        for (auto j : range_el(0, min(i + 1, b.len())))
+            tmp += b[j] * signal[i - j];
+        for (auto j : range_el(1, min(i + 1, a.len())))
+            tmp -= a[j] * result[i - j];
+        tmp /= _get<0>(a);
+        result.set(i, tmp);
+    }
+    return result;
+}
+
+auto a = create_array({1.00000000, -2.77555756e-16, 3.33333333e-01, -1.85037171e-17});
+auto b = create_array({0.16666667, 0.5, 0.5, 0.16666667});
+
+auto signal = create_array({-0.917843918645, 0.141984778794, 1.20536903482, 0.190286794412, -0.662370894973, -1.00700480494, -0.404707073677, 0.800482325044, 0.743500089861, 1.01090520172, 0.741527555207, 0.277841675195, 0.400833448236, -0.2085993586, -0.172842103641, -0.134316096293, 0.0259303398477, 0.490105989562, 0.549391221511, 0.9047198589});
+
+auto result = apply_filter(a, b, signal);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {int Lindex = 0;
+        for (auto &&r : result) {
+            auto i = Lindex;
+            print(u"#2.8"_S.format(r), u""_S);
+            print(mod((i + 1), 5) != 0 ? u", "_S : u"\n"_S, u""_S);
+            Lindex++;
+        }}
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Arbitrary-precision_integers_(included)#Python
+BigInt = int
+y = str( BigInt(5)**4**3**2 )
+print("5^4^3^2 = %s...%s and has %i digits" % (y[:20], y[-20:], len(y)))
+===
+V y = String(BigInt(5) ^ 4 ^ 3 ^ 2)
+print(‘5^4^3^2 = #....#. and has #. digits’.format(y[0.<20], y[(len)-20 ..], y.len))
+===
+auto y = String(pow(BigInt(5), pow(4, square(3))));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"5^4^3^2 = #....#. and has #. digits"_S.format(y[range_el(0, 20)], y[range_elen_i( - 20)], y.len()));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Arithmetic_coding/As_a_generalized_change_of_radix#Python
+import collections
+BigInt = int
+
+def cumulative_freq(freq):
+    cf : Dict[int, int] = {}
+    total = 0
+    for b in range(256):
+        if b in freq:
+            cf[b] = total
+            total += freq[b]
+    return cf
+
+def arithmethic_coding(bytes, radix):
+
+    # The frequency characters
+    freq : DefaultDict[int, int] = collections.defaultdict(int)
+    for b in bytes:
+        freq[ord(b)] += 1
+
+    # The cumulative frequency table
+    cf = cumulative_freq(freq)
+
+    # Base
+    base : BigInt = len(bytes)
+
+    # Lower bound
+    lower : BigInt = 0
+
+    # Product of all frequencies
+    pf : BigInt = 1
+
+    # Each term is multiplied by the product of the
+    # frequencies of all previously occurring symbols
+    for b in bytes:
+        lower = lower*base + cf[ord(b)]*pf
+        pf *= freq[ord(b)]
+
+    # Upper bound
+    upper = lower+pf
+
+    power : BigInt = 0
+    while True:
+        pf //= radix
+        if pf==0: break
+        power += 1
+
+    enc = (upper-1) // BigInt(radix)**power
+    return (enc, power, freq)
+
+def arithmethic_decoding(enc, radix, power, freq):
+
+    # Multiply enc by radix^power
+    enc *= radix**power
+
+    # Base
+    base = sum(freq.values())
+
+    # Create the cumulative frequency table
+    cf = cumulative_freq(freq)
+
+    # Create the dictionary
+    dict : Dict[int, int] = {}
+    for k,v in cf.items():
+        dict[v] = k
+
+    # Fill the gaps in the dictionary
+    lchar : Optional[int] = None
+    for i in range(base):
+        if i in dict:
+            lchar = dict[i]
+        elif lchar is not None:
+            dict[i] = lchar
+
+    # Decode the input number
+    decoded = ''#bytearray()
+    for i in range(base-1, -1, -1):
+        power = BigInt(base)**i
+        div = enc//power
+
+        c  = dict[int(div)]
+        fv = freq[c]
+        cv = cf[c]
+
+        rem = (enc - power*cv) // fv
+
+        enc = rem
+        decoded += chr(c)
+
+    # Return the decoded output
+    return decoded#bytes(decoded)
+
+radix = 10      # can be any integer greater or equal with 2
+
+for str in 'DABDDB DABDDBBDDBA ABRACADABRA TOBEORNOTTOBEORTOBEORNOT'.split(' '):
+    (enc, power, freq) = arithmethic_coding(str, radix)
+    dec = arithmethic_decoding(enc, radix, power, freq)
+
+    print("%-25s=> %19s * %d^%s" % (str, enc, radix, power))
+
+    if str != dec:
+        raise RuntimeError("\tHowever that is incorrect!")
+===
+F cumulative_freq(freq)
+   [Int = Int] cf
+   V total = 0
+   L(b) 256
+      I b C freq
+         cf[b] = total
+         total += freq[b]
+   R cf
+
+F arithmethic_coding(bytes, radix)
+
+   DefaultDict[Int, Int] freq
+   L(b) bytes
+      freq[b.code]++
+
+   V cf = cumulative_freq(freq)
+
+   BigInt base = bytes.len
+
+   BigInt lower = 0
+
+   BigInt pf = 1
+
+   L(b) bytes
+      lower = lower * base + cf[b.code] * pf
+      pf *= freq[b.code]
+
+   V upper = lower + pf
+
+   BigInt power = 0
+   L
+      pf I/= radix
+      I pf == 0
+         L.break
+      power++
+
+   V enc = (upper - 1) I/ BigInt(radix) ^ power
+   R (enc, power, freq)
+
+F arithmethic_decoding(=enc, radix, =power, freq)
+
+   enc *= radix ^ power
+
+   V base = sum(freq.values())
+
+   V cf = cumulative_freq(freq)
+
+   [Int = Int] dict
+   L(k, v) cf
+      dict[v] = k
+
+   Int? lchar
+   L(i) 0 .< base
+      I i C dict
+         lchar = dict[i]
+      E I lchar != N
+         dict[i] = lchar
+
+   V decoded = ‘’
+   L(i) (base - 1 .< -1).step(-1)
+      power = BigInt(base) ^ i
+      V div = enc I/ power
+
+      V c = dict[Int(div)]
+      V fv = freq[c]
+      V cv = cf[c]
+
+      V rem = (enc - power * cv) I/ fv
+
+      enc = rem
+      decoded ‘’= Char(code' c)
+
+   R decoded
+
+V radix = 10
+
+L(str) ‘DABDDB DABDDBBDDBA ABRACADABRA TOBEORNOTTOBEORTOBEORNOT’.split(‘ ’)
+   V (enc, power, freq) = arithmethic_coding(str, radix)
+   V dec = arithmethic_decoding(enc, radix, power, freq)
+
+   print(‘#<25=> #19 * #.^#.’.format(str, enc, radix, power))
+
+   I str != dec
+      X RuntimeError("\tHowever that is incorrect!")
+===
+template <typename T1> auto cumulative_freq(const T1 &freq)
+{
+    Dict<int, int> cf;
+    auto total = 0;
+    for (int b = 0; b < 256; b++)
+        if (in(b, freq)) {
+            cf.set(b, total);
+            total += freq[b];
+        }
+    return cf;
+}
+
+template <typename T1, typename T2> auto arithmethic_coding(const T1 &bytes, const T2 &radix)
+{
+
+    DefaultDict<int, int> freq;
+    for (auto &&b : bytes)
+        freq[b.code]++;
+
+    auto cf = cumulative_freq(freq);
+
+    BigInt base = bytes.len();
+
+    BigInt lower = 0;
+
+    BigInt pf = 1;
+
+    for (auto &&b : bytes) {
+        lower = lower * base + cf[b.code] * pf;
+        pf *= freq[b.code];
+    }
+
+    auto upper = lower + pf;
+
+    BigInt power = 0;
+    while (true) {
+        pf = idiv(pf, radix);
+        if (pf == 0)
+            break;
+        power++;
+    }
+
+    auto enc = idiv((upper - 1), pow(BigInt(radix), power));
+    return make_tuple(enc, power, freq);
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto arithmethic_decoding(T1 enc, const T2 &radix, T3 power, const T4 &freq)
+{
+
+    enc *= pow(radix, power);
+
+    auto base = sum(freq.values());
+
+    auto cf = cumulative_freq(freq);
+
+    Dict<int, int> dict;
+    for (auto &&[k, v] : cf)
+        dict.set(v, k);
+
+    Nullable<int> lchar;
+    for (auto i : range_el(0, base))
+        if (in(i, dict))
+            lchar = dict[i];
+        else if (lchar != nullptr)
+            dict.set(i, *lchar);
+
+    auto decoded = u""_S;
+    for (auto i : range_el(base - 1, -1).step(-1)) {
+        power = pow(BigInt(base), i);
+        auto div = idiv(enc, power);
+
+        auto c = dict[to_int(div)];
+        auto fv = freq[c];
+        auto cv = cf[c];
+
+        auto rem = idiv((enc - power * cv), fv);
+
+        enc = rem;
+        decoded &= Char(c);
+    }
+
+    return decoded;
+}
+
+auto radix = 10;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&str : u"DABDDB DABDDBBDDBA ABRACADABRA TOBEORNOTTOBEORTOBEORNOT"_S.split(u" "_S)) {
+            auto [enc, power, freq] = arithmethic_coding(str, radix);
+            auto dec = arithmethic_decoding(enc, radix, power, freq);
+
+            print(u"#<25=> #19 * #.^#."_S.format(str, enc, radix, power));
+
+            if (str != dec)
+                throw RuntimeError(u"\tHowever that is incorrect!"_S);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Associative_array/Merging#Python
+base = {"name":"Rocket Skates", "price":"12.75", "color":"yellow"}
+update = {"price":"15.25", "color":"red", "year":"1974"}
+
+result = base.copy()
+result.update(update)
+
+print(result)
+===
+V base = [‘name’ = ‘Rocket Skates’, ‘price’ = ‘12.75’, ‘color’ = ‘yellow’]
+V update = [‘price’ = ‘15.25’, ‘color’ = ‘red’, ‘year’ = ‘1974’]
+
+V result = base.copy()
+result.update(update)
+
+print(result)
+===
+auto base = create_dict(dict_of(u"name"_S, u"Rocket Skates"_S)(u"price"_S, u"12.75"_S)(u"color"_S, u"yellow"_S));
+auto update = create_dict(dict_of(u"price"_S, u"15.25"_S)(u"color"_S, u"red"_S)(u"year"_S, u"1974"_S));
+
+auto result = base.copy();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        result.update(update);
+
+        print(result);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Attractive_numbers#Python
+import math
+from typing import List
+
+def is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, int(math.sqrt(n)) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+def get_pfct(n):
+    i = 2; factors : List[int] = []
+    while i * i <= n:
+        if n % i:
+            i += 1
+        else:
+            n //= i
+            factors.append(i)
+    if n > 1:
+        factors.append(n)
+    return len(factors)
+
+pool : List[int] = []
+
+for each in range(0,121):
+    pool.append(get_pfct(each))
+
+r : List[int] = []
+for i,each in enumerate(pool):
+    if is_prime(each):
+        r.append(i)
+
+print(','.join(map(str, r)))
+===
+F is_prime(n)
+   I n < 2
+      R 0B
+   L(i) 2 .. Int(sqrt(n))
+      I n % i == 0
+         R 0B
+   R 1B
+
+F get_pfct(=n)
+   V i = 2
+   [Int] factors
+   L i * i <= n
+      I n % i
+         i++
+      E
+         n I/= i
+         factors.append(i)
+   I n > 1
+      factors.append(n)
+   R factors.len
+
+[Int] pool
+
+L(each) 0..120
+   pool.append(get_pfct(each))
+
+[Int] r
+L(each) pool
+   V i = L.index
+   I is_prime(each)
+      r.append(i)
+
+print(r.map(String).join(‘,’))
+===
+template <typename T1> auto is_prime(const T1 &n)
+{
+    if (n < 2)
+        return false;
+    for (auto i : range_ee(2, to_int(sqrt(n))))
+        if (mod(n, i) == 0)
+            return false;
+    return true;
+}
+
+template <typename T1> auto get_pfct(T1 n)
+{
+    auto i = 2;
+    Array<int> factors;
+    while (i * i <= n)
+        if (mod(n, i))
+            i++;
+        else {
+            n = idiv(n, i);
+            factors.append(i);
+        }
+    if (n > 1)
+        factors.append(n);
+    return factors.len();
+}
+
+Array<int> pool;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto each : range_ee(0, 120))
+            pool.append(get_pfct(each));
+    }
+} code_block_1;
+
+Array<int> r;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        {int Lindex = 0;
+        for (auto &&each : pool) {
+            auto i = Lindex;
+            if (is_prime(each))
+                r.append(i);
+            Lindex++;
+        }}
+
+        print(r.map([](const auto &x){return String(x);}).join(u","_S));
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Average_loop_length#Python
+import math
+import random
+
+def ffactorial(n):
+    result = 1.0
+    for i in range(2, n + 1):
+        result *= i
+    return result
+
+MAX_N = 20
+TIMES = 1000000
+
+def analytical(n):
+    return sum(ffactorial(n) / pow(float(n), float(i)) / ffactorial(n - i) for i in range(1, n+1))
+
+def test(n, times):
+    count = 0
+    for i in range(times):
+        (x, bits) = (1, 0)
+        while (bits & x) == 0:
+            count += 1
+            bits |= x
+            x = 1 << random.randrange(n)
+    return float(count) / times
+
+print(" n      avg     exp.    diff\n-------------------------------")
+for n in range(1, MAX_N+1):
+    avg = test(n, TIMES)
+    theory = analytical(n)
+    diff = (avg / theory - 1) * 100
+    print("%2d %8.4f %8.4f %6.3f%%" % (n, avg, theory, diff))
+===
+F ffactorial(n)
+   V result = 1.0
+   L(i) 2 .. n
+      result *= i
+   R result
+
+V MAX_N = 20
+V TIMES = 1000000
+
+F analytical(n)
+   R sum((1 .. n).map(i -> ffactorial(@n) / pow(Float(@n), Float(i)) / ffactorial(@n - i)))
+
+F test(n, times)
+   V count = 0
+   L(i) 0 .< times
+      V (x, bits) = (1, 0)
+      L (bits [&] x) == 0
+         count++
+         bits [|]= x
+         x = 1 << random:(n)
+   R Float(count) / times
+
+print(" n      avg     exp.    diff\n-------------------------------")
+L(n) 1 .. MAX_N
+   V avg = test(n, TIMES)
+   V theory = analytical(n)
+   V diff = (avg / theory - 1) * 100
+   print(‘#2 #3.4 #3.4 #2.3%’.format(n, avg, theory, diff))
+===
+template <typename T1> auto ffactorial(const T1 &n)
+{
+    auto result = 1.0;
+    for (auto i : range_ee(2, n))
+        result *= i;
+    return result;
+}
+
+auto MAX_N = 20;
+auto TIMES = 1000000;
+
+template <typename T1> auto analytical(const T1 &n)
+{
+    return sum_map(range_ee(1, n), [&n](const auto &i){return ffactorial(n) / pow(to_float(n), to_float(i)) / ffactorial(n - i);});
+}
+
+template <typename T1, typename T2> auto test(const T1 &n, const T2 &times)
+{
+    auto count = 0;
+    for (auto i : range_el(0, times)) {
+        auto [x, bits] = make_tuple(1, 0);
+        while ((bits & x) == 0) {
+            count++;
+            bits |= x;
+            x = 1 << randomns::_(n);
+        }
+    }
+    return to_float(count) / times;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u" n      avg     exp.    diff\n-------------------------------"_S);
+        for (auto n : range_ee(1, MAX_N)) {
+            auto avg = test(n, TIMES);
+            auto theory = analytical(n);
+            auto diff = (avg / theory - 1) * 100;
+            print(u"#2 #3.4 #3.4 #2.3%"_S.format(n, avg, theory, diff));
+        }
+    }
+} code_block_1;
