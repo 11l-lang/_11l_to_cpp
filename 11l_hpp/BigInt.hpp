@@ -65,6 +65,9 @@ public:
 	BigInt(const String &s) {
 		read(s);
 	}
+	BigInt(const String &s, int base) {
+		*this = to_int_t<BigInt>(s, base);
+	}
 
 	void operator=(const BigInt &v) {
 		sign = v.sign;

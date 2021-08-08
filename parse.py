@@ -3262,6 +3262,7 @@ for type_ in cpp_type_from_11l:
 f = ASTFunctionDefinition([('x', '', ''), ('radix', '10', 'Int')])
 f.first_named_only_argument = 1
 builtins_scope.ids['Int'].ast_nodes[0] = ASTTypeDefinition([f])
+builtins_scope.ids['BigInt'].ast_nodes[0] = ASTTypeDefinition([f])
 
 string_scope = Scope(None)
 str_last_member_var_decl = ASTVariableDeclaration()

@@ -18710,3 +18710,82 @@ struct CodeBlock1
         }}
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Base58Check_encoding#Python
+BigInt = int
+
+ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+
+def convertToBase58(num):
+    sb = ''
+    while (num > 0):
+        r = int(num % 58)
+        sb = sb + ALPHABET[r]
+        num = num // 58;
+    return sb[::-1]
+
+s = BigInt('25420294593250030202636073700053352635053786165627414518')
+b = convertToBase58(s)
+print("%s -> %s" % (s, b))
+
+hash_arr = ['61', '626262', '636363', '73696d706c792061206c6f6e6720737472696e67', '516b6fcd0f', 'bf4f89001e670274dd', '572e4794', 'ecac89cad93923c02321', '10c8511e']
+for num in hash_arr:
+    b = convertToBase58(BigInt(num, base = 16))
+    print("0x%-54s -> %s" % (num, b))
+===
+V ALPHABET = ‘123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz’
+
+F convertToBase58(=num)
+   V sb = ‘’
+   L (num > 0)
+      V r = Int(num % 58)
+      sb = sb‘’:ALPHABET[r]
+      num = num I/ 58
+   R reversed(sb)
+
+V s = BigInt(‘25420294593250030202636073700053352635053786165627414518’)
+V b = convertToBase58(s)
+print(‘#. -> #.’.format(s, b))
+
+V hash_arr = [‘61’, ‘626262’, ‘636363’, ‘73696d706c792061206c6f6e6720737472696e67’, ‘516b6fcd0f’, ‘bf4f89001e670274dd’, ‘572e4794’, ‘ecac89cad93923c02321’, ‘10c8511e’]
+L(num) hash_arr
+   b = convertToBase58(BigInt(num, radix' 16))
+   print(‘0x#<54 -> #.’.format(num, b))
+===
+auto ALPHABET = u"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"_S;
+
+template <typename T1> auto convertToBase58(T1 num)
+{
+    auto sb = u""_S;
+    while ((num > 0)) {
+        auto r = to_int(mod(num, 58));
+        sb = sb & ::ALPHABET[r];
+        num = idiv(num, 58);
+    }
+    return reversed(sb);
+}
+
+auto s = BigInt(u"25420294593250030202636073700053352635053786165627414518"_S);
+auto b = convertToBase58(s);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"#. -> #."_S.format(s, b));
+    }
+} code_block_1;
+
+auto hash_arr = create_array({u"61"_S, u"626262"_S, u"636363"_S, u"73696d706c792061206c6f6e6720737472696e67"_S, u"516b6fcd0f"_S, u"bf4f89001e670274dd"_S, u"572e4794"_S, u"ecac89cad93923c02321"_S, u"10c8511e"_S});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&num : hash_arr) {
+            b = convertToBase58(BigInt(num, 16));
+            print(u"0x#<54 -> #."_S.format(num, b));
+        }
+    }
+} code_block_2;
