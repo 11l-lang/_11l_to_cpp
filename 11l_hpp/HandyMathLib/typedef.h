@@ -32,7 +32,7 @@ typedef long double HMlong_double;
 #endif
 
 
-template <class T> class limits
+template <class T> class hm_limits
 {
 public:
 	static INLINE const T max();
@@ -45,7 +45,7 @@ public:
 #define UINT_MIN      0
 
 #define IMPLEMENT_LIMITS(T, ID)						\
-template <> class limits<T>							\
+template <> class hm_limits<T>						\
 {													\
 public:												\
 	static INLINE const T min() {return ID##_MIN;}	\

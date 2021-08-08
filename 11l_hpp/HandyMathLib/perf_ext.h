@@ -94,7 +94,7 @@ INLINE void fastnormalize(quat res[2], const quat dq[2])//res and dq can point t
 
 INLINE const float fastsqrt(const float x)
 {
-//	return x * inversesqrt(max(x, limits<float>::min()));//3x times faster than _mm_sqrt_ss with accuracy of 22 bits (but compiler optimize this not so well, and sqrtss works faster)
+//	return x * inversesqrt(max(x, hm_limits<float>::min()));//3x times faster than _mm_sqrt_ss with accuracy of 22 bits (but compiler optimize this not so well, and sqrtss works faster)
 	float r;
 	_mm_store_ss(&r, _mm_sqrt_ss(_mm_load_ss(&x)));
 	return r;

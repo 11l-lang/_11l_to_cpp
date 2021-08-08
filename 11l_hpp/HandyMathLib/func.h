@@ -112,7 +112,7 @@ INLINE const HMint random(const HMint randMin,const HMint randMax)
 {return (HMint)random(HMuint(randMin),HMuint(randMax));}
 
 INLINE const HMlong_double random(const HMlong_double randMax)
-{return random()*(randMax/limits<HMuint>::max());}
+{return random()*(randMax/hm_limits<HMuint>::max());}
 
 INLINE const HMlong_double random(const HMlong_double randMin,const HMlong_double randMax)
 {return random(randMax-randMin)+randMin;}
@@ -681,7 +681,7 @@ template <class Tres,class baseT,int sizeofT,class T> INLINE const Tres noise_(c
 				for (k=0;k<sizeofT;k++)
 					t+=ivC[k][(j>>k)&1][0];
 
-				cf[i][j]=f[j]=t*(baseT(2)/baseT(limits<HMuint>::max()))-baseT(1);
+				cf[i][j]=f[j]=t*(baseT(2)/baseT(hm_limits<HMuint>::max()))-baseT(1);
 			}
 		}
 
@@ -696,7 +696,7 @@ template <class Tres,class baseT,int sizeofT,class T> INLINE const Tres noise_(c
 /*	int i,j;
 	HMuint t[sizeofT];
 	for (i=0;i<sizeofT;i++)
-		t[i]=HMuint(fract(((baseT*)(&v))[i])*baseT(limits<HMuint>::max()));
+		t[i]=HMuint(fract(((baseT*)(&v))[i])*baseT(hm_limits<HMuint>::max()));
 
 	Tres r;
 	for (i=0;i<dimension(Tres());i++)
@@ -713,7 +713,7 @@ template <class Tres,class baseT,int sizeofT,class T> INLINE const Tres noise_(c
 		((baseT*)(&r))[i]=baseT(ir);
 	}
 
-	return r*baseT(2)/baseT(limits<HMuint>::max())-baseT(1);*/
+	return r*baseT(2)/baseT(hm_limits<HMuint>::max())-baseT(1);*/
 }
 
 #if _MSC_VER > 1000

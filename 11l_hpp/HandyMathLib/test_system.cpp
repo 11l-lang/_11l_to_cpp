@@ -760,7 +760,7 @@ int main()
 			perlinNoise[i][j]+=.25f*noise1(vec2(k,l),lerp);
 	for (i=0;i<NOISE_SIZE;i++)
 		for (j=0;j<NOISE_SIZE;j++)
-			perlinNoise[i][j]+=.125f*((HMuint)noise1(ivec2(i,j))*(2.f/limits<HMuint>::max())-1.f);
+			perlinNoise[i][j]+=.125f*((HMuint)noise1(ivec2(i,j))*(2.f/hm_limits<HMuint>::max())-1.f);
 
 	for (i=0;i<NOISE_SIZE;i++)
 		for (j=0;j<NOISE_SIZE;j++)

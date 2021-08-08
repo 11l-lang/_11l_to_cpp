@@ -28,8 +28,8 @@ public:
 		}
 		else
 		{
-			min =  limits<T>::max();
-			max = -limits<T>::max();
+			min =  hm_limits<T>::max();
+			max = -hm_limits<T>::max();
 		}
 	}
 	INLINE Trange(const T min,const T max):min(min),max(max) {}
@@ -110,8 +110,8 @@ public:
 #if _MSC_VER==1200
 #define typename
 #endif
-			min=Tvec( limits<typename Tvec::TYPE>::max());
-			max=Tvec(-limits<typename Tvec::TYPE>::max());
+			min=Tvec( hm_limits<typename Tvec::TYPE>::max());
+			max=Tvec(-hm_limits<typename Tvec::TYPE>::max());
 #ifdef typename
 #undef typename
 #endif
