@@ -18789,3 +18789,80 @@ struct CodeBlock2
         }
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Bell_numbers#Python
+BigInt = int
+
+def bellTriangle(n):
+    tri : List[List[BigInt]] = []
+    for i in range(n):
+        tri.append([BigInt(0)] * i    )
+    tri[1][0] = 1
+    for i in range(2, n):
+        tri[i][0] = tri[i - 1][i - 2]
+        for j in range(1, i):
+            tri[i][j] = tri[i][j - 1] + tri[i - 1][j - 1]
+    return tri
+
+bt = bellTriangle(51)
+print("First fifteen and fiftieth Bell numbers:")
+for i in range(1, 16):
+    print("%2d: %d" % (i, bt[i][0]))
+print("50:", bt[50][0])
+print()
+print("The first ten rows of Bell's triangle:")
+for i in range(1, 11):
+    print(bt[i])
+===
+F bellTriangle(n)
+   [[BigInt]] tri
+   L(i) 0 .< n
+      tri.append([BigInt(0)] * i)
+   tri[1][0] = 1
+   L(i) 2 .< n
+      tri[i][0] = tri[i - 1][i - 2]
+      L(j) 1 .< i
+         tri[i][j] = tri[i][j - 1] + tri[i - 1][j - 1]
+   R tri
+
+V bt = bellTriangle(51)
+print(‘First fifteen and fiftieth Bell numbers:’)
+L(i) 1..15
+   print(‘#2: #.’.format(i, bt[i][0]))
+print(‘50: ’bt[50][0])
+print()
+print(‘The first ten rows of Bell's triangle:’)
+L(i) 1..10
+   print(bt[i])
+===
+template <typename T1> auto bellTriangle(const T1 &n)
+{
+    Array<Array<BigInt>> tri;
+    for (auto i : range_el(0, n))
+        tri.append(create_array({BigInt(0)}) * i);
+    _set<0>(_get<1>(tri), 1);
+    for (auto i : range_el(2, n)) {
+        _set<0>(tri[i], tri[i - 1][i - 2]);
+        for (auto j : range_el(1, i))
+            tri[i].set(j, tri[i][j - 1] + tri[i - 1][j - 1]);
+    }
+    return tri;
+}
+
+auto bt = bellTriangle(51);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"First fifteen and fiftieth Bell numbers:"_S);
+        for (auto i : range_ee(1, 15))
+            print(u"#2: #."_S.format(i, _get<0>(bt[i])));
+        print(u"50: "_S & _get<0>(_get<50>(bt)));
+        print();
+        print(u"The first ten rows of Bell's triangle:"_S);
+        for (auto i : range_ee(1, 10))
+            print(bt[i]);
+    }
+} code_block_1;

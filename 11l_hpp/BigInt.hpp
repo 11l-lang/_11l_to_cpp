@@ -69,21 +69,24 @@ public:
 		*this = to_int_t<BigInt>(s, base);
 	}
 
-	void operator=(const BigInt &v) {
+	const BigInt &operator=(const BigInt &v) {
 		sign = v.sign;
 		a = v.a;
+		return *this;
 	}
 
-	void operator=(long long v) {
+	const BigInt &operator=(long long v) {
 		sign = 1;
 		a.clear();
 		if (v < 0)
 			sign = -1, v = -v;
 		for (; v > 0; v = v / base)
 			a.push_back(v % base);
+		return *this;
 	}
-	void operator=(int v) {
+	const BigInt &operator=(int v) {
 		*this = (long long)v;
+		return *this;
 	}
 
 	BigInt operator+(const BigInt &v) const {
