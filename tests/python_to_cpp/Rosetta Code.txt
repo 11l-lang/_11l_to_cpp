@@ -19005,3 +19005,21 @@ struct CodeBlock2
         bin_print(limits, bins);
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Binary_strings#Python
+x = b'abc'
+print(x[0])
+===
+V x = Bytes(‘abc’)
+print(x[0])
+===
+auto x = "abc"_B;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(_get<0>(x));
+    }
+} code_block_1;
