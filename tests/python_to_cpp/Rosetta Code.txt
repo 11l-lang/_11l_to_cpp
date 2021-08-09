@@ -19023,3 +19023,135 @@ struct CodeBlock1
         print(_get<0>(x));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Bioinformatics/base_count#Python
+import collections
+
+def basecount(dna):
+    d = collections.defaultdict(int) # Char
+    for c in dna:
+        d[c] += 1
+    return sorted(d.items())
+
+def seq_split(dna, n=50):
+    return [dna[i: i+n] for i in range(0, len(dna), n)]
+
+def seq_pp(dna, n=50):
+    for i, part in enumerate(seq_split(dna, n)):
+        print("{:>5}: {}".format(i*n, part))
+    print("\n  BASECOUNT:")
+    tot = 0
+    for base, count in basecount(dna):
+        print("    {:>3}: {}".format(base, count))
+        tot += count
+    (base, count) = ('TOT', tot)
+    print("    {:>3}= {}".format(base, count))
+
+print("SEQUENCE:")
+sequence = '''\
+CGTAAAAAATTACAACGTCCTTTGGCTATCTCTTAAACTCCTGCTAAATG\
+CTCGTGCTTTCCAATTATGTAAGCGTTCCGAGACGGGGTGGTCGATTCTG\
+AGGACAAAGGTCAAGATGGAGCGCATCGAACGCAATAAGGATCATTTGAT\
+GGGACGTTTCGTCGACAAAGTCTTGTTTCGAGAGTAACGGCTACCGTCTT\
+CGATTCTGCTTATAACACTATGTTCTTATGAAATGGATGTTCTGAGTTGG\
+TCAGTCCCAATGTGCGGGGTTTCTTTTAGTACGTCGGGAGTGGTATTATA\
+TTTAATTTTTCTATATAGCGATCTGTATTTAAGCAATTCATTTAGGTTAT\
+CGCCGCGATGCTCGGTTCGGACCGCCAAGCATCTGGCTCCACTGCTAGTG\
+TCCTAAATTTGAATGGCAAACACAAATAAGATTTAGCAATTCGTGTAGAC\
+GACCGGGGACTTGCATGATGGGAGCAGCTTTGTTAAACTACGAACGTAAT'''
+seq_pp(sequence)
+===
+F basecount(dna)
+   V d = DefaultDict[Char, Int]()
+   L(c) dna
+      d[c]++
+   R sorted(d.items())
+
+F seq_split(dna, n = 50)
+   R (0 .< dna.len).step(n).map(i -> @dna[i .< i + @n])
+
+F seq_pp(dna, n = 50)
+   L(part) seq_split(dna, n)
+      V i = L.index
+      print(‘#5: #.’.format(i * n, part))
+   print("\n  BASECOUNT:")
+   V tot = 0
+   L(base, count) basecount(dna)
+      print(‘    #3: #.’.format(base, count))
+      tot += count
+   V (base, count) = (‘TOT’, tot)
+   print(‘    #3= #.’.format(base, count))
+
+print(‘SEQUENCE:’)
+V sequence = "\
+CGTAAAAAATTACAACGTCCTTTGGCTATCTCTTAAACTCCTGCTAAATG\
+CTCGTGCTTTCCAATTATGTAAGCGTTCCGAGACGGGGTGGTCGATTCTG\
+AGGACAAAGGTCAAGATGGAGCGCATCGAACGCAATAAGGATCATTTGAT\
+GGGACGTTTCGTCGACAAAGTCTTGTTTCGAGAGTAACGGCTACCGTCTT\
+CGATTCTGCTTATAACACTATGTTCTTATGAAATGGATGTTCTGAGTTGG\
+TCAGTCCCAATGTGCGGGGTTTCTTTTAGTACGTCGGGAGTGGTATTATA\
+TTTAATTTTTCTATATAGCGATCTGTATTTAAGCAATTCATTTAGGTTAT\
+CGCCGCGATGCTCGGTTCGGACCGCCAAGCATCTGGCTCCACTGCTAGTG\
+TCCTAAATTTGAATGGCAAACACAAATAAGATTTAGCAATTCGTGTAGAC\
+GACCGGGGACTTGCATGATGGGAGCAGCTTTGTTAAACTACGAACGTAAT"
+seq_pp(sequence)
+===
+template <typename T1> auto basecount(const T1 &dna)
+{
+    auto d = DefaultDict<Char, int>();
+    for (auto &&c : dna)
+        d[c]++;
+    return sorted(d.items());
+}
+
+template <typename T1, typename T2 = decltype(50)> auto seq_split(const T1 &dna, const T2 &n = 50)
+{
+    return range_el(0, dna.len()).step(n).map([&dna, &n](const auto &i){return dna[range_el(i, i + n)];});
+}
+
+template <typename T1, typename T2 = decltype(50)> auto seq_pp(const T1 &dna, const T2 &n = 50)
+{
+    {int Lindex = 0;
+    for (auto &&part : seq_split(dna, n)) {
+        auto i = Lindex;
+        print(u"#5: #."_S.format(i * n, part));
+        Lindex++;
+    }}
+    print(u"\n  BASECOUNT:"_S);
+    auto tot = 0;
+    for (auto &&[base, count] : basecount(dna)) {
+        print(u"    #3: #."_S.format(base, count));
+        tot += count;
+    }
+    auto [base, count] = make_tuple(u"TOT"_S, tot);
+    print(u"    #3= #."_S.format(base, count));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"SEQUENCE:"_S);
+    }
+} code_block_1;
+
+auto sequence = u"\
+CGTAAAAAATTACAACGTCCTTTGGCTATCTCTTAAACTCCTGCTAAATG\
+CTCGTGCTTTCCAATTATGTAAGCGTTCCGAGACGGGGTGGTCGATTCTG\
+AGGACAAAGGTCAAGATGGAGCGCATCGAACGCAATAAGGATCATTTGAT\
+GGGACGTTTCGTCGACAAAGTCTTGTTTCGAGAGTAACGGCTACCGTCTT\
+CGATTCTGCTTATAACACTATGTTCTTATGAAATGGATGTTCTGAGTTGG\
+TCAGTCCCAATGTGCGGGGTTTCTTTTAGTACGTCGGGAGTGGTATTATA\
+TTTAATTTTTCTATATAGCGATCTGTATTTAAGCAATTCATTTAGGTTAT\
+CGCCGCGATGCTCGGTTCGGACCGCCAAGCATCTGGCTCCACTGCTAGTG\
+TCCTAAATTTGAATGGCAAACACAAATAAGATTTAGCAATTCGTGTAGAC\
+GACCGGGGACTTGCATGATGGGAGCAGCTTTGTTAAACTACGAACGTAAT"_S;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        seq_pp(sequence);
+    }
+} code_block_2;
