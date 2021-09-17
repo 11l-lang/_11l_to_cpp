@@ -738,3 +738,334 @@ struct CodeBlock1
         print();
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Best_shuffle#Python
+import random
+
+def count(w1,wnew):
+    return sum(int(c1==c2) for c1,c2 in zip(w1, wnew))
+
+def best_shuffle(w):
+    wnew = list(w)
+    n = len(w)
+    rangei = list(range(n))
+    rangej = list(range(n))
+    random.shuffle(rangei)
+    random.shuffle(rangej)
+    for i in rangei:
+        for j in rangej:
+            if i != j and wnew[j] != wnew[i] and w[i] != wnew[j] and w[j] != wnew[i]:
+                (wnew[j], wnew[i]) = (wnew[i], wnew[j])
+                break
+    wnew_s = ''.join(wnew)
+    return (wnew_s, count(w, wnew_s))
+
+test_words = ['tree', 'abracadabra', 'seesaw', 'elk', 'grrrrrr', 'up', 'a',
+              'antidisestablishmentarianism', 'hounddogs',
+              'aardvarks are ant eaters', 'immediately', 'abba']
+for w in test_words:
+    (wnew, c) = best_shuffle(w)
+    print("%29s, %-29s ,(%i)" % (w, wnew, c))
+===
+F count(w1, wnew)
+   R sum(zip(w1, wnew).map((c1, c2) -> Int(c1 == c2)))
+
+F best_shuffle(w)
+   V wnew = Array(w)
+   V n = w.len
+   V rangei = Array(0 .< n)
+   V rangej = Array(0 .< n)
+   random:shuffle(&rangei)
+   random:shuffle(&rangej)
+   L(i) rangei
+      L(j) rangej
+         I i != j & wnew[j] != wnew[i] & w[i] != wnew[j] & w[j] != wnew[i]
+            swap(&wnew[j], &wnew[i])
+            L.break
+   V wnew_s = wnew.join(‘’)
+   R (wnew_s, count(w, wnew_s))
+
+V test_words = [‘tree’, ‘abracadabra’, ‘seesaw’, ‘elk’, ‘grrrrrr’, ‘up’, ‘a’, ‘antidisestablishmentarianism’, ‘hounddogs’, ‘aardvarks are ant eaters’, ‘immediately’, ‘abba’]
+L(w) test_words
+   V (wnew, c) = best_shuffle(w)
+   print(‘#29, #<29 ,(#.)’.format(w, wnew, c))
+===
+template <typename T1, typename T2> auto count(const T1 &w1, const T2 &wnew)
+{
+    return sum_map(zip(w1, wnew), [](const auto &c1, const auto &c2){return to_int(c1 == c2);});
+}
+
+template <typename T1> auto best_shuffle(const T1 &w)
+{
+    auto wnew = create_array(w);
+    auto n = w.len();
+    auto rangei = create_array(range_el(0, n));
+    auto rangej = create_array(range_el(0, n));
+    randomns::shuffle(rangei);
+    randomns::shuffle(rangej);
+    for (auto &&i : rangei)
+        for (auto &&j : rangej)
+            if (i != j && wnew[j] != wnew[i] && w[i] != wnew[j] && w[j] != wnew[i]) {
+                swap(wnew[j], wnew[i]);
+                break;
+            }
+    auto wnew_s = wnew.join(u""_S);
+    return make_tuple(wnew_s, count(w, wnew_s));
+}
+
+auto test_words = create_array({u"tree"_S, u"abracadabra"_S, u"seesaw"_S, u"elk"_S, u"grrrrrr"_S, u"up"_S, u"a"_S, u"antidisestablishmentarianism"_S, u"hounddogs"_S, u"aardvarks are ant eaters"_S, u"immediately"_S, u"abba"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&w : test_words) {
+            auto [wnew, c] = best_shuffle(w);
+            print(u"#29, #<29 ,(#.)"_S.format(w, wnew, c));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Bioinformatics/global_alignment#Nim
+from _11l import *
+
+ACGT = ['A', 'C', 'G', 'T']   # Four DNA bases.
+
+def permutations(slist):
+    l = sorted(slist)
+    r = [l]
+    while next_permutation(l):
+        r += [l[:]]
+    return r
+
+def printCounts(dnaSeq):
+    counts = collections.defaultdict(int) # Char
+    for c in dnaSeq:
+        counts[c] += 1
+    print("\nNucleotide counts for {}:\n".format(dnaSeq))
+    for base in ACGT:
+        print("{:>10} {:11}".format(base, counts[base]))
+    others = 0
+    for base in counts.keys():
+        if base not in ACGT:
+            others += counts[base]
+    print("     Other {:11}".format(others))
+    print("  --------------------")
+    print("  Total length {:7}".format(len(dnaSeq)))
+
+def headTailOverlap(s1, s2):
+    start = 0
+    while True:
+        start = s1.find(s2[0], start)
+        if start < 0:
+            return 0
+        if s2.startswith(s1[start:]):
+            return len(s1) - start
+        start += 1
+
+def deduplicate(slist):
+    r : List[str] = []
+    s = set(slist)
+    for i, s1 in enumerate(s):
+        for j, s2 in enumerate(s):
+            if j != i and s1 in s2:
+                break
+        else:
+            r.append(s1)
+    return r
+
+def shortestCommonSuperstring(sl):
+    slist = deduplicate(sl)
+    result = ''.join(slist)
+    for perm in permutations(slist):
+        sup : str = perm[0]
+        for i in range(len(slist) - 1):
+            overlapPos = headTailOverlap(perm[i], perm[i+1])
+            sup += perm[i+1][overlapPos:]
+        if len(sup) < len(result):
+            result = sup
+    return result
+
+TestSequences = [
+   ["TA", "AAG", "TA", "GAA", "TA"],
+   ["CATTAGGG", "ATTAG", "GGG", "TA"],
+   ["AAGAUGGA", "GGAGCGCAUC", "AUCGCAAUAAGGA"],
+   ["ATGAAATGGATGTTCTGAGTTGGTCAGTCCCAATGTGCGGGGTTTCTTTTAGTACGTCGGGAGTGGTATTAT",
+    "GGTCGATTCTGAGGACAAAGGTCAAGATGGAGCGCATCGAACGCAATAAGGATCATTTGATGGGACGTTTCGTCGACAAAGT",
+    "CTATGTTCTTATGAAATGGATGTTCTGAGTTGGTCAGTCCCAATGTGCGGGGTTTCTTTTAGTACGTCGGGAGTGGTATTATA",
+    "TGCTTTCCAATTATGTAAGCGTTCCGAGACGGGGTGGTCGATTCTGAGGACAAAGGTCAAGATGGAGCGCATC",
+    "AACGCAATAAGGATCATTTGATGGGACGTTTCGTCGACAAAGTCTTGTTTCGAGAGTAACGGCTACCGTCTT",
+    "GCGCATCGAACGCAATAAGGATCATTTGATGGGACGTTTCGTCGACAAAGTCTTGTTTCGAGAGTAACGGCTACCGTC",
+    "CGTTTCGTCGACAAAGTCTTGTTTCGAGAGTAACGGCTACCGTCTTCGATTCTGCTTATAACACTATGTTCT",
+    "TGCTTTCCAATTATGTAAGCGTTCCGAGACGGGGTGGTCGATTCTGAGGACAAAGGTCAAGATGGAGCGCATC",
+    "CGTAAAAAATTACAACGTCCTTTGGCTATCTCTTAAACTCCTGCTAAATGCTCGTGC",
+    "GATGGAGCGCATCGAACGCAATAAGGATCATTTGATGGGACGTTTCGTCGACAAAGTCTTGTTTCGAGAGTAACGGCTACCGTCTTCGATT",
+    "TTTCCAATTATGTAAGCGTTCCGAGACGGGGTGGTCGATTCTGAGGACAAAGGTCAAGATGGAGCGCATC",
+    "CTATGTTCTTATGAAATGGATGTTCTGAGTTGGTCAGTCCCAATGTGCGGGGTTTCTTTTAGTACGTCGGGAGTGGTATTATA",
+    "TCTCTTAAACTCCTGCTAAATGCTCGTGCTTTCCAATTATGTAAGCGTTCCGAGACGGGGTGGTCGATTCTGAGGACAAAGGTCAAGA"]]
+
+for test in TestSequences:
+    scs = shortestCommonSuperstring(test)
+    printCounts(scs)
+===
+V ACGT = [‘A’, ‘C’, ‘G’, ‘T’]
+
+F permutations(slist)
+   V l = sorted(slist)
+   V r = [l]
+   L l.next_permutation()
+      r [+]= copy(l)
+   R r
+
+F printCounts(dnaSeq)
+   V counts = DefaultDict[Char, Int]()
+   L(c) dnaSeq
+      counts[c]++
+   print("\nNucleotide counts for #.:\n".format(dnaSeq))
+   L(base) :ACGT
+      print(‘#10 #11’.format(base, counts[base]))
+   V others = 0
+   L(base) counts.keys()
+      I base !C :ACGT
+         others += counts[base]
+   print(‘     Other #11’.format(others))
+   print(‘  --------------------’)
+   print(‘  Total length #7’.format(dnaSeq.len))
+
+F headTailOverlap(s1, s2)
+   V start = 0
+   L
+      start = s1.findi(s2[0], start)
+      I start < 0
+         R 0
+      I s2.starts_with(s1[start ..])
+         R s1.len - start
+      start++
+
+F deduplicate(slist)
+   [String] r
+   V s = Set(slist)
+   L(s1) s
+      V i = L.index
+      L(s2) s
+         V j = L.index
+         I j != i & s1 C s2
+            L.break
+      L.was_no_break
+         r.append(s1)
+   R r
+
+F shortestCommonSuperstring(sl)
+   V slist = deduplicate(sl)
+   V result = slist.join(‘’)
+   L(perm) permutations(slist)
+      String sup = perm[0]
+      L(i) 0 .< slist.len - 1
+         V overlapPos = headTailOverlap(perm[i], perm[i + 1])
+         sup ‘’= perm[i + 1][overlapPos ..]
+      I sup.len < result.len
+         result = sup
+   R result
+
+V TestSequences = [[‘TA’, ‘AAG’, ‘TA’, ‘GAA’, ‘TA’], [‘CATTAGGG’, ‘ATTAG’, ‘GGG’, ‘TA’], [‘AAGAUGGA’, ‘GGAGCGCAUC’, ‘AUCGCAAUAAGGA’], [‘ATGAAATGGATGTTCTGAGTTGGTCAGTCCCAATGTGCGGGGTTTCTTTTAGTACGTCGGGAGTGGTATTAT’, ‘GGTCGATTCTGAGGACAAAGGTCAAGATGGAGCGCATCGAACGCAATAAGGATCATTTGATGGGACGTTTCGTCGACAAAGT’, ‘CTATGTTCTTATGAAATGGATGTTCTGAGTTGGTCAGTCCCAATGTGCGGGGTTTCTTTTAGTACGTCGGGAGTGGTATTATA’, ‘TGCTTTCCAATTATGTAAGCGTTCCGAGACGGGGTGGTCGATTCTGAGGACAAAGGTCAAGATGGAGCGCATC’, ‘AACGCAATAAGGATCATTTGATGGGACGTTTCGTCGACAAAGTCTTGTTTCGAGAGTAACGGCTACCGTCTT’, ‘GCGCATCGAACGCAATAAGGATCATTTGATGGGACGTTTCGTCGACAAAGTCTTGTTTCGAGAGTAACGGCTACCGTC’, ‘CGTTTCGTCGACAAAGTCTTGTTTCGAGAGTAACGGCTACCGTCTTCGATTCTGCTTATAACACTATGTTCT’, ‘TGCTTTCCAATTATGTAAGCGTTCCGAGACGGGGTGGTCGATTCTGAGGACAAAGGTCAAGATGGAGCGCATC’, ‘CGTAAAAAATTACAACGTCCTTTGGCTATCTCTTAAACTCCTGCTAAATGCTCGTGC’, ‘GATGGAGCGCATCGAACGCAATAAGGATCATTTGATGGGACGTTTCGTCGACAAAGTCTTGTTTCGAGAGTAACGGCTACCGTCTTCGATT’, ‘TTTCCAATTATGTAAGCGTTCCGAGACGGGGTGGTCGATTCTGAGGACAAAGGTCAAGATGGAGCGCATC’, ‘CTATGTTCTTATGAAATGGATGTTCTGAGTTGGTCAGTCCCAATGTGCGGGGTTTCTTTTAGTACGTCGGGAGTGGTATTATA’, ‘TCTCTTAAACTCCTGCTAAATGCTCGTGCTTTCCAATTATGTAAGCGTTCCGAGACGGGGTGGTCGATTCTGAGGACAAAGGTCAAGA’]]
+
+L(test) TestSequences
+   V scs = shortestCommonSuperstring(test)
+   printCounts(scs)
+===
+auto ACGT = create_array({u'A'_C, u'C'_C, u'G'_C, u'T'_C});
+
+template <typename T1> auto permutations(const T1 &slist)
+{
+    auto l = sorted(slist);
+    auto r = create_array({l});
+    while (l.next_permutation())
+        r.append(copy(l));
+    return r;
+}
+
+template <typename T1> auto printCounts(const T1 &dnaSeq)
+{
+    auto counts = DefaultDict<Char, int>();
+    for (auto &&c : dnaSeq)
+        counts[c]++;
+    print(u"\nNucleotide counts for #.:\n"_S.format(dnaSeq));
+    for (auto &&base : ::ACGT)
+        print(u"#10 #11"_S.format(base, counts[base]));
+    auto others = 0;
+    for (auto &&base : counts.keys())
+        if (!in(base, ::ACGT))
+            others += counts[base];
+    print(u"     Other #11"_S.format(others));
+    print(u"  --------------------"_S);
+    print(u"  Total length #7"_S.format(dnaSeq.len()));
+}
+
+template <typename T1, typename T2> auto headTailOverlap(const T1 &s1, const T2 &s2)
+{
+    auto start = 0;
+    while (true) {
+        start = s1.findi(_get<0>(s2), start);
+        if (start < 0)
+            return 0;
+        if (s2.starts_with(s1[range_ei(start)]))
+            return s1.len() - start;
+        start++;
+    }
+}
+
+template <typename T1> auto deduplicate(const T1 &slist)
+{
+    Array<String> r;
+    auto s = create_set(slist);
+    {int Lindex = 0;
+    for (auto &&s1 : s) {
+        auto i = Lindex;
+        {bool was_break = false;
+        {int Lindex = 0;
+        for (auto &&s2 : s) {
+            auto j = Lindex;
+            if (j != i && in(s1, s2)) {
+                was_break = true;
+                break;
+            }
+            Lindex++;
+        }}
+        if (!was_break)
+            r.append(s1);
+        }
+        Lindex++;
+    }}
+    return r;
+}
+
+template <typename T1> auto shortestCommonSuperstring(const T1 &sl)
+{
+    auto slist = deduplicate(sl);
+    auto result = slist.join(u""_S);
+    for (auto &&perm : permutations(slist)) {
+        String sup = _get<0>(perm);
+        for (auto i : range_el(0, slist.len() - 1)) {
+            auto overlapPos = headTailOverlap(perm[i], perm[i + 1]);
+            sup &= perm[i + 1][range_ei(overlapPos)];
+        }
+        if (sup.len() < result.len())
+            result = sup;
+    }
+    return result;
+}
+
+auto TestSequences = create_array({create_array({u"TA"_S, u"AAG"_S, u"TA"_S, u"GAA"_S, u"TA"_S}), create_array({u"CATTAGGG"_S, u"ATTAG"_S, u"GGG"_S, u"TA"_S}), create_array({u"AAGAUGGA"_S, u"GGAGCGCAUC"_S, u"AUCGCAAUAAGGA"_S}), create_array({u"ATGAAATGGATGTTCTGAGTTGGTCAGTCCCAATGTGCGGGGTTTCTTTTAGTACGTCGGGAGTGGTATTAT"_S, u"GGTCGATTCTGAGGACAAAGGTCAAGATGGAGCGCATCGAACGCAATAAGGATCATTTGATGGGACGTTTCGTCGACAAAGT"_S, u"CTATGTTCTTATGAAATGGATGTTCTGAGTTGGTCAGTCCCAATGTGCGGGGTTTCTTTTAGTACGTCGGGAGTGGTATTATA"_S, u"TGCTTTCCAATTATGTAAGCGTTCCGAGACGGGGTGGTCGATTCTGAGGACAAAGGTCAAGATGGAGCGCATC"_S, u"AACGCAATAAGGATCATTTGATGGGACGTTTCGTCGACAAAGTCTTGTTTCGAGAGTAACGGCTACCGTCTT"_S, u"GCGCATCGAACGCAATAAGGATCATTTGATGGGACGTTTCGTCGACAAAGTCTTGTTTCGAGAGTAACGGCTACCGTC"_S, u"CGTTTCGTCGACAAAGTCTTGTTTCGAGAGTAACGGCTACCGTCTTCGATTCTGCTTATAACACTATGTTCT"_S, u"TGCTTTCCAATTATGTAAGCGTTCCGAGACGGGGTGGTCGATTCTGAGGACAAAGGTCAAGATGGAGCGCATC"_S, u"CGTAAAAAATTACAACGTCCTTTGGCTATCTCTTAAACTCCTGCTAAATGCTCGTGC"_S, u"GATGGAGCGCATCGAACGCAATAAGGATCATTTGATGGGACGTTTCGTCGACAAAGTCTTGTTTCGAGAGTAACGGCTACCGTCTTCGATT"_S, u"TTTCCAATTATGTAAGCGTTCCGAGACGGGGTGGTCGATTCTGAGGACAAAGGTCAAGATGGAGCGCATC"_S, u"CTATGTTCTTATGAAATGGATGTTCTGAGTTGGTCAGTCCCAATGTGCGGGGTTTCTTTTAGTACGTCGGGAGTGGTATTATA"_S, u"TCTCTTAAACTCCTGCTAAATGCTCGTGCTTTCCAATTATGTAAGCGTTCCGAGACGGGGTGGTCGATTCTGAGGACAAAGGTCAAGA"_S})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&test : TestSequences) {
+            auto scs = shortestCommonSuperstring(test);
+            printCounts(scs);
+        }
+    }
+} code_block_1;
