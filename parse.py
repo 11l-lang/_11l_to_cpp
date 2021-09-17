@@ -1047,13 +1047,11 @@ class ASTNodeWithChildren(ASTNode):
         if (len(self.children) != 1
                 or (check_for_if and (type(self.children[0]) == ASTIf or has_if(self.children[0]))) # for correctly handling of dangling-else
                 or type(self.children[0]) == ASTLoopRemoveCurrentElementAndContinue # `L.remove_current_element_and_continue` ‘раскрывается в 2 строки кода’\‘is translated into 2 statements’
-                or (type(self.children[0]) == ASTTupleAssignment and self.children[0].is_multi_st())): # for `mx, mx_index = digit, i` in [https://www.rosettacode.org/wiki/Next_highest_int_from_digits#Python:_Algorithm_2]
+                or (type(self.children[0]) == ASTTupleAssignment and self.children[0].is_multi_st()) # for `mx, mx_index = digit, i` in [https://www.rosettacode.org/wiki/Next_highest_int_from_digits#Python:_Algorithm_2]
+                or (type(self.children[0]) == ASTLoop and self.children[0].has_L_was_no_break())):
             return self.children_to_str(indent, r, False)
         assert(len(self.children) == 1)
-        c0str = self.children[0].to_str(indent+1)
-        if c0str.startswith(' ' * ((indent+1)*4) + "was_break = true;\n"):
-            return self.children_to_str(indent, r, False)
-        return pre_nl(self.tokeni) + ' ' * (indent*4) + r + "\n" + c0str
+        return pre_nl(self.tokeni) + ' ' * (indent*4) + r + "\n" + self.children[0].to_str(indent+1)
 
 class ASTNodeWithExpression(ASTNode):
     expression : SymbolNode
@@ -1533,8 +1531,6 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
 
     def to_str(self, indent):
         r = ''
-        if self.has_L_was_no_break():
-            r = ' ' * (indent*4) + "{bool was_break = false;\n"
 
         loop_auto = False
         if self.expression is not None and self.expression.token.category == Token.Category.NUMERIC_LITERAL:
@@ -1594,11 +1590,22 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
         else:
             r += rr
 
-        if self.has_L_last_iteration:
+        if self.has_L_last_iteration: # {
             r = r[:-1] + "}\n"
 
-        if self.has_L_was_no_break(): # {
-            r += self.was_no_break_node.children_to_str_detect_single_stmt(indent, 'if (!was_break)') + ' ' * (indent*4) + "}\n"
+        if self.has_L_was_no_break():
+            curly_braces_needed = False
+            for c in self.was_no_break_node.children:
+                if isinstance(c, ASTVariableDeclaration):
+                    curly_braces_needed = True
+                    break
+            s = ''
+            for c in self.was_no_break_node.children:
+                s += c.to_str(indent)
+            if curly_braces_needed:
+                r += ' ' * (indent*4) + "{\n" + s + ' ' * (indent*4) + "}\n"
+            else:
+                r += s
 
         if self.break_label_needed != -1:
             r += ' ' * (indent*4) + 'break_' + ('' if self.break_label_needed == 0 else str(self.break_label_needed)) + ":;\n"
@@ -1629,20 +1636,17 @@ class ASTLoopBreak(ASTNode):
     token : Token
 
     def to_str(self, indent):
-        r = ''
         n = self.parent
         loop_level = 0
         while True:
             if type(n) == ASTLoop:
                 if loop_level == self.loop_level if self.loop_variable == '' else self.loop_variable == n.loop_variable:
-                    if n.has_L_was_no_break():
-                        r = ' ' * (indent*4) + "was_break = true;\n"
-                    if loop_level > 0:
+                    if n.has_L_was_no_break() or loop_level > 0:
                         if n.break_label_needed == -1:
                             global break_label_index
                             break_label_index += 1
                             n.break_label_needed = break_label_index
-                        return r + ' ' * (indent*4) + 'goto break_' + ('' if n.break_label_needed == 0 else str(n.break_label_needed)) + ";\n"
+                        return ' ' * (indent*4) + 'goto break_' + ('' if n.break_label_needed == 0 else str(n.break_label_needed)) + ";\n"
                     break
                 loop_level += 1
             n = n.parent
@@ -1658,13 +1662,13 @@ class ASTLoopBreak(ASTNode):
                         if n.break_label_needed == -1:
                             break_label_index += 1
                             n.break_label_needed = break_label_index
-                        return r + ' ' * (indent*4) + 'goto break_' + ('' if n.break_label_needed == 0 else str(n.break_label_needed)) + ";\n"
+                        return ' ' * (indent*4) + 'goto break_' + ('' if n.break_label_needed == 0 else str(n.break_label_needed)) + ";\n"
                     n = n.parent
             if type(n) == ASTLoop:
                 break
             n = n.parent
 
-        return r + ' ' * (indent*4) + "break;\n"
+        return ' ' * (indent*4) + "break;\n"
 
 class ASTLoopRemoveCurrentElementAndContinue(ASTNode):
     def to_str(self, indent):

@@ -1826,7 +1826,6 @@ template <typename T1, typename T2 = decltype(16), typename T3 = decltype(pow(2,
     auto s = create_array({n});
     auto slen = 1;
     auto _new_ = n;
-    {bool was_break = false;
     while (slen <= maxlen && _new_ < maxterm) {
         _new_ = pdsum(s.last());
         if (in(_new_, s)) {
@@ -1850,9 +1849,7 @@ template <typename T1, typename T2 = decltype(16), typename T3 = decltype(pow(2,
             slen++;
         }
     }
-    if (!was_break)
-        return make_tuple(u"non-terminating"_S, s);
-    }
+    return make_tuple(u"non-terminating"_S, s);
 }
 
 struct CodeBlock1

@@ -1023,19 +1023,15 @@ template <typename T1> auto deduplicate(const T1 &slist)
     {int Lindex = 0;
     for (auto &&s1 : s) {
         auto i = Lindex;
-        {bool was_break = false;
         {int Lindex = 0;
         for (auto &&s2 : s) {
             auto j = Lindex;
-            if (j != i && in(s1, s2)) {
-                was_break = true;
-                break;
-            }
+            if (j != i && in(s1, s2))
+                goto break_;
             Lindex++;
         }}
-        if (!was_break)
-            r.append(s1);
-        }
+        r.append(s1);
+        break_:;
         Lindex++;
     }}
     return r;

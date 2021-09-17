@@ -46,20 +46,17 @@ template <typename T1 = decltype(5)> auto monkey_coconuts(const T1 &sailors = 5)
     while (true) {
         auto n0 = nuts;
         Array<ivec3> wakes;
-        {bool was_break = false;
         for (auto sailor : range_ee(0, sailors)) {
             auto [portion, remainder] = divmod(n0, sailors);
             wakes.append(make_tuple(n0, portion, remainder));
             if (portion <= 0 || remainder != (sailor != sailors ? 1 : 0)) {
                 nuts++;
-                was_break = true;
-                break;
+                goto break_;
             }
             n0 = n0 - portion - remainder;
         }
-        if (!was_break)
-            return make_tuple(nuts, wakes);
-        }
+        return make_tuple(nuts, wakes);
+        break_:;
     }
 }
 
@@ -560,17 +557,13 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        {bool was_break = false;
-
         for (auto i : range_el(1, pow(10, 6)))
             if (is_square(non_square(i))) {
                 print(u"Square found "_S & i);
-                was_break = true;
-                break;
+                goto break_;
             }
-        if (!was_break)
-            print(u"No squares found"_S);
-        }
+        print(u"No squares found"_S);
+        break_:;
     }
 } code_block_2;
 
@@ -6113,17 +6106,13 @@ template <typename T1, typename T2> auto successive_primes(const T1 &primes, con
     for (auto i : range_el(0, primes.len() - dl)) {
         auto group = create_array({0}) * (dl + 1);
         _set<0>(group, primes[i]);
-        {bool was_break = false;
         for (auto j : range_el(i, i + dl)) {
-            if (primes[j + 1] - primes[j] != diffs[j - i]) {
-                was_break = true;
-                break;
-            }
+            if (primes[j + 1] - primes[j] != diffs[j - i])
+                goto break_;
             group.set(j - i + 1, primes[j + 1]);
         }
-        if (!was_break)
-            results.append(group);
-        }
+        results.append(group);
+        break_:;
     }
 
     return results;
@@ -7386,17 +7375,15 @@ template <typename T1> auto patience_sort(T1 &arr)
         return;
 
     Array<Array<int>> piles;
-    for (auto &&el : arr)
-        {bool was_break = false;
+    for (auto &&el : arr) {
         for (auto &pile : piles)
             if (pile.last() > el) {
                 pile.append(el);
-                was_break = true;
-                break;
+                goto break_;
             }
-        if (!was_break)
-            piles.append(create_array({el}));
-        }
+        piles.append(create_array({el}));
+        break_:;
+    }
 
     for (auto i : range_el(0, arr.len())) {
         auto min = _get<0>(piles).last();

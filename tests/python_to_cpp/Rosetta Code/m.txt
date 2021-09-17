@@ -941,8 +941,7 @@ template <typename T1, typename T2> auto multisplit(const T1 &text, const T2 &se
     auto lastmatch = 0;
     auto i = 0;
     auto matches = u""_S;
-    while (i < text.len())
-        {bool was_break = false;
+    while (i < text.len()) {
         {int Lindex = 0;
         for (auto &&s : sep) {
             auto j = Lindex;
@@ -952,14 +951,13 @@ template <typename T1, typename T2> auto multisplit(const T1 &text, const T2 &se
                 matches &= u"{"_S & s & u"}"_S;
                 lastmatch = i + s.len();
                 i += s.len();
-                was_break = true;
-                break;
+                goto break_;
             }
             Lindex++;
         }}
-        if (!was_break)
-            i++;
-        }
+        i++;
+        break_:;
+    }
     if (i > lastmatch)
         matches &= text[range_el(lastmatch, i)];
     return matches;

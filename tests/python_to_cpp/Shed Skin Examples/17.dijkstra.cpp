@@ -106,26 +106,21 @@ public:
     template <typename T1, typename T2> auto distance(const T1 &s, const T2 &ss)
     {
         double d;
-        {bool was_break = false;
         for (auto &&edge : ::G.e.filter([&s, &ss](const auto &e){return e.u == s && e.v == _get<0>(ss);})) {
             d = edge.d;
-            was_break = true;
-            break;
+            goto break_;
         }
-        if (!was_break)
-            assert(false);
-        }
+        assert(false);
+        break_:;
 
-        for (auto &&[u, v] : zip(ss[range_e_llen(0,  - 1)], ss[range_ei(1)]))
-            {bool was_break = false;
+        for (auto &&[u, v] : zip(ss[range_e_llen(0,  - 1)], ss[range_ei(1)])) {
             for (auto &&edge : ::G.e.filter([&u, &v](const auto &e){return e.u == u && e.v == v;})) {
                 d += edge.d;
-                was_break = true;
-                break;
+                goto break_1;
             }
-            if (!was_break)
-                assert(false);
-            }
+            assert(false);
+            break_1:;
+        }
         return d;
     }
 };

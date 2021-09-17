@@ -1576,22 +1576,18 @@ template <typename T1 = decltype(u""_S)> auto advance(const T1 &sid = u""_S)
     auto token = ::tokens[::tokeni];
     if (_get<0>(token).is_alpha()) {
         ::token_node->symbol = &::symbol_table[u"(var)"_S];
-        {bool was_break = false;
         {int Lindex = 0;
         for (auto &&_var_ : ::vars) {
             auto i = Lindex;
             if (_var_.name == token) {
                 ::token_node->var_index = i;
-                was_break = true;
-                break;
+                goto break_;
             }
             Lindex++;
         }}
-        if (!was_break) {
-            ::token_node->var_index = ::vars.len();
-            ::vars.append(Var(token));
-        }
-        }
+        ::token_node->var_index = ::vars.len();
+        ::vars.append(Var(token));
+        break_:;
     }
     else
         ::token_node->symbol = &::symbol_table[token];

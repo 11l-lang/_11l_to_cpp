@@ -2446,34 +2446,26 @@ template <typename T1, typename T2, typename T3, typename T4> auto place(const T
     for (auto i : range_el(0, n))
         for (auto j : range_el(0, n)) {
             auto pos = make_tuple(i, j);
-            {bool was_break = false;
             for (auto &&queen : pBlackQueens)
-                if (queen == pos || ((!placingBlack) && isAttacking(queen, pos))) {
-                    was_break = true;
-                    break;
-                }
-            if (!was_break)
-                {bool was_break = false;
-                for (auto &&queen : pWhiteQueens)
-                    if (queen == pos || (placingBlack && isAttacking(queen, pos))) {
-                        was_break = true;
-                        break;
-                    }
-                if (!was_break)
-                    if (placingBlack) {
-                        pBlackQueens.append(pos);
-                        placingBlack = false;
-                    }
-                    else {
-                        pWhiteQueens.append(pos);
-                        if (place(m - 1, n, pBlackQueens, pWhiteQueens))
-                            return true;
-                        pBlackQueens.pop();
-                        pWhiteQueens.pop();
-                        placingBlack = true;
-                    }
-                }
+                if (queen == pos || ((!placingBlack) && isAttacking(queen, pos)))
+                    goto break_;
+            for (auto &&queen : pWhiteQueens)
+                if (queen == pos || (placingBlack && isAttacking(queen, pos)))
+                    goto break_1;
+            if (placingBlack) {
+                pBlackQueens.append(pos);
+                placingBlack = false;
             }
+            else {
+                pWhiteQueens.append(pos);
+                if (place(m - 1, n, pBlackQueens, pWhiteQueens))
+                    return true;
+                pBlackQueens.pop();
+                pWhiteQueens.pop();
+                placingBlack = true;
+            }
+            break_1:;
+            break_:;
         }
 
     if (!placingBlack)
@@ -3076,16 +3068,13 @@ auto maxsum = 99;
 template <typename T1> auto get_primes(const T1 &max)
 {
     auto lprimes = create_array({2});
-    for (auto x : range_el(3, max + 1).step(2))
-        {bool was_break = false;
+    for (auto x : range_el(3, max + 1).step(2)) {
         for (auto &&p : lprimes)
-            if (mod(x, p) == 0) {
-                was_break = true;
-                break;
-            }
-        if (!was_break)
-            lprimes.append(x);
-        }
+            if (mod(x, p) == 0)
+                goto break_;
+        lprimes.append(x);
+        break_:;
+    }
     return lprimes;
 }
 

@@ -1081,17 +1081,15 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto n : range_ee(2, 9))
-            {bool was_break = false;
+        for (auto n : range_ee(2, 9)) {
             for (auto x : range_el(2, n))
                 if (mod(n, x) == 0) {
                     print(String(n) & u" equals "_S & String(x) & u" * "_S & String(n / x));
-                    was_break = true;
-                    break;
+                    goto break_;
                 }
-            if (!was_break)
-                print(String(n) & u" is a prime number"_S);
-            }
+            print(String(n) & u" is a prime number"_S);
+            break_:;
+        }
     }
 } code_block_1;
 
@@ -3135,3 +3133,37 @@ a : Optional[List[int]] = [1, 2, 3]
 [Int]? a = [1, 2, 3]
 ===
 Nullable<Array<int>> a = create_array({1, 2, 3});
+
+
+for i in range(3):
+    if i == 3:
+        break
+    print(i)
+else:
+    s = '-1'
+    print(s)
+===
+L(i) 3
+   I i == 3
+      L.break
+   print(i)
+L.was_no_break
+   V s = ‘-1’
+   print(s)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int i = 0; i < 3; i++) {
+            if (i == 3)
+                goto break_;
+            print(i);
+        }
+        {
+        auto s = u"-1"_S;
+        print(s);
+        }
+        break_:;
+    }
+} code_block_1;

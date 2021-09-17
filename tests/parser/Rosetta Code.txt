@@ -3236,17 +3236,15 @@ template <typename T1> auto patience_sort(T1 &arr)
         return;
 
     Array<Array<TYPE_OF(_get<0>(arr))>> piles;
-    for (auto &&el : arr)
-        {bool was_break = false;
+    for (auto &&el : arr) {
         for (auto &pile : piles)
             if (pile.last() > el) {
                 pile.append(el);
-                was_break = true;
-                break;
+                goto break_;
             }
-        if (!was_break)
-            piles.append(create_array({el}));
-        }
+        piles.append(create_array({el}));
+        break_:;
+    }
 
     for (auto i : range_el(0, arr.len())) {
         auto min = _get<0>(piles).last();

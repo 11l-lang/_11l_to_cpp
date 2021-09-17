@@ -133,19 +133,16 @@ struct CodeBlock1
 
         for (auto &&row : a)
             print(row.join(u" "_S));
-        {bool was_break = false;
 
         for (int i = 0; i < 17; i++) {
             _set<0>(idx, i);
             if (find_group(u"1"_S, i + 1, 17) || find_group(u"0"_S, i + 1, 17)) {
                 print(u"no good"_S);
-                was_break = true;
-                break;
+                goto break_;
             }
         }
-        if (!was_break)
-            print(u"all good"_S);
-        }
+        print(u"all good"_S);
+        break_:;
     }
 } code_block_1;
 
@@ -1596,34 +1593,27 @@ public:
 
     template <typename T1> auto add(const T1 &add)
     {
-        {bool was_break = false;
         {int Lindex = 0;
         for (auto &&r : ranges) {
             auto i = Lindex;
-            if (in(add, range_ee(_get<0>(r), _get<1>(r)))) {
-                was_break = true;
-                break;
-            }
+            if (in(add, range_ee(_get<0>(r), _get<1>(r))))
+                goto break_;
             else if (_get<0>(r) - 1 == add) {
                 _set<0>(r, add);
-                was_break = true;
-                break;
+                goto break_;
             }
             else if (_get<1>(r) + 1 == add) {
                 _set<1>(r, add);
-                was_break = true;
-                break;
+                goto break_;
             }
             else if (_get<0>(r) > add) {
                 ranges.insert(i, create_array({add, add}));
-                was_break = true;
-                break;
+                goto break_;
             }
             Lindex++;
         }}
-        if (!was_break)
-            ranges.append(create_array({add, add}));
-        }
+        ranges.append(create_array({add, add}));
+        break_:;
 
         consolidate();
     }

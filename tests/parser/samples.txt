@@ -547,18 +547,13 @@ F f()
 ===
 auto f()
 {
-    {bool was_break = false;
     for (auto &&n : create_array({1, 2, 3, 4})) {
-        if (n == 30) {
-            was_break = true;
-            break;
-        }
+        if (n == 30)
+            goto break_;
         print(n);
     }
-
-    if (!was_break)
-        print(u"no break"_S);
-    }
+    print(u"no break"_S);
+    break_:;
 }
 
 

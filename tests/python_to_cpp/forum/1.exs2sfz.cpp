@@ -454,43 +454,40 @@ public:
             auto gid = Lindex;
             if (!group.sequence())
                 goto on_continue;
-            {bool was_break = false;
 
             for (auto sequence : sequences)
-                if (false) {
-                    was_break = true;
-                    break;
-                }
-            if (!was_break) {
+                if (false)
+                    goto break_;
+            {
 
-                Array<int> sequence;
+            Array<int> sequence;
 
-                auto cont = true;
-                while (cont == true) {
-                    cont = false;
-                    {int Lindex = 0;
-                    for (auto &&g : groups) {
-                        auto gid2 = Lindex;
-                        if (g.sequence() == gid && !(gid2 == g.sequence()) && !(in(gid, sequence))) {
-                            sequence.append(gid);
-                            gid = gid2;
-                            cont = true;
-                            break;
-                        }
-                        Lindex++;
-                    }}
-                }
-
-                sequence.drop();
-                while (!(gid == -1) && !(in(gid, sequence))) {
-                    sequence.append(gid);
-                    gid = groups[gid].sequence();
-                }
-
-                if (sequence.len() > 1)
-                    sequences.append(sequence);
+            auto cont = true;
+            while (cont == true) {
+                cont = false;
+                {int Lindex = 0;
+                for (auto &&g : groups) {
+                    auto gid2 = Lindex;
+                    if (g.sequence() == gid && !(gid2 == g.sequence()) && !(in(gid, sequence))) {
+                        sequence.append(gid);
+                        gid = gid2;
+                        cont = true;
+                        break;
+                    }
+                    Lindex++;
+                }}
             }
+
+            sequence.drop();
+            while (!(gid == -1) && !(in(gid, sequence))) {
+                sequence.append(gid);
+                gid = groups[gid].sequence();
             }
+
+            if (sequence.len() > 1)
+                sequences.append(sequence);
+            }
+            break_:;
 } on_continue:
             Lindex++;
         }}
@@ -535,17 +532,14 @@ public:
 
             auto keyrange = ranges[key];
             auto group = _get<0>(keyrange).group();
-            {bool was_break = false;
 
             for (auto &&sequence : sequences)
                 if (in(group, sequence)) {
                     group = _get<0>(sequence);
-                    was_break = true;
-                    break;
+                    goto break_1;
                 }
-            if (!was_break)
-                continue;
-            }
+            continue;
+            break_1:;
 
             key_sequence.set(key, group);
         }
