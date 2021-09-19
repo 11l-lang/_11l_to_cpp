@@ -551,7 +551,7 @@ class SymbolNode:
                     s = self.scope
                     while True:
                         if s.is_function:
-                            if type(s.node.parent) == ASTTypeDefinition:
+                            if s.node is not None and type(s.node.parent) == ASTTypeDefinition:
                                 fid = s.parent.ids.get('copy')
                                 if fid is not None:
                                     func_name = '::copy'
@@ -780,7 +780,8 @@ class SymbolNode:
             if self.symbol.id == '.':
                 cts0 = self.children[0].token_str()
                 c1 = self.children[1].to_str()
-                if cts0 == '@':
+                if cts0.endswith('@'):
+                    assert(cts0 == '@' * len(cts0))
                     if self.scope.find_in_current_type_function(c1):
                         return 'this->' + c1
                     else:
