@@ -3167,3 +3167,37 @@ struct CodeBlock1
         break_:;
     }
 } code_block_1;
+
+
+class Bitmap:
+    def circle(self, x0, y0, radius):
+        f = 1 - radius
+
+bitmap = Bitmap()
+bitmap.circle(x0=12, y0=12, radius=12)
+===
+T Bitmap
+   F circle(x0, y0, radius)
+      V f = 1 - radius
+
+V bitmap = Bitmap()
+bitmap.circle(x0' 12, y0' 12, radius' 12)
+===
+class Bitmap
+{
+public:
+    template <typename T1, typename T2, typename T3> auto circle(const T1 &x0, const T2 &_y0_, const T3 &radius)
+    {
+        auto f = 1 - radius;
+    }
+};
+
+auto bitmap = Bitmap();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        bitmap.circle(12, 12, 12);
+    }
+} code_block_1;

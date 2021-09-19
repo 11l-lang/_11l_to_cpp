@@ -2013,6 +2013,9 @@ def next_token(): # why ‘next_token’: >[https://youtu.be/Nlqv6NtBXcA?t=1203]
                             tokensn.token_str_override = '@=_' + token.value(source)[2:] + '_'
                     elif token.value(source)[1:] in cpp_keywords:
                         tokensn.token_str_override = '@_' + token.value(source)[1:] + '_'
+                elif token.value(source)[-1] == "'":
+                    if token.value(source)[:-1] in cpp_keywords:
+                        tokensn.token_str_override = '_' + token.value(source)[:-1] + "_'"
                 elif token.value(source) in cpp_keywords:
                     tokensn.token_str_override = '_' + token.value(source) + '_'
             elif token.category == Token.Category.CONSTANT:
