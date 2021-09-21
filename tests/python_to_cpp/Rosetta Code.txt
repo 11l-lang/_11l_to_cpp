@@ -19327,3 +19327,262 @@ struct CodeBlock1
         bitmap.chardisplay();
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Bitwise_IO#Python
+from typing import BinaryIO, List
+Byte = int
+Char = str
+
+class BitWriter:
+    out : BinaryIO
+
+    def __init__(self, fname):
+        self.accumulator = 0
+        self.bcount = 0
+        self.out = open(fname, 'wb')
+
+    def _writebit(self, bit):
+        if self.bcount == 8:
+            self.flush()
+        if bit > 0:
+            self.accumulator |= 1 << (7-self.bcount)
+        self.bcount += 1
+
+    def writebits(self, bits, n):
+        while n > 0:
+            self._writebit(bits & 1 << (n-1))
+            n -= 1
+
+    def flush(self):
+        self.out.write(bytes([Byte(self.accumulator)]))
+        self.accumulator = 0
+        self.bcount = 0
+
+    def close(self):
+        self.flush()
+        self.out.close()
+
+class BitReader:
+    input : BinaryIO
+
+    def __init__(self, fname):
+        self.input = open(fname, 'rb')
+        self.accumulator = 0
+        self.bcount = 0
+        self.read = 0
+
+    def _readbit(self):
+        if self.bcount == 0:
+            a = self.input.read(1)
+            if len(a):
+                self.accumulator = a[0]
+            self.bcount = 8
+            self.read = len(a)
+        rv = (self.accumulator & (1 << (self.bcount-1))) >> (self.bcount-1)
+        self.bcount -= 1
+        return rv
+
+    def readbits(self, n):
+        v = 0
+        while n > 0:
+            v = (v << 1) | self._readbit()
+            n -= 1
+        return v
+
+writer = BitWriter('bitio_test.dat')
+chars = '12345abcde'
+for ch in chars:
+    writer.writebits(ord(ch), 7)
+writer.close()
+
+reader = BitReader('bitio_test.dat')
+charsa : List[Char] = []
+while True:
+    x = reader.readbits(7)
+    if reader.read == 0:  # End-of-file?
+        break
+    charsa.append(chr(x))
+print(''.join(charsa))
+===
+T BitWriter
+   File out
+   accumulator = 0
+   bcount = 0
+
+   F (fname)
+      .out = File(fname, ‘w’)
+
+   F _writebit(bit)
+      I .bcount == 8
+         .flush()
+      I bit > 0
+         .accumulator [|]= 1 << (7 - .bcount)
+      .bcount++
+
+   F writebits(bits, =n)
+      L n > 0
+         ._writebit(bits [&] 1 << (n - 1))
+         n--
+
+   F flush()
+      .out.write_bytes([Byte(.accumulator)])
+      .accumulator = 0
+      .bcount = 0
+
+   F close()
+      .flush()
+      .out.close()
+
+T BitReader
+   File input
+   accumulator = 0
+   bcount = 0
+   read = 0
+
+   F (fname)
+      .input = File(fname, ‘r’)
+
+   F _readbit()
+      I .bcount == 0
+         V a = .input.read_bytes(1)
+         I !a.empty
+            .accumulator = a[0]
+         .bcount = 8
+         .read = a.len
+      V rv = (.accumulator [&] (1 << (.bcount - 1))) >> (.bcount - 1)
+      .bcount--
+      R rv
+
+   F readbits(=n)
+      V v = 0
+      L n > 0
+         v = (v << 1) [|] ._readbit()
+         n--
+      R v
+
+V writer = BitWriter(‘bitio_test.dat’)
+V chars = ‘12345abcde’
+L(ch) chars
+   writer.writebits(ch.code, 7)
+writer.close()
+
+V reader = BitReader(‘bitio_test.dat’)
+[Char] charsa
+L
+   V x = reader.readbits(7)
+   I reader.read == 0
+      L.break
+   charsa.append(Char(code' x))
+print(charsa.join(‘’))
+===
+class BitWriter
+{
+public:
+    File out;
+    decltype(0) accumulator = 0;
+    decltype(0) bcount = 0;
+
+    template <typename T1> BitWriter(const T1 &fname)
+    {
+        out = File(fname, u"w"_S);
+    }
+
+    template <typename T1> auto _writebit(const T1 &bit)
+    {
+        if (bcount == 8)
+            flush();
+        if (bit > 0)
+            accumulator |= 1 << (7 - bcount);
+        bcount++;
+    }
+
+    template <typename T1, typename T2> auto writebits(const T1 &bits, T2 n)
+    {
+        while (n > 0) {
+            _writebit(bits & 1 << (n - 1));
+            n--;
+        }
+    }
+
+    auto flush()
+    {
+        out.write_bytes(create_array({Byte(accumulator)}));
+        accumulator = 0;
+        bcount = 0;
+    }
+
+    auto close()
+    {
+        flush();
+        out.close();
+    }
+};
+
+class BitReader
+{
+public:
+    File input;
+    decltype(0) accumulator = 0;
+    decltype(0) bcount = 0;
+    decltype(0) read = 0;
+
+    template <typename T1> BitReader(const T1 &fname)
+    {
+        input = File(fname, u"r"_S);
+    }
+
+    auto _readbit()
+    {
+        if (bcount == 0) {
+            auto a = input.read_bytes(1);
+            if (!a.empty())
+                accumulator = _get<0>(a);
+            bcount = 8;
+            read = a.len();
+        }
+        auto rv = (accumulator & (1 << (bcount - 1))) >> (bcount - 1);
+        bcount--;
+        return rv;
+    }
+
+    template <typename T1> auto readbits(T1 n)
+    {
+        auto v = 0;
+        while (n > 0) {
+            v = (v << 1) | _readbit();
+            n--;
+        }
+        return v;
+    }
+};
+
+auto writer = BitWriter(u"bitio_test.dat"_S);
+auto chars = u"12345abcde"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&ch : chars)
+            writer.writebits(ch.code, 7);
+        writer.close();
+    }
+} code_block_1;
+
+auto reader = BitReader(u"bitio_test.dat"_S);
+Array<Char> charsa;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (true) {
+            auto x = reader.readbits(7);
+            if (reader.read == 0)
+                break;
+            charsa.append(Char(x));
+        }
+        print(charsa.join(u""_S));
+    }
+} code_block_2;

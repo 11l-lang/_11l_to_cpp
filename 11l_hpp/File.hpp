@@ -90,6 +90,8 @@ class File
 	bool check_bom = true;
 
 public:
+	File() : file(NULL) {}
+
 	File(FILE *file) : file(file) {}
 
 	File(const File &f)
@@ -258,7 +260,8 @@ public:
 		Array<Byte> file_bytes;
 		file_bytes.resize(n);
 		size_t read = fread(file_bytes.data(), 1, n, file);
-		assert(read == n);
+		//assert(read == n);
+		file_bytes.resize(read);
 		return file_bytes;
 	}
 
