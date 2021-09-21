@@ -19133,7 +19133,7 @@ struct CodeBlock2
 
 # https://www.rosettacode.org/wiki/Bitmap/Python#Alternative_version
 from copy import copy
-from typing import NamedTuple
+from typing import NamedTuple, List
 
 Byte = int
 class Colour(NamedTuple):

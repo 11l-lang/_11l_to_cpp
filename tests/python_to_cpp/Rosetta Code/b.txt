@@ -1065,3 +1065,2331 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Bioinformatics/Sequence_mutation#Python
+UInt32 = int
+
+seed : UInt32 = 0
+def nonrandom(n):
+    global seed
+    seed = (1664525 * seed + 1013904223) & 0xFFFF_FFFF
+    return int(seed >> 16) % n
+def nonrandom_choice(lst):
+    return lst[nonrandom(len(lst))]
+
+#from collections import Counter
+import collections
+
+def basecount(dna):
+    #return sorted(Counter(dna).items())
+    d = collections.defaultdict(int) # Char
+    for c in dna:
+        d[c] += 1
+    return sorted(d.items())
+
+def seq_split(dna, n=50):
+    return [dna[i: i+n] for i in range(0, len(dna), n)]
+
+def seq_pp(dna, n=50):
+    for i, part in enumerate(seq_split(dna, n)):
+        print("{:>5}: {}".format(i*n, part))
+    print("\n  BASECOUNT:")
+    tot = 0
+    for base, count in basecount(dna):
+        print("    {:>3}: {}".format(base, count))
+        tot += count
+    (base, count) = ('TOT', tot)
+    print("    {:>3}= {}".format(base, count))
+
+def seq_mutate(dna : str, count=1, kinds="IDSSSS", choice="ATCG" ):
+    mutation : List[Tuple[str, int]] = []
+    k2txt = {'I': 'Insert', 'D': 'Delete', 'S': 'Substitute'}
+    for _ in range(count):
+        kind = nonrandom_choice(kinds)
+        index = nonrandom(len(dna) + 1)
+        if kind == 'I':    # Insert
+            dna = dna[:index] + nonrandom_choice(choice) + dna[index:]
+        elif kind == 'D' and len(dna) != 0:  # Delete
+            dna = dna[:index] + dna[index+1:]
+        elif kind == 'S' and len(dna) != 0:  # Substitute
+            dna = dna[:index] + nonrandom_choice(choice) + dna[index+1:]
+        mutation.append((k2txt[kind], index))
+    return (dna, mutation)
+
+#length = 250
+print("SEQUENCE:")
+#sequence = ''.join(nonrandom_choices('ACGT', weights=(1, 0.8, .9, 1.1), k=length))
+sequence = 'TCAATCATTAATCGATTAATACATTCAATTTGAACATCTCCAGGAGAAGGCAGGGTAATCTCGTGTAGCCGTGCTTGGGGCCTCCGATATGGCCGGGGAATTTCAAAGTATAGTGTGCATCCCCTCATAATACATAGATCTATAGGTAAGTATATGGGTTGACGTTGTTAGATGCGATACACGTGCACACTTTATGAATTTTACGTTCCTCTGCCTAGAGTGCCAAGTTTCAATTTGCTACGGTTCCTCA'
+seq_pp(sequence)
+print("\n\nMUTATIONS:")
+(mseq, m) = seq_mutate(sequence, 10)
+for kind, index in m:
+    print(" {:>10} @{}".format(kind, index))
+print()
+seq_pp(mseq)
+===
+UInt32 seed = 0
+F nonrandom(n)
+   :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
+   R Int(:seed >> 16) % n
+F nonrandom_choice(lst)
+   R lst[nonrandom(lst.len)]
+
+F basecount(dna)
+   V d = DefaultDict[Char, Int]()
+   L(c) dna
+      d[c]++
+   R sorted(d.items())
+
+F seq_split(dna, n = 50)
+   R (0 .< dna.len).step(n).map(i -> @dna[i .< i + @n])
+
+F seq_pp(dna, n = 50)
+   L(part) seq_split(dna, n)
+      V i = L.index
+      print(‘#5: #.’.format(i * n, part))
+   print("\n  BASECOUNT:")
+   V tot = 0
+   L(base, count) basecount(dna)
+      print(‘    #3: #.’.format(base, count))
+      tot += count
+   V (base, count) = (‘TOT’, tot)
+   print(‘    #3= #.’.format(base, count))
+
+F seq_mutate(String =dna; count = 1, kinds = ‘IDSSSS’, choice = ‘ATCG’)
+   [(String, Int)] mutation
+   V k2txt = [‘I’ = ‘Insert’, ‘D’ = ‘Delete’, ‘S’ = ‘Substitute’]
+   L(_) 0 .< count
+      V kind = nonrandom_choice(kinds)
+      V index = nonrandom(dna.len + 1)
+      I kind == ‘I’
+         dna = dna[0 .< index]‘’nonrandom_choice(choice)‘’dna[index ..]
+      E I kind == ‘D’ & !dna.empty
+         dna = dna[0 .< index]‘’dna[index + 1 ..]
+      E I kind == ‘S’ & !dna.empty
+         dna = dna[0 .< index]‘’nonrandom_choice(choice)‘’dna[index + 1 ..]
+      mutation.append((k2txt[kind], index))
+   R (dna, mutation)
+
+print(‘SEQUENCE:’)
+V sequence = ‘TCAATCATTAATCGATTAATACATTCAATTTGAACATCTCCAGGAGAAGGCAGGGTAATCTCGTGTAGCCGTGCTTGGGGCCTCCGATATGGCCGGGGAATTTCAAAGTATAGTGTGCATCCCCTCATAATACATAGATCTATAGGTAAGTATATGGGTTGACGTTGTTAGATGCGATACACGTGCACACTTTATGAATTTTACGTTCCTCTGCCTAGAGTGCCAAGTTTCAATTTGCTACGGTTCCTCA’
+seq_pp(sequence)
+print("\n\nMUTATIONS:")
+V (mseq, m) = seq_mutate(sequence, 10)
+L(kind, index) m
+   print(‘ #10 @#.’.format(kind, index))
+print()
+seq_pp(mseq)
+===
+uint32_t seed = 0;
+template <typename T1> auto nonrandom(const T1 &n)
+{
+    ::seed = (1664525 * ::seed + 1013904223) & 0xFFFF'FFFF;
+    return mod(to_int(::seed >> 16), n);
+}
+template <typename T1> auto nonrandom_choice(const T1 &lst)
+{
+    return lst[nonrandom(lst.len())];
+}
+
+template <typename T1> auto basecount(const T1 &dna)
+{
+    auto d = DefaultDict<Char, int>();
+    for (auto &&c : dna)
+        d[c]++;
+    return sorted(d.items());
+}
+
+template <typename T1, typename T2 = decltype(50)> auto seq_split(const T1 &dna, const T2 &n = 50)
+{
+    return range_el(0, dna.len()).step(n).map([&dna, &n](const auto &i){return dna[range_el(i, i + n)];});
+}
+
+template <typename T1, typename T2 = decltype(50)> auto seq_pp(const T1 &dna, const T2 &n = 50)
+{
+    {int Lindex = 0;
+    for (auto &&part : seq_split(dna, n)) {
+        auto i = Lindex;
+        print(u"#5: #."_S.format(i * n, part));
+        Lindex++;
+    }}
+    print(u"\n  BASECOUNT:"_S);
+    auto tot = 0;
+    for (auto &&[base, count] : basecount(dna)) {
+        print(u"    #3: #."_S.format(base, count));
+        tot += count;
+    }
+    auto [base, count] = make_tuple(u"TOT"_S, tot);
+    print(u"    #3= #."_S.format(base, count));
+}
+
+template <typename T2 = decltype(1), typename T3 = decltype(u"IDSSSS"_S), typename T4 = decltype(u"ATCG"_S)> auto seq_mutate(String dna, const T2 &count = 1, const T3 &kinds = u"IDSSSS"_S, const T4 &choice = u"ATCG"_S)
+{
+    Array<Tuple<String, int>> mutation;
+    auto k2txt = create_dict(dict_of(u'I'_C, u"Insert"_S)(u'D'_C, u"Delete"_S)(u'S'_C, u"Substitute"_S));
+    for (auto _ : range_el(0, count)) {
+        auto kind = nonrandom_choice(kinds);
+        auto index = nonrandom(dna.len() + 1);
+        if (kind == u'I')
+            dna = dna[range_el(0, index)] & nonrandom_choice(choice) & dna[range_ei(index)];
+        else if (kind == u'D' && !dna.empty())
+            dna = dna[range_el(0, index)] & dna[range_ei(index + 1)];
+        else if (kind == u'S' && !dna.empty())
+            dna = dna[range_el(0, index)] & nonrandom_choice(choice) & dna[range_ei(index + 1)];
+        mutation.append(make_tuple(k2txt[kind], index));
+    }
+    return make_tuple(dna, mutation);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"SEQUENCE:"_S);
+    }
+} code_block_1;
+
+auto sequence = u"TCAATCATTAATCGATTAATACATTCAATTTGAACATCTCCAGGAGAAGGCAGGGTAATCTCGTGTAGCCGTGCTTGGGGCCTCCGATATGGCCGGGGAATTTCAAAGTATAGTGTGCATCCCCTCATAATACATAGATCTATAGGTAAGTATATGGGTTGACGTTGTTAGATGCGATACACGTGCACACTTTATGAATTTTACGTTCCTCTGCCTAGAGTGCCAAGTTTCAATTTGCTACGGTTCCTCA"_S;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        seq_pp(sequence);
+        print(u"\n\nMUTATIONS:"_S);
+    }
+} code_block_2;
+
+auto [mseq, m] = seq_mutate(sequence, 10);
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        for (auto &&[kind, index] : m)
+            print(u" #10 @#."_S.format(kind, index));
+        print();
+        seq_pp(mseq);
+    }
+} code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Bioinformatics/Subsequence#Python
+UInt32 = int
+
+seed : UInt32 = 34
+def nonrandom_choice(lst):
+    global seed
+    seed = (1664525 * seed + 1013904223) & 0xFFFF_FFFF
+    return lst[int(seed >> 16) % len(lst)]
+
+def generate_sequence(n: int):
+    return "".join([ nonrandom_choice(['A','C','G','T']) for _ in range(n) ])
+
+def positions(dnaSeq, subSeq):
+    r : List[int] = []
+    start = 0
+    while True:
+        pos = dnaSeq.find(subSeq, start)
+        if pos < 0: break
+        r.append(pos)
+        start = pos + 1
+    return r
+
+def dna_findall(needle: str, haystack: str) -> None:
+    pp = positions(haystack, needle)
+    if len(pp) == 0:
+        print("No matches found")
+    else:
+        print("Found", needle, "at the following indices:")
+        for p in pp:
+            print(str(p) + ':' + str(p + len(needle)))
+
+dna_seq = generate_sequence(200)
+sample_seq = generate_sequence(4)
+
+c = 1
+for i in dna_seq:
+    print(i, end="") if c % 20 != 0 else print(i)
+    c += 1
+print("\nSearch Sample:", sample_seq)
+
+dna_findall(sample_seq, dna_seq)
+===
+UInt32 seed = 34
+F nonrandom_choice(lst)
+   :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
+   R lst[Int(:seed >> 16) % lst.len]
+
+F generate_sequence(Int n)
+   R ((0 .< n).map(_ -> nonrandom_choice([‘A’, ‘C’, ‘G’, ‘T’]))).join(‘’)
+
+F positions(dnaSeq, subSeq)
+   [Int] r
+   V start = 0
+   L
+      V pos = dnaSeq.findi(subSeq, start)
+      I pos < 0
+         L.break
+      r.append(pos)
+      start = pos + 1
+   R r
+
+F dna_findall(String needle, String haystack) -> N
+   V pp = positions(haystack, needle)
+   I pp.empty
+      print(‘No matches found’)
+   E
+      print(‘Found ’needle‘ at the following indices:’)
+      L(p) pp
+         print(String(p)‘:’String(p + needle.len))
+
+V dna_seq = generate_sequence(200)
+V sample_seq = generate_sequence(4)
+
+V c = 1
+L(i) dna_seq
+   I c % 20 != 0 {print(i, end' ‘’)} E print(i)
+   c++
+print("\nSearch Sample: "sample_seq)
+
+dna_findall(sample_seq, dna_seq)
+===
+uint32_t seed = 34;
+template <typename T1> auto nonrandom_choice(const T1 &lst)
+{
+    ::seed = (1664525 * ::seed + 1013904223) & 0xFFFF'FFFF;
+    return lst[mod(to_int(::seed >> 16), lst.len())];
+}
+
+auto generate_sequence(const int n)
+{
+    return (range_el(0, n).map([](const auto &_){return nonrandom_choice(create_array({u'A'_C, u'C'_C, u'G'_C, u'T'_C}));})).join(u""_S);
+}
+
+template <typename T1, typename T2> auto positions(const T1 &dnaSeq, const T2 &subSeq)
+{
+    Array<int> r;
+    auto start = 0;
+    while (true) {
+        auto pos = dnaSeq.findi(subSeq, start);
+        if (pos < 0)
+            break;
+        r.append(pos);
+        start = pos + 1;
+    }
+    return r;
+}
+
+void dna_findall(const String &needle, const String &haystack)
+{
+    auto pp = positions(haystack, needle);
+    if (pp.empty())
+        print(u"No matches found"_S);
+    else {
+        print(u"Found "_S & needle & u" at the following indices:"_S);
+        for (auto &&p : pp)
+            print(String(p) & u":"_S & String(p + needle.len()));
+    }
+}
+
+auto dna_seq = generate_sequence(200);
+auto sample_seq = generate_sequence(4);
+
+auto c = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&i : dna_seq) {
+            if (mod(c, 20) != 0)
+                print(i, u""_S);
+            else
+                print(i);
+            c++;
+        }
+        print(u"\nSearch Sample: "_S & sample_seq);
+
+        dna_findall(sample_seq, dna_seq);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Biorhythms#Python
+import datetime, math
+
+def biorhythms(birthdate_str, targetdate_str):
+    """
+    Print out biorhythm data for targetdate assuming you were
+    born on birthdate.
+
+    birthdate and targetdata are strings in this format:
+
+    YYYY-MM-DD e.g. 1964-12-26
+    """
+
+    # print dates
+
+    print("Born: "+birthdate_str+" Target: "+targetdate_str)
+
+    # convert to date types - Python 3.7 or later
+
+    birthdate = datetime.datetime.strptime(birthdate_str, '%Y-%m-%d')
+    targetdate = datetime.datetime.strptime(targetdate_str, '%Y-%m-%d')
+
+    # days between
+
+    days = (targetdate - birthdate).days
+
+    print("Day: "+str(days))
+
+    # cycle logic - mostly from Julia example
+
+    cycle_labels = ["Physical", "Emotional", "Mental"]
+    cycle_lengths = [23, 28, 33]
+    quadrants = [("up and rising", "peak"), ("up but falling", "transition"),
+                   ("down and falling", "valley"), ("down but rising", "transition")]
+
+    for i in range(3):
+        label = cycle_labels[i]
+        length = cycle_lengths[i]
+        position = days % length
+        quadrant = int(math.floor((4 * position) / length))
+        percentage = int(round(100 * math.sin(2 * math.pi * position / length),0))
+        transition_date = (targetdate + datetime.timedelta(days=math.floor((quadrant + 1)/4 * length) - position)).strftime('%Y-%m-%d')
+        (trend, next) = quadrants[quadrant]
+
+        description : str
+        if percentage > 95:
+            description = "peak"
+        elif percentage < -95:
+             description = "valley"
+        elif abs(percentage) < 5:
+             description = "critical transition"
+        else:
+             description = str(percentage)+"% ("+trend+", next "+next+" "+transition_date+")"
+        print(label+" day "+str(position)+": "+description)
+
+biorhythms("2043-03-09","2072-07-11")
+===
+F biorhythms(birthdate_str, targetdate_str)
+   ‘
+    Print out biorhythm data for targetdate assuming you were
+    born on birthdate.
+
+    birthdate and targetdata are strings in this format:
+
+    YYYY-MM-DD e.g. 1964-12-26
+    ’
+
+   print(‘Born: ’birthdate_str‘ Target: ’targetdate_str)
+
+   V birthdate = time:strptime(birthdate_str, ‘%Y-%m-%d’)
+   V targetdate = time:strptime(targetdate_str, ‘%Y-%m-%d’)
+
+   V days = (targetdate - birthdate).days()
+
+   print(‘Day: ’String(days))
+
+   V cycle_labels = [‘Physical’, ‘Emotional’, ‘Mental’]
+   V cycle_lengths = [23, 28, 33]
+   V quadrants = [(‘up and rising’, ‘peak’), (‘up but falling’, ‘transition’), (‘down and falling’, ‘valley’), (‘down but rising’, ‘transition’)]
+
+   L(i) 3
+      V label = cycle_labels[i]
+      V length = cycle_lengths[i]
+      V position = days % length
+      V quadrant = Int(floor((4 * position) / length))
+      V percentage = Int(round(100 * sin(2 * math:pi * position / length), 0))
+      V transition_date = (targetdate + TimeDelta(days' floor((quadrant + 1) / 4 * length) - position)).strftime(‘%Y-%m-%d’)
+      V (trend, next) = quadrants[quadrant]
+
+      String description
+      I percentage > 95
+         description = ‘peak’
+      E I percentage < -95
+         description = ‘valley’
+      E I abs(percentage) < 5
+         description = ‘critical transition’
+      E
+         description = String(percentage)‘% (’trend‘, next ’next‘ ’transition_date‘)’
+      print(label‘ day ’String(position)‘: ’description)
+
+biorhythms(‘2043-03-09’, ‘2072-07-11’)
+===
+template <typename T1, typename T2> auto biorhythms(const T1 &birthdate_str, const T2 &targetdate_str)
+{
+    uR"(
+    Print out biorhythm data for targetdate assuming you were
+    born on birthdate.
+
+    birthdate and targetdata are strings in this format:
+
+    YYYY-MM-DD e.g. 1964-12-26
+    )"_S;
+
+    print(u"Born: "_S & birthdate_str & u" Target: "_S & targetdate_str);
+
+    auto birthdate = timens::strptime(birthdate_str, u"%Y-%m-%d"_S);
+    auto targetdate = timens::strptime(targetdate_str, u"%Y-%m-%d"_S);
+
+    auto days = (targetdate - birthdate).days();
+
+    print(u"Day: "_S & String(days));
+
+    auto cycle_labels = create_array({u"Physical"_S, u"Emotional"_S, u"Mental"_S});
+    auto cycle_lengths = create_array({23, 28, 33});
+    auto quadrants = create_array({make_tuple(u"up and rising"_S, u"peak"_S), make_tuple(u"up but falling"_S, u"transition"_S), make_tuple(u"down and falling"_S, u"valley"_S), make_tuple(u"down but rising"_S, u"transition"_S)});
+
+    for (int i = 0; i < 3; i++) {
+        auto label = cycle_labels[i];
+        auto length = cycle_lengths[i];
+        auto position = mod(days, length);
+        auto quadrant = to_int(floor((4 * position) / length));
+        auto percentage = to_int(round(100 * sin(2 * math::pi * position / length), 0));
+        auto transition_date = (targetdate + TimeDelta(floor((quadrant + 1) / 4.0 * length) - position)).strftime(u"%Y-%m-%d"_S);
+        auto [trend, next] = quadrants[quadrant];
+
+        String description;
+        if (percentage > 95)
+            description = u"peak"_S;
+        else if (percentage < -95)
+            description = u"valley"_S;
+        else if (abs(percentage) < 5)
+            description = u"critical transition"_S;
+        else
+            description = String(percentage) & u"% ("_S & trend & u", next "_S & next & u" "_S & transition_date & u")"_S;
+        print(label & u" day "_S & String(position) & u": "_S & description);
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        biorhythms(u"2043-03-09"_S, u"2072-07-11"_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Birthday_problem#D
+import random
+
+def equal_birthdays(sharers, groupsize, rep):
+    eq = 0
+    for j in range(rep):
+        group = [0] * 365
+        for i in range(groupsize):
+            group[random.randrange(len(group))] += 1
+        if any(c >= sharers for c in group):
+            eq += 1
+    return (eq * 100.) / rep
+
+group_est = 2
+for sharers in range(2, 6):
+    groupsize = group_est + 1
+    # Coarse
+    while equal_birthdays(sharers, groupsize, 100) < 50.:
+        groupsize += 1
+
+    # Finer
+    for gs in range(int(groupsize - (groupsize - group_est)/4.), groupsize + 999):
+        eq = equal_birthdays(sharers, gs, 250)
+        if eq > 50.:
+            groupsize = gs
+            break
+
+    # Finest
+    for gs in range(groupsize - 1, groupsize + 999):
+        eq = equal_birthdays(sharers, gs, 50_000)
+        if eq > 50.:
+            group_est = gs
+            print("%i independent people in a group of %s share a common birthday. (%5.1f)" % (sharers, gs, eq))
+            break
+===
+F equal_birthdays(sharers, groupsize, rep)
+   V eq = 0
+   L(j) 0 .< rep
+      V group = [0] * 365
+      L(i) 0 .< groupsize
+         group[random:(group.len)]++
+      I any(group.map(c -> c >= @sharers))
+         eq++
+   R (eq * 100.) / rep
+
+V group_est = 2
+L(sharers) 2..5
+   V groupsize = group_est + 1
+   L equal_birthdays(sharers, groupsize, 100) < 50.
+      groupsize++
+
+   L(gs) Int(groupsize - (groupsize - group_est) / 4.) .< groupsize + 999
+      V eq = equal_birthdays(sharers, gs, 250)
+      I eq > 50.
+         groupsize = gs
+         L.break
+
+   L(gs) groupsize - 1 .< groupsize + 999
+      V eq = equal_birthdays(sharers, gs, 50'000)
+      I eq > 50.
+         group_est = gs
+         print(‘#. independent people in a group of #. share a common birthday. (#3.1)’.format(sharers, gs, eq))
+         L.break
+===
+template <typename T1, typename T2, typename T3> auto equal_birthdays(const T1 &sharers, const T2 &groupsize, const T3 &rep)
+{
+    auto eq = 0;
+    for (auto j : range_el(0, rep)) {
+        auto group = create_array({0}) * 365;
+        for (auto i : range_el(0, groupsize))
+            group[randomns::_(group.len())]++;
+        if (any_map(group, [&sharers](const auto &c){return c >= sharers;}))
+            eq++;
+    }
+    return (eq * 100.) / rep;
+}
+
+auto group_est = 2;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto sharers : range_ee(2, 5)) {
+            auto groupsize = group_est + 1;
+            while (equal_birthdays(sharers, groupsize, 100) < 50.)
+                groupsize++;
+
+            for (auto gs : range_el(to_int(groupsize - (groupsize - group_est) / 4.), groupsize + 999)) {
+                auto eq = equal_birthdays(sharers, gs, 250);
+                if (eq > 50.) {
+                    groupsize = gs;
+                    break;
+                }
+            }
+
+            for (auto gs : range_el(groupsize - 1, groupsize + 999)) {
+                auto eq = equal_birthdays(sharers, gs, 50'000);
+                if (eq > 50.) {
+                    group_est = gs;
+                    print(u"#. independent people in a group of #. share a common birthday. (#3.1)"_S.format(sharers, gs, eq));
+                    break;
+                }
+            }
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Bitmap/Bresenham%27s_line_algorithm#Python
+from copy import copy
+from typing import NamedTuple, List
+
+Byte = int
+class Colour(NamedTuple):
+    r : Byte
+    g : Byte
+    b : Byte
+
+    def __eq__(self, other):
+        return self.r == other.r and self.g == other.g and self.b == other.b
+
+black = Colour(0,0,0)
+white = Colour(255,255,255) # Colour ranges are not enforced.
+
+class Bitmap:
+    width : int
+    height : int
+    background : Colour
+    map : List[List[Colour]]
+
+    def __init__(self, width = 40, height = 40, background=white):
+        assert width > 0 and height > 0# and type(background) == Colour
+        self.width = width
+        self.height = height
+        self.background = background
+        self.map = [[copy(background) for w in range(width)] for h in range(height)]
+
+    def fillrect(self, x, y, width, height, colour=black):
+        assert x >= 0 and y >= 0 and width > 0 and height > 0# and type(colour) == Colour
+        for h in range(height):
+            for w in range(width):
+                self.map[y+h][x+w] = copy(colour)
+
+    def chardisplay(self):
+        txt = [''.join((' ' if bit==self.background else '@')
+                       for bit in row)
+               for row in self.map]
+        # Boxing
+        txt = ['|'+row+'|' for row in txt]
+        txt.insert(0, '+' + '-' * self.width + '+')
+        txt.append('+' + '-' * self.width + '+')
+        print('\n'.join(reversed(txt)))
+
+    def set(self, x, y, colour=black):
+        #assert type(colour) == Colour
+        self.map[y][x]=colour
+
+    def get(self, x, y):
+        return self.map[y][x]
+
+    def line(self, x0, y0, x1, y1):
+        "Bresenham's line algorithm"
+        dx = abs(x1 - x0)
+        dy = abs(y1 - y0)
+        (x, y) = (x0, y0)
+        sx = -1 if x0 > x1 else 1
+        sy = -1 if y0 > y1 else 1
+        if dx > dy:
+            err = dx / 2.0
+            while x != x1:
+                self.set(x, y)
+                err -= dy
+                if err < 0:
+                    y += sy
+                    err += dx
+                x += sx
+        else:
+            err = dy / 2.0
+            while y != y1:
+                self.set(x, y)
+                err -= dx
+                if err < 0:
+                    x += sx
+                    err += dy
+                y += sy
+        self.set(x, y)
+
+bitmap = Bitmap(17,17)
+for x0, y0, x1, y1 in ((1,8,8,16),(8,16,16,8),(16,8,8,1),(8,1,1,8)):
+    bitmap.line(x0, y0, x1, y1)
+bitmap.chardisplay()
+===
+T Colour
+   Byte r
+   Byte g
+   Byte b
+
+   F ==(other)
+      R .r == other.r & .g == other.g & .b == other.b
+   F (r, g, b)
+      .r = r
+      .g = g
+      .b = b
+
+V black = Colour(0, 0, 0)
+V white = Colour(255, 255, 255)
+
+T Bitmap
+   Int width
+   Int height
+   Colour background
+   [[Colour]] map
+
+   F (width = 40, height = 40, background = white)
+      assert(width > 0 & height > 0)
+      .width = width
+      .height = height
+      .background = background
+      .map = (0 .< height).map(h -> (0 .< @width).map(w -> copy(@@background)))
+
+   F fillrect(x, y, width, height, colour = black)
+      assert(x >= 0 & y >= 0 & width > 0 & height > 0)
+      L(h) 0 .< height
+         L(w) 0 .< width
+            .map[y + h][x + w] = copy(colour)
+
+   F chardisplay()
+      V txt = .map.map(row -> row.map(bit -> (I bit == @@.background {‘ ’} E ‘@’)).join(‘’))
+      txt = txt.map(row -> ‘|’row‘|’)
+      txt.insert(0, ‘+’(‘-’ * .width)‘+’)
+      txt.append(‘+’(‘-’ * .width)‘+’)
+      print(reversed(txt).join("\n"))
+
+   F set(x, y, colour = black)
+      .map[y][x] = colour
+
+   F get(x, y)
+      R .map[y][x]
+
+   F line(x0, y0, x1, y1)
+      ‘Bresenham's line algorithm’
+      V dx = abs(x1 - x0)
+      V dy = abs(y1 - y0)
+      V (x, y) = (x0, y0)
+      V sx = I x0 > x1 {-1} E 1
+      V sy = I y0 > y1 {-1} E 1
+      I dx > dy
+         V err = dx / 2.0
+         L x != x1
+            .set(x, y)
+            err -= dy
+            I err < 0
+               y += sy
+               err += dx
+            x += sx
+      E
+         V err = dy / 2.0
+         L y != y1
+            .set(x, y)
+            err -= dx
+            I err < 0
+               x += sx
+               err += dy
+            y += sy
+      .set(x, y)
+
+V bitmap = Bitmap(17, 17)
+L(x0, y0, x1, y1) ((1, 8, 8, 16), (8, 16, 16, 8), (16, 8, 8, 1), (8, 1, 1, 8))
+   bitmap.line(x0, y0, x1, y1)
+bitmap.chardisplay()
+===
+class Colour
+{
+public:
+    Byte r;
+    Byte g;
+    Byte b;
+
+    template <typename T1> auto operator==(const T1 &other) const
+    {
+        return r == other.r && g == other.g && b == other.b;
+    }
+    template <typename T1, typename T2, typename T3> Colour(const T1 &r, const T2 &g, const T3 &b) :
+        r(r),
+        g(g),
+        b(b)
+    {
+    }
+};
+
+auto black = Colour(0, 0, 0);
+auto white = Colour(255, 255, 255);
+
+class Bitmap
+{
+public:
+    int width;
+    int height;
+    Colour background;
+    Array<Array<Colour>> map;
+
+    template <typename T1 = decltype(40), typename T2 = decltype(40), typename T3 = decltype(white)> Bitmap(const T1 &width = 40, const T2 &height = 40, const T3 &background = white) :
+        width(width),
+        height(height),
+        background(background)
+    {
+        assert(width > 0 && height > 0);
+        map = range_el(0, height).map([&background, &width](const auto &h){return range_el(0, width).map([&background](const auto &w){return copy(background);});});
+    }
+
+    template <typename T1, typename T2, typename T3, typename T4, typename T5 = decltype(black)> auto fillrect(const T1 &x, const T2 &y, const T3 &width, const T4 &height, const T5 &colour = black)
+    {
+        assert(x >= 0 && y >= 0 && width > 0 && height > 0);
+        for (auto h : range_el(0, height))
+            for (auto w : range_el(0, width))
+                map[y + h].set(x + w, copy(colour));
+    }
+
+    auto chardisplay()
+    {
+        auto txt = map.map([this](const auto &row){return row.map([this](const auto &bit){return (bit == background ? u" "_S : u"@"_S);}).join(u""_S);});
+        txt = txt.map([](const auto &row){return u"|"_S & row & u"|"_S;});
+        txt.insert(0, u"+"_S & (u"-"_S * width) & u"+"_S);
+        txt.append(u"+"_S & (u"-"_S * width) & u"+"_S);
+        print(reversed(txt).join(u"\n"_S));
+    }
+
+    template <typename T1, typename T2, typename T3 = decltype(black)> auto set(const T1 &x, const T2 &y, const T3 &colour = black)
+    {
+        map[y].set(x, colour);
+    }
+
+    template <typename T1, typename T2> auto get(const T1 &x, const T2 &y)
+    {
+        return map[y][x];
+    }
+
+    template <typename T1, typename T2, typename T3, typename T4> auto line(const T1 &x0, const T2 &_y0_, const T3 &x1, const T4 &_y1_)
+    {
+        u"Bresenham's line algorithm"_S;
+        auto dx = abs(x1 - x0);
+        auto dy = abs(_y1_ - _y0_);
+        auto [x, y] = make_tuple(x0, _y0_);
+        auto sx = x0 > x1 ? -1 : 1;
+        auto sy = _y0_ > _y1_ ? -1 : 1;
+        if (dx > dy) {
+            auto err = dx / 2.0;
+            while (x != x1) {
+                set(x, y);
+                err -= dy;
+                if (err < 0) {
+                    y += sy;
+                    err += dx;
+                }
+                x += sx;
+            }
+        }
+        else {
+            auto err = dy / 2.0;
+            while (y != _y1_) {
+                set(x, y);
+                err -= dx;
+                if (err < 0) {
+                    x += sx;
+                    err += dy;
+                }
+                y += sy;
+            }
+        }
+        set(x, y);
+    }
+};
+
+auto bitmap = Bitmap(17, 17);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[x0, _y0_, x1, _y1_] : make_tuple(make_tuple(1, 8, 8, 16), make_tuple(8, 16, 16, 8), make_tuple(16, 8, 8, 1), make_tuple(8, 1, 1, 8)))
+            bitmap.line(x0, _y0_, x1, _y1_);
+        bitmap.chardisplay();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Bitmap/B%C3%A9zier_curves/Cubic#Python
+from copy import copy
+from typing import NamedTuple, List
+
+Byte = int
+class Colour(NamedTuple):
+    r : Byte
+    g : Byte
+    b : Byte
+
+    def __eq__(self, other):
+        return self.r == other.r and self.g == other.g and self.b == other.b
+
+black = Colour(0,0,0)
+white = Colour(255,255,255) # Colour ranges are not enforced.
+
+class Bitmap:
+    width : int
+    height : int
+    background : Colour
+    map : List[List[Colour]]
+
+    def __init__(self, width = 40, height = 40, background=white):
+        assert width > 0 and height > 0# and type(background) == Colour
+        self.width = width
+        self.height = height
+        self.background = background
+        self.map = [[copy(background) for w in range(width)] for h in range(height)]
+
+    def fillrect(self, x, y, width, height, colour=black):
+        assert x >= 0 and y >= 0 and width > 0 and height > 0# and type(colour) == Colour
+        for h in range(height):
+            for w in range(width):
+                self.map[y+h][x+w] = copy(colour)
+
+    def chardisplay(self):
+        txt = [''.join((' ' if bit==self.background else '@')
+                       for bit in row)
+               for row in self.map]
+        # Boxing
+        txt = ['|'+row+'|' for row in txt]
+        txt.insert(0, '+' + '-' * self.width + '+')
+        txt.append('+' + '-' * self.width + '+')
+        print('\n'.join(reversed(txt)))
+
+    def set(self, x, y, colour=black):
+        #assert type(colour) == Colour
+        self.map[y][x]=colour
+
+    def get(self, x, y):
+        return self.map[y][x]
+
+    def line(self, x0, y0, x1, y1):
+        "Bresenham's line algorithm"
+        dx = abs(x1 - x0)
+        dy = abs(y1 - y0)
+        (x, y) = (x0, y0)
+        sx = -1 if x0 > x1 else 1
+        sy = -1 if y0 > y1 else 1
+        if dx > dy:
+            err = dx / 2.0
+            while x != x1:
+                self.set(x, y)
+                err -= dy
+                if err < 0:
+                    y += sy
+                    err += dx
+                x += sx
+        else:
+            err = dy / 2.0
+            while y != y1:
+                self.set(x, y)
+                err -= dx
+                if err < 0:
+                    x += sx
+                    err += dy
+                y += sy
+        self.set(x, y)
+
+    def cubicbezier(self, x0, y0, x1, y1, x2, y2, x3, y3, n=20):
+        pts : List[Tuple[int, int]] = []
+        for i in range(n+1):
+            t = float(i) / n
+            a = (1. - t)**3
+            b = 3. * t * (1. - t)**2
+            c = 3.0 * t**2 * (1.0 - t)
+            d = t**3
+
+            x = int(a * x0 + b * x1 + c * x2 + d * x3)
+            y = int(a * y0 + b * y1 + c * y2 + d * y3)
+            pts.append( (x, y) )
+        for i in range(n):
+            self.line(pts[i][0], pts[i][1], pts[i+1][0], pts[i+1][1])
+
+bitmap = Bitmap(17,17)
+bitmap.cubicbezier(16,1, 1,4, 3,16, 15,11)
+bitmap.chardisplay()
+===
+T Colour
+   Byte r
+   Byte g
+   Byte b
+
+   F ==(other)
+      R .r == other.r & .g == other.g & .b == other.b
+   F (r, g, b)
+      .r = r
+      .g = g
+      .b = b
+
+V black = Colour(0, 0, 0)
+V white = Colour(255, 255, 255)
+
+T Bitmap
+   Int width
+   Int height
+   Colour background
+   [[Colour]] map
+
+   F (width = 40, height = 40, background = white)
+      assert(width > 0 & height > 0)
+      .width = width
+      .height = height
+      .background = background
+      .map = (0 .< height).map(h -> (0 .< @width).map(w -> copy(@@background)))
+
+   F fillrect(x, y, width, height, colour = black)
+      assert(x >= 0 & y >= 0 & width > 0 & height > 0)
+      L(h) 0 .< height
+         L(w) 0 .< width
+            .map[y + h][x + w] = copy(colour)
+
+   F chardisplay()
+      V txt = .map.map(row -> row.map(bit -> (I bit == @@.background {‘ ’} E ‘@’)).join(‘’))
+      txt = txt.map(row -> ‘|’row‘|’)
+      txt.insert(0, ‘+’(‘-’ * .width)‘+’)
+      txt.append(‘+’(‘-’ * .width)‘+’)
+      print(reversed(txt).join("\n"))
+
+   F set(x, y, colour = black)
+      .map[y][x] = colour
+
+   F get(x, y)
+      R .map[y][x]
+
+   F line(x0, y0, x1, y1)
+      ‘Bresenham's line algorithm’
+      V dx = abs(x1 - x0)
+      V dy = abs(y1 - y0)
+      V (x, y) = (x0, y0)
+      V sx = I x0 > x1 {-1} E 1
+      V sy = I y0 > y1 {-1} E 1
+      I dx > dy
+         V err = dx / 2.0
+         L x != x1
+            .set(x, y)
+            err -= dy
+            I err < 0
+               y += sy
+               err += dx
+            x += sx
+      E
+         V err = dy / 2.0
+         L y != y1
+            .set(x, y)
+            err -= dx
+            I err < 0
+               x += sx
+               err += dy
+            y += sy
+      .set(x, y)
+
+   F cubicbezier(x0, y0, x1, y1, x2, y2, x3, y3, n = 20)
+      [(Int, Int)] pts
+      L(i) 0 .. n
+         V t = Float(i) / n
+         V a = (1. - t) ^ 3
+         V b = 3. * t * (1. - t) ^ 2
+         V c = 3.0 * t ^ 2 * (1.0 - t)
+         V d = t ^ 3
+
+         V x = Int(a * x0 + b * x1 + c * x2 + d * x3)
+         V y = Int(a * y0 + b * y1 + c * y2 + d * y3)
+         pts.append((x, y))
+      L(i) 0 .< n
+         .line(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1])
+
+V bitmap = Bitmap(17, 17)
+bitmap.cubicbezier(16, 1, 1, 4, 3, 16, 15, 11)
+bitmap.chardisplay()
+===
+class Colour
+{
+public:
+    Byte r;
+    Byte g;
+    Byte b;
+
+    template <typename T1> auto operator==(const T1 &other) const
+    {
+        return r == other.r && g == other.g && b == other.b;
+    }
+    template <typename T1, typename T2, typename T3> Colour(const T1 &r, const T2 &g, const T3 &b) :
+        r(r),
+        g(g),
+        b(b)
+    {
+    }
+};
+
+auto black = Colour(0, 0, 0);
+auto white = Colour(255, 255, 255);
+
+class Bitmap
+{
+public:
+    int width;
+    int height;
+    Colour background;
+    Array<Array<Colour>> map;
+
+    template <typename T1 = decltype(40), typename T2 = decltype(40), typename T3 = decltype(white)> Bitmap(const T1 &width = 40, const T2 &height = 40, const T3 &background = white) :
+        width(width),
+        height(height),
+        background(background)
+    {
+        assert(width > 0 && height > 0);
+        map = range_el(0, height).map([&background, &width](const auto &h){return range_el(0, width).map([&background](const auto &w){return copy(background);});});
+    }
+
+    template <typename T1, typename T2, typename T3, typename T4, typename T5 = decltype(black)> auto fillrect(const T1 &x, const T2 &y, const T3 &width, const T4 &height, const T5 &colour = black)
+    {
+        assert(x >= 0 && y >= 0 && width > 0 && height > 0);
+        for (auto h : range_el(0, height))
+            for (auto w : range_el(0, width))
+                map[y + h].set(x + w, copy(colour));
+    }
+
+    auto chardisplay()
+    {
+        auto txt = map.map([this](const auto &row){return row.map([this](const auto &bit){return (bit == background ? u" "_S : u"@"_S);}).join(u""_S);});
+        txt = txt.map([](const auto &row){return u"|"_S & row & u"|"_S;});
+        txt.insert(0, u"+"_S & (u"-"_S * width) & u"+"_S);
+        txt.append(u"+"_S & (u"-"_S * width) & u"+"_S);
+        print(reversed(txt).join(u"\n"_S));
+    }
+
+    template <typename T1, typename T2, typename T3 = decltype(black)> auto set(const T1 &x, const T2 &y, const T3 &colour = black)
+    {
+        map[y].set(x, colour);
+    }
+
+    template <typename T1, typename T2> auto get(const T1 &x, const T2 &y)
+    {
+        return map[y][x];
+    }
+
+    template <typename T1, typename T2, typename T3, typename T4> auto line(const T1 &x0, const T2 &_y0_, const T3 &x1, const T4 &_y1_)
+    {
+        u"Bresenham's line algorithm"_S;
+        auto dx = abs(x1 - x0);
+        auto dy = abs(_y1_ - _y0_);
+        auto [x, y] = make_tuple(x0, _y0_);
+        auto sx = x0 > x1 ? -1 : 1;
+        auto sy = _y0_ > _y1_ ? -1 : 1;
+        if (dx > dy) {
+            auto err = dx / 2.0;
+            while (x != x1) {
+                set(x, y);
+                err -= dy;
+                if (err < 0) {
+                    y += sy;
+                    err += dx;
+                }
+                x += sx;
+            }
+        }
+        else {
+            auto err = dy / 2.0;
+            while (y != _y1_) {
+                set(x, y);
+                err -= dx;
+                if (err < 0) {
+                    x += sx;
+                    err += dy;
+                }
+                y += sy;
+            }
+        }
+        set(x, y);
+    }
+
+    template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9 = decltype(20)> auto cubicbezier(const T1 &x0, const T2 &_y0_, const T3 &x1, const T4 &_y1_, const T5 &x2, const T6 &y2, const T7 &x3, const T8 &y3, const T9 &n = 20)
+    {
+        Array<ivec2> pts;
+        for (auto i : range_ee(0, n)) {
+            auto t = to_float(i) / n;
+            auto a = cube((1. - t));
+            auto b = 3. * t * square((1. - t));
+            auto c = 3.0 * square(t) * (1.0 - t);
+            auto d = cube(t);
+
+            auto x = to_int(a * x0 + b * x1 + c * x2 + d * x3);
+            auto y = to_int(a * _y0_ + b * _y1_ + c * y2 + d * y3);
+            pts.append(make_tuple(x, y));
+        }
+        for (auto i : range_el(0, n))
+            line(_get<0>(pts[i]), _get<1>(pts[i]), _get<0>(pts[i + 1]), _get<1>(pts[i + 1]));
+    }
+};
+
+auto bitmap = Bitmap(17, 17);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        bitmap.cubicbezier(16, 1, 1, 4, 3, 16, 15, 11);
+        bitmap.chardisplay();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Bitmap/Midpoint_circle_algorithm#Python
+from copy import copy
+from typing import NamedTuple, List
+
+Byte = int
+class Colour(NamedTuple):
+    r : Byte
+    g : Byte
+    b : Byte
+
+    def __eq__(self, other):
+        return self.r == other.r and self.g == other.g and self.b == other.b
+
+black = Colour(0,0,0)
+white = Colour(255,255,255) # Colour ranges are not enforced.
+
+class Bitmap:
+    width : int
+    height : int
+    background : Colour
+    map : List[List[Colour]]
+
+    def __init__(self, width = 40, height = 40, background=white):
+        assert width > 0 and height > 0# and type(background) == Colour
+        self.width = width
+        self.height = height
+        self.background = background
+        self.map = [[copy(background) for w in range(width)] for h in range(height)]
+
+    def fillrect(self, x, y, width, height, colour=black):
+        assert x >= 0 and y >= 0 and width > 0 and height > 0# and type(colour) == Colour
+        for h in range(height):
+            for w in range(width):
+                self.map[y+h][x+w] = copy(colour)
+
+    def chardisplay(self):
+        txt = [''.join((' ' if bit==self.background else '@')
+                       for bit in row)
+               for row in self.map]
+        # Boxing
+        txt = ['|'+row+'|' for row in txt]
+        txt.insert(0, '+' + '-' * self.width + '+')
+        txt.append('+' + '-' * self.width + '+')
+        print('\n'.join(reversed(txt)))
+
+    def set(self, x, y, colour=black):
+        #assert type(colour) == Colour
+        self.map[y][x]=colour
+
+    def get(self, x, y):
+        return self.map[y][x]
+
+    def circle(self, x0, y0, radius, colour=black):
+        f = 1 - radius
+        ddf_x = 1
+        ddf_y = -2 * radius
+        x = 0
+        y = radius
+        self.set(x0, y0 + radius, colour)
+        self.set(x0, y0 - radius, colour)
+        self.set(x0 + radius, y0, colour)
+        self.set(x0 - radius, y0, colour)
+
+        while x < y:
+            if f >= 0:
+                y -= 1
+                ddf_y += 2
+                f += ddf_y
+            x += 1
+            ddf_x += 2
+            f += ddf_x
+            self.set(x0 + x, y0 + y, colour)
+            self.set(x0 - x, y0 + y, colour)
+            self.set(x0 + x, y0 - y, colour)
+            self.set(x0 - x, y0 - y, colour)
+            self.set(x0 + y, y0 + x, colour)
+            self.set(x0 - y, y0 + x, colour)
+            self.set(x0 + y, y0 - x, colour)
+            self.set(x0 - y, y0 - x, colour)
+
+bitmap = Bitmap(25,25)
+bitmap.circle(x0=12, y0=12, radius=12)
+bitmap.chardisplay()
+===
+T Colour
+   Byte r
+   Byte g
+   Byte b
+
+   F ==(other)
+      R .r == other.r & .g == other.g & .b == other.b
+   F (r, g, b)
+      .r = r
+      .g = g
+      .b = b
+
+V black = Colour(0, 0, 0)
+V white = Colour(255, 255, 255)
+
+T Bitmap
+   Int width
+   Int height
+   Colour background
+   [[Colour]] map
+
+   F (width = 40, height = 40, background = white)
+      assert(width > 0 & height > 0)
+      .width = width
+      .height = height
+      .background = background
+      .map = (0 .< height).map(h -> (0 .< @width).map(w -> copy(@@background)))
+
+   F fillrect(x, y, width, height, colour = black)
+      assert(x >= 0 & y >= 0 & width > 0 & height > 0)
+      L(h) 0 .< height
+         L(w) 0 .< width
+            .map[y + h][x + w] = copy(colour)
+
+   F chardisplay()
+      V txt = .map.map(row -> row.map(bit -> (I bit == @@.background {‘ ’} E ‘@’)).join(‘’))
+      txt = txt.map(row -> ‘|’row‘|’)
+      txt.insert(0, ‘+’(‘-’ * .width)‘+’)
+      txt.append(‘+’(‘-’ * .width)‘+’)
+      print(reversed(txt).join("\n"))
+
+   F set(x, y, colour = black)
+      .map[y][x] = colour
+
+   F get(x, y)
+      R .map[y][x]
+
+   F circle(x0, y0, radius, colour = black)
+      V f = 1 - radius
+      V ddf_x = 1
+      V ddf_y = -2 * radius
+      V x = 0
+      V y = radius
+      .set(x0, y0 + radius, colour)
+      .set(x0, y0 - radius, colour)
+      .set(x0 + radius, y0, colour)
+      .set(x0 - radius, y0, colour)
+
+      L x < y
+         I f >= 0
+            y--
+            ddf_y += 2
+            f += ddf_y
+         x++
+         ddf_x += 2
+         f += ddf_x
+         .set(x0 + x, y0 + y, colour)
+         .set(x0 - x, y0 + y, colour)
+         .set(x0 + x, y0 - y, colour)
+         .set(x0 - x, y0 - y, colour)
+         .set(x0 + y, y0 + x, colour)
+         .set(x0 - y, y0 + x, colour)
+         .set(x0 + y, y0 - x, colour)
+         .set(x0 - y, y0 - x, colour)
+
+V bitmap = Bitmap(25, 25)
+bitmap.circle(x0' 12, y0' 12, radius' 12)
+bitmap.chardisplay()
+===
+class Colour
+{
+public:
+    Byte r;
+    Byte g;
+    Byte b;
+
+    template <typename T1> auto operator==(const T1 &other) const
+    {
+        return r == other.r && g == other.g && b == other.b;
+    }
+    template <typename T1, typename T2, typename T3> Colour(const T1 &r, const T2 &g, const T3 &b) :
+        r(r),
+        g(g),
+        b(b)
+    {
+    }
+};
+
+auto black = Colour(0, 0, 0);
+auto white = Colour(255, 255, 255);
+
+class Bitmap
+{
+public:
+    int width;
+    int height;
+    Colour background;
+    Array<Array<Colour>> map;
+
+    template <typename T1 = decltype(40), typename T2 = decltype(40), typename T3 = decltype(white)> Bitmap(const T1 &width = 40, const T2 &height = 40, const T3 &background = white) :
+        width(width),
+        height(height),
+        background(background)
+    {
+        assert(width > 0 && height > 0);
+        map = range_el(0, height).map([&background, &width](const auto &h){return range_el(0, width).map([&background](const auto &w){return copy(background);});});
+    }
+
+    template <typename T1, typename T2, typename T3, typename T4, typename T5 = decltype(black)> auto fillrect(const T1 &x, const T2 &y, const T3 &width, const T4 &height, const T5 &colour = black)
+    {
+        assert(x >= 0 && y >= 0 && width > 0 && height > 0);
+        for (auto h : range_el(0, height))
+            for (auto w : range_el(0, width))
+                map[y + h].set(x + w, copy(colour));
+    }
+
+    auto chardisplay()
+    {
+        auto txt = map.map([this](const auto &row){return row.map([this](const auto &bit){return (bit == background ? u" "_S : u"@"_S);}).join(u""_S);});
+        txt = txt.map([](const auto &row){return u"|"_S & row & u"|"_S;});
+        txt.insert(0, u"+"_S & (u"-"_S * width) & u"+"_S);
+        txt.append(u"+"_S & (u"-"_S * width) & u"+"_S);
+        print(reversed(txt).join(u"\n"_S));
+    }
+
+    template <typename T1, typename T2, typename T3 = decltype(black)> auto set(const T1 &x, const T2 &y, const T3 &colour = black)
+    {
+        map[y].set(x, colour);
+    }
+
+    template <typename T1, typename T2> auto get(const T1 &x, const T2 &y)
+    {
+        return map[y][x];
+    }
+
+    template <typename T1, typename T2, typename T3, typename T4 = decltype(black)> auto circle(const T1 &x0, const T2 &_y0_, const T3 &radius, const T4 &colour = black)
+    {
+        auto f = 1 - radius;
+        auto ddf_x = 1;
+        auto ddf_y = -2 * radius;
+        auto x = 0;
+        auto y = radius;
+        set(x0, _y0_ + radius, colour);
+        set(x0, _y0_ - radius, colour);
+        set(x0 + radius, _y0_, colour);
+        set(x0 - radius, _y0_, colour);
+
+        while (x < y) {
+            if (f >= 0) {
+                y--;
+                ddf_y += 2;
+                f += ddf_y;
+            }
+            x++;
+            ddf_x += 2;
+            f += ddf_x;
+            set(x0 + x, _y0_ + y, colour);
+            set(x0 - x, _y0_ + y, colour);
+            set(x0 + x, _y0_ - y, colour);
+            set(x0 - x, _y0_ - y, colour);
+            set(x0 + y, _y0_ + x, colour);
+            set(x0 - y, _y0_ + x, colour);
+            set(x0 + y, _y0_ - x, colour);
+            set(x0 - y, _y0_ - x, colour);
+        }
+    }
+};
+
+auto bitmap = Bitmap(25, 25);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        bitmap.circle(12, 12, 12);
+        bitmap.chardisplay();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Bitmap/Write_a_PPM_file#Python
+from copy import copy
+from typing import NamedTuple, List
+
+Byte = int
+class Colour(NamedTuple):
+    r : Byte
+    g : Byte
+    b : Byte
+
+    def __eq__(self, other):
+        return self.r == other.r and self.g == other.g and self.b == other.b
+
+black = Colour(0,0,0)
+white = Colour(255,255,255) # Colour ranges are not enforced.
+
+class Bitmap:
+    width : int
+    height : int
+    background : Colour
+    map : List[List[Colour]]
+
+    def __init__(self, width = 40, height = 40, background=white):
+        assert width > 0 and height > 0# and type(background) == Colour
+        self.width = width
+        self.height = height
+        self.background = background
+        self.map = [[copy(background) for w in range(width)] for h in range(height)]
+
+    def fillrect(self, x, y, width, height, colour=black):
+        assert x >= 0 and y >= 0 and width > 0 and height > 0# and type(colour) == Colour
+        for h in range(height):
+            for w in range(width):
+                self.map[y+h][x+w] = copy(colour)
+
+    def set(self, x, y, colour=black):
+        #assert type(colour) == Colour
+        self.map[y][x]=colour
+
+    def get(self, x, y):
+        return self.map[y][x]
+
+    def writeppmp3(self):
+        magic = "P3\n"
+        comment = '# generated from Bitmap.writeppmp3\n'
+        s = magic + comment + ('%i %i\n%i\n' % (self.width, self.height, 255))
+        for h in range(self.height-1, -1, -1):
+            for w in range(self.width):
+                (r, g, b) = self.get(w, h)
+                s += '   %3i %3i %3i' % (r, g, b)
+            s += "\n"
+        return s
+
+    def writeppmp6(self):
+        magic = "P6\n"
+        comment = '# generated from Bitmap.writeppmp6\n'
+        b : List[Byte] = []
+        b += magic.encode()
+        b += comment.encode()
+        b += ('%i %i\n%i\n' % (self.width, self.height, 255)).encode()
+        for h in range(self.height-1, -1, -1):
+            for w in range(self.width):
+                (r, g, bl) = self.get(w, h)
+                b += [r, g, bl]
+        return bytes(b)
+
+# Draw something simple
+bitmap = Bitmap(4, 4, black)
+bitmap.fillrect(1, 0, 1, 2, white)
+bitmap.set(3, 3, Colour(127, 0, 63))
+# Whats in the generated PPM file
+print(bitmap.writeppmp3())
+
+# Write a P6 file
+open('tmp.ppm', 'wb').write(bitmap.writeppmp6())
+===
+T Colour
+   Byte r
+   Byte g
+   Byte b
+
+   F ==(other)
+      R .r == other.r & .g == other.g & .b == other.b
+   F (r, g, b)
+      .r = r
+      .g = g
+      .b = b
+
+V black = Colour(0, 0, 0)
+V white = Colour(255, 255, 255)
+
+T Bitmap
+   Int width
+   Int height
+   Colour background
+   [[Colour]] map
+
+   F (width = 40, height = 40, background = white)
+      assert(width > 0 & height > 0)
+      .width = width
+      .height = height
+      .background = background
+      .map = (0 .< height).map(h -> (0 .< @width).map(w -> copy(@@background)))
+
+   F fillrect(x, y, width, height, colour = black)
+      assert(x >= 0 & y >= 0 & width > 0 & height > 0)
+      L(h) 0 .< height
+         L(w) 0 .< width
+            .map[y + h][x + w] = copy(colour)
+
+   F set(x, y, colour = black)
+      .map[y][x] = colour
+
+   F get(x, y)
+      R .map[y][x]
+
+   F writeppmp3()
+      V magic = "P3\n"
+      V comment = "# generated from Bitmap.writeppmp3\n"
+      V s = magic‘’comment‘’("#. #.\n#.\n".format(.width, .height, 255))
+      L(h) (.height - 1 .< -1).step(-1)
+         L(w) 0 .< .width
+            V (r, g, b) = .get(w, h)
+            s ‘’= ‘   #3 #3 #3’.format(r, g, b)
+         s ‘’= "\n"
+      R s
+
+   F writeppmp6()
+      V magic = "P6\n"
+      V comment = "# generated from Bitmap.writeppmp6\n"
+      [Byte] b
+      b [+]= magic.encode()
+      b [+]= comment.encode()
+      b [+]= ("#. #.\n#.\n".format(.width, .height, 255)).encode()
+      L(h) (.height - 1 .< -1).step(-1)
+         L(w) 0 .< .width
+            V (r, g, bl) = .get(w, h)
+            b [+]= [r, g, bl]
+      R b
+
+V bitmap = Bitmap(4, 4, black)
+bitmap.fillrect(1, 0, 1, 2, white)
+bitmap.set(3, 3, Colour(127, 0, 63))
+print(bitmap.writeppmp3())
+
+File(‘tmp.ppm’, ‘w’).write_bytes(bitmap.writeppmp6())
+===
+class Colour
+{
+public:
+    Byte r;
+    Byte g;
+    Byte b;
+
+    template <typename T1> auto operator==(const T1 &other) const
+    {
+        return r == other.r && g == other.g && b == other.b;
+    }
+    template <typename T1, typename T2, typename T3> Colour(const T1 &r, const T2 &g, const T3 &b) :
+        r(r),
+        g(g),
+        b(b)
+    {
+    }
+};
+
+auto black = Colour(0, 0, 0);
+auto white = Colour(255, 255, 255);
+
+class Bitmap
+{
+public:
+    int width;
+    int height;
+    Colour background;
+    Array<Array<Colour>> map;
+
+    template <typename T1 = decltype(40), typename T2 = decltype(40), typename T3 = decltype(white)> Bitmap(const T1 &width = 40, const T2 &height = 40, const T3 &background = white) :
+        width(width),
+        height(height),
+        background(background)
+    {
+        assert(width > 0 && height > 0);
+        map = range_el(0, height).map([&background, &width](const auto &h){return range_el(0, width).map([&background](const auto &w){return copy(background);});});
+    }
+
+    template <typename T1, typename T2, typename T3, typename T4, typename T5 = decltype(black)> auto fillrect(const T1 &x, const T2 &y, const T3 &width, const T4 &height, const T5 &colour = black)
+    {
+        assert(x >= 0 && y >= 0 && width > 0 && height > 0);
+        for (auto h : range_el(0, height))
+            for (auto w : range_el(0, width))
+                map[y + h].set(x + w, copy(colour));
+    }
+
+    template <typename T1, typename T2, typename T3 = decltype(black)> auto set(const T1 &x, const T2 &y, const T3 &colour = black)
+    {
+        map[y].set(x, colour);
+    }
+
+    template <typename T1, typename T2> auto get(const T1 &x, const T2 &y)
+    {
+        return map[y][x];
+    }
+
+    auto writeppmp3()
+    {
+        auto magic = u"P3\n"_S;
+        auto comment = u"# generated from Bitmap.writeppmp3\n"_S;
+        auto s = magic & comment & (u"#. #.\n#.\n"_S.format(width, height, 255));
+        for (auto h : range_el(height - 1, -1).step(-1)) {
+            for (auto w : range_el(0, width)) {
+                auto [r, g, b] = get(w, h);
+                s &= u"   #3 #3 #3"_S.format(r, g, b);
+            }
+            s &= u"\n"_S;
+        }
+        return s;
+    }
+
+    auto writeppmp6()
+    {
+        auto magic = u"P6\n"_S;
+        auto comment = u"# generated from Bitmap.writeppmp6\n"_S;
+        Array<Byte> b;
+        b.append(magic.encode());
+        b.append(comment.encode());
+        b.append((u"#. #.\n#.\n"_S.format(width, height, 255)).encode());
+        for (auto h : range_el(height - 1, -1).step(-1))
+            for (auto w : range_el(0, width)) {
+                auto [r, g, bl] = get(w, h);
+                b.append(create_array({r, g, bl}));
+            }
+        return b;
+    }
+};
+
+auto bitmap = Bitmap(4, 4, black);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        bitmap.fillrect(1, 0, 1, 2, white);
+        bitmap.set(3, 3, Colour(127, 0, 63));
+        print(bitmap.writeppmp3());
+
+        File(u"tmp.ppm"_S, u"w"_S).write_bytes(bitmap.writeppmp6());
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Bitmap/Read_a_PPM_file#Python
+from copy import copy
+from typing import NamedTuple, List
+
+Byte = int
+class Colour(NamedTuple):
+    r : Byte
+    g : Byte
+    b : Byte
+
+    def __eq__(self, other):
+        return self.r == other.r and self.g == other.g and self.b == other.b
+
+black = Colour(0,0,0)
+white = Colour(255,255,255) # Colour ranges are not enforced.
+
+class Bitmap:
+    width : int
+    height : int
+    background : Colour
+    map : List[List[Colour]]
+
+    def __init__(self, width = 40, height = 40, background=white):
+        assert width > 0 and height > 0# and type(background) == Colour
+        self.width = width
+        self.height = height
+        self.background = background
+        self.map = [[copy(background) for w in range(width)] for h in range(height)]
+
+    def fillrect(self, x, y, width, height, colour=black):
+        assert x >= 0 and y >= 0 and width > 0 and height > 0# and type(colour) == Colour
+        for h in range(height):
+            for w in range(width):
+                self.map[y+h][x+w] = copy(colour)
+
+    def set(self, x, y, colour=black):
+        #assert type(colour) == Colour
+        self.map[y][x]=colour
+
+    def get(self, x, y):
+        return self.map[y][x]
+
+    def togreyscale(self):
+        for h in range(self.height):
+            for w in range(self.width):
+                (r, g, b) = self.get(w, h)
+                l = int(0.2126 * r + 0.7152 * g + 0.0722 * b)
+                self.set(w, h, Colour(l, l, l))
+
+    def writeppmp3(self):
+        magic = "P3\n"
+        comment = '# generated from Bitmap.writeppmp3\n'
+        s = magic + comment + ('%i %i\n%i\n' % (self.width, self.height, 255))
+        for h in range(self.height-1, -1, -1):
+            for w in range(self.width):
+                (r, g, b) = self.get(w, h)
+                s += '   %3i %3i %3i' % (r, g, b)
+            s += "\n"
+        return s
+
+def tokenize(fstr):
+    tokens : List[str] = []
+    for line in fstr.split("\n"):
+        if not line.startswith('#'):
+            for t in line.split():
+                tokens.append(t)
+    return tokens
+
+def ppmp3tobitmap(fstr):
+    tokens = tokenize(fstr)
+    tokeni = -1
+    def nexttoken():
+        nonlocal tokeni
+        tokeni += 1
+        return tokens[tokeni]
+    assert 'P3' == nexttoken(), 'Wrong filetype'
+    #(width, height, maxval) = (int(nexttoken()), int(nexttoken()), int(nexttoken()))
+    width  = int(nexttoken())
+    height = int(nexttoken())
+    maxval = int(nexttoken())
+    bitmap = Bitmap(width, height, Colour(0, 0, 0))
+    for h in range(height-1, -1, -1):
+        for w in range(0, width):
+            #bitmap.set(w, h, Colour(int(nexttoken()), int(nexttoken()), int(nexttoken())))
+            r = int(nexttoken())
+            g = int(nexttoken())
+            b = int(nexttoken())
+            bitmap.set(w, h, Colour(r, g, b))
+
+    return bitmap
+
+ppmtxt = '''P3
+# feep.ppm
+4 4
+15
+ 0  0  0    0  0  0    0  0  0   15  0 15
+ 0  0  0    0 15  7    0  0  0    0  0  0
+ 0  0  0    0  0  0    0 15  7    0  0  0
+15  0 15    0  0  0    0  0  0    0  0  0
+'''
+
+bitmap = ppmp3tobitmap(ppmtxt)
+print('Grey PPM:')
+bitmap.togreyscale()
+print(bitmap.writeppmp3())
+===
+T Colour
+   Byte r
+   Byte g
+   Byte b
+
+   F ==(other)
+      R .r == other.r & .g == other.g & .b == other.b
+   F (r, g, b)
+      .r = r
+      .g = g
+      .b = b
+
+V black = Colour(0, 0, 0)
+V white = Colour(255, 255, 255)
+
+T Bitmap
+   Int width
+   Int height
+   Colour background
+   [[Colour]] map
+
+   F (width = 40, height = 40, background = white)
+      assert(width > 0 & height > 0)
+      .width = width
+      .height = height
+      .background = background
+      .map = (0 .< height).map(h -> (0 .< @width).map(w -> copy(@@background)))
+
+   F fillrect(x, y, width, height, colour = black)
+      assert(x >= 0 & y >= 0 & width > 0 & height > 0)
+      L(h) 0 .< height
+         L(w) 0 .< width
+            .map[y + h][x + w] = copy(colour)
+
+   F set(x, y, colour = black)
+      .map[y][x] = colour
+
+   F get(x, y)
+      R .map[y][x]
+
+   F togreyscale()
+      L(h) 0 .< .height
+         L(w) 0 .< .width
+            V (r, g, b) = .get(w, h)
+            V l = Int(0.2126 * r + 0.7152 * g + 0.0722 * b)
+            .set(w, h, Colour(l, l, l))
+
+   F writeppmp3()
+      V magic = "P3\n"
+      V comment = "# generated from Bitmap.writeppmp3\n"
+      V s = magic‘’comment‘’("#. #.\n#.\n".format(.width, .height, 255))
+      L(h) (.height - 1 .< -1).step(-1)
+         L(w) 0 .< .width
+            V (r, g, b) = .get(w, h)
+            s ‘’= ‘   #3 #3 #3’.format(r, g, b)
+         s ‘’= "\n"
+      R s
+
+F tokenize(fstr)
+   [String] tokens
+   L(line) fstr.split("\n")
+      I !line.starts_with(‘#’)
+         L(t) line.split_py()
+            tokens.append(t)
+   R tokens
+
+F ppmp3tobitmap(fstr)
+   V tokens = tokenize(fstr)
+   V tokeni = -1
+   F nexttoken()
+      @tokeni++
+      R @tokens[@tokeni]
+   assert(‘P3’ == nexttoken(), ‘Wrong filetype’)
+   V width = Int(nexttoken())
+   V height = Int(nexttoken())
+   V maxval = Int(nexttoken())
+   V bitmap = Bitmap(width, height, Colour(0, 0, 0))
+   L(h) (height - 1 .< -1).step(-1)
+      L(w) 0 .< width
+         V r = Int(nexttoken())
+         V g = Int(nexttoken())
+         V b = Int(nexttoken())
+         bitmap.set(w, h, Colour(r, g, b))
+
+   R bitmap
+
+V ppmtxt = ‘P3
+# feep.ppm
+4 4
+15
+ 0  0  0    0  0  0    0  0  0   15  0 15
+ 0  0  0    0 15  7    0  0  0    0  0  0
+ 0  0  0    0  0  0    0 15  7    0  0  0
+15  0 15    0  0  0    0  0  0    0  0  0
+’
+
+V bitmap = ppmp3tobitmap(ppmtxt)
+print(‘Grey PPM:’)
+bitmap.togreyscale()
+print(bitmap.writeppmp3())
+===
+class Colour
+{
+public:
+    Byte r;
+    Byte g;
+    Byte b;
+
+    template <typename T1> auto operator==(const T1 &other) const
+    {
+        return r == other.r && g == other.g && b == other.b;
+    }
+    template <typename T1, typename T2, typename T3> Colour(const T1 &r, const T2 &g, const T3 &b) :
+        r(r),
+        g(g),
+        b(b)
+    {
+    }
+};
+
+auto black = Colour(0, 0, 0);
+auto white = Colour(255, 255, 255);
+
+class Bitmap
+{
+public:
+    int width;
+    int height;
+    Colour background;
+    Array<Array<Colour>> map;
+
+    template <typename T1 = decltype(40), typename T2 = decltype(40), typename T3 = decltype(white)> Bitmap(const T1 &width = 40, const T2 &height = 40, const T3 &background = white) :
+        width(width),
+        height(height),
+        background(background)
+    {
+        assert(width > 0 && height > 0);
+        map = range_el(0, height).map([&background, &width](const auto &h){return range_el(0, width).map([&background](const auto &w){return copy(background);});});
+    }
+
+    template <typename T1, typename T2, typename T3, typename T4, typename T5 = decltype(black)> auto fillrect(const T1 &x, const T2 &y, const T3 &width, const T4 &height, const T5 &colour = black)
+    {
+        assert(x >= 0 && y >= 0 && width > 0 && height > 0);
+        for (auto h : range_el(0, height))
+            for (auto w : range_el(0, width))
+                map[y + h].set(x + w, copy(colour));
+    }
+
+    template <typename T1, typename T2, typename T3 = decltype(black)> auto set(const T1 &x, const T2 &y, const T3 &colour = black)
+    {
+        map[y].set(x, colour);
+    }
+
+    template <typename T1, typename T2> auto get(const T1 &x, const T2 &y)
+    {
+        return map[y][x];
+    }
+
+    auto togreyscale()
+    {
+        for (auto h : range_el(0, height))
+            for (auto w : range_el(0, width)) {
+                auto [r, g, b] = get(w, h);
+                auto l = to_int(0.2126 * r + 0.7152 * g + 0.0722 * b);
+                set(w, h, Colour(l, l, l));
+            }
+    }
+
+    auto writeppmp3()
+    {
+        auto magic = u"P3\n"_S;
+        auto comment = u"# generated from Bitmap.writeppmp3\n"_S;
+        auto s = magic & comment & (u"#. #.\n#.\n"_S.format(width, height, 255));
+        for (auto h : range_el(height - 1, -1).step(-1)) {
+            for (auto w : range_el(0, width)) {
+                auto [r, g, b] = get(w, h);
+                s &= u"   #3 #3 #3"_S.format(r, g, b);
+            }
+            s &= u"\n"_S;
+        }
+        return s;
+    }
+};
+
+template <typename T1> auto tokenize(const T1 &fstr)
+{
+    Array<String> tokens;
+    for (auto &&line : fstr.split(u"\n"_S))
+        if (!line.starts_with(u"#"_S))
+            for (auto &&t : line.split_py())
+                tokens.append(t);
+    return tokens;
+}
+
+template <typename T1> auto ppmp3tobitmap(const T1 &fstr)
+{
+    auto tokens = tokenize(fstr);
+    auto tokeni = -1;
+    auto nexttoken = [&tokeni, &tokens]()
+    {
+        tokeni++;
+        return tokens[tokeni];
+    };
+    assert(u"P3"_S == nexttoken(), u"Wrong filetype"_S);
+    auto width = to_int(nexttoken());
+    auto height = to_int(nexttoken());
+    auto maxval = to_int(nexttoken());
+    auto bitmap = Bitmap(width, height, Colour(0, 0, 0));
+    for (auto h : range_el(height - 1, -1).step(-1))
+        for (auto w : range_el(0, width)) {
+            auto r = to_int(nexttoken());
+            auto g = to_int(nexttoken());
+            auto b = to_int(nexttoken());
+            bitmap.set(w, h, Colour(r, g, b));
+        }
+
+    return bitmap;
+}
+
+auto ppmtxt = uR"(P3
+# feep.ppm
+4 4
+15
+ 0  0  0    0  0  0    0  0  0   15  0 15
+ 0  0  0    0 15  7    0  0  0    0  0  0
+ 0  0  0    0  0  0    0 15  7    0  0  0
+15  0 15    0  0  0    0  0  0    0  0  0
+)"_S;
+
+auto bitmap = ppmp3tobitmap(ppmtxt);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Grey PPM:"_S);
+        bitmap.togreyscale();
+        print(bitmap.writeppmp3());
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Grayscale_image#Python
+from copy import copy
+from typing import NamedTuple, List
+
+Byte = int
+class Colour(NamedTuple):
+    r : Byte
+    g : Byte
+    b : Byte
+
+    def __eq__(self, other):
+        return self.r == other.r and self.g == other.g and self.b == other.b
+
+black = Colour(0,0,0)
+white = Colour(255,255,255) # Colour ranges are not enforced.
+
+class Bitmap:
+    width : int
+    height : int
+    background : Colour
+    map : List[List[Colour]]
+
+    def __init__(self, width = 40, height = 40, background=white):
+        assert width > 0 and height > 0# and type(background) == Colour
+        self.width = width
+        self.height = height
+        self.background = background
+        self.map = [[copy(background) for w in range(width)] for h in range(height)]
+
+    def fillrect(self, x, y, width, height, colour=black):
+        assert x >= 0 and y >= 0 and width > 0 and height > 0# and type(colour) == Colour
+        for h in range(height):
+            for w in range(width):
+                self.map[y+h][x+w] = copy(colour)
+
+    def set(self, x, y, colour=black):
+        #assert type(colour) == Colour
+        self.map[y][x]=colour
+
+    def get(self, x, y):
+        return self.map[y][x]
+
+    def togreyscale(self):
+        for h in range(self.height):
+            for w in range(self.width):
+                (r, g, b) = self.get(w, h)
+                l = int(0.2126 * r + 0.7152 * g + 0.0722 * b)
+                self.set(w, h, Colour(l, l, l))
+
+    def writeppmp3(self):
+        magic = "P3\n"
+        comment = '# generated from Bitmap.writeppmp3\n'
+        s = magic + comment + ('%i %i\n%i\n' % (self.width, self.height, 255))
+        for h in range(self.height-1, -1, -1):
+            for w in range(self.width):
+                (r, g, b) = self.get(w, h)
+                s += '   %3i %3i %3i' % (r, g, b)
+            s += "\n"
+        return s
+
+# Draw something simple
+bitmap = Bitmap(4, 4, white)
+bitmap.fillrect(1, 0, 1, 2, Colour(127, 0, 63))
+bitmap.set(3, 3, Colour(0, 127, 31))
+print('Colour:')
+# Write to the open 'file' handle
+print(bitmap.writeppmp3())
+print('Grey:')
+bitmap.togreyscale()
+print(bitmap.writeppmp3())
+===
+T Colour
+   Byte r
+   Byte g
+   Byte b
+
+   F ==(other)
+      R .r == other.r & .g == other.g & .b == other.b
+   F (r, g, b)
+      .r = r
+      .g = g
+      .b = b
+
+V black = Colour(0, 0, 0)
+V white = Colour(255, 255, 255)
+
+T Bitmap
+   Int width
+   Int height
+   Colour background
+   [[Colour]] map
+
+   F (width = 40, height = 40, background = white)
+      assert(width > 0 & height > 0)
+      .width = width
+      .height = height
+      .background = background
+      .map = (0 .< height).map(h -> (0 .< @width).map(w -> copy(@@background)))
+
+   F fillrect(x, y, width, height, colour = black)
+      assert(x >= 0 & y >= 0 & width > 0 & height > 0)
+      L(h) 0 .< height
+         L(w) 0 .< width
+            .map[y + h][x + w] = copy(colour)
+
+   F set(x, y, colour = black)
+      .map[y][x] = colour
+
+   F get(x, y)
+      R .map[y][x]
+
+   F togreyscale()
+      L(h) 0 .< .height
+         L(w) 0 .< .width
+            V (r, g, b) = .get(w, h)
+            V l = Int(0.2126 * r + 0.7152 * g + 0.0722 * b)
+            .set(w, h, Colour(l, l, l))
+
+   F writeppmp3()
+      V magic = "P3\n"
+      V comment = "# generated from Bitmap.writeppmp3\n"
+      V s = magic‘’comment‘’("#. #.\n#.\n".format(.width, .height, 255))
+      L(h) (.height - 1 .< -1).step(-1)
+         L(w) 0 .< .width
+            V (r, g, b) = .get(w, h)
+            s ‘’= ‘   #3 #3 #3’.format(r, g, b)
+         s ‘’= "\n"
+      R s
+
+V bitmap = Bitmap(4, 4, white)
+bitmap.fillrect(1, 0, 1, 2, Colour(127, 0, 63))
+bitmap.set(3, 3, Colour(0, 127, 31))
+print(‘Colour:’)
+print(bitmap.writeppmp3())
+print(‘Grey:’)
+bitmap.togreyscale()
+print(bitmap.writeppmp3())
+===
+class Colour
+{
+public:
+    Byte r;
+    Byte g;
+    Byte b;
+
+    template <typename T1> auto operator==(const T1 &other) const
+    {
+        return r == other.r && g == other.g && b == other.b;
+    }
+    template <typename T1, typename T2, typename T3> Colour(const T1 &r, const T2 &g, const T3 &b) :
+        r(r),
+        g(g),
+        b(b)
+    {
+    }
+};
+
+auto black = Colour(0, 0, 0);
+auto white = Colour(255, 255, 255);
+
+class Bitmap
+{
+public:
+    int width;
+    int height;
+    Colour background;
+    Array<Array<Colour>> map;
+
+    template <typename T1 = decltype(40), typename T2 = decltype(40), typename T3 = decltype(white)> Bitmap(const T1 &width = 40, const T2 &height = 40, const T3 &background = white) :
+        width(width),
+        height(height),
+        background(background)
+    {
+        assert(width > 0 && height > 0);
+        map = range_el(0, height).map([&background, &width](const auto &h){return range_el(0, width).map([&background](const auto &w){return copy(background);});});
+    }
+
+    template <typename T1, typename T2, typename T3, typename T4, typename T5 = decltype(black)> auto fillrect(const T1 &x, const T2 &y, const T3 &width, const T4 &height, const T5 &colour = black)
+    {
+        assert(x >= 0 && y >= 0 && width > 0 && height > 0);
+        for (auto h : range_el(0, height))
+            for (auto w : range_el(0, width))
+                map[y + h].set(x + w, copy(colour));
+    }
+
+    template <typename T1, typename T2, typename T3 = decltype(black)> auto set(const T1 &x, const T2 &y, const T3 &colour = black)
+    {
+        map[y].set(x, colour);
+    }
+
+    template <typename T1, typename T2> auto get(const T1 &x, const T2 &y)
+    {
+        return map[y][x];
+    }
+
+    auto togreyscale()
+    {
+        for (auto h : range_el(0, height))
+            for (auto w : range_el(0, width)) {
+                auto [r, g, b] = get(w, h);
+                auto l = to_int(0.2126 * r + 0.7152 * g + 0.0722 * b);
+                set(w, h, Colour(l, l, l));
+            }
+    }
+
+    auto writeppmp3()
+    {
+        auto magic = u"P3\n"_S;
+        auto comment = u"# generated from Bitmap.writeppmp3\n"_S;
+        auto s = magic & comment & (u"#. #.\n#.\n"_S.format(width, height, 255));
+        for (auto h : range_el(height - 1, -1).step(-1)) {
+            for (auto w : range_el(0, width)) {
+                auto [r, g, b] = get(w, h);
+                s &= u"   #3 #3 #3"_S.format(r, g, b);
+            }
+            s &= u"\n"_S;
+        }
+        return s;
+    }
+};
+
+auto bitmap = Bitmap(4, 4, white);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        bitmap.fillrect(1, 0, 1, 2, Colour(127, 0, 63));
+        bitmap.set(3, 3, Colour(0, 127, 31));
+        print(u"Colour:"_S);
+        print(bitmap.writeppmp3());
+        print(u"Grey:"_S);
+        bitmap.togreyscale();
+        print(bitmap.writeppmp3());
+    }
+} code_block_1;
