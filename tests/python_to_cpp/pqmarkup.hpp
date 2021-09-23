@@ -875,9 +875,9 @@ public:
             else if (ch == u']')
                 write_to_i((u"<span class=\"sq_brackets\">"_S * ohd) & (u"</font><font color=\"#BFBFBF\">"_S * habr_html) & u"]"_S & (u"</font>"_S * habr_html) & (ohd * u"</span></span>"_S));
             else if (ch == u'{')
-                write_to_i(u"<span class=\"cu_brackets\" onclick=\"return spoiler(this, event)\"><span class=\"cu_brackets_b\">"_S * ohd & u"{"_S & (ohd * u"</span><span>…</span><span class=\"cu\" style=\"display: none\">"_S));
+                write_to_i((u"<span class=\"cu_brackets\" onclick=\"return spoiler(this, event)\"><span class=\"cu_brackets_b\">"_S * ohd) & u"{"_S & (ohd * u"</span><span>…</span><span class=\"cu\" style=\"display: none\">"_S));
             else if (ch == u'}')
-                write_to_i(u"</span><span class=\"cu_brackets_b\">"_S * ohd & u"}"_S & (ohd * u"</span></span>"_S));
+                write_to_i((u"</span><span class=\"cu_brackets_b\">"_S * ohd) & u"}"_S & (ohd * u"</span></span>"_S));
             else if (ch == u'\n') {
                 write_to_i((new_line_tag != u'\0' ? new_line_tag : u"<br />"_S) & (new_line_tag != u"" ? u"\n"_S : u""_S));
                 new_line_tag = u"\0"_S;

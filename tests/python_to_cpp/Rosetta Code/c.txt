@@ -163,3 +163,604 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Calkin-Wilf_sequence#Nim
+from typing import List
+
+class CalkinWilf:
+    n = 1
+    d = 1
+
+    def __call__(self):
+        r = (self.n, self.d)
+        self.n = 2 * (self.n // self.d) * self.d + self.d - self.n
+        (self.n, self.d) = (self.d, self.n)
+        return r
+
+print('The first 20 terms of the Calkwin-Wilf sequence are:')
+cw = CalkinWilf()
+seq : List[str] = []
+for i in range(20):
+    (n, d) = cw()
+    seq.append(str(n) if d == 1 else str(n) + '/' + str(d))
+print(', '.join(seq))
+
+cw = CalkinWilf()
+index = 1
+while cw() != (83116, 51639):
+    index += 1
+print("\nThe element 83116/51639 is at position", index, "in the sequence.")
+===
+T CalkinWilf
+   n = 1
+   d = 1
+
+   F ()()
+      V r = (.n, .d)
+      .n = 2 * (.n I/ .d) * .d + .d - .n
+      swap(&.n, &.d)
+      R r
+
+print(‘The first 20 terms of the Calkwin-Wilf sequence are:’)
+V cw = CalkinWilf()
+[String] seq
+L(i) 20
+   V (n, d) = cw()
+   seq.append(I d == 1 {String(n)} E String(n)‘/’String(d))
+print(seq.join(‘, ’))
+
+cw = CalkinWilf()
+V index = 1
+L cw() != (83116, 51639)
+   index++
+print("\nThe element 83116/51639 is at position "index‘ in the sequence.’)
+===
+class CalkinWilf
+{
+public:
+    decltype(1) n = 1;
+    decltype(1) d = 1;
+
+    auto operator()()
+    {
+        auto r = make_tuple(n, d);
+        n = 2 * (idiv(n, d)) * d + d - n;
+        swap(n, d);
+        return r;
+    }
+};
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"The first 20 terms of the Calkwin-Wilf sequence are:"_S);
+    }
+} code_block_1;
+
+auto cw = CalkinWilf();
+Array<String> seq;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (int i = 0; i < 20; i++) {
+            auto [n, d] = cw();
+            seq.append(d == 1 ? String(n) : String(n) & u"/"_S & String(d));
+        }
+        print(seq.join(u", "_S));
+
+        cw = CalkinWilf();
+    }
+} code_block_2;
+
+auto index = 1;
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        while (cw() != make_tuple(83116, 51639))
+            index++;
+        print(u"\nThe element 83116/51639 is at position "_S & index & u" in the sequence."_S);
+    }
+} code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Canonicalize_CIDR#C
+def cidr_parse(str):
+    (addr_str, m_str) = str.split('/')
+    (a, b, c, d) = map(int, addr_str.split('.'))
+    m = int(m_str)
+    if m < 1 or m > 32 \
+       or a < 0 or a > 255 \
+       or b < 0 or b > 255 \
+       or c < 0 or c > 255 \
+       or d < 0 or d > 255:
+        return (0, 0)
+    mask = ~((1 << (32 - m)) - 1)
+    address = (a << 24) + (b << 16) + (c << 8) + d
+    address &= mask
+    return (address, m)
+
+def cidr_format(address, mask_length):
+    d = address & 0xFF
+    address >>= 8
+    c = address & 0xFF
+    address >>= 8
+    b = address & 0xFF
+    address >>= 8
+    a = address & 0xFF
+    return str(a) + '.' + str(b) + '.' + str(c) + '.' + str(d) + '/' + str(mask_length)
+
+for test in ['87.70.141.1/22',
+             '36.18.154.103/12',
+             '62.62.197.11/29',
+             '67.137.119.181/4',
+             '161.214.74.21/24',
+             '184.232.176.184/18']:
+    (address, mask_length) = cidr_parse(test)
+    print('%-18s -> %s' % (test, cidr_format(address, mask_length)))
+===
+F cidr_parse(str)
+   V (addr_str, m_str) = str.split(‘/’)
+   V (a, b, c, d) = addr_str.split(‘.’).map(Int)
+   V m = Int(m_str)
+   I m < 1 | m > 32 | a < 0 | a > 255 | b < 0 | b > 255 | c < 0 | c > 255 | d < 0 | d > 255
+      R (0, 0)
+   V mask = (-)((1 << (32 - m)) - 1)
+   V address = (a << 24) + (b << 16) + (c << 8) + d
+   address [&]= mask
+   R (address, m)
+
+F cidr_format(=address, mask_length)
+   V d = address [&] F'F
+   address >>= 8
+   V c = address [&] F'F
+   address >>= 8
+   V b = address [&] F'F
+   address >>= 8
+   V a = address [&] F'F
+   R String(a)‘.’String(b)‘.’String(c)‘.’String(d)‘/’String(mask_length)
+
+L(test) [‘87.70.141.1/22’, ‘36.18.154.103/12’, ‘62.62.197.11/29’, ‘67.137.119.181/4’, ‘161.214.74.21/24’, ‘184.232.176.184/18’]
+   V (address, mask_length) = cidr_parse(test)
+   print(‘#<18 -> #.’.format(test, cidr_format(address, mask_length)))
+===
+template <typename T1> auto cidr_parse(const T1 &str)
+{
+    auto [addr_str, m_str] = bind_array<2>(str.split(u"/"_S));
+    auto [a, b, c, d] = bind_array<4>(addr_str.split(u"."_S).map([](const auto &x){return to_int(x);}));
+    auto m = to_int(m_str);
+    if (m < 1 || m > 32 || a < 0 || a > 255 || b < 0 || b > 255 || c < 0 || c > 255 || d < 0 || d > 255)
+        return make_tuple(0, 0);
+    auto mask = ~((1 << (32 - m)) - 1);
+    auto address = (a << 24) + (b << 16) + (c << 8) + d;
+    address &= mask;
+    return make_tuple(address, m);
+}
+
+template <typename T1, typename T2> auto cidr_format(T1 address, const T2 &mask_length)
+{
+    auto d = address & 0xFF;
+    address >>= 8;
+    auto c = address & 0xFF;
+    address >>= 8;
+    auto b = address & 0xFF;
+    address >>= 8;
+    auto a = address & 0xFF;
+    return String(a) & u"."_S & String(b) & u"."_S & String(c) & u"."_S & String(d) & u"/"_S & String(mask_length);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&test : create_array({u"87.70.141.1/22"_S, u"36.18.154.103/12"_S, u"62.62.197.11/29"_S, u"67.137.119.181/4"_S, u"161.214.74.21/24"_S, u"184.232.176.184/18"_S})) {
+            auto [address, mask_length] = cidr_parse(test);
+            print(u"#<18 -> #."_S.format(test, cidr_format(address, mask_length)));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Casting_out_nines#Python
+def CastOut(Base, Start, End):
+  ran = [y for y in range(Base-1) if y%(Base-1) == (y*y)%(Base-1)]
+  (x,y) = divmod(Start, Base-1)
+  r : List[int] = []
+  while True:
+    for n in ran:
+      k = (Base-1)*x + n
+      if k < Start:
+        continue
+      if k > End:
+        return r
+      r.append(k)
+    x += 1
+
+for v in CastOut(Base=16,Start=1,End=255):
+  print(v, end=' ')
+print()
+for v in CastOut(Base=10,Start=1,End=99):
+  print(v, end=' ')
+print()
+for v in CastOut(Base=17,Start=1,End=288):
+  print(v, end=' ')
+print()
+===
+F CastOut(Base, Start, End)
+   V ran = (0 .< Base - 1).filter(y -> y % (@Base - 1) == (y * y) % (@Base - 1))
+   V (x, y) = divmod(Start, Base - 1)
+   [Int] r
+   L
+      L(n) ran
+         V k = (Base - 1) * x + n
+         I k < Start
+            L.continue
+         I k > End
+            R r
+         r.append(k)
+      x++
+
+L(v) CastOut(Base' 16, Start' 1, End' 255)
+   print(v, end' ‘ ’)
+print()
+L(v) CastOut(Base' 10, Start' 1, End' 99)
+   print(v, end' ‘ ’)
+print()
+L(v) CastOut(Base' 17, Start' 1, End' 288)
+   print(v, end' ‘ ’)
+print()
+===
+template <typename T1, typename T2, typename T3> auto CastOut(const T1 &Base, const T2 &Start, const T3 &End)
+{
+    auto ran = range_el(0, Base - 1).filter([&Base](const auto &y){return mod(y, (Base - 1)) == mod((y * y), (Base - 1));});
+    auto [x, y] = divmod(Start, Base - 1);
+    Array<int> r;
+    while (true) {
+        for (auto &&n : ran) {
+            auto k = (Base - 1) * x + n;
+            if (k < Start)
+                continue;
+            if (k > End)
+                return r;
+            r.append(k);
+        }
+        x++;
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&v : CastOut(16, 1, 255))
+            print(v, u" "_S);
+        print();
+        for (auto &&v : CastOut(10, 1, 99))
+            print(v, u" "_S);
+        print();
+        for (auto &&v : CastOut(17, 1, 288))
+            print(v, u" "_S);
+        print();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Change_e_letters_to_i_in_words#Nim
+words = open('unixdict.txt').read().split("\n")
+words_set = set(words)
+
+for word in words:
+    if len(word) > 5:
+        new_word = word.replace('e', 'i')
+        if new_word != word and new_word in words_set:
+            print(word + ' -> ' + new_word)
+===
+V words = File(‘unixdict.txt’).read().split("\n")
+V words_set = Set(words)
+
+L(word) words
+   I word.len > 5
+      V new_word = word.replace(‘e’, ‘i’)
+      I new_word != word & new_word C words_set
+         print(word‘ -> ’new_word)
+===
+auto words = File(u"unixdict.txt"_S).read().split(u"\n"_S);
+auto words_set = create_set(words);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&word : words)
+            if (word.len() > 5) {
+                auto new_word = word.replace(u"e"_S, u"i"_S);
+                if (new_word != word && in(new_word, words_set))
+                    print(word & u" -> "_S & new_word);
+            }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Changeable_words#Nim
+words = [word for word in open('unixdict.txt').read().split("\n") if len(word) > 11]
+#words = list(filter(lambda word: len(word) > 11, open('unixdict.txt').read().split("\n")))
+
+def hamming_dist(word1, word2):
+    if len(word1) != len(word2):
+        return 0
+    count = 0
+    for i in range(len(word1)):
+        if word1[i] != word2[i]:
+            count += 1
+            if count == 2:
+                break # don't care about counts > 2
+    return count
+
+print("List of changeable words:\n")
+count = 0
+for i in range(len(words)):
+    word1 = words[i]
+    for j in range(i+1, len(words)):
+        word2 = words[j]
+        if hamming_dist(word1, word2) == 1:
+            print(word1 + ' <-> ' + word2)
+            count += 2
+
+print("\nFound", count, 'changeable words.')
+===
+V words = File(‘unixdict.txt’).read().split("\n").filter(word -> word.len > 11)
+
+F hamming_dist(word1, word2)
+   I word1.len != word2.len
+      R 0
+   V count = 0
+   L(i) 0 .< word1.len
+      I word1[i] != word2[i]
+         count++
+         I count == 2
+            L.break
+   R count
+
+print("List of changeable words:\n")
+V count = 0
+L(i) 0 .< words.len
+   V word1 = words[i]
+   L(j) i + 1 .< words.len
+      V word2 = words[j]
+      I hamming_dist(word1, word2) == 1
+         print(word1‘ <-> ’word2)
+         count += 2
+
+print("\nFound "count‘ changeable words.’)
+===
+auto words = File(u"unixdict.txt"_S).read().split(u"\n"_S).filter([](const auto &word){return word.len() > 11;});
+
+template <typename T1, typename T2> auto hamming_dist(const T1 &word1, const T2 &word2)
+{
+    if (word1.len() != word2.len())
+        return 0;
+    auto count = 0;
+    for (auto i : range_el(0, word1.len()))
+        if (word1[i] != word2[i]) {
+            count++;
+            if (count == 2)
+                break;
+        }
+    return count;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"List of changeable words:\n"_S);
+    }
+} code_block_1;
+
+auto count = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto i : range_el(0, words.len())) {
+            auto word1 = words[i];
+            for (auto j : range_el(i + 1, words.len())) {
+                auto word2 = words[j];
+                if (hamming_dist(word1, word2) == 1) {
+                    print(word1 & u" <-> "_S & word2);
+                    count += 2;
+                }
+            }
+        }
+
+        print(u"\nFound "_S & count & u" changeable words."_S);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Chaocipher#Python
+def correct_case(string):
+    return "".join([s.upper() for s in string if s.isalpha()])
+
+def permu(alp : str, num):
+    return alp[num:] + alp[:num]
+
+def rotate_wheels(lalph, ralph, key):
+    newin = ralph.index(key)
+    return (permu(lalph, newin), permu(ralph, newin))
+
+def scramble_wheels(lalph : str, ralph : str):
+    # LEFT = cipher wheel
+    # Cycle second[1] through nadir[14] forward
+    lalph = lalph[0] + lalph[2:14] + lalph[1] + lalph[14:]
+    # RIGHT = plain wheel
+    # Send the zenith[0] character to the end[25],
+    # cycle third[2] through nadir[14] characters forward
+    ralph = ralph[1:3] + ralph[4:15] + ralph[3] + ralph[15:] + ralph[0]
+    return (lalph, ralph)
+
+def do_chao(msg, lalpha, ralpha, en=True, show=False):
+    msg = correct_case(msg)
+    out = ""
+    if show:
+        print("="*54)
+        print(10*" " + "left:" + 21*" " + "right: ")
+        print("="*54)
+        print(lalpha, ralpha, "\n")
+    for l in msg:
+        if en:
+            (lalpha, ralpha) = rotate_wheels(lalpha, ralpha, l)
+            out += lalpha[0]
+        else:
+            (ralpha, lalpha) = rotate_wheels(ralpha, lalpha, l)
+            out += ralpha[0]
+        (lalpha, ralpha) = scramble_wheels(lalpha, ralpha)
+        if show:
+            print(lalpha, ralpha)
+    return out
+
+lalpha = "HXUCZVAMDSLKPEFJRIGTWOBNYQ"
+ralpha = "PTLNBQDEOYSFAVZKGJRIHWXUMC"
+msg = "WELLDONEISBETTERTHANWELLSAID"
+
+print("L:", lalpha)
+print("R:", ralpha)
+print("I:", msg)
+o = do_chao(msg, lalpha, ralpha, True, False)
+print("O:", o)
+print("D:", do_chao(o, lalpha, ralpha, False, False))
+print()
+
+do_chao(msg, lalpha, ralpha, True, True)
+===
+F correct_case(string)
+   R (string.filter(s -> s.is_alpha()).map(s -> s.uppercase())).join(‘’)
+
+F permu(String alp; num)
+   R alp[num ..]‘’alp[0 .< num]
+
+F rotate_wheels(lalph, ralph, key)
+   V newin = ralph.index(key)
+   R (permu(lalph, newin), permu(ralph, newin))
+
+F scramble_wheels(String =lalph, String =ralph)
+   lalph = lalph[0]‘’lalph[2.<14]‘’lalph[1]‘’lalph[14..]
+   ralph = ralph[1.<3]‘’ralph[4.<15]‘’ralph[3]‘’ralph[15..]‘’ralph[0]
+   R (lalph, ralph)
+
+F do_chao(=msg, =lalpha, =ralpha, en = 1B, show = 0B)
+   msg = correct_case(msg)
+   V out = ‘’
+   I show
+      print(‘=’ * 54)
+      print((10 * ‘ ’)‘left:’(21 * ‘ ’)‘right: ’)
+      print(‘=’ * 54)
+      print(lalpha‘ ’ralpha" \n")
+   L(l) msg
+      I en
+         (lalpha, ralpha) = rotate_wheels(lalpha, ralpha, l)
+         out ‘’= lalpha[0]
+      E
+         (ralpha, lalpha) = rotate_wheels(ralpha, lalpha, l)
+         out ‘’= ralpha[0]
+      (lalpha, ralpha) = scramble_wheels(lalpha, ralpha)
+      I show
+         print(lalpha‘ ’ralpha)
+   R out
+
+V lalpha = ‘HXUCZVAMDSLKPEFJRIGTWOBNYQ’
+V ralpha = ‘PTLNBQDEOYSFAVZKGJRIHWXUMC’
+V msg = ‘WELLDONEISBETTERTHANWELLSAID’
+
+print(‘L: ’lalpha)
+print(‘R: ’ralpha)
+print(‘I: ’msg)
+V o = do_chao(msg, lalpha, ralpha, 1B, 0B)
+print(‘O: ’o)
+print(‘D: ’do_chao(o, lalpha, ralpha, 0B, 0B))
+print()
+
+do_chao(msg, lalpha, ralpha, 1B, 1B)
+===
+template <typename T1> auto correct_case(const T1 &string)
+{
+    return (string.filter([](const auto &s){return s.is_alpha();}).map([](const auto &s){return s.uppercase();})).join(u""_S);
+}
+
+template <typename T2> auto permu(const String &alp, const T2 &num)
+{
+    return alp[range_ei(num)] & alp[range_el(0, num)];
+}
+
+template <typename T1, typename T2, typename T3> auto rotate_wheels(const T1 &lalph, const T2 &ralph, const T3 &key)
+{
+    auto newin = ralph.index(key);
+    return make_tuple(permu(lalph, newin), permu(ralph, newin));
+}
+
+auto scramble_wheels(String lalph, String ralph)
+{
+    lalph = _get<0>(lalph) & lalph[range_el(2, 14)] & _get<1>(lalph) & lalph[range_ei(14)];
+    ralph = ralph[range_el(1, 3)] & ralph[range_el(4, 15)] & _get<3>(ralph) & ralph[range_ei(15)] & _get<0>(ralph);
+    return make_tuple(lalph, ralph);
+}
+
+template <typename T1, typename T2, typename T3, typename T4 = decltype(true), typename T5 = decltype(false)> auto do_chao(T1 msg, T2 lalpha, T3 ralpha, const T4 &en = true, const T5 &show = false)
+{
+    msg = correct_case(msg);
+    auto out = u""_S;
+    if (show) {
+        print(u"="_S * 54);
+        print((10 * u" "_S) & u"left:"_S & (21 * u" "_S) & u"right: "_S);
+        print(u"="_S * 54);
+        print(lalpha & u" "_S & ralpha & u" \n"_S);
+    }
+    for (auto &&l : msg) {
+        if (en) {
+            assign_from_tuple(lalpha, ralpha, rotate_wheels(lalpha, ralpha, l));
+            out &= _get<0>(lalpha);
+        }
+        else {
+            assign_from_tuple(ralpha, lalpha, rotate_wheels(ralpha, lalpha, l));
+            out &= _get<0>(ralpha);
+        }
+        assign_from_tuple(lalpha, ralpha, scramble_wheels(lalpha, ralpha));
+        if (show)
+            print(lalpha & u" "_S & ralpha);
+    }
+    return out;
+}
+
+auto lalpha = u"HXUCZVAMDSLKPEFJRIGTWOBNYQ"_S;
+auto ralpha = u"PTLNBQDEOYSFAVZKGJRIHWXUMC"_S;
+auto msg = u"WELLDONEISBETTERTHANWELLSAID"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"L: "_S & lalpha);
+        print(u"R: "_S & ralpha);
+        print(u"I: "_S & msg);
+    }
+} code_block_1;
+
+auto o = do_chao(msg, lalpha, ralpha, true, false);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"O: "_S & o);
+        print(u"D: "_S & do_chao(o, lalpha, ralpha, false, false));
+        print();
+
+        do_chao(msg, lalpha, ralpha, true, true);
+    }
+} code_block_2;

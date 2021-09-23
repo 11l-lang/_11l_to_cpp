@@ -889,9 +889,9 @@ print("\t word \t". strip("\t ") ==    "word")
 print("\t word \t".rtrim("\t") == "\t word ")
 print("\t word \t".ltrim("\t") == " word \t")
 print("\t word \t".trim("\t") == ‘ word ’)
-print("\t word \t".rtrim(Array[Char]("\t ")) == "\t word")
-print("\t word \t".ltrim(Array[Char]("\t ")) == "word \t")
-print("\t word \t".trim(Array[Char]("\t ")) == ‘word’)
+print("\t word \t".rtrim([Char]("\t ")) == "\t word")
+print("\t word \t".ltrim([Char]("\t ")) == "word \t")
+print("\t word \t".trim([Char]("\t ")) == ‘word’)
 ===
 struct CodeBlock1
 {

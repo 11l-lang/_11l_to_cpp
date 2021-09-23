@@ -3393,3 +3393,606 @@ struct CodeBlock1
         print(bitmap.writeppmp3());
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Brace_expansion_using_ranges#Nim
+from typing import Optional
+
+def move(obj):
+    return obj
+
+def intFromString(s) -> Optional[int]:
+    try:
+        return int(s)
+    except ValueError:
+        return None
+
+def parseRange(r):
+    if len(r) == 0: return ['{}'] # rangeless, empty.
+    sp = r.split('..')
+    if len(sp) == 1: return ['{' + r + '}']
+    first = sp[0]
+    last = sp[1]
+    incr = '1' if len(sp) == 2 else sp[2]
+
+    val1 : Optional[int] = intFromString(first)
+    val2 : Optional[int] = intFromString(last)
+    val3 : Optional[int] = intFromString(incr)
+
+    if val3 is None: return ['{' + r + '}']   # increment isn't a number.
+    n3 = val3
+    numeric = val1 is not None and val2 is not None
+
+    n1 : int
+    n2 : int
+    if numeric:
+        n1 = val1
+        n2 = val2
+    else:
+        if (val1 is not None and val2 is None) or (val1 is None and val2 is not None):
+            return ['{' + r + '}']   # mixed numeric/alpha not expanded.
+        if len(first) != 1 or len(last) != 1:
+            return ['{' + r + '}']   # start/end are not both single alpha.
+        n1 = ord(first[0])
+        n2 = ord(last[0])
+
+    width = 1
+    if numeric:
+        width = max(len(first), len(last))
+
+    if n3 == 0:
+        # Zero increment.
+        return [str(n1).zfill(width)] if numeric else [first]
+
+    asc = n1 < n2
+    if n3 < 0:
+        asc = not asc
+        (n1, n2) = (n2, n1)
+        n3 = -n3
+
+    result : List[str] = []
+    i = n1
+    if asc:
+        while i <= n2:
+            result.append(str(i).zfill(width) if numeric else chr(i))
+            i += n3
+    else:
+        while i >= n2:
+            result.append(str(i).zfill(width) if numeric else chr(i))
+            i -= n3
+    return result
+
+def rangeExpand(s):
+    result = ['']
+    rng = ''
+    inRng = False
+
+    for c in s:
+        if c == '{' and not inRng:
+            inRng = True
+            rng = ''
+        elif c == '}' and inRng:
+            rngRes = parseRange(rng)
+            res : List[str] = []
+            for r in result:
+                for rr in rngRes:
+                    res.append(r + '' + rr)
+            result = move(res)
+            inRng = False
+        elif inRng:
+            rng += c
+        else:
+            for i in range(len(result)):
+                result[i] += '' + c
+
+    if inRng:
+        for i in range(len(result)):
+            result[i] += '{' + rng   # unmatched braces.
+    return result
+
+examples = ["simpleNumberRising{1..3}.txt",
+            "simpleAlphaDescending-{Z..X}.txt",
+            "steppedDownAndPadded-{10..00..5}.txt",
+            "minusSignFlipsSequence {030..20..-5}.txt",
+            "combined-{Q..P}{2..1}.txt",
+            "li{teral",
+            "rangeless{}empty",
+            "rangeless{random}string",
+            "mixedNumberAlpha{5..k}",
+            "steppedAlphaRising{P..Z..2}.txt",
+            "stops after endpoint-{02..10..3}.txt"]
+
+for s in examples:
+    print(s + " ->\n    ", end = '')
+    res = rangeExpand(s)
+    print("\n    ".join(res))
+    print()
+===
+F intFromString(s) -> Int?
+   X.try
+      R Int(s)
+   X.catch ValueError
+      R N
+
+F parseRange(r)
+   I r.empty
+      R [‘{}’]
+   V sp = r.split(‘..’)
+   I sp.len == 1
+      R [‘{’r‘}’]
+   V first = sp[0]
+   V last = sp[1]
+   V incr = I sp.len == 2 {‘1’} E sp[2]
+
+   Int? val1 = intFromString(first)
+   Int? val2 = intFromString(last)
+   Int? val3 = intFromString(incr)
+
+   I val3 == N
+      R [‘{’r‘}’]
+   V n3 = val3
+   V numeric = val1 != N & val2 != N
+
+   Int n1
+   Int n2
+   I numeric
+      n1 = val1
+      n2 = val2
+   E
+      I (val1 != N & val2 == N) | (val1 == N & val2 != N)
+         R [‘{’r‘}’]
+      I first.len != 1 | last.len != 1
+         R [‘{’r‘}’]
+      n1 = first[0].code
+      n2 = last[0].code
+
+   V width = 1
+   I numeric
+      width = max(first.len, last.len)
+
+   I n3 == 0
+      R I numeric {[String(n1).zfill(width)]} E [first]
+
+   V asc = n1 < n2
+   I n3 < 0
+      asc = !asc
+      swap(&n1, &n2)
+      n3 = -n3
+
+   [String] result
+   V i = n1
+   I asc
+      L i <= n2
+         result.append(I numeric {String(i).zfill(width)} E Char(code' i))
+         i += n3
+   E
+      L i >= n2
+         result.append(I numeric {String(i).zfill(width)} E Char(code' i))
+         i -= n3
+   R result
+
+F rangeExpand(s)
+   V result = [‘’]
+   V rng = ‘’
+   V inRng = 0B
+
+   L(c) s
+      I c == ‘{’ & !inRng
+         inRng = 1B
+         rng = ‘’
+      E I c == ‘}’ & inRng
+         V rngRes = parseRange(rng)
+         [String] res
+         L(r) result
+            L(rr) rngRes
+               res.append(r‘’rr)
+         result = move(res)
+         inRng = 0B
+      E I inRng
+         rng ‘’= c
+      E
+         L(i) 0 .< result.len
+            result[i] ‘’= ‘’c
+
+   I inRng
+      L(i) 0 .< result.len
+         result[i] ‘’= ‘{’rng
+   R result
+
+V examples = [‘simpleNumberRising{1..3}.txt’, ‘simpleAlphaDescending-{Z..X}.txt’, ‘steppedDownAndPadded-{10..00..5}.txt’, ‘minusSignFlipsSequence {030..20..-5}.txt’, ‘combined-{Q..P}{2..1}.txt’, ‘li{teral’, ‘rangeless{}empty’, ‘rangeless{random}string’, ‘mixedNumberAlpha{5..k}’, ‘steppedAlphaRising{P..Z..2}.txt’, ‘stops after endpoint-{02..10..3}.txt’]
+
+L(s) examples
+   print(s" ->\n    ", end' ‘’)
+   V res = rangeExpand(s)
+   print(res.join("\n    "))
+   print()
+===
+template <typename T1> Nullable<int> intFromString(const T1 &s)
+{
+    try
+    {
+        return to_int(s);
+    }
+    catch (const ValueError&)
+    {
+        return nullptr;
+    }
+}
+
+template <typename T1> auto parseRange(const T1 &r)
+{
+    if (r.empty())
+        return create_array({u"{}"_S});
+    auto sp = r.split(u".."_S);
+    if (sp.len() == 1)
+        return create_array({u"{"_S & r & u"}"_S});
+    auto first = _get<0>(sp);
+    auto last = _get<1>(sp);
+    auto incr = sp.len() == 2 ? u"1"_S : _get<2>(sp);
+
+    Nullable<int> val1 = intFromString(first);
+    Nullable<int> val2 = intFromString(last);
+    Nullable<int> val3 = intFromString(incr);
+
+    if (val3 == nullptr)
+        return create_array({u"{"_S & r & u"}"_S});
+    auto n3 = *val3;
+    auto numeric = val1 != nullptr && val2 != nullptr;
+
+    int n1;
+    int n2;
+    if (numeric) {
+        n1 = *val1;
+        n2 = *val2;
+    }
+    else {
+        if ((val1 != nullptr && val2 == nullptr) || (val1 == nullptr && val2 != nullptr))
+            return create_array({u"{"_S & r & u"}"_S});
+        if (first.len() != 1 || last.len() != 1)
+            return create_array({u"{"_S & r & u"}"_S});
+        n1 = _get<0>(first).code;
+        n2 = _get<0>(last).code;
+    }
+
+    auto width = 1;
+    if (numeric)
+        width = max(first.len(), last.len());
+
+    if (n3 == 0)
+        return numeric ? create_array({String(n1).zfill(width)}) : create_array({first});
+
+    auto asc = n1 < n2;
+    if (n3 < 0) {
+        asc = !asc;
+        swap(n1, n2);
+        n3 = -n3;
+    }
+
+    Array<String> result;
+    auto i = n1;
+    if (asc)
+        while (i <= n2) {
+            result.append(numeric ? String(i).zfill(width) : Char(i));
+            i += n3;
+        }
+    else
+        while (i >= n2) {
+            result.append(numeric ? String(i).zfill(width) : Char(i));
+            i -= n3;
+        }
+    return result;
+}
+
+template <typename T1> auto rangeExpand(const T1 &s)
+{
+    auto result = create_array({u""_S});
+    auto rng = u""_S;
+    auto inRng = false;
+
+    for (auto &&c : s)
+        if (c == u'{' && !inRng) {
+            inRng = true;
+            rng = u""_S;
+        }
+        else if (c == u'}' && inRng) {
+            auto rngRes = parseRange(rng);
+            Array<String> res;
+            for (auto &&r : result)
+                for (auto &&rr : rngRes)
+                    res.append(r & rr);
+            result = std::move(res);
+            inRng = false;
+        }
+        else if (inRng)
+            rng &= c;
+        else
+            for (auto i : range_el(0, result.len()))
+                result[i] &= u""_S & c;
+
+    if (inRng)
+        for (auto i : range_el(0, result.len()))
+            result[i] &= u"{"_S & rng;
+    return result;
+}
+
+auto examples = create_array({u"simpleNumberRising{1..3}.txt"_S, u"simpleAlphaDescending-{Z..X}.txt"_S, u"steppedDownAndPadded-{10..00..5}.txt"_S, u"minusSignFlipsSequence {030..20..-5}.txt"_S, u"combined-{Q..P}{2..1}.txt"_S, u"li{teral"_S, u"rangeless{}empty"_S, u"rangeless{random}string"_S, u"mixedNumberAlpha{5..k}"_S, u"steppedAlphaRising{P..Z..2}.txt"_S, u"stops after endpoint-{02..10..3}.txt"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&s : examples) {
+            print(s & u" ->\n    "_S, u""_S);
+            auto res = rangeExpand(s);
+            print(res.join(u"\n    "_S));
+            print();
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Brazilian_numbers#Nim
+def isPrime(n):
+    if n % 2 == 0:
+        return n == 2
+    if n % 3 == 0:
+        return n == 3
+    d = 5
+    while d * d <= n:
+        if n % d == 0:
+            return False
+        if n % (d + 2) == 0:
+            return False
+        d += 6
+    return True
+
+def sameDigits(n, b):
+    d = n % b
+    n //= b
+    if d == 0:
+        return False
+    while n > 0:
+        if n % b != d:
+            return False
+        n //= b
+    return True
+
+def isBrazilian(n):
+    if n < 7:
+        return False
+    if (n & 1) == 0:
+        return True
+    for b in range(2, n - 1):
+        if sameDigits(n, b):
+            return True
+    return False
+
+def printList(title, check):
+    print(title)
+    n = 7
+    l : List[int] = []
+    while True:
+        if check(n) and isBrazilian(n):
+            l.append(n)
+            if len(l) == 20: break
+        n += 1
+    print(', '.join(map(str, l)))
+    print()
+
+printList("First 20 Brazilian numbers:", lambda n: True)
+printList("First 20 odd Brazilian numbers:", lambda n: (n & 1) != 0)
+printList("First 20 prime Brazilian numbers:", lambda n: isPrime(n))
+===
+F isPrime(n)
+   I n % 2 == 0
+      R n == 2
+   I n % 3 == 0
+      R n == 3
+   V d = 5
+   L d * d <= n
+      I n % d == 0
+         R 0B
+      I n % (d + 2) == 0
+         R 0B
+      d += 6
+   R 1B
+
+F sameDigits(=n, b)
+   V d = n % b
+   n I/= b
+   I d == 0
+      R 0B
+   L n > 0
+      I n % b != d
+         R 0B
+      n I/= b
+   R 1B
+
+F isBrazilian(n)
+   I n < 7
+      R 0B
+   I (n [&] 1) == 0
+      R 1B
+   L(b) 2 .< n - 1
+      I sameDigits(n, b)
+         R 1B
+   R 0B
+
+F printList(title, check)
+   print(title)
+   V n = 7
+   [Int] l
+   L
+      I check(n) & isBrazilian(n)
+         l.append(n)
+         I l.len == 20
+            L.break
+      n++
+   print(l.map(String).join(‘, ’))
+   print()
+
+printList(‘First 20 Brazilian numbers:’, n -> 1B)
+printList(‘First 20 odd Brazilian numbers:’, n -> (n [&] 1) != 0)
+printList(‘First 20 prime Brazilian numbers:’, n -> isPrime(n))
+===
+template <typename T1> auto isPrime(const T1 &n)
+{
+    if (mod(n, 2) == 0)
+        return n == 2;
+    if (mod(n, 3) == 0)
+        return n == 3;
+    auto d = 5;
+    while (d * d <= n) {
+        if (mod(n, d) == 0)
+            return false;
+        if (mod(n, (d + 2)) == 0)
+            return false;
+        d += 6;
+    }
+    return true;
+}
+
+template <typename T1, typename T2> auto sameDigits(T1 n, const T2 &b)
+{
+    auto d = mod(n, b);
+    n = idiv(n, b);
+    if (d == 0)
+        return false;
+    while (n > 0) {
+        if (mod(n, b) != d)
+            return false;
+        n = idiv(n, b);
+    }
+    return true;
+}
+
+template <typename T1> auto isBrazilian(const T1 &n)
+{
+    if (n < 7)
+        return false;
+    if ((n & 1) == 0)
+        return true;
+    for (auto b : range_el(2, n - 1))
+        if (sameDigits(n, b))
+            return true;
+    return false;
+}
+
+template <typename T1, typename T2> auto printList(const T1 &title, const T2 &check)
+{
+    print(title);
+    auto n = 7;
+    Array<int> l;
+    while (true) {
+        if (check(n) && isBrazilian(n)) {
+            l.append(n);
+            if (l.len() == 20)
+                break;
+        }
+        n++;
+    }
+    print(l.map([](const auto &x){return String(x);}).join(u", "_S));
+    print();
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        printList(u"First 20 Brazilian numbers:"_S, [](const auto &n){return true;});
+        printList(u"First 20 odd Brazilian numbers:"_S, [](const auto &n){return (n & 1) != 0;});
+        printList(u"First 20 prime Brazilian numbers:"_S, [](const auto &n){return isPrime(n);});
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Burrows%E2%80%93Wheeler_transform#Python
+def bwt(s : str):
+    """Apply Burrows-Wheeler transform to input string."""
+    assert "\002" not in s and "\003" not in s, "Input string cannot contain STX and ETX characters"
+    s = "\002" + s + "\003"  # Add start and end of text marker
+    table = sorted(s[i:] + s[:i] for i in range(len(s)))  # Table of rotations of string
+    last_column = [row[-1:] for row in table]  # Last characters of each row
+    return "".join(last_column)  # Convert list of characters into string
+
+def ibwt(r : str):
+    """Apply inverse Burrows-Wheeler transform."""
+    table = [""] * len(r)  # Make empty table
+    for i in range(len(r)):
+        table = sorted(r[i] + table[i] for i in range(len(r)))  # Add a column of r
+    s = [row for row in table if row.endswith("\003")][0]  # Find the correct row (ending in ETX)
+    return s.rstrip("\003").strip("\002")  # Get rid of start and end markers
+
+for text in ["banana",
+             "appellee",
+             "dogwood",
+             "TO BE OR NOT TO BE OR WANT TO BE OR NOT?",
+             "SIX.MIXED.PIXIES.SIFT.SIXTY.PIXIE.DUST.BOXES"]:
+    transformed = bwt(text)
+    invTransformed = ibwt(transformed)
+
+    print("Original text:                " + text)
+    print("After transformation:         " + transformed.replace('\2', '^').replace('\3', '|'))
+    print("After inverse transformation: " + invTransformed)
+    print()
+===
+F bwt(String =s)
+   ‘Apply Burrows-Wheeler transform to input string.’
+   assert("\002" !C s & "\003" !C s, ‘Input string cannot contain STX and ETX characters’)
+   s = "\002"s"\003"
+   V table = sorted((0 .< s.len).map(i -> @s[i ..]‘’@s[0 .< i]))
+   V last_column = table.map(row -> row[(len)-1 ..])
+   R last_column.join(‘’)
+
+F ibwt(String r)
+   ‘Apply inverse Burrows-Wheeler transform.’
+   V table = [‘’] * r.len
+   L(i) 0 .< r.len
+      table = sorted((0 .< r.len).map(i -> @r[i]‘’@table[i]))
+   V s = table.filter(row -> row.ends_with("\003"))[0]
+   R s.rtrim([Char]("\003")).trim([Char]("\002"))
+
+L(text) [‘banana’, ‘appellee’, ‘dogwood’, ‘TO BE OR NOT TO BE OR WANT TO BE OR NOT?’, ‘SIX.MIXED.PIXIES.SIFT.SIXTY.PIXIE.DUST.BOXES’]
+   V transformed = bwt(text)
+   V invTransformed = ibwt(transformed)
+
+   print(‘Original text:                ’text)
+   print(‘After transformation:         ’transformed.replace("\2", ‘^’).replace("\3", ‘|’))
+   print(‘After inverse transformation: ’invTransformed)
+   print()
+===
+auto bwt(String s)
+{
+    u"Apply Burrows-Wheeler transform to input string."_S;
+    assert(!in(u"\002"_S, s) && !in(u"\003"_S, s), u"Input string cannot contain STX and ETX characters"_S);
+    s = u"\002"_S & s & u"\003"_S;
+    auto table = sorted(range_el(0, s.len()).map([&s](const auto &i){return s[range_ei(i)] & s[range_el(0, i)];}));
+    auto last_column = table.map([](const auto &row){return row[range_elen_i( - 1)];});
+    return last_column.join(u""_S);
+}
+
+auto ibwt(const String &r)
+{
+    u"Apply inverse Burrows-Wheeler transform."_S;
+    auto table = create_array({u""_S}) * r.len();
+    for (auto i : range_el(0, r.len()))
+        table = sorted(range_el(0, r.len()).map([&r, &table](const auto &i){return r[i] & table[i];}));
+    auto s = _get<0>(table.filter([](const auto &row){return row.ends_with(u"\003"_S);}));
+    return s.rtrim(Array<Char>(u"\003"_S)).trim(Array<Char>(u"\002"_S));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&text : create_array({u"banana"_S, u"appellee"_S, u"dogwood"_S, u"TO BE OR NOT TO BE OR WANT TO BE OR NOT?"_S, u"SIX.MIXED.PIXIES.SIFT.SIXTY.PIXIE.DUST.BOXES"_S})) {
+            auto transformed = bwt(text);
+            auto invTransformed = ibwt(transformed);
+
+            print(u"Original text:                "_S & text);
+            print(u"After transformation:         "_S & transformed.replace(u"\2"_S, u"^"_S).replace(u"\3"_S, u"|"_S));
+            print(u"After inverse transformation: "_S & invTransformed);
+            print();
+        }
+    }
+} code_block_1;
