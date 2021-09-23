@@ -1031,6 +1031,12 @@ inline double parse_float(const String &s) {return parse_float(s.c_str());}
 
 inline String format_float(float  x, int precision) {return String(x, precision);}
 inline String format_float(double x, int precision) {return String(x, precision);}
+inline String format_float_exp(double x, int precision, int width = 0)
+{
+	char s[64] = "\0";
+	snprintf(s, sizeof(s), "%*.*e", width, precision, x);
+	return String(s, s + strlen(s));
+}
 
 inline bool in(Char c, const String &s) {return s.find(c) != nullptr;}
 inline bool in(const String &c, const String &s) {return s.find(c) != nullptr;}
