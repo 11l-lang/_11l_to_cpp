@@ -33,6 +33,15 @@ public:
 		std::set<KeyType>::insert(other.begin(), other.end());
 	}
 
+	KeyType pop()
+	{
+		if (std::set<KeyType>::empty())
+			throw KeyError(String());
+		KeyType r(std::move(*std::set<KeyType>::begin()));
+		std::set<KeyType>::erase(std::set<KeyType>::begin());
+		return r;
+	}
+
 	void remove(const KeyType &elem)
 	{
 		auto it = std::set<KeyType>::find(elem);

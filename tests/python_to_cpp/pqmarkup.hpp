@@ -891,6 +891,7 @@ public:
 
         write_to_pos(instr.len(), 0);
         assert(ending_tags.empty());
+
         assert(to_html_called_inside_to_html_outer_pos_list.pop() == outer_pos);
 
         if (outfilef == nullptr) {

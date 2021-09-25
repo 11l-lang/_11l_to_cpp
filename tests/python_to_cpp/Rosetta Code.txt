@@ -19744,3 +19744,246 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Cheryl%27s_birthday#Nim
+from typing import NamedTuple, DefaultDict, Set
+import collections
+
+class Date(NamedTuple):
+    month : str
+    day : int
+
+dates = [Date("May", 15), Date("May", 16), Date("May", 19), Date("June", 17), Date("June", 18),
+         Date("July", 14), Date("July", 16), Date("August", 14), Date("August", 15), Date("August", 17)]
+
+monthTable : DefaultDict[int, Set[str]] = collections.defaultdict(set)
+for date in dates:
+    monthTable[date.day].add(date.month)
+
+dayTable : DefaultDict[str, Set[int]] = collections.defaultdict(set)
+for date in dates:
+    dayTable[date.month].add(date.day)
+
+possibleMonths = set() # str
+possibleDays   = set() # int
+
+for month, days in dayTable.items():
+    if len(days) > 1:
+        possibleMonths.add(month)
+
+for month, days in dayTable.items():
+    for day in days:
+        if len(monthTable[day]) == 1:
+            possibleMonths.remove(month)
+print("After first Albert's sentence, possible months are %s." % ', '.join(list(possibleMonths)))
+
+for day, months in monthTable.items():
+    if len(months) > 1:
+        possibleDays.add(day)
+
+impossibleDays = set() # int
+for day in possibleDays:
+    if len(monthTable[day].intersection(possibleMonths)) > 1:
+        impossibleDays.add(day)
+#possibleDays.difference_update(impossibleDays)
+for day in impossibleDays:
+    possibleDays.remove(day)
+print("After Bernard's sentence, possible days are %s." % ', '.join(list(map(str, possibleDays))))
+
+impossibleMonths = set() # str
+for month in possibleMonths:
+    if len(dayTable[month].intersection(possibleDays)) > 1:
+        impossibleMonths.add(month)
+#possibleMonths.difference_update(impossibleMonths)
+for month in impossibleMonths:
+    possibleMonths.remove(month)
+
+assert len(possibleMonths) == 1
+month = possibleMonths.pop()
+print("After second Albert's sentence, remaining month is %s..." % month)
+
+possibleDays = possibleDays.intersection(dayTable[month])
+assert len(possibleDays) == 1
+day = possibleDays.pop()
+print("and thus remaining day is %i." % day)
+
+print()
+print("So birthday date is %s %i." % (month, day))
+===
+T Date
+   String month
+   Int day
+   F (month, day)
+      .month = month
+      .day = day
+
+V dates = [Date(‘May’, 15), Date(‘May’, 16), Date(‘May’, 19), Date(‘June’, 17), Date(‘June’, 18), Date(‘July’, 14), Date(‘July’, 16), Date(‘August’, 14), Date(‘August’, 15), Date(‘August’, 17)]
+
+DefaultDict[Int, Set[String]] monthTable
+L(date) dates
+   monthTable[date.day].add(date.month)
+
+DefaultDict[String, Set[Int]] dayTable
+L(date) dates
+   dayTable[date.month].add(date.day)
+
+V possibleMonths = Set[String]()
+V possibleDays = Set[Int]()
+
+L(month, days) dayTable
+   I days.len > 1
+      possibleMonths.add(month)
+
+L(month, days) dayTable
+   L(day) days
+      I monthTable[day].len == 1
+         possibleMonths.remove(month)
+print(‘After first Albert's sentence, possible months are #..’.format(Array(possibleMonths).join(‘, ’)))
+
+L(day, months) monthTable
+   I months.len > 1
+      possibleDays.add(day)
+
+V impossibleDays = Set[Int]()
+L(day) possibleDays
+   I monthTable[day].intersection(possibleMonths).len > 1
+      impossibleDays.add(day)
+L(day) impossibleDays
+   possibleDays.remove(day)
+print(‘After Bernard's sentence, possible days are #..’.format(possibleDays.map(String).join(‘, ’)))
+
+V impossibleMonths = Set[String]()
+L(month) possibleMonths
+   I dayTable[month].intersection(possibleDays).len > 1
+      impossibleMonths.add(month)
+L(month) impossibleMonths
+   possibleMonths.remove(month)
+
+assert(possibleMonths.len == 1)
+V month = possibleMonths.pop()
+print(‘After second Albert's sentence, remaining month is #....’.format(month))
+
+possibleDays = possibleDays.intersection(dayTable[month])
+assert(possibleDays.len == 1)
+V day = possibleDays.pop()
+print(‘and thus remaining day is #..’.format(day))
+
+print()
+print(‘So birthday date is #. #..’.format(month, day))
+===
+class Date
+{
+public:
+    String month;
+    int day;
+    template <typename T1, typename T2> Date(const T1 &month, const T2 &day) :
+        month(month),
+        day(day)
+    {
+    }
+};
+
+auto dates = create_array<Date>({Date(u"May"_S, 15), Date(u"May"_S, 16), Date(u"May"_S, 19), Date(u"June"_S, 17), Date(u"June"_S, 18), Date(u"July"_S, 14), Date(u"July"_S, 16), Date(u"August"_S, 14), Date(u"August"_S, 15), Date(u"August"_S, 17)});
+
+DefaultDict<int, Set<String>> monthTable;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&date : dates)
+            monthTable[date.day].add(date.month);
+    }
+} code_block_1;
+
+DefaultDict<String, Set<int>> dayTable;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&date : dates)
+            dayTable[date.month].add(date.day);
+    }
+} code_block_2;
+
+auto possibleMonths = Set<String>();
+auto possibleDays = Set<int>();
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        for (auto &&[month, days] : dayTable)
+            if (days.len() > 1)
+                possibleMonths.add(month);
+
+        for (auto &&[month, days] : dayTable)
+            for (auto &&day : days)
+                if (monthTable[day].len() == 1)
+                    possibleMonths.remove(month);
+        print(u"After first Albert's sentence, possible months are #.."_S.format(create_array(possibleMonths).join(u", "_S)));
+
+        for (auto &&[day, months] : monthTable)
+            if (months.len() > 1)
+                possibleDays.add(day);
+    }
+} code_block_3;
+
+auto impossibleDays = Set<int>();
+
+struct CodeBlock4
+{
+    CodeBlock4()
+    {
+        for (auto &&day : possibleDays)
+            if (monthTable[day].intersection(possibleMonths).len() > 1)
+                impossibleDays.add(day);
+        for (auto &&day : impossibleDays)
+            possibleDays.remove(day);
+        print(u"After Bernard's sentence, possible days are #.."_S.format(possibleDays.map([](const auto &x){return String(x);}).join(u", "_S)));
+    }
+} code_block_4;
+
+auto impossibleMonths = Set<String>();
+
+struct CodeBlock5
+{
+    CodeBlock5()
+    {
+        for (auto &&month : possibleMonths)
+            if (dayTable[month].intersection(possibleDays).len() > 1)
+                impossibleMonths.add(month);
+        for (auto &&month : impossibleMonths)
+            possibleMonths.remove(month);
+
+        assert(possibleMonths.len() == 1);
+    }
+} code_block_5;
+
+auto month = possibleMonths.pop();
+
+struct CodeBlock6
+{
+    CodeBlock6()
+    {
+        print(u"After second Albert's sentence, remaining month is #...."_S.format(month));
+
+        possibleDays = possibleDays.intersection(dayTable[month]);
+        assert(possibleDays.len() == 1);
+    }
+} code_block_6;
+
+auto day = possibleDays.pop();
+
+struct CodeBlock7
+{
+    CodeBlock7()
+    {
+        print(u"and thus remaining day is #.."_S.format(day));
+
+        print();
+        print(u"So birthday date is #. #.."_S.format(month, day));
+    }
+} code_block_7;
