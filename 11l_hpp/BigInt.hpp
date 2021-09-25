@@ -336,6 +336,9 @@ public:
 			res = res * base + a[i];
 		return res * sign;
 	}
+	friend Int to_int(const BigInt &n) {
+		return Int(n.longValue());
+	}
 
 	friend BigInt gcd(const BigInt &a, const BigInt &b) {
 		return b.isZero() ? a : gcd(b, a % b);

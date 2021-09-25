@@ -19987,3 +19987,174 @@ struct CodeBlock7
         print(u"So birthday date is #. #.."_S.format(month, day));
     }
 } code_block_7;
+
+
+# https://www.rosettacode.org/wiki/Cipolla%27s_algorithm#Python
+BigInt = int
+
+#Converts n to base b as a list of integers between 0 and b-1
+#Most-significant digit on the left
+def convertToBase(n, b):
+    if(n < 2):
+        return [n]
+    temp = n
+    ans = [0] * 0
+    while(temp != 0):
+        ans = [temp % b]+ ans
+        temp //= b
+    return ans
+
+#Takes integer n and odd prime p
+#Returns both square roots of n modulo p as a pair (a,b)
+#Returns () if no root
+def cipolla(n,p):
+    n %= p
+    if(n == 0 or n == 1):
+        return [n,(p-n)%p]
+    phi = p - 1
+    if(pow(BigInt(n), phi//2, p) != 1):
+        return [0] * 0
+    if(p%4 == 3):
+        ans = int(pow(BigInt(n),(p+1)//4,p))
+        return [ans,(p-ans)%p]
+    aa = 0
+    for i in range(1,p):
+        temp = pow(BigInt((i*i-n)%p),phi//2,p)
+        if(temp == phi):
+            aa = i
+            break;
+    exponent = convertToBase((p+1)//2,2)
+    def cipollaMult(ab,cd,w,p):
+        (a,b) = ab
+        (c,d) = cd
+        return ((a*c+b*d*w)%p,(a*d+b*c)%p)
+    x1 = (aa,1)
+    x2 = cipollaMult(x1,x1,aa*aa-n,p)
+    for i in range(1,len(exponent)):
+        if(exponent[i] == 0):
+            x2 = cipollaMult(x2,x1,aa*aa-n,p)
+            x1 = cipollaMult(x1,x1,aa*aa-n,p)
+        else:
+            x1 = cipollaMult(x1,x2,aa*aa-n,p)
+            x2 = cipollaMult(x2,x2,aa*aa-n,p)
+    return [x1[0],(p-x1[0])%p]
+
+print("Roots of 2 mod 7: " +str(cipolla(2,7)))
+print("Roots of 8218 mod 10007: " +str(cipolla(8218,10007)))
+print("Roots of 56 mod 101: " +str(cipolla(56,101)))
+print("Roots of 1 mod 11: " +str(cipolla(1,11)))
+print("Roots of 8219 mod 10007: " +str(cipolla(8219,10007)))
+===
+F convertToBase(n, b)
+   I (n < 2)
+      R [n]
+   V temp = n
+   V ans = [Int]()
+   L (temp != 0)
+      ans = [temp % b] [+] ans
+      temp I/= b
+   R ans
+
+F cipolla(=n, p)
+   n %= p
+   I (n == 0 | n == 1)
+      R [n, (p - n) % p]
+   V phi = p - 1
+   I (pow(BigInt(n), phi I/ 2, p) != 1)
+      R [Int]()
+   I (p % 4 == 3)
+      V ans = Int(pow(BigInt(n), (p + 1) I/ 4, p))
+      R [ans, (p - ans) % p]
+   V aa = 0
+   L(i) 1 .< p
+      V temp = pow(BigInt((i * i - n) % p), phi I/ 2, p)
+      I (temp == phi)
+         aa = i
+         L.break
+   V exponent = convertToBase((p + 1) I/ 2, 2)
+   F cipollaMult(ab, cd, w, p)
+      V (a, b) = ab
+      V (c, d) = cd
+      R ((a * c + b * d * w) % p, (a * d + b * c) % p)
+   V x1 = (aa, 1)
+   V x2 = cipollaMult(x1, x1, aa * aa - n, p)
+   L(i) 1 .< exponent.len
+      I (exponent[i] == 0)
+         x2 = cipollaMult(x2, x1, aa * aa - n, p)
+         x1 = cipollaMult(x1, x1, aa * aa - n, p)
+      E
+         x1 = cipollaMult(x1, x2, aa * aa - n, p)
+         x2 = cipollaMult(x2, x2, aa * aa - n, p)
+   R [x1[0], (p - x1[0]) % p]
+
+print(‘Roots of 2 mod 7: ’String(cipolla(2, 7)))
+print(‘Roots of 8218 mod 10007: ’String(cipolla(8218, 10007)))
+print(‘Roots of 56 mod 101: ’String(cipolla(56, 101)))
+print(‘Roots of 1 mod 11: ’String(cipolla(1, 11)))
+print(‘Roots of 8219 mod 10007: ’String(cipolla(8219, 10007)))
+===
+template <typename T1, typename T2> auto convertToBase(const T1 &n, const T2 &b)
+{
+    if ((n < 2))
+        return create_array({n});
+    auto temp = n;
+    auto ans = Array<int>();
+    while ((temp != 0)) {
+        ans = create_array({mod(temp, b)}) + ans;
+        temp = idiv(temp, b);
+    }
+    return ans;
+}
+
+template <typename T1, typename T2> auto cipolla(T1 n, const T2 &p)
+{
+    n %= p;
+    if ((n == 0 || n == 1))
+        return create_array({n, mod((p - n), p)});
+    auto phi = p - 1;
+    if ((pow(BigInt(n), idiv(phi, 2), p) != 1))
+        return Array<int>();
+    if ((mod(p, 4) == 3)) {
+        auto ans = to_int(pow(BigInt(n), idiv((p + 1), 4), p));
+        return create_array({ans, mod((p - ans), p)});
+    }
+    auto aa = 0;
+    for (auto i : range_el(1, p)) {
+        auto temp = pow(BigInt(mod((i * i - n), p)), idiv(phi, 2), p);
+        if ((temp == phi)) {
+            aa = i;
+            break;
+        }
+    }
+    auto exponent = convertToBase(idiv((p + 1), 2), 2);
+    auto cipollaMult = [](const auto &ab, const auto &cd, const auto &w, const auto &p)
+    {
+        auto [a, b] = ab;
+        auto [c, d] = cd;
+        return make_tuple(mod((a * c + b * d * w), p), mod((a * d + b * c), p));
+    };
+    auto x1 = make_tuple(aa, 1);
+    auto x2 = cipollaMult(x1, x1, aa * aa - n, p);
+    for (auto i : range_el(1, exponent.len()))
+        if ((exponent[i] == 0)) {
+            x2 = cipollaMult(x2, x1, aa * aa - n, p);
+            x1 = cipollaMult(x1, x1, aa * aa - n, p);
+        }
+        else {
+            x1 = cipollaMult(x1, x2, aa * aa - n, p);
+            x2 = cipollaMult(x2, x2, aa * aa - n, p);
+        }
+    return create_array({_get<0>(x1), mod((p - _get<0>(x1)), p)});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Roots of 2 mod 7: "_S & String(cipolla(2, 7)));
+        print(u"Roots of 8218 mod 10007: "_S & String(cipolla(8218, 10007)));
+        print(u"Roots of 56 mod 101: "_S & String(cipolla(56, 101)));
+        print(u"Roots of 1 mod 11: "_S & String(cipolla(1, 11)));
+        print(u"Roots of 8219 mod 10007: "_S & String(cipolla(8219, 10007)));
+    }
+} code_block_1;
