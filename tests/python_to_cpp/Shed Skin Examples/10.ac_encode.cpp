@@ -66,6 +66,7 @@ template <typename T1, typename T2 = decltype(BETA0), typename T3 = decltype(BET
             a *= 2;
             b *= 2;
         }
+
         assert(a <= ::HALF);
         assert(b >= ::HALF);
         assert(a >= 0);
@@ -75,6 +76,7 @@ template <typename T1, typename T2 = decltype(BETA0), typename T3 = decltype(BET
             a = 2 * a - ::HALF;
             b = 2 * b - ::HALF;
         }
+
         assert(a <= ::HALF);
         assert(b >= ::HALF);
         assert(a >= 0);
@@ -178,6 +180,7 @@ template <typename T1, typename T2 = decltype(10000), typename T3 = decltype(BET
                 v *= 2;
                 model_needs_updating = 1;
             }
+
             assert(a <= ::HALF);
             assert(b >= ::HALF);
             assert(a >= 0);

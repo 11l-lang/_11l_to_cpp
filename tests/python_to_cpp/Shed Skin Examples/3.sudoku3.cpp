@@ -162,6 +162,7 @@ public:
                         assert(!in(_get<0>(squares[row][col]), known_values), u"bugger3"_S);
 
                         known_values.append(_get<0>(squares[row][col]));
+
                         assert(in(_get<0>(squares[row][col]), unassigned_values), u"bugger4"_S);
 
                         unassigned_values.remove(_get<0>(squares[row][col]));

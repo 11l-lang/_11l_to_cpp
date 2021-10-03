@@ -320,6 +320,7 @@ T Timsort
          num_remaining -= run_len
          I num_remaining == 0
             L.break
+
       assert(low == high)
       .merge_force_collapse()
       assert(.stack_size == 1)
@@ -342,6 +343,7 @@ T Timsort
 		@param number the length of the array to be sorted
 		@return the length of the minimum run to be merged
 		’
+
       assert(number >= 0)
       V low_bit = 0
       L number >= .min_merge
@@ -582,6 +584,7 @@ T Timsort
 			(must be aBase + aLen)
 		@param len2  length of second run to be merged (must be > 0)
 		’
+
       assert(len1 > 0 & len2 > 0 & base1 + len1 == base2)
 
       V tmp = .ensure_capacity(len2)

@@ -278,6 +278,7 @@ F postfix_to_infix(postfix)
          expr.append(Expression(token))
 
       print(token‘ -> ’String(expr))
+
    assert(expr.len == 1)
    R expr[0].ex
 
@@ -343,6 +344,7 @@ template <typename T1> auto postfix_to_infix(const T1 &postfix)
 
         print(token & u" -> "_S & String(expr));
     }
+
     assert(expr.len() == 1);
     return _get<0>(expr).ex;
 }

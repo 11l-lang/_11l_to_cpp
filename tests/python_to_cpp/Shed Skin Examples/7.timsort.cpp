@@ -363,6 +363,7 @@ public:
             if (num_remaining == 0)
                 break;
         }
+
         assert(low == high);
         merge_force_collapse();
         assert(stack_size == 1);
@@ -387,6 +388,7 @@ public:
 		@param number the length of the array to be sorted
 		@return the length of the minimum run to be merged
 		)"_S;
+
         assert(number >= 0);
         auto low_bit = 0;
         while (number >= min_merge) {
@@ -661,6 +663,7 @@ public:
 			(must be aBase + aLen)
 		@param len2  length of second run to be merged (must be > 0)
 		)"_S;
+
         assert(len1 > 0 && len2 > 0 && base1 + len1 == base2);
 
         auto tmp = ensure_capacity(len2);

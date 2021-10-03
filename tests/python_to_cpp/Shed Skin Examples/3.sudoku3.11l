@@ -125,6 +125,7 @@ T soduko
                   assert(.squares[row][col][0] !C known_values, ‘bugger3’)
 
                   known_values.append(.squares[row][col][0])
+
                   assert(.squares[row][col][0] C unassigned_values, ‘bugger4’)
 
                   unassigned_values.remove(.squares[row][col][0])
