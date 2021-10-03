@@ -2408,7 +2408,7 @@ F pprint(m)
       print(row)
 
 F matrix_mul(a, b)
-   V result = [[0.0] * a.len] * (a.len)
+   V result = [[0.0] * a.len] * a.len
    L(j) 0 .< a.len
       L(i) 0 .< a.len
          V r = 0.0
@@ -2462,7 +2462,7 @@ template <typename T1> auto pprint(const T1 &m)
 
 template <typename T1, typename T2> auto matrix_mul(const T1 &a, const T2 &b)
 {
-    auto result = create_array({create_array({0.0}) * a.len()}) * (a.len());
+    auto result = create_array({create_array({0.0}) * a.len()}) * a.len();
     for (auto j : range_el(0, a.len()))
         for (auto i : range_el(0, a.len())) {
             auto r = 0.0;

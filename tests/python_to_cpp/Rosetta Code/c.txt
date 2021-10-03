@@ -865,7 +865,7 @@ m2 = [[18, 22,  54,  42],
 pprint(cholesky(m2))
 ===
 F cholesky(A)
-   V l = [[0.0] * A.len] * (A.len)
+   V l = [[0.0] * A.len] * A.len
    L(i) 0 .< A.len
       L(j) 0 .. i
          V s = sum((0 .< j).map(k -> @l[@i][k] * @l[@j][k]))
@@ -887,7 +887,7 @@ pprint(cholesky(m2))
 ===
 template <typename T1> auto cholesky(const T1 &A)
 {
-    auto l = create_array({create_array({0.0}) * A.len()}) * (A.len());
+    auto l = create_array({create_array({0.0}) * A.len()}) * A.len();
     for (auto i : range_el(0, A.len()))
         for (auto j : range_ee(0, i)) {
             auto s = sum_map(range_el(0, j), [&i, &j, &l](const auto &k){return l[i][k] * l[j][k];});
@@ -1465,14 +1465,14 @@ F to_str(m)
    R r
 
 F conjugateTransposed(m)
-   V r = [[0i] * m.len] * (m.len)
+   V r = [[0i] * m.len] * m.len
    L(i) 0 .< m.len
       L(j) 0 .< m.len
          r[j][i] = conjugate(m[i][j])
    R r
 
 F mmul(m1, m2)
-   V r = [[0i] * m1.len] * (m1.len)
+   V r = [[0i] * m1.len] * m1.len
    L(i) 0 .< m1.len
       L(j) 0 .< m1.len
          L(k) 0 .< m1.len
@@ -1564,7 +1564,7 @@ template <typename T1> auto to_str(const T1 &m)
 
 template <typename T1> auto conjugateTransposed(const T1 &m)
 {
-    auto r = create_array({create_array({0i}) * m.len()}) * (m.len());
+    auto r = create_array({create_array({0i}) * m.len()}) * m.len();
     for (auto i : range_el(0, m.len()))
         for (auto j : range_el(0, m.len()))
             r[j].set(i, conjugate(m[i][j]));
@@ -1573,7 +1573,7 @@ template <typename T1> auto conjugateTransposed(const T1 &m)
 
 template <typename T1, typename T2> auto mmul(const T1 &m1, const T2 &m2)
 {
-    auto r = create_array({create_array({0i}) * m1.len()}) * (m1.len());
+    auto r = create_array({create_array({0i}) * m1.len()}) * m1.len();
     for (auto i : range_el(0, m1.len()))
         for (auto j : range_el(0, m1.len()))
             for (auto k : range_el(0, m1.len()))

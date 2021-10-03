@@ -10168,7 +10168,7 @@ for i in [3, 3, 5, 5]:
 ===
 F _transpose(matrix)
    assert(matrix.len == matrix[0].len)
-   V r = [[0] * matrix.len] * (matrix.len)
+   V r = [[0] * matrix.len] * matrix.len
    L(i) 0 .< matrix.len
       L(j) 0 .< matrix.len
          r[i][j] = matrix[j][i]
@@ -10216,7 +10216,7 @@ L(i) [3, 3, 5, 5]
 template <typename T1> auto _transpose(const T1 &matrix)
 {
     assert(matrix.len() == _get<0>(matrix).len());
-    auto r = create_array({create_array({0}) * matrix.len()}) * (matrix.len());
+    auto r = create_array({create_array({0}) * matrix.len()}) * matrix.len();
     for (auto i : range_el(0, matrix.len()))
         for (auto j : range_el(0, matrix.len()))
             r[i].set(j, matrix[j][i]);
