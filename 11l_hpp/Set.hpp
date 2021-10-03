@@ -28,7 +28,7 @@ public:
 		return r.second;
 	}
 
-	void update(const Set &other)
+	template <typename OtherType> void update(const OtherType &other)
 	{
 		std::set<KeyType>::insert(other.begin(), other.end());
 	}

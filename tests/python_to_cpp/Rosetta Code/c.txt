@@ -764,3 +764,2281 @@ struct CodeBlock2
         do_chao(msg, lalpha, ralpha, true, true);
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Chinese_zodiac#C.2B.2B
+animals = ["Rat","Ox","Tiger","Rabbit","Dragon","Snake","Horse","Goat","Monkey","Rooster","Dog","Pig"]
+elements = ["Wood","Fire","Earth","Metal","Water"]
+
+def getElement(year):
+    return elements[(year-4)%10//2]
+
+def getAnimal(year):
+    return animals[(year-4)%12]
+
+def getYY(year):
+    if year%2 == 0:
+        return "yang"
+    else:
+        return "yin"
+
+for year in [1935,1938,1968,1972,1976,2017]:
+    print(str(year) + ' is the year of the ' + getElement(year) + ' ' + getAnimal(year) + ' (' + getYY(year) + ').')
+===
+V animals = [‘Rat’, ‘Ox’, ‘Tiger’, ‘Rabbit’, ‘Dragon’, ‘Snake’, ‘Horse’, ‘Goat’, ‘Monkey’, ‘Rooster’, ‘Dog’, ‘Pig’]
+V elements = [‘Wood’, ‘Fire’, ‘Earth’, ‘Metal’, ‘Water’]
+
+F getElement(year)
+   R :elements[(year - 4) % 10 I/ 2]
+
+F getAnimal(year)
+   R :animals[(year - 4) % 12]
+
+F getYY(year)
+   I year % 2 == 0
+      R ‘yang’
+   E
+      R ‘yin’
+
+L(year) [1935, 1938, 1968, 1972, 1976, 2017]
+   print(String(year)‘ is the year of the ’getElement(year)‘ ’getAnimal(year)‘ (’getYY(year)‘).’)
+===
+auto animals = create_array({u"Rat"_S, u"Ox"_S, u"Tiger"_S, u"Rabbit"_S, u"Dragon"_S, u"Snake"_S, u"Horse"_S, u"Goat"_S, u"Monkey"_S, u"Rooster"_S, u"Dog"_S, u"Pig"_S});
+auto elements = create_array({u"Wood"_S, u"Fire"_S, u"Earth"_S, u"Metal"_S, u"Water"_S});
+
+template <typename T1> auto getElement(const T1 &year)
+{
+    return ::elements[idiv(mod((year - 4), 10), 2)];
+}
+
+template <typename T1> auto getAnimal(const T1 &year)
+{
+    return ::animals[mod((year - 4), 12)];
+}
+
+template <typename T1> auto getYY(const T1 &year)
+{
+    if (mod(year, 2) == 0)
+        return u"yang"_S;
+    else
+        return u"yin"_S;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&year : create_array({1935, 1938, 1968, 1972, 1976, 2017}))
+            print(String(year) & u" is the year of the "_S & getElement(year) & u" "_S & getAnimal(year) & u" ("_S & getYY(year) & u")."_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Cholesky_decomposition#Python
+import math
+
+def cholesky(A):
+    l = [[0.0] * len(A) for _ in range(len(A))]
+    for i in range(len(A)):
+        for j in range(i+1):
+            s = sum(l[i][k] * l[j][k] for k in range(j))
+            l[i][j] = math.sqrt(A[i][i] - s) if (i == j) else \
+                      (1.0 / l[j][j] * (A[i][j] - s))
+    return l
+
+def pprint(m):
+    print('[')
+    for row in m:
+        print(row)
+    print(']')
+
+m1 = [[25, 15, -5],
+      [15, 18,  0],
+      [-5,  0, 11]]
+print(cholesky(m1))
+print()
+
+m2 = [[18, 22,  54,  42],
+      [22, 70,  86,  62],
+      [54, 86, 174, 134],
+      [42, 62, 134, 106]]
+pprint(cholesky(m2))
+===
+F cholesky(A)
+   V l = [[0.0] * A.len] * (A.len)
+   L(i) 0 .< A.len
+      L(j) 0 .. i
+         V s = sum((0 .< j).map(k -> @l[@i][k] * @l[@j][k]))
+         l[i][j] = I (i == j) {sqrt(A[i][i] - s)} E (1.0 / l[j][j] * (A[i][j] - s))
+   R l
+
+F pprint(m)
+   print(‘[’)
+   L(row) m
+      print(row)
+   print(‘]’)
+
+V m1 = [[25, 15, -5], [15, 18, 0], [-5, 0, 11]]
+print(cholesky(m1))
+print()
+
+V m2 = [[18, 22, 54, 42], [22, 70, 86, 62], [54, 86, 174, 134], [42, 62, 134, 106]]
+pprint(cholesky(m2))
+===
+template <typename T1> auto cholesky(const T1 &A)
+{
+    auto l = create_array({create_array({0.0}) * A.len()}) * (A.len());
+    for (auto i : range_el(0, A.len()))
+        for (auto j : range_ee(0, i)) {
+            auto s = sum_map(range_el(0, j), [&i, &j, &l](const auto &k){return l[i][k] * l[j][k];});
+            l[i].set(j, (i == j) ? sqrt(A[i][i] - s) : (1.0 / l[j][j] * (A[i][j] - s)));
+        }
+    return l;
+}
+
+template <typename T1> auto pprint(const T1 &m)
+{
+    print(u"["_S);
+    for (auto &&row : m)
+        print(row);
+    print(u"]"_S);
+}
+
+auto m1 = create_array({create_array({25, 15, -5}), create_array({15, 18, 0}), create_array({-5, 0, 11})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(cholesky(m1));
+        print();
+    }
+} code_block_1;
+
+auto m2 = create_array({create_array({18, 22, 54, 42}), create_array({22, 70, 86, 62}), create_array({54, 86, 174, 134}), create_array({42, 62, 134, 106})});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        pprint(cholesky(m2));
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Chowla_numbers#C
+def chowla(n):
+    sum = 0
+    i = 2
+    while i * i <= n:
+        if n % i == 0:
+            sum += i
+            j = n // i
+            if i != j:
+                sum += j
+        i += 1
+    return sum
+
+for n in range(1, 38):
+    print('chowla(%i) = %i' % (n, chowla(n)))
+
+count = 0
+power = 100
+for n in range(2, 10_000_001):
+    if chowla(n) == 0: count += 1
+    if n % power == 0:
+        print('There are %i primes < %i' % (count, power))
+        power *= 10
+
+count = 0
+limit = 350_000_000
+k = 2
+kk = 3
+while True:
+    p = k * kk
+    if p > limit:
+        break
+    if chowla(p) == p - 1:
+        print(p, 'is a perfect number')
+        count += 1
+    k = kk + 1
+    kk += k
+print('There are', count, 'perfect numbers <', limit)
+===
+F chowla(n)
+   V sum = 0
+   V i = 2
+   L i * i <= n
+      I n % i == 0
+         sum += i
+         V j = n I/ i
+         I i != j
+            sum += j
+      i++
+   R sum
+
+L(n) 1..37
+   print(‘chowla(#.) = #.’.format(n, chowla(n)))
+
+V count = 0
+V power = 100
+L(n) 2..10000000
+   I chowla(n) == 0
+      count++
+   I n % power == 0
+      print(‘There are #. primes < #.’.format(count, power))
+      power *= 10
+
+count = 0
+V limit = 350'000'000
+V k = 2
+V kk = 3
+L
+   V p = k * kk
+   I p > limit
+      L.break
+   I chowla(p) == p - 1
+      print(p‘ is a perfect number’)
+      count++
+   k = kk + 1
+   kk += k
+print(‘There are ’count‘ perfect numbers < ’limit)
+===
+template <typename T1> auto chowla(const T1 &n)
+{
+    auto sum = 0;
+    auto i = 2;
+    while (i * i <= n) {
+        if (mod(n, i) == 0) {
+            sum += i;
+            auto j = idiv(n, i);
+            if (i != j)
+                sum += j;
+        }
+        i++;
+    }
+    return sum;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(1, 37))
+            print(u"chowla(#.) = #."_S.format(n, chowla(n)));
+    }
+} code_block_1;
+
+auto count = 0;
+auto power = 100;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto n : range_ee(2, 10000000)) {
+            if (chowla(n) == 0)
+                count++;
+            if (mod(n, power) == 0) {
+                print(u"There are #. primes < #."_S.format(count, power));
+                power *= 10;
+            }
+        }
+
+        count = 0;
+    }
+} code_block_2;
+
+auto limit = 350'000'000;
+auto k = 2;
+auto kk = 3;
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        while (true) {
+            auto p = k * kk;
+            if (p > limit)
+                break;
+            if (chowla(p) == p - 1) {
+                print(p & u" is a perfect number"_S);
+                count++;
+            }
+            k = kk + 1;
+            kk += k;
+        }
+        print(u"There are "_S & count & u" perfect numbers < "_S & limit);
+    }
+} code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Combinations_and_permutations#C.2B.2B
+BigInt = int
+
+def perm(n, p):
+    r : BigInt = 1
+    k = n - p
+    while n > k:
+        r *= n
+        n -= 1
+    return r
+
+def comb(n, k):
+    r = perm(n, k)
+    while k > 0:
+        r //= k
+        k -= 1
+    return r
+
+for i in range(1, 12):
+    print('P(12,' + str(i) + ') = ' + str(perm(12, i)))
+for i in range(10, 60, 10):
+    print('C(60,' + str(i) + ') = ' + str(comb(60, i)))
+===
+F perm(=n, p)
+   BigInt r = 1
+   V k = n - p
+   L n > k
+      r *= n
+      n--
+   R r
+
+F comb(n, =k)
+   V r = perm(n, k)
+   L k > 0
+      r I/= k
+      k--
+   R r
+
+L(i) 1..11
+   print(‘P(12,’String(i)‘) = ’String(perm(12, i)))
+L(i) (10.<60).step(10)
+   print(‘C(60,’String(i)‘) = ’String(comb(60, i)))
+===
+template <typename T1, typename T2> auto perm(T1 n, const T2 &p)
+{
+    BigInt r = 1;
+    auto k = n - p;
+    while (n > k) {
+        r *= n;
+        n--;
+    }
+    return r;
+}
+
+template <typename T1, typename T2> auto comb(const T1 &n, T2 k)
+{
+    auto r = perm(n, k);
+    while (k > 0) {
+        r = idiv(r, k);
+        k--;
+    }
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(1, 11))
+            print(u"P(12,"_S & String(i) & u") = "_S & String(perm(12, i)));
+        for (auto i : range_el(10, 60).step(10))
+            print(u"C(60,"_S & String(i) & u") = "_S & String(comb(60, i)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Commatizing_numbers#Nim
+import re
+
+def commatize(s : str, period = 3, sep = ','):
+    m = re.search(r'(\.[0-9]+|[1-9]([0-9]+)?(\.[0-9]+)?)', s)
+    if not m:
+        return s
+
+    match = m.group()
+    splits = match.split('.')
+
+    ip : str = splits[0]
+    if len(ip) > period:
+        inserted = 0
+        for i in range((len(ip) - 1) % period + 1, len(ip), period):
+            ip = ip[:i + inserted] + sep + ip[i + inserted:]
+            inserted += len(sep)
+
+    if len(splits) > 1:
+        dp : str = splits[1]
+        if len(dp) > period:
+            for i in range((len(dp) - 1) // period * period, period - 1, -period):
+                dp = dp[:i] + sep + dp[i:]
+        ip += '.' + dp
+
+    return s[:m.start()] + ip + s[m.end():]
+
+tests = [
+        "123456789.123456789",
+        ".123456789",
+        "57256.1D-4",
+        "pi=3.14159265358979323846264338327950288419716939937510582097494459231",
+        "The author has two Z$100000000000000 Zimbabwe notes (100 trillion).",
+        "-in Aus$+1411.8millions",
+        "===US$0017440 millions=== (in 2000 dollars)",
+        "123.e8000 is pretty big.",
+        "The land area of the earth is 57268900(29% of the surface) square miles.",
+        "Ain't no numbers in this here words, nohow, no way, Jose.",
+        "James was never known as 0000000007",
+        "Arthur Eddington wrote: I believe there are " +
+        "15747724136275002577605653961181555468044717914527116709366231425076185631031296" +
+        " protons in the universe.",
+        "   $-140000±100 millions.",
+        "6/9/1946 was a good year for some."
+        ]
+
+print(commatize(tests[0], period = 2, sep = "*"))
+print(commatize(tests[1], period = 3, sep = "-"))
+print(commatize(tests[2], period = 4, sep = "__"))
+print(commatize(tests[3], period = 5, sep = " "))
+print(commatize(tests[4], sep = "."))
+
+for test in tests[5:]:
+    print(commatize(test))
+===
+F commatize(String s; period = 3, sep = ‘,’)
+   V m = re:‘(\.[0-9]+|[1-9]([0-9]+)?(\.[0-9]+)?)’.search(s)
+   I !m
+      R s
+
+   V match = m.group()
+   V splits = match.split(‘.’)
+
+   String ip = splits[0]
+   I ip.len > period
+      V inserted = 0
+      L(i) ((ip.len - 1) % period + 1 .< ip.len).step(period)
+         ip = ip[0 .< i + inserted]‘’sep‘’ip[i + inserted ..]
+         inserted += sep.len
+
+   I splits.len > 1
+      String dp = splits[1]
+      I dp.len > period
+         L(i) ((dp.len - 1) I/ period * period .< period - 1).step(-period)
+            dp = dp[0 .< i]‘’sep‘’dp[i ..]
+      ip ‘’= ‘.’dp
+
+   R s[0 .< m.start()]‘’ip‘’s[m.end() ..]
+
+V tests = [‘123456789.123456789’, ‘.123456789’, ‘57256.1D-4’, ‘pi=3.14159265358979323846264338327950288419716939937510582097494459231’, ‘The author has two Z$100000000000000 Zimbabwe notes (100 trillion).’, ‘-in Aus$+1411.8millions’, ‘===US$0017440 millions=== (in 2000 dollars)’, ‘123.e8000 is pretty big.’, ‘The land area of the earth is 57268900(29% of the surface) square miles.’, ‘Ain't no numbers in this here words, nohow, no way, Jose.’, ‘James was never known as 0000000007’, ‘Arthur Eddington wrote: I believe there are ’""‘15747724136275002577605653961181555468044717914527116709366231425076185631031296’""‘ protons in the universe.’, ‘   $-140000±100 millions.’, ‘6/9/1946 was a good year for some.’]
+
+print(commatize(tests[0], period' 2, sep' ‘*’))
+print(commatize(tests[1], period' 3, sep' ‘-’))
+print(commatize(tests[2], period' 4, sep' ‘__’))
+print(commatize(tests[3], period' 5, sep' ‘ ’))
+print(commatize(tests[4], sep' ‘.’))
+
+L(test) tests[5..]
+   print(commatize(test))
+===
+template <typename T2 = decltype(3), typename T3 = decltype(u","_S)> auto commatize(const String &s, const T2 &period = 3, const T3 &sep = u","_S)
+{
+    auto m = re::_(uR"((\.[0-9]+|[1-9]([0-9]+)?(\.[0-9]+)?))"_S).search(s);
+    if (!m)
+        return s;
+
+    auto match = m.group();
+    auto splits = match.split(u"."_S);
+
+    String ip = _get<0>(splits);
+    if (ip.len() > period) {
+        auto inserted = 0;
+        for (auto i : range_el(mod((ip.len() - 1), period) + 1, ip.len()).step(period)) {
+            ip = ip[range_el(0, i + inserted)] & sep & ip[range_ei(i + inserted)];
+            inserted += sep.len();
+        }
+    }
+
+    if (splits.len() > 1) {
+        String dp = _get<1>(splits);
+        if (dp.len() > period)
+            for (auto i : range_el(idiv((dp.len() - 1), period) * period, period - 1).step(-period))
+                dp = dp[range_el(0, i)] & sep & dp[range_ei(i)];
+        ip &= u"."_S & dp;
+    }
+
+    return s[range_el(0, m.start())] & ip & s[range_ei(m.end())];
+}
+
+auto tests = create_array({u"123456789.123456789"_S, u".123456789"_S, u"57256.1D-4"_S, u"pi=3.14159265358979323846264338327950288419716939937510582097494459231"_S, u"The author has two Z$100000000000000 Zimbabwe notes (100 trillion)."_S, u"-in Aus$+1411.8millions"_S, u"===US$0017440 millions=== (in 2000 dollars)"_S, u"123.e8000 is pretty big."_S, u"The land area of the earth is 57268900(29% of the surface) square miles."_S, u"Ain't no numbers in this here words, nohow, no way, Jose."_S, u"James was never known as 0000000007"_S, u"Arthur Eddington wrote: I believe there are "_S & u"15747724136275002577605653961181555468044717914527116709366231425076185631031296"_S & u" protons in the universe."_S, u"   $-140000±100 millions."_S, u"6/9/1946 was a good year for some."_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(commatize(_get<0>(tests), 2, u"*"_S));
+        print(commatize(_get<1>(tests), 3, u"-"_S));
+        print(commatize(_get<2>(tests), 4, u"__"_S));
+        print(commatize(_get<3>(tests), 5, u" "_S));
+        print(commatize(_get<4>(tests), 3, u"."_S));
+
+        for (auto &&test : tests[range_ei(5)])
+            print(commatize(test));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Common_list_elements
+def cle(nums):
+    r = set(nums[0])
+    for num in nums[1:]:
+        r = r.intersection(set(num))
+    return r
+
+print(cle([[2,5,1,3,8,9,4,6], [3,5,6,2,9,8,4], [1,3,7,6,9]]))
+===
+F cle(nums)
+   V r = Set(nums[0])
+   L(num) nums[1..]
+      r = r.intersection(Set(num))
+   R r
+
+print(cle([[2, 5, 1, 3, 8, 9, 4, 6], [3, 5, 6, 2, 9, 8, 4], [1, 3, 7, 6, 9]]))
+===
+template <typename T1> auto cle(const T1 &nums)
+{
+    auto r = create_set(_get<0>(nums));
+    for (auto &&num : nums[range_ei(1)])
+        r = r.intersection(create_set(num));
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(cle(create_array({create_array({2, 5, 1, 3, 8, 9, 4, 6}), create_array({3, 5, 6, 2, 9, 8, 4}), create_array({1, 3, 7, 6, 9})})));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Common_sorted_list
+def csl(nums):
+    r = set() # int
+    for num in nums:
+        r.update(num)
+    return sorted(list(r))
+
+print(csl([[5,1,3,8,9,4,8,7], [3,5,9,8,4], [1,3,7,9]]))
+===
+F csl(nums)
+   V r = Set[Int]()
+   L(num) nums
+      r.update(num)
+   R sorted(Array(r))
+
+print(csl([[5, 1, 3, 8, 9, 4, 8, 7], [3, 5, 9, 8, 4], [1, 3, 7, 9]]))
+===
+template <typename T1> auto csl(const T1 &nums)
+{
+    auto r = Set<int>();
+    for (auto &&num : nums)
+        r.update(num);
+    return sorted(create_array(r));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(csl(create_array({create_array({5, 1, 3, 8, 9, 4, 8, 7}), create_array({3, 5, 9, 8, 4}), create_array({1, 3, 7, 9})})));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Conjugate_transpose#Nim
+import math
+
+eps = 1e-10
+
+def to_str(m):
+    r = ''
+    for i, row in enumerate(m):
+        r += '[' if i == 0 else ' '
+        for j, val in enumerate(row):
+            if j != 0: r += ' '
+            r += '(%7.4f, %7.4f)' % (val.real, val.imag)
+        r += ']' if i == len(m) - 1 else "\n"
+    return r
+
+def conjugateTransposed(m):
+    r = [[0j] * len(m) for i in range(len(m))]
+    for i in range(len(m)):
+        for j in range(len(m)):
+            r[j][i] = m[i][j].conjugate()
+    return r
+
+def mmul(m1, m2):
+    r = [[0j] * len(m1) for i in range(len(m1))]
+    for i in range(len(m1)):
+        for j in range(len(m1)):
+            for k in range(len(m1)):
+                r[i][j] += m1[i][k] * m2[k][j]
+    return r
+
+def isHermitian(m):
+    for i in range(len(m)):
+        for j in range(len(m)):
+            if m[i][j] != m[j][i].conjugate():
+                return False
+    return True
+
+def isEqual(m1, m2):
+    for i in range(len(m1)):
+        for j in range(len(m1)):
+            if m1[i][j] != m2[i][j]:
+                return False
+    return True
+
+def isNormal(m):
+    h = conjugateTransposed(m)
+    return isEqual(mmul(m, h), mmul(h, m))
+
+def isIdentity(m):
+    for i in range(len(m)):
+        for j in range(len(m)):
+            if i == j:
+                if abs(m[i][j] - 1.0) > eps:
+                    return False
+            else:
+                if abs(m[i][j]) > eps:
+                    return False
+    return True
+
+def isUnitary(m):
+    h = conjugateTransposed(m)
+    return isIdentity(mmul(m, h)) and isIdentity(mmul(h, m))
+
+def test(m):
+    print("Matrix")
+    print("------")
+    print(to_str(m))
+    print("")
+    print("Conjugate transposed")
+    print("--------------------")
+    print(to_str(conjugateTransposed(m)))
+    print("")
+    print("Hermitian:", 'true' if isHermitian(m) else 'false')
+    print("Normal:", 'true' if isNormal(m) else 'false')
+    print("Unitary:", 'true' if isUnitary(m) else 'false')
+
+M2 = [[3.0 + 0.0j, 2.0 + 1.0j],
+      [2.0 - 1.0j, 1.0 + 0.0j]]
+
+M3 = [[1.0 + 0.0j, 1.0 + 0.0j, 0.0 + 0.0j],
+      [0.0 + 0.0j, 1.0 + 0.0j, 1.0 + 0.0j],
+      [1.0 + 0.0j, 0.0 + 0.0j, 1.0 + 0.0j]]
+
+SR2 = 1 / math.sqrt(2.0)
+SR2i = SR2 * 1j
+M4 = [[SR2 + 0.0j, SR2 + 0.0j, 0.0 + 0.0j],
+      [0.0 + SR2i, 0.0 - SR2i, 0.0 + 0.0j],
+      [0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 1.0j]]
+
+test(M2)
+print("\n")
+test(M3)
+print("\n")
+test(M4)
+===
+V eps = 1e-10
+
+F to_str(m)
+   V r = ‘’
+   L(row) m
+      V i = L.index
+      r ‘’= I i == 0 {‘[’} E ‘ ’
+      L(val) row
+         V j = L.index
+         I j != 0
+            r ‘’= ‘ ’
+         r ‘’= ‘(#2.4, #2.4)’.format(val.real, val.imag)
+      r ‘’= I i == m.len - 1 {‘]’} E "\n"
+   R r
+
+F conjugateTransposed(m)
+   V r = [[0i] * m.len] * (m.len)
+   L(i) 0 .< m.len
+      L(j) 0 .< m.len
+         r[j][i] = conjugate(m[i][j])
+   R r
+
+F mmul(m1, m2)
+   V r = [[0i] * m1.len] * (m1.len)
+   L(i) 0 .< m1.len
+      L(j) 0 .< m1.len
+         L(k) 0 .< m1.len
+            r[i][j] += m1[i][k] * m2[k][j]
+   R r
+
+F isHermitian(m)
+   L(i) 0 .< m.len
+      L(j) 0 .< m.len
+         I m[i][j] != conjugate(m[j][i])
+            R 0B
+   R 1B
+
+F isEqual(m1, m2)
+   L(i) 0 .< m1.len
+      L(j) 0 .< m1.len
+         I m1[i][j] != m2[i][j]
+            R 0B
+   R 1B
+
+F isNormal(m)
+   V h = conjugateTransposed(m)
+   R isEqual(mmul(m, h), mmul(h, m))
+
+F isIdentity(m)
+   L(i) 0 .< m.len
+      L(j) 0 .< m.len
+         I i == j
+            I abs(m[i][j] - 1.0) > :eps
+               R 0B
+         E
+            I abs(m[i][j]) > :eps
+               R 0B
+   R 1B
+
+F isUnitary(m)
+   V h = conjugateTransposed(m)
+   R isIdentity(mmul(m, h)) & isIdentity(mmul(h, m))
+
+F test(m)
+   print(‘Matrix’)
+   print(‘------’)
+   print(to_str(m))
+   print(‘’)
+   print(‘Conjugate transposed’)
+   print(‘--------------------’)
+   print(to_str(conjugateTransposed(m)))
+   print(‘’)
+   print(‘Hermitian: ’(I isHermitian(m) {‘true’} E ‘false’))
+   print(‘Normal: ’(I isNormal(m) {‘true’} E ‘false’))
+   print(‘Unitary: ’(I isUnitary(m) {‘true’} E ‘false’))
+
+V M2 = [[3.0 + 0.0i, 2.0 + 1.0i], [2.0 - 1.0i, 1.0 + 0.0i]]
+
+V M3 = [[1.0 + 0.0i, 1.0 + 0.0i, 0.0 + 0.0i], [0.0 + 0.0i, 1.0 + 0.0i, 1.0 + 0.0i], [1.0 + 0.0i, 0.0 + 0.0i, 1.0 + 0.0i]]
+
+V SR2 = 1 / sqrt(2.0)
+V SR2i = SR2 * 1i
+V M4 = [[SR2 + 0.0i, SR2 + 0.0i, 0.0 + 0.0i], [0.0 + SR2i, 0.0 - SR2i, 0.0 + 0.0i], [0.0 + 0.0i, 0.0 + 0.0i, 0.0 + 1.0i]]
+
+test(M2)
+print("\n")
+test(M3)
+print("\n")
+test(M4)
+===
+auto eps = 1e-10;
+
+template <typename T1> auto to_str(const T1 &m)
+{
+    auto r = u""_S;
+    {int Lindex = 0;
+    for (auto &&row : m) {
+        auto i = Lindex;
+        r &= i == 0 ? u"["_S : u" "_S;
+        {int Lindex = 0;
+        for (auto &&val : row) {
+            auto j = Lindex;
+            if (j != 0)
+                r &= u" "_S;
+            r &= u"(#2.4, #2.4)"_S.format(val.real(), val.imag());
+            Lindex++;
+        }}
+        r &= i == m.len() - 1 ? u"]"_S : u"\n"_S;
+        Lindex++;
+    }}
+    return r;
+}
+
+template <typename T1> auto conjugateTransposed(const T1 &m)
+{
+    auto r = create_array({create_array({0i}) * m.len()}) * (m.len());
+    for (auto i : range_el(0, m.len()))
+        for (auto j : range_el(0, m.len()))
+            r[j].set(i, conjugate(m[i][j]));
+    return r;
+}
+
+template <typename T1, typename T2> auto mmul(const T1 &m1, const T2 &m2)
+{
+    auto r = create_array({create_array({0i}) * m1.len()}) * (m1.len());
+    for (auto i : range_el(0, m1.len()))
+        for (auto j : range_el(0, m1.len()))
+            for (auto k : range_el(0, m1.len()))
+                r[i][j] += m1[i][k] * m2[k][j];
+    return r;
+}
+
+template <typename T1> auto isHermitian(const T1 &m)
+{
+    for (auto i : range_el(0, m.len()))
+        for (auto j : range_el(0, m.len()))
+            if (m[i][j] != conjugate(m[j][i]))
+                return false;
+    return true;
+}
+
+template <typename T1, typename T2> auto isEqual(const T1 &m1, const T2 &m2)
+{
+    for (auto i : range_el(0, m1.len()))
+        for (auto j : range_el(0, m1.len()))
+            if (m1[i][j] != m2[i][j])
+                return false;
+    return true;
+}
+
+template <typename T1> auto isNormal(const T1 &m)
+{
+    auto h = conjugateTransposed(m);
+    return isEqual(mmul(m, h), mmul(h, m));
+}
+
+template <typename T1> auto isIdentity(const T1 &m)
+{
+    for (auto i : range_el(0, m.len()))
+        for (auto j : range_el(0, m.len()))
+            if (i == j) {
+                if (abs(m[i][j] - 1.0) > ::eps)
+                    return false;
+            }
+            else
+                if (abs(m[i][j]) > ::eps)
+                    return false;
+    return true;
+}
+
+template <typename T1> auto isUnitary(const T1 &m)
+{
+    auto h = conjugateTransposed(m);
+    return isIdentity(mmul(m, h)) && isIdentity(mmul(h, m));
+}
+
+template <typename T1> auto test(const T1 &m)
+{
+    print(u"Matrix"_S);
+    print(u"------"_S);
+    print(to_str(m));
+    print(u""_S);
+    print(u"Conjugate transposed"_S);
+    print(u"--------------------"_S);
+    print(to_str(conjugateTransposed(m)));
+    print(u""_S);
+    print(u"Hermitian: "_S & (isHermitian(m) ? u"true"_S : u"false"_S));
+    print(u"Normal: "_S & (isNormal(m) ? u"true"_S : u"false"_S));
+    print(u"Unitary: "_S & (isUnitary(m) ? u"true"_S : u"false"_S));
+}
+
+auto M2 = create_array({create_array({3.0 + 0.0i, 2.0 + 1.0i}), create_array({2.0 - 1.0i, 1.0 + 0.0i})});
+
+auto M3 = create_array({create_array({1.0 + 0.0i, 1.0 + 0.0i, 0.0 + 0.0i}), create_array({0.0 + 0.0i, 1.0 + 0.0i, 1.0 + 0.0i}), create_array({1.0 + 0.0i, 0.0 + 0.0i, 1.0 + 0.0i})});
+
+auto SR2 = 1.0 / sqrt(2.0);
+auto SR2i = SR2 * 1i;
+auto M4 = create_array({create_array({SR2 + 0.0i, SR2 + 0.0i, 0.0 + 0.0i}), create_array({0.0 + SR2i, 0.0 - SR2i, 0.0 + 0.0i}), create_array({0.0 + 0.0i, 0.0 + 0.0i, 0.0 + 1.0i})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        test(M2);
+        print(u"\n"_S);
+        test(M3);
+        print(u"\n"_S);
+        test(M4);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Continued_fraction/Arithmetic/Construct_from_rational_number#Python
+def r2cf(n1, n2):
+    r : List[int] = []
+    while n2 != 0:
+        (n1, t1_n2) = (n2, divmod(n1, n2))
+        n2 = t1_n2[1]
+        r += [t1_n2[0]]
+    return r
+
+print(r2cf(1,2))    # => [0, 2]
+print(r2cf(3,1))    # => [3]
+print(r2cf(23,8))    # => [2, 1, 7]
+print(r2cf(13,11))    # => [1, 5, 2]
+print(r2cf(22,7))    # => [3, 7]
+print(r2cf(14142,10000))    # => [1, 2, 2, 2, 2, 2, 1, 1, 29]
+print(r2cf(141421,100000))    # => [1, 2, 2, 2, 2, 2, 2, 3, 1, 1, 3, 1, 7, 2]
+print(r2cf(1414214,1000000))    # => [1, 2, 2, 2, 2, 2, 2, 2, 3, 6, 1, 2, 1, 12]
+print(r2cf(14142136,10000000))    # => [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 6, 1, 2, 4, 1, 1, 2]
+===
+F r2cf(=n1, =n2)
+   [Int] r
+   L n2 != 0
+      (n1, V t1_n2) = (n2, divmod(n1, n2))
+      n2 = t1_n2[1]
+      r [+]= t1_n2[0]
+   R r
+
+print(r2cf(1, 2))
+print(r2cf(3, 1))
+print(r2cf(23, 8))
+print(r2cf(13, 11))
+print(r2cf(22, 7))
+print(r2cf(14142, 10000))
+print(r2cf(141421, 100000))
+print(r2cf(1414214, 1000000))
+print(r2cf(14142136, 10000000))
+===
+template <typename T1, typename T2> auto r2cf(T1 n1, T2 n2)
+{
+    Array<int> r;
+    while (n2 != 0) {
+        TUPLE_ELEMENT_T(1, make_tuple(n2, divmod(n1, n2))) t1_n2;
+        assign_from_tuple(n1, t1_n2, make_tuple(n2, divmod(n1, n2)));
+        n2 = _get<1>(t1_n2);
+        r.append(_get<0>(t1_n2));
+    }
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(r2cf(1, 2));
+        print(r2cf(3, 1));
+        print(r2cf(23, 8));
+        print(r2cf(13, 11));
+        print(r2cf(22, 7));
+        print(r2cf(14142, 10000));
+        print(r2cf(141421, 100000));
+        print(r2cf(1414214, 1000000));
+        print(r2cf(14142136, 10000000));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Continued_fraction/Arithmetic/G(matrix_ng,_continued_fraction_n)#Python
+class NG:
+  a1 : int
+  a  : int
+  b1 : int
+  b  : int
+  def __init__(self, a1, a, b1, b):
+    self.a1 = a1
+    self.a  = a
+    self.b1 = b1
+    self.b  = b
+
+  def ingress(self, n):
+    (self.a, self.a1) = (self.a1, self.a + self.a1 * n)
+    (self.b, self.b1) = (self.b1, self.b + self.b1 * n)
+
+  def needterm(self):
+    return (self.b == 0 or self.b1 == 0) or not self.a//self.b == self.a1//self.b1
+
+  def egress(self):
+    n = self.a // self.b
+    (self.a,  self.b ) = (self.b,  self.a  - self.b  * n)
+    (self.a1, self.b1) = (self.b1, self.a1 - self.b1 * n)
+    return n
+
+  def egress_done(self):
+    if self.needterm(): (self.a, self.b) = (self.a1, self.b1)
+    return self.egress()
+
+  def done(self):
+    return self.b == 0 and self.b1 == 0
+
+def r2cf(n1, n2):
+    r : List[int] = []
+    while n2 != 0:
+        (n1, t1_n2) = (n2, divmod(n1, n2))
+        n2 = t1_n2[1]
+        r += [t1_n2[0]]
+    return r
+
+data = [("[1;5,2] + 1/2",      2,1,0,2, (13,11)),
+        ("[3;7] + 1/2",        2,1,0,2, (22, 7)),
+        ("[3;7] divided by 4", 1,0,0,4, (22, 7))]
+
+for string, a1, a, b1, b, r in data:
+  print( "%-20s->" % string, end='' )
+  op = NG(a1, a, b1, b)
+  for n in r2cf(r[0], r[1]):
+    if not op.needterm(): print( " %s" % op.egress(), end='' )
+    op.ingress(n)
+  while True:
+    print( " %s" % op.egress_done(), end='' )
+    if op.done(): break
+  print()
+===
+T NG
+   Int a1
+   Int a
+   Int b1
+   Int b
+   F (a1, a, b1, b)
+      .a1 = a1
+      .a = a
+      .b1 = b1
+      .b = b
+
+   F ingress(n)
+      (.a, .a1) = (.a1, .a + .a1 * n)
+      (.b, .b1) = (.b1, .b + .b1 * n)
+
+   F needterm()
+      R (.b == 0 | .b1 == 0) | !(.a I/ .b == .a1 I/ .b1)
+
+   F egress()
+      V n = .a I/ .b
+      (.a, .b) = (.b, .a - .b * n)
+      (.a1, .b1) = (.b1, .a1 - .b1 * n)
+      R n
+
+   F egress_done()
+      I .needterm()
+         (.a, .b) = (.a1, .b1)
+      R .egress()
+
+   F done()
+      R .b == 0 & .b1 == 0
+
+F r2cf(=n1, =n2)
+   [Int] r
+   L n2 != 0
+      (n1, V t1_n2) = (n2, divmod(n1, n2))
+      n2 = t1_n2[1]
+      r [+]= t1_n2[0]
+   R r
+
+V data = [(‘[1;5,2] + 1/2’, 2, 1, 0, 2, (13, 11)), (‘[3;7] + 1/2’, 2, 1, 0, 2, (22, 7)), (‘[3;7] divided by 4’, 1, 0, 0, 4, (22, 7))]
+
+L(string, a1, a, b1, b, r) data
+   print(‘#<20->’.format(string), end' ‘’)
+   V op = NG(a1, a, b1, b)
+   L(n) r2cf(r[0], r[1])
+      I !op.needterm()
+         print(‘ #.’.format(op.egress()), end' ‘’)
+      op.ingress(n)
+   L
+      print(‘ #.’.format(op.egress_done()), end' ‘’)
+      I op.done()
+         L.break
+   print()
+===
+class NG
+{
+public:
+    int a1;
+    int a;
+    int b1;
+    int b;
+    template <typename T1, typename T2, typename T3, typename T4> NG(const T1 &a1, const T2 &a, const T3 &b1, const T4 &b) :
+        a1(a1),
+        a(a),
+        b1(b1),
+        b(b)
+    {
+    }
+
+    template <typename T1> auto ingress(const T1 &n)
+    {
+        assign_from_tuple(a, a1, make_tuple(a1, a + a1 * n));
+        assign_from_tuple(b, b1, make_tuple(b1, b + b1 * n));
+    }
+
+    auto needterm()
+    {
+        return (b == 0 || b1 == 0) || !(idiv(a, b) == idiv(a1, b1));
+    }
+
+    auto egress()
+    {
+        auto n = idiv(a, b);
+        assign_from_tuple(a, b, make_tuple(b, a - b * n));
+        assign_from_tuple(a1, b1, make_tuple(b1, a1 - b1 * n));
+        return n;
+    }
+
+    auto egress_done()
+    {
+        if (needterm())
+            assign_from_tuple(a, b, make_tuple(a1, b1));
+        return egress();
+    }
+
+    auto done()
+    {
+        return b == 0 && b1 == 0;
+    }
+};
+
+template <typename T1, typename T2> auto r2cf(T1 n1, T2 n2)
+{
+    Array<int> r;
+    while (n2 != 0) {
+        TUPLE_ELEMENT_T(1, make_tuple(n2, divmod(n1, n2))) t1_n2;
+        assign_from_tuple(n1, t1_n2, make_tuple(n2, divmod(n1, n2)));
+        n2 = _get<1>(t1_n2);
+        r.append(_get<0>(t1_n2));
+    }
+    return r;
+}
+
+auto data = create_array({make_tuple(u"[1;5,2] + 1/2"_S, 2, 1, 0, 2, make_tuple(13, 11)), make_tuple(u"[3;7] + 1/2"_S, 2, 1, 0, 2, make_tuple(22, 7)), make_tuple(u"[3;7] divided by 4"_S, 1, 0, 0, 4, make_tuple(22, 7))});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[string, a1, a, b1, b, r] : data) {
+            print(u"#<20->"_S.format(string), u""_S);
+            auto op = NG(a1, a, b1, b);
+            for (auto &&n : r2cf(_get<0>(r), _get<1>(r))) {
+                if (!op.needterm())
+                    print(u" #."_S.format(op.egress()), u""_S);
+                op.ingress(n);
+            }
+            while (true) {
+                print(u" #."_S.format(op.egress_done()), u""_S);
+                if (op.done())
+                    break;
+            }
+            print();
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Convert_decimal_number_to_rational#Nim
+from typing import NamedTuple
+import math
+
+class Rational(NamedTuple):
+    numerator: int
+    denominator: int
+
+    def __str__(self):
+        if self.denominator == 1:
+            return str(self.numerator)
+        else:
+            return str(self.numerator) + "//" + str(self.denominator)
+
+def rationalize(x, tol = 1e-12):
+    xx = x
+    flagNeg = xx < 0.0
+    if flagNeg:
+        xx = -xx
+    if xx < 1e-10:
+        return Rational(0, 1)
+    if abs(xx - round(xx)) < tol:
+        return Rational(int(xx), 1)
+    a = 0
+    b = 1
+    c = int(math.ceil(xx))
+    d = 1
+    aux1 = 0x7FFF_FFFF // 2
+    while c < aux1 and d < aux1:
+        aux2 = (float(a) + float(c)) / (float(b) + float(d))
+        if abs(xx - aux2) < tol:
+            break
+        if xx > aux2:
+            a += c
+            b += d
+        else:
+            c += a
+            d += b
+    g = math.gcd(a + c, b + d)
+    if flagNeg:
+        return Rational(-(a + c) // g, (b + d) // g)
+    else:
+        return Rational( (a + c) // g, (b + d) // g)
+
+print(rationalize(0.9054054054))
+print(rationalize(0.9054054054, 0.0001))
+print(rationalize(0.5185185185))
+print(rationalize(0.5185185185, 0.0001))
+print(rationalize(0.75))
+print(rationalize(0.1428571428, 0.001))
+print(rationalize(35.000))
+print(rationalize(35.001))
+print(rationalize(0.9))
+print(rationalize(0.99))
+print(rationalize(0.909))
+print(rationalize(0.909, 0.001))
+===
+T Rational
+   Int numerator
+   Int denominator
+
+   F String()
+      I .denominator == 1
+         R String(.numerator)
+      E
+         R String(.numerator)‘//’String(.denominator)
+   F (numerator, denominator)
+      .numerator = numerator
+      .denominator = denominator
+
+F rationalize(x, tol = 1e-12)
+   V xx = x
+   V flagNeg = xx < 0.0
+   I flagNeg
+      xx = -xx
+   I xx < 1e-10
+      R Rational(0, 1)
+   I abs(xx - round(xx)) < tol
+      R Rational(Int(xx), 1)
+   V a = 0
+   V b = 1
+   V c = Int(ceil(xx))
+   V d = 1
+   V aux1 = 7FFF'FFFF I/ 2
+   L c < aux1 & d < aux1
+      V aux2 = (Float(a) + Float(c)) / (Float(b) + Float(d))
+      I abs(xx - aux2) < tol
+         L.break
+      I xx > aux2
+         a += c
+         b += d
+      E
+         c += a
+         d += b
+   V g = gcd(a + c, b + d)
+   I flagNeg
+      R Rational(-(a + c) I/ g, (b + d) I/ g)
+   E
+      R Rational((a + c) I/ g, (b + d) I/ g)
+
+print(rationalize(0.9054054054))
+print(rationalize(0.9054054054, 0.0001))
+print(rationalize(0.5185185185))
+print(rationalize(0.5185185185, 0.0001))
+print(rationalize(0.75))
+print(rationalize(0.1428571428, 0.001))
+print(rationalize(35.000))
+print(rationalize(35.001))
+print(rationalize(0.9))
+print(rationalize(0.99))
+print(rationalize(0.909))
+print(rationalize(0.909, 0.001))
+===
+class Rational
+{
+public:
+    int numerator;
+    int denominator;
+
+    operator String() const
+    {
+        if (denominator == 1)
+            return String(numerator);
+        else
+            return String(numerator) & u"//"_S & String(denominator);
+    }
+    template <typename T1, typename T2> Rational(const T1 &numerator, const T2 &denominator) :
+        numerator(numerator),
+        denominator(denominator)
+    {
+    }
+};
+
+template <typename T1, typename T2 = decltype(1e-12)> auto rationalize(const T1 &x, const T2 &tol = 1e-12)
+{
+    auto xx = x;
+    auto flagNeg = xx < 0.0;
+    if (flagNeg)
+        xx = -xx;
+    if (xx < 1e-10)
+        return Rational(0, 1);
+    if (abs(xx - round(xx)) < tol)
+        return Rational(to_int(xx), 1);
+    auto a = 0;
+    auto b = 1;
+    auto c = to_int(ceil(xx));
+    auto d = 1;
+    auto aux1 = idiv(0x7FFF'FFFF, 2);
+    while (c < aux1 && d < aux1) {
+        auto aux2 = (to_float(a) + to_float(c)) / (to_float(b) + to_float(d));
+        if (abs(xx - aux2) < tol)
+            break;
+        if (xx > aux2) {
+            a += c;
+            b += d;
+        }
+        else {
+            c += a;
+            d += b;
+        }
+    }
+    auto g = gcd(a + c, b + d);
+    if (flagNeg)
+        return Rational(idiv(-(a + c), g), idiv((b + d), g));
+    else
+        return Rational(idiv((a + c), g), idiv((b + d), g));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(rationalize(0.9054054054));
+        print(rationalize(0.9054054054, 0.0001));
+        print(rationalize(0.5185185185));
+        print(rationalize(0.5185185185, 0.0001));
+        print(rationalize(0.75));
+        print(rationalize(0.1428571428, 0.001));
+        print(rationalize(35.000));
+        print(rationalize(35.001));
+        print(rationalize(0.9));
+        print(rationalize(0.99));
+        print(rationalize(0.909));
+        print(rationalize(0.909, 0.001));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Convex_hull#Nim
+from typing import NamedTuple
+
+class Point(NamedTuple):
+    x: int
+    y: int
+
+    def __str__(self):
+        return str((self.x, self.y))
+
+def orientation(p, q, r):
+    val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
+    if val == 0:
+        return 0
+    return 1 if val > 0 else 2
+
+def calculateConvexHull(points):
+    result : List[Point] = []
+
+    if len(points) < 3:
+        return points
+
+    indexMinX = 0
+    for i, p in enumerate(points):
+        if p.x < points[indexMinX].x:
+            indexMinX = i
+
+    p = indexMinX
+    q = 0
+
+    while True:
+        result.append(points[p])
+
+        q = (p + 1) % len(points)
+
+        for i in range(len(points)):
+            if orientation(points[p], points[i], points[q]) == 2:
+                q = i
+
+        p = q
+        if p == indexMinX:
+            break
+
+    return result
+
+points = [Point(16, 3),
+          Point(12, 17),
+          Point(0, 6),
+          Point(-4, -6),
+          Point(16, 6),
+          Point(16, -7),
+          Point(17, -4),
+          Point(5, 19),
+          Point(19, -8),
+          Point(3, 16),
+          Point(12, 13),
+          Point(3, -4),
+          Point(17, 5),
+          Point(-3, 15),
+          Point(-3, -9),
+          Point(0, 11),
+          Point(-9, -3),
+          Point(-4, -2),
+          Point(12, 10)]
+
+hull = calculateConvexHull(points)
+for i in hull:
+    print(i)
+===
+T Point
+   Int x
+   Int y
+
+   F String()
+      R String((.x, .y))
+   F (x, y)
+      .x = x
+      .y = y
+
+F orientation(p, q, r)
+   V val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
+   I val == 0
+      R 0
+   R I val > 0 {1} E 2
+
+F calculateConvexHull(points)
+   [Point] result
+
+   I points.len < 3
+      R points
+
+   V indexMinX = 0
+   L(p) points
+      V i = L.index
+      I p.x < points[indexMinX].x
+         indexMinX = i
+
+   V p = indexMinX
+   V q = 0
+
+   L
+      result.append(points[p])
+
+      q = (p + 1) % points.len
+
+      L(i) 0 .< points.len
+         I orientation(points[p], points[i], points[q]) == 2
+            q = i
+
+      p = q
+      I p == indexMinX
+         L.break
+
+   R result
+
+V points = [Point(16, 3), Point(12, 17), Point(0, 6), Point(-4, -6), Point(16, 6), Point(16, -7), Point(17, -4), Point(5, 19), Point(19, -8), Point(3, 16), Point(12, 13), Point(3, -4), Point(17, 5), Point(-3, 15), Point(-3, -9), Point(0, 11), Point(-9, -3), Point(-4, -2), Point(12, 10)]
+
+V hull = calculateConvexHull(points)
+L(i) hull
+   print(i)
+===
+class Point
+{
+public:
+    int x;
+    int y;
+
+    operator String() const
+    {
+        return String(make_tuple(x, y));
+    }
+    template <typename T1, typename T2> Point(const T1 &x, const T2 &y) :
+        x(x),
+        y(y)
+    {
+    }
+};
+
+template <typename T1, typename T2, typename T3> auto orientation(const T1 &p, const T2 &q, const T3 &r)
+{
+    auto val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+    if (val == 0)
+        return 0;
+    return val > 0 ? 1 : 2;
+}
+
+template <typename T1> auto calculateConvexHull(const T1 &points)
+{
+    Array<Point> result;
+
+    if (points.len() < 3)
+        return points;
+
+    auto indexMinX = 0;
+    {int Lindex = 0;
+    for (auto &&p : points) {
+        auto i = Lindex;
+        if (p.x < points[indexMinX].x)
+            indexMinX = i;
+        Lindex++;
+    }}
+
+    auto p = indexMinX;
+    auto q = 0;
+
+    while (true) {
+        result.append(points[p]);
+
+        q = mod((p + 1), points.len());
+
+        for (auto i : range_el(0, points.len()))
+            if (orientation(points[p], points[i], points[q]) == 2)
+                q = i;
+
+        p = q;
+        if (p == indexMinX)
+            break;
+    }
+
+    return result;
+}
+
+auto points = create_array<Point>({Point(16, 3), Point(12, 17), Point(0, 6), Point(-4, -6), Point(16, 6), Point(16, -7), Point(17, -4), Point(5, 19), Point(19, -8), Point(3, 16), Point(12, 13), Point(3, -4), Point(17, 5), Point(-3, 15), Point(-3, -9), Point(0, 11), Point(-9, -3), Point(-4, -2), Point(12, 10)});
+
+auto hull = calculateConvexHull(points);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&i : hull)
+            print(i);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Coprimes#Python
+import math
+
+def coprime(a, b):
+    return math.gcd(a, b) == 1
+
+print([
+    (x, y) for x, y in [
+        (21, 15), (17, 23), (36, 12),
+        (18, 29), (60, 15)
+    ]
+    if coprime(x, y)
+])
+===
+F coprime(a, b)
+   R gcd(a, b) == 1
+
+print([(21, 15), (17, 23), (36, 12), (18, 29), (60, 15)].filter((x, y) -> coprime(x, y)))
+===
+template <typename T1, typename T2> auto coprime(const T1 &a, const T2 &b)
+{
+    return gcd(a, b) == 1;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(create_array({make_tuple(21, 15), make_tuple(17, 23), make_tuple(36, 12), make_tuple(18, 29), make_tuple(60, 15)}).filter([](const auto &x, const auto &y){return coprime(x, y);}));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Cousin_primes#Nim
+LIMIT = 1000
+
+def isPrime(n):
+    if (n & 1) == 0: return n == 2
+    m = 3
+    while m * m <= n:
+        if n % m == 0: return False
+        m += 2
+    return True
+
+PrimeList = [n for n in range(2, LIMIT) if isPrime(n)]
+
+PrimeSet = set(PrimeList)
+
+cousinList = [(n, n + 4) for n in PrimeList if (n + 4) in PrimeSet]
+
+print("Found {} cousin primes less than {}:".format(len(cousinList), LIMIT))
+for i, cousins in enumerate(cousinList):
+    print(str(cousins).center(10), end = "\n" if (i+1) % 7 == 0 else ' ')
+print()
+===
+V LIMIT = 1000
+
+F isPrime(n)
+   I (n [&] 1) == 0
+      R n == 2
+   V m = 3
+   L m * m <= n
+      I n % m == 0
+         R 0B
+      m += 2
+   R 1B
+
+V PrimeList = (2 .< LIMIT).filter(n -> isPrime(n))
+
+V PrimeSet = Set(PrimeList)
+
+V cousinList = PrimeList.filter(n -> (n + 4) C PrimeSet).map(n -> (n, n + 4))
+
+print(‘Found #. cousin primes less than #.:’.format(cousinList.len, LIMIT))
+L(cousins) cousinList
+   V i = L.index
+   print(String(cousins).center(10), end' I (i + 1) % 7 == 0 {"\n"} E ‘ ’)
+print()
+===
+auto LIMIT = 1000;
+
+template <typename T1> auto isPrime(const T1 &n)
+{
+    if ((n & 1) == 0)
+        return n == 2;
+    auto m = 3;
+    while (m * m <= n) {
+        if (mod(n, m) == 0)
+            return false;
+        m += 2;
+    }
+    return true;
+}
+
+auto PrimeList = range_el(2, LIMIT).filter([](const auto &n){return isPrime(n);});
+
+auto PrimeSet = create_set(PrimeList);
+
+auto cousinList = PrimeList.filter([](const auto &n){return in((n + 4), PrimeSet);}).map([](const auto &n){return make_tuple(n, n + 4);});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Found #. cousin primes less than #.:"_S.format(cousinList.len(), LIMIT));
+        {int Lindex = 0;
+        for (auto &&cousins : cousinList) {
+            auto i = Lindex;
+            print(String(cousins).center(10), mod((i + 1), 7) == 0 ? u"\n"_S : u" "_S);
+            Lindex++;
+        }}
+        print();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Cramer%27s_rule#Nim
+from copy import deepcopy
+
+def det(mm):
+    m = deepcopy(mm)
+    result = 1.0
+
+    for j in range(len(m)):
+        imax = j
+        for i in range(j + 1, len(m)):
+            if m[i][j] > m[imax][j]:
+                imax = i
+
+        if imax != j:
+            (m[imax], m[j]) = (m[j], m[imax])
+            result = -result
+
+        if abs(m[j][j]) < 1e-12:
+            return float('inf')
+
+        for i in range(j + 1, len(m)):
+            mult = -m[i][j] / m[j][j]
+            for k in range(len(m)):
+                m[i][k] += mult * m[j][k]
+
+    for i in range(len(m)):
+        result *= m[i][i]
+    return result
+
+def cramerSolve(aa, detA, b, col):
+    a = deepcopy(aa)
+    for i in range(len(a)):
+        a[i][col] = b[i]
+    return det(a) / detA
+
+A = [[2.0, -1.0,  5.0,  1.0],
+     [3.0,  2.0,  2.0, -6.0],
+     [1.0,  3.0,  3.0, -1.0],
+     [5.0, -2.0, -3.0,  3.0]]
+
+B = [-3.0, -32.0, -47.0, 49.0]
+
+detA = det(A)
+
+for i in range(len(A)):
+    print('%7.3f' % cramerSolve(A, detA, B, i))
+===
+F det(mm)
+   V m = copy(mm)
+   V result = 1.0
+
+   L(j) 0 .< m.len
+      V imax = j
+      L(i) j + 1 .< m.len
+         I m[i][j] > m[imax][j]
+            imax = i
+
+      I imax != j
+         swap(&m[imax], &m[j])
+         result = -result
+
+      I abs(m[j][j]) < 1e-12
+         R Float.infinity
+
+      L(i) j + 1 .< m.len
+         V mult = -m[i][j] / m[j][j]
+         L(k) 0 .< m.len
+            m[i][k] += mult * m[j][k]
+
+   L(i) 0 .< m.len
+      result *= m[i][i]
+   R result
+
+F cramerSolve(aa, detA, b, col)
+   V a = copy(aa)
+   L(i) 0 .< a.len
+      a[i][col] = b[i]
+   R det(a) / detA
+
+V A = [[2.0, -1.0, 5.0, 1.0], [3.0, 2.0, 2.0, -6.0], [1.0, 3.0, 3.0, -1.0], [5.0, -2.0, -3.0, 3.0]]
+
+V B = [-3.0, -32.0, -47.0, 49.0]
+
+V detA = det(A)
+
+L(i) 0 .< A.len
+   print(‘#3.3’.format(cramerSolve(A, detA, B, i)))
+===
+template <typename T1> auto det(const T1 &mm)
+{
+    auto m = copy(mm);
+    auto result = 1.0;
+
+    for (auto j : range_el(0, m.len())) {
+        auto imax = j;
+        for (auto i : range_el(j + 1, m.len()))
+            if (m[i][j] > m[imax][j])
+                imax = i;
+
+        if (imax != j) {
+            swap(m[imax], m[j]);
+            result = -result;
+        }
+
+        if (abs(m[j][j]) < 1e-12)
+            return std::numeric_limits<double>::infinity();
+
+        for (auto i : range_el(j + 1, m.len())) {
+            auto mult = -m[i][j] / m[j][j];
+            for (auto k : range_el(0, m.len()))
+                m[i][k] += mult * m[j][k];
+        }
+    }
+
+    for (auto i : range_el(0, m.len()))
+        result *= m[i][i];
+    return result;
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto cramerSolve(const T1 &aa, const T2 &detA, const T3 &b, const T4 &col)
+{
+    auto a = copy(aa);
+    for (auto i : range_el(0, a.len()))
+        a[i].set(col, b[i]);
+    return det(a) / detA;
+}
+
+auto A = create_array({create_array({2.0, -1.0, 5.0, 1.0}), create_array({3.0, 2.0, 2.0, -6.0}), create_array({1.0, 3.0, 3.0, -1.0}), create_array({5.0, -2.0, -3.0, 3.0})});
+
+auto B = create_array({-3.0, -32.0, -47.0, 49.0});
+
+auto detA = det(A);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(0, A.len()))
+            print(u"#3.3"_S.format(cramerSolve(A, detA, B, i)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Create_an_HTML_table#Python
+UInt32 = int
+
+seed : UInt32 = 0
+def nonrandom(n):
+    global seed
+    seed = (1664525 * seed + 1013904223) & 0xFFFF_FFFF
+    return int(seed >> 16) % n
+
+def rand9999():
+    return nonrandom(9000) + 1000
+
+def tag(tag, txt, attr=''):
+    return '<' + tag + attr + '>' + str(txt) + '</'+ tag + '>'
+
+header = tag('tr', ''.join(tag('th', txt) for txt in ',X,Y,Z'.split(','))) + "\n"
+rows = "\n".join(tag('tr', tag('td', i, ' style="font-weight: bold;"')
+                            + '' + ''.join(tag('td', rand9999())
+                                          for j in range(3)))
+                 for i in range(1, 6))
+table = tag('table', "\n" + header + rows + "\n")
+print(table)
+===
+UInt32 seed = 0
+F nonrandom(n)
+   :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
+   R Int(:seed >> 16) % n
+
+F rand9999()
+   R nonrandom(9000) + 1000
+
+F tag(tag, txt, attr = ‘’)
+   R ‘<’tag‘’attr‘>’String(txt)‘</’tag‘>’
+
+V header = tag(‘tr’, ‘,X,Y,Z’.split(‘,’).map(txt -> tag(‘th’, txt)).join(‘’))"\n"
+V rows = (1..5).map(i -> tag(‘tr’, tag(‘td’, i, ‘ style="font-weight: bold;"’)‘’(0.<3).map(j -> tag(‘td’, rand9999())).join(‘’))).join("\n")
+V table = tag(‘table’, "\n"header‘’rows"\n")
+print(table)
+===
+uint32_t seed = 0;
+template <typename T1> auto nonrandom(const T1 &n)
+{
+    ::seed = (1664525 * ::seed + 1013904223) & 0xFFFF'FFFF;
+    return mod(to_int(::seed >> 16), n);
+}
+
+auto rand9999()
+{
+    return nonrandom(9000) + 1000;
+}
+
+template <typename T1, typename T2, typename T3 = decltype(u""_S)> auto tag(const T1 &tag, const T2 &txt, const T3 &attr = u""_S)
+{
+    return u"<"_S & tag & attr & u">"_S & String(txt) & u"</"_S & tag & u">"_S;
+}
+
+auto header = tag(u"tr"_S, u",X,Y,Z"_S.split(u","_S).map([](const auto &txt){return tag(u"th"_S, txt);}).join(u""_S)) & u"\n"_S;
+auto rows = range_ee(1, 5).map([](const auto &i){return tag(u"tr"_S, tag(u"td"_S, i, u" style=\"font-weight: bold;\""_S) & range_el(0, 3).map([](const auto &j){return tag(u"td"_S, rand9999());}).join(u""_S));}).join(u"\n"_S);
+auto table = tag(u"table"_S, u"\n"_S & header & rows & u"\n"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(table);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Currency#Nim
+BigInt = int
+
+def currency(units, subunits):
+    return BigInt(units) * 100 + subunits
+
+def currency_from_str(s):
+    (units, subunits) = s.split('.')
+    return BigInt(units) * 100 + int(subunits)
+
+def percentage(a, num, denom):
+    return (a * num * 10 // denom + 5) // 10
+
+def to_str(c):
+    return str(c // 100) + '.%02i' % (c % 100)
+
+hamburgers = currency(5, 50) * 4_000_000_000_000_000
+milkshakes = currency_from_str("2.86") * 2
+beforeTax = hamburgers + milkshakes
+tax = percentage(beforeTax, 765, 10_000)
+total = beforeTax + tax
+
+maxlen = max(len(to_str(beforeTax)), len(to_str(tax)), len(to_str(total)))
+
+print("Total price before tax: " + to_str(beforeTax).rjust(maxlen))
+print("Tax:                    " + to_str(tax).rjust(maxlen))
+print("Total with tax:         " + to_str(total).rjust(maxlen))
+===
+F currency(units, subunits)
+   R BigInt(units) * 100 + subunits
+
+F currency_from_str(s)
+   V (units, subunits) = s.split(‘.’)
+   R BigInt(units) * 100 + Int(subunits)
+
+F percentage(a, num, denom)
+   R (a * num * 10 I/ denom + 5) I/ 10
+
+F to_str(c)
+   R String(c I/ 100)‘’‘.#02’.format(c % 100)
+
+V hamburgers = currency(5, 50) * 4'000'000'000'000'000
+V milkshakes = currency_from_str(‘2.86’) * 2
+V beforeTax = hamburgers + milkshakes
+V tax = percentage(beforeTax, 765, 10'000)
+V total = beforeTax + tax
+
+V maxlen = max(to_str(beforeTax).len, to_str(tax).len, to_str(total).len)
+
+print(‘Total price before tax: ’to_str(beforeTax).rjust(maxlen))
+print(‘Tax:                    ’to_str(tax).rjust(maxlen))
+print(‘Total with tax:         ’to_str(total).rjust(maxlen))
+===
+template <typename T1, typename T2> auto currency(const T1 &units, const T2 &subunits)
+{
+    return BigInt(units) * 100 + subunits;
+}
+
+template <typename T1> auto currency_from_str(const T1 &s)
+{
+    auto [units, subunits] = bind_array<2>(s.split(u"."_S));
+    return BigInt(units) * 100 + to_int(subunits);
+}
+
+template <typename T1, typename T2, typename T3> auto percentage(const T1 &a, const T2 &num, const T3 &denom)
+{
+    return idiv((idiv(a * num * 10, denom) + 5), 10);
+}
+
+template <typename T1> auto to_str(const T1 &c)
+{
+    return String(idiv(c, 100)) & u".#02"_S.format(mod(c, 100));
+}
+
+auto hamburgers = currency(5, 50) * 4'000'000'000'000'000;
+auto milkshakes = currency_from_str(u"2.86"_S) * 2;
+auto beforeTax = hamburgers + milkshakes;
+auto tax = percentage(beforeTax, 765, 10'000);
+auto total = beforeTax + tax;
+
+auto maxlen = max(to_str(beforeTax).len(), to_str(tax).len(), to_str(total).len());
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Total price before tax: "_S & to_str(beforeTax).rjust(maxlen));
+        print(u"Tax:                    "_S & to_str(tax).rjust(maxlen));
+        print(u"Total with tax:         "_S & to_str(total).rjust(maxlen));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Currying#Python
+def addN(n):
+    def adder(x):
+        nonlocal n # =
+        return x + n
+    return adder
+
+add2 = addN(2)
+add3 = addN(3)
+print(add2(7))
+print(add3(7))
+===
+F addN(n)
+   F adder(x)
+      R x + @=n
+   R adder
+
+V add2 = addN(2)
+V add3 = addN(3)
+print(add2(7))
+print(add3(7))
+===
+template <typename T1> auto addN(const T1 &n)
+{
+    auto adder = [n](const auto &x)
+    {
+        return x + n;
+    };
+    return adder;
+}
+
+auto add2 = addN(2);
+auto add3 = addN(3);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(add2(7));
+        print(add3(7));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/CUSIP#Python
+def cusip_check(cusip):
+    if len(cusip) != 9:
+        raise ValueError('CUSIP must be 9 characters')
+
+    cusip = cusip.upper()
+    total = 0
+    for i in range(8):
+        v = 0
+        c = cusip[i]
+        if c.isdigit():
+            v = int(c)
+        elif c.isalpha():
+            p = ord(c) - ord('A') + 1
+            v = p + 9
+        elif c == '*':
+            v = 36
+        elif c == '@':
+            v = 37
+        elif c == '#':
+            v = 38
+
+        if i % 2 != 0:
+            v *= 2
+
+        total += v // 10 + v % 10
+    check = (10 - (total % 10)) % 10
+    return str(check) == cusip[-1]
+
+codes = [
+        '037833100',
+        '17275R102',
+        '38259P508',
+        '594918104',
+        '68389X106',
+        '68389X105'
+        ]
+for code in codes:
+    print(code + ': ' + ('valid' if cusip_check(code) else 'invalid'))
+===
+F cusip_check(=cusip)
+   I cusip.len != 9
+      X ValueError(‘CUSIP must be 9 characters’)
+
+   cusip = cusip.uppercase()
+   V total = 0
+   L(i) 8
+      V v = 0
+      V c = cusip[i]
+      I c.is_digit()
+         v = Int(c)
+      E I c.is_alpha()
+         V p = c.code - ‘A’.code + 1
+         v = p + 9
+      E I c == ‘*’
+         v = 36
+      E I c == ‘@’
+         v = 37
+      E I c == ‘#’
+         v = 38
+
+      I i % 2 != 0
+         v *= 2
+
+      total += v I/ 10 + v % 10
+   V check = (10 - (total % 10)) % 10
+   R String(check) == cusip.last
+
+V codes = [‘037833100’, ‘17275R102’, ‘38259P508’, ‘594918104’, ‘68389X106’, ‘68389X105’]
+L(code) codes
+   print(code‘: ’(I cusip_check(code) {‘valid’} E ‘invalid’))
+===
+template <typename T1> auto cusip_check(T1 cusip)
+{
+    if (cusip.len() != 9)
+        throw ValueError(u"CUSIP must be 9 characters"_S);
+
+    cusip = cusip.uppercase();
+    auto total = 0;
+    for (int i = 0; i < 8; i++) {
+        auto v = 0;
+        auto c = cusip[i];
+        if (c.is_digit())
+            v = to_int(c);
+        else if (c.is_alpha()) {
+            auto p = c.code - u'A'_C.code + 1;
+            v = p + 9;
+        }
+        else if (c == u'*')
+            v = 36;
+        else if (c == u'@')
+            v = 37;
+        else if (c == u'#')
+            v = 38;
+
+        if (mod(i, 2) != 0)
+            v *= 2;
+
+        total += idiv(v, 10) + mod(v, 10);
+    }
+    auto check = mod((10 - (mod(total, 10))), 10);
+    return String(check) == cusip.last();
+}
+
+auto codes = create_array({u"037833100"_S, u"17275R102"_S, u"38259P508"_S, u"594918104"_S, u"68389X106"_S, u"68389X105"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&code : codes)
+            print(code & u": "_S & (cusip_check(code) ? u"valid"_S : u"invalid"_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Cut_a_rectangle#Python
+def cut_it(h, w):
+    dirs = [(1, 0), (-1, 0), (0, -1), (0, 1)]
+    if h % 2 != 0: (h, w) = (w, h)
+    if h % 2 != 0: return 0
+    if w == 1: return 1
+    count = 0
+
+    next = [w + 1, -w - 1, -1, 1]
+    blen = (h + 1) * (w + 1) - 1
+    grid = [False] * (blen + 1)
+
+    def walk(y : int, x : int, count : int) -> int:
+        if y == 0 or y == h or x == 0 or x == w:
+            return count + 1
+
+        t = y * (w + 1) + x
+        grid[t] = grid[blen - t] = True
+
+        for i in range(4):
+            if not grid[t + next[i]]:
+                count = walk(y + dirs[i][0], x + dirs[i][1], count)
+
+        grid[t] = grid[blen - t] = False
+        return count
+
+    t = h // 2 * (w + 1) + w // 2
+    if w % 2 != 0:
+        grid[t] = grid[t + 1] = True
+        count = walk(h // 2, w // 2 - 1, count)
+        res = count
+        count = 0
+        count = walk(h // 2 - 1, w // 2, count)
+        return res + count * 2
+    else:
+        grid[t] = True
+        count = walk(h // 2, w // 2 - 1, count)
+        if h == w:
+            return count * 2
+        count = walk(h // 2 - 1, w // 2, count)
+        return count
+
+for w in range(1, 10):
+    for h in range(1, w + 1):
+        if (w * h) % 2 == 0:
+            print("%d x %d: %d" % (w, h, cut_it(w, h)))
+===
+F cut_it(=h, =w)
+   V dirs = [(1, 0), (-1, 0), (0, -1), (0, 1)]
+   I h % 2 != 0
+      swap(&h, &w)
+   I h % 2 != 0
+      R 0
+   I w == 1
+      R 1
+   V count = 0
+
+   V next = [w + 1, -w - 1, -1, 1]
+   V blen = (h + 1) * (w + 1) - 1
+   V grid = [0B] * (blen + 1)
+
+   F walk(Int y, Int x, Int =count) -> Int
+      I y == 0 | y == @h | x == 0 | x == @w
+         R count + 1
+
+      V t = y * (@w + 1) + x
+      @grid[t] = @grid[@blen - t] = 1B
+
+      L(i) 4
+         I !@grid[t + @next[i]]
+            count = @walk(y + @dirs[i][0], x + @dirs[i][1], count)
+
+      @grid[t] = @grid[@blen - t] = 0B
+      R count
+
+   V t = h I/ 2 * (w + 1) + w I/ 2
+   I w % 2 != 0
+      grid[t] = grid[t + 1] = 1B
+      count = walk(h I/ 2, w I/ 2 - 1, count)
+      V res = count
+      count = 0
+      count = walk(h I/ 2 - 1, w I/ 2, count)
+      R res + count * 2
+   E
+      grid[t] = 1B
+      count = walk(h I/ 2, w I/ 2 - 1, count)
+      I h == w
+         R count * 2
+      count = walk(h I/ 2 - 1, w I/ 2, count)
+      R count
+
+L(w) 1..9
+   L(h) 1 .. w
+      I (w * h) % 2 == 0
+         print(‘#. x #.: #.’.format(w, h, cut_it(w, h)))
+===
+template <typename T1, typename T2> auto cut_it(T1 h, T2 w)
+{
+    auto dirs = create_array({make_tuple(1, 0), make_tuple(-1, 0), make_tuple(0, -1), make_tuple(0, 1)});
+    if (mod(h, 2) != 0)
+        swap(h, w);
+    if (mod(h, 2) != 0)
+        return 0;
+    if (w == 1)
+        return 1;
+    auto count = 0;
+
+    auto next = create_array({w + 1, -w - 1, -1, 1});
+    auto blen = (h + 1) * (w + 1) - 1;
+    auto grid = create_array({false}) * (blen + 1);
+
+    std::function<int(int, int, int)> walk = [&blen, &dirs, &grid, &h, &next, &w, &walk](const int y, const int x, int count)
+    {
+        if (y == 0 || y == h || x == 0 || x == w)
+            return count + 1;
+
+        auto t = y * (w + 1) + x;
+        grid.set(t, grid.set(blen - t, true));
+
+        for (int i = 0; i < 4; i++)
+            if (!grid[t + next[i]])
+                count = walk(y + _get<0>(dirs[i]), x + _get<1>(dirs[i]), count);
+
+        grid.set(t, grid.set(blen - t, false));
+        return count;
+    };
+
+    auto t = idiv(h, 2) * (w + 1) + idiv(w, 2);
+    if (mod(w, 2) != 0) {
+        grid.set(t, grid.set(t + 1, true));
+        count = walk(idiv(h, 2), idiv(w, 2) - 1, count);
+        auto res = count;
+        count = 0;
+        count = walk(idiv(h, 2) - 1, idiv(w, 2), count);
+        return res + count * 2;
+    }
+    else {
+        grid.set(t, true);
+        count = walk(idiv(h, 2), idiv(w, 2) - 1, count);
+        if (h == w)
+            return count * 2;
+        count = walk(idiv(h, 2) - 1, idiv(w, 2), count);
+        return count;
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto w : range_ee(1, 9))
+            for (auto h : range_ee(1, w))
+                if (mod((w * h), 2) == 0)
+                    print(u"#. x #.: #."_S.format(w, h, cut_it(w, h)));
+    }
+} code_block_1;

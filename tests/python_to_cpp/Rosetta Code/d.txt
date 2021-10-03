@@ -528,3 +528,751 @@ struct CodeBlock1
         print(graph.dijkstra(u"a"_S, u"e"_S));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Days_between_dates
+import datetime
+
+def parse_date(date):
+    return datetime.datetime.strptime(date, '%Y-%m-%d')
+
+date1 = parse_date('2019-01-01')
+date2 = parse_date('2019-09-30')
+print((date2 - date1).days)
+===
+F parse_date(date)
+   R time:strptime(date, ‘%Y-%m-%d’)
+
+V date1 = parse_date(‘2019-01-01’)
+V date2 = parse_date(‘2019-09-30’)
+print((date2 - date1).days())
+===
+template <typename T1> auto parse_date(const T1 &date)
+{
+    return timens::strptime(date, u"%Y-%m-%d"_S);
+}
+
+auto date1 = parse_date(u"2019-01-01"_S);
+auto date2 = parse_date(u"2019-09-30"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print((date2 - date1).days());
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/De_Bruijn_sequences#D
+Byte = int
+
+digits = "0123456789"
+
+def deBruijn(k, n):
+    alphabet = digits[:k]
+    a = [Byte(0)] * (k * n)
+    seq : List[Byte] = []
+
+    def db(t : int, p : int) -> None:
+        if t > n:
+            if n % p == 0:
+                seq.extend(a[1:p + 1])
+        else:
+            a[t] = a[t - p]
+            db(t + 1, p)
+            j = a[t - p] + 1
+            while j < k:
+                a[t] = j & 0xFF
+                db(t + 1, t)
+                j += 1
+
+    db(1, 1)
+    buf = ''
+    for i in seq:
+        buf += alphabet[i]
+
+    return buf + buf[0 : n - 1]
+
+def validate(db):
+    found = [0] * 10_000
+    errs : List[str] = []
+
+    for i in range(len(db) - 3):
+        s = db[i : i + 4]
+        if s.isdigit():
+            found[int(s)] += 1
+
+    for i in range(10_000):
+        if found[i] == 0:
+            errs += ["    PIN number %04d missing" % i]
+        elif found[i] > 1:
+            errs += ["    PIN number %04d occurs %d times" % (i, found[i])]
+
+    if len(errs) == 0:
+        print("  No errors found")
+    else:
+        pl = "" if len(errs) == 1 else "s"
+        print("  " + str(len(errs)) + " error" + pl + " found:")
+        for err in errs:
+            print(err)
+
+db = deBruijn(10, 4)
+
+print("The length of the de Bruijn sequence is", len(db))
+print("\nThe first 130 digits of the de Bruijn sequence are:", db[:130])
+print("\nThe last 130 digits of the de Bruijn sequence are:", db[-130:])
+
+print("\nValidating the deBruijn sequence:")
+validate(db)
+
+print("\nValidating the reversed deBruijn sequence:")
+validate(db[::-1])
+
+db = db[:4443] + '.' + db[4444:] # db[4443] = '.'
+print("\nValidating the overlaid deBruijn sequence:")
+validate(db)
+===
+V digits = ‘0123456789’
+
+F deBruijn(k, n)
+   V alphabet = :digits[0 .< k]
+   V a = [Byte(0)] * (k * n)
+   [Byte] seq
+
+   F db(Int t, Int p) -> N
+      I t > @n
+         I @n % p == 0
+            @seq.extend(@a[1 .< p + 1])
+      E
+         @a[t] = @a[t - p]
+         @db(t + 1, p)
+         V j = @a[t - p] + 1
+         L j < @k
+            @a[t] = j [&] F'F
+            @db(t + 1, t)
+            j++
+
+   db(1, 1)
+   V buf = ‘’
+   L(i) seq
+      buf ‘’= alphabet[i]
+
+   R buf‘’buf[0 .< n - 1]
+
+F validate(db)
+   V found = [0] * 10'000
+   [String] errs
+
+   L(i) 0 .< db.len - 3
+      V s = db[i .< i + 4]
+      I s.is_digit()
+         found[Int(s)]++
+
+   L(i) 10'000
+      I found[i] == 0
+         errs [+]= ‘    PIN number #04 missing’.format(i)
+      E I found[i] > 1
+         errs [+]= ‘    PIN number #04 occurs #. times’.format(i, found[i])
+
+   I errs.empty
+      print(‘  No errors found’)
+   E
+      V pl = I errs.len == 1 {‘’} E ‘s’
+      print(‘  ’String(errs.len)‘ error’pl‘ found:’)
+      L(err) errs
+         print(err)
+
+V db = deBruijn(10, 4)
+
+print(‘The length of the de Bruijn sequence is ’db.len)
+print("\nThe first 130 digits of the de Bruijn sequence are: "db[0.<130])
+print("\nThe last 130 digits of the de Bruijn sequence are: "db[(len)-130 ..])
+
+print("\nValidating the deBruijn sequence:")
+validate(db)
+
+print("\nValidating the reversed deBruijn sequence:")
+validate(reversed(db))
+
+db = db[0.<4443]‘.’db[4444..]
+print("\nValidating the overlaid deBruijn sequence:")
+validate(db)
+===
+auto digits = u"0123456789"_S;
+
+template <typename T1, typename T2> auto deBruijn(const T1 &k, const T2 &n)
+{
+    auto alphabet = ::digits[range_el(0, k)];
+    auto a = create_array({Byte(0)}) * (k * n);
+    Array<Byte> seq;
+
+    std::function<void(int, int)> db = [&a, &db, &k, &n, &seq](const int t, const int p)
+    {
+        if (t > n) {
+            if (mod(n, p) == 0)
+                seq.extend(a[range_el(1, p + 1)]);
+        }
+        else {
+            a.set(t, a[t - p]);
+            db(t + 1, p);
+            auto j = a[t - p] + 1;
+            while (j < k) {
+                a.set(t, j & 0xFF);
+                db(t + 1, t);
+                j++;
+            }
+        }
+    };
+
+    db(1, 1);
+    auto buf = u""_S;
+    for (auto &&i : seq)
+        buf &= alphabet[i];
+
+    return buf & buf[range_el(0, n - 1)];
+}
+
+template <typename T1> auto validate(const T1 &db)
+{
+    auto found = create_array({0}) * 10'000;
+    Array<String> errs;
+
+    for (auto i : range_el(0, db.len() - 3)) {
+        auto s = db[range_el(i, i + 4)];
+        if (s.is_digit())
+            found[to_int(s)]++;
+    }
+
+    for (int i = 0; i < 10'000; i++)
+        if (found[i] == 0)
+            errs.append(u"    PIN number #04 missing"_S.format(i));
+        else if (found[i] > 1)
+            errs.append(u"    PIN number #04 occurs #. times"_S.format(i, found[i]));
+
+    if (errs.empty())
+        print(u"  No errors found"_S);
+    else {
+        auto pl = errs.len() == 1 ? u""_S : u"s"_S;
+        print(u"  "_S & String(errs.len()) & u" error"_S & pl & u" found:"_S);
+        for (auto &&err : errs)
+            print(err);
+    }
+}
+
+auto db = deBruijn(10, 4);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"The length of the de Bruijn sequence is "_S & db.len());
+        print(u"\nThe first 130 digits of the de Bruijn sequence are: "_S & db[range_el(0, 130)]);
+        print(u"\nThe last 130 digits of the de Bruijn sequence are: "_S & db[range_elen_i( - 130)]);
+
+        print(u"\nValidating the deBruijn sequence:"_S);
+        validate(db);
+
+        print(u"\nValidating the reversed deBruijn sequence:"_S);
+        validate(reversed(db));
+
+        db = db[range_el(0, 4443)] & u"."_S & db[range_ei(4444)];
+        print(u"\nValidating the overlaid deBruijn sequence:"_S);
+        validate(db);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Deal_cards_for_FreeCell#Python
+import sys
+
+def randomGenerator(seed, n):
+    r : List[int] = []
+    max_int32 = 0x7FFF_FFFF#(1 << 31) - 1
+    seed = seed & max_int32
+
+    while len(r) < n:
+        seed = (seed * 214013 + 2531011) & max_int32
+        r += [seed >> 16]
+
+    return r
+
+def deal(seed):
+    nc = 52
+    cards = list(range(nc - 1, -1, -1))
+    rnd = randomGenerator(seed, nc)
+    for i, r in enumerate(rnd):
+        j = (nc - 1) - r % (nc - i)
+        (cards[i], cards[j]) = (cards[j], cards[i])
+    return cards
+
+def show(cards):
+    l = ["A23456789TJQK"[int(c/4)] + "CDHS"[c%4] for c in cards]
+    for i in range(0, len(cards), 8):
+        print(" ".join(l[i : i+8]))
+
+if __name__ == '__main__':
+    seed = int(sys.argv[1]) if len(sys.argv) == 2 else 11982
+    print("Hand {}".format(seed))
+    deck = deal(seed)
+    show(deck)
+===
+F randomGenerator(=seed, n)
+   [Int] r
+   V max_int32 = 7FFF'FFFF
+   seed = seed [&] max_int32
+
+   L r.len < n
+      seed = (seed * 214013 + 2531011) [&] max_int32
+      r [+]= seed >> 16
+
+   R r
+
+F deal(seed)
+   V nc = 52
+   V cards = Array((nc - 1 .< -1).step(-1))
+   V rnd = randomGenerator(seed, nc)
+   L(r) rnd
+      V i = L.index
+      V j = (nc - 1) - r % (nc - i)
+      swap(&cards[i], &cards[j])
+   R cards
+
+F show(cards)
+   V l = cards.map(c -> ‘A23456789TJQK’[Int(c / 4)]‘’‘CDHS’[c % 4])
+   L(i) (0 .< cards.len).step(8)
+      print((l[i .< i + 8]).join(‘ ’))
+
+:start:
+V seed = I :argv.len == 2 {Int(:argv[1])} E 11982
+print(‘Hand #.’.format(seed))
+V deck = deal(seed)
+show(deck)
+===
+Array<String> argv;
+
+template <typename T1, typename T2> auto randomGenerator(T1 seed, const T2 &n)
+{
+    Array<int> r;
+    auto max_int32 = 0x7FFF'FFFF;
+    seed = seed & max_int32;
+
+    while (r.len() < n) {
+        seed = (seed * 214013 + 2531011) & max_int32;
+        r.append(seed >> 16);
+    }
+
+    return r;
+}
+
+template <typename T1> auto deal(const T1 &seed)
+{
+    auto nc = 52;
+    auto cards = create_array(range_el(nc - 1, -1).step(-1));
+    auto rnd = randomGenerator(seed, nc);
+    {int Lindex = 0;
+    for (auto &&r : rnd) {
+        auto i = Lindex;
+        auto j = (nc - 1) - mod(r, (nc - i));
+        swap(cards[i], cards[j]);
+        Lindex++;
+    }}
+    return cards;
+}
+
+template <typename T1> auto show(const T1 &cards)
+{
+    auto l = cards.map([](const auto &c){return u"A23456789TJQK"_S[to_int(c / 4.0)] & u"CDHS"_S[mod(c, 4)];});
+    for (auto i : range_el(0, cards.len()).step(8))
+        print((l[range_el(i, i + 8)]).join(u" "_S));
+}
+
+int MAIN_WITH_ARGV()
+{
+    INIT_ARGV();
+
+    auto seed = ::argv.len() == 2 ? to_int(_get<1>(::argv)) : 11982;
+    print(u"Hand #."_S.format(seed));
+    auto deck = deal(seed);
+    show(deck);
+}
+
+
+# https://www.rosettacode.org/wiki/Death_Star#Python
+import math
+from typing import NamedTuple
+
+class Sphere(NamedTuple):
+    cx : float
+    cy : float
+    cz : float
+    r  : float
+
+class V3(NamedTuple):
+    x : float
+    y : float
+    z : float
+
+def normalize(xyz : V3):
+    (x, y, z) = xyz
+    len = math.sqrt(x**2 + y**2 + z**2)
+    return V3(x / len, y / len, z / len)
+
+def dot(v1, v2):
+    d = v1.x*v2.x + v1.y*v2.y + v1.z*v2.z
+    return -d if d < 0 else 0.0
+
+def hit_sphere(sph, x0, y0):
+    x = x0 - sph.cx
+    y = y0 - sph.cy
+    zsq = sph.r ** 2 - (x ** 2 + y ** 2)
+    if zsq < 0:
+        return (False, 0.0, 0.0)
+    szsq = math.sqrt(zsq)
+    return (True, sph.cz - szsq, sph.cz + szsq)
+
+def draw_sphere(k, ambient, light):
+    shades = ".:!*oe&#%@"
+    pos = Sphere(20.0, 20.0, 0.0, 20.0)
+    neg = Sphere(1.0, 1.0, -6.0, 20.0)
+
+    for i in range(int(math.floor(pos.cy - pos.r)),
+                    int(math.ceil(pos.cy + pos.r) + 1)):
+        y = i + 0.5
+        for j in range(int(math.floor(pos.cx - 2 * pos.r)),
+                        int(math.ceil(pos.cx + 2 * pos.r) + 1)):
+            x = (j - pos.cx) / 2.0 + 0.5 + pos.cx
+
+            (h, zb1, zb2) = hit_sphere(pos, x, y)
+            hit_result : int
+            zs2 : float
+            if not h:
+                hit_result = 0
+            else:
+                (h, zs1, zs2) = hit_sphere(neg, x, y)
+                if not h:
+                    hit_result = 1
+                elif zs1 > zb1:
+                    hit_result = 1
+                elif zs2 > zb2:
+                    hit_result = 0
+                elif zs2 > zb1:
+                    hit_result = 2
+                else:
+                    hit_result = 1
+
+            vec = V3(0, 0, 0)
+            if hit_result == 0:
+                print(' ', end = '')
+                continue
+            elif hit_result == 1:
+                vec = V3(x - pos.cx, y - pos.cy, zb1 - pos.cz)
+            elif hit_result == 2:
+                vec = V3(neg.cx-x, neg.cy-y, neg.cz-zs2)
+            vec = normalize(vec)
+
+            b = dot(light, vec) ** k + ambient
+            intensity = int((1 - b) * len(shades))
+            intensity = min(len(shades), max(0, intensity))
+            print(shades[intensity], end = '')
+        print()
+
+light = normalize(V3(-50, 30, 50))
+draw_sphere(2, 0.5, light)
+===
+T Sphere
+   Float cx
+   Float cy
+   Float cz
+   Float r
+   F (cx, cy, cz, r)
+      .cx = cx
+      .cy = cy
+      .cz = cz
+      .r = r
+
+T V3
+   Float x
+   Float y
+   Float z
+   F (x, y, z)
+      .x = x
+      .y = y
+      .z = z
+
+F normalize(V3 xyz)
+   V (x, y, z) = xyz
+   V len = sqrt(x ^ 2 + y ^ 2 + z ^ 2)
+   R V3(x / len, y / len, z / len)
+
+F dot(v1, v2)
+   V d = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
+   R I d < 0 {-d} E 0.0
+
+F hit_sphere(sph, x0, y0)
+   V x = x0 - sph.cx
+   V y = y0 - sph.cy
+   V zsq = sph.r ^ 2 - (x ^ 2 + y ^ 2)
+   I zsq < 0
+      R (0B, 0.0, 0.0)
+   V szsq = sqrt(zsq)
+   R (1B, sph.cz - szsq, sph.cz + szsq)
+
+F draw_sphere(k, ambient, light)
+   V shades = ‘.:!*oe&#%@’
+   V pos = Sphere(20.0, 20.0, 0.0, 20.0)
+   V neg = Sphere(1.0, 1.0, -6.0, 20.0)
+
+   L(i) Int(floor(pos.cy - pos.r)) .< Int(ceil(pos.cy + pos.r) + 1)
+      V y = i + 0.5
+      L(j) Int(floor(pos.cx - 2 * pos.r)) .< Int(ceil(pos.cx + 2 * pos.r) + 1)
+         V x = (j - pos.cx) / 2.0 + 0.5 + pos.cx
+
+         V (h, zb1, zb2) = hit_sphere(pos, x, y)
+         Int hit_result
+         Float zs2
+         I !h
+            hit_result = 0
+         E
+            (h, V zs1, zs2) = hit_sphere(neg, x, y)
+            I !h
+               hit_result = 1
+            E I zs1 > zb1
+               hit_result = 1
+            E I zs2 > zb2
+               hit_result = 0
+            E I zs2 > zb1
+               hit_result = 2
+            E
+               hit_result = 1
+
+         V vec = V3(0, 0, 0)
+         I hit_result == 0
+            print(‘ ’, end' ‘’)
+            L.continue
+         E I hit_result == 1
+            vec = V3(x - pos.cx, y - pos.cy, zb1 - pos.cz)
+         E I hit_result == 2
+            vec = V3(neg.cx - x, neg.cy - y, neg.cz - zs2)
+         vec = normalize(vec)
+
+         V b = dot(light, vec) ^ k + ambient
+         V intensity = Int((1 - b) * shades.len)
+         intensity = min(shades.len, max(0, intensity))
+         print(shades[intensity], end' ‘’)
+      print()
+
+V light = normalize(V3(-50, 30, 50))
+draw_sphere(2, 0.5, light)
+===
+class Sphere
+{
+public:
+    double cx;
+    double cy;
+    double cz;
+    double r;
+    template <typename T1, typename T2, typename T3, typename T4> Sphere(const T1 &cx, const T2 &cy, const T3 &cz, const T4 &r) :
+        cx(cx),
+        cy(cy),
+        cz(cz),
+        r(r)
+    {
+    }
+};
+
+class V3
+{
+public:
+    double x;
+    double y;
+    double z;
+    template <typename T1, typename T2, typename T3> V3(const T1 &x, const T2 &y, const T3 &z) :
+        x(x),
+        y(y),
+        z(z)
+    {
+    }
+};
+
+auto normalize(const V3 &xyz)
+{
+    auto [x, y, z] = xyz;
+    auto len = sqrt(square(x) + square(y) + square(z));
+    return V3(x / len, y / len, z / len);
+}
+
+template <typename T1, typename T2> auto dot(const T1 &v1, const T2 &v2)
+{
+    auto d = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+    return d < 0 ? -d : 0.0;
+}
+
+template <typename T1, typename T2, typename T3> auto hit_sphere(const T1 &sph, const T2 &x0, const T3 &_y0_)
+{
+    auto x = x0 - sph.cx;
+    auto y = _y0_ - sph.cy;
+    auto zsq = square(sph.r) - (square(x) + square(y));
+    if (zsq < 0)
+        return make_tuple(false, 0.0, 0.0);
+    auto szsq = sqrt(zsq);
+    return make_tuple(true, sph.cz - szsq, sph.cz + szsq);
+}
+
+template <typename T1, typename T2, typename T3> auto draw_sphere(const T1 &k, const T2 &ambient, const T3 &light)
+{
+    auto shades = u".:!*oe&#%@"_S;
+    auto pos = Sphere(20.0, 20.0, 0.0, 20.0);
+    auto neg = Sphere(1.0, 1.0, -6.0, 20.0);
+
+    for (auto i : range_el(to_int(floor(pos.cy - pos.r)), to_int(ceil(pos.cy + pos.r) + 1))) {
+        auto y = i + 0.5;
+        for (auto j : range_el(to_int(floor(pos.cx - 2 * pos.r)), to_int(ceil(pos.cx + 2 * pos.r) + 1))) {
+            auto x = (j - pos.cx) / 2.0 + 0.5 + pos.cx;
+            auto [h, zb1, zb2] = hit_sphere(pos, x, y);
+            int hit_result;
+            double zs2;
+            if (!h)
+                hit_result = 0;
+            else {
+                TUPLE_ELEMENT_T(1, hit_sphere(neg, x, y)) zs1;
+                assign_from_tuple(h, zs1, zs2, hit_sphere(neg, x, y));
+                if (!h)
+                    hit_result = 1;
+                else if (zs1 > zb1)
+                    hit_result = 1;
+                else if (zs2 > zb2)
+                    hit_result = 0;
+                else if (zs2 > zb1)
+                    hit_result = 2;
+                else
+                    hit_result = 1;
+            }
+
+            auto vec = V3(0, 0, 0);
+            if (hit_result == 0) {
+                print(u" "_S, u""_S);
+                continue;
+            }
+            else if (hit_result == 1)
+                vec = V3(x - pos.cx, y - pos.cy, zb1 - pos.cz);
+            else if (hit_result == 2)
+                vec = V3(neg.cx - x, neg.cy - y, neg.cz - zs2);
+            vec = normalize(vec);
+
+            auto b = pow(dot(light, vec), k) + ambient;
+            auto intensity = to_int((1 - b) * shades.len());
+            intensity = min(shades.len(), max(0, intensity));
+            print(shades[intensity], u""_S);
+        }
+        print();
+    }
+}
+
+auto light = normalize(V3(-50, 30, 50));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        draw_sphere(2, 0.5, light);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Decimal_floating_point_number_to_binary#Kotlin
+import math
+
+def decToBin(d):
+    whole  = int(math.floor(d))
+    binary = bin(whole)[2:] + "."
+    dd = d - whole
+    while dd > 0.0:
+        r = dd * 2.0
+        if r >= 1.0:
+            binary += "1"
+            dd = r - 1
+        else:
+            binary += "0"
+            dd = r
+    return binary
+
+def binToDec(s):
+    num = int(s.replace(".", ""), base = 2)
+    den = int("1" + s.split('.')[1].replace("1", "0"), base = 2)
+    return float(num) / den
+
+d = 23.34375
+print(str(d) + "\t => " + decToBin(d))
+s = "1011.11101"
+print(s + "\t => " + str(binToDec(s)))
+===
+F decToBin(d)
+   V whole = Int(floor(d))
+   V binary = bin(whole)‘.’
+   V dd = d - whole
+   L dd > 0.0
+      V r = dd * 2.0
+      I r >= 1.0
+         binary ‘’= ‘1’
+         dd = r - 1
+      E
+         binary ‘’= ‘0’
+         dd = r
+   R binary
+
+F binToDec(s)
+   V num = Int(s.replace(‘.’, ‘’), radix' 2)
+   V den = Int(‘1’s.split(‘.’)[1].replace(‘1’, ‘0’), radix' 2)
+   R Float(num) / den
+
+V d = 23.34375
+print(String(d)"\t => "decToBin(d))
+V s = ‘1011.11101’
+print(s"\t => "String(binToDec(s)))
+===
+template <typename T1> auto decToBin(const T1 &d)
+{
+    auto whole = to_int(floor(d));
+    auto binary = bin(whole) & u"."_S;
+    auto dd = d - whole;
+    while (dd > 0.0) {
+        auto r = dd * 2.0;
+        if (r >= 1.0) {
+            binary &= u"1"_S;
+            dd = r - 1;
+        }
+        else {
+            binary &= u"0"_S;
+            dd = r;
+        }
+    }
+    return binary;
+}
+
+template <typename T1> auto binToDec(const T1 &s)
+{
+    auto num = to_int(s.replace(u"."_S, u""_S), 2);
+    auto den = to_int(u"1"_S & _get<1>(s.split(u"."_S)).replace(u"1"_S, u"0"_S), 2);
+    return to_float(num) / den;
+}
+
+auto d = 23.34375;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(String(d) & u"\t => "_S & decToBin(d));
+    }
+} code_block_1;
+
+auto s = u"1011.11101"_S;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(s & u"\t => "_S & String(binToDec(s)));
+    }
+} code_block_2;

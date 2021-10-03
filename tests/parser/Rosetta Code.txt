@@ -3319,3 +3319,35 @@ int MAIN_WITH_ARGV()
         f.write(u"\t"_S & (::argv[range_ei(1)].join(u" "_S)) & u"\n"_S);
     }
 }
+
+
+// https://www.rosettacode.org/wiki/Combinations_with_repetitions#Nim
+F combsReps(lst, k)
+   T Ty = T(lst[0])
+   I k == 0
+      R [[Ty]()]
+   I lst.empty
+      R [[Ty]]()
+   R combsReps(lst, k - 1).map(x -> @lst[0] [+] x) [+] combsReps(lst[1..], k)
+
+print(combsReps([‘iced’, ‘jam’, ‘plain’], 2))
+print(combsReps(Array(1..10), 3).len)
+===
+template <typename T1, typename T2> auto combsReps(const T1 &lst, const T2 &k)
+{
+    using Ty = TYPE_OF(_get<0>(lst));
+    if (k == 0)
+        return create_array({Array<Ty>()});
+    if (lst.empty())
+        return Array<Array<Ty>>();
+    return combsReps(lst, k - 1).map([&lst](const auto &x){return _get<0>(lst) + x;}) + combsReps(lst[range_ei(1)], k);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(combsReps(create_array({u"iced"_S, u"jam"_S, u"plain"_S}), 2));
+        print(combsReps(create_array(range_ee(1, 10)), 3).len());
+    }
+} code_block_1;
