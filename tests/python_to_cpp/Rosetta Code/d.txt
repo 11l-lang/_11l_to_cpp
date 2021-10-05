@@ -1276,3 +1276,1132 @@ struct CodeBlock2
         print(s & u"\t => "_S & String(binToDec(s)));
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Decision_tables#Kotlin
+from typing import List
+
+conditions = [
+    ("Printer prints"                   , "NNNNYYYY"),
+    ("A red light is flashing"          , "YYNNYYNN"),
+    ("Printer is recognized by computer", "NYNYNYNY")]
+
+actions = [
+    ("Check the power cable"               , "NNYNNNNN"),
+    ("Check the printer-computer cable"    , "YNYNNNNN"),
+    ("Ensure printer software is installed", "YNYNYNYN"),
+    ("Check/replace ink"                   , "YYNNNYNN"),
+    ("Check for paper jam"                 , "NYNYNNNN")]
+
+nr = len(conditions[0][1])
+np = 7
+print("Please answer the following questions with a y or n:")
+
+answers : List[bool] = []
+for condition in conditions:
+    inp = ''
+    while True:
+        inp = input('  ' + condition[0] + ' ? ').upper()
+        if inp in ('Y', 'N'):
+            break
+    answers.append(inp == 'Y')
+
+print("\nRecommended action(s):")
+for r in range(nr):
+    for c in range(len(conditions)):
+        yn = 'Y' if answers[c] else 'N'
+        if conditions[c][1][r] != yn:
+            break # `L(r).continue`
+    else:
+        if r == np:
+            print("  None (no problem detected)")
+        else:
+            for action in actions:
+                if action[1][r] == 'Y':
+                    print('  ' + action[0])
+        break
+===
+V conditions = [(‘Printer prints’, ‘NNNNYYYY’), (‘A red light is flashing’, ‘YYNNYYNN’), (‘Printer is recognized by computer’, ‘NYNYNYNY’)]
+
+V actions = [(‘Check the power cable’, ‘NNYNNNNN’), (‘Check the printer-computer cable’, ‘YNYNNNNN’), (‘Ensure printer software is installed’, ‘YNYNYNYN’), (‘Check/replace ink’, ‘YYNNNYNN’), (‘Check for paper jam’, ‘NYNYNNNN’)]
+
+V nr = conditions[0][1].len
+V np = 7
+print(‘Please answer the following questions with a y or n:’)
+
+[Bool] answers
+L(condition) conditions
+   V inp = ‘’
+   L
+      inp = input(‘  ’condition[0]‘ ? ’).uppercase()
+      I inp C (‘Y’, ‘N’)
+         L.break
+   answers.append(inp == ‘Y’)
+
+print("\nRecommended action(s):")
+L(r) 0 .< nr
+   L(c) 0 .< conditions.len
+      V yn = I answers[c] {‘Y’} E ‘N’
+      I conditions[c][1][r] != yn
+         L.break
+   L.was_no_break
+      I r == np
+         print(‘  None (no problem detected)’)
+      E
+         L(action) actions
+            I action[1][r] == ‘Y’
+               print(‘  ’action[0])
+      L.break
+===
+auto conditions = create_array({make_tuple(u"Printer prints"_S, u"NNNNYYYY"_S), make_tuple(u"A red light is flashing"_S, u"YYNNYYNN"_S), make_tuple(u"Printer is recognized by computer"_S, u"NYNYNYNY"_S)});
+
+auto actions = create_array({make_tuple(u"Check the power cable"_S, u"NNYNNNNN"_S), make_tuple(u"Check the printer-computer cable"_S, u"YNYNNNNN"_S), make_tuple(u"Ensure printer software is installed"_S, u"YNYNYNYN"_S), make_tuple(u"Check/replace ink"_S, u"YYNNNYNN"_S), make_tuple(u"Check for paper jam"_S, u"NYNYNNNN"_S)});
+
+auto nr = _get<1>(_get<0>(conditions)).len();
+auto np = 7;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Please answer the following questions with a y or n:"_S);
+    }
+} code_block_1;
+
+Array<bool> answers;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&condition : conditions) {
+            auto inp = u""_S;
+            while (true) {
+                inp = input(u"  "_S & _get<0>(condition) & u" ? "_S).uppercase();
+                if (in(inp, make_tuple(u"Y"_S, u"N"_S)))
+                    break;
+            }
+            answers.append(inp == u'Y');
+        }
+
+        print(u"\nRecommended action(s):"_S);
+        for (auto r : range_el(0, nr)) {
+            for (auto c : range_el(0, conditions.len())) {
+                auto _yn_ = answers[c] ? u"Y"_S : u"N"_S;
+                if (_get<1>(conditions[c])[r] != _yn_)
+                    goto break_;
+            }
+            if (r == np)
+                print(u"  None (no problem detected)"_S);
+            else
+                for (auto &&action : actions)
+                    if (_get<1>(action)[r] == u'Y')
+                        print(u"  "_S & _get<0>(action));
+            goto break_;
+            break_:;
+        }
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Deming%27s_Funnel#Python
+import math
+
+dxs = [-0.533, 0.27, 0.859, -0.043, -0.205, -0.127, -0.071, 0.275, 1.251,
+       -0.231, -0.401, 0.269, 0.491, 0.951, 1.15, 0.001, -0.382, 0.161, 0.915,
+       2.08, -2.337, 0.034, -0.126, 0.014, 0.709, 0.129, -1.093, -0.483, -1.193,
+       0.02, -0.051, 0.047, -0.095, 0.695, 0.34, -0.182, 0.287, 0.213, -0.423,
+       -0.021, -0.134, 1.798, 0.021, -1.099, -0.361, 1.636, -1.134, 1.315, 0.201,
+       0.034, 0.097, -0.17, 0.054, -0.553, -0.024, -0.181, -0.7, -0.361, -0.789,
+       0.279, -0.174, -0.009, -0.323, -0.658, 0.348, -0.528, 0.881, 0.021, -0.853,
+       0.157, 0.648, 1.774, -1.043, 0.051, 0.021, 0.247, -0.31, 0.171, 0.0, 0.106,
+       0.024, -0.386, 0.962, 0.765, -0.125, -0.289, 0.521, 0.017, 0.281, -0.749,
+       -0.149, -2.436, -0.909, 0.394, -0.113, -0.598, 0.443, -0.521, -0.799,
+       0.087]
+
+dys = [0.136, 0.717, 0.459, -0.225, 1.392, 0.385, 0.121, -0.395, 0.49, -0.682,
+       -0.065, 0.242, -0.288, 0.658, 0.459, 0.0, 0.426, 0.205, -0.765, -2.188,
+       -0.742, -0.01, 0.089, 0.208, 0.585, 0.633, -0.444, -0.351, -1.087, 0.199,
+       0.701, 0.096, -0.025, -0.868, 1.051, 0.157, 0.216, 0.162, 0.249, -0.007,
+       0.009, 0.508, -0.79, 0.723, 0.881, -0.508, 0.393, -0.226, 0.71, 0.038,
+       -0.217, 0.831, 0.48, 0.407, 0.447, -0.295, 1.126, 0.38, 0.549, -0.445,
+       -0.046, 0.428, -0.074, 0.217, -0.822, 0.491, 1.347, -0.141, 1.23, -0.044,
+       0.079, 0.219, 0.698, 0.275, 0.056, 0.031, 0.421, 0.064, 0.721, 0.104,
+       -0.729, 0.65, -1.103, 0.154, -1.72, 0.051, -0.385, 0.477, 1.537, -0.901,
+       0.939, -0.411, 0.341, -0.411, 0.106, 0.224, -0.947, -1.424, -0.542, -1.032]
+
+def funnel(dxs, rule):
+    x = 0.0
+    rxs : List[float] = []
+    for dx in dxs:
+        rxs.append(x + dx)
+        x = rule(x, dx)
+    return rxs
+
+def mean(xs): return sum(xs) / len(xs)
+
+def stddev(xs):
+    m = mean(xs)
+    return math.sqrt(sum((x-m)**2 for x in xs) / len(xs))
+
+def experiment(label, rule):
+    (rxs, rys) = (funnel(dxs, rule), funnel(dys, rule))
+    print(label)
+    print('Mean x, y    : %.4f, %.4f' % (mean(rxs), mean(rys)))
+    print('Std dev x, y : %.4f, %.4f' % (stddev(rxs), stddev(rys)))
+    print()
+
+experiment('Rule 1:', lambda z, dz: 0)
+experiment('Rule 2:', lambda z, dz: -dz)
+experiment('Rule 3:', lambda z, dz: -(z+dz))
+experiment('Rule 4:', lambda z, dz: z+dz)
+===
+V dxs = [-0.533, 0.27, 0.859, -0.043, -0.205, -0.127, -0.071, 0.275, 1.251, -0.231, -0.401, 0.269, 0.491, 0.951, 1.15, 0.001, -0.382, 0.161, 0.915, 2.08, -2.337, 0.034, -0.126, 0.014, 0.709, 0.129, -1.093, -0.483, -1.193, 0.02, -0.051, 0.047, -0.095, 0.695, 0.34, -0.182, 0.287, 0.213, -0.423, -0.021, -0.134, 1.798, 0.021, -1.099, -0.361, 1.636, -1.134, 1.315, 0.201, 0.034, 0.097, -0.17, 0.054, -0.553, -0.024, -0.181, -0.7, -0.361, -0.789, 0.279, -0.174, -0.009, -0.323, -0.658, 0.348, -0.528, 0.881, 0.021, -0.853, 0.157, 0.648, 1.774, -1.043, 0.051, 0.021, 0.247, -0.31, 0.171, 0.0, 0.106, 0.024, -0.386, 0.962, 0.765, -0.125, -0.289, 0.521, 0.017, 0.281, -0.749, -0.149, -2.436, -0.909, 0.394, -0.113, -0.598, 0.443, -0.521, -0.799, 0.087]
+
+V dys = [0.136, 0.717, 0.459, -0.225, 1.392, 0.385, 0.121, -0.395, 0.49, -0.682, -0.065, 0.242, -0.288, 0.658, 0.459, 0.0, 0.426, 0.205, -0.765, -2.188, -0.742, -0.01, 0.089, 0.208, 0.585, 0.633, -0.444, -0.351, -1.087, 0.199, 0.701, 0.096, -0.025, -0.868, 1.051, 0.157, 0.216, 0.162, 0.249, -0.007, 0.009, 0.508, -0.79, 0.723, 0.881, -0.508, 0.393, -0.226, 0.71, 0.038, -0.217, 0.831, 0.48, 0.407, 0.447, -0.295, 1.126, 0.38, 0.549, -0.445, -0.046, 0.428, -0.074, 0.217, -0.822, 0.491, 1.347, -0.141, 1.23, -0.044, 0.079, 0.219, 0.698, 0.275, 0.056, 0.031, 0.421, 0.064, 0.721, 0.104, -0.729, 0.65, -1.103, 0.154, -1.72, 0.051, -0.385, 0.477, 1.537, -0.901, 0.939, -0.411, 0.341, -0.411, 0.106, 0.224, -0.947, -1.424, -0.542, -1.032]
+
+F funnel(dxs, rule)
+   V x = 0.0
+   [Float] rxs
+   L(dx) dxs
+      rxs.append(x + dx)
+      x = rule(x, dx)
+   R rxs
+
+F mean(xs)
+   R sum(xs) / xs.len
+
+F stddev(xs)
+   V m = mean(xs)
+   R sqrt(sum(xs.map(x -> (x - @m) ^ 2)) / xs.len)
+
+F experiment(label, rule)
+   V (rxs, rys) = (funnel(:dxs, rule), funnel(:dys, rule))
+   print(label)
+   print(‘Mean x, y    : #.4, #.4’.format(mean(rxs), mean(rys)))
+   print(‘Std dev x, y : #.4, #.4’.format(stddev(rxs), stddev(rys)))
+   print()
+
+experiment(‘Rule 1:’, (z, dz) -> 0)
+experiment(‘Rule 2:’, (z, dz) -> -dz)
+experiment(‘Rule 3:’, (z, dz) -> -(z + dz))
+experiment(‘Rule 4:’, (z, dz) -> z + dz)
+===
+auto dxs = create_array({-0.533, 0.27, 0.859, -0.043, -0.205, -0.127, -0.071, 0.275, 1.251, -0.231, -0.401, 0.269, 0.491, 0.951, 1.15, 0.001, -0.382, 0.161, 0.915, 2.08, -2.337, 0.034, -0.126, 0.014, 0.709, 0.129, -1.093, -0.483, -1.193, 0.02, -0.051, 0.047, -0.095, 0.695, 0.34, -0.182, 0.287, 0.213, -0.423, -0.021, -0.134, 1.798, 0.021, -1.099, -0.361, 1.636, -1.134, 1.315, 0.201, 0.034, 0.097, -0.17, 0.054, -0.553, -0.024, -0.181, -0.7, -0.361, -0.789, 0.279, -0.174, -0.009, -0.323, -0.658, 0.348, -0.528, 0.881, 0.021, -0.853, 0.157, 0.648, 1.774, -1.043, 0.051, 0.021, 0.247, -0.31, 0.171, 0.0, 0.106, 0.024, -0.386, 0.962, 0.765, -0.125, -0.289, 0.521, 0.017, 0.281, -0.749, -0.149, -2.436, -0.909, 0.394, -0.113, -0.598, 0.443, -0.521, -0.799, 0.087});
+
+auto dys = create_array({0.136, 0.717, 0.459, -0.225, 1.392, 0.385, 0.121, -0.395, 0.49, -0.682, -0.065, 0.242, -0.288, 0.658, 0.459, 0.0, 0.426, 0.205, -0.765, -2.188, -0.742, -0.01, 0.089, 0.208, 0.585, 0.633, -0.444, -0.351, -1.087, 0.199, 0.701, 0.096, -0.025, -0.868, 1.051, 0.157, 0.216, 0.162, 0.249, -0.007, 0.009, 0.508, -0.79, 0.723, 0.881, -0.508, 0.393, -0.226, 0.71, 0.038, -0.217, 0.831, 0.48, 0.407, 0.447, -0.295, 1.126, 0.38, 0.549, -0.445, -0.046, 0.428, -0.074, 0.217, -0.822, 0.491, 1.347, -0.141, 1.23, -0.044, 0.079, 0.219, 0.698, 0.275, 0.056, 0.031, 0.421, 0.064, 0.721, 0.104, -0.729, 0.65, -1.103, 0.154, -1.72, 0.051, -0.385, 0.477, 1.537, -0.901, 0.939, -0.411, 0.341, -0.411, 0.106, 0.224, -0.947, -1.424, -0.542, -1.032});
+
+template <typename T1, typename T2> auto funnel(const T1 &dxs, const T2 &rule)
+{
+    auto x = 0.0;
+    Array<double> rxs;
+    for (auto &&dx : dxs) {
+        rxs.append(x + dx);
+        x = rule(x, dx);
+    }
+    return rxs;
+}
+
+template <typename T1> auto mean(const T1 &xs)
+{
+    return sum(xs) / xs.len();
+}
+
+template <typename T1> auto stddev(const T1 &xs)
+{
+    auto m = mean(xs);
+    return sqrt(sum_map(xs, [&m](const auto &x){return square((x - m));}) / xs.len());
+}
+
+template <typename T1, typename T2> auto experiment(const T1 &label, const T2 &rule)
+{
+    auto [rxs, rys] = make_tuple(funnel(::dxs, rule), funnel(::dys, rule));
+    print(label);
+    print(u"Mean x, y    : #.4, #.4"_S.format(mean(rxs), mean(rys)));
+    print(u"Std dev x, y : #.4, #.4"_S.format(stddev(rxs), stddev(rys)));
+    print();
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        experiment(u"Rule 1:"_S, [](const auto &z, const auto &dz){return 0;});
+        experiment(u"Rule 2:"_S, [](const auto &z, const auto &dz){return -dz;});
+        experiment(u"Rule 3:"_S, [](const auto &z, const auto &dz){return -(z + dz);});
+        experiment(u"Rule 4:"_S, [](const auto &z, const auto &dz){return z + dz;});
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Determinant_and_permanent#Nim
+def s_permutations(seq):
+    items = [[0] * 0]
+    for j in seq:
+        new_items : List[List[int]] = []
+        for i, item in enumerate(items):
+            if i % 2:
+                # step up
+                new_items += [item[:i] + [j] + item[i:]
+                              for i in range(len(item) + 1)]
+            else:
+                # step down
+                new_items += [item[:i] + [j] + item[i:]
+                              for i in range(len(item), -1, -1)]
+        items = new_items
+
+    return [(item, -1 if i % 2 else 1)
+            for i, item in enumerate(items)]
+
+def det(a):
+    result = 0.0
+    for sigma, sign in s_permutations(list(range(len(a)))):
+        x = float(sign)
+        for i in range(len(a)):
+            x *= a[i][sigma[i]]
+        result += x
+    return result
+
+def perm(a):
+    result = 0.0
+    for sigma, sign in s_permutations(list(range(len(a)))):
+        x = 1.0
+        for i in range(len(a)):
+            x *= a[i][sigma[i]]
+        result += x
+    return result
+
+a = [ [1.0, 2.0]
+    , [3.0, 4.0]
+    ]
+b = [ [float( 1),  2,  3,  4]
+    , [float( 4),  5,  6,  7]
+    , [float( 7),  8,  9, 10]
+    , [float(10), 11, 12, 13]
+    ]
+c = [ [float( 0),  1,  2,  3,  4]
+    , [float( 5),  6,  7,  8,  9]
+    , [float(10), 11, 12, 13, 14]
+    , [float(15), 16, 17, 18, 19]
+    , [float(20), 21, 22, 23, 24]
+    ]
+
+print("perm:", perm(a), "det:", det(a))
+print("perm:", perm(b), "det:", det(b))
+print("perm:", perm(c), "det:", det(c))
+===
+F s_permutations(seq)
+   V items = [[Int]()]
+   L(j) seq
+      [[Int]] new_items
+      L(item) items
+         V i = L.index
+         I i % 2
+            new_items [+]= (0 .. item.len).map(i -> @item[0 .< i] [+] [@j] [+] @item[i ..])
+         E
+            new_items [+]= (item.len .< -1).step(-1).map(i -> @item[0 .< i] [+] [@j] [+] @item[i ..])
+      items = new_items
+
+   R enumerate(items).map((i, item) -> (item, I i % 2 {-1} E 1))
+
+F det(a)
+   V result = 0.0
+   L(sigma, _sign_) s_permutations(Array(0 .< a.len))
+      V x = Float(_sign_)
+      L(i) 0 .< a.len
+         x *= a[i][sigma[i]]
+      result += x
+   R result
+
+F perm(a)
+   V result = 0.0
+   L(sigma, _sign_) s_permutations(Array(0 .< a.len))
+      V x = 1.0
+      L(i) 0 .< a.len
+         x *= a[i][sigma[i]]
+      result += x
+   R result
+
+V a = [[1.0, 2.0], [3.0, 4.0]]
+V b = [[Float(1), 2, 3, 4], [Float(4), 5, 6, 7], [Float(7), 8, 9, 10], [Float(10), 11, 12, 13]]
+V c = [[Float(0), 1, 2, 3, 4], [Float(5), 6, 7, 8, 9], [Float(10), 11, 12, 13, 14], [Float(15), 16, 17, 18, 19], [Float(20), 21, 22, 23, 24]]
+
+print(‘perm: ’perm(a)‘ det: ’det(a))
+print(‘perm: ’perm(b)‘ det: ’det(b))
+print(‘perm: ’perm(c)‘ det: ’det(c))
+===
+template <typename T1> auto s_permutations(const T1 &seq)
+{
+    auto items = create_array({Array<int>()});
+    for (auto &&j : seq) {
+        Array<Array<int>> new_items;
+        {int Lindex = 0;
+        for (auto &&item : items) {
+            auto i = Lindex;
+            if (mod(i, 2))
+                new_items.append(range_ee(0, item.len()).map([&item, &j](const auto &i){return item[range_el(0, i)] + create_array({j}) + item[range_ei(i)];}));
+            else
+                new_items.append(range_el(item.len(), -1).step(-1).map([&item, &j](const auto &i){return item[range_el(0, i)] + create_array({j}) + item[range_ei(i)];}));
+            Lindex++;
+        }}
+        items = new_items;
+    }
+
+    return enumerate(items).map([](const auto &i, const auto &item){return make_tuple(item, mod(i, 2) ? -1 : 1);});
+}
+
+template <typename T1> auto det(const T1 &a)
+{
+    auto result = 0.0;
+    for (auto &&[sigma, _sign_] : s_permutations(create_array(range_el(0, a.len())))) {
+        auto x = to_float(_sign_);
+        for (auto i : range_el(0, a.len()))
+            x *= a[i][sigma[i]];
+        result += x;
+    }
+    return result;
+}
+
+template <typename T1> auto perm(const T1 &a)
+{
+    auto result = 0.0;
+    for (auto &&[sigma, _sign_] : s_permutations(create_array(range_el(0, a.len())))) {
+        auto x = 1.0;
+        for (auto i : range_el(0, a.len()))
+            x *= a[i][sigma[i]];
+        result += x;
+    }
+    return result;
+}
+
+auto a = create_array({create_array({1.0, 2.0}), create_array({3.0, 4.0})});
+auto b = create_array({create_array<double>({to_float(1), 2, 3, 4}), create_array<double>({to_float(4), 5, 6, 7}), create_array<double>({to_float(7), 8, 9, 10}), create_array<double>({to_float(10), 11, 12, 13})});
+auto c = create_array({create_array<double>({to_float(0), 1, 2, 3, 4}), create_array<double>({to_float(5), 6, 7, 8, 9}), create_array<double>({to_float(10), 11, 12, 13, 14}), create_array<double>({to_float(15), 16, 17, 18, 19}), create_array<double>({to_float(20), 21, 22, 23, 24})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"perm: "_S & perm(a) & u" det: "_S & det(a));
+        print(u"perm: "_S & perm(b) & u" det: "_S & det(b));
+        print(u"perm: "_S & perm(c) & u" det: "_S & det(c));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Determine_if_a_string_has_all_the_same_characters#Kotlin
+from _11l import *
+
+def analyze(s):
+    print('Examining [%s] which has a length of %d:' % (s, len(s)))
+    if len(s) > 1:
+        b = s[0]
+        for i, c in enumerate(s):
+            if c != b:
+                print('    Not all characters in the string are the same.')
+                print("    '" + c + "' (0x" + hexu(ord(c)) + ') is different at position ' + str(i))
+                return
+
+    print('    All characters in the string are the same.')
+
+strs = ['', '   ', '2', '333', '.55', 'tttTTT', '4444 444k']
+for s in strs:
+    analyze(s)
+===
+F analyze(s)
+   print(‘Examining [#.] which has a length of #.:’.format(s, s.len))
+   I s.len > 1
+      V b = s[0]
+      L(c) s
+         V i = L.index
+         I c != b
+            print(‘    Not all characters in the string are the same.’)
+            print(‘    '’c‘' (0x’hex(c.code)‘) is different at position ’String(i))
+            R
+
+   print(‘    All characters in the string are the same.’)
+
+V strs = [‘’, ‘   ’, ‘2’, ‘333’, ‘.55’, ‘tttTTT’, ‘4444 444k’]
+L(s) strs
+   analyze(s)
+===
+template <typename T1> auto analyze(const T1 &s)
+{
+    print(u"Examining [#.] which has a length of #.:"_S.format(s, s.len()));
+    if (s.len() > 1) {
+        auto b = _get<0>(s);
+        {int Lindex = 0;
+        for (auto &&c : s) {
+            auto i = Lindex;
+            if (c != b) {
+                print(u"    Not all characters in the string are the same."_S);
+                print(u"    '"_S & c & u"' (0x"_S & hex(c.code) & u") is different at position "_S & String(i));
+                return;
+            }
+            Lindex++;
+        }}
+    }
+
+    print(u"    All characters in the string are the same."_S);
+}
+
+auto strs = create_array({u""_S, u"   "_S, u"2"_S, u"333"_S, u".55"_S, u"tttTTT"_S, u"4444 444k"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&s : strs)
+            analyze(s);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Determine_if_a_string_has_all_unique_characters#Kotlin
+from _11l import *
+
+def processString(input):
+    charMap : Dict[Char, int] = {}
+    dup = Char("\0")
+    index = 0
+    pos1 = -1
+    pos2 = -1
+    for key in input:
+        index += 1
+        if key in charMap:
+            dup = key
+            pos1 = charMap[key]
+            pos2 = index
+            break
+        charMap[key] = index
+    unique = "yes" if dup == Char("\0") else "no"
+    diff = "" if dup == Char("\0") else "'" + dup + "'"
+    hexs = "" if dup == Char("\0") else hexu(ord(dup))
+    position = "" if dup == Char("\0") else str(pos1) + " " + str(pos2)
+    print("%-40s  %-6d  %-10s  %-8s  %-3s  %-5s" % (input, len(input), unique, diff, hexs, position))
+
+print("%-40s  %2s  %10s  %8s  %s  %s" % ("String", "Length", "All Unique", "1st Diff", "Hex", "Positions"))
+print("%-40s  %2s  %10s  %8s  %s  %s" % ("------------------------", "------", "----------", "--------", "---", "---------"))
+for s in ["", ".", "abcABC", "XYZ ZYX", "1234567890ABCDEFGHIJKLMN0PQRSTUVWXYZ"]:
+    processString(s)
+===
+F processString(input)
+   [Char = Int] charMap
+   V dup = Char("\0")
+   V index = 0
+   V pos1 = -1
+   V pos2 = -1
+   L(key) input
+      index++
+      I key C charMap
+         dup = key
+         pos1 = charMap[key]
+         pos2 = index
+         L.break
+      charMap[key] = index
+   V unique = I dup == Char("\0") {‘yes’} E ‘no’
+   V diff = I dup == Char("\0") {‘’} E ‘'’dup‘'’
+   V hexs = I dup == Char("\0") {‘’} E hex(dup.code)
+   V position = I dup == Char("\0") {‘’} E String(pos1)‘ ’String(pos2)
+   print(‘#<40  #<6  #<10  #<8  #<3  #<5’.format(input, input.len, unique, diff, hexs, position))
+
+print(‘#<40  #2  #10  #8  #.  #.’.format(‘String’, ‘Length’, ‘All Unique’, ‘1st Diff’, ‘Hex’, ‘Positions’))
+print(‘#<40  #2  #10  #8  #.  #.’.format(‘------------------------’, ‘------’, ‘----------’, ‘--------’, ‘---’, ‘---------’))
+L(s) [‘’, ‘.’, ‘abcABC’, ‘XYZ ZYX’, ‘1234567890ABCDEFGHIJKLMN0PQRSTUVWXYZ’]
+   processString(s)
+===
+template <typename T1> auto processString(const T1 &input)
+{
+    Dict<Char, int> charMap;
+    auto dup = u'\0'_C;
+    auto index = 0;
+    auto pos1 = -1;
+    auto pos2 = -1;
+    for (auto &&key : input) {
+        index++;
+        if (in(key, charMap)) {
+            dup = key;
+            pos1 = charMap[key];
+            pos2 = index;
+            break;
+        }
+        charMap.set(key, index);
+    }
+    auto unique = dup == u'\0'_C ? u"yes"_S : u"no"_S;
+    auto diff = dup == u'\0'_C ? u""_S : u"'"_S & dup & u"'"_S;
+    auto hexs = dup == u'\0'_C ? u""_S : hex(dup.code);
+    auto position = dup == u'\0'_C ? u""_S : String(pos1) & u" "_S & String(pos2);
+    print(u"#<40  #<6  #<10  #<8  #<3  #<5"_S.format(input, input.len(), unique, diff, hexs, position));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"#<40  #2  #10  #8  #.  #."_S.format(u"String"_S, u"Length"_S, u"All Unique"_S, u"1st Diff"_S, u"Hex"_S, u"Positions"_S));
+        print(u"#<40  #2  #10  #8  #.  #."_S.format(u"------------------------"_S, u"------"_S, u"----------"_S, u"--------"_S, u"---"_S, u"---------"_S));
+        for (auto &&s : create_array({u""_S, u"."_S, u"abcABC"_S, u"XYZ ZYX"_S, u"1234567890ABCDEFGHIJKLMN0PQRSTUVWXYZ"_S}))
+            processString(s);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Determine_if_a_string_is_collapsible#Kotlin
+Char = str
+
+def collapse(s):
+    cs = ''
+    last = Char("\0")
+    for c in s:
+        if c != last:
+            cs += c
+            last = c
+    return cs
+
+strings = [
+    "",
+    '"If I were two-faced, would I be wearing this one?" --- Abraham Lincoln ',
+    "..1111111111111111111111111111111111111111111111111111111111111117777888",
+    "I never give 'em hell, I just tell the truth, and they think it's hell. ",
+    "                                                   ---  Harry S Truman  ",
+    "The better the 4-wheel drive, the further you'll be from help when ya get stuck!",
+    "headmistressship",
+    "aardvark"
+]
+
+for s in strings:
+    c = collapse(s)
+    print("original  : length = " + str(len(s)) + ", string = <<<" + s + ">>>")
+    print("collapsed : length = " + str(len(c)) + ", string = <<<" + c + ">>>")
+    print()
+===
+F collapse(s)
+   V cs = ‘’
+   V last = Char("\0")
+   L(c) s
+      I c != last
+         cs ‘’= c
+         last = c
+   R cs
+
+V strings = [‘’, ‘"If I were two-faced, would I be wearing this one?" --- Abraham Lincoln ’, ‘..1111111111111111111111111111111111111111111111111111111111111117777888’, ‘I never give 'em hell, I just tell the truth, and they think it's hell. ’, ‘                                                   ---  Harry S Truman  ’, ‘The better the 4-wheel drive, the further you'll be from help when ya get stuck!’, ‘headmistressship’, ‘aardvark’]
+
+L(s) strings
+   V c = collapse(s)
+   print(‘original  : length = ’String(s.len)‘, string = <<<’s‘>>>’)
+   print(‘collapsed : length = ’String(c.len)‘, string = <<<’c‘>>>’)
+   print()
+===
+template <typename T1> auto collapse(const T1 &s)
+{
+    auto cs = u""_S;
+    auto last = u'\0'_C;
+    for (auto &&c : s)
+        if (c != last) {
+            cs &= c;
+            last = c;
+        }
+    return cs;
+}
+
+auto strings = create_array({u""_S, u"\"If I were two-faced, would I be wearing this one?\" --- Abraham Lincoln "_S, u"..1111111111111111111111111111111111111111111111111111111111111117777888"_S, u"I never give 'em hell, I just tell the truth, and they think it's hell. "_S, u"                                                   ---  Harry S Truman  "_S, u"The better the 4-wheel drive, the further you'll be from help when ya get stuck!"_S, u"headmistressship"_S, u"aardvark"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&s : strings) {
+            auto c = collapse(s);
+            print(u"original  : length = "_S & String(s.len()) & u", string = <<<"_S & s & u">>>"_S);
+            print(u"collapsed : length = "_S & String(c.len()) & u", string = <<<"_S & c & u">>>"_S);
+            print();
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Determine_if_a_string_is_squeezable#Java
+def squeeze(input, include):
+    s = ''
+    for i in range(len(input)):
+        if i == 0 or input[i - 1] != input[i] or (input[i - 1] == input[i] and input[i] != include):
+            s += input[i]
+    return s
+
+testStrings = [
+    "",
+    '"If I were two-faced, would I be wearing this one?" --- Abraham Lincoln ',
+    "..1111111111111111111111111111111111111111111111111111111111111117777888",
+    "I never give 'em hell, I just tell the truth, and they think it's hell. ",
+    "                                                    --- Harry S Truman  ",
+    "122333444455555666666777777788888888999999999",
+    "The better the 4-wheel drive, the further you'll be from help when ya get stuck!",
+    "headmistressship"
+]
+
+testChar = [
+    " ",
+    "-",
+    "7",
+    ".",
+    " -r",
+    "5",
+    "e",
+    "s"
+]
+
+for testNum in range(len(testStrings)):
+    s = testStrings[testNum]
+    for c in testChar[testNum]:
+        result = squeeze(s, c)
+        print("use: '%s'\nold:  %2d <<<%s>>>\nnew:  %2d <<<%s>>>\n" % (c, len(s), s, len(result), result))
+===
+F squeeze(input, include)
+   V s = ‘’
+   L(i) 0 .< input.len
+      I i == 0 | input[i - 1] != input[i] | (input[i - 1] == input[i] & input[i] != include)
+         s ‘’= input[i]
+   R s
+
+V testStrings = [‘’, ‘"If I were two-faced, would I be wearing this one?" --- Abraham Lincoln ’, ‘..1111111111111111111111111111111111111111111111111111111111111117777888’, ‘I never give 'em hell, I just tell the truth, and they think it's hell. ’, ‘                                                    --- Harry S Truman  ’, ‘122333444455555666666777777788888888999999999’, ‘The better the 4-wheel drive, the further you'll be from help when ya get stuck!’, ‘headmistressship’]
+
+V testChar = [‘ ’, ‘-’, ‘7’, ‘.’, ‘ -r’, ‘5’, ‘e’, ‘s’]
+
+L(testNum) 0 .< testStrings.len
+   V s = testStrings[testNum]
+   L(c) testChar[testNum]
+      V result = squeeze(s, c)
+      print("use: '#.'\nold:  #2 <<<#.>>>\nnew:  #2 <<<#.>>>\n".format(c, s.len, s, result.len, result))
+===
+template <typename T1, typename T2> auto squeeze(const T1 &input, const T2 &include)
+{
+    auto s = u""_S;
+    for (auto i : range_el(0, input.len()))
+        if (i == 0 || input[i - 1] != input[i] || (input[i - 1] == input[i] && input[i] != include))
+            s &= input[i];
+    return s;
+}
+
+auto testStrings = create_array({u""_S, u"\"If I were two-faced, would I be wearing this one?\" --- Abraham Lincoln "_S, u"..1111111111111111111111111111111111111111111111111111111111111117777888"_S, u"I never give 'em hell, I just tell the truth, and they think it's hell. "_S, u"                                                    --- Harry S Truman  "_S, u"122333444455555666666777777788888888999999999"_S, u"The better the 4-wheel drive, the further you'll be from help when ya get stuck!"_S, u"headmistressship"_S});
+
+auto testChar = create_array({u" "_S, u"-"_S, u"7"_S, u"."_S, u" -r"_S, u"5"_S, u"e"_S, u"s"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto testNum : range_el(0, testStrings.len())) {
+            auto s = testStrings[testNum];
+            for (auto &&c : testChar[testNum]) {
+                auto result = squeeze(s, c);
+                print(u"use: '#.'\nold:  #2 <<<#.>>>\nnew:  #2 <<<#.>>>\n"_S.format(c, s.len(), s, result.len(), result));
+            }
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Dinesman%27s_multiple-dwelling_problem#Nim
+from _11l import *
+
+BAKER = 0
+COOPER = 1
+FLETCHER = 2
+MILLER = 3
+SMITH = 4
+names = ['Baker', 'Cooper', 'Fletcher', 'Miller', 'Smith']
+
+floors = list(range(1, 6))
+
+while True:
+    if floors[BAKER] != 5 and \
+           floors[COOPER] != 1 and \
+           floors[FLETCHER] not in (1, 5) and \
+           floors[MILLER] > floors[COOPER] and \
+           abs(floors[SMITH] - floors[FLETCHER]) != 1 and \
+           abs(floors[FLETCHER] - floors[COOPER]) != 1:
+       for person, floor in enumerate(floors):
+           print(names[person], "lives on floor", floor)
+       break
+
+    if not next_permutation(floors):
+        print("No solution found.")
+        break
+===
+V BAKER = 0
+V COOPER = 1
+V FLETCHER = 2
+V MILLER = 3
+V SMITH = 4
+V names = [‘Baker’, ‘Cooper’, ‘Fletcher’, ‘Miller’, ‘Smith’]
+
+V floors = Array(1..5)
+
+L
+   I floors[BAKER] != 5 & floors[COOPER] != 1 & floors[FLETCHER] !C (1, 5) & floors[MILLER] > floors[COOPER] & abs(floors[SMITH] - floors[FLETCHER]) != 1 & abs(floors[FLETCHER] - floors[COOPER]) != 1
+      L(floor) floors
+         V person = L.index
+         print(names[person]‘ lives on floor ’floor)
+      L.break
+
+   I !floors.next_permutation()
+      print(‘No solution found.’)
+      L.break
+===
+auto BAKER = 0;
+auto COOPER = 1;
+auto FLETCHER = 2;
+auto MILLER = 3;
+auto SMITH = 4;
+auto names = create_array({u"Baker"_S, u"Cooper"_S, u"Fletcher"_S, u"Miller"_S, u"Smith"_S});
+
+auto floors = create_array(range_ee(1, 5));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            if (floors[BAKER] != 5 && floors[COOPER] != 1 && !in(floors[FLETCHER], make_tuple(1, 5)) && floors[MILLER] > floors[COOPER] && abs(floors[SMITH] - floors[FLETCHER]) != 1 && abs(floors[FLETCHER] - floors[COOPER]) != 1) {
+                {int Lindex = 0;
+                for (auto &&floor : floors) {
+                    auto person = Lindex;
+                    print(names[person] & u" lives on floor "_S & floor);
+                    Lindex++;
+                }}
+                break;
+            }
+
+            if (!floors.next_permutation()) {
+                print(u"No solution found."_S);
+                break;
+            }
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Distribution_of_0_Digits_in_factorial_series#Python
+BigInt = int
+
+def facpropzeros(n, verbose = True):
+    proportions = [0.0] * n
+    (fac, psum) = (BigInt(1), 0.0)
+    for i in range(n):
+        fac *= i + 1
+        d = str(fac)
+        psum += sum(map(lambda x: int(x == '0'), d)) / float(len(d))
+        proportions[i] = psum / (i + 1)
+
+    if verbose:
+        print("The mean proportion of 0 in factorials from 1 to {} is {}.".format(n, psum / n))
+
+    return proportions
+
+for n in [100, 1000, 10000]:
+    facpropzeros(n)
+===
+F facpropzeros(n, verbose = 1B)
+   V proportions = [0.0] * n
+   V (fac, psum) = (BigInt(1), 0.0)
+   L(i) 0 .< n
+      fac *= i + 1
+      V d = String(fac)
+      psum += sum(d.map(x -> Int(x == ‘0’))) / Float(d.len)
+      proportions[i] = psum / (i + 1)
+
+   I verbose
+      print(‘The mean proportion of 0 in factorials from 1 to #. is #..’.format(n, psum / n))
+
+   R proportions
+
+L(n) [100, 1000, 10000]
+   facpropzeros(n)
+===
+template <typename T1, typename T2 = decltype(true)> auto facpropzeros(const T1 &n, const T2 &verbose = true)
+{
+    auto proportions = create_array({0.0}) * n;
+    auto [fac, psum] = make_tuple(BigInt(1), 0.0);
+    for (auto i : range_el(0, n)) {
+        fac *= i + 1;
+        auto d = String(fac);
+        psum += sum_map(d, [](const auto &x){return to_int(x == u'0');}) / to_float(d.len());
+        proportions.set(i, psum / (i + 1));
+    }
+
+    if (verbose)
+        print(u"The mean proportion of 0 in factorials from 1 to #. is #.."_S.format(n, psum / n));
+
+    return proportions;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&n : create_array({100, 1000, 10000}))
+            facpropzeros(n);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Distribution_of_0_Digits_in_factorial_series#Base_1000_version_3
+def zinit():
+    zc = [0] * 999
+    for x in range(1, 10):
+        zc[x - 1] = 2        # 00x
+        zc[10 * x - 1] = 2   # 0x0
+        zc[100 * x - 1] = 2  # x00
+        for y in range(10, 100, 10):
+            zc[y + x - 1] = 1           # 0yx
+            zc[10 * y + x - 1] = 1      # y0x
+            zc[10 * (y + x) - 1] = 1    # yx0
+
+    return zc
+
+def meanfactorialdigits():
+    zc = zinit()
+    rfs = [1]
+    (total, trail, first) = (0.0, 1, 0)
+    for f in range(2, 50000):
+        (carry, d999, zeroes) = (0, 0, (trail - 1) * 3)
+        (j, l) = (trail, len(rfs))
+        while j <= l or carry != 0:
+            if j <= l:
+                carry = rfs[j-1] * f + carry
+
+            d999 = carry % 1000
+            if j <= l:
+                rfs[j-1] = d999
+            else:
+                rfs.append(d999)
+
+            zeroes += 3 if d999 == 0 else zc[d999-1]
+            carry //= 1000
+            j += 1
+
+        while rfs[trail-1] == 0:
+            trail += 1
+
+        # d999 is a quick correction for length and zeros
+        d999 = rfs[-1]
+        d999 = 0 if d999 >= 100 else 2 if d999 < 10 else 1
+
+        zeroes -= d999
+        digits = len(rfs) * 3 - d999
+        total += float(zeroes) / digits
+        ratio = total / f
+        if f in [100, 1000, 10000]:
+            print("The mean proportion of zero digits in factorials to {} is {}".format(f, ratio))
+
+        if ratio >= 0.16:
+            first = 0
+        elif first == 0:
+            first = f
+
+    print("The mean proportion dips permanently below 0.16 at {}.".format(first))
+
+meanfactorialdigits()
+===
+F zinit()
+   V zc = [0] * 999
+   L(x) 1..9
+      zc[x - 1] = 2
+      zc[10 * x - 1] = 2
+      zc[100 * x - 1] = 2
+      L(y) (10.<100).step(10)
+         zc[y + x - 1] = 1
+         zc[10 * y + x - 1] = 1
+         zc[10 * (y + x) - 1] = 1
+
+   R zc
+
+F meanfactorialdigits()
+   V zc = zinit()
+   V rfs = [1]
+   V (total, trail, first) = (0.0, 1, 0)
+   L(f) 2..49999
+      V (carry, d999, zeroes) = (0, 0, (trail - 1) * 3)
+      V (j, l) = (trail, rfs.len)
+      L j <= l | carry != 0
+         I j <= l
+            carry = rfs[j - 1] * f + carry
+
+         d999 = carry % 1000
+         I j <= l
+            rfs[j - 1] = d999
+         E
+            rfs.append(d999)
+
+         zeroes += I d999 == 0 {3} E zc[d999 - 1]
+         carry I/= 1000
+         j++
+
+      L rfs[trail - 1] == 0
+         trail++
+
+      d999 = rfs.last
+      d999 = I d999 >= 100 {0} E I d999 < 10 {2} E 1
+
+      zeroes -= d999
+      V digits = rfs.len * 3 - d999
+      total += Float(zeroes) / digits
+      V ratio = total / f
+      I f C [100, 1000, 10000]
+         print(‘The mean proportion of zero digits in factorials to #. is #.’.format(f, ratio))
+
+      I ratio >= 0.16
+         first = 0
+      E I first == 0
+         first = f
+
+   print(‘The mean proportion dips permanently below 0.16 at #..’.format(first))
+
+meanfactorialdigits()
+===
+auto zinit()
+{
+    auto zc = create_array({0}) * 999;
+    for (auto x : range_ee(1, 9)) {
+        zc.set(x - 1, 2);
+        zc.set(10 * x - 1, 2);
+        zc.set(100 * x - 1, 2);
+        for (auto y : range_el(10, 100).step(10)) {
+            zc.set(y + x - 1, 1);
+            zc.set(10 * y + x - 1, 1);
+            zc.set(10 * (y + x) - 1, 1);
+        }
+    }
+
+    return zc;
+}
+
+auto meanfactorialdigits()
+{
+    auto zc = zinit();
+    auto rfs = create_array({1});
+    auto [total, trail, first] = make_tuple(0.0, 1, 0);
+    for (auto f : range_ee(2, 49999)) {
+        auto [carry, d999, zeroes] = make_tuple(0, 0, (trail - 1) * 3);
+        auto [j, l] = make_tuple(trail, rfs.len());
+        while (j <= l || carry != 0) {
+            if (j <= l)
+                carry = rfs[j - 1] * f + carry;
+
+            d999 = mod(carry, 1000);
+            if (j <= l)
+                rfs.set(j - 1, d999);
+            else
+                rfs.append(d999);
+
+            zeroes += d999 == 0 ? 3 : zc[d999 - 1];
+            carry = idiv(carry, 1000);
+            j++;
+        }
+
+        while (rfs[trail - 1] == 0)
+            trail++;
+
+        d999 = rfs.last();
+        d999 = d999 >= 100 ? 0 : d999 < 10 ? 2 : 1;
+
+        zeroes -= d999;
+        auto digits = rfs.len() * 3 - d999;
+        total += to_float(zeroes) / digits;
+        auto ratio = total / f;
+        if (in(f, create_array({100, 1000, 10000})))
+            print(u"The mean proportion of zero digits in factorials to #. is #."_S.format(f, ratio));
+
+        if (ratio >= 0.16)
+            first = 0;
+        else if (first == 0)
+            first = f;
+    }
+
+    print(u"The mean proportion dips permanently below 0.16 at #.."_S.format(first));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        meanfactorialdigits();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Doomsday_rule#Python
+def isleap(year):
+    return year%4==0 and (year%100!=0 or year%400==0)
+
+def weekday(year, month, day):
+    days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday",
+            "Friday", "Saturday"]
+    dooms = [
+        [3, 7, 7, 4, 2, 6, 4, 1, 5, 3, 7, 5],
+        [4, 1, 7, 4, 2, 6, 4, 1, 5, 3, 7, 5]
+    ]
+
+    c = year // 100
+    r = year % 100
+    s = r // 12
+    t = r % 12
+    c_anchor = (5 * (c % 4) + 2) % 7
+    doomsday = (s + t + (t // 4) + c_anchor) % 7
+    anchorday = dooms[isleap(year)][month - 1]
+    weekday = (doomsday + day - anchorday + 7) % 7
+    return days[weekday]
+
+for year, month, day in [(1800, 1, 6), (1875, 3, 29), (1915, 12, 7),
+         (1970, 12, 23), (2043, 5, 14), (2077, 2, 12), (2101, 4, 2)]:
+    print('%d-%02d-%02d -> %s' % (year, month, day, weekday(year, month, day)))
+===
+F isleap(year)
+   R year % 4 == 0 & (year % 100 != 0 | year % 400 == 0)
+
+F weekday(year, month, day)
+   V days = [‘Sunday’, ‘Monday’, ‘Tuesday’, ‘Wednesday’, ‘Thursday’, ‘Friday’, ‘Saturday’]
+   V dooms = [[3, 7, 7, 4, 2, 6, 4, 1, 5, 3, 7, 5], [4, 1, 7, 4, 2, 6, 4, 1, 5, 3, 7, 5]]
+
+   V c = year I/ 100
+   V r = year % 100
+   V s = r I/ 12
+   V t = r % 12
+   V c_anchor = (5 * (c % 4) + 2) % 7
+   V doomsday = (s + t + (t I/ 4) + c_anchor) % 7
+   V anchorday = dooms[isleap(year)][month - 1]
+   V weekday = (doomsday + day - anchorday + 7) % 7
+   R days[weekday]
+
+L(year, month, day) [(1800, 1, 6), (1875, 3, 29), (1915, 12, 7), (1970, 12, 23), (2043, 5, 14), (2077, 2, 12), (2101, 4, 2)]
+   print(‘#.-#02-#02 -> #.’.format(year, month, day, weekday(year, month, day)))
+===
+template <typename T1> auto isleap(const T1 &year)
+{
+    return mod(year, 4) == 0 && (mod(year, 100) != 0 || mod(year, 400) == 0);
+}
+
+template <typename T1, typename T2, typename T3> auto weekday(const T1 &year, const T2 &month, const T3 &day)
+{
+    auto days = create_array({u"Sunday"_S, u"Monday"_S, u"Tuesday"_S, u"Wednesday"_S, u"Thursday"_S, u"Friday"_S, u"Saturday"_S});
+    auto dooms = create_array({create_array({3, 7, 7, 4, 2, 6, 4, 1, 5, 3, 7, 5}), create_array({4, 1, 7, 4, 2, 6, 4, 1, 5, 3, 7, 5})});
+
+    auto c = idiv(year, 100);
+    auto r = mod(year, 100);
+    auto s = idiv(r, 12);
+    auto t = mod(r, 12);
+    auto c_anchor = mod((5 * (mod(c, 4)) + 2), 7);
+    auto doomsday = mod((s + t + (idiv(t, 4)) + c_anchor), 7);
+    auto anchorday = dooms[isleap(year)][month - 1];
+    auto weekday = mod((doomsday + day - anchorday + 7), 7);
+    return days[weekday];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[year, month, day] : create_array({make_tuple(1800, 1, 6), make_tuple(1875, 3, 29), make_tuple(1915, 12, 7), make_tuple(1970, 12, 23), make_tuple(2043, 5, 14), make_tuple(2077, 2, 12), make_tuple(2101, 4, 2)}))
+            print(u"#.-#02-#02 -> #."_S.format(year, month, day, weekday(year, month, day)));
+    }
+} code_block_1;
