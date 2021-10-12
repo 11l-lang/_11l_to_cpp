@@ -223,3 +223,623 @@ struct CodeBlock1
         print(subPalindromes(tree));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Eban_numbers#Nim
+def iseban(n):
+    if n == 0:
+        return False
+    (b, r) = divmod(n, 1_000_000_000)
+    (m, r) = divmod(r, 1_000_000)
+    (t, r) = divmod(r, 1_000)
+    m = m % 10 if 30 <= m <= 66 else m
+    t = t % 10 if 30 <= t <= 66 else t
+    r = r % 10 if 30 <= r <= 66 else r
+    return {b, m, t, r} <= {0, 2, 4, 6}
+
+print('eban numbers up to and including 1000:')
+for i in range(101):
+    if iseban(i):
+        print(i, end = ' ')
+
+print("\n\neban numbers between 1000 and 4000 (inclusive):")
+for i in range(1000, 4001):
+    if iseban(i):
+        print(i, end = ' ')
+
+print()
+for maxn in (10_000, 100_000, 1_000_000, 10_000_000):
+    count = 0
+    for i in range(maxn + 1):
+        if iseban(i):
+            count += 1
+    print("\nNumber of eban numbers up to and including %8d: %4d" % (maxn, count))
+===
+F iseban(n)
+   I n == 0
+      R 0B
+   V (b, r) = divmod(n, 1'000'000'000)
+   (V m, r) = divmod(r, 1'000'000)
+   (V t, r) = divmod(r, 1'000)
+   m = I m C 30..66 {m % 10} E m
+   t = I t C 30..66 {t % 10} E t
+   r = I r C 30..66 {r % 10} E r
+   R Set([b, m, t, r]) <= Set([0, 2, 4, 6])
+
+print(‘eban numbers up to and including 1000:’)
+L(i) 101
+   I iseban(i)
+      print(i, end' ‘ ’)
+
+print("\n\neban numbers between 1000 and 4000 (inclusive):")
+L(i) 1000..4000
+   I iseban(i)
+      print(i, end' ‘ ’)
+
+print()
+L(maxn) (10'000, 100'000, 1'000'000, 10'000'000)
+   V count = 0
+   L(i) 0 .. maxn
+      I iseban(i)
+         count++
+   print("\nNumber of eban numbers up to and including #8: #4".format(maxn, count))
+===
+template <typename T1> auto iseban(const T1 &n)
+{
+    if (n == 0)
+        return false;
+    auto [b, r] = divmod(n, 1'000'000'000);
+    TUPLE_ELEMENT_T(0, divmod(r, 1'000'000)) m;
+    assign_from_tuple(m, r, divmod(r, 1'000'000));
+    TUPLE_ELEMENT_T(0, divmod(r, 1'000)) t;
+    assign_from_tuple(t, r, divmod(r, 1'000));
+    m = in(m, range_ee(30, 66)) ? mod(m, 10) : m;
+    t = in(t, range_ee(30, 66)) ? mod(t, 10) : t;
+    r = in(r, range_ee(30, 66)) ? mod(r, 10) : r;
+    return create_set({b, m, t, r}) <= create_set({0, 2, 4, 6});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"eban numbers up to and including 1000:"_S);
+        for (int i = 0; i < 101; i++)
+            if (iseban(i))
+                print(i, u" "_S);
+
+        print(u"\n\neban numbers between 1000 and 4000 (inclusive):"_S);
+        for (auto i : range_ee(1000, 4000))
+            if (iseban(i))
+                print(i, u" "_S);
+
+        print();
+        for (auto &&maxn : make_tuple(10'000, 100'000, 1'000'000, 10'000'000)) {
+            auto count = 0;
+            for (auto i : range_ee(0, maxn))
+                if (iseban(i))
+                    count++;
+            print(u"\nNumber of eban numbers up to and including #8: #4"_S.format(maxn, count));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Egyptian_division#Python
+from itertools import product
+
+def egyptian_divmod(dividend, divisor):
+    assert divisor != 0
+    (pwrs, dbls) = ([1], [divisor])
+    while dbls[-1] <= dividend:
+        pwrs.append(pwrs[-1] * 2)
+        dbls.append(pwrs[-1] * divisor)
+    (ans, accum) = (0, 0)
+    for pwr, dbl in zip(pwrs[-2::-1], dbls[-2::-1]):
+        if accum + dbl <= dividend:
+            accum += dbl
+            ans += pwr
+    return (ans, abs(accum - dividend))
+
+# Test it gives the same results as the divmod built-in
+for i, j in product(range(13), range(1, 13)):
+        assert egyptian_divmod(i, j) == divmod(i, j)
+# Mandated result
+(i, j) = (580, 34)
+(d, m) = egyptian_divmod(i, j)
+print('%i divided by %i using the Egyption method is %i remainder %i'
+      % (i, j, d, m))
+===
+F egyptian_divmod(dividend, divisor)
+   assert(divisor != 0)
+   V (pwrs, dbls) = ([1], [divisor])
+   L dbls.last <= dividend
+      pwrs.append(pwrs.last * 2)
+      dbls.append(pwrs.last * divisor)
+   V (ans, accum) = (0, 0)
+   L(pwr, dbl) zip(pwrs[((len)-2 ..).step(-1)], dbls[((len)-2 ..).step(-1)])
+      I accum + dbl <= dividend
+         accum += dbl
+         ans += pwr
+   R (ans, abs(accum - dividend))
+
+L(i, j) cart_product(0.<13, 1..12)
+   assert(egyptian_divmod(i, j) == divmod(i, j))
+V (i, j) = (580, 34)
+V (d, m) = egyptian_divmod(i, j)
+print(‘#. divided by #. using the Egyption method is #. remainder #.’.format(i, j, d, m))
+===
+template <typename T1, typename T2> auto egyptian_divmod(const T1 &dividend, const T2 &divisor)
+{
+    assert(divisor != 0);
+    auto [pwrs, dbls] = make_tuple(create_array({1}), create_array({divisor}));
+    while (dbls.last() <= dividend) {
+        pwrs.append(pwrs.last() * 2);
+        dbls.append(pwrs.last() * divisor);
+    }
+    auto [ans, accum] = make_tuple(0, 0);
+    for (auto &&[pwr, dbl] : zip(pwrs[range_elen_i( - 2).step(-1)], dbls[range_elen_i( - 2).step(-1)]))
+        if (accum + dbl <= dividend) {
+            accum += dbl;
+            ans += pwr;
+        }
+    return make_tuple(ans, abs(accum - dividend));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[i, j] : cart_product(range_el(0, 13), range_ee(1, 12)))
+            assert(egyptian_divmod(i, j) == divmod(i, j));
+    }
+} code_block_1;
+
+auto [i, j] = make_tuple(580, 34);
+auto [d, m] = egyptian_divmod(i, j);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"#. divided by #. using the Egyption method is #. remainder #."_S.format(i, j, d, m));
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/EKG_sequence_convergence#Nim
+from typing import List
+import math
+
+def ekg(n, limit):
+    values = set() # int
+    assert n >= 2
+    r = [(1, 1), (2, n)]
+    values.add(n)
+    i = 3
+    prev = n
+    while i <= limit:
+        val = 2
+        while True:
+            if val not in values and math.gcd(val, prev) != 1:
+                values.add(val)
+                r += [(i, val)]
+                prev = val
+                break
+            val += 1
+        i += 1
+    return r
+
+for n in [2, 5, 7, 9, 10]:
+    result : List[int] = []
+    for i, val in ekg(n, 10):
+        result += [val]
+    print(('EKG(' + str(n) + '):').ljust(8), ', '.join(map(str, result)))
+
+ekg5 = [0] * 101
+ekg7 = [0] * 101
+for i, val in ekg(5, 100): ekg5[i] = val
+for i, val in ekg(7, 100): ekg7[i] = val
+convIndex = 0
+for i in range(2, 101):
+    if ekg5[i] == ekg7[i] and sorted(ekg5[1:i]) == sorted(ekg7[1:i]):
+        convIndex = i
+        break
+print('EKG(5) and EKG(7) converge at index ' + str(convIndex) + '.')
+===
+F ekg(n, limit)
+   V values = Set[Int]()
+   assert(n >= 2)
+   V r = [(1, 1), (2, n)]
+   values.add(n)
+   V i = 3
+   V prev = n
+   L i <= limit
+      V val = 2
+      L
+         I val !C values & gcd(val, prev) != 1
+            values.add(val)
+            r [+]= (i, val)
+            prev = val
+            L.break
+         val++
+      i++
+   R r
+
+L(n) [2, 5, 7, 9, 10]
+   [Int] result
+   L(i, val) ekg(n, 10)
+      result [+]= val
+   print((‘EKG(’String(n)‘):’).ljust(8)‘ ’result.map(String).join(‘, ’))
+
+V ekg5 = [0] * 101
+V ekg7 = [0] * 101
+L(i, val) ekg(5, 100)
+   ekg5[i] = val
+L(i, val) ekg(7, 100)
+   ekg7[i] = val
+V convIndex = 0
+L(i) 2..100
+   I ekg5[i] == ekg7[i] & sorted(ekg5[1 .< i]) == sorted(ekg7[1 .< i])
+      convIndex = i
+      L.break
+print(‘EKG(5) and EKG(7) converge at index ’String(convIndex)‘.’)
+===
+template <typename T1, typename T2> auto ekg(const T1 &n, const T2 &limit)
+{
+    auto values = Set<int>();
+    assert(n >= 2);
+    auto r = create_array({make_tuple(1, 1), make_tuple(2, n)});
+    values.add(n);
+    auto i = 3;
+    auto prev = n;
+    while (i <= limit) {
+        auto val = 2;
+        while (true) {
+            if (!in(val, values) && gcd(val, prev) != 1) {
+                values.add(val);
+                r.append(make_tuple(i, val));
+                prev = val;
+                break;
+            }
+            val++;
+        }
+        i++;
+    }
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&n : create_array({2, 5, 7, 9, 10})) {
+            Array<int> result;
+            for (auto &&[i, val] : ekg(n, 10))
+                result.append(val);
+            print((u"EKG("_S & String(n) & u"):"_S).ljust(8) & u" "_S & result.map([](const auto &x){return String(x);}).join(u", "_S));
+        }
+    }
+} code_block_1;
+
+auto ekg5 = create_array({0}) * 101;
+auto ekg7 = create_array({0}) * 101;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&[i, val] : ekg(5, 100))
+            ekg5.set(i, val);
+        for (auto &&[i, val] : ekg(7, 100))
+            ekg7.set(i, val);
+    }
+} code_block_2;
+
+auto convIndex = 0;
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        for (auto i : range_ee(2, 100))
+            if (ekg5[i] == ekg7[i] && sorted(ekg5[range_el(1, i)]) == sorted(ekg7[range_el(1, i)])) {
+                convIndex = i;
+                break;
+            }
+        print(u"EKG(5) and EKG(7) converge at index "_S & String(convIndex) & u"."_S);
+    }
+} code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Elementary_cellular_automaton#Nim
+SIZE  = 32
+LINES = SIZE // 2
+RULE  = 90
+
+def ruleTest(x):
+    return 1 if RULE & (1 << (7 & x)) != 0 else 0
+
+def bitVal(s, bit):
+    return 1 if (s >> bit) & 1 != 0 else 0
+   #return 1 if s & (1 << bit) != 0 else 0
+
+def evolve(s):
+    t = 0
+    t |= ruleTest((bitVal(s, 0) << 2) | (bitVal(s, SIZE-1) << 1) | bitVal(s, SIZE-2)) << (SIZE-1)
+    t |= ruleTest((bitVal(s, 1) << 2) | (bitVal(s, 0)      << 1) | bitVal(s, SIZE-1))
+    for i in range(1, SIZE-1):
+        t |= ruleTest((bitVal(s, i+1) << 2) | (bitVal(s, i) << 1) | bitVal(s, i-1)) << i
+    return t
+
+def show(state):
+    for i in range(SIZE-1, -1, -1):
+        print(' *'[bitVal(state, i)], end = '')
+    print()
+
+state = 1 << LINES
+print('Rule', RULE)
+for _ in range(LINES):
+    show(state)
+    state = evolve(state)
+===
+V SIZE = 32
+V LINES = SIZE I/ 2
+V RULE = 90
+
+F ruleTest(x)
+   R I :RULE [&] (1 << (7 [&] x)) != 0 {1} E 0
+
+F bitVal(s, bit)
+   R I (s >> bit) [&] 1 != 0 {1} E 0
+
+F evolve(s)
+   V t = 0
+   t [|]= ruleTest((bitVal(s, 0) << 2) [|] (bitVal(s, :SIZE - 1) << 1) [|] bitVal(s, :SIZE - 2)) << (:SIZE - 1)
+   t [|]= ruleTest((bitVal(s, 1) << 2) [|] (bitVal(s, 0) << 1) [|] bitVal(s, :SIZE - 1))
+   L(i) 1 .< :SIZE - 1
+      t [|]= ruleTest((bitVal(s, i + 1) << 2) [|] (bitVal(s, i) << 1) [|] bitVal(s, i - 1)) << i
+   R t
+
+F show(state)
+   L(i) (:SIZE - 1 .< -1).step(-1)
+      print(‘ *’[bitVal(state, i)], end' ‘’)
+   print()
+
+V state = 1 << LINES
+print(‘Rule ’RULE)
+L(_) 0 .< LINES
+   show(state)
+   state = evolve(state)
+===
+auto _SIZE_ = 32;
+auto LINES = idiv(_SIZE_, 2);
+auto RULE = 90;
+
+template <typename T1> auto ruleTest(const T1 &x)
+{
+    return (::RULE & (1 << (7 & x))) != 0 ? 1 : 0;
+}
+
+template <typename T1, typename T2> auto bitVal(const T1 &s, const T2 &bit)
+{
+    return ((s >> bit) & 1) != 0 ? 1 : 0;
+}
+
+template <typename T1> auto evolve(const T1 &s)
+{
+    auto t = 0;
+    t |= ruleTest((bitVal(s, 0) << 2) | (bitVal(s, ::_SIZE_ - 1) << 1) | bitVal(s, ::_SIZE_ - 2)) << (::_SIZE_ - 1);
+    t |= ruleTest((bitVal(s, 1) << 2) | (bitVal(s, 0) << 1) | bitVal(s, ::_SIZE_ - 1));
+    for (auto i : range_el(1, ::_SIZE_ - 1))
+        t |= ruleTest((bitVal(s, i + 1) << 2) | (bitVal(s, i) << 1) | bitVal(s, i - 1)) << i;
+    return t;
+}
+
+template <typename T1> auto show(const T1 &state)
+{
+    for (auto i : range_el(::_SIZE_ - 1, -1).step(-1))
+        print(u" *"_S[bitVal(state, i)], u""_S);
+    print();
+}
+
+auto state = 1 << LINES;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Rule "_S & RULE);
+        for (auto _ : range_el(0, LINES)) {
+            show(state);
+            state = evolve(state);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Elementary_cellular_automaton/Infinite_length#Nim
+def step(cells, rule):
+    result = ''
+    for i in range(len(cells) - 2):
+        bin = 0
+        b = 2
+        for n in range(i, i + 3):
+            bin += int(cells[n] == '*') << b
+            b >>= 1
+        a = '*' if (rule & (1 << bin)) != 0 else '.'
+        result += a
+    return result
+
+def addNoCells(cells : str):
+    left  = '.' if cells[0]  == '*' else '*'
+    right = '.' if cells[-1] == '*' else '*'
+    cells = left + cells + right
+    cells = left + cells + right
+    return cells
+
+def evolve(limit, rule):
+    print('Rule #', rule, sep = '')
+    cells = '*'
+    for _ in range(limit):
+        cells = addNoCells(cells)
+        width = 40 + (len(cells) >> 1)
+        print(cells.rjust(width))
+        cells = step(cells, rule)
+
+evolve(35, 90)
+===
+F step(cells, rule)
+   V result = ‘’
+   L(i) 0 .< cells.len - 2
+      V bin = 0
+      V b = 2
+      L(n) i .< i + 3
+         bin += Int(cells[n] == ‘*’) << b
+         b >>= 1
+      V a = I (rule [&] (1 << bin)) != 0 {‘*’} E ‘.’
+      result ‘’= a
+   R result
+
+F addNoCells(String =cells)
+   V left = I cells[0] == ‘*’ {‘.’} E ‘*’
+   V right = I cells.last == ‘*’ {‘.’} E ‘*’
+   cells = left‘’cells‘’right
+   cells = left‘’cells‘’right
+   R cells
+
+F evolve(limit, rule)
+   print(‘Rule #’rule)
+   V cells = ‘*’
+   L(_) 0 .< limit
+      cells = addNoCells(cells)
+      V width = 40 + (cells.len >> 1)
+      print(cells.rjust(width))
+      cells = step(cells, rule)
+
+evolve(35, 90)
+===
+template <typename T1, typename T2> auto step(const T1 &cells, const T2 &rule)
+{
+    auto result = u""_S;
+    for (auto i : range_el(0, cells.len() - 2)) {
+        auto bin = 0;
+        auto b = 2;
+        for (auto n : range_el(i, i + 3)) {
+            bin += to_int(cells[n] == u'*') << b;
+            b >>= 1;
+        }
+        auto a = (rule & (1 << bin)) != 0 ? u"*"_S : u"."_S;
+        result &= a;
+    }
+    return result;
+}
+
+auto addNoCells(String cells)
+{
+    auto left = _get<0>(cells) == u'*' ? u"."_S : u"*"_S;
+    auto right = cells.last() == u'*' ? u"."_S : u"*"_S;
+    cells = left & cells & right;
+    cells = left & cells & right;
+    return cells;
+}
+
+template <typename T1, typename T2> auto evolve(const T1 &limit, const T2 &rule)
+{
+    print(u"Rule #"_S & rule);
+    auto cells = u"*"_S;
+    for (auto _ : range_el(0, limit)) {
+        cells = addNoCells(cells);
+        auto width = 40 + (cells.len() >> 1);
+        print(cells.rjust(width));
+        cells = step(cells, rule);
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        evolve(35, 90);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Elementary_cellular_automaton/Random_Number_Generator#Nim
+UInt64 = int
+
+n = 64
+
+def pow2(x):
+    return UInt64(1) << x
+
+def evolve(state : UInt64, rule):
+    for _ in range(10):
+        b = UInt64(0)
+        for q in range(7, -1, -1):
+            st = state
+            b |= (st & 1) << q
+            state = 0
+            for i in range(n):
+                t = ((st >> (i - 1) % 64) | (st << (n + 1 - i) % 64)) & 7
+                if (rule & pow2(t)) != 0:
+                    state |= pow2(i)
+        print('', b, end = '')
+    print()
+
+evolve(1, 30)
+===
+V n = 64
+
+F pow2(x)
+   R UInt64(1) << x
+
+F evolve(UInt64 =state; rule)
+   L(_) 10
+      V b = UInt64(0)
+      L(q) (7 .< -1).step(-1)
+         V st = state
+         b [|]= (st [&] 1) << q
+         state = 0
+         L(i) 0 .< :n
+            V t = ((st >> (i - 1) % 64) [|] (st << (:n + 1 - i) % 64)) [&] 7
+            I (rule [&] pow2(t)) != 0
+               state [|]= pow2(i)
+      print(‘ ’b, end' ‘’)
+   print()
+
+evolve(1, 30)
+===
+auto n = 64;
+
+template <typename T1> auto pow2(const T1 &x)
+{
+    return to_uint64(1) << x;
+}
+
+template <typename T2> auto evolve(UInt64 state, const T2 &rule)
+{
+    for (int _ = 0; _ < 10; _++) {
+        auto b = to_uint64(0);
+        for (auto q : range_el(7, -1).step(-1)) {
+            auto st = state;
+            b |= (st & 1) << q;
+            state = 0;
+            for (auto i : range_el(0, ::n)) {
+                auto t = ((st >> mod((i - 1), 64)) | (st << mod((::n + 1 - i), 64))) & 7;
+                if ((rule & pow2(t)) != 0)
+                    state |= pow2(i);
+            }
+        }
+        print(u" "_S & b, u""_S);
+    }
+    print();
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        evolve(1, 30);
+    }
+} code_block_1;

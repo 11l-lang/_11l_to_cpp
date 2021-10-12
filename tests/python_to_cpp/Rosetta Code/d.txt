@@ -2405,3 +2405,244 @@ struct CodeBlock1
             print(u"#.-#02-#02 -> #."_S.format(year, month, day, weekday(year, month, day)));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Draw_a_cuboid#Nim
+def cline(n, x, y, cde : str):
+    print(str(cde[0]).rjust(n + 1) + cde[1] * (9*x-1) + cde[0] + (str(cde[2]).rjust(y+1) if len(cde) > 2 else ''))
+
+def cuboid(x, y, z):
+    cline(y+1, x, 0, "+-")
+    for i in range(1, y + 1):
+        cline(y-i+1, x, i-1, "/ |")
+    cline(0, x, y, "+-|")
+    for i in range(4*z-y-3 + 1):
+        cline(0, x, y, "| |")
+    cline(0, x, y, "| +")
+    for i in range(y-1, -1, -1):
+        cline(0, x, i, "| /")
+    cline(0, x, 0, "+-\n")
+
+cuboid(2, 3, 4)
+cuboid(1, 1, 1)
+cuboid(6, 2, 1)
+===
+F cline(n, x, y, String cde)
+   print(String(cde[0]).rjust(n + 1)‘’cde[1] * (9 * x - 1)‘’cde[0]‘’(I cde.len > 2 {String(cde[2]).rjust(y + 1)} E ‘’))
+
+F cuboid(x, y, z)
+   cline(y + 1, x, 0, ‘+-’)
+   L(i) 1 .. y
+      cline(y - i + 1, x, i - 1, ‘/ |’)
+   cline(0, x, y, ‘+-|’)
+   L(i) 0 .. 4 * z - y - 3
+      cline(0, x, y, ‘| |’)
+   cline(0, x, y, ‘| +’)
+   L(i) (y - 1 .< -1).step(-1)
+      cline(0, x, i, ‘| /’)
+   cline(0, x, 0, "+-\n")
+
+cuboid(2, 3, 4)
+cuboid(1, 1, 1)
+cuboid(6, 2, 1)
+===
+template <typename T1, typename T2, typename T3> auto cline(const T1 &n, const T2 &x, const T3 &y, const String &cde)
+{
+    print(String(_get<0>(cde)).rjust(n + 1) & _get<1>(cde) * (9 * x - 1) & _get<0>(cde) & (cde.len() > 2 ? String(_get<2>(cde)).rjust(y + 1) : u""_S));
+}
+
+template <typename T1, typename T2, typename T3> auto cuboid(const T1 &x, const T2 &y, const T3 &z)
+{
+    cline(y + 1, x, 0, u"+-"_S);
+    for (auto i : range_ee(1, y))
+        cline(y - i + 1, x, i - 1, u"/ |"_S);
+    cline(0, x, y, u"+-|"_S);
+    for (auto i : range_ee(0, 4 * z - y - 3))
+        cline(0, x, y, u"| |"_S);
+    cline(0, x, y, u"| +"_S);
+    for (auto i : range_el(y - 1, -1).step(-1))
+        cline(0, x, i, u"| /"_S);
+    cline(0, x, 0, u"+-\n"_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        cuboid(2, 3, 4);
+        cuboid(1, 1, 1);
+        cuboid(6, 2, 1);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Draw_a_sphere#Python
+from typing import Tuple
+import math
+
+shades = ['.',':','!','*','o','e','&','#','%','@']
+
+def normalize(v : Tuple[float, float, float]):
+    len = math.sqrt(v[0]**2 + v[1]**2 + v[2]**2)
+    return (v[0]/len, v[1]/len, v[2]/len)
+
+def dot(x,y):
+    d = x[0]*y[0] + x[1]*y[1] + x[2]*y[2]
+    return -d if d < 0 else 0
+
+def draw_sphere(r, k, ambient, light):
+    for i in range(int(math.floor(-r)),int(math.ceil(r)+1)):
+        x = i + 0.5
+        line = ''
+
+        for j in range(int(math.floor(-2*r)),int(math.ceil(2*r)+1)):
+            y = j/2 + 0.5
+            if x*x + y*y <= r*r:
+                vec = normalize((x,y,math.sqrt(r*r - x*x - y*y)))
+                b = dot(light,vec)**k + ambient
+                intensity = int((1-b)*(len(shades)-1))
+                line += shades[intensity] if 0 <= intensity < len(shades) else shades[0]
+            else:
+                line += ' '
+
+        print(line)
+
+light = normalize((30.0,30.0,-50.0))
+draw_sphere(20,4,0.1, light)
+draw_sphere(10,2,0.4, light)
+===
+V shades = [‘.’, ‘:’, ‘!’, ‘*’, ‘o’, ‘e’, ‘&’, ‘#’, ‘%’, ‘@’]
+
+F normalize((Float, Float, Float) v)
+   V len = sqrt(v[0] ^ 2 + v[1] ^ 2 + v[2] ^ 2)
+   R (v[0] / len, v[1] / len, v[2] / len)
+
+F dot(x, y)
+   V d = x[0] * y[0] + x[1] * y[1] + x[2] * y[2]
+   R I d < 0 {-d} E 0
+
+F draw_sphere(r, k, ambient, light)
+   L(i) Int(floor(-r)) .< Int(ceil(r) + 1)
+      V x = i + 0.5
+      V line = ‘’
+
+      L(j) Int(floor(-2 * r)) .< Int(ceil(2 * r) + 1)
+         V y = j / 2 + 0.5
+         I x * x + y * y <= r * r
+            V vec = normalize((x, y, sqrt(r * r - x * x - y * y)))
+            V b = dot(light, vec) ^ k + ambient
+            V intensity = Int((1 - b) * (:shades.len - 1))
+            line ‘’= I intensity C 0 .< :shades.len {:shades[intensity]} E :shades[0]
+         E
+            line ‘’= ‘ ’
+
+      print(line)
+
+V light = normalize((30.0, 30.0, -50.0))
+draw_sphere(20, 4, 0.1, light)
+draw_sphere(10, 2, 0.4, light)
+===
+auto shades = create_array({u'.'_C, u':'_C, u'!'_C, u'*'_C, u'o'_C, u'e'_C, u'&'_C, u'#'_C, u'%'_C, u'@'_C});
+
+auto normalize(const dvec3 &v)
+{
+    auto len = sqrt(square(_get<0>(v)) + square(_get<1>(v)) + square(_get<2>(v)));
+    return make_tuple(_get<0>(v) / len, _get<1>(v) / len, _get<2>(v) / len);
+}
+
+template <typename T1, typename T2> auto dot(const T1 &x, const T2 &y)
+{
+    auto d = _get<0>(x) * _get<0>(y) + _get<1>(x) * _get<1>(y) + _get<2>(x) * _get<2>(y);
+    return d < 0 ? -d : 0;
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto draw_sphere(const T1 &r, const T2 &k, const T3 &ambient, const T4 &light)
+{
+    for (auto i : range_el(to_int(floor(-r)), to_int(ceil(r) + 1))) {
+        auto x = i + 0.5;
+        auto line = u""_S;
+
+        for (auto j : range_el(to_int(floor(-2 * r)), to_int(ceil(2 * r) + 1))) {
+            auto y = j / 2.0 + 0.5;
+            if (x * x + y * y <= r * r) {
+                auto vec = normalize(make_tuple(x, y, sqrt(r * r - x * x - y * y)));
+                auto b = pow(dot(light, vec), k) + ambient;
+                auto intensity = to_int((1 - b) * (::shades.len() - 1));
+                line &= in(intensity, range_el(0, ::shades.len())) ? ::shades[intensity] : _get<0>(::shades);
+            }
+            else
+                line &= u" "_S;
+        }
+
+        print(line);
+    }
+}
+
+auto light = normalize(make_tuple(30.0, 30.0, -50.0));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        draw_sphere(20, 4, 0.1, light);
+        draw_sphere(10, 2, 0.4, light);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Dutch_national_flag_problem#Python:_Construct_from_ball_counts
+colours_in_order = 'Red White Blue'.split(' ')
+
+def dutch_flag_sort3(items):
+    r : List[str] = []
+    for colour in colours_in_order:
+        r.extend([colour] * items.count(colour))
+    return r
+
+balls = ['Red', 'Red', 'Blue', 'Blue', 'Blue', 'Red', 'Red', 'Red', 'White', 'Blue']
+print("Original Ball order:", balls)
+sorted_balls = dutch_flag_sort3(balls)
+print("Sorted Ball Order:", sorted_balls)
+===
+V colours_in_order = ‘Red White Blue’.split(‘ ’)
+
+F dutch_flag_sort3(items)
+   [String] r
+   L(colour) :colours_in_order
+      r.extend([colour] * items.count(colour))
+   R r
+
+V balls = [‘Red’, ‘Red’, ‘Blue’, ‘Blue’, ‘Blue’, ‘Red’, ‘Red’, ‘Red’, ‘White’, ‘Blue’]
+print(‘Original Ball order: ’balls)
+V sorted_balls = dutch_flag_sort3(balls)
+print(‘Sorted Ball Order: ’sorted_balls)
+===
+auto colours_in_order = u"Red White Blue"_S.split(u" "_S);
+
+template <typename T1> auto dutch_flag_sort3(const T1 &items)
+{
+    Array<String> r;
+    for (auto &&colour : ::colours_in_order)
+        r.extend(create_array({colour}) * items.count(colour));
+    return r;
+}
+
+auto balls = create_array({u"Red"_S, u"Red"_S, u"Blue"_S, u"Blue"_S, u"Blue"_S, u"Red"_S, u"Red"_S, u"Red"_S, u"White"_S, u"Blue"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Original Ball order: "_S & balls);
+    }
+} code_block_1;
+
+auto sorted_balls = dutch_flag_sort3(balls);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"Sorted Ball Order: "_S & sorted_balls);
+    }
+} code_block_2;
