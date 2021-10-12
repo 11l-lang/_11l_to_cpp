@@ -303,8 +303,6 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                 if (source[range_el(i, i + op.len())] == op) {
                     if (op == u'|' && in(source[range_el(i + 1, i + 2)], make_tuple(u"‘"_S, u"'"_S)))
                         break;
-                    if (op == u'.' && source[range_el(i + 1, i + 2)].is_digit())
-                        break;
                     operator_s = op;
                     break;
                 }

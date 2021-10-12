@@ -282,8 +282,8 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                 if source[i:i+len(op)] == op:
                     if op == '|' and source[i+1:i+2] in ('‘', "'"): # ’ # this is an indented multi-line string literal
                         break
-                    if op == '.' and source[i+1:i+2].isdigit():
-                        break
+                    # if op == '.' and source[i+1:i+2].isdigit(): # `.` is not an operator in 11l tokenizer
+                    #     break
                     operator_s = op
                     break
 
