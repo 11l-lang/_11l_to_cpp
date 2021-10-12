@@ -149,6 +149,8 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
             auto operator_or_delimiter = u""_S;
             for (auto &&op : tokenizer::operators_and_delimiters)
                 if (source[range_el(i, i + op.len())] == op) {
+                    if (op == u'.' && source[range_el(i + 1, i + 2)].is_digit())
+                        break;
                     operator_or_delimiter = op;
                     break;
                 }
@@ -214,7 +216,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                     category = TYPE_RM_REF(category)::NAME;
             }
 
-            else if ((in(ch, u"-+"_S) && in(source[range_el(i, i + 1)], range_ee(u'0'_C, u'9'_C))) || in(ch, range_ee(u'0'_C, u'9'_C))) {
+            else if ((in(ch, u"-+"_S) && in(source[range_el(i, i + 1)], range_ee(u'0'_C, u'9'_C))) || in(ch, range_ee(u'0'_C, u'9'_C)) || (ch == u'.' && in(source[range_el(i, i + 1)], range_ee(u'0'_C, u'9'_C)))) {
                 if (in(ch, u"-+"_S)) {
                     assert(false);
                     ch = source[i + 1];
@@ -229,7 +231,7 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                 auto start = i;
                 i++;
                 if (is_hex)
-                    while (i < source.len() && (in(source[i], range_ee(u'0'_C, u'9'_C)) || in(source[i], range_ee(u'a'_C, u'z'_C)) || in(source[i], range_ee(u'A'_C, u'Z'_C)) || source[i] == u'_'))
+                    while (i < source.len() && (in(source[i], range_ee(u'0'_C, u'9'_C)) || in(source[i], range_ee(u'a'_C, u'f'_C)) || in(source[i], range_ee(u'A'_C, u'F'_C)) || source[i] == u'_'))
                         i++;
                 else if (is_oct)
                     while (i < source.len() && (in(source[i], range_ee(u'0'_C, u'7'_C)) || source[i] == u'_'))

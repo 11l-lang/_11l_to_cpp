@@ -123,6 +123,8 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
          V operator_or_delimiter = ‘’
          L(op) :operators_and_delimiters
             I source[i .< i + op.len] == op
+               I op == ‘.’ & source[i + 1 .< i + 2].is_digit()
+                  L.break
                operator_or_delimiter = op
                L.break
 
@@ -177,7 +179,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
             E
                category = NAME
 
-         E I (ch C ‘-+’ & source[i .< i + 1] C ‘0’..‘9’) | ch C ‘0’..‘9’
+         E I (ch C ‘-+’ & source[i .< i + 1] C ‘0’..‘9’) | ch C ‘0’..‘9’ | (ch == ‘.’ & source[i .< i + 1] C ‘0’..‘9’)
             I ch C ‘-+’
                assert(0B)
                ch = source[i + 1]
@@ -191,7 +193,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
             V start = i
             i++
             I is_hex
-               L i < source.len & (source[i] C ‘0’..‘9’ | source[i] C ‘a’..‘z’ | source[i] C ‘A’..‘Z’ | source[i] == ‘_’)
+               L i < source.len & (source[i] C ‘0’..‘9’ | source[i] C ‘a’..‘f’ | source[i] C ‘A’..‘F’ | source[i] == ‘_’)
                   i++
             E I is_oct
                L i < source.len & (source[i] C ‘0’..‘7’ | source[i] == ‘_’)

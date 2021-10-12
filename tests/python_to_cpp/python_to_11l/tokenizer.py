@@ -143,6 +143,8 @@ def tokenize(source, newline_chars : List[int] = None, comments : List[Tuple[int
             operator_or_delimiter = ''
             for op in operators_and_delimiters:
                 if source[i:i+len(op)] == op:
+                    if op == '.' and source[i+1:i+2].isdigit():
+                        break
                     operator_or_delimiter = op
                     break
 
@@ -197,7 +199,7 @@ def tokenize(source, newline_chars : List[int] = None, comments : List[Tuple[int
                 else:
                     category = Token.Category.NAME
 
-            elif (ch in '-+' and '0' <= source[i:i+1] <= '9') or '0' <= ch <= '9': # this is NUMERIC_LITERAL
+            elif (ch in '-+' and '0' <= source[i:i+1] <= '9') or '0' <= ch <= '9' or (ch == '.' and '0' <= source[i:i+1] <= '9'): # this is NUMERIC_LITERAL
                 if ch in '-+':
                     assert(False) # considering sign as a part of numeric literal is a bad idea — expressions like `j-3` are cease to parse correctly
                     #sign = ch
@@ -214,7 +216,7 @@ def tokenize(source, newline_chars : List[int] = None, comments : List[Tuple[int
                 start = i
                 i += 1
                 if is_hex:
-                    while i < len(source) and ('0' <= source[i] <= '9' or 'a' <= source[i] <= 'z' or 'A' <= source[i] <= 'Z' or source[i] == '_'):
+                    while i < len(source) and ('0' <= source[i] <= '9' or 'a' <= source[i] <= 'f' or 'A' <= source[i] <= 'F' or source[i] == '_'):
                         i += 1
                 elif is_oct:
                     while i < len(source) and ('0' <= source[i] <= '7' or source[i] == '_'):

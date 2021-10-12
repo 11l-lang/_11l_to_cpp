@@ -190,7 +190,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
             i += 2
             L.continue
 
-         I (tokens.len & tokens.last.category == OPERATOR & tokens.last.value(source) C :binary_operators[tokens.last.end - tokens.last.start] & source[tokens.last.end - 4 .< tokens.last.end] != ‘-> &’)
+         I (tokens.len & tokens.last.category == OPERATOR & tokens.last.value(source) C :binary_operators[tokens.last.end - tokens.last.start] & source[tokens.last.end - 4 .< tokens.last.end] != ‘-> &’ & (tokens.last.value(source) != ‘?’ | source[tokens.last.start - 1] == ‘ ’))
             I line_continuations != N
                line_continuations.append(tokens.last.end)
             L.continue
@@ -215,7 +215,8 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
 
          V indentation_level = ii - linestart
          I indentation_levels.len & indentation_levels.last[0] == -1
-            indentation_levels.last = (indentation_level, indentation_levels.last[1])
+            assert(indentation_levels.last[1])
+            indentation_levels.last = (indentation_level, 1B)
             indentation_tabs = tabs
          E
             V prev_indentation_level = I !indentation_levels.empty {indentation_levels.last[0]} E 0
@@ -277,6 +278,10 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
          V operator_s = ‘’
          L(op) :sorted_operators
             I source[i .< i + op.len] == op
+               I op == ‘|’ & source[i + 1 .< i + 2] C ("‘", ‘'’)
+                  L.break
+               I op == ‘.’ & source[i + 1 .< i + 2].is_digit()
+                  L.break
                operator_s = op
                L.break
 
@@ -316,7 +321,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
 
             E I source[i .< i + 1] == ‘'’
                i++
-               I source[i .< i + 1] == ‘ ’
+               I source[i .< i + 1] C (‘ ’, "\n")
                   category = NAME
                E I source[i .< i + 1] C ("‘", ‘'’)
                   i--
@@ -346,7 +351,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
             E
                category = NAME
 
-         E I ch C ‘0’..‘9’
+         E I ch C ‘0’..‘9’ | (ch == ‘.’ & source[i .< i + 1] C ‘0’..‘9’)
             I ch C ‘01’ & source[i .< i + 1] C (‘B’, ‘В’) & !(is_hexadecimal_digit(source[i + 1 .< i + 2]) | source[i + 1 .< i + 2] == ‘'’)
                i++
                category = CONSTANT
@@ -458,7 +463,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                L.continue
             category = STRING_LITERAL
 
-         E I ch C "‘'"
+         E I ch C "‘'" | (ch == ‘|’ & source[i .< i + 1] C ("‘", ‘'’))
             I source[i] == "’" & tokens.last.category == STRING_CONCATENATOR & tokens[(len)-2].category == STRING_LITERAL & tokens[(len)-2].value(source)[0] == ‘"’
                i++
                L.continue
@@ -467,7 +472,8 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                I source[i] == "’"
                   i++
                   L.continue
-            i--
+            I ch != ‘|’
+               i--
             L i < source.len & source[i] == ‘'’
                i++
             I source[i .< i + 1] != "‘"

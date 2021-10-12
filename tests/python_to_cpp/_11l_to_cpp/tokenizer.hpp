@@ -229,7 +229,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                 continue;
             }
 
-            if ((tokens.len() && tokens.last().category == TYPE_RM_REF(tokens.last().category)::OPERATOR && in(tokens.last().value(source), tokenizer::binary_operators[tokens.last().end - tokens.last().start]) && source[range_el(tokens.last().end - 4, tokens.last().end)] != u"-> &")) {
+            if ((tokens.len() && tokens.last().category == TYPE_RM_REF(tokens.last().category)::OPERATOR && in(tokens.last().value(source), tokenizer::binary_operators[tokens.last().end - tokens.last().start]) && source[range_el(tokens.last().end - 4, tokens.last().end)] != u"-> &" && (tokens.last().value(source) != u'?' || source[tokens.last().start - 1] == u' '))) {
                 if (line_continuations != nullptr)
                     line_continuations->append(tokens.last().end);
                 continue;
@@ -259,7 +259,8 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
 
             auto indentation_level = ii - linestart;
             if (indentation_levels.len() && _get<0>(indentation_levels.last()) == -1) {
-                indentation_levels.last() = make_tuple(indentation_level, _get<1>(indentation_levels.last()));
+                assert(_get<1>(indentation_levels.last()));
+                indentation_levels.last() = make_tuple(indentation_level, true);
                 indentation_tabs = tabs;
             }
             else {
@@ -332,6 +333,10 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
             auto operator_s = u""_S;
             for (auto &&op : tokenizer::sorted_operators)
                 if (source[range_el(i, i + op.len())] == op) {
+                    if (op == u'|' && in(source[range_el(i + 1, i + 2)], make_tuple(u"‘"_S, u"'"_S)))
+                        break;
+                    if (op == u'.' && source[range_el(i + 1, i + 2)].is_digit())
+                        break;
                     operator_s = op;
                     break;
                 }
@@ -378,7 +383,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
 
                 else if (source[range_el(i, i + 1)] == u'\'') {
                     i++;
-                    if (source[range_el(i, i + 1)] == u' ')
+                    if (in(source[range_el(i, i + 1)], make_tuple(u" "_S, u"\n"_S)))
                         category = TYPE_RM_REF(category)::NAME;
                     else if (in(source[range_el(i, i + 1)], make_tuple(u"‘"_S, u"'"_S))) {
                         i--;
@@ -416,7 +421,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                     category = TYPE_RM_REF(category)::NAME;
             }
 
-            else if (in(ch, range_ee(u'0'_C, u'9'_C))) {
+            else if (in(ch, range_ee(u'0'_C, u'9'_C)) || (ch == u'.' && in(source[range_el(i, i + 1)], range_ee(u'0'_C, u'9'_C)))) {
                 if (in(ch, u"01"_S) && in(source[range_el(i, i + 1)], make_tuple(u"B"_S, u"В"_S)) && !(is_hexadecimal_digit(source[range_el(i + 1, i + 2)]) || source[range_el(i + 1, i + 2)] == u'\'')) {
                     i++;
                     category = TYPE_RM_REF(category)::CONSTANT;
@@ -555,7 +560,7 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                 category = TYPE_RM_REF(category)::STRING_LITERAL;
             }
 
-            else if (in(ch, u"‘'"_S)) {
+            else if (in(ch, u"‘'"_S) || (ch == u'|' && in(source[range_el(i, i + 1)], make_tuple(u"‘"_S, u"'"_S)))) {
                 if (source[i] == u'’' && tokens.last().category == TYPE_RM_REF(tokens.last().category)::STRING_CONCATENATOR && tokens.at_plus_len( - 2).category == TYPE_RM_REF(tokens.at_plus_len( - 2).category)::STRING_LITERAL && _get<0>(tokens.at_plus_len( - 2).value(source)) == u'"') {
                     i++;
                     continue;
@@ -567,7 +572,8 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                         continue;
                     }
                 }
-                i--;
+                if (ch != u'|')
+                    i--;
                 while (i < source.len() && source[i] == u'\'')
                     i++;
                 if (source[range_el(i, i + 1)] != u'‘')

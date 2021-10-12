@@ -208,7 +208,8 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
             if (len(tokens)
                 and tokens[-1].category == Token.Category.OPERATOR
                 and tokens[-1].value(source) in binary_operators[tokens[-1].end - tokens[-1].start] # ‘Every line of code which ends with any binary operator should be joined with the following line of code.’:[https://github.com/JuliaLang/julia/issues/2097#issuecomment-339924750][-339924750]<
-                and source[tokens[-1].end-4:tokens[-1].end] != '-> &'): # for `F symbol(id, bp = 0) -> &`
+                and source[tokens[-1].end-4:tokens[-1].end] != '-> &' # for `F symbol(id, bp = 0) -> &`
+                and (tokens[-1].value(source) != '?' or source[tokens[-1].start-1] == ' ')): # for `F score(board = board) -> (Char, [Int])?`
                 if line_continuations is not None:
                     line_continuations.append(tokens[-1].end)
                 continue
@@ -228,7 +229,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                     line_continuations.append(tokens[-1].end)
                 continue
 
-            if source[i:i+2] == R'\.': # // Support for constructions like: ||| You need just to add `\` at the each line starting from dot:
+            if source[i:i+2] == R'\.': # // Support for constructions like: ||| You need just to add `\` at the each line starting with dot:
                 if len(tokens):        # \\ result = abc.method1()          ||| result = abc.method1()
                     i += 1             # \\             .method2()          |||            \.method2()
                #else: # with `if len(tokens): i += 1` there is no need for this else branch
@@ -243,7 +244,8 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
 
             indentation_level = ii - linestart
             if len(indentation_levels) and indentation_levels[-1][0] == -1: # сразу после символа `{` идёт новый произвольный отступ (понижение уровня отступа может быть полезно, если вдруг отступ оказался слишком большой), который действует вплоть до парного символа `}`
-                indentation_levels[-1] = (indentation_level, indentation_levels[-1][1]) #indentation_levels[-1][0] = indentation_level # || maybe this is unnecessary (actually it is necessary, see test "fn f()\n{\na = 1") // }
+                assert(indentation_levels[-1][1])
+                indentation_levels[-1] = (indentation_level, True) #indentation_levels[-1][0] = indentation_level # || maybe this is unnecessary (actually it is necessary, see test "fn f()\n{\na = 1") // }
                 indentation_tabs = tabs
             else:
                 prev_indentation_level = indentation_levels[-1][0] if len(indentation_levels) else 0
@@ -312,6 +314,10 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
             # else:
             for op in sorted_operators:
                 if source[i:i+len(op)] == op:
+                    if op == '|' and source[i+1:i+2] in ('‘', "'"): # ’ # this is an indented multi-line string literal
+                        break
+                    if op == '.' and source[i+1:i+2].isdigit():
+                        break
                     operator_s = op
                     break
 
@@ -352,7 +358,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
 
                 elif source[i:i+1] == "'": # this is a named argument, a raw string or a hexadecimal number
                     i += 1
-                    if source[i:i+1] == ' ': # this is a named argument
+                    if source[i:i+1] in (' ', "\n"): # this is a named argument
                         category = Token.Category.NAME
                     elif source[i:i+1] in ('‘', "'"): # ’ # this is a raw string
                         i -= 1
@@ -382,7 +388,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                 else:
                     category = Token.Category.NAME
 
-            elif '0' <= ch <= '9': # this is NUMERIC_LITERAL or CONSTANT 0B or 1B
+            elif '0' <= ch <= '9' or (ch == '.' and '0' <= source[i:i+1] <= '9'): # this is NUMERIC_LITERAL or CONSTANT 0B or 1B
                 if ch in '01' and source[i:i+1] in ('B', 'В') and not (is_hexadecimal_digit(source[i+1:i+2]) or source[i+1:i+2] == "'"):
                     i += 1
                     category = Token.Category.CONSTANT
@@ -497,7 +503,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                     continue
                 category = Token.Category.STRING_LITERAL
 
-            elif ch in "‘'":
+            elif ch in "‘'" or (ch == '|' and source[i:i+1] in ('‘', "'")): # ’
                 if source[i] == '’' \
                         and tokens[-1].category == Token.Category.STRING_CONCATENATOR \
                         and tokens[-2].category == Token.Category.STRING_LITERAL \
@@ -509,7 +515,8 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                     if source[i] == '’': # for cases like `a‘’b`
                         i += 1
                         continue
-                i -= 1
+                if ch != '|':
+                    i -= 1
                 while i < len(source) and source[i] == "'":
                     i += 1
                 if source[i:i+1] != '‘': # ’
