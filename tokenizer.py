@@ -46,6 +46,9 @@ empty_list_of_str : List[str] = []
 binary_operators : List[List[str]] = [empty_list_of_str, [str('+'), '-', '*', '/', '%', '^', '&', '|', '<', '>', '=', '?'], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '->', '..', '.<', '.+', '<.', 'I/', 'Ц/', 'C ', 'С '], ['<<=', '>>=', '‘’=', '[+]', '[&]', '[|]', '(+)', '<.<', 'I/=', 'Ц/=', 'in ', '!C ', '!С '], ['[+]=', '[&]=', '[|]=', '(+)=', '!in ']]
 unary_operators  : List[List[str]] = [empty_list_of_str, [str('!')], ['++', '--'], ['(-)']]
 sorted_operators = sorted(binary_operators[1] + binary_operators[2] + binary_operators[3] + binary_operators[4] + unary_operators[1] + unary_operators[2] + unary_operators[3], key = lambda x: len(x), reverse = True)
+first_char_of_operators = set() # Char
+for op in sorted_operators:
+    first_char_of_operators.add(op[0])
 binary_operators[1].remove('^') # for `^L.break` support
 binary_operators[2].remove('..') # for `L(n) 1..`
 
@@ -278,14 +281,15 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
             # if ch in 'CС' and not (source[i+1:i+2].isalpha() or source[i+1:i+2].isdigit()): # without this check [and if 'C' is in binary_operators] when identifier starts with `C` (for example `Circle`), then this first letter of identifier is mistakenly considered as an operator
             #     operator_s = ch
             # else:
-            for op in sorted_operators:
-                if source[i:i+len(op)] == op:
-                    if op == '|' and source[i+1:i+2] in ('‘', "'"): # ’ # this is an indented multi-line string literal
+            if ch in first_char_of_operators:
+                for op in sorted_operators:
+                    if source[i:i+len(op)] == op:
+                        if op == '|' and source[i+1:i+2] in ('‘', "'"): # ’ # this is an indented multi-line string literal
+                            break
+                        # if op == '.' and source[i+1:i+2].isdigit(): # `.` is not an operator in 11l tokenizer
+                        #     break
+                        operator_s = op
                         break
-                    # if op == '.' and source[i+1:i+2].isdigit(): # `.` is not an operator in 11l tokenizer
-                    #     break
-                    operator_s = op
-                    break
 
             lexem_start = i
             i += 1
