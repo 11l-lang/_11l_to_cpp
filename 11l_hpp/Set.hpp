@@ -79,6 +79,14 @@ public:
 		std::set_union(std::set<KeyType>::begin(), std::set<KeyType>::end(), other.begin(), other.end(), std::inserter(result, result.end()));
 		return result;
 	}
+	Set operator|(const Set &other) const
+	{
+		return set_union(other);
+	}
+	template <typename OtherType> void operator|=(const OtherType &other)
+	{
+		update(other);
+	}
 
 	Set symmetric_difference(const Set &other) const
 	{
@@ -155,7 +163,7 @@ template <typename Type> Array<Type> create_array(const Set<Type> &set)
 	return r;
 }
 
-template <typename KeyType> inline bool in(const KeyType &key, const Set<KeyType> &set)
+template <typename Ty, typename KeyType> inline bool in(const Ty &key, const Set<KeyType> &set)
 {
 	return set.find(key) != set.end();
 }

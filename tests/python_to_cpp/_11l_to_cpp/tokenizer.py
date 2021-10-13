@@ -34,7 +34,7 @@ SSTABSi = 0
 ===============================================================================================================
 """
 from enum import IntEnum
-from typing import List, Tuple
+from typing import List, Set, Tuple
 Char = str
 
 keywords = ['V',     'C',  'I',    'E',     'F',  'L',    'N',    'R',       'S',       'T',    'X',
@@ -43,9 +43,26 @@ keywords = ['V',     'C',  'I',    'E',     'F',  'L',    'N',    'R',       'S'
             'перем', 'С',  'если', 'иначе', 'фн', 'цикл', 'нуль', 'вернуть', 'выбрать', 'тип',  'исключение']
 #keywords.remove('C'); keywords.remove('С'); keywords.remove('in') # it is more convenient to consider C/in as an operator, not a keyword (however, this line is not necessary)
 empty_list_of_str : List[str] = []
-binary_operators : List[List[str]] = [empty_list_of_str, [str('+'), '-', '*', '/', '%', '^', '&', '|', '<', '>', '=', '?'], ['<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '->', '..', '.<', '.+', '<.', 'I/', 'Ц/', 'C ', 'С '], ['<<=', '>>=', '‘’=', '[+]', '[&]', '[|]', '(+)', '<.<', 'I/=', 'Ц/=', 'in ', '!C ', '!С '], ['[+]=', '[&]=', '[|]=', '(+)=', '!in ']]
-unary_operators  : List[List[str]] = [empty_list_of_str, [str('!')], ['++', '--'], ['(-)']]
-sorted_operators = sorted(binary_operators[1] + binary_operators[2] + binary_operators[3] + binary_operators[4] + unary_operators[1] + unary_operators[2] + unary_operators[3], key = lambda x: len(x), reverse = True)
+binary_operators : List[Set[str]] = [] # `initializer_list` does not support move-only types (like `Set`) ([https://stackoverflow.com/questions/8193102/initializer-list-and-move-semantics <- google:‘initializer_list rvalue’])
+binary_operators.append(set(empty_list_of_str))
+binary_operators.append({str('+'), '-', '*', '/', '%', '^', '&', '|', '<', '>', '=', '?'})
+binary_operators.append({'<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '->', '..', '.<', '.+', '<.', 'I/', 'Ц/', 'C ', 'С '})
+binary_operators.append({'<<=', '>>=', '‘’=', '[+]', '[&]', '[|]', '(+)', '<.<', 'I/=', 'Ц/=', 'in ', '!C ', '!С '})
+binary_operators.append({'[+]=', '[&]=', '[|]=', '(+)=', '!in '})
+unary_operators : List[Set[str]] = []
+unary_operators.append(set(empty_list_of_str))
+unary_operators.append({str('!')})
+unary_operators.append({'++', '--'})
+unary_operators.append({'(-)'})
+unary_operators.append(set(empty_list_of_str))
+all_operators = set() # str
+operators : List[Set[str]] = []
+for i in range(5):
+    operators.append(binary_operators[i] | unary_operators[i])
+    all_operators |= binary_operators[i] | unary_operators[i]
+first_char_of_operators = set() # Char
+for op in all_operators:
+    first_char_of_operators.add(op[0])
 binary_operators[1].remove('^') # for `^L.break` support
 binary_operators[2].remove('..') # for `L(n) 1..`
 
@@ -278,14 +295,13 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
             # if ch in 'CС' and not (source[i+1:i+2].isalpha() or source[i+1:i+2].isdigit()): # without this check [and if 'C' is in binary_operators] when identifier starts with `C` (for example `Circle`), then this first letter of identifier is mistakenly considered as an operator
             #     operator_s = ch
             # else:
-            for op in sorted_operators:
-                if source[i:i+len(op)] == op:
-                    if op == '|' and source[i+1:i+2] in ('‘', "'"): # ’ # this is an indented multi-line string literal
+            if ch in first_char_of_operators:
+                for n in range(4, 0, -1):
+                    if source[i:i+n] in operators[n]:
+                        operator_s = source[i:i+n]
+                        if operator_s == '|' and source[i+1:i+2] in ('‘', "'"): # ’ # this is an indented multi-line string literal
+                            operator_s = ''
                         break
-                    # if op == '.' and source[i+1:i+2].isdigit(): # `.` is not an operator in 11l tokenizer
-                    #     break
-                    operator_s = op
-                    break
 
             lexem_start = i
             i += 1

@@ -10,7 +10,13 @@ binary_operators
 unary_operators
     type = ‘’
     ast_nodes = []
-sorted_operators
+all_operators
+    type = ‘’
+    ast_nodes = []
+operators
+    type = ‘’
+    ast_nodes = []
+first_char_of_operators
     type = ‘’
     ast_nodes = []
 Error

@@ -11,7 +11,13 @@ binary_operators
 unary_operators
     type = List
     node = N
-sorted_operators
+all_operators
+    type = ‘’
+    node = N
+operators
+    type = List
+    node = N
+first_char_of_operators
     type = ‘’
     node = N
 tokenize

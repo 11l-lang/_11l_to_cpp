@@ -36,9 +36,26 @@ SSTABSi = 0
 
 V keywords = [‘V’, ‘C’, ‘I’, ‘E’, ‘F’, ‘L’, ‘N’, ‘R’, ‘S’, ‘T’, ‘X’, ‘П’, ‘С’, ‘Е’, ‘И’, ‘Ф’, ‘Ц’, ‘Н’, ‘Р’, ‘В’, ‘Т’, ‘Х’, ‘var’, ‘in’, ‘if’, ‘else’, ‘fn’, ‘loop’, ‘null’, ‘return’, ‘switch’, ‘type’, ‘exception’, ‘перем’, ‘С’, ‘если’, ‘иначе’, ‘фн’, ‘цикл’, ‘нуль’, ‘вернуть’, ‘выбрать’, ‘тип’, ‘исключение’]
 [String] empty_list_of_str
-[[String]] binary_operators = [empty_list_of_str, [String(‘+’), ‘-’, ‘*’, ‘/’, ‘%’, ‘^’, ‘&’, ‘|’, ‘<’, ‘>’, ‘=’, ‘?’], [‘<<’, ‘>>’, ‘<=’, ‘>=’, ‘==’, ‘!=’, ‘+=’, ‘-=’, ‘*=’, ‘/=’, ‘%=’, ‘&=’, ‘|=’, ‘^=’, ‘->’, ‘..’, ‘.<’, ‘.+’, ‘<.’, ‘I/’, ‘Ц/’, ‘C ’, ‘С ’], [‘<<=’, ‘>>=’, ‘‘’=’, ‘[+]’, ‘[&]’, ‘[|]’, ‘(+)’, ‘<.<’, ‘I/=’, ‘Ц/=’, ‘in ’, ‘!C ’, ‘!С ’], [‘[+]=’, ‘[&]=’, ‘[|]=’, ‘(+)=’, ‘!in ’]]
-[[String]] unary_operators = [empty_list_of_str, [String(‘!’)], [‘++’, ‘--’], [‘(-)’]]
-V sorted_operators = sorted(binary_operators[1] + binary_operators[2] + binary_operators[3] + binary_operators[4] + unary_operators[1] + unary_operators[2] + unary_operators[3], key' x -> x.len, reverse' 1B)
+[Set[String]] binary_operators
+binary_operators.append(Set(empty_list_of_str))
+binary_operators.append(Set([String(‘+’), ‘-’, ‘*’, ‘/’, ‘%’, ‘^’, ‘&’, ‘|’, ‘<’, ‘>’, ‘=’, ‘?’]))
+binary_operators.append(Set([‘<<’, ‘>>’, ‘<=’, ‘>=’, ‘==’, ‘!=’, ‘+=’, ‘-=’, ‘*=’, ‘/=’, ‘%=’, ‘&=’, ‘|=’, ‘^=’, ‘->’, ‘..’, ‘.<’, ‘.+’, ‘<.’, ‘I/’, ‘Ц/’, ‘C ’, ‘С ’]))
+binary_operators.append(Set([‘<<=’, ‘>>=’, ‘‘’=’, ‘[+]’, ‘[&]’, ‘[|]’, ‘(+)’, ‘<.<’, ‘I/=’, ‘Ц/=’, ‘in ’, ‘!C ’, ‘!С ’]))
+binary_operators.append(Set([‘[+]=’, ‘[&]=’, ‘[|]=’, ‘(+)=’, ‘!in ’]))
+[Set[String]] unary_operators
+unary_operators.append(Set(empty_list_of_str))
+unary_operators.append(Set([String(‘!’)]))
+unary_operators.append(Set([‘++’, ‘--’]))
+unary_operators.append(Set([‘(-)’]))
+unary_operators.append(Set(empty_list_of_str))
+V all_operators = Set[String]()
+[Set[String]] operators
+L(i) 5
+   operators.append(binary_operators[i] [|] unary_operators[i])
+   all_operators [|]= binary_operators[i] [|] unary_operators[i]
+V first_char_of_operators = Set[Char]()
+L(op) all_operators
+   first_char_of_operators.add(op[0])
 binary_operators[1].remove(‘^’)
 binary_operators[2].remove(‘..’)
 
@@ -244,12 +261,13 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
             R ch C ‘0’..‘9’ | ch C ‘A’..‘F’ | ch C ‘a’..‘f’ | ch C ‘абсдефАБСДЕФ’
 
          V operator_s = ‘’
-         L(op) :sorted_operators
-            I source[i .< i + op.len] == op
-               I op == ‘|’ & source[i + 1 .< i + 2] C ("‘", ‘'’)
+         I ch C :first_char_of_operators
+            L(n) (4.<0).step(-1)
+               I source[i .< i + n] C :operators[n]
+                  operator_s = source[i .< i + n]
+                  I operator_s == ‘|’ & source[i + 1 .< i + 2] C ("‘", ‘'’)
+                     operator_s = ‘’
                   L.break
-               operator_s = op
-               L.break
 
          V lexem_start = i
          i++

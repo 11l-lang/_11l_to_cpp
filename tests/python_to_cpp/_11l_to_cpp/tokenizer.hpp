@@ -42,18 +42,60 @@ SSTABSi = 0
 
 auto keywords = create_array({u"V"_S, u"C"_S, u"I"_S, u"E"_S, u"F"_S, u"L"_S, u"N"_S, u"R"_S, u"S"_S, u"T"_S, u"X"_S, u"П"_S, u"С"_S, u"Е"_S, u"И"_S, u"Ф"_S, u"Ц"_S, u"Н"_S, u"Р"_S, u"В"_S, u"Т"_S, u"Х"_S, u"var"_S, u"in"_S, u"if"_S, u"else"_S, u"fn"_S, u"loop"_S, u"null"_S, u"return"_S, u"switch"_S, u"type"_S, u"exception"_S, u"перем"_S, u"С"_S, u"если"_S, u"иначе"_S, u"фн"_S, u"цикл"_S, u"нуль"_S, u"вернуть"_S, u"выбрать"_S, u"тип"_S, u"исключение"_S});
 Array<String> empty_list_of_str;
-Array<Array<String>> binary_operators = create_array({empty_list_of_str, create_array<String>({String(u"+"_S), u"-"_S, u"*"_S, u"/"_S, u"%"_S, u"^"_S, u"&"_S, u"|"_S, u"<"_S, u">"_S, u"="_S, u"?"_S}), create_array({u"<<"_S, u">>"_S, u"<="_S, u">="_S, u"=="_S, u"!="_S, u"+="_S, u"-="_S, u"*="_S, u"/="_S, u"%="_S, u"&="_S, u"|="_S, u"^="_S, u"->"_S, u".."_S, u".<"_S, u".+"_S, u"<."_S, u"I/"_S, u"Ц/"_S, u"C "_S, u"С "_S}), create_array({u"<<="_S, u">>="_S, u"‘’="_S, u"[+]"_S, u"[&]"_S, u"[|]"_S, u"(+)"_S, u"<.<"_S, u"I/="_S, u"Ц/="_S, u"in "_S, u"!C "_S, u"!С "_S}), create_array({u"[+]="_S, u"[&]="_S, u"[|]="_S, u"(+)="_S, u"!in "_S})});
-Array<Array<String>> unary_operators = create_array({empty_list_of_str, create_array({String(u"!"_S)}), create_array({u"++"_S, u"--"_S}), create_array({u"(-)"_S})});
-auto sorted_operators = sorted(_get<1>(binary_operators) + _get<2>(binary_operators) + _get<3>(binary_operators) + _get<4>(binary_operators) + _get<1>(unary_operators) + _get<2>(unary_operators) + _get<3>(unary_operators), [](const auto &x){return x.len();}, true);
+Array<Set<String>> binary_operators;
 
 struct CodeBlock2
 {
     CodeBlock2()
     {
+        binary_operators.append(create_set(empty_list_of_str));
+        binary_operators.append(create_set<String>({String(u"+"_S), u"-"_S, u"*"_S, u"/"_S, u"%"_S, u"^"_S, u"&"_S, u"|"_S, u"<"_S, u">"_S, u"="_S, u"?"_S}));
+        binary_operators.append(create_set({u"<<"_S, u">>"_S, u"<="_S, u">="_S, u"=="_S, u"!="_S, u"+="_S, u"-="_S, u"*="_S, u"/="_S, u"%="_S, u"&="_S, u"|="_S, u"^="_S, u"->"_S, u".."_S, u".<"_S, u".+"_S, u"<."_S, u"I/"_S, u"Ц/"_S, u"C "_S, u"С "_S}));
+        binary_operators.append(create_set({u"<<="_S, u">>="_S, u"‘’="_S, u"[+]"_S, u"[&]"_S, u"[|]"_S, u"(+)"_S, u"<.<"_S, u"I/="_S, u"Ц/="_S, u"in "_S, u"!C "_S, u"!С "_S}));
+        binary_operators.append(create_set({u"[+]="_S, u"[&]="_S, u"[|]="_S, u"(+)="_S, u"!in "_S}));
+    }
+} code_block_2;
+
+Array<Set<String>> unary_operators;
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        unary_operators.append(create_set(empty_list_of_str));
+        unary_operators.append(create_set({String(u"!"_S)}));
+        unary_operators.append(create_set({u"++"_S, u"--"_S}));
+        unary_operators.append(create_set({u"(-)"_S}));
+        unary_operators.append(create_set(empty_list_of_str));
+    }
+} code_block_3;
+
+auto all_operators = Set<String>();
+Array<Set<String>> operators;
+
+struct CodeBlock4
+{
+    CodeBlock4()
+    {
+        for (int i = 0; i < 5; i++) {
+            operators.append(binary_operators[i] | unary_operators[i]);
+            all_operators |= binary_operators[i] | unary_operators[i];
+        }
+    }
+} code_block_4;
+
+auto first_char_of_operators = Set<Char>();
+
+struct CodeBlock5
+{
+    CodeBlock5()
+    {
+        for (auto &&op : all_operators)
+            first_char_of_operators.add(_get<0>(op));
         _get<1>(binary_operators).remove(u"^"_S);
         _get<2>(binary_operators).remove(u".."_S);
     }
-} code_block_2;
+} code_block_5;
 
 class Error
 {
@@ -299,13 +341,14 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
             };
 
             auto operator_s = u""_S;
-            for (auto &&op : tokenizer::sorted_operators)
-                if (source[range_el(i, i + op.len())] == op) {
-                    if (op == u'|' && in(source[range_el(i + 1, i + 2)], make_tuple(u"‘"_S, u"'"_S)))
+            if (in(ch, tokenizer::first_char_of_operators))
+                for (auto n : range_el(4, 0).step(-1))
+                    if (in(source[range_el(i, i + n)], tokenizer::operators[n])) {
+                        operator_s = source[range_el(i, i + n)];
+                        if (operator_s == u'|' && in(source[range_el(i + 1, i + 2)], make_tuple(u"‘"_S, u"'"_S)))
+                            operator_s = u""_S;
                         break;
-                    operator_s = op;
-                    break;
-                }
+                    }
 
             auto lexem_start = i;
             i++;

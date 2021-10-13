@@ -1422,7 +1422,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                     continue
                 i += 1
 
-        r = self.children_to_str(indent, ('template <' + ', '.join(templates) + '> ')*(len(templates) != 0) + s + '(' + ', '.join(arguments) + ')' + ' const'*(self.is_const or self.function_name in tokenizer.sorted_operators) + self.member_initializer_list)
+        r = self.children_to_str(indent, ('template <' + ', '.join(templates) + '> ')*(len(templates) != 0) + s + '(' + ', '.join(arguments) + ')' + ' const'*(self.is_const or self.function_name in tokenizer.all_operators) + self.member_initializer_list)
 
         if isinstance(self.parent, ASTTypeDefinition) and self.function_name in ('+', '-', '*', '/') and self.function_name + '=' not in self.parent.scope.ids:
             r += ' ' * (indent*4) + 'template <typename Ty> auto &operator' + self.function_name + "=(const Ty &t)\n"
