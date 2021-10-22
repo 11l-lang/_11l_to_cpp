@@ -62,6 +62,11 @@ template <typename Type> inline auto choice(const Array<Type> &arr)
 	return arr[_(arr.len())];
 }
 
+inline auto choice(const String &str)
+{
+	return str[_(str.len())];
+}
+
 template <typename Type> inline auto sample(const Array<Type> &population, Int k) // [https://github.com/python/cpython/blob/0363a4014d90df17a29042de008ef0b659f92505/Lib/random.py#L470-L478]
 {
 	Int n = population.len();

@@ -843,3 +843,1369 @@ struct CodeBlock1
         evolve(1, 30);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Elliptic_curve_arithmetic#Python
+class Point:
+    x : float
+    y : float
+    def __init__(self, x=float('inf'), y=float('inf')):
+        self.x = x
+        self.y = y
+
+    def copy(self): # const
+        return Point(self.x, self.y)
+
+    def is_zero(self): # const
+        return self.x > 1e20 or self.x < -1e20
+
+    def neg(self):
+        return Point(self.x, -self.y)
+
+    def dbl(self):
+        if self.is_zero():
+            return self.copy()
+        if self.y == 0:
+            return Point()
+        l = (3 * self.x * self.x) / (2 * self.y)
+        x = l * l - 2 * self.x
+        return Point(x, l * (self.x - x) - self.y)
+
+    def add(self, q):
+        if self.x == q.x and self.y == q.y:
+            return self.dbl()
+        if self.is_zero():
+            return q.copy()
+        if q.is_zero():
+            return self.copy()
+        if q.x - self.x == 0:
+            return Point()
+        l = (q.y - self.y) / (q.x - self.x)
+        x = l * l - self.x - q.x
+        return Point(x, l * (self.x - x) - self.y)
+
+    def mul(self, n):
+        p = self.copy()
+        r = Point()
+        i = 1
+        while i <= n:
+            if i&n:
+                r = r.add(p)
+            p = p.dbl()
+            i <<= 1
+        return r
+
+    def __str__(self):
+        return "({:.3f}, {:.3f})".format(self.x, self.y)
+
+Point_b = 7
+
+def show(s, p):
+    print(s, "Zero" if p.is_zero() else p)
+
+def from_y(y):
+    n = y * y - Point_b
+    x = n**(1./3) if n>=0 else -((-n)**(1./3))
+    return Point(x, y)
+
+# demonstrate
+a = from_y(1)
+b = from_y(2)
+show("a =", a)
+show("b =", b)
+c = a.add(b)
+show("c = a + b =", c)
+d = c.neg()
+show("d = -c =", d)
+show("c + d =", c.add(d))
+show("a + b + d =", a.add(b.add(d)))
+show("a * 12345 =", a.mul(12345))
+===
+T Point
+   Float x
+   Float y
+   F (x = Float.infinity, y = Float.infinity)
+      .x = x
+      .y = y
+
+   F.const copy()
+      R Point(.x, .y)
+
+   F.const is_zero()
+      R .x > 1e20 | .x < -1e20
+
+   F neg()
+      R Point(.x, -.y)
+
+   F dbl()
+      I .is_zero()
+         R .copy()
+      I .y == 0
+         R Point()
+      V l = (3 * .x * .x) / (2 * .y)
+      V x = l * l - 2 * .x
+      R Point(x, l * (.x - x) - .y)
+
+   F add(q)
+      I .x == q.x & .y == q.y
+         R .dbl()
+      I .is_zero()
+         R q.copy()
+      I q.is_zero()
+         R .copy()
+      I q.x - .x == 0
+         R Point()
+      V l = (q.y - .y) / (q.x - .x)
+      V x = l * l - .x - q.x
+      R Point(x, l * (.x - x) - .y)
+
+   F mul(n)
+      V p = .copy()
+      V r = Point()
+      V i = 1
+      L i <= n
+         I i [&] n
+            r = r.add(p)
+         p = p.dbl()
+         i <<= 1
+      R r
+
+   F String()
+      R ‘(#.3, #.3)’.format(.x, .y)
+
+V Point_b = 7
+
+F show(s, p)
+   print(s‘ ’(I p.is_zero() {‘Zero’} E p))
+
+F from_y(y)
+   V n = y * y - Point_b
+   V x = I n >= 0 {n ^ (1. / 3)} E -((-n) ^ (1. / 3))
+   R Point(x, y)
+
+V a = from_y(1)
+V b = from_y(2)
+show(‘a =’, a)
+show(‘b =’, b)
+V c = a.add(b)
+show(‘c = a + b =’, c)
+V d = c.neg()
+show(‘d = -c =’, d)
+show(‘c + d =’, c.add(d))
+show(‘a + b + d =’, a.add(b.add(d)))
+show(‘a * 12345 =’, a.mul(12345))
+===
+class Point
+{
+public:
+    double x;
+    double y;
+    template <typename T1 = decltype(std::numeric_limits<double>::infinity()), typename T2 = decltype(std::numeric_limits<double>::infinity())> Point(const T1 &x = std::numeric_limits<double>::infinity(), const T2 &y = std::numeric_limits<double>::infinity()) :
+        x(x),
+        y(y)
+    {
+    }
+
+    auto copy() const
+    {
+        return Point(x, y);
+    }
+
+    auto is_zero() const
+    {
+        return x > 1e20 || x < -1e20;
+    }
+
+    auto neg()
+    {
+        return Point(x, -y);
+    }
+
+    auto dbl()
+    {
+        if (is_zero())
+            return copy();
+        if (y == 0)
+            return Point();
+        auto l = (3 * this->x * this->x) / (2 * y);
+        auto x = l * l - 2 * this->x;
+        return Point(x, l * (this->x - x) - y);
+    }
+
+    template <typename T1> auto add(const T1 &q)
+    {
+        if (this->x == q.x && y == q.y)
+            return dbl();
+        if (is_zero())
+            return q.copy();
+        if (q.is_zero())
+            return copy();
+        if (q.x - this->x == 0)
+            return Point();
+        auto l = (q.y - y) / (q.x - this->x);
+        auto x = l * l - this->x - q.x;
+        return Point(x, l * (this->x - x) - y);
+    }
+
+    template <typename T1> auto mul(const T1 &n)
+    {
+        auto p = copy();
+        auto r = Point();
+        auto i = 1;
+        while (i <= n) {
+            if (i & n)
+                r = r.add(p);
+            p = p.dbl();
+            i <<= 1;
+        }
+        return r;
+    }
+
+    operator String() const
+    {
+        return u"(#.3, #.3)"_S.format(x, y);
+    }
+};
+
+auto Point_b = 7;
+
+template <typename T1, typename T2> auto show(const T1 &s, const T2 &p)
+{
+    print(s & u" "_S & (p.is_zero() ? u"Zero"_S : p));
+}
+
+template <typename T1> auto from_y(const T1 &y)
+{
+    auto n = y * y - Point_b;
+    auto x = n >= 0 ? pow(n, (1. / 3.0)) : -(pow((-n), (1. / 3.0)));
+    return Point(x, y);
+}
+
+auto a = from_y(1);
+auto b = from_y(2);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        show(u"a ="_S, a);
+        show(u"b ="_S, b);
+    }
+} code_block_1;
+
+auto c = a.add(b);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        show(u"c = a + b ="_S, c);
+    }
+} code_block_2;
+
+auto d = c.neg();
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        show(u"d = -c ="_S, d);
+        show(u"c + d ="_S, c.add(d));
+        show(u"a + b + d ="_S, a.add(b.add(d)));
+        show(u"a * 12345 ="_S, a.mul(12345));
+    }
+} code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Emirp_primes#Nim
+def reversed(n : int):
+    result = 0
+    while True:
+        result = 10 * result + n % 10
+        n //= 10
+        if n == 0:
+            return result
+
+limit = 1_000_000
+is_prime = [False] * 2 + [True] * (limit - 1)
+for n in range(int(limit**0.5 + 1.5)): # stop at ``sqrt(limit)``
+    if is_prime[n]:
+        for i in range(n*n, limit+1, n):
+            is_prime[i] = False
+
+def is_emirp(n):
+    if not is_prime[n]:
+        return False
+    r = reversed(n)
+    return r != n and is_prime[r]
+
+print('First 20 emirps:', end = '')
+count = 0
+for n in range(limit):
+    if is_emirp(n):
+        print('', n, end = '')
+        count += 1
+        if count == 20:
+            break
+print()
+
+print('Emirps between 7700 and 8000:', end = '')
+for n in range(7700, 8001):
+    if is_emirp(n):
+        print('', n, end = '')
+print()
+
+count = 0
+for n in range(limit):
+    if is_emirp(n):
+        count += 1
+        if count == 10000:
+            print('The 10000th emirp:', n)
+            break
+===
+F reversed(Int =n)
+   V result = 0
+   L
+      result = 10 * result + n % 10
+      n I/= 10
+      I n == 0
+         R result
+
+V limit = 1'000'000
+V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
+L(n) 0 .< Int(limit ^ 0.5 + 1.5)
+   I is_prime[n]
+      L(i) (n * n .< limit + 1).step(n)
+         is_prime[i] = 0B
+
+F is_emirp(n)
+   I !:is_prime[n]
+      R 0B
+   V r = reversed(n)
+   R r != n & :is_prime[r]
+
+print(‘First 20 emirps:’, end' ‘’)
+V count = 0
+L(n) 0 .< limit
+   I is_emirp(n)
+      print(‘ ’n, end' ‘’)
+      count++
+      I count == 20
+         L.break
+print()
+
+print(‘Emirps between 7700 and 8000:’, end' ‘’)
+L(n) 7700..8000
+   I is_emirp(n)
+      print(‘ ’n, end' ‘’)
+print()
+
+count = 0
+L(n) 0 .< limit
+   I is_emirp(n)
+      count++
+      I count == 10000
+         print(‘The 10000th emirp: ’n)
+         L.break
+===
+auto reversed(int n)
+{
+    auto result = 0;
+    while (true) {
+        result = 10 * result + mod(n, 10);
+        n = idiv(n, 10);
+        if (n == 0)
+            return result;
+    }
+}
+
+auto limit = 1'000'000;
+auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
+            if (is_prime[n])
+                for (auto i : range_el(n * n, limit + 1).step(n))
+                    is_prime.set(i, false);
+    }
+} code_block_1;
+
+template <typename T1> auto is_emirp(const T1 &n)
+{
+    if (!::is_prime[n])
+        return false;
+    auto r = reversed(n);
+    return r != n && ::is_prime[r];
+}
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"First 20 emirps:"_S, u""_S);
+    }
+} code_block_2;
+
+auto count = 0;
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        for (auto n : range_el(0, limit))
+            if (is_emirp(n)) {
+                print(u" "_S & n, u""_S);
+                count++;
+                if (count == 20)
+                    break;
+            }
+        print();
+
+        print(u"Emirps between 7700 and 8000:"_S, u""_S);
+        for (auto n : range_ee(7700, 8000))
+            if (is_emirp(n))
+                print(u" "_S & n, u""_S);
+        print();
+
+        count = 0;
+        for (auto n : range_el(0, limit))
+            if (is_emirp(n)) {
+                count++;
+                if (count == 10000) {
+                    print(u"The 10000th emirp: "_S & n);
+                    break;
+                }
+            }
+    }
+} code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Evolutionary_algorithm#Python
+import random
+
+target  = list("METHINKS IT IS LIKE A WEASEL")
+alphabet = " ABCDEFGHIJLKLMNOPQRSTUVWXYZ"
+p = 0.05 # mutation probability
+c = 100  # number of children in each generation
+
+def neg_fitness(trial):
+    return sum(int(t != h) for t,h in list(zip(trial, target)))
+
+def mutate(parent):
+    return [(random.choice(alphabet) if random.random() < p else ch) for ch in parent]
+
+parent = [random.choice(alphabet) for _ in range(len(target))]
+i = 0
+print("%3d" % i, "".join(parent))
+while parent != target:
+    copies = (mutate(parent) for _ in range(c))
+    parent = min(copies, key=lambda x:neg_fitness(x))
+    print("%3d" % i, "".join(parent))
+    i += 1
+===
+V target = Array(‘METHINKS IT IS LIKE A WEASEL’)
+V alphabet = ‘ ABCDEFGHIJLKLMNOPQRSTUVWXYZ’
+V p = 0.05
+V c = 100
+
+F neg_fitness(trial)
+   R sum(zip(trial, :target).map((t, h) -> Int(t != h)))
+
+F mutate(parent)
+   R parent.map(ch -> (I random:() < :p {random:choice(:alphabet)} E ch))
+
+V parent = (0 .< target.len).map(_ -> random:choice(:alphabet))
+V i = 0
+print((‘#3’.format(i))‘ ’parent.join(‘’))
+L parent != target
+   V copies = ((0 .< c).map(_ -> mutate(:parent)))
+   parent = min(copies, key' x -> neg_fitness(x))
+   print((‘#3’.format(i))‘ ’parent.join(‘’))
+   i++
+===
+auto target = create_array(u"METHINKS IT IS LIKE A WEASEL"_S);
+auto alphabet = u" ABCDEFGHIJLKLMNOPQRSTUVWXYZ"_S;
+auto p = 0.05;
+auto c = 100;
+
+template <typename T1> auto neg_fitness(const T1 &trial)
+{
+    return sum_map(zip(trial, ::target), [](const auto &t, const auto &h){return to_int(t != h);});
+}
+
+template <typename T1> auto mutate(const T1 &parent)
+{
+    return parent.map([](const auto &ch){return (randomns::_() < ::p ? randomns::choice(::alphabet) : ch);});
+}
+
+auto parent = range_el(0, target.len()).map([](const auto &_){return randomns::choice(::alphabet);});
+auto i = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print((u"#3"_S.format(i)) & u" "_S & parent.join(u""_S));
+        while (parent != target) {
+            auto copies = (range_el(0, c).map([](const auto &_){return mutate(::parent);}));
+            parent = min_with_key(copies, [](const auto &x){return neg_fitness(x);});
+            print((u"#3"_S.format(i)) & u" "_S & parent.join(u""_S));
+            i++;
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Execute_a_Markov_algorithm#Nim
+from typing import NamedTuple
+
+class Rule(NamedTuple):
+    pattern : str
+    replacement : str
+    terminating : bool
+
+def parse(rules):
+    result : List[Rule] = []
+    for line in rules.split("\n"):
+        if line.startswith('#'): continue
+        if len(line.strip(' ')) == 0: continue
+
+        (pat, rep) = line.split(' -> ')
+
+        terminating = False
+        if rep.startswith('.'):
+            rep = rep[1:]
+            terminating = True
+
+        result.append(Rule(pat, rep, terminating))
+    return result
+
+def apply(text, rules):
+    result = text
+    changed = True
+
+    while changed == True:
+        changed = False
+        for rule in rules:
+            if rule.pattern in result:
+                result = result.replace(rule.pattern, rule.replacement)
+                if rule.terminating: return result
+                changed = True
+                break
+
+    return result
+
+SampleTexts = ["I bought a B of As from T S.",
+               "I bought a B of As from T S.",
+               "I bought a B of As W my Bgage from T S.",
+               "_1111*11111_",
+               "000000A000000"]
+
+RuleSets = [
+
+#................................................
+
+"""# This rules file is extracted from Wikipedia:
+# http://en.wikipedia.org/wiki/Markov_Algorithm
+A -> apple
+B -> bag
+S -> shop
+T -> the
+the shop -> my brother
+a never used -> .terminating rule""",
+
+#................................................
+
+"""# Slightly modified from the rules on Wikipedia
+A -> apple
+B -> bag
+S -> .shop
+T -> the
+the shop -> my brother
+a never used -> .terminating rule""",
+
+#................................................
+
+"""# BNF Syntax testing rules
+A -> apple
+WWWW -> with
+Bgage -> ->.*
+B -> bag
+->.* -> money
+W -> WW
+S -> .shop
+T -> the
+the shop -> my brother
+a never used -> .terminating rule""",
+
+#................................................
+
+"""### Unary Multiplication Engine, for testing Markov Algorithm implementations
+### By Donal Fellows.
+# Unary addition engine
+_+1 -> _1+
+1+1 -> 11+
+# Pass for converting from the splitting of multiplication into ordinary
+# addition
+1! -> !1
+,! -> !+
+_! -> _
+# Unary multiplication by duplicating left side, right side times
+1*1 -> x,@y
+1x -> xX
+X, -> 1,1
+X1 -> 1X
+_x -> _X
+,x -> ,X
+y1 -> 1y
+y_ -> _
+# Next phase of applying
+1@1 -> x,@y
+1@_ -> @_
+,@_ -> !_
+++ -> +
+# Termination cleanup for addition
+_1 -> 1
+1+_ -> 1
+_+_ -> """,
+
+#................................................
+
+"""# Turing machine: three-state busy beaver
+#
+# state A, symbol 0 => write 1, move right, new state B
+A0 -> 1B
+# state A, symbol 1 => write 1, move left, new state C
+0A1 -> C01
+1A1 -> C11
+# state B, symbol 0 => write 1, move left, new state A
+0B0 -> A01
+1B0 -> A11
+# state B, symbol 1 => write 1, move right, new state B
+B1 -> 1B
+# state C, symbol 0 => write 1, move left, new state B
+0C0 -> B01
+1C0 -> B11
+# state C, symbol 1 => write 1, move left, halt
+0C1 -> H01
+1C1 -> H11"""
+
+]
+
+for n, ruleset in enumerate(RuleSets):
+    rules = parse(ruleset)
+    print(apply(SampleTexts[n], rules))
+===
+T Rule
+   String pattern
+   String replacement
+   Bool terminating
+   F (pattern, replacement, terminating)
+      .pattern = pattern
+      .replacement = replacement
+      .terminating = terminating
+
+F parse(rules)
+   [Rule] result
+   L(line) rules.split("\n")
+      I line.starts_with(‘#’)
+         L.continue
+      I line.trim(‘ ’).empty
+         L.continue
+
+      V (pat, rep) = line.split(‘ -> ’)
+
+      V terminating = 0B
+      I rep.starts_with(‘.’)
+         rep = rep[1..]
+         terminating = 1B
+
+      result.append(Rule(pat, rep, terminating))
+   R result
+
+F apply(text, rules)
+   V result = text
+   V changed = 1B
+
+   L changed == 1B
+      changed = 0B
+      L(rule) rules
+         I rule.pattern C result
+            result = result.replace(rule.pattern, rule.replacement)
+            I rule.terminating
+               R result
+            changed = 1B
+            L.break
+
+   R result
+
+V SampleTexts = [‘I bought a B of As from T S.’, ‘I bought a B of As from T S.’, ‘I bought a B of As W my Bgage from T S.’, ‘_1111*11111_’, ‘000000A000000’]
+
+V RuleSets = [‘# This rules file is extracted from Wikipedia:
+# http://en.wikipedia.org/wiki/Markov_Algorithm
+A -> apple
+B -> bag
+S -> shop
+T -> the
+the shop -> my brother
+a never used -> .terminating rule’, ‘# Slightly modified from the rules on Wikipedia
+A -> apple
+B -> bag
+S -> .shop
+T -> the
+the shop -> my brother
+a never used -> .terminating rule’, ‘# BNF Syntax testing rules
+A -> apple
+WWWW -> with
+Bgage -> ->.*
+B -> bag
+->.* -> money
+W -> WW
+S -> .shop
+T -> the
+the shop -> my brother
+a never used -> .terminating rule’, ‘### Unary Multiplication Engine, for testing Markov Algorithm implementations
+### By Donal Fellows.
+# Unary addition engine
+_+1 -> _1+
+1+1 -> 11+
+# Pass for converting from the splitting of multiplication into ordinary
+# addition
+1! -> !1
+,! -> !+
+_! -> _
+# Unary multiplication by duplicating left side, right side times
+1*1 -> x,@y
+1x -> xX
+X, -> 1,1
+X1 -> 1X
+_x -> _X
+,x -> ,X
+y1 -> 1y
+y_ -> _
+# Next phase of applying
+1@1 -> x,@y
+1@_ -> @_
+,@_ -> !_
+++ -> +
+# Termination cleanup for addition
+_1 -> 1
+1+_ -> 1
+_+_ -> ’, ‘# Turing machine: three-state busy beaver
+#
+# state A, symbol 0 => write 1, move right, new state B
+A0 -> 1B
+# state A, symbol 1 => write 1, move left, new state C
+0A1 -> C01
+1A1 -> C11
+# state B, symbol 0 => write 1, move left, new state A
+0B0 -> A01
+1B0 -> A11
+# state B, symbol 1 => write 1, move right, new state B
+B1 -> 1B
+# state C, symbol 0 => write 1, move left, new state B
+0C0 -> B01
+1C0 -> B11
+# state C, symbol 1 => write 1, move left, halt
+0C1 -> H01
+1C1 -> H11’]
+
+L(ruleset) RuleSets
+   V n = L.index
+   V rules = parse(ruleset)
+   print(apply(SampleTexts[n], rules))
+===
+class Rule
+{
+public:
+    String pattern;
+    String replacement;
+    bool terminating;
+    template <typename T1, typename T2, typename T3> Rule(const T1 &pattern, const T2 &replacement, const T3 &terminating) :
+        pattern(pattern),
+        replacement(replacement),
+        terminating(terminating)
+    {
+    }
+};
+
+template <typename T1> auto parse(const T1 &rules)
+{
+    Array<Rule> result;
+    for (auto &&line : rules.split(u"\n"_S)) {
+        if (line.starts_with(u"#"_S))
+            continue;
+        if (line.trim(u" "_S).empty())
+            continue;
+        auto [pat, rep] = bind_array<2>(line.split(u" -> "_S));
+
+        auto terminating = false;
+        if (rep.starts_with(u"."_S)) {
+            rep = rep[range_ei(1)];
+            terminating = true;
+        }
+
+        result.append(Rule(pat, rep, terminating));
+    }
+    return result;
+}
+
+template <typename T1, typename T2> auto _apply_(const T1 &text, const T2 &rules)
+{
+    auto result = text;
+    auto changed = true;
+
+    while (changed == true) {
+        changed = false;
+        for (auto &&rule : rules)
+            if (in(rule.pattern, result)) {
+                result = result.replace(rule.pattern, rule.replacement);
+                if (rule.terminating)
+                    return result;
+                changed = true;
+                break;
+            }
+    }
+
+    return result;
+}
+
+auto SampleTexts = create_array({u"I bought a B of As from T S."_S, u"I bought a B of As from T S."_S, u"I bought a B of As W my Bgage from T S."_S, u"_1111*11111_"_S, u"000000A000000"_S});
+
+auto RuleSets = create_array({uR"(# This rules file is extracted from Wikipedia:
+# http://en.wikipedia.org/wiki/Markov_Algorithm
+A -> apple
+B -> bag
+S -> shop
+T -> the
+the shop -> my brother
+a never used -> .terminating rule)"_S, uR"(# Slightly modified from the rules on Wikipedia
+A -> apple
+B -> bag
+S -> .shop
+T -> the
+the shop -> my brother
+a never used -> .terminating rule)"_S, uR"(# BNF Syntax testing rules
+A -> apple
+WWWW -> with
+Bgage -> ->.*
+B -> bag
+->.* -> money
+W -> WW
+S -> .shop
+T -> the
+the shop -> my brother
+a never used -> .terminating rule)"_S, uR"(### Unary Multiplication Engine, for testing Markov Algorithm implementations
+### By Donal Fellows.
+# Unary addition engine
+_+1 -> _1+
+1+1 -> 11+
+# Pass for converting from the splitting of multiplication into ordinary
+# addition
+1! -> !1
+,! -> !+
+_! -> _
+# Unary multiplication by duplicating left side, right side times
+1*1 -> x,@y
+1x -> xX
+X, -> 1,1
+X1 -> 1X
+_x -> _X
+,x -> ,X
+y1 -> 1y
+y_ -> _
+# Next phase of applying
+1@1 -> x,@y
+1@_ -> @_
+,@_ -> !_
+++ -> +
+# Termination cleanup for addition
+_1 -> 1
+1+_ -> 1
+_+_ -> )"_S, uR"(# Turing machine: three-state busy beaver
+#
+# state A, symbol 0 => write 1, move right, new state B
+A0 -> 1B
+# state A, symbol 1 => write 1, move left, new state C
+0A1 -> C01
+1A1 -> C11
+# state B, symbol 0 => write 1, move left, new state A
+0B0 -> A01
+1B0 -> A11
+# state B, symbol 1 => write 1, move right, new state B
+B1 -> 1B
+# state C, symbol 0 => write 1, move left, new state B
+0C0 -> B01
+1C0 -> B11
+# state C, symbol 1 => write 1, move left, halt
+0C1 -> H01
+1C1 -> H11)"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {int Lindex = 0;
+
+        for (auto &&ruleset : RuleSets) {
+            auto n = Lindex;
+            auto rules = parse(ruleset);
+            print(_apply_(SampleTexts[n], rules));
+            Lindex++;
+        }}
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Execute_CopyPasta_Language#Python
+import sys
+
+if __name__ == '__main__':
+    # get a filename from the command line and read the file in
+    source = open(sys.argv[1]).read()
+
+    # convert the source to lines of code
+    lines = source.split("\n")
+
+    # a variable to represent the 'clipboard'
+    clipboard = ""
+
+    # loop over the lines that were read
+    loc = 0
+    while loc < len(lines):
+        # check which command is on this line
+        command = lines[loc].strip(' ')
+
+        try:
+            if(command == "Copy"):
+                clipboard += lines[loc + 1]
+            elif(command == "CopyFile"):
+                if(lines[loc + 1] == "TheF*ckingCode"):
+                    clipboard += source
+                else:
+                    filetext = open(lines[loc+1]).read()
+                    clipboard += filetext
+            elif(command == "Duplicate"):
+                clipboard += clipboard * ((int(lines[loc + 1])) - 1)
+            elif(command == "Pasta!"):
+                print(clipboard)
+                break
+            else:
+                sys.exit("unknown command '" + command + "' encountered on line " + str(loc + 1))
+        except:
+            sys.exit("error while executing command '" + command + "' on line " + str(loc + 1))
+
+        # increment past the command and the next line
+        loc += 2
+===
+:start:
+V source = File(:argv[1]).read()
+
+V lines = source.split("\n")
+
+V clipboard = ‘’
+
+V loc = 0
+L loc < lines.len
+   V command = lines[loc].trim(‘ ’)
+
+   X.try
+      I (command == ‘Copy’)
+         clipboard ‘’= lines[loc + 1]
+      E I (command == ‘CopyFile’)
+         I (lines[loc + 1] == ‘TheF*ckingCode’)
+            clipboard ‘’= source
+         E
+            V filetext = File(lines[loc + 1]).read()
+            clipboard ‘’= filetext
+      E I (command == ‘Duplicate’)
+         clipboard ‘’= clipboard * ((Int(lines[loc + 1])) - 1)
+      E I (command == ‘Pasta!’)
+         print(clipboard)
+         L.break
+      E
+         exit(‘unknown command '’command‘' encountered on line ’String(loc + 1))
+   X.catch
+      exit(‘error while executing command '’command‘' on line ’String(loc + 1))
+
+   loc += 2
+===
+Array<String> argv;
+
+int MAIN_WITH_ARGV()
+{
+    INIT_ARGV();
+
+    auto source = File(_get<1>(::argv)).read();
+
+    auto lines = source.split(u"\n"_S);
+
+    auto clipboard = u""_S;
+
+    auto loc = 0;
+    while (loc < lines.len()) {
+        auto command = lines[loc].trim(u" "_S);
+
+        try
+        {
+            if ((command == u"Copy"))
+                clipboard &= lines[loc + 1];
+            else if ((command == u"CopyFile")) {
+                if ((lines[loc + 1] == u"TheF*ckingCode"))
+                    clipboard &= source;
+                else {
+                    auto filetext = File(lines[loc + 1]).read();
+                    clipboard &= filetext;
+                }
+            }
+            else if ((command == u"Duplicate"))
+                clipboard &= clipboard * ((to_int(lines[loc + 1])) - 1);
+            else if ((command == u"Pasta!")) {
+                print(clipboard);
+                break;
+            }
+            else
+                exit(u"unknown command '"_S & command & u"' encountered on line "_S & String(loc + 1));
+        }
+        catch (...)
+        {
+            exit(u"error while executing command '"_S & command & u"' on line "_S & String(loc + 1));
+        }
+
+        loc += 2;
+    }
+}
+
+
+# https://www.rosettacode.org/wiki/Execute_HQ9%2B#Python
+from typing import Dict, Callable
+Char = str
+import sys
+
+def hello():
+    print("Hello, world!")
+
+src : str
+def quine():
+    print(src)
+
+def bottles():
+    for i in range(99,2,-1):
+        print("%d bottles of beer on the wall" % i)
+        print("%d bottles of beer" % i)
+        print("Take one down, pass it around")
+        print("%d bottles of beer on the wall" % (i-1))
+        print()
+
+    print("2 bottles of beer on the wall")
+    print("2 bottles of beer")
+    print("Take one down, pass it around")
+    print("1 bottle of beer on the wall")
+    print()
+
+    print("1 bottle of beer on the wall")
+    print("1 bottle of beer")
+    print("Take one down, pass it around")
+    print("No more bottles of beer on the wall")
+    print()
+
+    print("No more bottles of beer on the wall")
+    print("No more bottles of beer on the wall")
+    print("Go to the store and buy some more")
+    print("99 bottles of beer on the wall.")
+    print()
+
+acc = 0
+def incr():
+    acc +=1
+
+if __name__ == '__main__':
+    src = open(sys.argv[1]).read()
+
+    # Implement interpreter using a dispatch table
+    dispatch : Dict[Char, Callable[[], None]] = {}
+    dispatch[Char('h')] = hello
+    dispatch[Char('q')] = quine
+    dispatch[Char('9')] = bottles
+    dispatch[Char('+')] = incr
+
+    for i in src.lower():
+        if i in dispatch:
+            dispatch[i]()
+===
+F hello()
+   print(‘Hello, world!’)
+
+String src
+F quine()
+   print(:src)
+
+F bottles()
+   L(i) (99.<2).step(-1)
+      print(‘#. bottles of beer on the wall’.format(i))
+      print(‘#. bottles of beer’.format(i))
+      print(‘Take one down, pass it around’)
+      print(‘#. bottles of beer on the wall’.format(i - 1))
+      print()
+
+   print(‘2 bottles of beer on the wall’)
+   print(‘2 bottles of beer’)
+   print(‘Take one down, pass it around’)
+   print(‘1 bottle of beer on the wall’)
+   print()
+
+   print(‘1 bottle of beer on the wall’)
+   print(‘1 bottle of beer’)
+   print(‘Take one down, pass it around’)
+   print(‘No more bottles of beer on the wall’)
+   print()
+
+   print(‘No more bottles of beer on the wall’)
+   print(‘No more bottles of beer on the wall’)
+   print(‘Go to the store and buy some more’)
+   print(‘99 bottles of beer on the wall.’)
+   print()
+
+V acc = 0
+F incr()
+   :acc++
+
+:start:
+src = File(:argv[1]).read()
+
+[Char = (() -> N)] dispatch
+dispatch[Char(‘h’)] = hello
+dispatch[Char(‘q’)] = quine
+dispatch[Char(‘9’)] = bottles
+dispatch[Char(‘+’)] = incr
+
+L(i) src.lowercase()
+   I i C dispatch
+      dispatch[i]()
+===
+Array<String> argv;
+
+auto hello()
+{
+    print(u"Hello, world!"_S);
+}
+
+String src;
+auto quine()
+{
+    print(::src);
+}
+
+auto bottles()
+{
+    for (auto i : range_el(99, 2).step(-1)) {
+        print(u"#. bottles of beer on the wall"_S.format(i));
+        print(u"#. bottles of beer"_S.format(i));
+        print(u"Take one down, pass it around"_S);
+        print(u"#. bottles of beer on the wall"_S.format(i - 1));
+        print();
+    }
+
+    print(u"2 bottles of beer on the wall"_S);
+    print(u"2 bottles of beer"_S);
+    print(u"Take one down, pass it around"_S);
+    print(u"1 bottle of beer on the wall"_S);
+    print();
+
+    print(u"1 bottle of beer on the wall"_S);
+    print(u"1 bottle of beer"_S);
+    print(u"Take one down, pass it around"_S);
+    print(u"No more bottles of beer on the wall"_S);
+    print();
+
+    print(u"No more bottles of beer on the wall"_S);
+    print(u"No more bottles of beer on the wall"_S);
+    print(u"Go to the store and buy some more"_S);
+    print(u"99 bottles of beer on the wall."_S);
+    print();
+}
+
+auto acc = 0;
+auto incr()
+{
+    ::acc++;
+}
+
+int MAIN_WITH_ARGV()
+{
+    INIT_ARGV();
+
+    src = File(_get<1>(::argv)).read();
+
+    Dict<Char, std::function<void()>> dispatch;
+    dispatch.set(u'h'_C, hello);
+    dispatch.set(u'q'_C, quine);
+    dispatch.set(u'9'_C, bottles);
+    dispatch.set(u'+'_C, incr);
+
+    for (auto &&i : src.lowercase())
+        if (in(i, dispatch))
+            dispatch[i]();
+}
+
+
+# https://www.rosettacode.org/wiki/Exponentiation_operator#JavaScript
+def my_pow(base, exp) -> float:
+    if exp < 0:
+        return 1 / my_pow(base, -exp)
+    if exp == 0:
+        return 1
+    ans = base
+    for i in range(exp - 1):
+        ans *= base
+    return ans
+
+print("2  ^ 3   =", my_pow( 2,   3))
+print("1  ^ -10 =", my_pow( 1, -10))
+print("-1 ^ -3  =", my_pow(-1, -3))
+print()
+print("2.0 ^ -3 =", my_pow(2.0, -3))
+print("1.5 ^ 0  =", my_pow(1.5,  0))
+print("4.5 ^ 2  =", my_pow(4.5,  2))
+===
+F my_pow(base, exp) -> Float
+   I exp < 0
+      R 1 / my_pow(base, -exp)
+   I exp == 0
+      R 1
+   V ans = base
+   L(i) 0 .< exp - 1
+      ans *= base
+   R ans
+
+print(‘2  ^ 3   = ’my_pow(2, 3))
+print(‘1  ^ -10 = ’my_pow(1, -10))
+print(‘-1 ^ -3  = ’my_pow(-1, -3))
+print()
+print(‘2.0 ^ -3 = ’my_pow(2.0, -3))
+print(‘1.5 ^ 0  = ’my_pow(1.5, 0))
+print(‘4.5 ^ 2  = ’my_pow(4.5, 2))
+===
+template <typename T1, typename T2> double my_pow(const T1 &base, const T2 &exp)
+{
+    if (exp < 0)
+        return 1.0 / my_pow(base, -exp);
+    if (exp == 0)
+        return 1;
+    auto ans = base;
+    for (auto i : range_el(0, exp - 1))
+        ans *= base;
+    return ans;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"2  ^ 3   = "_S & my_pow(2, 3));
+        print(u"1  ^ -10 = "_S & my_pow(1, -10));
+        print(u"-1 ^ -3  = "_S & my_pow(-1, -3));
+        print();
+        print(u"2.0 ^ -3 = "_S & my_pow(2.0, -3));
+        print(u"1.5 ^ 0  = "_S & my_pow(1.5, 0));
+        print(u"4.5 ^ 2  = "_S & my_pow(4.5, 2));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Extra_primes
+limit = 10_000
+
+is_prime = [False] * 2 + [True] * (limit - 1)
+for n in range(int(limit**0.5 + 1.5)): # stop at ``sqrt(limit)``
+    if is_prime[n]:
+        for i in range(n*n, limit+1, n):
+            is_prime[i] = False
+
+def is_extra_prime(n):
+    if not is_prime[n]:
+        return False
+    s = 0
+    for digit_char in str(n):
+        digit = int(digit_char)
+        if not is_prime[digit]:
+            return False
+        s += digit
+    return bool(is_prime[s])
+
+i = 0
+for n in range(limit):
+    if is_extra_prime(n):
+        i += 1
+        print('%4d' % n, end = "\n" if i % 9 == 0 else ' ')
+===
+V limit = 10'000
+
+V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
+L(n) 0 .< Int(limit ^ 0.5 + 1.5)
+   I is_prime[n]
+      L(i) (n * n .< limit + 1).step(n)
+         is_prime[i] = 0B
+
+F is_extra_prime(n)
+   I !:is_prime[n]
+      R 0B
+   V s = 0
+   L(digit_char) String(n)
+      V digit = Int(digit_char)
+      I !:is_prime[digit]
+         R 0B
+      s += digit
+   R Bool(:is_prime[s])
+
+V i = 0
+L(n) 0 .< limit
+   I is_extra_prime(n)
+      i++
+      print(‘#4’.format(n), end' I i % 9 == 0 {"\n"} E ‘ ’)
+===
+auto limit = 10'000;
+
+auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
+            if (is_prime[n])
+                for (auto i : range_el(n * n, limit + 1).step(n))
+                    is_prime.set(i, false);
+    }
+} code_block_1;
+
+template <typename T1> auto is_extra_prime(const T1 &n)
+{
+    if (!::is_prime[n])
+        return false;
+    auto s = 0;
+    for (auto &&digit_char : String(n)) {
+        auto digit = to_int(digit_char);
+        if (!::is_prime[digit])
+            return false;
+        s += digit;
+    }
+    return bool(::is_prime[s]);
+}
+
+auto i = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto n : range_el(0, limit))
+            if (is_extra_prime(n)) {
+                i++;
+                print(u"#4"_S.format(n), mod(i, 9) == 0 ? u"\n"_S : u" "_S);
+            }
+    }
+} code_block_2;
