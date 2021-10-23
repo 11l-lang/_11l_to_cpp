@@ -277,3 +277,885 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Faces_from_a_mesh#Python
+def perim_equal(p1, p2):
+    # Cheap tests first
+    if len(p1) != len(p2) or set(p1) != set(p2):
+        return False
+    if any(p2 == (p1[n:] + p1[:n]) for n in range(len(p1))):
+        return True
+    p2 = p2[::-1] # not inplace
+    return any(p2 == (p1[n:] + p1[:n]) for n in range(len(p1)))
+
+def edge_to_periphery(e):
+    edges = sorted(e)
+    p : List[int] = []
+    if len(edges):
+        p = [edges[0][0], edges[0][1]]
+        edges.pop(0)
+    last = p[-1] if len(p) else -1
+    while len(edges):
+        for n, ij in enumerate(edges):
+            (i, j) = ij
+            if i == last:
+                p.append(j)
+                last = j
+                edges.pop(n)
+                break
+            elif j == last:
+                p.append(i)
+                last = i
+                edges.pop(n)
+                break
+        else:
+            #raise ValueError(f'Invalid edge format: {e}')
+            return ">>>Error! Invalid edge format<<<"
+    return str(p[:-1])
+
+print('Perimeter format equality checks:')
+for eq_check in [
+        ( 'Q', [8, 1, 3],
+          'R', [1, 3, 8]),
+        ( 'U', [18, 8, 14, 10, 12, 17, 19],
+          'V', [8, 14, 10, 12, 17, 19, 18]) ]:
+    (n1, p1, n2, p2) = eq_check
+    eq = '==' if perim_equal(p1, p2) else '!='
+    print(' ', n1, eq, n2)
+
+print("\nEdge to perimeter format translations:")
+edge_d = {
+ 'E': [(1, 11), (7, 11), (1, 7)],
+ 'F': [(11, 23), (1, 17), (17, 23), (1, 11)],
+ 'G': [(8, 14), (17, 19), (10, 12), (10, 14), (12, 17), (8, 18), (18, 19)],
+ 'H': [(1, 3), (9, 11), (3, 11), (1, 11)]
+        }
+for name, edges in edge_d.items():
+    print('  ' + name + ': ' + str(edges) + "\n     -> " + edge_to_periphery(edges))
+===
+F perim_equal(p1, =p2)
+   I p1.len != p2.len | Set(p1) != Set(p2)
+      R 0B
+   I any((0 .< p1.len).map(n -> @p2 == (@p1[n ..] + @p1[0 .< n])))
+      R 1B
+   p2 = reversed(p2)
+   R any((0 .< p1.len).map(n -> @p2 == (@p1[n ..] + @p1[0 .< n])))
+
+F edge_to_periphery(e)
+   V edges = sorted(e)
+   [Int] p
+   I !edges.empty
+      p = [edges[0][0], edges[0][1]]
+      edges.pop(0)
+   V last = I !p.empty {p.last} E -1
+   L !edges.empty
+      L(ij) edges
+         V n = L.index
+         V (i, j) = ij
+         I i == last
+            p.append(j)
+            last = j
+            edges.pop(n)
+            L.break
+         E I j == last
+            p.append(i)
+            last = i
+            edges.pop(n)
+            L.break
+      L.was_no_break
+         R ‘>>>Error! Invalid edge format<<<’
+   R String(p[0 .< (len)-1])
+
+print(‘Perimeter format equality checks:’)
+L(eq_check) [(‘Q’, [8, 1, 3], ‘R’, [1, 3, 8]), (‘U’, [18, 8, 14, 10, 12, 17, 19], ‘V’, [8, 14, 10, 12, 17, 19, 18])]
+   V (n1, p1, n2, p2) = eq_check
+   V eq = I perim_equal(p1, p2) {‘==’} E ‘!=’
+   print(‘  ’n1‘ ’eq‘ ’n2)
+
+print("\nEdge to perimeter format translations:")
+V edge_d = [‘E’ = [(1, 11), (7, 11), (1, 7)], ‘F’ = [(11, 23), (1, 17), (17, 23), (1, 11)], ‘G’ = [(8, 14), (17, 19), (10, 12), (10, 14), (12, 17), (8, 18), (18, 19)], ‘H’ = [(1, 3), (9, 11), (3, 11), (1, 11)]]
+L(name, edges) edge_d
+   print(‘  ’name‘: ’String(edges)"\n     -> "edge_to_periphery(edges))
+===
+template <typename T1, typename T2> auto perim_equal(const T1 &p1, T2 p2)
+{
+    if (p1.len() != p2.len() || create_set(p1) != create_set(p2))
+        return false;
+    if (any_map(range_el(0, p1.len()), [&p1, &p2](const auto &n){return p2 == (p1[range_ei(n)] + p1[range_el(0, n)]);}))
+        return true;
+    p2 = reversed(p2);
+    return any_map(range_el(0, p1.len()), [&p1, &p2](const auto &n){return p2 == (p1[range_ei(n)] + p1[range_el(0, n)]);});
+}
+
+template <typename T1> auto edge_to_periphery(const T1 &e)
+{
+    auto edges = sorted(e);
+    Array<int> p;
+    if (!edges.empty()) {
+        p = create_array({_get<0>(_get<0>(edges)), _get<1>(_get<0>(edges))});
+        edges.pop(0);
+    }
+    auto last = !p.empty() ? p.last() : -1;
+    while (!edges.empty()) {
+        {int Lindex = 0;
+        for (auto &&ij : edges) {
+            auto n = Lindex;
+            auto [i, j] = ij;
+            if (i == last) {
+                p.append(j);
+                last = j;
+                edges.pop(n);
+                goto break_;
+            }
+            else if (j == last) {
+                p.append(i);
+                last = i;
+                edges.pop(n);
+                goto break_;
+            }
+            Lindex++;
+        }}
+        return u">>>Error! Invalid edge format<<<"_S;
+        break_:;
+    }
+    return String(p[range_e_llen(0,  - 1)]);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Perimeter format equality checks:"_S);
+        for (auto &&eq_check : create_array({make_tuple(u"Q"_S, create_array({8, 1, 3}), u"R"_S, create_array({1, 3, 8})), make_tuple(u"U"_S, create_array({18, 8, 14, 10, 12, 17, 19}), u"V"_S, create_array({8, 14, 10, 12, 17, 19, 18}))})) {
+            auto [n1, p1, n2, p2] = eq_check;
+            auto eq = perim_equal(p1, p2) ? u"=="_S : u"!="_S;
+            print(u"  "_S & n1 & u" "_S & eq & u" "_S & n2);
+        }
+
+        print(u"\nEdge to perimeter format translations:"_S);
+    }
+} code_block_1;
+
+auto edge_d = create_dict(dict_of(u'E'_C, create_array({make_tuple(1, 11), make_tuple(7, 11), make_tuple(1, 7)}))(u'F'_C, create_array({make_tuple(11, 23), make_tuple(1, 17), make_tuple(17, 23), make_tuple(1, 11)}))(u'G'_C, create_array({make_tuple(8, 14), make_tuple(17, 19), make_tuple(10, 12), make_tuple(10, 14), make_tuple(12, 17), make_tuple(8, 18), make_tuple(18, 19)}))(u'H'_C, create_array({make_tuple(1, 3), make_tuple(9, 11), make_tuple(3, 11), make_tuple(1, 11)})));
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&[name, edges] : edge_d)
+            print(u"  "_S & name & u": "_S & String(edges) & u"\n     -> "_S & edge_to_periphery(edges));
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Factorions#Python
+fact = [1] # cache factorials from 0 to 11
+for n in range(1, 12):
+    fact.append(fact[n-1] * n)
+
+for b in range(9, 12+1):
+    print('The factorions for base', b, 'are:')
+    for i in range(1, 1_500_000):
+        fact_sum = 0
+        j = i
+        while j > 0:
+            d = j % b
+            fact_sum += fact[d]
+            j = j//b
+        if fact_sum == i:
+            print(i, end=" ")
+    print()
+===
+V fact = [1]
+L(n) 1..11
+   fact.append(fact[n - 1] * n)
+
+L(b) 9 .. 12
+   print(‘The factorions for base ’b‘ are:’)
+   L(i) 1..1499999
+      V fact_sum = 0
+      V j = i
+      L j > 0
+         V d = j % b
+         fact_sum += fact[d]
+         j = j I/ b
+      I fact_sum == i
+         print(i, end' ‘ ’)
+   print()
+===
+auto fact = create_array({1});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(1, 11))
+            fact.append(fact[n - 1] * n);
+
+        for (auto b : range_ee(9, 12)) {
+            print(u"The factorions for base "_S & b & u" are:"_S);
+            for (auto i : range_ee(1, 1499999)) {
+                auto fact_sum = 0;
+                auto j = i;
+                while (j > 0) {
+                    auto d = mod(j, b);
+                    fact_sum += fact[d];
+                    j = idiv(j, b);
+                }
+                if (fact_sum == i)
+                    print(i, u" "_S);
+            }
+            print();
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Factors_of_a_Mersenne_number#Python
+import math
+BigInt = int
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+def m_factor(p):
+    max_k = 16384 // p # arbitrary limit; since Python automatically uses long's, it doesn't overflow
+    for k in range(max_k):
+        q = 2*p*k + 1
+        if not is_prime(q):
+            continue
+        elif q % 8 != 1 and q % 8 != 7:
+            continue
+        elif pow(BigInt(2), p, q) == 1:
+            return q
+    return 0
+
+exponent = int(input("Enter exponent of Mersenne number: "))
+if not is_prime(exponent):
+    print("Exponent is not prime: %d" % exponent)
+else:
+    factor = m_factor(exponent)
+    if factor == 0:
+        print("No factor found for M%d" % exponent)
+    else:
+        print("M%d has a factor: %d" % (exponent, factor))
+===
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .< Int(sqrt(a)) + 1).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+F m_factor(p)
+   V max_k = 16384 I/ p
+   L(k) 0 .< max_k
+      V q = 2 * p * k + 1
+      I !is_prime(q)
+         L.continue
+      E I q % 8 != 1 & q % 8 != 7
+         L.continue
+      E I pow(BigInt(2), p, q) == 1
+         R q
+   R 0
+
+V exponent = Int(input(‘Enter exponent of Mersenne number: ’))
+I !is_prime(exponent)
+   print(‘Exponent is not prime: #.’.format(exponent))
+E
+   V factor = m_factor(exponent)
+   I factor == 0
+      print(‘No factor found for M#.’.format(exponent))
+   E
+      print(‘M#. has a factor: #.’.format(exponent, factor))
+===
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_el(3, to_int(sqrt(a)) + 1).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+template <typename T1> auto m_factor(const T1 &p)
+{
+    auto max_k = idiv(16384, p);
+    for (auto k : range_el(0, max_k)) {
+        auto q = 2 * p * k + 1;
+        if (!is_prime(q))
+            continue;
+        else if (mod(q, 8) != 1 && mod(q, 8) != 7)
+            continue;
+        else if (pow(BigInt(2), p, q) == 1)
+            return q;
+    }
+    return 0;
+}
+
+auto exponent = to_int(input(u"Enter exponent of Mersenne number: "_S));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        if (!is_prime(exponent))
+            print(u"Exponent is not prime: #."_S.format(exponent));
+        else {
+            auto factor = m_factor(exponent);
+            if (factor == 0)
+                print(u"No factor found for M#."_S.format(exponent));
+            else
+                print(u"M#. has a factor: #."_S.format(exponent, factor));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Fairshare_between_two_and_more#Python
+import itertools
+
+def _basechange_int(num, b):
+    """
+    Return list of ints representing positive num in base b
+    """
+    if num == 0:
+        return [0]
+    result : List[int] = []
+    while num != 0:
+        (num, d) = divmod(num, b)
+        result.append(d)
+    return result[::-1]
+
+def fairshare(b, n):
+    r : List[int] = []
+    for i in itertools.count(0):
+        r += [sum(_basechange_int(i, b)) % b]
+        if len(r) == n:
+            break
+    return r
+
+for b in (2, 3, 5, 11):
+    print('{:>2}'.format(b) + ': ' + str(fairshare(b, 25))[1:-1])
+===
+F _basechange_int(=num, b)
+   ‘
+    Return list of ints representing positive num in base b
+    ’
+   I num == 0
+      R [0]
+   [Int] result
+   L num != 0
+      (num, V d) = divmod(num, b)
+      result.append(d)
+   R reversed(result)
+
+F fairshare(b, n)
+   [Int] r
+   L(i) 0..
+      r [+]= sum(_basechange_int(i, b)) % b
+      I r.len == n
+         L.break
+   R r
+
+L(b) (2, 3, 5, 11)
+   print(‘#2’.format(b)‘: ’String(fairshare(b, 25))[1 .< (len)-1])
+===
+template <typename T1, typename T2> auto _basechange_int(T1 num, const T2 &b)
+{
+    uR"(
+    Return list of ints representing positive num in base b
+    )"_S;
+    if (num == 0)
+        return create_array({0});
+    Array<int> result;
+    while (num != 0) {
+        TUPLE_ELEMENT_T(1, divmod(num, b)) d;
+        assign_from_tuple(num, d, divmod(num, b));
+        result.append(d);
+    }
+    return reversed(result);
+}
+
+template <typename T1, typename T2> auto fairshare(const T1 &b, const T2 &n)
+{
+    Array<int> r;
+    for (auto i : range_ei(0)) {
+        r.append(mod(sum(_basechange_int(i, b)), b));
+        if (r.len() == n)
+            break;
+    }
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&b : make_tuple(2, 3, 5, 11))
+            print(u"#2"_S.format(b) & u": "_S & String(fairshare(b, 25))[range_e_llen(1,  - 1)]);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/FASTA_format#Python
+FASTA=\
+'''>Rosetta_Example_1
+THERECANBENOSPACE
+>Rosetta_Example_2
+THERECANBESEVERAL
+LINESBUTTHEYALLMUST
+BECONCATENATED'''
+
+def fasta_parse(infile_str):
+    key = ''
+    val = ''
+    r : List[Tuple[str, str]] = []
+    for line in infile_str.split("\n"):
+        if line.startswith('>'):
+            if key != '':
+                r += [(key, val)]
+            key = line[1:].split()[0]
+            val = ''
+        elif key != '':
+            val += line
+    if key != '':
+        r += [(key, val)]
+    return r
+
+print("\n".join('%s: %s' % (key, val) for key, val in fasta_parse(FASTA)))
+===
+V FASTA = ‘>Rosetta_Example_1
+THERECANBENOSPACE
+>Rosetta_Example_2
+THERECANBESEVERAL
+LINESBUTTHEYALLMUST
+BECONCATENATED’
+
+F fasta_parse(infile_str)
+   V key = ‘’
+   V val = ‘’
+   [(String, String)] r
+   L(line) infile_str.split("\n")
+      I line.starts_with(‘>’)
+         I key != ‘’
+            r [+]= (key, val)
+         key = line[1..].split_py()[0]
+         val = ‘’
+      E I key != ‘’
+         val ‘’= line
+   I key != ‘’
+      r [+]= (key, val)
+   R r
+
+print(fasta_parse(FASTA).map((key, val) -> ‘#.: #.’.format(key, val)).join("\n"))
+===
+auto FASTA = uR"(>Rosetta_Example_1
+THERECANBENOSPACE
+>Rosetta_Example_2
+THERECANBESEVERAL
+LINESBUTTHEYALLMUST
+BECONCATENATED)"_S;
+
+template <typename T1> auto fasta_parse(const T1 &infile_str)
+{
+    auto key = u""_S;
+    auto val = u""_S;
+    Array<Tuple<String, String>> r;
+    for (auto &&line : infile_str.split(u"\n"_S))
+        if (line.starts_with(u">"_S)) {
+            if (key != u"")
+                r.append(make_tuple(key, val));
+            key = _get<0>(line[range_ei(1)].split_py());
+            val = u""_S;
+        }
+        else if (key != u"")
+            val &= line;
+    if (key != u"")
+        r.append(make_tuple(key, val));
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(fasta_parse(FASTA).map([](const auto &key, const auto &val){return u"#.: #."_S.format(key, val);}).join(u"\n"_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Find_if_a_point_is_within_a_triangle#Kotlin
+from typing import NamedTuple
+
+EPS = 0.001
+EPS_SQUARE = EPS * EPS
+
+class Point(NamedTuple):
+    x : float
+    y : float
+
+    def __str__(self):
+        return '(' + str(self.x) + ', ' + str(self.y) + ')'
+
+def side(p1, p2, p):
+    return (p2.y - p1.y) * (p.x - p1.x) + (-p2.x + p1.x) * (p.y - p1.y)
+
+def distanceSquarePointToSegment(p1, p2, p):
+    p1P2SquareLength = (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y)
+    dotProduct = ((p.x - p1.x) * (p2.x - p1.x) + (p.y - p1.y) * (p2.y - p1.y)) / p1P2SquareLength
+    if dotProduct < 0:
+        return (p.x - p1.x) * (p.x - p1.x) + (p.y - p1.y) * (p.y - p1.y)
+    if dotProduct <= 1:
+        pP1SquareLength = (p1.x - p.x) * (p1.x - p.x) + (p1.y - p.y) * (p1.y - p.y)
+        return pP1SquareLength - dotProduct * dotProduct * p1P2SquareLength
+    return (p.x - p2.x) * (p.x - p2.x) + (p.y - p2.y) * (p.y - p2.y)
+
+class Triangle(NamedTuple):
+    p1 : Point
+    p2 : Point
+    p3 : Point
+
+    def __str__(self):
+        return 'Triangle[' + str(self.p1) + ', ' + str(self.p2) + ', ' + str(self.p3) +']'
+
+    def pointInTriangleBoundingBox(self, p): # const
+        xMin = min(self.p1.x, min(self.p2.x, self.p3.x)) - EPS
+        xMax = max(self.p1.x, max(self.p2.x, self.p3.x)) + EPS
+        yMin = min(self.p1.y, min(self.p2.y, self.p3.y)) - EPS
+        yMax = max(self.p1.y, max(self.p2.y, self.p3.y)) + EPS
+        return not (p.x < xMin or xMax < p.x or p.y < yMin or yMax < p.y)
+
+    def nativePointInTriangle(self, p): # const
+        checkSide1 = side(self.p1, self.p2, p) >= 0
+        checkSide2 = side(self.p2, self.p3, p) >= 0
+        checkSide3 = side(self.p3, self.p1, p) >= 0
+        return checkSide1 and checkSide2 and checkSide3
+
+    def accuratePointInTriangle(self, p): # const
+        if not self.pointInTriangleBoundingBox(p):
+            return False
+        if self.nativePointInTriangle(p):
+            return True
+        if distanceSquarePointToSegment(self.p1, self.p2, p) <= EPS_SQUARE:
+            return True
+        if distanceSquarePointToSegment(self.p2, self.p3, p) <= EPS_SQUARE:
+            return True
+        return distanceSquarePointToSegment(self.p3, self.p1, p) <= EPS_SQUARE
+
+def test(t, p):
+    print(t)
+    print('Point', p, 'is within triangle ?', 'true' if t.accuratePointInTriangle(p) else 'false')
+
+p1 = Point(1.5, 2.4)
+p2 = Point(5.1, -3.1)
+p3 = Point(-3.8, 1.2)
+tri = Triangle(p1, p2, p3)
+test(tri, Point(0.0, 0.0))
+test(tri, Point(0.0, 1.0))
+test(tri, Point(3.0, 1.0))
+print()
+p1 = Point(1.0 / 10, 1.0 / 9)
+p2 = Point(100.0 / 8, 100.0 / 3)
+p3 = Point(100.0 / 4, 100.0 / 9)
+tri = Triangle(p1, p2, p3)
+pt = Point(p1.x + 3.0 / 7 * (p2.x - p1.x), p1.y + 3.0 / 7 * (p2.y - p1.y))
+test(tri, pt)
+print()
+p3 = Point(-100.0 / 8, 100.0 / 6)
+tri = Triangle(p1, p2, p3)
+test(tri, pt)
+===
+V EPS = 0.001
+V EPS_SQUARE = EPS * EPS
+
+T Point
+   Float x
+   Float y
+
+   F String()
+      R ‘(’String(.x)‘, ’String(.y)‘)’
+   F (x, y)
+      .x = x
+      .y = y
+
+F side(p1, p2, p)
+   R (p2.y - p1.y) * (p.x - p1.x) + (-p2.x + p1.x) * (p.y - p1.y)
+
+F distanceSquarePointToSegment(p1, p2, p)
+   V p1P2SquareLength = (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y)
+   V dotProduct = ((p.x - p1.x) * (p2.x - p1.x) + (p.y - p1.y) * (p2.y - p1.y)) / p1P2SquareLength
+   I dotProduct < 0
+      R (p.x - p1.x) * (p.x - p1.x) + (p.y - p1.y) * (p.y - p1.y)
+   I dotProduct <= 1
+      V pP1SquareLength = (p1.x - p.x) * (p1.x - p.x) + (p1.y - p.y) * (p1.y - p.y)
+      R pP1SquareLength - dotProduct * dotProduct * p1P2SquareLength
+   R (p.x - p2.x) * (p.x - p2.x) + (p.y - p2.y) * (p.y - p2.y)
+
+T Triangle
+   Point p1
+   Point p2
+   Point p3
+
+   F String()
+      R ‘Triangle[’String(.p1)‘, ’String(.p2)‘, ’String(.p3)‘]’
+
+   F.const pointInTriangleBoundingBox(p)
+      V xMin = min(.p1.x, min(.p2.x, .p3.x)) - :EPS
+      V xMax = max(.p1.x, max(.p2.x, .p3.x)) + :EPS
+      V yMin = min(.p1.y, min(.p2.y, .p3.y)) - :EPS
+      V yMax = max(.p1.y, max(.p2.y, .p3.y)) + :EPS
+      R !(p.x < xMin | xMax < p.x | p.y < yMin | yMax < p.y)
+
+   F.const nativePointInTriangle(p)
+      V checkSide1 = side(.p1, .p2, p) >= 0
+      V checkSide2 = side(.p2, .p3, p) >= 0
+      V checkSide3 = side(.p3, .p1, p) >= 0
+      R checkSide1 & checkSide2 & checkSide3
+
+   F.const accuratePointInTriangle(p)
+      I !.pointInTriangleBoundingBox(p)
+         R 0B
+      I .nativePointInTriangle(p)
+         R 1B
+      I distanceSquarePointToSegment(.p1, .p2, p) <= :EPS_SQUARE
+         R 1B
+      I distanceSquarePointToSegment(.p2, .p3, p) <= :EPS_SQUARE
+         R 1B
+      R distanceSquarePointToSegment(.p3, .p1, p) <= :EPS_SQUARE
+   F (p1, p2, p3)
+      .p1 = p1
+      .p2 = p2
+      .p3 = p3
+
+F test(t, p)
+   print(t)
+   print(‘Point ’p‘ is within triangle ? ’(I t.accuratePointInTriangle(p) {‘true’} E ‘false’))
+
+V p1 = Point(1.5, 2.4)
+V p2 = Point(5.1, -3.1)
+V p3 = Point(-3.8, 1.2)
+V tri = Triangle(p1, p2, p3)
+test(tri, Point(0.0, 0.0))
+test(tri, Point(0.0, 1.0))
+test(tri, Point(3.0, 1.0))
+print()
+p1 = Point(1.0 / 10, 1.0 / 9)
+p2 = Point(100.0 / 8, 100.0 / 3)
+p3 = Point(100.0 / 4, 100.0 / 9)
+tri = Triangle(p1, p2, p3)
+V pt = Point(p1.x + 3.0 / 7 * (p2.x - p1.x), p1.y + 3.0 / 7 * (p2.y - p1.y))
+test(tri, pt)
+print()
+p3 = Point(-100.0 / 8, 100.0 / 6)
+tri = Triangle(p1, p2, p3)
+test(tri, pt)
+===
+auto EPS = 0.001;
+auto EPS_SQUARE = EPS * EPS;
+
+class Point
+{
+public:
+    double x;
+    double y;
+
+    operator String() const
+    {
+        return u"("_S & String(x) & u", "_S & String(y) & u")"_S;
+    }
+    template <typename T1, typename T2> Point(const T1 &x, const T2 &y) :
+        x(x),
+        y(y)
+    {
+    }
+};
+
+template <typename T1, typename T2, typename T3> auto side(const T1 &p1, const T2 &p2, const T3 &p)
+{
+    return (p2.y - p1.y) * (p.x - p1.x) + (-p2.x + p1.x) * (p.y - p1.y);
+}
+
+template <typename T1, typename T2, typename T3> auto distanceSquarePointToSegment(const T1 &p1, const T2 &p2, const T3 &p)
+{
+    auto p1P2SquareLength = (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y);
+    auto dotProduct = ((p.x - p1.x) * (p2.x - p1.x) + (p.y - p1.y) * (p2.y - p1.y)) / p1P2SquareLength;
+    if (dotProduct < 0)
+        return (p.x - p1.x) * (p.x - p1.x) + (p.y - p1.y) * (p.y - p1.y);
+    if (dotProduct <= 1) {
+        auto pP1SquareLength = (p1.x - p.x) * (p1.x - p.x) + (p1.y - p.y) * (p1.y - p.y);
+        return pP1SquareLength - dotProduct * dotProduct * p1P2SquareLength;
+    }
+    return (p.x - p2.x) * (p.x - p2.x) + (p.y - p2.y) * (p.y - p2.y);
+}
+
+class Triangle
+{
+public:
+    Point p1;
+    Point p2;
+    Point p3;
+
+    operator String() const
+    {
+        return u"Triangle["_S & String(p1) & u", "_S & String(p2) & u", "_S & String(p3) & u"]"_S;
+    }
+
+    template <typename T1> auto pointInTriangleBoundingBox(const T1 &p) const
+    {
+        auto xMin = min(p1.x, min(p2.x, p3.x)) - ::EPS;
+        auto xMax = max(p1.x, max(p2.x, p3.x)) + ::EPS;
+        auto yMin = min(p1.y, min(p2.y, p3.y)) - ::EPS;
+        auto yMax = max(p1.y, max(p2.y, p3.y)) + ::EPS;
+        return !(p.x < xMin || xMax < p.x || p.y < yMin || yMax < p.y);
+    }
+
+    template <typename T1> auto nativePointInTriangle(const T1 &p) const
+    {
+        auto checkSide1 = side(p1, p2, p) >= 0;
+        auto checkSide2 = side(p2, p3, p) >= 0;
+        auto checkSide3 = side(p3, p1, p) >= 0;
+        return checkSide1 && checkSide2 && checkSide3;
+    }
+
+    template <typename T1> auto accuratePointInTriangle(const T1 &p) const
+    {
+        if (!pointInTriangleBoundingBox(p))
+            return false;
+        if (nativePointInTriangle(p))
+            return true;
+        if (distanceSquarePointToSegment(p1, p2, p) <= ::EPS_SQUARE)
+            return true;
+        if (distanceSquarePointToSegment(p2, p3, p) <= ::EPS_SQUARE)
+            return true;
+        return distanceSquarePointToSegment(p3, p1, p) <= ::EPS_SQUARE;
+    }
+    template <typename T1, typename T2, typename T3> Triangle(const T1 &p1, const T2 &p2, const T3 &p3) :
+        p1(p1),
+        p2(p2),
+        p3(p3)
+    {
+    }
+};
+
+template <typename T1, typename T2> auto test(const T1 &t, const T2 &p)
+{
+    print(t);
+    print(u"Point "_S & p & u" is within triangle ? "_S & (t.accuratePointInTriangle(p) ? u"true"_S : u"false"_S));
+}
+
+auto p1 = Point(1.5, 2.4);
+auto p2 = Point(5.1, -3.1);
+auto p3 = Point(-3.8, 1.2);
+auto tri = Triangle(p1, p2, p3);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        test(tri, Point(0.0, 0.0));
+        test(tri, Point(0.0, 1.0));
+        test(tri, Point(3.0, 1.0));
+        print();
+        p1 = Point(1.0 / 10.0, 1.0 / 9.0);
+        p2 = Point(100.0 / 8.0, 100.0 / 3.0);
+        p3 = Point(100.0 / 4.0, 100.0 / 9.0);
+        tri = Triangle(p1, p2, p3);
+    }
+} code_block_1;
+
+auto pt = Point(p1.x + 3.0 / 7.0 * (p2.x - p1.x), p1.y + 3.0 / 7.0 * (p2.y - p1.y));
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        test(tri, pt);
+        print();
+        p3 = Point(-100.0 / 8.0, 100.0 / 6.0);
+        tri = Triangle(p1, p2, p3);
+        test(tri, pt);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Find_the_intersection_of_two_lines#Python
+def line_intersect(Ax1, Ay1, Ax2, Ay2, Bx1, By1, Bx2, By2):
+    d = (By2 - By1) * (Ax2 - Ax1) - (Bx2 - Bx1) * (Ay2 - Ay1)
+    if d == 0:
+        return (float('inf'), float('inf'))
+
+    uA = ((Bx2 - Bx1) * (Ay1 - By1) - (By2 - By1) * (Ax1 - Bx1)) / d
+    uB = ((Ax2 - Ax1) * (Ay1 - By1) - (Ay2 - Ay1) * (Ax1 - Bx1)) / d
+
+    if not(0.0 <= uA <= 1.0 and 0.0 <= uB <= 1.0):
+        return (float('inf'), float('inf'))
+    x = Ax1 + uA * (Ax2 - Ax1)
+    y = Ay1 + uA * (Ay2 - Ay1)
+
+    return (x, y)
+
+(a, b, c, d) = (4.0, 0.0, 6.0, 10.0)  # try (4, 0), (6, 4)
+(e, f, g, h) = (0.0, 3.0, 10.0, 7.0)  # for non intersecting test
+pt = line_intersect(a, b, c, d, e, f, g, h)
+print(pt)
+===
+F line_intersect(Ax1, Ay1, Ax2, Ay2, Bx1, By1, Bx2, By2)
+   V d = (By2 - By1) * (Ax2 - Ax1) - (Bx2 - Bx1) * (Ay2 - Ay1)
+   I d == 0
+      R (Float.infinity, Float.infinity)
+
+   V uA = ((Bx2 - Bx1) * (Ay1 - By1) - (By2 - By1) * (Ax1 - Bx1)) / d
+   V uB = ((Ax2 - Ax1) * (Ay1 - By1) - (Ay2 - Ay1) * (Ax1 - Bx1)) / d
+
+   I !(uA C 0.0..1.0 & uB C 0.0..1.0)
+      R (Float.infinity, Float.infinity)
+   V x = Ax1 + uA * (Ax2 - Ax1)
+   V y = Ay1 + uA * (Ay2 - Ay1)
+
+   R (x, y)
+
+V (a, b, c, d) = (4.0, 0.0, 6.0, 10.0)
+V (e, f, g, h) = (0.0, 3.0, 10.0, 7.0)
+V pt = line_intersect(a, b, c, d, e, f, g, h)
+print(pt)
+===
+template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8> auto line_intersect(const T1 &Ax1, const T2 &Ay1, const T3 &Ax2, const T4 &Ay2, const T5 &Bx1, const T6 &By1, const T7 &Bx2, const T8 &By2)
+{
+    auto d = (By2 - By1) * (Ax2 - Ax1) - (Bx2 - Bx1) * (Ay2 - Ay1);
+    if (d == 0)
+        return make_tuple(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity());
+
+    auto uA = ((Bx2 - Bx1) * (Ay1 - By1) - (By2 - By1) * (Ax1 - Bx1)) / d;
+    auto uB = ((Ax2 - Ax1) * (Ay1 - By1) - (Ay2 - Ay1) * (Ax1 - Bx1)) / d;
+
+    if (!(in(uA, range_ee(0.0, 1.0)) && in(uB, range_ee(0.0, 1.0))))
+        return make_tuple(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity());
+    auto x = Ax1 + uA * (Ax2 - Ax1);
+    auto y = Ay1 + uA * (Ay2 - Ay1);
+
+    return make_tuple(x, y);
+}
+auto [a, b, c, d] = make_tuple(4.0, 0.0, 6.0, 10.0);
+auto [e, f, g, h] = make_tuple(0.0, 3.0, 10.0, 7.0);
+auto pt = line_intersect(a, b, c, d, e, f, g, h);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(pt);
+    }
+} code_block_1;
