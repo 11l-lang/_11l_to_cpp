@@ -1234,24 +1234,26 @@ class ASTTupleInitialization(ASTNodeWithExpression):
 
     def __init__(self):
         self.dest_vars = []
+        self.pre_nl = pre_nl()
 
     def to_str(self, indent):
         e = self.expression.to_str()
         if self.bind_array:
             e = 'bind_array<' + str(len(self.dest_vars)) + '>(' + e + ')'
-        return ' ' * (indent*4) + 'const '*self.is_const + 'auto [' + ', '.join(self.dest_vars) + '] = ' + e + ";\n"
+        return self.pre_nl + ' ' * (indent*4) + 'const '*self.is_const + 'auto [' + ', '.join(self.dest_vars) + '] = ' + e + ";\n"
 
 class ASTTupleAssignment(ASTNodeWithExpression):
     dest_vars : List[Tuple[str, bool]]
 
     def __init__(self):
         self.dest_vars = []
+        self.pre_nl = pre_nl()
 
     def is_multi_st(self):
         return any(b for s, b in self.dest_vars)
 
     def to_str(self, indent):
-        r = ''
+        r = self.pre_nl
         for i, dv in enumerate(self.dest_vars):
             if dv[1]:
                 r += ' ' * (indent*4) + 'TUPLE_ELEMENT_T(' + str(i) + ', ' + self.expression.to_str() + ') ' + dv[0] + ";\n"

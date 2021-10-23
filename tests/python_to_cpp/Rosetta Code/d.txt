@@ -1129,6 +1129,7 @@ template <typename T1, typename T2, typename T3> auto draw_sphere(const T1 &k, c
         auto y = i + 0.5;
         for (auto j : range_el(to_int(floor(pos.cx - 2 * pos.r)), to_int(ceil(pos.cx + 2 * pos.r) + 1))) {
             auto x = (j - pos.cx) / 2.0 + 0.5 + pos.cx;
+
             auto [h, zb1, zb2] = hit_sphere(pos, x, y);
             int hit_result;
             double zs2;

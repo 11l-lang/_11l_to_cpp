@@ -1250,6 +1250,7 @@ template <typename T1> auto longest_palindrome(const T1 &s)
         if (i + p[i] > r)
             assign_from_tuple(c, r, make_tuple(i, i + p[i]));
     }
+
     auto [max_len, center_index] = max_map(enumerate(p), [](const auto &i, const auto &n){return make_tuple(n, i);});
     return s[range_el(idiv((center_index - max_len), 2), idiv((center_index + max_len), 2))];
 }

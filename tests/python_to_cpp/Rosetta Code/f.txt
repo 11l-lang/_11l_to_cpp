@@ -1148,6 +1148,7 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5, typen
 
     return make_tuple(x, y);
 }
+
 auto [a, b, c, d] = make_tuple(4.0, 0.0, 6.0, 10.0);
 auto [e, f, g, h] = make_tuple(0.0, 3.0, 10.0, 7.0);
 auto pt = line_intersect(a, b, c, d, e, f, g, h);

@@ -1943,6 +1943,7 @@ template <typename T1, typename T2> auto choose_item(const T1 &weight, const T2 
     ::cache.set(k, make_tuple(best_v, best_list));
     return make_tuple(best_v, best_list);
 }
+
 auto [v, lst] = choose_item(400, items.len() - 1);
 auto w = 0;
 

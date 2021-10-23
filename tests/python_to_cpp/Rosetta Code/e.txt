@@ -1640,6 +1640,7 @@ template <typename T1> auto parse(const T1 &rules)
             continue;
         if (line.trim(u" "_S).empty())
             continue;
+
         auto [pat, rep] = bind_array<2>(line.split(u" -> "_S));
 
         auto terminating = false;

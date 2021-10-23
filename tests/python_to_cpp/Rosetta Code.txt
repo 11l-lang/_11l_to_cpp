@@ -7828,6 +7828,7 @@ template <typename T1, typename T2> auto choose_item(const T1 &weight, const T2 
         auto wlim = weight - i * w;
         if (wlim < 0)
             break;
+
         auto [val, taken] = choose_item(wlim, idx - 1);
         if (val + i * v > best_v) {
             best_v = val + i * v;
@@ -7839,6 +7840,7 @@ template <typename T1, typename T2> auto choose_item(const T1 &weight, const T2 
     ::cache.set(k, make_tuple(best_v, best_list));
     return make_tuple(best_v, best_list);
 }
+
 auto [v, lst] = choose_item(400, items.len() - 1);
 auto w = 0;
 
@@ -13237,6 +13239,7 @@ template <typename T1, typename T2, typename T4, typename T6 = decltype(0)> auto
             break;
         if (!in(make_tuple(st, tape[pos]), rules))
             break;
+
         auto [v1, dr, s1] = rules[make_tuple(st, tape[pos])];
         tape.set(pos, v1);
         if (dr == u"left") {
@@ -15109,8 +15112,10 @@ template <typename T1> auto solvePell(const T1 &n)
         y = r * z - y;
         z = idiv((n - y * y), z);
         r = idiv((x + y), z);
+
         assign_from_tuple(e1, e2, make_tuple(e2, e1 + e2 * r));
         assign_from_tuple(f1, f2, make_tuple(f2, f1 + f2 * r));
+
         auto [a, b] = make_tuple(f2 * x + e2, f2);
         if (a * a - n * b * b == 1)
             return make_tuple(a, b);
@@ -16153,6 +16158,7 @@ template <typename T1, typename T2> auto deduce(const T1 &hr, const T2 &vr)
     {
         return all_map(zip(a, b), [](const auto &x, const auto &y){return x & y;});
     };
+
     auto [w, h] = make_tuple(vr.len(), hr.len());
     auto rows = hr.map([&w](const auto &x){return gen_row(w, x);});
     auto cols = vr.map([&h](const auto &x){return gen_row(h, x);});

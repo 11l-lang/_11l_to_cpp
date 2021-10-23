@@ -218,6 +218,7 @@ public:
     template <typename T1> auto getNeighBours(const T1 &pt)
     {
         validatePoint(pt);
+
         auto [x, y] = pt;
 
         auto h = _height;
@@ -247,6 +248,7 @@ public:
     {
         validatePoint(pt1);
         validatePoint(pt2);
+
         auto [x1, _y1_] = pt1;
         auto [x2, y2] = pt2;
 

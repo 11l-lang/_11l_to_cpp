@@ -296,6 +296,7 @@ template <typename T1, typename T2, typename T3> auto AStarSearch(const T1 &star
 
     throw RuntimeError(u"A* failed to find a solution"_S);
 }
+
 auto [result, cost] = AStarSearch(make_tuple(0, 0), make_tuple(7, 7), create_array({create_array({make_tuple(2, 4), make_tuple(2, 5), make_tuple(2, 6), make_tuple(3, 6), make_tuple(4, 6), make_tuple(5, 6), make_tuple(5, 5), make_tuple(5, 4), make_tuple(5, 3), make_tuple(5, 2), make_tuple(4, 2), make_tuple(3, 2)})}));
 
 struct CodeBlock1

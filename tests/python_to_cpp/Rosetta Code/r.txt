@@ -767,6 +767,7 @@ template <typename T1, typename T2> auto addsub(const T1 &x, const T2 &y)
 {
     return make_tuple(x + y, x - y);
 }
+
 auto [summ, difference] = addsub(33, 12);
 
 struct CodeBlock1
@@ -1295,6 +1296,7 @@ double f(const double x, const double y)
 {
     return x * sqrt(y);
 }
+
 auto [vx, vy] = rk4(f, 0.0, 1.0, 10.0, 100);
 
 struct CodeBlock1
