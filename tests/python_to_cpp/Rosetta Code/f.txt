@@ -514,7 +514,6 @@ struct CodeBlock1
 
 # https://www.rosettacode.org/wiki/Factors_of_a_Mersenne_number#Python
 import math
-BigInt = int
 
 def is_prime(a):
     if a == 2: return True
@@ -532,7 +531,7 @@ def m_factor(p):
             continue
         elif q % 8 != 1 and q % 8 != 7:
             continue
-        elif pow(BigInt(2), p, q) == 1:
+        elif pow(2, p, q) == 1:
             return q
     return 0
 
@@ -564,7 +563,7 @@ F m_factor(p)
          L.continue
       E I q % 8 != 1 & q % 8 != 7
          L.continue
-      E I pow(BigInt(2), p, q) == 1
+      E I pow(2, p, q) == 1
          R q
    R 0
 
@@ -599,7 +598,7 @@ template <typename T1> auto m_factor(const T1 &p)
             continue;
         else if (mod(q, 8) != 1 && mod(q, 8) != 7)
             continue;
-        else if (pow(BigInt(2), p, q) == 1)
+        else if (pow(2, p, q) == 1)
             return q;
     }
     return 0;
