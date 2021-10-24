@@ -329,6 +329,9 @@ public:
 		res.sign *= res.sign;
 		return res;
 	}
+	friend BigInt abs(const BigInt &b) {
+		return b.abs();
+	}
 
 	long long longValue() const {
 		long long res = 0;

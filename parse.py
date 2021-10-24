@@ -549,6 +549,8 @@ class SymbolNode:
                     return func_name + '_map(' + self.children[2].children[0].children[0].to_str() + ', ' + self.children[2].children[2].to_str() + ')'
                 elif func_name in ('min', 'max') and len(self.children) == 5 and self.children[3] is not None and self.children[3].token_str() == "key'":
                     return func_name + '_with_key(' + self.children[2].to_str() + ', ' + self.children[4].to_str() + ')'
+                elif func_name == 'String' and len(self.children) == 5 and self.children[3] is not None and self.children[3].token_str() == "radix'":
+                    return 'int_to_str_with_radix(' + self.children[2].to_str() + ', ' + self.children[4].to_str() + ')'
                 elif func_name == 'copy':
                     s = self.scope
                     while True:

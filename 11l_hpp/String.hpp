@@ -1102,3 +1102,21 @@ inline String reversed(const String &s)
 	std::reverse(r.std::u16string::begin(), r.std::u16string::end()); // can not use `std::reverse(r.begin(), r.end());` because of MSVC error C2794 in debug build
 	return r;
 }
+
+// [https://www.rosettacode.org/wiki/First_perfect_square_in_base_n_with_n_unique_digits#D]
+template <typename T1, typename T2> auto int_to_str_with_radix(const T1 &num, const T2 &base)
+{
+	auto cnum = abs(num);
+	String result;
+	do {
+		static const char16_t alphabet[] = u"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		result &= Char(alphabet[cnum % base]);
+		cnum /= base;
+	} while (cnum != 0);
+
+	if (num < 0)
+		result &= u'-'_C;
+
+	std::reverse(result.std::u16string::begin(), result.std::u16string::end());
+	return result;
+}

@@ -1399,65 +1399,30 @@ struct CodeBlock1
 
 
 # https://www.rosettacode.org/wiki/First_perfect_square_in_base_n_with_n_unique_digits#Nim
-Int64 = int
-
-Alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-def toBaseN(num, base):
-    result = ''
-    while True:
-        result += Alphabet[num % base]
-        num = num // base
-        if num == 0: break
-    return result[::-1]
+from _11l import *
 
 for base in range(2, 17):
     n = Int64(float(base) ** ((base - 1) / 2))
     while True:
         sq = n * n
-        sqstr = toBaseN(sq, base)
+        sqstr = int_to_str_with_radix(sq, base)
         if len(sqstr) >= base and len(set(list(sqstr))) == base:
-            nstr = toBaseN(n, base)
+            nstr = int_to_str_with_radix(n, base)
             print('Base {:2}:  {:>8}^2 = {}'.format(base, nstr, sqstr))
             break
         n += 1
 ===
-V Alphabet = ‘0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ’
-
-F toBaseN(=num, base)
-   V result = ‘’
-   L
-      result ‘’= Alphabet[num % base]
-      num = num I/ base
-      I num == 0
-         L.break
-   R reversed(result)
-
 L(base) 2..16
    V n = Int64(Float(base) ^ ((base - 1) / 2))
    L
       V sq = n * n
-      V sqstr = toBaseN(sq, base)
+      V sqstr = String(sq, radix' base)
       I sqstr.len >= base & Set(Array(sqstr)).len == base
-         V nstr = toBaseN(n, base)
+         V nstr = String(n, radix' base)
          print(‘Base #2:  #8^2 = #.’.format(base, nstr, sqstr))
          L.break
       n++
 ===
-auto Alphabet = u"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"_S;
-
-template <typename T1, typename T2> auto toBaseN(T1 num, const T2 &base)
-{
-    auto result = u""_S;
-    while (true) {
-        result &= Alphabet[mod(num, base)];
-        num = idiv(num, base);
-        if (num == 0)
-            break;
-    }
-    return reversed(result);
-}
-
 struct CodeBlock1
 {
     CodeBlock1()
@@ -1466,9 +1431,9 @@ struct CodeBlock1
             auto n = to_int64(pow(to_float(base), ((base - 1) / 2.0)));
             while (true) {
                 auto sq = n * n;
-                auto sqstr = toBaseN(sq, base);
+                auto sqstr = int_to_str_with_radix(sq, base);
                 if (sqstr.len() >= base && create_set(create_array(sqstr)).len() == base) {
-                    auto nstr = toBaseN(n, base);
+                    auto nstr = int_to_str_with_radix(n, base);
                     print(u"Base #2:  #8^2 = #."_S.format(base, nstr, sqstr));
                     break;
                 }
