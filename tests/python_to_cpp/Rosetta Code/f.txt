@@ -1159,3 +1159,321 @@ struct CodeBlock1
         print(pt);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Find_words_which_contains_more_than_3_e_vowels#Python
+aiou = 'aiou' # to get round ‘bug in MSVC 2017’[https://developercommunity.visualstudio.com/t/bug-with-operator-in-c/565417]
+
+for word in open('unixdict.txt').read().split("\n"):
+    if not any(c in aiou for c in word) and sum(int(c=='e') for c in word)>3:
+        print(word)
+===
+V aiou = ‘aiou’
+
+L(word) File(‘unixdict.txt’).read().split("\n")
+   I !any(word.map(c -> c C :aiou)) & sum(word.map(c -> Int(c == ‘e’))) > 3
+      print(word)
+===
+auto aiou = u"aiou"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&word : File(u"unixdict.txt"_S).read().split(u"\n"_S))
+            if (!any_map(word, [](const auto &c){return in(c, ::aiou);}) && sum_map(word, [](const auto &c){return to_int(c == u'e');}) > 3)
+                print(word);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Find_words_with_alternating_vowels_and_consonants#Nim
+vowels = 'aeiou'
+
+count = 0
+for word in open('unixdict.txt').read().split("\n"):
+    if len(word) > 9:
+        first = word[0] in vowels
+        for i in range(2, len(word), 2):
+            if (word[i] in vowels) != first:
+                break
+        else:
+            for i in range(1, len(word), 2):
+                if (word[i] in vowels) == first:
+                    break
+            else:
+                count += 1
+                print(word.rjust(14), end = "\n" if count % 7 == 0 else ' ')
+print()
+===
+V vowels = ‘aeiou’
+
+V count = 0
+L(word) File(‘unixdict.txt’).read().split("\n")
+   I word.len > 9
+      V first = word[0] C vowels
+      L(i) (2 .< word.len).step(2)
+         I (word[i] C vowels) != first
+            L.break
+      L.was_no_break
+         L(i) (1 .< word.len).step(2)
+            I (word[i] C vowels) == first
+               L.break
+         L.was_no_break
+            count++
+            print(word.rjust(14), end' I count % 7 == 0 {"\n"} E ‘ ’)
+print()
+===
+auto vowels = u"aeiou"_S;
+
+auto count = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&word : File(u"unixdict.txt"_S).read().split(u"\n"_S))
+            if (word.len() > 9) {
+                auto first = in(_get<0>(word), vowels);
+                for (auto i : range_el(2, word.len()).step(2))
+                    if ((in(word[i], vowels)) != first)
+                        goto break_;
+                for (auto i : range_el(1, word.len()).step(2))
+                    if ((in(word[i], vowels)) == first)
+                        goto break_1;
+                count++;
+                print(word.rjust(14), mod(count, 7) == 0 ? u"\n"_S : u" "_S);
+                break_1:;
+                break_:;
+            }
+        print();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Finite_state_machine#Python
+states = {  'ready':
+                ('Machine ready: (d)eposit, or (q)uit?',
+                 [str('d'),'q']),
+            'waiting':
+                ('Machine waiting: (s)elect, or (r)efund?',
+                 [str('s'),'r']),
+            'dispense' :
+                ('Machine dispensing: please (r)emove product',
+                 [str('r')]),
+            'refunding' :
+                ('Refunding money',
+                 ['']*0),
+          }
+transitions = { 'ready': {
+                    str('d'): 'waiting',
+                    str('q'): 'exit'},
+                'waiting' : {
+                    str('s') : 'dispense',
+                    str('r') : 'refunding'},
+                'dispense' : {
+                    str('r') : 'ready'},
+                'refunding' : {
+                    '' : 'ready'}}
+
+def Acceptor(prompt, valids):
+    ''' Acceptor style finite state machine to prompt for user input'''
+    if len(valids) == 0:
+        print(prompt)
+        return ''
+    else:
+        while True:
+            resp = input(prompt)[0].lower()
+            if resp in valids:
+                return str(resp)
+
+def finite_state_machine(initial_state, exit_state):
+    next_state = initial_state
+    current_state = states[next_state]
+    while True:
+        response = Acceptor(current_state[0], current_state[1])
+        if response == exit_state:
+            break
+        next_state = transitions[next_state][response]
+        current_state = states[next_state]
+
+finite_state_machine('ready', 'q')
+===
+V states = [‘ready’ = (‘Machine ready: (d)eposit, or (q)uit?’, [String(‘d’), ‘q’]), ‘waiting’ = (‘Machine waiting: (s)elect, or (r)efund?’, [String(‘s’), ‘r’]), ‘dispense’ = (‘Machine dispensing: please (r)emove product’, [String(‘r’)]), ‘refunding’ = (‘Refunding money’, [‘’] * 0)]
+V transitions = [‘ready’ = [String(‘d’) = ‘waiting’, String(‘q’) = ‘exit’], ‘waiting’ = [String(‘s’) = ‘dispense’, String(‘r’) = ‘refunding’], ‘dispense’ = [String(‘r’) = ‘ready’], ‘refunding’ = [‘’ = ‘ready’]]
+
+F Acceptor(prompt, valids)
+   ‘ Acceptor style finite state machine to prompt for user input’
+   I valids.empty
+      print(prompt)
+      R ‘’
+   E
+      L
+         V resp = input(prompt)[0].lowercase()
+         I resp C valids
+            R String(resp)
+
+F finite_state_machine(initial_state, exit_state)
+   V next_state = initial_state
+   V current_state = :states[next_state]
+   L
+      V response = Acceptor(current_state[0], current_state[1])
+      I response == exit_state
+         L.break
+      next_state = :transitions[next_state][response]
+      current_state = :states[next_state]
+
+finite_state_machine(‘ready’, ‘q’)
+===
+auto states = create_dict(dict_of(u"ready"_S, make_tuple(u"Machine ready: (d)eposit, or (q)uit?"_S, create_array<String>({String(u"d"_S), u"q"_S})))(u"waiting"_S, make_tuple(u"Machine waiting: (s)elect, or (r)efund?"_S, create_array<String>({String(u"s"_S), u"r"_S})))(u"dispense"_S, make_tuple(u"Machine dispensing: please (r)emove product"_S, create_array({String(u"r"_S)})))(u"refunding"_S, make_tuple(u"Refunding money"_S, create_array({u""_S}) * 0)));
+auto transitions = create_dict(dict_of(u"ready"_S, create_dict(dict_of(String(u"d"_S), u"waiting"_S)(String(u"q"_S), u"exit"_S)))(u"waiting"_S, create_dict(dict_of(String(u"s"_S), u"dispense"_S)(String(u"r"_S), u"refunding"_S)))(u"dispense"_S, create_dict(dict_of(String(u"r"_S), u"ready"_S)))(u"refunding"_S, create_dict(dict_of(u""_S, u"ready"_S))));
+
+template <typename T1, typename T2> auto Acceptor(const T1 &prompt, const T2 &valids)
+{
+    u" Acceptor style finite state machine to prompt for user input"_S;
+    if (valids.empty()) {
+        print(prompt);
+        return u""_S;
+    }
+    else
+        while (true) {
+            auto resp = _get<0>(input(prompt)).lowercase();
+            if (in(resp, valids))
+                return String(resp);
+        }
+}
+
+template <typename T1, typename T2> auto finite_state_machine(const T1 &initial_state, const T2 &exit_state)
+{
+    auto next_state = initial_state;
+    auto current_state = ::states[next_state];
+    while (true) {
+        auto response = Acceptor(_get<0>(current_state), _get<1>(current_state));
+        if (response == exit_state)
+            break;
+        next_state = ::transitions[next_state][response];
+        current_state = ::states[next_state];
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        finite_state_machine(u"ready"_S, u"q"_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/First-class_functions/Use_numbers_analogously#Python
+(x,xi, y,yi) = (2.0,0.5, 4.0,0.25)
+z  = x + y
+zi = 1.0 / (x + y)
+multiplier = lambda n1, n2: (lambda m: n1 * n2 * m)
+numlist = [x, y, z]
+numlisti = [xi, yi, zi]
+print([multiplier(inversen, n)(.5) for n, inversen in zip(numlist, numlisti)])
+===
+V (x, xi, y, yi) = (2.0, 0.5, 4.0, 0.25)
+V z = x + y
+V zi = 1.0 / (x + y)
+V multiplier = (n1, n2) -> (m -> @n1 * @n2 * m)
+V numlist = [x, y, z]
+V numlisti = [xi, yi, zi]
+print(zip(numlist, numlisti).map((n, inversen) -> multiplier(inversen, n)(.5)))
+===
+auto [x, xi, y, yi] = make_tuple(2.0, 0.5, 4.0, 0.25);
+auto z = x + y;
+auto zi = 1.0 / (x + y);
+auto multiplier = [](const auto &n1, const auto &n2){return ([&n1, &n2](const auto &m){return n1 * n2 * m;});};
+auto numlist = create_array({x, y, z});
+auto numlisti = create_array({xi, yi, zi});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(zip(numlist, numlisti).map([](const auto &n, const auto &inversen){return multiplier(inversen, n)(.5);}));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/First_perfect_square_in_base_n_with_n_unique_digits#Nim
+Int64 = int
+
+Alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+def toBaseN(num, base):
+    result = ''
+    while True:
+        result += Alphabet[num % base]
+        num = num // base
+        if num == 0: break
+    return result[::-1]
+
+for base in range(2, 17):
+    n = Int64(float(base) ** ((base - 1) / 2))
+    while True:
+        sq = n * n
+        sqstr = toBaseN(sq, base)
+        if len(sqstr) >= base and len(set(list(sqstr))) == base:
+            nstr = toBaseN(n, base)
+            print('Base {:2}:  {:>8}^2 = {}'.format(base, nstr, sqstr))
+            break
+        n += 1
+===
+V Alphabet = ‘0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ’
+
+F toBaseN(=num, base)
+   V result = ‘’
+   L
+      result ‘’= Alphabet[num % base]
+      num = num I/ base
+      I num == 0
+         L.break
+   R reversed(result)
+
+L(base) 2..16
+   V n = Int64(Float(base) ^ ((base - 1) / 2))
+   L
+      V sq = n * n
+      V sqstr = toBaseN(sq, base)
+      I sqstr.len >= base & Set(Array(sqstr)).len == base
+         V nstr = toBaseN(n, base)
+         print(‘Base #2:  #8^2 = #.’.format(base, nstr, sqstr))
+         L.break
+      n++
+===
+auto Alphabet = u"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"_S;
+
+template <typename T1, typename T2> auto toBaseN(T1 num, const T2 &base)
+{
+    auto result = u""_S;
+    while (true) {
+        result &= Alphabet[mod(num, base)];
+        num = idiv(num, base);
+        if (num == 0)
+            break;
+    }
+    return reversed(result);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto base : range_ee(2, 16)) {
+            auto n = to_int64(pow(to_float(base), ((base - 1) / 2.0)));
+            while (true) {
+                auto sq = n * n;
+                auto sqstr = toBaseN(sq, base);
+                if (sqstr.len() >= base && create_set(create_array(sqstr)).len() == base) {
+                    auto nstr = toBaseN(n, base);
+                    print(u"Base #2:  #8^2 = #."_S.format(base, nstr, sqstr));
+                    break;
+                }
+                n++;
+            }
+        }
+    }
+} code_block_1;
