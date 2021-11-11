@@ -44,3 +44,693 @@ struct CodeBlock1
         print(random960());
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Gapful_numbers#Python
+import itertools
+
+for start, n in [(100, 30), (1_000_000, 15), (1_000_000_000, 10)]:
+    print("\nFirst", n, 'gapful numbers from', start)
+    l = [0] * 0
+    for x in itertools.count(start):
+        if x % (int(str(x)[0]) * 10 + (x % 10)) == 0:
+            l.append(x)
+            if len(l) == n:
+                break
+    print(l)
+===
+L(start, n) [(100, 30), (1'000'000, 15), (1'000'000'000, 10)]
+   print("\nFirst "n‘ gapful numbers from ’start)
+   V l = [Int]()
+   L(x) start..
+      I x % (Int(String(x)[0]) * 10 + (x % 10)) == 0
+         l.append(x)
+         I l.len == n
+            L.break
+   print(l)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[start, n] : create_array({make_tuple(100, 30), make_tuple(1'000'000, 15), make_tuple(1'000'000'000, 10)})) {
+            print(u"\nFirst "_S & n & u" gapful numbers from "_S & start);
+            auto l = Array<int>();
+            for (auto x : range_ei(start))
+                if (mod(x, (to_int(_get<0>(String(x))) * 10 + (mod(x, 10)))) == 0) {
+                    l.append(x);
+                    if (l.len() == n)
+                        break;
+                }
+            print(l);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Gauss-Jordan_matrix_inversion#Nim
+Eps = 1e-10
+
+def transformToRref(mat : list):
+    lead = 0
+
+    for r in range(len(mat)):
+        if lead >= len(mat[0]): return
+
+        i = r
+        while mat[i][lead] == 0:
+            i += 1
+            if i == len(mat):
+                i = r
+                lead += 1
+                if lead == len(mat[0]): return
+        (mat[i], mat[r]) = (mat[r], mat[i])
+
+        d = mat[r][lead]
+        if abs(d) > Eps:    # Checking "d != 0" will give wrong results in some cases.
+            for i in range(len(mat[r])):
+                mat[r][i] /= d
+
+        for i in range(len(mat)):
+            if i != r:
+                m = mat[i][lead]
+                for c in range(len(mat[0])):
+                    mat[i][c] -= mat[r][c] * m
+
+        lead += 1
+
+def inverse(mat):
+    # Build augmented matrix.
+    augmat = [[0.0] * (2 * len(mat)) for i in range(len(mat))]
+    for i in range(len(mat)):
+        for j in range(len(mat)):
+            augmat[i][j] = mat[i][j]
+        augmat[i][len(mat) + i] = 1
+
+    # Transform it to reduced row echelon form.
+    transformToRref(augmat)
+
+    # Check if the first half is the identity matrix and extract second half.
+    result = [[0.0] * len(mat) for i in range(len(mat))]
+    for i in range(len(mat)):
+        for j in range(len(mat)):
+            if augmat[i][j] != float(i == j):
+                raise ValueError('matrix is singular')
+            result[i][j] = augmat[i][len(mat) + j]
+    return result
+
+def print_mat(mat):
+    for row in mat:
+        line = ''
+        for val in row:
+            if len(line) != 0:
+                line += ' '
+            line += '%9.5f' % val
+        print(line)
+
+def runTest(mat):
+    print('Matrix:')
+    print_mat(mat)
+    print()
+    print('Inverse:')
+    print_mat(inverse(mat))
+    print()
+    print()
+
+m1 = [[float(1), 2, 3],
+      [float(4), 1, 6],
+      [float(7), 8, 9]]
+
+m2 = [[float( 2), -1,  0],
+      [float(-1),  2, -1],
+      [float( 0), -1,  2]]
+
+m3 = [[float(-1), -2,  3,  2],
+      [float(-4), -1,  6,  2],
+      [float( 7), -8,  9,  1],
+      [float( 1), -2,  1,  3]]
+
+runTest(m1)
+runTest(m2)
+runTest(m3)
+===
+V Eps = 1e-10
+
+F transformToRref(&mat)
+   V lead = 0
+
+   L(r) 0 .< mat.len
+      I lead >= mat[0].len
+         R
+
+      V i = r
+      L mat[i][lead] == 0
+         i++
+         I i == mat.len
+            i = r
+            lead++
+            I lead == mat[0].len
+               R
+      swap(&mat[i], &mat[r])
+
+      V d = mat[r][lead]
+      I abs(d) > Eps
+         L(i) 0 .< mat[r].len
+            mat[r][i] /= d
+
+      L(i) 0 .< mat.len
+         I i != r
+            V m = mat[i][lead]
+            L(c) 0 .< mat[0].len
+               mat[i][c] -= mat[r][c] * m
+
+      lead++
+
+F inverse(mat)
+   V augmat = [[0.0] * (2 * mat.len)] * mat.len
+   L(i) 0 .< mat.len
+      L(j) 0 .< mat.len
+         augmat[i][j] = mat[i][j]
+      augmat[i][mat.len + i] = 1
+
+   transformToRref(&augmat)
+
+   V result = [[0.0] * mat.len] * mat.len
+   L(i) 0 .< mat.len
+      L(j) 0 .< mat.len
+         I augmat[i][j] != Float(i == j)
+            X ValueError(‘matrix is singular’)
+         result[i][j] = augmat[i][mat.len + j]
+   R result
+
+F print_mat(mat)
+   L(row) mat
+      V line = ‘’
+      L(val) row
+         I !line.empty
+            line ‘’= ‘ ’
+         line ‘’= ‘#3.5’.format(val)
+      print(line)
+
+F runTest(mat)
+   print(‘Matrix:’)
+   print_mat(mat)
+   print()
+   print(‘Inverse:’)
+   print_mat(inverse(mat))
+   print()
+   print()
+
+V m1 = [[Float(1), 2, 3], [Float(4), 1, 6], [Float(7), 8, 9]]
+
+V m2 = [[Float(2), -1, 0], [Float(-1), 2, -1], [Float(0), -1, 2]]
+
+V m3 = [[Float(-1), -2, 3, 2], [Float(-4), -1, 6, 2], [Float(7), -8, 9, 1], [Float(1), -2, 1, 3]]
+
+runTest(m1)
+runTest(m2)
+runTest(m3)
+===
+auto Eps = 1e-10;
+
+template <typename T1> auto transformToRref(T1 &mat)
+{
+    auto lead = 0;
+
+    for (auto r : range_el(0, mat.len())) {
+        if (lead >= _get<0>(mat).len())
+            return;
+
+        auto i = r;
+        while (mat[i][lead] == 0) {
+            i++;
+            if (i == mat.len()) {
+                i = r;
+                lead++;
+                if (lead == _get<0>(mat).len())
+                    return;
+            }
+        }
+        swap(mat[i], mat[r]);
+
+        auto d = mat[r][lead];
+        if (abs(d) > Eps)
+            for (auto i : range_el(0, mat[r].len()))
+                mat[r][i] /= d;
+
+        for (auto i : range_el(0, mat.len()))
+            if (i != r) {
+                auto m = mat[i][lead];
+                for (auto c : range_el(0, _get<0>(mat).len()))
+                    mat[i][c] -= mat[r][c] * m;
+            }
+
+        lead++;
+    }
+}
+
+template <typename T1> auto inverse(const T1 &mat)
+{
+    auto augmat = create_array({create_array({0.0}) * (2 * mat.len())}) * mat.len();
+    for (auto i : range_el(0, mat.len())) {
+        for (auto j : range_el(0, mat.len()))
+            augmat[i].set(j, mat[i][j]);
+        augmat[i].set(mat.len() + i, 1);
+    }
+
+    transformToRref(augmat);
+
+    auto result = create_array({create_array({0.0}) * mat.len()}) * mat.len();
+    for (auto i : range_el(0, mat.len()))
+        for (auto j : range_el(0, mat.len())) {
+            if (augmat[i][j] != to_float(i == j))
+                throw ValueError(u"matrix is singular"_S);
+            result[i].set(j, augmat[i][mat.len() + j]);
+        }
+    return result;
+}
+
+template <typename T1> auto print_mat(const T1 &mat)
+{
+    for (auto &&row : mat) {
+        auto line = u""_S;
+        for (auto &&val : row) {
+            if (!line.empty())
+                line &= u" "_S;
+            line &= u"#3.5"_S.format(val);
+        }
+        print(line);
+    }
+}
+
+template <typename T1> auto runTest(const T1 &mat)
+{
+    print(u"Matrix:"_S);
+    print_mat(mat);
+    print();
+    print(u"Inverse:"_S);
+    print_mat(inverse(mat));
+    print();
+    print();
+}
+
+auto m1 = create_array({create_array<double>({to_float(1), 2, 3}), create_array<double>({to_float(4), 1, 6}), create_array<double>({to_float(7), 8, 9})});
+
+auto m2 = create_array({create_array<double>({to_float(2), -1, 0}), create_array<double>({to_float(-1), 2, -1}), create_array<double>({to_float(0), -1, 2})});
+
+auto m3 = create_array({create_array<double>({to_float(-1), -2, 3, 2}), create_array<double>({to_float(-4), -1, 6, 2}), create_array<double>({to_float(7), -8, 9, 1}), create_array<double>({to_float(1), -2, 1, 3})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        runTest(m1);
+        runTest(m2);
+        runTest(m3);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Generate_random_chess_position#Python
+import random
+Char = str
+
+board = [[" "] * 8 for y in range(8)]
+piece_list = ["R", "N", "B", "Q", "P"]
+
+def place_kings(brd : list):
+    while True:
+        (rank_white, file_white, rank_black, file_black) = (random.randint(0,7), random.randint(0,7), random.randint(0,7), random.randint(0,7))
+        diff_list = [abs(rank_white - rank_black),  abs(file_white - file_black)]
+        if sum(diff_list) > 2 or set(diff_list) == set([0, 2]):
+            (brd[rank_white][file_white], brd[rank_black][file_black]) = (Char("K"), Char("k"))
+            break
+
+def pawn_on_promotion_square(pc, pr):
+    if pc == "P" and pr == 0:
+        return True
+    elif pc == "p" and pr == 7:
+        return True
+    return False
+
+def populate_board(brd : list, wp, bp):
+    for x in range(2):
+        piece_amount : int
+        pieces : List[Char]
+        if x == 0:
+            piece_amount = wp
+            pieces = piece_list
+        else:
+            piece_amount = bp
+            pieces = [s.lower() for s in piece_list]
+        while piece_amount != 0:
+            (piece_rank, piece_file) = (random.randint(0, 7), random.randint(0, 7))
+            piece = random.choice(pieces)
+            if brd[piece_rank][piece_file] == " " and pawn_on_promotion_square(piece, piece_rank) == False:
+                brd[piece_rank][piece_file] = piece
+                piece_amount -= 1
+
+def fen_from_board(brd):
+    fen = ""
+    for x in brd:
+        n = 0
+        for y in x:
+            if y == " ":
+                n += 1
+            else:
+                if n != 0:
+                    fen += str(n)
+                fen += y
+                n = 0
+        if n != 0:
+            fen += str(n)
+        fen += "/" if fen.count("/") < 7 else ""
+    fen += " w - - 0 1\n"
+    return fen
+
+(piece_amount_white, piece_amount_black) = (random.randint(0, 15), random.randint(0, 15))
+place_kings(board)
+populate_board(board, piece_amount_white, piece_amount_black)
+print(fen_from_board(board))
+for x in board:
+    #print(x)
+    print('[' + ', '.join("'" + c + "'" for c in x) + ']')
+===
+V board = [[‘ ’] * 8] * 8
+V piece_list = [‘R’, ‘N’, ‘B’, ‘Q’, ‘P’]
+
+F place_kings(&brd)
+   L
+      V (rank_white, file_white, rank_black, file_black) = (random:(0 .. 7), random:(0 .. 7), random:(0 .. 7), random:(0 .. 7))
+      V diff_list = [abs(rank_white - rank_black), abs(file_white - file_black)]
+      I sum(diff_list) > 2 | Set(diff_list) == Set([0, 2])
+         (brd[rank_white][file_white], brd[rank_black][file_black]) = (Char(‘K’), Char(‘k’))
+         L.break
+
+F pawn_on_promotion_square(pc, pr)
+   I pc == ‘P’ & pr == 0
+      R 1B
+   E I pc == ‘p’ & pr == 7
+      R 1B
+   R 0B
+
+F populate_board(&brd, wp, bp)
+   L(x) 2
+      Int piece_amount
+      [Char] pieces
+      I x == 0
+         piece_amount = wp
+         pieces = :piece_list
+      E
+         piece_amount = bp
+         pieces = :piece_list.map(s -> s.lowercase())
+      L piece_amount != 0
+         V (piece_rank, piece_file) = (random:(0 .. 7), random:(0 .. 7))
+         V piece = random:choice(pieces)
+         I brd[piece_rank][piece_file] == ‘ ’ & pawn_on_promotion_square(piece, piece_rank) == 0B
+            brd[piece_rank][piece_file] = piece
+            piece_amount--
+
+F fen_from_board(brd)
+   V fen = ‘’
+   L(x) brd
+      V n = 0
+      L(y) x
+         I y == ‘ ’
+            n++
+         E
+            I n != 0
+               fen ‘’= String(n)
+            fen ‘’= y
+            n = 0
+      I n != 0
+         fen ‘’= String(n)
+      fen ‘’= I fen.count(‘/’) < 7 {‘/’} E ‘’
+   fen ‘’= " w - - 0 1\n"
+   R fen
+
+V (piece_amount_white, piece_amount_black) = (random:(0 .. 15), random:(0 .. 15))
+place_kings(&board)
+populate_board(&board, piece_amount_white, piece_amount_black)
+print(fen_from_board(board))
+L(x) board
+   print(‘[’x.map(c -> ‘'’c‘'’).join(‘, ’)‘]’)
+===
+auto board = create_array({create_array({u' '_C}) * 8}) * 8;
+auto piece_list = create_array({u'R'_C, u'N'_C, u'B'_C, u'Q'_C, u'P'_C});
+
+template <typename T1> auto place_kings(T1 &brd)
+{
+    while (true) {
+        auto [rank_white, file_white, rank_black, file_black] = make_tuple(randomns::_(range_ee(0, 7)), randomns::_(range_ee(0, 7)), randomns::_(range_ee(0, 7)), randomns::_(range_ee(0, 7)));
+        auto diff_list = create_array({abs(rank_white - rank_black), abs(file_white - file_black)});
+        if (sum(diff_list) > 2 || create_set(diff_list) == create_set({0, 2})) {
+            assign_from_tuple(brd[rank_white][file_white], brd[rank_black][file_black], make_tuple(u'K'_C, u'k'_C));
+            break;
+        }
+    }
+}
+
+template <typename T1, typename T2> auto pawn_on_promotion_square(const T1 &pc, const T2 &pr)
+{
+    if (pc == u'P' && pr == 0)
+        return true;
+    else if (pc == u'p' && pr == 7)
+        return true;
+    return false;
+}
+
+template <typename T1, typename T2, typename T3> auto populate_board(T1 &brd, const T2 &wp, const T3 &bp)
+{
+    for (int x = 0; x < 2; x++) {
+        int piece_amount;
+        Array<Char> pieces;
+        if (x == 0) {
+            piece_amount = wp;
+            pieces = ::piece_list;
+        }
+        else {
+            piece_amount = bp;
+            pieces = ::piece_list.map([](const auto &s){return s.lowercase();});
+        }
+        while (piece_amount != 0) {
+            auto [piece_rank, piece_file] = make_tuple(randomns::_(range_ee(0, 7)), randomns::_(range_ee(0, 7)));
+            auto piece = randomns::choice(pieces);
+            if (brd[piece_rank][piece_file] == u' ' && pawn_on_promotion_square(piece, piece_rank) == false) {
+                brd[piece_rank].set(piece_file, piece);
+                piece_amount--;
+            }
+        }
+    }
+}
+
+template <typename T1> auto fen_from_board(const T1 &brd)
+{
+    auto fen = u""_S;
+    for (auto &&x : brd) {
+        auto n = 0;
+        for (auto &&y : x)
+            if (y == u' ')
+                n++;
+            else {
+                if (n != 0)
+                    fen &= String(n);
+                fen &= y;
+                n = 0;
+            }
+        if (n != 0)
+            fen &= String(n);
+        fen &= fen.count(u"/"_S) < 7 ? u"/"_S : u""_S;
+    }
+    fen &= u" w - - 0 1\n"_S;
+    return fen;
+}
+
+auto [piece_amount_white, piece_amount_black] = make_tuple(randomns::_(range_ee(0, 15)), randomns::_(range_ee(0, 15)));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        place_kings(board);
+        populate_board(board, piece_amount_white, piece_amount_black);
+        print(fen_from_board(board));
+        for (auto &&x : board)
+            print(u"["_S & x.map([](const auto &c){return u"'"_S & c & u"'"_S;}).join(u", "_S) & u"]"_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Geohash#Python
+ch32 = list("0123456789bcdefghjkmnpqrstuvwxyz")
+bool2ch = {bin(i)[2:].zfill(5): ch for i, ch in enumerate(ch32)}
+ch2bool = {v : k for k, v in bool2ch.items()}
+
+def bisect(val, mn, mx, bits):
+    mid = (mn + mx) / 2
+    if val < mid:
+        bits <<= 1                        # push 0
+        mx = mid                          # range lower half
+    else:
+        bits = bits << 1 | 1              # push 1
+        mn = mid                          # range upper half
+
+    return (mn, mx, bits)
+
+def encoder(lat, lng, pre):
+    (latmin, latmax) = (-90.0, 90.0)
+    (lngmin, lngmax) = (-180.0, 180.0)
+    bits = Int64(0)
+    for i in range(pre * 5):
+        if i % 2 != 0:
+            # odd bit: bisect latitude
+            (latmin, latmax, bits) = bisect(lat, latmin, latmax, bits)
+        else:
+            # even bit: bisect longitude
+            (lngmin, lngmax, bits) = bisect(lng, lngmin, lngmax, bits)
+    # Bits to characters
+    #b = f"{bits:0{pre * 5}b}"
+    b = bin(bits)[2:].zfill(pre * 5)
+    geo = (bool2ch[b[i*5: (i+1)*5]] for i in range(pre))
+
+    return ''.join(geo)
+
+def decoder(geo):
+    (minmaxes, latlong) = ([[-90.0, 90.0], [-180.0, 180.0]], True)
+    for c in geo:
+        for bit in ch2bool[c]:
+            minmaxes[latlong][bit != '1'] = sum(minmaxes[latlong]) / 2
+            latlong = not latlong
+
+    return minmaxes
+
+for lat, lng, pre in [(51.433718, -0.214126,  2),
+                      (51.433718, -0.214126,  9),
+                      (57.64911,  10.40744 , 11)]:
+    print("encoder(lat=%f, lng=%f, pre=%i) = '%s'"
+          % (lat, lng, pre, encoder(lat, lng, pre)))
+===
+V ch32 = Array(‘0123456789bcdefghjkmnpqrstuvwxyz’)
+V bool2ch = Dict(enumerate(ch32), (i, ch) -> (bin(i).zfill(5), ch))
+V ch2bool = Dict(bool2ch.items(), (k, v) -> (v, k))
+
+F bisect(val, =mn, =mx, =bits)
+   V mid = (mn + mx) / 2
+   I val < mid
+      bits <<= 1
+      mx = mid
+   E
+      bits = bits << 1 [|] 1
+      mn = mid
+
+   R (mn, mx, bits)
+
+F encoder(lat, lng, pre)
+   V (latmin, latmax) = (-90.0, 90.0)
+   V (lngmin, lngmax) = (-180.0, 180.0)
+   V bits = Int64(0)
+   L(i) 0 .< pre * 5
+      I i % 2 != 0
+         (latmin, latmax, bits) = bisect(lat, latmin, latmax, bits)
+      E
+         (lngmin, lngmax, bits) = bisect(lng, lngmin, lngmax, bits)
+   V b = bin(bits).zfill(pre * 5)
+   V geo = ((0 .< pre).map(i -> :bool2ch[@b[i * 5 .< (i + 1) * 5]]))
+
+   R geo.join(‘’)
+
+F decoder(geo)
+   V (minmaxes, latlong) = ([[-90.0, 90.0], [-180.0, 180.0]], 1B)
+   L(c) geo
+      L(bit) :ch2bool[c]
+         minmaxes[latlong][bit != ‘1’] = sum(minmaxes[latlong]) / 2
+         latlong = !latlong
+
+   R minmaxes
+
+L(lat, lng, pre) [(51.433718, -0.214126, 2), (51.433718, -0.214126, 9), (57.64911, 10.40744, 11)]
+   print(‘encoder(lat=#.6, lng=#.6, pre=#.) = '#.'’.format(lat, lng, pre, encoder(lat, lng, pre)))
+===
+auto ch32 = create_array(u"0123456789bcdefghjkmnpqrstuvwxyz"_S);
+auto bool2ch = create_dict(enumerate(ch32), [](const auto &i, const auto &ch){return make_tuple(bin(i).zfill(5), ch);});
+auto ch2bool = create_dict(bool2ch.items(), [](const auto &k, const auto &v){return make_tuple(v, k);});
+
+template <typename T1, typename T2, typename T3, typename T4> auto bisect(const T1 &val, T2 mn, T3 mx, T4 bits)
+{
+    auto mid = (mn + mx) / 2.0;
+    if (val < mid) {
+        bits <<= 1;
+        mx = mid;
+    }
+    else {
+        bits = bits << 1 | 1;
+        mn = mid;
+    }
+
+    return make_tuple(mn, mx, bits);
+}
+
+template <typename T1, typename T2, typename T3> auto encoder(const T1 &lat, const T2 &lng, const T3 &pre)
+{
+    auto [latmin, latmax] = make_tuple(-90.0, 90.0);
+    auto [lngmin, lngmax] = make_tuple(-180.0, 180.0);
+    auto bits = to_int64(0);
+    for (auto i : range_el(0, pre * 5))
+        if (mod(i, 2) != 0)
+            assign_from_tuple(latmin, latmax, bits, bisect(lat, latmin, latmax, bits));
+        else
+            assign_from_tuple(lngmin, lngmax, bits, bisect(lng, lngmin, lngmax, bits));
+    auto b = bin(bits).zfill(pre * 5);
+    auto geo = (range_el(0, pre).map([&b](const auto &i){return ::bool2ch[b[range_el(i * 5, (i + 1) * 5)]];}));
+
+    return geo.join(u""_S);
+}
+
+template <typename T1> auto decoder(const T1 &geo)
+{
+    auto [minmaxes, latlong] = make_tuple(create_array({create_array({-90.0, 90.0}), create_array({-180.0, 180.0})}), true);
+    for (auto &&c : geo)
+        for (auto &&bit : ::ch2bool[c]) {
+            minmaxes[latlong].set(bit != u'1', sum(minmaxes[latlong]) / 2.0);
+            latlong = !latlong;
+        }
+
+    return minmaxes;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[lat, lng, pre] : create_array({make_tuple(51.433718, -0.214126, 2), make_tuple(51.433718, -0.214126, 9), make_tuple(57.64911, 10.40744, 11)}))
+            print(u"encoder(lat=#.6, lng=#.6, pre=#.) = '#.'"_S.format(lat, lng, pre, encoder(lat, lng, pre)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Getting_the_number_of_decimals#Python
+def dec(n):
+    return len(n.split('.')[-1]) if '.' in n else 0
+
+print(dec('12.345'))
+print(dec('12.3450'))
+===
+F dec(n)
+   R I ‘.’ C n {n.split(‘.’).last.len} E 0
+
+print(dec(‘12.345’))
+print(dec(‘12.3450’))
+===
+template <typename T1> auto dec(const T1 &n)
+{
+    return in(u'.'_C, n) ? n.split(u"."_S).last().len() : 0;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(dec(u"12.345"_S));
+        print(dec(u"12.3450"_S));
+    }
+} code_block_1;

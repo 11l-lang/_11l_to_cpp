@@ -1106,6 +1106,8 @@ inline String reversed(const String &s)
 // [https://www.rosettacode.org/wiki/First_perfect_square_in_base_n_with_n_unique_digits#D]
 template <typename T1, typename T2> auto int_to_str_with_radix(const T1 &num, const T2 &base)
 {
+	if (!(base >= 2 && base <= 36))
+		throw AssertionError();
 	auto cnum = abs(num);
 	String result;
 	do {

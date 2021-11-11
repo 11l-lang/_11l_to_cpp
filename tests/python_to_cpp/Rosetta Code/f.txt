@@ -1442,3 +1442,668 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/First_power_of_2_that_has_leading_decimal_digits_of_12#Python
+import math
+
+def p(l, n, pwr=2):
+    l = int(abs(l))
+    digitcount = math.floor(math.log(l, 10))
+    log10pwr = math.log(pwr, 10)
+    (raised, found) = (-1, 0)
+    while found < n:
+        raised += 1
+        firstdigits = math.floor(10**(math.modf(log10pwr * raised)[0] + digitcount))
+        if firstdigits == l:
+            found += 1
+    return raised
+
+for l, n in [(12, 1), (12, 2), (123, 45), (123, 12345), (123, 678910)]:
+    print('p(' + str(l) + ', ' + str(n) + ') = ' + str(p(l, n)))
+===
+F p(=l, n, pwr = 2)
+   l = Int(abs(l))
+   V digitcount = floor(log(l, 10))
+   V log10pwr = log(pwr, 10)
+   V (raised, found) = (-1, 0)
+   L found < n
+      raised++
+      V firstdigits = floor(10 ^ (modf(log10pwr * raised)[0] + digitcount))
+      I firstdigits == l
+         found++
+   R raised
+
+L(l, n) [(12, 1), (12, 2), (123, 45), (123, 12345), (123, 678910)]
+   print(‘p(’String(l)‘, ’String(n)‘) = ’String(p(l, n)))
+===
+template <typename T1, typename T2, typename T3 = decltype(2)> auto p(T1 l, const T2 &n, const T3 &pwr = 2)
+{
+    l = to_int(abs(l));
+    auto digitcount = floor(log(l, 10));
+    auto log10pwr = log(pwr, 10);
+    auto [raised, found] = make_tuple(-1, 0);
+    while (found < n) {
+        raised++;
+        auto firstdigits = floor(pow(10, (_get<0>(modf(log10pwr * raised)) + digitcount)));
+        if (firstdigits == l)
+            found++;
+    }
+    return raised;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[l, n] : create_array({make_tuple(12, 1), make_tuple(12, 2), make_tuple(123, 45), make_tuple(123, 12345), make_tuple(123, 678910)}))
+            print(u"p("_S & String(l) & u", "_S & String(n) & u") = "_S & String(p(l, n)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Flipping_bits_game#Python
+import random
+from copy import deepcopy
+ascii_lowercase = 'abcdefghij'
+digits = '0123456789' # to get round ‘bug in MSVC 2017’[https://developercommunity.visualstudio.com/t/bug-with-operator-in-c/565417]
+
+n = 3   # n x n Square arrray
+
+board  = [[0]* n for i in range(n)]
+
+def setbits(board : list, count=1):
+    for i in range(count):
+        board[random.randrange(n)][random.randrange(n)] ^= 1
+
+def fliprow(i):
+    #board[i-1][:] = [x ^ 1 for x in board[i-1] ]
+    for j in range(n):
+        board[i-1][j] ^= 1
+
+def flipcol(i):
+    for row in board: # &
+        row[i] ^= 1
+
+def shuffle(board, count=1):
+    for i in range(count):
+        if random.randrange(0, 2) != 0:
+            fliprow(random.randrange(n)+1)
+        else:
+            flipcol(random.randrange(n))
+
+def pr(board, comment=''):
+    print(comment)
+    print('     ' + ' '.join(ascii_lowercase[i] for i in range(n)))
+    print('  ' + '\n  '.join(' '.join(['%2s' % j] + [str(i) for i in line])
+                             for j, line in enumerate(board, 1)))
+
+def init(board : list):
+    setbits(board, count=random.randrange(n)+1)
+    target = deepcopy(board)
+    while board == target:
+        shuffle(board, count=2 * n)
+    prompt = '  X, T, or 1-%i / %s-%s to flip: ' % (n, ascii_lowercase[0],
+                                                    ascii_lowercase[n-1])
+    return (target, prompt)
+
+(target, prompt) = init(board)
+pr(target, 'Target configuration is:')
+print('')
+turns = 0
+while board != target:
+    turns += 1
+    pr(board, '%i:' % turns)
+    ans = input(prompt).strip(' ')
+    if (len(ans) == 1
+        and ans in ascii_lowercase and ascii_lowercase.index(ans) < n):
+        flipcol(ascii_lowercase.index(ans))
+    elif ans != '' and all(ch in digits for ch in ans) and 1 <= int(ans) <= n:
+        fliprow(int(ans))
+    elif ans == 'T':
+        pr(target, 'Target configuration is:')
+        turns -= 1
+    elif ans == 'X':
+        break
+    else:
+        print("  I don't understand '%s'... Try again. (X to exit or T to show target)\n" % ans[:9])
+        turns -= 1
+else:
+    print('\nWell done!\nBye.')
+===
+V ascii_lowercase = ‘abcdefghij’
+V digits = ‘0123456789’
+
+V n = 3
+
+V board = [[0] * :n] * n
+
+F setbits(&board, count = 1)
+   L(i) 0 .< count
+      board[random:(:n)][random:(:n)] (+)= 1
+
+F fliprow(i)
+   L(j) 0 .< :n
+      :board[i - 1][j] (+)= 1
+
+F flipcol(i)
+   L(&row) :board
+      row[i] (+)= 1
+
+F shuffle(board, count = 1)
+   L(i) 0 .< count
+      I random:(0 .< 2) != 0
+         fliprow(random:(:n) + 1)
+      E
+         flipcol(random:(:n))
+
+F pr(board, comment = ‘’)
+   print(comment)
+   print(‘     ’(0 .< :n).map(i -> :ascii_lowercase[i]).join(‘ ’))
+   print(‘  ’enumerate(board, 1).map((j, line) -> ([‘#2’.format(j)] [+] line.map(i -> String(i))).join(‘ ’)).join("\n  "))
+
+F init(&board)
+   setbits(&board, count' random:(:n) + 1)
+   V target = copy(board)
+   L board == target
+      shuffle(board, count' 2 * :n)
+   V prompt = ‘  X, T, or 1-#. / #.-#. to flip: ’.format(:n, :ascii_lowercase[0], :ascii_lowercase[:n - 1])
+   R (target, prompt)
+
+V (target, prompt) = init(&board)
+pr(target, ‘Target configuration is:’)
+print(‘’)
+V turns = 0
+L board != target
+   turns++
+   pr(board, ‘#.:’.format(turns))
+   V ans = input(prompt).trim(‘ ’)
+   I (ans.len == 1 & ans C ascii_lowercase & ascii_lowercase.index(ans) < n)
+      flipcol(ascii_lowercase.index(ans))
+   E I ans != ‘’ & all(ans.map(ch -> ch C :digits)) & Int(ans) C 1 .. n
+      fliprow(Int(ans))
+   E I ans == ‘T’
+      pr(target, ‘Target configuration is:’)
+      turns--
+   E I ans == ‘X’
+      L.break
+   E
+      print("  I don't understand '#.'... Try again. (X to exit or T to show target)\n".format(ans[0.<9]))
+      turns--
+L.was_no_break
+   print("\nWell done!\nBye.")
+===
+auto ascii_lowercase = u"abcdefghij"_S;
+auto digits = u"0123456789"_S;
+
+auto n = 3;
+
+auto board = create_array({create_array({0}) * ::n}) * n;
+
+template <typename T1, typename T2 = decltype(1)> auto setbits(T1 &board, const T2 &count = 1)
+{
+    for (auto i : range_el(0, count))
+        board[randomns::_(::n)][randomns::_(::n)] ^= 1;
+}
+
+template <typename T1> auto fliprow(const T1 &i)
+{
+    for (auto j : range_el(0, ::n))
+        ::board[i - 1][j] ^= 1;
+}
+
+template <typename T1> auto flipcol(const T1 &i)
+{
+    for (auto &row : ::board)
+        row[i] ^= 1;
+}
+
+template <typename T1, typename T2 = decltype(1)> auto shuffle(const T1 &board, const T2 &count = 1)
+{
+    for (auto i : range_el(0, count))
+        if (randomns::_(range_el(0, 2)) != 0)
+            fliprow(randomns::_(::n) + 1);
+        else
+            flipcol(randomns::_(::n));
+}
+
+template <typename T1, typename T2 = decltype(u""_S)> auto pr(const T1 &board, const T2 &comment = u""_S)
+{
+    print(comment);
+    print(u"     "_S & range_el(0, ::n).map([](const auto &i){return ::ascii_lowercase[i];}).join(u" "_S));
+    print(u"  "_S & enumerate(board, 1).map([](const auto &j, const auto &line){return (create_array({u"#2"_S.format(j)}) + line.map([](const auto &i){return String(i);})).join(u" "_S);}).join(u"\n  "_S));
+}
+
+template <typename T1> auto init(T1 &board)
+{
+    setbits(board, randomns::_(::n) + 1);
+    auto target = copy(board);
+    while (board == target)
+        shuffle(board, 2 * ::n);
+    auto prompt = u"  X, T, or 1-#. / #.-#. to flip: "_S.format(::n, _get<0>(::ascii_lowercase), ::ascii_lowercase[::n - 1]);
+    return make_tuple(target, prompt);
+}
+
+auto [target, prompt] = init(board);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        pr(target, u"Target configuration is:"_S);
+        print(u""_S);
+    }
+} code_block_1;
+
+auto turns = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (board != target) {
+            turns++;
+            pr(board, u"#.:"_S.format(turns));
+            auto ans = input(prompt).trim(u" "_S);
+            if ((ans.len() == 1 && in(ans, ascii_lowercase) && ascii_lowercase.index(ans) < n))
+                flipcol(ascii_lowercase.index(ans));
+            else if (ans != u"" && all_map(ans, [](const auto &ch){return in(ch, ::digits);}) && in(to_int(ans), range_ee(1, n)))
+                fliprow(to_int(ans));
+            else if (ans == u'T') {
+                pr(target, u"Target configuration is:"_S);
+                turns--;
+            }
+            else if (ans == u'X')
+                goto break_;
+            else {
+                print(u"  I don't understand '#.'... Try again. (X to exit or T to show target)\n"_S.format(ans[range_el(0, 9)]));
+                turns--;
+            }
+        }
+        print(u"\nWell done!\nBye."_S);
+        break_:;
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Four_is_magic#Nim
+Int64 = int
+
+Small = ["zero",    "one",     "two",       "three",    "four",
+         "five",    "six",     "seven",     "eight",    "nine",
+         "ten",     "eleven",  "twelve",    "thirteen", "fourteen",
+         "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]
+
+Tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
+
+Illions = ["", " thousand", " million", " billion", " trillion", " quadrillion", " quintillion"]
+
+def say(n : Int64) -> str:
+    result = ''
+    if n < 0:
+        result = "negative "
+        n = -n
+
+    if n < 20:
+        result += Small[int(n)]
+
+    elif n < 100:
+        result += Tens[int(n // 10)]
+        m = n % 10
+        if m != 0: result += '-' + Small[int(m)]
+
+    elif n < 1000:
+        result += Small[int(n // 100)] + " hundred"
+        m = n % 100
+        if m != 0: result += ' ' + say(m)
+
+    else:
+        # Work from right to left.
+        sx = ""
+        i = 0
+        while n > 0:
+            m = n % 1000
+            n //= 1000
+            if m != 0:
+                ix = say(m) + '' + Illions[i]
+                if len(sx) > 0: ix += " " + sx
+                sx = ix
+            i += 1
+        result += sx
+
+    return result
+
+def fourIsMagic(n):
+    s = say(n).capitalize()
+    result = s
+    while n != 4:
+        n = len(s)
+        s = say(n)
+        result += " is " + s + ", " + s
+    return result + " is magic."
+
+for n in [Int64(0), 4, 6, 11, 13, 75, 100, 337, -164, 0x7FFF_FFFF_FFFF_FFFF]:
+    print(fourIsMagic(n))
+===
+V Small = [‘zero’, ‘one’, ‘two’, ‘three’, ‘four’, ‘five’, ‘six’, ‘seven’, ‘eight’, ‘nine’, ‘ten’, ‘eleven’, ‘twelve’, ‘thirteen’, ‘fourteen’, ‘fifteen’, ‘sixteen’, ‘seventeen’, ‘eighteen’, ‘nineteen’]
+
+V Tens = [‘’, ‘’, ‘twenty’, ‘thirty’, ‘forty’, ‘fifty’, ‘sixty’, ‘seventy’, ‘eighty’, ‘ninety’]
+
+V Illions = [‘’, ‘ thousand’, ‘ million’, ‘ billion’, ‘ trillion’, ‘ quadrillion’, ‘ quintillion’]
+
+F say(Int64 =n) -> String
+   V result = ‘’
+   I n < 0
+      result = ‘negative ’
+      n = -n
+
+   I n < 20
+      result ‘’= Small[Int(n)]
+
+   E I n < 100
+      result ‘’= Tens[Int(n I/ 10)]
+      V m = n % 10
+      I m != 0
+         result ‘’= ‘-’Small[Int(m)]
+
+   E I n < 1000
+      result ‘’= Small[Int(n I/ 100)]‘ hundred’
+      V m = n % 100
+      I m != 0
+         result ‘’= ‘ ’say(m)
+
+   E
+      V sx = ‘’
+      V i = 0
+      L n > 0
+         V m = n % 1000
+         n I/= 1000
+         I m != 0
+            V ix = say(m)‘’Illions[i]
+            I sx.len > 0
+               ix ‘’= ‘ ’sx
+            sx = ix
+         i++
+      result ‘’= sx
+
+   R result
+
+F fourIsMagic(=n)
+   V s = say(n).capitalize()
+   V result = s
+   L n != 4
+      n = s.len
+      s = say(n)
+      result ‘’= ‘ is ’s‘, ’s
+   R result‘ is magic.’
+
+L(n) [Int64(0), 4, 6, 11, 13, 75, 100, 337, -164, 7FFF'FFFF'FFFF'FFFF]
+   print(fourIsMagic(n))
+===
+auto Small = create_array({u"zero"_S, u"one"_S, u"two"_S, u"three"_S, u"four"_S, u"five"_S, u"six"_S, u"seven"_S, u"eight"_S, u"nine"_S, u"ten"_S, u"eleven"_S, u"twelve"_S, u"thirteen"_S, u"fourteen"_S, u"fifteen"_S, u"sixteen"_S, u"seventeen"_S, u"eighteen"_S, u"nineteen"_S});
+
+auto Tens = create_array({u""_S, u""_S, u"twenty"_S, u"thirty"_S, u"forty"_S, u"fifty"_S, u"sixty"_S, u"seventy"_S, u"eighty"_S, u"ninety"_S});
+
+auto Illions = create_array({u""_S, u" thousand"_S, u" million"_S, u" billion"_S, u" trillion"_S, u" quadrillion"_S, u" quintillion"_S});
+
+String say(Int64 n)
+{
+    auto result = u""_S;
+    if (n < 0) {
+        result = u"negative "_S;
+        n = -n;
+    }
+
+    if (n < 20)
+        result &= Small[to_int(n)];
+
+    else if (n < 100) {
+        result &= Tens[to_int(idiv(n, 10))];
+        auto m = mod(n, 10);
+        if (m != 0)
+            result &= u"-"_S & Small[to_int(m)];
+    }
+
+    else if (n < 1000) {
+        result &= Small[to_int(idiv(n, 100))] & u" hundred"_S;
+        auto m = mod(n, 100);
+        if (m != 0)
+            result &= u" "_S & say(m);
+    }
+
+    else {
+        auto sx = u""_S;
+        auto i = 0;
+        while (n > 0) {
+            auto m = mod(n, 1000);
+            n = idiv(n, 1000);
+            if (m != 0) {
+                auto ix = say(m) & Illions[i];
+                if (sx.len() > 0)
+                    ix &= u" "_S & sx;
+                sx = ix;
+            }
+            i++;
+        }
+        result &= sx;
+    }
+
+    return result;
+}
+
+template <typename T1> auto fourIsMagic(T1 n)
+{
+    auto s = say(n).capitalize();
+    auto result = s;
+    while (n != 4) {
+        n = s.len();
+        s = say(n);
+        result &= u" is "_S & s & u", "_S & s;
+    }
+    return result & u" is magic."_S;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&n : create_array<Int64>({to_int64(0), 4, 6, 11, 13, 75, 100, 337, -164, 0x7FFF'FFFF'FFFF'FFFF}))
+            print(fourIsMagic(n));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Fractal_tree#Nim
+import math
+
+Width = 1000
+Height = 1000
+TrunkLength = 400
+ScaleFactor = 0.6
+StartingAngle = 1.5 * math.pi
+DeltaAngle = 0.2 * math.pi
+
+def drawTree(outfile, x : float, y : float, len, theta) -> None:
+    if len >= 1:
+        x2 = x + len * math.cos(theta)
+        y2 = y + len * math.sin(theta)
+        outfile.write("<line x1='%f' y1='%f' x2='%f' y2='%f' style='stroke:white;stroke-width:1'/>\n" % (x, y, x2, y2))
+        drawTree(outfile, x2, y2, len * ScaleFactor, theta + DeltaAngle)
+        drawTree(outfile, x2, y2, len * ScaleFactor, theta - DeltaAngle)
+
+outsvg = open("tree.svg", 'w', newline = "\n")
+outsvg.write(
+"""<?xml version='1.0' encoding='utf-8' standalone='no'?>
+<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>
+<svg width='100%%' height='100%%' version='1.1' xmlns='http://www.w3.org/2000/svg'>
+<rect width="100%" height="100%" fill="black"/>
+""")
+drawTree(outsvg, 0.5 * Width, Height, TrunkLength, StartingAngle)
+outsvg.write("</svg>\n")
+===
+V Width = 1000
+V Height = 1000
+V TrunkLength = 400
+V ScaleFactor = 0.6
+V StartingAngle = 1.5 * math:pi
+V DeltaAngle = 0.2 * math:pi
+
+F drawTree(outfile, Float x, Float y; len, theta) -> N
+   I len >= 1
+      V x2 = x + len * cos(theta)
+      V y2 = y + len * sin(theta)
+      outfile.write("<line x1='#.6' y1='#.6' x2='#.6' y2='#.6' style='stroke:white;stroke-width:1'/>\n".format(x, y, x2, y2))
+      drawTree(outfile, x2, y2, len * ScaleFactor, theta + DeltaAngle)
+      drawTree(outfile, x2, y2, len * ScaleFactor, theta - DeltaAngle)
+
+V outsvg = File(‘tree.svg’, ‘w’)
+outsvg.write(‘<?xml version='1.0' encoding='utf-8' standalone='no'?>
+<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>
+<svg width='100%%' height='100%%' version='1.1' xmlns='http://www.w3.org/2000/svg'>
+<rect width="100%" height="100%" fill="black"/>
+’)
+drawTree(outsvg, 0.5 * Width, Height, TrunkLength, StartingAngle)
+outsvg.write("</svg>\n")
+===
+auto Width = 1000;
+auto Height = 1000;
+auto TrunkLength = 400;
+auto ScaleFactor = 0.6;
+auto StartingAngle = 1.5 * math::pi;
+auto DeltaAngle = 0.2 * math::pi;
+
+template <typename T1, typename T4, typename T5> void drawTree(const T1 &outfile, const double x, const double y, const T4 &len, const T5 &theta)
+{
+    if (len >= 1) {
+        auto x2 = x + len * cos(theta);
+        auto y2 = y + len * sin(theta);
+        outfile.write(u"<line x1='#.6' y1='#.6' x2='#.6' y2='#.6' style='stroke:white;stroke-width:1'/>\n"_S.format(x, y, x2, y2));
+        drawTree(outfile, x2, y2, len * ScaleFactor, theta + DeltaAngle);
+        drawTree(outfile, x2, y2, len * ScaleFactor, theta - DeltaAngle);
+    }
+}
+
+auto outsvg = File(u"tree.svg"_S, u"w"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        outsvg.write(uR"(<?xml version='1.0' encoding='utf-8' standalone='no'?>
+<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>
+<svg width='100%%' height='100%%' version='1.1' xmlns='http://www.w3.org/2000/svg'>
+<rect width="100%" height="100%" fill="black"/>
+)"_S);
+        drawTree(outsvg, 0.5 * Width, Height, TrunkLength, StartingAngle);
+        outsvg.write(u"</svg>\n"_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Frobenius_numbers#Python
+import itertools
+
+def isPrime(v):
+  if v <= 1:
+    return False
+  if v < 4:
+    return True
+  if v % 2 == 0:
+    return False
+  if v < 9:
+    return True
+  if v % 3 == 0:
+    return False
+  else:
+    r = round(pow(v,0.5))
+    f = 5
+    while f <= r:
+      if v % f == 0 or v % (f + 2) == 0:
+        return False
+      f += 6
+    return True
+
+pn = 2
+n = 0
+for i in itertools.count(3, 2):
+  if isPrime(i):
+    n += 1
+    f = (pn * i) - pn - i
+    if f > 10000:
+      break
+    print (n, ' => ', f)
+    pn = i
+===
+F isPrime(v)
+   I v <= 1
+      R 0B
+   I v < 4
+      R 1B
+   I v % 2 == 0
+      R 0B
+   I v < 9
+      R 1B
+   I v % 3 == 0
+      R 0B
+   E
+      V r = round(pow(v, 0.5))
+      V f = 5
+      L f <= r
+         I v % f == 0 | v % (f + 2) == 0
+            R 0B
+         f += 6
+      R 1B
+
+V pn = 2
+V n = 0
+L(i) (3..).step(2)
+   I isPrime(i)
+      n++
+      V f = (pn * i) - pn - i
+      I f > 10000
+         L.break
+      print(n‘  =>  ’f)
+      pn = i
+===
+template <typename T1> auto isPrime(const T1 &v)
+{
+    if (v <= 1)
+        return false;
+    if (v < 4)
+        return true;
+    if (mod(v, 2) == 0)
+        return false;
+    if (v < 9)
+        return true;
+    if (mod(v, 3) == 0)
+        return false;
+    else {
+        auto r = round(pow(v, 0.5));
+        auto f = 5;
+        while (f <= r) {
+            if (mod(v, f) == 0 || mod(v, (f + 2)) == 0)
+                return false;
+            f += 6;
+        }
+        return true;
+    }
+}
+
+auto pn = 2;
+auto n = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ei(3).step(2))
+            if (isPrime(i)) {
+                n++;
+                auto f = (pn * i) - pn - i;
+                if (f > 10000)
+                    break;
+                print(n & u"  =>  "_S & f);
+                pn = i;
+            }
+    }
+} code_block_1;

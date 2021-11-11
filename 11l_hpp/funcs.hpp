@@ -53,6 +53,13 @@ inline double log(const double x, const double base) {return log(x) / log(base);
 //inline const unsigned mod(unsigned x, unsigned y) {return x%y;}
 //template <class T, class Ta> inline T mod(const T &x, const Ta &y) {return x - y*floor(x/y);}
 
+template <class Type> inline auto modf(const Type x)
+{
+	Tvec<Type, 2> r;
+	r[0] = modf(x, &r[1]);
+	return r;
+}
+
 //template <class T> inline T sign(const T x) {return x>0 ? T(1) : (x<0 ? T(-1) : 0);}
 
 // https://stackoverflow.com/a/776523
