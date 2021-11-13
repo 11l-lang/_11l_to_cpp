@@ -734,3 +734,429 @@ struct CodeBlock1
         print(dec(u"12.3450"_S));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Graph_colouring#Python
+import collections, itertools
+
+def first_avail_int(data):
+    "return lowest int 0... not in data"
+    d = set(data)
+    for i in itertools.count(0):
+        if i not in d:
+            return i
+
+def greedy_colour(name, connections):
+    graph : DefaultDict[int, List[int]] = collections.defaultdict(list)  # maps vertex to direct connections
+
+    for connection in connections.split(' '):
+        if '-' in connection:
+            (n1, n2) = map(int, connection.split('-'))
+            graph[n1].append(n2)    # Each the neighbour of the other
+            graph[n2].append(n1)
+        else:
+            graph[int(connection)] = [0] * 0
+
+    "Greedy colourisation algo."
+    order = sorted(graph.keys())      # Choose something
+    colour : Dict[int, int] = {}
+    neighbours = graph
+    for node in order:
+        used_neighbour_colours = (colour[nbr] for nbr in neighbours[node]
+                                  if nbr in colour)
+        colour[node] = first_avail_int(used_neighbour_colours)
+
+    print("\n" + name)
+    canonical_edges = set() # Tuple[int, int]
+    for n1, neighbours in sorted(graph.items()):
+        if len(neighbours):
+            for n2 in neighbours:
+                edge = tuple(sorted((n1, n2)))
+                if edge not in canonical_edges:
+                    print("       {}-{}: Colour: {}, {}".format(n1, n2, colour[n1], colour[n2]))
+                    canonical_edges.add(edge)
+        else:
+            print("         {}: Colour: {}".format(n1, colour[n1]))
+    lc = len(set(colour.values()))
+    print("    #Nodes: {}\n    #Edges: {}\n  #Colours: {}".format(len(colour), len(canonical_edges), lc))
+
+for name, connections in [
+        ('Ex1', "0-1 1-2 2-0 3"),
+        ('Ex2', "1-6 1-7 1-8 2-5 2-7 2-8 3-5 3-6 3-8 4-5 4-6 4-7"),
+        ('Ex3', "1-4 1-6 1-8 3-2 3-6 3-8 5-2 5-4 5-8 7-2 7-4 7-6"),
+        ('Ex4', "1-6 7-1 8-1 5-2 2-7 2-8 3-5 6-3 3-8 4-5 4-6 4-7"),
+        ]:
+    greedy_colour(name, connections)
+===
+F first_avail_int(data)
+   ‘return lowest int 0... not in data’
+   V d = Set(data)
+   L(i) 0..
+      I i !C d
+         R i
+
+F greedy_colour(name, connections)
+   DefaultDict[Int, [Int]] graph
+
+   L(connection) connections.split(‘ ’)
+      I ‘-’ C connection
+         V (n1, n2) = connection.split(‘-’).map(Int)
+         graph[n1].append(n2)
+         graph[n2].append(n1)
+      E
+         graph[Int(connection)] = [Int]()
+
+   ‘Greedy colourisation algo.’
+   V order = sorted(graph.keys())
+   [Int = Int] colour
+   V neighbours = graph
+   L(node) order
+      V used_neighbour_colours = (neighbours[node].filter(nbr -> nbr C @colour).map(nbr -> @colour[nbr]))
+      colour[node] = first_avail_int(used_neighbour_colours)
+
+   print("\n"name)
+   V canonical_edges = Set[(Int, Int)]()
+   L(n1, neighbours) sorted(graph.items())
+      I !neighbours.empty
+         L(n2) neighbours
+            V edge = tuple_sorted((n1, n2))
+            I edge !C canonical_edges
+               print(‘       #.-#.: Colour: #., #.’.format(n1, n2, colour[n1], colour[n2]))
+               canonical_edges.add(edge)
+      E
+         print(‘         #.: Colour: #.’.format(n1, colour[n1]))
+   V lc = Set(colour.values()).len
+   print("    #Nodes: #.\n    #Edges: #.\n  #Colours: #.".format(colour.len, canonical_edges.len, lc))
+
+L(name, connections) [(‘Ex1’, ‘0-1 1-2 2-0 3’), (‘Ex2’, ‘1-6 1-7 1-8 2-5 2-7 2-8 3-5 3-6 3-8 4-5 4-6 4-7’), (‘Ex3’, ‘1-4 1-6 1-8 3-2 3-6 3-8 5-2 5-4 5-8 7-2 7-4 7-6’), (‘Ex4’, ‘1-6 7-1 8-1 5-2 2-7 2-8 3-5 6-3 3-8 4-5 4-6 4-7’)]
+   greedy_colour(name, connections)
+===
+template <typename T1> auto first_avail_int(const T1 &data)
+{
+    u"return lowest int 0... not in data"_S;
+    auto d = create_set(data);
+    for (auto i : range_ei(0))
+        if (!in(i, d))
+            return i;
+}
+
+template <typename T1, typename T2> auto greedy_colour(const T1 &name, const T2 &connections)
+{
+    DefaultDict<int, Array<int>> graph;
+
+    for (auto &&connection : connections.split(u" "_S))
+        if (in(u'-'_C, connection)) {
+            auto [n1, n2] = bind_array<2>(connection.split(u"-"_S).map([](const auto &x){return to_int(x);}));
+            graph[n1].append(n2);
+            graph[n2].append(n1);
+        }
+        else
+            graph.set(to_int(connection), Array<int>());
+
+    u"Greedy colourisation algo."_S;
+    auto order = sorted(graph.keys());
+    Dict<int, int> colour;
+    auto neighbours = graph;
+    for (auto &&node : order) {
+        auto used_neighbour_colours = (neighbours[node].filter([&colour](const auto &nbr){return in(nbr, colour);}).map([&colour](const auto &nbr){return colour[nbr];}));
+        colour.set(node, first_avail_int(used_neighbour_colours));
+    }
+
+    print(u"\n"_S & name);
+    auto canonical_edges = Set<ivec2>();
+    for (auto &&[n1, neighbours] : sorted(graph.items()))
+        if (!neighbours.empty())
+            for (auto &&n2 : neighbours) {
+                auto edge = tuple_sorted(make_tuple(n1, n2));
+                if (!in(edge, canonical_edges)) {
+                    print(u"       #.-#.: Colour: #., #."_S.format(n1, n2, colour[n1], colour[n2]));
+                    canonical_edges.add(edge);
+                }
+            }
+        else
+            print(u"         #.: Colour: #."_S.format(n1, colour[n1]));
+    auto lc = create_set(colour.values()).len();
+    print(u"    #Nodes: #.\n    #Edges: #.\n  #Colours: #."_S.format(colour.len(), canonical_edges.len(), lc));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[name, connections] : create_array({make_tuple(u"Ex1"_S, u"0-1 1-2 2-0 3"_S), make_tuple(u"Ex2"_S, u"1-6 1-7 1-8 2-5 2-7 2-8 3-5 3-6 3-8 4-5 4-6 4-7"_S), make_tuple(u"Ex3"_S, u"1-4 1-6 1-8 3-2 3-6 3-8 5-2 5-4 5-8 7-2 7-4 7-6"_S), make_tuple(u"Ex4"_S, u"1-6 7-1 8-1 5-2 2-7 2-8 3-5 6-3 3-8 4-5 4-6 4-7"_S)}))
+            greedy_colour(name, connections);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Gray_code#Python
+def gray_encode(n):
+    return n ^ n >> 1
+
+def gray_decode(n):
+    m = n >> 1
+    while m != 0:
+        n ^= m
+        m >>= 1
+    return n
+
+print("DEC,   BIN =>  GRAY => DEC")
+for i in range(32):
+    gray = gray_encode(i)
+    dec = gray_decode(gray)
+    #print(f" {i:>2d}, {i:>05b} => {gray:>05b} => {dec:>2d}")
+    print(' %2d, %s => %s => %2d' % (i, bin(i)[2:].zfill(5), bin(gray)[2:].zfill(5), dec))
+===
+F gray_encode(n)
+   R n (+) n >> 1
+
+F gray_decode(=n)
+   V m = n >> 1
+   L m != 0
+      n (+)= m
+      m >>= 1
+   R n
+
+print(‘DEC,   BIN =>  GRAY => DEC’)
+L(i) 32
+   V gray = gray_encode(i)
+   V dec = gray_decode(gray)
+   print(‘ #2, #. => #. => #2’.format(i, bin(i).zfill(5), bin(gray).zfill(5), dec))
+===
+template <typename T1> auto gray_encode(const T1 &n)
+{
+    return n ^ n >> 1;
+}
+
+template <typename T1> auto gray_decode(T1 n)
+{
+    auto m = n >> 1;
+    while (m != 0) {
+        n ^= m;
+        m >>= 1;
+    }
+    return n;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"DEC,   BIN =>  GRAY => DEC"_S);
+        for (int i = 0; i < 32; i++) {
+            auto gray = gray_encode(i);
+            auto dec = gray_decode(gray);
+            print(u" #2, #. => #. => #2"_S.format(i, bin(i).zfill(5), bin(gray).zfill(5), dec));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Guess_the_number/With_feedback#Python
+import random
+
+(target_min, target_max) = (1, 100)
+
+print("Guess my target number that is between %i and %i (inclusive).\n"
+      % (target_min, target_max))
+target = random.randint(target_min, target_max)
+(answer, i) = (target_min - 1, 0)
+while answer != target:
+    i += 1
+    txt = input("Your guess(%i): " % i)
+    try:
+        answer = int(txt)
+    except ValueError:
+        print("  I don't understand your input of '%s' ?" % txt)
+        continue
+    if answer < target_min or answer > target_max:
+        print("  Out of range!")
+        continue
+    if answer == target:
+        print("  Ye-Haw!!")
+        break
+    if answer < target: print("  Too low.")
+    if answer > target: print("  Too high.")
+
+print("\nThanks for playing.")
+===
+V (target_min, target_max) = (1, 100)
+
+print("Guess my target number that is between #. and #. (inclusive).\n".format(target_min, target_max))
+V target = random:(target_min .. target_max)
+V (answer, i) = (target_min - 1, 0)
+L answer != target
+   i++
+   V txt = input(‘Your guess(#.): ’.format(i))
+   X.try
+      answer = Int(txt)
+   X.catch ValueError
+      print(‘  I don't understand your input of '#.' ?’.format(txt))
+      L.continue
+   I answer < target_min | answer > target_max
+      print(‘  Out of range!’)
+      L.continue
+   I answer == target
+      print(‘  Ye-Haw!!’)
+      L.break
+   I answer < target
+      print(‘  Too low.’)
+   I answer > target
+      print(‘  Too high.’)
+
+print("\nThanks for playing.")
+===
+auto [target_min, target_max] = make_tuple(1, 100);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Guess my target number that is between #. and #. (inclusive).\n"_S.format(target_min, target_max));
+    }
+} code_block_1;
+
+auto target = randomns::_(range_ee(target_min, target_max));
+auto [answer, i] = make_tuple(target_min - 1, 0);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (answer != target) {
+            i++;
+            auto txt = input(u"Your guess(#.): "_S.format(i));
+            try
+            {
+                answer = to_int(txt);
+            }
+            catch (const ValueError&)
+            {
+                print(u"  I don't understand your input of '#.' ?"_S.format(txt));
+                continue;
+            }
+            if (answer < target_min || answer > target_max) {
+                print(u"  Out of range!"_S);
+                continue;
+            }
+            if (answer == target) {
+                print(u"  Ye-Haw!!"_S);
+                break;
+            }
+            if (answer < target)
+                print(u"  Too low."_S);
+            if (answer > target)
+                print(u"  Too high."_S);
+        }
+
+        print(u"\nThanks for playing."_S);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Guess_the_number/With_feedback_(player)#Python
+(target_min, target_max) = (1, 10)
+(mn, mx) = (target_min, target_max)
+
+print(
+'''Think of a number between %i and %i and wait for me to guess it.
+On every guess of mine you should state whether the guess was
+too high, too low, or equal to your number by typing h, l, or =
+''' % (target_min, target_max))
+
+i = 0
+while True:
+    i += 1
+    guess = (mn+mx)//2
+    txt = input("Guess %2i is: %2i. The score for which is (h,l,=): "
+                % (i, guess)).strip(' ').lower()[0]
+    if txt not in 'hl=':
+        print("  I don't understand your input of '%s' ?" % txt)
+        continue
+    if txt == 'h':
+        mx = guess-1
+    if txt == 'l':
+        mn = guess+1
+    if txt == '=':
+        print("  Ye-Haw!!")
+        break
+    if (mn > mx) or (mn < target_min) or (mx > target_max):
+        print("Please check your scoring as I cannot find the value")
+        break
+
+print("\nThanks for keeping score.")
+===
+V (target_min, target_max) = (1, 10)
+V (mn, mx) = (target_min, target_max)
+
+print(‘Think of a number between #. and #. and wait for me to guess it.
+On every guess of mine you should state whether the guess was
+too high, too low, or equal to your number by typing h, l, or =
+’.format(target_min, target_max))
+
+V i = 0
+L
+   i++
+   V guess = (mn + mx) I/ 2
+   V txt = input(‘Guess #2 is: #2. The score for which is (h,l,=): ’.format(i, guess)).trim(‘ ’).lowercase()[0]
+   I txt !C ‘hl=’
+      print(‘  I don't understand your input of '#.' ?’.format(txt))
+      L.continue
+   I txt == ‘h’
+      mx = guess - 1
+   I txt == ‘l’
+      mn = guess + 1
+   I txt == ‘=’
+      print(‘  Ye-Haw!!’)
+      L.break
+   I (mn > mx) | (mn < target_min) | (mx > target_max)
+      print(‘Please check your scoring as I cannot find the value’)
+      L.break
+
+print("\nThanks for keeping score.")
+===
+auto [target_min, target_max] = make_tuple(1, 10);
+auto [mn, mx] = make_tuple(target_min, target_max);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(uR"(Think of a number between #. and #. and wait for me to guess it.
+On every guess of mine you should state whether the guess was
+too high, too low, or equal to your number by typing h, l, or =
+)"_S.format(target_min, target_max));
+    }
+} code_block_1;
+
+auto i = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (true) {
+            i++;
+            auto guess = idiv((mn + mx), 2);
+            auto txt = _get<0>(input(u"Guess #2 is: #2. The score for which is (h,l,=): "_S.format(i, guess)).trim(u" "_S).lowercase());
+            if (!in(txt, u"hl="_S)) {
+                print(u"  I don't understand your input of '#.' ?"_S.format(txt));
+                continue;
+            }
+            if (txt == u'h')
+                mx = guess - 1;
+            if (txt == u'l')
+                mn = guess + 1;
+            if (txt == u'=') {
+                print(u"  Ye-Haw!!"_S);
+                break;
+            }
+            if ((mn > mx) || (mn < target_min) || (mx > target_max)) {
+                print(u"Please check your scoring as I cannot find the value"_S);
+                break;
+            }
+        }
+
+        print(u"\nThanks for keeping score."_S);
+    }
+} code_block_2;

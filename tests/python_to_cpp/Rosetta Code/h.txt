@@ -134,3 +134,323 @@ struct CodeBlock2
             print(u"#.\t#.\t#."_S.format(_get<0>(p), symb2freq[_get<0>(p)], _get<1>(p)));
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Hilbert_curve#D
+class Point:
+    x = 0
+    y = 0
+
+    def rot(self, n, rx, ry):
+        if not ry:
+            if rx:
+                self.x = (n - 1) - self.x
+                self.y = (n - 1) - self.y
+
+            (self.x, self.y) = (self.y, self.x)
+
+    def calcD(self, n):
+        d = 0
+        s = n >> 1
+        while s > 0:
+            rx = ((self.x & s) != 0)
+            ry = ((self.y & s) != 0)
+            d += s * s * ((3 if rx else 0) ^ (1 if ry else 0))
+            self.rot(s, rx, ry)
+            s >>= 1
+        return d
+
+def fromD(n, d):
+    p = Point()
+    t = d
+    s = 1
+    while s < n:
+        rx = ((t & 2) != 0)
+        ry = (((t ^ (1 if rx else 0)) & 1) != 0)
+        p.rot(s, rx, ry)
+        p.x += (s if rx else 0)
+        p.y += (s if ry else 0)
+        t >>= 2
+        s <<= 1
+    return p
+
+def getPointsForCurve(n):
+    points : List[Point] = []
+    for d in range(n * n):
+        points += [fromD(n, d)]
+    return points
+
+def drawCurve(points, n):
+    canvas = [[' '] * (n * 3 - 2) for i in range(n)]
+
+    for i in range(1, len(points)):
+        lastPoint = points[i - 1]
+        curPoint = points[i]
+        deltaX = curPoint.x - lastPoint.x
+        deltaY = curPoint.y - lastPoint.y
+        if deltaX == 0:
+            assert deltaY != 0, "Duplicate point"
+            row = max(curPoint.y, lastPoint.y)
+            col = curPoint.x * 3
+            canvas[row][col] = '|'
+        else:
+            assert deltaY == 0, "Diagonal line"
+            row = curPoint.y
+            col = min(curPoint.x, lastPoint.x) * 3 + 1
+            canvas[row][col] = '_'
+            canvas[row][col + 1] = '_'
+
+    lines : List[str] = []
+    for row in canvas:
+        lines += [''.join(row)]
+    return lines
+
+for order in range(1, 6):
+    n = 1 << order
+    points = getPointsForCurve(n)
+    print("Hilbert curve, order="+str(order))
+    lines = drawCurve(points, n)
+    for line in lines:
+        print(line)
+    print()
+===
+T Point
+   x = 0
+   y = 0
+
+   F rot(n, rx, ry)
+      I !ry
+         I rx
+            .x = (n - 1) - .x
+            .y = (n - 1) - .y
+
+         swap(&.x, &.y)
+
+   F calcD(n)
+      V d = 0
+      V s = n >> 1
+      L s > 0
+         V rx = ((.x [&] s) != 0)
+         V ry = ((.y [&] s) != 0)
+         d += s * s * ((I rx {3} E 0) (+) (I ry {1} E 0))
+         .rot(s, rx, ry)
+         s >>= 1
+      R d
+
+F fromD(n, d)
+   V p = Point()
+   V t = d
+   V s = 1
+   L s < n
+      V rx = ((t [&] 2) != 0)
+      V ry = (((t (+) (I rx {1} E 0)) [&] 1) != 0)
+      p.rot(s, rx, ry)
+      p.x += (I rx {s} E 0)
+      p.y += (I ry {s} E 0)
+      t >>= 2
+      s <<= 1
+   R p
+
+F getPointsForCurve(n)
+   [Point] points
+   L(d) 0 .< n * n
+      points [+]= fromD(n, d)
+   R points
+
+F drawCurve(points, n)
+   V canvas = [[‘ ’] * (n * 3 - 2)] * n
+
+   L(i) 1 .< points.len
+      V lastPoint = points[i - 1]
+      V curPoint = points[i]
+      V deltaX = curPoint.x - lastPoint.x
+      V deltaY = curPoint.y - lastPoint.y
+      I deltaX == 0
+         assert(deltaY != 0, ‘Duplicate point’)
+         V row = max(curPoint.y, lastPoint.y)
+         V col = curPoint.x * 3
+         canvas[row][col] = ‘|’
+      E
+         assert(deltaY == 0, ‘Diagonal line’)
+         V row = curPoint.y
+         V col = min(curPoint.x, lastPoint.x) * 3 + 1
+         canvas[row][col] = ‘_’
+         canvas[row][col + 1] = ‘_’
+
+   [String] lines
+   L(row) canvas
+      lines [+]= row.join(‘’)
+   R lines
+
+L(order) 1..5
+   V n = 1 << order
+   V points = getPointsForCurve(n)
+   print(‘Hilbert curve, order=’String(order))
+   V lines = drawCurve(points, n)
+   L(line) lines
+      print(line)
+   print()
+===
+class Point
+{
+public:
+    decltype(0) x = 0;
+    decltype(0) y = 0;
+
+    template <typename T1, typename T2, typename T3> auto rot(const T1 &n, const T2 &rx, const T3 &ry)
+    {
+        if (!ry) {
+            if (rx) {
+                x = (n - 1) - x;
+                y = (n - 1) - y;
+            }
+
+            swap(x, y);
+        }
+    }
+
+    template <typename T1> auto calcD(const T1 &n)
+    {
+        auto d = 0;
+        auto s = n >> 1;
+        while (s > 0) {
+            auto rx = ((x & s) != 0);
+            auto ry = ((y & s) != 0);
+            d += s * s * ((rx ? 3 : 0) ^ (ry ? 1 : 0));
+            rot(s, rx, ry);
+            s >>= 1;
+        }
+        return d;
+    }
+};
+
+template <typename T1, typename T2> auto fromD(const T1 &n, const T2 &d)
+{
+    auto p = Point();
+    auto t = d;
+    auto s = 1;
+    while (s < n) {
+        auto rx = ((t & 2) != 0);
+        auto ry = (((t ^ (rx ? 1 : 0)) & 1) != 0);
+        p.rot(s, rx, ry);
+        p.x += (rx ? s : 0);
+        p.y += (ry ? s : 0);
+        t >>= 2;
+        s <<= 1;
+    }
+    return p;
+}
+
+template <typename T1> auto getPointsForCurve(const T1 &n)
+{
+    Array<Point> points;
+    for (auto d : range_el(0, n * n))
+        points.append(fromD(n, d));
+    return points;
+}
+
+template <typename T1, typename T2> auto drawCurve(const T1 &points, const T2 &n)
+{
+    auto canvas = create_array({create_array({u' '_C}) * (n * 3 - 2)}) * n;
+
+    for (auto i : range_el(1, points.len())) {
+        auto lastPoint = points[i - 1];
+        auto curPoint = points[i];
+        auto deltaX = curPoint.x - lastPoint.x;
+        auto deltaY = curPoint.y - lastPoint.y;
+        if (deltaX == 0) {
+            assert(deltaY != 0, u"Duplicate point"_S);
+            auto row = max(curPoint.y, lastPoint.y);
+            auto col = curPoint.x * 3;
+            canvas[row].set(col, u'|'_C);
+        }
+        else {
+            assert(deltaY == 0, u"Diagonal line"_S);
+            auto row = curPoint.y;
+            auto col = min(curPoint.x, lastPoint.x) * 3 + 1;
+            canvas[row].set(col, u'_'_C);
+            canvas[row].set(col + 1, u'_'_C);
+        }
+    }
+
+    Array<String> lines;
+    for (auto &&row : canvas)
+        lines.append(row.join(u""_S));
+    return lines;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto order : range_ee(1, 5)) {
+            auto n = 1 << order;
+            auto points = getPointsForCurve(n);
+            print(u"Hilbert curve, order="_S & String(order));
+            auto lines = drawCurve(points, n);
+            for (auto &&line : lines)
+                print(line);
+            print();
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Hourglass_puzzle#Python
+t4 = 0
+while t4 < 10_000:
+    t7_left = 7 - t4 % 7
+    if t7_left == 9 - 4:
+        print(
+"""Turn over both hour glasses at the same time and continue flipping them each
+when they individually run down until the 4 hour glass is flipped {} times,
+wherupon the 7 hour glass is immediately placed on its side with {} hours
+of sand in it.
+You can measure 9 hours by flipping the 4 hour glass once, then
+flipping the remaining sand in the 7 hour glass when the 4 hour glass ends.
+""".format(t4//4, t7_left))
+        break
+    t4 += 4
+else:
+    print('Not found')
+===
+V t4 = 0
+L t4 < 10'000
+   V t7_left = 7 - t4 % 7
+   I t7_left == 9 - 4
+      print(‘Turn over both hour glasses at the same time and continue flipping them each
+when they individually run down until the 4 hour glass is flipped #. times,
+wherupon the 7 hour glass is immediately placed on its side with #. hours
+of sand in it.
+You can measure 9 hours by flipping the 4 hour glass once, then
+flipping the remaining sand in the 7 hour glass when the 4 hour glass ends.
+’.format(t4 I/ 4, t7_left))
+      L.break
+   t4 += 4
+L.was_no_break
+   print(‘Not found’)
+===
+auto t4 = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (t4 < 10'000) {
+            auto t7_left = 7 - mod(t4, 7);
+            if (t7_left == 9 - 4) {
+                print(uR"(Turn over both hour glasses at the same time and continue flipping them each
+when they individually run down until the 4 hour glass is flipped #. times,
+wherupon the 7 hour glass is immediately placed on its side with #. hours
+of sand in it.
+You can measure 9 hours by flipping the 4 hour glass once, then
+flipping the remaining sand in the 7 hour glass when the 4 hour glass ends.
+)"_S.format(idiv(t4, 4), t7_left));
+                goto break_;
+            }
+            t4 += 4;
+        }
+        print(u"Not found"_S);
+        break_:;
+    }
+} code_block_1;

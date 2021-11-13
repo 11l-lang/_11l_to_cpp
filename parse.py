@@ -3280,6 +3280,9 @@ f.first_named_only_argument = 1
 builtins_scope.ids['Int'].ast_nodes[0] = ASTTypeDefinition([f])
 builtins_scope.ids['BigInt'].ast_nodes[0] = ASTTypeDefinition([f])
 
+f = ASTFunctionDefinition([('real', '', 'Float'), ('imag', '0', 'Float')])
+builtins_scope.ids['Complex'].ast_nodes[0] = ASTTypeDefinition([f])
+
 string_scope = Scope(None)
 str_last_member_var_decl = ASTVariableDeclaration()
 str_last_member_var_decl.type = 'Char'
