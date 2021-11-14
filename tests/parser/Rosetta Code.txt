@@ -3352,3 +3352,126 @@ struct CodeBlock1
         print(combsReps(create_array(range_ee(1, 10)), 3).len());
     }
 } code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Knuth%27s_power_tree#Python
+V p = [1 = 0]
+V lvl = [[1]]
+
+F path(n)
+   I !n
+      R [Int]()
+   L n !C :p
+      [Int] q
+      L(x) :lvl[0]
+         L(y) path(x)
+            I !(x + y C :p)
+               :p[x + y] = x
+               q.append(x + y)
+      :lvl[0] = q
+
+   R path(:p[n]) [+] [n]
+
+F tree_pow(x, n)
+   T Ty = T(x)
+   V (r, p) = ([0 = Ty(1), 1 = x], 0)
+   L(i) path(n)
+      r[i] = r[i - p] * r[p]
+      p = i
+   R r[n]
+
+F show_pow_i(x, n)
+   print("#.: #.\n#.^#. = #.\n".format(n, path(n), x, n, tree_pow(BigInt(x), n)))
+
+F show_pow_f(x, n)
+   print("#.: #.\n#.^#. = #.6\n".format(n, path(n), x, n, tree_pow(x, n)))
+
+L(x) 18
+   show_pow_i(2, x)
+show_pow_i(3, 191)
+show_pow_f(1.1, 81)
+===
+auto p = create_dict(dict_of(1, 0));
+auto lvl = create_array({create_array({1})});
+
+template <typename T1> auto path(const T1 &n)
+{
+    if (!n)
+        return Array<int>();
+    while (!in(n, ::p)) {
+        Array<int> q;
+        for (auto &&x : _get<0>(::lvl))
+            for (auto &&y : path(x))
+                if (!(in(x + y, ::p))) {
+                    ::p.set(x + y, x);
+                    q.append(x + y);
+                }
+        _set<0>(::lvl, q);
+    }
+
+    return path(::p[n]) + create_array({n});
+}
+
+template <typename T1, typename T2> auto tree_pow(const T1 &x, const T2 &n)
+{
+    using Ty = TYPE_OF(x);
+    auto [r, p] = make_tuple(create_dict(dict_of(0, Ty(1))(1, x)), 0);
+    for (auto &&i : path(n)) {
+        r.set(i, r[i - p] * r[p]);
+        p = i;
+    }
+    return r[n];
+}
+
+template <typename T1, typename T2> auto show_pow_i(const T1 &x, const T2 &n)
+{
+    print(u"#.: #.\n#.^#. = #.\n"_S.format(n, path(n), x, n, tree_pow(BigInt(x), n)));
+}
+
+template <typename T1, typename T2> auto show_pow_f(const T1 &x, const T2 &n)
+{
+    print(u"#.: #.\n#.^#. = #.6\n"_S.format(n, path(n), x, n, tree_pow(x, n)));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int x = 0; x < 18; x++)
+            show_pow_i(2, x);
+        show_pow_i(3, 191);
+        show_pow_f(1.1, 81);
+    }
+} code_block_1;
+
+
+// https://www.rosettacode.org/wiki/Loops/Wrong_ranges#Nim
+F displayRange(first, last, step)
+   print(‘(#2, #2, #2):   ’.format(first, last, step), end' ‘’)
+   I step == 0
+      print(‘not allowed.’)
+   E
+      print(Array((first..last).step(step)))
+
+L(f, l, s) [(-2, 2,  1), (-2, 2, 0), (-2, 2, -1),
+            (-2, 2, 10), (2, -2, 1), ( 2, 2,  1),
+            ( 2, 2, -1), (2,  2, 0), ( 0, 0,  0)]
+   displayRange(f, l, s)
+===
+template <typename T1, typename T2, typename T3> auto displayRange(const T1 &first, const T2 &last, const T3 &step)
+{
+    print(u"(#2, #2, #2):   "_S.format(first, last, step), u""_S);
+    if (step == 0)
+        print(u"not allowed."_S);
+    else
+        print(create_array(range_ee(first, last).step(step)));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[f, l, s] : create_array({make_tuple(-2, 2, 1), make_tuple(-2, 2, 0), make_tuple(-2, 2, -1), make_tuple(-2, 2, 10), make_tuple(2, -2, 1), make_tuple(2, 2, 1), make_tuple(2, 2, -1), make_tuple(2, 2, 0), make_tuple(0, 0, 0)}))
+            displayRange(f, l, s);
+    }
+} code_block_1;

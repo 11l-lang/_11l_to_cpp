@@ -1066,3 +1066,283 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Knuth%27s_power_tree#Python
+BigInt = int
+
+p = {1:0}
+lvl=[[1]]
+
+def path(n):
+    if not n: return [0]*0
+    while n not in p:
+        q : List[int] = []
+        # for x,y in ((x, x+y) for x in lvl[0] for y in path(x) if not x+y in p):
+        #     p[y] = x
+        #     q.append(y)
+        for x in lvl[0]:
+            for y in path(x):
+                if not x+y in p:
+                    p[x+y] = x
+                    q.append(x+y)
+        lvl[0] = q
+
+    return path(p[n]) + [n]
+
+def tree_pow_i(x, n):
+    (r, p) = ({0:BigInt(1), 1:BigInt(x)}, 0)
+    for i in path(n):
+        r[i] = r[i-p] * r[p]
+        p = i
+    return r[n]
+
+def tree_pow_f(x, n):
+    (r, p) = ({0:1.0, 1:x}, 0)
+    for i in path(n):
+        r[i] = r[i-p] * r[p]
+        p = i
+    return r[n]
+
+def show_pow_i(x, n):
+    print("%d: %s\n%d^%d = %d\n" % (n, str(path(n)), x, n, tree_pow_i(x, n)))
+
+def show_pow_f(x, n):
+    print("%d: %s\n%g^%d = %f\n" % (n, str(path(n)), x, n, tree_pow_f(x, n)))
+
+for x in range(18): show_pow_i(2, x)
+show_pow_i(3, 191)
+show_pow_f(1.1, 81)
+===
+V p = [1 = 0]
+V lvl = [[1]]
+
+F path(n)
+   I !n
+      R [Int]()
+   L n !C :p
+      [Int] q
+      L(x) :lvl[0]
+         L(y) path(x)
+            I !(x + y C :p)
+               :p[x + y] = x
+               q.append(x + y)
+      :lvl[0] = q
+
+   R path(:p[n]) [+] [n]
+
+F tree_pow_i(x, n)
+   V (r, p) = ([0 = BigInt(1), 1 = BigInt(x)], 0)
+   L(i) path(n)
+      r[i] = r[i - p] * r[p]
+      p = i
+   R r[n]
+
+F tree_pow_f(x, n)
+   V (r, p) = ([0 = 1.0, 1 = x], 0)
+   L(i) path(n)
+      r[i] = r[i - p] * r[p]
+      p = i
+   R r[n]
+
+F show_pow_i(x, n)
+   print("#.: #.\n#.^#. = #.\n".format(n, String(path(n)), x, n, tree_pow_i(x, n)))
+
+F show_pow_f(x, n)
+   print("#.: #.\n#.^#. = #.6\n".format(n, String(path(n)), x, n, tree_pow_f(x, n)))
+
+L(x) 18
+   show_pow_i(2, x)
+show_pow_i(3, 191)
+show_pow_f(1.1, 81)
+===
+auto p = create_dict(dict_of(1, 0));
+auto lvl = create_array({create_array({1})});
+
+template <typename T1> auto path(const T1 &n)
+{
+    if (!n)
+        return Array<int>();
+    while (!in(n, ::p)) {
+        Array<int> q;
+        for (auto &&x : _get<0>(::lvl))
+            for (auto &&y : path(x))
+                if (!(in(x + y, ::p))) {
+                    ::p.set(x + y, x);
+                    q.append(x + y);
+                }
+        _set<0>(::lvl, q);
+    }
+
+    return path(::p[n]) + create_array({n});
+}
+
+template <typename T1, typename T2> auto tree_pow_i(const T1 &x, const T2 &n)
+{
+    auto [r, p] = make_tuple(create_dict(dict_of(0, BigInt(1))(1, BigInt(x))), 0);
+    for (auto &&i : path(n)) {
+        r.set(i, r[i - p] * r[p]);
+        p = i;
+    }
+    return r[n];
+}
+
+template <typename T1, typename T2> auto tree_pow_f(const T1 &x, const T2 &n)
+{
+    auto [r, p] = make_tuple(create_dict(dict_of(0, 1.0)(1, x)), 0);
+    for (auto &&i : path(n)) {
+        r.set(i, r[i - p] * r[p]);
+        p = i;
+    }
+    return r[n];
+}
+
+template <typename T1, typename T2> auto show_pow_i(const T1 &x, const T2 &n)
+{
+    print(u"#.: #.\n#.^#. = #.\n"_S.format(n, String(path(n)), x, n, tree_pow_i(x, n)));
+}
+
+template <typename T1, typename T2> auto show_pow_f(const T1 &x, const T2 &n)
+{
+    print(u"#.: #.\n#.^#. = #.6\n"_S.format(n, String(path(n)), x, n, tree_pow_f(x, n)));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int x = 0; x < 18; x++)
+            show_pow_i(2, x);
+        show_pow_i(3, 191);
+        show_pow_f(1.1, 81);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Kronecker_product_based_fractals#Nim
+def kroneckerProduct(a, b):
+    m = len(a)
+    n = len(a[0])
+    p = len(b)
+    q = len(b[0])
+    result = [[0] * (n * q) for i in range(m * p)]
+    for i in range(m):
+        for j in range(n):
+            for k in range(p):
+                for l in range(q):
+                    result[i * p + k][j * q + l] = a[i][j] * b[k][l]
+    return result
+
+def kroneckerPower(m, n):
+    result = m
+    for i in range(2, n + 1):
+        result = kroneckerProduct(result, m)
+    return result
+
+def to_str(m):
+    result = ''
+    for row in m:
+        for val in row:
+            result += "  " if val == 0 else " *"
+        result += "\n"
+    return result
+
+a1 = [[0, 1, 0], [1, 1, 1], [0, 1, 0]]
+print('Vicsek fractal:')
+print(to_str(kroneckerPower(a1, 4)))
+print()
+a2 = [[1, 1, 1], [1, 0, 1], [1, 1, 1]]
+print('Sierpinski carpet fractal:')
+print(to_str(kroneckerPower(a2, 4)))
+===
+F kroneckerProduct(a, b)
+   V m = a.len
+   V n = a[0].len
+   V p = b.len
+   V q = b[0].len
+   V result = [[0] * (n * q)] * (m * p)
+   L(i) 0 .< m
+      L(j) 0 .< n
+         L(k) 0 .< p
+            L(l) 0 .< q
+               result[i * p + k][j * q + l] = a[i][j] * b[k][l]
+   R result
+
+F kroneckerPower(m, n)
+   V result = m
+   L(i) 2 .. n
+      result = kroneckerProduct(result, m)
+   R result
+
+F to_str(m)
+   V result = ‘’
+   L(row) m
+      L(val) row
+         result ‘’= I val == 0 {‘  ’} E ‘ *’
+      result ‘’= "\n"
+   R result
+
+V a1 = [[0, 1, 0], [1, 1, 1], [0, 1, 0]]
+print(‘Vicsek fractal:’)
+print(to_str(kroneckerPower(a1, 4)))
+print()
+V a2 = [[1, 1, 1], [1, 0, 1], [1, 1, 1]]
+print(‘Sierpinski carpet fractal:’)
+print(to_str(kroneckerPower(a2, 4)))
+===
+template <typename T1, typename T2> auto kroneckerProduct(const T1 &a, const T2 &b)
+{
+    auto m = a.len();
+    auto n = _get<0>(a).len();
+    auto p = b.len();
+    auto q = _get<0>(b).len();
+    auto result = create_array({create_array({0}) * (n * q)}) * (m * p);
+    for (auto i : range_el(0, m))
+        for (auto j : range_el(0, n))
+            for (auto k : range_el(0, p))
+                for (auto l : range_el(0, q))
+                    result[i * p + k].set(j * q + l, a[i][j] * b[k][l]);
+    return result;
+}
+
+template <typename T1, typename T2> auto kroneckerPower(const T1 &m, const T2 &n)
+{
+    auto result = m;
+    for (auto i : range_ee(2, n))
+        result = kroneckerProduct(result, m);
+    return result;
+}
+
+template <typename T1> auto to_str(const T1 &m)
+{
+    auto result = u""_S;
+    for (auto &&row : m) {
+        for (auto &&val : row)
+            result &= val == 0 ? u"  "_S : u" *"_S;
+        result &= u"\n"_S;
+    }
+    return result;
+}
+
+auto a1 = create_array({create_array({0, 1, 0}), create_array({1, 1, 1}), create_array({0, 1, 0})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Vicsek fractal:"_S);
+        print(to_str(kroneckerPower(a1, 4)));
+        print();
+    }
+} code_block_1;
+
+auto a2 = create_array({create_array({1, 1, 1}), create_array({1, 0, 1}), create_array({1, 1, 1})});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"Sierpinski carpet fractal:"_S);
+        print(to_str(kroneckerPower(a2, 4)));
+    }
+} code_block_2;

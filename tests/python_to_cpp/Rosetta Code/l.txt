@@ -2535,3 +2535,717 @@ struct CodeBlock2
         }
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Largest_proper_divisor_of_n#Python
+def lpd(n):
+    for i in range(n-1,0,-1):
+        if n%i==0: return i
+    return 1
+
+for i in range(1,101):
+    print("{:3}".format(lpd(i)), end="\n" if i%10==0 else '')
+===
+F lpd(n)
+   L(i) (n - 1 .< 0).step(-1)
+      I n % i == 0
+         R i
+   R 1
+
+L(i) 1..100
+   print(‘#3’.format(lpd(i)), end' I i % 10 == 0 {"\n"} E ‘’)
+===
+template <typename T1> auto lpd(const T1 &n)
+{
+    for (auto i : range_el(n - 1, 0).step(-1))
+        if (mod(n, i) == 0)
+            return i;
+    return 1;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(1, 100))
+            print(u"#3"_S.format(lpd(i)), mod(i, 10) == 0 ? u"\n"_S : u""_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Levenshtein_distance/Alignment#Nim
+def levenshteinAlign(aa, bb):
+    a = aa.lower()
+    b = bb.lower()
+    costs = [[0] * (len(b) + 1) for i in range(len(a) + 1)]
+    for j in range(len(b) + 1): costs[0][j] = j
+    for i in range(1, len(a) + 1):
+        costs[i][0] = i
+        for j in range(1, len(b) + 1):
+            tmp = costs[i - 1][j - 1] + int(a[i - 1] != b[j - 1])
+            costs[i][j] = min(1 + min(costs[i - 1][j], costs[i][j - 1]), tmp)
+
+    # Walk back through matrix to figure out path.
+    aPathRev = ''
+    bPathRev = ''
+    i = len(a)
+    j = len(b)
+    while i != 0 and j != 0:
+        tmp = costs[i - 1][j - 1] + int(a[i - 1] != b[j - 1])
+        if costs[i][j] == tmp:
+            i -= 1
+            j -= 1
+            aPathRev += a[i]
+            bPathRev += b[j]
+        elif costs[i][j] == 1 + costs[i-1][j]:
+            i -= 1
+            aPathRev += a[i]
+            bPathRev += '-'
+        elif costs[i][j] == 1 + costs[i][j-1]:
+            j -= 1
+            aPathRev += '-'
+            bPathRev += b[j]
+        else:
+            assert False, "Internal error"
+
+    return (aPathRev[::-1], bPathRev[::-1])
+
+result = levenshteinAlign("place", "palace")
+print(result[0])
+print(result[1])
+print()
+
+result = levenshteinAlign("rosettacode","raisethysword")
+print(result[0])
+print(result[1])
+===
+F levenshteinAlign(aa, bb)
+   V a = aa.lowercase()
+   V b = bb.lowercase()
+   V costs = [[0] * (b.len + 1)] * (a.len + 1)
+   L(j) 0 .. b.len
+      costs[0][j] = j
+   L(i) 1 .. a.len
+      costs[i][0] = i
+      L(j) 1 .. b.len
+         V tmp = costs[i - 1][j - 1] + Int(a[i - 1] != b[j - 1])
+         costs[i][j] = min(1 + min(costs[i - 1][j], costs[i][j - 1]), tmp)
+
+   V aPathRev = ‘’
+   V bPathRev = ‘’
+   V i = a.len
+   V j = b.len
+   L i != 0 & j != 0
+      V tmp = costs[i - 1][j - 1] + Int(a[i - 1] != b[j - 1])
+      I costs[i][j] == tmp
+         i--
+         j--
+         aPathRev ‘’= a[i]
+         bPathRev ‘’= b[j]
+      E I costs[i][j] == 1 + costs[i - 1][j]
+         i--
+         aPathRev ‘’= a[i]
+         bPathRev ‘’= ‘-’
+      E I costs[i][j] == 1 + costs[i][j - 1]
+         j--
+         aPathRev ‘’= ‘-’
+         bPathRev ‘’= b[j]
+      E
+         assert(0B, ‘Internal error’)
+
+   R (reversed(aPathRev), reversed(bPathRev))
+
+V result = levenshteinAlign(‘place’, ‘palace’)
+print(result[0])
+print(result[1])
+print()
+
+result = levenshteinAlign(‘rosettacode’, ‘raisethysword’)
+print(result[0])
+print(result[1])
+===
+template <typename T1, typename T2> auto levenshteinAlign(const T1 &aa, const T2 &bb)
+{
+    auto a = aa.lowercase();
+    auto b = bb.lowercase();
+    auto costs = create_array({create_array({0}) * (b.len() + 1)}) * (a.len() + 1);
+    for (auto j : range_ee(0, b.len()))
+        _get<0>(costs).set(j, j);
+    for (auto i : range_ee(1, a.len())) {
+        _set<0>(costs[i], i);
+        for (auto j : range_ee(1, b.len())) {
+            auto tmp = costs[i - 1][j - 1] + to_int(a[i - 1] != b[j - 1]);
+            costs[i].set(j, min(1 + min(costs[i - 1][j], costs[i][j - 1]), tmp));
+        }
+    }
+
+    auto aPathRev = u""_S;
+    auto bPathRev = u""_S;
+    auto i = a.len();
+    auto j = b.len();
+    while (i != 0 && j != 0) {
+        auto tmp = costs[i - 1][j - 1] + to_int(a[i - 1] != b[j - 1]);
+        if (costs[i][j] == tmp) {
+            i--;
+            j--;
+            aPathRev &= a[i];
+            bPathRev &= b[j];
+        }
+        else if (costs[i][j] == 1 + costs[i - 1][j]) {
+            i--;
+            aPathRev &= a[i];
+            bPathRev &= u"-"_S;
+        }
+        else if (costs[i][j] == 1 + costs[i][j - 1]) {
+            j--;
+            aPathRev &= u"-"_S;
+            bPathRev &= b[j];
+        }
+        else
+            assert(false, u"Internal error"_S);
+    }
+
+    return make_tuple(reversed(aPathRev), reversed(bPathRev));
+}
+
+auto result = levenshteinAlign(u"place"_S, u"palace"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(_get<0>(result));
+        print(_get<1>(result));
+        print();
+
+        result = levenshteinAlign(u"rosettacode"_S, u"raisethysword"_S);
+        print(_get<0>(result));
+        print(_get<1>(result));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Long_literals,_with_continuations#Python
+revdate = "2021-11-14"
+
+elements = \
+    "hydrogen helium lithium beryllium boron carbon nitrogen oxygen fluorine " + \
+    "neon sodium magnesium aluminum silicon phosphorous sulfur chlorine argon " + \
+    "potassium calcium scandium titanium vanadium chromium manganese iron " + \
+    "cobalt nickel copper zinc gallium germanium arsenic selenium bromine " + \
+    "krypton rubidium strontium yttrium zirconium niobium molybdenum " + \
+    "technetium ruthenium rhodium palladium silver cadmium indium tin " + \
+    "antimony tellurium iodine xenon cesium barium lanthanum cerium " + \
+    "praseodymium neodymium promethium samarium europium gadolinium terbium " + \
+    "dysprosium holmium erbium thulium ytterbium lutetium hafnium tantalum " + \
+    "tungsten rhenium osmium iridium platinum gold mercury thallium lead " + \
+    "bismuth polonium astatine radon francium radium actinium thorium " + \
+    "protactinium uranium neptunium plutonium americium curium berkelium " + \
+    "californium einsteinium fermium mendelevium nobelium lawrencium " + \
+    "rutherfordium dubnium seaborgium bohrium hassium meitnerium darmstadtium " + \
+    "roentgenium copernicium nihonium flerovium moscovium livermorium " + \
+    "tennessine oganesson"
+
+items = elements.split(' ')
+
+print("Last revision date:", revdate)
+print("Number of elements:", len(items))
+print("Last element      :", items[-1])
+===
+V revdate = ‘2021-11-14’
+
+V elements = ‘hydrogen helium lithium beryllium boron carbon nitrogen oxygen fluorine ’""‘neon sodium magnesium aluminum silicon phosphorous sulfur chlorine argon ’""‘potassium calcium scandium titanium vanadium chromium manganese iron ’""‘cobalt nickel copper zinc gallium germanium arsenic selenium bromine ’""‘krypton rubidium strontium yttrium zirconium niobium molybdenum ’""‘technetium ruthenium rhodium palladium silver cadmium indium tin ’""‘antimony tellurium iodine xenon cesium barium lanthanum cerium ’""‘praseodymium neodymium promethium samarium europium gadolinium terbium ’""‘dysprosium holmium erbium thulium ytterbium lutetium hafnium tantalum ’""‘tungsten rhenium osmium iridium platinum gold mercury thallium lead ’""‘bismuth polonium astatine radon francium radium actinium thorium ’""‘protactinium uranium neptunium plutonium americium curium berkelium ’""‘californium einsteinium fermium mendelevium nobelium lawrencium ’""‘rutherfordium dubnium seaborgium bohrium hassium meitnerium darmstadtium ’""‘roentgenium copernicium nihonium flerovium moscovium livermorium ’""‘tennessine oganesson’
+
+V items = elements.split(‘ ’)
+
+print(‘Last revision date: ’revdate)
+print(‘Number of elements: ’items.len)
+print(‘Last element      : ’items.last)
+===
+auto revdate = u"2021-11-14"_S;
+
+auto elements = u"hydrogen helium lithium beryllium boron carbon nitrogen oxygen fluorine "_S & u"neon sodium magnesium aluminum silicon phosphorous sulfur chlorine argon "_S & u"potassium calcium scandium titanium vanadium chromium manganese iron "_S & u"cobalt nickel copper zinc gallium germanium arsenic selenium bromine "_S & u"krypton rubidium strontium yttrium zirconium niobium molybdenum "_S & u"technetium ruthenium rhodium palladium silver cadmium indium tin "_S & u"antimony tellurium iodine xenon cesium barium lanthanum cerium "_S & u"praseodymium neodymium promethium samarium europium gadolinium terbium "_S & u"dysprosium holmium erbium thulium ytterbium lutetium hafnium tantalum "_S & u"tungsten rhenium osmium iridium platinum gold mercury thallium lead "_S & u"bismuth polonium astatine radon francium radium actinium thorium "_S & u"protactinium uranium neptunium plutonium americium curium berkelium "_S & u"californium einsteinium fermium mendelevium nobelium lawrencium "_S & u"rutherfordium dubnium seaborgium bohrium hassium meitnerium darmstadtium "_S & u"roentgenium copernicium nihonium flerovium moscovium livermorium "_S & u"tennessine oganesson"_S;
+
+auto items = elements.split(u" "_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Last revision date: "_S & revdate);
+        print(u"Number of elements: "_S & items.len());
+        print(u"Last element      : "_S & items.last());
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Longest_substrings_without_repeating_characters#Python:_Some_optimisation
+def longest_substring2(s):
+    max_subs = [s[0:1]] * 0
+    mx = 0
+    for x in range(len(s)):
+        for y in range(x+1, len(s) + 1):
+            sub = s[x:y]
+            if y - x >= mx and len(sub) == len(set(list(sub))):
+                if y - x == mx and sub not in max_subs:
+                    max_subs.append(sub)
+                else:
+                    max_subs = [sub]
+                    mx = y - x
+    return max_subs
+
+for s in ["xyzyabcybdfd", "xyzyab", "zzzzz", "a", ""]:
+    print(s, '=>', longest_substring2(s))
+
+arr = [1, 2, 3, 4, 1, 2, 5, 6, 1, 7, 8, 1, 0]
+print(arr, '=>', longest_substring2(arr))
+===
+F longest_substring2(s)
+   V max_subs = [s[0.<1]] * 0
+   V mx = 0
+   L(x) 0 .< s.len
+      L(y) x + 1 .. s.len
+         V sub = s[x .< y]
+         I y - x >= mx & sub.len == Set(Array(sub)).len
+            I y - x == mx & sub !C max_subs
+               max_subs.append(sub)
+            E
+               max_subs = [sub]
+               mx = y - x
+   R max_subs
+
+L(s) [‘xyzyabcybdfd’, ‘xyzyab’, ‘zzzzz’, ‘a’, ‘’]
+   print(s‘ => ’longest_substring2(s))
+
+V arr = [1, 2, 3, 4, 1, 2, 5, 6, 1, 7, 8, 1, 0]
+print(arr‘ => ’longest_substring2(arr))
+===
+template <typename T1> auto longest_substring2(const T1 &s)
+{
+    auto max_subs = create_array({s[range_el(0, 1)]}) * 0;
+    auto mx = 0;
+    for (auto x : range_el(0, s.len()))
+        for (auto y : range_ee(x + 1, s.len())) {
+            auto sub = s[range_el(x, y)];
+            if (y - x >= mx && sub.len() == create_set(create_array(sub)).len()) {
+                if (y - x == mx && !in(sub, max_subs))
+                    max_subs.append(sub);
+                else {
+                    max_subs = create_array({sub});
+                    mx = y - x;
+                }
+            }
+        }
+    return max_subs;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&s : create_array({u"xyzyabcybdfd"_S, u"xyzyab"_S, u"zzzzz"_S, u"a"_S, u""_S}))
+            print(s & u" => "_S & longest_substring2(s));
+    }
+} code_block_1;
+
+auto arr = create_array({1, 2, 3, 4, 1, 2, 5, 6, 1, 7, 8, 1, 0});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(arr & u" => "_S & longest_substring2(arr));
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Loops/With_multiple_ranges#Nim
+prod = 1
+s = 0
+
+x = +5
+y = -5
+z = -2
+one = 1
+three = 3
+seven = 7
+
+def body(j):
+    global s, prod
+    s += abs(j)
+    if abs(prod) < 2**27 and j != 0: prod *= j
+
+for j in range(-three, 3**3 + 1, three): body(j)
+for j in range(-seven, seven + 1, x): body(j)
+for j in range(555, 550 - y + 1): body(j)
+for j in range(22, -28 - 1, -three): body(j)
+for j in range(1927, 1939 + 1): body(j)
+for j in range(x, y - 1, z): body(j)
+for j in range(11**x, 11**x + one + 1): body(j)
+
+ss = str(s)
+ps = str(prod)
+m = max(len(ss), len(ps))
+print(" sum =", ss.rjust(m))
+print("prod =", ps.rjust(m))
+===
+V prod = 1
+V s = 0
+
+V x = +5
+V y = -5
+V z = -2
+V one = 1
+V three = 3
+V seven = 7
+
+F body(j)
+   :s += abs(j)
+   I abs(:prod) < 2 ^ 27 & j != 0
+      :prod *= j
+
+L(j) (-three .< 3 ^ 3 + 1).step(three)
+   body(j)
+L(j) (-seven .< seven + 1).step(x)
+   body(j)
+L(j) 555 .. 550 - y
+   body(j)
+L(j) (22 .< -28 - 1).step(-three)
+   body(j)
+L(j) 1927 .. 1939
+   body(j)
+L(j) (x .< y - 1).step(z)
+   body(j)
+L(j) 11 ^ x .. 11 ^ x + one
+   body(j)
+
+V ss = String(s)
+V ps = String(prod)
+V m = max(ss.len, ps.len)
+print(‘ sum = ’ss.rjust(m))
+print(‘prod = ’ps.rjust(m))
+===
+auto prod = 1;
+auto s = 0;
+
+auto x = +5;
+auto y = -5;
+auto z = -2;
+auto one = 1;
+auto three = 3;
+auto seven = 7;
+
+template <typename T1> auto body(const T1 &j)
+{
+    ::s += abs(j);
+    if (abs(::prod) < pow(2, 27) && j != 0)
+        ::prod *= j;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto j : range_el(-three, cube(3) + 1).step(three))
+            body(j);
+        for (auto j : range_el(-seven, seven + 1).step(x))
+            body(j);
+        for (auto j : range_ee(555, 550 - y))
+            body(j);
+        for (auto j : range_el(22, -28 - 1).step(-three))
+            body(j);
+        for (auto j : range_ee(1927, 1939))
+            body(j);
+        for (auto j : range_el(x, y - 1).step(z))
+            body(j);
+        for (auto j : range_ee(pow(11, x), pow(11, x) + one))
+            body(j);
+    }
+} code_block_1;
+
+auto ss = String(s);
+auto ps = String(prod);
+auto m = max(ss.len(), ps.len());
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u" sum = "_S & ss.rjust(m));
+        print(u"prod = "_S & ps.rjust(m));
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Lucky_and_even_lucky_numbers#Nim
+import sys
+
+NoValue = 0
+
+def initLuckyNumbers(nelems, evenlucky, limit = -1):
+    result : List[int] = []
+    for i in range(nelems):
+        k = i
+        for j in range(len(result) - 1, 0, -1):
+            k = k * result[j] // (result[j] - 1)
+        n = 2 * k + 1 + evenlucky
+        if limit != -1 and n > limit:
+            break
+        result.append(n)
+    return result
+
+def name(evenlucky):
+    return ['Lucky', 'Even lucky'][evenlucky]
+
+def printSingle(j, evenlucky):
+    luckySeq = initLuckyNumbers(j, evenlucky)
+    print(name(evenlucky), 'number at index', j, 'is', luckySeq[j - 1])
+
+def printRange(j, k, evenlucky):
+    luckySeq = initLuckyNumbers(k, evenlucky)
+    print(name(evenlucky), 'numbers at indexes', j, 'to', k, 'are: ', end = '')
+    for idx in range(j - 1, k):
+        if idx != j - 1:
+            print(', ', end = '')
+        print(luckySeq[idx], end = '')
+    print()
+
+def printInRange(j, k, evenlucky):
+    luckySeq = initLuckyNumbers(k, evenlucky, k)
+    print(name(evenlucky), 'numbers between', j, 'to', k, 'are: ', end = '')
+    first = True
+    for val in luckySeq:
+        #if val > k: break
+        if val > j:
+            if first:
+                first = False
+            else:
+                print(', ', end = '')
+            print(val, end = '')
+    print()
+
+def process_args(args):
+    assert 1 <= len(args) <= 3, 'Wrong number of arguments'
+
+    # First argument: "j" value.
+    j = int(args[0])
+
+    k = NoValue
+    # Second argument: "k" value or a comma.
+    if len(args) > 1:
+        if args[1] == ',':
+            # Must be followed by the kind of lucky number.
+            assert len(args) == 3, 'Missing kind argument'
+        else:
+            k = int(args[1])
+            assert k != 0, 'Expected a non null number'
+
+    evenlucky = 0
+    # Third argument: number kind.
+    if len(args) == 3:
+        kind = args[2].lower()
+        assert kind in ('lucky', 'evenlucky'), 'Wrong kind'
+        if kind == 'evenlucky':
+            evenlucky = 1
+
+    if k == NoValue:
+        # Print jth value.
+        printSingle(j, evenlucky)
+    elif k > 0:
+        # Print jth to kth values.
+        printRange(j, k, evenlucky)
+    else:
+        # Print values in range j..(-k).
+        printInRange(j, -k, evenlucky)
+
+if __name__ == '__main__':
+    if True:
+        for args in ['1 20', '1 20 evenlucky', '6000 -6100', '6000 -6100 evenlucky', '10000', '10000 , lucky', '10000 , evenlucky']:
+            print('Command line arguments: ' + args)
+            process_args(args.split(' '))
+            print()
+    else:
+        process_args(sys.argv[1:])
+===
+V NoValue = 0
+
+F initLuckyNumbers(nelems, evenlucky, limit = -1)
+   [Int] result
+   L(i) 0 .< nelems
+      V k = i
+      L(j) (result.len - 1 .< 0).step(-1)
+         k = k * result[j] I/ (result[j] - 1)
+      V n = 2 * k + 1 + evenlucky
+      I limit != -1 & n > limit
+         L.break
+      result.append(n)
+   R result
+
+F name(evenlucky)
+   R [‘Lucky’, ‘Even lucky’][evenlucky]
+
+F printSingle(j, evenlucky)
+   V luckySeq = initLuckyNumbers(j, evenlucky)
+   print(name(evenlucky)‘ number at index ’j‘ is ’luckySeq[j - 1])
+
+F printRange(j, k, evenlucky)
+   V luckySeq = initLuckyNumbers(k, evenlucky)
+   print(name(evenlucky)‘ numbers at indexes ’j‘ to ’k‘ are: ’, end' ‘’)
+   L(idx) j - 1 .< k
+      I idx != j - 1
+         print(‘, ’, end' ‘’)
+      print(luckySeq[idx], end' ‘’)
+   print()
+
+F printInRange(j, k, evenlucky)
+   V luckySeq = initLuckyNumbers(k, evenlucky, k)
+   print(name(evenlucky)‘ numbers between ’j‘ to ’k‘ are: ’, end' ‘’)
+   V first = 1B
+   L(val) luckySeq
+      I val > j
+         I first
+            first = 0B
+         E
+            print(‘, ’, end' ‘’)
+         print(val, end' ‘’)
+   print()
+
+F process_args(args)
+   assert(args.len C 1..3, ‘Wrong number of arguments’)
+
+   V j = Int(args[0])
+
+   V k = NoValue
+   I args.len > 1
+      I args[1] == ‘,’
+         assert(args.len == 3, ‘Missing kind argument’)
+      E
+         k = Int(args[1])
+         assert(k != 0, ‘Expected a non null number’)
+
+   V evenlucky = 0
+   I args.len == 3
+      V kind = args[2].lowercase()
+      assert(kind C (‘lucky’, ‘evenlucky’), ‘Wrong kind’)
+      I kind == ‘evenlucky’
+         evenlucky = 1
+
+   I k == NoValue
+      printSingle(j, evenlucky)
+   E I k > 0
+      printRange(j, k, evenlucky)
+   E
+      printInRange(j, -k, evenlucky)
+
+:start:
+I 1B
+   L(args) [‘1 20’, ‘1 20 evenlucky’, ‘6000 -6100’, ‘6000 -6100 evenlucky’, ‘10000’, ‘10000 , lucky’, ‘10000 , evenlucky’]
+      print(‘Command line arguments: ’args)
+      process_args(args.split(‘ ’))
+      print()
+E
+   process_args(:argv[1..])
+===
+Array<String> argv;
+
+auto NoValue = 0;
+
+template <typename T1, typename T2, typename T3 = decltype(-1)> auto initLuckyNumbers(const T1 &nelems, const T2 &evenlucky, const T3 &limit = -1)
+{
+    Array<int> result;
+    for (auto i : range_el(0, nelems)) {
+        auto k = i;
+        for (auto j : range_el(result.len() - 1, 0).step(-1))
+            k = idiv(k * result[j], (result[j] - 1));
+        auto n = 2 * k + 1 + evenlucky;
+        if (limit != -1 && n > limit)
+            break;
+        result.append(n);
+    }
+    return result;
+}
+
+template <typename T1> auto name(const T1 &evenlucky)
+{
+    return create_array({u"Lucky"_S, u"Even lucky"_S})[evenlucky];
+}
+
+template <typename T1, typename T2> auto printSingle(const T1 &j, const T2 &evenlucky)
+{
+    auto luckySeq = initLuckyNumbers(j, evenlucky);
+    print(name(evenlucky) & u" number at index "_S & j & u" is "_S & luckySeq[j - 1]);
+}
+
+template <typename T1, typename T2, typename T3> auto printRange(const T1 &j, const T2 &k, const T3 &evenlucky)
+{
+    auto luckySeq = initLuckyNumbers(k, evenlucky);
+    print(name(evenlucky) & u" numbers at indexes "_S & j & u" to "_S & k & u" are: "_S, u""_S);
+    for (auto idx : range_el(j - 1, k)) {
+        if (idx != j - 1)
+            print(u", "_S, u""_S);
+        print(luckySeq[idx], u""_S);
+    }
+    print();
+}
+
+template <typename T1, typename T2, typename T3> auto printInRange(const T1 &j, const T2 &k, const T3 &evenlucky)
+{
+    auto luckySeq = initLuckyNumbers(k, evenlucky, k);
+    print(name(evenlucky) & u" numbers between "_S & j & u" to "_S & k & u" are: "_S, u""_S);
+    auto first = true;
+    for (auto &&val : luckySeq)
+        if (val > j) {
+            if (first)
+                first = false;
+            else
+                print(u", "_S, u""_S);
+            print(val, u""_S);
+        }
+    print();
+}
+
+template <typename T1> auto process_args(const T1 &args)
+{
+    assert(in(args.len(), range_ee(1, 3)), u"Wrong number of arguments"_S);
+
+    auto j = to_int(_get<0>(args));
+
+    auto k = NoValue;
+    if (args.len() > 1) {
+        if (_get<1>(args) == u',')
+            assert(args.len() == 3, u"Missing kind argument"_S);
+        else {
+            k = to_int(_get<1>(args));
+            assert(k != 0, u"Expected a non null number"_S);
+        }
+    }
+
+    auto evenlucky = 0;
+    if (args.len() == 3) {
+        auto kind = _get<2>(args).lowercase();
+        assert(in(kind, make_tuple(u"lucky"_S, u"evenlucky"_S)), u"Wrong kind"_S);
+        if (kind == u"evenlucky")
+            evenlucky = 1;
+    }
+
+    if (k == NoValue)
+        printSingle(j, evenlucky);
+    else if (k > 0)
+        printRange(j, k, evenlucky);
+    else
+        printInRange(j, -k, evenlucky);
+}
+
+int MAIN_WITH_ARGV()
+{
+    INIT_ARGV();
+
+    if (true)
+        for (auto &&args : create_array({u"1 20"_S, u"1 20 evenlucky"_S, u"6000 -6100"_S, u"6000 -6100 evenlucky"_S, u"10000"_S, u"10000 , lucky"_S, u"10000 , evenlucky"_S})) {
+            print(u"Command line arguments: "_S & args);
+            process_args(args.split(u" "_S));
+            print();
+        }
+    else
+        process_args(::argv[range_ei(1)]);
+}

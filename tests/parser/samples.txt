@@ -1414,3 +1414,25 @@ Don‘t!)"_S;
     auto s2 = uR"(Don’t!
 Don’t!)"_S;
 }
+
+
+V prod = 1
+V s = 0
+
+-V
+   x = +5
+   y = -5
+   z = -2
+   one = 1
+   three = 3
+   seven = 7
+===
+auto prod = 1;
+auto s = 0;
+
+const auto x = +5;
+const auto y = -5;
+const auto z = -2;
+const auto one = 1;
+const auto three = 3;
+const auto seven = 7;

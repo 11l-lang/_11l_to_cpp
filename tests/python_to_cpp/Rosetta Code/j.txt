@@ -229,3 +229,230 @@ struct CodeBlock1
         print(j(41, 3));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Just_in_time_processing_on_a_character_stream#Python
+class UserInput:
+    formFeed : int
+    lineFeed : int
+    tab : int
+    space : int
+
+    def __init__(self, chunk):
+        self.formFeed = chunk[0]
+        self.lineFeed = chunk[1]
+        self.tab      = chunk[2]
+        self.space    = chunk[3]
+
+    def __str__(self):
+        return "(ff=%d; lf=%d; tb=%d; sp%d)" % (self.formFeed,self.lineFeed,self.tab,self.space)
+
+def chunks(l,n):
+    r : List[List[int]] = []
+    for i in range(0, len(l), n):
+        r.append(l[i:i+n])
+    return r
+
+def getUserInput():
+    h = "0 18 0 0 0 68 0 1 0 100 0 32 0 114 0 45 0 38 0 26 0 16 0 21 0 17 0 59 0 11 " + \
+        "0 29 0 102 0 0 0 10 0 50 0 39 0 42 0 33 0 50 0 46 0 54 0 76 0 47 0 84 2 28"
+    ha = list(map(int, h.split(' ')))
+    return [UserInput(chunk) for chunk in chunks(ha, 4)]
+
+def decode(filename,uiList):
+    f = open(filename, "r")
+    text = f.read()
+
+    def decode2(ui):
+        f = 0
+        l = 0
+        t = 0
+        s = 0
+        for c in text:
+            if f == ui.formFeed and l == ui.lineFeed and t == ui.tab and s == ui.space:
+                if c == '!':
+                    return False
+                print(c, end = '')
+                return True
+            if ord(c) == 0xc:
+                f=f+1
+                l=0
+                t=0
+                s=0
+            elif c == '\n':
+                l=l+1
+                t=0
+                s=0
+            elif c == '\t':
+                t=t+1
+                s=0
+            else:
+                s=s+1
+        return False
+
+    for ui in uiList:
+        if not decode2(ui):
+            break
+    print()
+
+##### Main #####
+
+uiList = getUserInput()
+decode("theRaven.txt", uiList)
+===
+T UserInput
+   Int formFeed
+   Int lineFeed
+   Int tab
+   Int space
+
+   F (chunk)
+      .formFeed = chunk[0]
+      .lineFeed = chunk[1]
+      .tab = chunk[2]
+      .space = chunk[3]
+
+   F String()
+      R ‘(ff=#.; lf=#.; tb=#.; sp#.)’.format(.formFeed, .lineFeed, .tab, .space)
+
+F chunks(l, n)
+   [[Int]] r
+   L(i) (0 .< l.len).step(n)
+      r.append(l[i .< i + n])
+   R r
+
+F getUserInput()
+   V h = ‘0 18 0 0 0 68 0 1 0 100 0 32 0 114 0 45 0 38 0 26 0 16 0 21 0 17 0 59 0 11 ’""‘0 29 0 102 0 0 0 10 0 50 0 39 0 42 0 33 0 50 0 46 0 54 0 76 0 47 0 84 2 28’
+   V ha = h.split(‘ ’).map(Int)
+   R chunks(ha, 4).map(chunk -> UserInput(chunk))
+
+F decode(filename, uiList)
+   V f = File(filename, ‘r’)
+   V text = f.read()
+
+   F decode2(ui)
+      V f = 0
+      V l = 0
+      V t = 0
+      V s = 0
+      L(c) @text
+         I f == ui.formFeed & l == ui.lineFeed & t == ui.tab & s == ui.space
+            I c == ‘!’
+               R 0B
+            print(c, end' ‘’)
+            R 1B
+         I c.code == 0'C
+            f = f + 1
+            l = 0
+            t = 0
+            s = 0
+         E I c == "\n"
+            l = l + 1
+            t = 0
+            s = 0
+         E I c == "\t"
+            t = t + 1
+            s = 0
+         E
+            s = s + 1
+      R 0B
+
+   L(ui) uiList
+      I !decode2(ui)
+         L.break
+   print()
+
+V uiList = getUserInput()
+decode(‘theRaven.txt’, uiList)
+===
+class UserInput
+{
+public:
+    int formFeed;
+    int lineFeed;
+    int tab;
+    int space;
+
+    template <typename T1> UserInput(const T1 &chunk)
+    {
+        formFeed = _get<0>(chunk);
+        lineFeed = _get<1>(chunk);
+        tab = _get<2>(chunk);
+        space = _get<3>(chunk);
+    }
+
+    operator String() const
+    {
+        return u"(ff=#.; lf=#.; tb=#.; sp#.)"_S.format(formFeed, lineFeed, tab, space);
+    }
+};
+
+template <typename T1, typename T2> auto chunks(const T1 &l, const T2 &n)
+{
+    Array<Array<int>> r;
+    for (auto i : range_el(0, l.len()).step(n))
+        r.append(l[range_el(i, i + n)]);
+    return r;
+}
+
+auto getUserInput()
+{
+    auto h = u"0 18 0 0 0 68 0 1 0 100 0 32 0 114 0 45 0 38 0 26 0 16 0 21 0 17 0 59 0 11 "_S & u"0 29 0 102 0 0 0 10 0 50 0 39 0 42 0 33 0 50 0 46 0 54 0 76 0 47 0 84 2 28"_S;
+    auto ha = h.split(u" "_S).map([](const auto &x){return to_int(x);});
+    return chunks(ha, 4).map([](const auto &chunk){return UserInput(chunk);});
+}
+
+template <typename T1, typename T2> auto decode(const T1 &filename, const T2 &uiList)
+{
+    auto f = File(filename, u"r"_S);
+    auto text = f.read();
+
+    auto decode2 = [&text](const auto &ui)
+    {
+        auto f = 0;
+        auto l = 0;
+        auto t = 0;
+        auto s = 0;
+        for (auto &&c : text) {
+            if (f == ui.formFeed && l == ui.lineFeed && t == ui.tab && s == ui.space) {
+                if (c == u'!')
+                    return false;
+                print(c, u""_S);
+                return true;
+            }
+            if (c.code == 0x0C) {
+                f = f + 1;
+                l = 0;
+                t = 0;
+                s = 0;
+            }
+            else if (c == u'\n') {
+                l = l + 1;
+                t = 0;
+                s = 0;
+            }
+            else if (c == u'\t') {
+                t = t + 1;
+                s = 0;
+            }
+            else
+                s = s + 1;
+        }
+        return false;
+    };
+
+    for (auto &&ui : uiList)
+        if (!decode2(ui))
+            break;
+    print();
+}
+
+auto uiList = getUserInput();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        decode(u"theRaven.txt"_S, uiList);
+    }
+} code_block_1;

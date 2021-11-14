@@ -653,7 +653,7 @@ class SymbolNode:
                                 t = self.children[len(self.children)-1].rightmost()
                                 raise Error('missing required argument `'+ f_node.function_arguments[last_function_arg][0] + '`', Token(t, t, Token.Category.DELIMITER))
                             last_function_arg += 1
-                    elif type(f_node) == ASTTypeEnum:
+                    elif type(f_node) in (ASTTypeEnum, ASTTypeAlias):
                         pass
                     elif f_node.function_pointer:
                         if last_function_arg != len(f_node.type_args):
@@ -2991,6 +2991,7 @@ def parse_internal(this_node):
 
                 node = ASTVariableInitialization()
                 node.pre_nl = npre_nl
+                npre_nl = ''
                 node.is_const = is_const
                 node.vars = [var_name]
                 node.set_expression(expression())
