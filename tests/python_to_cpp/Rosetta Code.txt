@@ -20161,3 +20161,216 @@ struct CodeBlock1
         print(u"Roots of 8219 mod 10007: "_S & String(cipolla(8219, 10007)));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/MD5/Implementation#Python
+from _11l import *
+import math
+
+rotate_amounts = [7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
+                  5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20,
+                  4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
+                  6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21]
+
+constants = [UInt32(UInt64(abs(math.sin(i+1)) * 2.0**32) & 0xFFFFFFFF) for i in range(64)]
+
+init_values = MutTuple(UInt32(0x67452301), UInt32(0xefcdab89), UInt32(0x98badcfe), UInt32(0x10325476))
+
+functions : List[Callable[[int, int, int], int]] = []
+functions += [lambda b, c, d: (b & c) | (~b & d)]
+functions += [lambda b, c, d: (d & b) | (~d & c)]
+functions += [lambda b, c, d: b ^ c ^ d]
+functions += [lambda b, c, d: c ^ (b | ~d)]
+
+index_functions : List[Callable[[int], int]] = []
+index_functions += [lambda i: i]
+index_functions += [lambda i: (5*i + 1)%16]
+index_functions += [lambda i: (3*i + 5)%16]
+index_functions += [lambda i: (7*i)%16]
+
+def md5(message):
+
+    message = bytearray(message) #copy our input into a mutable buffer
+    orig_len_in_bits = (UInt64(8) * len(message)) & 0xffffffffffffffff
+    message.append(0x80)
+    while len(message)%64 != 56:
+        message.append(0)
+    message.extend(orig_len_in_bits.to_bytes(8, byteorder='little'))
+
+    hash_pieces = copy(init_values)
+
+    for chunk_ofst in range(0, len(message), 64):
+        (a, b, c, d) = hash_pieces
+        chunk = message[chunk_ofst:chunk_ofst+64]
+        for i in range(64):
+            f = functions[i // 16](b, c, d)
+            g = index_functions[i // 16](i)
+            to_rotate = a + f + constants[i] + int.from_bytes(chunk[4*g:4*g+4], byteorder='little')
+            new_b = (b + rotl32(to_rotate, rotate_amounts[i])) & 0xFFFFFFFF
+            (a, b, c, d) = (d, new_b, b, c)
+        for i, val in enumerate([a, b, c, d]):
+            hash_pieces[i] += val
+            hash_pieces[i] &= 0xFFFFFFFF
+
+    r : List[Byte] = []
+    for x in hash_pieces:
+        r.extend([x & 0xFF, (x >> 8) & 0xFF, (x >> 16) & 0xFF, (x >> 24) & 0xFF])
+    return r
+
+def md5_to_hex(digest):
+    s = ''
+    for d in digest:
+        s += hexu(d).lower().zfill(2)
+    return s
+
+demo = [b"", "a".encode(), b"abc", b"message digest", b"abcdefghijklmnopqrstuvwxyz",
+        b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+        b"12345678901234567890123456789012345678901234567890123456789012345678901234567890"]
+for message in demo:
+    print(md5_to_hex(md5(message)),' <= "',message.decode('ascii'),'"', sep='')
+===
+V rotate_amounts = [7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21]
+
+V constants = (0.<64).map(i -> UInt32(UInt64(abs(sin(i + 1)) * 2.0 ^ 32) [&] FFFF'FFFF))
+
+V init_values = (UInt32(6745'2301), UInt32(EFCD'AB89), UInt32(98BA'DCFE), UInt32(1032'5476))
+
+[((Int, Int, Int) -> Int)] functions
+functions [+]= (b, c, d) -> (b [&] c) [|] ((-)b [&] d)
+functions [+]= (b, c, d) -> (d [&] b) [|] ((-)d [&] c)
+functions [+]= (b, c, d) -> b (+) c (+) d
+functions [+]= (b, c, d) -> c (+) (b [|] (-)d)
+
+[(Int -> Int)] index_functions
+index_functions [+]= i -> i
+index_functions [+]= i -> (5 * i + 1) % 16
+index_functions [+]= i -> (3 * i + 5) % 16
+index_functions [+]= i -> (7 * i) % 16
+
+F md5(=message)
+
+   message = [Byte](message)
+   V orig_len_in_bits = (UInt64(8) * message.len) [&] FFFF'FFFF'FFFF'FFFF
+   message.append(8'0)
+   L message.len % 64 != 56
+      message.append(0)
+   message.extend(bytes_from_int(UInt64(orig_len_in_bits)))
+
+   V hash_pieces = copy(:init_values)
+
+   L(chunk_ofst) (0 .< message.len).step(64)
+      V (a, b, c, d) = hash_pieces
+      V chunk = message[chunk_ofst .< chunk_ofst + 64]
+      L(i) 64
+         V f = :functions[i I/ 16](b, c, d)
+         V g = :index_functions[i I/ 16](i)
+         V to_rotate = a + f + :constants[i] + Int(bytes' chunk[4 * g .< 4 * g + 4])
+         V new_b = (b + rotl(to_rotate, :rotate_amounts[i])) [&] FFFF'FFFF
+         (a, b, c, d) = (d, new_b, b, c)
+      L(val) [a, b, c, d]
+         V i = L.index
+         hash_pieces[i] += val
+         hash_pieces[i] [&]= FFFF'FFFF
+
+   [Byte] r
+   L(x) hash_pieces
+      r.extend([x [&] F'F, (x >> 8) [&] F'F, (x >> 16) [&] F'F, (x >> 24) [&] F'F])
+   R r
+
+F md5_to_hex(digest)
+   V s = ‘’
+   L(d) digest
+      s ‘’= hex(d).lowercase().zfill(2)
+   R s
+
+V demo = [Bytes(‘’), ‘a’.encode(), Bytes(‘abc’), Bytes(‘message digest’), Bytes(‘abcdefghijklmnopqrstuvwxyz’), Bytes(‘ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789’), Bytes(‘12345678901234567890123456789012345678901234567890123456789012345678901234567890’)]
+L(message) demo
+   print(md5_to_hex(md5(message))‘ <= "’message.decode(‘ascii’)‘"’)
+===
+auto rotate_amounts = create_array({7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21});
+
+auto constants = range_el(0, 64).map([](const auto &i){return to_uint32(to_uint64(abs(sin(i + 1)) * pow(2.0, 32)) & 0xFFFF'FFFF);});
+
+auto init_values = make_tuple(to_uint32(0x6745'2301), to_uint32(0xEFCD'AB89), to_uint32(0x98BA'DCFE), to_uint32(0x1032'5476));
+
+Array<std::function<int(const int, const int, const int)>> functions;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        functions.append([](const auto &b, const auto &c, const auto &d){return (b & c) | (~b & d);});
+        functions.append([](const auto &b, const auto &c, const auto &d){return (d & b) | (~d & c);});
+        functions.append([](const auto &b, const auto &c, const auto &d){return b ^ c ^ d;});
+        functions.append([](const auto &b, const auto &c, const auto &d){return c ^ (b | ~d);});
+    }
+} code_block_1;
+
+Array<std::function<int(const int)>> index_functions;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        index_functions.append([](const auto &i){return i;});
+        index_functions.append([](const auto &i){return mod((5 * i + 1), 16);});
+        index_functions.append([](const auto &i){return mod((3 * i + 5), 16);});
+        index_functions.append([](const auto &i){return mod((7 * i), 16);});
+    }
+} code_block_2;
+
+template <typename T1> auto md5(T1 message)
+{
+
+    message = Array<Byte>(message);
+    auto orig_len_in_bits = (to_uint64(8) * message.len()) & 0xFFFF'FFFF'FFFF'FFFF;
+    message.append(0x80);
+    while (mod(message.len(), 64) != 56)
+        message.append(0);
+    message.extend(bytes_from_int(to_uint64(orig_len_in_bits)));
+
+    auto hash_pieces = copy(::init_values);
+
+    for (auto chunk_ofst : range_el(0, message.len()).step(64)) {
+        auto [a, b, c, d] = hash_pieces;
+        auto chunk = message[range_el(chunk_ofst, chunk_ofst + 64)];
+        for (int i = 0; i < 64; i++) {
+            auto f = ::functions[idiv(i, 16)](b, c, d);
+            auto g = ::index_functions[idiv(i, 16)](i);
+            auto to_rotate = a + f + ::constants[i] + int_from_bytes(chunk, range_el(4 * g, 4 * g + 4));
+            auto new_b = (b + rotl(to_rotate, ::rotate_amounts[i])) & 0xFFFF'FFFF;
+            assign_from_tuple(a, b, c, d, make_tuple(d, new_b, b, c));
+        }
+        {int Lindex = 0;
+        for (auto &&val : create_array({a, b, c, d})) {
+            auto i = Lindex;
+            hash_pieces[i] += val;
+            hash_pieces[i] &= 0xFFFF'FFFF;
+            Lindex++;
+        }}
+    }
+
+    Array<Byte> r;
+    for (auto &&x : hash_pieces)
+        r.extend(create_array({x & 0xFF, (x >> 8) & 0xFF, (x >> 16) & 0xFF, (x >> 24) & 0xFF}));
+    return r;
+}
+
+template <typename T1> auto md5_to_hex(const T1 &digest)
+{
+    auto s = u""_S;
+    for (auto &&d : digest)
+        s &= hex(d).lowercase().zfill(2);
+    return s;
+}
+
+auto demo = create_array<Array<Byte>>({""_B, u'a'_C.encode(), "abc"_B, "message digest"_B, "abcdefghijklmnopqrstuvwxyz"_B, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"_B, "12345678901234567890123456789012345678901234567890123456789012345678901234567890"_B});
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        for (auto &&message : demo)
+            print(md5_to_hex(md5(message)) & u" <= \""_S & message.decode(u"ascii"_S) & u"\""_S);
+    }
+} code_block_3;

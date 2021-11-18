@@ -874,6 +874,14 @@ template <typename Ty, bool include_beginning, bool include_ending> inline Int i
 	return r;
 }
 
+template <typename Ty> Array<Byte> bytes_from_int(const Ty i)
+{
+	Array<Byte> r;
+	r.resize(sizeof(i));
+	memcpy(r.data(), &i, sizeof(i));
+	return r;
+}
+
 inline Array<Byte> operator ""_B(const char *s, size_t sz)
 {
 	Array<Byte> r;

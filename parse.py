@@ -1105,7 +1105,7 @@ class ASTExpression(ASTNodeWithExpression):
         return self.pre_nl + ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
 cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'перем':'auto',
-                     'Int':'int', 'Int64':'Int64', 'UInt64':'UInt64', 'UInt32':'uint32_t', 'BigInt':'BigInt', 'Float':'double', 'Float32':'float', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte', 'Bytes':'Bytes',
+                     'Int':'int', 'Int64':'Int64', 'UInt64':'UInt64', 'UInt32':'uint32_t', 'BigInt':'BigInt', 'Float':'double', 'Float32':'float', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte', 'Bytes':'Array<Byte>',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
                      'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque'}
 
@@ -3204,6 +3204,7 @@ builtins_scope.add_function('rotr', ASTFunctionDefinition([('value', '', 'Int'),
 builtins_scope.add_function('bsr', ASTFunctionDefinition([('x', '', '')]))
 builtins_scope.add_function('bsf', ASTFunctionDefinition([('x', '', '')]))
 builtins_scope.add_function('bit_length', ASTFunctionDefinition([('x', '', '')]))
+builtins_scope.add_function('bytes_from_int', ASTFunctionDefinition([('i', '', '')]))
 builtins_scope.add_function('round', ASTFunctionDefinition([('number', '', 'Float'), ('ndigits', '0', '')]))
 builtins_scope.add_function('sleep', ASTFunctionDefinition([('secs', '', 'Float')]))
 builtins_scope.add_function('ceil',  ASTFunctionDefinition([('x', '', 'Float')]))

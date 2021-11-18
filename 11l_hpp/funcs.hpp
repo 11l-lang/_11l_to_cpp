@@ -74,6 +74,8 @@ inline unsigned long long rotr(unsigned long long value, int shift) {return (val
 #endif
 inline int rotl(int value, int shift) {return _rotl(value, shift);}
 inline int rotr(int value, int shift) {return _rotr(value, shift);}
+inline UInt32 rotl(UInt32 value, int shift) {return _rotl(value, shift);}
+inline UInt32 rotr(UInt32 value, int shift) {return _rotr(value, shift);}
 
 inline int   ext_int(int    n) {return n;}
 inline Int64 ext_int(Int64  n) {return n;}

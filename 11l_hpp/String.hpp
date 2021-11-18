@@ -991,6 +991,7 @@ inline UInt64 to_uint64( int     i) { return i; }
 inline UInt64 to_uint64(uint32_t i) { return i; }
 inline UInt64 to_uint64( Int64   i) { return i; }
 inline UInt64 to_uint64(UInt64   i) { return i; }
+inline UInt64 to_uint64(double   d) { return (UInt64)d; }
 
 inline uint32_t to_uint32(int i)
 {
