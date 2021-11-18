@@ -20223,7 +20223,7 @@ def md5_to_hex(digest):
         s += hexu(d).lower().zfill(2)
     return s
 
-demo = [b"", "a".encode(), b"abc", b"message digest", b"abcdefghijklmnopqrstuvwxyz",
+demo = [b"", Bytes("a"), b"abc", b"message digest", b"abcdefghijklmnopqrstuvwxyz",
         b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
         b"12345678901234567890123456789012345678901234567890123456789012345678901234567890"]
 for message in demo:
@@ -20283,7 +20283,7 @@ F md5_to_hex(digest)
       s ‘’= hex(d).lowercase().zfill(2)
    R s
 
-V demo = [Bytes(‘’), ‘a’.encode(), Bytes(‘abc’), Bytes(‘message digest’), Bytes(‘abcdefghijklmnopqrstuvwxyz’), Bytes(‘ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789’), Bytes(‘12345678901234567890123456789012345678901234567890123456789012345678901234567890’)]
+V demo = [Bytes(‘’), Bytes(‘a’), Bytes(‘abc’), Bytes(‘message digest’), Bytes(‘abcdefghijklmnopqrstuvwxyz’), Bytes(‘ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789’), Bytes(‘12345678901234567890123456789012345678901234567890123456789012345678901234567890’)]
 L(message) demo
    print(md5_to_hex(md5(message))‘ <= "’message.decode(‘ascii’)‘"’)
 ===
@@ -20364,7 +20364,7 @@ template <typename T1> auto md5_to_hex(const T1 &digest)
     return s;
 }
 
-auto demo = create_array<Array<Byte>>({""_B, u'a'_C.encode(), "abc"_B, "message digest"_B, "abcdefghijklmnopqrstuvwxyz"_B, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"_B, "12345678901234567890123456789012345678901234567890123456789012345678901234567890"_B});
+auto demo = create_array<Array<Byte>>({""_B, "a"_B, "abc"_B, "message digest"_B, "abcdefghijklmnopqrstuvwxyz"_B, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"_B, "12345678901234567890123456789012345678901234567890123456789012345678901234567890"_B});
 
 struct CodeBlock3
 {
