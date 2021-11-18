@@ -2974,7 +2974,7 @@ def parse_internal(this_node):
         elif ((token.value(source) in ('V', 'П', 'var', 'перем') and peek_token().category == Token.Category.SCOPE_BEGIN) # this is `V {v1 = ...; v2 = ...; ...}`
            or (token.value(source) == '-' and
         peek_token().value(source) in ('V', 'П', 'var', 'перем') and peek_token(2).category == Token.Category.SCOPE_BEGIN)): # this is `-V {v1 = ...; v2 = ...; ...}`
-            npre_nl = pre_nl()
+            first_pre_nl = pre_nl()
             is_const = False
             if token.value(source) == '-':
                 is_const = True
@@ -2983,15 +2983,17 @@ def parse_internal(this_node):
             next_token()
             next_token()
 
+            first = True
             while True:
+                node = ASTVariableInitialization()
+                node.pre_nl = first_pre_nl if first else pre_nl()
+                first = False
+
                 assert(token.category == Token.Category.NAME)
                 var_name = tokensn.token_str()
                 next_token()
                 advance('=')
 
-                node = ASTVariableInitialization()
-                node.pre_nl = npre_nl
-                npre_nl = ''
                 node.is_const = is_const
                 node.vars = [var_name]
                 node.set_expression(expression())
