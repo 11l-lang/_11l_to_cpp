@@ -178,11 +178,11 @@ public:
 	}
 
 	using std::u16string::assign;
-	void assign(double num, int digits = 9, bool remove_trailing_zeroes = true)
+	void assign(double num, int digits = 9, bool remove_trailing_zeroes = true, bool auto_e = true)
 	{
 		if (!isfinite(num)) {clear(); return;}
 
-		if (fabs(num) > 1e9 || (fabs(num) < 1e-6 && num != 0))
+		if ((fabs(num) > 1e9 || (fabs(num) < 1e-6 && num != 0)) && auto_e)
 		{
 			double exponent = floor(log10(fabs(num)));
 			num *= pow(.1, exponent);
@@ -800,7 +800,7 @@ template <typename ... Types> String String::format(const Types&... args) const
 						s.assign(fa.i);
 					}
 					else
-						s.assign(fa.f, after_period, false);
+						s.assign(fa.f, after_period, false, false);
 					if (left_align)
 						r &= s;
 					r.resize(r.size() + max(after_period + bool(after_period) + before_period - s.len(), Int(0)), zero_padding ? '0' : ' ');

@@ -1566,3 +1566,1090 @@ struct CodeBlock2
         print(pow(x1, x2, m));
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Magic_8-ball#Python
+import random
+
+s = ['It is certain', 'It is decidedly so', 'Without a doubt', 'Yes, definitely',
+ 'You may rely on it', 'As I see it, yes', 'Most likely', 'Outlook good',
+ 'Signs point to yes', 'Yes', 'Reply hazy, try again', 'Ask again later',
+ 'Better not tell you now', 'Cannot predict now', 'Concentrate and ask again',
+ "Don't bet on it", 'My reply is no', 'My sources say no', 'Outlook not so good',
+ 'Very doubtful']
+
+qs = set() # str
+
+while True:
+    question = input('Ask your question:')
+    if len(question) == 0: break
+
+    answer = random.choice(s)
+
+    if question in qs:
+        print('Your question has already been answered')
+    else:
+        qs.add(question)
+        print(answer)
+===
+V s = [‘It is certain’, ‘It is decidedly so’, ‘Without a doubt’, ‘Yes, definitely’, ‘You may rely on it’, ‘As I see it, yes’, ‘Most likely’, ‘Outlook good’, ‘Signs point to yes’, ‘Yes’, ‘Reply hazy, try again’, ‘Ask again later’, ‘Better not tell you now’, ‘Cannot predict now’, ‘Concentrate and ask again’, ‘Don't bet on it’, ‘My reply is no’, ‘My sources say no’, ‘Outlook not so good’, ‘Very doubtful’]
+
+V qs = Set[String]()
+
+L
+   V question = input(‘Ask your question:’)
+   I question.empty
+      L.break
+
+   V answer = random:choice(s)
+
+   I question C qs
+      print(‘Your question has already been answered’)
+   E
+      qs.add(question)
+      print(answer)
+===
+auto s = create_array({u"It is certain"_S, u"It is decidedly so"_S, u"Without a doubt"_S, u"Yes, definitely"_S, u"You may rely on it"_S, u"As I see it, yes"_S, u"Most likely"_S, u"Outlook good"_S, u"Signs point to yes"_S, u"Yes"_S, u"Reply hazy, try again"_S, u"Ask again later"_S, u"Better not tell you now"_S, u"Cannot predict now"_S, u"Concentrate and ask again"_S, u"Don't bet on it"_S, u"My reply is no"_S, u"My sources say no"_S, u"Outlook not so good"_S, u"Very doubtful"_S});
+
+auto qs = Set<String>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            auto question = input(u"Ask your question:"_S);
+            if (question.empty())
+                break;
+
+            auto answer = randomns::choice(s);
+
+            if (in(question, qs))
+                print(u"Your question has already been answered"_S);
+            else {
+                qs.add(question);
+                print(answer);
+            }
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Markov_chain_text_generator#Python
+import random
+
+def makerule(data, context):
+    '''Make a rule dict for given data.'''
+    rule : Dict[str, List[str]] = {}
+    words = data.split(' ')
+    index = context
+
+    for word in words[index:]:
+        key = ' '.join(words[index-context:index])
+        if key in rule:
+            rule[key].append(word)
+        else:
+            rule[key] = [word]
+        index += 1
+
+    return rule
+
+def makestring(rule, length):
+    '''Use a given rule to make a string.'''
+    oldwords = random.choice(list(rule.keys())).split(' ') #random starting words
+    string = ' '.join(oldwords) + ' '
+
+    for i in range(length):
+        try:
+            key = ' '.join(oldwords)
+            newword = random.choice(rule[key])
+            string += newword + ' '
+
+            for word in range(len(oldwords)):
+                oldwords[word] = oldwords[(word + 1) % len(oldwords)]
+            oldwords[-1] = newword
+
+        except KeyError:
+            return string
+    return string
+
+data = open('alice_oz.txt').read()
+rule = makerule(data, 3)
+string = makestring(rule, 100)
+max_line_size = 100
+cur_line_size = 0
+for word in string.split(' '):
+    if cur_line_size + len(word) >= max_line_size:
+        print()
+        cur_line_size = 0
+    cur_line_size += len(word) + 1
+    print(word, end = ' ')
+print()
+===
+F makerule(data, context)
+   ‘Make a rule dict for given data.’
+   [String = [String]] rule
+   V words = data.split(‘ ’)
+   V index = context
+
+   L(word) words[index ..]
+      V key = (words[index - context .< index]).join(‘ ’)
+      I key C rule
+         rule[key].append(word)
+      E
+         rule[key] = [word]
+      index++
+
+   R rule
+
+F makestring(rule, length)
+   ‘Use a given rule to make a string.’
+   V oldwords = random:choice(Array(rule.keys())).split(‘ ’)
+   V string = oldwords.join(‘ ’)‘ ’
+
+   L(i) 0 .< length
+      X.try
+         V key = oldwords.join(‘ ’)
+         V newword = random:choice(rule[key])
+         string ‘’= newword‘ ’
+
+         L(word) 0 .< oldwords.len
+            oldwords[word] = oldwords[(word + 1) % oldwords.len]
+         oldwords.last = newword
+
+      X.catch KeyError
+         R string
+   R string
+
+V data = File(‘alice_oz.txt’).read()
+V rule = makerule(data, 3)
+V string = makestring(rule, 100)
+V max_line_size = 100
+V cur_line_size = 0
+L(word) string.split(‘ ’)
+   I cur_line_size + word.len >= max_line_size
+      print()
+      cur_line_size = 0
+   cur_line_size += word.len + 1
+   print(word, end' ‘ ’)
+print()
+===
+template <typename T1, typename T2> auto makerule(const T1 &data, const T2 &context)
+{
+    u"Make a rule dict for given data."_S;
+    Dict<String, Array<String>> rule;
+    auto words = data.split(u" "_S);
+    auto index = context;
+
+    for (auto &&word : words[range_ei(index)]) {
+        auto key = (words[range_el(index - context, index)]).join(u" "_S);
+        if (in(key, rule))
+            rule[key].append(word);
+        else
+            rule.set(key, create_array({word}));
+        index++;
+    }
+
+    return rule;
+}
+
+template <typename T1, typename T2> auto makestring(const T1 &rule, const T2 &length)
+{
+    u"Use a given rule to make a string."_S;
+    auto oldwords = randomns::choice(create_array(rule.keys())).split(u" "_S);
+    auto string = oldwords.join(u" "_S) & u" "_S;
+
+    for (auto i : range_el(0, length)) {
+        try
+        {
+            auto key = oldwords.join(u" "_S);
+            auto newword = randomns::choice(rule[key]);
+            string &= newword & u" "_S;
+
+            for (auto word : range_el(0, oldwords.len()))
+                oldwords.set(word, oldwords[mod((word + 1), oldwords.len())]);
+            oldwords.last() = newword;
+        }
+
+        catch (const KeyError&)
+        {
+            return string;
+        }
+    }
+    return string;
+}
+
+auto data = File(u"alice_oz.txt"_S).read();
+auto rule = makerule(data, 3);
+auto string = makestring(rule, 100);
+auto max_line_size = 100;
+auto cur_line_size = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&word : string.split(u" "_S)) {
+            if (cur_line_size + word.len() >= max_line_size) {
+                print();
+                cur_line_size = 0;
+            }
+            cur_line_size += word.len() + 1;
+            print(word, u" "_S);
+        }
+        print();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Mastermind#Python
+import random
+
+def encode(correct, guess):
+    output_arr : List[str] = []
+
+    for i in range(len(correct)):
+        output_arr += ['X' if guess[i] == correct[i] else 'O' if guess[i] in correct else '-']
+
+    return output_arr
+
+def safe_int_input(prompt, min_val, max_val):
+    while True:
+        user_input_str = input(prompt)
+
+        try:
+            user_input = int(user_input_str)
+            if min_val <= user_input <= max_val:
+                return user_input
+        except ValueError:
+            continue
+
+def play_game():
+    print("Welcome to Mastermind.")
+    print("You will need to guess a random code.")
+    print("For each guess, you will receive a hint.")
+    print("In this hint, X denotes a correct letter, and O a letter in the original string but in a different position.")
+    print()
+
+    number_of_letters = safe_int_input("Select a number of possible letters for the code (2-20): ", 2, 20)
+    code_length = safe_int_input("Select a length for the code (4-10): ", 4, 10)
+
+    letters = 'ABCDEFGHIJKLMNOPQRST'[:number_of_letters]
+    code = ''
+    for i in range(code_length):
+        code += random.choice(letters)
+    guesses : List[str] = []
+
+    while True:
+        print()
+        guess = input("Enter a guess of length {} ({}): ".format(code_length, letters)).upper()
+
+        if len(guess) != code_length or any([char not in letters for char in guess]):
+            continue
+        elif guess == code:
+            print("\nYour guess", guess, 'was correct!')
+            break
+        else:
+            guesses.append("{}: {} => {}".format(len(guesses)+1, ' '.join(list(guess)), ' '.join(encode(code, guess))))
+
+        for i_guess in guesses:
+            print("------------------------------------")
+            print(i_guess)
+        print("------------------------------------")
+
+play_game()
+===
+F encode(correct, guess)
+   [String] output_arr
+
+   L(i) 0 .< correct.len
+      output_arr [+]= I guess[i] == correct[i] {‘X’} E I guess[i] C correct {‘O’} E ‘-’
+
+   R output_arr
+
+F safe_int_input(prompt, min_val, max_val)
+   L
+      V user_input_str = input(prompt)
+
+      X.try
+         V user_input = Int(user_input_str)
+         I user_input C min_val .. max_val
+            R user_input
+      X.catch ValueError
+         L.continue
+
+F play_game()
+   print(‘Welcome to Mastermind.’)
+   print(‘You will need to guess a random code.’)
+   print(‘For each guess, you will receive a hint.’)
+   print(‘In this hint, X denotes a correct letter, and O a letter in the original string but in a different position.’)
+   print()
+
+   V number_of_letters = safe_int_input(‘Select a number of possible letters for the code (2-20): ’, 2, 20)
+   V code_length = safe_int_input(‘Select a length for the code (4-10): ’, 4, 10)
+
+   V letters = ‘ABCDEFGHIJKLMNOPQRST’[0 .< number_of_letters]
+   V code = ‘’
+   L(i) 0 .< code_length
+      code ‘’= random:choice(letters)
+   [String] guesses
+
+   L
+      print()
+      V guess = input(‘Enter a guess of length #. (#.): ’.format(code_length, letters)).uppercase()
+
+      I guess.len != code_length | any(guess.map(char -> char !C @letters))
+         L.continue
+      E I guess == code
+         print("\nYour guess "guess‘ was correct!’)
+         L.break
+      E
+         guesses.append(‘#.: #. => #.’.format(guesses.len + 1, Array(guess).join(‘ ’), encode(code, guess).join(‘ ’)))
+
+      L(i_guess) guesses
+         print(‘------------------------------------’)
+         print(i_guess)
+      print(‘------------------------------------’)
+
+play_game()
+===
+template <typename T1, typename T2> auto encode(const T1 &correct, const T2 &guess)
+{
+    Array<String> output_arr;
+
+    for (auto i : range_el(0, correct.len()))
+        output_arr.append(guess[i] == correct[i] ? u"X"_S : in(guess[i], correct) ? u"O"_S : u"-"_S);
+
+    return output_arr;
+}
+
+template <typename T1, typename T2, typename T3> auto safe_int_input(const T1 &prompt, const T2 &min_val, const T3 &max_val)
+{
+    while (true) {
+        auto user_input_str = input(prompt);
+
+        try
+        {
+            auto user_input = to_int(user_input_str);
+            if (in(user_input, range_ee(min_val, max_val)))
+                return user_input;
+        }
+        catch (const ValueError&)
+        {
+            continue;
+        }
+    }
+}
+
+auto play_game()
+{
+    print(u"Welcome to Mastermind."_S);
+    print(u"You will need to guess a random code."_S);
+    print(u"For each guess, you will receive a hint."_S);
+    print(u"In this hint, X denotes a correct letter, and O a letter in the original string but in a different position."_S);
+    print();
+
+    auto number_of_letters = safe_int_input(u"Select a number of possible letters for the code (2-20): "_S, 2, 20);
+    auto code_length = safe_int_input(u"Select a length for the code (4-10): "_S, 4, 10);
+
+    auto letters = u"ABCDEFGHIJKLMNOPQRST"_S[range_el(0, number_of_letters)];
+    auto code = u""_S;
+    for (auto i : range_el(0, code_length))
+        code &= randomns::choice(letters);
+    Array<String> guesses;
+
+    while (true) {
+        print();
+        auto guess = input(u"Enter a guess of length #. (#.): "_S.format(code_length, letters)).uppercase();
+
+        if (guess.len() != code_length || any_map(guess, [&letters](const auto &_char_){return !in(_char_, letters);}))
+            continue;
+        else if (guess == code) {
+            print(u"\nYour guess "_S & guess & u" was correct!"_S);
+            break;
+        }
+        else
+            guesses.append(u"#.: #. => #."_S.format(guesses.len() + 1, create_array(guess).join(u" "_S), encode(code, guess).join(u" "_S)));
+
+        for (auto &&i_guess : guesses) {
+            print(u"------------------------------------"_S);
+            print(i_guess);
+        }
+        print(u"------------------------------------"_S);
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        play_game();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Matrix-exponentiation_operator#Python
+def matrix_mul(m1, m2):
+    assert(len(m1[0]) == len(m2))
+    r = [[0] * len(m2[0]) for i in range(len(m1))]
+    for j in range(len(m1)):
+        for i in range(len(m2[0])):
+            s = 0
+            for k in range(len(m2)):
+                s += m1[j][k] * m2[k][i]
+            r[j][i] = s
+    return r
+
+def identity(size):
+    rsize = range(size)
+    return [[int(i==j) for i in rsize] for j in rsize]
+
+def matrixExp(m, pow):
+    assert pow>=0 and int(pow)==pow, "Only non-negative, integer powers allowed"
+    accumulator = identity(len(m))
+    for i in range(pow):
+        accumulator = matrix_mul(accumulator, m)
+    return accumulator
+
+def printtable(data):
+    for row in data:
+        print(' '.join('%-5s' % cell for cell in row))
+
+m = [[3,2], [2,1]]
+for i in range(5):
+    print('\n%i:' % i)
+    printtable( matrixExp(m, i) )
+
+print("\n10:")
+printtable( matrixExp(m, 10) )
+===
+F matrix_mul(m1, m2)
+   assert(m1[0].len == m2.len)
+   V r = [[0] * m2[0].len] * m1.len
+   L(j) 0 .< m1.len
+      L(i) 0 .< m2[0].len
+         V s = 0
+         L(k) 0 .< m2.len
+            s += m1[j][k] * m2[k][i]
+         r[j][i] = s
+   R r
+
+F identity(size)
+   V rsize = 0 .< size
+   R rsize.map(j -> @rsize.map(i -> Int(i == @j)))
+
+F matrixExp(m, pow)
+   assert(pow >= 0 & Int(pow) == pow, ‘Only non-negative, integer powers allowed’)
+   V accumulator = identity(m.len)
+   L(i) 0 .< pow
+      accumulator = matrix_mul(accumulator, m)
+   R accumulator
+
+F printtable(data)
+   L(row) data
+      print(row.map(cell -> ‘#<5’.format(cell)).join(‘ ’))
+
+V m = [[3, 2], [2, 1]]
+L(i) 5
+   print("\n#.:".format(i))
+   printtable(matrixExp(m, i))
+
+print("\n10:")
+printtable(matrixExp(m, 10))
+===
+template <typename T1, typename T2> auto matrix_mul(const T1 &m1, const T2 &m2)
+{
+    assert(_get<0>(m1).len() == m2.len());
+    auto r = create_array({create_array({0}) * _get<0>(m2).len()}) * m1.len();
+    for (auto j : range_el(0, m1.len()))
+        for (auto i : range_el(0, _get<0>(m2).len())) {
+            auto s = 0;
+            for (auto k : range_el(0, m2.len()))
+                s += m1[j][k] * m2[k][i];
+            r[j].set(i, s);
+        }
+    return r;
+}
+
+template <typename T1> auto identity(const T1 &size)
+{
+    auto rsize = range_el(0, size);
+    return rsize.map([&rsize](const auto &j){return rsize.map([&j](const auto &i){return to_int(i == j);});});
+}
+
+template <typename T1, typename T2> auto matrixExp(const T1 &m, const T2 &pow)
+{
+    assert(pow >= 0 && to_int(pow) == pow, u"Only non-negative, integer powers allowed"_S);
+    auto accumulator = identity(m.len());
+    for (auto i : range_el(0, pow))
+        accumulator = matrix_mul(accumulator, m);
+    return accumulator;
+}
+
+template <typename T1> auto printtable(const T1 &data)
+{
+    for (auto &&row : data)
+        print(row.map([](const auto &cell){return u"#<5"_S.format(cell);}).join(u" "_S));
+}
+
+auto m = create_array({create_array({3, 2}), create_array({2, 1})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int i = 0; i < 5; i++) {
+            print(u"\n#.:"_S.format(i));
+            printtable(matrixExp(m, i));
+        }
+
+        print(u"\n10:"_S);
+        printtable(matrixExp(m, 10));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Matrix_multiplication#Nim
+def matrix_mul(m1, m2):
+    assert(len(m1[0]) == len(m2))
+    r = [[0.0] * len(m2[0]) for i in range(len(m1))]
+    for j in range(len(m1)):
+        for i in range(len(m2[0])):
+            s = 0.0
+            for k in range(len(m2)):
+                s += m1[j][k] * m2[k][i]
+            r[j][i] = s
+    return r
+
+def to_str(m):
+    result = "(["
+    for r in m:
+        if len(result) > 2: result += "]\n ["
+        for val in r: result += "%8.2f" % val
+    return result + "])"
+
+a = [[1.0,  1.0,  1.0,   1.0],
+     [2.0,  4.0,  8.0,  16.0],
+     [3.0,  9.0, 27.0,  81.0],
+     [4.0, 16.0, 64.0, 256.0]]
+
+b = [[    4.0, -3.0  ,  4/3.0,   -1/4.0],
+     [-13/3.0, 19/4.0, -7/3.0,  11/24.0],
+     [  3/2.0, -2.0  ,  7/6.0,   -1/4.0],
+     [ -1/6.0,  1/4.0, -1/6.0,   1/24.0]]
+
+print(to_str(a))
+print(to_str(b))
+print(to_str(matrix_mul(a, b)))
+print(to_str(matrix_mul(b, a)))
+===
+F matrix_mul(m1, m2)
+   assert(m1[0].len == m2.len)
+   V r = [[0.0] * m2[0].len] * m1.len
+   L(j) 0 .< m1.len
+      L(i) 0 .< m2[0].len
+         V s = 0.0
+         L(k) 0 .< m2.len
+            s += m1[j][k] * m2[k][i]
+         r[j][i] = s
+   R r
+
+F to_str(m)
+   V result = ‘([’
+   L(r) m
+      I result.len > 2
+         result ‘’= "]\n ["
+      L(val) r
+         result ‘’= ‘#5.2’.format(val)
+   R result‘])’
+
+V a = [[1.0, 1.0, 1.0, 1.0], [2.0, 4.0, 8.0, 16.0], [3.0, 9.0, 27.0, 81.0], [4.0, 16.0, 64.0, 256.0]]
+
+V b = [[4.0, -3.0, 4 / 3.0, -1 / 4.0], [-13 / 3.0, 19 / 4.0, -7 / 3.0, 11 / 24.0], [3 / 2.0, -2.0, 7 / 6.0, -1 / 4.0], [-1 / 6.0, 1 / 4.0, -1 / 6.0, 1 / 24.0]]
+
+print(to_str(a))
+print(to_str(b))
+print(to_str(matrix_mul(a, b)))
+print(to_str(matrix_mul(b, a)))
+===
+template <typename T1, typename T2> auto matrix_mul(const T1 &m1, const T2 &m2)
+{
+    assert(_get<0>(m1).len() == m2.len());
+    auto r = create_array({create_array({0.0}) * _get<0>(m2).len()}) * m1.len();
+    for (auto j : range_el(0, m1.len()))
+        for (auto i : range_el(0, _get<0>(m2).len())) {
+            auto s = 0.0;
+            for (auto k : range_el(0, m2.len()))
+                s += m1[j][k] * m2[k][i];
+            r[j].set(i, s);
+        }
+    return r;
+}
+
+template <typename T1> auto to_str(const T1 &m)
+{
+    auto result = u"(["_S;
+    for (auto &&r : m) {
+        if (result.len() > 2)
+            result &= u"]\n ["_S;
+        for (auto &&val : r)
+            result &= u"#5.2"_S.format(val);
+    }
+    return result & u"])"_S;
+}
+
+auto a = create_array({create_array({1.0, 1.0, 1.0, 1.0}), create_array({2.0, 4.0, 8.0, 16.0}), create_array({3.0, 9.0, 27.0, 81.0}), create_array({4.0, 16.0, 64.0, 256.0})});
+
+auto b = create_array({create_array({4.0, -3.0, 4.0 / 3.0, -1 / 4.0}), create_array({-13 / 3.0, 19.0 / 4.0, -7 / 3.0, 11.0 / 24.0}), create_array({3.0 / 2.0, -2.0, 7.0 / 6.0, -1 / 4.0}), create_array({-1 / 6.0, 1.0 / 4.0, -1 / 6.0, 1.0 / 24.0})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(to_str(a));
+        print(to_str(b));
+        print(to_str(matrix_mul(a, b)));
+        print(to_str(matrix_mul(b, a)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Matrix_chain_multiplication#Nim
+from typing import List
+
+class Optimizer:
+    dims : List[int]
+    m : List[List[int]]
+    s : List[List[int]]
+
+    def __init__(self, dims):
+        self.dims = dims
+
+    def findMatrixChainOrder(self):
+        n = len(self.dims) - 1
+        self.m = [[0] * n for i in range(n)]
+        self.s = [[0] * n for i in range(n)]
+
+        for lg in range(1, n):
+            for i in range(n - lg):
+                j = i + lg
+                self.m[i][j] = 0x7FFF_FFFF
+                for k in range(i, j):
+                    cost = self.m[i][k] + self.m[k+1][j] + self.dims[i] * self.dims[k+1] * self.dims[j+1]
+                    if cost < self.m[i][j]:
+                        self.m[i][j] = cost
+                        self.s[i][j] = k
+
+    def optimalChainOrder(self, i, j):
+        if i == j:
+            return str(chr(i + ord('A')))
+        else:
+            return '(' + self.optimalChainOrder(i, self.s[i][j]) \
+                       + self.optimalChainOrder(self.s[i][j] + 1, j) + ')'
+
+Dims1 = [5, 6, 3, 1]
+Dims2 = [1, 5, 25, 30, 100, 70, 2, 1, 100, 250, 1, 1000, 2]
+Dims3 = [1000, 1, 500, 12, 1, 700, 2500, 3, 2, 5, 14, 10]
+
+for dims in [Dims1, Dims2, Dims3]:
+    opt = Optimizer(dims)
+    opt.findMatrixChainOrder()
+    print("Dims: ", dims)
+    print("Order:", opt.optimalChainOrder(0, len(dims) - 2))
+    print("Cost: ", opt.m[0][len(dims) - 2])
+    print("")
+===
+T Optimizer
+   [Int] dims
+   [[Int]] m
+   [[Int]] s
+
+   F (dims)
+      .dims = dims
+
+   F findMatrixChainOrder()
+      V n = .dims.len - 1
+      .m = [[0] * n] * n
+      .s = [[0] * n] * n
+
+      L(lg) 1 .< n
+         L(i) 0 .< n - lg
+            V j = i + lg
+            .m[i][j] = 7FFF'FFFF
+            L(k) i .< j
+               V cost = .m[i][k] + .m[k + 1][j] + .dims[i] * .dims[k + 1] * .dims[j + 1]
+               I cost < .m[i][j]
+                  .m[i][j] = cost
+                  .s[i][j] = k
+
+   F optimalChainOrder(i, j)
+      I i == j
+         R String(Char(code' i + ‘A’.code))
+      E
+         R ‘(’(.optimalChainOrder(i, .s[i][j]))‘’.optimalChainOrder(.s[i][j] + 1, j)‘)’
+
+V Dims1 = [5, 6, 3, 1]
+V Dims2 = [1, 5, 25, 30, 100, 70, 2, 1, 100, 250, 1, 1000, 2]
+V Dims3 = [1000, 1, 500, 12, 1, 700, 2500, 3, 2, 5, 14, 10]
+
+L(dims) [Dims1, Dims2, Dims3]
+   V opt = Optimizer(dims)
+   opt.findMatrixChainOrder()
+   print(‘Dims:  ’dims)
+   print(‘Order: ’opt.optimalChainOrder(0, dims.len - 2))
+   print(‘Cost:  ’opt.m[0][dims.len - 2])
+   print(‘’)
+===
+class Optimizer
+{
+public:
+    Array<int> dims;
+    Array<Array<int>> m;
+    Array<Array<int>> s;
+
+    template <typename T1> Optimizer(const T1 &dims) :
+        dims(dims)
+    {
+    }
+
+    auto findMatrixChainOrder()
+    {
+        auto n = dims.len() - 1;
+        m = create_array({create_array({0}) * n}) * n;
+        s = create_array({create_array({0}) * n}) * n;
+
+        for (auto lg : range_el(1, n))
+            for (auto i : range_el(0, n - lg)) {
+                auto j = i + lg;
+                m[i].set(j, 0x7FFF'FFFF);
+                for (auto k : range_el(i, j)) {
+                    auto cost = m[i][k] + m[k + 1][j] + dims[i] * dims[k + 1] * dims[j + 1];
+                    if (cost < m[i][j]) {
+                        m[i].set(j, cost);
+                        s[i].set(j, k);
+                    }
+                }
+            }
+    }
+
+    template <typename T1, typename T2> auto optimalChainOrder(const T1 &i, const T2 &j)
+    {
+        if (i == j)
+            return String(Char(i + u'A'_C.code));
+        else
+            return u"("_S & (optimalChainOrder(i, s[i][j])) & optimalChainOrder(s[i][j] + 1, j) & u")"_S;
+    }
+};
+
+auto Dims1 = create_array({5, 6, 3, 1});
+auto Dims2 = create_array({1, 5, 25, 30, 100, 70, 2, 1, 100, 250, 1, 1000, 2});
+auto Dims3 = create_array({1000, 1, 500, 12, 1, 700, 2500, 3, 2, 5, 14, 10});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&dims : create_array({Dims1, Dims2, Dims3})) {
+            auto opt = Optimizer(dims);
+            opt.findMatrixChainOrder();
+            print(u"Dims:  "_S & dims);
+            print(u"Order: "_S & opt.optimalChainOrder(0, dims.len() - 2));
+            print(u"Cost:  "_S & _get<0>(opt.m)[dims.len() - 2]);
+            print(u""_S);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Maximum_difference_between_adjacent_elements_of_list#Python
+def maxDeltas(ns):
+    pairs = [
+        (abs(a - b), (a, b)) for a, b
+        in zip(ns, ns[1:])
+    ]
+    delta = max(pairs, key=lambda ab: ab[0])[0]
+
+    return [
+        ab for ab in pairs
+        if delta == ab[0]
+    ]
+
+maxPairs = maxDeltas([
+    float(1), 8, 2, -3, 0, 1, 1, -2.3, 0,
+    5.5, 8, 6, 2, 9, 11, 10, 3
+])
+
+for ab in maxPairs:
+    print(ab)
+===
+F maxDeltas(ns)
+   V pairs = zip(ns, ns[1..]).map((a, b) -> (abs(a - b), (a, b)))
+   V delta = max(pairs, key' ab -> ab[0])[0]
+
+   R pairs.filter(ab -> @delta == ab[0])
+
+V maxPairs = maxDeltas([Float(1), 8, 2, -3, 0, 1, 1, -2.3, 0, 5.5, 8, 6, 2, 9, 11, 10, 3])
+
+L(ab) maxPairs
+   print(ab)
+===
+template <typename T1> auto maxDeltas(const T1 &ns)
+{
+    auto pairs = zip(ns, ns[range_ei(1)]).map([](const auto &a, const auto &b){return make_tuple(abs(a - b), make_tuple(a, b));});
+    auto delta = _get<0>(max_with_key(pairs, [](const auto &ab){return _get<0>(ab);}));
+
+    return pairs.filter([&delta](const auto &ab){return delta == _get<0>(ab);});
+}
+
+auto maxPairs = maxDeltas(create_array<double>({to_float(1), 8, 2, -3, 0, 1, 1, -2.3, 0, 5.5, 8, 6, 2, 9, 11, 10, 3}));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&ab : maxPairs)
+            print(ab);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Mayan_numerals#Nim
+UL = "╔"
+UC = "╦"
+UR = "╗"
+LL = "╚"
+LC = "╩"
+LR = "╝"
+HB = "═"
+VB = "║"
+
+Mayan = ["    ",
+         " ∙  ",
+         " ∙∙ ",
+         "∙∙∙ ",
+         "∙∙∙∙"]
+
+M0 = " @  "
+M5 = "────"
+
+def toBase20(n):
+    result = [n % 20]
+    n //= 20
+    while n != 0:
+        result += [n % 20]
+        n //= 20
+    return result[::-1]
+
+def toMayanNumeral(d):
+    result = [Mayan[0], Mayan[0], Mayan[0], Mayan[0]]
+    if d == 0:
+        result[3] = M0
+        return result
+
+    for i in range(3, -1, -1):
+        if d >= 5:
+            result[i] = M5
+            d -= 5
+        else:
+            result[i] = Mayan[d]
+            break
+
+    return result
+
+def draw(mayans):
+    idx = len(mayans) - 1
+
+    print(UL, end = '')
+    for i in range(idx + 1):
+        for j in range(4):
+            print(HB, end = '')
+        if i < idx:
+            print(UC, end = '')
+        else:
+            print(UR)
+
+    for i in range(1, 5):
+        print(VB, end = '')
+        for j in range(idx + 1):
+            print(mayans[j][i-1] + VB, end = '')
+        print()
+
+    print(LL, end = '')
+    for i in range(idx + 1):
+        for j in range(4):
+            print(HB, end = '')
+        if i < idx:
+            print(LC, end = '')
+        else:
+            print(LR)
+
+for n in [4005, 8017, 326205, 886205, 1081439556]:
+    print("Converting", n, "to Mayan:")
+    digits = toBase20(n)
+    mayans = list(map(lambda d: toMayanNumeral(d), digits))
+    draw(mayans)
+    print()
+===
+V UL = ‘╔’
+V UC = ‘╦’
+V UR = ‘╗’
+V LL = ‘╚’
+V LC = ‘╩’
+V LR = ‘╝’
+V HB = ‘═’
+V VB = ‘║’
+
+V Mayan = [‘    ’, ‘ ∙  ’, ‘ ∙∙ ’, ‘∙∙∙ ’, ‘∙∙∙∙’]
+
+V M0 = ‘ @  ’
+V M5 = ‘────’
+
+F toBase20(=n)
+   V result = [n % 20]
+   n I/= 20
+   L n != 0
+      result [+]= n % 20
+      n I/= 20
+   R reversed(result)
+
+F toMayanNumeral(=d)
+   V result = [Mayan[0], Mayan[0], Mayan[0], Mayan[0]]
+   I d == 0
+      result[3] = :M0
+      R result
+
+   L(i) (3 .< -1).step(-1)
+      I d >= 5
+         result[i] = :M5
+         d -= 5
+      E
+         result[i] = Mayan[d]
+         L.break
+
+   R result
+
+F draw(mayans)
+   V idx = mayans.len - 1
+
+   print(:UL, end' ‘’)
+   L(i) 0 .. idx
+      L(j) 4
+         print(:HB, end' ‘’)
+      I i < idx
+         print(:UC, end' ‘’)
+      E
+         print(:UR)
+
+   L(i) 1..4
+      print(:VB, end' ‘’)
+      L(j) 0 .. idx
+         print(mayans[j][i - 1]‘’:VB, end' ‘’)
+      print()
+
+   print(:LL, end' ‘’)
+   L(i) 0 .. idx
+      L(j) 4
+         print(:HB, end' ‘’)
+      I i < idx
+         print(:LC, end' ‘’)
+      E
+         print(:LR)
+
+L(n) [4005, 8017, 326205, 886205, 1081439556]
+   print(‘Converting ’n‘ to Mayan:’)
+   V digits = toBase20(n)
+   V mayans = digits.map(d -> toMayanNumeral(d))
+   draw(mayans)
+   print()
+===
+auto UL = u"╔"_S;
+auto UC = u"╦"_S;
+auto UR = u"╗"_S;
+auto LL = u"╚"_S;
+auto LC = u"╩"_S;
+auto LR = u"╝"_S;
+auto HB = u"═"_S;
+auto VB = u"║"_S;
+
+auto Mayan = create_array({u"    "_S, u" ∙  "_S, u" ∙∙ "_S, u"∙∙∙ "_S, u"∙∙∙∙"_S});
+
+auto M0 = u" @  "_S;
+auto M5 = u"────"_S;
+
+template <typename T1> auto toBase20(T1 n)
+{
+    auto result = create_array({mod(n, 20)});
+    n = idiv(n, 20);
+    while (n != 0) {
+        result.append(mod(n, 20));
+        n = idiv(n, 20);
+    }
+    return reversed(result);
+}
+
+template <typename T1> auto toMayanNumeral(T1 d)
+{
+    auto result = create_array({_get<0>(Mayan), _get<0>(Mayan), _get<0>(Mayan), _get<0>(Mayan)});
+    if (d == 0) {
+        _set<3>(result, ::M0);
+        return result;
+    }
+
+    for (auto i : range_el(3, -1).step(-1))
+        if (d >= 5) {
+            result.set(i, ::M5);
+            d -= 5;
+        }
+        else {
+            result.set(i, Mayan[d]);
+            break;
+        }
+
+    return result;
+}
+
+template <typename T1> auto draw(const T1 &mayans)
+{
+    auto idx = mayans.len() - 1;
+
+    print(::UL, u""_S);
+    for (auto i : range_ee(0, idx)) {
+        for (int j = 0; j < 4; j++)
+            print(::HB, u""_S);
+        if (i < idx)
+            print(::UC, u""_S);
+        else
+            print(::UR);
+    }
+
+    for (auto i : range_ee(1, 4)) {
+        print(::VB, u""_S);
+        for (auto j : range_ee(0, idx))
+            print(mayans[j][i - 1] & ::VB, u""_S);
+        print();
+    }
+
+    print(::LL, u""_S);
+    for (auto i : range_ee(0, idx)) {
+        for (int j = 0; j < 4; j++)
+            print(::HB, u""_S);
+        if (i < idx)
+            print(::LC, u""_S);
+        else
+            print(::LR);
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&n : create_array({4005, 8017, 326205, 886205, 1081439556})) {
+            print(u"Converting "_S & n & u" to Mayan:"_S);
+            auto digits = toBase20(n);
+            auto mayans = digits.map([](const auto &d){return toMayanNumeral(d);});
+            draw(mayans);
+            print();
+        }
+    }
+} code_block_1;
