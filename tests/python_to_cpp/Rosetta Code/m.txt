@@ -2653,3 +2653,1092 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Mertens_function#Python
+def mertens(count):
+    """Generate Mertens numbers"""
+    m = [-1, 1]
+    for n in range(2, count+1):
+        m.append(1)
+        for k in range(2, n+1):
+            m[n] -= m[n//k]
+    return m
+
+ms = mertens(1000)
+
+print("The first 99 Mertens numbers are:")
+print("  ", end=' ')
+col = 1
+for n in ms[1:100]:
+    print("{:2}".format(n), end=' ')
+    col += 1
+    if col == 10:
+        print()
+        col = 0
+
+zeroes = sum(int(x==0) for x in ms)
+crosses = sum(int(a!=0 and b==0) for a,b in zip(ms, ms[1:]))
+print("M(N) equals zero {} times.".format(zeroes))
+print("M(N) crosses zero {} times.".format(crosses))
+===
+F mertens(count)
+   ‘Generate Mertens numbers’
+   V m = [-1, 1]
+   L(n) 2 .. count
+      m.append(1)
+      L(k) 2 .. n
+         m[n] -= m[n I/ k]
+   R m
+
+V ms = mertens(1000)
+
+print(‘The first 99 Mertens numbers are:’)
+print(‘  ’, end' ‘ ’)
+V col = 1
+L(n) ms[1.<100]
+   print(‘#2’.format(n), end' ‘ ’)
+   col++
+   I col == 10
+      print()
+      col = 0
+
+V zeroes = sum(ms.map(x -> Int(x == 0)))
+V crosses = sum(zip(ms, ms[1..]).map((a, b) -> Int(a != 0 & b == 0)))
+print(‘M(N) equals zero #. times.’.format(zeroes))
+print(‘M(N) crosses zero #. times.’.format(crosses))
+===
+template <typename T1> auto mertens(const T1 &count)
+{
+    u"Generate Mertens numbers"_S;
+    auto m = create_array({-1, 1});
+    for (auto n : range_ee(2, count)) {
+        m.append(1);
+        for (auto k : range_ee(2, n))
+            m[n] -= m[idiv(n, k)];
+    }
+    return m;
+}
+
+auto ms = mertens(1000);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"The first 99 Mertens numbers are:"_S);
+        print(u"  "_S, u" "_S);
+    }
+} code_block_1;
+
+auto col = 1;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&n : ms[range_el(1, 100)]) {
+            print(u"#2"_S.format(n), u" "_S);
+            col++;
+            if (col == 10) {
+                print();
+                col = 0;
+            }
+        }
+    }
+} code_block_2;
+
+auto zeroes = sum_map(ms, [](const auto &x){return to_int(x == 0);});
+auto crosses = sum_map(zip(ms, ms[range_ei(1)]), [](const auto &a, const auto &b){return to_int(a != 0 && b == 0);});
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print(u"M(N) equals zero #. times."_S.format(zeroes));
+        print(u"M(N) crosses zero #. times."_S.format(crosses));
+    }
+} code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Miller%E2%80%93Rabin_primality_test#D
+import random
+
+def isProbablePrime(n, k = 10):
+    if n < 2 or n % 2 == 0:
+        return n == 2
+
+    d = n - 1
+    s = 0
+    while d % 2 == 0:
+        d //= 2
+        s += 1
+
+    assert(2 ** s * d == n - 1)
+
+    for _ in range(k):
+        a = random.randrange(2, n)
+        x = pow(a, d, n)
+        if x == 1 or x == n - 1:
+            continue
+        for _ in range(s - 1):
+            x = pow(x, 2, n)
+            if x == 1:
+                return False
+            if x == n - 1:
+                break # `^L.continue`
+        else:
+            return False
+
+    return True
+
+print([x for x in range(2, 30) if isProbablePrime(x)])
+===
+F isProbablePrime(n, k = 10)
+   I n < 2 | n % 2 == 0
+      R n == 2
+
+   V d = n - 1
+   V s = 0
+   L d % 2 == 0
+      d I/= 2
+      s++
+
+   assert(2 ^ s * d == n - 1)
+
+   L(_) 0 .< k
+      V a = random:(2 .< n)
+      V x = pow(a, d, n)
+      I x == 1 | x == n - 1
+         L.continue
+      L(_) 0 .< s - 1
+         x = pow(x, 2, n)
+         I x == 1
+            R 0B
+         I x == n - 1
+            L.break
+      L.was_no_break
+         R 0B
+
+   R 1B
+
+print((2..29).filter(x -> isProbablePrime(x)))
+===
+template <typename T1, typename T2 = decltype(10)> auto isProbablePrime(const T1 &n, const T2 &k = 10)
+{
+    if (n < 2 || mod(n, 2) == 0)
+        return n == 2;
+
+    auto d = n - 1;
+    auto s = 0;
+    while (mod(d, 2) == 0) {
+        d = idiv(d, 2);
+        s++;
+    }
+
+    assert(pow(2, s) * d == n - 1);
+
+    for (auto _ : range_el(0, k)) {
+        auto a = randomns::_(range_el(2, n));
+        auto x = pow(a, d, n);
+        if (x == 1 || x == n - 1)
+            continue;
+        for (auto _ : range_el(0, s - 1)) {
+            x = pow(x, 2, n);
+            if (x == 1)
+                return false;
+            if (x == n - 1)
+                goto break_;
+        }
+        return false;
+        break_:;
+    }
+
+    return true;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(range_ee(2, 29).filter([](const auto &x){return isProbablePrime(x);}));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Minimal_steps_down_to_1#Python:_Tabulated
+from typing import Set
+from copy import copy
+
+class Mintab:
+    divs : Set[int]
+    subs : Set[int]
+
+    def __init__(self, divs, subs):
+        self.divs = copy(divs)
+        self.subs = copy(subs)
+        self.table : List[int] = [] # Last tabulated table
+        self.hows : List[List[str]] = [] # Last tabulated sample steps
+
+    def _mintab(self, n):
+        "Tabulation, memoised minimised steps to 1"
+        table = [n + 2] * (n + 1)   # sentinels
+        table[1] = 0                # zero steps to 1 from 1
+        how = [[''] for _ in range(n + 2)]  # What steps are taken
+        how[1] = [str('=')]
+        for t in range(1, n):
+            thisplus1 = table[t] + 1
+            for d in self.divs:
+                dt = d * t
+                if dt <= n and thisplus1 < table[dt]:
+                    table[dt] = thisplus1
+                    how[dt] = how[t] + ['/{}=>{:2}'.format(d, t)]
+            for s in self.subs:
+                st = s + t
+                if st <= n and thisplus1 < table[st]:
+                    table[st] = thisplus1
+                    how[st] = how[t] + ['-{}=>{:2}'.format(s, t)]
+        self.table = table
+        self.hows = [h[::-1][:-1] for h in how]   # Order and trim
+        return (self.table, self.hows)
+
+    def __call__(self, n):
+        "Tabulation"
+        (table, hows) = self._mintab(n)
+        return (table[n], hows[n])
+
+for DIVS, SUBS in [([2, 3], [1]), ([2, 3], [2])]:
+    print('\nMINIMUM STEPS TO 1: Tabulation algorithm')
+    print('  Possible divisors:  ', DIVS)
+    print('  Possible decrements:', SUBS)
+    mintab = Mintab(set(DIVS), set(SUBS))
+    mintab(10)
+    for n in range(1, 11):
+        (steps, how) = (mintab.table[n], mintab.hows[n])
+        print('    mintab({:2}) in {:2} by: '.format(n, steps), ', '.join(how))
+
+    for upto in [2000, 50_000]:
+        mintab(upto)
+        print('\n    Those numbers up to', upto, 'that take the maximum, "minimal steps down to 1":')
+        mx = max(mintab.table[1:])
+        ans = [n for n, steps in enumerate(mintab.table) if steps == mx]
+        print('      Taking', mx, 'steps is/are the', len(ans), 'numbers:',
+              ', '.join(str(n) for n in ans))
+===
+T Mintab
+   Set[Int] divs
+   Set[Int] subs
+   [Int] table
+   [[String]] hows
+
+   F (divs, subs)
+      .divs = copy(divs)
+      .subs = copy(subs)
+
+   F _mintab(n)
+      ‘Tabulation, memoised minimised steps to 1’
+      V table = [n + 2] * (n + 1)
+      table[1] = 0
+      V how = (0 .< n + 2).map(_ -> [‘’])
+      how[1] = [String(‘=’)]
+      L(t) 1 .< n
+         V thisplus1 = table[t] + 1
+         L(d) .divs
+            V dt = d * t
+            I dt <= n & thisplus1 < table[dt]
+               table[dt] = thisplus1
+               how[dt] = how[t] [+] [‘/#.=>#2’.format(d, t)]
+         L(s) .subs
+            V st = s + t
+            I st <= n & thisplus1 < table[st]
+               table[st] = thisplus1
+               how[st] = how[t] [+] [‘-#.=>#2’.format(s, t)]
+      .table = table
+      .hows = how.map(h -> reversed(h)[0 .< (len)-1])
+      R (.table, .hows)
+
+   F ()(n)
+      ‘Tabulation’
+      V (table, hows) = ._mintab(n)
+      R (table[n], hows[n])
+
+L(DIVS, SUBS) [([2, 3], [1]), ([2, 3], [2])]
+   print("\nMINIMUM STEPS TO 1: Tabulation algorithm")
+   print(‘  Possible divisors:   ’DIVS)
+   print(‘  Possible decrements: ’SUBS)
+   V mintab = Mintab(Set(DIVS), Set(SUBS))
+   mintab(10)
+   L(n) 1..10
+      V (steps, how) = (mintab.table[n], mintab.hows[n])
+      print(‘    mintab(#2) in #2 by: ’.format(n, steps)‘ ’how.join(‘, ’))
+
+   L(upto) [2000, 50'000]
+      mintab(upto)
+      print("\n    Those numbers up to "upto‘ that take the maximum, "minimal steps down to 1":’)
+      V mx = max(mintab.table[1..])
+      V ans = enumerate(mintab.table).filter((n, steps) -> steps == @mx).map((n, steps) -> n)
+      print(‘      Taking ’mx‘ steps is/are the ’ans.len‘ numbers: ’ans.map(n -> String(n)).join(‘, ’))
+===
+class Mintab
+{
+public:
+    Set<int> divs;
+    Set<int> subs;
+    Array<int> table;
+    Array<Array<String>> hows;
+
+    template <typename T1, typename T2> Mintab(const T1 &divs, const T2 &subs)
+    {
+        this->divs = copy(divs);
+        this->subs = copy(subs);
+    }
+
+    template <typename T1> auto _mintab(const T1 &n)
+    {
+        u"Tabulation, memoised minimised steps to 1"_S;
+        auto table = create_array({n + 2}) * (n + 1);
+        _set<1>(table, 0);
+        auto how = range_el(0, n + 2).map([](const auto &_){return create_array({u""_S});});
+        _set<1>(how, create_array({String(u"="_S)}));
+        for (auto t : range_el(1, n)) {
+            auto thisplus1 = table[t] + 1;
+            for (auto &&d : divs) {
+                auto dt = d * t;
+                if (dt <= n && thisplus1 < table[dt]) {
+                    table.set(dt, thisplus1);
+                    how.set(dt, how[t] + create_array({u"/#.=>#2"_S.format(d, t)}));
+                }
+            }
+            for (auto &&s : subs) {
+                auto st = s + t;
+                if (st <= n && thisplus1 < table[st]) {
+                    table.set(st, thisplus1);
+                    how.set(st, how[t] + create_array({u"-#.=>#2"_S.format(s, t)}));
+                }
+            }
+        }
+        this->table = table;
+        hows = how.map([](const auto &h){return reversed(h)[range_e_llen(0,  - 1)];});
+        return make_tuple(this->table, hows);
+    }
+
+    template <typename T1> auto operator()(const T1 &n)
+    {
+        u"Tabulation"_S;
+        auto [table, hows] = _mintab(n);
+        return make_tuple(table[n], hows[n]);
+    }
+};
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[DIVS, SUBS] : create_array({make_tuple(create_array({2, 3}), create_array({1})), make_tuple(create_array({2, 3}), create_array({2}))})) {
+            print(u"\nMINIMUM STEPS TO 1: Tabulation algorithm"_S);
+            print(u"  Possible divisors:   "_S & DIVS);
+            print(u"  Possible decrements: "_S & SUBS);
+            auto mintab = Mintab(create_set(DIVS), create_set(SUBS));
+            mintab(10);
+            for (auto n : range_ee(1, 10)) {
+                auto [steps, how] = make_tuple(mintab.table[n], mintab.hows[n]);
+                print(u"    mintab(#2) in #2 by: "_S.format(n, steps) & u" "_S & how.join(u", "_S));
+            }
+
+            for (auto &&upto : create_array({2000, 50'000})) {
+                mintab(upto);
+                print(u"\n    Those numbers up to "_S & upto & u" that take the maximum, \"minimal steps down to 1\":"_S);
+                auto mx = max(mintab.table[range_ei(1)]);
+                auto ans = enumerate(mintab.table).filter([&mx](const auto &n, const auto &steps){return steps == mx;}).map([](const auto &n, const auto &steps){return n;});
+                print(u"      Taking "_S & mx & u" steps is/are the "_S & ans.len() & u" numbers: "_S & ans.map([](const auto &n){return String(n);}).join(u", "_S));
+            }
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Minkowski_question-mark_function#Python
+import math
+
+MAXITER = 151
+
+def minkowski(x) -> float:
+    if x > 1 or x < 0:
+        return math.floor(x) + minkowski(x - math.floor(x))
+
+    p = int(x)
+    q = 1
+    r = p + 1
+    s = 1
+    d = 1.0
+    y = float(p)
+
+    while True:
+        d /= 2
+        if y + d == y:
+            break
+
+        m = p + r
+        if m < 0 or p < 0:
+            break
+
+        n = q + s
+        if n < 0:
+            break
+
+        if x < float(m) / n:
+            r = m
+            s = n
+        else:
+            y += d
+            p = m
+            q = n
+
+    return y + d
+
+def minkowski_inv(x) -> float:
+    if x > 1 or x < 0:
+        return math.floor(x) + minkowski_inv(x - math.floor(x))
+
+    if x == 1 or x == 0:
+        return x
+
+    cont_frac = [0]
+    current = 0
+    count = 1
+    i = 0
+
+    while True:
+        x *= 2
+
+        if current == 0:
+            if x < 1:
+                count += 1
+            else:
+                cont_frac.append(0)
+                cont_frac[i] = count
+
+                i += 1
+                count = 1
+                current = 1
+                x -= 1
+        else:
+            if x > 1:
+                count += 1
+                x -= 1
+            else:
+                cont_frac.append(0)
+                cont_frac[i] = count
+
+                i += 1
+                count = 1
+                current = 0
+
+        if x == math.floor(x):
+            cont_frac[i] = count
+            break
+
+        if i == MAXITER:
+            break
+
+    ret = 1.0 / cont_frac[i]
+    for j in range(i - 1, -1, -1):
+        ret = cont_frac[j] + 1.0 / ret
+
+    return 1.0 / ret
+
+print(
+    "{:19.16f} {:19.16f}".format(
+        minkowski(0.5 * (1 + math.sqrt(5))),
+        5.0 / 3.0
+    )
+)
+
+print(
+    "{:19.16f} {:19.16f}".format(
+        minkowski_inv(-5.0 / 9.0),
+        (math.sqrt(13) - 7) / 6
+    )
+)
+
+print(
+    "{:19.16f} {:19.16f}".format(
+        minkowski(minkowski_inv(0.718281828)),
+        minkowski_inv(minkowski(0.1213141516171819))
+    )
+)
+===
+V MAXITER = 151
+
+F minkowski(x) -> Float
+   I x > 1 | x < 0
+      R floor(x) + minkowski(x - floor(x))
+
+   V p = Int(x)
+   V q = 1
+   V r = p + 1
+   V s = 1
+   V d = 1.0
+   V y = Float(p)
+
+   L
+      d /= 2
+      I y + d == y
+         L.break
+
+      V m = p + r
+      I m < 0 | p < 0
+         L.break
+
+      V n = q + s
+      I n < 0
+         L.break
+
+      I x < Float(m) / n
+         r = m
+         s = n
+      E
+         y += d
+         p = m
+         q = n
+
+   R y + d
+
+F minkowski_inv(=x) -> Float
+   I x > 1 | x < 0
+      R floor(x) + minkowski_inv(x - floor(x))
+
+   I x == 1 | x == 0
+      R x
+
+   V cont_frac = [0]
+   V current = 0
+   V count = 1
+   V i = 0
+
+   L
+      x *= 2
+
+      I current == 0
+         I x < 1
+            count++
+         E
+            cont_frac.append(0)
+            cont_frac[i] = count
+
+            i++
+            count = 1
+            current = 1
+            x--
+      E
+         I x > 1
+            count++
+            x--
+         E
+            cont_frac.append(0)
+            cont_frac[i] = count
+
+            i++
+            count = 1
+            current = 0
+
+      I x == floor(x)
+         cont_frac[i] = count
+         L.break
+
+      I i == :MAXITER
+         L.break
+
+   V ret = 1.0 / cont_frac[i]
+   L(j) (i - 1 .< -1).step(-1)
+      ret = cont_frac[j] + 1.0 / ret
+
+   R 1.0 / ret
+
+print(‘#2.16 #2.16’.format(minkowski(0.5 * (1 + sqrt(5))), 5.0 / 3.0))
+
+print(‘#2.16 #2.16’.format(minkowski_inv(-5.0 / 9.0), (sqrt(13) - 7) / 6))
+
+print(‘#2.16 #2.16’.format(minkowski(minkowski_inv(0.718281828)), minkowski_inv(minkowski(0.1213141516171819))))
+===
+auto MAXITER = 151;
+
+template <typename T1> double minkowski(const T1 &x)
+{
+    if (x > 1 || x < 0)
+        return floor(x) + minkowski(x - floor(x));
+
+    auto p = to_int(x);
+    auto q = 1;
+    auto r = p + 1;
+    auto s = 1;
+    auto d = 1.0;
+    auto y = to_float(p);
+
+    while (true) {
+        d /= 2;
+        if (y + d == y)
+            break;
+
+        auto m = p + r;
+        if (m < 0 || p < 0)
+            break;
+
+        auto n = q + s;
+        if (n < 0)
+            break;
+
+        if (x < to_float(m) / n) {
+            r = m;
+            s = n;
+        }
+        else {
+            y += d;
+            p = m;
+            q = n;
+        }
+    }
+
+    return y + d;
+}
+
+template <typename T1> double minkowski_inv(T1 x)
+{
+    if (x > 1 || x < 0)
+        return floor(x) + minkowski_inv(x - floor(x));
+
+    if (x == 1 || x == 0)
+        return x;
+
+    auto cont_frac = create_array({0});
+    auto current = 0;
+    auto count = 1;
+    auto i = 0;
+
+    while (true) {
+        x *= 2;
+
+        if (current == 0) {
+            if (x < 1)
+                count++;
+            else {
+                cont_frac.append(0);
+                cont_frac.set(i, count);
+
+                i++;
+                count = 1;
+                current = 1;
+                x--;
+            }
+        }
+        else
+            if (x > 1) {
+                count++;
+                x--;
+            }
+            else {
+                cont_frac.append(0);
+                cont_frac.set(i, count);
+
+                i++;
+                count = 1;
+                current = 0;
+            }
+
+        if (x == floor(x)) {
+            cont_frac.set(i, count);
+            break;
+        }
+
+        if (i == ::MAXITER)
+            break;
+    }
+
+    auto ret = 1.0 / cont_frac[i];
+    for (auto j : range_el(i - 1, -1).step(-1))
+        ret = cont_frac[j] + 1.0 / ret;
+
+    return 1.0 / ret;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"#2.16 #2.16"_S.format(minkowski(0.5 * (1 + sqrt(5))), 5.0 / 3.0));
+
+        print(u"#2.16 #2.16"_S.format(minkowski_inv(-5.0 / 9.0), (sqrt(13) - 7) / 6.0));
+
+        print(u"#2.16 #2.16"_S.format(minkowski(minkowski_inv(0.718281828)), minkowski_inv(minkowski(0.1213141516171819))));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Modified_random_distribution#Python
+import random, collections
+from typing import List, Callable, Optional
+
+def modifier(x: float) -> float:
+    return 2*(.5 - x) if x < 0.5 else 2*(x - .5)
+
+def modified_random_distribution(modifier: Callable[[float], float],
+                                 n: int) -> List[float]:
+    d: List[float] = []
+    while len(d) < n:
+        prob = random.random()
+        if random.random() < modifier(prob):
+            d.append(prob)
+    return d
+
+data = modified_random_distribution(modifier, 50_000)
+bins = 15
+#counts = Counter(d // (1 / bins) for d in data)
+counts = collections.defaultdict(int) # int
+for d in data:
+    counts[d // (1 / bins)] += 1
+
+mx = max(counts.values())
+print("   BIN, COUNTS, DELTA: HISTOGRAM\n")
+last: Optional[float] = None
+for b, count in sorted(counts.items()):
+    delta = 'N/A' if last is None else str(count - last)
+    print('  {:5.2f},  {:4},  {:>4}: '.format(float(b) / bins, count, delta) + '#' * int(40 * count / mx))
+    last = count
+===
+F modifier(Float x) -> Float
+   R I x < 0.5 {2 * (.5 - x)} E 2 * (x - .5)
+
+F modified_random_distribution((Float -> Float) modifier, Int n) -> [Float]
+   [Float] d
+   L d.len < n
+      V prob = random:()
+      I random:() < modifier(prob)
+         d.append(prob)
+   R d
+
+V data = modified_random_distribution(modifier, 50'000)
+V bins = 15
+V counts = DefaultDict[Int, Int]()
+L(d) data
+   counts[d I/ (1 / bins)]++
+
+V mx = max(counts.values())
+print("   BIN, COUNTS, DELTA: HISTOGRAM\n")
+Float? last
+L(b, count) sorted(counts.items())
+   V delta = I last == N {‘N/A’} E String(count - last)
+   print(‘  #2.2,  #4,  #4: ’.format(Float(b) / bins, count, delta)‘’(‘#’ * Int(40 * count / mx)))
+   last = count
+===
+double modifier(const double x)
+{
+    return x < 0.5 ? 2 * (.5 - x) : 2 * (x - .5);
+}
+
+Array<double> modified_random_distribution(const std::function<double(const double)> &modifier, const int n)
+{
+    Array<double> d;
+    while (d.len() < n) {
+        auto prob = randomns::_();
+        if (randomns::_() < modifier(prob))
+            d.append(prob);
+    }
+    return d;
+}
+
+auto data = modified_random_distribution(modifier, 50'000);
+auto bins = 15;
+auto counts = DefaultDict<int, int>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&d : data)
+            counts[idiv(d, (1.0 / bins))]++;
+    }
+} code_block_1;
+
+auto mx = max(counts.values());
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"   BIN, COUNTS, DELTA: HISTOGRAM\n"_S);
+    }
+} code_block_2;
+
+Nullable<double> last;
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        for (auto &&[b, count] : sorted(counts.items())) {
+            auto delta = last == nullptr ? u"N/A"_S : String(count - *last);
+            print(u"  #2.2,  #4,  #4: "_S.format(to_float(b) / bins, count, delta) & (u"#"_S * to_int(40 * count / mx)));
+            last = count;
+        }
+    }
+} code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Multiplicative_order#D
+import math
+from typing import NamedTuple
+BigInt = int
+
+class PExp(NamedTuple):
+    prime : BigInt
+    exp : int
+
+def isqrt(self):
+    b = self
+    while True:
+        a = b
+        b = (self // a + a) // 2
+        if b >= a: return a
+
+def factor(n : BigInt):
+    pf : List[PExp] = []
+    nn = n
+    b = 0
+    while ((nn % 2) == 0):
+        nn //= 2
+        b += 1
+
+    if b > 0:
+        pf += [PExp(BigInt(2), b)]
+
+    s = isqrt(nn)
+    d = BigInt(3)
+    while nn > 1:
+        if d > s: d = nn
+        e = 0
+        while True:
+            (div, rem) = divmod(nn, d)
+            if rem.bit_length() > 0: break
+            nn = div
+            e += 1
+
+        if e > 0:
+            pf += [PExp(d, e)]
+            s = isqrt(nn)
+
+        d += 2
+
+    return pf
+
+def moBachShallit58(a : BigInt, n : BigInt, pf):
+    n1 = n - 1
+    mo = BigInt(1)
+    for pe in pf:
+        y = n1 // pow(pe.prime, BigInt(pe.exp))
+        o = 0
+        x = pow(a, y, n)
+        while x > 1:
+            x = pow(x, pe.prime, n)
+            o += 1
+        o1 = pow(pe.prime, BigInt(o))
+        o1 //= math.gcd(mo, o1)
+        mo *= o1
+    return mo
+
+def moTest(a, n):
+    if a.bit_length() < 100:
+        print('ord(' + str(a) + ')', end = '')
+    else:
+        print('ord([big])', end = '')
+    print(' mod', n, '=', moBachShallit58(a, n, factor(n - 1)))
+
+moTest(37, 3343)
+
+moTest(pow(BigInt(10), 100) + 1, 7919)
+moTest(pow(BigInt(10), 1000) + 1, 15485863)
+moTest(pow(BigInt(10), 10000) - 1, BigInt(22801763489))
+
+moTest(1511678068, 7379191741)
+moTest(BigInt('3047753288'), BigInt('2257683301'))
+===
+T PExp
+   BigInt prime
+   Int exp
+   F (prime, exp)
+      .prime = prime
+      .exp = exp
+
+F isqrt(self)
+   V b = self
+   L
+      V a = b
+      b = (self I/ a + a) I/ 2
+      I b >= a
+         R a
+
+F factor(BigInt n)
+   [PExp] pf
+   V nn = n
+   V b = 0
+   L ((nn % 2) == 0)
+      nn I/= 2
+      b++
+
+   I b > 0
+      pf [+]= PExp(BigInt(2), b)
+
+   V s = isqrt(nn)
+   V d = BigInt(3)
+   L nn > 1
+      I d > s
+         d = nn
+      V e = 0
+      L
+         V (div, rem) = divmod(nn, d)
+         I bit_length(rem) > 0
+            L.break
+         nn = div
+         e++
+
+      I e > 0
+         pf [+]= PExp(d, e)
+         s = isqrt(nn)
+
+      d += 2
+
+   R pf
+
+F moBachShallit58(BigInt a, BigInt n; pf)
+   V n1 = n - 1
+   V mo = BigInt(1)
+   L(pe) pf
+      V y = n1 I/ pow(pe.prime, BigInt(pe.exp))
+      V o = 0
+      V x = pow(a, y, n)
+      L x > 1
+         x = pow(x, pe.prime, n)
+         o++
+      V o1 = pow(pe.prime, BigInt(o))
+      o1 I/= gcd(mo, o1)
+      mo *= o1
+   R mo
+
+F moTest(a, n)
+   I bit_length(a) < 100
+      print(‘ord(’String(a)‘)’, end' ‘’)
+   E
+      print(‘ord([big])’, end' ‘’)
+   print(‘ mod ’n‘ = ’moBachShallit58(a, n, factor(n - 1)))
+
+moTest(37, 3343)
+
+moTest(pow(BigInt(10), 100) + 1, 7919)
+moTest(pow(BigInt(10), 1000) + 1, 15485863)
+moTest(pow(BigInt(10), 10000) - 1, BigInt(22801763489))
+
+moTest(1511678068, 7379191741)
+moTest(BigInt(‘3047753288’), BigInt(‘2257683301’))
+===
+class PExp
+{
+public:
+    BigInt prime;
+    int exp;
+    template <typename T1, typename T2> PExp(const T1 &prime, const T2 &exp) :
+        prime(prime),
+        exp(exp)
+    {
+    }
+};
+
+template <typename T1> auto isqrt(const T1 &self)
+{
+    auto b = self;
+    while (true) {
+        auto a = b;
+        b = idiv((idiv(self, a) + a), 2);
+        if (b >= a)
+            return a;
+    }
+}
+
+auto factor(const BigInt &n)
+{
+    Array<PExp> pf;
+    auto nn = n;
+    auto b = 0;
+    while (((mod(nn, 2)) == 0)) {
+        nn = idiv(nn, 2);
+        b++;
+    }
+
+    if (b > 0)
+        pf.append(PExp(BigInt(2), b));
+
+    auto s = isqrt(nn);
+    auto d = BigInt(3);
+    while (nn > 1) {
+        if (d > s)
+            d = nn;
+        auto e = 0;
+        while (true) {
+            auto [div, rem] = divmod(nn, d);
+            if (bit_length(rem) > 0)
+                break;
+            nn = div;
+            e++;
+        }
+
+        if (e > 0) {
+            pf.append(PExp(d, e));
+            s = isqrt(nn);
+        }
+
+        d += 2;
+    }
+
+    return pf;
+}
+
+template <typename T3> auto moBachShallit58(const BigInt &a, const BigInt &n, const T3 &pf)
+{
+    auto n1 = n - 1;
+    auto mo = BigInt(1);
+    for (auto &&pe : pf) {
+        auto y = idiv(n1, pow(pe.prime, BigInt(pe.exp)));
+        auto o = 0;
+        auto x = pow(a, y, n);
+        while (x > 1) {
+            x = pow(x, pe.prime, n);
+            o++;
+        }
+        auto o1 = pow(pe.prime, BigInt(o));
+        o1 = idiv(o1, gcd(mo, o1));
+        mo *= o1;
+    }
+    return mo;
+}
+
+template <typename T1, typename T2> auto moTest(const T1 &a, const T2 &n)
+{
+    if (bit_length(a) < 100)
+        print(u"ord("_S & String(a) & u")"_S, u""_S);
+    else
+        print(u"ord([big])"_S, u""_S);
+    print(u" mod "_S & n & u" = "_S & moBachShallit58(a, n, factor(n - 1)));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        moTest(37, 3343);
+
+        moTest(pow(BigInt(10), 100) + 1, 7919);
+        moTest(pow(BigInt(10), 1000) + 1, 15485863);
+        moTest(pow(BigInt(10), 10000) - 1, BigInt(22801763489));
+
+        moTest(1511678068, 7379191741);
+        moTest(BigInt(u"3047753288"_S), BigInt(u"2257683301"_S));
+    }
+} code_block_1;

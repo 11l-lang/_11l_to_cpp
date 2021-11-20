@@ -61,6 +61,7 @@ inline Char operator ""_C(char16_t c)
 }
 
 namespace re {class RegEx;}
+template <typename Type> class Set;
 
 class String : public std::u16string
 {
@@ -159,6 +160,16 @@ public:
 			if (i < arr.len()-1) *this &= u", ";
 		}
 		append(1, u']');
+	}
+	template <typename Type> explicit String(const Set<Type> &set)
+	{
+		assign(u"Set([");
+		for (auto &&el : set) {
+			if (len() > 5)
+				*this &= u", ";
+			*this &= String(el);
+		}
+		append(u"])");
 	}
 	explicit String(Complex c)
 	{
@@ -840,6 +851,10 @@ inline String operator*(Int n, Char c)
 {
 	return String(c) * n;
 }
+
+// This operators can not be declared as friends inside String class ([https://stackoverflow.com/questions/28003493/clang-g-difference-with-friend-function <- google:‘с++ friend argument type other class site:stackoverflow.com’])
+template <typename Ty> inline String operator&(const Ty &obj, Char c) {return String(obj) & c;}
+template <typename Ty> inline String operator&(Char c, const Ty &obj) {return c & String(obj);}
 
 inline String operator ""_S(const char16_t *s, size_t sz)
 {

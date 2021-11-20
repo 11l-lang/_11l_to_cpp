@@ -1133,3 +1133,937 @@ struct CodeBlock1
                 print(u"#. integrated using #.\n  from #. to #. (#. steps) = #."_S.format(func_name, rule_name, a, b, steps, integrate(func, a, b, steps, rule)));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/N-body_problem#Python
+from typing import List
+import math
+
+class Vector:
+    x : float
+    y : float
+    z : float
+
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def __add__(self, other):
+        return Vector(self.x + other.x, self.y + other.y, self.z + other.z)
+
+    def __sub__(self, other):
+        return Vector(self.x - other.x, self.y - other.y, self.z - other.z)
+
+    def __mul__(self, other):
+        return Vector(self.x * other, self.y * other, self.z * other)
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y and self.z == other.z
+
+    def __str__(self):
+        return '({x}, {y}, {z})'.format(x=self.x, y=self.y, z=self.z)
+
+    def abs(self):
+        return math.sqrt(self.x*self.x + self.y*self.y + self.z*self.z)
+
+origin = Vector(0, 0, 0)
+
+class NBody:
+    gc : float
+    bodies : int
+    timeSteps : int
+    masses : List[float]
+    positions : List[Vector]
+    velocities : List[Vector]
+    accelerations : List[Vector]
+
+    def __init__(self, fileName):
+        lines = open(fileName, "r").read().split("\n")
+        gbt = lines[0].split(' ')
+        self.gc = float(gbt[0])
+        self.bodies = int(gbt[1])
+        self.timeSteps = int(gbt[2])
+        self.masses = [0.0 for i in range(self.bodies)]
+        self.positions = [origin for i in range(self.bodies)]
+        self.velocities = [origin for i in range(self.bodies)]
+        self.accelerations = [origin for i in range(self.bodies)]
+        for i in range(self.bodies):
+            self.masses[i] = float(lines[i*3 + 1])
+            self.positions[i] = self.__decompose(lines[i*3 + 2])
+            self.velocities[i] = self.__decompose(lines[i*3 + 3])
+
+        print("Contents of", fileName)
+        for line in lines:
+            print(line)
+        print()
+        print("Body   :      x          y          z    |", end=' ')
+        print("     vx         vy         vz")
+
+    def __decompose(self, line):
+        xyz = line.split(' ')
+        x = float(xyz[0])
+        y = float(xyz[1])
+        z = float(xyz[2])
+        return Vector(x, y, z)
+
+    def __computeAccelerations(self):
+        for i in range(self.bodies):
+            self.accelerations[i] = origin
+            for j in range(self.bodies):
+                if i != j:
+                    temp = self.gc * self.masses[j] / math.pow((self.positions[i] - self.positions[j]).abs(), 3)
+                    self.accelerations[i] += (self.positions[j] - self.positions[i]) * temp
+
+    def __computePositions(self):
+        for i in range(self.bodies):
+            self.positions[i] += self.velocities[i] + self.accelerations[i] * 0.5
+
+    def __computeVelocities(self):
+        for i in range(self.bodies):
+            self.velocities[i] += self.accelerations[i]
+
+    def __resolveCollisions(self):
+        for i in range(self.bodies):
+            for j in range(self.bodies):
+                if self.positions[i] == self.positions[j]:
+                    (self.velocities[i], self.velocities[j]) = (self.velocities[j], self.velocities[i])
+
+    def simulate(self):
+        self.__computeAccelerations()
+        self.__computePositions()
+        self.__computeVelocities()
+        self.__resolveCollisions()
+
+    def printResults(self):
+        for i in range(self.bodies):
+            print("Body %d : %9.6f  %9.6f  %9.6f | %9.6f  %9.6f  %9.6f" % (i+1, self.positions[i].x, self.positions[i].y, self.positions[i].z, self.velocities[i].x, self.velocities[i].y, self.velocities[i].z))
+
+nb = NBody("nbody.txt")
+for i in range(nb.timeSteps):
+    print("\nCycle %d" % (i + 1))
+    nb.simulate()
+    nb.printResults()
+===
+T Vector
+   Float x
+   Float y
+   Float z
+
+   F (x, y, z)
+      .x = x
+      .y = y
+      .z = z
+
+   F +(other)
+      R Vector(.x + other.x, .y + other.y, .z + other.z)
+
+   F -(other)
+      R Vector(.x - other.x, .y - other.y, .z - other.z)
+
+   F *(other)
+      R Vector(.x * other, .y * other, .z * other)
+
+   F ==(other)
+      R .x == other.x & .y == other.y & .z == other.z
+
+   F String()
+      R ‘(#., #., #.)’.format(.x, .y, .z)
+
+   F abs()
+      R sqrt(.x * .x + .y * .y + .z * .z)
+
+V origin = Vector(0, 0, 0)
+
+T NBody
+   Float gc
+   Int bodies
+   Int timeSteps
+   [Float] masses
+   [Vector] positions
+   [Vector] velocities
+   [Vector] accelerations
+
+   F (fileName)
+      V lines = File(fileName, ‘r’).read().split("\n")
+      V gbt = lines[0].split(‘ ’)
+      .gc = Float(gbt[0])
+      .bodies = Int(gbt[1])
+      .timeSteps = Int(gbt[2])
+      .masses = (0 .< .bodies).map(i -> 0.0)
+      .positions = (0 .< .bodies).map(i -> :origin)
+      .velocities = (0 .< .bodies).map(i -> :origin)
+      .accelerations = (0 .< .bodies).map(i -> :origin)
+      L(i) 0 .< .bodies
+         .masses[i] = Float(lines[i * 3 + 1])
+         .positions[i] = .__decompose(lines[i * 3 + 2])
+         .velocities[i] = .__decompose(lines[i * 3 + 3])
+
+      print(‘Contents of ’fileName)
+      L(line) lines
+         print(line)
+      print()
+      print(‘Body   :      x          y          z    |’, end' ‘ ’)
+      print(‘     vx         vy         vz’)
+
+   F __decompose(line)
+      V xyz = line.split(‘ ’)
+      V x = Float(xyz[0])
+      V y = Float(xyz[1])
+      V z = Float(xyz[2])
+      R Vector(x, y, z)
+
+   F __computeAccelerations()
+      L(i) 0 .< .bodies
+         .accelerations[i] = :origin
+         L(j) 0 .< .bodies
+            I i != j
+               V temp = .gc * .masses[j] / pow((.positions[i] - .positions[j]).abs(), 3)
+               .accelerations[i] += (.positions[j] - .positions[i]) * temp
+
+   F __computePositions()
+      L(i) 0 .< .bodies
+         .positions[i] += .velocities[i] + .accelerations[i] * 0.5
+
+   F __computeVelocities()
+      L(i) 0 .< .bodies
+         .velocities[i] += .accelerations[i]
+
+   F __resolveCollisions()
+      L(i) 0 .< .bodies
+         L(j) 0 .< .bodies
+            I .positions[i] == .positions[j]
+               swap(&.velocities[i], &.velocities[j])
+
+   F simulate()
+      .__computeAccelerations()
+      .__computePositions()
+      .__computeVelocities()
+      .__resolveCollisions()
+
+   F printResults()
+      L(i) 0 .< .bodies
+         print(‘Body #. : #2.6  #2.6  #2.6 | #2.6  #2.6  #2.6’.format(i + 1, .positions[i].x, .positions[i].y, .positions[i].z, .velocities[i].x, .velocities[i].y, .velocities[i].z))
+
+V nb = NBody(‘nbody.txt’)
+L(i) 0 .< nb.timeSteps
+   print("\nCycle #.".format(i + 1))
+   nb.simulate()
+   nb.printResults()
+===
+class Vector
+{
+public:
+    double x;
+    double y;
+    double z;
+
+    template <typename T1, typename T2, typename T3> Vector(const T1 &x, const T2 &y, const T3 &z) :
+        x(x),
+        y(y),
+        z(z)
+    {
+    }
+
+    template <typename T1> auto operator+(const T1 &other) const
+    {
+        return Vector(x + other.x, y + other.y, z + other.z);
+    }
+    template <typename Ty> auto &operator+=(const Ty &t)
+    {
+        *this = *this + t;
+        return *this;
+    }
+
+    template <typename T1> auto operator-(const T1 &other) const
+    {
+        return Vector(x - other.x, y - other.y, z - other.z);
+    }
+    template <typename Ty> auto &operator-=(const Ty &t)
+    {
+        *this = *this - t;
+        return *this;
+    }
+
+    template <typename T1> auto operator*(const T1 &other) const
+    {
+        return Vector(x * other, y * other, z * other);
+    }
+    template <typename Ty> auto &operator*=(const Ty &t)
+    {
+        *this = *this * t;
+        return *this;
+    }
+
+    template <typename T1> auto operator==(const T1 &other) const
+    {
+        return x == other.x && y == other.y && z == other.z;
+    }
+
+    operator String() const
+    {
+        return u"(#., #., #.)"_S.format(x, y, z);
+    }
+
+    auto abs()
+    {
+        return sqrt(x * x + y * y + z * z);
+    }
+};
+
+auto origin = Vector(0, 0, 0);
+
+class NBody
+{
+public:
+    double gc;
+    int bodies;
+    int timeSteps;
+    Array<double> masses;
+    Array<Vector> positions;
+    Array<Vector> velocities;
+    Array<Vector> accelerations;
+
+    template <typename T1> NBody(const T1 &fileName)
+    {
+        auto lines = File(fileName, u"r"_S).read().split(u"\n"_S);
+        auto gbt = _get<0>(lines).split(u" "_S);
+        gc = to_float(_get<0>(gbt));
+        bodies = to_int(_get<1>(gbt));
+        timeSteps = to_int(_get<2>(gbt));
+        masses = range_el(0, bodies).map([](const auto &i){return 0.0;});
+        positions = range_el(0, bodies).map([](const auto &i){return ::origin;});
+        velocities = range_el(0, bodies).map([](const auto &i){return ::origin;});
+        accelerations = range_el(0, bodies).map([](const auto &i){return ::origin;});
+        for (auto i : range_el(0, bodies)) {
+            masses.set(i, to_float(lines[i * 3 + 1]));
+            positions.set(i, __decompose(lines[i * 3 + 2]));
+            velocities.set(i, __decompose(lines[i * 3 + 3]));
+        }
+
+        print(u"Contents of "_S & fileName);
+        for (auto &&line : lines)
+            print(line);
+        print();
+        print(u"Body   :      x          y          z    |"_S, u" "_S);
+        print(u"     vx         vy         vz"_S);
+    }
+
+    template <typename T1> auto __decompose(const T1 &line)
+    {
+        auto xyz = line.split(u" "_S);
+        auto x = to_float(_get<0>(xyz));
+        auto y = to_float(_get<1>(xyz));
+        auto z = to_float(_get<2>(xyz));
+        return Vector(x, y, z);
+    }
+
+    auto __computeAccelerations()
+    {
+        for (auto i : range_el(0, bodies)) {
+            accelerations.set(i, ::origin);
+            for (auto j : range_el(0, bodies))
+                if (i != j) {
+                    auto temp = gc * masses[j] / pow((positions[i] - positions[j]).abs(), 3);
+                    accelerations[i] += (positions[j] - positions[i]) * temp;
+                }
+        }
+    }
+
+    auto __computePositions()
+    {
+        for (auto i : range_el(0, bodies))
+            positions[i] += velocities[i] + accelerations[i] * 0.5;
+    }
+
+    auto __computeVelocities()
+    {
+        for (auto i : range_el(0, bodies))
+            velocities[i] += accelerations[i];
+    }
+
+    auto __resolveCollisions()
+    {
+        for (auto i : range_el(0, bodies))
+            for (auto j : range_el(0, bodies))
+                if (positions[i] == positions[j])
+                    swap(velocities[i], velocities[j]);
+    }
+
+    auto simulate()
+    {
+        __computeAccelerations();
+        __computePositions();
+        __computeVelocities();
+        __resolveCollisions();
+    }
+
+    auto printResults()
+    {
+        for (auto i : range_el(0, bodies))
+            print(u"Body #. : #2.6  #2.6  #2.6 | #2.6  #2.6  #2.6"_S.format(i + 1, positions[i].x, positions[i].y, positions[i].z, velocities[i].x, velocities[i].y, velocities[i].z));
+    }
+};
+
+auto nb = NBody(u"nbody.txt"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(0, nb.timeSteps)) {
+            print(u"\nCycle #."_S.format(i + 1));
+            nb.simulate();
+            nb.printResults();
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/N-queens_problem#Nim
+BoardSize = 8
+
+def underAttack(col, queens):
+    if col in queens: return True
+    for i, x in enumerate(queens):
+        if abs(col - x) == len(queens) - i:
+            return True
+    return False
+
+def solve(n):
+    result = [[0] * 0]
+    newSolutions : List[List[int]] = []
+    for row in range(1, n + 1):
+        for solution in result:
+            for i in range(1, BoardSize + 1):
+                if not underAttack(i, solution):
+                    newSolutions.append(solution + [i])
+        (result, newSolutions) = (newSolutions, result)
+        newSolutions.clear()
+    return result
+
+print('Solutions for a chessboard of size ' + str(BoardSize) + 'x' + str(BoardSize))
+print()
+
+for i, answer in enumerate(solve(BoardSize)):
+    for row, col in enumerate(answer):
+        if row > 0:
+            print(' ', end = '')
+        print(chr(ord('a') + row) + str(col), end = '')
+    print(end = "\n" if i % 4 == 3 else '      ')
+===
+V BoardSize = 8
+
+F underAttack(col, queens)
+   I col C queens
+      R 1B
+   L(x) queens
+      V i = L.index
+      I abs(col - x) == queens.len - i
+         R 1B
+   R 0B
+
+F solve(n)
+   V result = [[Int]()]
+   [[Int]] newSolutions
+   L(row) 1 .. n
+      L(solution) result
+         L(i) 1 .. BoardSize
+            I !underAttack(i, solution)
+               newSolutions.append(solution [+] [i])
+      swap(&result, &newSolutions)
+      newSolutions.clear()
+   R result
+
+print(‘Solutions for a chessboard of size ’String(BoardSize)‘x’String(BoardSize))
+print()
+
+L(answer) solve(BoardSize)
+   V i = L.index
+   L(col) answer
+      V row = L.index
+      I row > 0
+         print(‘ ’, end' ‘’)
+      print(Char(code' ‘a’.code + row)‘’String(col), end' ‘’)
+   print(end' I i % 4 == 3 {"\n"} E ‘      ’)
+===
+auto BoardSize = 8;
+
+template <typename T1, typename T2> auto underAttack(const T1 &col, const T2 &queens)
+{
+    if (in(col, queens))
+        return true;
+    {int Lindex = 0;
+    for (auto &&x : queens) {
+        auto i = Lindex;
+        if (abs(col - x) == queens.len() - i)
+            return true;
+        Lindex++;
+    }}
+    return false;
+}
+
+template <typename T1> auto solve(const T1 &n)
+{
+    auto result = create_array({Array<int>()});
+    Array<Array<int>> newSolutions;
+    for (auto row : range_ee(1, n)) {
+        for (auto &&solution : result)
+            for (auto i : range_ee(1, BoardSize))
+                if (!underAttack(i, solution))
+                    newSolutions.append(solution + create_array({i}));
+        swap(result, newSolutions);
+        newSolutions.clear();
+    }
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Solutions for a chessboard of size "_S & String(BoardSize) & u"x"_S & String(BoardSize));
+        print();
+        {int Lindex = 0;
+
+        for (auto &&answer : solve(BoardSize)) {
+            auto i = Lindex;
+            {int Lindex = 0;
+            for (auto &&col : answer) {
+                auto row = Lindex;
+                if (row > 0)
+                    print(u" "_S, u""_S);
+                print(Char(u'a'_C.code + row) & String(col), u""_S);
+                Lindex++;
+            }}
+            print(u""_S, mod(i, 4) == 3 ? u"\n"_S : u"      "_S);
+            Lindex++;
+        }}
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/N-smooth_numbers#Python
+primes = [2, 3, 5, 7, 11, 13, 17, 19, 23]
+
+def isPrime(n):
+    if n < 2:
+        return False
+
+    for i in primes:
+        if n == i:
+            return True
+        if n % i == 0:
+            return False
+        if i * i > n:
+            return True
+    print("Oops,", n, " is too large")
+    return False
+
+def init():
+    s = 24
+    while s < 600:
+        if isPrime(s - 1) and s - 1 > primes[-1]:
+            primes.append(s - 1)
+        if isPrime(s + 1) and s + 1 > primes[-1]:
+            primes.append(s + 1)
+        s += 6
+
+def nsmooth(n, size):
+    assert(2 <= n <= 521)
+    assert(size >= 1)
+
+    bn = n
+    ok = False
+    for prime in primes:
+        if bn == prime:
+            ok = True
+            break
+    assert ok, "must be a prime number"
+
+    ns = [BigInt(0)] * size
+    ns[0] = 1
+
+    next : List[BigInt] = []
+    for prime in primes:
+        if prime > bn:
+            break
+        next.append(prime)
+
+    indicies = [0] * len(next)
+    for m in range(1, size):
+        ns[m] = min(next)
+        for i in range(0, len(indicies)):
+            if ns[m] == next[i]:
+                indicies[i] += 1
+                next[i] = primes[i] * ns[indicies[i]]
+
+    return ns
+
+init()
+
+for p in primes:
+    if p >= 30:
+        break
+    print("The first", p, "-smooth numbers are:")
+    print(nsmooth(p, 25))
+    print()
+
+for p in primes[1:]:
+    if p >= 30:
+        break
+    print("The 3000 to 3202", p, "-smooth numbers are:")
+    print(nsmooth(p, 3002)[2999:])
+    print()
+
+for p in [503, 509, 521]:
+    print("The 30000 to 3019", p, "-smooth numbers are:")
+    print(nsmooth(p, 30019)[29999:])
+    print()
+===
+V primes = [2, 3, 5, 7, 11, 13, 17, 19, 23]
+
+F isPrime(n)
+   I n < 2
+      R 0B
+
+   L(i) :primes
+      I n == i
+         R 1B
+      I n % i == 0
+         R 0B
+      I i * i > n
+         R 1B
+   print(‘Oops, ’n‘  is too large’)
+   R 0B
+
+F init()
+   V s = 24
+   L s < 600
+      I isPrime(s - 1) & s - 1 > :primes.last
+         :primes.append(s - 1)
+      I isPrime(s + 1) & s + 1 > :primes.last
+         :primes.append(s + 1)
+      s += 6
+
+F nsmooth(n, size)
+   assert(n C 2..521)
+   assert(size >= 1)
+
+   V bn = n
+   V ok = 0B
+   L(prime) :primes
+      I bn == prime
+         ok = 1B
+         L.break
+   assert(ok, ‘must be a prime number’)
+
+   V ns = [BigInt(0)] * size
+   ns[0] = 1
+
+   [BigInt] next
+   L(prime) :primes
+      I prime > bn
+         L.break
+      next.append(prime)
+
+   V indicies = [0] * next.len
+   L(m) 1 .< size
+      ns[m] = min(next)
+      L(i) 0 .< indicies.len
+         I ns[m] == next[i]
+            indicies[i]++
+            next[i] = :primes[i] * ns[indicies[i]]
+
+   R ns
+
+init()
+
+L(p) primes
+   I p >= 30
+      L.break
+   print(‘The first ’p‘ -smooth numbers are:’)
+   print(nsmooth(p, 25))
+   print()
+
+L(p) primes[1..]
+   I p >= 30
+      L.break
+   print(‘The 3000 to 3202 ’p‘ -smooth numbers are:’)
+   print(nsmooth(p, 3002)[2999..])
+   print()
+
+L(p) [503, 509, 521]
+   print(‘The 30000 to 3019 ’p‘ -smooth numbers are:’)
+   print(nsmooth(p, 30019)[29999..])
+   print()
+===
+auto primes = create_array({2, 3, 5, 7, 11, 13, 17, 19, 23});
+
+template <typename T1> auto isPrime(const T1 &n)
+{
+    if (n < 2)
+        return false;
+
+    for (auto &&i : ::primes) {
+        if (n == i)
+            return true;
+        if (mod(n, i) == 0)
+            return false;
+        if (i * i > n)
+            return true;
+    }
+    print(u"Oops, "_S & n & u"  is too large"_S);
+    return false;
+}
+
+auto init()
+{
+    auto s = 24;
+    while (s < 600) {
+        if (isPrime(s - 1) && s - 1 > ::primes.last())
+            ::primes.append(s - 1);
+        if (isPrime(s + 1) && s + 1 > ::primes.last())
+            ::primes.append(s + 1);
+        s += 6;
+    }
+}
+
+template <typename T1, typename T2> auto nsmooth(const T1 &n, const T2 &size)
+{
+    assert(in(n, range_ee(2, 521)));
+    assert(size >= 1);
+
+    auto bn = n;
+    auto ok = false;
+    for (auto &&prime : ::primes)
+        if (bn == prime) {
+            ok = true;
+            break;
+        }
+    assert(ok, u"must be a prime number"_S);
+
+    auto ns = create_array({BigInt(0)}) * size;
+    _set<0>(ns, 1);
+
+    Array<BigInt> next;
+    for (auto &&prime : ::primes) {
+        if (prime > bn)
+            break;
+        next.append(prime);
+    }
+
+    auto indicies = create_array({0}) * next.len();
+    for (auto m : range_el(1, size)) {
+        ns.set(m, min(next));
+        for (auto i : range_el(0, indicies.len()))
+            if (ns[m] == next[i]) {
+                indicies[i]++;
+                next.set(i, ::primes[i] * ns[indicies[i]]);
+            }
+    }
+
+    return ns;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        init();
+
+        for (auto &&p : primes) {
+            if (p >= 30)
+                break;
+            print(u"The first "_S & p & u" -smooth numbers are:"_S);
+            print(nsmooth(p, 25));
+            print();
+        }
+
+        for (auto &&p : primes[range_ei(1)]) {
+            if (p >= 30)
+                break;
+            print(u"The 3000 to 3202 "_S & p & u" -smooth numbers are:"_S);
+            print(nsmooth(p, 3002)[range_ei(2999)]);
+            print();
+        }
+
+        for (auto &&p : create_array({503, 509, 521})) {
+            print(u"The 30000 to 3019 "_S & p & u" -smooth numbers are:"_S);
+            print(nsmooth(p, 30019)[range_ei(29999)]);
+            print();
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Names_to_numbers#Nim
+import re
+Int64 = int
+
+Names = {"one":   Int64(1),
+         "two":         2,
+         "three":       3,
+         "four":        4,
+         "five":        5,
+         "six":         6,
+         "seven":       7,
+         "eight":       8,
+         "nine":        9,
+         "ten":         10,
+         "eleven":      11,
+         "twelve":      12,
+         "thirteen":    13,
+         "fourteen":    14,
+         "fifteen":     15,
+         "sixteen":     16,
+         "seventeen":   17,
+         "eighteen":    18,
+         "nineteen":    19,
+         "twenty":      20,
+         "thirty":      30,
+         "forty":       40,
+         "fifty":       50,
+         "sixty":       60,
+         "seventy":     70,
+         "eighty":      80,
+         "ninety":      90,
+         "hundred":     100,
+         "thousand":    1000,
+         "million":     1000000,
+         "billion":     1000000000,
+         "trillion":    1000000000000,
+         "quadrillion": 1000000000000000,
+         "quintillion": 1000000000000000000}
+
+Zeros = ["zero", "nought", "nil", "none", "nothing"]
+
+def nameToNum(name):
+    text = name.lower()
+    isNegative = text.startswith("minus ")
+    if isNegative: text = text[6:]
+    if text.startswith("a"):
+        text = "one" + text[1:]
+    words = [w for w in re.split(",|-| and | ", text) if len(w) != 0]
+    if len(words) == 1 and words[0] in Zeros:
+        return Int64(0)
+
+    multiplier = Int64(1)
+    sum = Int64(0)
+    for i in range(len(words) - 1, -1, -1):
+        num = Names.get(words[i], 0)
+        if num >= 1000:
+            multiplier = num
+            if i == 0: sum += multiplier
+        elif num >= 100:
+            multiplier *= 100
+            if i == 0: sum += multiplier
+        else:
+            sum += num * multiplier
+
+    return -sum if isNegative else sum
+
+names = [
+    "none",
+    "one",
+    "twenty-five",
+    "minus one hundred and seventeen",
+    "hundred and fifty-six",
+    "minus two thousand two",
+    "nine thousand, seven hundred, one",
+    "minus six hundred and twenty six thousand, eight hundred and fourteen",
+    "four million, seven hundred thousand, three hundred and eighty-six",
+    "fifty-one billion, two hundred and fifty-two million, seventeen thousand, one hundred eighty-four",
+    "two hundred and one billion, twenty-one million, two thousand and one",
+    "minus three hundred trillion, nine million, four hundred and one thousand and thirty-one",
+    "seventeen quadrillion, one hundred thirty-seven",
+    "a quintillion, eight trillion and five",
+    "minus nine quintillion, two hundred and twenty-three quadrillion, three hundred and seventy-two trillion, thirty-six billion, eight hundred and fifty-four million, seven hundred and seventy-five thousand, eight hundred and eight"]
+
+for name in names:
+    print('%20d' % nameToNum(name), '=', name)
+===
+V Names = [‘one’ = Int64(1), ‘two’ = 2, ‘three’ = 3, ‘four’ = 4, ‘five’ = 5, ‘six’ = 6, ‘seven’ = 7, ‘eight’ = 8, ‘nine’ = 9, ‘ten’ = 10, ‘eleven’ = 11, ‘twelve’ = 12, ‘thirteen’ = 13, ‘fourteen’ = 14, ‘fifteen’ = 15, ‘sixteen’ = 16, ‘seventeen’ = 17, ‘eighteen’ = 18, ‘nineteen’ = 19, ‘twenty’ = 20, ‘thirty’ = 30, ‘forty’ = 40, ‘fifty’ = 50, ‘sixty’ = 60, ‘seventy’ = 70, ‘eighty’ = 80, ‘ninety’ = 90, ‘hundred’ = 100, ‘thousand’ = 1000, ‘million’ = 1000000, ‘billion’ = 1000000000, ‘trillion’ = 1000000000000, ‘quadrillion’ = 1000000000000000, ‘quintillion’ = 1000000000000000000]
+
+V Zeros = [‘zero’, ‘nought’, ‘nil’, ‘none’, ‘nothing’]
+
+F nameToNum(name)
+   V text = name.lowercase()
+   V isNegative = text.starts_with(‘minus ’)
+   I isNegative
+      text = text[6..]
+   I text.starts_with(‘a’)
+      text = ‘one’text[1..]
+   V words = text.split(re:‘,|-| and | ’).filter(w -> !w.empty)
+   I words.len == 1 & words[0] C Zeros
+      R Int64(0)
+
+   V multiplier = Int64(1)
+   V sum = Int64(0)
+   L(i) (words.len - 1 .< -1).step(-1)
+      V num = Names.get(words[i], 0)
+      I num >= 1000
+         multiplier = num
+         I i == 0
+            sum += multiplier
+      E I num >= 100
+         multiplier *= 100
+         I i == 0
+            sum += multiplier
+      E
+         sum += num * multiplier
+
+   R I isNegative {-sum} E sum
+
+V names = [‘none’, ‘one’, ‘twenty-five’, ‘minus one hundred and seventeen’, ‘hundred and fifty-six’, ‘minus two thousand two’, ‘nine thousand, seven hundred, one’, ‘minus six hundred and twenty six thousand, eight hundred and fourteen’, ‘four million, seven hundred thousand, three hundred and eighty-six’, ‘fifty-one billion, two hundred and fifty-two million, seventeen thousand, one hundred eighty-four’, ‘two hundred and one billion, twenty-one million, two thousand and one’, ‘minus three hundred trillion, nine million, four hundred and one thousand and thirty-one’, ‘seventeen quadrillion, one hundred thirty-seven’, ‘a quintillion, eight trillion and five’, ‘minus nine quintillion, two hundred and twenty-three quadrillion, three hundred and seventy-two trillion, thirty-six billion, eight hundred and fifty-four million, seven hundred and seventy-five thousand, eight hundred and eight’]
+
+L(name) names
+   print((‘#20’.format(nameToNum(name)))‘ = ’name)
+===
+auto Names = create_dict(dict_of(u"one"_S, to_int64(1))(u"two"_S, 2)(u"three"_S, 3)(u"four"_S, 4)(u"five"_S, 5)(u"six"_S, 6)(u"seven"_S, 7)(u"eight"_S, 8)(u"nine"_S, 9)(u"ten"_S, 10)(u"eleven"_S, 11)(u"twelve"_S, 12)(u"thirteen"_S, 13)(u"fourteen"_S, 14)(u"fifteen"_S, 15)(u"sixteen"_S, 16)(u"seventeen"_S, 17)(u"eighteen"_S, 18)(u"nineteen"_S, 19)(u"twenty"_S, 20)(u"thirty"_S, 30)(u"forty"_S, 40)(u"fifty"_S, 50)(u"sixty"_S, 60)(u"seventy"_S, 70)(u"eighty"_S, 80)(u"ninety"_S, 90)(u"hundred"_S, 100)(u"thousand"_S, 1000)(u"million"_S, 1000000)(u"billion"_S, 1000000000)(u"trillion"_S, 1000000000000)(u"quadrillion"_S, 1000000000000000)(u"quintillion"_S, 1000000000000000000));
+
+auto Zeros = create_array({u"zero"_S, u"nought"_S, u"nil"_S, u"none"_S, u"nothing"_S});
+
+template <typename T1> auto nameToNum(const T1 &name)
+{
+    auto text = name.lowercase();
+    auto isNegative = text.starts_with(u"minus "_S);
+    if (isNegative)
+        text = text[range_ei(6)];
+    if (text.starts_with(u"a"_S))
+        text = u"one"_S & text[range_ei(1)];
+    auto words = text.split(re::_(u",|-| and | "_S)).filter([](const auto &w){return !w.empty();});
+    if (words.len() == 1 && in(_get<0>(words), Zeros))
+        return to_int64(0);
+
+    auto multiplier = to_int64(1);
+    auto sum = to_int64(0);
+    for (auto i : range_el(words.len() - 1, -1).step(-1)) {
+        auto num = Names.get(words[i], 0);
+        if (num >= 1000) {
+            multiplier = num;
+            if (i == 0)
+                sum += multiplier;
+        }
+        else if (num >= 100) {
+            multiplier *= 100;
+            if (i == 0)
+                sum += multiplier;
+        }
+        else
+            sum += num * multiplier;
+    }
+
+    return isNegative ? -sum : sum;
+}
+
+auto names = create_array({u"none"_S, u"one"_S, u"twenty-five"_S, u"minus one hundred and seventeen"_S, u"hundred and fifty-six"_S, u"minus two thousand two"_S, u"nine thousand, seven hundred, one"_S, u"minus six hundred and twenty six thousand, eight hundred and fourteen"_S, u"four million, seven hundred thousand, three hundred and eighty-six"_S, u"fifty-one billion, two hundred and fifty-two million, seventeen thousand, one hundred eighty-four"_S, u"two hundred and one billion, twenty-one million, two thousand and one"_S, u"minus three hundred trillion, nine million, four hundred and one thousand and thirty-one"_S, u"seventeen quadrillion, one hundred thirty-seven"_S, u"a quintillion, eight trillion and five"_S, u"minus nine quintillion, two hundred and twenty-three quadrillion, three hundred and seventy-two trillion, thirty-six billion, eight hundred and fifty-four million, seven hundred and seventy-five thousand, eight hundred and eight"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&name : names)
+            print((u"#20"_S.format(nameToNum(name))) & u" = "_S & name);
+    }
+} code_block_1;
