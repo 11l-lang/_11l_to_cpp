@@ -745,6 +745,25 @@ Array<Char> sorted(const String &s, nullptr_t, bool reverse)
 	return arr;
 }
 
+// [https://stackoverflow.com/questions/32752739/python-how-does-the-functools-cmp-to-key-function-works <- google:‘c++ cmp_to_key’]
+template <typename CmpFn> auto cmp_to_key(CmpFn mycmp)
+{
+	return [mycmp](const auto &obj) {
+		class K
+		{
+			CmpFn cf;
+			const TYPE_OF(obj) *o;
+
+		public:
+			K(CmpFn cf, const TYPE_OF(obj) *o) : cf(cf), o(o) {}
+
+			bool operator<(const K &k) const {return cf(*o, *k.o) < 0;}
+		} k(mycmp, &obj);
+
+		return k;
+	};
+}
+
 template <typename Type> inline Array<Type> reversed(const Array<Type> &arr)
 {
 	Array<Type> r(arr);

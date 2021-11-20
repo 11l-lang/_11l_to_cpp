@@ -3190,6 +3190,7 @@ builtins_scope.add_function('product', ASTFunctionDefinition([('iterable', '', '
 builtins_scope.add_function('enumerate', ASTFunctionDefinition([('iterable', '', ''), ('start', '0', 'Int')]))
 builtins_scope.add_function('sorted', ASTFunctionDefinition([('iterable', '', ''), ('key', token_to_str('N', Token.Category.CONSTANT), ''), ('reverse', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
 builtins_scope.add_function('tuple_sorted', ASTFunctionDefinition([('tuple', '', ''), ('key', token_to_str('N', Token.Category.CONSTANT), ''), ('reverse', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
+builtins_scope.add_function('cmp_to_key', ASTFunctionDefinition([('func', '', '')]))
 builtins_scope.add_function('reversed', ASTFunctionDefinition([('iterable', '', '')]))
 builtins_scope.add_function('min', ASTFunctionDefinition([('arg1', '', ''), ('arg2', token_to_str('N', Token.Category.CONSTANT), ''), ('arg3', token_to_str('N', Token.Category.CONSTANT), '')]))
 builtins_scope.add_function('max', ASTFunctionDefinition([('arg1', '', ''), ('arg2', token_to_str('N', Token.Category.CONSTANT), ''), ('arg3', token_to_str('N', Token.Category.CONSTANT), '')]))

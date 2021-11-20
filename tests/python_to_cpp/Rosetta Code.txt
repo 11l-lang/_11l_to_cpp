@@ -20374,3 +20374,302 @@ struct CodeBlock3
             print(md5_to_hex(md5(message)) & u" <= \""_S & message.decode(u"ascii"_S) & u"\""_S);
     }
 } code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Natural_sorting#Nim
+from enum import IntEnum
+import re
+from functools import cmp_to_key
+
+class Kind(IntEnum):
+    STRING = 0
+    NUMBER = 1
+
+class KeyItem:
+    kind : Kind
+    s: str
+    num: int
+
+def natOrderKey(s):
+    # Remove leading and trailing white spaces.
+    s = s.strip()
+
+    # Make all whitespace characters equivalent and remove adjacent spaces.
+    s = re.sub(r"\s+", ' ', s)
+
+    # Switch to lower case.
+    s = s.lower()
+
+    # Remove leading "the ".
+    if s.startswith("the ") and len(s) > 4: s = s[4:]
+
+    # Split into fields.
+    result : List[KeyItem] = []
+    idx = 0
+    while idx < len(s):
+        e = idx
+        while e < len(s) and not s[e].isdigit():
+            e += 1
+        if e > idx:
+            ki = KeyItem()
+            ki.kind = Kind.STRING
+            ki.s = s[idx : e]
+            result.append(ki)
+            idx = e
+        while e < len(s) and s[e].isdigit():
+            e += 1
+        if e > idx:
+            ki = KeyItem()
+            ki.kind = Kind.NUMBER
+            ki.num = int(s[idx : e])
+            result.append(ki)
+            idx = e
+    return result
+
+def scmp(s1, s2):
+    if s1 < s2: return -1
+    if s1 > s2: return  1
+    return 0
+
+def naturalCmp(sa : str, sb : str):
+    a = natOrderKey(sa)
+    b = natOrderKey(sb)
+
+    for i in range(min(len(a), len(b))):
+        ai = a[i]
+        bi = b[i]
+        if ai.kind == bi.kind:
+            result = scmp(ai.s, bi.s) if ai.kind == Kind.STRING else ai.num - bi.num
+            if result != 0: return result
+        else:
+            return 1 if ai.kind == Kind.STRING else -1
+
+    return -1 if len(a) < len(b) else (0 if len(a) == len(b) else 1)
+
+def test(title, list):
+    print(title)
+    print("\n".join("'" + s + "'" for s in sorted(list, key = cmp_to_key(naturalCmp))))
+    print()
+
+test("Ignoring leading spaces.",
+       ["ignore leading spaces:  2-2",
+        " ignore leading spaces:  2-1",
+        "  ignore leading spaces:  2+0",
+        "   ignore leading spaces:  2+1"])
+
+test("Ignoring multiple adjacent spaces (MAS).",
+       ["ignore MAS spaces:  2-2",
+        "ignore MAS  spaces:  2-1",
+        "ignore MAS   spaces:  2+0",
+        "ignore MAS    spaces:  2+1"])
+
+test("Equivalent whitespace characters.",
+       ["Equiv.  spaces:     3-3",
+        "Equiv. \rspaces:    3-2",
+        "Equiv. \x0cspaces:  3-1",
+        "Equiv. \x0bspaces:  3+0",
+        "Equiv. \nspaces:    3+1",
+        "Equiv. \tspaces:    3+2"])
+
+test("Case Independent sort.",
+       ["cASE INDEPENDENT:  3-2",
+        "caSE INDEPENDENT:  3-1",
+        "casE INDEPENDENT:  3+0",
+        "case INDEPENDENT:  3+1"])
+
+test("Numeric fields as numerics.",
+       ["foo100bar99baz0.txt",
+        "foo100bar10baz0.txt",
+        "foo1000bar99baz10.txt",
+        "foo1000bar99baz9.txt"])
+
+test("Title sorts.",
+       ["The Wind in the Willows",
+        "The 40th step more",
+        "The 39 steps",
+        "Wanda"])
+===
+T.enum Kind
+   STRING
+   NUMBER
+
+T KeyItem
+   Kind kind
+   String s
+   Int num
+
+F natOrderKey(=s)
+   s = s.trim((‘ ’, "\t", "\r", "\n"))
+
+   s = s.replace(re:‘\s+’, ‘ ’)
+
+   s = s.lowercase()
+
+   I s.starts_with(‘the ’) & s.len > 4
+      s = s[4..]
+
+   [KeyItem] result
+   V idx = 0
+   L idx < s.len
+      V e = idx
+      L e < s.len & !s[e].is_digit()
+         e++
+      I e > idx
+         V ki = KeyItem()
+         ki.kind = Kind.STRING
+         ki.s = s[idx .< e]
+         result.append(ki)
+         idx = e
+      L e < s.len & s[e].is_digit()
+         e++
+      I e > idx
+         V ki = KeyItem()
+         ki.kind = Kind.NUMBER
+         ki.num = Int(s[idx .< e])
+         result.append(ki)
+         idx = e
+   R result
+
+F scmp(s1, s2)
+   I s1 < s2
+      R -1
+   I s1 > s2
+      R 1
+   R 0
+
+F naturalCmp(String sa, String sb)
+   V a = natOrderKey(sa)
+   V b = natOrderKey(sb)
+
+   L(i) 0 .< min(a.len, b.len)
+      V ai = a[i]
+      V bi = b[i]
+      I ai.kind == bi.kind
+         V result = I ai.kind == STRING {scmp(ai.s, bi.s)} E ai.num - bi.num
+         I result != 0
+            R result
+      E
+         R I ai.kind == STRING {1} E -1
+
+   R I a.len < b.len {-1} E (I a.len == b.len {0} E 1)
+
+F test(title, list)
+   print(title)
+   print(sorted(list, key' cmp_to_key(:naturalCmp)).map(s -> ‘'’s‘'’).join("\n"))
+   print()
+
+test(‘Ignoring leading spaces.’, [‘ignore leading spaces:  2-2’, ‘ ignore leading spaces:  2-1’, ‘  ignore leading spaces:  2+0’, ‘   ignore leading spaces:  2+1’])
+
+test(‘Ignoring multiple adjacent spaces (MAS).’, [‘ignore MAS spaces:  2-2’, ‘ignore MAS  spaces:  2-1’, ‘ignore MAS   spaces:  2+0’, ‘ignore MAS    spaces:  2+1’])
+
+test(‘Equivalent whitespace characters.’, [‘Equiv.  spaces:     3-3’, "Equiv. \rspaces:    3-2", "Equiv. \x0cspaces:  3-1", "Equiv. \x0bspaces:  3+0", "Equiv. \nspaces:    3+1", "Equiv. \tspaces:    3+2"])
+
+test(‘Case Independent sort.’, [‘cASE INDEPENDENT:  3-2’, ‘caSE INDEPENDENT:  3-1’, ‘casE INDEPENDENT:  3+0’, ‘case INDEPENDENT:  3+1’])
+
+test(‘Numeric fields as numerics.’, [‘foo100bar99baz0.txt’, ‘foo100bar10baz0.txt’, ‘foo1000bar99baz10.txt’, ‘foo1000bar99baz9.txt’])
+
+test(‘Title sorts.’, [‘The Wind in the Willows’, ‘The 40th step more’, ‘The 39 steps’, ‘Wanda’])
+===
+enum class Kind {
+    STRING,
+    NUMBER
+};
+
+class KeyItem
+{
+public:
+    Kind kind;
+    String s;
+    int num;
+};
+
+template <typename T1> auto natOrderKey(T1 s)
+{
+    s = s.trim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S));
+
+    s = s.replace(re::_(uR"(\s+)"_S), u" "_S);
+
+    s = s.lowercase();
+
+    if (s.starts_with(u"the "_S) && s.len() > 4)
+        s = s[range_ei(4)];
+
+    Array<KeyItem> result;
+    auto idx = 0;
+    while (idx < s.len()) {
+        auto e = idx;
+        while (e < s.len() && !s[e].is_digit())
+            e++;
+        if (e > idx) {
+            auto ki = KeyItem();
+            ki.kind = Kind::STRING;
+            ki.s = s[range_el(idx, e)];
+            result.append(ki);
+            idx = e;
+        }
+        while (e < s.len() && s[e].is_digit())
+            e++;
+        if (e > idx) {
+            auto ki = KeyItem();
+            ki.kind = Kind::NUMBER;
+            ki.num = to_int(s[range_el(idx, e)]);
+            result.append(ki);
+            idx = e;
+        }
+    }
+    return result;
+}
+
+template <typename T1, typename T2> auto scmp(const T1 &s1, const T2 &s2)
+{
+    if (s1 < s2)
+        return -1;
+    if (s1 > s2)
+        return 1;
+    return 0;
+}
+
+auto naturalCmp(const String &sa, const String &sb)
+{
+    auto a = natOrderKey(sa);
+    auto b = natOrderKey(sb);
+
+    for (auto i : range_el(0, min(a.len(), b.len()))) {
+        auto ai = a[i];
+        auto bi = b[i];
+        if (ai.kind == bi.kind) {
+            auto result = ai.kind == TYPE_RM_REF(ai.kind)::STRING ? scmp(ai.s, bi.s) : ai.num - bi.num;
+            if (result != 0)
+                return result;
+        }
+        else
+            return ai.kind == TYPE_RM_REF(ai.kind)::STRING ? 1 : -1;
+    }
+
+    return a.len() < b.len() ? -1 : (a.len() == b.len() ? 0 : 1);
+}
+
+template <typename T1, typename T2> auto test(const T1 &title, const T2 &list)
+{
+    print(title);
+    print(sorted(list, cmp_to_key(::naturalCmp)).map([](const auto &s){return u"'"_S & s & u"'"_S;}).join(u"\n"_S));
+    print();
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        test(u"Ignoring leading spaces."_S, create_array({u"ignore leading spaces:  2-2"_S, u" ignore leading spaces:  2-1"_S, u"  ignore leading spaces:  2+0"_S, u"   ignore leading spaces:  2+1"_S}));
+
+        test(u"Ignoring multiple adjacent spaces (MAS)."_S, create_array({u"ignore MAS spaces:  2-2"_S, u"ignore MAS  spaces:  2-1"_S, u"ignore MAS   spaces:  2+0"_S, u"ignore MAS    spaces:  2+1"_S}));
+
+        test(u"Equivalent whitespace characters."_S, create_array({u"Equiv.  spaces:     3-3"_S, u"Equiv. \rspaces:    3-2"_S, u"Equiv. \x0cspaces:  3-1"_S, u"Equiv. \x0bspaces:  3+0"_S, u"Equiv. \nspaces:    3+1"_S, u"Equiv. \tspaces:    3+2"_S}));
+
+        test(u"Case Independent sort."_S, create_array({u"cASE INDEPENDENT:  3-2"_S, u"caSE INDEPENDENT:  3-1"_S, u"casE INDEPENDENT:  3+0"_S, u"case INDEPENDENT:  3+1"_S}));
+
+        test(u"Numeric fields as numerics."_S, create_array({u"foo100bar99baz0.txt"_S, u"foo100bar10baz0.txt"_S, u"foo1000bar99baz10.txt"_S, u"foo1000bar99baz9.txt"_S}));
+
+        test(u"Title sorts."_S, create_array({u"The Wind in the Willows"_S, u"The 40th step more"_S, u"The 39 steps"_S, u"Wanda"_S}));
+    }
+} code_block_1;
