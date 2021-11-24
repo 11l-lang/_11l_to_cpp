@@ -67,10 +67,14 @@ template <class Type> inline auto modf(const Type x)
 #include <intrin.h>
 inline unsigned long long rotl(unsigned long long value, int shift) {return _rotl64(value, shift);}
 inline unsigned long long rotr(unsigned long long value, int shift) {return _rotr64(value, shift);}
+inline          long long rotl(         long long value, int shift) {return _rotl64(value, shift);}
+inline          long long rotr(         long long value, int shift) {return _rotr64(value, shift);}
 #else
 #include <x86intrin.h>
 inline unsigned long long rotl(unsigned long long value, int shift) {return (value << shift) | (value >> (64 - shift));} // https://stackoverflow.com/a/24370769
+inline          long long rotl(         long long value, int shift) {return (value << shift) | (value >> (64 - shift));}
 inline unsigned long long rotr(unsigned long long value, int shift) {return (value >> shift) | (value << (64 - shift));}
+inline          long long rotr(         long long value, int shift) {return (value >> shift) | (value << (64 - shift));}
 #endif
 inline int rotl(int value, int shift) {return _rotl(value, shift);}
 inline int rotr(int value, int shift) {return _rotr(value, shift);}

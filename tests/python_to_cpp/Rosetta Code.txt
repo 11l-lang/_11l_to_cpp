@@ -13348,7 +13348,7 @@ def url_encode(s):
     r = ''
     buf = ''
 
-    def flush_buf():
+    def flush_buf(): # this function is needed because strings in 11l are UTF-16 encoded
         nonlocal buf, r
 
         if buf != '':
@@ -20176,7 +20176,7 @@ constants = [UInt32(UInt64(abs(math.sin(i+1)) * 2.0**32) & 0xFFFFFFFF) for i in 
 
 init_values = MutTuple(UInt32(0x67452301), UInt32(0xefcdab89), UInt32(0x98badcfe), UInt32(0x10325476))
 
-functions : List[Callable[[int, int, int], int]] = []
+functions : List[Callable[[UInt32, UInt32, UInt32], UInt32]] = []
 functions += [lambda b, c, d: (b & c) | (~b & d)]
 functions += [lambda b, c, d: (d & b) | (~d & c)]
 functions += [lambda b, c, d: b ^ c ^ d]
@@ -20205,7 +20205,7 @@ def md5(message):
         for i in range(64):
             f = functions[i // 16](b, c, d)
             g = index_functions[i // 16](i)
-            to_rotate = a + f + constants[i] + int.from_bytes(chunk[4*g:4*g+4], byteorder='little')
+            to_rotate = a + f + constants[i] + UInt32.from_bytes(chunk[4*g:4*g+4], byteorder='little')
             new_b = (b + rotl32(to_rotate, rotate_amounts[i])) & 0xFFFFFFFF
             (a, b, c, d) = (d, new_b, b, c)
         for i, val in enumerate([a, b, c, d]):
@@ -20235,7 +20235,7 @@ V constants = (0.<64).map(i -> UInt32(UInt64(abs(sin(i + 1)) * 2.0 ^ 32) [&] FFF
 
 V init_values = (UInt32(6745'2301), UInt32(EFCD'AB89), UInt32(98BA'DCFE), UInt32(1032'5476))
 
-[((Int, Int, Int) -> Int)] functions
+[((UInt32, UInt32, UInt32) -> UInt32)] functions
 functions [+]= (b, c, d) -> (b [&] c) [|] ((-)b [&] d)
 functions [+]= (b, c, d) -> (d [&] b) [|] ((-)d [&] c)
 functions [+]= (b, c, d) -> b (+) c (+) d
@@ -20264,7 +20264,7 @@ F md5(=message)
       L(i) 64
          V f = :functions[i I/ 16](b, c, d)
          V g = :index_functions[i I/ 16](i)
-         V to_rotate = a + f + :constants[i] + Int(bytes' chunk[4 * g .< 4 * g + 4])
+         V to_rotate = a + f + :constants[i] + UInt32(bytes' chunk[4 * g .< 4 * g + 4])
          V new_b = (b + rotl(to_rotate, :rotate_amounts[i])) [&] FFFF'FFFF
          (a, b, c, d) = (d, new_b, b, c)
       L(val) [a, b, c, d]
@@ -20293,7 +20293,7 @@ auto constants = range_el(0, 64).map([](const auto &i){return to_uint32(to_uint6
 
 auto init_values = make_tuple(to_uint32(0x6745'2301), to_uint32(0xEFCD'AB89), to_uint32(0x98BA'DCFE), to_uint32(0x1032'5476));
 
-Array<std::function<int(const int, const int, const int)>> functions;
+Array<std::function<uint32_t(const uint32_t&, const uint32_t&, const uint32_t&)>> functions;
 
 struct CodeBlock1
 {
@@ -20337,7 +20337,7 @@ template <typename T1> auto md5(T1 message)
         for (int i = 0; i < 64; i++) {
             auto f = ::functions[idiv(i, 16)](b, c, d);
             auto g = ::index_functions[idiv(i, 16)](i);
-            auto to_rotate = a + f + ::constants[i] + int_from_bytes(chunk, range_el(4 * g, 4 * g + 4));
+            auto to_rotate = a + f + ::constants[i] + int_t_from_bytes<UInt32>(chunk, range_el(4 * g, 4 * g + 4));
             auto new_b = (b + rotl(to_rotate, ::rotate_amounts[i])) & 0xFFFF'FFFF;
             assign_from_tuple(a, b, c, d, make_tuple(d, new_b, b, c));
         }

@@ -495,21 +495,13 @@ class SymbolNode:
                         f_node = type_of(self.children[0])
                 elif func_name == 'Bool':
                     func_name = 'bool'
-                elif func_name == 'Int':
+                elif func_name in ('Int', 'Int64', 'UInt64', 'UInt32'):
                     if self.children[1] is not None and self.children[1].token_str() == "bytes'":
+                        int_from_bytes = 'int_from_bytes' if func_name == 'Int' else 'int_t_from_bytes<' + func_name + '>'
                         if self.children[2].symbol.id == '[' and not self.children[2].is_list and self.children[2].children[1].symbol.id in ('..', '.<', '.+', '<.', '<.<'): # ]
-                            return 'int_from_bytes(' + self.children[2].children[0].to_str() + ', ' + self.children[2].children[1].to_str() + ')'
-                        return 'int_from_bytes(' + self.children[2].to_str() + ')'
-                    func_name = 'to_int'
-                    f_node = builtins_scope.find('Int').ast_nodes[0].constructors[0]
-                elif func_name == 'Int64':
-                    func_name = 'to_int64'
-                    f_node = builtins_scope.find('Int').ast_nodes[0].constructors[0]
-                elif func_name == 'UInt64':
-                    func_name = 'to_uint64'
-                    f_node = builtins_scope.find('Int').ast_nodes[0].constructors[0]
-                elif func_name == 'UInt32':
-                    func_name = 'to_uint32'
+                            return int_from_bytes + '(' + self.children[2].children[0].to_str() + ', ' + self.children[2].children[1].to_str() + ')'
+                        return int_from_bytes + '(' + self.children[2].to_str() + ')'
+                    func_name = {'Int':'to_int', 'Int64':'to_int64', 'UInt64':'to_uint64', 'UInt32':'to_uint32'}[func_name]
                     f_node = builtins_scope.find('Int').ast_nodes[0].constructors[0]
                 elif func_name == 'Float':
                     func_name = 'to_float'

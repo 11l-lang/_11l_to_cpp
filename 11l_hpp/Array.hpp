@@ -893,6 +893,24 @@ template <typename Ty, bool include_beginning, bool include_ending> inline Int i
 	return r;
 }
 
+template <typename IntT> inline IntT int_t_from_bytes(const Array<Byte> &bytes)
+{
+	IntT r;
+	if (bytes.len() != sizeof(IntT))
+		throw AssertionError();
+	memcpy(&r, bytes.data(), sizeof(IntT));
+	return r;
+}
+
+template <typename IntT, typename Ty, bool include_beginning, bool include_ending> inline IntT int_t_from_bytes(const Array<Byte> &bytes, const Range<Ty, include_beginning, include_ending> &range)
+{
+	IntT r;
+	if (range.len() != sizeof(IntT))
+		throw AssertionError();
+	memcpy(&r, bytes.data() + range.b, sizeof(IntT));
+	return r;
+}
+
 template <typename Ty> Array<Byte> bytes_from_int(const Ty i)
 {
 	Array<Byte> r;

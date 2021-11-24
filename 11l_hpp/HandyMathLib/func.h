@@ -173,6 +173,7 @@ INLINE const HMushort mod(const HMushort x,const HMushort y) {MOD_CODE}
 INLINE const HMuint mod(const HMuint x,const HMuint y) {MOD_CODE}
 INLINE const int64_t mod(const int64_t x,const int64_t y) {MOD_CODE}
 INLINE const uint64_t mod(const uint64_t x,const uint64_t y) {MOD_CODE}
+INLINE const uint32_t mod(const uint32_t x,const int y) {MOD_CODE}
 INLINE const int64_t mod(const int x,const int64_t y) {MOD_CODE}
 INLINE const int64_t mod(const int64_t x,const int y) {MOD_CODE}
 #undef MOD_CODE
