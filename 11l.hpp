@@ -182,10 +182,14 @@ typedef   int8_t  Int8;
 typedef unsigned char Byte;
 
 #include "11l_hpp/funcs.hpp"
+#ifdef _MSC_VER
 namespace std {
+#endif
 template <typename Type, int dimension> inline const Type *begin(const Tvec<Type, dimension> &v) {return &v[0];}
 template <typename Type, int dimension> inline const Type *end  (const Tvec<Type, dimension> &v) {return &v[0] + dimension;}
+#ifdef _MSC_VER
 }
+#endif
 #include "11l_hpp/Range.hpp"
 #include <iostream> // for std::wcerr in String.hpp
 #include <complex>
