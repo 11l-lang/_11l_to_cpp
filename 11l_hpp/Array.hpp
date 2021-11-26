@@ -902,6 +902,16 @@ template <typename IntT> inline IntT int_t_from_bytes(const Array<Byte> &bytes)
 	return r;
 }
 
+template <typename IntT> inline IntT int_t_from_bytes_be(const Array<Byte> &bytes)
+{
+	IntT r;
+	if (bytes.len() != sizeof(IntT))
+		throw AssertionError();
+	for (int i=0; i<sizeof(IntT); i++)
+		((char*)&r)[i] = bytes.data()[sizeof(IntT) - 1 - i];
+	return r;
+}
+
 template <typename IntT, typename Ty, bool include_beginning, bool include_ending> inline IntT int_t_from_bytes(const Array<Byte> &bytes, const Range<Ty, include_beginning, include_ending> &range)
 {
 	IntT r;
@@ -911,7 +921,17 @@ template <typename IntT, typename Ty, bool include_beginning, bool include_endin
 	return r;
 }
 
-template <typename Ty> Array<Byte> bytes_from_int(const Ty i)
+template <typename IntT, typename Ty, bool include_beginning, bool include_ending> inline IntT int_t_from_bytes_be(const Array<Byte> &bytes, const Range<Ty, include_beginning, include_ending> &range)
+{
+	IntT r;
+	if (range.len() != sizeof(IntT))
+		throw AssertionError();
+	for (int i=0; i<sizeof(IntT); i++)
+		((char*)&r)[i] = bytes.data()[range.b + sizeof(IntT) - 1 - i];
+	return r;
+}
+
+template <typename Ty> Array<Byte> bytes_from_int(const Ty &i)
 {
 	Array<Byte> r;
 	r.resize(sizeof(i));
@@ -925,42 +945,4 @@ inline Array<Byte> operator ""_B(const char *s, size_t sz)
 	r.resize(sz);
 	memcpy(r.data(), s, sz);
 	return r;
-}
-
-template <typename Ty> inline Int unpack_from_bytes(const Array<Byte> &bytes)
-{
-	Ty r;
-	if (sizeof(Ty) != bytes.len())
-		throw AssertionError();
-	memcpy(&r, bytes.data(), sizeof(Ty));
-	return Int(r);
-}
-
-template <typename Ty> inline Int unpack_from_bytes(const Array<Byte> &bytes, Int offset)
-{
-	Ty r;
-	if (offset + sizeof(Ty) > bytes.len())
-		throw AssertionError();
-	memcpy(&r, bytes.data() + offset, sizeof(Ty));
-	return Int(r);
-}
-
-template <typename Ty> inline Int unpack_from_bytes_be(const Array<Byte> &bytes)
-{
-	Ty r;
-	if (sizeof(Ty) != bytes.len())
-		throw AssertionError();
-	for (int i=0; i<sizeof(Ty); i++)
-		((char*)&r)[i] = bytes.data()[sizeof(Ty) - 1 - i];
-	return Int(r);
-}
-
-template <typename Ty> inline Int unpack_from_bytes_be(const Array<Byte> &bytes, Int offset)
-{
-	Ty r;
-	if (offset + sizeof(Ty) > bytes.len())
-		throw AssertionError();
-	for (int i=0; i<sizeof(Ty); i++)
-		((char*)&r)[i] = bytes.data()[offset + sizeof(Ty) - 1 - i];
-	return Int(r);
 }

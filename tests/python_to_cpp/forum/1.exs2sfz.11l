@@ -16,7 +16,7 @@
 [Byte] instrument_data
 
 F chunk_size(instrument_data, offset)
-   R 84 + UInt32.unpack_from(instrument_data, offset + 4)
+   R 84 + Int(UInt32(bytes' instrument_data[offset + 4 .+ 4]))
 
 T EXSChunk
 
@@ -36,7 +36,7 @@ T EXSChunk
       ‘ return the chunk's id number; n.b. that this does not seem to actually be used --
 			the sequence of chunks of each type in the file is used instead ’
 
-      R UInt32.unpack_from(:instrument_data, .offset + 8)
+      R Int(UInt32(bytes' :instrument_data[.offset + 8 .+ 4]))
 
    F name()
       ‘ the name of a chunk starts at byte 20, and has a max. length of 64 bytes;
@@ -85,54 +85,54 @@ T EXSZone(EXSChunk)
       .offset = offset
 
    F.const rootnote()
-      R Byte.unpack_from(:instrument_data, .offset + 85)
+      R Int(Byte(bytes' :instrument_data[.offset + 85 .+ 1]))
 
    F finetune()
-      R Int8.unpack_from(:instrument_data, .offset + 86)
+      R Int(Int8(bytes' :instrument_data[.offset + 86 .+ 1]))
 
    F pan()
-      R Int8.unpack_from(:instrument_data, .offset + 87)
+      R Int(Int8(bytes' :instrument_data[.offset + 87 .+ 1]))
 
    F volumeadjust()
-      R Int8.unpack_from(:instrument_data, .offset + 88)
+      R Int(Int8(bytes' :instrument_data[.offset + 88 .+ 1]))
 
    F.const startnote()
-      R Byte.unpack_from(:instrument_data, .offset + 90)
+      R Int(Byte(bytes' :instrument_data[.offset + 90 .+ 1]))
    F.const endnote()
-      R Byte.unpack_from(:instrument_data, .offset + 91)
+      R Int(Byte(bytes' :instrument_data[.offset + 91 .+ 1]))
 
    F minvel()
-      R Byte.unpack_from(:instrument_data, .offset + 93)
+      R Int(Byte(bytes' :instrument_data[.offset + 93 .+ 1]))
    F maxvel()
-      R Byte.unpack_from(:instrument_data, .offset + 94)
+      R Int(Byte(bytes' :instrument_data[.offset + 94 .+ 1]))
 
    F samplestart()
-      R Int32.unpack_from(:instrument_data, .offset + 96)
+      R Int(Int32(bytes' :instrument_data[.offset + 96 .+ 4]))
    F sampleend()
-      R Int32.unpack_from(:instrument_data, .offset + 100)
+      R Int(Int32(bytes' :instrument_data[.offset + 100 .+ 4]))
 
    F loopstart()
-      R Int32.unpack_from(:instrument_data, .offset + 104)
+      R Int(Int32(bytes' :instrument_data[.offset + 104 .+ 4]))
    F loopend()
-      R Int32.unpack_from(:instrument_data, .offset + 108)
+      R Int(Int32(bytes' :instrument_data[.offset + 108 .+ 4]))
 
    F _loop_()
-      R Byte.unpack_from(:instrument_data, .offset + 117)
+      R Int(Byte(bytes' :instrument_data[.offset + 117 .+ 1]))
 
    F.const pitchtrack()
-      R !(Byte.unpack_from(:instrument_data, .offset + 84) [&] 1)
+      R !(Int(Byte(bytes' :instrument_data[.offset + 84 .+ 1])) [&] 1)
    F oneshot()
-      R Byte.unpack_from(:instrument_data, .offset + 84) [&] 2
+      R Int(Byte(bytes' :instrument_data[.offset + 84 .+ 1])) [&] 2
 
    F.const group()
-      V group = Int32.unpack_from(:instrument_data, .offset + 172)
+      V group = Int(Int32(bytes' :instrument_data[.offset + 172 .+ 4]))
       I group >= 0
          R group
 
       R 0
 
    F sampleindex()
-      R UInt32.unpack_from(:instrument_data, .offset + 176)
+      R Int(UInt32(bytes' :instrument_data[.offset + 176 .+ 4]))
 
 T EXSGroup(EXSChunk)
 
@@ -140,15 +140,15 @@ T EXSGroup(EXSChunk)
       .offset = offset
 
    F polyphony()
-      R Byte.unpack_from(:instrument_data, .offset + 86)
+      R Int(Byte(bytes' :instrument_data[.offset + 86 .+ 1]))
 
    F trigger()
-      R Byte.unpack_from(:instrument_data, .offset + 157)
+      R Int(Byte(bytes' :instrument_data[.offset + 157 .+ 1]))
 
    F output()
-      R Byte.unpack_from(:instrument_data, .offset + 158)
+      R Int(Byte(bytes' :instrument_data[.offset + 158 .+ 1]))
    F sequence()
-      R Int32.unpack_from(:instrument_data, .offset + 164)
+      R Int(Int32(bytes' :instrument_data[.offset + 164 .+ 4]))
 
 T EXSSample(EXSChunk)
 
@@ -156,13 +156,13 @@ T EXSSample(EXSChunk)
       .offset = offset
 
    F length()
-      R Int32.unpack_from(:instrument_data, .offset + 88)
+      R Int(Int32(bytes' :instrument_data[.offset + 88 .+ 4]))
 
    F rate()
-      R Int32.unpack_from(:instrument_data, .offset + 92)
+      R Int(Int32(bytes' :instrument_data[.offset + 92 .+ 4]))
 
    F bitdepth()
-      R Byte.unpack_from(:instrument_data, .offset + 96)
+      R Int(Byte(bytes' :instrument_data[.offset + 96 .+ 1]))
 
 T EXSParam(EXSChunk)
 
@@ -270,9 +270,9 @@ T EXSInstrument
          X RuntimeError(‘EXS file is too large; will not parse! (size > 1 MebiByte)’)
       :instrument_data = File(exsfile_name).read_bytes()
 
-      I UInt32.unpack_from_be(:instrument_data, 0) == EXSHeader_sig & :instrument_data[16.<20] == Bytes(‘SOBT’)
+      I Int(UInt32(bytes_be' :instrument_data[0 .+ 4])) == EXSHeader_sig & :instrument_data[16.<20] == Bytes(‘SOBT’)
          X RuntimeError(‘File is a big endian EXS file; cannot parse!’)
-      I !(UInt32.unpack_from(:instrument_data, 0) == EXSHeader_sig) & :instrument_data[16.<20] == Bytes(‘TBOS’)
+      I !(Int(UInt32(bytes' :instrument_data[0 .+ 4])) == EXSHeader_sig) & :instrument_data[16.<20] == Bytes(‘TBOS’)
          X RuntimeError(‘File is not an EXS file; will not parse!’)
 
       I sample_location == ‘’
@@ -283,7 +283,7 @@ T EXSInstrument
       V offset = 0
       V end = :instrument_data.len
       L offset < end
-         V sig = UInt32.unpack_from(:instrument_data, offset)
+         V sig = Int(UInt32(bytes' :instrument_data[offset .+ 4]))
 
          I sig == EXSHeader_sig
             V t = EXSHeader(offset)

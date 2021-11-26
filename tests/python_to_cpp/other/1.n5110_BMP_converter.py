@@ -42,7 +42,7 @@ if __name__ == '__main__':
     for line in range(bmp_h):
         for byte in range(bmp_b):
             bmp_byte = bmp.read(1)
-            bmp_line += bin(255-struct.unpack('B', bmp_byte)[0])[2:].zfill(8)
+            bmp_line += bin(255-bmp_byte[0])[2:].zfill(8)
         bmp_list.append(bmp_line[:bmp_w])
         bmp_list_v.append(bmp_line[:bmp_w].replace("0", " "))
         bmp_line = ''

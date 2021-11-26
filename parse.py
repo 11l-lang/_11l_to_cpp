@@ -486,22 +486,18 @@ class SymbolNode:
                             f_node = builtins_scope.find('Array').ast_nodes[0].scope.ids.get('sort_range').ast_nodes[0]
                     elif self.children[0].children[1].token.value(source) == 'union':
                         func_name = self.children[0].children[0].to_str() + '.set_union'
-                    elif func_name.endswith(('.unpack', '.unpack_from', '.unpack_be', '.unpack_from_be')) and self.children[0].children[0].token_str() in ('Int32', 'UInt32', 'Int16', 'UInt16', 'Int8', 'Byte'):
-                        res = 'unpack_from_bytes' + '_be'*func_name.endswith('_be') + '<' + self.children[0].children[0].token_str() + '>(' + self.children[2].to_str()
-                        if func_name.endswith(('.unpack_from', '.unpack_from_be')):
-                            res += ', ' + self.children[4].to_str()
-                        return res + ')'
                     else:
                         f_node = type_of(self.children[0])
                 elif func_name == 'Bool':
                     func_name = 'bool'
-                elif func_name in ('Int', 'Int64', 'UInt64', 'UInt32'):
-                    if self.children[1] is not None and self.children[1].token_str() == "bytes'":
-                        int_from_bytes = 'int_from_bytes' if func_name == 'Int' else 'int_t_from_bytes<' + func_name + '>'
+                elif func_name in ('Int', 'Int64', 'UInt64', 'Int32', 'UInt32', 'Int16', 'UInt16', 'Int8', 'Byte'):
+                    if self.children[1] is not None and self.children[1].token_str() in ("bytes'", "bytes_be'"):
+                        be = '_be' * (self.children[1].token_str() == "bytes_be'")
+                        int_from_bytes = 'int_from_bytes' + be if func_name == 'Int' else 'int_t_from_bytes' + be + '<' + func_name + '>'
                         if self.children[2].symbol.id == '[' and not self.children[2].is_list and self.children[2].children[1].symbol.id in ('..', '.<', '.+', '<.', '<.<'): # ]
                             return int_from_bytes + '(' + self.children[2].children[0].to_str() + ', ' + self.children[2].children[1].to_str() + ')'
                         return int_from_bytes + '(' + self.children[2].to_str() + ')'
-                    func_name = {'Int':'to_int', 'Int64':'to_int64', 'UInt64':'to_uint64', 'UInt32':'to_uint32'}[func_name]
+                    func_name = {'Int':'to_int', 'Int64':'to_int64', 'UInt64':'to_uint64', 'UInt32':'to_uint32', 'Byte':'Byte'}[func_name]
                     f_node = builtins_scope.find('Int').ast_nodes[0].constructors[0]
                 elif func_name == 'Float':
                     func_name = 'to_float'
@@ -1097,7 +1093,7 @@ class ASTExpression(ASTNodeWithExpression):
         return self.pre_nl + ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
 cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'перем':'auto',
-                     'Int':'int', 'Int64':'Int64', 'UInt64':'UInt64', 'UInt32':'uint32_t', 'BigInt':'BigInt', 'Float':'double', 'Float32':'float', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte', 'Bytes':'Array<Byte>',
+                     'Int':'int', 'Int64':'Int64', 'UInt64':'UInt64', 'Int32':'int32_t', 'UInt32':'uint32_t', 'Int16':'int16_t', 'UInt16':'uint16_t', 'BigInt':'BigInt', 'Float':'double', 'Float32':'float', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Int8':'int8_t', 'Byte':'Byte', 'Bytes':'Array<Byte>',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
                      'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque'}
 

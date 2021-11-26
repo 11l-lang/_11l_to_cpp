@@ -27,7 +27,7 @@ Array<Byte> instrument_data;
 
 template <typename T1, typename T2> auto chunk_size(const T1 &instrument_data, const T2 &offset)
 {
-    return 84 + unpack_from_bytes<UInt32>(instrument_data, offset + 4);
+    return 84 + to_int(int_t_from_bytes<UInt32>(instrument_data, range_ep(offset + 4, 4)));
 }
 
 class EXSChunk
@@ -53,7 +53,7 @@ public:
         uR"( return the chunk's id number; n.b. that this does not seem to actually be used --
 			the sequence of chunks of each type in the file is used instead )"_S;
 
-        return unpack_from_bytes<UInt32>(::instrument_data, offset + 8);
+        return to_int(int_t_from_bytes<UInt32>(::instrument_data, range_ep(offset + 8, 4)));
     }
 
     auto name()
@@ -125,77 +125,77 @@ public:
 
     auto rootnote() const
     {
-        return unpack_from_bytes<Byte>(::instrument_data, offset + 85);
+        return to_int(int_t_from_bytes<Byte>(::instrument_data, range_ep(offset + 85, 1)));
     }
 
     auto finetune()
     {
-        return unpack_from_bytes<Int8>(::instrument_data, offset + 86);
+        return to_int(int_t_from_bytes<Int8>(::instrument_data, range_ep(offset + 86, 1)));
     }
 
     auto pan()
     {
-        return unpack_from_bytes<Int8>(::instrument_data, offset + 87);
+        return to_int(int_t_from_bytes<Int8>(::instrument_data, range_ep(offset + 87, 1)));
     }
 
     auto volumeadjust()
     {
-        return unpack_from_bytes<Int8>(::instrument_data, offset + 88);
+        return to_int(int_t_from_bytes<Int8>(::instrument_data, range_ep(offset + 88, 1)));
     }
 
     auto startnote() const
     {
-        return unpack_from_bytes<Byte>(::instrument_data, offset + 90);
+        return to_int(int_t_from_bytes<Byte>(::instrument_data, range_ep(offset + 90, 1)));
     }
     auto endnote() const
     {
-        return unpack_from_bytes<Byte>(::instrument_data, offset + 91);
+        return to_int(int_t_from_bytes<Byte>(::instrument_data, range_ep(offset + 91, 1)));
     }
 
     auto minvel()
     {
-        return unpack_from_bytes<Byte>(::instrument_data, offset + 93);
+        return to_int(int_t_from_bytes<Byte>(::instrument_data, range_ep(offset + 93, 1)));
     }
     auto maxvel()
     {
-        return unpack_from_bytes<Byte>(::instrument_data, offset + 94);
+        return to_int(int_t_from_bytes<Byte>(::instrument_data, range_ep(offset + 94, 1)));
     }
 
     auto samplestart()
     {
-        return unpack_from_bytes<Int32>(::instrument_data, offset + 96);
+        return to_int(int_t_from_bytes<Int32>(::instrument_data, range_ep(offset + 96, 4)));
     }
     auto sampleend()
     {
-        return unpack_from_bytes<Int32>(::instrument_data, offset + 100);
+        return to_int(int_t_from_bytes<Int32>(::instrument_data, range_ep(offset + 100, 4)));
     }
 
     auto loopstart()
     {
-        return unpack_from_bytes<Int32>(::instrument_data, offset + 104);
+        return to_int(int_t_from_bytes<Int32>(::instrument_data, range_ep(offset + 104, 4)));
     }
     auto loopend()
     {
-        return unpack_from_bytes<Int32>(::instrument_data, offset + 108);
+        return to_int(int_t_from_bytes<Int32>(::instrument_data, range_ep(offset + 108, 4)));
     }
 
     auto _loop_()
     {
-        return unpack_from_bytes<Byte>(::instrument_data, offset + 117);
+        return to_int(int_t_from_bytes<Byte>(::instrument_data, range_ep(offset + 117, 1)));
     }
 
     auto pitchtrack() const
     {
-        return !(unpack_from_bytes<Byte>(::instrument_data, offset + 84) & 1);
+        return !(to_int(int_t_from_bytes<Byte>(::instrument_data, range_ep(offset + 84, 1))) & 1);
     }
     auto oneshot()
     {
-        return unpack_from_bytes<Byte>(::instrument_data, offset + 84) & 2;
+        return to_int(int_t_from_bytes<Byte>(::instrument_data, range_ep(offset + 84, 1))) & 2;
     }
 
     auto group() const
     {
-        auto group = unpack_from_bytes<Int32>(::instrument_data, offset + 172);
+        auto group = to_int(int_t_from_bytes<Int32>(::instrument_data, range_ep(offset + 172, 4)));
         if (group >= 0)
             return group;
 
@@ -204,7 +204,7 @@ public:
 
     auto sampleindex()
     {
-        return unpack_from_bytes<UInt32>(::instrument_data, offset + 176);
+        return to_int(int_t_from_bytes<UInt32>(::instrument_data, range_ep(offset + 176, 4)));
     }
 };
 
@@ -219,21 +219,21 @@ public:
 
     auto polyphony()
     {
-        return unpack_from_bytes<Byte>(::instrument_data, offset + 86);
+        return to_int(int_t_from_bytes<Byte>(::instrument_data, range_ep(offset + 86, 1)));
     }
 
     auto trigger()
     {
-        return unpack_from_bytes<Byte>(::instrument_data, offset + 157);
+        return to_int(int_t_from_bytes<Byte>(::instrument_data, range_ep(offset + 157, 1)));
     }
 
     auto output()
     {
-        return unpack_from_bytes<Byte>(::instrument_data, offset + 158);
+        return to_int(int_t_from_bytes<Byte>(::instrument_data, range_ep(offset + 158, 1)));
     }
     auto sequence()
     {
-        return unpack_from_bytes<Int32>(::instrument_data, offset + 164);
+        return to_int(int_t_from_bytes<Int32>(::instrument_data, range_ep(offset + 164, 4)));
     }
 };
 
@@ -248,17 +248,17 @@ public:
 
     auto length()
     {
-        return unpack_from_bytes<Int32>(::instrument_data, offset + 88);
+        return to_int(int_t_from_bytes<Int32>(::instrument_data, range_ep(offset + 88, 4)));
     }
 
     auto rate()
     {
-        return unpack_from_bytes<Int32>(::instrument_data, offset + 92);
+        return to_int(int_t_from_bytes<Int32>(::instrument_data, range_ep(offset + 92, 4)));
     }
 
     auto bitdepth()
     {
-        return unpack_from_bytes<Byte>(::instrument_data, offset + 96);
+        return to_int(int_t_from_bytes<Byte>(::instrument_data, range_ep(offset + 96, 1)));
     }
 };
 
@@ -409,9 +409,9 @@ public:
             throw RuntimeError(u"EXS file is too large; will not parse! (size > 1 MebiByte)"_S);
         ::instrument_data = File(exsfile_name).read_bytes();
 
-        if (unpack_from_bytes_be<UInt32>(::instrument_data, 0) == EXSHeader_sig && ::instrument_data[range_el(16, 20)] == "SOBT"_B)
+        if (to_int(int_t_from_bytes_be<UInt32>(::instrument_data, range_ep(0, 4))) == EXSHeader_sig && ::instrument_data[range_el(16, 20)] == "SOBT"_B)
             throw RuntimeError(u"File is a big endian EXS file; cannot parse!"_S);
-        if (!(unpack_from_bytes<UInt32>(::instrument_data, 0) == EXSHeader_sig) && ::instrument_data[range_el(16, 20)] == "TBOS"_B)
+        if (!(to_int(int_t_from_bytes<UInt32>(::instrument_data, range_ep(0, 4))) == EXSHeader_sig) && ::instrument_data[range_el(16, 20)] == "TBOS"_B)
             throw RuntimeError(u"File is not an EXS file; will not parse!"_S);
 
         if (sample_location == u"")
@@ -422,7 +422,7 @@ public:
         auto offset = 0;
         auto end = ::instrument_data.len();
         while (offset < end) {
-            auto sig = unpack_from_bytes<UInt32>(::instrument_data, offset);
+            auto sig = to_int(int_t_from_bytes<UInt32>(::instrument_data, range_ep(offset, 4)));
 
             if (sig == EXSHeader_sig)
                 auto t = EXSHeader(offset);

@@ -5,16 +5,16 @@ file_name = file_name.split(‘.’)[0]
 V bmp = File(file_name‘.bmp’, ‘r’)
 
 bmp.seek(10, 0)
-V offset = UInt32.unpack(bmp.read_bytes(4))
+V offset = Int(UInt32(bytes' bmp.read_bytes(4)))
 
 bmp.seek(18, 0)
-V bmp_w = UInt32.unpack(bmp.read_bytes(4))
-V bmp_h = UInt32.unpack(bmp.read_bytes(4))
+V bmp_w = Int(UInt32(bytes' bmp.read_bytes(4)))
+V bmp_h = Int(UInt32(bytes' bmp.read_bytes(4)))
 
 print(bmp_h‘ ’bmp_w)
 
 bmp.seek(34, 0)
-V bmp_s = UInt32.unpack(bmp.read_bytes(4))
+V bmp_s = Int(UInt32(bytes' bmp.read_bytes(4)))
 
 V bmp_b = Int(bmp_s / bmp_h)
 print(bmp_h‘ ’bmp_w‘ ’bmp_s‘ ’bmp_b)
@@ -27,7 +27,7 @@ V bmp_line = ‘’
 L(line) 0 .< bmp_h
    L(byte) 0 .< bmp_b
       V bmp_byte = bmp.read_bytes(1)
-      bmp_line ‘’= bin(255 - Byte.unpack(bmp_byte)).zfill(8)
+      bmp_line ‘’= bin(255 - bmp_byte[0]).zfill(8)
    bmp_list.append(bmp_line[0 .< bmp_w])
    bmp_list_v.append(bmp_line[0 .< bmp_w].replace(‘0’, ‘ ’))
    bmp_line = ‘’

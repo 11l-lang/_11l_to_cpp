@@ -12,16 +12,16 @@ int MAIN_WITH_ARGV()
     auto bmp = File(file_name & u".bmp"_S, u"r"_S);
 
     bmp.seek(10, 0);
-    auto offset = unpack_from_bytes<UInt32>(bmp.read_bytes(4));
+    auto offset = to_int(int_t_from_bytes<UInt32>(bmp.read_bytes(4)));
 
     bmp.seek(18, 0);
-    auto bmp_w = unpack_from_bytes<UInt32>(bmp.read_bytes(4));
-    auto bmp_h = unpack_from_bytes<UInt32>(bmp.read_bytes(4));
+    auto bmp_w = to_int(int_t_from_bytes<UInt32>(bmp.read_bytes(4)));
+    auto bmp_h = to_int(int_t_from_bytes<UInt32>(bmp.read_bytes(4)));
 
     print(bmp_h & u" "_S & bmp_w);
 
     bmp.seek(34, 0);
-    auto bmp_s = unpack_from_bytes<UInt32>(bmp.read_bytes(4));
+    auto bmp_s = to_int(int_t_from_bytes<UInt32>(bmp.read_bytes(4)));
 
     auto bmp_b = to_int(bmp_s / bmp_h);
     print(bmp_h & u" "_S & bmp_w & u" "_S & bmp_s & u" "_S & bmp_b);
@@ -34,7 +34,7 @@ int MAIN_WITH_ARGV()
     for (auto line : range_el(0, bmp_h)) {
         for (auto byte : range_el(0, bmp_b)) {
             auto bmp_byte = bmp.read_bytes(1);
-            bmp_line &= bin(255 - unpack_from_bytes<Byte>(bmp_byte)).zfill(8);
+            bmp_line &= bin(255 - _get<0>(bmp_byte)).zfill(8);
         }
         bmp_list.append(bmp_line[range_el(0, bmp_w)]);
         bmp_list_v.append(bmp_line[range_el(0, bmp_w)].replace(u"0"_S, u" "_S));
