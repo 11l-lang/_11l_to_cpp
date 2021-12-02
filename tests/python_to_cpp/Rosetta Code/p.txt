@@ -1892,7 +1892,7 @@ F get_primes(primes_count)
    V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
    L(n) 0 .< Int(limit ^ 0.5 + 1.5)
       I is_prime[n]
-         L(i) (n * n .< limit + 1).step(n)
+         L(i) (n * n .. limit).step(n)
             is_prime[i] = 0B
 
    [Int] primes
@@ -1923,7 +1923,7 @@ template <typename T1> auto get_primes(const T1 &primes_count)
     auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
     for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
         if (is_prime[n])
-            for (auto i : range_el(n * n, limit + 1).step(n))
+            for (auto i : range_ee(n * n, limit).step(n))
                 is_prime.set(i, false);
 
     Array<int> primes;
@@ -3027,7 +3027,7 @@ V maxsum = 99
 
 F get_primes(max)
    V lprimes = [2]
-   L(x) (3 .< max + 1).step(2)
+   L(x) (3 .. max).step(2)
       L(p) lprimes
          I x % p == 0
             L.break
@@ -3070,7 +3070,7 @@ auto maxsum = 99;
 template <typename T1> auto get_primes(const T1 &max)
 {
     auto lprimes = create_array({2});
-    for (auto x : range_el(3, max + 1).step(2)) {
+    for (auto x : range_ee(3, max).step(2)) {
         for (auto &&p : lprimes)
             if (mod(x, p) == 0)
                 goto break_;

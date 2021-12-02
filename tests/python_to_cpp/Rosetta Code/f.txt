@@ -550,7 +550,7 @@ F is_prime(a)
       R 1B
    I a < 2 | a % 2 == 0
       R 0B
-   L(i) (3 .< Int(sqrt(a)) + 1).step(2)
+   L(i) (3 .. Int(sqrt(a))).step(2)
       I a % i == 0
          R 0B
    R 1B
@@ -583,7 +583,7 @@ template <typename T1> auto is_prime(const T1 &a)
         return true;
     if (a < 2 || mod(a, 2) == 0)
         return false;
-    for (auto i : range_el(3, to_int(sqrt(a)) + 1).step(2))
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
         if (mod(a, i) == 0)
             return false;
     return true;

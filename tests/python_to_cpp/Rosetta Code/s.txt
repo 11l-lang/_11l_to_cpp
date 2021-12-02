@@ -966,7 +966,7 @@ for i in range(16):
     print()
 ===
 L(i) 16
-   L(j) (32 + i .< 127 + 1).step(16)
+   L(j) (32 + i .. 127).step(16)
       String k
       I j == 32
          k = ‘Spc’
@@ -982,7 +982,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (int i = 0; i < 16; i++) {
-            for (auto j : range_el(32 + i, 127 + 1).step(16)) {
+            for (auto j : range_ee(32 + i, 127).step(16)) {
                 String k;
                 if (j == 32)
                     k = u"Spc"_S;
@@ -1087,7 +1087,7 @@ F primes_upto(limit)
    V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
    L(n) 0 .< Int(limit ^ 0.5 + 1.5)
       I is_prime[n]
-         L(i) (n * n .< limit + 1).step(n)
+         L(i) (n * n .. limit).step(n)
             is_prime[i] = 0B
    R enumerate(is_prime).filter((i, prime) -> prime).map((i, prime) -> i)
 
@@ -1098,7 +1098,7 @@ template <typename T1> auto primes_upto(const T1 &limit)
     auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
     for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
         if (is_prime[n])
-            for (auto i : range_el(n * n, limit + 1).step(n))
+            for (auto i : range_ee(n * n, limit).step(n))
                 is_prime.set(i, false);
     return enumerate(is_prime).filter([](const auto &i, const auto &prime){return prime;}).map([](const auto &i, const auto &prime){return i;});
 }
@@ -5822,7 +5822,7 @@ F primes_upto(limit)
    V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
    L(n) 0 .< Int(limit ^ 0.5 + 1.5)
       I is_prime[n]
-         L(i) (n * n .< limit + 1).step(n)
+         L(i) (n * n .. limit).step(n)
             is_prime[i] = 0B
    R enumerate(is_prime).filter((i, prime) -> prime).map((i, prime) -> i)
 
@@ -5852,7 +5852,7 @@ template <typename T1> auto primes_upto(const T1 &limit)
     auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
     for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
         if (is_prime[n])
-            for (auto i : range_el(n * n, limit + 1).step(n))
+            for (auto i : range_ee(n * n, limit).step(n))
                 is_prime.set(i, false);
     return enumerate(is_prime).filter([](const auto &i, const auto &prime){return prime;}).map([](const auto &i, const auto &prime){return i;});
 }
@@ -5947,7 +5947,7 @@ F primes_upto(limit)
    V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
    L(n) 0 .< Int(limit ^ 0.5 + 1.5)
       I is_prime[n]
-         L(i) (n * n .< limit + 1).step(n)
+         L(i) (n * n .. limit).step(n)
             is_prime[i] = 0B
    R enumerate(is_prime).filter((i, prime) -> prime).map((i, prime) -> i)
 
@@ -5980,7 +5980,7 @@ template <typename T1> auto primes_upto(const T1 &limit)
     auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
     for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
         if (is_prime[n])
-            for (auto i : range_el(n * n, limit + 1).step(n))
+            for (auto i : range_ee(n * n, limit).step(n))
                 is_prime.set(i, false);
     return enumerate(is_prime).filter([](const auto &i, const auto &prime){return prime;}).map([](const auto &i, const auto &prime){return i;});
 }
@@ -6057,7 +6057,7 @@ F primes_upto(limit)
    V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
    L(n) 0 .< Int(limit ^ 0.5 + 1.5)
       I is_prime[n]
-         L(i) (n * n .< limit + 1).step(n)
+         L(i) (n * n .. limit).step(n)
             is_prime[i] = 0B
    R enumerate(is_prime).filter((i, prime) -> prime).map((i, prime) -> i)
 
@@ -6093,7 +6093,7 @@ template <typename T1> auto primes_upto(const T1 &limit)
     auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
     for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
         if (is_prime[n])
-            for (auto i : range_el(n * n, limit + 1).step(n))
+            for (auto i : range_ee(n * n, limit).step(n))
                 is_prime.set(i, false);
     return enumerate(is_prime).filter([](const auto &i, const auto &prime){return prime;}).map([](const auto &i, const auto &prime){return i;});
 }
@@ -6185,7 +6185,7 @@ F get_primes(limit)
    V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
    L(n) 0 .< Int(limit ^ 0.5 + 1.5)
       I is_prime[n]
-         L(i) (n * n .< limit + 1).step(n)
+         L(i) (n * n .. limit).step(n)
             is_prime[i] = 0B
    R enumerate(is_prime).filter((i, prime) -> prime).map((i, prime) -> i)
 
@@ -6228,7 +6228,7 @@ template <typename T1> auto get_primes(const T1 &limit)
     auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
     for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
         if (is_prime[n])
-            for (auto i : range_el(n * n, limit + 1).step(n))
+            for (auto i : range_ee(n * n, limit).step(n))
                 is_prime.set(i, false);
     return enumerate(is_prime).filter([](const auto &i, const auto &prime){return prime;}).map([](const auto &i, const auto &prime){return i;});
 }

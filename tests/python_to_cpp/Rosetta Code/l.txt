@@ -2904,9 +2904,9 @@ F body(j)
    I abs(:prod) < 2 ^ 27 & j != 0
       :prod *= j
 
-L(j) (-three .< 3 ^ 3 + 1).step(three)
+L(j) (-three .. 3 ^ 3).step(three)
    body(j)
-L(j) (-seven .< seven + 1).step(x)
+L(j) (-seven .. seven).step(x)
    body(j)
 L(j) 555 .. 550 - y
    body(j)
@@ -2946,9 +2946,9 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto j : range_el(-three, cube(3) + 1).step(three))
+        for (auto j : range_ee(-three, cube(3)).step(three))
             body(j);
-        for (auto j : range_el(-seven, seven + 1).step(x))
+        for (auto j : range_ee(-seven, seven).step(x))
             body(j);
         for (auto j : range_ee(555, 550 - y))
             body(j);

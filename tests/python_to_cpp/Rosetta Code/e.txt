@@ -1175,7 +1175,7 @@ V limit = 1'000'000
 V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
 L(n) 0 .< Int(limit ^ 0.5 + 1.5)
    I is_prime[n]
-      L(i) (n * n .< limit + 1).step(n)
+      L(i) (n * n .. limit).step(n)
          is_prime[i] = 0B
 
 F is_emirp(n)
@@ -1228,7 +1228,7 @@ struct CodeBlock1
     {
         for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
             if (is_prime[n])
-                for (auto i : range_el(n * n, limit + 1).step(n))
+                for (auto i : range_ee(n * n, limit).step(n))
                     is_prime.set(i, false);
     }
 } code_block_1;
@@ -2148,7 +2148,7 @@ V limit = 10'000
 V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
 L(n) 0 .< Int(limit ^ 0.5 + 1.5)
    I is_prime[n]
-      L(i) (n * n .< limit + 1).step(n)
+      L(i) (n * n .. limit).step(n)
          is_prime[i] = 0B
 
 F is_extra_prime(n)
@@ -2178,7 +2178,7 @@ struct CodeBlock1
     {
         for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
             if (is_prime[n])
-                for (auto i : range_el(n * n, limit + 1).step(n))
+                for (auto i : range_ee(n * n, limit).step(n))
                     is_prime.set(i, false);
     }
 } code_block_1;
