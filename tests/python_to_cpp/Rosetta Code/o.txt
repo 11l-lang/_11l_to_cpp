@@ -357,3 +357,597 @@ struct CodeBlock1
         print(maxorderedwords.join(u" "_S));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/OpenWebNet_password#Nim
+from _11l import *
+
+def ownCalcPass(password, nonce):
+    result : UInt32
+    start = True
+    for c in nonce:
+        if c != '0' and start:
+            result = UInt32(int(password))
+            start = False
+        c = c
+        if c == '0':
+            pass
+        elif c == '1':
+            result = rotr32(result, 7)
+        elif c == '2':
+            result = rotr32(result, 4)
+        elif c == '3':
+            result = rotr32(result, 3)
+        elif c == '4':
+            result = rotl32(result, 1)
+        elif c == '5':
+            result = rotl32(result, 5)
+        elif c == '6':
+            result = rotl32(result, 12)
+        elif c == '7':
+            result = (result & 0x0000FF00) | result << 24 | \
+                     (result & 0x00FF0000) >> 16 | (result & 0xFF000000) >> 8
+        elif c == '8':
+            result = result << 16 | result >> 24 | (result & 0x00FF0000) >> 8
+        elif c == '9':
+            result = ~result
+        else:
+            raise ValueError("non-digit in nonce.")
+    return result
+
+def test_passwd_calc(passwd, nonce, expected):
+    res = ownCalcPass(passwd, nonce)
+    m = passwd+' '+nonce+' '+str(res)+' '+str(expected)
+    if res == expected:
+        print('PASS '+m)
+    else :
+        print('FAIL '+m)
+
+test_passwd_calc('12345', '603356072', 25280520)
+test_passwd_calc('12345', '410501656', 119537670)
+test_passwd_calc('12345', '630292165', 4269684735)
+===
+F ownCalcPass(password, nonce)
+   UInt32 result
+   V start = 1B
+   L(=c) nonce
+      I c != ‘0’ & start
+         result = UInt32(Int(password))
+         start = 0B
+      S c
+         ‘0’
+         {
+         }
+         ‘1’
+            result = rotr(result, 7)
+         ‘2’
+            result = rotr(result, 4)
+         ‘3’
+            result = rotr(result, 3)
+         ‘4’
+            result = rotl(result, 1)
+         ‘5’
+            result = rotl(result, 5)
+         ‘6’
+            result = rotl(result, 12)
+         ‘7’
+            result = (result [&] 0000'FF00) [|] result << 24 [|] (result [&] 00FF'0000) >> 16 [|] (result [&] FF00'0000) >> 8
+         ‘8’
+            result = result << 16 [|] result >> 24 [|] (result [&] 00FF'0000) >> 8
+         ‘9’
+            result = (-)result
+         E
+            X ValueError(‘non-digit in nonce.’)
+   R result
+
+F test_passwd_calc(passwd, nonce, expected)
+   V res = ownCalcPass(passwd, nonce)
+   V m = passwd‘ ’nonce‘ ’String(res)‘ ’String(expected)
+   I res == expected
+      print(‘PASS ’m)
+   E
+      print(‘FAIL ’m)
+
+test_passwd_calc(‘12345’, ‘603356072’, 25280520)
+test_passwd_calc(‘12345’, ‘410501656’, 119537670)
+test_passwd_calc(‘12345’, ‘630292165’, 4269684735)
+===
+template <typename T1, typename T2> auto ownCalcPass(const T1 &password, const T2 &nonce)
+{
+    uint32_t result;
+    auto start = true;
+    for (auto c : nonce) {
+        if (c != u'0' && start) {
+            result = to_uint32(to_int(password));
+            start = false;
+        }
+        switch (c)
+        {
+        case u'0':
+            break;
+        case u'1':
+            result = rotr(result, 7);
+            break;
+        case u'2':
+            result = rotr(result, 4);
+            break;
+        case u'3':
+            result = rotr(result, 3);
+            break;
+        case u'4':
+            result = rotl(result, 1);
+            break;
+        case u'5':
+            result = rotl(result, 5);
+            break;
+        case u'6':
+            result = rotl(result, 12);
+            break;
+        case u'7':
+            result = (result & 0x0000'FF00) | result << 24 | (result & 0x00FF'0000) >> 16 | (result & 0xFF00'0000) >> 8;
+            break;
+        case u'8':
+            result = result << 16 | result >> 24 | (result & 0x00FF'0000) >> 8;
+            break;
+        case u'9':
+            result = ~result;
+            break;
+        default:
+            throw ValueError(u"non-digit in nonce."_S);
+            break;
+        }
+    }
+    return result;
+}
+
+template <typename T1, typename T2, typename T3> auto test_passwd_calc(const T1 &passwd, const T2 &nonce, const T3 &expected)
+{
+    auto res = ownCalcPass(passwd, nonce);
+    auto m = passwd & u" "_S & nonce & u" "_S & String(res) & u" "_S & String(expected);
+    if (res == expected)
+        print(u"PASS "_S & m);
+    else
+        print(u"FAIL "_S & m);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        test_passwd_calc(u"12345"_S, u"603356072"_S, 25280520);
+        test_passwd_calc(u"12345"_S, u"410501656"_S, 119537670);
+        test_passwd_calc(u"12345"_S, u"630292165"_S, 4269684735);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Orbital_elements#Python
+import math
+
+class Vector:
+    x : float
+    y : float
+    z : float
+
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def __add__(self, other):
+        return Vector(self.x + other.x, self.y + other.y, self.z + other.z)
+
+    def __mul__(self, other):
+        return Vector(self.x * other, self.y * other, self.z * other)
+
+    def __truediv__(self, other):
+        return Vector(self.x / other, self.y / other, self.z / other)
+
+    def __str__(self):
+        return '({x}, {y}, {z})'.format(x=self.x, y=self.y, z=self.z)
+
+    def abs(self):
+        return math.sqrt(self.x*self.x + self.y*self.y + self.z*self.z)
+
+def mulAdd(v1, x1, v2, x2):
+    return v1 * x1 + v2 * x2
+
+def rotate(i, j, alpha):
+    return [mulAdd(i,math.cos(alpha),j,math.sin(alpha)), mulAdd(i,-math.sin(alpha),j,math.cos(alpha))]
+
+def orbitalStateVectors(semimajorAxis, eccentricity, inclination, longitudeOfAscendingNode, argumentOfPeriapsis, trueAnomaly):
+    i = Vector(1, 0, 0)
+    j = Vector(0, 1, 0)
+    k = Vector(0, 0, 1)
+
+    p = rotate(i, j, longitudeOfAscendingNode)
+    i = p[0]
+    j = p[1]
+    p = rotate(j, k, inclination)
+    j = p[0]
+    p  =rotate(i, j, argumentOfPeriapsis)
+    i = p[0]
+    j = p[1]
+
+    l = 2.0 if (eccentricity == 1.0) else 1.0 - eccentricity * eccentricity
+    l *= semimajorAxis
+    c = math.cos(trueAnomaly)
+    s = math.sin(trueAnomaly)
+    r = 1 / (1.0 + eccentricity * c)
+    rprime = s * r * r / l
+    position = mulAdd(i, c, j, s) * r
+    speed = mulAdd(i, rprime * c - r * s, j, rprime * s + r * c)
+    speed = speed / speed.abs()
+    speed = speed * math.sqrt(2.0 / r - 1.0 / semimajorAxis)
+
+    return [position, speed]
+
+ps = orbitalStateVectors(1.0, 0.1, 0.0, 355.0 / (113.0 * 6.0), 0.0, 0.0)
+print("Position :", ps[0])
+print("Speed    :", ps[1])
+===
+T Vector
+   Float x
+   Float y
+   Float z
+
+   F (x, y, z)
+      .x = x
+      .y = y
+      .z = z
+
+   F +(other)
+      R Vector(.x + other.x, .y + other.y, .z + other.z)
+
+   F *(other)
+      R Vector(.x * other, .y * other, .z * other)
+
+   F /(other)
+      R Vector(.x / other, .y / other, .z / other)
+
+   F String()
+      R ‘(#., #., #.)’.format(.x, .y, .z)
+
+   F abs()
+      R sqrt(.x * .x + .y * .y + .z * .z)
+
+F mulAdd(v1, x1, v2, x2)
+   R v1 * x1 + v2 * x2
+
+F rotate(i, j, alpha)
+   R [mulAdd(i, cos(alpha), j, sin(alpha)), mulAdd(i, -sin(alpha), j, cos(alpha))]
+
+F orbitalStateVectors(semimajorAxis, eccentricity, inclination, longitudeOfAscendingNode, argumentOfPeriapsis, trueAnomaly)
+   V i = Vector(1, 0, 0)
+   V j = Vector(0, 1, 0)
+   V k = Vector(0, 0, 1)
+
+   V p = rotate(i, j, longitudeOfAscendingNode)
+   i = p[0]
+   j = p[1]
+   p = rotate(j, k, inclination)
+   j = p[0]
+   p = rotate(i, j, argumentOfPeriapsis)
+   i = p[0]
+   j = p[1]
+
+   V l = I (eccentricity == 1.0) {2.0} E 1.0 - eccentricity * eccentricity
+   l *= semimajorAxis
+   V c = cos(trueAnomaly)
+   V s = sin(trueAnomaly)
+   V r = 1 / (1.0 + eccentricity * c)
+   V rprime = s * r * r / l
+   V position = mulAdd(i, c, j, s) * r
+   V speed = mulAdd(i, rprime * c - r * s, j, rprime * s + r * c)
+   speed = speed / speed.abs()
+   speed = speed * sqrt(2.0 / r - 1.0 / semimajorAxis)
+
+   R [position, speed]
+
+V ps = orbitalStateVectors(1.0, 0.1, 0.0, 355.0 / (113.0 * 6.0), 0.0, 0.0)
+print(‘Position : ’ps[0])
+print(‘Speed    : ’ps[1])
+===
+class Vector
+{
+public:
+    double x;
+    double y;
+    double z;
+
+    template <typename T1, typename T2, typename T3> Vector(const T1 &x, const T2 &y, const T3 &z) :
+        x(x),
+        y(y),
+        z(z)
+    {
+    }
+
+    template <typename T1> auto operator+(const T1 &other) const
+    {
+        return Vector(x + other.x, y + other.y, z + other.z);
+    }
+    template <typename Ty> auto &operator+=(const Ty &t)
+    {
+        *this = *this + t;
+        return *this;
+    }
+
+    template <typename T1> auto operator*(const T1 &other) const
+    {
+        return Vector(x * other, y * other, z * other);
+    }
+    template <typename Ty> auto &operator*=(const Ty &t)
+    {
+        *this = *this * t;
+        return *this;
+    }
+
+    template <typename T1> auto operator/(const T1 &other) const
+    {
+        return Vector(x / other, y / other, z / other);
+    }
+    template <typename Ty> auto &operator/=(const Ty &t)
+    {
+        *this = *this / t;
+        return *this;
+    }
+
+    operator String() const
+    {
+        return u"(#., #., #.)"_S.format(x, y, z);
+    }
+
+    auto abs()
+    {
+        return sqrt(x * x + y * y + z * z);
+    }
+};
+
+template <typename T1, typename T2, typename T3, typename T4> auto mulAdd(const T1 &v1, const T2 &x1, const T3 &v2, const T4 &x2)
+{
+    return v1 * x1 + v2 * x2;
+}
+
+template <typename T1, typename T2, typename T3> auto rotate(const T1 &i, const T2 &j, const T3 &alpha)
+{
+    return create_array({mulAdd(i, cos(alpha), j, sin(alpha)), mulAdd(i, -sin(alpha), j, cos(alpha))});
+}
+
+template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6> auto orbitalStateVectors(const T1 &semimajorAxis, const T2 &eccentricity, const T3 &inclination, const T4 &longitudeOfAscendingNode, const T5 &argumentOfPeriapsis, const T6 &trueAnomaly)
+{
+    auto i = Vector(1, 0, 0);
+    auto j = Vector(0, 1, 0);
+    auto k = Vector(0, 0, 1);
+
+    auto p = rotate(i, j, longitudeOfAscendingNode);
+    i = _get<0>(p);
+    j = _get<1>(p);
+    p = rotate(j, k, inclination);
+    j = _get<0>(p);
+    p = rotate(i, j, argumentOfPeriapsis);
+    i = _get<0>(p);
+    j = _get<1>(p);
+
+    auto l = (eccentricity == 1.0) ? 2.0 : 1.0 - eccentricity * eccentricity;
+    l *= semimajorAxis;
+    auto c = cos(trueAnomaly);
+    auto s = sin(trueAnomaly);
+    auto r = 1.0 / (1.0 + eccentricity * c);
+    auto rprime = s * r * r / l;
+    auto position = mulAdd(i, c, j, s) * r;
+    auto speed = mulAdd(i, rprime * c - r * s, j, rprime * s + r * c);
+    speed = speed / speed.abs();
+    speed = speed * sqrt(2.0 / r - 1.0 / semimajorAxis);
+
+    return create_array({position, speed});
+}
+
+auto ps = orbitalStateVectors(1.0, 0.1, 0.0, 355.0 / (113.0 * 6.0), 0.0, 0.0);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Position : "_S & _get<0>(ps));
+        print(u"Speed    : "_S & _get<1>(ps));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Order_by_pair_comparisons#Python
+from functools import cmp_to_key
+
+def user_cmp(a : str, b : str):
+    return int(input("IS {:>6} <, ==, or > {:>6}  answer -1, 0 or 1:".format(a, b)))
+
+items = 'violet red green indigo blue yellow orange'.split(' ')
+ans = sorted(items, key=cmp_to_key(user_cmp))
+print('\n' + ' '.join(ans))
+===
+F user_cmp(String a, String b)
+   R Int(input(‘IS #6 <, ==, or > #6  answer -1, 0 or 1:’.format(a, b)))
+
+V items = ‘violet red green indigo blue yellow orange’.split(‘ ’)
+V ans = sorted(items, key' cmp_to_key(user_cmp))
+print("\n"ans.join(‘ ’))
+===
+auto user_cmp(const String &a, const String &b)
+{
+    return to_int(input(u"IS #6 <, ==, or > #6  answer -1, 0 or 1:"_S.format(a, b)));
+}
+
+auto items = u"violet red green indigo blue yellow orange"_S.split(u" "_S);
+auto ans = sorted(items, cmp_to_key(user_cmp));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"\n"_S & ans.join(u" "_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Ordered_partitions#Nim
+from _11l import *
+import sys
+
+def partitions(lengths):
+    r : List[List[List[int]]] = []
+    slices : List[Tuple[int, int]] = []
+    delta = -1
+    idx = 0
+    for length in lengths:
+        assert length >= 0, "lengths must not be negative."
+        delta += length
+        slices.append((idx, delta))
+        idx += length
+
+    n = sum(lengths)
+    perm = list(range(1, n+1))
+
+    while True:
+        part : List[List[int]] = []
+        for start, end in slices:
+            s = perm[start:end+1]
+            if not is_sorted(s):
+                break
+            part.append(s)
+        else:
+            r.append(part)
+
+        if not next_permutation(perm):
+            break
+
+    return r
+
+def toString(part):
+    result = '('
+    for s in part:
+        if len(result) > 1:
+            result += ', '
+        result += '{' + ', '.join(map(str, s)) + '}'
+    return result + ')'
+
+def displayPermutations(lengths):
+    print('Ordered permutations for (' + ', '.join(map(str, lengths)) + '):')
+    for part in partitions(lengths):
+        print(toString(part))
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        displayPermutations([int(arg) for arg in sys.argv[1:]])
+    else:
+        displayPermutations([2, 0, 2])
+===
+F partitions(lengths)
+   [[[Int]]] r
+   [(Int, Int)] slices
+   V delta = -1
+   V idx = 0
+   L(length) lengths
+      assert(length >= 0, ‘lengths must not be negative.’)
+      delta += length
+      slices.append((idx, delta))
+      idx += length
+
+   V n = sum(lengths)
+   V perm = Array(1 .. n)
+
+   L
+      [[Int]] part
+      L(start, end) slices
+         V s = perm[start .< end + 1]
+         I !s.is_sorted()
+            L.break
+         part.append(s)
+      L.was_no_break
+         r.append(part)
+
+      I !perm.next_permutation()
+         L.break
+
+   R r
+
+F toString(part)
+   V result = ‘(’
+   L(s) part
+      I result.len > 1
+         result ‘’= ‘, ’
+      result ‘’= ‘{’s.map(String).join(‘, ’)‘}’
+   R result‘)’
+
+F displayPermutations(lengths)
+   print(‘Ordered permutations for (’lengths.map(String).join(‘, ’)‘):’)
+   L(part) partitions(lengths)
+      print(toString(part))
+
+:start:
+I :argv.len > 1
+   displayPermutations(:argv[1..].map(arg -> Int(arg)))
+E
+   displayPermutations([2, 0, 2])
+===
+Array<String> argv;
+
+template <typename T1> auto partitions(const T1 &lengths)
+{
+    Array<Array<Array<int>>> r;
+    Array<ivec2> slices;
+    auto delta = -1;
+    auto idx = 0;
+    for (auto &&length : lengths) {
+        assert(length >= 0, u"lengths must not be negative."_S);
+        delta += length;
+        slices.append(make_tuple(idx, delta));
+        idx += length;
+    }
+
+    auto n = sum(lengths);
+    auto perm = create_array(range_ee(1, n));
+
+    while (true) {
+        Array<Array<int>> part;
+        for (auto &&[start, end] : slices) {
+            auto s = perm[range_el(start, end + 1)];
+            if (!s.is_sorted())
+                goto break_;
+            part.append(s);
+        }
+        r.append(part);
+        break_:;
+
+        if (!perm.next_permutation())
+            break;
+    }
+
+    return r;
+}
+
+template <typename T1> auto toString(const T1 &part)
+{
+    auto result = u"("_S;
+    for (auto &&s : part) {
+        if (result.len() > 1)
+            result &= u", "_S;
+        result &= u"{"_S & s.map([](const auto &x){return String(x);}).join(u", "_S) & u"}"_S;
+    }
+    return result & u")"_S;
+}
+
+template <typename T1> auto displayPermutations(const T1 &lengths)
+{
+    print(u"Ordered permutations for ("_S & lengths.map([](const auto &x){return String(x);}).join(u", "_S) & u"):"_S);
+    for (auto &&part : partitions(lengths))
+        print(toString(part));
+}
+
+int MAIN_WITH_ARGV()
+{
+    INIT_ARGV();
+
+    if (::argv.len() > 1)
+        displayPermutations(::argv[range_ei(1)].map([](const auto &arg){return to_int(arg);}));
+    else
+        displayPermutations(create_array({2, 0, 2}));
+}

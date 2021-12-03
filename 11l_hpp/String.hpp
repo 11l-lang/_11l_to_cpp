@@ -88,8 +88,11 @@ public:
 	explicit String(char16_t c) {assign(int(c));}
 	explicit String(bool b) : basic_string(b ? u"1B" : u"0B", 2) {}
 	explicit String(int num) {assign(num);}
+	explicit String(UInt32 num) {assign(num);}
 	explicit String(Int64 num) {assign(num);}
 	explicit String(UInt64 num) {assign(num);}
+	explicit String(unsigned long num) {assign(num);}
+	explicit String(long num) {assign(num);}
 	template <typename IntType> void assign_int(IntType num)
 	{
 		char16_t staticBuffer[30];
@@ -112,8 +115,11 @@ public:
 		assign(staticBuffer, len);
 	}
 	void assign(int   num) { assign_int(num); }
+	void assign(UInt32 num) { assign_int(num); }
 	void assign(Int64 num) { assign_int(num); }
 	void assign(UInt64 num) { assign_int(num); }
+	void assign(unsigned long num) { assign_int(num); }
+	void assign(long num) { assign_int(num); }
 	explicit String(float  num, int digits = 6, bool remove_trailing_zeroes = true) {assign(num, digits, remove_trailing_zeroes);}
 	explicit String(double num, int digits = 9, bool remove_trailing_zeroes = true) {assign(num, digits, remove_trailing_zeroes);}
 	explicit String(const char16_t *&s) : basic_string(s) {} // reference is needed here because otherwise `String(const char16_t (&s)[N])` is never called (`String(u"str")` calls `String(const char16_t *s)`)

@@ -2067,3 +2067,848 @@ struct CodeBlock1
             print((u"#20"_S.format(nameToNum(name))) & u" = "_S & name);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Nimber_arithmetic#Python
+# Highest power of two that divides a given number.
+def hpo2(n): return n & (-n)
+
+# Base 2 logarithm of the highest power of 2 dividing a given number.
+def lhpo2(n):
+    q = 0
+    m = hpo2(n)
+    while m%2 == 0:
+        m = m >> 1
+        q += 1
+    return q
+
+def nimsum(x : int, y : int): return x ^ y
+
+def nimprod(x : int, y : int):
+    if x < 2 or y < 2:
+        return x * y
+    h = hpo2(x)
+    if x > h:
+        return nimprod(h, y) ^ nimprod(x^h, y) # break x into powers of 2
+    if hpo2(y) < y:
+        return nimprod(y, x) # break y into powers of 2 by flipping operands
+    (xp, yp) = (lhpo2(x), lhpo2(y))
+    comp = xp & yp
+    if comp == 0:
+        return x * y # no Fermat power in common
+    h = hpo2(comp)
+    # a Fermat number square is its sequimultiple
+    return nimprod(nimprod(x>>h, y>>h), 3<<(h-1))
+
+for f, op in ((nimsum, '+'), (nimprod, '*')):
+    print('', op, '|', end='')
+    for i in range(16):
+        print('%3d' % i, end='')
+    print("\n--- " + "-"*48)
+    for i in range(16):
+        print('%2d |' % i, end='')
+        for j in range(16):
+            print("%3d" % f(i,j), end='')
+        print()
+    print()
+
+(a, b) = (21508, 42689)
+print(a, '+', b, '=', nimsum(a,b))
+print(a, '*', b, '=', nimprod(a,b))
+===
+F hpo2(n)
+   R n [&] (-n)
+
+F lhpo2(n)
+   V q = 0
+   V m = hpo2(n)
+   L m % 2 == 0
+      m = m >> 1
+      q++
+   R q
+
+F nimsum(Int x, Int y)
+   R x (+) y
+
+F nimprod(Int x, Int y)
+   I x < 2 | y < 2
+      R x * y
+   V h = hpo2(x)
+   I x > h
+      R nimprod(h, y) (+) nimprod(x (+) h, y)
+   I hpo2(y) < y
+      R nimprod(y, x)
+   V (xp, yp) = (lhpo2(x), lhpo2(y))
+   V comp = xp [&] yp
+   I comp == 0
+      R x * y
+   h = hpo2(comp)
+   R nimprod(nimprod(x >> h, y >> h), 3 << (h - 1))
+
+L(f, op) ((nimsum, ‘+’), (nimprod, ‘*’))
+   print(‘ ’op‘ |’, end' ‘’)
+   L(i) 16
+      print(‘#3’.format(i), end' ‘’)
+   print("\n--- "(‘-’ * 48))
+   L(i) 16
+      print(‘#2 |’.format(i), end' ‘’)
+      L(j) 16
+         print(‘#3’.format(f(i, j)), end' ‘’)
+      print()
+   print()
+
+V (a, b) = (21508, 42689)
+print(a‘ + ’b‘ = ’nimsum(a, b))
+print(a‘ * ’b‘ = ’nimprod(a, b))
+===
+template <typename T1> auto hpo2(const T1 &n)
+{
+    return n & (-n);
+}
+
+template <typename T1> auto lhpo2(const T1 &n)
+{
+    auto q = 0;
+    auto m = hpo2(n);
+    while (mod(m, 2) == 0) {
+        m = m >> 1;
+        q++;
+    }
+    return q;
+}
+
+auto nimsum(const int x, const int y)
+{
+    return x ^ y;
+}
+
+auto nimprod(const int x, const int y)
+{
+    if (x < 2 || y < 2)
+        return x * y;
+    auto h = hpo2(x);
+    if (x > h)
+        return nimprod(h, y) ^ nimprod(x ^ h, y);
+    if (hpo2(y) < y)
+        return nimprod(y, x);
+    auto [xp, yp] = make_tuple(lhpo2(x), lhpo2(y));
+    auto comp = xp & yp;
+    if (comp == 0)
+        return x * y;
+    h = hpo2(comp);
+    return nimprod(nimprod(x >> h, y >> h), 3 << (h - 1));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[f, op] : make_tuple(make_tuple(nimsum, u"+"_S), make_tuple(nimprod, u"*"_S))) {
+            print(u" "_S & op & u" |"_S, u""_S);
+            for (int i = 0; i < 16; i++)
+                print(u"#3"_S.format(i), u""_S);
+            print(u"\n--- "_S & (u"-"_S * 48));
+            for (int i = 0; i < 16; i++) {
+                print(u"#2 |"_S.format(i), u""_S);
+                for (int j = 0; j < 16; j++)
+                    print(u"#3"_S.format(f(i, j)), u""_S);
+                print();
+            }
+            print();
+        }
+    }
+} code_block_1;
+
+auto [a, b] = make_tuple(21508, 42689);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(a & u" + "_S & b & u" = "_S & nimsum(a, b));
+        print(a & u" * "_S & b & u" = "_S & nimprod(a, b));
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Numbers_divisible_by_their_individual_digits,_but_not_by_the_product_of_their_digits.#Python
+from _11l import *
+
+def p(n):
+    '''True if n is divisible by each of its digits,
+       but not divisible by the product of those digits.
+    '''
+    digits = [int(c) for c in str(n)]
+    return not 0 in digits and (
+        0 != (n % product_of_a_seq(digits))
+    ) and all(0 == n % d for d in digits)
+
+def chunksOf(n):
+    '''A series of lists of length n, subdividing the
+       contents of xs. Where the length of xs is not evenly
+       divible, the final list will be shorter than n.
+    '''
+    def go(xs):
+        nonlocal n # =
+        return (
+            xs[i:n + i] for i in range(0, len(xs), n)
+        )
+    return go
+
+xs = [
+    str(n) for n in range(1, 1000)
+    if p(n)
+]
+w = len(xs[-1])
+print(len(xs), "matching numbers:\n")
+print('\n'.join(
+    ' '.join(cell.rjust(w, ' ') for cell in row)
+    for row in chunksOf(10)(xs)
+))
+===
+F p(n)
+   ‘True if n is divisible by each of its digits,
+       but not divisible by the product of those digits.
+    ’
+   V digits = String(n).map(c -> Int(c))
+   R !(0 C digits) & (0 != (n % product(digits))) & all(digits.map(d -> 0 == @n % d))
+
+F chunksOf(n)
+   ‘A series of lists of length n, subdividing the
+       contents of xs. Where the length of xs is not evenly
+       divible, the final list will be shorter than n.
+    ’
+   F go(xs)
+      R ((0 .< xs.len).step(@=n).map(i -> @xs[i .< @=n + i]))
+   R go
+
+V xs = (1..999).filter(n -> p(n)).map(n -> String(n))
+V w = xs.last.len
+print(xs.len" matching numbers:\n")
+print(chunksOf(10)(xs).map(row -> row.map(cell -> cell.rjust(:w, ‘ ’)).join(‘ ’)).join("\n"))
+===
+template <typename T1> auto p(const T1 &n)
+{
+    uR"(True if n is divisible by each of its digits,
+       but not divisible by the product of those digits.
+    )"_S;
+    auto digits = String(n).map([](const auto &c){return to_int(c);});
+    return !(in(0, digits)) && (0 != (mod(n, product(digits)))) && all_map(digits, [&n](const auto &d){return 0 == mod(n, d);});
+}
+
+template <typename T1> auto chunksOf(const T1 &n)
+{
+    uR"(A series of lists of length n, subdividing the
+       contents of xs. Where the length of xs is not evenly
+       divible, the final list will be shorter than n.
+    )"_S;
+    auto go = [n](const auto &xs)
+    {
+        return (range_el(0, xs.len()).step(n).map([&xs, n](const auto &i){return xs[range_el(i, n + i)];}));
+    };
+    return go;
+}
+
+auto xs = range_ee(1, 999).filter([](const auto &n){return p(n);}).map([](const auto &n){return String(n);});
+auto w = xs.last().len();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(xs.len() & u" matching numbers:\n"_S);
+        print(chunksOf(10)(xs).map([](const auto &row){return row.map([](const auto &cell){return cell.rjust(::w, u" "_S);}).join(u" "_S);}).join(u"\n"_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Numbers_in_base_10_that_are_palindromic_in_bases_2,_4,_and_16#Python
+def reverse(n, base):
+    r = 0
+    while n > 0:
+        r = r*base + n%base
+        n = n//base
+    return r
+
+def palindrome(n, base):
+    return n == reverse(n, base)
+
+cnt = 0
+for i in range(25000):
+    if all(palindrome(i, base) for base in (2,4,16)):
+        cnt += 1
+        print("{:5}".format(i), end=" \n"[cnt % 12 == 0])
+
+print()
+===
+F reverse(=n, base)
+   V r = 0
+   L n > 0
+      r = r * base + n % base
+      n = n I/ base
+   R r
+
+F palindrome(n, base)
+   R n == reverse(n, base)
+
+V cnt = 0
+L(i) 25000
+   I all((2, 4, 16).map(base -> palindrome(@i, base)))
+      cnt++
+      print(‘#5’.format(i), end' " \n"[cnt % 12 == 0])
+
+print()
+===
+template <typename T1, typename T2> auto reverse(T1 n, const T2 &base)
+{
+    auto r = 0;
+    while (n > 0) {
+        r = r * base + mod(n, base);
+        n = idiv(n, base);
+    }
+    return r;
+}
+
+template <typename T1, typename T2> auto palindrome(const T1 &n, const T2 &base)
+{
+    return n == reverse(n, base);
+}
+
+auto cnt = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int i = 0; i < 25000; i++)
+            if (all_map(make_tuple(2, 4, 16), [&i](const auto &base){return palindrome(i, base);})) {
+                cnt++;
+                print(u"#5"_S.format(i), u" \n"_S[mod(cnt, 12) == 0]);
+            }
+
+        print();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Numbers_which_binary_and_ternary_digit_sum_are_prime#Nim
+import math
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+def digit_sum(n, b):
+    result = 0
+    while n != 0:
+        result += n % b
+        n //= b
+    return result
+
+count = 0
+for n in range(2, 200):
+    if is_prime(digit_sum(n, 2)) and is_prime(digit_sum(n, 3)):
+        count += 1
+        print('%3d' % n, end = "\n" if count % 16 == 0 else ' ')
+print()
+print('Found', count, 'numbers.')
+===
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+F digit_sum(=n, b)
+   V result = 0
+   L n != 0
+      result += n % b
+      n I/= b
+   R result
+
+V count = 0
+L(n) 2..199
+   I is_prime(digit_sum(n, 2)) & is_prime(digit_sum(n, 3))
+      count++
+      print(‘#3’.format(n), end' I count % 16 == 0 {"\n"} E ‘ ’)
+print()
+print(‘Found ’count‘ numbers.’)
+===
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+template <typename T1, typename T2> auto digit_sum(T1 n, const T2 &b)
+{
+    auto result = 0;
+    while (n != 0) {
+        result += mod(n, b);
+        n = idiv(n, b);
+    }
+    return result;
+}
+
+auto count = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(2, 199))
+            if (is_prime(digit_sum(n, 2)) && is_prime(digit_sum(n, 3))) {
+                count++;
+                print(u"#3"_S.format(n), mod(count, 16) == 0 ? u"\n"_S : u" "_S);
+            }
+        print();
+        print(u"Found "_S & count & u" numbers."_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Numbers_with_same_digit_set_in_base_10_and_base_16#Python
+from _11l import *
+
+col = 0
+for i in range(100000):
+    if set(list(str(i))) == set(list(hexu(i))):
+        col += 1
+        print("{:7}".format(i), end='\n'[:int(col % 10 == 0)])
+print()
+===
+V col = 0
+L(i) 100000
+   I Set(Array(String(i))) == Set(Array(hex(i)))
+      col++
+      print(‘#7’.format(i), end' "\n"[0 .< Int(col % 10 == 0)])
+print()
+===
+auto col = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int i = 0; i < 100000; i++)
+            if (create_set(create_array(String(i))) == create_set(create_array(hex(i)))) {
+                col++;
+                print(u"#7"_S.format(i), u"\n"_S[range_el(0, to_int(mod(col, 10) == 0))]);
+            }
+        print();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Numerical_integration/Adaptive_Simpson%27s_method#Python
+from typing import NamedTuple
+import math
+
+class Triple(NamedTuple):
+    m : float
+    fm : float
+    simp : float
+
+def _quad_simpsons_mem(f, a: float , fa: float, b: float, fb: float):
+    '''
+        Evaluates Simpson's Rule, also returning m and f(m) to reuse.
+    '''
+    m = a + (b - a) / 2
+    fm = f(m)
+    simp = abs(b - a) / 6 * (fa + 4*fm + fb)
+    return Triple(m, fm, simp)
+
+def _quad_asr(f, a: float, fa: float, b: float, fb: float, eps: float, whole: float, m: float, fm: float)->float:
+    '''
+        Efficient recursive implementation of adaptive Simpson's rule.
+        Function values at the start, middle, end of the intervals are retained.
+    '''
+    lt = _quad_simpsons_mem(f, a, fa, m, fm)
+    rt = _quad_simpsons_mem(f, m, fm, b, fb)
+    delta = lt.simp + rt.simp - whole
+    return (lt.simp + rt.simp + delta/15
+        if (abs(delta) <= eps * 15) else
+            _quad_asr(f, a, fa, m, fm, eps/2, lt.simp, lt.m, lt.fm) +
+            _quad_asr(f, m, fm, b, fb, eps/2, rt.simp, rt.m, rt.fm)
+    )
+
+def quad_asr(f, a: float, b: float, eps: float)->float:
+    '''
+        Integrate f from a to b using ASR with max error of eps.
+    '''
+    fa = f(a)
+    fb = f(b)
+    t = _quad_simpsons_mem(f, a, fa, b, fb)
+    return _quad_asr(f, a, fa, b, fb, eps, t.simp, t.m, t.fm)
+
+(a, b) = (0.0, 1.0)
+sinx = quad_asr(lambda x: math.sin(x), a, b, 1e-09)
+print("Simpson's integration of sine from {} to {} = {}".format(a, b, sinx))
+===
+T Triple
+   Float m
+   Float fm
+   Float simp
+   F (m, fm, simp)
+      .m = m
+      .fm = fm
+      .simp = simp
+
+F _quad_simpsons_mem(f, Float a, Float fa, Float b, Float fb)
+   ‘
+        Evaluates Simpson's Rule, also returning m and f(m) to reuse.
+    ’
+   V m = a + (b - a) / 2
+   V fm = f(m)
+   V simp = abs(b - a) / 6 * (fa + 4 * fm + fb)
+   R Triple(m, fm, simp)
+
+F _quad_asr(f, Float a, Float fa, Float b, Float fb, Float eps, Float whole, Float m, Float fm) -> Float
+   ‘
+        Efficient recursive implementation of adaptive Simpson's rule.
+        Function values at the start, middle, end of the intervals are retained.
+    ’
+   V lt = _quad_simpsons_mem(f, a, fa, m, fm)
+   V rt = _quad_simpsons_mem(f, m, fm, b, fb)
+   V delta = lt.simp + rt.simp - whole
+   R (I (abs(delta) <= eps * 15) {lt.simp + rt.simp + delta / 15} E _quad_asr(f, a, fa, m, fm, eps / 2, lt.simp, lt.m, lt.fm) + _quad_asr(f, m, fm, b, fb, eps / 2, rt.simp, rt.m, rt.fm))
+
+F quad_asr(f, Float a, Float b, Float eps) -> Float
+   ‘
+        Integrate f from a to b using ASR with max error of eps.
+    ’
+   V fa = f(a)
+   V fb = f(b)
+   V t = _quad_simpsons_mem(f, a, fa, b, fb)
+   R _quad_asr(f, a, fa, b, fb, eps, t.simp, t.m, t.fm)
+
+V (a, b) = (0.0, 1.0)
+V sinx = quad_asr(x -> sin(x), a, b, 1e-09)
+print(‘Simpson's integration of sine from #. to #. = #.’.format(a, b, sinx))
+===
+class Triple
+{
+public:
+    double m;
+    double fm;
+    double simp;
+    template <typename T1, typename T2, typename T3> Triple(const T1 &m, const T2 &fm, const T3 &simp) :
+        m(m),
+        fm(fm),
+        simp(simp)
+    {
+    }
+};
+
+template <typename T1> auto _quad_simpsons_mem(const T1 &f, const double a, const double fa, const double b, const double fb)
+{
+    uR"(
+        Evaluates Simpson's Rule, also returning m and f(m) to reuse.
+    )"_S;
+    auto m = a + (b - a) / 2.0;
+    auto fm = f(m);
+    auto simp = abs(b - a) / 6.0 * (fa + 4 * fm + fb);
+    return Triple(m, fm, simp);
+}
+
+template <typename T1> double _quad_asr(const T1 &f, const double a, const double fa, const double b, const double fb, const double eps, const double whole, const double m, const double fm)
+{
+    uR"(
+        Efficient recursive implementation of adaptive Simpson's rule.
+        Function values at the start, middle, end of the intervals are retained.
+    )"_S;
+    auto lt = _quad_simpsons_mem(f, a, fa, m, fm);
+    auto rt = _quad_simpsons_mem(f, m, fm, b, fb);
+    auto delta = lt.simp + rt.simp - whole;
+    return ((abs(delta) <= eps * 15) ? lt.simp + rt.simp + delta / 15.0 : _quad_asr(f, a, fa, m, fm, eps / 2.0, lt.simp, lt.m, lt.fm) + _quad_asr(f, m, fm, b, fb, eps / 2.0, rt.simp, rt.m, rt.fm));
+}
+
+template <typename T1> double quad_asr(const T1 &f, const double a, const double b, const double eps)
+{
+    uR"(
+        Integrate f from a to b using ASR with max error of eps.
+    )"_S;
+    auto fa = f(a);
+    auto fb = f(b);
+    auto t = _quad_simpsons_mem(f, a, fa, b, fb);
+    return _quad_asr(f, a, fa, b, fb, eps, t.simp, t.m, t.fm);
+}
+
+auto [a, b] = make_tuple(0.0, 1.0);
+auto sinx = quad_asr([](const auto &x){return sin(x);}, a, b, 1e-09);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Simpson's integration of sine from #. to #. = #."_S.format(a, b, sinx));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Numerical_integration/Gauss-Legendre_Quadrature#Nim
+import math
+
+def legendreIn(x, n):
+    def prev1(idx, pn1):
+        return (2*idx - 1) * x * pn1
+    def prev2(idx, pn2):
+        return (idx-1) * pn2
+
+    if n == 0:
+        return 1.0
+    elif n == 1:
+        return x
+    else:
+        result = 0.0
+        p1 = x
+        p2 = 1.0
+        for i in range(2, n + 1):
+            result = (prev1(i, p1) - prev2(i, p2)) / i
+            p2 = p1
+            p1 = result
+        return result
+
+def deriveLegendreIn(x, n):
+    def calcresult(curr, prev):
+        return float(n) / (x**2 - 1) * (x * curr - prev)
+    return calcresult(legendreIn(x, n), legendreIn(x, n-1))
+
+def guess(n, i):
+    return math.cos(math.pi * (i - 0.25) / (n + 0.5))
+
+def nodes(n):
+    result = [(0.0, 0.0)] * n
+    def calc(x):
+        return legendreIn(x, n) / deriveLegendreIn(x, n)
+
+    for i in range(n):
+        x = guess(n, i+1)
+        x0 = x
+        x -= calc(x)
+        while abs(x-x0) > 1e-12:
+            x0 = x
+            x -= calc(x)
+
+        result[i] = (x, 2 / ((1.0 - x**2) * (deriveLegendreIn(x, n))**2))
+
+    return result
+
+def integ(f, ns, p1, p2):
+    def dist():
+        return (p2 - p1) / 2
+    def avg():
+        return (p1 + p2) / 2
+    result = dist()
+    sum = 0.0
+    thenodes = [0.0] * ns
+    weights  = [0.0] * ns
+    for i, nw in enumerate(nodes(ns)):
+        sum += nw[1] * f(dist() * nw[0] + avg())
+        thenodes[i] = nw[0]
+        weights[i] = nw[1]
+
+    print('   nodes:', end = '')
+    for n in thenodes:
+        print(' %6.5f' % n, end = '')
+    print()
+    print(' weights:', end = '')
+    for w in weights:
+        print(' %6.5f' % w, end = '')
+    print()
+    return result * sum
+
+print('integral:', integ(lambda x: math.exp(x), 5, -3, 3))
+===
+F legendreIn(x, n)
+   F prev1(idx, pn1)
+      R (2 * idx - 1) * @x * pn1
+   F prev2(idx, pn2)
+      R (idx - 1) * pn2
+
+   I n == 0
+      R 1.0
+   E I n == 1
+      R x
+   E
+      V result = 0.0
+      V p1 = x
+      V p2 = 1.0
+      L(i) 2 .. n
+         result = (prev1(i, p1) - prev2(i, p2)) / i
+         p2 = p1
+         p1 = result
+      R result
+
+F deriveLegendreIn(x, n)
+   F calcresult(curr, prev)
+      R Float(@n) / (@x ^ 2 - 1) * (@x * curr - prev)
+   R calcresult(legendreIn(x, n), legendreIn(x, n - 1))
+
+F guess(n, i)
+   R cos(math:pi * (i - 0.25) / (n + 0.5))
+
+F nodes(n)
+   V result = [(0.0, 0.0)] * n
+   F calc(x)
+      R legendreIn(x, @n) / deriveLegendreIn(x, @n)
+
+   L(i) 0 .< n
+      V x = guess(n, i + 1)
+      V x0 = x
+      x -= calc(x)
+      L abs(x - x0) > 1e-12
+         x0 = x
+         x -= calc(x)
+
+      result[i] = (x, 2 / ((1.0 - x ^ 2) * (deriveLegendreIn(x, n)) ^ 2))
+
+   R result
+
+F integ(f, ns, p1, p2)
+   F dist()
+      R (@p2 - @p1) / 2
+   F avg()
+      R (@p1 + @p2) / 2
+   V result = dist()
+   V sum = 0.0
+   V thenodes = [0.0] * ns
+   V weights = [0.0] * ns
+   L(nw) nodes(ns)
+      V i = L.index
+      sum += nw[1] * f(dist() * nw[0] + avg())
+      thenodes[i] = nw[0]
+      weights[i] = nw[1]
+
+   print(‘   nodes:’, end' ‘’)
+   L(n) thenodes
+      print(‘ #.5’.format(n), end' ‘’)
+   print()
+   print(‘ weights:’, end' ‘’)
+   L(w) weights
+      print(‘ #.5’.format(w), end' ‘’)
+   print()
+   R result * sum
+
+print(‘integral: ’integ(x -> exp(x), 5, -3, 3))
+===
+template <typename T1, typename T2> auto legendreIn(const T1 &x, const T2 &n)
+{
+    auto prev1 = [&x](const auto &idx, const auto &pn1)
+    {
+        return (2 * idx - 1) * x * pn1;
+    };
+    auto prev2 = [](const auto &idx, const auto &pn2)
+    {
+        return (idx - 1) * pn2;
+    };
+
+    if (n == 0)
+        return 1.0;
+    else if (n == 1)
+        return x;
+    else {
+        auto result = 0.0;
+        auto p1 = x;
+        auto p2 = 1.0;
+        for (auto i : range_ee(2, n)) {
+            result = (prev1(i, p1) - prev2(i, p2)) / i;
+            p2 = p1;
+            p1 = result;
+        }
+        return result;
+    }
+}
+
+template <typename T1, typename T2> auto deriveLegendreIn(const T1 &x, const T2 &n)
+{
+    auto calcresult = [&n, &x](const auto &curr, const auto &prev)
+    {
+        return to_float(n) / (square(x) - 1) * (x * curr - prev);
+    };
+    return calcresult(legendreIn(x, n), legendreIn(x, n - 1));
+}
+
+template <typename T1, typename T2> auto guess(const T1 &n, const T2 &i)
+{
+    return cos(math::pi * (i - 0.25) / (n + 0.5));
+}
+
+template <typename T1> auto nodes(const T1 &n)
+{
+    auto result = create_array({make_tuple(0.0, 0.0)}) * n;
+    auto calc = [&n](const auto &x)
+    {
+        return legendreIn(x, n) / deriveLegendreIn(x, n);
+    };
+
+    for (auto i : range_el(0, n)) {
+        auto x = guess(n, i + 1);
+        auto x0 = x;
+        x -= calc(x);
+        while (abs(x - x0) > 1e-12) {
+            x0 = x;
+            x -= calc(x);
+        }
+
+        result.set(i, make_tuple(x, 2.0 / ((1.0 - square(x)) * square((deriveLegendreIn(x, n))))));
+    }
+
+    return result;
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto integ(const T1 &f, const T2 &ns, const T3 &p1, const T4 &p2)
+{
+    auto dist = [&p1, &p2]()
+    {
+        return (p2 - p1) / 2.0;
+    };
+    auto avg = [&p1, &p2]()
+    {
+        return (p1 + p2) / 2.0;
+    };
+    auto result = dist();
+    auto sum = 0.0;
+    auto thenodes = create_array({0.0}) * ns;
+    auto weights = create_array({0.0}) * ns;
+    {int Lindex = 0;
+    for (auto &&nw : nodes(ns)) {
+        auto i = Lindex;
+        sum += _get<1>(nw) * f(dist() * _get<0>(nw) + avg());
+        thenodes.set(i, _get<0>(nw));
+        weights.set(i, _get<1>(nw));
+        Lindex++;
+    }}
+
+    print(u"   nodes:"_S, u""_S);
+    for (auto &&n : thenodes)
+        print(u" #.5"_S.format(n), u""_S);
+    print();
+    print(u" weights:"_S, u""_S);
+    for (auto &&w : weights)
+        print(u" #.5"_S.format(w), u""_S);
+    print();
+    return result * sum;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"integral: "_S & integ([](const auto &x){return exp(x);}, 5, -3, 3));
+    }
+} code_block_1;
