@@ -505,7 +505,7 @@ template <typename Type1, typename Type2, typename Func> auto multiloop(const Ar
 	return r;
 }
 
-template <typename Func> auto multiloop(const String &str1, const String &str2, Func &&func) -> Array<decltype(func(std::declval<Char>(), std::declval<Char>()))>
+template <typename Type, typename = std::enable_if_t<std::is_same_v<Type, String>>, typename Func> auto multiloop(const Type &str1, const Type &str2, Func &&func) -> Array<decltype(func(std::declval<Char>(), std::declval<Char>()))>
 {
 	Array<decltype(func(std::declval<Char>(), std::declval<Char>()))> r;
 	r.reserve(str1.len() * str2.len());

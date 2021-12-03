@@ -3201,3 +3201,26 @@ struct CodeBlock1
         bitmap.circle(12, 12, 12);
     }
 } code_block_1;
+
+
+# [https://github.com/nayuki/Project-Euler-solutions/blob/master/python/p029.py?ts=4]
+BigInt = int
+
+seen = set(BigInt(a)**b for a in range(2, 101) for b in range(2, 101))
+print(len(seen))
+print([a+''+b for a in 'ab' for b in '12'])
+===
+V seen = Set(multiloop((2..100), (2..100), (a, b) -> BigInt(a) ^ b))
+print(seen.len)
+print(multiloop(‘ab’, ‘12’, (a, b) -> a‘’b))
+===
+auto seen = create_set(multiloop(range_ee(2, 100), range_ee(2, 100), [](const auto &a, const auto &b){return pow(BigInt(a), b);}));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(seen.len());
+        print(multiloop(u"ab"_S, u"12"_S, [](const auto &a, const auto &b){return a & b;}));
+    }
+} code_block_1;
