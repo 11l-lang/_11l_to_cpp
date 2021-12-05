@@ -50,6 +50,8 @@ inline float __(float min, float max)
 
 inline int _(const Range<int, true, false> range) {return __(range.b, range.e);}
 inline int _(const Range<int, true, true > range) {return __(range.b, range.e + 1);}
+inline double _(const Range<double, true, false> range) {return __(range.b, range.e);}
+inline double _(const Range<double, true, true > range) {return __(range.b, range.e);} // [-FIX-]
 
 template <typename Type> inline void shuffle(Array<Type> &arr)
 {

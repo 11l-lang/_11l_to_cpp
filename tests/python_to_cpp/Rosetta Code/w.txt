@@ -998,7 +998,7 @@ seed : UInt32 = 0
 def nonrandom(n):
     global seed
     seed = (1664525 * seed + 1013904223) & 0xFFFF_FFFF
-    return int(seed >> 16) % n
+    return (seed >> 16) % n
 
 def nonrandom_shuffle(x : list):
     for i in range(len(x)-1, 0, -1):
@@ -1072,7 +1072,7 @@ while WG.turn():
 UInt32 seed = 0
 F nonrandom(n)
    :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
-   R Int(:seed >> 16) % n
+   R (:seed >> 16) % n
 
 F nonrandom_shuffle(&x)
    L(i) (x.len - 1 .< 0).step(-1)
@@ -1147,7 +1147,7 @@ uint32_t seed = 0;
 template <typename T1> auto nonrandom(const T1 &n)
 {
     ::seed = (1664525 * ::seed + 1013904223) & 0xFFFF'FFFF;
-    return mod(to_int(::seed >> 16), n);
+    return mod((::seed >> 16), n);
 }
 
 template <typename T1> auto nonrandom_shuffle(T1 &x)

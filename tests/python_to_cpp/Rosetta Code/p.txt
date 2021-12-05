@@ -3308,3 +3308,1957 @@ struct CodeBlock1
         print(solveApollonius(c1, c2, c3, -1, -1, -1));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Padovan_n-step_number_sequences#Nim
+from typing import List
+
+def rn(n, k) -> List[int]:
+    assert k >= 2
+    result = [1, 1, 1] if n == 2 else rn(n - 1, n + 1)
+    while len(result) != k:
+        result.append(sum(result[-n-1:-1]))
+    return result
+
+for n in range(2, 9):
+    print(str(n) + ': ' + ' '.join('%3d' % it for it in rn(n, 15)))
+===
+F rn(n, k) -> [Int]
+   assert(k >= 2)
+   V result = I n == 2 {[1, 1, 1]} E rn(n - 1, n + 1)
+   L result.len != k
+      result.append(sum(result[(len)-n - 1 .< (len)-1]))
+   R result
+
+L(n) 2..8
+   print(String(n)‘: ’rn(n, 15).map(it -> ‘#3’.format(it)).join(‘ ’))
+===
+template <typename T1, typename T2> Array<int> rn(const T1 &n, const T2 &k)
+{
+    assert(k >= 2);
+    auto result = n == 2 ? create_array({1, 1, 1}) : rn(n - 1, n + 1);
+    while (result.len() != k)
+        result.append(sum(result[range_elen_llen( - n - 1,  - 1)]));
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(2, 8))
+            print(String(n) & u": "_S & rn(n, 15).map([](const auto &it){return u"#3"_S.format(it);}).join(u" "_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Padovan_sequence#Nim
+pp = 1.324717957244746025960908854
+ss = 1.0453567932525329623
+Rules = {'A': "B", 'B': "C", 'C': "AB"}
+
+def padovan1(n):
+    r = [1] * min(n, 3)
+    (a, b, c) = (1, 1, 1)
+    count = 3
+    while count < n:
+        (a, b, c) = (b, c, a + b)
+        r += [c]
+        count += 1
+    return r
+
+def padovan2(n):
+    r = [1] * (n > 1)
+    p = 1.0
+    count = 1
+    while count < n:
+        r += [int(round(p / ss))]
+        p *= pp
+        count += 1
+    return r
+
+def padovan3(n):
+    r : List[str] = []
+    s = 'A'
+    count = 0
+    while count < n:
+        r += [s]
+        next = ''
+        for ch in s:
+            next += Rules[ch]
+        s = next
+        count += 1
+    return r
+
+print('First 20 terms of the Padovan sequence:')
+print(' '.join(map(str, padovan1(20))))
+
+list1 = padovan1(64)
+list2 = padovan2(64)
+print('The first 64 iterative and calculated values', 'are the same.' if list1 == list2 else 'differ.')
+
+print()
+print('First 10 L-system strings:')
+print(' '.join(padovan3(10)))
+print()
+print('Lengths of the 32 first L-system strings:')
+list3 = [len(x) for x in padovan3(32)]
+print(' '.join(map(str, list3)))
+print('These lengths are', ' ' if list3 == list1[:32] else ' not ', 'the 32 first terms of the Padovan sequence.', sep = '')
+===
+V pp = 1.324717957244746025960908854
+V ss = 1.0453567932525329623
+V Rules = [‘A’ = ‘B’, ‘B’ = ‘C’, ‘C’ = ‘AB’]
+
+F padovan1(n)
+   V r = [1] * min(n, 3)
+   V (a, b, c) = (1, 1, 1)
+   V count = 3
+   L count < n
+      (a, b, c) = (b, c, a + b)
+      r [+]= c
+      count++
+   R r
+
+F padovan2(n)
+   V r = [1] * (n > 1)
+   V p = 1.0
+   V count = 1
+   L count < n
+      r [+]= Int(round(p / :ss))
+      p *= :pp
+      count++
+   R r
+
+F padovan3(n)
+   [String] r
+   V s = ‘A’
+   V count = 0
+   L count < n
+      r [+]= s
+      V next = ‘’
+      L(ch) s
+         next ‘’= Rules[ch]
+      s = next
+      count++
+   R r
+
+print(‘First 20 terms of the Padovan sequence:’)
+print(padovan1(20).map(String).join(‘ ’))
+
+V list1 = padovan1(64)
+V list2 = padovan2(64)
+print(‘The first 64 iterative and calculated values ’(I list1 == list2 {‘are the same.’} E ‘differ.’))
+
+print()
+print(‘First 10 L-system strings:’)
+print(padovan3(10).join(‘ ’))
+print()
+print(‘Lengths of the 32 first L-system strings:’)
+V list3 = padovan3(32).map(x -> x.len)
+print(list3.map(String).join(‘ ’))
+print(‘These lengths are’(I list3 == list1[0.<32] {‘ ’} E ‘ not ’)‘the 32 first terms of the Padovan sequence.’)
+===
+auto pp = 1.324717957244746025960908854;
+auto ss = 1.0453567932525329623;
+auto Rules = create_dict(dict_of(u'A'_C, u"B"_S)(u'B'_C, u"C"_S)(u'C'_C, u"AB"_S));
+
+template <typename T1> auto padovan1(const T1 &n)
+{
+    auto r = create_array({1}) * min(n, 3);
+    auto [a, b, c] = make_tuple(1, 1, 1);
+    auto count = 3;
+    while (count < n) {
+        assign_from_tuple(a, b, c, make_tuple(b, c, a + b));
+        r.append(c);
+        count++;
+    }
+    return r;
+}
+
+template <typename T1> auto padovan2(const T1 &n)
+{
+    auto r = create_array({1}) * (n > 1);
+    auto p = 1.0;
+    auto count = 1;
+    while (count < n) {
+        r.append(to_int(round(p / ::ss)));
+        p *= ::pp;
+        count++;
+    }
+    return r;
+}
+
+template <typename T1> auto padovan3(const T1 &n)
+{
+    Array<String> r;
+    auto s = u"A"_S;
+    auto count = 0;
+    while (count < n) {
+        r.append(s);
+        auto next = u""_S;
+        for (auto &&ch : s)
+            next &= Rules[ch];
+        s = next;
+        count++;
+    }
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"First 20 terms of the Padovan sequence:"_S);
+        print(padovan1(20).map([](const auto &x){return String(x);}).join(u" "_S));
+    }
+} code_block_1;
+
+auto list1 = padovan1(64);
+auto list2 = padovan2(64);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"The first 64 iterative and calculated values "_S & (list1 == list2 ? u"are the same."_S : u"differ."_S));
+
+        print();
+        print(u"First 10 L-system strings:"_S);
+        print(padovan3(10).join(u" "_S));
+        print();
+        print(u"Lengths of the 32 first L-system strings:"_S);
+    }
+} code_block_2;
+
+auto list3 = padovan3(32).map([](const auto &x){return x.len();});
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print(list3.map([](const auto &x){return String(x);}).join(u" "_S));
+        print(u"These lengths are"_S & (list3 == list1[range_el(0, 32)] ? u" "_S : u" not "_S) & u"the 32 first terms of the Padovan sequence."_S);
+    }
+} code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Palindromic_primes
+import math
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+for n in range(1000):
+    if is_prime(n):
+        s = str(n)
+        if s == s[::-1]:
+            print(n, end = ' ')
+print()
+===
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+L(n) 1000
+   I is_prime(n)
+      V s = String(n)
+      I s == reversed(s)
+         print(n, end' ‘ ’)
+print()
+===
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int n = 0; n < 1000; n++)
+            if (is_prime(n)) {
+                auto s = String(n);
+                if (s == reversed(s))
+                    print(n, u" "_S);
+            }
+        print();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Paraffins#Nim
+BigInt = int
+
+nMax = 250
+nBranches = 4
+rooted = [BigInt(0)] * (nMax + 1)
+unrooted = [BigInt(0)] * (nMax + 1)
+rooted[0] = BigInt(1)
+rooted[1] = BigInt(1)
+unrooted[0] = BigInt(1)
+unrooted[1] = BigInt(1)
+
+def choose(m, k):
+    if k == 1:
+        return m
+    result = m
+    for i in range(1, k):
+        result = result * (m + i) // (i + 1)
+    return result
+
+def tree(br, n, l, sum, cnt):
+    s = 0
+    for b in range(br + 1, nBranches + 1):
+        s = sum + (b - br) * n
+        if s > nMax: return
+
+        c = choose(rooted[n], b - br) * cnt
+
+        if l * 2 < s: unrooted[s] += c
+        if b == nBranches: return
+        rooted[s] += c
+        for m in range(n-1, 0, -1):
+            tree(b, m, l, s, c)
+
+def bicenter(s):
+    if (s & 1) == 0:
+        unrooted[s] += rooted[s // 2] * (rooted[s // 2] + 1) // 2
+
+for n in range(1, nMax + 1):
+    tree(0, n, n, 1, BigInt(1))
+    bicenter(n)
+    print(n, ": ", unrooted[n], sep = '')
+===
+V nMax = 250
+V nBranches = 4
+V rooted = [BigInt(0)] * (nMax + 1)
+V unrooted = [BigInt(0)] * (nMax + 1)
+rooted[0] = BigInt(1)
+rooted[1] = BigInt(1)
+unrooted[0] = BigInt(1)
+unrooted[1] = BigInt(1)
+
+F choose(m, k)
+   I k == 1
+      R m
+   V result = m
+   L(i) 1 .< k
+      result = result * (m + i) I/ (i + 1)
+   R result
+
+F tree(br, n, l, sum, cnt)
+   V s = 0
+   L(b) br + 1 .. :nBranches
+      s = sum + (b - br) * n
+      I s > :nMax
+         R
+
+      V c = choose(:rooted[n], b - br) * cnt
+
+      I l * 2 < s
+         :unrooted[s] += c
+      I b == :nBranches
+         R
+      :rooted[s] += c
+      L(m) (n - 1 .< 0).step(-1)
+         tree(b, m, l, s, c)
+
+F bicenter(s)
+   I (s [&] 1) == 0
+      :unrooted[s] += :rooted[s I/ 2] * (:rooted[s I/ 2] + 1) I/ 2
+
+L(n) 1 .. nMax
+   tree(0, n, n, 1, BigInt(1))
+   bicenter(n)
+   print(n‘: ’unrooted[n])
+===
+auto nMax = 250;
+auto nBranches = 4;
+auto rooted = create_array({BigInt(0)}) * (nMax + 1);
+auto unrooted = create_array({BigInt(0)}) * (nMax + 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _set<0>(rooted, BigInt(1));
+        _set<1>(rooted, BigInt(1));
+        _set<0>(unrooted, BigInt(1));
+        _set<1>(unrooted, BigInt(1));
+    }
+} code_block_1;
+
+template <typename T1, typename T2> auto choose(const T1 &m, const T2 &k)
+{
+    if (k == 1)
+        return m;
+    auto result = m;
+    for (auto i : range_el(1, k))
+        result = idiv(result * (m + i), (i + 1));
+    return result;
+}
+
+template <typename T1, typename T2, typename T3, typename T4, typename T5> auto tree(const T1 &br, const T2 &n, const T3 &l, const T4 &sum, const T5 &cnt)
+{
+    auto s = 0;
+    for (auto b : range_ee(br + 1, ::nBranches)) {
+        s = sum + (b - br) * n;
+        if (s > ::nMax)
+            return;
+
+        auto c = choose(::rooted[n], b - br) * cnt;
+
+        if (l * 2 < s)
+            ::unrooted[s] += c;
+        if (b == ::nBranches)
+            return;
+        ::rooted[s] += c;
+        for (auto m : range_el(n - 1, 0).step(-1))
+            tree(b, m, l, s, c);
+    }
+}
+
+template <typename T1> auto bicenter(const T1 &s)
+{
+    if ((s & 1) == 0)
+        ::unrooted[s] += idiv(::rooted[idiv(s, 2)] * (::rooted[idiv(s, 2)] + 1), 2);
+}
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto n : range_ee(1, nMax)) {
+            tree(0, n, n, 1, BigInt(1));
+            bicenter(n);
+            print(n & u": "_S & unrooted[n]);
+        }
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Partial_function_application#Python
+def partial(f, g):
+    def fg(x): return f(g, x)
+    return fg
+
+def main():
+    def ffs(f, x): return [f(a) for a in x]
+    def f1(a): return a * 2
+    def f2(a): return a * a
+
+    fsf1 = partial(ffs, f1)
+    fsf2 = partial(ffs, f2)
+
+    print(fsf1([1, 2, 3, 4]))
+    print(fsf2([1, 2, 3, 4]))
+
+main()
+===
+F partial(f, g)
+   F fg(x)
+      R @f(@g, x)
+   R fg
+
+F main()
+   F ffs(f, x)
+      R x.map(a -> @f(a))
+   F f1(a)
+      R a * 2
+   F f2(a)
+      R a * a
+
+   V fsf1 = partial(ffs, f1)
+   V fsf2 = partial(ffs, f2)
+
+   print(fsf1([1, 2, 3, 4]))
+   print(fsf2([1, 2, 3, 4]))
+
+main()
+===
+template <typename T1, typename T2> auto partial(const T1 &f, const T2 &g)
+{
+    auto fg = [&f, &g](const auto &x)
+    {
+        return f(g, x);
+    };
+    return fg;
+}
+
+auto _main_()
+{
+    auto ffs = [](const auto &f, const auto &x)
+    {
+        return x.map([&f](const auto &a){return f(a);});
+    };
+    auto f1 = [](const auto &a)
+    {
+        return a * 2;
+    };
+    auto f2 = [](const auto &a)
+    {
+        return a * a;
+    };
+
+    auto fsf1 = partial(ffs, f1);
+    auto fsf2 = partial(ffs, f2);
+
+    print(fsf1(create_array({1, 2, 3, 4})));
+    print(fsf2(create_array({1, 2, 3, 4})));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _main_();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Penney%27s_game#Python
+import random, time
+
+first = random.choice([True, False])
+
+you = ''
+me = ''
+ht = 'HT' # to get round ‘bug in MSVC 2017’[https://developercommunity.visualstudio.com/t/bug-with-operator-in-c/565417]
+if first:
+    me = ''.join(random.sample(list('HT'*3), 3))
+    print('I choose first and will win on first seeing {} in the list of tosses'.format(me))
+    while len(you) != 3 or any(ch not in ht for ch in you) or you == me:
+        you = input('What sequence of three Heads/Tails will you win with: ')
+else:
+    while len(you) != 3 or any(ch not in ht for ch in you):
+        you = input('After you: What sequence of three Heads/Tails will you win with: ')
+    me = ('H' if you[1] == 'T' else 'T') + you[:2]
+    print('I win on first seeing {} in the list of tosses'.format(me))
+
+print('Rolling:\n  ', end='')
+rolled = ''
+while True:
+    rolled += random.choice('HT')
+    print(rolled[-1], end='')
+    if rolled.endswith(you):
+        print('\n  You win!')
+        break
+    if rolled.endswith(me):
+        print('\n  I win!')
+        break
+    time.sleep(1)    # For dramatic effect
+===
+V first = random:choice([1B, 0B])
+
+V you = ‘’
+V me = ‘’
+V ht = ‘HT’
+I first
+   me = random:sample(Array(‘HT’ * 3), 3).join(‘’)
+   print(‘I choose first and will win on first seeing #. in the list of tosses’.format(me))
+   L you.len != 3 | any(you.map(ch -> ch !C :ht)) | you == me
+      you = input(‘What sequence of three Heads/Tails will you win with: ’)
+E
+   L you.len != 3 | any(you.map(ch -> ch !C :ht))
+      you = input(‘After you: What sequence of three Heads/Tails will you win with: ’)
+   me = (I you[1] == ‘T’ {‘H’} E ‘T’)‘’you[0.<2]
+   print(‘I win on first seeing #. in the list of tosses’.format(me))
+
+print("Rolling:\n  ", end' ‘’)
+V rolled = ‘’
+L
+   rolled ‘’= random:choice(‘HT’)
+   print(rolled.last, end' ‘’)
+   I rolled.ends_with(you)
+      print("\n  You win!")
+      L.break
+   I rolled.ends_with(me)
+      print("\n  I win!")
+      L.break
+   sleep(1)
+===
+auto first = randomns::choice(create_array({true, false}));
+
+auto you = u""_S;
+auto me = u""_S;
+auto ht = u"HT"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        if (first) {
+            me = randomns::sample(create_array(u"HT"_S * 3), 3).join(u""_S);
+            print(u"I choose first and will win on first seeing #. in the list of tosses"_S.format(me));
+            while (you.len() != 3 || any_map(you, [](const auto &ch){return !in(ch, ::ht);}) || you == me)
+                you = input(u"What sequence of three Heads/Tails will you win with: "_S);
+        }
+        else {
+            while (you.len() != 3 || any_map(you, [](const auto &ch){return !in(ch, ::ht);}))
+                you = input(u"After you: What sequence of three Heads/Tails will you win with: "_S);
+            me = (_get<1>(you) == u'T' ? u"H"_S : u"T"_S) & you[range_el(0, 2)];
+            print(u"I win on first seeing #. in the list of tosses"_S.format(me));
+        }
+
+        print(u"Rolling:\n  "_S, u""_S);
+    }
+} code_block_1;
+
+auto rolled = u""_S;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (true) {
+            rolled &= randomns::choice(u"HT"_S);
+            print(rolled.last(), u""_S);
+            if (rolled.ends_with(you)) {
+                print(u"\n  You win!"_S);
+                break;
+            }
+            if (rolled.ends_with(me)) {
+                print(u"\n  I win!"_S);
+                break;
+            }
+            sleep(1);
+        }
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Perceptron#Python
+from typing import List
+import random
+Char = str
+
+TRAINING_LENGTH = 2000
+
+class Perceptron:
+    c = .01
+    weights : List[float]
+
+    def __init__(self,n):
+        self.weights = [random.uniform(-1.0, 1.0) for _ in range(n)]
+
+    def feed_forward(self, inputs):
+        vars : List[float] = []
+        for i in range(len(inputs)):
+            vars.append(inputs[i] * self.weights[i])
+        return self.activate(sum(vars))
+
+    def activate(self, value):
+        return 1 if value > 0 else -1
+
+    def train(self, inputs, desired):
+        guess = self.feed_forward(inputs)
+        error = desired - guess
+        for i in range(len(inputs)):
+            self.weights[i] += self.c * error * inputs[i]
+
+class Trainer:
+    inputs : List[float]
+    answer : int
+
+    def __init__(self, x, y, a):
+        self.inputs = [x, y, 1.0]
+        self.answer = a
+
+def f(x):
+    return 2 * x + 1
+
+ptron = Perceptron(3)
+training : List[Trainer] = []
+for i in range(TRAINING_LENGTH):
+    x = random.uniform(-10.0, 10.0)
+    y = random.uniform(-10.0, 10.0)
+    answer = 1
+    if y < f(x): answer = -1
+    training.append(Trainer(x,y,answer))
+result : List[List[Char]] = []
+for y in range(-10,10):
+    temp : List[Char] = []
+    for x in range(-10,10):
+        if ptron.feed_forward([x,y,1]) == 1:
+            temp.append(Char('^'))
+        else:
+            temp.append(Char('.'))
+    result.append(temp)
+
+print('Untrained')
+for row in result:
+    print(''.join(v for v in row))
+
+for t in training:
+    ptron.train(t.inputs, t.answer)
+
+result.clear()
+for y in range(-10,10):
+    temp : List[Char] = []
+    for x in range(-10,10):
+        if ptron.feed_forward([x,y,1]) == 1:
+            temp.append(Char('^'))
+        else:
+            temp.append(Char('.'))
+    result.append(temp)
+
+print('Trained')
+for row in result:
+    print(''.join(v for v in row))
+===
+V TRAINING_LENGTH = 2000
+
+T Perceptron
+   c = .01
+   [Float] weights
+
+   F (n)
+      .weights = (0 .< n).map(_ -> random:(-1.0 .. 1.0))
+
+   F feed_forward(inputs)
+      [Float] vars
+      L(i) 0 .< inputs.len
+         vars.append(inputs[i] * .weights[i])
+      R .activate(sum(vars))
+
+   F activate(value)
+      R I value > 0 {1} E -1
+
+   F train(inputs, desired)
+      V guess = .feed_forward(inputs)
+      V error = desired - guess
+      L(i) 0 .< inputs.len
+         .weights[i] += .c * error * inputs[i]
+
+T Trainer
+   [Float] inputs
+   Int answer
+
+   F (x, y, a)
+      .inputs = [x, y, 1.0]
+      .answer = a
+
+F f(x)
+   R 2 * x + 1
+
+V ptron = Perceptron(3)
+[Trainer] training
+L(i) 0 .< TRAINING_LENGTH
+   V x = random:(-10.0 .. 10.0)
+   V y = random:(-10.0 .. 10.0)
+   V answer = 1
+   I y < f(x)
+      answer = -1
+   training.append(Trainer(x, y, answer))
+[[Char]] result
+L(y) -10 .< 10
+   [Char] temp
+   L(x) -10 .< 10
+      I ptron.feed_forward([x, y, 1]) == 1
+         temp.append(Char(‘^’))
+      E
+         temp.append(Char(‘.’))
+   result.append(temp)
+
+print(‘Untrained’)
+L(row) result
+   print(row.join(‘’))
+
+L(t) training
+   ptron.train(t.inputs, t.answer)
+
+result.clear()
+L(y) -10 .< 10
+   [Char] temp
+   L(x) -10 .< 10
+      I ptron.feed_forward([x, y, 1]) == 1
+         temp.append(Char(‘^’))
+      E
+         temp.append(Char(‘.’))
+   result.append(temp)
+
+print(‘Trained’)
+L(row) result
+   print(row.join(‘’))
+===
+auto TRAINING_LENGTH = 2000;
+
+class Perceptron
+{
+public:
+    decltype(.01) c = .01;
+    Array<double> weights;
+
+    template <typename T1> Perceptron(const T1 &n)
+    {
+        weights = range_el(0, n).map([](const auto &_){return randomns::_(range_ee(-1.0, 1.0));});
+    }
+
+    template <typename T1> auto feed_forward(const T1 &inputs)
+    {
+        Array<double> vars;
+        for (auto i : range_el(0, inputs.len()))
+            vars.append(inputs[i] * weights[i]);
+        return activate(sum(vars));
+    }
+
+    template <typename T1> auto activate(const T1 &value)
+    {
+        return value > 0 ? 1 : -1;
+    }
+
+    template <typename T1, typename T2> auto train(const T1 &inputs, const T2 &desired)
+    {
+        auto guess = feed_forward(inputs);
+        auto error = desired - guess;
+        for (auto i : range_el(0, inputs.len()))
+            weights[i] += c * error * inputs[i];
+    }
+};
+
+class Trainer
+{
+public:
+    Array<double> inputs;
+    int answer;
+
+    template <typename T1, typename T2, typename T3> Trainer(const T1 &x, const T2 &y, const T3 &a) :
+        answer(a)
+    {
+        inputs = create_array({x, y, 1.0});
+    }
+};
+
+template <typename T1> auto f(const T1 &x)
+{
+    return 2 * x + 1;
+}
+
+auto ptron = Perceptron(3);
+Array<Trainer> training;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(0, TRAINING_LENGTH)) {
+            auto x = randomns::_(range_ee(-10.0, 10.0));
+            auto y = randomns::_(range_ee(-10.0, 10.0));
+            auto answer = 1;
+            if (y < f(x))
+                answer = -1;
+            training.append(Trainer(x, y, answer));
+        }
+    }
+} code_block_1;
+
+Array<Array<Char>> result;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto y : range_el(-10, 10)) {
+            Array<Char> temp;
+            for (auto x : range_el(-10, 10))
+                if (ptron.feed_forward(create_array({x, y, 1})) == 1)
+                    temp.append(u'^'_C);
+                else
+                    temp.append(u'.'_C);
+            result.append(temp);
+        }
+
+        print(u"Untrained"_S);
+        for (auto &&row : result)
+            print(row.join(u""_S));
+
+        for (auto &&t : training)
+            ptron.train(t.inputs, t.answer);
+
+        result.clear();
+        for (auto y : range_el(-10, 10)) {
+            Array<Char> temp;
+            for (auto x : range_el(-10, 10))
+                if (ptron.feed_forward(create_array({x, y, 1})) == 1)
+                    temp.append(u'^'_C);
+                else
+                    temp.append(u'.'_C);
+            result.append(temp);
+        }
+
+        print(u"Trained"_S);
+        for (auto &&row : result)
+            print(row.join(u""_S));
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Percolation/Bond_percolation#Python
+from typing import NamedTuple, List, Tuple, Optional, Dict
+UInt32 = int
+
+seed : UInt32 = 0
+def nonrandom():
+    global seed
+    seed = (1664525 * seed + 1013904223) & 0xFFFF_FFFF
+    return (seed >> 16) / float(0xFFFF)
+
+class Grid(NamedTuple):
+    cell : List[List[int]]
+    hwall : List[List[int]]
+    vwall : List[List[int]]
+
+(M, nn, t) = (10, 10, 100)
+
+class PercolatedException(Exception):
+    t : Tuple[int, int]
+
+    def __init__(self, t):
+        self.t = t
+
+HVF = ([' .', ' _'], [':', '|'], [' ', '#'])  # Horiz, vert, fill chars
+
+def newgrid(p):
+    hwall = [[int(nonrandom() < p) for m in range(M)]
+             for n in range(nn+1)]
+    vwall = [[(1 if m in (0, M) else int(nonrandom() < p)) for m in range(M+1)]
+             for n in range(nn)]
+    cell = [[0 for m in range(M)]
+             for n in range(nn)]
+    return Grid(cell, hwall, vwall)
+
+def pgrid(grid, percolated):
+    (cell, hwall, vwall) = grid
+    (h, v, f) = HVF
+    for n in range(nn):
+        print('    ' + ''.join(h[hwall[n][m]] for m in range(M)))
+        print('%i)  ' % (n % 10) + ''.join(v[vwall[n][m]] + '' + f[cell[n][m] if m < M else 0]
+                                          for m in range(M+1))[:-1])
+    n = nn
+    print('    ' + ''.join(h[hwall[n][m]] for m in range(M)))
+    if percolated != (-1, -1):
+        where = percolated[0]
+        print('!)  ' + '  ' * where + ' ' + f[1])
+
+def flood_fill(m, n, cell : list, hwall, vwall) -> None:
+    # fill cell
+    cell[n][m] = 1
+    # bottom
+    if n < nn - 1 and not hwall[n + 1][m] and not cell[n+1][m]:
+        flood_fill(m, n+1, cell, hwall, vwall)
+    # THE bottom
+    elif n == nn - 1 and not hwall[n + 1][m]:
+        raise PercolatedException((m, n+1))
+    # left
+    if m and not vwall[n][m] and not cell[n][m - 1]:
+        flood_fill(m-1, n, cell, hwall, vwall)
+    # right
+    if m < M - 1 and not vwall[n][m + 1] and not cell[n][m + 1]:
+        flood_fill(m+1, n, cell, hwall, vwall)
+    # top
+    if n != 0 and not hwall[n][m] and not cell[n-1][m]:
+        flood_fill(m, n-1, cell, hwall, vwall)
+
+def pour_on_top(grid : "Grid") -> Optional[Tuple[int, int]]:
+    n = 0
+    try:
+        for m in range(M):
+            if grid.hwall[n][m] == 0:
+                flood_fill(m, n, grid.cell, grid.hwall, grid.vwall)
+    except PercolatedException as ex:
+        return ex.t
+    return None
+
+sample_printed = False
+pcount : Dict[float, int] = {}
+for p10 in range(11):
+    p = (10 - p10) / 10.0    # count down so sample print is interesting
+    pcount[p] = 0
+    for tries in range(t):
+        grid = newgrid(p)
+        percolated : Optional[Tuple[int, int]] = pour_on_top(grid)
+        if percolated is not None:
+            pcount[p] += 1
+            if not sample_printed:
+                print('\nSample percolating %i x %i grid' % (M, nn))
+                pgrid(grid, percolated if percolated is not None else (-1, -1))
+                sample_printed = True
+print('\n p: Fraction of %i tries that percolate through' % t )
+
+for p, c in sorted(pcount.items()):
+    print('%.1f: %s' % (p, c/float(t)))
+===
+UInt32 seed = 0
+F nonrandom()
+   :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
+   R (:seed >> 16) / Float(FF'FF)
+
+T Grid
+   [[Int]] cell
+   [[Int]] hwall
+   [[Int]] vwall
+   F (cell, hwall, vwall)
+      .cell = cell
+      .hwall = hwall
+      .vwall = vwall
+
+V (M, nn, t) = (10, 10, 100)
+
+T PercolatedException
+   (Int, Int) t
+
+   F (t)
+      .t = t
+
+V HVF = ([‘ .’, ‘ _’], [‘:’, ‘|’], [‘ ’, ‘#’])
+
+F newgrid(p)
+   V hwall = (0 .. :nn).map(n -> (0 .< :M).map(m -> Int(nonrandom() < @@p)))
+   V vwall = (0 .< :nn).map(n -> (0 .. :M).map(m -> (I m C (0, :M) {1} E Int(nonrandom() < @@p))))
+   V cell = (0 .< :nn).map(n -> (0 .< :M).map(m -> 0))
+   R Grid(cell, hwall, vwall)
+
+F pgrid(grid, percolated)
+   V (cell, hwall, vwall) = grid
+   V (h, v, f) = :HVF
+   L(n) 0 .< :nn
+      print(‘    ’(0 .< :M).map(m -> @h[@hwall[@n][m]]).join(‘’))
+      print(‘#.)  ’.format(n % 10)‘’(0 .. :M).map(m -> @v[@vwall[@n][m]]‘’@f[I m < :M {@cell[@n][m]} E 0]).join(‘’)[0 .< (len)-1])
+   V n = :nn
+   print(‘    ’(0 .< :M).map(m -> @h[@hwall[@n][m]]).join(‘’))
+   I percolated != (-1, -1)
+      V where = percolated[0]
+      print(‘!)  ’(‘  ’ * where)‘ ’f[1])
+
+F flood_fill(m, n, &cell, hwall, vwall) -> N
+   cell[n][m] = 1
+   I n < :nn - 1 & !hwall[n + 1][m] & !cell[n + 1][m]
+      flood_fill(m, n + 1, &cell, hwall, vwall)
+   E I n == :nn - 1 & !hwall[n + 1][m]
+      X PercolatedException((m, n + 1))
+   I m & !vwall[n][m] & !cell[n][m - 1]
+      flood_fill(m - 1, n, &cell, hwall, vwall)
+   I m < :M - 1 & !vwall[n][m + 1] & !cell[n][m + 1]
+      flood_fill(m + 1, n, &cell, hwall, vwall)
+   I n != 0 & !hwall[n][m] & !cell[n - 1][m]
+      flood_fill(m, n - 1, &cell, hwall, vwall)
+
+F pour_on_top(Grid &grid) -> (Int, Int)?
+   V n = 0
+   X.try
+      L(m) 0 .< :M
+         I grid.hwall[n][m] == 0
+            flood_fill(m, n, &grid.cell, grid.hwall, grid.vwall)
+   X.catch PercolatedException ex
+      R ex.t
+   R N
+
+V sample_printed = 0B
+[Float = Int] pcount
+L(p10) 11
+   V p = (10 - p10) / 10.0
+   pcount[p] = 0
+   L(tries) 0 .< t
+      V grid = newgrid(p)
+      (Int, Int)? percolated = pour_on_top(&grid)
+      I percolated != N
+         pcount[p]++
+         I !sample_printed
+            print("\nSample percolating #. x #. grid".format(M, nn))
+            pgrid(grid, percolated ? (-1, -1))
+            sample_printed = 1B
+print("\n p: Fraction of #. tries that percolate through".format(t))
+
+L(p, c) sorted(pcount.items())
+   print(‘#.1: #.’.format(p, c / Float(t)))
+===
+uint32_t seed = 0;
+auto nonrandom()
+{
+    ::seed = (1664525 * ::seed + 1013904223) & 0xFFFF'FFFF;
+    return (::seed >> 16) / to_float(0xFF'FF);
+}
+
+class Grid
+{
+public:
+    Array<Array<int>> cell;
+    Array<Array<int>> hwall;
+    Array<Array<int>> vwall;
+    template <typename T1, typename T2, typename T3> Grid(const T1 &cell, const T2 &hwall, const T3 &vwall) :
+        cell(cell),
+        hwall(hwall),
+        vwall(vwall)
+    {
+    }
+};
+
+auto [M, nn, t] = make_tuple(10, 10, 100);
+
+class PercolatedException
+{
+public:
+    ivec2 t;
+
+    template <typename T1> PercolatedException(const T1 &t) :
+        t(t)
+    {
+    }
+};
+
+auto HVF = make_tuple(create_array({u" ."_S, u" _"_S}), create_array({u':'_C, u'|'_C}), create_array({u' '_C, u'#'_C}));
+
+template <typename T1> auto newgrid(const T1 &p)
+{
+    auto hwall = range_ee(0, ::nn).map([&p](const auto &n){return range_el(0, ::M).map([&p](const auto &m){return to_int(nonrandom() < p);});});
+    auto vwall = range_el(0, ::nn).map([&p](const auto &n){return range_ee(0, ::M).map([&p](const auto &m){return (in(m, make_tuple(0, ::M)) ? 1 : to_int(nonrandom() < p));});});
+    auto cell = range_el(0, ::nn).map([](const auto &n){return range_el(0, ::M).map([](const auto &m){return 0;});});
+    return Grid(cell, hwall, vwall);
+}
+
+template <typename T1, typename T2> auto pgrid(const T1 &grid, const T2 &percolated)
+{
+    auto [cell, hwall, vwall] = grid;
+    auto [h, v, f] = ::HVF;
+    for (auto n : range_el(0, ::nn)) {
+        print(u"    "_S & range_el(0, ::M).map([&h, &hwall, &n](const auto &m){return h[hwall[n][m]];}).join(u""_S));
+        print(u"#.)  "_S.format(mod(n, 10)) & range_ee(0, ::M).map([&cell, &f, &n, &v, &vwall](const auto &m){return v[vwall[n][m]] & f[m < ::M ? cell[n][m] : 0];}).join(u""_S)[range_e_llen(0,  - 1)]);
+    }
+    auto n = ::nn;
+    print(u"    "_S & range_el(0, ::M).map([&h, &hwall, &n](const auto &m){return h[hwall[n][m]];}).join(u""_S));
+    if (percolated != make_tuple(-1, -1)) {
+        auto where = _get<0>(percolated);
+        print(u"!)  "_S & (u"  "_S * where) & u" "_S & _get<1>(f));
+    }
+}
+
+template <typename T1, typename T2, typename T3, typename T4, typename T5> void flood_fill(const T1 &m, const T2 &n, T3 &cell, const T4 &hwall, const T5 &vwall)
+{
+    cell[n].set(m, 1);
+    if (n < ::nn - 1 && !hwall[n + 1][m] && !cell[n + 1][m])
+        flood_fill(m, n + 1, cell, hwall, vwall);
+    else if (n == ::nn - 1 && !hwall[n + 1][m])
+        throw PercolatedException(make_tuple(m, n + 1));
+    if (m && !vwall[n][m] && !cell[n][m - 1])
+        flood_fill(m - 1, n, cell, hwall, vwall);
+    if (m < ::M - 1 && !vwall[n][m + 1] && !cell[n][m + 1])
+        flood_fill(m + 1, n, cell, hwall, vwall);
+    if (n != 0 && !hwall[n][m] && !cell[n - 1][m])
+        flood_fill(m, n - 1, cell, hwall, vwall);
+}
+
+Nullable<ivec2> pour_on_top(Grid &grid)
+{
+    auto n = 0;
+    try
+    {
+        for (auto m : range_el(0, ::M))
+            if (grid.hwall[n][m] == 0)
+                flood_fill(m, n, grid.cell, grid.hwall, grid.vwall);
+    }
+    catch (const PercolatedException& ex)
+    {
+        return ex.t;
+    }
+    return nullptr;
+}
+
+auto sample_printed = false;
+Dict<double, int> pcount;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int p10 = 0; p10 < 11; p10++) {
+            auto p = (10 - p10) / 10.0;
+            pcount.set(p, 0);
+            for (auto tries : range_el(0, t)) {
+                auto grid = newgrid(p);
+                Nullable<ivec2> percolated = pour_on_top(grid);
+                if (percolated != nullptr) {
+                    pcount[p]++;
+                    if (!sample_printed) {
+                        print(u"\nSample percolating #. x #. grid"_S.format(M, nn));
+                        pgrid(grid, [&]{auto R = percolated; return R != nullptr ? *R : make_tuple(-1, -1);}());
+                        sample_printed = true;
+                    }
+                }
+            }
+        }
+        print(u"\n p: Fraction of #. tries that percolate through"_S.format(t));
+
+        for (auto &&[p, c] : sorted(pcount.items()))
+            print(u"#.1: #."_S.format(p, c / to_float(t)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Percolation/Mean_run_density#Python
+UInt32 = int
+
+seed : UInt32 = 0
+def nonrandom():
+    global seed
+    seed = (1664525 * seed + 1013904223) & 0xFFFF_FFFF
+    return (seed >> 16) / float(0xFFFF)
+
+(p, t) = (0.5, 500)
+
+def newv(n, p):
+    return [int(nonrandom() < p) for i in range(n)]
+
+def runs(v):
+    return sum((a & ~b) for a, b in zip(v, v[1:] + [0]))
+
+def mean_run_density(n, p):
+    return runs(newv(n, p)) / float(n)
+
+for p10 in range(1, 10, 2):
+    p = p10 / 10
+    limit = p * (1 - p)
+    print('')
+    for n2 in range(10, 16, 2):
+        n = 2**n2
+        sim = sum(mean_run_density(n, p) for i in range(t)) / t
+        print('t=%3i p=%4.2f n=%5i p(1-p)=%5.3f sim=%5.3f delta=%3.1f%%'
+              % (t, p, n, limit, sim, abs(sim - limit) / limit * 100 if limit else sim * 100))
+===
+UInt32 seed = 0
+F nonrandom()
+   :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
+   R (:seed >> 16) / Float(FF'FF)
+
+V (p, t) = (0.5, 500)
+
+F newv(n, p)
+   R (0 .< n).map(i -> Int(nonrandom() < @p))
+
+F runs(v)
+   R sum(zip(v, v[1..] [+] [0]).map((a, b) -> (a [&] (-)b)))
+
+F mean_run_density(n, p)
+   R runs(newv(n, p)) / Float(n)
+
+L(p10) (1.<10).step(2)
+   p = p10 / 10
+   V limit = p * (1 - p)
+   print(‘’)
+   L(n2) (10.<16).step(2)
+      V n = 2 ^ n2
+      V sim = sum((0 .< t).map(i -> mean_run_density(@n, :p))) / t
+      print(‘t=#3 p=#.2 n=#5 p(1-p)=#.3 sim=#.3 delta=#.1%’.format(t, p, n, limit, sim, I limit {abs(sim - limit) / limit * 100} E sim * 100))
+===
+uint32_t seed = 0;
+auto nonrandom()
+{
+    ::seed = (1664525 * ::seed + 1013904223) & 0xFFFF'FFFF;
+    return (::seed >> 16) / to_float(0xFF'FF);
+}
+
+auto [p, t] = make_tuple(0.5, 500);
+
+template <typename T1, typename T2> auto newv(const T1 &n, const T2 &p)
+{
+    return range_el(0, n).map([&p](const auto &i){return to_int(nonrandom() < p);});
+}
+
+template <typename T1> auto runs(const T1 &v)
+{
+    return sum_map(zip(v, v[range_ei(1)] + create_array({0})), [](const auto &a, const auto &b){return (a & ~b);});
+}
+
+template <typename T1, typename T2> auto mean_run_density(const T1 &n, const T2 &p)
+{
+    return runs(newv(n, p)) / to_float(n);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto p10 : range_el(1, 10).step(2)) {
+            p = p10 / 10.0;
+            auto limit = p * (1 - p);
+            print(u""_S);
+            for (auto n2 : range_el(10, 16).step(2)) {
+                auto n = pow(2, n2);
+                auto sim = sum_map(range_el(0, t), [&n](const auto &i){return mean_run_density(n, ::p);}) / t;
+                print(u"t=#3 p=#.2 n=#5 p(1-p)=#.3 sim=#.3 delta=#.1%"_S.format(t, p, n, limit, sim, limit ? abs(sim - limit) / limit * 100 : sim * 100));
+            }
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Percolation/Site_percolation#Python
+from typing import Tuple, Optional, Dict
+UInt32 = int
+
+seed : UInt32 = 0
+def nonrandom():
+    global seed
+    seed = (1664525 * seed + 1013904223) & 0xFFFF_FFFF
+    return (seed >> 16) / float(0xFFFF)
+
+(M, nn, t) = (15, 15, 100)
+
+cell2char = ' #abcdefghijklmnopqrstuvwxyz'
+NOT_VISITED = 1     # filled cell not walked
+
+class PercolatedException(Exception):
+    t : Tuple[int, int]
+
+    def __init__(self, t):
+        self.t = t
+
+def newgrid(p):
+    return [[int(nonrandom() < p) for m in range(M)] for n in range(nn)] # cell
+
+def pgrid(cell, percolated):
+    for n in range(nn):
+        print( '%i)  ' % (n % 10)
+               + ' '.join(cell2char[cell[n][m]] for m in range(M)))
+    if percolated != (-1, -1):
+        where = percolated[0]
+        print('!)  ' + '  ' * where + cell2char[cell[nn - 1][where]])
+
+def walk_maze(m, n, cell : list, indx) -> None:
+    # fill cell
+    cell[n][m] = indx
+    # down
+    if n < nn - 1 and cell[n+1][m] == NOT_VISITED:
+        walk_maze(m, n+1, cell, indx)
+    # THE bottom
+    elif n == nn - 1:
+        raise PercolatedException((m, indx))
+    # left
+    if m and cell[n][m - 1] == NOT_VISITED:
+        walk_maze(m-1, n, cell, indx)
+    # right
+    if m < M - 1 and cell[n][m + 1] == NOT_VISITED:
+        walk_maze(m+1, n, cell, indx)
+    # up
+    if n and cell[n-1][m] == NOT_VISITED:
+        walk_maze(m, n-1, cell, indx)
+
+def check_from_top(cell : list) -> Optional[Tuple[int, int]]:
+    (n, walk_index) = (0, 1)
+    try:
+        for m in range(M):
+            if cell[n][m] == NOT_VISITED:
+                walk_index += 1
+                walk_maze(m, n, cell, walk_index)
+    except PercolatedException as ex:
+        return ex.t
+    return None
+
+sample_printed = False
+pcount : Dict[float, int] = {}
+for p10 in range(11):
+    p = p10 / 10.0
+    pcount[p] = 0
+    for tries in range(t):
+        cell = newgrid(p)
+        percolated : Optional[Tuple[int, int]] = check_from_top(cell)
+        if percolated is not None:
+            pcount[p] += 1
+            if not sample_printed:
+                print('\nSample percolating %i x %i, p = %5.2f grid\n' % (M, nn, p))
+                pgrid(cell, percolated)
+                sample_printed = True
+print('\n p: Fraction of %i tries that percolate through\n' % t )
+
+for p, c in sorted(pcount.items()):
+    print('%.1f: %s' % (p, c/float(t)))
+===
+UInt32 seed = 0
+F nonrandom()
+   :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
+   R (:seed >> 16) / Float(FF'FF)
+
+V (M, nn, t) = (15, 15, 100)
+
+V cell2char = ‘ #abcdefghijklmnopqrstuvwxyz’
+V NOT_VISITED = 1
+
+T PercolatedException
+   (Int, Int) t
+
+   F (t)
+      .t = t
+
+F newgrid(p)
+   R (0 .< :nn).map(n -> (0 .< :M).map(m -> Int(nonrandom() < @@p)))
+
+F pgrid(cell, percolated)
+   L(n) 0 .< :nn
+      print(‘#.)  ’.format(n % 10)‘’(0 .< :M).map(m -> :cell2char[@cell[@n][m]]).join(‘ ’))
+   I percolated != (-1, -1)
+      V where = percolated[0]
+      print(‘!)  ’(‘  ’ * where)‘’:cell2char[cell[:nn - 1][where]])
+
+F walk_maze(m, n, &cell, indx) -> N
+   cell[n][m] = indx
+   I n < :nn - 1 & cell[n + 1][m] == :NOT_VISITED
+      walk_maze(m, n + 1, &cell, indx)
+   E I n == :nn - 1
+      X PercolatedException((m, indx))
+   I m & cell[n][m - 1] == :NOT_VISITED
+      walk_maze(m - 1, n, &cell, indx)
+   I m < :M - 1 & cell[n][m + 1] == :NOT_VISITED
+      walk_maze(m + 1, n, &cell, indx)
+   I n & cell[n - 1][m] == :NOT_VISITED
+      walk_maze(m, n - 1, &cell, indx)
+
+F check_from_top(&cell) -> (Int, Int)?
+   V (n, walk_index) = (0, 1)
+   X.try
+      L(m) 0 .< :M
+         I cell[n][m] == :NOT_VISITED
+            walk_index++
+            walk_maze(m, n, &cell, walk_index)
+   X.catch PercolatedException ex
+      R ex.t
+   R N
+
+V sample_printed = 0B
+[Float = Int] pcount
+L(p10) 11
+   V p = p10 / 10.0
+   pcount[p] = 0
+   L(tries) 0 .< t
+      V cell = newgrid(p)
+      (Int, Int)? percolated = check_from_top(&cell)
+      I percolated != N
+         pcount[p]++
+         I !sample_printed
+            print("\nSample percolating #. x #., p = #2.2 grid\n".format(M, nn, p))
+            pgrid(cell, percolated)
+            sample_printed = 1B
+print("\n p: Fraction of #. tries that percolate through\n".format(t))
+
+L(p, c) sorted(pcount.items())
+   print(‘#.1: #.’.format(p, c / Float(t)))
+===
+uint32_t seed = 0;
+auto nonrandom()
+{
+    ::seed = (1664525 * ::seed + 1013904223) & 0xFFFF'FFFF;
+    return (::seed >> 16) / to_float(0xFF'FF);
+}
+
+auto [M, nn, t] = make_tuple(15, 15, 100);
+
+auto cell2char = u" #abcdefghijklmnopqrstuvwxyz"_S;
+auto NOT_VISITED = 1;
+
+class PercolatedException
+{
+public:
+    ivec2 t;
+
+    template <typename T1> PercolatedException(const T1 &t) :
+        t(t)
+    {
+    }
+};
+
+template <typename T1> auto newgrid(const T1 &p)
+{
+    return range_el(0, ::nn).map([&p](const auto &n){return range_el(0, ::M).map([&p](const auto &m){return to_int(nonrandom() < p);});});
+}
+
+template <typename T1, typename T2> auto pgrid(const T1 &cell, const T2 &percolated)
+{
+    for (auto n : range_el(0, ::nn))
+        print(u"#.)  "_S.format(mod(n, 10)) & range_el(0, ::M).map([&cell, &n](const auto &m){return ::cell2char[cell[n][m]];}).join(u" "_S));
+    if (percolated != make_tuple(-1, -1)) {
+        auto where = _get<0>(percolated);
+        print(u"!)  "_S & (u"  "_S * where) & ::cell2char[cell[::nn - 1][where]]);
+    }
+}
+
+template <typename T1, typename T2, typename T3, typename T4> void walk_maze(const T1 &m, const T2 &n, T3 &cell, const T4 &indx)
+{
+    cell[n].set(m, indx);
+    if (n < ::nn - 1 && cell[n + 1][m] == ::NOT_VISITED)
+        walk_maze(m, n + 1, cell, indx);
+    else if (n == ::nn - 1)
+        throw PercolatedException(make_tuple(m, indx));
+    if (m && cell[n][m - 1] == ::NOT_VISITED)
+        walk_maze(m - 1, n, cell, indx);
+    if (m < ::M - 1 && cell[n][m + 1] == ::NOT_VISITED)
+        walk_maze(m + 1, n, cell, indx);
+    if (n && cell[n - 1][m] == ::NOT_VISITED)
+        walk_maze(m, n - 1, cell, indx);
+}
+
+template <typename T1> Nullable<ivec2> check_from_top(T1 &cell)
+{
+    auto [n, walk_index] = make_tuple(0, 1);
+    try
+    {
+        for (auto m : range_el(0, ::M))
+            if (cell[n][m] == ::NOT_VISITED) {
+                walk_index++;
+                walk_maze(m, n, cell, walk_index);
+            }
+    }
+    catch (const PercolatedException& ex)
+    {
+        return ex.t;
+    }
+    return nullptr;
+}
+
+auto sample_printed = false;
+Dict<double, int> pcount;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int p10 = 0; p10 < 11; p10++) {
+            auto p = p10 / 10.0;
+            pcount.set(p, 0);
+            for (auto tries : range_el(0, t)) {
+                auto cell = newgrid(p);
+                Nullable<ivec2> percolated = check_from_top(cell);
+                if (percolated != nullptr) {
+                    pcount[p]++;
+                    if (!sample_printed) {
+                        print(u"\nSample percolating #. x #., p = #2.2 grid\n"_S.format(M, nn, p));
+                        pgrid(cell, *percolated);
+                        sample_printed = true;
+                    }
+                }
+            }
+        }
+        print(u"\n p: Fraction of #. tries that percolate through\n"_S.format(t));
+
+        for (auto &&[p, c] : sorted(pcount.items()))
+            print(u"#.1: #."_S.format(p, c / to_float(t)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Percolation/Mean_cluster_density#Nim
+UInt32 = int
+
+seed : UInt32 = 0
+def nonrandom():
+    global seed
+    seed = (1664525 * seed + 1013904223) & 0xFFFF_FFFF
+    return (seed >> 16) / float(0xFFFF)
+
+nn = 15
+tt = 5
+pp = 0.5
+NotClustered = 1
+Cell2Char = " #abcdefghijklmnopqrstuvwxyz"
+NRange = [4, 64, 256, 1024, 4096]
+
+def newGrid(n, p):
+    return [[int(nonrandom() < p) for i in range(n)] for i in range(n)]
+
+def walkMaze(grid : list, m, n, idx) -> None:
+    grid[n][m] = idx
+    if n < len(grid) - 1 and grid[n + 1][m] == NotClustered:
+        walkMaze(grid, m, n + 1, idx)
+    if m < len(grid[0]) - 1 and grid[n][m + 1] == NotClustered:
+        walkMaze(grid, m + 1, n, idx)
+    if m > 0 and grid[n][m - 1] == NotClustered:
+        walkMaze(grid, m - 1, n, idx)
+    if n > 0 and grid[n - 1][m] == NotClustered:
+        walkMaze(grid, m, n - 1, idx)
+
+def clusterCount(grid : list):
+    walkIndex = 1
+    for n in range(len(grid)):
+        for m in range(len(grid[0])):
+            if grid[n][m] == NotClustered:
+                walkIndex += 1
+                walkMaze(grid, m, n, walkIndex)
+    return walkIndex - 1
+
+def clusterDensity(n, p):
+    grid = newGrid(n, p)
+    return clusterCount(grid) / float(n * n)
+
+def print_grid(grid):
+    for n, row in enumerate(grid):
+        print(n % 10, end = ') ')
+        for cell in row:
+            print('', Cell2Char[cell], end = '')
+        print()
+
+grid = newGrid(nn, 0.5)
+print('Found', clusterCount(grid), 'clusters in this', nn, 'by', nn, "grid\n")
+print_grid(grid)
+print()
+
+for n in NRange:
+    sum = 0.0
+    for _ in range(tt):
+        sum += clusterDensity(n, pp)
+    sim = sum / tt
+    print('t = %d  p = %4.2f  n = %4d  sim = %7.5f' % (tt, pp, n, sim))
+===
+UInt32 seed = 0
+F nonrandom()
+   :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
+   R (:seed >> 16) / Float(FF'FF)
+
+V nn = 15
+V tt = 5
+V pp = 0.5
+V NotClustered = 1
+V Cell2Char = ‘ #abcdefghijklmnopqrstuvwxyz’
+V NRange = [4, 64, 256, 1024, 4096]
+
+F newGrid(n, p)
+   R (0 .< n).map(i -> (0 .< @n).map(i -> Int(nonrandom() < @@p)))
+
+F walkMaze(&grid, m, n, idx) -> N
+   grid[n][m] = idx
+   I n < grid.len - 1 & grid[n + 1][m] == NotClustered
+      walkMaze(&grid, m, n + 1, idx)
+   I m < grid[0].len - 1 & grid[n][m + 1] == NotClustered
+      walkMaze(&grid, m + 1, n, idx)
+   I m > 0 & grid[n][m - 1] == NotClustered
+      walkMaze(&grid, m - 1, n, idx)
+   I n > 0 & grid[n - 1][m] == NotClustered
+      walkMaze(&grid, m, n - 1, idx)
+
+F clusterCount(&grid)
+   V walkIndex = 1
+   L(n) 0 .< grid.len
+      L(m) 0 .< grid[0].len
+         I grid[n][m] == NotClustered
+            walkIndex++
+            walkMaze(&grid, m, n, walkIndex)
+   R walkIndex - 1
+
+F clusterDensity(n, p)
+   V grid = newGrid(n, p)
+   R clusterCount(&grid) / Float(n * n)
+
+F print_grid(grid)
+   L(row) grid
+      V n = L.index
+      print(n % 10, end' ‘) ’)
+      L(cell) row
+         print(‘ ’Cell2Char[cell], end' ‘’)
+      print()
+
+V grid = newGrid(nn, 0.5)
+print(‘Found ’clusterCount(&grid)‘ clusters in this ’nn‘ by ’nn" grid\n")
+print_grid(grid)
+print()
+
+L(n) NRange
+   V sum = 0.0
+   L(_) 0 .< tt
+      sum += clusterDensity(n, pp)
+   V sim = sum / tt
+   print(‘t = #.  p = #.2  n = #4  sim = #.5’.format(tt, pp, n, sim))
+===
+uint32_t seed = 0;
+auto nonrandom()
+{
+    ::seed = (1664525 * ::seed + 1013904223) & 0xFFFF'FFFF;
+    return (::seed >> 16) / to_float(0xFF'FF);
+}
+
+auto nn = 15;
+auto tt = 5;
+auto pp = 0.5;
+auto NotClustered = 1;
+auto Cell2Char = u" #abcdefghijklmnopqrstuvwxyz"_S;
+auto NRange = create_array({4, 64, 256, 1024, 4096});
+
+template <typename T1, typename T2> auto newGrid(const T1 &n, const T2 &p)
+{
+    return range_el(0, n).map([&n, &p](const auto &i){return range_el(0, n).map([&p](const auto &i){return to_int(nonrandom() < p);});});
+}
+
+template <typename T1, typename T2, typename T3, typename T4> void walkMaze(T1 &grid, const T2 &m, const T3 &n, const T4 &idx)
+{
+    grid[n].set(m, idx);
+    if (n < grid.len() - 1 && grid[n + 1][m] == NotClustered)
+        walkMaze(grid, m, n + 1, idx);
+    if (m < _get<0>(grid).len() - 1 && grid[n][m + 1] == NotClustered)
+        walkMaze(grid, m + 1, n, idx);
+    if (m > 0 && grid[n][m - 1] == NotClustered)
+        walkMaze(grid, m - 1, n, idx);
+    if (n > 0 && grid[n - 1][m] == NotClustered)
+        walkMaze(grid, m, n - 1, idx);
+}
+
+template <typename T1> auto clusterCount(T1 &grid)
+{
+    auto walkIndex = 1;
+    for (auto n : range_el(0, grid.len()))
+        for (auto m : range_el(0, _get<0>(grid).len()))
+            if (grid[n][m] == NotClustered) {
+                walkIndex++;
+                walkMaze(grid, m, n, walkIndex);
+            }
+    return walkIndex - 1;
+}
+
+template <typename T1, typename T2> auto clusterDensity(const T1 &n, const T2 &p)
+{
+    auto grid = newGrid(n, p);
+    return clusterCount(grid) / to_float(n * n);
+}
+
+template <typename T1> auto print_grid(const T1 &grid)
+{
+    {int Lindex = 0;
+    for (auto &&row : grid) {
+        auto n = Lindex;
+        print(mod(n, 10), u") "_S);
+        for (auto &&cell : row)
+            print(u" "_S & Cell2Char[cell], u""_S);
+        print();
+        Lindex++;
+    }}
+}
+
+auto grid = newGrid(nn, 0.5);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Found "_S & clusterCount(grid) & u" clusters in this "_S & nn & u" by "_S & nn & u" grid\n"_S);
+        print_grid(grid);
+        print();
+
+        for (auto &&n : NRange) {
+            auto sum = 0.0;
+            for (auto _ : range_el(0, tt))
+                sum += clusterDensity(n, pp);
+            auto sim = sum / tt;
+            print(u"t = #.  p = #.2  n = #4  sim = #.5"_S.format(tt, pp, n, sim));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Permutations/Rank_of_a_permutation#Nim
+import math
+UInt32 = int
+
+seed : UInt32 = 0
+def nonrandom():
+    global seed
+    seed = (1664525 * seed + 1013904223) & 0xFFFF_FFFF
+    return (seed >> 16) / float(0xFFFF)
+
+def mrUnrank1(vec : list, rank, n):
+    if n < 1: return
+    (q, r) = divmod(rank, n)
+    (vec[r], vec[n - 1]) = (vec[n - 1], vec[r])
+    mrUnrank1(vec, q, n - 1)
+
+def mrRank1(vec : list, inv : list, n):
+    if n < 2: return 0
+    s = vec[n - 1]
+    (vec[n - 1], vec[inv[n - 1]]) = (vec[inv[n - 1]], vec[n - 1])
+    (inv[s], inv[n - 1]) = (inv[n - 1], inv[s])
+    return s + n * mrRank1(vec, inv, n - 1)
+
+def getPermutation(vec : list, rank):
+    for i in range(len(vec)): vec[i] = i
+    mrUnrank1(vec, rank, len(vec))
+
+def getRank(vec):
+    v = [0] * len(vec)
+    inv = [0] * len(vec)
+    for i, val in enumerate(vec):
+        v[i] = val
+        inv[val] = i
+    return mrRank1(v, inv, len(vec))
+
+tv3 = [0] * 3
+for r in range(6):
+    getPermutation(tv3, r)
+    print('%2d -> %s -> %d' % (r, tv3, getRank(tv3)))
+
+print()
+tv4 = [0] * 4
+for r in range(24):
+    getPermutation(tv4, r)
+    print('%2d -> %s -> %d' % (r, tv4, getRank(tv4)))
+
+print()
+tv12 = [0] * 12
+for i in range(4):
+    r = int(nonrandom() * math.factorial(12))
+    getPermutation(tv12, r)
+    print('%9d -> %s -> %d' % (r, tv12, getRank(tv12)))
+===
+UInt32 seed = 0
+F nonrandom()
+   :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
+   R (:seed >> 16) / Float(FF'FF)
+
+F mrUnrank1(&vec, rank, n)
+   I n < 1
+      R
+   V (q, r) = divmod(rank, n)
+   swap(&vec[r], &vec[n - 1])
+   mrUnrank1(&vec, q, n - 1)
+
+F mrRank1(&vec, &inv, n)
+   I n < 2
+      R 0
+   V s = vec[n - 1]
+   swap(&vec[n - 1], &vec[inv[n - 1]])
+   swap(&inv[s], &inv[n - 1])
+   R s + n * mrRank1(&vec, &inv, n - 1)
+
+F getPermutation(&vec, rank)
+   L(i) 0 .< vec.len
+      vec[i] = i
+   mrUnrank1(&vec, rank, vec.len)
+
+F getRank(vec)
+   V v = [0] * vec.len
+   V inv = [0] * vec.len
+   L(val) vec
+      V i = L.index
+      v[i] = val
+      inv[val] = i
+   R mrRank1(&v, &inv, vec.len)
+
+V tv3 = [0] * 3
+L(r) 6
+   getPermutation(&tv3, r)
+   print(‘#2 -> #. -> #.’.format(r, tv3, getRank(tv3)))
+
+print()
+V tv4 = [0] * 4
+L(r) 24
+   getPermutation(&tv4, r)
+   print(‘#2 -> #. -> #.’.format(r, tv4, getRank(tv4)))
+
+print()
+V tv12 = [0] * 12
+L(i) 4
+   V r = Int(nonrandom() * factorial(12))
+   getPermutation(&tv12, r)
+   print(‘#9 -> #. -> #.’.format(r, tv12, getRank(tv12)))
+===
+uint32_t seed = 0;
+auto nonrandom()
+{
+    ::seed = (1664525 * ::seed + 1013904223) & 0xFFFF'FFFF;
+    return (::seed >> 16) / to_float(0xFF'FF);
+}
+
+template <typename T1, typename T2, typename T3> auto mrUnrank1(T1 &vec, const T2 &rank, const T3 &n)
+{
+    if (n < 1)
+        return;
+    auto [q, r] = divmod(rank, n);
+    swap(vec[r], vec[n - 1]);
+    mrUnrank1(vec, q, n - 1);
+}
+
+template <typename T1, typename T2, typename T3> auto mrRank1(T1 &vec, T2 &inv, const T3 &n)
+{
+    if (n < 2)
+        return 0;
+    auto s = vec[n - 1];
+    swap(vec[n - 1], vec[inv[n - 1]]);
+    swap(inv[s], inv[n - 1]);
+    return s + n * mrRank1(vec, inv, n - 1);
+}
+
+template <typename T1, typename T2> auto getPermutation(T1 &vec, const T2 &rank)
+{
+    for (auto i : range_el(0, vec.len()))
+        vec.set(i, i);
+    mrUnrank1(vec, rank, vec.len());
+}
+
+template <typename T1> auto getRank(const T1 &vec)
+{
+    auto v = create_array({0}) * vec.len();
+    auto inv = create_array({0}) * vec.len();
+    {int Lindex = 0;
+    for (auto &&val : vec) {
+        auto i = Lindex;
+        v.set(i, val);
+        inv.set(val, i);
+        Lindex++;
+    }}
+    return mrRank1(v, inv, vec.len());
+}
+
+auto tv3 = create_array({0}) * 3;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int r = 0; r < 6; r++) {
+            getPermutation(tv3, r);
+            print(u"#2 -> #. -> #."_S.format(r, tv3, getRank(tv3)));
+        }
+
+        print();
+    }
+} code_block_1;
+
+auto tv4 = create_array({0}) * 4;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (int r = 0; r < 24; r++) {
+            getPermutation(tv4, r);
+            print(u"#2 -> #. -> #."_S.format(r, tv4, getRank(tv4)));
+        }
+
+        print();
+    }
+} code_block_2;
+
+auto tv12 = create_array({0}) * 12;
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        for (int i = 0; i < 4; i++) {
+            auto r = to_int(nonrandom() * factorial(12));
+            getPermutation(tv12, r);
+            print(u"#9 -> #. -> #."_S.format(r, tv12, getRank(tv12)));
+        }
+    }
+} code_block_3;

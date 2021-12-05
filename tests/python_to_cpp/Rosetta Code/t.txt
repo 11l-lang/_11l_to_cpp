@@ -2495,7 +2495,7 @@ seed : UInt32 = 0
 def nonrandom(n):
     global seed
     seed = (1664525 * seed + 1013904223) & 0xFFFF_FFFF
-    return int(seed >> 16) % n
+    return (seed >> 16) % n
 
 cylinder = [False] * 6
 
@@ -2560,7 +2560,7 @@ for m in ["LSLSFSF", "LSLSFF", "LLSFSF", "LLSFF"]:
 UInt32 seed = 0
 F nonrandom(n)
    :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
-   R Int(:seed >> 16) % n
+   R (:seed >> 16) % n
 
 V cylinder = [0B] * 6
 
@@ -2626,7 +2626,7 @@ uint32_t seed = 0;
 template <typename T1> auto nonrandom(const T1 &n)
 {
     ::seed = (1664525 * ::seed + 1013904223) & 0xFFFF'FFFF;
-    return mod(to_int(::seed >> 16), n);
+    return mod((::seed >> 16), n);
 }
 
 auto cylinder = create_array({false}) * 6;

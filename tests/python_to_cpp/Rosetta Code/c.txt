@@ -2571,7 +2571,7 @@ seed : UInt32 = 0
 def nonrandom(n):
     global seed
     seed = (1664525 * seed + 1013904223) & 0xFFFF_FFFF
-    return int(seed >> 16) % n
+    return (seed >> 16) % n
 
 def rand9999():
     return nonrandom(9000) + 1000
@@ -2590,7 +2590,7 @@ print(table)
 UInt32 seed = 0
 F nonrandom(n)
    :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
-   R Int(:seed >> 16) % n
+   R (:seed >> 16) % n
 
 F rand9999()
    R nonrandom(9000) + 1000
@@ -2607,7 +2607,7 @@ uint32_t seed = 0;
 template <typename T1> auto nonrandom(const T1 &n)
 {
     ::seed = (1664525 * ::seed + 1013904223) & 0xFFFF'FFFF;
-    return mod(to_int(::seed >> 16), n);
+    return mod((::seed >> 16), n);
 }
 
 auto rand9999()

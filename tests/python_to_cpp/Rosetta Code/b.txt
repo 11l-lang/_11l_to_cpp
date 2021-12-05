@@ -1074,7 +1074,7 @@ seed : UInt32 = 0
 def nonrandom(n):
     global seed
     seed = (1664525 * seed + 1013904223) & 0xFFFF_FFFF
-    return int(seed >> 16) % n
+    return (seed >> 16) % n
 def nonrandom_choice(lst):
     return lst[nonrandom(len(lst))]
 
@@ -1132,7 +1132,7 @@ seq_pp(mseq)
 UInt32 seed = 0
 F nonrandom(n)
    :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
-   R Int(:seed >> 16) % n
+   R (:seed >> 16) % n
 F nonrandom_choice(lst)
    R lst[nonrandom(lst.len)]
 
@@ -1186,7 +1186,7 @@ uint32_t seed = 0;
 template <typename T1> auto nonrandom(const T1 &n)
 {
     ::seed = (1664525 * ::seed + 1013904223) & 0xFFFF'FFFF;
-    return mod(to_int(::seed >> 16), n);
+    return mod((::seed >> 16), n);
 }
 template <typename T1> auto nonrandom_choice(const T1 &lst)
 {
@@ -1282,7 +1282,7 @@ seed : UInt32 = 34
 def nonrandom_choice(lst):
     global seed
     seed = (1664525 * seed + 1013904223) & 0xFFFF_FFFF
-    return lst[int(seed >> 16) % len(lst)]
+    return lst[(seed >> 16) % len(lst)]
 
 def generate_sequence(n: int):
     return "".join([ nonrandom_choice(['A','C','G','T']) for _ in range(n) ])
@@ -1320,7 +1320,7 @@ dna_findall(sample_seq, dna_seq)
 UInt32 seed = 34
 F nonrandom_choice(lst)
    :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
-   R lst[Int(:seed >> 16) % lst.len]
+   R lst[(:seed >> 16) % lst.len]
 
 F generate_sequence(Int n)
    R ((0 .< n).map(_ -> nonrandom_choice([‘A’, ‘C’, ‘G’, ‘T’]))).join(‘’)
@@ -1360,7 +1360,7 @@ uint32_t seed = 34;
 template <typename T1> auto nonrandom_choice(const T1 &lst)
 {
     ::seed = (1664525 * ::seed + 1013904223) & 0xFFFF'FFFF;
-    return lst[mod(to_int(::seed >> 16), lst.len())];
+    return lst[mod((::seed >> 16), lst.len())];
 }
 
 auto generate_sequence(const int n)
