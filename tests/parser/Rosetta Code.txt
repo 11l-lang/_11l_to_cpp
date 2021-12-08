@@ -881,7 +881,7 @@ L(=line) File(‘data.csv’).read_lines()
    I L.index == 0
       line ‘’= ‘,SUM’
    E
-      line ‘’= ‘,’sum(line.split(‘,’).map(i -> Int(i)))
+      line ‘’= ‘,’sum(line.split(‘,’).map(Int))
    print(line)
 ===
 struct CodeBlock1
@@ -893,7 +893,7 @@ struct CodeBlock1
             if (Lindex == 0)
                 line &= u",SUM"_S;
             else
-                line &= u","_S & sum_map(line.split(u","_S), [](const auto &i){return to_int(i);});
+                line &= u","_S & sum_map(line.split(u","_S), [](const auto &x){return to_int(x);});
             print(line);
             Lindex++;
         }}

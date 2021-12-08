@@ -534,7 +534,10 @@ class SymbolNode:
                     func_name = func_name[:func_name.find('[')] + '<' + trans_type(c.to_type_str(), c.scope, c.token) + '>' # ]
                 elif func_name in ('sum', 'all', 'any', 'min', 'max') and self.children[2].function_call and self.children[2].children[0].symbol.id == '.' and self.children[2].children[0].children[1].token_str() == 'map':
                     assert(len(self.children) == 3)
-                    return func_name + '_map(' + self.children[2].children[0].children[0].to_str() + ', ' + self.children[2].children[2].to_str() + ')'
+                    c2 = self.children[2].children[2].to_str()
+                    if self.children[2].children[2].token.category == Token.Category.NAME and self.children[2].children[2].token_str()[0].isupper():
+                        c2 = '[](const auto &x){return ' + {'Int':'to_int', 'Int64':'to_int64', 'UInt64':'to_uint64', 'UInt32':'to_uint32', 'Float':'to_float'}.get(c2, c2) + '(x);}'
+                    return func_name + '_map(' + self.children[2].children[0].children[0].to_str() + ', ' + c2 + ')'
                 elif func_name in ('min', 'max') and len(self.children) == 5 and self.children[3] is not None and self.children[3].token_str() == "key'":
                     return func_name + '_with_key(' + self.children[2].to_str() + ', ' + self.children[4].to_str() + ')'
                 elif func_name == 'String' and len(self.children) == 5 and self.children[3] is not None and self.children[3].token_str() == "radix'":
