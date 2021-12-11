@@ -88,9 +88,10 @@ class Token:
         STRING_LITERAL = 6
         STRING_CONCATENATOR = 7 # special token inserted between adjacent string literal and some identifier
         FSTRING = 8
-        SCOPE_BEGIN = 9 # similar to ‘INDENT token in Python’[https://docs.python.org/3/reference/lexical_analysis.html][-1]
-        SCOPE_END   = 10 # similar to ‘DEDENT token in Python’[-1]
-        STATEMENT_SEPARATOR = 11
+        FSTRING_END = 9 # this is needed for syntax highlighting
+        SCOPE_BEGIN = 10 # similar to ‘INDENT token in Python’[https://docs.python.org/3/reference/lexical_analysis.html][-1]
+        SCOPE_END   = 11 # similar to ‘DEDENT token in Python’[-1]
+        STATEMENT_SEPARATOR = 12
 
     start : int
     end : int
@@ -371,7 +372,6 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
 
                 elif source[lexem_start:i+1] == 'f:': # this is a f-string
                     i += 1
-                    lexem_start = i
                     if source[i] in ('‘', "'"): # ’
                         while i < len(source) and source[i] == "'":
                             i += 1
@@ -408,8 +408,8 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                                 i += 1
                             elif ch == '"':
                                 break
-                    tokens.append(Token(lexem_start, i, Token.Category.FSTRING))
-                    j = lexem_start + 1
+                    tokens.append(Token(lexem_start, lexem_start + 3, Token.Category.FSTRING))
+                    j = lexem_start + 3
                     substr_start = j
                     while j < i - 1:
                         if source[j] == '{':
@@ -449,7 +449,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                         j += 1
                     if j > substr_start:
                         tokens.append(Token(substr_start, j, Token.Category.STRING_LITERAL))
-                    tokens.append(Token(i, i, Token.Category.STATEMENT_SEPARATOR))
+                    tokens.append(Token(j, i, Token.Category.FSTRING_END))
                     continue
 
                 else:

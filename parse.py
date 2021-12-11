@@ -480,7 +480,7 @@ class SymbolNode:
                     format_args += child.to_str()
                 i += 1
 
-            if source[self.token.start] == '"':
+            if source[self.token.start + 2] == '"':
                 nfmtstr = 'u"' + nfmtstr + '"_S'
             elif '\\' in nfmtstr or "\n" in nfmtstr:
                 delimiter = '' # (
@@ -2085,7 +2085,7 @@ def next_token(): # why ‘next_token’: >[https://youtu.be/Nlqv6NtBXcA?t=1203]
                 key = '(concat)'
             elif token.category == Token.Category.SCOPE_BEGIN:
                 key = '{' # }
-            elif token.category in (Token.Category.STATEMENT_SEPARATOR, Token.Category.SCOPE_END):
+            elif token.category in (Token.Category.STATEMENT_SEPARATOR, Token.Category.SCOPE_END, Token.Category.FSTRING_END):
                 key = ';'
             else:
                 key = token.value(source)
@@ -2395,7 +2395,7 @@ def nud(self):
 symbol('[').nud = nud # ]
 
 def nud(self):
-    while token.category != Token.Category.STATEMENT_SEPARATOR:
+    while token.category != Token.Category.FSTRING_END:
         if token.category == Token.Category.STRING_LITERAL:
             self.append_child(tokensn)
             next_token()
