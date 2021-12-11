@@ -3224,3 +3224,216 @@ struct CodeBlock1
         print(multiloop(u"ab"_S, u"12"_S, [](const auto &a, const auto &b){return a & b;}));
     }
 } code_block_1;
+
+
+# [https://www.rosettacode.org/wiki/Addition_chains#Python]
+n = 7
+best = [1, 2]
+print(f'L({n}) = {len(best)}')
+print(f'L({n}) = {len(best) - 1}')
+print(f'''L({n}) = {len(best) - 1}''')
+print(f'L({n}) = {len(best) - 1:2}')
+print(f"""L({n}) = {len(best) - 1:2}""")
+
+# [https://www.rosettacode.org/wiki/Bin_given_limits#Python]
+limits = [1]
+bins = [2]
+print(f"          < {limits[0]:3} := {bins[0]:3}")
+
+# [https://www.rosettacode.org/wiki/Bioinformatics/base_count#Python]
+(i, n, part) = (1, 2, 3)
+print(f"{i*n:>5}: {part}")
+print(f"{i*n:<5}: {part}")
+print(f"{i*n:>5}: {{part}}")
+print(f"{i*n:>5}: {{pa")
+print(f"{i*n:>5}: rt}}")
+print(f"{i*n:>5}: {{{part}}}")
+print(f"{i*n:>5}:\t{part}")
+print(f"{i*n}: {part}")
+print(f"{i*n}: {{part}}")
+print(f"{i*n}: {{pa")
+print(f"{i*n}: rt}}")
+print(f"{i*n}: {{{part}}}")
+print(f"{i*n}:\t{part}")
+print(f"{i*n}{str(part)}")
+
+# [https://www.rosettacode.org/wiki/Price_list_behind_API#Python]
+import random
+price_list_size = 100_000
+price_list = [random.randrange(100_000) for i in range(price_list_size)]
+def get_max_price():
+    return max(price_list)
+print(f"Using {price_list_size} random prices from 0 to {get_max_price()}")
+(mn, mx, count) = (1.1, 2.2, 3)
+print(f"  From {mn:8.1f} ... {mx:8.1f} with {count} items.")
+print("  From {:8.1f} ... {:8.1f} with {} items.".format(mn, mx, count))
+
+v = 0.5
+print(f'{v:16.14f}')
+#print(f'{v:16.14}')
+print('{:16.14f}'.format(v))
+print(f'{v:17.14f}')
+print('{:17.14f}'.format(v))
+print(f'{v:20.14f}')
+print('{:20.14f}'.format(v))
+print(f'{v:020.14f}')
+print(f'{v:16f}')
+print('{:16f}'.format(v))
+o = 1
+print(f'{o:03}')
+print('{:03}'.format(o))
+print(f'{f"{o:03}"}')
+print(f'{f"{o}":>3}')
+===
+V n = 7
+V best = [1, 2]
+print(‘L(’n‘) = ’best.len)
+print(‘L(’n‘) = ’(best.len - 1))
+print(‘L(’n‘) = ’(best.len - 1))
+print(f:‘L({n}) = {best.len - 1:2}’)
+print(f:‘L({n}) = {best.len - 1:2}’)
+
+V limits = [1]
+V bins = [2]
+print(f:‘          < {limits[0]:3} := {bins[0]:3}’)
+
+(V i, n, V part) = (1, 2, 3)
+print(f:‘{i * n:5}: {part}’)
+print(f:‘{i * n:<5}: {part}’)
+print(f:‘{i * n:5}: {{part}}’)
+print(f:‘{i * n:5}: {{pa’)
+print(f:‘{i * n:5}: rt}}’)
+print(f:‘{i * n:5}: {{{part}}}’)
+print(f:"{i * n:5}:\t{part}")
+print((i * n)‘: ’part)
+print((i * n)‘: {part}’)
+print((i * n)‘: {pa’)
+print((i * n)‘: rt}’)
+print((i * n)‘: {’part‘}’)
+print((i * n)":\t"part)
+print((i * n)‘’String(part))
+V price_list_size = 100'000
+V price_list = (0 .< price_list_size).map(i -> random:(100'000))
+F get_max_price()
+   R max(:price_list)
+print(‘Using ’price_list_size‘ random prices from 0 to ’get_max_price())
+V (mn, mx, count) = (1.1, 2.2, 3)
+print(f:‘  From {mn:8.1} ... {mx:8.1} with {count} items.’)
+print(‘  From #6.1 ... #6.1 with #. items.’.format(mn, mx, count))
+
+V v = 0.5
+print(f:‘{v:16.14}’)
+print(‘#.14’.format(v))
+print(f:‘{v:17.14}’)
+print(‘#2.14’.format(v))
+print(f:‘{v:20.14}’)
+print(‘#5.14’.format(v))
+print(f:‘{v:020.14}’)
+print(f:‘{v:16.6}’)
+print(‘#9.6’.format(v))
+V o = 1
+print(f:‘{o:03}’)
+print(‘#03’.format(o))
+print((f:‘{o:03}’))
+print(f:‘{o:3}’)
+===
+auto n = 7;
+auto best = create_array({1, 2});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"L("_S & n & u") = "_S & best.len());
+        print(u"L("_S & n & u") = "_S & (best.len() - 1));
+        print(u"L("_S & n & u") = "_S & (best.len() - 1));
+        print(u"L(#.) = #2"_S.format(n, best.len() - 1));
+        print(u"L(#.) = #2"_S.format(n, best.len() - 1));
+    }
+} code_block_1;
+
+auto limits = create_array({1});
+auto bins = create_array({2});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"          < #3 := #3"_S.format(_get<0>(limits), _get<0>(bins)));
+
+        TUPLE_ELEMENT_T(0, make_tuple(1, 2, 3)) i;
+        TUPLE_ELEMENT_T(2, make_tuple(1, 2, 3)) part;
+        assign_from_tuple(i, n, part, make_tuple(1, 2, 3));
+        print(u"#5: #."_S.format(i * n, part));
+        print(u"#<5: #."_S.format(i * n, part));
+        print(u"#5: {part}"_S.format(i * n));
+        print(u"#5: {pa"_S.format(i * n));
+        print(u"#5: rt}"_S.format(i * n));
+        print(u"#5: {#.}"_S.format(i * n, part));
+        print(u"#5:\t#."_S.format(i * n, part));
+        print((i * n) & u": "_S & part);
+        print((i * n) & u": {part}"_S);
+        print((i * n) & u": {pa"_S);
+        print((i * n) & u": rt}"_S);
+        print((i * n) & u": {"_S & part & u"}"_S);
+        print((i * n) & u":\t"_S & part);
+        print((i * n) & String(part));
+    }
+} code_block_2;
+
+auto price_list_size = 100'000;
+auto price_list = range_el(0, price_list_size).map([](const auto &i){return randomns::_(100'000);});
+auto get_max_price()
+{
+    return max(::price_list);
+}
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print(u"Using "_S & price_list_size & u" random prices from 0 to "_S & get_max_price());
+    }
+} code_block_3;
+
+auto [mn, mx, count] = make_tuple(1.1, 2.2, 3);
+
+struct CodeBlock4
+{
+    CodeBlock4()
+    {
+        print(u"  From #6.1 ... #6.1 with #. items."_S.format(mn, mx, count));
+        print(u"  From #6.1 ... #6.1 with #. items."_S.format(mn, mx, count));
+    }
+} code_block_4;
+
+auto v = 0.5;
+
+struct CodeBlock5
+{
+    CodeBlock5()
+    {
+        print(u"#.14"_S.format(v));
+        print(u"#.14"_S.format(v));
+        print(u"#2.14"_S.format(v));
+        print(u"#2.14"_S.format(v));
+        print(u"#5.14"_S.format(v));
+        print(u"#5.14"_S.format(v));
+        print(u"#05.14"_S.format(v));
+        print(u"#9.6"_S.format(v));
+        print(u"#9.6"_S.format(v));
+    }
+} code_block_5;
+
+auto o = 1;
+
+struct CodeBlock6
+{
+    CodeBlock6()
+    {
+        print(u"#03"_S.format(o));
+        print(u"#03"_S.format(o));
+        print((u"#03"_S.format(o)));
+        print(u"#3"_S.format(o));
+    }
+} code_block_6;

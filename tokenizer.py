@@ -34,7 +34,7 @@ SSTABSi = 0
 ===============================================================================================================
 """
 from enum import IntEnum
-from typing import List, Set, Tuple
+from typing import List, Set, Tuple, Optional
 Char = str
 
 keywords = ['V',     'C',  'I',    'E',     'F',  'L',    'N',    'R',       'S',       'T',    'X',
@@ -87,9 +87,10 @@ class Token:
         NUMERIC_LITERAL = 5
         STRING_LITERAL = 6
         STRING_CONCATENATOR = 7 # special token inserted between adjacent string literal and some identifier
-        SCOPE_BEGIN = 8 # similar to ‘INDENT token in Python’[https://docs.python.org/3/reference/lexical_analysis.html][-1]
-        SCOPE_END   = 9 # similar to ‘DEDENT token in Python’[-1]
-        STATEMENT_SEPARATOR = 10
+        FSTRING = 8
+        SCOPE_BEGIN = 9 # similar to ‘INDENT token in Python’[https://docs.python.org/3/reference/lexical_analysis.html][-1]
+        SCOPE_END   = 10 # similar to ‘DEDENT token in Python’[-1]
+        STATEMENT_SEPARATOR = 11
 
     start : int
     end : int
@@ -367,6 +368,83 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                                 i += 1
                             if source[lexem_start:i] in ('L.index', 'Ц.индекс', 'loop.index', 'цикл.индекс'): # for correct STRING_CONCATENATOR insertion
                                 category = Token.Category.NAME
+
+                elif source[lexem_start:i+1] == 'f:': # this is a f-string
+                    i += 1
+                    lexem_start = i
+                    if source[i] in ('‘', "'"): # ’
+                        while i < len(source) and source[i] == "'":
+                            i += 1
+                        if source[i:i+1] != '‘': # ’
+                            raise Error('expected left single quotation mark', i)
+                        startqpos = i
+                        i += 1
+                        nesting_level = 1
+                        while True:
+                            if i == len(source):
+                                raise Error('unpaired left single quotation mark', startqpos)
+                            ch = source[i]
+                            i += 1
+                            if ch == "‘":
+                                nesting_level += 1
+                            elif ch == "’":
+                                nesting_level -= 1
+                                if nesting_level == 0:
+                                    break
+                        while i < len(source) and source[i] == "'":
+                            i += 1
+                    else:
+                        assert(source[i] == '"')
+                        startqpos = i
+                        i += 1
+                        while True:
+                            if i == len(source):
+                                raise Error('unclosed string literal', startqpos)
+                            ch = source[i]
+                            i += 1
+                            if ch == '\\':
+                                if i == len(source):
+                                    continue
+                                i += 1
+                            elif ch == '"':
+                                break
+                    tokens.append(Token(lexem_start, i, Token.Category.FSTRING))
+                    j = lexem_start + 1
+                    substr_start = j
+                    while j < i - 1:
+                        if source[j] == '{':
+                            if source[j+1] == '{':
+                                j += 2
+                                continue
+                            if j > substr_start:
+                                tokens.append(Token(substr_start, j, Token.Category.STRING_LITERAL))
+                            tokens.append(Token(j, j, Token.Category.SCOPE_BEGIN))
+                            j += 1
+                            s = j
+                            colon_pos : Optional[int] = None # {{
+                            while source[j] != '}':
+                                if source[j] == ':':
+                                    colon_pos = j
+                                j += 1
+                            for new_token in tokenize(source[s:colon_pos if colon_pos is not None else j]):
+                                tokens.append(Token(new_token.start + s, new_token.end + s, new_token.category))
+                            if colon_pos is not None:
+                                #tokens.append(Token(colon_pos, colon_pos, Token.Category.STATEMENT_SEPARATOR))
+                                #tokens.append(Token(colon_pos + 1, j, Token.Category.STRING_LITERAL))
+                                tokens.append(Token(colon_pos + 1, j, Token.Category.STATEMENT_SEPARATOR))
+                            tokens.append(Token(j, j, Token.Category.SCOPE_END))
+                            substr_start = j + 1
+                        elif source[j] == '}':
+                            if source[j+1] != '}':
+                                raise Error("f-string: single '}' is not allowed", j)
+                            j += 2
+                            continue
+                        j += 1
+                    if j > substr_start:
+                        tokens.append(Token(substr_start, j, Token.Category.STRING_LITERAL))
+                    tokens.append(Token(i, i, Token.Category.STATEMENT_SEPARATOR))
+                    continue
+
                 else:
                     category = Token.Category.NAME
 

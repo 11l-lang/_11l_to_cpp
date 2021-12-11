@@ -429,6 +429,68 @@ class SymbolNode:
 
             return 'u"' + repr(s)[1:-1].replace('"', R'\"').replace(R"\'", "'") + '"_S'
 
+        if self.token.category == Token.Category.FSTRING:
+            nfmtstr = ''
+            format_args = ''
+            i = 0
+            while i < len(self.children):
+                child = self.children[i]
+                if child.token.category == Token.Category.STRING_LITERAL:
+                    s = child.token.value(source)
+                    j = 0
+                    while j < len(s):
+                        if s[j] == '#' and (s[j+1:j+2] in ('#', '.', '<') or s[j+1:j+2].isdigit()):
+                            nfmtstr += '##'
+                        elif s[j] == '{':
+                            j += 1
+                            assert(s[j] == '{')
+                            nfmtstr += '{'
+                        elif s[j] == '}':
+                            j += 1
+                            assert(s[j] == '}')
+                            nfmtstr += '}'
+                        else:
+                            nfmtstr += s[j]
+                        j += 1
+                else:
+                    nfmtstr += '#'
+                    if i + 1 < len(self.children) and self.children[i + 1].token.category == Token.Category.STATEMENT_SEPARATOR:
+                        fmt = self.children[i + 1].token.value(source)
+                        if fmt[0] == '<':
+                            nfmtstr += '<'
+                            fmt = fmt[1:]
+                        if '.' in fmt:
+                            if fmt[0] == '0' and fmt[1:2].isdigit(): # zero padding
+                                nfmtstr += '0'
+                            (before_period, after_period) = map(int, ('0' + fmt).split('.')) # `'0' + ` is for e.g. `#.6` (fmt = '.6')
+                            b = before_period
+                            if after_period != 0:
+                                b -= after_period + 1
+                            if b > 1:
+                                nfmtstr += str(b)
+                            nfmtstr += '.' + str(after_period)
+                        else:
+                            nfmtstr += fmt
+                        i += 1
+                    else:
+                        nfmtstr += '.'
+
+                    if format_args != '':
+                        format_args += ', '
+                    format_args += child.to_str()
+                i += 1
+
+            if source[self.token.start] == '"':
+                nfmtstr = 'u"' + nfmtstr + '"_S'
+            elif '\\' in nfmtstr or "\n" in nfmtstr:
+                delimiter = '' # (
+                while ')' + delimiter + '"' in nfmtstr:
+                    delimiter += "'"
+                nfmtstr = 'uR"' + delimiter + '(' + nfmtstr + ')' + delimiter + '"_S'
+            else:
+                nfmtstr = 'u"' + repr(nfmtstr)[1:-1].replace('"', R'\"').replace(R"\'", "'") + '"_S'
+            return nfmtstr + '.format(' + format_args + ')'
+
         if self.token.category == Token.Category.CONSTANT:
             return {'N': 'nullptr', 'Н': 'nullptr', 'null': 'nullptr', 'нуль': 'nullptr', '0B': 'false', '0В': 'false', '1B': 'true', '1В': 'true'}[self.token_str()]
 
@@ -2002,6 +2064,8 @@ def next_token(): # why ‘next_token’: >[https://youtu.be/Nlqv6NtBXcA?t=1203]
             key : str
             if token.category in (Token.Category.NUMERIC_LITERAL, Token.Category.STRING_LITERAL):
                 key = '(literal)'
+            elif token.category == Token.Category.FSTRING:
+                key = '(fstring)'
             elif token.category == Token.Category.NAME:
                 key = '(name)'
                 if token.value(source)[0] == '@':
@@ -2329,6 +2393,26 @@ def nud(self):
         advance(']')
     return self
 symbol('[').nud = nud # ]
+
+def nud(self):
+    while token.category != Token.Category.STATEMENT_SEPARATOR:
+        if token.category == Token.Category.STRING_LITERAL:
+            self.append_child(tokensn)
+            next_token()
+        else:
+            assert(token.category == Token.Category.SCOPE_BEGIN)
+            next_token()
+            self.append_child(expression())
+            if token.category == Token.Category.STATEMENT_SEPARATOR:
+                # next_token()
+                # assert(token.category == Token.Category.STRING_LITERAL)
+                self.append_child(tokensn)
+                next_token()
+            assert(token.category == Token.Category.SCOPE_END)
+            next_token()
+    next_token()
+    return self
+symbol('(fstring)').nud = nud
 
 def advance_scope_begin():
     if token.category != Token.Category.SCOPE_BEGIN:

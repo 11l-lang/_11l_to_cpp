@@ -48,3 +48,8 @@ s = '’
 
 ---
 ’
+
+
+// {{
+print(f:‘a } b’)
+           ^Error: f-string: single '}' is not allowed
