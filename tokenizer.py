@@ -421,9 +421,16 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                             tokens.append(Token(j, j, Token.Category.SCOPE_BEGIN))
                             j += 1
                             s = j
-                            colon_pos : Optional[int] = None # {{
-                            while source[j] != '}':
-                                if source[j] == ':':
+                            colon_pos : Optional[int] = None
+                            nesting_level = 0
+                            while True:
+                                if source[j] == '{':
+                                    nesting_level += 1
+                                elif source[j] == '}':
+                                    if nesting_level == 0:
+                                        break
+                                    nesting_level -= 1
+                                elif source[j] == ':' and nesting_level == 0:
                                     colon_pos = j
                                 j += 1
                             for new_token in tokenize(source[s:colon_pos if colon_pos is not None else j]):
@@ -435,7 +442,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                             tokens.append(Token(j, j, Token.Category.SCOPE_END))
                             substr_start = j + 1
                         elif source[j] == '}':
-                            if source[j+1] != '}':
+                            if source[j+1] != '}': # {
                                 raise Error("f-string: single '}' is not allowed", j)
                             j += 2
                             continue
