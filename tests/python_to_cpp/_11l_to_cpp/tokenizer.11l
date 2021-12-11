@@ -395,7 +395,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                            I nesting_level == 0
                               L.break
                            nesting_level--
-                        E I source[j] == ‘:’ & nesting_level == 0
+                        E I source[j] == ‘:’ & nesting_level == 0 & (source[j + 1] C (‘<’, ‘.’) | source[j + 1].is_digit())
                            colon_pos = j
                         j++
                      L(new_token) tokenize(source[s .< colon_pos ? j])

@@ -497,7 +497,7 @@ Array<Token> tokenize(const String &source, Array<Tuple<Char, int>>* const impli
                                         break;
                                     nesting_level--;
                                 }
-                                else if (source[j] == u':' && nesting_level == 0)
+                                else if (source[j] == u':' && nesting_level == 0 && (in(source[j + 1], make_tuple(u"<"_S, u"."_S)) || source[j + 1].is_digit()))
                                     colon_pos = j;
                                 j++;
                             }

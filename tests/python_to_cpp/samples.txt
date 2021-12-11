@@ -3464,3 +3464,20 @@ struct CodeBlock1
         print(source[([&]{auto R = colon_pos; return R != nullptr ? *R : 0;}())]);
     }
 } code_block_1;
+
+
+import random
+print(f'rnd10: {random.randrange(10)}, rnd100: {random.randrange(100):2}')
+print(f'rnd: {random.random():.3f}')
+===
+print(f:‘rnd10: {random:(10)}, rnd100: {random:(100):2}’)
+print(f:‘rnd: {random:():.3}’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"rnd10: #., rnd100: #2"_S.format(randomns::_(10), randomns::_(100)));
+        print(u"rnd: #.3"_S.format(randomns::_()));
+    }
+} code_block_1;
