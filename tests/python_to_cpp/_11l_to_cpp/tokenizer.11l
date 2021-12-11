@@ -79,6 +79,8 @@ T Token
       NUMERIC_LITERAL
       STRING_LITERAL
       STRING_CONCATENATOR
+      FSTRING
+      FSTRING_END
       SCOPE_BEGIN
       SCOPE_END
       STATEMENT_SEPARATOR
@@ -101,7 +103,7 @@ T Token
    F to_str(source)
       R ‘Token(’String(.category)‘, "’(.value(source))‘")’
 
-F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuations = N, [(Int, Int)]? &comments = N)
+F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_continuations = N, [(Int, Int)]? &comments = N) -> [Token]
    [Token] tokens
    [(Int, Bool)] indentation_levels
    [(Char, Int)] nesting_elements
@@ -332,6 +334,87 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                         i++
                      I source[lexem_start .< i] C (‘L.index’, ‘Ц.индекс’, ‘loop.index’, ‘цикл.индекс’)
                         category = NAME
+
+            E I source[lexem_start .< i + 1] == ‘f:’
+               i++
+               I source[i] C ("‘", ‘'’)
+                  L i < source.len & source[i] == ‘'’
+                     i++
+                  I source[i .< i + 1] != "‘"
+                     X Error(‘expected left single quotation mark’, i)
+                  V startqpos = i
+                  i++
+                  V nesting_level = 1
+                  L
+                     I i == source.len
+                        X Error(‘unpaired left single quotation mark’, startqpos)
+                     ch = source[i]
+                     i++
+                     I ch == "‘"
+                        nesting_level++
+                     E I ch == "’"
+                        nesting_level--
+                        I nesting_level == 0
+                           L.break
+                  L i < source.len & source[i] == ‘'’
+                     i++
+               E
+                  assert(source[i] == ‘"’)
+                  V startqpos = i
+                  i++
+                  L
+                     I i == source.len
+                        X Error(‘unclosed string literal’, startqpos)
+                     ch = source[i]
+                     i++
+                     I ch == ‘\’
+                        I i == source.len
+                           L.continue
+                        i++
+                     E I ch == ‘"’
+                        L.break
+               tokens.append(Token(lexem_start, lexem_start + 3, Token.Category.FSTRING))
+               j = lexem_start + 3
+               V substr_start = j
+               L j < i - 1
+                  I source[j] == ‘{’
+                     I source[j + 1] == ‘{’
+                        j += 2
+                        L.continue
+                     I j > substr_start
+                        tokens.append(Token(substr_start, j, Token.Category.STRING_LITERAL))
+                     tokens.append(Token(j, j, Token.Category.SCOPE_BEGIN))
+                     j++
+                     V s = j
+                     Int? colon_pos
+                     V nesting_level = 0
+                     L
+                        I source[j] == ‘{’
+                           nesting_level++
+                        E I source[j] == ‘}’
+                           I nesting_level == 0
+                              L.break
+                           nesting_level--
+                        E I source[j] == ‘:’ & nesting_level == 0
+                           colon_pos = j
+                        j++
+                     L(new_token) tokenize(source[s .< colon_pos ? j])
+                        tokens.append(Token(new_token.start + s, new_token.end + s, new_token.category))
+                     I colon_pos != N
+                        tokens.append(Token(colon_pos + 1, j, Token.Category.STATEMENT_SEPARATOR))
+                     tokens.append(Token(j, j, Token.Category.SCOPE_END))
+                     substr_start = j + 1
+                  E I source[j] == ‘}’
+                     I source[j + 1] != ‘}’
+                        X Error(‘f-string: single '}' is not allowed’, j)
+                     j += 2
+                     L.continue
+                  j++
+               I j > substr_start
+                  tokens.append(Token(substr_start, j, Token.Category.STRING_LITERAL))
+               tokens.append(Token(j, i, Token.Category.FSTRING_END))
+               L.continue
+
             E
                category = NAME
 

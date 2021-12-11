@@ -34,7 +34,7 @@ SSTABSi = 0
 ===============================================================================================================
 """
 from enum import IntEnum
-from typing import List, Set, Tuple
+from typing import List, Set, Tuple, Optional
 Char = str
 
 keywords = ['V',     'C',  'I',    'E',     'F',  'L',    'N',    'R',       'S',       'T',    'X',
@@ -87,9 +87,11 @@ class Token:
         NUMERIC_LITERAL = 5
         STRING_LITERAL = 6
         STRING_CONCATENATOR = 7 # special token inserted between adjacent string literal and some identifier
-        SCOPE_BEGIN = 8 # similar to ‘INDENT token in Python’[https://docs.python.org/3/reference/lexical_analysis.html][-1]
-        SCOPE_END   = 9 # similar to ‘DEDENT token in Python’[-1]
-        STATEMENT_SEPARATOR = 10
+        FSTRING = 8
+        FSTRING_END = 9 # this is needed for syntax highlighting
+        SCOPE_BEGIN = 10 # similar to ‘INDENT token in Python’[https://docs.python.org/3/reference/lexical_analysis.html][-1]
+        SCOPE_END   = 11 # similar to ‘DEDENT token in Python’[-1]
+        STATEMENT_SEPARATOR = 12
 
     start : int
     end : int
@@ -109,7 +111,7 @@ class Token:
     def to_str(self, source):
         return 'Token('+str(self.category)+', "'+self.value(source)+'")'
 
-def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_continuations : List[int] = None, comments : List[Tuple[int, int]] = None):
+def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_continuations : List[int] = None, comments : List[Tuple[int, int]] = None) -> List[Token]:
     tokens : List[Token] = []
     indentation_levels : List[Tuple[int, bool]] = []
     nesting_elements : List[Tuple[Char, int]] = [] # логически этот стек можно объединить с indentation_levels, но так немного удобнее (конкретно: для проверок `nesting_elements[-1][0] != ...`)
@@ -367,6 +369,89 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                                 i += 1
                             if source[lexem_start:i] in ('L.index', 'Ц.индекс', 'loop.index', 'цикл.индекс'): # for correct STRING_CONCATENATOR insertion
                                 category = Token.Category.NAME
+
+                elif source[lexem_start:i+1] == 'f:': # this is a f-string
+                    i += 1
+                    if source[i] in ('‘', "'"): # ’
+                        while i < len(source) and source[i] == "'":
+                            i += 1
+                        if source[i:i+1] != '‘': # ’
+                            raise Error('expected left single quotation mark', i)
+                        startqpos = i
+                        i += 1
+                        nesting_level = 1
+                        while True:
+                            if i == len(source):
+                                raise Error('unpaired left single quotation mark', startqpos)
+                            ch = source[i]
+                            i += 1
+                            if ch == "‘":
+                                nesting_level += 1
+                            elif ch == "’":
+                                nesting_level -= 1
+                                if nesting_level == 0:
+                                    break
+                        while i < len(source) and source[i] == "'":
+                            i += 1
+                    else:
+                        assert(source[i] == '"')
+                        startqpos = i
+                        i += 1
+                        while True:
+                            if i == len(source):
+                                raise Error('unclosed string literal', startqpos)
+                            ch = source[i]
+                            i += 1
+                            if ch == '\\':
+                                if i == len(source):
+                                    continue
+                                i += 1
+                            elif ch == '"':
+                                break
+                    tokens.append(Token(lexem_start, lexem_start + 3, Token.Category.FSTRING))
+                    j = lexem_start + 3
+                    substr_start = j
+                    while j < i - 1:
+                        if source[j] == '{':
+                            if source[j+1] == '{':
+                                j += 2
+                                continue
+                            if j > substr_start:
+                                tokens.append(Token(substr_start, j, Token.Category.STRING_LITERAL))
+                            tokens.append(Token(j, j, Token.Category.SCOPE_BEGIN))
+                            j += 1
+                            s = j
+                            colon_pos : Optional[int] = None
+                            nesting_level = 0
+                            while True:
+                                if source[j] == '{':
+                                    nesting_level += 1
+                                elif source[j] == '}':
+                                    if nesting_level == 0:
+                                        break
+                                    nesting_level -= 1
+                                elif source[j] == ':' and nesting_level == 0:
+                                    colon_pos = j
+                                j += 1
+                            for new_token in tokenize(source[s:colon_pos if colon_pos is not None else j]):
+                                tokens.append(Token(new_token.start + s, new_token.end + s, new_token.category))
+                            if colon_pos is not None:
+                                #tokens.append(Token(colon_pos, colon_pos, Token.Category.STATEMENT_SEPARATOR))
+                                #tokens.append(Token(colon_pos + 1, j, Token.Category.STRING_LITERAL))
+                                tokens.append(Token(colon_pos + 1, j, Token.Category.STATEMENT_SEPARATOR))
+                            tokens.append(Token(j, j, Token.Category.SCOPE_END))
+                            substr_start = j + 1
+                        elif source[j] == '}':
+                            if source[j+1] != '}': # {
+                                raise Error("f-string: single '}' is not allowed", j)
+                            j += 2
+                            continue
+                        j += 1
+                    if j > substr_start:
+                        tokens.append(Token(substr_start, j, Token.Category.STRING_LITERAL))
+                    tokens.append(Token(j, i, Token.Category.FSTRING_END))
+                    continue
+
                 else:
                     category = Token.Category.NAME
 

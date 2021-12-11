@@ -30,6 +30,8 @@ public:
         OPERATOR_OR_DELIMITER,
         NUMERIC_LITERAL,
         STRING_LITERAL,
+        FSTRING,
+        FSTRING_END,
         INDENT,
         DEDENT,
         STATEMENT_SEPARATOR
@@ -62,7 +64,7 @@ public:
     }
 };
 
-template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline_chars = nullptr, Array<ivec2>* const comments = nullptr)
+template <typename T1> Array<Token> tokenize(const T1 &source, Array<int>* const newline_chars = nullptr, Array<ivec2>* const comments = nullptr)
 {
     Array<Token> tokens;
     Array<int> indentation_levels;
@@ -173,9 +175,9 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                     category = TYPE_RM_REF(category)::STATEMENT_SEPARATOR;
             }
 
-            else if (in(ch, make_tuple(u"\""_S, u"'"_S)) || (in(ch, u"rRbB"_S) && in(source[range_el(i, i + 1)], make_tuple(u"\""_S, u"'"_S)))) {
+            else if (in(ch, make_tuple(u"\""_S, u"'"_S)) || (in(ch, u"rRbBfF"_S) && in(source[range_el(i, i + 1)], make_tuple(u"\""_S, u"'"_S)))) {
                 String ends;
-                if (in(ch, u"rRbB"_S))
+                if (in(ch, u"rRbBfF"_S))
                     ends = in(source[range_el(i, i + 3)], make_tuple(u"\"\"\""_S, u"'''"_S)) ? source[range_el(i, i + 3)] : source[i];
                 else {
                     i--;
@@ -196,6 +198,57 @@ template <typename T1> auto tokenize(const T1 &source, Array<int>* const newline
                     }
                     i++;
                 }
+
+                if (in(ch, u"fF"_S)) {
+                    tokens.append(Token(lexem_start, lexem_start + 1 + ends.len(), Token::Category::FSTRING));
+                    auto j = lexem_start + 1 + ends.len();
+                    auto substr_start = j;
+                    while (j < i - ends.len()) {
+                        if (source[j] == u'{') {
+                            if (source[j + 1] == u'{') {
+                                j += 2;
+                                continue;
+                            }
+                            if (j > substr_start)
+                                tokens.append(Token(substr_start, j, Token::Category::STRING_LITERAL));
+                            tokens.append(Token(j, j, Token::Category::INDENT));
+                            j++;
+                            auto s = j;
+                            Nullable<int> colon_pos;
+                            auto nesting_level = 0;
+                            while (true) {
+                                if (source[j] == u'{')
+                                    nesting_level++;
+                                else if (source[j] == u'}') {
+                                    if (nesting_level == 0)
+                                        break;
+                                    nesting_level--;
+                                }
+                                else if (source[j] == u':' && nesting_level == 0)
+                                    colon_pos = j;
+                                j++;
+                            }
+                            for (auto &&new_token : tokenize(source[range_el(s, [&]{auto R = colon_pos; return R != nullptr ? *R : j;}())]))
+                                tokens.append(Token(new_token.start + s, new_token.end + s, new_token.category));
+                            if (colon_pos != nullptr)
+                                tokens.append(Token(*colon_pos + 1, j, Token::Category::STATEMENT_SEPARATOR));
+                            tokens.append(Token(j, j, Token::Category::DEDENT));
+                            substr_start = j + 1;
+                        }
+                        else if (source[j] == u'}') {
+                            if (source[j + 1] != u'}')
+                                throw Error(u"f-string: single '}' is not allowed"_S, j);
+                            j += 2;
+                            continue;
+                        }
+                        j++;
+                    }
+                    if (j > substr_start)
+                        tokens.append(Token(substr_start, j, Token::Category::STRING_LITERAL));
+                    tokens.append(Token(j, i, Token::Category::FSTRING_END));
+                    continue;
+                }
+
                 category = TYPE_RM_REF(category)::STRING_LITERAL;
             }
 

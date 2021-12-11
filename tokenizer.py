@@ -111,7 +111,7 @@ class Token:
     def to_str(self, source):
         return 'Token('+str(self.category)+', "'+self.value(source)+'")'
 
-def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_continuations : List[int] = None, comments : List[Tuple[int, int]] = None):
+def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_continuations : List[int] = None, comments : List[Tuple[int, int]] = None) -> List[Token]:
     tokens : List[Token] = []
     indentation_levels : List[Tuple[int, bool]] = []
     nesting_elements : List[Tuple[Char, int]] = [] # логически этот стек можно объединить с indentation_levels, но так немного удобнее (конкретно: для проверок `nesting_elements[-1][0] != ...`)

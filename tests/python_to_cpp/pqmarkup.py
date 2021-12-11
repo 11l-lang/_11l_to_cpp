@@ -60,8 +60,8 @@ class Converter:
             return instr[i + offset] if i + offset < len(instr) else Char("\0")
 
         def i_next_str(str): # i_ — if_/is_
-            #return i + len(str) <= len(instr) and instr[i:i+len(str)] == str
-            return instr[i+1:i+1+len(str)] == str # first check is not necessarily in Python
+            #return i+1+len(str) <= len(instr) and instr[i+1:i+1+len(str)] == str # first check is not necessary in Python
+            return instr[i+1:i+1+len(str)] == str
 
         def prev_char(offset = 1):
             return instr[i - offset] if i - offset >= 0 else Char("\0")
@@ -149,7 +149,7 @@ class Converter:
                 i += 1
 
             link = html_escapeq(instr[endpos+1+q_offset:i])
-            tag : str = '<a href="' + link + '"'
+            tag = '<a href="' + link + '"'
             if link.startswith('./'):
                 tag += ' target="_self"'
 
@@ -182,7 +182,7 @@ class Converter:
                 text = self.to_html(instr[startpos+q_offset:endpos], outer_pos = startpos+q_offset)
             outfile.write(tag + '>' + (text if text != '' else link) + '</a>')
 
-        def write_note(startpos, endpos, q_offset = 1):
+        def write_abbr(startpos, endpos, q_offset = 1):
             nonlocal i
             i += q_offset
             endqpos2 = find_ending_pair_quote(i+1) # [[‘
@@ -352,7 +352,8 @@ class Converter:
                                 writepos = i + 2
                             # else this is just >‘Quoted text.’
                         ending_tags.append('</blockquote>')
-                    i += 1
+                    i += 2
+                    continue
 
             if ch == "‘":
                 prevci = i - 1
@@ -361,12 +362,12 @@ class Converter:
                 startqpos = i
                 i = find_ending_pair_quote(i)
                 endqpos = i
-                str_in_b = '' # (
+                str_in_p = '' # (
                 if prevc == ')':
-                    openb = instr.rfind('(', 0, prevci - 1) # )
-                    if openb != -1 and openb > 0:
-                        str_in_b = instr[openb+1:startqpos-1]
-                        prevci = openb - 1
+                    openp = instr.rfind('(', 0, prevci - 1) # )
+                    if openp != -1 and openp > 0:
+                        str_in_p = instr[openp+1:startqpos-1]
+                        prevci = openp - 1
                         prevc = instr[prevci]
                 if prevc in 'PР': # Рисунок обрабатывается по-особенному
                     write_to_pos(prevci, endqpos + 1)
@@ -378,8 +379,8 @@ class Converter:
                             exit_with_error('Expected `]` after `’`', endqpos2+1)
                         title = ' title="'+html_escapeq(remove_comments(instr[i+3:endqpos2], i+3))+'"'
                     imgtag = '<img'
-                    if str_in_b != '':
-                        wh = str_in_b.replace(',', ' ').split(' ')
+                    if str_in_p != '':
+                        wh = str_in_p.replace(',', ' ').split(' ')
                         assert(len(wh) in (1, 2))
                         imgtag += ' width="' + wh[0] + '" height="' + wh[-1] + '"'
                     imgtag += ' src="'+instr[startqpos+1:endqpos]+'"'+title+' />'
@@ -400,7 +401,7 @@ class Converter:
                     write_to_pos(startqpos, i+1)
                     outfile.write('<a href="' + link + '">' + html_escape(instr[startqpos+1:endqpos]) + '</a>')
                 elif i_next_str('[‘'): # ’] сноска/альтернативный текст/текст всплывающей подсказки
-                    write_note(startqpos, endqpos)
+                    write_abbr(startqpos, endqpos)
                 elif next_char() == '{' and (self.habr_html or self.ohd):
                     # Ищем окончание спойлера }
                     nesting_level = 0
@@ -450,15 +451,15 @@ class Converter:
                     write_to_pos(prevci, endqpos+1)
                     if self.habr_html:
                         contains_new_line = "\n" in ins
-                        outfile.write(('<source lang="' + str_in_b + '">' if str_in_b != '' else '<source>' if contains_new_line else '<code>') + ins + ("</source>" if str_in_b != '' or contains_new_line else "</code>")) # так как <source> в Habr — блочный элемент, а не встроенный\inline
+                        outfile.write(('<source lang="' + str_in_p + '">' if str_in_p != '' else '<source>' if contains_new_line else '<code>') + ins.replace('&', '&amp;').replace('<', '&lt;') + ("</source>" if str_in_p != '' or contains_new_line else "</code>")) # так как <source> в Habr — блочный элемент, а не встроенный\inline
                     else:
                         pre = '<pre ' + ('class="code_block"' if ins[0] == "\n" else 'style="display: inline"') + '>' # can not do `outfile.write('<pre ' + ...)` here because `outfile.write(syntax_highlighter_for_pqmarkup.css)` should be outside of <pre> block
-                        if self.ohd and syntax_highlighter_for_pqmarkup.is_lang_supported(str_in_b):
+                        if self.ohd and syntax_highlighter_for_pqmarkup.is_lang_supported(str_in_p):
                             if not self.highlight_style_was_added:
                                 outfile.write(syntax_highlighter_for_pqmarkup.css)
                                 self.highlight_style_was_added = True
                             try:
-                                outfile.write(pre + syntax_highlighter_for_pqmarkup.highlight(str_in_b, ins) + '</pre>')
+                                outfile.write(pre + syntax_highlighter_for_pqmarkup.highlight(str_in_p, ins) + '</pre>')
                             except syntax_highlighter_for_pqmarkup.Error as e:
                                 exit_with_error('Syntax highlighter: ' + e.message, startqpos+1+e.pos)
                         else:
@@ -588,7 +589,7 @@ class Converter:
                     outfile.write('<div align="' + {'<<':'left', '>>':'right', '><':'center', '<>':'justify'}[instr[prevci-1]+prevc] + '">'
                                  + self.to_html(instr[startqpos+1:endqpos], outer_pos = startqpos+1) + "</div>\n")
                     new_line_tag = ''
-                elif i_next_str(":‘") and instr[find_ending_pair_quote(i+2)+1:][:1] == '<': # this is reversed quote ‘Quoted text.’:‘Author's name’< # ’
+                elif i_next_str(":‘") and instr[find_ending_pair_quote(i+2)+1:find_ending_pair_quote(i+2)+2] == '<': # this is reversed quote ‘Quoted text.’:‘Author's name’< # ’
                     endrq = find_ending_pair_quote(i+2)
                     i = endrq + 1
                     write_to_pos(prevci + 1, i + 1)
@@ -596,38 +597,38 @@ class Converter:
                     new_line_tag = ''
                 else:
                     i = startqpos # откатываем позицию обратно
-                    if prev_char() in '*_-~':
+                    if prevc in '*_-~':
                         write_to_pos(i - 1, i + 1)
-                        tag = {'*':'b', '_':'u', '-':'s', '~':'i'}[prev_char()]
+                        tag = {'*':'b', '_':'u', '-':'s', '~':'i'}[prevc]
                         outfile.write('<' + tag + '>')
                         ending_tags.append('</' + tag + '>')
                     elif prevc in 'HН':
                         write_to_pos(prevci, i + 1)
-                        tag = 'h' + str(min(max(3 - (0 if str_in_b == '' else int(str_in_b)), 1), 6))
+                        tag = 'h' + str(min(max(3 - (0 if str_in_p == '' else int(str_in_p)), 1), 6))
                         outfile.write('<' + tag + '>')
                         ending_tags.append('</' + tag + '>')
                     elif prevc in 'CС':
                         write_to_pos(prevci, i + 1)
                         which_color = 'color'
-                        if str_in_b[0:1] == '-':
-                            str_in_b = str_in_b[1:]
+                        if str_in_p[0:1] == '-':
+                            str_in_p = str_in_p[1:]
                             which_color = 'background-color'
-                        if str_in_b[0:1] == '#':
-                            new_str_in_b = ''
-                            for c in str_in_b:
+                        if str_in_p[0:1] == '#':
+                            new_str_in_p = ''
+                            for c in str_in_p:
                                 cc = {'а':'A','б':'B','с':'C','д':'D','е':'E','ф':'F'}.get(c.lower(), c)[0]
-                                new_str_in_b += cc.lower() if c.islower() else cc
-                            str_in_b = new_str_in_b
-                        elif len(str_in_b) in (1, 3) and str_in_b.isdigit():
+                                new_str_in_p += cc.lower() if c.islower() else cc
+                            str_in_p = new_str_in_p
+                        elif len(str_in_p) in (1, 3) and str_in_p.isdigit():
                             new_str = "#"
-                            for ii in [0, 1, 2] if len(str_in_b) == 3 else [0, 0, 0]:
-                                new_str += hex((int(str_in_b[ii]) * 0xFF + 4) // 8)[2:].upper().zfill(2) # 8 - FF, 0 - 00, 4 - 80 (почему не 7F[‘когда `+ 3` вместо `+ 4`’] — две субъективные причины: 1.‘больше нравится как выглядит’ и 2.‘количество пикселей в строке `80` при `"font_face": "Courier New", "font_size": 10`’)
-                            str_in_b = new_str
+                            for ii in [0, 1, 2] if len(str_in_p) == 3 else [0, 0, 0]:
+                                new_str += hex((int(str_in_p[ii]) * 0xFF + 4) // 8)[2:].upper().zfill(2) # 8 - FF, 0 - 00, 4 - 80 (почему не 7F[‘когда `+ 3` вместо `+ 4`’] — две субъективные причины: 1.‘больше нравится как выглядит’ и 2.‘количество пикселей в строке `80` при `"font_face": "Courier New", "font_size": 10`’)
+                            str_in_p = new_str
                         if self.habr_html:
-                            outfile.write('<font color="' + str_in_b + '">')
+                            outfile.write('<font color="' + str_in_p + '">')
                             ending_tags.append('</font>')
                         else: # The <font> tag is not supported in HTML5.
-                            outfile.write('<span style="'+which_color+': ' + str_in_b + '">')
+                            outfile.write('<span style="'+which_color+': ' + str_in_p + '">')
                             ending_tags.append('</span>')
                     elif (instr[prevci-1:prevci], prevc) in (('/', "\\"), ("\\", '/')):
                         write_to_pos(prevci-1, i + 1)
@@ -684,7 +685,7 @@ class Converter:
                     while s >= writepos and instr[s] not in "\r\n\t [{(‘“": # ”’)}]
                         s -= 1
                     if i_next_str('‘'): # ’ сноска/альтернативный текст/текст всплывающей подсказки
-                        write_note(s + 1, i, 0)
+                        write_abbr(s + 1, i, 0)
                     elif i_next_str('http') or i_next_str('./'):
                         write_http_link(s + 1, i, 0)
                     else:
@@ -732,7 +733,8 @@ class Converter:
         close_unordered_list()
 
         write_to_pos(len(instr), 0)
-        assert(len(ending_tags) == 0) # ‘слишком много открывающих одинарных кавычек’/‘где-то есть незакрытая открывающая кавычка’
+        if len(ending_tags) != 0: # ‘слишком много открывающих одинарных кавычек’/‘где-то есть незакрытая открывающая кавычка’\‘there is an unclosed opening/left quote somewhere’
+            exit_with_error('Unclosed left single quotation mark somewhere', len(instr))
 
         assert(self.to_html_called_inside_to_html_outer_pos_list.pop() == outer_pos)
 

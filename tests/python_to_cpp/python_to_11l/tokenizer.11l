@@ -23,6 +23,8 @@ T Token
       OPERATOR_OR_DELIMITER
       NUMERIC_LITERAL
       STRING_LITERAL
+      FSTRING
+      FSTRING_END
       INDENT
       DEDENT
       STATEMENT_SEPARATOR
@@ -45,7 +47,7 @@ T Token
    F to_str(source)
       R ‘Token(’String(.category)‘, "’(.value(source))‘")’
 
-F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
+F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N) -> [Token]
    [Token] tokens
    [Int] indentation_levels
    [(Char, Int)] nesting_elements
@@ -144,9 +146,9 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
             E I ch == ‘;’
                category = STATEMENT_SEPARATOR
 
-         E I ch C (‘"’, ‘'’) | (ch C ‘rRbB’ & source[i .< i + 1] C (‘"’, ‘'’))
+         E I ch C (‘"’, ‘'’) | (ch C ‘rRbBfF’ & source[i .< i + 1] C (‘"’, ‘'’))
             String ends
-            I ch C ‘rRbB’
+            I ch C ‘rRbBfF’
                ends = I source[i .< i + 3] C (‘"""’, ‘'''’) {source[i .< i + 3]} E source[i]
             E
                i--
@@ -163,6 +165,50 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N)
                   i += ends.len
                   L.break
                i++
+
+            I ch C ‘fF’
+               tokens.append(Token(lexem_start, lexem_start + 1 + ends.len, Token.Category.FSTRING))
+               V j = lexem_start + 1 + ends.len
+               V substr_start = j
+               L j < i - ends.len
+                  I source[j] == ‘{’
+                     I source[j + 1] == ‘{’
+                        j += 2
+                        L.continue
+                     I j > substr_start
+                        tokens.append(Token(substr_start, j, Token.Category.STRING_LITERAL))
+                     tokens.append(Token(j, j, Token.Category.INDENT))
+                     j++
+                     V s = j
+                     Int? colon_pos
+                     V nesting_level = 0
+                     L
+                        I source[j] == ‘{’
+                           nesting_level++
+                        E I source[j] == ‘}’
+                           I nesting_level == 0
+                              L.break
+                           nesting_level--
+                        E I source[j] == ‘:’ & nesting_level == 0
+                           colon_pos = j
+                        j++
+                     L(new_token) tokenize(source[s .< colon_pos ? j])
+                        tokens.append(Token(new_token.start + s, new_token.end + s, new_token.category))
+                     I colon_pos != N
+                        tokens.append(Token(colon_pos + 1, j, Token.Category.STATEMENT_SEPARATOR))
+                     tokens.append(Token(j, j, Token.Category.DEDENT))
+                     substr_start = j + 1
+                  E I source[j] == ‘}’
+                     I source[j + 1] != ‘}’
+                        X Error(‘f-string: single '}' is not allowed’, j)
+                     j += 2
+                     L.continue
+                  j++
+               I j > substr_start
+                  tokens.append(Token(substr_start, j, Token.Category.STRING_LITERAL))
+               tokens.append(Token(j, i, Token.Category.FSTRING_END))
+               L.continue
+
             category = STRING_LITERAL
 
          E I ch.is_alpha() | ch == ‘_’

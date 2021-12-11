@@ -3437,3 +3437,30 @@ struct CodeBlock6
         print(u"#3"_S.format(o));
     }
 } code_block_6;
+
+
+from typing import Optional
+source = 'a:1'
+colon_pos : Optional[int] = None
+colon_pos = 1
+print(source[:colon_pos if colon_pos is not None else len(source) - 1])
+print(source[colon_pos if colon_pos is not None else 0])
+===
+V source = ‘a:1’
+Int? colon_pos
+colon_pos = 1
+print(source[0 .< colon_pos ? source.len - 1])
+print(source[colon_pos ? 0])
+===
+auto source = u"a:1"_S;
+Nullable<int> colon_pos;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        colon_pos = 1;
+        print(source[range_el(0, [&]{auto R = colon_pos; return R != nullptr ? *R : source.len() - 1;}())]);
+        print(source[([&]{auto R = colon_pos; return R != nullptr ? *R : 0;}())]);
+    }
+} code_block_1;

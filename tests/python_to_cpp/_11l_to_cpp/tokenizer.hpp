@@ -124,6 +124,8 @@ public:
         NUMERIC_LITERAL,
         STRING_LITERAL,
         STRING_CONCATENATOR,
+        FSTRING,
+        FSTRING_END,
         SCOPE_BEGIN,
         SCOPE_END,
         STATEMENT_SEPARATOR
@@ -156,7 +158,7 @@ public:
     }
 };
 
-auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scopes = nullptr, Array<int>* const line_continuations = nullptr, Array<ivec2>* const comments = nullptr)
+Array<Token> tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scopes = nullptr, Array<int>* const line_continuations = nullptr, Array<ivec2>* const comments = nullptr)
 {
     Array<Token> tokens;
     Array<Tuple<int, bool>> indentation_levels;
@@ -426,6 +428,100 @@ auto tokenize(const String &source, Array<Tuple<Char, int>>* const implied_scope
                         }
                     }
                 }
+
+                else if (source[range_el(lexem_start, i + 1)] == u"f:") {
+                    i++;
+                    if (in(source[i], make_tuple(u"‘"_S, u"'"_S))) {
+                        while (i < source.len() && source[i] == u'\'')
+                            i++;
+                        if (source[range_el(i, i + 1)] != u'‘')
+                            throw Error(u"expected left single quotation mark"_S, i);
+                        auto startqpos = i;
+                        i++;
+                        auto nesting_level = 1;
+                        while (true) {
+                            if (i == source.len())
+                                throw Error(u"unpaired left single quotation mark"_S, startqpos);
+                            ch = source[i];
+                            i++;
+                            if (ch == u'‘')
+                                nesting_level++;
+                            else if (ch == u'’') {
+                                nesting_level--;
+                                if (nesting_level == 0)
+                                    break;
+                            }
+                        }
+                        while (i < source.len() && source[i] == u'\'')
+                            i++;
+                    }
+                    else {
+                        assert(source[i] == u'"');
+                        auto startqpos = i;
+                        i++;
+                        while (true) {
+                            if (i == source.len())
+                                throw Error(u"unclosed string literal"_S, startqpos);
+                            ch = source[i];
+                            i++;
+                            if (ch == u'\\') {
+                                if (i == source.len())
+                                    continue;
+                                i++;
+                            }
+                            else if (ch == u'"')
+                                break;
+                        }
+                    }
+                    tokens.append(Token(lexem_start, lexem_start + 3, Token::Category::FSTRING));
+                    j = lexem_start + 3;
+                    auto substr_start = j;
+                    while (j < i - 1) {
+                        if (source[j] == u'{') {
+                            if (source[j + 1] == u'{') {
+                                j += 2;
+                                continue;
+                            }
+                            if (j > substr_start)
+                                tokens.append(Token(substr_start, j, Token::Category::STRING_LITERAL));
+                            tokens.append(Token(j, j, Token::Category::SCOPE_BEGIN));
+                            j++;
+                            auto s = j;
+                            Nullable<int> colon_pos;
+                            auto nesting_level = 0;
+                            while (true) {
+                                if (source[j] == u'{')
+                                    nesting_level++;
+                                else if (source[j] == u'}') {
+                                    if (nesting_level == 0)
+                                        break;
+                                    nesting_level--;
+                                }
+                                else if (source[j] == u':' && nesting_level == 0)
+                                    colon_pos = j;
+                                j++;
+                            }
+                            for (auto &&new_token : tokenize(source[range_el(s, [&]{auto R = colon_pos; return R != nullptr ? *R : j;}())]))
+                                tokens.append(Token(new_token.start + s, new_token.end + s, new_token.category));
+                            if (colon_pos != nullptr)
+                                tokens.append(Token(*colon_pos + 1, j, Token::Category::STATEMENT_SEPARATOR));
+                            tokens.append(Token(j, j, Token::Category::SCOPE_END));
+                            substr_start = j + 1;
+                        }
+                        else if (source[j] == u'}') {
+                            if (source[j + 1] != u'}')
+                                throw Error(u"f-string: single '}' is not allowed"_S, j);
+                            j += 2;
+                            continue;
+                        }
+                        j++;
+                    }
+                    if (j > substr_start)
+                        tokens.append(Token(substr_start, j, Token::Category::STRING_LITERAL));
+                    tokens.append(Token(j, i, Token::Category::FSTRING_END));
+                    continue;
+                }
+
                 else
                     category = TYPE_RM_REF(category)::NAME;
             }

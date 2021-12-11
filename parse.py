@@ -986,7 +986,8 @@ class SymbolNode:
                 #assert(False)
                 return 'assign_from_tuple(' + ', '.join(c.to_str() for c in self.children[0].children) + ', ' + self.children[1].to_str() + ')'
             elif self.symbol.id == '?':
-                return '[&]{auto R = ' + self.children[0].to_str() + '; return R != nullptr ? *R : ' + self.children[1].to_str() + ';}()'
+                parens = self.parent is not None and self.parent.symbol.id == '[' # ] # to fix MSVC error C3750
+                return '('*parens + '[&]{auto R = ' + self.children[0].to_str() + '; return R != nullptr ? *R : ' + self.children[1].to_str() + ';}()' + ')'*parens
             elif self.symbol.id == '^':
                 c1 = self.children[1].to_str()
                 if c1 == '2':
@@ -2149,7 +2150,7 @@ def prefix(id, bp):
 
 infix('[+]', 20); #infix('->', 15) # for `(0 .< h).map(_ -> [0] * @w [+] [1])`
 
-infix('?', 25) # based on C# operator precedence ([http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-334.pdf])
+#infix('?', 25) # based on C# operator precedence ([http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-334.pdf])
 
 infix('|', 30); infix('&', 40)
 
@@ -2157,8 +2158,10 @@ infix('==', 50); infix('!=', 50); infix('C', 50); infix('С', 50); infix('in', 5
 
 #infix('(concat)', 52) # `instr[prevci - 1 .< prevci]‘’prevc C ("/\\", "\\/")` = `(instr[prevci - 1 .< prevci]‘’prevc) C ("/\\", "\\/")`
 
-infix('..', 55); infix('.<', 55); infix('.+', 55); infix('<.', 55); infix('<.<', 55) # ch C ‘0’..‘9’ = ch C (‘0’..‘9’)
+infix('..', 55); infix('.<', 55); infix('.+', 55); infix('<.', 55); infix('<.<', 55) # `ch C ‘0’..‘9’` = `ch C (‘0’..‘9’)`
 #postfix('..', 55)
+
+infix('?', 57) # `source[s .< colon_pos ? j]` = `source[s .< (colon_pos ? j)]`
 
 infix('<', 60); infix('<=', 60)
 infix('>', 60); infix('>=', 60)

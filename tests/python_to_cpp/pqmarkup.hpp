@@ -197,7 +197,7 @@ public:
             break_:;
 
             link = html_escapeq(instr[range_el(endpos + 1 + q_offset, i)]);
-            String tag = u"<a href=\""_S & link & u"\""_S;
+            auto tag = u"<a href=\""_S & link & u"\""_S;
             if (link.starts_with(u"./"_S))
                 tag &= u" target=\"_self\""_S;
 
@@ -237,7 +237,7 @@ public:
             outfile.write(tag & u">"_S & (text != u"" ? text : link) & u"</a>"_S);
         };
 
-        auto write_note = [&exit_with_error, &find_ending_pair_quote, &html_escape, &html_escapeq, &i, &instr, &outfile, &remove_comments, &write_to_pos](const auto &startpos, const auto &endpos, const decltype(1) q_offset = 1)
+        auto write_abbr = [&exit_with_error, &find_ending_pair_quote, &html_escape, &html_escapeq, &i, &instr, &outfile, &remove_comments, &write_to_pos](const auto &startpos, const auto &endpos, const decltype(1) q_offset = 1)
         {
             i += q_offset;
             auto endqpos2 = find_ending_pair_quote(i + 1);
@@ -436,7 +436,8 @@ public:
                         }
                         ending_tags.append(u"</blockquote>"_S);
                     }
-                    i++;
+                    i += 2;
+                    continue;
                 }
             }
 
@@ -446,12 +447,12 @@ public:
                 auto startqpos = i;
                 i = find_ending_pair_quote(i);
                 auto endqpos = i;
-                auto str_in_b = u""_S;
+                auto str_in_p = u""_S;
                 if (prevc == u')') {
-                    auto openb = instr.rfindi(u"("_S, 0, prevci - 1);
-                    if (openb != -1 && openb > 0) {
-                        str_in_b = instr[range_el(openb + 1, startqpos - 1)];
-                        prevci = openb - 1;
+                    auto openp = instr.rfindi(u"("_S, 0, prevci - 1);
+                    if (openp != -1 && openp > 0) {
+                        str_in_p = instr[range_el(openp + 1, startqpos - 1)];
+                        prevci = openp - 1;
                         prevc = instr[prevci];
                     }
                 }
@@ -466,8 +467,8 @@ public:
                         title = u" title=\""_S & html_escapeq(remove_comments(instr[range_el(i + 3, endqpos2)], i + 3)) & u"\""_S;
                     }
                     auto imgtag = u"<img"_S;
-                    if (str_in_b != u"") {
-                        auto wh = str_in_b.replace(u","_S, u" "_S).split(u" "_S);
+                    if (str_in_p != u"") {
+                        auto wh = str_in_p.replace(u","_S, u" "_S).split(u" "_S);
                         assert(in(wh.len(), make_tuple(1, 2)));
                         imgtag &= u" width=\""_S & _get<0>(wh) & u"\" height=\""_S & wh.last() & u"\""_S;
                     }
@@ -494,7 +495,7 @@ public:
                     outfile.write(u"<a href=\""_S & link & u"\">"_S & html_escape(instr[range_el(startqpos + 1, endqpos)]) & u"</a>"_S);
                 }
                 else if (i_next_str(u"[‘"_S))
-                    write_note(startqpos, endqpos);
+                    write_abbr(startqpos, endqpos);
                 else if (next_char() == u'{' && (habr_html || ohd)) {
                     auto nesting_level = 0;
                     i += 2;
@@ -553,18 +554,18 @@ public:
                     write_to_pos(prevci, endqpos + 1);
                     if (habr_html) {
                         auto contains_new_line = in(u'\n'_C, ins);
-                        outfile.write((str_in_b != u"" ? u"<source lang=\""_S & str_in_b & u"\">"_S : contains_new_line ? u"<source>"_S : u"<code>"_S) & ins & (str_in_b != u"" || contains_new_line ? u"</source>"_S : u"</code>"_S));
+                        outfile.write((str_in_p != u"" ? u"<source lang=\""_S & str_in_p & u"\">"_S : contains_new_line ? u"<source>"_S : u"<code>"_S) & ins.replace(u"&"_S, u"&amp;"_S).replace(u"<"_S, u"&lt;"_S) & (str_in_p != u"" || contains_new_line ? u"</source>"_S : u"</code>"_S));
                     }
                     else {
                         auto pre = u"<pre "_S & (_get<0>(ins) == u'\n' ? u"class=\"code_block\""_S : u"style=\"display: inline\""_S) & u">"_S;
-                        if (ohd && syntax_highlighter_for_pqmarkup::is_lang_supported(str_in_b)) {
+                        if (ohd && syntax_highlighter_for_pqmarkup::is_lang_supported(str_in_p)) {
                             if (!(highlight_style_was_added)) {
                                 outfile.write(syntax_highlighter_for_pqmarkup::css);
                                 highlight_style_was_added = true;
                             }
                             try
                             {
-                                outfile.write(pre & syntax_highlighter_for_pqmarkup::highlight(str_in_b, ins) & u"</pre>"_S);
+                                outfile.write(pre & syntax_highlighter_for_pqmarkup::highlight(str_in_p, ins) & u"</pre>"_S);
                             }
                             catch (const syntax_highlighter_for_pqmarkup::Error& e)
                             {
@@ -714,7 +715,7 @@ public:
                     outfile.write(u"<div align=\""_S & ([&](const auto &a){return a == u"<<" ? u"left"_S : a == u">>" ? u"right"_S : a == u"><" ? u"center"_S : a == u"<>" ? u"justify"_S : throw KeyError(a);}(instr[prevci - 1] & prevc)) & u"\">"_S & (to_html(instr[range_el(startqpos + 1, endqpos)], nullptr, startqpos + 1)) & u"</div>\n"_S);
                     new_line_tag = u""_S;
                 }
-                else if (i_next_str(u":‘"_S) && instr[range_ei(find_ending_pair_quote(i + 2) + 1)][range_el(0, 1)] == u'<') {
+                else if (i_next_str(u":‘"_S) && instr[range_el(find_ending_pair_quote(i + 2) + 1, find_ending_pair_quote(i + 2) + 2)] == u'<') {
                     auto endrq = find_ending_pair_quote(i + 2);
                     i = endrq + 1;
                     write_to_pos(prevci + 1, i + 1);
@@ -723,45 +724,45 @@ public:
                 }
                 else {
                     i = startqpos;
-                    if (in(prev_char(), u"*_-~"_S)) {
+                    if (in(prevc, u"*_-~"_S)) {
                         write_to_pos(i - 1, i + 1);
-                        auto tag = [&](const auto &a){return a == u'*' ? u'b'_C : a == u'_' ? u'u'_C : a == u'-' ? u's'_C : a == u'~' ? u'i'_C : throw KeyError(a);}(prev_char());
+                        auto tag = [&](const auto &a){return a == u'*' ? u'b'_C : a == u'_' ? u'u'_C : a == u'-' ? u's'_C : a == u'~' ? u'i'_C : throw KeyError(a);}(prevc);
                         outfile.write(u"<"_S & tag & u">"_S);
                         ending_tags.append(u"</"_S & tag & u">"_S);
                     }
                     else if (in(prevc, u"HН"_S)) {
                         write_to_pos(prevci, i + 1);
-                        auto tag = u"h"_S & String(min(max(3 - (str_in_b == u"" ? 0 : to_int(str_in_b)), 1), 6));
+                        auto tag = u"h"_S & String(min(max(3 - (str_in_p == u"" ? 0 : to_int(str_in_p)), 1), 6));
                         outfile.write(u"<"_S & tag & u">"_S);
                         ending_tags.append(u"</"_S & tag & u">"_S);
                     }
                     else if (in(prevc, u"CС"_S)) {
                         write_to_pos(prevci, i + 1);
                         auto which_color = u"color"_S;
-                        if (str_in_b[range_el(0, 1)] == u'-') {
-                            str_in_b = str_in_b[range_ei(1)];
+                        if (str_in_p[range_el(0, 1)] == u'-') {
+                            str_in_p = str_in_p[range_ei(1)];
                             which_color = u"background-color"_S;
                         }
-                        if (str_in_b[range_el(0, 1)] == u'#') {
-                            auto new_str_in_b = u""_S;
-                            for (auto &&c : str_in_b) {
+                        if (str_in_p[range_el(0, 1)] == u'#') {
+                            auto new_str_in_p = u""_S;
+                            for (auto &&c : str_in_p) {
                                 auto cc = _get<0>(([&](const auto &a){return a == u'а' ? u"A"_S : a == u'б' ? u"B"_S : a == u'с' ? u"C"_S : a == u'д' ? u"D"_S : a == u'е' ? u"E"_S : a == u'ф' ? u"F"_S : c;}(c.lowercase())));
-                                new_str_in_b &= c.is_lowercase() ? cc.lowercase() : cc;
+                                new_str_in_p &= c.is_lowercase() ? cc.lowercase() : cc;
                             }
-                            str_in_b = new_str_in_b;
+                            str_in_p = new_str_in_p;
                         }
-                        else if (in(str_in_b.len(), make_tuple(1, 3)) && str_in_b.is_digit()) {
+                        else if (in(str_in_p.len(), make_tuple(1, 3)) && str_in_p.is_digit()) {
                             auto new_str = u"#"_S;
-                            for (auto &&ii : str_in_b.len() == 3 ? create_array({0, 1, 2}) : create_array({0, 0, 0}))
-                                new_str &= hex(idiv((to_int(str_in_b[ii]) * 0xFF + 4), 8)).zfill(2);
-                            str_in_b = new_str;
+                            for (auto &&ii : str_in_p.len() == 3 ? create_array({0, 1, 2}) : create_array({0, 0, 0}))
+                                new_str &= hex(idiv((to_int(str_in_p[ii]) * 0xFF + 4), 8)).zfill(2);
+                            str_in_p = new_str;
                         }
                         if (habr_html) {
-                            outfile.write(u"<font color=\""_S & str_in_b & u"\">"_S);
+                            outfile.write(u"<font color=\""_S & str_in_p & u"\">"_S);
                             ending_tags.append(u"</font>"_S);
                         }
                         else {
-                            outfile.write(u"<span style=\""_S & which_color & u": "_S & str_in_b & u"\">"_S);
+                            outfile.write(u"<span style=\""_S & which_color & u": "_S & str_in_p & u"\">"_S);
                             ending_tags.append(u"</span>"_S);
                         }
                     }
@@ -828,7 +829,7 @@ public:
                     while (s >= writepos && !in(instr[s], u"\r\n\t [{(‘“"_S))
                         s--;
                     if (i_next_str(u"‘"_S))
-                        write_note(s + 1, i, 0);
+                        write_abbr(s + 1, i, 0);
                     else if (i_next_str(u"http"_S) || i_next_str(u"./"_S))
                         write_http_link(s + 1, i, 0);
                     else {
@@ -890,7 +891,8 @@ public:
         close_unordered_list();
 
         write_to_pos(instr.len(), 0);
-        assert(ending_tags.empty());
+        if (!ending_tags.empty())
+            exit_with_error(u"Unclosed left single quotation mark somewhere"_S, instr.len());
 
         assert(to_html_called_inside_to_html_outer_pos_list.pop() == outer_pos);
 
