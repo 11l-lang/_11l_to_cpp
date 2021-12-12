@@ -1,13 +1,13 @@
 empty_dict : Dict[str, int] = {}
-dict = {'key': 1, 'key2': 2}
+dic = {'key': 1, 'key2': 2}
 arr = [1, 2]
 ===
 [String = Int] empty_dict
-V dict = [‘key’ = 1, ‘key2’ = 2]
+V dic = [‘key’ = 1, ‘key2’ = 2]
 V arr = [1, 2]
 ===
 Dict<String, int> empty_dict;
-auto dict = create_dict(dict_of(u"key"_S, 1)(u"key2"_S, 2));
+auto dic = create_dict(dict_of(u"key"_S, 1)(u"key2"_S, 2));
 auto arr = create_array({1, 2});
 
 
