@@ -8469,3 +8469,462 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/S-expressions#Nim
+from enum import IntEnum
+Char = str
+
+class Token:
+    class Kind(IntEnum):
+        INT = 0
+        FLOAT = 1
+        STRING = 2
+        IDENT = 3
+        LPAR = 4
+        RPAR = 5
+        END = 6
+
+    kind : Kind
+    val : str
+
+    def __init__(self, kind, val = ''):
+        self.kind = kind
+        self.val = val
+
+def lex(input_str):
+    result : List[Token] = []
+    pos = 0
+
+    def current():
+        return input_str[pos] if pos < len(input_str) else Char("\0")
+
+    while pos < len(input_str):
+        ch = input_str[pos]
+        if ch == '(':
+            pos += 1
+            result.append(Token(Token.Kind.LPAR))
+        elif ch == ')':
+            pos += 1
+            result.append(Token(Token.Kind.RPAR))
+        elif '0' <= ch <= '9':
+            num = ''
+            kind = Token.Kind.INT
+            while '0' <= current() <= '9':
+                num += current()
+                pos += 1
+            if current() == '.':
+                num += current()
+                kind = Token.Kind.FLOAT
+                pos += 1
+                while '0' <= current() <= '9':
+                    num += current()
+                    pos += 1
+            result.append(Token(kind, num))
+        elif ch in (' ', "\t", "\n", "\r"):
+            pos += 1
+        elif ch == '"':
+            str = ''
+            pos += 1
+            while current() != '"':
+                str += current()
+                pos += 1
+            pos += 1
+            result.append(Token(Token.Kind.STRING, str))
+        else:
+            BannedChars = {' ', '\t', '"', '(', ')', ';'}
+            ident = ''
+            while current() not in BannedChars:
+                ident += current()
+                pos += 1
+            result.append(Token(Token.Kind.IDENT, ident))
+
+    result.append(Token(Token.Kind.END))
+    return result
+
+def indent(s, count):
+    return count * ' ' + s.replace("\n", "\n" + count * ' ')
+
+class SExpr:
+    class Kind(IntEnum):
+        INT = 0
+        FLOAT = 1
+        STRING = 2
+        IDENT = 3
+        LIST = 4
+
+    kind : Kind
+    val : str
+
+    def __init__(self, kind, val = ''):
+        self.kind = kind
+        self.val = val
+        self.children : List[SExpr] = []
+
+    def to_str(self):
+        if self.kind in (SExpr.Kind.INT, SExpr.Kind.FLOAT, SExpr.Kind.IDENT):
+            return self.val
+        elif self.kind == SExpr.Kind.STRING:
+            return '"' + self.val + '"'
+        elif self.kind == SExpr.Kind.LIST:
+            result = '('
+            for i, ex in enumerate(self.children):
+                if ex.kind == SExpr.Kind.LIST and len(ex.children) > 1:
+                    result += "\n"
+                    result += indent(ex.to_str(), 2)
+                else:
+                    if i > 0:
+                        result += ' '
+                    result += ex.to_str()
+            return result + ')'
+        assert(False)
+
+input_str = """
+((data "quoted data" 123 4.5)
+ (data (!@# (4.5) "(more" "data)")))
+"""
+tokens = lex(input_str)
+pos = 0
+
+def current():
+    return tokens[pos] if pos < len(tokens) else Token(Token.Kind.END)
+
+def parse() -> SExpr:
+    token = current()
+    global pos
+    pos += 1
+    if token.kind == Token.Kind.INT:
+        return SExpr(SExpr.Kind.INT, token.val)
+    elif token.kind == Token.Kind.FLOAT:
+        return SExpr(SExpr.Kind.FLOAT, token.val)
+    elif token.kind == Token.Kind.STRING:
+        return SExpr(SExpr.Kind.STRING, token.val)
+    elif token.kind == Token.Kind.IDENT:
+        return SExpr(SExpr.Kind.IDENT, token.val)
+    elif token.kind == Token.Kind.LPAR:
+        result = SExpr(SExpr.Kind.LIST)
+        while current().kind not in (Token.Kind.RPAR, Token.Kind.END):
+            result.children.append(parse())
+        assert current().kind != Token.Kind.END, "Missing right paren ')'"
+        pos += 1
+        return result
+    assert(False)
+
+print(parse().to_str())
+===
+T Token
+   T.enum Kind
+      INT
+      FLOAT
+      STRING
+      IDENT
+      LPAR
+      RPAR
+      END
+
+   Kind kind
+   String val
+
+   F (kind, val = ‘’)
+      .kind = kind
+      .val = val
+
+F lex(input_str)
+   [Token] result
+   V pos = 0
+
+   F current()
+      R I @pos < @input_str.len {@input_str[@pos]} E Char("\0")
+
+   L pos < input_str.len
+      V ch = input_str[pos]
+      I ch == ‘(’
+         pos++
+         result.append(Token(Token.Kind.LPAR))
+      E I ch == ‘)’
+         pos++
+         result.append(Token(Token.Kind.RPAR))
+      E I ch C ‘0’..‘9’
+         V num = ‘’
+         V kind = Token.Kind.INT
+         L current() C ‘0’..‘9’
+            num ‘’= current()
+            pos++
+         I current() == ‘.’
+            num ‘’= current()
+            kind = FLOAT
+            pos++
+            L current() C ‘0’..‘9’
+               num ‘’= current()
+               pos++
+         result.append(Token(kind, num))
+      E I ch C (‘ ’, "\t", "\n", "\r")
+         pos++
+      E I ch == ‘"’
+         V str = ‘’
+         pos++
+         L current() != ‘"’
+            str ‘’= current()
+            pos++
+         pos++
+         result.append(Token(Token.Kind.STRING, str))
+      E
+         V BannedChars = Set([‘ ’, "\t", ‘"’, ‘(’, ‘)’, ‘;’])
+         V ident = ‘’
+         L current() !C BannedChars
+            ident ‘’= current()
+            pos++
+         result.append(Token(Token.Kind.IDENT, ident))
+
+   result.append(Token(Token.Kind.END))
+   R result
+
+F indent(s, count)
+   R (count * ‘ ’)‘’s.replace("\n", "\n"(count * ‘ ’))
+
+T SExpr
+   T.enum Kind
+      INT
+      FLOAT
+      STRING
+      IDENT
+      LIST
+
+   Kind kind
+   String val
+   [SExpr] children
+
+   F (kind, val = ‘’)
+      .kind = kind
+      .val = val
+
+   F to_str()
+      I .kind C (SExpr.Kind.INT, SExpr.Kind.FLOAT, SExpr.Kind.IDENT)
+         R .val
+      E I .kind == STRING
+         R ‘"’(.val)‘"’
+      E I .kind == LIST
+         V result = ‘(’
+         L(i, ex) enumerate(.children)
+            I ex.kind == LIST & ex.children.len > 1
+               result ‘’= "\n"
+               result ‘’= indent(ex.to_str(), 2)
+            E
+               I i > 0
+                  result ‘’= ‘ ’
+               result ‘’= ex.to_str()
+         R result‘)’
+      assert(0B)
+
+V input_str = ‘
+((data "quoted data" 123 4.5)
+ (data (!@# (4.5) "(more" "data)")))
+’
+V tokens = lex(input_str)
+V pos = 0
+
+F current()
+   R I :pos < :tokens.len {:tokens[:pos]} E Token(Token.Kind.END)
+
+F parse() -> SExpr
+   V token = current()
+   :pos++
+   I token.kind == INT
+      R SExpr(SExpr.Kind.INT, token.val)
+   E I token.kind == FLOAT
+      R SExpr(SExpr.Kind.FLOAT, token.val)
+   E I token.kind == STRING
+      R SExpr(SExpr.Kind.STRING, token.val)
+   E I token.kind == IDENT
+      R SExpr(SExpr.Kind.IDENT, token.val)
+   E I token.kind == LPAR
+      V result = SExpr(SExpr.Kind.LIST)
+      L current().kind !C (Token.Kind.RPAR, Token.Kind.END)
+         result.children.append(parse())
+      assert(current().kind != END, ‘Missing right paren ')'’)
+      :pos++
+      R result
+   assert(0B)
+
+print(parse().to_str())
+===
+class Token
+{
+public:
+    enum class Kind {
+        INT,
+        FLOAT,
+        STRING,
+        IDENT,
+        LPAR,
+        RPAR,
+        END
+    };
+
+    Kind kind;
+    String val;
+
+    template <typename T1, typename T2 = decltype(u""_S)> Token(const T1 &kind, const T2 &val = u""_S) :
+        kind(kind),
+        val(val)
+    {
+    }
+};
+
+template <typename T1> auto lex(const T1 &input_str)
+{
+    Array<Token> result;
+    auto pos = 0;
+
+    auto current = [&input_str, &pos]()
+    {
+        return pos < input_str.len() ? input_str[pos] : u'\0'_C;
+    };
+
+    while (pos < input_str.len()) {
+        auto ch = input_str[pos];
+        if (ch == u'(') {
+            pos++;
+            result.append(Token(Token::Kind::LPAR));
+        }
+        else if (ch == u')') {
+            pos++;
+            result.append(Token(Token::Kind::RPAR));
+        }
+        else if (in(ch, range_ee(u'0'_C, u'9'_C))) {
+            auto num = u""_S;
+            auto kind = Token::Kind::INT;
+            while (in(current(), range_ee(u'0'_C, u'9'_C))) {
+                num &= current();
+                pos++;
+            }
+            if (current() == u'.') {
+                num &= current();
+                kind = TYPE_RM_REF(kind)::FLOAT;
+                pos++;
+                while (in(current(), range_ee(u'0'_C, u'9'_C))) {
+                    num &= current();
+                    pos++;
+                }
+            }
+            result.append(Token(kind, num));
+        }
+        else if (in(ch, make_tuple(u" "_S, u"\t"_S, u"\n"_S, u"\r"_S)))
+            pos++;
+        else if (ch == u'"') {
+            auto str = u""_S;
+            pos++;
+            while (current() != u'"') {
+                str &= current();
+                pos++;
+            }
+            pos++;
+            result.append(Token(Token::Kind::STRING, str));
+        }
+        else {
+            auto BannedChars = create_set({u" "_S, u"\t"_S, u"\""_S, u"("_S, u")"_S, u";"_S});
+            auto ident = u""_S;
+            while (!in(current(), BannedChars)) {
+                ident &= current();
+                pos++;
+            }
+            result.append(Token(Token::Kind::IDENT, ident));
+        }
+    }
+
+    result.append(Token(Token::Kind::END));
+    return result;
+}
+
+template <typename T1, typename T2> auto indent(const T1 &s, const T2 &count)
+{
+    return (count * u" "_S) & s.replace(u"\n"_S, u"\n"_S & (count * u" "_S));
+}
+
+class SExpr
+{
+public:
+    enum class Kind {
+        INT,
+        FLOAT,
+        STRING,
+        IDENT,
+        LIST
+    };
+
+    Kind kind;
+    String val;
+    Array<SExpr> children;
+
+    template <typename T1, typename T2 = decltype(u""_S)> SExpr(const T1 &kind, const T2 &val = u""_S) :
+        kind(kind),
+        val(val)
+    {
+    }
+
+    auto to_str()
+    {
+        if (in(kind, make_tuple(SExpr::Kind::INT, SExpr::Kind::FLOAT, SExpr::Kind::IDENT)))
+            return val;
+        else if (kind == TYPE_RM_REF(kind)::STRING)
+            return u"\""_S & (val) & u"\""_S;
+        else if (kind == TYPE_RM_REF(kind)::LIST) {
+            auto result = u"("_S;
+            for (auto &&[i, ex] : enumerate(children))
+                if (ex.kind == TYPE_RM_REF(ex.kind)::LIST && ex.children.len() > 1) {
+                    result &= u"\n"_S;
+                    result &= indent(ex.to_str(), 2);
+                }
+                else {
+                    if (i > 0)
+                        result &= u" "_S;
+                    result &= ex.to_str();
+                }
+            return result & u")"_S;
+        }
+        assert(false);
+    }
+};
+
+auto input_str = uR"'(
+((data "quoted data" 123 4.5)
+ (data (!@# (4.5) "(more" "data)")))
+)'"_S;
+auto tokens = lex(input_str);
+auto pos = 0;
+
+auto current()
+{
+    return ::pos < ::tokens.len() ? ::tokens[::pos] : Token(Token::Kind::END);
+}
+
+SExpr parse()
+{
+    auto token = current();
+    ::pos++;
+    if (token.kind == TYPE_RM_REF(token.kind)::INT)
+        return SExpr(SExpr::Kind::INT, token.val);
+    else if (token.kind == TYPE_RM_REF(token.kind)::FLOAT)
+        return SExpr(SExpr::Kind::FLOAT, token.val);
+    else if (token.kind == TYPE_RM_REF(token.kind)::STRING)
+        return SExpr(SExpr::Kind::STRING, token.val);
+    else if (token.kind == TYPE_RM_REF(token.kind)::IDENT)
+        return SExpr(SExpr::Kind::IDENT, token.val);
+    else if (token.kind == TYPE_RM_REF(token.kind)::LPAR) {
+        auto result = SExpr(SExpr::Kind::LIST);
+        while (!in(current().kind, make_tuple(Token::Kind::RPAR, Token::Kind::END)))
+            result.children.append(parse());
+        assert(current().kind != TYPE_RM_REF(current().kind)::END, u"Missing right paren ')'"_S);
+        ::pos++;
+        return result;
+    }
+    assert(false);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(parse().to_str());
+    }
+} code_block_1;

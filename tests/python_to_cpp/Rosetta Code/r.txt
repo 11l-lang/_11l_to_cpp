@@ -2373,3 +2373,150 @@ struct CodeBlock1
         print(text);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Rock-paper-scissors#Python
+import random
+
+rules = {'rock': 'paper', 'scissors': 'rock', 'paper': 'scissors'}
+previous = ['rock', 'paper', 'scissors']
+
+while True:
+    human = input('\nchoose your weapon: ')
+    computer = rules[random.choice(previous)]  # choose the weapon which beats a randomly chosen weapon from "previous"
+
+    if human in ('quit', 'exit'): break
+
+    elif human in rules:
+        previous.append(human)
+        print('the computer played', computer, end='; ')
+
+        if rules[computer] == human:  # if what beats the computer's choice is the human's choice...
+            print('yay you win!')
+        elif rules[human] == computer:  # if what beats the human's choice is the computer's choice...
+            print('the computer beat you... :(')
+        else: print("it's a tie!")
+
+    else: print("that's not a valid choice")
+===
+V rules = [‘rock’ = ‘paper’, ‘scissors’ = ‘rock’, ‘paper’ = ‘scissors’]
+V previous = [‘rock’, ‘paper’, ‘scissors’]
+
+L
+   V human = input("\nchoose your weapon: ")
+   V computer = rules[random:choice(previous)]
+
+   I human C (‘quit’, ‘exit’)
+      L.break
+
+   E I human C rules
+      previous.append(human)
+      print(‘the computer played ’computer, end' ‘; ’)
+
+      I rules[computer] == human
+         print(‘yay you win!’)
+      E I rules[human] == computer
+         print(‘the computer beat you... :(’)
+      E
+         print(‘it's a tie!’)
+
+   E
+      print(‘that's not a valid choice’)
+===
+auto rules = create_dict(dict_of(u"rock"_S, u"paper"_S)(u"scissors"_S, u"rock"_S)(u"paper"_S, u"scissors"_S));
+auto previous = create_array({u"rock"_S, u"paper"_S, u"scissors"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            auto human = input(u"\nchoose your weapon: "_S);
+            auto computer = rules[randomns::choice(previous)];
+
+            if (in(human, make_tuple(u"quit"_S, u"exit"_S)))
+                break;
+
+            else if (in(human, rules)) {
+                previous.append(human);
+                print(u"the computer played "_S & computer, u"; "_S);
+
+                if (rules[computer] == human)
+                    print(u"yay you win!"_S);
+                else if (rules[human] == computer)
+                    print(u"the computer beat you... :("_S);
+                else
+                    print(u"it's a tie!"_S);
+            }
+
+            else
+                print(u"that's not a valid choice"_S);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/RPG_attributes_generator#Python
+import random, time
+random.seed(int(time.time()))
+total = 0
+count = 0
+
+attributes : List[int]
+while total < 75 or count < 2:
+    attributes = [(sum(sorted([random.randint(1, 6) for roll in range(0, 4)])[1:])) for attribute in range(0, 6)]
+
+    for attribute in attributes:
+        if attribute >= 15:
+            count += 1
+
+    total = sum(attributes)
+
+print(total, attributes)
+===
+random:seed(Int(Time().unix_time()))
+V total = 0
+V count = 0
+
+[Int] attributes
+L total < 75 | count < 2
+   attributes = (0..5).map(attribute -> (sum(sorted((0..3).map(roll -> random:(1 .. 6)))[1..])))
+
+   L(attribute) attributes
+      I attribute >= 15
+         count++
+
+   total = sum(attributes)
+
+print(total‘ ’attributes)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        randomns::seed(to_int(Time().unix_time()));
+    }
+} code_block_1;
+
+auto total = 0;
+auto count = 0;
+
+Array<int> attributes;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (total < 75 || count < 2) {
+            attributes = range_ee(0, 5).map([](const auto &attribute){return (sum(sorted(range_ee(0, 3).map([](const auto &roll){return randomns::_(range_ee(1, 6));}))[range_ei(1)]));});
+
+            for (auto &&attribute : attributes)
+                if (attribute >= 15)
+                    count++;
+
+            total = sum(attributes);
+        }
+
+        print(total & u" "_S & attributes);
+    }
+} code_block_2;

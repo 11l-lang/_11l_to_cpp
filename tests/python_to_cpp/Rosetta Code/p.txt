@@ -5262,3 +5262,881 @@ struct CodeBlock3
         }
     }
 } code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Pig_the_dice_game#Python
+import random
+
+playercount = 2
+maxscore = 100
+safescore = [0] * playercount
+player = 0
+score=0
+
+while max(safescore) < maxscore:
+    rolling = input("Player %i: (%i, %i) Rolling? (Y) "
+                    % (player, safescore[player], score)).strip(' ').lower() in {'yes', 'y', ''}
+    if rolling:
+        rolled = random.randint(1, 6)
+        print('  Rolled %i' % rolled)
+        if rolled == 1:
+            print('  Bust! you lose %i but still keep your previous %i'
+                  % (score, safescore[player]))
+            (score, player) = (0, (player + 1) % playercount)
+        else:
+            score += rolled
+    else:
+        safescore[player] += score
+        if safescore[player] >= maxscore:
+            break
+        print('  Sticking with %i' % safescore[player])
+        (score, player) = (0, (player + 1) % playercount)
+
+print('\nPlayer %i wins with a score of %i' %(player, safescore[player]))
+===
+V playercount = 2
+V maxscore = 100
+V safescore = [0] * playercount
+V player = 0
+V score = 0
+
+L max(safescore) < maxscore
+   V rolling = input(‘Player #.: (#., #.) Rolling? (Y) ’.format(player, safescore[player], score)).trim(‘ ’).lowercase() C Set([‘yes’, ‘y’, ‘’])
+   I rolling
+      V rolled = random:(1 .. 6)
+      print(‘  Rolled #.’.format(rolled))
+      I rolled == 1
+         print(‘  Bust! you lose #. but still keep your previous #.’.format(score, safescore[player]))
+         (score, player) = (0, (player + 1) % playercount)
+      E
+         score += rolled
+   E
+      safescore[player] += score
+      I safescore[player] >= maxscore
+         L.break
+      print(‘  Sticking with #.’.format(safescore[player]))
+      (score, player) = (0, (player + 1) % playercount)
+
+print("\nPlayer #. wins with a score of #.".format(player, safescore[player]))
+===
+auto playercount = 2;
+auto maxscore = 100;
+auto safescore = create_array({0}) * playercount;
+auto player = 0;
+auto score = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (max(safescore) < maxscore) {
+            auto rolling = in(input(u"Player #.: (#., #.) Rolling? (Y) "_S.format(player, safescore[player], score)).trim(u" "_S).lowercase(), create_set({u"yes"_S, u"y"_S, u""_S}));
+            if (rolling) {
+                auto rolled = randomns::_(range_ee(1, 6));
+                print(u"  Rolled #."_S.format(rolled));
+                if (rolled == 1) {
+                    print(u"  Bust! you lose #. but still keep your previous #."_S.format(score, safescore[player]));
+                    assign_from_tuple(score, player, make_tuple(0, mod((player + 1), playercount)));
+                }
+                else
+                    score += rolled;
+            }
+            else {
+                safescore[player] += score;
+                if (safescore[player] >= maxscore)
+                    break;
+                print(u"  Sticking with #."_S.format(safescore[player]));
+                assign_from_tuple(score, player, make_tuple(0, mod((player + 1), playercount)));
+            }
+        }
+
+        print(u"\nPlayer #. wins with a score of #."_S.format(player, safescore[player]));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Pisano_period#Nim
+import math, collections
+
+def lcm(m, n):
+    return m // math.gcd(m, n) * n
+
+def get_primes(n):
+    r : List[int] = []
+    for d in range(2, n + 1):
+        q = n // d
+        m = n % d
+        while m == 0:
+            r.append(d)
+            n = q
+            q = n // d
+            m = n % d
+    return r
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+def pisano_period(m):
+    p = 0
+    c = 1
+    for i in range(m*m):
+        p = (p + c) % m
+        (p, c) = (c, p)
+        if p == 0 and c == 1: return i + 1
+    return 1
+
+def pisano_prime(p, k):
+    return p**(k-1) * pisano_period(p) if is_prime(p) else 0
+
+def pisano(m):
+    primes = get_primes(m)
+    prime_powers = collections.defaultdict(int) # int
+    for p in primes:
+        prime_powers[p] += 1
+    pps : List[int] = []
+    for k, v in prime_powers.items():
+        pps.append(pisano_prime(k, v))
+    if len(pps) == 0: return 1
+    result = pps[0]
+    for i in range(1, len(pps)):
+        result = lcm(result, pps[i])
+    return result
+
+for p in range(2, 15):
+    pp = pisano_prime(p, 2)
+    if pp > 0:
+        print('pisano_prime({:2}, 2) = {}'.format(p, pp))
+
+print()
+for p in range(2, 180):
+    pp = pisano_prime(p, 1)
+    if pp > 0:
+        print('pisano_prime({:3}, 1) = {}'.format(p, pp))
+
+print()
+print("pisano(n) for integers 'n' from 1 to 180 are:")
+for n in range(1, 181):
+    print('%3d' % pisano(n), end = "\n" if n % 15 == 0 else ' ')
+===
+F lcm(m, n)
+   R m I/ gcd(m, n) * n
+
+F get_primes(=n)
+   [Int] r
+   L(d) 2 .. n
+      V q = n I/ d
+      V m = n % d
+      L m == 0
+         r.append(d)
+         n = q
+         q = n I/ d
+         m = n % d
+   R r
+
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+F pisano_period(m)
+   V p = 0
+   V c = 1
+   L(i) 0 .< m * m
+      p = (p + c) % m
+      swap(&p, &c)
+      I p == 0 & c == 1
+         R i + 1
+   R 1
+
+F pisano_prime(p, k)
+   R I is_prime(p) {p ^ (k - 1) * pisano_period(p)} E 0
+
+F pisano(m)
+   V primes = get_primes(m)
+   V prime_powers = DefaultDict[Int, Int]()
+   L(p) primes
+      prime_powers[p]++
+   [Int] pps
+   L(k, v) prime_powers
+      pps.append(pisano_prime(k, v))
+   I pps.empty
+      R 1
+   V result = pps[0]
+   L(i) 1 .< pps.len
+      result = lcm(result, pps[i])
+   R result
+
+L(p) 2..14
+   V pp = pisano_prime(p, 2)
+   I pp > 0
+      print(‘pisano_prime(#2, 2) = #.’.format(p, pp))
+
+print()
+L(p) 2..179
+   V pp = pisano_prime(p, 1)
+   I pp > 0
+      print(‘pisano_prime(#3, 1) = #.’.format(p, pp))
+
+print()
+print(‘pisano(n) for integers 'n' from 1 to 180 are:’)
+L(n) 1..180
+   print(‘#3’.format(pisano(n)), end' I n % 15 == 0 {"\n"} E ‘ ’)
+===
+template <typename T1, typename T2> auto lcm(const T1 &m, const T2 &n)
+{
+    return idiv(m, gcd(m, n)) * n;
+}
+
+template <typename T1> auto get_primes(T1 n)
+{
+    Array<int> r;
+    for (auto d : range_ee(2, n)) {
+        auto q = idiv(n, d);
+        auto m = mod(n, d);
+        while (m == 0) {
+            r.append(d);
+            n = q;
+            q = idiv(n, d);
+            m = mod(n, d);
+        }
+    }
+    return r;
+}
+
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+template <typename T1> auto pisano_period(const T1 &m)
+{
+    auto p = 0;
+    auto c = 1;
+    for (auto i : range_el(0, m * m)) {
+        p = mod((p + c), m);
+        swap(p, c);
+        if (p == 0 && c == 1)
+            return i + 1;
+    }
+    return 1;
+}
+
+template <typename T1, typename T2> auto pisano_prime(const T1 &p, const T2 &k)
+{
+    return is_prime(p) ? pow(p, (k - 1)) * pisano_period(p) : 0;
+}
+
+template <typename T1> auto pisano(const T1 &m)
+{
+    auto primes = get_primes(m);
+    auto prime_powers = DefaultDict<int, int>();
+    for (auto &&p : primes)
+        prime_powers[p]++;
+    Array<int> pps;
+    for (auto &&[k, v] : prime_powers)
+        pps.append(pisano_prime(k, v));
+    if (pps.empty())
+        return 1;
+    auto result = _get<0>(pps);
+    for (auto i : range_el(1, pps.len()))
+        result = lcm(result, pps[i]);
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto p : range_ee(2, 14)) {
+            auto pp = pisano_prime(p, 2);
+            if (pp > 0)
+                print(u"pisano_prime(#2, 2) = #."_S.format(p, pp));
+        }
+
+        print();
+        for (auto p : range_ee(2, 179)) {
+            auto pp = pisano_prime(p, 1);
+            if (pp > 0)
+                print(u"pisano_prime(#3, 1) = #."_S.format(p, pp));
+        }
+
+        print();
+        print(u"pisano(n) for integers 'n' from 1 to 180 are:"_S);
+        for (auto n : range_ee(1, 180))
+            print(u"#3"_S.format(pisano(n)), mod(n, 15) == 0 ? u"\n"_S : u" "_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Practical_numbers#Nim
+import math
+from copy import copy
+
+def properDivisors(n):
+    result = [1]
+    for i in range(2, int(math.sqrt(n)) + 1):
+        if n % i == 0:
+            j = n // i
+            result.append(i)
+            if i != j: result.append(j)
+    return result
+
+def allSums(n):
+    divs = properDivisors(n)
+    currSet = set() # int
+    result = set() # int
+    for d in divs:
+        currSet = copy(result)
+        for sum in currSet:
+            result.add(sum + d)
+        result.add(d)
+    return result
+
+def isPractical(n):
+    return set(list(range(1, n))) <= allSums(n)
+
+count = 0
+for n in range(1, 334):
+    if isPractical(n):
+        count += 1
+        print('%3d' % n, end = "\n" if count % 11 == 0 else ' ')
+print('Found', count, 'practical numbers between 1 and 333.')
+print()
+print('666 is ', '' if isPractical(666) else 'not ', 'a practical number.', sep = '')
+===
+F properDivisors(n)
+   V result = [1]
+   L(i) 2 .. Int(sqrt(n))
+      I n % i == 0
+         V j = n I/ i
+         result.append(i)
+         I i != j
+            result.append(j)
+   R result
+
+F allSums(n)
+   V divs = properDivisors(n)
+   V currSet = Set[Int]()
+   V result = Set[Int]()
+   L(d) divs
+      currSet = copy(result)
+      L(sum) currSet
+         result.add(sum + d)
+      result.add(d)
+   R result
+
+F isPractical(n)
+   R Set(Array(1 .< n)) <= allSums(n)
+
+V count = 0
+L(n) 1..333
+   I isPractical(n)
+      count++
+      print(‘#3’.format(n), end' I count % 11 == 0 {"\n"} E ‘ ’)
+print(‘Found ’count‘ practical numbers between 1 and 333.’)
+print()
+print(‘666 is ’(I isPractical(666) {‘’} E ‘not ’)‘a practical number.’)
+===
+template <typename T1> auto properDivisors(const T1 &n)
+{
+    auto result = create_array({1});
+    for (auto i : range_ee(2, to_int(sqrt(n))))
+        if (mod(n, i) == 0) {
+            auto j = idiv(n, i);
+            result.append(i);
+            if (i != j)
+                result.append(j);
+        }
+    return result;
+}
+
+template <typename T1> auto allSums(const T1 &n)
+{
+    auto divs = properDivisors(n);
+    auto currSet = Set<int>();
+    auto result = Set<int>();
+    for (auto &&d : divs) {
+        currSet = copy(result);
+        for (auto &&sum : currSet)
+            result.add(sum + d);
+        result.add(d);
+    }
+    return result;
+}
+
+template <typename T1> auto isPractical(const T1 &n)
+{
+    return create_set(create_array(range_el(1, n))) <= allSums(n);
+}
+
+auto count = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(1, 333))
+            if (isPractical(n)) {
+                count++;
+                print(u"#3"_S.format(n), mod(count, 11) == 0 ? u"\n"_S : u" "_S);
+            }
+        print(u"Found "_S & count & u" practical numbers between 1 and 333."_S);
+        print();
+        print(u"666 is "_S & (isPractical(666) ? u""_S : u"not "_S) & u"a practical number."_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Price_list_behind_API#Python
+import random
+
+#%%Sample price generation
+price_list_size = random.randrange(99_000, 101_000)
+price_list = [random.randrange(100_000) for i in range(price_list_size)]
+
+delta_price = 1     # Minimum difference between any two different prices.
+
+#%% API
+def get_prange_count(startp, endp):
+    return len([r for r in price_list if startp <= float(r) <= endp])
+
+def get_max_price():
+    return max(price_list)
+
+#%% Solution
+def get_5k(mn : float, mx : float, num=5_000):
+    "Binary search for num items between mn and mx, adjusting mx"
+    count = get_prange_count(mn, mx)
+    delta_mx = (mx - mn) / 2
+    while count != num and delta_mx >= delta_price / 2:
+        mx += -delta_mx if count > num else +delta_mx
+        mx = float(mx // 1)    # Floor
+        (count, delta_mx) = (get_prange_count(mn, mx), delta_mx / 2)
+    return (mx, count)
+
+def get_all_5k(mn=0.0, mx : float=get_max_price(), num=5_000):
+    "Get all non-overlapping ranges"
+    (partmax, partcount) = get_5k(mn, mx, num)
+    result = [(mn, partmax, partcount)]
+    while partmax < mx:
+        partmin = partmax + delta_price
+        (partmax, partcount) = get_5k(partmin, mx, num)
+        assert partcount > 0, \
+            f"price_list from {partmin} with too many of the same price"
+        result.append((partmin, partmax, partcount))
+    return result
+
+print(f"Using {price_list_size} random prices from 0 to {get_max_price()}")
+result = get_all_5k()
+print(f"Splits into {len(result)} bins of approx 5000 elements")
+for mn, mx, count in result:
+    print(f"  From {mn:8.1f} ... {mx:8.1f} with {count} items.")
+
+if len(price_list) != sum(count for mn, mx, count in result):
+    print("\nWhoops! Some items missing:")
+===
+V price_list_size = random:(99'000 .< 101'000)
+V price_list = (0 .< price_list_size).map(i -> random:(100'000))
+
+V delta_price = 1
+
+F get_prange_count(startp, endp)
+   R :price_list.filter(r -> Float(r) C @startp .. @endp).len
+
+F get_max_price()
+   R max(:price_list)
+
+F get_5k(Float mn, Float =mx; num = 5'000)
+   ‘Binary search for num items between mn and mx, adjusting mx’
+   V count = get_prange_count(mn, mx)
+   V delta_mx = (mx - mn) / 2
+   L count != num & delta_mx >= :delta_price / 2
+      mx += I count > num {-delta_mx} E +delta_mx
+      mx = Float(mx I/ 1)
+      (count, delta_mx) = (get_prange_count(mn, mx), delta_mx / 2)
+   R (mx, count)
+
+F get_all_5k(mn = 0.0, Float mx = get_max_price(); num = 5'000)
+   ‘Get all non-overlapping ranges’
+   V (partmax, partcount) = get_5k(mn, mx, num)
+   V result = [(mn, partmax, partcount)]
+   L partmax < mx
+      V partmin = partmax + :delta_price
+      (partmax, partcount) = get_5k(partmin, mx, num)
+      assert(partcount > 0, ‘price_list from ’partmin‘ with too many of the same price’)
+      result.append((partmin, partmax, partcount))
+   R result
+
+print(‘Using ’price_list_size‘ random prices from 0 to ’get_max_price())
+V result = get_all_5k()
+print(‘Splits into ’result.len‘ bins of approx 5000 elements’)
+L(mn, mx, count) result
+   print(f:‘  From {mn:8.1} ... {mx:8.1} with {count} items.’)
+
+I price_list.len != sum(result.map((mn, mx, count) -> count))
+   print("\nWhoops! Some items missing:")
+===
+auto price_list_size = randomns::_(range_el(99'000, 101'000));
+auto price_list = range_el(0, price_list_size).map([](const auto &i){return randomns::_(100'000);});
+
+auto delta_price = 1;
+
+template <typename T1, typename T2> auto get_prange_count(const T1 &startp, const T2 &endp)
+{
+    return ::price_list.filter([&endp, &startp](const auto &r){return in(to_float(r), range_ee(startp, endp));}).len();
+}
+
+auto get_max_price()
+{
+    return max(::price_list);
+}
+
+template <typename T3 = decltype(5'000)> auto get_5k(const double mn, double mx, const T3 &num = 5'000)
+{
+    u"Binary search for num items between mn and mx, adjusting mx"_S;
+    auto count = get_prange_count(mn, mx);
+    auto delta_mx = (mx - mn) / 2.0;
+    while (count != num && delta_mx >= ::delta_price / 2.0) {
+        mx += count > num ? -delta_mx : +delta_mx;
+        mx = to_float(idiv(mx, 1));
+        assign_from_tuple(count, delta_mx, make_tuple(get_prange_count(mn, mx), delta_mx / 2.0));
+    }
+    return make_tuple(mx, count);
+}
+
+template <typename T1 = decltype(0.0), typename T3 = decltype(5'000)> auto get_all_5k(const T1 &mn = 0.0, const double mx = get_max_price(), const T3 &num = 5'000)
+{
+    u"Get all non-overlapping ranges"_S;
+    auto [partmax, partcount] = get_5k(mn, mx, num);
+    auto result = create_array({make_tuple(mn, partmax, partcount)});
+    while (partmax < mx) {
+        auto partmin = partmax + ::delta_price;
+        assign_from_tuple(partmax, partcount, get_5k(partmin, mx, num));
+        assert(partcount > 0, u"price_list from "_S & partmin & u" with too many of the same price"_S);
+        result.append(make_tuple(partmin, partmax, partcount));
+    }
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Using "_S & price_list_size & u" random prices from 0 to "_S & get_max_price());
+    }
+} code_block_1;
+
+auto result = get_all_5k();
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"Splits into "_S & result.len() & u" bins of approx 5000 elements"_S);
+        for (auto &&[mn, mx, count] : result)
+            print(u"  From #6.1 ... #6.1 with #. items."_S.format(mn, mx, count));
+
+        if (price_list.len() != sum_map(result, [](const auto &mn, const auto &mx, const auto &count){return count;}))
+            print(u"\nWhoops! Some items missing:"_S);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Prime_numbers_which_contain_123
+import math
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+def is_prime123(n):
+    return '123' in str(n) and is_prime(n)
+
+c = 0
+for n in range(100_000):
+    if is_prime123(n):
+        c += 1
+        print('%5d' % n, end = "\n" if c % 8 == 0 else ' ')
+print()
+print('Found', c, '"123" primes less than 100000')
+c = 0
+for n in range(1_000_000):
+    if is_prime123(n):
+        c += 1
+print()
+print('Found', c, '"123" primes less than 1000000')
+===
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+F is_prime123(n)
+   R ‘123’ C String(n) & is_prime(n)
+
+V c = 0
+L(n) 100'000
+   I is_prime123(n)
+      c++
+      print(‘#5’.format(n), end' I c % 8 == 0 {"\n"} E ‘ ’)
+print()
+print(‘Found ’c‘ "123" primes less than 100000’)
+c = 0
+L(n) 1'000'000
+   I is_prime123(n)
+      c++
+print()
+print(‘Found ’c‘ "123" primes less than 1000000’)
+===
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+template <typename T1> auto is_prime123(const T1 &n)
+{
+    return in(u"123"_S, String(n)) && is_prime(n);
+}
+
+auto c = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int n = 0; n < 100'000; n++)
+            if (is_prime123(n)) {
+                c++;
+                print(u"#5"_S.format(n), mod(c, 8) == 0 ? u"\n"_S : u" "_S);
+            }
+        print();
+        print(u"Found "_S & c & u" \"123\" primes less than 100000"_S);
+        c = 0;
+        for (int n = 0; n < 1'000'000; n++)
+            if (is_prime123(n))
+                c++;
+        print();
+        print(u"Found "_S & c & u" \"123\" primes less than 1000000"_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Primes_whose_sum_of_digits_is_25#Nim
+import math
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+def digit_sum(n):
+    result = 0
+    while n != 0:
+        result += n % 10
+        n //= 10
+    return result
+
+c = 0
+for n in range(5000):
+    if digit_sum(n) == 25 and is_prime(n):
+        c += 1
+        print('%4d' % n, end = "\n" if c % 6 == 0 else ' ')
+print()
+print('Found', c, 'primes whose sum of digits is 25')
+===
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+F digit_sum(=n)
+   V result = 0
+   L n != 0
+      result += n % 10
+      n I/= 10
+   R result
+
+V c = 0
+L(n) 5000
+   I digit_sum(n) == 25 & is_prime(n)
+      c++
+      print(‘#4’.format(n), end' I c % 6 == 0 {"\n"} E ‘ ’)
+print()
+print(‘Found ’c‘ primes whose sum of digits is 25’)
+===
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+template <typename T1> auto digit_sum(T1 n)
+{
+    auto result = 0;
+    while (n != 0) {
+        result += mod(n, 10);
+        n = idiv(n, 10);
+    }
+    return result;
+}
+
+auto c = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int n = 0; n < 5000; n++)
+            if (digit_sum(n) == 25 && is_prime(n)) {
+                c++;
+                print(u"#4"_S.format(n), mod(c, 6) == 0 ? u"\n"_S : u" "_S);
+            }
+        print();
+        print(u"Found "_S & c & u" primes whose sum of digits is 25"_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Primes_with_digits_in_nondecreasing_order#Nim
+import math
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+def is_non_decreasing(n):
+    prev = 10
+    while n != 0:
+        d = n % 10
+        if d > prev: return False
+        prev = d
+        n //= 10
+    return True
+
+c = 0
+for n in range(1000):
+    if is_non_decreasing(n) and is_prime(n):
+        c += 1
+        print('%3d' % n, end = "\n" if c % 10 == 0 else ' ')
+print()
+print('Found', c, 'primes with digits in nondecreasing order')
+===
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+F is_non_decreasing(=n)
+   V prev = 10
+   L n != 0
+      V d = n % 10
+      I d > prev
+         R 0B
+      prev = d
+      n I/= 10
+   R 1B
+
+V c = 0
+L(n) 1000
+   I is_non_decreasing(n) & is_prime(n)
+      c++
+      print(‘#3’.format(n), end' I c % 10 == 0 {"\n"} E ‘ ’)
+print()
+print(‘Found ’c‘ primes with digits in nondecreasing order’)
+===
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+template <typename T1> auto is_non_decreasing(T1 n)
+{
+    auto prev = 10;
+    while (n != 0) {
+        auto d = mod(n, 10);
+        if (d > prev)
+            return false;
+        prev = d;
+        n = idiv(n, 10);
+    }
+    return true;
+}
+
+auto c = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int n = 0; n < 1000; n++)
+            if (is_non_decreasing(n) && is_prime(n)) {
+                c++;
+                print(u"#3"_S.format(n), mod(c, 10) == 0 ? u"\n"_S : u" "_S);
+            }
+        print();
+        print(u"Found "_S & c & u" primes with digits in nondecreasing order"_S);
+    }
+} code_block_1;
