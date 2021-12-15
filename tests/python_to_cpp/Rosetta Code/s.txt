@@ -8928,3 +8928,538 @@ struct CodeBlock1
         print(parse().to_str());
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Separate_the_house_number_from_the_street_name#Nim
+def separateHouseNumber(address):
+    fields = address.split()
+    last = fields[-1]
+    penult = fields[-2]
+    house = ''
+    if last[0].isdigit():
+        isdig = penult[0].isdigit()
+        if len(fields) > 2 and isdig and not penult.startswith("194"):
+            house = penult + ' ' + last
+        else:
+            house = last
+    elif len(fields) > 2:
+        house = penult + ' ' + last
+    return (address[:len(address)-len(house)].rstrip(' '), house)
+
+Addresses = ["Plataanstraat 5",
+             "Straat 12",
+             "Straat 12 II",
+             "Dr. J. Straat   12",
+             "Dr. J. Straat 12 a",
+             "Dr. J. Straat 12-14",
+             "Laan 1940 - 1945 37",
+             "Plein 1940 2",
+             "1213-laan 11",
+             "16 april 1944 Pad 1",
+             "1e Kruisweg 36",
+             "Laan 1940-'45 66",
+             "Laan '40-'45",
+             "Langeloerduinen 3 46",
+             "Marienwaerdt 2e Dreef 2",
+             "Provincialeweg N205 1",
+             "Rivium 2e Straat 59.",
+             "Nieuwe gracht 20rd",
+             "Nieuwe gracht 20rd 2",
+             "Nieuwe gracht 20zw /2",
+             "Nieuwe gracht 20zw/3",
+             "Nieuwe gracht 20 zw/4",
+             "Bahnhofstr. 4",
+             "Wertstr. 10",
+             "Lindenhof 1",
+             "Nordesch 20",
+             "Weilstr. 6",
+             "Harthauer Weg 2",
+             "Mainaustr. 49",
+             "August-Horch-Str. 3",
+             "Marktplatz 31",
+             "Schmidener Weg 3",
+             "Karl-Weysser-Str. 6"]
+
+print("       Street            House Number")
+print("---------------------    ------------")
+for address in Addresses:
+    (street, house) = separateHouseNumber(address)
+    print(street.rjust(22), " ", house if len(house) != 0 else "(none)")
+===
+F separateHouseNumber(address)
+   V fields = address.split_py()
+   V last = fields.last
+   V penult = fields[(len)-2]
+   V house = ‘’
+   I last[0].is_digit()
+      V isdig = penult[0].is_digit()
+      I fields.len > 2 & isdig & !penult.starts_with(‘194’)
+         house = penult‘ ’last
+      E
+         house = last
+   E I fields.len > 2
+      house = penult‘ ’last
+   R (address[0 .< address.len - house.len].rtrim(‘ ’), house)
+
+V Addresses = [‘Plataanstraat 5’, ‘Straat 12’, ‘Straat 12 II’, ‘Dr. J. Straat   12’, ‘Dr. J. Straat 12 a’, ‘Dr. J. Straat 12-14’, ‘Laan 1940 - 1945 37’, ‘Plein 1940 2’, ‘1213-laan 11’, ‘16 april 1944 Pad 1’, ‘1e Kruisweg 36’, ‘Laan 1940-'45 66’, ‘Laan '40-'45’, ‘Langeloerduinen 3 46’, ‘Marienwaerdt 2e Dreef 2’, ‘Provincialeweg N205 1’, ‘Rivium 2e Straat 59.’, ‘Nieuwe gracht 20rd’, ‘Nieuwe gracht 20rd 2’, ‘Nieuwe gracht 20zw /2’, ‘Nieuwe gracht 20zw/3’, ‘Nieuwe gracht 20 zw/4’, ‘Bahnhofstr. 4’, ‘Wertstr. 10’, ‘Lindenhof 1’, ‘Nordesch 20’, ‘Weilstr. 6’, ‘Harthauer Weg 2’, ‘Mainaustr. 49’, ‘August-Horch-Str. 3’, ‘Marktplatz 31’, ‘Schmidener Weg 3’, ‘Karl-Weysser-Str. 6’]
+
+print(‘       Street            House Number’)
+print(‘---------------------    ------------’)
+L(address) Addresses
+   V (street, house) = separateHouseNumber(address)
+   print(street.rjust(22)‘   ’(I !house.empty {house} E ‘(none)’))
+===
+template <typename T1> auto separateHouseNumber(const T1 &address)
+{
+    auto fields = address.split_py();
+    auto last = fields.last();
+    auto penult = fields.at_plus_len( - 2);
+    auto house = u""_S;
+    if (_get<0>(last).is_digit()) {
+        auto isdig = _get<0>(penult).is_digit();
+        if (fields.len() > 2 && isdig && !penult.starts_with(u"194"_S))
+            house = penult & u" "_S & last;
+        else
+            house = last;
+    }
+    else if (fields.len() > 2)
+        house = penult & u" "_S & last;
+    return make_tuple(address[range_el(0, address.len() - house.len())].rtrim(u" "_S), house);
+}
+
+auto Addresses = create_array({u"Plataanstraat 5"_S, u"Straat 12"_S, u"Straat 12 II"_S, u"Dr. J. Straat   12"_S, u"Dr. J. Straat 12 a"_S, u"Dr. J. Straat 12-14"_S, u"Laan 1940 - 1945 37"_S, u"Plein 1940 2"_S, u"1213-laan 11"_S, u"16 april 1944 Pad 1"_S, u"1e Kruisweg 36"_S, u"Laan 1940-'45 66"_S, u"Laan '40-'45"_S, u"Langeloerduinen 3 46"_S, u"Marienwaerdt 2e Dreef 2"_S, u"Provincialeweg N205 1"_S, u"Rivium 2e Straat 59."_S, u"Nieuwe gracht 20rd"_S, u"Nieuwe gracht 20rd 2"_S, u"Nieuwe gracht 20zw /2"_S, u"Nieuwe gracht 20zw/3"_S, u"Nieuwe gracht 20 zw/4"_S, u"Bahnhofstr. 4"_S, u"Wertstr. 10"_S, u"Lindenhof 1"_S, u"Nordesch 20"_S, u"Weilstr. 6"_S, u"Harthauer Weg 2"_S, u"Mainaustr. 49"_S, u"August-Horch-Str. 3"_S, u"Marktplatz 31"_S, u"Schmidener Weg 3"_S, u"Karl-Weysser-Str. 6"_S});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"       Street            House Number"_S);
+        print(u"---------------------    ------------"_S);
+        for (auto &&address : Addresses) {
+            auto [street, house] = separateHouseNumber(address);
+            print(street.rjust(22) & u"   "_S & (!house.empty() ? house : u"(none)"_S));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Shift_list_elements_to_left_by_3#Python
+def rotate(l, n):
+    k = (len(l) + n) % len(l)
+    return l[k:] + [] + l[:k]
+
+l = [1,2,3,4,5,6,7,8,9]
+print(l, " => ", rotate(l, 3))
+===
+F rotate(l, n)
+   V k = (l.len + n) % l.len
+   R l[k ..] [+] l[0 .< k]
+
+V l = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+print(l‘  =>  ’rotate(l, 3))
+===
+template <typename T1, typename T2> auto rotate(const T1 &l, const T2 &n)
+{
+    auto k = mod((l.len() + n), l.len());
+    return l[range_ei(k)] + l[range_el(0, k)];
+}
+
+auto l = create_array({1, 2, 3, 4, 5, 6, 7, 8, 9});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(l & u"  =>  "_S & rotate(l, 3));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Show_the_(decimal)_value_of_a_number_of_1s_appended_with_a_3,_then_squared#Python
+Int64 = int
+for i in range(0,8):
+    print("( " + "1"*i + "3 ) ^ 2 = " + str(Int64("1"*i + "3")**2))
+===
+L(i) 0..7
+   print(‘( ’(‘1’ * i)‘3 ) ^ 2 = ’String(Int64((‘1’ * i)‘3’) ^ 2))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(0, 7))
+            print(u"( "_S & (u"1"_S * i) & u"3 ) ^ 2 = "_S & String(square(to_int64((u"1"_S * i) & u"3"_S))));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Sleeping_Beauty_problem#Python
+import random
+
+def sleeping_beauty_experiment(repetitions):
+    """
+    Run the Sleeping Beauty Problem experiment `repetitions` times, checking to see
+    how often we had heads on waking Sleeping Beauty.
+    """
+    gotheadsonwaking = 0
+    wakenings = 0
+    for _ in range(repetitions):
+        coin_result = random.choice(["heads", "tails"])
+
+        # On Monday, we check if we got heads.
+        wakenings += 1
+        if coin_result == "heads":
+            gotheadsonwaking += 1
+
+        # If tails, we do this again, but of course we will not add as if it was heads..
+        if coin_result == "tails":
+            wakenings += 1
+            if coin_result == "heads":
+                gotheadsonwaking += 1   # never done
+
+    # Show the number of times she was wakened.
+    print("Wakenings over", repetitions, "experiments:", wakenings)
+
+    # Return the number of correct bets SB made out of the total number
+    # of times she is awoken over all the experiments with that bet.
+    return float(gotheadsonwaking) / wakenings
+
+CREDENCE = sleeping_beauty_experiment(1_000_000)
+print("Results of experiment:  Sleeping Beauty should estimate a credence of:", CREDENCE)
+===
+F sleeping_beauty_experiment(repetitions)
+   ‘
+    Run the Sleeping Beauty Problem experiment `repetitions` times, checking to see
+    how often we had heads on waking Sleeping Beauty.
+    ’
+   V gotheadsonwaking = 0
+   V wakenings = 0
+   L(_) 0 .< repetitions
+      V coin_result = random:choice([‘heads’, ‘tails’])
+
+      wakenings++
+      I coin_result == ‘heads’
+         gotheadsonwaking++
+
+      I coin_result == ‘tails’
+         wakenings++
+         I coin_result == ‘heads’
+            gotheadsonwaking++
+
+   print(‘Wakenings over ’repetitions‘ experiments: ’wakenings)
+
+   R Float(gotheadsonwaking) / wakenings
+
+V CREDENCE = sleeping_beauty_experiment(1'000'000)
+print(‘Results of experiment:  Sleeping Beauty should estimate a credence of: ’CREDENCE)
+===
+template <typename T1> auto sleeping_beauty_experiment(const T1 &repetitions)
+{
+    uR"(
+    Run the Sleeping Beauty Problem experiment `repetitions` times, checking to see
+    how often we had heads on waking Sleeping Beauty.
+    )"_S;
+    auto gotheadsonwaking = 0;
+    auto wakenings = 0;
+    for (auto _ : range_el(0, repetitions)) {
+        auto coin_result = randomns::choice(create_array({u"heads"_S, u"tails"_S}));
+
+        wakenings++;
+        if (coin_result == u"heads")
+            gotheadsonwaking++;
+
+        if (coin_result == u"tails") {
+            wakenings++;
+            if (coin_result == u"heads")
+                gotheadsonwaking++;
+        }
+    }
+
+    print(u"Wakenings over "_S & repetitions & u" experiments: "_S & wakenings);
+
+    return to_float(gotheadsonwaking) / wakenings;
+}
+
+auto CREDENCE = sleeping_beauty_experiment(1'000'000);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Results of experiment:  Sleeping Beauty should estimate a credence of: "_S & CREDENCE);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Simple_database#Kotlin
+from typing import NamedTuple
+import datetime, sys
+
+class Item(NamedTuple):
+    name : str
+    date : str
+    category : str
+
+    def __str__(self):
+        return self.name + ', ' + self.date + ', ' + self.category
+
+db_filename = 'simdb.csv'
+
+def load():
+    db : List[Item] = []
+    for line in open(db_filename).read().rstrip("\n").split("\n"):
+        item = line.split(', ')
+        db.append(Item(item[0], item[1], item[2]))
+    return db
+
+def store(item):
+    open(db_filename, 'a', newline = "\n").write(str(item) + "\n")
+
+def printUsage():
+    print("""
+Usage:
+  simdb cmd [categoryName]
+  add     add item, followed by optional category
+  latest  print last added item(s), followed by optional category
+  all     print all
+  For instance: add "some item name" "some category name""")
+
+def addItem(args):
+    if len(args) < 2:
+        printUsage()
+        return
+
+    date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    cat = args[2] if len(args) == 3 else "none"
+    store(Item(args[1], date, cat))
+
+def printLatest(a):
+    db = load()
+    if len(db) == 0:
+        print("No entries in database.")
+        return
+
+    if len(a) == 2:
+        for item in reversed(db):
+            if item.category == a[1]:
+                print(item)
+                break
+        else:
+            print(f"There are no items for category '{a[1]}'")
+    else:
+        print(db[-1])
+
+def printAll():
+    db = load()
+    if len(db) == 0:
+        print("No entries in database.")
+        return
+
+    for item in db:
+        print(item)
+
+if __name__ == '__main__':
+    if 2 <= len(sys.argv) <= 4:
+        cmd = sys.argv[1].lower()
+        if cmd == 'add':
+            addItem(sys.argv[1:])
+        elif cmd == 'latest':
+            printLatest(sys.argv[1:])
+        elif cmd == 'all':
+            printAll()
+        else:
+            printUsage()
+    else:
+        printUsage()
+===
+T Item
+   String name
+   String date
+   String category
+
+   F String()
+      R .name‘, ’(.date)‘, ’(.category)
+   F (name, date, category)
+      .name = name
+      .date = date
+      .category = category
+
+V db_filename = ‘simdb.csv’
+
+F load()
+   [Item] db
+   L(line) File(:db_filename).read().rtrim("\n").split("\n")
+      V item = line.split(‘, ’)
+      db.append(Item(item[0], item[1], item[2]))
+   R db
+
+F store(item)
+   File(:db_filename, ‘a’).write(String(item)"\n")
+
+F printUsage()
+   print(‘
+Usage:
+  simdb cmd [categoryName]
+  add     add item, followed by optional category
+  latest  print last added item(s), followed by optional category
+  all     print all
+  For instance: add "some item name" "some category name’)
+
+F addItem(args)
+   I args.len < 2
+      printUsage()
+      R
+
+   V date = Time().strftime(‘%Y-%m-%d %H:%M:%S’)
+   V cat = I args.len == 3 {args[2]} E ‘none’
+   store(Item(args[1], date, cat))
+
+F printLatest(a)
+   V db = load()
+   I db.empty
+      print(‘No entries in database.’)
+      R
+
+   I a.len == 2
+      L(item) reversed(db)
+         I item.category == a[1]
+            print(item)
+            L.break
+      L.was_no_break
+         print(‘There are no items for category '’a[1]‘'’)
+   E
+      print(db.last)
+
+F printAll()
+   V db = load()
+   I db.empty
+      print(‘No entries in database.’)
+      R
+
+   L(item) db
+      print(item)
+
+:start:
+I :argv.len C 2..4
+   S :argv[1].lowercase()
+      ‘add’
+         addItem(:argv[1..])
+      ‘latest’
+         printLatest(:argv[1..])
+      ‘all’
+         printAll()
+      E
+         printUsage()
+E
+   printUsage()
+===
+Array<String> argv;
+
+class Item
+{
+public:
+    String name;
+    String date;
+    String category;
+
+    operator String() const
+    {
+        return name & u", "_S & (date) & u", "_S & (category);
+    }
+    template <typename T1, typename T2, typename T3> Item(const T1 &name, const T2 &date, const T3 &category) :
+        name(name),
+        date(date),
+        category(category)
+    {
+    }
+};
+
+auto db_filename = u"simdb.csv"_S;
+
+auto load()
+{
+    Array<Item> db;
+    for (auto &&line : File(::db_filename).read().rtrim(u"\n"_S).split(u"\n"_S)) {
+        auto item = line.split(u", "_S);
+        db.append(Item(_get<0>(item), _get<1>(item), _get<2>(item)));
+    }
+    return db;
+}
+
+template <typename T1> auto store(const T1 &item)
+{
+    File(::db_filename, u"a"_S).write(String(item) & u"\n"_S);
+}
+
+auto printUsage()
+{
+    print(uR"(
+Usage:
+  simdb cmd [categoryName]
+  add     add item, followed by optional category
+  latest  print last added item(s), followed by optional category
+  all     print all
+  For instance: add "some item name" "some category name)"_S);
+}
+
+template <typename T1> auto addItem(const T1 &args)
+{
+    if (args.len() < 2) {
+        printUsage();
+        return;
+    }
+
+    auto date = Time().strftime(u"%Y-%m-%d %H:%M:%S"_S);
+    auto cat = args.len() == 3 ? _get<2>(args) : u"none"_S;
+    store(Item(_get<1>(args), date, cat));
+}
+
+template <typename T1> auto printLatest(const T1 &a)
+{
+    auto db = load();
+    if (db.empty()) {
+        print(u"No entries in database."_S);
+        return;
+    }
+
+    if (a.len() == 2) {
+        for (auto &&item : reversed(db))
+            if (item.category == _get<1>(a)) {
+                print(item);
+                goto break_;
+            }
+        print(u"There are no items for category '"_S & _get<1>(a) & u"'"_S);
+        break_:;
+    }
+    else
+        print(db.last());
+}
+
+auto printAll()
+{
+    auto db = load();
+    if (db.empty()) {
+        print(u"No entries in database."_S);
+        return;
+    }
+
+    for (auto &&item : db)
+        print(item);
+}
+
+int MAIN_WITH_ARGV()
+{
+    INIT_ARGV();
+
+    if (in(::argv.len(), range_ee(2, 4)))
+        if (_get<1>(::argv).lowercase() == u"add"_S)
+            addItem(::argv[range_ei(1)]);
+        else if (_get<1>(::argv).lowercase() == u"latest"_S)
+            printLatest(::argv[range_ei(1)]);
+        else if (_get<1>(::argv).lowercase() == u"all"_S)
+            printAll();
+        else
+            printUsage();
+    else
+        printUsage();
+}
