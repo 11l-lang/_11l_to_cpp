@@ -1537,18 +1537,18 @@ public:
 
     auto eval()
     {
-        auto symbolid = symbol->id;
-        if (symbolid == u"(number)"_S)
+        auto symbol_id = symbol->id;
+        if (symbol_id == u"(number)"_S)
             return value;
-        else if (symbolid == u'+')
+        else if (symbol_id == u'+')
             return first_child->eval() + second_child->eval();
-        else if (symbolid == u'-')
+        else if (symbol_id == u'-')
             return second_child == nullptr ? -first_child->eval() : first_child->eval() - second_child->eval();
-        else if (symbolid == u'*')
+        else if (symbol_id == u'*')
             return first_child->eval() * second_child->eval();
-        else if (symbolid == u'/')
+        else if (symbol_id == u'/')
             return first_child->eval() / second_child->eval();
-        else if (symbolid == u'(')
+        else if (symbol_id == u'(')
             return first_child->eval();
         else {
             assert(false);

@@ -1562,6 +1562,9 @@ class ASTSwitch(ASTNodeWithExpression):
                 for c in switch_expr:
                     if 'a' <= c <= 'z' or 'A' <= c <= 'Z' or '0' <= c <= '9' or c == '_':
                         switch_var += c
+                    else:
+                        if len(switch_var) == 0 or switch_var[-1] != '_':
+                            switch_var += '_'
                 r += ' ' * (indent*4) + 'auto ' + switch_var + ' = ' + switch_expr + ";\n"
                 switch_expr = switch_var
 
