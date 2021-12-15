@@ -1536,6 +1536,7 @@ class ASTSwitch(ASTNodeWithExpression):
 
     def __init__(self):
         self.cases = []
+        self.pre_nl = pre_nl()
 
     def walk_children(self, f):
         for case in self.cases:
@@ -1554,8 +1555,8 @@ class ASTSwitch(ASTNodeWithExpression):
                 return "u'" + child.token_str()[1:-1].replace("'", R"\'") + "'"
             return child.to_str()
 
+        r = self.pre_nl
         if self.has_string_case: # C++ does not support strings in case labels so insert if-elif-else chain in this case
-            r = ''
             switch_expr = self.expression.to_str()
             if self.expression.token.category != Token.Category.NAME:
                 switch_var = ''
@@ -1576,7 +1577,7 @@ class ASTSwitch(ASTNodeWithExpression):
                     r += case.children_to_str_detect_single_stmt(indent, ('if' if id(case) == id(self.cases[0]) else 'else if') + ' (' + switch_expr + ' == ' + char_if_len_1(case.expression) + ')', check_for_if = True)
             return r
 
-        r = ' ' * (indent*4) + 'switch (' + self.expression.to_str() + ")\n" + ' ' * (indent*4) + "{\n"
+        r += ' ' * (indent*4) + 'switch (' + self.expression.to_str() + ")\n" + ' ' * (indent*4) + "{\n"
         for case in self.cases:
             r += ' ' * (indent*4) + ('default' if case.expression.token_str() in ('E', 'И', 'else', 'иначе') else 'case ' + char_if_len_1(case.expression)) + ":\n"
             for c in case.children:

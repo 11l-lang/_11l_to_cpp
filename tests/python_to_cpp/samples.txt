@@ -3481,3 +3481,79 @@ struct CodeBlock1
         print(u"rnd: #.3"_S.format(randomns::_()));
     }
 } code_block_1;
+
+
+import sys
+
+if __name__ == '__main__':
+    if 2 <= len(sys.argv) <= 4:
+        v = 0
+
+        cmd = sys.argv[1].lower()
+        if cmd == 'add':
+            print('add')
+        elif cmd == 'all':
+            print('all')
+        else:
+            print('usage')
+
+        c = cmd[0]
+        if c == 'a':
+            print('a')
+        elif c == 'p':
+            print('p')
+        else:
+            print('e')
+===
+:start:
+I :argv.len C 2..4
+   V v = 0
+
+   V cmd = :argv[1].lowercase()
+   S cmd
+      ‘add’
+         print(‘add’)
+      ‘all’
+         print(‘all’)
+      E
+         print(‘usage’)
+
+   S cmd[0]
+      ‘a’
+         print(‘a’)
+      ‘p’
+         print(‘p’)
+      E
+         print(‘e’)
+===
+Array<String> argv;
+
+int MAIN_WITH_ARGV()
+{
+    INIT_ARGV();
+
+    if (in(::argv.len(), range_ee(2, 4))) {
+        auto v = 0;
+
+        auto cmd = _get<1>(::argv).lowercase();
+        if (cmd == u"add"_S)
+            print(u"add"_S);
+        else if (cmd == u"all"_S)
+            print(u"all"_S);
+        else
+            print(u"usage"_S);
+
+        switch (_get<0>(cmd))
+        {
+        case u'a':
+            print(u"a"_S);
+            break;
+        case u'p':
+            print(u"p"_S);
+            break;
+        default:
+            print(u"e"_S);
+            break;
+        }
+    }
+}
