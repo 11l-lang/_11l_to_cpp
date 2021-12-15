@@ -9451,15 +9451,17 @@ int MAIN_WITH_ARGV()
 {
     INIT_ARGV();
 
-    if (in(::argv.len(), range_ee(2, 4)))
-        if (_get<1>(::argv).lowercase() == u"add"_S)
+    if (in(::argv.len(), range_ee(2, 4))) {
+        auto _get1argvlowercase = _get<1>(::argv).lowercase();
+        if (_get1argvlowercase == u"add"_S)
             addItem(::argv[range_ei(1)]);
-        else if (_get<1>(::argv).lowercase() == u"latest"_S)
+        else if (_get1argvlowercase == u"latest"_S)
             printLatest(::argv[range_ei(1)]);
-        else if (_get<1>(::argv).lowercase() == u"all"_S)
+        else if (_get1argvlowercase == u"all"_S)
             printAll();
         else
             printUsage();
+    }
     else
         printUsage();
 }

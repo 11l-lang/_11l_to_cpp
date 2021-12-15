@@ -1539,17 +1539,18 @@ public:
 
     auto eval()
     {
-        if (symbol->id == u"(var)"_S)
+        auto symbolid = symbol->id;
+        if (symbolid == u"(var)"_S)
             return ::vars[var_index].value;
-        else if (symbol->id == u'|')
+        else if (symbolid == u'|')
             return first_child->eval() | second_child->eval();
-        else if (symbol->id == u'^')
+        else if (symbolid == u'^')
             return first_child->eval() ^ second_child->eval();
-        else if (symbol->id == u'&')
+        else if (symbolid == u'&')
             return first_child->eval() & second_child->eval();
-        else if (symbol->id == u'!')
+        else if (symbolid == u'!')
             return ~first_child->eval() & 1;
-        else if (symbol->id == u'(')
+        else if (symbolid == u'(')
             return first_child->eval();
         else {
             assert(false);

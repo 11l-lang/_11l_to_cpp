@@ -1107,7 +1107,8 @@ class ASTNodeWithChildren(ASTNode):
                 or (check_for_if and (type(self.children[0]) == ASTIf or has_if(self.children[0]))) # for correctly handling of dangling-else
                 or type(self.children[0]) == ASTLoopRemoveCurrentElementAndContinue # `L.remove_current_element_and_continue` ‘раскрывается в 2 строки кода’\‘is translated into 2 statements’
                 or (type(self.children[0]) == ASTTupleAssignment and self.children[0].is_multi_st()) # for `mx, mx_index = digit, i` in [https://www.rosettacode.org/wiki/Next_highest_int_from_digits#Python:_Algorithm_2]
-                or (type(self.children[0]) == ASTLoop and self.children[0].has_L_was_no_break())):
+                or (type(self.children[0]) == ASTLoop and self.children[0].has_L_was_no_break())
+                or (type(self.children[0]) == ASTSwitch and self.children[0].has_string_case)):
             return self.children_to_str(indent, r, False)
         assert(len(self.children) == 1)
         return pre_nl(self.tokeni) + ' ' * (indent*4) + r + "\n" + self.children[0].to_str(indent+1)
@@ -1555,12 +1556,21 @@ class ASTSwitch(ASTNodeWithExpression):
 
         if self.has_string_case: # C++ does not support strings in case labels so insert if-elif-else chain in this case
             r = ''
+            switch_expr = self.expression.to_str()
+            if self.expression.token.category != Token.Category.NAME:
+                switch_var = ''
+                for c in switch_expr:
+                    if 'a' <= c <= 'z' or 'A' <= c <= 'Z' or '0' <= c <= '9' or c == '_':
+                        switch_var += c
+                r += ' ' * (indent*4) + 'auto ' + switch_var + ' = ' + switch_expr + ";\n"
+                switch_expr = switch_var
+
             for case in self.cases:
                 if case.expression.token_str() in ('E', 'И', 'else', 'иначе'):
                     assert(id(case) == id(self.cases[-1]))
                     r += case.children_to_str_detect_single_stmt(indent, 'else')
                 else:
-                    r += case.children_to_str_detect_single_stmt(indent, ('if' if id(case) == id(self.cases[0]) else 'else if') + ' (' + self.expression.to_str() + ' == ' + char_if_len_1(case.expression) + ')', check_for_if = True)
+                    r += case.children_to_str_detect_single_stmt(indent, ('if' if id(case) == id(self.cases[0]) else 'else if') + ' (' + switch_expr + ' == ' + char_if_len_1(case.expression) + ')', check_for_if = True)
             return r
 
         r = ' ' * (indent*4) + 'switch (' + self.expression.to_str() + ")\n" + ' ' * (indent*4) + "{\n"
