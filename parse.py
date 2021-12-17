@@ -3154,7 +3154,7 @@ def parse_internal(this_node):
                         id = scope.find(node_expression.token_str().rstrip('?'))
                         if id is not None:
                             assert(len(id.ast_nodes) == 1)
-                            if type(id.ast_nodes[0]) not in (ASTTypeDefinition, ASTTypeEnum):
+                            if type(id.ast_nodes[0]) not in (ASTTypeDefinition, ASTTypeEnum, ASTTypeAlias):
                                 raise Error('identifier is of type `' + type(id.ast_nodes[0]).__name__ + '` (should be ASTTypeDefinition or ASTTypeEnum)', node_expression.token) # this error was in line `String sitem` because of `F String()`
                             if type(id.ast_nodes[0]) == ASTTypeDefinition:
                                 if id.ast_nodes[0].has_virtual_functions or id.ast_nodes[0].has_pointers_to_the_same_type:
@@ -3331,6 +3331,7 @@ builtins_scope.add_function('cross', ASTFunctionDefinition([('v1', '', ''), ('v2
 builtins_scope.add_function('perp',      ASTFunctionDefinition([('v', '', '')]))
 builtins_scope.add_function('sqlen',     ASTFunctionDefinition([('v', '', '')]))
 builtins_scope.add_function('length',    ASTFunctionDefinition([('v', '', '')]))
+builtins_scope.add_function('distance',  ASTFunctionDefinition([('p0', '', ''), ('p1', '', '')]))
 builtins_scope.add_function('normalize', ASTFunctionDefinition([('v', '', '')]))
 builtins_scope.add_function('conjugate', ASTFunctionDefinition([('c', '', '')]))
 builtins_scope.add_function('format_float', ASTFunctionDefinition([('x', '', 'Float'), ('precision', '', 'Int')]))

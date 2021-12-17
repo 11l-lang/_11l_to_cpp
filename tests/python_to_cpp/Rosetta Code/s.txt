@@ -9465,3 +9465,401 @@ int MAIN_WITH_ARGV()
     else
         printUsage();
 }
+
+
+# https://www.rosettacode.org/wiki/Smallest_enclosing_circle_problem#Nim
+import math, random
+from typing import NamedTuple
+
+class Point:
+    x : float
+    y : float
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __str__(self):
+        return f'({self.x}, {self.y})'
+
+class Circle(NamedTuple):
+    c : Point
+    r : float
+
+    def __str__(self):
+        return f'Center {self.c}, Radius {self.r}'
+
+def distSq(a, b):
+    return (a.x - b.x) ** 2 + (a.y - b.y) ** 2
+
+def dist(a, b):
+    return math.sqrt(distSq(a, b))
+
+def getCircleCenter(bx, by, cx, cy):
+    b = bx * bx + by * by
+    c = cx * cx + cy * cy
+    d = bx * cy - by * cx
+    return Point((cy * b - by * c) / (2 * d), (bx * c - cx * b) / (2 * d))
+
+def contains(ci, p):
+    return distSq(ci.c, p) <= ci.r ** 2
+
+def encloses(ci, ps):
+    for p in ps:
+        if not contains(ci, p):
+            return False
+    return True
+
+def circleFrom3(a, b, c):
+    i = getCircleCenter(b.x - a.x, b.y - a.y, c.x - a.x, c.y - a.y)
+    i.x += a.x
+    i.y += a.y
+    return Circle(i, dist(i, a))
+
+def circleFrom2(a, b):
+    c = Point((a.x + b.x) * 0.5, (a.y + b.y) * 0.5)
+    return Circle(c, dist(a, b) / 2)
+
+def secTrivial(rs):
+    if len(rs) == 0:
+        return Circle(Point(0, 0), 0)
+    if len(rs) == 1:
+        return Circle(rs[0], 0)
+    if len(rs) == 2:
+        return circleFrom2(rs[0], rs[1])
+    assert len(rs) == 3, "There shouldn't be more than three points."
+
+    for i in range(2):
+        for j in range(i + 1, 3):
+            c = circleFrom2(rs[i], rs[j])
+            if encloses(c, rs):
+                return c
+    return circleFrom3(rs[0], rs[1], rs[2])
+
+def welzlHelper(ps : "list", rs, n):
+    rc = rs[:]
+    if n == 0 or len(rc) == 3:
+        return secTrivial(rc)
+    idx = random.randrange(n)
+    p = ps[idx]
+    (ps[idx], ps[n-1]) = (ps[n-1], ps[idx])
+    d = welzlHelper(ps, rc, n-1)
+    if contains(d, p): return d
+    rc.append(p)
+    return welzlHelper(ps, rc, n-1)
+
+def welzl(ps):
+    pc = ps[:]
+    random.shuffle(pc)
+    return welzlHelper(pc, [Point(0, 0)] * 0, len(pc))
+
+Tests = [[Point(0.0, 0.0), Point(0.0, 1.0), Point(1.0, 0.0)],
+         [Point(5.0, -2.0), Point(-3.0, -2.0), Point(-2.0, 5.0), Point(1.0, 6.0), Point(0.0, 2.0)]]
+
+for test in Tests:
+    print(welzl(test))
+===
+T Point
+   Float x
+   Float y
+
+   F (x, y)
+      .x = x
+      .y = y
+
+   F String()
+      R ‘(’(.x)‘, ’(.y)‘)’
+
+T Circle
+   Point c
+   Float r
+
+   F String()
+      R ‘Center ’(.c)‘, Radius ’(.r)
+   F (c, r)
+      .c = c
+      .r = r
+
+F distSq(a, b)
+   R (a.x - b.x) ^ 2 + (a.y - b.y) ^ 2
+
+F dist(a, b)
+   R sqrt(distSq(a, b))
+
+F getCircleCenter(bx, by, cx, cy)
+   V b = bx * bx + by * by
+   V c = cx * cx + cy * cy
+   V d = bx * cy - by * cx
+   R Point((cy * b - by * c) / (2 * d), (bx * c - cx * b) / (2 * d))
+
+F contains(ci, p)
+   R distSq(ci.c, p) <= ci.r ^ 2
+
+F encloses(ci, ps)
+   L(p) ps
+      I !contains(ci, p)
+         R 0B
+   R 1B
+
+F circleFrom3(a, b, c)
+   V i = getCircleCenter(b.x - a.x, b.y - a.y, c.x - a.x, c.y - a.y)
+   i.x += a.x
+   i.y += a.y
+   R Circle(i, dist(i, a))
+
+F circleFrom2(a, b)
+   V c = Point((a.x + b.x) * 0.5, (a.y + b.y) * 0.5)
+   R Circle(c, dist(a, b) / 2)
+
+F secTrivial(rs)
+   I rs.empty
+      R Circle(Point(0, 0), 0)
+   I rs.len == 1
+      R Circle(rs[0], 0)
+   I rs.len == 2
+      R circleFrom2(rs[0], rs[1])
+   assert(rs.len == 3, ‘There shouldn't be more than three points.’)
+
+   L(i) 2
+      L(j) i + 1 .< 3
+         V c = circleFrom2(rs[i], rs[j])
+         I encloses(c, rs)
+            R c
+   R circleFrom3(rs[0], rs[1], rs[2])
+
+F welzlHelper(&ps, rs, n)
+   V rc = copy(rs)
+   I n == 0 | rc.len == 3
+      R secTrivial(rc)
+   V idx = random:(n)
+   V p = ps[idx]
+   swap(&ps[idx], &ps[n - 1])
+   V d = welzlHelper(&ps, rc, n - 1)
+   I contains(d, p)
+      R d
+   rc.append(p)
+   R welzlHelper(&ps, rc, n - 1)
+
+F welzl(ps)
+   V pc = copy(ps)
+   random:shuffle(&pc)
+   R welzlHelper(&pc, [Point(0, 0)] * 0, pc.len)
+
+V Tests = [[Point(0.0, 0.0), Point(0.0, 1.0), Point(1.0, 0.0)], [Point(5.0, -2.0), Point(-3.0, -2.0), Point(-2.0, 5.0), Point(1.0, 6.0), Point(0.0, 2.0)]]
+
+L(test) Tests
+   print(welzl(test))
+===
+class Point
+{
+public:
+    double x;
+    double y;
+
+    template <typename T1, typename T2> Point(const T1 &x, const T2 &y) :
+        x(x),
+        y(y)
+    {
+    }
+
+    operator String() const
+    {
+        return u"("_S & (x) & u", "_S & (y) & u")"_S;
+    }
+};
+
+class Circle
+{
+public:
+    Point c;
+    double r;
+
+    operator String() const
+    {
+        return u"Center "_S & (c) & u", Radius "_S & (r);
+    }
+    template <typename T1, typename T2> Circle(const T1 &c, const T2 &r) :
+        c(c),
+        r(r)
+    {
+    }
+};
+
+template <typename T1, typename T2> auto distSq(const T1 &a, const T2 &b)
+{
+    return square((a.x - b.x)) + square((a.y - b.y));
+}
+
+template <typename T1, typename T2> auto dist(const T1 &a, const T2 &b)
+{
+    return sqrt(distSq(a, b));
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto getCircleCenter(const T1 &bx, const T2 &by, const T3 &cx, const T4 &cy)
+{
+    auto b = bx * bx + by * by;
+    auto c = cx * cx + cy * cy;
+    auto d = bx * cy - by * cx;
+    return Point((cy * b - by * c) / (2 * d), (bx * c - cx * b) / (2 * d));
+}
+
+template <typename T1, typename T2> auto contains(const T1 &ci, const T2 &p)
+{
+    return distSq(ci.c, p) <= square(ci.r);
+}
+
+template <typename T1, typename T2> auto encloses(const T1 &ci, const T2 &ps)
+{
+    for (auto &&p : ps)
+        if (!contains(ci, p))
+            return false;
+    return true;
+}
+
+template <typename T1, typename T2, typename T3> auto circleFrom3(const T1 &a, const T2 &b, const T3 &c)
+{
+    auto i = getCircleCenter(b.x - a.x, b.y - a.y, c.x - a.x, c.y - a.y);
+    i.x += a.x;
+    i.y += a.y;
+    return Circle(i, dist(i, a));
+}
+
+template <typename T1, typename T2> auto circleFrom2(const T1 &a, const T2 &b)
+{
+    auto c = Point((a.x + b.x) * 0.5, (a.y + b.y) * 0.5);
+    return Circle(c, dist(a, b) / 2.0);
+}
+
+template <typename T1> auto secTrivial(const T1 &rs)
+{
+    if (rs.empty())
+        return Circle(Point(0, 0), 0);
+    if (rs.len() == 1)
+        return Circle(_get<0>(rs), 0);
+    if (rs.len() == 2)
+        return circleFrom2(_get<0>(rs), _get<1>(rs));
+    assert(rs.len() == 3, u"There shouldn't be more than three points."_S);
+
+    for (int i = 0; i < 2; i++)
+        for (auto j : range_el(i + 1, 3)) {
+            auto c = circleFrom2(rs[i], rs[j]);
+            if (encloses(c, rs))
+                return c;
+        }
+    return circleFrom3(_get<0>(rs), _get<1>(rs), _get<2>(rs));
+}
+
+template <typename T1, typename T2, typename T3> auto welzlHelper(T1 &ps, const T2 &rs, const T3 &n)
+{
+    auto rc = copy(rs);
+    if (n == 0 || rc.len() == 3)
+        return secTrivial(rc);
+    auto idx = randomns::_(n);
+    auto p = ps[idx];
+    swap(ps[idx], ps[n - 1]);
+    auto d = welzlHelper(ps, rc, n - 1);
+    if (contains(d, p))
+        return d;
+    rc.append(p);
+    return welzlHelper(ps, rc, n - 1);
+}
+
+template <typename T1> auto welzl(const T1 &ps)
+{
+    auto pc = copy(ps);
+    randomns::shuffle(pc);
+    return welzlHelper(pc, create_array({Point(0, 0)}) * 0, pc.len());
+}
+
+auto Tests = create_array({create_array<Point>({Point(0.0, 0.0), Point(0.0, 1.0), Point(1.0, 0.0)}), create_array<Point>({Point(5.0, -2.0), Point(-3.0, -2.0), Point(-2.0, 5.0), Point(1.0, 6.0), Point(0.0, 2.0)})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&test : Tests)
+            print(welzl(test));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Smallest_power_of_6_whose_decimal_expansion_contains_n#Python
+BigInt = int
+
+def smallest_six(n):
+    p = BigInt(1)
+    while str(n) not in str(p): p *= 6
+    return p
+
+for n in range(22):
+    print("{:2}: {}".format(n, smallest_six(n)))
+===
+F smallest_six(n)
+   V p = BigInt(1)
+   L String(n) !C String(p)
+      p *= 6
+   R p
+
+L(n) 22
+   print(‘#2: #.’.format(n, smallest_six(n)))
+===
+template <typename T1> auto smallest_six(const T1 &n)
+{
+    auto p = BigInt(1);
+    while (!in(String(n), String(p)))
+        p *= 6;
+    return p;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int n = 0; n < 22; n++)
+            print(u"#2: #."_S.format(n, smallest_six(n)));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Smallest_square_that_begins_with_n
+import itertools
+
+def firstSquareWithPrefix(n):
+    pfx = str(n)
+    #lng = len(pfx)
+    for x in itertools.count(0):
+        s = str(x * x)
+        if s.startswith(pfx):#pfx == s[0:lng]:
+            return int(s)
+
+for n in range(1, 50):
+    print(firstSquareWithPrefix(n))
+===
+F firstSquareWithPrefix(n)
+   V pfx = String(n)
+   L(x) 0..
+      V s = String(x * x)
+      I s.starts_with(pfx)
+         R Int(s)
+
+L(n) 1..49
+   print(firstSquareWithPrefix(n))
+===
+template <typename T1> auto firstSquareWithPrefix(const T1 &n)
+{
+    auto pfx = String(n);
+    for (auto x : range_ei(0)) {
+        auto s = String(x * x);
+        if (s.starts_with(pfx))
+            return to_int(s);
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(1, 49))
+            print(firstSquareWithPrefix(n));
+    }
+} code_block_1;
