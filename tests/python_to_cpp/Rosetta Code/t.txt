@@ -2721,3 +2721,531 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Tree_datastructures#Nim
+from typing import NamedTuple
+
+class NNode:
+    value : str
+
+    def __init__(self, value):
+        self.value = value
+        self.children : List[NNode] = []
+
+    def add(self, node):
+        self.children.append(node)
+
+    def to_str(self, depth) -> str: # const
+        result = '  ' * depth + self.value + "\n"
+        for child in self.children:
+            result += child.to_str(depth + 1)
+        return result
+
+    def __str__(self):
+        return self.to_str(0)
+
+class INode(NamedTuple):
+    value : str
+    level : int
+
+def to_indented(node):
+    result : List[INode] = []
+    def add_node(node : NNode, level : int) -> None:
+        result.append(INode(node.value, level))
+        for child in node.children:
+            add_node(child, level + 1)
+    add_node(node, 0)
+    return result
+
+def to_nested(tree):
+    stack : List[NNode] = []
+    nnode = NNode(tree[0].value)
+    for i in range(1, len(tree)):
+        inode = tree[i]
+        if inode.level > len(stack):
+            stack.append(nnode)
+        elif inode.level == len(stack):
+            stack[-1].children.append(nnode)
+        else:
+            while inode.level < len(stack):
+                stack[-1].children.append(nnode)
+                nnode = stack.pop()
+            stack[-1].children.append(nnode)
+        nnode = NNode(inode.value)
+
+    while len(stack) > 0:
+        stack[-1].children.append(nnode)
+        nnode = stack.pop()
+
+    return nnode
+
+print('Displaying tree built using nested structure:')
+nestedTree = NNode("RosettaCode")
+rocks = NNode("rocks")
+rocks.add(NNode("code"))
+rocks.add(NNode("comparison"))
+rocks.add(NNode("wiki"))
+mocks = NNode("mocks")
+mocks.add(NNode("trolling"))
+nestedTree.add(rocks)
+nestedTree.add(mocks)
+print(nestedTree)
+
+print('Displaying tree converted to indented structure:')
+indentedTree = to_indented(nestedTree)
+for node in indentedTree:
+    print(node.level, node.value)
+print()
+
+print('Displaying tree converted back to nested structure:')
+print(to_nested(indentedTree))
+
+print("Are they equal?", "yes" if str(nestedTree) == str(to_nested(indentedTree)) else "no")
+===
+T NNode
+   String value
+   [NNode] children
+
+   F (value)
+      .value = value
+
+   F add(node)
+      .children.append(node)
+
+   F.const to_str(depth) -> String
+      V result = (‘  ’ * depth)‘’(.value)"\n"
+      L(child) .children
+         result ‘’= child.to_str(depth + 1)
+      R result
+
+   F String()
+      R .to_str(0)
+
+T INode
+   String value
+   Int level
+   F (value, level)
+      .value = value
+      .level = level
+
+F to_indented(node)
+   [INode] result
+   F add_node(NNode node, Int level) -> N
+      @result.append(INode(node.value, level))
+      L(child) node.children
+         @add_node(child, level + 1)
+   add_node(node, 0)
+   R result
+
+F to_nested(tree)
+   [NNode] stack
+   V nnode = NNode(tree[0].value)
+   L(i) 1 .< tree.len
+      V inode = tree[i]
+      I inode.level > stack.len
+         stack.append(nnode)
+      E I inode.level == stack.len
+         stack.last.children.append(nnode)
+      E
+         L inode.level < stack.len
+            stack.last.children.append(nnode)
+            nnode = stack.pop()
+         stack.last.children.append(nnode)
+      nnode = NNode(inode.value)
+
+   L stack.len > 0
+      stack.last.children.append(nnode)
+      nnode = stack.pop()
+
+   R nnode
+
+print(‘Displaying tree built using nested structure:’)
+V nestedTree = NNode(‘RosettaCode’)
+V rocks = NNode(‘rocks’)
+rocks.add(NNode(‘code’))
+rocks.add(NNode(‘comparison’))
+rocks.add(NNode(‘wiki’))
+V mocks = NNode(‘mocks’)
+mocks.add(NNode(‘trolling’))
+nestedTree.add(rocks)
+nestedTree.add(mocks)
+print(nestedTree)
+
+print(‘Displaying tree converted to indented structure:’)
+V indentedTree = to_indented(nestedTree)
+L(node) indentedTree
+   print((node.level)‘ ’(node.value))
+print()
+
+print(‘Displaying tree converted back to nested structure:’)
+print(to_nested(indentedTree))
+
+print(‘Are they equal? ’(I String(nestedTree) == String(to_nested(indentedTree)) {‘yes’} E ‘no’))
+===
+class NNode
+{
+public:
+    String value;
+    Array<NNode> children;
+
+    template <typename T1> NNode(const T1 &value) :
+        value(value)
+    {
+    }
+
+    template <typename T1> auto add(const T1 &node)
+    {
+        children.append(node);
+    }
+
+    template <typename T1> String to_str(const T1 &depth) const
+    {
+        auto result = (u"  "_S * depth) & (value) & u"\n"_S;
+        for (auto &&child : children)
+            result &= child.to_str(depth + 1);
+        return result;
+    }
+
+    operator String() const
+    {
+        return to_str(0);
+    }
+};
+
+class INode
+{
+public:
+    String value;
+    int level;
+    template <typename T1, typename T2> INode(const T1 &value, const T2 &level) :
+        value(value),
+        level(level)
+    {
+    }
+};
+
+template <typename T1> auto to_indented(const T1 &node)
+{
+    Array<INode> result;
+    std::function<void(NNode, int)> add_node = [&add_node, &result](const NNode &node, const int level)
+    {
+        result.append(INode(node.value, level));
+        for (auto &&child : node.children)
+            add_node(child, level + 1);
+    };
+    add_node(node, 0);
+    return result;
+}
+
+template <typename T1> auto to_nested(const T1 &tree)
+{
+    Array<NNode> stack;
+    auto nnode = NNode(_get<0>(tree).value);
+    for (auto i : range_el(1, tree.len())) {
+        auto inode = tree[i];
+        if (inode.level > stack.len())
+            stack.append(nnode);
+        else if (inode.level == stack.len())
+            stack.last().children.append(nnode);
+        else {
+            while (inode.level < stack.len()) {
+                stack.last().children.append(nnode);
+                nnode = stack.pop();
+            }
+            stack.last().children.append(nnode);
+        }
+        nnode = NNode(inode.value);
+    }
+
+    while (stack.len() > 0) {
+        stack.last().children.append(nnode);
+        nnode = stack.pop();
+    }
+
+    return nnode;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Displaying tree built using nested structure:"_S);
+    }
+} code_block_1;
+
+auto nestedTree = NNode(u"RosettaCode"_S);
+auto rocks = NNode(u"rocks"_S);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        rocks.add(NNode(u"code"_S));
+        rocks.add(NNode(u"comparison"_S));
+        rocks.add(NNode(u"wiki"_S));
+    }
+} code_block_2;
+
+auto mocks = NNode(u"mocks"_S);
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        mocks.add(NNode(u"trolling"_S));
+        nestedTree.add(rocks);
+        nestedTree.add(mocks);
+        print(nestedTree);
+
+        print(u"Displaying tree converted to indented structure:"_S);
+    }
+} code_block_3;
+
+auto indentedTree = to_indented(nestedTree);
+
+struct CodeBlock4
+{
+    CodeBlock4()
+    {
+        for (auto &&node : indentedTree)
+            print((node.level) & u" "_S & (node.value));
+        print();
+
+        print(u"Displaying tree converted back to nested structure:"_S);
+        print(to_nested(indentedTree));
+
+        print(u"Are they equal? "_S & (String(nestedTree) == String(to_nested(indentedTree)) ? u"yes"_S : u"no"_S));
+    }
+} code_block_4;
+
+
+# https://www.rosettacode.org/wiki/Triplet_of_three_numbers#Python
+import math
+
+n = 6000
+p = [False] * 6000  #inicializamos la lista
+
+for i in range(2, int(round(math.sqrt(n)))):
+    if not p[i]:
+        for j in range(i*2, n, i):
+            p[j] = True
+
+for i in range(3, n):
+    if (p[i-1] or p[i+3] or p[i+5]):
+        continue
+    else:
+        #print(i, ': ', i-1,  ' ', i+3,  ' ', i+5)
+        print(f'{i:4}: {i-1:4} {i+3:4} {i+5:4}')
+===
+V n = 6000
+V p = [0B] * 6000
+
+L(i) 2 .< Int(round(sqrt(n)))
+   I !p[i]
+      L(j) (i * 2 .< n).step(i)
+         p[j] = 1B
+
+L(i) 3 .< n
+   I (p[i - 1] | p[i + 3] | p[i + 5])
+      L.continue
+   E
+      print(f:‘{i:4}: {i - 1:4} {i + 3:4} {i + 5:4}’)
+===
+auto n = 6000;
+auto p = create_array({false}) * 6000;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(2, to_int(round(sqrt(n)))))
+            if (!p[i])
+                for (auto j : range_el(i * 2, n).step(i))
+                    p.set(j, true);
+
+        for (auto i : range_el(3, n))
+            if ((p[i - 1] || p[i + 3] || p[i + 5]))
+                continue;
+            else
+                print(u"#4: #4 #4 #4"_S.format(i, i - 1, i + 3, i + 5));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Twelve_statements#Nim
+from typing import List, Callable
+
+predicates : List[Callable[[List[int]], bool]] = []
+predicates += [lambda st: len(st) == 12                ]
+predicates += [lambda st: sum(st[-6:]) == 3            ]
+predicates += [lambda st: sum(st[1::2]) == 2           ]
+predicates += [lambda st: (st[5]&st[6]) if st[4] else 1]
+predicates += [lambda st: sum(st[1:4]) == 0            ]
+predicates += [lambda st: sum(st[0::2]) == 4           ]
+predicates += [lambda st: sum(st[1:3]) == 1            ]
+predicates += [lambda st: (st[4]&st[5]) if st[6] else 1]
+predicates += [lambda st: sum(st[:6]) == 3             ]
+predicates += [lambda st: (st[10]&st[11])              ]
+predicates += [lambda st: sum(st[6:9]) == 1            ]
+predicates += [lambda st: sum(st[0:11]) == 4           ]
+
+def to_str(b):
+    return ' '.join(map(str, (i + 1 for i in range(12) if b[i])))
+
+print('Exact hits:')
+for n in range(1 << 12):
+    bools = [0] * 12
+    for i in range(12):
+        if n & (1 << (11 - i)) != 0:
+            bools[i] = 1
+
+    for i, predicate in enumerate(predicates):
+        if int(predicate(bools)) != bools[i]:
+            break
+    else:
+        print("    " + to_str(bools))
+
+print("\nNear misses:")
+for n in range(1 << 12):
+    bools = [0] * 12
+    for i in range(12):
+        if n & (1 << (11 - i)) != 0:
+            bools[i] = 1
+
+    count = 0
+    for i, predicate in enumerate(predicates):
+        if int(predicate(bools)) == bools[i]:
+            count += 1
+    if count == 11:
+        for i, predicate in enumerate(predicates):
+            if int(predicate(bools)) != bools[i]:
+                print(f'    (Fails at statement {i+1:2})  {to_str(bools)}')
+                break
+===
+[([Int] -> Bool)] predicates
+predicates [+]= st -> st.len == 12
+predicates [+]= st -> sum(st[(len)-6 ..]) == 3
+predicates [+]= st -> sum(st[(1..).step(2)]) == 2
+predicates [+]= st -> I st[4] {(st[5] [&] st[6])} E 1
+predicates [+]= st -> sum(st[1.<4]) == 0
+predicates [+]= st -> sum(st[(0..).step(2)]) == 4
+predicates [+]= st -> sum(st[1.<3]) == 1
+predicates [+]= st -> I st[6] {(st[4] [&] st[5])} E 1
+predicates [+]= st -> sum(st[0.<6]) == 3
+predicates [+]= st -> (st[10] [&] st[11])
+predicates [+]= st -> sum(st[6.<9]) == 1
+predicates [+]= st -> sum(st[0.<11]) == 4
+
+F to_str(b)
+   R ((0.<12).filter(i -> @b[i]).map(i -> i + 1)).map(String).join(‘ ’)
+
+print(‘Exact hits:’)
+L(n) 0 .< 1 << 12
+   V bools = [0] * 12
+   L(i) 12
+      I n [&] (1 << (11 - i)) != 0
+         bools[i] = 1
+
+   L(predicate) predicates
+      V i = L.index
+      I Int(predicate(bools)) != bools[i]
+         L.break
+   L.was_no_break
+      print(‘    ’to_str(bools))
+
+print("\nNear misses:")
+L(n) 0 .< 1 << 12
+   V bools = [0] * 12
+   L(i) 12
+      I n [&] (1 << (11 - i)) != 0
+         bools[i] = 1
+
+   V count = 0
+   L(predicate) predicates
+      V i = L.index
+      I Int(predicate(bools)) == bools[i]
+         count++
+   I count == 11
+      L(predicate) predicates
+         V i = L.index
+         I Int(predicate(bools)) != bools[i]
+            print(f:‘    (Fails at statement {i + 1:2})  {to_str(bools)}’)
+            L.break
+===
+Array<std::function<bool(const Array<int>&)>> predicates;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        predicates.append([](const auto &st){return st.len() == 12;});
+        predicates.append([](const auto &st){return sum(st[range_elen_i( - 6)]) == 3;});
+        predicates.append([](const auto &st){return sum(st[range_ei(1).step(2)]) == 2;});
+        predicates.append([](const auto &st){return _get<4>(st) ? (_get<5>(st) & _get<6>(st)) : 1;});
+        predicates.append([](const auto &st){return sum(st[range_el(1, 4)]) == 0;});
+        predicates.append([](const auto &st){return sum(st[range_ei(0).step(2)]) == 4;});
+        predicates.append([](const auto &st){return sum(st[range_el(1, 3)]) == 1;});
+        predicates.append([](const auto &st){return _get<6>(st) ? (_get<4>(st) & _get<5>(st)) : 1;});
+        predicates.append([](const auto &st){return sum(st[range_el(0, 6)]) == 3;});
+        predicates.append([](const auto &st){return (_get<10>(st) & _get<11>(st));});
+        predicates.append([](const auto &st){return sum(st[range_el(6, 9)]) == 1;});
+        predicates.append([](const auto &st){return sum(st[range_el(0, 11)]) == 4;});
+    }
+} code_block_1;
+
+template <typename T1> auto to_str(const T1 &b)
+{
+    return (range_el(0, 12).filter([&b](const auto &i){return b[i];}).map([](const auto &i){return i + 1;})).map([](const auto &x){return String(x);}).join(u" "_S);
+}
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"Exact hits:"_S);
+        for (auto n : range_el(0, 1 << 12)) {
+            auto bools = create_array({0}) * 12;
+            for (int i = 0; i < 12; i++)
+                if ((n & (1 << (11 - i))) != 0)
+                    bools.set(i, 1);
+            {int Lindex = 0;
+
+            for (auto &&predicate : predicates) {
+                auto i = Lindex;
+                if (to_int(predicate(bools)) != bools[i])
+                    goto break_;
+                Lindex++;
+            }}
+            print(u"    "_S & to_str(bools));
+            break_:;
+        }
+
+        print(u"\nNear misses:"_S);
+        for (auto n : range_el(0, 1 << 12)) {
+            auto bools = create_array({0}) * 12;
+            for (int i = 0; i < 12; i++)
+                if ((n & (1 << (11 - i))) != 0)
+                    bools.set(i, 1);
+
+            auto count = 0;
+            {int Lindex = 0;
+            for (auto &&predicate : predicates) {
+                auto i = Lindex;
+                if (to_int(predicate(bools)) == bools[i])
+                    count++;
+                Lindex++;
+            }}
+            if (count == 11)
+                {int Lindex = 0;
+                for (auto &&predicate : predicates) {
+                    auto i = Lindex;
+                    if (to_int(predicate(bools)) != bools[i]) {
+                        print(u"    (Fails at statement #2)  #."_S.format(i + 1, to_str(bools)));
+                        break;
+                    }
+                    Lindex++;
+                }}
+        }
+    }
+} code_block_2;

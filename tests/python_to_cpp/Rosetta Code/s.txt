@@ -9863,3 +9863,523 @@ struct CodeBlock1
             print(firstSquareWithPrefix(n));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Snake_and_Ladder#Python
+import random
+
+snl = {
+    4: 14,
+    9: 31,
+    17: 7,
+    20: 38,
+    28: 84,
+    40: 59,
+    51: 67,
+    54: 34,
+    62: 19,
+    63: 81,
+    64: 60,
+    71: 91,
+    87: 24,
+    93: 73,
+    95: 75,
+    99: 78
+}
+sixesRollAgain = True
+
+def turn(player, square):
+    while True:
+        roll = random.randint(1,6)
+        print("Player {0} on square {1}, rolls a {2}".format(player, square, roll), end = '')
+        if square + roll > 100:
+            print(" but cannot move.")
+        else:
+            square += roll
+            print(" and moves to square {0}".format(square))
+            if square == 100:
+                return 100
+            next = snl.get(square, square)
+            if square < next:
+                print("Yay! landed on a ladder. Climb up to {0}.".format(next))
+                if square == 100:
+                    return 100
+                square = next
+            elif square > next:
+                print("Oops! Landed on a snake. Slither down to {0}.".format(next))
+                square = next
+        if roll < 6 or not sixesRollAgain:
+            return square
+        print("Rolled a 6 so roll again.")
+
+def main():
+    players = [1, 1, 1]
+    while True:
+        for i in range(0, 3):
+            ns = turn(i+1, players[i])
+            if ns == 100:
+                print("Player {0} wins!".format(i+1))
+                return
+            players[i] = ns
+            print()
+
+main()
+===
+V snl = [4 = 14, 9 = 31, 17 = 7, 20 = 38, 28 = 84, 40 = 59, 51 = 67, 54 = 34, 62 = 19, 63 = 81, 64 = 60, 71 = 91, 87 = 24, 93 = 73, 95 = 75, 99 = 78]
+V sixesRollAgain = 1B
+
+F turn(player, =square)
+   L
+      V roll = random:(1 .. 6)
+      print(‘Player #. on square #., rolls a #.’.format(player, square, roll), end' ‘’)
+      I square + roll > 100
+         print(‘ but cannot move.’)
+      E
+         square += roll
+         print(‘ and moves to square #.’.format(square))
+         I square == 100
+            R 100
+         V next = :snl.get(square, square)
+         I square < next
+            print(‘Yay! landed on a ladder. Climb up to #..’.format(next))
+            I square == 100
+               R 100
+            square = next
+         E I square > next
+            print(‘Oops! Landed on a snake. Slither down to #..’.format(next))
+            square = next
+      I roll < 6 | !:sixesRollAgain
+         R square
+      print(‘Rolled a 6 so roll again.’)
+
+F main()
+   V players = [1, 1, 1]
+   L
+      L(i) 0..2
+         V ns = turn(i + 1, players[i])
+         I ns == 100
+            print(‘Player #. wins!’.format(i + 1))
+            R
+         players[i] = ns
+         print()
+
+main()
+===
+auto snl = create_dict(dict_of(4, 14)(9, 31)(17, 7)(20, 38)(28, 84)(40, 59)(51, 67)(54, 34)(62, 19)(63, 81)(64, 60)(71, 91)(87, 24)(93, 73)(95, 75)(99, 78));
+auto sixesRollAgain = true;
+
+template <typename T1, typename T2> auto turn(const T1 &player, T2 square)
+{
+    while (true) {
+        auto roll = randomns::_(range_ee(1, 6));
+        print(u"Player #. on square #., rolls a #."_S.format(player, square, roll), u""_S);
+        if (square + roll > 100)
+            print(u" but cannot move."_S);
+        else {
+            square += roll;
+            print(u" and moves to square #."_S.format(square));
+            if (square == 100)
+                return 100;
+            auto next = ::snl.get(square, square);
+            if (square < next) {
+                print(u"Yay! landed on a ladder. Climb up to #.."_S.format(next));
+                if (square == 100)
+                    return 100;
+                square = next;
+            }
+            else if (square > next) {
+                print(u"Oops! Landed on a snake. Slither down to #.."_S.format(next));
+                square = next;
+            }
+        }
+        if (roll < 6 || !::sixesRollAgain)
+            return square;
+        print(u"Rolled a 6 so roll again."_S);
+    }
+}
+
+auto _main_()
+{
+    auto players = create_array({1, 1, 1});
+    while (true)
+        for (auto i : range_ee(0, 2)) {
+            auto ns = turn(i + 1, players[i]);
+            if (ns == 100) {
+                print(u"Player #. wins!"_S.format(i + 1));
+                return;
+            }
+            players.set(i, ns);
+            print();
+        }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _main_();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Sum_and_product_puzzle#Python
+import collections
+
+def counter(arr):
+    d = collections.defaultdict(int) # int
+    for a in arr:
+        d[a] += 1
+    return d
+
+def decompose_sum(s):
+    return [(a,s-a) for a in range(2,int(s/2+1))]
+
+# Generate all possible pairs
+all_pairs_set = set() # Tuple[int, int]
+for a in range(2,100):
+    for b in range(a+1,100):
+        if a+b<100:
+            all_pairs_set.add((a, b))
+all_pairs = list(all_pairs_set)
+
+# Fact 1 --> Select pairs for which all sum decompositions have non-unique product
+product_counts = counter(c*d for c,d in all_pairs)
+unique_products = set((a,b) for a,b in all_pairs if product_counts[a*b]==1)
+s_pairs = [(a,b) for a,b in all_pairs if
+    all((x,y) not in unique_products for x,y in decompose_sum(a+b))]
+
+# Fact 2 --> Select pairs for which the product is unique
+product_counts = counter(c*d for c,d in s_pairs)
+p_pairs = [(a,b) for a,b in s_pairs if product_counts[a*b]==1]
+
+# Fact 3 --> Select pairs for which the sum is unique
+sum_counts = counter(c+d for c,d in p_pairs)
+final_pairs = [(a,b) for a,b in p_pairs if sum_counts[a+b]==1]
+
+print(final_pairs)
+===
+F counter(arr)
+   V d = DefaultDict[Int, Int]()
+   L(a) arr
+      d[a]++
+   R d
+
+F decompose_sum(s)
+   R (2 .< Int(s / 2 + 1)).map(a -> (a, @s - a))
+
+V all_pairs_set = Set[(Int, Int)]()
+L(a) 2..99
+   L(b) a + 1 .< 100
+      I a + b < 100
+         all_pairs_set.add((a, b))
+V all_pairs = Array(all_pairs_set)
+
+V product_counts = counter(all_pairs.map((c, d) -> c * d))
+V unique_products = Set(all_pairs.filter((a, b) -> :product_counts[a * b] == 1))
+V s_pairs = all_pairs.filter((a, b) -> all(decompose_sum(a + b).map((x, y) -> (x, y) !C :unique_products)))
+
+product_counts = counter(s_pairs.map((c, d) -> c * d))
+V p_pairs = s_pairs.filter((a, b) -> :product_counts[a * b] == 1)
+
+V sum_counts = counter(p_pairs.map((c, d) -> c + d))
+V final_pairs = p_pairs.filter((a, b) -> :sum_counts[a + b] == 1)
+
+print(final_pairs)
+===
+template <typename T1> auto counter(const T1 &arr)
+{
+    auto d = DefaultDict<int, int>();
+    for (auto &&a : arr)
+        d[a]++;
+    return d;
+}
+
+template <typename T1> auto decompose_sum(const T1 &s)
+{
+    return range_el(2, to_int(s / 2.0 + 1)).map([&s](const auto &a){return make_tuple(a, s - a);});
+}
+
+auto all_pairs_set = Set<ivec2>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto a : range_ee(2, 99))
+            for (auto b : range_el(a + 1, 100))
+                if (a + b < 100)
+                    all_pairs_set.add(make_tuple(a, b));
+    }
+} code_block_1;
+
+auto all_pairs = create_array(all_pairs_set);
+
+auto product_counts = counter(all_pairs.map([](const auto &c, const auto &d){return c * d;}));
+auto unique_products = create_set(all_pairs.filter([](const auto &a, const auto &b){return ::product_counts[a * b] == 1;}));
+auto s_pairs = all_pairs.filter([](const auto &a, const auto &b){return all_map(decompose_sum(a + b), [](const auto &x, const auto &y){return !in(make_tuple(x, y), ::unique_products);});});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        product_counts = counter(s_pairs.map([](const auto &c, const auto &d){return c * d;}));
+    }
+} code_block_2;
+
+auto p_pairs = s_pairs.filter([](const auto &a, const auto &b){return ::product_counts[a * b] == 1;});
+
+auto sum_counts = counter(p_pairs.map([](const auto &c, const auto &d){return c + d;}));
+auto final_pairs = p_pairs.filter([](const auto &a, const auto &b){return ::sum_counts[a + b] == 1;});
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print(final_pairs);
+    }
+} code_block_3;
+
+
+# https://www.rosettacode.org/wiki/Sum_of_elements_below_main_diagonal_of_matrix#Nim
+def sumBelowDiagonal(m):
+    result = 0
+    for i in range(1, len(m)):
+        for j in range(i):
+            result += m[i][j]
+    return result
+
+m = [[ 1,  3,  7,  8, 10],
+     [ 2,  4, 16, 14,  4],
+     [ 3,  1,  9, 18, 11],
+     [12, 14, 17, 18, 20],
+     [ 7,  1,  3,  9,  5]]
+
+print(sumBelowDiagonal(m))
+===
+F sumBelowDiagonal(m)
+   V result = 0
+   L(i) 1 .< m.len
+      L(j) 0 .< i
+         result += m[i][j]
+   R result
+
+V m = [[1, 3, 7, 8, 10], [2, 4, 16, 14, 4], [3, 1, 9, 18, 11], [12, 14, 17, 18, 20], [7, 1, 3, 9, 5]]
+
+print(sumBelowDiagonal(m))
+===
+template <typename T1> auto sumBelowDiagonal(const T1 &m)
+{
+    auto result = 0;
+    for (auto i : range_el(1, m.len()))
+        for (auto j : range_el(0, i))
+            result += m[i][j];
+    return result;
+}
+
+auto m = create_array({create_array({1, 3, 7, 8, 10}), create_array({2, 4, 16, 14, 4}), create_array({3, 1, 9, 18, 11}), create_array({12, 14, 17, 18, 20}), create_array({7, 1, 3, 9, 5})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sumBelowDiagonal(m));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Sum_of_first_n_cubes#Nim
+s = 0
+for n in range(50):
+    s += n * n * n
+    print(str(s).rjust(7), end = "\n" if (n + 1) % 10 == 0 else ' ')
+===
+V s = 0
+L(n) 50
+   s += n * n * n
+   print(String(s).rjust(7), end' I (n + 1) % 10 == 0 {"\n"} E ‘ ’)
+===
+auto s = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int n = 0; n < 50; n++) {
+            s += n * n * n;
+            print(String(s).rjust(7), mod((n + 1), 10) == 0 ? u"\n"_S : u" "_S);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Sum_of_the_digits_of_n_is_substring_of_n#Python
+count = 0
+for n in range(1000):
+    if str(sum(int(d) for d in str(n))) in str(n):
+        count += 1
+        print(f'{n:3}', end = "\n" if count % 8 == 0 else ' ')
+===
+V count = 0
+L(n) 1000
+   I String(sum(String(n).map(d -> Int(d)))) C String(n)
+      count++
+      print(f:‘{n:3}’, end' I count % 8 == 0 {"\n"} E ‘ ’)
+===
+auto count = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int n = 0; n < 1000; n++)
+            if (in(String(sum_map(String(n), [](const auto &d){return to_int(d);})), String(n))) {
+                count++;
+                print(u"#3"_S.format(n), mod(count, 8) == 0 ? u"\n"_S : u" "_S);
+            }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Summarize_primes#Nim
+import math
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+print('index  prime  prime sum')
+s = 0
+idx = 0
+for n in range(2, 1000):
+    if is_prime(n):
+        idx += 1
+        s += n
+        if is_prime(s):
+            print(f'{idx:3}   {n:5}   {s:7}')
+===
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+print(‘index  prime  prime sum’)
+V s = 0
+V idx = 0
+L(n) 2..999
+   I is_prime(n)
+      idx++
+      s += n
+      I is_prime(s)
+         print(f:‘{idx:3}   {n:5}   {s:7}’)
+===
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"index  prime  prime sum"_S);
+    }
+} code_block_1;
+
+auto s = 0;
+auto idx = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto n : range_ee(2, 999))
+            if (is_prime(n)) {
+                idx++;
+                s += n;
+                if (is_prime(s))
+                    print(u"#3   #5   #7"_S.format(idx, n, s));
+            }
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Sylvester%27s_sequence#Nim
+from _11l import *
+
+def sylverster(lim):
+    result = [BigInt(2)]
+    for _ in range(2, lim + 1):
+        result.append(product_of_a_seq(result) + 1)
+    return result
+
+l = sylverster(10)
+print('First 10 terms of the Sylvester sequence:')
+for item in l: print(item)
+
+s = 0.0
+for item in l: s += 1 / float(item)
+print("\nSum of the reciprocals of the first 10 terms: %.17f" % s)
+===
+F sylverster(lim)
+   V result = [BigInt(2)]
+   L(_) 2 .. lim
+      result.append(product(result) + 1)
+   R result
+
+V l = sylverster(10)
+print(‘First 10 terms of the Sylvester sequence:’)
+L(item) l
+   print(item)
+
+V s = 0.0
+L(item) l
+   s += 1 / Float(item)
+print("\nSum of the reciprocals of the first 10 terms: #.17".format(s))
+===
+template <typename T1> auto sylverster(const T1 &lim)
+{
+    auto result = create_array({BigInt(2)});
+    for (auto _ : range_ee(2, lim))
+        result.append(product(result) + 1);
+    return result;
+}
+
+auto l = sylverster(10);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"First 10 terms of the Sylvester sequence:"_S);
+        for (auto &&item : l)
+            print(item);
+    }
+} code_block_1;
+
+auto s = 0.0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&item : l)
+            s += 1.0 / to_float(item);
+        print(u"\nSum of the reciprocals of the first 10 terms: #.17"_S.format(s));
+    }
+} code_block_2;
