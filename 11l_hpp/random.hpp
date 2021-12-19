@@ -55,8 +55,14 @@ inline double _(const Range<double, true, true > range) {return __(range.b, rang
 
 template <typename Type> inline void shuffle(Array<Type> &arr)
 {
-	for (int i=0,l=arr.len(); i<l; i++)
+	for (Int i=0,l=arr.len(); i<l; i++)
 		std::swap(arr[_(l)], arr[_(l)]);
+}
+
+inline void shuffle(String &s)
+{
+	for (Int i=0,l=s.len(); i<l; i++)
+		std::swap(s[_(l)], s[_(l)]);
 }
 
 template <typename Type> inline auto choice(const Array<Type> &arr)

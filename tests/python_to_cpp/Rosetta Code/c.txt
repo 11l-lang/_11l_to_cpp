@@ -3042,3 +3042,476 @@ struct CodeBlock1
                     print(u"#. x #.: #."_S.format(w, h, cut_it(w, h)));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Camel_case_and_snake_case#Python
+import re
+from typing import List, Tuple, Callable
+
+def snakeToCamelCase(nam, sep='[_]+', lcmiddle=False):
+    """ convert snake '_' separator case to camel case """
+    if nam == '':
+        return nam
+    words = re.split(sep, nam.strip(' '))
+    if lcmiddle:
+        words = [w.lower() for w in words]
+    words = [words[0]] + [w[0].upper() + '' + w[1:] for w in words[1:] if len(w) > 0]
+    return ''.join(words)
+
+funcs : List[Tuple[str, Callable[[str], str]]] = []
+funcs += [('snakeToCamelCase', lambda nam: snakeToCamelCase(nam))]
+funcs += [('spaceToCamelCase', lambda nam: snakeToCamelCase(nam, sep=r'\s+'))]
+funcs += [('kebabToCamelCase', lambda nam: snakeToCamelCase(nam, sep=r'[\-]+'))]
+funcs += [('periodToCamelCase', lambda nam: snakeToCamelCase(nam, sep=r'[\.]+'))]
+funcs += [('allsepToCamelCase', lambda nam: snakeToCamelCase(nam, sep=r'[ \-_\.]+'))]
+funcs += [('lowermiddle_allsepToCamelCase', lambda nam: snakeToCamelCase(nam, sep=r'[ \-_\.]+', lcmiddle=True))]
+
+def camel_to_snake_case(nam, allsep='[_]+', sep='_', lcmiddle=True):
+    """ convert camel case to snake case (separate with '_') """
+    nam = re.sub('([A-Z]+)', sep + r"\1", nam.strip())
+    sep1 = '\\' + sep if sep == '.' else sep
+    if lcmiddle:
+        nam = sep.join([w.lower() for w in nam.split(sep1) if len(w) > 0])
+    else:
+        nam = sep.join([w[0].lower() + '' + w[1:] for w in nam.split(sep1) if len(w) > 0])
+    return re.sub(allsep, sep, nam)
+
+funcs += [('camel_to_snake_case', lambda nam: camel_to_snake_case(nam))]
+funcs += [('preserve_midcaps_camel_to_snake_case', lambda nam: camel_to_snake_case(nam, lcmiddle=False))]
+funcs += [('allsep_to_snake_case', lambda nam: camel_to_snake_case(nam, allsep=r'[ \-\._]+'))]
+funcs += [('allsep_to_kebab_case', lambda nam: camel_to_snake_case(nam, allsep=r'[ \-\._]+', sep='-'))]
+funcs += [('allsep_to_space_case', lambda nam: camel_to_snake_case(nam, allsep=r'[ \-\._]+', sep=' '))]
+funcs += [('allsep_to_period_case', lambda nam: camel_to_snake_case(nam, allsep=r'[ \-\._]+', sep='.'))]
+funcs += [('allsep_to_slash_case', lambda nam: camel_to_snake_case(nam, allsep=r'[ \-\._]+', sep='/'))]
+
+for f_name, f in funcs:
+    print(f"Testing function {f_name}:")
+    for teststring in [
+        "snakeCase",
+        "snake_case",
+        "snake-case",
+        "snake case",
+        "snake CASE",
+        "snake.case",
+        "variable_10_case",
+        "variable10Case",
+        "ergo rE tHis",
+        "hurry-up-joe!",
+        "c://my-docs/happy_Flag-Day/12.doc",
+        " spaces "]:
+        print(teststring.rjust(36), " => ", f(teststring))
+    print()
+===
+F snakeToCamelCase(nam, sep = ‘[_]+’, lcmiddle = 0B)
+   ‘ convert snake '_' separator case to camel case ’
+   I nam == ‘’
+      R nam
+   V words = nam.trim(‘ ’).split(re:(sep))
+   I lcmiddle
+      words = words.map(w -> w.lowercase())
+   words = [words[0]] [+] words[1..].filter(w -> w.len > 0).map(w -> w[0].uppercase()‘’w[1..])
+   R words.join(‘’)
+
+[(String, (String -> String))] funcs
+funcs [+]= (‘snakeToCamelCase’, nam -> snakeToCamelCase(nam))
+funcs [+]= (‘spaceToCamelCase’, nam -> snakeToCamelCase(nam, sep' ‘\s+’))
+funcs [+]= (‘kebabToCamelCase’, nam -> snakeToCamelCase(nam, sep' ‘[\-]+’))
+funcs [+]= (‘periodToCamelCase’, nam -> snakeToCamelCase(nam, sep' ‘[\.]+’))
+funcs [+]= (‘allsepToCamelCase’, nam -> snakeToCamelCase(nam, sep' ‘[ \-_\.]+’))
+funcs [+]= (‘lowermiddle_allsepToCamelCase’, nam -> snakeToCamelCase(nam, sep' ‘[ \-_\.]+’, lcmiddle' 1B))
+
+F camel_to_snake_case(=nam, allsep = ‘[_]+’, sep = ‘_’, lcmiddle = 1B)
+   ‘ convert camel case to snake case (separate with '_') ’
+   nam = nam.trim((‘ ’, "\t", "\r", "\n")).replace(re:‘([A-Z]+)’, sep‘$1’)
+   V sep1 = I sep == ‘.’ {‘\’sep} E sep
+   I lcmiddle
+      nam = (nam.split(sep1).filter(w -> w.len > 0).map(w -> w.lowercase())).join(sep)
+   E
+      nam = (nam.split(sep1).filter(w -> w.len > 0).map(w -> w[0].lowercase()‘’w[1..])).join(sep)
+   R nam.replace(re:(allsep), sep)
+
+funcs [+]= (‘camel_to_snake_case’, nam -> camel_to_snake_case(nam))
+funcs [+]= (‘preserve_midcaps_camel_to_snake_case’, nam -> camel_to_snake_case(nam, lcmiddle' 0B))
+funcs [+]= (‘allsep_to_snake_case’, nam -> camel_to_snake_case(nam, allsep' ‘[ \-\._]+’))
+funcs [+]= (‘allsep_to_kebab_case’, nam -> camel_to_snake_case(nam, allsep' ‘[ \-\._]+’, sep' ‘-’))
+funcs [+]= (‘allsep_to_space_case’, nam -> camel_to_snake_case(nam, allsep' ‘[ \-\._]+’, sep' ‘ ’))
+funcs [+]= (‘allsep_to_period_case’, nam -> camel_to_snake_case(nam, allsep' ‘[ \-\._]+’, sep' ‘.’))
+funcs [+]= (‘allsep_to_slash_case’, nam -> camel_to_snake_case(nam, allsep' ‘[ \-\._]+’, sep' ‘/’))
+
+L(f_name, f) funcs
+   print(‘Testing function ’f_name‘:’)
+   L(teststring) [‘snakeCase’, ‘snake_case’, ‘snake-case’, ‘snake case’, ‘snake CASE’, ‘snake.case’, ‘variable_10_case’, ‘variable10Case’, ‘ergo rE tHis’, ‘hurry-up-joe!’, ‘c://my-docs/happy_Flag-Day/12.doc’, ‘ spaces ’]
+      print(teststring.rjust(36)‘  =>  ’f(teststring))
+   print()
+===
+template <typename T1, typename T2 = decltype(u"[_]+"_S), typename T3 = decltype(false)> auto snakeToCamelCase(const T1 &nam, const T2 &sep = u"[_]+"_S, const T3 &lcmiddle = false)
+{
+    u" convert snake '_' separator case to camel case "_S;
+    if (nam == u"")
+        return nam;
+    auto words = nam.trim(u" "_S).split(re::_(sep));
+    if (lcmiddle)
+        words = words.map([](const auto &w){return w.lowercase();});
+    words = create_array({_get<0>(words)}) + words[range_ei(1)].filter([](const auto &w){return w.len() > 0;}).map([](const auto &w){return _get<0>(w).uppercase() & w[range_ei(1)];});
+    return words.join(u""_S);
+}
+
+Array<Tuple<String, std::function<String(const String&)>>> funcs;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        funcs.append(make_tuple(u"snakeToCamelCase"_S, [](const auto &nam){return snakeToCamelCase(nam);}));
+        funcs.append(make_tuple(u"spaceToCamelCase"_S, [](const auto &nam){return snakeToCamelCase(nam, uR"(\s+)"_S);}));
+        funcs.append(make_tuple(u"kebabToCamelCase"_S, [](const auto &nam){return snakeToCamelCase(nam, uR"([\-]+)"_S);}));
+        funcs.append(make_tuple(u"periodToCamelCase"_S, [](const auto &nam){return snakeToCamelCase(nam, uR"([\.]+)"_S);}));
+        funcs.append(make_tuple(u"allsepToCamelCase"_S, [](const auto &nam){return snakeToCamelCase(nam, uR"([ \-_\.]+)"_S);}));
+        funcs.append(make_tuple(u"lowermiddle_allsepToCamelCase"_S, [](const auto &nam){return snakeToCamelCase(nam, uR"([ \-_\.]+)"_S, true);}));
+    }
+} code_block_1;
+
+template <typename T1, typename T2 = decltype(u"[_]+"_S), typename T3 = decltype(u"_"_S), typename T4 = decltype(true)> auto camel_to_snake_case(T1 nam, const T2 &allsep = u"[_]+"_S, const T3 &sep = u"_"_S, const T4 &lcmiddle = true)
+{
+    u" convert camel case to snake case (separate with '_') "_S;
+    nam = nam.trim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S)).replace(re::_(u"([A-Z]+)"_S), sep & u"$1"_S);
+    auto sep1 = sep == u'.' ? uR"(\)"_S & sep : sep;
+    if (lcmiddle)
+        nam = (nam.split(sep1).filter([](const auto &w){return w.len() > 0;}).map([](const auto &w){return w.lowercase();})).join(sep);
+    else
+        nam = (nam.split(sep1).filter([](const auto &w){return w.len() > 0;}).map([](const auto &w){return _get<0>(w).lowercase() & w[range_ei(1)];})).join(sep);
+    return nam.replace(re::_(allsep), sep);
+}
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        funcs.append(make_tuple(u"camel_to_snake_case"_S, [](const auto &nam){return camel_to_snake_case(nam);}));
+        funcs.append(make_tuple(u"preserve_midcaps_camel_to_snake_case"_S, [](const auto &nam){return camel_to_snake_case(nam, u"[_]+"_S, u"_"_S, false);}));
+        funcs.append(make_tuple(u"allsep_to_snake_case"_S, [](const auto &nam){return camel_to_snake_case(nam, uR"([ \-\._]+)"_S);}));
+        funcs.append(make_tuple(u"allsep_to_kebab_case"_S, [](const auto &nam){return camel_to_snake_case(nam, uR"([ \-\._]+)"_S, u"-"_S);}));
+        funcs.append(make_tuple(u"allsep_to_space_case"_S, [](const auto &nam){return camel_to_snake_case(nam, uR"([ \-\._]+)"_S, u" "_S);}));
+        funcs.append(make_tuple(u"allsep_to_period_case"_S, [](const auto &nam){return camel_to_snake_case(nam, uR"([ \-\._]+)"_S, u"."_S);}));
+        funcs.append(make_tuple(u"allsep_to_slash_case"_S, [](const auto &nam){return camel_to_snake_case(nam, uR"([ \-\._]+)"_S, u"/"_S);}));
+
+        for (auto &&[f_name, f] : funcs) {
+            print(u"Testing function "_S & f_name & u":"_S);
+            for (auto &&teststring : create_array({u"snakeCase"_S, u"snake_case"_S, u"snake-case"_S, u"snake case"_S, u"snake CASE"_S, u"snake.case"_S, u"variable_10_case"_S, u"variable10Case"_S, u"ergo rE tHis"_S, u"hurry-up-joe!"_S, u"c://my-docs/happy_Flag-Day/12.doc"_S, u" spaces "_S}))
+                print(teststring.rjust(36) & u"  =>  "_S & f(teststring));
+            print();
+        }
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Consecutive_primes_with_ascending_or_descending_differences#Python
+from typing import List
+
+def primes_upto(limit):
+    is_prime = [False] * 2 + [True] * (limit - 1)
+    for n in range(int(limit**0.5 + 1.5)): # stop at ``sqrt(limit)``
+        if is_prime[n]:
+            for i in range(n*n, limit+1, n):
+                is_prime[i] = False
+    return [i for i, prime in enumerate(is_prime) if prime]
+
+primelist = primes_upto(1_000_000)
+
+listlen = len(primelist)
+
+# ascending
+
+pindex = 1
+old_diff = -1
+curr_list=[primelist[0]]
+longest_list : List[int]=[]
+
+while pindex < listlen:
+
+    diff = primelist[pindex] - primelist[pindex-1]
+    if diff > old_diff:
+        curr_list.append(primelist[pindex])
+        if len(curr_list) > len(longest_list):
+            longest_list = curr_list
+    else:
+        curr_list = [primelist[pindex-1],primelist[pindex]]
+
+    old_diff = diff
+    pindex += 1
+
+print(longest_list)
+
+# descending
+
+pindex = 1
+old_diff = -1
+curr_list=[primelist[0]]
+longest_list=[]
+
+while pindex < listlen:
+
+    diff = primelist[pindex] - primelist[pindex-1]
+    if diff < old_diff:
+        curr_list.append(primelist[pindex])
+        if len(curr_list) > len(longest_list):
+            longest_list = curr_list
+    else:
+        curr_list = [primelist[pindex-1],primelist[pindex]]
+
+    old_diff = diff
+    pindex += 1
+
+print(longest_list)
+===
+F primes_upto(limit)
+   V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
+   L(n) 0 .< Int(limit ^ 0.5 + 1.5)
+      I is_prime[n]
+         L(i) (n * n .. limit).step(n)
+            is_prime[i] = 0B
+   R enumerate(is_prime).filter((i, prime) -> prime).map((i, prime) -> i)
+
+V primelist = primes_upto(1'000'000)
+
+V listlen = primelist.len
+
+V pindex = 1
+V old_diff = -1
+V curr_list = [primelist[0]]
+[Int] longest_list
+
+L pindex < listlen
+
+   V diff = primelist[pindex] - primelist[pindex - 1]
+   I diff > old_diff
+      curr_list.append(primelist[pindex])
+      I curr_list.len > longest_list.len
+         longest_list = curr_list
+   E
+      curr_list = [primelist[pindex - 1], primelist[pindex]]
+
+   old_diff = diff
+   pindex++
+
+print(longest_list)
+
+pindex = 1
+old_diff = -1
+curr_list = [primelist[0]]
+longest_list.drop()
+
+L pindex < listlen
+
+   V diff = primelist[pindex] - primelist[pindex - 1]
+   I diff < old_diff
+      curr_list.append(primelist[pindex])
+      I curr_list.len > longest_list.len
+         longest_list = curr_list
+   E
+      curr_list = [primelist[pindex - 1], primelist[pindex]]
+
+   old_diff = diff
+   pindex++
+
+print(longest_list)
+===
+template <typename T1> auto primes_upto(const T1 &limit)
+{
+    auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
+    for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
+        if (is_prime[n])
+            for (auto i : range_ee(n * n, limit).step(n))
+                is_prime.set(i, false);
+    return enumerate(is_prime).filter([](const auto &i, const auto &prime){return prime;}).map([](const auto &i, const auto &prime){return i;});
+}
+
+auto primelist = primes_upto(1'000'000);
+
+auto listlen = primelist.len();
+
+auto pindex = 1;
+auto old_diff = -1;
+auto curr_list = create_array({_get<0>(primelist)});
+Array<int> longest_list;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (pindex < listlen) {
+
+            auto diff = primelist[pindex] - primelist[pindex - 1];
+            if (diff > old_diff) {
+                curr_list.append(primelist[pindex]);
+                if (curr_list.len() > longest_list.len())
+                    longest_list = curr_list;
+            }
+            else
+                curr_list = create_array({primelist[pindex - 1], primelist[pindex]});
+
+            old_diff = diff;
+            pindex++;
+        }
+
+        print(longest_list);
+
+        pindex = 1;
+        old_diff = -1;
+        curr_list = create_array({_get<0>(primelist)});
+        longest_list.drop();
+
+        while (pindex < listlen) {
+
+            auto diff = primelist[pindex] - primelist[pindex - 1];
+            if (diff < old_diff) {
+                curr_list.append(primelist[pindex]);
+                if (curr_list.len() > longest_list.len())
+                    longest_list = curr_list;
+            }
+            else
+                curr_list = create_array({primelist[pindex - 1], primelist[pindex]});
+
+            old_diff = diff;
+            pindex++;
+        }
+
+        print(longest_list);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Coprime_triplets#Nim
+import math
+
+lst = [1, 2]
+
+while True:
+    n = 3
+    prev2 = lst[-2]
+    prev1 = lst[-1]
+    while n in lst or math.gcd(n, prev2) != 1 or math.gcd(n, prev1) != 1:
+        n += 1
+    if n >= 50: break
+    lst.append(n)
+
+print(' '.join(map(str, lst)))
+===
+V lst = [1, 2]
+
+L
+   V n = 3
+   V prev2 = lst[(len)-2]
+   V prev1 = lst.last
+   L n C lst | gcd(n, prev2) != 1 | gcd(n, prev1) != 1
+      n++
+   I n >= 50
+      L.break
+   lst.append(n)
+
+print(lst.map(String).join(‘ ’))
+===
+auto lst = create_array({1, 2});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            auto n = 3;
+            auto prev2 = lst.at_plus_len( - 2);
+            auto prev1 = lst.last();
+            while (in(n, lst) || gcd(n, prev2) != 1 || gcd(n, prev1) != 1)
+                n++;
+            if (n >= 50)
+                break;
+            lst.append(n);
+        }
+
+        print(lst.map([](const auto &x){return String(x);}).join(u" "_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Count_how_many_vowels_and_consonants_occur_in_a_string#Python
+def isvowel(c):
+    """ true if c is an English vowel (ignore y) """
+    return c in ['a', 'e', 'i', 'o', 'u', 'A', 'E', "I", 'O', 'U']
+
+def isletter(c):
+    """ true if in English standard alphabet """
+    return 'a' <= c <= 'z' or 'A' <= c <= 'Z'
+
+def isconsonant(c):
+    """ true if an English consonant """
+    return  not isvowel(c) and isletter(c)
+
+def vccounts(s):
+    """ case insensitive vowel counts, total and unique """
+    a = list(s.lower())
+    au = set(a)
+    return (sum([int(isvowel(c)) for c in a ]), sum([int(isconsonant(c)) for c in a]),
+            sum([int(isvowel(c)) for c in au]), sum([int(isconsonant(c)) for c in au]))
+
+s = "Now is the time for all good men to come to the aid of their country."
+(vcnt, ccnt, vu, cu) = vccounts(s)
+print(f"String: {s}\n    Vowels: {vcnt} (distinct {vu})\n    Consonants: {ccnt} (distinct {cu})")
+===
+F isvowel(c)
+   ‘ true if c is an English vowel (ignore y) ’
+   R c C [‘a’, ‘e’, ‘i’, ‘o’, ‘u’, ‘A’, ‘E’, ‘I’, ‘O’, ‘U’]
+
+F isletter(c)
+   ‘ true if in English standard alphabet ’
+   R c C ‘a’..‘z’ | c C ‘A’..‘Z’
+
+F isconsonant(c)
+   ‘ true if an English consonant ’
+   R !isvowel(c) & isletter(c)
+
+F vccounts(s)
+   ‘ case insensitive vowel counts, total and unique ’
+   V a = Array(s.lowercase())
+   V au = Set(a)
+   R (sum(a.map(c -> Int(isvowel(c)))), sum(a.map(c -> Int(isconsonant(c)))), sum(au.map(c -> Int(isvowel(c)))), sum(au.map(c -> Int(isconsonant(c)))))
+
+V s = ‘Now is the time for all good men to come to the aid of their country.’
+V (vcnt, ccnt, vu, cu) = vccounts(s)
+print(‘String: ’s"\n    Vowels: "vcnt‘ (distinct ’vu")\n    Consonants: "ccnt‘ (distinct ’cu‘)’)
+===
+template <typename T1> auto isvowel(const T1 &c)
+{
+    u" true if c is an English vowel (ignore y) "_S;
+    return in(c, create_array({u'a'_C, u'e'_C, u'i'_C, u'o'_C, u'u'_C, u'A'_C, u'E'_C, u'I'_C, u'O'_C, u'U'_C}));
+}
+
+template <typename T1> auto isletter(const T1 &c)
+{
+    u" true if in English standard alphabet "_S;
+    return in(c, range_ee(u'a'_C, u'z'_C)) || in(c, range_ee(u'A'_C, u'Z'_C));
+}
+
+template <typename T1> auto isconsonant(const T1 &c)
+{
+    u" true if an English consonant "_S;
+    return !isvowel(c) && isletter(c);
+}
+
+template <typename T1> auto vccounts(const T1 &s)
+{
+    u" case insensitive vowel counts, total and unique "_S;
+    auto a = create_array(s.lowercase());
+    auto au = create_set(a);
+    return make_tuple(sum_map(a, [](const auto &c){return to_int(isvowel(c));}), sum_map(a, [](const auto &c){return to_int(isconsonant(c));}), sum_map(au, [](const auto &c){return to_int(isvowel(c));}), sum_map(au, [](const auto &c){return to_int(isconsonant(c));}));
+}
+
+auto s = u"Now is the time for all good men to come to the aid of their country."_S;
+auto [vcnt, ccnt, vu, cu] = vccounts(s);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"String: "_S & s & u"\n    Vowels: "_S & vcnt & u" (distinct "_S & vu & u")\n    Consonants: "_S & ccnt & u" (distinct "_S & cu & u")"_S);
+    }
+} code_block_1;
