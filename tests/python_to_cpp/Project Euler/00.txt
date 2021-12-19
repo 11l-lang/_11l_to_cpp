@@ -1,0 +1,348 @@
+# 1
+print(sum(x for x in range(1000) if (x % 3 == 0 or x % 5 == 0)))
+===
+print(sum((0.<1000).filter(x -> (x % 3 == 0 | x % 5 == 0))))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum(range_el(0, 1000).filter([](const auto &x){return (mod(x, 3) == 0 || mod(x, 5) == 0);})));
+    }
+} code_block_1;
+
+
+# 2
+ans = 0
+x = 1  # Represents the current Fibonacci number being processed
+y = 2  # Represents the next Fibonacci number in the sequence
+while x <= 4000000:
+    if x % 2 == 0:
+        ans += x
+    (x, y) = (y, x + y)
+print(ans)
+===
+V ans = 0
+V x = 1
+V y = 2
+L x <= 4000000
+   I x % 2 == 0
+      ans += x
+   (x, y) = (y, x + y)
+print(ans)
+===
+auto ans = 0;
+auto x = 1;
+auto y = 2;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (x <= 4000000) {
+            if (mod(x, 2) == 0)
+                ans += x;
+            assign_from_tuple(x, y, make_tuple(y, x + y));
+        }
+        print(ans);
+    }
+} code_block_1;
+
+
+# 3
+import math
+Int64 = int
+
+# Returns the smallest factor of n, which is in the range [2, n]. The result is always prime.
+def smallest_prime_factor(n):
+    assert n >= 2
+    for i in range(2, int(math.sqrt(n)) + 1):
+        if n % i == 0:
+            return Int64(i)
+    return n  # n itself is prime
+
+n = 600851475143
+while True:
+    p = smallest_prime_factor(n)
+    if p < n:
+        n //= p
+    else:
+        print(n)
+        break
+===
+F smallest_prime_factor(n)
+   assert(n >= 2)
+   L(i) 2 .. Int(sqrt(n))
+      I n % i == 0
+         R Int64(i)
+   R n
+
+V n = 600851475143
+L
+   V p = smallest_prime_factor(n)
+   I p < n
+      n I/= p
+   E
+      print(n)
+      L.break
+===
+template <typename T1> auto smallest_prime_factor(const T1 &n)
+{
+    assert(n >= 2);
+    for (auto i : range_ee(2, to_int(sqrt(n))))
+        if (mod(n, i) == 0)
+            return to_int64(i);
+    return n;
+}
+
+auto n = 600851475143;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            auto p = smallest_prime_factor(n);
+            if (p < n)
+                n = idiv(n, p);
+            else {
+                print(n);
+                break;
+            }
+        }
+    }
+} code_block_1;
+
+
+# 4
+ans = 0
+for i in range(100, 1000):
+    for j in range(100, 1000):
+        if str(i * j) == str(i * j)[::-1]:
+            ans = max(ans, i * j)
+print(ans)
+===
+V ans = 0
+L(i) 100..999
+   L(j) 100..999
+      I String(i * j) == reversed(String(i * j))
+         ans = max(ans, i * j)
+print(ans)
+===
+auto ans = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(100, 999))
+            for (auto j : range_ee(100, 999))
+                if (String(i * j) == reversed(String(i * j)))
+                    ans = max(ans, i * j);
+        print(ans);
+    }
+} code_block_1;
+
+
+# 5
+import math
+
+ans = 1
+for i in range(1, 21):
+    ans *= i // math.gcd(i, ans)
+print(ans)
+===
+V ans = 1
+L(i) 1..20
+   ans *= i I/ gcd(i, ans)
+print(ans)
+===
+auto ans = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(1, 20))
+            ans *= idiv(i, gcd(i, ans));
+        print(ans);
+    }
+} code_block_1;
+
+
+# 6
+n = 100
+s = sum(i for i in range(1, n + 1))
+s2 = sum(i**2 for i in range(1, n + 1))
+print(s**2 - s2)
+===
+V n = 100
+V s = sum((1 .. n))
+V s2 = sum((1 .. n).map(i -> i ^ 2))
+print(s ^ 2 - s2)
+===
+auto n = 100;
+auto s = sum(range_ee(1, n));
+auto s2 = sum_map(range_ee(1, n), [](const auto &i){return square(i);});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(square(s) - s2);
+    }
+} code_block_1;
+
+
+# 7
+import math, itertools
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+c = 0
+for n in itertools.count(2):
+    if is_prime(n):
+        c += 1
+        if c == 10001:
+            print(n)
+            break
+===
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+V c = 0
+L(n) 2..
+   I is_prime(n)
+      c++
+      I c == 10001
+         print(n)
+         L.break
+===
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+auto c = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ei(2))
+            if (is_prime(n)) {
+                c++;
+                if (c == 10001) {
+                    print(n);
+                    break;
+                }
+            }
+    }
+} code_block_1;
+
+
+# 8
+Int64 = int
+
+def digit_product(s):
+    result = Int64(1)
+    for c in s:
+        result *= int(c)
+    return result
+
+NUMBER = "7316717653133062491922511967442657474235534919493496983520312774506326239578318016984801869478851843858615607891129494954595017379583319528532088055111254069874715852386305071569329096329522744304355766896648950445244523161731856403098711121722383113622298934233803081353362766142828064444866452387493035890729629049156044077239071381051585930796086670172427121883998797908792274921901699720888093776657273330010533678812202354218097512545405947522435258490771167055601360483958644670632441572215539753697817977846174064955149290862569321978468622482839722413756570560574902614079729686524145351004748216637048440319989000889524345065854122758866688116427171479924442928230863465674813919123162824586178664583591245665294765456828489128831426076900422421902267105562632111110937054421750694165896040807198403850962455444362981230987879927244284909188845801561660979191338754992005240636899125607176060588611646710940507754100225698315520005593572972571636269561882670428252483600823257530420752963450"
+ADJACENT = 13
+
+print(max(digit_product(NUMBER[i : i + ADJACENT]) for i in range(len(NUMBER) - ADJACENT + 1)))
+===
+F digit_product(s)
+   V result = Int64(1)
+   L(c) s
+      result *= Int(c)
+   R result
+
+V NUMBER = ‘7316717653133062491922511967442657474235534919493496983520312774506326239578318016984801869478851843858615607891129494954595017379583319528532088055111254069874715852386305071569329096329522744304355766896648950445244523161731856403098711121722383113622298934233803081353362766142828064444866452387493035890729629049156044077239071381051585930796086670172427121883998797908792274921901699720888093776657273330010533678812202354218097512545405947522435258490771167055601360483958644670632441572215539753697817977846174064955149290862569321978468622482839722413756570560574902614079729686524145351004748216637048440319989000889524345065854122758866688116427171479924442928230863465674813919123162824586178664583591245665294765456828489128831426076900422421902267105562632111110937054421750694165896040807198403850962455444362981230987879927244284909188845801561660979191338754992005240636899125607176060588611646710940507754100225698315520005593572972571636269561882670428252483600823257530420752963450’
+V ADJACENT = 13
+
+print(max((0 .. NUMBER.len - ADJACENT).map(i -> digit_product(:NUMBER[i .< i + :ADJACENT]))))
+===
+template <typename T1> auto digit_product(const T1 &s)
+{
+    auto result = to_int64(1);
+    for (auto &&c : s)
+        result *= to_int(c);
+    return result;
+}
+
+auto NUMBER = u"7316717653133062491922511967442657474235534919493496983520312774506326239578318016984801869478851843858615607891129494954595017379583319528532088055111254069874715852386305071569329096329522744304355766896648950445244523161731856403098711121722383113622298934233803081353362766142828064444866452387493035890729629049156044077239071381051585930796086670172427121883998797908792274921901699720888093776657273330010533678812202354218097512545405947522435258490771167055601360483958644670632441572215539753697817977846174064955149290862569321978468622482839722413756570560574902614079729686524145351004748216637048440319989000889524345065854122758866688116427171479924442928230863465674813919123162824586178664583591245665294765456828489128831426076900422421902267105562632111110937054421750694165896040807198403850962455444362981230987879927244284909188845801561660979191338754992005240636899125607176060588611646710940507754100225698315520005593572972571636269561882670428252483600823257530420752963450"_S;
+auto ADJACENT = 13;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(max_map(range_ee(0, NUMBER.len() - ADJACENT), [](const auto &i){return digit_product(::NUMBER[range_el(i, i + ::ADJACENT)]);}));
+    }
+} code_block_1;
+
+
+# 9
+def compute():
+    PERIMETER = 1000
+    for a in range(1, PERIMETER + 1):
+        for b in range(a + 1, PERIMETER + 1):
+            c = PERIMETER - a - b
+            if a * a + b * b == c * c:
+                # It is now implied that b < c, because we have a > 0
+                return a * b * c
+
+print(compute())
+===
+F compute()
+   V PERIMETER = 1000
+   L(a) 1 .. PERIMETER
+      L(b) a + 1 .. PERIMETER
+         V c = PERIMETER - a - b
+         I a * a + b * b == c * c
+            R a * b * c
+
+print(compute())
+===
+auto compute()
+{
+    auto PERIMETER = 1000;
+    for (auto a : range_ee(1, PERIMETER))
+        for (auto b : range_ee(a + 1, PERIMETER)) {
+            auto c = PERIMETER - a - b;
+            if (a * a + b * b == c * c)
+                return a * b * c;
+        }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;

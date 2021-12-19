@@ -1,0 +1,494 @@
+# 20
+import math
+BigInt = int
+
+n = math.factorial(BigInt(100))
+print(sum(int(c) for c in str(n)))
+===
+V n = factorial(BigInt(100))
+print(sum(String(n).map(c -> Int(c))))
+===
+auto n = factorial(BigInt(100));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum_map(String(n), [](const auto &c){return to_int(c);}));
+    }
+} code_block_1;
+
+
+# 21
+# Compute sum of proper divisors for each number
+divisorsum = [0] * 10000
+for i in range(1, len(divisorsum)):
+    for j in range(i * 2, len(divisorsum), i):
+        divisorsum[j] += i
+
+# Find all amicable pairs within range
+ans = 0
+for i in range(1, len(divisorsum)):
+    j = divisorsum[i]
+    if j != i and j < len(divisorsum) and divisorsum[j] == i:
+        ans += i
+print(ans)
+===
+V divisorsum = [0] * 10000
+L(i) 1 .< divisorsum.len
+   L(j) (i * 2 .< divisorsum.len).step(i)
+      divisorsum[j] += i
+
+V ans = 0
+L(i) 1 .< divisorsum.len
+   V j = divisorsum[i]
+   I j != i & j < divisorsum.len & divisorsum[j] == i
+      ans += i
+print(ans)
+===
+auto divisorsum = create_array({0}) * 10000;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(1, divisorsum.len()))
+            for (auto j : range_el(i * 2, divisorsum.len()).step(i))
+                divisorsum[j] += i;
+    }
+} code_block_1;
+
+auto ans = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto i : range_el(1, divisorsum.len())) {
+            auto j = divisorsum[i];
+            if (j != i && j < divisorsum.len() && divisorsum[j] == i)
+                ans += i;
+        }
+        print(ans);
+    }
+} code_block_2;
+
+
+# 22
+NAMES = open('p022_names.txt').read().strip('"').split('","')
+
+ans = 0
+for i, name in enumerate(sorted(NAMES)):
+    for c in name:
+        ans += (i + 1) * (ord(c) - ord('A') + 1)
+print(ans)
+===
+V NAMES = File(‘p022_names.txt’).read().trim(‘"’).split(‘","’)
+
+V ans = 0
+L(name) sorted(NAMES)
+   V i = L.index
+   L(c) name
+      ans += (i + 1) * (c.code - ‘A’.code + 1)
+print(ans)
+===
+auto NAMES = File(u"p022_names.txt"_S).read().trim(u"\""_S).split(u"\",\""_S);
+
+auto ans = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {int Lindex = 0;
+        for (auto &&name : sorted(NAMES)) {
+            auto i = Lindex;
+            for (auto &&c : name)
+                ans += (i + 1) * (c.code - u'A'_C.code + 1);
+            Lindex++;
+        }}
+        print(ans);
+    }
+} code_block_1;
+
+
+# 23
+LIMIT = 28124
+divisorsum = [0] * LIMIT
+for i in range(1, LIMIT):
+    for j in range(i * 2, LIMIT, i):
+        divisorsum[j] += i
+abundantnums = [i for i, x in enumerate(divisorsum) if x > i]
+
+expressible = [False] * LIMIT
+for i in abundantnums:
+    for j in abundantnums:
+        if i + j < LIMIT:
+            expressible[i + j] = True
+        else:
+            break
+
+ans = sum(i for i, x in enumerate(expressible) if not x)
+print(ans)
+===
+V LIMIT = 28124
+V divisorsum = [0] * LIMIT
+L(i) 1 .< LIMIT
+   L(j) (i * 2 .< LIMIT).step(i)
+      divisorsum[j] += i
+V abundantnums = enumerate(divisorsum).filter((i, x) -> x > i).map((i, x) -> i)
+
+V expressible = [0B] * LIMIT
+L(i) abundantnums
+   L(j) abundantnums
+      I i + j < LIMIT
+         expressible[i + j] = 1B
+      E
+         L.break
+
+V ans = sum(enumerate(expressible).filter((i, x) -> !x).map((i, x) -> i))
+print(ans)
+===
+auto LIMIT = 28124;
+auto divisorsum = create_array({0}) * LIMIT;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(1, LIMIT))
+            for (auto j : range_el(i * 2, LIMIT).step(i))
+                divisorsum[j] += i;
+    }
+} code_block_1;
+
+auto abundantnums = enumerate(divisorsum).filter([](const auto &i, const auto &x){return x > i;}).map([](const auto &i, const auto &x){return i;});
+
+auto expressible = create_array({false}) * LIMIT;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&i : abundantnums)
+            for (auto &&j : abundantnums)
+                if (i + j < LIMIT)
+                    expressible.set(i + j, true);
+                else
+                    break;
+    }
+} code_block_2;
+
+auto ans = sum_map(enumerate(expressible).filter([](const auto &i, const auto &x){return !x;}), [](const auto &i, const auto &x){return i;});
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print(ans);
+    }
+} code_block_3;
+
+
+#24
+from _11l import *
+
+l = list(range(10))
+for i in range(999_999):
+    next_permutation(l)
+print("".join(str(x) for x in l))
+===
+V l = Array(0.<10)
+L(i) 999'999
+   l.next_permutation()
+print(l.map(x -> String(x)).join(‘’))
+===
+auto l = create_array(range_el(0, 10));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int i = 0; i < 999'999; i++)
+            l.next_permutation();
+        print(l.map([](const auto &x){return String(x);}).join(u""_S));
+    }
+} code_block_1;
+
+
+# 25
+import itertools
+BigInt = int
+
+digits = 1000
+prev = BigInt(1)
+cur = BigInt(0)
+for i in itertools.count(0):
+    # At this point, prev = fibonacci(i - 1) and cur = fibonacci(i)
+    if len(str(cur)) > digits:
+        raise RuntimeError("Not found")
+    elif len(str(cur)) == digits:
+        print(i)
+        break
+
+    # Advance the Fibonacci sequence by one step
+    (prev, cur) = (cur, prev + cur)
+===
+V digits = 1000
+V prev = BigInt(1)
+V cur = BigInt(0)
+L(i) 0..
+   I String(cur).len > digits
+      X RuntimeError(‘Not found’)
+   E I String(cur).len == digits
+      print(i)
+      L.break
+
+   (prev, cur) = (cur, prev + cur)
+===
+auto digits = 1000;
+auto prev = BigInt(1);
+auto cur = BigInt(0);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ei(0)) {
+            if (String(cur).len() > digits)
+                throw RuntimeError(u"Not found"_S);
+            else if (String(cur).len() == digits) {
+                print(i);
+                break;
+            }
+
+            assign_from_tuple(prev, cur, make_tuple(cur, prev + cur));
+        }
+    }
+} code_block_1;
+
+
+# 26
+import itertools
+
+def reciprocal_cycle_len(n : int):
+    seen : Dict[int, int] = {}
+    x = 1
+    for i in itertools.count(0):
+        if x in seen:
+            return i - seen[x]
+        else:
+            seen[x] = i
+            x = x * 10 % n
+
+print(max(range(1, 1000), key=reciprocal_cycle_len))
+===
+F reciprocal_cycle_len(Int n)
+   [Int = Int] seen
+   V x = 1
+   L(i) 0..
+      I x C seen
+         R i - seen[x]
+      E
+         seen[x] = i
+         x = x * 10 % n
+
+print(max(1..999, key' reciprocal_cycle_len))
+===
+auto reciprocal_cycle_len(const int n)
+{
+    Dict<int, int> seen;
+    auto x = 1;
+    for (auto i : range_ei(0))
+        if (in(x, seen))
+            return i - seen[x];
+        else {
+            seen.set(x, i);
+            x = mod(x * 10, n);
+        }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(max_with_key(range_ee(1, 999), reciprocal_cycle_len));
+    }
+} code_block_1;
+
+
+# 27
+import math, itertools
+
+limit = 1_000_000
+isprimecache = [False] * 2 + [True] * (limit - 1)
+for n in range(int(limit**0.5 + 1.5)): # stop at ``sqrt(limit)``
+    if isprimecache[n]:
+        for i in range(n*n, limit+1, n):
+            isprimecache[i] = False
+
+def is_prime(n):
+    if n < 0:
+        return False
+    elif n < len(isprimecache):
+        return bool(isprimecache[n])
+    else:
+        if n % 2 == 0: return False
+        for i in range(3, int(math.sqrt(n)) + 1, 2):
+            if n % i == 0:
+                return False
+        return True
+
+def count_consecutive_primes(a, b):
+    for i in itertools.count(0):
+        n = i * i + i * a + b
+        if not is_prime(n):
+            return i
+
+ans = (0, 0)
+max_ccp = 0
+for a in range(-999, 1000):
+    for b in range(2, 1000):
+        ccp = count_consecutive_primes(a, b)
+        if ccp > max_ccp:
+            max_ccp = ccp
+            ans = (a, b)
+print(ans[0] * ans[1])
+===
+V limit = 1'000'000
+V isprimecache = [0B] * 2 [+] [1B] * (limit - 1)
+L(n) 0 .< Int(limit ^ 0.5 + 1.5)
+   I isprimecache[n]
+      L(i) (n * n .. limit).step(n)
+         isprimecache[i] = 0B
+
+F is_prime(n)
+   I n < 0
+      R 0B
+   E I n < :isprimecache.len
+      R Bool(:isprimecache[n])
+   E
+      I n % 2 == 0
+         R 0B
+      L(i) (3 .. Int(sqrt(n))).step(2)
+         I n % i == 0
+            R 0B
+      R 1B
+
+F count_consecutive_primes(a, b)
+   L(i) 0..
+      V n = i * i + i * a + b
+      I !is_prime(n)
+         R i
+
+V ans = (0, 0)
+V max_ccp = 0
+L(a) -999 .< 1000
+   L(b) 2..999
+      V ccp = count_consecutive_primes(a, b)
+      I ccp > max_ccp
+         max_ccp = ccp
+         ans = (a, b)
+print(ans[0] * ans[1])
+===
+auto limit = 1'000'000;
+auto isprimecache = create_array({false}) * 2 + create_array({true}) * (limit - 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
+            if (isprimecache[n])
+                for (auto i : range_ee(n * n, limit).step(n))
+                    isprimecache.set(i, false);
+    }
+} code_block_1;
+
+template <typename T1> auto is_prime(const T1 &n)
+{
+    if (n < 0)
+        return false;
+    else if (n < ::isprimecache.len())
+        return bool(::isprimecache[n]);
+    else {
+        if (mod(n, 2) == 0)
+            return false;
+        for (auto i : range_ee(3, to_int(sqrt(n))).step(2))
+            if (mod(n, i) == 0)
+                return false;
+        return true;
+    }
+}
+
+template <typename T1, typename T2> auto count_consecutive_primes(const T1 &a, const T2 &b)
+{
+    for (auto i : range_ei(0)) {
+        auto n = i * i + i * a + b;
+        if (!is_prime(n))
+            return i;
+    }
+}
+
+auto ans = make_tuple(0, 0);
+auto max_ccp = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto a : range_el(-999, 1000))
+            for (auto b : range_ee(2, 999)) {
+                auto ccp = count_consecutive_primes(a, b);
+                if (ccp > max_ccp) {
+                    max_ccp = ccp;
+                    ans = make_tuple(a, b);
+                }
+            }
+        print(_get<0>(ans) * _get<1>(ans));
+    }
+} code_block_2;
+
+
+# 28
+SIZE = 1001  # Must be odd
+ans = 1  # Special case for size 1
+ans += sum(4 * i * i - 6 * (i - 1) for i in range(3, SIZE + 1, 2))
+print(ans)
+===
+V SIZE = 1001
+V ans = 1
+ans += sum((3 .. SIZE).step(2).map(i -> 4 * i * i - 6 * (i - 1)))
+print(ans)
+===
+auto _SIZE_ = 1001;
+auto ans = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        ans += sum_map(range_ee(3, _SIZE_).step(2), [](const auto &i){return 4 * i * i - 6 * (i - 1);});
+        print(ans);
+    }
+} code_block_1;
+
+
+# 29
+BigInt = int
+
+seen = set(BigInt(a)**b for a in range(2, 101) for b in range(2, 101))
+print(len(seen))
+===
+V seen = Set(multiloop((2..100), (2..100), (a, b) -> BigInt(a) ^ b))
+print(seen.len)
+===
+auto seen = create_set(multiloop(range_ee(2, 100), range_ee(2, 100), [](const auto &a, const auto &b){return pow(BigInt(a), b);}));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(seen.len());
+    }
+} code_block_1;
