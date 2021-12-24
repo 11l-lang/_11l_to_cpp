@@ -2647,3 +2647,243 @@ struct CodeBlock2
         print(u"Sorted Ball Order: "_S & sorted_balls);
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Dating_agency#Python
+sailors = ['Adrian', 'Caspian', 'Dune', 'Finn', 'Fisher', 'Heron', 'Kai',
+           'Ray', 'Sailor', 'Tao']
+
+ladies = ['Ariel', 'Bertha', 'Blue', 'Cali', 'Catalina', 'Gale', 'Hannah',
+           'Isla', 'Marina', 'Shelly']
+
+def isnicegirl(s):
+    return int(ord(s[0])) % 2 == 0
+
+def islovable(slady, ssailor):
+    return int(ord(slady[-1])) % 2 == int(ord(ssailor[-1])) % 2
+
+for lady in ladies:
+    if isnicegirl(lady):
+        print("Dating service should offer a date with", lady)
+        for sailor in sailors:
+            if islovable(lady, sailor):
+                print("    Sailor", sailor, "should take an offer to date her.")
+    else:
+        print("Dating service should NOT offer a date with", lady)
+===
+V sailors = [‘Adrian’, ‘Caspian’, ‘Dune’, ‘Finn’, ‘Fisher’, ‘Heron’, ‘Kai’, ‘Ray’, ‘Sailor’, ‘Tao’]
+
+V ladies = [‘Ariel’, ‘Bertha’, ‘Blue’, ‘Cali’, ‘Catalina’, ‘Gale’, ‘Hannah’, ‘Isla’, ‘Marina’, ‘Shelly’]
+
+F isnicegirl(s)
+   R Int(s[0].code) % 2 == 0
+
+F islovable(slady, ssailor)
+   R Int(slady.last.code) % 2 == Int(ssailor.last.code) % 2
+
+L(lady) ladies
+   I isnicegirl(lady)
+      print(‘Dating service should offer a date with ’lady)
+      L(sailor) sailors
+         I islovable(lady, sailor)
+            print(‘    Sailor ’sailor‘ should take an offer to date her.’)
+   E
+      print(‘Dating service should NOT offer a date with ’lady)
+===
+auto sailors = create_array({u"Adrian"_S, u"Caspian"_S, u"Dune"_S, u"Finn"_S, u"Fisher"_S, u"Heron"_S, u"Kai"_S, u"Ray"_S, u"Sailor"_S, u"Tao"_S});
+
+auto ladies = create_array({u"Ariel"_S, u"Bertha"_S, u"Blue"_S, u"Cali"_S, u"Catalina"_S, u"Gale"_S, u"Hannah"_S, u"Isla"_S, u"Marina"_S, u"Shelly"_S});
+
+template <typename T1> auto isnicegirl(const T1 &s)
+{
+    return mod(to_int(_get<0>(s).code), 2) == 0;
+}
+
+template <typename T1, typename T2> auto islovable(const T1 &slady, const T2 &ssailor)
+{
+    return mod(to_int(slady.last().code), 2) == mod(to_int(ssailor.last().code), 2);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&lady : ladies)
+            if (isnicegirl(lady)) {
+                print(u"Dating service should offer a date with "_S & lady);
+                for (auto &&sailor : sailors)
+                    if (islovable(lady, sailor))
+                        print(u"    Sailor "_S & sailor & u" should take an offer to date her."_S);
+            }
+            else
+                print(u"Dating service should NOT offer a date with "_S & lady);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Day_of_the_week_of_Christmas_and_New_Year#Python
+import datetime
+
+weekDays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
+thisXMas  = datetime.date(2021,12,25)
+thisXMasDay = int(thisXMas.strftime('%w'))
+thisXMasDayAsString = weekDays[thisXMasDay]
+print("This year's Christmas is on a", thisXMasDayAsString)
+
+nextNewYear = datetime.date(2022,1,1)
+nextNewYearDay = int(nextNewYear.strftime('%w'))
+nextNewYearDayAsString = weekDays[nextNewYearDay]
+print("Next new year is on a", nextNewYearDayAsString)
+===
+V weekDays = [‘Sunday’, ‘Monday’, ‘Tuesday’, ‘Wednesday’, ‘Thursday’, ‘Friday’, ‘Saturday’]
+V thisXMas = Time(2021, 12, 25)
+V thisXMasDay = Int(thisXMas.strftime(‘%w’))
+V thisXMasDayAsString = weekDays[thisXMasDay]
+print(‘This year's Christmas is on a ’thisXMasDayAsString)
+
+V nextNewYear = Time(2022, 1, 1)
+V nextNewYearDay = Int(nextNewYear.strftime(‘%w’))
+V nextNewYearDayAsString = weekDays[nextNewYearDay]
+print(‘Next new year is on a ’nextNewYearDayAsString)
+===
+auto weekDays = create_array({u"Sunday"_S, u"Monday"_S, u"Tuesday"_S, u"Wednesday"_S, u"Thursday"_S, u"Friday"_S, u"Saturday"_S});
+auto thisXMas = Time(2021, 12, 25);
+auto thisXMasDay = to_int(thisXMas.strftime(u"%w"_S));
+auto thisXMasDayAsString = weekDays[thisXMasDay];
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"This year's Christmas is on a "_S & thisXMasDayAsString);
+    }
+} code_block_1;
+
+auto nextNewYear = Time(2022, 1, 1);
+auto nextNewYearDay = to_int(nextNewYear.strftime(u"%w"_S));
+auto nextNewYearDayAsString = weekDays[nextNewYearDay];
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"Next new year is on a "_S & nextNewYearDayAsString);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Determine_sentence_type#Go
+Char = str
+
+def sentenceType(s):
+    if len(s) == 0:
+        return ''
+
+    types : List[Char] = []
+    for c in s:
+        if c == '?':
+            types.append(Char('Q'))
+        elif c == '!':
+            types.append(Char('E'))
+        elif c == '.':
+            types.append(Char('S'))
+
+    if s[-1] not in "?!.":
+        types.append(Char('N'))
+
+    return '|'.join(types)
+
+s = "hi there, how are you today? I'd like to present to you the washing machine 9001. You have been nominated to win one of these! Just make sure you don't break it"
+print(sentenceType(s))
+===
+F sentenceType(s)
+   I s.empty
+      R ‘’
+
+   [Char] types
+   L(c) s
+      I c == ‘?’
+         types.append(Char(‘Q’))
+      E I c == ‘!’
+         types.append(Char(‘E’))
+      E I c == ‘.’
+         types.append(Char(‘S’))
+
+   I s.last !C ‘?!.’
+      types.append(Char(‘N’))
+
+   R types.join(‘|’)
+
+V s = ‘hi there, how are you today? I'd like to present to you the washing machine 9001. You have been nominated to win one of these! Just make sure you don't break it’
+print(sentenceType(s))
+===
+template <typename T1> auto sentenceType(const T1 &s)
+{
+    if (s.empty())
+        return u""_S;
+
+    Array<Char> types;
+    for (auto &&c : s)
+        if (c == u'?')
+            types.append(u'Q'_C);
+        else if (c == u'!')
+            types.append(u'E'_C);
+        else if (c == u'.')
+            types.append(u'S'_C);
+
+    if (!in(s.last(), u"?!."_S))
+        types.append(u'N'_C);
+
+    return types.join(u"|"_S);
+}
+
+auto s = u"hi there, how are you today? I'd like to present to you the washing machine 9001. You have been nominated to win one of these! Just make sure you don't break it"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sentenceType(s));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Digit_fifth_powers
+def fifth_power_digit_sum(n):
+    return sum(int(c)**5 for c in str(n))
+
+print(sum(i for i in range(2, 1000000) if i == fifth_power_digit_sum(i)))
+===
+F fifth_power_digit_sum(n)
+   R sum(String(n).map(c -> Int(c) ^ 5))
+
+print(sum((2..999999).filter(i -> i == fifth_power_digit_sum(i))))
+===
+template <typename T1> auto fifth_power_digit_sum(const T1 &n)
+{
+    return sum_map(String(n), [](const auto &c){return pow(to_int(c), 5);});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum(range_ee(2, 999999).filter([](const auto &i){return i == fifth_power_digit_sum(i);})));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Distinct_power_numbers#Python
+from itertools import product
+
+print(sorted(list(set(a**b for a,b in product(range(2,6), range(2,6))))))
+===
+print(sorted(Array(Set(cart_product(2..5, 2..5).map((a, b) -> a ^ b)))))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sorted(create_array(create_set(cart_product(range_ee(2, 5), range_ee(2, 5)).map([](const auto &a, const auto &b){return pow(a, b);})))));
+    }
+} code_block_1;

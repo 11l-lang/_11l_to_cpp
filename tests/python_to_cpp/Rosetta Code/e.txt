@@ -2210,3 +2210,277 @@ struct CodeBlock2
             }
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Esthetic_numbers#Nim
+from _11l import *
+
+def isEsthetic(n, b):
+    if n == 0: return False
+    i = n % b
+    n //= b
+    while n > 0:
+        j = n % b
+        if abs(i - j) != 1:
+            return False
+        n //= b
+        i = j
+    return True
+
+def listEsths(n1 : Int64, n2 : Int64, m1 : Int64, m2 : Int64, perLine, all):
+    esths : List[Int64] = []
+
+    def dfs(n : Int64, m : Int64, i : Int64) -> None:
+        if i in range(n, m + 1):
+            esths.append(i)
+        if i == 0 or i > m: return
+        d = i % 10
+        i1 = i * 10 + d - 1
+        i2 = i1 + 2
+        if d == 0:
+            dfs(n, m, i2)
+        elif d == 9:
+            dfs(n, m, i1)
+        else:
+            dfs(n, m, i1)
+            dfs(n, m, i2)
+
+    for i in range(10):
+        dfs(n2, m2, i)
+
+    print(f'Base 10: {len(esths)} esthetic numbers between {n1} and {m1}:')
+    if all:
+        for i, esth in enumerate(esths):
+            print(esth, end = "\n" if (i + 1) % perLine == 0 else ' ')
+        print()
+    else:
+        for i in range(perLine):
+            print(esths[i], end = ' ')
+        print("\n............")
+        for i in range(len(esths) - perLine, len(esths)):
+            print(esths[i], end = ' ')
+        print()
+    print()
+
+for b in range(2, 17):
+    print(f'Base {b}: {4 * b}th to {6 * b}th esthetic numbers:')
+    n = Int64(1)
+    c = Int64(0)
+    while c < 6 * b:
+        if isEsthetic(n, b):
+            c += 1
+            if c >= 4 * b: print(int_to_str_with_radix(n, b), end = ' ')
+        n += 1
+    print("\n")
+
+# The following all use the obvious range limitations for the numbers in question.
+listEsths(1000, 1010, 9999, 9898, 16, True)
+listEsths(100_000_000, 101_010_101, 130_000_000, 123_456_789, 9, True)
+listEsths(100_000_000_000, 101_010_101_010, 130_000_000_000, 123_456_789_898, 7, False)
+listEsths(100_000_000_000_000, 101_010_101_010_101, 130_000_000_000, 123_456_789_898_989, 5, False)
+listEsths(100_000_000_000_000_000, 101_010_101_010_101_010, 130_000_000_000_000_000, 123_456_789_898_989_898, 4, False)
+===
+F isEsthetic(=n, b)
+   I n == 0
+      R 0B
+   V i = n % b
+   n I/= b
+   L n > 0
+      V j = n % b
+      I abs(i - j) != 1
+         R 0B
+      n I/= b
+      i = j
+   R 1B
+
+F listEsths(Int64 n1, Int64 n2, Int64 m1, Int64 m2; perLine, all)
+   [Int64] esths
+
+   F dfs(Int64 n, Int64 m, Int64 i) -> N
+      I i C n .. m
+         @esths.append(i)
+      I i == 0 | i > m
+         R
+      V d = i % 10
+      V i1 = i * 10 + d - 1
+      V i2 = i1 + 2
+      I d == 0
+         @dfs(n, m, i2)
+      E I d == 9
+         @dfs(n, m, i1)
+      E
+         @dfs(n, m, i1)
+         @dfs(n, m, i2)
+
+   L(i) 10
+      dfs(n2, m2, i)
+
+   print(‘Base 10: ’esths.len‘ esthetic numbers between ’n1‘ and ’m1‘:’)
+   I all
+      L(esth) esths
+         V i = L.index
+         print(esth, end' I (i + 1) % perLine == 0 {"\n"} E ‘ ’)
+      print()
+   E
+      L(i) 0 .< perLine
+         print(esths[i], end' ‘ ’)
+      print("\n............")
+      L(i) esths.len - perLine .< esths.len
+         print(esths[i], end' ‘ ’)
+      print()
+   print()
+
+L(b) 2..16
+   print(‘Base ’b‘: ’(4 * b)‘th to ’(6 * b)‘th esthetic numbers:’)
+   V n = Int64(1)
+   V c = Int64(0)
+   L c < 6 * b
+      I isEsthetic(n, b)
+         c++
+         I c >= 4 * b
+            print(String(n, radix' b), end' ‘ ’)
+      n++
+   print("\n")
+
+listEsths(1000, 1010, 9999, 9898, 16, 1B)
+listEsths(100'000'000, 101'010'101, 130'000'000, 123'456'789, 9, 1B)
+listEsths(100'000'000'000, 101'010'101'010, 130'000'000'000, 123'456'789'898, 7, 0B)
+listEsths(100'000'000'000'000, 101'010'101'010'101, 130'000'000'000, 123'456'789'898'989, 5, 0B)
+listEsths(100'000'000'000'000'000, 101'010'101'010'101'010, 130'000'000'000'000'000, 123'456'789'898'989'898, 4, 0B)
+===
+template <typename T1, typename T2> auto isEsthetic(T1 n, const T2 &b)
+{
+    if (n == 0)
+        return false;
+    auto i = mod(n, b);
+    n = idiv(n, b);
+    while (n > 0) {
+        auto j = mod(n, b);
+        if (abs(i - j) != 1)
+            return false;
+        n = idiv(n, b);
+        i = j;
+    }
+    return true;
+}
+
+template <typename T5, typename T6> auto listEsths(const Int64 &n1, const Int64 &n2, const Int64 &m1, const Int64 &m2, const T5 &perLine, const T6 &all)
+{
+    Array<Int64> esths;
+
+    std::function<void(Int64, Int64, Int64)> dfs = [&dfs, &esths](const Int64 &n, const Int64 &m, const Int64 &i)
+    {
+        if (in(i, range_ee(n, m)))
+            esths.append(i);
+        if (i == 0 || i > m)
+            return;
+        auto d = mod(i, 10);
+        auto i1 = i * 10 + d - 1;
+        auto i2 = i1 + 2;
+        if (d == 0)
+            dfs(n, m, i2);
+        else if (d == 9)
+            dfs(n, m, i1);
+        else {
+            dfs(n, m, i1);
+            dfs(n, m, i2);
+        }
+    };
+
+    for (int i = 0; i < 10; i++)
+        dfs(n2, m2, i);
+
+    print(u"Base 10: "_S & esths.len() & u" esthetic numbers between "_S & n1 & u" and "_S & m1 & u":"_S);
+    if (all) {
+        {int Lindex = 0;
+        for (auto &&esth : esths) {
+            auto i = Lindex;
+            print(esth, mod((i + 1), perLine) == 0 ? u"\n"_S : u" "_S);
+            Lindex++;
+        }}
+        print();
+    }
+    else {
+        for (auto i : range_el(0, perLine))
+            print(esths[i], u" "_S);
+        print(u"\n............"_S);
+        for (auto i : range_el(esths.len() - perLine, esths.len()))
+            print(esths[i], u" "_S);
+        print();
+    }
+    print();
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto b : range_ee(2, 16)) {
+            print(u"Base "_S & b & u": "_S & (4 * b) & u"th to "_S & (6 * b) & u"th esthetic numbers:"_S);
+            auto n = to_int64(1);
+            auto c = to_int64(0);
+            while (c < 6 * b) {
+                if (isEsthetic(n, b)) {
+                    c++;
+                    if (c >= 4 * b)
+                        print(int_to_str_with_radix(n, b), u" "_S);
+                }
+                n++;
+            }
+            print(u"\n"_S);
+        }
+
+        listEsths(1000, 1010, 9999, 9898, 16, true);
+        listEsths(100'000'000, 101'010'101, 130'000'000, 123'456'789, 9, true);
+        listEsths(100'000'000'000, 101'010'101'010, 130'000'000'000, 123'456'789'898, 7, false);
+        listEsths(100'000'000'000'000, 101'010'101'010'101, 130'000'000'000, 123'456'789'898'989, 5, false);
+        listEsths(100'000'000'000'000'000, 101'010'101'010'101'010, 130'000'000'000'000'000, 123'456'789'898'989'898, 4, false);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Exactly_three_adjacent_3_in_lists
+lists = [[9,3,3,3,2,1,7,8,5],
+         [5,2,9,3,3,7,8,4,1],
+         [1,4,3,6,7,3,8,3,2],
+         [1,2,3,4,5,6,7,8,9],
+         [4,6,8,7,2,3,3,3,1]]
+
+for l in lists:
+    print(l, end = ' -> ')
+    for i in range(len(l) - 2):
+        if l[i] == l[i+1] == l[i+2] == 3:
+            print('True')
+            break
+    else:
+        print('False')
+===
+V lists = [[9, 3, 3, 3, 2, 1, 7, 8, 5], [5, 2, 9, 3, 3, 7, 8, 4, 1], [1, 4, 3, 6, 7, 3, 8, 3, 2], [1, 2, 3, 4, 5, 6, 7, 8, 9], [4, 6, 8, 7, 2, 3, 3, 3, 1]]
+
+L(l) lists
+   print(l, end' ‘ -> ’)
+   L(i) 0 .< l.len - 2
+      I l[i] == l[i + 1] == l[i + 2] == 3
+         print(‘True’)
+         L.break
+   L.was_no_break
+      print(‘False’)
+===
+auto lists = create_array({create_array({9, 3, 3, 3, 2, 1, 7, 8, 5}), create_array({5, 2, 9, 3, 3, 7, 8, 4, 1}), create_array({1, 4, 3, 6, 7, 3, 8, 3, 2}), create_array({1, 2, 3, 4, 5, 6, 7, 8, 9}), create_array({4, 6, 8, 7, 2, 3, 3, 3, 1})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&l : lists) {
+            print(l, u" -> "_S);
+            for (auto i : range_el(0, l.len() - 2))
+                if (equal(l[i], l[i + 1], l[i + 2], 3)) {
+                    print(u"True"_S);
+                    goto break_;
+                }
+            print(u"False"_S);
+            break_:;
+        }
+    }
+} code_block_1;

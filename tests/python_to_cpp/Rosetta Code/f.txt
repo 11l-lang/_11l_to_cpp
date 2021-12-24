@@ -2107,3 +2107,460 @@ struct CodeBlock1
             }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Find_adjacent_primes_which_differ_by_a_square_integer#Python
+import math
+
+def primes_upto(limit):
+    is_prime = [False] * 2 + [True] * (limit - 1)
+    for n in range(int(limit**0.5 + 1.5)): # stop at ``sqrt(limit)``
+        if is_prime[n]:
+            for i in range(n*n, limit+1, n):
+                is_prime[i] = False
+    return [i for i, prime in enumerate(is_prime) if prime]
+
+primes = primes_upto(1_000_000)
+
+def is_square(x):
+    return int(math.sqrt(x)) ** 2 == x
+
+for n in range(2, len(primes)):
+    pr1 = primes[n]
+    pr2 = primes[n-1]
+    diff = pr1 - pr2
+    if (is_square(diff) and diff > 36):
+       print(pr1, pr2, "diff =", diff)
+===
+F primes_upto(limit)
+   V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
+   L(n) 0 .< Int(limit ^ 0.5 + 1.5)
+      I is_prime[n]
+         L(i) (n * n .. limit).step(n)
+            is_prime[i] = 0B
+   R enumerate(is_prime).filter((i, prime) -> prime).map((i, prime) -> i)
+
+V primes = primes_upto(1'000'000)
+
+F is_square(x)
+   R Int(sqrt(x)) ^ 2 == x
+
+L(n) 2 .< primes.len
+   V pr1 = primes[n]
+   V pr2 = primes[n - 1]
+   V diff = pr1 - pr2
+   I (is_square(diff) & diff > 36)
+      print(pr1‘ ’pr2‘ diff = ’diff)
+===
+template <typename T1> auto primes_upto(const T1 &limit)
+{
+    auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
+    for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
+        if (is_prime[n])
+            for (auto i : range_ee(n * n, limit).step(n))
+                is_prime.set(i, false);
+    return enumerate(is_prime).filter([](const auto &i, const auto &prime){return prime;}).map([](const auto &i, const auto &prime){return i;});
+}
+
+auto primes = primes_upto(1'000'000);
+
+template <typename T1> auto is_square(const T1 &x)
+{
+    return square(to_int(sqrt(x))) == x;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_el(2, primes.len())) {
+            auto pr1 = primes[n];
+            auto pr2 = primes[n - 1];
+            auto diff = pr1 - pr2;
+            if ((is_square(diff) && diff > 36))
+                print(pr1 & u" "_S & pr2 & u" diff = "_S & diff);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Find_first_missing_positive
+import itertools
+
+nums = [[1,2,0], [3,4,-1,1], [7,8,9,11,12]]
+
+for l in nums:
+    for n in itertools.count(1):
+        if n not in l:
+            print(l, '->', n)
+            break
+===
+V nums = [[1, 2, 0], [3, 4, -1, 1], [7, 8, 9, 11, 12]]
+
+L(l) nums
+   L(n) 1..
+      I n !C l
+         print(l‘ -> ’n)
+         L.break
+===
+auto nums = create_array({create_array({1, 2, 0}), create_array({3, 4, -1, 1}), create_array({7, 8, 9, 11, 12})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&l : nums)
+            for (auto n : range_ei(1))
+                if (!in(n, l)) {
+                    print(l & u" -> "_S & n);
+                    break;
+                }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Find_minimum_number_of_coins_that_make_a_given_value#Python_::_Procedural
+denominations = [1,2,5,10,20,50,100,200]
+total = 988
+print(f"Available denominations: {denominations}. Total is to be: {total}.")
+(coins, remaining) = (sorted(denominations, reverse=True), total)
+for n in range(len(coins)):
+    (coinsused, remaining) = divmod(remaining, coins[n])
+    if coinsused > 0:
+        print("   ", coinsused, "*", coins[n])
+===
+V denominations = [1, 2, 5, 10, 20, 50, 100, 200]
+V total = 988
+print(‘Available denominations: ’denominations‘. Total is to be: ’total‘.’)
+V (coins, remaining) = (sorted(denominations, reverse' 1B), total)
+L(n) 0 .< coins.len
+   (V coinsused, remaining) = divmod(remaining, coins[n])
+   I coinsused > 0
+      print(‘    ’coinsused‘ * ’coins[n])
+===
+auto denominations = create_array({1, 2, 5, 10, 20, 50, 100, 200});
+auto total = 988;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Available denominations: "_S & denominations & u". Total is to be: "_S & total & u"."_S);
+    }
+} code_block_1;
+
+auto [coins, remaining] = make_tuple(sorted(denominations, nullptr, true), total);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto n : range_el(0, coins.len())) {
+            TUPLE_ELEMENT_T(0, divmod(remaining, coins[n])) coinsused;
+            assign_from_tuple(coinsused, remaining, divmod(remaining, coins[n]));
+            if (coinsused > 0)
+                print(u"    "_S & coinsused & u" * "_S & coins[n]);
+        }
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Find_square_difference
+import itertools
+
+for n in itertools.count(1):
+    if n ** 2 - (n - 1) ** 2 > 1000:
+        print(n)
+        break
+===
+L(n) 1..
+   I n ^ 2 - (n - 1) ^ 2 > 1000
+      print(n)
+      L.break
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ei(1))
+            if (square(n) - square((n - 1)) > 1000) {
+                print(n);
+                break;
+            }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Find_words_which_contains_all_the_vowels#Nim
+for word in open('unixdict.txt').read().split("\n"):
+    if len(word) > 10:
+        for vowel in ('a', 'e', 'i', 'o', 'u'):
+            if word.count(vowel) != 1:
+                break
+        else:
+            print(word)
+===
+L(word) File(‘unixdict.txt’).read().split("\n")
+   I word.len > 10
+      L(vowel) (‘a’, ‘e’, ‘i’, ‘o’, ‘u’)
+         I word.count(vowel) != 1
+            L.break
+      L.was_no_break
+         print(word)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&word : File(u"unixdict.txt"_S).read().split(u"\n"_S))
+            if (word.len() > 10) {
+                for (auto &&vowel : make_tuple(u"a"_S, u"e"_S, u"i"_S, u"o"_S, u"u"_S))
+                    if (word.count(vowel) != 1)
+                        goto break_;
+                print(word);
+                break_:;
+            }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Find_words_whose_first_and_last_three_letters_are_equal
+for word in open('unixdict.txt').read().split("\n"):
+    if len(word) > 5 and word[:3] == word[-3:]:
+        print(word)
+===
+L(word) File(‘unixdict.txt’).read().split("\n")
+   I word.len > 5 & word[0.<3] == word[(len)-3 ..]
+      print(word)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&word : File(u"unixdict.txt"_S).read().split(u"\n"_S))
+            if (word.len() > 5 && word[range_el(0, 3)] == word[range_elen_i( - 3)])
+                print(word);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Fortunate_numbers#Nim
+# Slow BigInt
+import random, math, itertools
+BigInt = int
+
+def isProbablePrime(n, k = 10):
+    if n < 2 or n % 2 == 0:
+        return n == 2
+
+    d = n - 1
+    s = 0
+    while d % 2 == 0:
+        d //= 2
+        s += 1
+
+    assert(2 ** s * d == n - 1)
+
+    nn : int
+    if n < 0x7FFF_FFFF:
+        nn = int(n)
+    else:
+        nn = 0x7FFF_FFFF
+
+    for _ in range(k):
+        a = random.randrange(2, nn)
+        x = pow(a, d, n)
+        if x == 1 or x == n - 1:
+            continue
+        for _ in range(s - 1):
+            x = pow(x, 2, n)
+            if x == 1:
+                return False
+            if x == n - 1:
+                break # `^L.continue`
+        else:
+            return False
+
+    return True
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+primorial = BigInt(1)
+
+nn = 50
+lim = 75
+s = set() # int
+for n in itertools.count(1):
+    if is_prime(n):
+        primorial *= n
+        m = 3
+        while True:
+            if isProbablePrime(primorial + m, 25):
+                s.add(m)
+                break
+            m += 2
+        lim -= 1
+        if lim == 0:
+            break
+
+print('First', nn, 'fortunate numbers:')
+for i, m in enumerate(sorted(list(s))[:nn]):
+    print('%3d' % m, end = "\n" if (i + 1) % 10 == 0 else ' ')
+===
+F isProbablePrime(n, k = 10)
+   I n < 2 | n % 2 == 0
+      R n == 2
+
+   V d = n - 1
+   V s = 0
+   L d % 2 == 0
+      d I/= 2
+      s++
+
+   assert(2 ^ s * d == n - 1)
+
+   Int nn
+   I n < 7FFF'FFFF
+      nn = Int(n)
+   E
+      nn = 7FFF'FFFF
+
+   L(_) 0 .< k
+      V a = random:(2 .< nn)
+      V x = pow(a, d, n)
+      I x == 1 | x == n - 1
+         L.continue
+      L(_) 0 .< s - 1
+         x = pow(x, 2, n)
+         I x == 1
+            R 0B
+         I x == n - 1
+            L.break
+      L.was_no_break
+         R 0B
+
+   R 1B
+
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+V primorial = BigInt(1)
+
+V nn = 50
+V lim = 75
+V s = Set[Int]()
+L(n) 1..
+   I is_prime(n)
+      primorial *= n
+      V m = 3
+      L
+         I isProbablePrime(primorial + m, 25)
+            s.add(m)
+            L.break
+         m += 2
+      I --lim == 0
+         L.break
+
+print(‘First ’nn‘ fortunate numbers:’)
+L(m) sorted(Array(s))[0 .< nn]
+   V i = L.index
+   print(‘#3’.format(m), end' I (i + 1) % 10 == 0 {"\n"} E ‘ ’)
+===
+template <typename T1, typename T2 = decltype(10)> auto isProbablePrime(const T1 &n, const T2 &k = 10)
+{
+    if (n < 2 || mod(n, 2) == 0)
+        return n == 2;
+
+    auto d = n - 1;
+    auto s = 0;
+    while (mod(d, 2) == 0) {
+        d = idiv(d, 2);
+        s++;
+    }
+
+    assert(pow(2, s) * d == n - 1);
+
+    int nn;
+    if (n < 0x7FFF'FFFF)
+        nn = to_int(n);
+    else
+        nn = 0x7FFF'FFFF;
+
+    for (auto _ : range_el(0, k)) {
+        auto a = randomns::_(range_el(2, nn));
+        auto x = pow(a, d, n);
+        if (x == 1 || x == n - 1)
+            continue;
+        for (auto _ : range_el(0, s - 1)) {
+            x = pow(x, 2, n);
+            if (x == 1)
+                return false;
+            if (x == n - 1)
+                goto break_;
+        }
+        return false;
+        break_:;
+    }
+
+    return true;
+}
+
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+auto primorial = BigInt(1);
+
+auto nn = 50;
+auto lim = 75;
+auto s = Set<int>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ei(1))
+            if (is_prime(n)) {
+                primorial *= n;
+                auto m = 3;
+                while (true) {
+                    if (isProbablePrime(primorial + m, 25)) {
+                        s.add(m);
+                        break;
+                    }
+                    m += 2;
+                }
+                if (--lim == 0)
+                    break;
+            }
+
+        print(u"First "_S & nn & u" fortunate numbers:"_S);
+        {int Lindex = 0;
+        for (auto &&m : sorted(create_array(s))[range_el(0, nn)]) {
+            auto i = Lindex;
+            print(u"#3"_S.format(m), mod((i + 1), 10) == 0 ? u"\n"_S : u" "_S);
+            Lindex++;
+        }}
+    }
+} code_block_1;
