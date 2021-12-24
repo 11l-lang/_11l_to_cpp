@@ -1145,3 +1145,16 @@ template <typename T1, typename T2> auto int_to_str_with_radix(const T1 &num, co
 	std::reverse(result.std::u16string::begin(), result.std::u16string::end());
 	return result;
 }
+
+// [https://www.rosettacode.org/wiki/Isqrt_(integer_square_root)_of_X#11l]
+template <typename T1> String commatize(const T1 &number, const String &sep = u","_S, Int step = 3)
+{
+    auto s = reversed(String(number));
+    String r = s[0];
+    for (auto i : range_el(1, s.len())) {
+        if (i % step == 0)
+            r &= sep;
+        r &= s[i];
+    }
+    return reversed(r);
+}
