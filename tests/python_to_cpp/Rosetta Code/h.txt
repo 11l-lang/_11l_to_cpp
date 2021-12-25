@@ -454,3 +454,76 @@ flipping the remaining sand in the 7 hour glass when the 4 hour glass ends.
         break_:;
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Hex_words#Python
+def digroot(n):
+    while n > 9:
+        n = sum([int(d) for d in str(n)])
+    return n
+
+lines = open('unixdict.txt').read().split("\n")
+words = [w for w in lines if len(w) >= 4 and all(c in 'abcdef' for c in w)]
+results = [(w, int(w, 16), digroot(int(w, 16))) for w in words]
+
+print("Hex words in unixdict.txt:\nRoot  Word      Base 10\n", "-"*22)
+for a in sorted(results, key=lambda x:x[2]):
+    print(f"{a[2]}     {a[0]:<6}{a[1]:10}")
+
+print("Total count of these words:", len(results))
+print("\nHex words with > 3 distinct letters:\nRoot  Word      Base 10\n", "-"*22)
+results = [a for a in results if len(set(list(str(a[0])))) > 3]
+for a in sorted(results, key=lambda x:x[2]):
+    print(f"{a[2]}     {a[0]:<6}{a[1]:10}")
+
+print("Total count of those words:", len(results))
+===
+F digroot(=n)
+   L n > 9
+      n = sum(String(n).map(d -> Int(d)))
+   R n
+
+V lines = File(‘unixdict.txt’).read().split("\n")
+V words = lines.filter(w -> w.len >= 4 & all(w.map(c -> c C ‘abcdef’)))
+V results = words.map(w -> (w, Int(w, radix' 16), digroot(Int(w, radix' 16))))
+
+print("Hex words in unixdict.txt:\nRoot  Word      Base 10\n "(‘-’ * 22))
+L(a) sorted(results, key' x -> x[2])
+   print(f:‘{a[2]}     {a[0]:<6}{a[1]:10}’)
+
+print(‘Total count of these words: ’results.len)
+print("\nHex words with > 3 distinct letters:\nRoot  Word      Base 10\n "(‘-’ * 22))
+results = results.filter(a -> Set(Array(String(a[0]))).len > 3)
+L(a) sorted(results, key' x -> x[2])
+   print(f:‘{a[2]}     {a[0]:<6}{a[1]:10}’)
+
+print(‘Total count of those words: ’results.len)
+===
+template <typename T1> auto digroot(T1 n)
+{
+    while (n > 9)
+        n = sum_map(String(n), [](const auto &d){return to_int(d);});
+    return n;
+}
+
+auto lines = File(u"unixdict.txt"_S).read().split(u"\n"_S);
+auto words = lines.filter([](const auto &w){return w.len() >= 4 && all_map(w, [](const auto &c){return in(c, u"abcdef"_S);});});
+auto results = words.map([](const auto &w){return make_tuple(w, to_int(w, 16), digroot(to_int(w, 16)));});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Hex words in unixdict.txt:\nRoot  Word      Base 10\n "_S & (u"-"_S * 22));
+        for (auto &&a : sorted(results, [](const auto &x){return _get<2>(x);}))
+            print(u"#.     #<6#10"_S.format(_get<2>(a), _get<0>(a), _get<1>(a)));
+
+        print(u"Total count of these words: "_S & results.len());
+        print(u"\nHex words with > 3 distinct letters:\nRoot  Word      Base 10\n "_S & (u"-"_S * 22));
+        results = results.filter([](const auto &a){return create_set(create_array(String(_get<0>(a)))).len() > 3;});
+        for (auto &&a : sorted(results, [](const auto &x){return _get<2>(x);}))
+            print(u"#.     #<6#10"_S.format(_get<2>(a), _get<0>(a), _get<1>(a)));
+
+        print(u"Total count of those words: "_S & results.len());
+    }
+} code_block_1;

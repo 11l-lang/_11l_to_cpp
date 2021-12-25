@@ -3249,3 +3249,465 @@ int MAIN_WITH_ARGV()
     else
         process_args(::argv[range_ei(1)]);
 }
+
+
+# https://www.rosettacode.org/wiki/Largest_difference_between_adjacent_primes
+def primes_upto(limit):
+    is_prime = [False] * 2 + [True] * (limit - 1)
+    for n in range(int(limit**0.5 + 1.5)): # stop at ``sqrt(limit)``
+        if is_prime[n]:
+            for i in range(n*n, limit+1, n):
+                is_prime[i] = False
+    return [i for i, prime in enumerate(is_prime) if prime]
+
+primes = primes_upto(1_000_000)
+
+maxdiff = 0
+for n in range(1, len(primes)):
+    maxdiff = max(maxdiff, primes[n] - primes[n-1])
+
+print('Largest difference is', maxdiff)
+===
+F primes_upto(limit)
+   V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
+   L(n) 0 .< Int(limit ^ 0.5 + 1.5)
+      I is_prime[n]
+         L(i) (n * n .. limit).step(n)
+            is_prime[i] = 0B
+   R enumerate(is_prime).filter((i, prime) -> prime).map((i, prime) -> i)
+
+V primes = primes_upto(1'000'000)
+
+V maxdiff = 0
+L(n) 1 .< primes.len
+   maxdiff = max(maxdiff, primes[n] - primes[n - 1])
+
+print(‘Largest difference is ’maxdiff)
+===
+template <typename T1> auto primes_upto(const T1 &limit)
+{
+    auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
+    for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
+        if (is_prime[n])
+            for (auto i : range_ee(n * n, limit).step(n))
+                is_prime.set(i, false);
+    return enumerate(is_prime).filter([](const auto &i, const auto &prime){return prime;}).map([](const auto &i, const auto &prime){return i;});
+}
+
+auto primes = primes_upto(1'000'000);
+
+auto maxdiff = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_el(1, primes.len()))
+            maxdiff = max(maxdiff, primes[n] - primes[n - 1]);
+
+        print(u"Largest difference is "_S & maxdiff);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Largest_five_adjacent_number#Python
+import random
+
+largeNum = [random.randint(1, 9)] + [random.randint(0, 9) for i in range(999)]
+
+(maxNum, minNum) = (0, 99999)
+
+for i in range(996):
+    num = int(''.join(map(str, largeNum[i:i+5])))
+    if num > maxNum:
+        maxNum = num
+    elif num < minNum:
+        minNum = num
+
+print( "Largest 5-digit number extracted from random 1000-digit number:", maxNum)
+print("Smallest 5-digit number extracted from random 1000-digit number: %05d" % minNum)
+===
+V largeNum = [random:(1 .. 9)] [+] (0.<999).map(i -> random:(0 .. 9))
+
+V (maxNum, minNum) = (0, 99999)
+
+L(i) 996
+   V num = Int(largeNum[i .< i + 5].map(String).join(‘’))
+   I num > maxNum
+      maxNum = num
+   E I num < minNum
+      minNum = num
+
+print(‘Largest 5-digit number extracted from random 1000-digit number: ’maxNum)
+print(‘Smallest 5-digit number extracted from random 1000-digit number: #05’.format(minNum))
+===
+auto largeNum = create_array({randomns::_(range_ee(1, 9))}) + range_el(0, 999).map([](const auto &i){return randomns::_(range_ee(0, 9));});
+
+auto [maxNum, minNum] = make_tuple(0, 99999);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int i = 0; i < 996; i++) {
+            auto num = to_int(largeNum[range_el(i, i + 5)].map([](const auto &x){return String(x);}).join(u""_S));
+            if (num > maxNum)
+                maxNum = num;
+            else if (num < minNum)
+                minNum = num;
+        }
+
+        print(u"Largest 5-digit number extracted from random 1000-digit number: "_S & maxNum);
+        print(u"Smallest 5-digit number extracted from random 1000-digit number: #05"_S.format(minNum));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Largest_palindrome_product#Wren
+Int64 = int
+
+def reverse(n):
+    r = Int64(0)
+    while n > 0:
+        r = n%10 + r*10
+        n //= 10
+    return r
+
+po = Int64(10)
+for n in range(2, 8):
+    low = po * 9
+    po *= 10
+    high = po - 1
+    nextN = False
+    for i in range(high, low - 1, -1):
+        j = reverse(i)
+        p = i * po + j
+        k = high
+        while k > low:
+            if k % 10 != 5:
+                l = p // k
+                if l > high: break
+                if p % k == 0:
+                    print(f'Largest palindromic product of two {n}-digit integers: {k} x {l} = {p}')
+                    nextN = True
+                    break
+            k -= 2
+        if nextN:
+            break
+===
+F reverse(=n)
+   V r = Int64(0)
+   L n > 0
+      r = n % 10 + r * 10
+      n I/= 10
+   R r
+
+V po = Int64(10)
+L(n) 2..7
+   V low = po * 9
+   po *= 10
+   V high = po - 1
+   V nextN = 0B
+   L(i) (high .< low - 1).step(-1)
+      V j = reverse(i)
+      V p = i * po + j
+      V k = high
+      L k > low
+         I k % 10 != 5
+            V l = p I/ k
+            I l > high
+               L.break
+            I p % k == 0
+               print(‘Largest palindromic product of two ’n‘-digit integers: ’k‘ x ’l‘ = ’p)
+               nextN = 1B
+               L.break
+         k -= 2
+      I nextN
+         L.break
+===
+template <typename T1> auto reverse(T1 n)
+{
+    auto r = to_int64(0);
+    while (n > 0) {
+        r = mod(n, 10) + r * 10;
+        n = idiv(n, 10);
+    }
+    return r;
+}
+
+auto po = to_int64(10);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(2, 7)) {
+            auto low = po * 9;
+            po *= 10;
+            auto high = po - 1;
+            auto nextN = false;
+            for (auto i : range_el(high, low - 1).step(-1)) {
+                auto j = reverse(i);
+                auto p = i * po + j;
+                auto k = high;
+                while (k > low) {
+                    if (mod(k, 10) != 5) {
+                        auto l = idiv(p, k);
+                        if (l > high)
+                            break;
+                        if (mod(p, k) == 0) {
+                            print(u"Largest palindromic product of two "_S & n & u"-digit integers: "_S & k & u" x "_S & l & u" = "_S & p);
+                            nextN = true;
+                            break;
+                        }
+                    }
+                    k -= 2;
+                }
+                if (nextN)
+                    break;
+            }
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Largest_product_in_a_grid#Python
+from _11l import *
+
+def maxproduct(mat, length):
+    """ find the largest product of len length horizontal or vertical length in matrix """
+    (nrow, ncol) = (len(mat), len(mat[0]))
+    (maxprod, maxrow, maxcol, arr) = (Int64(0), [0, 0], [0, 0], [0])
+    for row in range(nrow):
+        for col in range(ncol):
+            (row2, col2) = (row + length, col + length)
+            if row < nrow - length:
+                array = [r[col] for r in mat[row:row2]]
+                pro = product_of_a_seq(map(Int64, array))
+                if pro > maxprod:
+                    (maxprod, maxrow, maxcol, arr) = (pro, [row, row2], [col], array)
+            if col < ncol - length:
+                pro = product_of_a_seq(map(Int64, mat[row][col:col2]))
+                if pro > maxprod:
+                    (maxprod, maxrow, maxcol, arr) = (pro, [row], [col, col2], mat[row][col:col2])
+
+    print(f"The max {length}-product is {maxprod}, product of {arr} at row {maxrow}, col {maxcol}.")
+
+MATRIX = [
+    [ 8,  2, 22, 97, 38, 15,  0, 40,  0, 75,  4,  5,  7, 78, 52, 12, 50, 77, 91,  8],
+    [49, 49, 99, 40, 17, 81, 18, 57, 60, 87, 17, 40, 98, 43, 69, 48,  4, 56, 62,  0],
+    [81, 49, 31, 73, 55, 79, 14, 29, 93, 71, 40, 67, 53, 88, 30,  3, 49, 13, 36, 65],
+    [52, 70, 95, 23,  4, 60, 11, 42, 69, 24, 68, 56,  1, 32, 56, 71, 37,  2, 36, 91],
+    [22, 31, 16, 71, 51, 67, 63, 89, 41, 92, 36, 54, 22, 40, 40, 28, 66, 33, 13, 80],
+    [24, 47, 32, 60, 99,  3, 45,  2, 44, 75, 33, 53, 78, 36, 84, 20, 35, 17, 12, 50],
+    [32, 98, 81, 28, 64, 23, 67, 10, 26, 38, 40, 67, 59, 54, 70, 66, 18, 38, 64, 70],
+    [67, 26, 20, 68,  2, 62, 12, 20, 95, 63, 94, 39, 63,  8, 40, 91, 66, 49, 94, 21],
+    [24, 55, 58,  5, 66, 73, 99, 26, 97, 17, 78, 78, 96, 83, 14, 88, 34, 89, 63, 72],
+    [21, 36, 23,  9, 75,  0, 76, 44, 20, 45, 35, 14,  0, 61, 33, 97, 34, 31, 33, 95],
+    [78, 17, 53, 28, 22, 75, 31, 67, 15, 94,  3, 80,  4, 62, 16, 14,  9, 53, 56, 92],
+    [16, 39,  5, 42, 96, 35, 31, 47, 55, 58, 88, 24,  0, 17, 54, 24, 36, 29, 85, 57],
+    [86, 56,  0, 48, 35, 71, 89,  7,  5, 44, 44, 37, 44, 60, 21, 58, 51, 54, 17, 58],
+    [19, 80, 81, 68,  5, 94, 47, 69, 28, 73, 92, 13, 86, 52, 17, 77,  4, 89, 55, 40],
+    [ 4, 52,  8, 83, 97, 35, 99, 16,  7, 97, 57, 32, 16, 26, 26, 79, 33, 27, 98, 66],
+    [88, 36, 68, 87, 57, 62, 20, 72,  3, 46, 33, 67, 46, 55, 12, 32, 63, 93, 53, 69],
+    [ 4, 42, 16, 73, 38, 25, 39, 11, 24, 94, 72, 18,  8, 46, 29, 32, 40, 62, 76, 36],
+    [20, 69, 36, 41, 72, 30, 23, 88, 34, 62, 99, 69, 82, 67, 59, 85, 74,  4, 36, 16],
+    [20, 73, 35, 29, 78, 31, 90,  1, 74, 31, 49, 71, 48, 86, 81, 16, 23, 57,  5, 54],
+    [ 1, 70, 54, 71, 83, 51, 54, 69, 16, 92, 33, 48, 61, 43, 52,  1, 89, 19, 67, 48]
+]
+
+for n in range(2, 6):
+    maxproduct(MATRIX, n)
+===
+F maxproduct(mat, length)
+   ‘ find the largest product of len length horizontal or vertical length in matrix ’
+   V (nrow, ncol) = (mat.len, mat[0].len)
+   V (maxprod, maxrow, maxcol, arr) = (Int64(0), [0, 0], [0, 0], [0])
+   L(row) 0 .< nrow
+      L(col) 0 .< ncol
+         V (row2, col2) = (row + length, col + length)
+         I row < nrow - length
+            V array = mat[row .< row2].map(r -> r[@col])
+            V pro = product(array.map(Int64))
+            I pro > maxprod
+               (maxprod, maxrow, maxcol, arr) = (pro, [row, row2], [col], array)
+         I col < ncol - length
+            V pro = product(mat[row][col .< col2].map(Int64))
+            I pro > maxprod
+               (maxprod, maxrow, maxcol, arr) = (pro, [row], [col, col2], mat[row][col .< col2])
+
+   print(‘The max ’length‘-product is ’maxprod‘, product of ’arr‘ at row ’maxrow‘, col ’maxcol‘.’)
+
+V MATRIX = [[8, 2, 22, 97, 38, 15, 0, 40, 0, 75, 4, 5, 7, 78, 52, 12, 50, 77, 91, 8], [49, 49, 99, 40, 17, 81, 18, 57, 60, 87, 17, 40, 98, 43, 69, 48, 4, 56, 62, 0], [81, 49, 31, 73, 55, 79, 14, 29, 93, 71, 40, 67, 53, 88, 30, 3, 49, 13, 36, 65], [52, 70, 95, 23, 4, 60, 11, 42, 69, 24, 68, 56, 1, 32, 56, 71, 37, 2, 36, 91], [22, 31, 16, 71, 51, 67, 63, 89, 41, 92, 36, 54, 22, 40, 40, 28, 66, 33, 13, 80], [24, 47, 32, 60, 99, 3, 45, 2, 44, 75, 33, 53, 78, 36, 84, 20, 35, 17, 12, 50], [32, 98, 81, 28, 64, 23, 67, 10, 26, 38, 40, 67, 59, 54, 70, 66, 18, 38, 64, 70], [67, 26, 20, 68, 2, 62, 12, 20, 95, 63, 94, 39, 63, 8, 40, 91, 66, 49, 94, 21], [24, 55, 58, 5, 66, 73, 99, 26, 97, 17, 78, 78, 96, 83, 14, 88, 34, 89, 63, 72], [21, 36, 23, 9, 75, 0, 76, 44, 20, 45, 35, 14, 0, 61, 33, 97, 34, 31, 33, 95], [78, 17, 53, 28, 22, 75, 31, 67, 15, 94, 3, 80, 4, 62, 16, 14, 9, 53, 56, 92], [16, 39, 5, 42, 96, 35, 31, 47, 55, 58, 88, 24, 0, 17, 54, 24, 36, 29, 85, 57], [86, 56, 0, 48, 35, 71, 89, 7, 5, 44, 44, 37, 44, 60, 21, 58, 51, 54, 17, 58], [19, 80, 81, 68, 5, 94, 47, 69, 28, 73, 92, 13, 86, 52, 17, 77, 4, 89, 55, 40], [4, 52, 8, 83, 97, 35, 99, 16, 7, 97, 57, 32, 16, 26, 26, 79, 33, 27, 98, 66], [88, 36, 68, 87, 57, 62, 20, 72, 3, 46, 33, 67, 46, 55, 12, 32, 63, 93, 53, 69], [4, 42, 16, 73, 38, 25, 39, 11, 24, 94, 72, 18, 8, 46, 29, 32, 40, 62, 76, 36], [20, 69, 36, 41, 72, 30, 23, 88, 34, 62, 99, 69, 82, 67, 59, 85, 74, 4, 36, 16], [20, 73, 35, 29, 78, 31, 90, 1, 74, 31, 49, 71, 48, 86, 81, 16, 23, 57, 5, 54], [1, 70, 54, 71, 83, 51, 54, 69, 16, 92, 33, 48, 61, 43, 52, 1, 89, 19, 67, 48]]
+
+L(n) 2..5
+   maxproduct(MATRIX, n)
+===
+template <typename T1, typename T2> auto maxproduct(const T1 &mat, const T2 &length)
+{
+    u" find the largest product of len length horizontal or vertical length in matrix "_S;
+    auto [nrow, ncol] = make_tuple(mat.len(), _get<0>(mat).len());
+    auto [maxprod, maxrow, maxcol, arr] = make_tuple(to_int64(0), create_array({0, 0}), create_array({0, 0}), create_array({0}));
+    for (auto row : range_el(0, nrow))
+        for (auto col : range_el(0, ncol)) {
+            auto [row2, col2] = make_tuple(row + length, col + length);
+            if (row < nrow - length) {
+                auto array = mat[range_el(row, row2)].map([&col](const auto &r){return r[col];});
+                auto pro = product(array.map([](const auto &x){return to_int64(x);}));
+                if (pro > maxprod)
+                    assign_from_tuple(maxprod, maxrow, maxcol, arr, make_tuple(pro, create_array({row, row2}), create_array({col}), array));
+            }
+            if (col < ncol - length) {
+                auto pro = product(mat[row][range_el(col, col2)].map([](const auto &x){return to_int64(x);}));
+                if (pro > maxprod)
+                    assign_from_tuple(maxprod, maxrow, maxcol, arr, make_tuple(pro, create_array({row}), create_array({col, col2}), mat[row][range_el(col, col2)]));
+            }
+        }
+
+    print(u"The max "_S & length & u"-product is "_S & maxprod & u", product of "_S & arr & u" at row "_S & maxrow & u", col "_S & maxcol & u"."_S);
+}
+
+auto MATRIX = create_array({create_array({8, 2, 22, 97, 38, 15, 0, 40, 0, 75, 4, 5, 7, 78, 52, 12, 50, 77, 91, 8}), create_array({49, 49, 99, 40, 17, 81, 18, 57, 60, 87, 17, 40, 98, 43, 69, 48, 4, 56, 62, 0}), create_array({81, 49, 31, 73, 55, 79, 14, 29, 93, 71, 40, 67, 53, 88, 30, 3, 49, 13, 36, 65}), create_array({52, 70, 95, 23, 4, 60, 11, 42, 69, 24, 68, 56, 1, 32, 56, 71, 37, 2, 36, 91}), create_array({22, 31, 16, 71, 51, 67, 63, 89, 41, 92, 36, 54, 22, 40, 40, 28, 66, 33, 13, 80}), create_array({24, 47, 32, 60, 99, 3, 45, 2, 44, 75, 33, 53, 78, 36, 84, 20, 35, 17, 12, 50}), create_array({32, 98, 81, 28, 64, 23, 67, 10, 26, 38, 40, 67, 59, 54, 70, 66, 18, 38, 64, 70}), create_array({67, 26, 20, 68, 2, 62, 12, 20, 95, 63, 94, 39, 63, 8, 40, 91, 66, 49, 94, 21}), create_array({24, 55, 58, 5, 66, 73, 99, 26, 97, 17, 78, 78, 96, 83, 14, 88, 34, 89, 63, 72}), create_array({21, 36, 23, 9, 75, 0, 76, 44, 20, 45, 35, 14, 0, 61, 33, 97, 34, 31, 33, 95}), create_array({78, 17, 53, 28, 22, 75, 31, 67, 15, 94, 3, 80, 4, 62, 16, 14, 9, 53, 56, 92}), create_array({16, 39, 5, 42, 96, 35, 31, 47, 55, 58, 88, 24, 0, 17, 54, 24, 36, 29, 85, 57}), create_array({86, 56, 0, 48, 35, 71, 89, 7, 5, 44, 44, 37, 44, 60, 21, 58, 51, 54, 17, 58}), create_array({19, 80, 81, 68, 5, 94, 47, 69, 28, 73, 92, 13, 86, 52, 17, 77, 4, 89, 55, 40}), create_array({4, 52, 8, 83, 97, 35, 99, 16, 7, 97, 57, 32, 16, 26, 26, 79, 33, 27, 98, 66}), create_array({88, 36, 68, 87, 57, 62, 20, 72, 3, 46, 33, 67, 46, 55, 12, 32, 63, 93, 53, 69}), create_array({4, 42, 16, 73, 38, 25, 39, 11, 24, 94, 72, 18, 8, 46, 29, 32, 40, 62, 76, 36}), create_array({20, 69, 36, 41, 72, 30, 23, 88, 34, 62, 99, 69, 82, 67, 59, 85, 74, 4, 36, 16}), create_array({20, 73, 35, 29, 78, 31, 90, 1, 74, 31, 49, 71, 48, 86, 81, 16, 23, 57, 5, 54}), create_array({1, 70, 54, 71, 83, 51, 54, 69, 16, 92, 33, 48, 61, 43, 52, 1, 89, 19, 67, 48})});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(2, 5))
+            maxproduct(MATRIX, n);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Last_list_item#Python
+def add_least_reduce(lis : list):
+    while len(lis) > 1:
+        el1 = lis.pop(lis.index(min(lis)))
+        el2 = lis.pop(lis.index(min(lis)))
+        lis.append(el1 + el2)
+        print('Interim list:', lis)
+    return lis
+
+LIST = [6, 81, 243, 14, 25, 49, 123, 69, 11]
+
+print(LIST, ' ==> ', add_least_reduce(LIST[:]))
+===
+F add_least_reduce(&lis)
+   L lis.len > 1
+      V el1 = lis.pop(lis.index(min(lis)))
+      V el2 = lis.pop(lis.index(min(lis)))
+      lis.append(el1 + el2)
+      print(‘Interim list: ’lis)
+   R lis
+
+V LIST = [6, 81, 243, 14, 25, 49, 123, 69, 11]
+
+print(LIST‘  ==>  ’add_least_reduce(&copy(LIST)))
+===
+template <typename T1> auto add_least_reduce(T1 &lis)
+{
+    while (lis.len() > 1) {
+        auto el1 = lis.pop(lis.index(min(lis)));
+        auto el2 = lis.pop(lis.index(min(lis)));
+        lis.append(el1 + el2);
+        print(u"Interim list: "_S & lis);
+    }
+    return lis;
+}
+
+auto LIST = create_array({6, 81, 243, 14, 25, 49, 123, 69, 11});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(LIST & u"  ==>  "_S & add_least_reduce(make_ref(copy(LIST))));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Long_stairs#C
+import random
+
+secs_tot  = 0
+steps_tot = 0
+print('Seconds    steps behind    steps ahead')
+
+for trial in range(1, 10001):
+    sbeh = 0; slen = 100; secs = 0
+    while sbeh < slen:
+        sbeh += 1
+        for wiz in range(5):
+            if random.randrange(slen) < sbeh:
+                sbeh += 1
+            slen += 1
+
+        secs += 1
+        if trial == 1 and 600 <= secs <= 609:
+            print("%d        %d            %d" % (secs, sbeh, slen-sbeh))
+
+    secs_tot += secs
+    steps_tot += slen
+
+print("Average secs taken: %f" % (secs_tot/10000.0))
+print("Average final length of staircase: %f" % (steps_tot/10000.0))
+===
+V secs_tot = 0
+V steps_tot = 0
+print(‘Seconds    steps behind    steps ahead’)
+
+L(trial) 1..10000
+   V sbeh = 0
+   V slen = 100
+   V secs = 0
+   L sbeh < slen
+      sbeh++
+      L(wiz) 5
+         I random:(slen) < sbeh
+            sbeh++
+         slen++
+
+      secs++
+      I trial == 1 & secs C 600..609
+         print(‘#.        #.            #.’.format(secs, sbeh, slen - sbeh))
+
+   secs_tot += secs
+   steps_tot += slen
+
+print(‘Average secs taken: #.6’.format(secs_tot / 10000.0))
+print(‘Average final length of staircase: #.6’.format(steps_tot / 10000.0))
+===
+auto secs_tot = 0;
+auto steps_tot = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Seconds    steps behind    steps ahead"_S);
+
+        for (auto trial : range_ee(1, 10000)) {
+            auto sbeh = 0;
+            auto slen = 100;
+            auto secs = 0;
+            while (sbeh < slen) {
+                sbeh++;
+                for (int wiz = 0; wiz < 5; wiz++) {
+                    if (randomns::_(slen) < sbeh)
+                        sbeh++;
+                    slen++;
+                }
+
+                secs++;
+                if (trial == 1 && in(secs, range_ee(600, 609)))
+                    print(u"#.        #.            #."_S.format(secs, sbeh, slen - sbeh));
+            }
+
+            secs_tot += secs;
+            steps_tot += slen;
+        }
+
+        print(u"Average secs taken: #.6"_S.format(secs_tot / 10000.0));
+        print(u"Average final length of staircase: #.6"_S.format(steps_tot / 10000.0));
+    }
+} code_block_1;

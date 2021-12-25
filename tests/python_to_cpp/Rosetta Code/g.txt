@@ -1160,3 +1160,66 @@ struct CodeBlock2
         print(u"\nThanks for keeping score."_S);
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Generate_random_numbers_without_repeating_a_value#Nim
+import random
+
+def generate(a, b):
+    result : List[int] = []
+    count = b - a + 1
+    generated = [False] * count
+    while True:
+        n = random.randint(a, b)
+        if not generated[n - a]:
+            generated[n - a] = True
+            result.append(n)
+            count -= 1
+            if count == 0:
+                break
+    return result
+
+for i in range(5):
+    print(generate(1, 20))
+===
+F generate(a, b)
+   [Int] result
+   V count = b - a + 1
+   V generated = [0B] * count
+   L
+      V n = random:(a .. b)
+      I !generated[n - a]
+         generated[n - a] = 1B
+         result.append(n)
+         I --count == 0
+            L.break
+   R result
+
+L(i) 5
+   print(generate(1, 20))
+===
+template <typename T1, typename T2> auto generate(const T1 &a, const T2 &b)
+{
+    Array<int> result;
+    auto count = b - a + 1;
+    auto generated = create_array({false}) * count;
+    while (true) {
+        auto n = randomns::_(range_ee(a, b));
+        if (!generated[n - a]) {
+            generated.set(n - a, true);
+            result.append(n);
+            if (--count == 0)
+                break;
+        }
+    }
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int i = 0; i < 5; i++)
+            print(generate(1, 20));
+    }
+} code_block_1;

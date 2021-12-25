@@ -456,3 +456,79 @@ struct CodeBlock1
         decode(u"theRaven.txt"_S, uiList);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Juggler_sequence#Nim
+import math
+Int64 = int
+
+def juggler(n):
+    a = Int64(n)
+    r_count = 0
+    r_max = a
+    r_maxidx = 0
+    while a != 1:
+        f = float(a)
+        a = Int64(math.sqrt(f) if a & 1 == 0 else f * math.sqrt(f))
+        r_count += 1
+        if a > r_max:
+            r_max = a
+            r_maxidx = r_count
+    return (r_count, r_max, r_maxidx)
+
+print('n   l[n]            h[n]  i[n]')
+print('------------------------------')
+for n in range(20, 40):
+    (l, h, i) = juggler(n)
+    print(f'{n}   {l:2}  {h:14}     {i}')
+===
+F juggler(n)
+   V a = Int64(n)
+   V r_count = 0
+   V r_max = a
+   V r_maxidx = 0
+   L a != 1
+      V f = Float(a)
+      a = Int64(I a [&] 1 == 0 {sqrt(f)} E f * sqrt(f))
+      r_count++
+      I a > r_max
+         r_max = a
+         r_maxidx = r_count
+   R (r_count, r_max, r_maxidx)
+
+print(‘n   l[n]            h[n]  i[n]’)
+print(‘------------------------------’)
+L(n) 20..39
+   V (l, h, i) = juggler(n)
+   print(f:‘{n}   {l:2}  {h:14}     {i}’)
+===
+template <typename T1> auto juggler(const T1 &n)
+{
+    auto a = to_int64(n);
+    auto r_count = 0;
+    auto r_max = a;
+    auto r_maxidx = 0;
+    while (a != 1) {
+        auto f = to_float(a);
+        a = to_int64((a & 1) == 0 ? sqrt(f) : f * sqrt(f));
+        r_count++;
+        if (a > r_max) {
+            r_max = a;
+            r_maxidx = r_count;
+        }
+    }
+    return make_tuple(r_count, r_max, r_maxidx);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"n   l[n]            h[n]  i[n]"_S);
+        print(u"------------------------------"_S);
+        for (auto n : range_ee(20, 39)) {
+            auto [l, h, i] = juggler(n);
+            print(u"#.   #2  #14     #."_S.format(n, l, h, i));
+        }
+    }
+} code_block_1;
