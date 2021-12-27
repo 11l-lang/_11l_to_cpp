@@ -6140,3 +6140,284 @@ struct CodeBlock1
         print(u"Found "_S & c & u" primes with digits in nondecreasing order"_S);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Permutations_with_some_identical_elements#Nim
+from typing import List
+
+def shouldSwap(s, start, curr):
+    for i in range(start, curr):
+        if s[i] == s[curr]: return False
+    return True
+
+def findPerms(ss, index, n, res : "list"):
+    if index >= n:
+        res.append(''.join(ss))
+        return
+
+    s = ss[:]
+    for i in range(index, n):
+        if shouldSwap(s, index, i):
+            (s[index], s[i]) = (s[i], s[index])
+            findPerms(s, index+1, n, res)
+            (s[index], s[i]) = (s[i], s[index])
+
+def createSlice(nums, charSet):
+    result = ''
+    for i, n in enumerate(nums):
+        for _ in range(n):
+            result += charSet[i]
+    return result
+
+res1 : List[str] = []
+res2 : List[str] = []
+res3 : List[str] = []
+nums = [2, 1]
+
+s = createSlice(nums, "12")
+findPerms(list(s), 0, len(s), res1)
+print(' '.join(res1))
+print()
+
+nums = [2, 3, 1]
+s = createSlice(nums, "123")
+findPerms(list(s), 0, len(s), res2)
+for i, val in enumerate(res2):
+    print(val, end = "\n" if (i + 1) % 10 == 0 else ' ')
+print()
+
+s = createSlice(nums, "ABC")
+findPerms(list(s), 0, len(s), res3)
+for i, val in enumerate(res3):
+    print(val, end = "\n" if (i + 1) % 10 == 0 else ' ')
+===
+F shouldSwap(s, start, curr)
+   L(i) start .< curr
+      I s[i] == s[curr]
+         R 0B
+   R 1B
+
+F findPerms(ss, index, n, &res)
+   I index >= n
+      res.append(ss.join(‘’))
+      R
+
+   V s = copy(ss)
+   L(i) index .< n
+      I shouldSwap(s, index, i)
+         swap(&s[index], &s[i])
+         findPerms(s, index + 1, n, &res)
+         swap(&s[index], &s[i])
+
+F createSlice(nums, charSet)
+   V result = ‘’
+   L(n) nums
+      V i = L.index
+      L(_) 0 .< n
+         result ‘’= charSet[i]
+   R result
+
+[String] res1
+[String] res2
+[String] res3
+V nums = [2, 1]
+
+V s = createSlice(nums, ‘12’)
+findPerms(Array(s), 0, s.len, &res1)
+print(res1.join(‘ ’))
+print()
+
+nums = [2, 3, 1]
+s = createSlice(nums, ‘123’)
+findPerms(Array(s), 0, s.len, &res2)
+L(val) res2
+   V i = L.index
+   print(val, end' I (i + 1) % 10 == 0 {"\n"} E ‘ ’)
+print()
+
+s = createSlice(nums, ‘ABC’)
+findPerms(Array(s), 0, s.len, &res3)
+L(val) res3
+   V i = L.index
+   print(val, end' I (i + 1) % 10 == 0 {"\n"} E ‘ ’)
+===
+template <typename T1, typename T2, typename T3> auto shouldSwap(const T1 &s, const T2 &start, const T3 &curr)
+{
+    for (auto i : range_el(start, curr))
+        if (s[i] == s[curr])
+            return false;
+    return true;
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto findPerms(const T1 &ss, const T2 &index, const T3 &n, T4 &res)
+{
+    if (index >= n) {
+        res.append(ss.join(u""_S));
+        return;
+    }
+
+    auto s = copy(ss);
+    for (auto i : range_el(index, n))
+        if (shouldSwap(s, index, i)) {
+            swap(s[index], s[i]);
+            findPerms(s, index + 1, n, res);
+            swap(s[index], s[i]);
+        }
+}
+
+template <typename T1, typename T2> auto createSlice(const T1 &nums, const T2 &charSet)
+{
+    auto result = u""_S;
+    {int Lindex = 0;
+    for (auto &&n : nums) {
+        auto i = Lindex;
+        for (auto _ : range_el(0, n))
+            result &= charSet[i];
+        Lindex++;
+    }}
+    return result;
+}
+
+Array<String> res1;
+Array<String> res2;
+Array<String> res3;
+auto nums = create_array({2, 1});
+
+auto s = createSlice(nums, u"12"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        findPerms(create_array(s), 0, s.len(), res1);
+        print(res1.join(u" "_S));
+        print();
+
+        nums = create_array({2, 3, 1});
+        s = createSlice(nums, u"123"_S);
+        findPerms(create_array(s), 0, s.len(), res2);
+        {int Lindex = 0;
+        for (auto &&val : res2) {
+            auto i = Lindex;
+            print(val, mod((i + 1), 10) == 0 ? u"\n"_S : u" "_S);
+            Lindex++;
+        }}
+        print();
+
+        s = createSlice(nums, u"ABC"_S);
+        findPerms(create_array(s), 0, s.len(), res3);
+        {int Lindex = 0;
+        for (auto &&val : res3) {
+            auto i = Lindex;
+            print(val, mod((i + 1), 10) == 0 ? u"\n"_S : u" "_S);
+            Lindex++;
+        }}
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Positive_decimal_integers_with_the_digit_1_occurring_exactly_twice
+for n in range(1, 1000):
+    if str(n).count('1') == 2:
+        print(n, end = ' ')
+===
+L(n) 1..999
+   I String(n).count(‘1’) == 2
+      print(n, end' ‘ ’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(1, 999))
+            if (String(n).count(u"1"_S) == 2)
+                print(n, u" "_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Prime_words
+import math
+
+def is_prime(a : int):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+prime_chars = set() # int
+for c in range(ord('a'), ord('z') + 1):
+    if is_prime(c):
+        prime_chars.add(c)
+for c in range(ord('A'), ord('Z') + 1):
+    if is_prime(c):
+        prime_chars.add(c)
+
+for word in open('unixdict.txt').read().split("\n"):
+    for c in word:
+        if ord(c) not in prime_chars:
+            break
+    else:
+        print(word)
+===
+F is_prime(Int a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+V prime_chars = Set[Int]()
+L(c) ‘a’.code .. ‘z’.code
+   I is_prime(c)
+      prime_chars.add(c)
+L(c) ‘A’.code .. ‘Z’.code
+   I is_prime(c)
+      prime_chars.add(c)
+
+L(word) File(‘unixdict.txt’).read().split("\n")
+   L(c) word
+      I c.code !C prime_chars
+         L.break
+   L.was_no_break
+      print(word)
+===
+auto is_prime(const int a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+auto prime_chars = Set<int>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto c : range_ee(u'a'_C.code, u'z'_C.code))
+            if (is_prime(c))
+                prime_chars.add(c);
+        for (auto c : range_ee(u'A'_C.code, u'Z'_C.code))
+            if (is_prime(c))
+                prime_chars.add(c);
+
+        for (auto &&word : File(u"unixdict.txt"_S).read().split(u"\n"_S)) {
+            for (auto &&c : word)
+                if (!in(c.code, prime_chars))
+                    goto break_;
+            print(word);
+            break_:;
+        }
+    }
+} code_block_1;

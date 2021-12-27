@@ -2912,3 +2912,35 @@ struct CodeBlock1
         print(u"integral: "_S & integ([](const auto &x){return exp(x);}, 5, -3, 3));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Numbers_in_base-16_representation_that_cannot_be_written_with_decimal_digits
+from _11l import *
+
+for n in range(1, 500):
+    for c in hexu(n):
+        if c.isdigit():
+            break
+    else:
+        print(n, end = ' ')
+===
+L(n) 1..499
+   L(c) hex(n)
+      I c.is_digit()
+         L.break
+   L.was_no_break
+      print(n, end' ‘ ’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(1, 499)) {
+            for (auto &&c : hex(n))
+                if (c.is_digit())
+                    goto break_;
+            print(n, u" "_S);
+            break_:;
+        }
+    }
+} code_block_1;

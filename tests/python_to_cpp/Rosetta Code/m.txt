@@ -3742,3 +3742,215 @@ struct CodeBlock1
         moTest(BigInt(u"3047753288"_S), BigInt(u"2257683301"_S));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Minimum_number_of_cells_after,_before,_above_and_below_NxN_squares#Python
+def min_cells_matrix(siz):
+    return [[min(row, col, siz - row - 1, siz - col - 1) for col in range(siz)] for row in range(siz)]
+
+def display_matrix(mat):
+    siz = len(mat)
+    spaces = 2 if siz < 20 else 3 if siz < 200 else 4
+    print(f"\nMinimum number of cells after, before, above and below {siz} x {siz} square:")
+    for row in range(siz):
+        print("".join([str(n).rjust(spaces) for n in mat[row]]))
+
+for siz in [23, 10, 9, 2, 1]:
+    display_matrix(min_cells_matrix(siz))
+===
+F min_cells_matrix(siz)
+   R (0 .< siz).map(row -> (0 .< @siz).map(col -> min(@row, col, @@siz - @row - 1, @@siz - col - 1)))
+
+F display_matrix(mat)
+   V siz = mat.len
+   V spaces = I siz < 20 {2} E I siz < 200 {3} E 4
+   print("\nMinimum number of cells after, before, above and below "siz‘ x ’siz‘ square:’)
+   L(row) 0 .< siz
+      print((mat[row].map(n -> String(n).rjust(@spaces))).join(‘’))
+
+L(siz) [23, 10, 9, 2, 1]
+   display_matrix(min_cells_matrix(siz))
+===
+template <typename T1> auto min_cells_matrix(const T1 &siz)
+{
+    return range_el(0, siz).map([&siz](const auto &row){return range_el(0, siz).map([&row, &siz](const auto &col){return min(row, col, siz - row - 1, siz - col - 1);});});
+}
+
+template <typename T1> auto display_matrix(const T1 &mat)
+{
+    auto siz = mat.len();
+    auto spaces = siz < 20 ? 2 : siz < 200 ? 3 : 4;
+    print(u"\nMinimum number of cells after, before, above and below "_S & siz & u" x "_S & siz & u" square:"_S);
+    for (auto row : range_el(0, siz))
+        print((mat[row].map([&spaces](const auto &n){return String(n).rjust(spaces);})).join(u""_S));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&siz : create_array({23, 10, 9, 2, 1}))
+            display_matrix(min_cells_matrix(siz));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Minimum_numbers_of_three_lists#Python
+numbers1 = [5,45,23,21,67]
+numbers2 = [43,22,78,46,38]
+numbers3 = [9,98,12,98,53]
+
+numbers = [min(numbers1[i],numbers2[i],numbers3[i]) for i in range(0,len(numbers1))]
+
+print(numbers)
+===
+V numbers1 = [5, 45, 23, 21, 67]
+V numbers2 = [43, 22, 78, 46, 38]
+V numbers3 = [9, 98, 12, 98, 53]
+
+V numbers = (0 .< numbers1.len).map(i -> min(:numbers1[i], :numbers2[i], :numbers3[i]))
+
+print(numbers)
+===
+auto numbers1 = create_array({5, 45, 23, 21, 67});
+auto numbers2 = create_array({43, 22, 78, 46, 38});
+auto numbers3 = create_array({9, 98, 12, 98, 53});
+
+auto numbers = range_el(0, numbers1.len()).map([](const auto &i){return min(::numbers1[i], ::numbers2[i], ::numbers3[i]);});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(numbers);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Minimum_positive_multiple_in_base_10_using_only_0_and_1#Kotlin
+# Slow BigInt
+BigInt = int
+
+def modp(m, n):
+    result = m % n
+    if result < 0:
+        result += n
+    return result
+
+def getA004290(n):
+    if n == 1:
+        return BigInt(1)
+    arr = [[0] * n for i in range(n)]
+    arr[0][0] = 1
+    arr[0][1] = 1
+    m = 0
+    ten = BigInt(10)
+    nBi = BigInt(n)
+    while True:
+        m += 1
+        if arr[m - 1][int(modp(-pow(ten, m), nBi))] == 1:
+            break
+        arr[m][0] = 1
+        for k in range(1, n):
+            arr[m][k] = max(arr[m - 1][k], arr[m - 1][int(modp(BigInt(k) - pow(ten, m), nBi))])
+
+    r = pow(ten, m)
+    k = int(modp(-r, nBi))
+    for j in range(m - 1, 0, -1):
+        if arr[j - 1][k] == 0:
+            r += pow(ten, j)
+            k = int(modp(BigInt(k) - pow(ten, j), nBi))
+    if k == 1:
+        r += 1
+    return r
+
+for n in list(range(1, 11)) + list(range(95, 106)) + [297, 576, 594, 891, 909, 999, 1998, 2079, 2251, 2277, 2439, 2997, 4878]:
+    result = getA004290(n)
+    print(f'A004290({n}) = {result} = {n} * {result // n}')
+===
+F modp(m, n)
+   V result = m % n
+   I result < 0
+      result += n
+   R result
+
+F getA004290(n)
+   I n == 1
+      R BigInt(1)
+   V arr = [[0] * n] * n
+   arr[0][0] = 1
+   arr[0][1] = 1
+   V m = 0
+   V ten = BigInt(10)
+   V nBi = BigInt(n)
+   L
+      m++
+      I arr[m - 1][Int(modp(-pow(ten, m), nBi))] == 1
+         L.break
+      arr[m][0] = 1
+      L(k) 1 .< n
+         arr[m][k] = max(arr[m - 1][k], arr[m - 1][Int(modp(BigInt(k) - pow(ten, m), nBi))])
+
+   V r = pow(ten, m)
+   V k = Int(modp(-r, nBi))
+   L(j) (m - 1 .< 0).step(-1)
+      I arr[j - 1][k] == 0
+         r += pow(ten, j)
+         k = Int(modp(BigInt(k) - pow(ten, j), nBi))
+   I k == 1
+      r++
+   R r
+
+L(n) Array(1..10) [+] Array(95..105) [+] [297, 576, 594, 891, 909, 999, 1998, 2079, 2251, 2277, 2439, 2997, 4878]
+   V result = getA004290(n)
+   print(‘A004290(’n‘) = ’result‘ = ’n‘ * ’(result I/ n))
+===
+template <typename T1, typename T2> auto modp(const T1 &m, const T2 &n)
+{
+    auto result = mod(m, n);
+    if (result < 0)
+        result += n;
+    return result;
+}
+
+template <typename T1> auto getA004290(const T1 &n)
+{
+    if (n == 1)
+        return BigInt(1);
+    auto arr = create_array({create_array({0}) * n}) * n;
+    _set<0>(_get<0>(arr), 1);
+    _set<1>(_get<0>(arr), 1);
+    auto m = 0;
+    auto ten = BigInt(10);
+    auto nBi = BigInt(n);
+    while (true) {
+        m++;
+        if (arr[m - 1][to_int(modp(-pow(ten, m), nBi))] == 1)
+            break;
+        _set<0>(arr[m], 1);
+        for (auto k : range_el(1, n))
+            arr[m].set(k, max(arr[m - 1][k], arr[m - 1][to_int(modp(BigInt(k) - pow(ten, m), nBi))]));
+    }
+
+    auto r = pow(ten, m);
+    auto k = to_int(modp(-r, nBi));
+    for (auto j : range_el(m - 1, 0).step(-1))
+        if (arr[j - 1][k] == 0) {
+            r += pow(ten, j);
+            k = to_int(modp(BigInt(k) - pow(ten, j), nBi));
+        }
+    if (k == 1)
+        r++;
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&n : create_array(range_ee(1, 10)) + create_array(range_ee(95, 105)) + create_array({297, 576, 594, 891, 909, 999, 1998, 2079, 2251, 2277, 2439, 2997, 4878})) {
+            auto result = getA004290(n);
+            print(u"A004290("_S & n & u") = "_S & result & u" = "_S & n & u" * "_S & (idiv(result, n)));
+        }
+    }
+} code_block_1;

@@ -951,3 +951,257 @@ int MAIN_WITH_ARGV()
     else
         displayPermutations(create_array({2, 0, 2}));
 }
+
+
+# https://www.rosettacode.org/wiki/Odd_and_square_numbers#Python
+import math
+limit = 1000
+
+for i in range(1, int(math.ceil(math.sqrt(limit))), 2):
+    num = i * i
+    if num < limit and num > 99:
+        print(num, end = ' ')
+===
+V limit = 1000
+
+L(i) (1 .< Int(ceil(sqrt(limit)))).step(2)
+   V num = i * i
+   I num < limit & num > 99
+      print(num, end' ‘ ’)
+===
+auto limit = 1000;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(1, to_int(ceil(sqrt(limit)))).step(2)) {
+            auto num = i * i;
+            if (num < limit && num > 99)
+                print(num, u" "_S);
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Odd_words#Python
+wordSet = Set(open('unixdict.txt').read().split("\n"))
+
+oddWordSet = set() # str
+
+for word in wordSet:
+    if len(word)>=9 and word[::2] in wordSet:
+        oddWordSet.add(word[::2])
+
+for i in sorted(list(oddWordSet)):
+    print(i)
+===
+V wordSet = Set(File(‘unixdict.txt’).read().split("\n"))
+
+V oddWordSet = Set[String]()
+
+L(word) wordSet
+   I word.len >= 9 & word[(0..).step(2)] C wordSet
+      oddWordSet.add(word[(0..).step(2)])
+
+L(i) sorted(Array(oddWordSet))
+   print(i)
+===
+auto wordSet = create_set(File(u"unixdict.txt"_S).read().split(u"\n"_S));
+
+auto oddWordSet = Set<String>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&word : wordSet)
+            if (word.len() >= 9 && in(word[range_ei(0).step(2)], wordSet))
+                oddWordSet.add(word[range_ei(0).step(2)]);
+
+        for (auto &&i : sorted(create_array(oddWordSet)))
+            print(i);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Own_digits_power_sum#Python
+from typing import List
+Int64 = int
+
+MAX_BASE = 10
+POWER_DIGIT = [[1 for _ in range(MAX_BASE)] for _ in range(MAX_BASE)]
+USED_DIGITS = [0 for _ in range(MAX_BASE)]
+NUMBERS : List[int] = []
+
+def calc_num(depth, used : list):
+    """ calculate the number at a given recurse depth """
+    result = Int64(0)
+    if depth < 3:
+        return
+    for i in range(1, MAX_BASE):
+        if used[i] > 0:
+            result += Int64(used[i]) * POWER_DIGIT[depth][i]
+    if result != 0:
+        (num, rnum) = (result, Int64(1))
+        while rnum != 0:
+            rnum = num // MAX_BASE
+            used[int(num - rnum * MAX_BASE)] -= 1
+            num = rnum
+            depth -= 1
+        if depth == 0:
+            i = 1
+            while i < MAX_BASE and used[i] == 0:
+                i += 1
+            if i >= MAX_BASE:
+                NUMBERS.append(int(result))
+
+def next_digit(dgt, depth) -> None:
+    """ get next digit at the given depth """
+    if depth < MAX_BASE - 1:
+        for i in range(dgt, MAX_BASE):
+            USED_DIGITS[dgt] += 1
+            next_digit(i, depth + 1)
+            USED_DIGITS[dgt] -= 1
+
+    if dgt == 0:
+        dgt = 1
+    for i in range(dgt, MAX_BASE):
+        USED_DIGITS[i] += 1
+        calc_num(depth, USED_DIGITS[:])
+        USED_DIGITS[i] -= 1
+
+for j in range(1, MAX_BASE):
+    for k in range(MAX_BASE):
+        POWER_DIGIT[j][k] = POWER_DIGIT[j - 1][k] * k
+
+next_digit(0, 0)
+print(NUMBERS)
+NUMBERS = list(set(NUMBERS))
+NUMBERS.sort()
+print('Own digits power sums for N = 3 to 9 inclusive:')
+for n in NUMBERS:
+    print(n)
+===
+V MAX_BASE = 10
+V POWER_DIGIT = (0 .< MAX_BASE).map(_ -> (0 .< :MAX_BASE).map(_ -> 1))
+V USED_DIGITS = (0 .< MAX_BASE).map(_ -> 0)
+[Int] NUMBERS
+
+F calc_num(=depth, &used)
+   ‘ calculate the number at a given recurse depth ’
+   V result = Int64(0)
+   I depth < 3
+      R
+   L(i) 1 .< :MAX_BASE
+      I used[i] > 0
+         result += Int64(used[i]) * :POWER_DIGIT[depth][i]
+   I result != 0
+      V (num, rnum) = (result, Int64(1))
+      L rnum != 0
+         rnum = num I/ :MAX_BASE
+         used[Int(num - rnum * :MAX_BASE)]--
+         num = rnum
+         depth--
+      I depth == 0
+         V i = 1
+         L i < :MAX_BASE & used[i] == 0
+            i++
+         I i >= :MAX_BASE
+            :NUMBERS.append(Int(result))
+
+F next_digit(=dgt, depth) -> N
+   ‘ get next digit at the given depth ’
+   I depth < :MAX_BASE - 1
+      L(i) dgt .< :MAX_BASE
+         :USED_DIGITS[dgt]++
+         next_digit(i, depth + 1)
+         :USED_DIGITS[dgt]--
+
+   I dgt == 0
+      dgt = 1
+   L(i) dgt .< :MAX_BASE
+      :USED_DIGITS[i]++
+      calc_num(depth, &copy(:USED_DIGITS))
+      :USED_DIGITS[i]--
+
+L(j) 1 .< MAX_BASE
+   L(k) 0 .< MAX_BASE
+      POWER_DIGIT[j][k] = POWER_DIGIT[j - 1][k] * k
+
+next_digit(0, 0)
+print(NUMBERS)
+NUMBERS = Array(Set(NUMBERS))
+NUMBERS.sort()
+print(‘Own digits power sums for N = 3 to 9 inclusive:’)
+L(n) NUMBERS
+   print(n)
+===
+auto MAX_BASE = 10;
+auto POWER_DIGIT = range_el(0, MAX_BASE).map([](const auto &_){return range_el(0, ::MAX_BASE).map([](const auto &_){return 1;});});
+auto USED_DIGITS = range_el(0, MAX_BASE).map([](const auto &_){return 0;});
+Array<int> NUMBERS;
+
+template <typename T1, typename T2> auto calc_num(T1 depth, T2 &used)
+{
+    u" calculate the number at a given recurse depth "_S;
+    auto result = to_int64(0);
+    if (depth < 3)
+        return;
+    for (auto i : range_el(1, ::MAX_BASE))
+        if (used[i] > 0)
+            result += to_int64(used[i]) * ::POWER_DIGIT[depth][i];
+    if (result != 0) {
+        auto [num, rnum] = make_tuple(result, to_int64(1));
+        while (rnum != 0) {
+            rnum = idiv(num, ::MAX_BASE);
+            used[to_int(num - rnum * ::MAX_BASE)]--;
+            num = rnum;
+            depth--;
+        }
+        if (depth == 0) {
+            auto i = 1;
+            while (i < ::MAX_BASE && used[i] == 0)
+                i++;
+            if (i >= ::MAX_BASE)
+                ::NUMBERS.append(to_int(result));
+        }
+    }
+}
+
+template <typename T1, typename T2> void next_digit(T1 dgt, const T2 &depth)
+{
+    u" get next digit at the given depth "_S;
+    if (depth < ::MAX_BASE - 1)
+        for (auto i : range_el(dgt, ::MAX_BASE)) {
+            ::USED_DIGITS[dgt]++;
+            next_digit(i, depth + 1);
+            ::USED_DIGITS[dgt]--;
+        }
+
+    if (dgt == 0)
+        dgt = 1;
+    for (auto i : range_el(dgt, ::MAX_BASE)) {
+        ::USED_DIGITS[i]++;
+        calc_num(depth, make_ref(copy(::USED_DIGITS)));
+        ::USED_DIGITS[i]--;
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto j : range_el(1, MAX_BASE))
+            for (auto k : range_el(0, MAX_BASE))
+                POWER_DIGIT[j].set(k, POWER_DIGIT[j - 1][k] * k);
+
+        next_digit(0, 0);
+        print(NUMBERS);
+        NUMBERS = create_array(create_set(NUMBERS));
+        NUMBERS.sort();
+        print(u"Own digits power sums for N = 3 to 9 inclusive:"_S);
+        for (auto &&n : NUMBERS)
+            print(n);
+    }
+} code_block_1;
