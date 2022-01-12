@@ -822,3 +822,41 @@ struct CodeBlock1
         print(sorted(create_array(create_set(create_array(LIST.join(u""_S)))).filter([](const auto &ch){return all_map(::LIST, [&ch](const auto &w){return w.count(ch) == 1;});})));
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Unique_characters
+import collections
+
+d = collections.defaultdict(int) # Char
+for s in ["133252abcdeeffd", "a6789798st", "yxcdfgxcyz"]:
+    for c in s:
+        d[c] += 1
+
+for k in sorted(d.keys()):
+    if d[k] == 1:
+        print(k, end = '')
+===
+V d = DefaultDict[Char, Int]()
+L(s) [‘133252abcdeeffd’, ‘a6789798st’, ‘yxcdfgxcyz’]
+   L(c) s
+      d[c]++
+
+L(k) sorted(d.keys())
+   I d[k] == 1
+      print(k, end' ‘’)
+===
+auto d = DefaultDict<Char, int>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&s : create_array({u"133252abcdeeffd"_S, u"a6789798st"_S, u"yxcdfgxcyz"_S}))
+            for (auto &&c : s)
+                d[c]++;
+
+        for (auto &&k : sorted(d.keys()))
+            if (d[k] == 1)
+                print(k, u""_S);
+    }
+} code_block_1;

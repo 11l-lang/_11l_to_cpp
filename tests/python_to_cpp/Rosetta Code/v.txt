@@ -1048,3 +1048,140 @@ struct CodeBlock2
         }
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Verhoeff_algorithm#Python
+Int64 = int
+
+MULTIPLICATION_TABLE = [
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    [1, 2, 3, 4, 0, 6, 7, 8, 9, 5],
+    [2, 3, 4, 0, 1, 7, 8, 9, 5, 6],
+    [3, 4, 0, 1, 2, 8, 9, 5, 6, 7],
+    [4, 0, 1, 2, 3, 9, 5, 6, 7, 8],
+    [5, 9, 8, 7, 6, 0, 4, 3, 2, 1],
+    [6, 5, 9, 8, 7, 1, 0, 4, 3, 2],
+    [7, 6, 5, 9, 8, 2, 1, 0, 4, 3],
+    [8, 7, 6, 5, 9, 3, 2, 1, 0, 4],
+    [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
+]
+
+INV = [0, 4, 3, 2, 1, 5, 6, 7, 8, 9]
+
+PERMUTATION_TABLE = [
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    [1, 5, 7, 6, 2, 8, 3, 0, 9, 4],
+    [5, 8, 0, 3, 7, 9, 6, 1, 4, 2],
+    [8, 9, 1, 6, 0, 4, 3, 5, 2, 7],
+    [9, 4, 5, 3, 1, 2, 6, 8, 7, 0],
+    [4, 2, 8, 6, 5, 7, 3, 9, 0, 1],
+    [2, 7, 9, 3, 8, 0, 6, 4, 1, 5],
+    [7, 0, 4, 6, 9, 1, 3, 2, 5, 8],
+]
+
+def verhoeffchecksum(n, validate=True, terse=True, verbose=False):
+    """
+    Calculate the Verhoeff checksum over `n`.
+    Terse mode or with single argument: return True if valid (last digit is a correct check digit).
+    If checksum mode, return the expected correct checksum digit.
+    If validation mode, return True if last digit checks correctly.
+    """
+    if verbose:
+        print(f"\n{'Validation' if validate else 'Check digit'}",\
+            f"calculations for {n}:\n\n i  ni  p[i,ni] c\n------------------")
+    # transform number list
+    (c, dig) = (0, list(str(n if validate else 10 * n)))
+    for i, ni in enumerate(dig[::-1]):
+        p = PERMUTATION_TABLE[i % 8][int(ni)]
+        c = MULTIPLICATION_TABLE[c][p]
+        if verbose:
+            print(f"{i:2}  {ni}      {p}    {c}")
+
+    if verbose and not validate:
+        print(f"\ninv({c}) = {INV[c]}")
+    if not terse:
+        print(f"\nThe validation for '{n}' is {'correct' if c == 0 else 'incorrect'}."\
+              if validate else f"\nThe check digit for '{n}' is {INV[c]}.")
+    return c == 0 if validate else INV[c]
+
+for n, va, t, ve in [
+    (Int64(236), False, False, True), (Int64(2363), True, False, True), (Int64(2369), True, False, True),
+    (Int64(12345), False, False, True), (Int64(123451), True, False, True), (Int64(123459), True, False, True),
+    (Int64(123456789012), False, False, False), (Int64(1234567890120), True, False, False),
+    (Int64(1234567890129), True, False, False)]:
+    verhoeffchecksum(n, va, t, ve)
+===
+V MULTIPLICATION_TABLE = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 0, 6, 7, 8, 9, 5], [2, 3, 4, 0, 1, 7, 8, 9, 5, 6], [3, 4, 0, 1, 2, 8, 9, 5, 6, 7], [4, 0, 1, 2, 3, 9, 5, 6, 7, 8], [5, 9, 8, 7, 6, 0, 4, 3, 2, 1], [6, 5, 9, 8, 7, 1, 0, 4, 3, 2], [7, 6, 5, 9, 8, 2, 1, 0, 4, 3], [8, 7, 6, 5, 9, 3, 2, 1, 0, 4], [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]]
+
+V INV = [0, 4, 3, 2, 1, 5, 6, 7, 8, 9]
+
+V PERMUTATION_TABLE = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 5, 7, 6, 2, 8, 3, 0, 9, 4], [5, 8, 0, 3, 7, 9, 6, 1, 4, 2], [8, 9, 1, 6, 0, 4, 3, 5, 2, 7], [9, 4, 5, 3, 1, 2, 6, 8, 7, 0], [4, 2, 8, 6, 5, 7, 3, 9, 0, 1], [2, 7, 9, 3, 8, 0, 6, 4, 1, 5], [7, 0, 4, 6, 9, 1, 3, 2, 5, 8]]
+
+F verhoeffchecksum(n, validate = 1B, terse = 1B, verbose = 0B)
+   ‘
+    Calculate the Verhoeff checksum over `n`.
+    Terse mode or with single argument: return True if valid (last digit is a correct check digit).
+    If checksum mode, return the expected correct checksum digit.
+    If validation mode, return True if last digit checks correctly.
+    ’
+   I verbose
+      print(("\n"(I validate {‘Validation’} E ‘Check digit’))‘ ’(‘calculations for ’n":\n\n i  ni  p[i,ni] c\n------------------"))
+   V (c, dig) = (0, Array(String(I validate {n} E 10 * n)))
+   L(ni) reversed(dig)
+      V i = L.index
+      V p = :PERMUTATION_TABLE[i % 8][Int(ni)]
+      c = :MULTIPLICATION_TABLE[c][p]
+      I verbose
+         print(f:‘{i:2}  {ni}      {p}    {c}’)
+
+   I verbose & !validate
+      print("\ninv("c‘) = ’:INV[c])
+   I !terse
+      print(I validate {"\nThe validation for '"n‘' is ’(I c == 0 {‘correct’} E ‘incorrect’)‘.’} E "\nThe check digit for '"n‘' is ’:INV[c]‘.’)
+   R I validate {c == 0} E :INV[c]
+
+L(n, va, t, ve) [(Int64(236), 0B, 0B, 1B), (Int64(2363), 1B, 0B, 1B), (Int64(2369), 1B, 0B, 1B), (Int64(12345), 0B, 0B, 1B), (Int64(123451), 1B, 0B, 1B), (Int64(123459), 1B, 0B, 1B), (Int64(123456789012), 0B, 0B, 0B), (Int64(1234567890120), 1B, 0B, 0B), (Int64(1234567890129), 1B, 0B, 0B)]
+   verhoeffchecksum(n, va, t, ve)
+===
+auto MULTIPLICATION_TABLE = create_array({create_array({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}), create_array({1, 2, 3, 4, 0, 6, 7, 8, 9, 5}), create_array({2, 3, 4, 0, 1, 7, 8, 9, 5, 6}), create_array({3, 4, 0, 1, 2, 8, 9, 5, 6, 7}), create_array({4, 0, 1, 2, 3, 9, 5, 6, 7, 8}), create_array({5, 9, 8, 7, 6, 0, 4, 3, 2, 1}), create_array({6, 5, 9, 8, 7, 1, 0, 4, 3, 2}), create_array({7, 6, 5, 9, 8, 2, 1, 0, 4, 3}), create_array({8, 7, 6, 5, 9, 3, 2, 1, 0, 4}), create_array({9, 8, 7, 6, 5, 4, 3, 2, 1, 0})});
+
+auto INV = create_array({0, 4, 3, 2, 1, 5, 6, 7, 8, 9});
+
+auto PERMUTATION_TABLE = create_array({create_array({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}), create_array({1, 5, 7, 6, 2, 8, 3, 0, 9, 4}), create_array({5, 8, 0, 3, 7, 9, 6, 1, 4, 2}), create_array({8, 9, 1, 6, 0, 4, 3, 5, 2, 7}), create_array({9, 4, 5, 3, 1, 2, 6, 8, 7, 0}), create_array({4, 2, 8, 6, 5, 7, 3, 9, 0, 1}), create_array({2, 7, 9, 3, 8, 0, 6, 4, 1, 5}), create_array({7, 0, 4, 6, 9, 1, 3, 2, 5, 8})});
+
+template <typename T1, typename T2 = decltype(true), typename T3 = decltype(true), typename T4 = decltype(false)> auto verhoeffchecksum(const T1 &n, const T2 &validate = true, const T3 &terse = true, const T4 &verbose = false)
+{
+    uR"(
+    Calculate the Verhoeff checksum over `n`.
+    Terse mode or with single argument: return True if valid (last digit is a correct check digit).
+    If checksum mode, return the expected correct checksum digit.
+    If validation mode, return True if last digit checks correctly.
+    )"_S;
+    if (verbose)
+        print((u"\n"_S & (validate ? u"Validation"_S : u"Check digit"_S)) & u" "_S & (u"calculations for "_S & n & u":\n\n i  ni  p[i,ni] c\n------------------"_S));
+    auto [c, dig] = make_tuple(0, create_array(String(validate ? n : 10 * n)));
+    {int Lindex = 0;
+    for (auto &&ni : reversed(dig)) {
+        auto i = Lindex;
+        auto p = ::PERMUTATION_TABLE[mod(i, 8)][to_int(ni)];
+        c = ::MULTIPLICATION_TABLE[c][p];
+        if (verbose)
+            print(u"#2  #.      #.    #."_S.format(i, ni, p, c));
+        Lindex++;
+    }}
+
+    if (verbose && !validate)
+        print(u"\ninv("_S & c & u") = "_S & ::INV[c]);
+    if (!terse)
+        print(validate ? u"\nThe validation for '"_S & n & u"' is "_S & (c == 0 ? u"correct"_S : u"incorrect"_S) & u"."_S : u"\nThe check digit for '"_S & n & u"' is "_S & ::INV[c] & u"."_S);
+    return validate ? c == 0 : ::INV[c];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[n, va, t, ve] : create_array({make_tuple(to_int64(236), false, false, true), make_tuple(to_int64(2363), true, false, true), make_tuple(to_int64(2369), true, false, true), make_tuple(to_int64(12345), false, false, true), make_tuple(to_int64(123451), true, false, true), make_tuple(to_int64(123459), true, false, true), make_tuple(to_int64(123456789012), false, false, false), make_tuple(to_int64(1234567890120), true, false, false), make_tuple(to_int64(1234567890129), true, false, false)}))
+            verhoeffchecksum(n, va, t, ve);
+    }
+} code_block_1;

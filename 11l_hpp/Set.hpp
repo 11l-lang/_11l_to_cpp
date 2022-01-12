@@ -125,6 +125,15 @@ public:
 		return r;
 	}
 
+	template <typename Func> auto filter(Func &&func) const
+	{
+		Array<KeyType> r;
+		for (auto &&el : *this)
+			if (func(el))
+				r.push_back(el);
+		return r;
+	}
+
 	friend Set operator-(const Set &s1, const Set &s2)
 	{
 		Set result;

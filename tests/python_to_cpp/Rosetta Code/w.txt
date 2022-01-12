@@ -1667,3 +1667,349 @@ struct CodeBlock2
         }
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Wordiff#Python
+import re, collections, random
+
+dict_fname = 'unixdict.txt'
+
+def load_dictionary(fname: str=dict_fname):
+    "Return appropriate words from a dictionary file"
+    return {word for word in open(fname).read().split("\n") if re.fullmatch('[a-z]{3,}', word)}
+
+def get_players():
+    names = input('Space separated list of contestants: ')
+    return [n.capitalize() for n in names.strip(' ').split(' ')]
+
+def is_wordiff_removal(word, prev : str, comment=True):
+    "Is word derived from prev by removing one letter?"
+    ans = word in {prev[:i] + prev[i+1:] for i in range(len(prev))}
+    if not ans:
+        if comment:
+            print('Word is not derived from previous by removal of one letter.')
+    return ans
+
+def counter(s):
+    d = collections.defaultdict(int) # Char
+    for c in s:
+        d[c] += 1
+    return d
+
+def is_wordiff_insertion(word: str, prev: str, comment=True) -> bool:
+    "Is word derived from prev by adding one letter?"
+    diff = counter(word)
+    for c in prev:
+        diff[c] -= 1
+        if diff[c] <= 0: del diff[c]
+    diffcount = sum(diff.values())
+    if diffcount != 1:
+        if comment:
+            print('More than one character insertion difference.')
+        return False
+
+    insert = list(diff.keys())[0]
+    ans =  word in {prev[:i] + insert + prev[i:] for i in range(len(prev) + 1)}
+    if not ans:
+        if comment:
+            print('Word is not derived from previous by insertion of one letter.')
+    return ans
+
+def is_wordiff_change(word: str, prev: str, comment=True) -> bool:
+    "Is word derived from prev by changing exactly one letter?"
+    diffcount = sum(int(w != p) for w, p in zip(word, prev))
+    if diffcount != 1:
+        if comment:
+            print('More or less than exactly one character changed.')
+        return False
+    return True
+
+def is_wordiff(wordiffs, word, dic, comment=True):
+    "Is word a valid wordiff from wordiffs[-1] ?"
+    if word not in dic:
+        if comment:
+            print('That word is not in my dictionary')
+        return False
+    if word in wordiffs:
+        if comment:
+            print('That word was already used.')
+        return False
+    if len(word) < len(wordiffs[-1]):
+        return is_wordiff_removal(word, wordiffs[-1], comment)
+    elif len(word) > len(wordiffs[-1]):
+        return is_wordiff_insertion(word, wordiffs[-1], comment)
+
+    return is_wordiff_change(word, wordiffs[-1], comment)
+
+def could_have_got(wordiffs, dic):
+    return [word for word in (dic - set(wordiffs))
+            if is_wordiff(wordiffs, word, dic, comment=False)]
+
+dic = load_dictionary()
+dic_3_4 = [word for word in dic if len(word) in (3, 4)]
+start = random.choice(dic_3_4)
+wordiffs = [start]
+players = get_players()
+cur_player = 0
+while True:
+    name = players[cur_player]
+    cur_player = (cur_player + 1) % len(players)
+
+    word = input(f"{name}: Input a wordiff from '{wordiffs[-1]}': ").strip(' ')
+    if is_wordiff(wordiffs, word, dic):
+        wordiffs.append(word)
+    else:
+        print(f'YOU HAVE LOST {name}!')
+        print("Could have used:",
+              ', '.join(could_have_got(wordiffs, dic)[:10]), '...')
+        break
+===
+V dict_fname = ‘unixdict.txt’
+
+F load_dictionary(String fname = dict_fname)
+   ‘Return appropriate words from a dictionary file’
+   R Set(File(fname).read().split("\n").filter(word -> re:‘[a-z]{3,}’.match(word)))
+
+F get_players()
+   V names = input(‘Space separated list of contestants: ’)
+   R names.trim(‘ ’).split(‘ ’).map(n -> n.capitalize())
+
+F is_wordiff_removal(word, String prev; comment = 1B)
+   ‘Is word derived from prev by removing one letter?’
+   V ans = word C Set((0 .< prev.len).map(i -> @prev[0 .< i]‘’@prev[i + 1 ..]))
+   I !ans
+      I comment
+         print(‘Word is not derived from previous by removal of one letter.’)
+   R ans
+
+F counter(s)
+   V d = DefaultDict[Char, Int]()
+   L(c) s
+      d[c]++
+   R d
+
+F is_wordiff_insertion(String word, String prev; comment = 1B) -> Bool
+   ‘Is word derived from prev by adding one letter?’
+   V diff = counter(word)
+   L(c) prev
+      I --diff[c] <= 0
+         diff.pop(c)
+   V diffcount = sum(diff.values())
+   I diffcount != 1
+      I comment
+         print(‘More than one character insertion difference.’)
+      R 0B
+
+   V insert = Array(diff.keys())[0]
+   V ans = word C Set((0 .. prev.len).map(i -> @prev[0 .< i]‘’@insert‘’@prev[i ..]))
+   I !ans
+      I comment
+         print(‘Word is not derived from previous by insertion of one letter.’)
+   R ans
+
+F is_wordiff_change(String word, String prev; comment = 1B) -> Bool
+   ‘Is word derived from prev by changing exactly one letter?’
+   V diffcount = sum(zip(word, prev).map((w, p) -> Int(w != p)))
+   I diffcount != 1
+      I comment
+         print(‘More or less than exactly one character changed.’)
+      R 0B
+   R 1B
+
+F is_wordiff(wordiffs, word, dic, comment = 1B)
+   ‘Is word a valid wordiff from wordiffs[-1] ?’
+   I word !C dic
+      I comment
+         print(‘That word is not in my dictionary’)
+      R 0B
+   I word C wordiffs
+      I comment
+         print(‘That word was already used.’)
+      R 0B
+   I word.len < wordiffs.last.len
+      R is_wordiff_removal(word, wordiffs.last, comment)
+   E I word.len > wordiffs.last.len
+      R is_wordiff_insertion(word, wordiffs.last, comment)
+
+   R is_wordiff_change(word, wordiffs.last, comment)
+
+F could_have_got(wordiffs, dic)
+   R (dic - Set(wordiffs)).filter(word -> is_wordiff(@wordiffs, word, @dic, comment' 0B))
+
+V dic = load_dictionary()
+V dic_3_4 = dic.filter(word -> word.len C (3, 4))
+V start = random:choice(dic_3_4)
+V wordiffs = [start]
+V players = get_players()
+V cur_player = 0
+L
+   V name = players[cur_player]
+   cur_player = (cur_player + 1) % players.len
+
+   V word = input(name‘: Input a wordiff from '’wordiffs.last‘': ’).trim(‘ ’)
+   I is_wordiff(wordiffs, word, dic)
+      wordiffs.append(word)
+   E
+      print(‘YOU HAVE LOST ’name‘!’)
+      print(‘Could have used: ’(could_have_got(wordiffs, dic)[0.<10]).join(‘, ’)‘ ...’)
+      L.break
+===
+auto dict_fname = u"unixdict.txt"_S;
+
+auto load_dictionary(const String &fname = dict_fname)
+{
+    u"Return appropriate words from a dictionary file"_S;
+    return create_set(File(fname).read().split(u"\n"_S).filter([](const auto &word){return re::_(u"[a-z]{3,}"_S).match(word);}));
+}
+
+auto get_players()
+{
+    auto names = input(u"Space separated list of contestants: "_S);
+    return names.trim(u" "_S).split(u" "_S).map([](const auto &n){return n.capitalize();});
+}
+
+template <typename T1, typename T3 = decltype(true)> auto is_wordiff_removal(const T1 &word, const String &prev, const T3 &comment = true)
+{
+    u"Is word derived from prev by removing one letter?"_S;
+    auto ans = in(word, create_set(range_el(0, prev.len()).map([&prev](const auto &i){return prev[range_el(0, i)] & prev[range_ei(i + 1)];})));
+    if (!ans) {
+        if (comment)
+            print(u"Word is not derived from previous by removal of one letter."_S);
+    }
+    return ans;
+}
+
+template <typename T1> auto counter(const T1 &s)
+{
+    auto d = DefaultDict<Char, int>();
+    for (auto &&c : s)
+        d[c]++;
+    return d;
+}
+
+template <typename T3 = decltype(true)> bool is_wordiff_insertion(const String &word, const String &prev, const T3 &comment = true)
+{
+    u"Is word derived from prev by adding one letter?"_S;
+    auto diff = counter(word);
+    for (auto &&c : prev)
+        if (--diff[c] <= 0)
+            diff.pop(c);
+    auto diffcount = sum(diff.values());
+    if (diffcount != 1) {
+        if (comment)
+            print(u"More than one character insertion difference."_S);
+        return false;
+    }
+
+    auto insert = _get<0>(create_array(diff.keys()));
+    auto ans = in(word, create_set(range_ee(0, prev.len()).map([&insert, &prev](const auto &i){return prev[range_el(0, i)] & insert & prev[range_ei(i)];})));
+    if (!ans) {
+        if (comment)
+            print(u"Word is not derived from previous by insertion of one letter."_S);
+    }
+    return ans;
+}
+
+template <typename T3 = decltype(true)> bool is_wordiff_change(const String &word, const String &prev, const T3 &comment = true)
+{
+    u"Is word derived from prev by changing exactly one letter?"_S;
+    auto diffcount = sum_map(zip(word, prev), [](const auto &w, const auto &p){return to_int(w != p);});
+    if (diffcount != 1) {
+        if (comment)
+            print(u"More or less than exactly one character changed."_S);
+        return false;
+    }
+    return true;
+}
+
+template <typename T1, typename T2, typename T3, typename T4 = decltype(true)> auto is_wordiff(const T1 &wordiffs, const T2 &word, const T3 &dic, const T4 &comment = true)
+{
+    u"Is word a valid wordiff from wordiffs[-1] ?"_S;
+    if (!in(word, dic)) {
+        if (comment)
+            print(u"That word is not in my dictionary"_S);
+        return false;
+    }
+    if (in(word, wordiffs)) {
+        if (comment)
+            print(u"That word was already used."_S);
+        return false;
+    }
+    if (word.len() < wordiffs.last().len())
+        return is_wordiff_removal(word, wordiffs.last(), comment);
+    else if (word.len() > wordiffs.last().len())
+        return is_wordiff_insertion(word, wordiffs.last(), comment);
+
+    return is_wordiff_change(word, wordiffs.last(), comment);
+}
+
+template <typename T1, typename T2> auto could_have_got(const T1 &wordiffs, const T2 &dic)
+{
+    return (dic - create_set(wordiffs)).filter([&dic, &wordiffs](const auto &word){return is_wordiff(wordiffs, word, dic, false);});
+}
+
+auto dic = load_dictionary();
+auto dic_3_4 = dic.filter([](const auto &word){return in(word.len(), make_tuple(3, 4));});
+auto start = randomns::choice(dic_3_4);
+auto wordiffs = create_array({start});
+auto players = get_players();
+auto cur_player = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            auto name = players[cur_player];
+            cur_player = mod((cur_player + 1), players.len());
+
+            auto word = input(name & u": Input a wordiff from '"_S & wordiffs.last() & u"': "_S).trim(u" "_S);
+            if (is_wordiff(wordiffs, word, dic))
+                wordiffs.append(word);
+            else {
+                print(u"YOU HAVE LOST "_S & name & u"!"_S);
+                print(u"Could have used: "_S & (could_have_got(wordiffs, dic)[range_el(0, 10)]).join(u", "_S) & u" ..."_S);
+                break;
+            }
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Words_from_neighbour_ones#Python
+wordList = open("unixdict.txt").read().split('\n')
+
+filteredWords = [chosenWord for chosenWord in wordList if len(chosenWord)>=9]
+
+for word in filteredWords[:-9]:
+    position = filteredWords.index(word)
+    newWord = "".join([filteredWords[position+i][i] for i in range(0,9)])
+    if newWord in filteredWords:
+        print(newWord)
+===
+V wordList = File(‘unixdict.txt’).read().split("\n")
+
+V filteredWords = wordList.filter(chosenWord -> chosenWord.len >= 9)
+
+L(word) filteredWords[0 .< (len)-9]
+   V position = filteredWords.index(word)
+   V newWord = ((0..8).map(i -> :filteredWords[@position + i][i])).join(‘’)
+   I newWord C filteredWords
+      print(newWord)
+===
+auto wordList = File(u"unixdict.txt"_S).read().split(u"\n"_S);
+
+auto filteredWords = wordList.filter([](const auto &chosenWord){return chosenWord.len() >= 9;});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&word : filteredWords[range_e_llen(0,  - 9)]) {
+            auto position = filteredWords.index(word);
+            auto newWord = (range_ee(0, 8).map([&position](const auto &i){return ::filteredWords[position + i][i];})).join(u""_S);
+            if (in(newWord, filteredWords))
+                print(newWord);
+        }
+    }
+} code_block_1;
