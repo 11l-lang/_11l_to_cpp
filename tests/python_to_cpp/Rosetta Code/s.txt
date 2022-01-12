@@ -10383,3 +10383,737 @@ struct CodeBlock2
         print(u"\nSum of the reciprocals of the first 10 terms: #.17"_S.format(s));
     }
 } code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Safe_and_Sophie_Germain_primes
+import math, itertools
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+cnt = 0
+for n in itertools.count(1):
+    if is_prime(n) and is_prime(2*n + 1):
+        print(n, end = ' ')
+        cnt += 1
+        if cnt == 50:
+            break
+print()
+===
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+V cnt = 0
+L(n) 1..
+   I is_prime(n) & is_prime(2 * n + 1)
+      print(n, end' ‘ ’)
+      cnt++
+      I cnt == 50
+         L.break
+print()
+===
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+auto cnt = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ei(1))
+            if (is_prime(n) && is_prime(2 * n + 1)) {
+                print(n, u" "_S);
+                cnt++;
+                if (cnt == 50)
+                    break;
+            }
+        print();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Sierpinski_arrowhead_curve#Nim
+import math
+
+sqrt3_2 = math.sqrt(3) / 2
+
+def sierpinski_arrowhead_next(points):
+    result = [(0.0, 0.0)] * (3 * (len(points) - 1) + 1)
+    j = 0
+    for i in range(len(points) - 1):
+        (x0, y0) = points[i]
+        (x1, y1) = points[i + 1]
+        dx = x1 - x0
+        result[j] = (x0, y0)
+        if y0 == y1:
+            d = abs(dx * sqrt3_2 / 2)
+            result[j + 1] = (x0 + dx / 4, y0 - d)
+            result[j + 2] = (x1 - dx / 4, y0 - d)
+        elif y1 < y0:
+            result[j + 1] = (x1, y0)
+            result[j + 2] = (x1 + dx / 2, (y0 + y1) / 2)
+        else:
+            result[j + 1] = (x0 - dx / 2, (y0 + y1) / 2)
+            result[j + 2] = (x0, y1)
+        j += 3
+    result[j] = points[-1]
+    return result
+
+size = 600
+iterations = 8
+outfile = open('sierpinski_arrowhead.svg', 'w', newline = "\n")
+
+outfile.write(f"<svg xmlns='http://www.w3.org/2000/svg' width='{size}' height='{size}'>\n")
+outfile.write("<rect width='100%' height='100%' fill='white'/>\n")
+outfile.write("<path stroke-width='1' stroke='black' fill='none' d='")
+margin = 20.0
+side = size - 2 * margin
+x = margin
+y = 0.5 * size + 0.5 * sqrt3_2 * side
+points = [(x, y), (x + side, y)]
+for _ in range(iterations):
+    points = sierpinski_arrowhead_next(points)
+for i, point in enumerate(points):
+    outfile.write('M' if i == 0 else 'L')
+    outfile.write(f"{point[0]},{point[1]}\n")
+outfile.write("'/>\n</svg>\n")
+===
+V sqrt3_2 = sqrt(3) / 2
+
+F sierpinski_arrowhead_next(points)
+   V result = [(0.0, 0.0)] * (3 * (points.len - 1) + 1)
+   V j = 0
+   L(i) 0 .< points.len - 1
+      V (x0, y0) = points[i]
+      V (x1, y1) = points[i + 1]
+      V dx = x1 - x0
+      result[j] = (x0, y0)
+      I y0 == y1
+         V d = abs(dx * :sqrt3_2 / 2)
+         result[j + 1] = (x0 + dx / 4, y0 - d)
+         result[j + 2] = (x1 - dx / 4, y0 - d)
+      E I y1 < y0
+         result[j + 1] = (x1, y0)
+         result[j + 2] = (x1 + dx / 2, (y0 + y1) / 2)
+      E
+         result[j + 1] = (x0 - dx / 2, (y0 + y1) / 2)
+         result[j + 2] = (x0, y1)
+      j += 3
+   result[j] = points.last
+   R result
+
+V size = 600
+V iterations = 8
+V outfile = File(‘sierpinski_arrowhead.svg’, ‘w’)
+
+outfile.write(‘<svg xmlns='http://www.w3.org/2000/svg' width='’size‘' height='’size"'>\n")
+outfile.write("<rect width='100%' height='100%' fill='white'/>\n")
+outfile.write(‘<path stroke-width='1' stroke='black' fill='none' d='’)
+V margin = 20.0
+V side = size - 2 * margin
+V x = margin
+V y = 0.5 * size + 0.5 * sqrt3_2 * side
+V points = [(x, y), (x + side, y)]
+L(_) 0 .< iterations
+   points = sierpinski_arrowhead_next(points)
+L(point) points
+   V i = L.index
+   outfile.write(I i == 0 {‘M’} E ‘L’)
+   outfile.write(point[0]‘,’point[1]"\n")
+outfile.write("'/>\n</svg>\n")
+===
+auto sqrt3_2 = sqrt(3) / 2.0;
+
+template <typename T1> auto sierpinski_arrowhead_next(const T1 &points)
+{
+    auto result = create_array({make_tuple(0.0, 0.0)}) * (3 * (points.len() - 1) + 1);
+    auto j = 0;
+    for (auto i : range_el(0, points.len() - 1)) {
+        auto [x0, _y0_] = points[i];
+        auto [x1, _y1_] = points[i + 1];
+        auto dx = x1 - x0;
+        result.set(j, make_tuple(x0, _y0_));
+        if (_y0_ == _y1_) {
+            auto d = abs(dx * ::sqrt3_2 / 2.0);
+            result.set(j + 1, make_tuple(x0 + dx / 4.0, _y0_ - d));
+            result.set(j + 2, make_tuple(x1 - dx / 4.0, _y0_ - d));
+        }
+        else if (_y1_ < _y0_) {
+            result.set(j + 1, make_tuple(x1, _y0_));
+            result.set(j + 2, make_tuple(x1 + dx / 2.0, (_y0_ + _y1_) / 2.0));
+        }
+        else {
+            result.set(j + 1, make_tuple(x0 - dx / 2.0, (_y0_ + _y1_) / 2.0));
+            result.set(j + 2, make_tuple(x0, _y1_));
+        }
+        j += 3;
+    }
+    result.set(j, points.last());
+    return result;
+}
+
+auto size = 600;
+auto iterations = 8;
+auto outfile = File(u"sierpinski_arrowhead.svg"_S, u"w"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        outfile.write(u"<svg xmlns='http://www.w3.org/2000/svg' width='"_S & size & u"' height='"_S & size & u"'>\n"_S);
+        outfile.write(u"<rect width='100%' height='100%' fill='white'/>\n"_S);
+        outfile.write(u"<path stroke-width='1' stroke='black' fill='none' d='"_S);
+    }
+} code_block_1;
+
+auto margin = 20.0;
+auto side = size - 2 * margin;
+auto x = margin;
+auto y = 0.5 * size + 0.5 * sqrt3_2 * side;
+auto points = create_array({make_tuple(x, y), make_tuple(x + side, y)});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto _ : range_el(0, iterations))
+            points = sierpinski_arrowhead_next(points);
+        {int Lindex = 0;
+        for (auto &&point : points) {
+            auto i = Lindex;
+            outfile.write(i == 0 ? u"M"_S : u"L"_S);
+            outfile.write(_get<0>(point) & u","_S & _get<1>(point) & u"\n"_S);
+            Lindex++;
+        }}
+        outfile.write(u"'/>\n</svg>\n"_S);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Sierpinski_square_curve#C.2B.2B
+import math
+
+def sierpinski_square(fname, size, length, order):
+    x = (size - length) / 2
+    y = float(length)
+    angle = 0.0
+
+    outfile = open(fname, 'w', newline = "\n")
+    outfile.write(f"<svg xmlns='http://www.w3.org/2000/svg' width='{size}' height='{size}'>\n")
+    outfile.write(f"<rect width='100%' height='100%' fill='white'/>\n")
+    outfile.write(f"<path stroke-width='1' stroke='black' fill='none' d='")
+    s = 'F+XF+F+XF'
+    for _ in range(order):
+        s = s.replace('X', 'XF-F+F-XF+F+XF-F+F-X')
+
+    outfile.write(f'M{x},{y}')
+    for c in s:
+        c = c
+        if c == 'F':
+            x += length * math.cos(math.radians(angle))
+            y += length * math.sin(math.radians(angle))
+            outfile.write(f' L{x},{y}')
+        elif c == '+':
+            angle = (angle + 90) % 360
+        elif c == '-':
+            angle = (angle - 90 + 360) % 360
+
+    outfile.write("'/>\n</svg>\n")
+
+sierpinski_square('sierpinski_square.svg', 635, 5, 5)
+===
+F sierpinski_square(fname, size, length, order)
+   V x = (size - length) / 2
+   V y = Float(length)
+   V angle = 0.0
+
+   V outfile = File(fname, ‘w’)
+   outfile.write(‘<svg xmlns='http://www.w3.org/2000/svg' width='’size‘' height='’size"'>\n")
+   outfile.write("<rect width='100%' height='100%' fill='white'/>\n")
+   outfile.write(‘<path stroke-width='1' stroke='black' fill='none' d='’)
+   V s = ‘F+XF+F+XF’
+   L(_) 0 .< order
+      s = s.replace(‘X’, ‘XF-F+F-XF+F+XF-F+F-X’)
+
+   outfile.write(‘M’x‘,’y)
+   L(=c) s
+      S c
+         ‘F’
+            x += length * cos(radians(angle))
+            y += length * sin(radians(angle))
+            outfile.write(‘ L’x‘,’y)
+         ‘+’
+            angle = (angle + 90) % 360
+         ‘-’
+            angle = (angle - 90 + 360) % 360
+
+   outfile.write("'/>\n</svg>\n")
+
+sierpinski_square(‘sierpinski_square.svg’, 635, 5, 5)
+===
+template <typename T1, typename T2, typename T3, typename T4> auto sierpinski_square(const T1 &fname, const T2 &size, const T3 &length, const T4 &order)
+{
+    auto x = (size - length) / 2.0;
+    auto y = to_float(length);
+    auto angle = 0.0;
+
+    auto outfile = File(fname, u"w"_S);
+    outfile.write(u"<svg xmlns='http://www.w3.org/2000/svg' width='"_S & size & u"' height='"_S & size & u"'>\n"_S);
+    outfile.write(u"<rect width='100%' height='100%' fill='white'/>\n"_S);
+    outfile.write(u"<path stroke-width='1' stroke='black' fill='none' d='"_S);
+    auto s = u"F+XF+F+XF"_S;
+    for (auto _ : range_el(0, order))
+        s = s.replace(u"X"_S, u"XF-F+F-XF+F+XF-F+F-X"_S);
+
+    outfile.write(u"M"_S & x & u","_S & y);
+    for (auto c : s)
+        switch (c)
+        {
+        case u'F':
+            x += length * cos(radians(angle));
+            y += length * sin(radians(angle));
+            outfile.write(u" L"_S & x & u","_S & y);
+            break;
+        case u'+':
+            angle = mod((angle + 90), 360);
+            break;
+        case u'-':
+            angle = mod((angle - 90 + 360), 360);
+            break;
+        }
+
+    outfile.write(u"'/>\n</svg>\n"_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        sierpinski_square(u"sierpinski_square.svg"_S, 635, 5, 5);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Smallest_multiple
+# (this solution is based on [https://github.com/nayuki/Project-Euler-solutions/blob/master/python/p005.py?ts=4])
+# Slow BigInt
+import math
+
+def f(n):
+    ans = BigInt(1)
+    for i in range(1, n + 1):
+        ans *= BigInt(i) // math.gcd(BigInt(i), BigInt(ans))
+    return ans
+
+for n in [10, 20, 200, 2000]:
+    print(f'{n}: {f(n)}')
+===
+F f(n)
+   V ans = BigInt(1)
+   L(i) 1 .. n
+      ans *= BigInt(i) I/ gcd(BigInt(i), BigInt(ans))
+   R ans
+
+L(n) [10, 20, 200, 2000]
+   print(n‘: ’f(n))
+===
+template <typename T1> auto f(const T1 &n)
+{
+    auto ans = BigInt(1);
+    for (auto i : range_ee(1, n))
+        ans *= idiv(BigInt(i), gcd(BigInt(i), BigInt(ans)));
+    return ans;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&n : create_array({10, 20, 200, 2000}))
+            print(n & u": "_S & f(n));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Smallest_numbers#Python
+from typing import Dict
+BigInt = int
+
+numLimit = 51
+
+resultSet : Dict[int, int] = {}
+
+base = 1
+
+while len(resultSet) != numLimit:
+    result = str(BigInt(base)**base)
+
+    for i in range(0,numLimit):
+        if str(i) in result and i not in resultSet:
+            resultSet[i] = base
+
+    base+=1
+
+for i in sorted(resultSet.keys()):
+    print(resultSet[i], end=' ')
+===
+V numLimit = 51
+
+[Int = Int] resultSet
+
+V base = 1
+
+L resultSet.len != numLimit
+   V result = String(BigInt(base) ^ base)
+
+   L(i) 0 .< numLimit
+      I String(i) C result & i !C resultSet
+         resultSet[i] = base
+
+   base++
+
+L(i) sorted(resultSet.keys())
+   print(resultSet[i], end' ‘ ’)
+===
+auto numLimit = 51;
+
+Dict<int, int> resultSet;
+
+auto base = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (resultSet.len() != numLimit) {
+            auto result = String(pow(BigInt(base), base));
+
+            for (auto i : range_el(0, numLimit))
+                if (in(String(i), result) && !in(i, resultSet))
+                    resultSet.set(i, base);
+
+            base++;
+        }
+
+        for (auto &&i : sorted(resultSet.keys()))
+            print(resultSet[i], u" "_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Sort_the_letters_of_string_in_alphabetical_order
+import collections
+
+def sorted_str(s):
+    d = collections.defaultdict(int) # Char
+    for c in s:
+        d[c] += 1
+    r = ''
+    for k in sorted(d.keys()):
+        r += k * d[k]
+    return r
+
+print(sorted_str('The quick brown fox jumps over the lazy dog, apparently'))
+print(sorted_str('Is this misspelling of alphabetical as alphabitical a joke ?'))
+===
+F sorted_str(s)
+   V d = DefaultDict[Char, Int]()
+   L(c) s
+      d[c]++
+   V r = ‘’
+   L(k) sorted(d.keys())
+      r ‘’= k * d[k]
+   R r
+
+print(sorted_str(‘The quick brown fox jumps over the lazy dog, apparently’))
+print(sorted_str(‘Is this misspelling of alphabetical as alphabitical a joke ?’))
+===
+template <typename T1> auto sorted_str(const T1 &s)
+{
+    auto d = DefaultDict<Char, int>();
+    for (auto &&c : s)
+        d[c]++;
+    auto r = u""_S;
+    for (auto &&k : sorted(d.keys()))
+        r &= k * d[k];
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sorted_str(u"The quick brown fox jumps over the lazy dog, apparently"_S));
+        print(sorted_str(u"Is this misspelling of alphabetical as alphabitical a joke ?"_S));
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Special_factorials#Nim
+import math
+BigInt = int
+
+def sf(n):
+    result = BigInt(1)
+    for i in range(2, n + 1):
+        result *= math.factorial(i)
+    return result
+
+def hf(n):
+    result = BigInt(1)
+    for i in range(2, n + 1):
+        result *= pow(BigInt(i), i)
+    return result
+
+def af(n):
+    result = BigInt(0)
+    m = ((n & 1) << 1) - 1
+    for i in range(1, n + 1):
+        result += m * math.factorial(i)
+        m = -m
+    return result
+
+def ef(n):
+    result = BigInt(1)
+    for k in range(2, n + 1):
+        result = pow(k, result)
+    return result
+
+def rf(n):
+    if n == 1: return 0
+    result = 1
+    p = 1
+    while p < n:
+        result += 1
+        p *= result
+    if p > n: result = -1
+    return result
+
+sfs = [str(sf(n)) for n in range(10)]
+print(f'First {len(sfs)} superfactorials: {" ".join(sfs)}')
+
+hfs = [str(hf(n)) for n in range(10)]
+print('First', len(hfs), 'hyperfactorials:', ' '.join(hfs))
+
+afs = [str(af(n)) for n in range(10)]
+print('First', len(afs), 'alternating factorials:', ' '.join(afs))
+
+efs = [str(ef(n)) for n in range(5)]
+print('First', len(efs), 'exponential factorials:', ' '.join(efs))
+
+print("\nNumber of digits of ef(5):", len(str(ef(5))))
+
+print("\nReverse factorials:")
+for n in [1, 2, 6, 24, 119, 120, 720, 5040, 40320, 362880, 3628800]:
+    r = rf(n)
+    print(f'{n:7}: {f"{r:2}" if r >= 0 else "undefined"}')
+===
+F sf(n)
+   V result = BigInt(1)
+   L(i) 2 .. n
+      result *= factorial(i)
+   R result
+
+F hf(n)
+   V result = BigInt(1)
+   L(i) 2 .. n
+      result *= pow(BigInt(i), i)
+   R result
+
+F af(n)
+   V result = BigInt(0)
+   V m = ((n [&] 1) << 1) - 1
+   L(i) 1 .. n
+      result += m * factorial(i)
+      m = -m
+   R result
+
+F ef(n)
+   V result = BigInt(1)
+   L(k) 2 .. n
+      result = pow(k, result)
+   R result
+
+F rf(n)
+   I n == 1
+      R 0
+   V result = 1
+   V p = 1
+   L p < n
+      result++
+      p *= result
+   I p > n
+      result = -1
+   R result
+
+V sfs = (0.<10).map(n -> String(sf(n)))
+print(‘First ’sfs.len‘ superfactorials: ’sfs.join(‘ ’))
+
+V hfs = (0.<10).map(n -> String(hf(n)))
+print(‘First ’hfs.len‘ hyperfactorials: ’hfs.join(‘ ’))
+
+V afs = (0.<10).map(n -> String(af(n)))
+print(‘First ’afs.len‘ alternating factorials: ’afs.join(‘ ’))
+
+V efs = (0.<5).map(n -> String(ef(n)))
+print(‘First ’efs.len‘ exponential factorials: ’efs.join(‘ ’))
+
+print("\nNumber of digits of ef(5): "String(ef(5)).len)
+
+print("\nReverse factorials:")
+L(n) [1, 2, 6, 24, 119, 120, 720, 5040, 40320, 362880, 3628800]
+   V r = rf(n)
+   print(f:‘{n:7}: {I r >= 0 {f:‘{r:2}’} E ‘undefined’}’)
+===
+template <typename T1> auto sf(const T1 &n)
+{
+    auto result = BigInt(1);
+    for (auto i : range_ee(2, n))
+        result *= factorial(i);
+    return result;
+}
+
+template <typename T1> auto hf(const T1 &n)
+{
+    auto result = BigInt(1);
+    for (auto i : range_ee(2, n))
+        result *= pow(BigInt(i), i);
+    return result;
+}
+
+template <typename T1> auto af(const T1 &n)
+{
+    auto result = BigInt(0);
+    auto m = ((n & 1) << 1) - 1;
+    for (auto i : range_ee(1, n)) {
+        result += m * factorial(i);
+        m = -m;
+    }
+    return result;
+}
+
+template <typename T1> auto ef(const T1 &n)
+{
+    auto result = BigInt(1);
+    for (auto k : range_ee(2, n))
+        result = pow(k, result);
+    return result;
+}
+
+template <typename T1> auto rf(const T1 &n)
+{
+    if (n == 1)
+        return 0;
+    auto result = 1;
+    auto p = 1;
+    while (p < n) {
+        result++;
+        p *= result;
+    }
+    if (p > n)
+        result = -1;
+    return result;
+}
+
+auto sfs = range_el(0, 10).map([](const auto &n){return String(sf(n));});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"First "_S & sfs.len() & u" superfactorials: "_S & sfs.join(u" "_S));
+    }
+} code_block_1;
+
+auto hfs = range_el(0, 10).map([](const auto &n){return String(hf(n));});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"First "_S & hfs.len() & u" hyperfactorials: "_S & hfs.join(u" "_S));
+    }
+} code_block_2;
+
+auto afs = range_el(0, 10).map([](const auto &n){return String(af(n));});
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print(u"First "_S & afs.len() & u" alternating factorials: "_S & afs.join(u" "_S));
+    }
+} code_block_3;
+
+auto efs = range_el(0, 5).map([](const auto &n){return String(ef(n));});
+
+struct CodeBlock4
+{
+    CodeBlock4()
+    {
+        print(u"First "_S & efs.len() & u" exponential factorials: "_S & efs.join(u" "_S));
+
+        print(u"\nNumber of digits of ef(5): "_S & String(ef(5)).len());
+
+        print(u"\nReverse factorials:"_S);
+        for (auto &&n : create_array({1, 2, 6, 24, 119, 120, 720, 5040, 40320, 362880, 3628800})) {
+            auto r = rf(n);
+            print(u"#7: #."_S.format(n, r >= 0 ? u"#2"_S.format(r) : u"undefined"_S));
+        }
+    }
+} code_block_4;
+
+
+# https://www.rosettacode.org/wiki/Special_pythagorean_triplet
+# (this solution is based on [https://github.com/nayuki/Project-Euler-solutions/blob/master/python/p009.py?ts=4])
+PERIMETER = 1000
+for a in range(1, PERIMETER + 1):
+    for b in range(a + 1, PERIMETER + 1):
+        c = PERIMETER - a - b
+        if a * a + b * b == c * c:
+            # It is now implied that b < c, because we have a > 0
+            print((a, b, c))
+===
+V PERIMETER = 1000
+L(a) 1 .. PERIMETER
+   L(b) a + 1 .. PERIMETER
+      V c = PERIMETER - a - b
+      I a * a + b * b == c * c
+         print((a, b, c))
+===
+auto PERIMETER = 1000;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto a : range_ee(1, PERIMETER))
+            for (auto b : range_ee(a + 1, PERIMETER)) {
+                auto c = PERIMETER - a - b;
+                if (a * a + b * b == c * c)
+                    print(make_tuple(a, b, c));
+            }
+    }
+} code_block_1;
