@@ -807,11 +807,11 @@ struct CodeBlock1
 # https://www.rosettacode.org/wiki/Unique_characters_in_each_string#Python
 LIST = ["1a3c52debeffd", "2b6178c97a938stf", "3ycxdb1fgxa2yz"]
 
-print(sorted([ch for ch in list(set(list([c for c in ''.join(LIST)]))) if all(w.count(ch) == 1 for w in LIST)]))
+print(sorted([ch for ch in set(list([c for c in ''.join(LIST)])) if all(w.count(ch) == 1 for w in LIST)]))
 ===
 V LIST = [‘1a3c52debeffd’, ‘2b6178c97a938stf’, ‘3ycxdb1fgxa2yz’]
 
-print(sorted(Array(Set(Array(LIST.join(‘’)))).filter(ch -> all(:LIST.map(w -> w.count(@ch) == 1)))))
+print(sorted(Set(Array(LIST.join(‘’))).filter(ch -> all(:LIST.map(w -> w.count(@ch) == 1)))))
 ===
 auto LIST = create_array({u"1a3c52debeffd"_S, u"2b6178c97a938stf"_S, u"3ycxdb1fgxa2yz"_S});
 
@@ -819,7 +819,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(sorted(create_array(create_set(create_array(LIST.join(u""_S)))).filter([](const auto &ch){return all_map(::LIST, [&ch](const auto &w){return w.count(ch) == 1;});})));
+        print(sorted(create_set(create_array(LIST.join(u""_S))).filter([](const auto &ch){return all_map(::LIST, [&ch](const auto &w){return w.count(ch) == 1;});})));
     }
 } code_block_1;
 

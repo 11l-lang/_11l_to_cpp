@@ -3458,6 +3458,7 @@ set_scope.add_name('remove', ASTFunctionDefinition([('elem', '', '')]))
 set_scope.add_name('discard', ASTFunctionDefinition([('elem', '', '')]))
 set_scope.add_name('clear', ASTFunctionDefinition([]))
 set_scope.add_name('map', ASTFunctionDefinition([('f', '', '')]))
+set_scope.add_name('filter', ASTFunctionDefinition([('f', '', '')]))
 builtins_scope.ids['Set'].ast_nodes[0].scope = set_scope
 deque_scope = Scope(None)
 deque_scope.add_name('append', ASTFunctionDefinition([('x', '', '')]))
