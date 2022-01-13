@@ -1,0 +1,104 @@
+# https://www.rosettacode.org/wiki/Quadrat_Special_Primes#Nim
+import math
+
+def is_prime(n):
+    if n == 2: return True
+    if n < 2 or n % 2 == 0: return False
+    for i in range(3, int(math.sqrt(n)) + 1, 2):
+        if n % i == 0:
+            return False
+    return True
+
+Max = 16_000
+quadraPrimes = [2, 3]
+n = 3
+br = False
+while not br:
+    for i in range(2, int(math.sqrt(Max)) + 1, 2):
+        next = n + i * i
+        if next >= Max:
+            br = True
+            break
+        if is_prime(next):
+            n = next
+            quadraPrimes += [n]
+            break
+
+print('Quadrat special primes < 16000:')
+for i, qp in enumerate(quadraPrimes):
+    print('%5d' % qp, end = "\n" if (i + 1) % 7 == 0 else ' ')
+===
+F is_prime(n)
+   I n == 2
+      R 1B
+   I n < 2 | n % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(n))).step(2)
+      I n % i == 0
+         R 0B
+   R 1B
+
+V Max = 16'000
+V quadraPrimes = [2, 3]
+V n = 3
+V br = 0B
+L !br
+   L(i) (2 .. Int(sqrt(Max))).step(2)
+      V next = n + i * i
+      I next >= Max
+         br = 1B
+         L.break
+      I is_prime(next)
+         n = next
+         quadraPrimes [+]= n
+         L.break
+
+print(‘Quadrat special primes < 16000:’)
+L(qp) quadraPrimes
+   V i = L.index
+   print(‘#5’.format(qp), end' I (i + 1) % 7 == 0 {"\n"} E ‘ ’)
+===
+template <typename T1> auto is_prime(const T1 &n)
+{
+    if (n == 2)
+        return true;
+    if (n < 2 || mod(n, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(n))).step(2))
+        if (mod(n, i) == 0)
+            return false;
+    return true;
+}
+
+auto Max = 16'000;
+auto quadraPrimes = create_array({2, 3});
+auto n = 3;
+auto br = false;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (!br)
+            for (auto i : range_ee(2, to_int(sqrt(Max))).step(2)) {
+                auto next = n + i * i;
+                if (next >= Max) {
+                    br = true;
+                    break;
+                }
+                if (is_prime(next)) {
+                    n = next;
+                    quadraPrimes.append(n);
+                    break;
+                }
+            }
+
+        print(u"Quadrat special primes < 16000:"_S);
+        {int Lindex = 0;
+        for (auto &&qp : quadraPrimes) {
+            auto i = Lindex;
+            print(u"#5"_S.format(qp), mod((i + 1), 7) == 0 ? u"\n"_S : u" "_S);
+            Lindex++;
+        }}
+    }
+} code_block_1;

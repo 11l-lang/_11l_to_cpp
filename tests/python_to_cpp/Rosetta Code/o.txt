@@ -1205,3 +1205,99 @@ struct CodeBlock1
             print(n);
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Odd_squarefree_semiprimes#C.2B.2B
+def odd_square_free_semiprime(n):
+    if n % 2 == 0:
+        return False
+    count = 0
+    i = 3
+    while i * i <= n:
+        while n % i == 0:
+            count += 1
+            if count > 1:
+                return False
+            n //= i
+        i += 2
+    return count == 1
+
+print('Odd square-free semiprimes < 1000:')
+count = 0
+for i in range(1, 1000, 2):
+    if odd_square_free_semiprime(i):
+        print('%4d' % i, end = '')
+        count += 1
+        if count % 20 == 0:
+            print()
+
+print("\nCount:", count)
+===
+F odd_square_free_semiprime(=n)
+   I n % 2 == 0
+      R 0B
+   V count = 0
+   V i = 3
+   L i * i <= n
+      L n % i == 0
+         count++
+         I count > 1
+            R 0B
+         n I/= i
+      i += 2
+   R count == 1
+
+print(‘Odd square-free semiprimes < 1000:’)
+V count = 0
+L(i) (1.<1000).step(2)
+   I odd_square_free_semiprime(i)
+      print(‘#4’.format(i), end' ‘’)
+      count++
+      I count % 20 == 0
+         print()
+
+print("\nCount: "count)
+===
+template <typename T1> auto odd_square_free_semiprime(T1 n)
+{
+    if (mod(n, 2) == 0)
+        return false;
+    auto count = 0;
+    auto i = 3;
+    while (i * i <= n) {
+        while (mod(n, i) == 0) {
+            count++;
+            if (count > 1)
+                return false;
+            n = idiv(n, i);
+        }
+        i += 2;
+    }
+    return count == 1;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Odd square-free semiprimes < 1000:"_S);
+    }
+} code_block_1;
+
+auto count = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto i : range_el(1, 1000).step(2))
+            if (odd_square_free_semiprime(i)) {
+                print(u"#4"_S.format(i), u""_S);
+                count++;
+                if (mod(count, 20) == 0)
+                    print();
+            }
+
+        print(u"\nCount: "_S & count);
+    }
+} code_block_2;

@@ -11117,3 +11117,274 @@ struct CodeBlock1
             }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Special_neighbor_primes#Nim
+import math
+
+def is_prime(n):
+    if n == 2: return True
+    if n < 2 or n % 2 == 0: return False
+    for i in range(3, int(math.sqrt(n)) + 1, 2):
+        if n % i == 0:
+            return False
+    return True
+
+primes = [n for n in range(100) if is_prime(n)]
+
+for i in range(len(primes) - 1):
+    p1 = primes[i]
+    p2 = primes[i + 1]
+    if is_prime(p1 + p2 - 1):
+        print((p1, p2))
+===
+F is_prime(n)
+   I n == 2
+      R 1B
+   I n < 2 | n % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(n))).step(2)
+      I n % i == 0
+         R 0B
+   R 1B
+
+V primes = (0.<100).filter(n -> is_prime(n))
+
+L(i) 0 .< primes.len - 1
+   V p1 = primes[i]
+   V p2 = primes[i + 1]
+   I is_prime(p1 + p2 - 1)
+      print((p1, p2))
+===
+template <typename T1> auto is_prime(const T1 &n)
+{
+    if (n == 2)
+        return true;
+    if (n < 2 || mod(n, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(n))).step(2))
+        if (mod(n, i) == 0)
+            return false;
+    return true;
+}
+
+auto primes = range_el(0, 100).filter([](const auto &n){return is_prime(n);});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(0, primes.len() - 1)) {
+            auto p1 = primes[i];
+            auto p2 = primes[i + 1];
+            if (is_prime(p1 + p2 - 1))
+                print(make_tuple(p1, p2));
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Substring_primes#Go
+import math
+from typing import List
+
+def is_prime(n):
+    if n == 2: return True
+    if n < 2 or n % 2 == 0: return False
+    for i in range(3, int(math.sqrt(n)) + 1, 2):
+        if n % i == 0:
+            return False
+    return True
+
+results = [2, 3, 5, 7]
+odigits = [3, 7]
+discarded : List[int] = []
+tests = 4
+
+i = 0
+while i < len(results):
+    r = results[i]
+    i += 1
+    for od in odigits:
+        if (r % 10) != od:
+            n = r * 10 + od
+            if is_prime(n):
+                results.append(n)
+            else:
+                discarded.append(n)
+            tests += 1
+
+print('There are', len(results), 'primes where all substrings are also primes, namely:')
+print(results)
+print("\nThe following numbers were also tested for primality but found to be composite:")
+print(discarded)
+print("\nTotal number of primality tests =", tests)
+===
+F is_prime(n)
+   I n == 2
+      R 1B
+   I n < 2 | n % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(n))).step(2)
+      I n % i == 0
+         R 0B
+   R 1B
+
+V results = [2, 3, 5, 7]
+V odigits = [3, 7]
+[Int] discarded
+V tests = 4
+
+V i = 0
+L i < results.len
+   V r = results[i]
+   i++
+   L(od) odigits
+      I (r % 10) != od
+         V n = r * 10 + od
+         I is_prime(n)
+            results.append(n)
+         E
+            discarded.append(n)
+         tests++
+
+print(‘There are ’results.len‘ primes where all substrings are also primes, namely:’)
+print(results)
+print("\nThe following numbers were also tested for primality but found to be composite:")
+print(discarded)
+print("\nTotal number of primality tests = "tests)
+===
+template <typename T1> auto is_prime(const T1 &n)
+{
+    if (n == 2)
+        return true;
+    if (n < 2 || mod(n, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(n))).step(2))
+        if (mod(n, i) == 0)
+            return false;
+    return true;
+}
+
+auto results = create_array({2, 3, 5, 7});
+auto odigits = create_array({3, 7});
+Array<int> discarded;
+auto tests = 4;
+
+auto i = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (i < results.len()) {
+            auto r = results[i];
+            i++;
+            for (auto &&od : odigits)
+                if ((mod(r, 10)) != od) {
+                    auto n = r * 10 + od;
+                    if (is_prime(n))
+                        results.append(n);
+                    else
+                        discarded.append(n);
+                    tests++;
+                }
+        }
+
+        print(u"There are "_S & results.len() & u" primes where all substrings are also primes, namely:"_S);
+        print(results);
+        print(u"\nThe following numbers were also tested for primality but found to be composite:"_S);
+        print(discarded);
+        print(u"\nTotal number of primality tests = "_S & tests);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Sum_of_primes_in_odd_positions_is_prime#Nim
+import math
+
+def is_prime(n):
+    if n == 2: return True
+    if n < 2 or n % 2 == 0: return False
+    for i in range(3, int(math.sqrt(n)) + 1, 2):
+        if n % i == 0:
+            return False
+    return True
+
+print('  i  p(i)   sum')
+idx = 0
+s = 0
+p = 1
+while p < 1000:
+    p += 1
+    if is_prime(p):
+        idx += 1
+        if idx % 2 != 0:
+            s += p
+            if is_prime(s):
+                print(f'{idx:3}  {p:3}  {s:5}')
+===
+F is_prime(n)
+   I n == 2
+      R 1B
+   I n < 2 | n % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(n))).step(2)
+      I n % i == 0
+         R 0B
+   R 1B
+
+print(‘  i  p(i)   sum’)
+V idx = 0
+V s = 0
+V p = 1
+L p < 1000
+   p++
+   I is_prime(p)
+      idx++
+      I idx % 2 != 0
+         s += p
+         I is_prime(s)
+            print(f:‘{idx:3}  {p:3}  {s:5}’)
+===
+template <typename T1> auto is_prime(const T1 &n)
+{
+    if (n == 2)
+        return true;
+    if (n < 2 || mod(n, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(n))).step(2))
+        if (mod(n, i) == 0)
+            return false;
+    return true;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"  i  p(i)   sum"_S);
+    }
+} code_block_1;
+
+auto idx = 0;
+auto s = 0;
+auto p = 1;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (p < 1000) {
+            p++;
+            if (is_prime(p)) {
+                idx++;
+                if (mod(idx, 2) != 0) {
+                    s += p;
+                    if (is_prime(s))
+                        print(u"#3  #3  #5"_S.format(idx, p, s));
+                }
+            }
+        }
+    }
+} code_block_2;

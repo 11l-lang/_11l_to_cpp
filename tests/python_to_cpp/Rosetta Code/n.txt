@@ -2944,3 +2944,310 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Next_special_primes#FreeBASIC
+import math
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+p = 3
+i = 2
+print('2 3', end = ' ') # special case
+
+while p + i < 1050:
+    if is_prime(p + i):
+        p += i
+        print(p, end = ' ')
+    i += 2
+===
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+V p = 3
+V i = 2
+print(‘2 3’, end' ‘ ’)
+
+L p + i < 1050
+   I is_prime(p + i)
+      p += i
+      print(p, end' ‘ ’)
+   i += 2
+===
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+auto p = 3;
+auto i = 2;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"2 3"_S, u" "_S);
+
+        while (p + i < 1050) {
+            if (is_prime(p + i)) {
+                p += i;
+                print(p, u" "_S);
+            }
+            i += 2;
+        }
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Nice_primes#C.2B.2B
+import math
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+def digital_root(n):
+    return 1 + (n - 1) % 9
+
+for n in range(501, 1000):
+    if is_prime(digital_root(n)) and is_prime(n):
+        print(n, end = ' ')
+===
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+F digital_root(n)
+   R 1 + (n - 1) % 9
+
+L(n) 501..999
+   I is_prime(digital_root(n)) & is_prime(n)
+      print(n, end' ‘ ’)
+===
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+template <typename T1> auto digital_root(const T1 &n)
+{
+    return 1 + mod((n - 1), 9);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(501, 999))
+            if (is_prime(digital_root(n)) && is_prime(n))
+                print(n, u" "_S);
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Numbers_whose_count_of_divisors_is_prime#FreeBASIC
+import math
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+print('Numbers which count of divisors is prime are:')
+row = 0
+
+for n in range(1, 100000):
+    num = 0
+    for m in range(1, n + 1):
+        if n % m == 0:
+            num += 1
+    if is_prime(num) and num != 2:
+        print('%6d' % n, end = ' ')
+        row += 1
+        if row % 5 == 0:
+            print()
+
+print("\n\nFound", row, 'numbers')
+===
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+print(‘Numbers which count of divisors is prime are:’)
+V row = 0
+
+L(n) 1..99999
+   V num = 0
+   L(m) 1 .. n
+      I n % m == 0
+         num++
+   I is_prime(num) & num != 2
+      print(‘#6’.format(n), end' ‘ ’)
+      row++
+      I row % 5 == 0
+         print()
+
+print("\n\nFound "row‘ numbers’)
+===
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Numbers which count of divisors is prime are:"_S);
+    }
+} code_block_1;
+
+auto row = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto n : range_ee(1, 99999)) {
+            auto num = 0;
+            for (auto m : range_ee(1, n))
+                if (mod(n, m) == 0)
+                    num++;
+            if (is_prime(num) && num != 2) {
+                print(u"#6"_S.format(n), u" "_S);
+                row++;
+                if (mod(row, 5) == 0)
+                    print();
+            }
+        }
+
+        print(u"\n\nFound "_S & row & u" numbers"_S);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Numbers_with_prime_digits_whose_sum_is_13#C
+def primeDigitsSum13(n):
+    sum = 0
+    while n > 0:
+        r = n % 10
+        if r not in (2, 3, 5, 7):
+            return False
+        n //= 10
+        sum += r
+    return sum == 13
+
+c = 0
+for i in range(1, 1_000_000):
+    if primeDigitsSum13(i):
+        print('%6d' % i, end = ' ')
+        c += 1
+        if c == 11:
+            c = 0
+            print()
+print()
+===
+F primeDigitsSum13(=n)
+   V sum = 0
+   L n > 0
+      V r = n % 10
+      I r !C (2, 3, 5, 7)
+         R 0B
+      n I/= 10
+      sum += r
+   R sum == 13
+
+V c = 0
+L(i) 1..999999
+   I primeDigitsSum13(i)
+      print(‘#6’.format(i), end' ‘ ’)
+      c++
+      I c == 11
+         c = 0
+         print()
+print()
+===
+template <typename T1> auto primeDigitsSum13(T1 n)
+{
+    auto sum = 0;
+    while (n > 0) {
+        auto r = mod(n, 10);
+        if (!in(r, make_tuple(2, 3, 5, 7)))
+            return false;
+        n = idiv(n, 10);
+        sum += r;
+    }
+    return sum == 13;
+}
+
+auto c = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(1, 999999))
+            if (primeDigitsSum13(i)) {
+                print(u"#6"_S.format(i), u" "_S);
+                c++;
+                if (c == 11) {
+                    c = 0;
+                    print();
+                }
+            }
+        print();
+    }
+} code_block_1;

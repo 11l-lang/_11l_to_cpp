@@ -2564,3 +2564,55 @@ struct CodeBlock1
         }}
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Find_prime_n_such_that_reversed_n_is_also_prime
+import math
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+for n in range(1, 500):
+    if is_prime(n) and is_prime(int(str(n)[::-1])):
+        print(n, end = ' ')
+===
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+L(n) 1..499
+   I is_prime(n) & is_prime(Int(reversed(String(n))))
+      print(n, end' ‘ ’)
+===
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(1, 499))
+            if (is_prime(n) && is_prime(to_int(reversed(String(n)))))
+                print(n, u" "_S);
+    }
+} code_block_1;

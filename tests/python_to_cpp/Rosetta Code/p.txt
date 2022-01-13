@@ -6421,3 +6421,434 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Palindromic_primes_in_base_16
+from _11l import *
+import math
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+for n in range(500):
+    h = hexu(n)
+    if h == h[::-1] and is_prime(n):
+        print(h, end = ' ')
+print()
+===
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+L(n) 500
+   V h = hex(n)
+   I h == reversed(h) & is_prime(n)
+      print(h, end' ‘ ’)
+print()
+===
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int n = 0; n < 500; n++) {
+            auto h = hex(n);
+            if (h == reversed(h) && is_prime(n))
+                print(h, u" "_S);
+        }
+        print();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Piprimes#Nim
+import math
+
+def is_prime(n):
+    if n == 2: return True
+    if n < 2 or n % 2 == 0: return False
+    for i in range(3, int(math.sqrt(n)) + 1, 2):
+        if n % i == 0:
+            return False
+    return True
+
+pi = 0
+n = 1
+while True:
+    print('%2d' % pi, end = "\n" if n % 10 == 0 else ' ')
+    n += 1
+    if is_prime(n):
+        pi += 1
+        if pi == 22: break
+print()
+===
+F is_prime(n)
+   I n == 2
+      R 1B
+   I n < 2 | n % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(n))).step(2)
+      I n % i == 0
+         R 0B
+   R 1B
+
+V pi = 0
+V n = 1
+L
+   print(‘#2’.format(pi), end' I n % 10 == 0 {"\n"} E ‘ ’)
+   n++
+   I is_prime(n)
+      pi++
+      I pi == 22
+         L.break
+print()
+===
+template <typename T1> auto is_prime(const T1 &n)
+{
+    if (n == 2)
+        return true;
+    if (n < 2 || mod(n, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(n))).step(2))
+        if (mod(n, i) == 0)
+            return false;
+    return true;
+}
+
+auto pi = 0;
+auto n = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            print(u"#2"_S.format(pi), mod(n, 10) == 0 ? u"\n"_S : u" "_S);
+            n++;
+            if (is_prime(n)) {
+                pi++;
+                if (pi == 22)
+                    break;
+            }
+        }
+        print();
+    }
+} code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Prime_triplets#Nim
+import math
+
+def is_prime(n):
+    if n == 2: return True
+    if n < 2 or n % 2 == 0: return False
+    for i in range(3, int(math.sqrt(n)) + 1, 2):
+        if n % i == 0:
+            return False
+    return True
+
+print('   p  p+2  p+6')
+count = 0
+for n in range(3, 5500, 2):
+    if is_prime(n) and is_prime(n + 2) and is_prime(n + 6):
+        print(f'{n:4} {n+2:4} {n+6:4}')
+        count += 1
+
+print(f"\nFound {count} primes triplets for p < 5500.")
+===
+F is_prime(n)
+   I n == 2
+      R 1B
+   I n < 2 | n % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(n))).step(2)
+      I n % i == 0
+         R 0B
+   R 1B
+
+print(‘   p  p+2  p+6’)
+V count = 0
+L(n) (3.<5500).step(2)
+   I is_prime(n) & is_prime(n + 2) & is_prime(n + 6)
+      print(f:‘{n:4} {n + 2:4} {n + 6:4}’)
+      count++
+
+print("\nFound "count‘ primes triplets for p < 5500.’)
+===
+template <typename T1> auto is_prime(const T1 &n)
+{
+    if (n == 2)
+        return true;
+    if (n < 2 || mod(n, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(n))).step(2))
+        if (mod(n, i) == 0)
+            return false;
+    return true;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"   p  p+2  p+6"_S);
+    }
+} code_block_1;
+
+auto count = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto n : range_el(3, 5500).step(2))
+            if (is_prime(n) && is_prime(n + 2) && is_prime(n + 6)) {
+                print(u"#4 #4 #4"_S.format(n, n + 2, n + 6));
+                count++;
+            }
+
+        print(u"\nFound "_S & count & u" primes triplets for p < 5500."_S);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Primes_which_contain_only_one_odd_digit#Nim
+import math
+
+def is_prime(n):
+    if n == 2: return True
+    if n < 2 or n % 2 == 0: return False
+    for i in range(3, int(math.sqrt(n)) + 1, 2):
+        if n % i == 0:
+            return False
+    return True
+
+def hasLastDigitOdd(n):
+    n //= 10
+    while n != 0:
+        if ((n % 10) & 1) != 0: return False
+        n //= 10
+    return True
+
+l = [n for n in range(1, 1000, 2) if hasLastDigitOdd(n) and is_prime(n)]
+print('Found', len(l), 'primes with only one odd digit below 1000:')
+for i, n in enumerate(l):
+    print('%3d' % n, end = "\n" if (i + 1) % 9 == 0 else ' ')
+
+count = 0
+for n in range(1, 1_000_000, 2):
+    if hasLastDigitOdd(n) and is_prime(n):
+        count += 1
+print("\nFound", count, 'primes with only one odd digit below 1000000.')
+===
+F is_prime(n)
+   I n == 2
+      R 1B
+   I n < 2 | n % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(n))).step(2)
+      I n % i == 0
+         R 0B
+   R 1B
+
+F hasLastDigitOdd(=n)
+   n I/= 10
+   L n != 0
+      I ((n % 10) [&] 1) != 0
+         R 0B
+      n I/= 10
+   R 1B
+
+V l = (1.<1000).step(2).filter(n -> hasLastDigitOdd(n) & is_prime(n))
+print(‘Found ’l.len‘ primes with only one odd digit below 1000:’)
+L(n) l
+   V i = L.index
+   print(‘#3’.format(n), end' I (i + 1) % 9 == 0 {"\n"} E ‘ ’)
+
+V count = 0
+L(n) (1.<1'000'000).step(2)
+   I hasLastDigitOdd(n) & is_prime(n)
+      count++
+print("\nFound "count‘ primes with only one odd digit below 1000000.’)
+===
+template <typename T1> auto is_prime(const T1 &n)
+{
+    if (n == 2)
+        return true;
+    if (n < 2 || mod(n, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(n))).step(2))
+        if (mod(n, i) == 0)
+            return false;
+    return true;
+}
+
+template <typename T1> auto hasLastDigitOdd(T1 n)
+{
+    n = idiv(n, 10);
+    while (n != 0) {
+        if (((mod(n, 10)) & 1) != 0)
+            return false;
+        n = idiv(n, 10);
+    }
+    return true;
+}
+
+auto l = range_el(1, 1000).step(2).filter([](const auto &n){return hasLastDigitOdd(n) && is_prime(n);});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Found "_S & l.len() & u" primes with only one odd digit below 1000:"_S);
+        {int Lindex = 0;
+        for (auto &&n : l) {
+            auto i = Lindex;
+            print(u"#3"_S.format(n), mod((i + 1), 9) == 0 ? u"\n"_S : u" "_S);
+            Lindex++;
+        }}
+    }
+} code_block_1;
+
+auto count = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto n : range_el(1, 1'000'000).step(2))
+            if (hasLastDigitOdd(n) && is_prime(n))
+                count++;
+        print(u"\nFound "_S & count & u" primes with only one odd digit below 1000000."_S);
+    }
+} code_block_2;
+
+
+# https://www.rosettacode.org/wiki/Primes_whose_first_and_last_number_is_3#Nim
+import math
+
+def is_prime(n):
+    if n == 2: return True
+    if n < 2 or n % 2 == 0: return False
+    for i in range(3, int(math.sqrt(n)) + 1, 2):
+        if n % i == 0:
+            return False
+    return True
+
+lim = 1_000_000
+primes3x3 = [3]
+m = 100
+count = 1
+while m * 3 < lim:
+    for n in range(3 * m + 3, 4 * m - 6, 10):
+        if n > lim: break
+        if is_prime(n):
+            count += 1
+            if n < 4000:
+                primes3x3.append(n)
+    m *= 10
+
+print('Found', len(primes3x3), 'primes starting and ending with 3 below 4000:')
+for i, n in enumerate(primes3x3):
+    print('%4d' % n, end = "\n" if (i + 1) % 11 == 0 else ' ')
+
+print("\nFound", count, 'primes starting and ending with 3 below 1000000.')
+===
+F is_prime(n)
+   I n == 2
+      R 1B
+   I n < 2 | n % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(n))).step(2)
+      I n % i == 0
+         R 0B
+   R 1B
+
+V lim = 1'000'000
+V primes3x3 = [3]
+V m = 100
+V count = 1
+L m * 3 < lim
+   L(n) (3 * m + 3 .< 4 * m - 6).step(10)
+      I n > lim
+         L.break
+      I is_prime(n)
+         count++
+         I n < 4000
+            primes3x3.append(n)
+   m *= 10
+
+print(‘Found ’primes3x3.len‘ primes starting and ending with 3 below 4000:’)
+L(n) primes3x3
+   V i = L.index
+   print(‘#4’.format(n), end' I (i + 1) % 11 == 0 {"\n"} E ‘ ’)
+
+print("\nFound "count‘ primes starting and ending with 3 below 1000000.’)
+===
+template <typename T1> auto is_prime(const T1 &n)
+{
+    if (n == 2)
+        return true;
+    if (n < 2 || mod(n, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(n))).step(2))
+        if (mod(n, i) == 0)
+            return false;
+    return true;
+}
+
+auto lim = 1'000'000;
+auto primes3x3 = create_array({3});
+auto m = 100;
+auto count = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (m * 3 < lim) {
+            for (auto n : range_el(3 * m + 3, 4 * m - 6).step(10)) {
+                if (n > lim)
+                    break;
+                if (is_prime(n)) {
+                    count++;
+                    if (n < 4000)
+                        primes3x3.append(n);
+                }
+            }
+            m *= 10;
+        }
+
+        print(u"Found "_S & primes3x3.len() & u" primes starting and ending with 3 below 4000:"_S);
+        {int Lindex = 0;
+        for (auto &&n : primes3x3) {
+            auto i = Lindex;
+            print(u"#4"_S.format(n), mod((i + 1), 11) == 0 ? u"\n"_S : u" "_S);
+            Lindex++;
+        }}
+
+        print(u"\nFound "_S & count & u" primes starting and ending with 3 below 1000000."_S);
+    }
+} code_block_1;

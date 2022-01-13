@@ -2484,3 +2484,175 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://www.rosettacode.org/wiki/Erd%C5%91s-primes#Nim
+import itertools, math
+from typing import List
+
+def primes_upto(limit):
+    is_prime = [False] * 2 + [True] * (limit - 1)
+    for n in range(int(limit**0.5 + 1.5)): # stop at ``sqrt(limit)``
+        if is_prime[n]:
+            for i in range(n*n, limit+1, n):
+                is_prime[i] = False
+    return is_prime
+
+is_prime = primes_upto(1_000_000)
+primeList = [i for i, prime in enumerate(is_prime) if prime]
+
+factorials : List[int] = []
+for n in itertools.count(1):
+    if math.factorial(n) >= 1_000_000:
+        break
+    factorials.append(math.factorial(n))
+
+def isErdosPrime(p):
+    for f in factorials:
+        if f >= p: break
+        if is_prime[p - f]: return False
+    return True
+
+erdosList2500 : List[int] = []
+for p in primeList:
+    if p >= 2500: break
+    if isErdosPrime(p):
+        erdosList2500.append(p)
+
+print('Found', len(erdosList2500), 'Erdos primes less than 2500:')
+for i, prime in enumerate(erdosList2500):
+    print('%5d' % prime, end = "\n" if (i+1) % 10 == 0 else ' ')
+print()
+
+count = 0
+for p in primeList:
+    if isErdosPrime(p):
+        count += 1
+        if count == 7875:
+            print(f"\nThe 7875th Erdos prime is {p}.")
+            break
+===
+F primes_upto(limit)
+   V is_prime = [0B] * 2 [+] [1B] * (limit - 1)
+   L(n) 0 .< Int(limit ^ 0.5 + 1.5)
+      I is_prime[n]
+         L(i) (n * n .. limit).step(n)
+            is_prime[i] = 0B
+   R is_prime
+
+V is_prime = primes_upto(1'000'000)
+V primeList = enumerate(is_prime).filter((i, prime) -> prime).map((i, prime) -> i)
+
+[Int] factorials
+L(n) 1..
+   I factorial(n) >= 1'000'000
+      L.break
+   factorials.append(factorial(n))
+
+F isErdosPrime(p)
+   L(f) :factorials
+      I f >= p
+         L.break
+      I :is_prime[p - f]
+         R 0B
+   R 1B
+
+[Int] erdosList2500
+L(p) primeList
+   I p >= 2500
+      L.break
+   I isErdosPrime(p)
+      erdosList2500.append(p)
+
+print(‘Found ’erdosList2500.len‘ Erdos primes less than 2500:’)
+L(prime) erdosList2500
+   V i = L.index
+   print(‘#5’.format(prime), end' I (i + 1) % 10 == 0 {"\n"} E ‘ ’)
+print()
+
+V count = 0
+L(p) primeList
+   I isErdosPrime(p)
+      count++
+      I count == 7875
+         print("\nThe 7875th Erdos prime is "p‘.’)
+         L.break
+===
+template <typename T1> auto primes_upto(const T1 &limit)
+{
+    auto is_prime = create_array({false}) * 2 + create_array({true}) * (limit - 1);
+    for (auto n : range_el(0, to_int(pow(limit, 0.5) + 1.5)))
+        if (is_prime[n])
+            for (auto i : range_ee(n * n, limit).step(n))
+                is_prime.set(i, false);
+    return is_prime;
+}
+
+auto is_prime = primes_upto(1'000'000);
+auto primeList = enumerate(is_prime).filter([](const auto &i, const auto &prime){return prime;}).map([](const auto &i, const auto &prime){return i;});
+
+Array<int> factorials;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ei(1)) {
+            if (factorial(n) >= 1'000'000)
+                break;
+            factorials.append(factorial(n));
+        }
+    }
+} code_block_1;
+
+template <typename T1> auto isErdosPrime(const T1 &p)
+{
+    for (auto &&f : ::factorials) {
+        if (f >= p)
+            break;
+        if (::is_prime[p - f])
+            return false;
+    }
+    return true;
+}
+
+Array<int> erdosList2500;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&p : primeList) {
+            if (p >= 2500)
+                break;
+            if (isErdosPrime(p))
+                erdosList2500.append(p);
+        }
+
+        print(u"Found "_S & erdosList2500.len() & u" Erdos primes less than 2500:"_S);
+        {int Lindex = 0;
+        for (auto &&prime : erdosList2500) {
+            auto i = Lindex;
+            print(u"#5"_S.format(prime), mod((i + 1), 10) == 0 ? u"\n"_S : u" "_S);
+            Lindex++;
+        }}
+        print();
+    }
+} code_block_2;
+
+auto count = 0;
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        for (auto &&p : primeList)
+            if (isErdosPrime(p)) {
+                count++;
+                if (count == 7875) {
+                    print(u"\nThe 7875th Erdos prime is "_S & p & u"."_S);
+                    break;
+                }
+            }
+    }
+} code_block_3;
