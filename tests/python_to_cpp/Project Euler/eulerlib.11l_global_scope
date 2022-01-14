@@ -1,0 +1,16 @@
+is_prime
+    type = ‘’
+    ast_nodes = [
+    .   node_type = function
+        function_arguments = [
+            ‘x; ; ; ’
+        ]
+    ]
+list_primality
+    type = ‘’
+    ast_nodes = [
+    .   node_type = function
+        function_arguments = [
+            ‘n; ; ; ’
+        ]
+    ]

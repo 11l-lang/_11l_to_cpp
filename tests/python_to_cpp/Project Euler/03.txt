@@ -205,19 +205,9 @@ struct CodeBlock1
 
 
 # 35
-import math
+import eulerlib
 
-def list_primality(n):
-    # Sieve of Eratosthenes
-    result = [True] * (n + 1)
-    result[0] = result[1] = False
-    for i in range(int(math.sqrt(n)) + 1):
-        if result[i]:
-            for j in range(i * i, len(result), i):
-                result[j] = False
-    return result
-
-isprime = list_primality(999999)
+isprime = eulerlib.list_primality(999999)
 def is_circular_prime(n):
     s = str(n)
     return all(isprime[int(s[i : ] + s[ : i])] for i in range(len(s)))
@@ -226,34 +216,18 @@ print(sum(1
     for i in range(len(isprime))
     if is_circular_prime(i)))
 ===
-F list_primality(n)
-   V result = [1B] * (n + 1)
-   result[0] = result[1] = 0B
-   L(i) 0 .. Int(sqrt(n))
-      I result[i]
-         L(j) (i * i .< result.len).step(i)
-            result[j] = 0B
-   R result
-
-V isprime = list_primality(999999)
+V isprime = eulerlib:list_primality(999999)
 F is_circular_prime(n)
    V s = String(n)
    R all((0 .< s.len).map(i -> :isprime[Int(@s[i ..]‘’@s[0 .< i])]))
 
 print(sum((0 .< isprime.len).filter(i -> is_circular_prime(i)).map(i -> 1)))
 ===
-template <typename T1> auto list_primality(const T1 &n)
-{
-    auto result = create_array({true}) * (n + 1);
-    _set<0>(result, _set<1>(result, false));
-    for (auto i : range_ee(0, to_int(sqrt(n))))
-        if (result[i])
-            for (auto j : range_el(i * i, result.len()).step(i))
-                result.set(j, false);
-    return result;
+namespace eulerlib {
+#include "eulerlib.hpp"
 }
 
-auto isprime = list_primality(999999);
+auto isprime = eulerlib::list_primality(999999);
 template <typename T1> auto is_circular_prime(const T1 &n)
 {
     auto s = String(n);
@@ -307,27 +281,19 @@ struct CodeBlock1
 
 
 # 37
-import math, itertools
-
-def is_prime(n):
-    if n == 2: return True
-    if n < 2 or n % 2 == 0: return False
-    for i in range(3, int(math.sqrt(n)) + 1, 2):
-        if n % i == 0:
-            return False
-    return True
+import eulerlib, itertools
 
 def is_truncatable_prime(n):
     # Test if left-truncatable
     i = 10
     while i <= n:
-        if not is_prime(n % i):
+        if not eulerlib.is_prime(n % i):
             return False
         i *= 10
 
     # Test if right-truncatable
     while n > 0:
-        if not is_prime(n):
+        if not eulerlib.is_prime(n):
             return False
         n //= 10
     return True
@@ -342,25 +308,15 @@ for i in itertools.count(10):
             break
 print(s)
 ===
-F is_prime(n)
-   I n == 2
-      R 1B
-   I n < 2 | n % 2 == 0
-      R 0B
-   L(i) (3 .. Int(sqrt(n))).step(2)
-      I n % i == 0
-         R 0B
-   R 1B
-
 F is_truncatable_prime(=n)
    V i = 10
    L i <= n
-      I !is_prime(n % i)
+      I !eulerlib:is_prime(n % i)
          R 0B
       i *= 10
 
    L n > 0
-      I !is_prime(n)
+      I !eulerlib:is_prime(n)
          R 0B
       n I/= 10
    R 1B
@@ -375,29 +331,21 @@ L(i) 10..
          L.break
 print(s)
 ===
-template <typename T1> auto is_prime(const T1 &n)
-{
-    if (n == 2)
-        return true;
-    if (n < 2 || mod(n, 2) == 0)
-        return false;
-    for (auto i : range_ee(3, to_int(sqrt(n))).step(2))
-        if (mod(n, i) == 0)
-            return false;
-    return true;
+namespace eulerlib {
+#include "eulerlib.hpp"
 }
 
 template <typename T1> auto is_truncatable_prime(T1 n)
 {
     auto i = 10;
     while (i <= n) {
-        if (!is_prime(mod(n, i)))
+        if (!eulerlib::is_prime(mod(n, i)))
             return false;
         i *= 10;
     }
 
     while (n > 0) {
-        if (!is_prime(n))
+        if (!eulerlib::is_prime(n))
             return false;
         n = idiv(n, 10);
     }

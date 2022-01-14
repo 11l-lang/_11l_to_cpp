@@ -1714,6 +1714,9 @@ class ASTLoopBreak(ASTNode):
         n = self.parent
         loop_level = 0
         while True:
+            if type(n) == ASTLoopWasNoBreak:
+                assert(type(n.parent) == ASTLoop)
+                n = n.parent.parent
             if type(n) == ASTLoop:
                 if loop_level == self.loop_level if self.loop_variable == '' else self.loop_variable == n.loop_variable:
                     if n.has_L_was_no_break() or loop_level > 0:

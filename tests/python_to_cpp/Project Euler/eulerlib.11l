@@ -1,0 +1,21 @@
+F is_prime(x)
+   I x <= 1
+      R 0B
+   E I x <= 3
+      R 1B
+   E I x % 2 == 0
+      R 0B
+   E
+      L(i) (3 .. Int(sqrt(x))).step(2)
+         I x % i == 0
+            R 0B
+      R 1B
+
+F list_primality(n)
+   V result = [1B] * (n + 1)
+   result[0] = result[1] = 0B
+   L(i) 0 .. Int(sqrt(n))
+      I result[i]
+         L(j) (i * i .< result.len).step(i)
+            result[j] = 0B
+   R result

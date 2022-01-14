@@ -3557,3 +3557,86 @@ int MAIN_WITH_ARGV()
         }
     }
 }
+
+
+# [https://github.com/nayuki/Project-Euler-solutions/blob/master/python/p047.py?ts=4]
+# parse.py:‘if type(n) == ASTLoopWasNoBreak:’
+import math, itertools
+
+def count_distinct_prime_factors(n):
+    count = 0
+    while n > 1:
+        count += 1
+        for i in range(2, int(math.sqrt(n)) + 1):
+            if n % i == 0:
+                while True:
+                    n //= i
+                    if n % i != 0:
+                        break
+                break
+        else:
+            break  # n is prime
+    return count
+
+cond = lambda i: all((count_distinct_prime_factors(i + j) == 4) for j in range(4))
+
+for i in itertools.count(0):
+    if cond(i):
+        print(i)
+        break
+===
+F count_distinct_prime_factors(=n)
+   V count = 0
+   L n > 1
+      count++
+      L(i) 2 .. Int(sqrt(n))
+         I n % i == 0
+            L
+               n I/= i
+               I n % i != 0
+                  L.break
+            L.break
+      L.was_no_break
+         L.break
+   R count
+
+V cond = i -> all((0.<4).map(j -> (count_distinct_prime_factors(@i + j) == 4)))
+
+L(i) 0..
+   I cond(i)
+      print(i)
+      L.break
+===
+template <typename T1> auto count_distinct_prime_factors(T1 n)
+{
+    auto count = 0;
+    while (n > 1) {
+        count++;
+        for (auto i : range_ee(2, to_int(sqrt(n))))
+            if (mod(n, i) == 0) {
+                while (true) {
+                    n = idiv(n, i);
+                    if (mod(n, i) != 0)
+                        break;
+                }
+                goto break_;
+            }
+        break;
+        break_:;
+    }
+    return count;
+}
+
+auto cond = [](const auto &i){return all_map(range_el(0, 4), [&i](const auto &j){return (count_distinct_prime_factors(i + j) == 4);});};
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ei(0))
+            if (cond(i)) {
+                print(i);
+                break;
+            }
+    }
+} code_block_1;

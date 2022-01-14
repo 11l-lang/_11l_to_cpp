@@ -1398,7 +1398,7 @@ struct CodeBlock2
                 for (auto &&action : actions)
                     if (_get<1>(action)[r] == u'Y')
                         print(u"  "_S & _get<0>(action));
-            goto break_;
+            break;
             break_:;
         }
     }

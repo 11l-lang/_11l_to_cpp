@@ -1,0 +1,719 @@
+# 40
+s = "".join(str(i) for i in range(1, 1000000))
+ans = 1
+for i in range(7):
+    ans *= int(s[10**i - 1])
+print(ans)
+===
+V s = (1..999999).map(i -> String(i)).join(‘’)
+V ans = 1
+L(i) 7
+   ans *= Int(s[10 ^ i - 1])
+print(ans)
+===
+auto s = range_ee(1, 999999).map([](const auto &i){return String(i);}).join(u""_S);
+auto ans = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int i = 0; i < 7; i++)
+            ans *= to_int(s[pow(10, i) - 1]);
+        print(ans);
+    }
+} code_block_1;
+
+
+# 41
+import eulerlib
+
+def prev_permutation(arr : "list"):
+    i = len(arr) - 1
+    while i > 0 and arr[i - 1] <= arr[i]:
+        i -= 1
+    if i <= 0:
+        return False
+    j = len(arr) - 1
+    while arr[j] >= arr[i - 1]:
+        j -= 1
+    (arr[i - 1], arr[j]) = (arr[j], arr[i - 1])
+    #arr[i : ] = arr[len(arr) - 1 : i - 1 : -1]
+    arr[i : ] = reversed(arr[i : ])
+    return True
+
+NONPRIME_LAST_DIGITS = {0, 2, 4, 5, 6, 8}
+
+def compute():
+    # Note: The only 1-digit pandigital number is 1, which is not prime. Thus we require n >= 2.
+    for n in range(9, 1, -1): # [-`reversed(range(2, 10))`-]
+        arr = list(range(n, 0, -1)) # [-`reversed(range(1, n + 1))`-]
+        while True:
+            if arr[-1] not in NONPRIME_LAST_DIGITS:
+                n = int("".join(str(x) for x in arr))
+                if eulerlib.is_prime(n):
+                    return str(n)
+            if not prev_permutation(arr):
+                break
+    assert False
+
+print(compute())
+===
+F prev_permutation(&arr)
+   V i = arr.len - 1
+   L i > 0 & arr[i - 1] <= arr[i]
+      i--
+   I i <= 0
+      R 0B
+   V j = arr.len - 1
+   L arr[j] >= arr[i - 1]
+      j--
+   swap(&arr[i - 1], &arr[j])
+   arr.reverse_range(i ..)
+   R 1B
+
+V NONPRIME_LAST_DIGITS = Set([0, 2, 4, 5, 6, 8])
+
+F compute()
+   L(=n) (9.<1).step(-1)
+      V arr = Array((n .< 0).step(-1))
+      L
+         I arr.last !C :NONPRIME_LAST_DIGITS
+            n = Int(arr.map(x -> String(x)).join(‘’))
+            I eulerlib:is_prime(n)
+               R String(n)
+         I !prev_permutation(&arr)
+            L.break
+   assert(0B)
+
+print(compute())
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1> auto prev_permutation(T1 &arr)
+{
+    auto i = arr.len() - 1;
+    while (i > 0 && arr[i - 1] <= arr[i])
+        i--;
+    if (i <= 0)
+        return false;
+    auto j = arr.len() - 1;
+    while (arr[j] >= arr[i - 1])
+        j--;
+    swap(arr[i - 1], arr[j]);
+    arr.reverse_range(range_ei(i));
+    return true;
+}
+
+auto NONPRIME_LAST_DIGITS = create_set({0, 2, 4, 5, 6, 8});
+
+auto compute()
+{
+    for (auto n : range_el(9, 1).step(-1)) {
+        auto arr = create_array(range_el(n, 0).step(-1));
+        while (true) {
+            if (!in(arr.last(), ::NONPRIME_LAST_DIGITS)) {
+                n = to_int(arr.map([](const auto &x){return String(x);}).join(u""_S));
+                if (eulerlib::is_prime(n))
+                    return String(n);
+            }
+            if (!prev_permutation(arr))
+                break;
+        }
+    }
+    assert(false);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
+
+
+# 42
+import itertools
+
+WORDS = open('p042_words.txt').read().strip('"').split('","')
+
+def is_triangular_number(n):
+    temp = 0
+    for i in itertools.count(0):
+        temp += i
+        if n == temp:
+            return True
+        elif n < temp:
+            return False
+
+print(sum(1
+    for s in WORDS
+    if is_triangular_number(sum((ord(c) - ord('A') + 1) for c in s))))
+===
+V WORDS = File(‘p042_words.txt’).read().trim(‘"’).split(‘","’)
+
+F is_triangular_number(n)
+   V temp = 0
+   L(i) 0..
+      temp += i
+      I n == temp
+         R 1B
+      E I n < temp
+         R 0B
+
+print(sum(WORDS.filter(s -> is_triangular_number(sum(s.map(c -> (c.code - ‘A’.code + 1))))).map(s -> 1)))
+===
+auto WORDS = File(u"p042_words.txt"_S).read().trim(u"\""_S).split(u"\",\""_S);
+
+template <typename T1> auto is_triangular_number(const T1 &n)
+{
+    auto temp = 0;
+    for (auto i : range_ei(0)) {
+        temp += i;
+        if (n == temp)
+            return true;
+        else if (n < temp)
+            return false;
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum_map(WORDS.filter([](const auto &s){return is_triangular_number(sum_map(s, [](const auto &c){return (c.code - u'A'_C.code + 1);}));}), [](const auto &s){return 1;}));
+    }
+} code_block_1;
+
+
+# 43
+from _11l import *
+
+DIVISIBILITY_TESTS = [2, 3, 5, 7, 11, 13, 17]
+
+def is_substring_divisible(num):
+    for i, p in enumerate(DIVISIBILITY_TESTS):
+        if (num[i + 1] * 100 + num[i + 2] * 10 + num[i + 3]) % p != 0:
+            return False
+    return True
+
+s = Int64(0)
+num = list(range(10))
+while True:
+    if is_substring_divisible(num):
+        s += Int64("".join(map(str, num)))
+
+    if not next_permutation(num):
+        break
+
+print(s)
+===
+V DIVISIBILITY_TESTS = [2, 3, 5, 7, 11, 13, 17]
+
+F is_substring_divisible(num)
+   L(p) :DIVISIBILITY_TESTS
+      V i = L.index
+      I (num[i + 1] * 100 + num[i + 2] * 10 + num[i + 3]) % p != 0
+         R 0B
+   R 1B
+
+V s = Int64(0)
+V num = Array(0.<10)
+L
+   I is_substring_divisible(num)
+      s += Int64(num.map(String).join(‘’))
+
+   I !num.next_permutation()
+      L.break
+
+print(s)
+===
+auto DIVISIBILITY_TESTS = create_array({2, 3, 5, 7, 11, 13, 17});
+
+template <typename T1> auto is_substring_divisible(const T1 &num)
+{
+    {int Lindex = 0;
+    for (auto &&p : ::DIVISIBILITY_TESTS) {
+        auto i = Lindex;
+        if (mod((num[i + 1] * 100 + num[i + 2] * 10 + num[i + 3]), p) != 0)
+            return false;
+        Lindex++;
+    }}
+    return true;
+}
+
+auto s = to_int64(0);
+auto num = create_array(range_el(0, 10));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            if (is_substring_divisible(num))
+                s += to_int64(num.map([](const auto &x){return String(x);}).join(u""_S));
+
+            if (!num.next_permutation())
+                break;
+        }
+
+        print(s);
+    }
+} code_block_1;
+
+
+# 44
+from typing import Optional
+import itertools
+Int64 = int
+
+# Provides memoization for generating and testing pentagonal numbers.
+class PentagonalNumberHelper:
+    def __init__(self):
+        self.term_list = [Int64(0)]
+        self.term_set = set() # Int64
+
+    def term(self, x):
+        assert x > 0
+        while len(self.term_list) <= x:
+            n = len(self.term_list)
+            term = (n * (Int64(n) * 3 - 1)) >> 1
+            self.term_list.append(term)
+            self.term_set.add(term)
+        return self.term_list[x]
+
+    def is_term(self, y):
+        assert y > 0
+        while self.term_list[-1] < y:
+            n = len(self.term_list)
+            term = (n * (Int64(n) * 3 - 1)) >> 1
+            self.term_list.append(term)
+            self.term_set.add(term)
+        return y in self.term_set
+
+pentanum = PentagonalNumberHelper()
+min_d : Optional[Int64] = None  # None means not found yet, positive number means found a candidate
+# For each upper pentagonal number index, going upward
+for i in itertools.count(2):
+    pent_i = pentanum.term(i)
+    # If the next number down is at least as big as a found difference, then conclude searching
+    if min_d is not None and pent_i - pentanum.term(i - 1) >= min_d:
+        break
+
+    # For each lower pentagonal number index, going downward
+    for j in range(i - 1, 0, -1):
+        pent_j = pentanum.term(j)
+        diff = pent_i - pent_j
+        # If the difference is at least as big as a found difference, then stop testing lower pentagonal numbers
+        if min_d is not None and diff >= min_d:
+            break
+        elif pentanum.is_term(pent_i + pent_j) and pentanum.is_term(diff):
+            min_d = diff  # Found a smaller difference
+print(min_d)
+===
+T PentagonalNumberHelper
+   term_list = [Int64(0)]
+   term_set = Set[Int64]()
+   F ()
+   {
+   }
+
+   F term(x)
+      assert(x > 0)
+      L .term_list.len <= x
+         V n = .term_list.len
+         V term = (n * (Int64(n) * 3 - 1)) >> 1
+         .term_list.append(term)
+         .term_set.add(term)
+      R .term_list[x]
+
+   F is_term(y)
+      assert(y > 0)
+      L .term_list.last < y
+         V n = .term_list.len
+         V term = (n * (Int64(n) * 3 - 1)) >> 1
+         .term_list.append(term)
+         .term_set.add(term)
+      R y C .term_set
+
+V pentanum = PentagonalNumberHelper()
+Int64? min_d
+L(i) 2..
+   V pent_i = pentanum.term(i)
+   I min_d != N & pent_i - pentanum.term(i - 1) >= min_d
+      L.break
+
+   L(j) (i - 1 .< 0).step(-1)
+      V pent_j = pentanum.term(j)
+      V diff = pent_i - pent_j
+      I min_d != N & diff >= min_d
+         L.break
+      E I pentanum.is_term(pent_i + pent_j) & pentanum.is_term(diff)
+         min_d = diff
+print(min_d)
+===
+class PentagonalNumberHelper
+{
+public:
+    decltype(create_array({to_int64(0)})) term_list = create_array({to_int64(0)});
+    decltype(Set<Int64>()) term_set = Set<Int64>();
+    PentagonalNumberHelper()
+    {
+    }
+
+    template <typename T1> auto term(const T1 &x)
+    {
+        assert(x > 0);
+        while (term_list.len() <= x) {
+            auto n = term_list.len();
+            auto term = (n * (to_int64(n) * 3 - 1)) >> 1;
+            term_list.append(term);
+            term_set.add(term);
+        }
+        return term_list[x];
+    }
+
+    template <typename T1> auto is_term(const T1 &y)
+    {
+        assert(y > 0);
+        while (term_list.last() < y) {
+            auto n = term_list.len();
+            auto term = (n * (to_int64(n) * 3 - 1)) >> 1;
+            term_list.append(term);
+            term_set.add(term);
+        }
+        return in(y, term_set);
+    }
+};
+
+auto pentanum = PentagonalNumberHelper();
+Nullable<Int64> min_d;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ei(2)) {
+            auto pent_i = pentanum.term(i);
+            if (min_d != nullptr && pent_i - pentanum.term(i - 1) >= *min_d)
+                break;
+
+            for (auto j : range_el(i - 1, 0).step(-1)) {
+                auto pent_j = pentanum.term(j);
+                auto diff = pent_i - pent_j;
+                if (min_d != nullptr && diff >= *min_d)
+                    break;
+                else if (pentanum.is_term(pent_i + pent_j) && pentanum.is_term(diff))
+                    min_d = diff;
+            }
+        }
+        print(*min_d);
+    }
+} code_block_1;
+
+
+# 45
+Int64 = int
+
+i = Int64(286)
+j = Int64(166)
+k = Int64(144)
+while True:
+    triangle = i * (i + 1) // 2
+    pentagon = j * (j * 3 - 1) // 2
+    hexagon  = k * (k * 2 - 1)
+    minimum = min(triangle, pentagon, hexagon)
+    if minimum == max(triangle, pentagon, hexagon):
+        print(triangle)
+        break
+    if minimum == triangle: i += 1
+    if minimum == pentagon: j += 1
+    if minimum == hexagon : k += 1
+===
+V i = Int64(286)
+V j = Int64(166)
+V k = Int64(144)
+L
+   V triangle = i * (i + 1) I/ 2
+   V pentagon = j * (j * 3 - 1) I/ 2
+   V hexagon = k * (k * 2 - 1)
+   V minimum = min(triangle, pentagon, hexagon)
+   I minimum == max(triangle, pentagon, hexagon)
+      print(triangle)
+      L.break
+   I minimum == triangle
+      i++
+   I minimum == pentagon
+      j++
+   I minimum == hexagon
+      k++
+===
+auto i = to_int64(286);
+auto j = to_int64(166);
+auto k = to_int64(144);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            auto triangle = idiv(i * (i + 1), 2);
+            auto pentagon = idiv(j * (j * 3 - 1), 2);
+            auto hexagon = k * (k * 2 - 1);
+            auto minimum = min(triangle, pentagon, hexagon);
+            if (minimum == max(triangle, pentagon, hexagon)) {
+                print(triangle);
+                break;
+            }
+            if (minimum == triangle)
+                i++;
+            if (minimum == pentagon)
+                j++;
+            if (minimum == hexagon)
+                k++;
+        }
+    }
+} code_block_1;
+
+
+# 46
+import eulerlib, itertools
+
+def test_goldbach(n):
+    if n % 2 == 0 or eulerlib.is_prime(n):
+        return True
+    for i in itertools.count(1):
+        k = n - 2 * i * i
+        if k <= 0:
+            return False
+        elif eulerlib.is_prime(k):
+            return True
+
+for i in itertools.count(9, 2):
+    if not test_goldbach(i):
+        print(i)
+        break
+===
+F test_goldbach(n)
+   I n % 2 == 0 | eulerlib:is_prime(n)
+      R 1B
+   L(i) 1..
+      V k = n - 2 * i * i
+      I k <= 0
+         R 0B
+      E I eulerlib:is_prime(k)
+         R 1B
+
+L(i) (9..).step(2)
+   I !test_goldbach(i)
+      print(i)
+      L.break
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1> auto test_goldbach(const T1 &n)
+{
+    if (mod(n, 2) == 0 || eulerlib::is_prime(n))
+        return true;
+    for (auto i : range_ei(1)) {
+        auto k = n - 2 * i * i;
+        if (k <= 0)
+            return false;
+        else if (eulerlib::is_prime(k))
+            return true;
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ei(9).step(2))
+            if (!test_goldbach(i)) {
+                print(i);
+                break;
+            }
+    }
+} code_block_1;
+
+
+# 47
+import math, itertools
+
+def count_distinct_prime_factors(n):
+    count = 0
+    while n > 1:
+        count += 1
+        for i in range(2, int(math.sqrt(n)) + 1):
+            if n % i == 0:
+                while True:
+                    n //= i
+                    if n % i != 0:
+                        break
+                break
+        else:
+            break  # n is prime
+    return count
+
+cond = lambda i: all((count_distinct_prime_factors(i + j) == 4) for j in range(4))
+
+for i in itertools.count(0):
+    if cond(i):
+        print(i)
+        break
+===
+F count_distinct_prime_factors(=n)
+   V count = 0
+   L n > 1
+      count++
+      L(i) 2 .. Int(sqrt(n))
+         I n % i == 0
+            L
+               n I/= i
+               I n % i != 0
+                  L.break
+            L.break
+      L.was_no_break
+         L.break
+   R count
+
+V cond = i -> all((0.<4).map(j -> (count_distinct_prime_factors(@i + j) == 4)))
+
+L(i) 0..
+   I cond(i)
+      print(i)
+      L.break
+===
+template <typename T1> auto count_distinct_prime_factors(T1 n)
+{
+    auto count = 0;
+    while (n > 1) {
+        count++;
+        for (auto i : range_ee(2, to_int(sqrt(n))))
+            if (mod(n, i) == 0) {
+                while (true) {
+                    n = idiv(n, i);
+                    if (mod(n, i) != 0)
+                        break;
+                }
+                goto break_;
+            }
+        break;
+        break_:;
+    }
+    return count;
+}
+
+auto cond = [](const auto &i){return all_map(range_el(0, 4), [&i](const auto &j){return (count_distinct_prime_factors(i + j) == 4);});};
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ei(0))
+            if (cond(i)) {
+                print(i);
+                break;
+            }
+    }
+} code_block_1;
+
+
+# 48
+BigInt = int
+
+MOD = BigInt(10)**10
+ans = sum(pow(i, i, MOD) for i in range(1, 1001)) % MOD
+print(ans)
+===
+V MOD = BigInt(10) ^ 10
+V ans = sum((1..1000).map(i -> pow(i, i, :MOD))) % MOD
+print(ans)
+===
+auto MOD = pow(BigInt(10), 10);
+auto ans = mod(sum_map(range_ee(1, 1000), [](const auto &i){return pow(i, i, ::MOD);}), MOD);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(ans);
+    }
+} code_block_1;
+
+
+# 49
+import eulerlib
+
+def has_same_digits(x, y):
+    return sorted(str(x)) == sorted(str(y))
+
+def compute():
+    LIMIT = 10000
+    isprime = eulerlib.list_primality(LIMIT - 1)
+    for base in range(1000, LIMIT):
+        if isprime[base]:
+            for step in range(1, LIMIT):
+                a = base + step
+                b = a + step
+                if     a < LIMIT and isprime[a] and has_same_digits(a, base) \
+                   and b < LIMIT and isprime[b] and has_same_digits(b, base) \
+                   and (base != 1487 or a != 4817):
+                    return str(base) + str(a) + str(b)
+    raise RuntimeError("Not found")
+
+print(compute())
+===
+F has_same_digits(x, y)
+   R sorted(String(x)) == sorted(String(y))
+
+F compute()
+   V LIMIT = 10000
+   V isprime = eulerlib:list_primality(LIMIT - 1)
+   L(base) 1000 .< LIMIT
+      I isprime[base]
+         L(step) 1 .< LIMIT
+            V a = base + step
+            V b = a + step
+            I a < LIMIT & isprime[a] & has_same_digits(a, base) & b < LIMIT & isprime[b] & has_same_digits(b, base) & (base != 1487 | a != 4817)
+               R String(base)‘’String(a)‘’String(b)
+   X RuntimeError(‘Not found’)
+
+print(compute())
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1, typename T2> auto has_same_digits(const T1 &x, const T2 &y)
+{
+    return sorted(String(x)) == sorted(String(y));
+}
+
+auto compute()
+{
+    auto LIMIT = 10000;
+    auto isprime = eulerlib::list_primality(LIMIT - 1);
+    for (auto base : range_el(1000, LIMIT))
+        if (isprime[base])
+            for (auto step : range_el(1, LIMIT)) {
+                auto a = base + step;
+                auto b = a + step;
+                if (a < LIMIT && isprime[a] && has_same_digits(a, base) && b < LIMIT && isprime[b] && has_same_digits(b, base) && (base != 1487 || a != 4817))
+                    return String(base) & String(a) & String(b);
+            }
+    throw RuntimeError(u"Not found"_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
