@@ -1,0 +1,505 @@
+# 30
+def fifth_power_digit_sum(n):
+    return sum(int(c)**5 for c in str(n))
+
+print(sum(i for i in range(2, 1000000) if i == fifth_power_digit_sum(i)))
+===
+F fifth_power_digit_sum(n)
+   R sum(String(n).map(c -> Int(c) ^ 5))
+
+print(sum((2..999999).filter(i -> i == fifth_power_digit_sum(i))))
+===
+template <typename T1> auto fifth_power_digit_sum(const T1 &n)
+{
+    return sum_map(String(n), [](const auto &c){return pow(to_int(c), 5);});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum(range_ee(2, 999999).filter([](const auto &i){return i == fifth_power_digit_sum(i);})));
+    }
+} code_block_1;
+
+
+# 31
+TOTAL = 200
+
+ways = [1] + [0] * TOTAL
+for coin in [1, 2, 5, 10, 20, 50, 100, 200]:
+    for i in range(len(ways) - coin):
+        ways[i + coin] += ways[i]
+
+print(ways[-1])
+===
+V TOTAL = 200
+
+V ways = [1] [+] [0] * TOTAL
+L(coin) [1, 2, 5, 10, 20, 50, 100, 200]
+   L(i) 0 .< ways.len - coin
+      ways[i + coin] += ways[i]
+
+print(ways.last)
+===
+auto TOTAL = 200;
+
+auto ways = create_array({1}) + create_array({0}) * TOTAL;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&coin : create_array({1, 2, 5, 10, 20, 50, 100, 200}))
+            for (auto i : range_el(0, ways.len() - coin))
+                ways[i + coin] += ways[i];
+
+        print(ways.last());
+    }
+} code_block_1;
+
+
+# 32
+import math
+
+def has_pandigital_product(n):
+    # Find and examine all factors of n
+    for i in range(1, int(math.sqrt(n)) + 1):
+        if n % i == 0:
+            temp = str(n) + str(i) + str(n // i)
+            if "".join(sorted(temp)) == "123456789":
+                return True
+    return False
+
+print(sum(i for i in range(1, 10000) if has_pandigital_product(i)))
+===
+F has_pandigital_product(n)
+   L(i) 1 .. Int(sqrt(n))
+      I n % i == 0
+         V temp = String(n)‘’String(i)‘’String(n I/ i)
+         I sorted(temp).join(‘’) == ‘123456789’
+            R 1B
+   R 0B
+
+print(sum((1..9999).filter(i -> has_pandigital_product(i))))
+===
+template <typename T1> auto has_pandigital_product(const T1 &n)
+{
+    for (auto i : range_ee(1, to_int(sqrt(n))))
+        if (mod(n, i) == 0) {
+            auto temp = String(n) & String(i) & String(idiv(n, i));
+            if (sorted(temp).join(u""_S) == u"123456789")
+                return true;
+        }
+    return false;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum(range_ee(1, 9999).filter([](const auto &i){return has_pandigital_product(i);})));
+    }
+} code_block_1;
+
+
+# 33
+import math
+
+numer = 1
+denom = 1
+for d in range(10, 100):
+    for n in range(10, d):
+        n0 = n % 10
+        n1 = n // 10
+        d0 = d % 10
+        d1 = d // 10
+        if (n1 == d0 and n0 * d == n * d1) or (n0 == d1 and n1 * d == n * d0):
+            numer *= n
+            denom *= d
+print(denom // math.gcd(numer, denom))
+===
+V numer = 1
+V denom = 1
+L(d) 10..99
+   L(n) 10 .< d
+      V n0 = n % 10
+      V n1 = n I/ 10
+      V d0 = d % 10
+      V d1 = d I/ 10
+      I (n1 == d0 & n0 * d == n * d1) | (n0 == d1 & n1 * d == n * d0)
+         numer *= n
+         denom *= d
+print(denom I/ gcd(numer, denom))
+===
+auto numer = 1;
+auto denom = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto d : range_ee(10, 99))
+            for (auto n : range_el(10, d)) {
+                auto n0 = mod(n, 10);
+                auto n1 = idiv(n, 10);
+                auto d0 = mod(d, 10);
+                auto d1 = idiv(d, 10);
+                if ((n1 == d0 && n0 * d == n * d1) || (n0 == d1 && n1 * d == n * d0)) {
+                    numer *= n;
+                    denom *= d;
+                }
+            }
+        print(idiv(denom, gcd(numer, denom)));
+    }
+} code_block_1;
+
+
+# 34
+import math
+
+FACTORIAL_DIGITS_SUM_WITHOUT_LEADING_ZEROS = [sum(math.factorial(int(c)) for c in str(i)) for i in range(10000)]
+FACTORIAL_DIGITS_SUM_WITH_LEADING_ZEROS = [sum(math.factorial(int(c)) for c in str(i).zfill(4)) for i in range(10000)]
+
+def factorial_digit_sum(n):
+    result = 0
+    while n >= 10000:
+        result += FACTORIAL_DIGITS_SUM_WITH_LEADING_ZEROS[n % 10000]
+        n //= 10000
+    return result + FACTORIAL_DIGITS_SUM_WITHOUT_LEADING_ZEROS[n]
+
+print(sum(i for i in range(3, 10000000) if i == factorial_digit_sum(i)))
+===
+V FACTORIAL_DIGITS_SUM_WITHOUT_LEADING_ZEROS = (0.<10000).map(i -> sum(String(i).map(c -> factorial(Int(c)))))
+V FACTORIAL_DIGITS_SUM_WITH_LEADING_ZEROS = (0.<10000).map(i -> sum(String(i).zfill(4).map(c -> factorial(Int(c)))))
+
+F factorial_digit_sum(=n)
+   V result = 0
+   L n >= 10000
+      result += :FACTORIAL_DIGITS_SUM_WITH_LEADING_ZEROS[n % 10000]
+      n I/= 10000
+   R result + :FACTORIAL_DIGITS_SUM_WITHOUT_LEADING_ZEROS[n]
+
+print(sum((3..9999999).filter(i -> i == factorial_digit_sum(i))))
+===
+auto FACTORIAL_DIGITS_SUM_WITHOUT_LEADING_ZEROS = range_el(0, 10000).map([](const auto &i){return sum_map(String(i), [](const auto &c){return factorial(to_int(c));});});
+auto FACTORIAL_DIGITS_SUM_WITH_LEADING_ZEROS = range_el(0, 10000).map([](const auto &i){return sum_map(String(i).zfill(4), [](const auto &c){return factorial(to_int(c));});});
+
+template <typename T1> auto factorial_digit_sum(T1 n)
+{
+    auto result = 0;
+    while (n >= 10000) {
+        result += ::FACTORIAL_DIGITS_SUM_WITH_LEADING_ZEROS[mod(n, 10000)];
+        n = idiv(n, 10000);
+    }
+    return result + ::FACTORIAL_DIGITS_SUM_WITHOUT_LEADING_ZEROS[n];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum(range_ee(3, 9999999).filter([](const auto &i){return i == factorial_digit_sum(i);})));
+    }
+} code_block_1;
+
+
+# 35
+import math
+
+def list_primality(n):
+    # Sieve of Eratosthenes
+    result = [True] * (n + 1)
+    result[0] = result[1] = False
+    for i in range(int(math.sqrt(n)) + 1):
+        if result[i]:
+            for j in range(i * i, len(result), i):
+                result[j] = False
+    return result
+
+isprime = list_primality(999999)
+def is_circular_prime(n):
+    s = str(n)
+    return all(isprime[int(s[i : ] + s[ : i])] for i in range(len(s)))
+
+print(sum(1
+    for i in range(len(isprime))
+    if is_circular_prime(i)))
+===
+F list_primality(n)
+   V result = [1B] * (n + 1)
+   result[0] = result[1] = 0B
+   L(i) 0 .. Int(sqrt(n))
+      I result[i]
+         L(j) (i * i .< result.len).step(i)
+            result[j] = 0B
+   R result
+
+V isprime = list_primality(999999)
+F is_circular_prime(n)
+   V s = String(n)
+   R all((0 .< s.len).map(i -> :isprime[Int(@s[i ..]‘’@s[0 .< i])]))
+
+print(sum((0 .< isprime.len).filter(i -> is_circular_prime(i)).map(i -> 1)))
+===
+template <typename T1> auto list_primality(const T1 &n)
+{
+    auto result = create_array({true}) * (n + 1);
+    _set<0>(result, _set<1>(result, false));
+    for (auto i : range_ee(0, to_int(sqrt(n))))
+        if (result[i])
+            for (auto j : range_el(i * i, result.len()).step(i))
+                result.set(j, false);
+    return result;
+}
+
+auto isprime = list_primality(999999);
+template <typename T1> auto is_circular_prime(const T1 &n)
+{
+    auto s = String(n);
+    return all_map(range_el(0, s.len()), [&s](const auto &i){return ::isprime[to_int(s[range_ei(i)] & s[range_el(0, i)])];});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum_map(range_el(0, isprime.len()).filter([](const auto &i){return is_circular_prime(i);}), [](const auto &i){return 1;}));
+    }
+} code_block_1;
+
+
+# 36
+def is_decimal_binary_palindrome(n):
+    s = str(n)
+    if s != s[ : : -1]:
+        return False
+    t = bin(n)[2 : ]
+    return t == t[ : : -1]
+
+print(sum(i for i in range(1000000) if is_decimal_binary_palindrome(i)))
+===
+F is_decimal_binary_palindrome(n)
+   V s = String(n)
+   I s != reversed(s)
+      R 0B
+   V t = bin(n)
+   R t == reversed(t)
+
+print(sum((0.<1000000).filter(i -> is_decimal_binary_palindrome(i))))
+===
+template <typename T1> auto is_decimal_binary_palindrome(const T1 &n)
+{
+    auto s = String(n);
+    if (s != reversed(s))
+        return false;
+    auto t = bin(n);
+    return t == reversed(t);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum(range_el(0, 1000000).filter([](const auto &i){return is_decimal_binary_palindrome(i);})));
+    }
+} code_block_1;
+
+
+# 37
+import math, itertools
+
+def is_prime(n):
+    if n == 2: return True
+    if n < 2 or n % 2 == 0: return False
+    for i in range(3, int(math.sqrt(n)) + 1, 2):
+        if n % i == 0:
+            return False
+    return True
+
+def is_truncatable_prime(n):
+    # Test if left-truncatable
+    i = 10
+    while i <= n:
+        if not is_prime(n % i):
+            return False
+        i *= 10
+
+    # Test if right-truncatable
+    while n > 0:
+        if not is_prime(n):
+            return False
+        n //= 10
+    return True
+
+s = 0
+c = 0
+for i in itertools.count(10):
+    if is_truncatable_prime(i):
+        s += i
+        c += 1
+        if c == 11:
+            break
+print(s)
+===
+F is_prime(n)
+   I n == 2
+      R 1B
+   I n < 2 | n % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(n))).step(2)
+      I n % i == 0
+         R 0B
+   R 1B
+
+F is_truncatable_prime(=n)
+   V i = 10
+   L i <= n
+      I !is_prime(n % i)
+         R 0B
+      i *= 10
+
+   L n > 0
+      I !is_prime(n)
+         R 0B
+      n I/= 10
+   R 1B
+
+V s = 0
+V c = 0
+L(i) 10..
+   I is_truncatable_prime(i)
+      s += i
+      c++
+      I c == 11
+         L.break
+print(s)
+===
+template <typename T1> auto is_prime(const T1 &n)
+{
+    if (n == 2)
+        return true;
+    if (n < 2 || mod(n, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(n))).step(2))
+        if (mod(n, i) == 0)
+            return false;
+    return true;
+}
+
+template <typename T1> auto is_truncatable_prime(T1 n)
+{
+    auto i = 10;
+    while (i <= n) {
+        if (!is_prime(mod(n, i)))
+            return false;
+        i *= 10;
+    }
+
+    while (n > 0) {
+        if (!is_prime(n))
+            return false;
+        n = idiv(n, 10);
+    }
+    return true;
+}
+
+auto s = 0;
+auto c = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ei(10))
+            if (is_truncatable_prime(i)) {
+                s += i;
+                c++;
+                if (c == 11)
+                    break;
+            }
+        print(s);
+    }
+} code_block_1;
+
+
+# 38
+ans = ""
+for n in range(2, 10):
+    for i in range(1, 10**(9 // n)):
+        s = "".join(str(i * j) for j in range(1, n + 1))
+        if "".join(sorted(s)) == "123456789":
+            if s > ans: # [-`ans = max(s, ans)`-]
+                ans = s
+print(ans)
+===
+V ans = ‘’
+L(n) 2..9
+   L(i) 1 .< 10 ^ (9 I/ n)
+      V s = (1 .. n).map(j -> String(@i * j)).join(‘’)
+      I sorted(s).join(‘’) == ‘123456789’
+         I s > ans
+            ans = s
+print(ans)
+===
+auto ans = u""_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(2, 9))
+            for (auto i : range_el(1, pow(10, (idiv(9, n))))) {
+                auto s = range_ee(1, n).map([&i](const auto &j){return String(i * j);}).join(u""_S);
+                if (sorted(s).join(u""_S) == u"123456789") {
+                    if (s > ans)
+                        ans = s;
+                }
+            }
+        print(ans);
+    }
+} code_block_1;
+
+
+# 39
+def count_solutions(p : int):
+    result = 0
+    for a in range(1, p + 1):
+        for b in range(a, (p - a) // 2 + 1):
+            c = p - a - b  # c >= b
+            if a * a + b * b == c * c:
+                result += 1
+    return result
+
+print(max(range(1, 1001), key=count_solutions))
+===
+F count_solutions(Int p)
+   V result = 0
+   L(a) 1 .. p
+      L(b) a .. (p - a) I/ 2
+         V c = p - a - b
+         I a * a + b * b == c * c
+            result++
+   R result
+
+print(max(1..1000, key' count_solutions))
+===
+auto count_solutions(const int p)
+{
+    auto result = 0;
+    for (auto a : range_ee(1, p))
+        for (auto b : range_ee(a, idiv((p - a), 2))) {
+            auto c = p - a - b;
+            if (a * a + b * b == c * c)
+                result++;
+        }
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(max_with_key(range_ee(1, 1000), count_solutions));
+    }
+} code_block_1;
