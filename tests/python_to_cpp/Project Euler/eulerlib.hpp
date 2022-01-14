@@ -24,3 +24,14 @@ template <typename T1> auto list_primality(const T1 &n)
                 result.set(j, false);
     return result;
 }
+
+template <typename T1> auto list_primes(const T1 &n)
+{
+    return enumerate(list_primality(n)).filter([](const auto &i, const auto &isprime){return isprime;}).map([](const auto &i, const auto &isprime){return i;});
+}
+
+auto binomial(const BigInt &n, const BigInt &k)
+{
+    assert(in(k, range_ee(BigInt(0), n)));
+    return idiv(factorial(n), (factorial(k) * factorial(n - k)));
+}

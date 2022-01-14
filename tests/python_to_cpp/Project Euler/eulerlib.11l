@@ -19,3 +19,10 @@ F list_primality(n)
          L(j) (i * i .< result.len).step(i)
             result[j] = 0B
    R result
+
+F list_primes(n)
+   R enumerate(list_primality(n)).filter((i, isprime) -> isprime).map((i, isprime) -> i)
+
+F binomial(BigInt n, BigInt k)
+   assert(k C BigInt(0) .. n)
+   R factorial(n) I/ (factorial(k) * factorial(n - k))

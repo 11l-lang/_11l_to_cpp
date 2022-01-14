@@ -1,0 +1,759 @@
+# 50
+import eulerlib
+
+ans = 0
+isprime = eulerlib.list_primality(999999)
+primes = eulerlib.list_primes(999999)
+consecutive = 0
+for i in range(len(primes)):
+    sum = primes[i]
+    consec = 1
+    for j in range(i + 1, len(primes)):
+        sum += primes[j]
+        consec += 1
+        if sum >= len(isprime):
+            break
+        if isprime[sum] and consec > consecutive:
+            ans = sum
+            consecutive = consec
+print(ans)
+===
+V ans = 0
+V isprime = eulerlib:list_primality(999999)
+V primes = eulerlib:list_primes(999999)
+V consecutive = 0
+L(i) 0 .< primes.len
+   V sum = primes[i]
+   V consec = 1
+   L(j) i + 1 .< primes.len
+      sum += primes[j]
+      consec++
+      I sum >= isprime.len
+         L.break
+      I isprime[sum] & consec > consecutive
+         ans = sum
+         consecutive = consec
+print(ans)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto ans = 0;
+auto isprime = eulerlib::list_primality(999999);
+auto primes = eulerlib::list_primes(999999);
+auto consecutive = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(0, primes.len())) {
+            auto sum = primes[i];
+            auto consec = 1;
+            for (auto j : range_el(i + 1, primes.len())) {
+                sum += primes[j];
+                consec++;
+                if (sum >= isprime.len())
+                    break;
+                if (isprime[sum] && consec > consecutive) {
+                    ans = sum;
+                    consecutive = consec;
+                }
+            }
+        }
+        print(ans);
+    }
+} code_block_1;
+
+
+# 51
+import eulerlib
+
+def do_mask(digits, mask):
+    return [d * ((~mask >> i) & 1) for i, d in enumerate(digits)]
+
+def add_mask(digits, mask):
+    return [d + ((mask >> i) & 1) for i, d in enumerate(digits)]
+
+def to_number(digits):
+    result = 0
+    for d in digits:
+        result = result * 10 + d
+    return result
+
+def compute():
+    isprime = eulerlib.list_primality(1000000)
+    for i in range(len(isprime)):
+        if not isprime[i]:
+            continue
+
+        n = [int(c) for c in str(i)]
+        for mask in range(1 << len(n)):
+            digits = do_mask(n, mask)
+            count = 0
+            for j in range(10):
+                if digits[0] != 0 and isprime[to_number(digits)]:
+                    count += 1
+                digits = add_mask(digits, mask)
+
+            if count == 8:
+                digits = do_mask(n, mask)
+                for j in range(10):
+                    if digits[0] != 0 and isprime[to_number(digits)]:
+                        return str(to_number(digits))
+                    digits = add_mask(digits, mask)
+    raise AssertionError("Not found")
+
+print(compute())
+===
+F do_mask(digits, mask)
+   R enumerate(digits).map((i, d) -> d * (((-)@mask >> i) [&] 1))
+
+F add_mask(digits, mask)
+   R enumerate(digits).map((i, d) -> d + ((@mask >> i) [&] 1))
+
+F to_number(digits)
+   V result = 0
+   L(d) digits
+      result = result * 10 + d
+   R result
+
+F compute()
+   V isprime = eulerlib:list_primality(1000000)
+   L(i) 0 .< isprime.len
+      I !isprime[i]
+         L.continue
+
+      V n = String(i).map(c -> Int(c))
+      L(mask) 0 .< 1 << n.len
+         V digits = do_mask(n, mask)
+         V count = 0
+         L(j) 10
+            I digits[0] != 0 & isprime[to_number(digits)]
+               count++
+            digits = add_mask(digits, mask)
+
+         I count == 8
+            digits = do_mask(n, mask)
+            L(j) 10
+               I digits[0] != 0 & isprime[to_number(digits)]
+                  R String(to_number(digits))
+               digits = add_mask(digits, mask)
+   X AssertionError(‘Not found’)
+
+print(compute())
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1, typename T2> auto do_mask(const T1 &digits, const T2 &mask)
+{
+    return enumerate(digits).map([&mask](const auto &i, const auto &d){return d * ((~mask >> i) & 1);});
+}
+
+template <typename T1, typename T2> auto add_mask(const T1 &digits, const T2 &mask)
+{
+    return enumerate(digits).map([&mask](const auto &i, const auto &d){return d + ((mask >> i) & 1);});
+}
+
+template <typename T1> auto to_number(const T1 &digits)
+{
+    auto result = 0;
+    for (auto &&d : digits)
+        result = result * 10 + d;
+    return result;
+}
+
+auto compute()
+{
+    auto isprime = eulerlib::list_primality(1000000);
+    for (auto i : range_el(0, isprime.len())) {
+        if (!isprime[i])
+            continue;
+
+        auto n = String(i).map([](const auto &c){return to_int(c);});
+        for (auto mask : range_el(0, 1 << n.len())) {
+            auto digits = do_mask(n, mask);
+            auto count = 0;
+            for (int j = 0; j < 10; j++) {
+                if (_get<0>(digits) != 0 && isprime[to_number(digits)])
+                    count++;
+                digits = add_mask(digits, mask);
+            }
+
+            if (count == 8) {
+                digits = do_mask(n, mask);
+                for (int j = 0; j < 10; j++) {
+                    if (_get<0>(digits) != 0 && isprime[to_number(digits)])
+                        return String(to_number(digits));
+                    digits = add_mask(digits, mask);
+                }
+            }
+        }
+    }
+    throw AssertionError(u"Not found"_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
+
+
+# 52
+import itertools
+
+cond = lambda i: all(sorted(str(i)) == sorted(str(j * i)) for j in range(2, 7))
+
+for i in itertools.count(1):
+    if cond(i):
+        print(i)
+        break
+===
+V cond = i -> all((2..6).map(j -> sorted(String(@i)) == sorted(String(j * @i))))
+
+L(i) 1..
+   I cond(i)
+      print(i)
+      L.break
+===
+auto cond = [](const auto &i){return all_map(range_ee(2, 6), [&i](const auto &j){return sorted(String(i)) == sorted(String(j * i));});};
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ei(1))
+            if (cond(i)) {
+                print(i);
+                break;
+            }
+    }
+} code_block_1;
+
+
+# 53
+# Slow BigInt
+import eulerlib
+
+ans = 0
+for n in range(1, 101):
+    for k in range(0, n + 1):
+        if eulerlib.binomial(n, k) > 1000000:
+            ans += 1
+print(ans)
+===
+V ans = 0
+L(n) 1..100
+   L(k) 0 .. n
+      I eulerlib:binomial(n, k) > 1000000
+         ans++
+print(ans)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto ans = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(1, 100))
+            for (auto k : range_ee(0, n))
+                if (eulerlib::binomial(n, k) > 1000000)
+                    ans++;
+        print(ans);
+    }
+} code_block_1;
+
+
+# 54
+RANKS = "23456789TJQKA"
+SUITS = "SHCD"
+
+# Card is a 2-letter string like "2H" for "two of hearts". Returns a pair of integers (rank, suit).
+def parse_card(card):
+    return (RANKS.index(card[0]), SUITS.index(card[1]))
+
+# Returns the rank of the highest card in the straight, or -1 if the set of cards does not form a straight.
+# This takes into account the fact that ace can be rank 0 (i.e. face value 1) or rank 13 (value immediately after king).
+def get_straight_high_rank(ranks):
+    for i in range(len(ranks) - 1, 2, -1): # [-`reversed(range(3, len(ranks)))`-]
+        for j in range(5):
+            if ranks[(i - j + 13) % 13] == 0:
+                break  # Current offset is not a straight
+        else:  # Straight found
+            return i
+    return -1
+
+# Encodes 5 card ranks into 20 bits in big-endian, starting with the most frequent cards,
+# breaking ties by highest rank. For example, the set of ranks {5,5,T,8,T} is encoded as
+# the sequence [T,T,5,5,8] because pairs come before singles and highest pairs come first.
+def get_5_frequent_highest_cards(ranks, rankshist):
+    result = 0
+    count = 0
+
+    for i in range(len(rankshist) - 1, -1, -1): # [-`reversed(range(len(rankshist)))`-]
+        for j in range(len(ranks) - 1, -1, -1): # [-`reversed(range(len(ranks)))`-]
+            if ranks[j] == i:
+                for k in range(i):
+                    if count >= 5:
+                        break
+                    result = result << 4 | j
+                    count += 1
+
+    if count != 5:
+        raise ValueError(count)
+    return result
+
+# Hand is an array of cards. Returns a score for the given hand. If handX beats handY then get_score(handX) > get_score(handY),
+# and if handX is a draw with handY then get_score(handX) = get_score(handY) (even if the hands have different cards).
+# Note that scores need not be consecutive - for example even if scores 1 and 3 exist, there might be no
+# hand that produces a score of 2. The comparison property is the only guarantee provided by get_score().
+def get_score(hand):
+    assert len(hand) == 5
+
+    # rankcounts[i] is the number of cards with the rank of i
+    rankcounts = [sum(1 for rank, _ in hand if rank == i) for i in range(13)]
+
+    # rankcounthist[i] is the number of times a rank count of i occurs.
+    # For example if there is exactly one triplet, then rankcounthist[3] = 1.
+    rankcounthist = [rankcounts.count(i) for i in range(6)]
+
+    # flushsuit is in the range [0,3] if all cards have that suit; otherwise -1
+    minsuit = min(suit[1] for suit in hand) # [-`min(suit for _, suit in hand)`-]
+    maxsuit = max(suit[1] for suit in hand) # [-`max(suit for _, suit in hand)`-]
+    flushsuit = minsuit if minsuit == maxsuit else -1
+
+    bestcards = get_5_frequent_highest_cards(rankcounts, rankcounthist)
+    straighthighrank = get_straight_high_rank(rankcounts)
+
+    # Main idea: Encode the hand type in the top bits, then encode up to 5 cards in big-endian (4 bits each).
+    if   straighthighrank != -1 and flushsuit != -1     : return 8 << 20 | straighthighrank  # Straight flush
+    elif rankcounthist[4] == 1                          : return 7 << 20 | bestcards         # Four of a kind
+    elif rankcounthist[3] == 1 and rankcounthist[2] == 1: return 6 << 20 | bestcards         # Full house
+    elif flushsuit != -1                                : return 5 << 20 | bestcards         # Flush
+    elif straighthighrank != -1                         : return 4 << 20 | straighthighrank  # Straight
+    elif rankcounthist[3] == 1                          : return 3 << 20 | bestcards         # Three of a kind
+    elif rankcounthist[2] == 2                          : return 2 << 20 | bestcards         # Two pairs
+    elif rankcounthist[2] == 1                          : return 1 << 20 | bestcards         # One pair
+    else                                                : return 0 << 20 | bestcards         # High card
+
+# Handpair is a space-separated string of 10 cards.
+def is_player1_win(handpair):
+    # Parse cards and divide among players
+    cards = [parse_card(item) for item in handpair.split(" ")]
+    assert len(cards) == 10
+    player1 = cards[ : 5]
+    player2 = cards[5 : ]
+    # Compare hand scores
+    return get_score(player1) > get_score(player2)
+
+HANDS = open('p054_poker.txt').read().rstrip("\n").split("\n")
+
+print(sum(1 for handpair in HANDS if is_player1_win(handpair)))
+===
+V RANKS = ‘23456789TJQKA’
+V SUITS = ‘SHCD’
+
+F parse_card(card)
+   R (:RANKS.index(card[0]), :SUITS.index(card[1]))
+
+F get_straight_high_rank(ranks)
+   L(i) (ranks.len - 1 .< 2).step(-1)
+      L(j) 5
+         I ranks[(i - j + 13) % 13] == 0
+            L.break
+      L.was_no_break
+         R i
+   R -1
+
+F get_5_frequent_highest_cards(ranks, rankshist)
+   V result = 0
+   V count = 0
+
+   L(i) (rankshist.len - 1 .< -1).step(-1)
+      L(j) (ranks.len - 1 .< -1).step(-1)
+         I ranks[j] == i
+            L(k) 0 .< i
+               I count >= 5
+                  L.break
+               result = result << 4 [|] j
+               count++
+
+   I count != 5
+      X ValueError(count)
+   R result
+
+F get_score(hand)
+   assert(hand.len == 5)
+
+   V rankcounts = (0.<13).map(i -> sum(@hand.filter((rank, _) -> rank == @i).map((rank, _) -> 1)))
+
+   V rankcounthist = (0.<6).map(i -> @rankcounts.count(i))
+
+   V minsuit = min(hand.map(suit -> suit[1]))
+   V maxsuit = max(hand.map(suit -> suit[1]))
+   V flushsuit = I minsuit == maxsuit {minsuit} E -1
+
+   V bestcards = get_5_frequent_highest_cards(rankcounts, rankcounthist)
+   V straighthighrank = get_straight_high_rank(rankcounts)
+
+   I straighthighrank != -1 & flushsuit != -1
+      R 8 << 20 [|] straighthighrank
+   E I rankcounthist[4] == 1
+      R 7 << 20 [|] bestcards
+   E I rankcounthist[3] == 1 & rankcounthist[2] == 1
+      R 6 << 20 [|] bestcards
+   E I flushsuit != -1
+      R 5 << 20 [|] bestcards
+   E I straighthighrank != -1
+      R 4 << 20 [|] straighthighrank
+   E I rankcounthist[3] == 1
+      R 3 << 20 [|] bestcards
+   E I rankcounthist[2] == 2
+      R 2 << 20 [|] bestcards
+   E I rankcounthist[2] == 1
+      R 1 << 20 [|] bestcards
+   E
+      R 0 << 20 [|] bestcards
+
+F is_player1_win(handpair)
+   V cards = handpair.split(‘ ’).map(item -> parse_card(item))
+   assert(cards.len == 10)
+   V player1 = cards[0.<5]
+   V player2 = cards[5..]
+   R get_score(player1) > get_score(player2)
+
+V HANDS = File(‘p054_poker.txt’).read().rtrim("\n").split("\n")
+
+print(sum(HANDS.filter(handpair -> is_player1_win(handpair)).map(handpair -> 1)))
+===
+auto RANKS = u"23456789TJQKA"_S;
+auto SUITS = u"SHCD"_S;
+
+template <typename T1> auto parse_card(const T1 &card)
+{
+    return make_tuple(::RANKS.index(_get<0>(card)), ::SUITS.index(_get<1>(card)));
+}
+
+template <typename T1> auto get_straight_high_rank(const T1 &ranks)
+{
+    for (auto i : range_el(ranks.len() - 1, 2).step(-1)) {
+        for (int j = 0; j < 5; j++)
+            if (ranks[mod((i - j + 13), 13)] == 0)
+                goto break_;
+        return i;
+        break_:;
+    }
+    return -1;
+}
+
+template <typename T1, typename T2> auto get_5_frequent_highest_cards(const T1 &ranks, const T2 &rankshist)
+{
+    auto result = 0;
+    auto count = 0;
+
+    for (auto i : range_el(rankshist.len() - 1, -1).step(-1))
+        for (auto j : range_el(ranks.len() - 1, -1).step(-1))
+            if (ranks[j] == i)
+                for (auto k : range_el(0, i)) {
+                    if (count >= 5)
+                        break;
+                    result = result << 4 | j;
+                    count++;
+                }
+
+    if (count != 5)
+        throw ValueError(count);
+    return result;
+}
+
+template <typename T1> auto get_score(const T1 &hand)
+{
+    assert(hand.len() == 5);
+
+    auto rankcounts = range_el(0, 13).map([&hand](const auto &i){return sum_map(hand.filter([&i](const auto &rank, const auto &_){return rank == i;}), [](const auto &rank, const auto &_){return 1;});});
+
+    auto rankcounthist = range_el(0, 6).map([&rankcounts](const auto &i){return rankcounts.count(i);});
+
+    auto minsuit = min_map(hand, [](const auto &suit){return _get<1>(suit);});
+    auto maxsuit = max_map(hand, [](const auto &suit){return _get<1>(suit);});
+    auto flushsuit = minsuit == maxsuit ? minsuit : -1;
+
+    auto bestcards = get_5_frequent_highest_cards(rankcounts, rankcounthist);
+    auto straighthighrank = get_straight_high_rank(rankcounts);
+
+    if (straighthighrank != -1 && flushsuit != -1)
+        return 8 << 20 | straighthighrank;
+    else if (_get<4>(rankcounthist) == 1)
+        return 7 << 20 | bestcards;
+    else if (_get<3>(rankcounthist) == 1 && _get<2>(rankcounthist) == 1)
+        return 6 << 20 | bestcards;
+    else if (flushsuit != -1)
+        return 5 << 20 | bestcards;
+    else if (straighthighrank != -1)
+        return 4 << 20 | straighthighrank;
+    else if (_get<3>(rankcounthist) == 1)
+        return 3 << 20 | bestcards;
+    else if (_get<2>(rankcounthist) == 2)
+        return 2 << 20 | bestcards;
+    else if (_get<2>(rankcounthist) == 1)
+        return 1 << 20 | bestcards;
+    else
+        return 0 << 20 | bestcards;
+}
+
+template <typename T1> auto is_player1_win(const T1 &handpair)
+{
+    auto cards = handpair.split(u" "_S).map([](const auto &item){return parse_card(item);});
+    assert(cards.len() == 10);
+    auto player1 = cards[range_el(0, 5)];
+    auto player2 = cards[range_ei(5)];
+    return get_score(player1) > get_score(player2);
+}
+
+auto HANDS = File(u"p054_poker.txt"_S).read().rtrim(u"\n"_S).split(u"\n"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum_map(HANDS.filter([](const auto &handpair){return is_player1_win(handpair);}), [](const auto &handpair){return 1;}));
+    }
+} code_block_1;
+
+
+# 55
+BigInt = int
+
+def is_lychrel(n : BigInt):
+    for i in range(50):
+        n += BigInt(str(n)[ : : -1])
+        if str(n) == str(n)[ : : -1]:
+            return False
+    return True
+
+print(sum(1 for i in range(10000) if is_lychrel(i)))
+===
+F is_lychrel(BigInt =n)
+   L(i) 50
+      n += BigInt(reversed(String(n)))
+      I String(n) == reversed(String(n))
+         R 0B
+   R 1B
+
+print(sum((0.<10000).filter(i -> is_lychrel(i)).map(i -> 1)))
+===
+auto is_lychrel(BigInt n)
+{
+    for (int i = 0; i < 50; i++) {
+        n += BigInt(reversed(String(n)));
+        if (String(n) == reversed(String(n)))
+            return false;
+    }
+    return true;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum_map(range_el(0, 10000).filter([](const auto &i){return is_lychrel(i);}), [](const auto &i){return 1;}));
+    }
+} code_block_1;
+
+
+# 56
+BigInt = int
+
+print(max(sum(int(c) for c in str(BigInt(a)**b))
+      for a in range(100) for b in range(100)))
+===
+print(max(multiloop((0.<100), (0.<100), (a, b) -> sum(String(BigInt(a) ^ b).map(c -> Int(c))))))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(max(multiloop(range_el(0, 100), range_el(0, 100), [](const auto &a, const auto &b){return sum_map(String(pow(BigInt(a), b)), [](const auto &c){return to_int(c);});})));
+    }
+} code_block_1;
+
+
+# 57
+BigInt = int
+
+LIMIT = 1000
+ans = 0
+numer = BigInt(0)
+denom = BigInt(1)
+for _ in range(LIMIT):
+    (numer, denom) = (denom, denom * 2 + numer)
+    # Now numer/denom is the i'th (0-based) continued fraction approximation of sqrt(2) - 1
+    if len(str(numer + denom)) > len(str(denom)):
+        ans += 1
+print(ans)
+===
+V LIMIT = 1000
+V ans = 0
+V numer = BigInt(0)
+V denom = BigInt(1)
+L(_) 0 .< LIMIT
+   (numer, denom) = (denom, denom * 2 + numer)
+   I String(numer + denom).len > String(denom).len
+      ans++
+print(ans)
+===
+auto LIMIT = 1000;
+auto ans = 0;
+auto numer = BigInt(0);
+auto denom = BigInt(1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto _ : range_el(0, LIMIT)) {
+            assign_from_tuple(numer, denom, make_tuple(denom, denom * 2 + numer));
+            if (String(numer + denom).len() > String(denom).len())
+                ans++;
+        }
+        print(ans);
+    }
+} code_block_1;
+
+
+# 58
+import eulerlib, itertools
+
+# From the diagram, let's observe the four corners of an n * n square (where n is odd).
+# It's not hard to convince yourself that:
+# - The bottom right corner always has the value n^2.
+# Working clockwise (backwards):
+# - The bottom left corner has the value n^2 - (n - 1).
+# - The top left corner has the value n^2 - 2(n - 1).
+# - The top right has the value n^2 - 3(n - 1).
+# Furthermore, the number of elements on the diagonal is 2n - 1.
+numprimes = 0
+for n in itertools.count(1, 2):
+    for i in range(4):
+        if eulerlib.is_prime(n * n - i * (n - 1)):
+            numprimes += 1
+    if n > 1 and numprimes * 10 < n * 2 - 1:
+        print(n)
+        break
+===
+V numprimes = 0
+L(n) (1..).step(2)
+   L(i) 4
+      I eulerlib:is_prime(n * n - i * (n - 1))
+         numprimes++
+   I n > 1 & numprimes * 10 < n * 2 - 1
+      print(n)
+      L.break
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto numprimes = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ei(1).step(2)) {
+            for (int i = 0; i < 4; i++)
+                if (eulerlib::is_prime(n * n - i * (n - 1)))
+                    numprimes++;
+            if (n > 1 && numprimes * 10 < n * 2 - 1) {
+                print(n);
+                break;
+            }
+        }
+    }
+} code_block_1;
+
+
+# 59
+CIPHERTEXT = list(map(int, open('p059_cipher.txt').read().split(','))) # `list()` is necessary here
+
+# Heuristical function that returns a penalty score, where lower is better.
+def get_score(plaintext):
+    result = 0
+    for c in plaintext:
+        if 65 <= c <= 90:  # ASCII uppercase 'A' to 'Z', good
+            result += 1
+        elif 97 <= c <= 122:  # ASCII lowercase 'a' to 'z', excellent
+            result += 2
+        elif c < 0x20 or c == 0x7F:  # ASCII control characters, very bad
+            result -= 10
+    return result
+
+# Takes two sequences of integers and returns a list of integers.
+def decrypt(ciphertext, key):
+    return [(c ^ key[i % 3]) for i, c in enumerate(ciphertext)]
+
+bestkey = max(((x, y, z)
+    for x in range(97, 123)  # ASCII lowercase 'a' to 'z'
+    for y in range(97, 123)
+    for z in range(97, 123)),
+    key=lambda key: get_score(decrypt(CIPHERTEXT, key)))
+print(sum(decrypt(CIPHERTEXT, bestkey)))
+===
+V CIPHERTEXT = File(‘p059_cipher.txt’).read().split(‘,’).map(Int)
+
+F get_score(plaintext)
+   V result = 0
+   L(c) plaintext
+      I c C 65..90
+         result++
+      E I c C 97..122
+         result += 2
+      E I c < 2'0 | c == 7'F
+         result -= 10
+   R result
+
+F decrypt(ciphertext, key)
+   R enumerate(ciphertext).map((i, c) -> (c (+) @key[i % 3]))
+
+V bestkey = max((multiloop((97..122), (97..122), (97..122), (x, y, z) -> (x, y, z))), key' key -> get_score(decrypt(:CIPHERTEXT, key)))
+print(sum(decrypt(CIPHERTEXT, bestkey)))
+===
+auto CIPHERTEXT = File(u"p059_cipher.txt"_S).read().split(u","_S).map([](const auto &x){return to_int(x);});
+
+template <typename T1> auto get_score(const T1 &plaintext)
+{
+    auto result = 0;
+    for (auto &&c : plaintext)
+        if (in(c, range_ee(65, 90)))
+            result++;
+        else if (in(c, range_ee(97, 122)))
+            result += 2;
+        else if (c < 0x20 || c == 0x7F)
+            result -= 10;
+    return result;
+}
+
+template <typename T1, typename T2> auto decrypt(const T1 &ciphertext, const T2 &key)
+{
+    return enumerate(ciphertext).map([&key](const auto &i, const auto &c){return (c ^ key[mod(i, 3)]);});
+}
+
+auto bestkey = max_with_key((multiloop(range_ee(97, 122), range_ee(97, 122), range_ee(97, 122), [](const auto &x, const auto &y, const auto &z){return make_tuple(x, y, z);})), [](const auto &key){return get_score(decrypt(::CIPHERTEXT, key));});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum(decrypt(CIPHERTEXT, bestkey)));
+    }
+} code_block_1;

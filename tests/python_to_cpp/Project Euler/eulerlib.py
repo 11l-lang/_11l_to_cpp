@@ -7,6 +7,7 @@
 #
 
 import math
+BigInt = int
 
 # Tests whether the given integer is a prime number.
 def is_prime(x):
@@ -33,3 +34,12 @@ def list_primality(n):
 			for j in range(i * i, len(result), i):
 				result[j] = False
 	return result
+
+# Returns all the prime numbers less than or equal to n, in ascending order.
+# For example: listPrimes(97) = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, ..., 83, 89, 97].
+def list_primes(n):
+	return [i for i, isprime in enumerate(list_primality(n)) if isprime]
+
+def binomial(n : BigInt, k : BigInt):
+    assert BigInt(0) <= k <= n
+    return math.factorial(n) // (math.factorial(k) * math.factorial(n - k))

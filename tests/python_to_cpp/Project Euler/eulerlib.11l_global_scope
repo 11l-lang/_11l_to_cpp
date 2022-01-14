@@ -14,3 +14,20 @@ list_primality
             ‘n; ; ; ’
         ]
     ]
+list_primes
+    type = ‘’
+    ast_nodes = [
+    .   node_type = function
+        function_arguments = [
+            ‘n; ; ; ’
+        ]
+    ]
+binomial
+    type = ‘’
+    ast_nodes = [
+    .   node_type = function
+        function_arguments = [
+            ‘n; ; BigInt; ’
+            ‘k; ; BigInt; ’
+        ]
+    ]

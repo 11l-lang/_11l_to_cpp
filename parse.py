@@ -3344,6 +3344,7 @@ builtins_scope.add_function('ValueError', ASTFunctionDefinition([('s', '', 'Stri
 builtins_scope.add_function('IndexError', ASTFunctionDefinition([('index', '', 'Int')]))
 builtins_scope.add_function('NotImplementedError', ASTFunctionDefinition([]))
 builtins_scope.add_function('RuntimeError', ASTFunctionDefinition([('message', '', 'String')]))
+builtins_scope.add_function('AssertionError', ASTFunctionDefinition([('message', '', 'String')]))
 
 def add_builtin_global_var(var_name, var_type, var_type_args = []):
     var = ASTVariableDeclaration()
