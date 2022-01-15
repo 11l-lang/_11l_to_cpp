@@ -451,7 +451,7 @@ public:
 
     template <typename T1> auto operator*(const T1 &b) const
     {
-        std::function<Array<int>(Array<int>&, Array<int>&)> _mul = [&_mul](Array<int> &a, Array<int> &b)
+        std::function<Array<int>(Array<int>&, Array<int>&)> _mul = [&_mul](Array<int> &a, Array<int> &b) -> Array<int>
         {
             if (!(!a.empty() && !b.empty()))
                 return Array<int>();

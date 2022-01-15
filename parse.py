@@ -1420,7 +1420,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                         arguments.append(('' if '=' in arg[3] or '&' in arg[3] else 'const ') + trans_type(arg[2], self.scope, tokens[self.tokeni]) + ' ' + ('&'*((arg[2] not in ('Int', 'Float')) and ('=' not in arg[3]))) + arg[0] + ('' if arg[1] == '' else ' = ' + arg[1]))
             return self.children_to_str(indent, ('auto' if self.function_return_type == '' else 'std::function<' + trans_type(self.function_return_type, self.scope, tokens[self.tokeni]) + '(' + ', '.join(trans_type(arg[2], self.scope, tokens[self.tokeni]) + '&'*('&' in arg[3]) for arg in self.function_arguments) + ')>') + ' ' + self.function_name
                 + ' = [' + ', '.join(sorted(filter(lambda v: not '&'+v in captured_variables, captured_variables))) + ']('
-                + ', '.join(arguments) + ')')[:-1] + ";\n"
+                + ', '.join(arguments) + ')' + ('' if self.function_return_type == '' else ' -> ' + trans_type(self.function_return_type, self.scope, tokens[self.tokeni])))[:-1] + ";\n"
 
         else:
             s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + self.function_name
@@ -3444,6 +3444,7 @@ dict_scope.add_name('update', ASTFunctionDefinition([('other', '', 'Dict')]))
 dict_scope.add_name('find', ASTFunctionDefinition([('key', '', '')]))
 dict_scope.add_name('get', ASTFunctionDefinition([('key', '', ''), ('default', '', '')]))
 dict_scope.add_name('pop', ASTFunctionDefinition([('key', '', '')]))
+dict_scope.add_name('clear', ASTFunctionDefinition([]))
 dict_scope.add_name('keys', ASTFunctionDefinition([]))
 dict_scope.add_name('values', ASTFunctionDefinition([]))
 dict_scope.add_name('items', ASTFunctionDefinition([]))

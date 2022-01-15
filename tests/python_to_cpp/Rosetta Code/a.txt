@@ -1617,7 +1617,7 @@ template <typename T1> auto bauer(const T1 &n)
     auto best_len = n;
     auto cnt = 0;
 
-    std::function<void(int, int)> extend_chain = [&best, &best_len, &chain, &cnt, &extend_chain, &in_chain, &n](const int x, int pos)
+    std::function<void(int, int)> extend_chain = [&best, &best_len, &chain, &cnt, &extend_chain, &in_chain, &n](const int x, int pos) -> void
     {
 
         if (best_len - pos < 32 && x < n >> (best_len - pos))

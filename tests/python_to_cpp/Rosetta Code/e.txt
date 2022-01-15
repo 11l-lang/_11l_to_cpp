@@ -196,7 +196,7 @@ template <typename T1> auto subPalindromes(const T1 &tree)
 {
     Array<String> s;
 
-    std::function<void(int, String)> children = [&children, &s, &tree](const int n, String p)
+    std::function<void(int, String)> children = [&children, &s, &tree](const int n, String p) -> void
     {
         for (auto &&[c, n] : tree[n].edges) {
             p = c & p & c;
@@ -2368,7 +2368,7 @@ template <typename T5, typename T6> auto listEsths(const Int64 &n1, const Int64 
 {
     Array<Int64> esths;
 
-    std::function<void(Int64, Int64, Int64)> dfs = [&dfs, &esths](const Int64 &n, const Int64 &m, const Int64 &i)
+    std::function<void(Int64, Int64, Int64)> dfs = [&dfs, &esths](const Int64 &n, const Int64 &m, const Int64 &i) -> void
     {
         if (in(i, range_ee(n, m)))
             esths.append(i);

@@ -1113,7 +1113,7 @@ L(i) 21
 ===
 template <typename T1> auto fib(const T1 &n)
 {
-    std::function<int(int)> f = [&f](const int n)
+    std::function<int(int)> f = [&f](const int n) -> int
     {
         if (n < 2)
             return n;
@@ -8766,7 +8766,7 @@ template <typename T1 = decltype(16), typename T2 = decltype(8)> auto make_maze(
     auto ver = range_el(0, h).map([&w](const auto &_){return create_array({u"|  "_S}) * w + create_array({String(u"|"_S)});}) + create_array({create_array({u""_S}) * 0});
     auto hor = range_ee(0, h).map([&w](const auto &_){return create_array({u"+--"_S}) * w + create_array({String(u"+"_S)});});
 
-    std::function<void(int, int)> walk = [&hor, &ver, &vis, &walk](const int x, const int y)
+    std::function<void(int, int)> walk = [&hor, &ver, &vis, &walk](const int x, const int y) -> void
     {
         vis[y].set(x, 1);
 
@@ -16133,7 +16133,7 @@ solve("B A A\nA A A")
 template <typename T1, typename T2> auto gen_row(const T1 &w, const T2 &s)
 {
     u"Create all patterns of a row or col that match given runs."_S;
-    std::function<Array<Array<int>>(Array<Array<int>>, int)> gen_seg = [&gen_seg](const Array<Array<int>> &o, const int sp)
+    std::function<Array<Array<int>>(Array<Array<int>>, int)> gen_seg = [&gen_seg](const Array<Array<int>> &o, const int sp) -> Array<Array<int>>
     {
         if (o.empty())
             return create_array({create_array({2}) * sp});
@@ -16224,7 +16224,7 @@ template <typename T1, typename T2> auto deduce(const T1 &hr, const T2 &vr)
 
     auto out = create_array({Array<int>()}) * h;
 
-    std::function<int(int)> try_all = [&cols, &h, &out, &rows, &show_gram, &try_all, &w](const int n)
+    std::function<int(int)> try_all = [&cols, &h, &out, &rows, &show_gram, &try_all, &w](const int n) -> int
     {
         if (n >= h) {
             for (auto j : range_el(0, w))
@@ -17256,7 +17256,7 @@ template <typename T1> auto from_edges(const T1 &edges)
 
 template <typename T1> auto trajan(T1 &vv)
 {
-    std::function<Array<Array<int>>(Node&, Array<Node>&)> strongconnect = [&strongconnect](Node &v, Array<Node> &s)
+    std::function<Array<Array<int>>(Node&, Array<Node>&)> strongconnect = [&strongconnect](Node &v, Array<Node> &s) -> Array<Array<int>>
     {
         auto pos = s.len();
         v.root = pos;

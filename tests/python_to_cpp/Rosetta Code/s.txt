@@ -5137,7 +5137,7 @@ public:
             return;
         }
 
-        std::function<void(int, String)> f = [&f, this](const int n, const String &pre)
+        std::function<void(int, String)> f = [&f, this](const int n, const String &pre) -> void
         {
             auto children = nodes[n].ch;
             if (children.empty()) {
@@ -10720,6 +10720,7 @@ struct CodeBlock1
 # (this solution is based on [https://github.com/nayuki/Project-Euler-solutions/blob/master/python/p005.py?ts=4])
 # Slow BigInt
 import math
+BigInt = int
 
 def f(n):
     ans = BigInt(1)

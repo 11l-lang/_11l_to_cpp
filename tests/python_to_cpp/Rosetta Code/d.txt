@@ -707,7 +707,7 @@ template <typename T1, typename T2> auto deBruijn(const T1 &k, const T2 &n)
     auto a = create_array({Byte(0)}) * (k * n);
     Array<Byte> seq;
 
-    std::function<void(int, int)> db = [&a, &db, &k, &n, &seq](const int t, const int p)
+    std::function<void(int, int)> db = [&a, &db, &k, &n, &seq](const int t, const int p) -> void
     {
         if (t > n) {
             if (mod(n, p) == 0)

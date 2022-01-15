@@ -2104,7 +2104,7 @@ template <typename T1, typename T2> auto dList(const T1 &n, T2 start)
     a.sort_range(range_ei(1));
     auto first = _get<1>(a);
     Array<Array<int>> r;
-    std::function<void(int)> recurse = [&a, &first, &r, &recurse](const int last)
+    std::function<void(int)> recurse = [&a, &first, &r, &recurse](const int last) -> void
     {
         if ((last == first)) {
             {int Lindex = 0;
@@ -2153,7 +2153,7 @@ template <typename T1, typename T2> auto reducedLatinSquares(const T1 &n, const 
         _get<0>(rlatin).set(j, j + 1);
 
     auto count = 0;
-    std::function<void(int)> recurse = [&count, &echo, &n, &recurse, &rlatin](const int i)
+    std::function<void(int)> recurse = [&count, &echo, &n, &recurse, &rlatin](const int i) -> void
     {
 
         auto rows = dList(n, i);

@@ -2928,7 +2928,7 @@ public:
 template <typename T1> auto to_indented(const T1 &node)
 {
     Array<INode> result;
-    std::function<void(NNode, int)> add_node = [&add_node, &result](const NNode &node, const int level)
+    std::function<void(NNode, int)> add_node = [&add_node, &result](const NNode &node, const int level) -> void
     {
         result.append(INode(node.value, level));
         for (auto &&child : node.children)

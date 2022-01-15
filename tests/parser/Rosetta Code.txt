@@ -2005,7 +2005,7 @@ template <typename T1> auto kosaraju(const T1 &g)
     auto x = size;
     auto t = create_array({Array<int>()}) * size;
 
-    std::function<void(int)> visit = [&g, &l, &t, &vis, &visit, &x](const int u)
+    std::function<void(int)> visit = [&g, &l, &t, &vis, &visit, &x](const int u) -> void
     {
         if (!vis[u]) {
             vis.set(u, true);
@@ -2022,7 +2022,7 @@ template <typename T1> auto kosaraju(const T1 &g)
         visit(u);
     auto c = create_array({0}) * size;
 
-    std::function<void(int, int)> assign = [&assign, &c, &t, &vis](const int u, const int root)
+    std::function<void(int, int)> assign = [&assign, &c, &t, &vis](const int u, const int root) -> void
     {
         if (vis[u]) {
             vis.set(u, false);

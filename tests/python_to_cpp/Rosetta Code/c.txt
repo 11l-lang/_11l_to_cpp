@@ -2997,7 +2997,7 @@ template <typename T1, typename T2> auto cut_it(T1 h, T2 w)
     auto blen = (h + 1) * (w + 1) - 1;
     auto grid = create_array({false}) * (blen + 1);
 
-    std::function<int(int, int, int)> walk = [&blen, &dirs, &grid, &h, &next, &w, &walk](const int y, const int x, int count)
+    std::function<int(int, int, int)> walk = [&blen, &dirs, &grid, &h, &next, &w, &walk](const int y, const int x, int count) -> int
     {
         if (y == 0 || y == h || x == 0 || x == w)
             return count + 1;
