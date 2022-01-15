@@ -1,3 +1,9 @@
+F is_square(x)
+   I x < 0
+      R 0B
+   V y = Int(sqrt(x))
+   R y * y == x
+
 F is_prime(x)
    I x <= 1
       R 0B
@@ -22,6 +28,14 @@ F list_primality(n)
 
 F list_primes(n)
    R enumerate(list_primality(n)).filter((i, isprime) -> isprime).map((i, isprime) -> i)
+
+F list_totients(n)
+   V result = Array(0 .. n)
+   L(i) 2 .< result.len
+      I result[i] == i
+         L(j) (i .< result.len).step(i)
+            result[j] -= result[j] I/ i
+   R result
 
 F binomial(BigInt n, BigInt k)
    assert(k C BigInt(0) .. n)

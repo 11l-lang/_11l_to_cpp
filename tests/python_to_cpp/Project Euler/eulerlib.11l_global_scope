@@ -1,3 +1,11 @@
+is_square
+    type = ‘’
+    ast_nodes = [
+    .   node_type = function
+        function_arguments = [
+            ‘x; ; ; ’
+        ]
+    ]
 is_prime
     type = ‘’
     ast_nodes = [
@@ -15,6 +23,14 @@ list_primality
         ]
     ]
 list_primes
+    type = ‘’
+    ast_nodes = [
+    .   node_type = function
+        function_arguments = [
+            ‘n; ; ; ’
+        ]
+    ]
+list_totients
     type = ‘’
     ast_nodes = [
     .   node_type = function

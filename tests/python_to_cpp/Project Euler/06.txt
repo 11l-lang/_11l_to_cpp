@@ -212,8 +212,7 @@ def compute():
     # Build table of numbers
     # numbers[i][j] is the set of figurate numbers of i sides (3 <= i <= 8), having 4 digits, beginning with the 2 digits equal to j
     def create_set():
-        s = set() # int
-        return s
+        return set() # int
     numbers = [[create_set() for j in range(100)] for i in range(9)]
     for sides in range(3, 9):
         for n in itertools.count(1):
@@ -253,8 +252,7 @@ F figurate_number(sides, n)
 
 F compute()
    F create_set()
-      V s = Set[Int]()
-      R s
+      R Set[Int]()
    V numbers = (0.<9).map(i -> (0.<100).map(j -> @@create_set()))
    L(sides) 3..8
       L(n) 1..
@@ -296,8 +294,7 @@ auto compute()
 {
     auto create_set = []()
     {
-        auto s = Set<int>();
-        return s;
+        return Set<int>();
     };
     auto numbers = range_el(0, 9).map([&create_set](const auto &i){return range_el(0, 100).map([&create_set](const auto &j){return create_set();});});
     for (auto sides : range_ee(3, 8))
@@ -445,5 +442,661 @@ struct CodeBlock1
                 if (String(pow(BigInt(i), j)).len() == j)
                     ans++;
         print(ans);
+    }
+} code_block_1;
+
+
+# 64
+import eulerlib, math
+
+def quadratic_surd(a, b, c, d):
+    if c == 0:
+        raise ValueError(0)
+
+    # Simplify
+    if c < 0:
+        a = -a
+        b = -b
+        c = -c
+    g = math.gcd(math.gcd(a, b), c)
+    if g != 1:
+        a //= g
+        b //= g
+        c //= g
+
+    return (a, b, c, d)
+
+def qs_floor(val):
+    (a, b, c, d) = val
+    temp = int(math.sqrt(b * b * d))
+    if b < 0:
+        temp = -(temp + 1)
+    temp += a
+    if temp < 0:
+        temp -= c - 1
+    return temp // c
+
+def qs_sub(self, other):
+    ( self_a,  self_b,  self_c,  self_d) = self
+    (other_a, other_b, other_c, other_d) = other
+    if self_d != other_d:
+        raise ValueError(0)
+    return quadratic_surd(
+        self_a * other_c - other_a * self_c,
+        self_b * other_c - other_b * self_c,
+        self_c * other_c,
+        self_d)
+
+def qs_reciprocal(val):
+    (a, b, c, d) = val
+    return (
+        -a * c,
+        b * c,
+        b * b * d - a * a,
+        d)
+
+# Returns the period of the continued fraction of sqrt(n)
+def get_sqrt_continued_fraction_period(n):
+    seen : Dict[Tuple[int, int, int, int], int] = {}
+    val = (0, 1, 1, n)
+    while True:
+        seen[val] = len(seen)
+        val = qs_reciprocal(qs_sub(val, (qs_floor(val), 0, 1, val[3])))
+        if val in seen:
+            return len(seen) - seen[val]
+
+print(sum(1 for i in range(1, 10001) if (not eulerlib.is_square(i) and get_sqrt_continued_fraction_period(i) % 2 == 1)))
+===
+F quadratic_surd(=a, =b, =c, d)
+   I c == 0
+      X ValueError(0)
+
+   I c < 0
+      a = -a
+      b = -b
+      c = -c
+   V g = gcd(gcd(a, b), c)
+   I g != 1
+      a I/= g
+      b I/= g
+      c I/= g
+
+   R (a, b, c, d)
+
+F qs_floor(val)
+   V (a, b, c, d) = val
+   V temp = Int(sqrt(b * b * d))
+   I b < 0
+      temp = -(temp + 1)
+   temp += a
+   I temp < 0
+      temp -= c - 1
+   R temp I/ c
+
+F qs_sub(self, other)
+   V (self_a, self_b, self_c, self_d) = self
+   V (other_a, other_b, other_c, other_d) = other
+   I self_d != other_d
+      X ValueError(0)
+   R quadratic_surd(self_a * other_c - other_a * self_c, self_b * other_c - other_b * self_c, self_c * other_c, self_d)
+
+F qs_reciprocal(val)
+   V (a, b, c, d) = val
+   R (-a * c, b * c, b * b * d - a * a, d)
+
+F get_sqrt_continued_fraction_period(n)
+   [(Int, Int, Int, Int) = Int] seen
+   V val = (0, 1, 1, n)
+   L
+      seen[val] = seen.len
+      val = qs_reciprocal(qs_sub(val, (qs_floor(val), 0, 1, val[3])))
+      I val C seen
+         R seen.len - seen[val]
+
+print(sum((1..10000).filter(i -> (!eulerlib:is_square(i) & get_sqrt_continued_fraction_period(i) % 2 == 1)).map(i -> 1)))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto quadratic_surd(T1 a, T2 b, T3 c, const T4 &d)
+{
+    if (c == 0)
+        throw ValueError(0);
+
+    if (c < 0) {
+        a = -a;
+        b = -b;
+        c = -c;
+    }
+    auto g = gcd(gcd(a, b), c);
+    if (g != 1) {
+        a = idiv(a, g);
+        b = idiv(b, g);
+        c = idiv(c, g);
+    }
+
+    return make_tuple(a, b, c, d);
+}
+
+template <typename T1> auto qs_floor(const T1 &val)
+{
+    auto [a, b, c, d] = val;
+    auto temp = to_int(sqrt(b * b * d));
+    if (b < 0)
+        temp = -(temp + 1);
+    temp += a;
+    if (temp < 0)
+        temp -= c - 1;
+    return idiv(temp, c);
+}
+
+template <typename T1, typename T2> auto qs_sub(const T1 &self, const T2 &other)
+{
+    auto [self_a, self_b, self_c, self_d] = self;
+    auto [other_a, other_b, other_c, other_d] = other;
+    if (self_d != other_d)
+        throw ValueError(0);
+    return quadratic_surd(self_a * other_c - other_a * self_c, self_b * other_c - other_b * self_c, self_c * other_c, self_d);
+}
+
+template <typename T1> auto qs_reciprocal(const T1 &val)
+{
+    auto [a, b, c, d] = val;
+    return make_tuple(-a * c, b * c, b * b * d - a * a, d);
+}
+
+template <typename T1> auto get_sqrt_continued_fraction_period(const T1 &n)
+{
+    Dict<ivec4, int> seen;
+    auto val = make_tuple(0, 1, 1, n);
+    while (true) {
+        seen.set(val, seen.len());
+        val = qs_reciprocal(qs_sub(val, make_tuple(qs_floor(val), 0, 1, _get<3>(val))));
+        if (in(val, seen))
+            return seen.len() - seen[val];
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum_map(range_ee(1, 10000).filter([](const auto &i){return (!eulerlib::is_square(i) && mod(get_sqrt_continued_fraction_period(i), 2) == 1);}), [](const auto &i){return 1;}));
+    }
+} code_block_1;
+
+
+# 65
+BigInt = int
+
+def e_contfrac_term(i):
+    if i == 0:
+        return 2
+    elif i % 3 == 2:
+        return i // 3 * 2 + 2
+    else:
+        return 1
+
+numer = BigInt(1)
+denom = BigInt(0)
+for i in range(99, -1, -1): # [-`reversed(range(100))`-]
+    (numer, denom) = (e_contfrac_term(i) * numer + denom, numer)
+print(sum(int(c) for c in str(numer)))
+===
+F e_contfrac_term(i)
+   I i == 0
+      R 2
+   E I i % 3 == 2
+      R i I/ 3 * 2 + 2
+   E
+      R 1
+
+V numer = BigInt(1)
+V denom = BigInt(0)
+L(i) (99 .< -1).step(-1)
+   (numer, denom) = (e_contfrac_term(i) * numer + denom, numer)
+print(sum(String(numer).map(c -> Int(c))))
+===
+template <typename T1> auto e_contfrac_term(const T1 &i)
+{
+    if (i == 0)
+        return 2;
+    else if (mod(i, 3) == 2)
+        return idiv(i, 3) * 2 + 2;
+    else
+        return 1;
+}
+
+auto numer = BigInt(1);
+auto denom = BigInt(0);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(99, -1).step(-1))
+            assign_from_tuple(numer, denom, make_tuple(e_contfrac_term(i) * numer + denom, numer));
+        print(sum_map(String(numer), [](const auto &c){return to_int(c);}));
+    }
+} code_block_1;
+
+
+# 66
+import eulerlib, math
+BigInt = int
+
+def quadratic_surd(a, b, c, d):
+    if c == 0:
+        raise ValueError(0)
+
+    # Simplify
+    if c < 0:
+        a = -a
+        b = -b
+        c = -c
+    g = math.gcd(math.gcd(a, b), c)
+    if g != 1:
+        a //= g
+        b //= g
+        c //= g
+
+    return (a, b, c, d)
+
+def qs_floor(val):
+    (a, b, c, d) = val
+    temp = int(math.sqrt(b * b * d))
+    if b < 0:
+        temp = -(temp + 1)
+    temp += a
+    if temp < 0:
+        temp -= c - 1
+    return temp // c
+
+def qs_sub(self, other):
+    ( self_a,  self_b,  self_c,  self_d) = self
+    (other_a, other_b, other_c, other_d) = other
+    if self_d != other_d:
+        raise ValueError(0)
+    return quadratic_surd(
+        self_a * other_c - other_a * self_c,
+        self_b * other_c - other_b * self_c,
+        self_c * other_c,
+        self_d)
+
+def qs_reciprocal(val):
+    (a, b, c, d) = val
+    return (
+        -a * c,
+        b * c,
+        b * b * d - a * a,
+        d)
+
+# Returns the periodic continued fraction of sqrt(n). Requires n to not be a perfect square.
+# result[0] is the minimal non-periodic prefix, and result[1] is the minimal periodic tail.
+def sqrt_to_continued_fraction(n):
+    terms : List[int] = []
+    seen : Dict[Tuple[int, int, int, int], int] = {}
+    val = (0, 1, 1, n)
+    while True:
+        seen[val] = len(seen)
+        flr = qs_floor(val)
+        terms.append(flr)
+        val = qs_reciprocal(qs_sub(val, (flr, 0, 1, val[3])))
+        if val in seen:
+            break
+    split = seen[val]
+    return (terms[ : split], terms[split : ])
+
+def fraction(numer, denom):
+    # if denom < 0: # [https://github.com/nayuki/Project-Euler-solutions/blob/master/java/Library.java#L357]
+    #     numer = -numer
+    #     denom = -denom
+    # g = math.gcd(numer, denom)
+    # if g != 1:
+    #     numer //= g
+    #     denom //= g
+    return (numer, denom)
+
+def fraction_add(fr, n):
+    return (fr[0] + n * fr[1], fr[1])
+
+# Returns the smallest x such that x > 0 and there exists some y such that x^2 - n y^2 = 1.
+# Requires n to not be a perfect square.
+def smallest_solution_x(n : int):
+    contfrac = sqrt_to_continued_fraction(n)
+    temp = contfrac[0] + contfrac[1][ : -1]
+
+    val = fraction(BigInt(temp[-1]), BigInt(1))
+    for term in reversed(temp[ : -1]):
+        val = fraction_add((val[1], val[0]), term)
+
+    if len(contfrac[1]) % 2 == 0:
+        return val[0]
+    else:
+        return val[0]**2 + val[1]**2 * n
+
+print(max((n for n in range(2, 1001) if (not eulerlib.is_square(n))), key=smallest_solution_x))
+===
+F quadratic_surd(=a, =b, =c, d)
+   I c == 0
+      X ValueError(0)
+
+   I c < 0
+      a = -a
+      b = -b
+      c = -c
+   V g = gcd(gcd(a, b), c)
+   I g != 1
+      a I/= g
+      b I/= g
+      c I/= g
+
+   R (a, b, c, d)
+
+F qs_floor(val)
+   V (a, b, c, d) = val
+   V temp = Int(sqrt(b * b * d))
+   I b < 0
+      temp = -(temp + 1)
+   temp += a
+   I temp < 0
+      temp -= c - 1
+   R temp I/ c
+
+F qs_sub(self, other)
+   V (self_a, self_b, self_c, self_d) = self
+   V (other_a, other_b, other_c, other_d) = other
+   I self_d != other_d
+      X ValueError(0)
+   R quadratic_surd(self_a * other_c - other_a * self_c, self_b * other_c - other_b * self_c, self_c * other_c, self_d)
+
+F qs_reciprocal(val)
+   V (a, b, c, d) = val
+   R (-a * c, b * c, b * b * d - a * a, d)
+
+F sqrt_to_continued_fraction(n)
+   [Int] terms
+   [(Int, Int, Int, Int) = Int] seen
+   V val = (0, 1, 1, n)
+   L
+      seen[val] = seen.len
+      V flr = qs_floor(val)
+      terms.append(flr)
+      val = qs_reciprocal(qs_sub(val, (flr, 0, 1, val[3])))
+      I val C seen
+         L.break
+   V split = seen[val]
+   R (terms[0 .< split], terms[split ..])
+
+F fraction(numer, denom)
+   R (numer, denom)
+
+F fraction_add(fr, n)
+   R (fr[0] + n * fr[1], fr[1])
+
+F smallest_solution_x(Int n)
+   V contfrac = sqrt_to_continued_fraction(n)
+   V temp = contfrac[0] + contfrac[1][0 .< (len)-1]
+
+   V val = fraction(BigInt(temp.last), BigInt(1))
+   L(term) reversed(temp[0 .< (len)-1])
+      val = fraction_add((val[1], val[0]), term)
+
+   I contfrac[1].len % 2 == 0
+      R val[0]
+   E
+      R val[0] ^ 2 + val[1] ^ 2 * n
+
+print(max(((2..1000).filter(n -> (!eulerlib:is_square(n)))), key' smallest_solution_x))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto quadratic_surd(T1 a, T2 b, T3 c, const T4 &d)
+{
+    if (c == 0)
+        throw ValueError(0);
+
+    if (c < 0) {
+        a = -a;
+        b = -b;
+        c = -c;
+    }
+    auto g = gcd(gcd(a, b), c);
+    if (g != 1) {
+        a = idiv(a, g);
+        b = idiv(b, g);
+        c = idiv(c, g);
+    }
+
+    return make_tuple(a, b, c, d);
+}
+
+template <typename T1> auto qs_floor(const T1 &val)
+{
+    auto [a, b, c, d] = val;
+    auto temp = to_int(sqrt(b * b * d));
+    if (b < 0)
+        temp = -(temp + 1);
+    temp += a;
+    if (temp < 0)
+        temp -= c - 1;
+    return idiv(temp, c);
+}
+
+template <typename T1, typename T2> auto qs_sub(const T1 &self, const T2 &other)
+{
+    auto [self_a, self_b, self_c, self_d] = self;
+    auto [other_a, other_b, other_c, other_d] = other;
+    if (self_d != other_d)
+        throw ValueError(0);
+    return quadratic_surd(self_a * other_c - other_a * self_c, self_b * other_c - other_b * self_c, self_c * other_c, self_d);
+}
+
+template <typename T1> auto qs_reciprocal(const T1 &val)
+{
+    auto [a, b, c, d] = val;
+    return make_tuple(-a * c, b * c, b * b * d - a * a, d);
+}
+
+template <typename T1> auto sqrt_to_continued_fraction(const T1 &n)
+{
+    Array<int> terms;
+    Dict<ivec4, int> seen;
+    auto val = make_tuple(0, 1, 1, n);
+    while (true) {
+        seen.set(val, seen.len());
+        auto flr = qs_floor(val);
+        terms.append(flr);
+        val = qs_reciprocal(qs_sub(val, make_tuple(flr, 0, 1, _get<3>(val))));
+        if (in(val, seen))
+            break;
+    }
+    auto split = seen[val];
+    return make_tuple(terms[range_el(0, split)], terms[range_ei(split)]);
+}
+
+template <typename T1, typename T2> auto fraction(const T1 &numer, const T2 &denom)
+{
+    return make_tuple(numer, denom);
+}
+
+template <typename T1, typename T2> auto fraction_add(const T1 &fr, const T2 &n)
+{
+    return make_tuple(_get<0>(fr) + n * _get<1>(fr), _get<1>(fr));
+}
+
+auto smallest_solution_x(const int n)
+{
+    auto contfrac = sqrt_to_continued_fraction(n);
+    auto temp = _get<0>(contfrac) + _get<1>(contfrac)[range_e_llen(0,  - 1)];
+
+    auto val = fraction(BigInt(temp.last()), BigInt(1));
+    for (auto &&term : reversed(temp[range_e_llen(0,  - 1)]))
+        val = fraction_add(make_tuple(_get<1>(val), _get<0>(val)), term);
+
+    if (mod(_get<1>(contfrac).len(), 2) == 0)
+        return _get<0>(val);
+    else
+        return square(_get<0>(val)) + square(_get<1>(val)) * n;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(max_with_key((range_ee(2, 1000).filter([](const auto &n){return (!eulerlib::is_square(n));})), smallest_solution_x));
+    }
+} code_block_1;
+
+
+# 67
+triangle = [list(map(int, line.split(' '))) for line in open('p067_triangle.txt').read().rstrip("\n").split("\n")]
+
+for i in range(len(triangle) - 2, -1, -1): # [-`reversed(range(len(triangle) - 1))`-]
+    for j in range(len(triangle[i])):
+        triangle[i][j] += max(triangle[i + 1][j], triangle[i + 1][j + 1])
+print(triangle[0][0])
+===
+V triangle = File(‘p067_triangle.txt’).read().rtrim("\n").split("\n").map(line -> line.split(‘ ’).map(Int))
+
+L(i) (triangle.len - 2 .< -1).step(-1)
+   L(j) 0 .< triangle[i].len
+      triangle[i][j] += max(triangle[i + 1][j], triangle[i + 1][j + 1])
+print(triangle[0][0])
+===
+auto triangle = File(u"p067_triangle.txt"_S).read().rtrim(u"\n"_S).split(u"\n"_S).map([](const auto &line){return line.split(u" "_S).map([](const auto &x){return to_int(x);});});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(triangle.len() - 2, -1).step(-1))
+            for (auto j : range_el(0, triangle[i].len()))
+                triangle[i][j] += max(triangle[i + 1][j], triangle[i + 1][j + 1]);
+        print(_get<0>(_get<0>(triangle)));
+    }
+} code_block_1;
+
+
+# 68
+from _11l import *
+
+state = list(range(1, 11))
+maxx : Optional[str] = None
+while True:
+    if state[0] + state[5] + state[6] == \
+       state[1] + state[6] + state[7] == \
+       state[2] + state[7] + state[8] == \
+       state[3] + state[8] + state[9] == \
+       state[4] + state[9] + state[5]:
+
+        minouterindex = 0
+        minouter = state[0]
+        for i in range(1, 5):
+            if state[i] < minouter:
+                minouterindex = i
+                minouter = state[i]
+
+        s = ""
+        for i in range(5):
+            s += str(state[(minouterindex + i) % 5])
+            s += str(state[(minouterindex + i) % 5 + 5])
+            s += str(state[(minouterindex + i + 1) % 5 + 5])
+        if len(s) == 16 and (maxx is None or s > maxx):
+            maxx = s
+
+    if not next_permutation(state):
+        break
+
+assert maxx is not None
+print(maxx)
+===
+V state = Array(1..10)
+String? maxx
+L
+   I state[0] + state[5] + state[6] == state[1] + state[6] + state[7] == state[2] + state[7] + state[8] == state[3] + state[8] + state[9] == state[4] + state[9] + state[5]
+
+      V minouterindex = 0
+      V minouter = state[0]
+      L(i) 1..4
+         I state[i] < minouter
+            minouterindex = i
+            minouter = state[i]
+
+      V s = ‘’
+      L(i) 5
+         s ‘’= String(state[(minouterindex + i) % 5])
+         s ‘’= String(state[(minouterindex + i) % 5 + 5])
+         s ‘’= String(state[(minouterindex + i + 1) % 5 + 5])
+      I s.len == 16 & (maxx == N | s > maxx)
+         maxx = s
+
+   I !state.next_permutation()
+      L.break
+
+assert(maxx != N)
+print(maxx)
+===
+auto state = create_array(range_ee(1, 10));
+Nullable<String> maxx;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            if (equal(_get<0>(state) + _get<5>(state) + _get<6>(state), _get<1>(state) + _get<6>(state) + _get<7>(state), _get<2>(state) + _get<7>(state) + _get<8>(state), _get<3>(state) + _get<8>(state) + _get<9>(state), _get<4>(state) + _get<9>(state) + _get<5>(state))) {
+
+                auto minouterindex = 0;
+                auto minouter = _get<0>(state);
+                for (auto i : range_ee(1, 4))
+                    if (state[i] < minouter) {
+                        minouterindex = i;
+                        minouter = state[i];
+                    }
+
+                auto s = u""_S;
+                for (int i = 0; i < 5; i++) {
+                    s &= String(state[mod((minouterindex + i), 5)]);
+                    s &= String(state[mod((minouterindex + i), 5) + 5]);
+                    s &= String(state[mod((minouterindex + i + 1), 5) + 5]);
+                }
+                if (s.len() == 16 && (maxx == nullptr || s > *maxx))
+                    maxx = s;
+            }
+
+            if (!state.next_permutation())
+                break;
+        }
+
+        assert(maxx != nullptr);
+        print(*maxx);
+    }
+} code_block_1;
+
+
+# 69
+import eulerlib
+
+totients = eulerlib.list_totients(10**6)
+print(max(range(2, len(totients)), key=(lambda i: float(i) / totients[i])))
+===
+V totients = eulerlib:list_totients(10 ^ 6)
+print(max(2 .< totients.len, key' (i -> Float(i) / :totients[i])))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto totients = eulerlib::list_totients(pow(10, 6));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(max_with_key(range_el(2, totients.len()), ([](const auto &i){return to_float(i) / ::totients[i];})));
     }
 } code_block_1;

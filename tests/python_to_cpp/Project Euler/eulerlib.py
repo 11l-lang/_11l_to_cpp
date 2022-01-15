@@ -9,6 +9,13 @@
 import math
 BigInt = int
 
+# Tests whether x is a perfect square, for any integer x.
+def is_square(x):
+	if x < 0:
+		return False
+	y = int(math.sqrt(x))
+	return y * y == x
+
 # Tests whether the given integer is a prime number.
 def is_prime(x):
 	if x <= 1:
@@ -40,6 +47,14 @@ def list_primality(n):
 def list_primes(n):
 	return [i for i, isprime in enumerate(list_primality(n)) if isprime]
 
+def list_totients(n):
+	result = list(range(n + 1))
+	for i in range(2, len(result)):
+		if result[i] == i:  # i is prime
+			for j in range(i, len(result), i):
+				result[j] -= result[j] // i
+	return result
+
 def binomial(n : BigInt, k : BigInt):
-    assert BigInt(0) <= k <= n
-    return math.factorial(n) // (math.factorial(k) * math.factorial(n - k))
+	assert BigInt(0) <= k <= n
+	return math.factorial(n) // (math.factorial(k) * math.factorial(n - k))

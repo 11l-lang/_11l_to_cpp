@@ -3653,8 +3653,7 @@ def compute():
     # Build table of numbers
     # numbers[i][j] is the set of figurate numbers of i sides (3 <= i <= 8), having 4 digits, beginning with the 2 digits equal to j
     def create_set():
-        s = set() # int
-        return s
+        return set() # int
     numbers = [[create_set() for j in range(100)] for i in range(9)]
     for sides in range(3, 9):
         for n in itertools.count(1):
@@ -3694,8 +3693,7 @@ F figurate_number(sides, n)
 
 F compute()
    F create_set()
-      V s = Set[Int]()
-      R s
+      R Set[Int]()
    V numbers = (0.<9).map(i -> (0.<100).map(j -> @@create_set()))
    L(sides) 3..8
       L(n) 1..
@@ -3737,8 +3735,7 @@ auto compute()
 {
     auto create_set = []()
     {
-        auto s = Set<int>();
-        return s;
+        return Set<int>();
     };
     auto numbers = range_el(0, 9).map([&create_set](const auto &i){return range_el(0, 100).map([&create_set](const auto &j){return create_set();});});
     for (auto sides : range_ee(3, 8))

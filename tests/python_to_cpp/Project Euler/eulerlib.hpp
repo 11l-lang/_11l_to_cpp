@@ -1,4 +1,12 @@
-﻿template <typename T1> auto is_prime(const T1 &x)
+﻿template <typename T1> auto is_square(const T1 &x)
+{
+    if (x < 0)
+        return false;
+    auto y = to_int(sqrt(x));
+    return y * y == x;
+}
+
+template <typename T1> auto is_prime(const T1 &x)
 {
     if (x <= 1)
         return false;
@@ -28,6 +36,16 @@ template <typename T1> auto list_primality(const T1 &n)
 template <typename T1> auto list_primes(const T1 &n)
 {
     return enumerate(list_primality(n)).filter([](const auto &i, const auto &isprime){return isprime;}).map([](const auto &i, const auto &isprime){return i;});
+}
+
+template <typename T1> auto list_totients(const T1 &n)
+{
+    auto result = create_array(range_ee(0, n));
+    for (auto i : range_el(2, result.len()))
+        if (result[i] == i)
+            for (auto j : range_el(i, result.len()).step(i))
+                result[j] -= idiv(result[j], i);
+    return result;
 }
 
 auto binomial(const BigInt &n, const BigInt &k)
