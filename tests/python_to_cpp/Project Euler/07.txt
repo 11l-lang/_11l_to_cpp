@@ -1,0 +1,731 @@
+# 70
+import eulerlib
+
+totients = eulerlib.list_totients(10**7 - 1)
+minnumer = 1
+mindenom = 0
+for i, tot in enumerate(totients[2 : ], 2):
+    if Int64(i) * mindenom < Int64(minnumer) * tot and sorted(str(i)) == sorted(str(tot)):
+        minnumer = i
+        mindenom = totients[i]
+print(minnumer)
+===
+V totients = eulerlib:list_totients(10 ^ 7 - 1)
+V minnumer = 1
+V mindenom = 0
+L(tot) totients[2..]
+   V i = L.index + 2
+   I Int64(i) * mindenom < Int64(minnumer) * tot & sorted(String(i)) == sorted(String(tot))
+      minnumer = i
+      mindenom = totients[i]
+print(minnumer)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto totients = eulerlib::list_totients(pow(10, 7) - 1);
+auto minnumer = 1;
+auto mindenom = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {int Lindex = 0;
+        for (auto &&tot : totients[range_ei(2)]) {
+            auto i = Lindex + 2;
+            if (to_int64(i) * mindenom < to_int64(minnumer) * tot && sorted(String(i)) == sorted(String(tot))) {
+                minnumer = i;
+                mindenom = totients[i];
+            }
+            Lindex++;
+        }}
+        print(minnumer);
+    }
+} code_block_1;
+
+
+# 71
+LIMIT = 1000000
+maxnumer = 0
+maxdenom = 1
+for d in range(1, LIMIT + 1):
+    n = d * 3 // 7
+    if d % 7 == 0:
+        n -= 1
+    if n * maxdenom > d * maxnumer:  # n/d > maxdenom/maxnumer
+        maxnumer = n
+        maxdenom = d
+print(maxnumer)
+===
+V LIMIT = 1000000
+V maxnumer = 0
+V maxdenom = 1
+L(d) 1 .. LIMIT
+   V n = d * 3 I/ 7
+   I d % 7 == 0
+      n--
+   I n * maxdenom > d * maxnumer
+      maxnumer = n
+      maxdenom = d
+print(maxnumer)
+===
+auto LIMIT = 1000000;
+auto maxnumer = 0;
+auto maxdenom = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto d : range_ee(1, LIMIT)) {
+            auto n = idiv(d * 3, 7);
+            if (mod(d, 7) == 0)
+                n--;
+            if (n * maxdenom > d * maxnumer) {
+                maxnumer = n;
+                maxdenom = d;
+            }
+        }
+        print(maxnumer);
+    }
+} code_block_1;
+
+
+# 72
+import eulerlib, itertools
+Int64 = int
+
+totients = eulerlib.list_totients(10**6)
+ans = sum(map(Int64, totients[2:]))
+print(ans)
+===
+V totients = eulerlib:list_totients(10 ^ 6)
+V ans = sum(totients[2..].map(Int64))
+print(ans)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto totients = eulerlib::list_totients(pow(10, 6));
+auto ans = sum_map(totients[range_ei(2)], [](const auto &x){return to_int64(x);});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(ans);
+    }
+} code_block_1;
+
+
+# 73
+ans = 0
+stack = [(1, 3, 1, 2)]
+while len(stack) > 0:
+    (leftn, leftd, rightn, rightd) = stack.pop()
+    d = leftd + rightd
+    if d <= 12000:
+        n = leftn + rightn
+        ans += 1
+        stack.append((n, d, rightn, rightd))
+        stack.append((leftn, leftd, n, d))
+print(ans)
+===
+V ans = 0
+V stack = [(1, 3, 1, 2)]
+L stack.len > 0
+   V (leftn, leftd, rightn, rightd) = stack.pop()
+   V d = leftd + rightd
+   I d <= 12000
+      V n = leftn + rightn
+      ans++
+      stack.append((n, d, rightn, rightd))
+      stack.append((leftn, leftd, n, d))
+print(ans)
+===
+auto ans = 0;
+auto stack = create_array({make_tuple(1, 3, 1, 2)});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (stack.len() > 0) {
+            auto [leftn, leftd, rightn, rightd] = stack.pop();
+            auto d = leftd + rightd;
+            if (d <= 12000) {
+                auto n = leftn + rightn;
+                ans++;
+                stack.append(make_tuple(n, d, rightn, rightd));
+                stack.append(make_tuple(leftn, leftd, n, d));
+            }
+        }
+        print(ans);
+    }
+} code_block_1;
+
+
+# 74
+# PyPy is faster than 11l
+import math
+
+FACTORIAL = [math.factorial(i) for i in range(10)]
+
+def factorialize(n):
+    result = 0
+    while n != 0:
+        result += FACTORIAL[n % 10]
+        n //= 10
+    return result
+
+def get_chain_length(n):
+    seen = set() # int
+    while True:
+        seen.add(n)
+        n = factorialize(n)
+        if n in seen:
+            return len(seen)
+
+LIMIT = 10**6
+ans = sum(1 for i in range(LIMIT) if get_chain_length(i) == 60)
+print(ans)
+===
+V FACTORIAL = (0.<10).map(i -> factorial(i))
+
+F factorialize(=n)
+   V result = 0
+   L n != 0
+      result += :FACTORIAL[n % 10]
+      n I/= 10
+   R result
+
+F get_chain_length(=n)
+   V seen = Set[Int]()
+   L
+      seen.add(n)
+      n = factorialize(n)
+      I n C seen
+         R seen.len
+
+V LIMIT = 10 ^ 6
+V ans = sum((0 .< LIMIT).filter(i -> get_chain_length(i) == 60).map(i -> 1))
+print(ans)
+===
+auto FACTORIAL = range_el(0, 10).map([](const auto &i){return factorial(i);});
+
+template <typename T1> auto factorialize(T1 n)
+{
+    auto result = 0;
+    while (n != 0) {
+        result += ::FACTORIAL[mod(n, 10)];
+        n = idiv(n, 10);
+    }
+    return result;
+}
+
+template <typename T1> auto get_chain_length(T1 n)
+{
+    auto seen = Set<int>();
+    while (true) {
+        seen.add(n);
+        n = factorialize(n);
+        if (in(n, seen))
+            return seen.len();
+    }
+}
+
+auto LIMIT = pow(10, 6);
+auto ans = sum_map(range_el(0, LIMIT).filter([](const auto &i){return get_chain_length(i) == 60;}), [](const auto &i){return 1;});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(ans);
+    }
+} code_block_1;
+
+
+# 75
+import math
+
+LIMIT = 1500000
+#
+# Pythagorean triples theorem:
+#   Every primitive Pythagorean triple with a odd and b even can be expressed as
+#   a = st, b = (s^2-t^2)/2, c = (s^2+t^2)/2, where s > t > 0 are coprime odd integers.
+#
+triples = set() # Tuple[int, int, int]
+for s in range(3, int(math.sqrt(LIMIT)) + 1, 2):
+    for t in range(s - 2, 0, -2):
+        if math.gcd(s, t) == 1:
+            a = s * t
+            b = (s * s - t * t) // 2
+            c = (s * s + t * t) // 2
+            if a + b + c <= LIMIT:
+                triples.add((a, b, c))
+
+ways = [0] * (LIMIT + 1)
+for triple in triples:
+    sigma = sum(triple)
+    for i in range(sigma, len(ways), sigma):
+        ways[i] += 1
+
+ans = ways.count(1)
+print(ans)
+===
+V LIMIT = 1500000
+V triples = Set[(Int, Int, Int)]()
+L(s) (3 .. Int(sqrt(LIMIT))).step(2)
+   L(t) (s - 2 .< 0).step(-2)
+      I gcd(s, t) == 1
+         V a = s * t
+         V b = (s * s - t * t) I/ 2
+         V c = (s * s + t * t) I/ 2
+         I a + b + c <= LIMIT
+            triples.add((a, b, c))
+
+V ways = [0] * (LIMIT + 1)
+L(triple) triples
+   V sigma = sum(triple)
+   L(i) (sigma .< ways.len).step(sigma)
+      ways[i]++
+
+V ans = ways.count(1)
+print(ans)
+===
+auto LIMIT = 1500000;
+auto triples = Set<ivec3>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto s : range_ee(3, to_int(sqrt(LIMIT))).step(2))
+            for (auto t : range_el(s - 2, 0).step(-2))
+                if (gcd(s, t) == 1) {
+                    auto a = s * t;
+                    auto b = idiv((s * s - t * t), 2);
+                    auto c = idiv((s * s + t * t), 2);
+                    if (a + b + c <= LIMIT)
+                        triples.add(make_tuple(a, b, c));
+                }
+    }
+} code_block_1;
+
+auto ways = create_array({0}) * (LIMIT + 1);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&triple : triples) {
+            auto sigma = sum(triple);
+            for (auto i : range_el(sigma, ways.len()).step(sigma))
+                ways[i]++;
+        }
+    }
+} code_block_2;
+
+auto ans = ways.count(1);
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print(ans);
+    }
+} code_block_3;
+
+
+# 76
+from typing import List
+
+LIMIT = 100
+partitions : List[List[int]] = []
+for i in range(LIMIT + 1):
+    partitions.append([0] * (LIMIT + 1))
+    for j in range(LIMIT, -1, -1): # [-`reversed(range(LIMIT + 1))`-]
+        val : int
+        if j == i:
+            val = 1
+        elif j > i:
+            val = 0
+        elif j == 0:
+            val = partitions[i][j + 1]
+        else:
+            val = partitions[i][j + 1] + partitions[i - j][j]
+        partitions[i][j] = val
+
+ans = partitions[LIMIT][1] - 1
+print(ans)
+===
+V LIMIT = 100
+[[Int]] partitions
+L(i) 0 .. LIMIT
+   partitions.append([0] * (LIMIT + 1))
+   L(j) (LIMIT .< -1).step(-1)
+      Int val
+      I j == i
+         val = 1
+      E I j > i
+         val = 0
+      E I j == 0
+         val = partitions[i][j + 1]
+      E
+         val = partitions[i][j + 1] + partitions[i - j][j]
+      partitions[i][j] = val
+
+V ans = partitions[LIMIT][1] - 1
+print(ans)
+===
+auto LIMIT = 100;
+Array<Array<int>> partitions;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(0, LIMIT)) {
+            partitions.append(create_array({0}) * (LIMIT + 1));
+            for (auto j : range_el(LIMIT, -1).step(-1)) {
+                int val;
+                if (j == i)
+                    val = 1;
+                else if (j > i)
+                    val = 0;
+                else if (j == 0)
+                    val = partitions[i][j + 1];
+                else
+                    val = partitions[i][j + 1] + partitions[i - j][j];
+                partitions[i].set(j, val);
+            }
+        }
+    }
+} code_block_1;
+
+auto ans = _get<1>(partitions[LIMIT]) - 1;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(ans);
+    }
+} code_block_2;
+
+
+# 77
+import eulerlib, itertools
+
+primes = [2]
+
+def num_prime_sum_ways(n):
+    for i in range(primes[-1] + 1, n + 1):
+        if eulerlib.is_prime(i):
+            primes.append(i)
+
+    ways = [1] + [0] * n
+    for p in primes:
+        for i in range(n + 1 - p):
+            ways[i + p] += ways[i]
+    return ways[n]
+
+cond = lambda n: num_prime_sum_ways(n) > 5000
+
+for i in itertools.count(2):
+    if cond(i):
+        print(i)
+        break
+===
+V primes = [2]
+
+F num_prime_sum_ways(n)
+   L(i) :primes.last + 1 .. n
+      I eulerlib:is_prime(i)
+         :primes.append(i)
+
+   V ways = [1] [+] [0] * n
+   L(p) :primes
+      L(i) 0 .< n + 1 - p
+         ways[i + p] += ways[i]
+   R ways[n]
+
+V cond = n -> num_prime_sum_ways(n) > 5000
+
+L(i) 2..
+   I cond(i)
+      print(i)
+      L.break
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto primes = create_array({2});
+
+template <typename T1> auto num_prime_sum_ways(const T1 &n)
+{
+    for (auto i : range_ee(::primes.last() + 1, n))
+        if (eulerlib::is_prime(i))
+            ::primes.append(i);
+
+    auto ways = create_array({1}) + create_array({0}) * n;
+    for (auto &&p : ::primes)
+        for (auto i : range_el(0, n + 1 - p))
+            ways[i + p] += ways[i];
+    return ways[n];
+}
+
+auto cond = [](const auto &n){return num_prime_sum_ways(n) > 5000;};
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ei(2))
+            if (cond(i)) {
+                print(i);
+                break;
+            }
+    }
+} code_block_1;
+
+
+# 78
+import itertools
+
+MODULUS = 10**6
+
+partitions = [1]
+for i in itertools.count(len(partitions)):
+    # We calculate partitions[i] mod 10^6 using a formula based on generalized pentagonal numbers:
+    #   partitions(i) =   partitions(i - pentagonal(1)) + partitions(i - pentagonal(-1))
+    #                   - partitions(i - pentagonal(2)) - partitions(i - pentagonal(-2))
+    #                   + partitions(i - pentagonal(3)) + partitions(i - pentagonal(-3))
+    #                   - partitions(i - pentagonal(4)) - partitions(i - pentagonal(-4))
+    #                   + ...,
+    #   where pentagonal(j) = (3*n^2 - n) / 2, and
+    #   we stop the sum when i - pentagonal(+/-j) < 0.
+    # Note that for j > 0, pentagonal(j) < pentagonal(-j) < pentagonal(j+1).
+    #
+    # (The formula is used without mathematical justification;
+    # see https://en.wikipedia.org/wiki/Partition_(number_theory)#Generating_function .)
+    item = 0
+    for j in itertools.count(1):
+        sign = -1 if j % 2 == 0 else +1
+        index = (j * j * 3 - j) // 2
+        if index > i:
+            break
+        item += partitions[i - index] * sign
+        index += j  # index == (j * j * 3 + j) // 2
+        if index > i:
+            break
+        item += partitions[i - index] * sign
+        item %= MODULUS
+        if item < 0:
+            item += MODULUS
+
+    # Check or memoize the number
+    if item == 0:
+        print(i)
+        break
+    partitions.append(item)
+===
+V MODULUS = 10 ^ 6
+
+V partitions = [1]
+L(i) partitions.len..
+   V item = 0
+   L(j) 1..
+      V _sign_ = I j % 2 == 0 {-1} E +1
+      V index = (j * j * 3 - j) I/ 2
+      I index > i
+         L.break
+      item += partitions[i - index] * _sign_
+      index += j
+      I index > i
+         L.break
+      item += partitions[i - index] * _sign_
+      item %= MODULUS
+      I item < 0
+         item += MODULUS
+
+   I item == 0
+      print(i)
+      L.break
+   partitions.append(item)
+===
+auto MODULUS = pow(10, 6);
+
+auto partitions = create_array({1});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ei(partitions.len())) {
+            auto item = 0;
+            for (auto j : range_ei(1)) {
+                auto _sign_ = mod(j, 2) == 0 ? -1 : +1;
+                auto index = idiv((j * j * 3 - j), 2);
+                if (index > i)
+                    break;
+                item += partitions[i - index] * _sign_;
+                index += j;
+                if (index > i)
+                    break;
+                item += partitions[i - index] * _sign_;
+                item %= MODULUS;
+                if (item < 0)
+                    item += MODULUS;
+            }
+
+            if (item == 0) {
+                print(i);
+                break;
+            }
+            partitions.append(item);
+        }
+    }
+} code_block_1;
+
+
+# 79
+import itertools
+
+SUBSEQS = open('p079_keylog.txt').read().rstrip("\n").split("\n")
+
+def is_subsequence(shortstr, longstr):
+    i = 0
+    for c in longstr:
+        if c == shortstr[i]:
+            i += 1
+            if i == len(shortstr):
+                return True
+    return False
+
+def is_consistent(guess):
+    return all(is_subsequence(s, guess) for s in SUBSEQS)
+
+def compute():
+    # Only guess characters that appear in the attempts
+    s = set() # Char
+    for ss in SUBSEQS:
+        s.update(set(list(ss)))
+    charsused = sorted(list(s))
+    base = len(charsused)
+
+    # Try ascending lengths
+    for length in itertools.count(base):
+        indices = [0] * length
+        while True:
+            guess = "".join(charsused[d] for d in indices)
+            if is_consistent(guess):
+                return guess
+
+            # Increment indices
+            i = 0
+            while i < length and indices[i] == base - 1:
+                indices[i] = 0
+                i += 1
+            if i == length:
+                break
+            indices[i] += 1
+
+print(compute())
+===
+V SUBSEQS = File(‘p079_keylog.txt’).read().rtrim("\n").split("\n")
+
+F is_subsequence(shortstr, longstr)
+   V i = 0
+   L(c) longstr
+      I c == shortstr[i]
+         i++
+         I i == shortstr.len
+            R 1B
+   R 0B
+
+F is_consistent(guess)
+   R all(:SUBSEQS.map(s -> is_subsequence(s, @guess)))
+
+F compute()
+   V s = Set[Char]()
+   L(ss) :SUBSEQS
+      s.update(Set(Array(ss)))
+   V charsused = sorted(Array(s))
+   V base = charsused.len
+
+   L(length) base..
+      V indices = [0] * length
+      L
+         V guess = indices.map(d -> @charsused[d]).join(‘’)
+         I is_consistent(guess)
+            R guess
+
+         V i = 0
+         L i < length & indices[i] == base - 1
+            indices[i] = 0
+            i++
+         I i == length
+            L.break
+         indices[i]++
+
+print(compute())
+===
+auto SUBSEQS = File(u"p079_keylog.txt"_S).read().rtrim(u"\n"_S).split(u"\n"_S);
+
+template <typename T1, typename T2> auto is_subsequence(const T1 &shortstr, const T2 &longstr)
+{
+    auto i = 0;
+    for (auto &&c : longstr)
+        if (c == shortstr[i]) {
+            i++;
+            if (i == shortstr.len())
+                return true;
+        }
+    return false;
+}
+
+template <typename T1> auto is_consistent(const T1 &guess)
+{
+    return all_map(::SUBSEQS, [&guess](const auto &s){return is_subsequence(s, guess);});
+}
+
+auto compute()
+{
+    auto s = Set<Char>();
+    for (auto &&ss : ::SUBSEQS)
+        s.update(create_set(create_array(ss)));
+    auto charsused = sorted(create_array(s));
+    auto base = charsused.len();
+
+    for (auto length : range_ei(base)) {
+        auto indices = create_array({0}) * length;
+        while (true) {
+            auto guess = indices.map([&charsused](const auto &d){return charsused[d];}).join(u""_S);
+            if (is_consistent(guess))
+                return guess;
+
+            auto i = 0;
+            while (i < length && indices[i] == base - 1) {
+                indices.set(i, 0);
+                i++;
+            }
+            if (i == length)
+                break;
+            indices[i]++;
+        }
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
