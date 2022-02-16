@@ -289,7 +289,7 @@ public:
 			it will be added to the list of known locations which are searched first )"_S;
 
         auto last = u""_S;
-        std::function<String(String)> search_location = [&filename, &last, &search_location, this](const String &search)
+        std::function<String(String)> search_location = [&filename, &last, &search_location, this](const String &search) -> String
         {
             if (in(search, locations))
                 return u""_S;

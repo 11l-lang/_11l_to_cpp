@@ -568,6 +568,10 @@ class SymbolNode:
                     if not is_char(self.children[2]):
                         raise Error('Char can be constructed only from single character string literals', self.children[2].token)
                     return char_or_str(self.children[2], True)
+                elif func_name == 'Char' and self.children[1] is not None and self.children[1].token_str() == "string'":
+                    return 'Char(' + self.children[2].to_str() + ')'
+                elif func_name == 'Char' and self.children[1] is not None and self.children[1].token_str() == "digit'":
+                    return 'char_from_digit(' + self.children[2].to_str() + ')'
                 elif func_name == 'Bytes' and self.children[2].token.category == Token.Category.STRING_LITERAL:
                     return '"' + self.children[2].token_str()[1:-1] + '"_B'
                 elif func_name.startswith('Array['): # ]

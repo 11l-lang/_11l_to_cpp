@@ -13098,7 +13098,7 @@ def run_utm(
     if len(tape) == 0: tape.append(blank)
     if pos < 0: pos += len(tape)
     #if pos >= len(tape) or pos < 0: raise Error( "bad init position")
-    rules = {(r[0], Char(r[1])): (Char(r[2]), r[3], r[4]) for r in rules_in}
+    rules = {(r[0], Char(str(r[1]))): (Char(str(r[2])), r[3], r[4]) for r in rules_in}
 
     while True:
         #print(st, '\t', end=" ")
@@ -13174,7 +13174,7 @@ F run_utm(halt, state, Char blank; rules_in, [Char] &tape = [Char](); =pos = 0)
       tape.append(blank)
    I pos < 0
       pos += tape.len
-   V rules = Dict(rules_in, r -> ((r[0], Char(r[1])), (Char(r[2]), r[3], r[4])))
+   V rules = Dict(rules_in, r -> ((r[0], Char(string' r[1])), (Char(string' r[2]), r[3], r[4])))
 
    L
       print(st.ljust(4), end' ‘ ’)

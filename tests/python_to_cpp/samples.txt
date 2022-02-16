@@ -3782,3 +3782,40 @@ struct CodeBlock1
         print(compute());
     }
 } code_block_1;
+
+
+# [https://codeforces.com/contest/1633/submission/146570768]
+Char = str
+
+def solve(n):
+    ns = list(str(n))
+    for i in range(len(ns)):
+        for d in range(1 if i == 0 else 0, 10):
+            nn = ns[:]
+            nn[i] = Char(int(d))
+            if int(''.join(nn)) % 7 == 0:
+                return int(''.join(nn))
+    raise 0
+===
+F solve(n)
+   V ns = Array(String(n))
+   L(i) 0 .< ns.len
+      L(d) (I i == 0 {1} E 0) .< 10
+         V nn = copy(ns)
+         nn[i] = Char(digit' d)
+         I Int(nn.join(‘’)) % 7 == 0
+            R Int(nn.join(‘’))
+   X 0
+===
+template <typename T1> auto solve(const T1 &n)
+{
+    auto ns = create_array(String(n));
+    for (auto i : range_el(0, ns.len()))
+        for (auto d : range_el((i == 0 ? 1 : 0), 10)) {
+            auto nn = copy(ns);
+            nn.set(i, char_from_digit(d));
+            if (mod(to_int(nn.join(u""_S)), 7) == 0)
+                return to_int(nn.join(u""_S));
+        }
+    throw 0;
+}
