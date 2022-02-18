@@ -391,6 +391,11 @@ public:
 		return (Int)r;
 	}
 
+	Int rfindi(const String &sub, Int start = 0) const
+	{
+		return rfindi(sub, start, len());
+	}
+
 	Int count(const char16_t *s, size_t sz) const
 	{
 		Int c = 0;

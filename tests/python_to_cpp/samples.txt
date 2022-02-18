@@ -3819,3 +3819,35 @@ template <typename T1> auto solve(const T1 &n)
         }
     throw 0;
 }
+
+
+# *[https://codeforces.com/contest/1617/submission/146468818]
+
+for _ in range(int(input())):
+    s = input();t = input();s = ''.join(sorted(s))
+    if t == 'abc' and 'a' in s and 'b' in s and 'c' in s:
+        s = s[:s.find('b')] + ('c'*s.count('c')) + ('b'*s.count('b')) + (s[s.rfind('c') + 1:])
+    print(s)
+===
+L(_) 0 .< Int(input())
+   V s = input()
+   V t = input()
+   s = sorted(s).join(‘’)
+   I t == ‘abc’ & ‘a’ C s & ‘b’ C s & ‘c’ C s
+      s = s[0 .< s.findi(‘b’)]‘’(‘c’ * s.count(‘c’))‘’(‘b’ * s.count(‘b’))‘’(s[s.rfindi(‘c’) + 1 ..])
+   print(s)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto _ : range_el(0, to_int(input()))) {
+            auto s = input();
+            auto t = input();
+            s = sorted(s).join(u""_S);
+            if (t == u"abc" && in(u'a'_C, s) && in(u'b'_C, s) && in(u'c'_C, s))
+                s = s[range_el(0, s.findi(u"b"_S))] & (u"c"_S * s.count(u"c"_S)) & (u"b"_S * s.count(u"b"_S)) & (s[range_ei(s.rfindi(u"c"_S) + 1)]);
+            print(s);
+        }
+    }
+} code_block_1;
