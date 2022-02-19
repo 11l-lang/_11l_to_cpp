@@ -960,8 +960,6 @@ class SymbolNode:
                 return 'idiv(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
             elif self.symbol.id in ('I/=', 'Ц/='):
                 return self.children[0].to_str() + ' = idiv(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
-            elif self.symbol.id in ('==', '!=') and self.children[1].token.category == Token.Category.STRING_LITERAL:
-                return self.children[0].to_str() + ' ' + self.symbol.id + ' ' + char_if_len_1(self.children[1])[:-2]
             elif self.symbol.id in ('==', '!=', '=') and self.children[1].token.category == Token.Category.NAME and self.children[1].token_str().isupper(): # `token.category == NAME` -> `token.category == TYPE_RM_REF(token.category)::NAME` and `category = NAME` -> `category = TYPE_RM_REF(category)::NAME`
                 return self.children[0].to_str() + ' ' + self.symbol.id + ' TYPE_RM_REF(' + self.children[0].to_str() + ')::' + self.children[1].token_str()
             elif self.symbol.id in ('==', '!=') and self.children[0].symbol.id == '&' and len(self.children[0].children) == 1 and self.children[1].symbol.id == '&' and len(self.children[1].children) == 1: # `&a == &b` -> `&a == &b`
@@ -972,9 +970,11 @@ class SymbolNode:
             elif self.symbol.id == '==' and self.children[0].symbol.id == '==': # replace `a == b == c` with `equal(a, b, c)`
                 def f(child):
                     if child.symbol.id == '==':
-                        return f(child.children[0]) + ', ' + child.children[1].to_str()
+                        return f(child.children[0]) + ', ' + char_if_len_1(child.children[1])
                     return child.to_str()
                 return 'equal(' + f(self) + ')'
+            elif self.symbol.id in ('==', '!=') and self.children[1].token.category == Token.Category.STRING_LITERAL:
+                return self.children[0].to_str() + ' ' + self.symbol.id + ' ' + char_if_len_1(self.children[1])[:-2]
             elif self.symbol.id == '=' and self.children[0].symbol.id == '[': # ] # replace `a[k] = v` with `a.set(k, v)`
                 if self.children[0].children[1].token.category == Token.Category.NUMERIC_LITERAL: # replace `a[0] = v` with `_set<0>(a, v)` to support tuples
                     return '_set<' + self.children[0].children[1].to_str() + '>(' + self.children[0].children[0].to_str() + ', ' + char_if_len_1(self.children[1]) + ')'

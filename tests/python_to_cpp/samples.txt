@@ -3881,3 +3881,52 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# [https://codeforces.com/contest/1598/submission/146900269]
+for _ in range(int(input())):
+    n = int(input())
+    l0 = input()
+    l1 = input()
+    assert(len(l0) == len(l1) == n)
+
+    for i in range(n):
+        if l0[i] == l1[i] == '1':
+            print('NO')
+            break
+    else:
+        print('YES')
+===
+L(_) 0 .< Int(input())
+   V n = Int(input())
+   V l0 = input()
+   V l1 = input()
+   assert(l0.len == l1.len == n)
+
+   L(i) 0 .< n
+      I l0[i] == l1[i] == ‘1’
+         print(‘NO’)
+         L.break
+   L.was_no_break
+      print(‘YES’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto _ : range_el(0, to_int(input()))) {
+            auto n = to_int(input());
+            auto l0 = input();
+            auto l1 = input();
+            assert(equal(l0.len(), l1.len(), n));
+
+            for (auto i : range_el(0, n))
+                if (equal(l0[i], l1[i], u'1'_C)) {
+                    print(u"NO"_S);
+                    goto break_;
+                }
+            print(u"YES"_S);
+            break_:;
+        }
+    }
+} code_block_1;
