@@ -3851,3 +3851,33 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# [https://codeforces.com/contest/1602/submission/146889996]
+for _ in range(int(input())):
+    s = input()
+
+    m = min(s)
+    i = s.index(m)
+    print(m, s[:i] + s[i+1:])
+===
+L(_) 0 .< Int(input())
+   V s = input()
+
+   V m = min(s)
+   V i = s.index(m)
+   print(m‘ ’(s[0 .< i]‘’s[i + 1 ..]))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto _ : range_el(0, to_int(input()))) {
+            auto s = input();
+
+            auto m = min(s);
+            auto i = s.index(m);
+            print(m & u" "_S & (s[range_el(0, i)] & s[range_ei(i + 1)]));
+        }
+    }
+} code_block_1;

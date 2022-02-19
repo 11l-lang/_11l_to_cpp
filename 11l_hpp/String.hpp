@@ -1170,3 +1170,19 @@ template <typename T1> String commatize(const T1 &number, const String &sep = u"
     }
     return reversed(r);
 }
+
+inline Char min(const String &s)
+{
+	Char r = s[0];
+	for (Char c : s)
+		if (c.code < r.code) r = c;
+	return r;
+}
+
+inline Char max(const String &s)
+{
+	Char r = s[0];
+	for (Char c : s)
+		if (c.code > r.code) r = c;
+	return r;
+}
