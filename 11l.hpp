@@ -644,3 +644,12 @@ public:
 	RuntimeError(const String &message) : message(message) {}
 	operator String() const {return message;}
 };
+
+static class IOSpeedBooster
+{
+public:
+	IOSpeedBooster() {
+		std::ios_base::sync_with_stdio(false);
+		//std::wcin.tie(nullptr); // this breaks interactive problems ([https://codeforces.com/blog/entry/90775 <- google:‘sync_with_stdio tie interactive’])
+	}
+} io_speed_booster;
