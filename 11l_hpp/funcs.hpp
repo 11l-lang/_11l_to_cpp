@@ -31,6 +31,13 @@ template <typename Type, int dimension> inline const Tvec<Type, dimension> tuple
 	return r;
 }
 
+template <typename Type, int dimension> inline const Tvec<Type, dimension> sorted(const Tvec<Type, dimension> &v)
+{
+	Tvec<Type, dimension> r = v;
+	std::sort(&r[0], &r[0] + dimension);
+	return r;
+}
+
 namespace math
 {
 	static const double pi = M_PI;
