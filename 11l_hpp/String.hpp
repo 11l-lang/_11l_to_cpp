@@ -42,10 +42,10 @@ public:
 	bool operator==(char16_t c) const {return code == c;}
 	bool operator!=(char16_t c) const {return code != c;}
 
-	void operator++() {++code;}
-//	Char operator+(Int i) const {return Char(code + (int)i);}
-	Char operator-(Int i) const {return Char(code - (int)i);}
-	Int operator-(Char c) const {return code - c.code;}
+	void operator++() {++code;}                               // this is needed for `create_array(range_ee(u'a'_C, u'z'_C))` [ <- `Array(‘a’..‘z’)`]
+	Char operator+(Int i) const {return Char(code + (int)i);} // /
+	Char operator-(Int i) const {return Char(code - (int)i);} // /
+	Int operator-(Char c) const {return code - c.code;}       // /
 
 	Char    lowercase() const {return towlower(code);}
 	bool is_lowercase() const {return iswlower(code);}
