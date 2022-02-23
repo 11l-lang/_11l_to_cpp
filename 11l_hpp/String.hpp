@@ -28,7 +28,7 @@ public:
 	explicit Char(const String &s);
 
 	operator char16_t() const {return code;} // for `switch (instr[i])` support
-	void operator+(const Char c) const = delete;
+	Char operator+(const Char c) const = delete;
 
 	bool is_digit() const {return in((int)code, range_ee((int)'0', (int)'9'));}
 
