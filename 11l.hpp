@@ -103,7 +103,7 @@ public:
 	Nullable() : has_value(false) {}
 	Nullable(nullptr_t) : has_value(false) {}
 	Nullable(const Ty &val) : has_value(true) {new(value)Ty(val);}
-//	Nullable(const Nullable &n) : has_value(n.has_value), value(n.value) {}
+	Nullable(const Nullable &n) : has_value(n.has_value) {if (has_value) new(value)Ty(*n);}
 //	template <typename Type> Nullable(Type &&value) : has_value(true), value(value) {} // for `Nullable<std::function<...>>`
 	~Nullable() {destroy();}
 
