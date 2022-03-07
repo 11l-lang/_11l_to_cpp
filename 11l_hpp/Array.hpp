@@ -233,14 +233,14 @@ public:
 	decltype(std::declval<const std::vector<Type>>().at(0)) operator[](Int i) const // decltype is needed for Array<bool> support
 	{
 		if (in(i, range_el(Int(0), len())))
-			return std::vector<Type>::at(i);
+			return std::vector<Type>::operator[](i);
 		throw IndexError(i);
 	}
 
 	decltype(std::declval<std::vector<Type>>().at(0)) operator[](Int i) // decltype is needed for Array<bool> support
 	{
 		if (in(i, range_el(Int(0), len())))
-			return std::vector<Type>::at(i);
+			return std::vector<Type>::operator[](i);
 		throw IndexError(i);
 	}
 
@@ -257,7 +257,7 @@ public:
 	const Type &set(Int i, const Type &v) // return `const Type&` for [https://www.rosettacode.org/wiki/Perlin_noise#Python]:‘p[256+i] = p[i] = permutation[i]’
 	{
 		if (in(i, range_el(Int(0), len())))
-			return std::vector<Type>::at(i) = v;
+			return std::vector<Type>::operator[](i) = v;
 		else
 			throw IndexError(i);
 	}
@@ -394,21 +394,21 @@ public:
 	{
 		if (std::vector<Type>::empty())
 			throw IndexError(0);
-		return std::vector<Type>::at(len()-1);
+		return std::vector<Type>::operator[](len()-1);
 	}
 
 	Type &last()
 	{
 		if (std::vector<Type>::empty())
 			throw IndexError(0);
-		return std::vector<Type>::at(len()-1);
+		return std::vector<Type>::operator[](len()-1);
 	}
 
 	Type pop()
 	{
 		if (std::vector<Type>::empty())
 			throw IndexError(0);
-		Type r(std::move(std::vector<Type>::at(len()-1)));
+		Type r(std::move(std::vector<Type>::operator[](len()-1)));
 		std::vector<Type>::pop_back();
 		return r;
 	}
@@ -465,7 +465,7 @@ public:
 	{
 		if (len() != arr.len()) return false;
 		for (Int i=0, n=len(); i<n; i++)
-			if (!(std::vector<Type>::at(i) == arr.at(i)))
+			if (!(std::vector<Type>::operator[](i) == arr.operator[](i)))
 				return false;
 		return true;
 	}
