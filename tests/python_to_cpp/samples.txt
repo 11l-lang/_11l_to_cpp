@@ -3930,3 +3930,71 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# *[https://codeforces.com/contest/1534/submission/119342023]
+
+def match(g, o):
+ return not any(a != '.' and a != b for a, b in zip(''.join(g), ''.join(o)))
+
+for _ in range(int(input())):
+ n, m = map(int, input().split())
+ g = [input() for _ in range(n)]
+ o1 = [''.join('WR'[(i+j)%2] for j in range(m)) for i in range(n)]
+ o2 = [''.join('WR'[(i+j+1)%2] for j in range(m)) for i in range(n)]
+ if match(g, o1):
+  print('YES')
+  for i in o1: print(i)
+ elif match(g, o2):
+  print('YES')
+  for i in o2: print(i)
+ else: print('NO')
+===
+F match(g, o)
+   R !any(zip(g.join(‘’), o.join(‘’)).map((a, b) -> a != ‘.’ & a != b))
+
+L(_) 0 .< Int(input())
+   V (n, m) = input().split_py().map(Int)
+   V g = (0 .< n).map(_ -> input())
+   V o1 = (0 .< n).map(i -> (0 .< @m).map(j -> ‘WR’[(@i + j) % 2]).join(‘’))
+   V o2 = (0 .< n).map(i -> (0 .< @m).map(j -> ‘WR’[(@i + j + 1) % 2]).join(‘’))
+   I match(g, o1)
+      print(‘YES’)
+      L(i) o1
+         print(i)
+   E I match(g, o2)
+      print(‘YES’)
+      L(i) o2
+         print(i)
+   E
+      print(‘NO’)
+===
+template <typename T1, typename T2> auto match(const T1 &g, const T2 &o)
+{
+    return !any_map(zip(g.join(u""_S), o.join(u""_S)), [](const auto &a, const auto &b){return a != u'.' && a != b;});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto _ : range_el(0, to_int(input()))) {
+            auto [n, m] = bind_array<2>(input().split_py().map([](const auto &x){return to_int(x);}));
+            auto g = range_el(0, n).map([](const auto &_){return input();});
+            auto o1 = range_el(0, n).map([&m](const auto &i){return range_el(0, m).map([&i](const auto &j){return u"WR"_S[mod((i + j), 2)];}).join(u""_S);});
+            auto o2 = range_el(0, n).map([&m](const auto &i){return range_el(0, m).map([&i](const auto &j){return u"WR"_S[mod((i + j + 1), 2)];}).join(u""_S);});
+            if (match(g, o1)) {
+                print(u"YES"_S);
+                for (auto &&i : o1)
+                    print(i);
+            }
+            else if (match(g, o2)) {
+                print(u"YES"_S);
+                for (auto &&i : o2)
+                    print(i);
+            }
+            else
+                print(u"NO"_S);
+        }
+    }
+} code_block_1;

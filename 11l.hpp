@@ -611,6 +611,15 @@ template <typename Iterable, typename Func> bool any_map(const Iterable &i, Func
 	return false;
 }
 
+template <typename Type, typename Func, typename = decltype(std::declval<Func>()(std::declval<decltype(tuple_element_f<Type, 0>())>(),
+                                                                                 std::declval<decltype(tuple_element_f<Type, 1>())>()))> bool any_map(const Array<Type> &arr, Func &&func)
+{
+	for (auto &&el : arr)
+		if (func(_get<0>(el), _get<1>(el)))
+			return true;
+	return false;
+}
+
 template <typename Ty> Ty copy(const Ty &obj)
 {
 	return obj;
