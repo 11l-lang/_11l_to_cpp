@@ -232,6 +232,10 @@ public:
 
 	decltype(std::declval<const std::vector<Type>>().at(0)) operator[](Int i) const // decltype is needed for Array<bool> support
 	{
+#ifdef PYTHON_NEGATIVE_INDEXING
+		if (i < 0)
+			i += len();
+#endif
 		if (in(i, range_el(Int(0), len())))
 			return std::vector<Type>::operator[](i);
 		throw IndexError(i);
@@ -239,6 +243,10 @@ public:
 
 	decltype(std::declval<std::vector<Type>>().at(0)) operator[](Int i) // decltype is needed for Array<bool> support
 	{
+#ifdef PYTHON_NEGATIVE_INDEXING
+		if (i < 0)
+			i += len();
+#endif
 		if (in(i, range_el(Int(0), len())))
 			return std::vector<Type>::operator[](i);
 		throw IndexError(i);
@@ -246,16 +254,26 @@ public:
 
 	const Type &at_plus_len(Int i) const
 	{
-		return (*this)[len() + i];
+		i += len();
+		if (in(i, range_el(Int(0), len())))
+			return std::vector<Type>::operator[](i);
+		throw IndexError(i);
 	}
 
 	Type &at_plus_len(Int i)
 	{
-		return (*this)[len() + i];
+		i += len();
+		if (in(i, range_el(Int(0), len())))
+			return std::vector<Type>::operator[](i);
+		throw IndexError(i);
 	}
 
 	const Type &set(Int i, const Type &v) // return `const Type&` for [https://www.rosettacode.org/wiki/Perlin_noise#Python]:‘p[256+i] = p[i] = permutation[i]’
 	{
+#ifdef PYTHON_NEGATIVE_INDEXING
+		if (i < 0)
+			i += len();
+#endif
 		if (in(i, range_el(Int(0), len())))
 			return std::vector<Type>::operator[](i) = v;
 		else
@@ -264,7 +282,11 @@ public:
 
 	const Type &set_plus_len(Int i, const Type &v)
 	{
-		return set(len() + i, v);
+		i += len();
+		if (in(i, range_el(Int(0), len())))
+			return std::vector<Type>::operator[](i) = v;
+		else
+			throw IndexError(i);
 	}
 
 	void append(Type &&v) {std::vector<Type>::push_back(std::move(v));}
@@ -415,6 +437,10 @@ public:
 
 	Type pop(Int i)
 	{
+#ifdef PYTHON_NEGATIVE_INDEXING
+		if (i < 0)
+			i += len();
+#endif
 		if (!in(i, range_el(Int(0), len())))
 			throw IndexError(i);
 		Type r(std::move((*this)[i]));
