@@ -3998,3 +3998,56 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# *[https://codeforces.com/contest/1538/submission/120037475]
+import bisect
+
+n = 5
+l = 5
+r = 8
+a = [5, 1, 2, 4, 3]
+a.sort()
+s = 0
+for i in range(n):
+    x = a.pop()
+    s += bisect.bisect_right(a, r - x) - bisect.bisect_left(a, l - x)
+print(s)
+===
+V n = 5
+V l = 5
+V r = 8
+V a = [5, 1, 2, 4, 3]
+a.sort()
+V s = 0
+L(i) 0 .< n
+   V x = a.pop()
+   s += bisect:right(a, r - x) - bisect:left(a, l - x)
+print(s)
+===
+auto n = 5;
+auto l = 5;
+auto r = 8;
+auto a = create_array({5, 1, 2, 4, 3});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        a.sort();
+    }
+} code_block_1;
+
+auto s = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto i : range_el(0, n)) {
+            auto x = a.pop();
+            s += bisect::right(a, r - x) - bisect::left(a, l - x);
+        }
+        print(s);
+    }
+} code_block_2;

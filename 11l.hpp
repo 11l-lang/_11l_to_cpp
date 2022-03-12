@@ -237,6 +237,7 @@ template <typename Ty> inline std::complex<Ty> conjugate(const std::complex<Ty> 
 #include "11l_hpp/re.hpp"
 #include "11l_hpp/random.hpp"
 #include "11l_hpp/minmaxheap.hpp"
+#include "11l_hpp/bisect.hpp"
 namespace std {
 template <> class hash<String>
 {
