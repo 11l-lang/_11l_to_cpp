@@ -148,7 +148,7 @@ public:
 				size_t oldsz = s.size();
 				s.resize(oldsz + n);
 				for (size_t i = 0; i < n; i++)
-					s[oldsz + i] = buf[i];
+					s[oldsz + i] = (char16_t)buf[i];
 			}
 			return s;
 		}
@@ -270,7 +270,7 @@ public:
 		assert(n == 1);
 		char c;
 		size_t _ = fread(&c, 1, 1, file);
-		return c;
+		return (char16_t)c;
 	}
 
 	void seek(Int offset, Int whence = 0)

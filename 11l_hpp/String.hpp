@@ -24,6 +24,13 @@ public:
 	char16_t code;
 
 	Char(char16_t code) : code(code) {}
+	Char(Int c)
+	{
+		if (in(c, range_ee(Int(0), Int(0xFFFF))))
+			code = char16_t(c);
+		else
+			throw AssertionError();
+	}
 	explicit Char(const class BigInt &b);
 	explicit Char(const String &s);
 
@@ -43,13 +50,13 @@ public:
 	bool operator!=(char16_t c) const {return code != c;}
 
 	void operator++() {++code;}                               // this is needed for `create_array(range_ee(u'a'_C, u'z'_C))` [ <- `Array(‘a’..‘z’)`]
-	Char operator+(Int i) const {return Char(code + (int)i);} // /
-	Char operator-(Int i) const {return Char(code - (int)i);} // /
+	Char operator+(Int i) const {return Char(code + (Int)i);} // /
+	Char operator-(Int i) const {return Char(code - (Int)i);} // /
 	Int operator-(Char c) const {return code - c.code;}       // /
 
-	Char    lowercase() const {return towlower(code);}
+	Char    lowercase() const {return Int(towlower(code));}
 	bool is_lowercase() const {return iswlower(code);}
-	Char    uppercase() const {return towupper(code);}
+	Char    uppercase() const {return Int(towupper(code));}
 	bool is_uppercase() const {return iswupper(code);}
 	bool is_alpha    () const {return iswalpha(code);}
 
@@ -444,7 +451,7 @@ public:
 		String r;
 		r.resize(len());
 		for (int i=0; i<len(); i++)
-			r[i] = towlower(at(i));
+			r[i] = Int(towlower(at(i)));
 		return r;
 	}
 
@@ -453,14 +460,14 @@ public:
 		String r;
 		r.resize(len());
 		for (int i=0; i<len(); i++)
-			r[i] = towupper(at(i));
+			r[i] = Int(towupper(at(i)));
 		return r;
 	}
 
 	String capitalize() const
 	{
 		String r(*this);
-		r[0] = towupper(at(0));
+		r[0] = Int(towupper(at(0)));
 		return r;
 	}
 
@@ -1163,7 +1170,7 @@ template <typename T1> String commatize(const T1 &number, const String &sep = u"
 {
     auto s = reversed(String(number));
     String r = s[0];
-    for (auto i : range_el(1, s.len())) {
+    for (auto i : range_el(Int(1), s.len())) {
         if (i % step == 0)
             r &= sep;
         r &= s[i];

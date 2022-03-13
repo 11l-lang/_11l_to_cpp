@@ -481,7 +481,14 @@ public:
 	}
 };
 
-Char::Char(const BigInt &b) : code((char16_t)b.longValue()) {}
+Char::Char(const BigInt &b)
+{
+	long long c = b.longValue();
+	if (in(c, range_ee((long long)0, (long long)0xFFFF)))
+		code = char16_t(c);
+	else
+		throw AssertionError();
+}
 
 Int pow(Int base, Int exponent, const Int modulus)
 {
