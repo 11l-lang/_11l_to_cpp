@@ -889,7 +889,7 @@ public:
 inline Char char_from_digit(Int i)
 {
 	if (in(i, range_el(Int(0), Int(10))))
-		return Char(u'0' + i);
+		return Char(char16_t(u'0' + i));
 	throw ValueError(i);
 }
 
