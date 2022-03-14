@@ -78,7 +78,7 @@ T board
       .cels[cr][cc] = .cels[cr][cc] [&] mask
 
    F.const cell(num)
-      R Int(ceil((num + 1) / 3.0)) - 1
+      R ceili((num + 1) / 3.0) - 1
 
    F.const to_str()
       V ret = ‘’

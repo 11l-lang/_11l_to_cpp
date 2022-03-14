@@ -539,7 +539,7 @@ def check(number):
     return 0
 
 limit = 100000000
-cache_size = int(math.ceil(math.log10(limit)))
+cache_size = math.ceil(math.log10(limit))
 assert 10 ** cache_size == limit
 
 number = [0] * cache_size
@@ -591,7 +591,7 @@ F check(number)
    R 0
 
 V limit = 100000000
-V cache_size = Int(ceil(log10(limit)))
+V cache_size = ceili(log10(limit))
 assert(10 ^ cache_size == limit)
 
 V number = [0] * cache_size
@@ -649,7 +649,7 @@ template <typename T1> auto check(const T1 &number)
 }
 
 auto limit = 100000000;
-auto cache_size = to_int(ceil(log10(limit)));
+auto cache_size = ceili(log10(limit));
 
 struct CodeBlock1
 {
@@ -747,7 +747,7 @@ def toQuaterImaginary(c):
         ss += str(rem) + '0'
     if im != 0:
         f = c.imag / 2
-        im = int(math.ceil(f))
+        im = math.ceil(f)
         f = -4 * (f - im)
         index = 1
         while im != 0:
@@ -848,7 +848,7 @@ F toQuaterImaginary(c)
       ss ‘’= String(rem)‘0’
    I im != 0
       V f = c.imag / 2
-      im = Int(ceil(f))
+      im = ceili(f)
       f = -4 * (f - im)
       V index = 1
       L im != 0
@@ -966,7 +966,7 @@ template <typename T1> auto toQuaterImaginary(const T1 &c)
     }
     if (im != 0) {
         auto f = c.imag() / 2.0;
-        im = to_int(ceil(f));
+        im = ceili(f);
         f = -4 * (f - im);
         auto index = 1;
         while (im != 0) {

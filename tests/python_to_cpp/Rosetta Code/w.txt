@@ -1345,7 +1345,7 @@ F betain(x, p, q)
    V term = 1.0
    V ai = 1.0
    V value = 1.0
-   V ns = floor(qq + cx * psq)
+   V ns = floori(qq + cx * psq)
    V rx = xx / cx
    V temp = qq - ai
    I ns == 0
@@ -1419,7 +1419,7 @@ template <typename T1, typename T2, typename T3> auto betain(const T1 &x, const 
     auto term = 1.0;
     auto ai = 1.0;
     auto value = 1.0;
-    auto ns = floor(qq + cx * psq);
+    auto ns = floori(qq + cx * psq);
     auto rx = xx / cx;
     auto temp = qq - ai;
     if (ns == 0)

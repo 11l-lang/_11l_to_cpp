@@ -266,8 +266,8 @@ log(x)
 log10(x)
 exp(x)
 abs(x)
-floor(x)
-ceil(x)
+floori(x)
+ceili(x)
 x ^ y
 ===
 auto x = 0;
@@ -284,8 +284,8 @@ struct CodeBlock1
         log10(x);
         exp(x);
         abs(x);
-        floor(x);
-        ceil(x);
+        floori(x);
+        ceili(x);
         pow(x, y);
     }
 } code_block_1;

@@ -110,7 +110,7 @@ public:
 
     template <typename T1> auto cell(const T1 &num) const
     {
-        return to_int(ceil((num + 1) / 3.0)) - 1;
+        return ceili((num + 1) / 3.0) - 1;
     }
 
     auto to_str() const

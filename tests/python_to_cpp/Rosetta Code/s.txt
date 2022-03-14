@@ -506,7 +506,7 @@ struct CodeBlock1
 import math
 
 def non_square(n : int):
-    return n + int(math.floor(1/2 + math.sqrt(n)))
+    return n + math.floor(1/2 + math.sqrt(n))
 
 print(*map(non_square, range(1, 23)))
 
@@ -521,7 +521,7 @@ else:
     print('No squares found')
 ===
 F non_square(Int n)
-   R n + Int(floor(1 / 2 + sqrt(n)))
+   R n + floori(1 / 2 + sqrt(n))
 
 print_elements((1..22).map(non_square))
 
@@ -537,7 +537,7 @@ L.was_no_break
 ===
 auto non_square(const int n)
 {
-    return n + to_int(floor(1.0 / 2 + sqrt(n)));
+    return n + floori(1.0 / 2 + sqrt(n));
 }
 
 struct CodeBlock1

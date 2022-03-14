@@ -1456,7 +1456,7 @@ def biorhythms(birthdate_str, targetdate_str):
         label = cycle_labels[i]
         length = cycle_lengths[i]
         position = days % length
-        quadrant = int(math.floor((4 * position) / length))
+        quadrant = math.floor((4 * position) / length)
         percentage = int(round(100 * math.sin(2 * math.pi * position / length),0))
         transition_date = (targetdate + datetime.timedelta(days=math.floor((quadrant + 1)/4 * length) - position)).strftime('%Y-%m-%d')
         (trend, next) = quadrants[quadrant]
@@ -1501,9 +1501,9 @@ F biorhythms(birthdate_str, targetdate_str)
       V label = cycle_labels[i]
       V length = cycle_lengths[i]
       V position = days % length
-      V quadrant = Int(floor((4 * position) / length))
+      V quadrant = floori((4 * position) / length)
       V percentage = Int(round(100 * sin(2 * math:pi * position / length), 0))
-      V transition_date = (targetdate + TimeDelta(days' floor((quadrant + 1) / 4 * length) - position)).strftime(‘%Y-%m-%d’)
+      V transition_date = (targetdate + TimeDelta(days' floori((quadrant + 1) / 4 * length) - position)).strftime(‘%Y-%m-%d’)
       V (trend, next) = quadrants[quadrant]
 
       String description
@@ -1547,9 +1547,9 @@ template <typename T1, typename T2> auto biorhythms(const T1 &birthdate_str, con
         auto label = cycle_labels[i];
         auto length = cycle_lengths[i];
         auto position = mod(days, length);
-        auto quadrant = to_int(floor((4 * position) / length));
+        auto quadrant = floori((4 * position) / length);
         auto percentage = to_int(round(100 * sin(2 * math::pi * position / length), 0));
-        auto transition_date = (targetdate + TimeDelta(floor((quadrant + 1) / 4.0 * length) - position)).strftime(u"%Y-%m-%d"_S);
+        auto transition_date = (targetdate + TimeDelta(floori((quadrant + 1) / 4.0 * length) - position)).strftime(u"%Y-%m-%d"_S);
         auto [trend, next] = quadrants[quadrant];
 
         String description;

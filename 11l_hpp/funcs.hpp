@@ -108,6 +108,9 @@ inline float fdiv(float a, float b)
 	return a / b;
 }
 
+template <class Type> inline Int ceili (const Type x) {return Int(ceil (x));}
+template <class Type> inline Int floori(const Type x) {return Int(floor(x));}
+
 #ifdef __GNUC__
 inline int bsr(int   x) {return __builtin_clz  (x) ^ 31;}
 inline int bsr(Int64 x) {return __builtin_clzll(x) ^ 63;}

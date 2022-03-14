@@ -1946,7 +1946,7 @@ def rationalize(x, tol = 1e-12):
         return Rational(int(xx), 1)
     a = 0
     b = 1
-    c = int(math.ceil(xx))
+    c = math.ceil(xx)
     d = 1
     aux1 = 0x7FFF_FFFF // 2
     while c < aux1 and d < aux1:
@@ -2002,7 +2002,7 @@ F rationalize(x, tol = 1e-12)
       R Rational(Int(xx), 1)
    V a = 0
    V b = 1
-   V c = Int(ceil(xx))
+   V c = ceili(xx)
    V d = 1
    V aux1 = 7FFF'FFFF I/ 2
    L c < aux1 & d < aux1
@@ -2066,7 +2066,7 @@ template <typename T1, typename T2 = decltype(1e-12)> auto rationalize(const T1 
         return Rational(to_int(xx), 1);
     auto a = 0;
     auto b = 1;
-    auto c = to_int(ceil(xx));
+    auto c = ceili(xx);
     auto d = 1;
     auto aux1 = idiv(0x7FFF'FFFF, 2);
     while (c < aux1 && d < aux1) {

@@ -957,14 +957,14 @@ int MAIN_WITH_ARGV()
 import math
 limit = 1000
 
-for i in range(1, int(math.ceil(math.sqrt(limit))), 2):
+for i in range(1, math.ceil(math.sqrt(limit)), 2):
     num = i * i
     if num < limit and num > 99:
         print(num, end = ' ')
 ===
 V limit = 1000
 
-L(i) (1 .< Int(ceil(sqrt(limit)))).step(2)
+L(i) (1 .< ceili(sqrt(limit))).step(2)
    V num = i * i
    I num < limit & num > 99
       print(num, end' ‘ ’)
@@ -975,7 +975,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto i : range_el(1, to_int(ceil(sqrt(limit)))).step(2)) {
+        for (auto i : range_el(1, ceili(sqrt(limit))).step(2)) {
             auto num = i * i;
             if (num < limit && num > 99)
                 print(num, u" "_S);

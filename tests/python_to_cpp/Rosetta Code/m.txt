@@ -156,7 +156,7 @@ def build_sems(s):
 def display(q):
     s = q[1]
     print(" - %i x %i\n" % (s, s))
-    k = 1 + int(math.floor(math.log(s * s) / LOG_10))
+    k = 1 + math.floor(math.log(s * s) / LOG_10)
     for j in range(0, s):
         for i in range(0, s):
             print(str(q[0][i][j]).zfill(k), end = ' ')
@@ -226,7 +226,7 @@ F build_sems(=s)
 F display(q)
    V s = q[1]
    print(" - #. x #.\n".format(s, s))
-   V k = 1 + Int(floor(log(s * s) / :LOG_10))
+   V k = 1 + floori(log(s * s) / :LOG_10)
    L(j) 0 .< s
       L(i) 0 .< s
          print(String(q[0][i][j]).zfill(k), end' ‘ ’)
@@ -305,7 +305,7 @@ template <typename T1> auto display(const T1 &q)
 {
     auto s = _get<1>(q);
     print(u" - #. x #.\n"_S.format(s, s));
-    auto k = 1 + to_int(floor(log(s * s) / ::LOG_10));
+    auto k = 1 + floori(log(s * s) / ::LOG_10);
     for (auto j : range_el(0, s)) {
         for (auto i : range_el(0, s))
             print(String(_get<0>(q)[i][j]).zfill(k), u" "_S);
@@ -3172,7 +3172,7 @@ V MAXITER = 151
 
 F minkowski(x) -> Float
    I x > 1 | x < 0
-      R floor(x) + minkowski(x - floor(x))
+      R floori(x) + minkowski(x - floori(x))
 
    V p = Int(x)
    V q = 1
@@ -3206,7 +3206,7 @@ F minkowski(x) -> Float
 
 F minkowski_inv(=x) -> Float
    I x > 1 | x < 0
-      R floor(x) + minkowski_inv(x - floor(x))
+      R floori(x) + minkowski_inv(x - floori(x))
 
    I x == 1 | x == 0
       R x
@@ -3242,7 +3242,7 @@ F minkowski_inv(=x) -> Float
             count = 1
             current = 0
 
-      I x == floor(x)
+      I x == floori(x)
          cont_frac[i] = count
          L.break
 
@@ -3266,7 +3266,7 @@ auto MAXITER = 151;
 template <typename T1> double minkowski(const T1 &x)
 {
     if (x > 1 || x < 0)
-        return floor(x) + minkowski(x - floor(x));
+        return floori(x) + minkowski(x - floori(x));
 
     auto p = to_int(x);
     auto q = 1;
@@ -3305,7 +3305,7 @@ template <typename T1> double minkowski(const T1 &x)
 template <typename T1> double minkowski_inv(T1 x)
 {
     if (x > 1 || x < 0)
-        return floor(x) + minkowski_inv(x - floor(x));
+        return floori(x) + minkowski_inv(x - floori(x));
 
     if (x == 1 || x == 0)
         return x;
@@ -3345,7 +3345,7 @@ template <typename T1> double minkowski_inv(T1 x)
                 current = 0;
             }
 
-        if (x == floor(x)) {
+        if (x == floori(x)) {
             cont_frac.set(i, count);
             break;
         }

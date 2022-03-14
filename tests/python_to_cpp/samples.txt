@@ -932,8 +932,8 @@ print(math.radians(1) - 0.017453292519943295 + 1)
 print(math.pi - 2.141592653589793)
 print(math.factorial(3))
 ===
-print(ceil(3.6) == 4)
-print(floor(3.6) == 3)
+print(ceili(3.6) == 4)
+print(floori(3.6) == 3)
 print(trunc(-3.6) == -3)
 print(abs(-3.5) == 3.5)
 print(exp(2) - 7.38905609893065 + 1)
@@ -959,8 +959,8 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(ceil(3.6) == 4);
-        print(floor(3.6) == 3);
+        print(ceili(3.6) == 4);
+        print(floori(3.6) == 3);
         print(trunc(-3.6) == -3);
         print(abs(-3.5) == 3.5);
         print(exp(2) - 7.38905609893065 + 1);

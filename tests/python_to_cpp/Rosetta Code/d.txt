@@ -936,11 +936,11 @@ def draw_sphere(k, ambient, light):
     pos = Sphere(20.0, 20.0, 0.0, 20.0)
     neg = Sphere(1.0, 1.0, -6.0, 20.0)
 
-    for i in range(int(math.floor(pos.cy - pos.r)),
-                    int(math.ceil(pos.cy + pos.r) + 1)):
+    for i in range(math.floor(pos.cy - pos.r),
+                    math.ceil(pos.cy + pos.r) + 1):
         y = i + 0.5
-        for j in range(int(math.floor(pos.cx - 2 * pos.r)),
-                        int(math.ceil(pos.cx + 2 * pos.r) + 1)):
+        for j in range(math.floor(pos.cx - 2 * pos.r),
+                        math.ceil(pos.cx + 2 * pos.r) + 1):
             x = (j - pos.cx) / 2.0 + 0.5 + pos.cx
 
             (h, zb1, zb2) = hit_sphere(pos, x, y)
@@ -1023,9 +1023,9 @@ F draw_sphere(k, ambient, light)
    V pos = Sphere(20.0, 20.0, 0.0, 20.0)
    V neg = Sphere(1.0, 1.0, -6.0, 20.0)
 
-   L(i) Int(floor(pos.cy - pos.r)) .< Int(ceil(pos.cy + pos.r) + 1)
+   L(i) floori(pos.cy - pos.r) .. ceili(pos.cy + pos.r)
       V y = i + 0.5
-      L(j) Int(floor(pos.cx - 2 * pos.r)) .< Int(ceil(pos.cx + 2 * pos.r) + 1)
+      L(j) floori(pos.cx - 2 * pos.r) .. ceili(pos.cx + 2 * pos.r)
          V x = (j - pos.cx) / 2.0 + 0.5 + pos.cx
 
          V (h, zb1, zb2) = hit_sphere(pos, x, y)
@@ -1125,9 +1125,9 @@ template <typename T1, typename T2, typename T3> auto draw_sphere(const T1 &k, c
     auto pos = Sphere(20.0, 20.0, 0.0, 20.0);
     auto neg = Sphere(1.0, 1.0, -6.0, 20.0);
 
-    for (auto i : range_el(to_int(floor(pos.cy - pos.r)), to_int(ceil(pos.cy + pos.r) + 1))) {
+    for (auto i : range_ee(floori(pos.cy - pos.r), ceili(pos.cy + pos.r))) {
         auto y = i + 0.5;
-        for (auto j : range_el(to_int(floor(pos.cx - 2 * pos.r)), to_int(ceil(pos.cx + 2 * pos.r) + 1))) {
+        for (auto j : range_ee(floori(pos.cx - 2 * pos.r), ceili(pos.cx + 2 * pos.r))) {
             auto x = (j - pos.cx) / 2.0 + 0.5 + pos.cx;
 
             auto [h, zb1, zb2] = hit_sphere(pos, x, y);
@@ -1185,7 +1185,7 @@ struct CodeBlock1
 import math
 
 def decToBin(d):
-    whole  = int(math.floor(d))
+    whole  = math.floor(d)
     binary = bin(whole)[2:] + "."
     dd = d - whole
     while dd > 0.0:
@@ -1209,7 +1209,7 @@ s = "1011.11101"
 print(s + "\t => " + str(binToDec(s)))
 ===
 F decToBin(d)
-   V whole = Int(floor(d))
+   V whole = floori(d)
    V binary = bin(whole)‘.’
    V dd = d - whole
    L dd > 0.0
@@ -1234,7 +1234,7 @@ print(s"\t => "String(binToDec(s)))
 ===
 template <typename T1> auto decToBin(const T1 &d)
 {
-    auto whole = to_int(floor(d));
+    auto whole = floori(d);
     auto binary = bin(whole) & u"."_S;
     auto dd = d - whole;
     while (dd > 0.0) {
@@ -2492,11 +2492,11 @@ def dot(x,y):
     return -d if d < 0 else 0
 
 def draw_sphere(r, k, ambient, light):
-    for i in range(int(math.floor(-r)),int(math.ceil(r)+1)):
+    for i in range(math.floor(-r),math.ceil(r)+1):
         x = i + 0.5
         line = ''
 
-        for j in range(int(math.floor(-2*r)),int(math.ceil(2*r)+1)):
+        for j in range(math.floor(-2*r),math.ceil(2*r)+1):
             y = j/2 + 0.5
             if x*x + y*y <= r*r:
                 vec = normalize((x,y,math.sqrt(r*r - x*x - y*y)))
@@ -2523,11 +2523,11 @@ F dot(x, y)
    R I d < 0 {-d} E 0
 
 F draw_sphere(r, k, ambient, light)
-   L(i) Int(floor(-r)) .< Int(ceil(r) + 1)
+   L(i) floori(-r) .. ceili(r)
       V x = i + 0.5
       V line = ‘’
 
-      L(j) Int(floor(-2 * r)) .< Int(ceil(2 * r) + 1)
+      L(j) floori(-2 * r) .. ceili(2 * r)
          V y = j / 2 + 0.5
          I x * x + y * y <= r * r
             V vec = normalize((x, y, sqrt(r * r - x * x - y * y)))
@@ -2559,11 +2559,11 @@ template <typename T1, typename T2> auto dot(const T1 &x, const T2 &y)
 
 template <typename T1, typename T2, typename T3, typename T4> auto draw_sphere(const T1 &r, const T2 &k, const T3 &ambient, const T4 &light)
 {
-    for (auto i : range_el(to_int(floor(-r)), to_int(ceil(r) + 1))) {
+    for (auto i : range_ee(floori(-r), ceili(r))) {
         auto x = i + 0.5;
         auto line = u""_S;
 
-        for (auto j : range_el(to_int(floor(-2 * r)), to_int(ceil(2 * r) + 1))) {
+        for (auto j : range_ee(floori(-2 * r), ceili(2 * r))) {
             auto y = j / 2.0 + 0.5;
             if (x * x + y * y <= r * r) {
                 auto vec = normalize(make_tuple(x, y, sqrt(r * r - x * x - y * y)));

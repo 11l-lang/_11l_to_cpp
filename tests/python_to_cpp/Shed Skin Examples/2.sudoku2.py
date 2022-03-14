@@ -101,7 +101,7 @@ class board:
                 self.cels[cr][cc] = self.cels[cr][cc] & mask
 
         def cell(self, num): # const
-                return int(math.ceil((num + 1) / 3.0)) - 1
+                return math.ceil((num + 1) / 3.0) - 1
 
         def to_str(self): # const
                 ret = ""
