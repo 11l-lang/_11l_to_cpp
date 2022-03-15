@@ -287,3 +287,19 @@ template <typename KeyType, typename ValueType> inline bool in(const KeyType &ke
 {
 	return dict.std::map<KeyType, ValueType>::find(key) != dict.end();
 }
+
+template <typename KeyType> inline DefaultDict<KeyType, Int> Counter(const Array<KeyType> &arr)
+{
+	DefaultDict<KeyType, Int> d;
+	for (auto &&el : arr)
+		d[el]++;
+	return d;
+}
+
+inline DefaultDict<Char, Int> Counter(const String &str)
+{
+	DefaultDict<Char, Int> d;
+	for (Char c : str)
+		d[c]++;
+	return d;
+}

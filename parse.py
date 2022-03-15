@@ -1166,7 +1166,7 @@ class ASTExpression(ASTNodeWithExpression):
 cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'перем':'auto',
                      'Int':'int', 'Int64':'Int64', 'UInt64':'UInt64', 'Int32':'int32_t', 'UInt32':'uint32_t', 'Int16':'int16_t', 'UInt16':'uint16_t', 'BigInt':'BigInt', 'Float':'double', 'Float32':'float', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Int8':'int8_t', 'Byte':'Byte', 'Bytes':'Array<Byte>',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
-                     'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque'}
+                     'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque', 'Counter':'Counter'}
 
 def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False):
     if ty[-1] == '?':
@@ -3459,6 +3459,7 @@ dict_scope.add_name('items', ASTFunctionDefinition([]))
 dict_scope.add_name('map', ASTFunctionDefinition([('f', '', '')]))
 builtins_scope.ids['Dict'].ast_nodes[0].scope = dict_scope
 builtins_scope.ids['DefaultDict'].ast_nodes[0].scope = dict_scope
+builtins_scope.ids['Counter'].ast_nodes[0].scope = dict_scope
 set_scope = Scope(None)
 set_scope.add_name('update', ASTFunctionDefinition([('other', '', 'Set')]))
 set_scope.add_name('intersection', ASTFunctionDefinition([('other', '', 'Set')]))
