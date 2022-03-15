@@ -602,6 +602,11 @@ public:
 	{
 		return String(*this) * n;
 	}
+	void operator*=(Int n)
+	{
+		//*this = std::move(std::move(*this) * n); // this does not work in GCC (try [https://codeforces.com/contest/1511/submission/112900393] with ‘5 1’ input)
+		*this = std::move(String(*this) * n);
+	}
 
 	Char &operator[](size_t pos)
 	{
