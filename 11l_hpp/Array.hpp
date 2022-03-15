@@ -448,6 +448,16 @@ public:
 		return r;
 	}
 
+	Type pop_plus_len(Int i)
+	{
+		i += len();
+		if (!in(i, range_el(Int(0), len())))
+			throw IndexError(i);
+		Type r(std::move((*this)[i]));
+		std::vector<Type>::erase(begin() + i);
+		return r;
+	}
+
 	void remove(const Type &val)
 	{
 		auto it = std::find(begin(), end(), val);

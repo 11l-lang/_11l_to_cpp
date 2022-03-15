@@ -546,6 +546,8 @@ class SymbolNode:
                         f_node = type_of(self.children[0])
                         if f_node is None: # assume this is Array method
                             f_node = builtins_scope.find('Array').ast_nodes[0].scope.ids.get('sort_range').ast_nodes[0]
+                    elif func_name.endswith('.pop') and len(self.children) == 3 and self.children[2].to_str().startswith('(len)'):
+                        return func_name + '_plus_len(' + self.children[2].to_str()[len('(len)'):] + ')'
                     elif self.children[0].children[1].token.value(source) == 'union':
                         func_name = self.children[0].children[0].to_str() + '.set_union'
                     else:
