@@ -1632,9 +1632,9 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
             else:
                 if self.expression is not None and self.expression.token.category == Token.Category.NAME:
                     l = tokens[self.tokeni].value(source)
-                    raise Error('please write `' + l + ' ' + self.expression.token_str() + ' != 0` or `'
-                                                 + l + ' 1..' + self.expression.token_str() + '` instead of `'
-                                                 + l + ' ' + self.expression.token_str() + '`', Token(tokens[self.tokeni].start, self.expression.token.end, Token.Category.NAME))
+                    raise Error('please write `' + l + ' ' + self.expression.token.value(source) + ' != 0` or `'
+                                                 + l + ' 1..' + self.expression.token.value(source) + '` instead of `'
+                                                 + l + ' ' + self.expression.token.value(source) + '`', Token(tokens[self.tokeni].start, self.expression.token.end, Token.Category.NAME))
                 tr = 'while (' + (self.expression.to_str() if self.expression is not None else 'true') + ')'
         rr = self.children_to_str_detect_single_stmt(indent, tr)
 
