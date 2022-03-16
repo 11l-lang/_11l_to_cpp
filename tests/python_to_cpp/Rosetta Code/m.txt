@@ -1918,7 +1918,7 @@ template <typename T1, typename T2> auto encode(const T1 &correct, const T2 &gue
     Array<String> output_arr;
 
     for (auto i : range_el(0, correct.len()))
-        output_arr.append(guess[i] == correct[i] ? u"X"_S : in(guess[i], correct) ? u"O"_S : u"-"_S);
+        output_arr.append(guess[i] == correct[i] ? u"X"_S : in(guess[i], correct) ? u'O'_C : u'-'_C);
 
     return output_arr;
 }

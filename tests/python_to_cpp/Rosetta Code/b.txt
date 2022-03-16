@@ -123,7 +123,7 @@ template <typename T1> auto decode(const T1 &message)
     auto et = u""_S;
     for (auto &&c : message)
         if (in(c, range_ee(u'A'_C, u'Z'_C)) || in(c, range_ee(u'a'_C, u'z'_C)))
-            et &= c.is_lowercase() ? u"A"_S : u"B"_S;
+            et &= c.is_lowercase() ? u'A'_C : u'B'_C;
     for (auto i : range_el(0, et.len() - 4).step(5))
         result &= ::rev_codes[et[range_el(i, i + 5)]];
     return result;
@@ -732,7 +732,7 @@ struct CodeBlock1
         {int Lindex = 0;
         for (auto &&n : l) {
             auto i = Lindex;
-            print(u"#3"_S.format(n), mod((i + 1), 19) == 0 ? u"\n"_S : u" "_S);
+            print(u"#3"_S.format(n), mod((i + 1), 19) == 0 ? u'\n'_C : u' '_C);
             Lindex++;
         }}
         print();
@@ -1895,7 +1895,7 @@ public:
 
     auto chardisplay()
     {
-        auto txt = map.map([this](const auto &row){return row.map([this](const auto &bit){return (bit == background ? u" "_S : u"@"_S);}).join(u""_S);});
+        auto txt = map.map([this](const auto &row){return row.map([this](const auto &bit){return (bit == background ? u' '_C : u'@'_C);}).join(u""_S);});
         txt = txt.map([](const auto &row){return u"|"_S & row & u"|"_S;});
         txt.insert(0, u"+"_S & (u"-"_S * width) & u"+"_S);
         txt.append(u"+"_S & (u"-"_S * width) & u"+"_S);
@@ -2201,7 +2201,7 @@ public:
 
     auto chardisplay()
     {
-        auto txt = map.map([this](const auto &row){return row.map([this](const auto &bit){return (bit == background ? u" "_S : u"@"_S);}).join(u""_S);});
+        auto txt = map.map([this](const auto &row){return row.map([this](const auto &bit){return (bit == background ? u' '_C : u'@'_C);}).join(u""_S);});
         txt = txt.map([](const auto &row){return u"|"_S & row & u"|"_S;});
         txt.insert(0, u"+"_S & (u"-"_S * width) & u"+"_S);
         txt.append(u"+"_S & (u"-"_S * width) & u"+"_S);
@@ -2496,7 +2496,7 @@ public:
 
     auto chardisplay()
     {
-        auto txt = map.map([this](const auto &row){return row.map([this](const auto &bit){return (bit == background ? u" "_S : u"@"_S);}).join(u""_S);});
+        auto txt = map.map([this](const auto &row){return row.map([this](const auto &bit){return (bit == background ? u' '_C : u'@'_C);}).join(u""_S);});
         txt = txt.map([](const auto &row){return u"|"_S & row & u"|"_S;});
         txt.insert(0, u"+"_S & (u"-"_S * width) & u"+"_S);
         txt.append(u"+"_S & (u"-"_S * width) & u"+"_S);

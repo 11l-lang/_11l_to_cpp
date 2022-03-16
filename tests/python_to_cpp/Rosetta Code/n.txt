@@ -2473,7 +2473,7 @@ struct CodeBlock1
         for (auto n : range_ee(2, 199))
             if (is_prime(digit_sum(n, 2)) && is_prime(digit_sum(n, 3))) {
                 count++;
-                print(u"#3"_S.format(n), mod(count, 16) == 0 ? u"\n"_S : u" "_S);
+                print(u"#3"_S.format(n), mod(count, 16) == 0 ? u'\n'_C : u' '_C);
             }
         print();
         print(u"Found "_S & count & u" numbers."_S);

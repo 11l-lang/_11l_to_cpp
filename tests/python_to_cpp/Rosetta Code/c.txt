@@ -1547,7 +1547,7 @@ template <typename T1> auto to_str(const T1 &m)
     {int Lindex = 0;
     for (auto &&row : m) {
         auto i = Lindex;
-        r &= i == 0 ? u"["_S : u" "_S;
+        r &= i == 0 ? u'['_C : u' '_C;
         {int Lindex = 0;
         for (auto &&val : row) {
             auto j = Lindex;
@@ -1556,7 +1556,7 @@ template <typename T1> auto to_str(const T1 &m)
             r &= u"(#2.4, #2.4)"_S.format(val.real(), val.imag());
             Lindex++;
         }}
-        r &= i == m.len() - 1 ? u"]"_S : u"\n"_S;
+        r &= i == m.len() - 1 ? u']'_C : u'\n'_C;
         Lindex++;
     }}
     return r;
@@ -2413,7 +2413,7 @@ struct CodeBlock1
         {int Lindex = 0;
         for (auto &&cousins : cousinList) {
             auto i = Lindex;
-            print(String(cousins).center(10), mod((i + 1), 7) == 0 ? u"\n"_S : u" "_S);
+            print(String(cousins).center(10), mod((i + 1), 7) == 0 ? u'\n'_C : u' '_C);
             Lindex++;
         }}
         print();
@@ -3596,7 +3596,7 @@ struct CodeBlock1
         {int Lindex = 0;
         for (auto &&n : sorted(create_array(concatPrimes))) {
             auto i = Lindex;
-            print(u"#4"_S.format(n), mod((i + 1), 16) == 0 ? u"\n"_S : u" "_S);
+            print(u"#4"_S.format(n), mod((i + 1), 16) == 0 ? u'\n'_C : u' '_C);
             Lindex++;
         }}
     }

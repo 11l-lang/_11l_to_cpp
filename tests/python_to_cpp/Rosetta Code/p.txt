@@ -2077,7 +2077,7 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5> auto 
         if (sum_map(combo, [](const auto &idx){return ::primes[idx];}) == x) {
             print(u"Partitioned #5 with #2 #.: "_S.format(x, m, m > 1 ? u"primes"_S : u"prime "_S), u""_S);
             for (auto i : range_el(0, m))
-                print(::primes[combo[i]], i < m - 1 ? u"+"_S : u"\n"_S);
+                print(::primes[combo[i]], i < m - 1 ? u'+'_C : u'\n'_C);
             return true;
         }
     }
@@ -2259,7 +2259,7 @@ struct CodeBlock2
     {
         for (int i = 0; i < 5; i++)
             for (auto j : range_ee(0, i)) {
-                print(u"#4"_S.format(to_int(0.5 + v[idx])), j < i ? u" "_S : u"\n"_S);
+                print(u"#4"_S.format(to_int(0.5 + v[idx])), j < i ? u' '_C : u'\n'_C);
                 idx++;
             }
     }
@@ -3915,7 +3915,7 @@ struct CodeBlock1
         else {
             while (you.len() != 3 || any_map(you, [](const auto &ch){return !in(ch, ::ht);}))
                 you = input(u"After you: What sequence of three Heads/Tails will you win with: "_S);
-            me = (_get<1>(you) == u'T' ? u"H"_S : u"T"_S) & you[range_el(0, 2)];
+            me = (_get<1>(you) == u'T' ? u'H'_C : u'T'_C) & you[range_el(0, 2)];
             print(u"I win on first seeing #. in the list of tosses"_S.format(me));
         }
 
@@ -5580,7 +5580,7 @@ struct CodeBlock1
         print();
         print(u"pisano(n) for integers 'n' from 1 to 180 are:"_S);
         for (auto n : range_ee(1, 180))
-            print(u"#3"_S.format(pisano(n)), mod(n, 15) == 0 ? u"\n"_S : u" "_S);
+            print(u"#3"_S.format(pisano(n)), mod(n, 15) == 0 ? u'\n'_C : u' '_C);
     }
 } code_block_1;
 
@@ -5695,7 +5695,7 @@ struct CodeBlock1
         for (auto n : range_ee(1, 333))
             if (isPractical(n)) {
                 count++;
-                print(u"#3"_S.format(n), mod(count, 11) == 0 ? u"\n"_S : u" "_S);
+                print(u"#3"_S.format(n), mod(count, 11) == 0 ? u'\n'_C : u' '_C);
             }
         print(u"Found "_S & count & u" practical numbers between 1 and 333."_S);
         print();
@@ -5940,7 +5940,7 @@ struct CodeBlock1
         for (int n = 0; n < 100'000; n++)
             if (is_prime123(n)) {
                 c++;
-                print(u"#5"_S.format(n), mod(c, 8) == 0 ? u"\n"_S : u" "_S);
+                print(u"#5"_S.format(n), mod(c, 8) == 0 ? u'\n'_C : u' '_C);
             }
         print();
         print(u"Found "_S & c & u" \"123\" primes less than 100000"_S);
@@ -6036,7 +6036,7 @@ struct CodeBlock1
         for (int n = 0; n < 5000; n++)
             if (digit_sum(n) == 25 && is_prime(n)) {
                 c++;
-                print(u"#4"_S.format(n), mod(c, 6) == 0 ? u"\n"_S : u" "_S);
+                print(u"#4"_S.format(n), mod(c, 6) == 0 ? u'\n'_C : u' '_C);
             }
         print();
         print(u"Found "_S & c & u" primes whose sum of digits is 25"_S);
@@ -6134,7 +6134,7 @@ struct CodeBlock1
         for (int n = 0; n < 1000; n++)
             if (is_non_decreasing(n) && is_prime(n)) {
                 c++;
-                print(u"#3"_S.format(n), mod(c, 10) == 0 ? u"\n"_S : u" "_S);
+                print(u"#3"_S.format(n), mod(c, 10) == 0 ? u'\n'_C : u' '_C);
             }
         print();
         print(u"Found "_S & c & u" primes with digits in nondecreasing order"_S);
@@ -6299,7 +6299,7 @@ struct CodeBlock1
         {int Lindex = 0;
         for (auto &&val : res2) {
             auto i = Lindex;
-            print(val, mod((i + 1), 10) == 0 ? u"\n"_S : u" "_S);
+            print(val, mod((i + 1), 10) == 0 ? u'\n'_C : u' '_C);
             Lindex++;
         }}
         print();
@@ -6309,7 +6309,7 @@ struct CodeBlock1
         {int Lindex = 0;
         for (auto &&val : res3) {
             auto i = Lindex;
-            print(val, mod((i + 1), 10) == 0 ? u"\n"_S : u" "_S);
+            print(val, mod((i + 1), 10) == 0 ? u'\n'_C : u' '_C);
             Lindex++;
         }}
     }
@@ -6545,7 +6545,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         while (true) {
-            print(u"#2"_S.format(pi), mod(n, 10) == 0 ? u"\n"_S : u" "_S);
+            print(u"#2"_S.format(pi), mod(n, 10) == 0 ? u'\n'_C : u' '_C);
             n++;
             if (is_prime(n)) {
                 pi++;
@@ -6726,7 +6726,7 @@ struct CodeBlock1
         {int Lindex = 0;
         for (auto &&n : l) {
             auto i = Lindex;
-            print(u"#3"_S.format(n), mod((i + 1), 9) == 0 ? u"\n"_S : u" "_S);
+            print(u"#3"_S.format(n), mod((i + 1), 9) == 0 ? u'\n'_C : u' '_C);
             Lindex++;
         }}
     }
@@ -6845,7 +6845,7 @@ struct CodeBlock1
         {int Lindex = 0;
         for (auto &&n : primes3x3) {
             auto i = Lindex;
-            print(u"#4"_S.format(n), mod((i + 1), 11) == 0 ? u"\n"_S : u" "_S);
+            print(u"#4"_S.format(n), mod((i + 1), 11) == 0 ? u'\n'_C : u' '_C);
             Lindex++;
         }}
 

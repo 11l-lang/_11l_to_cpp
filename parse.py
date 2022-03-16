@@ -1035,7 +1035,8 @@ class SymbolNode:
                     return '[&](auto &&T){auto X = ' + self.children[2].children[0].to_str() + '; return X != nullptr ? *X : ' + self.children[2].children[1].to_str() + ';}(' + self.children[0].to_str() + ')'
                 return '[&](auto &&T){return ' + self.children[2].to_str() + ';}(' + self.children[0].to_str() + ')' # why I prefer `auto &&T` to `auto&& T`: ampersand is related to the variable, but not to the type, for example in `int &i, j` `j` is not a reference, but just an integer
             assert(self.symbol.id in ('I', 'Е', 'if', 'если'))
-            return self.children[0].to_str() + ' ? ' + self.children[1].to_str() + ' : ' + self.children[2].to_str()
+            result_is_char = is_char(self.children[1]) and is_char(self.children[2])
+            return self.children[0].to_str() + ' ? ' + char_or_str(self.children[1], result_is_char) + ' : ' + char_or_str(self.children[2], result_is_char)
 
         return ''
 

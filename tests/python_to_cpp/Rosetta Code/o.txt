@@ -220,7 +220,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (int n = 0; n < 10; n++) {
-            print(gen.map([](const auto &cell){return (cell != 0 ? u"#"_S : u"_"_S);}).join(u""_S));
+            print(gen.map([](const auto &cell){return (cell != 0 ? u'#'_C : u'_'_C);}).join(u""_S));
             gen = create_array({0}) + gen + create_array({0});
             gen = range_el(0, gen.len() - 2).map([](const auto &m){return to_int(sum(::gen[range_el(m, m + 3)]) == 2);});
         }

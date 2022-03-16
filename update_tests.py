@@ -18,12 +18,15 @@ for fname in os.listdir('tests/parser'):
         print(full_fname)
 
 for dir in ['tests/python_to_cpp',
-            'tests/python_to_cpp/Rosetta Code']:
+            'tests/python_to_cpp/Rosetta Code',
+            'tests/python_to_cpp/Project Euler']:
     for fname in os.listdir(dir):
         assert(fname[0] != '-')
         if not fname.endswith('.txt'): # skip .py, .11l and .hpp files
             continue
         if dir.endswith('Rosetta Code') and len(fname) != 5: # process only single letter files in Rosetta Code subdirectory
+            continue
+        if dir.endswith('Project Euler') and len(fname) != 6: # process only two letter files in Project Euler subdirectory
             continue
 
         full_fname = dir + '/' + fname

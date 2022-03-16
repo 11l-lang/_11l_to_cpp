@@ -729,7 +729,7 @@ template <typename T1, typename T2> auto step(const T1 &cells, const T2 &rule)
             bin += to_int(cells[n] == u'*') << b;
             b >>= 1;
         }
-        auto a = (rule & (1 << bin)) != 0 ? u"*"_S : u"."_S;
+        auto a = (rule & (1 << bin)) != 0 ? u'*'_C : u'.'_C;
         result &= a;
     }
     return result;
@@ -737,8 +737,8 @@ template <typename T1, typename T2> auto step(const T1 &cells, const T2 &rule)
 
 auto addNoCells(String cells)
 {
-    auto left = _get<0>(cells) == u'*' ? u"."_S : u"*"_S;
-    auto right = cells.last() == u'*' ? u"."_S : u"*"_S;
+    auto left = _get<0>(cells) == u'*' ? u'.'_C : u'*'_C;
+    auto right = cells.last() == u'*' ? u'.'_C : u'*'_C;
     cells = left & cells & right;
     cells = left & cells & right;
     return cells;
@@ -2206,7 +2206,7 @@ struct CodeBlock2
         for (auto n : range_el(0, limit))
             if (is_extra_prime(n)) {
                 i++;
-                print(u"#4"_S.format(n), mod(i, 9) == 0 ? u"\n"_S : u" "_S);
+                print(u"#4"_S.format(n), mod(i, 9) == 0 ? u'\n'_C : u' '_C);
             }
     }
 } code_block_2;
@@ -2395,7 +2395,7 @@ template <typename T5, typename T6> auto listEsths(const Int64 &n1, const Int64 
         {int Lindex = 0;
         for (auto &&esth : esths) {
             auto i = Lindex;
-            print(esth, mod((i + 1), perLine) == 0 ? u"\n"_S : u" "_S);
+            print(esth, mod((i + 1), perLine) == 0 ? u'\n'_C : u' '_C);
             Lindex++;
         }}
         print();
@@ -2633,7 +2633,7 @@ struct CodeBlock2
         {int Lindex = 0;
         for (auto &&prime : erdosList2500) {
             auto i = Lindex;
-            print(u"#5"_S.format(prime), mod((i + 1), 10) == 0 ? u"\n"_S : u" "_S);
+            print(u"#5"_S.format(prime), mod((i + 1), 10) == 0 ? u'\n'_C : u' '_C);
             Lindex++;
         }}
         print();

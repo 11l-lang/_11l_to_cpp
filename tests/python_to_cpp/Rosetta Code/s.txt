@@ -10206,7 +10206,7 @@ struct CodeBlock1
     {
         for (int n = 0; n < 50; n++) {
             s += n * n * n;
-            print(String(s).rjust(7), mod((n + 1), 10) == 0 ? u"\n"_S : u" "_S);
+            print(String(s).rjust(7), mod((n + 1), 10) == 0 ? u'\n'_C : u' '_C);
         }
     }
 } code_block_1;
@@ -10234,7 +10234,7 @@ struct CodeBlock1
         for (int n = 0; n < 1000; n++)
             if (in(String(sum_map(String(n), [](const auto &d){return to_int(d);})), String(n))) {
                 count++;
-                print(u"#3"_S.format(n), mod(count, 8) == 0 ? u"\n"_S : u" "_S);
+                print(u"#3"_S.format(n), mod(count, 8) == 0 ? u'\n'_C : u' '_C);
             }
     }
 } code_block_1;
@@ -10603,7 +10603,7 @@ struct CodeBlock2
         {int Lindex = 0;
         for (auto &&point : points) {
             auto i = Lindex;
-            outfile.write(i == 0 ? u"M"_S : u"L"_S);
+            outfile.write(i == 0 ? u'M'_C : u'L'_C);
             outfile.write(_get<0>(point) & u","_S & _get<1>(point) & u"\n"_S);
             Lindex++;
         }}

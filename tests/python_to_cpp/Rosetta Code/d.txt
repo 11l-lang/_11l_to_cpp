@@ -1388,7 +1388,7 @@ struct CodeBlock2
         print(u"\nRecommended action(s):"_S);
         for (auto r : range_el(0, nr)) {
             for (auto c : range_el(0, conditions.len())) {
-                auto _yn_ = answers[c] ? u"Y"_S : u"N"_S;
+                auto _yn_ = answers[c] ? u'Y'_C : u'N'_C;
                 if (_get<1>(conditions[c])[r] != _yn_)
                     goto break_;
             }

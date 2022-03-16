@@ -357,7 +357,7 @@ template <typename T1> auto chararray(const T1 &intmatrix)
 template <typename T1> auto toTxt(const T1 &intmatrix)
 {
     u"Change a 2d list of lists of 1/0 ints into lines of '#' and '.' chars"_S;
-    return intmatrix.map([](const auto &row){return row.map([](const auto &p){return (p ? u"#"_S : u"."_S);}).join(u""_S);}).join(u"\n"_S);
+    return intmatrix.map([](const auto &row){return row.map([](const auto &p){return (p ? u'#'_C : u'.'_C);}).join(u""_S);}).join(u"\n"_S);
 }
 
 template <typename T1, typename T2, typename T3> auto neighbours_array(const T1 &x, const T2 &y, const T3 &image)

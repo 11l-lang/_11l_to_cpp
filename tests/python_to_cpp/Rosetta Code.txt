@@ -8687,7 +8687,7 @@ template <typename T1, typename T2, typename T3> auto step(const T1 &start, cons
     return (range_el(0, iterations).map([&start, &step](const auto &i){return start + (i * step);}));
 }
 
-auto rows = (step(1, -0.05, 41).map([](const auto &y){return (step(-2.0, 0.0315, 80).map([&y](const auto &x){return (abs(mandelbrot(x + 1i * y)) < 2 ? u"*"_S : u" "_S);}));}));
+auto rows = (step(1, -0.05, 41).map([](const auto &y){return (step(-2.0, 0.0315, 80).map([&y](const auto &x){return (abs(mandelbrot(x + 1i * y)) < 2 ? u'*'_C : u' '_C);}));}));
 
 struct CodeBlock1
 {
@@ -19299,7 +19299,7 @@ public:
 
     auto chardisplay()
     {
-        auto txt = map.map([this](const auto &row){return row.map([this](const auto &bit){return (bit == background ? u" "_S : u"@"_S);}).join(u""_S);});
+        auto txt = map.map([this](const auto &row){return row.map([this](const auto &bit){return (bit == background ? u' '_C : u'@'_C);}).join(u""_S);});
         txt = txt.map([](const auto &row){return u"|"_S & row & u"|"_S;});
         txt.insert(0, u"+"_S & (u"-"_S * width) & u"+"_S);
         txt.append(u"+"_S & (u"-"_S * width) & u"+"_S);

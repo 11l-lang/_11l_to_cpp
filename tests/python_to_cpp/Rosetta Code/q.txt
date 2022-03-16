@@ -97,7 +97,7 @@ struct CodeBlock1
         {int Lindex = 0;
         for (auto &&qp : quadraPrimes) {
             auto i = Lindex;
-            print(u"#5"_S.format(qp), mod((i + 1), 7) == 0 ? u"\n"_S : u" "_S);
+            print(u"#5"_S.format(qp), mod((i + 1), 7) == 0 ? u'\n'_C : u' '_C);
             Lindex++;
         }}
     }

@@ -1242,7 +1242,7 @@ struct CodeBlock1
                     if ((in(word[i], vowels)) == first)
                         goto break_1;
                 count++;
-                print(word.rjust(14), mod(count, 7) == 0 ? u"\n"_S : u" "_S);
+                print(word.rjust(14), mod(count, 7) == 0 ? u'\n'_C : u' '_C);
                 break_1:;
                 break_:;
             }
@@ -2559,7 +2559,7 @@ struct CodeBlock1
         {int Lindex = 0;
         for (auto &&m : sorted(create_array(s))[range_el(0, nn)]) {
             auto i = Lindex;
-            print(u"#3"_S.format(m), mod((i + 1), 10) == 0 ? u"\n"_S : u" "_S);
+            print(u"#3"_S.format(m), mod((i + 1), 10) == 0 ? u'\n'_C : u' '_C);
             Lindex++;
         }}
     }
