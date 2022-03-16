@@ -627,6 +627,7 @@ public:
 	String operator[](const Range<Int, false, false> range) const {return slice(max(range.b + 1, Int(0)), min((unsigned)range.e     , (unsigned)len()));}
 	String operator[](const RangeEI<Int>             range) const {return slice(max(range.b    , Int(0)), len());}
 	String operator[](const RangeEIWithStep<Int>     range) const {return slice(max(range.b    , Int(0)), range.step > 0 ? len() : -1, range.step);}
+	String operator[](const RangeWithStep<Int, true, false> range) const {return slice(max(range.b, Int(0)), min((unsigned)range.e, (unsigned)len()), range.step);}
 
 	String operator[](const range_e_llen    range) const {return (*this)[range_el(        range.b, len() + range.e)];}
 	String operator[](const range_elen_elen range) const {return (*this)[range_ee(len() + range.b, len() + range.e)];}
