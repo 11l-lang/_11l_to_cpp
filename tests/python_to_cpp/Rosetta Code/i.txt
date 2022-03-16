@@ -912,7 +912,7 @@ public:
     template <typename T1> QuaterImaginary(const T1 &str) :
         b2i(str)
     {
-        if (!re::_(u"[0123.]+"_S).match(str) || str.count(u"."_S) > 1)
+        if (!re::_(u"[0123.]+"_S).match(str) || str.count(u'.'_C) > 1)
             assert(false, u"Invalid base 2i number"_S);
     }
 

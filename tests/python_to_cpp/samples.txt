@@ -3846,7 +3846,7 @@ struct CodeBlock1
             auto t = input();
             s = sorted(s).join(u""_S);
             if (t == u"abc" && in(u'a'_C, s) && in(u'b'_C, s) && in(u'c'_C, s))
-                s = s[range_el(0, s.findi(u"b"_S))] & (u"c"_S * s.count(u"c"_S)) & (u"b"_S * s.count(u"b"_S)) & (s[range_ei(s.rfindi(u"c"_S) + 1)]);
+                s = s[range_el(0, s.findi(u"b"_S))] & (u"c"_S * s.count(u'c'_C)) & (u"b"_S * s.count(u'b'_C)) & (s[range_ei(s.rfindi(u"c"_S) + 1)]);
             print(s);
         }
     }
@@ -4110,5 +4110,22 @@ struct CodeBlock1
         for (auto &&i : reversed(range_el(1, maxn)))
             print(i, u""_S);
         print();
+    }
+} code_block_1;
+
+
+s = list(input())
+print(s.count('1'))
+===
+V s = Array(input())
+print(s.count(‘1’))
+===
+auto s = create_array(input());
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(s.count(u'1'_C));
     }
 } code_block_1;

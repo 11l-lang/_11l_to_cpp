@@ -806,7 +806,7 @@ public:
                     exit_with_error(u"Unended ` started"_S, start);
                 write_to_pos(start, end + i - start);
                 auto ins = instr[range_el(i, end)];
-                auto delta = ins.count(u"‘"_S) - ins.count(u"’"_S);
+                auto delta = ins.count(u'‘'_C) - ins.count(u'’'_C);
                 if (delta > 0)
                     for (auto ii : range_el(0, delta))
                         ending_tags.append(u"’"_S);

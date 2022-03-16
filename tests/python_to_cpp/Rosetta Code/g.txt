@@ -540,7 +540,7 @@ template <typename T1> auto fen_from_board(const T1 &brd)
             }
         if (n != 0)
             fen &= String(n);
-        fen &= fen.count(u"/"_S) < 7 ? u"/"_S : u""_S;
+        fen &= fen.count(u'/'_C) < 7 ? u"/"_S : u""_S;
     }
     fen &= u" w - - 0 1\n"_S;
     return fen;

@@ -422,6 +422,10 @@ public:
 	{
 		return count(s.data(), s.len());
 	}
+	Int count(const Char c) const
+	{
+		return (Int)std::count(basic_string::begin(), basic_string::end(), c.code);
+	}
 
 	Array<String> split(const String &delim, Nullable<Int> limit = nullptr, bool group_delimiters = false) const;
 	template <typename ... Types> Array<String> split(const Tuple<Types...> &delim_tuple, Nullable<Int> limit = nullptr, bool group_delimiters = false) const;

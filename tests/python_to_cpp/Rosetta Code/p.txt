@@ -921,7 +921,7 @@ L(i) 888888877 .. 888888888
 ===
 template <typename T1> auto popcount(const T1 &n)
 {
-    return bin(n).count(u"1"_S);
+    return bin(n).count(u'1'_C);
 }
 
 template <typename T1> auto is_prime(const T1 &n)
@@ -1247,7 +1247,7 @@ print(odious[0.<30])
 ===
 template <typename T1> auto popcount(const T1 &n)
 {
-    return bin(n).count(u"1"_S);
+    return bin(n).count(u'1'_C);
 }
 
 struct CodeBlock1
@@ -6330,7 +6330,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto n : range_ee(1, 999))
-            if (String(n).count(u"1"_S) == 2)
+            if (String(n).count(u'1'_C) == 2)
                 print(n, u" "_S);
     }
 } code_block_1;

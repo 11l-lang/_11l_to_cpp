@@ -531,7 +531,7 @@ print(thue_morse_digits(20))
 ===
 template <typename T1> auto thue_morse_digits(const T1 &digits)
 {
-    return range_el(0, digits).map([](const auto &n){return mod(bin(n).count(u"1"_S), 2);});
+    return range_el(0, digits).map([](const auto &n){return mod(bin(n).count(u'1'_C), 2);});
 }
 
 struct CodeBlock1

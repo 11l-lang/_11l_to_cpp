@@ -4936,7 +4936,7 @@ template <typename T1> auto entropy(const T1 &s)
     if (s.len() <= 1)
         return 0.0;
     auto lns = to_float(s.len());
-    auto count0 = s.count(u"0"_S);
+    auto count0 = s.count(u'0'_C);
     return -sum_map(make_tuple(count0, s.len() - count0), [&lns](const auto &count){return count / lns * log(count / lns, 2);});
 }
 
