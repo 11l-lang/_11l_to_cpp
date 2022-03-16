@@ -4071,3 +4071,44 @@ struct CodeBlock1
         a.pop_plus_len( - 2);
     }
 } code_block_1;
+
+
+maxn = 3
+for i in reversed(range(maxn)):
+    print(i, end = '')
+print()
+for i in reversed(range(maxn + 1)):
+    print(i, end = '')
+print()
+for i in reversed(range(1, maxn)):
+    print(i, end = '')
+print()
+===
+V maxn = 3
+L(i) reversed(0 .< maxn)
+   print(i, end' ‘’)
+print()
+L(i) reversed(0 .. maxn)
+   print(i, end' ‘’)
+print()
+L(i) reversed(1 .< maxn)
+   print(i, end' ‘’)
+print()
+===
+auto maxn = 3;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&i : reversed(range_el(0, maxn)))
+            print(i, u""_S);
+        print();
+        for (auto &&i : reversed(range_ee(0, maxn)))
+            print(i, u""_S);
+        print();
+        for (auto &&i : reversed(range_el(1, maxn)))
+            print(i, u""_S);
+        print();
+    }
+} code_block_1;

@@ -220,6 +220,9 @@ template <typename Ty> inline auto range_le(const Ty &begin, const Ty &end) {ret
 template <typename Ty> inline auto range_ll(const Ty &begin, const Ty &end) {return Range<Ty, false, false>(begin, end);} // less-less   range (`a<.<b`)
 template <typename Ty> inline auto range_ei(const Ty &begin               ) {return RangeEI<Ty>            (begin     );} // equal-infinity range (`a..`)
 
+template <typename Ty> inline auto reversed(const Range<Ty, true,  true> &range) {return RangeWithStep<Ty, true, true>(range.e,     range.b, -1);}
+template <typename Ty> inline auto reversed(const Range<Ty, true, false> &range) {return RangeWithStep<Ty, true, true>(range.e - 1, range.b, -1);}
+
 template <typename Ty> inline bool in(const Ty &val, const Range<Ty, true,  true > &range) {return val >= range.b && val <= range.e;}
 template <typename Ty> inline bool in(const Ty &val, const Range<Ty, true,  false> &range) {return val >= range.b && val <  range.e;}
 template <typename Ty> inline bool in(const Ty &val, const Range<Ty, false, true > &range) {return val >  range.b && val <= range.e;}
