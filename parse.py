@@ -548,7 +548,7 @@ class SymbolNode:
                             f_node = builtins_scope.find('Array').ast_nodes[0].scope.ids.get('sort_range').ast_nodes[0]
                     elif func_name.endswith('.pop') and len(self.children) == 3 and self.children[2].to_str().startswith('(len)'):
                         return func_name + '_plus_len(' + self.children[2].to_str()[len('(len)'):] + ')'
-                    elif func_name.endswith('.count') and len(self.children) == 3 and self.children[2].token.category == Token.Category.STRING_LITERAL:
+                    elif func_name.endswith(('.count', '.index')) and len(self.children) == 3 and self.children[2].token.category == Token.Category.STRING_LITERAL:
                         return func_name + '(' + char_or_str(self.children[2], is_char(self.children[2])) + ')'
                     elif self.children[0].children[1].token.value(source) == 'union':
                         func_name = self.children[0].children[0].to_str() + '.set_union'
