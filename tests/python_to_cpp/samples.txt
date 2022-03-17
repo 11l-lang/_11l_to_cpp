@@ -4211,3 +4211,32 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+M = max(1, 2)
+a, b = 3, 4
+if a == b == M:
+    print(1)
+if a == M:
+    print(2)
+===
+V M = max(1, 2)
+V (a, b) = (3, 4)
+I a == b == M
+   print(1)
+I a == M
+   print(2)
+===
+auto M = max(1, 2);
+auto [a, b] = make_tuple(3, 4);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        if (equal(a, b, M))
+            print(1);
+        if (a == M)
+            print(2);
+    }
+} code_block_1;
