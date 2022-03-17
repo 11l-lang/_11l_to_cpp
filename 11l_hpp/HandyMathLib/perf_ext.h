@@ -157,8 +157,8 @@ template <int N> INLINE const Tvec<float, N>  ceil(const Tvec<float, N> &v) {ret
 
 INLINE const float fract(const float &x) {return x - (float)lfloor(x);}
 INLINE const float mod(const float &x, const float &y) {return x - y*lfloor(x/y);}
-INLINE const float  snap(const float  &x, const float  &gridSize) {return lround(x/gridSize) * gridSize;}
-INLINE const double snap(const double &x, const double &gridSize) {return lround(x/gridSize) * gridSize;}
+INLINE const float  snap(const float  &x, const float  &gridSize) {return roundf(x/gridSize) * gridSize;}
+INLINE const double snap(const double &x, const double &gridSize) {return round (x/gridSize) * gridSize;}
 template <int N> INLINE const Tvec<float , N> snap(const Tvec<float , N> &x, const float  &gridSize) {return (Tvec<float , N>)lround(x/gridSize) * gridSize;}
 template <int N> INLINE const Tvec<double, N> snap(const Tvec<double, N> &x, const double &gridSize) {return (Tvec<double, N>)lround(x/gridSize) * gridSize;}
 template <int N> INLINE const Tvec<float , N> snap(const Tvec<float , N> &x, const Tvec<float , N> &gridSize) {return (Tvec<float , N>)lround(x/gridSize) * gridSize;}
