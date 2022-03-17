@@ -117,7 +117,7 @@ template <typename T1> auto toString(const T1 &move)
             return u"O-O"_S;
     }
     if (move & 0x0200'0000)
-        mid = u"x"_S;
+        mid = u'x'_C;
     auto retval = letters[fr & 7] & numbers[fr >> 4] & mid & letters[to & 7] & numbers[to >> 4];
     return retval;
 }

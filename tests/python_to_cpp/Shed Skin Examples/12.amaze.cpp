@@ -146,11 +146,11 @@ public:
             for (auto &&item : row) {
                 String sitem;
                 if (item == ::PATH)
-                    sitem = u"*"_S;
+                    sitem = u'*'_C;
                 else if (item == ::START)
-                    sitem = u"S"_S;
+                    sitem = u'S'_C;
                 else if (item == ::EXIT)
-                    sitem = u"E"_S;
+                    sitem = u'E'_C;
                 else
                     sitem = String(item);
 
