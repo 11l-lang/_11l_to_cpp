@@ -4240,3 +4240,20 @@ struct CodeBlock1
             print(2);
     }
 } code_block_1;
+
+
+s = 'bc'
+print(s[0] >= 'a')
+===
+V s = ‘bc’
+print(s[0] >= ‘a’)
+===
+auto s = u"bc"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(_get<0>(s) >= u'a');
+    }
+} code_block_1;

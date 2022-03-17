@@ -43,6 +43,10 @@ public:
 	bool operator<=(Char c) const {return code <= c.code;}
 	bool operator> (Char c) const {return code >  c.code;}
 	bool operator>=(Char c) const {return code >= c.code;}
+	bool operator< (char16_t c) const {return code <  c;}
+	bool operator<=(char16_t c) const {return code <= c;}
+	bool operator> (char16_t c) const {return code >  c;}
+	bool operator>=(char16_t c) const {return code >= c;}
 
 	bool operator==(Char c) const {return code == c.code;}
 	bool operator!=(Char c) const {return code != c.code;}

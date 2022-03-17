@@ -977,7 +977,7 @@ class SymbolNode:
                         return f(child.children[0]) + ', ' + char_if_len_1(child.children[1])
                     return child.to_str()
                 return 'equal(' + f(self) + ')'
-            elif self.symbol.id in ('==', '!=') and self.children[1].token.category == Token.Category.STRING_LITERAL:
+            elif self.symbol.id in ('==', '!=', '<', '<=', '>', '>=') and self.children[1].token.category == Token.Category.STRING_LITERAL:
                 return self.children[0].to_str() + ' ' + self.symbol.id + ' ' + char_if_len_1(self.children[1])[:-2]
             elif self.symbol.id == '=' and self.children[0].symbol.id == '[': # ] # replace `a[k] = v` with `a.set(k, v)`
                 if self.children[0].children[1].token.category == Token.Category.NUMERIC_LITERAL: # replace `a[0] = v` with `_set<0>(a, v)` to support tuples
