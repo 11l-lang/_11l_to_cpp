@@ -839,7 +839,7 @@ F deal(seed)
    R cards
 
 F show(cards)
-   V l = cards.map(c -> ‘A23456789TJQK’[Int(c / 4)]‘’‘CDHS’[c % 4])
+   V l = cards.map(c -> ‘A23456789TJQK’[Int(c / 4)]‘CDHS’[c % 4])
    L(i) (0 .< cards.len).step(8)
       print((l[i .< i + 8]).join(‘ ’))
 

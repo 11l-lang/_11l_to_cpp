@@ -2672,7 +2672,7 @@ F percentage(a, num, denom)
    R (a * num * 10 I/ denom + 5) I/ 10
 
 F to_str(c)
-   R String(c I/ 100)‘’‘.#02’.format(c % 100)
+   R String(c I/ 100)‘.#02’.format(c % 100)
 
 V hamburgers = currency(5, 50) * 4'000'000'000'000'000
 V milkshakes = currency_from_str(‘2.86’) * 2
