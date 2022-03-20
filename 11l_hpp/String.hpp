@@ -590,7 +590,7 @@ public:
 
 	//String &operator=(const String &s) {assign(s); return *this;}
 
-	friend String &&operator*(String &&s, Int n)
+	friend String operator*(String &&s, Int n)
 	{
 		size_t s_len = s.length();
 		if (n < 1) // mimic Python's behavior in which 's' * 0 = '' and 's' * -1 = ''
@@ -602,7 +602,7 @@ public:
 		}
 		return std::move(s);
 	}
-	friend String &&operator*(Int n, String &&s)
+	friend String operator*(Int n, String &&s)
 	{
 		return std::move(s) * n;
 	}

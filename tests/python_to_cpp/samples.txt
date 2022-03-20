@@ -4274,3 +4274,19 @@ struct CodeBlock1
         tmp.sort([](const auto &x){return _get<0>(x);});
     }
 } code_block_1;
+
+
+for _ in " "*int(input()):
+    print(0)
+===
+L(_) ‘ ’ * Int(input())
+   print(0)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&_ : u" "_S * to_int(input()))
+            print(0);
+    }
+} code_block_1;
