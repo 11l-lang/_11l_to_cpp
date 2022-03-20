@@ -254,18 +254,18 @@ public:
 
 	const Type &at_plus_len(Int i) const
 	{
+#ifndef PYTHON_NEGATIVE_INDEXING
 		i += len();
-		if (in(i, range_el(Int(0), len())))
-			return std::vector<Type>::operator[](i);
-		throw IndexError(i);
+#endif
+		return operator[](i);
 	}
 
 	Type &at_plus_len(Int i)
 	{
+#ifndef PYTHON_NEGATIVE_INDEXING
 		i += len();
-		if (in(i, range_el(Int(0), len())))
-			return std::vector<Type>::operator[](i);
-		throw IndexError(i);
+#endif
+		return operator[](i);
 	}
 
 	const Type &set(Int i, const Type &v) // return `const Type&` for [https://www.rosettacode.org/wiki/Perlin_noise#Python]:‘p[256+i] = p[i] = permutation[i]’
@@ -282,11 +282,10 @@ public:
 
 	const Type &set_plus_len(Int i, const Type &v)
 	{
+#ifndef PYTHON_NEGATIVE_INDEXING
 		i += len();
-		if (in(i, range_el(Int(0), len())))
-			return std::vector<Type>::operator[](i) = v;
-		else
-			throw IndexError(i);
+#endif
+		return set(i, v);
 	}
 
 	void append(Type &&v) {std::vector<Type>::push_back(std::move(v));}
@@ -450,12 +449,10 @@ public:
 
 	Type pop_plus_len(Int i)
 	{
+#ifndef PYTHON_NEGATIVE_INDEXING
 		i += len();
-		if (!in(i, range_el(Int(0), len())))
-			throw IndexError(i);
-		Type r(std::move((*this)[i]));
-		std::vector<Type>::erase(begin() + i);
-		return r;
+#endif
+		return pop(i);
 	}
 
 	void remove(const Type &val)
