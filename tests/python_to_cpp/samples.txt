@@ -4257,3 +4257,20 @@ struct CodeBlock1
         print(_get<0>(s) >= u'a');
     }
 } code_block_1;
+
+
+tmp = [(0,0)]*0
+tmp.sort(key=lambda x:x[0])
+===
+V tmp = [(0, 0)] * 0
+tmp.sort(key' x -> x[0])
+===
+auto tmp = create_array({make_tuple(0, 0)}) * 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        tmp.sort([](const auto &x){return _get<0>(x);});
+    }
+} code_block_1;

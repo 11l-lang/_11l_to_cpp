@@ -2051,7 +2051,8 @@ def type_of(sn):
                 return None
             return tid.ast_nodes[0]
         if ((left.expression.function_call and left.expression.children[0].symbol.id == '.' and len(left.expression.children[0].children) == 2 and left.expression.children[0].children[1].token_str() in ('map', 'filter')) # for `V a = ....map(Int); a.sort(reverse' 1B)`
-                or left.expression.is_list): # for `V employees = [...]; employees.sort(key' e -> e.name)`
+                or left.expression.is_list # for `V employees = [...]; employees.sort(key' e -> e.name)`
+                or (left.expression.symbol.id == '*' and left.expression.children[0].is_list)): # for `V tmp = [(0, 0)] * 0; tmp.sort(key' x -> x[0])`
             tid = builtins_scope.find('Array').ast_nodes[0].scope.ids.get(sn.children[1].token_str())
             if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition)):
                 raise Error('member `' + sn.children[1].token_str() + '` is not found in type `Array`', sn.left_to_right_token())
