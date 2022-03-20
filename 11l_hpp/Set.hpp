@@ -2,6 +2,9 @@
 
 template <typename KeyType> class Set : public std::set<KeyType>
 {
+#ifdef PUBLIC_SET_COPY_CONSTRUCTOR
+public:
+#endif
 	Set(const Set &s) : std::set<KeyType>(s) {}
 
 public:
