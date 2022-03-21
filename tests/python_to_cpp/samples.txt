@@ -4290,3 +4290,16 @@ struct CodeBlock1
             print(0);
     }
 } code_block_1;
+
+
+DIGITS = 55
+save : List[Dict[int, int]] = [{} for d in range(DIGITS)]
+saves : List[Dict[int, str]] = [{} for d in range(DIGITS)]
+===
+V DIGITS = 55
+[[Int = Int]] save = (0 .< DIGITS).map(d -> [Int = Int]())
+[[Int = String]] saves = (0 .< DIGITS).map(d -> [Int = String]())
+===
+auto DIGITS = 55;
+Array<Dict<int, int>> save = range_el(0, DIGITS).map([](const auto &d){return Dict<int, int>();});
+Array<Dict<int, String>> saves = range_el(0, DIGITS).map([](const auto &d){return Dict<int, String>();});

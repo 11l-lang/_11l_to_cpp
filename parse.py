@@ -582,7 +582,7 @@ class SymbolNode:
                     func_name = 'Array<' + func_name[6:-1] + '>'
                 elif func_name == 'Array': # `list(range(1,10))` -> `Array(1.<10)` -> `create_array(range_el(1, 10))`
                     func_name = 'create_array'
-                elif self.children[0].symbol.id == '[' and self.children[0].is_list: # ] # `[Type]()` -> `Array<Type>()`
+                elif self.children[0].symbol.id == '[' and (self.children[0].is_list or self.children[0].is_dict): # ] # `[Type]()` -> `Array<Type>()`, `[KeyType = ValueType]()` -> `Dict<KeyType, ValueType>()`
                     func_name = trans_type(self.children[0].to_type_str(), self.children[0].scope, self.children[0].token)
                 elif func_name == 'Dict':
                     func_name = 'create_dict'
