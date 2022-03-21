@@ -1477,3 +1477,8 @@ const auto rotate_amounts = create_array({7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 1
 const auto constants = range_el(0, 64).map([](const auto &i){return to_uint32(to_uint64(abs(sin(i + 1)) * pow(2.0, 32)) & 0xFFFF'FFFF);});
 
 const auto init_values = make_tuple(to_uint32(0x6745'2301), to_uint32(0xEFCD'AB89), to_uint32(0x98BA'DCFE), to_uint32(0x1032'5476));
+
+
+[[Int = String]] save
+===
+Array<Dict<int, String>> save;

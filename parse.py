@@ -2397,8 +2397,9 @@ def led(self, left):
 symbol('[').led = led
 
 def nud(self):
-    i = 1 # [[
-    if token.value(source) != ']': # for `R []`
+    i = 1 # [
+    if token.value(source) not in ('[', # for `[[Int = Int]] save`
+                                   ']'): # for `R []`
         if token.value(source) == '(': # for `V celltable = [(1, 2) = 1, (1, 3) = 1, (0, 3) = 1]`
             while peek_token(i).value(source) != ')':
                 i += 1
