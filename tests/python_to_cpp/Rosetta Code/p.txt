@@ -4006,7 +4006,7 @@ for y in range(-10,10):
 
 print('Untrained')
 for row in result:
-    print(''.join(v for v in row))
+    print(''.join(row))
 
 for t in training:
     ptron.train(t.inputs, t.answer)
@@ -4023,7 +4023,7 @@ for y in range(-10,10):
 
 print('Trained')
 for row in result:
-    print(''.join(v for v in row))
+    print(''.join(row))
 ===
 V TRAINING_LENGTH = 2000
 

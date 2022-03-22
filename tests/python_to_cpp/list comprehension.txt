@@ -245,7 +245,7 @@ struct CodeBlock1
 
 aa = [1, 2]
 bb = [3, 4]
-print([a for a in aa if [3, 4] == [b for b in bb]])
+print([a for a in aa if [3, 4] == bb])
 print([a for a in aa if [4, 5] == [b + 1 for b in bb]])
 ===
 V aa = [1, 2]

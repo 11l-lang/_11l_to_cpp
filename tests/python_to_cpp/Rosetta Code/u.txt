@@ -807,7 +807,7 @@ struct CodeBlock1
 # https://www.rosettacode.org/wiki/Unique_characters_in_each_string#Python
 LIST = ["1a3c52debeffd", "2b6178c97a938stf", "3ycxdb1fgxa2yz"]
 
-print(sorted([ch for ch in set(list([c for c in ''.join(LIST)])) if all(w.count(ch) == 1 for w in LIST)]))
+print(sorted([ch for ch in set(list(''.join(LIST))) if all(w.count(ch) == 1 for w in LIST)]))
 ===
 V LIST = [‘1a3c52debeffd’, ‘2b6178c97a938stf’, ‘3ycxdb1fgxa2yz’]
 

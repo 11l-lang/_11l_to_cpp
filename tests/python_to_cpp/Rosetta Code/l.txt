@@ -1556,7 +1556,7 @@ def ludic(nmax=100000):
         lst = newlst
     return r
 
-ludics = [l for l in ludic()]
+ludics = ludic()
 
 print('First 25 ludic primes:')
 print(ludics[:25])
