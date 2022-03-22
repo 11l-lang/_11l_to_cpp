@@ -1110,13 +1110,15 @@ class ASTNodeWithChildren(ASTNode):
     def children_to_str_detect_single_stmt(self, indent, r, check_for_if = False):
         def has_if(node):
             while True:
-                if not isinstance(node, ASTNodeWithChildren) or len(node.children) != 1:
+                if not isinstance(node, ASTNodeWithChildren):
                     return False
                 if type(node) == ASTIf:
                     return True
+                if len(node.children) != 1:
+                    return False
                 node = node.children[0]
         if (len(self.children) != 1
-                or (check_for_if and (type(self.children[0]) == ASTIf or has_if(self.children[0]))) # for correctly handling of dangling-else
+                or (check_for_if and (type(self.children[0]) == ASTIf or (has_if(self.children[0]) and type(self) in (ASTIf, ASTElseIf) and self.else_or_elif is not None))) # for correctly handling of dangling-else
                 or type(self.children[0]) == ASTLoopRemoveCurrentElementAndContinue # `L.remove_current_element_and_continue` ‘раскрывается в 2 строки кода’\‘is translated into 2 statements’
                 or (type(self.children[0]) == ASTTupleAssignment and self.children[0].is_multi_st()) # for `mx, mx_index = digit, i` in [https://www.rosettacode.org/wiki/Next_highest_int_from_digits#Python:_Algorithm_2]
                 or (type(self.children[0]) == ASTLoop and self.children[0].has_L_was_no_break())

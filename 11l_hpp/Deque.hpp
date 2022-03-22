@@ -70,6 +70,14 @@ template <typename Type> Deque<Type> create_deque(std::initializer_list<Type> il
 	return Deque<Type>(il);
 }
 
+template <typename Type> Deque<Type> create_deque(const Array<Type> &arr)
+{
+	Deque<Type> r;
+	for (auto &&el : arr)
+		r.append(el);
+	return r;
+}
+
 template <typename Type> inline bool in(const Type &val, const Deque<Type> &d)
 {
 	return std::find(d.begin(), d.end(), val) != d.end();

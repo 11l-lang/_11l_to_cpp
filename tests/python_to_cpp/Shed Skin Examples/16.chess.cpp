@@ -184,11 +184,10 @@ template <typename T1> auto pseudoLegalMovesWhite(const T1 &board)
                             break;
                         retval.append(sq * 0x01'01 + k);
                     }
-            else if (b == 6) {
+            else if (b == 6)
                 for (auto &&k : ::kingMoves)
                     if (!(k + sq & 0x88) && board[k + sq] == 0)
                         retval.append(sq * 0x01'01 + k);
-            }
         }
     }
     if ((_get<10>(board) && _get<1>(board) == 0 && _get<2>(board) == 0 && _get<3>(board) == 0 && !(in(-1, board[range_el(17, 22)])) && !nonpawnBlackAttacks(board, 2) && !nonpawnBlackAttacks(board, 3) && !nonpawnBlackAttacks(board, 4)))
@@ -229,11 +228,10 @@ template <typename T1> auto pseudoLegalMovesBlack(const T1 &board)
                             break;
                         retval.append(sq * 0x01'01 + k);
                     }
-            else if (b == -6) {
+            else if (b == -6)
                 for (auto &&k : ::kingMoves)
                     if (!(k + sq & 0x88) && board[k + sq] == 0)
                         retval.append(sq * 0x01'01 + k);
-            }
         }
     }
     if ((_get<12>(board) && _get<0x71>(board) == 0 && _get<0x72>(board) == 0 && _get<0x73>(board) == 0 && !(in(1, board[range_el(0x61, 0x65)])) && !nonpawnWhiteAttacks(board, 0x72) && !nonpawnWhiteAttacks(board, 0x73) && !nonpawnWhiteAttacks(board, 0x74)))
@@ -339,11 +337,10 @@ template <typename T1> auto pseudoLegalCapturesBlack(const T1 &board)
                             break;
                         }
                     }
-            else if (b == -6) {
+            else if (b == -6)
                 for (auto &&k : ::kingMoves)
                     if (board[k + sq] >= 1)
                         retval.append(0x0200'0000 + sq * 0x01'01 + k);
-            }
         }
     }
     return retval;

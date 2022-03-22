@@ -1482,3 +1482,44 @@ const auto init_values = make_tuple(to_uint32(0x6745'2301), to_uint32(0xEFCD'AB8
 [[Int = String]] save
 ===
 Array<Dict<int, String>> save;
+
+
+I t C M
+  L(nv) M
+     I 1B
+        print(1)
+        print(2)
+E
+  print(‘NO’)
+  exit()
+
+I t C M
+  L(nv) M
+     I 1B
+        print(1)
+        print(2)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        if (in(t, M)) {
+            for (auto &&nv : M)
+                if (true) {
+                    print(1);
+                    print(2);
+                }
+        }
+        else {
+            print(u"NO"_S);
+            exit();
+        }
+
+        if (in(t, M))
+            for (auto &&nv : M)
+                if (true) {
+                    print(1);
+                    print(2);
+                }
+    }
+} code_block_1;

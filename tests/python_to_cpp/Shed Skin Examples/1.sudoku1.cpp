@@ -7,22 +7,19 @@ template <typename T1, typename T2, typename T3, typename T4> auto validMove(con
     auto py = idiv(y, 3);
     if (puzzle[x][y] != 0)
         blnOK = false;
-    if (blnOK) {
+    if (blnOK)
         for (int i = 0; i < 9; i++)
             if (puzzle[i][y] == number)
                 blnOK = false;
-    }
-    if (blnOK) {
+    if (blnOK)
         for (int j = 0; j < 9; j++)
             if (puzzle[x][j] == number)
                 blnOK = false;
-    }
-    if (blnOK) {
+    if (blnOK)
         for (int i = 0; i < 3; i++)
             for (int j = 0; j < 3; j++)
                 if (puzzle[px * 3 + i][py * 3 + j] == number)
                     blnOK = false;
-    }
     return blnOK;
 }
 
