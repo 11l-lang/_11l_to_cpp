@@ -103,6 +103,11 @@ public:
 		return value;
 	}
 
+	void set_default(const KeyType &key, const ValueType &value)
+	{
+		insert(std::make_pair(key, value));
+	}
+
 	void update(const DefaultDict &other)
 	{
 		for (auto &&el : other)

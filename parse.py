@@ -2409,6 +2409,7 @@ def nud(self):
         self.is_dict = True
         while True: # [[
             self.append_child(expression())
+            assert(self.children[-1].symbol.id == '=')
             if token.value(source) != ',':
                 break
             advance(',')
@@ -3461,6 +3462,7 @@ dict_scope = Scope(None)
 dict_scope.add_name('update', ASTFunctionDefinition([('other', '', 'Dict')]))
 dict_scope.add_name('find', ASTFunctionDefinition([('key', '', '')]))
 dict_scope.add_name('get', ASTFunctionDefinition([('key', '', ''), ('default', '', '')]))
+dict_scope.add_name('set_default', ASTFunctionDefinition([('key', '', ''), ('default', '', '')]))
 dict_scope.add_name('pop', ASTFunctionDefinition([('key', '', '')]))
 dict_scope.add_name('clear', ASTFunctionDefinition([]))
 dict_scope.add_name('keys', ASTFunctionDefinition([]))
