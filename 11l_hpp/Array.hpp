@@ -400,6 +400,7 @@ public:
 	void reverse_range(const Range<Int, true,  true> range) {std::reverse(begin() + range.b, begin() + range.e + 1);}
 	void reverse_range(const Range<Int, true, false> range) {std::reverse(begin() + range.b, begin() + range.e);}
 	void reverse_range(const RangeEI<Int>            range) {std::reverse(begin() + range.b, end());}
+	void reverse_range(const range_elen_i            range) {reverse_range(range_ei(len() + range.b));}
 
 	bool next_permutation()
 	{

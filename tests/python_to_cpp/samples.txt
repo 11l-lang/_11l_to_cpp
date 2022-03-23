@@ -4303,3 +4303,43 @@ V DIGITS = 55
 auto DIGITS = 55;
 Array<Dict<int, int>> save = range_el(0, DIGITS).map([](const auto &d){return Dict<int, int>();});
 Array<Dict<int, String>> saves = range_el(0, DIGITS).map([](const auto &d){return Dict<int, String>();});
+
+
+# *[https://codeforces.com/contest/1473/submission/104325447]
+t= int(input())
+for _ in range(t):
+    n,k = map(int, input().split())
+
+    a = [i for i in range(1, k+1)]
+    d = n - k + 1
+    if d:
+        a[-d:] = a[-d:][::-1]
+    print(*a)
+===
+V t = Int(input())
+L(_) 0 .< t
+   V (n, k) = input().split_py().map(Int)
+
+   V a = Array(1 .. k)
+   V d = n - k + 1
+   I d
+      a.reverse_range((len)-d ..)
+   print_elements(a)
+===
+auto t = to_int(input());
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto _ : range_el(0, t)) {
+            auto [n, k] = bind_array<2>(input().split_py().map([](const auto &x){return to_int(x);}));
+
+            auto a = create_array(range_ee(1, k));
+            auto d = n - k + 1;
+            if (d)
+                a.reverse_range(range_elen_i( - d));
+            print_elements(a);
+        }
+    }
+} code_block_1;
