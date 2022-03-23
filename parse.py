@@ -1005,7 +1005,7 @@ class SymbolNode:
                 return 'pow(' + self.children[0].to_str() + ', ' + c1 + ')'
             elif self.symbol.id == '%':
                 return 'mod(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
-            elif self.symbol.id == '[&]' and self.parent is not None and self.parent.symbol.id in ('==', '!='): # there is a difference in precedence of operators `&` and `==`/`!=` in Python/11l and C++
+            elif self.symbol.id == '[&]' and self.parent is not None and self.parent.symbol.id in ('==', '!=', '<', '<=', '>', '>='): # there is a difference in precedence of operators `&` and `==`/`!=` in Python/11l and C++
                 return '(' + self.children[0].to_str() + ' & ' + self.children[1].to_str() + ')'
             elif self.symbol.id == '(concat)' and self.parent is not None and self.parent.symbol.id in ('+', '-', '==', '!='): # `print(‘id = ’id+1)` -> `print((‘id = ’id)+1)`, `a & b != u"1x"` -> `(a & b) != u"1x"` [[[`'-'` is needed because `print(‘id = ’id-1)` also should generate a compile-time error]]]
                 return '(' + self.children[0].to_str() + ' & ' + self.children[1].to_str() + ')'
