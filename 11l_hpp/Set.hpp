@@ -4,6 +4,7 @@ template <typename KeyType> class Set : public std::set<KeyType>
 {
 #ifdef PUBLIC_SET_COPY_CONSTRUCTOR
 public:
+	const Set &operator=(const Set &s) { std::set<KeyType>::operator=(s); return *this; }
 #endif
 	Set(const Set &s) : std::set<KeyType>(s) {}
 
