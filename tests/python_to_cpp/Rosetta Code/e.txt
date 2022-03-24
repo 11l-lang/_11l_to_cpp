@@ -1118,7 +1118,7 @@ struct CodeBlock3
 
 
 # https://www.rosettacode.org/wiki/Emirp_primes#Nim
-def reversed(n : int):
+def reversed_int(n : int):
     result = 0
     while True:
         result = 10 * result + n % 10
@@ -1136,7 +1136,7 @@ for n in range(int(limit**0.5 + 1.5)): # stop at ``sqrt(limit)``
 def is_emirp(n):
     if not is_prime[n]:
         return False
-    r = reversed(n)
+    r = reversed_int(n)
     return r != n and is_prime[r]
 
 print('First 20 emirps:', end = '')
@@ -1163,7 +1163,7 @@ for n in range(limit):
             print('The 10000th emirp:', n)
             break
 ===
-F reversed(Int =n)
+F reversed_int(Int =n)
    V result = 0
    L
       result = 10 * result + n % 10
@@ -1181,7 +1181,7 @@ L(n) 0 .< Int(limit ^ 0.5 + 1.5)
 F is_emirp(n)
    I !:is_prime[n]
       R 0B
-   V r = reversed(n)
+   V r = reversed_int(n)
    R r != n & :is_prime[r]
 
 print(‘First 20 emirps:’, end' ‘’)
@@ -1208,7 +1208,7 @@ L(n) 0 .< limit
          print(‘The 10000th emirp: ’n)
          L.break
 ===
-auto reversed(int n)
+auto reversed_int(int n)
 {
     auto result = 0;
     while (true) {
@@ -1237,7 +1237,7 @@ template <typename T1> auto is_emirp(const T1 &n)
 {
     if (!::is_prime[n])
         return false;
-    auto r = reversed(n);
+    auto r = reversed_int(n);
     return r != n && ::is_prime[r];
 }
 

@@ -2289,9 +2289,7 @@ struct CodeBlock1
 
 # https://www.rosettacode.org/wiki/Topological_sort/Extracted_top_item#Python
 from typing import List
-
-def copy(obj):
-    return obj
+from copy import copy
 
 def _topx(data, tops, _sofar : list) -> List[List[str]]:
     'Recursive topological extractor'
