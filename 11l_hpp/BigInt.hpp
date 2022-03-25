@@ -270,6 +270,9 @@ public:
 	void operator++(int) {
 		*this = *this + 1;
 	}
+	void operator--(int) {
+		*this = *this - 1;
+	}
 	void operator-=(const BigInt &v) {
 		*this = *this - v;
 	}
