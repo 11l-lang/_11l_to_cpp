@@ -24,7 +24,7 @@ public:
 		std::set<KeyType>::operator=(std::forward<std::set<KeyType>>(s));
 	}
 
-	int len() const {return (int)std::set<KeyType>::size();}
+	Int len() const {return (Int)std::set<KeyType>::size();}
 
 	bool add(const KeyType &k)
 	{
@@ -75,6 +75,10 @@ public:
 		Set result;
 		std::set_intersection(std::set<KeyType>::begin(), std::set<KeyType>::end(), other.begin(), other.end(), std::inserter(result, result.end()));
 		return result;
+	}
+	Set operator&(const Set &other) const
+	{
+		return intersection(other);
 	}
 
 	Set set_union(const Set &other) const

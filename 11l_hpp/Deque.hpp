@@ -15,7 +15,7 @@ public:
 	      std::deque<Type>::end,
 	      std::deque<Type>::clear;
 
-	int len() const {return (int)std::deque<Type>::size();}
+	Int len() const {return (Int)std::deque<Type>::size();}
 
 	void append(Type &&v) {std::deque<Type>::push_back(std::move(v));}
 	void append(const Type &v) {std::deque<Type>::push_back(v);}

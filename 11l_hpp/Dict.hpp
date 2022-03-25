@@ -86,7 +86,7 @@ public:
 	DefaultDict() {}
 	DefaultDict(DictInitializer<KeyType, ValueType> &&di) : std::map<KeyType, ValueType>(std::forward<std::map<KeyType, ValueType>>(di.dict)) {}
 
-	int len() const {return (int)size();}
+	Int len() const {return (Int)size();}
 
 	const ValueType &set(const KeyType &key, const ValueType &value)
 	{
