@@ -4343,3 +4343,61 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# *[https://codeforces.com/contest/1457/submission/99992389]
+def xor_arr():
+    n = 5
+    arr = list(map(int, '1 2 4 6 20'.split()))
+    xor_arr = [0]
+    for x in arr:
+        xor_arr += [xor_arr[-1] ^ x]
+
+    for i in range(1, n - 1):
+        for j in range(n - i - 1):
+            for k in range(j + 1, j + i + 2):
+                if xor_arr[k] ^ xor_arr[j] > xor_arr[k] ^ xor_arr[j + i + 2]:
+                    return i
+    return -1
+
+print(xor_arr())
+===
+F xor_arr()
+   V n = 5
+   V arr = ‘1 2 4 6 20’.split_py().map(Int)
+   V xor_arr = [0]
+   L(x) arr
+      xor_arr [+]= xor_arr.last (+) x
+
+   L(i) 1 .< n - 1
+      L(j) 0 .< n - i - 1
+         L(k) j + 1 .< j + i + 2
+            I xor_arr[k] (+) xor_arr[j] > xor_arr[k] (+) xor_arr[j + i + 2]
+               R i
+   R -1
+
+print(xor_arr())
+===
+auto xor_arr()
+{
+    auto n = 5;
+    auto arr = u"1 2 4 6 20"_S.split_py().map([](const auto &x){return to_int(x);});
+    auto xor_arr = create_array({0});
+    for (auto &&x : arr)
+        xor_arr.append(xor_arr.last() ^ x);
+
+    for (auto i : range_el(1, n - 1))
+        for (auto j : range_el(0, n - i - 1))
+            for (auto k : range_el(j + 1, j + i + 2))
+                if ((xor_arr[k] ^ xor_arr[j]) > (xor_arr[k] ^ xor_arr[j + i + 2]))
+                    return i;
+    return -1;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(xor_arr());
+    }
+} code_block_1;
