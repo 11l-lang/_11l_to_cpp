@@ -693,6 +693,9 @@ class SymbolNode:
                         argument_name = self.children[i].token_str()[:-1]
                         while True:
                             if last_function_arg == len(f_node.function_arguments):
+                                for arg in f_node.function_arguments:
+                                    if arg[0] == argument_name:
+                                        raise Error('please correct order of argument `' + argument_name + '`', self.children[i].token)
                                 raise Error('argument `' + argument_name + '` is not found in function `' + func_name + '`', self.children[i].token)
                             if f_node.function_arguments[last_function_arg][0] == argument_name:
                                 last_function_arg += 1

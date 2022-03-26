@@ -270,3 +270,8 @@ V do = Int(input())
 L do
 ^Error: please write `L do != 0` or `L 1..do` instead of `L do`
    V n = Int(input())
+
+
+V order = [(0, 1), (2, 3)]
+order.sort(reverse' 1B, key' x -> x[0])
+                        ^Error: please correct order of argument `key`
