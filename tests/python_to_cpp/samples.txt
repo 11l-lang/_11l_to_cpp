@@ -4401,3 +4401,37 @@ struct CodeBlock1
         print(xor_arr());
     }
 } code_block_1;
+
+
+class SegmentTree:
+    def BS1(self, pos):
+        print(pos)
+
+sg = SegmentTree()
+sg.BS1(1)
+===
+T SegmentTree
+   F BS1(pos)
+      print(pos)
+
+V sg = SegmentTree()
+sg.BS1(1)
+===
+class SegmentTree
+{
+public:
+    template <typename T1> auto BS1(const T1 &pos)
+    {
+        print(pos);
+    }
+};
+
+auto sg = SegmentTree();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        sg.BS1(1);
+    }
+} code_block_1;

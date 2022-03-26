@@ -910,7 +910,7 @@ class SymbolNode:
                         if tid is not None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
                             return cts0 + '->' + c1
 
-                if c1.isupper():
+                if c1.isupper() and not (self.parent is not None and self.parent.function_call and self is self.parent.children[0]):
                     c0 = self.children[0].to_str()
                     #assert(c0[0].isupper())
                     return c0.replace('.', '::') + '::' + c1 # replace `Token.Category.STATEMENT_SEPARATOR` with `Token::Category::STATEMENT_SEPARATOR`
