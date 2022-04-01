@@ -117,6 +117,8 @@ for n, test in enumerate(tokenizer_tests):
     print('OK')
 
 for fname in os.listdir('tests/parser'):
+    if not fname.endswith('.txt'): # skip .11l and .hpp files
+        continue
     full_fname = 'tests/parser/' + fname
     for test in open(full_fname, encoding="utf8").read().split("\n\n\n"):
         if test.startswith('---'):

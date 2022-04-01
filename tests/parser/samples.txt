@@ -1523,3 +1523,20 @@ struct CodeBlock1
                 }
     }
 } code_block_1;
+
+
+test_module:()
+test_module:(‘abc’)
+===
+namespace test_module {
+#include "test_module.hpp"
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        test_module::_();
+        test_module::_(u"abc"_S);
+    }
+} code_block_1;

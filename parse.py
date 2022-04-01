@@ -1442,7 +1442,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 + ', '.join(arguments) + ')' + ('' if self.function_return_type == '' else ' -> ' + trans_type(self.function_return_type, self.scope, tokens[self.tokeni])))[:-1] + ";\n"
 
         else:
-            s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + self.function_name
+            s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + (self.function_name if self.function_name != '' else '_')
 
         if len(self.function_arguments) == 0:
             return self.children_to_str(indent, s + '()' + ' const'*(self.is_const or is_const))
