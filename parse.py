@@ -1598,10 +1598,11 @@ class ASTSwitch(ASTNodeWithExpression):
 
         r += ' ' * (indent*4) + 'switch (' + self.expression.to_str() + ")\n" + ' ' * (indent*4) + "{\n"
         for case in self.cases:
-            r += ' ' * (indent*4) + ('default' if case.expression.token_str() in ('E', 'И', 'else', 'иначе') else 'case ' + char_if_len_1(case.expression)) + ":\n"
+            cu = any(isinstance(child, ASTVariableDeclaration) for child in case.children) and case is not self.cases[-1]
+            r += ' ' * (indent*4) + ('default' if case.expression.token_str() in ('E', 'И', 'else', 'иначе') else 'case ' + char_if_len_1(case.expression)) + ':' + ' {'*cu + "\n"
             for c in case.children:
                 r += c.to_str(indent+1)
-            r += ' ' * ((indent+1)*4) + "break;\n"
+            r += ' ' * ((indent+1)*4) + 'break;' + ' }'*cu + "\n"
         return r + ' ' * (indent*4) + "}\n"
 
 class ASTLoopWasNoBreak(ASTNodeWithChildren):

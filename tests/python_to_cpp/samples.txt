@@ -4435,3 +4435,120 @@ struct CodeBlock1
         sg.BS1(1);
     }
 } code_block_1;
+
+
+# *[https://codeforces.com/contest/1494/submission/109458430]
+Char = str
+
+def solve():
+    n, m = map(int, input().split());e : Dict[Tuple[int, int], Char] = dict();same = 0;diff = 0;res = ['']*0
+    for i in range(m):
+        a = input().split();c = Char(str(a[0]))
+        if c == '+':
+            u = int(a[1]);v = int(a[2]);c = Char(str(a[3]));z = e.get((v,u),Char("\0"))
+            if z == c:              same += 1
+            elif z != "\0":             diff += 1
+            e[(u,v)] = c
+        elif c == '-':
+            u = int(a[1]);v = int(a[2]);c = e[(u,v)];del e[(u,v)];z = e.get((v,u),Char("\0"))
+            if z == c:              same -= 1
+            elif z != "\0":             diff -= 1
+        else:
+            ci = int(a[1])
+            if ci % 2 == 1:              res.append('YES' if diff + same > 0 else 'NO')
+            else:               res.append('YES' if same > 0 else 'NO')
+    print('\n'.join(res))
+solve()
+===
+F solve()
+   V (n, m) = input().split_py().map(Int)
+   [(Int, Int) = Char] e
+   V same = 0
+   V diff = 0
+   V res = [‘’] * 0
+   L(i) 0 .< m
+      V a = input().split_py()
+      V c = Char(string' a[0])
+      S c
+         ‘+’
+            V u = Int(a[1])
+            V v = Int(a[2])
+            c = Char(string' a[3])
+            V z = e.get((v, u), Char("\0"))
+            I z == c
+               same++
+            E I z != "\0"
+               diff++
+            e[(u, v)] = c
+         ‘-’
+            V u = Int(a[1])
+            V v = Int(a[2])
+            c = e[(u, v)]
+            e.pop((u, v))
+            V z = e.get((v, u), Char("\0"))
+            I z == c
+               same--
+            E I z != "\0"
+               diff--
+         E
+            V ci = Int(a[1])
+            I ci % 2 == 1
+               res.append(I diff + same > 0 {‘YES’} E ‘NO’)
+            E
+               res.append(I same > 0 {‘YES’} E ‘NO’)
+   print(res.join("\n"))
+solve()
+===
+auto solve()
+{
+    auto [n, m] = bind_array<2>(input().split_py().map([](const auto &x){return to_int(x);}));
+    Dict<ivec2, Char> e;
+    auto same = 0;
+    auto diff = 0;
+    auto res = create_array({u""_S}) * 0;
+    for (auto i : range_el(0, m)) {
+        auto a = input().split_py();
+        auto c = Char(_get<0>(a));
+        switch (c)
+        {
+        case u'+': {
+            auto u = to_int(_get<1>(a));
+            auto v = to_int(_get<2>(a));
+            c = Char(_get<3>(a));
+            auto z = e.get(make_tuple(v, u), u'\0'_C);
+            if (z == c)
+                same++;
+            else if (z != u'\0')
+                diff++;
+            e.set(make_tuple(u, v), c);
+            break; }
+        case u'-': {
+            auto u = to_int(_get<1>(a));
+            auto v = to_int(_get<2>(a));
+            c = e[make_tuple(u, v)];
+            e.pop(make_tuple(u, v));
+            auto z = e.get(make_tuple(v, u), u'\0'_C);
+            if (z == c)
+                same--;
+            else if (z != u'\0')
+                diff--;
+            break; }
+        default:
+            auto ci = to_int(_get<1>(a));
+            if (mod(ci, 2) == 1)
+                res.append(diff + same > 0 ? u"YES"_S : u"NO"_S);
+            else
+                res.append(same > 0 ? u"YES"_S : u"NO"_S);
+            break;
+        }
+    }
+    print(res.join(u"\n"_S));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        solve();
+    }
+} code_block_1;
