@@ -155,6 +155,33 @@ public:
 		return std::move(el);
 	}
 
+	/*class Keys
+	{
+		const DefaultDict *d;
+	public:
+		Keys(const DefaultDict *d) : d(d) {}
+
+		class Iterator : public std::map<KeyType, ValueType>::const_iterator // inspired by [https://stackoverflow.com/a/35262398/2692494 <- google:‘c++ map keys iterator’]
+		{
+		public:
+			Iterator(const typename std::map<KeyType, ValueType>::const_iterator &it) : std::map<KeyType, ValueType>::const_iterator(it) {}
+			const KeyType &operator*() {return std::map<KeyType, ValueType>::const_iterator::operator*().first;}
+		};
+
+		Iterator begin() const {return d->begin();}
+		Iterator end()   const {return d->end  ();}
+
+		//template <typename Func> auto filter(Func &&func) const {[-...-]} // for [https://codeforces.com/contest/1447/submission/98523271]
+
+		//template <typename Func> auto map(Func &&func) const {[-...-]} // for https://www.rosettacode.org/wiki/Vogel%27s_approximation_method
+
+		//[-Add support for `sorted(d.keys())`, `max(stat.sumCount.keys())` and `set(data.keys())`-]
+	};
+
+	Keys keys() const
+	{
+		return Keys(this);
+	}*/
 	Array<KeyType> keys() const
 	{
 		Array<KeyType> r;
