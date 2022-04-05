@@ -3,6 +3,8 @@ sys.path.insert(0, '..') # `append(..)` here works incorrectly if 11l package is
 import python_to_11l.tokenizer as py_tokenizer, python_to_11l.parse as py_parser
 
 for fname in os.listdir('tests/parser'):
+    if not fname.endswith('.txt'): # skip .11l and .hpp files
+        continue
     if fname != 'errors.txt':
         tests = []
         full_fname = 'tests/parser/' + fname
