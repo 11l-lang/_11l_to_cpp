@@ -4559,3 +4559,23 @@ w : dict[tuple[tuple[int, int], tuple[int, int]], int] = {}
 [((Int, Int), (Int, Int)) = Int] w
 ===
 Dict<Tuple<ivec2, ivec2>, int> w;
+
+
+instant = [(1, 2), (3, 4)]
+print(min(x+y for x,y in instant))
+print(max(x+y for x,y in instant))
+===
+V instant = [(1, 2), (3, 4)]
+print(min(instant.map((x, y) -> x + y)))
+print(max(instant.map((x, y) -> x + y)))
+===
+auto instant = create_array({make_tuple(1, 2), make_tuple(3, 4)});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(min_map(instant, [](const auto &x, const auto &y){return x + y;}));
+        print(max_map(instant, [](const auto &x, const auto &y){return x + y;}));
+    }
+} code_block_1;

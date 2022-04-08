@@ -827,6 +827,17 @@ template <typename Iterable, typename Func> auto max_map(const Iterable &iterabl
 	return r;
 }
 
+template <typename Type, typename Func, typename = decltype(std::declval<Func>()(std::declval<decltype(tuple_element_f<Type, 0>())>(),
+                                                                                 std::declval<decltype(tuple_element_f<Type, 1>())>()))> auto max_map(const Array<Type> &arr, Func &&func)
+{
+	auto r = func(_get<0>(*std::begin(arr)), _get<1>(*std::begin(arr)));
+	for (auto &&el : arr) {
+		auto i = func(_get<0>(el), _get<1>(el));
+		if (i > r) r = i;
+	}
+	return r;
+}
+
 template <typename Ty> bool operator<(const Tvec<Ty, 2> &v1, const Tvec<Ty, 2> &v2) {return std::make_tuple(v1[0], v1[1]) < std::make_tuple(v2[0], v2[1]);}
 template <typename Ty> bool operator<(const Tvec<Ty, 3> &v1, const Tvec<Ty, 3> &v2) {return std::make_tuple(v1[0], v1[1], v1[2]) < std::make_tuple(v2[0], v2[1], v2[2]);}
 template <typename Ty> bool operator<(const Tvec<Ty, 4> &v1, const Tvec<Ty, 4> &v2) {return std::make_tuple(v1[0], v1[1], v1[2], v1[3]) < std::make_tuple(v2[0], v2[1], v2[2], v2[3]);}
@@ -844,6 +855,17 @@ template <typename Iterable, typename Func> auto min_map(const Iterable &iterabl
 	auto r = func(*std::begin(iterable));
 	for (auto &&el : iterable) {
 		auto i = func(el);
+		if (i < r) r = i;
+	}
+	return r;
+}
+
+template <typename Type, typename Func, typename = decltype(std::declval<Func>()(std::declval<decltype(tuple_element_f<Type, 0>())>(),
+                                                                                 std::declval<decltype(tuple_element_f<Type, 1>())>()))> auto min_map(const Array<Type> &arr, Func &&func)
+{
+	auto r = func(_get<0>(*std::begin(arr)), _get<1>(*std::begin(arr)));
+	for (auto &&el : arr) {
+		auto i = func(_get<0>(el), _get<1>(el));
 		if (i < r) r = i;
 	}
 	return r;
