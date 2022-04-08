@@ -2408,8 +2408,16 @@ def nud(self):
     i = 1 # [
     if token.value(source) not in ('[', # for `[[Int = Int]] save`
                                    ']'): # for `R []`
-        if token.value(source) == '(': # for `V celltable = [(1, 2) = 1, (1, 3) = 1, (0, 3) = 1]`
-            while peek_token(i).value(source) != ')':
+        if token.value(source) == '(': # ) # for `V celltable = [(1, 2) = 1, (1, 3) = 1, (0, 3) = 1]`
+            nesting_level = 1
+            while True: # for `[((Int, Int), (Int, Int)) = Int] w`
+                ch = peek_token(i).value(source)
+                if ch == '(':
+                    nesting_level += 1
+                elif ch == ')':
+                    nesting_level -= 1
+                    if nesting_level == 0:
+                        break
                 i += 1
         while peek_token(i).value(source) not in ('=', ',', ']'): # for `V cat_to_class_python = [python_to_11l:tokenizer:Token.Category.NAME = ‘identifier’, ...]`
             i += 1

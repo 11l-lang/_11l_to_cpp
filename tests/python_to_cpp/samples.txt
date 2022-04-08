@@ -4552,3 +4552,10 @@ struct CodeBlock1
         solve();
     }
 } code_block_1;
+
+
+w : dict[tuple[tuple[int, int], tuple[int, int]], int] = {}
+===
+[((Int, Int), (Int, Int)) = Int] w
+===
+Dict<Tuple<ivec2, ivec2>, int> w;
