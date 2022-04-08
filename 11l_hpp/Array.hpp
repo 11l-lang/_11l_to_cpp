@@ -294,7 +294,7 @@ public:
 	void append(const Array<Type> &arr)
 	{
 		reserve(std::vector<Type>::size() + arr.size());
-		for (auto el : arr)
+		for (auto &&el : arr)
 			append(el);
 	}
 
@@ -312,7 +312,7 @@ public:
 	template <typename Ty> void extend(const Ty &iterable)
 	{
 		reserve(std::vector<Type>::size() + iterable.len());
-		for (auto el : iterable)
+		for (auto &&el : iterable)
 			append(el);
 	}
 
