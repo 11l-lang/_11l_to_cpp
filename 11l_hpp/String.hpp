@@ -606,6 +606,10 @@ public:
 	{
 		return std::move(s) * n;
 	}
+	friend String operator*(Int n, const String &s)
+	{
+		return s * n;
+	}
 	String operator*(Int n) const
 	{
 		return String(*this) * n;
