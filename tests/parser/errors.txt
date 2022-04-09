@@ -275,3 +275,8 @@ L do
 V order = [(0, 1), (2, 3)]
 order.sort(reverse' 1B, key' x -> x[0])
                         ^Error: please correct order of argument `key`
+
+
+V r = :stdin.readline
+V a = r().split_py().map(Int)
+      ^Error: unable to determine the return type of `r()`

@@ -1975,7 +1975,8 @@ def type_of(sn):
             tid = tid.ast_nodes[0].scope.find(type_name)
         else: # `Converter(habr_html, ohd).to_html(instr, outfilef)`
             type_name = sn.children[0].children[0].token_str()
-        assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
+        if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition):
+            raise Error('unable to determine the return type of `' + sn.children[0].children[0].token_str() + '()`', sn.children[0].children[0].token)
         tid = tid.ast_nodes[0].scope.ids.get(sn.children[1].token_str())
         if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition)):
             if type_name == 'auto&':
