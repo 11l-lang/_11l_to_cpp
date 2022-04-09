@@ -924,6 +924,8 @@ template <typename TInt> inline TInt to_int_t(const String &str)
 	const char16_t *s = str.c_str();
 	while (*s && (*s == u' ' || *s == u'\t')) s++; // skip whitespace
 	if (*s == u'-') sign=-1, s++; else if (*s == u'+') s++;
+	if (!Char(*s).is_digit())
+		throw ValueError(str);
 	for (; *s; s++) {
 		if (!Char(*s).is_digit()) {
 			while (*s == u' ' || *s == u'\t' || *s == u'\n') // why check for \n only at the end of the string with integer: \n at the beginning is very strange, while it's ok to have a file with integer ending with \n (so `int(open('...').read())` must work in this case)
