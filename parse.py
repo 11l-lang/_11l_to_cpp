@@ -1246,6 +1246,10 @@ def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False
                     tt = trans_type(ty, scope, type_token, ast_type_node)
                     return tt if tt.startswith('std::unique_ptr<') else 'const ' + tt + ('&'*(ty not in ('Int', 'Float')))
                 return 'std::function<' + trans_type(tylist[-1], scope, type_token, ast_type_node) + '(' + ', '.join(trans_ty(t) for t in tylist[:-1]) + ')>'
+            if ty.startswith('Tuple['): # ]
+                tuple_types = ty[6:-1].split(', ')
+                if tuple_types[0] in ('Int', 'Int64', 'Float32', 'Float') and tuple_types.count(tuple_types[0]) == len(tuple_types) and len(tuple_types) in range(2, 5):
+                    return {'Int':'i', 'Int64':'ll', 'Float32':'', 'Float':'d'}[tuple_types[0]] + 'vec' + str(len(tuple_types))
             return (trans_type(ty[:p], scope, type_token, ast_type_node) if p != 0 else 'Array') + '<' + trans_type(ty[p+1:-1], scope, type_token, ast_type_node) + '>'
         p = ty.find(',')
         if p != -1:
@@ -2406,43 +2410,36 @@ def led(self, left):
 symbol('[').led = led
 
 def nud(self):
-    i = 1 # [
-    if token.value(source) not in ('[', # for `[[Int = Int]] save`
-                                   ']'): # for `R []`
-        if token.value(source) == '(': # ) # for `V celltable = [(1, 2) = 1, (1, 3) = 1, (0, 3) = 1]`
-            nesting_level = 1
-            while True: # for `[((Int, Int), (Int, Int)) = Int] w`
-                ch = peek_token(i).value(source)
-                if ch == '(':
-                    nesting_level += 1
-                elif ch == ')':
-                    nesting_level -= 1
-                    if nesting_level == 0:
-                        break
-                i += 1
-        while peek_token(i).value(source) not in ('=', ',', ']'): # for `V cat_to_class_python = [python_to_11l:tokenizer:Token.Category.NAME = ‘identifier’, ...]`
-            i += 1
-    if peek_token(i).value(source) == '=':
-        self.is_dict = True
-        while True: # [[
-            self.append_child(expression())
-            assert(self.children[-1].symbol.id == '=')
-            if token.value(source) != ',':
-                break
-            advance(',')
-            if token.value(source) == ']':
-                break
+    if token.value(source) == ']': # for `R []`
+        self.is_list = True # [
         advance(']')
     else:
-        self.is_list = True
-        while True: # [
-            if token.value(source) == ']':
-                break
-            self.append_child(expression())
-            if token.value(source) != ',':
-                break
-            advance(',')
-        advance(']')
+        self.append_child(expression())
+        if self.children[-1].symbol.id == '=':
+            self.is_dict = True
+            if token.value(source) == ',':
+                advance(',')
+                while True: # [[
+                    if token.value(source) == ']':
+                        break
+                    self.append_child(expression())
+                    assert(self.children[-1].symbol.id == '=')
+                    if token.value(source) != ',':
+                        break
+                    advance(',')
+            advance(']')
+        else:
+            self.is_list = True
+            if token.value(source) == ',':
+                advance(',')
+                while True: # [[
+                    if token.value(source) == ']':
+                        break
+                    self.append_child(expression())
+                    if token.value(source) != ',':
+                        break
+                    advance(',')
+            advance(']')
     return self
 symbol('[').nud = nud # ]
 

@@ -965,7 +965,7 @@ T StaticIntArray[Int n] = StaticArray[Int, n]
 ===
 template <typename Ty> using Tuple2 = Tuple<Ty, Ty>;
 template <typename Ty1, typename Ty2> using Tuple23 = Tuple<Ty1, Ty1, Ty2>;
-using Tuple2Int = Tuple<int, int>;
+using Tuple2Int = ivec2;
 using StaticArray = Array;
 template <int n> using StaticIntArray = StaticArray<int, n>;
 
@@ -1540,3 +1540,15 @@ struct CodeBlock1
         test_module::_(u"abc"_S);
     }
 } code_block_1;
+
+
+V a = [1,]
+V d = [1 = ‘s’,]
+===
+auto a = create_array({1});
+auto d = create_dict(dict_of(1, u's'_C));
+
+
+[Tuple[Int, Int] = String] t
+===
+Dict<ivec2, String> t;
