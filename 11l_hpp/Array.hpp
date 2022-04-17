@@ -321,11 +321,15 @@ public:
 		std::vector<Type>::insert(begin() + index, v);
 	}
 
-	Int index(const Type &v, Int start = 0) const
+	Int index(const Type &v, Int start, Int end) const
 	{
-		for (Int i=start, l=len(); i<l; i++)
+		for (Int i=start; i<end; i++)
 			if (std::vector<Type>::data()[i] == v) return i;
 		throw ValueError(v);
+	}
+	Int index(const Type &v, Int start = 0) const
+	{
+		return index(v, start, len());
 	}
 
 	Nullable<Int> find(const Type &val, Int start = 0) const
