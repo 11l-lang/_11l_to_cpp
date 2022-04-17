@@ -193,15 +193,15 @@ template <class T, int N> INLINE const T funcName(const Tvec<T,N> &v)\
 		if (v[i] sign res) res=v[i];								\
 	return res;														\
 }																	\
-template <class T, int N> INLINE const Tvec<T,N> funcName(const Tvec<T,N> &x,const Tvec<T,N> &y)\
+template <class T, int N> INLINE const Tvec<T,N> funcName##cw(const Tvec<T,N> &x,const Tvec<T,N> &y)\
 {																	\
 	Tvec<T,N> res;													\
 	for (int i=0;i<N;i++)											\
 		res[i]=x[i] sign y[i] ? x[i] : y[i];						\
 	return res;														\
 }																	\
-template <class T> INLINE const T funcName(const T &x,const T &y,const T &z) {return funcName(funcName(x,y),z);}	\
-template <class T> INLINE const T funcName(const T &x,const T &y,const T &z,const T &w) {return funcName(funcName(x,y),funcName(z,w));}
+template <class T> INLINE const T funcName##cw(const T &x,const T &y,const T &z) {return funcName##cw(funcName##cw(x,y),z);}	\
+template <class T> INLINE const T funcName##cw(const T &x,const T &y,const T &z,const T &w) {return funcName##cw(funcName##cw(x,y),funcName##cw(z,w));}
 
 minmaxFuncs(min,<)
 minmaxFuncs(max,>)

@@ -875,6 +875,9 @@ template <typename Type, typename Func, typename = decltype(std::declval<Func>()
 	return r;
 }
 
+template <class T, int N> Tvec<T,N> min(const Tvec<T,N> &a, const Tvec<T,N> &b) {return a < b ? a : b;}
+template <class T, int N> Tvec<T,N> max(const Tvec<T,N> &a, const Tvec<T,N> &b) {return a > b ? a : b;}
+
 template <typename Iterable, typename Key> auto min_with_key(const Iterable &iterable, Key &&key)
 {
 	std::remove_const_t<std::remove_reference_t<decltype(*std::begin(iterable))>> minitem = *std::begin(iterable);
