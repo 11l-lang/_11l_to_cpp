@@ -563,7 +563,7 @@ class SymbolNode:
                         if self.children[2].symbol.id == '[' and not self.children[2].is_list and self.children[2].children[1].symbol.id in ('..', '.<', '.+', '<.', '<.<'): # ]
                             return int_from_bytes + '(' + self.children[2].children[0].to_str() + ', ' + self.children[2].children[1].to_str() + ')'
                         return int_from_bytes + '(' + self.children[2].to_str() + ')'
-                    func_name = {'Int':'to_int', 'Int64':'to_int64', 'UInt64':'to_uint64', 'UInt32':'to_uint32', 'Byte':'Byte'}[func_name]
+                    func_name = {'Int':'to_int', 'Int64':'to_int64', 'UInt64':'to_uint64', 'Int32':'to_int32', 'UInt32':'to_uint32', 'Int16':'to_int16', 'UInt16':'to_uint16', 'Int8':'to_int8', 'Byte':'Byte'}[func_name]
                     f_node = builtins_scope.find('Int').ast_nodes[0].constructors[0]
                 elif func_name == 'Float':
                     func_name = 'to_float'
