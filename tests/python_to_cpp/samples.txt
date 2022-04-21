@@ -4579,3 +4579,20 @@ struct CodeBlock1
         print(max_map(instant, [](const auto &x, const auto &y){return x + y;}));
     }
 } code_block_1;
+
+
+f = [0] * 0
+f.sort(reverse=True)
+===
+V f = [Int]()
+f.sort(reverse' 1B)
+===
+auto f = Array<int>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        f.sort(nullptr, true);
+    }
+} code_block_1;
