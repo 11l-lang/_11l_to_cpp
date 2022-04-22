@@ -3505,6 +3505,7 @@ deque_scope = Scope(None)
 deque_scope.add_name('append', ASTFunctionDefinition([('x', '', '')]))
 deque_scope.add_name('append_left', ASTFunctionDefinition([('x', '', '')]))
 deque_scope.add_name('pop_left', ASTFunctionDefinition([]))
+deque_scope.add_name('pop', ASTFunctionDefinition([]))
 builtins_scope.ids['Deque'].ast_nodes[0].scope = deque_scope
 
 module_scope = Scope(None)
