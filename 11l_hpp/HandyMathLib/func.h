@@ -200,6 +200,8 @@ template <class T, int N> INLINE const Tvec<T,N> funcName##cw(const Tvec<T,N> &x
 		res[i]=x[i] sign y[i] ? x[i] : y[i];						\
 	return res;														\
 }																	\
+template <class T> INLINE const T funcName(const T &x,const T &y,const T &z) {return funcName(funcName(x,y),z);}	\
+template <class T> INLINE const T funcName(const T &x,const T &y,const T &z,const T &w) {return funcName(funcName(x,y),funcName(z,w));}\
 template <class T> INLINE const T funcName##cw(const T &x,const T &y,const T &z) {return funcName##cw(funcName##cw(x,y),z);}	\
 template <class T> INLINE const T funcName##cw(const T &x,const T &y,const T &z,const T &w) {return funcName##cw(funcName##cw(x,y),funcName##cw(z,w));}
 
