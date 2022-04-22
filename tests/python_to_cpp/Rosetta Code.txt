@@ -8571,7 +8571,7 @@ V (lychrel, l_related) = find_lychrel(maxn, reversion_limit)
 print(‘  Number of Lychrel numbers: ’lychrel.len)
 print(‘    Lychrel numbers: ’lychrel.map(n -> String(n)).join(‘, ’))
 print(‘  Number of Lychrel related: ’l_related.len)
-V pals = lychrel + l_related.filter(x -> x == reverse_int(x))
+V pals = (lychrel + l_related).filter(x -> x == reverse_int(x))
 print(‘  Number of Lychrel palindromes: ’pals.len)
 print(‘    Lychrel palindromes: ’pals.map(n -> String(n)).join(‘, ’))
 ===
@@ -8640,7 +8640,7 @@ struct CodeBlock2
     }
 } code_block_2;
 
-auto pals = lychrel + l_related.filter([](const auto &x){return x == reverse_int(x);});
+auto pals = (lychrel + l_related).filter([](const auto &x){return x == reverse_int(x);});
 
 struct CodeBlock3
 {

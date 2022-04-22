@@ -26,6 +26,13 @@ public:
 	template <typename Ty> void extend(const Ty &iterable) { for (auto &&el : iterable) append(el); }
 	template <typename Ty> void extend_left(const Ty &iterable) { for (auto &&el : iterable) append_left(el); }
 
+	Deque operator+(const Deque &a) const
+	{
+		Deque r(*this);
+		r.extend(a);
+		return r;
+	}
+
 	int index(const Type &v, int start = 0) const
 	{
 		for (int i=start, l=len(); i<l; i++)
@@ -62,6 +69,15 @@ public:
 		if (it == end())
 			throw ValueError(val);
 		std::deque<Type>::erase(it);
+	}
+
+	template <typename Func> auto map(Func &&func) const -> Deque<decltype(func(std::declval<Type>()))>
+	{
+		Deque<decltype(func(std::declval<Type>()))> r;
+		//r.reserve(len());
+		for (auto &&el : *this)
+			r.append(func(el));
+		return r;
 	}
 };
 
