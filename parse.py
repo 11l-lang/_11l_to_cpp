@@ -2094,6 +2094,28 @@ cpp_keywords = {'alignas', 'alignof', 'and', 'and_eq', 'asm', 'auto', 'bitand', 
     'template', 'this', 'thread_local', 'throw', 'true', 'try', 'typedef', 'typeid', 'typename', 'union', 'unsigned', 'using', 'virtual', 'void', 'volatile', 'wchar_t', 'while', 'xor', 'xor_eq',
     'j0', 'j1', 'jn', 'y0', 'y1', 'yn', 'pascal', 'main', 'stat', 'SIZE', 'apply'}
 
+russian_names = {
+    'ввод':'input', 'вывод':'print', "кон'":"end'", 'вывод_эл':'print_elements', "разд'":"sep'", 'выход':'exit', 'скоп':'copy', 'перем':'move', 'сортй':'sorted', 'обратный':'reversed',
+    'обмен':'swap', 'все':'all', 'любой':'any', 'сумма':'sum', 'нод':'gcd', 'шаг':'step', 'формат':'format',
+    'Бул':'Bool',
+     'Цел': 'Int', 'Цел8':'Int8',  'Цел16': 'Int16',  'Цел32': 'Int32',  'Цел64': 'Int64',
+    'БЦел':'UInt', 'Байт':'Byte', 'БЦел16':'UInt16', 'БЦел32':'UInt32', 'БЦел64':'UInt64', 'БолЦел':'BigInt',
+    'Вещ':'Float', 'Вещ32':'Float32', 'Вещ64':'Float64',
+    'Символ':'Char', 'код':'code', "код'":"code'", "цифра'":"digit'", "строка'":"string'",
+    'е_цифра':'is_digit', 'е_буква':'is_alpha', 'е_нижрег':'is_lowercase', 'е_верхрег':'is_uppercase', 'нижрег':'lowercase', 'верхрег':'uppercase',
+    'Строка':'String', 'длина':'len', 'пуста':'empty', 'послед':'last', 'начин_с':'starts_with', 'начин_на':'starts_with', 'закан_на':'ends_with', 'колво':'count',
+     'найти':'find', 'найти_и':'findi', 'об_найти':'rfind', 'об_найти_и':'rfindi', 'заменить':'replace',
+     'разделить':'split', 'разделить_п':'split_py', 'разбить':'split', 'разбить_п':'split_py', "групп_разделители'":"group_delimiters'",
+    'Кортеж':'Tuple',
+    'Массив':'Array', 'пуст':'empty', 'соединить':'join', 'применить':'map', 'фильтр':'filter', 'добавить':'append', 'извлечь':'pop', 'индекс':'index', 'сорт':'sort', 'сорт_диапазон':'sort_range', 'обратить':'reverse',
+    'Словарь':'Dict', 'получить':'get', 'ключи':'keys', 'значения':'values',
+    'Счётчик':'Counter', 'Счетчик':'Counter',
+    'Множество':'Set', 'доб':'add', 'удалить':'remove', 'отбросить':'discard', 'очистить':'clear',
+    'Дек':'Deque', 'добавить_в_начало':'append_left', 'расширить':'extend', 'расширить_с_начала':'extend_left', 'вставить':'insert', 'извлечь_с_начала':'pop_left',
+    'Файл':'File', 'прочитать':'read', 'прочитать_строку':'read_line', 'прочитать_строки':'read_lines', 'прочитать_байты':'read_bytes', 'записать':'write', 'записать_байты':'write_bytes',
+    'минкуча':'minheap', 'макскуча':'maxheap', 'поместить':'push',
+}
+
 def next_token(): # why ‘next_token’: >[https://youtu.be/Nlqv6NtBXcA?t=1203]:‘we'll have an advance method which will fetch the next token’
     global token, tokeni, tokensn
     if token is None and tokeni != -1:
@@ -2119,6 +2141,8 @@ def next_token(): # why ‘next_token’: >[https://youtu.be/Nlqv6NtBXcA?t=1203]
                             tokensn.token_str_override = '@=_' + token.value(source)[2:] + '_'
                     elif token.value(source)[1:] in cpp_keywords:
                         tokensn.token_str_override = '@_' + token.value(source)[1:] + '_'
+                elif token.value(source) in russian_names:
+                    tokensn.token_str_override = russian_names[token.value(source)]
                 elif token.value(source)[-1] == "'":
                     if token.value(source)[:-1] in cpp_keywords:
                         tokensn.token_str_override = '_' + token.value(source)[:-1] + "_'"
