@@ -40,15 +40,15 @@ Char = str
 keywords = ['V',     'C',  'I',    'E',     'F',  'L',    'N',    'R',       'S',       'T',    'X',
             'П',     'С',  'Е',    'И',     'Ф',  'Ц',    'Н',    'Р',       'В',       'Т',    'Х',
             'var',   'in', 'if',   'else',  'fn', 'loop', 'null', 'return',  'switch',  'type', 'exception',
-            'перем', 'С',  'если', 'иначе', 'фн', 'цикл', 'нуль', 'вернуть', 'выбрать', 'тип',  'исключение']
-#keywords.remove('C'); keywords.remove('С'); keywords.remove('in') # it is more convenient to consider C/in as an operator, not a keyword (however, this line is not necessary)
+            'перем', 'св', 'если', 'иначе', 'фн', 'цикл', 'нуль', 'вернуть', 'выбрать', 'тип',  'исключение']
+#keywords.remove('C'); keywords.remove('С'); keywords.remove('in'); keywords.remove('св') # it is more convenient to consider C/in as an operator, not a keyword (however, this line is not necessary)
 empty_list_of_str : List[str] = []
 binary_operators : List[Set[str]] = [] # `initializer_list` does not support move-only types (like `Set`) ([https://stackoverflow.com/questions/8193102/initializer-list-and-move-semantics <- google:‘initializer_list rvalue’])
 binary_operators.append(set(empty_list_of_str))
 binary_operators.append({str('+'), '-', '*', '/', '%', '^', '&', '|', '<', '>', '=', '?'})
 binary_operators.append({'<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '->', '..', '.<', '.+', '<.', 'I/', 'Ц/', 'C ', 'С '})
-binary_operators.append({'<<=', '>>=', '‘’=', '[+]', '[&]', '[|]', '(+)', '<.<', 'I/=', 'Ц/=', 'in ', '!C ', '!С '})
-binary_operators.append({'[+]=', '[&]=', '[|]=', '(+)=', '!in '})
+binary_operators.append({'<<=', '>>=', '‘’=', '[+]', '[&]', '[|]', '(+)', '<.<', 'I/=', 'Ц/=', 'in ', 'св ', '!C ', '!С '})
+binary_operators.append({'[+]=', '[&]=', '[|]=', '(+)=', '!in ', '!св '})
 unary_operators : List[Set[str]] = []
 unary_operators.append(set(empty_list_of_str))
 unary_operators.append({str('!')})

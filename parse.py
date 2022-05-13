@@ -959,9 +959,9 @@ class SymbolNode:
                     e += 'len'
                     c1 = c1[len('(len)'):]
                 return 'range_' + b + '_'*(len(b) > 1 or len(e) > 1) + e + '(' + c0 + ', ' + c1 + ')'
-            elif self.symbol.id in ('C', 'С', 'in'):
+            elif self.symbol.id in ('C', 'С', 'in', 'св'):
                 return 'in(' + char_if_len_1(self.children[0]) + ', ' + self.children[1].to_str() + ')'
-            elif self.symbol.id in ('!C', '!С', '!in'):
+            elif self.symbol.id in ('!C', '!С', '!in', '!св'):
                 return '!in(' + char_if_len_1(self.children[0]) + ', ' + self.children[1].to_str() + ')'
             elif self.symbol.id in ('I/', 'Ц/'):
                 return 'idiv(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
@@ -1059,7 +1059,7 @@ def symbol(id, bp = 0):
         s.id = id
         s.lbp = bp
         symbol_table[id] = s
-        if id[0].isalpha() and not id in ('I/', 'Ц/', 'I/=', 'Ц/=', 'C', 'С', 'in', 'T?'): # this is keyword-in-expression
+        if id[0].isalpha() and not id in ('I/', 'Ц/', 'I/=', 'Ц/=', 'C', 'С', 'in', 'св', 'T?'): # this is keyword-in-expression
             assert(id.isalpha() or id in ('L.last_iteration', 'Ц.последняя_итерация', 'loop.last_iteration', 'цикл.последняя_итерация'))
             allowed_keywords_in_expressions.append(id)
     else:
@@ -2198,7 +2198,7 @@ infix('[+]', 20); #infix('->', 15) # for `(0 .< h).map(_ -> [0] * @w [+] [1])`
 
 infix('|', 30); infix('&', 40)
 
-infix('==', 50); infix('!=', 50); infix('C', 50); infix('С', 50); infix('in', 50); infix('!C', 50); infix('!С', 50); infix('!in', 50)
+infix('==', 50); infix('!=', 50); infix('C', 50); infix('С', 50); infix('in', 50); infix('св', 50); infix('!C', 50); infix('!С', 50); infix('!in', 50); infix('!св', 50)
 
 #infix('(concat)', 52) # `instr[prevci - 1 .< prevci]‘’prevc C ("/\\", "\\/")` = `(instr[prevci - 1 .< prevci]‘’prevc) C ("/\\", "\\/")`
 
