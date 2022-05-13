@@ -1178,14 +1178,14 @@ class ASTExpression(ASTNodeWithExpression):
             return self.pre_nl + ' ' * (indent*4) + 'decltype(' + self.expression.children[1].to_str() + ') ' + self.expression.to_str() + ";\n"
         return self.pre_nl + ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
-cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'перем':'auto',
+cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'пер':'auto',
                      'Int':'int', 'Int64':'Int64', 'UInt64':'UInt64', 'Int32':'int32_t', 'UInt32':'uint32_t', 'Int16':'int16_t', 'UInt16':'uint16_t', 'BigInt':'BigInt', 'Float':'double', 'Float32':'float', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Int8':'int8_t', 'Byte':'Byte', 'Bytes':'Array<Byte>',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
                      'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque', 'Counter':'Counter'}
 
 def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False):
     if ty[-1] == '?':
-        if ty not in ('V?', 'П?', 'var?', 'перем?'):
+        if ty not in ('V?', 'П?', 'var?', 'пер?'):
             tt = trans_type(ty[:-1], scope, type_token, ast_type_node, is_reference)
             if not tt.startswith('std::unique_ptr<'):
                 return 'Nullable<' + tt + '>'
@@ -1296,7 +1296,7 @@ class ASTVariableDeclaration(ASTNode):
                 tt = self.trans_type(ty)
                 return tt if tt.startswith('std::unique_ptr<') else 'const ' + tt + ('&'*(ty not in ('Int', 'Float')))
             return self.pre_nl + ' ' * (indent*4) + 'std::function<' + self.trans_type(self.type) + '(' + ', '.join(trans_type(ty) for ty in self.type_args) + ')> ' + ', '.join(self.vars) + ";\n"
-        if self.type.endswith('?') and self.type not in ('V?', 'П?', 'var?', 'перем?'):
+        if self.type.endswith('?') and self.type not in ('V?', 'П?', 'var?', 'пер?'):
             tt = self.trans_type(self.type)
             if not tt.startswith(('std::unique_ptr<', 'Nullable<')):
                 assert(not self.is_const and not self.is_reference)
@@ -2052,7 +2052,7 @@ def type_of(sn):
         return None # [-TODO-]
     if type(left) not in (ASTVariableDeclaration, ASTVariableInitialization):
         raise Error('left type is `' + str(type(left)) + '`', sn.left_to_right_token())
-    if left.type in ('V', 'П', 'var', 'перем', 'V?', 'П?', 'var?', 'перем?', 'V&', 'П&', 'var&', 'перем&'): # for `V selection_strings = ... selection_strings.map(...)`
+    if left.type in ('V', 'П', 'var', 'пер', 'V?', 'П?', 'var?', 'пер?', 'V&', 'П&', 'var&', 'пер&'): # for `V selection_strings = ... selection_strings.map(...)`
         assert(type(left) == ASTVariableInitialization)
         if left.expression.function_call and left.expression.children[0].token.category == Token.Category.NAME and left.expression.children[0].token_str()[0].isupper(): # for `V n = Node()`
             tid = sn.scope.find(left.expression.children[0].token_str())
@@ -3023,9 +3023,9 @@ def parse_internal(this_node):
                 assert(token.category != Token.Category.STATEMENT_SEPARATOR)
             continue
 
-        elif ((token.value(source) in ('V', 'П', 'var', 'перем') and peek_token().value(source) == '(') # ) # this is `V (a, b) = ...`
+        elif ((token.value(source) in ('V', 'П', 'var', 'пер') and peek_token().value(source) == '(') # ) # this is `V (a, b) = ...`
            or (token.value(source) == '-' and
-        peek_token().value(source) in ('V', 'П', 'var', 'перем') and peek_token(2).value(source) == '(')): # this is `-V (a, b) = ...`
+        peek_token().value(source) in ('V', 'П', 'var', 'пер') and peek_token(2).value(source) == '(')): # this is `-V (a, b) = ...`
             node = ASTTupleInitialization()
             if token.value(source) == '-':
                 node.is_const = True
@@ -3074,7 +3074,7 @@ def parse_internal(this_node):
                     raise Error('expected variable name', token)
 
                 add_var = False
-                if token.value(source) in ('V', 'П', 'var', 'перем'):
+                if token.value(source) in ('V', 'П', 'var', 'пер'):
                     add_var = True
                     next_token()
                     assert(token.category == Token.Category.NAME)
@@ -3096,9 +3096,9 @@ def parse_internal(this_node):
             if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
                 next_token()
 
-        elif ((token.value(source) in ('V', 'П', 'var', 'перем') and peek_token().category == Token.Category.SCOPE_BEGIN) # this is `V {v1 = ...; v2 = ...; ...}`
+        elif ((token.value(source) in ('V', 'П', 'var', 'пер') and peek_token().category == Token.Category.SCOPE_BEGIN) # this is `V {v1 = ...; v2 = ...; ...}`
            or (token.value(source) == '-' and
-        peek_token().value(source) in ('V', 'П', 'var', 'перем') and peek_token(2).category == Token.Category.SCOPE_BEGIN)): # this is `-V {v1 = ...; v2 = ...; ...}`
+        peek_token().value(source) in ('V', 'П', 'var', 'пер') and peek_token(2).category == Token.Category.SCOPE_BEGIN)): # this is `-V {v1 = ...; v2 = ...; ...}`
             first_pre_nl = pre_nl()
             is_const = False
             if token.value(source) == '-':
@@ -3163,8 +3163,8 @@ def parse_internal(this_node):
                         next_token()
                         node = ASTVariableInitialization()
                         node.set_expression(expression())
-                        if node_expression.token.value(source) not in ('V', 'П', 'var', 'перем'):
-                            if node_expression.token.value(source) in ('V?', 'П?', 'var?', 'перем?'):
+                        if node_expression.token.value(source) not in ('V', 'П', 'var', 'пер'):
+                            if node_expression.token.value(source) in ('V?', 'П?', 'var?', 'пер?'):
                                 node.is_ptr = True
                                 node.nullable = True
                             else:
@@ -3249,7 +3249,7 @@ def parse_internal(this_node):
                             node.type_args.clear()
                         else:
                             node.type += '?'
-                    if not (node.type[0].isupper() or node.type[0] == '(' or node.type in ('var', 'перем')): # )
+                    if not (node.type[0].isupper() or node.type[0] == '(' or node.type in ('var', 'пер')): # )
                         raise Error('type name must starts with an upper case letter', node.type_token)
                     for var in node.vars:
                         scope.add_name(var, node)
