@@ -3221,16 +3221,16 @@ def parse_internal(this_node):
                         node.vars = [var_name]
                         while token.value(source) == ',':
                             node.vars.append(expected_name('variable name'))
-                    node.type = node_expression.token.value(source)
+                    node.type = node_expression.token_str()
                     if node.type == '-' and len(node_expression.children) == 1:
                         node.is_const = True
                         node_expression = node_expression.children[0]
-                        node.type = node_expression.token.value(source)
+                        node.type = node_expression.token_str()
                     is_nullable = False
                     if node.type == '?' and len(node_expression.children) == 1:
                         is_nullable = True
                         node_expression = node_expression.children[0]
-                        node.type = node_expression.token.value(source)
+                        node.type = node_expression.token_str()
                     node.type_token = node_expression.token
                     node.type_args = []
                     if node.type == '[': # ]
@@ -3244,7 +3244,7 @@ def parse_internal(this_node):
                             node.type_args = [node_expression.children[0].to_type_str()]
                         else:
                             assert(node_expression.is_type)
-                            node.type = node_expression.children[0].token.value(source)
+                            node.type = node_expression.children[0].token_str()
                             for i in range(1, len(node_expression.children)):
                                 node.type_args.append(node_expression.children[i].to_type_str())
                     elif node.type == '(': # )
