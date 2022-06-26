@@ -148,7 +148,7 @@ public:
 				size_t oldsz = s.size();
 				s.resize(oldsz + n);
 				for (size_t i = 0; i < n; i++)
-					s[oldsz + i] = (char16_t)buf[i];
+					s[Int(oldsz + i)] = (char16_t)buf[i];
 			}
 			return s;
 		}

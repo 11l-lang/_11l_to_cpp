@@ -77,6 +77,9 @@ template <typename Type> class Set;
 
 class String : public std::u16string
 {
+	char16_t  at(Int i) const {return std::u16string::operator[](i);}
+	char16_t &at(Int i)       {return std::u16string::operator[](i);}
+
 	String slice(Int begin, Int end) const
 	{
 		return String(c_str() + begin, end - begin);
@@ -243,10 +246,10 @@ public:
 			}
 			// Remove trailing zeroes ...
 			if (remove_trailing_zeroes) {
-				size_t l = length() - 1;
+				Int l = len() - 1;
 				while (at(l) == u'0') l--;
 				if (at(l) == u'.') l--; // ... and dot/period.
-				resize(l + 1);
+				resize((size_t)l + 1);
 			}
 		}
 	}
@@ -458,7 +461,7 @@ public:
 	{
 		String r;
 		r.resize(len());
-		for (int i=0; i<len(); i++)
+		for (Int i=0; i<len(); i++)
 			r[i] = Int(towlower(at(i)));
 		return r;
 	}
@@ -467,7 +470,7 @@ public:
 	{
 		String r;
 		r.resize(len());
-		for (int i=0; i<len(); i++)
+		for (Int i=0; i<len(); i++)
 			r[i] = Int(towupper(at(i)));
 		return r;
 	}
@@ -620,11 +623,11 @@ public:
 		*this = std::move(String(*this) * n);
 	}
 
-	Char &operator[](size_t pos)
+	Char &operator[](Int pos)
 	{
 		return (Char&)at(pos);
 	}
-	const Char operator[](size_t pos) const
+	const Char operator[](Int pos) const
 	{
 		return Char(at(pos));
 	}
