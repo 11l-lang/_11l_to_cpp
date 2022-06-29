@@ -4720,3 +4720,28 @@ struct CodeBlock2
         print_elements((sa + sb).map([](const auto &u){return u + 1;}));
     }
 } code_block_2;
+
+
+# [https://codeforces.com/contest/1358/submission/83732060]
+def LI(): return list(map(int, input().split()))
+bb = LI()
+bb.reverse()
+===
+F LI()
+   R input().split_py().map(Int)
+V bb = LI()
+bb.reverse()
+===
+auto LI()
+{
+    return input().split_py().map([](const auto &x){return to_int(x);});
+}
+auto bb = LI();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        bb.reverse();
+    }
+} code_block_1;

@@ -2056,7 +2056,10 @@ def type_of(sn):
         assert(type(left) == ASTVariableInitialization)
         if left.expression.function_call and left.expression.children[0].token.category == Token.Category.NAME and left.expression.children[0].token_str()[0].isupper(): # for `V n = Node()`
             tid = sn.scope.find(left.expression.children[0].token_str())
-            assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
+            assert(tid is not None and len(tid.ast_nodes) == 1)
+            if type(tid.ast_nodes[0]) == ASTFunctionDefinition:
+                return None
+            assert(type(tid.ast_nodes[0]) == ASTTypeDefinition)
             tid = tid.ast_nodes[0].find_id_including_base_types(sn.children[1].token_str())
             if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition, ASTExpression)): # `ASTExpression` is needed to fix an error ‘identifier `Vhor` is not found in type `Scene`’ in '9.yopyra.py' (when `Vhor = .look.pVectorial(.upCamara)`, i.e. when there is no `Vhor : Vector`)
                 raise Error('identifier `' + sn.children[1].token_str() + '` is not found in type `' + left.expression.children[0].token_str() + '`', sn.left_to_right_token()) # error message example: method `remove` is not found in type `Array`
