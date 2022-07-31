@@ -14,11 +14,9 @@ class SpaceNotEmpty
 {
 };
 
-
 class MultiVictory
 {
 };
-
 
 class rectBoard
 {

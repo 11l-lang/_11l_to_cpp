@@ -1879,12 +1879,7 @@ class ASTTypeDefinition(ASTNodeWithChildren):
                 c.set_serializable_to_children()
 
     def to_str(self, indent):
-        r = ''
-        if self.tokeni > 0:
-            ti = self.tokeni - 1
-            while ti > 0 and tokens[ti].category in (Token.Category.SCOPE_END, Token.Category.STATEMENT_SEPARATOR):
-                ti -= 1
-            r = (source[tokens[ti].end:tokens[self.tokeni].start].count("\n")-1) * "\n"
+        r = pre_nl(self.tokeni)
         base_types = []
         # if self.has_pointers_to_the_same_type:
         #     base_types += ['SharedObject']
