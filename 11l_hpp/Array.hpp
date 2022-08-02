@@ -32,7 +32,7 @@ template <typename Type> class Array : public std::vector<Type>
 	{
 		Array r;
 		if (step > 0) {
-			r.reserve((end - begin + step - 1) / step);
+			r.reserve(max(Int(0), (end - begin + step - 1) / step));
 			for (Int i = begin; i < end; i += step)
 				r.push_back(std::vector<Type>::at(i));
 		}
@@ -46,7 +46,7 @@ template <typename Type> class Array : public std::vector<Type>
 	{
 		Array r;
 		if (step > 0) {
-			r.reserve((end - begin + step) / step);
+			r.reserve(max(Int(0), (end - begin + step) / step));
 			for (Int i = begin; i <= end; i += step)
 				r.push_back(std::vector<Type>::at(i));
 		}
