@@ -1,4 +1,19 @@
-﻿template <typename T1> auto is_square(const T1 &x)
+﻿BigInt sqrt(const BigInt &x)
+{
+    assert(x >= 0);
+    BigInt i = 1;
+    while (i * i <= x)
+        i *= 2;
+    BigInt y = 0;
+    while (i > 0) {
+        if (square((y + i)) <= x)
+            y += i;
+        i = idiv(i, 2);
+    }
+    return y;
+}
+
+template <typename T1> auto is_square(const T1 &x)
 {
     if (x < 0)
         return false;

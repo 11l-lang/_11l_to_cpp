@@ -1,3 +1,11 @@
+sqrt
+    type = ‘’
+    ast_nodes = [
+    .   node_type = function
+        function_arguments = [
+            ‘x; ; BigInt; ’
+        ]
+    ]
 is_square
     type = ‘’
     ast_nodes = [

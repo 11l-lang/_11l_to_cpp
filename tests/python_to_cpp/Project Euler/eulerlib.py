@@ -9,6 +9,19 @@
 import math
 BigInt = int
 
+# Given integer x, this returns the integer floor(sqrt(x)).
+def sqrt(x: BigInt) -> BigInt:
+	assert x >= 0
+	i: BigInt = 1
+	while i * i <= x:
+		i *= 2
+	y: BigInt = 0
+	while i > 0:
+		if (y + i)**2 <= x:
+			y += i
+		i //= 2
+	return y
+
 # Tests whether x is a perfect square, for any integer x.
 def is_square(x):
 	if x < 0:

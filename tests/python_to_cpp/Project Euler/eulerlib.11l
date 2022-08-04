@@ -1,3 +1,15 @@
+F sqrt(BigInt x) -> BigInt
+   assert(x >= 0)
+   BigInt i = 1
+   L i * i <= x
+      i *= 2
+   BigInt y = 0
+   L i > 0
+      I (y + i) ^ 2 <= x
+         y += i
+      i I/= 2
+   R y
+
 F is_square(x)
    I x < 0
       R 0B

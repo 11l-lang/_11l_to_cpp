@@ -1,0 +1,1073 @@
+# 80
+# Slow BigInt
+import eulerlib
+BigInt = int
+
+DIGITS = 100
+MULTIPLIER = BigInt(100)**DIGITS
+ans = sum(
+    sum(int(c) for c in str(eulerlib.sqrt(i * MULTIPLIER))[ : DIGITS])
+    for i in range(100)
+    if eulerlib.sqrt(i)**2 != i)
+print(ans)
+===
+V DIGITS = 100
+V MULTIPLIER = BigInt(100) ^ DIGITS
+V ans = sum((0.<100).filter(i -> eulerlib:sqrt(i) ^ 2 != i).map(i -> sum(String(eulerlib:sqrt(i * :MULTIPLIER))[0 .< :DIGITS].map(c -> Int(c)))))
+print(ans)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto DIGITS = 100;
+auto MULTIPLIER = pow(BigInt(100), DIGITS);
+auto ans = sum_map(range_el(0, 100).filter([](const auto &i){return square(eulerlib::sqrt(i)) != i;}), [](const auto &i){return sum_map(String(eulerlib::sqrt(i * ::MULTIPLIER))[range_el(0, ::DIGITS)], [](const auto &c){return to_int(c);});});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(ans);
+    }
+} code_block_1;
+
+
+# 81
+grid = [list(map(int, line.split(','))) for line in open('p081_matrix.txt').read().rstrip("\n").split("\n")]
+
+# Dynamic programming
+for i in reversed(range(len(grid))):
+    for j in reversed(range(len(grid[i]))):
+        temp : int
+        if i + 1 < len(grid) and j + 1 < len(grid[i]):
+            temp = min(grid[i + 1][j], grid[i][j + 1])
+        elif i + 1 < len(grid):
+            temp = grid[i + 1][j]
+        elif j + 1 < len(grid[i]):
+            temp = grid[i][j + 1]
+        else:
+            temp = 0
+        grid[i][j] += temp
+print(grid[0][0])
+===
+V grid = File(‘p081_matrix.txt’).read().rtrim("\n").split("\n").map(line -> line.split(‘,’).map(Int))
+
+L(i) reversed(0 .< grid.len)
+   L(j) reversed(0 .< grid[i].len)
+      Int temp
+      I i + 1 < grid.len & j + 1 < grid[i].len
+         temp = min(grid[i + 1][j], grid[i][j + 1])
+      E I i + 1 < grid.len
+         temp = grid[i + 1][j]
+      E I j + 1 < grid[i].len
+         temp = grid[i][j + 1]
+      E
+         temp = 0
+      grid[i][j] += temp
+print(grid[0][0])
+===
+auto grid = File(u"p081_matrix.txt"_S).read().rtrim(u"\n"_S).split(u"\n"_S).map([](const auto &line){return line.split(u","_S).map([](const auto &x){return to_int(x);});});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&i : reversed(range_el(0, grid.len())))
+            for (auto &&j : reversed(range_el(0, grid[i].len()))) {
+                int temp;
+                if (i + 1 < grid.len() && j + 1 < grid[i].len())
+                    temp = min(grid[i + 1][j], grid[i][j + 1]);
+                else if (i + 1 < grid.len())
+                    temp = grid[i + 1][j];
+                else if (j + 1 < grid[i].len())
+                    temp = grid[i][j + 1];
+                else
+                    temp = 0;
+                grid[i][j] += temp;
+            }
+        print(_get<0>(_get<0>(grid)));
+    }
+} code_block_1;
+
+
+# 82
+GRID = [list(map(int, line.split(','))) for line in open('p082_matrix.txt').read().rstrip("\n").split("\n")]
+
+h = len(GRID)
+w = len(GRID[0])
+INFINITY = 1 << 30
+
+# Dynamic programming
+distances = [[0] * w for i in range(h)]
+
+def get_value(x, y):
+    if x < 0:
+        return 0
+    elif y < 0 or y >= h or x >= w:
+        return INFINITY
+    else:
+        return distances[y][x]
+
+for x in range(w):
+    for y in range(h):
+        distances[y][x] = GRID[y][x] + min(get_value(x - 1, y), get_value(x, y - 1))
+    for y in reversed(range(h)):
+        distances[y][x] = min(GRID[y][x] + get_value(x, y + 1), distances[y][x])
+
+# Minimum of rightmost column
+print(min(distances[y][-1] for y in range(h)))
+===
+V GRID = File(‘p082_matrix.txt’).read().rtrim("\n").split("\n").map(line -> line.split(‘,’).map(Int))
+
+V h = GRID.len
+V w = GRID[0].len
+V INFINITY = 1 << 30
+
+V distances = [[0] * :w] * h
+
+F get_value(x, y)
+   I x < 0
+      R 0
+   E I y < 0 | y >= :h | x >= :w
+      R :INFINITY
+   E
+      R :distances[y][x]
+
+L(x) 0 .< w
+   L(y) 0 .< h
+      distances[y][x] = GRID[y][x] + min(get_value(x - 1, y), get_value(x, y - 1))
+   L(y) reversed(0 .< h)
+      distances[y][x] = min(GRID[y][x] + get_value(x, y + 1), distances[y][x])
+
+print(min((0 .< h).map(y -> :distances[y].last)))
+===
+auto GRID = File(u"p082_matrix.txt"_S).read().rtrim(u"\n"_S).split(u"\n"_S).map([](const auto &line){return line.split(u","_S).map([](const auto &x){return to_int(x);});});
+
+auto h = GRID.len();
+auto w = _get<0>(GRID).len();
+auto _INFINITY_ = 1 << 30;
+
+auto distances = create_array({create_array({0}) * ::w}) * h;
+
+template <typename T1, typename T2> auto get_value(const T1 &x, const T2 &y)
+{
+    if (x < 0)
+        return 0;
+    else if (y < 0 || y >= ::h || x >= ::w)
+        return ::_INFINITY_;
+    else
+        return ::distances[y][x];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto x : range_el(0, w)) {
+            for (auto y : range_el(0, h))
+                distances[y].set(x, GRID[y][x] + min(get_value(x - 1, y), get_value(x, y - 1)));
+            for (auto &&y : reversed(range_el(0, h)))
+                distances[y].set(x, min(GRID[y][x] + get_value(x, y + 1), distances[y][x]));
+        }
+
+        print(min_map(range_el(0, h), [](const auto &y){return ::distances[y].last();}));
+    }
+} code_block_1;
+
+
+# 83
+GRID = [list(map(int, line.split(','))) for line in open('p083_matrix.txt').read().rstrip("\n").split("\n")]
+
+h = len(GRID)
+w = len(GRID[0])
+INFINITY = 1 << 30
+distances = [[INFINITY] * w for i in range(h)]
+
+def get_distance(x, y):
+    if x < 0 or x >= w or y < 0 or y >= h:
+        return INFINITY
+    else:
+        return distances[y][x]
+
+# Bellman-Ford algorithm with early exit
+distances[0][0] = GRID[0][0]
+changed = True
+while changed == True:  # Note: The worst-case number of iterations is w*h
+    changed = False
+    for y in range(h):
+        for x in range(w):
+            temp = GRID[y][x] + min(
+                get_distance(x - 1, y),
+                get_distance(x + 1, y),
+                get_distance(x, y - 1),
+                get_distance(x, y + 1))
+            if temp < distances[y][x]:
+                distances[y][x] = temp
+                changed = True
+print(distances[h - 1][w - 1])
+===
+V GRID = File(‘p083_matrix.txt’).read().rtrim("\n").split("\n").map(line -> line.split(‘,’).map(Int))
+
+V h = GRID.len
+V w = GRID[0].len
+V INFINITY = 1 << 30
+V distances = [[:INFINITY] * :w] * h
+
+F get_distance(x, y)
+   I x < 0 | x >= :w | y < 0 | y >= :h
+      R :INFINITY
+   E
+      R :distances[y][x]
+
+distances[0][0] = GRID[0][0]
+V changed = 1B
+L changed == 1B
+   changed = 0B
+   L(y) 0 .< h
+      L(x) 0 .< w
+         V temp = GRID[y][x] + min(get_distance(x - 1, y), get_distance(x + 1, y), get_distance(x, y - 1), get_distance(x, y + 1))
+         I temp < distances[y][x]
+            distances[y][x] = temp
+            changed = 1B
+print(distances[h - 1][w - 1])
+===
+auto GRID = File(u"p083_matrix.txt"_S).read().rtrim(u"\n"_S).split(u"\n"_S).map([](const auto &line){return line.split(u","_S).map([](const auto &x){return to_int(x);});});
+
+auto h = GRID.len();
+auto w = _get<0>(GRID).len();
+auto _INFINITY_ = 1 << 30;
+auto distances = create_array({create_array({::_INFINITY_}) * ::w}) * h;
+
+template <typename T1, typename T2> auto get_distance(const T1 &x, const T2 &y)
+{
+    if (x < 0 || x >= ::w || y < 0 || y >= ::h)
+        return ::_INFINITY_;
+    else
+        return ::distances[y][x];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _set<0>(_get<0>(distances), _get<0>(_get<0>(GRID)));
+    }
+} code_block_1;
+
+auto changed = true;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (changed == true) {
+            changed = false;
+            for (auto y : range_el(0, h))
+                for (auto x : range_el(0, w)) {
+                    auto temp = GRID[y][x] + min(get_distance(x - 1, y), get_distance(x + 1, y), get_distance(x, y - 1), get_distance(x, y + 1));
+                    if (temp < distances[y][x]) {
+                        distances[y].set(x, temp);
+                        changed = true;
+                    }
+                }
+        }
+        print(distances[h - 1][w - 1]);
+    }
+} code_block_2;
+
+
+# 84
+from typing import List
+import random
+
+class CardDeck:
+    cards : List[int]
+    index : int
+
+    def __init__(self, size):
+        self.cards = list(range(size))
+        self.index = size
+
+    def next_card(self):
+        if self.index == len(self.cards):
+            random.shuffle(self.cards)
+            self.index = 0
+        result = self.cards[self.index]
+        self.index += 1
+        return result
+
+# This is a statistical sampling approximation algorithm that simply simulates the game for a fixed number of dice rolls.
+# An exact algorithm would involve calculating the eigenvector of the largest eigenvalue of the transition matrix (which is practical),
+# but averaging over all possible permutations of both the Chance and Community Chest decks (which is computationally infeasible).
+def compute():
+    TRIALS = 10**5#TRIALS = 10**7
+
+    visitcounts = [0] * 40
+
+    chance = CardDeck(16)
+    communitychest = CardDeck(16)
+    consecutivedoubles = 0
+    location = 0
+
+    for i in range(TRIALS):
+        # Roll tetrahedral dice
+        die0 = random.randint(1, 4)
+        die1 = random.randint(1, 4)
+        consecutivedoubles = (consecutivedoubles + 1) if (die0 == die1) else 0
+        if consecutivedoubles < 3:
+            location = (location + die0 + die1) % 40
+        else:
+            location = 30
+            consecutivedoubles = 0
+
+        # Process actions for some locations
+        if location in (7, 22, 36):  # Chance
+            card = chance.next_card()
+            if   card == 0:  location =  0
+            elif card == 1:  location = 10
+            elif card == 2:  location = 11
+            elif card == 3:  location = 24
+            elif card == 4:  location = 39
+            elif card == 5:  location =  5
+            elif card in (6, 7):  # Next railway
+                location = (location + 5) // 10 % 4 * 10 + 5
+            elif card == 8:  # Next utility
+                location = 28 if (12 < location < 28) else 12
+            elif card == 9:
+                location -= 3
+            else:
+                pass
+        elif location == 30:  # Go to jail
+            location = 10
+        else:
+            pass
+
+        if location in (2, 17, 33):  # Community chest
+            card = communitychest.next_card()
+            if   card == 0:  location =  0
+            elif card == 1:  location = 10
+
+        visitcounts[location] += 1
+
+    temp = sorted(enumerate(visitcounts), key=(lambda ic: -ic[1]))
+    ans = "".join(f"{i:02}" for i, c in temp[ : 3])
+    return str(ans)
+
+print(compute())
+===
+T CardDeck
+   [Int] cards
+   Int index
+
+   F (size)
+      .cards = Array(0 .< size)
+      .index = size
+
+   F next_card()
+      I .index == .cards.len
+         random:shuffle(&.cards)
+         .index = 0
+      V result = .cards[.index]
+      .index++
+      R result
+
+F compute()
+   V TRIALS = 10 ^ 5
+
+   V visitcounts = [0] * 40
+
+   V chance = CardDeck(16)
+   V communitychest = CardDeck(16)
+   V consecutivedoubles = 0
+   V location = 0
+
+   L(i) 0 .< TRIALS
+      V die0 = random:(1 .. 4)
+      V die1 = random:(1 .. 4)
+      consecutivedoubles = I (die0 == die1) {(consecutivedoubles + 1)} E 0
+      I consecutivedoubles < 3
+         location = (location + die0 + die1) % 40
+      E
+         location = 30
+         consecutivedoubles = 0
+
+      I location C (7, 22, 36)
+         V card = chance.next_card()
+         I card == 0
+            location = 0
+         E I card == 1
+            location = 10
+         E I card == 2
+            location = 11
+         E I card == 3
+            location = 24
+         E I card == 4
+            location = 39
+         E I card == 5
+            location = 5
+         E I card C (6, 7)
+            location = (location + 5) I/ 10 % 4 * 10 + 5
+         E I card == 8
+            location = I (location C 12<.<28) {28} E 12
+         E I card == 9
+            location -= 3
+         E
+         {
+         }
+      E I location == 30
+         location = 10
+      E
+      {
+      }
+
+      I location C (2, 17, 33)
+         S communitychest.next_card()
+            0
+               location = 0
+            1
+               location = 10
+
+      visitcounts[location]++
+
+   V temp = sorted(enumerate(visitcounts), key' (ic -> -ic[1]))
+   V ans = temp[0.<3].map((i, c) -> f:‘{i:02}’).join(‘’)
+   R String(ans)
+
+print(compute())
+===
+class CardDeck
+{
+public:
+    Array<int> cards;
+    int index;
+
+    template <typename T1> CardDeck(const T1 &size) :
+        index(size)
+    {
+        cards = create_array(range_el(0, size));
+    }
+
+    auto next_card()
+    {
+        if (index == cards.len()) {
+            randomns::shuffle(cards);
+            index = 0;
+        }
+        auto result = cards[index];
+        index++;
+        return result;
+    }
+};
+
+auto compute()
+{
+    auto TRIALS = pow(10, 5);
+
+    auto visitcounts = create_array({0}) * 40;
+
+    auto chance = CardDeck(16);
+    auto communitychest = CardDeck(16);
+    auto consecutivedoubles = 0;
+    auto location = 0;
+
+    for (auto i : range_el(0, TRIALS)) {
+        auto die0 = randomns::_(range_ee(1, 4));
+        auto die1 = randomns::_(range_ee(1, 4));
+        consecutivedoubles = (die0 == die1) ? (consecutivedoubles + 1) : 0;
+        if (consecutivedoubles < 3)
+            location = mod((location + die0 + die1), 40);
+        else {
+            location = 30;
+            consecutivedoubles = 0;
+        }
+
+        if (in(location, make_tuple(7, 22, 36))) {
+            auto card = chance.next_card();
+            if (card == 0)
+                location = 0;
+            else if (card == 1)
+                location = 10;
+            else if (card == 2)
+                location = 11;
+            else if (card == 3)
+                location = 24;
+            else if (card == 4)
+                location = 39;
+            else if (card == 5)
+                location = 5;
+            else if (in(card, make_tuple(6, 7)))
+                location = mod(idiv((location + 5), 10), 4) * 10 + 5;
+            else if (card == 8)
+                location = (in(location, range_ll(12, 28))) ? 28 : 12;
+            else if (card == 9)
+                location -= 3;
+            else {
+            }
+        }
+
+        else if (location == 30)
+            location = 10;
+        else {
+        }
+
+        if (in(location, make_tuple(2, 17, 33)))
+            switch (communitychest.next_card())
+            {
+            case 0:
+                location = 0;
+                break;
+            case 1:
+                location = 10;
+                break;
+            }
+
+        visitcounts[location]++;
+    }
+
+    auto temp = sorted(enumerate(visitcounts), ([](const auto &ic){return -_get<1>(ic);}));
+    auto ans = temp[range_el(0, 3)].map([](const auto &i, const auto &c){return u"#02"_S.format(i);}).join(u""_S);
+    return String(ans);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
+
+
+# 85
+import math
+
+def num_rectangles(m, n):
+    return (m + 1) * m * (n + 1) * n // 4  # A bit more than m^2 n^2 / 4
+
+TARGET = 2000000
+end = int(math.sqrt(TARGET)) + 1
+gen = ((w, h) for w in range(1, end) for h in range(1, end))
+func = lambda wh: abs(num_rectangles(wh[0], wh[1]) - TARGET)
+ans = min(gen, key=func)
+print(ans[0] * ans[1])
+===
+F num_rectangles(m, n)
+   R (m + 1) * m * (n + 1) * n I/ 4
+
+V TARGET = 2000000
+V end = Int(sqrt(TARGET)) + 1
+V gen = (multiloop((1 .< end), (1 .< end), (w, h) -> (w, h)))
+V func = wh -> abs(num_rectangles(wh[0], wh[1]) - :TARGET)
+V ans = min(gen, key' func)
+print(ans[0] * ans[1])
+===
+template <typename T1, typename T2> auto num_rectangles(const T1 &m, const T2 &n)
+{
+    return idiv((m + 1) * m * (n + 1) * n, 4);
+}
+
+auto TARGET = 2000000;
+auto end = to_int(sqrt(TARGET)) + 1;
+auto gen = (multiloop(range_el(1, end), range_el(1, end), [](const auto &w, const auto &h){return make_tuple(w, h);}));
+auto func = [](const auto &wh){return abs(num_rectangles(_get<0>(wh), _get<1>(wh)) - ::TARGET);};
+auto ans = min_with_key(gen, func);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(_get<0>(ans) * _get<1>(ans));
+    }
+} code_block_1;
+
+
+# 86
+import math, itertools
+
+def compute():
+    limit = 1
+
+    # solutions[k] is the set of all solutions where the largest side has length k.
+    # A solution is a triple (x, y, z) such that 0 < x <= y <= z, and in the rectangular prism with dimensions x * y * z,
+    # the shortest surface path from one vertex to the opposite vertex has an integral length.
+    solutions : List[Set[Tuple[int, int, int]]] = []
+
+    # Assumes that a^2 + b^2 = c^2.
+    def find_splits(a, b, c):
+        z = b
+        for x in range(1, a):
+            y = a - x
+            if y < x:
+                break
+            if c * c == min(
+                    (x + y) * (x + y) + z * z,
+                    (y + z) * (y + z) + x * x,
+                    (z + x) * (z + x) + y * y):
+                temp = max(x, y, z)
+                if temp < limit:
+                    # Add canonical solution
+                    item = tuple(sorted((x, y, z)))
+                    solutions[temp].add(item)
+
+    # Generates all solutions where the largest side has length less than 'limit'.
+    def generate_solutions():
+        # Pythagorean triples theorem:
+        #   Every primitive Pythagorean triple with a odd and b even can be expressed as
+        #   a = st, b = (s^2-t^2)/2, c = (s^2+t^2)/2, where s > t > 0 are coprime odd integers.
+        # Now generate all Pythagorean triples, including non-primitive ones.
+        for s in itertools.count(3, 2):
+            for t in range(s - 2, 0, -2):
+                if s * s // 2 >= limit * 3:
+                    return
+
+                if math.gcd(s, t) == 1:
+                    for k in itertools.count(1):
+                        a = s * t * k
+                        b = (s * s - t * t) // 2 * k
+                        c = (s * s + t * t) // 2 * k
+                        if a >= limit and b >= limit:
+                            break
+                        find_splits(a, b, c)
+                        find_splits(b, a, c)
+
+    # cumulativesolutions[m] = len(solutions[0]) + len(solutions[1]) + ... + len(solutions[m]).
+    cumulativesolutions = [0]
+
+    while True:
+        # Extend the solutions list with blank sets
+        while len(solutions) < limit:
+            solutions.append(set() # Tuple[int, int, int]
+                            )
+
+        generate_solutions()
+
+        # Compute the number of cumulative solutions up to and including a certain maximum size
+        for i in range(len(cumulativesolutions), limit):
+            sum = cumulativesolutions[i - 1] + len(solutions[i])
+            cumulativesolutions.append(sum)
+            if sum > 1000000:
+                return str(i)
+
+        # Raise the limit and keep searching
+        limit *= 2
+
+print(compute())
+===
+F compute()
+   V limit = 1
+
+   [Set[(Int, Int, Int)]] solutions
+
+   F find_splits(a, b, c)
+      V z = b
+      L(x) 1 .< a
+         V y = a - x
+         I y < x
+            L.break
+         I c * c == min((x + y) * (x + y) + z * z, (y + z) * (y + z) + x * x, (z + x) * (z + x) + y * y)
+            V temp = max(x, y, z)
+            I temp < @limit
+               V item = tuple_sorted((x, y, z))
+               @solutions[temp].add(item)
+
+   F generate_solutions()
+      L(s) (3..).step(2)
+         L(t) (s - 2 .< 0).step(-2)
+            I s * s I/ 2 >= @limit * 3
+               R
+
+            I gcd(s, t) == 1
+               L(k) 1..
+                  V a = s * t * k
+                  V b = (s * s - t * t) I/ 2 * k
+                  V c = (s * s + t * t) I/ 2 * k
+                  I a >= @limit & b >= @limit
+                     L.break
+                  @find_splits(a, b, c)
+                  @find_splits(b, a, c)
+
+   V cumulativesolutions = [0]
+
+   L
+      L solutions.len < limit
+         solutions.append(Set[(Int, Int, Int)]())
+
+      generate_solutions()
+
+      L(i) cumulativesolutions.len .< limit
+         V sum = cumulativesolutions[i - 1] + solutions[i].len
+         cumulativesolutions.append(sum)
+         I sum > 1000000
+            R String(i)
+
+      limit *= 2
+
+print(compute())
+===
+auto compute()
+{
+    auto limit = 1;
+
+    Array<Set<ivec3>> solutions;
+
+    auto find_splits = [&limit, &solutions](const auto &a, const auto &b, const auto &c)
+    {
+        auto z = b;
+        for (auto x : range_el(1, a)) {
+            auto y = a - x;
+            if (y < x)
+                break;
+            if (c * c == min((x + y) * (x + y) + z * z, (y + z) * (y + z) + x * x, (z + x) * (z + x) + y * y)) {
+                auto temp = max(x, y, z);
+                if (temp < limit) {
+                    auto item = tuple_sorted(make_tuple(x, y, z));
+                    solutions[temp].add(item);
+                }
+            }
+        }
+    };
+
+    auto generate_solutions = [&find_splits, &limit]()
+    {
+        for (auto s : range_ei(3).step(2))
+            for (auto t : range_el(s - 2, 0).step(-2)) {
+                if (idiv(s * s, 2) >= limit * 3)
+                    return;
+
+                if (gcd(s, t) == 1)
+                    for (auto k : range_ei(1)) {
+                        auto a = s * t * k;
+                        auto b = idiv((s * s - t * t), 2) * k;
+                        auto c = idiv((s * s + t * t), 2) * k;
+                        if (a >= limit && b >= limit)
+                            break;
+                        find_splits(a, b, c);
+                        find_splits(b, a, c);
+                    }
+            }
+    };
+
+    auto cumulativesolutions = create_array({0});
+
+    while (true) {
+        while (solutions.len() < limit)
+            solutions.append(Set<ivec3>());
+
+        generate_solutions();
+
+        for (auto i : range_el(cumulativesolutions.len(), limit)) {
+            auto sum = cumulativesolutions[i - 1] + solutions[i].len();
+            cumulativesolutions.append(sum);
+            if (sum > 1000000)
+                return String(i);
+        }
+
+        limit *= 2;
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
+
+
+# 87
+import eulerlib, math
+
+def move(obj):
+    return obj
+
+LIMIT = 50000000
+primes = eulerlib.list_primes(int(math.sqrt(LIMIT)))
+
+sums = {0}
+for i in range(2, 5):
+    newsums = set() # int
+    for p in primes:
+        q = p**i # float(p) ** float(i)
+        if q > LIMIT:
+            break
+        for x in sums:
+            if x + q <= LIMIT:
+                newsums.add(x + q)
+    sums = move(newsums)
+print(len(sums))
+===
+V LIMIT = 50000000
+V primes = eulerlib:list_primes(Int(sqrt(LIMIT)))
+
+V sums = Set([0])
+L(i) 2..4
+   V newsums = Set[Int]()
+   L(p) primes
+      V q = p ^ i
+      I q > LIMIT
+         L.break
+      L(x) sums
+         I x + q <= LIMIT
+            newsums.add(x + q)
+   sums = move(newsums)
+print(sums.len)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto LIMIT = 50000000;
+auto primes = eulerlib::list_primes(to_int(sqrt(LIMIT)));
+
+auto sums = create_set({0});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(2, 4)) {
+            auto newsums = Set<int>();
+            for (auto &&p : primes) {
+                auto q = pow(p, i);
+                if (q > LIMIT)
+                    break;
+                for (auto &&x : sums)
+                    if (x + q <= LIMIT)
+                        newsums.add(x + q);
+            }
+            sums = std::move(newsums);
+        }
+        print(sums.len());
+    }
+} code_block_1;
+
+
+# 88
+# minSumProduct[k] is the smallest positive integers that can be written as both a sum and a product of the same collection of k positive integers.
+# For example, minSumProduct[3] = 6 because 6 = 1 + 2 + 3 = 1 * 2 * 3, and this is the minimum possible number for 3 terms.
+#
+# For all k >= 2:
+# - minSumProduct[k] > k because 1 + ... + 1 (with k terms) = k, which is the minimum sum of k positive integers,
+#   but the product is 1 which is unequal to k, so k is not a valid solution.
+# - minSumProduct[k] <= 2k because 1 + ... + 1 + 2 + k (with k terms in total) = (k - 2) + 2 + k = 2k. The product is 2k, which equals the sum.
+#   Since this is one achievable solution, the minimum solution must be no larger than this.
+# - Aside: minSumProduct[k] is not a prime number. Suppose minSumProduct[k] = p, where p is prime. Then p can only be factorized as p, p * 1, p * 1 * 1, etc.
+#   So whenever the factorization has more than one term, the sum exceeds p, which makes it unequal to the product.
+#
+# Therefore we need to consider all numbers from 2 to LIMIT*2 and factorize them in all possible ways to find all the relevant solutions.
+def compute():
+    LIMIT = 12000
+    minsumproduct = [-1] * (LIMIT + 1)
+
+    # Calculates all factorizations of the integer n >= 2 and updates smaller solutions into minSumProduct.
+    # For example, 12 can be factorized as follows - and duplicates are eliminated by finding only non-increasing sequences of factors:
+    # - 12 = 12. (1 term)
+    # - 12 = 6 * 2 * 1 * 1 * 1 * 1 = 6 + 2 + 1 + 1 + 1 + 1. (6 terms)
+    # - 12 = 4 * 3 * 1 * 1 * 1 * 1 * 1 = 4 + 3 + 1 + 1 + 1 + 1 + 1. (7 terms)
+    # - 12 = 3 * 2 * 2 * 1 * 1 * 1 * 1 * 1 = 3 + 2 + 2 + 1 + 1 + 1 + 1 + 1. (8 terms)
+    def factorize(n : int, remain : int, maxfactor : int, sum : int, terms : int) -> None:
+        if remain == 1:
+            if sum > n:  # Without using factors of 1, the sum never exceeds the product
+                raise AssertionError('')
+            terms += n - sum
+            if terms <= LIMIT and (minsumproduct[terms] == -1 or n < minsumproduct[terms]):
+                minsumproduct[terms] = n
+        else:
+            # Note: maxfactor <= remain
+            for i in range(2, maxfactor + 1):
+                if remain % i == 0:
+                    factor = i
+                    factorize(n, remain // factor, min(factor, maxfactor), sum + factor, terms + 1)
+
+    for i in range(2, LIMIT * 2 + 1):
+        factorize(i, i, i, 0, 0)
+
+    # Eliminate duplicates and compute sum
+    ans = sum(set(minsumproduct[2 : ]))
+    return str(ans)
+
+print(compute())
+===
+F compute()
+   V LIMIT = 12000
+   V minsumproduct = [-1] * (LIMIT + 1)
+
+   F factorize(Int n, Int remain, Int maxfactor, Int sum, Int =terms) -> N
+      I remain == 1
+         I sum > n
+            X AssertionError(‘’)
+         terms += n - sum
+         I terms <= @LIMIT & (@minsumproduct[terms] == -1 | n < @minsumproduct[terms])
+            @minsumproduct[terms] = n
+      E
+         L(i) 2 .. maxfactor
+            I remain % i == 0
+               V factor = i
+               @factorize(n, remain I/ factor, min(factor, maxfactor), sum + factor, terms + 1)
+
+   L(i) 2 .. LIMIT * 2
+      factorize(i, i, i, 0, 0)
+
+   V ans = sum(Set(minsumproduct[2..]))
+   R String(ans)
+
+print(compute())
+===
+auto compute()
+{
+    auto LIMIT = 12000;
+    auto minsumproduct = create_array({-1}) * (LIMIT + 1);
+
+    std::function<void(int, int, int, int, int)> factorize = [&LIMIT, &factorize, &minsumproduct](const int n, const int remain, const int maxfactor, const int sum, int terms) -> void
+    {
+        if (remain == 1) {
+            if (sum > n)
+                throw AssertionError(u""_S);
+            terms += n - sum;
+            if (terms <= LIMIT && (minsumproduct[terms] == -1 || n < minsumproduct[terms]))
+                minsumproduct.set(terms, n);
+        }
+        else
+            for (auto i : range_ee(2, maxfactor))
+                if (mod(remain, i) == 0) {
+                    auto factor = i;
+                    factorize(n, idiv(remain, factor), min(factor, maxfactor), sum + factor, terms + 1);
+                }
+    };
+
+    for (auto i : range_ee(2, LIMIT * 2))
+        factorize(i, i, i, 0, 0);
+
+    auto ans = sum(create_set(minsumproduct[range_ei(2)]));
+    return String(ans);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
+
+
+# 89
+ROMAN_NUMERALS_PREFIXES = [
+    ("M" , 1000),
+    ("CM",  900),
+    ("D" ,  500),
+    ("CD",  400),
+    ("C" ,  100),
+    ("XC",   90),
+    ("L" ,   50),
+    ("XL",   40),
+    ("X" ,   10),
+    ("IX",    9),
+    ("V" ,    5),
+    ("IV",    4),
+    ("I" ,    1),
+]
+
+def parse_roman_numeral(s):
+    result = 0
+    while len(s) > 0:
+        for prefix, val in ROMAN_NUMERALS_PREFIXES:
+            if s.startswith(prefix):
+                result += val
+                s = s[len(prefix) : ]
+                break
+        else:
+            raise AssertionError("Cannot parse Roman numeral")
+    return result
+
+# e.g. (empty), I, II, III, IV, V, VI, VII, VIII, IX
+DIGIT_LENGTHS = [0, 1, 2, 3, 2, 1, 2, 3, 4, 2]
+
+def roman_numeral_len(n):
+    assert 1 < n < 5000
+    result = 0
+    if n >= 4000:  # 4000 is MMMM, which doesn't have a two-letter form
+        result += 2  # Compensate for this fact
+    while n > 0:
+        result += DIGIT_LENGTHS[n % 10]
+        n //= 10
+    return result
+
+TO_SIMPLIFY = open('p089_roman.txt').read().split("\n")
+
+print(sum(len(s) - roman_numeral_len(parse_roman_numeral(s)) for s in TO_SIMPLIFY))
+===
+V ROMAN_NUMERALS_PREFIXES = [(‘M’, 1000), (‘CM’, 900), (‘D’, 500), (‘CD’, 400), (‘C’, 100), (‘XC’, 90), (‘L’, 50), (‘XL’, 40), (‘X’, 10), (‘IX’, 9), (‘V’, 5), (‘IV’, 4), (‘I’, 1)]
+
+F parse_roman_numeral(=s)
+   V result = 0
+   L s.len > 0
+      L(prefix, val) :ROMAN_NUMERALS_PREFIXES
+         I s.starts_with(prefix)
+            result += val
+            s = s[prefix.len ..]
+            L.break
+      L.was_no_break
+         X AssertionError(‘Cannot parse Roman numeral’)
+   R result
+
+V DIGIT_LENGTHS = [0, 1, 2, 3, 2, 1, 2, 3, 4, 2]
+
+F roman_numeral_len(=n)
+   assert(n C 1<.<5000)
+   V result = 0
+   I n >= 4000
+      result += 2
+   L n > 0
+      result += :DIGIT_LENGTHS[n % 10]
+      n I/= 10
+   R result
+
+V TO_SIMPLIFY = File(‘p089_roman.txt’).read().split("\n")
+
+print(sum(TO_SIMPLIFY.map(s -> s.len - roman_numeral_len(parse_roman_numeral(s)))))
+===
+auto ROMAN_NUMERALS_PREFIXES = create_array({make_tuple(u"M"_S, 1000), make_tuple(u"CM"_S, 900), make_tuple(u"D"_S, 500), make_tuple(u"CD"_S, 400), make_tuple(u"C"_S, 100), make_tuple(u"XC"_S, 90), make_tuple(u"L"_S, 50), make_tuple(u"XL"_S, 40), make_tuple(u"X"_S, 10), make_tuple(u"IX"_S, 9), make_tuple(u"V"_S, 5), make_tuple(u"IV"_S, 4), make_tuple(u"I"_S, 1)});
+
+template <typename T1> auto parse_roman_numeral(T1 s)
+{
+    auto result = 0;
+    while (s.len() > 0) {
+        for (auto &&[prefix, val] : ::ROMAN_NUMERALS_PREFIXES)
+            if (s.starts_with(prefix)) {
+                result += val;
+                s = s[range_ei(prefix.len())];
+                goto break_;
+            }
+        throw AssertionError(u"Cannot parse Roman numeral"_S);
+        break_:;
+    }
+    return result;
+}
+
+auto DIGIT_LENGTHS = create_array({0, 1, 2, 3, 2, 1, 2, 3, 4, 2});
+
+template <typename T1> auto roman_numeral_len(T1 n)
+{
+    assert(in(n, range_ll(1, 5000)));
+    auto result = 0;
+    if (n >= 4000)
+        result += 2;
+    while (n > 0) {
+        result += ::DIGIT_LENGTHS[mod(n, 10)];
+        n = idiv(n, 10);
+    }
+    return result;
+}
+
+auto TO_SIMPLIFY = File(u"p089_roman.txt"_S).read().split(u"\n"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum_map(TO_SIMPLIFY, [](const auto &s){return s.len() - roman_numeral_len(parse_roman_numeral(s));}));
+    }
+} code_block_1;
