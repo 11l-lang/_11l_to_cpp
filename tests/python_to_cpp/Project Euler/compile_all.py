@@ -40,7 +40,7 @@ for fname in os.listdir():
 
             results.append((problem_id, min_time_py / min_time_11l))
 
-open('results.txt', 'w').write("\n".join(f'{problem_id}: {speed_factor}' for problem_id, speed_factor in sorted(results, key = lambda r: r[1], reverse = True)))
+open('results.txt', 'w', newline = "\n").write("\n".join(f'{problem_id}: {speed_factor}' for problem_id, speed_factor in sorted(results, key = lambda r: r[1], reverse = True)))
 
 os.remove('problem.py')
 os.remove('problem.11l')

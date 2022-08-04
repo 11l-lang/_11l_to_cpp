@@ -301,7 +301,7 @@ class CardDeck:
 # An exact algorithm would involve calculating the eigenvector of the largest eigenvalue of the transition matrix (which is practical),
 # but averaging over all possible permutations of both the Chance and Community Chest decks (which is computationally infeasible).
 def compute():
-    TRIALS = 10**5#TRIALS = 10**7
+    TRIALS = 10**6#TRIALS = 10**7
 
     visitcounts = [0] * 40
 

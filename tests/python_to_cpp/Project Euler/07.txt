@@ -1,5 +1,6 @@
 # 70
 import eulerlib
+Int64 = int
 
 totients = eulerlib.list_totients(10**7 - 1)
 minnumer = 1

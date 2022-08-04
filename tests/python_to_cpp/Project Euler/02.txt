@@ -190,7 +190,7 @@ struct CodeBlock3
 } code_block_3;
 
 
-#24
+# 24
 from _11l import *
 
 l = list(range(10))
