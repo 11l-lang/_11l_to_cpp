@@ -1,0 +1,747 @@
+# 100
+import eulerlib
+BigInt = int
+
+# Fundamental solution
+x0 = BigInt(3)
+y0 = BigInt(1)
+
+# Current solution
+x = x0
+y = y0  # An alias for the number of red discs
+while True:
+    # Check if this solution is acceptable
+    sqrt = eulerlib.sqrtb(y**2 * 8 + 1)
+    if sqrt % 2 == 1:  # Is odd
+        blue = (sqrt + 1) // 2 + y
+        if blue + y > BigInt(10)**12:
+            print(blue)
+            break
+
+    # Create the next bigger solution
+    nextx = x * x0 + y * y0 * 8
+    nexty = x * y0 + y * x0
+    x = nextx
+    y = nexty
+===
+V x0 = BigInt(3)
+V y0 = BigInt(1)
+
+V x = x0
+V y = y0
+L
+   V sqrt = eulerlib:sqrtb(y ^ 2 * 8 + 1)
+   I sqrt % 2 == 1
+      V blue = (sqrt + 1) I/ 2 + y
+      I blue + y > BigInt(10) ^ 12
+         print(blue)
+         L.break
+
+   V nextx = x * x0 + y * y0 * 8
+   V nexty = x * y0 + y * x0
+   x = nextx
+   y = nexty
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto x0 = BigInt(3);
+auto _y0_ = BigInt(1);
+
+auto x = x0;
+auto y = _y0_;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            auto sqrt = eulerlib::sqrtb(square(y) * 8 + 1);
+            if (mod(sqrt, 2) == 1) {
+                auto blue = idiv((sqrt + 1), 2) + y;
+                if (blue + y > pow(BigInt(10), 12)) {
+                    print(blue);
+                    break;
+                }
+            }
+
+            auto nextx = x * x0 + y * _y0_ * 8;
+            auto nexty = x * _y0_ + y * x0;
+            x = nextx;
+            y = nexty;
+        }
+    }
+} code_block_1;
+
+
+---
+# 101 [-Fraction-]
+
+
+# 102
+def sign(x):
+    if x > 0:
+        return 1
+    elif x < 0:
+        return -1
+    elif x == 0:
+        return 0
+    else:
+        raise ValueError(str(x))
+
+def is_origin_in_triangle(cs):
+    x0, y0, x1, y1, x2, y2 = cs[0], cs[1], cs[2], cs[3], cs[4], cs[5]
+    a = sign((y0 - y1) * x0 - (x0 - x1) * y0)
+    b = sign((y1 - y2) * x1 - (x1 - x2) * y1)
+    c = sign((y2 - y0) * x2 - (x2 - x0) * y2)
+    return 0 in (a, b, c) or a == b == c
+
+TRIANGLES = [list(map(int, line.split(','))) for line in open('p102_triangles.txt').read().rstrip("\n").split("\n")]
+
+print(sum(1 for coords in TRIANGLES if is_origin_in_triangle(coords)))
+===
+F _sign_(x)
+   I x > 0
+      R 1
+   E I x < 0
+      R -1
+   E I x == 0
+      R 0
+   E
+      X ValueError(String(x))
+
+F is_origin_in_triangle(cs)
+   V (x0, y0, x1, y1, x2, y2) = (cs[0], cs[1], cs[2], cs[3], cs[4], cs[5])
+   V a = _sign_((y0 - y1) * x0 - (x0 - x1) * y0)
+   V b = _sign_((y1 - y2) * x1 - (x1 - x2) * y1)
+   V c = _sign_((y2 - y0) * x2 - (x2 - x0) * y2)
+   R 0 C (a, b, c) | a == b == c
+
+V TRIANGLES = File(‘p102_triangles.txt’).read().rtrim("\n").split("\n").map(line -> line.split(‘,’).map(Int))
+
+print(sum(TRIANGLES.filter(coords -> is_origin_in_triangle(coords)).map(coords -> 1)))
+===
+template <typename T1> auto _sign_(const T1 &x)
+{
+    if (x > 0)
+        return 1;
+    else if (x < 0)
+        return -1;
+    else if (x == 0)
+        return 0;
+    else
+        throw ValueError(String(x));
+}
+
+template <typename T1> auto is_origin_in_triangle(const T1 &cs)
+{
+    auto [x0, _y0_, x1, _y1_, x2, y2] = make_tuple(_get<0>(cs), _get<1>(cs), _get<2>(cs), _get<3>(cs), _get<4>(cs), _get<5>(cs));
+    auto a = _sign_((_y0_ - _y1_) * x0 - (x0 - x1) * _y0_);
+    auto b = _sign_((_y1_ - y2) * x1 - (x1 - x2) * _y1_);
+    auto c = _sign_((y2 - _y0_) * x2 - (x2 - x0) * y2);
+    return in(0, make_tuple(a, b, c)) || equal(a, b, c);
+}
+
+auto TRIANGLES = File(u"p102_triangles.txt"_S).read().rtrim(u"\n"_S).split(u"\n"_S).map([](const auto &line){return line.split(u","_S).map([](const auto &x){return to_int(x);});});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum_map(TRIANGLES.filter([](const auto &coords){return is_origin_in_triangle(coords);}), [](const auto &coords){return 1;}));
+    }
+} code_block_1;
+
+
+---
+# 103 [-@staticmethod-]
+
+
+# 104
+import itertools
+BigInt = int
+
+# Returns the tuple (F(n), F(n+1)), computed by the fast doubling method.
+def fibonacci(n):
+    if n == 0:
+        return (BigInt(0), BigInt(1))
+    else:
+        a, b = fibonacci(n // 2)
+        c = a * (b * 2 - a)
+        d = a * a + b * b
+        if n % 2 == 0:
+            return (c, d)
+        else:
+            return (d, c + d)
+
+def compute():
+    MOD = 10**9
+    a = 0
+    b = 1
+    for i in itertools.count(0):
+        # Loop invariants: a == fib(i) % MOD, b == fib(i+1) % MOD
+        if "".join(sorted(str(a))) == "123456789":  # If suffix is pandigital
+            f = fibonacci(i)[0]
+            if "".join(sorted(str(f)[ : 9])) == "123456789":  # If prefix is pandigital
+                return str(i)
+        a, b = b, (a + b) % MOD
+    #return str(ans) [-Make pull request to remove this unnecessary line-]
+
+print(compute())
+===
+F fibonacci(n)
+   I n == 0
+      R (BigInt(0), BigInt(1))
+   E
+      V (a, b) = fibonacci(n I/ 2)
+      V c = a * (b * 2 - a)
+      V d = a * a + b * b
+      I n % 2 == 0
+         R (c, d)
+      E
+         R (d, c + d)
+
+F compute()
+   V MOD = 10 ^ 9
+   V a = 0
+   V b = 1
+   L(i) 0..
+      I sorted(String(a)).join(‘’) == ‘123456789’
+         V f = fibonacci(i)[0]
+         I sorted(String(f)[0.<9]).join(‘’) == ‘123456789’
+            R String(i)
+      (a, b) = (b, (a + b) % MOD)
+
+print(compute())
+===
+template <typename T1> auto fibonacci(const T1 &n)
+{
+    if (n == 0)
+        return make_tuple(BigInt(0), BigInt(1));
+    else {
+        auto [a, b] = fibonacci(idiv(n, 2));
+        auto c = a * (b * 2 - a);
+        auto d = a * a + b * b;
+        if (mod(n, 2) == 0)
+            return make_tuple(c, d);
+        else
+            return make_tuple(d, c + d);
+    }
+}
+
+auto compute()
+{
+    auto MOD = pow(10, 9);
+    auto a = 0;
+    auto b = 1;
+    for (auto i : range_ei(0)) {
+        if (sorted(String(a)).join(u""_S) == u"123456789") {
+            auto f = _get<0>(fibonacci(i));
+            if (sorted(String(f)[range_el(0, 9)]).join(u""_S) == u"123456789")
+                return String(i);
+        }
+        assign_from_tuple(a, b, make_tuple(b, mod((a + b), MOD)));
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
+
+
+# 104
+import itertools
+BigInt = int
+
+def compute():
+    MOD = 10**9
+    a = 0
+    b = 1
+    a, b = b, (a + b) % MOD
+    previous, fib_number = BigInt(0), BigInt(1) # [https://realpython.com/fibonacci-sequence-python/]
+
+    for i in itertools.count(1):
+        # Loop invariants: a == fib(i) % MOD, b == fib(i+1) % MOD
+        if "".join(sorted(str(a))) == "123456789":  # If suffix is pandigital
+            if "".join(sorted(str(fib_number)[ : 9])) == "123456789":  # If prefix is pandigital
+                return str(i)
+        a, b = b, (a + b) % MOD
+
+        previous, fib_number = fib_number, previous + fib_number
+
+print(compute())
+===
+F compute()
+   V MOD = 10 ^ 9
+   V a = 0
+   V b = 1
+   (a, b) = (b, (a + b) % MOD)
+   V (previous, fib_number) = (BigInt(0), BigInt(1))
+
+   L(i) 1..
+      I sorted(String(a)).join(‘’) == ‘123456789’
+         I sorted(String(fib_number)[0.<9]).join(‘’) == ‘123456789’
+            R String(i)
+      (a, b) = (b, (a + b) % MOD)
+
+      (previous, fib_number) = (fib_number, previous + fib_number)
+
+print(compute())
+===
+auto compute()
+{
+    auto MOD = pow(10, 9);
+    auto a = 0;
+    auto b = 1;
+    assign_from_tuple(a, b, make_tuple(b, mod((a + b), MOD)));
+    auto [previous, fib_number] = make_tuple(BigInt(0), BigInt(1));
+
+    for (auto i : range_ei(1)) {
+        if (sorted(String(a)).join(u""_S) == u"123456789") {
+            if (sorted(String(fib_number)[range_el(0, 9)]).join(u""_S) == u"123456789")
+                return String(i);
+        }
+        assign_from_tuple(a, b, make_tuple(b, mod((a + b), MOD)));
+
+        assign_from_tuple(previous, fib_number, make_tuple(fib_number, previous + fib_number));
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
+
+
+# 105
+def is_special_sum_set(s):
+    sumsseen = set() # int
+    minsum = [-1] * (len(s) + 1)
+    maxsum = [-1] * (len(s) + 1)
+
+    def explore_subsets(i : int, count : int, sum : int)  -> None:
+        if i == len(s):
+            sumsseen.add(sum)
+            if minsum[count] == -1 or sum < minsum[count]:
+                minsum[count] = sum
+            if maxsum[count] == -1 or sum > maxsum[count]:
+                maxsum[count] = sum
+        else:
+            explore_subsets(i + 1, count, sum)
+            explore_subsets(i + 1, count + 1, sum + s[i])
+
+    explore_subsets(0, 0, 0)
+    return len(sumsseen) == 2**len(s) and all(maxsum[i] < minsum[i + 1] for i in range(len(s)))
+
+SETS = [list(map(int, line.split(','))) for line in open('p105_sets.txt').read().split("\n")]
+
+print(sum(sum(s) for s in SETS if is_special_sum_set(s)))
+===
+F is_special_sum_set(s)
+   V sumsseen = Set[Int]()
+   V minsum = [-1] * (s.len + 1)
+   V maxsum = [-1] * (s.len + 1)
+
+   F explore_subsets(Int i, Int count, Int sum) -> N
+      I i == @s.len
+         @sumsseen.add(sum)
+         I @minsum[count] == -1 | sum < @minsum[count]
+            @minsum[count] = sum
+         I @maxsum[count] == -1 | sum > @maxsum[count]
+            @maxsum[count] = sum
+      E
+         @explore_subsets(i + 1, count, sum)
+         @explore_subsets(i + 1, count + 1, sum + @s[i])
+
+   explore_subsets(0, 0, 0)
+   R sumsseen.len == 2 ^ s.len & all((0 .< s.len).map(i -> @maxsum[i] < @minsum[i + 1]))
+
+V SETS = File(‘p105_sets.txt’).read().split("\n").map(line -> line.split(‘,’).map(Int))
+
+print(sum(SETS.filter(s -> is_special_sum_set(s)).map(s -> sum(s))))
+===
+template <typename T1> auto is_special_sum_set(const T1 &s)
+{
+    auto sumsseen = Set<int>();
+    auto minsum = create_array({-1}) * (s.len() + 1);
+    auto maxsum = create_array({-1}) * (s.len() + 1);
+
+    std::function<void(int, int, int)> explore_subsets = [&explore_subsets, &maxsum, &minsum, &s, &sumsseen](const int i, const int count, const int sum) -> void
+    {
+        if (i == s.len()) {
+            sumsseen.add(sum);
+            if (minsum[count] == -1 || sum < minsum[count])
+                minsum.set(count, sum);
+            if (maxsum[count] == -1 || sum > maxsum[count])
+                maxsum.set(count, sum);
+        }
+        else {
+            explore_subsets(i + 1, count, sum);
+            explore_subsets(i + 1, count + 1, sum + s[i]);
+        }
+    };
+
+    explore_subsets(0, 0, 0);
+    return sumsseen.len() == pow(2, s.len()) && all_map(range_el(0, s.len()), [&maxsum, &minsum](const auto &i){return maxsum[i] < minsum[i + 1];});
+}
+
+auto SETS = File(u"p105_sets.txt"_S).read().split(u"\n"_S).map([](const auto &line){return line.split(u","_S).map([](const auto &x){return to_int(x);});});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum_map(SETS.filter([](const auto &s){return is_special_sum_set(s);}), [](const auto &s){return sum(s);}));
+    }
+} code_block_1;
+
+
+# 106
+import eulerlib
+
+SET_SIZE = 12
+
+def catalan(n):
+    return eulerlib.binomial(n * 2, n) // (n + 1)
+
+print(sum(eulerlib.binomial(SET_SIZE, i * 2) * (eulerlib.binomial(i * 2, i) // 2 - catalan(i))
+    for i in range(2, SET_SIZE // 2 + 1)))
+===
+V SET_SIZE = 12
+
+F catalan(n)
+   R eulerlib:binomial(n * 2, n) I/ (n + 1)
+
+print(sum((2 .. SET_SIZE I/ 2).map(i -> eulerlib:binomial(:SET_SIZE, i * 2) * (eulerlib:binomial(i * 2, i) I/ 2 - catalan(i)))))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto SET_SIZE = 12;
+
+template <typename T1> auto catalan(const T1 &n)
+{
+    return idiv(eulerlib::binomial(n * 2, n), (n + 1));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum_map(range_ee(2, idiv(SET_SIZE, 2)), [](const auto &i){return eulerlib::binomial(::SET_SIZE, i * 2) * (idiv(eulerlib::binomial(i * 2, i), 2) - catalan(i));}));
+    }
+} code_block_1;
+
+
+# 107
+WEIGHTS = [list(map(lambda x: -1 if x == '-' else int(x), line.split(','))) for line in open('p107_network.txt').read().rstrip("\n").split("\n")]
+
+def compute():
+    # Number of nodes/vertices in the matrix
+    numnodes = len(WEIGHTS)
+
+    # Check that the matrix is well-behaved
+    if any((len(row) != numnodes) for row in WEIGHTS):
+        raise AssertionError("Matrix not square")
+    if any(WEIGHTS[i][i] != -1 for i in range(numnodes)):
+        raise AssertionError("Self edge")
+    if any(WEIGHTS[i][j] != WEIGHTS[j][i] for i in range(numnodes) for j in range(numnodes)):
+        raise AssertionError("Matrix not symmetric")
+
+    # Add up all undirected edge weights
+    oldweight = 0
+    for i in range(numnodes):
+        for j in range(i + 1, numnodes):
+            if WEIGHTS[i][j] != -1:
+                oldweight += WEIGHTS[i][j]
+
+    # Inefficient minimum spanning tree algorithm
+    connected = set([0])  # Node indexes
+    newweight = 0  # Total of edge weights used in spanning tree
+    for _ in range(numnodes - 1):  # One new node is connected per iteration
+        lowestweight, newnode = min((WEIGHTS[j][k], k)
+            for j in list(connected)
+            for k in list(range(numnodes))
+            if k not in connected and WEIGHTS[j][k] != -1)
+        connected.add(newnode)
+        newweight += lowestweight
+
+    ans = oldweight - newweight
+    return str(ans)
+
+print(compute())
+===
+V WEIGHTS = File(‘p107_network.txt’).read().rtrim("\n").split("\n").map(line -> line.split(‘,’).map(x -> I x == ‘-’ {-1} E Int(x)))
+
+F compute()
+   V numnodes = :WEIGHTS.len
+
+   I any(:WEIGHTS.map(row -> (row.len != @numnodes)))
+      X AssertionError(‘Matrix not square’)
+   I any((0 .< numnodes).map(i -> :WEIGHTS[i][i] != -1))
+      X AssertionError(‘Self edge’)
+   I any(multiloop((0 .< numnodes), (0 .< numnodes), (i, j) -> :WEIGHTS[i][j] != :WEIGHTS[j][i]))
+      X AssertionError(‘Matrix not symmetric’)
+
+   V oldweight = 0
+   L(i) 0 .< numnodes
+      L(j) i + 1 .< numnodes
+         I :WEIGHTS[i][j] != -1
+            oldweight += :WEIGHTS[i][j]
+
+   V connected = Set([0])
+   V newweight = 0
+   L(_) 0 .< numnodes - 1
+      V (lowestweight, newnode) = min(multiloop_filtered(Array(connected), Array(0 .< numnodes), (j, k) -> k !C @connected & :WEIGHTS[j][k] != -1, (j, k) -> (:WEIGHTS[j][k], k)))
+      connected.add(newnode)
+      newweight += lowestweight
+
+   V ans = oldweight - newweight
+   R String(ans)
+
+print(compute())
+===
+auto WEIGHTS = File(u"p107_network.txt"_S).read().rtrim(u"\n"_S).split(u"\n"_S).map([](const auto &line){return line.split(u","_S).map([](const auto &x){return x == u'-' ? -1 : to_int(x);});});
+
+auto compute()
+{
+    auto numnodes = ::WEIGHTS.len();
+
+    if (any_map(::WEIGHTS, [&numnodes](const auto &row){return (row.len() != numnodes);}))
+        throw AssertionError(u"Matrix not square"_S);
+    if (any_map(range_el(0, numnodes), [](const auto &i){return ::WEIGHTS[i][i] != -1;}))
+        throw AssertionError(u"Self edge"_S);
+    if (any(multiloop(range_el(0, numnodes), range_el(0, numnodes), [](const auto &i, const auto &j){return ::WEIGHTS[i][j] != ::WEIGHTS[j][i];})))
+        throw AssertionError(u"Matrix not symmetric"_S);
+
+    auto oldweight = 0;
+    for (auto i : range_el(0, numnodes))
+        for (auto j : range_el(i + 1, numnodes))
+            if (::WEIGHTS[i][j] != -1)
+                oldweight += ::WEIGHTS[i][j];
+
+    auto connected = create_set({0});
+    auto newweight = 0;
+    for (auto _ : range_el(0, numnodes - 1)) {
+        auto [lowestweight, newnode] = min(multiloop_filtered(create_array(connected), create_array(range_el(0, numnodes)), [&connected](const auto &j, const auto &k){return !in(k, connected) && ::WEIGHTS[j][k] != -1;}, [](const auto &j, const auto &k){return make_tuple(::WEIGHTS[j][k], k);}));
+        connected.add(newnode);
+        newweight += lowestweight;
+    }
+
+    auto ans = oldweight - newweight;
+    return String(ans);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
+
+
+# 108
+import math, itertools
+
+# Returns the number of divisors of n^2
+def count_divisors_squared(n):
+    count = 1
+    end = int(math.sqrt(n))
+    for i in itertools.count(2):
+        if i > end:
+            break
+        if n % i == 0:
+            j = 0
+            while True:
+                n //= i
+                j += 1
+                if n % i != 0:
+                    break
+            count *= j * 2 + 1
+            end = int(math.sqrt(n))
+    if n != 1:  # Remaining largest prime factor
+        count *= 3
+    return count
+
+for n in itertools.count(1):
+    if (count_divisors_squared(n) + 1) // 2 > 1000:
+        print(n)
+        break
+===
+F count_divisors_squared(=n)
+   V count = 1
+   V end = Int(sqrt(n))
+   L(i) 2..
+      I i > end
+         L.break
+      I n % i == 0
+         V j = 0
+         L
+            n I/= i
+            j++
+            I n % i != 0
+               L.break
+         count *= j * 2 + 1
+         end = Int(sqrt(n))
+   I n != 1
+      count *= 3
+   R count
+
+L(n) 1..
+   I (count_divisors_squared(n) + 1) I/ 2 > 1000
+      print(n)
+      L.break
+===
+template <typename T1> auto count_divisors_squared(T1 n)
+{
+    auto count = 1;
+    auto end = to_int(sqrt(n));
+    for (auto i : range_ei(2)) {
+        if (i > end)
+            break;
+        if (mod(n, i) == 0) {
+            auto j = 0;
+            while (true) {
+                n = idiv(n, i);
+                j++;
+                if (mod(n, i) != 0)
+                    break;
+            }
+            count *= j * 2 + 1;
+            end = to_int(sqrt(n));
+        }
+    }
+    if (n != 1)
+        count *= 3;
+    return count;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ei(1))
+            if (idiv((count_divisors_squared(n) + 1), 2) > 1000) {
+                print(n);
+                break;
+            }
+    }
+} code_block_1;
+
+
+# 109
+def compute():
+    # Both lists are orderless but duplicates are important; they are sort of like multisets
+    points = [i * j for i in range(1, 21) for j in range(1, 4)] + [25, 50]
+    doublepoints = [i * 2 for i in range(1, 21)] + [25 * 2]
+
+    # Memoization array, with dimensions (3, 101, len(points))
+    ways = [[[-1] * len(points) for j in range(101)] for i in range(3)]
+
+    # Number of ways to get exactly 'total' points in exactly 'throwz' throws, using
+    # items (unordered) from the 'points' list with index less than or equal to 'maxIndex'.
+    def calc_ways(throws : int, total : int, maxindex : int) -> int:
+        if ways[throws][total][maxindex] == -1:
+            result : int
+            if throws == 0:
+                result = 1 if total == 0 else 0
+            else:
+                result = 0
+                if maxindex > 0:
+                    result += calc_ways(throws, total, maxindex - 1)
+                if points[maxindex] <= total:
+                    result += calc_ways(throws - 1, total - points[maxindex], maxindex)
+            ways[throws][total][maxindex] = result
+        return ways[throws][total][maxindex]
+
+    checkouts = 0
+    for remainingpoints in range(1, 100):
+        for throws in range(3):
+            for p in doublepoints:
+                if p <= remainingpoints:
+                    checkouts += calc_ways(throws, remainingpoints - p, len(points) - 1)
+    return str(checkouts)
+
+print(compute())
+===
+F compute()
+   V points = multiloop((1..20), (1..3), (i, j) -> i * j) [+] [25, 50]
+   V doublepoints = (1..20).map(i -> i * 2) [+] [25 * 2]
+
+   V ways = (0.<3).map(i -> [[-1] * @points.len] * 101)
+
+   F calc_ways(Int throws, Int total, Int maxindex) -> Int
+      I @ways[throws][total][maxindex] == -1
+         Int result
+         I throws == 0
+            result = I total == 0 {1} E 0
+         E
+            result = 0
+            I maxindex > 0
+               result += @calc_ways(throws, total, maxindex - 1)
+            I @points[maxindex] <= total
+               result += @calc_ways(throws - 1, total - @points[maxindex], maxindex)
+         @ways[throws][total][maxindex] = result
+      R @ways[throws][total][maxindex]
+
+   V checkouts = 0
+   L(remainingpoints) 1..99
+      L(throws) 3
+         L(p) doublepoints
+            I p <= remainingpoints
+               checkouts += calc_ways(throws, remainingpoints - p, points.len - 1)
+   R String(checkouts)
+
+print(compute())
+===
+auto compute()
+{
+    auto points = multiloop(range_ee(1, 20), range_ee(1, 3), [](const auto &i, const auto &j){return i * j;}) + create_array({25, 50});
+    auto doublepoints = range_ee(1, 20).map([](const auto &i){return i * 2;}) + create_array({25 * 2});
+
+    auto ways = range_el(0, 3).map([&points](const auto &i){return create_array({create_array({-1}) * points.len()}) * 101;});
+
+    std::function<int(int, int, int)> calc_ways = [&calc_ways, &points, &ways](const int throws, const int total, const int maxindex) -> int
+    {
+        if (ways[throws][total][maxindex] == -1) {
+            int result;
+            if (throws == 0)
+                result = total == 0 ? 1 : 0;
+            else {
+                result = 0;
+                if (maxindex > 0)
+                    result += calc_ways(throws, total, maxindex - 1);
+                if (points[maxindex] <= total)
+                    result += calc_ways(throws - 1, total - points[maxindex], maxindex);
+            }
+            ways[throws][total].set(maxindex, result);
+        }
+        return ways[throws][total][maxindex];
+    };
+
+    auto checkouts = 0;
+    for (auto remainingpoints : range_ee(1, 99))
+        for (int throws = 0; throws < 3; throws++)
+            for (auto &&p : doublepoints)
+                if (p <= remainingpoints)
+                    checkouts += calc_ways(throws, remainingpoints - p, points.len() - 1);
+    return String(checkouts);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
