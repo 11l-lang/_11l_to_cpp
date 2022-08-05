@@ -1,7 +1,7 @@
 F popcount(Int x) -> Int
    R bin(x).count(‘1’)
 
-F sqrt(BigInt x) -> BigInt
+F sqrtb(BigInt x) -> BigInt
    assert(x >= 0)
    BigInt i = 1
    L i * i <= x

@@ -6,7 +6,7 @@ popcount
             ‘x; ; Int; ’
         ]
     ]
-sqrt
+sqrtb
     type = ‘’
     ast_nodes = [
     .   node_type = function

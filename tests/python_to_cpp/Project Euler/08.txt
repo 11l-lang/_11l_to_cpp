@@ -6,14 +6,14 @@ BigInt = int
 DIGITS = 100
 MULTIPLIER = BigInt(100)**DIGITS
 ans = sum(
-    sum(int(c) for c in str(eulerlib.sqrt(i * MULTIPLIER))[ : DIGITS])
+    sum(int(c) for c in str(eulerlib.sqrtb(i * MULTIPLIER))[ : DIGITS])
     for i in range(100)
-    if eulerlib.sqrt(i)**2 != i)
+    if eulerlib.sqrtb(i)**2 != i)
 print(ans)
 ===
 V DIGITS = 100
 V MULTIPLIER = BigInt(100) ^ DIGITS
-V ans = sum((0.<100).filter(i -> eulerlib:sqrt(i) ^ 2 != i).map(i -> sum(String(eulerlib:sqrt(i * :MULTIPLIER))[0 .< :DIGITS].map(c -> Int(c)))))
+V ans = sum((0.<100).filter(i -> eulerlib:sqrtb(i) ^ 2 != i).map(i -> sum(String(eulerlib:sqrtb(i * :MULTIPLIER))[0 .< :DIGITS].map(c -> Int(c)))))
 print(ans)
 ===
 namespace eulerlib {
@@ -22,7 +22,7 @@ namespace eulerlib {
 
 auto DIGITS = 100;
 auto MULTIPLIER = pow(BigInt(100), DIGITS);
-auto ans = sum_map(range_el(0, 100).filter([](const auto &i){return square(eulerlib::sqrt(i)) != i;}), [](const auto &i){return sum_map(String(eulerlib::sqrt(i * ::MULTIPLIER))[range_el(0, ::DIGITS)], [](const auto &c){return to_int(c);});});
+auto ans = sum_map(range_el(0, 100).filter([](const auto &i){return square(eulerlib::sqrtb(i)) != i;}), [](const auto &i){return sum_map(String(eulerlib::sqrtb(i * ::MULTIPLIER))[range_el(0, ::DIGITS)], [](const auto &c){return to_int(c);});});
 
 struct CodeBlock1
 {
@@ -373,7 +373,7 @@ T CardDeck
       R result
 
 F compute()
-   V TRIALS = 10 ^ 5
+   V TRIALS = 10 ^ 6
 
    V visitcounts = [0] * 40
 
@@ -462,7 +462,7 @@ public:
 
 auto compute()
 {
-    auto TRIALS = pow(10, 5);
+    auto TRIALS = pow(10, 6);
 
     auto visitcounts = create_array({0}) * 40;
 

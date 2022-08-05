@@ -15,7 +15,7 @@ def popcount(x: int) -> int:
 	return bin(x).count("1")
 
 # Given integer x, this returns the integer floor(sqrt(x)).
-def sqrt(x: BigInt) -> BigInt:
+def sqrtb(x: BigInt) -> BigInt:
 	assert x >= 0
 	i: BigInt = 1
 	while i * i <= x:

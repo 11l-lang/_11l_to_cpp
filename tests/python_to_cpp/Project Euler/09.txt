@@ -445,6 +445,8 @@ struct CodeBlock1
 
 
 # 96
+from typing import List
+
 # Given a string of 81 digits, this returns a list of 81 ints representing the solved sudoku puzzle.
 def solve(puzzlestr):
     # Initialize initial state
@@ -492,7 +494,7 @@ def solve(puzzlestr):
         raise AssertionError("Unsolvable")
     return state
 
-PUZZLES = [''] * 0
+PUZZLES : List[str] = []
 lines = open('p096_sudoku.txt').read().split("\n")
 for i in range(len(lines) // 10):
     PUZZLES.append(''.join(lines[i * 10 + 1 : (i+1) * 10]))
@@ -543,7 +545,7 @@ F solve(puzzlestr)
       X AssertionError(‘Unsolvable’)
    R state
 
-V PUZZLES = [‘’] * 0
+[String] PUZZLES
 V lines = File(‘p096_sudoku.txt’).read().split("\n")
 L(i) 0 .< lines.len I/ 10
    PUZZLES.append((lines[i * 10 + 1 .< (i + 1) * 10]).join(‘’))
@@ -602,7 +604,7 @@ template <typename T1> auto solve(const T1 &puzzlestr)
     return state;
 }
 
-auto PUZZLES = create_array({u""_S}) * 0;
+Array<String> PUZZLES;
 auto lines = File(u"p096_sudoku.txt"_S).read().split(u"\n"_S);
 
 struct CodeBlock1
@@ -649,15 +651,10 @@ struct CodeBlock1
 
 
 # 98
-import math
+import eulerlib
+Int64 = int
 
 WORDS = open('p098_words.txt').read().strip('"').split('","')
-
-def is_square64(x):
-    if x < 0:
-        return False
-    y = Int64(math.sqrt(x))
-    return y * y == x
 
 # Strings a and b must be anagrams of each other.
 def max_square_pair(a, b, index, assignments : dict, isdigitused : list):
@@ -671,7 +668,7 @@ def max_square_pair(a, b, index, assignments : dict, isdigitused : list):
         for x, y in zip(a, b):
             anum = anum * 10 + assignments[x]
             bnum = bnum * 10 + assignments[y]
-        if is_square64(anum) and is_square64(bnum):
+        if eulerlib.is_square(anum) and eulerlib.is_square(bnum):
             return max(int(anum), int(bnum))
         else:
             return 0
@@ -711,12 +708,6 @@ print(compute())
 ===
 V WORDS = File(‘p098_words.txt’).read().trim(‘"’).split(‘","’)
 
-F is_square64(x)
-   I x < 0
-      R 0B
-   V y = Int64(sqrt(x))
-   R y * y == x
-
 F max_square_pair(a, b, index, &assignments, &isdigitused)
    I index == a.len
       I (a[0] C assignments & assignments[a[0]] == 0) | (b[0] C assignments & assignments[b[0]] == 0)
@@ -727,7 +718,7 @@ F max_square_pair(a, b, index, &assignments, &isdigitused)
       L(x, y) zip(a, b)
          anum = anum * 10 + assignments[x]
          bnum = bnum * 10 + assignments[y]
-      I is_square64(anum) & is_square64(bnum)
+      I eulerlib:is_square(anum) & eulerlib:is_square(bnum)
          R max(Int(anum), Int(bnum))
       E
          R 0
@@ -765,15 +756,11 @@ F compute()
 
 print(compute())
 ===
-auto WORDS = File(u"p098_words.txt"_S).read().trim(u"\""_S).split(u"\",\""_S);
-
-template <typename T1> auto is_square64(const T1 &x)
-{
-    if (x < 0)
-        return false;
-    auto y = to_int64(sqrt(x));
-    return y * y == x;
+namespace eulerlib {
+#include "eulerlib.hpp"
 }
+
+auto WORDS = File(u"p098_words.txt"_S).read().trim(u"\""_S).split(u"\",\""_S);
 
 template <typename T1, typename T2, typename T3, typename T4, typename T5> auto max_square_pair(const T1 &a, const T2 &b, const T3 &index, T4 &assignments, T5 &isdigitused)
 {
@@ -787,7 +774,7 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5> auto 
             anum = anum * 10 + assignments[x];
             bnum = bnum * 10 + assignments[y];
         }
-        if (is_square64(anum) && is_square64(bnum))
+        if (eulerlib::is_square(anum) && eulerlib::is_square(bnum))
             return max(to_int(anum), to_int(bnum));
         else
             return 0;

@@ -3,7 +3,7 @@
     return bin(x).count(u'1'_C);
 }
 
-BigInt sqrt(const BigInt &x)
+BigInt sqrtb(const BigInt &x)
 {
     assert(x >= 0);
     BigInt i = 1;
