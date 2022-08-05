@@ -1,0 +1,844 @@
+# 90
+import eulerlib
+
+def test_bit(x, i):
+    return ((x >> i) & 1) != 0
+
+SQUARES = [(i**2 // 10, i**2 % 10) for i in range(1, 10)]
+
+def is_arrangement_valid(a, b):
+    if test_bit(a, 6) or test_bit(a, 9):
+        a |= (1 << 6) | (1 << 9)
+    if test_bit(b, 6) or test_bit(b, 9):
+        b |= (1 << 6) | (1 << 9)
+    return all(((test_bit(a, c) and test_bit(b, d)) or (test_bit(a, d) and test_bit(b, c)))
+        for c, d in SQUARES)
+
+# Each die has (10 choose 6) arrangements, so we have at most 44100 arrangements to check
+ans = 0
+for i in range(1 << 10):
+    for j in range(i, 1 << 10):  # Ensure i <= j to force the dice to be orderless
+        # If both have Hamming weight of 6
+        if eulerlib.popcount(i) == eulerlib.popcount(j) == 6 and is_arrangement_valid(i, j):
+            ans += 1
+print(ans)
+===
+F test_bit(x, i)
+   R ((x >> i) [&] 1) != 0
+
+V SQUARES = (1..9).map(i -> (i ^ 2 I/ 10, i ^ 2 % 10))
+
+F is_arrangement_valid(=a, =b)
+   I test_bit(a, 6) | test_bit(a, 9)
+      a [|]= (1 << 6) [|] (1 << 9)
+   I test_bit(b, 6) | test_bit(b, 9)
+      b [|]= (1 << 6) [|] (1 << 9)
+   R all(:SQUARES.map((c, d) -> ((test_bit(@a, c) & test_bit(@b, d)) | (test_bit(@a, d) & test_bit(@b, c)))))
+
+V ans = 0
+L(i) 0 .< 1 << 10
+   L(j) i .< 1 << 10
+      I eulerlib:popcount(i) == eulerlib:popcount(j) == 6 & is_arrangement_valid(i, j)
+         ans++
+print(ans)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1, typename T2> auto test_bit(const T1 &x, const T2 &i)
+{
+    return ((x >> i) & 1) != 0;
+}
+
+auto SQUARES = range_ee(1, 9).map([](const auto &i){return make_tuple(idiv(square(i), 10), mod(square(i), 10));});
+
+template <typename T1, typename T2> auto is_arrangement_valid(T1 a, T2 b)
+{
+    if (test_bit(a, 6) || test_bit(a, 9))
+        a |= (1 << 6) | (1 << 9);
+    if (test_bit(b, 6) || test_bit(b, 9))
+        b |= (1 << 6) | (1 << 9);
+    return all_map(::SQUARES, [&a, &b](const auto &c, const auto &d){return ((test_bit(a, c) && test_bit(b, d)) || (test_bit(a, d) && test_bit(b, c)));});
+}
+
+auto ans = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(0, 1 << 10))
+            for (auto j : range_el(i, 1 << 10))
+                if (equal(eulerlib::popcount(i), eulerlib::popcount(j), 6) && is_arrangement_valid(i, j))
+                    ans++;
+        print(ans);
+    }
+} code_block_1;
+
+
+# 91
+# Tests whether the three points {(0,0), (x1,y1), (x2,y2)} form a right triangle.
+def is_right_triangle(x1, y1, x2, y2):
+    a = x1**2 + y1**2
+    b = x2**2 + y2**2
+    c = (x2 - x1)**2 + (y2 - y1)**2
+    return (a + b == c) or (b + c == a) or (c + a == b)
+
+LIMIT = 51
+ans = 0
+for x1 in range(LIMIT):
+    for y1 in range(LIMIT):
+        for x2 in range(LIMIT):
+            for y2 in range(LIMIT):
+                # For uniqueness, ensure that (x1,y1) has a larger angle than (x2,y2)
+                if y2 * x1 < y1 * x2 and is_right_triangle(x1, y1, x2, y2):
+                    ans += 1
+print(ans)
+===
+F is_right_triangle(x1, y1, x2, y2)
+   V a = x1 ^ 2 + y1 ^ 2
+   V b = x2 ^ 2 + y2 ^ 2
+   V c = (x2 - x1) ^ 2 + (y2 - y1) ^ 2
+   R (a + b == c) | (b + c == a) | (c + a == b)
+
+V LIMIT = 51
+V ans = 0
+L(x1) 0 .< LIMIT
+   L(y1) 0 .< LIMIT
+      L(x2) 0 .< LIMIT
+         L(y2) 0 .< LIMIT
+            I y2 * x1 < y1 * x2 & is_right_triangle(x1, y1, x2, y2)
+               ans++
+print(ans)
+===
+template <typename T1, typename T2, typename T3, typename T4> auto is_right_triangle(const T1 &x1, const T2 &_y1_, const T3 &x2, const T4 &y2)
+{
+    auto a = square(x1) + square(_y1_);
+    auto b = square(x2) + square(y2);
+    auto c = square((x2 - x1)) + square((y2 - _y1_));
+    return (a + b == c) || (b + c == a) || (c + a == b);
+}
+
+auto LIMIT = 51;
+auto ans = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto x1 : range_el(0, LIMIT))
+            for (auto _y1_ : range_el(0, LIMIT))
+                for (auto x2 : range_el(0, LIMIT))
+                    for (auto y2 : range_el(0, LIMIT))
+                        if (y2 * x1 < _y1_ * x2 && is_right_triangle(x1, _y1_, x2, y2))
+                            ans++;
+        print(ans);
+    }
+} code_block_1;
+
+
+# 92
+SQUARE_DIGITS_SUM = [sum(int(c)**2 for c in str(i)) for i in range(1000)]
+
+def square_digit_sum(n):
+    result = 0
+    while n > 0:
+        result += SQUARE_DIGITS_SUM[n % 1000]
+        n //= 1000
+    return result
+
+TERMINALS = (1, 89)
+
+def get_terminal(n):
+    while n not in TERMINALS:
+        n = square_digit_sum(n)
+    return n
+
+ans = sum(1
+    for i in range(1, 10000000)
+    if get_terminal(i) == 89)
+print(ans)
+===
+V SQUARE_DIGITS_SUM = (0.<1000).map(i -> sum(String(i).map(c -> Int(c) ^ 2)))
+
+F square_digit_sum(=n)
+   V result = 0
+   L n > 0
+      result += :SQUARE_DIGITS_SUM[n % 1000]
+      n I/= 1000
+   R result
+
+V TERMINALS = (1, 89)
+
+F get_terminal(=n)
+   L n !C :TERMINALS
+      n = square_digit_sum(n)
+   R n
+
+V ans = sum((1..9999999).filter(i -> get_terminal(i) == 89).map(i -> 1))
+print(ans)
+===
+auto SQUARE_DIGITS_SUM = range_el(0, 1000).map([](const auto &i){return sum_map(String(i), [](const auto &c){return square(to_int(c));});});
+
+template <typename T1> auto square_digit_sum(T1 n)
+{
+    auto result = 0;
+    while (n > 0) {
+        result += ::SQUARE_DIGITS_SUM[mod(n, 1000)];
+        n = idiv(n, 1000);
+    }
+    return result;
+}
+
+auto TERMINALS = make_tuple(1, 89);
+
+template <typename T1> auto get_terminal(T1 n)
+{
+    while (!in(n, ::TERMINALS))
+        n = square_digit_sum(n);
+    return n;
+}
+
+auto ans = sum_map(range_ee(1, 9999999).filter([](const auto &i){return get_terminal(i) == 89;}), [](const auto &i){return 1;});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(ans);
+    }
+} code_block_1;
+
+
+---
+# 93 [-Fraction-]
+
+
+# 94
+import math, itertools
+
+def compute():
+    LIMIT = 10**9
+    ans = 0
+    # What search range do we need?
+    # c = (s^2+t^2)/2. Perimeter = p = 3c +/- 1 = 3/2 (s^2+t^2) +/- 1 <= LIMIT.
+    # We need to keep the smaller perimeter within limit for
+    # the search to be meaningful, so 3/2 (s^2+t^2) - 1 <= LIMIT.
+    # With t < s, we have that s^2+t^2 < 2s^2, so 3/2 (s^2+t^2) - 1 < 3s^2 - 1.
+    # Therefore it is sufficient to ensure that 3s^2 - 1 <= LIMIT, i.e. s^2 <= (LIMIT+1)/3.
+    for s in itertools.count(1, 2):
+        if s * s > (LIMIT + 1) // 3:
+            break
+        for t in range(s - 2, 0, -2):
+            if math.gcd(s, t) == 1:
+                a = s * t
+                b = (s * s - t * t) // 2
+                c = (s * s + t * t) // 2
+                if a * 2 == c - 1:
+                    p = c * 3 - 1
+                    if p <= LIMIT:
+                        ans += p
+                if a * 2 == c + 1:
+                    p = c * 3 + 1
+                    if p <= LIMIT:
+                        ans += p
+                # Swap the roles of a and b and try the same tests
+                # Note that a != b, since otherwise c = a * sqrt(2) would be irrational
+                if b * 2 == c - 1:
+                    p = c * 3 - 1
+                    if p <= LIMIT:
+                        ans += p
+                if b * 2 == c + 1:
+                    p = c * 3 + 1
+                    if p <= LIMIT:
+                        ans += p
+    return str(ans)
+
+print(compute())
+===
+F compute()
+   V LIMIT = 10 ^ 9
+   V ans = 0
+   L(s) (1..).step(2)
+      I s * s > (LIMIT + 1) I/ 3
+         L.break
+      L(t) (s - 2 .< 0).step(-2)
+         I gcd(s, t) == 1
+            V a = s * t
+            V b = (s * s - t * t) I/ 2
+            V c = (s * s + t * t) I/ 2
+            I a * 2 == c - 1
+               V p = c * 3 - 1
+               I p <= LIMIT
+                  ans += p
+            I a * 2 == c + 1
+               V p = c * 3 + 1
+               I p <= LIMIT
+                  ans += p
+            I b * 2 == c - 1
+               V p = c * 3 - 1
+               I p <= LIMIT
+                  ans += p
+            I b * 2 == c + 1
+               V p = c * 3 + 1
+               I p <= LIMIT
+                  ans += p
+   R String(ans)
+
+print(compute())
+===
+auto compute()
+{
+    auto LIMIT = pow(10, 9);
+    auto ans = 0;
+    for (auto s : range_ei(1).step(2)) {
+        if (s * s > idiv((LIMIT + 1), 3))
+            break;
+        for (auto t : range_el(s - 2, 0).step(-2))
+            if (gcd(s, t) == 1) {
+                auto a = s * t;
+                auto b = idiv((s * s - t * t), 2);
+                auto c = idiv((s * s + t * t), 2);
+                if (a * 2 == c - 1) {
+                    auto p = c * 3 - 1;
+                    if (p <= LIMIT)
+                        ans += p;
+                }
+                if (a * 2 == c + 1) {
+                    auto p = c * 3 + 1;
+                    if (p <= LIMIT)
+                        ans += p;
+                }
+                if (b * 2 == c - 1) {
+                    auto p = c * 3 - 1;
+                    if (p <= LIMIT)
+                        ans += p;
+                }
+                if (b * 2 == c + 1) {
+                    auto p = c * 3 + 1;
+                    if (p <= LIMIT)
+                        ans += p;
+                }
+            }
+    }
+    return String(ans);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
+
+
+# 95
+import itertools
+
+def compute():
+    LIMIT = 10**6
+
+    # divisorsum[n] is the sum of all the proper divisors of n
+    divisorsum = [0] * (LIMIT + 1)
+    for i in range(1, LIMIT + 1):
+        for j in range(i * 2, LIMIT + 1, i):
+            divisorsum[j] += i
+
+    # Analyze the amicable chain length for each number in ascending order
+    maxchainlen = 0
+    ans = -1
+    for i in range(LIMIT + 1):
+        visited = set() # int
+        cur = i
+        for count in itertools.count(1):
+            # 'count' is the length of the this amicable chain
+            visited.add(cur)
+            next = divisorsum[cur]
+            if next == i:
+                if count > maxchainlen:
+                    ans = i
+                    maxchainlen = count
+                break
+            # Exceeds limit or not a chain (a rho shape instead)
+            elif next > LIMIT or next in visited:
+                break
+            else:
+                cur = next
+
+    return str(ans)
+
+print(compute())
+===
+F compute()
+   V LIMIT = 10 ^ 6
+
+   V divisorsum = [0] * (LIMIT + 1)
+   L(i) 1 .. LIMIT
+      L(j) (i * 2 .. LIMIT).step(i)
+         divisorsum[j] += i
+
+   V maxchainlen = 0
+   V ans = -1
+   L(i) 0 .. LIMIT
+      V visited = Set[Int]()
+      V cur = i
+      L(count) 1..
+         visited.add(cur)
+         V next = divisorsum[cur]
+         I next == i
+            I count > maxchainlen
+               ans = i
+               maxchainlen = count
+            L.break
+         E I next > LIMIT | next C visited
+            L.break
+         E
+            cur = next
+
+   R String(ans)
+
+print(compute())
+===
+auto compute()
+{
+    auto LIMIT = pow(10, 6);
+
+    auto divisorsum = create_array({0}) * (LIMIT + 1);
+    for (auto i : range_ee(1, LIMIT))
+        for (auto j : range_ee(i * 2, LIMIT).step(i))
+            divisorsum[j] += i;
+
+    auto maxchainlen = 0;
+    auto ans = -1;
+    for (auto i : range_ee(0, LIMIT)) {
+        auto visited = Set<int>();
+        auto cur = i;
+        for (auto count : range_ei(1)) {
+            visited.add(cur);
+            auto next = divisorsum[cur];
+            if (next == i) {
+                if (count > maxchainlen) {
+                    ans = i;
+                    maxchainlen = count;
+                }
+                break;
+            }
+            else if (next > LIMIT || in(next, visited))
+                break;
+            else
+                cur = next;
+        }
+    }
+
+    return String(ans);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
+
+
+# 96
+# Given a string of 81 digits, this returns a list of 81 ints representing the solved sudoku puzzle.
+def solve(puzzlestr):
+    # Initialize initial state
+    assert len(puzzlestr) == 81
+    state = [int(c) for c in puzzlestr]
+    colfree = [set(range(1, 10)) for i in range(9)]
+    rowfree = [set(range(1, 10)) for i in range(9)]
+    boxfree = [set(range(1, 10)) for i in range(9)]
+    for y in range(9):
+        for x in range(9):
+            d = state[y * 9 + x]
+            if d != 0:
+                colfree[x].remove(d)
+                rowfree[y].remove(d)
+                boxfree[y // 3 * 3 + x // 3].remove(d)
+
+    # Returns True/False to indicate whether a solution was found
+    # when given the initial state and coordinates.
+    def recurse(i : int) -> bool:
+        if i == 81:
+            return True
+        elif state[i] != 0:
+            return recurse(i + 1)
+        else:
+            x = i % 9
+            y = i // 9
+            j = y // 3 * 3 + x // 3
+            candidates = colfree[x].intersection(rowfree[y]).intersection(boxfree[j]) # [-`intersection(rowfree[y], boxfree[j])`-]
+            for d in candidates:
+                state[i] = d
+                colfree[x].remove(d)
+                rowfree[y].remove(d)
+                boxfree[j].remove(d)
+                if recurse(i + 1):
+                    return True
+                # Otherwise backtrack
+                colfree[x].add(d)
+                rowfree[y].add(d)
+                boxfree[j].add(d)
+            state[i] = 0
+            return False
+
+    # Call the helper function
+    if not recurse(0):
+        raise AssertionError("Unsolvable")
+    return state
+
+PUZZLES = [''] * 0
+lines = open('p096_sudoku.txt').read().split("\n")
+for i in range(len(lines) // 10):
+    PUZZLES.append(''.join(lines[i * 10 + 1 : (i+1) * 10]))
+
+def extract(sudoku):  # For example: extract([3, 9, 4, 1, ...]) = 394
+    return int("".join(map(str, sudoku[ : 3])))
+
+print(sum(extract(solve(puz)) for puz in PUZZLES))
+===
+F solve(puzzlestr)
+   assert(puzzlestr.len == 81)
+   V state = puzzlestr.map(c -> Int(c))
+   V colfree = (0.<9).map(i -> Set(1..9))
+   V rowfree = (0.<9).map(i -> Set(1..9))
+   V boxfree = (0.<9).map(i -> Set(1..9))
+   L(y) 9
+      L(x) 9
+         V d = state[y * 9 + x]
+         I d != 0
+            colfree[x].remove(d)
+            rowfree[y].remove(d)
+            boxfree[y I/ 3 * 3 + x I/ 3].remove(d)
+
+   F recurse(Int i) -> Bool
+      I i == 81
+         R 1B
+      E I @state[i] != 0
+         R @recurse(i + 1)
+      E
+         V x = i % 9
+         V y = i I/ 9
+         V j = y I/ 3 * 3 + x I/ 3
+         V candidates = @colfree[x].intersection(@rowfree[y]).intersection(@boxfree[j])
+         L(d) candidates
+            @state[i] = d
+            @colfree[x].remove(d)
+            @rowfree[y].remove(d)
+            @boxfree[j].remove(d)
+            I @recurse(i + 1)
+               R 1B
+            @colfree[x].add(d)
+            @rowfree[y].add(d)
+            @boxfree[j].add(d)
+         @state[i] = 0
+         R 0B
+
+   I !recurse(0)
+      X AssertionError(‘Unsolvable’)
+   R state
+
+V PUZZLES = [‘’] * 0
+V lines = File(‘p096_sudoku.txt’).read().split("\n")
+L(i) 0 .< lines.len I/ 10
+   PUZZLES.append((lines[i * 10 + 1 .< (i + 1) * 10]).join(‘’))
+
+F extract(sudoku)
+   R Int(sudoku[0.<3].map(String).join(‘’))
+
+print(sum(PUZZLES.map(puz -> extract(solve(puz)))))
+===
+template <typename T1> auto solve(const T1 &puzzlestr)
+{
+    assert(puzzlestr.len() == 81);
+    auto state = puzzlestr.map([](const auto &c){return to_int(c);});
+    auto colfree = range_el(0, 9).map([](const auto &i){return create_set(range_ee(1, 9));});
+    auto rowfree = range_el(0, 9).map([](const auto &i){return create_set(range_ee(1, 9));});
+    auto boxfree = range_el(0, 9).map([](const auto &i){return create_set(range_ee(1, 9));});
+    for (int y = 0; y < 9; y++)
+        for (int x = 0; x < 9; x++) {
+            auto d = state[y * 9 + x];
+            if (d != 0) {
+                colfree[x].remove(d);
+                rowfree[y].remove(d);
+                boxfree[idiv(y, 3) * 3 + idiv(x, 3)].remove(d);
+            }
+        }
+
+    std::function<bool(int)> recurse = [&boxfree, &colfree, &recurse, &rowfree, &state](const int i) -> bool
+    {
+        if (i == 81)
+            return true;
+        else if (state[i] != 0)
+            return recurse(i + 1);
+        else {
+            auto x = mod(i, 9);
+            auto y = idiv(i, 9);
+            auto j = idiv(y, 3) * 3 + idiv(x, 3);
+            auto candidates = colfree[x].intersection(rowfree[y]).intersection(boxfree[j]);
+            for (auto &&d : candidates) {
+                state.set(i, d);
+                colfree[x].remove(d);
+                rowfree[y].remove(d);
+                boxfree[j].remove(d);
+                if (recurse(i + 1))
+                    return true;
+                colfree[x].add(d);
+                rowfree[y].add(d);
+                boxfree[j].add(d);
+            }
+            state.set(i, 0);
+            return false;
+        }
+    };
+
+    if (!recurse(0))
+        throw AssertionError(u"Unsolvable"_S);
+    return state;
+}
+
+auto PUZZLES = create_array({u""_S}) * 0;
+auto lines = File(u"p096_sudoku.txt"_S).read().split(u"\n"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(0, idiv(lines.len(), 10)))
+            PUZZLES.append((lines[range_el(i * 10 + 1, (i + 1) * 10)]).join(u""_S));
+    }
+} code_block_1;
+
+template <typename T1> auto extract(const T1 &sudoku)
+{
+    return to_int(sudoku[range_el(0, 3)].map([](const auto &x){return String(x);}).join(u""_S));
+}
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(sum_map(PUZZLES, [](const auto &puz){return extract(solve(puz));}));
+    }
+} code_block_2;
+
+
+# 97
+BigInt = int
+
+MOD = BigInt(10)**10
+print((28433 * pow(BigInt(2), 7830457, MOD) + 1) % MOD)
+===
+V MOD = BigInt(10) ^ 10
+print((28433 * pow(BigInt(2), 7830457, MOD) + 1) % MOD)
+===
+auto MOD = pow(BigInt(10), 10);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(mod((28433 * pow(BigInt(2), 7830457, MOD) + 1), MOD));
+    }
+} code_block_1;
+
+
+# 98
+import math
+
+WORDS = open('p098_words.txt').read().strip('"').split('","')
+
+def is_square64(x):
+    if x < 0:
+        return False
+    y = Int64(math.sqrt(x))
+    return y * y == x
+
+# Strings a and b must be anagrams of each other.
+def max_square_pair(a, b, index, assignments : dict, isdigitused : list):
+    if index == len(a):
+        if      (a[0] in assignments and assignments[a[0]] == 0) or \
+                (b[0] in assignments and assignments[b[0]] == 0):
+            return 0
+
+        anum = Int64(0)
+        bnum = Int64(0)
+        for x, y in zip(a, b):
+            anum = anum * 10 + assignments[x]
+            bnum = bnum * 10 + assignments[y]
+        if is_square64(anum) and is_square64(bnum):
+            return max(int(anum), int(bnum))
+        else:
+            return 0
+
+    elif a[index] in assignments:
+        return max_square_pair(a, b, index + 1, assignments, isdigitused)
+
+    else:
+        result = 0
+        for i in range(10):
+            if not isdigitused[i]:
+                isdigitused[i] = True
+                assignments[a[index]] = i
+                result = max(max_square_pair(a, b, index + 1, assignments, isdigitused), result)
+                del assignments[a[index]]
+                isdigitused[i] = False
+        return result
+
+def compute():
+    anagrams : Dict[str, List[str]] = {}
+    for word in WORDS:
+        key = "".join(sorted(word))
+        if key not in anagrams:
+            anagrams[key] = [''] * 0
+        anagrams[key].append(word)
+
+    ans = 0
+    for key, words in anagrams.items():
+        for i in range(len(words)):
+            for j in range(i + 1, len(words)):
+                assignments : Dict[Char, int] = {}
+                isdigitused = [False] * 10
+                ans = max(max_square_pair(words[i], words[j], 0, assignments, isdigitused), ans)
+    return str(ans)
+
+print(compute())
+===
+V WORDS = File(‘p098_words.txt’).read().trim(‘"’).split(‘","’)
+
+F is_square64(x)
+   I x < 0
+      R 0B
+   V y = Int64(sqrt(x))
+   R y * y == x
+
+F max_square_pair(a, b, index, &assignments, &isdigitused)
+   I index == a.len
+      I (a[0] C assignments & assignments[a[0]] == 0) | (b[0] C assignments & assignments[b[0]] == 0)
+         R 0
+
+      V anum = Int64(0)
+      V bnum = Int64(0)
+      L(x, y) zip(a, b)
+         anum = anum * 10 + assignments[x]
+         bnum = bnum * 10 + assignments[y]
+      I is_square64(anum) & is_square64(bnum)
+         R max(Int(anum), Int(bnum))
+      E
+         R 0
+
+   E I a[index] C assignments
+      R max_square_pair(a, b, index + 1, &assignments, &isdigitused)
+
+   E
+      V result = 0
+      L(i) 10
+         I !isdigitused[i]
+            isdigitused[i] = 1B
+            assignments[a[index]] = i
+            result = max(max_square_pair(a, b, index + 1, &assignments, &isdigitused), result)
+            assignments.pop(a[index])
+            isdigitused[i] = 0B
+      R result
+
+F compute()
+   [String = [String]] anagrams
+   L(word) :WORDS
+      V key = sorted(word).join(‘’)
+      I key !C anagrams
+         anagrams[key] = [‘’] * 0
+      anagrams[key].append(word)
+
+   V ans = 0
+   L(key, words) anagrams
+      L(i) 0 .< words.len
+         L(j) i + 1 .< words.len
+            [Char = Int] assignments
+            V isdigitused = [0B] * 10
+            ans = max(max_square_pair(words[i], words[j], 0, &assignments, &isdigitused), ans)
+   R String(ans)
+
+print(compute())
+===
+auto WORDS = File(u"p098_words.txt"_S).read().trim(u"\""_S).split(u"\",\""_S);
+
+template <typename T1> auto is_square64(const T1 &x)
+{
+    if (x < 0)
+        return false;
+    auto y = to_int64(sqrt(x));
+    return y * y == x;
+}
+
+template <typename T1, typename T2, typename T3, typename T4, typename T5> auto max_square_pair(const T1 &a, const T2 &b, const T3 &index, T4 &assignments, T5 &isdigitused)
+{
+    if (index == a.len()) {
+        if ((in(_get<0>(a), assignments) && assignments[_get<0>(a)] == 0) || (in(_get<0>(b), assignments) && assignments[_get<0>(b)] == 0))
+            return 0;
+
+        auto anum = to_int64(0);
+        auto bnum = to_int64(0);
+        for (auto &&[x, y] : zip(a, b)) {
+            anum = anum * 10 + assignments[x];
+            bnum = bnum * 10 + assignments[y];
+        }
+        if (is_square64(anum) && is_square64(bnum))
+            return max(to_int(anum), to_int(bnum));
+        else
+            return 0;
+    }
+
+    else if (in(a[index], assignments))
+        return max_square_pair(a, b, index + 1, assignments, isdigitused);
+
+    else {
+        auto result = 0;
+        for (int i = 0; i < 10; i++)
+            if (!isdigitused[i]) {
+                isdigitused.set(i, true);
+                assignments.set(a[index], i);
+                result = max(max_square_pair(a, b, index + 1, assignments, isdigitused), result);
+                assignments.pop(a[index]);
+                isdigitused.set(i, false);
+            }
+        return result;
+    }
+}
+
+auto compute()
+{
+    Dict<String, Array<String>> anagrams;
+    for (auto &&word : ::WORDS) {
+        auto key = sorted(word).join(u""_S);
+        if (!in(key, anagrams))
+            anagrams.set(key, create_array({u""_S}) * 0);
+        anagrams[key].append(word);
+    }
+
+    auto ans = 0;
+    for (auto &&[key, words] : anagrams)
+        for (auto i : range_el(0, words.len()))
+            for (auto j : range_el(i + 1, words.len())) {
+                Dict<Char, int> assignments;
+                auto isdigitused = create_array({false}) * 10;
+                ans = max(max_square_pair(words[i], words[j], 0, assignments, isdigitused), ans);
+            }
+    return String(ans);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
+
+
+---
+# 99 [-BigFloat-]

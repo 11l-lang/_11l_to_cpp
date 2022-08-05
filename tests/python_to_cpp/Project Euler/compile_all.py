@@ -5,6 +5,9 @@ results = []
 for fname in os.listdir():
     if fname.endswith('.txt') and len(fname) == 6:
         for problem in open(fname, encoding = 'utf-8').read().split("\n\n\n"):
+            if problem.startswith('---'):
+                continue
+
             in_python, in_11l, in_cpp = problem.split("===\n")
             open('problem.py', 'w').write(in_python)
 
@@ -19,6 +22,7 @@ for fname in os.listdir():
                 if total_time >= 1.0:
                     break
 
+            assert(in_python[:2] == '# ')
             problem_id = int(in_python[2:].split("\n", 1)[0].split(' ', 1)[0])
             if os.system(r'..\..\..\..\11l problem.py') != 0:
                 print('Compilation error in problem', problem_id)

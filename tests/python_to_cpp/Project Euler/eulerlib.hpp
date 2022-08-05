@@ -1,4 +1,9 @@
-﻿BigInt sqrt(const BigInt &x)
+﻿int popcount(const int x)
+{
+    return bin(x).count(u'1'_C);
+}
+
+BigInt sqrt(const BigInt &x)
 {
     assert(x >= 0);
     BigInt i = 1;
