@@ -1,0 +1,651 @@
+# 111
+import eulerlib, math
+from _11l import next_permutation
+Int64 = int
+
+def compute():
+    DIGITS = 10
+
+    primes = eulerlib.list_primes(int(math.sqrt(10.0**DIGITS)))
+
+    # Only valid if 1 < n <= 10^DIGITS.
+    def is_prime(n):
+        end = Int64(math.sqrt(n))
+        for p in primes:
+            if p > end:
+                break
+            if n % p == 0:
+                return False
+        return True
+
+    ans = Int64(0)
+    # For each repeating digit
+    for digit in range(10):
+
+        # Search by the number of repetitions in decreasing order
+        for rep in range(DIGITS, -1, -1):
+            sum = Int64(0)
+            digits = [0] * DIGITS
+
+            # Try all possibilities for filling the non-repeating digits
+            for i in range(Int64(0), Int64(9**(DIGITS - rep))):
+
+                # Build initial array. For example, if DIGITS=7, digit=5, rep=4, i=123, then the array will be filled with 5,5,5,5,1,4,7.
+                for j in range(rep):
+                    digits[j] = digit
+                temp = i
+                for j in range(DIGITS - rep):
+                    d = int(temp % 9)
+                    if d >= digit:  # Skip the repeating digit
+                        d += 1
+                    if j > 0 and d > digits[DIGITS - j]:  # If this is true, then after sorting, the array will be in an already-tried configuration
+                        break
+                    digits[-1 - j] = d
+                    temp //= 9
+
+                else:
+                    digits.sort()  # Start at lowest permutation
+
+                    while True:  # Go through all permutations
+                        if digits[0] > 0:  # Skip if the number has a leading zero, which means it has less than DIGIT digits
+                            num = Int64("".join(map(str, digits)))
+                            if is_prime(num):
+                                sum += num
+                        if not next_permutation(digits):
+                            break
+
+            if sum > 0:  # Primes found; skip all lesser repetitions
+                ans += sum
+                break
+
+    return str(ans)
+
+print(compute())
+===
+F compute()
+   V DIGITS = 10
+
+   V primes = eulerlib:list_primes(Int(sqrt(10.0 ^ DIGITS)))
+
+   F is_prime(n)
+      V end = Int64(sqrt(n))
+      L(p) @primes
+         I p > end
+            L.break
+         I n % p == 0
+            R 0B
+      R 1B
+
+   V ans = Int64(0)
+   L(digit) 10
+
+      L(rep) (DIGITS .< -1).step(-1)
+         V sum = Int64(0)
+         V digits = [0] * DIGITS
+
+         L(i) Int64(0) .< Int64(9 ^ (DIGITS - rep))
+
+            L(j) 0 .< rep
+               digits[j] = digit
+            V temp = i
+            L(j) 0 .< DIGITS - rep
+               V d = Int(temp % 9)
+               I d >= digit
+                  d++
+               I j > 0 & d > digits[DIGITS - j]
+                  L.break
+               digits[(len)-1 - j] = d
+               temp I/= 9
+
+            L.was_no_break
+               digits.sort()
+
+               L
+                  I digits[0] > 0
+                     V num = Int64(digits.map(String).join(‘’))
+                     I is_prime(num)
+                        sum += num
+                  I !digits.next_permutation()
+                     L.break
+
+         I sum > 0
+            ans += sum
+            L.break
+
+   R String(ans)
+
+print(compute())
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto compute()
+{
+    auto DIGITS = 10;
+
+    auto primes = eulerlib::list_primes(to_int(sqrt(pow(10.0, DIGITS))));
+
+    auto is_prime = [&primes](const auto &n)
+    {
+        auto end = to_int64(sqrt(n));
+        for (auto &&p : primes) {
+            if (p > end)
+                break;
+            if (mod(n, p) == 0)
+                return false;
+        }
+        return true;
+    };
+
+    auto ans = to_int64(0);
+    for (int digit = 0; digit < 10; digit++)
+
+        for (auto rep : range_el(DIGITS, -1).step(-1)) {
+            auto sum = to_int64(0);
+            auto digits = create_array({0}) * DIGITS;
+
+            for (auto i : range_el(to_int64(0), to_int64(pow(9, (DIGITS - rep))))) {
+
+                for (auto j : range_el(0, rep))
+                    digits.set(j, digit);
+                auto temp = i;
+                for (auto j : range_el(0, DIGITS - rep)) {
+                    auto d = to_int(mod(temp, 9));
+                    if (d >= digit)
+                        d++;
+                    if (j > 0 && d > digits[DIGITS - j])
+                        goto break_;
+                    digits.set_plus_len( - 1 - j, d);
+                    temp = idiv(temp, 9);
+                }
+                digits.sort();
+
+                while (true) {
+                    if (_get<0>(digits) > 0) {
+                        auto num = to_int64(digits.map([](const auto &x){return String(x);}).join(u""_S));
+                        if (is_prime(num))
+                            sum += num;
+                    }
+                    if (!digits.next_permutation())
+                        break;
+                }
+                break_:;
+            }
+
+            if (sum > 0) {
+                ans += sum;
+                break;
+            }
+        }
+
+    return String(ans);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
+
+
+# 112
+import itertools
+
+count = 0
+for i in itertools.count(1):
+    s = str(i)
+    t = "".join(sorted(s))
+    if s != t and s[ : : -1] != t:
+        count += 1  # i is bouncy
+    if count * 100 == 99 * i:
+        print(i)
+        break
+===
+V count = 0
+L(i) 1..
+   V s = String(i)
+   V t = sorted(s).join(‘’)
+   I s != t & reversed(s) != t
+      count++
+   I count * 100 == 99 * i
+      print(i)
+      L.break
+===
+auto count = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ei(1)) {
+            auto s = String(i);
+            auto t = sorted(s).join(u""_S);
+            if (s != t && reversed(s) != t)
+                count++;
+            if (count * 100 == 99 * i) {
+                print(i);
+                break;
+            }
+        }
+    }
+} code_block_1;
+
+
+# 113
+import eulerlib
+
+DIGITS = 100
+increasing = eulerlib.binomial(DIGITS + 9, 9) - 1
+decreasing = eulerlib.binomial(DIGITS + 10, 10) - (DIGITS + 1)
+flat = DIGITS * 9
+print(increasing + decreasing - flat)
+===
+V DIGITS = 100
+V increasing = eulerlib:binomial(DIGITS + 9, 9) - 1
+V decreasing = eulerlib:binomial(DIGITS + 10, 10) - (DIGITS + 1)
+V flat = DIGITS * 9
+print(increasing + decreasing - flat)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto DIGITS = 100;
+auto increasing = eulerlib::binomial(DIGITS + 9, 9) - 1;
+auto decreasing = eulerlib::binomial(DIGITS + 10, 10) - (DIGITS + 1);
+auto flat = DIGITS * 9;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(increasing + decreasing - flat);
+    }
+} code_block_1;
+
+
+# 114
+Int64 = int
+
+# Dynamic programming
+LENGTH = 50
+ways = [Int64(0)] * (LENGTH + 1)
+for n in range(len(ways)):
+    if n < 3:
+        ways[n] = 1
+    else:
+        ways[n] = ways[n - 1] + sum(ways[ : n - 3]) + 1
+print(ways[-1])
+===
+V LENGTH = 50
+V ways = [Int64(0)] * (LENGTH + 1)
+L(n) 0 .< ways.len
+   I n < 3
+      ways[n] = 1
+   E
+      ways[n] = ways[n - 1] + sum(ways[0 .< n - 3]) + 1
+print(ways.last)
+===
+auto LENGTH = 50;
+auto ways = create_array({to_int64(0)}) * (LENGTH + 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_el(0, ways.len()))
+            if (n < 3)
+                ways.set(n, 1);
+            else
+                ways.set(n, ways[n - 1] + sum(ways[range_el(0, n - 3)]) + 1);
+        print(ways.last());
+    }
+} code_block_1;
+
+
+# 115
+import itertools
+
+# Dynamic programming
+M = 50
+ways = [1]
+for n in itertools.count(1):
+    s = ways[n - 1] + sum(ways[ : max(n - M, 0)])
+    if n >= M:
+        s += 1
+    ways.append(s)
+    if s > 1000000:
+        print(n)
+        break
+===
+V M = 50
+V ways = [1]
+L(n) 1..
+   V s = ways[n - 1] + sum(ways[0 .< max(n - M, 0)])
+   I n >= M
+      s++
+   ways.append(s)
+   I s > 1000000
+      print(n)
+      L.break
+===
+auto M = 50;
+auto ways = create_array({1});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ei(1)) {
+            auto s = ways[n - 1] + sum(ways[range_el(0, max(n - M, 0))]);
+            if (n >= M)
+                s++;
+            ways.append(s);
+            if (s > 1000000) {
+                print(n);
+                break;
+            }
+        }
+    }
+} code_block_1;
+
+
+# 116
+Int64 = int
+
+def count_ways(length, m):
+    # Dynamic programming
+    ways = [Int64(1)] + [Int64(0)] * length
+    for n in range(1, len(ways)):
+        ways[n] += ways[n - 1]
+        if n >= m:
+            ways[n] += ways[n - m]
+    return ways[-1] - 1
+
+LENGTH = 50
+print(sum(count_ways(LENGTH, i) for i in range(2, 5)))
+===
+F count_ways(length, m)
+   V ways = [Int64(1)] [+] [Int64(0)] * length
+   L(n) 1 .< ways.len
+      ways[n] += ways[n - 1]
+      I n >= m
+         ways[n] += ways[n - m]
+   R ways.last - 1
+
+V LENGTH = 50
+print(sum((2..4).map(i -> count_ways(:LENGTH, i))))
+===
+template <typename T1, typename T2> auto count_ways(const T1 &length, const T2 &m)
+{
+    auto ways = create_array({to_int64(1)}) + create_array({to_int64(0)}) * length;
+    for (auto n : range_el(1, ways.len())) {
+        ways[n] += ways[n - 1];
+        if (n >= m)
+            ways[n] += ways[n - m];
+    }
+    return ways.last() - 1;
+}
+
+auto LENGTH = 50;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum_map(range_ee(2, 4), [](const auto &i){return count_ways(::LENGTH, i);}));
+    }
+} code_block_1;
+
+
+# 117
+Int64 = int
+
+LENGTH = 50
+ways = [Int64(1)] + [Int64(0)] * LENGTH
+for n in range(1, len(ways)):
+    ways[n] += sum(ways[max(n - 4, 0) : n])
+print(ways[-1])
+===
+V LENGTH = 50
+V ways = [Int64(1)] [+] [Int64(0)] * LENGTH
+L(n) 1 .< ways.len
+   ways[n] += sum(ways[max(n - 4, 0) .< n])
+print(ways.last)
+===
+auto LENGTH = 50;
+auto ways = create_array({to_int64(1)}) + create_array({to_int64(0)}) * LENGTH;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_el(1, ways.len()))
+            ways[n] += sum(ways[range_el(max(n - 4, 0), n)]);
+        print(ways.last());
+    }
+} code_block_1;
+
+
+# 118
+import eulerlib
+from _11l import next_permutation
+
+def compute():
+    isprime = eulerlib.list_primality(10000)  # Cache for small numbers
+    digits = list(range(1, 10))
+
+    def is_prime(n):
+        if n < len(isprime):
+            return bool(isprime[n])
+        else:
+            return eulerlib.is_prime(n)
+
+    def count_prime_sets(startindex : int, prevnum : int) -> int:
+        if startindex == len(digits):
+            return 1
+        else:
+            result = 0
+            for split in range(startindex + 1, len(digits) + 1):
+                num = int("".join(map(str, digits[startindex : split])))
+                if num > prevnum and is_prime(num):
+                    result += count_prime_sets(split, num)
+            return result
+
+    ans = 0
+    while True:
+        ans += count_prime_sets(0, 0)
+        if not next_permutation(digits):
+            break
+    return str(ans)
+
+print(compute())
+===
+F compute()
+   V isprime = eulerlib:list_primality(10000)
+   V digits = Array(1..9)
+
+   F is_prime(n)
+      I n < @isprime.len
+         R Bool(@isprime[n])
+      E
+         R eulerlib:is_prime(n)
+
+   F count_prime_sets(Int startindex, Int prevnum) -> Int
+      I startindex == @digits.len
+         R 1
+      E
+         V result = 0
+         L(split) startindex + 1 .. @digits.len
+            V num = Int(@digits[startindex .< split].map(String).join(‘’))
+            I num > prevnum & @is_prime(num)
+               result += @count_prime_sets(split, num)
+         R result
+
+   V ans = 0
+   L
+      ans += count_prime_sets(0, 0)
+      I !digits.next_permutation()
+         L.break
+   R String(ans)
+
+print(compute())
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto compute()
+{
+    auto isprime = eulerlib::list_primality(10000);
+    auto digits = create_array(range_ee(1, 9));
+
+    auto is_prime = [&isprime](const auto &n)
+    {
+        if (n < isprime.len())
+            return bool(isprime[n]);
+        else
+            return eulerlib::is_prime(n);
+    };
+
+    std::function<int(int, int)> count_prime_sets = [&count_prime_sets, &digits, &is_prime](const int startindex, const int prevnum) -> int
+    {
+        if (startindex == digits.len())
+            return 1;
+        else {
+            auto result = 0;
+            for (auto split : range_ee(startindex + 1, digits.len())) {
+                auto num = to_int(digits[range_el(startindex, split)].map([](const auto &x){return String(x);}).join(u""_S));
+                if (num > prevnum && is_prime(num))
+                    result += count_prime_sets(split, num);
+            }
+            return result;
+        }
+    };
+
+    auto ans = 0;
+    while (true) {
+        ans += count_prime_sets(0, 0);
+        if (!digits.next_permutation())
+            break;
+    }
+    return String(ans);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
+
+
+# 119
+import itertools
+BigInt = int
+
+def is_digit_sum_power(x):
+    digitsum = sum(int(c) for c in str(x))
+    if digitsum == 1:  # Powers of 10 are never a power of 1
+        return False
+    pow = BigInt(digitsum)
+    while pow < x:
+        pow *= digitsum
+    return pow == x
+
+def compute():
+    INDEX = 30  # 1-based
+    limit = BigInt(1)
+    while True:
+        candidates = set() # BigInt
+        k = 2
+        #while (1 << k) < limit:
+        while (BigInt(2) ** k) < limit:
+            for n in itertools.count(2):
+                power = BigInt(n)**k
+                if power >= limit and len(str(power)) * 9 < n:
+                    break
+                if power >= 10 and is_digit_sum_power(power):
+                    candidates.add(power)
+            k += 1
+        if len(candidates) >= INDEX:
+            return str(sorted(list(candidates))[INDEX - 1])
+        #limit <<= 8
+        limit *= 256
+
+print(compute())
+===
+F is_digit_sum_power(x)
+   V digitsum = sum(String(x).map(c -> Int(c)))
+   I digitsum == 1
+      R 0B
+   V pow = BigInt(digitsum)
+   L pow < x
+      pow *= digitsum
+   R pow == x
+
+F compute()
+   V INDEX = 30
+   V limit = BigInt(1)
+   L
+      V candidates = Set[BigInt]()
+      V k = 2
+      L (BigInt(2) ^ k) < limit
+         L(n) 2..
+            V power = BigInt(n) ^ k
+            I power >= limit & String(power).len * 9 < n
+               L.break
+            I power >= 10 & is_digit_sum_power(power)
+               candidates.add(power)
+         k++
+      I candidates.len >= INDEX
+         R String(sorted(Array(candidates))[INDEX - 1])
+      limit *= 256
+
+print(compute())
+===
+template <typename T1> auto is_digit_sum_power(const T1 &x)
+{
+    auto digitsum = sum_map(String(x), [](const auto &c){return to_int(c);});
+    if (digitsum == 1)
+        return false;
+    auto pow = BigInt(digitsum);
+    while (pow < x)
+        pow *= digitsum;
+    return pow == x;
+}
+
+auto compute()
+{
+    auto INDEX = 30;
+    auto limit = BigInt(1);
+    while (true) {
+        auto candidates = Set<BigInt>();
+        auto k = 2;
+        while ((pow(BigInt(2), k)) < limit) {
+            for (auto n : range_ei(2)) {
+                auto power = pow(BigInt(n), k);
+                if (power >= limit && String(power).len() * 9 < n)
+                    break;
+                if (power >= 10 && is_digit_sum_power(power))
+                    candidates.add(power);
+            }
+            k++;
+        }
+        if (candidates.len() >= INDEX)
+            return String(sorted(create_array(candidates))[INDEX - 1]);
+        limit *= 256;
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
