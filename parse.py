@@ -537,7 +537,7 @@ class SymbolNode:
                             assert(s)
                     elif func_name.endswith('.map') and self.children[2].token.category == Token.Category.NAME and self.children[2].token_str()[0].isupper():
                         c2 = self.children[2].to_str()
-                        return func_name + '([](const auto &x){return ' + {'Int':'to_int', 'Int64':'to_int64', 'UInt64':'to_uint64', 'UInt32':'to_uint32', 'Float':'to_float'}.get(c2, c2) + '(x);})'
+                        return func_name + '([](const auto &x){return ' + {'Int':'to_int', 'Int64':'to_int64', 'UInt64':'to_uint64', 'UInt32':'to_uint32', 'Float':'to_float', 'SFloat':'to_float32', 'Float32':'to_float32'}.get(c2, c2) + '(x);})'
                     elif func_name.endswith('.split'):
                         f_node = type_of(self.children[0])
                         if f_node is None: # assume this is String method
@@ -565,8 +565,8 @@ class SymbolNode:
                         return int_from_bytes + '(' + self.children[2].to_str() + ')'
                     func_name = {'Int':'to_int', 'Int64':'to_int64', 'UInt64':'to_uint64', 'Int32':'to_int32', 'UInt32':'to_uint32', 'Int16':'to_int16', 'UInt16':'to_uint16', 'Int8':'to_int8', 'Byte':'Byte'}[func_name]
                     f_node = builtins_scope.find('Int').ast_nodes[0].constructors[0]
-                elif func_name == 'Float':
-                    func_name = 'to_float'
+                elif func_name in ('Float', 'SFloat', 'Float32', 'Float64'):
+                    func_name = 'to_float' + '32'*(func_name in ('SFloat', 'Float32'))
                 elif func_name == 'Char' and self.children[2].token.category == Token.Category.STRING_LITERAL:
                     assert(self.children[1] is None) # [-TODO: write a good error message-]
                     if not is_char(self.children[2]):
@@ -606,7 +606,7 @@ class SymbolNode:
                     assert(len(self.children) == 3)
                     c2 = self.children[2].children[2].to_str()
                     if self.children[2].children[2].token.category == Token.Category.NAME and self.children[2].children[2].token_str()[0].isupper():
-                        c2 = '[](const auto &x){return ' + {'Int':'to_int', 'Int64':'to_int64', 'UInt64':'to_uint64', 'UInt32':'to_uint32', 'Float':'to_float'}.get(c2, c2) + '(x);}'
+                        c2 = '[](const auto &x){return ' + {'Int':'to_int', 'Int64':'to_int64', 'UInt64':'to_uint64', 'UInt32':'to_uint32', 'Float':'to_float', 'SFloat':'to_float32', 'Float32':'to_float32'}.get(c2, c2) + '(x);}'
                     return func_name + '_map(' + self.children[2].children[0].children[0].to_str() + ', ' + c2 + ')'
                 elif func_name in ('min', 'max') and len(self.children) == 5 and self.children[3] is not None and self.children[3].token_str() == "key'":
                     return func_name + '_with_key(' + self.children[2].to_str() + ', ' + self.children[4].to_str() + ')'
@@ -890,7 +890,7 @@ class SymbolNode:
                             if frtid is not None and len(frtid.ast_nodes) == 1 and type(frtid.ast_nodes[0]) == ASTTypeDefinition and frtid.ast_nodes[0].has_pointers_to_the_same_type:
                                 return self.children[0].to_str() + '->' + c1
 
-                if cts0 in ('Float', 'Float32') and c1 == 'infinity':
+                if cts0 in ('Float', 'SFloat', 'Float32', 'Float64') and c1 == 'infinity':
                     return 'std::numeric_limits<' + cpp_type_from_11l[cts0] + '>::infinity()'
 
                 id_, s = self.scope.find_and_return_scope(cts0.lstrip('@='))
@@ -1179,7 +1179,8 @@ class ASTExpression(ASTNodeWithExpression):
         return self.pre_nl + ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
 cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'пер':'auto',
-                     'Int':'int', 'Int64':'Int64', 'UInt64':'UInt64', 'Int32':'int32_t', 'UInt32':'uint32_t', 'Int16':'int16_t', 'UInt16':'uint16_t', 'BigInt':'BigInt', 'Float':'double', 'Float32':'float', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Int8':'int8_t', 'Byte':'Byte', 'Bytes':'Array<Byte>',
+                     'Int':'int', 'Int64':'Int64', 'UInt64':'UInt64', 'Int32':'int32_t', 'UInt32':'uint32_t', 'Int16':'int16_t', 'UInt16':'uint16_t', 'Int8':'int8_t', 'BigInt':'BigInt',
+                     'Float':'double', 'SFloat':'float', 'Float32':'float', 'Float64':'double', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte', 'Bytes':'Array<Byte>',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
                      'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque', 'Counter':'Counter'}
 
@@ -1248,8 +1249,8 @@ def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False
                 return 'std::function<' + trans_type(tylist[-1], scope, type_token, ast_type_node) + '(' + ', '.join(trans_ty(t) for t in tylist[:-1]) + ')>'
             if ty.startswith('Tuple['): # ]
                 tuple_types = ty[6:-1].split(', ')
-                if tuple_types[0] in ('Int', 'Int64', 'Float32', 'Float') and tuple_types.count(tuple_types[0]) == len(tuple_types) and len(tuple_types) in range(2, 5):
-                    return {'Int':'i', 'Int64':'ll', 'Float32':'', 'Float':'d'}[tuple_types[0]] + 'vec' + str(len(tuple_types))
+                if tuple_types[0] in ('Int', 'Int64', 'Float32', 'SFloat', 'Float') and tuple_types.count(tuple_types[0]) == len(tuple_types) and len(tuple_types) in range(2, 5):
+                    return {'Int':'i', 'Int64':'ll', 'Float32':'', 'SFloat':'', 'Float':'d'}[tuple_types[0]] + 'vec' + str(len(tuple_types))
             return (trans_type(ty[:p], scope, type_token, ast_type_node) if p != 0 else 'Array') + '<' + trans_type(ty[p+1:-1], scope, type_token, ast_type_node) + '>'
         p = ty.find(',')
         if p != -1:

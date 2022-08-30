@@ -1095,6 +1095,16 @@ inline double to_float(UInt64   i) { return (double)i; }
 inline double to_float(float    f) { return f; }
 inline double to_float(double   d) { return d; }
 
+template <typename T> inline float to_float32(const T &t) {return (float)t;}
+inline float to_float32(const String &str)
+{
+	return (float)atof(str.to_string().c_str());
+}
+inline float to_float32(Char ch)
+{
+	return ch.is_digit() ? float(ch.code - '0') : throw ValueError(ch);
+}
+
 inline double parse_float(const char16_t *s)
 {
 	double res = 0, f = 1, sign = 1;
