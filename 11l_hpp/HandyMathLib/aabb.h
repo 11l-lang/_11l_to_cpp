@@ -4,8 +4,10 @@
 #include "func.h"
 #include <string.h> // for memcmp [in GCC]
 
-template <class T> T minimum(const T &t1, const T &t2) {return min(t1, t2);}
-template <class T> T maximum(const T &t1, const T &t2) {return max(t1, t2);}
+template <class T> INLINE T minimum(const T &t1, const T &t2) {return min(t1, t2);}
+template <class T> INLINE T maximum(const T &t1, const T &t2) {return max(t1, t2);}
+template <class T, int N> INLINE Tvec<T,N> minimum(const Tvec<T,N> &t1, const Tvec<T,N> &t2) {return mincw(t1, t2);}
+template <class T, int N> INLINE Tvec<T,N> maximum(const Tvec<T,N> &t1, const Tvec<T,N> &t2) {return maxcw(t1, t2);}
 
 
 template <class T> class Trange

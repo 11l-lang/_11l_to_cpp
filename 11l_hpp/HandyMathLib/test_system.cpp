@@ -3,6 +3,7 @@
 //#define MAKE_TESTS
 #define _CRT_SECURE_NO_WARNINGS
 
+#include <stdint.h> // for int64_t in func.h
 #include "hm.h"
 
 #include <iostream>
@@ -555,8 +556,8 @@ int main()
 	TEST(max(8,10),10);
 	TEST(min(vec3(1,2,3)),1);
 	TEST(max(ivec3(1,2,3)),3);
-	TEST(min(dvec3(1,2,3),dvec3(3,2,1)),dvec3(1,2,1));
-	TEST(max(ldvec3(1,2,3),ldvec3(3,2,1)),ldvec3(3,2,3));
+	TEST(mincw(dvec3(1,2,3),dvec3(3,2,1)),dvec3(1,2,1));
+	TEST(maxcw(ldvec3(1,2,3),ldvec3(3,2,1)),ldvec3(3,2,3));
 	TEST(clamp(-1,4,6),4);
 	TEST(clamp(5.0,4.0,6.0),5);
 	TEST(clamp(7.0f,4.0f,6.0f),6);
@@ -566,9 +567,9 @@ int main()
 	TEST(cerp(vec2(1,3),vec2(3,0),.75f),vec2(2.70711f,0.43934f));
 	TEST(herp3(vec2(1,3),vec2(3,0),.75f),vec2(2.6875f,0.46875f));
 	TEST(herp5(vec2(1,3),vec2(3,0),.75f),vec2(2.79297f,0.310547f));
-	TEST(step(1,2),1);
-	TEST(step(3,3),1);
-	TEST(step(4,0),0);
+//	TEST(step(1,2),1);
+//	TEST(step(3,3),1);
+//	TEST(step(4,0),0);
 	TEST(equal(smoothstep(10.0,20.0,12.0),0.104),HMtrue);
 	TEST(equal(smoothstep(10.0,20.0,2.0),0.0),HMtrue);
 	TEST(equal(smoothstep(10.0,20.0,22.0),1.0),HMtrue);
