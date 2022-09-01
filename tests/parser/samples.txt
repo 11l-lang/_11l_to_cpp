@@ -1558,10 +1558,15 @@ T Starship
    [String = Int] :stats
    Int :i1
    Int :i2 = 1
+   :i3 = 2
+
+   F f()
+      .:i1 = 3
 
 print(Starship.:stats)
 print(Starship.:i1)
 print(Starship.:i2)
+print(Starship.:i3)
 ===
 class Starship
 {
@@ -1569,6 +1574,12 @@ public:
     static inline Dict<String, int> s_stats;
     static inline int s_i1;
     static inline int s_i2 = 1;
+    static inline auto s_i3 = 2;
+
+    auto f()
+    {
+        s_i1 = 3;
+    }
 };
 
 struct CodeBlock1
@@ -1578,5 +1589,6 @@ struct CodeBlock1
         print(Starship::s_stats);
         print(Starship::s_i1);
         print(Starship::s_i2);
+        print(Starship::s_i3);
     }
 } code_block_1;

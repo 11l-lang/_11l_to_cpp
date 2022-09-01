@@ -828,6 +828,8 @@ class SymbolNode:
                     return 'this->' + c0
                 else:
                     return c0
+            elif self.symbol.id == '.:':
+                return 's_' + self.children[0].to_str()
             elif self.symbol.id == '..':
                 c0 = self.children[0].to_str()
                 if c0.startswith('(len)'):
@@ -1179,6 +1181,8 @@ class ASTProgram(ASTNodeWithChildren):
 class ASTExpression(ASTNodeWithExpression):
     def to_str(self, indent):
         if self.expression.symbol.id == '=' and type(self.parent) == ASTTypeDefinition:
+            if self.expression.children[0].symbol.id == ':' and len(self.expression.children[0].children) == 1:
+                return self.pre_nl + ' ' * (indent*4) + 'static inline auto s_' + self.expression.children[0].children[0].to_str() + ' = ' + self.expression.children[1].to_str() + ";\n"
             return self.pre_nl + ' ' * (indent*4) + 'decltype(' + self.expression.children[1].to_str() + ') ' + self.expression.to_str() + ";\n"
         return self.pre_nl + ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
@@ -2262,7 +2266,7 @@ prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('(-)', 130); prefix
 infix_r('^', 140)
 
 symbol('.', 150); symbol(':', 150); symbol('.:', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('T?', 150); postfix('T:', 150); postfix('--', 150); postfix('++', 150)
-prefix('.', 150); prefix(':', 150)
+prefix('.', 150); prefix(':', 150); prefix('.:', 150)
 
 infix_r('=', 10); infix_r('+=', 10); infix_r('-=', 10); infix_r('*=', 10); infix_r('/=', 10); infix_r('I/=', 10); infix_r('Ц/=', 10); infix_r('%=', 10); infix_r('>>=', 10); infix_r('<<=', 10); infix_r('^=', 10)
 infix_r('[+]=', 10); infix_r('[&]=', 10); infix_r('[|]=', 10); infix_r('(+)=', 10); infix_r('‘’=', 10)
