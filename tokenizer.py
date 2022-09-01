@@ -630,6 +630,8 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
 
             elif ch in (',', '.', ':'):
                 category = Token.Category.DELIMITER
+                if ch == '.' and i < len(source) and source[i] == ':': # for `.:`
+                    i += 1
 
             elif ch in '([':
                 if source[lexem_start:lexem_start+3] == '(.)':

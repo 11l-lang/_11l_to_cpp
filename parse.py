@@ -923,6 +923,10 @@ class SymbolNode:
                       'random':'randomns'}.get(c0, c0) # GCC: .../11l-lang/_11l_to_cpp/11l_hpp/random.hpp:1:11: error: ‘namespace random { }’ redeclared as different kind of symbol
                 c1 = self.children[1].to_str()
                 return c0 + '::' + (c1 if c1 != '' else '_')
+
+            elif self.symbol.id == '.:':
+                return self.children[0].to_str() + '::s_' + self.children[1].to_str()
+
             elif self.symbol.id == '->':
                 captured_variables = set()
                 def gather_captured_variables(sn, capture_level = 0):
@@ -1059,7 +1063,7 @@ def symbol(id, bp = 0):
         s.id = id
         s.lbp = bp
         symbol_table[id] = s
-        if id[0].isalpha() and not id in ('I/', 'Ц/', 'I/=', 'Ц/=', 'C', 'С', 'in', 'св', 'T?'): # this is keyword-in-expression
+        if id[0].isalpha() and not id in ('I/', 'Ц/', 'I/=', 'Ц/=', 'C', 'С', 'in', 'св', 'T?', 'T:'): # this is keyword-in-expression
             assert(id.isalpha() or id in ('L.last_iteration', 'Ц.последняя_итерация', 'loop.last_iteration', 'цикл.последняя_итерация'))
             allowed_keywords_in_expressions.append(id)
     else:
@@ -1274,6 +1278,7 @@ class ASTVariableDeclaration(ASTNode):
     type : str
     type_args : List[str]
     is_const = False
+    is_static = False
     function_pointer = False
     is_reference = False
     scope : Scope
@@ -1302,7 +1307,9 @@ class ASTVariableDeclaration(ASTNode):
             if not tt.startswith(('std::unique_ptr<', 'Nullable<')):
                 assert(not self.is_const and not self.is_reference)
                 return ' ' * (indent*4) + 'Nullable<' + tt + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + '> ' + ', '.join(self.vars) + ";\n"
-        return self.pre_nl + ' ' * (indent*4) + 'const '*self.is_const + self.trans_type(self.type, self.is_reference) + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + ' ' + '*'*self.is_reference + ', '.join(self.vars) + ";\n"
+        return self.pre_nl + ' ' * (indent*4) + 'const '*self.is_const + 'static inline '*self.is_static + self.trans_type(self.type, self.is_reference) \
+                           + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') \
+                           + ' ' + '*'*self.is_reference + 's_'*self.is_static + ', '.join(self.vars) + ";\n"
 
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
     def to_str(self, indent):
@@ -2160,6 +2167,11 @@ def next_token(): # why ‘next_token’: >[https://youtu.be/Nlqv6NtBXcA?t=1203]
                 key = token.value(source)
                 if key == '?' and source[token.end] in (' ', "\n") and source[token.start-1] != ' ': # for `(Char, [Int])?` (but `i?1` must be equivalent to `i ? 1`)
                     key = 'T?'
+                elif key == ':' and source[token.start-1] == ' ' and source[token.end] != ' ': # for `Int :i1`
+                    if tokens[tokeni-1].category not in (Token.Category.KEYWORD, Token.Category.OPERATOR): # for `I :argv.len == 1` and `L n !C :p`
+                        pc = source[token.start-2] # [[
+                        if pc.isalpha() or pc.isdigit() or pc in '_]': # in 11l: `I source[token.start-2]. {.is_alpha() | .is_digit() | (.) C ‘_]’}`
+                            key = 'T:'
             tokensn.symbol = symbol_table[key]
 
 def advance(value):
@@ -2249,7 +2261,7 @@ prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('(-)', 130); prefix
 
 infix_r('^', 140)
 
-symbol('.', 150); symbol(':', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('T?', 150); postfix('--', 150); postfix('++', 150)
+symbol('.', 150); symbol(':', 150); symbol('.:', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('T?', 150); postfix('T:', 150); postfix('--', 150); postfix('++', 150)
 prefix('.', 150); prefix(':', 150)
 
 infix_r('=', 10); infix_r('+=', 10); infix_r('-=', 10); infix_r('*=', 10); infix_r('/=', 10); infix_r('I/=', 10); infix_r('Ц/=', 10); infix_r('%=', 10); infix_r('>>=', 10); infix_r('<<=', 10); infix_r('^=', 10)
@@ -2314,6 +2326,15 @@ def led(self, left):
     next_token()
     return self
 symbol('.').led = led
+
+def led(self, left):
+    if token.category != Token.Category.NAME:
+        raise Error('expected an attribute name', token)
+    self.append_child(left)
+    self.append_child(tokensn)
+    next_token()
+    return self
+symbol('.:').led = led
 
 class Module:
     scope : Scope
@@ -3229,6 +3250,10 @@ def parse_internal(this_node):
                     is_nullable = False
                     if node.type == '?' and len(node_expression.children) == 1:
                         is_nullable = True
+                        node_expression = node_expression.children[0]
+                        node.type = node_expression.token_str()
+                    if node.type == ':' and len(node_expression.children) == 1:
+                        node.is_static = True
                         node_expression = node_expression.children[0]
                         node.type = node_expression.token_str()
                     node.type_token = node_expression.token

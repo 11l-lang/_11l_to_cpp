@@ -1552,3 +1552,31 @@ auto d = create_dict(dict_of(1, u's'_C));
 [Tuple[Int, Int] = String] t
 ===
 Dict<ivec2, String> t;
+
+
+T Starship
+   [String = Int] :stats
+   Int :i1
+   Int :i2 = 1
+
+print(Starship.:stats)
+print(Starship.:i1)
+print(Starship.:i2)
+===
+class Starship
+{
+public:
+    static inline Dict<String, int> s_stats;
+    static inline int s_i1;
+    static inline int s_i2 = 1;
+};
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(Starship::s_stats);
+        print(Starship::s_i1);
+        print(Starship::s_i2);
+    }
+} code_block_1;
