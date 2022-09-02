@@ -1664,3 +1664,31 @@ struct CodeBlock1
         Ty::SubTy::SubSubTy::s_g(2);
     }
 } code_block_1;
+
+
+F fake_random()
+   -V seq = [3, 1, 2, 4, 7, 5, 6]
+   //:V n = 0 //static variable
+   V :n = 0 //static variable
+   :n = (:n + 1) % seq.len
+   R seq[:n]
+
+L 3
+   print(fake_random())
+===
+auto fake_random()
+{
+    const auto seq = create_array({3, 1, 2, 4, 7, 5, 6});
+    static auto s_n = 0;
+    s_n = mod((s_n + 1), seq.len());
+    return seq[s_n];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int Lindex = 0; Lindex < 3; Lindex++)
+            print(fake_random());
+    }
+} code_block_1;

@@ -84,12 +84,12 @@ class Scope:
         s = self
         while True:
             if name in s.ids:
-                return True
+                return s.ids[name]
             if s.is_function:
-                return False
+                return None
             s = s.parent
             if s is None:
-                return False
+                return None
 
     def find_in_current_type_function(self, name):
         s = self
@@ -826,6 +826,9 @@ class SymbolNode:
                 c0 = self.children[0].to_str()
                 if c0 in ('stdin', 'stdout', 'stderr'):
                     return '_' + c0
+                tid = self.scope.find_in_current_function(c0)
+                if tid is not None and isinstance(tid.ast_nodes[0], ASTVariableDeclaration) and tid.ast_nodes[0].is_static:
+                    return 's_' + c0
                 if importing_module:
                     return os.path.basename(file_name)[:-4] + '::' + c0
                 return '::' + c0
@@ -1341,7 +1344,10 @@ class ASTVariableDeclaration(ASTNode):
             if not tt.startswith(('std::unique_ptr<', 'Nullable<')):
                 assert(not self.is_const and not self.is_reference)
                 return ' ' * (indent*4) + 'Nullable<' + tt + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') + '> ' + ', '.join(self.vars) + ";\n"
-        return self.pre_nl + ' ' * (indent*4) + 'const '*self.is_const + 'static inline '*self.is_static + self.trans_type(self.type, self.is_reference) \
+        static_decl = ''
+        if self.is_static:
+            static_decl = 'static inline ' if type(self.parent) == ASTTypeDefinition else 'static '
+        return self.pre_nl + ' ' * (indent*4) + 'const '*self.is_const + static_decl + self.trans_type(self.type, self.is_reference) \
                            + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') \
                            + ' ' + '*'*self.is_reference + 's_'*self.is_static + ', '.join(self.vars) + ";\n"
 
