@@ -1563,7 +1563,11 @@ T Starship
    F f()
       .:i1 = 3
 
+   F :set_i1(a, b)
+      Starship.:i1 = a + b
+
 print(Starship.:stats)
+Starship.set_i1(1, 2)
 print(Starship.:i1)
 print(Starship.:i2)
 print(Starship.:i3)
@@ -1580,6 +1584,11 @@ public:
     {
         s_i1 = 3;
     }
+
+    template <typename T1, typename T2> static auto s_set_i1(const T1 &a, const T2 &b)
+    {
+        Starship::s_i1 = a + b;
+    }
 };
 
 struct CodeBlock1
@@ -1587,6 +1596,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         print(Starship::s_stats);
+        Starship::s_set_i1(1, 2);
         print(Starship::s_i1);
         print(Starship::s_i2);
         print(Starship::s_i3);

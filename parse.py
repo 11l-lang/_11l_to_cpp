@@ -907,6 +907,10 @@ class SymbolNode:
                         tid = self.scope.find(id_.ast_nodes[0].type)#.rstrip('?'))
                         if tid is not None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
                             return cts0 + '->' + c1
+                    if len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTTypeDefinition:
+                        for child in id_.ast_nodes[0].children:
+                            if type(child) == ASTFunctionDefinition and child.is_static and child.function_name == c1:
+                                return cts0 + '::s_' + c1
                     if id_.type != '' and s.is_function:
                         tid = s.find(id_.type)
                         if tid is not None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
@@ -1359,6 +1363,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
     function_name : str = ''
     function_return_type : str = ''
     is_const = False
+    is_static = False
     function_arguments : List[Tuple[str, str, str, str]]# = [] # (arg_name, default_value, type_, qualifier)
     first_named_only_argument = None
     last_non_default_argument : int
@@ -1400,7 +1405,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 s = 'operator String'
                 is_const = True
             else:
-                s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + \
+                s = 'static '*self.is_static + ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + 's_'*self.is_static + \
                     {'()':'operator()', '[&]':'operator&', '<':'operator<', '==':'operator==', '+':'operator+', '-':'operator-', '*':'operator*', '/':'operator/'}.get(self.function_name, self.function_name)
 
             if self.virtual_category != self.VirtualCategory.NO:
@@ -2644,6 +2649,11 @@ def parse_internal(this_node):
                 next_token()
                 if node.function_name != '(destructor)':
                     if token.category == Token.Category.NAME:
+                        node.function_name = tokensn.token_str()
+                        next_token()
+                    elif token.value(source) == ':' and peek_token().category == Token.Category.NAME:
+                        node.is_static = True
+                        next_token()
                         node.function_name = tokensn.token_str()
                         next_token()
                     elif token.value(source) == '(': # this is constructor [`F () {...}` or `F (...) {...}`] or operator() [`F ()(...) {...}`]
