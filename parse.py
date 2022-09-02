@@ -2081,8 +2081,15 @@ def type_of(sn):
         if type(left) == ASTLoop:
             return None
 
-    if type(left) in (ASTTypeDefinition, ASTTupleInitialization, ASTTupleAssignment):
+    if type(left) in (ASTTupleInitialization, ASTTupleAssignment):
         return None # [-TODO-]
+    if type(left) == ASTTypeDefinition:
+        tid = left.find_id_including_base_types(sn.children[1].token_str())
+        if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTTypeDefinition, ASTFunctionDefinition, ASTTypeEnum)):
+            raise Error('identifier `' + sn.children[1].token_str() + '` is not found in type `' + left.type_name + '`', sn.left_to_right_token())
+        if type(tid.ast_nodes[0]) == ASTTypeEnum:
+            return None # [-TODO-]
+        return tid.ast_nodes[0]
     if type(left) not in (ASTVariableDeclaration, ASTVariableInitialization):
         raise Error('left type is `' + str(type(left)) + '`', sn.left_to_right_token())
     if left.type in ('V', 'П', 'var', 'пер', 'V?', 'П?', 'var?', 'пер?', 'V&', 'П&', 'var&', 'пер&'): # for `V selection_strings = ... selection_strings.map(...)`

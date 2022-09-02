@@ -1573,6 +1573,7 @@ T Starship
 
 print(Starship.:stats)
 Starship.set_i1(1, 2)
+Starship.set_i1(a' 1, b' 2)
 print(Starship.:i1)
 print(Starship.:i2)
 print(Starship.:i3)
@@ -1610,6 +1611,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         print(Starship::s_stats);
+        Starship::s_set_i1(1, 2);
         Starship::s_set_i1(1, 2);
         print(Starship::s_i1);
         print(Starship::s_i2);
