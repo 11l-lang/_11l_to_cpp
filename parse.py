@@ -635,6 +635,25 @@ class SymbolNode:
                 else:
                     if self.children[0].symbol.id == ':':
                         fid, sc = find_module(self.children[0].children[0].to_str()).scope.find_and_return_scope(self.children[0].children[1].token_str())
+                    elif self.children[0].symbol.id == '.:':
+                        fn_name = self.children[0].children[0].token_str()
+                        fid = None
+                        sc = self.scope
+                        while True:
+                            if type(sc.node) == ASTTypeDefinition:
+                                for child in sc.node.children:
+                                    if type(child) == ASTFunctionDefinition and child.is_static and child.function_name == fn_name:
+                                        for id_ in sc.ids.values():
+                                            if id_.ast_nodes[0] is child:
+                                                fid = id_
+                                                break
+                                        if fid is not None:
+                                            break
+                                if fid is not None:
+                                    break
+                            sc = sc.parent
+                            if sc is None:
+                                break
                     else:
                         fid, sc = self.scope.find_and_return_scope(func_name)
                     if fid is None:
@@ -3323,7 +3342,8 @@ def parse_internal(this_node):
                     node = ASTExpression()
                     node.set_expression(node_expression)
                     if isinstance(this_node, ASTTypeDefinition) and node_expression.symbol.id == '=': # fix error ‘identifier `disInter` is not found in `r`’ in '9.yopyra.py'
-                        scope.add_name(node_expression.children[0].token_str(), node)
+                        c0 = node_expression.children[0]
+                        scope.add_name(c0.children[0].token_str() if c0.symbol.id == ':' and len(c0.children) == 1 else c0.token_str(), node)
 
                 node.pre_nl = npre_nl
 

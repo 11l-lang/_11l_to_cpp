@@ -1560,16 +1560,23 @@ T Starship
    Int :i2 = 1
    :i3 = 2
 
+   F :set_i3(i3)
+      .:i3 = i3
+
    F f()
       .:i1 = 3
+      .:set_i3(4)
 
    F :set_i1(a, b)
-      Starship.:i1 = a + b
+      .:i1 = a + b
+      .:set_i3(5)
 
 print(Starship.:stats)
 Starship.set_i1(1, 2)
 print(Starship.:i1)
 print(Starship.:i2)
+print(Starship.:i3)
+Starship().f()
 print(Starship.:i3)
 ===
 class Starship
@@ -1580,14 +1587,21 @@ public:
     static inline int s_i2 = 1;
     static inline auto s_i3 = 2;
 
+    template <typename T1> static auto s_set_i3(const T1 &i3)
+    {
+        s_i3 = i3;
+    }
+
     auto f()
     {
         s_i1 = 3;
+        s_set_i3(4);
     }
 
     template <typename T1, typename T2> static auto s_set_i1(const T1 &a, const T2 &b)
     {
-        Starship::s_i1 = a + b;
+        s_i1 = a + b;
+        s_set_i3(5);
     }
 };
 
@@ -1599,6 +1613,8 @@ struct CodeBlock1
         Starship::s_set_i1(1, 2);
         print(Starship::s_i1);
         print(Starship::s_i2);
+        print(Starship::s_i3);
+        Starship().f();
         print(Starship::s_i3);
     }
 } code_block_1;
