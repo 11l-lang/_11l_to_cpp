@@ -156,7 +156,7 @@ struct CodeBlock2
 
 
 # https://www.rosettacode.org/wiki/Balanced_ternary#Python
-from typing import List
+from typing import ClassVar, List
 from functools import reduce
 
 def py_idiv(a, b): # ‘floored quotient of x and y’/‘python floor division implementation’
@@ -165,38 +165,11 @@ def py_idiv(a, b): # ‘floored quotient of x and y’/‘python floor division 
     #return (a - b + 1) // b
     return -(-(a - b + 1) // b)
 
-def BalancedTernary_int2ternary(n):
-    if n == 0: return [0]*0
-    n3 = ((n % 3) + 3) % 3
-    if n3 == 0: return [0] + BalancedTernary_int2ternary(py_idiv(n, 3))
-    if n3 == 1: return [1] + BalancedTernary_int2ternary(py_idiv(n, 3))
-    if n3 == 2: return [-1] + BalancedTernary_int2ternary(py_idiv((n + 1), 3))
-    raise RuntimeError('')
-
-def BalancedTernary_neg(digs):
-    return [-d for d in digs]
-
-table = [(0, -1), (1, -1), (-1, 0), (0, 0), (1, 0), (-1, 1), (0, 1)] # immutable
-
-def BalancedTernary_add(a, b, c=0):
-    if not (len(a) != 0 and len(b) != 0):
-        if c == 0:
-            return a if len(a) else b
-        else:
-            return BalancedTernary_add([c], a if len(a) else b)
-    else:
-        (d, c) = table[3 + (a[0] if len(a) else 0) + (b[0] if len(b) else 0) + c]
-        res = BalancedTernary_add(a[1:], b[1:], c)
-        # trim leading zeros
-        if len(res) != 0 or d != 0:
-            return [d] + res
-        else:
-            return res
-
-BalancedTernary_str2dig = {'+': 1, '-': -1, '0': 0} # immutable
-BalancedTernary_dig2str = {1: '+', -1: '-', 0: '0'} # immutable
-
 class BalancedTernary:
+    str2dig : ClassVar = {'+': 1, '-': -1, '0': 0} # immutable
+    dig2str : ClassVar = {1: '+', -1: '-', 0: '0'} # immutable
+    table : ClassVar = [(0, -1), (1, -1), (-1, 0), (0, 0), (1, 0), (-1, 1), (0, 1)] # immutable
+
     # Represented as a list of 0, 1 or -1s, with least significant digit first.
     digits : List[int]
 
@@ -206,22 +179,51 @@ class BalancedTernary:
         else:
             raise ValueError("BalancedTernary: Wrong input digits.")
 
+    @staticmethod
+    def int2ternary(n):
+        if n == 0: return [0]*0
+        n3 = ((n % 3) + 3) % 3
+        if n3 == 0: return [0] + BalancedTernary.int2ternary(py_idiv(n, 3))
+        if n3 == 1: return [1] + BalancedTernary.int2ternary(py_idiv(n, 3))
+        if n3 == 2: return [-1] + BalancedTernary.int2ternary(py_idiv((n + 1), 3))
+        raise RuntimeError('')
+
     def to_int(self):
         return reduce(lambda y,x: x + 3 * y, reversed(self.digits), 0)
 
     def __str__(self):
         if len(self.digits) == 0: return "0"
-        return "".join(BalancedTernary_dig2str[d] for d in reversed(self.digits))
+        return "".join(BalancedTernary.dig2str[d] for d in reversed(self.digits))
 
-    # def __neg__(self):
-    #     return BalancedTernary(BalancedTernary_neg(self.digits))
+    @staticmethod
+    def neg(digs):
+        return [-d for d in digs]
+
+    def __neg__(self):
+        return BalancedTernary(BalancedTernary.neg(self.digits))
+
+    @staticmethod
+    def add(a, b, c=0):
+        if not (len(a) != 0 and len(b) != 0):
+            if c == 0:
+                return a if len(a) else b
+            else:
+                return BalancedTernary.add([c], a if len(a) else b)
+        else:
+            (d, c) = BalancedTernary.table[3 + (a[0] if len(a) else 0) + (b[0] if len(b) else 0) + c]
+            res = BalancedTernary.add(a[1:], b[1:], c)
+            # trim leading zeros
+            if len(res) != 0 or d != 0:
+                return [d] + res
+            else:
+                return res
 
     def __add__(self, b):
-        return BalancedTernary(BalancedTernary_add(self.digits, b.digits))
+        return BalancedTernary(BalancedTernary.add(self.digits, b.digits))
 
     def __sub__(self, b):
-        #return self + (-b)
-        return self + BalancedTernary(BalancedTernary_neg(b.digits))
+        return self + (-b)
+        #return self + BalancedTernary(BalancedTernary_neg(b.digits))
 
     def __mul__(self, b):
         def _mul(a : List[int], b : List[int]) -> List[int]:
@@ -229,19 +231,19 @@ class BalancedTernary:
                 return [0]*0
             else:
                 x : List[int] = []
-                if   a[0] == -1: x = BalancedTernary_neg(b)
+                if   a[0] == -1: x = BalancedTernary.neg(b)
                 elif a[0] ==  0: pass#x = []
                 elif a[0] ==  1: x = b
                 else: assert False
                 y = [0] + _mul(list(a[1:]), b)
-                return BalancedTernary_add(x, y)
+                return BalancedTernary.add(x, y)
 
         return BalancedTernary(_mul(list(self.digits), list(b.digits)))
 
 def createBalancedTernaryFromStr(inp):
-    return BalancedTernary([BalancedTernary_str2dig[c] for c in reversed(inp)])
+    return BalancedTernary([BalancedTernary.str2dig[c] for c in reversed(inp)])
 def createBalancedTernaryFromInt(inp):
-    return BalancedTernary(BalancedTernary_int2ternary(inp))
+    return BalancedTernary(BalancedTernary.int2ternary(inp))
 
 a = createBalancedTernaryFromStr("+-0++0+")
 print("a:", a.to_int(), a)
@@ -260,41 +262,11 @@ F py_idiv(a, b)
       R a I/ b
    R -(-(a - b + 1) I/ b)
 
-F BalancedTernary_int2ternary(n)
-   I n == 0
-      R [Int]()
-   V n3 = ((n % 3) + 3) % 3
-   I n3 == 0
-      R [0] [+] BalancedTernary_int2ternary(py_idiv(n, 3))
-   I n3 == 1
-      R [1] [+] BalancedTernary_int2ternary(py_idiv(n, 3))
-   I n3 == 2
-      R [-1] [+] BalancedTernary_int2ternary(py_idiv((n + 1), 3))
-   X RuntimeError(‘’)
-
-F BalancedTernary_neg(digs)
-   R digs.map(d -> -d)
-
-V table = [(0, -1), (1, -1), (-1, 0), (0, 0), (1, 0), (-1, 1), (0, 1)]
-
-F BalancedTernary_add(a, b, =c = 0)
-   I !(!a.empty & !b.empty)
-      I c == 0
-         R I !a.empty {a} E b
-      E
-         R BalancedTernary_add([c], I !a.empty {a} E b)
-   E
-      (V d, c) = :table[3 + (I !a.empty {a[0]} E 0) + (I !b.empty {b[0]} E 0) + c]
-      V res = BalancedTernary_add(a[1..], b[1..], c)
-      I !res.empty | d != 0
-         R [d] [+] res
-      E
-         R res
-
-V BalancedTernary_str2dig = [‘+’ = 1, ‘-’ = -1, ‘0’ = 0]
-V BalancedTernary_dig2str = [1 = ‘+’, -1 = ‘-’, 0 = ‘0’]
-
 T BalancedTernary
+   :str2dig = [‘+’ = 1, ‘-’ = -1, ‘0’ = 0]
+   :dig2str = [1 = ‘+’, -1 = ‘-’, 0 = ‘0’]
+   :table = [(0, -1), (1, -1), (-1, 0), (0, 0), (1, 0), (-1, 1), (0, 1)]
+
    [Int] digits
 
    F (inp)
@@ -303,19 +275,51 @@ T BalancedTernary
       E
          X ValueError(‘BalancedTernary: Wrong input digits.’)
 
+   F :int2ternary(n)
+      I n == 0
+         R [Int]()
+      V n3 = ((n % 3) + 3) % 3
+      I n3 == 0
+         R [0] [+] BalancedTernary.int2ternary(py_idiv(n, 3))
+      I n3 == 1
+         R [1] [+] BalancedTernary.int2ternary(py_idiv(n, 3))
+      I n3 == 2
+         R [-1] [+] BalancedTernary.int2ternary(py_idiv((n + 1), 3))
+      X RuntimeError(‘’)
+
    F to_int()
       R reversed(.digits).reduce(0, (y, x) -> x + 3 * y)
 
    F String()
       I .digits.empty
          R ‘0’
-      R reversed(.digits).map(d -> BalancedTernary_dig2str[d]).join(‘’)
+      R reversed(.digits).map(d -> BalancedTernary.:dig2str[d]).join(‘’)
+
+   F :neg(digs)
+      R digs.map(d -> -d)
+
+   F -()
+      R BalancedTernary(BalancedTernary.neg(.digits))
+
+   F :add(a, b, =c = 0)
+      I !(!a.empty & !b.empty)
+         I c == 0
+            R I !a.empty {a} E b
+         E
+            R BalancedTernary.add([c], I !a.empty {a} E b)
+      E
+         (V d, c) = BalancedTernary.:table[3 + (I !a.empty {a[0]} E 0) + (I !b.empty {b[0]} E 0) + c]
+         V res = BalancedTernary.add(a[1..], b[1..], c)
+         I !res.empty | d != 0
+            R [d] [+] res
+         E
+            R res
 
    F +(b)
-      R BalancedTernary(BalancedTernary_add(.digits, b.digits))
+      R BalancedTernary(BalancedTernary.add(.digits, b.digits))
 
    F -(b)
-      R (.) + BalancedTernary(BalancedTernary_neg(b.digits))
+      R (.) + (-b)
 
    F *(b)
       F _mul([Int] &a, [Int] &b) -> [Int]
@@ -324,7 +328,7 @@ T BalancedTernary
          E
             [Int] x
             I a[0] == -1
-               x = BalancedTernary_neg(b)
+               x = BalancedTernary.neg(b)
             E I a[0] == 0
             {
             }
@@ -333,14 +337,14 @@ T BalancedTernary
             E
                assert(0B)
             V y = [0] [+] @_mul(&Array(a[1..]), &b)
-            R BalancedTernary_add(x, y)
+            R BalancedTernary.add(x, y)
 
       R BalancedTernary(_mul(&Array(.digits), &Array(b.digits)))
 
 F createBalancedTernaryFromStr(inp)
-   R BalancedTernary(reversed(inp).map(c -> BalancedTernary_str2dig[c]))
+   R BalancedTernary(reversed(inp).map(c -> BalancedTernary.:str2dig[c]))
 F createBalancedTernaryFromInt(inp)
-   R BalancedTernary(BalancedTernary_int2ternary(inp))
+   R BalancedTernary(BalancedTernary.int2ternary(inp))
 
 V a = createBalancedTernaryFromStr(‘+-0++0+’)
 print(‘a: ’a.to_int()‘ ’a)
@@ -361,52 +365,13 @@ template <typename T1, typename T2> auto py_idiv(const T1 &a, const T2 &b)
     return -(idiv(-(a - b + 1), b));
 }
 
-template <typename T1> auto BalancedTernary_int2ternary(const T1 &n)
-{
-    if (n == 0)
-        return Array<int>();
-    auto n3 = mod(((mod(n, 3)) + 3), 3);
-    if (n3 == 0)
-        return create_array({0}) + BalancedTernary_int2ternary(py_idiv(n, 3));
-    if (n3 == 1)
-        return create_array({1}) + BalancedTernary_int2ternary(py_idiv(n, 3));
-    if (n3 == 2)
-        return create_array({-1}) + BalancedTernary_int2ternary(py_idiv((n + 1), 3));
-    throw RuntimeError(u""_S);
-}
-
-template <typename T1> auto BalancedTernary_neg(const T1 &digs)
-{
-    return digs.map([](const auto &d){return -d;});
-}
-
-auto table = create_array({make_tuple(0, -1), make_tuple(1, -1), make_tuple(-1, 0), make_tuple(0, 0), make_tuple(1, 0), make_tuple(-1, 1), make_tuple(0, 1)});
-
-template <typename T1, typename T2, typename T3 = decltype(0)> auto BalancedTernary_add(const T1 &a, const T2 &b, T3 c = 0)
-{
-    if (!(!a.empty() && !b.empty())) {
-        if (c == 0)
-            return !a.empty() ? a : b;
-        else
-            return BalancedTernary_add(create_array({c}), !a.empty() ? a : b);
-    }
-    else {
-        TUPLE_ELEMENT_T(0, ::table[3 + (!a.empty() ? _get<0>(a) : 0) + (!b.empty() ? _get<0>(b) : 0) + c]) d;
-        assign_from_tuple(d, c, ::table[3 + (!a.empty() ? _get<0>(a) : 0) + (!b.empty() ? _get<0>(b) : 0) + c]);
-        auto res = BalancedTernary_add(a[range_ei(1)], b[range_ei(1)], c);
-        if (!res.empty() || d != 0)
-            return create_array({d}) + res;
-        else
-            return res;
-    }
-}
-
-auto BalancedTernary_str2dig = create_dict(dict_of(u'+'_C, 1)(u'-'_C, -1)(u'0'_C, 0));
-auto BalancedTernary_dig2str = create_dict(dict_of(1, u'+'_C)(-1, u'-'_C)(0, u'0'_C));
-
 class BalancedTernary
 {
 public:
+    static inline auto s_str2dig = create_dict(dict_of(u'+'_C, 1)(u'-'_C, -1)(u'0'_C, 0));
+    static inline auto s_dig2str = create_dict(dict_of(1, u'+'_C)(-1, u'-'_C)(0, u'0'_C));
+    static inline auto s_table = create_array({make_tuple(0, -1), make_tuple(1, -1), make_tuple(-1, 0), make_tuple(0, 0), make_tuple(1, 0), make_tuple(-1, 1), make_tuple(0, 1)});
+
     Array<int> digits;
 
     template <typename T1> BalancedTernary(const T1 &inp)
@@ -415,6 +380,20 @@ public:
             digits = copy(inp);
         else
             throw ValueError(u"BalancedTernary: Wrong input digits."_S);
+    }
+
+    template <typename T1> static auto s_int2ternary(const T1 &n)
+    {
+        if (n == 0)
+            return Array<int>();
+        auto n3 = mod(((mod(n, 3)) + 3), 3);
+        if (n3 == 0)
+            return create_array({0}) + BalancedTernary::s_int2ternary(py_idiv(n, 3));
+        if (n3 == 1)
+            return create_array({1}) + BalancedTernary::s_int2ternary(py_idiv(n, 3));
+        if (n3 == 2)
+            return create_array({-1}) + BalancedTernary::s_int2ternary(py_idiv((n + 1), 3));
+        throw RuntimeError(u""_S);
     }
 
     auto to_int()
@@ -426,12 +405,41 @@ public:
     {
         if (digits.empty())
             return u"0"_S;
-        return reversed(digits).map([](const auto &d){return BalancedTernary_dig2str[d];}).join(u""_S);
+        return reversed(digits).map([](const auto &d){return BalancedTernary::s_dig2str[d];}).join(u""_S);
+    }
+
+    template <typename T1> static auto s_neg(const T1 &digs)
+    {
+        return digs.map([](const auto &d){return -d;});
+    }
+
+    auto operator-() const
+    {
+        return BalancedTernary(BalancedTernary::s_neg(digits));
+    }
+
+    template <typename T1, typename T2, typename T3 = decltype(0)> static auto s_add(const T1 &a, const T2 &b, T3 c = 0)
+    {
+        if (!(!a.empty() && !b.empty())) {
+            if (c == 0)
+                return !a.empty() ? a : b;
+            else
+                return BalancedTernary::s_add(create_array({c}), !a.empty() ? a : b);
+        }
+        else {
+            TUPLE_ELEMENT_T(0, BalancedTernary::s_table[3 + (!a.empty() ? _get<0>(a) : 0) + (!b.empty() ? _get<0>(b) : 0) + c]) d;
+            assign_from_tuple(d, c, BalancedTernary::s_table[3 + (!a.empty() ? _get<0>(a) : 0) + (!b.empty() ? _get<0>(b) : 0) + c]);
+            auto res = BalancedTernary::s_add(a[range_ei(1)], b[range_ei(1)], c);
+            if (!res.empty() || d != 0)
+                return create_array({d}) + res;
+            else
+                return res;
+        }
     }
 
     template <typename T1> auto operator+(const T1 &b) const
     {
-        return BalancedTernary(BalancedTernary_add(digits, b.digits));
+        return BalancedTernary(BalancedTernary::s_add(digits, b.digits));
     }
     template <typename Ty> auto &operator+=(const Ty &t)
     {
@@ -441,7 +449,7 @@ public:
 
     template <typename T1> auto operator-(const T1 &b) const
     {
-        return *this + BalancedTernary(BalancedTernary_neg(b.digits));
+        return *this + (-b);
     }
     template <typename Ty> auto &operator-=(const Ty &t)
     {
@@ -458,7 +466,7 @@ public:
             else {
                 Array<int> x;
                 if (_get<0>(a) == -1)
-                    x = BalancedTernary_neg(b);
+                    x = BalancedTernary::s_neg(b);
                 else if (_get<0>(a) == 0) {
                 }
 
@@ -467,7 +475,7 @@ public:
                 else
                     assert(false);
                 auto y = create_array({0}) + _mul(make_ref(create_array(a[range_ei(1)])), b);
-                return BalancedTernary_add(x, y);
+                return BalancedTernary::s_add(x, y);
             }
         };
 
@@ -482,11 +490,11 @@ public:
 
 template <typename T1> auto createBalancedTernaryFromStr(const T1 &inp)
 {
-    return BalancedTernary(reversed(inp).map([](const auto &c){return BalancedTernary_str2dig[c];}));
+    return BalancedTernary(reversed(inp).map([](const auto &c){return BalancedTernary::s_str2dig[c];}));
 }
 template <typename T1> auto createBalancedTernaryFromInt(const T1 &inp)
 {
-    return BalancedTernary(BalancedTernary_int2ternary(inp));
+    return BalancedTernary(BalancedTernary::s_int2ternary(inp));
 }
 
 auto a = createBalancedTernaryFromStr(u"+-0++0+"_S);

@@ -693,15 +693,16 @@ struct CodeBlock2
 # https://www.rosettacode.org/wiki/Imaginary_base_numbers#Python
 import math
 import re
+from typing import ClassVar
 
 def inv(c):
     denom = c.real * c.real + c.imag * c.imag
     return complex(c.real / denom, -c.imag / denom)
 
-QuaterImaginary_twoI = complex(0, 2)
-QuaterImaginary_invTwoI = inv(QuaterImaginary_twoI)
-
 class QuaterImaginary:
+    twoI : ClassVar[complex] = complex(0, 2)
+    invTwoI : ClassVar[complex] = inv(QuaterImaginary.twoI)
+
     b2i : str
 
     def __init__(self, str):
@@ -718,14 +719,14 @@ class QuaterImaginary:
             k = int(self.b2i[posLen - 1 - j])
             if k > 0:
                 sum += prod * k
-            prod *= QuaterImaginary_twoI
+            prod *= QuaterImaginary.twoI
         if pointPos != -1:
-            prod = QuaterImaginary_invTwoI
+            prod = QuaterImaginary.invTwoI
             for j in range(posLen + 1, len(self.b2i)):
                 k = int(self.b2i[j])
                 if k > 0:
                     sum += prod * k
-                prod *= QuaterImaginary_invTwoI
+                prod *= QuaterImaginary.invTwoI
         return sum
 
     def __str__(self):
@@ -799,10 +800,10 @@ F inv(c)
    V denom = c.real * c.real + c.imag * c.imag
    R Complex(c.real / denom, -c.imag / denom)
 
-V QuaterImaginary_twoI = Complex(0, 2)
-V QuaterImaginary_invTwoI = inv(QuaterImaginary_twoI)
-
 T QuaterImaginary
+   Complex :twoI = Complex(0, 2)
+   Complex :invTwoI = inv(QuaterImaginary.:twoI)
+
    String b2i
 
    F (str)
@@ -819,14 +820,14 @@ T QuaterImaginary
          V k = Int(.b2i[posLen - 1 - j])
          I k > 0
             sum += prod * k
-         prod *= QuaterImaginary_twoI
+         prod *= QuaterImaginary.:twoI
       I pointPos != -1
-         prod = QuaterImaginary_invTwoI
+         prod = QuaterImaginary.:invTwoI
          L(j) posLen + 1 .< .b2i.len
             V k = Int(.b2i[j])
             I k > 0
                sum += prod * k
-            prod *= QuaterImaginary_invTwoI
+            prod *= QuaterImaginary.:invTwoI
       R sum
 
    F String()
@@ -901,12 +902,12 @@ template <typename T1> auto inv(const T1 &c)
     return Complex(c.real() / denom, -c.imag() / denom);
 }
 
-auto QuaterImaginary_twoI = Complex(0, 2);
-auto QuaterImaginary_invTwoI = inv(QuaterImaginary_twoI);
-
 class QuaterImaginary
 {
 public:
+    static inline Complex s_twoI = Complex(0, 2);
+    static inline Complex s_invTwoI = inv(QuaterImaginary::s_twoI);
+
     String b2i;
 
     template <typename T1> QuaterImaginary(const T1 &str) :
@@ -926,15 +927,15 @@ public:
             auto k = to_int(b2i[posLen - 1 - j]);
             if (k > 0)
                 sum += prod * k;
-            prod *= QuaterImaginary_twoI;
+            prod *= QuaterImaginary::s_twoI;
         }
         if (pointPos != -1) {
-            prod = QuaterImaginary_invTwoI;
+            prod = QuaterImaginary::s_invTwoI;
             for (auto j : range_el(posLen + 1, b2i.len())) {
                 auto k = to_int(b2i[j]);
                 if (k > 0)
                     sum += prod * k;
-                prod *= QuaterImaginary_invTwoI;
+                prod *= QuaterImaginary::s_invTwoI;
             }
         }
         return sum;

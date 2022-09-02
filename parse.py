@@ -1426,6 +1426,8 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
             else:
                 s = 'static '*self.is_static + ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + 's_'*self.is_static + \
                     {'()':'operator()', '[&]':'operator&', '<':'operator<', '==':'operator==', '+':'operator+', '-':'operator-', '*':'operator*', '/':'operator/'}.get(self.function_name, self.function_name)
+                if self.function_name in tokenizer.all_operators:
+                    is_const = True
 
             if self.virtual_category != self.VirtualCategory.NO:
                 arguments = []
