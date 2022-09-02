@@ -1620,3 +1620,47 @@ struct CodeBlock1
         print(Starship::s_i3);
     }
 } code_block_1;
+
+
+T Ty
+   T SubTy
+       F :f(a)
+          R a
+       T SubSubTy
+          F :g(b)
+             R b
+   SubTy st
+
+Ty.SubTy.f(a' 1)
+Ty.SubTy.SubSubTy.g(b' 2)
+===
+class Ty
+{
+public:
+    class SubTy
+    {
+    public:
+        template <typename T1> static auto s_f(const T1 &a)
+        {
+            return a;
+        }
+        class SubSubTy
+        {
+        public:
+            template <typename T1> static auto s_g(const T1 &b)
+            {
+                return b;
+            }
+        };
+    };
+    SubTy st;
+};
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        Ty::SubTy::s_f(1);
+        Ty::SubTy::SubSubTy::s_g(2);
+    }
+} code_block_1;

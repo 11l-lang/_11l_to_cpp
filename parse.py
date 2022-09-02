@@ -901,6 +901,11 @@ class SymbolNode:
                     t_node = type_of(self.children[0])                  # \\ and `ASTNode token_node; ... :token_node.symbol.id = sid` -> `... ::token_node->symbol->id = sid`
                     if t_node is not None and type(t_node) in (ASTVariableDeclaration, ASTVariableInitialization) and (t_node.is_reference or t_node.is_ptr): # ( # t_node.is_shared_ptr):
                         return self.children[0].to_str() + '->' + c1
+                    if t_node is not None and type(t_node) == ASTTypeDefinition:
+                        for child in t_node.children:
+                            if type(child) == ASTFunctionDefinition and child.is_static and child.function_name == c1:
+                                return self.children[0].to_str() + '::s_' + c1
+                        return self.children[0].to_str() + '::' + c1
 
                 if cts0 == '(': # ) # `parse(expr_str).eval()` -> `parse(expr_str)->eval()`
                     fid, sc = self.scope.find_and_return_scope(self.children[0].children[0].token_str())
@@ -930,6 +935,8 @@ class SymbolNode:
                         for child in id_.ast_nodes[0].children:
                             if type(child) == ASTFunctionDefinition and child.is_static and child.function_name == c1:
                                 return cts0 + '::s_' + c1
+                            if type(child) == ASTTypeDefinition and child.type_name == c1:
+                                return cts0 + '::' + c1
                     if id_.type != '' and s.is_function:
                         tid = s.find(id_.type)
                         if tid is not None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and tid.ast_nodes[0].has_pointers_to_the_same_type:
