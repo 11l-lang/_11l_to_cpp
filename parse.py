@@ -1049,6 +1049,8 @@ class SymbolNode:
                 return 'pow(' + self.children[0].to_str() + ', ' + c1 + ')'
             elif self.symbol.id == '%':
                 return 'mod(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
+            elif self.symbol.id == '-%':
+                return 'nmod(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
             elif self.symbol.id == '[&]' and self.parent is not None and self.parent.symbol.id in ('==', '!=', '<', '<=', '>', '>='): # there is a difference in precedence of operators `&` and `==`/`!=` in Python/11l and C++
                 return '(' + self.children[0].to_str() + ' & ' + self.children[1].to_str() + ')'
             elif self.symbol.id == '(+)' and self.parent is not None and self.parent.symbol.id in ('==', '!=', '<', '<=', '>', '>='): # there is a difference in precedence of operators `^` and `<`/`<=`/`>`/`>=` in Python/11l and C++
@@ -2307,7 +2309,7 @@ infix('+', 110); infix('-', 110)
 infix('(concat)', 115) # `print(‘id = ’id+1)` = `print((‘id = ’id)+1)`, `str(c) + str(1-c)*charstack[0]` -> `String(c)‘’String(1 - c) * charstack[0]` = `String(c)‘’(String(1 - c) * charstack[0])`
 
 infix('*', 120); infix('/', 120); infix('I/', 120); infix('Ц/', 120); infix('-I/', 120); infix('-Ц/', 120)
-infix('%', 120)
+infix('%', 120); infix('-%', 120)
 
 prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('(-)', 130); prefix('--', 130); prefix('++', 130); prefix('&', 130)
 
