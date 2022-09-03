@@ -97,12 +97,16 @@ template <typename Type1, typename Type2> inline auto idiv(Type1 a, Type2 b)
 {
 	return ext_int(a / b);
 }
-#ifdef FLOOR_INTEGER_DIVISION
-Int idiv(Int a, Int b) // [https://stackoverflow.com/a/46270859/2692494 <- google:‘floor division c++ site:stackoverflow.com’]
+Int nidiv(Int a, Int b) // [https://stackoverflow.com/a/46270859/2692494 <- google:‘floor division c++ site:stackoverflow.com’]
 {
 	Int d = a / b;
 	Int r = a % b;  /* optimizes into single division. */
 	return r ? (d - ((a < 0) ^ (b < 0))) : d;
+}
+#ifdef FLOOR_INTEGER_DIVISION
+Int idiv(Int a, Int b)
+{
+	return nidiv(a, b);
 }
 #endif
 

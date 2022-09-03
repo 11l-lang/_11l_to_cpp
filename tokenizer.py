@@ -47,7 +47,7 @@ binary_operators : List[Set[str]] = [] # `initializer_list` does not support mov
 binary_operators.append(set(empty_list_of_str))
 binary_operators.append({str('+'), '-', '*', '/', '%', '^', '&', '|', '<', '>', '=', '?'})
 binary_operators.append({'<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '->', '..', '.<', '.+', '<.', 'I/', 'Ц/', 'C ', 'С '})
-binary_operators.append({'<<=', '>>=', '‘’=', '[+]', '[&]', '[|]', '(+)', '<.<', 'I/=', 'Ц/=', 'in ', 'св ', '!C ', '!С '})
+binary_operators.append({'<<=', '>>=', '‘’=', '[+]', '[&]', '[|]', '(+)', '<.<', '-I/', '-Ц/', 'I/=', 'Ц/=', 'in ', 'св ', '!C ', '!С '})
 binary_operators.append({'[+]=', '[&]=', '[|]=', '(+)=', '!in ', '!св '})
 unary_operators : List[Set[str]] = []
 unary_operators.append(set(empty_list_of_str))
