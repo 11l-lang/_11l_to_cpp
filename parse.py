@@ -800,6 +800,9 @@ class SymbolNode:
                     return self.children[0].to_str() + '.at_plus_len(' + c1[len('(len)'):] + ')'
                 return self.children[0].to_str() + '[' + c1 + ']'
 
+        elif self.symbol.id == '[%': # ]
+            return self.children[0].to_str() + '.at_ni(' + self.children[1].to_str() + ')'
+
         elif self.symbol.id in ('S', 'В', 'switch', 'выбрать'):
             char_val = True
             for i in range(1, len(self.children), 2):
@@ -2316,7 +2319,7 @@ prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('(-)', 130); prefix
 infix_r('^', 140)
 
 symbol('.', 150); symbol(':', 150); symbol('.:', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('T?', 150); postfix('T:', 150); postfix('--', 150); postfix('++', 150)
-prefix('.', 150); prefix(':', 150); prefix('.:', 150)
+prefix('.', 150); prefix(':', 150); prefix('.:', 150); symbol('[%', 150) # ]
 
 infix_r('=', 10); infix_r('+=', 10); infix_r('-=', 10); infix_r('*=', 10); infix_r('/=', 10); infix_r('I/=', 10); infix_r('Ц/=', 10); infix_r('%=', 10); infix_r('>>=', 10); infix_r('<<=', 10); infix_r('^=', 10)
 infix_r('[+]=', 10); infix_r('[&]=', 10); infix_r('[|]=', 10); infix_r('(+)=', 10); infix_r('‘’=', 10)
@@ -2507,7 +2510,14 @@ def led(self, left):
         self.append_child(expression()) # [
     advance(']')
     return self
-symbol('[').led = led
+symbol('[').led = led # ]
+
+def led(self, left):
+    self.append_child(left)
+    self.append_child(expression()) # [
+    advance(']')
+    return self
+symbol('[%').led = led
 
 def nud(self):
     if token.value(source) == ']': # for `R []`

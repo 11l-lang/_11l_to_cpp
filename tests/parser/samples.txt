@@ -1624,11 +1624,11 @@ struct CodeBlock1
 
 T Ty
    T SubTy
-       F :f(a)
-          R a
-       T SubSubTy
-          F :g(b)
-             R b
+      F :f(a)
+         R a
+      T SubSubTy
+         F :g(b)
+            R b
    SubTy st
 
 Ty.SubTy.f(a' 1)
@@ -1690,5 +1690,44 @@ struct CodeBlock1
     {
         for (int Lindex = 0; Lindex < 3; Lindex++)
             print(fake_random());
+    }
+} code_block_1;
+
+
+F p(a)
+   print(a[%-2])
+
+X.try
+   V a = [1, 2, 3]
+   p(a)
+   a[%-1] = 4
+   print(a[%-1])
+   print(a[%-3])
+   print(a[%-4])
+X.catch IndexError err
+   print(‘Wrong index: ’err)
+===
+template <typename T1> auto p(const T1 &a)
+{
+    print(a.at_ni(-2));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        try
+        {
+            auto a = create_array({1, 2, 3});
+            p(a);
+            a.at_ni(-1) = 4;
+            print(a.at_ni(-1));
+            print(a.at_ni(-3));
+            print(a.at_ni(-4));
+        }
+        catch (const IndexError& err)
+        {
+            print(u"Wrong index: "_S & err);
+        }
     }
 } code_block_1;

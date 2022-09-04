@@ -288,6 +288,26 @@ public:
 		return set(i, v);
 	}
 
+	decltype(std::declval<const std::vector<Type>>().at(0)) at_ni(Int ii) const // decltype is needed for Array<bool> support
+	{
+		Int i = ii;
+		if (i < 0)
+			i += len();
+		if (in(i, range_el(Int(0), len())))
+			return std::vector<Type>::operator[](i);
+		throw IndexError(ii);
+	}
+
+	decltype(std::declval<std::vector<Type>>().at(0)) at_ni(Int ii) // decltype is needed for Array<bool> support
+	{
+		Int i = ii;
+		if (i < 0)
+			i += len();
+		if (in(i, range_el(Int(0), len())))
+			return std::vector<Type>::operator[](i);
+		throw IndexError(ii);
+	}
+
 	void append(Type &&v) {std::vector<Type>::push_back(std::move(v));}
 	void append(const Type &v) {std::vector<Type>::push_back(v);}
 

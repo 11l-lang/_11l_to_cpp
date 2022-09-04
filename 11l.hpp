@@ -155,16 +155,18 @@ typedef Int64 Int;
 typedef int32_t Int;
 #endif
 
+class String;
 class IndexError
 {
 public:
 	Int index;
 
 	IndexError(Int index) : index(index) {}
+
+	operator String() const;
 };
 
 #include <memory>
-class String;
 class AssertionError
 {
 	std::unique_ptr<String> message;
@@ -197,6 +199,7 @@ typedef std::complex<double> Complex;
 #include "11l_hpp/String.hpp"
 AssertionError::AssertionError(const String &message) : message(std::make_unique<String>(message)) {}
 AssertionError::operator String() const {return message != nullptr ? *message : String();}
+IndexError::operator String() const {return String(index);}
 #include "11l_hpp/Array.hpp"
 #include "11l_hpp/Dict.hpp"
 #include "11l_hpp/Set.hpp"
