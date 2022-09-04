@@ -151,9 +151,14 @@ typedef long long Int64; // this is needed because in GCC `int64_t` is `long` in
 typedef unsigned long long UInt64;
 #ifdef INT_IS_INT64
 typedef Int64 Int;
+typedef UInt64 UInt;
 #else
 typedef int32_t Int;
+typedef uint32_t UInt;
 #endif
+
+typedef Int Size;
+typedef UInt USize;
 
 class String;
 class IndexError
