@@ -1354,12 +1354,12 @@ struct CodeBlock1
 
 // https://www.rosettacode.org/wiki/Find_first_and_last_set_bit_of_a_long_integer#Python
 L(i) 6
-    V x = Int(42 ^ i)
-    print(‘#10 MSB: #2 LSB: #2’.format(x, bsr(x), bsf(x)))
+   V x = Int(42 ^ i)
+   print(‘#10 MSB: #2 LSB: #2’.format(x, bsr(x), bsf(x)))
 
 L(i) 6
-    V x = Int64(1302 ^ i)
-    print(‘#20 MSB: #2 LSB: #2’.format(x, bsr(x), bsf(x)))
+   V x = Int64(1302 ^ i)
+   print(‘#20 MSB: #2 LSB: #2’.format(x, bsr(x), bsf(x)))
 ===
 struct CodeBlock1
 {
@@ -3047,10 +3047,10 @@ struct CodeBlock1
 
 // https://www.rosettacode.org/wiki/Vector_products#Python
 F scalartriplep(a, b, c)
-    return dot(a, cross(b, c))
+   return dot(a, cross(b, c))
 
 F vectortriplep(a, b, c)
-    return cross(a, cross(b, c))
+   return cross(a, cross(b, c))
 
 V a = (3, 4, 5)
 V b = (4, 3, 5)

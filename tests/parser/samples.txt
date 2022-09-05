@@ -70,9 +70,9 @@ fn m2() {}
 fn f()
    if foo
       if bar
-          m1()
+         m1()
    else
-       m2()
+      m2()
 ===
 auto m1()
 {
@@ -99,14 +99,14 @@ fn f()
 {
    if foo
       if bar
-          m1()
+         m1()
       else if z
-          if e
-             m3()
+         if e
+            m3()
       else
-          m4()
+         m4()
    else
-       m2()
+      m2()
 }
 ===
 auto m1()
@@ -733,7 +733,7 @@ struct CodeBlock1
 
 
 F func(Int n) -> N
-    print(n)
+   print(n)
 
 (Int -> N) fptr = func
 fptr(1)
@@ -1485,19 +1485,19 @@ Array<Dict<int, String>> save;
 
 
 I t C M
-  L(nv) M
-     I 1B
-        print(1)
-        print(2)
+   L(nv) M
+      I 1B
+         print(1)
+         print(2)
 E
-  print(‘NO’)
-  exit()
+   print(‘NO’)
+   exit()
 
 I t C M
-  L(nv) M
-     I 1B
-        print(1)
-        print(2)
+   L(nv) M
+      I 1B
+         print(1)
+         print(2)
 ===
 struct CodeBlock1
 {

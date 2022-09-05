@@ -153,7 +153,13 @@ for fname in os.listdir('tests/parser'):
             try:
                 in_11l, expected_cpp = test.split("===\n")
                 expected_cpp += "\n"
-                in_cpp = parse.parse_and_to_str(tokenizer.tokenize(in_11l), in_11l, full_fname)
+                tokens = tokenizer.tokenize(in_11l)
+                for token in tokens:
+                    if token.category == token.category.SCOPE_BEGIN and in_11l[token.start] != '{' and (token.end - token.start) % 3 != 0: # }
+                        if "r[L.index] = S c\n" not in in_11l and "V tag = S ‘_’\n" not in in_11l:
+                            print("Wrong indentation:\n" + in_11l + "[in file '" + full_fname + "']")
+                            exit(1)
+                in_cpp = parse.parse_and_to_str(tokens, in_11l, full_fname)
                 if in_cpp != expected_cpp:
                     print("Mismatch for test:\n" + in_11l + "Output:\n" + in_cpp + "\nExpected output:\n" + expected_cpp + "[in file '" + full_fname + "']")
                     kdiff3(in_cpp, expected_cpp)
