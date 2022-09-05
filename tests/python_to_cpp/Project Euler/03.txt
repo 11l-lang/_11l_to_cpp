@@ -77,7 +77,7 @@ F has_pandigital_product(n)
    L(i) 1 .. Int(sqrt(n))
       I n % i == 0
          V temp = String(n)‘’String(i)‘’String(n I/ i)
-         I sorted(temp).join(‘’) == ‘123456789’
+         I sorted(temp) == ‘123456789’
             R 1B
    R 0B
 
@@ -88,7 +88,7 @@ template <typename T1> auto has_pandigital_product(const T1 &n)
     for (auto i : range_ee(1, to_int(sqrt(n))))
         if (mod(n, i) == 0) {
             auto temp = String(n) & String(i) & String(idiv(n, i));
-            if (sorted(temp).join(u""_S) == u"123456789")
+            if (sorted(temp) == u"123456789")
                 return true;
         }
     return false;
@@ -385,7 +385,7 @@ V ans = ‘’
 L(n) 2..9
    L(i) 1 .< 10 ^ (9 I/ n)
       V s = (1 .. n).map(j -> String(@i * j)).join(‘’)
-      I sorted(s).join(‘’) == ‘123456789’
+      I sorted(s) == ‘123456789’
          I s > ans
             ans = s
 print(ans)
@@ -399,7 +399,7 @@ struct CodeBlock1
         for (auto n : range_ee(2, 9))
             for (auto i : range_el(1, pow(10, (idiv(9, n))))) {
                 auto s = range_ee(1, n).map([&i](const auto &j){return String(i * j);}).join(u""_S);
-                if (sorted(s).join(u""_S) == u"123456789") {
+                if (sorted(s) == u"123456789") {
                     if (s > ans)
                         ans = s;
                 }

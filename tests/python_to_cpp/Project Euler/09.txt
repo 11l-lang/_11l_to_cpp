@@ -740,7 +740,7 @@ F max_square_pair(a, b, index, &assignments, &isdigitused)
 F compute()
    [String = [String]] anagrams
    L(word) :WORDS
-      V key = sorted(word).join(‘’)
+      V key = sorted(word)
       I key !C anagrams
          anagrams[key] = [‘’] * 0
       anagrams[key].append(word)
@@ -801,7 +801,7 @@ auto compute()
 {
     Dict<String, Array<String>> anagrams;
     for (auto &&word : ::WORDS) {
-        auto key = sorted(word).join(u""_S);
+        auto key = sorted(word);
         if (!in(key, anagrams))
             anagrams.set(key, create_array({u""_S}) * 0);
         anagrams[key].append(word);

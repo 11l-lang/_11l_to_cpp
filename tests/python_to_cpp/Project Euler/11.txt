@@ -207,7 +207,7 @@ for i in itertools.count(1):
 V count = 0
 L(i) 1..
    V s = String(i)
-   V t = sorted(s).join(‘’)
+   V t = sorted(s)
    I s != t & reversed(s) != t
       count++
    I count * 100 == 99 * i
@@ -222,7 +222,7 @@ struct CodeBlock1
     {
         for (auto i : range_ei(1)) {
             auto s = String(i);
-            auto t = sorted(s).join(u""_S);
+            auto t = sorted(s);
             if (s != t && reversed(s) != t)
                 count++;
             if (count * 100 == 99 * i) {

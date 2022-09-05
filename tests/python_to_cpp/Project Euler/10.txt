@@ -207,9 +207,9 @@ F compute()
    V a = 0
    V b = 1
    L(i) 0..
-      I sorted(String(a)).join(‘’) == ‘123456789’
+      I sorted(String(a)) == ‘123456789’
          V f = fibonacci(i)[0]
-         I sorted(String(f)[0.<9]).join(‘’) == ‘123456789’
+         I sorted(String(f)[0.<9]) == ‘123456789’
             R String(i)
       (a, b) = (b, (a + b) % MOD)
 
@@ -236,9 +236,9 @@ auto compute()
     auto a = 0;
     auto b = 1;
     for (auto i : range_ei(0)) {
-        if (sorted(String(a)).join(u""_S) == u"123456789") {
+        if (sorted(String(a)) == u"123456789") {
             auto f = _get<0>(fibonacci(i));
-            if (sorted(String(f)[range_el(0, 9)]).join(u""_S) == u"123456789")
+            if (sorted(String(f)[range_el(0, 9)]) == u"123456789")
                 return String(i);
         }
         assign_from_tuple(a, b, make_tuple(b, mod((a + b), MOD)));
@@ -284,8 +284,8 @@ F compute()
    V (previous, fib_number) = (BigInt(0), BigInt(1))
 
    L(i) 1..
-      I sorted(String(a)).join(‘’) == ‘123456789’
-         I sorted(String(fib_number)[0.<9]).join(‘’) == ‘123456789’
+      I sorted(String(a)) == ‘123456789’
+         I sorted(String(fib_number)[0.<9]) == ‘123456789’
             R String(i)
       (a, b) = (b, (a + b) % MOD)
 
@@ -302,8 +302,8 @@ auto compute()
     auto [previous, fib_number] = make_tuple(BigInt(0), BigInt(1));
 
     for (auto i : range_ei(1)) {
-        if (sorted(String(a)).join(u""_S) == u"123456789") {
-            if (sorted(String(fib_number)[range_el(0, 9)]).join(u""_S) == u"123456789")
+        if (sorted(String(a)) == u"123456789") {
+            if (sorted(String(fib_number)[range_el(0, 9)]) == u"123456789")
                 return String(i);
         }
         assign_from_tuple(a, b, make_tuple(b, mod((a + b), MOD)));

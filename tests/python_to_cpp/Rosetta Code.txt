@@ -971,7 +971,7 @@ for ana in anagram.values():
 ===
 DefaultDict[String, [String]] anagram
 L(word) File(‘unixdict.txt’).read().split("\n")
-   anagram[sorted(word).join(‘’)].append(word)
+   anagram[sorted(word)].append(word)
 
 V count = max(anagram.values().map(ana -> ana.len))
 
@@ -986,7 +986,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto &&word : File(u"unixdict.txt"_S).read().split(u"\n"_S))
-            anagram[sorted(word).join(u""_S)].append(word);
+            anagram[sorted(word)].append(word);
     }
 } code_block_1;
 
@@ -1039,7 +1039,7 @@ F is_not_deranged(s1, s2)
 [String = [String]] anagram
 V count = 0
 L(word) File(‘unixdict.txt’).read().split("\n")
-   V a = sorted(word).join(‘’)
+   V a = sorted(word)
    I a !C anagram
       anagram[a] = [word]
    E
@@ -1070,7 +1070,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto &&word : File(u"unixdict.txt"_S).read().split(u"\n"_S)) {
-            auto a = sorted(word).join(u""_S);
+            auto a = sorted(word);
             if (!in(a, anagram))
                 anagram.set(a, create_array({word}));
             else {

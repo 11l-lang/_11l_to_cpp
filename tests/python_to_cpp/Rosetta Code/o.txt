@@ -340,13 +340,13 @@ maxorderedwords = [word for word in ordered if len(word) == maxlen]
 print(' '.join(maxorderedwords))
 ===
 V words = File(‘unixdict.txt’).read().split("\n")
-V ordered = words.filter(word -> word == sorted(word).join(‘’))
+V ordered = words.filter(word -> word == sorted(word))
 V maxlen = max(ordered, key' w -> w.len).len
 V maxorderedwords = ordered.filter(word -> word.len == :maxlen)
 print(maxorderedwords.join(‘ ’))
 ===
 auto words = File(u"unixdict.txt"_S).read().split(u"\n"_S);
-auto ordered = words.filter([](const auto &word){return word == sorted(word).join(u""_S);});
+auto ordered = words.filter([](const auto &word){return word == sorted(word);});
 auto maxlen = max_with_key(ordered, [](const auto &w){return w.len();}).len();
 auto maxorderedwords = ordered.filter([](const auto &word){return word.len() == ::maxlen;});
 

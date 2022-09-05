@@ -3832,7 +3832,7 @@ for _ in range(int(input())):
 L(_) 0 .< Int(input())
    V s = input()
    V t = input()
-   s = sorted(s).join(‘’)
+   s = sorted(s)
    I t == ‘abc’ & ‘a’ C s & ‘b’ C s & ‘c’ C s
       s = s[0 .< s.findi(‘b’)]‘’(‘c’ * s.count(‘c’))‘’(‘b’ * s.count(‘b’))‘’(s[s.rfindi(‘c’) + 1 ..])
    print(s)
@@ -3844,7 +3844,7 @@ struct CodeBlock1
         for (auto _ : range_el(0, to_int(input()))) {
             auto s = input();
             auto t = input();
-            s = sorted(s).join(u""_S);
+            s = sorted(s);
             if (t == u"abc" && in(u'a'_C, s) && in(u'b'_C, s) && in(u'c'_C, s))
                 s = s[range_el(0, s.findi(u"b"_S))] & (u"c"_S * s.count(u'c'_C)) & (u"b"_S * s.count(u'b'_C)) & (s[range_ei(s.rfindi(u"c"_S) + 1)]);
             print(s);

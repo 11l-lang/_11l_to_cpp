@@ -3709,7 +3709,7 @@ DefaultDict[String, [String]] smap
 L(s1) states[0 .< (len)-1]
    V i = L.index
    L(s2) states[i + 1 ..]
-      smap[sorted(s1‘’s2).join(‘’)].append(s1‘ + ’s2)
+      smap[sorted(s1‘’s2)].append(s1‘ + ’s2)
 
 L(pairs) sorted(smap.values())
    I pairs.len > 1
@@ -3735,7 +3735,7 @@ struct CodeBlock2
         for (auto &&s1 : states[range_e_llen(0,  - 1)]) {
             auto i = Lindex;
             for (auto &&s2 : states[range_ei(i + 1)])
-                smap[sorted(s1 & s2).join(u""_S)].append(s1 & u" + "_S & s2);
+                smap[sorted(s1 & s2)].append(s1 & u" + "_S & s2);
             Lindex++;
         }}
 

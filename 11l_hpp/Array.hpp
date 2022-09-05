@@ -784,23 +784,21 @@ template <typename Type> Array<Type> sorted(const Array<Type> &arr, nullptr_t, b
 	return r;
 }
 
-Array<Char> sorted(const String &s)
+String sorted(const String &s)
 {
-	Array<Char> arr;
-	arr.assign(s.cbegin(), s.cend());
-	std::sort(arr.begin(), arr.end());
-	return arr;
+	String r(s);
+	std::sort(r.std::u16string::begin(), r.std::u16string::end());
+	return r;
 }
 
-Array<Char> sorted(const String &s, nullptr_t, bool reverse)
+String sorted(const String &s, nullptr_t, bool reverse)
 {
-	Array<Char> arr;
-	arr.assign(s.cbegin(), s.cend());
+	String r(s);
 	if (!reverse)
-		std::sort(arr.begin(), arr.end());
+		std::sort(r.std::u16string::begin(), r.std::u16string::end());
 	else
-		std::sort(arr.begin(), arr.end(), std::greater<>());
-	return arr;
+		std::sort(r.std::u16string::begin(), r.std::u16string::end(), std::greater<>());
+	return r;
 }
 
 // [https://stackoverflow.com/questions/32752739/python-how-does-the-functools-cmp-to-key-function-works <- google:‘c++ cmp_to_key’]
