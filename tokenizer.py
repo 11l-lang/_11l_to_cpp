@@ -319,7 +319,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                 if ch == '@':
                     while i < len(source) and source[i] == '@':
                         i += 1
-                    if i < len(source) and source[i] == '=':
+                    if i < len(source) and source[i] in ('=', ':'):
                         i += 1
                 while i < len(source):
                     ch = source[i]
@@ -329,7 +329,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                 # Tokenize `fs:path:dirname` to ['fs:path', ':', 'dirname']
                 j = i - 1
                 while j > lexem_start:
-                    if source[j] == ':':
+                    if source[j] == ':' and source[j-1] != '@':
                         i = j
                         break
                     j -= 1

@@ -338,6 +338,12 @@ class SymbolNode:
                                        and not (self.parent.symbol.id == '=' and self is self.parent.children[0])):
                     return '*' + self.token_str()
 
+            if '@:' in self.token_str():
+                var_name = self.token_str()[self.token_str().index(':') + 1:]
+                tid = self.scope.find(var_name)
+                if tid is not None and len(tid.ast_nodes) and isinstance(tid.ast_nodes[0], ASTVariableDeclaration) and tid.ast_nodes[0].is_static:
+                    return 's_' + var_name
+
             return self.token_str().lstrip('@=').replace(':', '::')
 
         if self.token.category == Token.Category.KEYWORD and self.token_str() in ('L.last_iteration', 'Ц.последняя_итерация', 'loop.last_iteration', 'цикл.последняя_итерация'):
@@ -978,7 +984,8 @@ class SymbolNode:
                                 if t.startswith('='):
                                     t = t[1:]
                                     by_ref = False
-                                captured_variables.add('this' if t == '' else '&'*by_ref + t)
+                                if not t.startswith(':'):
+                                    captured_variables.add('this' if t == '' else '&'*by_ref + t)
                         elif sn.token.value(source) == '(.)':
                             captured_variables.add('this')
                     else:
@@ -1480,7 +1487,8 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                                 if t.startswith('='):
                                     t = t[1:]
                                     by_ref = False
-                                captured_variables.add('this' if t == '' else '&'*by_ref + t)
+                                if not t.startswith(':'):
+                                    captured_variables.add('this' if t == '' else '&'*by_ref + t)
                         elif sn.token.value(source) == '(.)':
                             captured_variables.add('this')
                     else:

@@ -1760,3 +1760,18 @@ public:
     {
     }
 };
+
+
+F f()
+   V :n = 0 //static local variable
+   F g()
+      @:n++
+===
+auto f()
+{
+    static auto s_n = 0;
+    auto g = []()
+    {
+        s_n++;
+    };
+}
