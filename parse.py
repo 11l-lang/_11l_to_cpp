@@ -1221,6 +1221,11 @@ class ASTProgram(ASTNodeWithChildren):
 class ASTExpression(ASTNodeWithExpression):
     def to_str(self, indent):
         if self.expression.symbol.id == '=' and type(self.parent) == ASTTypeDefinition:
+            if self.expression.children[0].symbol.id == '-' and len(self.expression.children[0].children) == 1:
+                if self.expression.children[0].children[0].symbol.id == ':' and len(self.expression.children[0].children[0].children) == 1:
+                    return self.pre_nl + ' ' * (indent*4) + 'static const auto s_' + self.expression.children[0].children[0].children[0].to_str() + ' = ' + self.expression.children[1].to_str() + ";\n"
+                #return self.pre_nl + ' ' * (indent*4) + 'const decltype(' + self.expression.children[1].to_str() + ') ' + self.expression.children[0].children[0].to_str() + ' = ' + self.expression.children[1].to_str() + ";\n"
+                assert(False)
             if self.expression.children[0].symbol.id == ':' and len(self.expression.children[0].children) == 1:
                 return self.pre_nl + ' ' * (indent*4) + 'static inline auto s_' + self.expression.children[0].children[0].to_str() + ' = ' + self.expression.children[1].to_str() + ";\n"
             return self.pre_nl + ' ' * (indent*4) + 'decltype(' + self.expression.children[1].to_str() + ') ' + self.expression.to_str() + ";\n"

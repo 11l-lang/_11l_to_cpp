@@ -1731,3 +1731,13 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+T Type
+   . -:private_const_static_var = 10
+===
+class Type
+{
+private:
+    static const auto s_private_const_static_var = 10;
+};
