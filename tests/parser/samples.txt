@@ -1735,12 +1735,28 @@ struct CodeBlock1
 
 T Type
    . -:private_const_static_var = 10
+   -const_var = 11
    -Int c
+   -Int cc = 2
+
+   F ()
+      .const_var = -11
+      .c = 1
+      .cc = 3
 ===
 class Type
 {
 private:
     static const auto s_private_const_static_var = 10;
 public:
+    const decltype(11) const_var = 11;
     const int c;
+    const int cc = 2;
+
+    Type() :
+        const_var(-11),
+        c(1),
+        cc(3)
+    {
+    }
 };

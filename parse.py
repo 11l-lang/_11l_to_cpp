@@ -1224,8 +1224,7 @@ class ASTExpression(ASTNodeWithExpression):
             if self.expression.children[0].symbol.id == '-' and len(self.expression.children[0].children) == 1:
                 if self.expression.children[0].children[0].symbol.id == ':' and len(self.expression.children[0].children[0].children) == 1:
                     return self.pre_nl + ' ' * (indent*4) + 'static const auto s_' + self.expression.children[0].children[0].children[0].to_str() + ' = ' + self.expression.children[1].to_str() + ";\n"
-                #return self.pre_nl + ' ' * (indent*4) + 'const decltype(' + self.expression.children[1].to_str() + ') ' + self.expression.children[0].children[0].to_str() + ' = ' + self.expression.children[1].to_str() + ";\n"
-                assert(False)
+                return self.pre_nl + ' ' * (indent*4) + 'const decltype(' + self.expression.children[1].to_str() + ') ' + self.expression.children[0].children[0].to_str() + ' = ' + self.expression.children[1].to_str() + ";\n"
             if self.expression.children[0].symbol.id == ':' and len(self.expression.children[0].children) == 1:
                 return self.pre_nl + ' ' * (indent*4) + 'static inline auto s_' + self.expression.children[0].children[0].to_str() + ' = ' + self.expression.children[1].to_str() + ";\n"
             return self.pre_nl + ' ' * (indent*4) + 'decltype(' + self.expression.children[1].to_str() + ') ' + self.expression.to_str() + ";\n"
@@ -1511,8 +1510,8 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
         else:
             s = ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + (self.function_name if self.function_name != '' else '_')
 
-        if len(self.function_arguments) == 0:
-            return self.children_to_str(indent, s + '()' + ' const'*(self.is_const or is_const))
+        #if len(self.function_arguments) == 0:
+        #    return self.children_to_str(indent, s + '()' + ' const'*(self.is_const or is_const))
 
         templates = []
         arguments = []
@@ -1540,6 +1539,17 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                         + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + 'make_ref('*make_ref + arg[1] + ')'*make_ref))
 
         if self.member_initializer_list == '' and self.function_name == '' and type(self.parent) == ASTTypeDefinition:
+            def is_const_var(var_name):
+                for child in self.parent.children:
+                    if type(child) == ASTExpression:
+                        if child.expression.symbol.id == '=' and child.expression.children[0].symbol.id == '-' and len(child.expression.children[0].children) == 1:
+                            if child.expression.children[0].children[0].token_str() == var_name:
+                                return True
+                    elif isinstance(child, ASTVariableDeclaration):
+                        if child.is_const and var_name in child.vars:
+                            return True
+                return False
+
             i = 0
             while i < len(self.children):
                 c = self.children[i]
@@ -1547,8 +1557,9 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                         and c.expression.children[0].symbol.id == '.' \
                     and len(c.expression.children[0].children) == 1 \
                         and c.expression.children[0].children[0].token.category == Token.Category.NAME \
-                        and c.expression.children[1].token.category == Token.Category.NAME \
-                        and c.expression.children[1].token_str() in (arg[0] for arg in self.function_arguments):
+                      and ((c.expression.children[1].token.category == Token.Category.NAME
+                        and c.expression.children[1].token_str() in (arg[0] for arg in self.function_arguments))
+                         or is_const_var(c.expression.children[0].children[0].token_str())):
 
                     if self.scope.parent.ids.get(c.expression.children[0].children[0].token_str()) is None: # this member variable is defined in the base type/class
                         i += 1
@@ -1558,7 +1569,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                         self.member_initializer_list = " :\n"
                     else:
                         self.member_initializer_list += ",\n"
-                    ec1 = c.expression.children[1].token_str()
+                    ec1 = c.expression.children[1].to_str()
                     for index, arg in enumerate(self.function_arguments):
                         if arg[0] == ec1:
                             if arguments[index].startswith('std::unique_ptr<'):
@@ -1569,9 +1580,9 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                     continue
                 i += 1
 
-        r = self.children_to_str(indent, ('template <' + ', '.join(templates) + '> ')*(len(templates) != 0) + s + '(' + ', '.join(arguments) + ')' + ' const'*(self.is_const or self.function_name in tokenizer.all_operators) + self.member_initializer_list)
+        r = self.children_to_str(indent, ('template <' + ', '.join(templates) + '> ')*(len(templates) != 0) + s + '(' + ', '.join(arguments) + ')' + ' const'*(self.is_const or is_const) + self.member_initializer_list)
 
-        if isinstance(self.parent, ASTTypeDefinition) and self.function_name in ('+', '-', '*', '/') and self.function_name + '=' not in self.parent.scope.ids:
+        if isinstance(self.parent, ASTTypeDefinition) and self.function_name in ('+', '-', '*', '/') and self.function_name + '=' not in self.parent.scope.ids and len(self.function_arguments) == 1:
             r += ' ' * (indent*4) + 'template <typename Ty> auto &operator' + self.function_name + "=(const Ty &t)\n"
             r += ' ' * (indent*4) + "{\n"
             r += ' ' * ((indent+1)*4) + '*this = *this ' + self.function_name + " t;\n"
