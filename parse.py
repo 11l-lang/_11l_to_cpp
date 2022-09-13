@@ -3307,7 +3307,7 @@ def parse_internal(this_node):
                         if id is not None:
                             assert(len(id.ast_nodes) == 1)
                             if type(id.ast_nodes[0]) not in (ASTTypeDefinition, ASTTypeEnum, ASTTypeAlias):
-                                raise Error('identifier is of type `' + type(id.ast_nodes[0]).__name__ + '` (should be ASTTypeDefinition or ASTTypeEnum)', node_expression.token) # this error was in line `String sitem` because of `F String()`
+                                raise Error('identifier is of type `' + type(id.ast_nodes[0]).__name__ + '` (should be ASTTypeDefinition, ASTTypeEnum, or ASTTypeAlias)', node_expression.token) # this error was in line `String sitem` because of `F String()`
                             if type(id.ast_nodes[0]) == ASTTypeDefinition:
                                 if id.ast_nodes[0].has_virtual_functions or id.ast_nodes[0].has_pointers_to_the_same_type:
                                     node.is_ptr = True
@@ -3384,7 +3384,16 @@ def parse_internal(this_node):
                     node.set_expression(node_expression)
                     if isinstance(this_node, ASTTypeDefinition) and node_expression.symbol.id == '=': # fix error ‘identifier `disInter` is not found in `r`’ in '9.yopyra.py'
                         c0 = node_expression.children[0]
-                        scope.add_name(c0.children[0].token_str() if c0.symbol.id == ':' and len(c0.children) == 1 else c0.token_str(), node)
+                        if c0.symbol.id == '-' and len(c0.children) == 1:
+                            if c0.children[0].symbol.id == ':' and len(c0.children[0].children) == 1:
+                                name = c0.children[0].children[0].token_str()
+                            else:
+                                name = c0.children[0].token_str()
+                        elif c0.symbol.id == ':' and len(c0.children) == 1:
+                            name = c0.children[0].token_str()
+                        else:
+                            name = c0.token_str()
+                        scope.add_name(name, node)
 
                 node.pre_nl = npre_nl
 
