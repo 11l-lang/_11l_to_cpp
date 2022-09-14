@@ -46,7 +46,7 @@ empty_list_of_str : List[str] = []
 binary_operators : List[Set[str]] = [] # `initializer_list` does not support move-only types (like `Set`) ([https://stackoverflow.com/questions/8193102/initializer-list-and-move-semantics <- google:‘initializer_list rvalue’])
 binary_operators.append(set(empty_list_of_str))
 binary_operators.append({str('+'), '-', '*', '/', '%', '^', '&', '|', '<', '>', '=', '?'})
-binary_operators.append({'<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '->', '..', '.<', '.+', '<.', 'I/', 'Ц/', '-%', 'C ', 'С '})
+binary_operators.append({'<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '.=', '->', '..', '.<', '.+', '<.', 'I/', 'Ц/', '-%', 'C ', 'С '})
 binary_operators.append({'<<=', '>>=', '‘’=', '[+]', '[&]', '[|]', '(+)', '<.<', '-I/', '-Ц/', 'I/=', 'Ц/=', 'in ', 'св ', '!C ', '!С '})
 binary_operators.append({'[+]=', '[&]=', '[|]=', '(+)=', '!in ', '!св '})
 unary_operators : List[Set[str]] = []

@@ -2417,6 +2417,23 @@ def led(self, left):
     return self
 symbol('.:').led = led
 
+def led(self, left):
+    expr = expression(10 - 1)
+    assert(expr.function_call)
+    f = expr.children[0]
+    expr.children[0] = SymbolNode(Token(token.start, token.start, Token.Category.DELIMITER))
+    expr.children[0].symbol = symbol_table['.']
+    expr.children[0].parent = f.parent
+    expr.children[0].append_child(left)
+    expr.children[0].append_child(f)
+
+    sn = SymbolNode(Token(token.start, token.start, Token.Category.OPERATOR))
+    sn.symbol = symbol_table['=']
+    sn.append_child(left)
+    sn.append_child(expr)
+    return sn
+symbol('.=', 10).led = led
+
 class Module:
     scope : Scope
 

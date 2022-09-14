@@ -1775,3 +1775,26 @@ auto f()
         s_n++;
     };
 }
+
+
+F p(=s, keep_newline)
+   I !keep_newline
+      s .= rtrim("\n", 1)
+   print(s.len)
+
+p("...\n\n", 0B)
+===
+template <typename T1, typename T2> auto p(T1 s, const T2 &keep_newline)
+{
+    if (!keep_newline)
+        s = s.rtrim(u"\n"_S, 1);
+    print(s.len());
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        p(u"...\n\n"_S, false);
+    }
+} code_block_1;
