@@ -742,7 +742,7 @@ class SymbolNode:
                                 t = self.children[len(self.children)-1].rightmost()
                                 raise Error('missing required argument `'+ f_node.function_arguments[last_function_arg][0] + '`', Token(t, t, Token.Category.DELIMITER))
                             last_function_arg += 1
-                    elif type(f_node) in (ASTTypeEnum, ASTTypeAlias):
+                    elif type(f_node) in (ASTTypeEnum, ASTTypeAlias, ASTTypeDefinition):
                         pass
                     elif f_node.function_pointer:
                         if last_function_arg != len(f_node.type_args):

@@ -1798,3 +1798,22 @@ struct CodeBlock1
         p(u"...\n\n"_S, false);
     }
 } code_block_1;
+
+
+T Type
+   T SubType
+      member = 0
+
+V t = Type.SubType()
+===
+class Type
+{
+public:
+    class SubType
+    {
+    public:
+        decltype(0) member = 0;
+    };
+};
+
+auto t = Type::SubType();
