@@ -274,7 +274,7 @@ class SymbolNode:
                     if i < len(self.children) - 1:
                         r += ', '
                 return r + ')'
-        elif self.symbol.id == 'T?':
+        elif self.symbol.id == 'T? ':
             return self.children[0].to_type_str() + '?'
 
         assert(self.token.category == Token.Category.NAME or (self.token.category == Token.Category.CONSTANT and self.token.value(source) in ('N', 'Н', 'null', 'нуль')))
@@ -1112,7 +1112,7 @@ def symbol(id, bp = 0):
         s.id = id
         s.lbp = bp
         symbol_table[id] = s
-        if id[0].isalpha() and not id in ('I/', 'Ц/', 'I/=', 'Ц/=', 'C', 'С', 'in', 'св', 'T?', 'T:'): # this is keyword-in-expression
+        if id[0].isalpha() and not id in ('I/', 'Ц/', 'I/=', 'Ц/=', 'C', 'С', 'in', 'св', 'T? ', 'T :'): # this is keyword-in-expression
             assert(id.isalpha() or id in ('L.last_iteration', 'Ц.последняя_итерация', 'loop.last_iteration', 'цикл.последняя_итерация'))
             allowed_keywords_in_expressions.append(id)
     else:
@@ -2247,12 +2247,12 @@ def next_token(): # why ‘next_token’: >[https://youtu.be/Nlqv6NtBXcA?t=1203]
             else:
                 key = token.value(source)
                 if key == '?' and source[token.end] in (' ', "\n") and source[token.start-1] != ' ': # for `(Char, [Int])?` (but `i?1` must be equivalent to `i ? 1`)
-                    key = 'T?'
+                    key = 'T? '
                 elif key == ':' and source[token.start-1] == ' ' and source[token.end] != ' ': # for `Int :i1`
                     if tokens[tokeni-1].category not in (Token.Category.KEYWORD, Token.Category.OPERATOR): # for `I :argv.len == 1` and `L n !C :p`
                         pc = source[token.start-2] # [[
                         if pc.isalpha() or pc.isdigit() or pc in '_]': # in 11l: `I source[token.start-2]. {.is_alpha() | .is_digit() | (.) C ‘_]’}`
-                            key = 'T:'
+                            key = 'T :'
             tokensn.symbol = symbol_table[key]
 
 def advance(value):
@@ -2342,7 +2342,7 @@ prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('(-)', 130); prefix
 
 infix_r('^', 140)
 
-symbol('.', 150); symbol(':', 150); symbol('.:', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('T?', 150); postfix('T:', 150); postfix('--', 150); postfix('++', 150)
+symbol('.', 150); symbol(':', 150); symbol('.:', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('T? ', 150); postfix('T :', 150); postfix('--', 150); postfix('++', 150)
 prefix('.', 150); prefix(':', 150); prefix('.:', 150); symbol('[%', 150) # ]
 
 infix_r('=', 10); infix_r('+=', 10); infix_r('-=', 10); infix_r('*=', 10); infix_r('/=', 10); infix_r('I/=', 10); infix_r('Ц/=', 10); infix_r('%=', 10); infix_r('>>=', 10); infix_r('<<=', 10); infix_r('^=', 10)
