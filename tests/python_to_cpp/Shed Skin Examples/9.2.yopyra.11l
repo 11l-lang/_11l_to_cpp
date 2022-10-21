@@ -56,7 +56,7 @@ T Cuerpo
    F init(tipo, material)
       .tipo = tipo
       .material = material
-   F.virtual.abstract intersecta(Rayo& r) -> Bool
+   F.virtual.abstract intersecta(Rayo &r) -> Bool
    F.virtual.abstract getNormal((Float, Float, Float) punto) -> (Float, Float, Float)
 
 T Esfera(Cuerpo)
@@ -68,7 +68,7 @@ T Esfera(Cuerpo)
       .posicion = posicion
       .radio = radio
 
-   F.virtual.assign intersecta(Rayo& r) -> Bool
+   F.virtual.assign intersecta(Rayo &r) -> Bool
       V esfera_rayo = .posicion - r.origen
       V v = dot(esfera_rayo, r.direccion)
 
@@ -97,7 +97,7 @@ T Plano(Cuerpo)
       .normal = normalize(normal)
       .distancia = distancia
 
-   F.virtual.assign intersecta(Rayo& r) -> Bool
+   F.virtual.assign intersecta(Rayo &r) -> Bool
       V v = dot(.normal, r.direccion)
       I v == 0.0
          R 0B
@@ -200,7 +200,7 @@ T Scene
 V scene_namefile = ‘testdata/scene.txt’
 V scene = Scene(scene_namefile)
 
-F calculaSombra(Rayo& r; objChoque)
+F calculaSombra(Rayo &r; objChoque)
    V sombra = 1.0
    L(obj) :scene.lObjetos
       r.objInter = N
@@ -210,7 +210,7 @@ F calculaSombra(Rayo& r; objChoque)
          sombra *= :scene.lMateriales[obj.material].cTransmitividad
    R sombra
 
-F trazar(Rayo& r; prof) -> (Float, Float, Float)
+F trazar(Rayo &r; prof) -> (Float, Float, Float)
    V c = (0.0, 0.0, 0.0)
 
    L(obj) :scene.lObjetos

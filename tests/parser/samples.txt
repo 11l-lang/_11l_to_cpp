@@ -1817,3 +1817,11 @@ public:
 };
 
 auto t = Type::SubType();
+
+
+// [https://codeforces.com/usertalk/with/2020TAndr]:‘def __best(n, m, arr: List[Tuple[Callable[[Int64, Int64, Int64], Int64], Int64]]) -> Tuple[Callable[[Int64, Int64, Int64], Int64], Int64]:’
+F f([((Int, Int) -> Int)] &arr) {}
+===
+auto f(Array<std::function<int(const int, const int)>> &arr)
+{
+}

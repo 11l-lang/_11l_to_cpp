@@ -98,7 +98,7 @@ T Cuerpo
       .tipo = tipo
       .material = material
 
-   F.virtual.abstract intersecta(Rayo& r) -> Bool
+   F.virtual.abstract intersecta(Rayo &r) -> Bool
 
    F.virtual.abstract getNormal(Vector punto) -> Vector
 
@@ -111,7 +111,7 @@ T Esfera(Cuerpo)
       .posicion = posicion
       .radio = radio
 
-   F.virtual.assign intersecta(Rayo& r) -> Bool
+   F.virtual.assign intersecta(Rayo &r) -> Bool
       V esfera_rayo = .posicion - r.origen
       V v = esfera_rayo.pEscalar(r.direccion)
 
@@ -143,7 +143,7 @@ T Plano(Cuerpo)
       .normal.normalizar()
       .distancia = distancia
 
-   F.virtual.assign intersecta(Rayo& r) -> Bool
+   F.virtual.assign intersecta(Rayo &r) -> Bool
       V v = .normal.pEscalar(r.direccion)
       I v == 0.0
          R 0B
@@ -260,7 +260,7 @@ T Scene
 V scene_namefile = ‘testdata/scene.txt’
 V scene = Scene(scene_namefile)
 
-F calculaSombra(Rayo& r; objChoque)
+F calculaSombra(Rayo &r; objChoque)
    V sombra = 1.0
    L(obj) :scene.lObjetos
       r.objInter = N
@@ -271,7 +271,7 @@ F calculaSombra(Rayo& r; objChoque)
 
    R sombra
 
-F trazar(Rayo& r; prof) -> Color
+F trazar(Rayo &r; prof) -> Color
    V c = Color()
 
    L(obj) :scene.lObjetos

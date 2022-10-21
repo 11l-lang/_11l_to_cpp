@@ -1921,9 +1921,9 @@ T Vector
 {
 }
 T Base
-   F.virtual.abstract intersecta(Rayo& r, Vector v) -> N
+   F.virtual.abstract intersecta(Rayo &r, Vector v) -> N
 T Derived(Base)
-   F.virtual.assign intersecta(Rayo& r, Vector v) -> N
+   F.virtual.assign intersecta(Rayo &r, Vector v) -> N
    {
    }
 ===
@@ -2024,20 +2024,20 @@ T Cuerpo
       .tipo = tipo
       .material = material
 
-   F.virtual.abstract intersecta(Rayo& r) -> N
+   F.virtual.abstract intersecta(Rayo &r) -> N
 
 T Esfera(Cuerpo)
    F (material)
       .init(‘esfera’, material)
 
-   F.virtual.assign intersecta(Rayo& r) -> N
+   F.virtual.assign intersecta(Rayo &r) -> N
       r.objInter = (.)
 
 T Plano(Cuerpo)
    F (material)
       .init(‘plano’, material)
 
-   F.virtual.assign intersecta(Rayo& r) -> N
+   F.virtual.assign intersecta(Rayo &r) -> N
       r.objInter = (.)
 
 T Scene
@@ -2050,13 +2050,13 @@ T Scene
 
 V scene = Scene()
 
-F calculaSombra(Rayo& r; objChoque)
+F calculaSombra(Rayo &r; objChoque)
    L(obj) :scene.lObjetos
       r.objInter = N
       obj.intersecta(r)
       print(&obj != &objChoque)
 
-F trazar(Rayo& r)
+F trazar(Rayo &r)
    L(obj) :scene.lObjetos
       obj.intersecta(r)
 

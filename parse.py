@@ -692,9 +692,9 @@ class SymbolNode:
                 last_function_arg = 0
                 res = func_name + '('
                 for i in range(1, len(self.children), 2):
-                    make_ref = self.children[i+1].symbol.id == '&' and len(self.children[i+1].children) == 1 and (self.children[i+1].children[0].is_list
-                                                                                                               or self.children[i+1].children[0].is_dict
-                                                                                                               or self.children[i+1].children[0].function_call)
+                    make_ref = self.children[i+1].symbol.id in ('&', 'T &') and len(self.children[i+1].children) == 1 and (self.children[i+1].children[0].is_list
+                                                                                                                        or self.children[i+1].children[0].is_dict
+                                                                                                                        or self.children[i+1].children[0].function_call)
                     if self.children[i] is None:
                         cstr = self.children[i+1].to_str()
                         if f_node is not None and type(f_node) == ASTFunctionDefinition:
@@ -702,7 +702,7 @@ class SymbolNode:
                                 raise Error('too many arguments for function `' + func_name + '`', self.children[0].left_to_right_token())
                             if f_node.first_named_only_argument is not None and last_function_arg >= f_node.first_named_only_argument:
                                 raise Error('argument `' + f_node.function_arguments[last_function_arg][0] + '` of function `' + func_name + '` is named-only', self.children[i+1].token)
-                            if len(f_node.function_arguments[last_function_arg]) > 3 and '&' in f_node.function_arguments[last_function_arg][3] and not (self.children[i+1].symbol.id == '&' and len(self.children[i+1].children) == 1) and self.children[i+1].token_str() not in ('N', 'Н', 'null', 'нуль'):
+                            if len(f_node.function_arguments[last_function_arg]) > 3 and '&' in f_node.function_arguments[last_function_arg][3] and not (self.children[i+1].symbol.id in ('&', 'T &') and len(self.children[i+1].children) == 1) and self.children[i+1].token_str() not in ('N', 'Н', 'null', 'нуль'):
                                 raise Error('argument `' + f_node.function_arguments[last_function_arg][0] + '` of function `' + func_name + '` is in-out, but there is no `&` prefix', self.children[i+1].token)
                             if f_node.function_arguments[last_function_arg][2] == 'File?':
                                 tid = self.scope.find(self.children[i+1].token_str())
@@ -867,7 +867,7 @@ class SymbolNode:
                     return 'range_elen_i(' + c0[len('(len)'):] + ')'
                 else:
                     return 'range_ei(' + c0 + ')'
-            elif self.symbol.id == '&':
+            elif self.symbol.id in ('&', 'T &'):
                 assert(self.parent.function_call)
                 return self.children[0].to_str()
             else:
@@ -1020,7 +1020,7 @@ class SymbolNode:
                 return self.children[0].to_str() + ' = idiv(' + self.children[0].to_str() + ', ' + self.children[1].to_str() + ')'
             elif self.symbol.id in ('==', '!=', '=') and self.children[1].token.category == Token.Category.NAME and self.children[1].token_str().isupper() and self.scope.find(self.children[1].token_str()) is None: # `token.category == NAME` -> `token.category == TYPE_RM_REF(token.category)::NAME` and `category = NAME` -> `category = TYPE_RM_REF(category)::NAME`
                 return self.children[0].to_str() + ' ' + self.symbol.id + ' TYPE_RM_REF(' + self.children[0].to_str() + ')::' + self.children[1].token_str()
-            elif self.symbol.id in ('==', '!=') and self.children[0].symbol.id == '&' and len(self.children[0].children) == 1 and self.children[1].symbol.id == '&' and len(self.children[1].children) == 1: # `&a == &b` -> `&a == &b`
+            elif self.symbol.id in ('==', '!=') and self.children[0].symbol.id in ('&', 'T &') and len(self.children[0].children) == 1 and self.children[1].symbol.id in ('&', 'T &') and len(self.children[1].children) == 1: # `&a == &b` -> `&a == &b`
                 id_, s = self.scope.find_and_return_scope(self.children[0].children[0].token_str())
                 if id_ is not None and len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTLoop and id_.ast_nodes[0].is_loop_variable_a_ptr and self.children[0].children[0].token_str() == id_.ast_nodes[0].loop_variable: # `L(obj)...&obj != &objChoque` -> `...&*obj != objChoque`
                     return '&*' + self.children[0].children[0].token_str() + ' ' + self.symbol.id + ' ' + self.children[1].children[0].token_str()
@@ -1112,7 +1112,7 @@ def symbol(id, bp = 0):
         s.id = id
         s.lbp = bp
         symbol_table[id] = s
-        if id[0].isalpha() and not id in ('I/', 'Ц/', 'I/=', 'Ц/=', 'C', 'С', 'in', 'св', 'T? ', 'T :'): # this is keyword-in-expression
+        if id[0].isalpha() and not id in ('I/', 'Ц/', 'I/=', 'Ц/=', 'C', 'С', 'in', 'св', 'T? ', 'T :', 'T &', 'T ='): # this is keyword-in-expression
             assert(id.isalpha() or id in ('L.last_iteration', 'Ц.последняя_итерация', 'loop.last_iteration', 'цикл.последняя_итерация'))
             allowed_keywords_in_expressions.append(id)
     else:
@@ -2253,6 +2253,12 @@ def next_token(): # why ‘next_token’: >[https://youtu.be/Nlqv6NtBXcA?t=1203]
                         pc = source[token.start-2] # [[
                         if pc.isalpha() or pc.isdigit() or pc in '_]': # in 11l: `I source[token.start-2]. {.is_alpha() | .is_digit() | (.) C ‘_]’}`
                             key = 'T :'
+                # elif key == '&' and source[token.start-1] == ' ' and source[token.end] not in (' ', "\n"): # for `F (ArgTy &arg)`
+                #     key = 'T &'
+                # elif key == '=' and source[token.start-1] == ' ' and source[token.end] not in (' ', "\n"): # for `F (ArgTy =arg)`
+                #     key = 'T ='
+                elif key in ('&', '=') and source[token.start-1] == ' ' and source[token.end] not in (' ', "\n"): # for `F (ArgTy &arg)` and `F (ArgTy =arg)`
+                    key = 'T ' + key
             tokensn.symbol = symbol_table[key]
 
 def advance(value):
@@ -2343,7 +2349,7 @@ prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('(-)', 130); prefix
 infix_r('^', 140)
 
 symbol('.', 150); symbol(':', 150); symbol('.:', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('T? ', 150); postfix('T :', 150); postfix('--', 150); postfix('++', 150)
-prefix('.', 150); prefix(':', 150); prefix('.:', 150); symbol('[%', 150) # ]
+prefix('.', 150); prefix(':', 150); prefix('.:', 150); symbol('[%', 150); prefix('T &', 130); prefix('T =', 150) # ]
 
 infix_r('=', 10); infix_r('+=', 10); infix_r('-=', 10); infix_r('*=', 10); infix_r('/=', 10); infix_r('I/=', 10); infix_r('Ц/=', 10); infix_r('%=', 10); infix_r('>>=', 10); infix_r('<<=', 10); infix_r('^=', 10)
 infix_r('[+]=', 10); infix_r('[&]=', 10); infix_r('[|]=', 10); infix_r('(+)=', 10); infix_r('‘’=', 10)
@@ -2780,45 +2786,12 @@ def parse_internal(this_node):
                             next_token()
                             continue
                         type_ = '' # (
-                        if token.value(source)[0].isupper() and peek_token().value(source) not in (',', ')'): # this is a type name
-                            type_ = token.value(source)
-                            next_token()
-                        if token.value(source) == '[': # ]
-                            nesting_level = 0
-                            while True:
-                                type_ += token.value(source)
-                                if token.value(source) == '[':
-                                    next_token()
-                                    nesting_level += 1
-                                elif token.value(source) == ']':
-                                    next_token()
-                                    nesting_level -= 1
-                                    if nesting_level == 0:
-                                        break
-                                elif token.value(source) == ',':
-                                    type_ += ' '
-                                    next_token()
-                                elif token.value(source) == '=':
-                                    next_token()
-                                else:
-                                    if token.category != Token.Category.NAME:
-                                        raise Error('expected subtype name', token)
-                                    next_token()
-                                if token.value(source) == '(':
-                                    type_ += '('
-                                    next_token()
-                                    while token.value(source) != ')':
-                                        type_ += token.value(source)
-                                        if token.value(source) == ',':
-                                            type_ += ' '
-                                        next_token()
-                                    next_token()
-                                    type_ += ')'
-                            if token.value(source) == '?':
-                                type_ += '?'
-                                next_token()
-                        if token.value(source) == '(': # )
+                        if not (token.value(source) in ('&', '=') or (token.category == Token.Category.NAME
+                                                                      and (peek_token().value(source) in (',', ';', ')') or
+                                                                          (peek_token().value(source) == '=') and source[peek_token().start-1:peek_token().end+1] in (' = ', " =\n")))):
                             type_ = expression().to_type_str()
+                            if type_.startswith('Array['): # ]
+                                type_ = type_[5:]
                         if type_ == '':
                             type_ = prev_type_name
                         qualifier = ''
