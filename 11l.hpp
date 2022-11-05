@@ -149,6 +149,7 @@ template <typename Ty> Ty &make_ref(const Ty &cref)
 
 typedef long long Int64; // this is needed because in GCC `int64_t` is `long` in 64-bit mode
 typedef unsigned long long UInt64;
+#include <stdint.h>
 #ifdef INT_IS_INT64
 typedef Int64 Int;
 typedef UInt64 UInt;
