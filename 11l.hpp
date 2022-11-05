@@ -94,6 +94,8 @@ template <typename Type0, typename Type1, typename Type2, typename Type3, typena
 class NullPointerException
 {};
 
+using std::nullptr_t;
+
 template <typename Ty> class Nullable
 {
 	bool has_value;
