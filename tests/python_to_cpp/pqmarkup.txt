@@ -233,7 +233,7 @@ class Converter:
         while i < len(instr):
             ch = instr[i]
             if (i == 0 or prev_char() == "\n" # if beginning of line
-                       or (i == writepos and len(ending_tags) != 0 and ending_tags[-1] in ('</blockquote>', '</div>') and instr[i-2:i] in ('>‘', '<‘', '!‘'))): # ’’’ # or beginning of blockquote or note
+                       or (i == writepos and len(ending_tags) != 0 and ending_tags[-1] in ('</blockquote>', '</div>') and instr[i-2:i] in ('>‘', '<‘', '!‘', ':‘'))): # ’’’’ # or beginning of blockquote or note
                 if ch == '.' and (next_char() in ' ‘'): # ’ this is unordered list
                     close_ordered_list()
                     s = ''
@@ -609,26 +609,37 @@ class Converter:
                         ending_tags.append('</' + tag + '>')
                     elif prevc in 'CС':
                         write_to_pos(prevci, i + 1)
-                        which_color = 'color'
-                        if str_in_p[0:1] == '-':
-                            str_in_p = str_in_p[1:]
-                            which_color = 'background-color'
-                        if str_in_p[0:1] == '#':
-                            new_str_in_p = ''
-                            for c in str_in_p:
-                                cc = {'а':'A','б':'B','с':'C','д':'D','е':'E','ф':'F'}.get(c.lower(), c)[0]
-                                new_str_in_p += cc.lower() if c.islower() else cc
-                            str_in_p = new_str_in_p
-                        elif len(str_in_p) in (1, 3) and str_in_p.isdigit():
-                            new_str = "#"
-                            for ii in [0, 1, 2] if len(str_in_p) == 3 else [0, 0, 0]:
-                                new_str += hex((int(str_in_p[ii]) * 0xFF + 4) // 8)[2:].upper().zfill(2) # 8 - FF, 0 - 00, 4 - 80 (почему не 7F[‘когда `+ 3` вместо `+ 4`’] — две субъективные причины: 1.‘больше нравится как выглядит’ и 2.‘количество пикселей в строке `80` при `"font_face": "Courier New", "font_size": 10`’)
-                            str_in_p = new_str
+
+                        def translate_color(color):
+                            if color[0:1] == '#':
+                                r = ''
+                                for c in color:
+                                    cc = {'а':'A','б':'B','с':'C','д':'D','е':'E','ф':'F'}.get(c.lower(), c)[0]
+                                    r += cc.lower() if c.islower() else cc
+                                return r
+                            elif len(color) in (1, 3) and color.isdigit():
+                                r = "#"
+                                for ii in [0, 1, 2] if len(color) == 3 else [0, 0, 0]:
+                                    r += hex((int(color[ii]) * 0xFF + 4) // 8)[2:].upper().zfill(2) # 8 - FF, 0 - 00, 4 - 80 (почему не 7F[‘когда `+ 3` вместо `+ 4`’] — две субъективные причины: 1.‘больше нравится как выглядит’ и 2.‘количество пикселей в строке `80` при `"font_face": "Courier New", "font_size": 10`’)
+                                return r
+                            return color
+
                         if self.habr_html:
-                            outfile.write('<font color="' + str_in_p + '">')
+                            if '-' in str_in_p:
+                                #exit_with_error('`-` is not supported in color with --habr-html', prevci + 2 + str_in_p.index('-'))
+                                exit_with_error('background color is not supported with --habr-html', prevci + 2 + str_in_p.index('-'))
+                            outfile.write('<font color="' + translate_color(str_in_p) + '">')
                             ending_tags.append('</font>')
                         else: # The <font> tag is not supported in HTML5.
-                            outfile.write('<span style="'+which_color+': ' + str_in_p + '">')
+                            style = ''
+                            if str_in_p[0:1] == '-':
+                                style = 'background-color: ' + translate_color(str_in_p[1:])
+                            elif '-' in str_in_p:
+                                color, bgcolor = str_in_p.split('-')
+                                style = 'color: ' + translate_color(color) + '; background-color: ' + translate_color(bgcolor)
+                            else:
+                                style = 'color: ' + translate_color(str_in_p)
+                            outfile.write('<span style="' + style + '">')
                             ending_tags.append('</span>')
                     elif (instr[prevci-1:prevci], prevc) in (('/', "\\"), ("\\", '/')):
                         write_to_pos(prevci-1, i + 1)
@@ -752,7 +763,7 @@ def to_html(instr, outfilef : IO[str] = None, ohd = False, *, habr_html = False)
 if __name__ == '__main__':
     # Support running module as a command line command.
     if '-h' in sys.argv or '--help' in sys.argv:
-        print(R'''A Python implementation of pq markup to HTML converter.
+        print(R'''A Python implementation of pqmarkup to HTML converter.
 
 Usage: pqmarkup [options] [INPUTFILE]
 
@@ -766,7 +777,7 @@ Options:
   --output-html-document
                         add some html header for rough testing preview of your
                         converted documents
-  -f [OUTPUT_FILE], --file [OUTPUT_FILE]
+  -f OUTPUT_FILE, --file OUTPUT_FILE
                         write output to OUTPUT_FILE (defaults to STDOUT)''')
         sys.exit(0)
 
@@ -1151,7 +1162,7 @@ T Converter
 
       L i < instr.len
          V ch = instr[i]
-         I (i == 0 | prev_char() == "\n" | (i == writepos & !ending_tags.empty & ending_tags.last C (‘</blockquote>’, ‘</div>’) & instr[i - 2 .< i] C (">‘", "<‘", "!‘")))
+         I (i == 0 | prev_char() == "\n" | (i == writepos & !ending_tags.empty & ending_tags.last C (‘</blockquote>’, ‘</div>’) & instr[i - 2 .< i] C (">‘", "<‘", "!‘", ":‘")))
             I ch == ‘.’ & (next_char() C " ‘")
                close_ordered_list()
                V s = ‘’
@@ -1515,26 +1526,36 @@ T Converter
                   ending_tags.append(‘</’tag‘>’)
                E I prevc C ‘CС’
                   write_to_pos(prevci, i + 1)
-                  V which_color = ‘color’
-                  I str_in_p[0.<1] == ‘-’
-                     str_in_p = str_in_p[1..]
-                     which_color = ‘background-color’
-                  I str_in_p[0.<1] == ‘#’
-                     V new_str_in_p = ‘’
-                     L(c) str_in_p
-                        V cc = (S c.lowercase() {‘а’ {‘A’}; ‘б’ {‘B’}; ‘с’ {‘C’}; ‘д’ {‘D’}; ‘е’ {‘E’}; ‘ф’ {‘F’} E c})[0]
-                        new_str_in_p ‘’= I c.is_lowercase() {cc.lowercase()} E cc
-                     str_in_p = new_str_in_p
-                  E I str_in_p.len C (1, 3) & str_in_p.is_digit()
-                     V new_str = ‘#’
-                     L(ii) I str_in_p.len == 3 {[0, 1, 2]} E [0, 0, 0]
-                        new_str ‘’= hex((Int(str_in_p[ii]) * F'F + 4) I/ 8).zfill(2)
-                     str_in_p = new_str
+
+                  F translate_color(color)
+                     I color[0.<1] == ‘#’
+                        V r = ‘’
+                        L(c) color
+                           V cc = (S c.lowercase() {‘а’ {‘A’}; ‘б’ {‘B’}; ‘с’ {‘C’}; ‘д’ {‘D’}; ‘е’ {‘E’}; ‘ф’ {‘F’} E c})[0]
+                           r ‘’= I c.is_lowercase() {cc.lowercase()} E cc
+                        R r
+                     E I color.len C (1, 3) & color.is_digit()
+                        V r = ‘#’
+                        L(ii) I color.len == 3 {[0, 1, 2]} E [0, 0, 0]
+                           r ‘’= hex((Int(color[ii]) * F'F + 4) I/ 8).zfill(2)
+                        R r
+                     R color
+
                   I .habr_html
-                     outfile.write(‘<font color="’str_in_p‘">’)
+                     I ‘-’ C str_in_p
+                        exit_with_error(‘background color is not supported with --habr-html’, prevci + 2 + str_in_p.index(‘-’))
+                     outfile.write(‘<font color="’translate_color(str_in_p)‘">’)
                      ending_tags.append(‘</font>’)
                   E
-                     outfile.write(‘<span style="’which_color‘: ’str_in_p‘">’)
+                     V style = ‘’
+                     I str_in_p[0.<1] == ‘-’
+                        style = ‘background-color: ’translate_color(str_in_p[1..])
+                     E I ‘-’ C str_in_p
+                        V (color, bgcolor) = str_in_p.split(‘-’)
+                        style = ‘color: ’translate_color(color)‘; background-color: ’translate_color(bgcolor)
+                     E
+                        style = ‘color: ’translate_color(str_in_p)
+                     outfile.write(‘<span style="’style‘">’)
                      ending_tags.append(‘</span>’)
                E I (instr[prevci - 1 .< prevci], prevc) C ((‘/’, ‘\’), (‘\’, ‘/’))
                   write_to_pos(prevci - 1, i + 1)
@@ -1655,7 +1676,7 @@ F to_html(instr, File? outfilef = N; ohd = 0B, ', habr_html = 0B)
 
 :start:
 I ‘-h’ C :argv | ‘--help’ C :argv
-   print(‘A Python implementation of pq markup to HTML converter.
+   print(‘A Python implementation of pqmarkup to HTML converter.
 
 Usage: pqmarkup [options] [INPUTFILE]
 
@@ -1669,7 +1690,7 @@ Options:
   --output-html-document
                         add some html header for rough testing preview of your
                         converted documents
-  -f [OUTPUT_FILE], --file [OUTPUT_FILE]
+  -f OUTPUT_FILE, --file OUTPUT_FILE
                         write output to OUTPUT_FILE (defaults to STDOUT)’)
    exit(0)
 
@@ -2136,7 +2157,7 @@ public:
 
         while (i < instr.len()) {
             auto ch = instr[i];
-            if ((i == 0 || prev_char() == u'\n' || (i == writepos && !ending_tags.empty() && in(ending_tags.last(), make_tuple(u"</blockquote>"_S, u"</div>"_S)) && in(instr[range_el(i - 2, i)], make_tuple(u">‘"_S, u"<‘"_S, u"!‘"_S))))) {
+            if ((i == 0 || prev_char() == u'\n' || (i == writepos && !ending_tags.empty() && in(ending_tags.last(), make_tuple(u"</blockquote>"_S, u"</div>"_S)) && in(instr[range_el(i - 2, i)], make_tuple(u">‘"_S, u"<‘"_S, u"!‘"_S, u":‘"_S))))) {
                 if (ch == u'.' && (in(next_char(), u" ‘"_S))) {
                     close_ordered_list();
                     auto s = u""_S;
@@ -2577,31 +2598,43 @@ public:
                     }
                     else if (in(prevc, u"CС"_S)) {
                         write_to_pos(prevci, i + 1);
-                        auto which_color = u"color"_S;
-                        if (str_in_p[range_el(0, 1)] == u'-') {
-                            str_in_p = str_in_p[range_ei(1)];
-                            which_color = u"background-color"_S;
-                        }
-                        if (str_in_p[range_el(0, 1)] == u'#') {
-                            auto new_str_in_p = u""_S;
-                            for (auto &&c : str_in_p) {
-                                auto cc = _get<0>(([&](const auto &a){return a == u'а' ? u"A"_S : a == u'б' ? u"B"_S : a == u'с' ? u"C"_S : a == u'д' ? u"D"_S : a == u'е' ? u"E"_S : a == u'ф' ? u"F"_S : c;}(c.lowercase())));
-                                new_str_in_p &= c.is_lowercase() ? cc.lowercase() : cc;
+
+                        auto translate_color = [](const auto &color)
+                        {
+                            if (color[range_el(0, 1)] == u'#') {
+                                auto r = u""_S;
+                                for (auto &&c : color) {
+                                    auto cc = _get<0>(([&](const auto &a){return a == u'а' ? u"A"_S : a == u'б' ? u"B"_S : a == u'с' ? u"C"_S : a == u'д' ? u"D"_S : a == u'е' ? u"E"_S : a == u'ф' ? u"F"_S : c;}(c.lowercase())));
+                                    r &= c.is_lowercase() ? cc.lowercase() : cc;
+                                }
+                                return r;
                             }
-                            str_in_p = new_str_in_p;
-                        }
-                        else if (in(str_in_p.len(), make_tuple(1, 3)) && str_in_p.is_digit()) {
-                            auto new_str = u"#"_S;
-                            for (auto &&ii : str_in_p.len() == 3 ? create_array({0, 1, 2}) : create_array({0, 0, 0}))
-                                new_str &= hex(idiv((to_int(str_in_p[ii]) * 0xFF + 4), 8)).zfill(2);
-                            str_in_p = new_str;
-                        }
+                            else if (in(color.len(), make_tuple(1, 3)) && color.is_digit()) {
+                                auto r = u"#"_S;
+                                for (auto &&ii : color.len() == 3 ? create_array({0, 1, 2}) : create_array({0, 0, 0}))
+                                    r &= hex(idiv((to_int(color[ii]) * 0xFF + 4), 8)).zfill(2);
+                                return r;
+                            }
+                            return color;
+                        };
+
                         if (habr_html) {
-                            outfile.write(u"<font color=\""_S & str_in_p & u"\">"_S);
+                            if (in(u'-'_C, str_in_p))
+                                exit_with_error(u"background color is not supported with --habr-html"_S, prevci + 2 + str_in_p.index(u'-'_C));
+                            outfile.write(u"<font color=\""_S & translate_color(str_in_p) & u"\">"_S);
                             ending_tags.append(u"</font>"_S);
                         }
                         else {
-                            outfile.write(u"<span style=\""_S & which_color & u": "_S & str_in_p & u"\">"_S);
+                            auto style = u""_S;
+                            if (str_in_p[range_el(0, 1)] == u'-')
+                                style = u"background-color: "_S & translate_color(str_in_p[range_ei(1)]);
+                            else if (in(u'-'_C, str_in_p)) {
+                                auto [color, bgcolor] = bind_array<2>(str_in_p.split(u"-"_S));
+                                style = u"color: "_S & translate_color(color) & u"; background-color: "_S & translate_color(bgcolor);
+                            }
+                            else
+                                style = u"color: "_S & translate_color(str_in_p);
+                            outfile.write(u"<span style=\""_S & style & u"\">"_S);
                             ending_tags.append(u"</span>"_S);
                         }
                     }
@@ -2756,7 +2789,7 @@ int MAIN_WITH_ARGV()
     INIT_ARGV();
 
     if (in(u"-h"_S, ::argv) || in(u"--help"_S, ::argv)) {
-        print(uR"(A Python implementation of pq markup to HTML converter.
+        print(uR"(A Python implementation of pqmarkup to HTML converter.
 
 Usage: pqmarkup [options] [INPUTFILE]
 
@@ -2770,7 +2803,7 @@ Options:
   --output-html-document
                         add some html header for rough testing preview of your
                         converted documents
-  -f [OUTPUT_FILE], --file [OUTPUT_FILE]
+  -f OUTPUT_FILE, --file OUTPUT_FILE
                         write output to OUTPUT_FILE (defaults to STDOUT))"_S);
         exit(0);
     }

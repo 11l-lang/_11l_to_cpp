@@ -1825,3 +1825,30 @@ F f([((Int, Int) -> Int)] &arr) {}
 auto f(Array<std::function<int(const int, const int)>> &arr)
 {
 }
+
+
+F to_html()
+   F translate_color(color)
+      I color[0.<1] == ‘#’
+         V r = ‘’
+         L(c) color
+            V cc = (S c.lowercase() {‘а’ {‘A’}; ‘б’ {‘B’}; ‘с’ {‘C’}; ‘д’ {‘D’}; ‘е’ {‘E’}; ‘ф’ {‘F’} E c})[0]
+            r ‘’= I c.is_lowercase() {cc.lowercase()} E cc
+         R r
+      R color
+===
+auto to_html()
+{
+    auto translate_color = [](const auto &color)
+    {
+        if (color[range_el(0, 1)] == u'#') {
+            auto r = u""_S;
+            for (auto &&c : color) {
+                auto cc = _get<0>(([&](const auto &a){return a == u'а' ? u"A"_S : a == u'б' ? u"B"_S : a == u'с' ? u"C"_S : a == u'д' ? u"D"_S : a == u'е' ? u"E"_S : a == u'ф' ? u"F"_S : c;}(c.lowercase())));
+                r &= c.is_lowercase() ? cc.lowercase() : cc;
+            }
+            return r;
+        }
+        return color;
+    };
+}

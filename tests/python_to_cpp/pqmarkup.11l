@@ -210,7 +210,7 @@ T Converter
 
       L i < instr.len
          V ch = instr[i]
-         I (i == 0 | prev_char() == "\n" | (i == writepos & !ending_tags.empty & ending_tags.last C (‘</blockquote>’, ‘</div>’) & instr[i - 2 .< i] C (">‘", "<‘", "!‘")))
+         I (i == 0 | prev_char() == "\n" | (i == writepos & !ending_tags.empty & ending_tags.last C (‘</blockquote>’, ‘</div>’) & instr[i - 2 .< i] C (">‘", "<‘", "!‘", ":‘")))
             I ch == ‘.’ & (next_char() C " ‘")
                close_ordered_list()
                V s = ‘’
@@ -574,26 +574,36 @@ T Converter
                   ending_tags.append(‘</’tag‘>’)
                E I prevc C ‘CС’
                   write_to_pos(prevci, i + 1)
-                  V which_color = ‘color’
-                  I str_in_p[0.<1] == ‘-’
-                     str_in_p = str_in_p[1..]
-                     which_color = ‘background-color’
-                  I str_in_p[0.<1] == ‘#’
-                     V new_str_in_p = ‘’
-                     L(c) str_in_p
-                        V cc = (S c.lowercase() {‘а’ {‘A’}; ‘б’ {‘B’}; ‘с’ {‘C’}; ‘д’ {‘D’}; ‘е’ {‘E’}; ‘ф’ {‘F’} E c})[0]
-                        new_str_in_p ‘’= I c.is_lowercase() {cc.lowercase()} E cc
-                     str_in_p = new_str_in_p
-                  E I str_in_p.len C (1, 3) & str_in_p.is_digit()
-                     V new_str = ‘#’
-                     L(ii) I str_in_p.len == 3 {[0, 1, 2]} E [0, 0, 0]
-                        new_str ‘’= hex((Int(str_in_p[ii]) * F'F + 4) I/ 8).zfill(2)
-                     str_in_p = new_str
+
+                  F translate_color(color)
+                     I color[0.<1] == ‘#’
+                        V r = ‘’
+                        L(c) color
+                           V cc = (S c.lowercase() {‘а’ {‘A’}; ‘б’ {‘B’}; ‘с’ {‘C’}; ‘д’ {‘D’}; ‘е’ {‘E’}; ‘ф’ {‘F’} E c})[0]
+                           r ‘’= I c.is_lowercase() {cc.lowercase()} E cc
+                        R r
+                     E I color.len C (1, 3) & color.is_digit()
+                        V r = ‘#’
+                        L(ii) I color.len == 3 {[0, 1, 2]} E [0, 0, 0]
+                           r ‘’= hex((Int(color[ii]) * F'F + 4) I/ 8).zfill(2)
+                        R r
+                     R color
+
                   I .habr_html
-                     outfile.write(‘<font color="’str_in_p‘">’)
+                     I ‘-’ C str_in_p
+                        exit_with_error(‘background color is not supported with --habr-html’, prevci + 2 + str_in_p.index(‘-’))
+                     outfile.write(‘<font color="’translate_color(str_in_p)‘">’)
                      ending_tags.append(‘</font>’)
                   E
-                     outfile.write(‘<span style="’which_color‘: ’str_in_p‘">’)
+                     V style = ‘’
+                     I str_in_p[0.<1] == ‘-’
+                        style = ‘background-color: ’translate_color(str_in_p[1..])
+                     E I ‘-’ C str_in_p
+                        V (color, bgcolor) = str_in_p.split(‘-’)
+                        style = ‘color: ’translate_color(color)‘; background-color: ’translate_color(bgcolor)
+                     E
+                        style = ‘color: ’translate_color(str_in_p)
+                     outfile.write(‘<span style="’style‘">’)
                      ending_tags.append(‘</span>’)
                E I (instr[prevci - 1 .< prevci], prevc) C ((‘/’, ‘\’), (‘\’, ‘/’))
                   write_to_pos(prevci - 1, i + 1)
@@ -714,7 +724,7 @@ F to_html(instr, File? outfilef = N; ohd = 0B, ', habr_html = 0B)
 
 :start:
 I ‘-h’ C :argv | ‘--help’ C :argv
-   print(‘A Python implementation of pq markup to HTML converter.
+   print(‘A Python implementation of pqmarkup to HTML converter.
 
 Usage: pqmarkup [options] [INPUTFILE]
 
@@ -728,7 +738,7 @@ Options:
   --output-html-document
                         add some html header for rough testing preview of your
                         converted documents
-  -f [OUTPUT_FILE], --file [OUTPUT_FILE]
+  -f OUTPUT_FILE, --file OUTPUT_FILE
                         write output to OUTPUT_FILE (defaults to STDOUT)’)
    exit(0)
 

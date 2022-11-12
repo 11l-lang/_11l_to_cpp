@@ -233,7 +233,7 @@ class Converter:
         while i < len(instr):
             ch = instr[i]
             if (i == 0 or prev_char() == "\n" # if beginning of line
-                       or (i == writepos and len(ending_tags) != 0 and ending_tags[-1] in ('</blockquote>', '</div>') and instr[i-2:i] in ('>‘', '<‘', '!‘'))): # ’’’ # or beginning of blockquote or note
+                       or (i == writepos and len(ending_tags) != 0 and ending_tags[-1] in ('</blockquote>', '</div>') and instr[i-2:i] in ('>‘', '<‘', '!‘', ':‘'))): # ’’’’ # or beginning of blockquote or note
                 if ch == '.' and (next_char() in ' ‘'): # ’ this is unordered list
                     close_ordered_list()
                     s = ''
@@ -609,26 +609,37 @@ class Converter:
                         ending_tags.append('</' + tag + '>')
                     elif prevc in 'CС':
                         write_to_pos(prevci, i + 1)
-                        which_color = 'color'
-                        if str_in_p[0:1] == '-':
-                            str_in_p = str_in_p[1:]
-                            which_color = 'background-color'
-                        if str_in_p[0:1] == '#':
-                            new_str_in_p = ''
-                            for c in str_in_p:
-                                cc = {'а':'A','б':'B','с':'C','д':'D','е':'E','ф':'F'}.get(c.lower(), c)[0]
-                                new_str_in_p += cc.lower() if c.islower() else cc
-                            str_in_p = new_str_in_p
-                        elif len(str_in_p) in (1, 3) and str_in_p.isdigit():
-                            new_str = "#"
-                            for ii in [0, 1, 2] if len(str_in_p) == 3 else [0, 0, 0]:
-                                new_str += hex((int(str_in_p[ii]) * 0xFF + 4) // 8)[2:].upper().zfill(2) # 8 - FF, 0 - 00, 4 - 80 (почему не 7F[‘когда `+ 3` вместо `+ 4`’] — две субъективные причины: 1.‘больше нравится как выглядит’ и 2.‘количество пикселей в строке `80` при `"font_face": "Courier New", "font_size": 10`’)
-                            str_in_p = new_str
+
+                        def translate_color(color):
+                            if color[0:1] == '#':
+                                r = ''
+                                for c in color:
+                                    cc = {'а':'A','б':'B','с':'C','д':'D','е':'E','ф':'F'}.get(c.lower(), c)[0]
+                                    r += cc.lower() if c.islower() else cc
+                                return r
+                            elif len(color) in (1, 3) and color.isdigit():
+                                r = "#"
+                                for ii in [0, 1, 2] if len(color) == 3 else [0, 0, 0]:
+                                    r += hex((int(color[ii]) * 0xFF + 4) // 8)[2:].upper().zfill(2) # 8 - FF, 0 - 00, 4 - 80 (почему не 7F[‘когда `+ 3` вместо `+ 4`’] — две субъективные причины: 1.‘больше нравится как выглядит’ и 2.‘количество пикселей в строке `80` при `"font_face": "Courier New", "font_size": 10`’)
+                                return r
+                            return color
+
                         if self.habr_html:
-                            outfile.write('<font color="' + str_in_p + '">')
+                            if '-' in str_in_p:
+                                #exit_with_error('`-` is not supported in color with --habr-html', prevci + 2 + str_in_p.index('-'))
+                                exit_with_error('background color is not supported with --habr-html', prevci + 2 + str_in_p.index('-'))
+                            outfile.write('<font color="' + translate_color(str_in_p) + '">')
                             ending_tags.append('</font>')
                         else: # The <font> tag is not supported in HTML5.
-                            outfile.write('<span style="'+which_color+': ' + str_in_p + '">')
+                            style = ''
+                            if str_in_p[0:1] == '-':
+                                style = 'background-color: ' + translate_color(str_in_p[1:])
+                            elif '-' in str_in_p:
+                                color, bgcolor = str_in_p.split('-')
+                                style = 'color: ' + translate_color(color) + '; background-color: ' + translate_color(bgcolor)
+                            else:
+                                style = 'color: ' + translate_color(str_in_p)
+                            outfile.write('<span style="' + style + '">')
                             ending_tags.append('</span>')
                     elif (instr[prevci-1:prevci], prevc) in (('/', "\\"), ("\\", '/')):
                         write_to_pos(prevci-1, i + 1)
@@ -753,7 +764,7 @@ def to_html(instr, outfilef : IO[str] = None, ohd = False, *, habr_html = False)
 if __name__ == '__main__':
     # Support running module as a command line command.
     if '-h' in sys.argv or '--help' in sys.argv:
-        print(R'''A Python implementation of pq markup to HTML converter.
+        print(R'''A Python implementation of pqmarkup to HTML converter.
 
 Usage: pqmarkup [options] [INPUTFILE]
 
@@ -767,7 +778,7 @@ Options:
   --output-html-document
                         add some html header for rough testing preview of your
                         converted documents
-  -f [OUTPUT_FILE], --file [OUTPUT_FILE]
+  -f OUTPUT_FILE, --file OUTPUT_FILE
                         write output to OUTPUT_FILE (defaults to STDOUT)''')
         sys.exit(0)
 

@@ -297,7 +297,7 @@ public:
 
         while (i < instr.len()) {
             auto ch = instr[i];
-            if ((i == 0 || prev_char() == u'\n' || (i == writepos && !ending_tags.empty() && in(ending_tags.last(), make_tuple(u"</blockquote>"_S, u"</div>"_S)) && in(instr[range_el(i - 2, i)], make_tuple(u">‘"_S, u"<‘"_S, u"!‘"_S))))) {
+            if ((i == 0 || prev_char() == u'\n' || (i == writepos && !ending_tags.empty() && in(ending_tags.last(), make_tuple(u"</blockquote>"_S, u"</div>"_S)) && in(instr[range_el(i - 2, i)], make_tuple(u">‘"_S, u"<‘"_S, u"!‘"_S, u":‘"_S))))) {
                 if (ch == u'.' && (in(next_char(), u" ‘"_S))) {
                     close_ordered_list();
                     auto s = u""_S;
@@ -738,31 +738,43 @@ public:
                     }
                     else if (in(prevc, u"CС"_S)) {
                         write_to_pos(prevci, i + 1);
-                        auto which_color = u"color"_S;
-                        if (str_in_p[range_el(0, 1)] == u'-') {
-                            str_in_p = str_in_p[range_ei(1)];
-                            which_color = u"background-color"_S;
-                        }
-                        if (str_in_p[range_el(0, 1)] == u'#') {
-                            auto new_str_in_p = u""_S;
-                            for (auto &&c : str_in_p) {
-                                auto cc = _get<0>(([&](const auto &a){return a == u'а' ? u"A"_S : a == u'б' ? u"B"_S : a == u'с' ? u"C"_S : a == u'д' ? u"D"_S : a == u'е' ? u"E"_S : a == u'ф' ? u"F"_S : c;}(c.lowercase())));
-                                new_str_in_p &= c.is_lowercase() ? cc.lowercase() : cc;
+
+                        auto translate_color = [](const auto &color)
+                        {
+                            if (color[range_el(0, 1)] == u'#') {
+                                auto r = u""_S;
+                                for (auto &&c : color) {
+                                    auto cc = _get<0>(([&](const auto &a){return a == u'а' ? u"A"_S : a == u'б' ? u"B"_S : a == u'с' ? u"C"_S : a == u'д' ? u"D"_S : a == u'е' ? u"E"_S : a == u'ф' ? u"F"_S : c;}(c.lowercase())));
+                                    r &= c.is_lowercase() ? cc.lowercase() : cc;
+                                }
+                                return r;
                             }
-                            str_in_p = new_str_in_p;
-                        }
-                        else if (in(str_in_p.len(), make_tuple(1, 3)) && str_in_p.is_digit()) {
-                            auto new_str = u"#"_S;
-                            for (auto &&ii : str_in_p.len() == 3 ? create_array({0, 1, 2}) : create_array({0, 0, 0}))
-                                new_str &= hex(idiv((to_int(str_in_p[ii]) * 0xFF + 4), 8)).zfill(2);
-                            str_in_p = new_str;
-                        }
+                            else if (in(color.len(), make_tuple(1, 3)) && color.is_digit()) {
+                                auto r = u"#"_S;
+                                for (auto &&ii : color.len() == 3 ? create_array({0, 1, 2}) : create_array({0, 0, 0}))
+                                    r &= hex(idiv((to_int(color[ii]) * 0xFF + 4), 8)).zfill(2);
+                                return r;
+                            }
+                            return color;
+                        };
+
                         if (habr_html) {
-                            outfile.write(u"<font color=\""_S & str_in_p & u"\">"_S);
+                            if (in(u'-'_C, str_in_p))
+                                exit_with_error(u"background color is not supported with --habr-html"_S, prevci + 2 + str_in_p.index(u'-'_C));
+                            outfile.write(u"<font color=\""_S & translate_color(str_in_p) & u"\">"_S);
                             ending_tags.append(u"</font>"_S);
                         }
                         else {
-                            outfile.write(u"<span style=\""_S & which_color & u": "_S & str_in_p & u"\">"_S);
+                            auto style = u""_S;
+                            if (str_in_p[range_el(0, 1)] == u'-')
+                                style = u"background-color: "_S & translate_color(str_in_p[range_ei(1)]);
+                            else if (in(u'-'_C, str_in_p)) {
+                                auto [color, bgcolor] = bind_array<2>(str_in_p.split(u"-"_S));
+                                style = u"color: "_S & translate_color(color) & u"; background-color: "_S & translate_color(bgcolor);
+                            }
+                            else
+                                style = u"color: "_S & translate_color(str_in_p);
+                            outfile.write(u"<span style=\""_S & style & u"\">"_S);
                             ending_tags.append(u"</span>"_S);
                         }
                     }

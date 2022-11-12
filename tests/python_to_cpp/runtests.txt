@@ -62,6 +62,7 @@ TEST("С(4)‘gray text’", '<span style="color: #808080">gray text</span>')
 TEST('С(#фФ0000)‘red text’', '<span style="color: #fF0000">red text</span>')
 TEST('C(#fF0000)‘red text’', '<span style="color: #fF0000">red text</span>')
 TEST('C(-800)‘text on a red background’', '<span style="background-color: #FF0000">text on a red background</span>')
+TEST('C(888-000)‘white text on black background’', '<span style="color: #FFFFFF; background-color: #000000">white text on black background</span>')
 TEST("link[http://address][1] ‘the same link’[1]", '<a href="http://address">link</a>[1] ‘the same link’[1]')
 TEST("link[http://address][-1] ‘the same link’[-1]", '<a href="http://address">link</a> <a href="http://address">the same link</a>')
 TEST("[[[comment[[[[sensitive information]]]]]]]", "<!--[[[comment]]]-->")
@@ -149,6 +150,7 @@ TEST(">‘>‘Автор против nullable-типов?’\nДа. Адрес,
 TEST(">‘> Автор против nullable-типов?\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.’", '<blockquote><blockquote>Автор против nullable-типов?</blockquote>\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.</blockquote>')
 TEST(">‘1. A\n’", "<blockquote><ol>\n<li>A</li>\n</ol>\n</blockquote>")
 TEST("!‘1. A\n’", "<div class=\"note\"><ol>\n<li>A</li>\n</ol>\n</div>")
+TEST('>[http://ruscomp.24bb.ru/viewtopic.php?id=20]:‘> То есть обычные русские слова уже не являются для вас "общепринятым" языком?\nОбщепринятые – это те, которые я читаю в книгах, в том числе по программированию.’', '<blockquote><a href="http://ruscomp.24bb.ru/viewtopic.php?id=20"><i>http://ruscomp.24bb.ru/viewtopic.php?id=20</i></a>:<br />\n<blockquote>То есть обычные русские слова уже не являются для вас "общепринятым" языком?</blockquote>\nОбщепринятые – это те, которые я читаю в книгах, в том числе по программированию.</blockquote>')
 TEST("‘понимание [[[процесса]]] разбора [[[разметки]]] человеком’[‘говоря проще: приходится [[[гораздо]]] меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё’]", '<abbr title="говоря проще: приходится  меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё">понимание  разбора  человеком</abbr>')
 TEST(
 """. unordered
@@ -453,6 +455,7 @@ TEST(‘С(4)‘gray text’’, ‘<span style="color: #808080">gray text</span
 TEST(‘С(#фФ0000)‘red text’’, ‘<span style="color: #fF0000">red text</span>’)
 TEST(‘C(#fF0000)‘red text’’, ‘<span style="color: #fF0000">red text</span>’)
 TEST(‘C(-800)‘text on a red background’’, ‘<span style="background-color: #FF0000">text on a red background</span>’)
+TEST(‘C(888-000)‘white text on black background’’, ‘<span style="color: #FFFFFF; background-color: #000000">white text on black background</span>’)
 TEST(‘link[http://address][1] ‘the same link’[1]’, ‘<a href="http://address">link</a>[1] ‘the same link’[1]’)
 TEST(‘link[http://address][-1] ‘the same link’[-1]’, ‘<a href="http://address">link</a> <a href="http://address">the same link</a>’)
 TEST(‘[[[comment[[[[sensitive information]]]]]]]’, ‘<!--[[[comment]]]-->’)
@@ -532,6 +535,7 @@ TEST(">‘>‘Автор против nullable-типов?’\nДа. Адрес,
 TEST(">‘> Автор против nullable-типов?\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.’", "<blockquote><blockquote>Автор против nullable-типов?</blockquote>\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.</blockquote>")
 TEST(">‘1. A\n’", "<blockquote><ol>\n<li>A</li>\n</ol>\n</blockquote>")
 TEST("!‘1. A\n’", "<div class=\"note\"><ol>\n<li>A</li>\n</ol>\n</div>")
+TEST(">[http://ruscomp.24bb.ru/viewtopic.php?id=20]:‘> То есть обычные русские слова уже не являются для вас \"общепринятым\" языком?\nОбщепринятые – это те, которые я читаю в книгах, в том числе по программированию.’", "<blockquote><a href=\"http://ruscomp.24bb.ru/viewtopic.php?id=20\"><i>http://ruscomp.24bb.ru/viewtopic.php?id=20</i></a>:<br />\n<blockquote>То есть обычные русские слова уже не являются для вас \"общепринятым\" языком?</blockquote>\nОбщепринятые – это те, которые я читаю в книгах, в том числе по программированию.</blockquote>")
 TEST(‘‘понимание [[[процесса]]] разбора [[[разметки]]] человеком’[‘говоря проще: приходится [[[гораздо]]] меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё’]’, ‘<abbr title="говоря проще: приходится  меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё">понимание  разбора  человеком</abbr>’)
 TEST(‘. unordered
 . list’, ‘<ul>
@@ -809,6 +813,7 @@ struct CodeBlock1
         TEST(u"С(#фФ0000)‘red text’"_S, u"<span style=\"color: #fF0000\">red text</span>"_S);
         TEST(u"C(#fF0000)‘red text’"_S, u"<span style=\"color: #fF0000\">red text</span>"_S);
         TEST(u"C(-800)‘text on a red background’"_S, u"<span style=\"background-color: #FF0000\">text on a red background</span>"_S);
+        TEST(u"C(888-000)‘white text on black background’"_S, u"<span style=\"color: #FFFFFF; background-color: #000000\">white text on black background</span>"_S);
         TEST(u"link[http://address][1] ‘the same link’[1]"_S, u"<a href=\"http://address\">link</a>[1] ‘the same link’[1]"_S);
         TEST(u"link[http://address][-1] ‘the same link’[-1]"_S, u"<a href=\"http://address\">link</a> <a href=\"http://address\">the same link</a>"_S);
         TEST(u"[[[comment[[[[sensitive information]]]]]]]"_S, u"<!--[[[comment]]]-->"_S);
@@ -888,6 +893,7 @@ Some text.)"_S, false, true);
         TEST(u">‘> Автор против nullable-типов?\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.’"_S, u"<blockquote><blockquote>Автор против nullable-типов?</blockquote>\nДа. Адрес, указывающий на незаконный участок памяти, сам незаконен.</blockquote>"_S);
         TEST(u">‘1. A\n’"_S, u"<blockquote><ol>\n<li>A</li>\n</ol>\n</blockquote>"_S);
         TEST(u"!‘1. A\n’"_S, u"<div class=\"note\"><ol>\n<li>A</li>\n</ol>\n</div>"_S);
+        TEST(u">[http://ruscomp.24bb.ru/viewtopic.php?id=20]:‘> То есть обычные русские слова уже не являются для вас \"общепринятым\" языком?\nОбщепринятые – это те, которые я читаю в книгах, в том числе по программированию.’"_S, u"<blockquote><a href=\"http://ruscomp.24bb.ru/viewtopic.php?id=20\"><i>http://ruscomp.24bb.ru/viewtopic.php?id=20</i></a>:<br />\n<blockquote>То есть обычные русские слова уже не являются для вас \"общепринятым\" языком?</blockquote>\nОбщепринятые – это те, которые я читаю в книгах, в том числе по программированию.</blockquote>"_S);
         TEST(u"‘понимание [[[процесса]]] разбора [[[разметки]]] человеком’[‘говоря проще: приходится [[[гораздо]]] меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё’]"_S, u"<abbr title=\"говоря проще: приходится  меньше думать о том, будет это работать или не будет, а просто пишешь в соответствии с чёткими/простыми/логичными правилами, и всё\">понимание  разбора  человеком</abbr>"_S);
         TEST(uR"(. unordered
 . list)"_S, uR"(<ul>

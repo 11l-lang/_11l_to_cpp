@@ -991,7 +991,7 @@ class SymbolNode:
                     else:
                         for child in sn.children:
                             if child is not None:
-                                gather_captured_variables(child, capture_level + int(child.symbol.id == '->'))
+                                gather_captured_variables(child, capture_level + int(child.symbol is not None and child.symbol.id == '->'))
                 gather_captured_variables(self.children[1])
                 return '[' + ', '.join(sorted(captured_variables)) + '](' + ', '.join(map(lambda c: 'const ' + ('auto &' if c.symbol.id != '=' else 'decltype(' + c.children[1].to_str() + ') &') + c.to_str(),
                     self.children[0].children if self.children[0].symbol.id == '(' else [self.children[0]])) + '){return ' + self.children[1].to_str() + ';}' # )
@@ -1494,7 +1494,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                     else:
                         for child in sn.children:
                             if child is not None:
-                                f(child, capture_level + int(child.symbol.id == '->'))
+                                f(child, capture_level + int(child.symbol is not None and child.symbol.id == '->'))
 
                 node.walk_expressions(f)
                 node.walk_children(gather_captured_variables)
