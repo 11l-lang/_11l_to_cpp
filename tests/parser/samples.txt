@@ -1852,3 +1852,85 @@ auto to_html()
         return color;
     };
 }
+
+
+Bool? b
+I b != N
+   Bool bb = !b
+
+V? i = ‘abc’.find(‘b’)
+Int ii = i!
+
+T ASTNode
+   String symbol
+   Int value
+   ASTNode? first_child
+   ASTNode? second_child
+
+   F eval()
+      S .symbol
+         ‘(number)’
+            R .value
+         ‘+’
+            R .first_child!.eval() + .second_child!.eval()
+      R -1
+
+ASTNode n
+print(n.first_child!.eval())
+print(n.first_child!.first_child!.eval())
+
+ASTNode? nn
+print(nn!.first_child!.first_child!.eval())
+===
+Nullable<bool> b;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        if (b != nullptr)
+            bool bb = !*b;
+    }
+} code_block_1;
+
+auto i = u"abc"_S.find(u"b"_S);
+int ii = (*i);
+
+class ASTNode
+{
+public:
+    String symbol;
+    int value;
+    std::unique_ptr<ASTNode> first_child;
+    std::unique_ptr<ASTNode> second_child;
+
+    auto eval()
+    {
+        if (symbol == u"(number)"_S)
+            return value;
+        else if (symbol == u'+')
+            return (*first_child).eval() + (*second_child).eval();
+        return -1;
+    }
+};
+
+std::unique_ptr<ASTNode> n;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print((*n->first_child).eval());
+        print((*(*n->first_child).first_child).eval());
+    }
+} code_block_2;
+
+std::unique_ptr<ASTNode> nn;
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print((*(*(*nn).first_child).first_child).eval());
+    }
+} code_block_3;

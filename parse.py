@@ -235,6 +235,29 @@ class SymbolNode:
     def token_str(self):
         return self.token.value(source) if not self.token_str_override else self.token_str_override
 
+    def to_debug_str(self):
+        if self.token.category == Token.Category.NAME:
+            return self.token_str()
+
+        if self.function_call:
+            res = self.children[0].to_debug_str() + '('
+            for i in range(1, len(self.children), 2):
+                res += self.children[i+1].to_debug_str()
+                if i < len(self.children)-2:
+                    res += ', '
+            return res + ')'
+
+        if len(self.children) == 1:
+            if self.symbol.id == '(': # )
+                return '(' + self.children[0].to_debug_str() + ')'
+            if self.postfix:
+                return '(' + self.children[0].to_debug_str() + self.symbol.id + ')'
+            else:
+                return '(' + self.symbol.id + self.children[0].to_debug_str() + ')'
+
+        assert(len(self.children) == 2)
+        return '(' + self.children[0].to_debug_str() + ' ' + self.symbol.id + ' ' + self.children[1].to_debug_str() + ')'
+
     def to_type_str(self):
         if self.symbol.id == '[': # ]
             if self.is_list:
@@ -302,7 +325,7 @@ class SymbolNode:
             tid = self.scope.find(self.token_str())
             if tid is not None and ((len(tid.ast_nodes) and isinstance(tid.ast_nodes[0], ASTVariableDeclaration) and tid.ast_nodes[0].is_ptr and not tid.ast_nodes[0].nullable) # `animals [+]= animal` -> `animals.append(std::move(animal));`
                                  or (tid.type_node is not None and (tid.type_node.has_virtual_functions or tid.type_node.has_pointers_to_the_same_type))) \
-                                and (self.parent is None or self.parent.symbol.id not in ('.', ':')):
+                                and (self.parent is None or self.parent.symbol.id not in ('.', ':', '!')):
                 if tid.last_occurrence is None:
                     last_reference = None
                     var_name = self.token_str()
@@ -335,6 +358,7 @@ class SymbolNode:
                 if self.parent is None or (not (self.parent.symbol.id in ('==', '!=') and self.parent.children[1].token_str() in ('N', 'Н', 'null', 'нуль'))
                                        and not (self.parent.symbol.id == '.')
                                        and not (self.parent.symbol.id == '?')
+                                       and not (self.parent.symbol.id == '!' and self.parent.postfix)
                                        and not (self.parent.symbol.id == '=' and self is self.parent.children[0])):
                     return '*' + self.token_str()
 
@@ -830,6 +854,8 @@ class SymbolNode:
         if len(self.children) == 1:
             #return '(' + self.symbol.id + self.children[0].to_str() + ')'
             if self.postfix:
+                if self.symbol.id == '!':
+                    return '(*' + self.children[0].to_str() + ')'
                 return self.children[0].to_str() + self.symbol.id
             elif self.symbol.id == ':':
                 c0 = self.children[0].to_str()
@@ -1671,8 +1697,9 @@ class ASTSwitch(ASTNodeWithExpression):
                     else:
                         if len(switch_var) == 0 or switch_var[-1] != '_':
                             switch_var += '_'
-                r += ' ' * (indent*4) + 'auto ' + switch_var + ' = ' + switch_expr + ";\n"
-                switch_expr = switch_var
+                if switch_var != switch_expr:
+                    r += ' ' * (indent*4) + 'auto ' + switch_var + ' = ' + switch_expr + ";\n"
+                    switch_expr = switch_var
 
             for case in self.cases:
                 if case.expression.token_str() in ('E', 'И', 'else', 'иначе'):
@@ -2037,6 +2064,13 @@ def type_of(sn):
         left = type_of(sn.children[0])
         if left is None: # `Array[Array[Array[String]]] table... table.last.append([...])`
             return None
+    elif sn.children[0].symbol.id == '!' and sn.children[0].children[0].symbol.id == '.':
+        assert(sn.children[0].postfix)
+        if len(sn.children[0].children[0].children) == 1:
+            return None
+        left = type_of(sn.children[0].children[0])
+        if left is None:
+            return None
     elif sn.children[0].symbol.id == '[': # ]
         return None
     elif sn.children[0].symbol.id == '(': # )
@@ -2105,9 +2139,14 @@ def type_of(sn):
                 raise Error('method `' + sn.children[1].token_str() + '` is not found in type `String`', sn.left_to_right_token())
             return tid.ast_nodes[0]
 
-        tid, s = sn.scope.find_and_return_scope(sn.children[0].token_str())
+        c0 = sn.children[0]
+        if c0.symbol.id == '!':
+            assert(c0.postfix)
+            c0 = c0.children[0]
+
+        tid, s = sn.scope.find_and_return_scope(c0.token_str())
         if tid is None:
-            raise Error('identifier is not found', sn.children[0].token)
+            raise Error('identifier is not found', c0.token)
         if len(tid.ast_nodes) != 1: # for `F f(active_window, s)... R s.find(‘.’) ? s.len`
             if tid.type != '' and s.is_function: # for `F nud(ASTNode self)... self.symbol.nud_bp`
                 if '[' in tid.type: # ] # for `F decompress(Array[Int] &compressed)`
@@ -2116,7 +2155,7 @@ def type_of(sn):
                 assert(tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) == ASTTypeDefinition)
                 tid = tid.ast_nodes[0].scope.ids.get(sn.children[1].token_str())
                 if not (tid is not None and len(tid.ast_nodes) == 1 and type(tid.ast_nodes[0]) in (ASTVariableDeclaration, ASTVariableInitialization, ASTFunctionDefinition, ASTExpression)): # `ASTExpression` is needed to fix an error ‘identifier `disInter` is not found in `r`’ in '9.yopyra.py' (when there is no `disInter : float`)
-                    raise Error('identifier `' + sn.children[1].token_str() + '` is not found in `' + sn.children[0].token_str() + '`', sn.children[1].token)
+                    raise Error('identifier `' + sn.children[1].token_str() + '` is not found in `' + c0.token_str() + '`', sn.children[1].token)
                 if isinstance(tid.ast_nodes[0], ASTExpression):
                     return None
                 return tid.ast_nodes[0]
@@ -2348,7 +2387,7 @@ prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('(-)', 130); prefix
 
 infix_r('^', 140)
 
-symbol('.', 150); symbol(':', 150); symbol('.:', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('T? ', 150); postfix('T :', 150); postfix('--', 150); postfix('++', 150)
+symbol('.', 150); symbol(':', 150); symbol('.:', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('T? ', 150); postfix('T :', 150); postfix('--', 150); postfix('++', 150); postfix('!', 150)
 prefix('.', 150); prefix(':', 150); prefix('.:', 150); symbol('[%', 150); prefix('T &', 130); prefix('T =', 150) # ]
 
 infix_r('=', 10); infix_r('+=', 10); infix_r('-=', 10); infix_r('*=', 10); infix_r('/=', 10); infix_r('I/=', 10); infix_r('Ц/=', 10); infix_r('%=', 10); infix_r('>>=', 10); infix_r('<<=', 10); infix_r('^=', 10)
@@ -3733,7 +3772,7 @@ module_scope.add_function('reparse', ASTFunctionDefinition([('eldf_str', '', 'St
 module_scope.add_function('test_parse', ASTFunctionDefinition([('eldf_str', '', 'String')]))
 builtin_modules['eldf'] = Module(module_scope)
 
-def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
+def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False, to_debug_str = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
     if len(tokens_) == 0: return ASTProgram().to_str()
     global tokens, source, tokeni, token, break_label_index, scope, global_scope, tokensn, file_name, importing_module, modules
     prev_tokens    = tokens
@@ -3759,6 +3798,10 @@ def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, ap
     prev_modules = modules
     modules = {}
     next_token()
+
+    if to_debug_str:
+        return expression().to_debug_str()
+
     p = ASTProgram()
     parse_internal(p)
 
@@ -3803,3 +3846,6 @@ def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, ap
     modules = prev_modules
 
     return s
+
+def print_debug_str(source_):
+    print(parse_and_to_str(tokenizer.tokenize(source_), source_, '', to_debug_str = True))
