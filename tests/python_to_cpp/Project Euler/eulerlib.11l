@@ -19,7 +19,7 @@ F is_square(x)
    V y = Int(sqrt(x))
    R y * y == x
 
-F is_prime(x)
+F is_prime(Int x)
    I x <= 1
       R 0B
    E I x <= 3

@@ -26,7 +26,7 @@ template <typename T1> auto is_square(const T1 &x)
     return y * y == x;
 }
 
-template <typename T1> auto is_prime(const T1 &x)
+auto is_prime(const int x)
 {
     if (x <= 1)
         return false;

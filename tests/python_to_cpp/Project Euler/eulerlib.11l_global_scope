@@ -27,7 +27,7 @@ is_prime
     ast_nodes = [
     .   node_type = function
         function_arguments = [
-            ‘x; ; ; ’
+            ‘x; ; Int; ’
         ]
     ]
 list_primality

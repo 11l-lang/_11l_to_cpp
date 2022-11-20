@@ -1,3 +1,7 @@
+---
+# 110 [not implemented]
+
+
 # 111
 import eulerlib, math
 from _11l import next_permutation

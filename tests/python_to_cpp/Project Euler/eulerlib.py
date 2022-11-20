@@ -35,7 +35,7 @@ def is_square(x):
 	return y * y == x
 
 # Tests whether the given integer is a prime number.
-def is_prime(x):
+def is_prime(x : int):
 	if x <= 1:
 		return False
 	elif x <= 3:
