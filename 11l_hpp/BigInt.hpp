@@ -505,3 +505,31 @@ Int pow(Int base, Int exponent, const Int modulus)
 	}
 	return result;
 }
+
+#ifndef INT_IS_INT64
+Int pow(Int64 base, Int exponent, const Int modulus)
+{
+	Int result = 1;
+
+	while (exponent != 0) {
+		if (exponent % 2 != 0)
+			result = Int((result * base) % modulus);
+		exponent /= 2;
+		base = (base * base) % modulus;
+	}
+	return result;
+}
+
+Int pow(Int64 base, Int64 exponent, const Int modulus)
+{
+	Int result = 1;
+
+	while (exponent != 0) {
+		if (exponent % 2 != 0)
+			result = Int((result * base) % modulus);
+		exponent /= 2;
+		base = (base * base) % modulus;
+	}
+	return result;
+}
+#endif

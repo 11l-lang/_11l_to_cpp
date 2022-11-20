@@ -1,0 +1,319 @@
+# 130
+import eulerlib, itertools
+
+# Returns the smallest k such that R(k) is divisible by n.
+def find_least_divisible_repunit(n):
+    if n % 2 == 0 or n % 5 == 0:
+        return 0
+    sum = 1  # Equal to R(k) mod n
+    pow = 1  # Equal to 10^k mod n
+    k = 1
+    while sum % n != 0:
+        k += 1
+        pow = pow * 10 % n
+        sum = (sum + pow) % n
+    return k
+
+cond = lambda i: (i % 5 != 0) and (not eulerlib.is_prime(i)) \
+    and ((i - 1) % find_least_divisible_repunit(i) == 0)
+
+i = 0
+ans = 0
+for n in itertools.count(7, 2):
+    if cond(n):
+        ans += n
+        i += 1
+        if i == 25:
+            print(ans)
+            break
+===
+F find_least_divisible_repunit(n)
+   I n % 2 == 0 | n % 5 == 0
+      R 0
+   V sum = 1
+   V pow = 1
+   V k = 1
+   L sum % n != 0
+      k++
+      pow = pow * 10 % n
+      sum = (sum + pow) % n
+   R k
+
+V cond = i -> (i % 5 != 0) & (!eulerlib:is_prime(i)) & ((i - 1) % find_least_divisible_repunit(i) == 0)
+
+V i = 0
+V ans = 0
+L(n) (7..).step(2)
+   I cond(n)
+      ans += n
+      i++
+      I i == 25
+         print(ans)
+         L.break
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1> auto find_least_divisible_repunit(const T1 &n)
+{
+    if (mod(n, 2) == 0 || mod(n, 5) == 0)
+        return 0;
+    auto sum = 1;
+    auto pow = 1;
+    auto k = 1;
+    while (mod(sum, n) != 0) {
+        k++;
+        pow = mod(pow * 10, n);
+        sum = mod((sum + pow), n);
+    }
+    return k;
+}
+
+auto cond = [](const auto &i){return (mod(i, 5) != 0) && (!eulerlib::is_prime(i)) && (mod((i - 1), find_least_divisible_repunit(i)) == 0);};
+
+auto i = 0;
+auto ans = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ei(7).step(2))
+            if (cond(n)) {
+                ans += n;
+                i++;
+                if (i == 25) {
+                    print(ans);
+                    break;
+                }
+            }
+    }
+} code_block_1;
+
+
+---
+# 131 [not implemented]
+
+
+# 132
+import eulerlib, itertools
+Int64 = int
+
+def repunit_mod(k, m):
+    return (pow(Int64(10), k, m * 9) - 1) // 9
+
+# Among the integers starting from 2, take the sum of
+# the first 40 integers satisfying the filter condition
+cond = lambda i: eulerlib.is_prime(i) and repunit_mod(10**9, i) == 0
+
+i = 0
+ans = 0
+for n in itertools.count(2):
+    if cond(n):
+        ans += n
+        i += 1
+        if i == 40:
+            print(ans)
+            break
+===
+F repunit_mod(k, m)
+   R (pow(Int64(10), k, m * 9) - 1) I/ 9
+
+V cond = i -> eulerlib:is_prime(i) & repunit_mod(10 ^ 9, i) == 0
+
+V i = 0
+V ans = 0
+L(n) 2..
+   I cond(n)
+      ans += n
+      i++
+      I i == 40
+         print(ans)
+         L.break
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1, typename T2> auto repunit_mod(const T1 &k, const T2 &m)
+{
+    return idiv((pow(to_int64(10), k, m * 9) - 1), 9);
+}
+
+auto cond = [](const auto &i){return eulerlib::is_prime(i) && repunit_mod(pow(10, 9), i) == 0;};
+
+auto i = 0;
+auto ans = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ei(2))
+            if (cond(n)) {
+                ans += n;
+                i++;
+                if (i == 40) {
+                    print(ans);
+                    break;
+                }
+            }
+    }
+} code_block_1;
+
+
+# 133
+import eulerlib
+Int64 = int
+
+# Tests whether there exists a k such that R(10^k) is a multiple of p
+def has_divisible_repunit(p):
+    return (pow(Int64(10), Int64(10)**16, p * 9) - 1) // 9 % p == 0
+
+primes = eulerlib.list_primes(100000)
+print(sum(p for p in primes if p == 2 or p == 5 or not has_divisible_repunit(p)))
+===
+F has_divisible_repunit(p)
+   R (pow(Int64(10), Int64(10) ^ 16, p * 9) - 1) I/ 9 % p == 0
+
+V primes = eulerlib:list_primes(100000)
+print(sum(primes.filter(p -> p == 2 | p == 5 | !has_divisible_repunit(p))))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1> auto has_divisible_repunit(const T1 &p)
+{
+    return mod(idiv((pow(to_int64(10), pow(to_int64(10), 16), p * 9) - 1), 9), p) == 0;
+}
+
+auto primes = eulerlib::list_primes(100000);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum(primes.filter([](const auto &p){return p == 2 || p == 5 || !has_divisible_repunit(p);})));
+    }
+} code_block_1;
+
+
+---
+# 134 [-`pow(base, -1, mod)`-]
+
+
+# 135
+LIMIT = 10**6
+solutions = [0] * LIMIT
+for m in range(1, LIMIT * 2):
+    for k in range(m // 5 + 1, (m + 1) // 2):
+        temp = (m - k) * (k * 5 - m)
+        if temp >= LIMIT:
+            break
+        solutions[temp] += 1
+
+print(solutions.count(10))
+===
+V LIMIT = 10 ^ 6
+V solutions = [0] * LIMIT
+L(m) 1 .< LIMIT * 2
+   L(k) m I/ 5 + 1 .< (m + 1) I/ 2
+      V temp = (m - k) * (k * 5 - m)
+      I temp >= LIMIT
+         L.break
+      solutions[temp]++
+
+print(solutions.count(10))
+===
+auto LIMIT = pow(10, 6);
+auto solutions = create_array({0}) * LIMIT;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto m : range_el(1, LIMIT * 2))
+            for (auto k : range_el(idiv(m, 5) + 1, idiv((m + 1), 2))) {
+                auto temp = (m - k) * (k * 5 - m);
+                if (temp >= LIMIT)
+                    break;
+                solutions[temp]++;
+            }
+
+        print(solutions.count(10));
+    }
+} code_block_1;
+
+
+---
+# 136 [not implemented]
+
+
+---
+# 137 [not implemented]
+
+
+---
+# 138 [not implemented]
+
+
+# 139
+import math
+
+LIMIT = 100000000
+
+# Pythagorean triples theorem:
+#   Every primitive Pythagorean triple with a odd and b even can be expressed as
+#   a = st, b = (s^2-t^2)/2, c = (s^2+t^2)/2, where s > t > 0 are coprime odd integers.
+ans = 0
+for s in range(3, int(math.sqrt(LIMIT * 2)), 2):
+    for t in range(1, s, 2):
+        a = s * t
+        b = (s * s - t * t) // 2
+        c = (s * s + t * t) // 2
+        p = a + b + c
+        if p >= LIMIT:
+            break
+        if c % (a - b) == 0 and math.gcd(s, t) == 1:
+            ans += (LIMIT - 1) // p
+print(ans)
+===
+V LIMIT = 100000000
+
+V ans = 0
+L(s) (3 .< Int(sqrt(LIMIT * 2))).step(2)
+   L(t) (1 .< s).step(2)
+      V a = s * t
+      V b = (s * s - t * t) I/ 2
+      V c = (s * s + t * t) I/ 2
+      V p = a + b + c
+      I p >= LIMIT
+         L.break
+      I c % (a - b) == 0 & gcd(s, t) == 1
+         ans += (LIMIT - 1) I/ p
+print(ans)
+===
+auto LIMIT = 100000000;
+
+auto ans = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto s : range_el(3, to_int(sqrt(LIMIT * 2))).step(2))
+            for (auto t : range_el(1, s).step(2)) {
+                auto a = s * t;
+                auto b = idiv((s * s - t * t), 2);
+                auto c = idiv((s * s + t * t), 2);
+                auto p = a + b + c;
+                if (p >= LIMIT)
+                    break;
+                if (mod(c, (a - b)) == 0 && gcd(s, t) == 1)
+                    ans += idiv((LIMIT - 1), p);
+            }
+        print(ans);
+    }
+} code_block_1;
