@@ -1391,6 +1391,9 @@ class ASTVariableDeclaration(ASTNode):
         static_decl = ''
         if self.is_static:
             static_decl = 'static inline ' if type(self.parent) == ASTTypeDefinition else 'static '
+        if self.type == 'Array' and self.type_args == ['Bool']:
+            return self.pre_nl + ' ' * (indent*4) + 'const '*self.is_const + static_decl + 'Array<char>' \
+                               + ' ' + '*'*self.is_reference + 's_'*self.is_static + ', '.join(self.vars) + ";\n"
         return self.pre_nl + ' ' * (indent*4) + 'const '*self.is_const + static_decl + self.trans_type(self.type, self.is_reference) \
                            + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') \
                            + ' ' + '*'*self.is_reference + 's_'*self.is_static + ', '.join(self.vars) + ";\n"
