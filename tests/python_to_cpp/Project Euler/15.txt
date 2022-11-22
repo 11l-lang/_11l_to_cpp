@@ -1,0 +1,291 @@
+# 150
+from typing import List
+
+def compute_plain(triangle):
+    # Calculate cumulative sums for each row
+    rowsums : List[List[int]] = []
+    for row in triangle:
+        rowsum = [0]
+        for j in range(len(row)):
+            rowsum.append(rowsum[j] + row[j])
+        rowsums.append(rowsum)
+
+    # Calculate minimum subtriangle sum for each apex position
+    result = 0
+    for i in range(len(triangle)):
+        for j in range(len(triangle[i])):
+            # Apex element selected at triangle[i][j]
+            cursum = 0
+            for k in range(i, len(triangle)):  # Ending row (inclusive)
+                cursum += rowsums[k][k - i + 1 + j] - rowsums[k][j]
+                result = min(cursum, result)
+    return result
+
+# Generate the triangle
+ROWS = 1000
+triangle : List[List[int]] = []
+state = 0
+for i in range(ROWS):
+    row : List[int] = []
+    for j in range(i + 1):
+        state = (615949 * state + 797807) & ((1 << 20) - 1)
+        row.append(state - (1 << 19))
+    triangle.append(row)
+
+print(compute_plain(triangle))
+===
+F compute_plain(triangle)
+   [[Int]] rowsums
+   L(row) triangle
+      V rowsum = [0]
+      L(j) 0 .< row.len
+         rowsum.append(rowsum[j] + row[j])
+      rowsums.append(rowsum)
+
+   V result = 0
+   L(i) 0 .< triangle.len
+      L(j) 0 .< triangle[i].len
+         V cursum = 0
+         L(k) i .< triangle.len
+            cursum += rowsums[k][k - i + 1 + j] - rowsums[k][j]
+            result = min(cursum, result)
+   R result
+
+V ROWS = 1000
+[[Int]] triangle
+V state = 0
+L(i) 0 .< ROWS
+   [Int] row
+   L(j) 0 .. i
+      state = (615949 * state + 797807) [&] ((1 << 20) - 1)
+      row.append(state - (1 << 19))
+   triangle.append(row)
+
+print(compute_plain(triangle))
+===
+template <typename T1> auto compute_plain(const T1 &triangle)
+{
+    Array<Array<int>> rowsums;
+    for (auto &&row : triangle) {
+        auto rowsum = create_array({0});
+        for (auto j : range_el(0, row.len()))
+            rowsum.append(rowsum[j] + row[j]);
+        rowsums.append(rowsum);
+    }
+
+    auto result = 0;
+    for (auto i : range_el(0, triangle.len()))
+        for (auto j : range_el(0, triangle[i].len())) {
+            auto cursum = 0;
+            for (auto k : range_el(i, triangle.len())) {
+                cursum += rowsums[k][k - i + 1 + j] - rowsums[k][j];
+                result = min(cursum, result);
+            }
+        }
+    return result;
+}
+
+auto ROWS = 1000;
+Array<Array<int>> triangle;
+auto state = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(0, ROWS)) {
+            Array<int> row;
+            for (auto j : range_ee(0, i)) {
+                state = (615949 * state + 797807) & ((1 << 20) - 1);
+                row.append(state - (1 << 19));
+            }
+            triangle.append(row);
+        }
+
+        print(compute_plain(triangle));
+    }
+} code_block_1;
+
+
+# 151
+PseudoTuple = tuple
+
+cache = {PseudoTuple([-1]) : 0.0}
+
+def get_expected_singles(state) -> float:
+    def get_expected_singles_cached(state):
+        if state in cache:
+            return cache[state]
+        r = get_expected_singles(state)
+        cache[state] = r
+        return r
+
+    result = 0.0
+    if len(state) > 0:
+        for i in range(len(state)):
+            tempstate = list(state)
+            sheet = state[i]
+            del tempstate[i]
+            for j in range(sheet + 1, 6):
+                tempstate.append(j)
+            tempstate.sort()
+            result += get_expected_singles_cached(PseudoTuple(tempstate))
+        result /= len(state)
+        if len(state) == 1:
+            result += 1.0
+    return result
+
+print(f"{get_expected_singles(PseudoTuple([1])) - 2:.6f}")
+===
+V cache = [Array([-1]) = 0.0]
+
+F get_expected_singles(state) -> Float
+   F get_expected_singles_cached(state)
+      I state C :cache
+         R :cache[state]
+      V r = get_expected_singles(state)
+      :cache[state] = r
+      R r
+
+   V result = 0.0
+   I state.len > 0
+      L(i) 0 .< state.len
+         V tempstate = Array(state)
+         V sheet = state[i]
+         tempstate.pop(i)
+         L(j) sheet + 1 .< 6
+            tempstate.append(j)
+         tempstate.sort()
+         result += get_expected_singles_cached(Array(tempstate))
+      result /= state.len
+      I state.len == 1
+         result += 1.0
+   R result
+
+print(f:‘{get_expected_singles(Array([1])) - 2:.6}’)
+===
+auto cache = create_dict(dict_of(create_array(create_array({-1})), 0.0));
+
+template <typename T1> double get_expected_singles(const T1 &state)
+{
+    auto get_expected_singles_cached = [](const auto &state)
+    {
+        if (in(state, ::cache))
+            return ::cache[state];
+        auto r = get_expected_singles(state);
+        ::cache.set(state, r);
+        return r;
+    };
+
+    auto result = 0.0;
+    if (state.len() > 0) {
+        for (auto i : range_el(0, state.len())) {
+            auto tempstate = create_array(state);
+            auto sheet = state[i];
+            tempstate.pop(i);
+            for (auto j : range_el(sheet + 1, 6))
+                tempstate.append(j);
+            tempstate.sort();
+            result += get_expected_singles_cached(create_array(tempstate));
+        }
+        result /= state.len();
+        if (state.len() == 1)
+            result += 1.0;
+    }
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"#.6"_S.format(get_expected_singles(create_array(create_array({1}))) - 2));
+    }
+} code_block_1;
+
+
+# 155
+import math
+
+def move(obj):
+    return obj
+
+SIZE = 18
+# possible[i] holds all the possible capacitance values of a series/parallel
+# capacitor network that uses exactly i capacitors of 60 uF each
+possible : List[Set[Tuple[int, int]]] = []
+# Union of every possible[i]
+alls = set() # Tuple[int, int]
+# Note: Each fraction is represented as a pair (num, den), where den > 0 and gcd(num, den) = 1.
+# This approach is much faster than using the fractions.Fraction class.
+possible.append(set([(0, 0)] * 0))
+possible.append({(60, 1)})
+alls.update(possible[1])
+for i in range(2, SIZE + 1):
+    poss = set() # Tuple[int, int]
+    for j in range(1, i // 2 + 1):
+        for n0, d0 in possible[j]:
+            for n1, d1 in possible[i - j]:
+                pseudosum = n0 * d1 + n1 * d0
+                numerprod = n0 * n1
+                denomprod = d0 * d1
+                npgcd = math.gcd(pseudosum, numerprod)
+                dpgcd = math.gcd(pseudosum, denomprod)
+                poss.add((pseudosum // dpgcd, denomprod // dpgcd))  # Parallel
+                poss.add((numerprod // npgcd, pseudosum // npgcd))  # Series
+    alls.update(poss)
+    possible.append(move(poss))
+print(len(alls))
+===
+V SIZE = 18
+[Set[(Int, Int)]] possible
+V alls = Set[(Int, Int)]()
+possible.append(Set([(0, 0)] * 0))
+possible.append(Set([(60, 1)]))
+alls.update(possible[1])
+L(i) 2 .. SIZE
+   V poss = Set[(Int, Int)]()
+   L(j) 1 .. i I/ 2
+      L(n0, d0) possible[j]
+         L(n1, d1) possible[i - j]
+            V pseudosum = n0 * d1 + n1 * d0
+            V numerprod = n0 * n1
+            V denomprod = d0 * d1
+            V npgcd = gcd(pseudosum, numerprod)
+            V dpgcd = gcd(pseudosum, denomprod)
+            poss.add((pseudosum I/ dpgcd, denomprod I/ dpgcd))
+            poss.add((numerprod I/ npgcd, pseudosum I/ npgcd))
+   alls.update(poss)
+   possible.append(move(poss))
+print(alls.len)
+===
+auto _SIZE_ = 18;
+Array<Set<ivec2>> possible;
+auto alls = Set<ivec2>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        possible.append(create_set(create_array({make_tuple(0, 0)}) * 0));
+        possible.append(create_set({make_tuple(60, 1)}));
+        alls.update(_get<1>(possible));
+        for (auto i : range_ee(2, _SIZE_)) {
+            auto poss = Set<ivec2>();
+            for (auto j : range_ee(1, idiv(i, 2)))
+                for (auto &&[n0, d0] : possible[j])
+                    for (auto &&[n1, d1] : possible[i - j]) {
+                        auto pseudosum = n0 * d1 + n1 * d0;
+                        auto numerprod = n0 * n1;
+                        auto denomprod = d0 * d1;
+                        auto npgcd = gcd(pseudosum, numerprod);
+                        auto dpgcd = gcd(pseudosum, denomprod);
+                        poss.add(make_tuple(idiv(pseudosum, dpgcd), idiv(denomprod, dpgcd)));
+                        poss.add(make_tuple(idiv(numerprod, npgcd), idiv(pseudosum, npgcd)));
+                    }
+            alls.update(poss);
+            possible.append(std::move(poss));
+        }
+        print(alls.len());
+    }
+} code_block_1;
