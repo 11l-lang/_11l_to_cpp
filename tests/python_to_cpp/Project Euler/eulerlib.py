@@ -76,3 +76,20 @@ def list_totients(n):
 def binomial(n : BigInt, k : BigInt):
 	assert BigInt(0) <= k <= n
 	return math.factorial(n) // (math.factorial(k) * math.factorial(n - k))
+
+# Returns x^-1 mod m. Note that x * x^-1 mod m = x^-1 * x mod m = 1.
+def reciprocal_mod(x: int, m: int) -> int:
+	assert 0 <= x < m
+
+	# Based on a simplification of the extended Euclidean algorithm
+	y: int = x
+	x      = m
+	a: int = 0
+	b: int = 1
+	while y != 0:
+		a, b = b, a - x // y * b
+		x, y = y, x % y
+	if x == 1:
+		return a if a >= 0 else a + m
+	else:
+		raise ValueError("Reciprocal does not exist")

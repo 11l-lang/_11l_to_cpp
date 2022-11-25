@@ -63,3 +63,12 @@ binomial
             ‘k; ; BigInt; ’
         ]
     ]
+reciprocal_mod
+    type = ‘’
+    ast_nodes = [
+    .   node_type = function
+        function_arguments = [
+            ‘x; ; Int; =’
+            ‘m; ; Int; ’
+        ]
+    ]

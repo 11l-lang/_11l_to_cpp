@@ -55,3 +55,18 @@ F list_totients(n)
 F binomial(BigInt n, BigInt k)
    assert(k C BigInt(0) .. n)
    R factorial(n) I/ (factorial(k) * factorial(n - k))
+
+F reciprocal_mod(Int =x, Int m) -> Int
+   assert(x C 0 .< m)
+
+   Int y = x
+   x = m
+   Int a = 0
+   Int b = 1
+   L y != 0
+      (a, b) = (b, a - x I/ y * b)
+      (x, y) = (y, x % y)
+   I x == 1
+      R I a >= 0 {a} E a + m
+   E
+      X ValueError(‘Reciprocal does not exist’)

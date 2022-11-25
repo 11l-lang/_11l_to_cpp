@@ -73,3 +73,21 @@ auto binomial(const BigInt &n, const BigInt &k)
     assert(in(k, range_ee(BigInt(0), n)));
     return idiv(factorial(n), (factorial(k) * factorial(n - k)));
 }
+
+int reciprocal_mod(int x, const int m)
+{
+    assert(in(x, range_el(0, m)));
+
+    int y = x;
+    x = m;
+    int a = 0;
+    int b = 1;
+    while (y != 0) {
+        assign_from_tuple(a, b, make_tuple(b, a - idiv(x, y) * b));
+        assign_from_tuple(x, y, make_tuple(y, mod(x, y)));
+    }
+    if (x == 1)
+        return a >= 0 ? a : a + m;
+    else
+        throw ValueError(u"Reciprocal does not exist"_S);
+}

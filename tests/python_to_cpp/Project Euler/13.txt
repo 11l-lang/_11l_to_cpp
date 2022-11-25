@@ -200,8 +200,63 @@ struct CodeBlock1
 } code_block_1;
 
 
----
-# 134 [-`pow(base, -1, mod)`-]
+# 134
+import eulerlib, itertools
+Int64 = int
+
+ans = Int64(0)
+primes = eulerlib.list_primes(2000000)
+for i in itertools.count(2):
+    p = primes[i]
+    q = primes[i + 1]
+    if p > 1000000:
+        break
+    k = 1
+    while k < p:
+        k *= 10
+    m = (q - p) * eulerlib.reciprocal_mod(k % q, q) % q
+    ans += Int64(m) * k + p
+print(ans)
+===
+V ans = Int64(0)
+V primes = eulerlib:list_primes(2000000)
+L(i) 2..
+   V p = primes[i]
+   V q = primes[i + 1]
+   I p > 1000000
+      L.break
+   V k = 1
+   L k < p
+      k *= 10
+   V m = (q - p) * eulerlib:reciprocal_mod(k % q, q) % q
+   ans += Int64(m) * k + p
+print(ans)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto ans = to_int64(0);
+auto primes = eulerlib::list_primes(2000000);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ei(2)) {
+            auto p = primes[i];
+            auto q = primes[i + 1];
+            if (p > 1000000)
+                break;
+            auto k = 1;
+            while (k < p)
+                k *= 10;
+            auto m = mod((q - p) * eulerlib::reciprocal_mod(mod(k, q), q), q);
+            ans += to_int64(m) * k + p;
+        }
+        print(ans);
+    }
+} code_block_1;
 
 
 # 135
