@@ -1,0 +1,466 @@
+# 160
+Int64 = int
+
+# The product of {all numbers from 1 to n that are coprime with 10}, modulo 10^5.
+# The input argument can be taken modulo 10^5 because factorialoid(10^5) = 1, and each block of 10^5 numbers behaves the same.
+def factorial_coprime(n):
+    n %= 100000
+    product = Int64(1)
+    for i in range(1, int(n) + 1):
+        if i % 2 != 0 and i % 5 != 0:
+            product = i * product % 100000
+    return product
+
+# Equal to n! but with all factors of 2 and 5 removed and then modulo 10^5.
+# The identity factorialIsh(n) = odd_factorialish(n) * even_factorialish(n) (mod 10^5) is true by definition.
+def factorialish(n) -> Int64:
+    # The product of {all even numbers from 1 to n}, but with all factors of 2 and 5 removed and then modulo 10^5.
+    # For example, even_factorialish(9) only considers the numbers {2, 4, 6, 8}. Divide each number by 2 to get {1, 2, 3, 4}. Thus even_factorialish(9) = factorialish(4).
+    def even_factorialish(n):
+        if n == 0:
+            return Int64(1)
+        else:
+            return factorialish(n // 2)
+
+    # The product of {all odd numbers from 1 to n}, but with all factors of 2 and 5 removed and then modulo 10^5.
+    # By definition, odd_factorialish() never considers any number that has a factor of 2. The product of the numbers that not a multiple of 5 are accumulated by factorial_coprime().
+    # Those that are a multiple of 5 are handled recursively by odd_factorialish(), noting that they are still odd after dividing by 5.
+    def odd_factorialish(n : Int64) -> Int64:
+        if n == 0:
+            return 1
+        else:
+            return odd_factorialish(n // 5) * factorial_coprime(n) % 100000
+
+    return even_factorialish(n) * odd_factorialish(n) % 100000
+
+# Counts the number of factors of n in the set of integers {1, 2, ..., end}.
+# For example, count_factors(25, 5) = 6 because {5, 10, 15, 20} each has one factor of 5, and 25 has two factors of 5.
+def count_factors(end, n):
+    if end == 0:
+        return Int64(0)
+    else:
+        return end // n + count_factors(end // n, n)
+
+# The last 5 digits of n!, excluding trailing zeros.
+def factorial_suffix(n):
+    twos = count_factors(n, 2) - count_factors(n, 5)  # Always non-negative for every n
+    # We can reduce 'twos' because there is a cycle: 2^5 = 2^2505 = 32 mod 100000
+    if twos >= 2505:
+        twos = (twos - 5) % 2500 + 5
+    return factorialish(n) * pow(Int64(2), twos, 100000) % 100000
+
+print(factorial_suffix(Int64(10)**12))
+===
+F factorial_coprime(=n)
+   n %= 100000
+   V product = Int64(1)
+   L(i) 1 .. Int(n)
+      I i % 2 != 0 & i % 5 != 0
+         product = i * product % 100000
+   R product
+
+F factorialish(n) -> Int64
+   F even_factorialish(n)
+      I n == 0
+         R Int64(1)
+      E
+         R factorialish(n I/ 2)
+
+   F odd_factorialish(Int64 n) -> Int64
+      I n == 0
+         R 1
+      E
+         R @odd_factorialish(n I/ 5) * factorial_coprime(n) % 100000
+
+   R even_factorialish(n) * odd_factorialish(n) % 100000
+
+F count_factors(end, n)
+   I end == 0
+      R Int64(0)
+   E
+      R end I/ n + count_factors(end I/ n, n)
+
+F factorial_suffix(n)
+   V twos = count_factors(n, 2) - count_factors(n, 5)
+   I twos >= 2505
+      twos = (twos - 5) % 2500 + 5
+   R factorialish(n) * pow(Int64(2), twos, 100000) % 100000
+
+print(factorial_suffix(Int64(10) ^ 12))
+===
+template <typename T1> auto factorial_coprime(T1 n)
+{
+    n %= 100000;
+    auto product = to_int64(1);
+    for (auto i : range_ee(1, to_int(n)))
+        if (mod(i, 2) != 0 && mod(i, 5) != 0)
+            product = mod(i * product, 100000);
+    return product;
+}
+
+template <typename T1> Int64 factorialish(const T1 &n)
+{
+    auto even_factorialish = [](const auto &n)
+    {
+        if (n == 0)
+            return to_int64(1);
+        else
+            return factorialish(idiv(n, 2));
+    };
+
+    std::function<Int64(Int64)> odd_factorialish = [&odd_factorialish](const Int64 &n) -> Int64
+    {
+        if (n == 0)
+            return 1;
+        else
+            return mod(odd_factorialish(idiv(n, 5)) * factorial_coprime(n), 100000);
+    };
+
+    return mod(even_factorialish(n) * odd_factorialish(n), 100000);
+}
+
+template <typename T1, typename T2> auto count_factors(const T1 &end, const T2 &n)
+{
+    if (end == 0)
+        return to_int64(0);
+    else
+        return idiv(end, n) + count_factors(idiv(end, n), n);
+}
+
+template <typename T1> auto factorial_suffix(const T1 &n)
+{
+    auto twos = count_factors(n, 2) - count_factors(n, 5);
+    if (twos >= 2505)
+        twos = mod((twos - 5), 2500) + 5;
+    return mod(factorialish(n) * pow(to_int64(2), twos, 100000), 100000);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(factorial_suffix(pow(to_int64(10), 12)));
+    }
+} code_block_1;
+
+
+---
+# 161 [not implemented]
+
+
+# 162
+Int64 = int
+BigInt = int
+
+print(hex(Int64(sum((15 * BigInt(16)**(n-1) - 43 * BigInt(15)**(n-1) + 41 * BigInt(14)**(n-1) - BigInt(13)**n) for n in range(1, 17))))[2:].upper())
+===
+print(hex(Int64(sum((1..16).map(n -> (15 * BigInt(16) ^ (n - 1) - 43 * BigInt(15) ^ (n - 1) + 41 * BigInt(14) ^ (n - 1) - BigInt(13) ^ n))))))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(hex(to_int64(sum_map(range_ee(1, 16), [](const auto &n){return (15 * pow(BigInt(16), (n - 1)) - 43 * pow(BigInt(15), (n - 1)) + 41 * pow(BigInt(14), (n - 1)) - pow(BigInt(13), n));}))));
+    }
+} code_block_1;
+
+
+---
+# 163 [not implemented]
+
+
+# 164
+def digit_sum(n):
+    return sum(int(c) for c in str(n))
+
+BASE = 10
+DIGITS = 20
+CONSECUTIVE = 3
+MAX_SUM = 9
+
+# Dynamic programming array, with base case (ways for 0-digit numbers)
+innerlen = BASE ** CONSECUTIVE
+ways = [[Int64(1)] + [Int64(0)] * (innerlen - 1)]
+
+# Compute DP table
+for digits in range(1, DIGITS + CONSECUTIVE + 1):
+    newrow : List[Int64] = []
+    for prefix in range(innerlen):
+        s : Int64 = 0
+        if digit_sum(prefix) <= MAX_SUM:
+            for nextdigit in range(BASE):
+                s += ways[digits - 1][prefix % (BASE ** (CONSECUTIVE - 1)) * BASE + nextdigit]
+        newrow.append(s)
+    ways.append(newrow)
+
+print(ways[-1][0] - ways[-2][0])
+===
+F digit_sum(n)
+   R sum(String(n).map(c -> Int(c)))
+
+V BASE = 10
+V DIGITS = 20
+V CONSECUTIVE = 3
+V MAX_SUM = 9
+
+V innerlen = BASE ^ CONSECUTIVE
+V ways = [[Int64(1)] [+] [Int64(0)] * (innerlen - 1)]
+
+L(digits) 1 .. DIGITS + CONSECUTIVE
+   [Int64] newrow
+   L(prefix) 0 .< innerlen
+      Int64 s = 0
+      I digit_sum(prefix) <= MAX_SUM
+         L(nextdigit) 0 .< BASE
+            s += ways[digits - 1][prefix % (BASE ^ (CONSECUTIVE - 1)) * BASE + nextdigit]
+      newrow.append(s)
+   ways.append(newrow)
+
+print(ways.last[0] - ways[(len)-2][0])
+===
+template <typename T1> auto digit_sum(const T1 &n)
+{
+    return sum_map(String(n), [](const auto &c){return to_int(c);});
+}
+
+auto BASE = 10;
+auto DIGITS = 20;
+auto CONSECUTIVE = 3;
+auto MAX_SUM = 9;
+
+auto innerlen = pow(BASE, CONSECUTIVE);
+auto ways = create_array({create_array({to_int64(1)}) + create_array({to_int64(0)}) * (innerlen - 1)});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto digits : range_ee(1, DIGITS + CONSECUTIVE)) {
+            Array<Int64> newrow;
+            for (auto prefix : range_el(0, innerlen)) {
+                Int64 s = 0;
+                if (digit_sum(prefix) <= MAX_SUM)
+                    for (auto nextdigit : range_el(0, BASE))
+                        s += ways[digits - 1][mod(prefix, (pow(BASE, (CONSECUTIVE - 1)))) * BASE + nextdigit];
+                newrow.append(s);
+            }
+            ways.append(newrow);
+        }
+
+        print(_get<0>(ways.last()) - _get<0>(ways.at_plus_len( - 2)));
+    }
+} code_block_1;
+
+
+---
+# 165 [-fractions-]
+
+
+# 166
+ans = 0
+digits = range(10)
+for b in digits:
+    for c in digits:
+        for d in digits:
+            for e in digits:
+                for i in digits:
+                    m = b + c + d - e - i
+                    if m < 0 or m > 9: continue
+                    for k in digits:
+                        f = b + c + d*2 - e - i - k
+                        if f < 0 or f > 9: continue
+                        for a in digits:
+                            for g in digits:
+                                o = a + b + d - g - k
+                                if o < 0 or o > 9: continue
+                                j = a + b + c - g - m
+                                if j < 0 or j > 9: continue
+                                l = a + b + c + d - i - j - k
+                                if l < 0 or l > 9: continue
+                                h = a + b + c + d - e - f - g
+                                if h < 0 or h > 9: continue
+                                n = a + c + d - f - j
+                                if n < 0 or n > 9: continue
+                                p = a + b + c - h - l
+                                if p < 0 or p > 9: continue
+                                ans += 1
+print(ans)
+===
+V ans = 0
+V digits = 0.<10
+L(b) digits
+   L(c) digits
+      L(d) digits
+         L(e) digits
+            L(i) digits
+               V m = b + c + d - e - i
+               I m < 0 | m > 9
+                  L.continue
+               L(k) digits
+                  V f = b + c + d * 2 - e - i - k
+                  I f < 0 | f > 9
+                     L.continue
+                  L(a) digits
+                     L(g) digits
+                        V o = a + b + d - g - k
+                        I o < 0 | o > 9
+                           L.continue
+                        V j = a + b + c - g - m
+                        I j < 0 | j > 9
+                           L.continue
+                        V l = a + b + c + d - i - j - k
+                        I l < 0 | l > 9
+                           L.continue
+                        V h = a + b + c + d - e - f - g
+                        I h < 0 | h > 9
+                           L.continue
+                        V n = a + c + d - f - j
+                        I n < 0 | n > 9
+                           L.continue
+                        V p = a + b + c - h - l
+                        I p < 0 | p > 9
+                           L.continue
+                        ans++
+print(ans)
+===
+auto ans = 0;
+auto digits = range_el(0, 10);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&b : digits)
+            for (auto &&c : digits)
+                for (auto &&d : digits)
+                    for (auto &&e : digits)
+                        for (auto &&i : digits) {
+                            auto m = b + c + d - e - i;
+                            if (m < 0 || m > 9)
+                                continue;
+                            for (auto &&k : digits) {
+                                auto f = b + c + d * 2 - e - i - k;
+                                if (f < 0 || f > 9)
+                                    continue;
+                                for (auto &&a : digits)
+                                    for (auto &&g : digits) {
+                                        auto o = a + b + d - g - k;
+                                        if (o < 0 || o > 9)
+                                            continue;
+                                        auto j = a + b + c - g - m;
+                                        if (j < 0 || j > 9)
+                                            continue;
+                                        auto l = a + b + c + d - i - j - k;
+                                        if (l < 0 || l > 9)
+                                            continue;
+                                        auto h = a + b + c + d - e - f - g;
+                                        if (h < 0 || h > 9)
+                                            continue;
+                                        auto n = a + c + d - f - j;
+                                        if (n < 0 || n > 9)
+                                            continue;
+                                        auto p = a + b + c - h - l;
+                                        if (p < 0 || p > 9)
+                                            continue;
+                                        ans++;
+                                    }
+                            }
+                        }
+        print(ans);
+    }
+} code_block_1;
+
+
+---
+# 167 [not implemented]
+
+
+---
+# 168 [not implemented]
+
+
+# 169
+from typing import Dict, Tuple
+BigInt = int
+Int64 = int
+
+cache : Dict[Tuple[BigInt, int, int], Int64] = {}
+
+def count_ways(number, exponent, repetitions):
+    def count_ways_cached(number, exponent, repetitions):
+        if (number, exponent, repetitions) in cache:
+            return cache[(number, exponent, repetitions)]
+        r = count_ways(number, exponent, repetitions)
+        cache[(number, exponent, repetitions)] = r
+        return r
+
+    if exponent < 0:
+        return Int64(1 if number == 0 else 0)
+    else:
+        result = count_ways_cached(number, exponent - 1, 2)
+        power = BigInt(2) ** exponent
+        upper = power * (repetitions + 2)
+        if repetitions > 0 and power <= number and number < upper:
+            result += count_ways_cached(number - power, exponent, repetitions - 1)
+        return result
+
+NUMBER = BigInt(10)**25
+print(count_ways(NUMBER, NUMBER.bit_length() - 1, 2))
+===
+[(BigInt, Int, Int) = Int64] cache
+
+F count_ways(number, exponent, repetitions)
+   F count_ways_cached(number, exponent, repetitions)
+      I (number, exponent, repetitions) C :cache
+         R :cache[(number, exponent, repetitions)]
+      V r = count_ways(number, exponent, repetitions)
+      :cache[(number, exponent, repetitions)] = r
+      R r
+
+   I exponent < 0
+      R Int64(I number == 0 {1} E 0)
+   E
+      V result = count_ways_cached(number, exponent - 1, 2)
+      V power = BigInt(2) ^ exponent
+      V upper = power * (repetitions + 2)
+      I repetitions > 0 & power <= number & number < upper
+         result += count_ways_cached(number - power, exponent, repetitions - 1)
+      R result
+
+V NUMBER = BigInt(10) ^ 25
+print(count_ways(NUMBER, bit_length(NUMBER) - 1, 2))
+===
+Dict<Tuple<BigInt, int, int>, Int64> cache;
+
+template <typename T1, typename T2, typename T3> auto count_ways(const T1 &number, const T2 &exponent, const T3 &repetitions)
+{
+    auto count_ways_cached = [](const auto &number, const auto &exponent, const auto &repetitions)
+    {
+        if (in(make_tuple(number, exponent, repetitions), ::cache))
+            return ::cache[make_tuple(number, exponent, repetitions)];
+        auto r = count_ways(number, exponent, repetitions);
+        ::cache.set(make_tuple(number, exponent, repetitions), r);
+        return r;
+    };
+
+    if (exponent < 0)
+        return to_int64(number == 0 ? 1 : 0);
+    else {
+        auto result = count_ways_cached(number, exponent - 1, 2);
+        auto power = pow(BigInt(2), exponent);
+        auto upper = power * (repetitions + 2);
+        if (repetitions > 0 && power <= number && number < upper)
+            result += count_ways_cached(number - power, exponent, repetitions - 1);
+        return result;
+    }
+}
+
+auto NUMBER = pow(BigInt(10), 25);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(count_ways(NUMBER, bit_length(NUMBER) - 1, 2));
+    }
+} code_block_1;

@@ -163,6 +163,16 @@ public:
 		*this &= _get<1>(tuple);
 		append(1, u')');
 	}
+	template <typename Type1, typename Type2, typename Type3> explicit String(const Tuple<Type1, Type2, Type3> &tuple)
+	{
+		assign(1, u'(');
+		*this &= _get<0>(tuple);
+		*this &= u", ";
+		*this &= _get<1>(tuple);
+		*this &= u", ";
+		*this &= _get<2>(tuple);
+		append(1, u')');
+	}
 	template <typename...Types> explicit String(const Tuple<Types...> &t)
 	{
 		assign(1, u'(');
