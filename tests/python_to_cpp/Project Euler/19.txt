@@ -1,0 +1,197 @@
+# 191
+def create_nested_lists(value, dimensions0, dimensions1, dimensions2):
+    return [[[value] * dimensions2 for i in range(dimensions1)] for i in range(dimensions0)]
+
+NUM_DAYS = 30
+MAX_ABSENT = 2
+MAX_LATE = 1
+
+# num_prize_strings[i][j][k] is the number of prize strings of length i with
+# exactly j absences at the tail and exactly k lates in the whole string
+num_prize_strings = create_nested_lists(0, NUM_DAYS + 1, MAX_ABSENT + 1, MAX_LATE + 1)
+num_prize_strings[0][0][0] = 1
+for i in range(1, len(num_prize_strings)):
+    for j in range(len(num_prize_strings[i])):
+        for k in range(len(num_prize_strings[i][j])):
+            s : int
+            if j == 0:
+                s = 0
+                for l in range(MAX_ABSENT + 1):
+                    s += num_prize_strings[i - 1][l][k]  # On time
+                if k > 0:
+                    for l in range(MAX_ABSENT + 1):
+                        s += num_prize_strings[i - 1][l][k - 1]  # Late
+            else:
+                s = num_prize_strings[i - 1][j - 1][k]  # Absent
+            num_prize_strings[i][j][k] = s
+
+print(sum(map(lambda a: sum(a), num_prize_strings[NUM_DAYS])))
+===
+F create_nested_lists(value, dimensions0, dimensions1, dimensions2)
+   R (0 .< dimensions0).map(i -> [[@value] * @dimensions2] * @dimensions1)
+
+V NUM_DAYS = 30
+V MAX_ABSENT = 2
+V MAX_LATE = 1
+
+V num_prize_strings = create_nested_lists(0, NUM_DAYS + 1, MAX_ABSENT + 1, MAX_LATE + 1)
+num_prize_strings[0][0][0] = 1
+L(i) 1 .< num_prize_strings.len
+   L(j) 0 .< num_prize_strings[i].len
+      L(k) 0 .< num_prize_strings[i][j].len
+         Int s
+         I j == 0
+            s = 0
+            L(l) 0 .. MAX_ABSENT
+               s += num_prize_strings[i - 1][l][k]
+            I k > 0
+               L(l) 0 .. MAX_ABSENT
+                  s += num_prize_strings[i - 1][l][k - 1]
+         E
+            s = num_prize_strings[i - 1][j - 1][k]
+         num_prize_strings[i][j][k] = s
+
+print(sum(num_prize_strings[NUM_DAYS].map(a -> sum(a))))
+===
+template <typename T1, typename T2, typename T3, typename T4> auto create_nested_lists(const T1 &value, const T2 &dimensions0, const T3 &dimensions1, const T4 &dimensions2)
+{
+    return range_el(0, dimensions0).map([&dimensions1, &dimensions2, &value](const auto &i){return create_array({create_array({value}) * dimensions2}) * dimensions1;});
+}
+
+auto NUM_DAYS = 30;
+auto MAX_ABSENT = 2;
+auto MAX_LATE = 1;
+
+auto num_prize_strings = create_nested_lists(0, NUM_DAYS + 1, MAX_ABSENT + 1, MAX_LATE + 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _set<0>(_get<0>(_get<0>(num_prize_strings)), 1);
+        for (auto i : range_el(1, num_prize_strings.len()))
+            for (auto j : range_el(0, num_prize_strings[i].len()))
+                for (auto k : range_el(0, num_prize_strings[i][j].len())) {
+                    int s;
+                    if (j == 0) {
+                        s = 0;
+                        for (auto l : range_ee(0, MAX_ABSENT))
+                            s += num_prize_strings[i - 1][l][k];
+                        if (k > 0)
+                            for (auto l : range_ee(0, MAX_ABSENT))
+                                s += num_prize_strings[i - 1][l][k - 1];
+                    }
+                    else
+                        s = num_prize_strings[i - 1][j - 1][k];
+                    num_prize_strings[i][j].set(k, s);
+                }
+
+        print(sum_map(num_prize_strings[NUM_DAYS], [](const auto &a){return sum(a);}));
+    }
+} code_block_1;
+
+
+# 197
+import math
+Int64 = int
+
+def f(x):
+    return math.floor(2.0 ** (30.403243784 - x * x)) / 1.0e9
+
+ITERATIONS = Int64(10)**12
+
+# Floyd's cycle-finding algorithm
+x = -1.0
+y = -1.0
+i = 0
+while True:#i < ITERATIONS:
+    # Here at the top of the loop, x = f^i(-1) and y = f^{2i}(-1)
+
+    if i > 0 and x == y:  # This means index i is part of the cycle, and (2i - i) = i is some multiple of the true cycle length
+        break
+
+    # Advance the states at different speeds
+    x = f(x)
+    y = f(f(y))
+    i += 1
+
+# Advance by many multiples of the cycle length, then deal with the remaining iterations
+remain = int((ITERATIONS - i) % i)
+for i in range(remain):
+    x = f(x)
+
+ans = x + f(x)
+#ans = math.floor(ans * 1.0e9) / 1.0e9  # Truncate to 9 digits after the decimal point
+print(f"{ans:.9f}")
+===
+F f(x)
+   R floori(2.0 ^ (30.403243784 - x * x)) / 1.0e9
+
+V ITERATIONS = Int64(10) ^ 12
+
+V x = -1.0
+V y = -1.0
+V i = 0
+L
+
+   I i > 0 & x == y
+      L.break
+
+   x = f(x)
+   y = f(f(y))
+   i++
+
+V remain = Int((ITERATIONS - i) % i)
+L(i) 0 .< remain
+   x = f(x)
+
+V ans = x + f(x)
+print(f:‘{ans:.9}’)
+===
+template <typename T1> auto f(const T1 &x)
+{
+    return floori(pow(2.0, (30.403243784 - x * x))) / 1.0e9;
+}
+
+auto ITERATIONS = pow(to_int64(10), 12);
+
+auto x = -1.0;
+auto y = -1.0;
+auto i = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+
+            if (i > 0 && x == y)
+                break;
+
+            x = f(x);
+            y = f(f(y));
+            i++;
+        }
+    }
+} code_block_1;
+
+auto remain = to_int(mod((ITERATIONS - i), i));
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto i : range_el(0, remain))
+            x = f(x);
+    }
+} code_block_2;
+
+auto ans = x + f(x);
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print(u"#.9"_S.format(ans));
+    }
+} code_block_3;
