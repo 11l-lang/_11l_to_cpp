@@ -1,0 +1,495 @@
+---
+# 170 [not implemented]
+
+
+# 171
+from typing import List
+import math, itertools
+Int64 = int
+
+LENGTH = 20
+BASE = 10
+MODULUS = 10**9
+
+# Maximum possible squared digit sum (for 99...99)
+MAX_SQR_DIGIT_SUM = (BASE - 1)**2 * LENGTH
+
+# sqsum[n][s] is the sum of all length-n numbers with a square digit sum of s, modulo MODULUS
+# count[n][s] is the count of all length-n numbers with a square digit sum of s, modulo MODULUS
+sqsum : List[List[int]] = []
+count : List[List[int]] = []
+
+for i in range(LENGTH + 1):
+    sqsum.append([0] * (MAX_SQR_DIGIT_SUM + 1))
+    count.append([0] * (MAX_SQR_DIGIT_SUM + 1))
+    if i == 0:
+        count[0][0] = 1
+    else:
+        for j in range(BASE):
+            for k in itertools.count(0):
+                index = k + j**2
+                if index > MAX_SQR_DIGIT_SUM:
+                    break
+                sqsum[i][index] = int((sqsum[i][index] + sqsum[i - 1][k] + Int64(pow(Int64(BASE), i - 1, MODULUS)) * j * count[i - 1][k]) % MODULUS)
+                count[i][index] = int((count[i][index] + count[i - 1][k]) % MODULUS)
+
+ans = sum(Int64(sqsum[LENGTH][i**2]) for i in range(1, int(math.sqrt(MAX_SQR_DIGIT_SUM))))
+print(f"{ans%MODULUS:09}")
+===
+V LENGTH = 20
+V BASE = 10
+V MODULUS = 10 ^ 9
+
+V MAX_SQR_DIGIT_SUM = (BASE - 1) ^ 2 * LENGTH
+
+[[Int]] sqsum
+[[Int]] count
+
+L(i) 0 .. LENGTH
+   sqsum.append([0] * (MAX_SQR_DIGIT_SUM + 1))
+   count.append([0] * (MAX_SQR_DIGIT_SUM + 1))
+   I i == 0
+      count[0][0] = 1
+   E
+      L(j) 0 .< BASE
+         L(k) 0..
+            V index = k + j ^ 2
+            I index > MAX_SQR_DIGIT_SUM
+               L.break
+            sqsum[i][index] = Int((sqsum[i][index] + sqsum[i - 1][k] + Int64(pow(Int64(BASE), i - 1, MODULUS)) * j * count[i - 1][k]) % MODULUS)
+            count[i][index] = Int((count[i][index] + count[i - 1][k]) % MODULUS)
+
+V ans = sum((1 .< Int(sqrt(MAX_SQR_DIGIT_SUM))).map(i -> Int64(:sqsum[:LENGTH][i ^ 2])))
+print(f:‘{ans % MODULUS:09}’)
+===
+auto LENGTH = 20;
+auto BASE = 10;
+auto MODULUS = pow(10, 9);
+
+auto MAX_SQR_DIGIT_SUM = square((BASE - 1)) * LENGTH;
+
+Array<Array<int>> sqsum;
+Array<Array<int>> count;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(0, LENGTH)) {
+            sqsum.append(create_array({0}) * (MAX_SQR_DIGIT_SUM + 1));
+            count.append(create_array({0}) * (MAX_SQR_DIGIT_SUM + 1));
+            if (i == 0)
+                _set<0>(_get<0>(count), 1);
+            else
+                for (auto j : range_el(0, BASE))
+                    for (auto k : range_ei(0)) {
+                        auto index = k + square(j);
+                        if (index > MAX_SQR_DIGIT_SUM)
+                            break;
+                        sqsum[i].set(index, to_int(mod((sqsum[i][index] + sqsum[i - 1][k] + to_int64(pow(to_int64(BASE), i - 1, MODULUS)) * j * count[i - 1][k]), MODULUS)));
+                        count[i].set(index, to_int(mod((count[i][index] + count[i - 1][k]), MODULUS)));
+                    }
+        }
+    }
+} code_block_1;
+
+auto ans = sum_map(range_el(1, to_int(sqrt(MAX_SQR_DIGIT_SUM))), [](const auto &i){return to_int64(::sqsum[::LENGTH][square(i)]);});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"#09"_S.format(mod(ans, MODULUS)));
+    }
+} code_block_2;
+
+
+# 172
+import math
+BigInt = int
+Int64 = int
+
+# Highly customizable!
+LENGTH = 18    # >= 1
+MAX_COUNT = 3  # >= ceiling(LENGTH / BASE), else the result is 0
+BASE = 10      # >= 2
+
+def count_ways(freqs):
+    # The number of times each frequency value occurs
+    histogram = [0] * (MAX_COUNT + 1)
+    for x in freqs:
+        histogram[x] += 1
+
+    # Multinomial coefficient: BASE! / (histogram[0]! * histogram[1]! * ...)
+    ways = math.factorial(BASE)
+    for x in histogram:
+        ways //= math.factorial(x)
+
+    # Multinomial coefficient: LENGTH! / (freqs[0]! * freqs[1]! * ...)
+    ways_big = BigInt(ways) * math.factorial(Int64(LENGTH))
+    for x in freqs:
+        ways_big //= math.factorial(x)
+
+    return Int64(ways_big)
+
+# Expresses 'LENGTH' as a sum of 'BASE' non-increasing terms, where terms to be added are in the range [0, max].
+# e.g. partitionAndCount(7, 2, [3, 3, 2, 2, 1]) asks us to express 18 as a sum of 5 more terms,
+# where the new terms have a sum of 7 and each is no greater than 2 and all terms are non-increasing.
+def partition_and_count(sum, max, terms : list):
+    if len(terms) == BASE:
+        return count_ways(terms) if (sum == 0) else 0
+    else:
+        result = Int64(0)
+        for i in reversed(range(min(max, sum) + 1)):
+            terms.append(i)
+            result += partition_and_count(sum - i, i, terms)
+            terms.pop()
+        return result
+
+def divide_exactly(x, y):
+    if x % y != 0:
+        raise ValueError("Not divisible")
+    return x // y
+
+ans = partition_and_count(LENGTH, MAX_COUNT, [0]*0)
+# Multiply by (base - 1) / base to discount sequences with leading zeros
+ans = divide_exactly(ans * (BASE - 1), BASE)
+print(ans)
+===
+V LENGTH = 18
+V MAX_COUNT = 3
+V BASE = 10
+
+F count_ways(freqs)
+   V histogram = [0] * (:MAX_COUNT + 1)
+   L(x) freqs
+      histogram[x]++
+
+   V ways = factorial(:BASE)
+   L(x) histogram
+      ways I/= factorial(x)
+
+   V ways_big = BigInt(ways) * factorial(Int64(:LENGTH))
+   L(x) freqs
+      ways_big I/= factorial(x)
+
+   R Int64(ways_big)
+
+F partition_and_count(sum, max, &terms)
+   I terms.len == :BASE
+      R I (sum == 0) {count_ways(terms)} E 0
+   E
+      V result = Int64(0)
+      L(i) reversed(0 .. min(max, sum))
+         terms.append(i)
+         result += partition_and_count(sum - i, i, &terms)
+         terms.pop()
+      R result
+
+F divide_exactly(x, y)
+   I x % y != 0
+      X ValueError(‘Not divisible’)
+   R x I/ y
+
+V ans = partition_and_count(LENGTH, MAX_COUNT, &[Int]())
+ans = divide_exactly(ans * (BASE - 1), BASE)
+print(ans)
+===
+auto LENGTH = 18;
+auto MAX_COUNT = 3;
+auto BASE = 10;
+
+template <typename T1> auto count_ways(const T1 &freqs)
+{
+    auto histogram = create_array({0}) * (::MAX_COUNT + 1);
+    for (auto &&x : freqs)
+        histogram[x]++;
+
+    auto ways = factorial(::BASE);
+    for (auto &&x : histogram)
+        ways = idiv(ways, factorial(x));
+
+    auto ways_big = BigInt(ways) * factorial(to_int64(::LENGTH));
+    for (auto &&x : freqs)
+        ways_big = idiv(ways_big, factorial(x));
+
+    return to_int64(ways_big);
+}
+
+template <typename T1, typename T2, typename T3> auto partition_and_count(const T1 &sum, const T2 &max, T3 &terms)
+{
+    if (terms.len() == ::BASE)
+        return (sum == 0) ? count_ways(terms) : 0;
+    else {
+        auto result = to_int64(0);
+        for (auto &&i : reversed(range_ee(0, min(max, sum)))) {
+            terms.append(i);
+            result += partition_and_count(sum - i, i, terms);
+            terms.pop();
+        }
+        return result;
+    }
+}
+
+template <typename T1, typename T2> auto divide_exactly(const T1 &x, const T2 &y)
+{
+    if (mod(x, y) != 0)
+        throw ValueError(u"Not divisible"_S);
+    return idiv(x, y);
+}
+
+auto ans = partition_and_count(LENGTH, MAX_COUNT, make_ref(Array<int>()));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        ans = divide_exactly(ans * (BASE - 1), BASE);
+        print(ans);
+    }
+} code_block_1;
+
+
+# 173
+TILES = 10**6
+ans = 0
+for n in range(3, TILES // 4 + 2):  # Outer square length
+    for k in range(n - 2, 0, -2):  # Inner square length
+        if n * n - k * k > TILES:
+            break
+        ans += 1
+print(ans)
+===
+V TILES = 10 ^ 6
+V ans = 0
+L(n) 3 .< TILES I/ 4 + 2
+   L(k) (n - 2 .< 0).step(-2)
+      I n * n - k * k > TILES
+         L.break
+      ans++
+print(ans)
+===
+auto TILES = pow(10, 6);
+auto ans = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_el(3, idiv(TILES, 4) + 2))
+            for (auto k : range_el(n - 2, 0).step(-2)) {
+                if (n * n - k * k > TILES)
+                    break;
+                ans++;
+            }
+        print(ans);
+    }
+} code_block_1;
+
+
+# 174
+SIZE_LIMIT = 1000000
+TYPE_LIMIT = 10
+
+# Generate all possible laminae with at most SIZE_LIMIT tiles
+type = [0] * (SIZE_LIMIT + 1)
+for n in range(3, SIZE_LIMIT // 4 + 2):  # Outer square size
+    for m in range(n - 2, 0, -2):  # Inner square hole size
+        tiles = n * n - m * m
+        if tiles > SIZE_LIMIT:
+            break
+        type[tiles] += 1
+
+# Examine the type of each total tiling
+print(sum(1 for t in type if 1 <= t <= TYPE_LIMIT))
+===
+V SIZE_LIMIT = 1000000
+V TYPE_LIMIT = 10
+
+V _type_ = [0] * (SIZE_LIMIT + 1)
+L(n) 3 .< SIZE_LIMIT I/ 4 + 2
+   L(m) (n - 2 .< 0).step(-2)
+      V tiles = n * n - m * m
+      I tiles > SIZE_LIMIT
+         L.break
+      _type_[tiles]++
+
+print(sum(_type_.filter(t -> t C 1 .. :TYPE_LIMIT).map(t -> 1)))
+===
+auto SIZE_LIMIT = 1000000;
+auto TYPE_LIMIT = 10;
+
+auto _type_ = create_array({0}) * (SIZE_LIMIT + 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_el(3, idiv(SIZE_LIMIT, 4) + 2))
+            for (auto m : range_el(n - 2, 0).step(-2)) {
+                auto tiles = n * n - m * m;
+                if (tiles > SIZE_LIMIT)
+                    break;
+                _type_[tiles]++;
+            }
+
+        print(sum_map(_type_.filter([](const auto &t){return in(t, range_ee(1, ::TYPE_LIMIT));}), [](const auto &t){return 1;}));
+    }
+} code_block_1;
+
+
+---
+# 175 [not implemented]
+
+
+---
+# 176 [not implemented]
+
+
+---
+# 177 [not implemented]
+
+
+# 178
+from typing import Dict, Tuple
+Int64 = int
+
+cache : Dict[Tuple[int, int, int, int], Int64] = {}
+
+# Returns the number of pandigital step numbers such that each
+# number is 'digits' long, starts with the digit 'head' (can be 0),
+# and the union of all the digits equals the interval [low, high].
+def count_step_pandigital(digits, head, low, high) -> Int64:
+    def count_step_pandigital_cached(digits, head, low, high):
+        if (digits, head, low, high) in cache:
+            return cache[(digits, head, low, high)]
+        r = count_step_pandigital(digits, head, low, high)
+        cache[(digits, head, low, high)] = r
+        return r
+
+    assert digits >= 0
+    assert low <= head <= high
+    if digits <= 1:
+        return 1 if (low == head == high) else 0
+    else:
+        result = Int64(0)
+        if head - 1 >= low:
+            result += count_step_pandigital_cached(digits - 1, head - 1, low, high)
+            if head == high:
+                result += count_step_pandigital_cached(digits - 1, head - 1, low, high - 1)
+        if head + 1 <= high:
+            result += count_step_pandigital_cached(digits - 1, head + 1, low, high)
+            if head == low:
+                result += count_step_pandigital_cached(digits - 1, head + 1, low + 1, high)
+        #assert 0 <= result < 10**digits
+        return result
+
+LIMIT = 40
+ans = sum(count_step_pandigital(digits, head, 0, 9)
+    for digits in range(LIMIT + 1)
+    for head in range(1, 10))
+print(ans)
+===
+[(Int, Int, Int, Int) = Int64] cache
+
+F count_step_pandigital(digits, head, low, high) -> Int64
+   F count_step_pandigital_cached(digits, head, low, high)
+      I (digits, head, low, high) C :cache
+         R :cache[(digits, head, low, high)]
+      V r = count_step_pandigital(digits, head, low, high)
+      :cache[(digits, head, low, high)] = r
+      R r
+
+   assert(digits >= 0)
+   assert(head C low .. high)
+   I digits <= 1
+      R I (low == head == high) {1} E 0
+   E
+      V result = Int64(0)
+      I head - 1 >= low
+         result += count_step_pandigital_cached(digits - 1, head - 1, low, high)
+         I head == high
+            result += count_step_pandigital_cached(digits - 1, head - 1, low, high - 1)
+      I head + 1 <= high
+         result += count_step_pandigital_cached(digits - 1, head + 1, low, high)
+         I head == low
+            result += count_step_pandigital_cached(digits - 1, head + 1, low + 1, high)
+      R result
+
+V LIMIT = 40
+V ans = sum(multiloop((0 .. LIMIT), (1..9), (digits, head) -> count_step_pandigital(digits, head, 0, 9)))
+print(ans)
+===
+Dict<ivec4, Int64> cache;
+
+template <typename T1, typename T2, typename T3, typename T4> Int64 count_step_pandigital(const T1 &digits, const T2 &head, const T3 &low, const T4 &high)
+{
+    auto count_step_pandigital_cached = [](const auto &digits, const auto &head, const auto &low, const auto &high)
+    {
+        if (in(make_tuple(digits, head, low, high), ::cache))
+            return ::cache[make_tuple(digits, head, low, high)];
+        auto r = count_step_pandigital(digits, head, low, high);
+        ::cache.set(make_tuple(digits, head, low, high), r);
+        return r;
+    };
+
+    assert(digits >= 0);
+    assert(in(head, range_ee(low, high)));
+    if (digits <= 1)
+        return (equal(low, head, high)) ? 1 : 0;
+    else {
+        auto result = to_int64(0);
+        if (head - 1 >= low) {
+            result += count_step_pandigital_cached(digits - 1, head - 1, low, high);
+            if (head == high)
+                result += count_step_pandigital_cached(digits - 1, head - 1, low, high - 1);
+        }
+        if (head + 1 <= high) {
+            result += count_step_pandigital_cached(digits - 1, head + 1, low, high);
+            if (head == low)
+                result += count_step_pandigital_cached(digits - 1, head + 1, low + 1, high);
+        }
+        return result;
+    }
+}
+
+auto LIMIT = 40;
+auto ans = sum(multiloop(range_ee(0, LIMIT), range_ee(1, 9), [](const auto &digits, const auto &head){return count_step_pandigital(digits, head, 0, 9);}));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(ans);
+    }
+} code_block_1;
+
+
+# 179
+divisors = [2] * (10**7 + 1)  # Invalid for indexes 0 and 1
+for i in range(2, (len(divisors) + 1) // 2):
+    for j in range(i * 2, len(divisors), i):
+        divisors[j] += 1
+
+print(sum((1 if divisors[i] == divisors[i + 1] else 0) for i in range(2, len(divisors) - 1)))
+===
+V divisors = [2] * (10 ^ 7 + 1)
+L(i) 2 .< (divisors.len + 1) I/ 2
+   L(j) (i * 2 .< divisors.len).step(i)
+      divisors[j]++
+
+print(sum((2 .< divisors.len - 1).map(i -> (I :divisors[i] == :divisors[i + 1] {1} E 0))))
+===
+auto divisors = create_array({2}) * (pow(10, 7) + 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(2, idiv((divisors.len() + 1), 2)))
+            for (auto j : range_el(i * 2, divisors.len()).step(i))
+                divisors[j]++;
+
+        print(sum_map(range_el(2, divisors.len() - 1), [](const auto &i){return (::divisors[i] == ::divisors[i + 1] ? 1 : 0);}));
+    }
+} code_block_1;
