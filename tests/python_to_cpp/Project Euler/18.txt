@@ -1,0 +1,334 @@
+---
+# 180 [not implemented]
+
+
+---
+# 181 [not implemented]
+
+
+# 182
+from typing import List
+import math
+Int64 = int
+
+def count_unconcealed(modulus, e):
+    result = 0
+    for m in range(modulus):
+        if pow(m, e, modulus) == m:
+            result += 1
+    return result
+
+def count_all_unconcealed(prime):
+    result : List[int] = []
+    for e in range(prime - 1):
+        if math.gcd(e, prime - 1) == 1:
+            result.append(count_unconcealed(prime, e))
+        else:
+            result.append(10**9)  # Sentinel
+    return result
+
+P = 1009
+Q = 3643
+TOTIENT = (P - 1) * (Q - 1)
+numunconcealedp = count_all_unconcealed(P)
+numunconcealedq = count_all_unconcealed(Q)
+minunconcealedp = min(numunconcealedp)
+minunconcealedq = min(numunconcealedq)
+
+print(sum(Int64(e) for e in range(TOTIENT) if
+    numunconcealedp[e % (P - 1)] == minunconcealedp and
+    numunconcealedq[e % (Q - 1)] == minunconcealedq))
+===
+F count_unconcealed(modulus, e)
+   V result = 0
+   L(m) 0 .< modulus
+      I pow(m, e, modulus) == m
+         result++
+   R result
+
+F count_all_unconcealed(prime)
+   [Int] result
+   L(e) 0 .< prime - 1
+      I gcd(e, prime - 1) == 1
+         result.append(count_unconcealed(prime, e))
+      E
+         result.append(10 ^ 9)
+   R result
+
+V P = 1009
+V Q = 3643
+V TOTIENT = (P - 1) * (Q - 1)
+V numunconcealedp = count_all_unconcealed(P)
+V numunconcealedq = count_all_unconcealed(Q)
+V minunconcealedp = min(numunconcealedp)
+V minunconcealedq = min(numunconcealedq)
+
+print(sum((0 .< TOTIENT).filter(e -> :numunconcealedp[e % (:P - 1)] == :minunconcealedp & :numunconcealedq[e % (:Q - 1)] == :minunconcealedq).map(e -> Int64(e))))
+===
+template <typename T1, typename T2> auto count_unconcealed(const T1 &modulus, const T2 &e)
+{
+    auto result = 0;
+    for (auto m : range_el(0, modulus))
+        if (pow(m, e, modulus) == m)
+            result++;
+    return result;
+}
+
+template <typename T1> auto count_all_unconcealed(const T1 &prime)
+{
+    Array<int> result;
+    for (auto e : range_el(0, prime - 1))
+        if (gcd(e, prime - 1) == 1)
+            result.append(count_unconcealed(prime, e));
+        else
+            result.append(pow(10, 9));
+    return result;
+}
+
+auto P = 1009;
+auto Q = 3643;
+auto TOTIENT = (P - 1) * (Q - 1);
+auto numunconcealedp = count_all_unconcealed(P);
+auto numunconcealedq = count_all_unconcealed(Q);
+auto minunconcealedp = min(numunconcealedp);
+auto minunconcealedq = min(numunconcealedq);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum_map(range_el(0, TOTIENT).filter([](const auto &e){return ::numunconcealedp[mod(e, (::P - 1))] == ::minunconcealedp && ::numunconcealedq[mod(e, (::Q - 1))] == ::minunconcealedq;}), [](const auto &e){return to_int64(e);}));
+    }
+} code_block_1;
+
+
+---
+# 183 [not implemented]
+
+
+---
+# 184 [not implemented]
+
+
+---
+# 185 [not implemented]
+
+
+---
+# 186 [-`if self.parent != self:`-]
+
+
+# 187
+import eulerlib, math
+
+# Given a sorted list and a value, this returns an index i such that lst[i] == x if it exists,
+# otherwise this returns (-i - 1) where i is the index that x should be inserted at.
+def binary_search(lst, x):
+    start = 0
+    end = len(lst)
+    while start < end:
+        mid = (start + end) // 2
+        if x < lst[mid]:
+            end = mid
+        elif x > lst[mid]:
+            start = mid + 1
+        elif x == lst[mid]:
+            return mid
+        else:
+            raise AssertionError('')
+    return -start - 1
+
+# LIMIT is the highest number that we will test for being semiprime.
+# Make a list of primes: 2, 3, 5, 7, ... . Stop beyond LIMIT/2, because one of the prime factors in the semiprime is at least 2.
+# For each prime p in the list, look at the set of numbers q such that q >= p and pq <= LIMIT.
+# Actually, we can stop when p^2 > LIMIT, as we'll see later.
+# In this algorithm, we find the index 'end' such that primes[i] * primes[end] > LIMIT.
+# So for that p, we have (end - i) different choices for q. Since q >= p, all these pairs are unique.
+# Furthermore, by the fundamental theorem of arithmetic, all the products pq are unique.
+LIMIT = 10**8 - 1
+ans = 0
+primes = eulerlib.list_primes(LIMIT // 2)
+sqr = int(math.sqrt(LIMIT))
+for i, p in enumerate(primes):
+    if p > sqr:
+        break
+    end = binary_search(primes, LIMIT // p)
+    ans += (end + 1 if end >= 0 else -end - 1) - i
+print(ans)
+===
+F binary_search(lst, x)
+   V start = 0
+   V end = lst.len
+   L start < end
+      V mid = (start + end) I/ 2
+      I x < lst[mid]
+         end = mid
+      E I x > lst[mid]
+         start = mid + 1
+      E I x == lst[mid]
+         R mid
+      E
+         X AssertionError(‘’)
+   R -start - 1
+
+V LIMIT = 10 ^ 8 - 1
+V ans = 0
+V primes = eulerlib:list_primes(LIMIT I/ 2)
+V sqr = Int(sqrt(LIMIT))
+L(p) primes
+   V i = L.index
+   I p > sqr
+      L.break
+   V end = binary_search(primes, LIMIT I/ p)
+   ans += (I end >= 0 {end + 1} E -end - 1) - i
+print(ans)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1, typename T2> auto binary_search(const T1 &lst, const T2 &x)
+{
+    auto start = 0;
+    auto end = lst.len();
+    while (start < end) {
+        auto mid = idiv((start + end), 2);
+        if (x < lst[mid])
+            end = mid;
+        else if (x > lst[mid])
+            start = mid + 1;
+        else if (x == lst[mid])
+            return mid;
+        else
+            throw AssertionError(u""_S);
+    }
+    return -start - 1;
+}
+
+auto LIMIT = pow(10, 8) - 1;
+auto ans = 0;
+auto primes = eulerlib::list_primes(idiv(LIMIT, 2));
+auto sqr = to_int(sqrt(LIMIT));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {int Lindex = 0;
+        for (auto &&p : primes) {
+            auto i = Lindex;
+            if (p > sqr)
+                break;
+            auto end = binary_search(primes, idiv(LIMIT, p));
+            ans += (end >= 0 ? end + 1 : -end - 1) - i;
+            Lindex++;
+        }}
+        print(ans);
+    }
+} code_block_1;
+
+
+# 188
+import math, sys
+Int64 = int
+
+def totient(n):
+    assert n > 0
+    p = 1
+    i = 2
+    end = int(math.sqrt(n))
+    while i <= end:
+        if n % i == 0:  # Found a factor
+            p *= i - 1
+            n //= i
+            while n % i == 0:
+                p *= i
+                n //= i
+            end = int(math.sqrt(n))
+        i += 1
+    if n != 1:
+        p *= n - 1
+    return p
+
+def tetration_mod(x, y, m):
+    if y == 1:
+        return x % m
+    else:
+        # Fact: If x and m are coprime, then x^y mod m = x^(y mod totient(m)) mod m
+        return pow(Int64(x), tetration_mod(x, y - 1, totient(m)), m)
+
+x, y, m = 1777, 1855, 10**8
+sys.setrecursionlimit(y + 30)  # Because the default recursion limit of 1000 is insufficient
+print(tetration_mod(x, y, m))
+===
+F totient(=n)
+   assert(n > 0)
+   V p = 1
+   V i = 2
+   V end = Int(sqrt(n))
+   L i <= end
+      I n % i == 0
+         p *= i - 1
+         n I/= i
+         L n % i == 0
+            p *= i
+            n I/= i
+         end = Int(sqrt(n))
+      i++
+   I n != 1
+      p *= n - 1
+   R p
+
+F tetration_mod(x, y, m)
+   I y == 1
+      R x % m
+   E
+      R pow(Int64(x), tetration_mod(x, y - 1, totient(m)), m)
+
+V (x, y, m) = (1777, 1855, 10 ^ 8)
+print(tetration_mod(x, y, m))
+===
+template <typename T1> auto totient(T1 n)
+{
+    assert(n > 0);
+    auto p = 1;
+    auto i = 2;
+    auto end = to_int(sqrt(n));
+    while (i <= end) {
+        if (mod(n, i) == 0) {
+            p *= i - 1;
+            n = idiv(n, i);
+            while (mod(n, i) == 0) {
+                p *= i;
+                n = idiv(n, i);
+            }
+            end = to_int(sqrt(n));
+        }
+        i++;
+    }
+    if (n != 1)
+        p *= n - 1;
+    return p;
+}
+
+template <typename T1, typename T2, typename T3> auto tetration_mod(const T1 &x, const T2 &y, const T3 &m)
+{
+    if (y == 1)
+        return mod(x, m);
+    else
+        return pow(to_int64(x), tetration_mod(x, y - 1, totient(m)), m);
+}
+
+auto [x, y, m] = make_tuple(1777, 1855, pow(10, 8));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(tetration_mod(x, y, m));
+    }
+} code_block_1;
+
+
+---
+# 189 [not implemented]
