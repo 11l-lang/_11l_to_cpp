@@ -4,10 +4,10 @@
 #include "func.h"
 #include <string.h> // for memcmp [in GCC]
 
-template <class T> INLINE T minimum(const T &t1, const T &t2) {return min(t1, t2);}
-template <class T> INLINE T maximum(const T &t1, const T &t2) {return max(t1, t2);}
-template <class T, int N> INLINE Tvec<T,N> minimum(const Tvec<T,N> &t1, const Tvec<T,N> &t2) {return mincw(t1, t2);}
-template <class T, int N> INLINE Tvec<T,N> maximum(const Tvec<T,N> &t1, const Tvec<T,N> &t2) {return maxcw(t1, t2);}
+template <class T> INLINE T minimum_(const T &t1, const T &t2) {return min(t1, t2);}
+template <class T> INLINE T maximum_(const T &t1, const T &t2) {return max(t1, t2);}
+template <class T, int N> INLINE Tvec<T,N> minimum_(const Tvec<T,N> &t1, const Tvec<T,N> &t2) {return mincw(t1, t2);}
+template <class T, int N> INLINE Tvec<T,N> maximum_(const Tvec<T,N> &t1, const Tvec<T,N> &t2) {return maxcw(t1, t2);}
 
 
 template <class T> class Trange
@@ -55,15 +55,15 @@ public:
 	INLINE const Trange operator-(const T &v) const {return Trange(min-v, max-v);}
 
 	INLINE const Trange operator|(const T &v) const
-	{return Trange(::minimum(min,v),::maximum(max,v));}
+	{return Trange(::minimum_(min,v),::maximum_(max,v));}
 
 	INLINE const Trange operator|(const Trange &b) const
-	{return Trange(::minimum(min,b.min),::maximum(max,b.max));}
+	{return Trange(::minimum_(min,b.min),::maximum_(max,b.max));}
 
 	INLINE const Trange operator&(const Trange &b) const
 	{
 		if (intersect(*this,b))
-			return Trange(::maximum(min,b.min),::minimum(max,b.max));
+			return Trange(::maximum_(min,b.min),::minimum_(max,b.max));
 		else
 			return Trange(0);
 	}
@@ -138,15 +138,15 @@ public:
 	}
 
 	INLINE const Taabb operator|(const Tvec &v) const
-	{return Taabb(::minimum(min,v),::maximum(max,v));}
+	{return Taabb(::minimum_(min,v),::maximum_(max,v));}
 
 	INLINE const Taabb operator|(const Taabb &b) const
-	{return Taabb(::minimum(min,b.min),::maximum(max,b.max));}
+	{return Taabb(::minimum_(min,b.min),::maximum_(max,b.max));}
 
 	INLINE const Taabb operator&(const Taabb &b) const
 	{
 		if (intersect(*this,b))
-			return Taabb(::maximum(min,b.min),::minimum(max,b.max));
+			return Taabb(::maximum_(min,b.min),::minimum_(max,b.max));
 		else
 			return Taabb(0);
 	}
@@ -208,7 +208,7 @@ public:
 
 template <class T>
 INLINE const Trange<T> operator|(const T &v,const Trange<T> &b)
-{return Trange<T>(::minimum(b.min,v),::maximum(b.max,v));}
+{return Trange<T>(::minimum_(b.min,v),::maximum_(b.max,v));}
 
 template <class T> INLINE HMbool intersect(const Trange<T> &b0,const Trange<T> &b1)
 {

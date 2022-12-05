@@ -1,0 +1,529 @@
+---
+# 200 [not implemented]
+
+
+---
+# 201 [not implemented]
+
+
+---
+# 202 [not implemented]
+
+
+# 203
+import eulerlib, math
+Int64 = int
+
+# Collect unique numbers in Pascal's triangle
+numbers = set() # Int64
+for n in range(51):
+    for k in range(n + 1):
+        numbers.add(Int64(eulerlib.binomial(n, k)))
+maximum = max(numbers)
+
+# Prepare list of squared primes
+primes = eulerlib.list_primes(int(math.sqrt(maximum)))
+primessquared = [Int64(p) * p for p in primes]
+
+def is_squarefree(n):
+    for p2 in primessquared:
+        if p2 > n:
+            break
+        if n % p2 == 0:
+            return False
+    return True
+
+# Sum up the squarefree numbers
+print(sum(n for n in numbers if is_squarefree(n)))
+===
+V numbers = Set[Int64]()
+L(n) 51
+   L(k) 0 .. n
+      numbers.add(Int64(eulerlib:binomial(n, k)))
+V maximum = max(numbers)
+
+V primes = eulerlib:list_primes(Int(sqrt(maximum)))
+V primessquared = primes.map(p -> Int64(p) * p)
+
+F is_squarefree(n)
+   L(p2) :primessquared
+      I p2 > n
+         L.break
+      I n % p2 == 0
+         R 0B
+   R 1B
+
+print(sum(numbers.filter(n -> is_squarefree(n))))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto numbers = Set<Int64>();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int n = 0; n < 51; n++)
+            for (auto k : range_ee(0, n))
+                numbers.add(to_int64(eulerlib::binomial(n, k)));
+    }
+} code_block_1;
+
+auto maximum = max(numbers);
+
+auto primes = eulerlib::list_primes(to_int(sqrt(maximum)));
+auto primessquared = primes.map([](const auto &p){return to_int64(p) * p;});
+
+template <typename T1> auto is_squarefree(const T1 &n)
+{
+    for (auto &&p2 : ::primessquared) {
+        if (p2 > n)
+            break;
+        if (mod(n, p2) == 0)
+            return false;
+    }
+    return true;
+}
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(sum(numbers.filter([](const auto &n){return is_squarefree(n);})));
+    }
+} code_block_2;
+
+
+# 204
+import eulerlib
+
+LIMIT = 10**9
+primes = eulerlib.list_primes(100)
+
+def count(primeindex, product : Int64):
+    if primeindex == len(primes):
+        return 1 if product <= LIMIT else 0
+    else:
+        result = 0
+        while product <= LIMIT:
+            result += count(primeindex + 1, product)
+            product *= primes[primeindex]
+        return result
+
+print(count(0, 1))
+===
+V LIMIT = 10 ^ 9
+V primes = eulerlib:list_primes(100)
+
+F count(primeindex, Int64 =product)
+   I primeindex == :primes.len
+      R I product <= :LIMIT {1} E 0
+   E
+      V result = 0
+      L product <= :LIMIT
+         result += count(primeindex + 1, product)
+         product *= :primes[primeindex]
+      R result
+
+print(count(0, 1))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto LIMIT = pow(10, 9);
+auto primes = eulerlib::list_primes(100);
+
+template <typename T1> auto count(const T1 &primeindex, Int64 product)
+{
+    if (primeindex == ::primes.len())
+        return product <= ::LIMIT ? 1 : 0;
+    else {
+        auto result = 0;
+        while (product <= ::LIMIT) {
+            result += count(primeindex + 1, product);
+            product *= ::primes[primeindex];
+        }
+        return result;
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(count(0, 1));
+    }
+} code_block_1;
+
+
+# 205
+Int64 = int
+
+def convolve(a, b):
+    c = [0] * (len(a) + len(b) - 1)
+    for i in range(len(a)):
+        for j in range(len(b)):
+            c[i + j] += a[i] * b[j]
+    return c
+
+nine_pyramidal_pdf = [1]
+PYRAMIDAL_DIE_PDF = [0, 1, 1, 1, 1]
+for i in range(9):
+    nine_pyramidal_pdf = convolve(nine_pyramidal_pdf, PYRAMIDAL_DIE_PDF)
+
+six_cubic_pdf = [1]
+CUBIC_DIE_PDF = [0, 1, 1, 1, 1, 1, 1]
+for i in range(6):
+    six_cubic_pdf = convolve(six_cubic_pdf, CUBIC_DIE_PDF)
+
+ans = Int64(0)
+for i in range(len(nine_pyramidal_pdf)):
+    ans += nine_pyramidal_pdf[i] * sum(six_cubic_pdf[ : i])
+print(f"{float(ans) / (Int64(sum(nine_pyramidal_pdf)) * sum(six_cubic_pdf)):.7f}")
+===
+F convolve(a, b)
+   V c = [0] * (a.len + b.len - 1)
+   L(i) 0 .< a.len
+      L(j) 0 .< b.len
+         c[i + j] += a[i] * b[j]
+   R c
+
+V nine_pyramidal_pdf = [1]
+V PYRAMIDAL_DIE_PDF = [0, 1, 1, 1, 1]
+L(i) 9
+   nine_pyramidal_pdf = convolve(nine_pyramidal_pdf, PYRAMIDAL_DIE_PDF)
+
+V six_cubic_pdf = [1]
+V CUBIC_DIE_PDF = [0, 1, 1, 1, 1, 1, 1]
+L(i) 6
+   six_cubic_pdf = convolve(six_cubic_pdf, CUBIC_DIE_PDF)
+
+V ans = Int64(0)
+L(i) 0 .< nine_pyramidal_pdf.len
+   ans += nine_pyramidal_pdf[i] * sum(six_cubic_pdf[0 .< i])
+print(f:‘{Float(ans) / (Int64(sum(nine_pyramidal_pdf)) * sum(six_cubic_pdf)):.7}’)
+===
+template <typename T1, typename T2> auto convolve(const T1 &a, const T2 &b)
+{
+    auto c = create_array({0}) * (a.len() + b.len() - 1);
+    for (auto i : range_el(0, a.len()))
+        for (auto j : range_el(0, b.len()))
+            c[i + j] += a[i] * b[j];
+    return c;
+}
+
+auto nine_pyramidal_pdf = create_array({1});
+auto PYRAMIDAL_DIE_PDF = create_array({0, 1, 1, 1, 1});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int i = 0; i < 9; i++)
+            nine_pyramidal_pdf = convolve(nine_pyramidal_pdf, PYRAMIDAL_DIE_PDF);
+    }
+} code_block_1;
+
+auto six_cubic_pdf = create_array({1});
+auto CUBIC_DIE_PDF = create_array({0, 1, 1, 1, 1, 1, 1});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (int i = 0; i < 6; i++)
+            six_cubic_pdf = convolve(six_cubic_pdf, CUBIC_DIE_PDF);
+    }
+} code_block_2;
+
+auto ans = to_int64(0);
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        for (auto i : range_el(0, nine_pyramidal_pdf.len()))
+            ans += nine_pyramidal_pdf[i] * sum(six_cubic_pdf[range_el(0, i)]);
+        print(u"#.7"_S.format(to_float(ans) / (to_int64(sum(nine_pyramidal_pdf)) * sum(six_cubic_pdf))));
+    }
+} code_block_3;
+
+
+# 206
+Int64 = int
+
+def is_concealed_square(n):
+    for i in range(1, 10):  # Scan for 1 to 9
+        if n[20 - i * 2] != i:
+            return False
+    return n[0] == 0  # Special case for 0
+
+def add_10pow(n : list, i):
+    while n[i] == 9:
+        n[i] = 0
+        i += 1
+    n[i] += 1
+
+def add_20n(n, n2 : list):
+    carry = 0
+    i = 0
+    while i < len(n):
+        sum = n[i] * 2 + n2[i + 1] + carry
+        n2[i + 1] = sum % 10
+        carry = sum // 10
+        i += 1
+    i += 1
+    while carry > 0:
+        sum = n2[i] + carry
+        n2[i] = sum % 10
+        carry = sum // 10
+        i += 1
+
+# Initialize
+n = 1000000000  # The pattern is greater than 10^18, so start searching at 10^9
+
+ndigits = [0] * 10  # In base 10, little-endian
+temp = n
+for i in range(len(ndigits)):
+    ndigits[i] = temp % 10
+    temp //= 10
+
+n2digits = [0] * 19  # Based on length of pattern
+temp2 = Int64(n) * n
+for i in range(len(n2digits)):
+    n2digits[i] = int(temp2 % 10)
+    temp2 //= 10
+
+# Increment and search
+while not is_concealed_square(n2digits):
+    # Add 20n + 100 so that n2digits = (n + 10)^2
+    add_20n(ndigits, n2digits)
+    add_10pow(n2digits, 2)
+
+    # Since n^2 ends with 0, n must end with 0
+    n += 10
+    add_10pow(ndigits, 1)
+    # Now n2digits = n^2
+print(n)
+===
+F is_concealed_square(n)
+   L(i) 1..9
+      I n[20 - i * 2] != i
+         R 0B
+   R n[0] == 0
+
+F add_10pow(&n, =i)
+   L n[i] == 9
+      n[i] = 0
+      i++
+   n[i]++
+
+F add_20n(n, &n2)
+   V carry = 0
+   V i = 0
+   L i < n.len
+      V sum = n[i] * 2 + n2[i + 1] + carry
+      n2[i + 1] = sum % 10
+      carry = sum I/ 10
+      i++
+   i++
+   L carry > 0
+      V sum = n2[i] + carry
+      n2[i] = sum % 10
+      carry = sum I/ 10
+      i++
+
+V n = 1000000000
+
+V ndigits = [0] * 10
+V temp = n
+L(i) 0 .< ndigits.len
+   ndigits[i] = temp % 10
+   temp I/= 10
+
+V n2digits = [0] * 19
+V temp2 = Int64(n) * n
+L(i) 0 .< n2digits.len
+   n2digits[i] = Int(temp2 % 10)
+   temp2 I/= 10
+
+L !is_concealed_square(n2digits)
+   add_20n(ndigits, &n2digits)
+   add_10pow(&n2digits, 2)
+
+   n += 10
+   add_10pow(&ndigits, 1)
+print(n)
+===
+template <typename T1> auto is_concealed_square(const T1 &n)
+{
+    for (auto i : range_ee(1, 9))
+        if (n[20 - i * 2] != i)
+            return false;
+    return _get<0>(n) == 0;
+}
+
+template <typename T1, typename T2> auto add_10pow(T1 &n, T2 i)
+{
+    while (n[i] == 9) {
+        n.set(i, 0);
+        i++;
+    }
+    n[i]++;
+}
+
+template <typename T1, typename T2> auto add_20n(const T1 &n, T2 &n2)
+{
+    auto carry = 0;
+    auto i = 0;
+    while (i < n.len()) {
+        auto sum = n[i] * 2 + n2[i + 1] + carry;
+        n2.set(i + 1, mod(sum, 10));
+        carry = idiv(sum, 10);
+        i++;
+    }
+    i++;
+    while (carry > 0) {
+        auto sum = n2[i] + carry;
+        n2.set(i, mod(sum, 10));
+        carry = idiv(sum, 10);
+        i++;
+    }
+}
+
+auto n = 1000000000;
+
+auto ndigits = create_array({0}) * 10;
+auto temp = n;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(0, ndigits.len())) {
+            ndigits.set(i, mod(temp, 10));
+            temp = idiv(temp, 10);
+        }
+    }
+} code_block_1;
+
+auto n2digits = create_array({0}) * 19;
+auto temp2 = to_int64(n) * n;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto i : range_el(0, n2digits.len())) {
+            n2digits.set(i, to_int(mod(temp2, 10)));
+            temp2 = idiv(temp2, 10);
+        }
+
+        while (!is_concealed_square(n2digits)) {
+            add_20n(ndigits, n2digits);
+            add_10pow(n2digits, 2);
+
+            n += 10;
+            add_10pow(ndigits, 1);
+        }
+        print(n);
+    }
+} code_block_2;
+
+
+---
+# 207 [not implemented]
+
+
+# 208
+from _11l import *
+
+ANTICLOCKWISE_MOVES = [
+    ( 0, -1,  0, +1),
+    (-1,  0, +1, -1),
+    ( 0,  0, -2,  0),
+    (+1,  0, +1, -1),
+    ( 0, +1,  0, +1),
+]
+
+LIMIT = 70
+
+# Returns a new state tuple.
+def mov(state, sign):
+    entry = ANTICLOCKWISE_MOVES[nmod(state[0] * sign, 5)]
+    return (
+        (state[0] + sign) % 5,
+        state[1] + entry[0] * sign,
+        state[2] + entry[1] * sign,
+        state[3] + entry[2],
+        state[4] + entry[3])
+
+reachable = {(0, 0, 0, 0, 0): Int64(1)}
+for _ in range(LIMIT):
+    newreachable : Dict[Tuple[int, int, int, int, int], Int64] = {}
+    for state, ways in reachable.items():
+        acwst = mov(state, +1)
+        cwst  = mov(state, -1)
+        newreachable[acwst] = newreachable.get(acwst, 0) + ways
+        newreachable[cwst ] = newreachable.get(cwst , 0) + ways
+    reachable = newreachable
+
+print(sum(reachable.get((dir, 0, 0, 0, 0), 0) for dir in range(5)))
+===
+V ANTICLOCKWISE_MOVES = [(0, -1, 0, +1), (-1, 0, +1, -1), (0, 0, -2, 0), (+1, 0, +1, -1), (0, +1, 0, +1)]
+
+V LIMIT = 70
+
+F mov(state, _sign_)
+   V entry = :ANTICLOCKWISE_MOVES[state[0] * _sign_ -% 5]
+   R ((state[0] + _sign_) % 5, state[1] + entry[0] * _sign_, state[2] + entry[1] * _sign_, state[3] + entry[2], state[4] + entry[3])
+
+V reachable = [(0, 0, 0, 0, 0) = Int64(1)]
+L(_) 0 .< LIMIT
+   [(Int, Int, Int, Int, Int) = Int64] newreachable
+   L(state, ways) reachable
+      V acwst = mov(state, +1)
+      V cwst = mov(state, -1)
+      newreachable[acwst] = newreachable.get(acwst, 0) + ways
+      newreachable[cwst] = newreachable.get(cwst, 0) + ways
+   reachable = newreachable
+
+print(sum((0.<5).map(dir -> :reachable.get((dir, 0, 0, 0, 0), 0))))
+===
+auto ANTICLOCKWISE_MOVES = create_array({make_tuple(0, -1, 0, +1), make_tuple(-1, 0, +1, -1), make_tuple(0, 0, -2, 0), make_tuple(+1, 0, +1, -1), make_tuple(0, +1, 0, +1)});
+
+auto LIMIT = 70;
+
+template <typename T1, typename T2> auto mov(const T1 &state, const T2 &_sign_)
+{
+    auto entry = ::ANTICLOCKWISE_MOVES[nmod(_get<0>(state) * _sign_, 5)];
+    return make_tuple(mod((_get<0>(state) + _sign_), 5), _get<1>(state) + _get<0>(entry) * _sign_, _get<2>(state) + _get<1>(entry) * _sign_, _get<3>(state) + _get<2>(entry), _get<4>(state) + _get<3>(entry));
+}
+
+auto reachable = create_dict(dict_of(make_tuple(0, 0, 0, 0, 0), to_int64(1)));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto _ : range_el(0, LIMIT)) {
+            Dict<Tuple<int, int, int, int, int>, Int64> newreachable;
+            for (auto &&[state, ways] : reachable) {
+                auto acwst = mov(state, +1);
+                auto cwst = mov(state, -1);
+                newreachable.set(acwst, newreachable.get(acwst, 0) + ways);
+                newreachable.set(cwst, newreachable.get(cwst, 0) + ways);
+            }
+            reachable = newreachable;
+        }
+
+        print(sum_map(range_el(0, 5), [](const auto &dir){return ::reachable.get(make_tuple(dir, 0, 0, 0, 0), 0);}));
+    }
+} code_block_1;
+
+
+---
+# 209 [not implemented]
