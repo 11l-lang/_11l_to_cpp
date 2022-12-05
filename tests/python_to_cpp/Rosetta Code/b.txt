@@ -180,7 +180,7 @@ class BalancedTernary:
         n3 = ((n % 3) + 3) % 3
         if n3 == 0: return [0] + BalancedTernary.int2ternary(nidiv(n, 3))
         if n3 == 1: return [1] + BalancedTernary.int2ternary(nidiv(n, 3))
-        if n3 == 2: return [-1] + BalancedTernary.int2ternary(nidiv((n + 1), 3))
+        if n3 == 2: return [-1] + BalancedTernary.int2ternary(nidiv(n + 1, 3))
         raise RuntimeError('')
 
     def to_int(self):

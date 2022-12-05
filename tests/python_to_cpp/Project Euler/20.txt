@@ -455,7 +455,7 @@ LIMIT = 70
 def mov(state, sign):
     entry = ANTICLOCKWISE_MOVES[nmod(state[0] * sign, 5)]
     return (
-        (state[0] + sign) % 5,
+        (state[0] + sign) % 5, #nmod(state[0] + sign, 5),
         state[1] + entry[0] * sign,
         state[2] + entry[1] * sign,
         state[3] + entry[2],
