@@ -205,6 +205,7 @@ struct CodeBlock1
 
 
 # 155
+from typing import List, Set, Tuple
 import math
 
 def move(obj):

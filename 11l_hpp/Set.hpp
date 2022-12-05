@@ -81,6 +81,28 @@ public:
 		return intersection(other);
 	}
 
+	bool is_disjoint(const Set &set2) const // [https://stackoverflow.com/a/1964252/2692494 <- google:‘isdisjoint c++’]
+	{
+		if(empty() || set2.empty()) return true;
+
+		const_iterator
+			it1 = begin(),
+			it1End = end(),
+			it2 = set2.begin(),
+			it2End = set2.end();
+
+		if(*it1 > *set2.rbegin() || *it2 > *rbegin()) return true;
+
+		while(it1 != it1End && it2 != it2End)
+		{
+			if(*it1 == *it2) return false;
+			if(*it1 < *it2) { it1++; }
+			else { it2++; }
+		}
+
+		return true;
+	}
+
 	Set set_union(const Set &other) const
 	{
 		Set result;

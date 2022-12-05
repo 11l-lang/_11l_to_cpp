@@ -98,6 +98,7 @@ struct CodeBlock2
 
 # 204
 import eulerlib
+Int64 = int
 
 LIMIT = 10**9
 primes = eulerlib.list_primes(100)

@@ -1,0 +1,528 @@
+---
+# 210 [not implemented]
+
+
+# 211
+import array, math
+UInt16 = int
+Int64 = int
+
+def is_square64(x):
+    if x < 0:
+        return False
+    y = Int64(math.sqrt(x))
+    return y * y == x
+
+def list_sigma2(n):
+    # If i has a prime factor p <= sqrt, then quasiprimefactor[i] = p.
+    # Otherwise i > sqrt must be prime, and quasiprimefactor[i] = 0 because i may overflow an int16.
+    quasiprimefactor = array.array("H", (0 for _ in range(n + 1)))
+
+    # Richer version of the sieve of Eratosthenes
+    for i in range(2, int(math.sqrt(n)) + 1):
+        if quasiprimefactor[i] == 0:
+            quasiprimefactor[i] = UInt16(i)
+            for j in range(i * i, n + 1, i):
+                if quasiprimefactor[j] == 0:
+                    quasiprimefactor[j] = UInt16(i)
+
+    sigma2 = array.array("Q", (0 for _ in range(n + 1)))
+    sigma2[1] = 1
+    for i in range(2, len(sigma2)):
+        p = int(quasiprimefactor[i])
+        if p == 0:
+            p = i
+        sum = Int64(1)
+        j = i
+        p2 = Int64(p) * p
+        k = p2
+        while j % p == 0:
+            sum += k
+            j //= p
+            k *= p2
+        sigma2[i] = sum * sigma2[j]
+    return sigma2
+
+LIMIT = 64000000
+
+# Can be any number >= 1, but it's most beneficial to use a product of unique small primes excluding 2
+RESIDUE_TEST = 3 * 5 * 7 * 11 * 13
+
+isresidue = [False] * RESIDUE_TEST
+for i in range(RESIDUE_TEST):
+    isresidue[i * i % RESIDUE_TEST] = True
+
+def is_perfect_square(x):
+    # Optional optimization: Check if x is a quadratic residue modulo some number.
+    # The modulus was chosen to be a product of k primes; in this case, k = 5.
+    # If x is a square, then it must be a quadratic residue modulo each prime.
+    # For each prime p, there is an approximately half chance that an arbitrary number
+    # is a residue mod p. Thus with 5 primes, only about 1/32 of candidates remain.
+    # Note that the prime 2 tells us nothing about whether x is a square, so we exclude it.
+    return isresidue[int(x % RESIDUE_TEST)] and is_square64(x)
+
+# Requires at least 640 MB of memory
+sigma2 = list_sigma2(LIMIT - 1)
+print(sum(i for i in range(1, LIMIT) if is_perfect_square(sigma2[i])))
+===
+F is_square64(x)
+   I x < 0
+      R 0B
+   V y = Int64(sqrt(x))
+   R y * y == x
+
+F list_sigma2(n)
+   V quasiprimefactor = [UInt16(0)] * (n + 1)
+
+   L(i) 2 .. Int(sqrt(n))
+      I quasiprimefactor[i] == 0
+         quasiprimefactor[i] = UInt16(i)
+         L(j) (i * i .. n).step(i)
+            I quasiprimefactor[j] == 0
+               quasiprimefactor[j] = UInt16(i)
+
+   V sigma2 = [UInt64(0)] * (n + 1)
+   sigma2[1] = 1
+   L(i) 2 .< sigma2.len
+      V p = Int(quasiprimefactor[i])
+      I p == 0
+         p = i
+      V sum = Int64(1)
+      V j = i
+      V p2 = Int64(p) * p
+      V k = p2
+      L j % p == 0
+         sum += k
+         j I/= p
+         k *= p2
+      sigma2[i] = sum * sigma2[j]
+   R sigma2
+
+V LIMIT = 64000000
+
+V RESIDUE_TEST = 3 * 5 * 7 * 11 * 13
+
+V isresidue = [0B] * RESIDUE_TEST
+L(i) 0 .< RESIDUE_TEST
+   isresidue[i * i % RESIDUE_TEST] = 1B
+
+F is_perfect_square(x)
+   R :isresidue[Int(x % :RESIDUE_TEST)] & is_square64(x)
+
+V sigma2 = list_sigma2(LIMIT - 1)
+print(sum((1 .< LIMIT).filter(i -> is_perfect_square(:sigma2[i]))))
+===
+template <typename T1> auto is_square64(const T1 &x)
+{
+    if (x < 0)
+        return false;
+    auto y = to_int64(sqrt(x));
+    return y * y == x;
+}
+
+template <typename T1> auto list_sigma2(const T1 &n)
+{
+    auto quasiprimefactor = create_array({to_uint16(0)}) * (n + 1);
+
+    for (auto i : range_ee(2, to_int(sqrt(n))))
+        if (quasiprimefactor[i] == 0) {
+            quasiprimefactor.set(i, to_uint16(i));
+            for (auto j : range_ee(i * i, n).step(i))
+                if (quasiprimefactor[j] == 0)
+                    quasiprimefactor.set(j, to_uint16(i));
+        }
+
+    auto sigma2 = create_array({to_uint64(0)}) * (n + 1);
+    _set<1>(sigma2, 1);
+    for (auto i : range_el(2, sigma2.len())) {
+        auto p = to_int(quasiprimefactor[i]);
+        if (p == 0)
+            p = i;
+        auto sum = to_int64(1);
+        auto j = i;
+        auto p2 = to_int64(p) * p;
+        auto k = p2;
+        while (mod(j, p) == 0) {
+            sum += k;
+            j = idiv(j, p);
+            k *= p2;
+        }
+        sigma2.set(i, sum * sigma2[j]);
+    }
+    return sigma2;
+}
+
+auto LIMIT = 64000000;
+
+auto RESIDUE_TEST = 3 * 5 * 7 * 11 * 13;
+
+auto isresidue = create_array({false}) * RESIDUE_TEST;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(0, RESIDUE_TEST))
+            isresidue.set(mod(i * i, RESIDUE_TEST), true);
+    }
+} code_block_1;
+
+template <typename T1> auto is_perfect_square(const T1 &x)
+{
+    return ::isresidue[to_int(mod(x, ::RESIDUE_TEST))] && is_square64(x);
+}
+
+auto sigma2 = list_sigma2(LIMIT - 1);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(sum(range_el(1, LIMIT).filter([](const auto &i){return is_perfect_square(::sigma2[i]);})));
+    }
+} code_block_2;
+
+
+---
+# 212 [not implemented]
+
+
+---
+# 213 [not implemented]
+
+
+# 214
+import array
+Int64 = int
+
+def list_totients(n):
+    assert n < (Int64(1) << 32)
+    result = array.array("l", range(n + 1))
+    for i in range(2, n + 1):
+        if result[i] == i:  # i is prime
+            for j in range(i, n + 1, i):
+                result[j] = result[j] // i * (i - 1)
+    return result
+
+LIMIT = 40000000
+totient = list_totients(LIMIT - 1)
+totientchainlen = array.array("l", [0, 1])
+ans = Int64(0)
+# Fill table in ascending order because totient chains are strictly decreasing
+for i in range(len(totientchainlen), len(totient)):
+    chainlen = totientchainlen[totient[i]] + 1
+    totientchainlen.append(chainlen)
+    if chainlen == 25 and totient[i] == i - 1:  # i is prime iff totient(i) = i-1
+        ans += i
+print(ans)
+===
+F list_totients(n)
+   assert(n < (Int64(1) << 32))
+   V result = Array(Int32(0) .< Int32(n + 1))
+   L(i) 2 .. n
+      I result[i] == i
+         L(j) (i .. n).step(i)
+            result[j] = result[j] I/ i * (i - 1)
+   R result
+
+V LIMIT = 40000000
+V totient = list_totients(LIMIT - 1)
+V totientchainlen = [Int32(0), 1]
+V ans = Int64(0)
+L(i) totientchainlen.len .< totient.len
+   V chainlen = totientchainlen[totient[i]] + 1
+   totientchainlen.append(chainlen)
+   I chainlen == 25 & totient[i] == i - 1
+      ans += i
+print(ans)
+===
+template <typename T1> auto list_totients(const T1 &n)
+{
+    assert(n < (to_int64(1) << 32));
+    auto result = create_array(range_el(to_int32(0), to_int32(n + 1)));
+    for (auto i : range_ee(2, n))
+        if (result[i] == i)
+            for (auto j : range_ee(i, n).step(i))
+                result.set(j, idiv(result[j], i) * (i - 1));
+    return result;
+}
+
+auto LIMIT = 40000000;
+auto totient = list_totients(LIMIT - 1);
+auto totientchainlen = create_array<int32_t>({to_int32(0), 1});
+auto ans = to_int64(0);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(totientchainlen.len(), totient.len())) {
+            auto chainlen = totientchainlen[totient[i]] + 1;
+            totientchainlen.append(chainlen);
+            if (chainlen == 25 && totient[i] == i - 1)
+                ans += i;
+        }
+        print(ans);
+    }
+} code_block_1;
+
+
+# 215
+from typing import List, Set
+Int64 = int
+
+WIDTH = 32
+HEIGHT = 10
+crackpositions : List[Set[int]] = []
+
+def get_crack_positions(cracks : list, position) -> None:
+    if position < 0:
+        raise ValueError('')
+    elif position < WIDTH:
+        for i in (2, 3):
+            cracks.append(position + i)
+            get_crack_positions(cracks, position + i)
+            cracks.pop()
+    elif position == WIDTH:
+        crackpositions.append(set(cracks[ : -1]))
+    else:  # position > WIDTH
+        return
+
+get_crack_positions([0] * 0, 0)
+
+noncrackindices : List[List[int]] = []
+for cp0 in crackpositions:
+    arr : List[int] = []
+    for i, cp1 in enumerate(crackpositions):
+        if cp0.isdisjoint(cp1):
+            arr.append(i)
+    noncrackindices.append(arr)
+
+ways = [Int64(1)] * len(crackpositions)
+for i in range(1, HEIGHT):
+    newways = [sum(ways[k] for k in nci) for nci in noncrackindices]
+    ways = newways
+
+print(sum(ways))
+===
+V WIDTH = 32
+V HEIGHT = 10
+[Set[Int]] crackpositions
+
+F get_crack_positions(&cracks, position) -> N
+   I position < 0
+      X ValueError(‘’)
+   E I position < :WIDTH
+      L(i) (2, 3)
+         cracks.append(position + i)
+         get_crack_positions(&cracks, position + i)
+         cracks.pop()
+   E I position == :WIDTH
+      :crackpositions.append(Set(cracks[0 .< (len)-1]))
+   E
+      R
+
+get_crack_positions(&[Int](), 0)
+
+[[Int]] noncrackindices
+L(cp0) crackpositions
+   [Int] arr
+   L(cp1) crackpositions
+      V i = L.index
+      I cp0.is_disjoint(cp1)
+         arr.append(i)
+   noncrackindices.append(arr)
+
+V ways = [Int64(1)] * crackpositions.len
+L(i) 1 .< HEIGHT
+   V newways = noncrackindices.map(nci -> sum(nci.map(k -> :ways[k])))
+   ways = newways
+
+print(sum(ways))
+===
+auto WIDTH = 32;
+auto HEIGHT = 10;
+Array<Set<int>> crackpositions;
+
+template <typename T1, typename T2> void get_crack_positions(T1 &cracks, const T2 &position)
+{
+    if (position < 0)
+        throw ValueError(u""_S);
+    else if (position < ::WIDTH)
+        for (auto &&i : make_tuple(2, 3)) {
+            cracks.append(position + i);
+            get_crack_positions(cracks, position + i);
+            cracks.pop();
+        }
+    else if (position == ::WIDTH)
+        ::crackpositions.append(create_set(cracks[range_e_llen(0,  - 1)]));
+    else
+        return;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        get_crack_positions(make_ref(Array<int>()), 0);
+    }
+} code_block_1;
+
+Array<Array<int>> noncrackindices;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&cp0 : crackpositions) {
+            Array<int> arr;
+            {int Lindex = 0;
+            for (auto &&cp1 : crackpositions) {
+                auto i = Lindex;
+                if (cp0.is_disjoint(cp1))
+                    arr.append(i);
+                Lindex++;
+            }}
+            noncrackindices.append(arr);
+        }
+    }
+} code_block_2;
+
+auto ways = create_array({to_int64(1)}) * crackpositions.len();
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        for (auto i : range_el(1, HEIGHT)) {
+            auto newways = noncrackindices.map([](const auto &nci){return sum_map(nci, [](const auto &k){return ::ways[k];});});
+            ways = newways;
+        }
+
+        print(sum(ways));
+    }
+} code_block_3;
+
+
+---
+# 216 [requires too much memory]
+Int64 = int
+
+# Produce the entire sequence
+LIMIT = 50000000
+sequence = [Int64(2) * i * i - 1 for i in range(LIMIT + 1)]
+sequence[0] = sequence[1] = -1
+
+# Divide out factors using a kind of sieve
+ans = 0
+for i, term in enumerate(sequence):
+    if i < 2:
+        continue
+    # We can assert at this point that term == 1 or isPrime(term)
+    if term == Int64(2) * i * i - 1:
+        ans += 1
+
+    # We can skip if term > LIMIT * 2 because in the second loop would do nothing. This also avoids overflows because term is a long.
+    # The loop does nothing because: i <= LIMIT < p/2; p/2 - i > 0; p - i > p/2; 2(p - i) > p. Clearly 2(p - i) < 2p.
+    # Hence 2(p - i) % p = p - 2i. Next, the start index j = i + (p - 2i) = p - i > p/2 >= LIMIT, therefore j > LIMIT.
+    if Int64(1) < term <= Int64(LIMIT) * 2:
+        # Visit specific later entries in the sequence and divide out all factors of p
+        p = int(term)
+        # j starts at the smallest number such that j > i and j = +i mod p
+        for j in range(i + p, LIMIT + 1, p):
+            while True:
+                sequence[j] //= p
+                if sequence[j] % p != 0:
+                    break
+        # j starts at the smallest number such that j > i and j = -i mod p
+        for j in range(i + (p - i) * 2 % p, LIMIT + 1, p):
+            while True:
+                sequence[j] //= p
+                if sequence[j] % p != 0:
+                    break
+print(ans)
+===
+V LIMIT = 50000000
+V sequence = (0 .. LIMIT).map(i -> Int64(2) * i * i - 1)
+sequence[0] = sequence[1] = -1
+
+V ans = 0
+L(term) sequence
+   V i = L.index
+   I i < 2
+      L.continue
+   I term == Int64(2) * i * i - 1
+      ans++
+
+   I term C Int64(1) <. Int64(LIMIT) * 2
+      V p = Int(term)
+      L(j) (i + p .. LIMIT).step(p)
+         L
+            sequence[j] I/= p
+            I sequence[j] % p != 0
+               L.break
+      L(j) (i + (p - i) * 2 % p .. LIMIT).step(p)
+         L
+            sequence[j] I/= p
+            I sequence[j] % p != 0
+               L.break
+print(ans)
+===
+auto LIMIT = 50000000;
+auto sequence = range_ee(0, LIMIT).map([](const auto &i){return to_int64(2) * i * i - 1;});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _set<0>(sequence, _set<1>(sequence, -1));
+    }
+} code_block_1;
+
+auto ans = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        {int Lindex = 0;
+        for (auto &&term : sequence) {{
+            auto i = Lindex;
+            if (i < 2)
+                goto on_continue;
+            if (term == to_int64(2) * i * i - 1)
+                ans++;
+
+            if (in(term, range_le(to_int64(1), to_int64(LIMIT) * 2))) {
+                auto p = to_int(term);
+                for (auto j : range_ee(i + p, LIMIT).step(p))
+                    while (true) {
+                        sequence[j] = idiv(sequence[j], p);
+                        if (mod(sequence[j], p) != 0)
+                            break;
+                    }
+                for (auto j : range_ee(i + mod((p - i) * 2, p), LIMIT).step(p))
+                    while (true) {
+                        sequence[j] = idiv(sequence[j], p);
+                        if (mod(sequence[j], p) != 0)
+                            break;
+                    }
+            }
+} on_continue:
+            Lindex++;
+        }}
+        print(ans);
+    }
+} code_block_2;
+
+
+---
+# 217 [not implemented]
+
+
+---
+# 218 [just prints "0"]
+
+
+---
+# 219 [not implemented]

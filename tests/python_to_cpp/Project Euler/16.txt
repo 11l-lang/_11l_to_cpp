@@ -170,6 +170,9 @@ struct CodeBlock1
 
 
 # 164
+from typing import List
+Int64 = int
+
 def digit_sum(n):
     return sum(int(c) for c in str(n))
 
