@@ -1,0 +1,194 @@
+# 222
+import eulerlib, math
+
+NUM_SPHERES = 21
+
+sphereradii = [(i + 30) * 1000 for i in range(NUM_SPHERES)]  # In micrometres
+minlength = [[-float("inf")] * (2**NUM_SPHERES) for _ in range(NUM_SPHERES)]
+
+# minlength[i][j] is the minimum achievable length for fitting a set of spheres in a cylindrical tube
+# of radius 50000 micrometres, where the sphere of radius sphereradii[i] is at the left end,
+# the bit vector j represents the set of spheres, and i must be in the set denoted by j.
+# (In the integer j, bit k denotes whether the sphere of radius sphereradii[k] is in the set or not.)
+# The right-side length of the rightmost sphere is included, the length of the distance between spheres
+# (arranged in an optimal way) is included, but the left-side length of the leftmost sphere is excluded.
+#
+# For example, minlength[3][0x819] is the minimum length of fitting the set of spheres with radii
+# {30000, 33000, 34000, 41000} micrometres, where the leftmost sphere has radius 33000
+# (and this value is discounted from the total length).
+def find_minimum_length(currentsphereindex, setofspheres) -> float:
+    if setofspheres & (1 << currentsphereindex) == 0:
+        raise ValueError('')
+
+    # Memoization
+    if minlength[currentsphereindex][setofspheres] == -float("inf"):
+        result : float
+        if eulerlib.popcount(setofspheres) == 1:
+            result = sphereradii[currentsphereindex]  # This sphere is rightmost
+        else:
+            result = float("inf")
+            newsetofspheres = setofspheres ^ (1 << currentsphereindex)
+            for i in range(NUM_SPHERES):  # i is the index of the next sphere
+                if newsetofspheres & (1 << i) == 0:
+                    continue
+                # The sqrt() here is what makes the entire computation not guaranteed to be accurate
+                temp = math.sqrt(float(sphereradii[i] + sphereradii[currentsphereindex] - 50000) * 200000)
+                temp += find_minimum_length(i, newsetofspheres)
+                result = min(temp, result)
+        minlength[currentsphereindex][setofspheres] = result
+    return minlength[currentsphereindex][setofspheres]
+
+ans = min((find_minimum_length(i, (1 << NUM_SPHERES) - 1) + sphereradii[i])
+    for i in range(NUM_SPHERES))
+print(int(round(ans)))
+===
+V NUM_SPHERES = 21
+
+V sphereradii = (0 .< NUM_SPHERES).map(i -> (i + 30) * 1000)
+V minlength = [[-Float.infinity] * (2 ^ :NUM_SPHERES)] * NUM_SPHERES
+
+F find_minimum_length(currentsphereindex, setofspheres) -> Float
+   I setofspheres [&] (1 << currentsphereindex) == 0
+      X ValueError(‘’)
+
+   I :minlength[currentsphereindex][setofspheres] == -Float.infinity
+      Float result
+      I eulerlib:popcount(setofspheres) == 1
+         result = :sphereradii[currentsphereindex]
+      E
+         result = Float.infinity
+         V newsetofspheres = setofspheres (+) (1 << currentsphereindex)
+         L(i) 0 .< :NUM_SPHERES
+            I newsetofspheres [&] (1 << i) == 0
+               L.continue
+            V temp = sqrt(Float(:sphereradii[i] + :sphereradii[currentsphereindex] - 50000) * 200000)
+            temp += find_minimum_length(i, newsetofspheres)
+            result = min(temp, result)
+      :minlength[currentsphereindex][setofspheres] = result
+   R :minlength[currentsphereindex][setofspheres]
+
+V ans = min((0 .< NUM_SPHERES).map(i -> (find_minimum_length(i, (1 << :NUM_SPHERES) - 1) + :sphereradii[i])))
+print(Int(round(ans)))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto NUM_SPHERES = 21;
+
+auto sphereradii = range_el(0, NUM_SPHERES).map([](const auto &i){return (i + 30) * 1000;});
+auto minlength = create_array({create_array({-std::numeric_limits<double>::infinity()}) * (pow(2, ::NUM_SPHERES))}) * NUM_SPHERES;
+
+template <typename T1, typename T2> double find_minimum_length(const T1 &currentsphereindex, const T2 &setofspheres)
+{
+    if ((setofspheres & (1 << currentsphereindex)) == 0)
+        throw ValueError(u""_S);
+
+    if (::minlength[currentsphereindex][setofspheres] == -std::numeric_limits<double>::infinity()) {
+        double result;
+        if (eulerlib::popcount(setofspheres) == 1)
+            result = ::sphereradii[currentsphereindex];
+        else {
+            result = std::numeric_limits<double>::infinity();
+            auto newsetofspheres = setofspheres ^ (1 << currentsphereindex);
+            for (auto i : range_el(0, ::NUM_SPHERES)) {
+                if ((newsetofspheres & (1 << i)) == 0)
+                    continue;
+                auto temp = sqrt(to_float(::sphereradii[i] + ::sphereradii[currentsphereindex] - 50000) * 200000);
+                temp += find_minimum_length(i, newsetofspheres);
+                result = min(temp, result);
+            }
+        }
+        ::minlength[currentsphereindex].set(setofspheres, result);
+    }
+    return ::minlength[currentsphereindex][setofspheres];
+}
+
+auto ans = min_map(range_el(0, NUM_SPHERES), [](const auto &i){return (find_minimum_length(i, (1 << ::NUM_SPHERES) - 1) + ::sphereradii[i]);});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(to_int(round(ans)));
+    }
+} code_block_1;
+
+
+# 225
+import itertools
+
+def has_tribonacci_multiple(i):
+    seen = set() # Tuple[int, int, int]
+    a, b, c = 1, 1, 1
+    while True:
+        key = (a, b, c)
+        if key in seen:
+            return False
+        seen.add(key)
+        if a % i == 0:
+            return True
+        a, b, c = b, c, (a + b + c) % i
+
+n = 0
+INDEX = 124  # 1-based
+for i in itertools.count(1, 2):
+    if not has_tribonacci_multiple(i):
+        if n == INDEX - 1:
+            print(i)
+            break
+        n += 1
+===
+F has_tribonacci_multiple(i)
+   V seen = Set[(Int, Int, Int)]()
+   V (a, b, c) = (1, 1, 1)
+   L
+      V key = (a, b, c)
+      I key C seen
+         R 0B
+      seen.add(key)
+      I a % i == 0
+         R 1B
+      (a, b, c) = (b, c, (a + b + c) % i)
+
+V n = 0
+V INDEX = 124
+L(i) (1..).step(2)
+   I !has_tribonacci_multiple(i)
+      I n == INDEX - 1
+         print(i)
+         L.break
+      n++
+===
+template <typename T1> auto has_tribonacci_multiple(const T1 &i)
+{
+    auto seen = Set<ivec3>();
+    auto [a, b, c] = make_tuple(1, 1, 1);
+    while (true) {
+        auto key = make_tuple(a, b, c);
+        if (in(key, seen))
+            return false;
+        seen.add(key);
+        if (mod(a, i) == 0)
+            return true;
+        assign_from_tuple(a, b, c, make_tuple(b, c, mod((a + b + c), i)));
+    }
+}
+
+auto n = 0;
+auto INDEX = 124;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ei(1).step(2))
+            if (!has_tribonacci_multiple(i)) {
+                if (n == INDEX - 1) {
+                    print(i);
+                    break;
+                }
+                n++;
+            }
+    }
+} code_block_1;
