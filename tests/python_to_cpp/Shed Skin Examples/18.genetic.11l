@@ -2,11 +2,11 @@ V infiniteNeg = -1e302
 
 T Individual
    Int ngenes
-   [Bool] genome
+   [Byte] genome
    fitness = :infiniteNeg
    F (ngenes = 0)
       .ngenes = ngenes
-      .genome = (0 .< ngenes).map(i -> random:() < 0.5)
+      .genome = (0 .< ngenes).map(i -> Byte(random:() < 0.5))
    F bin2dec(inf = 0, =sup = 0)
       I sup == 0
          sup = .ngenes - 1

@@ -6,16 +6,17 @@ import random
 import math
 from copy import copy
 from typing import List
+Byte = int
 
 infiniteNeg = -1e302
 
 
 class Individual:
     ngenes : int
-    genome : List[bool]
+    genome : List[Byte]#List[bool]
     def __init__(self, ngenes = 0):
         self.ngenes = ngenes
-        self.genome = [random.random()<0.5 for i in range(ngenes)]
+        self.genome = [Byte(random.random()<0.5) for i in range(ngenes)]
         self.fitness = infiniteNeg
     def bin2dec(self, inf=0, sup=0):
         if sup == 0: sup = self.ngenes - 1

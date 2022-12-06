@@ -6,12 +6,12 @@ class Individual
 {
 public:
     int ngenes;
-    Array<bool> genome;
+    Array<Byte> genome;
     decltype(::infiniteNeg) fitness = ::infiniteNeg;
     template <typename T1 = decltype(0)> Individual(const T1 &ngenes = 0) :
         ngenes(ngenes)
     {
-        genome = range_el(0, ngenes).map([](const auto &i){return randomns::_() < 0.5;});
+        genome = range_el(0, ngenes).map([](const auto &i){return Byte(randomns::_() < 0.5);});
     }
     template <typename T1 = decltype(0), typename T2 = decltype(0)> auto bin2dec(const T1 &inf = 0, T2 sup = 0)
     {

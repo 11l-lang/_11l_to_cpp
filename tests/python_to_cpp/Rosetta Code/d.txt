@@ -1369,7 +1369,7 @@ struct CodeBlock1
     }
 } code_block_1;
 
-Array<bool> answers;
+Array<char> answers;
 
 struct CodeBlock2
 {
