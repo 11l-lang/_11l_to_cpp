@@ -46,6 +46,14 @@ list_primes
             ‘n; ; ; ’
         ]
     ]
+list_smallest_prime_factors
+    type = ‘’
+    ast_nodes = [
+    .   node_type = function
+        function_arguments = [
+            ‘n; ; Int; ’
+        ]
+    ]
 list_totients
     type = ‘’
     ast_nodes = [

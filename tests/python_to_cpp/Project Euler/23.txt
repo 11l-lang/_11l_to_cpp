@@ -1,0 +1,65 @@
+# 231
+import eulerlib
+Int64 = int
+
+N = 20000000
+K = 15000000
+smallestprimefactor = eulerlib.list_smallest_prime_factors(N)
+
+def factorial_prime_factor_sum(n):
+    result : Int64 = 0
+    for i in range(n + 1):
+        j = i
+        while j > 1:
+            p = smallestprimefactor[j]
+            result += p
+            j //= p
+    return result
+
+print(factorial_prime_factor_sum(N) - factorial_prime_factor_sum(K) - factorial_prime_factor_sum(N - K))
+===
+V _n_ = 20000000
+V K = 15000000
+V smallestprimefactor = eulerlib:list_smallest_prime_factors(_n_)
+
+F factorial_prime_factor_sum(n)
+   Int64 result = 0
+   L(i) 0 .. n
+      V j = i
+      L j > 1
+         V p = :smallestprimefactor[j]
+         result += p
+         j I/= p
+   R result
+
+print(factorial_prime_factor_sum(_n_) - factorial_prime_factor_sum(K) - factorial_prime_factor_sum(_n_ - K))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto _n_ = 20000000;
+auto K = 15000000;
+auto smallestprimefactor = eulerlib::list_smallest_prime_factors(_n_);
+
+template <typename T1> auto factorial_prime_factor_sum(const T1 &n)
+{
+    Int64 result = 0;
+    for (auto i : range_ee(0, n)) {
+        auto j = i;
+        while (j > 1) {
+            auto p = ::smallestprimefactor[j];
+            result += p;
+            j = idiv(j, p);
+        }
+    }
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(factorial_prime_factor_sum(_n_) - factorial_prime_factor_sum(K) - factorial_prime_factor_sum(_n_ - K));
+    }
+} code_block_1;

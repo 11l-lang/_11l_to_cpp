@@ -65,6 +65,18 @@ def list_primality(n):
 def list_primes(n):
 	return [i for i, isprime in enumerate(list_primality(n)) if isprime]
 
+def list_smallest_prime_factors(n: int):
+	result = [0] * (n + 1)
+	limit = int(math.sqrt(n))
+	for i in range(2, len(result)):
+		if result[i] == 0:
+			result[i] = i
+			if i <= limit:
+				for j in range(i * i, n + 1, i):
+					if result[j] == 0:
+						result[j] = i
+	return result
+
 def list_totients(n):
 	result = list(range(n + 1))
 	for i in range(2, len(result)):

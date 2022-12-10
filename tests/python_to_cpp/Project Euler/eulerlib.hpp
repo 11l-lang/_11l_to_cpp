@@ -58,6 +58,21 @@ template <typename T1> auto list_primes(const T1 &n)
     return enumerate(list_primality(n)).filter([](const auto &i, const auto &isprime){return isprime;}).map([](const auto &i, const auto &isprime){return i;});
 }
 
+auto list_smallest_prime_factors(const int n)
+{
+    auto result = create_array({0}) * (n + 1);
+    auto limit = to_int(sqrt(n));
+    for (auto i : range_el(2, result.len()))
+        if (result[i] == 0) {
+            result.set(i, i);
+            if (i <= limit)
+                for (auto j : range_ee(i * i, n).step(i))
+                    if (result[j] == 0)
+                        result.set(j, i);
+        }
+    return result;
+}
+
 template <typename T1> auto list_totients(const T1 &n)
 {
     auto result = create_array(range_ee(0, n));

@@ -44,6 +44,18 @@ F list_primality(n)
 F list_primes(n)
    R enumerate(list_primality(n)).filter((i, isprime) -> isprime).map((i, isprime) -> i)
 
+F list_smallest_prime_factors(Int n)
+   V result = [0] * (n + 1)
+   V limit = Int(sqrt(n))
+   L(i) 2 .< result.len
+      I result[i] == 0
+         result[i] = i
+         I i <= limit
+            L(j) (i * i .. n).step(i)
+               I result[j] == 0
+                  result[j] = i
+   R result
+
 F list_totients(n)
    V result = Array(0 .. n)
    L(i) 2 .< result.len
