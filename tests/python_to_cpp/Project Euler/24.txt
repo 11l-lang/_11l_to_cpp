@@ -1,0 +1,89 @@
+---
+# 243 [-fractions-]
+
+
+# 249
+import eulerlib
+Int64 = int
+
+LIMIT = 5000
+MODULUS = Int64(10)**16
+
+# Use dynamic programming. count[i] is the number of subsets of primes with the sum of i, modulo MODULUS.
+count = [Int64(0)] * (LIMIT**2 // 2)
+count[0] = 1
+s = 0  # Sum of all primes seen so far, and thus the highest index among nonzero entries in 'count'
+for p in eulerlib.list_primes(LIMIT):
+    for i in reversed(range(s + 1)):
+        count[i + p] = (count[i + p] + count[i]) % MODULUS
+    s += p
+
+isprime = eulerlib.list_primality(s + 1)
+ans : Int64 = 0
+for i in range(s + 1):
+    if isprime[i]:
+        ans = (ans + count[i]) % MODULUS
+print(ans)
+===
+V LIMIT = 5000
+V MODULUS = Int64(10) ^ 16
+
+V count = [Int64(0)] * (LIMIT ^ 2 I/ 2)
+count[0] = 1
+V s = 0
+L(p) eulerlib:list_primes(LIMIT)
+   L(i) reversed(0 .. s)
+      count[i + p] = (count[i + p] + count[i]) % MODULUS
+   s += p
+
+V isprime = eulerlib:list_primality(s + 1)
+Int64 ans = 0
+L(i) 0 .. s
+   I isprime[i]
+      ans = (ans + count[i]) % MODULUS
+print(ans)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto LIMIT = 5000;
+auto MODULUS = pow(to_int64(10), 16);
+
+auto count = create_array({to_int64(0)}) * (idiv(square(LIMIT), 2));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _set<0>(count, 1);
+    }
+} code_block_1;
+
+auto s = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&p : eulerlib::list_primes(LIMIT)) {
+            for (auto &&i : reversed(range_ee(0, s)))
+                count.set(i + p, mod((count[i + p] + count[i]), MODULUS));
+            s += p;
+        }
+    }
+} code_block_2;
+
+auto isprime = eulerlib::list_primality(s + 1);
+Int64 ans = 0;
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        for (auto i : range_ee(0, s))
+            if (isprime[i])
+                ans = mod((ans + count[i]), MODULUS);
+        print(ans);
+    }
+} code_block_3;

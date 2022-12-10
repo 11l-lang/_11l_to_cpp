@@ -1,0 +1,192 @@
+# 265 [based on Java solution]
+Int64 = int
+
+N = 5  # Must be at least 1
+TWO_POW_N = 2**N
+MASK = TWO_POW_N - 1  # Equal to n 1's in binary, i.e. 0b11111
+
+def check_arrangement(digits : Int64):
+    seen = 0
+    digits |= digits << TWO_POW_N  # Make second copy
+    for i in range(TWO_POW_N):
+        seen |= 1 << ((digits >> i) & MASK)
+    return seen == 0xFFFF_FFFF
+
+start = 2**(TWO_POW_N - N - 1) + 1
+end = 2**(TWO_POW_N - N)
+ans : Int64 = 0
+for i in range(start, end, 2):
+    if check_arrangement(i):
+        ans += i
+print(ans)
+===
+V _n_ = 5
+V TWO_POW_N = 2 ^ _n_
+V MASK = TWO_POW_N - 1
+
+F check_arrangement(Int64 =digits)
+   V seen = 0
+   digits [|]= digits << :TWO_POW_N
+   L(i) 0 .< :TWO_POW_N
+      seen [|]= 1 << ((digits >> i) [&] :MASK)
+   R seen == FFFF'FFFF
+
+V start = 2 ^ (TWO_POW_N - _n_ - 1) + 1
+V end = 2 ^ (TWO_POW_N - _n_)
+Int64 ans = 0
+L(i) (start .< end).step(2)
+   I check_arrangement(i)
+      ans += i
+print(ans)
+===
+auto _n_ = 5;
+auto TWO_POW_N = pow(2, _n_);
+auto MASK = TWO_POW_N - 1;
+
+auto check_arrangement(Int64 digits)
+{
+    auto seen = 0;
+    digits |= digits << ::TWO_POW_N;
+    for (auto i : range_el(0, ::TWO_POW_N))
+        seen |= 1 << ((digits >> i) & ::MASK);
+    return seen == 0xFFFF'FFFF;
+}
+
+auto start = pow(2, (TWO_POW_N - _n_ - 1)) + 1;
+auto end = pow(2, (TWO_POW_N - _n_));
+Int64 ans = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(start, end).step(2))
+            if (check_arrangement(i))
+                ans += i;
+        print(ans);
+    }
+} code_block_1;
+
+
+---
+# 267
+# Very slow BigInt
+import eulerlib, math
+
+# Returns the cumulative binomial probability index.
+def calc_billionaire_probability(betproportion, trials):
+    initcapital = 1.0
+    logbillionaire = math.log(1.0e9)
+    i = 0
+    while i <= trials:  # Number of losses
+        # Need to take logarithms because Python's ** operator and math.pow()
+        # would raise an exception on overflow instead of returning infinity
+        logfinalcapital = math.log(initcapital)
+        logfinalcapital += math.log(1.0 - betproportion) * i
+        logfinalcapital += math.log(1.0 + betproportion * 2) * (trials - i)
+        if logfinalcapital < logbillionaire:
+            break
+        i += 1
+    return i  # Range [0, TRIALS + 1]
+
+# Heuristic sampling algorithm.
+# At level 1 we test {1/2}. At level 2 we test {1/4, 3/4}.
+# At level 3 we test {1/8, 3/8, 5/8, 7/8}. Et cetera.
+TRIALS = 1000
+maxindex = -1
+prevchangelevel = 1
+level = 1
+while level - prevchangelevel <= 8:
+    scaler = 0.5**level
+    for i in range(1, 1 << level, 2):
+        index = calc_billionaire_probability(i * scaler, TRIALS)
+        if index > maxindex:
+            maxindex = index
+            prevchangelevel = level
+    level += 1
+
+# Calculate the cumulative probability: binomialSum = sum (n choose k) for 0 <= k < maxIndex
+binomialsum = sum(eulerlib.binomial(TRIALS, i) for i in range(maxindex))
+print('%.12f' % (float(binomialsum) / (2.0 ** TRIALS)))
+===
+F calc_billionaire_probability(betproportion, trials)
+   V initcapital = 1.0
+   V logbillionaire = log(1.0e9)
+   V i = 0
+   L i <= trials
+      V logfinalcapital = log(initcapital)
+      logfinalcapital += log(1.0 - betproportion) * i
+      logfinalcapital += log(1.0 + betproportion * 2) * (trials - i)
+      I logfinalcapital < logbillionaire
+         L.break
+      i++
+   R i
+
+V TRIALS = 1000
+V maxindex = -1
+V prevchangelevel = 1
+V level = 1
+L level - prevchangelevel <= 8
+   V scaler = 0.5 ^ level
+   L(i) (1 .< 1 << level).step(2)
+      V index = calc_billionaire_probability(i * scaler, TRIALS)
+      I index > maxindex
+         maxindex = index
+         prevchangelevel = level
+   level++
+
+V binomialsum = sum((0 .< maxindex).map(i -> eulerlib:binomial(:TRIALS, i)))
+print(‘#.12’.format(Float(binomialsum) / (2.0 ^ TRIALS)))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1, typename T2> auto calc_billionaire_probability(const T1 &betproportion, const T2 &trials)
+{
+    auto initcapital = 1.0;
+    auto logbillionaire = log(1.0e9);
+    auto i = 0;
+    while (i <= trials) {
+        auto logfinalcapital = log(initcapital);
+        logfinalcapital += log(1.0 - betproportion) * i;
+        logfinalcapital += log(1.0 + betproportion * 2) * (trials - i);
+        if (logfinalcapital < logbillionaire)
+            break;
+        i++;
+    }
+    return i;
+}
+
+auto TRIALS = 1000;
+auto maxindex = -1;
+auto prevchangelevel = 1;
+auto level = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (level - prevchangelevel <= 8) {
+            auto scaler = pow(0.5, level);
+            for (auto i : range_el(1, 1 << level).step(2)) {
+                auto index = calc_billionaire_probability(i * scaler, TRIALS);
+                if (index > maxindex) {
+                    maxindex = index;
+                    prevchangelevel = level;
+                }
+            }
+            level++;
+        }
+    }
+} code_block_1;
+
+auto binomialsum = sum_map(range_el(0, maxindex), [](const auto &i){return eulerlib::binomial(::TRIALS, i);});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"#.12"_S.format(to_float(binomialsum) / (pow(2.0, TRIALS))));
+    }
+} code_block_2;

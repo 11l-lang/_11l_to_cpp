@@ -1,0 +1,50 @@
+# 250 [based on Java solution]
+Int64 = int
+
+# Use dynamic programming
+MOD = Int64(10)**16
+subsets = [Int64(0)] * 250  # subsets[i] is {the number of subsets with sum equal to i mod 250} mod 10^16
+nsubsets = [Int64(0)] * 250
+subsets[0] = 1
+
+for i in range(1, 250250 + 1):
+    offset = pow(Int64(i), i, 250)
+    for j in range(250):
+        nsubsets[(j + offset) % 250] = (subsets[j] + subsets[(j + offset) % 250]) % MOD
+    subsets, nsubsets = nsubsets, subsets
+
+print((subsets[0] - 1) % MOD)
+===
+V MOD = Int64(10) ^ 16
+V subsets = [Int64(0)] * 250
+V nsubsets = [Int64(0)] * 250
+subsets[0] = 1
+
+L(i) 1 .. 250250
+   V offset = pow(Int64(i), i, 250)
+   L(j) 250
+      nsubsets[(j + offset) % 250] = (subsets[j] + subsets[(j + offset) % 250]) % MOD
+   swap(&subsets, &nsubsets)
+
+print((subsets[0] - 1) % MOD)
+===
+auto MOD = pow(to_int64(10), 16);
+auto subsets = create_array({to_int64(0)}) * 250;
+auto nsubsets = create_array({to_int64(0)}) * 250;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _set<0>(subsets, 1);
+
+        for (auto i : range_ee(1, 250250)) {
+            auto offset = pow(to_int64(i), i, 250);
+            for (int j = 0; j < 250; j++)
+                nsubsets.set(mod((j + offset), 250), mod((subsets[j] + subsets[mod((j + offset), 250)]), MOD));
+            swap(subsets, nsubsets);
+        }
+
+        print(mod((_get<0>(subsets) - 1), MOD));
+    }
+} code_block_1;
