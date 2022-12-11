@@ -1,0 +1,376 @@
+# 280
+import eulerlib, itertools
+from typing import Dict, List
+Byte = int
+
+# Represents the global state of the system, including the ant and seeds. Immutable.
+class State:
+    # All valid state IDs are in the range [0, ID_LIMIT). Not every number in the range is a valid state.
+    #ID_LIMIT = 5 * 5 * 2**11 + 1
+
+    @staticmethod
+    def get_done_state():
+        return State(True, 0, 0, [Byte(True), True, True, True, True, False, False, False, False, False, False])
+
+    @staticmethod
+    def list_all_states():
+        result : List[State] = []
+        # Try all 2^11 ways for which cells (or ant) hold a seed
+        for i in range(2**11):
+            if eulerlib.popcount(i) != 5:
+                continue  # Invalid state if not 5 things hold a seed
+
+            # For all 5*5 possible ant positions
+            for y in range(5):
+                for x in range(5):
+                    seed = [Byte(((i >> j) & 1) != 0) for j in range(11)]
+                    result.append(State(False, x, y, seed))
+        result.append(State.get_done_state())
+        return result
+
+    isdone : bool
+    antx : int
+    anty : int
+    hasseed : List[Byte]#List[bool]
+    id : int
+
+    def __init__(self, done, x, y, seed):
+        self.isdone = done
+        self.antx = x
+        self.anty = y
+        self.hasseed = seed
+        if done:
+            self.id = 5 * 5 * 2**11
+        else:
+            temp = sum((1 if b else 0) << i for i, b in enumerate(seed))
+            self.id = x + y * 5 + temp * 25
+
+    # Returns a set (of size 0 to 4) containing this state's successors.
+    # Remember that this state transitions to a successor with equal probability.
+    def get_successors(self):
+        result : List[State] = []
+        if not self.isdone:
+            self.try_add_successor(-1, 0, result)
+            self.try_add_successor(+1, 0, result)
+            self.try_add_successor(0, -1, result)
+            self.try_add_successor(0, +1, result)
+        return result
+
+    def try_add_successor(self, dx, dy, result : list):
+        x = self.antx + dx
+        y = self.anty + dy
+        if not (0 <= x < 5 and 0 <= y < 5):
+            return  # Ant moves off the grid
+
+        seed = self.hasseed[:]
+        done = False
+        if not seed[10] and y == 4 and seed[5 + x]:  # Pick up seed
+            seed[5 + x] = False
+            seed[10] = True
+        elif seed[10] and y == 0 and not seed[x]:  # Drop off seed
+            seed[10] = False
+            seed[x] = True
+            done = seed[0] & seed[1] & seed[2] & seed[3] & seed[4]
+        result.append(State(done, x, y, seed))
+
+# Model the problem as a Markov process, and solve using dynamic programming
+# Memoize the successors of each valid state
+successors : Dict[int, List[int]] = {}
+for st in State.list_all_states():
+    successors[st.id] = [s.id for s in st.get_successors()]
+
+# Run the simulation
+ans = 0.0
+START_STATE = State(False, 2, 2, [Byte(False), False, False, False, False, True, True, True, True, True, False])
+probs = {START_STATE.id: 1.0}  # The current probability of being in each state
+for i in itertools.count(1):
+    # Note: The done state has no outgoing neighbors,
+    # so its probability disappears in the next iteration
+    nextprobs : Dict[int, float] = {}
+    for j, p in probs.items():
+        suc = successors[j]
+        for k in suc:
+            nextprobs[k] = nextprobs.get(k, 0.0) + probs[j] / float(len(suc))
+
+    donenow = nextprobs.get(State.get_done_state().id, 0.0)
+    if i > 44 and donenow < 1e-20:  # Note: Minimum completion is 44 steps
+        break
+    ans += donenow * i
+    probs = nextprobs
+print(f"{ans:.6f}")
+===
+T State
+
+   F :get_done_state()
+      R State(1B, 0, 0, [Byte(1B), 1B, 1B, 1B, 1B, 0B, 0B, 0B, 0B, 0B, 0B])
+
+   F :list_all_states()
+      [State] result
+      L(i) 0 .< 2 ^ 11
+         I eulerlib:popcount(i) != 5
+            L.continue
+
+         L(y) 5
+            L(x) 5
+               V seed = (0.<11).map(j -> Byte(((@i >> j) [&] 1) != 0))
+               result.append(State(0B, x, y, seed))
+      result.append(State.get_done_state())
+      R result
+
+   Bool isdone
+   Int antx
+   Int anty
+   [Byte] hasseed
+   Int id
+
+   F (done, x, y, seed)
+      .isdone = done
+      .antx = x
+      .anty = y
+      .hasseed = seed
+      I done
+         .id = 5 * 5 * 2 ^ 11
+      E
+         V temp = sum(enumerate(seed).map((i, b) -> (I b {1} E 0) << i))
+         .id = x + y * 5 + temp * 25
+
+   F get_successors()
+      [State] result
+      I !(.isdone)
+         .try_add_successor(-1, 0, &result)
+         .try_add_successor(+1, 0, &result)
+         .try_add_successor(0, -1, &result)
+         .try_add_successor(0, +1, &result)
+      R result
+
+   F try_add_successor(dx, dy, &result)
+      V x = .antx + dx
+      V y = .anty + dy
+      I !(x C 0.<5 & y C 0.<5)
+         R
+
+      V seed = copy(.hasseed)
+      V done = 0B
+      I !seed[10] & y == 4 & seed[5 + x]
+         seed[5 + x] = 0B
+         seed[10] = 1B
+      E I seed[10] & y == 0 & !seed[x]
+         seed[10] = 0B
+         seed[x] = 1B
+         done = seed[0] [&] seed[1] [&] seed[2] [&] seed[3] [&] seed[4]
+      result.append(State(done, x, y, seed))
+
+[Int = [Int]] successors
+L(st) State.list_all_states()
+   successors[st.id] = st.get_successors().map(s -> s.id)
+
+V ans = 0.0
+V START_STATE = State(0B, 2, 2, [Byte(0B), 0B, 0B, 0B, 0B, 1B, 1B, 1B, 1B, 1B, 0B])
+V probs = [START_STATE.id = 1.0]
+L(i) 1..
+   [Int = Float] nextprobs
+   L(j, p) probs
+      V suc = successors[j]
+      L(k) suc
+         nextprobs[k] = nextprobs.get(k, 0.0) + probs[j] / Float(suc.len)
+
+   V donenow = nextprobs.get(State.get_done_state().id, 0.0)
+   I i > 44 & donenow < 1e-20
+      L.break
+   ans += donenow * i
+   probs = nextprobs
+print(f:‘{ans:.6}’)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+class State
+{
+public:
+
+    static auto s_get_done_state()
+    {
+        return State(true, 0, 0, create_array<Byte>({Byte(true), true, true, true, true, false, false, false, false, false, false}));
+    }
+
+    static auto s_list_all_states()
+    {
+        Array<State> result;
+        for (auto i : range_el(0, pow(2, 11))) {
+            if (eulerlib::popcount(i) != 5)
+                continue;
+
+            for (int y = 0; y < 5; y++)
+                for (int x = 0; x < 5; x++) {
+                    auto seed = range_el(0, 11).map([&i](const auto &j){return Byte(((i >> j) & 1) != 0);});
+                    result.append(State(false, x, y, seed));
+                }
+        }
+        result.append(State::s_get_done_state());
+        return result;
+    }
+
+    bool isdone;
+    int antx;
+    int anty;
+    Array<Byte> hasseed;
+    int id;
+
+    template <typename T1, typename T2, typename T3, typename T4> State(const T1 &done, const T2 &x, const T3 &y, const T4 &seed) :
+        isdone(done),
+        antx(x),
+        anty(y),
+        hasseed(seed)
+    {
+        if (done)
+            id = 5 * 5 * pow(2, 11);
+        else {
+            auto temp = sum_map(enumerate(seed), [](const auto &i, const auto &b){return (b ? 1 : 0) << i;});
+            id = x + y * 5 + temp * 25;
+        }
+    }
+
+    auto get_successors()
+    {
+        Array<State> result;
+        if (!(isdone)) {
+            try_add_successor(-1, 0, result);
+            try_add_successor(+1, 0, result);
+            try_add_successor(0, -1, result);
+            try_add_successor(0, +1, result);
+        }
+        return result;
+    }
+
+    template <typename T1, typename T2, typename T3> auto try_add_successor(const T1 &dx, const T2 &dy, T3 &result)
+    {
+        auto x = antx + dx;
+        auto y = anty + dy;
+        if (!(in(x, range_el(0, 5)) && in(y, range_el(0, 5))))
+            return;
+
+        auto seed = copy(hasseed);
+        auto done = false;
+        if (!_get<10>(seed) && y == 4 && seed[5 + x]) {
+            seed.set(5 + x, false);
+            _set<10>(seed, true);
+        }
+        else if (_get<10>(seed) && y == 0 && !seed[x]) {
+            _set<10>(seed, false);
+            seed.set(x, true);
+            done = _get<0>(seed) & _get<1>(seed) & _get<2>(seed) & _get<3>(seed) & _get<4>(seed);
+        }
+        result.append(State(done, x, y, seed));
+    }
+};
+
+Dict<int, Array<int>> successors;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&st : State::s_list_all_states())
+            successors.set(st.id, st.get_successors().map([](const auto &s){return s.id;}));
+    }
+} code_block_1;
+
+auto ans = 0.0;
+auto START_STATE = State(false, 2, 2, create_array<Byte>({Byte(false), false, false, false, false, true, true, true, true, true, false}));
+auto probs = create_dict(dict_of(START_STATE.id, 1.0));
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto i : range_ei(1)) {
+            Dict<int, double> nextprobs;
+            for (auto &&[j, p] : probs) {
+                auto suc = successors[j];
+                for (auto &&k : suc)
+                    nextprobs.set(k, nextprobs.get(k, 0.0) + probs[j] / to_float(suc.len()));
+            }
+
+            auto donenow = nextprobs.get(State::s_get_done_state().id, 0.0);
+            if (i > 44 && donenow < 1e-20)
+                break;
+            ans += donenow * i;
+            probs = nextprobs;
+        }
+        print(u"#.6"_S.format(ans));
+    }
+} code_block_2;
+
+
+# 287
+Int64 = int
+
+N = 24
+RADIUS_SQUARED = Int64(2)**(2 * N - 2)
+
+# Returns the exact minimum number of bits required to encode
+# the circle image's region of [xstart, end) * [ystart, yend),
+# requiring 0 <= xstart < xend and 0 <= ystart < yend.
+def compressed_length(xstart, xend, ystart, yend):
+    if Int64(xstart) * xstart + Int64(ystart) * ystart > RADIUS_SQUARED:  # All white
+        return 2
+    elif Int64(xend - 1) * (xend - 1) + Int64(yend - 1) * (yend - 1) <= RADIUS_SQUARED:  # All black
+        return 2
+    else:  # Subdivide and recurse
+        xmid = (xstart + xend) >> 1
+        ymid = (ystart + yend) >> 1
+        return (1 +
+            compressed_length(xstart, xmid, ymid  , yend) +  # Top left
+            compressed_length(xmid  , xend, ymid  , yend) +  # Top right
+            compressed_length(xstart, xmid, ystart, ymid) +  # Bottom left
+            compressed_length(xmid  , xend, ystart, ymid))   # Bottom right
+
+temp = 2**(N - 1)
+print(1 +
+    compressed_length(0, temp, 0, temp) +
+    compressed_length(0, temp, 1, temp + 1) +
+    compressed_length(1, temp + 1, 0, temp) +
+    compressed_length(1, temp + 1, 1, temp + 1))
+===
+V _n_ = 24
+V RADIUS_SQUARED = Int64(2) ^ (2 * _n_ - 2)
+
+F compressed_length(xstart, xend, ystart, yend)
+   I Int64(xstart) * xstart + Int64(ystart) * ystart > :RADIUS_SQUARED
+      R 2
+   E I Int64(xend - 1) * (xend - 1) + Int64(yend - 1) * (yend - 1) <= :RADIUS_SQUARED
+      R 2
+   E
+      V xmid = (xstart + xend) >> 1
+      V ymid = (ystart + yend) >> 1
+      R (1 + compressed_length(xstart, xmid, ymid, yend) + compressed_length(xmid, xend, ymid, yend) + compressed_length(xstart, xmid, ystart, ymid) + compressed_length(xmid, xend, ystart, ymid))
+
+V temp = 2 ^ (_n_ - 1)
+print(1 + compressed_length(0, temp, 0, temp) + compressed_length(0, temp, 1, temp + 1) + compressed_length(1, temp + 1, 0, temp) + compressed_length(1, temp + 1, 1, temp + 1))
+===
+auto _n_ = 24;
+auto RADIUS_SQUARED = pow(to_int64(2), (2 * _n_ - 2));
+
+template <typename T1, typename T2, typename T3, typename T4> auto compressed_length(const T1 &xstart, const T2 &xend, const T3 &ystart, const T4 &yend)
+{
+    if (to_int64(xstart) * xstart + to_int64(ystart) * ystart > ::RADIUS_SQUARED)
+        return 2;
+    else if (to_int64(xend - 1) * (xend - 1) + to_int64(yend - 1) * (yend - 1) <= ::RADIUS_SQUARED)
+        return 2;
+    else {
+        auto xmid = (xstart + xend) >> 1;
+        auto ymid = (ystart + yend) >> 1;
+        return (1 + compressed_length(xstart, xmid, ymid, yend) + compressed_length(xmid, xend, ymid, yend) + compressed_length(xstart, xmid, ystart, ymid) + compressed_length(xmid, xend, ystart, ymid));
+    }
+}
+
+auto temp = pow(2, (_n_ - 1));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(1 + compressed_length(0, temp, 0, temp) + compressed_length(0, temp, 1, temp + 1) + compressed_length(1, temp + 1, 0, temp) + compressed_length(1, temp + 1, 1, temp + 1));
+    }
+} code_block_1;

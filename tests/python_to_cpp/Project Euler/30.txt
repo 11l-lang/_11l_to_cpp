@@ -1,0 +1,295 @@
+# 301
+a = 0
+b = 1
+for i in range(32):
+    a, b = b, a + b
+print(a)
+===
+V a = 0
+V b = 1
+L(i) 32
+   (a, b) = (b, a + b)
+print(a)
+===
+auto a = 0;
+auto b = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int i = 0; i < 32; i++)
+            assign_from_tuple(a, b, make_tuple(b, a + b));
+        print(a);
+    }
+} code_block_1;
+
+
+# 303
+from _11l import *
+
+def find_minimum_multiple(n):
+    # feasible[i][j] indicates whether there exists an i-digit number that consists of
+    # only the digits {0, 1, 2} (with possible leading zeros) having a remainder of j modulo n:
+    # - 0: No i-digit number can form this remainder
+    # - 1: Only zero can form this remainder
+    # - 2: Some non-zero number can form this remainder
+
+    # Initialization and base case
+    feasible = [[1] + [0] * (n - 1)]
+
+    # Add digits on the left side until a solution exists, using dynamic programming
+    i = 0
+    while feasible[i][0] != 2:  # Unbounded loop
+        assert i == len(feasible) - 1
+        prev = feasible[i]
+        cur = list(prev)  # Clone
+        digitmod = pow(10, i, n)
+        for j in range(n):  # Run time of O(n)
+            if prev[j] > 0:
+                cur[(j + digitmod * 1) % n] = 2
+                cur[(j + digitmod * 2) % n] = 2
+        feasible.append(cur)
+        i += 1
+
+    # Construct the smallest solution using the memoized table
+    # Run time of O(len(feasible)) bigint operations
+    result : BigInt = 0
+    remainder = 0  # Modulo n
+    # Pick digit values from left (most significant) to right
+    for i in reversed(range(len(feasible) - 1)):
+        digitmod = pow(10, i, n)
+        # Leading digit must start searching at 1; subsequent digits start searching at 0
+        for j in range((1 if (i == len(feasible) - 2) else 0), 3):
+            newrem = nmod(remainder - digitmod * j, n)
+            if feasible[i][newrem] > 0:
+                result = result * 10 + j
+                remainder = newrem
+                break
+        else:
+            raise AssertionError('')
+    return result
+
+print(sum(Int64(find_minimum_multiple(n) // n) for n in range(1, 10001)))
+===
+F find_minimum_multiple(n)
+
+   V feasible = [[1] [+] [0] * (n - 1)]
+
+   V i = 0
+   L feasible[i][0] != 2
+      assert(i == feasible.len - 1)
+      V prev = feasible[i]
+      V cur = Array(prev)
+      V digitmod = pow(10, i, n)
+      L(j) 0 .< n
+         I prev[j] > 0
+            cur[(j + digitmod * 1) % n] = 2
+            cur[(j + digitmod * 2) % n] = 2
+      feasible.append(cur)
+      i++
+
+   BigInt result = 0
+   V remainder = 0
+   L(i) reversed(0 .< feasible.len - 1)
+      V digitmod = pow(10, i, n)
+      L(j) (I (i == feasible.len - 2) {1} E 0) .< 3
+         V newrem = (remainder - digitmod * j) -% n
+         I feasible[i][newrem] > 0
+            result = result * 10 + j
+            remainder = newrem
+            L.break
+      L.was_no_break
+         X AssertionError(‘’)
+   R result
+
+print(sum((1..10000).map(n -> Int64(find_minimum_multiple(n) I/ n))))
+===
+template <typename T1> auto find_minimum_multiple(const T1 &n)
+{
+
+    auto feasible = create_array({create_array({1}) + create_array({0}) * (n - 1)});
+
+    auto i = 0;
+    while (_get<0>(feasible[i]) != 2) {
+        assert(i == feasible.len() - 1);
+        auto prev = feasible[i];
+        auto cur = create_array(prev);
+        auto digitmod = pow(10, i, n);
+        for (auto j : range_el(0, n))
+            if (prev[j] > 0) {
+                cur.set(mod((j + digitmod * 1), n), 2);
+                cur.set(mod((j + digitmod * 2), n), 2);
+            }
+        feasible.append(cur);
+        i++;
+    }
+
+    BigInt result = 0;
+    auto remainder = 0;
+    for (auto &&i : reversed(range_el(0, feasible.len() - 1))) {
+        auto digitmod = pow(10, i, n);
+        for (auto j : range_el(((i == feasible.len() - 2) ? 1 : 0), 3)) {
+            auto newrem = nmod((remainder - digitmod * j), n);
+            if (feasible[i][newrem] > 0) {
+                result = result * 10 + j;
+                remainder = newrem;
+                goto break_;
+            }
+        }
+        throw AssertionError(u""_S);
+        break_:;
+    }
+    return result;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum_map(range_ee(1, 10000), [](const auto &n){return to_int64(idiv(find_minimum_multiple(n), n));}));
+    }
+} code_block_1;
+
+
+# 304
+# Very slow BigInt
+import eulerlib, math
+BigInt = int
+Int64 = int
+
+def fibonacci_mod(n, mod):
+    a, b = BigInt(0), BigInt(1)
+    binary = bin(n)[2 : ]
+    for bit in binary:
+        a, b = a * (b * 2 - a), a * a + b * b
+        if bit == "1":
+            a, b = b, a + b
+        a %= mod
+        b %= mod
+    return Int64(a)
+
+BASE = Int64(10)**14
+SEARCH_RANGE = 10000000  # Number of candidates starting from BASE to search for primes. Hopefully there are 100 000 primes among here.
+MODULUS = Int64(1234567891011)
+
+# iscomposite[i] pertains to the number BASE + i
+# Sieve of Eratosthenes, but starting at BASE
+iscomposite = [False] * SEARCH_RANGE
+primes = eulerlib.list_primes(int(math.sqrt(BASE + SEARCH_RANGE)))
+for p in primes:
+    for i in range(int((BASE + p - 1) // p * p - BASE), len(iscomposite), p):
+        iscomposite[i] = True
+
+# Returns p - BASE, where p is the next prime after n + BASE
+def next_prime(n):
+    while True:
+        n += 1
+        if n >= len(iscomposite):
+            raise AssertionError("Search range exhausted")
+        if not iscomposite[n]:
+            return n
+
+ans = Int64(0)
+p = 0
+for i in range(100000):
+    p = next_prime(p)
+    ans = (ans + fibonacci_mod(BASE + p, MODULUS)) % MODULUS
+print(ans)
+===
+F fibonacci_mod(n, mod)
+   V (a, b) = (BigInt(0), BigInt(1))
+   V binary = bin(n)
+   L(bit) binary
+      (a, b) = (a * (b * 2 - a), a * a + b * b)
+      I bit == ‘1’
+         (a, b) = (b, a + b)
+      a %= mod
+      b %= mod
+   R Int64(a)
+
+V BASE = Int64(10) ^ 14
+V SEARCH_RANGE = 10000000
+V MODULUS = Int64(1234567891011)
+
+V iscomposite = [0B] * SEARCH_RANGE
+V primes = eulerlib:list_primes(Int(sqrt(BASE + SEARCH_RANGE)))
+L(p) primes
+   L(i) (Int((BASE + p - 1) I/ p * p - BASE) .< iscomposite.len).step(p)
+      iscomposite[i] = 1B
+
+F next_prime(=n)
+   L
+      n++
+      I n >= :iscomposite.len
+         X AssertionError(‘Search range exhausted’)
+      I !:iscomposite[n]
+         R n
+
+V ans = Int64(0)
+V p = 0
+L(i) 100000
+   p = next_prime(p)
+   ans = (ans + fibonacci_mod(BASE + p, MODULUS)) % MODULUS
+print(ans)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1, typename T2> auto fibonacci_mod(const T1 &n, const T2 &mod)
+{
+    auto [a, b] = make_tuple(BigInt(0), BigInt(1));
+    auto binary = bin(n);
+    for (auto &&bit : binary) {
+        assign_from_tuple(a, b, make_tuple(a * (b * 2 - a), a * a + b * b));
+        if (bit == u'1')
+            assign_from_tuple(a, b, make_tuple(b, a + b));
+        a %= mod;
+        b %= mod;
+    }
+    return to_int64(a);
+}
+
+auto BASE = pow(to_int64(10), 14);
+auto SEARCH_RANGE = 10000000;
+auto MODULUS = to_int64(1234567891011);
+
+auto iscomposite = create_array({false}) * SEARCH_RANGE;
+auto primes = eulerlib::list_primes(to_int(sqrt(BASE + SEARCH_RANGE)));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&p : primes)
+            for (auto i : range_el(to_int(idiv((BASE + p - 1), p) * p - BASE), iscomposite.len()).step(p))
+                iscomposite.set(i, true);
+    }
+} code_block_1;
+
+template <typename T1> auto next_prime(T1 n)
+{
+    while (true) {
+        n++;
+        if (n >= ::iscomposite.len())
+            throw AssertionError(u"Search range exhausted"_S);
+        if (!::iscomposite[n])
+            return n;
+    }
+}
+
+auto ans = to_int64(0);
+auto p = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (int i = 0; i < 100000; i++) {
+            p = next_prime(p);
+            ans = mod((ans + fibonacci_mod(BASE + p, MODULUS)), MODULUS);
+        }
+        print(ans);
+    }
+} code_block_2;

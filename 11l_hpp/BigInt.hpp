@@ -285,6 +285,9 @@ public:
 	void operator/=(const BigInt &v) {
 		*this = *this / v;
 	}
+	void operator%=(const BigInt &v) {
+		*this = *this % v;
+	}
 
 	bool operator<(const BigInt &v) const {
 		if (sign != v.sign)
