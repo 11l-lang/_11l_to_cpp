@@ -1,0 +1,70 @@
+# 271
+from _11l import *
+import eulerlib
+
+# Assuming that p and q are coprime, 0 <= a < p, and 0 <= b < q, this returns the unique # (
+# integer x in the range [0, p*q) such that x satisfies (x = a mod p) and (x = b mod q). # ]
+def chinese_remainder_theorem(a, p, b, q):
+    return nmod(a + (BigInt(b) - a) * eulerlib.reciprocal_mod(int(p % q), q) * p, p * q)
+
+FACTORS = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43]
+factorsols = [
+    [j for j in range(fact) if pow(j, 3, fact) == 1]
+    for fact in FACTORS]
+
+def build_and_sum_solutions(i, x, mod):
+    if i == len(FACTORS):
+        return x
+    else:
+        fact = FACTORS[i]
+        return sum(
+            build_and_sum_solutions(i + 1, chinese_remainder_theorem(x, mod, sol, fact), mod * fact)
+            for sol in factorsols[i])
+
+# Note: The recursive algorithm generates all solutions, but the problem statement excludes 1
+print(build_and_sum_solutions(0, BigInt(0), BigInt(1)) - 1)
+===
+F chinese_remainder_theorem(a, p, b, q)
+   R (a + (BigInt(b) - a) * eulerlib:reciprocal_mod(Int(p % q), q) * p) -% (p * q)
+
+V FACTORS = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43]
+V factorsols = FACTORS.map(fact -> (0 .< fact).filter(j -> pow(j, 3, @fact) == 1))
+
+F build_and_sum_solutions(i, x, mod)
+   I i == :FACTORS.len
+      R x
+   E
+      V fact = :FACTORS[i]
+      R sum(:factorsols[i].map(sol -> build_and_sum_solutions(@i + 1, chinese_remainder_theorem(@x, @mod, sol, @fact), @mod * @fact)))
+
+print(build_and_sum_solutions(0, BigInt(0), BigInt(1)) - 1)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1, typename T2, typename T3, typename T4> auto chinese_remainder_theorem(const T1 &a, const T2 &p, const T3 &b, const T4 &q)
+{
+    return nmod((a + (BigInt(b) - a) * eulerlib::reciprocal_mod(to_int(mod(p, q)), q) * p), (p * q));
+}
+
+auto FACTORS = create_array({2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43});
+auto factorsols = FACTORS.map([](const auto &fact){return range_el(0, fact).filter([&fact](const auto &j){return pow(j, 3, fact) == 1;});});
+
+template <typename T1, typename T2, typename T3> auto build_and_sum_solutions(const T1 &i, const T2 &x, const T3 &mod)
+{
+    if (i == ::FACTORS.len())
+        return x;
+    else {
+        auto fact = ::FACTORS[i];
+        return sum_map(::factorsols[i], [&fact, &i, &mod, &x](const auto &sol){return build_and_sum_solutions(i + 1, chinese_remainder_theorem(x, mod, sol, fact), mod * fact);});
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(build_and_sum_solutions(0, BigInt(0), BigInt(1)) - 1);
+    }
+} code_block_1;

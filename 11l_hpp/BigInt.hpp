@@ -237,6 +237,9 @@ public:
 	friend BigInt mod(const BigInt &a, Int64 b) {
 		return a % BigInt(b);
 	}
+	friend BigInt nmod(const BigInt &x, const BigInt &y) {
+		auto r = x % y; if (r < 0) r += y; return r;
+	}
 
 	void operator/=(int v) {
 		if (v < 0)
