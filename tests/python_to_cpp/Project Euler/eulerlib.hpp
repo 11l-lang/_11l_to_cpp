@@ -1,4 +1,4 @@
-﻿int popcount(const int x)
+﻿template <typename T1> int popcount(const T1 &x)
 {
     return bin(x).count(u'1'_C);
 }

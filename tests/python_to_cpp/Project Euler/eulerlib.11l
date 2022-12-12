@@ -1,4 +1,4 @@
-F popcount(Int x) -> Int
+F popcount(x) -> Int
    R bin(x).count(‘1’)
 
 F sqrtb(BigInt x) -> BigInt

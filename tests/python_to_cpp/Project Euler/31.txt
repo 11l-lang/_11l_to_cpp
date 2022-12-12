@@ -1,0 +1,150 @@
+# 315 [Int64 from Java solution]
+import eulerlib
+Int64 = int
+
+# Also known as digital root.
+def digit_sum(n):
+    if n < 0:
+        raise ValueError('')
+    result = 0
+    while n != 0:
+        result += n % 10
+        n //= 10
+    return result
+
+# Mapping of [0, 10) -> [0x00, 0x7F); each output fits in 7 bits.
+DECIMAL_DIGIT_TO_SEGMENT = [0b1110111, 0b0010010, 0b1011101, 0b1011011, 0b0111010, 0b1101011, 0b1101111, 0b1110010, 0b1111111, 0b1111011]
+
+def number_to_segments(n):
+    if n < 0:
+        raise ValueError('')
+    result : Int64 = 0
+    i = 0
+    while True:
+        result |= Int64(DECIMAL_DIGIT_TO_SEGMENT[n % 10]) << (i * 7)
+        n //= 10
+        i += 1
+        if n == 0:
+            return result
+
+def sam_transitions_minus_max_transitions(n):
+    samtrans = 0
+    maxtrans = 0
+    segmentstate : Int64 = 0
+    while True:
+        newstate = number_to_segments(n)
+        if newstate == segmentstate:
+            break
+        maxtrans += eulerlib.popcount(newstate ^ segmentstate)
+        segmentstate = newstate
+        samtrans += 2 * eulerlib.popcount(newstate)
+        n = digit_sum(n)
+    maxtrans += eulerlib.popcount(segmentstate)
+    return samtrans - maxtrans
+
+isprime = eulerlib.list_primality(20000000)
+print(sum(sam_transitions_minus_max_transitions(i)
+    for i, p in enumerate(isprime)
+    if i >= 10000000 and p))
+===
+F digit_sum(=n)
+   I n < 0
+      X ValueError(‘’)
+   V result = 0
+   L n != 0
+      result += n % 10
+      n I/= 10
+   R result
+
+V DECIMAL_DIGIT_TO_SEGMENT = [1110111b, 0010010b, 1011101b, 1011011b, 0111010b, 1101011b, 1101111b, 1110010b, 1111111b, 1111011b]
+
+F number_to_segments(=n)
+   I n < 0
+      X ValueError(‘’)
+   Int64 result = 0
+   V i = 0
+   L
+      result [|]= Int64(:DECIMAL_DIGIT_TO_SEGMENT[n % 10]) << (i * 7)
+      n I/= 10
+      i++
+      I n == 0
+         R result
+
+F sam_transitions_minus_max_transitions(=n)
+   V samtrans = 0
+   V maxtrans = 0
+   Int64 segmentstate = 0
+   L
+      V newstate = number_to_segments(n)
+      I newstate == segmentstate
+         L.break
+      maxtrans += eulerlib:popcount(newstate (+) segmentstate)
+      segmentstate = newstate
+      samtrans += 2 * eulerlib:popcount(newstate)
+      n = digit_sum(n)
+   maxtrans += eulerlib:popcount(segmentstate)
+   R samtrans - maxtrans
+
+V isprime = eulerlib:list_primality(20000000)
+print(sum(enumerate(isprime).filter((i, p) -> i >= 10000000 & p).map((i, p) -> sam_transitions_minus_max_transitions(i))))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1> auto digit_sum(T1 n)
+{
+    if (n < 0)
+        throw ValueError(u""_S);
+    auto result = 0;
+    while (n != 0) {
+        result += mod(n, 10);
+        n = idiv(n, 10);
+    }
+    return result;
+}
+
+auto DECIMAL_DIGIT_TO_SEGMENT = create_array({0b1110111, 0b0010010, 0b1011101, 0b1011011, 0b0111010, 0b1101011, 0b1101111, 0b1110010, 0b1111111, 0b1111011});
+
+template <typename T1> auto number_to_segments(T1 n)
+{
+    if (n < 0)
+        throw ValueError(u""_S);
+    Int64 result = 0;
+    auto i = 0;
+    while (true) {
+        result |= to_int64(::DECIMAL_DIGIT_TO_SEGMENT[mod(n, 10)]) << (i * 7);
+        n = idiv(n, 10);
+        i++;
+        if (n == 0)
+            return result;
+    }
+}
+
+template <typename T1> auto sam_transitions_minus_max_transitions(T1 n)
+{
+    auto samtrans = 0;
+    auto maxtrans = 0;
+    Int64 segmentstate = 0;
+    while (true) {
+        auto newstate = number_to_segments(n);
+        if (newstate == segmentstate)
+            break;
+        maxtrans += eulerlib::popcount(newstate ^ segmentstate);
+        segmentstate = newstate;
+        samtrans += 2 * eulerlib::popcount(newstate);
+        n = digit_sum(n);
+    }
+    maxtrans += eulerlib::popcount(segmentstate);
+    return samtrans - maxtrans;
+}
+
+auto isprime = eulerlib::list_primality(20000000);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum_map(enumerate(isprime).filter([](const auto &i, const auto &p){return i >= 10000000 && p;}), [](const auto &i, const auto &p){return sam_transitions_minus_max_transitions(i);}));
+    }
+} code_block_1;
