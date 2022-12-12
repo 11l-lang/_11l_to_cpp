@@ -1,0 +1,454 @@
+# 345
+import eulerlib
+
+MATRIX = [list(map(int, line.split())) for line in '''
+  7  53 183 439 863 497 383 563  79 973 287  63 343 169 583
+627 343 773 959 943 767 473 103 699 303 957 703 583 639 913
+447 283 463  29  23 487 463 993 119 883 327 493 423 159 743
+217 623   3 399 853 407 103 983  89 463 290 516 212 462 350
+960 376 682 962 300 780 486 502 912 800 250 346 172 812 350
+870 456 192 162 593 473 915  45 989 873 823 965 425 329 803
+973 965 905 919 133 673 665 235 509 613 673 815 165 992 326
+322 148 972 962 286 255 941 541 265 323 925 281 601  95 973
+445 721  11 525 473  65 511 164 138 672  18 428 154 448 848
+414 456 310 312 798 104 566 520 302 248 694 976 430 392 198
+184 829 373 181 631 101 969 613 840 740 778 458 284 760 390
+821 461 843 513  17 901 711 993 293 157 274  94 192 156 574
+ 34 124   4 878 450 476 712 914 838 669 875 299 823 329 699
+815 559 813 459 522 788 168 586 966 232 308 833 251 631 107
+813 883 451 509 615  77 281 613 459 205 380 274 302  35 805
+'''.strip("\n").split("\n")]
+
+ROWS = len(MATRIX)
+COLUMNS = len(MATRIX[0])
+
+# Memoization
+maxsum = [[0] * (2**COLUMNS) for _ in range(ROWS)]
+
+# Returns the maximum sum when considering the submatrix from row 'startrow' until the bottom,
+# with the bit set 'setofcols' indicating which column indexes are still free to be used.
+def find_maximum_sum(startrow, setofcols):
+    if startrow == ROWS:
+        assert eulerlib.popcount(setofcols) == COLUMNS - ROWS
+        return 0
+    if maxsum[startrow][setofcols] == 0:
+        result = 0
+        col = 0
+        bit = 1
+        while True:
+            if bit > setofcols:
+                break
+            if setofcols & bit != 0:
+                result = max(MATRIX[startrow][col] + find_maximum_sum(startrow + 1, setofcols ^ bit), result)
+            col += 1
+            bit <<= 1
+        maxsum[startrow][setofcols] = result
+    return maxsum[startrow][setofcols]
+
+print(find_maximum_sum(0, 2**COLUMNS - 1))
+===
+V MATRIX = ‘
+  7  53 183 439 863 497 383 563  79 973 287  63 343 169 583
+627 343 773 959 943 767 473 103 699 303 957 703 583 639 913
+447 283 463  29  23 487 463 993 119 883 327 493 423 159 743
+217 623   3 399 853 407 103 983  89 463 290 516 212 462 350
+960 376 682 962 300 780 486 502 912 800 250 346 172 812 350
+870 456 192 162 593 473 915  45 989 873 823 965 425 329 803
+973 965 905 919 133 673 665 235 509 613 673 815 165 992 326
+322 148 972 962 286 255 941 541 265 323 925 281 601  95 973
+445 721  11 525 473  65 511 164 138 672  18 428 154 448 848
+414 456 310 312 798 104 566 520 302 248 694 976 430 392 198
+184 829 373 181 631 101 969 613 840 740 778 458 284 760 390
+821 461 843 513  17 901 711 993 293 157 274  94 192 156 574
+ 34 124   4 878 450 476 712 914 838 669 875 299 823 329 699
+815 559 813 459 522 788 168 586 966 232 308 833 251 631 107
+813 883 451 509 615  77 281 613 459 205 380 274 302  35 805
+’.trim("\n").split("\n").map(line -> line.split_py().map(Int))
+
+V ROWS = MATRIX.len
+V COLUMNS = MATRIX[0].len
+
+V maxsum = [[0] * (2 ^ :COLUMNS)] * ROWS
+
+F find_maximum_sum(startrow, setofcols)
+   I startrow == :ROWS
+      assert(eulerlib:popcount(setofcols) == :COLUMNS - :ROWS)
+      R 0
+   I :maxsum[startrow][setofcols] == 0
+      V result = 0
+      V col = 0
+      V bit = 1
+      L
+         I bit > setofcols
+            L.break
+         I setofcols [&] bit != 0
+            result = max(:MATRIX[startrow][col] + find_maximum_sum(startrow + 1, setofcols (+) bit), result)
+         col++
+         bit <<= 1
+      :maxsum[startrow][setofcols] = result
+   R :maxsum[startrow][setofcols]
+
+print(find_maximum_sum(0, 2 ^ COLUMNS - 1))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto MATRIX = uR"(
+  7  53 183 439 863 497 383 563  79 973 287  63 343 169 583
+627 343 773 959 943 767 473 103 699 303 957 703 583 639 913
+447 283 463  29  23 487 463 993 119 883 327 493 423 159 743
+217 623   3 399 853 407 103 983  89 463 290 516 212 462 350
+960 376 682 962 300 780 486 502 912 800 250 346 172 812 350
+870 456 192 162 593 473 915  45 989 873 823 965 425 329 803
+973 965 905 919 133 673 665 235 509 613 673 815 165 992 326
+322 148 972 962 286 255 941 541 265 323 925 281 601  95 973
+445 721  11 525 473  65 511 164 138 672  18 428 154 448 848
+414 456 310 312 798 104 566 520 302 248 694 976 430 392 198
+184 829 373 181 631 101 969 613 840 740 778 458 284 760 390
+821 461 843 513  17 901 711 993 293 157 274  94 192 156 574
+ 34 124   4 878 450 476 712 914 838 669 875 299 823 329 699
+815 559 813 459 522 788 168 586 966 232 308 833 251 631 107
+813 883 451 509 615  77 281 613 459 205 380 274 302  35 805
+)"_S.trim(u"\n"_S).split(u"\n"_S).map([](const auto &line){return line.split_py().map([](const auto &x){return to_int(x);});});
+
+auto ROWS = MATRIX.len();
+auto COLUMNS = _get<0>(MATRIX).len();
+
+auto maxsum = create_array({create_array({0}) * (pow(2, ::COLUMNS))}) * ROWS;
+
+template <typename T1, typename T2> auto find_maximum_sum(const T1 &startrow, const T2 &setofcols)
+{
+    if (startrow == ::ROWS) {
+        assert(eulerlib::popcount(setofcols) == ::COLUMNS - ::ROWS);
+        return 0;
+    }
+    if (::maxsum[startrow][setofcols] == 0) {
+        auto result = 0;
+        auto col = 0;
+        auto bit = 1;
+        while (true) {
+            if (bit > setofcols)
+                break;
+            if ((setofcols & bit) != 0)
+                result = max(::MATRIX[startrow][col] + find_maximum_sum(startrow + 1, setofcols ^ bit), result);
+            col++;
+            bit <<= 1;
+        }
+        ::maxsum[startrow].set(setofcols, result);
+    }
+    return ::maxsum[startrow][setofcols];
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(find_maximum_sum(0, pow(2, COLUMNS) - 1));
+    }
+} code_block_1;
+
+
+# 346
+import itertools
+Int64 = int
+BigInt = int
+
+LIMIT = Int64(10)**12
+
+# Collect all generated numbers to eliminate duplicates
+strongrepunits = {Int64(1)}  # Special case
+
+# For each possible length of strong repunits (ignoring the trivial length of 2)
+for length in range(3, LIMIT.bit_length() + 1):
+
+    # For each base to evaluate the repunit in, until the value exceeds the limit
+    for base in itertools.count(2):
+
+        # Evaluate value = base^(length-1) + base^(length-2) + ... + base^1 + base^0
+        # Due to the geometric series, value = (base^length - 1) / (base - 1)
+        value = (BigInt(base)**length - 1) // (base - 1)
+        if value >= LIMIT:
+            break
+        strongrepunits.add(Int64(value))
+
+# Sum all the numbers generated
+print(sum(strongrepunits))
+===
+V LIMIT = Int64(10) ^ 12
+
+V strongrepunits = Set([Int64(1)])
+
+L(length) 3 .. bit_length(LIMIT)
+
+   L(base) 2..
+
+      V value = (BigInt(base) ^ length - 1) I/ (base - 1)
+      I value >= LIMIT
+         L.break
+      strongrepunits.add(Int64(value))
+
+print(sum(strongrepunits))
+===
+auto LIMIT = pow(to_int64(10), 12);
+
+auto strongrepunits = create_set({to_int64(1)});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto length : range_ee(3, bit_length(LIMIT)))
+
+            for (auto base : range_ei(2)) {
+
+                auto value = idiv((pow(BigInt(base), length) - 1), (base - 1));
+                if (value >= LIMIT)
+                    break;
+                strongrepunits.add(to_int64(value));
+            }
+
+        print(sum(strongrepunits));
+    }
+} code_block_1;
+
+
+# 347
+import eulerlib, math
+Int64 = int
+
+LIMIT = 10000000
+
+possible = set() # Int64
+primes = eulerlib.list_primes(LIMIT // 2)
+end = int(math.sqrt(LIMIT))
+for i in range(len(primes)):
+    p = primes[i]
+    if p > end:
+        break
+    for j in range(i + 1, len(primes)):
+        q = primes[j]
+        lcm = p * q
+        if lcm > LIMIT:
+            break
+        multlimit = LIMIT // lcm
+
+        multiplier = 1
+        while multiplier * p <= multlimit:
+            multiplier *= p
+        maxmult = multiplier
+        while multiplier % p == 0:
+            multiplier //= p
+            while multiplier * q <= multlimit:
+                multiplier *= q
+            maxmult = max(multiplier, maxmult)
+        possible.add(maxmult * lcm)
+
+print(sum(possible))
+===
+V LIMIT = 10000000
+
+V possible = Set[Int64]()
+V primes = eulerlib:list_primes(LIMIT I/ 2)
+V end = Int(sqrt(LIMIT))
+L(i) 0 .< primes.len
+   V p = primes[i]
+   I p > end
+      L.break
+   L(j) i + 1 .< primes.len
+      V q = primes[j]
+      V lcm = p * q
+      I lcm > LIMIT
+         L.break
+      V multlimit = LIMIT I/ lcm
+
+      V multiplier = 1
+      L multiplier * p <= multlimit
+         multiplier *= p
+      V maxmult = multiplier
+      L multiplier % p == 0
+         multiplier I/= p
+         L multiplier * q <= multlimit
+            multiplier *= q
+         maxmult = max(multiplier, maxmult)
+      possible.add(maxmult * lcm)
+
+print(sum(possible))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto LIMIT = 10000000;
+
+auto possible = Set<Int64>();
+auto primes = eulerlib::list_primes(idiv(LIMIT, 2));
+auto end = to_int(sqrt(LIMIT));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(0, primes.len())) {
+            auto p = primes[i];
+            if (p > end)
+                break;
+            for (auto j : range_el(i + 1, primes.len())) {
+                auto q = primes[j];
+                auto lcm = p * q;
+                if (lcm > LIMIT)
+                    break;
+                auto multlimit = idiv(LIMIT, lcm);
+
+                auto multiplier = 1;
+                while (multiplier * p <= multlimit)
+                    multiplier *= p;
+                auto maxmult = multiplier;
+                while (mod(multiplier, p) == 0) {
+                    multiplier = idiv(multiplier, p);
+                    while (multiplier * q <= multlimit)
+                        multiplier *= q;
+                    maxmult = max(multiplier, maxmult);
+                }
+                possible.add(maxmult * lcm);
+            }
+        }
+
+        print(sum(possible));
+    }
+} code_block_1;
+
+
+# 348
+# [-Slow 11l-]
+import math, itertools
+from typing import Dict
+
+TARGET_WAYS = 4
+TARGET_COUNT = 5
+
+def is_palindrome(x):
+    s = str(x)
+    return s == s[ : : -1]
+
+# Examines all integers in the range [0, limit), and returns the sum of the lowest
+# TARGET_COUNT integers each with the property that it is a palidrome in base 10
+# and it can be expressed in exactly TARGET_COUNT ways as a sum of a perfect square
+# greater than 1 and a perfect cube greater than 1. If fewer than TARGET_COUNT integers
+# in [0, limit) have the desired property, then None is returned. Note that if
+# trySearch(n) == k != 0, then for every m > n, trySearch(m) == k also holds.
+def try_search(limit):
+    # If i can be expressed as the sum of a square greater than 1 and
+    # a cube greater than 1, then ways[i] is the number of different ways
+    # it can be done. Otherwise, i is not a key in the ways dictionary.
+    ways : Dict[int, int] = {}
+
+    for i in itertools.count(2):
+        cube = i*i*i
+        if cube >= limit:
+            break
+        for j in range(2, int(math.sqrt(limit - 1 - cube)) + 1):
+            index = cube + j**2
+            ways[index] = ways.get(index, 0) + 1
+
+    result = 0
+    count = 0
+    for i in sorted(ways.keys()):
+        if ways[i] == TARGET_WAYS and is_palindrome(i):
+            result += i
+            count += 1
+            if count == TARGET_COUNT:
+                return result
+    return 0
+
+for i in itertools.count(0):
+    limit = 10**i
+    ans = try_search(limit)
+    if ans != 0:
+        print(ans)
+        break
+===
+V TARGET_WAYS = 4
+V TARGET_COUNT = 5
+
+F is_palindrome(x)
+   V s = String(x)
+   R s == reversed(s)
+
+F try_search(limit)
+   [Int = Int] ways
+
+   L(i) 2..
+      V cube = i * i * i
+      I cube >= limit
+         L.break
+      L(j) 2 .. Int(sqrt(limit - 1 - cube))
+         V index = cube + j ^ 2
+         ways[index] = ways.get(index, 0) + 1
+
+   V result = 0
+   V count = 0
+   L(i) sorted(ways.keys())
+      I ways[i] == :TARGET_WAYS & is_palindrome(i)
+         result += i
+         count++
+         I count == :TARGET_COUNT
+            R result
+   R 0
+
+L(i) 0..
+   V limit = 10 ^ i
+   V ans = try_search(limit)
+   I ans != 0
+      print(ans)
+      L.break
+===
+auto TARGET_WAYS = 4;
+auto TARGET_COUNT = 5;
+
+template <typename T1> auto is_palindrome(const T1 &x)
+{
+    auto s = String(x);
+    return s == reversed(s);
+}
+
+template <typename T1> auto try_search(const T1 &limit)
+{
+    Dict<int, int> ways;
+
+    for (auto i : range_ei(2)) {
+        auto cube = i * i * i;
+        if (cube >= limit)
+            break;
+        for (auto j : range_ee(2, to_int(sqrt(limit - 1 - cube)))) {
+            auto index = cube + square(j);
+            ways.set(index, ways.get(index, 0) + 1);
+        }
+    }
+
+    auto result = 0;
+    auto count = 0;
+    for (auto &&i : sorted(ways.keys()))
+        if (ways[i] == ::TARGET_WAYS && is_palindrome(i)) {
+            result += i;
+            count++;
+            if (count == ::TARGET_COUNT)
+                return result;
+        }
+    return 0;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ei(0)) {
+            auto limit = pow(10, i);
+            auto ans = try_search(limit);
+            if (ans != 0) {
+                print(ans);
+                break;
+            }
+        }
+    }
+} code_block_1;

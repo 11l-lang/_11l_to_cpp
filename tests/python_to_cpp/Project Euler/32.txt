@@ -1,0 +1,205 @@
+# 323
+import eulerlib
+
+SIZE = 32
+
+# Calculate the answer
+expect = [0.0]
+for n in range(1, SIZE + 1):
+    temp = sum(float(eulerlib.binomial(n, k)) * expect[k] for k in range(n))
+    expect.append((2.0**n + temp) / (2.0**n - 1))
+ans = expect[-1]
+
+print(f"{ans:.10f}")
+===
+V SIZE = 32
+
+V expect = [0.0]
+L(n) 1 .. SIZE
+   V temp = sum((0 .< n).map(k -> Float(eulerlib:binomial(@n, k)) * :expect[k]))
+   expect.append((2.0 ^ n + temp) / (2.0 ^ n - 1))
+V ans = expect.last
+
+print(f:‘{ans:.10}’)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto _SIZE_ = 32;
+
+auto expect = create_array({0.0});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(1, _SIZE_)) {
+            auto temp = sum_map(range_el(0, n), [&n](const auto &k){return to_float(eulerlib::binomial(n, k)) * ::expect[k];});
+            expect.append((pow(2.0, n) + temp) / (pow(2.0, n) - 1));
+        }
+    }
+} code_block_1;
+
+auto ans = expect.last();
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"#.10"_S.format(ans));
+    }
+} code_block_2;
+
+
+# 329
+import eulerlib, math
+Byte = int
+Int64 = int
+
+START_NUM = 1
+END_NUM = 500
+CROAK_SEQ = "PPPPNNPPPNPPNPN"
+assert 0 <= START_NUM < END_NUM
+assert 1 <= len(CROAK_SEQ)
+
+NUM_JUMPS = len(CROAK_SEQ) - 1
+NUM_TRIALS = 2**NUM_JUMPS
+
+globalnumerator = 0
+isprime = eulerlib.list_primality(END_NUM)
+
+# For each starting square
+for i in range(START_NUM, END_NUM + 1):
+    # For each sequence of jumps
+    for j in range(NUM_TRIALS):
+
+        # Set initial position and croak
+        pos = i
+        trialnumerator = 1
+        if isprime[pos] == Byte(CROAK_SEQ[0] == 'P'):
+            trialnumerator *= 2
+
+        # Simulate each jump and croak
+        for k in range(NUM_JUMPS):
+            if pos <= START_NUM:
+                pos += 1  # Forced move
+            elif pos >= END_NUM:
+                pos -= 1  # Forced move
+            elif (j >> k) & 1 == 0:
+                pos += 1  # Chosen move
+            else:
+                pos -= 1  # Chosen move
+
+            # Multiply the running probability by 2/3 if primeness of current position
+            # matches croak sequence at current index, otherwise multiply by 1/3
+            if isprime[pos] == Byte(CROAK_SEQ[k + 1] == 'P'):
+                trialnumerator *= 2
+        globalnumerator += trialnumerator
+
+# Calculate final probability fraction
+globaldenominator = Int64(END_NUM + 1 - START_NUM) * 2**NUM_JUMPS * 3**len(CROAK_SEQ)
+d = math.gcd(Int64(globalnumerator), globaldenominator)
+print(f'{globalnumerator//d}/{globaldenominator//d}')
+===
+V START_NUM = 1
+V END_NUM = 500
+V CROAK_SEQ = ‘PPPPNNPPPNPPNPN’
+assert(START_NUM C 0 .< END_NUM)
+assert(1 <= CROAK_SEQ.len)
+
+V NUM_JUMPS = CROAK_SEQ.len - 1
+V NUM_TRIALS = 2 ^ NUM_JUMPS
+
+V globalnumerator = 0
+V isprime = eulerlib:list_primality(END_NUM)
+
+L(i) START_NUM .. END_NUM
+   L(j) 0 .< NUM_TRIALS
+
+      V pos = i
+      V trialnumerator = 1
+      I isprime[pos] == Byte(CROAK_SEQ[0] == ‘P’)
+         trialnumerator *= 2
+
+      L(k) 0 .< NUM_JUMPS
+         I pos <= START_NUM
+            pos++
+         E I pos >= END_NUM
+            pos--
+         E I (j >> k) [&] 1 == 0
+            pos++
+         E
+            pos--
+
+         I isprime[pos] == Byte(CROAK_SEQ[k + 1] == ‘P’)
+            trialnumerator *= 2
+      globalnumerator += trialnumerator
+
+V globaldenominator = Int64(END_NUM + 1 - START_NUM) * 2 ^ NUM_JUMPS * 3 ^ CROAK_SEQ.len
+V d = gcd(Int64(globalnumerator), globaldenominator)
+print((globalnumerator I/ d)‘/’(globaldenominator I/ d))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto START_NUM = 1;
+auto END_NUM = 500;
+auto CROAK_SEQ = u"PPPPNNPPPNPPNPN"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        assert(in(START_NUM, range_el(0, END_NUM)));
+        assert(1 <= CROAK_SEQ.len());
+    }
+} code_block_1;
+
+auto NUM_JUMPS = CROAK_SEQ.len() - 1;
+auto NUM_TRIALS = pow(2, NUM_JUMPS);
+
+auto globalnumerator = 0;
+auto isprime = eulerlib::list_primality(END_NUM);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto i : range_ee(START_NUM, END_NUM))
+            for (auto j : range_el(0, NUM_TRIALS)) {
+
+                auto pos = i;
+                auto trialnumerator = 1;
+                if (isprime[pos] == Byte(_get<0>(CROAK_SEQ) == u'P'))
+                    trialnumerator *= 2;
+
+                for (auto k : range_el(0, NUM_JUMPS)) {
+                    if (pos <= START_NUM)
+                        pos++;
+                    else if (pos >= END_NUM)
+                        pos--;
+                    else if (((j >> k) & 1) == 0)
+                        pos++;
+                    else
+                        pos--;
+
+                    if (isprime[pos] == Byte(CROAK_SEQ[k + 1] == u'P'))
+                        trialnumerator *= 2;
+                }
+                globalnumerator += trialnumerator;
+            }
+    }
+} code_block_2;
+
+auto globaldenominator = to_int64(END_NUM + 1 - START_NUM) * pow(2, NUM_JUMPS) * pow(3, CROAK_SEQ.len());
+auto d = gcd(to_int64(globalnumerator), globaldenominator);
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print((idiv(globalnumerator, d)) & u"/"_S & (idiv(globaldenominator, d)));
+    }
+} code_block_3;
