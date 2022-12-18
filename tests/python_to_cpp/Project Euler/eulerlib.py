@@ -35,7 +35,7 @@ def is_square(x):
 	return y * y == x
 
 # Tests whether the given integer is a prime number.
-def is_prime(x : int):
+def is_prime(x):
 	if x <= 1:
 		return False
 	elif x <= 3:
@@ -64,6 +64,24 @@ def list_primality(n):
 # For example: listPrimes(97) = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, ..., 83, 89, 97].
 def list_primes(n):
 	return [i for i, isprime in enumerate(list_primality(n)) if isprime]
+
+# Returns a list of prime numbers in ascending order from 2 to limit (inclusive).
+def primes_up_to_limit(limit: int):
+	r : List[int] = []
+	if limit >= 2:
+		r.append(2)
+
+	# Sieve of Eratosthenes, storing only odd numbers starting at 3
+	isprime = [True] * ((limit - 1) // 2)
+	sieveend = int(math.sqrt(limit))
+	for i in range(len(isprime)):
+		if isprime[i]:
+			p: int = i * 2 + 3
+			r.append(p)
+			if i <= sieveend:
+				for j in range((p * p - 3) >> 1, len(isprime), p):
+					isprime[j] = False
+	return r
 
 def list_smallest_prime_factors(n: int):
 	result = [0] * (n + 1)

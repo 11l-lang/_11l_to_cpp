@@ -19,7 +19,7 @@ F is_square(x)
    V y = Int(sqrt(x))
    R y * y == x
 
-F is_prime(Int x)
+F is_prime(x)
    I x <= 1
       R 0B
    E I x <= 3
@@ -43,6 +43,22 @@ F list_primality(n)
 
 F list_primes(n)
    R enumerate(list_primality(n)).filter((i, isprime) -> isprime).map((i, isprime) -> i)
+
+F primes_up_to_limit(Int limit)
+   [Int] r
+   I limit >= 2
+      r.append(2)
+
+   V isprime = [1B] * ((limit - 1) I/ 2)
+   V sieveend = Int(sqrt(limit))
+   L(i) 0 .< isprime.len
+      I isprime[i]
+         Int p = i * 2 + 3
+         r.append(p)
+         I i <= sieveend
+            L(j) ((p * p - 3) >> 1 .< isprime.len).step(p)
+               isprime[j] = 0B
+   R r
 
 F list_smallest_prime_factors(Int n)
    V result = [0] * (n + 1)

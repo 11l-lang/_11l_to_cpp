@@ -1,0 +1,45 @@
+# 357
+import eulerlib, math
+Int64 = int
+
+LIMIT = 10**8
+
+isprime = eulerlib.list_primality(LIMIT + 1)
+
+def is_prime_generating(n):
+    return all(
+        (n % d != 0 or isprime[d + n // d])
+        for d in range(2, int(math.sqrt(n)) + 1))
+
+print(sum(Int64(n) for n in range(LIMIT + 1)
+    if isprime[n + 1] and is_prime_generating(n)))
+===
+V LIMIT = 10 ^ 8
+
+V isprime = eulerlib:list_primality(LIMIT + 1)
+
+F is_prime_generating(n)
+   R all((2 .. Int(sqrt(n))).map(d -> (@n % d != 0 | :isprime[d + @n I/ d])))
+
+print(sum((0 .. LIMIT).filter(n -> :isprime[n + 1] & is_prime_generating(n)).map(n -> Int64(n))))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto LIMIT = pow(10, 8);
+
+auto isprime = eulerlib::list_primality(LIMIT + 1);
+
+template <typename T1> auto is_prime_generating(const T1 &n)
+{
+    return all_map(range_ee(2, to_int(sqrt(n))), [&n](const auto &d){return (mod(n, d) != 0 || ::isprime[d + idiv(n, d)]);});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum_map(range_ee(0, LIMIT).filter([](const auto &n){return ::isprime[n + 1] && is_prime_generating(n);}), [](const auto &n){return to_int64(n);}));
+    }
+} code_block_1;

@@ -26,7 +26,7 @@ template <typename T1> auto is_square(const T1 &x)
     return y * y == x;
 }
 
-auto is_prime(const int x)
+template <typename T1> auto is_prime(const T1 &x)
 {
     if (x <= 1)
         return false;
@@ -56,6 +56,25 @@ template <typename T1> auto list_primality(const T1 &n)
 template <typename T1> auto list_primes(const T1 &n)
 {
     return enumerate(list_primality(n)).filter([](const auto &i, const auto &isprime){return isprime;}).map([](const auto &i, const auto &isprime){return i;});
+}
+
+auto primes_up_to_limit(const int limit)
+{
+    Array<int> r;
+    if (limit >= 2)
+        r.append(2);
+
+    auto isprime = create_array({true}) * (idiv((limit - 1), 2));
+    auto sieveend = to_int(sqrt(limit));
+    for (auto i : range_el(0, isprime.len()))
+        if (isprime[i]) {
+            int p = i * 2 + 3;
+            r.append(p);
+            if (i <= sieveend)
+                for (auto j : range_el((p * p - 3) >> 1, isprime.len()).step(p))
+                    isprime.set(j, false);
+        }
+    return r;
 }
 
 auto list_smallest_prime_factors(const int n)

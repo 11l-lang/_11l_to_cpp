@@ -48,5 +48,6 @@ open('results.txt', 'w', newline = "\n").write("\n".join(f'{problem_id}: {speed_
 
 os.remove('problem.py')
 os.remove('problem.11l')
+os.remove('problem.cpp')
 os.remove('problem.obj')
 os.remove('problem.exe')

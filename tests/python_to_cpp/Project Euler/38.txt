@@ -1,0 +1,116 @@
+# 381
+import eulerlib
+Int64 = int
+
+def s(p):
+    return Int64(p - 3) * eulerlib.reciprocal_mod(8 % p, p) % p
+
+print(sum(s(p) for p in eulerlib.primes_up_to_limit(10**8) if p >= 5))
+===
+F s(p)
+   R Int64(p - 3) * eulerlib:reciprocal_mod(8 % p, p) % p
+
+print(sum(eulerlib:primes_up_to_limit(10 ^ 8).filter(p -> p >= 5).map(p -> s(p))))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1> auto s(const T1 &p)
+{
+    return mod(to_int64(p - 3) * eulerlib::reciprocal_mod(mod(8, p), p), p);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(sum_map(eulerlib::primes_up_to_limit(pow(10, 8)).filter([](const auto &p){return p >= 5;}), [](const auto &p){return s(p);}));
+    }
+} code_block_1;
+
+
+# 387
+import eulerlib
+Int64 = int
+
+#def is_prime64(x : Int64):
+
+LIMIT = Int64(10)**14
+
+ans : Int64 = 0
+
+# Note: n must be a right-truncatable Harshad number, and the other arguments are properties of the number n.
+def find_harshad_primes(n : Int64, digitsum, isstrong) -> None:
+    # Shift left by 1 digit, and try all 10 possibilities for the rightmost digit
+    m = n * 10
+    s = digitsum
+    for i in range(10):
+        if m >= LIMIT:
+            break
+        if isstrong and eulerlib.is_prime(m):
+            global ans
+            ans += m
+        if m % s == 0:
+            find_harshad_primes(m, s, eulerlib.is_prime(m // s))
+        m += 1
+        s += 1
+
+for i in range(1, 10):  # All one-digit numbers are trivially Harshad numbers
+    find_harshad_primes(i, i, False)
+print(ans)
+===
+V LIMIT = Int64(10) ^ 14
+
+Int64 ans = 0
+
+F find_harshad_primes(Int64 n; digitsum, isstrong) -> N
+   V m = n * 10
+   V s = digitsum
+   L(i) 10
+      I m >= :LIMIT
+         L.break
+      I isstrong & eulerlib:is_prime(m)
+         :ans += m
+      I m % s == 0
+         find_harshad_primes(m, s, eulerlib:is_prime(m I/ s))
+      m++
+      s++
+
+L(i) 1..9
+   find_harshad_primes(i, i, 0B)
+print(ans)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto LIMIT = pow(to_int64(10), 14);
+
+Int64 ans = 0;
+
+template <typename T2, typename T3> void find_harshad_primes(const Int64 &n, const T2 &digitsum, const T3 &isstrong)
+{
+    auto m = n * 10;
+    auto s = digitsum;
+    for (int i = 0; i < 10; i++) {
+        if (m >= ::LIMIT)
+            break;
+        if (isstrong && eulerlib::is_prime(m))
+            ::ans += m;
+        if (mod(m, s) == 0)
+            find_harshad_primes(m, s, eulerlib::is_prime(idiv(m, s)));
+        m++;
+        s++;
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(1, 9))
+            find_harshad_primes(i, i, false);
+        print(ans);
+    }
+} code_block_1;

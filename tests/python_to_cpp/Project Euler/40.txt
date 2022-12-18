@@ -1,0 +1,116 @@
+---
+# 401 [too slow BigInt]
+
+
+# 407 [based on Java solution]
+import eulerlib
+from typing import List
+Int64 = int
+
+LIMIT = 10**7
+
+smallestprimefactor = eulerlib.list_smallest_prime_factors(LIMIT)
+
+ans : Int64 = 0
+for i in range(1, LIMIT + 1):
+    # Compute factorization as coprime prime powers. e.g. 360 = {2^3, 3^2, 5^1}
+    factorization : List[int] = []
+    j = i
+    while j != 1:
+        p = smallestprimefactor[j]
+        q = 1
+        while True:
+            j //= p
+            q *= p
+            if j % p != 0:
+                break
+        factorization.append(q)
+
+    solns = [0]
+    modulus = 1
+    for q in factorization:
+        # Use Chinese remainder theorem; cache parts of it
+        recip = eulerlib.reciprocal_mod(q % modulus, modulus)
+        newmod = q * modulus
+        solns = [((0 + int(Int64(x - 0 + modulus) * recip % modulus) * q) % newmod) for x in solns] + \
+                [((1 + int(Int64(x - 1 + modulus) * recip % modulus) * q) % newmod) for x in solns]
+        modulus = newmod
+
+    ans += max(solns)
+
+print(ans)
+===
+V LIMIT = 10 ^ 7
+
+V smallestprimefactor = eulerlib:list_smallest_prime_factors(LIMIT)
+
+Int64 ans = 0
+L(i) 1 .. LIMIT
+   [Int] factorization
+   V j = i
+   L j != 1
+      V p = smallestprimefactor[j]
+      V q = 1
+      L
+         j I/= p
+         q *= p
+         I j % p != 0
+            L.break
+      factorization.append(q)
+
+   V solns = [0]
+   V modulus = 1
+   L(q) factorization
+      V recip = eulerlib:reciprocal_mod(q % modulus, modulus)
+      V newmod = q * modulus
+      solns = solns.map(x -> ((0 + Int(Int64(x - 0 + @modulus) * @recip % @modulus) * @q) % @newmod)) [+] solns.map(x -> ((1 + Int(Int64(x - 1 + @modulus) * @recip % @modulus) * @q) % @newmod))
+      modulus = newmod
+
+   ans += max(solns)
+
+print(ans)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto LIMIT = pow(10, 7);
+
+auto smallestprimefactor = eulerlib::list_smallest_prime_factors(LIMIT);
+
+Int64 ans = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ee(1, LIMIT)) {
+            Array<int> factorization;
+            auto j = i;
+            while (j != 1) {
+                auto p = smallestprimefactor[j];
+                auto q = 1;
+                while (true) {
+                    j = idiv(j, p);
+                    q *= p;
+                    if (mod(j, p) != 0)
+                        break;
+                }
+                factorization.append(q);
+            }
+
+            auto solns = create_array({0});
+            auto modulus = 1;
+            for (auto &&q : factorization) {
+                auto recip = eulerlib::reciprocal_mod(mod(q, modulus), modulus);
+                auto newmod = q * modulus;
+                solns = solns.map([&modulus, &newmod, &q, &recip](const auto &x){return (mod((0 + to_int(mod(to_int64(x - 0 + modulus) * recip, modulus)) * q), newmod));}) + solns.map([&modulus, &newmod, &q, &recip](const auto &x){return (mod((1 + to_int(mod(to_int64(x - 1 + modulus) * recip, modulus)) * q), newmod));});
+                modulus = newmod;
+            }
+
+            ans += max(solns);
+        }
+
+        print(ans);
+    }
+} code_block_1;
