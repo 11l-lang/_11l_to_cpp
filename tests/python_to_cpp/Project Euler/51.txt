@@ -1,0 +1,107 @@
+# 518 [Int64 from Java solution]
+import eulerlib, math, itertools
+Int64 = int
+
+LIMIT = 10**8
+
+ans : Int64 = 0
+isprime = eulerlib.list_primality(LIMIT - 1)
+
+# Search all possible x's. We know that c = x * z * z - 1. With the requirement c < LIMIT, we have x * z * z <= LIMIT.
+# Because z > y > 0, we know z >= 2. So at the very least we require x * 4 <= LIMIT. This implies x <= floor(LIMIT/4).
+for x in range(1, LIMIT // 4 + 1):
+
+    # Search all possible y's. Notice that when y increases, 'a' strictly increases.
+    # So when some y generates an 'a' such that a >= LIMIT, no candidates are possible with higher values of y.
+    for y in itertools.count(1):
+        a = Int64(x) * y * y - 1
+        if a >= LIMIT:
+            break
+        if not isprime[int(a)]:
+            continue
+
+        # Search all valid z's. We require z > y and gcd(y, z) = 1. Notice that when z increases, c strictly increases.
+        # So when some z generates a c such that c >= LIMIT, no candidates are possible with higher values of z.
+        for z in itertools.count(y + 1):
+            if math.gcd(y, z) != 1:
+                continue
+            c = Int64(x) * z * z - 1
+            if c >= LIMIT:
+                break
+
+            # Check whether (a, b, c) is a solution
+            if isprime[int(c)]:
+                b = x * y * z - 1
+                if isprime[b]:
+                    ans += a + b + c
+
+print(ans)
+===
+V LIMIT = 10 ^ 8
+
+Int64 ans = 0
+V isprime = eulerlib:list_primality(LIMIT - 1)
+
+L(x) 1 .. LIMIT I/ 4
+
+   L(y) 1..
+      V a = Int64(x) * y * y - 1
+      I a >= LIMIT
+         L.break
+      I !isprime[Int(a)]
+         L.continue
+
+      L(z) y + 1..
+         I gcd(y, z) != 1
+            L.continue
+         V c = Int64(x) * z * z - 1
+         I c >= LIMIT
+            L.break
+
+         I isprime[Int(c)]
+            V b = x * y * z - 1
+            I isprime[b]
+               ans += a + b + c
+
+print(ans)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto LIMIT = pow(10, 8);
+
+Int64 ans = 0;
+auto isprime = eulerlib::list_primality(LIMIT - 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto x : range_ee(1, idiv(LIMIT, 4)))
+
+            for (auto y : range_ei(1)) {
+                auto a = to_int64(x) * y * y - 1;
+                if (a >= LIMIT)
+                    break;
+                if (!isprime[to_int(a)])
+                    continue;
+
+                for (auto z : range_ei(y + 1)) {
+                    if (gcd(y, z) != 1)
+                        continue;
+                    auto c = to_int64(x) * z * z - 1;
+                    if (c >= LIMIT)
+                        break;
+
+                    if (isprime[to_int(c)]) {
+                        auto b = x * y * z - 1;
+                        if (isprime[b])
+                            ans += a + b + c;
+                    }
+                }
+            }
+
+        print(ans);
+    }
+} code_block_1;

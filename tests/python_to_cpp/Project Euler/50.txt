@@ -1,0 +1,89 @@
+# 500 [Int64 from Java solution]
+import eulerlib, heapq
+Int64 = int
+
+TARGET = 500500
+MODULUS = 500500507
+isprime = eulerlib.list_primality(7376507)  # 500500th (1-based) prime number
+
+queue : List[Int64] = []
+nextprime = 2
+heapq.heappush(queue, Int64(nextprime))
+
+ans = 1
+for _ in range(TARGET):
+    item = heapq.heappop(queue)
+    ans = int((ans * item) % MODULUS)
+    heapq.heappush(queue, item**2)
+
+    if item == nextprime:
+        nextprime += 1
+        while not isprime[nextprime]:
+            nextprime += 1
+        heapq.heappush(queue, Int64(nextprime))
+
+print(ans)
+===
+V TARGET = 500500
+V MODULUS = 500500507
+V isprime = eulerlib:list_primality(7376507)
+
+[Int64] queue
+V nextprime = 2
+minheap:push(&queue, Int64(nextprime))
+
+V ans = 1
+L(_) 0 .< TARGET
+   V item = minheap:pop(&queue)
+   ans = Int((ans * item) % MODULUS)
+   minheap:push(&queue, item ^ 2)
+
+   I item == nextprime
+      nextprime++
+      L !isprime[nextprime]
+         nextprime++
+      minheap:push(&queue, Int64(nextprime))
+
+print(ans)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto TARGET = 500500;
+auto MODULUS = 500500507;
+auto isprime = eulerlib::list_primality(7376507);
+
+Array<Int64> queue;
+auto nextprime = 2;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        minheap::push(queue, to_int64(nextprime));
+    }
+} code_block_1;
+
+auto ans = 1;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto _ : range_el(0, TARGET)) {
+            auto item = minheap::pop(queue);
+            ans = to_int(mod((ans * item), MODULUS));
+            minheap::push(queue, square(item));
+
+            if (item == nextprime) {
+                nextprime++;
+                while (!isprime[nextprime])
+                    nextprime++;
+                minheap::push(queue, to_int64(nextprime));
+            }
+        }
+
+        print(ans);
+    }
+} code_block_2;

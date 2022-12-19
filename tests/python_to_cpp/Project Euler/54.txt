@@ -1,0 +1,84 @@
+# 549 [Int64 from Java solution]
+import itertools
+Int64 = int
+
+LIMIT = 10**8
+
+# Modification of the sieve of Eratosthenes
+smallestdivisiblefactorials = [0] * (LIMIT + 1)
+for i in range(2, len(smallestdivisiblefactorials)):
+    if smallestdivisiblefactorials[i] == 0:
+        # Now we know that i is prime
+
+        power : Int64 = 1
+        for j in itertools.count(i, i):
+            # We know j contains at least one factor of i
+            power *= i
+            if power > LIMIT:
+                break
+
+            # Update answer for all multiples of 'power'
+            for k in range(int(power), len(smallestdivisiblefactorials), int(power)):
+                smallestdivisiblefactorials[k] = max(j, smallestdivisiblefactorials[k])
+
+            # Update power to include the remaining factors of i in j
+            temp = j // i
+            while temp % i == 0:
+                power *= i
+                temp //= i
+
+print(sum(Int64(i) for i in smallestdivisiblefactorials))
+===
+V LIMIT = 10 ^ 8
+
+V smallestdivisiblefactorials = [0] * (LIMIT + 1)
+L(i) 2 .< smallestdivisiblefactorials.len
+   I smallestdivisiblefactorials[i] == 0
+
+      Int64 power = 1
+      L(j) (i..).step(i)
+         power *= i
+         I power > LIMIT
+            L.break
+
+         L(k) (Int(power) .< smallestdivisiblefactorials.len).step(Int(power))
+            smallestdivisiblefactorials[k] = max(j, smallestdivisiblefactorials[k])
+
+         V temp = j I/ i
+         L temp % i == 0
+            power *= i
+            temp I/= i
+
+print(sum(smallestdivisiblefactorials.map(i -> Int64(i))))
+===
+auto LIMIT = pow(10, 8);
+
+auto smallestdivisiblefactorials = create_array({0}) * (LIMIT + 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(2, smallestdivisiblefactorials.len()))
+            if (smallestdivisiblefactorials[i] == 0) {
+
+                Int64 power = 1;
+                for (auto j : range_ei(i).step(i)) {
+                    power *= i;
+                    if (power > LIMIT)
+                        break;
+
+                    for (auto k : range_el(to_int(power), smallestdivisiblefactorials.len()).step(to_int(power)))
+                        smallestdivisiblefactorials.set(k, max(j, smallestdivisiblefactorials[k]));
+
+                    auto temp = idiv(j, i);
+                    while (mod(temp, i) == 0) {
+                        power *= i;
+                        temp = idiv(temp, i);
+                    }
+                }
+            }
+
+        print(sum_map(smallestdivisiblefactorials, [](const auto &i){return to_int64(i);}));
+    }
+} code_block_1;

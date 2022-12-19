@@ -1,0 +1,62 @@
+# 587
+import itertools, math
+
+# The indefinite integral of (1 - sqrt(2x - x^2)) dx.
+def integral(x):
+    t = x - 1.0
+    return t - (math.sqrt(x * (2.0 - x)) * t + math.asin(t)) / 2.0
+
+lsectionarea = 1.0 - math.pi / 4.0
+for i in itertools.count(1):
+    slope = 1.0 / i
+    a = slope**2 + 1.0
+    b = -2.0 * (slope + 1.0)
+    c = 1.0
+    x = (2.0 * c) / (-b + math.sqrt(b * b - 4 * a * c))
+    concavetrianglearea = (x**2 * slope / 2) + (integral(1.0) - integral(x))
+    if concavetrianglearea / lsectionarea < 0.001:
+        print(i)
+        break
+===
+F integral(x)
+   V t = x - 1.0
+   R t - (sqrt(x * (2.0 - x)) * t + asin(t)) / 2.0
+
+V lsectionarea = 1.0 - math:pi / 4.0
+L(i) 1..
+   V slope = 1.0 / i
+   V a = slope ^ 2 + 1.0
+   V b = -2.0 * (slope + 1.0)
+   V c = 1.0
+   V x = (2.0 * c) / (-b + sqrt(b * b - 4 * a * c))
+   V concavetrianglearea = (x ^ 2 * slope / 2) + (integral(1.0) - integral(x))
+   I concavetrianglearea / lsectionarea < 0.001
+      print(i)
+      L.break
+===
+template <typename T1> auto integral(const T1 &x)
+{
+    auto t = x - 1.0;
+    return t - (sqrt(x * (2.0 - x)) * t + asin(t)) / 2.0;
+}
+
+auto lsectionarea = 1.0 - math::pi / 4.0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_ei(1)) {
+            auto slope = 1.0 / i;
+            auto a = square(slope) + 1.0;
+            auto b = -2.0 * (slope + 1.0);
+            auto c = 1.0;
+            auto x = (2.0 * c) / (-b + sqrt(b * b - 4 * a * c));
+            auto concavetrianglearea = (square(x) * slope / 2.0) + (integral(1.0) - integral(x));
+            if (concavetrianglearea / lsectionarea < 0.001) {
+                print(i);
+                break;
+            }
+        }
+    }
+} code_block_1;
