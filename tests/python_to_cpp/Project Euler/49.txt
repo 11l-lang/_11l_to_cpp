@@ -1,0 +1,151 @@
+# 493
+import eulerlib, math
+Int64 = int
+
+NUM_COLORS = 7
+BALLS_PER_COLOR = 10
+NUM_PICKED = 20
+
+numerator : Int64 = 0
+
+def divide_exactly(x, y):
+    if x % y != 0:
+        raise ValueError("Not divisible")
+    return x // y
+
+def explore(remain, limit, history : list) -> None:
+    if remain == 0:
+        hist = list(history)
+        while len(hist) < NUM_COLORS:
+            hist.append(0)
+
+        histogram = [0] * (BALLS_PER_COLOR + 1)
+        for x in hist:
+            histogram[x] += 1
+
+        count : Int64 = math.factorial(NUM_COLORS)
+        for x in histogram:
+            count = divide_exactly(count, math.factorial(x))
+
+        for x in hist:
+            count *= Int64(eulerlib.binomial(BALLS_PER_COLOR, x))
+
+        distinctcolors = len(history)
+        global numerator
+        numerator += count * distinctcolors
+
+    elif len(history) < NUM_COLORS:
+        for i in range(min(limit, remain), 0, -1):
+            history.append(i)
+            explore(remain - i, i, history)
+            history.pop()
+
+explore(NUM_PICKED, BALLS_PER_COLOR, [0] * 0)
+denominator = Int64(eulerlib.binomial(NUM_COLORS * BALLS_PER_COLOR, NUM_PICKED))
+print('%.9f' % (float(numerator) / denominator))
+===
+V NUM_COLORS = 7
+V BALLS_PER_COLOR = 10
+V NUM_PICKED = 20
+
+Int64 numerator = 0
+
+F divide_exactly(x, y)
+   I x % y != 0
+      X ValueError(‘Not divisible’)
+   R x I/ y
+
+F explore(remain, limit, &history) -> N
+   I remain == 0
+      V hist = Array(history)
+      L hist.len < :NUM_COLORS
+         hist.append(0)
+
+      V histogram = [0] * (:BALLS_PER_COLOR + 1)
+      L(x) hist
+         histogram[x]++
+
+      Int64 count = factorial(:NUM_COLORS)
+      L(x) histogram
+         count = divide_exactly(count, factorial(x))
+
+      L(x) hist
+         count *= Int64(eulerlib:binomial(:BALLS_PER_COLOR, x))
+
+      V distinctcolors = history.len
+      :numerator += count * distinctcolors
+
+   E I history.len < :NUM_COLORS
+      L(i) (min(limit, remain) .< 0).step(-1)
+         history.append(i)
+         explore(remain - i, i, &history)
+         history.pop()
+
+explore(NUM_PICKED, BALLS_PER_COLOR, &[Int]())
+V denominator = Int64(eulerlib:binomial(NUM_COLORS * BALLS_PER_COLOR, NUM_PICKED))
+print(‘#.9’.format(Float(numerator) / denominator))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto NUM_COLORS = 7;
+auto BALLS_PER_COLOR = 10;
+auto NUM_PICKED = 20;
+
+Int64 numerator = 0;
+
+template <typename T1, typename T2> auto divide_exactly(const T1 &x, const T2 &y)
+{
+    if (mod(x, y) != 0)
+        throw ValueError(u"Not divisible"_S);
+    return idiv(x, y);
+}
+
+template <typename T1, typename T2, typename T3> void explore(const T1 &remain, const T2 &limit, T3 &history)
+{
+    if (remain == 0) {
+        auto hist = create_array(history);
+        while (hist.len() < ::NUM_COLORS)
+            hist.append(0);
+
+        auto histogram = create_array({0}) * (::BALLS_PER_COLOR + 1);
+        for (auto &&x : hist)
+            histogram[x]++;
+
+        Int64 count = factorial(::NUM_COLORS);
+        for (auto &&x : histogram)
+            count = divide_exactly(count, factorial(x));
+
+        for (auto &&x : hist)
+            count *= to_int64(eulerlib::binomial(::BALLS_PER_COLOR, x));
+
+        auto distinctcolors = history.len();
+        ::numerator += count * distinctcolors;
+    }
+
+    else if (history.len() < ::NUM_COLORS)
+        for (auto i : range_el(min(limit, remain), 0).step(-1)) {
+            history.append(i);
+            explore(remain - i, i, history);
+            history.pop();
+        }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        explore(NUM_PICKED, BALLS_PER_COLOR, make_ref(Array<int>()));
+    }
+} code_block_1;
+
+auto denominator = to_int64(eulerlib::binomial(NUM_COLORS * BALLS_PER_COLOR, NUM_PICKED));
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"#.9"_S.format(to_float(numerator) / denominator));
+    }
+} code_block_2;

@@ -1,0 +1,136 @@
+# 451
+import array, math, itertools
+from typing import List
+Int64 = int
+
+LIMIT = 20000000
+
+# Build table of smallest prime factors
+smallestprimefactor = array.array("l", itertools.repeat(0, LIMIT + 1))
+end = int(math.sqrt(len(smallestprimefactor)) - 1)
+for i in range(2, len(smallestprimefactor)):
+    if smallestprimefactor[i] == 0:
+        smallestprimefactor[i] = i
+        if i <= end:
+            for j in range(i * i, len(smallestprimefactor), i):
+                if smallestprimefactor[j] == 0:
+                    smallestprimefactor[j] = i
+
+solutions = [[0]*0, [0]*0, [1]]
+
+# Returns all the solutions (in ascending order) such that
+# for each k, 1 <= k < n and k^2 = 1 mod n.
+def get_solutions(n):
+    if smallestprimefactor[n] == n:  # n is prime
+        return [1, n - 1]
+    else:
+        temp : List[int] = []
+        p = smallestprimefactor[n]
+        sols = solutions[n // p]
+        for i in range(0, n, n // p):
+            for j in sols:
+                k = i + j
+                if Int64(k) * k % n == 1:
+                    temp.append(k)
+        return temp
+
+# Process every integer in range
+ans : Int64 = 0
+for i in range(3, LIMIT + 1):
+    sols = get_solutions(i)
+    if i <= LIMIT // 2:
+        solutions.append(sols)
+    ans += sols[-2]  # Second-largest solution
+print(ans)
+===
+V LIMIT = 20000000
+
+V smallestprimefactor = [Int32(0)] * (LIMIT + 1)
+V end = Int(sqrt(smallestprimefactor.len) - 1)
+L(i) 2 .< smallestprimefactor.len
+   I smallestprimefactor[i] == 0
+      smallestprimefactor[i] = i
+      I i <= end
+         L(j) (i * i .< smallestprimefactor.len).step(i)
+            I smallestprimefactor[j] == 0
+               smallestprimefactor[j] = i
+
+V solutions = [[Int](), [Int](), [1]]
+
+F get_solutions(n)
+   I :smallestprimefactor[n] == n
+      R [1, n - 1]
+   E
+      [Int] temp
+      V p = :smallestprimefactor[n]
+      V sols = :solutions[n I/ p]
+      L(i) (0 .< n).step(n I/ p)
+         L(j) sols
+            V k = i + j
+            I Int64(k) * k % n == 1
+               temp.append(k)
+      R temp
+
+Int64 ans = 0
+L(i) 3 .. LIMIT
+   V sols = get_solutions(i)
+   I i <= LIMIT I/ 2
+      solutions.append(sols)
+   ans += sols[(len)-2]
+print(ans)
+===
+auto LIMIT = 20000000;
+
+auto smallestprimefactor = create_array({to_int32(0)}) * (LIMIT + 1);
+auto end = to_int(sqrt(smallestprimefactor.len()) - 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto i : range_el(2, smallestprimefactor.len()))
+            if (smallestprimefactor[i] == 0) {
+                smallestprimefactor.set(i, i);
+                if (i <= end)
+                    for (auto j : range_el(i * i, smallestprimefactor.len()).step(i))
+                        if (smallestprimefactor[j] == 0)
+                            smallestprimefactor.set(j, i);
+            }
+    }
+} code_block_1;
+
+auto solutions = create_array({Array<int>(), Array<int>(), create_array({1})});
+
+template <typename T1> auto get_solutions(const T1 &n)
+{
+    if (::smallestprimefactor[n] == n)
+        return create_array({1, n - 1});
+    else {
+        Array<int> temp;
+        auto p = ::smallestprimefactor[n];
+        auto sols = ::solutions[idiv(n, p)];
+        for (auto i : range_el(0, n).step(idiv(n, p)))
+            for (auto &&j : sols) {
+                auto k = i + j;
+                if (mod(to_int64(k) * k, n) == 1)
+                    temp.append(k);
+            }
+        return temp;
+    }
+}
+
+Int64 ans = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto i : range_ee(3, LIMIT)) {
+            auto sols = get_solutions(i);
+            if (i <= idiv(LIMIT, 2))
+                solutions.append(sols);
+            ans += sols.at_plus_len( - 2);
+        }
+        print(ans);
+    }
+} code_block_2;

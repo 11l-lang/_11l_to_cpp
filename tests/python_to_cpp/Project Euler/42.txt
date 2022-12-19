@@ -1,0 +1,242 @@
+# 425
+import eulerlib, heapq
+from typing import List
+Int64 = int
+
+# Returns the given non-negative integer as an array of digits, in big endian, with an extra leading zero.
+# e.g. 0 -> [0,0]; 1 -> [0,1]; 8 -> [0,8]; 42 -> [0,4,2]; 596 -> [0,5,9,6].
+def to_digits(n):
+    if n < 0:
+        raise ValueError('')
+
+    # Extract base-10 digits in little endian
+    temp : List[int] = []
+    while True:
+        temp.append(n % 10)
+        n //= 10
+        if n == 0:
+            break
+
+    temp.append(0)
+    temp.reverse()
+    return temp
+
+def to_number(digits):
+    result = 0
+    for x in digits:
+        result = result * 10 + x
+    return result
+
+LIMIT = 10**7
+
+isprime = eulerlib.list_primality(LIMIT)
+
+# pathmax[i] = 0 if i is not prime or i is not connected to 2.
+# Otherwise, considering all connection paths from 2 to i and for each path computing
+# the maximum number, pathmax[i] is the minimum number among all these maxima.
+pathmax = [0] * len(isprime)
+
+# Process paths in increasing order of maximum number
+queue = [(2, 2)]
+while len(queue) > 0:
+    pmax, n = heapq.heappop(queue)
+    if pathmax[n] != 0 and pmax >= pathmax[n]:
+        # This happens if at the time this update was queued, a better
+        # or equally good update was queued ahead but not processed yet
+        continue
+
+    # Update the target node and explore neighbors
+    pathmax[n] = pmax
+
+    # Try all replacements of a single digit, including the leading zero.
+    # This generates exactly all (no more, no less) the ways that a number m is connected to n.
+    digits = to_digits(n)
+    tempdigits = list(digits)
+    for i in range(len(tempdigits)):  # For each digit position
+        for j in range(10):  # For each digit value
+            tempdigits[i] = j
+            m = to_number(tempdigits)
+            nextpmax = max(m, pmax)
+            if m < len(isprime) and isprime[m] and (pathmax[m] == 0 or nextpmax < pathmax[m]):
+                heapq.heappush(queue, (nextpmax, m))
+        tempdigits[i] = digits[i]  # Restore the digit
+
+print(sum(Int64(i) for i in range(len(isprime))
+    if isprime[i] and (pathmax[i] == 0 or pathmax[i] > i)))
+===
+F to_digits(=n)
+   I n < 0
+      X ValueError(‘’)
+
+   [Int] temp
+   L
+      temp.append(n % 10)
+      n I/= 10
+      I n == 0
+         L.break
+
+   temp.append(0)
+   temp.reverse()
+   R temp
+
+F to_number(digits)
+   V result = 0
+   L(x) digits
+      result = result * 10 + x
+   R result
+
+V LIMIT = 10 ^ 7
+
+V isprime = eulerlib:list_primality(LIMIT)
+
+V pathmax = [0] * isprime.len
+
+V queue = [(2, 2)]
+L queue.len > 0
+   V (pmax, n) = minheap:pop(&queue)
+   I pathmax[n] != 0 & pmax >= pathmax[n]
+      L.continue
+
+   pathmax[n] = pmax
+
+   V digits = to_digits(n)
+   V tempdigits = Array(digits)
+   L(i) 0 .< tempdigits.len
+      L(j) 10
+         tempdigits[i] = j
+         V m = to_number(tempdigits)
+         V nextpmax = max(m, pmax)
+         I m < isprime.len & isprime[m] & (pathmax[m] == 0 | nextpmax < pathmax[m])
+            minheap:push(&queue, (nextpmax, m))
+      tempdigits[i] = digits[i]
+
+print(sum((0 .< isprime.len).filter(i -> :isprime[i] & (:pathmax[i] == 0 | :pathmax[i] > i)).map(i -> Int64(i))))
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1> auto to_digits(T1 n)
+{
+    if (n < 0)
+        throw ValueError(u""_S);
+
+    Array<int> temp;
+    while (true) {
+        temp.append(mod(n, 10));
+        n = idiv(n, 10);
+        if (n == 0)
+            break;
+    }
+
+    temp.append(0);
+    temp.reverse();
+    return temp;
+}
+
+template <typename T1> auto to_number(const T1 &digits)
+{
+    auto result = 0;
+    for (auto &&x : digits)
+        result = result * 10 + x;
+    return result;
+}
+
+auto LIMIT = pow(10, 7);
+
+auto isprime = eulerlib::list_primality(LIMIT);
+
+auto pathmax = create_array({0}) * isprime.len();
+
+auto queue = create_array({make_tuple(2, 2)});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (queue.len() > 0) {
+            auto [pmax, n] = minheap::pop(queue);
+            if (pathmax[n] != 0 && pmax >= pathmax[n])
+                continue;
+
+            pathmax.set(n, pmax);
+
+            auto digits = to_digits(n);
+            auto tempdigits = create_array(digits);
+            for (auto i : range_el(0, tempdigits.len())) {
+                for (int j = 0; j < 10; j++) {
+                    tempdigits.set(i, j);
+                    auto m = to_number(tempdigits);
+                    auto nextpmax = max(m, pmax);
+                    if (m < isprime.len() && isprime[m] && (pathmax[m] == 0 || nextpmax < pathmax[m]))
+                        minheap::push(queue, make_tuple(nextpmax, m));
+                }
+                tempdigits.set(i, digits[i]);
+            }
+        }
+
+        print(sum_map(range_el(0, isprime.len()).filter([](const auto &i){return ::isprime[i] && (::pathmax[i] == 0 || ::pathmax[i] > i);}), [](const auto &i){return to_int64(i);}));
+    }
+} code_block_1;
+
+
+# 429
+import eulerlib
+Int64 = int
+
+# Returns the number of factors of p (prime) in factorial(n).
+def count_factors(n, p):
+    if n == 0:
+        return 0
+    else:
+        return n // p + count_factors(n // p, p)
+
+LIMIT = 10**8
+MOD = 1000000009
+ans = 1
+for p in eulerlib.primes_up_to_limit(LIMIT):
+    power = count_factors(LIMIT, p)
+    ans = int(Int64(ans) * (1 + pow(Int64(p), power * 2, MOD)) % MOD)
+print(ans)
+===
+F count_factors(n, p)
+   I n == 0
+      R 0
+   E
+      R n I/ p + count_factors(n I/ p, p)
+
+V LIMIT = 10 ^ 8
+V MOD = 1000000009
+V ans = 1
+L(p) eulerlib:primes_up_to_limit(LIMIT)
+   V power = count_factors(LIMIT, p)
+   ans = Int(Int64(ans) * (1 + pow(Int64(p), power * 2, MOD)) % MOD)
+print(ans)
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+template <typename T1, typename T2> auto count_factors(const T1 &n, const T2 &p)
+{
+    if (n == 0)
+        return 0;
+    else
+        return idiv(n, p) + count_factors(idiv(n, p), p);
+}
+
+auto LIMIT = pow(10, 8);
+auto MOD = 1000000009;
+auto ans = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&p : eulerlib::primes_up_to_limit(LIMIT)) {
+            auto power = count_factors(LIMIT, p);
+            ans = to_int(mod(to_int64(ans) * (1 + pow(to_int64(p), power * 2, MOD)), MOD));
+        }
+        print(ans);
+    }
+} code_block_1;
