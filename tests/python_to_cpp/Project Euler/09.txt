@@ -211,8 +211,236 @@ struct CodeBlock1
 } code_block_1;
 
 
----
-# 93 [-Fraction-]
+# 93
+from _11l import *
+import itertools
+
+def longest_consecutive(abcd : Tuple[int, int, int, int]):
+    a, b, c, d = abcd
+    expressible = set() # int
+
+    # Try all possible orderings of operands and operators
+    ops = [0, 0, 0, a, b, c, d]  # 0 = operator slot, 1 to 9 = literal operand
+    while True:
+
+        # Try all possibilities for the 3 operators
+        for i in range(64):
+            stack : List[float] = []
+            j = 0  # Operator index
+
+            stackunderflow = False
+            divbyzero = False
+            for op in ops:
+                if 1 <= op <= 9:  # Operand
+                    stack.append(float(op))
+                elif op == 0:  # Operator
+                    if len(stack) < 2:
+                        stackunderflow = True
+                        break
+                    right = stack.pop()
+                    left = stack.pop()
+                    oper = (i >> (j * 2)) & 3
+                    if oper == 0:
+                        stack.append(left + right)
+                    elif oper == 1:
+                        stack.append(left - right)
+                    elif oper == 2:
+                        stack.append(left * right)
+                    elif oper == 3:
+                        if right == 0:
+                            divbyzero = True
+                            break
+                        stack.append(left / right)
+                    else:
+                        raise AssertionError('')
+                    j += 1  # Consume an operator
+                else:
+                    raise AssertionError('')
+
+            if stackunderflow:
+                break
+            if divbyzero:
+                continue
+            if len(stack) != 1:
+                raise AssertionError('')
+
+            result = stack.pop()
+            if result.is_integer():
+                expressible.add(int(result))
+
+        if not next_permutation(ops):
+            break
+
+    # Find largest set of consecutive expressible integers starting from 1
+    for i in itertools.count(1):
+        if i not in expressible:
+            return i - 1
+
+l : List[Tuple[int, int, int, int]] = []
+for a in range(1, 10):
+    for b in range(a + 1, 10):
+        for c in range(b + 1, 10):
+            for d in range(c + 1, 10):
+                l.append((a, b, c, d))
+ans = max(l, key=longest_consecutive)
+print(f'{str(ans[0])}{ans[1]}{ans[2]}{ans[3]}')
+===
+F longest_consecutive((Int, Int, Int, Int) abcd)
+   V (a, b, c, d) = abcd
+   V expressible = Set[Int]()
+
+   V ops = [0, 0, 0, a, b, c, d]
+   L
+
+      L(i) 64
+         [Float] stack
+         V j = 0
+
+         V stackunderflow = 0B
+         V divbyzero = 0B
+         L(op) ops
+            I op C 1..9
+               stack.append(Float(op))
+            E I op == 0
+               I stack.len < 2
+                  stackunderflow = 1B
+                  L.break
+               V right = stack.pop()
+               V left = stack.pop()
+               V oper = (i >> (j * 2)) [&] 3
+               I oper == 0
+                  stack.append(left + right)
+               E I oper == 1
+                  stack.append(left - right)
+               E I oper == 2
+                  stack.append(left * right)
+               E I oper == 3
+                  I right == 0
+                     divbyzero = 1B
+                     L.break
+                  stack.append(left / right)
+               E
+                  X AssertionError(‘’)
+               j++
+            E
+               X AssertionError(‘’)
+
+         I stackunderflow
+            L.break
+         I divbyzero
+            L.continue
+         I stack.len != 1
+            X AssertionError(‘’)
+
+         V result = stack.pop()
+         I fract(result) == 0
+            expressible.add(Int(result))
+
+      I !ops.next_permutation()
+         L.break
+
+   L(i) 1..
+      I i !C expressible
+         R i - 1
+
+[(Int, Int, Int, Int)] l
+L(a) 1..9
+   L(b) a + 1 .< 10
+      L(c) b + 1 .< 10
+         L(d) c + 1 .< 10
+            l.append((a, b, c, d))
+V ans = max(l, key' longest_consecutive)
+print(String(ans[0])‘’ans[1]‘’ans[2]‘’ans[3])
+===
+auto longest_consecutive(const ivec4 &abcd)
+{
+    auto [a, b, c, d] = abcd;
+    auto expressible = Set<int>();
+
+    auto ops = create_array({0, 0, 0, a, b, c, d});
+    while (true) {
+
+        for (int i = 0; i < 64; i++) {
+            Array<double> stack;
+            auto j = 0;
+
+            auto stackunderflow = false;
+            auto divbyzero = false;
+            for (auto &&op : ops)
+                if (in(op, range_ee(1, 9)))
+                    stack.append(to_float(op));
+                else if (op == 0) {
+                    if (stack.len() < 2) {
+                        stackunderflow = true;
+                        break;
+                    }
+                    auto right = stack.pop();
+                    auto left = stack.pop();
+                    auto oper = (i >> (j * 2)) & 3;
+                    if (oper == 0)
+                        stack.append(left + right);
+                    else if (oper == 1)
+                        stack.append(left - right);
+                    else if (oper == 2)
+                        stack.append(left * right);
+                    else if (oper == 3) {
+                        if (right == 0) {
+                            divbyzero = true;
+                            break;
+                        }
+                        stack.append(left / right);
+                    }
+                    else
+                        throw AssertionError(u""_S);
+                    j++;
+                }
+                else
+                    throw AssertionError(u""_S);
+
+            if (stackunderflow)
+                break;
+            if (divbyzero)
+                continue;
+            if (stack.len() != 1)
+                throw AssertionError(u""_S);
+
+            auto result = stack.pop();
+            if (fract(result) == 0)
+                expressible.add(to_int(result));
+        }
+
+        if (!ops.next_permutation())
+            break;
+    }
+
+    for (auto i : range_ei(1))
+        if (!in(i, expressible))
+            return i - 1;
+}
+
+Array<ivec4> l;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto a : range_ee(1, 9))
+            for (auto b : range_el(a + 1, 10))
+                for (auto c : range_el(b + 1, 10))
+                    for (auto d : range_el(c + 1, 10))
+                        l.append(make_tuple(a, b, c, d));
+    }
+} code_block_1;
+
+auto ans = max_with_key(l, longest_consecutive);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(String(_get<0>(ans)) & _get<1>(ans) & _get<2>(ans) & _get<3>(ans));
+    }
+} code_block_2;
 
 
 # 94

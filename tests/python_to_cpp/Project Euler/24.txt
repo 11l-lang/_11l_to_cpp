@@ -1,5 +1,97 @@
----
-# 243 [-fractions-]
+# 243
+import eulerlib, fractions
+
+def compute():
+    TARGET = fractions.Fraction(15499, 94744)
+    totient = 1
+    denominator = 1
+    p = 2
+    while True:
+        totient *= p - 1
+        denominator *= p
+        # Note: At this point in the code, denominator is the product of one copy of each
+        # prime number up to and including p, totient is equal to totient(denominator),
+        # and totient/denominator = R'(2 * 3 * ... * p) (the pseudo-resilience).
+
+        # Advance to the next prime
+        while True:
+            p += 1
+            if eulerlib.is_prime(p):
+                break
+
+        # If the lower bound is below the target, there might be a suitable solution d such that
+        # d's factorization only contains prime factors strictly below the current (advanced) value of p
+        if fractions.Fraction(totient, denominator) < TARGET:
+            # Try to find the lowest factor i such that R(i*d) < TARGET, if any.
+            # Note that over this range of i, we have R'(d) = R'(i*d) < R(i*d).
+            for i in range(1, p):
+                numer = i * totient
+                denom = i * denominator
+                if fractions.Fraction(numer, denom - 1) < TARGET:
+                    return denom
+
+print(compute())
+===
+F compute()
+   V TARGET = Fraction(15499, 94744)
+   V totient = 1
+   V denominator = 1
+   V p = 2
+   L
+      totient *= p - 1
+      denominator *= p
+
+      L
+         p++
+         I eulerlib:is_prime(p)
+            L.break
+
+      I Fraction(totient, denominator) < TARGET
+         L(i) 1 .< p
+            V numer = i * totient
+            V denom = i * denominator
+            I Fraction(numer, denom - 1) < TARGET
+               R denom
+
+print(compute())
+===
+namespace eulerlib {
+#include "eulerlib.hpp"
+}
+
+auto compute()
+{
+    auto TARGET = Fraction(15499, 94744);
+    auto totient = 1;
+    auto denominator = 1;
+    auto p = 2;
+    while (true) {
+        totient *= p - 1;
+        denominator *= p;
+
+        while (true) {
+            p++;
+            if (eulerlib::is_prime(p))
+                break;
+        }
+
+        if (Fraction(totient, denominator) < TARGET)
+            for (auto i : range_el(1, p)) {
+                auto numer = i * totient;
+                auto denom = i * denominator;
+                if (Fraction(numer, denom - 1) < TARGET)
+                    return denom;
+            }
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(compute());
+    }
+} code_block_1;
 
 
 # 249

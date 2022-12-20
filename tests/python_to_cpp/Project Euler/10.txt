@@ -75,8 +75,105 @@ struct CodeBlock1
 } code_block_1;
 
 
----
-# 101 [-Fraction-]
+# 101
+import itertools, fractions
+Int64 = int
+
+DEGREE = 10
+
+def generating_function(n):
+    return sum(Int64(-n)**i for i in range(DEGREE + 1))
+
+def optimum_polynomial(k, n):
+    # Lagrange interpolation
+    sum = fractions.Fraction(0)
+    for i in range(k + 1):
+        product = fractions.Fraction(generating_function(i))
+        for j in range(1, k + 1):
+            if j != i:
+                product *= fractions.Fraction(n - j, i - j)
+        sum += product
+    return sum
+
+ans = fractions.Fraction(0)
+for k in range(1, DEGREE + 1):
+    for n in itertools.count(k + 1):
+        if n == DEGREE + 2:
+            raise AssertionError('')
+        reference = fractions.Fraction(generating_function(n))
+        term = optimum_polynomial(k, n)
+        if term != reference:
+            ans += term
+            break
+print(ans)
+===
+V DEGREE = 10
+
+F generating_function(n)
+   R sum((0 .. :DEGREE).map(i -> Int64(-@n) ^ i))
+
+F optimum_polynomial(k, n)
+   V sum = Fraction(0)
+   L(i) 0 .. k
+      V product = Fraction(generating_function(i))
+      L(j) 1 .. k
+         I j != i
+            product *= Fraction(n - j, i - j)
+      sum += product
+   R sum
+
+V ans = Fraction(0)
+L(k) 1 .. DEGREE
+   L(n) k + 1..
+      I n == DEGREE + 2
+         X AssertionError(‘’)
+      V reference = Fraction(generating_function(n))
+      V term = optimum_polynomial(k, n)
+      I term != reference
+         ans += term
+         L.break
+print(ans)
+===
+auto DEGREE = 10;
+
+template <typename T1> auto generating_function(const T1 &n)
+{
+    return sum_map(range_ee(0, ::DEGREE), [&n](const auto &i){return pow(to_int64(-n), i);});
+}
+
+template <typename T1, typename T2> auto optimum_polynomial(const T1 &k, const T2 &n)
+{
+    auto sum = Fraction(0);
+    for (auto i : range_ee(0, k)) {
+        auto product = Fraction(generating_function(i));
+        for (auto j : range_ee(1, k))
+            if (j != i)
+                product *= Fraction(n - j, i - j);
+        sum += product;
+    }
+    return sum;
+}
+
+auto ans = Fraction(0);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto k : range_ee(1, DEGREE))
+            for (auto n : range_ei(k + 1)) {
+                if (n == DEGREE + 2)
+                    throw AssertionError(u""_S);
+                auto reference = Fraction(generating_function(n));
+                auto term = optimum_polynomial(k, n);
+                if (term != reference) {
+                    ans += term;
+                    break;
+                }
+            }
+        print(ans);
+    }
+} code_block_1;
 
 
 # 102

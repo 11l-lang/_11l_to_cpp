@@ -7,6 +7,7 @@ class BigInt
 	static const int base_digits = 9;
 	std::vector<int> a;
 	int sign;
+	friend class Fraction;
 	/*<arpa>*/
 	int size(){
 		if(a.empty())return 0;
@@ -542,3 +543,67 @@ Int pow(Int64 base, Int64 exponent, const Int modulus)
 	return result;
 }
 #endif
+
+
+class Fraction
+{
+public:
+	BigInt numerator, denominator;
+
+	Fraction(const BigInt &numerator) : numerator(numerator), denominator(1) {}
+
+	Fraction(const BigInt &numer, const BigInt &denom) : numerator(numer), denominator(denom) {
+		if (denominator.isZero())
+			throw AssertionError();
+
+		if (denominator.sign == -1) {
+			numerator.sign   = -numerator.sign;
+			denominator.sign = -denominator.sign;
+		}
+
+		BigInt d = gcd(numerator, denominator);
+		if (d != 1) {
+			numerator /= d;
+			denominator /= d;
+		}
+	}
+
+	Fraction operator+(const Fraction &other) const {
+		return Fraction(numerator * other.denominator + denominator * other.numerator, denominator * other.denominator);
+	}
+
+	Fraction operator-(const Fraction &other) const {
+		return Fraction(numerator * other.denominator - denominator * other.numerator, denominator * other.denominator);
+	}
+
+	Fraction operator*(const Fraction &other) const {
+		return Fraction(numerator * other.numerator, denominator * other.denominator);
+	}
+
+	Fraction operator/(const Fraction &other) const {
+		return Fraction(numerator * other.denominator, denominator * other.numerator);
+	}
+
+	void operator+=(const Fraction &other) {*this = *this + other;}
+	void operator-=(const Fraction &other) {*this = *this - other;}
+	void operator*=(const Fraction &other) {*this = *this * other;}
+	void operator/=(const Fraction &other) {*this = *this / other;}
+
+	bool operator==(const Fraction &other) const {
+		return numerator == other.numerator && denominator == other.denominator;
+	}
+	bool operator!=(const Fraction &other) const {
+		return !(*this == other);
+	}
+
+	bool operator<(const Fraction &other) const {
+		return numerator * other.denominator < other.numerator * denominator;
+	}
+
+	operator String() const {
+		if (denominator == 1)
+			return String(numerator);
+		else
+			return String(numerator) & u'/'_C & String(denominator);
+	}
+};

@@ -1267,7 +1267,7 @@ cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'п
                      'Int':'int', 'Int64':'Int64', 'UInt64':'UInt64', 'Int32':'int32_t', 'UInt32':'uint32_t', 'Int16':'int16_t', 'UInt16':'uint16_t', 'Int8':'int8_t', 'BigInt':'BigInt', 'Size':'Size', 'USize':'USize',
                      'Float':'double', 'SFloat':'float', 'Float32':'float', 'Float64':'double', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte', 'Bytes':'Array<Byte>',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
-                     'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque', 'Counter':'Counter'}
+                     'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque', 'Counter':'Counter', 'Fraction':'Fraction'}
 
 def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False):
     if ty[-1] == '?':
@@ -2239,7 +2239,7 @@ russian_names = {
     'Кортеж':'Tuple',
     'Массив':'Array', 'пуст':'empty', 'соединить':'join', 'применить':'map', 'фильтр':'filter', 'добавить':'append', 'извлечь':'pop', 'индекс':'index', 'сорт':'sort', 'сорт_диапазон':'sort_range', 'обратить':'reverse',
     'Словарь':'Dict', 'получить':'get', 'ключи':'keys', 'значения':'values',
-    'Счётчик':'Counter', 'Счетчик':'Counter',
+    'Счётчик':'Counter', 'Счетчик':'Counter', 'Дробь':'Fraction', 'числитель':'numerator', 'знаменатель':'denominator',
     'Множество':'Set', 'доб':'add', 'удалить':'remove', 'отбросить':'discard', 'очистить':'clear',
     'Дек':'Deque', 'добавить_в_начало':'append_left', 'расширить':'extend', 'расширить_с_начала':'extend_left', 'вставить':'insert', 'извлечь_с_начала':'pop_left',
     'Файл':'File', 'прочитать':'read', 'прочитать_строку':'read_line', 'прочитать_строки':'read_lines', 'прочитать_байты':'read_bytes', 'записать':'write', 'записать_байты':'write_bytes',
@@ -3601,6 +3601,9 @@ builtins_scope.ids['BigInt'].ast_nodes[0] = ASTTypeDefinition([f])
 
 f = ASTFunctionDefinition([('real', '', 'Float'), ('imag', '0', 'Float')])
 builtins_scope.ids['Complex'].ast_nodes[0] = ASTTypeDefinition([f])
+
+f = ASTFunctionDefinition([('numerator', '', 'BigInt'), ('denominator', '1', 'BigInt')])
+builtins_scope.ids['Fraction'].ast_nodes[0] = ASTTypeDefinition([f])
 
 string_scope = Scope(None)
 str_last_member_var_decl = ASTVariableDeclaration()
