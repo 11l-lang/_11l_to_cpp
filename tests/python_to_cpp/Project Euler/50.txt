@@ -1,5 +1,6 @@
 # 500 [Int64 from Java solution]
 import eulerlib, heapq
+from typing import List
 Int64 = int
 
 TARGET = 500500
