@@ -3292,3 +3292,189 @@ struct CodeBlock1
         print(zip(list1, list2, list3).map([](const auto &n1, const auto &n2, const auto &n3){return String(n1) & n2 & n3;}));
     }
 } code_block_1;
+
+
+# https://rosettacode.org/wiki/Arithmetic_numbers#Python
+def factors(n: int):
+    f = set([1, n])
+    i = 2
+    while True:
+        j = n // i
+        if j < i:
+            break
+        if i * j == n:
+            f.add(i)
+            f.add(j)
+        i += 1
+    return f
+
+arithmetic_count = 0
+composite_count = 0
+n = 1
+while arithmetic_count <= 1000000:
+    f = factors(n)
+    if sum(f) % len(f) == 0:
+        arithmetic_count += 1
+        if len(f) > 2:
+            composite_count += 1
+        if arithmetic_count <= 100:
+            print(f'{n:3} ', end='')
+            if arithmetic_count % 10 == 0:
+                print()
+        if arithmetic_count in (1000, 10000, 100000, 1000000):
+            print(f'\n{arithmetic_count}th arithmetic number is {n}')
+            print(f'Number of composite arithmetic numbers <= {n}: {composite_count}')
+    n += 1
+===
+F factors(Int n)
+   V f = Set([1, n])
+   V i = 2
+   L
+      V j = n I/ i
+      I j < i
+         L.break
+      I i * j == n
+         f.add(i)
+         f.add(j)
+      i++
+   R f
+
+V arithmetic_count = 0
+V composite_count = 0
+V n = 1
+L arithmetic_count <= 1000000
+   V f = factors(n)
+   I sum(f) % f.len == 0
+      arithmetic_count++
+      I f.len > 2
+         composite_count++
+      I arithmetic_count <= 100
+         print(f:‘{n:3} ’, end' ‘’)
+         I arithmetic_count % 10 == 0
+            print()
+      I arithmetic_count C (1000, 10000, 100000, 1000000)
+         print("\n"arithmetic_count‘th arithmetic number is ’n)
+         print(‘Number of composite arithmetic numbers <= ’n‘: ’composite_count)
+   n++
+===
+auto factors(const int n)
+{
+    auto f = create_set({1, n});
+    auto i = 2;
+    while (true) {
+        auto j = idiv(n, i);
+        if (j < i)
+            break;
+        if (i * j == n) {
+            f.add(i);
+            f.add(j);
+        }
+        i++;
+    }
+    return f;
+}
+
+auto arithmetic_count = 0;
+auto composite_count = 0;
+auto n = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (arithmetic_count <= 1000000) {
+            auto f = factors(n);
+            if (mod(sum(f), f.len()) == 0) {
+                arithmetic_count++;
+                if (f.len() > 2)
+                    composite_count++;
+                if (arithmetic_count <= 100) {
+                    print(u"#3 "_S.format(n), u""_S);
+                    if (mod(arithmetic_count, 10) == 0)
+                        print();
+                }
+                if (in(arithmetic_count, make_tuple(1000, 10000, 100000, 1000000))) {
+                    print(u"\n"_S & arithmetic_count & u"th arithmetic number is "_S & n);
+                    print(u"Number of composite arithmetic numbers <= "_S & n & u": "_S & composite_count);
+                }
+            }
+            n++;
+        }
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Ascending_primes#Python
+from typing import List
+
+def isprime(n):
+    if n == 2: return True
+    if n == 1 or n % 2 == 0: return False
+    root1 = int(n**0.5) + 1
+    for k in range(3, root1, 2):
+        if n % k == 0: return False
+    return True
+
+queue = [k for k in range(1, 10)]
+primes : List[int] = []
+
+while len(queue):
+    n = queue.pop(0)
+    if isprime(n):
+        primes.append(n)
+    queue.extend(n * 10 + k for k in range(n % 10 + 1, 10))
+
+print(primes)
+===
+F isprime(n)
+   I n == 2
+      R 1B
+   I n == 1 | n % 2 == 0
+      R 0B
+   V root1 = Int(n ^ 0.5) + 1
+   L(k) (3 .< root1).step(2)
+      I n % k == 0
+         R 0B
+   R 1B
+
+V queue = Array(1..9)
+[Int] primes
+
+L !queue.empty
+   V n = queue.pop(0)
+   I isprime(n)
+      primes.append(n)
+   queue.extend((n % 10 + 1 .< 10).map(k -> @n * 10 + k))
+
+print(primes)
+===
+template <typename T1> auto isprime(const T1 &n)
+{
+    if (n == 2)
+        return true;
+    if (n == 1 || mod(n, 2) == 0)
+        return false;
+    auto root1 = to_int(pow(n, 0.5)) + 1;
+    for (auto k : range_el(3, root1).step(2))
+        if (mod(n, k) == 0)
+            return false;
+    return true;
+}
+
+auto queue = create_array(range_ee(1, 9));
+Array<int> primes;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (!queue.empty()) {
+            auto n = queue.pop(0);
+            if (isprime(n))
+                primes.append(n);
+            queue.extend(range_el(mod(n, 10) + 1, 10).map([&n](const auto &k){return n * 10 + k;}));
+        }
+
+        print(primes);
+    }
+} code_block_1;

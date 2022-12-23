@@ -485,7 +485,7 @@ class SymbolNode:
                 else:
                     nfmtstr += '#'
                     if i + 1 < len(self.children) and self.children[i + 1].token.category == Token.Category.STATEMENT_SEPARATOR:
-                        fmt = self.children[i + 1].token.value(source)
+                        fmt = self.children[i + 1].token.value(source).lstrip(' ')
                         if fmt[0] == '<':
                             nfmtstr += '<'
                             fmt = fmt[1:]

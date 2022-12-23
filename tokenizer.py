@@ -430,7 +430,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                                     if nesting_level == 0:
                                         break
                                     nesting_level -= 1
-                                elif source[j] == ':' and nesting_level == 0 and (source[j+1] in ('<', '.') or source[j+1].isdigit()):
+                                elif source[j] == ':' and nesting_level == 0 and (source[j+1] in ('<', '.', ' ') or source[j+1].isdigit()):
                                     colon_pos = j
                                 j += 1
                             for new_token in tokenize(source[s:colon_pos if colon_pos is not None else j]):

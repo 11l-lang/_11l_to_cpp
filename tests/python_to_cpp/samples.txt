@@ -4745,3 +4745,17 @@ struct CodeBlock1
         bb.reverse();
     }
 } code_block_1;
+
+
+# [https://rosettacode.org/wiki/Colorful_numbers#Python]
+print(f'{1 + 2: 5,}')
+===
+print(f:‘{commatize(1 + 2): 5}’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"#5"_S.format(commatize(1 + 2)));
+    }
+} code_block_1;
