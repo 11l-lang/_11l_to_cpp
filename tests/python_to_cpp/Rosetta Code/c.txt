@@ -3812,3 +3812,214 @@ struct CodeBlock2
         print(u"The total number of colorful numbers is "_S & csum & u"."_S);
     }
 } code_block_2;
+
+
+# https://rosettacode.org/wiki/Conjugate_a_Latin_verb#Python
+def conjugate(infinitive):
+    if not infinitive[-3:] == "are":
+        print("'", infinitive, "' non prima coniugatio verbi.\n", sep='')
+        return
+
+    stem = infinitive[0:-3]
+    if len(stem) == 0:
+        print("\'", infinitive, "\' non satis diu conjugatus\n", sep='')
+        return
+
+    print("Praesens indicativi temporis of '", infinitive, "':", sep='')
+    for ending in ("o", "as", "at", "amus", "atis", "ant"):
+        print("     ", stem, ending, sep='')
+    print()
+
+for infinitive in ("amare", "dare", "qwerty", "are"):
+    conjugate(infinitive)
+===
+F conjugate(infinitive)
+   I !(infinitive[(len)-3 ..] == ‘are’)
+      print(‘'’infinitive"' non prima coniugatio verbi.\n")
+      R
+
+   V stem = infinitive[0 .< (len)-3]
+   I stem.empty
+      print("\'"infinitive"\' non satis diu conjugatus\n")
+      R
+
+   print(‘Praesens indicativi temporis of '’infinitive‘':’)
+   L(ending) (‘o’, ‘as’, ‘at’, ‘amus’, ‘atis’, ‘ant’)
+      print(‘     ’stem‘’ending)
+   print()
+
+L(infinitive) (‘amare’, ‘dare’, ‘qwerty’, ‘are’)
+   conjugate(infinitive)
+===
+template <typename T1> auto conjugate(const T1 &infinitive)
+{
+    if (!(infinitive[range_elen_i( - 3)] == u"are")) {
+        print(u"'"_S & infinitive & u"' non prima coniugatio verbi.\n"_S);
+        return;
+    }
+
+    auto stem = infinitive[range_e_llen(0,  - 3)];
+    if (stem.empty()) {
+        print(u"\'"_S & infinitive & u"\' non satis diu conjugatus\n"_S);
+        return;
+    }
+
+    print(u"Praesens indicativi temporis of '"_S & infinitive & u"':"_S);
+    for (auto &&ending : make_tuple(u"o"_S, u"as"_S, u"at"_S, u"amus"_S, u"atis"_S, u"ant"_S))
+        print(u"     "_S & stem & ending);
+    print();
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&infinitive : make_tuple(u"amare"_S, u"dare"_S, u"qwerty"_S, u"are"_S))
+            conjugate(infinitive);
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Count_the_coins/0-1#Nim
+import math
+from typing import List
+ConstList = List
+
+class Solver:
+    want: int
+    count1 = 0
+    count2 = 0
+    width: int
+
+    def __init__(self, want, width):
+        self.want = want
+        self.width = width
+
+    def count(self, sum: int, used: ConstList[int], have: ConstList[int], uindices: ConstList[int], rindices: ConstList[int]) -> None:
+        if sum == self.want:
+            self.count1 += 1
+            self.count2 += math.factorial(len(used))
+            if self.count1 < 11:
+                uindiceStr = ' '.join(str(i) for i in uindices).ljust(self.width)
+                print('  indices', uindiceStr, ' =>  used', ' '.join(str(i) for i in used))
+        elif sum < self.want and len(have) != 0:
+            thisCoin = have[0]
+            index = rindices[0]
+            rest = have[1:]
+            new_rindices = rindices[1:]
+            self.count(sum + thisCoin, used + [thisCoin], rest, uindices + [index], new_rindices)
+            self.count(sum, used, rest, uindices, new_rindices)
+
+def count_coins(want: int, coins: List[int], width: int):
+    print('Sum', want, 'from coins', ' '.join(str(i) for i in coins))
+    solver = Solver(want, width)
+    rindices = list(range(len(coins)))
+    solver.count(0, [0] * 0, coins, [0] * 0, rindices)
+    if solver.count1 > 10:
+        print('  .......')
+        print('  (only the first 10 ways generated are shown)')
+    print('Number of ways - order unimportant :', solver.count1, '(as above)')
+    print('Number of ways - order important   :', solver.count2, '(all perms of above indices)\n')
+
+count_coins(6, [1, 2, 3, 4, 5], 5)
+count_coins(6, [1, 1, 2, 3, 3, 4, 5], 7)
+count_coins(40, [1, 2, 3, 4, 5, 5, 5, 5, 15, 15, 10, 10, 10, 10, 25, 100], 18)
+===
+T Solver
+   Int want
+   count1 = 0
+   count2 = 0
+   Int width
+
+   F (want, width)
+      .want = want
+      .width = width
+
+   F count(Int sum, [Int] used, [Int] have, [Int] uindices, [Int] rindices) -> N
+      I sum == .want
+         .count1++
+         .count2 += factorial(used.len)
+         I .count1 < 11
+            V uindiceStr = uindices.map(i -> String(i)).join(‘ ’).ljust(.width)
+            print(‘  indices ’uindiceStr‘  =>  used ’used.map(i -> String(i)).join(‘ ’))
+      E I sum < .want & !have.empty
+         V thisCoin = have[0]
+         V index = rindices[0]
+         V rest = have[1..]
+         V new_rindices = rindices[1..]
+         .count(sum + thisCoin, used [+] [thisCoin], rest, uindices [+] [index], new_rindices)
+         .count(sum, used, rest, uindices, new_rindices)
+
+F count_coins(Int want, [Int] &coins, Int width)
+   print(‘Sum ’want‘ from coins ’coins.map(i -> String(i)).join(‘ ’))
+   V solver = Solver(want, width)
+   V rindices = Array(0 .< coins.len)
+   solver.count(0, [Int](), coins, [Int](), rindices)
+   I solver.count1 > 10
+      print(‘  .......’)
+      print(‘  (only the first 10 ways generated are shown)’)
+   print(‘Number of ways - order unimportant : ’(solver.count1)‘ (as above)’)
+   print(‘Number of ways - order important   : ’(solver.count2)" (all perms of above indices)\n")
+
+count_coins(6, &[1, 2, 3, 4, 5], 5)
+count_coins(6, &[1, 1, 2, 3, 3, 4, 5], 7)
+count_coins(40, &[1, 2, 3, 4, 5, 5, 5, 5, 15, 15, 10, 10, 10, 10, 25, 100], 18)
+===
+class Solver
+{
+public:
+    int want;
+    decltype(0) count1 = 0;
+    decltype(0) count2 = 0;
+    int width;
+
+    template <typename T1, typename T2> Solver(const T1 &want, const T2 &width) :
+        want(want),
+        width(width)
+    {
+    }
+
+    void count(const int sum, const Array<int> &used, const Array<int> &have, const Array<int> &uindices, const Array<int> &rindices)
+    {
+        if (sum == want) {
+            count1++;
+            count2 += factorial(used.len());
+            if (count1 < 11) {
+                auto uindiceStr = uindices.map([](const auto &i){return String(i);}).join(u" "_S).ljust(width);
+                print(u"  indices "_S & uindiceStr & u"  =>  used "_S & used.map([](const auto &i){return String(i);}).join(u" "_S));
+            }
+        }
+        else if (sum < want && !have.empty()) {
+            auto thisCoin = _get<0>(have);
+            auto index = _get<0>(rindices);
+            auto rest = have[range_ei(1)];
+            auto new_rindices = rindices[range_ei(1)];
+            count(sum + thisCoin, used + create_array({thisCoin}), rest, uindices + create_array({index}), new_rindices);
+            count(sum, used, rest, uindices, new_rindices);
+        }
+    }
+};
+
+auto count_coins(const int want, Array<int> &coins, const int width)
+{
+    print(u"Sum "_S & want & u" from coins "_S & coins.map([](const auto &i){return String(i);}).join(u" "_S));
+    auto solver = Solver(want, width);
+    auto rindices = create_array(range_el(0, coins.len()));
+    solver.count(0, Array<int>(), coins, Array<int>(), rindices);
+    if (solver.count1 > 10) {
+        print(u"  ......."_S);
+        print(u"  (only the first 10 ways generated are shown)"_S);
+    }
+    print(u"Number of ways - order unimportant : "_S & (solver.count1) & u" (as above)"_S);
+    print(u"Number of ways - order important   : "_S & (solver.count2) & u" (all perms of above indices)\n"_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        count_coins(6, make_ref(create_array({1, 2, 3, 4, 5})), 5);
+        count_coins(6, make_ref(create_array({1, 1, 2, 3, 3, 4, 5})), 7);
+        count_coins(40, make_ref(create_array({1, 2, 3, 4, 5, 5, 5, 5, 15, 15, 10, 10, 10, 10, 25, 100})), 18);
+    }
+} code_block_1;

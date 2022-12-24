@@ -4759,3 +4759,43 @@ struct CodeBlock1
         print(u"#5"_S.format(commatize(1 + 2)));
     }
 } code_block_1;
+
+
+# [https://rosettacode.org/wiki/Count_the_coins/0-1]
+from typing import List
+
+class Solver:
+    def count(self, rindices: List[int]) -> None:
+        self.count(rindices)
+
+solver = Solver()
+rindices = list(range(10))
+solver.count(rindices)
+===
+T Solver
+   F count([Int] &rindices) -> N
+      .count(&rindices)
+
+V solver = Solver()
+V rindices = Array(0.<10)
+solver.count(&rindices)
+===
+class Solver
+{
+public:
+    void count(Array<int> &rindices)
+    {
+        count(rindices);
+    }
+};
+
+auto solver = Solver();
+auto rindices = create_array(range_el(0, 10));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        solver.count(rindices);
+    }
+} code_block_1;
