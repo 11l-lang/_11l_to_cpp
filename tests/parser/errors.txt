@@ -280,3 +280,9 @@ order.sort(reverse' 1B, key' x -> x[0])
 V r = :stdin.readline
 V a = r().split_py().map(Int)
       ^Error: unable to determine the return type of `r()`
+
+
+T Solver
+   F count([Int] &rindices) -> N
+      .count(&rindices [+] 1)
+             ^Error: wrong usage of unary `&` operator
