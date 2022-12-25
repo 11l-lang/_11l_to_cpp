@@ -3707,7 +3707,7 @@ print('Colorful numbers for 1:25, 26:50, 51:75, and 76:100:')
 for i in range(1, 101, 25):
     for j in range(25):
         if iscolorful(i + j):
-            print(f'{i + j: 5,}', end='')
+            print(f'{i + j:5,}', end='')
     print()
 
 csum = 0
@@ -3744,7 +3744,7 @@ print(‘Colorful numbers for 1:25, 26:50, 51:75, and 76:100:’)
 L(i) (1.<101).step(25)
    L(j) 25
       I iscolorful(i + j)
-         print(f:‘{commatize(i + j): 5}’, end' ‘’)
+         print(f:‘{commatize(i + j):5}’, end' ‘’)
    print()
 
 V csum = 0
@@ -4021,5 +4021,264 @@ struct CodeBlock1
         count_coins(6, make_ref(create_array({1, 2, 3, 4, 5})), 5);
         count_coins(6, make_ref(create_array({1, 1, 2, 3, 3, 4, 5})), 7);
         count_coins(40, make_ref(create_array({1, 2, 3, 4, 5, 5, 5, 5, 15, 15, 10, 10, 10, 10, 25, 100})), 18);
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Countdown#Python
+best = 0
+best_out = ""
+target = 952
+nbrs = [100, 75, 50, 25, 6, 3]
+
+def sol(target, nbrs, out="") -> None:
+    global best, best_out
+    if abs(target - best) > abs(target - nbrs[0]):
+        best = nbrs[0]
+        best_out = out
+    if target == nbrs[0]:
+        print(out)
+    elif len(nbrs) > 1:
+        for i1 in range(0, len(nbrs)-1):
+            for i2 in range(i1+1, len(nbrs)):
+                remains = nbrs[:i1] + [] + nbrs[i1+1:i2] + [] + nbrs[i2+1:]
+                a, b = nbrs[i1], nbrs[i2]
+                if a > b: a, b = b, a
+                res = b + a
+                op = str(b) + " + " + str(a) + " = " + str(res) + " ; "
+                sol(target, [res] + remains, out + op)
+                if b != a:
+                    res = b - a
+                    op = str(b) + " - " + str(a) + " = " + str(res) + " ; "
+                    sol(target, [res] + remains, out + op)
+                if a != 1:
+                    res = b * a
+                    op = str(b) + " * " + str(a) + " = " + str(res) + " ; "
+                    sol(target, [res] + remains, out + op)
+                    if b % a == 0:
+                        res = int(b / a)
+                        op = str(b) + " / " + str(a) + " = " + str(res) + " ; "
+                        sol(target, [res] + remains, out + op)
+
+sol(target, nbrs)
+if best != target:
+    print("Best solution " + str(best))
+    print(best_out)
+===
+V best = 0
+V best_out = ‘’
+V target = 952
+V nbrs = [100, 75, 50, 25, 6, 3]
+
+F sol(target, nbrs, out = ‘’) -> N
+   I abs(target - :best) > abs(target - nbrs[0])
+      :best = nbrs[0]
+      :best_out = out
+   I target == nbrs[0]
+      print(out)
+   E I nbrs.len > 1
+      L(i1) 0 .< nbrs.len - 1
+         L(i2) i1 + 1 .< nbrs.len
+            V remains = nbrs[0 .< i1] [+] nbrs[i1 + 1 .< i2] [+] nbrs[i2 + 1 ..]
+            V (a, b) = (nbrs[i1], nbrs[i2])
+            I a > b
+               swap(&a, &b)
+            V res = b + a
+            V op = String(b)‘ + ’String(a)‘ = ’String(res)‘ ; ’
+            sol(target, [res] [+] remains, out‘’op)
+            I b != a
+               res = b - a
+               op = String(b)‘ - ’String(a)‘ = ’String(res)‘ ; ’
+               sol(target, [res] [+] remains, out‘’op)
+            I a != 1
+               res = b * a
+               op = String(b)‘ * ’String(a)‘ = ’String(res)‘ ; ’
+               sol(target, [res] [+] remains, out‘’op)
+               I b % a == 0
+                  res = Int(b / a)
+                  op = String(b)‘ / ’String(a)‘ = ’String(res)‘ ; ’
+                  sol(target, [res] [+] remains, out‘’op)
+
+sol(target, nbrs)
+I best != target
+   print(‘Best solution ’String(best))
+   print(best_out)
+===
+auto best = 0;
+auto best_out = u""_S;
+auto target = 952;
+auto nbrs = create_array({100, 75, 50, 25, 6, 3});
+
+template <typename T1, typename T2, typename T3 = decltype(u""_S)> void sol(const T1 &target, const T2 &nbrs, const T3 &out = u""_S)
+{
+    if (abs(target - ::best) > abs(target - _get<0>(nbrs))) {
+        ::best = _get<0>(nbrs);
+        ::best_out = out;
+    }
+    if (target == _get<0>(nbrs))
+        print(out);
+    else if (nbrs.len() > 1)
+        for (auto i1 : range_el(0, nbrs.len() - 1))
+            for (auto i2 : range_el(i1 + 1, nbrs.len())) {
+                auto remains = nbrs[range_el(0, i1)] + nbrs[range_el(i1 + 1, i2)] + nbrs[range_ei(i2 + 1)];
+                auto [a, b] = make_tuple(nbrs[i1], nbrs[i2]);
+                if (a > b)
+                    swap(a, b);
+                auto res = b + a;
+                auto op = String(b) & u" + "_S & String(a) & u" = "_S & String(res) & u" ; "_S;
+                sol(target, create_array({res}) + remains, out & op);
+                if (b != a) {
+                    res = b - a;
+                    op = String(b) & u" - "_S & String(a) & u" = "_S & String(res) & u" ; "_S;
+                    sol(target, create_array({res}) + remains, out & op);
+                }
+                if (a != 1) {
+                    res = b * a;
+                    op = String(b) & u" * "_S & String(a) & u" = "_S & String(res) & u" ; "_S;
+                    sol(target, create_array({res}) + remains, out & op);
+                    if (mod(b, a) == 0) {
+                        res = to_int(b / a);
+                        op = String(b) & u" / "_S & String(a) & u" = "_S & String(res) & u" ; "_S;
+                        sol(target, create_array({res}) + remains, out & op);
+                    }
+                }
+            }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        sol(target, nbrs);
+        if (best != target) {
+            print(u"Best solution "_S & String(best));
+            print(best_out);
+        }
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Cullen_and_Woodall_numbers#Python
+def cullen(n): return (n<<n)+1
+
+def woodall(n): return (n<<n)-1
+
+print("First 20 Cullen numbers:")
+for i in range(1,21):
+    print(cullen(i),end=" ")
+print()
+print()
+print("First 20 Woodall numbers:")
+for i in range(1,21):
+    print(woodall(i),end=" ")
+print()
+===
+F cullen(n)
+   R (n << n) + 1
+
+F woodall(n)
+   R (n << n) - 1
+
+print(‘First 20 Cullen numbers:’)
+L(i) 1..20
+   print(cullen(i), end' ‘ ’)
+print()
+print()
+print(‘First 20 Woodall numbers:’)
+L(i) 1..20
+   print(woodall(i), end' ‘ ’)
+print()
+===
+template <typename T1> auto cullen(const T1 &n)
+{
+    return (n << n) + 1;
+}
+
+template <typename T1> auto woodall(const T1 &n)
+{
+    return (n << n) - 1;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"First 20 Cullen numbers:"_S);
+        for (auto i : range_ee(1, 20))
+            print(cullen(i), u" "_S);
+        print();
+        print();
+        print(u"First 20 Woodall numbers:"_S);
+        for (auto i : range_ee(1, 20))
+            print(woodall(i), u" "_S);
+        print();
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Curzon_numbers#C++
+from typing import List
+Int64 = int
+
+def is_curzon(n, k):
+    m = k * n + 1
+    return pow(Int64(k), n, m) + 1 == m
+
+for k in [2, 4, 6, 8, 10]:
+    n = 1
+    curzons : List[int] = []
+    while len(curzons) < 1000:
+        if is_curzon(n, k):
+            curzons.append(n)
+        n += 1
+    print(f'Curzon numbers with k = {k}:')
+    for i, c in enumerate(curzons[:50]):
+        print(f' {c:4,}', end='\n' if (i + 1) % 25 == 0 else '')
+    print(f'    Thousandth Curzon with k = {k}: {curzons[999]}.\n')
+===
+F is_curzon(n, k)
+   V m = k * n + 1
+   R pow(Int64(k), n, m) + 1 == m
+
+L(k) [2, 4, 6, 8, 10]
+   V n = 1
+   [Int] curzons
+   L curzons.len < 1000
+      I is_curzon(n, k)
+         curzons.append(n)
+      n++
+   print(‘Curzon numbers with k = ’k‘:’)
+   L(c) curzons[0.<50]
+      V i = L.index
+      print(f:‘ {commatize(c):4}’, end' I (i + 1) % 25 == 0 {"\n"} E ‘’)
+   print(‘    Thousandth Curzon with k = ’k‘: ’curzons[999]".\n")
+===
+template <typename T1, typename T2> auto is_curzon(const T1 &n, const T2 &k)
+{
+    auto m = k * n + 1;
+    return pow(to_int64(k), n, m) + 1 == m;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&k : create_array({2, 4, 6, 8, 10})) {
+            auto n = 1;
+            Array<int> curzons;
+            while (curzons.len() < 1000) {
+                if (is_curzon(n, k))
+                    curzons.append(n);
+                n++;
+            }
+            print(u"Curzon numbers with k = "_S & k & u":"_S);
+            {int Lindex = 0;
+            for (auto &&c : curzons[range_el(0, 50)]) {
+                auto i = Lindex;
+                print(u" #4"_S.format(commatize(c)), mod((i + 1), 25) == 0 ? u"\n"_S : u""_S);
+                Lindex++;
+            }}
+            print(u"    Thousandth Curzon with k = "_S & k & u": "_S & _get<999>(curzons) & u".\n"_S);
+        }
     }
 } code_block_1;

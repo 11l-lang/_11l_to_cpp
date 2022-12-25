@@ -485,7 +485,10 @@ class SymbolNode:
                 else:
                     nfmtstr += '#'
                     if i + 1 < len(self.children) and self.children[i + 1].token.category == Token.Category.STATEMENT_SEPARATOR:
-                        fmt = self.children[i + 1].token.value(source).lstrip(' ')
+                        fmt = self.children[i + 1].token.value(source)#.lstrip(' ')
+                        if fmt[0] == ' ':
+                            p = self.children[i + 1].token.start
+                            raise Error('space format option is not supported [but you can write `f:‘ {c:4}’` instead of `f:‘{c: 5}’`]', Token(p, p, Token.Category.DELIMITER))
                         if fmt[0] == '<':
                             nfmtstr += '<'
                             fmt = fmt[1:]

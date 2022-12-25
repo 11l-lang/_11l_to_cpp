@@ -4747,6 +4747,7 @@ struct CodeBlock1
 } code_block_1;
 
 
+---
 # [https://rosettacode.org/wiki/Colorful_numbers#Python]
 print(f'{1 + 2: 5,}')
 ===
