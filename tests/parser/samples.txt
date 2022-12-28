@@ -1747,7 +1747,7 @@ T Type
 class Type
 {
 private:
-    static const auto s_private_const_static_var = 10;
+    static inline const auto s_private_const_static_var = 10;
 public:
     const decltype(11) const_var = 11;
     const int c;
@@ -1934,3 +1934,13 @@ struct CodeBlock3
         print((*(*(*nn).first_child).first_child).eval());
     }
 } code_block_3;
+
+
+T BalancedTernary
+   -:str2dig = [‘+’ = 1, ‘-’ = -1, ‘0’ = 0]
+===
+class BalancedTernary
+{
+public:
+    static inline const auto s_str2dig = create_dict(dict_of(u'+'_C, 1)(u'-'_C, -1)(u'0'_C, 0));
+};
