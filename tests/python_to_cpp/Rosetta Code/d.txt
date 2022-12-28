@@ -2887,3 +2887,401 @@ struct CodeBlock1
         print(sorted(create_array(create_set(cart_product(range_ee(2, 5), range_ee(2, 5)).map([](const auto &a, const auto &b){return pow(a, b);})))));
     }
 } code_block_1;
+
+
+# https://rosettacode.org/wiki/De_Polignac_numbers#C++
+import math, itertools
+
+def is_prime(p):
+    if p < 2 or p % 2 == 0:
+        return p == 2
+    for i in range(3, int(math.sqrt(p)) + 1, 2):
+        if p % i == 0:
+            return False
+    return True
+
+def is_depolignac_number(n):
+    p = 1
+    while p < n:
+        if is_prime(n - p):
+            return False
+        p <<= 1
+    return True
+
+print('First 50 de Polignac numbers:')
+count = 0
+for n in itertools.count(1, 2):
+    if is_depolignac_number(n):
+        count += 1
+        if count <= 50:
+            print(f'{n:5,}', end = "\n" if count % 10 == 0 else ' ')
+        elif count == 1000:
+            print(f"\nOne thousandth: {n:,}")
+        elif count == 10000:
+            print(f"\nTen thousandth: {n:,}")
+            break
+===
+F is_prime(p)
+   I p < 2 | p % 2 == 0
+      R p == 2
+   L(i) (3 .. Int(sqrt(p))).step(2)
+      I p % i == 0
+         R 0B
+   R 1B
+
+F is_depolignac_number(n)
+   V p = 1
+   L p < n
+      I is_prime(n - p)
+         R 0B
+      p <<= 1
+   R 1B
+
+print(‘First 50 de Polignac numbers:’)
+V count = 0
+L(n) (1..).step(2)
+   I is_depolignac_number(n)
+      count++
+      I count <= 50
+         print(f:‘{commatize(n):5}’, end' I count % 10 == 0 {"\n"} E ‘ ’)
+      E I count == 1000
+         print(f:"\nOne thousandth: {commatize(n)}")
+      E I count == 10000
+         print(f:"\nTen thousandth: {commatize(n)}")
+         L.break
+===
+template <typename T1> auto is_prime(const T1 &p)
+{
+    if (p < 2 || mod(p, 2) == 0)
+        return p == 2;
+    for (auto i : range_ee(3, to_int(sqrt(p))).step(2))
+        if (mod(p, i) == 0)
+            return false;
+    return true;
+}
+
+template <typename T1> auto is_depolignac_number(const T1 &n)
+{
+    auto p = 1;
+    while (p < n) {
+        if (is_prime(n - p))
+            return false;
+        p <<= 1;
+    }
+    return true;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"First 50 de Polignac numbers:"_S);
+    }
+} code_block_1;
+
+auto count = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto n : range_ei(1).step(2))
+            if (is_depolignac_number(n)) {
+                count++;
+                if (count <= 50)
+                    print(u"#5"_S.format(commatize(n)), mod(count, 10) == 0 ? u'\n'_C : u' '_C);
+                else if (count == 1000)
+                    print(u"\nOne thousandth: #."_S.format(commatize(n)));
+                else if (count == 10000) {
+                    print(u"\nTen thousandth: #."_S.format(commatize(n)));
+                    break;
+                }
+            }
+    }
+} code_block_2;
+
+
+# https://rosettacode.org/wiki/Descending_primes#C#
+import math
+
+def is_prime(p):
+    if p < 2 or p % 2 == 0:
+        return p == 2
+    for i in range(3, int(math.sqrt(p)) + 1, 2):
+        if p % i == 0:
+            return False
+    return True
+
+c = 0
+ps = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+nxt = [0] * 128
+
+while True:
+    nc = 0
+    for a in ps:
+        if is_prime(a):
+            c += 1
+            print('%8d' % a, end = "\n" if c % 5 == 0 else ' ')
+        b = a * 10
+        l = a % 10 + b
+        b += 1
+        while b < l:
+            nxt[nc] = b
+            nc += 1
+            b += 1
+
+    if nc > 1:
+        ps = nxt[:nc]
+    else:
+        break
+
+print(f"\n{c} descending primes found")
+===
+F is_prime(p)
+   I p < 2 | p % 2 == 0
+      R p == 2
+   L(i) (3 .. Int(sqrt(p))).step(2)
+      I p % i == 0
+         R 0B
+   R 1B
+
+V c = 0
+V ps = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+V nxt = [0] * 128
+
+L
+   V nc = 0
+   L(a) ps
+      I is_prime(a)
+         c++
+         print(‘#8’.format(a), end' I c % 5 == 0 {"\n"} E ‘ ’)
+      V b = a * 10
+      V l = a % 10 + b
+      b++
+      L b < l
+         nxt[nc] = b
+         nc++
+         b++
+
+   I nc > 1
+      ps = nxt[0 .< nc]
+   E
+      L.break
+
+print("\n"c‘ descending primes found’)
+===
+template <typename T1> auto is_prime(const T1 &p)
+{
+    if (p < 2 || mod(p, 2) == 0)
+        return p == 2;
+    for (auto i : range_ee(3, to_int(sqrt(p))).step(2))
+        if (mod(p, i) == 0)
+            return false;
+    return true;
+}
+
+auto c = 0;
+auto ps = create_array({1, 2, 3, 4, 5, 6, 7, 8, 9});
+auto nxt = create_array({0}) * 128;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            auto nc = 0;
+            for (auto &&a : ps) {
+                if (is_prime(a)) {
+                    c++;
+                    print(u"#8"_S.format(a), mod(c, 5) == 0 ? u'\n'_C : u' '_C);
+                }
+                auto b = a * 10;
+                auto l = mod(a, 10) + b;
+                b++;
+                while (b < l) {
+                    nxt.set(nc, b);
+                    nc++;
+                    b++;
+                }
+            }
+
+            if (nc > 1)
+                ps = nxt[range_el(0, nc)];
+            else
+                break;
+        }
+
+        print(u"\n"_S & c & u" descending primes found"_S);
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Descending_primes
+import math
+from typing import List
+
+def is_prime(p):
+    if p < 2 or p % 2 == 0:
+        return p == 2
+    for i in range(3, int(math.sqrt(p)) + 1, 2):
+        if p % i == 0:
+            return False
+    return True
+
+descending_primes : List[int] = []
+
+for n in range(1, 2**9):
+    s = ''
+    for i in range(8, -1, -1):
+        if n & (1 << i) != 0:
+            s += str(i + 1)
+    if is_prime(int(s)):
+        descending_primes.append(int(s))
+
+for c, n in enumerate(sorted(descending_primes)):
+    print('%8d' % n, end = "\n" if (c + 1) % 5 == 0 else ' ')
+
+print(f"\n{len(descending_primes)} descending primes found")
+===
+F is_prime(p)
+   I p < 2 | p % 2 == 0
+      R p == 2
+   L(i) (3 .. Int(sqrt(p))).step(2)
+      I p % i == 0
+         R 0B
+   R 1B
+
+[Int] descending_primes
+
+L(n) 1 .< 2 ^ 9
+   V s = ‘’
+   L(i) (8 .< -1).step(-1)
+      I n [&] (1 << i) != 0
+         s ‘’= String(i + 1)
+   I is_prime(Int(s))
+      descending_primes.append(Int(s))
+
+L(n) sorted(descending_primes)
+   V c = L.index
+   print(‘#8’.format(n), end' I (c + 1) % 5 == 0 {"\n"} E ‘ ’)
+
+print("\n"descending_primes.len‘ descending primes found’)
+===
+template <typename T1> auto is_prime(const T1 &p)
+{
+    if (p < 2 || mod(p, 2) == 0)
+        return p == 2;
+    for (auto i : range_ee(3, to_int(sqrt(p))).step(2))
+        if (mod(p, i) == 0)
+            return false;
+    return true;
+}
+
+Array<int> descending_primes;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_el(1, pow(2, 9))) {
+            auto s = u""_S;
+            for (auto i : range_el(8, -1).step(-1))
+                if ((n & (1 << i)) != 0)
+                    s &= String(i + 1);
+            if (is_prime(to_int(s)))
+                descending_primes.append(to_int(s));
+        }
+        {int Lindex = 0;
+
+        for (auto &&n : sorted(descending_primes)) {
+            auto c = Lindex;
+            print(u"#8"_S.format(n), mod((c + 1), 5) == 0 ? u'\n'_C : u' '_C);
+            Lindex++;
+        }}
+
+        print(u"\n"_S & descending_primes.len() & u" descending primes found"_S);
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Disarium_numbers#Python
+def is_disarium(n):
+    digitos = len(str(n))
+    suma = 0
+    x = n
+    while x != 0:
+        suma += (x % 10) ** digitos
+        digitos -= 1
+        x //= 10
+    if suma == n:
+        return True
+    else:
+        return False
+
+limite = 19
+cont = 0
+n = 0
+print("The first",limite,"Disarium numbers are:")
+while cont < limite:
+    if is_disarium(n):
+        print(n, end = " ")
+        cont += 1
+    n += 1
+===
+F is_disarium(n)
+   V digitos = String(n).len
+   V suma = 0
+   V x = n
+   L x != 0
+      suma += (x % 10) ^ digitos
+      digitos--
+      x I/= 10
+   I suma == n
+      R 1B
+   E
+      R 0B
+
+V limite = 19
+V cont = 0
+V n = 0
+print(‘The first ’limite‘ Disarium numbers are:’)
+L cont < limite
+   I is_disarium(n)
+      print(n, end' ‘ ’)
+      cont++
+   n++
+===
+template <typename T1> auto is_disarium(const T1 &n)
+{
+    auto digitos = String(n).len();
+    auto suma = 0;
+    auto x = n;
+    while (x != 0) {
+        suma += pow((mod(x, 10)), digitos);
+        digitos--;
+        x = idiv(x, 10);
+    }
+    if (suma == n)
+        return true;
+    else
+        return false;
+}
+
+auto limite = 19;
+auto cont = 0;
+auto n = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"The first "_S & limite & u" Disarium numbers are:"_S);
+        while (cont < limite) {
+            if (is_disarium(n)) {
+                print(n, u" "_S);
+                cont++;
+            }
+            n++;
+        }
+    }
+} code_block_1;

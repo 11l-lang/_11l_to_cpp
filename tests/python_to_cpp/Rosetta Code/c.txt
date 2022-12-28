@@ -4282,3 +4282,250 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://rosettacode.org/wiki/Cyclops_numbers#C++
+import math, itertools
+from typing import List
+
+def print50(a, width=8):
+    for i, n in enumerate(a):
+        print((f'{n:,}').rjust(width), end='\n' if (i + 1) % 10 == 0 else '')
+
+def is_cyclops(n):
+    if n == 0:
+        return True
+    m = n % 10
+    count = 0
+    while m != 0:
+        count += 1
+        n //= 10
+        m = n % 10
+    n //= 10
+    m = n % 10
+    while m != 0:
+        count -= 1
+        n //= 10
+        m = n % 10
+    return n == 0 and count == 0
+
+def is_prime(p):
+    if p < 2 or p % 2 == 0:
+        return p == 2
+    for i in range(3, int(math.sqrt(p)) + 1, 2):
+        if p % i == 0:
+            return False
+    return True
+
+def is_palindromic(d):
+    return str(d) == str(d)[::-1]
+
+arr : List[int] = []
+
+print('The first 50 cyclops numbers are:')
+for i in itertools.count(0):
+    if is_cyclops(i):
+        arr.append(i)
+        if len(arr) == 50:
+            break
+print50(arr)
+
+print('\nThe first 50 prime cyclops numbers are:')
+arr.clear()
+for i in itertools.count(0):
+    if is_cyclops(i) and is_prime(i):
+        arr.append(i)
+        if len(arr) == 50:
+            break
+print50(arr)
+
+print('\nThe first 50 blind prime cyclops numbers are:')
+arr.clear()
+for i in itertools.count(0):
+    if is_cyclops(i) and is_prime(i):
+        istr = str(i)
+        mid = len(istr) // 2
+        if is_prime(int(istr[:mid] + istr[mid+1:])):
+            arr.append(i)
+            if len(arr) == 50:
+                break
+print50(arr)
+
+print('\nThe first 50 palindromic prime cyclops numbers are:')
+arr.clear()
+for i in itertools.count(0):
+    if is_cyclops(i) and is_prime(i) and is_palindromic(i):
+        arr.append(i)
+        if len(arr) == 50:
+            break
+print50(arr, 11)
+===
+F print50(a, width = 8)
+   L(n) a
+      V i = L.index
+      print((f:‘{commatize(n)}’).rjust(width), end' I (i + 1) % 10 == 0 {"\n"} E ‘’)
+
+F is_cyclops(=n)
+   I n == 0
+      R 1B
+   V m = n % 10
+   V count = 0
+   L m != 0
+      count++
+      n I/= 10
+      m = n % 10
+   n I/= 10
+   m = n % 10
+   L m != 0
+      count--
+      n I/= 10
+      m = n % 10
+   R n == 0 & count == 0
+
+F is_prime(p)
+   I p < 2 | p % 2 == 0
+      R p == 2
+   L(i) (3 .. Int(sqrt(p))).step(2)
+      I p % i == 0
+         R 0B
+   R 1B
+
+F is_palindromic(d)
+   R String(d) == reversed(String(d))
+
+[Int] arr
+
+print(‘The first 50 cyclops numbers are:’)
+L(i) 0..
+   I is_cyclops(i)
+      arr.append(i)
+      I arr.len == 50
+         L.break
+print50(arr)
+
+print("\nThe first 50 prime cyclops numbers are:")
+arr.clear()
+L(i) 0..
+   I is_cyclops(i) & is_prime(i)
+      arr.append(i)
+      I arr.len == 50
+         L.break
+print50(arr)
+
+print("\nThe first 50 blind prime cyclops numbers are:")
+arr.clear()
+L(i) 0..
+   I is_cyclops(i) & is_prime(i)
+      V istr = String(i)
+      V mid = istr.len I/ 2
+      I is_prime(Int(istr[0 .< mid]‘’istr[mid + 1 ..]))
+         arr.append(i)
+         I arr.len == 50
+            L.break
+print50(arr)
+
+print("\nThe first 50 palindromic prime cyclops numbers are:")
+arr.clear()
+L(i) 0..
+   I is_cyclops(i) & is_prime(i) & is_palindromic(i)
+      arr.append(i)
+      I arr.len == 50
+         L.break
+print50(arr, 11)
+===
+template <typename T1, typename T2 = decltype(8)> auto print50(const T1 &a, const T2 &width = 8)
+{
+    {int Lindex = 0;
+    for (auto &&n : a) {
+        auto i = Lindex;
+        print((u"#."_S.format(commatize(n))).rjust(width), mod((i + 1), 10) == 0 ? u"\n"_S : u""_S);
+        Lindex++;
+    }}
+}
+
+template <typename T1> auto is_cyclops(T1 n)
+{
+    if (n == 0)
+        return true;
+    auto m = mod(n, 10);
+    auto count = 0;
+    while (m != 0) {
+        count++;
+        n = idiv(n, 10);
+        m = mod(n, 10);
+    }
+    n = idiv(n, 10);
+    m = mod(n, 10);
+    while (m != 0) {
+        count--;
+        n = idiv(n, 10);
+        m = mod(n, 10);
+    }
+    return n == 0 && count == 0;
+}
+
+template <typename T1> auto is_prime(const T1 &p)
+{
+    if (p < 2 || mod(p, 2) == 0)
+        return p == 2;
+    for (auto i : range_ee(3, to_int(sqrt(p))).step(2))
+        if (mod(p, i) == 0)
+            return false;
+    return true;
+}
+
+template <typename T1> auto is_palindromic(const T1 &d)
+{
+    return String(d) == reversed(String(d));
+}
+
+Array<int> arr;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"The first 50 cyclops numbers are:"_S);
+        for (auto i : range_ei(0))
+            if (is_cyclops(i)) {
+                arr.append(i);
+                if (arr.len() == 50)
+                    break;
+            }
+        print50(arr);
+
+        print(u"\nThe first 50 prime cyclops numbers are:"_S);
+        arr.clear();
+        for (auto i : range_ei(0))
+            if (is_cyclops(i) && is_prime(i)) {
+                arr.append(i);
+                if (arr.len() == 50)
+                    break;
+            }
+        print50(arr);
+
+        print(u"\nThe first 50 blind prime cyclops numbers are:"_S);
+        arr.clear();
+        for (auto i : range_ei(0))
+            if (is_cyclops(i) && is_prime(i)) {
+                auto istr = String(i);
+                auto mid = idiv(istr.len(), 2);
+                if (is_prime(to_int(istr[range_el(0, mid)] & istr[range_ei(mid + 1)]))) {
+                    arr.append(i);
+                    if (arr.len() == 50)
+                        break;
+                }
+            }
+        print50(arr);
+
+        print(u"\nThe first 50 palindromic prime cyclops numbers are:"_S);
+        arr.clear();
+        for (auto i : range_ei(0))
+            if (is_cyclops(i) && is_prime(i) && is_palindromic(i)) {
+                arr.append(i);
+                if (arr.len() == 50)
+                    break;
+            }
+        print50(arr, 11);
+    }
+} code_block_1;

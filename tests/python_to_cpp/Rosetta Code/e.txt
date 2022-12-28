@@ -2658,3 +2658,125 @@ struct CodeBlock3
             }
     }
 } code_block_3;
+
+
+# https://rosettacode.org/wiki/Even_numbers_which_cannot_be_expressed_as_the_sum_of_two_twin_primes#Python
+import math
+
+def list_primality(n):
+    # Sieve of Eratosthenes
+    result = [True] * (n + 1)
+    result[0] = result[1] = False
+    for i in range(int(math.sqrt(n)) + 1):
+        if result[i]:
+            for j in range(i * i, len(result), i):
+                result[j] = False
+    return result
+
+def nonpairsums(include1=False, limit=20_000):
+    prim = list_primality(limit + 2)
+
+    """ Even numbers which cannot be expressed as the sum of two twin primes """
+    tpri = [prim[i] and (prim[i - 2] or prim[i + 2])
+            for i in range(limit+2)]
+    if include1:
+        tpri[1] = True
+    twinsums = [False] * (limit * 2)
+    for i in range(limit):
+        for j in range(limit-i+1):
+            if tpri[i] and tpri[j]:
+                twinsums[i + j] = True
+
+    return [i for i in range(2, limit+1, 2) if not twinsums[i]]
+
+print('Non twin prime sums:')
+for k, p in enumerate(nonpairsums()):
+    print(f'{p:6}', end='\n' if (k + 1) % 10 == 0 else '')
+
+print('\n\nNon twin prime sums (including 1):')
+for k, p in enumerate(nonpairsums(include1=True)):
+    print(f'{p:6}', end='\n' if (k + 1) % 10 == 0 else '')
+===
+F list_primality(n)
+   V result = [1B] * (n + 1)
+   result[0] = result[1] = 0B
+   L(i) 0 .. Int(sqrt(n))
+      I result[i]
+         L(j) (i * i .< result.len).step(i)
+            result[j] = 0B
+   R result
+
+F nonpairsums(include1 = 0B, limit = 20'000)
+   V prim = list_primality(limit + 2)
+
+   ‘ Even numbers which cannot be expressed as the sum of two twin primes ’
+   V tpri = (0 .< limit + 2).map(i -> @prim[i] & (@prim[i - 2] | @prim[i + 2]))
+   I include1
+      tpri[1] = 1B
+   V twinsums = [0B] * (limit * 2)
+   L(i) 0 .< limit
+      L(j) 0 .. limit - i
+         I tpri[i] & tpri[j]
+            twinsums[i + j] = 1B
+
+   R (2 .. limit).step(2).filter(i -> !@twinsums[i])
+
+print(‘Non twin prime sums:’)
+L(p) nonpairsums()
+   V k = L.index
+   print(f:‘{p:6}’, end' I (k + 1) % 10 == 0 {"\n"} E ‘’)
+
+print("\n\nNon twin prime sums (including 1):")
+L(p) nonpairsums(include1' 1B)
+   V k = L.index
+   print(f:‘{p:6}’, end' I (k + 1) % 10 == 0 {"\n"} E ‘’)
+===
+template <typename T1> auto list_primality(const T1 &n)
+{
+    auto result = create_array({true}) * (n + 1);
+    _set<0>(result, _set<1>(result, false));
+    for (auto i : range_ee(0, to_int(sqrt(n))))
+        if (result[i])
+            for (auto j : range_el(i * i, result.len()).step(i))
+                result.set(j, false);
+    return result;
+}
+
+template <typename T1 = decltype(false), typename T2 = decltype(20'000)> auto nonpairsums(const T1 &include1 = false, const T2 &limit = 20'000)
+{
+    auto prim = list_primality(limit + 2);
+
+    u" Even numbers which cannot be expressed as the sum of two twin primes "_S;
+    auto tpri = range_el(0, limit + 2).map([&prim](const auto &i){return prim[i] && (prim[i - 2] || prim[i + 2]);});
+    if (include1)
+        _set<1>(tpri, true);
+    auto twinsums = create_array({false}) * (limit * 2);
+    for (auto i : range_el(0, limit))
+        for (auto j : range_ee(0, limit - i))
+            if (tpri[i] && tpri[j])
+                twinsums.set(i + j, true);
+
+    return range_ee(2, limit).step(2).filter([&twinsums](const auto &i){return !twinsums[i];});
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Non twin prime sums:"_S);
+        {int Lindex = 0;
+        for (auto &&p : nonpairsums()) {
+            auto k = Lindex;
+            print(u"#6"_S.format(p), mod((k + 1), 10) == 0 ? u"\n"_S : u""_S);
+            Lindex++;
+        }}
+
+        print(u"\n\nNon twin prime sums (including 1):"_S);
+        {int Lindex = 0;
+        for (auto &&p : nonpairsums(true)) {
+            auto k = Lindex;
+            print(u"#6"_S.format(p), mod((k + 1), 10) == 0 ? u"\n"_S : u""_S);
+            Lindex++;
+        }}
+    }
+} code_block_1;

@@ -3636,6 +3636,7 @@ string_scope.add_name('ljust',  ASTFunctionDefinition([('width', '', 'Int'), ('f
 string_scope.add_name('rjust',  ASTFunctionDefinition([('width', '', 'Int'), ('fillchar', token_to_str('‘ ’'), 'Char')]))
 string_scope.add_name('format', ASTFunctionDefinition([('arg', token_to_str('N', Token.Category.CONSTANT), '')] * 32))
 string_scope.add_name('map', ASTFunctionDefinition([('function', '', '(Char -> T)')]))
+string_scope.add_name('filter', ASTFunctionDefinition([('function', '', '(Char -> Bool)')]))
 string_scope.add_name('reduce', ASTFunctionDefinition([('initial', '', 'T'), ('function', '', '((T, Char) -> T)')]))
 string_scope.add_name('encode', ASTFunctionDefinition([('encoding', token_to_str('‘utf-8’'), 'String')]))
 builtins_scope.ids['String'].ast_nodes[0].scope = string_scope
