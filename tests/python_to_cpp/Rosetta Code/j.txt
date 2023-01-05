@@ -532,3 +532,129 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://rosettacode.org/wiki/Jacobsthal_numbers#Python
+import math
+Int64 = int
+
+def isPrime(n):
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+def odd(n):
+    return n & 1 != 0
+
+def jacobsthal(n):
+    return math.floor((pow(2.0,n)+odd(n))/3)
+
+def jacobsthal_lucas(n):
+    return int(pow(2,n)+pow(-1,n))
+
+def jacobsthal_oblong(n):
+    return Int64(jacobsthal(n))*jacobsthal(n+1)
+
+print("First 30 Jacobsthal numbers:")
+for j in range(0, 30):
+    print(jacobsthal(j), end="  ")
+
+print("\n\nFirst 30 Jacobsthal-Lucas numbers: ")
+for j in range(0, 30):
+    print(jacobsthal_lucas(j), end = '\t')
+
+print("\n\nFirst 20 Jacobsthal oblong numbers: ")
+for j in range(0, 20):
+    print(jacobsthal_oblong(j), end="  ")
+
+print("\n\nFirst 10 Jacobsthal primes: ")
+for j in range(3, 33):
+    if isPrime(jacobsthal(j)):
+        print(jacobsthal(j))
+===
+F isPrime(n)
+   L(i) 2 .. Int(n ^ 0.5)
+      I n % i == 0
+         R 0B
+   R 1B
+
+F odd(n)
+   R n [&] 1 != 0
+
+F jacobsthal(n)
+   R floori((pow(2.0, n) + odd(n)) / 3)
+
+F jacobsthal_lucas(n)
+   R Int(pow(2, n) + pow(-1, n))
+
+F jacobsthal_oblong(n)
+   R Int64(jacobsthal(n)) * jacobsthal(n + 1)
+
+print(‘First 30 Jacobsthal numbers:’)
+L(j) 0..29
+   print(jacobsthal(j), end' ‘  ’)
+
+print("\n\nFirst 30 Jacobsthal-Lucas numbers: ")
+L(j) 0..29
+   print(jacobsthal_lucas(j), end' "\t")
+
+print("\n\nFirst 20 Jacobsthal oblong numbers: ")
+L(j) 0..19
+   print(jacobsthal_oblong(j), end' ‘  ’)
+
+print("\n\nFirst 10 Jacobsthal primes: ")
+L(j) 3..32
+   I isPrime(jacobsthal(j))
+      print(jacobsthal(j))
+===
+template <typename T1> auto isPrime(const T1 &n)
+{
+    for (auto i : range_ee(2, to_int(pow(n, 0.5))))
+        if (mod(n, i) == 0)
+            return false;
+    return true;
+}
+
+template <typename T1> auto odd(const T1 &n)
+{
+    return (n & 1) != 0;
+}
+
+template <typename T1> auto jacobsthal(const T1 &n)
+{
+    return floori((pow(2.0, n) + odd(n)) / 3.0);
+}
+
+template <typename T1> auto jacobsthal_lucas(const T1 &n)
+{
+    return to_int(pow(2, n) + pow(-1, n));
+}
+
+template <typename T1> auto jacobsthal_oblong(const T1 &n)
+{
+    return to_int64(jacobsthal(n)) * jacobsthal(n + 1);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"First 30 Jacobsthal numbers:"_S);
+        for (auto j : range_ee(0, 29))
+            print(jacobsthal(j), u"  "_S);
+
+        print(u"\n\nFirst 30 Jacobsthal-Lucas numbers: "_S);
+        for (auto j : range_ee(0, 29))
+            print(jacobsthal_lucas(j), u"\t"_S);
+
+        print(u"\n\nFirst 20 Jacobsthal oblong numbers: "_S);
+        for (auto j : range_ee(0, 19))
+            print(jacobsthal_oblong(j), u"  "_S);
+
+        print(u"\n\nFirst 10 Jacobsthal primes: "_S);
+        for (auto j : range_ee(3, 32))
+            if (isPrime(jacobsthal(j)))
+                print(jacobsthal(j));
+    }
+} code_block_1;

@@ -67,7 +67,7 @@ def list_primes(n):
 
 # Returns a list of prime numbers in ascending order from 2 to limit (inclusive).
 def primes_up_to_limit(limit: int):
-	r : List[int] = []
+	r: List[int] = []
 	if limit >= 2:
 		r.append(2)
 
@@ -103,7 +103,7 @@ def list_totients(n):
 				result[j] -= result[j] // i
 	return result
 
-def binomial(n : BigInt, k : BigInt):
+def binomial(n: BigInt, k: BigInt):
 	assert BigInt(0) <= k <= n
 	return math.factorial(n) // (math.factorial(k) * math.factorial(n - k))
 

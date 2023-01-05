@@ -1223,3 +1223,302 @@ struct CodeBlock1
             print(generate(1, 20));
     }
 } code_block_1;
+
+
+# https://rosettacode.org/wiki/Gaussian_primes#Python
+import math
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+def is_gaussian_prime(n):
+    r, c = int(abs(n.real)), int(abs(n.imag))
+    return is_prime(r * r + c * c) or (c == 0 and is_prime(r) and (r - 3) % 4 == 0) or (r == 0 and is_prime(c) and (c - 3) % 4 == 0)
+
+def norm(c):
+    return c.real * c.real + c.imag * c.imag
+
+limitsquared = 100
+lim = int(math.sqrt(limitsquared))
+testvals = [complex(r, c) for r in range(-lim, lim) for c in range(-lim, lim)]
+testvals = filter(lambda c : is_gaussian_prime(c) and norm(c) < limitsquared, testvals)
+gprimes = sorted([(c, i) for i, c in enumerate(testvals)], key=lambda c:(norm(c[0]),c[1]))
+print(f'Gaussian primes within {lim} of the origin on the complex plane:')
+for i, c in enumerate(gprimes):
+    print(str(c[0]).ljust(9), end='\n' if (i+1) % 10 == 0 else '')
+===
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+F is_gaussian_prime(n)
+   V (r, c) = (Int(abs(n.real)), Int(abs(n.imag)))
+   R is_prime(r * r + c * c) | (c == 0 & is_prime(r) & (r - 3) % 4 == 0) | (r == 0 & is_prime(c) & (c - 3) % 4 == 0)
+
+F norm(c)
+   R c.real * c.real + c.imag * c.imag
+
+V limitsquared = 100
+V lim = Int(sqrt(limitsquared))
+V testvals = multiloop((-lim .< lim), (-lim .< lim), (r, c) -> Complex(r, c))
+testvals = testvals.filter(c -> is_gaussian_prime(c) & norm(c) < :limitsquared)
+V gprimes = sorted(enumerate(testvals).map((i, c) -> (c, i)), key' c -> (norm(c[0]), c[1]))
+print(‘Gaussian primes within ’lim‘ of the origin on the complex plane:’)
+L(c) gprimes
+   V i = L.index
+   print(String(c[0]).ljust(9), end' I (i + 1) % 10 == 0 {"\n"} E ‘’)
+===
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+template <typename T1> auto is_gaussian_prime(const T1 &n)
+{
+    auto [r, c] = make_tuple(to_int(abs(n.real())), to_int(abs(n.imag())));
+    return is_prime(r * r + c * c) || (c == 0 && is_prime(r) && mod((r - 3), 4) == 0) || (r == 0 && is_prime(c) && mod((c - 3), 4) == 0);
+}
+
+template <typename T1> auto norm(const T1 &c)
+{
+    return c.real() * c.real() + c.imag() * c.imag();
+}
+
+auto limitsquared = 100;
+auto lim = to_int(sqrt(limitsquared));
+auto testvals = multiloop(range_el(-lim, lim), range_el(-lim, lim), [](const auto &r, const auto &c){return Complex(r, c);});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        testvals = testvals.filter([](const auto &c){return is_gaussian_prime(c) && norm(c) < ::limitsquared;});
+    }
+} code_block_1;
+
+auto gprimes = sorted(enumerate(testvals).map([](const auto &i, const auto &c){return make_tuple(c, i);}), [](const auto &c){return make_tuple(norm(_get<0>(c)), _get<1>(c));});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(u"Gaussian primes within "_S & lim & u" of the origin on the complex plane:"_S);
+        {int Lindex = 0;
+        for (auto &&c : gprimes) {
+            auto i = Lindex;
+            print(String(_get<0>(c)).ljust(9), mod((i + 1), 10) == 0 ? u"\n"_S : u""_S);
+            Lindex++;
+        }}
+    }
+} code_block_2;
+
+
+# https://rosettacode.org/wiki/Giuga_numbers#Python
+import math
+
+def isGiuga(m):
+    n = m
+    f = 2
+    l = math.sqrt(n)
+    while True:
+        if n % f == 0:
+            if ((m // f) - 1) % f != 0:
+                return False
+            n //= f
+            if f > n:
+                return True
+        else:
+            f += 1
+            if f > l:
+                return False
+
+n = 3
+c = 0
+print("The first 4 Giuga numbers are:")
+while c < 4:
+    if isGiuga(n):
+        c += 1
+        print(n)
+    n += 1
+===
+F isGiuga(m)
+   V n = m
+   V f = 2
+   V l = sqrt(n)
+   L
+      I n % f == 0
+         I ((m I/ f) - 1) % f != 0
+            R 0B
+         n I/= f
+         I f > n
+            R 1B
+      E
+         f++
+         I f > l
+            R 0B
+
+V n = 3
+V c = 0
+print(‘The first 4 Giuga numbers are:’)
+L c < 4
+   I isGiuga(n)
+      c++
+      print(n)
+   n++
+===
+template <typename T1> auto isGiuga(const T1 &m)
+{
+    auto n = m;
+    auto f = 2;
+    auto l = sqrt(n);
+    while (true)
+        if (mod(n, f) == 0) {
+            if (mod(((idiv(m, f)) - 1), f) != 0)
+                return false;
+            n = idiv(n, f);
+            if (f > n)
+                return true;
+        }
+        else {
+            f++;
+            if (f > l)
+                return false;
+        }
+}
+
+auto n = 3;
+auto c = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"The first 4 Giuga numbers are:"_S);
+        while (c < 4) {
+            if (isGiuga(n)) {
+                c++;
+                print(n);
+            }
+            n++;
+        }
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Goldbach%27s_comet#Python
+import math
+
+def is_prime(a):
+    if a == 2: return True
+    if a < 2 or a % 2 == 0: return False
+    for i in range(3, int(math.sqrt(a)) + 1, 2):
+        if a % i == 0:
+            return False
+    return True
+
+def g(n):
+    assert n > 2 and n % 2 == 0, 'n in goldbach function g(n) must be even'
+    count = 0
+    for i in range(1, n//2 + 1):
+        if is_prime(i) and is_prime(n - i):
+            count += 1
+    return count
+
+print('The first 100 G numbers are:')
+
+col = 1
+for n in range(4, 204, 2):
+    print(str(g(n)).ljust(4), end = '\n' if (col % 10 == 0) else '')
+    col += 1
+
+print('\nThe value of G(1000000) is', g(1_000_000))
+===
+F is_prime(a)
+   I a == 2
+      R 1B
+   I a < 2 | a % 2 == 0
+      R 0B
+   L(i) (3 .. Int(sqrt(a))).step(2)
+      I a % i == 0
+         R 0B
+   R 1B
+
+F g(n)
+   assert(n > 2 & n % 2 == 0, ‘n in goldbach function g(n) must be even’)
+   V count = 0
+   L(i) 1 .. n I/ 2
+      I is_prime(i) & is_prime(n - i)
+         count++
+   R count
+
+print(‘The first 100 G numbers are:’)
+
+V col = 1
+L(n) (4.<204).step(2)
+   print(String(g(n)).ljust(4), end' I (col % 10 == 0) {"\n"} E ‘’)
+   col++
+
+print("\nThe value of G(1000000) is "g(1'000'000))
+===
+template <typename T1> auto is_prime(const T1 &a)
+{
+    if (a == 2)
+        return true;
+    if (a < 2 || mod(a, 2) == 0)
+        return false;
+    for (auto i : range_ee(3, to_int(sqrt(a))).step(2))
+        if (mod(a, i) == 0)
+            return false;
+    return true;
+}
+
+template <typename T1> auto g(const T1 &n)
+{
+    assert(n > 2 && mod(n, 2) == 0, u"n in goldbach function g(n) must be even"_S);
+    auto count = 0;
+    for (auto i : range_ee(1, idiv(n, 2)))
+        if (is_prime(i) && is_prime(n - i))
+            count++;
+    return count;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"The first 100 G numbers are:"_S);
+    }
+} code_block_1;
+
+auto col = 1;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto n : range_el(4, 204).step(2)) {
+            print(String(g(n)).ljust(4), (mod(col, 10) == 0) ? u"\n"_S : u""_S);
+            col++;
+        }
+
+        print(u"\nThe value of G(1000000) is "_S & g(1'000'000));
+    }
+} code_block_2;

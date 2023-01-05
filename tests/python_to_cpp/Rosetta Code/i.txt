@@ -1424,3 +1424,199 @@ struct CodeBlock2
         }
     }
 } code_block_2;
+
+
+# https://rosettacode.org/wiki/Idoneal_numbers#Python
+def is_idoneal(num):
+    ''' Return true if num is an idoneal number '''
+    for a in range(1, num):
+        for b in range(a + 1, num):
+            if a * b + a + b > num:
+                break
+            for c in range(b + 1, num):
+                sum3 = a * b + b * c + a * c
+                if sum3 == num:
+                    return False
+                if sum3 > num:
+                    break
+    return True
+
+row = 0
+for n in range(1, 2000):
+    if is_idoneal(n):
+        row += 1
+        print(f'{n:5}', end='\n' if row % 13 == 0 else '')
+===
+F is_idoneal(num)
+   ‘ Return true if num is an idoneal number ’
+   L(a) 1 .< num
+      L(b) a + 1 .< num
+         I a * b + a + b > num
+            L.break
+         L(c) b + 1 .< num
+            V sum3 = a * b + b * c + a * c
+            I sum3 == num
+               R 0B
+            I sum3 > num
+               L.break
+   R 1B
+
+V row = 0
+L(n) 1..1999
+   I is_idoneal(n)
+      row++
+      print(f:‘{n:5}’, end' I row % 13 == 0 {"\n"} E ‘’)
+===
+template <typename T1> auto is_idoneal(const T1 &num)
+{
+    u" Return true if num is an idoneal number "_S;
+    for (auto a : range_el(1, num))
+        for (auto b : range_el(a + 1, num)) {
+            if (a * b + a + b > num)
+                break;
+            for (auto c : range_el(b + 1, num)) {
+                auto sum3 = a * b + b * c + a * c;
+                if (sum3 == num)
+                    return false;
+                if (sum3 > num)
+                    break;
+            }
+        }
+    return true;
+}
+
+auto row = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(1, 1999))
+            if (is_idoneal(n)) {
+                row++;
+                print(u"#5"_S.format(n), mod(row, 13) == 0 ? u"\n"_S : u""_S);
+            }
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Inconsummate_numbers_in_base_10#Python
+from typing import List
+Int64 = int
+
+def digitalsum(num):
+    ''' Return sum of digits of a number in base 10 '''
+    return sum(int(d) for d in str(num))
+
+def generate_inconsummate(max_wanted):
+    ''' generate the series of inconsummate numbers up to max_wanted '''
+    minimum_digitsums = [(Int64(10)**i, int((Int64(10)**i - 1) / (9 * i)))
+                         for i in range(1, 15)]
+    limit = 20 * int(min(p[0] for p in minimum_digitsums if p[1] > max_wanted))
+    arr = [1] + [0] * (limit - 1)
+
+    for dividend in range(1, limit):
+        quo, rem = divmod(dividend, digitalsum(dividend))
+        if rem == 0 and quo < limit:
+            arr[quo] = 1
+    r: List[int] = []
+    for j, flag in enumerate(arr):
+        if flag == 0:
+            r.append(j)
+    return r
+
+for i, n in enumerate(generate_inconsummate(100000)):
+    if i < 50:
+        print(f'{n:6}', end='\n' if (i + 1) % 10 == 0 else '')
+    elif i == 999:
+        print('\nThousandth inconsummate number:', n)
+    elif i == 9999:
+        print('\nTen-thousanth inconsummate number:', n)
+    elif i == 99999:
+        print('\nHundred-thousanth inconsummate number:', n)
+        break
+===
+F digitalsum(num)
+   ‘ Return sum of digits of a number in base 10 ’
+   R sum(String(num).map(d -> Int(d)))
+
+F generate_inconsummate(max_wanted)
+   ‘ generate the series of inconsummate numbers up to max_wanted ’
+   V minimum_digitsums = (1..14).map(i -> (Int64(10) ^ i, Int((Int64(10) ^ i - 1) / (9 * i))))
+   V limit = 20 * Int(min(minimum_digitsums.filter(p -> p[1] > @max_wanted).map(p -> p[0])))
+   V arr = [1] [+] [0] * (limit - 1)
+
+   L(dividend) 1 .< limit
+      V (quo, rem) = divmod(dividend, digitalsum(dividend))
+      I rem == 0 & quo < limit
+         arr[quo] = 1
+   [Int] r
+   L(flag) arr
+      V j = L.index
+      I flag == 0
+         r.append(j)
+   R r
+
+L(n) generate_inconsummate(100000)
+   V i = L.index
+   I i < 50
+      print(f:‘{n:6}’, end' I (i + 1) % 10 == 0 {"\n"} E ‘’)
+   E I i == 999
+      print("\nThousandth inconsummate number: "n)
+   E I i == 9999
+      print("\nTen-thousanth inconsummate number: "n)
+   E I i == 99999
+      print("\nHundred-thousanth inconsummate number: "n)
+      L.break
+===
+template <typename T1> auto digitalsum(const T1 &num)
+{
+    u" Return sum of digits of a number in base 10 "_S;
+    return sum_map(String(num), [](const auto &d){return to_int(d);});
+}
+
+template <typename T1> auto generate_inconsummate(const T1 &max_wanted)
+{
+    u" generate the series of inconsummate numbers up to max_wanted "_S;
+    auto minimum_digitsums = range_ee(1, 14).map([](const auto &i){return make_tuple(pow(to_int64(10), i), to_int((pow(to_int64(10), i) - 1) / (9 * i)));});
+    auto limit = 20 * to_int(min_map(minimum_digitsums.filter([&max_wanted](const auto &p){return _get<1>(p) > max_wanted;}), [](const auto &p){return _get<0>(p);}));
+    auto arr = create_array({1}) + create_array({0}) * (limit - 1);
+
+    for (auto dividend : range_el(1, limit)) {
+        auto [quo, rem] = divmod(dividend, digitalsum(dividend));
+        if (rem == 0 && quo < limit)
+            arr.set(quo, 1);
+    }
+    Array<int> r;
+    {int Lindex = 0;
+    for (auto &&flag : arr) {
+        auto j = Lindex;
+        if (flag == 0)
+            r.append(j);
+        Lindex++;
+    }}
+    return r;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {int Lindex = 0;
+
+        for (auto &&n : generate_inconsummate(100000)) {
+            auto i = Lindex;
+            if (i < 50)
+                print(u"#6"_S.format(n), mod((i + 1), 10) == 0 ? u"\n"_S : u""_S);
+            else if (i == 999)
+                print(u"\nThousandth inconsummate number: "_S & n);
+            else if (i == 9999)
+                print(u"\nTen-thousanth inconsummate number: "_S & n);
+            else if (i == 99999) {
+                print(u"\nHundred-thousanth inconsummate number: "_S & n);
+                break;
+            }
+            Lindex++;
+        }}
+    }
+} code_block_1;
