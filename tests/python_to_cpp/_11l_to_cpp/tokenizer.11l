@@ -34,14 +34,14 @@ SSTABSi = 0
 ===============================================================================================================
 ’
 
-V keywords = [‘V’, ‘C’, ‘I’, ‘E’, ‘F’, ‘L’, ‘N’, ‘R’, ‘S’, ‘T’, ‘X’, ‘П’, ‘С’, ‘Е’, ‘И’, ‘Ф’, ‘Ц’, ‘Н’, ‘Р’, ‘В’, ‘Т’, ‘Х’, ‘var’, ‘in’, ‘if’, ‘else’, ‘fn’, ‘loop’, ‘null’, ‘return’, ‘switch’, ‘type’, ‘exception’, ‘перем’, ‘С’, ‘если’, ‘иначе’, ‘фн’, ‘цикл’, ‘нуль’, ‘вернуть’, ‘выбрать’, ‘тип’, ‘исключение’]
+V keywords = [‘V’, ‘C’, ‘I’, ‘E’, ‘F’, ‘L’, ‘N’, ‘R’, ‘S’, ‘T’, ‘X’, ‘П’, ‘С’, ‘Е’, ‘И’, ‘Ф’, ‘Ц’, ‘Н’, ‘Р’, ‘В’, ‘Т’, ‘Х’, ‘var’, ‘in’, ‘if’, ‘else’, ‘fn’, ‘loop’, ‘null’, ‘return’, ‘switch’, ‘type’, ‘exception’, ‘пер’, ‘св’, ‘если’, ‘иначе’, ‘фн’, ‘цикл’, ‘нуль’, ‘вернуть’, ‘выбрать’, ‘тип’, ‘исключение’]
 [String] empty_list_of_str
 [Set[String]] binary_operators
 binary_operators.append(Set(empty_list_of_str))
 binary_operators.append(Set([String(‘+’), ‘-’, ‘*’, ‘/’, ‘%’, ‘^’, ‘&’, ‘|’, ‘<’, ‘>’, ‘=’, ‘?’]))
-binary_operators.append(Set([‘<<’, ‘>>’, ‘<=’, ‘>=’, ‘==’, ‘!=’, ‘+=’, ‘-=’, ‘*=’, ‘/=’, ‘%=’, ‘&=’, ‘|=’, ‘^=’, ‘->’, ‘..’, ‘.<’, ‘.+’, ‘<.’, ‘I/’, ‘Ц/’, ‘C ’, ‘С ’]))
-binary_operators.append(Set([‘<<=’, ‘>>=’, ‘‘’=’, ‘[+]’, ‘[&]’, ‘[|]’, ‘(+)’, ‘<.<’, ‘I/=’, ‘Ц/=’, ‘in ’, ‘!C ’, ‘!С ’]))
-binary_operators.append(Set([‘[+]=’, ‘[&]=’, ‘[|]=’, ‘(+)=’, ‘!in ’]))
+binary_operators.append(Set([‘<<’, ‘>>’, ‘<=’, ‘>=’, ‘==’, ‘!=’, ‘+=’, ‘-=’, ‘*=’, ‘/=’, ‘%=’, ‘&=’, ‘|=’, ‘^=’, ‘.=’, ‘->’, ‘..’, ‘.<’, ‘.+’, ‘<.’, ‘I/’, ‘Ц/’, ‘-%’, ‘C ’, ‘С ’]))
+binary_operators.append(Set([‘<<=’, ‘>>=’, ‘‘’=’, ‘[+]’, ‘[&]’, ‘[|]’, ‘(+)’, ‘<.<’, ‘-I/’, ‘-Ц/’, ‘I/=’, ‘Ц/=’, ‘in ’, ‘св ’, ‘!C ’, ‘!С ’]))
+binary_operators.append(Set([‘[+]=’, ‘[&]=’, ‘[|]=’, ‘(+)=’, ‘!in ’, ‘!св ’]))
 [Set[String]] unary_operators
 unary_operators.append(Set(empty_list_of_str))
 unary_operators.append(Set([String(‘!’)]))
@@ -285,7 +285,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
             I ch == ‘@’
                L i < source.len & source[i] == ‘@’
                   i++
-               I i < source.len & source[i] == ‘=’
+               I i < source.len & source[i] C (‘=’, ‘:’)
                   i++
             L i < source.len
                ch = source[i]
@@ -294,7 +294,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                i++
             V j = i - 1
             L j > lexem_start
-               I source[j] == ‘:’
+               I source[j] == ‘:’ & source[j - 1] != ‘@’
                   i = j
                   L.break
                j--
@@ -320,7 +320,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                   category = NUMERIC_LITERAL
 
             E I source[lexem_start .< i] C :keywords
-               I source[lexem_start .< i] C (‘V’, ‘П’, ‘var’, ‘перем’)
+               I source[lexem_start .< i] C (‘V’, ‘П’, ‘var’, ‘пер’)
                   category = NAME
                   I source[i .< i + 1] == ‘&’
                      i++
@@ -395,7 +395,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                            I nesting_level == 0
                               L.break
                            nesting_level--
-                        E I source[j] == ‘:’ & nesting_level == 0 & (source[j + 1] C (‘<’, ‘.’) | source[j + 1].is_digit())
+                        E I source[j] == ‘:’ & nesting_level == 0 & (source[j + 1] C (‘<’, ‘.’, ‘ ’) | source[j + 1].is_digit())
                            colon_pos = j
                         j++
                      L(new_token) tokenize(source[s .< colon_pos ? j])
@@ -587,12 +587,16 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
 
          E I ch C (‘,’, ‘.’, ‘:’)
             category = DELIMITER
+            I ch == ‘.’ & i < source.len & source[i] == ‘:’
+               i++
 
          E I ch C ‘([’
             I source[lexem_start .< lexem_start + 3] == ‘(.)’
                i += 2
                category = NAME
             E
+               I ch == ‘[’ & source[i] == ‘%’
+                  i++
                nesting_elements.append((ch, lexem_start))
                category = DELIMITER
          E I ch C ‘])’

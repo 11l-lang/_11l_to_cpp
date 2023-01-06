@@ -182,6 +182,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N) -> [T
                      V s = j
                      Int? colon_pos
                      V nesting_level = 0
+                     V bracket_nesting_level = 0
                      L
                         I source[j] == ‘{’
                            nesting_level++
@@ -189,11 +190,18 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N) -> [T
                            I nesting_level == 0
                               L.break
                            nesting_level--
-                        E I source[j] == ‘:’ & nesting_level == 0
+                        E I source[j] == ‘[’
+                           bracket_nesting_level++
+                        E I source[j] == ‘]’
+                           bracket_nesting_level--
+                        E I source[j] == ‘:’ & nesting_level == 0 & bracket_nesting_level == 0
                            colon_pos = j
                         j++
-                     L(new_token) tokenize(source[s .< colon_pos ? j])
-                        tokens.append(Token(new_token.start + s, new_token.end + s, new_token.category))
+                     X.try
+                        L(new_token) tokenize(source[s .< colon_pos ? j])
+                           tokens.append(Token(new_token.start + s, new_token.end + s, new_token.category))
+                     X.catch Error error
+                        X Error(error.message, error.pos + s)
                      I colon_pos != N
                         tokens.append(Token(colon_pos + 1, j, Token.Category.STATEMENT_SEPARATOR))
                      tokens.append(Token(j, j, Token.Category.DEDENT))

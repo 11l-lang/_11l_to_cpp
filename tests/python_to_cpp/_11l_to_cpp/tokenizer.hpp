@@ -40,7 +40,7 @@ SSTABSi = 0
     }
 } code_block_1;
 
-auto keywords = create_array({u"V"_S, u"C"_S, u"I"_S, u"E"_S, u"F"_S, u"L"_S, u"N"_S, u"R"_S, u"S"_S, u"T"_S, u"X"_S, u"П"_S, u"С"_S, u"Е"_S, u"И"_S, u"Ф"_S, u"Ц"_S, u"Н"_S, u"Р"_S, u"В"_S, u"Т"_S, u"Х"_S, u"var"_S, u"in"_S, u"if"_S, u"else"_S, u"fn"_S, u"loop"_S, u"null"_S, u"return"_S, u"switch"_S, u"type"_S, u"exception"_S, u"перем"_S, u"С"_S, u"если"_S, u"иначе"_S, u"фн"_S, u"цикл"_S, u"нуль"_S, u"вернуть"_S, u"выбрать"_S, u"тип"_S, u"исключение"_S});
+auto keywords = create_array({u"V"_S, u"C"_S, u"I"_S, u"E"_S, u"F"_S, u"L"_S, u"N"_S, u"R"_S, u"S"_S, u"T"_S, u"X"_S, u"П"_S, u"С"_S, u"Е"_S, u"И"_S, u"Ф"_S, u"Ц"_S, u"Н"_S, u"Р"_S, u"В"_S, u"Т"_S, u"Х"_S, u"var"_S, u"in"_S, u"if"_S, u"else"_S, u"fn"_S, u"loop"_S, u"null"_S, u"return"_S, u"switch"_S, u"type"_S, u"exception"_S, u"пер"_S, u"св"_S, u"если"_S, u"иначе"_S, u"фн"_S, u"цикл"_S, u"нуль"_S, u"вернуть"_S, u"выбрать"_S, u"тип"_S, u"исключение"_S});
 Array<String> empty_list_of_str;
 Array<Set<String>> binary_operators;
 
@@ -50,9 +50,9 @@ struct CodeBlock2
     {
         binary_operators.append(create_set(empty_list_of_str));
         binary_operators.append(create_set<String>({String(u"+"_S), u"-"_S, u"*"_S, u"/"_S, u"%"_S, u"^"_S, u"&"_S, u"|"_S, u"<"_S, u">"_S, u"="_S, u"?"_S}));
-        binary_operators.append(create_set({u"<<"_S, u">>"_S, u"<="_S, u">="_S, u"=="_S, u"!="_S, u"+="_S, u"-="_S, u"*="_S, u"/="_S, u"%="_S, u"&="_S, u"|="_S, u"^="_S, u"->"_S, u".."_S, u".<"_S, u".+"_S, u"<."_S, u"I/"_S, u"Ц/"_S, u"C "_S, u"С "_S}));
-        binary_operators.append(create_set({u"<<="_S, u">>="_S, u"‘’="_S, u"[+]"_S, u"[&]"_S, u"[|]"_S, u"(+)"_S, u"<.<"_S, u"I/="_S, u"Ц/="_S, u"in "_S, u"!C "_S, u"!С "_S}));
-        binary_operators.append(create_set({u"[+]="_S, u"[&]="_S, u"[|]="_S, u"(+)="_S, u"!in "_S}));
+        binary_operators.append(create_set({u"<<"_S, u">>"_S, u"<="_S, u">="_S, u"=="_S, u"!="_S, u"+="_S, u"-="_S, u"*="_S, u"/="_S, u"%="_S, u"&="_S, u"|="_S, u"^="_S, u".="_S, u"->"_S, u".."_S, u".<"_S, u".+"_S, u"<."_S, u"I/"_S, u"Ц/"_S, u"-%"_S, u"C "_S, u"С "_S}));
+        binary_operators.append(create_set({u"<<="_S, u">>="_S, u"‘’="_S, u"[+]"_S, u"[&]"_S, u"[|]"_S, u"(+)"_S, u"<.<"_S, u"-I/"_S, u"-Ц/"_S, u"I/="_S, u"Ц/="_S, u"in "_S, u"св "_S, u"!C "_S, u"!С "_S}));
+        binary_operators.append(create_set({u"[+]="_S, u"[&]="_S, u"[|]="_S, u"(+)="_S, u"!in "_S, u"!св "_S}));
     }
 } code_block_2;
 
@@ -367,7 +367,7 @@ Array<Token> tokenize(const String &source, Array<Tuple<Char, int>>* const impli
                 if (ch == u'@') {
                     while (i < source.len() && source[i] == u'@')
                         i++;
-                    if (i < source.len() && source[i] == u'=')
+                    if (i < source.len() && in(source[i], make_tuple(u"="_S, u":"_S)))
                         i++;
                 }
                 while (i < source.len()) {
@@ -378,7 +378,7 @@ Array<Token> tokenize(const String &source, Array<Tuple<Char, int>>* const impli
                 }
                 auto j = i - 1;
                 while (j > lexem_start) {
-                    if (source[j] == u':') {
+                    if (source[j] == u':' && source[j - 1] != u'@') {
                         i = j;
                         break;
                     }
@@ -410,7 +410,7 @@ Array<Token> tokenize(const String &source, Array<Tuple<Char, int>>* const impli
                 }
 
                 else if (in(source[range_el(lexem_start, i)], tokenizer::keywords)) {
-                    if (in(source[range_el(lexem_start, i)], make_tuple(u"V"_S, u"П"_S, u"var"_S, u"перем"_S))) {
+                    if (in(source[range_el(lexem_start, i)], make_tuple(u"V"_S, u"П"_S, u"var"_S, u"пер"_S))) {
                         category = TYPE_RM_REF(category)::NAME;
                         if (source[range_el(i, i + 1)] == u'&')
                             i++;
@@ -497,7 +497,7 @@ Array<Token> tokenize(const String &source, Array<Tuple<Char, int>>* const impli
                                         break;
                                     nesting_level--;
                                 }
-                                else if (source[j] == u':' && nesting_level == 0 && (in(source[j + 1], make_tuple(u"<"_S, u"."_S)) || source[j + 1].is_digit()))
+                                else if (source[j] == u':' && nesting_level == 0 && (in(source[j + 1], make_tuple(u"<"_S, u"."_S, u" "_S)) || source[j + 1].is_digit()))
                                     colon_pos = j;
                                 j++;
                             }
@@ -730,8 +730,11 @@ Array<Token> tokenize(const String &source, Array<Tuple<Char, int>>* const impli
             else if (ch == u';')
                 category = TYPE_RM_REF(category)::STATEMENT_SEPARATOR;
 
-            else if (in(ch, make_tuple(u","_S, u"."_S, u":"_S)))
+            else if (in(ch, make_tuple(u","_S, u"."_S, u":"_S))) {
                 category = TYPE_RM_REF(category)::DELIMITER;
+                if (ch == u'.' && i < source.len() && source[i] == u':')
+                    i++;
+            }
 
             else if (in(ch, u"(["_S)) {
                 if (source[range_el(lexem_start, lexem_start + 3)] == u"(.)") {
@@ -739,6 +742,8 @@ Array<Token> tokenize(const String &source, Array<Tuple<Char, int>>* const impli
                     category = TYPE_RM_REF(category)::NAME;
                 }
                 else {
+                    if (ch == u'[' && source[i] == u'%')
+                        i++;
                     nesting_elements.append(make_tuple(ch, lexem_start));
                     category = TYPE_RM_REF(category)::DELIMITER;
                 }
