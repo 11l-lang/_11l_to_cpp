@@ -53,3 +53,8 @@ s = '’
 // {{
 print(f:‘a } b’)
            ^Error: f-string: single '}' is not allowed
+
+
+print(f:‘{text(:10)}’)
+              ^Error: there is no corresponding closing parenthesis/bracket/brace for `(`
+// )

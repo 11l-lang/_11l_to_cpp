@@ -501,8 +501,15 @@ Array<Token> tokenize(const String &source, Array<Tuple<Char, int>>* const impli
                                     colon_pos = j;
                                 j++;
                             }
-                            for (auto &&new_token : tokenize(source[range_el(s, [&]{auto R = colon_pos; return R != nullptr ? *R : j;}())]))
-                                tokens.append(Token(new_token.start + s, new_token.end + s, new_token.category));
+                            try
+                            {
+                                for (auto &&new_token : tokenize(source[range_el(s, [&]{auto R = colon_pos; return R != nullptr ? *R : j;}())]))
+                                    tokens.append(Token(new_token.start + s, new_token.end + s, new_token.category));
+                            }
+                            catch (const Error& error)
+                            {
+                                throw Error(error.message, error.pos + s);
+                            }
                             if (colon_pos != nullptr)
                                 tokens.append(Token(*colon_pos + 1, j, Token::Category::STATEMENT_SEPARATOR));
                             tokens.append(Token(j, j, Token::Category::SCOPE_END));
