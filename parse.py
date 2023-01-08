@@ -600,6 +600,8 @@ class SymbolNode:
                     f_node = builtins_scope.find('Int').ast_nodes[0].constructors[0]
                 elif func_name in ('Float', 'SFloat', 'Float32', 'Float64'):
                     func_name = 'to_float' + '32'*(func_name in ('SFloat', 'Float32'))
+                elif func_name in cpp_vectype_from_11l:
+                    func_name = cpp_vectype_from_11l[func_name]
                 elif func_name == 'Char' and self.children[2].token.category == Token.Category.STRING_LITERAL:
                     assert(self.children[1] is None) # [-TODO: write a good error message-]
                     if not is_char(self.children[2]):
@@ -1272,6 +1274,14 @@ cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'п
                      'Float':'double', 'SFloat':'float', 'Float32':'float', 'Float64':'double', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte', 'Bytes':'Array<Byte>',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
                      'Array':'Array', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque', 'Counter':'Counter', 'Fraction':'Fraction'}
+cpp_vectype_from_11l = {}
+for dimension in ('2', '3', '4'):
+    cpp_vectype_from_11l['IVec' + dimension] = 'ivec' + dimension
+    cpp_vectype_from_11l['SVec' + dimension] =  'vec' + dimension
+    cpp_vectype_from_11l['DVec' + dimension] = 'dvec' + dimension
+    cpp_vectype_from_11l['I64Vec' + dimension] = 'llvec' + dimension
+for _11l_vectype, cpp_vectype in cpp_vectype_from_11l.items():
+    cpp_type_from_11l[_11l_vectype] = cpp_vectype
 
 def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False):
     if ty[-1] == '?':

@@ -1944,3 +1944,21 @@ class BalancedTernary
 public:
     static inline const auto s_str2dig = create_dict(dict_of(u'+'_C, 1)(u'-'_C, -1)(u'0'_C, 0));
 };
+
+
+[IVec2] directions
+[SVec2] directions2
+[DVec2] directions3
+print(SVec3(0))
+===
+Array<ivec2> directions;
+Array<vec2> directions2;
+Array<dvec2> directions3;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(vec3(0));
+    }
+} code_block_1;
