@@ -1346,3 +1346,334 @@ struct CodeBlock2
         print(to_str(kroneckerPower(a2, 4)));
     }
 } code_block_2;
+
+
+# https://rosettacode.org/wiki/Klarner-Rado_sequence#Python
+def klarner_rado(n):
+    K = [1]
+    for i in range(n):
+        j = K[i]
+        firstadd, secondadd = 2 * j + 1, 3 * j + 1
+        if firstadd < K[-1]:
+            for pos in range(len(K)-1, 1, -1):
+                if K[pos] < firstadd and firstadd < K[pos + 1]:
+                    K.insert(pos + 1, firstadd)
+                    break
+        elif firstadd > K[-1]:
+            K.append(firstadd)
+        if secondadd < K[-1]:
+            for pos in range(len(K)-1, 1, -1):
+                if K[pos] < secondadd and secondadd < K[pos + 1]:
+                    K.insert(pos + 1, secondadd)
+                    break
+        elif secondadd > K[-1]:
+            K.append(secondadd)
+
+    return K
+
+kr1m = klarner_rado(100_000)
+
+print('First 100 Klarner-Rado sequence numbers:')
+for idx, v in enumerate(kr1m[:100]):
+    print(f' {v:3}', end='\n' if (idx + 1) % 20 == 0 else '') # f'{v: 4}' [space format option is not supported]
+for n in [1000, 10_000, 100_000]:
+    print(f'The {n :,}th Klarner-Rado number is {kr1m[n-1] :,}')
+===
+F klarner_rado(n)
+   V K = [1]
+   L(i) 0 .< n
+      V j = K[i]
+      V (firstadd, secondadd) = (2 * j + 1, 3 * j + 1)
+      I firstadd < K.last
+         L(pos) (K.len - 1 .< 1).step(-1)
+            I K[pos] < firstadd & firstadd < K[pos + 1]
+               K.insert(pos + 1, firstadd)
+               L.break
+      E I firstadd > K.last
+         K.append(firstadd)
+      I secondadd < K.last
+         L(pos) (K.len - 1 .< 1).step(-1)
+            I K[pos] < secondadd & secondadd < K[pos + 1]
+               K.insert(pos + 1, secondadd)
+               L.break
+      E I secondadd > K.last
+         K.append(secondadd)
+
+   R K
+
+V kr1m = klarner_rado(100'000)
+
+print(‘First 100 Klarner-Rado sequence numbers:’)
+L(v) kr1m[0.<100]
+   V idx = L.index
+   print(f:‘ {v:3}’, end' I (idx + 1) % 20 == 0 {"\n"} E ‘’)
+L(n) [1000, 10'000, 100'000]
+   print(f:‘The {commatize(n)}th Klarner-Rado number is {commatize(kr1m[n - 1])}’)
+===
+template <typename T1> auto klarner_rado(const T1 &n)
+{
+    auto K = create_array({1});
+    for (auto i : range_el(0, n)) {
+        auto j = K[i];
+        auto [firstadd, secondadd] = make_tuple(2 * j + 1, 3 * j + 1);
+        if (firstadd < K.last()) {
+            for (auto pos : range_el(K.len() - 1, 1).step(-1))
+                if (K[pos] < firstadd && firstadd < K[pos + 1]) {
+                    K.insert(pos + 1, firstadd);
+                    break;
+                }
+        }
+        else if (firstadd > K.last())
+            K.append(firstadd);
+        if (secondadd < K.last()) {
+            for (auto pos : range_el(K.len() - 1, 1).step(-1))
+                if (K[pos] < secondadd && secondadd < K[pos + 1]) {
+                    K.insert(pos + 1, secondadd);
+                    break;
+                }
+        }
+        else if (secondadd > K.last())
+            K.append(secondadd);
+    }
+
+    return K;
+}
+
+auto kr1m = klarner_rado(100'000);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"First 100 Klarner-Rado sequence numbers:"_S);
+        {int Lindex = 0;
+        for (auto &&v : kr1m[range_el(0, 100)]) {
+            auto idx = Lindex;
+            print(u" #3"_S.format(v), mod((idx + 1), 20) == 0 ? u"\n"_S : u""_S);
+            Lindex++;
+        }}
+        for (auto &&n : create_array({1000, 10'000, 100'000}))
+            print(u"The #.th Klarner-Rado number is #."_S.format(commatize(n), commatize(kr1m[n - 1])));
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Knuth-Morris-Pratt_string_search#Python
+from typing import List
+
+def kmp_table(word: str) -> List[int]:
+    position = 1
+    candidate = 0
+
+    table = [0] * (len(word) + 1)
+    table[0] = -1
+
+    while position < len(word):
+        if word[position] == word[candidate]:
+            table[position] = table[candidate]
+        else:
+            table[position] = candidate
+            while candidate >= 0 and word[position] != word[candidate]:
+                candidate = table[candidate]
+        position += 1
+        candidate += 1
+
+    table[position] = candidate
+    return table
+
+def kmp_search(text: str, word: str):
+    text_position = 0
+    word_position = 0
+
+    positions: List[int] = []
+    number_of_positions = 0
+    table = kmp_table(word)
+
+    while text_position < len(text):
+        if word[word_position] == text[text_position]:
+            text_position += 1
+            word_position += 1
+            if word_position == len(word):
+                positions.append(text_position - word_position)
+                number_of_positions += 1
+                word_position = table[word_position]
+        else:
+            word_position = table[word_position]
+            if word_position < 0:
+                text_position += 1
+                word_position += 1
+
+    return positions, number_of_positions
+
+TEST_CASES = [
+    ("GCTAGCTCTACGAGTCTA", "TCTA"),
+    ("GGCTATAATGCGTA", "TAATAAA"),
+    ("there would have been a time for such a word", "word"),
+    ("needle need noodle needle", "needle"),
+    (
+        (
+            "InhisbookseriesTheArtofComputerProgrammingpublishedbyAddisonWesley" +
+            "DKnuthusesanimaginarycomputertheMIXanditsassociatedmachinecodeand" +
+            "assemblylanguagestoillustratetheconceptsandalgorithmsastheyare" +
+            "presented"
+        ),
+        "put",
+    ),
+    (
+        (
+            "InhisbookseriesTheArtofComputerProgrammingpublishedbyAddisonWesley" +
+            "DKnuthusesanimaginarycomputertheMIXanditsassociatedmachinecodeand" +
+            "assemblylanguagestoillustratetheconceptsandalgorithmsastheyare" +
+            "presented"
+        ),
+        "and",
+    ),
+    (
+        (
+            "Nearby farms grew a half acre of alfalfa on the dairy's behalf, " +
+            "with bales of all that alfalfa exchanged for milk."
+        ),
+        "alfalfa",
+    ),
+]
+
+for text, word in TEST_CASES:
+    positions, number_of_positions = kmp_search(text, word)
+
+    if number_of_positions == 0:
+        print(f"`{word}` not found in `{text[:10]}...`")
+    elif number_of_positions == 1:
+        print(f"Found `{word}` in `{text[:10]}...` once at {positions}.")
+    else:
+        print(
+            f"Found `{word}` in `{text[:10]}...` {number_of_positions} times at {positions}."
+        )
+===
+F kmp_table(String word) -> [Int]
+   V position = 1
+   V candidate = 0
+
+   V table = [0] * (word.len + 1)
+   table[0] = -1
+
+   L position < word.len
+      I word[position] == word[candidate]
+         table[position] = table[candidate]
+      E
+         table[position] = candidate
+         L candidate >= 0 & word[position] != word[candidate]
+            candidate = table[candidate]
+      position++
+      candidate++
+
+   table[position] = candidate
+   R table
+
+F kmp_search(String text, String word)
+   V text_position = 0
+   V word_position = 0
+
+   [Int] positions
+   V number_of_positions = 0
+   V table = kmp_table(word)
+
+   L text_position < text.len
+      I word[word_position] == text[text_position]
+         text_position++
+         word_position++
+         I word_position == word.len
+            positions.append(text_position - word_position)
+            number_of_positions++
+            word_position = table[word_position]
+      E
+         word_position = table[word_position]
+         I word_position < 0
+            text_position++
+            word_position++
+
+   R (positions, number_of_positions)
+
+V TEST_CASES = [(‘GCTAGCTCTACGAGTCTA’, ‘TCTA’), (‘GGCTATAATGCGTA’, ‘TAATAAA’), (‘there would have been a time for such a word’, ‘word’), (‘needle need noodle needle’, ‘needle’), ((‘InhisbookseriesTheArtofComputerProgrammingpublishedbyAddisonWesley’""‘DKnuthusesanimaginarycomputertheMIXanditsassociatedmachinecodeand’""‘assemblylanguagestoillustratetheconceptsandalgorithmsastheyare’""‘presented’), ‘put’), ((‘InhisbookseriesTheArtofComputerProgrammingpublishedbyAddisonWesley’""‘DKnuthusesanimaginarycomputertheMIXanditsassociatedmachinecodeand’""‘assemblylanguagestoillustratetheconceptsandalgorithmsastheyare’""‘presented’), ‘and’), ((‘Nearby farms grew a half acre of alfalfa on the dairy's behalf, ’""‘with bales of all that alfalfa exchanged for milk.’), ‘alfalfa’)]
+
+L(text, word) TEST_CASES
+   V (positions, number_of_positions) = kmp_search(text, word)
+
+   I number_of_positions == 0
+      print(‘`’word‘` not found in `’text[0.<10]‘...`’)
+   E I number_of_positions == 1
+      print(‘Found `’word‘` in `’text[0.<10]‘...` once at ’positions‘.’)
+   E
+      print(‘Found `’word‘` in `’text[0.<10]‘...` ’number_of_positions‘ times at ’positions‘.’)
+===
+Array<int> kmp_table(const String &word)
+{
+    auto position = 1;
+    auto candidate = 0;
+
+    auto table = create_array({0}) * (word.len() + 1);
+    _set<0>(table, -1);
+
+    while (position < word.len()) {
+        if (word[position] == word[candidate])
+            table.set(position, table[candidate]);
+        else {
+            table.set(position, candidate);
+            while (candidate >= 0 && word[position] != word[candidate])
+                candidate = table[candidate];
+        }
+        position++;
+        candidate++;
+    }
+
+    table.set(position, candidate);
+    return table;
+}
+
+auto kmp_search(const String &text, const String &word)
+{
+    auto text_position = 0;
+    auto word_position = 0;
+
+    Array<int> positions;
+    auto number_of_positions = 0;
+    auto table = kmp_table(word);
+
+    while (text_position < text.len())
+        if (word[word_position] == text[text_position]) {
+            text_position++;
+            word_position++;
+            if (word_position == word.len()) {
+                positions.append(text_position - word_position);
+                number_of_positions++;
+                word_position = table[word_position];
+            }
+        }
+        else {
+            word_position = table[word_position];
+            if (word_position < 0) {
+                text_position++;
+                word_position++;
+            }
+        }
+
+    return make_tuple(positions, number_of_positions);
+}
+
+auto TEST_CASES = create_array({make_tuple(u"GCTAGCTCTACGAGTCTA"_S, u"TCTA"_S), make_tuple(u"GGCTATAATGCGTA"_S, u"TAATAAA"_S), make_tuple(u"there would have been a time for such a word"_S, u"word"_S), make_tuple(u"needle need noodle needle"_S, u"needle"_S), make_tuple((u"InhisbookseriesTheArtofComputerProgrammingpublishedbyAddisonWesley"_S & u"DKnuthusesanimaginarycomputertheMIXanditsassociatedmachinecodeand"_S & u"assemblylanguagestoillustratetheconceptsandalgorithmsastheyare"_S & u"presented"_S), u"put"_S), make_tuple((u"InhisbookseriesTheArtofComputerProgrammingpublishedbyAddisonWesley"_S & u"DKnuthusesanimaginarycomputertheMIXanditsassociatedmachinecodeand"_S & u"assemblylanguagestoillustratetheconceptsandalgorithmsastheyare"_S & u"presented"_S), u"and"_S), make_tuple((u"Nearby farms grew a half acre of alfalfa on the dairy's behalf, "_S & u"with bales of all that alfalfa exchanged for milk."_S), u"alfalfa"_S)});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[text, word] : TEST_CASES) {
+            auto [positions, number_of_positions] = kmp_search(text, word);
+
+            if (number_of_positions == 0)
+                print(u"`"_S & word & u"` not found in `"_S & text[range_el(0, 10)] & u"...`"_S);
+            else if (number_of_positions == 1)
+                print(u"Found `"_S & word & u"` in `"_S & text[range_el(0, 10)] & u"...` once at "_S & positions & u"."_S);
+            else
+                print(u"Found `"_S & word & u"` in `"_S & text[range_el(0, 10)] & u"...` "_S & number_of_positions & u" times at "_S & positions & u"."_S);
+        }
+    }
+} code_block_1;

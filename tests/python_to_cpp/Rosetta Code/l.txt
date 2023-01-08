@@ -3711,3 +3711,216 @@ struct CodeBlock1
         print(u"Average final length of staircase: #.6"_S.format(steps_tot / 10000.0));
     }
 } code_block_1;
+
+
+# https://rosettacode.org/wiki/Largest_prime_factor#Python
+def isPrime(n):
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+n = 600851475143
+j = 3
+while not isPrime(n):
+    if n % j == 0:
+        n //= j
+    j += 2
+print(n)
+===
+F isPrime(n)
+   L(i) 2 .. Int(n ^ 0.5)
+      I n % i == 0
+         R 0B
+   R 1B
+
+V n = 600851475143
+V j = 3
+L !isPrime(n)
+   I n % j == 0
+      n I/= j
+   j += 2
+print(n)
+===
+template <typename T1> auto isPrime(const T1 &n)
+{
+    for (auto i : range_ee(2, to_int(pow(n, 0.5))))
+        if (mod(n, i) == 0)
+            return false;
+    return true;
+}
+
+auto n = 600851475143;
+auto j = 3;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (!isPrime(n)) {
+            if (mod(n, j) == 0)
+                n = idiv(n, j);
+            j += 2;
+        }
+        print(n);
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Legendre_prime_counting_function#Python
+import math
+from typing import Dict, Tuple
+
+def primes_up_to_limit(limit: int):
+    r: List[int] = []
+    if limit >= 2:
+        r.append(2)
+
+    # Sieve of Eratosthenes, storing only odd numbers starting at 3
+    isprime = [True] * ((limit - 1) // 2)
+    sieveend = int(math.sqrt(limit))
+    for i in range(len(isprime)):
+        if isprime[i]:
+            p: int = i * 2 + 3
+            r.append(p)
+            if i <= sieveend:
+                for j in range((p * p - 3) >> 1, len(isprime), p):
+                    isprime[j] = False
+    return r
+
+p = primes_up_to_limit(int(math.sqrt(1_000_000_000)))
+
+cache : Dict[Tuple[int, int], int] = {}
+
+def phi(x, a):
+    def phi_cached(x, a):
+        if (x, a) in cache:
+            return cache[(x, a)]
+        r = phi(x, a)
+        cache[(x, a)] = r
+        return r
+
+    res = 0
+    while True:
+        if not a or not x:
+            return x + res
+
+        a -= 1
+        res -= phi_cached(x//p[a], a) # partial tail recursion
+
+def legpi(n):
+    if n < 2: return 0
+
+    a = legpi(int(math.sqrt(n)))
+    return phi(n, a) + a - 1
+
+for e in range(10):
+    print(f'10^{e}', legpi(10**e))
+===
+F primes_up_to_limit(Int limit)
+   [Int] r
+   I limit >= 2
+      r.append(2)
+
+   V isprime = [1B] * ((limit - 1) I/ 2)
+   V sieveend = Int(sqrt(limit))
+   L(i) 0 .< isprime.len
+      I isprime[i]
+         Int p = i * 2 + 3
+         r.append(p)
+         I i <= sieveend
+            L(j) ((p * p - 3) >> 1 .< isprime.len).step(p)
+               isprime[j] = 0B
+   R r
+
+V p = primes_up_to_limit(Int(sqrt(1'000'000'000)))
+
+[(Int, Int) = Int] cache
+
+F phi(x, =a)
+   F phi_cached(x, a)
+      I (x, a) C :cache
+         R :cache[(x, a)]
+      V r = phi(x, a)
+      :cache[(x, a)] = r
+      R r
+
+   V res = 0
+   L
+      I !a | !x
+         R x + res
+
+      a--
+      res -= phi_cached(x I/ :p[a], a)
+
+F legpi(n)
+   I n < 2
+      R 0
+
+   V a = legpi(Int(sqrt(n)))
+   R phi(n, a) + a - 1
+
+L(e) 10
+   print((‘10^’e)‘ ’legpi(10 ^ e))
+===
+auto primes_up_to_limit(const int limit)
+{
+    Array<int> r;
+    if (limit >= 2)
+        r.append(2);
+
+    auto isprime = create_array({true}) * (idiv((limit - 1), 2));
+    auto sieveend = to_int(sqrt(limit));
+    for (auto i : range_el(0, isprime.len()))
+        if (isprime[i]) {
+            int p = i * 2 + 3;
+            r.append(p);
+            if (i <= sieveend)
+                for (auto j : range_el((p * p - 3) >> 1, isprime.len()).step(p))
+                    isprime.set(j, false);
+        }
+    return r;
+}
+
+auto p = primes_up_to_limit(to_int(sqrt(1'000'000'000)));
+
+Dict<ivec2, int> cache;
+
+template <typename T1, typename T2> auto phi(const T1 &x, T2 a)
+{
+    auto phi_cached = [](const auto &x, const auto &a)
+    {
+        if (in(make_tuple(x, a), ::cache))
+            return ::cache[make_tuple(x, a)];
+        auto r = phi(x, a);
+        ::cache.set(make_tuple(x, a), r);
+        return r;
+    };
+
+    auto res = 0;
+    while (true) {
+        if (!a || !x)
+            return x + res;
+
+        a--;
+        res -= phi_cached(idiv(x, ::p[a]), a);
+    }
+}
+
+template <typename T1> auto legpi(const T1 &n)
+{
+    if (n < 2)
+        return 0;
+
+    auto a = legpi(to_int(sqrt(n)));
+    return phi(n, a) + a - 1;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int e = 0; e < 10; e++)
+            print((u"10^"_S & e) & u" "_S & legpi(pow(10, e)));
+    }
+} code_block_1;

@@ -3954,3 +3954,201 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+# https://rosettacode.org/wiki/M%C3%B6bius_function#Python
+def isPrime(n) :
+    if (n < 2) :
+        return False
+    for i in range(2, n + 1) :
+        if (i * i <= n and n % i == 0) :
+            return False
+    return True
+
+def mobius(n) :
+    # Base Case
+    if (n == 1) :
+        return 1
+
+    # For a prime factor i
+    # check if i^2 is also
+    # a factor.
+    p = 0
+    for i in range(1, n + 1) :
+        if (n % i == 0 and
+                isPrime(i)) :
+
+            # Check if n is
+            # divisible by i^2
+            if (n % (i * i) == 0) :
+                return 0
+            else :
+
+                # i occurs only once,
+                # increase f
+                p = p + 1
+
+    # All prime factors are
+    # contained only once
+    # Return 1 if p is even
+    # else -1
+    if(p % 2 != 0) :
+        return -1
+    else :
+        return 1
+
+# Driver Code
+print("Mobius numbers from 1..99:")
+
+for i in range(1, 100):
+    print(f"{mobius(i):>4}", end = '')
+
+    if i % 20 == 0: print()
+===
+F isPrime(n)
+   I (n < 2)
+      R 0B
+   L(i) 2 .. n
+      I (i * i <= n & n % i == 0)
+         R 0B
+   R 1B
+
+F mobius(n)
+   I (n == 1)
+      R 1
+
+   V p = 0
+   L(i) 1 .. n
+      I (n % i == 0 & isPrime(i))
+
+         I (n % (i * i) == 0)
+            R 0
+         E
+
+            p = p + 1
+
+   I (p % 2 != 0)
+      R -1
+   E
+      R 1
+
+print(‘Mobius numbers from 1..99:’)
+
+L(i) 1..99
+   print(f:‘{mobius(i):4}’, end' ‘’)
+
+   I i % 20 == 0
+      print()
+===
+template <typename T1> auto isPrime(const T1 &n)
+{
+    if ((n < 2))
+        return false;
+    for (auto i : range_ee(2, n))
+        if ((i * i <= n && mod(n, i) == 0))
+            return false;
+    return true;
+}
+
+template <typename T1> auto mobius(const T1 &n)
+{
+    if ((n == 1))
+        return 1;
+
+    auto p = 0;
+    for (auto i : range_ee(1, n))
+        if ((mod(n, i) == 0 && isPrime(i))) {
+
+            if ((mod(n, (i * i)) == 0))
+                return 0;
+            else
+
+                p = p + 1;
+        }
+
+    if ((mod(p, 2) != 0))
+        return -1;
+    else
+        return 1;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"Mobius numbers from 1..99:"_S);
+
+        for (auto i : range_ee(1, 99)) {
+            print(u"#4"_S.format(mobius(i)), u""_S);
+
+            if (mod(i, 20) == 0)
+                print();
+        }
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Magic_constant#Python
+def a(n):
+    n += 2
+    return n*(n**2 + 1)/2
+
+def inv_a(x):
+    k = 0
+    while k*(k**2.0+1)/2+2 < x:
+        k+=1
+    return k
+
+print("The first 20 magic constants are:")
+for n in range(1, 20):
+    print(int(a(n)), end = " ");
+print("\nThe 1,000th magic constant is:",int(a(1000)))
+
+for e in range(1, 20):
+    print(f'10^{e}: {inv_a(10.0**e)}')
+===
+F a(=n)
+   n += 2
+   R n * (n ^ 2 + 1) / 2
+
+F inv_a(x)
+   V k = 0
+   L k * (k ^ 2.0 + 1) / 2 + 2 < x
+      k++
+   R k
+
+print(‘The first 20 magic constants are:’)
+L(n) 1..19
+   print(Int(a(n)), end' ‘ ’)
+print("\nThe 1,000th magic constant is: "Int(a(1000)))
+
+L(e) 1..19
+   print(‘10^’e‘: ’inv_a(10.0 ^ e))
+===
+template <typename T1> auto a(T1 n)
+{
+    n += 2;
+    return n * (square(n) + 1) / 2.0;
+}
+
+template <typename T1> auto inv_a(const T1 &x)
+{
+    auto k = 0;
+    while (k * (pow(k, 2.0) + 1) / 2.0 + 2 < x)
+        k++;
+    return k;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"The first 20 magic constants are:"_S);
+        for (auto n : range_ee(1, 19))
+            print(to_int(a(n)), u" "_S);
+        print(u"\nThe 1,000th magic constant is: "_S & to_int(a(1000)));
+
+        for (auto e : range_ee(1, 19))
+            print(u"10^"_S & e & u": "_S & inv_a(pow(10.0, e)));
+    }
+} code_block_1;
