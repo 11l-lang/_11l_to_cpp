@@ -4800,3 +4800,99 @@ struct CodeBlock1
         solver.count(rindices);
     }
 } code_block_1;
+
+
+Char = str
+
+direction: str
+v = 1
+if v in (1, 5, 13):
+    direction = 'N'
+elif v in (2, 3, 7):
+    direction = 'E'
+elif v == 6:
+    direction = 'W'
+else:
+    raise RuntimeError('Illegal state.')
+
+dir = Char('E')
+if dir in ('N', 'W'):
+    v = 1
+elif dir == 'E':
+    v = 2
+
+dir2 = Char('E')
+if dir2 in ('NE', 'W'):
+    v = 1
+elif dir2 == 'E':
+    v = 2
+===
+String direction
+V v = 1
+S v
+   1, 5, 13
+      direction = ‘N’
+   2, 3, 7
+      direction = ‘E’
+   6
+      direction = ‘W’
+   E
+      X RuntimeError(‘Illegal state.’)
+
+S Char(‘E’)
+   ‘N’, ‘W’
+      v = 1
+   ‘E’
+      v = 2
+
+S Char(‘E’)
+   ‘NE’, ‘W’
+      v = 1
+   ‘E’
+      v = 2
+===
+String direction;
+auto v = 1;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        switch (v)
+        {
+        case 1:
+        case 5:
+        case 13:
+            direction = u'N'_C;
+            break;
+        case 2:
+        case 3:
+        case 7:
+            direction = u'E'_C;
+            break;
+        case 6:
+            direction = u'W'_C;
+            break;
+        default:
+            throw RuntimeError(u"Illegal state."_S);
+            break;
+        }
+
+        switch (u'E'_C)
+        {
+        case u'N':
+        case u'W':
+            v = 1;
+            break;
+        case u'E':
+            v = 2;
+            break;
+        }
+
+        auto u_E__C = u'E'_C;
+        if (in(u_E__C, make_tuple(u"NE"_S, u'W')))
+            v = 1;
+        else if (u_E__C == u'E')
+            v = 2;
+    }
+} code_block_1;

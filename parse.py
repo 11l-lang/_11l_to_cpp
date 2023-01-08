@@ -362,7 +362,7 @@ class SymbolNode:
                                        and not (self.parent.symbol.id == '=' and self is self.parent.children[0])):
                     return '*' + self.token_str()
 
-            if '@:' in self.token_str():
+            if self.token_str().startswith('@:'):
                 var_name = self.token_str()[self.token_str().index(':') + 1:]
                 tid = self.scope.find(var_name)
                 if tid is not None and len(tid.ast_nodes) and isinstance(tid.ast_nodes[0], ASTVariableDeclaration) and tid.ast_nodes[0].is_static:
@@ -1668,7 +1668,10 @@ class ASTElse(ASTNodeWithChildren):
 
 class ASTSwitch(ASTNodeWithExpression):
     class Case(ASTNodeWithChildren, ASTNodeWithExpression):
-        pass
+        def __init__(self):
+            super().__init__()
+            self.additional_expressions = []
+
     cases : List[Case]
     has_string_case = False
 
@@ -1713,13 +1716,28 @@ class ASTSwitch(ASTNodeWithExpression):
                     assert(id(case) == id(self.cases[-1]))
                     r += case.children_to_str_detect_single_stmt(indent, 'else')
                 else:
-                    r += case.children_to_str_detect_single_stmt(indent, ('if' if id(case) == id(self.cases[0]) else 'else if') + ' (' + switch_expr + ' == ' + char_if_len_1(case.expression) + ')', check_for_if = True)
+                    cond_expr: str
+                    if len(case.additional_expressions) == 0:
+                        cond_expr = switch_expr + ' == ' + char_if_len_1(case.expression)
+                    else:
+                        cond_expr = 'in(' + switch_expr + ', make_tuple(' + char_if_len_1(case.expression)
+                        for aexpr in case.additional_expressions:
+                            cond_expr += ', ' + char_if_len_1(aexpr)
+                        cond_expr += '))'
+                    r += case.children_to_str_detect_single_stmt(indent, ('if' if id(case) == id(self.cases[0]) else 'else if') + ' (' + cond_expr + ')', check_for_if = True)
             return r
 
         r += ' ' * (indent*4) + 'switch (' + self.expression.to_str() + ")\n" + ' ' * (indent*4) + "{\n"
         for case in self.cases:
             cu = any(isinstance(child, ASTVariableDeclaration) for child in case.children) and case is not self.cases[-1]
-            r += ' ' * (indent*4) + ('default' if case.expression.token_str() in ('E', 'И', 'else', 'иначе') else 'case ' + char_if_len_1(case.expression)) + ':' + ' {'*cu + "\n"
+            r += ' ' * (indent*4)
+            if case.expression.token_str() in ('E', 'И', 'else', 'иначе'):
+                r += 'default'
+            else:
+                r += 'case ' + char_if_len_1(case.expression)
+                for aexpr in case.additional_expressions:
+                    r += ":\n" + ' ' * (indent*4) + 'case ' + char_if_len_1(aexpr)
+            r += ':' + ' {'*cu + "\n"
             for c in case.children:
                 r += c.to_str(indent+1)
             r += ' ' * ((indent+1)*4) + 'break;' + ' }'*cu + "\n"
@@ -3038,6 +3056,13 @@ def parse_internal(this_node):
                         ts = case.expression.token_str()
                         if case.expression.token.category == Token.Category.STRING_LITERAL and not (len(ts) == 3 or (ts[:2] == '"\\' and len(ts) == 4)):
                             node.has_string_case = True
+                        while token.value(source) == ',':
+                            advance(',')
+                            case.additional_expressions.append(expression())
+                            case.additional_expressions[-1].ast_parent = case
+                            ts = case.additional_expressions[-1].token_str()
+                            if case.additional_expressions[-1].token.category == Token.Category.STRING_LITERAL and not (len(ts) == 3 or (ts[:2] == '"\\' and len(ts) == 4)):
+                                node.has_string_case = True
                     new_scope(case)
                     node.cases.append(case)
                 next_token()

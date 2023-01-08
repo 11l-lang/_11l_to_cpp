@@ -4152,3 +4152,341 @@ struct CodeBlock1
             print(u"10^"_S & e & u": "_S & inv_a(pow(10.0, e)));
     }
 } code_block_1;
+
+
+# https://rosettacode.org/wiki/Marching_squares#Wren
+from typing import List, Tuple
+
+DIR_E  = ( 1,  0)
+DIR_NE = ( 1,  1)
+DIR_N  = ( 0,  1)
+DIR_NW = (-1,  1)
+DIR_W  = (-1,  0)
+DIR_SW = (-1, -1)
+DIR_S  = ( 0, -1)
+DIR_SE = ( 1, -1)
+
+def path_str(origin_x, origin_y, directions):
+    dirn = {DIR_E : 'E',
+            DIR_NE: 'NE',
+            DIR_N : 'N',
+            DIR_NW: 'NW',
+            DIR_W : 'W',
+            DIR_SW: 'SW',
+            DIR_S : 'S',
+            DIR_SE: 'SE'}
+    return f'X: {origin_x}, Y: {origin_y}, Path: {[dirn[d] for d in directions]}'
+
+class MarchingSquares:
+    width: int
+    height: int
+    data: List[int]
+
+    def __init__(self, width, height, data):
+        self.width = width
+        self.height = height
+        self.data = data[:]
+
+    def is_set(self, x, y):
+        if x <= 0 or x > self.width or y <= 0 or y > self.height:
+            return False
+        return self.data[(y - 1) * self.width + (x - 1)] != 0
+
+    def value(self, x, y):
+        sum = 0
+        if self.is_set(x, y): sum |= 1
+        if self.is_set(x + 1, y): sum |= 2
+        if self.is_set(x, y + 1): sum |= 4
+        if self.is_set(x + 1, y + 1): sum |= 8
+        return sum
+
+    def identify_perimeter_(self, initial_x, initial_y):
+        if initial_x < 0: initial_x = 0
+        if initial_x > self.width: initial_x = self.width
+        if initial_y < 0: initial_y = 0
+        if initial_y > self.height: initial_y = self.height
+        initial_value = self.value(initial_x, initial_y)
+        if initial_value in (0, 15):
+            raise RuntimeError('Supplied initial coordinates (%d, %d) do not lie on a perimeter.' % (initial_x, initial_y))
+
+        directions: List[Tuple[int, int]] = []
+        x = initial_x
+        y = initial_y
+        previous = (0, 0)
+
+        while True:
+            direction: Tuple[int, int]
+
+            v = self.value(x, y)
+            if v in (1, 5, 13):
+                direction = DIR_N
+            elif v in (2, 3, 7):
+                direction = DIR_E
+            elif v in (4, 12, 14):
+                direction = DIR_W
+            elif v in (8, 10, 11):
+                direction = DIR_S
+            elif v == 6:
+                direction = DIR_W if previous == DIR_N else DIR_E
+            elif v == 9:
+                direction = DIR_N if previous == DIR_E else DIR_S
+            else:
+                raise RuntimeError('Illegal state.')
+
+            directions.append(direction)
+            x += direction[0]
+            y -= direction[1]
+            previous = direction
+            if x == initial_x and y == initial_y:
+                break
+
+        return path_str(initial_x, -initial_y, directions)
+
+    def identify_perimeter(self):
+        size = self.width * self.height
+        for i in range(size):
+            if self.data[i] != 0:
+                return self.identify_perimeter_(i % self.width, i // self.width)
+
+example = [
+    0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0,
+    0, 0, 1, 1, 0,
+    0, 0, 1, 1, 0,
+    0, 0, 0, 1, 0,
+    0, 0, 0, 0, 0
+]
+ms = MarchingSquares(5, 6, example)
+print(ms.identify_perimeter())
+===
+V DIR_E = (1, 0)
+V DIR_NE = (1, 1)
+V DIR_N = (0, 1)
+V DIR_NW = (-1, 1)
+V DIR_W = (-1, 0)
+V DIR_SW = (-1, -1)
+V DIR_S = (0, -1)
+V DIR_SE = (1, -1)
+
+F path_str(origin_x, origin_y, directions)
+   V dirn = [:DIR_E = ‘E’, :DIR_NE = ‘NE’, :DIR_N = ‘N’, :DIR_NW = ‘NW’, :DIR_W = ‘W’, :DIR_SW = ‘SW’, :DIR_S = ‘S’, :DIR_SE = ‘SE’]
+   R ‘X: ’origin_x‘, Y: ’origin_y‘, Path: ’directions.map(d -> @dirn[d])
+
+T MarchingSquares
+   Int width
+   Int height
+   [Int] data
+
+   F (width, height, data)
+      .width = width
+      .height = height
+      .data = copy(data)
+
+   F is_set(x, y)
+      I x <= 0 | x > .width | y <= 0 | y > .height
+         R 0B
+      R .data[(y - 1) * .width + (x - 1)] != 0
+
+   F value(x, y)
+      V sum = 0
+      I .is_set(x, y)
+         sum [|]= 1
+      I .is_set(x + 1, y)
+         sum [|]= 2
+      I .is_set(x, y + 1)
+         sum [|]= 4
+      I .is_set(x + 1, y + 1)
+         sum [|]= 8
+      R sum
+
+   F identify_perimeter_(=initial_x, =initial_y)
+      I initial_x < 0
+         initial_x = 0
+      I initial_x > .width
+         initial_x = .width
+      I initial_y < 0
+         initial_y = 0
+      I initial_y > .height
+         initial_y = .height
+      V initial_value = .value(initial_x, initial_y)
+      I initial_value C (0, 15)
+         X RuntimeError(‘Supplied initial coordinates (#., #.) do not lie on a perimeter.’.format(initial_x, initial_y))
+
+      [(Int, Int)] directions
+      V x = initial_x
+      V y = initial_y
+      V previous = (0, 0)
+
+      L
+         (Int, Int) direction
+
+         S .value(x, y)
+            1, 5, 13
+               direction = :DIR_N
+            2, 3, 7
+               direction = :DIR_E
+            4, 12, 14
+               direction = :DIR_W
+            8, 10, 11
+               direction = :DIR_S
+            6
+               direction = I previous == :DIR_N {:DIR_W} E :DIR_E
+            9
+               direction = I previous == :DIR_E {:DIR_N} E :DIR_S
+            E
+               X RuntimeError(‘Illegal state.’)
+
+         directions.append(direction)
+         x += direction[0]
+         y -= direction[1]
+         previous = direction
+         I x == initial_x & y == initial_y
+            L.break
+
+      R path_str(initial_x, -initial_y, directions)
+
+   F identify_perimeter()
+      V size = .width * .height
+      L(i) 0 .< size
+         I .data[i] != 0
+            R .identify_perimeter_(i % .width, i I/ .width)
+
+V example = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
+V ms = MarchingSquares(5, 6, example)
+print(ms.identify_perimeter())
+===
+auto DIR_E = make_tuple(1, 0);
+auto DIR_NE = make_tuple(1, 1);
+auto DIR_N = make_tuple(0, 1);
+auto DIR_NW = make_tuple(-1, 1);
+auto DIR_W = make_tuple(-1, 0);
+auto DIR_SW = make_tuple(-1, -1);
+auto DIR_S = make_tuple(0, -1);
+auto DIR_SE = make_tuple(1, -1);
+
+template <typename T1, typename T2, typename T3> auto path_str(const T1 &origin_x, const T2 &origin_y, const T3 &directions)
+{
+    auto dirn = create_dict(dict_of(::DIR_E, u"E"_S)(::DIR_NE, u"NE"_S)(::DIR_N, u"N"_S)(::DIR_NW, u"NW"_S)(::DIR_W, u"W"_S)(::DIR_SW, u"SW"_S)(::DIR_S, u"S"_S)(::DIR_SE, u"SE"_S));
+    return u"X: "_S & origin_x & u", Y: "_S & origin_y & u", Path: "_S & directions.map([&dirn](const auto &d){return dirn[d];});
+}
+
+class MarchingSquares
+{
+public:
+    int width;
+    int height;
+    Array<int> data;
+
+    template <typename T1, typename T2, typename T3> MarchingSquares(const T1 &width, const T2 &height, const T3 &data) :
+        width(width),
+        height(height)
+    {
+        this->data = copy(data);
+    }
+
+    template <typename T1, typename T2> auto is_set(const T1 &x, const T2 &y)
+    {
+        if (x <= 0 || x > width || y <= 0 || y > height)
+            return false;
+        return data[(y - 1) * width + (x - 1)] != 0;
+    }
+
+    template <typename T1, typename T2> auto value(const T1 &x, const T2 &y)
+    {
+        auto sum = 0;
+        if (is_set(x, y))
+            sum |= 1;
+        if (is_set(x + 1, y))
+            sum |= 2;
+        if (is_set(x, y + 1))
+            sum |= 4;
+        if (is_set(x + 1, y + 1))
+            sum |= 8;
+        return sum;
+    }
+
+    template <typename T1, typename T2> auto identify_perimeter_(T1 initial_x, T2 initial_y)
+    {
+        if (initial_x < 0)
+            initial_x = 0;
+        if (initial_x > width)
+            initial_x = width;
+        if (initial_y < 0)
+            initial_y = 0;
+        if (initial_y > height)
+            initial_y = height;
+        auto initial_value = value(initial_x, initial_y);
+        if (in(initial_value, make_tuple(0, 15)))
+            throw RuntimeError(u"Supplied initial coordinates (#., #.) do not lie on a perimeter."_S.format(initial_x, initial_y));
+
+        Array<ivec2> directions;
+        auto x = initial_x;
+        auto y = initial_y;
+        auto previous = make_tuple(0, 0);
+
+        while (true) {
+            ivec2 direction;
+
+            switch (value(x, y))
+            {
+            case 1:
+            case 5:
+            case 13:
+                direction = ::DIR_N;
+                break;
+            case 2:
+            case 3:
+            case 7:
+                direction = ::DIR_E;
+                break;
+            case 4:
+            case 12:
+            case 14:
+                direction = ::DIR_W;
+                break;
+            case 8:
+            case 10:
+            case 11:
+                direction = ::DIR_S;
+                break;
+            case 6:
+                direction = previous == ::DIR_N ? ::DIR_W : ::DIR_E;
+                break;
+            case 9:
+                direction = previous == ::DIR_E ? ::DIR_N : ::DIR_S;
+                break;
+            default:
+                throw RuntimeError(u"Illegal state."_S);
+                break;
+            }
+
+            directions.append(direction);
+            x += _get<0>(direction);
+            y -= _get<1>(direction);
+            previous = direction;
+            if (x == initial_x && y == initial_y)
+                break;
+        }
+
+        return path_str(initial_x, -initial_y, directions);
+    }
+
+    auto identify_perimeter()
+    {
+        auto size = width * height;
+        for (auto i : range_el(0, size))
+            if (data[i] != 0)
+                return identify_perimeter_(mod(i, width), idiv(i, width));
+    }
+};
+
+auto example = create_array({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0});
+auto ms = MarchingSquares(5, 6, example);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(ms.identify_perimeter());
+    }
+} code_block_1;
