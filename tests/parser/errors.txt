@@ -286,3 +286,7 @@ T Solver
    F count([Int] &rindices) -> N
       .count(&rindices [+] 1)
              ^Error: wrong usage of unary `&` operator
+
+
+print(Char(65))
+           ^Error: argument `code` of function `Char` is named-only

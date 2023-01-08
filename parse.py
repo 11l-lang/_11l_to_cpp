@@ -3616,6 +3616,7 @@ builtins_scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code
 char_scope = Scope(None)
 char_scope.add_name('is_digit', ASTFunctionDefinition([]))
 builtins_scope.ids['Char'].ast_nodes[0].scope = char_scope
+builtins_scope.ids['Char'].ast_nodes[0].constructors[0].first_named_only_argument = 0
 
 builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('mode', token_to_str('‘r’'), 'String'), ('encoding', token_to_str('‘utf-8’'), 'String')])]))
 file_scope = Scope(None)
