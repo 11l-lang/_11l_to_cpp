@@ -1084,9 +1084,9 @@ class SymbolNode:
                 return '('*parens + '[&]{auto R = ' + self.children[0].to_str() + '; return R != nullptr ? *R : ' + self.children[1].to_str() + ';}()' + ')'*parens
             elif self.symbol.id == '^':
                 c1 = self.children[1].to_str()
-                if c1 == '2':
+                if c1 in ('2', '2LL'):
                     return 'square(' + self.children[0].to_str() + ')'
-                if c1 == '3':
+                if c1 in ('3', '3LL'):
                     return 'cube(' + self.children[0].to_str() + ')'
                 return 'pow(' + self.children[0].to_str() + ', ' + c1 + ')'
             elif self.symbol.id == '%':

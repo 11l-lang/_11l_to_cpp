@@ -4490,3 +4490,459 @@ struct CodeBlock1
         print(ms.identify_perimeter());
     }
 } code_block_1;
+
+
+# https://rosettacode.org/wiki/Matrix_with_two_diagonals#Wren
+def two_diagonal_matrix(n):
+    for i in range(n):
+        for j in range(n):
+            print(1 if i == j or i + j == n - 1 else 0, end = ' ')
+        print()
+
+two_diagonal_matrix(6)
+print()
+two_diagonal_matrix(7)
+===
+F two_diagonal_matrix(n)
+   L(i) 0 .< n
+      L(j) 0 .< n
+         print(I i == j | i + j == n - 1 {1} E 0, end' ‘ ’)
+      print()
+
+two_diagonal_matrix(6)
+print()
+two_diagonal_matrix(7)
+===
+template <typename T1> auto two_diagonal_matrix(const T1 &n)
+{
+    for (auto i : range_el(0, n)) {
+        for (auto j : range_el(0, n))
+            print(i == j || i + j == n - 1 ? 1 : 0, u" "_S);
+        print();
+    }
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        two_diagonal_matrix(6);
+        print();
+        two_diagonal_matrix(7);
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Mayan_calendar#Python
+from typing import List
+
+# Utility functions (taken from [https://github.com/python/cpython/blob/main/Lib/datetime.py])
+# -1 is a placeholder for indexing purposes.
+_DAYS_IN_MONTH = [-1, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+_DAYS_BEFORE_MONTH = [-1]  # -1 is a placeholder for indexing purposes.
+dbm = 0
+for dim in _DAYS_IN_MONTH[1:]:
+    _DAYS_BEFORE_MONTH.append(dbm)
+    dbm += dim
+
+def _days_before_year(year):
+    "year -> number of days before January 1st of year."
+    y = year - 1
+    return y*365 + y//4 - y//100 + y//400
+
+def _is_leap(year):
+    "year -> 1 if leap year, else 0."
+    return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+
+def _days_before_month(year, month):
+    "year, month -> number of days in year preceding first day of month."
+    return _DAYS_BEFORE_MONTH[month] + (month > 2 and _is_leap(year))
+
+def _ymd2ord(year, month, day):
+    "year, month, day -> ordinal, considering 01-Jan-0001 as day 1."
+    return (_days_before_year(year) +
+            _days_before_month(year, month) +
+            day)
+
+def g2m(date, gtm_correlation=True):
+    correlation = 584283 if gtm_correlation else 584285
+
+    long_count_days = [144000, 7200, 360, 20, 1]
+
+    tzolkin_months = ['Imix\'', 'Ik\'', 'Ak\'bal', 'K\'an', 'Chikchan', 'Kimi', 'Manik\'', 'Lamat', 'Muluk', 'Ok', 'Chuwen',
+                      'Eb', 'Ben', 'Hix', 'Men', 'K\'ib\'', 'Kaban', 'Etz\'nab\'', 'Kawak', 'Ajaw']  # tzolk'in
+
+    haad_months = ['Pop', 'Wo\'', 'Sip', 'Sotz\'', 'Sek', 'Xul', 'Yaxk\'in', 'Mol', 'Ch\'en', 'Yax', 'Sak\'', 'Keh', 'Mak',
+                   'K\'ank\'in', 'Muwan', 'Pax', 'K\'ayab', 'Kumk\'u', 'Wayeb\'']  # haab'
+
+    #gregorian_days = datetime.datetime.strptime(date, '%Y-%m-%d').toordinal()
+    year, month, day = map(int, date.split('-'))
+    gregorian_days = _ymd2ord(year, month, day)
+    julian_days = gregorian_days + 1721425
+
+    # 1. calculate long count date
+
+    long_date: List[int] = list()
+    remainder = julian_days - correlation
+
+    for days in long_count_days:
+        result, remainder = divmod(remainder, days)
+        long_date.append(int(result))
+
+    long_date_str = '.'.join(['{:02}'.format(d) for d in long_date])
+
+    # 2. calculate round calendar date
+
+    tzolkin_month = (julian_days + 16) % 20
+    tzolkin_day = ((julian_days + 5) % 13) + 1
+
+    haab_month = int(((julian_days + 65) % 365) / 20)
+    haab_day = ((julian_days + 65) % 365) % 20
+    haab_day_str = str(haab_day) if haab_day else 'Chum'
+
+    lord_number = (julian_days - correlation) % 9
+    lord_number = lord_number if lord_number else 9
+
+    round_date = f'{tzolkin_day} {tzolkin_months[tzolkin_month]} {haab_day_str} {haad_months[haab_month]} G{lord_number}'
+
+    return long_date_str, round_date
+
+dates = ['2004-06-19', '2012-12-18', '2012-12-21', '2019-01-19', '2019-03-27', '2020-02-29', '2020-03-01']
+for date in dates:
+    long, round_date = g2m(date)
+    print(date, long, round_date)
+===
+V _DAYS_IN_MONTH = [-1, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+V _DAYS_BEFORE_MONTH = [-1]
+V dbm = 0
+L(dim) _DAYS_IN_MONTH[1..]
+   _DAYS_BEFORE_MONTH.append(dbm)
+   dbm += dim
+
+F _days_before_year(year)
+   ‘year -> number of days before January 1st of year.’
+   V y = year - 1
+   R y * 365 + y I/ 4 - y I/ 100 + y I/ 400
+
+F _is_leap(year)
+   ‘year -> 1 if leap year, else 0.’
+   R year % 4 == 0 & (year % 100 != 0 | year % 400 == 0)
+
+F _days_before_month(year, month)
+   ‘year, month -> number of days in year preceding first day of month.’
+   R :_DAYS_BEFORE_MONTH[month] + (month > 2 & _is_leap(year))
+
+F _ymd2ord(year, month, day)
+   ‘year, month, day -> ordinal, considering 01-Jan-0001 as day 1.’
+   R (_days_before_year(year) + _days_before_month(year, month) + day)
+
+F g2m(date, gtm_correlation = 1B)
+   V correlation = I gtm_correlation {584283} E 584285
+
+   V long_count_days = [144000, 7200, 360, 20, 1]
+
+   V tzolkin_months = ["Imix'", "Ik'", "Ak'bal", "K'an", ‘Chikchan’, ‘Kimi’, "Manik'", ‘Lamat’, ‘Muluk’, ‘Ok’, ‘Chuwen’, ‘Eb’, ‘Ben’, ‘Hix’, ‘Men’, "K'ib'", ‘Kaban’, "Etz'nab'", ‘Kawak’, ‘Ajaw’]
+
+   V haad_months = [‘Pop’, "Wo'", ‘Sip’, "Sotz'", ‘Sek’, ‘Xul’, "Yaxk'in", ‘Mol’, "Ch'en", ‘Yax’, "Sak'", ‘Keh’, ‘Mak’, "K'ank'in", ‘Muwan’, ‘Pax’, "K'ayab", "Kumk'u", "Wayeb'"]
+
+   V (year, month, day) = date.split(‘-’).map(Int)
+   V gregorian_days = _ymd2ord(year, month, day)
+   V julian_days = gregorian_days + 1721425
+
+   [Int] long_date
+   V remainder = julian_days - correlation
+
+   L(days) long_count_days
+      (V result, remainder) = divmod(remainder, days)
+      long_date.append(Int(result))
+
+   V long_date_str = (long_date.map(d -> ‘#02’.format(d))).join(‘.’)
+
+   V tzolkin_month = (julian_days + 16) % 20
+   V tzolkin_day = ((julian_days + 5) % 13) + 1
+
+   V haab_month = Int(((julian_days + 65) % 365) / 20)
+   V haab_day = ((julian_days + 65) % 365) % 20
+   V haab_day_str = I haab_day {String(haab_day)} E ‘Chum’
+
+   V lord_number = (julian_days - correlation) % 9
+   lord_number = I lord_number {lord_number} E 9
+
+   V round_date = tzolkin_day‘ ’tzolkin_months[tzolkin_month]‘ ’haab_day_str‘ ’haad_months[haab_month]‘ G’lord_number
+
+   R (long_date_str, round_date)
+
+V dates = [‘2004-06-19’, ‘2012-12-18’, ‘2012-12-21’, ‘2019-01-19’, ‘2019-03-27’, ‘2020-02-29’, ‘2020-03-01’]
+L(date) dates
+   V (long, round_date) = g2m(date)
+   print(date‘ ’long‘ ’round_date)
+===
+auto _DAYS_IN_MONTH = create_array({-1, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31});
+
+auto _DAYS_BEFORE_MONTH = create_array({-1});
+auto dbm = 0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&dim : _DAYS_IN_MONTH[range_ei(1)]) {
+            _DAYS_BEFORE_MONTH.append(dbm);
+            dbm += dim;
+        }
+    }
+} code_block_1;
+
+template <typename T1> auto _days_before_year(const T1 &year)
+{
+    u"year -> number of days before January 1st of year."_S;
+    auto y = year - 1;
+    return y * 365 + idiv(y, 4) - idiv(y, 100) + idiv(y, 400);
+}
+
+template <typename T1> auto _is_leap(const T1 &year)
+{
+    u"year -> 1 if leap year, else 0."_S;
+    return mod(year, 4) == 0 && (mod(year, 100) != 0 || mod(year, 400) == 0);
+}
+
+template <typename T1, typename T2> auto _days_before_month(const T1 &year, const T2 &month)
+{
+    u"year, month -> number of days in year preceding first day of month."_S;
+    return ::_DAYS_BEFORE_MONTH[month] + (month > 2 && _is_leap(year));
+}
+
+template <typename T1, typename T2, typename T3> auto _ymd2ord(const T1 &year, const T2 &month, const T3 &day)
+{
+    u"year, month, day -> ordinal, considering 01-Jan-0001 as day 1."_S;
+    return (_days_before_year(year) + _days_before_month(year, month) + day);
+}
+
+template <typename T1, typename T2 = decltype(true)> auto g2m(const T1 &date, const T2 &gtm_correlation = true)
+{
+    auto correlation = gtm_correlation ? 584283 : 584285;
+
+    auto long_count_days = create_array({144000, 7200, 360, 20, 1});
+
+    auto tzolkin_months = create_array({u"Imix'"_S, u"Ik'"_S, u"Ak'bal"_S, u"K'an"_S, u"Chikchan"_S, u"Kimi"_S, u"Manik'"_S, u"Lamat"_S, u"Muluk"_S, u"Ok"_S, u"Chuwen"_S, u"Eb"_S, u"Ben"_S, u"Hix"_S, u"Men"_S, u"K'ib'"_S, u"Kaban"_S, u"Etz'nab'"_S, u"Kawak"_S, u"Ajaw"_S});
+
+    auto haad_months = create_array({u"Pop"_S, u"Wo'"_S, u"Sip"_S, u"Sotz'"_S, u"Sek"_S, u"Xul"_S, u"Yaxk'in"_S, u"Mol"_S, u"Ch'en"_S, u"Yax"_S, u"Sak'"_S, u"Keh"_S, u"Mak"_S, u"K'ank'in"_S, u"Muwan"_S, u"Pax"_S, u"K'ayab"_S, u"Kumk'u"_S, u"Wayeb'"_S});
+
+    auto [year, month, day] = bind_array<3>(date.split(u"-"_S).map([](const auto &x){return to_int(x);}));
+    auto gregorian_days = _ymd2ord(year, month, day);
+    auto julian_days = gregorian_days + 1721425;
+
+    Array<int> long_date;
+    auto remainder = julian_days - correlation;
+
+    for (auto &&days : long_count_days) {
+        TUPLE_ELEMENT_T(0, divmod(remainder, days)) result;
+        assign_from_tuple(result, remainder, divmod(remainder, days));
+        long_date.append(to_int(result));
+    }
+
+    auto long_date_str = (long_date.map([](const auto &d){return u"#02"_S.format(d);})).join(u"."_S);
+
+    auto tzolkin_month = mod((julian_days + 16), 20);
+    auto tzolkin_day = (mod((julian_days + 5), 13)) + 1;
+
+    auto haab_month = to_int((mod((julian_days + 65), 365)) / 20.0);
+    auto haab_day = mod((mod((julian_days + 65), 365)), 20);
+    auto haab_day_str = haab_day ? String(haab_day) : u"Chum"_S;
+
+    auto lord_number = mod((julian_days - correlation), 9);
+    lord_number = lord_number ? lord_number : 9;
+
+    auto round_date = tzolkin_day & u" "_S & tzolkin_months[tzolkin_month] & u" "_S & haab_day_str & u" "_S & haad_months[haab_month] & u" G"_S & lord_number;
+
+    return make_tuple(long_date_str, round_date);
+}
+
+auto dates = create_array({u"2004-06-19"_S, u"2012-12-18"_S, u"2012-12-21"_S, u"2019-01-19"_S, u"2019-03-27"_S, u"2020-02-29"_S, u"2020-03-01"_S});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto &&date : dates) {
+            auto [_long_, round_date] = g2m(date);
+            print(date & u" "_S & _long_ & u" "_S & round_date);
+        }
+    }
+} code_block_2;
+
+
+# https://rosettacode.org/wiki/Meissel%E2%80%93Mertens_constant#Python
+import math
+
+def primes_up_to_limit(limit: int):
+    r: List[int] = []
+    if limit >= 2:
+        r.append(2)
+
+    # Sieve of Eratosthenes, storing only odd numbers starting at 3
+    isprime = [True] * ((limit - 1) // 2)
+    sieveend = int(math.sqrt(limit))
+    for i in range(len(isprime)):
+        if isprime[i]:
+            p: int = i * 2 + 3
+            r.append(p)
+            if i <= sieveend:
+                for j in range((p * p - 3) >> 1, len(isprime), p):
+                    isprime[j] = False
+    return r
+
+euler = 0.57721566490153286
+m = 0.0
+for x in primes_up_to_limit(10_000_000):
+    m += math.log(1-(1/x)) + (1/x)
+
+print("MM = %.16f" % (euler + m))
+===
+F primes_up_to_limit(Int limit)
+   [Int] r
+   I limit >= 2
+      r.append(2)
+
+   V isprime = [1B] * ((limit - 1) I/ 2)
+   V sieveend = Int(sqrt(limit))
+   L(i) 0 .< isprime.len
+      I isprime[i]
+         Int p = i * 2 + 3
+         r.append(p)
+         I i <= sieveend
+            L(j) ((p * p - 3) >> 1 .< isprime.len).step(p)
+               isprime[j] = 0B
+   R r
+
+V euler = 0.57721566490153286
+V m = 0.0
+L(x) primes_up_to_limit(10'000'000)
+   m += log(1 - (1 / x)) + (1 / x)
+
+print(‘MM = #.16’.format(euler + m))
+===
+auto primes_up_to_limit(const int limit)
+{
+    Array<int> r;
+    if (limit >= 2)
+        r.append(2);
+
+    auto isprime = create_array({true}) * (idiv((limit - 1), 2));
+    auto sieveend = to_int(sqrt(limit));
+    for (auto i : range_el(0, isprime.len()))
+        if (isprime[i]) {
+            int p = i * 2 + 3;
+            r.append(p);
+            if (i <= sieveend)
+                for (auto j : range_el((p * p - 3) >> 1, isprime.len()).step(p))
+                    isprime.set(j, false);
+        }
+    return r;
+}
+
+auto euler = 0.57721566490153286;
+auto m = 0.0;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&x : primes_up_to_limit(10'000'000))
+            m += log(1 - (1.0 / x)) + (1.0 / x);
+
+        print(u"MM = #.16"_S.format(euler + m));
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Minimum_multiple_of_m_where_digital_sum_equals_m#C++
+import itertools
+
+def digit_sum(n):
+    sum = 0
+    while n > 0:
+        sum += n % 10
+        n //= 10
+    return sum
+
+for n in range(1, 71):
+    for m in itertools.count(1):
+        if digit_sum(m * n) == n:
+            print('%8i' % m, end = "\n" if n % 10 == 0 else ' ')
+            break
+===
+F digit_sum(=n)
+   V sum = 0
+   L n > 0
+      sum += n % 10
+      n I/= 10
+   R sum
+
+L(n) 1..70
+   L(m) 1..
+      I digit_sum(m * n) == n
+         print(‘#8’.format(m), end' I n % 10 == 0 {"\n"} E ‘ ’)
+         L.break
+===
+template <typename T1> auto digit_sum(T1 n)
+{
+    auto sum = 0;
+    while (n > 0) {
+        sum += mod(n, 10);
+        n = idiv(n, 10);
+    }
+    return sum;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto n : range_ee(1, 70))
+            for (auto m : range_ei(1))
+                if (digit_sum(m * n) == n) {
+                    print(u"#8"_S.format(m), mod(n, 10) == 0 ? u'\n'_C : u' '_C);
+                    break;
+                }
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Mosaic_matrix#Python
+size = 9
+for Row in range(size):
+    for Col in range(size):
+        if (Row % 2 == 1 and Col % 2 == 1) or (Row % 2 == 0 and Col % 2 == 0):
+            print("1", end=" ")
+        else:
+            print("0", end=" ")
+    print()
+===
+V size = 9
+L(Row) 0 .< size
+   L(Col) 0 .< size
+      I (Row % 2 == 1 & Col % 2 == 1) | (Row % 2 == 0 & Col % 2 == 0)
+         print(‘1’, end' ‘ ’)
+      E
+         print(‘0’, end' ‘ ’)
+   print()
+===
+auto size = 9;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto Row : range_el(0, size)) {
+            for (auto Col : range_el(0, size))
+                if ((mod(Row, 2) == 1 && mod(Col, 2) == 1) || (mod(Row, 2) == 0 && mod(Col, 2) == 0))
+                    print(u"1"_S, u" "_S);
+                else
+                    print(u"0"_S, u" "_S);
+            print();
+        }
+    }
+} code_block_1;

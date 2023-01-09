@@ -3251,3 +3251,158 @@ struct CodeBlock1
         print();
     }
 } code_block_1;
+
+
+# https://rosettacode.org/wiki/Neighbour_primes#Python
+def isPrime(n):
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+print("p        q       pq+2")
+print("-----------------------")
+for p in range(2, 499):
+    if not isPrime(p):
+        continue
+    q = p + 1
+    while not isPrime(q):
+        q += 1
+    if not isPrime(2 + p*q):
+        continue
+    print(p, "\t", q, "\t", 2+p*q)
+===
+F isPrime(n)
+   L(i) 2 .. Int(n ^ 0.5)
+      I n % i == 0
+         R 0B
+   R 1B
+
+print(‘p        q       pq+2’)
+print(‘-----------------------’)
+L(p) 2..498
+   I !isPrime(p)
+      L.continue
+   V q = p + 1
+   L !isPrime(q)
+      q++
+   I !isPrime(2 + p * q)
+      L.continue
+   print(p" \t "q" \t "(2 + p * q))
+===
+template <typename T1> auto isPrime(const T1 &n)
+{
+    for (auto i : range_ee(2, to_int(pow(n, 0.5))))
+        if (mod(n, i) == 0)
+            return false;
+    return true;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"p        q       pq+2"_S);
+        print(u"-----------------------"_S);
+        for (auto p : range_ee(2, 498)) {
+            if (!isPrime(p))
+                continue;
+            auto q = p + 1;
+            while (!isPrime(q))
+                q++;
+            if (!isPrime(2 + p * q))
+                continue;
+            print(p & u" \t "_S & q & u" \t "_S & (2 + p * q));
+        }
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Numbers_which_are_the_cube_roots_of_the_product_of_their_proper_divisors
+import math, itertools
+Int64 = int
+
+def product_of_proper_divisors(n):
+    prod = Int64(1)
+    for d in range(2, int(math.sqrt(n)+1)):
+        if n % d == 0:
+            prod *= d
+            otherD = n // d
+            if otherD != d:
+                prod *= otherD
+    return prod
+
+print('First 50 numbers which are the cube roots of the products of their proper divisors:')
+found = 0
+for num in itertools.count(1):
+    if Int64(num) ** 3 == product_of_proper_divisors(num):
+        found += 1
+        if found <= 50:
+            print(f'{num:3}', end = "\n" if found % 10 == 0 else ' ')
+        elif found in (500, 5000, 50000):
+            print(f'{found:6,}th: {num:,}')
+            if found == 50000:
+                break
+===
+F product_of_proper_divisors(n)
+   V prod = Int64(1)
+   L(d) 2 .< Int(sqrt(n) + 1)
+      I n % d == 0
+         prod *= d
+         V otherD = n I/ d
+         I otherD != d
+            prod *= otherD
+   R prod
+
+print(‘First 50 numbers which are the cube roots of the products of their proper divisors:’)
+V found = 0
+L(num) 1..
+   I Int64(num) ^ 3 == product_of_proper_divisors(num)
+      found++
+      I found <= 50
+         print(f:‘{num:3}’, end' I found % 10 == 0 {"\n"} E ‘ ’)
+      E I found C (500, 5000, 50000)
+         print(f:‘{commatize(found):6}th: {commatize(num)}’)
+         I found == 50000
+            L.break
+===
+template <typename T1> auto product_of_proper_divisors(const T1 &n)
+{
+    auto prod = to_int64(1);
+    for (auto d : range_el(2, to_int(sqrt(n) + 1)))
+        if (mod(n, d) == 0) {
+            prod *= d;
+            auto otherD = idiv(n, d);
+            if (otherD != d)
+                prod *= otherD;
+        }
+    return prod;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"First 50 numbers which are the cube roots of the products of their proper divisors:"_S);
+    }
+} code_block_1;
+
+auto found = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto num : range_ei(1))
+            if (cube(to_int64(num)) == product_of_proper_divisors(num)) {
+                found++;
+                if (found <= 50)
+                    print(u"#3"_S.format(num), mod(found, 10) == 0 ? u'\n'_C : u' '_C);
+                else if (in(found, make_tuple(500, 5000, 50000))) {
+                    print(u"#6th: #."_S.format(commatize(found), commatize(num)));
+                    if (found == 50000)
+                        break;
+                }
+            }
+    }
+} code_block_2;
