@@ -6852,3 +6852,1020 @@ struct CodeBlock1
         print(u"\nFound "_S & count & u" primes starting and ending with 3 below 1000000."_S);
     }
 } code_block_1;
+
+
+# https://rosettacode.org/wiki/Penrose_tiling#Python
+def penrose(depth):
+    print('''<svg viewBox="-100 -100 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <path id="A0" d="M 80.90169943749474 58.778525229247315 L 0 0 100 0" stroke="black" fill="#8bc" />
+    <path id="B0" d="M 0 0 80.90169943749474 58.778525229247315 161.80339887498948 0" stroke="black" fill="#97e" />''')
+
+    for d in range(depth):
+        print(f'''  <g id="A{d+1}" transform="translate(100, 0) scale(0.6180339887498949)">
+        <use href="#A{d}" transform="rotate(108)" />
+        <use href="#B{d}" transform="scale(-1, 1)" />
+    </g>
+    <g id="B{d+1}">
+        <use href="#A{d+1}" />
+        <use href="#B{d}" transform="translate(100, 0) scale(0.6180339887498949) rotate(144) translate(-80.90169943749474,-58.778525229247315)"/>
+    </g>''')
+
+    print(f'''  <g id="G">
+        <use href="#A{depth}"/>
+        <use href="#A{depth}" transform="scale(1, -1)" />
+    </g>
+  </defs>
+  <g transform="scale(2, 2)">
+    <use href="#G" transform="rotate(-144)" />
+    <use href="#G" transform="rotate(-72)" />
+    <use href="#G" transform="rotate(0)" />
+    <use href="#G" transform="rotate(72)" />
+    <use href="#G" transform="rotate(144)" />
+  </g>
+</svg>''')
+
+penrose(6)
+===
+F penrose(depth)
+   print(‘<svg viewBox="-100 -100 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <path id="A0" d="M 80.90169943749474 58.778525229247315 L 0 0 100 0" stroke="black" fill="#8bc" />
+    <path id="B0" d="M 0 0 80.90169943749474 58.778525229247315 161.80339887498948 0" stroke="black" fill="#97e" />’)
+
+   L(d) 0 .< depth
+      print(‘  <g id="A’(d + 1)‘" transform="translate(100, 0) scale(0.6180339887498949)">
+        <use href="#A’d‘" transform="rotate(108)" />
+        <use href="#B’d‘" transform="scale(-1, 1)" />
+    </g>
+    <g id="B’(d + 1)‘">
+        <use href="#A’(d + 1)‘" />
+        <use href="#B’d‘" transform="translate(100, 0) scale(0.6180339887498949) rotate(144) translate(-80.90169943749474,-58.778525229247315)"/>
+    </g>’)
+
+   print(‘  <g id="G">
+        <use href="#A’depth‘"/>
+        <use href="#A’depth‘" transform="scale(1, -1)" />
+    </g>
+  </defs>
+  <g transform="scale(2, 2)">
+    <use href="#G" transform="rotate(-144)" />
+    <use href="#G" transform="rotate(-72)" />
+    <use href="#G" transform="rotate(0)" />
+    <use href="#G" transform="rotate(72)" />
+    <use href="#G" transform="rotate(144)" />
+  </g>
+</svg>’)
+
+penrose(6)
+===
+template <typename T1> auto penrose(const T1 &depth)
+{
+    print(uR"(<svg viewBox="-100 -100 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <path id="A0" d="M 80.90169943749474 58.778525229247315 L 0 0 100 0" stroke="black" fill="#8bc" />
+    <path id="B0" d="M 0 0 80.90169943749474 58.778525229247315 161.80339887498948 0" stroke="black" fill="#97e" />)"_S);
+
+    for (auto d : range_el(0, depth))
+        print(u"  <g id=\"A"_S & (d + 1) & uR"'(" transform="translate(100, 0) scale(0.6180339887498949)">
+        <use href="#A)'"_S & d & uR"'(" transform="rotate(108)" />
+        <use href="#B)'"_S & d & uR"'(" transform="scale(-1, 1)" />
+    </g>
+    <g id="B)'"_S & (d + 1) & uR"(">
+        <use href="#A)"_S & (d + 1) & uR"(" />
+        <use href="#B)"_S & d & uR"'(" transform="translate(100, 0) scale(0.6180339887498949) rotate(144) translate(-80.90169943749474,-58.778525229247315)"/>
+    </g>)'"_S);
+
+    print(uR"(  <g id="G">
+        <use href="#A)"_S & depth & uR"("/>
+        <use href="#A)"_S & depth & uR"'(" transform="scale(1, -1)" />
+    </g>
+  </defs>
+  <g transform="scale(2, 2)">
+    <use href="#G" transform="rotate(-144)" />
+    <use href="#G" transform="rotate(-72)" />
+    <use href="#G" transform="rotate(0)" />
+    <use href="#G" transform="rotate(72)" />
+    <use href="#G" transform="rotate(144)" />
+  </g>
+</svg>)'"_S);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        penrose(6);
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Pentomino_tiling#Nim
+from typing import List
+UInt32 = int
+Char = str
+
+'''
+var seed = 0'u
+proc nonrandom(n: uint): uint =
+  seed = (1664525 * seed + 1013904223) and 0xFFFFFFFF'u
+  return (seed shr 16) mod n
+'''
+
+seed: UInt32 = 0
+def nonrandom(n):
+    global seed
+    seed = (1664525 * seed + 1013904223) & 0xFFFF_FFFF
+    return (seed >> 16) % n
+
+SF = [[1, -1, 1, 0, 1, 1, 2, 1], [0, 1, 1, -1, 1, 0, 2, 0],
+      [1, 0, 1, 1, 1, 2, 2, 1], [1, 0, 1, 1, 2, -1, 2, 0],
+      [1, -2, 1, -1, 1, 0, 2, -1], [0, 1, 1, 1, 1, 2, 2, 1],
+      [1, -1, 1, 0, 1, 1, 2, -1], [1, -1, 1, 0, 2, 0, 2, 1]]
+
+SI = [[0, 1, 0, 2, 0, 3, 0, 4], [1, 0, 2, 0, 3, 0, 4, 0]]
+
+SL = [[1, 0, 1, 1, 1, 2, 1, 3], [1, 0, 2, 0, 3, -1, 3, 0],
+      [0, 1, 0, 2, 0, 3, 1, 3], [0, 1, 1, 0, 2, 0, 3, 0],
+      [0, 1, 1, 1, 2, 1, 3, 1], [0, 1, 0, 2, 0, 3, 1, 0],
+      [1, 0, 2, 0, 3, 0, 3, 1], [1, -3, 1, -2, 1, -1, 1, 0]]
+
+SN = [[0, 1, 1, -2, 1, -1, 1, 0], [1, 0, 1, 1, 2, 1, 3, 1],
+      [0, 1, 0, 2, 1, -1, 1, 0], [1, 0, 2, 0, 2, 1, 3, 1],
+      [0, 1, 1, 1, 1, 2, 1, 3], [1, 0, 2, -1, 2, 0, 3, -1],
+      [0, 1, 0, 2, 1, 2, 1, 3], [1, -1, 1, 0, 2, -1, 3, -1]]
+
+SP = [[0, 1, 1, 0, 1, 1, 2, 1], [0, 1, 0, 2, 1, 0, 1, 1],
+      [1, 0, 1, 1, 2, 0, 2, 1], [0, 1, 1, -1, 1, 0, 1, 1],
+      [0, 1, 1, 0, 1, 1, 1, 2], [1, -1, 1, 0, 2, -1, 2, 0],
+      [0, 1, 0, 2, 1, 1, 1, 2], [0, 1, 1, 0, 1, 1, 2, 0]]
+
+ST = [[0, 1, 0, 2, 1, 1, 2, 1], [1, -2, 1, -1, 1, 0, 2, 0],
+      [1, 0, 2, -1, 2, 0, 2, 1], [1, 0, 1, 1, 1, 2, 2, 0]]
+
+SU = [[0, 1, 0, 2, 1, 0, 1, 2], [0, 1, 1, 1, 2, 0, 2, 1],
+      [0, 2, 1, 0, 1, 1, 1, 2], [0, 1, 1, 0, 2, 0, 2, 1]]
+
+SV = [[1, 0, 2, 0, 2, 1, 2, 2], [0, 1, 0, 2, 1, 0, 2, 0],
+      [1, 0, 2, -2, 2, -1, 2, 0], [0, 1, 0, 2, 1, 2, 2, 2]]
+
+SW = [[1, 0, 1, 1, 2, 1, 2, 2], [1, -1, 1, 0, 2, -2, 2, -1],
+      [0, 1, 1, 1, 1, 2, 2, 2], [0, 1, 1, -1, 1, 0, 2, -1]]
+
+SX = [[1, -1, 1, 0, 1, 1, 2, 0]]
+
+SY = [[1, -2, 1, -1, 1, 0, 1, 1], [1, -1, 1, 0, 2, 0, 3, 0],
+      [0, 1, 0, 2, 0, 3, 1, 1], [1, 0, 2, 0, 2, 1, 3, 0],
+      [0, 1, 0, 2, 0, 3, 1, 2], [1, 0, 1, 1, 2, 0, 3, 0],
+      [1, -1, 1, 0, 1, 1, 1, 2], [1, 0, 2, -1, 2, 0, 3, 0]]
+
+SZ = [[0, 1, 1, 0, 2, -1, 2, 0], [1, 0, 1, 1, 1, 2, 2, 2],
+      [0, 1, 1, 1, 2, 1, 2, 2], [1, -2, 1, -1, 1, 0, 2, -2]]
+
+Shapes = [SF, SI, SL, SN, SP, ST, SU, SV, SW, SX, SY, SZ]
+Symbols = list("FILNPTUVWXYZ-")
+
+NRows = 8
+NCols = 8
+Blank = len(Shapes)
+
+class Tiling:
+    shapes: List[List[List[int]]]
+    symbols: List[Char]
+    grid: List[List[int]]
+    placed: List[bool]
+
+    def __init__(self):
+        self.shapes = []
+        self.symbols = []
+
+        indexes = [4, 6, 11, 7, 10, 3, 9, 5, 1, 8, 0, 2]
+        for index in indexes:
+            self.shapes.append(Shapes[index])
+            self.symbols.append(Symbols[index])
+        self.symbols.append(Symbols[-1])
+
+        self.grid = [[-1] * NCols for i in range(NRows)]
+
+        for i in range(4):
+            while True:
+                randRow = nonrandom(NRows)
+                randCol = nonrandom(NCols)
+                if self.grid[randRow][randCol] != Blank:
+                    self.grid[randRow][randCol] = Blank
+                    break
+
+        self.placed = [False] * len(Shapes)
+
+    def tryPlaceOrientation(self, o, r, c, shapeIndex):
+        for i in range(0, len(o), 2):
+            x = c + o[i + 1]
+            y = r + o[i]
+            if x not in range(NCols) or y not in range(NRows) or self.grid[y][x] != -1: return False
+        self.grid[r][c] = shapeIndex
+        for i in range(0, len(o), 2):
+            self.grid[r + o[i]][c + o[i + 1]] = shapeIndex
+        return True
+
+    def removeOrientation(self, o, r, c):
+        self.grid[r][c] = -1
+        for i in range(0, len(o), 2):
+            self.grid[r + o[i]][c + o[i + 1]] = -1
+
+    def solve(self, pos, numPlaced):
+        if numPlaced == len(self.shapes): return True
+        row = pos // NCols
+        col = pos % NCols
+        if self.grid[row][col] != -1: return self.solve(pos + 1, numPlaced)
+
+        for i in range(len(self.shapes)):
+            if not self.placed[i]:
+                for orientation in self.shapes[i]:
+                    if not self.tryPlaceOrientation(orientation, row, col, i): continue
+                    self.placed[i] = True
+                    if self.solve(pos + 1, numPlaced + 1): return True
+                    self.removeOrientation(orientation, row, col)
+                    self.placed[i] = False
+        return False
+
+    def printResult(self):
+        for r in self.grid:
+            print(' '.join(self.symbols[i] for i in r))
+
+tiling = Tiling()
+if tiling.solve(0, 0): tiling.printResult()
+else: print('No solution')
+===
+‘
+var seed = 0'u
+proc nonrandom(n: uint): uint =
+  seed = (1664525 * seed + 1013904223) and 0xFFFFFFFF'u
+  return (seed shr 16) mod n
+’
+
+UInt32 seed = 0
+F nonrandom(n)
+   :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
+   R (:seed >> 16) % n
+
+V SF = [[1, -1, 1, 0, 1, 1, 2, 1], [0, 1, 1, -1, 1, 0, 2, 0], [1, 0, 1, 1, 1, 2, 2, 1], [1, 0, 1, 1, 2, -1, 2, 0], [1, -2, 1, -1, 1, 0, 2, -1], [0, 1, 1, 1, 1, 2, 2, 1], [1, -1, 1, 0, 1, 1, 2, -1], [1, -1, 1, 0, 2, 0, 2, 1]]
+
+V SI = [[0, 1, 0, 2, 0, 3, 0, 4], [1, 0, 2, 0, 3, 0, 4, 0]]
+
+V SL = [[1, 0, 1, 1, 1, 2, 1, 3], [1, 0, 2, 0, 3, -1, 3, 0], [0, 1, 0, 2, 0, 3, 1, 3], [0, 1, 1, 0, 2, 0, 3, 0], [0, 1, 1, 1, 2, 1, 3, 1], [0, 1, 0, 2, 0, 3, 1, 0], [1, 0, 2, 0, 3, 0, 3, 1], [1, -3, 1, -2, 1, -1, 1, 0]]
+
+V SN = [[0, 1, 1, -2, 1, -1, 1, 0], [1, 0, 1, 1, 2, 1, 3, 1], [0, 1, 0, 2, 1, -1, 1, 0], [1, 0, 2, 0, 2, 1, 3, 1], [0, 1, 1, 1, 1, 2, 1, 3], [1, 0, 2, -1, 2, 0, 3, -1], [0, 1, 0, 2, 1, 2, 1, 3], [1, -1, 1, 0, 2, -1, 3, -1]]
+
+V SP = [[0, 1, 1, 0, 1, 1, 2, 1], [0, 1, 0, 2, 1, 0, 1, 1], [1, 0, 1, 1, 2, 0, 2, 1], [0, 1, 1, -1, 1, 0, 1, 1], [0, 1, 1, 0, 1, 1, 1, 2], [1, -1, 1, 0, 2, -1, 2, 0], [0, 1, 0, 2, 1, 1, 1, 2], [0, 1, 1, 0, 1, 1, 2, 0]]
+
+V ST = [[0, 1, 0, 2, 1, 1, 2, 1], [1, -2, 1, -1, 1, 0, 2, 0], [1, 0, 2, -1, 2, 0, 2, 1], [1, 0, 1, 1, 1, 2, 2, 0]]
+
+V SU = [[0, 1, 0, 2, 1, 0, 1, 2], [0, 1, 1, 1, 2, 0, 2, 1], [0, 2, 1, 0, 1, 1, 1, 2], [0, 1, 1, 0, 2, 0, 2, 1]]
+
+V SV = [[1, 0, 2, 0, 2, 1, 2, 2], [0, 1, 0, 2, 1, 0, 2, 0], [1, 0, 2, -2, 2, -1, 2, 0], [0, 1, 0, 2, 1, 2, 2, 2]]
+
+V SW = [[1, 0, 1, 1, 2, 1, 2, 2], [1, -1, 1, 0, 2, -2, 2, -1], [0, 1, 1, 1, 1, 2, 2, 2], [0, 1, 1, -1, 1, 0, 2, -1]]
+
+V SX = [[1, -1, 1, 0, 1, 1, 2, 0]]
+
+V SY = [[1, -2, 1, -1, 1, 0, 1, 1], [1, -1, 1, 0, 2, 0, 3, 0], [0, 1, 0, 2, 0, 3, 1, 1], [1, 0, 2, 0, 2, 1, 3, 0], [0, 1, 0, 2, 0, 3, 1, 2], [1, 0, 1, 1, 2, 0, 3, 0], [1, -1, 1, 0, 1, 1, 1, 2], [1, 0, 2, -1, 2, 0, 3, 0]]
+
+V SZ = [[0, 1, 1, 0, 2, -1, 2, 0], [1, 0, 1, 1, 1, 2, 2, 2], [0, 1, 1, 1, 2, 1, 2, 2], [1, -2, 1, -1, 1, 0, 2, -2]]
+
+V Shapes = [SF, SI, SL, SN, SP, ST, SU, SV, SW, SX, SY, SZ]
+V Symbols = Array(‘FILNPTUVWXYZ-’)
+
+V NRows = 8
+V NCols = 8
+V Blank = Shapes.len
+
+T Tiling
+   [[[Int]]] shapes
+   [Char] symbols
+   [[Int]] grid
+   [Bool] placed
+
+   F ()
+
+      V indexes = [4, 6, 11, 7, 10, 3, 9, 5, 1, 8, 0, 2]
+      L(index) indexes
+         .shapes.append(Shapes[index])
+         .symbols.append(Symbols[index])
+      .symbols.append(Symbols.last)
+
+      .grid = [[-1] * NCols] * NRows
+
+      L(i) 4
+         L
+            V randRow = nonrandom(NRows)
+            V randCol = nonrandom(NCols)
+            I .grid[randRow][randCol] != Blank
+               .grid[randRow][randCol] = Blank
+               L.break
+
+      .placed = [0B] * Shapes.len
+
+   F tryPlaceOrientation(o, r, c, shapeIndex)
+      L(i) (0 .< o.len).step(2)
+         V x = c + o[i + 1]
+         V y = r + o[i]
+         I x !C 0 .< NCols | y !C 0 .< NRows | .grid[y][x] != -1
+            R 0B
+      .grid[r][c] = shapeIndex
+      L(i) (0 .< o.len).step(2)
+         .grid[r + o[i]][c + o[i + 1]] = shapeIndex
+      R 1B
+
+   F removeOrientation(o, r, c)
+      .grid[r][c] = -1
+      L(i) (0 .< o.len).step(2)
+         .grid[r + o[i]][c + o[i + 1]] = -1
+
+   F solve(pos, numPlaced)
+      I numPlaced == .shapes.len
+         R 1B
+      V row = pos I/ NCols
+      V col = pos % NCols
+      I .grid[row][col] != -1
+         R .solve(pos + 1, numPlaced)
+
+      L(i) 0 .< .shapes.len
+         I !.placed[i]
+            L(orientation) .shapes[i]
+               I !.tryPlaceOrientation(orientation, row, col, i)
+                  L.continue
+               .placed[i] = 1B
+               I .solve(pos + 1, numPlaced + 1)
+                  R 1B
+               .removeOrientation(orientation, row, col)
+               .placed[i] = 0B
+      R 0B
+
+   F printResult()
+      L(r) .grid
+         print(r.map(i -> @.symbols[i]).join(‘ ’))
+
+V tiling = Tiling()
+I tiling.solve(0, 0)
+   tiling.printResult()
+E
+   print(‘No solution’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        uR"(
+var seed = 0'u
+proc nonrandom(n: uint): uint =
+  seed = (1664525 * seed + 1013904223) and 0xFFFFFFFF'u
+  return (seed shr 16) mod n
+)"_S;
+    }
+} code_block_1;
+
+uint32_t seed = 0;
+template <typename T1> auto nonrandom(const T1 &n)
+{
+    ::seed = (1664525 * ::seed + 1013904223) & 0xFFFF'FFFF;
+    return mod((::seed >> 16), n);
+}
+
+auto SF = create_array({create_array({1, -1, 1, 0, 1, 1, 2, 1}), create_array({0, 1, 1, -1, 1, 0, 2, 0}), create_array({1, 0, 1, 1, 1, 2, 2, 1}), create_array({1, 0, 1, 1, 2, -1, 2, 0}), create_array({1, -2, 1, -1, 1, 0, 2, -1}), create_array({0, 1, 1, 1, 1, 2, 2, 1}), create_array({1, -1, 1, 0, 1, 1, 2, -1}), create_array({1, -1, 1, 0, 2, 0, 2, 1})});
+
+auto SI = create_array({create_array({0, 1, 0, 2, 0, 3, 0, 4}), create_array({1, 0, 2, 0, 3, 0, 4, 0})});
+
+auto SL = create_array({create_array({1, 0, 1, 1, 1, 2, 1, 3}), create_array({1, 0, 2, 0, 3, -1, 3, 0}), create_array({0, 1, 0, 2, 0, 3, 1, 3}), create_array({0, 1, 1, 0, 2, 0, 3, 0}), create_array({0, 1, 1, 1, 2, 1, 3, 1}), create_array({0, 1, 0, 2, 0, 3, 1, 0}), create_array({1, 0, 2, 0, 3, 0, 3, 1}), create_array({1, -3, 1, -2, 1, -1, 1, 0})});
+
+auto SN = create_array({create_array({0, 1, 1, -2, 1, -1, 1, 0}), create_array({1, 0, 1, 1, 2, 1, 3, 1}), create_array({0, 1, 0, 2, 1, -1, 1, 0}), create_array({1, 0, 2, 0, 2, 1, 3, 1}), create_array({0, 1, 1, 1, 1, 2, 1, 3}), create_array({1, 0, 2, -1, 2, 0, 3, -1}), create_array({0, 1, 0, 2, 1, 2, 1, 3}), create_array({1, -1, 1, 0, 2, -1, 3, -1})});
+
+auto SP = create_array({create_array({0, 1, 1, 0, 1, 1, 2, 1}), create_array({0, 1, 0, 2, 1, 0, 1, 1}), create_array({1, 0, 1, 1, 2, 0, 2, 1}), create_array({0, 1, 1, -1, 1, 0, 1, 1}), create_array({0, 1, 1, 0, 1, 1, 1, 2}), create_array({1, -1, 1, 0, 2, -1, 2, 0}), create_array({0, 1, 0, 2, 1, 1, 1, 2}), create_array({0, 1, 1, 0, 1, 1, 2, 0})});
+
+auto ST = create_array({create_array({0, 1, 0, 2, 1, 1, 2, 1}), create_array({1, -2, 1, -1, 1, 0, 2, 0}), create_array({1, 0, 2, -1, 2, 0, 2, 1}), create_array({1, 0, 1, 1, 1, 2, 2, 0})});
+
+auto SU = create_array({create_array({0, 1, 0, 2, 1, 0, 1, 2}), create_array({0, 1, 1, 1, 2, 0, 2, 1}), create_array({0, 2, 1, 0, 1, 1, 1, 2}), create_array({0, 1, 1, 0, 2, 0, 2, 1})});
+
+auto SV = create_array({create_array({1, 0, 2, 0, 2, 1, 2, 2}), create_array({0, 1, 0, 2, 1, 0, 2, 0}), create_array({1, 0, 2, -2, 2, -1, 2, 0}), create_array({0, 1, 0, 2, 1, 2, 2, 2})});
+
+auto SW = create_array({create_array({1, 0, 1, 1, 2, 1, 2, 2}), create_array({1, -1, 1, 0, 2, -2, 2, -1}), create_array({0, 1, 1, 1, 1, 2, 2, 2}), create_array({0, 1, 1, -1, 1, 0, 2, -1})});
+
+auto SX = create_array({create_array({1, -1, 1, 0, 1, 1, 2, 0})});
+
+auto SY = create_array({create_array({1, -2, 1, -1, 1, 0, 1, 1}), create_array({1, -1, 1, 0, 2, 0, 3, 0}), create_array({0, 1, 0, 2, 0, 3, 1, 1}), create_array({1, 0, 2, 0, 2, 1, 3, 0}), create_array({0, 1, 0, 2, 0, 3, 1, 2}), create_array({1, 0, 1, 1, 2, 0, 3, 0}), create_array({1, -1, 1, 0, 1, 1, 1, 2}), create_array({1, 0, 2, -1, 2, 0, 3, 0})});
+
+auto SZ = create_array({create_array({0, 1, 1, 0, 2, -1, 2, 0}), create_array({1, 0, 1, 1, 1, 2, 2, 2}), create_array({0, 1, 1, 1, 2, 1, 2, 2}), create_array({1, -2, 1, -1, 1, 0, 2, -2})});
+
+auto Shapes = create_array({SF, SI, SL, SN, SP, ST, SU, SV, SW, SX, SY, SZ});
+auto Symbols = create_array(u"FILNPTUVWXYZ-"_S);
+
+auto NRows = 8;
+auto NCols = 8;
+auto Blank = Shapes.len();
+
+class Tiling
+{
+public:
+    Array<Array<Array<int>>> shapes;
+    Array<Char> symbols;
+    Array<Array<int>> grid;
+    Array<char> placed;
+
+    Tiling()
+    {
+
+        auto indexes = create_array({4, 6, 11, 7, 10, 3, 9, 5, 1, 8, 0, 2});
+        for (auto &&index : indexes) {
+            shapes.append(Shapes[index]);
+            symbols.append(Symbols[index]);
+        }
+        symbols.append(Symbols.last());
+
+        grid = create_array({create_array({-1}) * NCols}) * NRows;
+
+        for (int i = 0; i < 4; i++)
+            while (true) {
+                auto randRow = nonrandom(NRows);
+                auto randCol = nonrandom(NCols);
+                if (grid[randRow][randCol] != Blank) {
+                    grid[randRow].set(randCol, Blank);
+                    break;
+                }
+            }
+
+        placed = create_array({false}) * Shapes.len();
+    }
+
+    template <typename T1, typename T2, typename T3, typename T4> auto tryPlaceOrientation(const T1 &o, const T2 &r, const T3 &c, const T4 &shapeIndex)
+    {
+        for (auto i : range_el(0, o.len()).step(2)) {
+            auto x = c + o[i + 1];
+            auto y = r + o[i];
+            if (!in(x, range_el(0, NCols)) || !in(y, range_el(0, NRows)) || grid[y][x] != -1)
+                return false;
+        }
+        grid[r].set(c, shapeIndex);
+        for (auto i : range_el(0, o.len()).step(2))
+            grid[r + o[i]].set(c + o[i + 1], shapeIndex);
+        return true;
+    }
+
+    template <typename T1, typename T2, typename T3> auto removeOrientation(const T1 &o, const T2 &r, const T3 &c)
+    {
+        grid[r].set(c, -1);
+        for (auto i : range_el(0, o.len()).step(2))
+            grid[r + o[i]].set(c + o[i + 1], -1);
+    }
+
+    template <typename T1, typename T2> auto solve(const T1 &pos, const T2 &numPlaced)
+    {
+        if (numPlaced == shapes.len())
+            return true;
+        auto row = idiv(pos, NCols);
+        auto col = mod(pos, NCols);
+        if (grid[row][col] != -1)
+            return solve(pos + 1, numPlaced);
+
+        for (auto i : range_el(0, shapes.len()))
+            if (!placed[i])
+                for (auto &&orientation : shapes[i]) {
+                    if (!tryPlaceOrientation(orientation, row, col, i))
+                        continue;
+                    placed.set(i, true);
+                    if (solve(pos + 1, numPlaced + 1))
+                        return true;
+                    removeOrientation(orientation, row, col);
+                    placed.set(i, false);
+                }
+        return false;
+    }
+
+    auto printResult()
+    {
+        for (auto &&r : grid)
+            print(r.map([this](const auto &i){return symbols[i];}).join(u" "_S));
+    }
+};
+
+auto tiling = Tiling();
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        if (tiling.solve(0, 0))
+            tiling.printResult();
+        else
+            print(u"No solution"_S);
+    }
+} code_block_2;
+
+
+# https://rosettacode.org/wiki/Periodic_table#Python
+def perta(atomic):
+
+    NOBLES = [2, 10, 18, 36, 54, 86, 118]
+    INTERTWINED = [0, 0, 0, 0, 0, 57, 89]
+    INTERTWINING_SIZE = 14
+    LINE_WIDTH = 18
+
+    prev_noble = 0
+    row = 0
+    col: int
+    for row_, noble in enumerate(NOBLES):
+        row = row_
+        if atomic <= noble:  # we are at the good row. We now need to determine the column
+            nb_elem = noble - prev_noble  # number of elements on that row
+            rank =  atomic - prev_noble  # rank of the input element among elements
+            if INTERTWINED[row] and INTERTWINED[row] <= atomic <= INTERTWINED[row] + INTERTWINING_SIZE:  # lantanides or actinides
+                row += 2
+                col = rank + 1
+            else:  # not a lantanide nor actinide
+                # handle empty spaces between 1-2, 4-5 and 12-13.
+                nb_empty = LINE_WIDTH - nb_elem  # spaces count as columns
+                inside_left_element_rank = 2 if noble > 2 else 1
+                col = rank + (nb_empty if rank > inside_left_element_rank else 0)
+            break
+        prev_noble = noble
+    return row+1, col
+
+# small test suite
+
+TESTS = [
+    (1, (1, 1)),
+    (2, (1, 18)),
+    (29, (4,11)),
+    (42, (5, 6)),
+    (58, (8, 5)),
+    (59, (8, 6)),
+    (57, (8, 4)),
+    (71, (8, 18)),
+    (72, (6, 4)),
+    (89, (9, 4)),
+    (90, (9, 5)),
+    (103, (9, 18)),
+]
+
+for input, out in TESTS:
+    found = perta(input)
+    print('TEST:{:3} -> '.format(input) + str(found) + (f' ; ERROR: expected {out}' if found != out else ''))
+===
+F perta(atomic)
+
+   V NOBLES = [2, 10, 18, 36, 54, 86, 118]
+   V INTERTWINED = [0, 0, 0, 0, 0, 57, 89]
+   V INTERTWINING_SIZE = 14
+   V LINE_WIDTH = 18
+
+   V prev_noble = 0
+   V row = 0
+   Int col
+   L(noble) NOBLES
+      V row_ = L.index
+      row = row_
+      I atomic <= noble
+         V nb_elem = noble - prev_noble
+         V rank = atomic - prev_noble
+         I INTERTWINED[row] & atomic C INTERTWINED[row] .. INTERTWINED[row] + INTERTWINING_SIZE
+            row += 2
+            col = rank + 1
+         E
+            V nb_empty = LINE_WIDTH - nb_elem
+            V inside_left_element_rank = I noble > 2 {2} E 1
+            col = rank + (I rank > inside_left_element_rank {nb_empty} E 0)
+         L.break
+      prev_noble = noble
+   R (row + 1, col)
+
+V TESTS = [(1, (1, 1)), (2, (1, 18)), (29, (4, 11)), (42, (5, 6)), (58, (8, 5)), (59, (8, 6)), (57, (8, 4)), (71, (8, 18)), (72, (6, 4)), (89, (9, 4)), (90, (9, 5)), (103, (9, 18))]
+
+L(input, out) TESTS
+   V found = perta(input)
+   print(‘TEST:#3 -> ’.format(input)‘’String(found)‘’(I found != out {‘ ; ERROR: expected ’out} E ‘’))
+===
+template <typename T1> auto perta(const T1 &atomic)
+{
+
+    auto NOBLES = create_array({2, 10, 18, 36, 54, 86, 118});
+    auto INTERTWINED = create_array({0, 0, 0, 0, 0, 57, 89});
+    auto INTERTWINING_SIZE = 14;
+    auto LINE_WIDTH = 18;
+
+    auto prev_noble = 0;
+    auto row = 0;
+    int col;
+    {int Lindex = 0;
+    for (auto &&noble : NOBLES) {
+        auto row_ = Lindex;
+        row = row_;
+        if (atomic <= noble) {
+            auto nb_elem = noble - prev_noble;
+            auto rank = atomic - prev_noble;
+            if (INTERTWINED[row] && in(atomic, range_ee(INTERTWINED[row], INTERTWINED[row] + INTERTWINING_SIZE))) {
+                row += 2;
+                col = rank + 1;
+            }
+            else {
+                auto nb_empty = LINE_WIDTH - nb_elem;
+                auto inside_left_element_rank = noble > 2 ? 2 : 1;
+                col = rank + (rank > inside_left_element_rank ? nb_empty : 0);
+            }
+            break;
+        }
+        prev_noble = noble;
+        Lindex++;
+    }}
+    return make_tuple(row + 1, col);
+}
+
+auto TESTS = create_array({make_tuple(1, make_tuple(1, 1)), make_tuple(2, make_tuple(1, 18)), make_tuple(29, make_tuple(4, 11)), make_tuple(42, make_tuple(5, 6)), make_tuple(58, make_tuple(8, 5)), make_tuple(59, make_tuple(8, 6)), make_tuple(57, make_tuple(8, 4)), make_tuple(71, make_tuple(8, 18)), make_tuple(72, make_tuple(6, 4)), make_tuple(89, make_tuple(9, 4)), make_tuple(90, make_tuple(9, 5)), make_tuple(103, make_tuple(9, 18))});
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&[input, out] : TESTS) {
+            auto found = perta(input);
+            print(u"TEST:#3 -> "_S.format(input) & String(found) & (found != out ? u" ; ERROR: expected "_S & out : u""_S));
+        }
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Powerful_numbers#Python
+import math
+from typing import List
+Int64 = int
+
+def primes_up_to_limit(limit: int):
+    r: List[int] = []
+    if limit >= 2:
+        r.append(2)
+
+    # Sieve of Eratosthenes, storing only odd numbers starting at 3
+    isprime = [True] * ((limit - 1) // 2)
+    sieveend = int(math.sqrt(limit))
+    for i in range(len(isprime)):
+        if isprime[i]:
+            p: int = i * 2 + 3
+            r.append(p)
+            if i <= sieveend:
+                for j in range((p * p - 3) >> 1, len(isprime), p):
+                    isprime[j] = False
+    return r
+
+def primepowers(k, upper_bound):
+    ub = int(math.pow(upper_bound, 1/k) + .5)
+    res = [[Int64(1)]]
+
+    for p in primes_up_to_limit(ub):
+        a = [Int64(p)**k]
+        u = upper_bound // a[-1]
+        while u >= p:
+            a.append(a[-1]*p)
+            u //= p
+        res.append(a)
+
+    return res
+
+def kpowerful(k, upper_bound):
+    ps = primepowers(k, upper_bound)
+
+    def accu(i: int, ub: Int64) -> List[Int64]:
+        c: List[Int64] = []
+        for p in ps[i]:
+            u = ub//p
+            if not u: break
+
+            c += [p]
+
+            for j in range(i + 1, len(ps)):
+                if u < ps[j][0]:
+                    break
+                c += [p*x for x in accu(j, u)]
+        return c
+
+    return sorted(accu(0, upper_bound))
+
+def kpowerful_count_only(k, upper_bound):
+    ps = primepowers(k, upper_bound)
+
+    def accu(i: int, ub: Int64) -> int:
+        c = 0
+        for p in ps[i]:
+            u = ub//p
+            if not u: break
+
+            c += 1
+
+            for j in range(i + 1, len(ps)):
+                if u < ps[j][0]:
+                    break
+                c += accu(j, u)
+        return c
+
+    return accu(0, upper_bound)
+
+for k in range(2, 11):
+    res = kpowerful(k, Int64(10)**k)
+    print(f'{len(res)} {k}-powerfuls up to 10^{k}:',
+        ' '.join(str(x) for x in res[:5]),
+        '...',
+        ' '.join(str(x) for x in res[-5:])
+        )
+
+for k in range(2, 10):
+    res = [kpowerful_count_only(k, Int64(10)**n) for n in range(k+10)]
+    print(f'{k}-powerful up to 10^{k+10}:',
+        ' '.join(str(x) for x in res))
+===
+F primes_up_to_limit(Int limit)
+   [Int] r
+   I limit >= 2
+      r.append(2)
+
+   V isprime = [1B] * ((limit - 1) I/ 2)
+   V sieveend = Int(sqrt(limit))
+   L(i) 0 .< isprime.len
+      I isprime[i]
+         Int p = i * 2 + 3
+         r.append(p)
+         I i <= sieveend
+            L(j) ((p * p - 3) >> 1 .< isprime.len).step(p)
+               isprime[j] = 0B
+   R r
+
+F primepowers(k, upper_bound)
+   V ub = Int(pow(upper_bound, 1 / k) + .5)
+   V res = [[Int64(1)]]
+
+   L(p) primes_up_to_limit(ub)
+      V a = [Int64(p) ^ k]
+      V u = upper_bound I/ a.last
+      L u >= p
+         a.append(a.last * p)
+         u I/= p
+      res.append(a)
+
+   R res
+
+F kpowerful(k, upper_bound)
+   V ps = primepowers(k, upper_bound)
+
+   F accu(Int i, Int64 ub) -> [Int64]
+      [Int64] c
+      L(p) @ps[i]
+         V u = ub I/ p
+         I !u
+            L.break
+
+         c [+]= p
+
+         L(j) i + 1 .< @ps.len
+            I u < @ps[j][0]
+               L.break
+            c [+]= @accu(j, u).map(x -> @p * x)
+      R c
+
+   R sorted(accu(0, upper_bound))
+
+F kpowerful_count_only(k, upper_bound)
+   V ps = primepowers(k, upper_bound)
+
+   F accu(Int i, Int64 ub) -> Int
+      V c = 0
+      L(p) @ps[i]
+         V u = ub I/ p
+         I !u
+            L.break
+
+         c++
+
+         L(j) i + 1 .< @ps.len
+            I u < @ps[j][0]
+               L.break
+            c += @accu(j, u)
+      R c
+
+   R accu(0, upper_bound)
+
+L(k) 2..10
+   V res = kpowerful(k, Int64(10) ^ k)
+   print((res.len‘ ’k‘-powerfuls up to 10^’k‘:’)‘ ’res[0.<5].map(x -> String(x)).join(‘ ’)‘ ... ’res[(len)-5 ..].map(x -> String(x)).join(‘ ’))
+
+L(k) 2..9
+   V res = (0 .< k + 10).map(n -> kpowerful_count_only(@k, Int64(10) ^ n))
+   print((k‘-powerful up to 10^’(k + 10)‘:’)‘ ’res.map(x -> String(x)).join(‘ ’))
+===
+auto primes_up_to_limit(const int limit)
+{
+    Array<int> r;
+    if (limit >= 2)
+        r.append(2);
+
+    auto isprime = create_array({true}) * (idiv((limit - 1), 2));
+    auto sieveend = to_int(sqrt(limit));
+    for (auto i : range_el(0, isprime.len()))
+        if (isprime[i]) {
+            int p = i * 2 + 3;
+            r.append(p);
+            if (i <= sieveend)
+                for (auto j : range_el((p * p - 3) >> 1, isprime.len()).step(p))
+                    isprime.set(j, false);
+        }
+    return r;
+}
+
+template <typename T1, typename T2> auto primepowers(const T1 &k, const T2 &upper_bound)
+{
+    auto ub = to_int(pow(upper_bound, 1.0 / k) + .5);
+    auto res = create_array({create_array({to_int64(1)})});
+
+    for (auto &&p : primes_up_to_limit(ub)) {
+        auto a = create_array({pow(to_int64(p), k)});
+        auto u = idiv(upper_bound, a.last());
+        while (u >= p) {
+            a.append(a.last() * p);
+            u = idiv(u, p);
+        }
+        res.append(a);
+    }
+
+    return res;
+}
+
+template <typename T1, typename T2> auto kpowerful(const T1 &k, const T2 &upper_bound)
+{
+    auto ps = primepowers(k, upper_bound);
+
+    std::function<Array<Int64>(int, Int64)> accu = [&accu, &ps](const int i, const Int64 &ub) -> Array<Int64>
+    {
+        Array<Int64> c;
+        for (auto &&p : ps[i]) {
+            auto u = idiv(ub, p);
+            if (!u)
+                break;
+
+            c.append(p);
+
+            for (auto j : range_el(i + 1, ps.len())) {
+                if (u < _get<0>(ps[j]))
+                    break;
+                c.append(accu(j, u).map([&p](const auto &x){return p * x;}));
+            }
+        }
+        return c;
+    };
+
+    return sorted(accu(0, upper_bound));
+}
+
+template <typename T1, typename T2> auto kpowerful_count_only(const T1 &k, const T2 &upper_bound)
+{
+    auto ps = primepowers(k, upper_bound);
+
+    std::function<int(int, Int64)> accu = [&accu, &ps](const int i, const Int64 &ub) -> int
+    {
+        auto c = 0;
+        for (auto &&p : ps[i]) {
+            auto u = idiv(ub, p);
+            if (!u)
+                break;
+
+            c++;
+
+            for (auto j : range_el(i + 1, ps.len())) {
+                if (u < _get<0>(ps[j]))
+                    break;
+                c += accu(j, u);
+            }
+        }
+        return c;
+    };
+
+    return accu(0, upper_bound);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto k : range_ee(2, 10)) {
+            auto res = kpowerful(k, pow(to_int64(10), k));
+            print((res.len() & u" "_S & k & u"-powerfuls up to 10^"_S & k & u":"_S) & u" "_S & res[range_el(0, 5)].map([](const auto &x){return String(x);}).join(u" "_S) & u" ... "_S & res[range_elen_i( - 5)].map([](const auto &x){return String(x);}).join(u" "_S));
+        }
+
+        for (auto k : range_ee(2, 9)) {
+            auto res = range_el(0, k + 10).map([&k](const auto &n){return kpowerful_count_only(k, pow(to_int64(10), n));});
+            print((k & u"-powerful up to 10^"_S & (k + 10) & u":"_S) & u" "_S & res.map([](const auto &x){return String(x);}).join(u" "_S));
+        }
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Product_of_min_and_max_prime_factors#BASIC
+m = 100
+c = [False] * (m + 1)
+
+for p in range(2, int(m**0.5) + 1):
+    for ci in range(p * p, m + 1, p):
+        c[ci] = True#-1
+
+print(' %4i' % 1, end = '')
+'''
+for i in range(2, m + 1):
+    for l in range(2, i + 1):
+        if not(c[l] or i % l > 0):
+            break
+    # else:
+    #     l = i + 1
+
+    for h in range(i, 1, -1):
+        if not(c[h] or i % h > 0):
+            break
+    # else:
+    #     h = 1
+
+    print(' %4i' % (l * h), end = "\n" if i % 10 == 0 else '')
+'''
+for i in range(2, m + 1):
+    for l in range(2, i + 1):
+        if not(c[l] or i % l > 0):
+            for h in range(i, 1, -1):
+                if not(c[h] or i % h > 0):
+                    print(' %4i' % (l * h), end = "\n" if i % 10 == 0 else '')
+                    break
+            break
+===
+V m = 100
+V c = [0B] * (m + 1)
+
+L(p) 2 .. Int(m ^ 0.5)
+   L(ci) (p * p .. m).step(p)
+      c[ci] = 1B
+
+print(‘ #4’.format(1), end' ‘’)
+"\n\
+for i in range(2, m + 1):\n\
+    for l in range(2, i + 1):\n\
+        if not(c[l] or i % l > 0):\n\
+            break\n\
+    # else:\n\
+    #     l = i + 1\n\
+\n\
+    for h in range(i, 1, -1):\n\
+        if not(c[h] or i % h > 0):\n\
+            break\n\
+    # else:\n\
+    #     h = 1\n\
+\n\
+    print(' %4i' % (l * h), end = \"\n\" if i % 10 == 0 else '')\n\
+"
+L(i) 2 .. m
+   L(l) 2 .. i
+      I !(c[l] | i % l > 0)
+         L(h) (i .< 1).step(-1)
+            I !(c[h] | i % h > 0)
+               print(‘ #4’.format(l * h), end' I i % 10 == 0 {"\n"} E ‘’)
+               L.break
+         L.break
+===
+auto m = 100;
+auto c = create_array({false}) * (m + 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto p : range_ee(2, to_int(pow(m, 0.5))))
+            for (auto ci : range_ee(p * p, m).step(p))
+                c.set(ci, true);
+
+        print(u" #4"_S.format(1), u""_S);
+        u"\n\
+for i in range(2, m + 1):\n\
+    for l in range(2, i + 1):\n\
+        if not(c[l] or i % l > 0):\n\
+            break\n\
+    # else:\n\
+    #     l = i + 1\n\
+\n\
+    for h in range(i, 1, -1):\n\
+        if not(c[h] or i % h > 0):\n\
+            break\n\
+    # else:\n\
+    #     h = 1\n\
+\n\
+    print(' %4i' % (l * h), end = \"\n\" if i % 10 == 0 else '')\n\
+"_S;
+        for (auto i : range_ee(2, m))
+            for (auto l : range_ee(2, i))
+                if (!(c[l] || mod(i, l) > 0)) {
+                    for (auto h : range_el(i, 1).step(-1))
+                        if (!(c[h] || mod(i, h) > 0)) {
+                            print(u" #4"_S.format(l * h), mod(i, 10) == 0 ? u"\n"_S : u""_S);
+                            break;
+                        }
+                    break;
+                }
+    }
+} code_block_1;

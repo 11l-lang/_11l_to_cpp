@@ -3662,3 +3662,48 @@ struct CodeBlock1
             print(welzl(test));
     }
 } code_block_1;
+
+
+// https://rosettacode.org/wiki/Product_of_min_and_max_prime_factors#BASIC
+V m = 100
+V c = [0B] * (m + 1)
+
+L(p) 2 .. Int(m ^ 0.5)
+   L(ci) (p * p .. m).step(p)
+      c[ci] = 1B
+
+print(‘ #4’.format(1), end' ‘’)
+
+L(i) 2 .. m
+   L(l) 2 .. i
+      I !(c[l] | i % l > 0)
+         L(h) (i .. 2).step(-1)
+            I !(c[h] | i % h > 0)
+               print(‘ #4’.format(l * h), end' I i % 10 == 0 {"\n"} E ‘’)
+               L(l).break
+===
+auto m = 100;
+auto c = create_array({false}) * (m + 1);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto p : range_ee(2, to_int(pow(m, 0.5))))
+            for (auto ci : range_ee(p * p, m).step(p))
+                c.set(ci, true);
+
+        print(u" #4"_S.format(1), u""_S);
+
+        for (auto i : range_ee(2, m)) {
+            for (auto l : range_ee(2, i))
+                if (!(c[l] || mod(i, l) > 0))
+                    for (auto h : range_ee(i, 2).step(-1))
+                        if (!(c[h] || mod(i, h) > 0)) {
+                            print(u" #4"_S.format(l * h), mod(i, 10) == 0 ? u"\n"_S : u""_S);
+                            goto break_;
+                        }
+            break_:;
+        }
+    }
+} code_block_1;

@@ -1211,7 +1211,7 @@ class ASTNodeWithChildren(ASTNode):
                 or (check_for_if and (type(self.children[0]) == ASTIf or (has_if(self.children[0]) and type(self) in (ASTIf, ASTElseIf) and self.else_or_elif is not None))) # for correctly handling of dangling-else
                 or type(self.children[0]) == ASTLoopRemoveCurrentElementAndContinue # `L.remove_current_element_and_continue` ‘раскрывается в 2 строки кода’\‘is translated into 2 statements’
                 or (type(self.children[0]) == ASTTupleAssignment and self.children[0].is_multi_st()) # for `mx, mx_index = digit, i` in [https://www.rosettacode.org/wiki/Next_highest_int_from_digits#Python:_Algorithm_2]
-                or (type(self.children[0]) == ASTLoop and self.children[0].has_L_was_no_break())
+                or (type(self.children[0]) == ASTLoop and (self.children[0].has_L_was_no_break() or self.children[0].break_label_needed != -1))
                 or (type(self.children[0]) == ASTSwitch and self.children[0].has_string_case)):
             return self.children_to_str(indent, r, False)
         assert(len(self.children) == 1)
@@ -1857,6 +1857,11 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
     def walk_expressions(self, f):
         if self.expression is not None: f(self.expression)
 
+    def walk_children(self, f):
+        super().walk_children(f)
+        if self.was_no_break_node is not None:
+            self.was_no_break_node.walk_children(f)
+
 class ASTContinue(ASTNode):
     token : Token
 
@@ -1877,8 +1882,9 @@ class ASTLoopBreak(ASTNode):
     loop_variable : str = ''
     loop_level = 0
     token : Token
+    break_label = -1
 
-    def to_str(self, indent):
+    def set_break_label_needed(self):
         n = self.parent
         loop_level = 0
         while True:
@@ -1892,7 +1898,8 @@ class ASTLoopBreak(ASTNode):
                             global break_label_index
                             break_label_index += 1
                             n.break_label_needed = break_label_index
-                        return ' ' * (indent*4) + 'goto break_' + ('' if n.break_label_needed == 0 else str(n.break_label_needed)) + ";\n"
+                        self.break_label = n.break_label_needed
+                        return
                     break
                 loop_level += 1
             n = n.parent
@@ -1908,13 +1915,15 @@ class ASTLoopBreak(ASTNode):
                         if n.break_label_needed == -1:
                             break_label_index += 1
                             n.break_label_needed = break_label_index
-                        return ' ' * (indent*4) + 'goto break_' + ('' if n.break_label_needed == 0 else str(n.break_label_needed)) + ";\n"
+                        self.break_label = n.break_label_needed
+                        return
                     n = n.parent
             if type(n) == ASTLoop:
                 break
             n = n.parent
 
-        return ' ' * (indent*4) + "break;\n"
+    def to_str(self, indent):
+        return ' ' * (indent*4) + ("break;\n" if self.break_label == -1 else 'goto break_' + ('' if self.break_label == 0 else str(self.break_label)) + ";\n")
 
 class ASTLoopRemoveCurrentElementAndContinue(ASTNode):
     def to_str(self, indent):
@@ -3856,7 +3865,10 @@ def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, ap
         p.beginning_extra = "\n".join(map(lambda m: 'namespace ' + m.replace('::', ' { namespace ') + " {\n#include \"" + m.replace('::', '/') + ".hpp\"\n}" + '}'*m.count('::'), modules)) + "\n\n"
 
     found_reference_to_argv = False
-    def find_reference_to_argv(node):
+    def traverse(node):
+        if type(node) == ASTLoopBreak:
+            node.set_break_label_needed()
+
         def f(e : SymbolNode):
             if len(e.children) == 1 and e.symbol.id == ':' and e.children[0].token_str() == 'argv':
                 nonlocal found_reference_to_argv
@@ -3867,8 +3879,8 @@ def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, ap
                     f(child)
 
         node.walk_expressions(f)
-        node.walk_children(find_reference_to_argv)
-    find_reference_to_argv(p)
+        node.walk_children(traverse)
+    traverse(p)
 
     if found_reference_to_argv:
         if type(p.children[-1]) != ASTMain:
