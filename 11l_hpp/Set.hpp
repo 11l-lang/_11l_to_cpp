@@ -83,15 +83,15 @@ public:
 
 	bool is_disjoint(const Set &set2) const // [https://stackoverflow.com/a/1964252/2692494 <- google:‘isdisjoint c++’]
 	{
-		if(empty() || set2.empty()) return true;
+		if(std::set<KeyType>::empty() || set2.empty()) return true;
 
-		const_iterator
-			it1 = begin(),
-			it1End = end(),
+		typename std::set<KeyType>::const_iterator
+			it1 = std::set<KeyType>::begin(),
+			it1End = std::set<KeyType>::end(),
 			it2 = set2.begin(),
 			it2End = set2.end();
 
-		if(*it1 > *set2.rbegin() || *it2 > *rbegin()) return true;
+		if(*it1 > *set2.rbegin() || *it2 > *std::set<KeyType>::rbegin()) return true;
 
 		while(it1 != it1End && it2 != it2End)
 		{
