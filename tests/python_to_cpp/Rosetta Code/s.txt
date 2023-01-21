@@ -11389,3 +11389,55 @@ struct CodeBlock2
         }
     }
 } code_block_2;
+
+
+# https://rosettacode.org/wiki/Search_in_paragraph%27s_text#Python
+f = open('Traceback.txt')
+rawText = f.read()
+
+paragraphs = rawText.split( "\n\n" )
+
+for p in paragraphs:
+    if "SystemError" in p:
+
+        index = p.find( "Traceback (most recent call last):" )
+
+        if -1 != index:
+            print( p[index:] )
+            print( "----------------" )
+===
+V f = File(‘Traceback.txt’)
+V rawText = f.read()
+
+V paragraphs = rawText.split("\n\n")
+
+L(p) paragraphs
+   I ‘SystemError’ C p
+
+      V index = p.findi(‘Traceback (most recent call last):’)
+
+      I -1 != index
+         print(p[index ..])
+         print(‘----------------’)
+===
+auto f = File(u"Traceback.txt"_S);
+auto rawText = f.read();
+
+auto paragraphs = rawText.split(u"\n\n"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&p : paragraphs)
+            if (in(u"SystemError"_S, p)) {
+
+                auto index = p.findi(u"Traceback (most recent call last):"_S);
+
+                if (-1 != index) {
+                    print(p[range_ei(index)]);
+                    print(u"----------------"_S);
+                }
+            }
+    }
+} code_block_1;

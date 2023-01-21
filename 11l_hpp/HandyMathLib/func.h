@@ -273,7 +273,8 @@ template <class T> INLINE const T cross(const Tvec<T,2> &v0,const Tvec<T,2> &v1)
 template <class T> INLINE const Tvec<T,3> cross(const Tvec<T,3> &v0,const Tvec<T,3> &v1)
 {return Tvec<T,3>(v0.y*v1.z-v0.z*v1.y, v0.z*v1.x-v0.x*v1.z, v0.x*v1.y-v0.y*v1.x);}
 
-template <class T> INLINE const T normalize(const T &v) {return v/length(v);}
+template <class T, int N> INLINE const Tvec<T, N> normalize(const Tvec<T, N> &v) {return v/length(v);}
+template <class T> INLINE const Tquat<T> normalize(const Tquat<T> &q) {return q/length(q);}
 /*template <class T> INLINE const Tvec<T,2> normalize(const Tvec<T,2> &v) {return v/length(v);}
 template <class T> INLINE const Tvec<T,3> normalize(const Tvec<T,3> &v) {return v/length(v);}
 template <class T> INLINE const Tvec<T,4> normalize(const Tvec<T,4> &v) {return v/length(v);}*/

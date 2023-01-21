@@ -7869,3 +7869,43 @@ for i in range(2, m + 1):\n\
                 }
     }
 } code_block_1;
+
+
+# https://rosettacode.org/wiki/Pseudo-random_numbers/Middle-square_method#Python
+Int64 = int
+
+seed = 675248
+
+def random():
+    global seed
+    seed = int(str(Int64(seed) ** 2).zfill(12)[3:9])
+    return seed
+
+for _ in range(5):
+    print(random())
+===
+V seed = 675248
+
+F random()
+   :seed = Int(String(Int64(:seed) ^ 2).zfill(12)[3.<9])
+   R :seed
+
+L(_) 5
+   print(random())
+===
+auto seed = 675248;
+
+auto random()
+{
+    ::seed = to_int(String(square(to_int64(::seed))).zfill(12)[range_el(3, 9)]);
+    return ::seed;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int _ = 0; _ < 5; _++)
+            print(random());
+    }
+} code_block_1;
