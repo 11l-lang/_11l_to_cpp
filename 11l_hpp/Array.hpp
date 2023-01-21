@@ -472,6 +472,20 @@ public:
 		return r;
 	}
 
+	Type pop_fast(Int i)
+	{
+#ifdef PYTHON_NEGATIVE_INDEXING
+		if (i < 0)
+			i += len();
+#endif
+		if (!in(i, range_el(Int(0), len())))
+			throw IndexError(i);
+		Type r(std::move((*this)[i]));
+		std::swap((*this)[i], std::vector<Type>::back());
+		std::vector<Type>::pop_back();
+		return r;
+	}
+
 	Type pop_plus_len(Int i)
 	{
 #ifndef PYTHON_NEGATIVE_INDEXING

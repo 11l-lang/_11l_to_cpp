@@ -1,0 +1,24 @@
+// 5.2
+V l = Array(‘A’..‘Z’) [+] Array(‘0’..‘9’)
+
+L 6
+   L 6
+      -V rnd = random:(l.len)
+      print(l.pop_fast(rnd), end' ‘ ’)
+   print()
+===
+auto l = create_array(range_ee(u'A'_C, u'Z'_C)) + create_array(range_ee(u'0'_C, u'9'_C));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int Lindex = 0; Lindex < 6; Lindex++) {
+            for (int Lindex = 0; Lindex < 6; Lindex++) {
+                const auto rnd = randomns::_(l.len());
+                print(l.pop_fast(rnd), u" "_S);
+            }
+            print();
+        }
+    }
+} code_block_1;
