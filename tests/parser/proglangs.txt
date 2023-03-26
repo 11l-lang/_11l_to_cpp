@@ -22,3 +22,46 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+// 6
+-V
+   g = [[‘  ██  ’, ‘██████’, ‘██████’],
+        [‘████  ’, ‘    ██’, ‘    ██’],
+        [‘  ██  ’, ‘██████’, ‘  ████’],
+        [‘  ██  ’, ‘██    ’, ‘    ██’],
+        [‘██████’, ‘██████’, ‘██████’]]
+   digits = input()
+
+// Vertically
+L(digit) digits
+   L(line) 5
+      print(g[line][Int(digit)-1])
+   print()
+
+// Horizontally
+L(line) 5
+   L(digit) digits
+      print(g[line][Int(digit)-1], end' ‘  ’)
+   print()
+===
+const auto g = create_array({create_array({u"  ██  "_S, u"██████"_S, u"██████"_S}), create_array({u"████  "_S, u"    ██"_S, u"    ██"_S}), create_array({u"  ██  "_S, u"██████"_S, u"  ████"_S}), create_array({u"  ██  "_S, u"██    "_S, u"    ██"_S}), create_array({u"██████"_S, u"██████"_S, u"██████"_S})});
+const auto digits = input();
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&digit : digits) {
+            for (int line = 0; line < 5; line++)
+                print(g[line][to_int(digit) - 1]);
+            print();
+        }
+
+        for (int line = 0; line < 5; line++) {
+            for (auto &&digit : digits)
+                print(g[line][to_int(digit) - 1], u"  "_S);
+            print();
+        }
+    }
+} code_block_1;
