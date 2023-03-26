@@ -1,3 +1,35 @@
+// 1
+-V
+   a = Float(input(‘a:’))
+   b = Float(input(‘b:’))
+   c = Float(input(‘c:’))
+   d = b^2 - 4*a*c
+
+I d == 0
+   print(‘x = ’(-b / (2*a)))
+E
+   print(‘x1 = ’((-b + sqrt(d + 0i)) / (2*a)))
+   print(‘x2 = ’((-b - sqrt(d + 0i)) / (2*a)))
+===
+const auto a = to_float(input(u"a:"_S));
+const auto b = to_float(input(u"b:"_S));
+const auto c = to_float(input(u"c:"_S));
+const auto d = square(b) - 4 * a * c;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        if (d == 0)
+            print(u"x = "_S & (-b / (2 * a)));
+        else {
+            print(u"x1 = "_S & ((-b + sqrt(d + 0i)) / (2 * a)));
+            print(u"x2 = "_S & ((-b - sqrt(d + 0i)) / (2 * a)));
+        }
+    }
+} code_block_1;
+
+
 // 5.2
 V l = Array(‘A’..‘Z’) [+] Array(‘0’..‘9’)
 
