@@ -97,3 +97,56 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+// 7
+F parse_number(s, &i)
+   V r = 0
+   L i < s.len & s[i].is_digit()
+      r = r * 10 + Int(s[i++])
+   R r
+
+V
+   s = input(‘Expression:’)
+   i = 0
+   result = parse_number(s, &i)
+
+L i < s.len
+   S s[i++]
+      ‘+’
+         result += parse_number(s, &i)
+      ‘-’
+         result -= parse_number(s, &i)
+
+print(result)
+===
+template <typename T1, typename T2> auto parse_number(const T1 &s, T2 &i)
+{
+    auto r = 0;
+    while (i < s.len() && s[i].is_digit())
+        r = r * 10 + to_int(s[i++]);
+    return r;
+}
+
+auto s = input(u"Expression:"_S);
+auto i = 0;
+auto result = parse_number(s, i);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (i < s.len())
+            switch (s[i++])
+            {
+            case u'+':
+                result += parse_number(s, i);
+                break;
+            case u'-':
+                result -= parse_number(s, i);
+                break;
+            }
+
+        print(result);
+    }
+} code_block_1;
