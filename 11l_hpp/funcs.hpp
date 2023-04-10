@@ -170,6 +170,11 @@ Int64 pow(Int64 x, Int64 y) {return (Int64)pow(double(x), double(y));}
 
 using std::swap;
 
-template <typename Ty> bool equal(const Ty &a, const Ty &b, const Ty &c)                           {return a == b && a == c;}
-template <typename Ty> bool equal(const Ty &a, const Ty &b, const Ty &c, const Ty &d)              {return a == b && a == c && a == d;}
-template <typename Ty> bool equal(const Ty &a, const Ty &b, const Ty &c, const Ty &d, const Ty &e) {return a == b && a == c && a == d && a == e;}
+template <typename T1, typename T2> bool equal(const T1 &a, const T2 &b)
+{
+	return a == b;
+}
+template <typename T1, typename T2, typename... Rest> bool equal(const T1 &a, const T2 &b, const Rest&... rest) // [https://learn.microsoft.com/en-us/cpp/cpp/ellipses-and-variadic-templates <- google:‘c++ variadic templates msvc’]
+{
+	return a == b && equal(a, rest...);
+}
