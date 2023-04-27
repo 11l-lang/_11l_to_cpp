@@ -850,8 +850,13 @@ class SymbolNode:
                     res += char_or_str(self.children[i+1], char_val)
                     was_break = True
                     break
-                res += ('a == ' + (char_or_str(self.children[i], is_char(self.children[i]))[:-2] if self.children[i].token.category == Token.Category.STRING_LITERAL else self.children[i].to_str()) if self.children[i].symbol.id not in ('..', '.<', '.+', '<.', '<.<')
-                   else 'in(a, ' + self.children[i].to_str() + ')') + ' ? ' + char_or_str(self.children[i+1], char_val) + ' : '
+                if self.children[i].symbol.id in ('..', '.<', '.+', '<.', '<.<'):
+                    res += 'in(a, ' + self.children[i].to_str() + ')'
+                elif self.children[i].symbol.id in ('<', '<=', '>', '>='):
+                    res += 'a ' + self.children[i].symbol.id + ' ' + self.children[i].children[0].to_str()
+                else:
+                    res += 'a == ' + (char_or_str(self.children[i], is_char(self.children[i]))[:-2] if self.children[i].token.category == Token.Category.STRING_LITERAL else self.children[i].to_str())
+                res += ' ? ' + char_or_str(self.children[i+1], char_val) + ' : '
                 # L.was_no_break
                 #    res ‘’= ‘throw KeyError(a)’
             return res + ('throw KeyError(a)' if not was_break else '') + ';}(' + self.children[0].to_str() + ')'
@@ -2724,7 +2729,12 @@ def nud(self):
             else:
                 self.append_child(expression())
         else:
-            self.append_child(expression())
+            if token.value(source) in ('<', '<=', '>', '>='):
+                self.append_child(tokensn)
+                next_token()
+                self.children[-1].append_child(expression())
+            else:
+                self.append_child(expression())
             advance_scope_begin()
             self.append_child(expression())
             if token.category != Token.Category.SCOPE_END:

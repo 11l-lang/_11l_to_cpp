@@ -150,3 +150,47 @@ struct CodeBlock1
         print(result);
     }
 } code_block_1;
+
+
+// 8
+L(fname) [‘1.bmp’, ‘2.bmp’, ‘3.bmp’]
+   -V
+      b = File(fname).read_bytes()
+      w = Int32(bytes' b[18 .+ 4])
+      h = Int32(bytes' b[22 .+ 4])
+
+   L(y) reversed(0 .< h)
+      L(x) 0 .< w
+         -V c = S b[54 + (y*w + x) * 3]
+                   >= 204
+                      ‘  ’
+                   >= 153
+                      ‘░░’
+                   >= 102
+                      ‘▒▒’
+                   >=  51
+                      ‘▓▓’
+                   E
+                      ‘██’
+         print(c, end' ‘’)
+      print()
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&fname : create_array({u"1.bmp"_S, u"2.bmp"_S, u"3.bmp"_S})) {
+            const auto b = File(fname).read_bytes();
+            const auto w = int_t_from_bytes<Int32>(b, range_ep(18, 4));
+            const auto h = int_t_from_bytes<Int32>(b, range_ep(22, 4));
+
+            for (auto &&y : reversed(range_el(0, h))) {
+                for (auto x : range_el(0, w)) {
+                    const auto c = [&](const auto &a){return a >= 204 ? u"  "_S : a >= 153 ? u"░░"_S : a >= 102 ? u"▒▒"_S : a >= 51 ? u"▓▓"_S : u"██"_S;}(b[54 + (y * w + x) * 3]);
+                    print(c, u""_S);
+                }
+                print();
+            }
+        }
+    }
+} code_block_1;

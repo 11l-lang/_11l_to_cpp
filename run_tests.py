@@ -156,7 +156,7 @@ for fname in os.listdir('tests/parser'):
                 tokens = tokenizer.tokenize(in_11l)
                 for token in tokens:
                     if token.category == token.category.SCOPE_BEGIN and in_11l[token.start] != '{' and (token.end - token.start) % 3 != 0: # }
-                        if "r[L.index] = S c\n" not in in_11l and "V tag = S ‘_’\n" not in in_11l:
+                        if "r[L.index] = S c\n" not in in_11l and "V tag = S ‘_’\n" not in in_11l and ' = S ' not in in_11l:
                             print("Wrong indentation:\n" + in_11l + "[in file '" + full_fname + "']")
                             exit(1)
                 in_cpp = parse.parse_and_to_str(tokens, in_11l, full_fname)

@@ -207,7 +207,8 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
               and not (source[i    ] in unary_operators[1]  # Rude fix for:
                     or source[i:i+2] in unary_operators[2]  # a=b
                     or source[i:i+3] in unary_operators[3]) # ++i // Plus symbol at the beginning here should not be treated as binary + operator, so there is no implied line joining
-              and (source[i] not in ('&', '-') or source[i+1:i+2] == ' ')): # Символы `&` и `-` обрабатываются по-особенному — склеивание строк происходит только если после одного из этих символов стоит пробел
+              and (source[i] not in ('&', '-') or source[i+1:i+2] == ' ') # Символы `&` и `-` обрабатываются по-особенному — склеивание строк происходит только если после одного из этих символов стоит пробел
+              and source[i] not in ('<', '>')): # for `<`/`<=`/`>`/`>=` cases in switch
                 if len(tokens) == 0:
                     raise Error('source can not starts with a binary operator', i)
                 if line_continuations is not None:
