@@ -904,7 +904,7 @@ class SymbolNode:
                 else:
                     return 'range_ei(' + c0 + ')'
             elif self.symbol.id in ('&', 'T &'):
-                if not self.parent.function_call:
+                if not self.parent.function_call and not (self.parent.symbol.id == '>>' and self is self.parent.children[1]):
                     raise Error('wrong usage of unary `&` operator', self.token)
                 return self.children[0].to_str()
             else:

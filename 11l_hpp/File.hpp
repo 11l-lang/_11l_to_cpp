@@ -273,6 +273,13 @@ public:
 		return (char16_t)c;
 	}
 
+	template <class Ty> File &operator>>(Ty &v)
+	{
+		assert(file == stdin);
+		std::wcin >> v;
+		return *this;
+	}
+
 	void seek(Int offset, Int whence = 0)
 	{
 		fseek(file, (long)offset, (int)whence);

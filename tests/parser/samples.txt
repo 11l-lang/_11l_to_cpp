@@ -1962,3 +1962,23 @@ struct CodeBlock1
         print(vec3(0));
     }
 } code_block_1;
+
+
+Int t, a, b
+:stdin >> &t
+:stdin >> &a >> &b
+
+print(t‘: ’a‘, ’b)
+===
+int t, a, b;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _stdin >> t;
+        _stdin >> a >> b;
+
+        print(t & u": "_S & a & u", "_S & b);
+    }
+} code_block_1;
