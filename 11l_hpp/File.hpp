@@ -236,7 +236,7 @@ public:
 
 			line.append(s, len);
 
-			if (orig_len < sizeof(buf)-1)
+			if (orig_len < sizeof(buf)-1 || buf[orig_len-1] == '\n')
 				break;
 		}
 
