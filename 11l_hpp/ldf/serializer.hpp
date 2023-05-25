@@ -28,7 +28,7 @@ public:
 			//dict.reserve(element->value.object->members.size());
 			for (auto &[k, el] : element->value.object->members) {
 				ValueTy &dv = dict[k];
-				ldf::Serializer ser(&el, true, move_strings);
+				ldf::Serializer ser(const_cast<Element*>(&el), true, move_strings);
 				ser.serialize(dv);
 			}
 		}
