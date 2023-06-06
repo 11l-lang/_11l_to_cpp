@@ -2006,7 +2006,8 @@ class ASTTypeDefinition(ASTNodeWithChildren):
         super().__init__()
         self.base_types = []
         self.constructors = constructors or []
-        self.scope = scope # needed for built-in types, e.g. `File(full_fname, ‘w’, encoding' ‘utf-8-sig’).write(...)`
+        if constructors is not None:
+            self.scope = Scope(None) # needed for built-in types, e.g. `File(full_fname, ‘w’, encoding' ‘utf-8-sig’).write(...)`
         self.forward_declared_types = set()
 
     def serialize_to_dict(self):
@@ -3720,7 +3721,9 @@ array_scope.add_name('join', ASTFunctionDefinition([('sep', '', 'String')]))
 array_scope.add_name('sort', ASTFunctionDefinition([('key', token_to_str('N', Token.Category.CONSTANT), ''), ('reverse', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
 array_scope.add_name('sort_range', ASTFunctionDefinition([('range', '', 'Range'), ('key', token_to_str('N', Token.Category.CONSTANT), ''), ('reverse', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
 array_scope.add_name('decode', ASTFunctionDefinition([('encoding', token_to_str('‘utf-8’'), 'String')]))
+array_scope.add_name('hex', ASTFunctionDefinition([]))
 builtins_scope.ids['Array'].ast_nodes[0].scope = array_scope
+builtins_scope.ids['Bytes'].ast_nodes[0].scope = array_scope
 dict_scope = Scope(None)
 dict_scope.add_name('update', ASTFunctionDefinition([('other', '', 'Dict')]))
 dict_scope.add_name('find', ASTFunctionDefinition([('key', '', '')]))

@@ -4896,3 +4896,16 @@ struct CodeBlock1
             v = 2;
     }
 } code_block_1;
+
+
+print(b'\xf0\xf1\xf2'.hex())
+===
+print(Bytes("\xf0\xf1\xf2").hex().lowercase())
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print("\xf0\xf1\xf2"_B.hex().lowercase());
+    }
+} code_block_1;

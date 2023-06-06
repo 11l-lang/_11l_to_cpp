@@ -533,6 +533,19 @@ public:
 			throw AssertionError();
 	}
 
+	String hex() const
+	{
+		static_assert(std::is_same_v<Type, Byte>, "`hex()` can be called only on `Array<Byte>`");
+
+		String r;
+		r.reserve(len() * 2);
+		for (auto el : *this) {
+			r &= Char(hex_to_char(el >> 4));
+			r &= Char(hex_to_char(el & 0xF));
+		}
+		return r;
+	}
+
 	template <typename Ty> bool operator==(const Array<Ty> &arr) const
 	{
 		if (len() != arr.len()) return false;
