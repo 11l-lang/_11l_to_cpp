@@ -611,6 +611,8 @@ class SymbolNode:
                     return 'Char(' + self.children[2].to_str() + ')'
                 elif func_name == 'Char' and self.children[1] is not None and self.children[1].token_str() == "digit'":
                     return 'char_from_digit(' + self.children[2].to_str() + ')'
+                elif func_name == 'String' and self.children[2].token.category == Token.Category.STRING_LITERAL:
+                    return self.children[2].to_str()
                 elif func_name == 'Bytes' and self.children[2].token.category == Token.Category.STRING_LITERAL:
                     return '"' + self.children[2].token_str()[1:-1] + '"_B'
                 elif func_name.startswith('Array['): # ]

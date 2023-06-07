@@ -3632,7 +3632,7 @@ L(x) [[1, 2, 3], [0, 1, 2, 3], [1, 0, 3, 4], [1, 2, 0], [0, 0, 0], [0], [1, 1, 1
 template <typename T1> auto linear(const T1 &x)
 {
     auto a = enumerate(x).filter([](const auto &i, const auto &v){return v != 0;}).map([](const auto &i, const auto &v){return u"#.e(#.)"_S.format(v == -1 ? u"-"_S : v == 1 ? u""_S : String(v) & u"*"_S, i + 1);});
-    return (!a.empty() ? a : create_array({String(u"0"_S)})).join(u" + "_S).replace(u" + -"_S, u" - "_S);
+    return (!a.empty() ? a : create_array({u"0"_S})).join(u" + "_S).replace(u" + -"_S, u" - "_S);
 }
 
 struct CodeBlock1
@@ -4941,7 +4941,7 @@ template <typename T1> auto entropy(const T1 &s)
 }
 
 auto nmax = 37;
-auto fwords = create_array<String>({String(u"1"_S), u"0"_S});
+auto fwords = create_array<String>({u"1"_S, u"0"_S});
 
 struct CodeBlock1
 {
@@ -8763,8 +8763,8 @@ print(make_maze())
 template <typename T1 = decltype(16), typename T2 = decltype(8)> auto make_maze(const T1 &w = 16, const T2 &h = 8)
 {
     auto vis = range_el(0, h).map([&w](const auto &_){return create_array({0}) * w + create_array({1});}) + create_array({create_array({1}) * (w + 1)});
-    auto ver = range_el(0, h).map([&w](const auto &_){return create_array({u"|  "_S}) * w + create_array({String(u"|"_S)});}) + create_array({create_array({u""_S}) * 0});
-    auto hor = range_ee(0, h).map([&w](const auto &_){return create_array({u"+--"_S}) * w + create_array({String(u"+"_S)});});
+    auto ver = range_el(0, h).map([&w](const auto &_){return create_array({u"|  "_S}) * w + create_array({u"|"_S});}) + create_array({create_array({u""_S}) * 0});
+    auto hor = range_ee(0, h).map([&w](const auto &_){return create_array({u"+--"_S}) * w + create_array({u"+"_S});});
 
     std::function<void(int, int)> walk = [&hor, &ver, &vis, &walk](const int x, const int y) -> void
     {
@@ -8791,7 +8791,7 @@ template <typename T1 = decltype(16), typename T2 = decltype(8)> auto make_maze(
 
     auto s = u""_S;
     for (auto &&[a, b] : zip(hor, ver))
-        s &= (a + create_array({String(u"\n"_S)}) + b + create_array({String(u"\n"_S)})).join(u""_S);
+        s &= (a + create_array({u"\n"_S}) + b + create_array({u"\n"_S})).join(u""_S);
     return s;
 }
 
@@ -12239,7 +12239,7 @@ L(n) [‘Gary’, ‘Earl’, ‘Billy’, ‘Felix’, ‘Mary’]
 ===
 template <typename T1> auto print_verse(const T1 &n)
 {
-    auto l = create_array<String>({String(u"b"_S), u"f"_S, u"m"_S});
+    auto l = create_array<String>({u"b"_S, u"f"_S, u"m"_S});
     auto s = n[range_ei(1)];
     if (in(_get<0>(n).lowercase(), l))
         l.set(l.index(_get<0>(n).lowercase()), u""_S);

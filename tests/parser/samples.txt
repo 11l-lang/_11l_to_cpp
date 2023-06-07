@@ -1982,3 +1982,10 @@ struct CodeBlock1
         print(t & u": "_S & a & u", "_S & b);
     }
 } code_block_1;
+
+
+V a = [String(‘a’), ‘b’, ‘c’]
+V s = String(‘-’)
+===
+auto a = create_array<String>({u"a"_S, u"b"_S, u"c"_S});
+auto s = u"-"_S;

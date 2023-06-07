@@ -1019,7 +1019,7 @@ print(sierpinski_carpet(3))
 ===
 template <typename T1> auto sierpinski_carpet(const T1 &n)
 {
-    auto carpet = create_array({String(u"#"_S)});
+    auto carpet = create_array({u"#"_S});
     for (auto i : range_el(0, n))
         carpet = carpet.map([](const auto &x){return x & x & x;}) + carpet.map([](const auto &x){return x & x.replace(u"#"_S, u" "_S) & x;}) + carpet.map([](const auto &x){return x & x & x;});
     return carpet.join(u"\n"_S);
@@ -1055,7 +1055,7 @@ print(sierpinski(4).join("\n"))
 ===
 template <typename T1> auto sierpinski(const T1 &n)
 {
-    auto d = create_array({String(u"*"_S)});
+    auto d = create_array({u"*"_S});
     for (auto i : range_el(0, n)) {
         auto sp = u" "_S * (pow(2, i));
         d = d.map([&sp](const auto &x){return sp & x & sp;}) + d.map([](const auto &x){return x & u" "_S & x;});
@@ -7828,7 +7828,7 @@ V O = ‘One night-it was on the twentieth of March, 1888-I was returning’
 print(‘Encoded: ’straddle(O))
 print(‘Decoded: ’unstraddle(straddle(O)).join(‘’))
 ===
-auto t = create_array({create_array<String>({String(u"79"_S), u"0"_S, u"1"_S, u"2"_S, u"3"_S, u"4"_S, u"5"_S, u"6"_S, u"7"_S, u"8"_S, u"9"_S}), create_array<String>({String(u""_S), u"H"_S, u"O"_S, u"L"_S, u""_S, u"M"_S, u"E"_S, u"S"_S, u""_S, u"R"_S, u"T"_S}), create_array<String>({String(u"3"_S), u"A"_S, u"B"_S, u"C"_S, u"D"_S, u"F"_S, u"G"_S, u"I"_S, u"J"_S, u"K"_S, u"N"_S}), create_array<String>({String(u"7"_S), u"P"_S, u"Q"_S, u"U"_S, u"V"_S, u"W"_S, u"X"_S, u"Y"_S, u"Z"_S, u"."_S, u"/"_S})});
+auto t = create_array({create_array<String>({u"79"_S, u"0"_S, u"1"_S, u"2"_S, u"3"_S, u"4"_S, u"5"_S, u"6"_S, u"7"_S, u"8"_S, u"9"_S}), create_array<String>({u""_S, u"H"_S, u"O"_S, u"L"_S, u""_S, u"M"_S, u"E"_S, u"S"_S, u""_S, u"R"_S, u"T"_S}), create_array<String>({u"3"_S, u"A"_S, u"B"_S, u"C"_S, u"D"_S, u"F"_S, u"G"_S, u"I"_S, u"J"_S, u"K"_S, u"N"_S}), create_array<String>({u"7"_S, u"P"_S, u"Q"_S, u"U"_S, u"V"_S, u"W"_S, u"X"_S, u"Y"_S, u"Z"_S, u"."_S, u"/"_S})});
 
 template <typename T1> auto straddle(const T1 &s)
 {

@@ -3025,7 +3025,7 @@ L(n) [‘Gary’, ‘Earl’, ‘Billy’, ‘Felix’, ‘Mary’]
 ===
 template <typename T1> auto print_verse(const T1 &n)
 {
-    auto l = create_array<String>({String(u"b"_S), u"f"_S, u"m"_S});
+    auto l = create_array<String>({u"b"_S, u"f"_S, u"m"_S});
     auto s = n[range_ei(1)];
     auto i = l.find(_get<0>(n).lowercase());
     if (i != nullptr)

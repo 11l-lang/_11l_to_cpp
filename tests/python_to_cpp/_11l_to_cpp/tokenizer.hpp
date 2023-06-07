@@ -49,7 +49,7 @@ struct CodeBlock2
     CodeBlock2()
     {
         binary_operators.append(create_set(empty_list_of_str));
-        binary_operators.append(create_set<String>({String(u"+"_S), u"-"_S, u"*"_S, u"/"_S, u"%"_S, u"^"_S, u"&"_S, u"|"_S, u"<"_S, u">"_S, u"="_S, u"?"_S}));
+        binary_operators.append(create_set<String>({u"+"_S, u"-"_S, u"*"_S, u"/"_S, u"%"_S, u"^"_S, u"&"_S, u"|"_S, u"<"_S, u">"_S, u"="_S, u"?"_S}));
         binary_operators.append(create_set({u"<<"_S, u">>"_S, u"<="_S, u">="_S, u"=="_S, u"!="_S, u"+="_S, u"-="_S, u"*="_S, u"/="_S, u"%="_S, u"&="_S, u"|="_S, u"^="_S, u".="_S, u"->"_S, u".."_S, u".<"_S, u".+"_S, u"<."_S, u"I/"_S, u"Ц/"_S, u"-%"_S, u"C "_S, u"С "_S}));
         binary_operators.append(create_set({u"<<="_S, u">>="_S, u"‘’="_S, u"[+]"_S, u"[&]"_S, u"[|]"_S, u"(+)"_S, u"<.<"_S, u"-I/"_S, u"-Ц/"_S, u"I/="_S, u"Ц/="_S, u"in "_S, u"св "_S, u"!C "_S, u"!С "_S}));
         binary_operators.append(create_set({u"[+]="_S, u"[&]="_S, u"[|]="_S, u"(+)="_S, u"!in "_S, u"!св "_S}));
@@ -63,7 +63,7 @@ struct CodeBlock3
     CodeBlock3()
     {
         unary_operators.append(create_set(empty_list_of_str));
-        unary_operators.append(create_set({String(u"!"_S)}));
+        unary_operators.append(create_set({u"!"_S}));
         unary_operators.append(create_set({u"++"_S, u"--"_S}));
         unary_operators.append(create_set({u"(-)"_S}));
         unary_operators.append(create_set(empty_list_of_str));

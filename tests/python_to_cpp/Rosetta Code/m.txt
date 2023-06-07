@@ -2999,7 +2999,7 @@ public:
         auto table = create_array({n + 2}) * (n + 1);
         _set<1>(table, 0);
         auto how = range_el(0, n + 2).map([](const auto &_){return create_array({u""_S});});
-        _set<1>(how, create_array({String(u"="_S)}));
+        _set<1>(how, create_array({u"="_S}));
         for (auto t : range_el(1, n)) {
             auto thisplus1 = table[t] + 1;
             for (auto &&d : divs) {

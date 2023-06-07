@@ -1325,8 +1325,8 @@ F finite_state_machine(initial_state, exit_state)
 
 finite_state_machine(‘ready’, ‘q’)
 ===
-auto states = create_dict(dict_of(u"ready"_S, make_tuple(u"Machine ready: (d)eposit, or (q)uit?"_S, create_array<String>({String(u"d"_S), u"q"_S})))(u"waiting"_S, make_tuple(u"Machine waiting: (s)elect, or (r)efund?"_S, create_array<String>({String(u"s"_S), u"r"_S})))(u"dispense"_S, make_tuple(u"Machine dispensing: please (r)emove product"_S, create_array({String(u"r"_S)})))(u"refunding"_S, make_tuple(u"Refunding money"_S, create_array({u""_S}) * 0)));
-auto transitions = create_dict(dict_of(u"ready"_S, create_dict(dict_of(String(u"d"_S), u"waiting"_S)(String(u"q"_S), u"exit"_S)))(u"waiting"_S, create_dict(dict_of(String(u"s"_S), u"dispense"_S)(String(u"r"_S), u"refunding"_S)))(u"dispense"_S, create_dict(dict_of(String(u"r"_S), u"ready"_S)))(u"refunding"_S, create_dict(dict_of(u""_S, u"ready"_S))));
+auto states = create_dict(dict_of(u"ready"_S, make_tuple(u"Machine ready: (d)eposit, or (q)uit?"_S, create_array<String>({u"d"_S, u"q"_S})))(u"waiting"_S, make_tuple(u"Machine waiting: (s)elect, or (r)efund?"_S, create_array<String>({u"s"_S, u"r"_S})))(u"dispense"_S, make_tuple(u"Machine dispensing: please (r)emove product"_S, create_array({u"r"_S})))(u"refunding"_S, make_tuple(u"Refunding money"_S, create_array({u""_S}) * 0)));
+auto transitions = create_dict(dict_of(u"ready"_S, create_dict(dict_of(u"d"_S, u"waiting"_S)(u"q"_S, u"exit"_S)))(u"waiting"_S, create_dict(dict_of(u"s"_S, u"dispense"_S)(u"r"_S, u"refunding"_S)))(u"dispense"_S, create_dict(dict_of(u"r"_S, u"ready"_S)))(u"refunding"_S, create_dict(dict_of(u""_S, u"ready"_S))));
 
 template <typename T1, typename T2> auto Acceptor(const T1 &prompt, const T2 &valids)
 {

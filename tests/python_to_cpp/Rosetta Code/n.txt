@@ -822,9 +822,9 @@ auto nysiis(String name)
     while (i < name.len()) {
         auto [n_1, n] = make_tuple(name[i - 1], name[i]);
         auto n1_ = i + 1 < name.len() ? name[i + 1] : u""_S;
-        name = replace_at(name, i, create_array({u"EV"_S}) + create_array(::_vowels).map([](const auto &x){return String(x);}), create_array({u"AF"_S}) + create_array({String(u"A"_S)}) * 5);
-        name = replace_at(name, i, create_array<String>({String(u"Q"_S), u"Z"_S, u"M"_S}), create_array<String>({String(u"G"_S), u"S"_S, u"N"_S}));
-        name = replace_at(name, i, create_array({u"KN"_S, u"K"_S}), create_array<String>({String(u"N"_S), u"C"_S}));
+        name = replace_at(name, i, create_array({u"EV"_S}) + create_array(::_vowels).map([](const auto &x){return String(x);}), create_array({u"AF"_S}) + create_array({u"A"_S}) * 5);
+        name = replace_at(name, i, create_array<String>({u"Q"_S, u"Z"_S, u"M"_S}), create_array<String>({u"G"_S, u"S"_S, u"N"_S}));
+        name = replace_at(name, i, create_array({u"KN"_S, u"K"_S}), create_array<String>({u"N"_S, u"C"_S}));
         name = replace_at(name, i, create_array({u"SCH"_S, u"PH"_S}), create_array({u"SSS"_S, u"FF"_S}));
         if (n == u'H' && (!in(n_1, ::_vowels) || !in(n1_, ::_vowels)))
             name = name[range_el(0, i)] & n_1 & name[range_ei(i + 1)];
