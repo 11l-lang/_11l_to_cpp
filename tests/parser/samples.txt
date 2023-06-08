@@ -1989,3 +1989,16 @@ V s = String(‘-’)
 ===
 auto a = create_array<String>({u"a"_S, u"b"_S, u"c"_S});
 auto s = u"-"_S;
+
+
+assert(00AB'CDEF.bits(4 .+ 8) == D'E)
+assert(00AB'CDEF.bits(4..)    == 0A'BC'DE)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        assert(int_bits(0x00AB'CDEF, range_ep(4, 8)) == 0xDE);
+        assert(int_bits(0x00AB'CDEF, range_ei(4)) == 0x0A'BC'DE);
+    }
+} code_block_1;

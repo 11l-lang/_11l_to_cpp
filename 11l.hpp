@@ -274,6 +274,12 @@ template <typename Ty> auto hash(const Ty &obj)
 	return std::hash<Ty>()(obj);
 }
 
+template <typename Ty> Ty int_bits(Ty x, const RangeEI<Int> range) { return x >> range.b; }
+template <typename Ty> Ty int_bits(Ty x, const Range<Int, true, false> range)
+{
+	return (x >> range.b) & ((1 << range.len()) - 1);
+}
+
 inline void print(const String &s = u"", const String &end = u"\n", bool flush = false)
 {
 	std::wcout << std::wstring(s.cbegin(), s.cend()) << std::wstring(end.cbegin(), end.cend());

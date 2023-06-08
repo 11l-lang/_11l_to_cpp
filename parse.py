@@ -587,6 +587,8 @@ class SymbolNode:
                         func_name = self.children[0].children[0].to_str() + '.set_union'
                     elif func_name.endswith('.to_bytes'):
                         return 'bytes_from_int(' + self.children[0].children[0].to_str() + ')'
+                    elif func_name.endswith('.bits'):
+                        return 'int_bits(' + self.children[0].children[0].to_str() + ', ' + self.children[2].to_str() + ')'
                     else:
                         f_node = type_of(self.children[0])
                 elif func_name == 'Bool':
