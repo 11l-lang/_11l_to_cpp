@@ -20255,7 +20255,7 @@ F md5(=message)
    message.append(8'0)
    L message.len % 64 != 56
       message.append(0)
-   message.extend(bytes_from_int(UInt64(orig_len_in_bits)))
+   message.extend(UInt64(orig_len_in_bits).to_bytes())
 
    V hash_pieces = copy(:init_values)
 

@@ -585,6 +585,8 @@ class SymbolNode:
                         return func_name + '(' + char_or_str(self.children[2], is_char(self.children[2])) + ')'
                     elif self.children[0].children[1].token.value(source) == 'union':
                         func_name = self.children[0].children[0].to_str() + '.set_union'
+                    elif func_name.endswith('.to_bytes'):
+                        return 'bytes_from_int(' + self.children[0].children[0].to_str() + ')'
                     else:
                         f_node = type_of(self.children[0])
                 elif func_name == 'Bool':
@@ -3577,7 +3579,6 @@ builtins_scope.add_function('rotr', ASTFunctionDefinition([('value', '', 'Int'),
 builtins_scope.add_function('bsr', ASTFunctionDefinition([('x', '', '')]))
 builtins_scope.add_function('bsf', ASTFunctionDefinition([('x', '', '')]))
 builtins_scope.add_function('bit_length', ASTFunctionDefinition([('x', '', '')]))
-builtins_scope.add_function('bytes_from_int', ASTFunctionDefinition([('i', '', '')]))
 builtins_scope.add_function('round', ASTFunctionDefinition([('number', '', 'Float'), ('ndigits', '0', '')]))
 builtins_scope.add_function('sleep', ASTFunctionDefinition([('secs', '', 'Float')]))
 builtins_scope.add_function('ceil',  ASTFunctionDefinition([('x', '', 'Float')]))
