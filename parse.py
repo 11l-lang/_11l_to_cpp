@@ -669,6 +669,10 @@ class SymbolNode:
                     func_name = 'std::move'
                 elif func_name == '*this':
                     func_name = '(*this)' # function call has higher precedence than dereference in C++, so `*this(...)` is equivalent to `*(this(...))`
+                elif func_name == 'term::color':
+                    if self.children[2].token_str() not in {'GRAY', 'BLUE', 'GREEN', 'CYAN', 'RED', 'MAGENTA', 'YELLOW', 'RESET'}:
+                        raise Error('wrong color', self.children[2].left_to_right_token())
+                    return func_name + '(term::Color::' + self.children[2].token_str() + ')'
                 elif self.children[0].symbol.id == '[': # ]
                     pass
                 elif self.children[0].function_call: # for `enumFromTo(0)(1000)`
@@ -3846,6 +3850,7 @@ module_scope.add_function('to_json', ASTFunctionDefinition([('eldf_str', '', 'St
 module_scope.add_function('reparse', ASTFunctionDefinition([('eldf_str', '', 'String')]))
 module_scope.add_function('test_parse', ASTFunctionDefinition([('eldf_str', '', 'String')]))
 builtin_modules['eldf'] = Module(module_scope)
+builtin_modules['term'] = Module(Scope(None))
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False, to_debug_str = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
     if len(tokens_) == 0: return ASTProgram().to_str()

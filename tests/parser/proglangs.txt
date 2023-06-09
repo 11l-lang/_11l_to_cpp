@@ -194,3 +194,106 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+// 13
+V src = ‘’
+L
+   V line = input()
+   I line.empty
+      L.break
+   src ‘’= line"\n"
+
+V i = 0
+L i < src.len
+   I src[i].is_alpha()
+      V start = i++
+      L i < src.len & (src[i].is_alpha() | src[i].is_digit())
+         i++
+      V lexem = src[start .< i]
+      I lexem C (‘def’, ‘if’, ‘else’, ‘return’)
+         term:color(BLUE)
+         print(lexem, end' ‘’)
+         term:color(RESET)
+      E
+         print(lexem, end' ‘’)
+   E I src[i].is_digit()
+      term:color(GREEN)
+      L
+         print(src[i++], end' ‘’)
+         I !(i < src.len & src[i].is_digit())
+            L.break
+      term:color(RESET)
+   E I src[i] C ‘"'’
+      V q = src[i]
+      term:color(RED)
+      L
+         print(src[i++], end' ‘’)
+         I !(i < src.len & src[i] != q)
+            L.break
+      I i < src.len
+         print(src[i++], end' ‘’)
+      term:color(RESET)
+   E
+      print(src[i++], end' ‘’)
+===
+auto src = u""_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (true) {
+            auto line = input();
+            if (line.empty())
+                break;
+            src &= line & u"\n"_S;
+        }
+    }
+} code_block_1;
+
+auto i = 0;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        while (i < src.len())
+            if (src[i].is_alpha()) {
+                auto start = i++;
+                while (i < src.len() && (src[i].is_alpha() || src[i].is_digit()))
+                    i++;
+                auto lexem = src[range_el(start, i)];
+                if (in(lexem, make_tuple(u"def"_S, u"if"_S, u"else"_S, u"return"_S))) {
+                    term::color(term::Color::BLUE);
+                    print(lexem, u""_S);
+                    term::color(term::Color::RESET);
+                }
+                else
+                    print(lexem, u""_S);
+            }
+            else if (src[i].is_digit()) {
+                term::color(term::Color::GREEN);
+                while (true) {
+                    print(src[i++], u""_S);
+                    if (!(i < src.len() && src[i].is_digit()))
+                        break;
+                }
+                term::color(term::Color::RESET);
+            }
+            else if (in(src[i], u"\"'"_S)) {
+                auto q = src[i];
+                term::color(term::Color::RED);
+                while (true) {
+                    print(src[i++], u""_S);
+                    if (!(i < src.len() && src[i] != q))
+                        break;
+                }
+                if (i < src.len())
+                    print(src[i++], u""_S);
+                term::color(term::Color::RESET);
+            }
+            else
+                print(src[i++], u""_S);
+    }
+} code_block_2;
