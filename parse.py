@@ -2059,7 +2059,7 @@ class ASTTypeDefinition(ASTNodeWithChildren):
         access_specifier_public = -1
         for c in self.children:
             if c.access_specifier_public != access_specifier_public:
-                r += ' ' * (indent*4) + ['private', 'public'][c.access_specifier_public] + ":\n"
+                r += ' ' * (indent*4) + ['protected', 'public'][c.access_specifier_public] + ":\n"
                 access_specifier_public = c.access_specifier_public
             r += c.to_str(indent+1)
         if len(self.forward_declared_types):

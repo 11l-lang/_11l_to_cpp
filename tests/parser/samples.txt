@@ -982,13 +982,13 @@ class MyType
 {
 public:
     int public_variable;
-private:
+protected:
     int private_variable;
 };
 
 class MyType2
 {
-private:
+protected:
     int private_variable;
 public:
     int public_variable;
@@ -1746,7 +1746,7 @@ T Type
 ===
 class Type
 {
-private:
+protected:
     static inline const auto s_private_const_static_var = 10;
 public:
     const decltype(11) const_var = 11;
