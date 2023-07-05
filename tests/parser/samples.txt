@@ -2002,3 +2002,30 @@ struct CodeBlock1
         assert(int_bits(0x00AB'CDEF, range_ei(4)) == 0x0A'BC'DE);
     }
 } code_block_1;
+
+
+S input(‘?’)
+   ‘1’
+      print(1)
+   ‘2s’
+      print(2)
+   ‘3’, ‘4’
+      print(‘3 | 4’)
+   ‘5’, ‘6’, ‘7’
+      print(‘5 | 6 | 7’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        auto input_u__S_ = input(u"?"_S);
+        if (input_u__S_ == u'1')
+            print(1);
+        else if (input_u__S_ == u"2s"_S)
+            print(2);
+        else if (in(input_u__S_, make_tuple(u'3', u'4')))
+            print(u"3 | 4"_S);
+        else if (in(input_u__S_, make_tuple(u'5', u'6', u'7')))
+            print(u"5 | 6 | 7"_S);
+    }
+} code_block_1;
