@@ -2029,3 +2029,32 @@ struct CodeBlock1
             print(u"5 | 6 | 7"_S);
     }
 } code_block_1;
+
+
+T Ty
+   F method(a, b)
+      ...
+
+F Ty.method(a, b)
+   R a + b
+
+print(Ty().method(1, 2))
+===
+class Ty
+{
+public:
+    template <typename T1, typename T2> auto method(const T1 &a, const T2 &b);
+};
+
+template <typename T1, typename T2> auto Ty::method(const T1 &a, const T2 &b)
+{
+    return a + b;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(Ty().method(1, 2));
+    }
+} code_block_1;

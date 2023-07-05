@@ -1472,6 +1472,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
     function_return_type : str = ''
     is_const = False
     is_static = False
+    is_declaration = False
     function_arguments : List[Tuple[str, str, str, str]]# = [] # (arg_name, default_value, type_, qualifier)
     first_named_only_argument = None
     last_non_default_argument : int
@@ -1502,9 +1503,15 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
     def deserialize_from_dict(self, d):
         self.function_arguments = [arg.split('; ') for arg in d['function_arguments']]
 
+    def children_to_str(self, indent, t):
+        if self.is_declaration:
+            return pre_nl(self.tokeni) + ' ' * (indent*4) + t + ";\n"
+        else:
+            return super().children_to_str(indent, t)
+
     def to_str(self, indent):
         is_const = False
-        if type(self.parent) == ASTTypeDefinition:
+        if type(self.parent) == ASTTypeDefinition or '::' in self.function_name:
             if self.function_name == '': # this is constructor
                 s = self.parent.type_name
             elif self.function_name == '(destructor)':
@@ -2857,6 +2864,8 @@ def parse_internal(this_node):
                     if token.category == Token.Category.NAME:
                         node.function_name = tokensn.token_str()
                         next_token()
+                        while token.value(source) == '.':
+                            node.function_name += '::' + expected_name('function name')
                     elif token.value(source) == ':' and peek_token().category == Token.Category.NAME:
                         node.is_static = True
                         next_token()
@@ -2947,7 +2956,15 @@ def parse_internal(this_node):
                             node.function_return_type = expression().to_type_str()
 
                 if node.virtual_category != node.VirtualCategory.ABSTRACT:
-                    new_scope(node, map(lambda arg: (arg[0], arg[2]), node.function_arguments))
+                    if token.category == Token.Category.SCOPE_BEGIN and source[peek_token().start : peek_token().start + 3] == '...':
+                        advance_scope_begin()
+                        advance('..')
+                        advance('.')
+                        assert(token.category == Token.Category.SCOPE_END)
+                        next_token()
+                        node.is_declaration = True
+                    else:
+                        new_scope(node, map(lambda arg: (arg[0], arg[2]), node.function_arguments))
                 else:
                     if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
                         next_token()
