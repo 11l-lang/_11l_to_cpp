@@ -3661,6 +3661,7 @@ add_builtin_global_var('stderr', 'File')
 builtins_scope.add_name('Char', ASTTypeDefinition([ASTFunctionDefinition([('code', '', 'Int')])]))
 char_scope = Scope(None)
 char_scope.add_name('is_digit', ASTFunctionDefinition([]))
+char_scope.add_name('is_surrogate', ASTFunctionDefinition([]))
 builtins_scope.ids['Char'].ast_nodes[0].scope = char_scope
 builtins_scope.ids['Char'].ast_nodes[0].constructors[0].first_named_only_argument = 0
 

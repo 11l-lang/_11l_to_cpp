@@ -64,6 +64,8 @@ public:
 	bool is_uppercase() const {return iswupper(code);}
 	bool is_alpha    () const {return iswalpha(code);}
 
+	bool is_surrogate() const {return in((int)code, range_ee(0xD800, 0xDFFF));}
+
 	Array<Byte> encode(const String &encoding) const;
 };
 
