@@ -198,10 +198,7 @@ struct CodeBlock1
 
 // 13
 V src = ‘’
-L
-   V line = input()
-   I line.empty
-      L.break
+L (V line = input()) != ‘’
    src ‘’= line"\n"
 
 V i = 0
@@ -243,12 +240,8 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        while (true) {
-            auto line = input();
-            if (line.empty())
-                break;
+        for (auto line = input(); line != u""; line = input())
             src &= line & u"\n"_S;
-        }
     }
 } code_block_1;
 

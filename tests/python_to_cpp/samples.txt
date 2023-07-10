@@ -4909,3 +4909,47 @@ struct CodeBlock1
         print("\xf0\xf1\xf2"_B.hex().lowercase());
     }
 } code_block_1;
+
+
+if (l := input()) != '':
+    print(l)
+
+code = ''
+while (line := input()) != '':
+    code += line + "\n"
+
+print('Your code:')
+print(code)
+===
+I (V l = input()) != ‘’
+   print(l)
+
+V code = ‘’
+L (V line = input()) != ‘’
+   code ‘’= line"\n"
+
+print(‘Your code:’)
+print(code)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        if (auto l = input(); l != u"")
+            print(l);
+    }
+} code_block_1;
+
+auto code = u""_S;
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        for (auto line = input(); line != u""; line = input())
+            code &= line & u"\n"_S;
+
+        print(u"Your code:"_S);
+        print(code);
+    }
+} code_block_2;

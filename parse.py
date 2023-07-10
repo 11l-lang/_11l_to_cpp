@@ -184,6 +184,7 @@ class SymbolNode:
     is_dict : bool = False
     is_type : bool = False
     postfix : bool = False
+    is_var_decl    = False
     scope : Scope
     token_str_override : str
 
@@ -796,6 +797,10 @@ class SymbolNode:
                     if i < len(self.children)-1:
                         res += ', '
                 return res + ')'
+
+            elif self.is_var_decl:
+                assert(self.children[0].symbol.id == '=' and self.children[0].children[0].token.category == Token.Category.NAME)
+                return self.children[0].children[0].token_str()
 
             else:
                 assert(len(self.children) == 1)
@@ -1675,7 +1680,10 @@ class ASTIf(ASTNodeWithChildren, ASTNodeWithExpression):
 
     def to_str(self, indent):
         if self.likely == 0:
-            s = 'if (' + self.expression.to_str() + ')'
+            if len(self.expression.children) == 2 and self.expression.children[0].is_var_decl:
+                s = 'if (auto ' + self.expression.children[0].children[0].to_str() + '; ' + self.expression.to_str() + ')'
+            else:
+                s = 'if (' + self.expression.to_str() + ')'
         elif self.likely == 1:
             s = 'if (likely(' + self.expression.to_str() + '))'
         else:
@@ -1816,7 +1824,11 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
                     raise Error('please write `' + l + ' ' + self.expression.token.value(source) + ' != 0` or `'
                                                  + l + ' 1..' + self.expression.token.value(source) + '` instead of `'
                                                  + l + ' ' + self.expression.token.value(source) + '`', Token(tokens[self.tokeni].start, self.expression.token.end, Token.Category.NAME))
-                tr = 'while (' + (self.expression.to_str() if self.expression is not None else 'true') + ')'
+                if self.expression is not None and len(self.expression.children) == 2 and self.expression.children[0].is_var_decl:
+                    tr = 'for (auto ' + self.expression.children[0].children[0].to_str() + '; ' + self.expression.to_str() \
+                               + '; ' + self.expression.children[0].children[0].to_str() + ')'
+                else:
+                    tr = 'while (' + (self.expression.to_str() if self.expression is not None else 'true') + ')'
         rr = self.children_to_str_detect_single_stmt(indent, tr)
 
         if self.has_L_remove_current_element_and_continue:
@@ -2634,6 +2646,10 @@ def led(self, left):
 symbol('(').led = led
 
 def nud(self):
+    if token.value(source) in ('V', 'П', 'var', 'пер'):
+        self.is_var_decl = True
+        next_token()
+
     comma = False # ((
     if token.value(source) != ')':
         while True:
