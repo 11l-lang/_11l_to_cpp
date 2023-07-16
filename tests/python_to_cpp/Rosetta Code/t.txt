@@ -525,13 +525,13 @@ def thue_morse_digits(digits):
 print(thue_morse_digits(20))
 ===
 F thue_morse_digits(digits)
-   R (0 .< digits).map(n -> bin(n).count(‘1’) % 2)
+   R (0 .< digits).map(n -> n.popcount() % 2)
 
 print(thue_morse_digits(20))
 ===
 template <typename T1> auto thue_morse_digits(const T1 &digits)
 {
-    return range_el(0, digits).map([](const auto &n){return mod(bin(n).count(u'1'_C), 2);});
+    return range_el(0, digits).map([](const auto &n){return mod(popcount(n), 2);});
 }
 
 struct CodeBlock1

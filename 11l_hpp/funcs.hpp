@@ -129,12 +129,16 @@ inline int bsr(int   x) {return __builtin_clz  (x) ^ 31;}
 inline int bsr(Int64 x) {return __builtin_clzll(x) ^ 63;}
 inline int bsf(int   x) {return __builtin_ctz  (x);}
 inline int bsf(Int64 x) {return __builtin_ctzll(x);}
+inline int popcount(int   x) {return __builtin_popcount  (x);}
+inline int popcount(Int64 x) {return __builtin_popcountll(x);}
 #elif _MSC_VER
 inline int bsr(int x)   {unsigned long r; _BitScanReverse  (&r, x); return r;}
 inline int bsf(int x)   {unsigned long r; _BitScanForward  (&r, x); return r;}
+inline int popcount(int x) {return __popcnt(x);}
 #ifdef _M_AMD64
 inline int bsr(Int64 x) {unsigned long r; _BitScanReverse64(&r, x); return r;}
 inline int bsf(Int64 x) {unsigned long r; _BitScanForward64(&r, x); return r;}
+inline int popcount(Int64 x) {return (int)__popcnt64(x);}
 #endif
 #else
 #error Unsupported compiler

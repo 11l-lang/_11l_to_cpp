@@ -1,5 +1,6 @@
 # 222
-import eulerlib, math
+import math
+from _11l import *
 
 NUM_SPHERES = 21
 
@@ -23,7 +24,7 @@ def find_minimum_length(currentsphereindex, setofspheres) -> float:
     # Memoization
     if minlength[currentsphereindex][setofspheres] == -float("inf"):
         result : float
-        if eulerlib.popcount(setofspheres) == 1:
+        if popcount(setofspheres) == 1:
             result = sphereradii[currentsphereindex]  # This sphere is rightmost
         else:
             result = float("inf")
@@ -53,7 +54,7 @@ F find_minimum_length(currentsphereindex, setofspheres) -> Float
 
    I :minlength[currentsphereindex][setofspheres] == -Float.infinity
       Float result
-      I eulerlib:popcount(setofspheres) == 1
+      I setofspheres.popcount() == 1
          result = :sphereradii[currentsphereindex]
       E
          result = Float.infinity
@@ -70,10 +71,6 @@ F find_minimum_length(currentsphereindex, setofspheres) -> Float
 V ans = min((0 .< NUM_SPHERES).map(i -> (find_minimum_length(i, (1 << :NUM_SPHERES) - 1) + :sphereradii[i])))
 print(Int(round(ans)))
 ===
-namespace eulerlib {
-#include "eulerlib.hpp"
-}
-
 auto NUM_SPHERES = 21;
 
 auto sphereradii = range_el(0, NUM_SPHERES).map([](const auto &i){return (i + 30) * 1000;});
@@ -86,7 +83,7 @@ template <typename T1, typename T2> double find_minimum_length(const T1 &current
 
     if (::minlength[currentsphereindex][setofspheres] == -std::numeric_limits<double>::infinity()) {
         double result;
-        if (eulerlib::popcount(setofspheres) == 1)
+        if (popcount(setofspheres) == 1)
             result = ::sphereradii[currentsphereindex];
         else {
             result = std::numeric_limits<double>::infinity();

@@ -588,6 +588,8 @@ class SymbolNode:
                         func_name = self.children[0].children[0].to_str() + '.set_union'
                     elif func_name.endswith('.to_bytes'):
                         return 'bytes_from_int(' + self.children[0].children[0].to_str() + ')'
+                    elif func_name.endswith('.popcount'):
+                        return 'popcount(' + self.children[0].children[0].to_str() + ')'
                     elif func_name.endswith('.bits'):
                         return 'int_bits(' + self.children[0].children[0].to_str() + ', ' + self.children[2].to_str() + ')'
                     else:
@@ -3749,6 +3751,7 @@ array_scope.add_name('remove', ASTFunctionDefinition([('x', '', '')]))
 array_scope.add_name('count', ASTFunctionDefinition([('x', '', '')]))
 array_scope.add_name('index', ASTFunctionDefinition([('x', '', ''), ('start', '0', 'Int'), ('end', '-1', 'Int')]))
 array_scope.add_name('find', ASTFunctionDefinition([('x', '', ''), ('start', '0', 'Int')]))
+array_scope.add_name('del', ASTFunctionDefinition([('range', '', 'Range')]))
 array_scope.add_name('pop', ASTFunctionDefinition([('i', '-1', 'Int')]))
 array_scope.add_name('pop_fast', ASTFunctionDefinition([('i', '', 'Int')]))
 array_scope.add_name('insert', ASTFunctionDefinition([('i', '', 'Int'), ('x', '', '')]))

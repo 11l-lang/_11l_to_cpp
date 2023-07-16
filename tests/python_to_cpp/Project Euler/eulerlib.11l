@@ -1,6 +1,3 @@
-F popcount(x) -> Int
-   R bin(x).count(‘1’)
-
 F sqrtb(BigInt x) -> BigInt
    assert(x >= 0)
    BigInt i = 1

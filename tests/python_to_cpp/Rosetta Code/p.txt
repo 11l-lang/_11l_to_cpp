@@ -865,10 +865,8 @@ struct CodeBlock1
 
 
 # https://www.rosettacode.org/wiki/Pernicious_numbers#Python
+from _11l import *
 import math
-
-def popcount(n):
-    return bin(n).count('1')
 
 def is_prime(n):
     if n < 2:
@@ -893,9 +891,6 @@ for i in range(888888877, 888888888 + 1):
     if is_prime(popcount(i)):
         print(i, end = ' ')
 ===
-F popcount(n)
-   R bin(n).count(‘1’)
-
 F is_prime(n)
    I n < 2
       R 0B
@@ -907,7 +902,7 @@ F is_prime(n)
 V i = 0
 V cnt = 0
 L
-   I is_prime(popcount(i))
+   I is_prime(i.popcount())
       print(i, end' ‘ ’)
       cnt++
       I cnt == 25
@@ -916,14 +911,9 @@ L
 
 print()
 L(i) 888888877 .. 888888888
-   I is_prime(popcount(i))
+   I is_prime(i.popcount())
       print(i, end' ‘ ’)
 ===
-template <typename T1> auto popcount(const T1 &n)
-{
-    return bin(n).count(u'1'_C);
-}
-
 template <typename T1> auto is_prime(const T1 &n)
 {
     if (n < 2)
@@ -1206,11 +1196,7 @@ struct CodeBlock3
 
 
 # https://www.rosettacode.org/wiki/Population_count#Python
-from typing import List
-Int64 = int
-
-def popcount(n):
-    return bin(n).count('1')
+from _11l import *
 
 print([popcount(Int64(3)**i) for i in range(30)])
 
@@ -1226,16 +1212,13 @@ while len(evil) < 30 or len(odious) < 30:
 print(evil[:30])
 print(odious[:30])
 ===
-F popcount(n)
-   R bin(n).count(‘1’)
-
-print((0.<30).map(i -> popcount(Int64(3) ^ i)))
+print((0.<30).map(i -> (Int64(3) ^ i).popcount()))
 
 [Int] evil
 [Int] odious
 V i = 0
 L evil.len < 30 | odious.len < 30
-   V p = popcount(i)
+   V p = i.popcount()
    I (p % 2) != 0
       odious.append(i)
    E
@@ -1245,16 +1228,11 @@ L evil.len < 30 | odious.len < 30
 print(evil[0.<30])
 print(odious[0.<30])
 ===
-template <typename T1> auto popcount(const T1 &n)
-{
-    return bin(n).count(u'1'_C);
-}
-
 struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(range_el(0, 30).map([](const auto &i){return popcount(pow(to_int64(3), i));}));
+        print(range_el(0, 30).map([](const auto &i){return popcount((pow(to_int64(3), i)));}));
     }
 } code_block_1;
 

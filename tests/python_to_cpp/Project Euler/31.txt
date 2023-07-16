@@ -1,6 +1,6 @@
 # 315 [Int64 from Java solution]
 import eulerlib
-Int64 = int
+from _11l import *
 
 # Also known as digital root.
 def digit_sum(n):
@@ -35,11 +35,11 @@ def sam_transitions_minus_max_transitions(n):
         newstate = number_to_segments(n)
         if newstate == segmentstate:
             break
-        maxtrans += eulerlib.popcount(newstate ^ segmentstate)
+        maxtrans += popcount(newstate ^ segmentstate)
         segmentstate = newstate
-        samtrans += 2 * eulerlib.popcount(newstate)
+        samtrans += 2 * popcount(newstate)
         n = digit_sum(n)
-    maxtrans += eulerlib.popcount(segmentstate)
+    maxtrans += popcount(segmentstate)
     return samtrans - maxtrans
 
 isprime = eulerlib.list_primality(20000000)
@@ -78,11 +78,11 @@ F sam_transitions_minus_max_transitions(=n)
       V newstate = number_to_segments(n)
       I newstate == segmentstate
          L.break
-      maxtrans += eulerlib:popcount(newstate (+) segmentstate)
+      maxtrans += (newstate (+) segmentstate).popcount()
       segmentstate = newstate
-      samtrans += 2 * eulerlib:popcount(newstate)
+      samtrans += 2 * newstate.popcount()
       n = digit_sum(n)
-   maxtrans += eulerlib:popcount(segmentstate)
+   maxtrans += segmentstate.popcount()
    R samtrans - maxtrans
 
 V isprime = eulerlib:list_primality(20000000)
@@ -130,12 +130,12 @@ template <typename T1> auto sam_transitions_minus_max_transitions(T1 n)
         auto newstate = number_to_segments(n);
         if (newstate == segmentstate)
             break;
-        maxtrans += eulerlib::popcount(newstate ^ segmentstate);
+        maxtrans += popcount((newstate ^ segmentstate));
         segmentstate = newstate;
-        samtrans += 2 * eulerlib::popcount(newstate);
+        samtrans += 2 * popcount(newstate);
         n = digit_sum(n);
     }
-    maxtrans += eulerlib::popcount(segmentstate);
+    maxtrans += popcount(segmentstate);
     return samtrans - maxtrans;
 }
 

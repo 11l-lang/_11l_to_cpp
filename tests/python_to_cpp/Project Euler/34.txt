@@ -1,5 +1,5 @@
 # 345
-import eulerlib
+from _11l import *
 
 MATRIX = [list(map(int, line.split())) for line in '''
   7  53 183 439 863 497 383 563  79 973 287  63 343 169 583
@@ -29,7 +29,7 @@ maxsum = [[0] * (2**COLUMNS) for _ in range(ROWS)]
 # with the bit set 'setofcols' indicating which column indexes are still free to be used.
 def find_maximum_sum(startrow, setofcols):
     if startrow == ROWS:
-        assert eulerlib.popcount(setofcols) == COLUMNS - ROWS
+        assert popcount(setofcols) == COLUMNS - ROWS
         return 0
     if maxsum[startrow][setofcols] == 0:
         result = 0
@@ -72,7 +72,7 @@ V maxsum = [[0] * (2 ^ :COLUMNS)] * ROWS
 
 F find_maximum_sum(startrow, setofcols)
    I startrow == :ROWS
-      assert(eulerlib:popcount(setofcols) == :COLUMNS - :ROWS)
+      assert(setofcols.popcount() == :COLUMNS - :ROWS)
       R 0
    I :maxsum[startrow][setofcols] == 0
       V result = 0
@@ -90,10 +90,6 @@ F find_maximum_sum(startrow, setofcols)
 
 print(find_maximum_sum(0, 2 ^ COLUMNS - 1))
 ===
-namespace eulerlib {
-#include "eulerlib.hpp"
-}
-
 auto MATRIX = uR"(
   7  53 183 439 863 497 383 563  79 973 287  63 343 169 583
 627 343 773 959 943 767 473 103 699 303 957 703 583 639 913
@@ -120,7 +116,7 @@ auto maxsum = create_array({create_array({0}) * (pow(2, ::COLUMNS))}) * ROWS;
 template <typename T1, typename T2> auto find_maximum_sum(const T1 &startrow, const T2 &setofcols)
 {
     if (startrow == ::ROWS) {
-        assert(eulerlib::popcount(setofcols) == ::COLUMNS - ::ROWS);
+        assert(popcount(setofcols) == ::COLUMNS - ::ROWS);
         return 0;
     }
     if (::maxsum[startrow][setofcols] == 0) {

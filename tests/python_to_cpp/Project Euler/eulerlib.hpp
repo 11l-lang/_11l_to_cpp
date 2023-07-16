@@ -1,9 +1,4 @@
-﻿template <typename T1> int popcount(const T1 &x)
-{
-    return bin(x).count(u'1'_C);
-}
-
-BigInt sqrtb(const BigInt &x)
+﻿BigInt sqrtb(const BigInt &x)
 {
     assert(x >= 0);
     BigInt i = 1;

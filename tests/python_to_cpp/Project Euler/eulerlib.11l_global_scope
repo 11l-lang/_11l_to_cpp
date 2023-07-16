@@ -1,11 +1,3 @@
-popcount
-    type = ‘’
-    ast_nodes = [
-    .   node_type = function
-        function_arguments = [
-            ‘x; ; ; ’
-        ]
-    ]
 sqrtb
     type = ‘’
     ast_nodes = [

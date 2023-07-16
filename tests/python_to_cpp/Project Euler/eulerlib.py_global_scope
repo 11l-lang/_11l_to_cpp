@@ -1,10 +1,4 @@
 Imported modules = []
-popcount
-    type = ‘’
-    node
-        function_arguments = [
-            ‘x; ; ; ’
-        ]
 sqrtb
     type = ‘’
     node
