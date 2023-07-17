@@ -175,7 +175,7 @@ V LIMIT = Int64(10) ^ 12
 
 V strongrepunits = Set([Int64(1)])
 
-L(length) 3 .. bit_length(LIMIT)
+L(length) 3 .. bits:length(LIMIT)
 
    L(base) 2..
 
@@ -194,7 +194,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto length : range_ee(3, bit_length(LIMIT)))
+        for (auto length : range_ee(3, bits::length(LIMIT)))
 
             for (auto base : range_ei(2)) {
 

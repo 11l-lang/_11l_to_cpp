@@ -431,7 +431,7 @@ F count_ways(number, exponent, repetitions)
       R result
 
 V NUMBER = BigInt(10) ^ 25
-print(count_ways(NUMBER, bit_length(NUMBER) - 1, 2))
+print(count_ways(NUMBER, bits:length(NUMBER) - 1, 2))
 ===
 Dict<Tuple<BigInt, int, int>, Int64> cache;
 
@@ -464,6 +464,6 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(count_ways(NUMBER, bit_length(NUMBER) - 1, 2));
+        print(count_ways(NUMBER, bits::length(NUMBER) - 1, 2));
     }
 } code_block_1;

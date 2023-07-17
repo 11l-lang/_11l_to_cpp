@@ -2252,21 +2252,21 @@ print((2).bit_length())
 print((3).bit_length())
 print((4).bit_length())
 ===
-print(bit_length((0)))
-print(bit_length((1)))
-print(bit_length((2)))
-print(bit_length((3)))
-print(bit_length((4)))
+print(bits:length((0)))
+print(bits:length((1)))
+print(bits:length((2)))
+print(bits:length((3)))
+print(bits:length((4)))
 ===
 struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(bit_length((0)));
-        print(bit_length((1)));
-        print(bit_length((2)));
-        print(bit_length((3)));
-        print(bit_length((4)));
+        print(bits::length((0)));
+        print(bits::length((1)));
+        print(bits::length((2)));
+        print(bits::length((3)));
+        print(bits::length((4)));
     }
 } code_block_1;
 

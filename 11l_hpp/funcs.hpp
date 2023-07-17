@@ -145,8 +145,8 @@ inline int popcount(Int64 x) {return (int)__popcnt64(x);}
 #else
 #error Unsupported compiler
 #endif
+template <typename Ty> int length(Ty x) {return x != 0 ? bsr(x) + 1 : 0;}
 }
-template <typename Ty> int bit_length(Ty x) {return x != 0 ? bits::bsr(x) + 1 : 0;}
 
 auto divmod(int   x, int   y) {  div_t r =   div(x, y); return make_tuple(r.quot, r.rem);}
 auto divmod(Int64 x, Int64 y) {lldiv_t r = lldiv(x, y); return make_tuple(r.quot, r.rem);}

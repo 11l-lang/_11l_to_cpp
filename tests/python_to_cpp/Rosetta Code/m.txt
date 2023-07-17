@@ -1433,7 +1433,7 @@ T Montgomery
 
    F (m)
       .m = m
-      .n = bit_length(m)
+      .n = bits:length(m)
       .rrm = (BigInt(2) ^ (.n * 2)) % m
 
    F reduce(t)
@@ -1476,7 +1476,7 @@ print("\nMontgomery computation of x1 ^ x2 mod m:")
 V prod = mont.reduce(mont.rrm)
 V base = mont.reduce(x1 * mont.rrm)
 V ex = x2
-L bit_length(ex) > 0
+L bits:length(ex) > 0
    I (ex % 2) == 1
       prod = mont.reduce(prod * base)
    ex I/= 2
@@ -1495,7 +1495,7 @@ public:
     template <typename T1> Montgomery(const T1 &m) :
         m(m)
     {
-        n = bit_length(m);
+        n = bits::length(m);
         rrm = mod((pow(BigInt(2), (n * 2))), m);
     }
 
@@ -1555,7 +1555,7 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        while (bit_length(ex) > 0) {
+        while (bits::length(ex) > 0) {
             if ((mod(ex, 2)) == 1)
                 prod = mont.reduce(prod * base);
             ex = idiv(ex, 2);
@@ -3595,7 +3595,7 @@ F factor(BigInt n)
       V e = 0
       L
          V (div, rem) = divmod(nn, d)
-         I bit_length(rem) > 0
+         I bits:length(rem) > 0
             L.break
          nn = div
          e++
@@ -3624,7 +3624,7 @@ F moBachShallit58(BigInt a, BigInt n; pf)
    R mo
 
 F moTest(a, n)
-   I bit_length(a) < 100
+   I bits:length(a) < 100
       print(‘ord(’String(a)‘)’, end' ‘’)
    E
       print(‘ord([big])’, end' ‘’)
@@ -3683,7 +3683,7 @@ auto factor(const BigInt &n)
         auto e = 0;
         while (true) {
             auto [div, rem] = divmod(nn, d);
-            if (bit_length(rem) > 0)
+            if (bits::length(rem) > 0)
                 break;
             nn = div;
             e++;
@@ -3721,7 +3721,7 @@ template <typename T3> auto moBachShallit58(const BigInt &a, const BigInt &n, co
 
 template <typename T1, typename T2> auto moTest(const T1 &a, const T2 &n)
 {
-    if (bit_length(a) < 100)
+    if (bits::length(a) < 100)
         print(u"ord("_S & String(a) & u")"_S, u""_S);
     else
         print(u"ord([big])"_S, u""_S);

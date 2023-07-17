@@ -3887,6 +3887,7 @@ module_scope.add_function('test_parse', ASTFunctionDefinition([('eldf_str', '', 
 builtin_modules['eldf'] = Module(module_scope)
 builtin_modules['term'] = Module(Scope(None))
 module_scope = Scope(None)
+module_scope.add_function('length', ASTFunctionDefinition([('x', '', 'Int')]))
 module_scope.add_function('popcount', ASTFunctionDefinition([('x', '', 'Int')]))
 builtin_modules['bits'] = Module(module_scope)
 

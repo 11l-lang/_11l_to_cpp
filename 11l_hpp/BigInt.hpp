@@ -362,14 +362,6 @@ public:
 	friend BigInt lcm(const BigInt &a, const BigInt &b) {
 		return a / gcd(a, b) * b;
 	}
-	friend int bit_length(BigInt v) {
-		int result = 0;
-		while (v > 0) {
-			v /= 2;
-			result++;
-		}
-		return result;
-	}
 
 	void read(const String &s) {
 		sign = 1;
@@ -543,6 +535,17 @@ Int pow(Int64 base, Int64 exponent, const Int modulus)
 	return result;
 }
 #endif
+
+namespace bits {
+int length(BigInt v)
+{
+	int result = 0;
+	while (v > 0) {
+		v /= 2;
+		result++;
+	}
+	return result;
+}}
 
 
 class Fraction
