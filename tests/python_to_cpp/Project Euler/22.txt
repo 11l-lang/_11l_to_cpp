@@ -54,7 +54,7 @@ F find_minimum_length(currentsphereindex, setofspheres) -> Float
 
    I :minlength[currentsphereindex][setofspheres] == -Float.infinity
       Float result
-      I setofspheres.popcount() == 1
+      I bits:popcount(setofspheres) == 1
          result = :sphereradii[currentsphereindex]
       E
          result = Float.infinity
@@ -83,7 +83,7 @@ template <typename T1, typename T2> double find_minimum_length(const T1 &current
 
     if (::minlength[currentsphereindex][setofspheres] == -std::numeric_limits<double>::infinity()) {
         double result;
-        if (popcount(setofspheres) == 1)
+        if (bits::popcount(setofspheres) == 1)
             result = ::sphereradii[currentsphereindex];
         else {
             result = std::numeric_limits<double>::infinity();

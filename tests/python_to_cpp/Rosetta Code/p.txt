@@ -902,7 +902,7 @@ F is_prime(n)
 V i = 0
 V cnt = 0
 L
-   I is_prime(i.popcount())
+   I is_prime(bits:popcount(i))
       print(i, end' ‘ ’)
       cnt++
       I cnt == 25
@@ -911,7 +911,7 @@ L
 
 print()
 L(i) 888888877 .. 888888888
-   I is_prime(i.popcount())
+   I is_prime(bits:popcount(i))
       print(i, end' ‘ ’)
 ===
 template <typename T1> auto is_prime(const T1 &n)
@@ -932,7 +932,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         while (true) {
-            if (is_prime(popcount(i))) {
+            if (is_prime(bits::popcount(i))) {
                 print(i, u" "_S);
                 cnt++;
                 if (cnt == 25)
@@ -943,7 +943,7 @@ struct CodeBlock1
 
         print();
         for (auto i : range_ee(888888877, 888888888))
-            if (is_prime(popcount(i)))
+            if (is_prime(bits::popcount(i)))
                 print(i, u" "_S);
     }
 } code_block_1;
@@ -1212,13 +1212,13 @@ while len(evil) < 30 or len(odious) < 30:
 print(evil[:30])
 print(odious[:30])
 ===
-print((0.<30).map(i -> (Int64(3) ^ i).popcount()))
+print((0.<30).map(i -> bits:popcount(Int64(3) ^ i)))
 
 [Int] evil
 [Int] odious
 V i = 0
 L evil.len < 30 | odious.len < 30
-   V p = i.popcount()
+   V p = bits:popcount(i)
    I (p % 2) != 0
       odious.append(i)
    E
@@ -1232,7 +1232,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        print(range_el(0, 30).map([](const auto &i){return popcount((pow(to_int64(3), i)));}));
+        print(range_el(0, 30).map([](const auto &i){return bits::popcount(pow(to_int64(3), i));}));
     }
 } code_block_1;
 
@@ -1245,7 +1245,7 @@ struct CodeBlock2
     CodeBlock2()
     {
         while (evil.len() < 30 || odious.len() < 30) {
-            auto p = popcount(i);
+            auto p = bits::popcount(i);
             if ((mod(p, 2)) != 0)
                 odious.append(i);
             else

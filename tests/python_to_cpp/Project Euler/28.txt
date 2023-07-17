@@ -106,7 +106,7 @@ T State
    F :list_all_states()
       [State] result
       L(i) 0 .< 2 ^ 11
-         I i.popcount() != 5
+         I bits:popcount(i) != 5
             L.continue
 
          L(y) 5
@@ -193,7 +193,7 @@ public:
     {
         Array<State> result;
         for (auto i : range_el(0, pow(2, 11))) {
-            if (popcount(i) != 5)
+            if (bits::popcount(i) != 5)
                 continue;
 
             for (int y = 0; y < 5; y++)

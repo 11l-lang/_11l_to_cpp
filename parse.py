@@ -588,8 +588,6 @@ class SymbolNode:
                         func_name = self.children[0].children[0].to_str() + '.set_union'
                     elif func_name.endswith('.to_bytes'):
                         return 'bytes_from_int(' + self.children[0].children[0].to_str() + ')'
-                    elif func_name.endswith('.popcount'):
-                        return 'popcount(' + self.children[0].children[0].to_str() + ')'
                     elif func_name.endswith('.bits'):
                         return 'int_bits(' + self.children[0].children[0].to_str() + ', ' + self.children[2].to_str() + ')'
                     else:
@@ -3888,6 +3886,9 @@ module_scope.add_function('reparse', ASTFunctionDefinition([('eldf_str', '', 'St
 module_scope.add_function('test_parse', ASTFunctionDefinition([('eldf_str', '', 'String')]))
 builtin_modules['eldf'] = Module(module_scope)
 builtin_modules['term'] = Module(Scope(None))
+module_scope = Scope(None)
+module_scope.add_function('popcount', ASTFunctionDefinition([('x', '', 'Int')]))
+builtin_modules['bits'] = Module(module_scope)
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False, to_debug_str = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
     if len(tokens_) == 0: return ASTProgram().to_str()

@@ -78,11 +78,11 @@ F sam_transitions_minus_max_transitions(=n)
       V newstate = number_to_segments(n)
       I newstate == segmentstate
          L.break
-      maxtrans += (newstate (+) segmentstate).popcount()
+      maxtrans += bits:popcount(newstate (+) segmentstate)
       segmentstate = newstate
-      samtrans += 2 * newstate.popcount()
+      samtrans += 2 * bits:popcount(newstate)
       n = digit_sum(n)
-   maxtrans += segmentstate.popcount()
+   maxtrans += bits:popcount(segmentstate)
    R samtrans - maxtrans
 
 V isprime = eulerlib:list_primality(20000000)
@@ -130,12 +130,12 @@ template <typename T1> auto sam_transitions_minus_max_transitions(T1 n)
         auto newstate = number_to_segments(n);
         if (newstate == segmentstate)
             break;
-        maxtrans += popcount((newstate ^ segmentstate));
+        maxtrans += bits::popcount(newstate ^ segmentstate);
         segmentstate = newstate;
-        samtrans += 2 * popcount(newstate);
+        samtrans += 2 * bits::popcount(newstate);
         n = digit_sum(n);
     }
-    maxtrans += popcount(segmentstate);
+    maxtrans += bits::popcount(segmentstate);
     return samtrans - maxtrans;
 }
 

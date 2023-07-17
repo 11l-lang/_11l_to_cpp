@@ -38,7 +38,7 @@ F is_arrangement_valid(=a, =b)
 V ans = 0
 L(i) 0 .< 1 << 10
    L(j) i .< 1 << 10
-      I i.popcount() == j.popcount() == 6 & is_arrangement_valid(i, j)
+      I bits:popcount(i) == bits:popcount(j) == 6 & is_arrangement_valid(i, j)
          ans++
 print(ans)
 ===
@@ -66,7 +66,7 @@ struct CodeBlock1
     {
         for (auto i : range_el(0, 1 << 10))
             for (auto j : range_el(i, 1 << 10))
-                if (equal(popcount(i), popcount(j), 6) && is_arrangement_valid(i, j))
+                if (equal(bits::popcount(i), bits::popcount(j), 6) && is_arrangement_valid(i, j))
                     ans++;
         print(ans);
     }

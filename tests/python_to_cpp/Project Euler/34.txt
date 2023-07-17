@@ -72,7 +72,7 @@ V maxsum = [[0] * (2 ^ :COLUMNS)] * ROWS
 
 F find_maximum_sum(startrow, setofcols)
    I startrow == :ROWS
-      assert(setofcols.popcount() == :COLUMNS - :ROWS)
+      assert(bits:popcount(setofcols) == :COLUMNS - :ROWS)
       R 0
    I :maxsum[startrow][setofcols] == 0
       V result = 0
@@ -116,7 +116,7 @@ auto maxsum = create_array({create_array({0}) * (pow(2, ::COLUMNS))}) * ROWS;
 template <typename T1, typename T2> auto find_maximum_sum(const T1 &startrow, const T2 &setofcols)
 {
     if (startrow == ::ROWS) {
-        assert(popcount(setofcols) == ::COLUMNS - ::ROWS);
+        assert(bits::popcount(setofcols) == ::COLUMNS - ::ROWS);
         return 0;
     }
     if (::maxsum[startrow][setofcols] == 0) {
