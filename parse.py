@@ -573,6 +573,8 @@ class SymbolNode:
                         c2 = self.children[2].to_str()
                         return func_name + '([](const auto &x){return ' + {'Int':'to_int', 'Int64':'to_int64', 'UInt64':'to_uint64', 'UInt32':'to_uint32', 'Float':'to_float', 'SFloat':'to_float32', 'Float32':'to_float32'}.get(c2, c2) + '(x);})'
                     elif func_name.endswith('.split'):
+                        if len(self.children) == 5 and self.children[3] is not None and self.children[3].token_str() == "req'":
+                            return func_name + '_req(' + self.children[2].to_str() + ', ' + self.children[4].to_str() + ')'
                         f_node = type_of(self.children[0])
                         if f_node is None: # assume this is String method
                             f_node = builtins_scope.find('String').ast_nodes[0].scope.ids.get('split').ast_nodes[0]

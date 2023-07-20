@@ -766,6 +766,22 @@ inline Array<String> String::split_py() const
 	return split(make_tuple(u' '_C, u'\t'_C, u'\r'_C, u'\n'_C), nullptr, true);
 }
 
+Array<String> String::split_req(const String &delim, Int req) const
+{
+	Array<String> res = split(delim);
+	if (res.len() != req)
+		throw AssertionError();
+	return res;
+}
+
+template <typename RangeOrTupleType> Array<String> String::split_req(const String &delim, const RangeOrTupleType &req) const
+{
+	Array<String> res = split(delim);
+	if (!in(res.len(), req))
+		throw AssertionError();
+	return res;
+}
+
 inline String String::ltrim(const Array<Char> &arr, Nullable<Int> limit) const
 {
 	const char16_t *s = data();

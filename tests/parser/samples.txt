@@ -2058,3 +2058,18 @@ struct CodeBlock1
         print(Ty().method(1, 2));
     }
 } code_block_1;
+
+
+print(input().split(‘,’, req' 2))
+print(input().split(‘,’, req' (1, 3)))
+print(input().split(‘,’, req' 1..3))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(input().split_req(u","_S, 2));
+        print(input().split_req(u","_S, make_tuple(1, 3)));
+        print(input().split_req(u","_S, range_ee(1, 3)));
+    }
+} code_block_1;
