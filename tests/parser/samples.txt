@@ -2080,6 +2080,7 @@ V fixed_array2 = -[9] * 10
 V fixed_array1s = -[Int16(1), 2, 3]
 V fixed_array2s = -[Int16(9)] * 10
 [Int, len' 3] fixed_array3
+Array[Int, len' 3] fixed_array3a
 
 fixed_array1[1] = fixed_array1s[1] = 4
 fixed_array2[1] = fixed_array2s[1] = 2
@@ -2096,6 +2097,7 @@ auto fixed_array2 = create_array_fix_len_el<10>(9);
 auto fixed_array1s = create_array_fix_len<3, int16_t>({to_int16(1), 2, 3});
 auto fixed_array2s = create_array_fix_len_el<10>(to_int16(9));
 ArrayFixLen<int, 3> fixed_array3;
+ArrayFixLen<int, 3> fixed_array3a;
 
 struct CodeBlock1
 {

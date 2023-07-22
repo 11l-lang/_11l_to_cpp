@@ -2695,6 +2695,8 @@ def led(self, left):
         self.is_type = True
         while True:
             self.append_child(expression())
+            if self.children[-1].token.category == Token.Category.NAME and self.children[-1].token_str().endswith("'"):
+                self.append_child(expression())
             if token.value(source) != ',':
                 break
             advance(',')
@@ -3526,8 +3528,12 @@ def parse_internal(this_node):
                         else:
                             assert(node_expression.is_type)
                             node.type = node_expression.children[0].token_str()
-                            for i in range(1, len(node_expression.children)):
-                                node.type_args.append(node_expression.children[i].to_type_str())
+                            if node.type == 'Array' and len(node_expression.children) == 4 and node_expression.children[2].token_str() == "len'":
+                                node.type = 'ArrayFixLen'
+                                node.type_args = [node_expression.children[1].to_type_str(), '__EXPRESSION__(' + node_expression.children[3].to_str() + ')']
+                            else:
+                                for i in range(1, len(node_expression.children)):
+                                    node.type_args.append(node_expression.children[i].to_type_str())
                     elif node.type == '(': # )
                         if len(node_expression.children) == 1 and node_expression.children[0].symbol.id == '->':
                             node.function_pointer = True
