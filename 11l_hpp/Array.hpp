@@ -1070,3 +1070,94 @@ inline Array<Byte> operator ""_B(const char *s, size_t sz)
 	memcpy(r.data(), s, sz);
 	return r;
 }
+
+
+template <typename Type, size_t fix_len> class ArrayFixLen
+{
+	std::array<Type, fix_len> elements;
+public:
+	ArrayFixLen() {}
+	ArrayFixLen(std::initializer_list<Type> il) {
+		if (il.size() != fix_len)
+			throw AssertionError();
+		std::copy(il.begin(), il.end(), elements.begin());
+	}
+
+	auto begin() const {return elements.begin();}
+	auto begin()       {return elements.begin();}
+	auto end  () const {return elements.end  ();}
+	auto end  ()       {return elements.end  ();}
+
+	Int len() const {return fix_len;}
+
+	decltype(std::declval<const std::vector<Type>>().at(0)) operator[](Int i) const // decltype is needed for Array<bool> support
+	{
+#ifdef PYTHON_NEGATIVE_INDEXING
+		if (i < 0)
+			i += len();
+#endif
+		if (in(i, range_el(Int(0), len())))
+			return elements[i];
+		throw IndexError(i);
+	}
+
+	decltype(std::declval<std::vector<Type>>().at(0)) operator[](Int i) // decltype is needed for Array<bool> support
+	{
+#ifdef PYTHON_NEGATIVE_INDEXING
+		if (i < 0)
+			i += len();
+#endif
+		if (in(i, range_el(Int(0), len())))
+			return elements[i];
+		throw IndexError(i);
+	}
+
+	const Type &at_plus_len(Int i) const
+	{
+#ifndef PYTHON_NEGATIVE_INDEXING
+		i += len();
+#endif
+		return operator[](i);
+	}
+
+	Type &at_plus_len(Int i)
+	{
+#ifndef PYTHON_NEGATIVE_INDEXING
+		i += len();
+#endif
+		return operator[](i);
+	}
+
+	const Type &set(Int i, const Type &v) // return `const Type&` for [https://www.rosettacode.org/wiki/Perlin_noise#Python]:‘p[256+i] = p[i] = permutation[i]’
+	{
+#ifdef PYTHON_NEGATIVE_INDEXING
+		if (i < 0)
+			i += len();
+#endif
+		if (in(i, range_el(Int(0), len())))
+			return elements[i] = v;
+		else
+			throw IndexError(i);
+	}
+
+	const Type &set_plus_len(Int i, const Type &v)
+	{
+#ifndef PYTHON_NEGATIVE_INDEXING
+		i += len();
+#endif
+		return set(i, v);
+	}
+};
+
+template <size_t len, typename Type> auto create_array_fix_len(std::initializer_list<Type> il)
+{
+	return ArrayFixLen<Type, len>(il);
+}
+
+template <size_t len, typename Type> auto create_array_fix_len_el(const Type &el)
+{
+	ArrayFixLen<Type, len> r;
+	for (auto &e : r)
+		e = el;
+	return r;
+}

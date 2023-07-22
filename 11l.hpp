@@ -358,6 +358,18 @@ template <typename Ty> inline void print(const Array<Ty> &arr, const String &end
 		std::wcout.flush();
 }
 
+template <typename Ty, size_t n> inline void print(const ArrayFixLen<Ty, n> &arr, const String &end = u"\n", bool flush = false)
+{
+	std::wcout << L'[';
+	for (int i=0; i<arr.len(); i++) {
+		print(arr[i], u""_S);
+		if (i < arr.len()-1) std::wcout << L", ";
+	}
+	std::wcout << L']' << std::wstring(end.cbegin(), end.cend());
+	if (flush)
+		std::wcout.flush();
+}
+
 template <typename Key, typename Value> inline void print(const Dict<Key, Value> &dict, const String &end = u"\n", bool flush = false)
 {
 	std::wcout << L'[';
