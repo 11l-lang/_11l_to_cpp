@@ -2114,3 +2114,25 @@ struct CodeBlock1
         print(fixed_array3);
     }
 } code_block_1;
+
+
+[Int, max_len' 10] static_array
+static_array.append(1)
+static_array.append(2)
+print(static_array.pop())
+static_array.extend([3, 4, 5])
+print(static_array)
+===
+ArrayMaxLen<int, 10> static_array;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        static_array.append(1);
+        static_array.append(2);
+        print(static_array.pop());
+        static_array.extend(create_array({3, 4, 5}));
+        print(static_array);
+    }
+} code_block_1;

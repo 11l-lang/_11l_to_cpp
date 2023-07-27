@@ -1311,7 +1311,7 @@ cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'п
                      'Int':'int', 'Int64':'Int64', 'UInt64':'UInt64', 'Int32':'int32_t', 'UInt32':'uint32_t', 'Int16':'int16_t', 'UInt16':'uint16_t', 'Int8':'int8_t', 'BigInt':'BigInt', 'Size':'Size', 'USize':'USize',
                      'Float':'double', 'SFloat':'float', 'Float32':'float', 'Float64':'double', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte', 'Bytes':'Array<Byte>',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
-                     'Array':'Array', 'ArrayFixLen':'ArrayFixLen', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque', 'Counter':'Counter', 'Fraction':'Fraction'}
+                     'Array':'Array', 'ArrayFixLen':'ArrayFixLen', 'ArrayMaxLen':'ArrayMaxLen', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque', 'Counter':'Counter', 'Fraction':'Fraction'}
 cpp_vectype_from_11l = {}
 for dimension in ('2', '3', '4'):
     cpp_vectype_from_11l['IVec' + dimension] = 'ivec' + dimension
@@ -3518,8 +3518,8 @@ def parse_internal(this_node):
                             node.type = 'Dict'
                             node.type_args = [node_expression.children[0].children[0].to_type_str(), node_expression.children[0].children[1].to_type_str()]
                         elif node_expression.is_list:
-                            if len(node_expression.children) == 3 and node_expression.children[1].token_str() == "len'":
-                                node.type = 'ArrayFixLen'
+                            if len(node_expression.children) == 3 and node_expression.children[1].token_str() in ("len'", "max_len'"):
+                                node.type = 'ArrayFixLen' if node_expression.children[1].token_str() == "len'" else 'ArrayMaxLen'
                                 node.type_args = [node_expression.children[0].to_type_str(), '__EXPRESSION__(' + node_expression.children[2].to_str() + ')']
                             else:
                                 assert(len(node_expression.children) == 1)
@@ -3528,8 +3528,8 @@ def parse_internal(this_node):
                         else:
                             assert(node_expression.is_type)
                             node.type = node_expression.children[0].token_str()
-                            if node.type == 'Array' and len(node_expression.children) == 4 and node_expression.children[2].token_str() == "len'":
-                                node.type = 'ArrayFixLen'
+                            if node.type == 'Array' and len(node_expression.children) == 4 and node_expression.children[2].token_str() in ("len'", "max_len'"):
+                                node.type = 'ArrayFixLen' if node_expression.children[2].token_str() == "len'" else 'ArrayMaxLen'
                                 node.type_args = [node_expression.children[1].to_type_str(), '__EXPRESSION__(' + node_expression.children[3].to_str() + ')']
                             else:
                                 for i in range(1, len(node_expression.children)):
@@ -3803,6 +3803,7 @@ array_scope.add_name('decode', ASTFunctionDefinition([('encoding', token_to_str(
 array_scope.add_name('hex', ASTFunctionDefinition([]))
 builtins_scope.ids['Array'].ast_nodes[0].scope = array_scope
 builtins_scope.ids['Bytes'].ast_nodes[0].scope = array_scope
+builtins_scope.ids['ArrayMaxLen'].ast_nodes[0].scope = array_scope
 dict_scope = Scope(None)
 dict_scope.add_name('update', ASTFunctionDefinition([('other', '', 'Dict')]))
 dict_scope.add_name('find', ASTFunctionDefinition([('key', '', '')]))

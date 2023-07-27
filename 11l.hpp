@@ -209,6 +209,7 @@ AssertionError::AssertionError(const String &message) : message(std::make_unique
 AssertionError::operator String() const {return message != nullptr ? *message : String();}
 IndexError::operator String() const {return String(index);}
 #include "11l_hpp/Array.hpp"
+#include "11l_hpp/ArrayMaxLen.hpp"
 #include "11l_hpp/Dict.hpp"
 #include "11l_hpp/Set.hpp"
 #include "11l_hpp/Deque.hpp"
@@ -359,6 +360,18 @@ template <typename Ty> inline void print(const Array<Ty> &arr, const String &end
 }
 
 template <typename Ty, size_t n> inline void print(const ArrayFixLen<Ty, n> &arr, const String &end = u"\n", bool flush = false)
+{
+	std::wcout << L'[';
+	for (int i=0; i<arr.len(); i++) {
+		print(arr[i], u""_S);
+		if (i < arr.len()-1) std::wcout << L", ";
+	}
+	std::wcout << L']' << std::wstring(end.cbegin(), end.cend());
+	if (flush)
+		std::wcout.flush();
+}
+
+template <typename Ty, size_t n> inline void print(const ArrayMaxLen<Ty, n> &arr, const String &end = u"\n", bool flush = false)
 {
 	std::wcout << L'[';
 	for (int i=0; i<arr.len(); i++) {
