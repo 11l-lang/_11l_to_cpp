@@ -128,14 +128,14 @@ class Scope:
                 return None, None
 
     def add_function(self, name, ast_node):
-        if name in self.ids:                                                   # V &id = .ids.set_if_not_present(name, Id(N)) // [[[or `put_if_absent` as in Java, or `add_if_absent`]]] note that this is an error: `V id = .ids.set_if_not_present(...)`, but you can do this: `V id = copy(.ids.set_if_not_present(...))`
+        if name in self.ids:                                                   # V &id = .ids.set_if_not_present(name, Id(‘’)) // [[[or `put_if_absent` as in Java, or `add_if_absent`]]] note that this is an error: `V id = .ids.set_if_not_present(...)`, but you can do this: `V id = copy(.ids.set_if_not_present(...))`
             assert(type(self.ids[name].ast_nodes[0]) == ASTFunctionDefinition) # assert(id.ast_nodes.empty | T(id.ast_nodes[0]) == ASTFunctionDefinition)
             self.ids[name].ast_nodes.append(ast_node)                          # id.ast_nodes [+]= ast_node
         else:
             self.ids[name] = Scope.Id('', ast_node)
 
     def add_name(self, name, ast_node):
-        if name in self.ids:                                                            # I !.ids.set(name, Id(N, ast_node))
+        if name in self.ids:                                                            # I !.ids.set(name, Id(‘’, ast_node))
             if isinstance(ast_node, ASTVariableDeclaration):
                 t = ast_node.type_token
             elif isinstance(ast_node, ASTNodeWithChildren):
