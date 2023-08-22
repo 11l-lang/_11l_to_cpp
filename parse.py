@@ -3652,7 +3652,6 @@ builtins_scope.add_function('rotl', ASTFunctionDefinition([('value', '', 'Int'),
 builtins_scope.add_function('rotr', ASTFunctionDefinition([('value', '', 'Int'), ('shift', '', 'Int')]))
 builtins_scope.add_function('bsr', ASTFunctionDefinition([('x', '', '')]))
 builtins_scope.add_function('bsf', ASTFunctionDefinition([('x', '', '')]))
-builtins_scope.add_function('bit_length', ASTFunctionDefinition([('x', '', '')]))
 builtins_scope.add_function('round', ASTFunctionDefinition([('number', '', 'Float'), ('ndigits', '0', '')]))
 builtins_scope.add_function('sleep', ASTFunctionDefinition([('secs', '', 'Float')]))
 builtins_scope.add_function('ceil',  ASTFunctionDefinition([('x', '', 'Float')]))
