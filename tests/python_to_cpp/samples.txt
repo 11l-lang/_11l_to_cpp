@@ -4999,3 +4999,19 @@ struct CodeBlock2
         print(code);
     }
 } code_block_2;
+
+
+print("start address: 0x{:04X}".format(256))
+print("start address: 0x{:X}".format(256))
+===
+print(‘start address: 0x#04’.format(hex(256)))
+print(‘start address: 0x#.’.format(hex(256)))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"start address: 0x#04"_S.format(hex(256)));
+        print(u"start address: 0x#."_S.format(hex(256)));
+    }
+} code_block_1;

@@ -45,6 +45,10 @@ fin.seek(4 + data_length)
 V checksum = Int(bytes_be' fin.read_bytes(2))
 fin.seek(4)
 
+debug(‘start address: 0x#04’.format(hex(addr_start)))
+debug(‘end address: 0x#04’.format(hex(addr_end)))
+debug(‘checksum: 0x#04’.format(hex(checksum)))
+
 fout.write_bytes([Byte(0)] * WAV_HEADER_SIZE)
 V file_size = WAV_HEADER_SIZE
 

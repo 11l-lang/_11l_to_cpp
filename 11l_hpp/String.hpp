@@ -848,7 +848,7 @@ template <typename ... Types> String String::format(const Types&... args) const
 					throw AssertionError();
 				if (left_align)
 					r &= *fa.string;
-				r.resize(r.size() + max(before_period - fa.string->len(), Int(0)), ' ');
+				r.resize(r.size() + max(before_period - fa.string->len(), Int(0)), zero_padding ? '0' : ' ');
 				if (!left_align)
 					r &= *fa.string;
 			}

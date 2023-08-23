@@ -69,6 +69,10 @@ int MAIN_WITH_ARGV()
     auto checksum = int_from_bytes_be(fin.read_bytes(2));
     fin.seek(4);
 
+    debug(u"start address: 0x#04"_S.format(hex(addr_start)));
+    debug(u"end address: 0x#04"_S.format(hex(addr_end)));
+    debug(u"checksum: 0x#04"_S.format(hex(checksum)));
+
     fout.write_bytes(create_array({Byte(0)}) * WAV_HEADER_SIZE);
     auto file_size = WAV_HEADER_SIZE;
 

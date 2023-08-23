@@ -128,9 +128,9 @@ if __name__ == '__main__':
     checksum = int.from_bytes(fin.read(2), 'big')
     fin.seek(4)
 
-    # debug("start address: 0x{:04X}".format(addr_start))
-    # debug("end address: 0x{:04X}".format(addr_end))
-    # debug("checksum: 0x{:04X}".format(checksum))
+    debug("start address: 0x{:04X}".format(addr_start))
+    debug("end address: 0x{:04X}".format(addr_end))
+    debug("checksum: 0x{:04X}".format(checksum))
 
     # reserve space for the WAV header
     fout.write(bytes([Byte(0)] * WAV_HEADER_SIZE))
