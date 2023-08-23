@@ -132,7 +132,7 @@ public:
 		fwrite(utf8.data(), utf8.size(), 1, file);
 	}
 
-	void write_bytes(const Array<Byte> &bytes)
+	void write_bytes(const Array<Byte> &bytes) const
 	{
 		fwrite(bytes.data(), bytes.size(), 1, file);
 	}

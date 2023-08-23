@@ -517,7 +517,7 @@ class EXSInstrument:
 if __name__ == '__main__':
 
 	if len(sys.argv) < 3 or len(sys.argv) > 4:
-		print("Usage: {0} EXSfile.exs SFZfile.sfz [samplefolder]".format('1.exs2sfz.py'))
+		print("Usage: {0} EXSfile.exs SFZfile.sfz [samplefolder]".format('1.exs2sfz'))
 		print()
 		print("    the samplefolder argument is optional; if not specified, the program will")
 		print("    attempt to locate the samples by searching folders surrounding the exs file")

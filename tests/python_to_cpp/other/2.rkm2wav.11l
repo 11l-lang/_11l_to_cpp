@@ -1,0 +1,95 @@
+V WAV_HEADER_SIZE = 44
+V SAMPLE_RATE = 44100
+V BAUD_RATE = 700
+V SAMPLES_PER_BIT = Int(SAMPLE_RATE / BAUD_RATE)
+
+V temp_arr = [255 - 32] * (SAMPLES_PER_BIT - SAMPLES_PER_BIT I/ 2) [+] [32] * (SAMPLES_PER_BIT I/ 2)
+
+V BIT_ZERO_WAVE = copy(temp_arr)
+temp_arr.reverse()
+V BIT_ONE_WAVE = temp_arr
+
+V FIR_WEIGHTS = [0.000577926080672738, 0.000459465018502213, 0.000314862245890514, 0.000114058758552773, -0.000176232019410298, -0.000586368131836170, -0.001136970252974637, -0.001832200078313594, -0.002653914944386688, -0.003557457996743626, -0.004469734119871817, -0.005290040439872776, -0.005893881011277897, -0.006139718992073919, -0.005878331252147731, -0.004964157085603880, -0.003267801176075040, -0.000688684837013550, 0.002833242904185398, 0.007307810544085602, 0.012687912264589127, 0.018866545092452867, 0.025678084518976477, 0.032903957573255177, 0.040282515704921813, 0.047522557733791673, 0.054319636536848272, 0.060374030484608231, 0.065409095148934615, 0.069188648369429409, 0.071532089395465556, 0.072326107924878466, 0.071532089395465556, 0.069188648369429409, 0.065409095148934615, 0.060374030484608238, 0.054319636536848279, 0.047522557733791680, 0.040282515704921813, 0.032903957573255184, 0.025678084518976480, 0.018866545092452870, 0.012687912264589122, 0.007307810544085603, 0.002833242904185400, -0.000688684837013550, -0.003267801176075043, -0.004964157085603879, -0.005878331252147732, -0.006139718992073923, -0.005893881011277897, -0.005290040439872781, -0.004469734119871819, -0.003557457996743629, -0.002653914944386688, -0.001832200078313594, -0.001136970252974637, -0.000586368131836170, -0.000176232019410298, 0.000114058758552773, 0.000314862245890515, 0.000459465018502213, 0.000577926080672738]
+V WINDOW_SIZE = FIR_WEIGHTS.len
+V fir_window = (0 .< WINDOW_SIZE).map(i -> 128)
+
+F fir_low_pass_filter(arr)
+   V filtered = [Byte(0)] * arr.len
+   L(i) 0 .< arr.len
+      :fir_window = [arr[i]] [+] :fir_window[0 .< :WINDOW_SIZE - 1]
+      filtered[i] = Int(sum((0 .< :WINDOW_SIZE).map(j -> :fir_window[j] * :FIR_WEIGHTS[j])))
+   R filtered
+
+F wav_write_byte(File f; b)
+   L(i) 0..7
+      V data = I (b >> (7 - i)) [&] 1 {:BIT_ONE_WAVE} E :BIT_ZERO_WAVE
+      f.write_bytes(fir_low_pass_filter(data))
+   R :SAMPLES_PER_BIT * 8
+
+V _debug = 0B
+F debug(msg)
+   I :_debug
+      print(‘DEBUG: ’msg)
+
+:start:
+I :argv.len < 2 | ‘-h’ C :argv | ‘--help’ C :argv
+   print(‘usage: 2.rkm2wav INPUT_FILE’)
+   exit(1)
+
+V fin = File(:argv[1], ‘r’)
+V fout = File(fs:path:split_ext(:argv[1])[0]‘.wav’, ‘w’)
+V addr_start = Int(bytes_be' fin.read_bytes(2))
+V addr_end = Int(bytes_be' fin.read_bytes(2))
+V data_length = addr_end - addr_start + 1
+fin.seek(4 + data_length)
+V checksum = Int(bytes_be' fin.read_bytes(2))
+fin.seek(4)
+
+fout.write_bytes([Byte(0)] * WAV_HEADER_SIZE)
+V file_size = WAV_HEADER_SIZE
+
+L(i) 0..255
+   file_size += wav_write_byte(fout, 0'0)
+
+file_size += wav_write_byte(fout, E'6)
+
+L(i) 0..1
+   file_size += wav_write_byte(fout, (addr_start >> (1 - i) * 8) [&] F'F)
+
+L(i) 0..1
+   file_size += wav_write_byte(fout, (addr_end >> (1 - i) * 8) [&] F'F)
+
+L(i) 0 .< data_length
+   V b = Int(bytes_be' fin.read_bytes(1))
+   file_size += wav_write_byte(fout, b)
+
+L(i) 0..1
+   file_size += wav_write_byte(fout, (checksum >> (1 - i) * 8) [&] F'F)
+
+fout.write_bytes(fir_low_pass_filter((0 .< WINDOW_SIZE).map(i -> 128)))
+file_size += WINDOW_SIZE
+
+fout.seek(0)
+fout.write_bytes(Bytes(‘RIFF’))
+V temp = file_size - 8
+fout.write_bytes(UInt32(temp).to_bytes())
+fout.write_bytes(Bytes(‘WAVEfmt ’))
+temp = 16
+fout.write_bytes(UInt32(temp).to_bytes())
+temp = 1
+fout.write_bytes(UInt16(temp).to_bytes())
+temp = 1
+fout.write_bytes(UInt16(temp).to_bytes())
+temp = SAMPLE_RATE
+fout.write_bytes(UInt32(temp).to_bytes())
+temp = SAMPLE_RATE * 1
+fout.write_bytes(UInt32(temp).to_bytes())
+temp = 1
+fout.write_bytes(UInt16(temp).to_bytes())
+temp = 8
+fout.write_bytes(UInt16(temp).to_bytes())
+fout.write_bytes(Bytes(‘data’))
+temp = file_size - WAV_HEADER_SIZE
+fout.write_bytes(UInt32(temp).to_bytes())
+
+debug(‘done’)
