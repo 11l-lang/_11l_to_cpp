@@ -1008,6 +1008,17 @@ inline Int int_from_bytes(const Array<Byte> &bytes)
 	return r;
 }
 
+inline Int int_from_bytes_be(const Array<Byte> &bytes)
+{
+	Int r = 0;
+	if (bytes.len() > sizeof(Int))
+		throw AssertionError();
+	memcpy(&r, bytes.data(), bytes.len());
+	for (int i=0; i<bytes.len(); i++)
+		((char*)&r)[i] = bytes.data()[bytes.len() - 1 - i];
+	return r;
+}
+
 template <typename Ty, bool include_beginning, bool include_ending> inline Int int_from_bytes(const Array<Byte> &bytes, const Range<Ty, include_beginning, include_ending> &range)
 {
 	Int r = 0;

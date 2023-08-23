@@ -3059,6 +3059,52 @@ struct CodeBlock1
 } code_block_1;
 
 
+import struct
+Byte = int
+
+print(hex(int.from_bytes([Byte(0), 0xab, 0xcd, 0xef], 'big')))
+print(hex(struct.unpack('>I', bytes([Byte(0), 0xab, 0xcd, 0xef]))[0]))
+
+print(hex(int.from_bytes([Byte(0), 0xab, 0xcd, 0xef], 'little')))
+print(hex(struct.unpack('I', bytes([Byte(0), 0xab, 0xcd, 0xef]))[0]))
+
+print(hex(int.from_bytes([Byte(0), 0xab], 'big')))
+print(hex(struct.unpack('>H', bytes([Byte(0), 0xab]))[0]))
+
+print(hex(int.from_bytes([Byte(0), 0xab], 'little')))
+print(hex(struct.unpack('H', bytes([Byte(0), 0xab]))[0]))
+===
+print((‘0x’hex(Int(bytes_be' [Byte(0), A'B, C'D, E'F])).lowercase()))
+print((‘0x’hex(Int(UInt32(bytes_be' [Byte(0), A'B, C'D, E'F]))).lowercase()))
+
+print((‘0x’hex(Int(bytes' [Byte(0), A'B, C'D, E'F])).lowercase()))
+print((‘0x’hex(Int(UInt32(bytes' [Byte(0), A'B, C'D, E'F]))).lowercase()))
+
+print((‘0x’hex(Int(bytes_be' [Byte(0), A'B])).lowercase()))
+print((‘0x’hex(Int(UInt16(bytes_be' [Byte(0), A'B]))).lowercase()))
+
+print((‘0x’hex(Int(bytes' [Byte(0), A'B])).lowercase()))
+print((‘0x’hex(Int(UInt16(bytes' [Byte(0), A'B]))).lowercase()))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print((u"0x"_S & hex(int_from_bytes_be(create_array<Byte>({Byte(0), 0xAB, 0xCD, 0xEF}))).lowercase()));
+        print((u"0x"_S & hex(to_int(int_t_from_bytes_be<UInt32>(create_array<Byte>({Byte(0), 0xAB, 0xCD, 0xEF})))).lowercase()));
+
+        print((u"0x"_S & hex(int_from_bytes(create_array<Byte>({Byte(0), 0xAB, 0xCD, 0xEF}))).lowercase()));
+        print((u"0x"_S & hex(to_int(int_t_from_bytes<UInt32>(create_array<Byte>({Byte(0), 0xAB, 0xCD, 0xEF})))).lowercase()));
+
+        print((u"0x"_S & hex(int_from_bytes_be(create_array<Byte>({Byte(0), 0xAB}))).lowercase()));
+        print((u"0x"_S & hex(to_int(int_t_from_bytes_be<UInt16>(create_array<Byte>({Byte(0), 0xAB})))).lowercase()));
+
+        print((u"0x"_S & hex(int_from_bytes(create_array<Byte>({Byte(0), 0xAB}))).lowercase()));
+        print((u"0x"_S & hex(to_int(int_t_from_bytes<UInt16>(create_array<Byte>({Byte(0), 0xAB})))).lowercase()));
+    }
+} code_block_1;
+
+
 def tokenize(source, comments : List[Tuple[int, int]] = None):
     if comments is not None:
         comments.append((10, 20))
