@@ -11441,3 +11441,371 @@ struct CodeBlock1
             }
     }
 } code_block_1;
+
+
+# https://rosettacode.org/wiki/Selectively_replace_multiple_instances_of_a_character_within_a_string#Python
+import collections
+
+rep = {'a' : {1 : 'A', 2 : 'B', 4 : 'C', 5 : 'D'}, 'b' : {1 : 'E'}, 'r' : {2 : 'F'}}
+
+def trstring(oldstring, repdict):
+    seen = collections.defaultdict(int) # Char
+    newchars = ''
+    for c in oldstring:
+        seen[c] += 1
+        i = seen[c]
+        newchars += repdict[c][i] if c in repdict and i in repdict[c] else c
+    return newchars
+
+print('abracadabra ->', trstring('abracadabra', rep))
+===
+V rep = [‘a’ = [1 = ‘A’, 2 = ‘B’, 4 = ‘C’, 5 = ‘D’], ‘b’ = [1 = ‘E’], ‘r’ = [2 = ‘F’]]
+
+F trstring(oldstring, repdict)
+   V seen = DefaultDict[Char, Int]()
+   V newchars = ‘’
+   L(c) oldstring
+      seen[c]++
+      V i = seen[c]
+      newchars ‘’= I c C repdict & i C repdict[c] {repdict[c][i]} E c
+   R newchars
+
+print(‘abracadabra -> ’trstring(‘abracadabra’, rep))
+===
+auto rep = create_dict(dict_of(u'a'_C, create_dict(dict_of(1, u'A'_C)(2, u'B'_C)(4, u'C'_C)(5, u'D'_C)))(u'b'_C, create_dict(dict_of(1, u'E'_C)))(u'r'_C, create_dict(dict_of(2, u'F'_C))));
+
+template <typename T1, typename T2> auto trstring(const T1 &oldstring, const T2 &repdict)
+{
+    auto seen = DefaultDict<Char, int>();
+    auto newchars = u""_S;
+    for (auto &&c : oldstring) {
+        seen[c]++;
+        auto i = seen[c];
+        newchars &= in(c, repdict) && in(i, repdict[c]) ? repdict[c][i] : c;
+    }
+    return newchars;
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(u"abracadabra -> "_S & trstring(u"abracadabra"_S, rep));
+    }
+} code_block_1;
+
+
+# https://rosettacode.org/wiki/Set_right-adjacent_bits#Python
+from typing import List
+
+def set_right_adjacent_bits_list(n: int, b: List[int]) -> List[int]:
+    #   [0]*x is padding b on the left.
+    #   zip(*(list1, list2,..)) returns the n'th elements on list1, list2,...
+    #   int(any(...)) or's them.
+#    return [int(any(shifts))
+#            for shifts in zip(*([0]*x + b for x in range(n+1)))]
+    return [int(any(b[max(0, i-n):i+1])) for i in range(len(b))]
+
+def _list2bin(b: List[int]) -> str:
+    "List of 0/1 ints to bool string."
+    return ''.join(str(x) for x in b)
+
+def _to_list(bits: str) -> List[int]:
+    return [int(char) for char in bits]
+
+if __name__ == "__main__":
+    print("SAME n & Width.\n")
+    n = 2  # bits to the right of set bits, to also set
+    bits = "1000 0100 0010 0000"
+    first = True
+    for b_str in bits.split():
+        b = _to_list(b_str)
+        e = len(b_str)
+        if first:
+            first = False
+            print(f"n = {n}; Width e = {e}:\n")
+        result = set_right_adjacent_bits_list(n, b)
+        print(f"     Input b: {_list2bin(b)}")
+        print(f"      Result: {_list2bin(result)}\n")
+
+    print("SAME Input & Width.\n")
+    #bits = "01000010001001010110"
+    bits = '01' + '1'.join('0'*x for x in range(10, 0, -1))
+    for n in range(4):
+        first = True
+        for b_str in bits.split():
+            b = _to_list(b_str)
+            e = len(b_str)
+            if first:
+                first = False
+                print(f"n = {n}; Width e = {e}:\n")
+            result = set_right_adjacent_bits_list(n, b)
+            print(f"     Input b: {_list2bin(b)}")
+            print(f"      Result: {_list2bin(result)}\n")
+===
+F set_right_adjacent_bits_list(Int n, [Int] &b) -> [Int]
+   R (0 .< b.len).map(i -> Int(any(@b[max(0, i - @n) .< i + 1])))
+
+F _list2bin([Int] &b) -> String
+   ‘List of 0/1 ints to bool string.’
+   R b.map(x -> String(x)).join(‘’)
+
+F _to_list(String bits) -> [Int]
+   R bits.map(char -> Int(char))
+
+:start:
+print("SAME n & Width.\n")
+V n = 2
+V bits = ‘1000 0100 0010 0000’
+V first = 1B
+L(b_str) bits.split_py()
+   V b = _to_list(b_str)
+   V e = b_str.len
+   I first
+      first = 0B
+      print(‘n = ’n‘; Width e = ’e":\n")
+   V result = set_right_adjacent_bits_list(n, &b)
+   print(‘     Input b: ’_list2bin(&b))
+   print(‘      Result: ’_list2bin(&result)"\n")
+
+print("SAME Input & Width.\n")
+bits = ‘01’(10.<0).step(-1).map(x -> ‘0’ * x).join(‘1’)
+L(n) 4
+   first = 1B
+   L(b_str) bits.split_py()
+      V b = _to_list(b_str)
+      V e = b_str.len
+      I first
+         first = 0B
+         print(‘n = ’n‘; Width e = ’e":\n")
+      V result = set_right_adjacent_bits_list(n, &b)
+      print(‘     Input b: ’_list2bin(&b))
+      print(‘      Result: ’_list2bin(&result)"\n")
+===
+Array<int> set_right_adjacent_bits_list(const int n, Array<int> &b)
+{
+    return range_el(0, b.len()).map([&b, &n](const auto &i){return to_int(any(b[range_el(max(0, i - n), i + 1)]));});
+}
+
+String _list2bin(Array<int> &b)
+{
+    u"List of 0/1 ints to bool string."_S;
+    return b.map([](const auto &x){return String(x);}).join(u""_S);
+}
+
+Array<int> _to_list(const String &bits)
+{
+    return bits.map([](const auto &_char_){return to_int(_char_);});
+}
+
+int main()
+{
+    print(u"SAME n & Width.\n"_S);
+    auto n = 2;
+    auto bits = u"1000 0100 0010 0000"_S;
+    auto first = true;
+    for (auto &&b_str : bits.split_py()) {
+        auto b = _to_list(b_str);
+        auto e = b_str.len();
+        if (first) {
+            first = false;
+            print(u"n = "_S & n & u"; Width e = "_S & e & u":\n"_S);
+        }
+        auto result = set_right_adjacent_bits_list(n, b);
+        print(u"     Input b: "_S & _list2bin(b));
+        print(u"      Result: "_S & _list2bin(result) & u"\n"_S);
+    }
+
+    print(u"SAME Input & Width.\n"_S);
+    bits = u"01"_S & range_el(10, 0).step(-1).map([](const auto &x){return u"0"_S * x;}).join(u"1"_S);
+    for (int n = 0; n < 4; n++) {
+        first = true;
+        for (auto &&b_str : bits.split_py()) {
+            auto b = _to_list(b_str);
+            auto e = b_str.len();
+            if (first) {
+                first = false;
+                print(u"n = "_S & n & u"; Width e = "_S & e & u":\n"_S);
+            }
+            auto result = set_right_adjacent_bits_list(n, b);
+            print(u"     Input b: "_S & _list2bin(b));
+            print(u"      Result: "_S & _list2bin(result) & u"\n"_S);
+        }
+    }
+}
+
+
+# https://rosettacode.org/wiki/Sierpinski_curve#C++
+import math
+
+class SierpinskiCurve:
+    x: float
+    y: float
+    angle: int
+    length: int
+
+    def line(self, out):
+        theta = math.radians(float(self.angle))
+        self.x += self.length * math.cos(theta)
+        self.y -= self.length * math.sin(theta)
+        out.write(f' L{self.x:g},{self.y:g}')
+
+    def execute(self, out, s):
+        out.write(f'M{self.x:g},{self.y:g}')
+        for c in s:
+            c = c
+            if c in ('F', 'G'):
+                self.line(out)
+            elif c == '+':
+                self.angle = (self.angle + 45) % 360
+            elif c == '-':
+                self.angle = (self.angle - 45) % 360
+
+    @staticmethod
+    def rewrite(s):
+        t = ''
+        for c in s:
+            if c == 'X':
+                t += "XF+G+XF--F--XF+G+X"
+            else:
+                t += c
+        return t
+
+    def write(self, out, size, length, order):
+        self.length = length
+        self.x = length / math.sqrt(2)
+        self.y = self.x * 2
+        self.angle = 45
+        out.write(f"<svg xmlns='http://www.w3.org/2000/svg' width='{size}' height='{size}'>\n")
+        out.write("<rect width='100%' height='100%' fill='white'/>\n")
+        out.write("<path stroke-width='1' stroke='black' fill='none' d='")
+        s = "F--XF--F--XF"
+        for _ in range(order):
+            s = SierpinskiCurve.rewrite(s)
+        self.execute(out, s)
+        out.write("'/>\n</svg>\n")
+
+out = open("sierpinski_curve.svg", 'w', newline = "\n")
+SierpinskiCurve().write(out, 545, 7, 5)
+===
+T SierpinskiCurve
+   Float x
+   Float y
+   Int angle
+   Int length
+
+   F line(out)
+      V theta = radians(Float(.angle))
+      .x += .length * cos(theta)
+      .y -= .length * sin(theta)
+      out.write(f:‘ L{gconvfmt(.x)},{gconvfmt(.y)}’)
+
+   F execute(out, s)
+      out.write(f:‘M{gconvfmt(.x)},{gconvfmt(.y)}’)
+      L(=c) s
+         S c
+            ‘F’, ‘G’
+               .line(out)
+            ‘+’
+               .angle = (.angle + 45) % 360
+            ‘-’
+               .angle = (.angle - 45) % 360
+
+   F :rewrite(s)
+      V t = ‘’
+      L(c) s
+         I c == ‘X’
+            t ‘’= ‘XF+G+XF--F--XF+G+X’
+         E
+            t ‘’= c
+      R t
+
+   F write(out, size, length, order)
+      .length = length
+      .x = length / sqrt(2)
+      .y = .x * 2
+      .angle = 45
+      out.write(‘<svg xmlns='http://www.w3.org/2000/svg' width='’size‘' height='’size"'>\n")
+      out.write("<rect width='100%' height='100%' fill='white'/>\n")
+      out.write(‘<path stroke-width='1' stroke='black' fill='none' d='’)
+      V s = ‘F--XF--F--XF’
+      L(_) 0 .< order
+         s = SierpinskiCurve.rewrite(s)
+      .execute(out, s)
+      out.write("'/>\n</svg>\n")
+
+V out = File(‘sierpinski_curve.svg’, ‘w’)
+SierpinskiCurve().write(out, 545, 7, 5)
+===
+class SierpinskiCurve
+{
+public:
+    double x;
+    double y;
+    int angle;
+    int length;
+
+    template <typename T1> auto line(const T1 &out)
+    {
+        auto theta = radians(to_float(angle));
+        x += length * cos(theta);
+        y -= length * sin(theta);
+        out.write(u" L#.,#."_S.format(gconvfmt(x), gconvfmt(y)));
+    }
+
+    template <typename T1, typename T2> auto execute(const T1 &out, const T2 &s)
+    {
+        out.write(u"M#.,#."_S.format(gconvfmt(x), gconvfmt(y)));
+        for (auto c : s)
+            switch (c)
+            {
+            case u'F':
+            case u'G':
+                line(out);
+                break;
+            case u'+':
+                angle = mod((angle + 45), 360);
+                break;
+            case u'-':
+                angle = mod((angle - 45), 360);
+                break;
+            }
+    }
+
+    template <typename T1> static auto s_rewrite(const T1 &s)
+    {
+        auto t = u""_S;
+        for (auto &&c : s)
+            if (c == u'X')
+                t &= u"XF+G+XF--F--XF+G+X"_S;
+            else
+                t &= c;
+        return t;
+    }
+
+    template <typename T1, typename T2, typename T3, typename T4> auto write(const T1 &out, const T2 &size, const T3 &length, const T4 &order)
+    {
+        this->length = length;
+        x = length / sqrt(2);
+        y = x * 2;
+        angle = 45;
+        out.write(u"<svg xmlns='http://www.w3.org/2000/svg' width='"_S & size & u"' height='"_S & size & u"'>\n"_S);
+        out.write(u"<rect width='100%' height='100%' fill='white'/>\n"_S);
+        out.write(u"<path stroke-width='1' stroke='black' fill='none' d='"_S);
+        auto s = u"F--XF--F--XF"_S;
+        for (auto _ : range_el(0, order))
+            s = SierpinskiCurve::s_rewrite(s);
+        execute(out, s);
+        out.write(u"'/>\n</svg>\n"_S);
+    }
+};
+
+auto out = File(u"sierpinski_curve.svg"_S, u"w"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        SierpinskiCurve().write(out, 545, 7, 5);
+    }
+} code_block_1;

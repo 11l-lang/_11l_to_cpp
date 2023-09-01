@@ -5,6 +5,7 @@
 # https://eax.me/rkm-to-wav/
 
 import sys, os
+from typing import BinaryIO
 Byte = int
 
 WAV_HEADER_SIZE = 44

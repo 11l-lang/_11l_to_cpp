@@ -1241,6 +1241,15 @@ template <typename T1> String commatize(const T1 &number, const String &sep = u"
     return reversed(r);
 }
 
+String gconvfmt(double f) // [https://en.cppreference.com/w/cpp/io/c/fprintf]:‘conversion format specifier’
+{
+	char buf[32];
+	int n = std::snprintf(buf, sizeof(buf), "%g", f);
+	if (n < 0 || n >= sizeof(buf))
+		throw AssertionError();
+	return String(buf, buf + n);
+}
+
 inline Char min(const String &s)
 {
 	Char r = s[0];
