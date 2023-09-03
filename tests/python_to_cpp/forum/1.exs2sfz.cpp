@@ -633,7 +633,7 @@ int MAIN_WITH_ARGV()
     INIT_ARGV();
 
     if (::argv.len() < 3 || ::argv.len() > 4) {
-        print(u"Usage: #. EXSfile.exs SFZfile.sfz [samplefolder]"_S.format(u"1.exs2sfz.py"_S));
+        print(u"Usage: #. EXSfile.exs SFZfile.sfz [samplefolder]"_S.format(u"1.exs2sfz"_S));
         print();
         print(u"    the samplefolder argument is optional; if not specified, the program will"_S);
         print(u"    attempt to locate the samples by searching folders surrounding the exs file"_S);

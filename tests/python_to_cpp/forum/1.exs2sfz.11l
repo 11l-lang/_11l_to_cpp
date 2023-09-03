@@ -460,7 +460,7 @@ T EXSInstrument
 :start:
 
 I :argv.len < 3 | :argv.len > 4
-   print(‘Usage: #. EXSfile.exs SFZfile.sfz [samplefolder]’.format(‘1.exs2sfz.py’))
+   print(‘Usage: #. EXSfile.exs SFZfile.sfz [samplefolder]’.format(‘1.exs2sfz’))
    print()
    print(‘    the samplefolder argument is optional; if not specified, the program will’)
    print(‘    attempt to locate the samples by searching folders surrounding the exs file’)

@@ -290,3 +290,10 @@ T Solver
 
 print(Char(65))
            ^Error: argument `code` of function `Char` is named-only
+
+
+T SierpinskiCurve
+   Float x
+   F line(out)
+      out.write(f:‘ L{.x:h}’)
+                      ^Error: can not import module `.`: file 'tests/parser/..11l' is not found

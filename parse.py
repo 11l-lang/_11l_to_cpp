@@ -2601,7 +2601,7 @@ def led(self, left):
 
     # Process module [transpile it if necessary and load it]
     global scope
-    module_name = left.to_str()
+    module_name = left.token_str().replace(':', '::')
     if module_name not in modules and module_name not in builtin_modules:
         module_file_name = os.path.join(os.path.dirname(file_name), module_name.replace('::', '/')).replace('\\', '/') # `os.path.join()` is needed for case when `os.path.dirname(file_name)` is empty string, `replace('\\', '/')` is needed for passing 'tests/parser/errors.txt'
         try:
