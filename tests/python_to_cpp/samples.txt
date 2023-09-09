@@ -638,7 +638,7 @@ print(Time(2001, 2, 3, 4, 5, 6).format(‘YYYY.MM.DD hh:mm:ss’) == ‘2001.02.
 print(Time(2001, 2, 3, 4, 5, 6).format(‘ГГГГ.ММ.ДД чч:мм:сс’) == ‘2001.02.03 04:05:06’)
 print(time:strptime(‘2001.02.03 04:05:06’, ‘%Y.%m.%d %H:%M:%S’) == Time(2001, 2, 3, 4, 5, 6))
 print(Time(1970, 1, 2).unix_time())
-print(time:from_unix_time(Time(1970, 1, 2).unix_time()))
+print(Time(unix_time' Time(1970, 1, 2).unix_time()))
 ===
 struct CodeBlock1
 {

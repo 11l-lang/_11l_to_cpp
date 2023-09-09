@@ -143,6 +143,8 @@ class Scope:
             else:
                 t = token
             raise Error('redefinition of already defined identifier is not allowed', t) #    X Error(‘redefinition ...’, ...)
+        if type(ast_node) == ASTTypeDefinition:
+            ast_node.type_name = name
         self.ids[name] = Scope.Id('', ast_node)
 
 scope : Scope
@@ -618,6 +620,8 @@ class SymbolNode:
                     return 'Char(' + self.children[2].to_str() + ')'
                 elif func_name == 'Char' and self.children[1] is not None and self.children[1].token_str() == "digit'":
                     return 'char_from_digit(' + self.children[2].to_str() + ')'
+                elif func_name == 'Time' and len(self.children) == 3 and self.children[1] is not None and self.children[1].token_str() == "unix_time'":
+                    return 'timens::from_unix_time(' + self.children[2].to_str() + ')'
                 elif func_name == 'String' and self.children[2].token.category == Token.Category.STRING_LITERAL:
                     return self.children[2].to_str()
                 elif func_name == 'Bytes' and self.children[2].token.category == Token.Category.STRING_LITERAL:
@@ -3886,7 +3890,6 @@ builtins_scope.ids['TimeDelta'].ast_nodes[0].scope = time_delta_scope
 module_scope = Scope(None)
 module_scope.add_function('perf_counter', ASTFunctionDefinition([]))
 module_scope.add_function('today', ASTFunctionDefinition([]))
-module_scope.add_function('from_unix_time', ASTFunctionDefinition([('unix_time', '', 'Float')]))
 module_scope.add_function('strptime', ASTFunctionDefinition([('datetime_string', '', 'String'), ('format', '', 'String')]))
 builtin_modules['time'] = Module(module_scope)
 module_scope = Scope(None)

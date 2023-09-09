@@ -297,3 +297,7 @@ T SierpinskiCurve
    F line(out)
       out.write(f:‘ L{.x:h}’)
                       ^Error: can not import module `.`: file 'tests/parser/..11l' is not found
+
+
+Time.fromtimestamp(123)
+^Error: identifier `fromtimestamp` is not found in type `Time`
