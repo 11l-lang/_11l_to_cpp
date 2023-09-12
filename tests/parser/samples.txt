@@ -2136,3 +2136,60 @@ struct CodeBlock1
         print(static_array);
     }
 } code_block_1;
+
+
+V b = 1110'0000b
+b.bit(1).flip()
+L(i) 0..7
+   V data = I b.bit(7 - i) {‘BIT_ONE_WAVE’} E ‘BIT_ZERO_WAVE’
+   print(data)
+
+b.bit(2) = 1 // `1` looks nicer than `1B`
+b.bit(2) = random:() < 0.5 // but sometimes Bool is needed
+
+F get_bit(n, bit) // check for const `x` in `bit_ref()`
+   R n.bit(bit)
+
+print(get_bit(b, 1))
+-V cb = 11b
+print(cb.bit(1)) // another check for const `x` in `bit_ref()`
+===
+auto b = 0b1110'0000;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        bit_ref(b, 1).flip();
+        for (auto i : range_ee(0, 7)) {
+            auto data = bit_ref(b, 7 - i) ? u"BIT_ONE_WAVE"_S : u"BIT_ZERO_WAVE"_S;
+            print(data);
+        }
+
+        bit_ref(b, 2) = 1;
+        bit_ref(b, 2) = randomns::_() < 0.5;
+    }
+} code_block_1;
+
+template <typename T1, typename T2> auto get_bit(const T1 &n, const T2 &bit)
+{
+    return bit_ref(n, bit);
+}
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(get_bit(b, 1));
+    }
+} code_block_2;
+
+const auto cb = 0b11;
+
+struct CodeBlock3
+{
+    CodeBlock3()
+    {
+        print(bit_ref(cb, 1));
+    }
+} code_block_3;

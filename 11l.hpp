@@ -282,6 +282,41 @@ template <typename Ty> Ty int_bits(Ty x, const Range<Int, true, false> range)
 	return (x >> range.b) & ((1 << range.len()) - 1);
 }
 
+template <typename Ty> class BitRef
+{
+	Ty &x;
+	int bit;
+
+public:
+	BitRef(Ty &x, int bit) : x(x), bit(bit) {}
+
+	void operator=(Int b) {
+		assert(UInt(b) <= 1);
+		operator=(bool(b));
+	}
+	void operator=(bool b) {
+		if (b)
+			x |= 1 << bit;
+		else
+			x &= ~(1 << bit);
+	}
+	explicit operator bool() {
+		return (x & (1 << bit)) != 0;
+	}
+	operator Int() {
+		return (x >> bit) & 1;
+	}
+
+	void flip() {
+		x ^= 1 << bit;
+	}
+};
+
+template <typename Ty> BitRef<Ty> bit_ref(Ty &x, int bit) // bit_proxy(), get_bit()/set_bit()
+{
+	return BitRef<Ty>(x, bit);
+}
+
 inline void print(const String &s = u"", const String &end = u"\n", bool flush = false)
 {
 	std::wcout << std::wstring(s.cbegin(), s.cend()) << std::wstring(end.cbegin(), end.cend());
