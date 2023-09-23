@@ -902,6 +902,8 @@ class SymbolNode:
             if self.postfix:
                 if self.symbol.id == '!':
                     return '(*' + self.children[0].to_str() + ')'
+                elif self.symbol.id == '.*':
+                    return '(*' + self.children[0].to_str() + ')'
                 return self.children[0].to_str() + self.symbol.id
             elif self.symbol.id == ':':
                 c0 = self.children[0].to_str()
@@ -2497,7 +2499,7 @@ prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('(-)', 130); prefix
 
 infix_r('^', 140)
 
-symbol('.', 150); symbol(':', 150); symbol('.:', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('T? ', 150); postfix('T :', 150); postfix('--', 150); postfix('++', 150); postfix('!', 150)
+symbol('.', 150); symbol(':', 150); symbol('.:', 150); symbol('[', 150); symbol('(', 150); symbol(')'); symbol(']'); postfix('T? ', 150); postfix('T :', 150); postfix('--', 150); postfix('++', 150); postfix('!', 150); postfix('.*', 150)
 prefix('.', 150); prefix(':', 150); prefix('.:', 150); symbol('[%', 150); prefix('T &', 130); prefix('T =', 150) # ]
 
 infix_r('=', 10); infix_r('+=', 10); infix_r('-=', 10); infix_r('*=', 10); infix_r('/=', 10); infix_r('I/=', 10); infix_r('Ц/=', 10); infix_r('%=', 10); infix_r('>>=', 10); infix_r('<<=', 10); infix_r('^=', 10)

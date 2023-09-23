@@ -2198,6 +2198,13 @@ struct CodeBlock3
 V buf = malloc(1024).as(Ptr[Byte])
 Ptr[UInt16] buf2
 memset(buf, 0, 1024)
+
+print(buf.*)
+T Pair
+   Int first, second
+V pair = buf.as(Ptr[Pair])
+print(pair.*.second)
+
 free(buf)
 ===
 auto buf = Ptr<Byte>(malloc(1024));
@@ -2208,6 +2215,24 @@ struct CodeBlock1
     CodeBlock1()
     {
         memset(buf, 0, 1024);
-        free(buf);
+
+        print((*buf));
     }
 } code_block_1;
+
+class Pair
+{
+public:
+    int first, second;
+};
+auto pair = Ptr<Pair>(buf);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print((*pair).second);
+
+        free(buf);
+    }
+} code_block_2;
