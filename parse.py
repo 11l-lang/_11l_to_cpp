@@ -596,6 +596,8 @@ class SymbolNode:
                         return 'int_bits(' + self.children[0].children[0].to_str() + ', ' + self.children[2].to_str() + ')'
                     elif func_name.endswith('.bit'):
                         return 'bit_ref(' + self.children[0].children[0].to_str() + ', ' + self.children[2].to_str() + ')'
+                    elif func_name.endswith('.as'):
+                        return trans_type(self.children[2].to_type_str(), self.children[2].scope, self.children[2].token) + '(' + self.children[0].children[0].to_str() + ')'
                     else:
                         f_node = type_of(self.children[0])
                 elif func_name == 'Bool':
@@ -1315,7 +1317,7 @@ class ASTExpression(ASTNodeWithExpression):
 
 cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'пер':'auto',
                      'Int':'int', 'Int64':'Int64', 'UInt64':'UInt64', 'Int32':'int32_t', 'UInt32':'uint32_t', 'Int16':'int16_t', 'UInt16':'uint16_t', 'Int8':'int8_t', 'BigInt':'BigInt', 'Size':'Size', 'USize':'USize',
-                     'Float':'double', 'SFloat':'float', 'Float32':'float', 'Float64':'double', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte', 'Bytes':'Array<Byte>',
+                     'Float':'double', 'SFloat':'float', 'Float32':'float', 'Float64':'double', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte', 'Bytes':'Array<Byte>', 'Ptr':'Ptr',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
                      'Array':'Array', 'ArrayFixLen':'ArrayFixLen', 'ArrayMaxLen':'ArrayMaxLen', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque', 'Counter':'Counter', 'Fraction':'Fraction'}
 cpp_vectype_from_11l = {}
@@ -3698,6 +3700,9 @@ builtins_scope.add_function('format_float', ASTFunctionDefinition([('x', '', 'Fl
 builtins_scope.add_function('format_float_exp', ASTFunctionDefinition([('x', '', 'Float'), ('precision', '', 'Int'), ('width', '0', 'Int')]))
 builtins_scope.add_function('commatize', ASTFunctionDefinition([('number', '', 'Int'), ('sep', token_to_str('‘,’'), 'String'), ('step', '3', 'Int')]))
 builtins_scope.add_function('gconvfmt', ASTFunctionDefinition([('number', '', 'Float')]))
+builtins_scope.add_function('malloc',   ASTFunctionDefinition([('size', '', 'Size')]))
+builtins_scope.add_function('free',     ASTFunctionDefinition([('ptr', '', 'Ptr')]))
+builtins_scope.add_function('memset',   ASTFunctionDefinition([('dest', '', 'Ptr'), ('ch', '', 'Int'), ('count', '', 'Size')]))
 builtins_scope.add_function('ValueError', ASTFunctionDefinition([('s', '', 'String')]))
 builtins_scope.add_function('IndexError', ASTFunctionDefinition([('index', '', 'Int')]))
 builtins_scope.add_function('NotImplementedError', ASTFunctionDefinition([]))

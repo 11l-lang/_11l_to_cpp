@@ -2,6 +2,8 @@
 //using std::min;
 //using std::max;
 
+template <typename Ty> using Ptr = Ty*;
+
 #include <tuple>
 template <typename...Types> using Tuple = std::tuple<Types...>;
 using std::make_tuple;

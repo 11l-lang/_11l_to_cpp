@@ -2193,3 +2193,21 @@ struct CodeBlock3
         print(bit_ref(cb, 1));
     }
 } code_block_3;
+
+
+V buf = malloc(1024).as(Ptr[Byte])
+Ptr[UInt16] buf2
+memset(buf, 0, 1024)
+free(buf)
+===
+auto buf = Ptr<Byte>(malloc(1024));
+Ptr<uint16_t> buf2;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        memset(buf, 0, 1024);
+        free(buf);
+    }
+} code_block_1;
