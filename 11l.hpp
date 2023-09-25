@@ -246,9 +246,13 @@ template <typename Ty> inline std::complex<Ty> conjugate(const std::complex<Ty> 
 
 #include "11l_hpp/File.hpp"
 #include "11l_hpp/os.hpp"
+#ifdef INCLUDE_FS
 #include "11l_hpp/fs.hpp"
+#endif
 #include "11l_hpp/time.hpp"
+#ifdef INCLUDE_RE
 #include "11l_hpp/re.hpp"
+#endif
 #include "11l_hpp/random.hpp"
 #include "11l_hpp/minmaxheap.hpp"
 #include "11l_hpp/bisect.hpp"
@@ -259,10 +263,14 @@ public:
 	size_t operator()(const String &s) const { return hash<u16string>()(s); }
 };
 }
+#ifdef INCLUDE_LDF
 #include "11l_hpp/ordered_map.h"
+#endif
 #undef assert
 #define assert(...) assert_file_line(__FILE__, __LINE__, __VA_ARGS__) // to fix warning C4002 for assert with 2 arguments
+#ifdef INCLUDE_LDF
 #include "11l_hpp/ldf.hpp"
+#endif
 #include "11l_hpp/BigInt.hpp"
 #include "11l_hpp/term.hpp"
 

@@ -1,4 +1,5 @@
-﻿#include "C:\!!BITBUCKET\11l-lang\_11l_to_cpp\11l.hpp"
+﻿#define INCLUDE_FS
+#include "C:\!!BITBUCKET\11l-lang\_11l_to_cpp\11l.hpp"
 
 Array<String> argv;
 

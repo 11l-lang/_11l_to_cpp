@@ -2599,6 +2599,7 @@ class Module:
 
 modules : Dict[str, Module] = {}
 builtin_modules : Dict[str, Module] = {}
+used_builtin_modules_set = None
 
 def find_module(name):
     if name in modules:
@@ -2639,6 +2640,8 @@ def led(self, left):
             module_scope = Scope(None)
             module_scope.deserialize_from_dict(eldf.parse(open(module_file_name + '.11l_global_scope', encoding = 'utf-8-sig').read()))
             modules[module_name] = Module(module_scope)
+    elif module_name in builtin_modules and used_builtin_modules_set is not None:
+        used_builtin_modules_set.add(module_name.split('::')[0])
 
     self.append_child(left)
     if token.category == Token.Category.STRING_LITERAL: # for `re:‘pattern’`
@@ -3939,9 +3942,9 @@ module_scope.add_function('length', ASTFunctionDefinition([('x', '', 'Int')]))
 module_scope.add_function('popcount', ASTFunctionDefinition([('x', '', 'Int')]))
 builtin_modules['bits'] = Module(module_scope)
 
-def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False, to_debug_str = False): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
+def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False, to_debug_str = False, used_builtin_modules = None): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
     if len(tokens_) == 0: return ASTProgram().to_str()
-    global tokens, source, tokeni, token, break_label_index, scope, global_scope, tokensn, file_name, importing_module, modules
+    global tokens, source, tokeni, token, break_label_index, scope, global_scope, tokensn, file_name, importing_module, modules, used_builtin_modules_set
     prev_tokens    = tokens
     prev_source    = source
     prev_tokeni    = tokeni
@@ -3964,6 +3967,8 @@ def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, ap
     importing_module = importing_module_
     prev_modules = modules
     modules = {}
+    if used_builtin_modules is not None:
+        used_builtin_modules_set = used_builtin_modules
     next_token()
 
     if to_debug_str:
@@ -4014,6 +4019,8 @@ def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, ap
     importing_module = prev_importing_module
     break_label_index = prev_break_label_index
     modules = prev_modules
+    if used_builtin_modules is not None:
+        used_builtin_modules_set = None
 
     return s
 
