@@ -617,9 +617,9 @@ class Converter:
                                     cc = {'а':'A','б':'B','с':'C','д':'D','е':'E','ф':'F'}.get(c.lower(), c)[0]
                                     r += cc.lower() if c.islower() else cc
                                 return r
-                            elif len(color) in (1, 3) and color.isdigit():
+                            elif len(color) in (1, 3, 4) and color.isdigit():
                                 r = "#"
-                                for ii in [0, 1, 2] if len(color) == 3 else [0, 0, 0]:
+                                for ii in [0, 0, 0] if len(color) == 1 else list(range(len(color))):
                                     r += hex((int(color[ii]) * 0xFF + 4) // 8)[2:].upper().zfill(2) # 8 - FF, 0 - 00, 4 - 80 (почему не 7F[‘когда `+ 3` вместо `+ 4`’] — две субъективные причины: 1.‘больше нравится как выглядит’ и 2.‘количество пикселей в строке `80` при `"font_face": "Courier New", "font_size": 10`’)
                                 return r
                             return color
@@ -766,7 +766,7 @@ if __name__ == '__main__':
     if '-h' in sys.argv or '--help' in sys.argv:
         print(R'''A Python implementation of pqmarkup to HTML converter.
 
-Usage: pqmarkup [options] [INPUTFILE]
+Usage: pqmarkup [options] [INPUT_FILE]
 
 Positional arguments:
   INPUT_FILE            input file (STDIN is assumed if no INPUT_FILE is

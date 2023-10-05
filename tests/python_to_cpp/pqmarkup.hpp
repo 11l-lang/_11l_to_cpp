@@ -749,9 +749,9 @@ public:
                                 }
                                 return r;
                             }
-                            else if (in(color.len(), make_tuple(1, 3)) && color.is_digit()) {
+                            else if (in(color.len(), make_tuple(1, 3, 4)) && color.is_digit()) {
                                 auto r = u"#"_S;
-                                for (auto &&ii : color.len() == 3 ? create_array({0, 1, 2}) : create_array({0, 0, 0}))
+                                for (auto &&ii : color.len() == 1 ? create_array({0, 0, 0}) : create_array(range_el(0, color.len())))
                                     r &= hex(idiv((to_int(color[ii]) * 0xFF + 4), 8)).zfill(2);
                                 return r;
                             }

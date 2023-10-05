@@ -61,7 +61,7 @@ F highlight(lang, source)
 
             V tokstr = html_escape(token.value(source))
             String css_class
-            I (token.category == NAME & tokstr C (‘V’, ‘П’, ‘var’, ‘перем’)) | (token.category == OPERATOR & tokstr C (‘C’, ‘С’, ‘in’, ‘!C’, ‘!С’, ‘!in’)) | tokstr.split(‘.’)[0] C _11l_to_cpp:tokenizer:keywords
+            I (token.category == NAME & token.value(source).rtrim([Char](‘&?’)) C (‘V’, ‘П’, ‘var’, ‘пер’)) | (token.category == OPERATOR & tokstr C (‘C’, ‘С’, ‘in’, ‘св’, ‘!C’, ‘!С’, ‘!in’, ‘!св’)) | tokstr.split(‘.’)[0] C _11l_to_cpp:tokenizer:keywords
                css_class = ‘keyword’
             E
                css_class = :cat_to_class_11l[token.category]

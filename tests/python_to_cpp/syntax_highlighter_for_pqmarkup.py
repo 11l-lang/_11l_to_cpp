@@ -90,8 +90,8 @@ def highlight(lang, source):
 
                 tokstr = html_escape(token.value(source))
                 css_class : str
-                if (token.category == _11l_to_cpp.tokenizer.Token.Category.NAME and tokstr in ('V', 'П', 'var', 'перем')) \
-                or (token.category == _11l_to_cpp.tokenizer.Token.Category.OPERATOR and tokstr in ('C', 'С', 'in', '!C', '!С', '!in')) \
+                if (token.category == _11l_to_cpp.tokenizer.Token.Category.NAME and token.value(source).rstrip('&?') in ('V', 'П', 'var', 'пер')) \
+                or (token.category == _11l_to_cpp.tokenizer.Token.Category.OPERATOR and tokstr in ('C', 'С', 'in', 'св', '!C', '!С', '!in', '!св')) \
                 or tokstr.split('.')[0] in _11l_to_cpp.tokenizer.keywords:
                     css_class = 'keyword'
                 else:
