@@ -1,6 +1,6 @@
 ﻿auto keywords = create_array({u"False"_S, u"await"_S, u"else"_S, u"import"_S, u"pass"_S, u"None"_S, u"break"_S, u"except"_S, u"in"_S, u"raise"_S, u"True"_S, u"class"_S, u"finally"_S, u"is"_S, u"return"_S, u"and"_S, u"continue"_S, u"for"_S, u"lambda"_S, u"try"_S, u"as"_S, u"def"_S, u"from"_S, u"nonlocal"_S, u"while"_S, u"assert"_S, u"del"_S, u"global"_S, u"not"_S, u"with"_S, u"async"_S, u"elif"_S, u"if"_S, u"or"_S, u"yield"_S});
 
-auto operators = create_array({u"+"_S, u"-"_S, u"*"_S, u"**"_S, u"/"_S, u"//"_S, u"%"_S, u"@"_S, u"<<"_S, u">>"_S, u"&"_S, u"|"_S, u"^"_S, u"~"_S, u"<"_S, u">"_S, u"<="_S, u">="_S, u"=="_S, u"!="_S});
+auto operators = create_array({u"+"_S, u"-"_S, u"*"_S, u"**"_S, u"/"_S, u"//"_S, u"%"_S, u"@"_S, u"<<"_S, u">>"_S, u"&"_S, u"|"_S, u"^"_S, u"~"_S, u":="_S, u"<"_S, u">"_S, u"<="_S, u">="_S, u"=="_S, u"!="_S});
 
 auto delimiters = create_array({u"("_S, u")"_S, u"["_S, u"]"_S, u"{"_S, u"}"_S, u","_S, u":"_S, u"."_S, u";"_S, u"@"_S, u"="_S, u"->"_S, u"+="_S, u"-="_S, u"*="_S, u"/="_S, u"//="_S, u"%="_S, u"@="_S, u"&="_S, u"|="_S, u"^="_S, u">>="_S, u"<<="_S, u"**="_S});
 auto operators_and_delimiters = sorted(operators + delimiters, [](const auto &x){return x.len();}, true);
@@ -277,8 +277,23 @@ template <typename T1> Array<Token> tokenize(const T1 &source, Array<int>* const
                     else
                         category = TYPE_RM_REF(category)::KEYWORD;
                 }
-                else
+                else {
                     category = TYPE_RM_REF(category)::NAME;
+                    if (source[range_el(lexem_start, i + 1)] == u"match " && (tokens.empty() || in(tokens.last().category, make_tuple(Token::Category::STATEMENT_SEPARATOR, Token::Category::INDENT, Token::Category::DEDENT)))) {
+                        auto j = i + 1;
+                        while (j < source.len() && source[j] == u' ')
+                            j++;
+                        if (source[range_el(j, j + 1)].is_alpha() || source[range_el(j, j + 1)] == u'_')
+                            category = TYPE_RM_REF(category)::KEYWORD;
+                    }
+                    else if (source[range_el(lexem_start, i + 1)] == u"case " && tokens.len() > 0 && in(tokens.last().category, make_tuple(Token::Category::INDENT, Token::Category::DEDENT))) {
+                        auto j = i + 1;
+                        while (j < source.len() && source[j] == u' ')
+                            j++;
+                        if (in(source[range_el(j, j + 1)], make_tuple(u"'"_S, u"\""_S)) || source[range_el(j, j + 1)].is_digit())
+                            category = TYPE_RM_REF(category)::KEYWORD;
+                    }
+                }
             }
 
             else if ((in(ch, u"-+"_S) && in(source[range_el(i, i + 1)], range_ee(u'0'_C, u'9'_C))) || in(ch, range_ee(u'0'_C, u'9'_C)) || (ch == u'.' && in(source[range_el(i, i + 1)], range_ee(u'0'_C, u'9'_C)))) {

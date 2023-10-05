@@ -64,7 +64,7 @@ struct CodeBlock3
     {
         unary_operators.append(create_set(empty_list_of_str));
         unary_operators.append(create_set({u"!"_S}));
-        unary_operators.append(create_set({u"++"_S, u"--"_S}));
+        unary_operators.append(create_set({u"++"_S, u"--"_S, u".*"_S}));
         unary_operators.append(create_set({u"(-)"_S}));
         unary_operators.append(create_set(empty_list_of_str));
     }
@@ -247,7 +247,7 @@ Array<Token> tokenize(const String &source, Array<Tuple<Char, int>>* const impli
                 continue;
             }
 
-            if (((in(source[i], _get<1>(tokenizer::binary_operators)) || in(source[range_el(i, i + 2)], _get<2>(tokenizer::binary_operators)) || in(source[range_el(i, i + 3)], _get<3>(tokenizer::binary_operators)) || in(source[range_el(i, i + 4)], _get<4>(tokenizer::binary_operators))) && !(in(source[i], _get<1>(tokenizer::unary_operators)) || in(source[range_el(i, i + 2)], _get<2>(tokenizer::unary_operators)) || in(source[range_el(i, i + 3)], _get<3>(tokenizer::unary_operators))) && (!in(source[i], make_tuple(u"&"_S, u"-"_S)) || source[range_el(i + 1, i + 2)] == u' '))) {
+            if (((in(source[i], _get<1>(tokenizer::binary_operators)) || in(source[range_el(i, i + 2)], _get<2>(tokenizer::binary_operators)) || in(source[range_el(i, i + 3)], _get<3>(tokenizer::binary_operators)) || in(source[range_el(i, i + 4)], _get<4>(tokenizer::binary_operators))) && !(in(source[i], _get<1>(tokenizer::unary_operators)) || in(source[range_el(i, i + 2)], _get<2>(tokenizer::unary_operators)) || in(source[range_el(i, i + 3)], _get<3>(tokenizer::unary_operators))) && (!in(source[i], make_tuple(u"&"_S, u"-"_S)) || source[range_el(i + 1, i + 2)] == u' ') && !in(source[i], make_tuple(u"<"_S, u">"_S)))) {
                 if (tokens.empty())
                     throw Error(u"source can not starts with a binary operator"_S, i);
                 if (line_continuations != nullptr)

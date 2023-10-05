@@ -45,7 +45,7 @@ binary_operators.append(Set([‘[+]=’, ‘[&]=’, ‘[|]=’, ‘(+)=’, ‘
 [Set[String]] unary_operators
 unary_operators.append(Set(empty_list_of_str))
 unary_operators.append(Set([String(‘!’)]))
-unary_operators.append(Set([‘++’, ‘--’]))
+unary_operators.append(Set([‘++’, ‘--’, ‘.*’]))
 unary_operators.append(Set([‘(-)’]))
 unary_operators.append(Set(empty_list_of_str))
 V all_operators = Set[String]()
@@ -182,7 +182,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                line_continuations.append(tokens.last.end)
             L.continue
 
-         I ((source[i] C :binary_operators[1] | source[i .< i + 2] C :binary_operators[2] | source[i .< i + 3] C :binary_operators[3] | source[i .< i + 4] C :binary_operators[4]) & !(source[i] C :unary_operators[1] | source[i .< i + 2] C :unary_operators[2] | source[i .< i + 3] C :unary_operators[3]) & (source[i] !C (‘&’, ‘-’) | source[i + 1 .< i + 2] == ‘ ’))
+         I ((source[i] C :binary_operators[1] | source[i .< i + 2] C :binary_operators[2] | source[i .< i + 3] C :binary_operators[3] | source[i .< i + 4] C :binary_operators[4]) & !(source[i] C :unary_operators[1] | source[i .< i + 2] C :unary_operators[2] | source[i .< i + 3] C :unary_operators[3]) & (source[i] !C (‘&’, ‘-’) | source[i + 1 .< i + 2] == ‘ ’) & source[i] !C (‘<’, ‘>’))
             I tokens.empty
                X Error(‘source can not starts with a binary operator’, i)
             I line_continuations != N

@@ -1,6 +1,6 @@
 V keywords = [‘False’, ‘await’, ‘else’, ‘import’, ‘pass’, ‘None’, ‘break’, ‘except’, ‘in’, ‘raise’, ‘True’, ‘class’, ‘finally’, ‘is’, ‘return’, ‘and’, ‘continue’, ‘for’, ‘lambda’, ‘try’, ‘as’, ‘def’, ‘from’, ‘nonlocal’, ‘while’, ‘assert’, ‘del’, ‘global’, ‘not’, ‘with’, ‘async’, ‘elif’, ‘if’, ‘or’, ‘yield’]
 
-V operators = [‘+’, ‘-’, ‘*’, ‘**’, ‘/’, ‘//’, ‘%’, ‘@’, ‘<<’, ‘>>’, ‘&’, ‘|’, ‘^’, ‘~’, ‘<’, ‘>’, ‘<=’, ‘>=’, ‘==’, ‘!=’]
+V operators = [‘+’, ‘-’, ‘*’, ‘**’, ‘/’, ‘//’, ‘%’, ‘@’, ‘<<’, ‘>>’, ‘&’, ‘|’, ‘^’, ‘~’, ‘:=’, ‘<’, ‘>’, ‘<=’, ‘>=’, ‘==’, ‘!=’]
 
 V delimiters = [‘(’, ‘)’, ‘[’, ‘]’, ‘{’, ‘}’, ‘,’, ‘:’, ‘.’, ‘;’, ‘@’, ‘=’, ‘->’, ‘+=’, ‘-=’, ‘*=’, ‘/=’, ‘//=’, ‘%=’, ‘@=’, ‘&=’, ‘|=’, ‘^=’, ‘>>=’, ‘<<=’, ‘**=’]
 V operators_and_delimiters = sorted(operators [+] delimiters, key' x -> x.len, reverse' 1B)
@@ -232,6 +232,18 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N) -> [T
                   category = KEYWORD
             E
                category = NAME
+               I source[lexem_start .< i + 1] == ‘match ’ & (tokens.empty | tokens.last.category C (Token.Category.STATEMENT_SEPARATOR, Token.Category.INDENT, Token.Category.DEDENT))
+                  V j = i + 1
+                  L j < source.len & source[j] == ‘ ’
+                     j++
+                  I source[j .< j + 1].is_alpha() | source[j .< j + 1] == ‘_’
+                     category = KEYWORD
+               E I source[lexem_start .< i + 1] == ‘case ’ & tokens.len > 0 & tokens.last.category C (Token.Category.INDENT, Token.Category.DEDENT)
+                  V j = i + 1
+                  L j < source.len & source[j] == ‘ ’
+                     j++
+                  I source[j .< j + 1] C (‘'’, ‘"’) | source[j .< j + 1].is_digit()
+                     category = KEYWORD
 
          E I (ch C ‘-+’ & source[i .< i + 1] C ‘0’..‘9’) | ch C ‘0’..‘9’ | (ch == ‘.’ & source[i .< i + 1] C ‘0’..‘9’)
             I ch C ‘-+’
