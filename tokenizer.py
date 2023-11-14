@@ -547,6 +547,9 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                 i += 1
                 category = Token.Category.DELIMITER
 
+            elif ch == "'" and source[i:i+1] == ' ': # this is an implicit named argument
+                category = Token.Category.NAME
+
             elif ch == '"':
                 if source[i] == '"' \
                         and tokens[-1].category == Token.Category.STRING_CONCATENATOR \

@@ -301,3 +301,10 @@ T SierpinskiCurve
 
 Time.fromtimestamp(123)
 ^Error: identifier `fromtimestamp` is not found in type `Time`
+
+
+F f(level)
+   print(level)
+
+f(' 123)
+    ^Error: variable name expected for implicit named argument

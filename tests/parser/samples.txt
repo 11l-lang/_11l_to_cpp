@@ -2236,3 +2236,29 @@ struct CodeBlock2
         free(buf);
     }
 } code_block_2;
+
+
+F f(b = 1B, ', level)
+   I b
+      print(level)
+
+L(level) 5
+   f(level' level)
+   f(' level)
+===
+template <typename T1, typename T2> auto f(const T1 &b, const T2 &level)
+{
+    if (b)
+        print(level);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (int level = 0; level < 5; level++) {
+            f(true, level);
+            f(true, level);
+        }
+    }
+} code_block_1;

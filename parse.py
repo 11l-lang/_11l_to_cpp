@@ -766,6 +766,12 @@ class SymbolNode:
                         if f_node is None or type(f_node) != ASTFunctionDefinition:
                             raise Error('function `' + func_name + '` is not found (you can remove named arguments in function call to suppress this error)', self.children[0].left_to_right_token())
                         argument_name = self.children[i].token_str()[:-1]
+
+                        if argument_name == '':
+                            if self.children[i+1].token.category != Token.Category.NAME:
+                                raise Error('variable name expected for implicit named argument', self.children[i+1].token)
+                            argument_name = self.children[i+1].token_str()
+
                         while True:
                             if last_function_arg == len(f_node.function_arguments):
                                 for arg in f_node.function_arguments:
