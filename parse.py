@@ -411,6 +411,11 @@ class SymbolNode:
                 indented = True
                 s = s[1:]
                 assert(s[0] != '"')
+            elif s.startswith(r'\/'):
+                if s[3] != "\n":
+                    raise Error('Zero indented multi-line string literal must starts with a new line', Token(self.token.start + 3, self.token.start + 3, Token.Category.STRING_LITERAL))
+                s = s[2] + s[4:]
+                assert(s[0] != '"')
             if s[0] == '"':
                 return 'u' + s + '_S'
 

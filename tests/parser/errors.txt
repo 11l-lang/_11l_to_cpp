@@ -308,3 +308,7 @@ F f(level)
 
 f(' 123)
     ^Error: variable name expected for implicit named argument
+
+
+print(\/‘abc’)
+         ^Error: Zero indented multi-line string literal must starts with a new line

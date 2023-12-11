@@ -2262,3 +2262,17 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+print(\/‘
+<html>
+...’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(uR"(<html>
+...)"_S);
+    }
+} code_block_1;
