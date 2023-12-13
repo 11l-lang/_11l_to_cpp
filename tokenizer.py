@@ -506,7 +506,10 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                                 raise Error('wrong ultrashort hexadecimal number', lexem_start)
                             i += 1
                             if i < len(source) and is_hexadecimal_digit(source[i]):
-                                raise Error('expected end of ultrashort hexadecimal number', i)
+                                if source[i-1:i+7] == '0'*8: # check for special hexadecimal literal
+                                    i += 7
+                                else:
+                                    raise Error('expected end of ultrashort hexadecimal number', i)
                         else:
                             i += 1
                             while i < len(source) and is_hexadecimal_digit(source[i]):
