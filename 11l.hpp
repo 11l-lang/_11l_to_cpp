@@ -249,6 +249,9 @@ template <typename Ty> inline std::complex<Ty> conjugate(const std::complex<Ty> 
 #ifdef INCLUDE_FS
 #include "11l_hpp/fs.hpp"
 #endif
+#ifdef INCLUDE_CSV
+#include "11l_hpp/csv.hpp"
+#endif
 #include "11l_hpp/time.hpp"
 #ifdef INCLUDE_RE
 #include "11l_hpp/re.hpp"

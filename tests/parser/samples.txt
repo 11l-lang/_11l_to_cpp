@@ -2276,3 +2276,16 @@ struct CodeBlock1
 ...)"_S);
     }
 } code_block_1;
+
+
+L(row) csv:read(‘test.csv’)
+   print(row[1]‘: ’row[2])
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&row : csv::read(u"test.csv"_S))
+            print(_get<1>(row) & u": "_S & _get<2>(row));
+    }
+} code_block_1;

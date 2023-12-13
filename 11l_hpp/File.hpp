@@ -82,12 +82,15 @@ inline Array<Byte> Char::encode(const String &encoding = u"utf-8") const
 	return String(*this).encode(encoding);
 }
 
+namespace csv {class Reader;}
+
 class FileNotFoundError {};
 
 class File
 {
 	FILE *file;
 	bool check_bom = true;
+	friend class csv::Reader;
 
 public:
 	File() : file(NULL) {}
@@ -102,6 +105,7 @@ public:
 
 	File(const String &name, const String &mode = u"r"_S, const String &encoding = u"utf-8"_S, const String &newline = u""_S)
 	{
+		assert(encoding == u"utf-8");
 #ifdef _WIN32
 		file = NULL;
 		_wfopen_s(&file, (wchar_t*)name.c_str(), (wchar_t*)(mode & u'b'_C).c_str());

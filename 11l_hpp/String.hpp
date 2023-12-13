@@ -935,21 +935,20 @@ inline Char char_from_digit(Int i)
 	throw ValueError(i);
 }
 
-template <typename TInt> inline TInt to_int_t(const String &str)
+template <typename TInt, typename CharTy> inline TInt to_int_t(const CharTy *s)
 {
 	TInt res = 0, sign = 1;
-	const char16_t *s = str.c_str();
 	while (*s && (*s == u' ' || *s == u'\t')) s++; // skip whitespace
 	if (*s == u'-') sign=-1, s++; else if (*s == u'+') s++;
 	if (!Char(*s).is_digit())
-		throw ValueError(str);
+		throw ValueError(String(Char(*s)));
 	for (; *s; s++) {
 		if (!Char(*s).is_digit()) {
 			while (*s == u' ' || *s == u'\t' || *s == u'\n') // why check for \n only at the end of the string with integer: \n at the beginning is very strange, while it's ok to have a file with integer ending with \n (so `int(open('...').read())` must work in this case)
 				s++;
 			if (*s == 0)
 				break;
-			throw ValueError(str);
+			throw ValueError(String(Char(*s)));
 		}
 		res = res * 10 + (*s - u'0');
 	}
@@ -958,12 +957,12 @@ template <typename TInt> inline TInt to_int_t(const String &str)
 
 inline Int to_int(const String &str)
 {
-	return to_int_t<Int>(str);
+	return to_int_t<Int>(str.c_str());
 }
 
 inline Int64 to_int64(const String &str)
 {
-	return to_int_t<Int64>(str);
+	return to_int_t<Int64>(str.c_str());
 }
 
 template <typename TInt> inline TInt to_int_t(const String &str, int base)
