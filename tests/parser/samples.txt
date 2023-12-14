@@ -2289,3 +2289,22 @@ struct CodeBlock1
             print(_get<1>(row) & u": "_S & _get<2>(row));
     }
 } code_block_1;
+
+
+L(row) csv:read(‘test.csv’)
+   print(row[‘Наименование’]‘: ’row[‘Количество’])
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {
+        auto reader = csv::read(u"test.csv"_S);
+        auto header = reader.read_current_row_as_str_array();
+        int НаименованиеIndex = header.index(u"Наименование"_S);
+        int КоличествоIndex = header.index(u"Количество"_S);
+        for (auto &&row : reader)
+            print(row[НаименованиеIndex] & u": "_S & row[КоличествоIndex]);
+        }
+    }
+} code_block_1;

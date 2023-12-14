@@ -1849,6 +1849,7 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
     def to_str(self, indent):
         r = ''
 
+        csv_read_column_names = []
         loop_auto = False
         if self.expression is not None and self.expression.token.category == Token.Category.NUMERIC_LITERAL:
             lv = self.loop_variable if self.loop_variable is not None else 'Lindex'
@@ -1859,9 +1860,34 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
                     tr = 'for (auto ' + '&&'*(not self.copy_loop_variable) + '[' + self.loop_variable + '] : ' + self.expression.to_str() + ')'
                 else:
                     loop_auto = True
+                    if self.loop_variable is not None and self.expression is not None and self.expression.function_call \
+                            and self.expression.children[0].symbol.id == ':' and len(self.expression.children[0].children) == 2 \
+                            and self.expression.children[0].children[0].token_str() == 'csv' \
+                            and self.expression.children[0].children[1].token_str() == 'read':
+
+                        def find_access_to_row_field_by_column_name(node):
+                            def f(e: SymbolNode):
+                                if e.symbol.id == '[' and not e.is_list and not e.is_dict and e.children[0].token_str() == self.loop_variable \
+                                                                                          and e.children[1].token.category == Token.Category.STRING_LITERAL: # ]
+                                    name_str = e.children[1].to_str()
+                                    index_var_name = e.children[1].token_str()[1:-1].replace(' ', '_') + 'Index'
+                                    csv_read_column_names.append((name_str, index_var_name))
+                                    e.children[1].token.category = Token.Category.NAME
+                                    e.children[1].token_str_override = index_var_name
+                                for child in e.children:
+                                    if child is not None:
+                                        f(child)
+                            node.walk_expressions(f)
+                            node.walk_children(find_access_to_row_field_by_column_name)
+                        find_access_to_row_field_by_column_name(self)
+
+                    if len(csv_read_column_names):
+                        expression_str = 'reader'
+                    else:
+                        expression_str = self.expression.to_str()
                     tr = 'for (auto ' + ('&' if self.is_loop_variable_a_reference else '&&'*(self.is_loop_variable_a_ptr or (not self.copy_loop_variable and not (
                         self.expression.symbol.id in ('..', '.<') or (self.expression.symbol.id == '(' and self.expression.children[0].symbol.id == '.' and self.expression.children[0].children[0].symbol.id == '(' and self.expression.children[0].children[0].children[0].symbol.id in ('..', '.<'))))) # ))
-                                        ) + (self.loop_variable if self.loop_variable is not None else '__unused') + ' : ' + self.expression.to_str() + ')'
+                                        ) + (self.loop_variable if self.loop_variable is not None else '__unused') + ' : ' + expression_str + ')'
             else:
                 if self.expression is not None and self.expression.token.category == Token.Category.NAME:
                     l = tokens[self.tokeni].value(source)
@@ -1902,6 +1928,15 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
                     add_at_beginning = ' ' * ((indent+1)*4) + 'auto &&'+ self.loop_variable + " = *__begin; ++__begin;\n")
         elif self.has_L_index and not (self.loop_variable is None and self.expression is not None and self.expression.token.category == Token.Category.NUMERIC_LITERAL):
             rr = self.children_to_str(indent, tr, False)
+
+        if len(csv_read_column_names):
+            pr = ' ' * (indent*4) + "{\n" \
+               + ' ' * (indent*4) + 'auto reader = ' + self.expression.to_str() + ";\n" \
+               + ' ' * (indent*4) + "auto header = reader.read_current_row_as_str_array();\n"
+            for name_str, index_var_name in csv_read_column_names:
+                pr += ' ' * (indent*4) + 'int ' + index_var_name + ' = header.index(' + name_str + ");\n"
+            rr = pr + rr
+            rr += ' ' * (indent*4) + "}\n"
 
         if self.has_L_index and not (self.loop_variable is None and self.expression is not None and self.expression.token.category == Token.Category.NUMERIC_LITERAL):
             if self.has_continue:

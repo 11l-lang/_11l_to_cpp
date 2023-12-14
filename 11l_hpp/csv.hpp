@@ -41,9 +41,9 @@ class Reader
 		Iterator(Reader *reader) : reader(reader) {}
 		bool operator!=(Iterator i) const {
 			assert(i.reader == nullptr);
-			return reader != nullptr;
+			return !reader->row_data.empty();
 		}
-		void operator++() {reader->read_row(); if (reader->row_data.empty()) reader = nullptr;}
+		void operator++() {reader->read_row();}
 		Row operator*() const {return Row(reader);}
 	};
 
@@ -72,9 +72,8 @@ class Reader
 			if (c == '\n' || c == EOF)
 				break;
 
-			if (c == delimiter.code) {
+			if (c == delimiter.code)
 				delim_positions.append(row_data.len());
-			}
 			//else // this line can be uncommented [:‘when to_int_t() will accept string length argument’] and get_column_cstr() won't be needed [in favour to get_column_span()]
 			row_data.append(c);
 		}
@@ -112,17 +111,27 @@ public:
 	Reader(const String &file_name, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S) : file(file_name), delimiter(delimiter)
 	{
 		assert(unsigned(this->delimiter.code) < 128);
+		read_row();
 	}
 
 	Iterator begin()
 	{
-		read_row();
 		return Iterator(this);
 	}
 
 	Iterator end()
 	{
 		return Iterator(nullptr);
+	}
+
+	Array<String> /*get_header*/read_current_row_as_str_array()
+	{
+		Array<String> r;
+		r.reserve(delim_positions.len() + 1);
+		for (Int i = 0; i <= delim_positions.len(); i++)
+			r.append(get_column_string(i));
+		read_row();
+		return r;
 	}
 };
 
