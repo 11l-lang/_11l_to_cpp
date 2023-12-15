@@ -108,7 +108,12 @@ public: // for `col.reader->get_column_cstr()`
 	}
 
 public:
-	Reader(const String &file_name, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S) : file(file_name), delimiter(delimiter)
+	Reader(const String &file_name, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S) : file(file_name, encoding), delimiter(delimiter)
+	{
+		assert(unsigned(this->delimiter.code) < 128);
+		read_row();
+	}
+	Reader(File &&file, const String &delimiter = u","_S) : file(std::move(file)), delimiter(delimiter)
 	{
 		assert(unsigned(this->delimiter.code) < 128);
 		read_row();
@@ -138,5 +143,13 @@ public:
 Reader read(const String &file_name, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S)
 {
 	return Reader(file_name, encoding, delimiter);
+}
+Reader read(File &&file, const String &delimiter = u","_S)
+{
+	return Reader(std::forward<File>(file), delimiter);
+}
+Reader readf(File &&file, const String &delimiter = u","_S)
+{
+	return Reader(std::forward<File>(file), delimiter);
 }
 }

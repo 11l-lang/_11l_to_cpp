@@ -3930,6 +3930,7 @@ module_scope.add_function('split_ext', ASTFunctionDefinition([('path', '', 'Stri
 builtin_modules['fs::path'] = Module(module_scope)
 module_scope = Scope(None)
 module_scope.add_function('read', ASTFunctionDefinition([('file_name', '', 'String'), ('encoding', token_to_str('‘utf-8’'), 'String'), ('delimiter', token_to_str('‘,’'), 'String')]))
+module_scope.add_function('readf', ASTFunctionDefinition([('file', '', 'File'), ('delimiter', token_to_str('‘,’'), 'String')]))
 builtin_modules['csv'] = Module(module_scope)
 module_scope = Scope(None)
 module_scope.add_function('', ASTFunctionDefinition([('command', '', 'String')]))

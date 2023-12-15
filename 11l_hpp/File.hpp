@@ -97,6 +97,8 @@ public:
 
 	File(FILE *file) : file(file) {}
 
+	File(File &&f) : check_bom(f.check_bom) {file = f.file; f.file = NULL;}
+
 	File(const File &f)
 	{
 		assert(f.file == stdin || f.file == stdout || f.file == stderr);
@@ -105,7 +107,7 @@ public:
 
 	File(const String &name, const String &mode = u"r"_S, const String &encoding = u"utf-8"_S, const String &newline = u""_S)
 	{
-		assert(encoding == u"utf-8");
+		assert(encoding == u"utf-8" || encoding == u"utf-8-sig"); // in 11l, utf-8 encoding works as utf-8-sig when reading a file by intent [so the default encoding for writing files is utf-8, but the default encoding for reading files is like utf-8-sig in Python]
 #ifdef _WIN32
 		file = NULL;
 		_wfopen_s(&file, (wchar_t*)name.c_str(), (wchar_t*)(mode & u'b'_C).c_str());
@@ -114,6 +116,11 @@ public:
 #endif
 		if (file == NULL)
 			throw FileNotFoundError();
+
+		if (mode == u'w' && encoding == u"utf-8-sig") {
+			unsigned char utf8bom[3] = {0xEF, 0xBB, 0xBF};
+			fwrite(utf8bom, 3, 1, file);
+		}
 	}
 
 	File &operator=(File &&f)
