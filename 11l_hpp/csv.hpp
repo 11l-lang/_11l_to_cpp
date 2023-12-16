@@ -108,7 +108,7 @@ public: // for `col.reader->get_column_cstr()`
 	}
 
 public:
-	Reader(const String &file_name, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S) : file(file_name, encoding), delimiter(delimiter)
+	Reader(const String &file_name, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S) : file(file_name, u"r", encoding), delimiter(delimiter)
 	{
 		assert(unsigned(this->delimiter.code) < 128);
 		read_row();
@@ -152,4 +152,36 @@ Reader readf(File &&file, const String &delimiter = u","_S)
 {
 	return Reader(std::forward<File>(file), delimiter);
 }
+
+class WriterF
+{
+	File file;
+	Char delimiter;
+
+public:
+	WriterF(File &&file, const String &delimiter = u","_S) : file(std::move(file)), delimiter(delimiter)
+	{
+		assert(unsigned(this->delimiter.code) < 128);
+	}
+
+	template <class ElemTy> void write_row(const Array<ElemTy> &arr)
+	{
+		for (Int i=0; i<arr.len(); i++) {
+			if (i > 0)
+				file.write(delimiter);
+			String field(arr[i]);
+			if (field.starts_with(u" ") || field.ends_with(u" ") || in(u'"', field) || in(u'\n', field) || in(delimiter, field))
+				field = u'"'_C & field.replace(u"\"", u"\"\"") & u'"'_C;
+			file.write(field);
+		}
+		file.write(u'\n'_C);
+	}
+};
+
+class Writer : public WriterF
+{
+public:
+	Writer(const String &file_name, const String &encoding = u"utf-8"_S,
+		                            const String &delimiter = u","_S) : WriterF(File(file_name, u"w", encoding), delimiter) {}
+};
 }

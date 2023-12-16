@@ -5039,3 +5039,25 @@ struct CodeBlock1
             print(_get<1>(row) & u": "_S & _get<2>(row));
     }
 } code_block_1;
+
+
+import csv
+
+writer = csv.writer(open('t.csv', 'w', newline = '', encoding = 'utf-8'), delimiter = ';')
+writer.writerow([1, 2, 3])
+writer.writerow(['d"b', 'c'])
+===
+V writer = csv:WriterF(File(‘t.csv’, ‘w’, encoding' ‘utf-8’), delimiter' ‘;’)
+writer.write_row([1, 2, 3])
+writer.write_row([‘d"b’, ‘c’])
+===
+auto writer = csv::WriterF(File(u"t.csv"_S, u"w"_S, u"utf-8"_S), u";"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        writer.write_row(create_array({1, 2, 3}));
+        writer.write_row(create_array({u"d\"b"_S, u"c"_S}));
+    }
+} code_block_1;

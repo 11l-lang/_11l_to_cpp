@@ -2308,3 +2308,19 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+V writer = csv:Writer(‘t.csv’)
+writer.write_row([1, 2])
+writer.write_row([‘a"b’])
+===
+auto writer = csv::Writer(u"t.csv"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        writer.write_row(create_array({1, 2}));
+        writer.write_row(create_array({u"a\"b"_S}));
+    }
+} code_block_1;
