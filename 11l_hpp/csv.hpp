@@ -107,16 +107,22 @@ public: // for `col.reader->get_column_cstr()`
 		return convert_utf8_string_to_String(&row_data[start], end - start);
 	}
 
-public:
-	Reader(const String &file_name, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S) : file(file_name, u"r", encoding), delimiter(delimiter)
+	void init(Array<String> *header)
 	{
-		assert(unsigned(this->delimiter.code) < 128);
+		assert(unsigned(delimiter.code) < 128);
 		read_row();
+		if (header != nullptr)
+			*header = read_current_row_as_str_array();
 	}
-	Reader(File &&file, const String &delimiter = u","_S) : file(std::move(file)), delimiter(delimiter)
+
+public:
+	Reader(const String &file_name, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S, Array<String> *header = nullptr) : file(file_name, u"r", encoding), delimiter(delimiter)
 	{
-		assert(unsigned(this->delimiter.code) < 128);
-		read_row();
+		init(header);
+	}
+	Reader(File &&file, const String &delimiter = u","_S, Array<String> *header = nullptr) : file(std::move(file)), delimiter(delimiter)
+	{
+		init(header);
 	}
 
 	Iterator begin()
@@ -140,17 +146,17 @@ public:
 	}
 };
 
-Reader read(const String &file_name, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S)
+Reader read(const String &file_name, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S, Array<String> *header = nullptr)
 {
-	return Reader(file_name, encoding, delimiter);
+	return Reader(file_name, encoding, delimiter, header);
 }
-Reader read(File &&file, const String &delimiter = u","_S)
+Reader read(File &&file, const String &delimiter = u","_S, Array<String> *header = nullptr)
 {
-	return Reader(std::forward<File>(file), delimiter);
+	return Reader(std::forward<File>(file), delimiter, header);
 }
-Reader readf(File &&file, const String &delimiter = u","_S)
+Reader readf(File &&file, const String &delimiter = u","_S, Array<String> *header = nullptr)
 {
-	return Reader(std::forward<File>(file), delimiter);
+	return Reader(std::forward<File>(file), delimiter, header);
 }
 
 class WriterF

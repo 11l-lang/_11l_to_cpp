@@ -784,6 +784,8 @@ class SymbolNode:
                                         raise Error('please correct order of argument `' + argument_name + '`', self.children[i].token)
                                 raise Error('argument `' + argument_name + '` is not found in function `' + func_name + '`', self.children[i].token)
                             if f_node.function_arguments[last_function_arg][0] == argument_name:
+                                if len(f_node.function_arguments[last_function_arg]) > 3 and '&' in f_node.function_arguments[last_function_arg][3] and not (self.children[i+1].symbol.id in ('&', 'T &') and len(self.children[i+1].children) == 1) and self.children[i+1].token_str() not in ('N', 'Н', 'null', 'нуль'):
+                                    raise Error('argument `' + f_node.function_arguments[last_function_arg][0] + '` of function `' + func_name + '` is in-out, but there is no `&` prefix', self.children[i+1].token)
                                 last_function_arg += 1
                                 break
                             if f_node.function_arguments[last_function_arg][1] == '':
@@ -3929,8 +3931,8 @@ module_scope.add_function('canonical', ASTFunctionDefinition([('path', '', 'Stri
 module_scope.add_function('split_ext', ASTFunctionDefinition([('path', '', 'String')]))
 builtin_modules['fs::path'] = Module(module_scope)
 module_scope = Scope(None)
-module_scope.add_function('read', ASTFunctionDefinition([('file_name', '', 'String'), ('encoding', token_to_str('‘utf-8’'), 'String'), ('delimiter', token_to_str('‘,’'), 'String')]))
-module_scope.add_function('readf', ASTFunctionDefinition([('file', '', 'File'), ('delimiter', token_to_str('‘,’'), 'String')]))
+module_scope.add_function('read', ASTFunctionDefinition([('file_name', '', 'String'), ('encoding', token_to_str('‘utf-8’'), 'String'), ('delimiter', token_to_str('‘,’'), 'String'), ('header', token_to_str('N', Token.Category.CONSTANT), '[String]?', '&')]))
+module_scope.add_function('readf', ASTFunctionDefinition([('file', '', 'File'), ('delimiter', token_to_str('‘,’'), 'String'), ('header', token_to_str('N', Token.Category.CONSTANT), '[String]?', '&')]))
 module_scope.add_name('Writer', ASTTypeDefinition([ASTFunctionDefinition([('file_name', '', 'String'), ('encoding', token_to_str('‘utf-8’'), 'String'), ('delimiter', token_to_str('‘,’'), 'String')])]))
 #csv_writer_scope = Scope(None)
 #module_scope.ids['Writer'].ast_nodes[0].scope = csv_writer_scope

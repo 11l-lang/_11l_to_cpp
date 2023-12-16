@@ -5061,3 +5061,34 @@ struct CodeBlock1
         writer.write_row(create_array({u"d\"b"_S, u"c"_S}));
     }
 } code_block_1;
+
+
+import csv
+
+reader = csv.reader(open('test.csv', encoding = 'utf-8'))
+hdr = next(reader)
+НаименованиеIndex = hdr.index('Наименование')
+КоличествоIndex   = hdr.index('Количество')
+for row in reader:
+    print(row[НаименованиеIndex] + ': ' + row[КоличествоIndex])
+===
+[String] hdr
+V reader = csv:readf(File(‘test.csv’, encoding' ‘utf-8’), header' &hdr)
+V НаименованиеIndex = hdr.index(‘Наименование’)
+V КоличествоIndex = hdr.index(‘Количество’)
+L(row) reader
+   print(row[НаименованиеIndex]‘: ’row[КоличествоIndex])
+===
+Array<String> hdr;
+auto reader = csv::readf(File(u"test.csv"_S, u"r"_S, u"utf-8"_S), u","_S, &hdr);
+auto НаименованиеIndex = hdr.index(u"Наименование"_S);
+auto КоличествоIndex = hdr.index(u"Количество"_S);
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&row : reader)
+            print(row[НаименованиеIndex] & u": "_S & row[КоличествоIndex]);
+    }
+} code_block_1;
