@@ -107,22 +107,26 @@ public: // for `col.reader->get_column_cstr()`
 		return convert_utf8_string_to_String(&row_data[start], end - start);
 	}
 
-	void init(Array<String> *header)
+	void init(Array<String> *header, bool skip_first_row)
 	{
 		assert(unsigned(delimiter.code) < 128);
 		read_row();
-		if (header != nullptr)
+		if (header != nullptr) {
 			*header = read_current_row_as_str_array();
+			assert(skip_first_row);
+		}
+		else if (skip_first_row)
+			read_row();
 	}
 
 public:
-	Reader(const String &file_name, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S, Array<String> *header = nullptr) : file(file_name, u"r", encoding), delimiter(delimiter)
+	Reader(const String &file_name, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S, Array<String> *header = nullptr, bool skip_first_row = true) : file(file_name, u"r", encoding), delimiter(delimiter)
 	{
-		init(header);
+		init(header, skip_first_row);
 	}
-	Reader(File &&file, const String &delimiter = u","_S, Array<String> *header = nullptr) : file(std::move(file)), delimiter(delimiter)
+	Reader(File &&file, const String &delimiter = u","_S, Array<String> *header = nullptr, bool skip_first_row = true) : file(std::move(file)), delimiter(delimiter)
 	{
-		init(header);
+		init(header, skip_first_row);
 	}
 
 	Iterator begin()
@@ -146,17 +150,17 @@ public:
 	}
 };
 
-Reader read(const String &file_name, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S, Array<String> *header = nullptr)
+Reader read(const String &file_name, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S, Array<String> *header = nullptr, bool skip_first_row = true)
 {
-	return Reader(file_name, encoding, delimiter, header);
+	return Reader(file_name, encoding, delimiter, header, skip_first_row);
 }
-Reader read(File &&file, const String &delimiter = u","_S, Array<String> *header = nullptr)
+Reader read(File &&file, const String &delimiter = u","_S, Array<String> *header = nullptr, bool skip_first_row = true)
 {
-	return Reader(std::forward<File>(file), delimiter, header);
+	return Reader(std::forward<File>(file), delimiter, header, skip_first_row);
 }
-Reader readf(File &&file, const String &delimiter = u","_S, Array<String> *header = nullptr)
+Reader readf(File &&file, const String &delimiter = u","_S, Array<String> *header = nullptr, bool skip_first_row = true)
 {
-	return Reader(std::forward<File>(file), delimiter, header);
+	return Reader(std::forward<File>(file), delimiter, header, skip_first_row);
 }
 
 class WriterF

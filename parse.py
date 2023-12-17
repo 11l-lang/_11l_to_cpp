@@ -1932,6 +1932,11 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
             rr = self.children_to_str(indent, tr, False)
 
         if len(csv_read_column_names):
+            self.expression.append_child(SymbolNode(Token(0, 0, Token.Category.NAME), "skip_first_row'"))
+            sn = SymbolNode(Token(0, 0, Token.Category.CONSTANT), '0B')
+            sn.symbol = symbol_table['(constant)']
+            self.expression.append_child(sn)
+
             pr = ' ' * (indent*4) + "{\n" \
                + ' ' * (indent*4) + 'auto reader = ' + self.expression.to_str() + ";\n" \
                + ' ' * (indent*4) + "auto header = reader.read_current_row_as_str_array();\n"
@@ -3931,8 +3936,8 @@ module_scope.add_function('canonical', ASTFunctionDefinition([('path', '', 'Stri
 module_scope.add_function('split_ext', ASTFunctionDefinition([('path', '', 'String')]))
 builtin_modules['fs::path'] = Module(module_scope)
 module_scope = Scope(None)
-module_scope.add_function('read', ASTFunctionDefinition([('file_name', '', 'String'), ('encoding', token_to_str('‘utf-8’'), 'String'), ('delimiter', token_to_str('‘,’'), 'String'), ('header', token_to_str('N', Token.Category.CONSTANT), '[String]?', '&')]))
-module_scope.add_function('readf', ASTFunctionDefinition([('file', '', 'File'), ('delimiter', token_to_str('‘,’'), 'String'), ('header', token_to_str('N', Token.Category.CONSTANT), '[String]?', '&')]))
+module_scope.add_function('read', ASTFunctionDefinition([('file_name', '', 'String'), ('encoding', token_to_str('‘utf-8’'), 'String'), ('delimiter', token_to_str('‘,’'), 'String'), ('header', token_to_str('N', Token.Category.CONSTANT), '[String]?', '&'), ('skip_first_row', token_to_str('1B', Token.Category.CONSTANT), 'Bool')]))
+module_scope.add_function('readf', ASTFunctionDefinition([('file', '', 'File'), ('delimiter', token_to_str('‘,’'), 'String'), ('header', token_to_str('N', Token.Category.CONSTANT), '[String]?', '&'), ('skip_first_row', token_to_str('1B', Token.Category.CONSTANT), 'Bool')]))
 module_scope.add_name('Writer', ASTTypeDefinition([ASTFunctionDefinition([('file_name', '', 'String'), ('encoding', token_to_str('‘utf-8’'), 'String'), ('delimiter', token_to_str('‘,’'), 'String')])]))
 #csv_writer_scope = Scope(None)
 #module_scope.ids['Writer'].ast_nodes[0].scope = csv_writer_scope

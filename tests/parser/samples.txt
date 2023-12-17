@@ -2299,7 +2299,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         {
-        auto reader = csv::read(u"test.csv"_S);
+        auto reader = csv::read(u"test.csv"_S, u"utf-8"_S, u","_S, nullptr, false);
         auto header = reader.read_current_row_as_str_array();
         int НаименованиеIndex = header.index(u"Наименование"_S);
         int КоличествоIndex = header.index(u"Количество"_S);
@@ -2322,5 +2322,18 @@ struct CodeBlock1
     {
         writer.write_row(create_array({1, 2}));
         writer.write_row(create_array({u"a\"b"_S}));
+    }
+} code_block_1;
+
+
+L(row) csv:read(‘test.csv’, skip_first_row' 0B)
+   print(row[1]‘: ’row[2])
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&row : csv::read(u"test.csv"_S, u"utf-8"_S, u","_S, nullptr, false))
+            print(_get<1>(row) & u": "_S & _get<2>(row));
     }
 } code_block_1;
