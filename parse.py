@@ -4,7 +4,7 @@
 except ImportError:
     from .tokenizer import Token
     from . import tokenizer
-from typing import List, Tuple, Dict, Callable, Set
+from typing import List, Tuple, Dict, Callable, Set, ClassVar
 from enum import IntEnum
 import os, re, eldf
 
@@ -306,7 +306,28 @@ class SymbolNode:
         assert(self.token.category == Token.Category.NAME or (self.token.category == Token.Category.CONSTANT and self.token.value(source) in ('N', 'Н', 'null', 'нуль')))
         return self.token_str()
 
+    inside_it_lambda: ClassVar = False
+
     def to_str(self):
+        if not SymbolNode.inside_it_lambda:
+            found_it = False
+            def f(sn: SymbolNode):
+                if sn.function_call:
+                    return
+                if sn.token.category == Token.Category.NAME and sn.token_str() == '(->)':
+                    nonlocal found_it
+                    found_it = True
+                else:
+                    for child in sn.children:
+                        if child is not None:
+                            f(child)
+            f(self)
+            if found_it:
+                SymbolNode.inside_it_lambda = True
+                r = '[](const auto &it){return ' + self.to_str() + ';}'
+                SymbolNode.inside_it_lambda = False
+                return r
+
         if self.token.category == Token.Category.NAME:
             if self.token_str() in ('L.index', 'Ц.индекс', 'loop.index', 'цикл.индекс'):
                 parent = self
@@ -324,6 +345,9 @@ class SymbolNode:
                 # if self.parent is not None and self.parent.symbol.id == '=' and self is self.parent.children[1]: # `... = (.)` -> `... = this;`
                 #     return 'this'
                 return '*this'
+
+            if self.token_str() == '(->)':
+                return 'it'
 
             tid = self.scope.find(self.token_str())
             if tid is not None and ((len(tid.ast_nodes) and isinstance(tid.ast_nodes[0], ASTVariableDeclaration) and tid.ast_nodes[0].is_ptr and not tid.ast_nodes[0].nullable) # `animals [+]= animal` -> `animals.append(std::move(animal));`
@@ -2562,7 +2586,7 @@ symbol('(name)').nud = lambda self: self
 symbol('(literal)').nud = lambda self: self
 symbol('(constant)').nud = lambda self: self
 
-symbol('(.)').nud = lambda self: self
+#symbol('(.)').nud = lambda self: self
 
 symbol('L.last_iteration').nud = lambda self: self
 symbol('Ц.последняя_итерация').nud = lambda self: self

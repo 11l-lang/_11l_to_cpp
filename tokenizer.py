@@ -649,6 +649,9 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                 if source[lexem_start:lexem_start+3] == '(.)':
                     i += 2
                     category = Token.Category.NAME
+                elif source[lexem_start:lexem_start+4] == '(->)':
+                    i += 3
+                    category = Token.Category.NAME
                 else:
                     if ch == '[' and source[i] == '%': # ]
                         i += 1

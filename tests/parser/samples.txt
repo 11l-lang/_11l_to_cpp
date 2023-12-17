@@ -2337,3 +2337,24 @@ struct CodeBlock1
             print(_get<1>(row) & u": "_S & _get<2>(row));
     }
 } code_block_1;
+
+
+print([(1, 2), (3, 4)].map((x, y) -> x + y))
+print([(1, 2), (3, 4)].map((->).x + (->).y))
+print([(1, 2), (3, 4)].map(v -> v.x + v.y))
+
+print(max([‘c’, ‘ab’], key' s -> s.len))
+print(max([‘c’, ‘ab’], key' (->).len))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(create_array({make_tuple(1, 2), make_tuple(3, 4)}).map([](const auto &x, const auto &y){return x + y;}));
+        print(create_array({make_tuple(1, 2), make_tuple(3, 4)}).map([](const auto &it){return it.x + it.y;}));
+        print(create_array({make_tuple(1, 2), make_tuple(3, 4)}).map([](const auto &v){return v.x + v.y;}));
+
+        print(max_with_key(create_array({u"c"_S, u"ab"_S}), [](const auto &s){return s.len();}));
+        print(max_with_key(create_array({u"c"_S, u"ab"_S}), [](const auto &it){return it.len();}));
+    }
+} code_block_1;
