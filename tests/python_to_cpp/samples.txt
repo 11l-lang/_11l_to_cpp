@@ -5024,18 +5024,18 @@ for row in csv.reader(open('test.csv', encoding = 'utf-8')):
 for row in csv.reader(open('test.csv', encoding = 'utf-8'), delimiter = ','):
     print(row[1] + ': ' + row[2])
 ===
-L(row) csv:readf(File(‘test.csv’, encoding' ‘utf-8’))
+L(row) csv:readf(File(‘test.csv’, encoding' ‘utf-8’), skip_first_row' 0B)
    print(row[1]‘: ’row[2])
-L(row) csv:readf(File(‘test.csv’, encoding' ‘utf-8’), delimiter' ‘,’)
+L(row) csv:readf(File(‘test.csv’, encoding' ‘utf-8’), delimiter' ‘,’, skip_first_row' 0B)
    print(row[1]‘: ’row[2])
 ===
 struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto &&row : csv::readf(File(u"test.csv"_S, u"r"_S, u"utf-8"_S)))
+        for (auto &&row : csv::readf(File(u"test.csv"_S, u"r"_S, u"utf-8"_S), u","_S, nullptr, false))
             print(_get<1>(row) & u": "_S & _get<2>(row));
-        for (auto &&row : csv::readf(File(u"test.csv"_S, u"r"_S, u"utf-8"_S), u","_S))
+        for (auto &&row : csv::readf(File(u"test.csv"_S, u"r"_S, u"utf-8"_S), u","_S, nullptr, false))
             print(_get<1>(row) & u": "_S & _get<2>(row));
     }
 } code_block_1;
