@@ -5092,3 +5092,27 @@ struct CodeBlock1
             print(row[НаименованиеIndex] & u": "_S & row[КоличествоIndex]);
     }
 } code_block_1;
+
+
+import csv
+
+for row in csv.DictReader(open('test.csv', encoding = 'utf-8')):
+    print(row['Наименование'] + ': ' + row['Количество'])
+===
+L(row) csv:readf(File(‘test.csv’, encoding' ‘utf-8’))
+   print(row[‘Наименование’]‘: ’row[‘Количество’])
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        {
+        auto reader = csv::readf(File(u"test.csv"_S, u"r"_S, u"utf-8"_S), u","_S, nullptr, false);
+        auto header = reader.read_current_row_as_str_array();
+        int НаименованиеIndex = header.index(u"Наименование"_S);
+        int КоличествоIndex = header.index(u"Количество"_S);
+        for (auto &&row : reader)
+            print(row[НаименованиеIndex] & u": "_S & row[КоличествоIndex]);
+        }
+    }
+} code_block_1;

@@ -1889,7 +1889,7 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
                     if self.loop_variable is not None and self.expression is not None and self.expression.function_call \
                             and self.expression.children[0].symbol.id == ':' and len(self.expression.children[0].children) == 2 \
                             and self.expression.children[0].children[0].token_str() == 'csv' \
-                            and self.expression.children[0].children[1].token_str() == 'read':
+                            and self.expression.children[0].children[1].token_str() in ('read', 'readf'):
 
                         def find_access_to_row_field_by_column_name(node):
                             def f(e: SymbolNode):
