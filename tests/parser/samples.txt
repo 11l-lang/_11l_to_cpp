@@ -2366,6 +2366,12 @@ V my = Fraction(BigInt(‘123456789123456789123456789123456789’),
 print(my)
 print(Float(my))
 print(Float(my.numerator))
+
+F fraction_as_decimal_string(f, digits)
+   V s = String(f.numerator * BigInt(10)^digits I/ f.denominator)
+   s.insert(s.len - digits, ‘.’)
+   R s
+print(fraction_as_decimal_string(my, 18))
 ===
 auto my = Fraction(BigInt(u"123456789123456789123456789123456789"_S), BigInt(u"1000000000000000000"_S));
 
@@ -2378,3 +2384,18 @@ struct CodeBlock1
         print(to_float(my.numerator));
     }
 } code_block_1;
+
+template <typename T1, typename T2> auto fraction_as_decimal_string(const T1 &f, const T2 &digits)
+{
+    auto s = String(idiv(f.numerator * pow(BigInt(10), digits), f.denominator));
+    s.insert(s.len() - digits, u"."_S);
+    return s;
+}
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(fraction_as_decimal_string(my, 18));
+    }
+} code_block_2;

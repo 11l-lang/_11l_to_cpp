@@ -3866,6 +3866,7 @@ string_scope.add_name('map', ASTFunctionDefinition([('function', '', '(Char -> T
 string_scope.add_name('filter', ASTFunctionDefinition([('function', '', '(Char -> Bool)')]))
 string_scope.add_name('reduce', ASTFunctionDefinition([('initial', '', 'T'), ('function', '', '((T, Char) -> T)')]))
 string_scope.add_name('encode', ASTFunctionDefinition([('encoding', token_to_str('‘utf-8’'), 'String')]))
+string_scope.add_name('insert', ASTFunctionDefinition([('i', '', 'Int'), ('s', '', 'String')]))
 builtins_scope.ids['String'].ast_nodes[0].scope = string_scope
 array_scope = Scope(None)
 arr_last_member_var_decl = ASTVariableDeclaration()
