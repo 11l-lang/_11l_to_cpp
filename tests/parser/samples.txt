@@ -2358,3 +2358,23 @@ struct CodeBlock1
         print(max_with_key(create_array({u"c"_S, u"ab"_S}), [](const auto &it){return it.len();}));
     }
 } code_block_1;
+
+
+// [https://forum.11l-lang.org/threads/Тип-bigfloat.39/post-166]
+V my = Fraction(BigInt(‘123456789123456789123456789123456789’),
+                                 BigInt(‘1000000000000000000’))
+print(my)
+print(Float(my))
+print(Float(my.numerator))
+===
+auto my = Fraction(BigInt(u"123456789123456789123456789123456789"_S), BigInt(u"1000000000000000000"_S));
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(my);
+        print(to_float(my));
+        print(to_float(my.numerator));
+    }
+} code_block_1;

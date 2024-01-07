@@ -2,7 +2,7 @@
 {
 class Reader
 {
-	File file;
+	File file; // `const File &` cannot be used here, because the lifetimes of all temporaries within range-expression `csv::readf(File(...))` are extended only since C++23
 	Char delimiter;
 	bool check_bom = true;
 	Array<char> row_data;

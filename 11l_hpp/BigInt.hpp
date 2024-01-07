@@ -553,7 +553,7 @@ class Fraction
 public:
 	BigInt numerator, denominator;
 
-	Fraction(const BigInt &numerator) : numerator(numerator), denominator(1) {}
+	explicit Fraction(const BigInt &numerator) : numerator(numerator), denominator(1) {}
 
 	Fraction(const BigInt &numer, const BigInt &denom) : numerator(numer), denominator(denom) {
 		if (denominator.isZero())
@@ -609,4 +609,10 @@ public:
 		else
 			return String(numerator) & u'/'_C & String(denominator);
 	}
+
+	explicit operator double() const {
+		return to_float(numerator) / to_float(denominator);
+	}
 };
+
+inline double to_float(const Fraction &f) { return (double)f; }
