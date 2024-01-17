@@ -481,7 +481,7 @@ public:
 		if (!in(i, range_el(Int(0), len())))
 			throw IndexError(i);
 		Type r(std::move((*this)[i]));
-		std::swap((*this)[i], std::vector<Type>::back());
+		(*this)[i] = std::move(std::vector<Type>::back());
 		std::vector<Type>::pop_back();
 		return r;
 	}
