@@ -354,7 +354,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                     i += 1
                     if source[i:i+1] in (' ', "\n"): # this is a named argument
                         category = Token.Category.NAME
-                    elif source[i:i+1] in ('‘', "'"): # ’ # this is a raw string
+                    elif source[i:i+1] in ('‘', "'", '"'): # ’ # this is a raw string
                         i -= 1
                         category = Token.Category.NAME
                     else: # this is a hexadecimal number
