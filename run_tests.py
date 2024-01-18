@@ -19,9 +19,9 @@ def p(s):
 tokenizer_tests = []
 for root, dirs, files in os.walk('tests/tokenizer'):
     for name in files:
-        test = open(os.path.join(root, name), encoding="utf8").read()
+        tests = open(os.path.join(root, name), encoding="utf8").read()
         if name == 'comments.txt':
-            source, expected_comments = test.split("===\n")
+            source, expected_comments = tests.split("===\n")
             comments = []
             tokenizer.tokenize(source, comments = comments)
             comments_str = "\n".join(str(t) for t in comments)
@@ -30,8 +30,21 @@ for root, dirs, files in os.walk('tests/tokenizer'):
                 exit(1)
             else:
                 print("OK (Comments)")
+        elif name == 'ascii_raw_string_literals.txt':
+            for test in tests.split("\n\n\n"):
+                original_11l, expected_corrected_11l = test.split("===\n")
+                expected_corrected_11l += "\n"
+                tokens = tokenizer.tokenize(original_11l)
+                if not tokenizer.needs_source_code_correction(tokens, original_11l):
+                    print("`tokenizer.needs_source_code_correction()` returned `False` for test:\n" + original_11l)
+                    exit(1)
+                corrected_11l = tokenizer.correct_source_code(tokens, original_11l)
+                if corrected_11l != expected_corrected_11l:
+                    print("Mismatch for test:\n" + original_11l + "Output:\n" + corrected_11l + "\nExpected output:\n" + expected_corrected_11l + "[in file '" + name + "']")
+                    kdiff3(corrected_11l, expected_corrected_11l)
+                    exit(1)
         else:
-            tokenizer_tests += test.split("\n\n\n")
+            tokenizer_tests += tests.split("\n\n\n")
 
 for n, test in enumerate(tokenizer_tests):
     if test.startswith('---'):

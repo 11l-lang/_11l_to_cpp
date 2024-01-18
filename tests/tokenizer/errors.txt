@@ -58,3 +58,19 @@ print(f:‘a } b’)
 print(f:‘{text(:10)}’)
               ^Error: there is no corresponding closing parenthesis/bracket/brace for `(`
 // )
+
+
+s = "str
+    ^Error: unclosed string literal
+
+
+s = f:"str
+      ^Error: unclosed string literal
+
+
+s = '"str
+    ^Error: unclosed string literal
+
+
+s = ''"str"'
+    ^Error: unclosed string literal

@@ -111,6 +111,15 @@ class Token:
     def to_str(self, source):
         return 'Token('+str(self.category)+', "'+self.value(source)+'")'
 
+    def is_ascii_raw_string_literal(self, source):
+        if self.category == Token.Category.STRING_LITERAL and source[self.start] == "'":
+            i = self.start + 1
+            while i < len(source) and source[i] == "'":
+                i += 1
+            if source[i:i+1] == '"':
+                return True
+        return False
+
 def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_continuations : List[int] = None, comments : List[Tuple[int, int]] = None) -> List[Token]:
     tokens : List[Token] = []
     indentation_levels : List[Tuple[int, bool]] = []
@@ -598,28 +607,35 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                     i -= 1
                 while i < len(source) and source[i] == "'":
                     i += 1
-                if source[i:i+1] != '‘': # ’
-                    raise Error('expected left single quotation mark', i)
-                startqpos = i
-                i += 1
-                nesting_level = 1
-                while True:
-                    if i == len(source):
-                        raise Error('unpaired left single quotation mark', startqpos)
-                    ch = source[i]
+                if source[i:i+1] == '"':
+                    ending = '"' + "'"*(i - lexem_start)
+                    i = source.find(ending, i+1)
+                    if i == -1:
+                        raise Error('unclosed string literal', lexem_start)
+                    i += len(ending)
+                else:
+                    if source[i:i+1] != '‘': # ’
+                        raise Error('expected left single quotation mark', i)
+                    startqpos = i
                     i += 1
-                    if ch == "‘":
-                        nesting_level += 1
-                    elif ch == "’":
-                        nesting_level -= 1
-                        if nesting_level == 0:
-                            break
-                while i < len(source) and source[i] == "'":
-                    i += 1
-                if source[i:i+1].isalpha() or source[i:i+1] in ('_', '@', ':', '"', '('): # )
-                    tokens.append(Token(lexem_start, i, Token.Category.STRING_LITERAL))
-                    tokens.append(Token(i, i, Token.Category.STRING_CONCATENATOR))
-                    continue
+                    nesting_level = 1
+                    while True:
+                        if i == len(source):
+                            raise Error('unpaired left single quotation mark', startqpos)
+                        ch = source[i]
+                        i += 1
+                        if ch == "‘":
+                            nesting_level += 1
+                        elif ch == "’":
+                            nesting_level -= 1
+                            if nesting_level == 0:
+                                break
+                    while i < len(source) and source[i] == "'":
+                        i += 1
+                    if source[i:i+1].isalpha() or source[i:i+1] in ('_', '@', ':', '"', '('): # )
+                        tokens.append(Token(lexem_start, i, Token.Category.STRING_LITERAL))
+                        tokens.append(Token(i, i, Token.Category.STRING_CONCATENATOR))
+                        continue
                 category = Token.Category.STRING_LITERAL
 
             elif ch == '{':
@@ -680,3 +696,27 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
         indentation_levels.pop()
 
     return tokens
+
+def needs_source_code_correction(tokens, source):
+    for token in tokens:
+        if token.is_ascii_raw_string_literal(source):
+            return True
+    return False
+
+def correct_source_code(tokens, source):
+    result = ''
+    writepos = 0
+
+    for token in tokens:
+        if token.is_ascii_raw_string_literal(source):
+            result += source[writepos:token.start]
+            c = source.find('"', token.start + 1)
+            assert(c != -1 and c < token.end)
+            c -= token.start - 1
+            result += '‘' + source[token.start + c : token.end - c] + '’'
+        else:
+            result += source[writepos:token.end]
+        writepos = token.end
+
+    result += source[writepos:]
+    return result
