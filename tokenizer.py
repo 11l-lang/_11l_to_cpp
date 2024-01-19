@@ -698,8 +698,9 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
     return tokens
 
 def needs_source_code_correction(tokens, source):
-    for token in tokens:
-        if token.is_ascii_raw_string_literal(source) or (token.category == Token.Category.OPERATOR and token.value(source) == '""='):
+    for token in tokens: # ‘
+        if token.is_ascii_raw_string_literal(source) or (token.category == Token.Category.OPERATOR and token.value(source) == '""=') \
+                                                     or (token.category == Token.Category.STRING_LITERAL and token.value(source) == '""' and source[token.start - 1] != '’'): # `""` -> `‘’` except `""` in `‘some big ...’""`
             return True
     return False
 
@@ -707,8 +708,8 @@ def correct_source_code(tokens, source):
     result = ''
     writepos = 0
 
-    for token in tokens:
-        if token.is_ascii_raw_string_literal(source):
+    for token in tokens: # ‘
+        if token.is_ascii_raw_string_literal(source) or (token.category == Token.Category.STRING_LITERAL and token.value(source) == '""' and source[token.start - 1] != '’'):
             result += source[writepos:token.start]
             c = source.find('"', token.start + 1)
             assert(c != -1 and c < token.end)

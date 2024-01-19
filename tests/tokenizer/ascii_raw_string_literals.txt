@@ -19,3 +19,18 @@ print(a‘...’)
 a ""= b
 ===
 a ‘’= b
+
+
+print(a""b)
+print(a""(b+1))
+print((a+1)""b)
+print(a[1]""b)
+print(a""@b)
+print(a"":b)
+===
+print(a‘’b)
+print(a‘’(b+1))
+print((a+1)‘’b)
+print(a[1]‘’b)
+print(a‘’@b)
+print(a‘’:b)
