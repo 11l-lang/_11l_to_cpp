@@ -47,7 +47,7 @@ binary_operators : List[Set[str]] = [] # `initializer_list` does not support mov
 binary_operators.append(set(empty_list_of_str))
 binary_operators.append({str('+'), '-', '*', '/', '%', '^', '&', '|', '<', '>', '=', '?'})
 binary_operators.append({'<<', '>>', '<=', '>=', '==', '!=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '.=', '->', '..', '.<', '.+', '<.', 'I/', 'Ц/', '-%', 'C ', 'С '})
-binary_operators.append({'<<=', '>>=', '‘’=', '[+]', '[&]', '[|]', '(+)', '<.<', '-I/', '-Ц/', 'I/=', 'Ц/=', 'in ', 'св ', '!C ', '!С '})
+binary_operators.append({'<<=', '>>=', '‘’=', '""=', '[+]', '[&]', '[|]', '(+)', '<.<', '-I/', '-Ц/', 'I/=', 'Ц/=', 'in ', 'св ', '!C ', '!С '})
 binary_operators.append({'[+]=', '[&]=', '[|]=', '(+)=', '!in ', '!св '})
 unary_operators : List[Set[str]] = []
 unary_operators.append(set(empty_list_of_str))
@@ -699,7 +699,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
 
 def needs_source_code_correction(tokens, source):
     for token in tokens:
-        if token.is_ascii_raw_string_literal(source):
+        if token.is_ascii_raw_string_literal(source) or (token.category == Token.Category.OPERATOR and token.value(source) == '""='):
             return True
     return False
 
@@ -714,6 +714,8 @@ def correct_source_code(tokens, source):
             assert(c != -1 and c < token.end)
             c -= token.start - 1
             result += '‘' + source[token.start + c : token.end - c] + '’'
+        elif token.category == Token.Category.OPERATOR and token.value(source) == '""=':
+            result += source[writepos:token.start] + '‘’='
         else:
             result += source[writepos:token.end]
         writepos = token.end
