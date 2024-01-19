@@ -704,6 +704,18 @@ def needs_source_code_correction(tokens, source):
             return True
     return False
 
+def balance_pq_string(s):
+    min_nesting_level = 0
+    nesting_level = 0
+    for ch in s:
+        if ch == "‘":
+            nesting_level += 1
+        elif ch == "’":
+            nesting_level -= 1
+            min_nesting_level = min(min_nesting_level, nesting_level)
+    nesting_level -= min_nesting_level
+    return "'"*-min_nesting_level + "‘"*-min_nesting_level + "‘" + s + "’" + "’"*nesting_level + "'"*nesting_level
+
 def correct_source_code(tokens, source):
     result = ''
     writepos = 0
@@ -714,7 +726,7 @@ def correct_source_code(tokens, source):
             c = source.find('"', token.start + 1)
             assert(c != -1 and c < token.end)
             c -= token.start - 1
-            result += '‘' + source[token.start + c : token.end - c] + '’'
+            result += balance_pq_string(source[token.start + c : token.end - c])
         elif token.category == Token.Category.OPERATOR and token.value(source) == '""=':
             result += source[writepos:token.start] + '‘’='
         else:
