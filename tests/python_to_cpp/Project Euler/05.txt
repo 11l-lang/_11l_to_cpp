@@ -108,7 +108,7 @@ def compute():
 print(compute())
 ===
 F do_mask(digits, mask)
-   R enumerate(digits).map((i, d) -> d * (((-)@mask >> i) [&] 1))
+   R enumerate(digits).map((i, d) -> d * ((~@mask >> i) [&] 1))
 
 F add_mask(digits, mask)
    R enumerate(digits).map((i, d) -> d + ((@mask >> i) [&] 1))

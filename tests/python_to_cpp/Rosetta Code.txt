@@ -4198,7 +4198,7 @@ F snusp(store, code)
          ‘,’
             ds[dp] = Byte(:stdin.read(1).code)
          ‘/’
-            id = (-)id
+            id = ~id
          ‘\’
             id (+)= 1
          ‘!’
@@ -20237,10 +20237,10 @@ V constants = (0.<64).map(i -> UInt32(UInt64(abs(sin(i + 1)) * 2.0 ^ 32) [&] FFF
 V init_values = (UInt32(6745'2301), UInt32(EFCD'AB89), UInt32(98BA'DCFE), UInt32(1032'5476))
 
 [((UInt32, UInt32, UInt32) -> UInt32)] functions
-functions [+]= (b, c, d) -> (b [&] c) [|] ((-)b [&] d)
-functions [+]= (b, c, d) -> (d [&] b) [|] ((-)d [&] c)
+functions [+]= (b, c, d) -> (b [&] c) [|] (~b [&] d)
+functions [+]= (b, c, d) -> (d [&] b) [|] (~d [&] c)
 functions [+]= (b, c, d) -> b (+) c (+) d
-functions [+]= (b, c, d) -> c (+) (b [|] (-)d)
+functions [+]= (b, c, d) -> c (+) (b [|] ~d)
 
 [(Int -> Int)] index_functions
 index_functions [+]= i -> i

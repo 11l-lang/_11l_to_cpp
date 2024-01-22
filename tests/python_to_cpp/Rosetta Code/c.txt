@@ -310,7 +310,7 @@ F cidr_parse(str)
    V m = Int(m_str)
    I m < 1 | m > 32 | a < 0 | a > 255 | b < 0 | b > 255 | c < 0 | c > 255 | d < 0 | d > 255
       R (0, 0)
-   V mask = (-)((1 << (32 - m)) - 1)
+   V mask = ~((1 << (32 - m)) - 1)
    V address = (a << 24) + (b << 16) + (c << 8) + d
    address [&]= mask
    R (address, m)

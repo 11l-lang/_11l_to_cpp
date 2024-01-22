@@ -51,9 +51,9 @@ binary_operators.append({'<<=', '>>=', '‘’=', '""=', '[+]', '[&]', '[|]', '(
 binary_operators.append({'[+]=', '[&]=', '[|]=', '(+)=', '!in ', '!св '})
 unary_operators : List[Set[str]] = []
 unary_operators.append(set(empty_list_of_str))
-unary_operators.append({str('!')})
+unary_operators.append({str('!'), '~'})
 unary_operators.append({'++', '--', '.*'})
-unary_operators.append({'(-)'})
+unary_operators.append(set(empty_list_of_str))
 unary_operators.append(set(empty_list_of_str))
 all_operators = set() # str
 operators : List[Set[str]] = []

@@ -6,8 +6,9 @@ for fname in os.listdir('tests/parser'):
     if not fname.endswith('.txt'): # skip .11l and .hpp files
         continue
     if fname != 'errors.txt':
-        tests = []
         full_fname = 'tests/parser/' + fname
+        print(full_fname)
+        tests = []
         for test in open(full_fname, encoding = 'utf-8').read().split("\n\n\n"):
             if test.startswith('---'):
                 tests.append(test)
@@ -17,7 +18,6 @@ for fname in os.listdir('tests/parser'):
             assert(in_cpp[-1] == "\n")
             tests.append(in_11l + "===\n" + in_cpp[:-1])
         open(full_fname, 'w', encoding = 'utf-8', newline = "\n").write("\n\n\n".join(tests))
-        print(full_fname)
 
 for dir in ['tests/python_to_cpp',
             'tests/python_to_cpp/Rosetta Code',
@@ -32,6 +32,7 @@ for dir in ['tests/python_to_cpp',
             continue
 
         full_fname = dir + '/' + fname
+        print(full_fname)
         tests = []
         for test in open(full_fname, encoding = 'utf-8').read().split("\n\n\n"):
             if test.startswith('---'):
@@ -44,4 +45,3 @@ for dir in ['tests/python_to_cpp',
             assert(in_cpp[-1] == "\n")
             tests.append(in_python + "===\n" + in_11l + "===\n" + in_cpp[:-1])
         open(full_fname, 'w', encoding = 'utf-8', newline = "\n").write("\n\n\n".join(tests))
-        print(full_fname)

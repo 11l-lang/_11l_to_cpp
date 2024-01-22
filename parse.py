@@ -985,7 +985,7 @@ class SymbolNode:
             elif self.symbol.id == '-' and self.children[0].is_list:
                 return self.children[0].to_str()
             else:
-                return {'(-)':'~'}.get(self.symbol.id, self.symbol.id) + self.children[0].to_str()
+                return self.symbol.id + self.children[0].to_str()
         elif len(self.children) == 2:
             #return '(' + self.children[0].to_str() + ' ' + self.symbol.id + ' ' + self.children[1].to_str() + ')'
 
@@ -2572,7 +2572,7 @@ infix('(concat)', 115) # `print(‘id = ’id+1)` = `print((‘id = ’id)+1)`, 
 infix('*', 120); infix('/', 120); infix('I/', 120); infix('Ц/', 120); infix('-I/', 120); infix('-Ц/', 120)
 infix('%', 120); infix('-%', 120)
 
-prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('(-)', 130); prefix('--', 130); prefix('++', 130); prefix('&', 130)
+prefix('-', 130); prefix('+', 130); prefix('!', 130); prefix('~', 130); prefix('--', 130); prefix('++', 130); prefix('&', 130)
 
 infix_r('^', 140)
 

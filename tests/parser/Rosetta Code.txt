@@ -253,7 +253,7 @@ V x = 10
 V y = 2
 print(‘x       = ’x)
 print(‘y       = ’y)
-print(‘NOT x   = ’(-)x)
+print(‘NOT x   = ’(~x))
 print(‘x AND y = ’(x [&] y))
 print(‘x OR  y = ’(x [|] y))
 print(‘x XOR y = ’(x (+) y))
@@ -271,7 +271,7 @@ struct CodeBlock1
     {
         print(u"x       = "_S & x);
         print(u"y       = "_S & y);
-        print(u"NOT x   = "_S & ~x);
+        print(u"NOT x   = "_S & (~x));
         print(u"x AND y = "_S & (x & y));
         print(u"x OR  y = "_S & (x | y));
         print(u"x XOR y = "_S & (x ^ y));
@@ -2456,7 +2456,7 @@ T PCG32
       .state = (old * 6364136223846793005) + .inc
       V shifted = UInt32(((old >> 18) (+) old) >> 27)
       V rot = UInt32(old >> 59)
-      R (shifted >> rot) [|] (shifted << (((-)rot + 1) [&] 31))
+      R (shifted >> rot) [|] (shifted << ((~rot + 1) [&] 31))
 
    F seed(UInt64 seed_state, seed_sequence)
       .state = 0
