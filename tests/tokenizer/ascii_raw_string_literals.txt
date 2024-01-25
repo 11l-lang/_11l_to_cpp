@@ -41,3 +41,12 @@ V rq = '"’"'
 ===
 V lq = ‘‘’’'
 V rq = '‘‘’’
+
+
+r = ""
+r = abc‘some big ...’""
+       ‘... string’
+===
+r = ‘’
+r = abc‘some big ...’""
+       ‘... string’
