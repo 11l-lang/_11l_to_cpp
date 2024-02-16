@@ -5024,18 +5024,18 @@ for row in csv.reader(open('test.csv', encoding = 'utf-8')):
 for row in csv.reader(open('test.csv', encoding = 'utf-8'), delimiter = ','):
     print(row[1] + ': ' + row[2])
 ===
-L(row) csv:readf(File(‘test.csv’, encoding' ‘utf-8’), skip_first_row' 0B)
+L(row) csv:read(File(‘test.csv’, encoding' ‘utf-8’), skip_first_row' 0B)
    print(row[1]‘: ’row[2])
-L(row) csv:readf(File(‘test.csv’, encoding' ‘utf-8’), delimiter' ‘,’, skip_first_row' 0B)
+L(row) csv:read(File(‘test.csv’, encoding' ‘utf-8’), delimiter' ‘,’, skip_first_row' 0B)
    print(row[1]‘: ’row[2])
 ===
 struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto &&row : csv::readf(File(u"test.csv"_S, u"r"_S, u"utf-8"_S), u","_S, nullptr, false))
+        for (auto &&row : csv::read(File(u"test.csv"_S, u"r"_S, u"utf-8"_S), u"utf-8"_S, u","_S, nullptr, false))
             print(_get<1>(row) & u": "_S & _get<2>(row));
-        for (auto &&row : csv::readf(File(u"test.csv"_S, u"r"_S, u"utf-8"_S), u","_S, nullptr, false))
+        for (auto &&row : csv::read(File(u"test.csv"_S, u"r"_S, u"utf-8"_S), u"utf-8"_S, u","_S, nullptr, false))
             print(_get<1>(row) & u": "_S & _get<2>(row));
     }
 } code_block_1;
@@ -5047,11 +5047,11 @@ writer = csv.writer(open('t.csv', 'w', newline = '', encoding = 'utf-8'), delimi
 writer.writerow([1, 2, 3])
 writer.writerow(['d"b', 'c'])
 ===
-V writer = csv:WriterF(File(‘t.csv’, ‘w’, encoding' ‘utf-8’), delimiter' ‘;’)
+V writer = csv:Writer(File(‘t.csv’, ‘w’, encoding' ‘utf-8’), delimiter' ‘;’)
 writer.write_row([1, 2, 3])
 writer.write_row([‘d"b’, ‘c’])
 ===
-auto writer = csv::WriterF(File(u"t.csv"_S, u"w"_S, u"utf-8"_S), u";"_S);
+auto writer = csv::Writer(File(u"t.csv"_S, u"w"_S, u"utf-8"_S), u"utf-8"_S, u";"_S);
 
 struct CodeBlock1
 {
@@ -5073,14 +5073,14 @@ for row in reader:
     print(row[НаименованиеIndex] + ': ' + row[КоличествоIndex])
 ===
 [String] hdr
-V reader = csv:readf(File(‘test.csv’, encoding' ‘utf-8’), header' &hdr)
+V reader = csv:read(File(‘test.csv’, encoding' ‘utf-8’), header' &hdr)
 V НаименованиеIndex = hdr.index(‘Наименование’)
 V КоличествоIndex = hdr.index(‘Количество’)
 L(row) reader
    print(row[НаименованиеIndex]‘: ’row[КоличествоIndex])
 ===
 Array<String> hdr;
-auto reader = csv::readf(File(u"test.csv"_S, u"r"_S, u"utf-8"_S), u","_S, &hdr);
+auto reader = csv::read(File(u"test.csv"_S, u"r"_S, u"utf-8"_S), u"utf-8"_S, u","_S, &hdr);
 auto НаименованиеIndex = hdr.index(u"Наименование"_S);
 auto КоличествоIndex = hdr.index(u"Количество"_S);
 
@@ -5099,7 +5099,7 @@ import csv
 for row in csv.DictReader(open('test.csv', encoding = 'utf-8')):
     print(row['Наименование'] + ': ' + row['Количество'])
 ===
-L(row) csv:readf(File(‘test.csv’, encoding' ‘utf-8’))
+L(row) csv:read(File(‘test.csv’, encoding' ‘utf-8’))
    print(row[‘Наименование’]‘: ’row[‘Количество’])
 ===
 struct CodeBlock1
@@ -5107,7 +5107,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         {
-        auto reader = csv::readf(File(u"test.csv"_S, u"r"_S, u"utf-8"_S), u","_S, nullptr, false);
+        auto reader = csv::read(File(u"test.csv"_S, u"r"_S, u"utf-8"_S), u"utf-8"_S, u","_S, nullptr, false);
         auto header = reader.read_current_row_as_str_array();
         int НаименованиеIndex = header.index(u"Наименование"_S);
         int КоличествоIndex = header.index(u"Количество"_S);

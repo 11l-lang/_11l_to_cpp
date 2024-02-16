@@ -2,7 +2,7 @@
 {
 class Reader
 {
-	File file; // `const File &` cannot be used here, because the lifetimes of all temporaries within range-expression `csv::readf(File(...))` are extended only since C++23
+	File file; // `const File &` cannot be used here, because the lifetimes of all temporaries within range-expression `csv::read(File(...))` are extended only since C++23
 	Char delimiter;
 	bool check_bom = true;
 	Array<char> row_data;
@@ -154,25 +154,23 @@ Reader read(const String &file_name, const String &encoding = u"utf-8"_S, const 
 {
 	return Reader(file_name, encoding, delimiter, header, skip_first_row);
 }
-Reader read(File &&file, const String &delimiter = u","_S, Array<String> *header = nullptr, bool skip_first_row = true)
-{
-	return Reader(std::forward<File>(file), delimiter, header, skip_first_row);
-}
-Reader readf(File &&file, const String &delimiter = u","_S, Array<String> *header = nullptr, bool skip_first_row = true)
+Reader read(File &&file, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S, Array<String> *header = nullptr, bool skip_first_row = true)
 {
 	return Reader(std::forward<File>(file), delimiter, header, skip_first_row);
 }
 
-class WriterF
+class Writer
 {
 	File file;
 	Char delimiter;
 
 public:
-	WriterF(File &&file, const String &delimiter = u","_S) : file(std::move(file)), delimiter(delimiter)
+	Writer(File &&file, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S) : file(std::move(file)), delimiter(delimiter)
 	{
 		assert(unsigned(this->delimiter.code) < 128);
 	}
+	Writer(const String &file_name, const String &encoding = u"utf-8"_S,
+		                            const String &delimiter = u","_S) : Writer(File(file_name, u"w", encoding), delimiter) {}
 
 	template <class ElemTy> void write_row(const Array<ElemTy> &arr)
 	{
@@ -186,12 +184,5 @@ public:
 		}
 		file.write(u'\n'_C);
 	}
-};
-
-class Writer : public WriterF
-{
-public:
-	Writer(const String &file_name, const String &encoding = u"utf-8"_S,
-		                            const String &delimiter = u","_S) : WriterF(File(file_name, u"w", encoding), delimiter) {}
 };
 }
