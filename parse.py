@@ -2650,7 +2650,7 @@ def led(self, left):
             self.append_child(expression())
             advance('}')
         return self
-    if token.value(source) == '.': # "with"-expression
+    if token.value(source) in ('.', '('): # ) # "with"-expression
         self.append_child(left)
         sn = SymbolNode(Token(token.start, token.end, Token.Category.SCOPE_BEGIN))
         sn.symbol = symbol_table['{'] # }
@@ -3555,7 +3555,7 @@ def parse_internal(this_node):
         else:
             npre_nl = pre_nl()
             node_expression = expression()
-            if node_expression.symbol.id == '.' and node_expression.children[1].token.category == Token.Category.SCOPE_BEGIN and node_expression.children[1].token.value(source) not in ('{', '.'): # } # this is a "with"-statement
+            if node_expression.symbol.id == '.' and node_expression.children[1].token.category == Token.Category.SCOPE_BEGIN and node_expression.children[1].token.value(source) not in ('{', '.', '('): # )} # this is a "with"-statement
                 node = ASTWith()
                 node.set_expression(node_expression.children[0])
                 new_scope(node)
