@@ -239,7 +239,7 @@ class SymbolNode:
         return self.token.value(source) if not self.token_str_override else self.token_str_override
 
     def to_debug_str(self):
-        if self.token.category == Token.Category.NAME:
+        if self.token.category in (Token.Category.NAME, Token.Category.NUMERIC_LITERAL):
             return self.token_str()
 
         if self.function_call:
@@ -257,6 +257,10 @@ class SymbolNode:
                 return '(' + self.children[0].to_debug_str() + self.symbol.id + ')'
             else:
                 return '(' + self.symbol.id + self.children[0].to_debug_str() + ')'
+
+        if len(self.children) == 3: # "with"-expression
+            assert(self.children[1].token.category == Token.Category.SCOPE_BEGIN)
+            return self.children[0].to_debug_str() + '. (' + self.children[2].to_debug_str() + ')'
 
         assert(len(self.children) == 2)
         return '(' + self.children[0].to_debug_str() + ' ' + self.symbol.id + ' ' + self.children[1].to_debug_str() + ')'
@@ -2646,6 +2650,13 @@ def led(self, left):
             self.append_child(expression())
             advance('}')
         return self
+    if token.value(source) == '.': # "with"-expression
+        self.append_child(left)
+        sn = SymbolNode(Token(token.start, token.end, Token.Category.SCOPE_BEGIN))
+        sn.symbol = symbol_table['{'] # }
+        self.append_child(sn)
+        self.append_child(expression())
+        return self
     if token.category != Token.Category.NAME:
         raise Error('expected an attribute name', token)
     self.append_child(left)
@@ -3544,7 +3555,7 @@ def parse_internal(this_node):
         else:
             npre_nl = pre_nl()
             node_expression = expression()
-            if node_expression.symbol.id == '.' and node_expression.children[1].token.category == Token.Category.SCOPE_BEGIN and node_expression.children[1].token.value(source) != '{': # } # this is a "with"-statement
+            if node_expression.symbol.id == '.' and node_expression.children[1].token.category == Token.Category.SCOPE_BEGIN and node_expression.children[1].token.value(source) not in ('{', '.'): # } # this is a "with"-statement
                 node = ASTWith()
                 node.set_expression(node_expression.children[0])
                 new_scope(node)
