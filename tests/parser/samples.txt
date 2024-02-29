@@ -2402,11 +2402,16 @@ struct CodeBlock2
 
 
 infile. {.seek(.tell() + 8)}
+infile.
+   .seek(.tell() + 8)
 ===
 struct CodeBlock1
 {
     CodeBlock1()
     {
         [&](auto &&T){return T.seek(T.tell() + 8);}(infile);
+        [&](auto &&T) {
+            T.seek(T.tell() + 8);
+        }(infile);
     }
 } code_block_1;

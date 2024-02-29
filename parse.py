@@ -608,6 +608,8 @@ class SymbolNode:
                                                     raise Error('constructors\' overloading is not supported for now (see type `' + f_node.type_name + '`)', self.children[0].left_to_right_token())
                                                 f_node = f_node.constructors[0]
                                     break
+                                if type(s.node) == ASTWith:
+                                    break
                                 s = s.parent
                                 assert(s)
                     elif func_name.endswith('.map') and self.children[2].token.category == Token.Category.NAME and self.children[2].token_str()[0].isupper():
