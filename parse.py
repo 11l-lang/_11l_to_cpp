@@ -576,30 +576,40 @@ class SymbolNode:
                 f_node = None
                 if self.children[0].symbol.id == '.':
                     if len(self.children[0].children) == 1:
-                        s = self.scope
+                        in_with = False
+                        n = self
                         while True:
-                            if s.is_function:
-                                if type(s.node) != ASTFunctionDefinition:
-                                    assert(s.is_lambda)
-                                    raise Error('probably `@` is missing (before this dot)', self.children[0].token)
-                                if type(s.node.parent) == ASTTypeDefinition:
-                                    assert(s.node.parent.scope == s.parent)
-                                    fid = s.node.parent.find_id_including_base_types(self.children[0].children[0].to_str())
-                                    if fid is None:
-                                        raise Error('call of undefined method `' + func_name + '`', self.children[0].children[0].token)
-                                    if len(fid.ast_nodes) > 1:
-                                        raise Error('methods\' overloading is not supported for now', self.children[0].children[0].token)
-                                    f_node = fid.ast_nodes[0]
-                                    if type(f_node) == ASTTypeDefinition:
-                                        if len(f_node.constructors) == 0:
-                                            f_node = ASTFunctionDefinition()
-                                        else:
-                                            if len(f_node.constructors) > 1:
-                                                raise Error('constructors\' overloading is not supported for now (see type `' + f_node.type_name + '`)', self.children[0].left_to_right_token())
-                                            f_node = f_node.constructors[0]
+                            n = n.parent
+                            if n is None:
                                 break
-                            s = s.parent
-                            assert(s)
+                            if len(n.children) == 3 and not n.function_call and n.children[1].token.category == Token.Category.SCOPE_BEGIN:
+                                in_with = True
+                                break
+                        if not in_with:
+                            s = self.scope
+                            while True:
+                                if s.is_function:
+                                    if type(s.node) != ASTFunctionDefinition:
+                                        assert(s.is_lambda)
+                                        raise Error('probably `@` is missing (before this dot)', self.children[0].token)
+                                    if type(s.node.parent) == ASTTypeDefinition:
+                                        assert(s.node.parent.scope == s.parent)
+                                        fid = s.node.parent.find_id_including_base_types(self.children[0].children[0].to_str())
+                                        if fid is None:
+                                            raise Error('call of undefined method `' + func_name + '`', self.children[0].children[0].token)
+                                        if len(fid.ast_nodes) > 1:
+                                            raise Error('methods\' overloading is not supported for now', self.children[0].children[0].token)
+                                        f_node = fid.ast_nodes[0]
+                                        if type(f_node) == ASTTypeDefinition:
+                                            if len(f_node.constructors) == 0:
+                                                f_node = ASTFunctionDefinition()
+                                            else:
+                                                if len(f_node.constructors) > 1:
+                                                    raise Error('constructors\' overloading is not supported for now (see type `' + f_node.type_name + '`)', self.children[0].left_to_right_token())
+                                                f_node = f_node.constructors[0]
+                                    break
+                                s = s.parent
+                                assert(s)
                     elif func_name.endswith('.map') and self.children[2].token.category == Token.Category.NAME and self.children[2].token_str()[0].isupper():
                         c2 = self.children[2].to_str()
                         return func_name + '([](const auto &x){return ' + {'Int':'to_int', 'Int64':'to_int64', 'UInt64':'to_uint64', 'UInt32':'to_uint32', 'Float':'to_float', 'SFloat':'to_float32', 'Float32':'to_float32'}.get(c2, c2) + '(x);})'
@@ -3532,7 +3542,7 @@ def parse_internal(this_node):
         else:
             npre_nl = pre_nl()
             node_expression = expression()
-            if node_expression.symbol.id == '.' and node_expression.children[1].token.category == Token.Category.SCOPE_BEGIN: # this is a "with"-statement
+            if node_expression.symbol.id == '.' and node_expression.children[1].token.category == Token.Category.SCOPE_BEGIN and node_expression.children[1].token.value(source) != '{': # } # this is a "with"-statement
                 node = ASTWith()
                 node.set_expression(node_expression.children[0])
                 new_scope(node)
