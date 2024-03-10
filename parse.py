@@ -2133,7 +2133,10 @@ class ASTException(ASTNodeWithExpression):
         self.pre_nl = pre_nl()
 
     def to_str(self, indent):
-        return self.pre_nl + ' ' * (indent*4) + 'throw ' + self.expression.to_str() + ";\n"
+        return self.pre_nl + ' ' * (indent*4) + 'throw' + (' ' + self.expression.to_str() if self.expression is not None else '') + ";\n"
+
+    def walk_expressions(self, f):
+        if self.expression is not None: f(self.expression)
 
 class ASTExceptionTry(ASTNodeWithChildren):
     def to_str(self, indent):
@@ -3376,7 +3379,10 @@ def parse_internal(this_node):
             elif token.value(source) in ('X', 'Х', 'exception', 'исключение'):
                 node = ASTException()
                 next_token()
-                node.set_expression(expression())
+                if token.category in (Token.Category.SCOPE_END, Token.Category.STATEMENT_SEPARATOR):
+                    node.expression = None
+                else:
+                    node.set_expression(expression())
                 if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
                     next_token()
 
