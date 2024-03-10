@@ -31,7 +31,11 @@ const char16_t *from_str(const char16_t *s, const char16_t *end, const char16_t 
 		el.value_type = ValueType::STRING;
 		return read_string(s, end, *el.value.string);
 	}
-	if (*s == u'‘') {
+	if (*s == u'‘' || (*s == u'\\' && s[1] == u'/' && s[2] == u'‘')) { // ’
+		if (*s == u'\\') {
+			s += 2;
+			start += 3;
+		}
 		const char16_t *endq = find_ending_pair_quote(s, end, sstart);
 		s = endq + 1;
 		while (s < end && *s == u'\'')
