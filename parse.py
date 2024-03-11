@@ -441,7 +441,7 @@ class SymbolNode:
                 assert(s[0] != '"')
             elif s.startswith(r'\/'):
                 if s[3] != "\n":
-                    raise Error('Zero indented multi-line string literal must starts with a new line', Token(self.token.start + 3, self.token.start + 3, Token.Category.STRING_LITERAL))
+                    raise Error('Zero indented multi-line string literal must start with a new line', Token(self.token.start + 3, self.token.start + 3, Token.Category.STRING_LITERAL))
                 s = s[2] + s[4:]
                 assert(s[0] != '"')
             if s[0] == '"':
@@ -2807,7 +2807,7 @@ symbol('(').nud = nud # )
 
 def led(self, left):
     self.append_child(left)
-    if token.value(source)[0].isupper() or (token.value(source) == '(' and source[token.start+1].isupper()): # ) # type name must starts with an upper case letter
+    if token.value(source)[0].isupper() or (token.value(source) == '(' and source[token.start+1].isupper()): # ) # type name must start with an upper case letter
         self.is_type = True
         while True:
             self.append_child(expression())
@@ -3680,7 +3680,7 @@ def parse_internal(this_node):
                         else:
                             node.type += '?'
                     if not (node.type[0].isupper() or node.type[0] == '(' or node.type in ('var', 'пер')): # )
-                        raise Error('type name must starts with an upper case letter', node.type_token)
+                        raise Error('type name must start with an upper case letter', node.type_token)
                     for var in node.vars:
                         scope.add_name(var, node)
                     if type(this_node) == ASTTypeDefinition and this_node.type_name == node.type.rstrip('?'):

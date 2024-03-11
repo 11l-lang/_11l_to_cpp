@@ -33,6 +33,8 @@ const char16_t *from_str(const char16_t *s, const char16_t *end, const char16_t 
 	}
 	if (*s == u'‘' || (*s == u'\\' && s[1] == u'/' && s[2] == u'‘')) { // ’
 		if (*s == u'\\') {
+			if (s[3] != u'\n')
+				throw Error(u"Zero indented multi-line string literal must start with a new line", s - sstart);
 			s += 2;
 			start += 3;
 		}

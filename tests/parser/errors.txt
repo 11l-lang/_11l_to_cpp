@@ -311,7 +311,7 @@ f(' 123)
 
 
 print(\/‘abc’)
-         ^Error: Zero indented multi-line string literal must starts with a new line
+         ^Error: Zero indented multi-line string literal must start with a new line
 
 
 V reader = csv:read(File(‘test.csv’, encoding' ‘utf-8’), header' hdr)
