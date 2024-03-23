@@ -87,7 +87,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto &&word : re::_(uR"(\w+)"_S).find_strings(File(u"135-0.txt"_S, u"r"_S, u"utf-8-sig"_S).read().lowercase()))
+        for (auto &&word : re::_(uR"(\w+)"_S).find_strings(File(u"135-0.txt"_S, u"utf-8-sig"_S).read().lowercase()))
             cnt[word]++;
 
         print(sorted(cnt.items(), [](const auto &wordc){return _get<1>(wordc);}, true)[range_el(0, 10)]);
@@ -267,7 +267,7 @@ T Grid
 F read_words(filename)
 
    [String] words
-   L(line) File(filename, ‘r’).read_lines(1B)
+   L(line) File(filename).read_lines(1B)
       V s = line.trim((‘ ’, "\t", "\r", "\n")).lowercase()
       I re:‘^[a-z]{3,10}’.match(s)
          words.append(s)
@@ -417,7 +417,7 @@ template <typename T1> auto read_words(const T1 &filename)
 {
 
     Array<String> words;
-    for (auto &&line : File(filename, u"r"_S).read_lines(true)) {
+    for (auto &&line : File(filename).read_lines(true)) {
         auto s = line.trim(make_tuple(u" "_S, u"\t"_S, u"\r"_S, u"\n"_S)).lowercase();
         if (re::_(u"^[a-z]{3,10}"_S).match(s))
             words.append(s);

@@ -61,8 +61,8 @@ int MAIN_WITH_ARGV()
         exit(1);
     }
 
-    auto fin = File(_get<1>(::argv), u"r"_S);
-    auto fout = File(_get<0>(fs::path::split_ext(_get<1>(::argv))) & u".wav"_S, u"w"_S);
+    auto fin = File(_get<1>(::argv));
+    auto fout = FileWr(_get<0>(fs::path::split_ext(_get<1>(::argv))) & u".wav"_S);
     auto addr_start = int_from_bytes_be(fin.read_bytes(2));
     auto addr_end = int_from_bytes_be(fin.read_bytes(2));
     auto data_length = addr_end - addr_start + 1;

@@ -1704,7 +1704,7 @@ L i < :argv.len
       L.continue
    I !:argv[i].starts_with(‘-’)
       X.try
-         args_infile = File(:argv[i], ‘r’, encoding' ‘utf-8-sig’)
+         args_infile = File(:argv[i], encoding' ‘utf-8-sig’)
       X.catch
          exit(‘Can't open file '’:argv[i]‘'’)
       L.break
@@ -1714,10 +1714,10 @@ String outfile_name
 X.try
    I ‘-f’ C :argv
       outfile_name = :argv[:argv.index(‘-f’) + 1]
-      args_outfile = File(outfile_name, ‘w’, encoding' ‘utf-8’)
+      args_outfile = File(outfile_name, WRITE, encoding' ‘utf-8’)
    E I ‘--file’ C :argv
       outfile_name = :argv[:argv.index(‘--file’) + 1]
-      args_outfile = File(outfile_name, ‘w’, encoding' ‘utf-8’)
+      args_outfile = File(outfile_name, WRITE, encoding' ‘utf-8’)
 X.catch
    exit(‘Can't open file '’outfile_name‘' for writing’)
 
@@ -2820,7 +2820,7 @@ Options:
         if (!::argv[i].starts_with(u"-"_S)) {
             try
             {
-                args_infile = File(::argv[i], u"r"_S, u"utf-8-sig"_S);
+                args_infile = File(::argv[i], u"utf-8-sig"_S);
             }
             catch (...)
             {
@@ -2836,11 +2836,11 @@ Options:
     {
         if (in(u"-f"_S, ::argv)) {
             outfile_name = ::argv[::argv.index(u"-f"_S) + 1];
-            args_outfile = File(outfile_name, u"w"_S, u"utf-8"_S);
+            args_outfile = FileWr(outfile_name, u"utf-8"_S);
         }
         else if (in(u"--file"_S, ::argv)) {
             outfile_name = ::argv[::argv.index(u"--file"_S) + 1];
-            args_outfile = File(outfile_name, u"w"_S, u"utf-8"_S);
+            args_outfile = FileWr(outfile_name, u"utf-8"_S);
         }
     }
     catch (...)

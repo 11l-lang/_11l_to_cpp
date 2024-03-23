@@ -56,7 +56,7 @@ T board
    F fread(=filename = ‘’)
       I filename == ‘’
          filename = input(‘filename: ’)
-      V f = File(filename, ‘r’)
+      V f = File(filename)
       V lines = f.read_lines(1B)
       L(row) 9
          L(digit) 1..9

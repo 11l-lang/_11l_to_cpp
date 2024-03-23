@@ -19415,7 +19415,7 @@ T BitWriter
    bcount = 0
 
    F (fname)
-      .out = File(fname, ‘w’)
+      .out = File(fname, WRITE)
 
    F _writebit(bit)
       I .bcount == 8
@@ -19445,7 +19445,7 @@ T BitReader
    read = 0
 
    F (fname)
-      .input = File(fname, ‘r’)
+      .input = File(fname)
 
    F _readbit()
       I .bcount == 0
@@ -19489,7 +19489,7 @@ public:
 
     template <typename T1> BitWriter(const T1 &fname)
     {
-        out = File(fname, u"w"_S);
+        out = FileWr(fname);
     }
 
     template <typename T1> auto _writebit(const T1 &bit)
@@ -19533,7 +19533,7 @@ public:
 
     template <typename T1> BitReader(const T1 &fname)
     {
-        input = File(fname, u"r"_S);
+        input = File(fname);
     }
 
     auto _readbit()

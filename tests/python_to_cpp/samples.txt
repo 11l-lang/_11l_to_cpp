@@ -1120,7 +1120,7 @@ print(fs:path:absolute(‘.’))
 print(fs:path:relative(‘a/b’, ‘a/c’).replace(‘\’, ‘/’) == ‘../b’)
 print(fs:path:dir_name(‘a/b/c’) == ‘a/b’)
 print(fs:path:base_name(‘a/b/c’) == ‘c’)
-File(‘temp’, ‘w’).write(‘123’)
+File(‘temp’, WRITE).write(‘123’)
 print(fs:file_size(‘temp’) == 3)
 print(fs:is_file(‘temp’))
 print(!fs:is_dir(‘temp’))
@@ -1144,7 +1144,7 @@ struct CodeBlock1
         print(fs::path::relative(u"a/b"_S, u"a/c"_S).replace(uR"(\)"_S, u"/"_S) == u"../b");
         print(fs::path::dir_name(u"a/b/c"_S) == u"a/b");
         print(fs::path::base_name(u"a/b/c"_S) == u'c');
-        File(u"temp"_S, u"w"_S).write(u"123"_S);
+        FileWr(u"temp"_S).write(u"123"_S);
         print(fs::file_size(u"temp"_S) == 3);
         print(fs::is_file(u"temp"_S));
         print(!fs::is_dir(u"temp"_S));
@@ -3003,7 +3003,7 @@ print('Vertical Resolution: %s' % struct.unpack('I', bmp.read(4))[0])
 print('Number of Colours: %s' % struct.unpack('I', bmp.read(4))[0])
 print('Important Colours: %s' % struct.unpack('I', bmp.read(4))[0])
 ===
-V bmp = File(‘1.bmp’, ‘r’)
+V bmp = File(‘1.bmp’)
 V t = bmp.read_bytes(2)
 print(‘Type: ’(Char(code' t[0])‘’Char(code' t[1])))
 print(‘Size: #.’.format(Int(UInt32(bytes' bmp.read_bytes(4)))))
@@ -3027,7 +3027,7 @@ print(‘Vertical Resolution: #.’.format(Int(UInt32(bytes' bmp.read_bytes(4)))
 print(‘Number of Colours: #.’.format(Int(UInt32(bytes' bmp.read_bytes(4)))))
 print(‘Important Colours: #.’.format(Int(UInt32(bytes' bmp.read_bytes(4)))))
 ===
-auto bmp = File(u"1.bmp"_S, u"r"_S);
+auto bmp = File(u"1.bmp"_S);
 auto t = bmp.read_bytes(2);
 
 struct CodeBlock1
@@ -5033,9 +5033,9 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (auto &&row : csv::read(File(u"test.csv"_S, u"r"_S, u"utf-8"_S), u"utf-8"_S, u","_S, nullptr, false))
+        for (auto &&row : csv::read(File(u"test.csv"_S, u"utf-8"_S), u"utf-8"_S, u","_S, nullptr, false))
             print(_get<1>(row) & u": "_S & _get<2>(row));
-        for (auto &&row : csv::read(File(u"test.csv"_S, u"r"_S, u"utf-8"_S), u"utf-8"_S, u","_S, nullptr, false))
+        for (auto &&row : csv::read(File(u"test.csv"_S, u"utf-8"_S), u"utf-8"_S, u","_S, nullptr, false))
             print(_get<1>(row) & u": "_S & _get<2>(row));
     }
 } code_block_1;
@@ -5047,11 +5047,11 @@ writer = csv.writer(open('t.csv', 'w', newline = '', encoding = 'utf-8'), delimi
 writer.writerow([1, 2, 3])
 writer.writerow(['d"b', 'c'])
 ===
-V writer = csv:Writer(File(‘t.csv’, ‘w’, encoding' ‘utf-8’), delimiter' ‘;’)
+V writer = csv:Writer(File(‘t.csv’, WRITE, encoding' ‘utf-8’), delimiter' ‘;’)
 writer.write_row([1, 2, 3])
 writer.write_row([‘d"b’, ‘c’])
 ===
-auto writer = csv::Writer(File(u"t.csv"_S, u"w"_S, u"utf-8"_S), u"utf-8"_S, u";"_S);
+auto writer = csv::Writer(FileWr(u"t.csv"_S, u"utf-8"_S), u"utf-8"_S, u";"_S);
 
 struct CodeBlock1
 {
@@ -5080,7 +5080,7 @@ L(row) reader
    print(row[НаименованиеIndex]‘: ’row[КоличествоIndex])
 ===
 Array<String> hdr;
-auto reader = csv::read(File(u"test.csv"_S, u"r"_S, u"utf-8"_S), u"utf-8"_S, u","_S, &hdr);
+auto reader = csv::read(File(u"test.csv"_S, u"utf-8"_S), u"utf-8"_S, u","_S, &hdr);
 auto НаименованиеIndex = hdr.index(u"Наименование"_S);
 auto КоличествоIndex = hdr.index(u"Количество"_S);
 
@@ -5107,7 +5107,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         {
-        auto reader = csv::read(File(u"test.csv"_S, u"r"_S, u"utf-8"_S), u"utf-8"_S, u","_S, nullptr, false);
+        auto reader = csv::read(File(u"test.csv"_S, u"utf-8"_S), u"utf-8"_S, u","_S, nullptr, false);
         auto header = reader.read_current_row_as_str_array();
         int НаименованиеIndex = header.index(u"Наименование"_S);
         int КоличествоIndex = header.index(u"Количество"_S);
@@ -5116,3 +5116,78 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+open('out.txt', 'wb').write(b"123")
+f1 = open('out.txt', 'r')
+f2 = open('out.txt', 'r', encoding = 'utf-8')
+fb = open('out.txt', 'rb')
+of1 = open('out1.txt', 'w')
+of2 = open('out2.txt', 'w', encoding = 'utf-8-sig')
+ofb = open('outb.txt', 'wb')
+af1 = open('ap1.txt', 'a')
+af2 = open('ap2.txt', 'a', encoding = 'utf-8-sig')
+afb = open('apb.txt', 'ab')
+print(f1.read())
+print(f2.read())
+print(fb.read(2))
+of1.write('a')
+of2.write('a')
+ofb.write(b'aa')
+af1.write('a')
+af2.write('a')
+afb.write(b'aa')
+===
+File(‘out.txt’, WRITE).write_bytes(Bytes(‘123’))
+V f1 = File(‘out.txt’)
+V f2 = File(‘out.txt’, encoding' ‘utf-8’)
+V fb = File(‘out.txt’)
+V of1 = File(‘out1.txt’, WRITE)
+V of2 = File(‘out2.txt’, WRITE, encoding' ‘utf-8-sig’)
+V ofb = File(‘outb.txt’, WRITE)
+V af1 = File(‘ap1.txt’, APPEND)
+V af2 = File(‘ap2.txt’, APPEND, encoding' ‘utf-8-sig’)
+V afb = File(‘apb.txt’, APPEND)
+print(f1.read())
+print(f2.read())
+print(fb.read_bytes(2))
+of1.write(‘a’)
+of2.write(‘a’)
+ofb.write_bytes(Bytes(‘aa’))
+af1.write(‘a’)
+af2.write(‘a’)
+afb.write_bytes(Bytes(‘aa’))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        FileWr(u"out.txt"_S).write_bytes("123"_B);
+    }
+} code_block_1;
+
+auto f1 = File(u"out.txt"_S);
+auto f2 = File(u"out.txt"_S, u"utf-8"_S);
+auto fb = File(u"out.txt"_S);
+auto of1 = FileWr(u"out1.txt"_S);
+auto of2 = FileWr(u"out2.txt"_S, u"utf-8-sig"_S);
+auto ofb = FileWr(u"outb.txt"_S);
+auto af1 = FileWr(u"ap1.txt"_S, u"utf-8"_S, true);
+auto af2 = FileWr(u"ap2.txt"_S, u"utf-8-sig"_S, true);
+auto afb = FileWr(u"apb.txt"_S, u"utf-8"_S, true);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(f1.read());
+        print(f2.read());
+        print(fb.read_bytes(2));
+        of1.write(u"a"_S);
+        of2.write(u"a"_S);
+        ofb.write_bytes("aa"_B);
+        af1.write(u"a"_S);
+        af2.write(u"a"_S);
+        afb.write_bytes("aa"_B);
+    }
+} code_block_2;

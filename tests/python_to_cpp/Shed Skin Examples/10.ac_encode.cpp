@@ -201,8 +201,8 @@ template <typename T1, typename T2 = decltype(10000), typename T3 = decltype(BET
 auto hardertest()
 {
     print(u"Reading the BentCoinFile"_S);
-    auto inputfile = File(u"testdata/BentCoinFile"_S, u"r"_S);
-    auto outputfile = File(u"tmp.zip"_S, u"w"_S);
+    auto inputfile = File(u"testdata/BentCoinFile"_S);
+    auto outputfile = FileWr(u"tmp.zip"_S);
     print(u"Compressing to tmp.zip"_S);
 
     auto s = inputfile.read();
@@ -213,8 +213,8 @@ auto hardertest()
     inputfile.close();
     print(u"DONE compressing"_S);
 
-    inputfile = File(u"tmp.zip"_S, u"r"_S);
-    outputfile = File(u"tmp2"_S, u"w"_S);
+    inputfile = File(u"tmp.zip"_S);
+    outputfile = FileWr(u"tmp2"_S);
     print(u"Uncompressing to tmp2"_S);
     auto unc = decode(create_array(inputfile.read()), n, 10, 1);
     outputfile.write(unc);

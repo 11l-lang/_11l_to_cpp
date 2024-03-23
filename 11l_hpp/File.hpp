@@ -20,6 +20,8 @@ std::u16string convert_utf8_to_utf16(const char *s, size_t len)
 	return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes(s, s + len);
 }
 #endif
+#include "file_for_humans/IFile.hpp"
+#include "file_for_humans/OFile.hpp"
 
 class UnicodeDecodeError {};
 
@@ -82,233 +84,222 @@ inline Array<Byte> Char::encode(const String &encoding = u"utf-8") const
 	return String(*this).encode(encoding);
 }
 
-namespace csv {class Reader;}
+//class FileNotFoundError {};
 
-class FileNotFoundError {};
+class StdHandleTag {};
 
-class File
+template <bool reading> class TFile;
+
+template <> class TFile<true> : public IFile
 {
-	FILE *file;
-	bool check_bom = true;
-	friend class csv::Reader;
-
-public:
-	File() : file(NULL) {}
-
-	File(FILE *file) : file(file) {}
-
-	File(File &&f) : check_bom(f.check_bom) {file = f.file; f.file = NULL;}
-
-	File(const File &f)
+	IFile *as_mutable() const
 	{
-		assert(f.file == stdin || f.file == stdout || f.file == stderr);
-		file = f.file;
+		return const_cast<IFile*>(static_cast<const IFile*>(this));
 	}
 
-	File(const String &name, const String &mode = u"r"_S, const String &encoding = u"utf-8"_S, const String &newline = u""_S)
+public:
+	TFile() {}
+	TFile(StdHandleTag, decltype(detail::stdin_handle()) handle)
+	{
+		fh.assign_std_handle(handle);
+	}
+	TFile(TFile &&f) : IFile(std::forward<IFile>(f)) {} // for `V ff = File(‘...’); V f = move(ff)`
+	TFile(const TFile &f)
+	{
+		fh.assign_std_handle(f.fh);
+	}
+
+	TFile(const String &name, const String &encoding = u"utf-8"_S) : IFile(name)
 	{
 		assert(encoding == u"utf-8" || encoding == u"utf-8-sig"); // in 11l, utf-8 encoding works as utf-8-sig when reading a file by intent [so the default encoding for writing files is utf-8, but the default encoding for reading files is like utf-8-sig in Python]
-#ifdef _WIN32
-		file = NULL;
-		_wfopen_s(&file, (wchar_t*)name.c_str(), (wchar_t*)(mode & u'b'_C).c_str());
-#else
-		file = fopen(convert_utf16_to_utf8(name).c_str(), convert_utf16_to_utf8(mode & u'b'_C).c_str());
-#endif
-		if (file == NULL)
-			throw FileNotFoundError();
+	}
 
-		if (mode == u'w' && encoding == u"utf-8-sig") {
+	TFile &operator=(TFile &&f)
+	{
+		IFile::operator=(std::forward<IFile>(f));
+		return *this;
+	}
+
+	bool at_eof() const
+	{
+		return as_mutable()->at_eof();
+	}
+
+	String read() const
+	{
+		return convert_utf8_string_to_String(as_mutable()->read_text());
+	}
+
+	class Lines
+	{
+		IFile file;
+		bool keep_newline;
+
+		class Sentinel {};
+		class Iterator
+		{
+			Lines *lines;
+			String line;
+		    bool has_next;
+
+		public:
+			Iterator(Lines *lines) : lines(lines) {has_next = !lines->file.at_eof(); if (has_next) operator++();}
+			bool operator!=(Sentinel) const {return has_next;}
+			void operator++() {has_next = !lines->file.at_eof(); if (has_next) line = convert_utf8_string_to_String(lines->file.read_line(lines->keep_newline));}
+			const String &operator*() const {return line;}
+		};
+#if 0
+		class Iter
+		{
+			IFile file;
+			bool keep_newline;
+			String line;
+
+		public:
+			Iter(IFile &&file, bool keep_newline) : file(std::move(file)), keep_newline(keep_newline) {advance();}
+
+			const String &current() {return line;}
+
+			bool advance()
+			{
+				if (file.at_eof())
+					return false;
+				line = convert_utf8_string_to_String(file.read_line(keep_newline));
+				return true;
+			}
+		};
+#endif
+	public:
+		Lines(IFile &&file, bool keep_newline) : file(std::move(file)), keep_newline(keep_newline) {}
+
+		Iterator begin()
+		{
+			return Iterator(this);
+		}
+
+		Sentinel end()
+		{
+			return Sentinel();
+		}
+#if 0
+		std::optional<Iter> iter() &&
+		{
+			if (file.at_eof())
+				return std::nullopt;
+			return Iter(std::move(file), keep_newline);
+		}
+#endif
+	};
+
+	Lines read_lines(bool keep_newline = false) &&
+	{
+		return Lines(std::move(static_cast<IFile&&>(*this)), keep_newline);
+	}
+
+	String read_line(bool keep_newline = false) const
+	{
+		return convert_utf8_string_to_String(as_mutable()->read_line(keep_newline));
+	}
+
+	Array<Byte> read_bytes() const
+	{
+		return static_cast<Array<Byte>&&>(as_mutable()->read_bytes());
+	}
+
+	Array<Byte> read_bytes(size_t n) const
+	{
+		return static_cast<Array<Byte>&&>(as_mutable()->read_bytes(n));
+	}
+
+	Char read(int n) const
+	{
+		assert(n == 1);
+		char32_t c = as_mutable()->read_char();
+		assert(c <= 0xFFFF);
+		return (char16_t)c;
+	}
+
+	template <class Ty> TFile &operator>>(Ty &v)
+	{
+		assert(fh.is_std_handle());
+		std::wcin >> v;
+		return *this;
+	}
+
+	void seek(Int64 offset, Int whence = 0) const
+	{
+		switch (whence) {
+		case SEEK_SET:
+			break;
+		case SEEK_CUR:
+			offset += tell();
+			break;
+		case SEEK_END:
+			offset += as_mutable()->get_file_size();
+			break;
+		default:
+			assert(false);
+		}
+		as_mutable()->seek(offset);
+	}
+};
+
+template <> class TFile<false> : public OFile
+{
+	OFile *as_mutable() const
+	{
+		return const_cast<OFile*>(static_cast<const OFile*>(this));
+	}
+
+public:
+	TFile() {}
+	TFile(StdHandleTag, decltype(detail::stdout_handle()) handle)
+	{
+		fh.assign_std_handle(handle);
+	}
+	TFile(TFile &&f) : OFile(std::forward<OFile>(f)) {}
+	TFile(const TFile &f)
+	{
+		fh.assign_std_handle(f.fh);
+	}
+
+	TFile(const String &name, const String &encoding = u"utf-8"_S, bool append = false) : OFile(name)
+	{
+		assert(!append);
+		assert(encoding == u"utf-8" || encoding == u"utf-8-sig");
+
+		if (encoding == u"utf-8-sig") {
 			unsigned char utf8bom[3] = {0xEF, 0xBB, 0xBF};
-			fwrite(utf8bom, 3, 1, file);
+			OFile::write(utf8bom, 3);
 		}
 	}
 
-	File &operator=(File &&f)
+	TFile &operator=(TFile &&f)
 	{
-		close();
-		file = f.file;
-		f.file = nullptr;
+		f.flush(); // `flush()` is needed for `V f = :stdout; f = File(‘...’, WRITE, encoding' ‘utf-8-sig’)`
+		OFile::operator=(std::forward<OFile>(f));
 		return *this;
 	}
 
 	void write(const String &s) const
 	{
-		std::string utf8;
-#ifdef _WIN32
-		utf8.resize(s.length() * 3);
-		utf8.resize(WideCharToMultiByte(CP_UTF8, 0, (LPCWCH)s.data(), (int)s.len(), const_cast<char*>(utf8.data()), (int)utf8.size(), NULL, NULL));
-#else
-		utf8 = convert_utf16_to_utf8(s);
-#endif
-		fwrite(utf8.data(), utf8.size(), 1, file);
+		as_mutable()->write(utf::as_str8(s));
 	}
 
 	void write_bytes(const Array<Byte> &bytes) const
 	{
-		fwrite(bytes.data(), bytes.size(), 1, file);
+		as_mutable()->write(bytes);
 	}
 
-	String read() const
+	void flush() const
 	{
-		if (file == stdin) {
-			String s;
-			while (!feof(stdin)) {
-				char buf[64*1024];
-				size_t n = fread(buf, 1, sizeof(buf), stdin);
-				assert(n > 0);
-				size_t oldsz = s.size();
-				s.resize(oldsz + n);
-				for (size_t i = 0; i < n; i++)
-					s[Int(oldsz + i)] = (char16_t)buf[i];
-			}
-			return s;
-		}
-
-		fseek(file, 0, SEEK_END);
-		size_t file_size = ftell(file);
-		fseek(file, 0, SEEK_SET);
-
-		std::string file_str;
-		unsigned char utf8bom[3] = {0xEF, 0xBB, 0xBF}, first3bytes[3] = {0};
-		size_t _ = fread(first3bytes, 3, 1, file); // `size_t _` to suppress GCC warning ‘ignoring return value of ‘size_t fread(void*, size_t, size_t, FILE*)’, declared with attribute warn_unused_result [-Wunused-result]’
-		if (memcmp(first3bytes, utf8bom, 3) == 0)
-			file_size -= 3;
-		else
-			fseek(file, 0, SEEK_SET);
-		file_str.resize(file_size);
-		_ = fread(file_str.data(), file_size, 1, file);
-
-		size_t cr_pos = file_str.find('\r');
-		if (cr_pos != std::string::npos) {
-			char *dest = file_str.data() + cr_pos;
-			const char *src = dest + 1, *end = file_str.data() + file_str.size();
-			while (src < end) {
-				if (*src == '\r') {
-					src++;
-					continue;
-				}
-				*dest = *src;
-				dest++;
-				src++;
-			}
-			file_str.resize(dest - file_str.data());
-		}
-
-		return convert_utf8_string_to_String(file_str);
+		as_mutable()->flush();
 	}
-
-	Array<String> read_lines(bool keep_newline = false)
-	{
-		Array<String> r = read().split(u"\n");
-		if (keep_newline) {
-			if (r[r.len()-1].empty()) {
-				r.resize(r.len()-1);
-				for (Int i=0, n=r.len(); i < n; i++)
-					r[i] &= u'\n'_C;
-			}
-			else
-				for (Int i=0, n=r.len()-1; i < n; i++)
-					r[i] &= u'\n'_C;
-		}
-		else
-			if (r[r.len()-1].empty())
-				r.resize(r.len()-1);
-		return r;
-	}
-
-	String read_line(bool keep_newline = false)
-	{
-		std::string line;
-
-		while (true) {
-			char buf[64*1024];
-			buf[0] = '\0';
-			char *s = fgets(buf, sizeof(buf), file);
-			if (buf[0] == '\0')
-				break;
-			assert(buf == s);
-			int len = (int)strlen(s);
-			int orig_len = len;
-			if (buf[len-1] == '\r')
-				len--;
-			else if (buf[len-1] == '\n' && len >= 2 && buf[len-2] == '\r') {
-				buf[len-2] = '\n';
-				len--;
-			}
-			if (!keep_newline && buf[len-1] == '\n')
-				len--;
-
-			if (check_bom) {
-				check_bom = false;
-				unsigned char utf8bom[3] = {0xEF, 0xBB, 0xBF};
-				if (memcmp(buf, utf8bom, 3) == 0)
-					s += 3, len -= 3;
-			}
-
-			line.append(s, len);
-
-			if (orig_len < sizeof(buf)-1 || buf[orig_len-1] == '\n')
-				break;
-		}
-
-		return convert_utf8_string_to_String(line);
-	}
-
-	Array<Byte> read_bytes()
-	{
-		fseek(file, 0, SEEK_END);
-		size_t file_size = ftell(file);
-		fseek(file, 0, SEEK_SET);
-
-		Array<Byte> file_bytes;
-		file_bytes.resize(file_size);
-		size_t _ = fread(file_bytes.data(), file_size, 1, file);
-		return file_bytes;
-	}
-
-	Array<Byte> read_bytes(size_t n)
-	{
-		Array<Byte> file_bytes;
-		file_bytes.resize(n);
-		size_t read = fread(file_bytes.data(), 1, n, file);
-		//assert(read == n);
-		file_bytes.resize(read);
-		return file_bytes;
-	}
-
-	Char read(int n)
-	{
-		assert(n == 1);
-		char c;
-		size_t _ = fread(&c, 1, 1, file);
-		return (char16_t)c;
-	}
-
-	template <class Ty> File &operator>>(Ty &v)
-	{
-		assert(file == stdin);
-		std::wcin >> v;
-		return *this;
-	}
-
-	void seek(Int offset, Int whence = 0)
-	{
-		fseek(file, (long)offset, (int)whence);
-	}
-
-	void flush()
-	{
-		fflush(file);
-	}
-
-	void close()
-	{
-		if (file && file != stdin && file != stdout && file != stderr)
-			fclose(file);
-		file = nullptr;
-	}
-
-	~File() {close();}
 };
 
-File _stdin(stdin), _stdout(stdout), _stderr(stderr);
+typedef TFile<true> File;
+typedef TFile<false> FileWr;
+
+File _stdin(StdHandleTag(), detail::stdin_handle());
+FileWr _stdout(StdHandleTag(), detail::stdout_handle());
+//FileWr _stderr(StdHandleTag(), detail::stderr_handle());

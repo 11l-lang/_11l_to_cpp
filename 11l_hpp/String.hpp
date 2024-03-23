@@ -14,6 +14,8 @@ public:
 		setlocale(LC_CTYPE, ""); // for correct work of `towlower()` and `iswlower()` [example: `print('Ф'.lower() == 'ф')`]
 #ifdef _WIN32
 		_setmode(_fileno(stdout), _O_U8TEXT); // [https://stackoverflow.com/questions/2492077/output-unicode-strings-in-windows-console-app <- google:‘wcout cyrillic msvc widechartomultibyte’]
+#else
+		std::locale::global(std::locale("")); // for std::wcout [https://stackoverflow.com/questions/18675720/cout-привет-or-wcout-lпривет <- google:‘linux wcout’]
 #endif
 	}
 } locale_initializer;

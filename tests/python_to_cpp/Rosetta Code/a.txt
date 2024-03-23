@@ -378,7 +378,7 @@ template <typename T1, typename T2> auto shortest_abbreviation_length(const T1 &
 
 template <typename T1, typename T2> auto automatic_abbreviations(const T1 &filename, const T2 &words_per_line)
 {
-    for (auto &&line : File(filename, u"r"_S, u"utf-8"_S).read().split(u"\n"_S))
+    for (auto &&line : File(filename, u"utf-8"_S).read().split(u"\n"_S))
         if (line.len() > 0) {
             auto length = shortest_abbreviation_length(line, words_per_line);
             print(u"#2 #."_S.format(length, line));
@@ -861,7 +861,7 @@ grid[32][32] = 64 * 64
 
 simulate(&grid)
 
-V ppm = File(‘sand_pile.ppm’, ‘w’)
+V ppm = File(‘sand_pile.ppm’, WRITE)
 ppm.write_bytes(("P6\n#. #.\n255\n".format(grid.len, grid.len)).encode())
 V colors = [[Byte(0), 0, 0], [Byte(255), 0, 0], [Byte(0), 255, 0], [Byte(0), 0, 255]]
 L(row) grid
@@ -930,7 +930,7 @@ struct CodeBlock2
     }
 } code_block_2;
 
-auto ppm = File(u"sand_pile.ppm"_S, u"w"_S);
+auto ppm = FileWr(u"sand_pile.ppm"_S);
 
 struct CodeBlock3
 {

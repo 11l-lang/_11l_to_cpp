@@ -296,7 +296,7 @@ F renderPixel(=x, =y)
 
 :start:
 print(‘Rendering: ’scene_namefile)
-V fileout = File(scene_namefile‘.ppm’, ‘w’)
+V fileout = File(scene_namefile‘.ppm’, WRITE)
 fileout.write("P3\n")
 fileout.write(String(scene.imgAncho)‘ ’String(scene.endline - scene.startline + 1)"\n")
 fileout.write("255\n")

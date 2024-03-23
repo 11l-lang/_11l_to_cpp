@@ -9,7 +9,7 @@ int MAIN_WITH_ARGV()
     auto file_name = _get<1>(::argv);
     file_name = _get<0>(file_name.split(u"."_S));
 
-    auto bmp = File(file_name & u".bmp"_S, u"r"_S);
+    auto bmp = File(file_name & u".bmp"_S);
 
     bmp.seek(10, 0);
     auto offset = to_int(int_t_from_bytes<UInt32>(bmp.read_bytes(4)));
@@ -64,7 +64,7 @@ int MAIN_WITH_ARGV()
 
     n5110_array.reverse();
 
-    auto text_file = File(file_name & u".txt"_S, u"w"_S);
+    auto text_file = FileWr(file_name & u".txt"_S);
     text_file.write(u"static unsigned short "_S & file_name & u"_rows = "_S & String(n5110_array.len()) & u";\n"_S);
     text_file.write(u"static unsigned short "_S & file_name & u"_cols = "_S & String(_get<0>(n5110_array).len()) & u";\n"_S);
     text_file.write(u"static unsigned char "_S & file_name & u"[] =\n"_S);

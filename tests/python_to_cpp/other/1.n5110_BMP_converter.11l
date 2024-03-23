@@ -2,7 +2,7 @@
 V file_name = :argv[1]
 file_name = file_name.split(‘.’)[0]
 
-V bmp = File(file_name‘.bmp’, ‘r’)
+V bmp = File(file_name‘.bmp’)
 
 bmp.seek(10, 0)
 V offset = Int(UInt32(bytes' bmp.read_bytes(4)))
@@ -53,7 +53,7 @@ L(line) (0 .< bmp_h).step(8)
 
 n5110_array.reverse()
 
-V text_file = File(file_name‘.txt’, ‘w’)
+V text_file = File(file_name‘.txt’, WRITE)
 text_file.write(‘static unsigned short ’file_name‘_rows = ’String(n5110_array.len)";\n")
 text_file.write(‘static unsigned short ’file_name‘_cols = ’String(n5110_array[0].len)";\n")
 text_file.write(‘static unsigned char ’file_name"[] =\n")

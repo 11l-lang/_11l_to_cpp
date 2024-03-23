@@ -81,7 +81,7 @@ public:
     {
         if (filename == u"")
             filename = input(u"filename: "_S);
-        auto f = File(filename, u"r"_S);
+        auto f = File(filename);
         auto lines = f.read_lines(true);
         for (int row = 0; row < 9; row++)
             for (auto digit : range_ee(1, 9)) {

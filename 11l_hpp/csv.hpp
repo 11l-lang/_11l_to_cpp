@@ -54,14 +54,15 @@ class Reader
 		row_data.clear();
 		delim_positions.clear();
 
-		for (int c; (c = fgetc(file.file)) != EOF;) {
+		while (!file.at_eof()) {
+			char c = (char)file.read_byte();
 			if (c == '"') {
 				while (true) {
-					c = fgetc(file.file);
-					if (c == EOF)
+					if (file.at_eof())
 						throw Error();
+					c = (char)file.read_byte();
 					if (c == '"') {
-						c = fgetc(file.file);
+						c = (char)file.read_byte();
 						if (c != '"')
 							break;
 					}
@@ -120,7 +121,7 @@ public: // for `col.reader->get_column_cstr()`
 	}
 
 public:
-	Reader(const String &file_name, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S, Array<String> *header = nullptr, bool skip_first_row = true) : file(file_name, u"r", encoding), delimiter(delimiter)
+	Reader(const String &file_name, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S, Array<String> *header = nullptr, bool skip_first_row = true) : file(file_name, encoding), delimiter(delimiter)
 	{
 		init(header, skip_first_row);
 	}
@@ -161,16 +162,16 @@ Reader read(File &&file, const String &encoding = u"utf-8"_S, const String &deli
 
 class Writer
 {
-	File file;
+	FileWr file;
 	Char delimiter;
 
 public:
-	Writer(File &&file, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S) : file(std::move(file)), delimiter(delimiter)
+	Writer(FileWr &&file, const String &encoding = u"utf-8"_S, const String &delimiter = u","_S) : file(std::move(file)), delimiter(delimiter)
 	{
 		assert(unsigned(this->delimiter.code) < 128);
 	}
 	Writer(const String &file_name, const String &encoding = u"utf-8"_S,
-		                            const String &delimiter = u","_S) : Writer(File(file_name, u"w", encoding), delimiter) {}
+		                            const String &delimiter = u","_S) : Writer(FileWr(file_name, encoding), delimiter) {}
 
 	template <class ElemTy> void write_row(const Array<ElemTy> &arr)
 	{

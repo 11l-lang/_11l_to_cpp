@@ -659,7 +659,7 @@ T Config
       R N
 
    F store()
-      V f = File(.path, ‘w’)
+      V f = File(.path, WRITE)
       L(e) .entries
          I e.etype == EMPTY
             f.write("\n")
@@ -776,7 +776,7 @@ public:
 
     auto store()
     {
-        auto f = File(path, u"w"_S);
+        auto f = FileWr(path);
         for (auto &&e : entries)
             if (e.etype == TYPE_RM_REF(e.etype)::EMPTY)
                 f.write(u"\n"_S);

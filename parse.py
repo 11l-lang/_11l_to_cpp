@@ -729,6 +729,20 @@ class SymbolNode:
                     if self.children[2].token_str() not in {'GRAY', 'BLUE', 'GREEN', 'CYAN', 'RED', 'MAGENTA', 'YELLOW', 'RESET'}:
                         raise Error('wrong color', self.children[2].left_to_right_token())
                     return func_name + '(term::Color::' + self.children[2].token_str() + ')'
+                elif func_name == 'File' and len(self.children) >= 5 and self.children[3] is None:
+                    if self.children[4].token_str() not in {'WRITE', 'APPEND'}:
+                        raise Error('wrong file open mode', self.children[4].left_to_right_token())
+                    args = self.children[2].to_str()
+                    if len(self.children) > 5:
+                        if len(self.children) != 7 or not (self.children[5] is not None and self.children[5].token_str() == "encoding'"):
+                            raise Error('wrong arguments', self.left_to_right_token())
+                        args += ', ' + self.children[6].to_str()
+                        if self.children[4].token_str() == 'APPEND':
+                            args += ', true'
+                    else:
+                        if self.children[4].token_str() == 'APPEND':
+                            args += ', u"utf-8"_S, true'
+                    return 'FileWr(' + args + ')'
                 elif self.children[0].symbol.id == '[': # ]
                     pass
                 elif self.children[0].function_call: # for `enumFromTo(0)(1000)`
@@ -3838,8 +3852,9 @@ char_scope.add_name('is_surrogate', ASTFunctionDefinition([]))
 builtins_scope.ids['Char'].ast_nodes[0].scope = char_scope
 builtins_scope.ids['Char'].ast_nodes[0].constructors[0].first_named_only_argument = 0
 
-builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('mode', token_to_str('‘r’'), 'String'), ('encoding', token_to_str('‘utf-8’'), 'String')])]))
+builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('encoding', token_to_str('‘utf-8’'), 'String')])]))
 file_scope = Scope(None)
+file_scope.add_name('at_eof', ASTFunctionDefinition([]))
 file_scope.add_name('read_bytes', ASTFunctionDefinition([('size', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
 file_scope.add_name('write_bytes', ASTFunctionDefinition([('bytes', '', '[Byte]')]))
 file_scope.add_name('read', ASTFunctionDefinition([('size', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))

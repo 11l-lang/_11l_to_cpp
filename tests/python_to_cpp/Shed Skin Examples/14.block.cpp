@@ -439,15 +439,15 @@ template <typename T1, typename T2> auto uncompress_it(const T1 &inputfile, cons
 auto hardertest()
 {
     print(u"Reading the BentCoinFile"_S);
-    auto inputfile = File(u"testdata/BentCoinFile"_S, u"r"_S);
-    auto outputfile = File(u"tmp.zip"_S, u"w"_S);
+    auto inputfile = File(u"testdata/BentCoinFile"_S);
+    auto outputfile = FileWr(u"tmp.zip"_S);
     print(u"Compressing to tmp.zip"_S);
     compress_it(inputfile, outputfile);
     outputfile.close();
     inputfile.close();
 
-    inputfile = File(u"tmp.zip"_S, u"r"_S);
-    outputfile = File(u"tmp2"_S, u"w"_S);
+    inputfile = File(u"tmp.zip"_S);
+    outputfile = FileWr(u"tmp2"_S);
     print(u"Uncompressing to tmp2"_S);
     uncompress_it(inputfile, outputfile);
     outputfile.close();

@@ -2699,7 +2699,7 @@ bitmap.fillrect(1, 0, 1, 2, white)
 bitmap.set(3, 3, Colour(127, 0, 63))
 print(bitmap.writeppmp3())
 
-File(‘tmp.ppm’, ‘w’).write_bytes(bitmap.writeppmp6())
+File(‘tmp.ppm’, WRITE).write_bytes(bitmap.writeppmp6())
 ===
 class Colour
 {
@@ -2800,7 +2800,7 @@ struct CodeBlock1
         bitmap.set(3, 3, Colour(127, 0, 63));
         print(bitmap.writeppmp3());
 
-        File(u"tmp.ppm"_S, u"w"_S).write_bytes(bitmap.writeppmp6());
+        FileWr(u"tmp.ppm"_S).write_bytes(bitmap.writeppmp6());
     }
 } code_block_1;
 

@@ -1285,7 +1285,7 @@ T NBody
    [Vector] accelerations
 
    F (fileName)
-      V lines = File(fileName, ‘r’).read().split("\n")
+      V lines = File(fileName).read().split("\n")
       V gbt = lines[0].split(‘ ’)
       .gc = Float(gbt[0])
       .bodies = Int(gbt[1])
@@ -1426,7 +1426,7 @@ public:
 
     template <typename T1> NBody(const T1 &fileName)
     {
-        auto lines = File(fileName, u"r"_S).read().split(u"\n"_S);
+        auto lines = File(fileName).read().split(u"\n"_S);
         auto gbt = _get<0>(lines).split(u" "_S);
         gc = to_float(_get<0>(gbt));
         bodies = to_int(_get<1>(gbt));

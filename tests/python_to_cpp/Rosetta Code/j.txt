@@ -327,7 +327,7 @@ F getUserInput()
    R chunks(ha, 4).map(chunk -> UserInput(chunk))
 
 F decode(filename, uiList)
-   V f = File(filename, ‘r’)
+   V f = File(filename)
    V text = f.read()
 
    F decode2(ui)
@@ -404,7 +404,7 @@ auto getUserInput()
 
 template <typename T1, typename T2> auto decode(const T1 &filename, const T2 &uiList)
 {
-    auto f = File(filename, u"r"_S);
+    auto f = File(filename);
     auto text = f.read();
 
     auto decode2 = [&text](const auto &ui)

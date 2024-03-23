@@ -548,7 +548,7 @@ public:
         if (!overwrite && fs::is_file(sfzfilename))
             throw RuntimeError(u"file #. already exists; will not overwrite!"_S.format(sfzfilename));
 
-        auto sfzfile = File(sfzfilename, u"w"_S);
+        auto sfzfile = FileWr(sfzfilename);
 
         sfzfile.write(u"// this file was generated from #. using vonred's #.. Trickster goddess incoming.\n\n"_S.format(fs::path::base_name(exsfile_name), fs::path::base_name(u"1.exs2sfz.py"_S)));
 

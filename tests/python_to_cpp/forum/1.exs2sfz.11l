@@ -382,7 +382,7 @@ T EXSInstrument
       I !overwrite & fs:is_file(sfzfilename)
          X RuntimeError(‘file #. already exists; will not overwrite!’.format(sfzfilename))
 
-      V sfzfile = File(sfzfilename, ‘w’)
+      V sfzfile = File(sfzfilename, WRITE)
 
       sfzfile.write("// this file was generated from #. using vonred's #.. Trickster goddess incoming.\n\n".format(fs:path:base_name(.exsfile_name), fs:path:base_name(‘1.exs2sfz.py’)))
 

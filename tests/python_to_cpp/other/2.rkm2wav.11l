@@ -36,8 +36,8 @@ I :argv.len < 2 | ‘-h’ C :argv | ‘--help’ C :argv
    print(‘usage: 2.rkm2wav INPUT_FILE’)
    exit(1)
 
-V fin = File(:argv[1], ‘r’)
-V fout = File(fs:path:split_ext(:argv[1])[0]‘.wav’, ‘w’)
+V fin = File(:argv[1])
+V fout = File(fs:path:split_ext(:argv[1])[0]‘.wav’, WRITE)
 V addr_start = Int(bytes_be' fin.read_bytes(2))
 V addr_end = Int(bytes_be' fin.read_bytes(2))
 V data_length = addr_end - addr_start + 1

@@ -18,7 +18,7 @@ T PPM
       .rgb = rgb
 
    F save(filename)
-      V f = File(filename, ‘w’)
+      V f = File(filename, WRITE)
       f.write("P3\n")
       f.write(String(.w)‘ ’String(.h)"\n")
       f.write("255\n")

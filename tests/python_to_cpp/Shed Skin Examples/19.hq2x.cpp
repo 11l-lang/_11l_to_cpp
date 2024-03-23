@@ -25,7 +25,7 @@ public:
 
     template <typename T1> auto save(const T1 &filename)
     {
-        auto f = File(filename, u"w"_S);
+        auto f = FileWr(filename);
         f.write(u"P3\n"_S);
         f.write(String(w) & u" "_S & String(h) & u"\n"_S);
         f.write(u"255\n"_S);

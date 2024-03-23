@@ -2895,7 +2895,7 @@ struct CodeBlock1
 :start:
 V l = File(:argv[1]).read_lines()
 l.del(Int(:argv[2]) - 1 .+ Int(:argv[3]))
-File(:argv[1], ‘w’).write(l.join("\n"))
+File(:argv[1], WRITE).write(l.join("\n"))
 ===
 Array<String> argv;
 
@@ -2905,7 +2905,7 @@ int MAIN_WITH_ARGV()
 
     auto l = File(_get<1>(::argv)).read_lines();
     l.del(range_ep(to_int(_get<2>(::argv)) - 1, to_int(_get<3>(::argv))));
-    File(_get<1>(::argv), u"w"_S).write(l.join(u"\n"_S));
+    FileWr(_get<1>(::argv)).write(l.join(u"\n"_S));
 }
 
 
@@ -3302,7 +3302,7 @@ struct CodeBlock3
 I :argv.len == 1
    print(File(‘notes.txt’).read(), end' ‘’)
 E
-   V f = File(‘notes.txt’, ‘a’)
+   V f = File(‘notes.txt’, APPEND)
    f.write(Time().format("YYYY-MM-DD hh:mm:ss\n"))
    f.write("\t"(:argv[1..].join(‘ ’))"\n")
 ===
@@ -3315,7 +3315,7 @@ int MAIN_WITH_ARGV()
     if (::argv.len() == 1)
         print(File(u"notes.txt"_S).read(), u""_S);
     else {
-        auto f = File(u"notes.txt"_S, u"a"_S);
+        auto f = FileWr(u"notes.txt"_S, u"utf-8"_S, true);
         f.write(Time().format(u"YYYY-MM-DD hh:mm:ss\n"_S));
         f.write(u"\t"_S & (::argv[range_ei(1)].join(u" "_S)) & u"\n"_S);
     }
