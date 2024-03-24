@@ -19408,7 +19408,7 @@ while True:
 print(''.join(charsa))
 ===
 T BitWriter
-   FileWr out
+   File[WRITE] out
    accumulator = 0
    bcount = 0
 

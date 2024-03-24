@@ -1528,10 +1528,12 @@ class ASTVariableDeclaration(ASTNode):
         if self.is_static:
             static_decl = 'static inline ' if type(self.parent) == ASTTypeDefinition else 'static '
         if self.type == 'Array' and self.type_args == ['Bool']:
-            return self.pre_nl + ' ' * (indent*4) + 'const '*self.is_const + static_decl + 'Array<char>' \
-                               + ' ' + '*'*self.is_reference + 's_'*self.is_static + ', '.join(self.vars) + ";\n"
-        return self.pre_nl + ' ' * (indent*4) + 'const '*self.is_const + static_decl + self.trans_type(self.type, self.is_reference) \
-                           + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '') \
+            type_name = 'Array<char>'
+        elif self.type == 'File' and self.type_args == ['WRITE']:
+            type_name = 'FileWr'
+        else:
+            type_name = self.trans_type(self.type, self.is_reference) + ('<' + ', '.join(self.trans_type(ty) for ty in self.type_args) + '>' if len(self.type_args) else '')
+        return self.pre_nl + ' ' * (indent*4) + 'const '*self.is_const + static_decl + type_name \
                            + ' ' + '*'*self.is_reference + 's_'*self.is_static + ', '.join(self.vars) + ";\n"
 
 class ASTVariableInitialization(ASTVariableDeclaration, ASTNodeWithExpression):
