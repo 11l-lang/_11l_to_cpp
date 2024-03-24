@@ -63,11 +63,11 @@ int MAIN_WITH_ARGV()
 
     auto fin = File(_get<1>(::argv));
     auto fout = FileWr(_get<0>(fs::path::split_ext(_get<1>(::argv))) & u".wav"_S);
-    auto addr_start = int_from_bytes_be(fin.read_bytes(2));
-    auto addr_end = int_from_bytes_be(fin.read_bytes(2));
+    auto addr_start = int_from_bytes_be(fin.read_bytes_at_most(2));
+    auto addr_end = int_from_bytes_be(fin.read_bytes_at_most(2));
     auto data_length = addr_end - addr_start + 1;
     fin.seek(4 + data_length);
-    auto checksum = int_from_bytes_be(fin.read_bytes(2));
+    auto checksum = int_from_bytes_be(fin.read_bytes_at_most(2));
     fin.seek(4);
 
     debug(u"start address: 0x#04"_S.format(hex(addr_start)));
@@ -89,7 +89,7 @@ int MAIN_WITH_ARGV()
         file_size += wav_write_byte(fout, (addr_end >> (1 - i) * 8) & 0xFF);
 
     for (auto i : range_el(0, data_length)) {
-        auto b = int_from_bytes_be(fin.read_bytes(1));
+        auto b = int_from_bytes_be(fin.read_bytes_at_most(1));
         file_size += wav_write_byte(fout, b);
     }
 

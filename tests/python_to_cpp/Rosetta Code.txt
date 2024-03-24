@@ -19447,7 +19447,7 @@ T BitReader
 
    F _readbit()
       I .bcount == 0
-         V a = .input.read_bytes_at_most(1)
+         V a = .input.read_bytes(at_most' 1)
          I !a.empty
             .accumulator = a[0]
          .bcount = 8

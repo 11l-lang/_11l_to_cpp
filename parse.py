@@ -625,6 +625,8 @@ class SymbolNode:
                         f_node = type_of(self.children[0])
                         if f_node is None: # assume this is String method
                             f_node = builtins_scope.find('String').ast_nodes[0].scope.ids.get('split').ast_nodes[0]
+                    elif func_name.endswith('.read_bytes') and len(self.children) == 3 and self.children[1] is not None and self.children[1].token_str() == "at_most'":
+                        return func_name + '_at_most(' + self.children[2].to_str() + ')'
                     elif func_name.endswith('.sort_range'):
                         f_node = type_of(self.children[0])
                         if f_node is None: # assume this is Array method
@@ -3856,7 +3858,6 @@ builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name
 file_scope = Scope(None)
 file_scope.add_name('at_eof', ASTFunctionDefinition([]))
 file_scope.add_name('read_bytes', ASTFunctionDefinition([('size', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
-file_scope.add_name('read_bytes_at_most', ASTFunctionDefinition([('size', '', 'Int')]))
 file_scope.add_name('write_bytes', ASTFunctionDefinition([('bytes', '', '[Byte]')]))
 file_scope.add_name('read', ASTFunctionDefinition([('size', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
 file_scope.add_name('write', ASTFunctionDefinition([('s', '', 'String')]))
