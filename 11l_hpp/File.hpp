@@ -307,4 +307,4 @@ typedef TFile<false> FileWr;
 
 File _stdin(StdHandleTag(), detail::stdin_handle());
 FileWr _stdout(StdHandleTag(), detail::stdout_handle());
-//FileWr _stderr(StdHandleTag(), detail::stderr_handle());
+FileWr _stderr(StdHandleTag(), detail::stderr_handle());

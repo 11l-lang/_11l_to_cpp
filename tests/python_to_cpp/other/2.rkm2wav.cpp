@@ -36,7 +36,7 @@ template <typename T1> auto fir_low_pass_filter(const T1 &arr)
     return filtered;
 }
 
-template <typename T2> auto wav_write_byte(const File &f, const T2 &b)
+template <bool reading, typename T2> auto wav_write_byte(const TFile<reading> &f, const T2 &b)
 {
     for (auto i : range_ee(0, 7)) {
         auto data = (b >> (7 - i)) & 1 ? ::BIT_ONE_WAVE : ::BIT_ZERO_WAVE;

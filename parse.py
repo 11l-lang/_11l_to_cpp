@@ -1710,11 +1710,21 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                         + arg[3] # add `&` if needed
                         + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
                 elif arg[2].endswith('?'):
-                    arguments.append(trans_type(arg[2].rstrip('?'), self.scope, tokens[self.tokeni]) + '* '
+                    ty = trans_type(arg[2].rstrip('?'), self.scope, tokens[self.tokeni])
+                    if ty == 'File':
+                        if arg[1] == 'nullptr': # dirty hack for pqmarkup.py [to fix error C2672 in `outfile.write(to_html(instr[range_el(i + 2, endqpos)], nullptr, i + 2));`] as I dislike `TextOutput = TextIO` or `from _11l import *` inside pqmarkup.py
+                            ty = 'FileWr'
+                        else:
+                            templates.append('bool reading = false')
+                            ty = 'TFile<reading>'
+                    arguments.append(ty + '* '
                             + ('' if '=' in arg[3] else 'const ')
                             + arg[0] + ('' if arg[1] == '' or index < self.last_non_default_argument else ' = ' + arg[1]))
                 else:
                     ty = trans_type(arg[2], self.scope, tokens[self.tokeni])
+                    if ty == 'File':
+                        templates.append('bool reading')
+                        ty = 'TFile<reading>'
                     make_ref = arg[3] == '&'
                     arguments.append(
                         (('' if arg[3] == '=' else 'const ') + ty + ' ' + '&'*(arg[2] not in ('Int', 'Float') and arg[3] != '=') if arg[3] != '&' else ty + ' &')

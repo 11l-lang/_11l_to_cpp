@@ -384,7 +384,7 @@ for root, dirs, files in os.walk('.'):
 # [кроме того случая, когда человек, которому поручили это, уже имеет соответствующий опыт].
 def check_file(fname):
     try:
-        pqmarkup.to_html(open(fname, encoding='utf8').read(), ohd = True)
+        pqmarkup.to_html(open(fname, encoding='utf-8').read(), ohd = True)
     except pqmarkup.Exception as e:
         print(e.message + " at file '" + fname + "', line " + str(e.line) + ", column " + str(e.column))
         sys.exit(1)
@@ -730,7 +730,7 @@ L(_fname) fs:walk_dir(‘.’, dir_filter' d -> d[0] != ‘.’, files_only' 0B)
 
 F check_file(fname)
    X.try
-      pqmarkup:to_html(File(fname, encoding' ‘utf8’).read(), ohd' 1B)
+      pqmarkup:to_html(File(fname, encoding' ‘utf-8’).read(), ohd' 1B)
    X.catch pqmarkup:Exception e
       print(e.message‘ at file '’fname‘', line ’String(e.line)‘, column ’String(e.column))
       exit(1)
@@ -1112,7 +1112,7 @@ template <typename T1> auto check_file(const T1 &fname)
 {
     try
     {
-        pqmarkup::to_html(File(fname, u"utf8"_S).read(), nullptr, true);
+        pqmarkup::to_html(File(fname, u"utf-8"_S).read(), nullptr, true);
     }
     catch (const pqmarkup::Exception& e)
     {
