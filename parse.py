@@ -3856,6 +3856,7 @@ builtins_scope.add_name('File', ASTTypeDefinition([ASTFunctionDefinition([('name
 file_scope = Scope(None)
 file_scope.add_name('at_eof', ASTFunctionDefinition([]))
 file_scope.add_name('read_bytes', ASTFunctionDefinition([('size', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
+file_scope.add_name('read_bytes_at_most', ASTFunctionDefinition([('size', '', 'Int')]))
 file_scope.add_name('write_bytes', ASTFunctionDefinition([('bytes', '', '[Byte]')]))
 file_scope.add_name('read', ASTFunctionDefinition([('size', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
 file_scope.add_name('write', ASTFunctionDefinition([('s', '', 'String')]))
@@ -3865,6 +3866,14 @@ file_scope.add_name('seek', ASTFunctionDefinition([('offset', '', 'Int'), ('when
 file_scope.add_name('flush', ASTFunctionDefinition([]))
 file_scope.add_name('close', ASTFunctionDefinition([]))
 builtins_scope.ids['File'].ast_nodes[0].scope = file_scope
+
+builtins_scope.add_name('FileWr', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('encoding', token_to_str('‘utf-8’'), 'String'), ('append', token_to_str('0B', Token.Category.CONSTANT), 'Bool')])]))
+file_scope = Scope(None)
+file_scope.add_name('write_bytes', ASTFunctionDefinition([('bytes', '', '[Byte]')]))
+file_scope.add_name('write', ASTFunctionDefinition([('s', '', 'String')]))
+file_scope.add_name('flush', ASTFunctionDefinition([]))
+file_scope.add_name('close', ASTFunctionDefinition([]))
+builtins_scope.ids['FileWr'].ast_nodes[0].scope = file_scope
 
 for type_ in cpp_type_from_11l:
     builtins_scope.add_name(type_, ASTTypeDefinition([ASTFunctionDefinition([('object', token_to_str('‘’'), '')])]))

@@ -3004,57 +3004,57 @@ print('Number of Colours: %s' % struct.unpack('I', bmp.read(4))[0])
 print('Important Colours: %s' % struct.unpack('I', bmp.read(4))[0])
 ===
 V bmp = File(‘1.bmp’)
-V t = bmp.read_bytes(2)
+V t = bmp.read_bytes_at_most(2)
 print(‘Type: ’(Char(code' t[0])‘’Char(code' t[1])))
-print(‘Size: #.’.format(Int(UInt32(bytes' bmp.read_bytes(4)))))
+print(‘Size: #.’.format(Int(UInt32(bytes' bmp.read_bytes_at_most(4)))))
 print(‘Size: #.’.format(Int(UInt32(bytes' File(‘1.bmp’).read_bytes()[2 .+ 4]))))
 print(‘Size BE: #.’.format(Int(UInt32(bytes_be' File(‘1.bmp’).read_bytes()[2 .+ 4]))))
-print(‘Reserved 1: #.’.format(Int(UInt16(bytes' bmp.read_bytes(2)))))
-print(‘Reserved 2: #.’.format(Int(UInt16(bytes' bmp.read_bytes(2)))))
-print(‘Offset: #.’.format(Int(UInt32(bytes' bmp.read_bytes(4)))))
+print(‘Reserved 1: #.’.format(Int(UInt16(bytes' bmp.read_bytes_at_most(2)))))
+print(‘Reserved 2: #.’.format(Int(UInt16(bytes' bmp.read_bytes_at_most(2)))))
+print(‘Offset: #.’.format(Int(UInt32(bytes' bmp.read_bytes_at_most(4)))))
 
-print(‘DIB Header Size: #.’.format(Int(UInt32(bytes' bmp.read_bytes(4)))))
-print(‘Width: #.’.format(Int(UInt32(bytes' bmp.read_bytes(4)))))
-print(‘Height: #.’.format(Int(UInt32(bytes' bmp.read_bytes(4)))))
-print(‘Colour Planes: #.’.format(Int(UInt16(bytes' bmp.read_bytes(2)))))
-t = bmp.read_bytes(2)
+print(‘DIB Header Size: #.’.format(Int(UInt32(bytes' bmp.read_bytes_at_most(4)))))
+print(‘Width: #.’.format(Int(UInt32(bytes' bmp.read_bytes_at_most(4)))))
+print(‘Height: #.’.format(Int(UInt32(bytes' bmp.read_bytes_at_most(4)))))
+print(‘Colour Planes: #.’.format(Int(UInt16(bytes' bmp.read_bytes_at_most(2)))))
+t = bmp.read_bytes_at_most(2)
 print(‘Bits per Pixel: #.’.format(Int(UInt16(bytes' t))))
 print(‘Bits per Pixel BE: #.’.format(Int(UInt16(bytes_be' t))))
-print(‘Compression Method: #.’.format(Int(UInt32(bytes' bmp.read_bytes(4)))))
-print(‘Raw Image Size: #.’.format(Int(UInt32(bytes' bmp.read_bytes(4)))))
-print(‘Horizontal Resolution: #.’.format(Int(UInt32(bytes' bmp.read_bytes(4)))))
-print(‘Vertical Resolution: #.’.format(Int(UInt32(bytes' bmp.read_bytes(4)))))
-print(‘Number of Colours: #.’.format(Int(UInt32(bytes' bmp.read_bytes(4)))))
-print(‘Important Colours: #.’.format(Int(UInt32(bytes' bmp.read_bytes(4)))))
+print(‘Compression Method: #.’.format(Int(UInt32(bytes' bmp.read_bytes_at_most(4)))))
+print(‘Raw Image Size: #.’.format(Int(UInt32(bytes' bmp.read_bytes_at_most(4)))))
+print(‘Horizontal Resolution: #.’.format(Int(UInt32(bytes' bmp.read_bytes_at_most(4)))))
+print(‘Vertical Resolution: #.’.format(Int(UInt32(bytes' bmp.read_bytes_at_most(4)))))
+print(‘Number of Colours: #.’.format(Int(UInt32(bytes' bmp.read_bytes_at_most(4)))))
+print(‘Important Colours: #.’.format(Int(UInt32(bytes' bmp.read_bytes_at_most(4)))))
 ===
 auto bmp = File(u"1.bmp"_S);
-auto t = bmp.read_bytes(2);
+auto t = bmp.read_bytes_at_most(2);
 
 struct CodeBlock1
 {
     CodeBlock1()
     {
         print(u"Type: "_S & (Char(_get<0>(t)) & Char(_get<1>(t))));
-        print(u"Size: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes(4)))));
+        print(u"Size: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes_at_most(4)))));
         print(u"Size: #."_S.format(to_int(int_t_from_bytes<UInt32>(File(u"1.bmp"_S).read_bytes(), range_ep(2, 4)))));
         print(u"Size BE: #."_S.format(to_int(int_t_from_bytes_be<UInt32>(File(u"1.bmp"_S).read_bytes(), range_ep(2, 4)))));
-        print(u"Reserved 1: #."_S.format(to_int(int_t_from_bytes<UInt16>(bmp.read_bytes(2)))));
-        print(u"Reserved 2: #."_S.format(to_int(int_t_from_bytes<UInt16>(bmp.read_bytes(2)))));
-        print(u"Offset: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes(4)))));
+        print(u"Reserved 1: #."_S.format(to_int(int_t_from_bytes<UInt16>(bmp.read_bytes_at_most(2)))));
+        print(u"Reserved 2: #."_S.format(to_int(int_t_from_bytes<UInt16>(bmp.read_bytes_at_most(2)))));
+        print(u"Offset: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes_at_most(4)))));
 
-        print(u"DIB Header Size: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes(4)))));
-        print(u"Width: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes(4)))));
-        print(u"Height: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes(4)))));
-        print(u"Colour Planes: #."_S.format(to_int(int_t_from_bytes<UInt16>(bmp.read_bytes(2)))));
-        t = bmp.read_bytes(2);
+        print(u"DIB Header Size: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes_at_most(4)))));
+        print(u"Width: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes_at_most(4)))));
+        print(u"Height: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes_at_most(4)))));
+        print(u"Colour Planes: #."_S.format(to_int(int_t_from_bytes<UInt16>(bmp.read_bytes_at_most(2)))));
+        t = bmp.read_bytes_at_most(2);
         print(u"Bits per Pixel: #."_S.format(to_int(int_t_from_bytes<UInt16>(t))));
         print(u"Bits per Pixel BE: #."_S.format(to_int(int_t_from_bytes_be<UInt16>(t))));
-        print(u"Compression Method: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes(4)))));
-        print(u"Raw Image Size: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes(4)))));
-        print(u"Horizontal Resolution: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes(4)))));
-        print(u"Vertical Resolution: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes(4)))));
-        print(u"Number of Colours: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes(4)))));
-        print(u"Important Colours: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes(4)))));
+        print(u"Compression Method: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes_at_most(4)))));
+        print(u"Raw Image Size: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes_at_most(4)))));
+        print(u"Horizontal Resolution: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes_at_most(4)))));
+        print(u"Vertical Resolution: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes_at_most(4)))));
+        print(u"Number of Colours: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes_at_most(4)))));
+        print(u"Important Colours: #."_S.format(to_int(int_t_from_bytes<UInt32>(bmp.read_bytes_at_most(4)))));
     }
 } code_block_1;
 
@@ -5150,7 +5150,7 @@ V af2 = File(‘ap2.txt’, APPEND, encoding' ‘utf-8-sig’)
 V afb = File(‘apb.txt’, APPEND)
 print(f1.read())
 print(f2.read())
-print(fb.read_bytes(2))
+print(fb.read_bytes_at_most(2))
 of1.write(‘a’)
 of2.write(‘a’)
 ofb.write_bytes(Bytes(‘aa’))
@@ -5182,7 +5182,7 @@ struct CodeBlock2
     {
         print(f1.read());
         print(f2.read());
-        print(fb.read_bytes(2));
+        print(fb.read_bytes_at_most(2));
         of1.write(u"a"_S);
         of2.write(u"a"_S);
         ofb.write_bytes("aa"_B);

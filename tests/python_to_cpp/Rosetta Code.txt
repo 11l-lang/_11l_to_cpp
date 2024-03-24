@@ -19334,12 +19334,10 @@ struct CodeBlock1
 
 
 # https://www.rosettacode.org/wiki/Bitwise_IO#Python
-from typing import BinaryIO, List
-Byte = int
-Char = str
+from _11l import *
 
 class BitWriter:
-    out : BinaryIO
+    out : BinaryOutput
 
     def __init__(self, fname):
         self.accumulator = 0
@@ -19410,7 +19408,7 @@ while True:
 print(''.join(charsa))
 ===
 T BitWriter
-   File out
+   FileWr out
    accumulator = 0
    bcount = 0
 
@@ -19449,7 +19447,7 @@ T BitReader
 
    F _readbit()
       I .bcount == 0
-         V a = .input.read_bytes(1)
+         V a = .input.read_bytes_at_most(1)
          I !a.empty
             .accumulator = a[0]
          .bcount = 8
@@ -19483,7 +19481,7 @@ print(charsa.join(‘’))
 class BitWriter
 {
 public:
-    File out;
+    FileWr out;
     decltype(0) accumulator = 0;
     decltype(0) bcount = 0;
 
@@ -19539,7 +19537,7 @@ public:
     auto _readbit()
     {
         if (bcount == 0) {
-            auto a = input.read_bytes(1);
+            auto a = input.read_bytes_at_most(1);
             if (!a.empty())
                 accumulator = _get<0>(a);
             bcount = 8;

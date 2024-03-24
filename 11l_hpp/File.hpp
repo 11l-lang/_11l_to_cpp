@@ -211,6 +211,11 @@ public:
 		return static_cast<Array<Byte>&&>(as_mutable()->read_bytes(n));
 	}
 
+	Array<Byte> read_bytes_at_most(size_t n) const
+	{
+		return static_cast<Array<Byte>&&>(as_mutable()->read_bytes_at_most(n));
+	}
+
 	Char read(int n) const
 	{
 		assert(n == 1);
