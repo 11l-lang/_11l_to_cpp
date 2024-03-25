@@ -268,12 +268,15 @@ public:
 		fh.assign_std_handle(f.fh);
 	}
 
-	TFile(const String &name, const String &encoding = u"utf-8"_S, bool append = false) : OFile(name)
+	TFile(const String &name, const String &encoding = u"utf-8"_S, bool append = false) : OFile(name, append)
 	{
-		assert(!append);
 		assert(encoding == u"utf-8" || encoding == u"utf-8-sig");
 
 		if (encoding == u"utf-8-sig") {
+			if (append) {
+				if (fh.get_file_size() != 0)
+					return; // it looks like BOM has already been written
+			}
 			unsigned char utf8bom[3] = {0xEF, 0xBB, 0xBF};
 			OFile::write(utf8bom, 3);
 		}
