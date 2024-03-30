@@ -419,6 +419,8 @@ class SymbolNode:
                 return '0' + n[:-1] + 'LL'*int_is_int64
             if n[-1] in 'bд':
                 return '0b' + n[:-1] + 'LL'*int_is_int64
+            if n[-1] in 'LД':
+                return n[:-1] + 'LL'
             if n[-1] == 's':
                 return n[:-1] + 'f'
             if n[4:5] == "'" or n[-3:-2] == "'" or n[-2:-1] == "'" or n[-9:-8] == "'":
@@ -618,7 +620,7 @@ class SymbolNode:
                                 assert(s)
                     elif func_name.endswith('.map') and self.children[2].token.category == Token.Category.NAME and self.children[2].token_str()[0].isupper():
                         c2 = self.children[2].to_str()
-                        return func_name + '([](const auto &x){return ' + {'Int':'to_int', 'Int64':'to_int64', 'UInt64':'to_uint64', 'UInt32':'to_uint32', 'Float':'to_float', 'SFloat':'to_float32', 'Float32':'to_float32'}.get(c2, c2) + '(x);})'
+                        return func_name + '([](const auto &x){return ' + {'Int':'to_int', 'Int64':'to_int64', 'Long':'to_int64', 'UInt64':'to_uint64', 'ULong':'to_uint64', 'UInt32':'to_uint32', 'Float':'to_float', 'SFloat':'to_float32', 'Float32':'to_float32'}.get(c2, c2) + '(x);})'
                     elif func_name.endswith('.split'):
                         if len(self.children) == 5 and self.children[3] is not None and self.children[3].token_str() == "req'":
                             return func_name + '_req(' + self.children[2].to_str() + ', ' + self.children[4].to_str() + ')'
@@ -705,7 +707,7 @@ class SymbolNode:
                     assert(len(self.children) == 3)
                     c2 = self.children[2].children[2].to_str()
                     if self.children[2].children[2].token.category == Token.Category.NAME and self.children[2].children[2].token_str()[0].isupper():
-                        c2 = '[](const auto &x){return ' + {'Int':'to_int', 'Int64':'to_int64', 'UInt64':'to_uint64', 'UInt32':'to_uint32', 'Float':'to_float', 'SFloat':'to_float32', 'Float32':'to_float32'}.get(c2, c2) + '(x);}'
+                        c2 = '[](const auto &x){return ' + {'Int':'to_int', 'Int64':'to_int64', 'Long':'to_int64', 'UInt64':'to_uint64', 'ULong':'to_uint64', 'UInt32':'to_uint32', 'Float':'to_float', 'SFloat':'to_float32', 'Float32':'to_float32'}.get(c2, c2) + '(x);}'
                     return func_name + '_map(' + self.children[2].children[0].children[0].to_str() + ', ' + c2 + ')'
                 elif func_name in ('min', 'max') and len(self.children) == 5 and self.children[3] is not None and self.children[3].token_str() == "key'":
                     return func_name + '_with_key(' + self.children[2].to_str() + ', ' + self.children[4].to_str() + ')'
@@ -1387,7 +1389,7 @@ class ASTExpression(ASTNodeWithExpression):
         return self.pre_nl + ' ' * (indent*4) + self.expression.to_str() + ";\n"
 
 cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'пер':'auto',
-                     'Int':'int', 'Int64':'Int64', 'UInt64':'UInt64', 'Int32':'int32_t', 'UInt32':'uint32_t', 'Int16':'int16_t', 'UInt16':'uint16_t', 'Int8':'int8_t', 'BigInt':'BigInt', 'Size':'Size', 'USize':'USize',
+                     'Int':'int', 'Long':'Long', 'ULong':'ULong', 'Int64':'Int64', 'UInt64':'UInt64', 'Int32':'int32_t', 'UInt32':'uint32_t', 'Int16':'int16_t', 'UInt16':'uint16_t', 'Int8':'int8_t', 'BigInt':'BigInt', 'Size':'Size', 'USize':'USize',
                      'Float':'double', 'SFloat':'float', 'Float32':'float', 'Float64':'double', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte', 'Bytes':'Array<Byte>', 'Ptr':'Ptr',
                      'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
                      'Array':'Array', 'ArrayFixLen':'ArrayFixLen', 'ArrayMaxLen':'ArrayMaxLen', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque', 'Counter':'Counter', 'Fraction':'Fraction'}
@@ -2460,8 +2462,8 @@ russian_names = {
     'ввод':'input', 'вывод':'print', "кон'":"end'", 'вывод_эл':'print_elements', "разд'":"sep'", 'выход':'exit', 'скоп':'copy', 'перем':'move', 'сортй':'sorted', 'обратный':'reversed',
     'обмен':'swap', 'все':'all', 'любой':'any', 'сумма':'sum', 'нод':'gcd', 'шаг':'step', 'формат':'format',
     'Бул':'Bool',
-     'Цел': 'Int', 'Цел8':'Int8',  'Цел16': 'Int16',  'Цел32': 'Int32',  'Цел64': 'Int64',  'ЦелУкз': 'IntPtr',  'Размер': 'Size', 'Укз':'Ptr', 'как':'as',
-    'БЦел':'UInt', 'Байт':'Byte', 'БЦел16':'UInt16', 'БЦел32':'UInt32', 'БЦел64':'UInt64', 'БЦелУкз':'UIntPtr', 'БРазмер':'USize', 'БолЦел':'BigInt',
+     'Цел': 'Int', 'Цел8':'Int8',  'Цел16': 'Int16',  'Цел32': 'Int32',  'Цел64': 'Int64',  'ДлЦел': 'Long',  'ЦелУкз': 'IntPtr',  'Размер': 'Size', 'Укз':'Ptr', 'как':'as',
+    'БЦел':'UInt', 'Байт':'Byte', 'БЦел16':'UInt16', 'БЦел32':'UInt32', 'БЦел64':'UInt64', 'БДлЦел':'ULong', 'БЦелУкз':'UIntPtr', 'БРазмер':'USize', 'БолЦел':'BigInt',
     'Вещ':'Float', 'Вещ32':'Float32', 'Вещ64':'Float64',
     'Символ':'Char', 'код':'code', "код'":"code'", "цифра'":"digit'", "строка'":"string'",
      'е_цифра':'is_digit', 'е_буква':'is_alpha', 'е_нижрег':'is_lowercase', 'е_верхрег':'is_uppercase', 'нижрег':'lowercase', 'верхрег':'uppercase',

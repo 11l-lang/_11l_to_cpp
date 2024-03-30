@@ -2419,3 +2419,12 @@ struct CodeBlock1
         }(infile);
     }
 } code_block_1;
+
+
+Long r = 0
+V r2 = Long(0)
+V r3 = 0L
+===
+Long r = 0;
+auto r2 = Long(0);
+auto r3 = 0LL;
