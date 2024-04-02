@@ -25,10 +25,9 @@ std::u16string convert_utf8_to_utf16(const char *s, size_t len)
 
 class UnicodeDecodeError {};
 
-String convert_utf8_string_to_String(const char *s, size_t len)
+void convert_utf8_string_to_String(String &r, const char *s, size_t len)
 {
 #ifdef _WIN32
-	String r;
 	if (len != 0) {
 		r.resize(len);
 		SetLastError(ERROR_SUCCESS);
@@ -38,10 +37,21 @@ String convert_utf8_string_to_String(const char *s, size_t len)
 			throw UnicodeDecodeError();
 		}
 	}
-	return r;
 #else
-	return String(convert_utf8_to_utf16(s, len));
+	r = convert_utf8_to_utf16(s, len);
 #endif
+}
+
+String convert_utf8_string_to_String(const char *s, size_t len)
+{
+	String r;
+	convert_utf8_string_to_String(r, s, len);
+	return r;
+}
+
+void convert_utf8_string_to_String(String &r, const std::string &s)
+{
+	convert_utf8_string_to_String(r, s.data(), s.size());
 }
 
 String convert_utf8_string_to_String(const std::string &s)
@@ -97,6 +107,8 @@ template <> class TFile<true> : public IFile
 		return const_cast<IFile*>(static_cast<const IFile*>(this));
 	}
 
+	mutable std::string line_buf;
+
 public:
 	TFile() {}
 	TFile(StdHandleTag, decltype(detail::stdin_handle()) handle)
@@ -139,13 +151,14 @@ public:
 		class Iterator
 		{
 			Lines *lines;
+			std::string line_buf;
 			String line;
 		    bool has_next;
 
 		public:
 			Iterator(Lines *lines) : lines(lines) {has_next = !lines->file.at_eof(); if (has_next) operator++();}
 			bool operator!=(Sentinel) const {return has_next;}
-			void operator++() {has_next = !lines->file.at_eof(); if (has_next) line = convert_utf8_string_to_String(lines->file.read_line(lines->keep_newline));}
+			void operator++() {has_next = !lines->file.at_eof(); if (has_next) {lines->file.read_line(line_buf, lines->keep_newline); convert_utf8_string_to_String(line, line_buf);}}
 			const String &operator*() const {return line;}
 		};
 #if 0
@@ -153,6 +166,7 @@ public:
 		{
 			IFile file;
 			bool keep_newline;
+			std::string line_buf;
 			String line;
 
 		public:
@@ -164,7 +178,8 @@ public:
 			{
 				if (file.at_eof())
 					return false;
-				line = convert_utf8_string_to_String(file.read_line(keep_newline));
+				file.read_line(line_buf, keep_newline);
+				convert_utf8_string_to_String(line, line_buf);
 				return true;
 			}
 		};
@@ -198,7 +213,14 @@ public:
 
 	String read_line(bool keep_newline = false) const
 	{
-		return convert_utf8_string_to_String(as_mutable()->read_line(keep_newline));
+		as_mutable()->read_line(line_buf, keep_newline);
+		return convert_utf8_string_to_String(line_buf);
+	}
+
+	void read_line(String &r, bool keep_newline = false) const
+	{
+		as_mutable()->read_line(line_buf, keep_newline);
+		convert_utf8_string_to_String(r, line_buf);
 	}
 
 	Array<Byte> read_bytes() const

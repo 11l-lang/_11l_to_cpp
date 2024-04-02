@@ -4129,6 +4129,21 @@ def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, ap
     p = ASTProgram()
     parse_internal(p)
 
+    def transformations(node):
+        if type(node) == ASTExpression and node.expression.symbol.id == '=' and node.expression.children[1].function_call:
+            c1 = node.expression.children[1]
+            c1c0 = c1.children[0]
+            if c1c0.symbol.id == '.' and len(c1c0.children) == 2 and c1c0.children[1].token_str() == 'read_line': # transform `line = f.read_line()` into `f.read_line(line)`
+                c1.children.insert(1, None)
+                c1.children.insert(2, node.expression.children[0])
+                node.expression.children[0].parent = c1
+                node.expression = c1
+                node.expression.parent = None
+                node.expression.ast_parent = node
+
+        node.walk_children(transformations)
+    transformations(p)
+
     if len(modules):
         p.beginning_extra = "\n".join(map(lambda m: 'namespace ' + m.replace('::', ' { namespace ') + " {\n#include \"" + m.replace('::', '/') + ".hpp\"\n}" + '}'*m.count('::'), modules)) + "\n\n"
 

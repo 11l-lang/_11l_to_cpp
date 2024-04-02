@@ -2428,3 +2428,37 @@ V r3 = 0L
 Long r = 0;
 auto r2 = Long(0);
 auto r3 = 0LL;
+
+
+V
+   s = 0
+   n = 0
+   f = File(‘lines.txt’)
+
+String line
+L !f.at_eof()
+   line = f.read_line()
+   s += line.len
+   n++
+
+print(s / n)
+===
+auto s = 0;
+auto n = 0;
+auto f = File(u"lines.txt"_S);
+
+String line;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        while (!f.at_eof()) {
+            f.read_line(line);
+            s += line.len();
+            n++;
+        }
+
+        print(s / n);
+    }
+} code_block_1;
