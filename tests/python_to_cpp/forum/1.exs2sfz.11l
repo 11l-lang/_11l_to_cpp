@@ -46,7 +46,7 @@ T EXSChunk
 
    F display()
       ‘" display the raw chunk data in hexdump format ’
-      X NotImplementedError()
+      X.throw NotImplementedError()
 ‘
 		for line in range(0, self.size(), 16):
 			print("0x{0:04X}: ".format(line), end='')
@@ -77,7 +77,7 @@ T EXSHeader(EXSChunk)
       .offset = offset
 
       I !(offset == 0)
-         X RuntimeError(‘Found header at location  other than beginning of file! offset is #.’.format(offset))
+         X.throw RuntimeError(‘Found header at location  other than beginning of file! offset is #.’.format(offset))
 
 T EXSZone(EXSChunk)
 
@@ -219,7 +219,7 @@ T EXSSamplePool
          last = fs:path:canonical(fs:path:absolute(fs:path:join(.base, search)))
          search = fs:path:join(search, ‘..’)
 
-      X RuntimeError(‘Couldn't locate sample #.!’.format(filename))
+      X.throw RuntimeError(‘Couldn't locate sample #.!’.format(filename))
 
    F.virtual.abstract path(String filename) -> String
 
@@ -239,7 +239,7 @@ T EXSSamplePoolFixed(EXSSamplePool)
       I fs:is_dir(path)
          .base = fs:path:dir_name(path)
       E
-         X RuntimeError(‘#.is not a valid path!’.format(path))
+         X.throw RuntimeError(‘#.is not a valid path!’.format(path))
 
    F.virtual.assign path(String filename) -> String
       R fs:path:join(.base, .locate(filename), filename)
@@ -267,13 +267,13 @@ T EXSInstrument
       .exsfile_name = exsfile_name
 
       I fs:file_size(exsfile_name) > 1024 * 1024
-         X RuntimeError(‘EXS file is too large; will not parse! (size > 1 MebiByte)’)
+         X.throw RuntimeError(‘EXS file is too large; will not parse! (size > 1 MebiByte)’)
       :instrument_data = File(exsfile_name).read_bytes()
 
       I Int(UInt32(bytes_be' :instrument_data[0 .+ 4])) == EXSHeader_sig & :instrument_data[16.<20] == Bytes(‘SOBT’)
-         X RuntimeError(‘File is a big endian EXS file; cannot parse!’)
+         X.throw RuntimeError(‘File is a big endian EXS file; cannot parse!’)
       I !(Int(UInt32(bytes' :instrument_data[0 .+ 4])) == EXSHeader_sig) & :instrument_data[16.<20] == Bytes(‘TBOS’)
-         X RuntimeError(‘File is not an EXS file; will not parse!’)
+         X.throw RuntimeError(‘File is not an EXS file; will not parse!’)
 
       I sample_location == ‘’
          .pool = EXSSamplePoolLocator(exsfile_name)
@@ -296,7 +296,7 @@ T EXSInstrument
          E I sig == 0400'0101
             V t = EXSParam(offset)
          E
-            X RuntimeError(‘Encountered an unknown chunk signature! signature is ’(‘0x’hex(sig).lowercase()))
+            X.throw RuntimeError(‘Encountered an unknown chunk signature! signature is ’(‘0x’hex(sig).lowercase()))
 
          offset += chunk_size(:instrument_data, offset)
 
@@ -380,7 +380,7 @@ T EXSInstrument
          key_sequence[key] = group
 
       I !overwrite & fs:is_file(sfzfilename)
-         X RuntimeError(‘file #. already exists; will not overwrite!’.format(sfzfilename))
+         X.throw RuntimeError(‘file #. already exists; will not overwrite!’.format(sfzfilename))
 
       V sfzfile = File(sfzfilename, WRITE)
 

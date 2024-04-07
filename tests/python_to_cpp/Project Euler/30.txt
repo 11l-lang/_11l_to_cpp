@@ -100,7 +100,7 @@ F find_minimum_multiple(n)
             remainder = newrem
             L.break
       L.was_no_break
-         X AssertionError(‘’)
+         X.throw AssertionError(‘’)
    R result
 
 print(sum((1..10000).map(n -> Int64(find_minimum_multiple(n) I/ n))))
@@ -222,7 +222,7 @@ F next_prime(=n)
    L
       n++
       I n >= :iscomposite.len
-         X AssertionError(‘Search range exhausted’)
+         X.throw AssertionError(‘Search range exhausted’)
       I !:iscomposite[n]
          R n
 

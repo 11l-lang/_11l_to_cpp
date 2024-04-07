@@ -207,7 +207,7 @@ F AStarSearch(start, end, barriers)
          V H = heuristic(neighbour, end)
          f[neighbour] = G[neighbour] + H
 
-   X RuntimeError(‘A* failed to find a solution’)
+   X.throw RuntimeError(‘A* failed to find a solution’)
 
 V (result, cost) = AStarSearch((0, 0), (7, 7), [[(2, 4), (2, 5), (2, 6), (3, 6), (4, 6), (5, 6), (5, 5), (5, 4), (5, 3), (5, 2), (4, 2), (3, 2)]])
 print(‘route ’result)
@@ -341,7 +341,7 @@ F shortest_abbreviation_length(line, list_size)
    V words = line.split(‘ ’)
    V word_count = words.len
    I word_count != list_size
-      X ValueError(‘Not enough entries, expected #. found #.’.format(list_size, word_count))
+      X.throw ValueError(‘Not enough entries, expected #. found #.’.format(list_size, word_count))
 
    V abbreviation_length = 1
    L
@@ -2374,7 +2374,7 @@ L(str) ‘DABDDB DABDDBBDDBA ABRACADABRA TOBEORNOTTOBEORTOBEORNOT’.split(‘ �
    print(‘#<25=> #19 * #.^#.’.format(str, enc, radix, power))
 
    I str != dec
-      X RuntimeError("\tHowever that is incorrect!")
+      X.throw RuntimeError("\tHowever that is incorrect!")
 ===
 template <typename T1> auto cumulative_freq(const T1 &freq)
 {

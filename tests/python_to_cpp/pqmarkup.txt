@@ -997,7 +997,7 @@ T Converter
                line++
                line_start = t
             t++
-         X Exception(message, line, pos - line_start, pos)
+         X.throw Exception(message, line, pos - line_start, pos)
 
       V i = 0
       F next_char(offset = 1)

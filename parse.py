@@ -3407,6 +3407,9 @@ def parse_internal(this_node):
                     next_token()
 
             elif token.value(source) in ('X', 'Х', 'exception', 'исключение'):
+                raise Error('exceptions of the first kind are not supported', token)
+
+            elif token.value(source) in ('X.throw', 'Х.возбудить', 'exception.throw', 'исключение.возбудить'):
                 node = ASTException()
                 next_token()
                 if token.category in (Token.Category.SCOPE_END, Token.Category.STATEMENT_SEPARATOR):

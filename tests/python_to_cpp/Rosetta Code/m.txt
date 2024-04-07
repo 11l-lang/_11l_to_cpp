@@ -4310,7 +4310,7 @@ T MarchingSquares
          initial_y = .height
       V initial_value = .value(initial_x, initial_y)
       I initial_value C (0, 15)
-         X RuntimeError(‘Supplied initial coordinates (#., #.) do not lie on a perimeter.’.format(initial_x, initial_y))
+         X.throw RuntimeError(‘Supplied initial coordinates (#., #.) do not lie on a perimeter.’.format(initial_x, initial_y))
 
       [(Int, Int)] directions
       V x = initial_x
@@ -4334,7 +4334,7 @@ T MarchingSquares
             9
                direction = I previous == :DIR_E {:DIR_N} E :DIR_S
             E
-               X RuntimeError(‘Illegal state.’)
+               X.throw RuntimeError(‘Illegal state.’)
 
          directions.append(direction)
          x += direction[0]

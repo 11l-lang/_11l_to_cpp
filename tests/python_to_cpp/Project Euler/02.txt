@@ -239,7 +239,7 @@ V prev = BigInt(1)
 V cur = BigInt(0)
 L(i) 0..
    I String(cur).len > digits
-      X RuntimeError(‘Not found’)
+      X.throw RuntimeError(‘Not found’)
    E I String(cur).len == digits
       print(i)
       L.break

@@ -49,7 +49,7 @@ print(sum(sam_transitions_minus_max_transitions(i)
 ===
 F digit_sum(=n)
    I n < 0
-      X ValueError(‘’)
+      X.throw ValueError(‘’)
    V result = 0
    L n != 0
       result += n % 10
@@ -60,7 +60,7 @@ V DECIMAL_DIGIT_TO_SEGMENT = [1110111b, 0010010b, 1011101b, 1011011b, 0111010b, 
 
 F number_to_segments(=n)
    I n < 0
-      X ValueError(‘’)
+      X.throw ValueError(‘’)
    Int64 result = 0
    V i = 0
    L

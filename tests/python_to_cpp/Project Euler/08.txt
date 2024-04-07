@@ -908,7 +908,7 @@ F compute()
    F factorize(Int n, Int remain, Int maxfactor, Int sum, Int =terms) -> N
       I remain == 1
          I sum > n
-            X AssertionError(‘’)
+            X.throw AssertionError(‘’)
          terms += n - sum
          I terms <= @LIMIT & (@minsumproduct[terms] == -1 | n < @minsumproduct[terms])
             @minsumproduct[terms] = n
@@ -1021,7 +1021,7 @@ F parse_roman_numeral(=s)
             s = s[prefix.len ..]
             L.break
       L.was_no_break
-         X AssertionError(‘Cannot parse Roman numeral’)
+         X.throw AssertionError(‘Cannot parse Roman numeral’)
    R result
 
 V DIGIT_LENGTHS = [0, 1, 2, 3, 2, 1, 2, 3, 4, 2]

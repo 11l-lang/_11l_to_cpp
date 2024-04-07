@@ -50,7 +50,7 @@ V minlength = [[-Float.infinity] * (2 ^ :NUM_SPHERES)] * NUM_SPHERES
 
 F find_minimum_length(currentsphereindex, setofspheres) -> Float
    I setofspheres [&] (1 << currentsphereindex) == 0
-      X ValueError(‘’)
+      X.throw ValueError(‘’)
 
    I :minlength[currentsphereindex][setofspheres] == -Float.infinity
       Float result

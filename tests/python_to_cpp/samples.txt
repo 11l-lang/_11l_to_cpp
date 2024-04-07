@@ -3768,7 +3768,7 @@ F compute()
          Int? temp = find_solution_sum(num, num, 1 << 3, num)
          I temp != N
             R String(temp)
-   X AssertionError(‘No solution’)
+   X.throw AssertionError(‘No solution’)
 
 print(compute())
 ===
@@ -3851,7 +3851,7 @@ F solve(n)
          nn[i] = Char(digit' d)
          I Int(nn.join(‘’)) % 7 == 0
             R Int(nn.join(‘’))
-   X 0
+   X.throw 0
 ===
 template <typename T1> auto solve(const T1 &n)
 {
@@ -4883,7 +4883,7 @@ S v
    6
       direction = ‘W’
    E
-      X RuntimeError(‘Illegal state.’)
+      X.throw RuntimeError(‘Illegal state.’)
 
 S Char(‘E’)
    ‘N’, ‘W’

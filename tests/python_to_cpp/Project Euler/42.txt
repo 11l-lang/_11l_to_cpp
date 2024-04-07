@@ -66,7 +66,7 @@ print(sum(Int64(i) for i in range(len(isprime))
 ===
 F to_digits(=n)
    I n < 0
-      X ValueError(‘’)
+      X.throw ValueError(‘’)
 
    [Int] temp
    L

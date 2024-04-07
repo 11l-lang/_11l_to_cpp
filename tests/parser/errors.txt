@@ -316,3 +316,8 @@ print(\/‘abc’)
 
 V reader = csv:read(File(‘test.csv’, encoding' ‘utf-8’), header' hdr)
                                                                  ^Error: argument `header` of function `csv::read` is in-out, but there is no `&` prefix
+
+
+T SomeError {}
+X SomeError()
+^Error: exceptions of the first kind are not supported

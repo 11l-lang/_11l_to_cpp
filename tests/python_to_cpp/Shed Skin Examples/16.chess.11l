@@ -63,7 +63,7 @@ F mov([Int] &board; mv)
             board[7'7] = 0
             board[7'5] = -4
          E
-            X ‘faulty castling’
+            X.throw ‘faulty castling’
    I mv [&] 0800'0000
       I board[26]
          board[mv [&] 0'7 + 64] = 0
@@ -99,7 +99,7 @@ F moveStr([Int] &board; strMove)
          R
    L(m) moves
       print(toString(m))
-   X ‘no move found’
+   X.throw ‘no move found’
 
 F rowAttack(board, attackers, ix, dir)
    V own = attackers[0]

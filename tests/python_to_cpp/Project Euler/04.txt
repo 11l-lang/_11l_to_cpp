@@ -682,7 +682,7 @@ F compute()
             V b = a + step
             I a < LIMIT & isprime[a] & has_same_digits(a, base) & b < LIMIT & isprime[b] & has_same_digits(b, base) & (base != 1487 | a != 4817)
                R String(base)‘’String(a)‘’String(b)
-   X RuntimeError(‘Not found’)
+   X.throw RuntimeError(‘Not found’)
 
 print(compute())
 ===

@@ -140,7 +140,7 @@ F compute()
                I digits[0] != 0 & isprime[to_number(digits)]
                   R String(to_number(digits))
                digits = add_mask(digits, mask)
-   X AssertionError(‘Not found’)
+   X.throw AssertionError(‘Not found’)
 
 print(compute())
 ===
@@ -389,7 +389,7 @@ F get_5_frequent_highest_cards(ranks, rankshist)
                count++
 
    I count != 5
-      X ValueError(count)
+      X.throw ValueError(count)
    R result
 
 F get_score(hand)

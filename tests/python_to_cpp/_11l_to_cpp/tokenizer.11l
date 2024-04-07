@@ -128,7 +128,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
             I nesting_level == 0
                L.break
          I @i == @source.len
-            X Error(‘there is no corresponding opening parenthesis/bracket/brace/qoute for `’lbr‘`’, comment_start + 1)
+            X.throw Error(‘there is no corresponding opening parenthesis/bracket/brace/qoute for `’lbr‘`’, comment_start + 1)
       I @comments != N
          @comments.append((comment_start, @i))
 
@@ -184,7 +184,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
 
          I ((source[i] C :binary_operators[1] | source[i .< i + 2] C :binary_operators[2] | source[i .< i + 3] C :binary_operators[3] | source[i .< i + 4] C :binary_operators[4]) & !(source[i] C :unary_operators[1] | source[i .< i + 2] C :unary_operators[2] | source[i .< i + 3] C :unary_operators[3]) & (source[i] !C (‘&’, ‘-’) | source[i + 1 .< i + 2] == ‘ ’) & source[i] !C (‘<’, ‘>’))
             I tokens.empty
-               X Error(‘source can not starts with a binary operator’, i)
+               X.throw Error(‘source can not starts with a binary operator’, i)
             I line_continuations != N
                line_continuations.append(tokens.last.end)
             L.continue
@@ -198,7 +198,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
 
          I tabs & spaces
             V next_line_pos = source.findi("\n", i)
-            X Error(‘mixing tabs and spaces in indentation: `’source[linestart .< i].replace(‘ ’, ‘S’).replace("\t", ‘TAB’)‘’source[i .< I next_line_pos != -1 {next_line_pos} E source.len]‘`’, i)
+            X.throw Error(‘mixing tabs and spaces in indentation: `’source[linestart .< i].replace(‘ ’, ‘S’).replace("\t", ‘TAB’)‘’source[i .< I next_line_pos != -1 {next_line_pos} E source.len]‘`’, i)
 
          V indentation_level = ii - linestart
          I indentation_levels.len & indentation_levels.last[0] == -1
@@ -212,7 +212,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                V e = i + 1
                L e < source.len & source[e] !C "\r\n"
                   e++
-               X Error("inconsistent indentations:\n```\n"prev_indentation_level * (I indentation_tabs {‘TAB’} E ‘S’)‘’source[prev_linestart .< linestart]‘’(ii - linestart) * (I tabs {‘TAB’} E ‘S’)‘’source[ii .< e]"\n```", ii)
+               X.throw Error("inconsistent indentations:\n```\n"prev_indentation_level * (I indentation_tabs {‘TAB’} E ‘S’)‘’source[prev_linestart .< linestart]‘’(ii - linestart) * (I tabs {‘TAB’} E ‘S’)‘’source[ii .< e]"\n```", ii)
             prev_linestart = ii
 
             I indentation_level == prev_indentation_level
@@ -228,7 +228,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
             E
                L
                   I indentation_levels.last[1]
-                     X Error(‘too much unindent, what is this unindent intended for?’, ii)
+                     X.throw Error(‘too much unindent, what is this unindent intended for?’, ii)
                   indentation_levels.pop()
                   tokens.append(Token(ii, ii, Token.Category.SCOPE_END))
                   I implied_scopes != N
@@ -237,7 +237,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                   I level == indentation_level
                      L.break
                   I level < indentation_level
-                     X Error(‘unindent does not match any outer indentation level’, ii)
+                     X.throw Error(‘unindent does not match any outer indentation level’, ii)
 
       V ch = source[i]
 
@@ -303,7 +303,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                I source[i - 2 .< i - 1] == ‘ ’
                   category = OPERATOR
                E
-                  X Error(‘please clarify your intention by putting space character before or after `I`’, i - 1)
+                  X.throw Error(‘please clarify your intention by putting space character before or after `I`’, i - 1)
 
             E I source[i .< i + 1] == ‘'’
                i++
@@ -316,7 +316,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                   L i < source.len & (is_hexadecimal_digit(source[i]) | source[i] == ‘'’)
                      i++
                   I !(source[lexem_start + 4 .< lexem_start + 5] == ‘'’ | source[i - 3 .< i - 2] == ‘'’ | source[i - 2 .< i - 1] == ‘'’)
-                     X Error(‘digit separator in this hexadecimal number is located in the wrong place’, lexem_start)
+                     X.throw Error(‘digit separator in this hexadecimal number is located in the wrong place’, lexem_start)
                   category = NUMERIC_LITERAL
 
             E I source[lexem_start .< i] C :keywords
@@ -341,13 +341,13 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                   L i < source.len & source[i] == ‘'’
                      i++
                   I source[i .< i + 1] != "‘"
-                     X Error(‘expected left single quotation mark’, i)
+                     X.throw Error(‘expected left single quotation mark’, i)
                   V startqpos = i
                   i++
                   V nesting_level = 1
                   L
                      I i == source.len
-                        X Error(‘unpaired left single quotation mark’, startqpos)
+                        X.throw Error(‘unpaired left single quotation mark’, startqpos)
                      ch = source[i]
                      i++
                      I ch == "‘"
@@ -364,7 +364,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                   i++
                   L
                      I i == source.len
-                        X Error(‘unclosed string literal’, startqpos)
+                        X.throw Error(‘unclosed string literal’, startqpos)
                      ch = source[i]
                      i++
                      I ch == ‘\’
@@ -402,14 +402,14 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                         L(new_token) tokenize(source[s .< colon_pos ? j])
                            tokens.append(Token(new_token.start + s, new_token.end + s, new_token.category))
                      X.catch Error error
-                        X Error(error.message, error.pos + s)
+                        X.throw Error(error.message, error.pos + s)
                      I colon_pos != N
                         tokens.append(Token(colon_pos + 1, j, Token.Category.STATEMENT_SEPARATOR))
                      tokens.append(Token(j, j, Token.Category.SCOPE_END))
                      substr_start = j + 1
                   E I source[j] == ‘}’
                      I source[j + 1] != ‘}’
-                        X Error(‘f-string: single '}' is not allowed’, j)
+                        X.throw Error(‘f-string: single '}' is not allowed’, j)
                      j += 2
                      L.continue
                   j++
@@ -456,19 +456,19 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                      L
                         i++
                         I i + 2 > source.len | !is_hexadecimal_digit(source[i]) | !is_hexadecimal_digit(source[i + 1])
-                           X Error(‘wrong short hexadecimal number’, lexem_start)
+                           X.throw Error(‘wrong short hexadecimal number’, lexem_start)
                         i += 2
                         I i < source.len & is_hexadecimal_digit(source[i])
-                           X Error(‘expected end of short hexadecimal number’, i)
+                           X.throw Error(‘expected end of short hexadecimal number’, i)
                         I source[i .< i + 1] != ‘'’
                            L.break
                   E I i - lexem_start == 1
                      i++
                      I i + 1 > source.len | !is_hexadecimal_digit(source[i])
-                        X Error(‘wrong ultrashort hexadecimal number’, lexem_start)
+                        X.throw Error(‘wrong ultrashort hexadecimal number’, lexem_start)
                      i++
                      I i < source.len & is_hexadecimal_digit(source[i])
-                        X Error(‘expected end of ultrashort hexadecimal number’, i)
+                        X.throw Error(‘expected end of ultrashort hexadecimal number’, i)
                   E
                      i++
                      L i < source.len & is_hexadecimal_digit(source[i])
@@ -477,12 +477,12 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                            I source[i] != ‘'’
                               I !is_hexadecimal_digit(source[i])
                                  L.break
-                              X Error(‘here should be a digit separator in hexadecimal number’, i)
+                              X.throw Error(‘here should be a digit separator in hexadecimal number’, i)
                            i++
                      I i < source.len & source[i] == ‘'’
-                        X Error(‘digit separator in hexadecimal number is located in the wrong place’, i)
+                        X.throw Error(‘digit separator in hexadecimal number is located in the wrong place’, i)
                      I (i - lexem_start) % 5 != 4
-                        X Error(‘after this digit separator there should be 4 digits in hexadecimal number’, source.rfindi(‘'’, 0, i))
+                        X.throw Error(‘after this digit separator there should be 4 digits in hexadecimal number’, source.rfindi(‘'’, 0, i))
                E
                   L i < source.len & (source[i] C ‘0’..‘9’ | source[i] C ‘'.eE’)
                      I source[i .< i + 2] C (‘..’, ‘.<’, ‘.+’)
@@ -502,7 +502,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                         j -= 3
                      number_with_separators = number[0 .< j]‘’number_with_separators
                      I source[lexem_start .< i] != number_with_separators
-                        X Error(‘digit separator in this number is located in the wrong place (should be: ’number_with_separators‘)’, lexem_start)
+                        X.throw Error(‘digit separator in this number is located in the wrong place (should be: ’number_with_separators‘)’, lexem_start)
                category = NUMERIC_LITERAL
 
          E I ch == ‘'’ & source[i .< i + 1] == ‘,’
@@ -518,7 +518,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                tokens.append(Token(lexem_start, lexem_start, Token.Category.STRING_CONCATENATOR))
             L
                I i == source.len
-                  X Error(‘unclosed string literal’, startqpos)
+                  X.throw Error(‘unclosed string literal’, startqpos)
                ch = source[i]
                i++
                I ch == ‘\’
@@ -547,13 +547,13 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
             L i < source.len & source[i] == ‘'’
                i++
             I source[i .< i + 1] != "‘"
-               X Error(‘expected left single quotation mark’, i)
+               X.throw Error(‘expected left single quotation mark’, i)
             V startqpos = i
             i++
             V nesting_level = 1
             L
                I i == source.len
-                  X Error(‘unpaired left single quotation mark’, startqpos)
+                  X.throw Error(‘unpaired left single quotation mark’, startqpos)
                ch = source[i]
                i++
                I ch == "‘"
@@ -576,7 +576,7 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
             category = SCOPE_BEGIN
          E I ch == ‘}’
             I nesting_elements.empty | nesting_elements.last[0] != ‘{’
-               X Error(‘there is no corresponding opening brace for `}`’, lexem_start)
+               X.throw Error(‘there is no corresponding opening brace for `}`’, lexem_start)
             nesting_elements.pop()
             L indentation_levels.last[1] != 1B
                tokens.append(Token(lexem_start, lexem_start, Token.Category.SCOPE_END))
@@ -604,17 +604,17 @@ F tokenize(String source, [(Char, Int)]? &implied_scopes = N, [Int]? &line_conti
                category = DELIMITER
          E I ch C ‘])’
             I nesting_elements.empty | nesting_elements.last[0] != (S ch {‘]’ {‘[’}; ‘)’ {‘(’}})
-               X Error(‘there is no corresponding opening parenthesis/bracket for `’ch‘`’, lexem_start)
+               X.throw Error(‘there is no corresponding opening parenthesis/bracket for `’ch‘`’, lexem_start)
             nesting_elements.pop()
             category = DELIMITER
 
          E
-            X Error(‘unexpected character `’ch‘`’, lexem_start)
+            X.throw Error(‘unexpected character `’ch‘`’, lexem_start)
 
          tokens.append(Token(lexem_start, i, category))
 
    I !nesting_elements.empty
-      X Error(‘there is no corresponding closing parenthesis/bracket/brace for `’nesting_elements.last[0]‘`’, nesting_elements.last[1])
+      X.throw Error(‘there is no corresponding closing parenthesis/bracket/brace for `’nesting_elements.last[0]‘`’, nesting_elements.last[1])
 
    L !indentation_levels.empty
       assert(indentation_levels.last[1] != 1B)

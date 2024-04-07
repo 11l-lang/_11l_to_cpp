@@ -52,7 +52,7 @@ Int64 numerator = 0
 
 F divide_exactly(x, y)
    I x % y != 0
-      X ValueError(‘Not divisible’)
+      X.throw ValueError(‘Not divisible’)
    R x I/ y
 
 F explore(remain, limit, &history) -> N

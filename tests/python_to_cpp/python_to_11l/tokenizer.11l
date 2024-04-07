@@ -79,14 +79,14 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N) -> [T
 
          I expected_an_indented_block
             I !(indentation_level > prev_indentation_level)
-               X Error(‘expected an indented block’, i)
+               X.throw Error(‘expected an indented block’, i)
 
          I indentation_level == prev_indentation_level
             I !tokens.empty
                tokens.append(Token(linestart - 1, linestart, Token.Category.STATEMENT_SEPARATOR))
          E I indentation_level > prev_indentation_level
             I !expected_an_indented_block
-               X Error(‘unexpected indent’, i)
+               X.throw Error(‘unexpected indent’, i)
             expected_an_indented_block = 0B
             indentation_levels.append(indentation_level)
             tokens.append(Token(linestart, i, Token.Category.INDENT))
@@ -98,7 +98,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N) -> [T
                I level == indentation_level
                   L.break
                I level < indentation_level
-                  X Error(‘unindent does not match any outer indentation level’, i)
+                  X.throw Error(‘unindent does not match any outer indentation level’, i)
 
       V ch = source[i]
 
@@ -141,7 +141,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N) -> [T
                nesting_elements.append((ch, lexem_start))
             E I ch C ‘)]}’
                I nesting_elements.empty | nesting_elements.last[0] != (S ch {‘)’ {‘(’}; ‘]’ {‘[’}; ‘}’ {‘{’}})
-                  X Error(‘there is no corresponding opening parenthesis/bracket/brace for `’ch‘`’, lexem_start)
+                  X.throw Error(‘there is no corresponding opening parenthesis/bracket/brace for `’ch‘`’, lexem_start)
                nesting_elements.pop()
             E I ch == ‘;’
                category = STATEMENT_SEPARATOR
@@ -156,7 +156,7 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N) -> [T
             i += ends.len
             L
                I i == source.len
-                  X Error(‘unclosed string literal’, lexem_start)
+                  X.throw Error(‘unclosed string literal’, lexem_start)
                I source[i] == ‘\’
                   i++
                   I i == source.len
@@ -201,14 +201,14 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N) -> [T
                         L(new_token) tokenize(source[s .< colon_pos ? j])
                            tokens.append(Token(new_token.start + s, new_token.end + s, new_token.category))
                      X.catch Error error
-                        X Error(error.message, error.pos + s)
+                        X.throw Error(error.message, error.pos + s)
                      I colon_pos != N
                         tokens.append(Token(colon_pos + 1, j, Token.Category.STATEMENT_SEPARATOR))
                      tokens.append(Token(j, j, Token.Category.DEDENT))
                      substr_start = j + 1
                   E I source[j] == ‘}’
                      I source[j + 1] != ‘}’
-                        X Error(‘f-string: single '}' is not allowed’, j)
+                        X.throw Error(‘f-string: single '}' is not allowed’, j)
                      j += 2
                      L.continue
                   j++
@@ -284,12 +284,12 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N) -> [T
                      j -= 3
                   number_with_separators = number[0 .< j]‘’number_with_separators
                   I source[start .< i] != number_with_separators
-                     X Error(‘digit separator in this number is located in the wrong place (should be: ’number_with_separators‘)’, start)
+                     X.throw Error(‘digit separator in this number is located in the wrong place (should be: ’number_with_separators‘)’, start)
             category = NUMERIC_LITERAL
 
          E I ch == ‘\’
             I source[i] !C "\r\n"
-               X Error(‘only new line character allowed after backslash’, i)
+               X.throw Error(‘only new line character allowed after backslash’, i)
             I source[i] == "\r"
                i++
             I source[i] == "\n"
@@ -297,15 +297,15 @@ F tokenize(source, [Int]? &newline_chars = N, [(Int, Int)]? &comments = N) -> [T
             L.continue
 
          E
-            X Error(‘unexpected character ’ch, lexem_start)
+            X.throw Error(‘unexpected character ’ch, lexem_start)
 
          tokens.append(Token(lexem_start, i, category))
 
    I !nesting_elements.empty
-      X Error(‘there is no corresponding closing parenthesis/bracket/brace for `’nesting_elements.last[0]‘`’, nesting_elements.last[1])
+      X.throw Error(‘there is no corresponding closing parenthesis/bracket/brace for `’nesting_elements.last[0]‘`’, nesting_elements.last[1])
 
    I expected_an_indented_block
-      X Error(‘expected an indented block’, i)
+      X.throw Error(‘expected an indented block’, i)
 
    L !indentation_levels.empty
       tokens.append(Token(i, i, Token.Category.DEDENT))

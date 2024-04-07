@@ -184,7 +184,7 @@ F count_reversibles(numdigits)
    E I numdigits % 4 == 1
       R 0
    E
-      X AssertionError(‘’)
+      X.throw AssertionError(‘’)
 
 print(sum((2..9).map(d -> count_reversibles(d))))
 ===

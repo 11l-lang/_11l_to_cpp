@@ -1321,7 +1321,7 @@ print(welch_ttest(a1, a2))
 ===
 F betain(x, p, q)
    I p <= 0 | q <= 0 | x < 0 | x > 1
-      X ValueError(0)
+      X.throw ValueError(0)
 
    I x == 0 | x == 1
       R x
@@ -1373,7 +1373,7 @@ F welch_ttest(a1, a2)
    V n1 = a1.len
    V n2 = a2.len
    I n1 <= 1 | n2 <= 1
-      X ValueError(0)
+      X.throw ValueError(0)
 
    V mean1 = sum(a1) / n1
    V mean2 = sum(a2) / n2

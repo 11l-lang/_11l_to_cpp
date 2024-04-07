@@ -3983,7 +3983,7 @@ T SillyError
       .message = message
 
 X.try
-   X SillyError(‘egg’)
+   X.throw SillyError(‘egg’)
 X.catch SillyError se
    print(se.message)
 ===
@@ -4044,9 +4044,9 @@ T U1
 
 F baz(i)
    I i == 0
-      X U0()
+      X.throw U0()
    E
-      X U1()
+      X.throw U1()
 
 F bar(i)
    baz(i)
@@ -7387,9 +7387,9 @@ for n in range(1, 22, 2):
 ===
 F jacobi(=a, =n)
    I n <= 0
-      X ValueError(‘'n' must be a positive integer.’)
+      X.throw ValueError(‘'n' must be a positive integer.’)
    I n % 2 == 0
-      X ValueError(‘'n' must be odd.’)
+      X.throw ValueError(‘'n' must be odd.’)
    a %= n
    V result = 1
    L a != 0

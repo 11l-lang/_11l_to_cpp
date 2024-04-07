@@ -27,7 +27,7 @@ T rectBoard
          .__board[row][col] = value
          .__empty--
       E
-         X SpaceNotEmpty()
+         X.throw SpaceNotEmpty()
 
    F isfull()
       R .__empty == 0
@@ -62,7 +62,7 @@ T rectBoard
       I victors.empty
          R 0
       I Set(victors).len > 1
-         X MultiVictory()
+         X.throw MultiVictory()
       R victors[0]
 
    F String()

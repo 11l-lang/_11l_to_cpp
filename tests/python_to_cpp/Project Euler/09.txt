@@ -316,17 +316,17 @@ F longest_consecutive((Int, Int, Int, Int) abcd)
                      L.break
                   stack.append(left / right)
                E
-                  X AssertionError(‘’)
+                  X.throw AssertionError(‘’)
                j++
             E
-               X AssertionError(‘’)
+               X.throw AssertionError(‘’)
 
          I stackunderflow
             L.break
          I divbyzero
             L.continue
          I stack.len != 1
-            X AssertionError(‘’)
+            X.throw AssertionError(‘’)
 
          V result = stack.pop()
          I fract(result) == 0
@@ -766,7 +766,7 @@ F solve(puzzlestr)
          R 0B
 
    I !recurse(0)
-      X AssertionError(‘Unsolvable’)
+      X.throw AssertionError(‘Unsolvable’)
    R state
 
 [String] PUZZLES

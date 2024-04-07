@@ -126,7 +126,7 @@ V ans = Fraction(0)
 L(k) 1 .. DEGREE
    L(n) k + 1..
       I n == DEGREE + 2
-         X AssertionError(‘’)
+         X.throw AssertionError(‘’)
       V reference = Fraction(generating_function(n))
       V term = optimum_polynomial(k, n)
       I term != reference
@@ -206,7 +206,7 @@ F _sign_(x)
    E I x == 0
       R 0
    E
-      X ValueError(String(x))
+      X.throw ValueError(String(x))
 
 F is_origin_in_triangle(cs)
    V (x0, y0, x1, y1, x2, y2) = (cs[0], cs[1], cs[2], cs[3], cs[4], cs[5])
@@ -583,11 +583,11 @@ F compute()
    V numnodes = :WEIGHTS.len
 
    I any(:WEIGHTS.map(row -> (row.len != @numnodes)))
-      X AssertionError(‘Matrix not square’)
+      X.throw AssertionError(‘Matrix not square’)
    I any((0 .< numnodes).map(i -> :WEIGHTS[i][i] != -1))
-      X AssertionError(‘Self edge’)
+      X.throw AssertionError(‘Self edge’)
    I any(multiloop((0 .< numnodes), (0 .< numnodes), (i, j) -> :WEIGHTS[i][j] != :WEIGHTS[j][i]))
-      X AssertionError(‘Matrix not symmetric’)
+      X.throw AssertionError(‘Matrix not symmetric’)
 
    V oldweight = 0
    L(i) 0 .< numnodes

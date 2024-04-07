@@ -53,7 +53,7 @@ T MazeReader
             row = input(‘Enter row number #.: ’.format(x + 1))
          V rowsplit = row.split_py().map(y -> Int(y))
          I rowsplit.len != w
-            X MazeReaderException(‘invalid size of maze row’)
+            X.throw MazeReaderException(‘invalid size of maze row’)
          .maze_rows.append(rowsplit)
 
    F readFile()
@@ -69,11 +69,11 @@ T MazeReader
          L(line) lines
             V row = line.split_py().map(y -> Int(y))
             I row.len != w
-               X MazeReaderException(‘Invalid maze file - error in maze dimensions’)
+               X.throw MazeReaderException(‘Invalid maze file - error in maze dimensions’)
             E
                .maze_rows.append(row)
       X.catch
-         X MazeReaderException(‘read error’)
+         X.throw MazeReaderException(‘read error’)
 
    F getData()
       R .maze_rows
@@ -124,7 +124,7 @@ T Maze
       V width = ._rows[0].len
       V widths = ._rows.map(row -> row.len)
       I widths.count(width) != widths.len
-         X MazeError(‘Invalid maze!’)
+         X.throw MazeError(‘Invalid maze!’)
 
       ._height = ._rows.len
       ._width = width
@@ -141,10 +141,10 @@ T Maze
       V h = ._height
 
       I x > w - 1 | x < 0
-         X MazeError(‘x co-ordinate out of range!’)
+         X.throw MazeError(‘x co-ordinate out of range!’)
 
       I y > h - 1 | y < 0
-         X MazeError(‘y co-ordinate out of range!’)
+         X.throw MazeError(‘y co-ordinate out of range!’)
 
    F getItem(x, y)
       .validatePoint((x, y))

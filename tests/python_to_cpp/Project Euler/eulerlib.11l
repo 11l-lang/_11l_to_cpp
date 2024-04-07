@@ -94,4 +94,4 @@ F reciprocal_mod(Int =x, Int m) -> Int
    I x == 1
       R I a >= 0 {a} E a + m
    E
-      X ValueError(‘Reciprocal does not exist’)
+      X.throw ValueError(‘Reciprocal does not exist’)

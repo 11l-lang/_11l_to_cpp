@@ -566,7 +566,7 @@ T Timsort
          array_copy(.list_, cursor2, &.list_, dest, len2)
          .list_[dest + len2] = tmp[cursor1]
       E I len1 == 0
-         X ValueError(‘Comparison function violates its general contract!’)
+         X.throw ValueError(‘Comparison function violates its general contract!’)
       E
          assert(len2 == 0)
          assert(len1 > 1)
@@ -700,7 +700,7 @@ T Timsort
          array_copy(.list_, cursor1 + 1, &.list_, dest + 1, len1)
          .list_[dest] = tmp[cursor2]
       E I len2 == 0
-         X ValueError(‘Comparison function violates its general contract!’)
+         X.throw ValueError(‘Comparison function violates its general contract!’)
       E
          assert(len1 == 0)
          assert(len2 > 0)
@@ -752,11 +752,11 @@ F range_check(array_len, from_index, to_index)
 		 or to_index > array_len
 	’
    I from_index > to_index
-      X ValueError(‘from_index(’String(from_index)‘) > to_index(’String(to_index)‘)’)
+      X.throw ValueError(‘from_index(’String(from_index)‘) > to_index(’String(to_index)‘)’)
    I from_index < 0
-      X IndexError(from_index)
+      X.throw IndexError(from_index)
    I to_index > array_len
-      X IndexError(to_index)
+      X.throw IndexError(to_index)
 
 :start:
 V l = Array(0.<1000)

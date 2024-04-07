@@ -46,7 +46,7 @@ F highlight(lang, source)
                res ‘’= html_escape(token.value(source))
 
       X.catch python_to_11l:tokenizer:Error e
-         X Error(e.message, e.pos)
+         X.throw Error(e.message, e.pos)
    E
       assert(lang == ‘11l’)
       X.try
@@ -85,6 +85,6 @@ F highlight(lang, source)
                res ‘’= tokstr
 
       X.catch _11l_to_cpp:tokenizer:Error e
-         X Error(e.message, e.pos)
+         X.throw Error(e.message, e.pos)
 
    R res

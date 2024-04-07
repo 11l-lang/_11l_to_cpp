@@ -311,7 +311,7 @@ V HEIGHT = 10
 
 F get_crack_positions(&cracks, position) -> N
    I position < 0
-      X ValueError(‘’)
+      X.throw ValueError(‘’)
    E I position < :WIDTH
       L(i) (2, 3)
          cracks.append(position + i)

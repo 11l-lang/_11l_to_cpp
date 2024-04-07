@@ -168,7 +168,7 @@ F binary_search(lst, x)
       E I x == lst[mid]
          R mid
       E
-         X AssertionError(‘’)
+         X.throw AssertionError(‘’)
    R -start - 1
 
 V LIMIT = 10 ^ 8 - 1

@@ -57,7 +57,7 @@ T soduko
       I x C .squares[row][col]
          .squares[row][col].remove(x)
          I .squares[row][col].empty
-            X .Error()
+            X.throw .Error()
          I .squares[row][col].len == 1
             ._changed = 1B
             .update_neighbours(row, col, .squares[row][col][0])

@@ -521,7 +521,7 @@ F to_english(n)
    E I n C 1000.<1000000
       R to_english(n I/ 1000)‘thousand’(I (n % 1000 != 0) {to_english(n % 1000)} E ‘’)
    E
-      X ValueError(n)
+      X.throw ValueError(n)
 
 print(sum((1..1000).map(i -> to_english(i).len)))
 ===
