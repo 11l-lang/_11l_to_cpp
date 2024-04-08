@@ -280,6 +280,13 @@ public:
 #include "11l_hpp/BigInt.hpp"
 #include "11l_hpp/term.hpp"
 
+namespace c_ns
+{
+	using ::malloc;
+	using ::free;
+	using ::memset;
+}
+
 #include <thread>
 
 void sleep(double secs) // I could not pick up an appropriate namespace for this function, so left it in a global namespace (like in Ruby, Julia and Groovy)

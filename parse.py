@@ -1112,7 +1112,9 @@ class SymbolNode:
             elif self.symbol.id == ':':
                 c0 = self.children[0].to_str()
                 c0 = {'time':'timens', # 'time': a symbol with this name already exists and therefore this name cannot be used as a namespace name
-                      'random':'randomns'}.get(c0, c0) # GCC: .../11l-lang/_11l_to_cpp/11l_hpp/random.hpp:1:11: error: ‘namespace random { }’ redeclared as different kind of symbol
+                      'random':'randomns', # GCC: .../11l-lang/_11l_to_cpp/11l_hpp/random.hpp:1:11: error: ‘namespace random { }’ redeclared as different kind of symbol
+                      'c':'c_ns', # `c` is a too short name for namespace (there may be conflicts with variable naming)
+                     }.get(c0, c0)
                 c1 = self.children[1].to_str()
                 return c0 + '::' + (c1 if c1 != '' else '_')
 
@@ -3844,9 +3846,6 @@ builtins_scope.add_function('format_float', ASTFunctionDefinition([('x', '', 'Fl
 builtins_scope.add_function('format_float_exp', ASTFunctionDefinition([('x', '', 'Float'), ('precision', '', 'Int'), ('width', '0', 'Int')]))
 builtins_scope.add_function('commatize', ASTFunctionDefinition([('number', '', 'Int'), ('sep', token_to_str('‘,’'), 'String'), ('step', '3', 'Int')]))
 builtins_scope.add_function('gconvfmt', ASTFunctionDefinition([('number', '', 'Float')]))
-builtins_scope.add_function('malloc',   ASTFunctionDefinition([('size', '', 'Size')]))
-builtins_scope.add_function('free',     ASTFunctionDefinition([('ptr', '', 'Ptr')]))
-builtins_scope.add_function('memset',   ASTFunctionDefinition([('dest', '', 'Ptr'), ('ch', '', 'Int'), ('count', '', 'Size')]))
 builtins_scope.add_function('ValueError', ASTFunctionDefinition([('s', '', 'String')]))
 builtins_scope.add_function('IndexError', ASTFunctionDefinition([('index', '', 'Int')]))
 builtins_scope.add_function('NotImplementedError', ASTFunctionDefinition([]))
@@ -4096,6 +4095,11 @@ module_scope = Scope(None)
 module_scope.add_function('length', ASTFunctionDefinition([('x', '', 'Int')]))
 module_scope.add_function('popcount', ASTFunctionDefinition([('x', '', 'Int')]))
 builtin_modules['bits'] = Module(module_scope)
+module_scope = Scope(None)
+module_scope.add_function('malloc', ASTFunctionDefinition([('size', '', 'Size')]))
+module_scope.add_function('free',   ASTFunctionDefinition([('ptr', '', 'Ptr')]))
+module_scope.add_function('memset', ASTFunctionDefinition([('dest', '', 'Ptr'), ('ch', '', 'Int'), ('count', '', 'Size')]))
+builtin_modules['c'] = Module(module_scope)
 
 def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False, to_debug_str = False, used_builtin_modules = None): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
     if len(tokens_) == 0: return ASTProgram().to_str()
