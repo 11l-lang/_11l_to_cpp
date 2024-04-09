@@ -107,7 +107,9 @@ public:
 	Nullable() : has_value(false) {}
 	Nullable(nullptr_t) : has_value(false) {}
 	Nullable(const Ty &val) : has_value(true) {new(value)Ty(val);}
+	Nullable(Ty      &&val) : has_value(true) {new(value)Ty(std::move(val));}
 	Nullable(const Nullable &n) : has_value(n.has_value) {if (has_value) new(value)Ty(*n);}
+	Nullable(Nullable &&n) : has_value(n.has_value) {if (has_value) new(value)Ty(std::move(*n)); n.has_value = false;}
 //	template <typename Type> Nullable(Type &&value) : has_value(true), value(value) {} // for `Nullable<std::function<...>>`
 	~Nullable() {destroy();}
 
@@ -118,6 +120,9 @@ public:
 
 	const Ty &operator*() const {if (!has_value) throw NullPointerException(); return *reinterpret_cast<const Ty*>(value);}
 	      Ty &operator*()       {if (!has_value) throw NullPointerException(); return *reinterpret_cast<      Ty*>(value);}
+
+	const Ty *operator->() const {return &**this;}
+	      Ty *operator->()       {return &**this;}
 };
 
 /*template <class Ty> class OptionalMutableArgument
@@ -744,6 +749,34 @@ inline void exit(const String &msg)
 inline void exit()
 {
 	exit(0);
+}
+
+class Sentinel
+{
+};
+
+template <class Iter> class Iterator
+{
+	Nullable<Iter> iter;
+	bool has_next;
+
+public:
+	Iterator(Nullable<Iter> &&iter) : iter(std::move(iter)) {has_next = this->iter != nullptr;}
+
+	bool operator!=(Sentinel) const {return has_next;}
+
+	auto &operator*() {return iter->current();}
+	void operator++() {has_next = iter->advance();}
+};
+
+//template <class Iter> auto begin(Nullable<Iter> &iter) // MSVC does not compile `begin()` without `const` [error C4239]
+template <class Iter> auto begin(const Nullable<Iter> &iter)
+{
+	return Iterator(std::move(const_cast<Nullable<Iter>&>(iter)));
+}
+template <class Iter> auto end(const Nullable<Iter> &)
+{
+	return Sentinel();
 }
 
 class NotImplementedError {};

@@ -2462,3 +2462,63 @@ struct CodeBlock1
         print(s / n);
     }
 } code_block_1;
+
+
+T RangeIterator
+   Int cur, end
+
+   F (start, end)
+      .cur = start
+      .end = end
+
+   F current() -> &
+      R .cur
+
+   F advance()
+      R ++.cur < .end
+
+F xrange(start, end) -> RangeIterator?
+   I start >= end
+      R N
+   R RangeIterator(start, end)
+
+L(i) xrange(2, 9)
+   print(i)
+===
+class RangeIterator
+{
+public:
+    int cur, end;
+
+    template <typename T1, typename T2> RangeIterator(const T1 &start, const T2 &end) :
+        cur(start),
+        end(end)
+    {
+    }
+
+    auto& current()
+    {
+        return cur;
+    }
+
+    auto advance()
+    {
+        return ++cur < end;
+    }
+};
+
+template <typename T1, typename T2> Nullable<RangeIterator> xrange(const T1 &start, const T2 &end)
+{
+    if (start >= end)
+        return nullptr;
+    return RangeIterator(start, end);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&i : xrange(2, 9))
+            print(i);
+    }
+} code_block_1;
