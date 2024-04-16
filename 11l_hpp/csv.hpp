@@ -66,11 +66,23 @@ class Reader
 						if (c != '"')
 							break;
 					}
+					if (c == '\n' && !row_data.empty() && row_data.last() == '\r')
+						row_data.pop_back();
 					row_data.append(c);
 				}
 			}
 
-			if (c == '\n' || c == EOF)
+			if (c == '\r') {
+				row_data.append(c);
+				if (file.at_eof())
+					break;
+				c = (char)file.read_byte();
+				if (c == '\n') {
+					row_data.pop_back();
+					break;
+				}
+			}
+			else if (c == '\n')
 				break;
 
 			if (c == delimiter.code)
