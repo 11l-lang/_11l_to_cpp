@@ -977,7 +977,7 @@ T Converter
 
       [String] result
       T Writer
-         (String -> N) write
+         (String -> Void) write
       V outfile = Writer()
       I outfilef == N
          outfile.write = s -> @result.append(s)

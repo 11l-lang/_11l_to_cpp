@@ -103,7 +103,7 @@ T board
    F.const openspaces()
       R .__openspaces
 
-   F __solve(_board, depth) -> N
+   F __solve(_board, depth) -> Void
       I BoardRep(_board) !C .examined
          .examined.add(BoardRep(_board))
 

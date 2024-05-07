@@ -4327,7 +4327,7 @@ F pgrid(grid, percolated)
       V where = percolated[0]
       print(‘!)  ’(‘  ’ * where)‘ ’f[1])
 
-F flood_fill(m, n, &cell, hwall, vwall) -> N
+F flood_fill(m, n, &cell, hwall, vwall) -> Void
    cell[n][m] = 1
    I n < :nn - 1 & !hwall[n + 1][m] & !cell[n + 1][m]
       flood_fill(m, n + 1, &cell, hwall, vwall)
@@ -4695,7 +4695,7 @@ F pgrid(cell, percolated)
       V where = percolated[0]
       print(‘!)  ’(‘  ’ * where)‘’:cell2char[cell[:nn - 1][where]])
 
-F walk_maze(m, n, &cell, indx) -> N
+F walk_maze(m, n, &cell, indx) -> Void
    cell[n][m] = indx
    I n < :nn - 1 & cell[n + 1][m] == :NOT_VISITED
       walk_maze(m, n + 1, &cell, indx)
@@ -4917,7 +4917,7 @@ V NRange = [4, 64, 256, 1024, 4096]
 F newGrid(n, p)
    R (0 .< n).map(i -> (0 .< @n).map(i -> Int(nonrandom() < @@p)))
 
-F walkMaze(&grid, m, n, idx) -> N
+F walkMaze(&grid, m, n, idx) -> Void
    grid[n][m] = idx
    I n < grid.len - 1 & grid[n + 1][m] == NotClustered
       walkMaze(&grid, m, n + 1, idx)

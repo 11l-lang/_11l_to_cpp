@@ -447,7 +447,7 @@ F is_special_sum_set(s)
    V minsum = [-1] * (s.len + 1)
    V maxsum = [-1] * (s.len + 1)
 
-   F explore_subsets(Int i, Int count, Int sum) -> N
+   F explore_subsets(Int i, Int count, Int sum) -> Void
       I i == @s.len
          @sumsseen.add(sum)
          I @minsum[count] == -1 | sum < @minsum[count]

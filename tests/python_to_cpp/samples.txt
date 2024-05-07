@@ -741,14 +741,14 @@ if __name__ == '__main__':
         animal.say()
 ===
 T Animal
-   F.virtual.abstract say() -> N
+   F.virtual.abstract say() -> Void
 
 T Sheep(Animal)
-   F.virtual.assign say() -> N
+   F.virtual.assign say() -> Void
       print(‘baa’)
 
 T Cat(Animal)
-   F.virtual.assign say() -> N
+   F.virtual.assign say() -> Void
       print(‘meow’)
 
 [Animal] animals
@@ -840,15 +840,15 @@ class Cat(Animal):
         print('meow')
 ===
 T Animal
-   F.virtual.new say() -> N
+   F.virtual.new say() -> Void
       print(‘’)
 
 T Sheep(Animal)
-   F.virtual.override say() -> N
+   F.virtual.override say() -> Void
       print(‘baa’)
 
 T Cat(Animal)
-   F.virtual.override say() -> N
+   F.virtual.override say() -> Void
       print(‘meow’)
 ===
 class Animal
@@ -1921,9 +1921,9 @@ T Vector
 {
 }
 T Base
-   F.virtual.abstract intersecta(Rayo &r, Vector v) -> N
+   F.virtual.abstract intersecta(Rayo &r, Vector v) -> Void
 T Derived(Base)
-   F.virtual.assign intersecta(Rayo &r, Vector v) -> N
+   F.virtual.assign intersecta(Rayo &r, Vector v) -> Void
    {
    }
 ===
@@ -2024,20 +2024,20 @@ T Cuerpo
       .tipo = tipo
       .material = material
 
-   F.virtual.abstract intersecta(Rayo &r) -> N
+   F.virtual.abstract intersecta(Rayo &r) -> Void
 
 T Esfera(Cuerpo)
    F (material)
       .init(‘esfera’, material)
 
-   F.virtual.assign intersecta(Rayo &r) -> N
+   F.virtual.assign intersecta(Rayo &r) -> Void
       r.objInter = (.)
 
 T Plano(Cuerpo)
    F (material)
       .init(‘plano’, material)
 
-   F.virtual.assign intersecta(Rayo &r) -> N
+   F.virtual.assign intersecta(Rayo &r) -> Void
       r.objInter = (.)
 
 T Scene
@@ -4820,7 +4820,7 @@ rindices = list(range(10))
 solver.count(rindices)
 ===
 T Solver
-   F count([Int] &rindices) -> N
+   F count([Int] &rindices) -> Void
       .count(&rindices)
 
 V solver = Solver()

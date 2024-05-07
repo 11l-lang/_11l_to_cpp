@@ -1332,7 +1332,7 @@ F positions(dnaSeq, subSeq)
       start = pos + 1
    R r
 
-F dna_findall(String needle, String haystack) -> N
+F dna_findall(String needle, String haystack) -> Void
    V pp = positions(haystack, needle)
    I pp.empty
       print(‘No matches found’)

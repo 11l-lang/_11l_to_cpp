@@ -64,7 +64,7 @@ V LIMIT = Int64(10) ^ 14
 
 Int64 ans = 0
 
-F find_harshad_primes(Int64 n; digitsum, isstrong) -> N
+F find_harshad_primes(Int64 n; digitsum, isstrong) -> Void
    V m = n * 10
    V s = digitsum
    L(i) 10

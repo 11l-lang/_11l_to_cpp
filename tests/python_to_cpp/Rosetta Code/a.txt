@@ -1239,10 +1239,10 @@ class PrintQueue(AbstractQueue):
         print(item)
 ===
 T AbstractQueue
-   F.virtual.abstract enqueue(Int item) -> N
+   F.virtual.abstract enqueue(Int item) -> Void
 
 T PrintQueue(AbstractQueue)
-   F.virtual.assign enqueue(Int item) -> N
+   F.virtual.assign enqueue(Int item) -> Void
       print(item)
 ===
 class AbstractQueue
@@ -1578,7 +1578,7 @@ F bauer(n)
    V best_len = n
    V cnt = 0
 
-   F extend_chain(Int x, Int =pos) -> N
+   F extend_chain(Int x, Int =pos) -> Void
 
       I @best_len - pos < 32 & x < @n >> (@best_len - pos)
          R

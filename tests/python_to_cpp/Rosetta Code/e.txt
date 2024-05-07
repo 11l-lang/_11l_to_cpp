@@ -115,7 +115,7 @@ F eertree(s)
 F subPalindromes(tree)
    [String] s
 
-   F children(Int n, String =p) -> N
+   F children(Int n, String =p) -> Void
       L(c, n) @tree[n].edges
          p = c‘’p‘’c
          @s [+]= p
@@ -1979,7 +1979,7 @@ F incr()
 :start:
 src = File(:argv[1]).read()
 
-[Char = (() -> N)] dispatch
+[Char = (() -> Void)] dispatch
 dispatch[Char(‘h’)] = hello
 dispatch[Char(‘q’)] = quine
 dispatch[Char(‘9’)] = bottles
@@ -2298,7 +2298,7 @@ F isEsthetic(=n, b)
 F listEsths(Int64 n1, Int64 n2, Int64 m1, Int64 m2; perLine, all)
    [Int64] esths
 
-   F dfs(Int64 n, Int64 m, Int64 i) -> N
+   F dfs(Int64 n, Int64 m, Int64 i) -> Void
       I i C n .. m
          @esths.append(i)
       I i == 0 | i > m

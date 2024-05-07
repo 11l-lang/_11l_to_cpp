@@ -1392,8 +1392,7 @@ class ASTExpression(ASTNodeWithExpression):
 
 cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'пер':'auto',
                      'Int':'int', 'Long':'Long', 'ULong':'ULong', 'Int64':'Int64', 'UInt64':'UInt64', 'Int32':'int32_t', 'UInt32':'uint32_t', 'Int16':'int16_t', 'UInt16':'uint16_t', 'Int8':'int8_t', 'BigInt':'BigInt', 'Size':'Size', 'USize':'USize',
-                     'Float':'double', 'SFloat':'float', 'Float32':'float', 'Float64':'double', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte', 'Bytes':'Array<Byte>', 'Ptr':'Ptr',
-                     'N':'void', 'Н':'void', 'null':'void', 'нуль':'void',
+                     'Float':'double', 'SFloat':'float', 'Float32':'float', 'Float64':'double', 'Complex':'Complex', 'String':'String', 'Bool':'bool', 'Byte':'Byte', 'Bytes':'Array<Byte>', 'Ptr':'Ptr', 'Void':'void',
                      'Array':'Array', 'ArrayFixLen':'ArrayFixLen', 'ArrayMaxLen':'ArrayMaxLen', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque', 'Counter':'Counter', 'Fraction':'Fraction'}
 cpp_vectype_from_11l = {}
 for dimension in ('2', '3', '4'):
@@ -2463,7 +2462,7 @@ cpp_keywords = {'alignas', 'alignof', 'and', 'and_eq', 'asm', 'auto', 'bitand', 
 russian_names = {
     'ввод':'input', 'вывод':'print', "кон'":"end'", 'вывод_эл':'print_elements', "разд'":"sep'", 'выход':'exit', 'скоп':'copy', 'перем':'move', 'сортй':'sorted', 'обратный':'reversed',
     'обмен':'swap', 'все':'all', 'любой':'any', 'сумма':'sum', 'нод':'gcd', 'шаг':'step', 'формат':'format',
-    'Бул':'Bool',
+    'Пуст':'Void', 'Бул':'Bool',
      'Цел': 'Int', 'Цел8':'Int8',  'Цел16': 'Int16',  'Цел32': 'Int32',  'Цел64': 'Int64',  'ДлЦел': 'Long',  'ЦелУкз': 'IntPtr',  'Размер': 'Size', 'Укз':'Ptr', 'как':'as',
     'БЦел':'UInt', 'Байт':'Byte', 'БЦел16':'UInt16', 'БЦел32':'UInt32', 'БЦел64':'UInt64', 'БДлЦел':'ULong', 'БЦелУкз':'UIntPtr', 'БРазмер':'USize', 'БолЦел':'BigInt',
     'Вещ':'Float', 'Вещ32':'Float32', 'Вещ64':'Float64',

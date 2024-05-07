@@ -3014,7 +3014,7 @@ arr = [7, 6, 5, 9, 8, 4, 3, 1, 2, 0]
 quicksort(arr)
 print(arr)
 ===
-F _quicksort(&array, start, stop) -> N
+F _quicksort(&array, start, stop) -> Void
    I stop - start > 0
       V pivot = array[start]
       V left = start
@@ -3291,7 +3291,7 @@ data = [1, 4, 5, 3, -6, 3, 7, 10, -2, -5, 7, 5, 9, -3, 7]
 stooge(data)
 print(data)
 ===
-F stoogesort(&l, i, j) -> N
+F stoogesort(&l, i, j) -> Void
    I l[j] < l[i]
       swap(&l[i], &l[j])
    I j - i > 1
@@ -5052,7 +5052,7 @@ T SuffixTree
          print(‘<empty>’)
          R
 
-      F f(Int n, String pre) -> N
+      F f(Int n, String pre) -> Void
          V children = @.nodes[n].ch
          I children.empty
             print(‘-- ’(@.nodes[n].sub))
@@ -8133,7 +8133,7 @@ for test in ['9900', '9090', '9009']:
 [String] result
 V longest = 0
 
-F make_sequence(n) -> N
+F make_sequence(n) -> Void
    DefaultDict[Char, Int] map
    L(c) n
       map[c]++

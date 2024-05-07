@@ -431,7 +431,7 @@ T MazeGame
 
    F.virtual.abstract createMaze() -> Maze
 
-   F.virtual.abstract getStartEndPoints(Maze maze) -> N
+   F.virtual.abstract getStartEndPoints(Maze maze) -> Void
 
    F runGame()
       V maze = .createMaze()
@@ -452,7 +452,7 @@ T FilebasedMazeGame(MazeGame)
       print(m)
       R m
 
-   F.virtual.assign getStartEndPoints(Maze maze) -> N
+   F.virtual.assign getStartEndPoints(Maze maze) -> Void
 
       L
          X.try

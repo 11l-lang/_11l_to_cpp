@@ -66,7 +66,7 @@ T soduko
       }
       R
 
-   F update_neighbours(set_row, set_col, x) -> N
+   F update_neighbours(set_row, set_col, x) -> Void
       L(row) 0..8
          I row != set_row
             .cell_exclude(row, set_col, x)

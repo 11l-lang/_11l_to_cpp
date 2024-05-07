@@ -55,7 +55,7 @@ F divide_exactly(x, y)
       X.throw ValueError(‘Not divisible’)
    R x I/ y
 
-F explore(remain, limit, &history) -> N
+F explore(remain, limit, &history) -> Void
    I remain == 0
       V hist = Array(history)
       L hist.len < :NUM_COLORS

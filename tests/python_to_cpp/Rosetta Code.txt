@@ -8733,7 +8733,7 @@ F make_maze(w = 16, h = 8)
    V ver = (0 .< h).map(_ -> [‘|  ’] * @w [+] [String(‘|’)]) [+] [[‘’] * 0]
    V hor = (0 .. h).map(_ -> [‘+--’] * @w [+] [String(‘+’)])
 
-   F walk(Int x, Int y) -> N
+   F walk(Int x, Int y) -> Void
       @vis[y][x] = 1
 
       V d = [(x - 1, y), (x, y + 1), (x + 1, y), (x, y - 1)]
@@ -10607,13 +10607,13 @@ T Resistor
 
    F.virtual.new res() -> Float
       R .resistance
-   F.virtual.new setVoltage(Float voltage) -> N
+   F.virtual.new setVoltage(Float voltage) -> Void
       .voltage = voltage
    F current()
       R .voltage / .res()
    F effect()
       R .current() * .voltage
-   F report(level = ‘’) -> N
+   F report(level = ‘’) -> Void
       print(‘#4.3 #4.3 #4.3 #4.3  #.#.’.format(.res(), .voltage, .current(), .effect(), level, .symbol))
       I .a != N
          .a.report(level‘| ’)
@@ -10629,7 +10629,7 @@ T Serial(Resistor)
    F.virtual.override res() -> Float
       R .a.res() + .b.res()
 
-   F.virtual.override setVoltage(Float voltage) -> N
+   F.virtual.override setVoltage(Float voltage) -> Void
       V ra = .a.res()
       V rb = .b.res()
       .a.setVoltage(ra / (ra + rb) * voltage)
@@ -10645,7 +10645,7 @@ T Parallel(Resistor)
    F.virtual.override res() -> Float
       R 1 / (1 / .a.res() + 1 / .b.res())
 
-   F.virtual.override setVoltage(Float voltage) -> N
+   F.virtual.override setVoltage(Float voltage) -> Void
       .a.setVoltage(voltage)
       .b.setVoltage(voltage)
       .voltage = voltage
@@ -12659,28 +12659,28 @@ T Node
       .left = left
       .right = right
 
-   F preorder(visitor) -> N
+   F preorder(visitor) -> Void
       visitor(.data)
       I .left != N
          .left.preorder(visitor)
       I .right != N
          .right.preorder(visitor)
 
-   F inorder(visitor) -> N
+   F inorder(visitor) -> Void
       I .left != N
          .left.inorder(visitor)
       visitor(.data)
       I .right != N
          .right.inorder(visitor)
 
-   F postorder(visitor) -> N
+   F postorder(visitor) -> Void
       I .left != N
          .left.postorder(visitor)
       I .right != N
          .right.postorder(visitor)
       visitor(.data)
 
-   F preorder2(&d, level = 0) -> N
+   F preorder2(&d, level = 0) -> Void
       d[level].append(.data)
       I .left != N
          .left.preorder2(d, level + 1)
@@ -16348,7 +16348,7 @@ F help()
    print(‘  help’)
    :histArr [+]= ‘help’
 
-[String = (() -> N)] aa
+[String = (() -> Void)] aa
 aa[‘help’] = help
 aa[‘hist’] = hist
 aa[‘hello’] = hello
@@ -17425,7 +17425,7 @@ T Graph
       .graph = Dict(move(g))
       .tarjan_algo()
 
-   F _visitor(this) -> N
+   F _visitor(this) -> Void
       ‘
         Recursive function that finds SCC's
         using DFS traversal of vertices.

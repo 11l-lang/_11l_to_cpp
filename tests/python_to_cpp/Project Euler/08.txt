@@ -905,7 +905,7 @@ F compute()
    V LIMIT = 12000
    V minsumproduct = [-1] * (LIMIT + 1)
 
-   F factorize(Int n, Int remain, Int maxfactor, Int sum, Int =terms) -> N
+   F factorize(Int n, Int remain, Int maxfactor, Int sum, Int =terms) -> Void
       I remain == 1
          I sum > n
             X.throw AssertionError(‘’)

@@ -3935,7 +3935,7 @@ T Solver
       .want = want
       .width = width
 
-   F count(Int sum, [Int] used, [Int] have, [Int] uindices, [Int] rindices) -> N
+   F count(Int sum, [Int] used, [Int] have, [Int] uindices, [Int] rindices) -> Void
       I sum == .want
          .count1++
          .count2 += factorial(used.len)
@@ -4070,7 +4070,7 @@ V best_out = ‘’
 V target = 952
 V nbrs = [100, 75, 50, 25, 6, 3]
 
-F sol(target, nbrs, out = ‘’) -> N
+F sol(target, nbrs, out = ‘’) -> Void
    I abs(target - :best) > abs(target - nbrs[0])
       :best = nbrs[0]
       :best_out = out

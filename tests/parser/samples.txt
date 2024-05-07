@@ -732,10 +732,10 @@ struct CodeBlock1
 } code_block_1;
 
 
-F func(Int n) -> N
+F func(Int n) -> Void
    print(n)
 
-(Int -> N) fptr = func
+(Int -> Void) fptr = func
 fptr(1)
 ===
 void func(const int n)

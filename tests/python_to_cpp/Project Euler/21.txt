@@ -309,7 +309,7 @@ V WIDTH = 32
 V HEIGHT = 10
 [Set[Int]] crackpositions
 
-F get_crack_positions(&cracks, position) -> N
+F get_crack_positions(&cracks, position) -> Void
    I position < 0
       X.throw ValueError(‘’)
    E I position < :WIDTH

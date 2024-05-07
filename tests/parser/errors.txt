@@ -172,7 +172,7 @@ Array[Animal] animals
 
 
 T Animal
-   F.virtual.abstract say(arg) -> N
+   F.virtual.abstract say(arg) -> Void
    ^Error: type should be specified for argument `arg` [for virtual functions all arguments should have types]
 
 
@@ -283,7 +283,7 @@ V a = r().split_py().map(Int)
 
 
 T Solver
-   F count([Int] &rindices) -> N
+   F count([Int] &rindices) -> Void
       .count(&rindices [+] 1)
              ^Error: wrong usage of unary `&` operator
 
