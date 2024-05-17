@@ -5191,3 +5191,19 @@ struct CodeBlock2
         afb.write_bytes("aa"_B);
     }
 } code_block_2;
+
+
+class Token:
+    pass
+indent_f: Callable[[List[Token]], str]
+===
+T Token
+{
+}
+([Token] -> String) indent_f
+===
+class Token
+{
+};
+
+std::function<String(const Array<Token>&)> indent_f;

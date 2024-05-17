@@ -3695,6 +3695,8 @@ def parse_internal(this_node):
                             node.type = c0.children[1].token_str() # return value type
                             if c0.children[0].token.category == Token.Category.NAME:
                                 node.type_args.append(c0.children[0].token_str())
+                            elif c0.children[0].symbol.id == '[': # ]
+                                node.type_args.append(c0.children[0].to_type_str())
                             else:
                                 assert(c0.children[0].symbol.id == '(') # )
                                 for child in c0.children[0].children:
