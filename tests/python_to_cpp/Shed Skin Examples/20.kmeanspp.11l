@@ -97,14 +97,7 @@ F lloyd(&points, nclusters)
 
    R cluster_centers
 
-T Color
-   Float r
-   Float g
-   Float b
-   F (r, g, b)
-      .r = r
-      .g = g
-      .b = b
+T Color = (Float r, Float g, Float b)
 
 F print_eps(points, cluster_centers, w = 400, h = 400)
    [Color] colors

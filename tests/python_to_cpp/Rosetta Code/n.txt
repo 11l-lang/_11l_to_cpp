@@ -2559,14 +2559,7 @@ def quad_asr(f, a: float, b: float, eps: float)->float:
 sinx = quad_asr(lambda x: math.sin(x), a, b, 1e-09)
 print("Simpson's integration of sine from {} to {} = {}".format(a, b, sinx))
 ===
-T Triple
-   Float m
-   Float fm
-   Float simp
-   F (m, fm, simp)
-      .m = m
-      .fm = fm
-      .simp = simp
+T Triple = (Float m, Float fm, Float simp)
 
 F _quad_simpsons_mem(f, Float a, Float fa, Float b, Float fb)
    ‘
@@ -2606,12 +2599,9 @@ public:
     double m;
     double fm;
     double simp;
-    template <typename T1, typename T2, typename T3> Triple(const T1 &m, const T2 &fm, const T3 &simp) :
-        m(m),
-        fm(fm),
-        simp(simp)
-    {
-    }
+
+    Triple(const double &m, const double &fm, const double &simp) :
+        m(m), fm(fm), simp(simp) {}
 };
 
 template <typename T1> auto _quad_simpsons_mem(const T1 &f, const double a, const double fa, const double b, const double fb)

@@ -140,12 +140,9 @@ public:
     double r;
     double g;
     double b;
-    template <typename T1, typename T2, typename T3> Color(const T1 &r, const T2 &g, const T3 &b) :
-        r(r),
-        g(g),
-        b(b)
-    {
-    }
+
+    Color(const double &r, const double &g, const double &b) :
+        r(r), g(g), b(b) {}
 };
 
 template <typename T1, typename T2, typename T3 = decltype(400), typename T4 = decltype(400)> auto print_eps(const T1 &points, const T2 &cluster_centers, const T3 &w = 400, const T4 &h = 400)

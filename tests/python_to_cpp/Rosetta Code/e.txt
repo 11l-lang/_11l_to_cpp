@@ -1501,14 +1501,7 @@ for n, ruleset in enumerate(RuleSets):
     rules = parse(ruleset)
     print(apply(SampleTexts[n], rules))
 ===
-T Rule
-   String pattern
-   String replacement
-   Bool terminating
-   F (pattern, replacement, terminating)
-      .pattern = pattern
-      .replacement = replacement
-      .terminating = terminating
+T Rule = (String pattern, String replacement, Bool terminating)
 
 F parse(rules)
    [Rule] result
@@ -1626,12 +1619,9 @@ public:
     String pattern;
     String replacement;
     bool terminating;
-    template <typename T1, typename T2, typename T3> Rule(const T1 &pattern, const T2 &replacement, const T3 &terminating) :
-        pattern(pattern),
-        replacement(replacement),
-        terminating(terminating)
-    {
-    }
+
+    Rule(const String &pattern, const String &replacement, const bool &terminating) :
+        pattern(pattern), replacement(replacement), terminating(terminating) {}
 };
 
 template <typename T1> auto parse(const T1 &rules)

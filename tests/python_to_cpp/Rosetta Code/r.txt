@@ -2125,12 +2125,7 @@ T Edge
       .a = a
       .b = b
 
-T Poly
-   String name
-   [Edge] edges
-   F (name, edges)
-      .name = name
-      .edges = edges
+T Poly = (String name, [Edge] edges)
 
 V _eps = 0.00001
 V _huge = 1e+100
@@ -2221,11 +2216,9 @@ class Poly
 public:
     String name;
     Array<Edge> edges;
-    template <typename T1, typename T2> Poly(const T1 &name, const T2 &edges) :
-        name(name),
-        edges(edges)
-    {
-    }
+
+    Poly(const String &name, const Array<Edge> &edges) :
+        name(name), edges(edges) {}
 };
 
 auto _eps = 0.00001;

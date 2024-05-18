@@ -4290,14 +4290,7 @@ F nonrandom()
    :seed = (1664525 * :seed + 1013904223) [&] FFFF'FFFF
    R (:seed >> 16) / Float(FF'FF)
 
-T Grid
-   [[Int]] cell
-   [[Int]] hwall
-   [[Int]] vwall
-   F (cell, hwall, vwall)
-      .cell = cell
-      .hwall = hwall
-      .vwall = vwall
+T Grid = ([[Int]] cell, [[Int]] hwall, [[Int]] vwall)
 
 V (M, nn, t) = (10, 10, 100)
 
@@ -4382,12 +4375,9 @@ public:
     Array<Array<int>> cell;
     Array<Array<int>> hwall;
     Array<Array<int>> vwall;
-    template <typename T1, typename T2, typename T3> Grid(const T1 &cell, const T2 &hwall, const T3 &vwall) :
-        cell(cell),
-        hwall(hwall),
-        vwall(vwall)
-    {
-    }
+
+    Grid(const Array<Array<int>> &cell, const Array<Array<int>> &hwall, const Array<Array<int>> &vwall) :
+        cell(cell), hwall(hwall), vwall(vwall) {}
 };
 
 auto [M, nn, t] = make_tuple(10, 10, 100);

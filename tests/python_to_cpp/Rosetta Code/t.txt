@@ -2820,12 +2820,7 @@ T NNode
    F String()
       R .to_str(0)
 
-T INode
-   String value
-   Int level
-   F (value, level)
-      .value = value
-      .level = level
+T INode = (String value, Int level)
 
 F to_indented(node)
    [INode] result
@@ -2916,11 +2911,9 @@ class INode
 public:
     String value;
     int level;
-    template <typename T1, typename T2> INode(const T1 &value, const T2 &level) :
-        value(value),
-        level(level)
-    {
-    }
+
+    INode(const String &value, const int &level) :
+        value(value), level(level) {}
 };
 
 template <typename T1> auto to_indented(const T1 &node)

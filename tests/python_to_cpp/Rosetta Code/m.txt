@@ -3561,12 +3561,7 @@ moTest(pow(BigInt(10), 10000) - 1, BigInt(22801763489))
 moTest(1511678068, 7379191741)
 moTest(BigInt('3047753288'), BigInt('2257683301'))
 ===
-T PExp
-   BigInt prime
-   Int exp
-   F (prime, exp)
-      .prime = prime
-      .exp = exp
+T PExp = (BigInt prime, Int exp)
 
 F isqrt(self)
    V b = self
@@ -3644,11 +3639,9 @@ class PExp
 public:
     BigInt prime;
     int exp;
-    template <typename T1, typename T2> PExp(const T1 &prime, const T2 &exp) :
-        prime(prime),
-        exp(exp)
-    {
-    }
+
+    PExp(const BigInt &prime, const int &exp) :
+        prime(prime), exp(exp) {}
 };
 
 template <typename T1> auto isqrt(const T1 &self)

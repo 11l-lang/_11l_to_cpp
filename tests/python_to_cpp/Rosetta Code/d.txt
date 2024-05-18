@@ -402,14 +402,7 @@ graph = Graph([("a", "b", 7),  ("a", "c", 9),  ("a", "f", 14), ("b", "c", 10),
                ("e", "f", 9)])
 print(graph.dijkstra("a", "e"))
 ===
-T Edge
-   String start
-   String end
-   Int cost
-   F (start, end, cost)
-      .start = start
-      .end = end
-      .cost = cost
+T Edge = (String start, String end, Int cost)
 
 T Graph
    [Edge] edges
@@ -459,12 +452,9 @@ public:
     String start;
     String end;
     int cost;
-    template <typename T1, typename T2, typename T3> Edge(const T1 &start, const T2 &end, const T3 &cost) :
-        start(start),
-        end(end),
-        cost(cost)
-    {
-    }
+
+    Edge(const String &start, const String &end, const int &cost) :
+        start(start), end(end), cost(cost) {}
 };
 
 class Graph
@@ -980,25 +970,9 @@ def draw_sphere(k, ambient, light):
 light = normalize(V3(-50, 30, 50))
 draw_sphere(2, 0.5, light)
 ===
-T Sphere
-   Float cx
-   Float cy
-   Float cz
-   Float r
-   F (cx, cy, cz, r)
-      .cx = cx
-      .cy = cy
-      .cz = cz
-      .r = r
+T Sphere = (Float cx, Float cy, Float cz, Float r)
 
-T V3
-   Float x
-   Float y
-   Float z
-   F (x, y, z)
-      .x = x
-      .y = y
-      .z = z
+T V3 = (Float x, Float y, Float z)
 
 F normalize(V3 xyz)
    V (x, y, z) = xyz
@@ -1072,13 +1046,9 @@ public:
     double cy;
     double cz;
     double r;
-    template <typename T1, typename T2, typename T3, typename T4> Sphere(const T1 &cx, const T2 &cy, const T3 &cz, const T4 &r) :
-        cx(cx),
-        cy(cy),
-        cz(cz),
-        r(r)
-    {
-    }
+
+    Sphere(const double &cx, const double &cy, const double &cz, const double &r) :
+        cx(cx), cy(cy), cz(cz), r(r) {}
 };
 
 class V3
@@ -1087,12 +1057,9 @@ public:
     double x;
     double y;
     double z;
-    template <typename T1, typename T2, typename T3> V3(const T1 &x, const T2 &y, const T3 &z) :
-        x(x),
-        y(y),
-        z(z)
-    {
-    }
+
+    V3(const double &x, const double &y, const double &z) :
+        x(x), y(y), z(z) {}
 };
 
 auto normalize(const V3 &xyz)

@@ -14032,14 +14032,7 @@ V w = ‘tH.........
 .   .
 Ht.. ......’
 
-T WW
-   [[Char]] world
-   Int w
-   Int h
-   F (world, w, h)
-      .world = world
-      .w = w
-      .h = h
+T WW = ([[Char]] world, Int w, Int h)
 
 F readfile(f)
    ‘file > initial world configuration’
@@ -14103,12 +14096,9 @@ public:
     Array<Array<Char>> world;
     int w;
     int h;
-    template <typename T1, typename T2, typename T3> WW(const T1 &world, const T2 &w, const T3 &h) :
-        world(world),
-        w(w),
-        h(h)
-    {
-    }
+
+    WW(const Array<Array<Char>> &world, const int &w, const int &h) :
+        world(world), w(w), h(h) {}
 };
 
 template <typename T1> auto readfile(const T1 &f)
@@ -19813,12 +19803,7 @@ print("and thus remaining day is %i." % day)
 print()
 print("So birthday date is %s %i." % (month, day))
 ===
-T Date
-   String month
-   Int day
-   F (month, day)
-      .month = month
-      .day = day
+T Date = (String month, Int day)
 
 V dates = [Date(‘May’, 15), Date(‘May’, 16), Date(‘May’, 19), Date(‘June’, 17), Date(‘June’, 18), Date(‘July’, 14), Date(‘July’, 16), Date(‘August’, 14), Date(‘August’, 15), Date(‘August’, 17)]
 
@@ -19879,11 +19864,9 @@ class Date
 public:
     String month;
     int day;
-    template <typename T1, typename T2> Date(const T1 &month, const T2 &day) :
-        month(month),
-        day(day)
-    {
-    }
+
+    Date(const String &month, const int &day) :
+        month(month), day(day) {}
 };
 
 auto dates = create_array<Date>({Date(u"May"_S, 15), Date(u"May"_S, 16), Date(u"May"_S, 19), Date(u"June"_S, 17), Date(u"June"_S, 18), Date(u"July"_S, 14), Date(u"July"_S, 16), Date(u"August"_S, 14), Date(u"August"_S, 15), Date(u"August"_S, 17)});

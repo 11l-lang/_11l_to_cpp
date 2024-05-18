@@ -804,6 +804,8 @@ class SymbolNode:
                                     if len(f_node.constructors) > 1:
                                         raise Error('constructors\' overloading is not supported for now (see type `' + f_node.type_name + '`)', self.children[0].left_to_right_token())
                                     f_node = f_node.constructors[0]
+                            elif type(f_node) == ASTTypeAlias and len(f_node.named_tuple_members) > 0:
+                                f_node = f_node.constructor
                 last_function_arg = 0
                 res = func_name + '('
                 for i in range(1, len(self.children), 2):
@@ -2262,12 +2264,26 @@ class ASTTypeAlias(ASTNode):
     name : str
     defining_type : str # this term is taken from C++ Standard (‘using identifier attribute-specifier-seqopt = defining-type-id ;’)
     template_params : List[str]
+    named_tuple_members: List[Tuple[str, str]]
 
     def __init__(self):
         self.template_params = []
+        self.named_tuple_members = []
 
     def to_str(self, indent):
-        r = ' ' * (indent*4)
+        if len(self.named_tuple_members) > 0: # this is a named tuple
+            r = self.pre_nl
+            r += ' ' * (indent*4) + 'class ' + self.name + "\n"
+            r += ' ' * (indent*4) + "{\n"
+            r += ' ' * (indent*4) + "public:\n"
+            for member_type, member_name in self.named_tuple_members:
+                r += ' ' * ((indent+1)*4) + member_type + ' ' + member_name + ";\n"
+            r += "\n"
+            r += ' ' * ((indent+1)*4) + self.name + '(' + ', '.join('const ' + ty + ' &' + na for ty, na in self.named_tuple_members) + ") :\n"
+            r += ' ' * ((indent+2)*4) + ', '.join(na + '(' + na + ')' for ty, na in self.named_tuple_members) + " {}\n"
+            return r + ' ' * (indent*4) + "};\n"
+
+        r = self.pre_nl + ' ' * (indent*4)
         if len(self.template_params):
             r += 'template <' + ', '.join(self.template_params) + '> '
         return r + 'using ' + self.name + ' = ' + self.defining_type + ";\n"
@@ -3171,6 +3187,7 @@ def parse_internal(this_node):
                 if token.value(source) in ('[', '='): # ] # this is a type alias
                     n = ASTTypeAlias()
                     n.name = node.type_name
+                    n.pre_nl = pre_nl(node.tokeni)
                     node = n
                     scope.add_name(node.name, node)
 
@@ -3199,8 +3216,23 @@ def parse_internal(this_node):
                             advance(',')
                     advance('=')
 
-                    expr = expression()
-                    node.defining_type = trans_type(expr.to_type_str(), scope, expr.left_to_right_token())
+                    if token.value(source) == '(' and peek_token(2).value(source) != ',':
+                        next_token()
+                        while token.value(source) != ')':
+                            expr = expression()
+                            type_name = trans_type(expr.to_type_str(), scope, expr.left_to_right_token())
+                            if token.category != Token.Category.NAME:
+                                raise Error('expected named tuple member name', token)
+                            node.named_tuple_members.append((type_name, tokensn.token_str()))
+                            next_token()
+                            if token.value(source) == ',':
+                                next_token()
+                        node.constructor = ASTFunctionDefinition([(m[1], '', m[0]) for m in node.named_tuple_members])
+                        next_token()
+                    else:
+                        expr = expression()
+                        node.defining_type = trans_type(expr.to_type_str(), scope, expr.left_to_right_token())
+
                     scope = prev_scope
                     if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
                         next_token()
