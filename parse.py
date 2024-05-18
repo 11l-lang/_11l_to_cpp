@@ -1680,17 +1680,19 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
             gather_captured_variables(self)
 
             arguments = []
+            argument_types_are_specified = True
             for arg in self.function_arguments:
                 if arg[2] == '': # if there is no type specified
                     arguments.append(('auto ' if '=' in arg[3] else 'const auto &') + arg[0] if arg[1] == '' else
                                           ('' if '=' in arg[3] else 'const ') + 'decltype(' + arg[1] + ') ' + arg[0] + ' = ' + arg[1])
+                    argument_types_are_specified = False
                 else:
                     tid = self.scope.parent.find(arg[2].rstrip('?'))
                     if tid is not None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and (tid.ast_nodes[0].has_virtual_functions or tid.ast_nodes[0].has_pointers_to_the_same_type):
                         arguments.append('std::unique_ptr<' + arg[2].rstrip('?') + '> ' + arg[0] + ('' if arg[1] == '' else ' = ' + arg[1]))
                     else:
                         arguments.append(('' if '=' in arg[3] or '&' in arg[3] else 'const ') + trans_type(arg[2], self.scope, tokens[self.tokeni]) + ' ' + ('&'*((arg[2] not in ('Int', 'Float')) and ('=' not in arg[3]))) + arg[0] + ('' if arg[1] == '' else ' = ' + arg[1]))
-            return self.children_to_str(indent, ('auto' if self.function_return_type == '' else 'std::function<' + trans_type(self.function_return_type, self.scope, tokens[self.tokeni]) + '(' + ', '.join(trans_type(arg[2], self.scope, tokens[self.tokeni]) + '&'*('&' in arg[3]) for arg in self.function_arguments) + ')>') + ' ' + self.function_name
+            return self.children_to_str(indent, ('auto' if self.function_return_type == '' or not argument_types_are_specified else 'std::function<' + trans_type(self.function_return_type, self.scope, tokens[self.tokeni]) + '(' + ', '.join(trans_type(arg[2], self.scope, tokens[self.tokeni]) + '&'*('&' in arg[3]) for arg in self.function_arguments) + ')>') + ' ' + self.function_name
                 + ' = [' + ', '.join(sorted(filter(lambda v: not '&'+v in captured_variables, captured_variables))) + ']('
                 + ', '.join(arguments) + ')' + ('' if self.function_return_type == '' else ' -> ' + trans_type(self.function_return_type, self.scope, tokens[self.tokeni])))[:-1] + ";\n"
 

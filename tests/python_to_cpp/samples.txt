@@ -5244,3 +5244,32 @@ struct CodeBlock1
         }
     }
 } code_block_1;
+
+
+if __name__ == '__main__':
+    def get_comment(src_line) -> str:
+        return ' '
+
+    comment = get_comment(0)
+    if True:
+        comment += get_comment(0)
+===
+:start:
+F get_comment(src_line) -> String
+   R ‘ ’
+
+V comment = get_comment(0)
+I 1B
+   comment ‘’= get_comment(0)
+===
+int main()
+{
+    auto get_comment = [](const auto &src_line) -> String
+    {
+        return u" "_S;
+    };
+
+    auto comment = get_comment(0);
+    if (true)
+        comment &= get_comment(0);
+}
