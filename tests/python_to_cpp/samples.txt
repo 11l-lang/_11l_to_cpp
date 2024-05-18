@@ -5207,3 +5207,10 @@ class Token
 };
 
 std::function<String(const Array<Token>&)> indent_f;
+
+
+longest_src_line_len = max([1, 2], default = 0)
+===
+V longest_src_line_len = max([1, 2], default' 0)
+===
+auto longest_src_line_len = max_with_default(create_array({1, 2}), 0);

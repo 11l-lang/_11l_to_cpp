@@ -882,6 +882,16 @@ template <typename Type> Type max(const Array<Type> &arr)
 	return r;
 }
 
+template <typename Type> Type max_with_default(const Array<Type> &arr, const Type &default_)
+{
+	if (arr.empty())
+		return default_;
+	Type r = arr[0];
+	for (auto i : arr)
+		if (i > r) r = i;
+	return r;
+}
+
 template <typename Iterable, typename Func> auto max_map(const Iterable &iterable, Func &&func)
 {
 	auto r = func(*std::begin(iterable));
@@ -909,6 +919,16 @@ template <typename Ty> bool operator<(const Tvec<Ty, 4> &v1, const Tvec<Ty, 4> &
 
 template <typename Type> Type min(const Array<Type> &arr)
 {
+	Type r = arr[0];
+	for (auto i : arr)
+		if (i < r) r = i;
+	return r;
+}
+
+template <typename Type> Type min_with_default(const Array<Type> &arr, const Type &default_)
+{
+	if (arr.empty())
+		return default_;
 	Type r = arr[0];
 	for (auto i : arr)
 		if (i < r) r = i;
