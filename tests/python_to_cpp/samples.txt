@@ -5214,3 +5214,33 @@ longest_src_line_len = max([1, 2], default = 0)
 V longest_src_line_len = max([1, 2], default' 0)
 ===
 auto longest_src_line_len = max_with_default(create_array({1, 2}), 0);
+
+
+options_list = ['mode', 'indent']
+new_config = ''
+for option in options_list:
+    new_config += option + "\n"
+    if option is not options_list[-1]:
+        new_config += "\n"
+===
+V options_list = [‘mode’, ‘indent’]
+V new_config = ‘’
+L(option) options_list
+   new_config ‘’= option"\n"
+   I &option != &options_list.last
+      new_config ‘’= "\n"
+===
+auto options_list = create_array({u"mode"_S, u"indent"_S});
+auto new_config = u""_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        for (auto &&option : options_list) {
+            new_config &= option & u"\n"_S;
+            if (&option != &options_list.last())
+                new_config &= u"\n"_S;
+        }
+    }
+} code_block_1;

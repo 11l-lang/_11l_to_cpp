@@ -1176,7 +1176,7 @@ class SymbolNode:
                 id_, s = self.scope.find_and_return_scope(self.children[0].children[0].token_str())
                 if id_ is not None and len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTLoop and id_.ast_nodes[0].is_loop_variable_a_ptr and self.children[0].children[0].token_str() == id_.ast_nodes[0].loop_variable: # `L(obj)...&obj != &objChoque` -> `...&*obj != objChoque`
                     return '&*' + self.children[0].children[0].token_str() + ' ' + self.symbol.id + ' ' + self.children[1].children[0].token_str()
-                return '&' + self.children[0].children[0].token_str() + ' ' + self.symbol.id + ' &' + self.children[1].children[0].token_str()
+                return '&' + self.children[0].children[0].token_str() + ' ' + self.symbol.id + ' &' + self.children[1].children[0].to_str()
             elif self.symbol.id == '==' and self.children[0].symbol.id == '==': # replace `a == b == c` with `equal(a, b, c)`
                 def f(child):
                     if child.symbol.id == '==':
