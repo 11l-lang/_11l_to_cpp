@@ -1763,17 +1763,9 @@ for x0, y0, x1, y1 in ((1,8,8,16),(8,16,16,8),(16,8,8,1),(8,1,1,8)):
     bitmap.line(x0, y0, x1, y1)
 bitmap.chardisplay()
 ===
-T Colour
-   Byte r
-   Byte g
-   Byte b
-
+T Colour((Byte r, Byte g, Byte b))
    F ==(other)
       R .r == other.r & .g == other.g & .b == other.b
-   F (r, g, b)
-      .r = r
-      .g = g
-      .b = b
 
 V black = Colour(0, 0, 0)
 V white = Colour(255, 255, 255)
@@ -1849,15 +1841,12 @@ public:
     Byte g;
     Byte b;
 
+    Colour(const Byte &r, const Byte &g, const Byte &b) :
+        r(r), g(g), b(b) {}
+
     template <typename T1> auto operator==(const T1 &other) const
     {
         return r == other.r && g == other.g && b == other.b;
-    }
-    template <typename T1, typename T2, typename T3> Colour(const T1 &r, const T2 &g, const T3 &b) :
-        r(r),
-        g(g),
-        b(b)
-    {
     }
 };
 
@@ -2055,17 +2044,9 @@ bitmap = Bitmap(17,17)
 bitmap.cubicbezier(16,1, 1,4, 3,16, 15,11)
 bitmap.chardisplay()
 ===
-T Colour
-   Byte r
-   Byte g
-   Byte b
-
+T Colour((Byte r, Byte g, Byte b))
    F ==(other)
       R .r == other.r & .g == other.g & .b == other.b
-   F (r, g, b)
-      .r = r
-      .g = g
-      .b = b
 
 V black = Colour(0, 0, 0)
 V white = Colour(255, 255, 255)
@@ -2155,15 +2136,12 @@ public:
     Byte g;
     Byte b;
 
+    Colour(const Byte &r, const Byte &g, const Byte &b) :
+        r(r), g(g), b(b) {}
+
     template <typename T1> auto operator==(const T1 &other) const
     {
         return r == other.r && g == other.g && b == other.b;
-    }
-    template <typename T1, typename T2, typename T3> Colour(const T1 &r, const T2 &g, const T3 &b) :
-        r(r),
-        g(g),
-        b(b)
-    {
     }
 };
 
@@ -2364,17 +2342,9 @@ bitmap = Bitmap(25,25)
 bitmap.circle(x0=12, y0=12, radius=12)
 bitmap.chardisplay()
 ===
-T Colour
-   Byte r
-   Byte g
-   Byte b
-
+T Colour((Byte r, Byte g, Byte b))
    F ==(other)
       R .r == other.r & .g == other.g & .b == other.b
-   F (r, g, b)
-      .r = r
-      .g = g
-      .b = b
 
 V black = Colour(0, 0, 0)
 V white = Colour(255, 255, 255)
@@ -2450,15 +2420,12 @@ public:
     Byte g;
     Byte b;
 
+    Colour(const Byte &r, const Byte &g, const Byte &b) :
+        r(r), g(g), b(b) {}
+
     template <typename T1> auto operator==(const T1 &other) const
     {
         return r == other.r && g == other.g && b == other.b;
-    }
-    template <typename T1, typename T2, typename T3> Colour(const T1 &r, const T2 &g, const T3 &b) :
-        r(r),
-        g(g),
-        b(b)
-    {
     }
 };
 
@@ -2630,17 +2597,9 @@ print(bitmap.writeppmp3())
 # Write a P6 file
 open('tmp.ppm', 'wb').write(bitmap.writeppmp6())
 ===
-T Colour
-   Byte r
-   Byte g
-   Byte b
-
+T Colour((Byte r, Byte g, Byte b))
    F ==(other)
       R .r == other.r & .g == other.g & .b == other.b
-   F (r, g, b)
-      .r = r
-      .g = g
-      .b = b
 
 V black = Colour(0, 0, 0)
 V white = Colour(255, 255, 255)
@@ -2708,15 +2667,12 @@ public:
     Byte g;
     Byte b;
 
+    Colour(const Byte &r, const Byte &g, const Byte &b) :
+        r(r), g(g), b(b) {}
+
     template <typename T1> auto operator==(const T1 &other) const
     {
         return r == other.r && g == other.g && b == other.b;
-    }
-    template <typename T1, typename T2, typename T3> Colour(const T1 &r, const T2 &g, const T3 &b) :
-        r(r),
-        g(g),
-        b(b)
-    {
     }
 };
 
@@ -2911,17 +2867,9 @@ print('Grey PPM:')
 bitmap.togreyscale()
 print(bitmap.writeppmp3())
 ===
-T Colour
-   Byte r
-   Byte g
-   Byte b
-
+T Colour((Byte r, Byte g, Byte b))
    F ==(other)
       R .r == other.r & .g == other.g & .b == other.b
-   F (r, g, b)
-      .r = r
-      .g = g
-      .b = b
 
 V black = Colour(0, 0, 0)
 V white = Colour(255, 255, 255)
@@ -3019,15 +2967,12 @@ public:
     Byte g;
     Byte b;
 
+    Colour(const Byte &r, const Byte &g, const Byte &b) :
+        r(r), g(g), b(b) {}
+
     template <typename T1> auto operator==(const T1 &other) const
     {
         return r == other.r && g == other.g && b == other.b;
-    }
-    template <typename T1, typename T2, typename T3> Colour(const T1 &r, const T2 &g, const T3 &b) :
-        r(r),
-        g(g),
-        b(b)
-    {
     }
 };
 
@@ -3224,17 +3169,9 @@ print('Grey:')
 bitmap.togreyscale()
 print(bitmap.writeppmp3())
 ===
-T Colour
-   Byte r
-   Byte g
-   Byte b
-
+T Colour((Byte r, Byte g, Byte b))
    F ==(other)
       R .r == other.r & .g == other.g & .b == other.b
-   F (r, g, b)
-      .r = r
-      .g = g
-      .b = b
 
 V black = Colour(0, 0, 0)
 V white = Colour(255, 255, 255)
@@ -3298,15 +3235,12 @@ public:
     Byte g;
     Byte b;
 
+    Colour(const Byte &r, const Byte &g, const Byte &b) :
+        r(r), g(g), b(b) {}
+
     template <typename T1> auto operator==(const T1 &other) const
     {
         return r == other.r && g == other.g && b == other.b;
-    }
-    template <typename T1, typename T2, typename T3> Colour(const T1 &r, const T2 &g, const T3 &b) :
-        r(r),
-        g(g),
-        b(b)
-    {
     }
 };
 

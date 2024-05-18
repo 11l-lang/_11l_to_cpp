@@ -5273,3 +5273,44 @@ int main()
     if (true)
         comment &= get_comment(0);
 }
+
+
+class Pt(NamedTuple):
+    x : float
+    y : float
+    def __str__(self):
+        return 'Pt(x=%s, y=%s)' % (self.x, self.y)
+
+print(Pt(1, 2))
+print(Pt(x=1, y=2))
+===
+T Pt((Float x, Float y))
+   F String()
+      R ‘Pt(x=#., y=#.)’.format(.x, .y)
+
+print(Pt(1, 2))
+print(Pt(x' 1, y' 2))
+===
+class Pt
+{
+public:
+    double x;
+    double y;
+
+    Pt(const double &x, const double &y) :
+        x(x), y(y) {}
+
+    operator String() const
+    {
+        return u"Pt(x=#., y=#.)"_S.format(x, y);
+    }
+};
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(Pt(1, 2));
+        print(Pt(1, 2));
+    }
+} code_block_1;

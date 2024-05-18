@@ -19185,17 +19185,9 @@ bitmap.set(0, 1, black)
 assert bitmap.get(0, 1) == black
 bitmap.chardisplay()
 ===
-T Colour
-   Byte r
-   Byte g
-   Byte b
-
+T Colour((Byte r, Byte g, Byte b))
    F ==(other)
       R .r == other.r & .g == other.g & .b == other.b
-   F (r, g, b)
-      .r = r
-      .g = g
-      .b = b
 
 V black = Colour(0, 0, 0)
 V white = Colour(255, 255, 255)
@@ -19247,15 +19239,12 @@ public:
     Byte g;
     Byte b;
 
+    Colour(const Byte &r, const Byte &g, const Byte &b) :
+        r(r), g(g), b(b) {}
+
     template <typename T1> auto operator==(const T1 &other) const
     {
         return r == other.r && g == other.g && b == other.b;
-    }
-    template <typename T1, typename T2, typename T3> Colour(const T1 &r, const T2 &g, const T3 &b) :
-        r(r),
-        g(g),
-        b(b)
-    {
     }
 };
 

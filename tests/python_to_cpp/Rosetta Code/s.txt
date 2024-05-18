@@ -9272,17 +9272,9 @@ if __name__ == '__main__':
     else:
         printUsage()
 ===
-T Item
-   String name
-   String date
-   String category
-
+T Item((String name, String date, String category))
    F String()
       R .name‘, ’(.date)‘, ’(.category)
-   F (name, date, category)
-      .name = name
-      .date = date
-      .category = category
 
 V db_filename = ‘simdb.csv’
 
@@ -9362,15 +9354,12 @@ public:
     String date;
     String category;
 
+    Item(const String &name, const String &date, const String &category) :
+        name(name), date(date), category(category) {}
+
     operator String() const
     {
         return name & u", "_S & (date) & u", "_S & (category);
-    }
-    template <typename T1, typename T2, typename T3> Item(const T1 &name, const T2 &date, const T3 &category) :
-        name(name),
-        date(date),
-        category(category)
-    {
     }
 };
 
@@ -9570,15 +9559,9 @@ T Point
    F String()
       R ‘(’(.x)‘, ’(.y)‘)’
 
-T Circle
-   Point c
-   Float r
-
+T Circle((Point c, Float r))
    F String()
       R ‘Center ’(.c)‘, Radius ’(.r)
-   F (c, r)
-      .c = c
-      .r = r
 
 F distSq(a, b)
    R (a.x - b.x) ^ 2 + (a.y - b.y) ^ 2
@@ -9674,14 +9657,12 @@ public:
     Point c;
     double r;
 
+    Circle(const Point &c, const double &r) :
+        c(c), r(r) {}
+
     operator String() const
     {
         return u"Center "_S & (c) & u", Radius "_S & (r);
-    }
-    template <typename T1, typename T2> Circle(const T1 &c, const T2 &r) :
-        c(c),
-        r(r)
-    {
     }
 };
 

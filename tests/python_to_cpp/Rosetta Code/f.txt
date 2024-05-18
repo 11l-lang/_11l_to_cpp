@@ -880,15 +880,9 @@ test(tri, pt)
 V EPS = 0.001
 V EPS_SQUARE = EPS * EPS
 
-T Point
-   Float x
-   Float y
-
+T Point((Float x, Float y))
    F String()
       R ‘(’String(.x)‘, ’String(.y)‘)’
-   F (x, y)
-      .x = x
-      .y = y
 
 F side(p1, p2, p)
    R (p2.y - p1.y) * (p.x - p1.x) + (-p2.x + p1.x) * (p.y - p1.y)
@@ -903,11 +897,7 @@ F distanceSquarePointToSegment(p1, p2, p)
       R pP1SquareLength - dotProduct * dotProduct * p1P2SquareLength
    R (p.x - p2.x) * (p.x - p2.x) + (p.y - p2.y) * (p.y - p2.y)
 
-T Triangle
-   Point p1
-   Point p2
-   Point p3
-
+T Triangle((Point p1, Point p2, Point p3))
    F String()
       R ‘Triangle[’String(.p1)‘, ’String(.p2)‘, ’String(.p3)‘]’
 
@@ -934,10 +924,6 @@ T Triangle
       I distanceSquarePointToSegment(.p2, .p3, p) <= :EPS_SQUARE
          R 1B
       R distanceSquarePointToSegment(.p3, .p1, p) <= :EPS_SQUARE
-   F (p1, p2, p3)
-      .p1 = p1
-      .p2 = p2
-      .p3 = p3
 
 F test(t, p)
    print(t)
@@ -971,14 +957,12 @@ public:
     double x;
     double y;
 
+    Point(const double &x, const double &y) :
+        x(x), y(y) {}
+
     operator String() const
     {
         return u"("_S & String(x) & u", "_S & String(y) & u")"_S;
-    }
-    template <typename T1, typename T2> Point(const T1 &x, const T2 &y) :
-        x(x),
-        y(y)
-    {
     }
 };
 
@@ -1006,6 +990,9 @@ public:
     Point p1;
     Point p2;
     Point p3;
+
+    Triangle(const Point &p1, const Point &p2, const Point &p3) :
+        p1(p1), p2(p2), p3(p3) {}
 
     operator String() const
     {
@@ -1040,12 +1027,6 @@ public:
         if (distanceSquarePointToSegment(p2, p3, p) <= ::EPS_SQUARE)
             return true;
         return distanceSquarePointToSegment(p3, p1, p) <= ::EPS_SQUARE;
-    }
-    template <typename T1, typename T2, typename T3> Triangle(const T1 &p1, const T2 &p2, const T3 &p3) :
-        p1(p1),
-        p2(p2),
-        p3(p3)
-    {
     }
 };
 

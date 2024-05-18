@@ -44,15 +44,9 @@ print("Symbol\tWeight\tHuffman Code")
 for p in huff:
     print("%s\t%s\t%s" % (p[0], symb2freq[p[0]], p[1]))
 ===
-T Element
-   Int weight
-   [(Char, String)] symbols
-
+T Element((Int weight, [(Char, String)] symbols))
    F <(other)
       R (.weight, .symbols) < (other.weight, other.symbols)
-   F (weight, symbols)
-      .weight = weight
-      .symbols = symbols
 
 F encode(symb2freq)
    ‘Huffman encode the given dict mapping symbols to weights’
@@ -83,14 +77,12 @@ public:
     int weight;
     Array<Tuple<Char, String>> symbols;
 
+    Element(const int &weight, const Array<Tuple<Char, String>> &symbols) :
+        weight(weight), symbols(symbols) {}
+
     template <typename T1> auto operator<(const T1 &other) const
     {
         return make_tuple(weight, symbols) < make_tuple(other.weight, other.symbols);
-    }
-    template <typename T1, typename T2> Element(const T1 &weight, const T2 &symbols) :
-        weight(weight),
-        symbols(symbols)
-    {
     }
 };
 

@@ -2188,6 +2188,15 @@ class ASTExceptionCatch(ASTNodeWithChildren):
             return self.children_to_str(indent, 'catch (...)')
         return self.children_to_str(indent, 'catch (const ' + self.exception_object_type + '&' + (' ' + self.exception_object_name if self.exception_object_name != '' else '') + ')')
 
+def named_tuple_members_and_constructor(indent, name, named_tuple_members):
+    r = ''
+    for member_type, member_name in named_tuple_members:
+        r += ' ' * ((indent+1)*4) + member_type + ' ' + member_name + ";\n"
+    r += "\n"
+    r += ' ' * ((indent+1)*4) + name + '(' + ', '.join('const ' + ty + ' &' + na for ty, na in named_tuple_members) + ") :\n"
+    r += ' ' * ((indent+2)*4) + ', '.join(na + '(' + na + ')' for ty, na in named_tuple_members) + " {}\n"
+    return r
+
 class ASTTypeDefinition(ASTNodeWithChildren):
     base_types : List[str]
     type_name : str
@@ -2196,6 +2205,7 @@ class ASTTypeDefinition(ASTNodeWithChildren):
     has_pointers_to_the_same_type = False
     forward_declared_types : Set[str]
     serializable = False
+    named_tuple_members: List[Tuple[str, str]]
 
     def __init__(self, constructors = None):
         super().__init__()
@@ -2204,6 +2214,7 @@ class ASTTypeDefinition(ASTNodeWithChildren):
         if constructors is not None:
             self.scope = Scope(None) # needed for built-in types, e.g. `File(full_fname, ‘w’, encoding' ‘utf-8-sig’).write(...)`
         self.forward_declared_types = set()
+        self.named_tuple_members = []
 
     def serialize_to_dict(self):
         return {'node_type': 'type', 'constructors': [c.serialize_to_dict(False) for c in self.constructors]}
@@ -2242,6 +2253,10 @@ class ASTTypeDefinition(ASTNodeWithChildren):
           + 'class ' + self.type_name + (' : ' + ', '.join(map(lambda c: 'public ' + c, base_types)) if len(base_types) else '') \
           + "\n" + ' ' * (indent*4) + "{\n"
         access_specifier_public = -1
+        if len(self.named_tuple_members) > 0:
+            r += ' ' * (indent*4) + "public:\n"
+            access_specifier_public = 1
+            r += named_tuple_members_and_constructor(indent, self.type_name, self.named_tuple_members) + "\n"
         for c in self.children:
             if c.access_specifier_public != access_specifier_public:
                 r += ' ' * (indent*4) + ['protected', 'public'][c.access_specifier_public] + ":\n"
@@ -2276,11 +2291,7 @@ class ASTTypeAlias(ASTNode):
             r += ' ' * (indent*4) + 'class ' + self.name + "\n"
             r += ' ' * (indent*4) + "{\n"
             r += ' ' * (indent*4) + "public:\n"
-            for member_type, member_name in self.named_tuple_members:
-                r += ' ' * ((indent+1)*4) + member_type + ' ' + member_name + ";\n"
-            r += "\n"
-            r += ' ' * ((indent+1)*4) + self.name + '(' + ', '.join('const ' + ty + ' &' + na for ty, na in self.named_tuple_members) + ") :\n"
-            r += ' ' * ((indent+2)*4) + ', '.join(na + '(' + na + ')' for ty, na in self.named_tuple_members) + " {}\n"
+            r += named_tuple_members_and_constructor(indent, self.name, self.named_tuple_members)
             return r + ' ' * (indent*4) + "};\n"
 
         r = self.pre_nl + ' ' * (indent*4)
@@ -3240,10 +3251,25 @@ def parse_internal(this_node):
                     scope.add_name(node.type_name, node)
 
                     if token.value(source) == '(':
-                        while True:
-                            node.base_types.append(expected_name('base type name'))
-                            if token.value(source) != ',':
-                                break
+                        if peek_token().value(source) == '(': # base type is a named tuple
+                            next_token()
+                            next_token()
+                            while token.value(source) != ')':
+                                expr = expression()
+                                type_name = trans_type(expr.to_type_str(), scope, expr.left_to_right_token())
+                                if token.category != Token.Category.NAME:
+                                    raise Error('expected named tuple member name', token)
+                                node.named_tuple_members.append((type_name, tokensn.token_str()))
+                                next_token()
+                                if token.value(source) == ',':
+                                    next_token()
+                            node.constructors.append(ASTFunctionDefinition([(m[1], '', m[0]) for m in node.named_tuple_members]))
+                            next_token()
+                        else:
+                            while True:
+                                node.base_types.append(expected_name('base type name'))
+                                if token.value(source) != ',':
+                                    break
                         if token.value(source) != ')': # (
                             raise Error('expected `)`', token)
                         next_token()

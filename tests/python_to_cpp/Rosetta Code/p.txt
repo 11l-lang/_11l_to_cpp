@@ -3161,16 +3161,9 @@ def solveApollonius(c1, c2, c3, s1, s2, s3):
 print(solveApollonius(c1, c2, c3, 1, 1, 1))    #Expects "Circle[x=2.00,y=2.10,r=3.90]" (green circle in image)
 print(solveApollonius(c1, c2, c3, -1, -1, -1)) #Expects "Circle[x=2.00,y=0.83,r=1.17]" (red circle in image)
 ===
-T Circle
-   Float x
-   Float y
-   Float r
+T Circle((Float x, Float y, Float r))
    F String()
       R ‘Circle(x=#., y=#., r=#.)’.format(.x, .y, .r)
-   F (x, y, r)
-      .x = x
-      .y = y
-      .r = r
 
 F solveApollonius(c1, c2, c3, s1, s2, s3)
    V (x1, y1, r1) = c1
@@ -3222,15 +3215,13 @@ public:
     double x;
     double y;
     double r;
+
+    Circle(const double &x, const double &y, const double &r) :
+        x(x), y(y), r(r) {}
+
     operator String() const
     {
         return u"Circle(x=#., y=#., r=#.)"_S.format(x, y, r);
-    }
-    template <typename T1, typename T2, typename T3> Circle(const T1 &x, const T2 &y, const T3 &r) :
-        x(x),
-        y(y),
-        r(r)
-    {
     }
 };
 

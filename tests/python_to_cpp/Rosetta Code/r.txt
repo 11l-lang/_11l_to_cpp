@@ -2107,23 +2107,13 @@ for poly in polys:
     print ('   ', '\t'.join("%s: %s" % (p, 'True' if ispointinside(p, poly) else 'False')
                            for p in testpoints[6:]))
 ===
-T Pt
-   Float x
-   Float y
+T Pt((Float x, Float y))
    F String()
       R ‘Pt(x=#., y=#.)’.format(.x, .y)
-   F (x, y)
-      .x = x
-      .y = y
 
-T Edge
-   Pt a
-   Pt b
+T Edge((Pt a, Pt b))
    F String()
       R ‘Edge(a=#., b=#.)’.format(.a, .b)
-   F (a, b)
-      .a = a
-      .b = b
 
 T Poly = (String name, [Edge] edges)
 
@@ -2184,14 +2174,13 @@ class Pt
 public:
     double x;
     double y;
+
+    Pt(const double &x, const double &y) :
+        x(x), y(y) {}
+
     operator String() const
     {
         return u"Pt(x=#., y=#.)"_S.format(x, y);
-    }
-    template <typename T1, typename T2> Pt(const T1 &x, const T2 &y) :
-        x(x),
-        y(y)
-    {
     }
 };
 
@@ -2200,14 +2189,13 @@ class Edge
 public:
     Pt a;
     Pt b;
+
+    Edge(const Pt &a, const Pt &b) :
+        a(a), b(b) {}
+
     operator String() const
     {
         return u"Edge(a=#., b=#.)"_S.format(a, b);
-    }
-    template <typename T1, typename T2> Edge(const T1 &a, const T2 &b) :
-        a(a),
-        b(b)
-    {
     }
 };
 

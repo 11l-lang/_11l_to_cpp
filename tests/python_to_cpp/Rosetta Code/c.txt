@@ -55,16 +55,9 @@ for p1, p2, r in [((0.1234, 0.9876), (0.8765, 0.2345), 2.0),
     except Error as v:
         print('  ERROR: %s\n' % v.msg)
 ===
-T Circle
-   Float x
-   Float y
-   Float r
+T Circle((Float x, Float y, Float r))
    F String()
       R ‘Circle(x=#.6, y=#.6, r=#.6)’.format(.x, .y, .r)
-   F (x, y, r)
-      .x = x
-      .y = y
-      .r = r
 
 T Error
    String msg
@@ -103,15 +96,13 @@ public:
     double x;
     double y;
     double r;
+
+    Circle(const double &x, const double &y, const double &r) :
+        x(x), y(y), r(r) {}
+
     operator String() const
     {
         return u"Circle(x=#.6, y=#.6, r=#.6)"_S.format(x, y, r);
-    }
-    template <typename T1, typename T2, typename T3> Circle(const T1 &x, const T2 &y, const T3 &r) :
-        x(x),
-        y(y),
-        r(r)
-    {
     }
 };
 
@@ -1978,18 +1969,12 @@ print(rationalize(0.99))
 print(rationalize(0.909))
 print(rationalize(0.909, 0.001))
 ===
-T Rational
-   Int numerator
-   Int denominator
-
+T Rational((Int numerator, Int denominator))
    F String()
       I .denominator == 1
          R String(.numerator)
       E
          R String(.numerator)‘//’String(.denominator)
-   F (numerator, denominator)
-      .numerator = numerator
-      .denominator = denominator
 
 F rationalize(x, tol = 1e-12)
    V xx = x
@@ -2040,17 +2025,15 @@ public:
     int numerator;
     int denominator;
 
+    Rational(const int &numerator, const int &denominator) :
+        numerator(numerator), denominator(denominator) {}
+
     operator String() const
     {
         if (denominator == 1)
             return String(numerator);
         else
             return String(numerator) & u"//"_S & String(denominator);
-    }
-    template <typename T1, typename T2> Rational(const T1 &numerator, const T2 &denominator) :
-        numerator(numerator),
-        denominator(denominator)
-    {
     }
 };
 
@@ -2178,15 +2161,9 @@ hull = calculateConvexHull(points)
 for i in hull:
     print(i)
 ===
-T Point
-   Int x
-   Int y
-
+T Point((Int x, Int y))
    F String()
       R String((.x, .y))
-   F (x, y)
-      .x = x
-      .y = y
 
 F orientation(p, q, r)
    V val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
@@ -2236,14 +2213,12 @@ public:
     int x;
     int y;
 
+    Point(const int &x, const int &y) :
+        x(x), y(y) {}
+
     operator String() const
     {
         return String(make_tuple(x, y));
-    }
-    template <typename T1, typename T2> Point(const T1 &x, const T2 &y) :
-        x(x),
-        y(y)
-    {
     }
 };
 
