@@ -1401,10 +1401,15 @@ cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'п
 cpp_vectype_from_11l = {}
 for dimension in ('2', '3', '4'):
     cpp_vectype_from_11l['BVec' + dimension] ='ubvec' + dimension
+    cpp_vectype_from_11l['I8Vec'+ dimension] ='sbvec' + dimension
     cpp_vectype_from_11l['IVec' + dimension] = 'ivec' + dimension
     cpp_vectype_from_11l['SVec' + dimension] =  'vec' + dimension
     cpp_vectype_from_11l['DVec' + dimension] = 'dvec' + dimension
+    cpp_vectype_from_11l['I16Vec' + dimension] =  'svec' + dimension
+    cpp_vectype_from_11l['U16Vec' + dimension] = 'usvec' + dimension
     cpp_vectype_from_11l['I64Vec' + dimension] = 'llvec' + dimension
+    cpp_vectype_from_11l['LVec'   + dimension] = 'llvec' + dimension
+    cpp_vectype_from_11l['BoolVec' + dimension] = 'bvec' + dimension
 for _11l_vectype, cpp_vectype in cpp_vectype_from_11l.items():
     cpp_type_from_11l[_11l_vectype] = cpp_vectype
 
