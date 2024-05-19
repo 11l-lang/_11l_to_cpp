@@ -1400,6 +1400,7 @@ cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'п
                      'Array':'Array', 'ArrayFixLen':'ArrayFixLen', 'ArrayMaxLen':'ArrayMaxLen', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque', 'Counter':'Counter', 'Fraction':'Fraction'}
 cpp_vectype_from_11l = {}
 for dimension in ('2', '3', '4'):
+    cpp_vectype_from_11l['BVec' + dimension] ='ubvec' + dimension
     cpp_vectype_from_11l['IVec' + dimension] = 'ivec' + dimension
     cpp_vectype_from_11l['SVec' + dimension] =  'vec' + dimension
     cpp_vectype_from_11l['DVec' + dimension] = 'dvec' + dimension
