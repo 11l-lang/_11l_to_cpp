@@ -1,0 +1,6 @@
+Error
+    type = ‘’
+    ast_nodes = [
+    .   node_type = type
+        constructors = []
+    ]

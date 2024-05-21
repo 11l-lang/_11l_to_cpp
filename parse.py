@@ -306,6 +306,8 @@ class SymbolNode:
                 return r + ')'
         elif self.symbol.id == 'T? ':
             return self.children[0].to_type_str() + '?'
+        elif self.symbol.id == ':':
+            return self.children[0].to_type_str() + ':' + self.children[1].to_type_str()
 
         assert(self.token.category == Token.Category.NAME or (self.token.category == Token.Category.CONSTANT and self.token.value(source) in ('N', 'Н', 'null', 'нуль')))
         return self.token_str()
@@ -1433,6 +1435,8 @@ def trans_type(ty, scope, type_token, ast_type_node = None, is_reference = False
     else:
         if '.' in ty: # for `Token.Category category`
             return ty.replace('.', '::') # [-TODO: generalize-]
+        if ':' in ty: # for `[symasm:Error] errors`
+            return ty.replace(':', '::') # [-TODO: generalize-]
 
         if ty.startswith('TYPE_OF('):
             assert(ty[-1] == ')')
