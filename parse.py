@@ -20,13 +20,15 @@ class Scope:
 
     class Id:
         type : str
+        default_val: str
         type_node : 'ASTTypeDefinition' = None
         ast_nodes : List['ASTNodeWithChildren']
         last_occurrence : 'SymbolNode' = None
 
-        def __init__(self, type, ast_node = None):
+        def __init__(self, type, default_val = '', ast_node = None):
             assert(type is not None)
             self.type = type
+            self.default_val = default_val
             self.ast_nodes = []
             if ast_node is not None:
                 self.ast_nodes.append(ast_node)
@@ -59,7 +61,7 @@ class Scope:
         self.parent = None
         if func_args is not None:
             self.is_function = True
-            self.ids = dict(map(lambda x: (x[0], Scope.Id(x[1])), func_args))
+            self.ids = dict(map(lambda x: (x[0], Scope.Id(x[1], x[2])), func_args))
         else:
             self.is_function = False
             self.ids = {}
@@ -132,7 +134,7 @@ class Scope:
             assert(type(self.ids[name].ast_nodes[0]) == ASTFunctionDefinition) # assert(id.ast_nodes.empty | T(id.ast_nodes[0]) == ASTFunctionDefinition)
             self.ids[name].ast_nodes.append(ast_node)                          # id.ast_nodes [+]= ast_node
         else:
-            self.ids[name] = Scope.Id('', ast_node)
+            self.ids[name] = Scope.Id('', '', ast_node)
 
     def add_name(self, name, ast_node):
         if name in self.ids:                                                            # I !.ids.set(name, .Id(‘’, ast_node))
@@ -145,7 +147,7 @@ class Scope:
             raise Error('redefinition of already defined identifier is not allowed', t) #    X Error(‘redefinition ...’, ...)
         if type(ast_node) == ASTTypeDefinition:
             ast_node.type_name = name
-        self.ids[name] = Scope.Id('', ast_node)
+        self.ids[name] = Scope.Id('', '', ast_node)
 
 scope : Scope
 
@@ -829,6 +831,9 @@ class SymbolNode:
                                     res += '&'
                             elif f_node.function_arguments[last_function_arg][2].endswith('?') and f_node.function_arguments[last_function_arg][2].startswith('[') and cstr != 'nullptr': # ] #f_node.function_arguments[last_function_arg][2] != 'Int?' and not cstr.startswith(('std::make_unique<', 'make_SharedPtr<')):
                                 res += '&'
+                                tid = self.scope.find(cstr)
+                                if tid is not None and tid.default_val == 'nullptr':
+                                    res = res[:-1] # res -= '&'
                         res += 'make_ref('*make_ref + cstr + ')'*make_ref
                         last_function_arg += 1
                     else:
@@ -3195,7 +3200,7 @@ def parse_internal(this_node):
                         next_token()
                         node.is_declaration = True
                     else:
-                        new_scope(node, map(lambda arg: (arg[0], arg[2]), node.function_arguments))
+                        new_scope(node, map(lambda arg: (arg[0], arg[2], arg[1]), node.function_arguments))
                 else:
                     if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
                         next_token()

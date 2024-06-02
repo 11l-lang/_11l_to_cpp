@@ -5327,3 +5327,99 @@ namespace symasm {
 }
 
 Array<symasm::Error> errors;
+
+
+class Error:
+    message: str
+
+    def __init__(self, message):
+        self.message = message
+
+def error_at_token(errors: list, message):
+    errors.append(Error(message))
+
+def coc(errors: List[Error] = None): # check operand count
+    errors.append(Error(f'instruction must have 2 operand(s)'))
+
+def translate_masm_to_symasm(errors: List[Error] = None):
+    def eoc(n): # expected operand count
+        if errors is not None:
+            error_at_token(errors, f'instruction must have 2 operand(s)')
+    def eoc2(n): # expected operand count
+        return coc(errors)
+
+    #eoc(2)
+    eoc2(2)
+
+errors: List[Error] = []
+translate_masm_to_symasm(errors)
+===
+T Error
+   String message
+
+   F (message)
+      .message = message
+
+F error_at_token(&errors, message)
+   errors.append(Error(message))
+
+F coc([Error]? &errors = N)
+   errors.append(Error(‘instruction must have 2 operand(s)’))
+
+F translate_masm_to_symasm([Error]? &errors = N)
+   F eoc(n)
+      I @errors != N
+         error_at_token(&@errors, ‘instruction must have 2 operand(s)’)
+   F eoc2(n)
+      R coc(&@errors)
+
+   eoc2(2)
+
+[Error] errors
+translate_masm_to_symasm(&errors)
+===
+class Error
+{
+public:
+    String message;
+
+    template <typename T1> Error(const T1 &message) :
+        message(message)
+    {
+    }
+};
+
+template <typename T1, typename T2> auto error_at_token(T1 &errors, const T2 &message)
+{
+    errors.append(Error(message));
+}
+
+auto coc(Array<Error>* const errors = nullptr)
+{
+    errors->append(Error(u"instruction must have 2 operand(s)"_S));
+}
+
+auto translate_masm_to_symasm(Array<Error>* const errors = nullptr)
+{
+    auto eoc = [&errors](const auto &n)
+    {
+        if (errors != nullptr)
+            error_at_token(errors, u"instruction must have 2 operand(s)"_S);
+    };
+    auto eoc2 = [&errors](const auto &n)
+    {
+        return coc(errors);
+    };
+
+    eoc2(2);
+}
+
+Array<Error> errors;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        translate_masm_to_symasm(&errors);
+    }
+} code_block_1;
