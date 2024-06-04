@@ -1093,7 +1093,7 @@ class SymbolNode:
                 id_, s = self.scope.find_and_return_scope(cts0.lstrip('@='))
                 if id_ is not None:
                     if id_.type != '' and id_.type.endswith('?'):
-                        return cts0.lstrip('@=') + '->' + c1
+                        return cts0.lstrip('@=') + '->' + c1 + '()'*(c1 in ('len', 'last', 'empty'))
                     if len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTLoop and id_.ast_nodes[0].is_loop_variable_a_ptr and cts0 == id_.ast_nodes[0].loop_variable:
                         return cts0 + '->' + c1
                     if len(id_.ast_nodes) and type(id_.ast_nodes[0]) == ASTVariableInitialization and (id_.ast_nodes[0].is_ptr): # ( # or id_.ast_nodes[0].is_shared_ptr):
@@ -1368,7 +1368,7 @@ class ASTProgram(ASTNodeWithChildren):
         code_block_id = 1
 
         for c in self.children:
-            global_statement = type(c) in (ASTVariableDeclaration, ASTVariableInitialization, ASTTupleInitialization, ASTFunctionDefinition, ASTTypeDefinition, ASTTypeAlias, ASTTypeEnum, ASTMain)
+            global_statement = type(c) in (ASTVariableDeclaration, ASTVariableInitialization, ASTTupleInitialization, ASTFunctionDefinition, ASTTypeDefinition, ASTTypeAlias, ASTTypeEnum, ASTMain, ASTIncludeFile)
             beginning_of_codeblock = False
             if global_statement != prev_global_statement:
                 beginning_of_codeblock = True
@@ -2341,6 +2341,14 @@ class ASTMain(ASTNodeWithChildren):
             return self.children_to_str(indent, 'int main()')
         return self.children_to_str(indent, 'int MAIN_WITH_ARGV()', add_at_beginning = ' ' * ((indent+1)*4) + "INIT_ARGV();\n\n")
 
+class ASTIncludeFile(ASTNode):
+    def __init__(self, include_file_name):
+        self.pre_nl = pre_nl()
+        self.include_file_name = include_file_name
+
+    def to_str(self, indent):
+        return self.pre_nl + ' ' * (indent*4) + '#include "' + self.include_file_name + '.hpp"\n'
+
 def type_of(sn):
     assert(sn.symbol.id == '.' and len(sn.children) == 2)
     if sn.children[0].symbol.id == '.':
@@ -3022,6 +3030,8 @@ symbol('если').nud = nud
 
 symbol('{') # }
 
+included_11l_files = set()
+
 def parse_internal(this_node):
     global token, scope
 
@@ -3075,6 +3085,38 @@ def parse_internal(this_node):
             access_specifier_private = True
             next_token()
             continue
+
+        elif token.category == Token.Category.NAME and peek_token().value(source) == ':' and peek_token(2).value(source) == '*':
+            node = ASTIncludeFile(tokensn.token_str())
+
+            def include_file(file_path):
+                global included_11l_files
+                if file_path in included_11l_files:
+                    return
+                included_11l_files.add(file_path)
+                module_source = open(file_path, encoding = 'utf-8-sig').read()
+                s = "#pragma once\n\n"
+                s += parse_and_to_str(tokenizer.tokenize(module_source), module_source, file_path, reset_scope = False)
+                open(file_path.rsplit('.', 1)[0] + '.hpp', 'w', encoding = 'utf-8-sig', newline = "\n").write(s)
+
+            path_name = os.path.join(os.path.dirname(file_name), node.include_file_name).replace('\\', '/')
+            if os.path.isfile(path_name + '.11l'):
+                include_file(path_name + '.11l')
+            else:
+                if not os.path.isdir(path_name):
+                    raise Error(f"cannot include '{node.include_file_name}'", token)
+
+                hpp = open(path_name + '.hpp', 'w', encoding = 'utf-8-sig', newline = "\n")
+                for file_path in os.listdir(path_name):
+                    if file_path.endswith('.11l'):
+                        include_file(path_name + '/' + file_path)
+                        hpp.write(f'#include "{path_name}/{file_path[:-4]}.hpp"\n')
+
+            next_token()
+            next_token()
+            next_token()
+            if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
+                next_token()
 
         elif token.category == Token.Category.KEYWORD:
             if token.value(source).startswith(('F', 'Ф', 'fn', 'фн')):
@@ -4179,7 +4221,7 @@ module_scope.add_function('free',   ASTFunctionDefinition([('ptr', '', 'Ptr')]))
 module_scope.add_function('memset', ASTFunctionDefinition([('dest', '', 'Ptr'), ('ch', '', 'Int'), ('count', '', 'Size')]))
 builtin_modules['c'] = Module(module_scope)
 
-def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False, to_debug_str = False, used_builtin_modules = None): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
+def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, append_main = False, suppress_error_please_wrap_in_copy = False, to_debug_str = False, used_builtin_modules = None, reset_scope = True): # option suppress_error_please_wrap_in_copy is needed to simplify conversion of large Python source into C++
     if len(tokens_) == 0: return ASTProgram().to_str()
     global tokens, source, tokeni, token, break_label_index, scope, global_scope, tokensn, file_name, importing_module, modules, used_builtin_modules_set
     prev_tokens    = tokens
@@ -4196,10 +4238,11 @@ def parse_and_to_str(tokens_, source_, file_name_, importing_module_ = False, ap
     tokeni = -1
     token = None
     break_label_index = -1
-    scope = Scope(None)
-    if not importing_module_:
-        global_scope = scope
-    scope.parent = builtins_scope
+    if reset_scope:
+        scope = Scope(None)
+        if not importing_module_:
+            global_scope = scope
+        scope.parent = builtins_scope
     file_name = file_name_
     importing_module = importing_module_
     prev_modules = modules
