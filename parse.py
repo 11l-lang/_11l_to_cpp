@@ -995,7 +995,7 @@ class SymbolNode:
                 if tid is not None and isinstance(tid.ast_nodes[0], ASTVariableDeclaration) and tid.ast_nodes[0].is_static:
                     return 's_' + c0
                 if importing_module:
-                    return os.path.basename(file_name)[:-4] + '::' + c0
+                    return (importing_module if type(importing_module) == str else os.path.basename(file_name)[:-4]) + '::' + c0
                 return '::' + c0
             elif self.symbol.id == '.':
                 c0 = self.children[0].to_str()
@@ -1652,7 +1652,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 is_const = True
             else:
                 s = 'static '*self.is_static + ('auto' if self.function_return_type == '' else trans_type(self.function_return_type, self.scope, tokens[self.tokeni])) + ' ' + 's_'*self.is_static + \
-                    {'()':'operator()', '[&]':'operator&', '<':'operator<', '==':'operator==', '+':'operator+', '-':'operator-', '*':'operator*', '/':'operator/'}.get(self.function_name, self.function_name)
+                    {'()':'operator()', '[&]':'operator&', '<':'operator<', '==':'operator==', '!=':'operator!=', '+':'operator+', '-':'operator-', '*':'operator*', '/':'operator/'}.get(self.function_name, self.function_name)
                 if self.function_name in tokenizer.all_operators:
                     is_const = True
 
@@ -2342,12 +2342,21 @@ class ASTMain(ASTNodeWithChildren):
         return self.children_to_str(indent, 'int MAIN_WITH_ARGV()', add_at_beginning = ' ' * ((indent+1)*4) + "INIT_ARGV();\n\n")
 
 class ASTIncludeFile(ASTNode):
+    enclose_in_namespace = False
+
     def __init__(self, include_file_name):
         self.pre_nl = pre_nl()
         self.include_file_name = include_file_name
 
     def to_str(self, indent):
-        return self.pre_nl + ' ' * (indent*4) + '#include "' + self.include_file_name + '.hpp"\n'
+        r = self.pre_nl
+        if self.enclose_in_namespace:
+            r += ' ' * (indent*4) + 'namespace ' + os.path.basename(file_name)[:-4] + " {\n"
+        r += ' ' * (indent*4) + '#include "' + self.include_file_name + '.hpp"\n'
+        if self.enclose_in_namespace:
+            r += ' ' * (indent*4) + "}\n"
+            r += ' ' * (indent*4) + f"using namespace {os.path.basename(file_name)[:-4]};\n"
+        return r
 
 def type_of(sn):
     assert(sn.symbol.id == '.' and len(sn.children) == 2)
@@ -3089,27 +3098,30 @@ def parse_internal(this_node):
         elif token.category == Token.Category.NAME and peek_token().value(source) == ':' and peek_token(2).value(source) == '*':
             node = ASTIncludeFile(tokensn.token_str())
 
-            def include_file(file_path):
+            def include_file(file_path, namespace):
                 global included_11l_files
                 if file_path in included_11l_files:
                     return
                 included_11l_files.add(file_path)
                 module_source = open(file_path, encoding = 'utf-8-sig').read()
                 s = "#pragma once\n\n"
-                s += parse_and_to_str(tokenizer.tokenize(module_source), module_source, file_path, reset_scope = False)
+                s += parse_and_to_str(tokenizer.tokenize(module_source), module_source, file_path, namespace, reset_scope = False)
                 open(file_path.rsplit('.', 1)[0] + '.hpp', 'w', encoding = 'utf-8-sig', newline = "\n").write(s)
 
             path_name = os.path.join(os.path.dirname(file_name), node.include_file_name).replace('\\', '/')
             if os.path.isfile(path_name + '.11l'):
-                include_file(path_name + '.11l')
+                include_file(path_name + '.11l', importing_module)
             else:
                 if not os.path.isdir(path_name):
                     raise Error(f"cannot include '{node.include_file_name}'", token)
 
+                if not importing_module:
+                    node.enclose_in_namespace = True
+
                 hpp = open(path_name + '.hpp', 'w', encoding = 'utf-8-sig', newline = "\n")
                 for file_path in os.listdir(path_name):
                     if file_path.endswith('.11l'):
-                        include_file(path_name + '/' + file_path)
+                        include_file(path_name + '/' + file_path, os.path.basename(file_name)[:-4])
                         hpp.write(f'#include "{path_name}/{file_path[:-4]}.hpp"\n')
 
             next_token()
