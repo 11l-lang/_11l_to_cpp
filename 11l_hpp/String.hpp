@@ -898,6 +898,11 @@ inline String operator&(Char ch1, Char ch2)
 	return String(ch1) & ch2;
 }
 
+inline String operator*(Char c, bool b)
+{
+	return String(c) * b;
+}
+
 inline String operator*(Char c, Int n)
 {
 	return String(c) * n;
