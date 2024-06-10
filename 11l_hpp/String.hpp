@@ -320,15 +320,15 @@ public:
 	}
 	template <int N> bool ends_with(const char16_t (&s)[N]) const {return ends_with(s, N-1);}
 	bool ends_with(const String &s) const {return ends_with(s.data(), s.len());}
-	template <typename Type> bool ends_with(const Tuple<Type, Type> &tuple)
+	template <typename Type> bool ends_with(const Tuple<Type, Type> &tuple) const
 	{
 		return ends_with(_get<0>(tuple)) || ends_with(_get<1>(tuple));
 	}
-	template <typename Type> bool ends_with(const Tuple<Type, Type, Type> &tuple)
+	template <typename Type> bool ends_with(const Tuple<Type, Type, Type> &tuple) const
 	{
 		return ends_with(_get<0>(tuple)) || ends_with(_get<1>(tuple)) || ends_with(_get<2>(tuple));
 	}
-	template <typename Type> bool ends_with(const Tuple<Type, Type, Type, Type> &tuple)
+	template <typename Type> bool ends_with(const Tuple<Type, Type, Type, Type> &tuple) const
 	{
 		return ends_with(_get<0>(tuple)) || ends_with(_get<1>(tuple)) || ends_with(_get<2>(tuple)) || ends_with(_get<3>(tuple));
 	}
