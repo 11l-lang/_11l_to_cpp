@@ -834,6 +834,10 @@ class SymbolNode:
                                 tid = self.scope.find(cstr)
                                 if tid is not None and tid.default_val == 'nullptr':
                                     res = res[:-1] # res -= '&'
+                            elif f_node.function_arguments[last_function_arg][2] == 'Char':
+                                if self.children[i+1].token.category == Token.Category.STRING_LITERAL:
+                                    assert(cstr.startswith('u"') and cstr.endswith('"_S'))
+                                    cstr = "u'" + cstr[2:-3] + "'_C"
                         res += 'make_ref('*make_ref + cstr + ')'*make_ref
                         last_function_arg += 1
                     else:
@@ -2404,7 +2408,7 @@ def type_of(sn):
         if len(sn.children[0].children) == 2:
             return None # [-TODO-]
         assert(len(sn.children[0].children) == 1)
-        tid = global_scope.find(sn.children[0].children[0].token_str())
+        tid = (scope if importing_module else global_scope).find(sn.children[0].children[0].token_str())
         if tid is None or len(tid.ast_nodes) != 1:
             raise Error('`' + sn.children[0].children[0].token_str() + '` is not found in global scope', sn.left_to_right_token()) # this error occurs without this code: ` or (self.token_str()[0].isupper() and self.token_str() != self.token_str().upper())`
         left = tid.ast_nodes[0]
