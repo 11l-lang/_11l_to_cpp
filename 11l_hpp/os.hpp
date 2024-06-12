@@ -8,6 +8,14 @@ u':'
 #endif
 ;
 
+static const String name =
+#ifdef _WIN32
+u"nt"
+#else
+u"posix"
+#endif
+;
+
 inline String getenv(const String &name, const String &def = String())
 {
 #ifdef _WIN32
