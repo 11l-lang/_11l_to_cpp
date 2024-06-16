@@ -4262,7 +4262,16 @@ V DIR_S = (0, -1)
 V DIR_SE = (1, -1)
 
 F path_str(origin_x, origin_y, directions)
-   V dirn = [:DIR_E = ‘E’, :DIR_NE = ‘NE’, :DIR_N = ‘N’, :DIR_NW = ‘NW’, :DIR_W = ‘W’, :DIR_SW = ‘SW’, :DIR_S = ‘S’, :DIR_SE = ‘SE’]
+   V dirn = [
+      :DIR_E  = ‘E’,
+      :DIR_NE = ‘NE’,
+      :DIR_N  = ‘N’,
+      :DIR_NW = ‘NW’,
+      :DIR_W  = ‘W’,
+      :DIR_SW = ‘SW’,
+      :DIR_S  = ‘S’,
+      :DIR_SE = ‘SE’
+   ]
    R ‘X: ’origin_x‘, Y: ’origin_y‘, Path: ’directions.map(d -> @dirn[d])
 
 T MarchingSquares

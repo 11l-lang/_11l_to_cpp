@@ -52,7 +52,35 @@ decodedtext = decode(ciphertext)
 print("\nHidden text →")
 print(decodedtext)
 ===
-V codes = [‘a’ = ‘AAAAA’, ‘b’ = ‘AAAAB’, ‘c’ = ‘AAABA’, ‘d’ = ‘AAABB’, ‘e’ = ‘AABAA’, ‘f’ = ‘AABAB’, ‘g’ = ‘AABBA’, ‘h’ = ‘AABBB’, ‘i’ = ‘ABAAA’, ‘j’ = ‘ABAAB’, ‘k’ = ‘ABABA’, ‘l’ = ‘ABABB’, ‘m’ = ‘ABBAA’, ‘n’ = ‘ABBAB’, ‘o’ = ‘ABBBA’, ‘p’ = ‘ABBBB’, ‘q’ = ‘BAAAA’, ‘r’ = ‘BAAAB’, ‘s’ = ‘BAABA’, ‘t’ = ‘BAABB’, ‘u’ = ‘BABAA’, ‘v’ = ‘BABAB’, ‘w’ = ‘BABBA’, ‘x’ = ‘BABBB’, ‘y’ = ‘BBAAA’, ‘z’ = ‘BBAAB’, ‘ ’ = ‘BBBAA’]
+V codes = [
+   ‘a’ = ‘AAAAA’,
+   ‘b’ = ‘AAAAB’,
+   ‘c’ = ‘AAABA’,
+   ‘d’ = ‘AAABB’,
+   ‘e’ = ‘AABAA’,
+   ‘f’ = ‘AABAB’,
+   ‘g’ = ‘AABBA’,
+   ‘h’ = ‘AABBB’,
+   ‘i’ = ‘ABAAA’,
+   ‘j’ = ‘ABAAB’,
+   ‘k’ = ‘ABABA’,
+   ‘l’ = ‘ABABB’,
+   ‘m’ = ‘ABBAA’,
+   ‘n’ = ‘ABBAB’,
+   ‘o’ = ‘ABBBA’,
+   ‘p’ = ‘ABBBB’,
+   ‘q’ = ‘BAAAA’,
+   ‘r’ = ‘BAAAB’,
+   ‘s’ = ‘BAABA’,
+   ‘t’ = ‘BAABB’,
+   ‘u’ = ‘BABAA’,
+   ‘v’ = ‘BABAB’,
+   ‘w’ = ‘BABBA’,
+   ‘x’ = ‘BABBB’,
+   ‘y’ = ‘BBAAA’,
+   ‘z’ = ‘BBAAB’,
+   ‘ ’ = ‘BBBAA’
+]
 
 V rev_codes = Dict(codes.items(), (k, v) -> (v, k))
 

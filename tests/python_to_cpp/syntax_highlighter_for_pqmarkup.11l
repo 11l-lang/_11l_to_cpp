@@ -7,9 +7,35 @@ span.constant {color: #008000;}
 span.comment {color: #808080;}
 </style>’
 
-V cat_to_class_python = [python_to_11l:tokenizer:Token.Category.NAME = ‘identifier’, python_to_11l:tokenizer:Token.Category.KEYWORD = ‘keyword’, python_to_11l:tokenizer:Token.Category.CONSTANT = ‘constant’, python_to_11l:tokenizer:Token.Category.OPERATOR_OR_DELIMITER = ‘’, python_to_11l:tokenizer:Token.Category.NUMERIC_LITERAL = ‘numeric-literal’, python_to_11l:tokenizer:Token.Category.STRING_LITERAL = ‘string-literal’, python_to_11l:tokenizer:Token.Category.FSTRING = ‘string-literal’, python_to_11l:tokenizer:Token.Category.FSTRING_END = ‘string-literal’, python_to_11l:tokenizer:Token.Category.INDENT = ‘’, python_to_11l:tokenizer:Token.Category.DEDENT = ‘’, python_to_11l:tokenizer:Token.Category.STATEMENT_SEPARATOR = ‘’]
+V cat_to_class_python = [
+   python_to_11l:tokenizer:Token.Category.NAME                  = ‘identifier’,
+   python_to_11l:tokenizer:Token.Category.KEYWORD               = ‘keyword’,
+   python_to_11l:tokenizer:Token.Category.CONSTANT              = ‘constant’,
+   python_to_11l:tokenizer:Token.Category.OPERATOR_OR_DELIMITER = ‘’,
+   python_to_11l:tokenizer:Token.Category.NUMERIC_LITERAL       = ‘numeric-literal’,
+   python_to_11l:tokenizer:Token.Category.STRING_LITERAL        = ‘string-literal’,
+   python_to_11l:tokenizer:Token.Category.FSTRING               = ‘string-literal’,
+   python_to_11l:tokenizer:Token.Category.FSTRING_END           = ‘string-literal’,
+   python_to_11l:tokenizer:Token.Category.INDENT                = ‘’,
+   python_to_11l:tokenizer:Token.Category.DEDENT                = ‘’,
+   python_to_11l:tokenizer:Token.Category.STATEMENT_SEPARATOR   = ‘’
+]
 
-V cat_to_class_11l = [_11l_to_cpp:tokenizer:Token.Category.NAME = ‘identifier’, _11l_to_cpp:tokenizer:Token.Category.KEYWORD = ‘keyword’, _11l_to_cpp:tokenizer:Token.Category.CONSTANT = ‘constant’, _11l_to_cpp:tokenizer:Token.Category.DELIMITER = ‘’, _11l_to_cpp:tokenizer:Token.Category.OPERATOR = ‘’, _11l_to_cpp:tokenizer:Token.Category.NUMERIC_LITERAL = ‘numeric-literal’, _11l_to_cpp:tokenizer:Token.Category.STRING_LITERAL = ‘string-literal’, _11l_to_cpp:tokenizer:Token.Category.FSTRING = ‘string-literal’, _11l_to_cpp:tokenizer:Token.Category.FSTRING_END = ‘string-literal’, _11l_to_cpp:tokenizer:Token.Category.STRING_CONCATENATOR = ‘’, _11l_to_cpp:tokenizer:Token.Category.SCOPE_BEGIN = ‘’, _11l_to_cpp:tokenizer:Token.Category.SCOPE_END = ‘’, _11l_to_cpp:tokenizer:Token.Category.STATEMENT_SEPARATOR = ‘’]
+V cat_to_class_11l = [
+   _11l_to_cpp:tokenizer:Token.Category.NAME                = ‘identifier’,
+   _11l_to_cpp:tokenizer:Token.Category.KEYWORD             = ‘keyword’,
+   _11l_to_cpp:tokenizer:Token.Category.CONSTANT            = ‘constant’,
+   _11l_to_cpp:tokenizer:Token.Category.DELIMITER           = ‘’,
+   _11l_to_cpp:tokenizer:Token.Category.OPERATOR            = ‘’,
+   _11l_to_cpp:tokenizer:Token.Category.NUMERIC_LITERAL     = ‘numeric-literal’,
+   _11l_to_cpp:tokenizer:Token.Category.STRING_LITERAL      = ‘string-literal’,
+   _11l_to_cpp:tokenizer:Token.Category.FSTRING             = ‘string-literal’,
+   _11l_to_cpp:tokenizer:Token.Category.FSTRING_END         = ‘string-literal’,
+   _11l_to_cpp:tokenizer:Token.Category.STRING_CONCATENATOR = ‘’,
+   _11l_to_cpp:tokenizer:Token.Category.SCOPE_BEGIN         = ‘’,
+   _11l_to_cpp:tokenizer:Token.Category.SCOPE_END           = ‘’,
+   _11l_to_cpp:tokenizer:Token.Category.STATEMENT_SEPARATOR = ‘’
+]
 
 F is_lang_supported(lang)
    R lang C (‘11l’, ‘Python’)

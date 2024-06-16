@@ -7210,7 +7210,72 @@ F mod97(numberstring)
    number = Int(prepended‘’numberstring[segstart ..])
    R number % 97
 
-V country2length = [‘IS’ = 26, ‘IT’ = 27, ‘MT’ = 31, ‘MU’ = 30, ‘MR’ = 27, ‘MK’ = 19, ‘IE’ = 22, ‘MD’ = 24, ‘ME’ = 22, ‘MC’ = 27, ‘IL’ = 23, ‘DE’ = 22, ‘DO’ = 28, ‘DK’ = 18, ‘PK’ = 24, ‘HR’ = 21, ‘HU’ = 28, ‘FI’ = 18, ‘LU’ = 20, ‘LT’ = 20, ‘LV’ = 21, ‘KW’ = 30, ‘LI’ = 21, ‘PS’ = 29, ‘PT’ = 25, ‘LB’ = 28, ‘GB’ = 22, ‘GE’ = 22, ‘CR’ = 21, ‘TR’ = 26, ‘GI’ = 23, ‘GL’ = 18, ‘CY’ = 28, ‘CZ’ = 24, ‘GR’ = 27, ‘GT’ = 28, ‘KZ’ = 20, ‘TN’ = 24, ‘CH’ = 21, ‘SE’ = 24, ‘SA’ = 24, ‘SM’ = 27, ‘SI’ = 19, ‘SK’ = 24, ‘PL’ = 28, ‘BR’ = 29, ‘FR’ = 27, ‘FO’ = 18, ‘BA’ = 20, ‘BG’ = 22, ‘BE’ = 16, ‘BH’ = 22, ‘VG’ = 24, ‘RO’ = 24, ‘RS’ = 22, ‘NO’ = 15, ‘NL’ = 18, ‘AZ’ = 28, ‘EE’ = 20, ‘AT’ = 20, ‘ES’ = 24, ‘AL’ = 28, ‘AD’ = 24, ‘AE’ = 23]
+V country2length = [
+   ‘IS’ = 26,
+   ‘IT’ = 27,
+   ‘MT’ = 31,
+   ‘MU’ = 30,
+   ‘MR’ = 27,
+   ‘MK’ = 19,
+   ‘IE’ = 22,
+   ‘MD’ = 24,
+   ‘ME’ = 22,
+   ‘MC’ = 27,
+   ‘IL’ = 23,
+   ‘DE’ = 22,
+   ‘DO’ = 28,
+   ‘DK’ = 18,
+   ‘PK’ = 24,
+   ‘HR’ = 21,
+   ‘HU’ = 28,
+   ‘FI’ = 18,
+   ‘LU’ = 20,
+   ‘LT’ = 20,
+   ‘LV’ = 21,
+   ‘KW’ = 30,
+   ‘LI’ = 21,
+   ‘PS’ = 29,
+   ‘PT’ = 25,
+   ‘LB’ = 28,
+   ‘GB’ = 22,
+   ‘GE’ = 22,
+   ‘CR’ = 21,
+   ‘TR’ = 26,
+   ‘GI’ = 23,
+   ‘GL’ = 18,
+   ‘CY’ = 28,
+   ‘CZ’ = 24,
+   ‘GR’ = 27,
+   ‘GT’ = 28,
+   ‘KZ’ = 20,
+   ‘TN’ = 24,
+   ‘CH’ = 21,
+   ‘SE’ = 24,
+   ‘SA’ = 24,
+   ‘SM’ = 27,
+   ‘SI’ = 19,
+   ‘SK’ = 24,
+   ‘PL’ = 28,
+   ‘BR’ = 29,
+   ‘FR’ = 27,
+   ‘FO’ = 18,
+   ‘BA’ = 20,
+   ‘BG’ = 22,
+   ‘BE’ = 16,
+   ‘BH’ = 22,
+   ‘VG’ = 24,
+   ‘RO’ = 24,
+   ‘RS’ = 22,
+   ‘NO’ = 15,
+   ‘NL’ = 18,
+   ‘AZ’ = 28,
+   ‘EE’ = 20,
+   ‘AT’ = 20,
+   ‘ES’ = 24,
+   ‘AL’ = 28,
+   ‘AD’ = 24,
+   ‘AE’ = 23
+]
 
 F valid_iban(iban_)
    V iban = iban_.replace(‘ ’, ‘’).replace("\t", ‘’)
@@ -7765,7 +7830,30 @@ for cnt, name in lst:
 
 print("Total weight:", w, "Value:", v)
 ===
-V items = [‘sandwich’ = (50, 60, 2), ‘map’ = (9, 150, 1), ‘compass’ = (13, 35, 1), ‘water’ = (153, 200, 3), ‘glucose’ = (15, 60, 2), ‘tin’ = (68, 45, 3), ‘banana’ = (27, 60, 3), ‘apple’ = (39, 40, 3), ‘cheese’ = (23, 30, 1), ‘beer’ = (52, 10, 3), ‘suntan cream’ = (11, 70, 1), ‘camera’ = (32, 30, 1), ‘t-shirt’ = (24, 15, 2), ‘trousers’ = (48, 10, 2), ‘umbrella’ = (73, 40, 1), ‘w-trousers’ = (42, 70, 1), ‘w-overcoat’ = (43, 75, 1), ‘note-case’ = (22, 80, 1), ‘sunglasses’ = (7, 20, 1), ‘towel’ = (18, 12, 2), ‘socks’ = (4, 50, 1), ‘book’ = (30, 10, 2)]
+V items = [
+   ‘sandwich’     = (50, 60, 2),
+   ‘map’          = (9, 150, 1),
+   ‘compass’      = (13, 35, 1),
+   ‘water’        = (153, 200, 3),
+   ‘glucose’      = (15, 60, 2),
+   ‘tin’          = (68, 45, 3),
+   ‘banana’       = (27, 60, 3),
+   ‘apple’        = (39, 40, 3),
+   ‘cheese’       = (23, 30, 1),
+   ‘beer’         = (52, 10, 3),
+   ‘suntan cream’ = (11, 70, 1),
+   ‘camera’       = (32, 30, 1),
+   ‘t-shirt’      = (24, 15, 2),
+   ‘trousers’     = (48, 10, 2),
+   ‘umbrella’     = (73, 40, 1),
+   ‘w-trousers’   = (42, 70, 1),
+   ‘w-overcoat’   = (43, 75, 1),
+   ‘note-case’    = (22, 80, 1),
+   ‘sunglasses’   = (7, 20, 1),
+   ‘towel’        = (18, 12, 2),
+   ‘socks’        = (4, 50, 1),
+   ‘book’         = (30, 10, 2)
+]
 
 V item_keys = Array(items.keys())
 
@@ -11674,7 +11762,14 @@ print(soundex("Example"))
 print(soundex("Sownteks"))
 print(soundex("Ekzampul"))
 ===
-V inv_code = [‘1’ = [‘B’, ‘F’, ‘P’, ‘V’], ‘2’ = [‘C’, ‘G’, ‘J’, ‘K’, ‘Q’, ‘S’, ‘X’, ‘Z’], ‘3’ = [‘D’, ‘T’], ‘4’ = [‘L’], ‘5’ = [‘M’, ‘N’], ‘6’ = [‘R’]]
+V inv_code = [
+   ‘1’ = [‘B’, ‘F’, ‘P’, ‘V’],
+   ‘2’ = [‘C’, ‘G’, ‘J’, ‘K’, ‘Q’, ‘S’, ‘X’, ‘Z’],
+   ‘3’ = [‘D’, ‘T’],
+   ‘4’ = [‘L’],
+   ‘5’ = [‘M’, ‘N’],
+   ‘6’ = [‘R’]
+]
 
 [Char = Char] _code
 L(k, arr) inv_code
@@ -12495,7 +12590,21 @@ print('\n'.join( toposort2(data) ))
 ===
 V empty_set = Set[String]()
 
-V data = [‘des_system_lib’ = Set(‘std synopsys std_cell_lib des_system_lib dw02 dw01 ramlib ieee’.split(‘ ’)), ‘dw01’ = Set(‘ieee dw01 dware gtech’.split(‘ ’)), ‘dw02’ = Set(‘ieee dw02 dware’.split(‘ ’)), ‘dw03’ = Set(‘std synopsys dware dw03 dw02 dw01 ieee gtech’.split(‘ ’)), ‘dw04’ = Set(‘dw04 ieee dw01 dware gtech’.split(‘ ’)), ‘dw05’ = Set(‘dw05 ieee dware’.split(‘ ’)), ‘dw06’ = Set(‘dw06 ieee dware’.split(‘ ’)), ‘dw07’ = Set(‘ieee dware’.split(‘ ’)), ‘dware’ = Set(‘ieee dware’.split(‘ ’)), ‘gtech’ = Set(‘ieee gtech’.split(‘ ’)), ‘ramlib’ = Set(‘std ieee’.split(‘ ’)), ‘std_cell_lib’ = Set(‘ieee std_cell_lib’.split(‘ ’)), ‘synopsys’ = move(empty_set)]
+V data = [
+   ‘des_system_lib’ = Set(‘std synopsys std_cell_lib des_system_lib dw02 dw01 ramlib ieee’.split(‘ ’)),
+   ‘dw01’           = Set(‘ieee dw01 dware gtech’.split(‘ ’)),
+   ‘dw02’           = Set(‘ieee dw02 dware’.split(‘ ’)),
+   ‘dw03’           = Set(‘std synopsys dware dw03 dw02 dw01 ieee gtech’.split(‘ ’)),
+   ‘dw04’           = Set(‘dw04 ieee dw01 dware gtech’.split(‘ ’)),
+   ‘dw05’           = Set(‘dw05 ieee dware’.split(‘ ’)),
+   ‘dw06’           = Set(‘dw06 ieee dware’.split(‘ ’)),
+   ‘dw07’           = Set(‘ieee dware’.split(‘ ’)),
+   ‘dware’          = Set(‘ieee dware’.split(‘ ’)),
+   ‘gtech’          = Set(‘ieee gtech’.split(‘ ’)),
+   ‘ramlib’         = Set(‘std ieee’.split(‘ ’)),
+   ‘std_cell_lib’   = Set(‘ieee std_cell_lib’.split(‘ ’)),
+   ‘synopsys’       = move(empty_set)
+]
 
 F toposort2(&data)
    L(k, v) data
@@ -13641,7 +13750,12 @@ for g in sorted(costs.keys()):
     print()
 print("\n\nTotal Cost = ", cost)
 ===
-V costs = [‘W’ = [‘A’ = 16, ‘B’ = 16, ‘C’ = 13, ‘D’ = 22, ‘E’ = 17], ‘X’ = [‘A’ = 14, ‘B’ = 14, ‘C’ = 13, ‘D’ = 19, ‘E’ = 15], ‘Y’ = [‘A’ = 19, ‘B’ = 19, ‘C’ = 20, ‘D’ = 23, ‘E’ = 50], ‘Z’ = [‘A’ = 50, ‘B’ = 12, ‘C’ = 50, ‘D’ = 15, ‘E’ = 11]]
+V costs = [
+   ‘W’ = [‘A’ = 16, ‘B’ = 16, ‘C’ = 13, ‘D’ = 22, ‘E’ = 17],
+   ‘X’ = [‘A’ = 14, ‘B’ = 14, ‘C’ = 13, ‘D’ = 19, ‘E’ = 15],
+   ‘Y’ = [‘A’ = 19, ‘B’ = 19, ‘C’ = 20, ‘D’ = 23, ‘E’ = 50],
+   ‘Z’ = [‘A’ = 50, ‘B’ = 12, ‘C’ = 50, ‘D’ = 15, ‘E’ = 11]
+]
 V demand = [‘A’ = 30, ‘B’ = 20, ‘C’ = 70, ‘D’ = 30, ‘E’ = 60]
 V cols = sorted(demand.keys())
 V supply = [‘W’ = 50, ‘X’ = 60, ‘Y’ = 50, ‘Z’ = 50]

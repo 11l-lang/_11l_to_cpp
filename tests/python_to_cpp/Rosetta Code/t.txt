@@ -2402,7 +2402,15 @@ F printorder(order)
    L(o) order[1..]
       print(‘ Then: ’o.map(s -> String(s)).join(‘, ’))
 
-V data = [‘top1’ = Set([‘ip1’, ‘des1’, ‘ip2’]), ‘top2’ = Set([‘ip2’, ‘des1’, ‘ip3’]), ‘des1’ = Set([‘des1a’, ‘des1b’, ‘des1c’]), ‘des1a’ = Set([‘des1a1’, ‘des1a2’]), ‘des1c’ = Set([‘des1c1’, ‘extra1’]), ‘ip2’ = Set([‘ip2a’, ‘ip2b’, ‘ip2c’, ‘ipcommon’]), ‘ip1’ = Set([‘ip1a’, ‘ipcommon’, ‘extra1’])]
+V data = [
+   ‘top1’  = Set([‘ip1’, ‘des1’, ‘ip2’]),
+   ‘top2’  = Set([‘ip2’, ‘des1’, ‘ip3’]),
+   ‘des1’  = Set([‘des1a’, ‘des1b’, ‘des1c’]),
+   ‘des1a’ = Set([‘des1a1’, ‘des1a2’]),
+   ‘des1c’ = Set([‘des1c1’, ‘extra1’]),
+   ‘ip2’   = Set([‘ip2a’, ‘ip2b’, ‘ip2c’, ‘ipcommon’]),
+   ‘ip1’   = Set([‘ip1a’, ‘ipcommon’, ‘extra1’])
+]
 
 V tops = toplevels(&data)
 print(‘The top levels of the dependency graph are: ’Array(tops).join(‘ ’))

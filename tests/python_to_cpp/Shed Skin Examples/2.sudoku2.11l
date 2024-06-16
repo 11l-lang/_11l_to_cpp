@@ -164,7 +164,14 @@ T board
 
    F stats()
       V t = I .__status == 1 {Time().unix_time() - .__starttime} E .__endtime - .__starttime
-      R [‘max depth’ = .__maxdepth, ‘turns’ = .__turns, ‘backtracks’ = .__backtracks, ‘elapsed time’ = Int(t), ‘boards examined’ = .examined.len, ‘number of solutions’ = .solutions.len]
+      R [
+         ‘max depth’           = .__maxdepth,
+         ‘turns’               = .__turns,
+         ‘backtracks’          = .__backtracks,
+         ‘elapsed time’        = Int(t),
+         ‘boards examined’     = .examined.len,
+         ‘number of solutions’ = .solutions.len
+      ]
 
    F onexit()
       .__endtime = Time().unix_time()
