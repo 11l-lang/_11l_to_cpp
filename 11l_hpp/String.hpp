@@ -332,6 +332,10 @@ public:
 	{
 		return ends_with(_get<0>(tuple)) || ends_with(_get<1>(tuple)) || ends_with(_get<2>(tuple)) || ends_with(_get<3>(tuple));
 	}
+	template <typename Type> bool ends_with(const Tuple<Type, Type, Type, Type, Type> &tuple) const
+	{
+		return ends_with(_get<0>(tuple)) || ends_with(_get<1>(tuple)) || ends_with(_get<2>(tuple)) || ends_with(_get<3>(tuple)) || ends_with(_get<4>(tuple));
+	}
 
 	/*
 	String replace(const String &old, const String &n) const
