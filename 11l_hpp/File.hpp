@@ -269,6 +269,11 @@ public:
 		}
 		as_mutable()->seek(offset);
 	}
+
+	bool is_associated_with_console() const
+	{
+		return fh.is_associated_with_console();
+	}
 };
 
 template <> class TFile<false> : public OFile
@@ -324,6 +329,11 @@ public:
 	void flush() const
 	{
 		as_mutable()->flush();
+	}
+
+	bool is_associated_with_console() const
+	{
+		return fh.is_associated_with_console();
 	}
 };
 

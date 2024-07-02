@@ -4018,6 +4018,7 @@ file_scope.add_name('read_line',  ASTFunctionDefinition([('keep_newline', token_
 file_scope.add_name('seek', ASTFunctionDefinition([('offset', '', 'Int'), ('whence', '0', 'Int')]))
 file_scope.add_name('flush', ASTFunctionDefinition([]))
 file_scope.add_name('close', ASTFunctionDefinition([]))
+file_scope.add_name('is_associated_with_console', ASTFunctionDefinition([]))
 builtins_scope.ids['File'].ast_nodes[0].scope = file_scope
 
 builtins_scope.add_name('FileWr', ASTTypeDefinition([ASTFunctionDefinition([('name', '', 'String'), ('encoding', token_to_str('‘utf-8’'), 'String'), ('append', token_to_str('0B', Token.Category.CONSTANT), 'Bool')])]))
