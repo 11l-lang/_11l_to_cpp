@@ -518,12 +518,12 @@ TEST(‘''''‘‘‘‘Don’t! Don’t! Don’t!’'’, "Don’t! Don’t! Do
 TEST(‘<<‘выравнивание по левому краю’
 >>‘выравнивание по правому краю’
 ><‘выравнивание по центру’
-<>‘выравнивание по ширине’’, "\
-<div align=\"left\">выравнивание по левому краю</div>\n\
-<div align=\"right\">выравнивание по правому краю</div>\n\
-<div align=\"center\">выравнивание по центру</div>\n\
-<div align=\"justify\">выравнивание по ширине</div>\n\
-")
+<>‘выравнивание по ширине’’, \/‘
+<div align="left">выравнивание по левому краю</div>
+<div align="right">выравнивание по правому краю</div>
+<div align="center">выравнивание по центру</div>
+<div align="justify">выравнивание по ширине</div>
+’)
 TEST(‘‘’<<’, ‘‘’&lt;&lt;’)
 TEST(‘/\‘надстрочный\superscript’\/‘подстрочный\subscript’’, ‘<sup>надстрочный\superscript</sup><sub>подстрочный\subscript</sub>’)
 TEST("> Quote\n"‘’">‘Quote2’\n", "<blockquote>Quote</blockquote>\n"‘’"<blockquote>Quote2</blockquote>\n")
@@ -877,12 +877,11 @@ Some text.)"_S, false, true);
         TEST(uR"(<<‘выравнивание по левому краю’
 >>‘выравнивание по правому краю’
 ><‘выравнивание по центру’
-<>‘выравнивание по ширине’)"_S, u"\
-<div align=\"left\">выравнивание по левому краю</div>\n\
-<div align=\"right\">выравнивание по правому краю</div>\n\
-<div align=\"center\">выравнивание по центру</div>\n\
-<div align=\"justify\">выравнивание по ширине</div>\n\
-"_S);
+<>‘выравнивание по ширине’)"_S, uR"(<div align="left">выравнивание по левому краю</div>
+<div align="right">выравнивание по правому краю</div>
+<div align="center">выравнивание по центру</div>
+<div align="justify">выравнивание по ширине</div>
+)"_S);
         TEST(u"‘’<<"_S, u"‘’&lt;&lt;"_S);
         TEST(uR"(/\‘надстрочный\superscript’\/‘подстрочный\subscript’)"_S, uR"(<sup>надстрочный\superscript</sup><sub>подстрочный\subscript</sub>)"_S);
         TEST(u"> Quote\n"_S & u">‘Quote2’\n"_S, u"<blockquote>Quote</blockquote>\n"_S & u"<blockquote>Quote2</blockquote>\n"_S);
