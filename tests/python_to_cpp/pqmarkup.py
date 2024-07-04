@@ -72,7 +72,10 @@ class Converter:
                 str = str.replace('"', '&quot;') # нужно для корректного отображения кавычек в <a href="http://address">, так как Habr автоматически конвертирует "" в «»
             return str
         def html_escapeq(str):
-            return str.replace('&', '&amp;').replace('"', '&quot;')
+            if self.habr_html:
+                return str.replace('"', "''")
+            else:
+                return str.replace('&', '&amp;').replace('"', '&quot;')
 
         writepos = 0
         def write_to_pos(pos, npos):
@@ -116,12 +119,17 @@ class Converter:
                 if i == len(str):
                     exit_with_error('Unended comment started', start + starti)
 
-        def remove_comments(s : str, start, level = 3):
+        def remove_comments(s : str, start, level = 3, incode = False):
+            j = 0
             while True:
-                j = s.find("["*level) # ]
+                j = s.find("["*level, j)
                 if j == -1:
                     break
                 k = find_ending_sq_bracket(s, j, start) + 1
+                if incode:
+                    if s[k-3:k-1] != ']|':
+                        j += 3
+                        continue
                 start += k - j
                 s = s[0:j] + s[k:]
             return s
@@ -334,14 +342,18 @@ class Converter:
                             if instr[endqpos+1:endqpos+2] == "[": # >‘Author's name’[http...]:‘Quoted text.’ # ]
                                 startqpos = i + 1
                                 i = endqpos
-                                outfile.write('<i>')
-                                assert(writepos == startqpos + 1)
-                                writepos = startqpos
-                                write_http_link(startqpos, endqpos)
-                                outfile.write('</i>')
-                                i += 1
+                                if numbered_link(2): # >‘Author's name’[-1]:‘Quoted text.’
+                                    outfile.write('<i><a href="' + link + '">' + html_escape(instr[startqpos+1:endqpos]) + '</a></i>')
+                                    i = endi + 1
+                                else:
+                                    outfile.write('<i>')
+                                    assert(writepos == startqpos + 1)
+                                    writepos = startqpos
+                                    write_http_link(startqpos, endqpos)
+                                    outfile.write('</i>')
+                                    i += 1
                                 if instr[i:i+2] != ':‘': # ’
-                                    exit_with_error("Quotation with url should always has :‘...’ after ["+link[:link.find(':')]+"://url]", i)
+                                    exit_with_error("Quotation with url should always has :‘...’ after [...]", i)
                                 outfile.write(":<br />\n")
                                 writepos = i + 2
                             elif instr[endqpos+1:endqpos+2] == ":": # >‘Author's name’:‘Quoted text.’
@@ -447,11 +459,13 @@ class Converter:
                     write_to_pos(prevci, endqpos+1)
                     outfile.write(html_escape(instr[startqpos+1:endqpos]).replace("\n", "<br />\n"))
                 elif prevc == "#":
-                    ins = instr[startqpos+1:endqpos]
+                    ins = remove_comments(instr[startqpos+1:endqpos], startqpos+1, incode = True)
                     write_to_pos(prevci, endqpos+1)
                     if self.habr_html:
-                        contains_new_line = "\n" in ins
-                        outfile.write(('<source lang="' + str_in_p + '">' if str_in_p != '' else '<source>' if contains_new_line else '<code>') + ins.replace('&', '&amp;').replace('<', '&lt;') + ("</source>" if str_in_p != '' or contains_new_line else "</code>")) # так как <source> в Habr — блочный элемент, а не встроенный\inline
+                        if str_in_p == 'C++':
+                            str_in_p = 'cpp'
+                        not_inline = "\n" in ins or (prevci == 0 and endqpos == len(instr) - 1)
+                        outfile.write((('<source lang="' + str_in_p + '">' if str_in_p != '' else '<source>') if not_inline else '<code>') + ins.replace('&', '&amp;').replace('<', '&lt;') + ("</source>" if not_inline else "</code>")) # так как <source> в Habr — блочный элемент, а не встроенный\inline
                     else:
                         pre = '<pre ' + ('class="code_block"' if ins[0] == "\n" else 'style="display: inline"') + '>' # can not do `outfile.write('<pre ' + ...)` here because `outfile.write(syntax_highlighter_for_pqmarkup.css)` should be outside of <pre> block
                         if self.ohd and syntax_highlighter_for_pqmarkup.is_lang_supported(str_in_p):
@@ -464,9 +478,8 @@ class Converter:
                                 exit_with_error('Syntax highlighter: ' + e.message, startqpos+1+e.pos)
                         else:
                             outfile.write(pre + html_escape(ins) + '</pre>') # в habr_html тег pre не стоит задействовать, так как в Habr для тега pre используется шрифт monospace, в котором символы ‘ и ’ выглядят непонятно (не так как в Courier New)
-                    if ins[0] == "\n" and instr[i+1:i+2] == "\n":
-                        outfile.write("\n")
-                        new_line_tag = ''
+                    if ins[0] == "\n" and (instr[i+1:i+2] == "\n" or instr[i+1:i+4] == '[[['): # ]]]
+                        new_line_tag = "\n"
                 elif prevc in 'TТ':
                     write_to_pos(prevci, endqpos+1)
                     header_row = False
@@ -657,11 +670,21 @@ class Converter:
                 if len(ending_tags) == 0:
                     exit_with_error('Unpaired right single quotation mark', i)
                 last = ending_tags.pop()
-                outfile.write(last)
                 if next_char() == "\n" and (last.startswith('</h') or last in ('</blockquote>', '</div>')): # так как <h.> - блоковый элемент, то он автоматически завершает строку, поэтому лишний тег <br> в этом случае добавлять не нужно (иначе получится лишняя пустая строка после заголовка)
+                    # Поскольку мы пропускаем "\n", необходимо добавить new_line_tag, если он есть
+                    if new_line_tag not in ('', "\0"):
+                        outfile.write(new_line_tag)
+                    new_line_tag = "\0"
+                    i += 1 # эта строка была перенесена сюда из-за особенности работы функций close_*ordered_list()
+                    # Также закрываем список внутри цитаты перед тегом </blockquote>
+                    close_ordered_list()
+                    close_unordered_list()
+
+                    outfile.write(last)
                     outfile.write("\n")
-                    i += 1
                     writepos += 1
+                else:
+                    outfile.write(last)
             elif ch == '`':
                 # Сначала считаем количество символов ` — это определит границу, где находится окончание span of code
                 start = i
@@ -735,7 +758,7 @@ class Converter:
             elif ch == "}":
                 write_to_i('</span><span class="cu_brackets_b">'*self.ohd + '}' + self.ohd*'</span></span>')
             elif ch == "\n":
-                write_to_i((new_line_tag if new_line_tag != "\0" else "<br />") + ("\n" if new_line_tag != '' else "")) # код `"\n" if new_line_tag != ''` нужен только для списков (unordered/ordered list)
+                write_to_i((new_line_tag if new_line_tag != "\0" else "<br />") + ("\n" if new_line_tag not in ('', "\n") else "")) # код `"\n" if new_line_tag != ''` нужен только для списков (unordered/ordered list)
                 new_line_tag = "\0"
 
             i += 1
@@ -774,7 +797,7 @@ Positional arguments:
 
 Options:
   -h, --help            show this help message and exit
-  --habr-html           for publishing posts on habr.com
+  --habr-html           for publishing articles on habr.com
   --output-html-document
                         add some html header for rough testing preview of your
                         converted documents

@@ -53,6 +53,7 @@ class Error(Exception):
 def highlight(lang, source):
     writepos = 0
     comments : List[Tuple[int, int]] = []
+    cur_comment = 0
     res = ''
 
     def html_escape(s):
@@ -61,11 +62,11 @@ def highlight(lang, source):
     if lang == 'Python':
         try:
             for token in python_to_11l.tokenizer.tokenize(source, comments = comments) + [python_to_11l.tokenizer.Token(len(source), len(source), python_to_11l.tokenizer.Token.Category.STATEMENT_SEPARATOR)]:
-                while len(comments) and comments[0][0] < token.start:
-                    res += html_escape(source[writepos:comments[0][0]])
-                    writepos = comments[0][1]
-                    res += '<span class="comment">' + html_escape(source[comments[0][0]:comments[0][1]]) + '</span>'
-                    comments.pop(0)
+                while cur_comment < len(comments) and comments[cur_comment][0] < token.start:
+                    res += html_escape(source[writepos:comments[cur_comment][0]])
+                    writepos = comments[cur_comment][1]
+                    res += '<span class="comment">' + html_escape(source[comments[cur_comment][0]:comments[cur_comment][1]]) + '</span>'
+                    cur_comment += 1
                 res += html_escape(source[writepos:token.start])
                 writepos = token.end
                 css_class = cat_to_class_python[token.category]
@@ -79,12 +80,14 @@ def highlight(lang, source):
     else:
         assert(lang == '11l')
         try:
+            inside_fstring = 0
+
             for token in _11l_to_cpp.tokenizer.tokenize(source, comments = comments) + [_11l_to_cpp.tokenizer.Token(len(source), len(source), _11l_to_cpp.tokenizer.Token.Category.STATEMENT_SEPARATOR)]:
-                while len(comments) and comments[0][0] < token.start:
-                    res += html_escape(source[writepos:comments[0][0]])
-                    writepos = comments[0][1]
-                    res += '<span class="comment">' + html_escape(source[comments[0][0]:comments[0][1]]) + '</span>'
-                    comments.pop(0)
+                while cur_comment < len(comments) and comments[cur_comment][0] < token.start:
+                    res += html_escape(source[writepos:comments[cur_comment][0]])
+                    writepos = comments[cur_comment][1]
+                    res += '<span class="comment">' + html_escape(source[comments[cur_comment][0]:comments[cur_comment][1]]) + '</span>'
+                    cur_comment += 1
                 res += html_escape(source[writepos:token.start])
                 writepos = token.end
 
@@ -97,8 +100,13 @@ def highlight(lang, source):
                 else:
                     css_class = cat_to_class_11l[token.category]
 
+                if token.category == _11l_to_cpp.tokenizer.Token.Category.FSTRING:
+                    inside_fstring += 1
+                elif token.category == _11l_to_cpp.tokenizer.Token.Category.FSTRING_END:
+                    inside_fstring -= 1
+
                 if css_class != '':
-                    if token.category == _11l_to_cpp.tokenizer.Token.Category.STRING_LITERAL:
+                    if token.category == _11l_to_cpp.tokenizer.Token.Category.STRING_LITERAL and inside_fstring == 0:
                         if tokstr[0] == "'":
                             apos = 1
                             while tokstr[apos] == "'":

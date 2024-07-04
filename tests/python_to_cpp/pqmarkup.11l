@@ -63,7 +63,10 @@ T Converter
             str = str.replace(‘"’, ‘&quot;’)
          R str
       F html_escapeq(str)
-         R str.replace(‘&’, ‘&amp;’).replace(‘"’, ‘&quot;’)
+         I @.habr_html
+            R str.replace(‘"’, ‘''’)
+         E
+            R str.replace(‘&’, ‘&amp;’).replace(‘"’, ‘&quot;’)
 
       V writepos = 0
       F write_to_pos(pos, npos)
@@ -104,12 +107,17 @@ T Converter
             I i == str.len
                @exit_with_error(‘Unended comment started’, start + starti)
 
-      F remove_comments(String =s; =start, level = 3)
+      F remove_comments(String =s; =start, level = 3, incode = 0B)
+         V j = 0
          L
-            V j = s.findi(‘[’ * level)
+            j = s.findi(‘[’ * level, j)
             I j == -1
                L.break
             V k = @find_ending_sq_bracket(s, j, start) + 1
+            I incode
+               I s[k - 3 .< k - 1] != ‘]|’
+                  j += 3
+                  L.continue
             start += k - j
             s = s[0 .< j]‘’s[k ..]
          R s
@@ -311,14 +319,18 @@ T Converter
                      I instr[endqpos + 1 .< endqpos + 2] == ‘[’
                         V startqpos = i + 1
                         i = endqpos
-                        outfile.write(‘<i>’)
-                        assert(writepos == startqpos + 1)
-                        writepos = startqpos
-                        write_http_link(startqpos, endqpos)
-                        outfile.write(‘</i>’)
-                        i++
+                        I numbered_link(2)
+                           outfile.write(‘<i><a href="’link‘">’html_escape(instr[startqpos + 1 .< endqpos])‘</a></i>’)
+                           i = endi + 1
+                        E
+                           outfile.write(‘<i>’)
+                           assert(writepos == startqpos + 1)
+                           writepos = startqpos
+                           write_http_link(startqpos, endqpos)
+                           outfile.write(‘</i>’)
+                           i++
                         I instr[i .< i + 2] != ":‘"
-                           exit_with_error(‘Quotation with url should always has :‘...’ after [’link[0 .< link.findi(‘:’)]‘://url]’, i)
+                           exit_with_error(‘Quotation with url should always has :‘...’ after [...]’, i)
                         outfile.write(":<br />\n")
                         writepos = i + 2
                      E I instr[endqpos + 1 .< endqpos + 2] == ‘:’
@@ -419,11 +431,13 @@ T Converter
                write_to_pos(prevci, endqpos + 1)
                outfile.write(html_escape(instr[startqpos + 1 .< endqpos]).replace("\n", "<br />\n"))
             E I prevc == ‘#’
-               V ins = instr[startqpos + 1 .< endqpos]
+               V ins = remove_comments(instr[startqpos + 1 .< endqpos], startqpos + 1, incode' 1B)
                write_to_pos(prevci, endqpos + 1)
                I .habr_html
-                  V contains_new_line = "\n" C ins
-                  outfile.write((I str_in_p != ‘’ {‘<source lang="’str_in_p‘">’} E I contains_new_line {‘<source>’} E ‘<code>’)‘’ins.replace(‘&’, ‘&amp;’).replace(‘<’, ‘&lt;’)‘’(I str_in_p != ‘’ | contains_new_line {‘</source>’} E ‘</code>’))
+                  I str_in_p == ‘C++’
+                     str_in_p = ‘cpp’
+                  V not_inline = "\n" C ins | (prevci == 0 & endqpos == instr.len - 1)
+                  outfile.write((I not_inline {(I str_in_p != ‘’ {‘<source lang="’str_in_p‘">’} E ‘<source>’)} E ‘<code>’)‘’ins.replace(‘&’, ‘&amp;’).replace(‘<’, ‘&lt;’)‘’(I not_inline {‘</source>’} E ‘</code>’))
                E
                   V pre = ‘<pre ’(I ins[0] == "\n" {‘class="code_block"’} E ‘style="display: inline"’)‘>’
                   I .ohd & syntax_highlighter_for_pqmarkup:is_lang_supported(str_in_p)
@@ -436,9 +450,8 @@ T Converter
                         exit_with_error(‘Syntax highlighter: ’e.message, startqpos + 1 + e.pos)
                   E
                      outfile.write(pre‘’html_escape(ins)‘</pre>’)
-               I ins[0] == "\n" & instr[i + 1 .< i + 2] == "\n"
-                  outfile.write("\n")
-                  new_line_tag = ‘’
+               I ins[0] == "\n" & (instr[i + 1 .< i + 2] == "\n" | instr[i + 1 .< i + 4] == ‘[[[’)
+                  new_line_tag = "\n"
             E I prevc C ‘TТ’
                write_to_pos(prevci, endqpos + 1)
                V header_row = 0B
@@ -621,11 +634,19 @@ T Converter
             I ending_tags.empty
                exit_with_error(‘Unpaired right single quotation mark’, i)
             V last = ending_tags.pop()
-            outfile.write(last)
             I next_char() == "\n" & (last.starts_with(‘</h’) | last C (‘</blockquote>’, ‘</div>’))
-               outfile.write("\n")
+               I new_line_tag !C (‘’, "\0")
+                  outfile.write(new_line_tag)
+               new_line_tag = "\0"
                i++
+               close_ordered_list()
+               close_unordered_list()
+
+               outfile.write(last)
+               outfile.write("\n")
                writepos++
+            E
+               outfile.write(last)
          E I ch == ‘`’
             V start = i
             i++
@@ -697,7 +718,7 @@ T Converter
          E I ch == ‘}’
             write_to_i((‘</span><span class="cu_brackets_b">’ * .ohd)‘}’(.ohd * ‘</span></span>’))
          E I ch == "\n"
-            write_to_i((I new_line_tag != "\0" {new_line_tag} E ‘<br />’)‘’(I new_line_tag != ‘’ {"\n"} E ‘’))
+            write_to_i((I new_line_tag != "\0" {new_line_tag} E ‘<br />’)‘’(I new_line_tag !C (‘’, "\n") {"\n"} E ‘’))
             new_line_tag = "\0"
 
          i++
@@ -734,7 +755,7 @@ Positional arguments:
 
 Options:
   -h, --help            show this help message and exit
-  --habr-html           for publishing posts on habr.com
+  --habr-html           for publishing articles on habr.com
   --output-html-document
                         add some html header for rough testing preview of your
                         converted documents

@@ -50,6 +50,7 @@ T Error
 F highlight(lang, source)
    V writepos = 0
    [(Int, Int)] comments
+   V cur_comment = 0
    V res = ‘’
 
    F html_escape(s)
@@ -58,11 +59,11 @@ F highlight(lang, source)
    I lang == ‘Python’
       X.try
          L(token) python_to_11l:tokenizer:tokenize(source, comments' &comments) [+] [python_to_11l:tokenizer:Token(source.len, source.len, python_to_11l:tokenizer:Token.Category.STATEMENT_SEPARATOR)]
-            L comments.len & comments[0][0] < token.start
-               res ‘’= html_escape(source[writepos .< comments[0][0]])
-               writepos = comments[0][1]
-               res ‘’= ‘<span class="comment">’html_escape(source[comments[0][0] .< comments[0][1]])‘</span>’
-               comments.pop(0)
+            L cur_comment < comments.len & comments[cur_comment][0] < token.start
+               res ‘’= html_escape(source[writepos .< comments[cur_comment][0]])
+               writepos = comments[cur_comment][1]
+               res ‘’= ‘<span class="comment">’html_escape(source[comments[cur_comment][0] .< comments[cur_comment][1]])‘</span>’
+               cur_comment++
             res ‘’= html_escape(source[writepos .< token.start])
             writepos = token.end
             V css_class = :cat_to_class_python[token.category]
@@ -76,12 +77,14 @@ F highlight(lang, source)
    E
       assert(lang == ‘11l’)
       X.try
+         V inside_fstring = 0
+
          L(token) _11l_to_cpp:tokenizer:tokenize(source, comments' &comments) [+] [_11l_to_cpp:tokenizer:Token(source.len, source.len, _11l_to_cpp:tokenizer:Token.Category.STATEMENT_SEPARATOR)]
-            L comments.len & comments[0][0] < token.start
-               res ‘’= html_escape(source[writepos .< comments[0][0]])
-               writepos = comments[0][1]
-               res ‘’= ‘<span class="comment">’html_escape(source[comments[0][0] .< comments[0][1]])‘</span>’
-               comments.pop(0)
+            L cur_comment < comments.len & comments[cur_comment][0] < token.start
+               res ‘’= html_escape(source[writepos .< comments[cur_comment][0]])
+               writepos = comments[cur_comment][1]
+               res ‘’= ‘<span class="comment">’html_escape(source[comments[cur_comment][0] .< comments[cur_comment][1]])‘</span>’
+               cur_comment++
             res ‘’= html_escape(source[writepos .< token.start])
             writepos = token.end
 
@@ -92,8 +95,13 @@ F highlight(lang, source)
             E
                css_class = :cat_to_class_11l[token.category]
 
+            I token.category == FSTRING
+               inside_fstring++
+            E I token.category == FSTRING_END
+               inside_fstring--
+
             I css_class != ‘’
-               I token.category == STRING_LITERAL
+               I token.category == STRING_LITERAL & inside_fstring == 0
                   I tokstr[0] == ‘'’
                      V apos = 1
                      L tokstr[apos] == ‘'’

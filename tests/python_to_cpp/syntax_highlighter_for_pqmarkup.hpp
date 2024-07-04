@@ -39,6 +39,7 @@ template <typename T1, typename T2> auto highlight(const T1 &lang, const T2 &sou
 {
     auto writepos = 0;
     Array<ivec2> comments;
+    auto cur_comment = 0;
     auto res = u""_S;
 
     auto html_escape = [](const auto &s)
@@ -50,11 +51,11 @@ template <typename T1, typename T2> auto highlight(const T1 &lang, const T2 &sou
         try
         {
             for (auto &&token : python_to_11l::tokenizer::tokenize(source, nullptr, &comments) + create_array({python_to_11l::tokenizer::Token(source.len(), source.len(), python_to_11l::tokenizer::Token::Category::STATEMENT_SEPARATOR)})) {
-                while (comments.len() && _get<0>(_get<0>(comments)) < token.start) {
-                    res &= html_escape(source[range_el(writepos, _get<0>(_get<0>(comments)))]);
-                    writepos = _get<1>(_get<0>(comments));
-                    res &= u"<span class=\"comment\">"_S & html_escape(source[range_el(_get<0>(_get<0>(comments)), _get<1>(_get<0>(comments)))]) & u"</span>"_S;
-                    comments.pop(0);
+                while (cur_comment < comments.len() && _get<0>(comments[cur_comment]) < token.start) {
+                    res &= html_escape(source[range_el(writepos, _get<0>(comments[cur_comment]))]);
+                    writepos = _get<1>(comments[cur_comment]);
+                    res &= u"<span class=\"comment\">"_S & html_escape(source[range_el(_get<0>(comments[cur_comment]), _get<1>(comments[cur_comment]))]) & u"</span>"_S;
+                    cur_comment++;
                 }
                 res &= html_escape(source[range_el(writepos, token.start)]);
                 writepos = token.end;
@@ -75,12 +76,14 @@ template <typename T1, typename T2> auto highlight(const T1 &lang, const T2 &sou
         assert(lang == u"11l");
         try
         {
+            auto inside_fstring = 0;
+
             for (auto &&token : _11l_to_cpp::tokenizer::tokenize(source, nullptr, nullptr, &comments) + create_array({_11l_to_cpp::tokenizer::Token(source.len(), source.len(), _11l_to_cpp::tokenizer::Token::Category::STATEMENT_SEPARATOR)})) {
-                while (comments.len() && _get<0>(_get<0>(comments)) < token.start) {
-                    res &= html_escape(source[range_el(writepos, _get<0>(_get<0>(comments)))]);
-                    writepos = _get<1>(_get<0>(comments));
-                    res &= u"<span class=\"comment\">"_S & html_escape(source[range_el(_get<0>(_get<0>(comments)), _get<1>(_get<0>(comments)))]) & u"</span>"_S;
-                    comments.pop(0);
+                while (cur_comment < comments.len() && _get<0>(comments[cur_comment]) < token.start) {
+                    res &= html_escape(source[range_el(writepos, _get<0>(comments[cur_comment]))]);
+                    writepos = _get<1>(comments[cur_comment]);
+                    res &= u"<span class=\"comment\">"_S & html_escape(source[range_el(_get<0>(comments[cur_comment]), _get<1>(comments[cur_comment]))]) & u"</span>"_S;
+                    cur_comment++;
                 }
                 res &= html_escape(source[range_el(writepos, token.start)]);
                 writepos = token.end;
@@ -92,8 +95,13 @@ template <typename T1, typename T2> auto highlight(const T1 &lang, const T2 &sou
                 else
                     css_class = syntax_highlighter_for_pqmarkup::cat_to_class_11l[token.category];
 
+                if (token.category == TYPE_RM_REF(token.category)::FSTRING)
+                    inside_fstring++;
+                else if (token.category == TYPE_RM_REF(token.category)::FSTRING_END)
+                    inside_fstring--;
+
                 if (css_class != u"") {
-                    if (token.category == TYPE_RM_REF(token.category)::STRING_LITERAL) {
+                    if (token.category == TYPE_RM_REF(token.category)::STRING_LITERAL && inside_fstring == 0) {
                         if (_get<0>(tokstr) == u'\'') {
                             auto apos = 1;
                             while (tokstr[apos] == u'\'')

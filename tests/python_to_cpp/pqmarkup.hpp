@@ -93,9 +93,12 @@ public:
                 str = str.replace(u"\""_S, u"&quot;"_S);
             return str;
         };
-        auto html_escapeq = [](const auto &str)
+        auto html_escapeq = [this](const auto &str)
         {
-            return str.replace(u"&"_S, u"&amp;"_S).replace(u"\""_S, u"&quot;"_S);
+            if (habr_html)
+                return str.replace(u"\""_S, u"''"_S);
+            else
+                return str.replace(u"&"_S, u"&amp;"_S).replace(u"\""_S, u"&quot;"_S);
         };
 
         auto writepos = 0;
@@ -155,13 +158,20 @@ public:
             }
         };
 
-        auto remove_comments = [&find_ending_sq_bracket](String s, auto start, const decltype(3) level = 3)
+        auto remove_comments = [&find_ending_sq_bracket](String s, auto start, const decltype(3) level = 3, const decltype(false) incode = false)
         {
+            auto j = 0;
             while (true) {
-                auto j = s.findi(u"["_S * level);
+                j = s.findi(u"["_S * level, j);
                 if (j == -1)
                     break;
                 auto k = find_ending_sq_bracket(s, j, start) + 1;
+                if (incode) {
+                    if (s[range_el(k - 3, k - 1)] != u"]|") {
+                        j += 3;
+                        continue;
+                    }
+                }
                 start += k - j;
                 s = s[range_el(0, j)] & s[range_ei(k)];
             }
@@ -415,14 +425,20 @@ public:
                             if (instr[range_el(endqpos + 1, endqpos + 2)] == u'[') {
                                 auto startqpos = i + 1;
                                 i = endqpos;
-                                outfile.write(u"<i>"_S);
-                                assert(writepos == startqpos + 1);
-                                writepos = startqpos;
-                                write_http_link(startqpos, endqpos);
-                                outfile.write(u"</i>"_S);
-                                i++;
+                                if (numbered_link(2)) {
+                                    outfile.write(u"<i><a href=\""_S & link & u"\">"_S & html_escape(instr[range_el(startqpos + 1, endqpos)]) & u"</a></i>"_S);
+                                    i = endi + 1;
+                                }
+                                else {
+                                    outfile.write(u"<i>"_S);
+                                    assert(writepos == startqpos + 1);
+                                    writepos = startqpos;
+                                    write_http_link(startqpos, endqpos);
+                                    outfile.write(u"</i>"_S);
+                                    i++;
+                                }
                                 if (instr[range_el(i, i + 2)] != u":‘")
-                                    exit_with_error(u"Quotation with url should always has :‘...’ after ["_S & link[range_el(0, link.findi(u":"_S))] & u"://url]"_S, i);
+                                    exit_with_error(u"Quotation with url should always has :‘...’ after [...]"_S, i);
                                 outfile.write(u":<br />\n"_S);
                                 writepos = i + 2;
                             }
@@ -550,11 +566,13 @@ public:
                     outfile.write(html_escape(instr[range_el(startqpos + 1, endqpos)]).replace(u"\n"_S, u"<br />\n"_S));
                 }
                 else if (prevc == u'#') {
-                    auto ins = instr[range_el(startqpos + 1, endqpos)];
+                    auto ins = remove_comments(instr[range_el(startqpos + 1, endqpos)], startqpos + 1, 3, true);
                     write_to_pos(prevci, endqpos + 1);
                     if (habr_html) {
-                        auto contains_new_line = in(u'\n'_C, ins);
-                        outfile.write((str_in_p != u"" ? u"<source lang=\""_S & str_in_p & u"\">"_S : contains_new_line ? u"<source>"_S : u"<code>"_S) & ins.replace(u"&"_S, u"&amp;"_S).replace(u"<"_S, u"&lt;"_S) & (str_in_p != u"" || contains_new_line ? u"</source>"_S : u"</code>"_S));
+                        if (str_in_p == u"C++")
+                            str_in_p = u"cpp"_S;
+                        auto not_inline = in(u'\n'_C, ins) || (prevci == 0 && endqpos == instr.len() - 1);
+                        outfile.write((not_inline ? (str_in_p != u"" ? u"<source lang=\""_S & str_in_p & u"\">"_S : u"<source>"_S) : u"<code>"_S) & ins.replace(u"&"_S, u"&amp;"_S).replace(u"<"_S, u"&lt;"_S) & (not_inline ? u"</source>"_S : u"</code>"_S));
                     }
                     else {
                         auto pre = u"<pre "_S & (_get<0>(ins) == u'\n' ? u"class=\"code_block\""_S : u"style=\"display: inline\""_S) & u">"_S;
@@ -575,10 +593,8 @@ public:
                         else
                             outfile.write(pre & html_escape(ins) & u"</pre>"_S);
                     }
-                    if (_get<0>(ins) == u'\n' && instr[range_el(i + 1, i + 2)] == u'\n') {
-                        outfile.write(u"\n"_S);
-                        new_line_tag = u""_S;
-                    }
+                    if (_get<0>(ins) == u'\n' && (instr[range_el(i + 1, i + 2)] == u'\n' || instr[range_el(i + 1, i + 4)] == u"[[["))
+                        new_line_tag = u'\n'_C;
                 }
                 else if (in(prevc, u"TТ"_S)) {
                     write_to_pos(prevci, endqpos + 1);
@@ -798,12 +814,20 @@ public:
                 if (ending_tags.empty())
                     exit_with_error(u"Unpaired right single quotation mark"_S, i);
                 auto last = ending_tags.pop();
-                outfile.write(last);
                 if (next_char() == u'\n' && (last.starts_with(u"</h"_S) || in(last, make_tuple(u"</blockquote>"_S, u"</div>"_S)))) {
-                    outfile.write(u"\n"_S);
+                    if (!in(new_line_tag, make_tuple(u""_S, u"\0"_S)))
+                        outfile.write(new_line_tag);
+                    new_line_tag = u'\0'_C;
                     i++;
+                    close_ordered_list();
+                    close_unordered_list();
+
+                    outfile.write(last);
+                    outfile.write(u"\n"_S);
                     writepos++;
                 }
+                else
+                    outfile.write(last);
             }
             else if (ch == u'`') {
                 auto start = i;
@@ -892,7 +916,7 @@ public:
             else if (ch == u'}')
                 write_to_i((u"</span><span class=\"cu_brackets_b\">"_S * ohd) & u"}"_S & (ohd * u"</span></span>"_S));
             else if (ch == u'\n') {
-                write_to_i((new_line_tag != u'\0' ? new_line_tag : u"<br />"_S) & (new_line_tag != u"" ? u"\n"_S : u""_S));
+                write_to_i((new_line_tag != u'\0' ? new_line_tag : u"<br />"_S) & (!in(new_line_tag, make_tuple(u""_S, u"\n"_S)) ? u"\n"_S : u""_S));
                 new_line_tag = u'\0'_C;
             }
 

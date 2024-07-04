@@ -124,6 +124,21 @@ TEST("'‘<Don‘t! Don‘t! Don‘t!>’’’’''''", "<Don‘t! Don‘t! Don
 TEST("`'‘<div>&lt;</div>’'`", "<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>", habr_html = True)
 TEST("''‘‘’‘’’''", "’‘")
 TEST("''''‘‘‘‘Don’t! Don’t! Don’t!’'", "Don’t! Don’t! Don’t!")
+TEST('модуль #(11l)‘fs’', 'модуль <code>fs</code>', habr_html = True)
+TEST('''\
+Т‘
+‘‘Python’ ‘#(Python)‘rn = {'I': 1, 'V': 5, 'X': 10, 'L': 50, ...}’’’
+’''', '''<table>
+<tr><td>Python</td><td><source lang="Python">rn = {'I': 1, 'V': 5, 'X': 10, 'L': 50, ...}</source></td></tr>
+</table>
+''', habr_html = True)
+TEST('''\
+Т‘
+‘‘Python’ ‘#(Python)‘rn = {'I': 1, 'V': 5, 'X': 10, 'L': 50, ...}’ — ...’’
+’''', '''<table>
+<tr><td>Python</td><td><code>rn = {'I': 1, 'V': 5, 'X': 10, 'L': 50, ...}</code> — ...</td></tr>
+</table>
+''', habr_html = True)
 #TEST(open("tests/test1.pq", encoding="utf-8").read(), open("tests/test1.pq.to_habr_html", encoding="utf-8").read(), habr_html = True) # для проверки безопасности рефакторинга нужен был какой-либо обширный тестовый текст на пк-разметке [-TODO подобрать такой текст, который не стыдно закоммитить :)(:-]
 TEST("""<<‘выравнивание по левому краю’
 >>‘выравнивание по правому краю’
@@ -144,6 +159,9 @@ TEST(">[http://another-address][-1]:‘Quoted text.’\n" +
      ">[-1]:‘Another quoted text.’",                    '<blockquote><a href="http://another-address">[1]<i>http://another-address</i></a>:<br />\nQuoted text.</blockquote>\n'
                                                       + '<blockquote><a href="http://another-address">[1]<i>http://another-address</i></a>:<br />\nAnother quoted text.</blockquote>')
 TEST(">‘Author's name’[http://address]:‘Quoted text.’", '<blockquote><i><a href="http://address">Author\'s name</a></i>:<br />\nQuoted text.</blockquote>')
+TEST(">‘Author's name’[http://address][-1]:‘Quoted text.’\n" +
+     ">‘Author's name’[-1]:‘Another quoted text.’",     '<blockquote><i><a href="http://address">Author\'s name</a></i>:<br />\nQuoted text.</blockquote>\n'
+                                                      + '<blockquote><i><a href="http://address">Author\'s name</a></i>:<br />\nAnother quoted text.</blockquote>')
 TEST(">‘Author's name’:‘Quoted text.’",                 '<blockquote><i>Author\'s name</i>:<br />\nQuoted text.</blockquote>')
 TEST("‘Quoted text.’:‘Author's name’<",                 "<blockquote>Quoted text.<br />\n<div align='right'><i>Author's name</i></div></blockquote>")
 TEST('>‘Как люди думают. Дмитрий Чернышев. 2015. 304с.’:‘[[[стр.89:]]]...’', "<blockquote><i>Как люди думают. Дмитрий Чернышев. 2015. 304с.</i>:<br />\n<!--[[[стр.89:]]]-->...</blockquote>")
@@ -245,6 +263,27 @@ TEST(
 </ol>
 <br />
 Один существенный минус ...""", ohd = True)
+
+TEST('''>‘. a
+. b’
+c
+d''', '''<blockquote><ul>
+<li>a</li>
+<li>b</li>
+</ul>
+</blockquote>
+c<br />
+d''')
+
+TEST('''>[https://habr.com/ru/articles/780372/comments/#comment_26271586]:‘
+Джоэл Спольски в своё время подробно расписал, почему так получается:
+> Чтобы создать хороший продукт, требуется 10 лет разработки, но когда он готов - он ~‘готов’. После этого уже никто не может придумать ни единой фичи, которая была бы реально нужна.’
+Поддерживаю.''', '''<blockquote><a href="https://habr.com/ru/articles/780372/comments/#comment_26271586"><i>https://habr.com/ru/articles/780372/comments/...</i></a>:<br />
+<br />
+Джоэл Спольски в своё время подробно расписал, почему так получается:<br />
+<blockquote>Чтобы создать хороший продукт, требуется 10 лет разработки, но когда он готов - он <i>готов</i>. После этого уже никто не может придумать ни единой фичи, которая была бы реально нужна.</blockquote></blockquote>
+Поддерживаю.''')
+
 TEST(
 """T‘
 H‘‘1’ ‘2’’
@@ -343,6 +382,46 @@ span.comment {color: #808080;}
 (<span class="string-literal"><span style="opacity: 0.25">'''‘‘‘</span>‘Don’t! Don’t! Don’t!’</span>)
 (<span class="string-literal">‘Don‘t! Don‘t! Don‘t!’<span style="opacity: 0.25">’’’'''</span></span>)
 (<span class="string-literal"><span style="opacity: 0.25">'‘</span>‘’‘’<span style="opacity: 0.25">’'</span></span>)</pre>""", ohd = True)
+TEST('''#‘
+...
+’[[[comment]]]
+---
+''', '''<pre class="code_block">
+...
+</pre><!--[[[comment]]]-->
+<hr />
+''')
+TEST('''#‘
+BOOOsssSSSdddDDD
+│└┬┘└┬┘└┬┘└┬┘└┬┘
+│ │  │  │  │  └─ 0-2 биты: регистр-приёмник
+│ │  │  │  └──── 3-5 биты: режим адресации регистра-приёмника
+│ │  │  └─────── 6-8 биты: регистр-источник
+│ │  └───────── 9-11 биты: режим адресации регистра-источника
+│ └─────────── 12-14 биты: код операции
+└───────────────── 15 бит: признак byte-инструкций[[[ (если 0, то инструкция выполняется над словом, а если 1 — над байтом)]]|]
+’''', '''<pre class="code_block">
+BOOOsssSSSdddDDD
+│└┬┘└┬┘└┬┘└┬┘└┬┘
+│ │  │  │  │  └─ 0-2 биты: регистр-приёмник
+│ │  │  │  └──── 3-5 биты: режим адресации регистра-приёмника
+│ │  │  └─────── 6-8 биты: регистр-источник
+│ │  └───────── 9-11 биты: режим адресации регистра-источника
+│ └─────────── 12-14 биты: код операции
+└───────────────── 15 бит: признак byte-инструкций
+</pre>''')
+TEST('''#(Python)‘
+array3d = [[[1, 2, 3], [4, 5, 6]]] # this should not be treated as a comment!
+’''', '''<pre class="code_block">
+array3d = [[[1, 2, 3], [4, 5, 6]]] # this should not be treated as a comment!
+</pre>''')
+TEST('''#(Python)‘
+array3d = [[[1, 2, 3],[[[ hidden comment]]|]
+            [4, 5, 6]]]
+’''', '''<pre class="code_block">
+array3d = [[[1, 2, 3],
+            [4, 5, 6]]]
+</pre>''')
 
 # Check for error handling
 test_id += 1
@@ -515,6 +594,21 @@ TEST(‘'‘<Don‘t! Don‘t! Don‘t!>’’’’''''’, "<Don‘t! Don‘t!
 TEST(‘`'‘<div>&lt;</div>’'`’, ‘<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>’, habr_html' 1B)
 TEST(‘''‘‘’‘’’''’, '‘‘’‘’’')
 TEST(‘''''‘‘‘‘Don’t! Don’t! Don’t!’'’, "Don’t! Don’t! Don’t!")
+TEST(‘модуль #(11l)‘fs’’, ‘модуль <code>fs</code>’, habr_html' 1B)
+TEST(\/‘
+Т‘
+‘‘Python’ ‘#(Python)‘rn = {'I': 1, 'V': 5, 'X': 10, 'L': 50, ...}’’’
+’’, ‘<table>
+<tr><td>Python</td><td><source lang="Python">rn = {'I': 1, 'V': 5, 'X': 10, 'L': 50, ...}</source></td></tr>
+</table>
+’, habr_html' 1B)
+TEST(\/‘
+Т‘
+‘‘Python’ ‘#(Python)‘rn = {'I': 1, 'V': 5, 'X': 10, 'L': 50, ...}’ — ...’’
+’’, ‘<table>
+<tr><td>Python</td><td><code>rn = {'I': 1, 'V': 5, 'X': 10, 'L': 50, ...}</code> — ...</td></tr>
+</table>
+’, habr_html' 1B)
 TEST(‘<<‘выравнивание по левому краю’
 >>‘выравнивание по правому краю’
 ><‘выравнивание по центру’
@@ -530,6 +624,7 @@ TEST("> Quote\n"‘’">‘Quote2’\n", "<blockquote>Quote</blockquote>\n"‘�
 TEST(‘>[http://address]:‘Quoted text.’’, "<blockquote><a href=\"http://address\"><i>http://address</i></a>:<br />\nQuoted text.</blockquote>")
 TEST(">[http://another-address][-1]:‘Quoted text.’\n"‘>[-1]:‘Another quoted text.’’, "<blockquote><a href=\"http://another-address\">[1]<i>http://another-address</i></a>:<br />\nQuoted text.</blockquote>\n"‘’"<blockquote><a href=\"http://another-address\">[1]<i>http://another-address</i></a>:<br />\nAnother quoted text.</blockquote>")
 TEST(‘>‘Author's name’[http://address]:‘Quoted text.’’, "<blockquote><i><a href=\"http://address\">Author's name</a></i>:<br />\nQuoted text.</blockquote>")
+TEST(">‘Author's name’[http://address][-1]:‘Quoted text.’\n"‘>‘Author's name’[-1]:‘Another quoted text.’’, "<blockquote><i><a href=\"http://address\">Author's name</a></i>:<br />\nQuoted text.</blockquote>\n"‘’"<blockquote><i><a href=\"http://address\">Author's name</a></i>:<br />\nAnother quoted text.</blockquote>")
 TEST(‘>‘Author's name’:‘Quoted text.’’, "<blockquote><i>Author's name</i>:<br />\nQuoted text.</blockquote>")
 TEST(‘‘Quoted text.’:‘Author's name’<’, "<blockquote>Quoted text.<br />\n<div align='right'><i>Author's name</i></div></blockquote>")
 TEST(‘>‘Как люди думают. Дмитрий Чернышев. 2015. 304с.’:‘[[[стр.89:]]]...’’, "<blockquote><i>Как люди думают. Дмитрий Чернышев. 2015. 304с.</i>:<br />\n<!--[[[стр.89:]]]-->...</blockquote>")
@@ -613,6 +708,27 @@ TEST(‘4. ‘А ещё мне коды[/годы] этих символов н�
 </ol>
 <br />
 Один существенный минус ...’, ohd' 1B)
+
+TEST(‘>‘. a
+. b’
+c
+d’, ‘<blockquote><ul>
+<li>a</li>
+<li>b</li>
+</ul>
+</blockquote>
+c<br />
+d’)
+
+TEST(‘>[https://habr.com/ru/articles/780372/comments/#comment_26271586]:‘
+Джоэл Спольски в своё время подробно расписал, почему так получается:
+> Чтобы создать хороший продукт, требуется 10 лет разработки, но когда он готов - он ~‘готов’. После этого уже никто не может придумать ни единой фичи, которая была бы реально нужна.’
+Поддерживаю.’, ‘<blockquote><a href="https://habr.com/ru/articles/780372/comments/#comment_26271586"><i>https://habr.com/ru/articles/780372/comments/...</i></a>:<br />
+<br />
+Джоэл Спольски в своё время подробно расписал, почему так получается:<br />
+<blockquote>Чтобы создать хороший продукт, требуется 10 лет разработки, но когда он готов - он <i>готов</i>. После этого уже никто не может придумать ни единой фичи, которая была бы реально нужна.</blockquote></blockquote>
+Поддерживаю.’)
+
 TEST(‘T‘
 H‘‘1’ ‘2’’
  ‘‘3’ ‘4’[[[comment]]]’
@@ -700,6 +816,46 @@ span.comment {color: #808080;}
 (<span class="string-literal"><span style="opacity: 0.25">'''‘‘‘</span>‘Don’t! Don’t! Don’t!’</span>)
 (<span class="string-literal">‘Don‘t! Don‘t! Don‘t!’<span style="opacity: 0.25">’’’'''</span></span>)
 (<span class="string-literal"><span style="opacity: 0.25">'‘</span>‘’‘’<span style="opacity: 0.25">’'</span></span>)</pre>’, ohd' 1B)
+TEST(‘#‘
+...
+’[[[comment]]]
+---
+’, ‘<pre class="code_block">
+...
+</pre><!--[[[comment]]]-->
+<hr />
+’)
+TEST(‘#‘
+BOOOsssSSSdddDDD
+│└┬┘└┬┘└┬┘└┬┘└┬┘
+│ │  │  │  │  └─ 0-2 биты: регистр-приёмник
+│ │  │  │  └──── 3-5 биты: режим адресации регистра-приёмника
+│ │  │  └─────── 6-8 биты: регистр-источник
+│ │  └───────── 9-11 биты: режим адресации регистра-источника
+│ └─────────── 12-14 биты: код операции
+└───────────────── 15 бит: признак byte-инструкций[[[ (если 0, то инструкция выполняется над словом, а если 1 — над байтом)]]|]
+’’, ‘<pre class="code_block">
+BOOOsssSSSdddDDD
+│└┬┘└┬┘└┬┘└┬┘└┬┘
+│ │  │  │  │  └─ 0-2 биты: регистр-приёмник
+│ │  │  │  └──── 3-5 биты: режим адресации регистра-приёмника
+│ │  │  └─────── 6-8 биты: регистр-источник
+│ │  └───────── 9-11 биты: режим адресации регистра-источника
+│ └─────────── 12-14 биты: код операции
+└───────────────── 15 бит: признак byte-инструкций
+</pre>’)
+TEST(‘#(Python)‘
+array3d = [[[1, 2, 3], [4, 5, 6]]] # this should not be treated as a comment!
+’’, ‘<pre class="code_block">
+array3d = [[[1, 2, 3], [4, 5, 6]]] # this should not be treated as a comment!
+</pre>’)
+TEST(‘#(Python)‘
+array3d = [[[1, 2, 3],[[[ hidden comment]]|]
+            [4, 5, 6]]]
+’’, ‘<pre class="code_block">
+array3d = [[[1, 2, 3],
+            [4, 5, 6]]]
+</pre>’)
 
 test_id++
 V was_error = 0B
@@ -874,6 +1030,19 @@ Some text.)"_S, false, true);
         TEST(u"`'‘<div>&lt;</div>’'`"_S, u"<code>'‘&lt;div>&amp;lt;&lt;/div>’'</code>"_S, false, true);
         TEST(u"''‘‘’‘’’''"_S, u"’‘"_S);
         TEST(u"''''‘‘‘‘Don’t! Don’t! Don’t!’'"_S, u"Don’t! Don’t! Don’t!"_S);
+        TEST(u"модуль #(11l)‘fs’"_S, u"модуль <code>fs</code>"_S, false, true);
+        TEST(uR"(Т‘
+‘‘Python’ ‘#(Python)‘rn = {'I': 1, 'V': 5, 'X': 10, 'L': 50, ...}’’’
+’)"_S, uR"(<table>
+<tr><td>Python</td><td><source lang="Python">rn = {'I': 1, 'V': 5, 'X': 10, 'L': 50, ...}</source></td></tr>
+</table>
+)"_S, false, true);
+        TEST(uR"(Т‘
+‘‘Python’ ‘#(Python)‘rn = {'I': 1, 'V': 5, 'X': 10, 'L': 50, ...}’ — ...’’
+’)"_S, uR"(<table>
+<tr><td>Python</td><td><code>rn = {'I': 1, 'V': 5, 'X': 10, 'L': 50, ...}</code> — ...</td></tr>
+</table>
+)"_S, false, true);
         TEST(uR"(<<‘выравнивание по левому краю’
 >>‘выравнивание по правому краю’
 ><‘выравнивание по центру’
@@ -888,6 +1057,7 @@ Some text.)"_S, false, true);
         TEST(u">[http://address]:‘Quoted text.’"_S, u"<blockquote><a href=\"http://address\"><i>http://address</i></a>:<br />\nQuoted text.</blockquote>"_S);
         TEST(u">[http://another-address][-1]:‘Quoted text.’\n"_S & u">[-1]:‘Another quoted text.’"_S, u"<blockquote><a href=\"http://another-address\">[1]<i>http://another-address</i></a>:<br />\nQuoted text.</blockquote>\n"_S & u"<blockquote><a href=\"http://another-address\">[1]<i>http://another-address</i></a>:<br />\nAnother quoted text.</blockquote>"_S);
         TEST(u">‘Author's name’[http://address]:‘Quoted text.’"_S, u"<blockquote><i><a href=\"http://address\">Author's name</a></i>:<br />\nQuoted text.</blockquote>"_S);
+        TEST(u">‘Author's name’[http://address][-1]:‘Quoted text.’\n"_S & u">‘Author's name’[-1]:‘Another quoted text.’"_S, u"<blockquote><i><a href=\"http://address\">Author's name</a></i>:<br />\nQuoted text.</blockquote>\n"_S & u"<blockquote><i><a href=\"http://address\">Author's name</a></i>:<br />\nAnother quoted text.</blockquote>"_S);
         TEST(u">‘Author's name’:‘Quoted text.’"_S, u"<blockquote><i>Author's name</i>:<br />\nQuoted text.</blockquote>"_S);
         TEST(u"‘Quoted text.’:‘Author's name’<"_S, u"<blockquote>Quoted text.<br />\n<div align='right'><i>Author's name</i></div></blockquote>"_S);
         TEST(u">‘Как люди думают. Дмитрий Чернышев. 2015. 304с.’:‘[[[стр.89:]]]...’"_S, u"<blockquote><i>Как люди думают. Дмитрий Чернышев. 2015. 304с.</i>:<br />\n<!--[[[стр.89:]]]-->...</blockquote>"_S);
@@ -971,6 +1141,27 @@ list element</li>
 </ol>
 <br />
 Один существенный минус ...)'"_S, true);
+
+        TEST(uR"(>‘. a
+. b’
+c
+d)"_S, uR"(<blockquote><ul>
+<li>a</li>
+<li>b</li>
+</ul>
+</blockquote>
+c<br />
+d)"_S);
+
+        TEST(uR"(>[https://habr.com/ru/articles/780372/comments/#comment_26271586]:‘
+Джоэл Спольски в своё время подробно расписал, почему так получается:
+> Чтобы создать хороший продукт, требуется 10 лет разработки, но когда он готов - он ~‘готов’. После этого уже никто не может придумать ни единой фичи, которая была бы реально нужна.’
+Поддерживаю.)"_S, uR"(<blockquote><a href="https://habr.com/ru/articles/780372/comments/#comment_26271586"><i>https://habr.com/ru/articles/780372/comments/...</i></a>:<br />
+<br />
+Джоэл Спольски в своё время подробно расписал, почему так получается:<br />
+<blockquote>Чтобы создать хороший продукт, требуется 10 лет разработки, но когда он готов - он <i>готов</i>. После этого уже никто не может придумать ни единой фичи, которая была бы реально нужна.</blockquote></blockquote>
+Поддерживаю.)"_S);
+
         TEST(uR"(T‘
 H‘‘1’ ‘2’’
  ‘‘3’ ‘4’[[[comment]]]’
@@ -1058,6 +1249,46 @@ span.comment {color: #808080;}
 (<span class="string-literal"><span style="opacity: 0.25">'''‘‘‘</span>‘Don’t! Don’t! Don’t!’</span>)
 (<span class="string-literal">‘Don‘t! Don‘t! Don‘t!’<span style="opacity: 0.25">’’’'''</span></span>)
 (<span class="string-literal"><span style="opacity: 0.25">'‘</span>‘’‘’<span style="opacity: 0.25">’'</span></span>)</pre>)"_S, true);
+        TEST(uR"(#‘
+...
+’[[[comment]]]
+---
+)"_S, uR"(<pre class="code_block">
+...
+</pre><!--[[[comment]]]-->
+<hr />
+)"_S);
+        TEST(uR"(#‘
+BOOOsssSSSdddDDD
+│└┬┘└┬┘└┬┘└┬┘└┬┘
+│ │  │  │  │  └─ 0-2 биты: регистр-приёмник
+│ │  │  │  └──── 3-5 биты: режим адресации регистра-приёмника
+│ │  │  └─────── 6-8 биты: регистр-источник
+│ │  └───────── 9-11 биты: режим адресации регистра-источника
+│ └─────────── 12-14 биты: код операции
+└───────────────── 15 бит: признак byte-инструкций[[[ (если 0, то инструкция выполняется над словом, а если 1 — над байтом)]]|]
+’)"_S, uR"(<pre class="code_block">
+BOOOsssSSSdddDDD
+│└┬┘└┬┘└┬┘└┬┘└┬┘
+│ │  │  │  │  └─ 0-2 биты: регистр-приёмник
+│ │  │  │  └──── 3-5 биты: режим адресации регистра-приёмника
+│ │  │  └─────── 6-8 биты: регистр-источник
+│ │  └───────── 9-11 биты: режим адресации регистра-источника
+│ └─────────── 12-14 биты: код операции
+└───────────────── 15 бит: признак byte-инструкций
+</pre>)"_S);
+        TEST(uR"(#(Python)‘
+array3d = [[[1, 2, 3], [4, 5, 6]]] # this should not be treated as a comment!
+’)"_S, uR"(<pre class="code_block">
+array3d = [[[1, 2, 3], [4, 5, 6]]] # this should not be treated as a comment!
+</pre>)"_S);
+        TEST(uR"(#(Python)‘
+array3d = [[[1, 2, 3],[[[ hidden comment]]|]
+            [4, 5, 6]]]
+’)"_S, uR"(<pre class="code_block">
+array3d = [[[1, 2, 3],
+            [4, 5, 6]]]
+</pre>)"_S);
 
         test_id++;
     }
