@@ -65,6 +65,7 @@ class Scope:
         else:
             self.is_function = False
             self.ids = {}
+        self.module_aliases = {}
 
     def init_ids_type_node(self):
         for id in self.ids.values():
@@ -110,6 +111,16 @@ class Scope:
             id = s.ids.get(name)
             if id is not None:
                 return id
+            s = s.parent
+            if s is None:
+                return None
+
+    def module_alias(self, name):
+        s = self
+        while True:
+            ma = s.module_aliases.get(name)
+            if ma is not None:
+                return ma
             s = s.parent
             if s is None:
                 return None
@@ -2813,6 +2824,9 @@ def led(self, left):
 
     # Process module [transpile it if necessary and load it]
     global scope
+    ma = scope.module_alias(left.token_str())
+    if ma is not None:
+        left.token_str_override = ma
     module_name = left.token_str().replace(':', '::')
     if module_name not in modules and module_name not in builtin_modules:
         module_file_name = os.path.join(os.path.dirname(file_name), module_name.replace('::', '/')).replace('\\', '/') # `os.path.join()` is needed for case when `os.path.dirname(file_name)` is empty string, `replace('\\', '/')` is needed for passing 'tests/parser/errors.txt'
@@ -3097,6 +3111,28 @@ def parse_internal(this_node):
         elif token.value(source) == '.' and type(this_node) == ASTTypeDefinition:
             access_specifier_private = True
             next_token()
+            continue
+
+        elif token.category == Token.Category.NAME and peek_token().value(source) == ':' and peek_token(2).value(source) == '=' and \
+             peek_token(3).category == Token.Category.NAME and peek_token(4).value(source) == ':':
+            m = tokensn.token_str()
+            next_token()
+            next_token()
+            next_token()
+            scope.module_aliases[m] = tokensn.token_str()
+            next_token()
+            advance(':')
+            if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
+                next_token()
+            continue
+
+        elif tokensn.symbol is not None and tokensn.symbol.id == '-' and peek_token().category == Token.Category.NAME and peek_token(2).value(source) == ':':
+            next_token()
+            del scope.module_aliases[tokensn.token_str()]
+            next_token()
+            advance(':')
+            if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
+                next_token()
             continue
 
         elif token.category == Token.Category.NAME and peek_token().value(source) == ':' and peek_token(2).value(source) == '*':

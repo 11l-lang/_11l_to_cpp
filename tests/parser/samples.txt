@@ -2522,3 +2522,18 @@ struct CodeBlock1
             print(i);
     }
 } code_block_1;
+
+
+o: = os:
+o:‘echo *’
+-o:
+os:‘echo *’
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        os::_(u"echo *"_S);
+        os::_(u"echo *"_S);
+    }
+} code_block_1;
