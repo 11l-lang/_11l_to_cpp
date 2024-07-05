@@ -321,3 +321,18 @@ V reader = csv:read(File(‘test.csv’, encoding' ‘utf-8’), header' hdr)
 T SomeError {}
 X SomeError()
 ^Error: exceptions of the first kind are not supported
+
+
+o: = os:
+o:‘echo *’
+-o:
+o:‘echo *’
+^Error: can not import module `o`: file 'tests/parser/o.11l' is not found
+
+
+: = os:
+:(‘echo *’)
+:‘echo *’
+-:
+:‘echo *’
+^Error: can not import module ``: file 'tests/parser/.11l' is not found

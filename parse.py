@@ -2579,7 +2579,9 @@ def next_token(): # why ‘next_token’: >[https://youtu.be/Nlqv6NtBXcA?t=1203]
                 key = '(fstring)'
             elif token.category == Token.Category.NAME:
                 key = '(name)'
-                if token.value(source)[0] == '@':
+                if token.value(source) == '': # empty module name
+                    pass
+                elif token.value(source)[0] == '@':
                     if token.value(source)[1:2] == '=':
                         if token.value(source)[2:] in cpp_keywords:
                             tokensn.token_str_override = '@=_' + token.value(source)[2:] + '_'
@@ -3113,10 +3115,14 @@ def parse_internal(this_node):
             next_token()
             continue
 
-        elif token.category == Token.Category.NAME and peek_token().value(source) == ':' and peek_token(2).value(source) == '=' and \
-             peek_token(3).category == Token.Category.NAME and peek_token(4).value(source) == ':':
-            m = tokensn.token_str()
-            next_token()
+        elif (token.category == Token.Category.NAME and peek_token().value(source) == ':' and peek_token(2).value(source) == '=' and
+              peek_token(3).category == Token.Category.NAME and peek_token(4).value(source) == ':') or (token.value(source) == ':' and peek_token(1).value(source) == '=' and
+              peek_token(2).category == Token.Category.NAME and peek_token(3).value(source) == ':'):
+            if token.value(source) == ':':
+                m = ''
+            else:
+                m = tokensn.token_str()
+                next_token()
             next_token()
             next_token()
             scope.module_aliases[m] = tokensn.token_str()
@@ -3126,9 +3132,13 @@ def parse_internal(this_node):
                 next_token()
             continue
 
-        elif tokensn.symbol is not None and tokensn.symbol.id == '-' and peek_token().category == Token.Category.NAME and peek_token(2).value(source) == ':':
-            next_token()
-            del scope.module_aliases[tokensn.token_str()]
+        elif tokensn.symbol is not None and tokensn.symbol.id == '-' and (peek_token().category == Token.Category.NAME and peek_token(2).value(source) == ':' and peek_token(3).category == Token.Category.STATEMENT_SEPARATOR
+                                                                                                                         or peek_token().value(source) == ':' and peek_token(2).category == Token.Category.STATEMENT_SEPARATOR):
+            if peek_token().value(source) == ':':
+                del scope.module_aliases['']
+            else:
+                next_token()
+                del scope.module_aliases[tokensn.token_str()]
             next_token()
             advance(':')
             if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:

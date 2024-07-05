@@ -2537,3 +2537,19 @@ struct CodeBlock1
         os::_(u"echo *"_S);
     }
 } code_block_1;
+
+
+: = os:
+:(‘echo *’)
+:‘echo *’
+-:
+//:‘echo *’
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        os::_(u"echo *"_S);
+        os::_(u"echo *"_S);
+    }
+} code_block_1;
