@@ -85,3 +85,9 @@ inline int _(const String &s)
 #endif
 }
 }
+
+namespace _9
+{
+inline int _(const String &s) {return os::_(s);}
+}
+namespace _9os = _9;

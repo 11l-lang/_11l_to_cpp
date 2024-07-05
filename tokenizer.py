@@ -553,7 +553,14 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                             number_with_separators = number[0:j] + number_with_separators
                             if source[lexem_start:i] != number_with_separators:
                                 raise Error('digit separator in this number is located in the wrong place (should be: '+ number_with_separators +')', lexem_start)
-                    category = Token.Category.NUMERIC_LITERAL
+                    j = i
+                    while j < len(source) and (source[j].isalpha() or source[j] == '_' or source[j].isdigit()):
+                        j += 1
+                    if j < len(source) and source[j] == ':': # the module name can start with a digit
+                        i = j
+                        category = Token.Category.NAME
+                    else:
+                        category = Token.Category.NUMERIC_LITERAL
 
             elif ch == "'" and source[i:i+1] == ',': # this is a named-only arguments mark
                 i += 1
@@ -658,7 +665,11 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
 
             elif ch in (',', '.', ':'):
                 if ch == ':' and source[i] in '(‘' and not (len(tokens) and tokens[-1].category == Token.Category.NAME): # ’)
-                    tokens.append(Token(lexem_start, lexem_start, Token.Category.NAME))
+                    # if len(tokens) and tokens[-1].category == Token.Category.NUMERIC_LITERAL:
+                    #     tokens[-1].end = lexem_start
+                    #     tokens[-1].category = Token.Category.NAME
+                    # else:
+                        tokens.append(Token(lexem_start, lexem_start, Token.Category.NAME))
                 category = Token.Category.DELIMITER
                 if ch == '.' and i < len(source) and source[i] == ':': # for `.:`
                     i += 1

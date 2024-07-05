@@ -1137,6 +1137,8 @@ class SymbolNode:
 
             elif self.symbol.id == ':':
                 c0 = self.children[0].to_str()
+                if c0[0].isdigit():
+                    c0 = '_' + c0
                 c0 = {'time':'timens', # 'time': a symbol with this name already exists and therefore this name cannot be used as a namespace name
                       'random':'randomns', # GCC: .../11l-lang/_11l_to_cpp/11l_hpp/random.hpp:1:11: error: ‘namespace random { }’ redeclared as different kind of symbol
                       'c':'c_ns', # `c` is a too short name for namespace (there may be conflicts with variable naming)
@@ -4224,6 +4226,9 @@ module_scope.add_function('', ASTFunctionDefinition([('command', '', 'String')])
 module_scope.add_function('getenv', ASTFunctionDefinition([('name', '', 'String'), ('default', token_to_str('‘’'), 'String')]))
 module_scope.add_function('setenv', ASTFunctionDefinition([('name', '', 'String'), ('value', '', 'String')]))
 builtin_modules['os'] = Module(module_scope)
+module_scope = Scope(None)
+module_scope.add_function('', ASTFunctionDefinition([('command', '', 'String')]))
+builtin_modules['9'] = builtin_modules['9os'] = Module(module_scope)
 builtins_scope.add_name('Time', ASTTypeDefinition([ASTFunctionDefinition([('year', '0', 'Int'), ('month', '1', 'Int'), ('day', '1', 'Int'), ('hour', '0', 'Int'), ('minute', '0', 'Int'), ('second', '0', 'Float')])]))
 time_scope = Scope(None)
 time_scope.add_name('unix_time', ASTFunctionDefinition([]))

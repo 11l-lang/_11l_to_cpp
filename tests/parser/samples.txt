@@ -2553,3 +2553,16 @@ struct CodeBlock1
         os::_(u"echo *"_S);
     }
 } code_block_1;
+
+
+9:‘filename_old -> filename_new’
+9os:‘filename_old -> filename_new’
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        _9::_(u"filename_old -> filename_new"_S);
+        _9os::_(u"filename_old -> filename_new"_S);
+    }
+} code_block_1;
