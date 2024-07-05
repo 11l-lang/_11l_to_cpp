@@ -2870,13 +2870,9 @@ def led(self, left):
         sn.function_call = True
         sn.append_child(self)
         sn.children.append(None)
-        if token.category == Token.Category.STRING_LITERAL:
-            sn.append_child(tokensn)
-            next_token()
-        else:
-            t = tokensn
-            next_token()
-            sn.append_child(t.symbol.nud(t))
+        t = tokensn
+        next_token()
+        sn.append_child(t.symbol.nud(t))
         return sn
     elif token.value(source) != '(': # )
         self.append_child(tokensn)
