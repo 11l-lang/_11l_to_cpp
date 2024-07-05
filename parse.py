@@ -2823,8 +2823,8 @@ def find_module(name):
     return builtin_modules[name]
 
 def led(self, left):
-    if token.category != Token.Category.NAME and token.value(source) != '(' and token.category != Token.Category.STRING_LITERAL: # )
-        raise Error('expected an identifier name or string literal', token)
+    if token.category != Token.Category.NAME and token.value(source) != '(' and token.value(source) != '[' and token.category != Token.Category.STRING_LITERAL: # ])
+        raise Error('expected an identifier name or string literal or array/dict literal', token)
 
     # Process module [transpile it if necessary and load it]
     global scope
@@ -2863,15 +2863,20 @@ def led(self, left):
         used_builtin_modules_set.add(module_name.split('::')[0])
 
     self.append_child(left)
-    if token.category == Token.Category.STRING_LITERAL: # for `re:‘pattern’`
+    if token.category == Token.Category.STRING_LITERAL or token.value(source) == '[': # ] # for `re:‘pattern’` and `os:[‘gcc’, ‘test.c’]`
         self.append_child(SymbolNode(Token(token.start, token.start, Token.Category.NAME), symbol = symbol_table['(name)']))
         sn = SymbolNode(Token(token.start, token.start, Token.Category.DELIMITER))
         sn.symbol = symbol_table['('] # )
         sn.function_call = True
         sn.append_child(self)
         sn.children.append(None)
-        sn.append_child(tokensn)
-        next_token()
+        if token.category == Token.Category.STRING_LITERAL:
+            sn.append_child(tokensn)
+            next_token()
+        else:
+            t = tokensn
+            next_token()
+            sn.append_child(t.symbol.nud(t))
         return sn
     elif token.value(source) != '(': # )
         self.append_child(tokensn)

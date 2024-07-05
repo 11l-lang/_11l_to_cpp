@@ -2566,3 +2566,14 @@ struct CodeBlock1
         _9os::_(u"filename_old -> filename_new"_S);
     }
 } code_block_1;
+
+
+os:[‘gcc’, ‘test.c’]
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        os::_(create_array({u"gcc"_S, u"test.c"_S}));
+    }
+} code_block_1;
