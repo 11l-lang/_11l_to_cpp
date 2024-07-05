@@ -664,7 +664,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                 category = Token.Category.STATEMENT_SEPARATOR
 
             elif ch in (',', '.', ':'):
-                if ch == ':' and source[i] in '(‘' and not (len(tokens) and tokens[-1].category == Token.Category.NAME): # ’)
+                if ch == ':' and source[i] in '(‘[' and not (len(tokens) and tokens[-1].category == Token.Category.NAME): # ]’)
                     # if len(tokens) and tokens[-1].category == Token.Category.NUMERIC_LITERAL:
                     #     tokens[-1].end = lexem_start
                     #     tokens[-1].category = Token.Category.NAME

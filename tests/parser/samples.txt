@@ -2569,11 +2569,14 @@ struct CodeBlock1
 
 
 os:[‘gcc’, ‘test.c’]
+: = os:
+:[‘gcc’, ‘test.c’]
 ===
 struct CodeBlock1
 {
     CodeBlock1()
     {
+        os::_(create_array({u"gcc"_S, u"test.c"_S}));
         os::_(create_array({u"gcc"_S, u"test.c"_S}));
     }
 } code_block_1;
