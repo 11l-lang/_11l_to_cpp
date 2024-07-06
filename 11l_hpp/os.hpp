@@ -84,10 +84,18 @@ inline int _(const String &s)
 	return system(convert_utf16_to_utf8(s).c_str());
 #endif
 }
+
+inline int _(const Array<String> &args)
+{
+	//return _(args.map([](const String &a){return u'"'_C & a & u'"'_C;}).join(u' '_C));
+	String a0 = args[0];
+    if (in(u' '_C, a0))
+        a0 = u'"'_C & a0 & u'"'_C;
+    return _((a0 + args[range_ei(1)].map([](const String &a){return u'"'_C & a & u'"'_C;})).join(u' '_C));}
 }
 
 namespace _9
 {
-inline int _(const String &s) {return os::_(s);}
+template <typename Ty> inline int _(const Ty &cmd) {return os::_(cmd);}
 }
 namespace _9os = _9;
