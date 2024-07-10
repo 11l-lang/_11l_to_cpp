@@ -2877,7 +2877,7 @@ def led(self, left):
     elif token.value(source) != '(': # )
         self.append_child(tokensn)
         next_token()
-    else: # for `os:(...)` and `time:(...)`
+    else: # for `os:(...)` and `random:(...)`
         self.append_child(SymbolNode(Token(token.start, token.start, Token.Category.NAME), symbol = symbol_table['(name)']))
     return self
 symbol(':').led = led
@@ -3149,7 +3149,7 @@ def parse_internal(this_node):
             continue
 
         elif token.category == Token.Category.NAME and peek_token().value(source) == ':' and peek_token(2).value(source) == '*':
-            node = ASTIncludeFile(tokensn.token_str())
+            node = ASTIncludeFile(tokensn.token_str().replace(':', '/'))
 
             def include_file(file_path, namespace):
                 global included_11l_files
@@ -3175,7 +3175,7 @@ def parse_internal(this_node):
                 for file_path in os.listdir(path_name):
                     if file_path.endswith('.11l'):
                         include_file(path_name + '/' + file_path, os.path.basename(file_name)[:-4])
-                        hpp.write(f'#include "{path_name}/{file_path[:-4]}.hpp"\n')
+                        hpp.write(f'#include "{os.path.basename(path_name)}/{file_path[:-4]}.hpp"\n')
 
             next_token()
             next_token()
@@ -3706,6 +3706,13 @@ def parse_internal(this_node):
             next_token()
 
             while True:
+                name = ''
+                if token.value(source) == ':':
+                    if importing_module:
+                        name = importing_module if type(importing_module) == str else os.path.basename(file_name)[:-4]
+                    name += '::'
+                    next_token()
+
                 if token.category != Token.Category.NAME:
                     raise Error('expected variable name', token)
 
@@ -3715,7 +3722,7 @@ def parse_internal(this_node):
                     next_token()
                     assert(token.category == Token.Category.NAME)
 
-                name = tokensn.token_str()
+                name += tokensn.token_str()
                 node.dest_vars.append((name, add_var))
                 if add_var:
                     scope.add_name(name, node)
