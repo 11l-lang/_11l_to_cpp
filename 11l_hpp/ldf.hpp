@@ -149,12 +149,12 @@ const char16_t *read_number(const char16_t *s, const char16_t *end, Element &el)
 		s++;
 		assert(s < end);
 	}
-	while (s < end && Char(*s).is_digit())
+	while (s < end && (Char(*s).is_digit() || *s == '\''))
 		s++;
 
 	if (s == end || (*s != '.' && *s != 'e' && *s != 'E')) {
 		el.value_type = ValueType::NUMBER_INT;
-		el.value.number_int = to_int64(String(start, s - start));
+		el.value.number_int = to_int64(String(start, s - start).replace(u"'", u""));
 		return s;
 	}
 	//s++; // this line was commented to fix `1e-21`
