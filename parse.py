@@ -1383,6 +1383,7 @@ class ASTProgram(ASTNodeWithChildren):
         r = self.beginning_extra
         prev_global_statement = True
         code_block_id = 1
+        code_block_suffix = '_' + os.path.basename(file_name)[:-4] if type(importing_module) == str else ''
 
         for c in self.children:
             global_statement = type(c) in (ASTVariableDeclaration, ASTVariableInitialization, ASTTupleInitialization, ASTFunctionDefinition, ASTTypeDefinition, ASTTypeAlias, ASTTypeEnum, ASTMain, ASTIncludeFile)
@@ -1391,10 +1392,10 @@ class ASTProgram(ASTNodeWithChildren):
                 beginning_of_codeblock = True
                 prev_global_statement = global_statement
                 if not global_statement:
-                    sname = 'CodeBlock' + str(code_block_id)
+                    sname = 'CodeBlock' + str(code_block_id) + code_block_suffix
                     r += "\n"*(c is not self.children[0]) + 'struct ' + sname + "\n{\n    " + sname + "()\n    {\n"
                 else:
-                    r += "    }\n} code_block_" + str(code_block_id) + ";\n\n"
+                    r += "    }\n} code_block_" + str(code_block_id) + code_block_suffix + ";\n\n"
                     code_block_id += 1
             s = c.to_str(2*(not global_statement))
             if beginning_of_codeblock:
@@ -1402,7 +1403,7 @@ class ASTProgram(ASTNodeWithChildren):
             r += s
 
         if prev_global_statement != True: # {{
-            r += "    }\n} code_block_" + str(code_block_id) + ";\n"
+            r += "    }\n} code_block_" + str(code_block_id) + code_block_suffix + ";\n"
 
         return r
 
