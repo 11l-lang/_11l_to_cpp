@@ -430,13 +430,13 @@ class SymbolNode:
 
         if self.token.category == Token.Category.NUMERIC_LITERAL:
             n = self.token_str()
-            if n[-1] in 'oо':
+            if n[-1] in 'oв':
                 return '0' + n[:-1] + 'LL'*int_is_int64
             if n[-1] in 'bд':
                 return '0b' + n[:-1] + 'LL'*int_is_int64
             if n[-1] in 'LД':
                 return n[:-1] + 'LL'
-            if n[-1] == 's':
+            if n[-1] in 'sо':
                 return n[:-1] + 'f'
             if n[4:5] == "'" or n[-3:-2] == "'" or n[-2:-1] == "'" or n[-9:-8] == "'":
                 nn = ''

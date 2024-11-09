@@ -495,7 +495,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                             j = i + 1
                             while j < len(source) and ((is_hexadecimal_digit(source[j]) and not source[j] in 'bд') or source[j] == "'"): # I know, checking for `in 'bд'` is hacky
                                 j += 1
-                            if j < len(source) and source[j] in 'oоbд':
+                            if j < len(source) and source[j] in 'oвbд':
                                 is_oct_or_bin = True
 
                     if i < len(source) and source[i] == "'" and ((i - lexem_start == 4 and not is_oct_or_bin) or (i - lexem_start in (2, 1) and (next_digit_separator != 3 or is_hex))): # this is a hexadecimal number
@@ -541,7 +541,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                                 if source[i+1:i+2] in '-+':
                                     i += 1
                             i += 1
-                        if source[i:i+1] in ('o', 'о', 'b', 'д', 's', 'i', 'L', 'Д'):
+                        if source[i:i+1] in ('o', 'в', 'b', 'д', 's', 'о', 'i', 'L', 'Д'):
                             i += 1
                         elif "'" in source[lexem_start:i] and not '.' in source[lexem_start:i]: # float numbers do not checked for a while
                             number = source[lexem_start:i].replace("'", '')
