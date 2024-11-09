@@ -1425,16 +1425,16 @@ cpp_type_from_11l = {'auto&':'auto&', 'V':'auto', 'П':'auto', 'var':'auto', 'п
                      'Array':'Array', 'ArrayFixLen':'ArrayFixLen', 'ArrayMaxLen':'ArrayMaxLen', 'Tuple':'Tuple', 'Dict':'Dict', 'DefaultDict':'DefaultDict', 'Set':'Set', 'Deque':'Deque', 'Counter':'Counter', 'Fraction':'Fraction'}
 cpp_vectype_from_11l = {}
 for dimension in ('2', '3', '4'):
-    cpp_vectype_from_11l['BVec' + dimension] ='ubvec' + dimension
-    cpp_vectype_from_11l['I8Vec'+ dimension] ='sbvec' + dimension
-    cpp_vectype_from_11l['IVec' + dimension] = 'ivec' + dimension
-    cpp_vectype_from_11l['SVec' + dimension] =  'vec' + dimension
-    cpp_vectype_from_11l['DVec' + dimension] = 'dvec' + dimension
-    cpp_vectype_from_11l['I16Vec' + dimension] =  'svec' + dimension
-    cpp_vectype_from_11l['U16Vec' + dimension] = 'usvec' + dimension
-    cpp_vectype_from_11l['I64Vec' + dimension] = 'llvec' + dimension
-    cpp_vectype_from_11l['LVec'   + dimension] = 'llvec' + dimension
-    cpp_vectype_from_11l['BoolVec' + dimension] = 'bvec' + dimension
+    cpp_vectype_from_11l['Vec' + dimension + 'b'  ] ='ubvec' + dimension
+    cpp_vectype_from_11l['Vec' + dimension + 'i8' ] ='sbvec' + dimension
+    cpp_vectype_from_11l['Vec' + dimension + 'i'  ] = 'ivec' + dimension
+    cpp_vectype_from_11l['Vec' + dimension + 's'  ] =  'vec' + dimension
+    cpp_vectype_from_11l['Vec' + dimension + 'd'  ] = 'dvec' + dimension
+    cpp_vectype_from_11l['Vec' + dimension + 'i16'] = 'svec' + dimension
+    cpp_vectype_from_11l['Vec' + dimension + 'u16'] ='usvec' + dimension
+    cpp_vectype_from_11l['Vec' + dimension + 'i64'] ='llvec' + dimension
+    cpp_vectype_from_11l['Vec' + dimension + 'L'  ] ='llvec' + dimension
+    cpp_vectype_from_11l['Vec' + dimension + 'B'  ] = 'bvec' + dimension
 for _11l_vectype, cpp_vectype in cpp_vectype_from_11l.items():
     cpp_type_from_11l[_11l_vectype] = cpp_vectype
 
@@ -2546,7 +2546,7 @@ russian_names = {
     'Пуст':'Void', 'Бул':'Bool',
      'Цел': 'Int', 'Цел8':'Int8',  'Цел16': 'Int16',  'Цел32': 'Int32',  'Цел64': 'Int64',  'ДлЦел': 'Long',  'ЦелУкз': 'IntPtr',  'Размер': 'Size', 'Укз':'Ptr', 'как':'as',
     'БЦел':'UInt', 'Байт':'Byte', 'БЦел16':'UInt16', 'БЦел32':'UInt32', 'БЦел64':'UInt64', 'БДлЦел':'ULong', 'БЦелУкз':'UIntPtr', 'БРазмер':'USize', 'БолЦел':'BigInt',
-    'Вещ':'Float', 'Вещ32':'Float32', 'Вещ64':'Float64',
+    'Вещ':'Float', 'ВещО':'SFloat', 'Вещ32':'Float32', 'Вещ64':'Float64',
     'Символ':'Char', 'код':'code', "код'":"code'", "цифра'":"digit'", "строка'":"string'",
      'е_цифра':'is_digit', 'е_буква':'is_alpha', 'е_нижрег':'is_lowercase', 'е_верхрег':'is_uppercase', 'нижрег':'lowercase', 'верхрег':'uppercase',
     'Строка':'String', 'длина':'len', 'пуста':'empty', 'пусто':'empty', 'послед':'last', 'начин_с':'starts_with', 'начин_на':'starts_with', 'закан_на':'ends_with',

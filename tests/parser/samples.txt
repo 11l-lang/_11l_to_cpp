@@ -1946,10 +1946,10 @@ public:
 };
 
 
-[IVec2] directions
-[SVec2] directions2
-[DVec2] directions3
-print(SVec3(0))
+[Vec2i] directions
+[Vec2s] directions2
+[Vec2d] directions3
+print(Vec3s(0))
 ===
 Array<ivec2> directions;
 Array<vec2> directions2;
