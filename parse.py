@@ -2562,6 +2562,9 @@ russian_names = {
     'Файл':'File', 'прочитать':'read', 'прочитать_строку':'read_line', 'прочитать_строки':'read_lines', 'прочитать_байты':'read_bytes', 'записать':'write', 'записать_байты':'write_bytes',
     'минкуча':'minheap', 'макскуча':'maxheap', 'поместить':'push',
 }
+for dimension in ('2', '3', '4'):
+    for suffix_ru, suffix_en in {'б':'b', 'ц8':'i8', 'ц':'i', 'о':'s', 'д':'d', 'ц16':'i16', 'б16':'u16', 'ц64':'i64', 'Д':'L', 'Б':'B'}.items():
+        russian_names['Век' + dimension + suffix_ru] = 'Vec' + dimension + suffix_en
 
 def next_token(): # why ‘next_token’: >[https://youtu.be/Nlqv6NtBXcA?t=1203]:‘we'll have an advance method which will fetch the next token’
     global token, tokeni, tokensn

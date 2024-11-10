@@ -1947,18 +1947,26 @@ public:
 
 
 [Vec2i] directions
+[Век2ц] направления
 [Vec2s] directions2
+[Век2о] направления2
 [Vec2d] directions3
+[Век2д] направления3
 print(Vec3s(0))
+вывод(Век3о(0))
 ===
 Array<ivec2> directions;
+Array<ivec2> направления;
 Array<vec2> directions2;
+Array<vec2> направления2;
 Array<dvec2> directions3;
+Array<dvec2> направления3;
 
 struct CodeBlock1
 {
     CodeBlock1()
     {
+        print(vec3(0));
         print(vec3(0));
     }
 } code_block_1;
