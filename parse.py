@@ -3595,10 +3595,10 @@ def parse_internal(this_node):
                 if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
                     next_token()
 
-            elif token.value(source) in ('X', 'Х', 'exception', 'исключение'):
+            elif token.value(source) in ('X', 'К', 'exception', 'исключение'):
                 raise Error('exceptions of the first kind are not supported', token)
 
-            elif token.value(source) in ('X.throw', 'Х.возбудить', 'exception.throw', 'исключение.возбудить'):
+            elif token.value(source) in ('X.throw', 'К.возбудить', 'exception.throw', 'исключение.возбудить'):
                 node = ASTException()
                 next_token()
                 if token.category in (Token.Category.SCOPE_END, Token.Category.STATEMENT_SEPARATOR):
@@ -3608,12 +3608,12 @@ def parse_internal(this_node):
                 if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
                     next_token()
 
-            elif token.value(source) in ('X.try', 'Х.контроль', 'exception.try', 'исключение.контроль'):
+            elif token.value(source) in ('X.try', 'К.контроль', 'exception.try', 'исключение.контроль'):
                 node = ASTExceptionTry()
                 next_token()
                 new_scope(node)
 
-            elif token.value(source) in ('X.catch', 'Х.перехват', 'exception.catch', 'исключение.перехват'):
+            elif token.value(source) in ('X.catch', 'К.перехват', 'exception.catch', 'исключение.перехват'):
                 node = ASTExceptionCatch()
                 if peek_token().category != Token.Category.SCOPE_BEGIN:
                     if peek_token().value(source) == '.':

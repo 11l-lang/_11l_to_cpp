@@ -38,7 +38,7 @@ from typing import List, Set, Tuple, Optional
 Char = str
 
 keywords = ['V',   'C',  'I',    'E',     'F',  'L',    'N',    'R',       'S',       'T',    'X',
-            'П',   'С',  'Е',    'И',     'Ф',  'Ц',    'Н',    'Р',       'В',       'Т',    'Х',
+            'П',   'С',  'Е',    'И',     'Ф',  'Ц',    'Н',    'Р',       'В',       'Т',    'К',
             'var', 'in', 'if',   'else',  'fn', 'loop', 'null', 'return',  'switch',  'type', 'exception',
             'пер', 'св', 'если', 'иначе', 'фн', 'цикл', 'нуль', 'вернуть', 'выбрать', 'тип',  'исключение']
 #keywords.remove('C'); keywords.remove('С'); keywords.remove('in'); keywords.remove('св') # it is more convenient to consider C/in as an operator, not a keyword (however, this line is not necessary)

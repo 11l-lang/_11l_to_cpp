@@ -153,7 +153,7 @@ public:
 			Lines *lines;
 			std::string line_buf;
 			String line;
-		    bool has_next;
+			bool has_next;
 
 		public:
 			Iterator(Lines *lines) : lines(lines) {has_next = !lines->file.at_eof(); if (has_next) operator++();}
