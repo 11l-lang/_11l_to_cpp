@@ -3124,6 +3124,11 @@ def parse_internal(this_node):
             next_token()
             continue
 
+        elif token.value(source) == '.' and type(this_node) == ASTProgram and \
+             peek_token().category == Token.Category.KEYWORD and peek_token().value(source).startswith(('F', 'Ф', 'fn', 'фн')):
+            next_token()
+            continue
+
         elif (token.category == Token.Category.NAME and peek_token().value(source) == ':' and peek_token(2).value(source) == '=' and
               peek_token(3).category == Token.Category.NAME and peek_token(4).value(source) == ':') or (token.value(source) == ':' and peek_token(1).value(source) == '=' and
               peek_token(2).category == Token.Category.NAME and peek_token(3).value(source) == ':'):
