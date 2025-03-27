@@ -602,6 +602,22 @@ template <typename T1, typename T2, typename T3, typename T4> auto cart_product(
 	return r;
 }
 
+template <typename T> auto cart_product_repeat(const T &arr, int repeat)
+{
+	Array<Array<TYPE_OF(arr[0])>> prod;
+	prod.append(Array<TYPE_OF(arr[0])>());
+	for (int r = 0; r < repeat; r++) {
+		Array<Array<TYPE_OF(arr[0])>> newProd;
+		for (auto &&seq : prod) {
+			for (auto &&el : arr) {
+				newProd.append(seq + el);
+			}
+		}
+		prod = std::move(newProd);
+	}
+	return prod;
+}
+
 template <typename Type1, typename Type2, typename Func> auto multiloop(const Array<Type1> &arr1, const Array<Type2> &arr2, Func &&func) -> Array<decltype(func(std::declval<Type1>(), std::declval<Type2>()))>
 {
 	Array<decltype(func(std::declval<Type1>(), std::declval<Type2>()))> r;

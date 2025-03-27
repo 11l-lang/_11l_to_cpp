@@ -477,6 +477,26 @@ public:
 		return true;
 	}
 
+	bool is_lowercase() const
+	{
+		const char16_t *s = data();
+		for (Int i=0, n=len(); i<n; i++)
+			if (Char(s[i]).is_alpha() && !Char(s[i]).is_lowercase()) return false;
+		for (Int i=0, n=len(); i<n; i++)
+			if (Char(s[i]).is_alpha()) return true; // there is at least one cased character
+		return false;
+	}
+
+	bool is_uppercase() const
+	{
+		const char16_t *s = data();
+		for (Int i=0, n=len(); i<n; i++)
+			if (Char(s[i]).is_alpha() && !Char(s[i]).is_uppercase()) return false;
+		for (Int i=0, n=len(); i<n; i++)
+			if (Char(s[i]).is_alpha()) return true; // there is at least one cased character
+		return false;
+	}
+
 	String lowercase() const
 	{
 		String r;
