@@ -2392,7 +2392,7 @@ F countingSort(a, min, max)
    [Int] result
    L(n) cnt
       V x = L.index + min
-      result [+]= [x] * n
+      result.extend([x] * n)
    R result
 
 V data = [9, 7, 10, 2, 9, 7, 4, 3, 10, 2, 7, 10, 2, 1, 3, 8, 7, 3, 9, 5, 8, 5, 1, 6, 3, 7, 5, 4, 6, 9, 9, 6, 6, 10, 2, 4, 5, 2, 8, 2, 2, 5, 2, 9, 3, 3, 5, 7, 8, 4]
@@ -2408,7 +2408,7 @@ template <typename T1, typename T2, typename T3> auto countingSort(const T1 &a, 
     {int Lindex = 0;
     for (auto &&n : cnt) {
         auto x = Lindex + min;
-        result.append(create_array({x}) * n);
+        result.extend(create_array({x}) * n);
         Lindex++;
     }}
     return result;
@@ -3108,7 +3108,7 @@ print(radix_sort(arr))
 F flatten(some_list)
    [Int] new_list
    L(sub_list) some_list
-      new_list [+]= sub_list
+      new_list.extend(sub_list)
    R new_list
 
 F radix_sort(l, =p = -1, =s = -1)
@@ -3125,7 +3125,7 @@ F radix_sort(l, =p = -1, =s = -1)
    V bins = [[Int]()] * 10
 
    L(e) l
-      bins[Int(String(e).zfill(s)[i])] [+]= e
+      bins[Int(String(e).zfill(s)[i])].append(e)
 
    R flatten(bins.map(b -> radix_sort(b, @p - 1, @s)))
 
@@ -3136,7 +3136,7 @@ template <typename T1> auto flatten(const T1 &some_list)
 {
     Array<int> new_list;
     for (auto &&sub_list : some_list)
-        new_list.append(sub_list);
+        new_list.extend(sub_list);
     return new_list;
 }
 
@@ -3373,8 +3373,8 @@ F merge_list(&a, &b)
          out.append(a.pop(0))
       E
          out.append(b.pop(0))
-   out [+]= a
-   out [+]= b
+   out.extend(a)
+   out.extend(b)
    R out
 
 F strand(&a)
@@ -3403,8 +3403,8 @@ template <typename T1, typename T2> auto merge_list(T1 &a, T2 &b)
             out.append(a.pop(0));
         else
             out.append(b.pop(0));
-    out.append(a);
-    out.append(b);
+    out.extend(a);
+    out.extend(b);
     return out;
 }
 
@@ -3932,7 +3932,7 @@ F stern_brocot(predicate = series -> series.len < 20)
    V sb = [1, 1]
    V i = 0
    L predicate(sb)
-      sb [+]= [sum(sb[i .< i + 2]), sb[i + 1]]
+      sb.extend([sum(sb[i .< i + 2]), sb[i + 1]])
       i++
    R sb
 
@@ -3953,7 +3953,7 @@ template <typename T1 = decltype([](const auto &series){return series.len() < 20
     auto sb = create_array({1, 1});
     auto i = 0;
     while (predicate(sb)) {
-        sb.append(create_array({sum(sb[range_el(i, i + 2)]), sb[i + 1]}));
+        sb.extend(create_array({sum(sb[range_el(i, i + 2)]), sb[i + 1]}));
         i++;
     }
     return sb;
@@ -5989,11 +5989,11 @@ V p = primes_upto(10'000'000)
 [Int] b
 L(i) 1 .< p.len - 1
    I p[i] > (p[i - 1] + p[i + 1]) * 0.5
-      s [+]= p[i]
+      s.append(p[i])
    E I p[i] < (p[i - 1] + p[i + 1]) * 0.5
-      w [+]= p[i]
+      w.append(p[i])
    E
-      b [+]= p[i]
+      b.append(p[i])
 
 print(‘The first   36   strong primes: ’s[0.<36])
 print(‘The   count   of the strong primes below   1,000,000: ’sum(s.filter(p -> p < 1'000'000).map(p -> 1)))
@@ -6105,7 +6105,7 @@ F successive_primes(primes, diffs)
             L.break
          group[j - i + 1] = primes[j + 1]
       L.was_no_break
-         results [+]= group
+         results.append(group)
 
    R results
 
@@ -6947,7 +6947,7 @@ F solve()
    V perm = Array(1..8)
    L
       I all(:connections.map(conn -> ok(conn, @perm)))
-         r [+]= copy(perm)
+         r.append(copy(perm))
       I !perm.next_permutation()
          L.break
    R r
@@ -7889,9 +7889,9 @@ F unstraddle(s)
       I c C (:t[2][0], :t[3][0])
          V i = [:t[2][0], :t[3][0]].index(c)
          V n = :t[2 + i][:t[0].index(next())]
-         r [+]= I n == ‘/’ {next()} E n
+         r.append(I n == ‘/’ {next()} E n)
       E
-         r [+]= :t[1][:t[0].index(c)]
+         r.append(:t[1][:t[0].index(c)])
    R r
 
 V O = ‘One night-it was on the twentieth of March, 1888-I was returning’
@@ -8215,7 +8215,7 @@ F make_sequence(n) -> Void
    I :longest <= z.len
       :longest = z.len
       I z !C :result
-         :result [+]= z
+         :result.append(z)
          make_sequence(z)
 
 L(test) [‘9900’, ‘9090’, ‘9009’]

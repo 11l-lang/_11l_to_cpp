@@ -1257,7 +1257,7 @@ V visits_csv = ‘PATIENT_ID,VISIT_DATE,SCORE
 F csv2list(s)
    [[String]] rows
    L(row) s.split("\n")
-      rows [+]= row.split(‘,’)
+      rows.append(row.split(‘,’))
    R rows
 
 V patients = csv2list(patients_csv)
@@ -1268,7 +1268,7 @@ result[0].append(‘LAST_VISIT’)
 V last = Dict(visits[1..], p_vis -> (p_vis[0], p_vis[1]))
 L(record) 1 .< result.len
    result[record].append(last.get(result[record][0], ‘’))
-result[0] [+]= [‘SCORE_SUM’, ‘SCORE_AVG’]
+result[0].extend([‘SCORE_SUM’, ‘SCORE_AVG’])
 V n = Dict(patients[1..], p -> (p[0], 0))
 V tot = Dict(patients[1..], p -> (p[0], 0.0))
 L(record) visits[1..]
@@ -1280,9 +1280,9 @@ L(record) visits[1..]
 L(record) 1 .< result.len
    V p = result[record][0]
    I n[p] != 0
-      result[record] [+]= [‘#3.1’.format(tot[p]), ‘#2.2’.format(tot[p] / n[p])]
+      result[record].extend([‘#3.1’.format(tot[p]), ‘#2.2’.format(tot[p] / n[p])])
    E
-      result[record] [+]= [‘’, ‘’]
+      result[record].extend([‘’, ‘’])
 L(record) result
    print(‘| ’record.map(r -> r.center(10)).join(‘ | ’)‘ |’)
 ===
@@ -1332,7 +1332,7 @@ struct CodeBlock2
     {
         for (auto record : range_el(1, result.len()))
             result[record].append(last.get(_get<0>(result[record]), u""_S));
-        _get<0>(result).append(create_array({u"SCORE_SUM"_S, u"SCORE_AVG"_S}));
+        _get<0>(result).extend(create_array({u"SCORE_SUM"_S, u"SCORE_AVG"_S}));
     }
 } code_block_2;
 
@@ -1354,9 +1354,9 @@ struct CodeBlock3
         for (auto record : range_el(1, result.len())) {
             auto p = _get<0>(result[record]);
             if (n[p] != 0)
-                result[record].append(create_array({u"#3.1"_S.format(tot[p]), u"#2.2"_S.format(tot[p] / n[p])}));
+                result[record].extend(create_array({u"#3.1"_S.format(tot[p]), u"#2.2"_S.format(tot[p] / n[p])}));
             else
-                result[record].append(create_array({u""_S, u""_S}));
+                result[record].extend(create_array({u""_S, u""_S}));
         }
         for (auto &&record : result)
             print(u"| "_S & record.map([](const auto &r){return r.center(10);}).join(u" | "_S) & u" |"_S);
@@ -1863,7 +1863,7 @@ F encode(correct, guess)
    [String] output_arr
 
    L(i) 0 .< correct.len
-      output_arr [+]= I guess[i] == correct[i] {‘X’} E I guess[i] C correct {‘O’} E ‘-’
+      output_arr.append(I guess[i] == correct[i] {‘X’} E I guess[i] C correct {‘O’} E ‘-’)
 
    R output_arr
 
@@ -2508,7 +2508,7 @@ F toBase20(=n)
    V result = [n % 20]
    n I/= 20
    L n != 0
-      result [+]= n % 20
+      result.append(n % 20)
       n I/= 20
    R reversed(result)
 
@@ -3580,7 +3580,7 @@ F factor(BigInt n)
       b++
 
    I b > 0
-      pf [+]= PExp(BigInt(2), b)
+      pf.append(PExp(BigInt(2), b))
 
    V s = isqrt(nn)
    V d = BigInt(3)
@@ -3596,7 +3596,7 @@ F factor(BigInt n)
          e++
 
       I e > 0
-         pf [+]= PExp(d, e)
+         pf.append(PExp(d, e))
          s = isqrt(nn)
 
       d += 2

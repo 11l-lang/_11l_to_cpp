@@ -96,7 +96,7 @@ F eertree(s)
          L.continue
 
       suffix = tree.len
-      tree [+]= Node(k + 2)
+      tree.append(Node(k + 2))
       tree[n].edges[c] = suffix
       I tree[suffix].length == 1
          tree[suffix].suffix = 0
@@ -118,12 +118,12 @@ F subPalindromes(tree)
    F children(Int n, String =p) -> Void
       L(c, n) @tree[n].edges
          p = c‘’p‘’c
-         @s [+]= p
+         @s.append(p)
          @children(n, p)
 
    children(0, ‘’)
    L(c, n) tree[1].edges
-      s [+]= c
+      s.append(c)
       children(n, c)
 
    R s
@@ -459,7 +459,7 @@ F ekg(n, limit)
       L
          I val !C values & gcd(val, prev) != 1
             values.add(val)
-            r [+]= (i, val)
+            r.append((i, val))
             prev = val
             L.break
          val++
@@ -469,7 +469,7 @@ F ekg(n, limit)
 L(n) [2, 5, 7, 9, 10]
    [Int] result
    L(i, val) ekg(n, 10)
-      result [+]= val
+      result.append(val)
    print((‘EKG(’String(n)‘):’).ljust(8)‘ ’result.map(String).join(‘, ’))
 
 V ekg5 = [0] * 101

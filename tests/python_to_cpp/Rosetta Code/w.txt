@@ -1554,7 +1554,7 @@ F isOneAway(word1, word2)
 DefaultDict[Int, [String]] words
 
 L(word) File(‘unixdict.txt’).read().split("\n")
-   words[word.len] [+]= word
+   words[word.len].append(word)
 
 F find_path(start, target)
    V lg = start.len

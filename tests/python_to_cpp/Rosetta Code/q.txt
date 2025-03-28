@@ -50,7 +50,7 @@ L !br
          L.break
       I is_prime(next)
          n = next
-         quadraPrimes [+]= n
+         quadraPrimes.append(n)
          L.break
 
 print(‘Quadrat special primes < 16000:’)

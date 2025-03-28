@@ -448,7 +448,7 @@ template <typename T1, typename T2> auto comb(const T1 &arr, const T2 &k)
     for (auto &&x : arr) {
         auto i = Lindex;
         for (auto &&suffix : comb(arr[range_ei(i + 1)], k - 1))
-            result.append(x + suffix);
+            result.operator_append(x + suffix);
         Lindex++;
     }}
 
@@ -837,7 +837,7 @@ auto get_fibs()
     auto b = 1.0;
     Array<double> r;
     for (int Lindex = 0; Lindex < 1000; Lindex++) {
-        r.append(a);
+        r.operator_append(a);
         assign_from_tuple(a, b, make_tuple(b, a + b));
     }
     return r;
@@ -1421,7 +1421,7 @@ template <typename T1> auto last_sundays(const T1 &year)
         while (true) {
             last_day_of_month -= TimeDelta(1);
             if (last_day_of_month.strftime(u"%w"_S) == u'0') {
-                sundays.append(year & u"-"_S & (u"#02"_S.format(month)) & u"-"_S & last_day_of_month.strftime(u"%d"_S));
+                sundays.operator_append(year & u"-"_S & (u"#02"_S.format(month)) & u"-"_S & last_day_of_month.strftime(u"%d"_S));
                 break;
             }
         }
@@ -2011,7 +2011,7 @@ template <typename T1> auto kosaraju(const T1 &g)
             vis.set(u, true);
             for (auto &&v : g[u]) {
                 visit(v);
-                t[v].append(u);
+                t[v].operator_append(u);
             }
             x--;
             l.set(x, u);
@@ -2134,7 +2134,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (int Lindex = 0; Lindex < 10; Lindex++)
-            mat.append(range_ee(1, 10).map([](const auto &x){return randomns::_(range_ee(1, 20));}));
+            mat.operator_append(range_ee(1, 10).map([](const auto &x){return randomns::_(range_ee(1, 20));}));
 
         for (auto &&row : mat)
             for (auto &&el : row) {
@@ -2415,7 +2415,7 @@ template <typename T1> auto derangements(const T1 &n)
     auto perm = create_array(range_el(0, n));
     while (true) {
         if (all_map(enumerate(perm), [](const auto &indx, const auto &p){return indx != p;}))
-            r.append(perm);
+            r.operator_append(perm);
         if (!perm.next_permutation())
             break;
     }

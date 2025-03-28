@@ -63,7 +63,7 @@ F narcissists(m)
             (div, V mod) = divmod(div, 10)
             digitpsum += digitpowers[mod]
          I n == digitpsum
-            result [+]= n
+            result.append(n)
             I result.len == m
                R result
 
@@ -911,20 +911,20 @@ for blocks, cells in [
 F nonoblocks([Int] &blocks, Int cells) -> [[(Int, Int)]]
    [[(Int, Int)]] r
    I blocks.empty | blocks[0] == 0
-      r [+]= [(0, 0)]
+      r.append([(0, 0)])
    E
       assert(sum(blocks) + blocks.len - 1 <= cells, ‘Those blocks will not fit in those cells’)
       V (blength, brest) = (blocks[0], blocks[1..])
       V minspace4rest = sum(brest.map(b -> 1 + b))
       L(bpos) 0 .. cells - minspace4rest - blength
          I brest.empty
-            r [+]= [(bpos, blength)]
+            r.append([(bpos, blength)])
          E
             V offset = bpos + blength + 1
             L(subpos) nonoblocks(&brest, cells - offset)
                V rest = subpos.map((bp, bl) -> (@offset + bp, bl))
                V vec = [(bpos, blength)] [+] rest
-               r [+]= vec
+               r.append(vec)
    R r
 
 F pblock(vec, cells)

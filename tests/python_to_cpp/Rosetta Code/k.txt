@@ -304,7 +304,7 @@ L(unit_value, amount, name) sorted_items
    wt += portion
    V addval = portion * unit_value
    val += addval
-   bagged [+]= (name, portion, addval)
+   bagged.append((name, portion, addval))
    I wt >= MAXWT
       L.break
 
@@ -665,7 +665,7 @@ F gen_kolakoski(s, n)
    V i = 0
    L seq.len < n
       V next = s[i % s.len]
-      seq [+]= [next] * (I i >= seq.len {next} E seq[i])
+      seq.extend([next] * (I i >= seq.len {next} E seq[i]))
       i++
    R seq[0 .< n]
 
@@ -696,7 +696,7 @@ template <typename T1, typename T2> auto gen_kolakoski(const T1 &s, const T2 &n)
     auto i = 0;
     while (seq.len() < n) {
         auto next = s[mod(i, s.len())];
-        seq.append(create_array({next}) * (i >= seq.len() ? next : seq[i]));
+        seq.extend(create_array({next}) * (i >= seq.len() ? next : seq[i]));
         i++;
     }
     return seq[range_el(0, n)];
@@ -789,7 +789,7 @@ F kosaraju(g)
          @vis[u] = 1B
          L(v) @g[u]
             @visit(v)
-            @t[v] [+]= u
+            @t[v].append(u)
          @x--
          @l[@x] = u
 

@@ -1676,7 +1676,7 @@ F r2cf(=n1, =n2)
    L n2 != 0
       (n1, V t1_n2) = (n2, divmod(n1, n2))
       n2 = t1_n2[1]
-      r [+]= t1_n2[0]
+      r.append(t1_n2[0])
    R r
 
 print(r2cf(1, 2))
@@ -1810,7 +1810,7 @@ F r2cf(=n1, =n2)
    L n2 != 0
       (n1, V t1_n2) = (n2, divmod(n1, n2))
       n2 = t1_n2[1]
-      r [+]= t1_n2[0]
+      r.append(t1_n2[0])
    R r
 
 V data = [(‘[1;5,2] + 1/2’, 2, 1, 0, 2, (13, 11)), (‘[3;7] + 1/2’, 2, 1, 0, 2, (22, 7)), (‘[3;7] divided by 4’, 1, 0, 0, 4, (22, 7))]
@@ -3088,12 +3088,12 @@ F snakeToCamelCase(nam, sep = ‘[_]+’, lcmiddle = 0B)
    R words.join(‘’)
 
 [(String, (String -> String))] funcs
-funcs [+]= (‘snakeToCamelCase’, nam -> snakeToCamelCase(nam))
-funcs [+]= (‘spaceToCamelCase’, nam -> snakeToCamelCase(nam, sep' ‘\s+’))
-funcs [+]= (‘kebabToCamelCase’, nam -> snakeToCamelCase(nam, sep' ‘[\-]+’))
-funcs [+]= (‘periodToCamelCase’, nam -> snakeToCamelCase(nam, sep' ‘[\.]+’))
-funcs [+]= (‘allsepToCamelCase’, nam -> snakeToCamelCase(nam, sep' ‘[ \-_\.]+’))
-funcs [+]= (‘lowermiddle_allsepToCamelCase’, nam -> snakeToCamelCase(nam, sep' ‘[ \-_\.]+’, lcmiddle' 1B))
+funcs.append((‘snakeToCamelCase’, nam -> snakeToCamelCase(nam)))
+funcs.append((‘spaceToCamelCase’, nam -> snakeToCamelCase(nam, sep' ‘\s+’)))
+funcs.append((‘kebabToCamelCase’, nam -> snakeToCamelCase(nam, sep' ‘[\-]+’)))
+funcs.append((‘periodToCamelCase’, nam -> snakeToCamelCase(nam, sep' ‘[\.]+’)))
+funcs.append((‘allsepToCamelCase’, nam -> snakeToCamelCase(nam, sep' ‘[ \-_\.]+’)))
+funcs.append((‘lowermiddle_allsepToCamelCase’, nam -> snakeToCamelCase(nam, sep' ‘[ \-_\.]+’, lcmiddle' 1B)))
 
 F camel_to_snake_case(=nam, allsep = ‘[_]+’, sep = ‘_’, lcmiddle = 1B)
    ‘ convert camel case to snake case (separate with '_') ’
@@ -3105,13 +3105,13 @@ F camel_to_snake_case(=nam, allsep = ‘[_]+’, sep = ‘_’, lcmiddle = 1B)
       nam = (nam.split(sep1).filter(w -> w.len > 0).map(w -> w[0].lowercase()‘’w[1..])).join(sep)
    R nam.replace(re:(allsep), sep)
 
-funcs [+]= (‘camel_to_snake_case’, nam -> camel_to_snake_case(nam))
-funcs [+]= (‘preserve_midcaps_camel_to_snake_case’, nam -> camel_to_snake_case(nam, lcmiddle' 0B))
-funcs [+]= (‘allsep_to_snake_case’, nam -> camel_to_snake_case(nam, allsep' ‘[ \-\._]+’))
-funcs [+]= (‘allsep_to_kebab_case’, nam -> camel_to_snake_case(nam, allsep' ‘[ \-\._]+’, sep' ‘-’))
-funcs [+]= (‘allsep_to_space_case’, nam -> camel_to_snake_case(nam, allsep' ‘[ \-\._]+’, sep' ‘ ’))
-funcs [+]= (‘allsep_to_period_case’, nam -> camel_to_snake_case(nam, allsep' ‘[ \-\._]+’, sep' ‘.’))
-funcs [+]= (‘allsep_to_slash_case’, nam -> camel_to_snake_case(nam, allsep' ‘[ \-\._]+’, sep' ‘/’))
+funcs.append((‘camel_to_snake_case’, nam -> camel_to_snake_case(nam)))
+funcs.append((‘preserve_midcaps_camel_to_snake_case’, nam -> camel_to_snake_case(nam, lcmiddle' 0B)))
+funcs.append((‘allsep_to_snake_case’, nam -> camel_to_snake_case(nam, allsep' ‘[ \-\._]+’)))
+funcs.append((‘allsep_to_kebab_case’, nam -> camel_to_snake_case(nam, allsep' ‘[ \-\._]+’, sep' ‘-’)))
+funcs.append((‘allsep_to_space_case’, nam -> camel_to_snake_case(nam, allsep' ‘[ \-\._]+’, sep' ‘ ’)))
+funcs.append((‘allsep_to_period_case’, nam -> camel_to_snake_case(nam, allsep' ‘[ \-\._]+’, sep' ‘.’)))
+funcs.append((‘allsep_to_slash_case’, nam -> camel_to_snake_case(nam, allsep' ‘[ \-\._]+’, sep' ‘/’)))
 
 L(f_name, f) funcs
    print(‘Testing function ’f_name‘:’)

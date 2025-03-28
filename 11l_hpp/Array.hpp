@@ -311,14 +311,14 @@ public:
 	void append(Type &&v) {std::vector<Type>::push_back(std::move(v));}
 	void append(const Type &v) {std::vector<Type>::push_back(v);}
 
-	void append(const Array<Type> &arr)
+	void operator_append(Type &&v) {append(std::move(v));}
+	void operator_append(const Type &v) {append(v);}
+	template <typename Ty> void operator_append(const Ty &obj)
 	{
-		reserve(std::vector<Type>::size() + arr.size());
-		for (auto &&el : arr)
-			append(el);
+		extend(obj);
 	}
 
-	template <typename Ty, bool include_beginning, bool include_ending> void append(const Range<Ty, include_beginning, include_ending> &range)
+	template <typename Ty, bool include_beginning, bool include_ending> void extend(const Range<Ty, include_beginning, include_ending> &range)
 	{
 		reserve(std::vector<Type>::size() + range.size());
 		for (auto i : range)
@@ -326,7 +326,7 @@ public:
 	}
 //	template <typename Ty, bool include_beginning, bool include_ending> void operator+=(const Range<Ty, include_beginning, include_ending> &range)
 //	{
-//		append(range);
+//		extend(range);
 //	}
 
 	template <typename Ty> void extend(const Ty &iterable)
@@ -562,7 +562,7 @@ public:
 	Array operator+(const Array &a) const
 	{
 		Array r(*this);
-		r.append(a);
+		r.extend(a);
 		return r;
 	}
 
@@ -577,7 +577,7 @@ public:
 	{
 		Array r;
 		r.append(t);
-		r.append(a);
+		r.extend(a);
 		return r;
 	}
 };

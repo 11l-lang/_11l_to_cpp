@@ -1323,9 +1323,9 @@ struct CodeBlock2
             auto root = fs::path::dir_name(_fname);
             Array<String> dirs, files;
             if (fs::is_dir(_fname))
-                dirs.append(fs::path::base_name(_fname));
+                dirs.operator_append(fs::path::base_name(_fname));
             else
-                files.append(fs::path::base_name(_fname));
+                files.operator_append(fs::path::base_name(_fname));
             for (auto &&name : files)
                 if (name.ends_with(make_tuple(u".py"_S, u".txt"_S))) {
                     auto file_bytes = File(fs::path::join(root, name)).read_bytes();

@@ -187,7 +187,7 @@ F f()
    dict[‘key’] = 1
    assert(‘key’ C dict)
    [Int] arr
-   arr [+]= 10
+   arr.append(10)
 ===
 auto f()
 {
@@ -534,9 +534,9 @@ template <typename T1> auto process_files(const T1 &exclude_dir)
         auto root = fs::path::dir_name(_fname);
         Array<String> dirs, files;
         if (fs::is_dir(_fname))
-            dirs.append(fs::path::base_name(_fname));
+            dirs.operator_append(fs::path::base_name(_fname));
         else
-            files.append(fs::path::base_name(_fname));
+            files.operator_append(fs::path::base_name(_fname));
         for (auto &&name : files)
             print(fs::path::join(root, name));
     }
@@ -548,9 +548,9 @@ auto process_files2()
         auto root = fs::path::dir_name(_fname);
         Array<String> dirs, files;
         if (fs::is_dir(_fname))
-            dirs.append(fs::path::base_name(_fname));
+            dirs.operator_append(fs::path::base_name(_fname));
         else
-            files.append(fs::path::base_name(_fname));
+            files.operator_append(fs::path::base_name(_fname));
         for (auto &&name : files)
             print(fs::path::join(root, name));
     }
@@ -756,18 +756,18 @@ T Cat(Animal)
 F add_animal(Animal animal)
    T Animal
       String name
-   :animals [+]= animal
+   :animals.append(animal)
 
 F global_func()
    F local_func(Animal animal)
-      :animals [+]= animal
+      :animals.append(animal)
 
 :start:
-animals [+]= Sheep()
-animals [+]= Cat()
+animals.append(Sheep())
+animals.append(Cat())
 V animal = Sheep()
 animal.say()
-animals [+]= animal
+animals.append(animal)
 L(animal) animals
    animal.say()
 ===
@@ -4413,7 +4413,7 @@ F xor_arr()
    V arr = ‘1 2 4 6 20’.split_py().map(Int)
    V xor_arr = [0]
    L(x) arr
-      xor_arr [+]= xor_arr.last (+) x
+      xor_arr.append(xor_arr.last (+) x)
 
    L(i) 1 .< n - 1
       L(j) 0 .< n - i - 1

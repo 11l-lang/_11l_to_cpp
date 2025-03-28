@@ -26,10 +26,10 @@ F z(=n)
    [Int] dig
    L(f) fib
       I f <= n
-         dig [+]= 1
+         dig.append(1)
          n -= f
       E
-         dig [+]= 0
+         dig.append(0)
    R I dig[0] {dig} E dig[1..]
 
 L(i) 0 .. n
@@ -1068,11 +1068,11 @@ F getDivisors(n)
    V i = 2
    L i * i <= n
       I n % i == 0
-         divs [+]= i
+         divs.append(i)
 
          V j = n I/ i
          I i != j
-            divs [+]= j
+            divs.append(j)
       i++
    R divs
 
@@ -1087,7 +1087,7 @@ F isPartSum(divs, sum)
    V last = divs.last
    [Int] newDivs
    L(i) 0 .< le - 1
-      newDivs [+]= divs[i]
+      newDivs.append(divs[i])
 
    I last > sum
       R isPartSum(newDivs, sum)

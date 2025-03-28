@@ -351,14 +351,14 @@ auto f()
     print(arr[range_ei(1)]);
     _set<1>(arr, 4);
     print(arr[range_ei(1)]);
-    arr.append(create_array({5, 6}));
+    arr.operator_append(create_array({5, 6}));
     assert(arr[range_ee(0, 4).step(2)] == create_array({1, 3, 6}));
     assert(arr[range_ei(1).step(2)] == create_array({4, 5}));
     Dict<String, int> dict;
     Dict<String, int> dict2;
     dict.set(u"key"_S, 1);
     Array<int> arr2;
-    arr2.append(10);
+    arr2.operator_append(10);
 }
 
 
@@ -1089,7 +1089,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        a.append(Array<int>());
+        a.operator_append(Array<int>());
         print(a);
         print(create_array({Array<int>()}));
     }

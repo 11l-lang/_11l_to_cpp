@@ -940,7 +940,7 @@ F permutations(slist)
    V l = sorted(slist)
    V r = [l]
    L l.next_permutation()
-      r [+]= copy(l)
+      r.append(copy(l))
    R r
 
 F printCounts(dnaSeq)
@@ -2672,13 +2672,13 @@ T Bitmap
       V magic = "P6\n"
       V comment = "# generated from Bitmap.writeppmp6\n"
       [Byte] b
-      b [+]= magic.encode()
-      b [+]= comment.encode()
-      b [+]= ("#. #.\n#.\n".format(.width, .height, 255)).encode()
+      b.extend(magic.encode())
+      b.extend(comment.encode())
+      b.extend(("#. #.\n#.\n".format(.width, .height, 255)).encode())
       L(h) (.height - 1 .< -1).step(-1)
          L(w) 0 .< .width
             V (r, g, bl) = .get(w, h)
-            b [+]= [r, g, bl]
+            b.extend([r, g, bl])
       R b
 
 V bitmap = Bitmap(4, 4, black)
@@ -2762,13 +2762,13 @@ public:
         auto magic = u"P6\n"_S;
         auto comment = u"# generated from Bitmap.writeppmp6\n"_S;
         Array<Byte> b;
-        b.append(magic.encode());
-        b.append(comment.encode());
-        b.append((u"#. #.\n#.\n"_S.format(width, height, 255)).encode());
+        b.extend(magic.encode());
+        b.extend(comment.encode());
+        b.extend((u"#. #.\n#.\n"_S.format(width, height, 255)).encode());
         for (auto h : range_el(height - 1, -1).step(-1))
             for (auto w : range_el(0, width)) {
                 auto [r, g, bl] = get(w, h);
-                b.append(create_array({r, g, bl}));
+                b.extend(create_array({r, g, bl}));
             }
         return b;
     }

@@ -2362,7 +2362,7 @@ if len(tops) > 1:
 ===
 F _topx(data, tops, &_sofar) -> [[String]]
    ‘Recursive topological extractor’
-   _sofar [+]= copy(tops)
+   _sofar.append(copy(tops))
    V depends = Set[String]()
    L(top) tops
       I top C data
@@ -2372,7 +2372,7 @@ F _topx(data, tops, &_sofar) -> [[String]]
    [[String]] ordered
    V accum = Set[String]()
    L(i) (_sofar.len - 1 .< -1).step(-1)
-      ordered [+]= sorted(Array(_sofar[i] - accum))
+      ordered.append(sorted(Array(_sofar[i] - accum)))
       accum.update(_sofar[i])
    R ordered
 
@@ -2614,11 +2614,11 @@ F mstring(s)
    L(=c) s
       S c
          ‘L’
-            l [+]= ‘load’
+            l.append(‘load’)
          ‘S’
-            l [+]= ‘spin’
+            l.append(‘spin’)
          ‘F’
-            l [+]= ‘fire’
+            l.append(‘fire’)
    R l.join(‘, ’)
 
 V tests = 100000
@@ -3123,18 +3123,18 @@ for n in range(1 << 12):
                 break
 ===
 [([Int] -> Bool)] predicates
-predicates [+]= st -> st.len == 12
-predicates [+]= st -> sum(st[(len)-6 ..]) == 3
-predicates [+]= st -> sum(st[(1..).step(2)]) == 2
-predicates [+]= st -> I st[4] {(st[5] [&] st[6])} E 1
-predicates [+]= st -> sum(st[1.<4]) == 0
-predicates [+]= st -> sum(st[(0..).step(2)]) == 4
-predicates [+]= st -> sum(st[1.<3]) == 1
-predicates [+]= st -> I st[6] {(st[4] [&] st[5])} E 1
-predicates [+]= st -> sum(st[0.<6]) == 3
-predicates [+]= st -> (st[10] [&] st[11])
-predicates [+]= st -> sum(st[6.<9]) == 1
-predicates [+]= st -> sum(st[0.<11]) == 4
+predicates.append(st -> st.len == 12)
+predicates.append(st -> sum(st[(len)-6 ..]) == 3)
+predicates.append(st -> sum(st[(1..).step(2)]) == 2)
+predicates.append(st -> I st[4] {(st[5] [&] st[6])} E 1)
+predicates.append(st -> sum(st[1.<4]) == 0)
+predicates.append(st -> sum(st[(0..).step(2)]) == 4)
+predicates.append(st -> sum(st[1.<3]) == 1)
+predicates.append(st -> I st[6] {(st[4] [&] st[5])} E 1)
+predicates.append(st -> sum(st[0.<6]) == 3)
+predicates.append(st -> (st[10] [&] st[11]))
+predicates.append(st -> sum(st[6.<9]) == 1)
+predicates.append(st -> sum(st[0.<11]) == 4)
 
 F to_str(b)
    R ((0.<12).filter(i -> @b[i]).map(i -> i + 1)).map(String).join(‘ ’)

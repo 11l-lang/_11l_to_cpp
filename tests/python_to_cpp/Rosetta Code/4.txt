@@ -88,7 +88,7 @@ F foursquares(lo, hi, unique, show)
                V a = c + d
                I a >= @lo & a <= @hi
                   I (!@unique) | (c != 0 & d != 0)
-                     r [+]= (a, c, d)
+                     r.append((a, c, d))
       R r
 
    V solutions = 0
@@ -108,7 +108,7 @@ F foursquares(lo, hi, unique, show)
                V g = @d + e
                I g >= @lo & g <= @hi
                   I (!@unique) | (g !C (@a, @c, @d, e))
-                     r [+]= (g, e)
+                     r.append((g, e))
          R r
 
       L(ge) ge_arr()
@@ -127,7 +127,7 @@ F foursquares(lo, hi, unique, show)
                   V b = @e + f - @c
                   I b >= @lo & b <= @hi
                      I (!@unique) | (b !C (@a, @c, @d, @g, @e, f))
-                        r [+]= (b, f)
+                        r.append((b, f))
             R r
 
          L(bf) bf_arr()

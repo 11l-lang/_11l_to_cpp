@@ -246,7 +246,7 @@ F fromD(n, d)
 F getPointsForCurve(n)
    [Point] points
    L(d) 0 .< n * n
-      points [+]= fromD(n, d)
+      points.append(fromD(n, d))
    R points
 
 F drawCurve(points, n)
@@ -271,7 +271,7 @@ F drawCurve(points, n)
 
    [String] lines
    L(row) canvas
-      lines [+]= row.join(‘’)
+      lines.append(row.join(‘’))
    R lines
 
 L(order) 1..5

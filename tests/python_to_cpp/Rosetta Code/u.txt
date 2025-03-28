@@ -363,7 +363,7 @@ F decodeUPC(input)
          pos += 7
 
          I part C :LEFT_DIGITS
-            output [+]= :LEFT_DIGITS[part]
+            output.append(:LEFT_DIGITS[part])
          E
             R (0B, output)
 
@@ -378,7 +378,7 @@ F decodeUPC(input)
          pos += 7
 
          I part C :RIGHT_DIGITS
-            output [+]= :RIGHT_DIGITS[part]
+            output.append(:RIGHT_DIGITS[part])
          E
             R (0B, output)
 

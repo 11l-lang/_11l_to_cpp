@@ -605,7 +605,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto cart_product(
 template <typename T> auto cart_product_repeat(const T &arr, int repeat)
 {
 	Array<Array<TYPE_OF(arr[0])>> prod;
-	prod.append(Array<TYPE_OF(arr[0])>());
+	prod.append(Array<TYPE_OF(arr[0])>()); // here was `prod.append(Array<Array<TYPE_OF(arr[0])>>());`, now it's a compile-time error
 	for (int r = 0; r < repeat; r++) {
 		Array<Array<TYPE_OF(arr[0])>> newProd;
 		for (auto &&seq : prod) {

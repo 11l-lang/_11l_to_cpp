@@ -669,7 +669,7 @@ F _basechange_int(=num, b)
 F fairshare(b, n)
    [Int] r
    L(i) 0..
-      r [+]= sum(_basechange_int(i, b)) % b
+      r.append(sum(_basechange_int(i, b)) % b)
       I r.len == n
          L.break
    R r
@@ -755,13 +755,13 @@ F fasta_parse(infile_str)
    L(line) infile_str.split("\n")
       I line.starts_with(‘>’)
          I key != ‘’
-            r [+]= (key, val)
+            r.append((key, val))
          key = line[1..].split_py()[0]
          val = ‘’
       E I key != ‘’
          val ‘’= line
    I key != ‘’
-      r [+]= (key, val)
+      r.append((key, val))
    R r
 
 print(fasta_parse(FASTA).map((key, val) -> ‘#.: #.’.format(key, val)).join("\n"))

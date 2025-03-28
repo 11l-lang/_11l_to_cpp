@@ -85,7 +85,7 @@ F rangeexpand(txt)
    L(r) txt.split(‘,’)
       I ‘-’ C r[1..]
          V rr = r[1..].split(‘-’, 1 + 1)
-         lst [+]= Int(r[0]‘’rr[0]) .. Int(rr[1])
+         lst.extend(Int(r[0]‘’rr[0]) .. Int(rr[1]))
       E
          lst.append(Int(r))
    R lst
@@ -98,7 +98,7 @@ template <typename T1> auto rangeexpand(const T1 &txt)
     for (auto &&r : txt.split(u","_S))
         if (in(u'-'_C, r[range_ei(1)])) {
             auto rr = r[range_ei(1)].split(u"-"_S, 1 + 1);
-            lst.append(range_ee(to_int(_get<0>(r) & _get<0>(rr)), to_int(_get<1>(rr))));
+            lst.extend(range_ee(to_int(_get<0>(r) & _get<0>(rr)), to_int(_get<1>(rr))));
         }
         else
             lst.append(to_int(r));
@@ -2416,7 +2416,7 @@ F getgroup(=s, depth)
       s = gs[1]
       I s == ‘’
          L.break
-      out [+]= gs[0]
+      out.extend(gs[0])
 
       I s[0] == ‘}’
          I comma
@@ -2468,7 +2468,7 @@ template <typename T1, typename T2> auto getgroup(T1 s, const T2 &depth)
         s = _get<1>(gs);
         if (s == u"")
             break;
-        out.append(_get<0>(gs));
+        out.extend(_get<0>(gs));
 
         if (_get<0>(s) == u'}') {
             if (comma)
@@ -2714,7 +2714,7 @@ F cart_prod(a, b)
    [(Int, Int)] p
    L(i) a
       L(j) b
-         p [+]= (i, j)
+         p.append((i, j))
    R p
 ===
 template <typename T1, typename T2> auto cart_prod(const T1 &a, const T2 &b)
@@ -4927,7 +4927,7 @@ V fwords = [String(‘1’), ‘0’]
 print(‘#<3 #10 #<10 #.’.format(‘N’, ‘Length’, ‘Entropy’, ‘Fibword’))
 L(n) 1 .. nmax
    L fwords.len < n
-      fwords [+]= (reversed(fwords[(len)-2 ..])).join(‘’)
+      fwords.append((reversed(fwords[(len)-2 ..])).join(‘’))
    V v = fwords[n - 1]
    print(‘#3 #10 #2.7 #.’.format(n, v.len, entropy(v), I v.len < 56 {v} E ‘<too long>’))
 ===
@@ -5320,7 +5320,7 @@ F five_weekends_per_month(years)
             c[Int(d.strftime(‘%w’))]++
             d += TimeDelta(days' 1)
          I c[0] == 5 & c[5] == 5 & c[6] == 5
-            dates [+]= sd
+            dates.append(sd)
    R dates
 
 V dates = five_weekends_per_month(2000..2100)
@@ -5796,7 +5796,7 @@ F fractran(prog, =val, limit)
    V fracts = prog.split(‘ ’).map(p -> p.split(‘/’).map(i -> Int(i)))
    [Float] r
    L(n) 0 .< limit
-      r [+]= val
+      r.append(val)
       L(p) fracts
          I val % p[1] == 0
             val = p[0] * val / p[1]
@@ -6389,7 +6389,7 @@ F harshad(num)
    [Int] r
    L(n) 1..
       I is_harshad(n)
-         r [+]= n
+         r.append(n)
          I r.len == num
             R r
 
@@ -6491,7 +6491,7 @@ F hash_join(table1, table2)
    [((Int, String), (String, String))] res
    L(r) table2
       L(s) h[r[0]]
-         res [+]= (s, r)
+         res.append((s, r))
    R res
 
 V table1 = [(27, ‘Jonah’), (18, ‘Alan’), (28, ‘Glory’), (18, ‘Popeye’), (28, ‘Alan’)]
@@ -6593,7 +6593,7 @@ L(x) 1 .. MAXSIDE
    L(y) x .. MAXSIDE
       L(z) y .. MAXSIDE
          I (x + y > z) & gcd3(x, y, z) == 1 & is_heronian(x, y, z)
-            h [+]= (x, y, z)
+            h.append((x, y, z))
 
 h = sorted(h, key' x -> (hero(x[0], x[1], x[2]), sum(x), (x[2], x[1], x[0])))
 
@@ -6733,7 +6733,7 @@ V cS = [2]
 F extend_RS()
    V x = :cR[:cR.len - 1] + :cS[:cR.len - 1]
    :cR.append(x)
-   :cS [+]= :cS.last + 1 .< x
+   :cS.extend(:cS.last + 1 .< x)
    :cS.append(x + 1)
 
 F ff_R(n)
@@ -6767,7 +6767,7 @@ auto extend_RS()
 {
     auto x = ::cR[::cR.len() - 1] + ::cS[::cR.len() - 1];
     ::cR.append(x);
-    ::cS.append(range_el(::cS.last() + 1, x));
+    ::cS.extend(range_el(::cS.last() + 1, x));
     ::cS.append(x + 1);
 }
 
@@ -9071,8 +9071,8 @@ F random_partition(stack, count)
 (black_stack, V black_swap) = random_partition(black_stack, swap_count)
 (red_stack, V red_swap) = random_partition(red_stack, swap_count)
 
-black_stack [+]= red_swap
-red_stack [+]= black_swap
+black_stack.extend(red_swap)
+red_stack.extend(black_swap)
 
 I black_stack.count(Black) == red_stack.count(Red)
    print(‘Yeha! The mathematicians assertion is correct.’)
@@ -9142,8 +9142,8 @@ struct CodeBlock4
         TUPLE_ELEMENT_T(1, random_partition(red_stack, swap_count)) red_swap;
         assign_from_tuple(red_stack, red_swap, random_partition(red_stack, swap_count));
 
-        black_stack.append(red_swap);
-        red_stack.append(black_swap);
+        black_stack.extend(red_swap);
+        red_stack.extend(black_swap);
 
         if (black_stack.count(Black) == red_stack.count(Red))
             print(u"Yeha! The mathematicians assertion is correct."_S);
@@ -9615,9 +9615,9 @@ F s_permutations(seq)
       L(item) items
          V i = L.index
          I i % 2
-            new_items [+]= (0 .. item.len).map(i -> @item[0 .< i] [+] [@j] [+] @item[i ..])
+            new_items.extend((0 .. item.len).map(i -> @item[0 .< i] [+] [@j] [+] @item[i ..]))
          E
-            new_items [+]= (item.len .< -1).step(-1).map(i -> @item[0 .< i] [+] [@j] [+] @item[i ..])
+            new_items.extend((item.len .< -1).step(-1).map(i -> @item[0 .< i] [+] [@j] [+] @item[i ..]))
       items = new_items
 
    R enumerate(items).map((i, item) -> (item, I i % 2 {-1} E 1))
@@ -9637,9 +9637,9 @@ template <typename T1> auto s_permutations(const T1 &seq)
         for (auto &&item : items) {
             auto i = Lindex;
             if (mod(i, 2))
-                new_items.append(range_ee(0, item.len()).map([&item, &j](const auto &i){return item[range_el(0, i)] + create_array({j}) + item[range_ei(i)];}));
+                new_items.extend(range_ee(0, item.len()).map([&item, &j](const auto &i){return item[range_el(0, i)] + create_array({j}) + item[range_ei(i)];}));
             else
-                new_items.append(range_el(item.len(), -1).step(-1).map([&item, &j](const auto &i){return item[range_el(0, i)] + create_array({j}) + item[range_ei(i)];}));
+                new_items.extend(range_el(item.len(), -1).step(-1).map([&item, &j](const auto &i){return item[range_el(0, i)] + create_array({j}) + item[range_ei(i)];}));
             Lindex++;
         }}
         items = new_items;
@@ -13635,7 +13635,7 @@ F check_isin(a)
          I i == 11
             R 0B
          V (d, m) = divmod(c.code - 55, 10)
-         s [+]= [d, m]
+         s.extend([d, m])
       E
          R 0B
    V v = sum(s[((len)-1..).step(-2)])
@@ -13663,7 +13663,7 @@ template <typename T1> auto check_isin(const T1 &a)
             if (i == 11)
                 return false;
             auto [d, m] = divmod(c.code - 55, 10);
-            s.append(create_array({d, m}));
+            s.extend(create_array({d, m}));
         }
         else
             return false;
@@ -13947,9 +13947,9 @@ F divisors(n)
    L i * i <= n
       I n % i == 0
          V j = n I/ i
-         divs [+]= i
+         divs.append(i)
          I i != j
-            divs2 [+]= j
+            divs2.append(j)
       i++
    R divs2 [+] Array(reversed(divs))
 
@@ -14332,14 +14332,14 @@ F word_break(s, dictionary)
    L !queue.empty
       V node = queue.pop_left()
       I node.val.empty
-         matches [+]= node.parsed
+         matches.append(node.parsed)
       E
          L(word) dictionary
             I node.val.starts_with(word)
                V val_new = node.val[word.len .< node.val.len]
                V parsed_new = copy(node.parsed)
-               parsed_new [+]= word
-               queue [+]= Node(val_new, &parsed_new)
+               parsed_new.append(word)
+               queue.append(Node(val_new, &parsed_new))
    R matches
 
 F process(d, test_strings)
@@ -15467,13 +15467,13 @@ T Playfair
       V i = 0
       L i < c.len - 1
          I c[i + 1] == c[i]
-            lst [+]= c[i]‘X’
+            lst.append(c[i]‘X’)
             i++
          E
-            lst [+]= c[i]‘’c[i + 1]
+            lst.append(c[i]‘’c[i + 1])
             i += 2
       I i == c.len - 1
-         lst [+]= c.last‘X’
+         lst.append(c.last‘X’)
       R lst.map(a -> @.enc[a]).join(‘ ’)
 
    F decode(encoded)
@@ -16130,7 +16130,7 @@ F gen_row(w, s)
       [[Int]] r
       L(x) 1 .< sp - o.len + 2
          L(tail) @gen_seg(o[1..], sp - x)
-            r [+]= [2] * x [+] o[0] [+] tail
+            r.append([2] * x [+] o[0] [+] tail)
       R r
 
    R gen_seg(s.map(i -> [1] * i), w + 1 - sum(s)).map(x -> x[1..])
@@ -16218,7 +16218,7 @@ F deduce(hr, vr)
 F solve(p, show_runs = 1B)
    [[[Int]]] s
    L(l) p.split("\n")
-      s [+]= l.split(‘ ’).map(w -> w.map(c -> c.code - ‘A’.code + 1))
+      s.append(l.split(‘ ’).map(w -> w.map(c -> c.code - ‘A’.code + 1)))
    I show_runs
       print(‘Horizontal runs: ’s[0])
       print(‘Vertical runs: ’s[1])
@@ -16433,7 +16433,7 @@ while True:
 
 F hello()
    print(‘Hello World!’)
-   :histArr [+]= ‘hello’
+   :histArr.append(‘hello’)
 
 F hist()
    I :histArr.empty
@@ -16441,7 +16441,7 @@ F hist()
    E
       L(cmd) :histArr
          print(‘ - ’cmd)
-   :histArr [+]= ‘hist’
+   :histArr.append(‘hist’)
 
 F help()
    print(‘Available commands:’)
@@ -16449,7 +16449,7 @@ F help()
    print(‘  hist’)
    print(‘  exit’)
    print(‘  help’)
-   :histArr [+]= ‘help’
+   :histArr.append(‘help’)
 
 [String = (() -> Void)] aa
 aa[‘help’] = help
@@ -18058,7 +18058,7 @@ F unprime(n)
    [Int] r
    L(a) 1..
       I unprimeable(a)
-         r [+]= a
+         r.append(a)
          I r.len == n
             L.break
    R r
@@ -20320,16 +20320,16 @@ V constants = (0.<64).map(i -> UInt32(UInt64(abs(sin(i + 1)) * 2.0 ^ 32) [&] FFF
 V init_values = (UInt32(6745'2301), UInt32(EFCD'AB89), UInt32(98BA'DCFE), UInt32(1032'5476))
 
 [((UInt32, UInt32, UInt32) -> UInt32)] functions
-functions [+]= (b, c, d) -> (b [&] c) [|] (~b [&] d)
-functions [+]= (b, c, d) -> (d [&] b) [|] (~d [&] c)
-functions [+]= (b, c, d) -> b (+) c (+) d
-functions [+]= (b, c, d) -> c (+) (b [|] ~d)
+functions.append((b, c, d) -> (b [&] c) [|] (~b [&] d))
+functions.append((b, c, d) -> (d [&] b) [|] (~d [&] c))
+functions.append((b, c, d) -> b (+) c (+) d)
+functions.append((b, c, d) -> c (+) (b [|] ~d))
 
 [(Int -> Int)] index_functions
-index_functions [+]= i -> i
-index_functions [+]= i -> (5 * i + 1) % 16
-index_functions [+]= i -> (3 * i + 5) % 16
-index_functions [+]= i -> (7 * i) % 16
+index_functions.append(i -> i)
+index_functions.append(i -> (5 * i + 1) % 16)
+index_functions.append(i -> (3 * i + 5) % 16)
+index_functions.append(i -> (7 * i) % 16)
 
 F md5(=message)
 

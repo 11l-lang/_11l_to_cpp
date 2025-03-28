@@ -555,7 +555,7 @@ F flatten(lst)
    [Int] r
    L(sublst) lst
       L(i) sublst
-         r [+]= i
+         r.append(i)
    R r
 
 F magic_shuffle(deck)
@@ -651,7 +651,7 @@ F perfect_totient(cnt)
          n = φ(n)
          parts += n
       I parts == n0
-         r [+]= n0
+         r.append(n0)
          I r.len == cnt
             R r
 
@@ -2355,10 +2355,10 @@ F place(m, n, &pBlackQueens, &pWhiteQueens)
                   L.break
             L.was_no_break
                I placingBlack
-                  pBlackQueens [+]= pos
+                  pBlackQueens.append(pos)
                   placingBlack = 0B
                E
-                  pWhiteQueens [+]= pos
+                  pWhiteQueens.append(pos)
                   I place(m - 1, n, &pBlackQueens, &pWhiteQueens)
                      R 1B
                   pBlackQueens.pop()
@@ -3021,7 +3021,7 @@ V primes = get_primes(maxsum)
 L(p) primes
    descendants[p].append(p)
    L(s) 1 .< descendants.len - p
-      descendants[s + p] [+]= descendants[s].map(pr -> @p * pr)
+      descendants[s + p].extend(descendants[s].map(pr -> @p * pr))
 
 L(p) primes [+] [4]
    descendants[p].pop()
@@ -3070,7 +3070,7 @@ struct CodeBlock1
         for (auto &&p : primes) {
             descendants[p].append(p);
             for (auto s : range_el(1, descendants.len() - p))
-                descendants[s + p].append(descendants[s].map([&p](const auto &pr){return p * pr;}));
+                descendants[s + p].extend(descendants[s].map([&p](const auto &pr){return p * pr;}));
         }
 
         for (auto &&p : primes + create_array({4}))
@@ -3385,7 +3385,7 @@ F padovan1(n)
    V count = 3
    L count < n
       (a, b, c) = (b, c, a + b)
-      r [+]= c
+      r.append(c)
       count++
    R r
 
@@ -3394,7 +3394,7 @@ F padovan2(n)
    V p = 1.0
    V count = 1
    L count < n
-      r [+]= Int(round(p / :ss))
+      r.append(Int(round(p / :ss)))
       p *= :pp
       count++
    R r
@@ -3404,7 +3404,7 @@ F padovan3(n)
    V s = ‘A’
    V count = 0
    L count < n
-      r [+]= s
+      r.append(s)
       V next = ‘’
       L(ch) s
          next ‘’= Rules[ch]
@@ -7577,12 +7577,12 @@ F kpowerful(k, upper_bound)
          I !u
             L.break
 
-         c [+]= p
+         c.append(p)
 
          L(j) i + 1 .< @ps.len
             I u < @ps[j][0]
                L.break
-            c [+]= @accu(j, u).map(x -> @p * x)
+            c.extend(@accu(j, u).map(x -> @p * x))
       R c
 
    R sorted(accu(0, upper_bound))
@@ -7669,7 +7669,7 @@ template <typename T1, typename T2> auto kpowerful(const T1 &k, const T2 &upper_
             for (auto j : range_el(i + 1, ps.len())) {
                 if (u < _get<0>(ps[j]))
                     break;
-                c.append(accu(j, u).map([&p](const auto &x){return p * x;}));
+                c.extend(accu(j, u).map([&p](const auto &x){return p * x;}));
             }
         }
         return c;

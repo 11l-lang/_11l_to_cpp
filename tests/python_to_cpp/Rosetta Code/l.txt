@@ -1834,7 +1834,7 @@ F lychrel(BigInt =n)
       I n C :cache
          res = :cache[n]
          L.break
-      seen [+]= n
+      seen.append(n)
 
    L(x) seen
       :cache[x] = res
@@ -1849,11 +1849,11 @@ L(i) 1..9999
    I !tf_s[0]
       L.continue
    I BigInt(i) == tf_s[1]
-      seeds [+]= i
+      seeds.append(i)
    E
-      related [+]= i
+      related.append(i)
    I BigInt(i) == rev(i)
-      palin [+]= i
+      palin.append(i)
 
 print(seeds.len‘ Lychrel seeds: ’seeds)
 print(related.len‘ Lychrel related’)

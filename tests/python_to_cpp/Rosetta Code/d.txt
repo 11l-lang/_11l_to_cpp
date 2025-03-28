@@ -661,9 +661,9 @@ F validate(db)
 
    L(i) 10'000
       I found[i] == 0
-         errs [+]= ‘    PIN number #04 missing’.format(i)
+         errs.append(‘    PIN number #04 missing’.format(i))
       E I found[i] > 1
-         errs [+]= ‘    PIN number #04 occurs #. times’.format(i, found[i])
+         errs.append(‘    PIN number #04 occurs #. times’.format(i, found[i]))
 
    I errs.empty
       print(‘  No errors found’)
@@ -814,7 +814,7 @@ F randomGenerator(=seed, n)
 
    L r.len < n
       seed = (seed * 214013 + 2531011) [&] max_int32
-      r [+]= seed >> 16
+      r.append(seed >> 16)
 
    R r
 
@@ -1565,9 +1565,9 @@ F s_permutations(seq)
       L(item) items
          V i = L.index
          I i % 2
-            new_items [+]= (0 .. item.len).map(i -> @item[0 .< i] [+] [@j] [+] @item[i ..])
+            new_items.extend((0 .. item.len).map(i -> @item[0 .< i] [+] [@j] [+] @item[i ..]))
          E
-            new_items [+]= (item.len .< -1).step(-1).map(i -> @item[0 .< i] [+] [@j] [+] @item[i ..])
+            new_items.extend((item.len .< -1).step(-1).map(i -> @item[0 .< i] [+] [@j] [+] @item[i ..]))
       items = new_items
 
    R enumerate(items).map((i, item) -> (item, I i % 2 {-1} E 1))
@@ -1607,9 +1607,9 @@ template <typename T1> auto s_permutations(const T1 &seq)
         for (auto &&item : items) {
             auto i = Lindex;
             if (mod(i, 2))
-                new_items.append(range_ee(0, item.len()).map([&item, &j](const auto &i){return item[range_el(0, i)] + create_array({j}) + item[range_ei(i)];}));
+                new_items.extend(range_ee(0, item.len()).map([&item, &j](const auto &i){return item[range_el(0, i)] + create_array({j}) + item[range_ei(i)];}));
             else
-                new_items.append(range_el(item.len(), -1).step(-1).map([&item, &j](const auto &i){return item[range_el(0, i)] + create_array({j}) + item[range_ei(i)];}));
+                new_items.extend(range_el(item.len(), -1).step(-1).map([&item, &j](const auto &i){return item[range_el(0, i)] + create_array({j}) + item[range_ei(i)];}));
             Lindex++;
         }}
         items = new_items;

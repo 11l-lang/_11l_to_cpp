@@ -1222,8 +1222,8 @@ class SymbolNode:
                         return self.children[0].children[0].to_str() + '.set_plus_len(' + c01[len('(len)'):] + ', ' + char_if_len_1(self.children[1]) + ')'
                     else:
                         return self.children[0].children[0].to_str() + '.set(' + c01 + ', ' + char_if_len_1(self.children[1]) + ')'
-            elif self.symbol.id == '[+]=': # replace `a [+]= v` with `a.append(v)`
-                return self.children[0].to_str() + '.append(' + self.children[1].to_str() + ')'
+            elif self.symbol.id == '[+]=': # replace `a [+]= v` with `a.operator_append(v)`
+                return self.children[0].to_str() + '.operator_append(' + self.children[1].to_str() + ')'
             elif self.symbol.id == '=' and self.children[0].tuple:
                 #assert(False)
                 return 'assign_from_tuple(' + ', '.join(c.to_str() for c in self.children[0].children) + ', ' + self.children[1].to_str() + ')'

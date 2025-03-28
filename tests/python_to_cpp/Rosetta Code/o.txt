@@ -292,7 +292,7 @@ F order_disjoint_list_items(&data, items)
       V lastindex = [-1]
       L(i) 0 .< itemcount
          lastindex.append(data.index(item, lastindex.last + 1))
-      itemindices [+]= lastindex[1..]
+      itemindices.extend(lastindex[1..])
    itemindices.sort()
    L(index, item) zip(itemindices, items)
       data[index] = item
@@ -316,7 +316,7 @@ template <typename T1, typename T2> auto order_disjoint_list_items(T1 &data, con
         auto lastindex = create_array({-1});
         for (auto i : range_el(0, itemcount))
             lastindex.append(data.index(item, lastindex.last() + 1));
-        itemindices.append(lastindex[range_ei(1)]);
+        itemindices.extend(lastindex[range_ei(1)]);
     }
     itemindices.sort();
     for (auto &&[index, item] : zip(itemindices, items))

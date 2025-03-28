@@ -186,12 +186,12 @@ F range_extract(lst)
          i++
       V hi = lst[i]
       I hi - low >= 2
-         r [+]= [low, hi]
+         r.append([low, hi])
       E I hi - low == 1
-         r [+]= [low]
-         r [+]= [hi]
+         r.append([low])
+         r.append([hi])
       E
-         r [+]= [low]
+         r.append([low])
       i++
    R r
 
@@ -1805,12 +1805,12 @@ F mc_rank([(Int, String)] &iterable)
    L(item) iterable
       V n = L.index
       I item[0] == lastresult
-         fifo [+]= item
+         fifo.append(item)
       E
          L !fifo.empty
             r.append((n, fifo.pop(0)))
          lastresult = item[0]
-         fifo [+]= item
+         fifo.append(item)
    L !fifo.empty
       r.append((iterable.len, fifo.pop(0)))
    R r
