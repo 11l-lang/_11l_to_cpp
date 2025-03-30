@@ -2588,3 +2588,16 @@ struct CodeBlock1
         os::_(create_array({u"gcc"_S, u"test.c"_S}));
     }
 } code_block_1;
+
+
+print(Array(‘а’..‘я’) [+] ‘ё’)
+print(Array(‘а’..‘я’)‘ё’)
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(create_array(range_ee(u'а'_C, u'я'_C)) + u'ё'_C);
+        print(create_array(range_ee(u'а'_C, u'я'_C)) & u"ё"_S);
+    }
+} code_block_1;
