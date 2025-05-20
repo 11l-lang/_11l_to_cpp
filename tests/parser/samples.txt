@@ -2601,3 +2601,40 @@ struct CodeBlock1
         print(create_array(range_ee(u'а'_C, u'я'_C)) & u"ё"_S);
     }
 } code_block_1;
+
+
+F test_split(s, sep = ‘,’, ', group_delimiters = 0B)
+   V a = s.split(sep, group_delimiters' group_delimiters)
+   print(f:‘{f:‘‘{s}’{‘g’*group_delimiters}:’:<13} {a.len} {a}’)
+
+test_split(‘’)                                     // ‘’:           0 []
+test_split(‘,’)                                    // ‘,’:          2 [, ]
+test_split(‘,’, group_delimiters' 1B)              // ‘,’g:         0 []
+test_split(‘11’)                                   // ‘11’:         1 [11]
+test_split(‘1,’)                                   // ‘1,’:         2 [1, ]
+test_split(‘1,2’)                                  // ‘1,2’:        2 [1, 2]
+test_split(‘1,,’)                                  // ‘1,,’:        3 [1, , ]
+test_split(‘1,,’, group_delimiters' 1B)            // ‘1,,’g:       1 [1]
+test_split(‘ 1 2  3  ’, ‘ ’, group_delimiters' 1B) // ‘ 1 2  3  ’g: 3 [1, 2, 3]
+===
+template <typename T1, typename T2 = decltype(u","_S), typename T3 = decltype(false)> auto test_split(const T1 &s, const T2 &sep = u","_S, const T3 &group_delimiters = false)
+{
+    auto a = s.split(sep, nullptr, group_delimiters);
+    print(u"#<13 #. #."_S.format(u"‘#.’#.:"_S.format(s, u"g"_S * group_delimiters), a.len(), a));
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        test_split(u""_S);
+        test_split(u","_S);
+        test_split(u","_S, u","_S, true);
+        test_split(u"11"_S);
+        test_split(u"1,"_S);
+        test_split(u"1,2"_S);
+        test_split(u"1,,"_S);
+        test_split(u"1,,"_S, u","_S, true);
+        test_split(u" 1 2  3  "_S, u" "_S, true);
+    }
+} code_block_1;

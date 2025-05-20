@@ -725,7 +725,7 @@ inline Array<String> String::split(const String &delim, Nullable<Int> limit, boo
 	//str += delim.len() - 1; // with this line of code there was an error in `u"[]\n===\n[]"_S.split(u"===\n"_S)` (second string in the resulting array has additional null character)
 	str = data() + len();
 
-	if (!group_delimiters || str != begin)
+	if (group_delimiters ? str != begin : !empty())
 		arr.append(String(begin, str-begin));
 	return arr;
 }
@@ -756,7 +756,7 @@ template <typename ... Types> inline Array<String> String::split(const Tuple<Typ
 		else
 			str++;
 
-	if (!group_delimiters || str != begin)
+	if (group_delimiters ? str != begin : !empty())
 		arr.append(String(begin, str-begin));
 	return arr;
 }
