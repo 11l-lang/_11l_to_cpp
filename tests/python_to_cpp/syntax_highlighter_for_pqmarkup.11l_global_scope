@@ -12,7 +12,7 @@ is_lang_supported
     ast_nodes = [
     .   node_type = function
         function_arguments = [
-            ‘lang; ; ; ’
+        .   name = lang
         ]
     ]
 Error
@@ -21,8 +21,8 @@ Error
     .   node_type = type
         constructors = [
         .   function_arguments = [
-                ‘message; ; ; ’
-                ‘pos; ; ; ’
+            .   name = message
+            .   name = pos
             ]
         ]
     ]
@@ -31,7 +31,7 @@ highlight
     ast_nodes = [
     .   node_type = function
         function_arguments = [
-            ‘lang; ; ; ’
-            ‘source; ; ; ’
+        .   name = lang
+        .   name = source
         ]
     ]

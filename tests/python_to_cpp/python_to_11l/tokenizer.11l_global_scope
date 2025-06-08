@@ -16,8 +16,8 @@ Error
     .   node_type = type
         constructors = [
         .   function_arguments = [
-                ‘message; ; ; ’
-                ‘pos; ; ; ’
+            .   name = message
+            .   name = pos
             ]
         ]
     ]
@@ -27,9 +27,9 @@ Token
     .   node_type = type
         constructors = [
         .   function_arguments = [
-                ‘start; ; ; ’
-                ‘end; ; ; ’
-                ‘category; ; ; ’
+            .   name = start
+            .   name = end
+            .   name = category
             ]
         ]
     ]
@@ -38,8 +38,15 @@ tokenize
     ast_nodes = [
     .   node_type = function
         function_arguments = [
-            ‘source; ; ; ’
-            ‘newline_chars; nullptr; [Int]?; &’
-            ‘comments; nullptr; [(Int, Int)]?; &’
+        .   name = source
+        .   name = newline_chars
+            default_value = nullptr
+            type = ‘[Int]?’
+            qualifier = &
+
+        .   name = comments
+            default_value = nullptr
+            type = ‘[(Int, Int)]?’
+            qualifier = &
         ]
     ]

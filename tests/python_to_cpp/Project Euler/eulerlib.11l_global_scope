@@ -3,7 +3,8 @@ sqrtb
     ast_nodes = [
     .   node_type = function
         function_arguments = [
-            ‘x; ; BigInt; ’
+        .   name = x
+            type = BigInt
         ]
     ]
 is_square
@@ -11,7 +12,7 @@ is_square
     ast_nodes = [
     .   node_type = function
         function_arguments = [
-            ‘x; ; ; ’
+        .   name = x
         ]
     ]
 is_prime
@@ -19,7 +20,7 @@ is_prime
     ast_nodes = [
     .   node_type = function
         function_arguments = [
-            ‘x; ; ; ’
+        .   name = x
         ]
     ]
 list_primality
@@ -27,7 +28,7 @@ list_primality
     ast_nodes = [
     .   node_type = function
         function_arguments = [
-            ‘n; ; ; ’
+        .   name = n
         ]
     ]
 list_primes
@@ -35,7 +36,7 @@ list_primes
     ast_nodes = [
     .   node_type = function
         function_arguments = [
-            ‘n; ; ; ’
+        .   name = n
         ]
     ]
 primes_up_to_limit
@@ -43,7 +44,8 @@ primes_up_to_limit
     ast_nodes = [
     .   node_type = function
         function_arguments = [
-            ‘limit; ; Int; ’
+        .   name = limit
+            type = Int
         ]
     ]
 list_smallest_prime_factors
@@ -51,7 +53,8 @@ list_smallest_prime_factors
     ast_nodes = [
     .   node_type = function
         function_arguments = [
-            ‘n; ; Int; ’
+        .   name = n
+            type = Int
         ]
     ]
 list_totients
@@ -59,7 +62,7 @@ list_totients
     ast_nodes = [
     .   node_type = function
         function_arguments = [
-            ‘n; ; ; ’
+        .   name = n
         ]
     ]
 binomial
@@ -67,8 +70,10 @@ binomial
     ast_nodes = [
     .   node_type = function
         function_arguments = [
-            ‘n; ; BigInt; ’
-            ‘k; ; BigInt; ’
+        .   name = n
+            type = BigInt
+        .   name = k
+            type = BigInt
         ]
     ]
 reciprocal_mod
@@ -76,7 +81,11 @@ reciprocal_mod
     ast_nodes = [
     .   node_type = function
         function_arguments = [
-            ‘x; ; Int; =’
-            ‘m; ; Int; ’
+        .   name = x
+            type = Int
+            qualifier = =
+
+        .   name = m
+            type = Int
         ]
     ]

@@ -4,10 +4,10 @@ Exception
     .   node_type = type
         constructors = [
         .   function_arguments = [
-                ‘message; ; ; ’
-                ‘line; ; ; ’
-                ‘column; ; ; ’
-                ‘pos; ; ; ’
+            .   name = message
+            .   name = line
+            .   name = column
+            .   name = pos
             ]
         ]
     ]
@@ -17,8 +17,8 @@ Converter
     .   node_type = type
         constructors = [
         .   function_arguments = [
-                ‘habr_html; ; ; ’
-                ‘ohd; ; ; ’
+            .   name = habr_html
+            .   name = ohd
             ]
         ]
     ]
@@ -27,9 +27,14 @@ to_html
     ast_nodes = [
     .   node_type = function
         function_arguments = [
-            ‘instr; ; ; ’
-            ‘outfilef; nullptr; File?; ’
-            ‘ohd; false; ; ’
-            ‘habr_html; false; ; ’
+        .   name = instr
+        .   name = outfilef
+            default_value = nullptr
+            type = File?
+
+        .   name = ohd
+            default_value = false
+        .   name = habr_html
+            default_value = false
         ]
     ]

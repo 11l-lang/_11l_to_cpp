@@ -3,6 +3,7 @@
     ast_nodes = [
     .   node_type = function
         function_arguments = [
-            ‘a; 0; ; ’
+        .   name = a
+            default_value = ‘0’
         ]
     ]
