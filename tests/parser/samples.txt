@@ -1527,6 +1527,7 @@ struct CodeBlock1
 
 test_module:()
 test_module:(‘abc’)
+test_module:f(outer_name' 1)
 ===
 namespace test_module {
 #include "test_module.hpp"
@@ -1538,6 +1539,7 @@ struct CodeBlock1
     {
         test_module::_();
         test_module::_(u"abc"_S);
+        test_module::f(1);
     }
 } code_block_1;
 
@@ -2636,5 +2638,34 @@ struct CodeBlock1
         test_split(u"1,,"_S);
         test_split(u"1,,"_S, u","_S, true);
         test_split(u" 1 2  3  "_S, u" "_S, true);
+    }
+} code_block_1;
+
+
+F f(outer_name' inner_name = 0)
+   R inner_name
+
+F f2(String outer_name' inner_name)
+   print(inner_name)
+
+f(outer_name' 1)
+f2(outer_name' ‘1’)
+===
+template <typename T1 = decltype(0)> auto f(const T1 &inner_name = 0)
+{
+    return inner_name;
+}
+
+auto f2(const String &inner_name)
+{
+    print(inner_name);
+}
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        f(1);
+        f2(u"1"_S);
     }
 } code_block_1;

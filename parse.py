@@ -835,9 +835,9 @@ class SymbolNode:
                             if last_function_arg >= len(f_node.function_arguments):
                                 raise Error('too many arguments for function `' + func_name + '`', self.children[0].left_to_right_token())
                             if f_node.first_named_only_argument is not None and last_function_arg >= f_node.first_named_only_argument:
-                                raise Error('argument `' + f_node.function_arguments[last_function_arg].name + '` of function `' + func_name + '` is named-only', self.children[i+1].token)
+                                raise Error('argument `' + f_node.function_arguments[last_function_arg].outer_name + '` of function `' + func_name + '` is named-only', self.children[i+1].token)
                             if f_node.function_arguments[last_function_arg].qualifier == '&' and not (self.children[i+1].symbol.id in ('&', 'T &') and len(self.children[i+1].children) == 1) and self.children[i+1].token_str() not in ('N', 'Н', 'null', 'нуль'):
-                                raise Error('argument `' + f_node.function_arguments[last_function_arg].name + '` of function `' + func_name + '` is in-out, but there is no `&` prefix', self.children[i+1].token)
+                                raise Error('argument `' + f_node.function_arguments[last_function_arg].outer_name + '` of function `' + func_name + '` is in-out, but there is no `&` prefix', self.children[i+1].token)
                             if f_node.function_arguments[last_function_arg].type_name == 'File?':
                                 tid = self.scope.find(self.children[i+1].token_str())
                                 if tid is None or tid.type != 'File?':
@@ -866,16 +866,16 @@ class SymbolNode:
                         while True:
                             if last_function_arg == len(f_node.function_arguments):
                                 for arg in f_node.function_arguments:
-                                    if arg.name == argument_name:
+                                    if arg.outer_name == argument_name:
                                         raise Error('please correct order of argument `' + argument_name + '`', self.children[i].token)
                                 raise Error('argument `' + argument_name + '` is not found in function `' + func_name + '`', self.children[i].token)
-                            if f_node.function_arguments[last_function_arg].name == argument_name:
+                            if f_node.function_arguments[last_function_arg].outer_name == argument_name:
                                 if f_node.function_arguments[last_function_arg].qualifier == '&' and not (self.children[i+1].symbol.id in ('&', 'T &') and len(self.children[i+1].children) == 1) and self.children[i+1].token_str() not in ('N', 'Н', 'null', 'нуль'):
-                                    raise Error('argument `' + f_node.function_arguments[last_function_arg].name + '` of function `' + func_name + '` is in-out, but there is no `&` prefix', self.children[i+1].token)
+                                    raise Error('argument `' + f_node.function_arguments[last_function_arg].outer_name + '` of function `' + func_name + '` is in-out, but there is no `&` prefix', self.children[i+1].token)
                                 last_function_arg += 1
                                 break
                             if f_node.function_arguments[last_function_arg].default_value == '':
-                                raise Error('argument `' + f_node.function_arguments[last_function_arg].name + '` of function `' + func_name + '` has no default value, please specify its value here', self.children[i].token)
+                                raise Error('argument `' + f_node.function_arguments[last_function_arg].outer_name + '` of function `' + func_name + '` has no default value, please specify its value here', self.children[i].token)
                             res += f_node.function_arguments[last_function_arg].default_value + ', '
                             last_function_arg += 1
                         if f_node.function_arguments[last_function_arg-1].type_name.endswith('?') and not '->' in f_node.function_arguments[last_function_arg-1].type_name and self.children[i+1].token_str() not in ('N', 'Н', 'null', 'нуль'):
@@ -889,7 +889,7 @@ class SymbolNode:
                         while last_function_arg < len(f_node.function_arguments):
                             if f_node.function_arguments[last_function_arg].default_value == '':
                                 t = self.children[len(self.children)-1].rightmost()
-                                raise Error('missing required argument `'+ f_node.function_arguments[last_function_arg].name + '`', Token(t, t, Token.Category.DELIMITER))
+                                raise Error('missing required argument `'+ f_node.function_arguments[last_function_arg].outer_name + '`', Token(t, t, Token.Category.DELIMITER))
                             last_function_arg += 1
                     elif type(f_node) in (ASTTypeEnum, ASTTypeAlias, ASTTypeDefinition):
                         pass
@@ -1628,16 +1628,21 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
     is_declaration = False
     class Argument:
         def __init__(self, arg_name, default_value, type_, qualifier = ''):
-            self.name = arg_name
+            if isinstance(arg_name, tuple): self.outer_name , self.inner_name = arg_name
+            else:                           self.outer_name = self.inner_name = arg_name
             self.default_value = default_value
             self.type_name = type_
             self.qualifier = qualifier
         def serialize_to_dict(self):
             d = {}
+            if self.outer_name == self.inner_name:
+                d['name'] = self.inner_name
+            else:
+                d['outer_name'] = self.outer_name
+                d['inner_name'] = self.inner_name
             def a(key, value):
                 if value != '':
                     d[key] = value
-            a('name', self.name)
             a('default_value', self.default_value)
             a('type', self.type_name)
             a('qualifier', self.qualifier)
@@ -1671,7 +1676,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
 
     def deserialize_from_dict(self, d):
         for ad in d['function_arguments']:
-            self.function_arguments.append(self.Argument(ad['name'], ad.get('default_value', ''), ad.get('type', ''), ad.get('qualifier', '')))
+            self.function_arguments.append(self.Argument(ad.get('name', (ad.get('outer_name'), ad.get('inner_name'))), ad.get('default_value', ''), ad.get('type', ''), ad.get('qualifier', '')))
 
     def children_to_str(self, indent, t):
         if self.is_declaration:
@@ -1699,13 +1704,13 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                 arguments = []
                 for index, arg in enumerate(self.function_arguments):
                     if arg.type_name == '': # if there is no type specified
-                        raise Error('type should be specified for argument `' + arg.name + '` [for virtual functions all arguments should have types]', tokens[self.tokeni])
+                        raise Error('type should be specified for argument `' + arg.inner_name + '` [for virtual functions all arguments should have types]', tokens[self.tokeni])
                     else:
                         arguments.append(
                               ('' if '=' in arg.qualifier or '&' in arg.qualifier else 'const ')
                             + trans_type(arg.type_name.rstrip('?'), self.scope, tokens[self.tokeni]) + '* '*0 + ' '
                             + ('&' if '&' in arg.qualifier or '=' not in arg.qualifier else '')
-                            + arg.name + ('' if arg.default_value == '' or index < self.last_non_default_argument else ' = ' + arg.default_value))
+                            + arg.inner_name + ('' if arg.default_value == '' or index < self.last_non_default_argument else ' = ' + arg.default_value))
                 s = 'virtual ' + s + '(' + ', '.join(arguments) + ')' + ('', ' override', ' = 0', ' override', ' final')[self.virtual_category - 1]
                 return pre_nl(self.tokeni) + ' ' * (indent*4) + s + ";\n" if self.virtual_category == self.VirtualCategory.ABSTRACT else self.children_to_str(indent, s)
 
@@ -1739,15 +1744,15 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
             argument_types_are_specified = True
             for arg in self.function_arguments:
                 if arg.type_name == '': # if there is no type specified
-                    arguments.append(('auto ' if '=' in arg.qualifier else 'const auto &') + arg.name if arg.default_value == '' else
-                                          ('' if '=' in arg.qualifier else 'const ') + 'decltype(' + arg.default_value + ') ' + arg.name + ' = ' + arg.default_value)
+                    arguments.append(('auto ' if '=' in arg.qualifier else 'const auto &') + arg.inner_name if arg.default_value == '' else
+                                          ('' if '=' in arg.qualifier else 'const ') + 'decltype(' + arg.default_value + ') ' + arg.inner_name + ' = ' + arg.default_value)
                     argument_types_are_specified = False
                 else:
                     tid = self.scope.parent.find(arg.type_name.rstrip('?'))
                     if tid is not None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and (tid.ast_nodes[0].has_virtual_functions or tid.ast_nodes[0].has_pointers_to_the_same_type):
-                        arguments.append('std::unique_ptr<' + arg.type_name.rstrip('?') + '> ' + arg.name + ('' if arg.default_value == '' else ' = ' + arg.default_value))
+                        arguments.append('std::unique_ptr<' + arg.type_name.rstrip('?') + '> ' + arg.inner_name + ('' if arg.default_value == '' else ' = ' + arg.default_value))
                     else:
-                        arguments.append(('' if '=' in arg.qualifier or '&' in arg.qualifier else 'const ') + trans_type(arg.type_name, self.scope, tokens[self.tokeni]) + ' ' + ('&'*((arg.type_name not in ('Int', 'Float')) and ('=' not in arg.qualifier))) + arg.name + ('' if arg.default_value == '' else ' = ' + arg.default_value))
+                        arguments.append(('' if '=' in arg.qualifier or '&' in arg.qualifier else 'const ') + trans_type(arg.type_name, self.scope, tokens[self.tokeni]) + ' ' + ('&'*((arg.type_name not in ('Int', 'Float')) and ('=' not in arg.qualifier))) + arg.inner_name + ('' if arg.default_value == '' else ' = ' + arg.default_value))
             return self.children_to_str(indent, ('auto' if self.function_return_type == '' or not argument_types_are_specified else 'std::function<' + trans_type(self.function_return_type, self.scope, tokens[self.tokeni]) + '(' + ', '.join(trans_type(arg.type_name, self.scope, tokens[self.tokeni]) + '&'*('&' in arg.qualifier) for arg in self.function_arguments) + ')>') + ' ' + self.function_name
                 + ' = [' + ', '.join(sorted(filter(lambda v: not '&'+v in captured_variables, captured_variables))) + ']('
                 + ', '.join(arguments) + ')' + ('' if self.function_return_type == '' else ' -> ' + trans_type(self.function_return_type, self.scope, tokens[self.tokeni])))[:-1] + ";\n"
@@ -1764,14 +1769,14 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
             if arg.type_name == '': # if there is no type specified
                 templates.append('typename T' + str(index + 1) + ('' if arg.default_value == '' or index < self.last_non_default_argument else ' = decltype(' + arg.default_value + ')'))
                 arguments.append(('T' + str(index + 1) + ' ' if '=' in arg.qualifier else 'const '*(arg.qualifier != '&') + 'T' + str(index + 1) + ' &')
-                    + arg.name + ('' if arg.default_value == '' or index < self.last_non_default_argument else ' = ' + arg.default_value))
+                    + arg.inner_name + ('' if arg.default_value == '' or index < self.last_non_default_argument else ' = ' + arg.default_value))
             else:
                 tid = self.scope.parent.find(arg.type_name.rstrip('?'))
                 if tid is not None and len(tid.ast_nodes) and type(tid.ast_nodes[0]) == ASTTypeDefinition and (tid.ast_nodes[0].has_virtual_functions or tid.ast_nodes[0].has_pointers_to_the_same_type):
                     arguments.append('std::unique_ptr<' + arg.type_name.rstrip('?') + '> '
                         #+ ('' if '=' in arg.qualifier else 'const ')
                         + arg.qualifier # add `&` if needed
-                        + arg.name + ('' if arg.default_value == '' or index < self.last_non_default_argument else ' = ' + arg.default_value))
+                        + arg.inner_name + ('' if arg.default_value == '' or index < self.last_non_default_argument else ' = ' + arg.default_value))
                 elif arg.type_name.endswith('?'):
                     ty = trans_type(arg.type_name.rstrip('?'), self.scope, tokens[self.tokeni])
                     if ty == 'File':
@@ -1782,7 +1787,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                             ty = 'TFile<reading>'
                     arguments.append(ty + '* '
                             + ('' if '=' in arg.qualifier else 'const ')
-                            + arg.name + ('' if arg.default_value == '' or index < self.last_non_default_argument else ' = ' + arg.default_value))
+                            + arg.inner_name + ('' if arg.default_value == '' or index < self.last_non_default_argument else ' = ' + arg.default_value))
                 else:
                     ty = trans_type(arg.type_name, self.scope, tokens[self.tokeni])
                     if ty == 'File':
@@ -1791,7 +1796,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                     make_ref = arg.qualifier == '&'
                     arguments.append(
                         (('' if arg.qualifier == '=' else 'const ') + ty + ' ' + '&'*(arg.type_name not in ('Int', 'Float') and arg.qualifier != '=') if arg.qualifier != '&' else ty + ' &')
-                        + arg.name + ('' if arg.default_value == '' or index < self.last_non_default_argument else ' = ' + 'make_ref('*make_ref + arg.default_value + ')'*make_ref))
+                        + arg.inner_name + ('' if arg.default_value == '' or index < self.last_non_default_argument else ' = ' + 'make_ref('*make_ref + arg.default_value + ')'*make_ref))
 
         if self.member_initializer_list == '' and self.function_name == '' and type(self.parent) == ASTTypeDefinition:
             def is_const_var(var_name):
@@ -1813,7 +1818,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                     and len(c.expression.children[0].children) == 1 \
                         and c.expression.children[0].children[0].token.category == Token.Category.NAME \
                       and ((c.expression.children[1].token.category == Token.Category.NAME
-                        and c.expression.children[1].token_str() in (arg.name for arg in self.function_arguments))
+                        and c.expression.children[1].token_str() in (arg.inner_name for arg in self.function_arguments))
                          or is_const_var(c.expression.children[0].children[0].token_str())):
 
                     if self.scope.parent.ids.get(c.expression.children[0].children[0].token_str()) is None: # this member variable is defined in the base type/class
@@ -1826,7 +1831,7 @@ class ASTFunctionDefinition(ASTNodeWithChildren):
                         self.member_initializer_list += ",\n"
                     ec1 = c.expression.children[1].to_str()
                     for index, arg in enumerate(self.function_arguments):
-                        if arg.name == ec1:
+                        if arg.inner_name == ec1:
                             if arguments[index].startswith('std::unique_ptr<'):
                                 ec1 = 'std::move(' + ec1 + ')'
                             break
@@ -3273,7 +3278,8 @@ def parse_internal(this_node):
                             continue
                         type_ = '' # (
                         if not (token.value(source) in ('&', '=') or (token.category == Token.Category.NAME
-                                                                      and (peek_token().value(source) in (',', ';', ')') or
+                                                                      and (token.value(source).endswith("'") or
+                                                                           peek_token().value(source) in (',', ';', ')') or
                                                                           (peek_token().value(source) == '=') and source[peek_token().start-1:peek_token().end+1] in (' = ', " =\n")))):
                             type_ = expression().to_type_str()
                             if type_.startswith('Array['): # ]
@@ -3291,6 +3297,11 @@ def parse_internal(this_node):
                             raise Error('expected function\'s argument name', token)
                         func_arg_name = tokensn.token_str()
                         next_token()
+                        if func_arg_name.endswith("'"): # this is an outer name
+                            if token.category != Token.Category.NAME:
+                                raise Error('the outer name of the argument must be followed by an inner name', token)
+                            func_arg_name = (func_arg_name[:-1], tokensn.token_str())
+                            next_token()
                         if token.value(source) == '=':
                             next_token()
                             default = expression().to_str()
@@ -3337,7 +3348,7 @@ def parse_internal(this_node):
                         next_token()
                         node.is_declaration = True
                     else:
-                        new_scope(node, map(lambda arg: (arg.name, arg.type_name, arg.default_value), node.function_arguments))
+                        new_scope(node, map(lambda arg: (arg.inner_name, arg.type_name, arg.default_value), node.function_arguments))
                 else:
                     if token is not None and token.category == Token.Category.STATEMENT_SEPARATOR:
                         next_token()

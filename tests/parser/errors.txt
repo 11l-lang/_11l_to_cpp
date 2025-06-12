@@ -336,3 +336,8 @@ o:‘echo *’
 -:
 :‘echo *’
 ^Error: can not import module ``: file 'tests/parser/.11l' is not found
+
+
+F f2(String outer_name' = 0)
+                        ^Error: the outer name of the argument must be followed by an inner name
+   print()

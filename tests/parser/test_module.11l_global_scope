@@ -7,3 +7,13 @@
             default_value = ‘0’
         ]
     ]
+f
+    type = ‘’
+    ast_nodes = [
+    .   node_type = function
+        function_arguments = [
+        .   outer_name = outer_name
+            inner_name = inner_name
+            default_value = ‘0’
+        ]
+    ]

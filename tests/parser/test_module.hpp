@@ -2,3 +2,8 @@
 {
     print(a);
 }
+
+template <typename T1 = decltype(0)> auto f(const T1 &inner_name = 0)
+{
+    return inner_name;
+}

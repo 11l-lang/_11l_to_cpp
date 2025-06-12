@@ -1,2 +1,5 @@
 F (a = 0)
    print(a)
+
+F f(outer_name' inner_name = 0)
+   R inner_name
