@@ -7,8 +7,13 @@ to_html
     type = ‘’
     node
         function_arguments = [
-            ‘instr; ; ; ’
-            ‘outfilef; N; IO[str]; ’
-            ‘ohd; 0B; ; ’
-            ‘habr_html; 0B; ; ’
+        .   name = instr
+        .   name = outfilef
+            default_value = ‘N’
+            type = IO[str]
+
+        .   name = ohd
+            default_value = ‘0B’
+        .   name = habr_html
+            default_value = ‘0B’
         ]

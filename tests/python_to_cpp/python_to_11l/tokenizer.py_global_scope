@@ -15,7 +15,12 @@ tokenize
     type = ‘’
     node
         function_arguments = [
-            ‘source; ; ; ’
-            ‘newline_chars; N; List[int]; ’
-            ‘comments; N; List[Tuple[int, int]]; ’
+        .   name = source
+        .   name = newline_chars
+            default_value = ‘N’
+            type = List[int]
+
+        .   name = comments
+            default_value = ‘N’
+            type = List[Tuple[int, int]]
         ]

@@ -15,12 +15,12 @@ is_lang_supported
     type = ‘’
     node
         function_arguments = [
-            ‘lang; ; ; ’
+        .   name = lang
         ]
 highlight
     type = ‘’
     node
         function_arguments = [
-            ‘lang; ; ; ’
-            ‘source; ; ; ’
+        .   name = lang
+        .   name = source
         ]

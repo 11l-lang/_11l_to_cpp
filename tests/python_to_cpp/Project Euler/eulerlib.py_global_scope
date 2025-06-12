@@ -3,61 +3,68 @@ sqrtb
     type = ‘’
     node
         function_arguments = [
-            ‘x; ; BigInt; ’
+        .   name = x
+            type = BigInt
         ]
 is_square
     type = ‘’
     node
         function_arguments = [
-            ‘x; ; ; ’
+        .   name = x
         ]
 is_prime
     type = ‘’
     node
         function_arguments = [
-            ‘x; ; ; ’
+        .   name = x
         ]
 list_primality
     type = ‘’
     node
         function_arguments = [
-            ‘n; ; ; ’
+        .   name = n
         ]
 list_primes
     type = ‘’
     node
         function_arguments = [
-            ‘n; ; ; ’
+        .   name = n
         ]
 primes_up_to_limit
     type = ‘’
     node
         function_arguments = [
-            ‘limit; ; int; ’
+        .   name = limit
+            type = int
         ]
 list_smallest_prime_factors
     type = ‘’
     node
         function_arguments = [
-            ‘n; ; int; ’
+        .   name = n
+            type = int
         ]
 list_totients
     type = ‘’
     node
         function_arguments = [
-            ‘n; ; ; ’
+        .   name = n
         ]
 binomial
     type = ‘’
     node
         function_arguments = [
-            ‘n; ; BigInt; ’
-            ‘k; ; BigInt; ’
+        .   name = n
+            type = BigInt
+        .   name = k
+            type = BigInt
         ]
 reciprocal_mod
     type = ‘’
     node
         function_arguments = [
-            ‘=x; ; int; ’
-            ‘m; ; int; ’
+        .   name = =x
+            type = int
+        .   name = m
+            type = int
         ]
