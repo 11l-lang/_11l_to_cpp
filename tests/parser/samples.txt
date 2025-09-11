@@ -2669,3 +2669,14 @@ struct CodeBlock1
         f2(u"1"_S);
     }
 } code_block_1;
+
+
+print(fs:path:split_ext(‘video.mp4’). .name‘.part’(.ext))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print([&](auto &&T){return T.name & u".part"_S & (T.ext);}(fs::path::split_ext(u"video.mp4"_S)));
+    }
+} code_block_1;

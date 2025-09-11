@@ -220,17 +220,34 @@ inline String canonical(const String &path)
 	return std::filesystem::canonical((std::u16string&)path).u16string();
 }
 
-inline Tuple<String, String> split_ext(const String &path)
+struct SplittedPath
+{
+	String name, ext;
+
+	template <typename Ty> bool operator==(const Ty &other) const {return name == _get<0>(other) && ext == _get<1>(other);}
+
+	operator String() const {return u'('_C & name & u", " & ext & u')'_C;}
+};
+inline SplittedPath split_ext(const String &path)
 {
 	size_t sep_pos = path.find_last_of(u"/\\");
 	if (sep_pos == String::npos)
 		sep_pos = 0;
 	size_t dot_pos = path.find_last_of(u".");
 
-	if (dot_pos == String::npos || dot_pos < sep_pos)
-		return Tuple<String, String>(path, String());
+	SplittedPath sp;
+	if (dot_pos == String::npos || dot_pos < sep_pos) {
+		sp.name = path;
+		return sp;
+	}
 
-	return Tuple<String, String>(path[range_el(Int(0), (Int)dot_pos)], path[range_ei((Int)dot_pos)]);
+	sp.name = path[range_el(Int(0), (Int)dot_pos)];
+	sp.ext  = path[range_ei((Int)dot_pos)];
+	return sp;
 }
+
+template <int n> inline const String &_get(const SplittedPath &sp);
+template <> inline const String &_get<0>(const SplittedPath &sp) {return sp.name;}
+template <> inline const String &_get<1>(const SplittedPath &sp) {return sp.ext;}
 }
 }

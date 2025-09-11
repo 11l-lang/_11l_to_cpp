@@ -1115,6 +1115,11 @@ print(os.path.sep in ('/', '\\'))
 print(os.path.splitext('a/b/c.txt') == ('a/b/c', '.txt'))
 print(os.path.splitext('c.txt') == ('c', '.txt'))
 print(os.path.splitext('a/b.c/d') == ('a/b.c/d', ''))
+print(os.path.splitext('a/b/c.txt'))
+print(os.path.splitext('a/b/c.txt')[0])
+print(os.path.splitext('a/b/c.txt')[1])
+name, ext = os.path.splitext('file.tar.gz')
+print(name, ext)
 ===
 print(fs:path:absolute(‘.’))
 print(fs:path:relative(‘a/b’, ‘a/c’).replace(‘\’, ‘/’) == ‘../b’)
@@ -1135,6 +1140,11 @@ print(fs:path:sep C (‘/’, ‘\’))
 print(fs:path:split_ext(‘a/b/c.txt’) == (‘a/b/c’, ‘.txt’))
 print(fs:path:split_ext(‘c.txt’) == (‘c’, ‘.txt’))
 print(fs:path:split_ext(‘a/b.c/d’) == (‘a/b.c/d’, ‘’))
+print(fs:path:split_ext(‘a/b/c.txt’))
+print(fs:path:split_ext(‘a/b/c.txt’)[0])
+print(fs:path:split_ext(‘a/b/c.txt’)[1])
+V (name, ext) = fs:path:split_ext(‘file.tar.gz’)
+print(name‘ ’ext)
 ===
 struct CodeBlock1
 {
@@ -1159,8 +1169,21 @@ struct CodeBlock1
         print(fs::path::split_ext(u"a/b/c.txt"_S) == make_tuple(u"a/b/c"_S, u".txt"_S));
         print(fs::path::split_ext(u"c.txt"_S) == make_tuple(u"c"_S, u".txt"_S));
         print(fs::path::split_ext(u"a/b.c/d"_S) == make_tuple(u"a/b.c/d"_S, u""_S));
+        print(fs::path::split_ext(u"a/b/c.txt"_S));
+        print(_get<0>(fs::path::split_ext(u"a/b/c.txt"_S)));
+        print(_get<1>(fs::path::split_ext(u"a/b/c.txt"_S)));
     }
 } code_block_1;
+
+auto [name, ext] = fs::path::split_ext(u"file.tar.gz"_S);
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        print(name & u" "_S & ext);
+    }
+} code_block_2;
 
 
 print('Number: %4g, %g.' % (1.1, 1.1))
