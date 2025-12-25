@@ -455,6 +455,7 @@ public:
 	Array<String> split(const String &delim, Nullable<Int> limit = nullptr, bool group_delimiters = false) const;
 	template <typename ... Types> Array<String> split(const Tuple<Types...> &delim_tuple, Nullable<Int> limit = nullptr, bool group_delimiters = false) const;
 	Array<String> split(const re::RegEx &regex) const;
+	Array<String> split_sg() const;
 	Array<String> split_py() const;
 	Array<String> split_req(const String &delim, Int req) const;
 	template <typename RangeOrTupleType> Array<String> split_req(const String &delim, const RangeOrTupleType &req) const;

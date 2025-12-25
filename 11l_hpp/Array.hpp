@@ -761,6 +761,11 @@ template <typename ... Types> inline Array<String> String::split(const Tuple<Typ
 	return arr;
 }
 
+inline Array<String> String::split_sg() const
+{
+	return split(u' '_C, nullptr, true);
+}
+
 inline Array<String> String::split_py() const
 {
 	return split(make_tuple(u' '_C, u'\t'_C, u'\r'_C, u'\n'_C), nullptr, true);

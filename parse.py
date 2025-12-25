@@ -2578,7 +2578,7 @@ russian_names = {
     'Строка':'String', 'длина':'len', 'пуста':'empty', 'пусто':'empty', 'послед':'last', 'начин_с':'starts_with', 'начин_на':'starts_with', 'закан_на':'ends_with',
      'колво':'count', 'только_цифры':'is_digit', 'только_буквы':'is_alpha', 'сократить':'trim',
      'найти':'find', 'найти_и':'findi', 'об_найти':'rfind', 'об_найти_и':'rfindi', 'заменить':'replace',
-     'разделить':'split', 'разделить_п':'split_py', 'разбить':'split', 'разбить_п':'split_py', "групп_разделители'":"group_delimiters'",
+     'разделить':'split', 'разделить_пг':'split_sg', 'разделить_py':'split_py', "групп_разделители'":"group_delimiters'",
     'Кортеж':'Tuple',
     'Массив':'Array', 'пуст':'empty', 'соединить':'join', 'применить':'map', 'фильтр':'filter', 'добавить':'append', 'извлечь':'pop', 'индекс':'index', 'сорт':'sort', 'сорт_диапазон':'sort_range', 'обратить':'reverse',
     'Словарь':'Dict', 'получить':'get', 'ключи':'keys', 'значения':'values',
@@ -3726,12 +3726,12 @@ def parse_internal(this_node):
 
             if node.expression.function_call and node.expression.children[0].symbol.id == '.' \
                                          and len(node.expression.children[0].children) == 2   \
-                                            and (node.expression.children[0].children[1].token_str() in ('split', 'split_py') # `V (name, ...) = ....split(...)` ~> `(V name, V ...) = ....split(...)` -> `...assign_from_tuple(name, ...);` (because `auto [name, ...] = ....split(...);` does not working)
+                                            and (node.expression.children[0].children[1].token_str() in ('split', 'split_sg', 'split_py') # `V (name, ...) = ....split(...)` ~> `(V name, V ...) = ....split(...)` -> `...assign_from_tuple(name, ...);` (because `auto [name, ...] = ....split(...);` does not working)
                                              or (node.expression.children[0].children[1].token_str() == 'map' # for `V (w, h) = lines[1].split_py().map(i -> Int(i))`
                                              and node.expression.children[0].children[0].function_call)
                                              and node.expression.children[0].children[0].children[0].symbol.id == '.'
                                          and len(node.expression.children[0].children[0].children[0].children) == 2
-                                             and node.expression.children[0].children[0].children[0].children[1].token_str() in ('split', 'split_py')):
+                                             and node.expression.children[0].children[0].children[0].children[1].token_str() in ('split', 'split_sg', 'split_py')):
                 # n = node
                 # node = ASTTupleAssignment()
                 # for dv in n.dest_vars:
@@ -4147,6 +4147,7 @@ string_scope.add_name('last', str_last_member_var_decl)
 string_scope.add_name('starts_with', ASTFunctionDefinition([('prefix', '', 'String')]))
 string_scope.add_name('ends_with', ASTFunctionDefinition([('suffix', '', 'String')]))
 string_scope.add_name('split', ASTFunctionDefinition([('delim', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?'), ('group_delimiters', token_to_str('0B', Token.Category.CONSTANT), 'Bool')]))
+string_scope.add_name('split_sg', ASTFunctionDefinition([]))
 string_scope.add_name('split_py', ASTFunctionDefinition([]))
 string_scope.add_name('rtrim', ASTFunctionDefinition([('s', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
 string_scope.add_name('ltrim', ASTFunctionDefinition([('s', '', 'String'), ('limit', token_to_str('N', Token.Category.CONSTANT), 'Int?')]))
