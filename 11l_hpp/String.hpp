@@ -25,8 +25,8 @@ class Char
 public:
 	char16_t code;
 
-	Char(char16_t code) : code(code) {}
-	Char(Int c)
+	explicit Char(char16_t code) : code(code) {}
+	explicit Char(Int c)
 	{
 		if (in(c, range_ee(Int(0), Int(0xFFFF))))
 			code = char16_t(c);
@@ -60,9 +60,9 @@ public:
 	Char operator-(Int i) const {return Char(code - (Int)i);} // /
 	Int operator-(Char c) const {return code - c.code;}       // /
 
-	Char    lowercase() const {return Int(towlower(code));}
+	Char    lowercase() const {return Char(Int(towlower(code)));}
 	bool is_lowercase() const {return iswlower(code);}
-	Char    uppercase() const {return Int(towupper(code));}
+	Char    uppercase() const {return Char(Int(towupper(code)));}
 	bool is_uppercase() const {return iswupper(code);}
 	bool is_alpha    () const {return iswalpha(code);}
 
@@ -503,7 +503,7 @@ public:
 		String r;
 		r.resize(len());
 		for (Int i=0; i<len(); i++)
-			r[i] = Int(towlower(at(i)));
+			r[i] = Char(Int(towlower(at(i))));
 		return r;
 	}
 
@@ -512,14 +512,14 @@ public:
 		String r;
 		r.resize(len());
 		for (Int i=0; i<len(); i++)
-			r[i] = Int(towupper(at(i)));
+			r[i] = Char(Int(towupper(at(i))));
 		return r;
 	}
 
 	String capitalize() const
 	{
 		String r(*this);
-		r[0] = Int(towupper(at(0)));
+		r[0] = Char(Int(towupper(at(0))));
 		return r;
 	}
 
@@ -716,6 +716,10 @@ public:
 	bool operator!=(Char ch) const {return !(len() == 1 && at(0) == ch.code);}
 	friend bool operator==(Char ch, const String &s) {return   s.len() == 1 && s.at(0) == ch.code ;}
 	friend bool operator!=(Char ch, const String &s) {return !(s.len() == 1 && s.at(0) == ch.code);}
+	bool operator==(char16_t ch_code) const {return   len() == 1 && at(0) == ch_code ;}
+	bool operator!=(char16_t ch_code) const {return !(len() == 1 && at(0) == ch_code);}
+	bool operator==(Int) const = delete;
+	bool operator!=(Int) const = delete;
 
 	template <int N> bool operator==(const char16_t (&s)[N]) const {return   len() == N-1 && memcmp(c_str(), s, (N-1)*sizeof(char16_t)) == 0 ;}
 	template <int N> bool operator!=(const char16_t (&s)[N]) const {return !(len() == N-1 && memcmp(c_str(), s, (N-1)*sizeof(char16_t)) == 0);}

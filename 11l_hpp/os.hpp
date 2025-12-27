@@ -1,12 +1,12 @@
 namespace os
 {
-static const Char env_path_sep =
+static const Char env_path_sep(
 #ifdef _WIN32
 u';'
 #else
 u':'
 #endif
-;
+);
 
 static const String name =
 #ifdef _WIN32

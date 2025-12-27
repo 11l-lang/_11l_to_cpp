@@ -243,7 +243,7 @@ public:
 		assert(n == 1);
 		char32_t c = as_mutable()->read_char();
 		assert(c <= 0xFFFF);
-		return (char16_t)c;
+		return Char((char16_t)c);
 	}
 
 	template <class Ty> TFile &operator>>(Ty &v)
