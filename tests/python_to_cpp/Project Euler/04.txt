@@ -7,7 +7,7 @@ print(ans)
 ===
 V s = (1..999999).map(i -> String(i)).join(‘’)
 V ans = 1
-L(i) 7
+L(i) 0.<7
    ans *= Int(s[10 ^ i - 1])
 print(ans)
 ===
@@ -18,7 +18,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 7; i++)
+        for (auto i : range_el(0, 7))
             ans *= to_int(s[pow(10, i) - 1]);
         print(ans);
     }

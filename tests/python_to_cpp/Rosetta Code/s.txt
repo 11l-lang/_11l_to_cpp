@@ -91,7 +91,7 @@ F sattolo_cycle(&items)
       V j = random:(i)
       swap(&items[j], &items[i])
 
-L(_) 3
+L(_) 0.<3
    V lst = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
    sattolo_cycle(&lst)
    print(lst)
@@ -108,7 +108,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int _ = 0; _ < 3; _++) {
+        for (auto _ : range_el(0, 3)) {
             auto lst = create_array({1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
             sattolo_cycle(lst);
             print(lst);
@@ -965,7 +965,7 @@ for i in range(16):
         print("%3d : %-3s" % (j,k), end="")
     print()
 ===
-L(i) 16
+L(i) 0.<16
    L(j) (32 + i .. 127).step(16)
       String k
       I j == 32
@@ -981,7 +981,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 16; i++) {
+        for (auto i : range_el(0, 16)) {
             for (auto j : range_ee(32 + i, 127).step(16)) {
                 String k;
                 if (j == 32)
@@ -1740,8 +1740,8 @@ F solve(pz, w, h)
 
 V r = solve(‘011011011111111111111011111000111000001000’, 7, 6)
 I r[0] == 1
-   L(j) 6
-      L(i) 7
+   L(j) 0.<6
+      L(i) 0.<7
          I r[1][i][j] == -1
             print(‘   ’, end' ‘’)
          E
@@ -1814,8 +1814,8 @@ struct CodeBlock1
     CodeBlock1()
     {
         if (_get<0>(r) == 1)
-            for (int j = 0; j < 6; j++) {
-                for (int i = 0; i < 7; i++)
+            for (auto j : range_el(0, 6)) {
+                for (auto i : range_el(0, 7))
                     if (_get<1>(r)[i][j] == -1)
                         print(u"   "_S, u""_S);
                     else
@@ -2097,7 +2097,7 @@ F circle_sort(&l)
       s = circle_sort_backend(&l, 0, l.len)
       swaps += s
    R swaps
-L(i) 309
+L(i) 0.<309
    V l = Array(0 .< i)
    V m = copy(l)
    random:shuffle(&l)
@@ -2142,7 +2142,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 309; i++) {
+        for (auto i : range_el(0, 309)) {
             auto l = create_array(range_el(0, i));
             auto m = copy(l);
             randomns::shuffle(l);
@@ -3654,7 +3654,7 @@ for i in range(10):
 L(i) 1..10
    stack.append(i)
 
-L(i) 10
+L(i) 0.<10
    print(stack.pop())
 ===
 Array<int> stack;
@@ -3666,7 +3666,7 @@ struct CodeBlock1
         for (auto i : range_ee(1, 10))
             stack.append(i);
 
-        for (int i = 0; i < 10; i++)
+        for (auto i : range_el(0, 10))
             print(stack.pop());
     }
 } code_block_1;
@@ -4888,7 +4888,7 @@ L(n) 2..54
    s.append((s[n - 2] - s[n - 1]) % 10 ^ 9)
 
 V r = Deque[Int]()
-L(n) 55
+L(n) 0.<55
    V i = (34 * (n + 1)) % 55
    r.append(s[i])
 
@@ -4903,7 +4903,7 @@ F getnextr()
 L(n) 0 .< 219 - 54
    getnextr()
 
-L(i) 5
+L(i) 0.<5
    print(‘result = ’getnextr())
 ===
 auto s = Deque<int>();
@@ -4927,7 +4927,7 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        for (int n = 0; n < 55; n++) {
+        for (auto n : range_el(0, 55)) {
             auto i = mod((34 * (n + 1)), 55);
             r.append(s[i]);
         }
@@ -4953,7 +4953,7 @@ struct CodeBlock3
         for (auto n : range_el(0, 219 - 54))
             getnextr();
 
-        for (int i = 0; i < 5; i++)
+        for (auto i : range_el(0, 5))
             print(u"result = "_S & getnextr());
     }
 } code_block_3;
@@ -6714,7 +6714,7 @@ V wid = 0
 V hei = 0
 
 F find_next(pa, x, y, z)
-   L(i) 4
+   L(i) 0.<4
       V a = x + :neighbours[i][0]
       V b = y + :neighbours[i][1]
       I a C -1 <.< :wid & b C -1 <.< :hei
@@ -6732,7 +6732,7 @@ F find_solution(&pa, x, y, z)
          R 0
       R find_solution(&pa, s[0], s[1], z + 1)
 
-   L(i) 4
+   L(i) 0.<4
       V a = x + :neighbours[i][0]
       V b = y + :neighbours[i][1]
       I a C -1 <.< :wid & b C -1 <.< :hei
@@ -6804,7 +6804,7 @@ auto hei = 0;
 
 template <typename T1, typename T2, typename T3, typename T4> auto find_next(const T1 &pa, const T2 &x, const T3 &y, const T4 &z)
 {
-    for (int i = 0; i < 4; i++) {
+    for (auto i : range_el(0, 4)) {
         auto a = x + _get<0>(::neighbours[i]);
         auto b = y + _get<1>(::neighbours[i]);
         if (in(a, range_ll(-1, ::wid)) && in(b, range_ll(-1, ::hei))) {
@@ -6827,7 +6827,7 @@ template <typename T1, typename T2, typename T3, typename T4> auto find_solution
         return find_solution(pa, _get<0>(s), _get<1>(s), z + 1);
     }
 
-    for (int i = 0; i < 4; i++) {
+    for (auto i : range_el(0, 4)) {
         auto a = x + _get<0>(::neighbours[i]);
         auto b = y + _get<1>(::neighbours[i]);
         if (in(a, range_ll(-1, ::wid)) && in(b, range_ll(-1, ::hei))) {
@@ -8021,8 +8021,8 @@ T Sudoku
 
    F (rows)
       assert(rows.len == 9 & all(rows.map(row -> row.len == 9)), ‘Grid must be 9 x 9’)
-      L(i) 9
-         L(j) 9
+      L(i) 0.<9
+         L(j) 0.<9
             .grid[9 * i + j] = Int(rows[i][j])
 
    F solve()
@@ -8050,7 +8050,7 @@ T Sudoku
             .grid[pos] = 0
 
    F checkValidity(v, x, y)
-      L(i) 9
+      L(i) 0.<9
          I .grid[y * 9 + i] == v | .grid[i * 9 + x] == v
             R 0B
 
@@ -8065,8 +8065,8 @@ T Sudoku
 
    F String()
       V s = ‘’
-      L(i) 9
-         L(j) 9
+      L(i) 0.<9
+         L(j) 0.<9
             s ‘’= String(.grid[i * 9 + j])‘ ’
             I j C (2, 5)
                s ‘’= ‘| ’
@@ -8088,8 +8088,8 @@ public:
     template <typename T1> Sudoku(const T1 &rows)
     {
         assert(rows.len() == 9 && all_map(rows, [](const auto &row){return row.len() == 9;}), u"Grid must be 9 x 9"_S);
-        for (int i = 0; i < 9; i++)
-            for (int j = 0; j < 9; j++)
+        for (auto i : range_el(0, 9))
+            for (auto j : range_el(0, 9))
                 grid.set(9 * i + j, to_int(rows[i][j]));
     }
 
@@ -8126,7 +8126,7 @@ public:
 
     template <typename T1, typename T2, typename T3> auto checkValidity(const T1 &v, const T2 &x, const T3 &y)
     {
-        for (int i = 0; i < 9; i++)
+        for (auto i : range_el(0, 9))
             if (grid[y * 9 + i] == v || grid[i * 9 + x] == v)
                 return false;
 
@@ -8143,8 +8143,8 @@ public:
     operator String() const
     {
         auto s = u""_S;
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
+        for (auto i : range_el(0, 9)) {
+            for (auto j : range_el(0, 9)) {
                 s &= String(grid[i * 9 + j]) & u" "_S;
                 if (in(j, make_tuple(2, 5)))
                     s &= u"| "_S;
@@ -9673,7 +9673,7 @@ F secTrivial(rs)
       R circleFrom2(rs[0], rs[1])
    assert(rs.len == 3, ‘There shouldn't be more than three points.’)
 
-   L(i) 2
+   L(i) 0.<2
       L(j) i + 1 .< 3
          V c = circleFrom2(rs[i], rs[j])
          I encloses(c, rs)
@@ -9791,7 +9791,7 @@ template <typename T1> auto secTrivial(const T1 &rs)
         return circleFrom2(_get<0>(rs), _get<1>(rs));
     assert(rs.len() == 3, u"There shouldn't be more than three points."_S);
 
-    for (int i = 0; i < 2; i++)
+    for (auto i : range_el(0, 2))
         for (auto j : range_el(i + 1, 3)) {
             auto c = circleFrom2(rs[i], rs[j]);
             if (encloses(c, rs))
@@ -9851,7 +9851,7 @@ F smallest_six(n)
       p *= 6
    R p
 
-L(n) 22
+L(n) 0.<22
    print(‘#2: #.’.format(n, smallest_six(n)))
 ===
 template <typename T1> auto smallest_six(const T1 &n)
@@ -9866,7 +9866,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int n = 0; n < 22; n++)
+        for (auto n : range_el(0, 22))
             print(u"#2: #."_S.format(n, smallest_six(n)));
     }
 } code_block_1;
@@ -10262,7 +10262,7 @@ for n in range(50):
     print(str(s).rjust(7), end = "\n" if (n + 1) % 10 == 0 else ' ')
 ===
 V s = 0
-L(n) 50
+L(n) 0.<50
    s += n * n * n
    print(String(s).rjust(7), end' I (n + 1) % 10 == 0 {"\n"} E ‘ ’)
 ===
@@ -10272,7 +10272,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int n = 0; n < 50; n++) {
+        for (auto n : range_el(0, 50)) {
             s += n * n * n;
             print(String(s).rjust(7), mod((n + 1), 10) == 0 ? u'\n'_C : u' '_C);
         }
@@ -10288,7 +10288,7 @@ for n in range(1000):
         print(f'{n:3}', end = "\n" if count % 8 == 0 else ' ')
 ===
 V count = 0
-L(n) 1000
+L(n) 0.<1000
    I String(sum(String(n).map(d -> Int(d)))) C String(n)
       count++
       print(f:‘{n:3}’, end' I count % 8 == 0 {"\n"} E ‘ ’)
@@ -10299,7 +10299,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int n = 0; n < 1000; n++)
+        for (auto n : range_el(0, 1000))
             if (in(String(sum_map(String(n), [](const auto &d){return to_int(d);})), String(n))) {
                 count++;
                 print(u"#3"_S.format(n), mod(count, 8) == 0 ? u'\n'_C : u' '_C);
@@ -11638,7 +11638,7 @@ L(b_str) bits.split_py()
 
 print("SAME Input & Width.\n")
 bits = ‘01’(10.<0).step(-1).map(x -> ‘0’ * x).join(‘1’)
-L(n) 4
+L(n) 0.<4
    first = 1B
    L(b_str) bits.split_py()
       V b = _to_list(b_str)
@@ -11686,7 +11686,7 @@ int main()
 
     print(u"SAME Input & Width.\n"_S);
     bits = u"01"_S & range_el(10, 0).step(-1).map([](const auto &x){return u"0"_S * x;}).join(u"1"_S);
-    for (int n = 0; n < 4; n++) {
+    for (auto n : range_el(0, 4)) {
         first = true;
         for (auto &&b_str : bits.split_py()) {
             auto b = _to_list(b_str);

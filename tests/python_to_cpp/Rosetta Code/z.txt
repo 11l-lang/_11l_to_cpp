@@ -263,7 +263,7 @@ F neighbours_tuple(x, y, image)
 
 F transitions(neighbours)
    V s = 0
-   L(i) 7
+   L(i) 0.<7
       s += Int((neighbours[i], neighbours[i + 1]) == (0, 1))
    R s + Int((neighbours[7], neighbours[0]) == (0, 1))
 
@@ -379,7 +379,7 @@ template <typename T1, typename T2, typename T3> auto neighbours_tuple(const T1 
 template <typename T1> auto transitions(const T1 &neighbours)
 {
     auto s = 0;
-    for (int i = 0; i < 7; i++)
+    for (auto i : range_el(0, 7))
         s += to_int(make_tuple(neighbours[i], neighbours[i + 1]) == make_tuple(0, 1));
     return s + to_int(make_tuple(_get<7>(neighbours), _get<0>(neighbours)) == make_tuple(0, 1));
 }

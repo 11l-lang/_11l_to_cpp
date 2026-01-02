@@ -102,7 +102,7 @@ L queue.len > 0
    V digits = to_digits(n)
    V tempdigits = Array(digits)
    L(i) 0 .< tempdigits.len
-      L(j) 10
+      L(j) 0.<10
          tempdigits[i] = j
          V m = to_number(tempdigits)
          V nextpmax = max(m, pmax)
@@ -164,7 +164,7 @@ struct CodeBlock1
             auto digits = to_digits(n);
             auto tempdigits = create_array(digits);
             for (auto i : range_el(0, tempdigits.len())) {
-                for (int j = 0; j < 10; j++) {
+                for (auto j : range_el(0, 10)) {
                     tempdigits.set(i, j);
                     auto m = to_number(tempdigits);
                     auto nextpmax = max(m, pmax);

@@ -82,7 +82,7 @@ public:
     {
         Array<Vertex> v;
 
-        for (int n = 0; n < 100; n++)
+        for (auto n : range_el(0, 100))
             v.append(Vertex(String(n + 1)));
 
         Array<Edge> e;
@@ -182,7 +182,7 @@ template <typename T1, typename T2, typename T3> auto dijkstra(const T1 &g, cons
 
 int main()
 {
-    for (int n = 0; n < 100; n++) {
+    for (auto n : range_el(0, 100)) {
         G = Graph();
         auto si = randint(G.v.len());
         auto s = G.v[si];

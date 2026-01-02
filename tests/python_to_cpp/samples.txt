@@ -163,14 +163,14 @@ def f():
 F f()
    L(i) (0.<11).step(2)
       print(i)
-   L(i) 11
+   L(i) 0.<11
       print(i)
 ===
 auto f()
 {
     for (auto i : range_el(0, 11).step(2))
         print(i);
-    for (int i = 0; i < 11; i++)
+    for (auto i : range_el(0, 11))
         print(i);
 }
 
@@ -3212,7 +3212,7 @@ else:
     s = '-1'
     print(s)
 ===
-L(i) 3
+L(i) 0.<3
    I i == 3
       L.break
    print(i)
@@ -3224,7 +3224,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 3; i++) {
+        for (auto i : range_el(0, 3)) {
             if (i == 3)
                 goto break_;
             print(i);

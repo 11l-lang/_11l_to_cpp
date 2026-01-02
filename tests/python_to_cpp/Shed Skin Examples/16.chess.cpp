@@ -43,7 +43,7 @@ template <typename T1> auto evaluate(const T1 &board)
 template <typename T1> auto printBoard(const T1 &board)
 {
     for (auto i : range_el(7, -1).step(-1)) {
-        for (int j = 0; j < 8; j++) {
+        for (auto j : range_el(0, 8)) {
             auto ix = i * 16 + j;
             print(::pieces[board[ix]], u" "_S);
         }

@@ -558,21 +558,21 @@ auto f()
 
 
 F f()
-   L(i) 4 {L(j) 4 {I i + j == 5 {L(i).break}; print(i + j)}}
-   L(i) 4 {L(j) 4 {I i + j == 5 {  ^L.break}; print(i + j)}}
+   L(i) 0.<4 {L(j) 0.<4 {I i + j == 5 {L(i).break}; print(i + j)}}
+   L(i) 0.<4 {L(j) 0.<4 {I i + j == 5 {  ^L.break}; print(i + j)}}
    print(0)
 ===
 auto f()
 {
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++) {
+    for (auto i : range_el(0, 4))
+        for (auto j : range_el(0, 4)) {
             if (i + j == 5)
                 goto break_;
             print(i + j);
         }
     break_:;
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++) {
+    for (auto i : range_el(0, 4))
+        for (auto j : range_el(0, 4)) {
             if (i + j == 5)
                 goto break_1;
             print(i + j);
@@ -2252,7 +2252,7 @@ F f(b = 1B, ', level)
    I b
       print(level)
 
-L(level) 5
+L(level) 0.<5
    f(level' level)
    f(' level)
 ===
@@ -2266,7 +2266,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int level = 0; level < 5; level++) {
+        for (auto level : range_el(0, 5)) {
             f(true, level);
             f(true, level);
         }

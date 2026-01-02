@@ -563,7 +563,7 @@ L(item) items
    s_of_n(item)
    print(‘  Item: #. -> sample: #.’.format(item, s_of_n.sample))
 
-L(trial) 100000
+L(trial) 0.<100000
    s_of_n = S_of_n_creator(3)
    L(item) items
       s_of_n(item)
@@ -614,7 +614,7 @@ struct CodeBlock2
             print(u"  Item: #. -> sample: #."_S.format(item, s_of_n.sample));
         }
 
-        for (int trial = 0; trial < 100000; trial++) {
+        for (auto trial : range_el(0, 100000)) {
             s_of_n = S_of_n_creator(3);
             for (auto &&item : items)
                 s_of_n(item);
@@ -1151,7 +1151,7 @@ F show_pow_i(x, n)
 F show_pow_f(x, n)
    print("#.: #.\n#.^#. = #.6\n".format(n, String(path(n)), x, n, tree_pow_f(x, n)))
 
-L(x) 18
+L(x) 0.<18
    show_pow_i(2, x)
 show_pow_i(3, 191)
 show_pow_f(1.1, 81)
@@ -1211,7 +1211,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int x = 0; x < 18; x++)
+        for (auto x : range_el(0, 18))
             show_pow_i(2, x);
         show_pow_i(3, 191);
         show_pow_f(1.1, 81);

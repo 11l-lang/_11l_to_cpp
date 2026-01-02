@@ -222,7 +222,7 @@ for n in range(10):
     gen = [int(sum(gen[m:m+3]) == 2) for m in range(len(gen)-2)]
 ===
 V gen = ‘_###_##_#_#_#_#__#__’.map(ch -> Int(ch == ‘#’))
-L(n) 10
+L(n) 0.<10
    print(gen.map(cell -> (I cell != 0 {‘#’} E ‘_’)).join(‘’))
    gen = [0] [+] gen [+] [0]
    gen = (0 .< gen.len - 2).map(m -> Int(sum(:gen[m .< m + 3]) == 2))
@@ -233,7 +233,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int n = 0; n < 10; n++) {
+        for (auto n : range_el(0, 10)) {
             print(gen.map([](const auto &cell){return (cell != 0 ? u'#'_C : u'_'_C);}).join(u""_S));
             gen = create_array({0}) + gen + create_array({0});
             gen = range_el(0, gen.len() - 2).map([](const auto &m){return to_int(sum(::gen[range_el(m, m + 3)]) == 2);});

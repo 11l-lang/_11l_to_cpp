@@ -599,7 +599,7 @@ for i in range(100):
    print('Door ' + str(i+1) + ': '+ ('open' if doors[i] else 'close'))
 ===
 V doors = [0B] * 100
-L(i) 100
+L(i) 0.<100
    L(j) (i .< 100).step(i + 1)
       doors[j] = !doors[j]
    print(‘Door ’String(i + 1)‘: ’(I doors[i] {‘open’} E ‘close’))
@@ -610,7 +610,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 100; i++) {
+        for (auto i : range_el(0, 100)) {
             for (auto j : range_el(i, 100).step(i + 1))
                 doors.set(j, !doors[j]);
             print(u"Door "_S & String(i + 1) & u": "_S & (doors[i] ? u"open"_S : u"close"_S));
@@ -1108,7 +1108,7 @@ F fib(n)
       R @f(n - 1) + @f(n - 2)
    R f(n)
 
-L(i) 21
+L(i) 0.<21
    print(fib(i), end' ‘ ’)
 ===
 template <typename T1> auto fib(const T1 &n)
@@ -1126,7 +1126,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 21; i++)
+        for (auto i : range_el(0, 21))
             print(fib(i), u" "_S);
     }
 } code_block_1;
@@ -2093,7 +2093,7 @@ F is_balanced(s)
             R 0B
    R 1B
 
-L(n) 10
+L(n) 0.<10
    V s = gen(n)
    print(s‘’(‘ ’ * (20 - s.len))‘is ’(I is_balanced(s) {‘balanced’} E ‘not balanced’))
 ===
@@ -2122,7 +2122,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int n = 0; n < 10; n++) {
+        for (auto n : range_el(0, 10)) {
             auto s = gen(n);
             print(s & (u" "_S * (20 - s.len())) & u"is "_S & (is_balanced(s) ? u"balanced"_S : u"not balanced"_S));
         }
@@ -2164,7 +2164,7 @@ F get_fibs()
    V a = 1.0
    V b = 1.0
    [Float] r
-   L(i) 1000
+   L(i) 0.<1000
       r.append(a)
       (a, b) = (b, a + b)
    R r
@@ -2193,7 +2193,7 @@ auto get_fibs()
     auto a = 1.0;
     auto b = 1.0;
     Array<double> r;
-    for (int i = 0; i < 1000; i++) {
+    for (auto i : range_el(0, 1000)) {
         r.append(a);
         assign_from_tuple(a, b, make_tuple(b, a + b));
     }
@@ -2279,7 +2279,7 @@ F degrees2compasspoint(=d)
    R q[minorindex].replace(‘N’, p1).replace(‘E’, p2).capitalize()
 
 :start:
-L(i) 33
+L(i) 0.<33
    V d = i * 11.25
    S i % 3
       1
@@ -2319,7 +2319,7 @@ template <typename T1> auto degrees2compasspoint(T1 d)
 
 int main()
 {
-    for (int i = 0; i < 33; i++) {
+    for (auto i : range_el(0, 33)) {
         auto d = i * 11.25;
         switch (mod(i, 3))
         {
@@ -3133,7 +3133,7 @@ universe[(1, 4)] = 1
 universe[(2, 4)] = 1
 universe[(3, 4)] = 1
 
-L(i) 4
+L(i) 0.<4
    print("\nGeneration "String(i)‘:’)
    L(row) 0 .< cellcounty
       print(‘  ’(0 .< cellcountx).map(col -> [‘. ’, ‘O ’][:universe[(@row, col)]]).join(‘’))
@@ -3160,7 +3160,7 @@ struct CodeBlock1
         universe.set(make_tuple(2, 4), 1);
         universe.set(make_tuple(3, 4), 1);
 
-        for (int i = 0; i < 4; i++) {
+        for (auto i : range_el(0, 4)) {
             print(u"\nGeneration "_S & String(i) & u":"_S);
             for (auto row : range_el(0, cellcounty))
                 print(u"  "_S & range_el(0, cellcountx).map([&row](const auto &col){return create_array({u". "_S, u"O "_S})[::universe[make_tuple(row, col)]];}).join(u""_S));
@@ -3242,9 +3242,9 @@ def crc32(buf, crc = UInt32(0)):
 print(hex(crc32('The quick brown fox jumps over the lazy dog'))[2:].upper())
 ===
 V crc_table = [0] * 256
-L(i) 256
+L(i) 0.<256
    UInt32 rem = i
-   L(j) 8
+   L(j) 0.<8
       I rem [&] 1 != 0
          rem >>= 1
          rem (+)= EDB8'8320
@@ -3266,9 +3266,9 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 256; i++) {
+        for (auto i : range_el(0, 256)) {
             uint32_t rem = i;
-            for (int j = 0; j < 8; j++)
+            for (auto j : range_el(0, 8))
                 if ((rem & 1) != 0) {
                     rem >>= 1;
                     rem ^= 0xEDB8'8320;
@@ -4052,7 +4052,7 @@ F bar(i)
    baz(i)
 
 F foo()
-   L(i) 2
+   L(i) 0.<2
       X.try
          bar(i)
       X.catch U0
@@ -4083,7 +4083,7 @@ template <typename T1> auto bar(const T1 &i)
 
 auto foo()
 {
-    for (int i = 0; i < 2; i++) {
+    for (auto i : range_el(0, 2)) {
         try
         {
             bar(i);
@@ -5245,11 +5245,11 @@ print(missing)
 V perms = [‘ABCD’, ‘CABD’, ‘ACDB’, ‘DACB’, ‘BCDA’, ‘ACBD’, ‘ADCB’, ‘CDAB’, ‘DABC’, ‘BCAD’, ‘CADB’, ‘CDBA’, ‘CBAD’, ‘ABDC’, ‘ADBC’, ‘BDCA’, ‘DCBA’, ‘BACD’, ‘BADC’, ‘BDAC’, ‘CBDA’, ‘DBCA’, ‘DCAB’]
 
 V missing = ‘’
-L(i) 4
+L(i) 0.<4
    V cnt = [0] * 4
    L(j) 0 .< perms.len
       cnt[perms[j][i].code - ‘A’.code]++
-   L(j) 4
+   L(j) 0.<4
       I cnt[j] != factorial(4 - 1)
          missing ‘’= Char(code' ‘A’.code + j)
          L.break
@@ -5264,11 +5264,11 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 4; i++) {
+        for (auto i : range_el(0, 4)) {
             auto cnt = create_array({0}) * 4;
             for (auto j : range_el(0, perms.len()))
                 cnt[perms[j][i].code - u'A'_C.code]++;
-            for (int j = 0; j < 4; j++)
+            for (auto j : range_el(0, 4))
                 if (cnt[j] != factorial(4 - 1)) {
                     missing &= Char(u'A'_C.code + j);
                     break;
@@ -5410,7 +5410,7 @@ F fivenum(array)
    V d = [1.0, n4, (n + 1) / 2, n + 1 - n4, Float(n)]
    [Float] sum_array
 
-   L(e) 5
+   L(e) 0.<5
       V fl = floori(d[e] - 1)
       V ce = ceili(d[e] - 1)
       sum_array.append(0.5 * (x[fl] + x[ce]))
@@ -5430,7 +5430,7 @@ template <typename T1> auto fivenum(const T1 &array)
     auto d = create_array({1.0, n4, (n + 1) / 2.0, n + 1 - n4, to_float(n)});
     Array<double> sum_array;
 
-    for (int e = 0; e < 5; e++) {
+    for (auto e : range_el(0, 5)) {
         auto fl = floori(d[e] - 1);
         auto ce = ceili(d[e] - 1);
         sum_array.append(0.5 * (x[fl] + x[ce]));
@@ -5628,7 +5628,7 @@ F difn(s, n) -> [Int]
    R I n != 0 {difn(dif(s), n - 1)} E s
 
 V s = [90, 47, 58, 29, 22, 32, 55, 5, 55, 73]
-L(i) 10
+L(i) 0.<10
    print(difn(s, i))
 ===
 auto dif = [](const auto &s){return enumerate(s[range_ei(1)]).map([&s](const auto &i, const auto &x){return x - s[i];});};
@@ -5643,7 +5643,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 10; i++)
+        for (auto i : range_el(0, 10))
             print(difn(s, i));
     }
 } code_block_1;
@@ -8531,7 +8531,7 @@ F lookandsay(=number)
 
 V num = ‘1’
 
-L(i) 10
+L(i) 0.<10
    print(num)
    num = lookandsay(num)
 ===
@@ -8561,7 +8561,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 10; i++) {
+        for (auto i : range_el(0, 10)) {
             print(num);
             num = lookandsay(num);
         }
@@ -9214,7 +9214,7 @@ print("Switch =", switch)
 V stay = 0
 V _switch_ = 0
 
-L(i) 1000
+L(i) 0.<1000
    V lst = [1, 0, 0]
    random:shuffle(&lst)
 
@@ -9247,7 +9247,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 1000; i++) {
+        for (auto i : range_el(0, 1000)) {
             auto lst = create_array({1, 0, 0});
             randomns::shuffle(lst);
 
@@ -9487,7 +9487,7 @@ print("%1.17f" % perlin_noise(3.14, 42, 7))
 ===
 V p = [-1] * 512
 V permutation = [151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23, 190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33, 88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27, 166, 77, 146, 158, 231, 83, 111, 229, 122, 60, 211, 133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244, 102, 143, 54, 65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208, 89, 18, 169, 200, 196, 135, 130, 116, 188, 159, 86, 164, 100, 109, 198, 173, 186, 3, 64, 52, 217, 226, 250, 124, 123, 5, 202, 38, 147, 118, 126, 255, 82, 85, 212, 207, 206, 59, 227, 47, 16, 58, 17, 182, 189, 28, 42, 223, 183, 170, 213, 119, 248, 152, 2, 44, 154, 163, 70, 221, 153, 101, 155, 167, 43, 172, 9, 129, 22, 39, 253, 19, 98, 108, 110, 79, 113, 224, 232, 178, 185, 112, 104, 218, 246, 97, 228, 251, 34, 242, 193, 238, 210, 144, 12, 191, 179, 162, 241, 81, 51, 145, 235, 249, 14, 239, 107, 49, 192, 214, 31, 181, 199, 106, 157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254, 138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180]
-L(i) 256
+L(i) 0.<256
    p[256 + i] = p[i] = permutation[i]
 
 F fade(t)
@@ -9530,7 +9530,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 256; i++)
+        for (auto i : range_el(0, 256))
             p.set(256 + i, p.set(i, permutation[i]));
     }
 } code_block_1;
@@ -9868,12 +9868,12 @@ T MRG32k3a
 
 V random_gen = MRG32k3a()
 random_gen.seed(1234567)
-L(i) 5
+L(i) 0.<5
    print(random_gen.next_int())
 
 random_gen.seed(987654321)
 V hist = Dict(0.<5, i -> (i, 0))
-L(i) 100'000
+L(i) 0.<100'000
    hist[Int(random_gen.next_float() * 5)]++
 print(hist)
 ===
@@ -9926,7 +9926,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         random_gen.seed(1234567);
-        for (int i = 0; i < 5; i++)
+        for (auto i : range_el(0, 5))
             print(random_gen.next_int());
 
         random_gen.seed(987654321);
@@ -9939,7 +9939,7 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        for (int i = 0; i < 100'000; i++)
+        for (auto i : range_el(0, 100'000))
             hist[to_int(random_gen.next_float() * 5)]++;
         print(hist);
     }
@@ -14186,7 +14186,7 @@ F world2string(ww)
 
 V ww = readfile(w.split("\n"))
 
-L(gen) 10
+L(gen) 0.<10
    print(("\n#3 ".format(gen))‘’(‘=’ * (ww.w - 4))"\n")
    print(world2string(ww))
    ww = nextgen(ww)
@@ -14266,7 +14266,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int gen = 0; gen < 10; gen++) {
+        for (auto gen : range_el(0, 10)) {
             print((u"\n#3 "_S.format(gen)) & (u"="_S * (ww.w - 4)) & u"\n"_S);
             print(world2string(ww));
             ww = nextgen(ww);
@@ -14631,10 +14631,10 @@ F lah(BigInt n, BigInt k)
 
 print(‘Unsigned Lah numbers: L(n, k):’)
 print(‘n/k ’, end' ‘ ’)
-L(i) 13
+L(i) 0.<13
    print(‘#11’.format(i), end' ‘ ’)
 print()
-L(row) 13
+L(row) 0.<13
    print(‘#<4’.format(row), end' ‘ ’)
    L(i) 0 .. row
       V l = lah(row, i)
@@ -14663,10 +14663,10 @@ struct CodeBlock1
     {
         print(u"Unsigned Lah numbers: L(n, k):"_S);
         print(u"n/k "_S, u" "_S);
-        for (int i = 0; i < 13; i++)
+        for (auto i : range_el(0, 13))
             print(u"#11"_S.format(i), u" "_S);
         print();
-        for (int row = 0; row < 13; row++) {
+        for (auto row : range_el(0, 13)) {
             print(u"#<4"_S.format(row), u" "_S);
             for (auto i : range_ee(0, row)) {
                 auto l = lah(row, i);
@@ -15449,7 +15449,7 @@ T Playfair
             I i != j
                .enc[row[i]‘’row[j]] = row[(i + 1) % 5]‘’row[(j + 1) % 5]
 
-      L(ci) 5
+      L(ci) 0.<5
          V c = [m[0][ci], m[1][ci], m[2][ci], m[3][ci], m[4][ci]]
          L(i, j) cart_product(0.<5, 0.<5)
             I i != j
@@ -15521,7 +15521,7 @@ public:
                 if (i != j)
                     enc.set(row[i] & row[j], row[mod((i + 1), 5)] & row[mod((j + 1), 5)]);
 
-        for (int ci = 0; ci < 5; ci++) {
+        for (auto ci : range_el(0, 5)) {
             auto c = create_array({_get<0>(m)[ci], _get<1>(m)[ci], _get<2>(m)[ci], _get<3>(m)[ci], _get<4>(m)[ci]});
             for (auto &&[i, j] : cart_product(range_el(0, 5), range_el(0, 5)))
                 if (i != j)
@@ -15711,9 +15711,9 @@ T Filter
 
 V gen = Filter(PowersGenerator(2), PowersGenerator(3))
 
-L(i) 20
+L(i) 0.<20
    gen()
-L(i) 10
+L(i) 0.<10
    print(gen(), end' ‘ ’)
 ===
 class Generator
@@ -15777,9 +15777,9 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 20; i++)
+        for (auto i : range_el(0, 20))
             gen();
-        for (int i = 0; i < 10; i++)
+        for (auto i : range_el(0, 10))
             print(gen(), u" "_S);
     }
 } code_block_1;
@@ -18411,7 +18411,7 @@ F play_random(n)
    L(_round) 0 .< n
       random:shuffle(&in_drawer)
       V found = 0B
-      L(prisoner) 100
+      L(prisoner) 0.<100
          found = 0B
          L(reveal) random:sample(sampler, 50)
             V card = in_drawer[reveal]
@@ -18430,10 +18430,10 @@ F play_optimal(n)
    L(_round) 0 .< n
       random:shuffle(&in_drawer)
       V found = 0B
-      L(prisoner) 100
+      L(prisoner) 0.<100
          V reveal = prisoner
          found = 0B
-         L(go) 50
+         L(go) 0.<50
             V card = in_drawer[reveal]
             I card == prisoner
                found = 1B
@@ -18458,7 +18458,7 @@ template <typename T1> auto play_random(const T1 &n)
     for (auto _round : range_el(0, n)) {
         randomns::shuffle(in_drawer);
         auto found = false;
-        for (int prisoner = 0; prisoner < 100; prisoner++) {
+        for (auto prisoner : range_el(0, 100)) {
             found = false;
             for (auto &&reveal : randomns::sample(sampler, 50)) {
                 auto card = in_drawer[reveal];
@@ -18483,10 +18483,10 @@ template <typename T1> auto play_optimal(const T1 &n)
     for (auto _round : range_el(0, n)) {
         randomns::shuffle(in_drawer);
         auto found = false;
-        for (int prisoner = 0; prisoner < 100; prisoner++) {
+        for (auto prisoner : range_el(0, 100)) {
             auto reveal = prisoner;
             found = false;
-            for (int go = 0; go < 50; go++) {
+            for (auto go : range_el(0, 50)) {
                 auto card = in_drawer[reveal];
                 if (card == prisoner) {
                     found = true;
@@ -19771,7 +19771,7 @@ L(i) 0 .< n
    print(c[i])
 
 print("\n\nApproximation:\n    x      func(x)       approx      diff")
-L(i) 20
+L(i) 0.<20
    V x = mapper(i, 0.0, 20.0, minv, maxv)
    V f = test_func(x)
    V approx = cheb_approx(x, n, minv, maxv, c)
@@ -19830,7 +19830,7 @@ struct CodeBlock1
             print(c[i]);
 
         print(u"\n\nApproximation:\n    x      func(x)       approx      diff"_S);
-        for (int i = 0; i < 20; i++) {
+        for (auto i : range_el(0, 20)) {
             auto x = mapper(i, 0.0, 20.0, minv, maxv);
             auto f = test_func(x);
             auto approx = cheb_approx(x, n, minv, maxv, c);
@@ -20345,7 +20345,7 @@ F md5(=message)
    L(chunk_ofst) (0 .< message.len).step(64)
       V (a, b, c, d) = hash_pieces
       V chunk = message[chunk_ofst .< chunk_ofst + 64]
-      L(i) 64
+      L(i) 0.<64
          V f = :functions[i I/ 16](b, c, d)
          V g = :index_functions[i I/ 16](i)
          V to_rotate = a + f + :constants[i] + UInt32(bytes' chunk[4 * g .< 4 * g + 4])
@@ -20418,7 +20418,7 @@ template <typename T1> auto md5(T1 message)
     for (auto chunk_ofst : range_el(0, message.len()).step(64)) {
         auto [a, b, c, d] = hash_pieces;
         auto chunk = message[range_el(chunk_ofst, chunk_ofst + 64)];
-        for (int i = 0; i < 64; i++) {
+        for (auto i : range_el(0, 64)) {
             auto f = ::functions[idiv(i, 16)](b, c, d);
             auto g = ::index_functions[idiv(i, 16)](i);
             auto to_rotate = a + f + ::constants[i] + int_t_from_bytes<UInt32>(chunk, range_el(4 * g, 4 * g + 4));

@@ -435,7 +435,7 @@ F pawn_on_promotion_square(pc, pr)
    R 0B
 
 F populate_board(&brd, wp, bp)
-   L(x) 2
+   L(x) 0.<2
       Int piece_amount
       [Char] pieces
       I x == 0
@@ -502,7 +502,7 @@ template <typename T1, typename T2> auto pawn_on_promotion_square(const T1 &pc, 
 
 template <typename T1, typename T2, typename T3> auto populate_board(T1 &brd, const T2 &wp, const T3 &bp)
 {
-    for (int x = 0; x < 2; x++) {
+    for (auto x : range_el(0, 2)) {
         int piece_amount;
         Array<Char> pieces;
         if (x == 0) {
@@ -918,7 +918,7 @@ F gray_decode(=n)
    R n
 
 print(‘DEC,   BIN =>  GRAY => DEC’)
-L(i) 32
+L(i) 0.<32
    V gray = gray_encode(i)
    V dec = gray_decode(gray)
    print(‘ #2, #. => #. => #2’.format(i, bin(i).zfill(5), bin(gray).zfill(5), dec))
@@ -943,7 +943,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         print(u"DEC,   BIN =>  GRAY => DEC"_S);
-        for (int i = 0; i < 32; i++) {
+        for (auto i : range_el(0, 32)) {
             auto gray = gray_encode(i);
             auto dec = gray_decode(gray);
             print(u" #2, #. => #. => #2"_S.format(i, bin(i).zfill(5), bin(gray).zfill(5), dec));
@@ -1195,7 +1195,7 @@ F generate(a, b)
             L.break
    R result
 
-L(i) 5
+L(i) 0.<5
    print(generate(1, 20))
 ===
 template <typename T1, typename T2> auto generate(const T1 &a, const T2 &b)
@@ -1219,7 +1219,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 5; i++)
+        for (auto i : range_el(0, 5))
             print(generate(1, 20));
     }
 } code_block_1;

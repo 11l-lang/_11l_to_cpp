@@ -621,6 +621,6 @@ public:
 int main()
 {
     auto game = std::make_unique<FilebasedMazeGame>();
-    for (int x = 0; x < 1; x++)
+    for (auto x : range_el(0, 1))
         game->runGame();
 }

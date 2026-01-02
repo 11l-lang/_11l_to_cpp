@@ -29,7 +29,7 @@ F evaluate(board)
 
 F printBoard(board)
    L(i) (7 .< -1).step(-1)
-      L(j) 8
+      L(j) 0.<8
          V ix = i * 16 + j
          print(:pieces[board[ix]], end' ‘ ’)
       print()

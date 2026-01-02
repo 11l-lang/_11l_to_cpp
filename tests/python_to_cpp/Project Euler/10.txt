@@ -793,7 +793,7 @@ F compute()
 
    V checkouts = 0
    L(remainingpoints) 1..99
-      L(throws) 3
+      L(throws) 0.<3
          L(p) doublepoints
             I p <= remainingpoints
                checkouts += calc_ways(throws, remainingpoints - p, points.len - 1)
@@ -828,7 +828,7 @@ auto compute()
 
     auto checkouts = 0;
     for (auto remainingpoints : range_ee(1, 99))
-        for (int throws = 0; throws < 3; throws++)
+        for (auto throws : range_el(0, 3))
             for (auto &&p : doublepoints)
                 if (p <= remainingpoints)
                     checkouts += calc_ways(throws, remainingpoints - p, points.len() - 1);

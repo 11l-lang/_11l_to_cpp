@@ -67,7 +67,7 @@ Int64 ans = 0
 F find_harshad_primes(Int64 n; digitsum, isstrong) -> Void
    V m = n * 10
    V s = digitsum
-   L(i) 10
+   L(i) 0.<10
       I m >= :LIMIT
          L.break
       I isstrong & eulerlib:is_prime(m)
@@ -93,7 +93,7 @@ template <typename T2, typename T3> void find_harshad_primes(const Int64 &n, con
 {
     auto m = n * 10;
     auto s = digitsum;
-    for (int i = 0; i < 10; i++) {
+    for (auto i : range_el(0, 10)) {
         if (m >= ::LIMIT)
             break;
         if (isstrong && eulerlib::is_prime(m))

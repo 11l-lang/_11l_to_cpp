@@ -37,7 +37,7 @@ def is_squarefree(n):
 print(sum(n for n in numbers if is_squarefree(n)))
 ===
 V numbers = Set[Int64]()
-L(n) 51
+L(n) 0.<51
    L(k) 0 .. n
       numbers.add(Int64(eulerlib:binomial(n, k)))
 V maximum = max(numbers)
@@ -65,7 +65,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int n = 0; n < 51; n++)
+        for (auto n : range_el(0, 51))
             for (auto k : range_ee(0, n))
                 numbers.add(to_int64(eulerlib::binomial(n, k)));
     }
@@ -194,12 +194,12 @@ F convolve(a, b)
 
 V nine_pyramidal_pdf = [1]
 V PYRAMIDAL_DIE_PDF = [0, 1, 1, 1, 1]
-L(i) 9
+L(i) 0.<9
    nine_pyramidal_pdf = convolve(nine_pyramidal_pdf, PYRAMIDAL_DIE_PDF)
 
 V six_cubic_pdf = [1]
 V CUBIC_DIE_PDF = [0, 1, 1, 1, 1, 1, 1]
-L(i) 6
+L(i) 0.<6
    six_cubic_pdf = convolve(six_cubic_pdf, CUBIC_DIE_PDF)
 
 V ans = Int64(0)
@@ -223,7 +223,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 9; i++)
+        for (auto i : range_el(0, 9))
             nine_pyramidal_pdf = convolve(nine_pyramidal_pdf, PYRAMIDAL_DIE_PDF);
     }
 } code_block_1;
@@ -235,7 +235,7 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        for (int i = 0; i < 6; i++)
+        for (auto i : range_el(0, 6))
             six_cubic_pdf = convolve(six_cubic_pdf, CUBIC_DIE_PDF);
     }
 } code_block_2;

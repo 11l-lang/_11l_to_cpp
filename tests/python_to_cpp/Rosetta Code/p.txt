@@ -1891,7 +1891,7 @@ F primorial(n)
    R r
 
 print(‘First ten primorials: ’(0.<10).map(n -> primorial(n)))
-L(e) 6
+L(e) 0.<6
    V n = 10 ^ e
    print(‘primorial(#.) has #. digits’.format(n, String(primorial(n)).len))
 ===
@@ -1933,7 +1933,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         print(u"First ten primorials: "_S & range_el(0, 10).map([](const auto &n){return primorial(n);}));
-        for (int e = 0; e < 6; e++) {
+        for (auto e : range_el(0, 6)) {
             auto n = pow(10, e);
             print(u"primorial(#.) has #. digits"_S.format(n, String(primorial(n)).len()));
         }
@@ -2173,7 +2173,7 @@ V diff = [0.0] * 15
 iterate(&v, &diff)
 
 V idx = 0
-L(i) 5
+L(i) 0.<5
    L(j) 0 .. i
       print(‘#4’.format(Int(0.5 + v[idx])), end' I j < i {‘ ’} E "\n")
       idx++
@@ -2235,7 +2235,7 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        for (int i = 0; i < 5; i++)
+        for (auto i : range_el(0, 5))
             for (auto j : range_ee(0, i)) {
                 print(u"#4"_S.format(to_int(0.5 + v[idx])), j < i ? u' '_C : u'\n'_C);
                 idx++;
@@ -2920,7 +2920,7 @@ V _cout = [0.10, 0.18, 0.26, 0.32, 0.38, 0.44, 0.50, 0.54, 0.58, 0.62, 0.66, 0.7
 F pricerounder(pricein)
    R :_cout[bisect_right(:_cin, pricein)]
 
-L(i) 11
+L(i) 0.<11
    print(‘#.2 #.2’.format(i / 10, pricerounder(i / 10)))
 ===
 template <typename T1, typename T2> auto bisect_right(const T1 &a, const T2 &x)
@@ -2948,7 +2948,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 11; i++)
+        for (auto i : range_el(0, 11))
             print(u"#.2 #.2"_S.format(i / 10.0, pricerounder(i / 10.0)));
     }
 } code_block_1;
@@ -3540,7 +3540,7 @@ F is_prime(a)
          R 0B
    R 1B
 
-L(n) 1000
+L(n) 0.<1000
    I is_prime(n)
       V s = String(n)
       I s == reversed(s)
@@ -3563,7 +3563,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int n = 0; n < 1000; n++)
+        for (auto n : range_el(0, 1000))
             if (is_prime(n)) {
                 auto s = String(n);
                 if (s == reversed(s))
@@ -4336,7 +4336,7 @@ F pour_on_top(Grid &grid) -> (Int, Int)?
 
 V sample_printed = 0B
 [Float = Int] pcount
-L(p10) 11
+L(p10) 0.<11
    V p = (10 - p10) / 10.0
    pcount[p] = 0
    L(tries) 0 .< t
@@ -4448,7 +4448,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int p10 = 0; p10 < 11; p10++) {
+        for (auto p10 : range_el(0, 11)) {
             auto p = (10 - p10) / 10.0;
             pcount.set(p, 0);
             for (auto tries : range_el(0, t)) {
@@ -4702,7 +4702,7 @@ F check_from_top(&cell) -> (Int, Int)?
 
 V sample_printed = 0B
 [Float = Int] pcount
-L(p10) 11
+L(p10) 0.<11
    V p = p10 / 10.0
    pcount[p] = 0
    L(tries) 0 .< t
@@ -4797,7 +4797,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int p10 = 0; p10 < 11; p10++) {
+        for (auto p10 : range_el(0, 11)) {
             auto p = p10 / 10.0;
             pcount.set(p, 0);
             for (auto tries : range_el(0, t)) {
@@ -5114,19 +5114,19 @@ F getRank(vec)
    R mrRank1(&v, &inv, vec.len)
 
 V tv3 = [0] * 3
-L(r) 6
+L(r) 0.<6
    getPermutation(&tv3, r)
    print(‘#2 -> #. -> #.’.format(r, tv3, getRank(tv3)))
 
 print()
 V tv4 = [0] * 4
-L(r) 24
+L(r) 0.<24
    getPermutation(&tv4, r)
    print(‘#2 -> #. -> #.’.format(r, tv4, getRank(tv4)))
 
 print()
 V tv12 = [0] * 12
-L(i) 4
+L(i) 0.<4
    V r = Int(nonrandom() * factorial(12))
    getPermutation(&tv12, r)
    print(‘#9 -> #. -> #.’.format(r, tv12, getRank(tv12)))
@@ -5184,7 +5184,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int r = 0; r < 6; r++) {
+        for (auto r : range_el(0, 6)) {
             getPermutation(tv3, r);
             print(u"#2 -> #. -> #."_S.format(r, tv3, getRank(tv3)));
         }
@@ -5199,7 +5199,7 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        for (int r = 0; r < 24; r++) {
+        for (auto r : range_el(0, 24)) {
             getPermutation(tv4, r);
             print(u"#2 -> #. -> #."_S.format(r, tv4, getRank(tv4)));
         }
@@ -5214,7 +5214,7 @@ struct CodeBlock3
 {
     CodeBlock3()
     {
-        for (int i = 0; i < 4; i++) {
+        for (auto i : range_el(0, 4)) {
             auto r = to_int(nonrandom() * factorial(12));
             getPermutation(tv12, r);
             print(u"#9 -> #. -> #."_S.format(r, tv12, getRank(tv12)));
@@ -5860,14 +5860,14 @@ F is_prime123(n)
    R ‘123’ C String(n) & is_prime(n)
 
 V c = 0
-L(n) 100'000
+L(n) 0.<100'000
    I is_prime123(n)
       c++
       print(‘#5’.format(n), end' I c % 8 == 0 {"\n"} E ‘ ’)
 print()
 print(‘Found ’c‘ "123" primes less than 100000’)
 c = 0
-L(n) 1'000'000
+L(n) 0.<1'000'000
    I is_prime123(n)
       c++
 print()
@@ -5896,7 +5896,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int n = 0; n < 100'000; n++)
+        for (auto n : range_el(0, 100'000))
             if (is_prime123(n)) {
                 c++;
                 print(u"#5"_S.format(n), mod(c, 8) == 0 ? u'\n'_C : u' '_C);
@@ -5904,7 +5904,7 @@ struct CodeBlock1
         print();
         print(u"Found "_S & c & u" \"123\" primes less than 100000"_S);
         c = 0;
-        for (int n = 0; n < 1'000'000; n++)
+        for (auto n : range_el(0, 1'000'000))
             if (is_prime123(n))
                 c++;
         print();
@@ -5957,7 +5957,7 @@ F digit_sum(=n)
    R result
 
 V c = 0
-L(n) 5000
+L(n) 0.<5000
    I digit_sum(n) == 25 & is_prime(n)
       c++
       print(‘#4’.format(n), end' I c % 6 == 0 {"\n"} E ‘ ’)
@@ -5992,7 +5992,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int n = 0; n < 5000; n++)
+        for (auto n : range_el(0, 5000))
             if (digit_sum(n) == 25 && is_prime(n)) {
                 c++;
                 print(u"#4"_S.format(n), mod(c, 6) == 0 ? u'\n'_C : u' '_C);
@@ -6052,7 +6052,7 @@ F is_non_decreasing(=n)
    R 1B
 
 V c = 0
-L(n) 1000
+L(n) 0.<1000
    I is_non_decreasing(n) & is_prime(n)
       c++
       print(‘#3’.format(n), end' I c % 10 == 0 {"\n"} E ‘ ’)
@@ -6090,7 +6090,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int n = 0; n < 1000; n++)
+        for (auto n : range_el(0, 1000))
             if (is_non_decreasing(n) && is_prime(n)) {
                 c++;
                 print(u"#3"_S.format(n), mod(c, 10) == 0 ? u'\n'_C : u' '_C);
@@ -6410,7 +6410,7 @@ F is_prime(a)
          R 0B
    R 1B
 
-L(n) 500
+L(n) 0.<500
    V h = hex(n)
    I h == reversed(h) & is_prime(n)
       print(h, end' ‘ ’)
@@ -6432,7 +6432,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int n = 0; n < 500; n++) {
+        for (auto n : range_el(0, 500)) {
             auto h = hex(n);
             if (h == reversed(h) && is_prime(n))
                 print(h, u" "_S);
@@ -7114,7 +7114,7 @@ T Tiling
 
       .grid = [[-1] * NCols] * NRows
 
-      L(i) 4
+      L(i) 0.<4
          L
             V randRow = nonrandom(NRows)
             V randCol = nonrandom(NCols)
@@ -7241,7 +7241,7 @@ public:
 
         grid = create_array({create_array({-1}) * NCols}) * NRows;
 
-        for (int i = 0; i < 4; i++)
+        for (auto i : range_el(0, 4))
             while (true) {
                 auto randRow = nonrandom(NRows);
                 auto randCol = nonrandom(NCols);
@@ -7849,7 +7849,7 @@ F random()
    :seed = Int(String(Int64(:seed) ^ 2).zfill(12)[3.<9])
    R :seed
 
-L(_) 5
+L(_) 0.<5
    print(random())
 ===
 auto seed = 675248;
@@ -7864,7 +7864,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int _ = 0; _ < 5; _++)
+        for (auto _ : range_el(0, 5))
             print(random());
     }
 } code_block_1;

@@ -52,7 +52,7 @@ F find_group(mark, min_n, max_n, depth = 1)
    I depth == 4
       V prefix = I mark == ‘1’ {‘’} E ‘un’
       print(‘Fail, found totally #.connected group:’.format(prefix))
-      L(i) 4
+      L(i) 0.<4
          print(:idx[i])
       R 1B
 
@@ -70,17 +70,17 @@ F find_group(mark, min_n, max_n, depth = 1)
 
    R 0B
 
-L(i) 17
+L(i) 0.<17
    a[i][i] = ‘-’
-L(k) 4
-   L(i) 17
+L(k) 0.<4
+   L(i) 0.<17
       V j = (i + pow(2, k)) % 17
       a[i][j] = a[j][i] = ‘1’
 
 L(row) a
    print(row.join(‘ ’))
 
-L(i) 17
+L(i) 0.<17
    idx[0] = i
    I find_group(‘1’, i + 1, 17) | find_group(‘0’, i + 1, 17)
       print(‘no good’)
@@ -96,7 +96,7 @@ template <typename T1, typename T2, typename T3, typename T4 = decltype(1)> auto
     if (depth == 4) {
         auto prefix = mark == u'1' ? u""_S : u"un"_S;
         print(u"Fail, found totally #.connected group:"_S.format(prefix));
-        for (int i = 0; i < 4; i++)
+        for (auto i : range_el(0, 4))
             print(::idx[i]);
         return true;
     }
@@ -123,10 +123,10 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 17; i++)
+        for (auto i : range_el(0, 17))
             a[i].set(i, u'-'_C);
-        for (int k = 0; k < 4; k++)
-            for (int i = 0; i < 17; i++) {
+        for (auto k : range_el(0, 4))
+            for (auto i : range_el(0, 17)) {
                 auto j = mod((i + pow(2, k)), 17);
                 a[i].set(j, a[j].set(i, u'1'_C));
             }
@@ -134,7 +134,7 @@ struct CodeBlock1
         for (auto &&row : a)
             print(row.join(u" "_S));
 
-        for (int i = 0; i < 17; i++) {
+        for (auto i : range_el(0, 17)) {
             _set<0>(idx, i);
             if (find_group(u"1"_S, i + 1, 17) || find_group(u"0"_S, i + 1, 17)) {
                 print(u"no good"_S);
@@ -2901,7 +2901,7 @@ F riordan(nn)
 
 V rios = riordan(10'000)
 
-L(i) 32
+L(i) 0.<32
    print(f:‘{commatize(rios[i]):18}’, end' I (i + 1) % 4 == 0 {"\n"} E ‘’)
 
 print(‘The 1,000th Riordan has ’String(rios[999]).len‘ digits.’)
@@ -2921,7 +2921,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 32; i++)
+        for (auto i : range_el(0, 32))
             print(u"#18"_S.format(commatize(rios[i])), mod((i + 1), 4) == 0 ? u"\n"_S : u""_S);
 
         print(u"The 1,000th Riordan has "_S & String(_get<999>(rios)).len() & u" digits."_S);

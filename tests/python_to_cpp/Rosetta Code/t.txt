@@ -561,7 +561,7 @@ print(time_func(lambda: do_work(100)))
 ===
 F do_work(x)
    V n = x
-   L(i) 10000000
+   L(i) 0.<10000000
       n += i
    R n
 
@@ -575,7 +575,7 @@ print(time_func(() -> do_work(100)))
 template <typename T1> auto do_work(const T1 &x)
 {
     auto n = x;
-    for (int i = 0; i < 10000000; i++)
+    for (auto i : range_el(0, 10000000))
         n += i;
     return n;
 }
@@ -2578,7 +2578,7 @@ F rshift()
    :cylinder[0] = t
 
 F unload()
-   L(i) 6
+   L(i) 0.<6
       :cylinder[i] = 0B
 
 F load()
@@ -2648,7 +2648,7 @@ auto rshift()
 
 auto unload()
 {
-    for (int i = 0; i < 6; i++)
+    for (auto i : range_el(0, 6))
         ::cylinder.set(i, false);
 }
 
@@ -3142,7 +3142,7 @@ F to_str(b)
 print(‘Exact hits:’)
 L(n) 0 .< 1 << 12
    V bools = [0] * 12
-   L(i) 12
+   L(i) 0.<12
       I n [&] (1 << (11 - i)) != 0
          bools[i] = 1
 
@@ -3156,7 +3156,7 @@ L(n) 0 .< 1 << 12
 print("\nNear misses:")
 L(n) 0 .< 1 << 12
    V bools = [0] * 12
-   L(i) 12
+   L(i) 0.<12
       I n [&] (1 << (11 - i)) != 0
          bools[i] = 1
 
@@ -3205,7 +3205,7 @@ struct CodeBlock2
         print(u"Exact hits:"_S);
         for (auto n : range_el(0, 1 << 12)) {
             auto bools = create_array({0}) * 12;
-            for (int i = 0; i < 12; i++)
+            for (auto i : range_el(0, 12))
                 if ((n & (1 << (11 - i))) != 0)
                     bools.set(i, 1);
             {int Lindex = 0;
@@ -3223,7 +3223,7 @@ struct CodeBlock2
         print(u"\nNear misses:"_S);
         for (auto n : range_el(0, 1 << 12)) {
             auto bools = create_array({0}) * 12;
-            for (int i = 0; i < 12; i++)
+            for (auto i : range_el(0, 12))
                 if ((n & (1 << (11 - i))) != 0)
                     bools.set(i, 1);
 

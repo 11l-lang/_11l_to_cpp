@@ -899,7 +899,7 @@ L
             records[games[i][1].code - ‘1’.code] += 3
 
    records.sort()
-   L(i) 4
+   L(i) 0.<4
       points[i][records[i]]++
 
    I !nextResult()
@@ -908,9 +908,9 @@ L
 print(‘POINTS       0    1    2    3    4    5    6    7    8    9’)
 print(‘-------------------------------------------------------------’)
 V places = [‘1st’, ‘2nd’, ‘3rd’, ‘4th’]
-L(i) 4
+L(i) 0.<4
    print(places[i], end' ‘ place    ’)
-   L(j) 10
+   L(j) 0.<10
       print(‘#<5’.format(points[3 - i][j]), end' ‘’)
    print()
 ===
@@ -962,7 +962,7 @@ struct CodeBlock1
                 }
 
             records.sort();
-            for (int i = 0; i < 4; i++)
+            for (auto i : range_el(0, 4))
                 points[i][records[i]]++;
 
             if (!nextResult())
@@ -980,9 +980,9 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        for (int i = 0; i < 4; i++) {
+        for (auto i : range_el(0, 4)) {
             print(places[i], u" place    "_S);
-            for (int j = 0; j < 10; j++)
+            for (auto j : range_el(0, 10))
                 print(u"#<5"_S.format(points[3 - i][j]), u""_S);
             print();
         }

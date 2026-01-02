@@ -67,12 +67,12 @@ struct CodeBlock1
 
 // Vertically
 L(digit) digits
-   L(line) 5
+   L(line) 0.<5
       print(g[line][Int(digit)-1])
    print()
 
 // Horizontally
-L(line) 5
+L(line) 0.<5
    L(digit) digits
       print(g[line][Int(digit)-1], end' ‘  ’)
    print()
@@ -85,12 +85,12 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto &&digit : digits) {
-            for (int line = 0; line < 5; line++)
+            for (auto line : range_el(0, 5))
                 print(g[line][to_int(digit) - 1]);
             print();
         }
 
-        for (int line = 0; line < 5; line++) {
+        for (auto line : range_el(0, 5)) {
             for (auto &&digit : digits)
                 print(g[line][to_int(digit) - 1], u"  "_S);
             print();

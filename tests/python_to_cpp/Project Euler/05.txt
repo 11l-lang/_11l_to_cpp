@@ -129,14 +129,14 @@ F compute()
       L(mask) 0 .< 1 << n.len
          V digits = do_mask(n, mask)
          V count = 0
-         L(j) 10
+         L(j) 0.<10
             I digits[0] != 0 & isprime[to_number(digits)]
                count++
             digits = add_mask(digits, mask)
 
          I count == 8
             digits = do_mask(n, mask)
-            L(j) 10
+            L(j) 0.<10
                I digits[0] != 0 & isprime[to_number(digits)]
                   R String(to_number(digits))
                digits = add_mask(digits, mask)
@@ -177,7 +177,7 @@ auto compute()
         for (auto mask : range_el(0, 1 << n.len())) {
             auto digits = do_mask(n, mask);
             auto count = 0;
-            for (int j = 0; j < 10; j++) {
+            for (auto j : range_el(0, 10)) {
                 if (_get<0>(digits) != 0 && isprime[to_number(digits)])
                     count++;
                 digits = add_mask(digits, mask);
@@ -185,7 +185,7 @@ auto compute()
 
             if (count == 8) {
                 digits = do_mask(n, mask);
-                for (int j = 0; j < 10; j++) {
+                for (auto j : range_el(0, 10)) {
                     if (_get<0>(digits) != 0 && isprime[to_number(digits)])
                         return String(to_number(digits));
                     digits = add_mask(digits, mask);
@@ -368,7 +368,7 @@ F parse_card(card)
 
 F get_straight_high_rank(ranks)
    L(i) (ranks.len - 1 .< 2).step(-1)
-      L(j) 5
+      L(j) 0.<5
          I ranks[(i - j + 13) % 13] == 0
             L.break
       L.was_no_break
@@ -447,7 +447,7 @@ template <typename T1> auto parse_card(const T1 &card)
 template <typename T1> auto get_straight_high_rank(const T1 &ranks)
 {
     for (auto i : range_el(ranks.len() - 1, 2).step(-1)) {
-        for (int j = 0; j < 5; j++)
+        for (auto j : range_el(0, 5))
             if (ranks[mod((i - j + 13), 13)] == 0)
                 goto break_;
         return i;
@@ -544,7 +544,7 @@ def is_lychrel(n : BigInt):
 print(sum(1 for i in range(10000) if is_lychrel(i)))
 ===
 F is_lychrel(BigInt =n)
-   L(i) 50
+   L(i) 0.<50
       n += BigInt(reversed(String(n)))
       I String(n) == reversed(String(n))
          R 0B
@@ -554,7 +554,7 @@ print(sum((0.<10000).filter(i -> is_lychrel(i)).map(i -> 1)))
 ===
 auto is_lychrel(BigInt n)
 {
-    for (int i = 0; i < 50; i++) {
+    for (auto i : range_el(0, 50)) {
         n += BigInt(reversed(String(n)));
         if (String(n) == reversed(String(n)))
             return false;
@@ -653,7 +653,7 @@ for n in itertools.count(1, 2):
 ===
 V numprimes = 0
 L(n) (1..).step(2)
-   L(i) 4
+   L(i) 0.<4
       I eulerlib:is_prime(n * n - i * (n - 1))
          numprimes++
    I n > 1 & numprimes * 10 < n * 2 - 1
@@ -671,7 +671,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         for (auto n : range_ei(1).step(2)) {
-            for (int i = 0; i < 4; i++)
+            for (auto i : range_el(0, 4))
                 if (eulerlib::is_prime(n * n - i * (n - 1)))
                     numprimes++;
             if (n > 1 && numprimes * 10 < n * 2 - 1) {

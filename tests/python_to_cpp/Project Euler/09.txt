@@ -288,7 +288,7 @@ F longest_consecutive((Int, Int, Int, Int) abcd)
    V ops = [0, 0, 0, a, b, c, d]
    L
 
-      L(i) 64
+      L(i) 0.<64
          [Float] stack
          V j = 0
 
@@ -356,7 +356,7 @@ auto longest_consecutive(const ivec4 &abcd)
     auto ops = create_array({0, 0, 0, a, b, c, d});
     while (true) {
 
-        for (int i = 0; i < 64; i++) {
+        for (auto i : range_el(0, 64)) {
             Array<double> stack;
             auto j = 0;
 
@@ -734,8 +734,8 @@ F solve(puzzlestr)
    V colfree = (0.<9).map(i -> Set(1..9))
    V rowfree = (0.<9).map(i -> Set(1..9))
    V boxfree = (0.<9).map(i -> Set(1..9))
-   L(y) 9
-      L(x) 9
+   L(y) 0.<9
+      L(x) 0.<9
          V d = state[y * 9 + x]
          I d != 0
             colfree[x].remove(d)
@@ -786,8 +786,8 @@ template <typename T1> auto solve(const T1 &puzzlestr)
     auto colfree = range_el(0, 9).map([](const auto &i){return create_set(range_ee(1, 9));});
     auto rowfree = range_el(0, 9).map([](const auto &i){return create_set(range_ee(1, 9));});
     auto boxfree = range_el(0, 9).map([](const auto &i){return create_set(range_ee(1, 9));});
-    for (int y = 0; y < 9; y++)
-        for (int x = 0; x < 9; x++) {
+    for (auto y : range_el(0, 9))
+        for (auto x : range_el(0, 9)) {
             auto d = state[y * 9 + x];
             if (d != 0) {
                 colfree[x].remove(d);
@@ -952,7 +952,7 @@ F max_square_pair(a, b, index, &assignments, &isdigitused)
 
    E
       V result = 0
-      L(i) 10
+      L(i) 0.<10
          I !isdigitused[i]
             isdigitused[i] = 1B
             assignments[a[index]] = i
@@ -1009,7 +1009,7 @@ template <typename T1, typename T2, typename T3, typename T4, typename T5> auto 
 
     else {
         auto result = 0;
-        for (int i = 0; i < 10; i++)
+        for (auto i : range_el(0, 10))
             if (!isdigitused[i]) {
                 isdigitused.set(i, true);
                 assignments.set(a[index], i);

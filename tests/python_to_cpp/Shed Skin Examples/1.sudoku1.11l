@@ -5,16 +5,16 @@ F validMove(puzzle, x, y, number)
    I puzzle[x][y] != 0
       blnOK = 0B
    I blnOK
-      L(i) 9
+      L(i) 0.<9
          I puzzle[i][y] == number
             blnOK = 0B
    I blnOK
-      L(j) 9
+      L(j) 0.<9
          I puzzle[x][j] == number
             blnOK = 0B
    I blnOK
-      L(i) 3
-         L(j) 3
+      L(i) 0.<3
+         L(j) 0.<3
             I puzzle[px * 3 + i][py * 3 + j] == number
                blnOK = 0B
    R blnOK
@@ -28,8 +28,8 @@ F findallMoves(puzzle, x, y)
 
 F solvePuzzleStep([[Int]] &puzzle)
    V isChanged = 0B
-   L(y) 9
-      L(x) 9
+   L(y) 0.<9
+      L(x) 0.<9
          I puzzle[x][y] == 0
             V allMoves = findallMoves(puzzle, x, y)
             I allMoves.len == 1
@@ -52,7 +52,7 @@ F calc_hash_of_list(l)
 
 F calc_hash(puzzle)
    V hashcode = 0
-   L(c) 9
+   L(c) 0.<9
       hashcode = hashcode * 17 + calc_hash_of_list(puzzle[c])
    R hashcode
 
@@ -65,9 +65,9 @@ F hash_lookup(puzzle)
 V iterations = 0
 
 F printpuzzle(puzzle)
-   L(x) 9
+   L(x) 0.<9
       V s = ‘ ’
-      L(y) 9
+      L(y) 0.<9
          V p = puzzle[x][y]
          I p == 0
             s ‘’= ‘.’
@@ -78,8 +78,8 @@ F printpuzzle(puzzle)
 
 F genMoveList(puzzle, i, j)
    V l = Array(1..9)
-   L(y) 3
-      L(x) 3
+   L(y) 0.<3
+      L(x) 0.<3
          V p = puzzle[i * 3 + x][j * 3 + y]
          I p != 0
             l.remove(p)
@@ -96,7 +96,7 @@ F perm([[Int]] &puzzle; i, j, =l, [(Int, Int)] &u)
       I l.empty
 
          [[Int]] puzzlebackup
-         L(c) 9
+         L(c) 0.<9
             puzzlebackup.append(puzzle[c][0..])
          solvePuzzleSimple(&puzzle)
 
@@ -112,8 +112,8 @@ F perm([[Int]] &puzzle; i, j, =l, [(Int, Int)] &u)
                   hash_add(puzzle)
                u.insert(c, (inew, jnew))
 
-         L(y) 9
-            L(x) 9
+         L(y) 0.<9
+            L(x) 0.<9
                puzzle[x][y] = puzzlebackup[x][y]
          hash_add(puzzle)
          R 0B
@@ -121,8 +121,8 @@ F perm([[Int]] &puzzle; i, j, =l, [(Int, Int)] &u)
          V ii = i * 3
          V jj = j * 3
          L(m) 0 .< l.len
-            L(y) 3
-               L(x) 3
+            L(y) 0.<3
+               L(x) 0.<3
                   I validMove(puzzle, x + ii, y + jj, l[m])
                      puzzle[x + ii][y + jj] = l[m]
                      V backup = l.pop(m)
@@ -139,8 +139,8 @@ F solve()
 
    [(Int, Int)] u
    [Int] lcount
-   L(y) 3
-      L(x) 3
+   L(y) 0.<3
+      L(x) 0.<3
          u.append((x, y))
          lcount.append(genMoveList(puzzle, x, y).len)
 
@@ -154,5 +154,5 @@ F solve()
    V l = genMoveList(puzzle, 0, 0)
    perm(&puzzle, 0, 0, l, &u)
 
-L(x) 30
+L(x) 0.<30
    solve()

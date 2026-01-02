@@ -50,7 +50,7 @@ unary_operators.append(Set([‘(-)’]))
 unary_operators.append(Set(empty_list_of_str))
 V all_operators = Set[String]()
 [Set[String]] operators
-L(i) 5
+L(i) 0.<5
    operators.append(binary_operators[i] [|] unary_operators[i])
    all_operators [|]= binary_operators[i] [|] unary_operators[i]
 V first_char_of_operators = Set[Char]()

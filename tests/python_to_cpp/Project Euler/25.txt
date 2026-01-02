@@ -22,7 +22,7 @@ subsets[0] = 1
 
 L(i) 1 .. 250250
    V offset = pow(Int64(i), i, 250)
-   L(j) 250
+   L(j) 0.<250
       nsubsets[(j + offset) % 250] = (subsets[j] + subsets[(j + offset) % 250]) % MOD
    swap(&subsets, &nsubsets)
 
@@ -40,7 +40,7 @@ struct CodeBlock1
 
         for (auto i : range_ee(1, 250250)) {
             auto offset = pow(to_int64(i), i, 250);
-            for (int j = 0; j < 250; j++)
+            for (auto j : range_el(0, 250))
                 nsubsets.set(mod((j + offset), 250), mod((subsets[j] + subsets[mod((j + offset), 250)]), MOD));
             swap(subsets, nsubsets);
         }

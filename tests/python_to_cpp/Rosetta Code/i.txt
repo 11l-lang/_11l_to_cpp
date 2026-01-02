@@ -1348,7 +1348,7 @@ F isqrt(BigInt x)
    R r
 
 print(‘The integer square root of integers from 0 to 65 are:’)
-L(i) 66
+L(i) 0.<66
    print(isqrt(BigInt(i)), end' ‘ ’)
 print()
 
@@ -1401,7 +1401,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         print(u"The integer square root of integers from 0 to 65 are:"_S);
-        for (int i = 0; i < 66; i++)
+        for (auto i : range_el(0, 66))
             print(isqrt(BigInt(i)), u" "_S);
         print();
 

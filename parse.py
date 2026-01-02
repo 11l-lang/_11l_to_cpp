@@ -1989,8 +1989,8 @@ class ASTLoop(ASTNodeWithChildren, ASTNodeWithExpression):
 
         csv_read_column_names = []
         loop_auto = False
-        if self.expression is not None and self.expression.token.category == Token.Category.NUMERIC_LITERAL:
-            lv = self.loop_variable if self.loop_variable is not None else 'Lindex'
+        if self.loop_variable is None and self.expression is not None and self.expression.token.category == Token.Category.NUMERIC_LITERAL:
+            lv = 'Lindex'
             tr = 'for (' + ('Int' if int_is_int64 else 'int') + ' ' + lv + ' = 0; ' + lv + ' < ' + self.expression.to_str() + '; ' + lv + '++)'
         else:
             if self.loop_variable is not None or (self.expression is not None and self.expression.symbol.id in ('..', '.<')):

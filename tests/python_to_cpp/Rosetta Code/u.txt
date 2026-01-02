@@ -49,7 +49,7 @@ F ulam(n)
          query++
    R query
 
-L(p) 5
+L(p) 0.<5
    V n = 10 ^ p
    print(‘The #.#. Ulam number is #.’.format(n, I n != 1 {‘th’} E ‘st’, ulam(n)))
 ===
@@ -86,7 +86,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int p = 0; p < 5; p++) {
+        for (auto p : range_el(0, 5)) {
             auto n = pow(10, p);
             print(u"The #.#. Ulam number is #."_S.format(n, n != 1 ? u"th"_S : u"st"_S, ulam(n)));
         }
@@ -358,7 +358,7 @@ F decodeUPC(input)
          R (0B, [Int]())
 
       [Int] output
-      L(i) 6
+      L(i) 0.<6
          part = candidate[pos .< pos + 7]
          pos += 7
 
@@ -373,7 +373,7 @@ F decodeUPC(input)
       E
          R (0B, output)
 
-      L(i) 6
+      L(i) 0.<6
          part = candidate[pos .< pos + 7]
          pos += 7
 
@@ -435,7 +435,7 @@ template <typename T1> auto decodeUPC(const T1 &input)
             return make_tuple(false, Array<int>());
 
         Array<int> output;
-        for (int i = 0; i < 6; i++) {
+        for (auto i : range_el(0, 6)) {
             part = candidate[range_el(pos, pos + 7)];
             pos += 7;
 
@@ -451,7 +451,7 @@ template <typename T1> auto decodeUPC(const T1 &input)
         else
             return make_tuple(false, output);
 
-        for (int i = 0; i < 6; i++) {
+        for (auto i : range_el(0, 6)) {
             part = candidate[range_el(pos, pos + 7)];
             pos += 7;
 

@@ -334,7 +334,7 @@ for s in range(11):
 F maprange(a, b, s)
    R b[0] + (Float(s - a[0]) * (b[1] - b[0]) / (a[1] - a[0]))
 
-L(s) 11
+L(s) 0.<11
    print(‘#2 maps to #.’.format(s, maprange((0, 10), (-1, 0), s)))
 ===
 template <typename T1, typename T2, typename T3> auto maprange(const T1 &a, const T2 &b, const T3 &s)
@@ -346,7 +346,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int s = 0; s < 11; s++)
+        for (auto s : range_el(0, 11))
             print(u"#2 maps to #."_S.format(s, maprange(make_tuple(0, 10), make_tuple(-1, 0), s)));
     }
 } code_block_1;
@@ -977,7 +977,7 @@ for i in range(5000):
     if i == sum(int(x) ** int(x) for x in str(i)):
         print(i)
 ===
-L(i) 5000
+L(i) 0.<5000
    I i == sum(String(i).map(x -> Int(x) ^ Int(x)))
       print(i)
 ===
@@ -985,7 +985,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 5000; i++)
+        for (auto i : range_el(0, 5000))
             if (i == sum_map(String(i), [](const auto &x){return pow(to_int(x), to_int(x));}))
                 print(i);
     }
@@ -2050,7 +2050,7 @@ F printtable(data)
       print(row.map(cell -> ‘#<5’.format(cell)).join(‘ ’))
 
 V m = [[3, 2], [2, 1]]
-L(i) 5
+L(i) 0.<5
    print("\n#.:".format(i))
    printtable(matrixExp(m, i))
 
@@ -2098,7 +2098,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 5; i++) {
+        for (auto i : range_el(0, 5)) {
             print(u"\n#.:"_S.format(i));
             printtable(matrixExp(m, i));
         }
@@ -2533,7 +2533,7 @@ F draw(mayans)
 
    print(:UL, end' ‘’)
    L(i) 0 .. idx
-      L(j) 4
+      L(j) 0.<4
          print(:HB, end' ‘’)
       I i < idx
          print(:UC, end' ‘’)
@@ -2548,7 +2548,7 @@ F draw(mayans)
 
    print(:LL, end' ‘’)
    L(i) 0 .. idx
-      L(j) 4
+      L(j) 0.<4
          print(:HB, end' ‘’)
       I i < idx
          print(:LC, end' ‘’)
@@ -2614,7 +2614,7 @@ template <typename T1> auto draw(const T1 &mayans)
 
     print(::UL, u""_S);
     for (auto i : range_ee(0, idx)) {
-        for (int j = 0; j < 4; j++)
+        for (auto j : range_el(0, 4))
             print(::HB, u""_S);
         if (i < idx)
             print(::UC, u""_S);
@@ -2631,7 +2631,7 @@ template <typename T1> auto draw(const T1 &mayans)
 
     print(::LL, u""_S);
     for (auto i : range_ee(0, idx)) {
-        for (int j = 0; j < 4; j++)
+        for (auto j : range_el(0, 4))
             print(::HB, u""_S);
         if (i < idx)
             print(::LC, u""_S);

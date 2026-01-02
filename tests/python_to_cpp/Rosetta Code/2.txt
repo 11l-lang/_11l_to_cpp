@@ -326,7 +326,7 @@ T RPNParse
 
 [Int] digits
 print(‘Make 24 with the digits:’, end' ‘’)
-L(i) 4
+L(i) 0.<4
    V n = random:(1 .. 9)
    print(‘ ’String(n), end' ‘’)
    digits.append(n)
@@ -413,7 +413,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         print(u"Make 24 with the digits:"_S, u""_S);
-        for (int i = 0; i < 4; i++) {
+        for (auto i : range_el(0, 4)) {
             auto n = randomns::_(range_ee(1, 9));
             print(u" "_S & String(n), u""_S);
             digits.append(n);

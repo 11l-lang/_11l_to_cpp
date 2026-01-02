@@ -647,7 +647,7 @@ F nextNum()
    R :num
 
 print(‘The first 200 numbers are:’)
-L(i) 200
+L(i) 0.<200
    print(nextNum(), end' ‘ ’)
 print()
 
@@ -686,7 +686,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         print(u"The first 200 numbers are:"_S);
-        for (int i = 0; i < 200; i++)
+        for (auto i : range_el(0, 200))
             print(nextNum(), u" "_S);
         print();
 
@@ -2182,12 +2182,12 @@ F nimprod(Int x, Int y)
 
 L(f, op) ((nimsum, ‘+’), (nimprod, ‘*’))
    print(‘ ’op‘ |’, end' ‘’)
-   L(i) 16
+   L(i) 0.<16
       print(‘#3’.format(i), end' ‘’)
    print("\n--- "(‘-’ * 48))
-   L(i) 16
+   L(i) 0.<16
       print(‘#2 |’.format(i), end' ‘’)
-      L(j) 16
+      L(j) 0.<16
          print(‘#3’.format(f(i, j)), end' ‘’)
       print()
    print()
@@ -2240,12 +2240,12 @@ struct CodeBlock1
     {
         for (auto &&[f, op] : make_tuple(make_tuple(nimsum, u"+"_S), make_tuple(nimprod, u"*"_S))) {
             print(u" "_S & op & u" |"_S, u""_S);
-            for (int i = 0; i < 16; i++)
+            for (auto i : range_el(0, 16))
                 print(u"#3"_S.format(i), u""_S);
             print(u"\n--- "_S & (u"-"_S * 48));
-            for (int i = 0; i < 16; i++) {
+            for (auto i : range_el(0, 16)) {
                 print(u"#2 |"_S.format(i), u""_S);
-                for (int j = 0; j < 16; j++)
+                for (auto j : range_el(0, 16))
                     print(u"#3"_S.format(f(i, j)), u""_S);
                 print();
             }
@@ -2387,7 +2387,7 @@ F palindrome(n, base)
    R n == reverse(n, base)
 
 V cnt = 0
-L(i) 25000
+L(i) 0.<25000
    I all((2, 4, 16).map(base -> palindrome(@i, base)))
       cnt++
       print(‘#5’.format(i), end' " \n"[cnt % 12 == 0])
@@ -2415,7 +2415,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 25000; i++)
+        for (auto i : range_el(0, 25000))
             if (all_map(make_tuple(2, 4, 16), [&i](const auto &base){return palindrome(i, base);})) {
                 cnt++;
                 print(u"#5"_S.format(i), u" \n"_S[mod(cnt, 12) == 0]);
@@ -2527,7 +2527,7 @@ for i in range(100000):
 print()
 ===
 V col = 0
-L(i) 100000
+L(i) 0.<100000
    I Set(Array(String(i))) == Set(Array(hex(i)))
       col++
       print(‘#7’.format(i), end' "\n"[0 .< Int(col % 10 == 0)])
@@ -2539,7 +2539,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 100000; i++)
+        for (auto i : range_el(0, 100000))
             if (create_set(create_array(String(i))) == create_set(create_array(hex(i)))) {
                 col++;
                 print(u"#7"_S.format(i), u"\n"_S[range_el(0, to_int(mod(col, 10) == 0))]);

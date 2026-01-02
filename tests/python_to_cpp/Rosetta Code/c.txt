@@ -196,7 +196,7 @@ T CalkinWilf
 print(‘The first 20 terms of the Calkwin-Wilf sequence are:’)
 V cw = CalkinWilf()
 [String] seq
-L(i) 20
+L(i) 0.<20
    V (n, d) = cw()
    seq.append(I d == 1 {String(n)} E String(n)‘/’String(d))
 print(seq.join(‘, ’))
@@ -237,7 +237,7 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        for (int i = 0; i < 20; i++) {
+        for (auto i : range_el(0, 20)) {
             auto [n, d] = cw();
             seq.append(d == 1 ? String(n) : String(n) & u"/"_S & String(d));
         }
@@ -2791,7 +2791,7 @@ F cusip_check(=cusip)
 
    cusip = cusip.uppercase()
    V total = 0
-   L(i) 8
+   L(i) 0.<8
       V v = 0
       V c = cusip[i]
       I c.is_digit()
@@ -2824,7 +2824,7 @@ template <typename T1> auto cusip_check(T1 cusip)
 
     cusip = cusip.uppercase();
     auto total = 0;
-    for (int i = 0; i < 8; i++) {
+    for (auto i : range_el(0, 8)) {
         auto v = 0;
         auto c = cusip[i];
         if (c.is_digit())
@@ -2929,7 +2929,7 @@ F cut_it(=h, =w)
       V t = y * (@w + 1) + x
       @grid[t] = @grid[@blen - t] = 1B
 
-      L(i) 4
+      L(i) 0.<4
          I !@grid[t + @next[i]]
             count = @walk(y + @dirs[i][0], x + @dirs[i][1], count)
 
@@ -2980,7 +2980,7 @@ template <typename T1, typename T2> auto cut_it(T1 h, T2 w)
         auto t = y * (w + 1) + x;
         grid.set(t, grid.set(blen - t, true));
 
-        for (int i = 0; i < 4; i++)
+        for (auto i : range_el(0, 4))
             if (!grid[t + next[i]])
                 count = walk(y + _get<0>(dirs[i]), x + _get<1>(dirs[i]), count);
 
@@ -3717,13 +3717,13 @@ F iscolorful(n)
 
 print(‘Colorful numbers for 1:25, 26:50, 51:75, and 76:100:’)
 L(i) (1.<101).step(25)
-   L(j) 25
+   L(j) 0.<25
       I iscolorful(i + j)
          print(f:‘{commatize(i + j):5}’, end' ‘’)
    print()
 
 V csum = 0
-L(i) 8
+L(i) 0.<8
    V j = I i == 0 {0} E 10 ^ i
    V k = 10 ^ (i + 1) - 1
    V n = sum((j .. k).map(x -> Int(iscolorful(x))))
@@ -3761,7 +3761,7 @@ struct CodeBlock1
     {
         print(u"Colorful numbers for 1:25, 26:50, 51:75, and 76:100:"_S);
         for (auto i : range_el(1, 101).step(25)) {
-            for (int j = 0; j < 25; j++)
+            for (auto j : range_el(0, 25))
                 if (iscolorful(i + j))
                     print(u"#5"_S.format(commatize(i + j)), u""_S);
             print();
@@ -3775,7 +3775,7 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        for (int i = 0; i < 8; i++) {
+        for (auto i : range_el(0, 8)) {
             auto j = i == 0 ? 0 : pow(10, i);
             auto k = pow(10, (i + 1)) - 1;
             auto n = sum_map(range_ee(j, k), [](const auto &x){return to_int(iscolorful(x));});

@@ -47,7 +47,7 @@ T Graph
    F ()
       [Vertex] v
 
-      L(n) 100
+      L(n) 0.<100
          v.append(Vertex(String(n + 1)))
 
       [Edge] e
@@ -127,7 +127,7 @@ F dijkstra(g, t, s)
    R ss
 
 :start:
-L(n) 100
+L(n) 0.<100
    G = Graph()
    V si = randint(G.v.len)
    V s = G.v[si]

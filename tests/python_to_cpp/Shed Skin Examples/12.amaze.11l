@@ -478,5 +478,5 @@ T FilebasedMazeGame(MazeGame)
 
 :start:
 V game = FilebasedMazeGame()
-L(x) 1
+L(x) 0.<1
    game.runGame()

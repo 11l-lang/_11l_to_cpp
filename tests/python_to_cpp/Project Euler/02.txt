@@ -199,7 +199,7 @@ for i in range(999_999):
 print("".join(str(x) for x in l))
 ===
 V l = Array(0.<10)
-L(i) 999'999
+L(i) 0.<999'999
    l.next_permutation()
 print(l.map(x -> String(x)).join(‘’))
 ===
@@ -209,7 +209,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 999'999; i++)
+        for (auto i : range_el(0, 999'999))
             l.next_permutation();
         print(l.map([](const auto &x){return String(x);}).join(u""_S));
     }

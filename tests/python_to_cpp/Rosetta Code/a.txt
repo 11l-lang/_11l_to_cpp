@@ -1086,7 +1086,7 @@ T Sandpile
 
    F String()
       [String] txt
-      L(row) 3
+      L(row) 0.<3
          txt.append((0.<3).map(col -> String(@.grid[(@row, col)])).join(‘ ’))
       R txt.join("\n")
 
@@ -1185,7 +1185,7 @@ public:
     operator String() const
     {
         Array<String> txt;
-        for (int row = 0; row < 3; row++)
+        for (auto row : range_el(0, 3))
             txt.append(range_el(0, 3).map([&row, this](const auto &col){return String(grid[make_tuple(row, col)]);}).join(u" "_S));
         return txt.join(u"\n"_S);
     }
@@ -1699,7 +1699,7 @@ F aks_test(p)
    R !any(ex[0 .< (len)-1].map(mult -> mult % @p != 0))
 
 print(‘# p: (x-1)^p for small p’)
-L(p) 12
+L(p) 0.<12
    print(‘#3: #.’.format(p, enumerate(expand_x_1(p)).map((n, e) -> ‘#.#.#.’.format(‘+’ * (e >= 0), e, I n {(‘x^#.’.format(n))} E ‘’)).join(‘ ’)))
 
 print("\n# small primes using the aks test")
@@ -1727,7 +1727,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         print(u"# p: (x-1)^p for small p"_S);
-        for (int p = 0; p < 12; p++)
+        for (auto p : range_el(0, 12))
             print(u"#3: #."_S.format(p, enumerate(expand_x_1(p)).map([](const auto &n, const auto &e){return u"#.#.#."_S.format(u"+"_S * (e >= 0), e, n ? (u"x^#."_S.format(n)) : u""_S);}).join(u" "_S)));
 
         print(u"\n# small primes using the aks test"_S);
@@ -2294,7 +2294,7 @@ for str in 'DABDDB DABDDBBDDBA ABRACADABRA TOBEORNOTTOBEORTOBEORNOT'.split(' '):
 F cumulative_freq(freq)
    [Int = Int] cf
    V total = 0
-   L(b) 256
+   L(b) 0.<256
       I b C freq
          cf[b] = total
          total += freq[b]
@@ -2380,7 +2380,7 @@ template <typename T1> auto cumulative_freq(const T1 &freq)
 {
     Dict<int, int> cf;
     auto total = 0;
-    for (int b = 0; b < 256; b++)
+    for (auto b : range_el(0, 256))
         if (in(b, freq)) {
             cf.set(b, total);
             total += freq[b];
@@ -2963,8 +2963,8 @@ V adfgvx = ‘ADFGVX’
 F encrypt(plainText, polybius, key)
    V s = ‘’
    L(ch) plainText
-      L(r) 6
-         L(c) 6
+      L(r) 0.<6
+         L(c) 0.<6
             I polybius[r][c] == ch
                s ‘’= :adfgvx[r]‘’:adfgvx[c]
 
@@ -3004,8 +3004,8 @@ F decrypt(cipherText, polybius, key)
 V polybius = [[Char("\0")] * 6] * 6
 V alphabet = ‘ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789’
 random:shuffle(&alphabet)
-L(r) 6
-   L(c) 6
+L(r) 0.<6
+   L(c) 0.<6
       polybius[r][c] = alphabet[6 * r + c]
 
 print("6 x 6 Polybius square:\n")
@@ -3034,8 +3034,8 @@ template <typename T1, typename T2, typename T3> auto encrypt(const T1 &plainTex
 {
     auto s = u""_S;
     for (auto &&ch : plainText)
-        for (int r = 0; r < 6; r++)
-            for (int c = 0; c < 6; c++)
+        for (auto r : range_el(0, 6))
+            for (auto c : range_el(0, 6))
                 if (polybius[r][c] == ch)
                     s &= ::adfgvx[r] & ::adfgvx[c];
 
@@ -3089,8 +3089,8 @@ struct CodeBlock1
     CodeBlock1()
     {
         randomns::shuffle(alphabet);
-        for (int r = 0; r < 6; r++)
-            for (int c = 0; c < 6; c++)
+        for (auto r : range_el(0, 6))
+            for (auto c : range_el(0, 6))
                 polybius[r].set(c, alphabet[6 * r + c]);
 
         print(u"6 x 6 Polybius square:\n"_S);

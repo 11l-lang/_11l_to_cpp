@@ -1027,7 +1027,7 @@ L
             minouter = state[i]
 
       V s = ‘’
-      L(i) 5
+      L(i) 0.<5
          s ‘’= String(state[(minouterindex + i) % 5])
          s ‘’= String(state[(minouterindex + i) % 5 + 5])
          s ‘’= String(state[(minouterindex + i + 1) % 5 + 5])
@@ -1059,7 +1059,7 @@ struct CodeBlock1
                     }
 
                 auto s = u""_S;
-                for (int i = 0; i < 5; i++) {
+                for (auto i : range_el(0, 5)) {
                     s &= String(state[mod((minouterindex + i), 5)]);
                     s &= String(state[mod((minouterindex + i), 5) + 5]);
                     s &= String(state[mod((minouterindex + i + 1), 5) + 5]);

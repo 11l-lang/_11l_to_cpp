@@ -77,7 +77,7 @@ struct CodeBlock4
 {
     CodeBlock4()
     {
-        for (int i = 0; i < 5; i++) {
+        for (auto i : range_el(0, 5)) {
             operators.append(binary_operators[i] | unary_operators[i]);
             all_operators |= binary_operators[i] | unary_operators[i];
         }

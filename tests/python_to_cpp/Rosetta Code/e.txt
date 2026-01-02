@@ -267,7 +267,7 @@ F iseban(n)
    R Set([b, m, t, r]) <= Set([0, 2, 4, 6])
 
 print(‘eban numbers up to and including 1000:’)
-L(i) 101
+L(i) 0.<101
    I iseban(i)
       print(i, end' ‘ ’)
 
@@ -304,7 +304,7 @@ struct CodeBlock1
     CodeBlock1()
     {
         print(u"eban numbers up to and including 1000:"_S);
-        for (int i = 0; i < 101; i++)
+        for (auto i : range_el(0, 101))
             if (iseban(i))
                 print(i, u" "_S);
 
@@ -795,7 +795,7 @@ F pow2(x)
    R UInt64(1) << x
 
 F evolve(UInt64 =state; rule)
-   L(_) 10
+   L(_) 0.<10
       V b = UInt64(0)
       L(q) (7 .< -1).step(-1)
          V st = state
@@ -819,7 +819,7 @@ template <typename T1> auto pow2(const T1 &x)
 
 template <typename T2> auto evolve(UInt64 state, const T2 &rule)
 {
-    for (int _ = 0; _ < 10; _++) {
+    for (auto _ : range_el(0, 10)) {
         auto b = to_uint64(0);
         for (auto q : range_el(7, -1).step(-1)) {
             auto st = state;
@@ -2304,7 +2304,7 @@ F listEsths(Int64 n1, Int64 n2, Int64 m1, Int64 m2; perLine, all)
          @dfs(n, m, i1)
          @dfs(n, m, i2)
 
-   L(i) 10
+   L(i) 0.<10
       dfs(n2, m2, i)
 
    print(‘Base 10: ’esths.len‘ esthetic numbers between ’n1‘ and ’m1‘:’)
@@ -2379,7 +2379,7 @@ template <typename T5, typename T6> auto listEsths(const Int64 &n1, const Int64 
         }
     };
 
-    for (int i = 0; i < 10; i++)
+    for (auto i : range_el(0, 10))
         dfs(n2, m2, i);
 
     print(u"Base 10: "_S & esths.len() & u" esthetic numbers between "_S & n1 & u" and "_S & m1 & u":"_S);

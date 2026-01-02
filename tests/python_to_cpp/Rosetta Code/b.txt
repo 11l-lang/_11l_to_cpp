@@ -1521,7 +1521,7 @@ F biorhythms(birthdate_str, targetdate_str)
    V cycle_lengths = [23, 28, 33]
    V quadrants = [(‘up and rising’, ‘peak’), (‘up but falling’, ‘transition’), (‘down and falling’, ‘valley’), (‘down but rising’, ‘transition’)]
 
-   L(i) 3
+   L(i) 0.<3
       V label = cycle_labels[i]
       V length = cycle_lengths[i]
       V position = days % length
@@ -1567,7 +1567,7 @@ template <typename T1, typename T2> auto biorhythms(const T1 &birthdate_str, con
     auto cycle_lengths = create_array({23, 28, 33});
     auto quadrants = create_array({make_tuple(u"up and rising"_S, u"peak"_S), make_tuple(u"up but falling"_S, u"transition"_S), make_tuple(u"down and falling"_S, u"valley"_S), make_tuple(u"down but rising"_S, u"transition"_S)});
 
-    for (int i = 0; i < 3; i++) {
+    for (auto i : range_el(0, 3)) {
         auto label = cycle_labels[i];
         auto length = cycle_lengths[i];
         auto position = mod(days, length);

@@ -7,7 +7,7 @@ print(a)
 ===
 V a = 0
 V b = 1
-L(i) 32
+L(i) 0.<32
    (a, b) = (b, a + b)
 print(a)
 ===
@@ -18,7 +18,7 @@ struct CodeBlock1
 {
     CodeBlock1()
     {
-        for (int i = 0; i < 32; i++)
+        for (auto i : range_el(0, 32))
             assign_from_tuple(a, b, make_tuple(b, a + b));
         print(a);
     }
@@ -228,7 +228,7 @@ F next_prime(=n)
 
 V ans = Int64(0)
 V p = 0
-L(i) 100000
+L(i) 0.<100000
    p = next_prime(p)
    ans = (ans + fibonacci_mod(BASE + p, MODULUS)) % MODULUS
 print(ans)
@@ -286,7 +286,7 @@ struct CodeBlock2
 {
     CodeBlock2()
     {
-        for (int i = 0; i < 100000; i++) {
+        for (auto i : range_el(0, 100000)) {
             p = next_prime(p);
             ans = mod((ans + fibonacci_mod(BASE + p, MODULUS)), MODULUS);
         }

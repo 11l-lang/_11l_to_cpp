@@ -231,7 +231,7 @@ public:
 
 int main()
 {
-    for (int x = 0; x < 50; x++) {
+    for (auto x : range_el(0, 50)) {
         auto t = soduko(create_array({u"800000600"_S, u"040500100"_S, u"070090000"_S, u"030020007"_S, u"600008004"_S, u"500000090"_S, u"000030020"_S, u"001006050"_S, u"004000003"_S}));
 
         t.check();

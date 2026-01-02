@@ -81,7 +81,7 @@ F compute()
       R 1B
 
    V ans = Int64(0)
-   L(digit) 10
+   L(digit) 0.<10
 
       L(rep) (DIGITS .< -1).step(-1)
          V sum = Int64(0)
@@ -143,7 +143,7 @@ auto compute()
     };
 
     auto ans = to_int64(0);
-    for (int digit = 0; digit < 10; digit++)
+    for (auto digit : range_el(0, 10))
 
         for (auto rep : range_el(DIGITS, -1).step(-1)) {
             auto sum = to_int64(0);
