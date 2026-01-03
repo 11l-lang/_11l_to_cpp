@@ -2680,3 +2680,23 @@ struct CodeBlock1
         print([&](auto &&T){return T.name & u".part"_S & (T.ext);}(fs::path::split_ext(u"video.mp4"_S)));
     }
 } code_block_1;
+
+
+V GRID =
+‘N   D   E
+ O   K   G
+ E   L   W’
+
+print(GRID.lowercase().replace((‘ ’, "\n"), ‘’))
+===
+auto GRID = uR"(N   D   E
+ O   K   G
+ E   L   W)"_S;
+
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(GRID.lowercase().replace(make_tuple(u" "_S, u"\n"_S), u""_S));
+    }
+} code_block_1;

@@ -369,6 +369,20 @@ public:
 
 	String replace(const re::RegEx &regex, const String &repl) const;
 
+	template <typename ... Types> String replace(const Tuple<Types...> &t, const String &to) const
+	{
+		String newString;
+		newString.reserve(length());
+
+		for (char16_t c : *this)
+			if (in(c, t))
+				newString &= to;
+			else
+				newString &= Char(c);
+
+		return newString;
+	}
+
 	Nullable<Int> find(Char c, Int start = 0) const
 	{
 		const char16_t *s = data();
