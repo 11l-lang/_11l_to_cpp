@@ -718,6 +718,8 @@ public:
 	friend bool operator!=(Char ch, const String &s) {return !(s.len() == 1 && s.at(0) == ch.code);}
 	bool operator==(char16_t ch_code) const {return   len() == 1 && at(0) == ch_code ;}
 	bool operator!=(char16_t ch_code) const {return !(len() == 1 && at(0) == ch_code);}
+	friend bool operator==(char16_t ch_code, const String &s) {return   s.len() == 1 && s.at(0) == ch_code ;}
+	friend bool operator!=(char16_t ch_code, const String &s) {return !(s.len() == 1 && s.at(0) == ch_code);}
 	bool operator==(Int) const = delete;
 	bool operator!=(Int) const = delete;
 
