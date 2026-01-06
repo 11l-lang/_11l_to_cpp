@@ -139,8 +139,8 @@ non_existing_module:func()
 ^Error: can not import module `non_existing_module`: file 'tests/parser/non_existing_module.11l' is not found
 
 
-L(i) 10
-   L(j) 20
+L(i) 0.<10
+   L(j) 0.<20
       L(k).break
       ^Error: loop corresponding to this `L(k).break` statement is not found
 
