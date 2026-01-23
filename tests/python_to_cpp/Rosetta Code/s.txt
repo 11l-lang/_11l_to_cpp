@@ -6612,300 +6612,252 @@ struct CodeBlock1
 
 
 # https://www.rosettacode.org/wiki/Solve_a_Numbrix_puzzle#Python
-from typing import List
-
-neighbours = [[-1, 0], [0, -1], [1, 0], [0, 1]]
-exists : List[int] = []
-lastNumber = 0
-wid = 0
-hei = 0
-
-def find_next(pa, x, y, z):
-    for i in range(4):
-        a = x + neighbours[i][0]
-        b = y + neighbours[i][1]
-        if -1 < a < wid and -1 < b < hei:
-            if pa[a][b] == z:
-                return (a, b)
-
-    return (-1, -1)
-
-def find_solution(pa : list, x, y, z):
-    if z > lastNumber:
-        return 1
-    if exists[z] == 1:
-        s = find_next(pa, x, y, z)
-        if s[0] < 0:
-            return 0
-        return find_solution(pa, s[0], s[1], z + 1)
-
-    for i in range(4):
-        a = x + neighbours[i][0]
-        b = y + neighbours[i][1]
-        if -1 < a < wid and -1 < b < hei:
-            if pa[a][b] == 0:
-                pa[a][b] = z
-                r = find_solution(pa, a, b, z + 1)
-                if r == 1:
-                    return 1
-                pa[a][b] = 0
-
-    return 0
-
-def solve(pz, w, h):
-    global lastNumber, wid, hei, exists
-
-    lastNumber = w * h
-    wid = w
-    hei = h
-    exists = [0] * (lastNumber + 1)
-
-    pa = [[0] * h for i in range(w)]
-    st = pz.split(' ')
-    idx = 0
-    for j in range(h):
-        for i in range(w):
-            if st[idx] == ".":
-                idx += 1
-            else:
-                pa[i][j] = int(st[idx])
-                exists[pa[i][j]] = 1
-                idx += 1
-
-    x = 0
-    y = 0
-    t = w * h + 1
-    for j in range(h):
-        for i in range(w):
-            if pa[i][j] != 0 and pa[i][j] < t:
-                t = pa[i][j]
-                x = i
-                y = j
-
-    return (find_solution(pa, x, y, t + 1), pa)
-
-def show_result(r):
-    if r[0] == 1:
-        for j in range(hei):
-            for i in range(wid):
-                print(" {:02}".format(r[1][i][j]), end = '')
+MOVES = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+class Numbrix:
+    def __init__(self):
+        self.grid: list[list[int]]
+        self.clues: list[int]
+        self.totalToFill: int
+        self.startRow: int
+        self.startCol: int
+    def solve(self, row, col, count:int, nextClue: int) -> bool:
+        if count > self.totalToFill:
+            return True
+        back = self.grid[row][col]
+        if back not in [0, count]:
+            return False
+        if back == 0 and nextClue < len(self.clues) and self.clues[nextClue] == count:
+            return False
+        nextClue = nextClue
+        if back == count: nextClue += 1
+        self.grid[row][col] = count
+        for move in MOVES:
+            if self.solve(row + move[1], col + move[0], count + 1, nextClue):
+                return True
+        self.grid[row][col] = back
+        return False
+    def xprint(self):
+        for row in self.grid:
+            for val in row:
+                if val != -1:
+                    print(f"{val:02} ",end='')
             print()
+def initNumbrix(board: list[str]) -> Numbrix:
+    result = Numbrix()
+    nRows = len(board)
+    nCols = len(board[0].split(','))
+    result.grid = [[-1]*(nCols + 2) for _ in range(nRows + 2)]
+    result.totalToFill = nRows * nCols
+    xlist: list[int] = []
+    for r, row in enumerate(board):
+        for c, tile in enumerate(row.split(',')):
+            val = int(tile)
+            result.grid[r + 1][c + 1] = val
+            if val > 0:
+                xlist.append(val)
+                if val == 1:
+                    result.startRow = r + 1
+                    result.startCol = c + 1
+    xlist.sort()
+    result.clues = xlist
+    return result
+
+EXAMPLE1 = ["00,00,00,00,00,00,00,00,00",
+            "00,00,46,45,00,55,74,00,00",
+            "00,38,00,00,43,00,00,78,00",
+            "00,35,00,00,00,00,00,71,00",
+            "00,00,33,00,00,00,59,00,00",
+            "00,17,00,00,00,00,00,67,00",
+            "00,18,00,00,11,00,00,64,00",
+            "00,00,24,21,00,01,02,00,00",
+            "00,00,00,00,00,00,00,00,00"]
+EXAMPLE2 = ["00,00,00,00,00,00,00,00,00",
+            "00,11,12,15,18,21,62,61,00",
+            "00,06,00,00,00,00,00,60,00",
+            "00,33,00,00,00,00,00,57,00",
+            "00,32,00,00,00,00,00,56,00",
+            "00,37,00,01,00,00,00,73,00",
+            "00,38,00,00,00,00,00,72,00",
+            "00,43,44,47,48,51,76,77,00",
+            "00,00,00,00,00,00,00,00,00"]
+EXAMPLE3 = ["17,00,00,00,11,00,00,00,59",
+            "00,15,00,00,06,00,00,61,00",
+            "00,00,03,00,00,00,63,00,00",
+            "00,00,00,01,66,00,00,00,00",
+            "23,24,00,68,67,78,00,54,55",
+            "00,00,00,00,72,00,00,00,00",
+            "00,00,35,00,00,00,49,00,00",
+            "00,29,00,00,40,00,00,47,00",
+            "31,00,00,00,39,00,00,00,45"]
+for i, board in enumerate([EXAMPLE1,EXAMPLE2, EXAMPLE3]):
+    numbrix = initNumbrix(board)
+    if numbrix.solve(numbrix.startRow, numbrix.startCol, 1, 0):
+        print(f"Solution for example {i+1}:", end="")
+        numbrix.xprint()
     else:
-        print("No Solution!")
-
-    print()
-
-r = solve(". . . . . . . . . . . 46 45 . 55 74 . . . 38 . . 43 . . 78 . . 35 . . . . . 71 . . . 33 . . . 59 . . . 17" +
-          " . . . . . 67 . . 18 . . 11 . . 64 . . . 24 21 . 1 2 . . . . . . . . . . .", 9, 9)
-show_result(r)
-
-r = solve(". . . . . . . . . . 11 12 15 18 21 62 61 . . 6 . . . . . 60 . . 33 . . . . . 57 . . 32 . . . . . 56 . . 37" +
-          " . 1 . . . 73 . . 38 . . . . . 72 . . 43 44 47 48 51 76 77 . . . . . . . . . .", 9, 9)
-show_result(r)
-
-r = solve("17 . . . 11 . . . 59 . 15 . . 6 . . 61 . . . 3 . . . 63 . . . . . . 66 . . . . 23 24 . 68 67 78 . 54 55" +
-          " . . . . 72 . . . . . . 35 . . . 49 . . . 29 . . 40 . . 47 . 31 . . . 39 . . . 45", 9, 9)
-show_result(r)
+        print("No solution.")
 ===
-V neighbours = [[-1, 0], [0, -1], [1, 0], [0, 1]]
-[Int] exists
-V lastNumber = 0
-V wid = 0
-V hei = 0
-
-F find_next(pa, x, y, z)
-   L(i) 0.<4
-      V a = x + :neighbours[i][0]
-      V b = y + :neighbours[i][1]
-      I a C -1 <.< :wid & b C -1 <.< :hei
-         I pa[a][b] == z
-            R (a, b)
-
-   R (-1, -1)
-
-F find_solution(&pa, x, y, z)
-   I z > :lastNumber
-      R 1
-   I :exists[z] == 1
-      V s = find_next(pa, x, y, z)
-      I s[0] < 0
-         R 0
-      R find_solution(&pa, s[0], s[1], z + 1)
-
-   L(i) 0.<4
-      V a = x + :neighbours[i][0]
-      V b = y + :neighbours[i][1]
-      I a C -1 <.< :wid & b C -1 <.< :hei
-         I pa[a][b] == 0
-            pa[a][b] = z
-            V r = find_solution(&pa, a, b, z + 1)
-            I r == 1
-               R 1
-            pa[a][b] = 0
-
-   R 0
-
-F solve(pz, w, h)
-
-   :lastNumber = w * h
-   :wid = w
-   :hei = h
-   :exists = [0] * (:lastNumber + 1)
-
-   V pa = [[0] * h] * w
-   V st = pz.split(‘ ’)
-   V idx = 0
-   L(j) 0 .< h
-      L(i) 0 .< w
-         I st[idx] == ‘.’
-            idx++
-         E
-            pa[i][j] = Int(st[idx])
-            :exists[pa[i][j]] = 1
-            idx++
-
-   V x = 0
-   V y = 0
-   V t = w * h + 1
-   L(j) 0 .< h
-      L(i) 0 .< w
-         I pa[i][j] != 0 & pa[i][j] < t
-            t = pa[i][j]
-            x = i
-            y = j
-
-   R (find_solution(&pa, x, y, t + 1), pa)
-
-F show_result(r)
-   I r[0] == 1
-      L(j) 0 .< :hei
-         L(i) 0 .< :wid
-            print(‘ #02’.format(r[1][i][j]), end' ‘’)
+V MOVES = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+T Numbrix
+   [[Int]] grid
+   [Int] clues
+   Int totalToFill
+   Int startRow
+   Int startCol
+   F ()
+   {
+   }
+   F solve(row, col, Int count, Int =nextClue) -> Bool
+      I count > .totalToFill
+         R 1B
+      V back = .grid[row][col]
+      I back !C [0, count]
+         R 0B
+      I back == 0 & nextClue < .clues.len & .clues[nextClue] == count
+         R 0B
+      nextClue = nextClue
+      I back == count
+         nextClue++
+      .grid[row][col] = count
+      L(move) :MOVES
+         I .solve(row + move[1], col + move[0], count + 1, nextClue)
+            R 1B
+      .grid[row][col] = back
+      R 0B
+   F xprint()
+      L(row) .grid
+         L(val) row
+            I val != -1
+               print(f:‘{val:02} ’, end' ‘’)
          print()
+F initNumbrix([String] &board) -> Numbrix
+   V result = Numbrix()
+   V nRows = board.len
+   V nCols = board[0].split(‘,’).len
+   result.grid = [[-1] * (nCols + 2)] * (nRows + 2)
+   result.totalToFill = nRows * nCols
+   [Int] xlist
+   L(row) board
+      V r = L.index
+      L(tile) row.split(‘,’)
+         V c = L.index
+         V val = Int(tile)
+         result.grid[r + 1][c + 1] = val
+         I val > 0
+            xlist.append(val)
+            I val == 1
+               result.startRow = r + 1
+               result.startCol = c + 1
+   xlist.sort()
+   result.clues = xlist
+   R result
+
+V EXAMPLE1 = [‘00,00,00,00,00,00,00,00,00’, ‘00,00,46,45,00,55,74,00,00’, ‘00,38,00,00,43,00,00,78,00’, ‘00,35,00,00,00,00,00,71,00’, ‘00,00,33,00,00,00,59,00,00’, ‘00,17,00,00,00,00,00,67,00’, ‘00,18,00,00,11,00,00,64,00’, ‘00,00,24,21,00,01,02,00,00’, ‘00,00,00,00,00,00,00,00,00’]
+V EXAMPLE2 = [‘00,00,00,00,00,00,00,00,00’, ‘00,11,12,15,18,21,62,61,00’, ‘00,06,00,00,00,00,00,60,00’, ‘00,33,00,00,00,00,00,57,00’, ‘00,32,00,00,00,00,00,56,00’, ‘00,37,00,01,00,00,00,73,00’, ‘00,38,00,00,00,00,00,72,00’, ‘00,43,44,47,48,51,76,77,00’, ‘00,00,00,00,00,00,00,00,00’]
+V EXAMPLE3 = [‘17,00,00,00,11,00,00,00,59’, ‘00,15,00,00,06,00,00,61,00’, ‘00,00,03,00,00,00,63,00,00’, ‘00,00,00,01,66,00,00,00,00’, ‘23,24,00,68,67,78,00,54,55’, ‘00,00,00,00,72,00,00,00,00’, ‘00,00,35,00,00,00,49,00,00’, ‘00,29,00,00,40,00,00,47,00’, ‘31,00,00,00,39,00,00,00,45’]
+L(board) [EXAMPLE1, EXAMPLE2, EXAMPLE3]
+   V i = L.index
+   V numbrix = initNumbrix(&board)
+   I numbrix.solve(numbrix.startRow, numbrix.startCol, 1, 0)
+      print(‘Solution for example ’(i + 1)‘:’, end' ‘’)
+      numbrix.xprint()
    E
-      print(‘No Solution!’)
-
-   print()
-
-V r = solve(‘. . . . . . . . . . . 46 45 . 55 74 . . . 38 . . 43 . . 78 . . 35 . . . . . 71 . . . 33 . . . 59 . . . 17’""‘ . . . . . 67 . . 18 . . 11 . . 64 . . . 24 21 . 1 2 . . . . . . . . . . .’, 9, 9)
-show_result(r)
-
-r = solve(‘. . . . . . . . . . 11 12 15 18 21 62 61 . . 6 . . . . . 60 . . 33 . . . . . 57 . . 32 . . . . . 56 . . 37’""‘ . 1 . . . 73 . . 38 . . . . . 72 . . 43 44 47 48 51 76 77 . . . . . . . . . .’, 9, 9)
-show_result(r)
-
-r = solve(‘17 . . . 11 . . . 59 . 15 . . 6 . . 61 . . . 3 . . . 63 . . . . . . 66 . . . . 23 24 . 68 67 78 . 54 55’""‘ . . . . 72 . . . . . . 35 . . . 49 . . . 29 . . 40 . . 47 . 31 . . . 39 . . . 45’, 9, 9)
-show_result(r)
+      print(‘No solution.’)
 ===
-auto neighbours = create_array({create_array({-1, 0}), create_array({0, -1}), create_array({1, 0}), create_array({0, 1})});
-Array<int> exists;
-auto lastNumber = 0;
-auto wid = 0;
-auto hei = 0;
-
-template <typename T1, typename T2, typename T3, typename T4> auto find_next(const T1 &pa, const T2 &x, const T3 &y, const T4 &z)
+auto MOVES = create_array({make_tuple(1, 0), make_tuple(0, 1), make_tuple(-1, 0), make_tuple(0, -1)});
+class Numbrix
 {
-    for (auto i : range_el(0, 4)) {
-        auto a = x + _get<0>(::neighbours[i]);
-        auto b = y + _get<1>(::neighbours[i]);
-        if (in(a, range_ll(-1, ::wid)) && in(b, range_ll(-1, ::hei))) {
-            if (pa[a][b] == z)
-                return make_tuple(a, b);
-        }
+public:
+    Array<Array<int>> grid;
+    Array<int> clues;
+    int totalToFill;
+    int startRow;
+    int startCol;
+    Numbrix()
+    {
     }
 
-    return make_tuple(-1, -1);
-}
-
-template <typename T1, typename T2, typename T3, typename T4> auto find_solution(T1 &pa, const T2 &x, const T3 &y, const T4 &z)
-{
-    if (z > ::lastNumber)
-        return 1;
-    if (::exists[z] == 1) {
-        auto s = find_next(pa, x, y, z);
-        if (_get<0>(s) < 0)
-            return 0;
-        return find_solution(pa, _get<0>(s), _get<1>(s), z + 1);
+    template <typename T1, typename T2> bool solve(const T1 &row, const T2 &col, const int count, int nextClue)
+    {
+        if (count > totalToFill)
+            return true;
+        auto back = grid[row][col];
+        if (!in(back, create_array({0, count})))
+            return false;
+        if (back == 0 && nextClue < clues.len() && clues[nextClue] == count)
+            return false;
+        nextClue = nextClue;
+        if (back == count)
+            nextClue++;
+        grid[row].set(col, count);
+        for (auto &&move : ::MOVES)
+            if (solve(row + _get<1>(move), col + _get<0>(move), count + 1, nextClue))
+                return true;
+        grid[row].set(col, back);
+        return false;
     }
-
-    for (auto i : range_el(0, 4)) {
-        auto a = x + _get<0>(::neighbours[i]);
-        auto b = y + _get<1>(::neighbours[i]);
-        if (in(a, range_ll(-1, ::wid)) && in(b, range_ll(-1, ::hei))) {
-            if (pa[a][b] == 0) {
-                pa[a].set(b, z);
-                auto r = find_solution(pa, a, b, z + 1);
-                if (r == 1)
-                    return 1;
-                pa[a].set(b, 0);
-            }
-        }
-    }
-
-    return 0;
-}
-
-template <typename T1, typename T2, typename T3> auto solve(const T1 &pz, const T2 &w, const T3 &h)
-{
-
-    ::lastNumber = w * h;
-    ::wid = w;
-    ::hei = h;
-    ::exists = create_array({0}) * (::lastNumber + 1);
-
-    auto pa = create_array({create_array({0}) * h}) * w;
-    auto st = pz.split(u" "_S);
-    auto idx = 0;
-    for (auto j : range_el(0, h))
-        for (auto i : range_el(0, w))
-            if (st[idx] == u'.')
-                idx++;
-            else {
-                pa[i].set(j, to_int(st[idx]));
-                ::exists.set(pa[i][j], 1);
-                idx++;
-            }
-
-    auto x = 0;
-    auto y = 0;
-    auto t = w * h + 1;
-    for (auto j : range_el(0, h))
-        for (auto i : range_el(0, w))
-            if (pa[i][j] != 0 && pa[i][j] < t) {
-                t = pa[i][j];
-                x = i;
-                y = j;
-            }
-
-    return make_tuple(find_solution(pa, x, y, t + 1), pa);
-}
-
-template <typename T1> auto show_result(const T1 &r)
-{
-    if (_get<0>(r) == 1)
-        for (auto j : range_el(0, ::hei)) {
-            for (auto i : range_el(0, ::wid))
-                print(u" #02"_S.format(_get<1>(r)[i][j]), u""_S);
+    auto xprint()
+    {
+        for (auto &&row : grid) {
+            for (auto &&val : row)
+                if (val != -1)
+                    print(u"#02 "_S.format(val), u""_S);
             print();
         }
-    else
-        print(u"No Solution!"_S);
-
-    print();
+    }
+};
+Numbrix initNumbrix(Array<String> &board)
+{
+    auto result = Numbrix();
+    auto nRows = board.len();
+    auto nCols = _get<0>(board).split(u","_S).len();
+    result.grid = create_array({create_array({-1}) * (nCols + 2)}) * (nRows + 2);
+    result.totalToFill = nRows * nCols;
+    Array<int> xlist;
+    {int Lindex = 0;
+    for (auto &&row : board) {
+        auto r = Lindex;
+        {int Lindex = 0;
+        for (auto &&tile : row.split(u","_S)) {
+            auto c = Lindex;
+            auto val = to_int(tile);
+            result.grid[r + 1].set(c + 1, val);
+            if (val > 0) {
+                xlist.append(val);
+                if (val == 1) {
+                    result.startRow = r + 1;
+                    result.startCol = c + 1;
+                }
+            }
+            Lindex++;
+        }}
+        Lindex++;
+    }}
+    xlist.sort();
+    result.clues = xlist;
+    return result;
 }
 
-auto r = solve(u". . . . . . . . . . . 46 45 . 55 74 . . . 38 . . 43 . . 78 . . 35 . . . . . 71 . . . 33 . . . 59 . . . 17"_S & u" . . . . . 67 . . 18 . . 11 . . 64 . . . 24 21 . 1 2 . . . . . . . . . . ."_S, 9, 9);
+auto EXAMPLE1 = create_array({u"00,00,00,00,00,00,00,00,00"_S, u"00,00,46,45,00,55,74,00,00"_S, u"00,38,00,00,43,00,00,78,00"_S, u"00,35,00,00,00,00,00,71,00"_S, u"00,00,33,00,00,00,59,00,00"_S, u"00,17,00,00,00,00,00,67,00"_S, u"00,18,00,00,11,00,00,64,00"_S, u"00,00,24,21,00,01,02,00,00"_S, u"00,00,00,00,00,00,00,00,00"_S});
+auto EXAMPLE2 = create_array({u"00,00,00,00,00,00,00,00,00"_S, u"00,11,12,15,18,21,62,61,00"_S, u"00,06,00,00,00,00,00,60,00"_S, u"00,33,00,00,00,00,00,57,00"_S, u"00,32,00,00,00,00,00,56,00"_S, u"00,37,00,01,00,00,00,73,00"_S, u"00,38,00,00,00,00,00,72,00"_S, u"00,43,44,47,48,51,76,77,00"_S, u"00,00,00,00,00,00,00,00,00"_S});
+auto EXAMPLE3 = create_array({u"17,00,00,00,11,00,00,00,59"_S, u"00,15,00,00,06,00,00,61,00"_S, u"00,00,03,00,00,00,63,00,00"_S, u"00,00,00,01,66,00,00,00,00"_S, u"23,24,00,68,67,78,00,54,55"_S, u"00,00,00,00,72,00,00,00,00"_S, u"00,00,35,00,00,00,49,00,00"_S, u"00,29,00,00,40,00,00,47,00"_S, u"31,00,00,00,39,00,00,00,45"_S});
 
 struct CodeBlock1
 {
     CodeBlock1()
     {
-        show_result(r);
-
-        r = solve(u". . . . . . . . . . 11 12 15 18 21 62 61 . . 6 . . . . . 60 . . 33 . . . . . 57 . . 32 . . . . . 56 . . 37"_S & u" . 1 . . . 73 . . 38 . . . . . 72 . . 43 44 47 48 51 76 77 . . . . . . . . . ."_S, 9, 9);
-        show_result(r);
-
-        r = solve(u"17 . . . 11 . . . 59 . 15 . . 6 . . 61 . . . 3 . . . 63 . . . . . . 66 . . . . 23 24 . 68 67 78 . 54 55"_S & u" . . . . 72 . . . . . . 35 . . . 49 . . . 29 . . 40 . . 47 . 31 . . . 39 . . . 45"_S, 9, 9);
-        show_result(r);
+        {int Lindex = 0;
+        for (auto &&board : create_array({EXAMPLE1, EXAMPLE2, EXAMPLE3})) {
+            auto i = Lindex;
+            auto numbrix = initNumbrix(board);
+            if (numbrix.solve(numbrix.startRow, numbrix.startCol, 1, 0)) {
+                print(u"Solution for example "_S & (i + 1) & u":"_S, u""_S);
+                numbrix.xprint();
+            }
+            else
+                print(u"No solution."_S);
+            Lindex++;
+        }}
     }
 } code_block_1;
 
