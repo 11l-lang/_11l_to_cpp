@@ -2574,8 +2574,8 @@ russian_names = {
     'БЦел':'UInt', 'Байт':'Byte', 'БЦел16':'UInt16', 'БЦел32':'UInt32', 'БЦел64':'UInt64', 'БДлЦел':'ULong', 'БЦелУкз':'UIntPtr', 'БРазмер':'USize', 'БолЦел':'BigInt',
     'Вещ':'Float', 'ВещО':'SFloat', 'Вещ32':'Float32', 'Вещ64':'Float64',
     'Символ':'Char', 'код':'code', "код'":"code'", "цифра'":"digit'", "строка'":"string'",
-     'е_цифра':'is_digit', 'е_буква':'is_alpha', 'е_нижрег':'is_lowercase', 'е_верхрег':'is_uppercase', 'нижрег':'lowercase', 'верхрег':'uppercase',
-    'Строка':'String', 'длина':'len', 'пуста':'empty', 'пусто':'empty', 'послед':'last', 'начин_с':'starts_with', 'начин_на':'starts_with', 'закан_на':'ends_with',
+     'е_цифра':'is_digit', 'е_буква':'is_alpha', 'е_ниж_рег':'is_lowercase', 'е_верх_рег':'is_uppercase', 'ниж_рег':'lowercase', 'верх_рег':'uppercase',
+    'Строка':'String', 'длина':'len', 'пуста':'empty', 'пусто':'empty', 'посл':'last', 'начин_с':'starts_with', 'начин_на':'starts_with', 'закан_на':'ends_with',
      'колво':'count', 'только_цифры':'is_digit', 'только_буквы':'is_alpha', 'сократить':'trim',
      'найти':'find', 'найти_и':'findi', 'об_найти':'rfind', 'об_найти_и':'rfindi', 'заменить':'replace',
      'разделить':'split', 'разделить_пг':'split_sg', 'разделить_py':'split_py', "групп_разделители'":"group_delimiters'",
@@ -2586,7 +2586,7 @@ russian_names = {
     'Множество':'Set', 'доб':'add', 'удалить':'remove', 'отбросить':'discard', 'очистить':'clear',
     'Дек':'Deque', 'добавить_в_начало':'append_left', 'расширить':'extend', 'расширить_с_начала':'extend_left', 'вставить':'insert', 'извлечь_с_начала':'pop_left',
     'Файл':'File', 'прочитать':'read', 'прочитать_строку':'read_line', 'прочитать_строки':'read_lines', 'прочитать_байты':'read_bytes', 'записать':'write', 'записать_байты':'write_bytes',
-    'минкуча':'minheap', 'макскуча':'maxheap', 'поместить':'push',
+    'мин_куча':'minheap', 'макс_куча':'maxheap', 'поместить':'push',
 }
 for dimension in ('2', '3', '4'):
     for suffix_ru, suffix_en in {'б':'b', 'ц8':'i8', 'ц':'i', 'о':'s', 'д':'d', 'ц16':'i16', 'б16':'u16', 'ц64':'i64', 'Д':'L', 'Б':'B'}.items():
