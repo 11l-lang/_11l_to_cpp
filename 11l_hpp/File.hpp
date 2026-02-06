@@ -318,7 +318,7 @@ public:
 
 	void write(const String &s) const
 	{
-		as_mutable()->write(utf::as_str8(s));
+		as_mutable()->write(s);
 	}
 
 	void write_bytes(const Array<Byte> &bytes) const
