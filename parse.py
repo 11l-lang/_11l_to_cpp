@@ -333,7 +333,7 @@ class SymbolNode:
             def f(sn: SymbolNode):
                 if sn.function_call:
                     return
-                if sn.token.category == Token.Category.NAME and sn.token_str() == '(->)':
+                if (sn.token.category == Token.Category.NAME and sn.token_str() == '(->)') or (sn.token_str() == '->' and len(sn.children) == 0):
                     nonlocal found_it
                     found_it = True
                 else:
@@ -972,6 +972,9 @@ class SymbolNode:
 
         elif self.symbol.id == '[%': # ]
             return self.children[0].to_str() + '.at_ni(' + self.children[1].to_str() + ')'
+
+        elif self.symbol.id == '->' and len(self.children) == 0:
+            return 'it'
 
         elif self.symbol.id in ('S', 'В', 'switch', 'выбрать'):
             char_val = True
@@ -2779,6 +2782,7 @@ def led(self, left):
     scope = prev_scope
     return self
 symbol('->', 15).set_led_bp(15, led)
+symbol('->').nud = lambda self: self
 
 def led(self, left):
     self.append_child(left) # [(
