@@ -332,6 +332,7 @@ class SymbolNode:
             found_it = False
             def f(sn: SymbolNode):
                 if sn.function_call:
+                    f(sn.children[0])
                     return
                 if (sn.token.category == Token.Category.NAME and sn.token_str() == '(->)') or (sn.token_str() == '->' and len(sn.children) == 0):
                     nonlocal found_it
@@ -2480,6 +2481,8 @@ def type_of(sn):
         return None
     elif sn.children[0].token_str().startswith('@'):
         return None # [-TODO-]
+    elif sn.children[0].token_str() in ('(->)', '->'):
+        return None
     else:
         if sn.children[0].token.category == Token.Category.STRING_LITERAL:
             tid = builtins_scope.ids.get('String')
@@ -4165,6 +4168,7 @@ string_scope.add_name('count', ASTFunctionDefinition([('s', '', 'String')]))
 string_scope.add_name('replace', ASTFunctionDefinition([('old', '', 'String'), ('new', '', 'String')]))
 string_scope.add_name('lowercase', ASTFunctionDefinition([]))
 string_scope.add_name('uppercase', ASTFunctionDefinition([]))
+string_scope.add_name('case_fold', ASTFunctionDefinition([]))
 string_scope.add_name('capitalize', ASTFunctionDefinition([]))
 string_scope.add_name('zfill', ASTFunctionDefinition([('width', '', 'Int')]))
 string_scope.add_name('center', ASTFunctionDefinition([('width', '', 'Int'), ('fillchar', token_to_str('‘ ’'), 'Char')]))

@@ -530,6 +530,11 @@ public:
 		return r;
 	}
 
+	String case_fold() const
+	{
+		return lowercase();
+	}
+
 	String capitalize() const
 	{
 		String r(*this);

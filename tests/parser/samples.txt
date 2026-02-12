@@ -2360,6 +2360,10 @@ print(max([‘c’, ‘ab’], key' ->.len))
 
 print([1, 2, 0, 3].filter((->) != 0))
 print([1, 2, 0, 3].filter(-> != 0))
+
+V str_arr = [‘c’, ‘ab’]
+str_arr.sort(key' (->).case_fold())
+str_arr.sort(key'   ->.case_fold())
 ===
 struct CodeBlock1
 {
@@ -2378,6 +2382,17 @@ struct CodeBlock1
         print(create_array({1, 2, 0, 3}).filter([](const auto &it){return it != 0;}));
     }
 } code_block_1;
+
+auto str_arr = create_array({u"c"_S, u"ab"_S});
+
+struct CodeBlock2
+{
+    CodeBlock2()
+    {
+        str_arr.sort([](const auto &it){return it.case_fold();});
+        str_arr.sort([](const auto &it){return it.case_fold();});
+    }
+} code_block_2;
 
 
 // [https://forum.11l-lang.org/threads/Тип-bigfloat.39/post-166]
