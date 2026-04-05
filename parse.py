@@ -2573,7 +2573,7 @@ cpp_keywords = {'alignas', 'alignof', 'and', 'and_eq', 'asm', 'auto', 'bitand', 
     'j0', 'j1', 'jn', 'y0', 'y1', 'yn', 'pascal', 'main', 'stat', 'SIZE', 'apply', 'INFINITY'}
 
 russian_names = {
-    'ввод':'input', 'вывод':'print', "кон'":"end'", 'вывод_эл':'print_elements', "разд'":"sep'", 'выход':'exit', 'скоп':'copy', 'перем':'move', 'сортй':'sorted', 'обратный':'reversed',
+    'ввод':'input', 'вывод':'print', "кон'":"end'", 'вывод_эл':'print_elements', "разд'":"sep'", 'завершить':'exit', 'скоп':'copy', 'перем':'move', 'сортй':'sorted', 'обратный':'reversed',
     'обмен':'swap', 'все':'all', 'любой':'any', 'сумма':'sum', 'нод':'gcd', 'шаг':'step', 'формат':'format',
     'Пуст':'Void', 'Бул':'Bool',
      'Цел': 'Int', 'Цел8':'Int8',  'Цел16': 'Int16',  'Цел32': 'Int32',  'Цел64': 'Int64',  'ДлЦел': 'Long',  'ЦелУкз': 'IntPtr',  'Размер': 'Size', 'Укз':'Ptr', 'как':'as',
