@@ -413,12 +413,12 @@ String balance_pq_string(const String &s)
 
 String to_str(const String &vs, char16_t additional_prohibited_character = 0, char16_t additional_prohibited_character2 = 0)
 {
-	if (vs.len() < 100 && in(u'\n', vs))
+	if (vs.len() < 100 && in(u'\n'_C, vs))
 		return string(vs);
 
-	if (vs.empty() || in(vs[0], u" \t['") || vs.starts_with(u". ") || in(vs.last(), u" \t") || in(u'‘', vs) || in(u'’', vs) || in(u';', vs) || in(u'\n', vs) || vs == u'N'_C || vs == u'Н'_C // ]
-		|| (additional_prohibited_character  != 0 && (in(additional_prohibited_character, vs) ||
-		   (additional_prohibited_character2 != 0 && in(additional_prohibited_character2, vs)))) || vs[0].is_digit() || (vs[0] == u'-' && vs.len() > 1 && vs[1].is_digit()))
+	if (vs.empty() || in(vs[0], u" \t['") || vs.starts_with(u". ") || in(vs.last(), u" \t") || in(u'‘'_C, vs) || in(u'’'_C, vs) || in(u';'_C, vs) || in(u'\n'_C, vs) || vs == u'N'_C || vs == u'Н'_C // ]
+		|| (additional_prohibited_character  != 0 && (in(Char(additional_prohibited_character), vs) ||
+		   (additional_prohibited_character2 != 0 && in(Char(additional_prohibited_character2), vs)))) || vs[0].is_digit() || (vs[0] == u'-' && vs.len() > 1 && vs[1].is_digit()))
 		return balance_pq_string(vs);
 
 	return vs;
@@ -469,8 +469,12 @@ String to_eldf(const Element &el, Int indent = 4, Int level = 0, bool toplevel =
 				else
 					r &= u" = [\n" & to_eldf(element, indent, level, false) & indent * level * u' '_C & u"]\n";
 			}
-			else // this is value
-				r &= u" = " & detail::to_str(element) & u'\n'_C;
+			else { // this is a value
+				if (element.value_type == ValueType::STRING && element.value.string->empty())
+					r &= u" =\n";
+				else
+					r &= u" = " & detail::to_str(element) & u'\n'_C;
+			}
 		}
 	}
 	else if (el.value_type == ValueType::ARRAY) {

@@ -1,5 +1,5 @@
 Exception
-    type = ‘’
+    type =
     ast_nodes = [
     .   node_type = type
         constructors = [
@@ -12,7 +12,7 @@ Exception
         ]
     ]
 Converter
-    type = ‘’
+    type =
     ast_nodes = [
     .   node_type = type
         constructors = [
@@ -23,7 +23,7 @@ Converter
         ]
     ]
 to_html
-    type = ‘’
+    type =
     ast_nodes = [
     .   node_type = function
         function_arguments = [

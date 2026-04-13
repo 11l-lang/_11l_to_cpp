@@ -4,7 +4,7 @@ Imported modules = [
     _11l_to_cpp.tokenizer
 ]
 to_html
-    type = ‘’
+    type =
     node
         function_arguments = [
         .   name = instr

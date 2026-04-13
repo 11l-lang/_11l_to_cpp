@@ -1,5 +1,5 @@
 ‘’
-    type = ‘’
+    type =
     ast_nodes = [
     .   node_type = function
         function_arguments = [
@@ -8,7 +8,7 @@
         ]
     ]
 f
-    type = ‘’
+    type =
     ast_nodes = [
     .   node_type = function
         function_arguments = [

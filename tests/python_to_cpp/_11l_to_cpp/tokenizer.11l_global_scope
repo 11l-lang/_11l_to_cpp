@@ -1,26 +1,26 @@
 keywords
-    type = ‘’
+    type =
     ast_nodes = []
 empty_list_of_str
-    type = ‘’
+    type =
     ast_nodes = []
 binary_operators
-    type = ‘’
+    type =
     ast_nodes = []
 unary_operators
-    type = ‘’
+    type =
     ast_nodes = []
 all_operators
-    type = ‘’
+    type =
     ast_nodes = []
 operators
-    type = ‘’
+    type =
     ast_nodes = []
 first_char_of_operators
-    type = ‘’
+    type =
     ast_nodes = []
 Error
-    type = ‘’
+    type =
     ast_nodes = [
     .   node_type = type
         constructors = [
@@ -31,7 +31,7 @@ Error
         ]
     ]
 Token
-    type = ‘’
+    type =
     ast_nodes = [
     .   node_type = type
         constructors = [
@@ -43,7 +43,7 @@ Token
         ]
     ]
 tokenize
-    type = ‘’
+    type =
     ast_nodes = [
     .   node_type = function
         function_arguments = [

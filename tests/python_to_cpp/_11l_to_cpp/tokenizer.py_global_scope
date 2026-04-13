@@ -12,16 +12,16 @@ unary_operators
     type = List
     node = N
 all_operators
-    type = ‘’
+    type =
     node = N
 operators
     type = List
     node = N
 first_char_of_operators
-    type = ‘’
+    type =
     node = N
 tokenize
-    type = ‘’
+    type =
     node
         function_arguments = [
         .   name = source

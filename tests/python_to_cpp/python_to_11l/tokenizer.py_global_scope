@@ -9,10 +9,10 @@ delimiters
     type = List
     node = N
 operators_and_delimiters
-    type = ‘’
+    type =
     node = N
 tokenize
-    type = ‘’
+    type =
     node
         function_arguments = [
         .   name = source

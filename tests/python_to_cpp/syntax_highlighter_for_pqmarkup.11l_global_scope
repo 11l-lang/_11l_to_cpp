@@ -1,14 +1,14 @@
 css
-    type = ‘’
+    type =
     ast_nodes = []
 cat_to_class_python
-    type = ‘’
+    type =
     ast_nodes = []
 cat_to_class_11l
-    type = ‘’
+    type =
     ast_nodes = []
 is_lang_supported
-    type = ‘’
+    type =
     ast_nodes = [
     .   node_type = function
         function_arguments = [
@@ -16,7 +16,7 @@ is_lang_supported
         ]
     ]
 Error
-    type = ‘’
+    type =
     ast_nodes = [
     .   node_type = type
         constructors = [
@@ -27,7 +27,7 @@ Error
         ]
     ]
 highlight
-    type = ‘’
+    type =
     ast_nodes = [
     .   node_type = function
         function_arguments = [

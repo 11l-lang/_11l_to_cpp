@@ -12,13 +12,13 @@ cat_to_class_11l
     type = Dict
     node = N
 is_lang_supported
-    type = ‘’
+    type =
     node
         function_arguments = [
         .   name = lang
         ]
 highlight
-    type = ‘’
+    type =
     node
         function_arguments = [
         .   name = lang
