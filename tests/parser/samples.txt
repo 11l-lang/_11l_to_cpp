@@ -2725,3 +2725,14 @@ struct CodeBlock1
         print(GRID.lowercase().replace(make_tuple(u" "_S, u"\n"_S), u""_S));
     }
 } code_block_1;
+
+
+print(Char(digit' 15, radix' 16))
+===
+struct CodeBlock1
+{
+    CodeBlock1()
+    {
+        print(char_from_digit_with_radix(15, 16));
+    }
+} code_block_1;

@@ -688,6 +688,8 @@ class SymbolNode:
                 elif func_name == 'Char' and self.children[1] is not None and self.children[1].token_str() == "string'":
                     return 'Char(' + self.children[2].to_str() + ')'
                 elif func_name == 'Char' and self.children[1] is not None and self.children[1].token_str() == "digit'":
+                    if len(self.children) == 5 and self.children[3] is not None and self.children[3].token_str() == "radix'":
+                        return 'char_from_digit_with_radix(' + self.children[2].to_str() + ', ' + self.children[4].to_str() + ')'
                     return 'char_from_digit(' + self.children[2].to_str() + ')'
                 elif func_name == 'Time' and len(self.children) == 3 and self.children[1] is not None and self.children[1].token_str() == "unix_time'":
                     return 'timens::from_unix_time(' + self.children[2].to_str() + ')'
@@ -2579,7 +2581,7 @@ russian_names = {
      'Цел': 'Int', 'Цел8':'Int8',  'Цел16': 'Int16',  'Цел32': 'Int32',  'Цел64': 'Int64',  'ДлЦел': 'Long',  'ЦелУкз': 'IntPtr',  'Размер': 'Size', 'Укз':'Ptr', 'как':'as',
     'БЦел':'UInt', 'Байт':'Byte', 'БЦел16':'UInt16', 'БЦел32':'UInt32', 'БЦел64':'UInt64', 'БДлЦел':'ULong', 'БЦелУкз':'UIntPtr', 'БРазмер':'USize', 'БолЦел':'BigInt',
     'Вещ':'Float', 'ВещО':'SFloat', 'Вещ32':'Float32', 'Вещ64':'Float64',
-    'Символ':'Char', 'код':'code', "код'":"code'", "цифра'":"digit'", "строка'":"string'",
+    'Символ':'Char', 'код':'code', "код'":"code'", "цифра'":"digit'", "основание'":"radix'", "строка'":"string'",
      'е_цифра':'is_digit', 'е_буква':'is_alpha', 'е_ниж_рег':'is_lowercase', 'е_верх_рег':'is_uppercase', 'ниж_рег':'lowercase', 'верх_рег':'uppercase',
     'Строка':'String', 'длина':'len', 'пуста':'empty', 'пусто':'empty', 'посл':'last', 'начин_с':'starts_with', 'начин_на':'starts_with', 'закан_на':'ends_with',
      'колво':'count', 'только_цифры':'is_digit', 'только_буквы':'is_alpha', 'сократить':'trim',

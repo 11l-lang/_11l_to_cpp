@@ -992,6 +992,17 @@ inline Char char_from_digit(Int i)
 	throw ValueError(i);
 }
 
+inline Char char_from_digit_with_radix(Int i, Int base)
+{
+	if (!(base >= 2 && base <= 36))
+		throw AssertionError();
+	if (in(i, range_el(Int(0), Int(base)))) {
+		static const char16_t alphabet[] = u"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		return Char(alphabet[i]);
+	}
+	throw ValueError(i);
+}
+
 template <typename TInt, typename CharTy> inline TInt to_int_t(const CharTy *s)
 {
 	TInt res = 0, sign = 1;
