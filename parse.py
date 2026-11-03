@@ -579,7 +579,7 @@ class SymbolNode:
             return nfmtstr + '.format(' + format_args + ')'
 
         if self.token.category == Token.Category.CONSTANT:
-            return {'N': 'nullptr', 'Н': 'nullptr', 'null': 'nullptr', 'нулл': 'nullptr', '0B': 'false', '0В': 'false', '1B': 'true', '1В': 'true'}[self.token_str()]
+            return {'N': 'nullptr', 'Н': 'nullptr', 'null': 'nullptr', 'нулл': 'nullptr', '0B': 'false', '0Л': 'false', '1B': 'true', '1Л': 'true'}[self.token_str()]
 
         def is_char(child):
             ts = child.token_str()
@@ -2577,7 +2577,7 @@ cpp_keywords = {'alignas', 'alignof', 'and', 'and_eq', 'asm', 'auto', 'bitand', 
 russian_names = {
     'ввод':'input', 'вывод':'print', "кон'":"end'", 'вывод_эл':'print_elements', "разд'":"sep'", 'завершить':'exit', 'скоп':'copy', 'перем':'move', 'сортй':'sorted', 'обратный':'reversed',
     'обмен':'swap', 'все':'all', 'любой':'any', 'сумма':'sum', 'нод':'gcd', 'шаг':'step', 'формат':'format',
-    'Пуст':'Void', 'Бул':'Bool', 'Нулловый':'Nullable',
+    'Пуст':'Void', 'Лог':'Bool', 'Нулловый':'Nullable',
      'Цел': 'Int', 'Цел8':'Int8',  'Цел16': 'Int16',  'Цел32': 'Int32',  'Цел64': 'Int64',  'ДлЦел': 'Long',  'ЦелУкз': 'IntPtr',  'Размер': 'Size', 'Укз':'Ptr', 'как':'as',
     'БЦел':'UInt', 'Байт':'Byte', 'БЦел16':'UInt16', 'БЦел32':'UInt32', 'БЦел64':'UInt64', 'БДлЦел':'ULong', 'БЦелУкз':'UIntPtr', 'БРазмер':'USize', 'БолЦел':'BigInt',
     'Вещ':'Float', 'ВещО':'SFloat', 'Вещ32':'Float32', 'Вещ64':'Float64',

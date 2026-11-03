@@ -469,7 +469,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                     category = Token.Category.NAME
 
             elif '0' <= ch <= '9' or (ch == '.' and '0' <= source[i:i+1] <= '9'): # this is NUMERIC_LITERAL or CONSTANT 0B or 1B
-                if ch in '01' and source[i:i+1] in ('B', 'В') and not (is_hexadecimal_digit(source[i+1:i+2]) or source[i+1:i+2] == "'"):
+                if ch in '01' and source[i:i+1] in ('B', 'Л') and not (is_hexadecimal_digit(source[i+1:i+2]) or source[i+1:i+2] == "'"):
                     i += 1
                     category = Token.Category.CONSTANT
                 else:
