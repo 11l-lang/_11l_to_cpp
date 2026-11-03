@@ -40,7 +40,7 @@ Char = str
 keywords = ['V',   'C',  'I',    'E',     'F',  'L',    'N',    'R',       'S',       'T',    'X',
             'П',   'С',  'Е',    'И',     'Ф',  'Ц',    'Н',    'Р',       'В',       'Т',    'К',
             'var', 'in', 'if',   'else',  'fn', 'loop', 'null', 'return',  'switch',  'type', 'exception',
-            'пер', 'св', 'если', 'иначе', 'фн', 'цикл', 'нуль', 'вернуть', 'выбрать', 'тип',  'исключение']
+            'пер', 'св', 'если', 'иначе', 'фн', 'цикл', 'нулл', 'вернуть', 'выбрать', 'тип',  'исключение']
 #keywords.remove('C'); keywords.remove('С'); keywords.remove('in'); keywords.remove('св') # it is more convenient to consider C/in as an operator, not a keyword (however, this line is not necessary)
 empty_list_of_str : List[str] = []
 binary_operators : List[Set[str]] = [] # `initializer_list` does not support move-only types (like `Set`) ([https://stackoverflow.com/questions/8193102/initializer-list-and-move-semantics <- google:‘initializer_list rvalue’])
@@ -369,7 +369,7 @@ def tokenize(source : str, implied_scopes : List[Tuple[Char, int]] = None, line_
                         category = Token.Category.NAME
                         if source[i:i+1] == '&':
                             i += 1
-                    elif source[lexem_start:i] in ('N', 'Н', 'null', 'нуль'):
+                    elif source[lexem_start:i] in ('N', 'Н', 'null', 'нулл'):
                         category = Token.Category.CONSTANT
                     else:
                         category = Token.Category.KEYWORD

@@ -322,7 +322,7 @@ class SymbolNode:
         elif self.symbol.id == ':':
             return self.children[0].to_type_str() + ':' + self.children[1].to_type_str()
 
-        assert(self.token.category == Token.Category.NAME or (self.token.category == Token.Category.CONSTANT and self.token.value(source) in ('N', 'Н', 'null', 'нуль')))
+        assert(self.token.category == Token.Category.NAME or (self.token.category == Token.Category.CONSTANT and self.token.value(source) in ('N', 'Н', 'null', 'нулл')))
         return self.token_str()
 
     inside_it_lambda: ClassVar = False
@@ -402,7 +402,7 @@ class SymbolNode:
                     return 'std::move(' + self.token_str() + ')'
 
             if tid is not None and len(tid.ast_nodes) and isinstance(tid.ast_nodes[0], ASTVariableDeclaration) and tid.ast_nodes[0].type.endswith('?'):
-                if self.parent is None or (not (self.parent.symbol.id in ('==', '!=') and self.parent.children[1].token_str() in ('N', 'Н', 'null', 'нуль'))
+                if self.parent is None or (not (self.parent.symbol.id in ('==', '!=') and self.parent.children[1].token_str() in ('N', 'Н', 'null', 'нулл'))
                                        and not (self.parent.symbol.id == '.')
                                        and not (self.parent.symbol.id == '?')
                                        and not (self.parent.symbol.id == '!' and self.parent.postfix)
@@ -579,7 +579,7 @@ class SymbolNode:
             return nfmtstr + '.format(' + format_args + ')'
 
         if self.token.category == Token.Category.CONSTANT:
-            return {'N': 'nullptr', 'Н': 'nullptr', 'null': 'nullptr', 'нуль': 'nullptr', '0B': 'false', '0В': 'false', '1B': 'true', '1В': 'true'}[self.token_str()]
+            return {'N': 'nullptr', 'Н': 'nullptr', 'null': 'nullptr', 'нулл': 'nullptr', '0B': 'false', '0В': 'false', '1B': 'true', '1В': 'true'}[self.token_str()]
 
         def is_char(child):
             ts = child.token_str()
@@ -839,7 +839,7 @@ class SymbolNode:
                                 raise Error('too many arguments for function `' + func_name + '`', self.children[0].left_to_right_token())
                             if f_node.first_named_only_argument is not None and last_function_arg >= f_node.first_named_only_argument:
                                 raise Error('argument `' + f_node.function_arguments[last_function_arg].outer_name + '` of function `' + func_name + '` is named-only', self.children[i+1].token)
-                            if f_node.function_arguments[last_function_arg].qualifier == '&' and not (self.children[i+1].symbol.id in ('&', 'T &') and len(self.children[i+1].children) == 1) and self.children[i+1].token_str() not in ('N', 'Н', 'null', 'нуль'):
+                            if f_node.function_arguments[last_function_arg].qualifier == '&' and not (self.children[i+1].symbol.id in ('&', 'T &') and len(self.children[i+1].children) == 1) and self.children[i+1].token_str() not in ('N', 'Н', 'null', 'нулл'):
                                 raise Error('argument `' + f_node.function_arguments[last_function_arg].outer_name + '` of function `' + func_name + '` is in-out, but there is no `&` prefix', self.children[i+1].token)
                             if f_node.function_arguments[last_function_arg].type_name == 'File?':
                                 tid = self.scope.find(self.children[i+1].token_str())
@@ -873,7 +873,7 @@ class SymbolNode:
                                         raise Error('please correct order of argument `' + argument_name + '`', self.children[i].token)
                                 raise Error('argument `' + argument_name + '` is not found in function `' + func_name + '`', self.children[i].token)
                             if f_node.function_arguments[last_function_arg].outer_name == argument_name:
-                                if f_node.function_arguments[last_function_arg].qualifier == '&' and not (self.children[i+1].symbol.id in ('&', 'T &') and len(self.children[i+1].children) == 1) and self.children[i+1].token_str() not in ('N', 'Н', 'null', 'нуль'):
+                                if f_node.function_arguments[last_function_arg].qualifier == '&' and not (self.children[i+1].symbol.id in ('&', 'T &') and len(self.children[i+1].children) == 1) and self.children[i+1].token_str() not in ('N', 'Н', 'null', 'нулл'):
                                     raise Error('argument `' + f_node.function_arguments[last_function_arg].outer_name + '` of function `' + func_name + '` is in-out, but there is no `&` prefix', self.children[i+1].token)
                                 last_function_arg += 1
                                 break
@@ -881,7 +881,7 @@ class SymbolNode:
                                 raise Error('argument `' + f_node.function_arguments[last_function_arg].outer_name + '` of function `' + func_name + '` has no default value, please specify its value here', self.children[i].token)
                             res += f_node.function_arguments[last_function_arg].default_value + ', '
                             last_function_arg += 1
-                        if f_node.function_arguments[last_function_arg-1].type_name.endswith('?') and not '->' in f_node.function_arguments[last_function_arg-1].type_name and self.children[i+1].token_str() not in ('N', 'Н', 'null', 'нуль'):
+                        if f_node.function_arguments[last_function_arg-1].type_name.endswith('?') and not '->' in f_node.function_arguments[last_function_arg-1].type_name and self.children[i+1].token_str() not in ('N', 'Н', 'null', 'нулл'):
                             res += '&'
                         res += 'make_ref('*make_ref + self.children[i+1].to_str() + ')'*make_ref
                     if i < len(self.children)-2:
@@ -2577,7 +2577,7 @@ cpp_keywords = {'alignas', 'alignof', 'and', 'and_eq', 'asm', 'auto', 'bitand', 
 russian_names = {
     'ввод':'input', 'вывод':'print', "кон'":"end'", 'вывод_эл':'print_elements', "разд'":"sep'", 'завершить':'exit', 'скоп':'copy', 'перем':'move', 'сортй':'sorted', 'обратный':'reversed',
     'обмен':'swap', 'все':'all', 'любой':'any', 'сумма':'sum', 'нод':'gcd', 'шаг':'step', 'формат':'format',
-    'Пуст':'Void', 'Бул':'Bool',
+    'Пуст':'Void', 'Бул':'Bool', 'Нулловый':'Nullable',
      'Цел': 'Int', 'Цел8':'Int8',  'Цел16': 'Int16',  'Цел32': 'Int32',  'Цел64': 'Int64',  'ДлЦел': 'Long',  'ЦелУкз': 'IntPtr',  'Размер': 'Size', 'Укз':'Ptr', 'как':'as',
     'БЦел':'UInt', 'Байт':'Byte', 'БЦел16':'UInt16', 'БЦел32':'UInt32', 'БЦел64':'UInt64', 'БДлЦел':'ULong', 'БЦелУкз':'UIntPtr', 'БРазмер':'USize', 'БолЦел':'BigInt',
     'Вещ':'Float', 'ВещО':'SFloat', 'Вещ32':'Float32', 'Вещ64':'Float64',
@@ -3339,7 +3339,7 @@ def parse_internal(this_node):
                     next_token()
                     if token.value(source) == '->':
                         next_token()
-                        if token.value(source) in ('N', 'Н', 'null', 'нуль'):
+                        if token.value(source) in ('N', 'Н', 'null', 'нулл'):
                             node.function_return_type = token.value(source)
                             next_token()
                         elif token.value(source) == '&':
@@ -3932,7 +3932,7 @@ def parse_internal(this_node):
                         if len(node_expression.children) == 1 and node_expression.children[0].symbol.id == '->':
                             node.function_pointer = True
                             c0 = node_expression.children[0]
-                            assert(c0.children[1].token.category == Token.Category.NAME or c0.children[1].token_str() in ('N', 'Н', 'null', 'нуль'))
+                            assert(c0.children[1].token.category == Token.Category.NAME or c0.children[1].token_str() in ('N', 'Н', 'null', 'нулл'))
                             node.type = c0.children[1].token_str() # return value type
                             if c0.children[0].token.category == Token.Category.NAME:
                                 node.type_args.append(c0.children[0].token_str())
